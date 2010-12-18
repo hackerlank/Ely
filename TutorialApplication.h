@@ -19,7 +19,8 @@
 
 #include "BaseApplication.h"
 
-class TutorialApplication: public BaseApplication {
+class TutorialApplication: public BaseApplication
+{
 public:
 	TutorialApplication(void);
 	virtual ~TutorialApplication(void);

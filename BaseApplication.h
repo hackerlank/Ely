@@ -88,8 +88,8 @@ protected:
 
     //OIS Input devices
     OIS::InputManager* mInputManager;
-    OIS::Mouse*    mMouse;
-    OIS::Keyboard* mKeyboard;
+    OIS::Mouse* mMouse;
+	OIS::Keyboard* mKeyboard;
 };
 
 #endif // #ifndef __BaseApplication_h_
