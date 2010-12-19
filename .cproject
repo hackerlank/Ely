@@ -43,6 +43,7 @@
 <tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1235103925" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 <option id="gnu.cpp.link.option.libs.1450785237" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 <listOptionValue builtIn="false" value="OgreMain_d"/>
+<listOptionValue builtIn="false" value="OgreTerrain_d"/>
 <listOptionValue builtIn="false" value="OIS"/>
 </option>
 <option id="gnu.cpp.link.option.paths.890803978" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
