@@ -28,16 +28,45 @@ TutorialApplication::~TutorialApplication(void)
 void TutorialApplication::createFrameListener(void)
 {
 	BaseApplication::createFrameListener();
+
+	mInfoLabel = mTrayMgr->createLabel(OgreBites::TL_TOP, "TInfo", "", 350);
 }
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
 	bool ret = BaseApplication::frameRenderingQueued(evt);
+
+	if (mTerrainGroup->isDerivedDataUpdateInProgress())
+	{
+		mTrayMgr->moveWidgetToTray(mInfoLabel, OgreBites::TL_TOP, 0);
+		mInfoLabel->show();
+		if (mTerrainsImported)
+		{
+			mInfoLabel->setCaption("Building terrain, please wait...");
+		}
+		else
+		{
+			mInfoLabel->setCaption("Updating textures, patience...");
+		}
+	}
+	else
+	{
+		mTrayMgr->removeWidgetFromTray(mInfoLabel);
+		mInfoLabel->hide();
+		if (mTerrainsImported)
+		{
+			mTerrainGroup->saveAllTerrains(true);
+			mTerrainsImported = false;
+		}
+	}
+
 	return ret;
 }
 //-------------------------------------------------------------------------------------
 void TutorialApplication::destroyScene(void)
 {
+	OGRE_DELETE mTerrainGroup;
+	OGRE_DELETE mTerrainGlobals;
 }
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
@@ -98,6 +127,12 @@ void TutorialApplication::createScene(void)
 
 	mTerrainGroup->freeTemporaryResources();
 
+	//	mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
+	//	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 16);
+	Ogre::Plane plane;
+	plane.d = 1000;
+	plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
+	mSceneMgr->setSkyPlane(true, plane, "Examples/SpaceSkyPlane", 1500, 75);
 }
 //-------------------------------------------------------------------------------------
 void getTerrainImage(bool flipX, bool flipY, Ogre::Image& img)
@@ -130,32 +165,32 @@ void TutorialApplication::defineTerrain(long x, long y)
 void TutorialApplication::initBlendMaps(Ogre::Terrain* terrain)
 {
 	Ogre::TerrainLayerBlendMap* blendMap0 = terrain->getLayerBlendMap(1);
-	    Ogre::TerrainLayerBlendMap* blendMap1 = terrain->getLayerBlendMap(2);
-	    Ogre::Real minHeight0 = 70;
-	    Ogre::Real fadeDist0 = 40;
-	    Ogre::Real minHeight1 = 70;
-	    Ogre::Real fadeDist1 = 15;
-	    float* pBlend1 = blendMap1->getBlendPointer();
-	    for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
-	    {
-	        for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
-	        {
-	            Ogre::Real tx, ty;
+	Ogre::TerrainLayerBlendMap* blendMap1 = terrain->getLayerBlendMap(2);
+	Ogre::Real minHeight0 = 70;
+	Ogre::Real fadeDist0 = 40;
+	Ogre::Real minHeight1 = 70;
+	Ogre::Real fadeDist1 = 15;
+	float* pBlend1 = blendMap1->getBlendPointer();
+	for (Ogre::uint16 y = 0; y < terrain->getLayerBlendMapSize(); ++y)
+	{
+		for (Ogre::uint16 x = 0; x < terrain->getLayerBlendMapSize(); ++x)
+		{
+			Ogre::Real tx, ty;
 
-	            blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
-	            Ogre::Real height = terrain->getHeightAtTerrainPosition(tx, ty);
-	            Ogre::Real val = (height - minHeight0) / fadeDist0;
-	            val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
+			blendMap0->convertImageToTerrainSpace(x, y, &tx, &ty);
+			Ogre::Real height = terrain->getHeightAtTerrainPosition(tx, ty);
+			Ogre::Real val = (height - minHeight0) / fadeDist0;
+			val = Ogre::Math::Clamp(val, (Ogre::Real) 0, (Ogre::Real) 1);
 
-	            val = (height - minHeight1) / fadeDist1;
-	            val = Ogre::Math::Clamp(val, (Ogre::Real)0, (Ogre::Real)1);
-	            *pBlend1++ = val;
-	        }
-	    }
-	    blendMap0->dirty();
-	    blendMap1->dirty();
-	    blendMap0->update();
-	    blendMap1->update();
+			val = (height - minHeight1) / fadeDist1;
+			val = Ogre::Math::Clamp(val, (Ogre::Real) 0, (Ogre::Real) 1);
+			*pBlend1++ = val;
+		}
+	}
+	blendMap0->dirty();
+	blendMap1->dirty();
+	blendMap0->update();
+	blendMap1->update();
 }
 //-------------------------------------------------------------------------------------
 void TutorialApplication::configureTerrainDefaults(Ogre::Light* light)

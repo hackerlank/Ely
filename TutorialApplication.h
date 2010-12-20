@@ -27,6 +27,7 @@ private:
 	Ogre::TerrainGlobalOptions* mTerrainGlobals;
 	Ogre::TerrainGroup* mTerrainGroup;
 	bool mTerrainsImported;
+	OgreBites::Label* mInfoLabel;
 
 	void defineTerrain(long x, long y);
 	void initBlendMaps(Ogre::Terrain* terrain);
