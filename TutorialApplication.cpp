@@ -127,12 +127,42 @@ void TutorialApplication::createScene(void)
 
 	mTerrainGroup->freeTemporaryResources();
 
-	//	mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-	//	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 16);
+	//A option
+//	Ogre::ColourValue fadeColour(0.9, 0.9, 0.9);
+//	mWindow->getViewport(0)->setBackgroundColour(fadeColour);
+//	mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0.0, 50, 500);
+//	mSceneMgr->setFog(Ogre::FOG_EXP, fadeColour, 0.005);
+//	mSceneMgr->setFog(Ogre::FOG_EXP2, fadeColour, 0.003);
+
+//	mSceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
+//	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 16);
+//	Ogre::Plane plane;
+//	plane.d = 1000;
+//	plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
+//	mSceneMgr->setSkyPlane(true, plane, "Examples/SpaceSkyPlane", 1500, 75);
+//	mSceneMgr->setSkyPlane(true, plane, "Examples/SpaceSkyPlane", 1500, 50, true, 1.5f, 150, 150);
+//	mSceneMgr->setSkyPlane(true, plane, "Examples/CloudySky", 1500, 40, true, 1.5f, 150, 150);
+	//B option
+//	Ogre::ColourValue fadeColour(0.9, 0.9, 0.9);
+//	mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0.0, 10, 1200);
+//	mWindow->getViewport(0)->setBackgroundColour(fadeColour);
+//	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8, 500);
+	//C option
+//	Ogre::ColourValue fadeColour(0.9, 0.9, 0.9);
+//	mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0.0, 10, 1200);
+//	mWindow->getViewport(0)->setBackgroundColour(fadeColour);
+//	Ogre::Plane plane;
+//	plane.d = 100;
+//	plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
+//	mSceneMgr->setSkyPlane(true, plane, "Examples/CloudySky", 500, 20, true, 0.5, 150, 150);
+	//D option
+	Ogre::ColourValue fadeColour(0.1, 0.1, 0.1);
+	mWindow->getViewport(0)->setBackgroundColour(fadeColour);
+	mSceneMgr->setFog(Ogre::FOG_LINEAR, fadeColour, 0.0, 10, 150);
 	Ogre::Plane plane;
-	plane.d = 1000;
+	plane.d = 10;
 	plane.normal = Ogre::Vector3::NEGATIVE_UNIT_Y;
-	mSceneMgr->setSkyPlane(true, plane, "Examples/SpaceSkyPlane", 1500, 75);
+	mSceneMgr->setSkyPlane(true, plane, "Examples/SpaceSkyPlane", 100, 45, true, 0.5, 150, 150);
 }
 //-------------------------------------------------------------------------------------
 void getTerrainImage(bool flipX, bool flipY, Ogre::Image& img)
