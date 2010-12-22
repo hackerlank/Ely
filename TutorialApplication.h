@@ -23,24 +23,16 @@
 #include <Terrain/OgreTerrainGroup.h>
 class TutorialApplication: public BaseApplication
 {
-private:
-	Ogre::TerrainGlobalOptions* mTerrainGlobals;
-	Ogre::TerrainGroup* mTerrainGroup;
-	bool mTerrainsImported;
-	OgreBites::Label* mInfoLabel;
-
-	void defineTerrain(long x, long y);
-	void initBlendMaps(Ogre::Terrain* terrain);
-	void configureTerrainDefaults(Ogre::Light* light);
 public:
 	TutorialApplication(void);
 	virtual ~TutorialApplication(void);
 
 protected:
-	virtual void createScene(void);
-	virtual void createFrameListener(void);
-	virtual void destroyScene(void);
-	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    virtual void createScene(void);
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+private:
+	bool processUnbufferedInput(const Ogre::FrameEvent& evt);
+
 };
 
 #endif // #ifndef __TutorialApplication_h_
