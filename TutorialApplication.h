@@ -17,46 +17,36 @@
 #ifndef __TutorialApplication_h_
 #define __TutorialApplication_h_
 
-#include <OgreRoot.h>
-#include <OgreConfigFile.h>
-#include <OgreException.h>
-#include <OgreCamera.h>
-#include <OgreViewport.h>
-#include <OgreSceneManager.h>
-#include <OgreRenderWindow.h>
-#include <OgreEntity.h>
-#include <OgreWindowEventUtilities.h>
+#include "BaseApplication.h"
 
-#include <OIS/OISEvents.h>
-#include <OIS/OISInputManager.h>
-#include <OIS/OISKeyboard.h>
-#include <OIS/OISMouse.h>
+#include <CEGUI.h>
+#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
 
-class TutorialApplication: public Ogre::WindowEventListener, public Ogre::FrameListener
+class TutorialApplication : public BaseApplication
 {
 public:
 	TutorialApplication(void);
-	virtual ~TutorialApplication(void);
-	bool go(void);
+    virtual ~TutorialApplication(void);
 
 protected:
-	// Ogre::WindowEventListener
-	virtual void windowResized(Ogre::RenderWindow* rw);
-	virtual void windowClosed(Ogre::RenderWindow* rw);
-	// Ogre::FrameListener
-	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+    CEGUI::OgreRenderer* mRenderer;
 
-private:
-	Ogre::Root* mRoot;
-	Ogre::String mPluginsCfg;
-	Ogre::String mResourcesCfg;
-	Ogre::RenderWindow* mWindow;
-	Ogre::SceneManager* mSceneMgr;
-	Ogre::Camera* mCamera;
-	// OIS Input devices
-	OIS::InputManager* mInputManager;
-	OIS::Mouse* mMouse;
-	OIS::Keyboard* mKeyboard;
+    virtual void createScene(void);
+
+    virtual void createFrameListener(void);
+
+    // Ogre::FrameListener
+    virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+
+    // OIS::KeyListener
+    virtual bool keyPressed( const OIS::KeyEvent &arg );
+    virtual bool keyReleased( const OIS::KeyEvent &arg );
+    // OIS::MouseListener
+    virtual bool mouseMoved( const OIS::MouseEvent &arg );
+    virtual bool mousePressed( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+    virtual bool mouseReleased( const OIS::MouseEvent &arg, OIS::MouseButtonID id );
+
+    bool quit(const CEGUI::EventArgs &e);
 };
 
 #endif // #ifndef __TutorialApplication_h_

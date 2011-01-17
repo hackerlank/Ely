@@ -17,102 +17,41 @@
 #include "TutorialApplication.h"
 
 //-------------------------------------------------------------------------------------
-TutorialApplication::TutorialApplication(void) :
-	mRoot(0), mPluginsCfg(Ogre::StringUtil::BLANK)
+TutorialApplication::TutorialApplication(void)
 {
 }
 //-------------------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
 {
-	//Remove ourself as a Window listener
-	Ogre::WindowEventUtilities::removeWindowEventListener(mWindow, this);
-	windowClosed(mWindow);
-	delete mRoot;
+
 }
 //-------------------------------------------------------------------------------------
-bool TutorialApplication::go(void)
+void TutorialApplication::createScene(void)
 {
-#ifdef _DEBUG
-	mResourcesCfg = "resources_d.cfg";
-	mPluginsCfg = "plugins_d.cfg";
-#else
-	mResourcesCfg = "resources.cfg";
-	mPluginsCfg = "plugins.cfg";
-#endif
-
-	// construct Ogre::Root
-	mRoot = new Ogre::Root(mPluginsCfg);
-
-	// setup resources
-	// Load resource paths from config file
-	Ogre::ConfigFile cf;
-	cf.load(mResourcesCfg);
-
-	// Go through all sections & settings in the file
-	Ogre::ConfigFile::SectionIterator seci = cf.getSectionIterator();
-
-	Ogre::String secName, typeName, archName;
-	while (seci.hasMoreElements())
-	{
-		secName = seci.peekNextKey();
-		Ogre::ConfigFile::SettingsMultiMap *settings = seci.getNext();
-		Ogre::ConfigFile::SettingsMultiMap::iterator i;
-		for (i = settings->begin(); i != settings->end(); ++i)
-		{
-			typeName = i->first;
-			archName = i->second;
-			Ogre::ResourceGroupManager::getSingleton().addResourceLocation(
-					archName, typeName, secName);
-		}
-	}
-
-	// configure
-	// Show the configuration dialog and initialise the system
-	if (!(mRoot->restoreConfig() || mRoot->showConfigDialog()))
-	{
-		return false;
-	}
-
-	mWindow = mRoot->initialise(true, "BasicTutorial6 Render Window");
-
-	// Set default mipmap level (NB some APIs ignore this)
-	Ogre::TextureManager::getSingleton().setDefaultNumMipmaps(5);
-	// initialise all resource groups
-	Ogre::ResourceGroupManager::getSingleton().initialiseAllResourceGroups();
-
-	// Create the SceneManager, in this case a generic one
-	mSceneMgr = mRoot->createSceneManager("DefaultSceneManager");
-
-	// Create the camera
-	mCamera = mSceneMgr->createCamera("PlayerCam");
-
-	// Position it at 500 in Z direction
-	mCamera->setPosition(Ogre::Vector3(0, 0, 80));
-	// Look back along -Z
-	mCamera->lookAt(Ogre::Vector3(0, 0, -300));
-	mCamera->setNearClipDistance(5);
-
-	// Create one viewport, entire window
-	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
-
-	// Alter the camera aspect ratio to match the viewport
-	mCamera->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
-			vp->getActualHeight()));
-
-	Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-
-	Ogre::SceneNode* headNode =
-			mSceneMgr->getRootSceneNode()->createChildSceneNode();
-	headNode->attachObject(ogreHead);
-
-	// Set ambient light
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
-
-	// Create a light
-	Ogre::Light* l = mSceneMgr->createLight("MainLight");
-	l->setPosition(20, 80, 50);
-
+	mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+	CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
+	CEGUI::Font::setDefaultResourceGroup("Fonts");
+	CEGUI::Scheme::setDefaultResourceGroup("Schemes");
+	CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
+	CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
+	CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
+	CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook",
+			"MouseArrow");
+	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
+	CEGUI::Window *sheet =
+			wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
+	CEGUI::Window *quit = wmgr.createWindow("TaharezLook/Button",
+			"CEGUIDemo/QuitButton");
+	quit->setText("Quit");
+	quit->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
+	sheet->addChildWindow(quit);
+	CEGUI::System::getSingleton().setGUISheet(sheet);
+	quit->subscribeEvent(CEGUI::PushButton::EventClicked,
+			CEGUI::Event::Subscriber(&TutorialApplication::quit, this));
+}
+//-------------------------------------------------------------------------------------
+void TutorialApplication::createFrameListener(void)
+{
 	Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
 	OIS::ParamList pl;
 	size_t windowHnd = 0;
@@ -125,9 +64,12 @@ bool TutorialApplication::go(void)
 	mInputManager = OIS::InputManager::createInputSystem(pl);
 
 	mKeyboard = static_cast<OIS::Keyboard*> (mInputManager->createInputObject(
-			OIS::OISKeyboard, false));
+			OIS::OISKeyboard, true));
 	mMouse = static_cast<OIS::Mouse*> (mInputManager->createInputObject(
-			OIS::OISMouse, false));
+			OIS::OISMouse, true));
+
+	mMouse->setEventCallback(this);
+	mKeyboard->setEventCallback(this);
 
 	//Set initial mouse clipping size
 	windowResized(mWindow);
@@ -136,55 +78,6 @@ bool TutorialApplication::go(void)
 	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
 
 	mRoot->addFrameListener(this);
-
-	mRoot->startRendering();
-
-	// Render Loop
-//	while (true)
-//	{
-//		// Pump window messages for nice behaviour
-//		Ogre::WindowEventUtilities::messagePump();
-//
-//		if (mWindow->isClosed())
-//		{
-//			return false;
-//		}
-//
-//		// Render a frame
-//		if (!mRoot->renderOneFrame())
-//			return false;
-//	}
-
-	return true;
-}
-//-------------------------------------------------------------------------------------
-//Adjust mouse clipping area
-void TutorialApplication::windowResized(Ogre::RenderWindow* rw)
-{
-	unsigned int width, height, depth;
-	int left, top;
-	rw->getMetrics(width, height, depth, left, top);
-
-	const OIS::MouseState &ms = mMouse->getMouseState();
-	ms.width = width;
-	ms.height = height;
-}
-//-------------------------------------------------------------------------------------
-//Unattach OIS before window shutdown (very important under Linux)
-void TutorialApplication::windowClosed(Ogre::RenderWindow* rw)
-{
-	//Only close for window that created OIS (the main window in these demos)
-	if (rw == mWindow)
-	{
-		if (mInputManager)
-		{
-			mInputManager->destroyInputObject(mMouse);
-			mInputManager->destroyInputObject(mKeyboard);
-
-			OIS::InputManager::destroyInputSystem(mInputManager);
-			mInputManager = 0;
-		}
-	}
 }
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
@@ -192,16 +85,77 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 	if (mWindow->isClosed())
 		return false;
 
+	if (mShutDown)
+		return false;
+
 	//Need to capture/update each device
 	mKeyboard->capture();
 	mMouse->capture();
 
-	if (mKeyboard->isKeyDown(OIS::KC_ESCAPE))
-		return false;
-
 	return true;
 }
 //-------------------------------------------------------------------------------------
+bool TutorialApplication::keyPressed(const OIS::KeyEvent &arg)
+{
+	CEGUI::System &sys = CEGUI::System::getSingleton();
+	sys.injectKeyDown(arg.key);
+	sys.injectChar(arg.text);
+	return true;
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::keyReleased(const OIS::KeyEvent &arg)
+{
+	CEGUI::System::getSingleton().injectKeyUp(arg.key);
+	return true;
+}
+//-------------------------------------------------------------------------------------
+static inline CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
+{
+	switch (buttonID)
+	{
+	case OIS::MB_Left:
+		return CEGUI::LeftButton;
+
+	case OIS::MB_Right:
+		return CEGUI::RightButton;
+
+	case OIS::MB_Middle:
+		return CEGUI::MiddleButton;
+
+	default:
+		return CEGUI::LeftButton;
+	}
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::mouseMoved(const OIS::MouseEvent &arg)
+{
+	CEGUI::System &sys = CEGUI::System::getSingleton();
+	sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
+	// Scroll wheel.
+	if (arg.state.Z.rel)
+		sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
+	return true;
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::mousePressed(const OIS::MouseEvent &arg,
+		OIS::MouseButtonID id)
+{
+	CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
+	return true;
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::mouseReleased(const OIS::MouseEvent &arg,
+		OIS::MouseButtonID id)
+{
+	CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
+	return true;
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::quit(const CEGUI::EventArgs &e)
+{
+	mShutDown = true;
+	return true;
+}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
@@ -214,7 +168,7 @@ extern "C"
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
 #else
 int main(int argc, char *argv[])
 #endif
@@ -228,7 +182,9 @@ int main(int argc, char *argv[])
 	} catch (Ogre::Exception& e)
 	{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+		MessageBox(NULL, e.getFullDescription().c_str(),
+				"An exception has occured!", MB_OK | MB_ICONERROR
+				| MB_TASKMODAL);
 #else
 		std::cerr << "An exception has occured: "
 				<< e.getFullDescription().c_str() << std::endl;
