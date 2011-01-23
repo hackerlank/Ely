@@ -15,9 +15,11 @@
  -----------------------------------------------------------------------------
  */
 #include "TutorialApplication.h"
+#define CAMERA_NAME "SceneCamera"
 
 //-------------------------------------------------------------------------------------
-TutorialApplication::TutorialApplication(void)
+TutorialApplication::TutorialApplication(void) :
+	mPrimarySceneMgr(0), mSecondarySceneMgr(0), mDual(false)
 {
 }
 //-------------------------------------------------------------------------------------
@@ -26,62 +28,74 @@ TutorialApplication::~TutorialApplication(void)
 
 }
 //-------------------------------------------------------------------------------------
+//Local Functions
+void TutorialApplication::setupViewport(Ogre::SceneManager *curr)
+{
+	mWindow->removeAllViewports();
+
+	Ogre::Camera *cam = curr->getCamera(CAMERA_NAME); //The Camera
+	Ogre::Viewport *vp = mWindow->addViewport(cam); //Our Viewport linked to the camera
+
+	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+	cam->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
+			vp->getActualHeight()));
+}
+
+void TutorialApplication::dualViewport(Ogre::SceneManager *primarySceneMgr,
+		Ogre::SceneManager *secondarySceneMgr)
+{
+	mWindow->removeAllViewports();
+
+	Ogre::Viewport *vp = 0;
+	Ogre::Camera *cam = primarySceneMgr->getCamera(CAMERA_NAME);
+	vp = mWindow->addViewport(cam, 0, 0, 0, 0.5, 1);
+	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+	cam->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
+			vp->getActualHeight()));
+
+	cam = secondarySceneMgr->getCamera(CAMERA_NAME);
+	vp = mWindow->addViewport(cam, 1, 0.5, 0, 0.5, 1);
+	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
+	cam->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
+			vp->getActualHeight()));
+}
+
+static void swap(Ogre::SceneManager *&first, Ogre::SceneManager *&second)
+{
+	Ogre::SceneManager *tmp = first;
+	first = second;
+	second = tmp;
+}
+
+//-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
-	mRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-	CEGUI::Imageset::setDefaultResourceGroup("Imagesets");
-	CEGUI::Font::setDefaultResourceGroup("Fonts");
-	CEGUI::Scheme::setDefaultResourceGroup("Schemes");
-	CEGUI::WidgetLookManager::setDefaultResourceGroup("LookNFeel");
-	CEGUI::WindowManager::setDefaultResourceGroup("Layouts");
-	CEGUI::SchemeManager::getSingleton().create("TaharezLook.scheme");
-	CEGUI::System::getSingleton().setDefaultMouseCursor("TaharezLook",
-			"MouseArrow");
-	CEGUI::WindowManager &wmgr = CEGUI::WindowManager::getSingleton();
-	CEGUI::Window *sheet =
-			wmgr.createWindow("DefaultWindow", "CEGUIDemo/Sheet");
-	CEGUI::Window *quit = wmgr.createWindow("TaharezLook/Button",
-			"CEGUIDemo/QuitButton");
-	quit->setText("Quit");
-	quit->setSize(CEGUI::UVector2(CEGUI::UDim(0.15, 0), CEGUI::UDim(0.05, 0)));
-	sheet->addChildWindow(quit);
-	CEGUI::System::getSingleton().setGUISheet(sheet);
-	quit->subscribeEvent(CEGUI::PushButton::EventClicked,
-			CEGUI::Event::Subscriber(&TutorialApplication::quit, this));
-
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(1, 1, 1));
-	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
-	Ogre::Entity* ogreHead = mSceneMgr->createEntity("Head", "ogrehead.mesh");
-	Ogre::SceneNode* headNode =
-			mSceneMgr->getRootSceneNode()->createChildSceneNode(Ogre::Vector3(
-					0, 0, -300));
-	headNode->attachObject(ogreHead);
-	Ogre::TexturePtr tex = mRoot->getTextureManager()->createManual("RTT",
-			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
-			Ogre::TEX_TYPE_2D, 512, 512, 0, Ogre::PF_R8G8B8,
-			Ogre::TU_RENDERTARGET);
-	Ogre::RenderTexture *rtex = tex->getBuffer()->getRenderTarget();
-	Ogre::Camera *cam = mSceneMgr->createCamera("RTTCam");
-	cam->setPosition(100, -100, -400);
-	cam->lookAt(0, 0, -300);
-	Ogre::Viewport *v = rtex->addViewport(cam);
-	v->setOverlaysEnabled(false);
-	v->setClearEveryFrame(true);
-	v->setBackgroundColour(Ogre::ColourValue::Black);
-	CEGUI::Texture &guiTex = mRenderer->createTexture(tex);
-	CEGUI::Imageset &imageSet = CEGUI::ImagesetManager::getSingleton().create(
-			"RTTImageset", guiTex);
-	imageSet.defineImage("RTTImage", CEGUI::Point(0.0f, 0.0f), CEGUI::Size(
-			guiTex.getSize().d_width, guiTex.getSize().d_height), CEGUI::Point(
-			0.0f, 0.0f));
-	CEGUI::Window *si = CEGUI::WindowManager::getSingleton().createWindow(
-			"TaharezLook/StaticImage", "RTTWindow");
-	si->setSize(CEGUI::UVector2(CEGUI::UDim(0.5f, 0), CEGUI::UDim(0.4f, 0)));
-	si->setPosition(CEGUI::UVector2(CEGUI::UDim(0.5f, 0), CEGUI::UDim(0.0f, 0)));
-	si->setProperty("Image", CEGUI::PropertyHelper::imageToString(
-			&imageSet.getImage("RTTImage")));
-	sheet->addChildWindow(si);
+	// Setup the space SceneManager
+	mPrimarySceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
+	// Setup the Cloudy SceneManager
+	mSecondarySceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 }
+//-------------------------------------------------------------------------------------
+void TutorialApplication::chooseSceneManager(void)
+{
+	mPrimarySceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "primary");
+	mSecondarySceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC,
+			"secondary");
+}
+
+//-------------------------------------------------------------------------------------
+void TutorialApplication::createCamera()
+{
+	mPrimarySceneMgr->createCamera(CAMERA_NAME);
+	mSecondarySceneMgr->createCamera(CAMERA_NAME);
+}
+
+//-------------------------------------------------------------------------------------
+void TutorialApplication::createViewports()
+{
+	setupViewport(mPrimarySceneMgr);
+}
+
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createFrameListener(void)
 {
@@ -112,6 +126,7 @@ void TutorialApplication::createFrameListener(void)
 
 	mRoot->addFrameListener(this);
 }
+
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
@@ -127,68 +142,61 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 
 	return true;
 }
+
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::keyPressed(const OIS::KeyEvent &arg)
 {
-	CEGUI::System &sys = CEGUI::System::getSingleton();
-	sys.injectKeyDown(arg.key);
-	sys.injectChar(arg.text);
+	if (arg.key == OIS::KC_ESCAPE)
+	{
+		mShutDown = true;
+	}
+	else if (arg.key == OIS::KC_V)
+	{
+		mDual = !mDual;
+
+		if (mDual)
+			dualViewport(mPrimarySceneMgr, mSecondarySceneMgr);
+		else
+			setupViewport(mPrimarySceneMgr);
+	}
+	else if (arg.key == OIS::KC_C)
+	{
+		swap(mPrimarySceneMgr, mSecondarySceneMgr);
+
+		if (mDual)
+			dualViewport(mPrimarySceneMgr, mSecondarySceneMgr);
+		else
+			setupViewport(mPrimarySceneMgr);
+	}
+
 	return true;
 }
+
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::keyReleased(const OIS::KeyEvent &arg)
 {
-	CEGUI::System::getSingleton().injectKeyUp(arg.key);
 	return true;
 }
-//-------------------------------------------------------------------------------------
-static inline CEGUI::MouseButton convertButton(OIS::MouseButtonID buttonID)
-{
-	switch (buttonID)
-	{
-	case OIS::MB_Left:
-		return CEGUI::LeftButton;
 
-	case OIS::MB_Right:
-		return CEGUI::RightButton;
-
-	case OIS::MB_Middle:
-		return CEGUI::MiddleButton;
-
-	default:
-		return CEGUI::LeftButton;
-	}
-}
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::mouseMoved(const OIS::MouseEvent &arg)
 {
-	CEGUI::System &sys = CEGUI::System::getSingleton();
-	sys.injectMouseMove(arg.state.X.rel, arg.state.Y.rel);
-	// Scroll wheel.
-	if (arg.state.Z.rel)
-		sys.injectMouseWheelChange(arg.state.Z.rel / 120.0f);
 	return true;
 }
-//-------------------------------------------------------------------------------------
+
 bool TutorialApplication::mousePressed(const OIS::MouseEvent &arg,
 		OIS::MouseButtonID id)
 {
-	CEGUI::System::getSingleton().injectMouseButtonDown(convertButton(id));
 	return true;
 }
+
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::mouseReleased(const OIS::MouseEvent &arg,
 		OIS::MouseButtonID id)
 {
-	CEGUI::System::getSingleton().injectMouseButtonUp(convertButton(id));
 	return true;
 }
 //-------------------------------------------------------------------------------------
-bool TutorialApplication::quit(const CEGUI::EventArgs &e)
-{
-	mShutDown = true;
-	return true;
-}
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
