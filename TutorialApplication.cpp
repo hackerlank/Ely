@@ -18,182 +18,147 @@
 #define CAMERA_NAME "SceneCamera"
 
 //-------------------------------------------------------------------------------------
-TutorialApplication::TutorialApplication(void) :
-	mPrimarySceneMgr(0), mSecondarySceneMgr(0), mDual(false)
+TutorialApplication::TutorialApplication(void)
 {
 }
 //-------------------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
 {
-
 }
-//-------------------------------------------------------------------------------------
-//Local Functions
-void TutorialApplication::setupViewport(Ogre::SceneManager *curr)
-{
-	mWindow->removeAllViewports();
-
-	Ogre::Camera *cam = curr->getCamera(CAMERA_NAME); //The Camera
-	Ogre::Viewport *vp = mWindow->addViewport(cam); //Our Viewport linked to the camera
-
-	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
-	cam->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
-			vp->getActualHeight()));
-}
-
-void TutorialApplication::dualViewport(Ogre::SceneManager *primarySceneMgr,
-		Ogre::SceneManager *secondarySceneMgr)
-{
-	mWindow->removeAllViewports();
-
-	Ogre::Viewport *vp = 0;
-	Ogre::Camera *cam = primarySceneMgr->getCamera(CAMERA_NAME);
-	vp = mWindow->addViewport(cam, 0, 0, 0, 0.5, 1);
-	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
-	cam->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
-			vp->getActualHeight()));
-
-	cam = secondarySceneMgr->getCamera(CAMERA_NAME);
-	vp = mWindow->addViewport(cam, 1, 0.5, 0, 0.5, 1);
-	vp->setBackgroundColour(Ogre::ColourValue(0, 0, 0));
-	cam->setAspectRatio(Ogre::Real(vp->getActualWidth()) / Ogre::Real(
-			vp->getActualHeight()));
-}
-
-static void swap(Ogre::SceneManager *&first, Ogre::SceneManager *&second)
-{
-	Ogre::SceneManager *tmp = first;
-	first = second;
-	second = tmp;
-}
-
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
-	// Setup the space SceneManager
-	mPrimarySceneMgr->setSkyBox(true, "Examples/SpaceSkyBox");
-	// Setup the Cloudy SceneManager
-	mSecondarySceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
-}
-//-------------------------------------------------------------------------------------
-void TutorialApplication::chooseSceneManager(void)
-{
-	mPrimarySceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC, "primary");
-	mSecondarySceneMgr = mRoot->createSceneManager(Ogre::ST_GENERIC,
-			"secondary");
-}
+	// Set the default lighting.
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
+	// Create the entity
+	mEntity = mSceneMgr->createEntity("Robot", "robot.mesh");
 
-//-------------------------------------------------------------------------------------
-void TutorialApplication::createCamera()
-{
-	mPrimarySceneMgr->createCamera(CAMERA_NAME);
-	mSecondarySceneMgr->createCamera(CAMERA_NAME);
-}
+	// Create the scene node
+	mNode = mSceneMgr->getRootSceneNode()-> createChildSceneNode("RobotNode",
+			Ogre::Vector3(0.0f, 0.0f, 25.0f));
+	mNode->attachObject(mEntity);
 
-//-------------------------------------------------------------------------------------
-void TutorialApplication::createViewports()
-{
-	setupViewport(mPrimarySceneMgr);
-}
+	// Create the walking list
+	mWalkList.push_back(Ogre::Vector3(550.0f, 0.0f, 50.0f));
+	mWalkList.push_back(Ogre::Vector3(-100.0f, 0.0f, -200.0f));
+	mWalkList.push_back(Ogre::Vector3(-550.0f, 0.0f, 50.0f));
 
+	// Create objects so we can see movement
+	Ogre::Entity *ent;
+	Ogre::SceneNode *node;
+
+	ent = mSceneMgr->createEntity("Knot1", "knot.mesh");
+	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot1Node",
+			Ogre::Vector3(0.0f, -10.0f, 25.0f));
+	node->attachObject(ent);
+	node->setScale(0.1f, 0.1f, 0.1f);
+
+	ent = mSceneMgr->createEntity("Knot2", "knot.mesh");
+	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot2Node",
+			Ogre::Vector3(550.0f, -10.0f, 50.0f));
+	node->attachObject(ent);
+	node->setScale(0.1f, 0.1f, 0.1f);
+
+	ent = mSceneMgr->createEntity("Knot3", "knot.mesh");
+	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot3Node",
+			Ogre::Vector3(-100.0f, -10.0f, -200.0f));
+	node->attachObject(ent);
+	node->setScale(0.1f, 0.1f, 0.1f);
+
+	ent = mSceneMgr->createEntity("Knot4", "knot.mesh");
+	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot4Node",
+			Ogre::Vector3(-550.0f, -10.0f, 50.0f));
+	node->attachObject(ent);
+	node->setScale(0.1f, 0.1f, 0.1f);
+
+	// Set the camera to look at our handiwork
+	mCamera->setPosition(90.0f, 280.0f, 535.0f);
+	mCamera->pitch(Ogre::Degree(-30.0f));
+	mCamera->yaw(Ogre::Degree(-15.0f));
+}
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createFrameListener(void)
 {
-	Ogre::LogManager::getSingletonPtr()->logMessage("*** Initializing OIS ***");
-	OIS::ParamList pl;
-	size_t windowHnd = 0;
-	std::ostringstream windowHndStr;
+	BaseApplication::createFrameListener();
 
-	mWindow->getCustomAttribute("WINDOW", &windowHnd);
-	windowHndStr << windowHnd;
-	pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+	// Set idle animation
+	mAnimationState = mEntity->getAnimationState("Idle");
+	mAnimationState->setLoop(true);
+	mAnimationState->setEnabled(true);
 
-	mInputManager = OIS::InputManager::createInputSystem(pl);
-
-	mKeyboard = static_cast<OIS::Keyboard*> (mInputManager->createInputObject(
-			OIS::OISKeyboard, true));
-	mMouse = static_cast<OIS::Mouse*> (mInputManager->createInputObject(
-			OIS::OISMouse, true));
-
-	mMouse->setEventCallback(this);
-	mKeyboard->setEventCallback(this);
-
-	//Set initial mouse clipping size
-	windowResized(mWindow);
-
-	//Register as a Window listener
-	Ogre::WindowEventUtilities::addWindowEventListener(mWindow, this);
-
-	mRoot->addFrameListener(this);
+	// Set default values for variables
+	mWalkSpeed = 35.0f;
+	mDirection = Ogre::Vector3::ZERO;
 }
-
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-	if (mWindow->isClosed())
+
+	if (mDirection == Ogre::Vector3::ZERO)
+	{
+		if (nextLocation())
+		{
+			// Set walking animation
+			mAnimationState = mEntity->getAnimationState("Walk");
+			mAnimationState->setLoop(true);
+			mAnimationState->setEnabled(true);
+		}
+	}
+	else
+	{
+		Ogre::Real move = mWalkSpeed * evt.timeSinceLastFrame;
+		mDistance -= move;
+		if (mDistance <= 0.0f)
+		{
+			mNode->setPosition(mDestination);
+			mDirection = Ogre::Vector3::ZERO;
+			// Set animation based on if the robot has another point to walk to.
+			if (!nextLocation())
+			{
+				// Set Idle animation
+				mAnimationState = mEntity->getAnimationState("Die");
+				mAnimationState->setLoop(true);
+				mAnimationState->setEnabled(true);
+			}
+			else
+			{
+				// Rotation Code will go here later
+				Ogre::Vector3 src = mNode->getOrientation()
+						* Ogre::Vector3::UNIT_X;
+				if ((1.0f + src.dotProduct(mDirection)) < 0.0001f)
+				{
+					mNode->yaw(Ogre::Degree(180));
+				}
+				else
+				{
+					Ogre::Quaternion quat = src.getRotationTo(mDirection);
+					mNode->rotate(quat);
+				} // else
+			}
+		}
+		else
+		{
+			mNode->translate(mDirection * move);
+		} // else
+	} // if
+
+
+	mAnimationState->addTime(evt.timeSinceLastFrame);
+	return BaseApplication::frameRenderingQueued(evt);
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::nextLocation(void)
+{
+
+	if (mWalkList.empty())
 		return false;
 
-	if (mShutDown)
-		return false;
+	mDestination = mWalkList.front(); // this gets the front of the deque
+	mWalkList.pop_front(); // this removes the front of the deque
 
-	//Need to capture/update each device
-	mKeyboard->capture();
-	mMouse->capture();
+	mDirection = mDestination - mNode->getPosition();
+	mDistance = mDirection.normalise();
 
-	return true;
-}
-
-//-------------------------------------------------------------------------------------
-bool TutorialApplication::keyPressed(const OIS::KeyEvent &arg)
-{
-	if (arg.key == OIS::KC_ESCAPE)
-	{
-		mShutDown = true;
-	}
-	else if (arg.key == OIS::KC_V)
-	{
-		mDual = !mDual;
-
-		if (mDual)
-			dualViewport(mPrimarySceneMgr, mSecondarySceneMgr);
-		else
-			setupViewport(mPrimarySceneMgr);
-	}
-	else if (arg.key == OIS::KC_C)
-	{
-		swap(mPrimarySceneMgr, mSecondarySceneMgr);
-
-		if (mDual)
-			dualViewport(mPrimarySceneMgr, mSecondarySceneMgr);
-		else
-			setupViewport(mPrimarySceneMgr);
-	}
-
-	return true;
-}
-
-//-------------------------------------------------------------------------------------
-bool TutorialApplication::keyReleased(const OIS::KeyEvent &arg)
-{
-	return true;
-}
-
-//-------------------------------------------------------------------------------------
-bool TutorialApplication::mouseMoved(const OIS::MouseEvent &arg)
-{
-	return true;
-}
-
-bool TutorialApplication::mousePressed(const OIS::MouseEvent &arg,
-		OIS::MouseButtonID id)
-{
-	return true;
-}
-
-//-------------------------------------------------------------------------------------
-bool TutorialApplication::mouseReleased(const OIS::MouseEvent &arg,
-		OIS::MouseButtonID id)
-{
 	return true;
 }
 //-------------------------------------------------------------------------------------

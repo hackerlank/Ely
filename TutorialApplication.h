@@ -18,6 +18,7 @@
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
+#include <deque>
 
 class TutorialApplication: public BaseApplication
 {
@@ -27,28 +28,22 @@ public:
 
 protected:
 	virtual void createScene(void);
-	virtual void chooseSceneManager(void);
-	virtual void createCamera(void);
-	virtual void createViewports(void);
 	virtual void createFrameListener(void);
-	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-	// OIS::KeyListener
-	virtual bool keyPressed(const OIS::KeyEvent &arg);
-	virtual bool keyReleased(const OIS::KeyEvent &arg);
-	// OIS::MouseListener
-	virtual bool mouseMoved(const OIS::MouseEvent &arg);
-	virtual bool
-	mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	virtual bool mouseReleased(const OIS::MouseEvent &arg,
-			OIS::MouseButtonID id);
-private:
-	Ogre::SceneManager* mPrimarySceneMgr;
-	Ogre::SceneManager* mSecondarySceneMgr;
-	bool mDual;
+	virtual bool nextLocation(void);
+	virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
 
-	virtual void setupViewport(Ogre::SceneManager *curr);
-	virtual void dualViewport(Ogre::SceneManager *primarySceneMgr,
-			Ogre::SceneManager *secondarySceneMgr);
+	Ogre::Real mDistance; // The distance the object has left to travel
+	Ogre::Vector3 mDirection; // The direction the object is moving
+	Ogre::Vector3 mDestination; // The destination the object is moving towards
+
+	Ogre::AnimationState *mAnimationState; // The current animation state of the object
+
+	Ogre::Entity *mEntity; // The Entity we are animating
+	Ogre::SceneNode *mNode; // The SceneNode that the Entity is attached to
+	std::deque<Ogre::Vector3> mWalkList; // The list of points we are walking to
+
+	Ogre::Real mWalkSpeed; // The speed at which the object is moving
+
 };
 
 #endif // #ifndef __TutorialApplication_h_
