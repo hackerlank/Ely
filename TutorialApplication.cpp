@@ -17,7 +17,8 @@
 #include "TutorialApplication.h"
 #define CAMERA_NAME "SceneCamera"
 
-Ogre::Real TutorialApplication::mWalkSpeed = 35.0f;;
+Ogre::Real TutorialApplication::mWalkSpeed = 35.0f;
+;
 
 //-------------------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
@@ -89,14 +90,16 @@ void TutorialApplication::createFrameListener(void)
 	mAnimationState->setEnabled(true);
 
 	// Set default values for variables
-//	mWalkSpeed = 35.0f;
-	mDirection = Ogre::Vector3::ZERO;
+	//	mWalkSpeed = 35.0f;
+	//	mDirection = Ogre::Vector3::ZERO;
+	mWalking = false;
 }
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
 
-	if (mDirection == Ogre::Vector3::ZERO)
+	//	if (mDirection == Ogre::Vector3::ZERO)
+	if (not mWalking)
 	{
 		if (nextLocation())
 		{
@@ -114,6 +117,7 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 		{
 			mNode->setPosition(mDestination);
 			mDirection = Ogre::Vector3::ZERO;
+			mWalking = false;
 			// Set animation based on if the robot has another point to walk to.
 			if (!nextLocation())
 			{
@@ -160,6 +164,7 @@ bool TutorialApplication::nextLocation(void)
 
 	mDirection = mDestination - mNode->getPosition();
 	mDistance = mDirection.normalise();
+	mWalking = true;
 
 	return true;
 }

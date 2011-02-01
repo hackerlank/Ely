@@ -34,6 +34,7 @@ protected:
 
 	Ogre::Real mDistance; // The distance the object has left to travel
 	Ogre::Vector3 mDirection; // The direction the object is moving
+	bool mWalking; // Whether or not the robot is moving
 	Ogre::Vector3 mDestination; // The destination the object is moving towards
 
 	Ogre::AnimationState *mAnimationState; // The current animation state of the object
