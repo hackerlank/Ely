@@ -17,6 +17,8 @@
 #include "TutorialApplication.h"
 #define CAMERA_NAME "SceneCamera"
 
+Ogre::Real TutorialApplication::mWalkSpeed = 35.0f;;
+
 //-------------------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
 {
@@ -87,7 +89,7 @@ void TutorialApplication::createFrameListener(void)
 	mAnimationState->setEnabled(true);
 
 	// Set default values for variables
-	mWalkSpeed = 35.0f;
+//	mWalkSpeed = 35.0f;
 	mDirection = Ogre::Vector3::ZERO;
 }
 //-------------------------------------------------------------------------------------

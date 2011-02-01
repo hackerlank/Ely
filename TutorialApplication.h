@@ -42,7 +42,7 @@ protected:
 	Ogre::SceneNode *mNode; // The SceneNode that the Entity is attached to
 	std::deque<Ogre::Vector3> mWalkList; // The list of points we are walking to
 
-	Ogre::Real mWalkSpeed; // The speed at which the object is moving
+	static Ogre::Real mWalkSpeed; // The speed at which the object is moving
 
 };
 
