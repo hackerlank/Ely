@@ -14,11 +14,11 @@
  http://www.ogre3d.org/tikiwiki/
  -----------------------------------------------------------------------------
  */
-#include "TutorialApplication.h"
-#define CAMERA_NAME "SceneCamera"
+#include <CEGUISystem.h>
+#include <CEGUISchemeManager.h>
+#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
 
-Ogre::Real TutorialApplication::mWalkSpeed = 35.0f;
-;
+#include "TutorialApplication.h"
 
 //-------------------------------------------------------------------------------------
 TutorialApplication::TutorialApplication(void)
@@ -31,141 +31,56 @@ TutorialApplication::~TutorialApplication(void)
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
-	// Set the default lighting.
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
-	// Create the entity
-	mEntity = mSceneMgr->createEntity("Robot", "robot.mesh");
+	// Set ambient light
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
-	// Create the scene node
-	mNode = mSceneMgr->getRootSceneNode()-> createChildSceneNode("RobotNode",
-			Ogre::Vector3(0.0f, 0.0f, 25.0f));
-	mNode->attachObject(mEntity);
+	// World geometry
+	mSceneMgr->setWorldGeometry("terrain.cfg");
 
-	// Create the walking list
-	mWalkList.push_back(Ogre::Vector3(550.0f, 0.0f, 50.0f));
-	mWalkList.push_back(Ogre::Vector3(-100.0f, 0.0f, -200.0f));
-	mWalkList.push_back(Ogre::Vector3(-550.0f, 0.0f, 50.0f));
+	// Set camera look point
+	mCamera->setPosition(40, 100, 580);
+	mCamera->pitch(Ogre::Degree(-30));
+	mCamera->yaw(Ogre::Degree(-45));
 
-	// Create objects so we can see movement
-	Ogre::Entity *ent;
-	Ogre::SceneNode *node;
-
-	ent = mSceneMgr->createEntity("Knot1", "knot.mesh");
-	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot1Node",
-			Ogre::Vector3(0.0f, -10.0f, 25.0f));
-	node->attachObject(ent);
-	node->setScale(0.1f, 0.1f, 0.1f);
-
-	ent = mSceneMgr->createEntity("Knot2", "knot.mesh");
-	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot2Node",
-			Ogre::Vector3(550.0f, -10.0f, 50.0f));
-	node->attachObject(ent);
-	node->setScale(0.1f, 0.1f, 0.1f);
-
-	ent = mSceneMgr->createEntity("Knot3", "knot.mesh");
-	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot3Node",
-			Ogre::Vector3(-100.0f, -10.0f, -200.0f));
-	node->attachObject(ent);
-	node->setScale(0.1f, 0.1f, 0.1f);
-
-	ent = mSceneMgr->createEntity("Knot4", "knot.mesh");
-	node = mSceneMgr->getRootSceneNode()->createChildSceneNode("Knot4Node",
-			Ogre::Vector3(-550.0f, -10.0f, 50.0f));
-	node->attachObject(ent);
-	node->setScale(0.1f, 0.1f, 0.1f);
-
-	// Set the camera to look at our handiwork
-	mCamera->setPosition(90.0f, 280.0f, 535.0f);
-	mCamera->pitch(Ogre::Degree(-30.0f));
-	mCamera->yaw(Ogre::Degree(-15.0f));
+	// CEGUI setup
+	mGUIRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
+	// Mouse
+	CEGUI::SchemeManager::getSingleton().create(
+			(CEGUI::utf8*) "TaharezLook.scheme");
+	CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
 }
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createFrameListener(void)
 {
 	BaseApplication::createFrameListener();
-
-	// Set idle animation
-	mAnimationState = mEntity->getAnimationState("Idle");
-	mAnimationState->setLoop(true);
-	mAnimationState->setEnabled(true);
-
-	// Set default values for variables
-	//	mWalkSpeed = 35.0f;
-	//	mDirection = Ogre::Vector3::ZERO;
-	mWalking = false;
 }
 //-------------------------------------------------------------------------------------
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-
-	//	if (mDirection == Ogre::Vector3::ZERO)
-	if (not mWalking)
-	{
-		if (nextLocation())
-		{
-			// Set walking animation
-			mAnimationState = mEntity->getAnimationState("Walk");
-			mAnimationState->setLoop(true);
-			mAnimationState->setEnabled(true);
-		}
-	}
-	else
-	{
-		Ogre::Real move = mWalkSpeed * evt.timeSinceLastFrame;
-		mDistance -= move;
-		if (mDistance <= 0.0f)
-		{
-			mNode->setPosition(mDestination);
-			mDirection = Ogre::Vector3::ZERO;
-			mWalking = false;
-			// Set animation based on if the robot has another point to walk to.
-			if (!nextLocation())
-			{
-				// Set Idle animation
-				mAnimationState = mEntity->getAnimationState("Die");
-				mAnimationState->setLoop(true);
-				mAnimationState->setEnabled(true);
-			}
-			else
-			{
-				// Rotation Code will go here later
-				Ogre::Vector3 src = mNode->getOrientation()
-						* Ogre::Vector3::UNIT_X;
-				if ((1.0f + src.dotProduct(mDirection)) < 0.0001f)
-				{
-					mNode->yaw(Ogre::Degree(180));
-				}
-				else
-				{
-					Ogre::Quaternion quat = src.getRotationTo(mDirection);
-					mNode->rotate(quat);
-				} // else
-			}
-		}
-		else
-		{
-			mNode->translate(mDirection * move);
-		} // else
-	} // if
-
-
-	mAnimationState->addTime(evt.timeSinceLastFrame);
 	return BaseApplication::frameRenderingQueued(evt);
 }
 //-------------------------------------------------------------------------------------
-bool TutorialApplication::nextLocation(void)
+void TutorialApplication::chooseSceneManager(void)
 {
-
-	if (mWalkList.empty())
-		return false;
-
-	mDestination = mWalkList.front(); // this gets the front of the deque
-	mWalkList.pop_front(); // this removes the front of the deque
-
-	mDirection = mDestination - mNode->getPosition();
-	mDistance = mDirection.normalise();
-	mWalking = true;
-
+	// Use the terrain scene manager.
+	mSceneMgr = mRoot->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::mouseMoved(const OIS::MouseEvent &arg)
+{
+	return true;
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::mousePressed(const OIS::MouseEvent &arg,
+		OIS::MouseButtonID id)
+{
+	return true;
+}
+//-------------------------------------------------------------------------------------
+bool TutorialApplication::mouseReleased(const OIS::MouseEvent &arg,
+		OIS::MouseButtonID id)
+{
 	return true;
 }
 //-------------------------------------------------------------------------------------
@@ -181,7 +96,7 @@ extern "C"
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
 int main(int argc, char *argv[])
 #endif
@@ -195,9 +110,7 @@ int main(int argc, char *argv[])
 	} catch (Ogre::Exception& e)
 	{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		MessageBox(NULL, e.getFullDescription().c_str(),
-				"An exception has occured!", MB_OK | MB_ICONERROR
-				| MB_TASKMODAL);
+		MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 #else
 		std::cerr << "An exception has occured: "
 				<< e.getFullDescription().c_str() << std::endl;
@@ -209,5 +122,4 @@ int main(int argc, char *argv[])
 
 #ifdef __cplusplus
 }
-
 #endif

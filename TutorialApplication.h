@@ -18,7 +18,6 @@
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
-#include <deque>
 
 class TutorialApplication: public BaseApplication
 {
@@ -28,22 +27,23 @@ public:
 
 protected:
 	virtual void createScene(void);
+	virtual void chooseSceneManager(void);
 	virtual void createFrameListener(void);
-	virtual bool nextLocation(void);
+	//frame listener
 	virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
-
-	Ogre::Real mDistance; // The distance the object has left to travel
-	Ogre::Vector3 mDirection; // The direction the object is moving
-	bool mWalking; // Whether or not the robot is moving
-	Ogre::Vector3 mDestination; // The destination the object is moving towards
-
-	Ogre::AnimationState *mAnimationState; // The current animation state of the object
-
-	Ogre::Entity *mEntity; // The Entity we are animating
-	Ogre::SceneNode *mNode; // The SceneNode that the Entity is attached to
-	std::deque<Ogre::Vector3> mWalkList; // The list of points we are walking to
-
-	static Ogre::Real mWalkSpeed; // The speed at which the object is moving
+	//mouse listener
+	virtual bool mouseMoved(const OIS::MouseEvent &arg);
+	virtual bool
+			mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
+	virtual bool mouseReleased(const OIS::MouseEvent &arg,
+			OIS::MouseButtonID id);
+protected:
+	Ogre::RaySceneQuery *mRaySceneQuery;// The ray scene query pointer
+	bool mLMouseDown, mRMouseDown; // True if the mouse buttons are down
+	int mCount; // The number of robots on the screen
+	Ogre::SceneNode *mCurrentObject; // The newly created object
+	CEGUI::Renderer *mGUIRenderer; // CEGUI renderer
+	float mRotateSpeed;
 
 };
 
