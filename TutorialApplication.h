@@ -18,6 +18,9 @@
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
+#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
+#include "../res/resource.h"
+#endif
 
 class TutorialApplication: public BaseApplication
 {
@@ -34,9 +37,10 @@ protected:
 	//mouse listener
 	virtual bool mouseMoved(const OIS::MouseEvent &arg);
 	virtual bool
-			mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
+	mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
 	virtual bool mouseReleased(const OIS::MouseEvent &arg,
 			OIS::MouseButtonID id);
+
 protected:
 	Ogre::RaySceneQuery *mRaySceneQuery;// The ray scene query pointer
 	bool mLMouseDown, mRMouseDown; // True if the mouse buttons are down

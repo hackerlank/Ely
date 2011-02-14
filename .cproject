@@ -65,6 +65,7 @@
 </tool>
 </toolChain>
 </folderInfo>
+<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.499442956.923257005" name="OGRE-CMakeCache.txt" rcbsApplicability="disable" resourcePath="OGRE-CMakeCache.txt" toolsToInvoke=""/>
 <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.499442956.1137212046" name="BaseApplication.h" rcbsApplicability="disable" resourcePath="BaseApplication.h" toolsToInvoke=""/>
 <sourceEntries>
 <entry excluding="TutorialApplication 7.h|TutorialApplication 7.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
