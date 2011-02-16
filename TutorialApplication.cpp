@@ -21,6 +21,8 @@ TutorialApplication::TutorialApplication(void) :
 	mCount(0), mCurrentObject(0), bLMouseDown(false), bRMouseDown(false),
 			mRotateSpeed(0.1f)
 {
+	// Set the default state
+	bRobotMode = true;
 }
 //-------------------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
@@ -86,18 +88,26 @@ bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& arg)
 
 	mRayScnQuery->setRay(cameraRay);
 
-	Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
+	// Perform the scene query
+	mRayScnQuery->setSortByDistance(false);
+	Ogre::RaySceneQueryResult &result = mRayScnQuery->execute();
 	Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-	if (iter != result.end() && iter->worldFragment)
+	// Get the results, set the camera height
+	for (iter; iter != result.end(); iter++)
 	{
-		Ogre::Real terrainHeight = iter->worldFragment->singleIntersection.y;
-
-		if ((terrainHeight + 10.0f) > camPos.y)
+		if (iter->worldFragment)
 		{
-			mCamera->setPosition(camPos.x, terrainHeight + 10.0f, camPos.z);
-		}
-	}
+			Ogre::Real terrainHeight =
+					iter->worldFragment->singleIntersection.y;
+			if ((terrainHeight + 10.0f) > camPos.y)
+			{
+				mCamera->setPosition(camPos.x, terrainHeight + 10.0f, camPos.z);
+			}
+			break;
+		} // if
+	} // for
+
 	return true;
 }
 
@@ -118,16 +128,23 @@ bool TutorialApplication::mouseMoved(const OIS::MouseEvent& arg)
 		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x
 				/ float(arg.state.width), mousePos.d_y
 				/ float(arg.state.height));
-		mRayScnQuery->setRay(mouseRay);
 
-		Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
+		mRayScnQuery->setRay(mouseRay);
+		mRayScnQuery->setSortByDistance(false);
+
+		Ogre::RaySceneQueryResult &result = mRayScnQuery->execute();
 		Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-		//check to see if the mouse is pointing at the world and put our current object at that location
-		if (iter != result.end() && iter->worldFragment)
+		for (iter; iter != result.end(); iter++)
 		{
-			mCurrentObject->setPosition(iter->worldFragment->singleIntersection);
+			if (iter->worldFragment)
+			{
+				mCurrentObject->setPosition(
+						iter->worldFragment->singleIntersection);
+				break;
+			} // if
 		}
+
 	}
 	else if (bRMouseDown) //if the right mouse button is held down, be rotate the camera with the mouse
 	{
@@ -148,37 +165,56 @@ bool TutorialApplication::mousePressed(const OIS::MouseEvent& arg,
 	}
 	if (id == OIS::MB_Left)
 	{
-		//find the current mouse position
+		// Setup the ray scene query
 		CEGUI::Point mousePos =
 				CEGUI::MouseCursor::getSingleton().getPosition();
-
-		//then send a raycast straight out from the camera at the mouse's position
 		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x
 				/ float(arg.state.width), mousePos.d_y
 				/ float(arg.state.height));
 		mRayScnQuery->setRay(mouseRay);
+		mRayScnQuery->setSortByDistance(true);
+		mRayScnQuery->setQueryMask(bRobotMode ? ROBOT_MASK : NINJA_MASK);
 
-		/*
-		 This next chunk finds the results of the raycast
-		 If the mouse is pointing at world geometry we spawn a robot at that position
-		 */
-		Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
-		Ogre::RaySceneQueryResult::iterator iter = result.begin();
+		// Execute query
+		Ogre::RaySceneQueryResult &result = mRayScnQuery->execute();
+		Ogre::RaySceneQueryResult::iterator iter;
 
-		if (iter != result.end() && iter->worldFragment)
+		// Get results, create a node/entity on the position
+		for (iter = result.begin(); iter != result.end(); iter++)
 		{
-			char name[16];
-			sprintf(name, "Robot%d", mCount++);
+			if (iter->movable && iter->movable->getName().substr(0, 5)
+					!= "tile[")
+			{
+				mCurrentObject = iter->movable->getParentSceneNode();
+				break;
+			} // if
+			else if (iter->worldFragment)
+			{
+				Ogre::Entity *ent;
+				char name[16];
+				if (bRobotMode)
+				{
+					sprintf(name, "Robot%d", mCount++);
+					ent = mSceneMgr->createEntity(name, "robot.mesh");
+					ent->setQueryFlags(ROBOT_MASK);
+				} // if
+				else
+				{
+					sprintf(name, "Ninja%d", mCount++);
+					ent = mSceneMgr->createEntity(name, "ninja.mesh");
+					ent->setQueryFlags(NINJA_MASK);
+				} // else
 
-			Ogre::Entity* ent = mSceneMgr->createEntity(name, "robot.mesh");
-			mCurrentObject
-					= mSceneMgr->getRootSceneNode()->createChildSceneNode(
-							std::string(name) + "Node",
-							iter->worldFragment->singleIntersection);
-			mCurrentObject->attachObject(ent);
+				mCurrentObject
+						= mSceneMgr->getRootSceneNode()->createChildSceneNode(
+								Ogre::String(name) + "Node",
+								iter->worldFragment->singleIntersection);
+				mCurrentObject->attachObject(ent);
+				mCurrentObject->setScale(0.1f, 0.1f, 0.1f);
+				break;
+			} // else if
+		} // for
 
-			mCurrentObject->setScale(0.1f, 0.1f, 0.1f);
-		}
 		bLMouseDown = true;
 	}
 	else if (id == OIS::MB_Right) // if the right mouse button is held we hide the mouse cursor for view mode
@@ -207,6 +243,19 @@ bool TutorialApplication::mouseReleased(const OIS::MouseEvent& arg,
 		bRMouseDown = false;
 	}
 	return true;
+}
+
+bool TutorialApplication::keyPressed(const OIS::KeyEvent& arg)
+{
+	//check and see if the spacebar was hit, and this will switch which mesh is spawned
+	if (arg.key == OIS::KC_SPACE)
+	{
+		bRobotMode = !bRobotMode;
+	}
+
+	//then we return the base app keyPressed function so that we get all of the functionality
+	//and the return value in one line
+	return BaseApplication::keyPressed(arg);
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32

@@ -26,6 +26,11 @@
 class TutorialApplication: public BaseApplication
 {
 public:
+	enum QueryFlags
+	{
+	        NINJA_MASK = 1<<0,
+	        ROBOT_MASK = 1<<1
+	};
 	TutorialApplication(void);
 	virtual ~TutorialApplication(void);
 
@@ -39,9 +44,10 @@ protected:
 
 	virtual bool mouseMoved(const OIS::MouseEvent& arg);
 	virtual bool
-			mousePressed(const OIS::MouseEvent& arg, OIS::MouseButtonID id);
+	mousePressed(const OIS::MouseEvent& arg, OIS::MouseButtonID id);
 	virtual bool mouseReleased(const OIS::MouseEvent& arg,
 			OIS::MouseButtonID id);
+	virtual bool keyPressed(const OIS::KeyEvent& arg);
 
 	Ogre::SceneNode *mCurrentObject; //pointer to our currently selected object
 	Ogre::RaySceneQuery* mRayScnQuery; //pointer to our ray scene query
@@ -51,7 +57,7 @@ protected:
 	int mCount; //number of objects created
 	float mRotateSpeed; //the rotation speed for the camera
 
-
+	bool bRobotMode; // The current state
 };
 
 #endif // #ifndef __TutorialApplication_h_
