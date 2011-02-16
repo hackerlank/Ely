@@ -14,178 +14,198 @@
  http://www.ogre3d.org/tikiwiki/
  -----------------------------------------------------------------------------
  */
-#include <CEGUISystem.h>
-#include <CEGUISchemeManager.h>
-#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
-
 #include "TutorialApplication.h"
 
 //-------------------------------------------------------------------------------------
-TutorialApplication::TutorialApplication(void)
+TutorialApplication::TutorialApplication(void) :
+	mCount(0), mCurrentObject(0), bLMouseDown(false), bRMouseDown(false),
+			mRotateSpeed(0.1f)
 {
 }
 //-------------------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
 {
-	// We created the query, and we are also responsible for deleting it.
-	mSceneMgr->destroyQuery(mRaySceneQuery);
+	mSceneMgr->destroyQuery(mRayScnQuery);
 }
 
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
-	// Set ambient light
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5, 0.5, 0.5));
+	//Scene setup
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
 	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
 
-	// World geometry
+	//World geometry
 	mSceneMgr->setWorldGeometry("terrain.cfg");
 
-	// Set camera look point
+	//camera setup
 	mCamera->setPosition(40, 100, 580);
 	mCamera->pitch(Ogre::Degree(-30));
 	mCamera->yaw(Ogre::Degree(-45));
 
-	// CEGUI setup
+	//CEGUI setup
 	mGUIRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-	// Mouse
+
+	//show the CEGUI cursor
 	CEGUI::SchemeManager::getSingleton().create(
 			(CEGUI::utf8*) "TaharezLook.scheme");
 	CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
 }
-void TutorialApplication::createFrameListener(void)
-{
-	BaseApplication::createFrameListener();
-	// Setup default variables
-	mCount = 0;
-	mCurrentObject = NULL;
-	mLMouseDown = false;
-	mRMouseDown = false;
 
-	// Reduce rotate speed
-	mRotateSpeed = .1;
-
-	// Create RaySceneQuery
-	mRaySceneQuery = mSceneMgr->createRayQuery(Ogre::Ray());
-}
 void TutorialApplication::chooseSceneManager(void)
 {
-	// Use the terrain scene manager.
+	//create a scene manager that is meant for handling outdoor scenes
 	mSceneMgr = mRoot->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
 }
 
-bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent &evt)
+void TutorialApplication::createFrameListener(void)
 {
-	// Process the base frame listener code.  Since we are going to be
-	// manipulating the translate vector, we need this to happen first.
-	if (!BaseApplication::frameRenderingQueued(evt))
-		return false;
+	//we still want to create the frame listener from the base app
+	BaseApplication::createFrameListener();
 
-	// Setup the scene query
+	//but we also want to set up our raySceneQuery after everything has been initialized
+	mRayScnQuery = mSceneMgr->createRayQuery(Ogre::Ray());
+}
+
+bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& arg)
+{
+	//we want to run everything in the previous frameRenderingQueued call
+	//but we also want to do something afterwards, so lets  start off with this
+	if (!BaseApplication::frameRenderingQueued(arg))
+	{
+		return false;
+	}
+
+	/*
+	 This next big chunk basically sends a raycast straight down from the camera's position
+	 It then checks to see if it is under world geometry and if it is we move the camera back up
+	 */
 	Ogre::Vector3 camPos = mCamera->getPosition();
 	Ogre::Ray cameraRay(Ogre::Vector3(camPos.x, 5000.0f, camPos.z),
 			Ogre::Vector3::NEGATIVE_UNIT_Y);
-	mRaySceneQuery->setRay(cameraRay);
 
-	// Perform the scene query
-	Ogre::RaySceneQueryResult &result = mRaySceneQuery->execute();
-	Ogre::RaySceneQueryResult::iterator itr = result.begin();
-	// Get the results, set the camera height
-	if (itr != result.end() && itr->worldFragment)
+	mRayScnQuery->setRay(cameraRay);
+
+	Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
+	Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+	if (iter != result.end() && iter->worldFragment)
 	{
-		Ogre::Real terrainHeight = itr->worldFragment->singleIntersection.y;
+		Ogre::Real terrainHeight = iter->worldFragment->singleIntersection.y;
+
 		if ((terrainHeight + 10.0f) > camPos.y)
+		{
 			mCamera->setPosition(camPos.x, terrainHeight + 10.0f, camPos.z);
+		}
 	}
-
 	return true;
-
 }
-bool TutorialApplication::mouseMoved(const OIS::MouseEvent &arg)
+
+bool TutorialApplication::mouseMoved(const OIS::MouseEvent& arg)
 {
-	// Update CEGUI with the mouse motion
+	//updates CEGUI with mouse movement
 	CEGUI::System::getSingleton().injectMouseMove(arg.state.X.rel,
 			arg.state.Y.rel);
 
-	// If we are dragging the left mouse button.
-	if (mLMouseDown)
+	//if the left mouse button is held down
+	if (bLMouseDown)
 	{
+		//find the current mouse position
 		CEGUI::Point mousePos =
 				CEGUI::MouseCursor::getSingleton().getPosition();
+
+		//create a raycast straight out from the camera at the mouse's location
 		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x
 				/ float(arg.state.width), mousePos.d_y
 				/ float(arg.state.height));
-		mRaySceneQuery->setRay(mouseRay);
+		mRayScnQuery->setRay(mouseRay);
 
-		Ogre::RaySceneQueryResult &result = mRaySceneQuery->execute();
-		Ogre::RaySceneQueryResult::iterator itr = result.begin();
+		Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
+		Ogre::RaySceneQueryResult::iterator iter = result.begin();
 
-		if (itr != result.end() && itr->worldFragment)
-			mCurrentObject->setPosition(itr->worldFragment->singleIntersection);
-	} // if
-	// If we are dragging the right mouse button.
-	else if (mRMouseDown)
+		//check to see if the mouse is pointing at the world and put our current object at that location
+		if (iter != result.end() && iter->worldFragment)
+		{
+			mCurrentObject->setPosition(iter->worldFragment->singleIntersection);
+		}
+	}
+	else if (bRMouseDown) //if the right mouse button is held down, be rotate the camera with the mouse
 	{
 		mCamera->yaw(Ogre::Degree(-arg.state.X.rel * mRotateSpeed));
 		mCamera->pitch(Ogre::Degree(-arg.state.Y.rel * mRotateSpeed));
-	} // else if
+	}
+
 	return true;
 }
-bool TutorialApplication::mousePressed(const OIS::MouseEvent &arg,
+
+bool TutorialApplication::mousePressed(const OIS::MouseEvent& arg,
 		OIS::MouseButtonID id)
 {
-	// Left mouse button down
+	//show that the current object has been deselected by removing the bounding box visual
+	if (mCurrentObject)
+	{
+		mCurrentObject->showBoundingBox(false);
+	}
 	if (id == OIS::MB_Left)
 	{
-		// Setup the ray scene query, use CEGUI's mouse position
+		//find the current mouse position
 		CEGUI::Point mousePos =
 				CEGUI::MouseCursor::getSingleton().getPosition();
+
+		//then send a raycast straight out from the camera at the mouse's position
 		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x
 				/ float(arg.state.width), mousePos.d_y
 				/ float(arg.state.height));
-		mRaySceneQuery->setRay(mouseRay);
-		// Execute query
-		Ogre::RaySceneQueryResult &result = mRaySceneQuery->execute();
-		Ogre::RaySceneQueryResult::iterator itr = result.begin();
-		// Get results, create a node/entity on the position
-		if (itr != result.end() && itr->worldFragment)
+		mRayScnQuery->setRay(mouseRay);
+
+		/*
+		 This next chunk finds the results of the raycast
+		 If the mouse is pointing at world geometry we spawn a robot at that position
+		 */
+		Ogre::RaySceneQueryResult& result = mRayScnQuery->execute();
+		Ogre::RaySceneQueryResult::iterator iter = result.begin();
+
+		if (iter != result.end() && iter->worldFragment)
 		{
 			char name[16];
 			sprintf(name, "Robot%d", mCount++);
-			Ogre::Entity *ent = mSceneMgr->createEntity(name, "robot.mesh");
+
+			Ogre::Entity* ent = mSceneMgr->createEntity(name, "robot.mesh");
 			mCurrentObject
 					= mSceneMgr->getRootSceneNode()->createChildSceneNode(
 							std::string(name) + "Node",
-							itr->worldFragment->singleIntersection);
+							iter->worldFragment->singleIntersection);
 			mCurrentObject->attachObject(ent);
-			mCurrentObject->setScale(0.1f, 0.1f, 0.1f);
-		} // if
 
-		mLMouseDown = true;
-	} // if
-	// Right mouse button down
-	else if (id == OIS::MB_Right)
+			mCurrentObject->setScale(0.1f, 0.1f, 0.1f);
+		}
+		bLMouseDown = true;
+	}
+	else if (id == OIS::MB_Right) // if the right mouse button is held we hide the mouse cursor for view mode
 	{
 		CEGUI::MouseCursor::getSingleton().hide();
-		mRMouseDown = true;
-	} // else if
-
+		bRMouseDown = true;
+	}
+	//now we show the bounding box so the user can see that this object is selected
+	if (mCurrentObject)
+	{
+		mCurrentObject->showBoundingBox(true);
+	}
 	return true;
 }
-bool TutorialApplication::mouseReleased(const OIS::MouseEvent &arg,
+
+bool TutorialApplication::mouseReleased(const OIS::MouseEvent& arg,
 		OIS::MouseButtonID id)
 {
-	// Left mouse button up
 	if (id == OIS::MB_Left)
 	{
-		mLMouseDown = false;
-	} // if
-	// Right mouse button up
-	else if (id == OIS::MB_Right)
+		bLMouseDown = false;
+	}
+	else if (id == OIS::MB_Right) //when the right mouse is released we then unhide the cursor
 	{
 		CEGUI::MouseCursor::getSingleton().show();
-		mRMouseDown = false;
-	} // else if
+		bRMouseDown = false;
+	}
 	return true;
 }
 
@@ -200,7 +220,7 @@ extern "C"
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
+INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
 #else
 int main(int argc, char *argv[])
 #endif
@@ -214,7 +234,9 @@ int main(int argc, char *argv[])
 	} catch (Ogre::Exception& e)
 	{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
+		MessageBox(NULL, e.getFullDescription().c_str(),
+				"An exception has occured!", MB_OK | MB_ICONERROR
+				| MB_TASKMODAL);
 #else
 		std::cerr << "An exception has occured: "
 				<< e.getFullDescription().c_str() << std::endl;

@@ -18,9 +18,10 @@
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
-#if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-#include "../res/resource.h"
-#endif
+
+#include <CEGUISystem.h>
+#include <CEGUISchemeManager.h>
+#include <RendererModules/Ogre/CEGUIOgreRenderer.h>
 
 class TutorialApplication: public BaseApplication
 {
@@ -30,24 +31,26 @@ public:
 
 protected:
 	virtual void createScene(void);
+
 	virtual void chooseSceneManager(void);
 	virtual void createFrameListener(void);
-	//frame listener
-	virtual bool frameRenderingQueued(const Ogre::FrameEvent &evt);
-	//mouse listener
-	virtual bool mouseMoved(const OIS::MouseEvent &arg);
+
+	virtual bool frameRenderingQueued(const Ogre::FrameEvent& arg);
+
+	virtual bool mouseMoved(const OIS::MouseEvent& arg);
 	virtual bool
-	mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	virtual bool mouseReleased(const OIS::MouseEvent &arg,
+			mousePressed(const OIS::MouseEvent& arg, OIS::MouseButtonID id);
+	virtual bool mouseReleased(const OIS::MouseEvent& arg,
 			OIS::MouseButtonID id);
 
-protected:
-	Ogre::RaySceneQuery *mRaySceneQuery;// The ray scene query pointer
-	bool mLMouseDown, mRMouseDown; // True if the mouse buttons are down
-	int mCount; // The number of robots on the screen
-	Ogre::SceneNode *mCurrentObject; // The newly created object
-	CEGUI::Renderer *mGUIRenderer; // CEGUI renderer
-	float mRotateSpeed;
+	Ogre::SceneNode *mCurrentObject; //pointer to our currently selected object
+	Ogre::RaySceneQuery* mRayScnQuery; //pointer to our ray scene query
+	CEGUI::Renderer* mGUIRenderer; //our CEGUI renderer
+
+	bool bLMouseDown, bRMouseDown; //true if mouse buttons are held down
+	int mCount; //number of objects created
+	float mRotateSpeed; //the rotation speed for the camera
+
 
 };
 
