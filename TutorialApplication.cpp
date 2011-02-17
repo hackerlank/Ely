@@ -137,20 +137,44 @@ void TutorialApplication::performSelection(const Ogre::Vector2& first,
 	Ogre::Ray topRight = mCamera->getCameraToViewportRay(right, top);
 	Ogre::Ray bottomLeft = mCamera->getCameraToViewportRay(left, bottom);
 	Ogre::Ray bottomRight = mCamera->getCameraToViewportRay(right, bottom);
+	Ogre::PlaneBoundedVolume vol;
+	vol.planes.push_back(Ogre::Plane(topLeft.getPoint(3), topRight.getPoint(3),
+			bottomRight.getPoint(3))); // front plane
+	vol.planes.push_back(Ogre::Plane(topLeft.getOrigin(),
+			topLeft.getPoint(100), topRight.getPoint(100))); // top plane
+	vol.planes.push_back(Ogre::Plane(topLeft.getOrigin(), bottomLeft.getPoint(
+			100), topLeft.getPoint(100))); // left plane
+	vol.planes.push_back(Ogre::Plane(bottomLeft.getOrigin(),
+			bottomRight.getPoint(100), bottomLeft.getPoint(100))); // bottom plane
+	vol.planes.push_back(Ogre::Plane(topRight.getOrigin(), topRight.getPoint(
+			100), bottomRight.getPoint(100))); // right plane
+	Ogre::PlaneBoundedVolumeList volList;
+	volList.push_back(vol);
+	mVolQuery->setVolumes(volList);
+	Ogre::SceneQueryResult result = mVolQuery->execute();
 
+	deselectObjects();
+	Ogre::SceneQueryResultMovableList::iterator iter;
+	for (iter = result.movables.begin(); iter != result.movables.end(); ++iter)
+		selectObject(*iter);
 }
 
 void TutorialApplication::deselectObjects()
 {
-
+	std::list<Ogre::MovableObject*>::iterator iter;
+	for (iter = mSelected.begin(); iter != mSelected.end(); iter++)
+	{
+		(*iter)->getParentSceneNode()->showBoundingBox(false);
+	}
 }
 
 void TutorialApplication::selectObject(Ogre::MovableObject* obj)
 {
-
+	obj->getParentSceneNode()->showBoundingBox(true);
+	mSelected.push_back(obj);
 }
 
-void swap(float& x, float& y)
+void TutorialApplication::swap(float& x, float& y)
 {
 	float temp = x;
 	x = y;
