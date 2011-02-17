@@ -17,216 +17,93 @@
 #include "TutorialApplication.h"
 
 //-------------------------------------------------------------------------------------
-TutorialApplication::TutorialApplication(void) :
-	mCount(0), mCurrentObject(0), bLMouseDown(false), bRMouseDown(false),
-			mRotateSpeed(0.1f)
+TutorialApplication::TutorialApplication(void)
 {
-	// Set the default state
-	bRobotMode = true;
 }
 //-------------------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
 {
-	mSceneMgr->destroyQuery(mRayScnQuery);
+	mSceneMgr->destroyQuery(mVolQuery);
+
+	if (mSelectionBox)
+	{
+		delete mSelectionBox;
+	}
 }
 
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
-	//Scene setup
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.5f, 0.5f, 0.5f));
-	mSceneMgr->setSkyDome(true, "Examples/CloudySky", 5, 8);
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 
-	//World geometry
-	mSceneMgr->setWorldGeometry("terrain.cfg");
+	for (int i = 0; i < 10; ++i)
+	{
+		for (int j = 0; j < 10; ++j)
+		{
+			Ogre::Entity* ent =
+					mSceneMgr->createEntity("Robot"
+							+ Ogre::StringConverter::toString(i + j * 10),
+							"robot.mesh");
+			Ogre::SceneNode* node =
+					mSceneMgr->getRootSceneNode()->createChildSceneNode(
+							Ogre::Vector3(1 * 15, 0, j * 15));
+			node->attachObject(ent);
+			node->setScale(0.1f, 0.1f, 0.1f);
+		}
+	}
 
-	//camera setup
-	mCamera->setPosition(40, 100, 580);
-	mCamera->pitch(Ogre::Degree(-30));
-	mCamera->yaw(Ogre::Degree(-45));
+	mCamera->setPosition(-60, 100, -60);
+	mCamera->lookAt(60, 0, 60);
 
-	//CEGUI setup
 	mGUIRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
 
-	//show the CEGUI cursor
 	CEGUI::SchemeManager::getSingleton().create(
 			(CEGUI::utf8*) "TaharezLook.scheme");
 	CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
+
+	mSelectionBox = new SelectionBox("SelectionBox");
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(
+			mSelectionBox);
+
+	mVolQuery = mSceneMgr->createPlaneBoundedVolumeQuery(
+			Ogre::PlaneBoundedVolumeList());
 }
 
-void TutorialApplication::chooseSceneManager(void)
+bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-	//create a scene manager that is meant for handling outdoor scenes
-	mSceneMgr = mRoot->createSceneManager(Ogre::ST_EXTERIOR_CLOSE);
-}
-
-void TutorialApplication::createFrameListener(void)
-{
-	//we still want to create the frame listener from the base app
-	BaseApplication::createFrameListener();
-
-	//but we also want to set up our raySceneQuery after everything has been initialized
-	mRayScnQuery = mSceneMgr->createRayQuery(Ogre::Ray());
-}
-
-bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& arg)
-{
-	//we want to run everything in the previous frameRenderingQueued call
-	//but we also want to do something afterwards, so lets  start off with this
-	if (!BaseApplication::frameRenderingQueued(arg))
-	{
-		return false;
-	}
-
-	/*
-	 This next big chunk basically sends a raycast straight down from the camera's position
-	 It then checks to see if it is under world geometry and if it is we move the camera back up
-	 */
-	Ogre::Vector3 camPos = mCamera->getPosition();
-	Ogre::Ray cameraRay(Ogre::Vector3(camPos.x, 5000.0f, camPos.z),
-			Ogre::Vector3::NEGATIVE_UNIT_Y);
-
-	mRayScnQuery->setRay(cameraRay);
-
-	// Perform the scene query
-	mRayScnQuery->setSortByDistance(false);
-	Ogre::RaySceneQueryResult &result = mRayScnQuery->execute();
-	Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
-	// Get the results, set the camera height
-	for (iter; iter != result.end(); iter++)
-	{
-		if (iter->worldFragment)
-		{
-			Ogre::Real terrainHeight =
-					iter->worldFragment->singleIntersection.y;
-			if ((terrainHeight + 10.0f) > camPos.y)
-			{
-				mCamera->setPosition(camPos.x, terrainHeight + 10.0f, camPos.z);
-			}
-			break;
-		} // if
-	} // for
-
-	return true;
+	return BaseApplication::frameRenderingQueued(evt);
 }
 
 bool TutorialApplication::mouseMoved(const OIS::MouseEvent& arg)
 {
-	//updates CEGUI with mouse movement
 	CEGUI::System::getSingleton().injectMouseMove(arg.state.X.rel,
 			arg.state.Y.rel);
-
-	//if the left mouse button is held down
-	if (bLMouseDown)
+	if (mSelecting)
 	{
-		//find the current mouse position
-		CEGUI::Point mousePos =
-				CEGUI::MouseCursor::getSingleton().getPosition();
+		CEGUI::MouseCursor *mouse = CEGUI::MouseCursor::getSingletonPtr();
+		mStop.x = mouse->getPosition().d_x / (float) arg.state.width;
+		mStop.y = mouse->getPosition().d_y / (float) arg.state.height;
 
-		//create a raycast straight out from the camera at the mouse's location
-		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x
-				/ float(arg.state.width), mousePos.d_y
-				/ float(arg.state.height));
-
-		mRayScnQuery->setRay(mouseRay);
-		mRayScnQuery->setSortByDistance(false);
-
-		Ogre::RaySceneQueryResult &result = mRayScnQuery->execute();
-		Ogre::RaySceneQueryResult::iterator iter = result.begin();
-
-		for (iter; iter != result.end(); iter++)
-		{
-			if (iter->worldFragment)
-			{
-				mCurrentObject->setPosition(
-						iter->worldFragment->singleIntersection);
-				break;
-			} // if
-		}
-
+		mSelectionBox->setCorners(mStart, mStop);
 	}
-	else if (bRMouseDown) //if the right mouse button is held down, be rotate the camera with the mouse
-	{
-		mCamera->yaw(Ogre::Degree(-arg.state.X.rel * mRotateSpeed));
-		mCamera->pitch(Ogre::Degree(-arg.state.Y.rel * mRotateSpeed));
-	}
-
 	return true;
 }
 
 bool TutorialApplication::mousePressed(const OIS::MouseEvent& arg,
 		OIS::MouseButtonID id)
 {
-	//show that the current object has been deselected by removing the bounding box visual
-	if (mCurrentObject)
-	{
-		mCurrentObject->showBoundingBox(false);
-	}
 	if (id == OIS::MB_Left)
 	{
-		// Setup the ray scene query
-		CEGUI::Point mousePos =
-				CEGUI::MouseCursor::getSingleton().getPosition();
-		Ogre::Ray mouseRay = mCamera->getCameraToViewportRay(mousePos.d_x
-				/ float(arg.state.width), mousePos.d_y
-				/ float(arg.state.height));
-		mRayScnQuery->setRay(mouseRay);
-		mRayScnQuery->setSortByDistance(true);
-		mRayScnQuery->setQueryMask(bRobotMode ? ROBOT_MASK : NINJA_MASK);
+		CEGUI::MouseCursor *mouse = CEGUI::MouseCursor::getSingletonPtr();
+		mStart.x = mouse->getPosition().d_x / (float) arg.state.width;
+		mStart.y = mouse->getPosition().d_y / (float) arg.state.height;
+		mStop = mStart;
 
-		// Execute query
-		Ogre::RaySceneQueryResult &result = mRayScnQuery->execute();
-		Ogre::RaySceneQueryResult::iterator iter;
-
-		// Get results, create a node/entity on the position
-		for (iter = result.begin(); iter != result.end(); iter++)
-		{
-			if (iter->movable && iter->movable->getName().substr(0, 5)
-					!= "tile[")
-			{
-				mCurrentObject = iter->movable->getParentSceneNode();
-				break;
-			} // if
-			else if (iter->worldFragment)
-			{
-				Ogre::Entity *ent;
-				char name[16];
-				if (bRobotMode)
-				{
-					sprintf(name, "Robot%d", mCount++);
-					ent = mSceneMgr->createEntity(name, "robot.mesh");
-					ent->setQueryFlags(ROBOT_MASK);
-				} // if
-				else
-				{
-					sprintf(name, "Ninja%d", mCount++);
-					ent = mSceneMgr->createEntity(name, "ninja.mesh");
-					ent->setQueryFlags(NINJA_MASK);
-				} // else
-
-				mCurrentObject
-						= mSceneMgr->getRootSceneNode()->createChildSceneNode(
-								Ogre::String(name) + "Node",
-								iter->worldFragment->singleIntersection);
-				mCurrentObject->attachObject(ent);
-				mCurrentObject->setScale(0.1f, 0.1f, 0.1f);
-				break;
-			} // else if
-		} // for
-
-		bLMouseDown = true;
+		mSelecting = true;
+		mSelectionBox->clear();
+		mSelectionBox->setVisible(true);
 	}
-	else if (id == OIS::MB_Right) // if the right mouse button is held we hide the mouse cursor for view mode
-	{
-		CEGUI::MouseCursor::getSingleton().hide();
-		bRMouseDown = true;
-	}
-	//now we show the bounding box so the user can see that this object is selected
-	if (mCurrentObject)
-	{
-		mCurrentObject->showBoundingBox(true);
-	}
+
 	return true;
 }
 
@@ -235,27 +112,49 @@ bool TutorialApplication::mouseReleased(const OIS::MouseEvent& arg,
 {
 	if (id == OIS::MB_Left)
 	{
-		bLMouseDown = false;
+		performSelection(mStart, mStop);
+		mSelecting = false;
+		mSelectionBox->setVisible(false);
 	}
-	else if (id == OIS::MB_Right) //when the right mouse is released we then unhide the cursor
-	{
-		CEGUI::MouseCursor::getSingleton().show();
-		bRMouseDown = false;
-	}
+
 	return true;
 }
 
-bool TutorialApplication::keyPressed(const OIS::KeyEvent& arg)
+void TutorialApplication::performSelection(const Ogre::Vector2& first,
+		const Ogre::Vector2& second)
 {
-	//check and see if the spacebar was hit, and this will switch which mesh is spawned
-	if (arg.key == OIS::KC_SPACE)
-	{
-		bRobotMode = !bRobotMode;
-	}
+	float left = first.x, right = second.x, top = first.y, bottom = second.y;
 
-	//then we return the base app keyPressed function so that we get all of the functionality
-	//and the return value in one line
-	return BaseApplication::keyPressed(arg);
+	if (left > right)
+		swap(left, right);
+	if (top > bottom)
+		swap(top, bottom);
+
+	if ((right - left) * (bottom - top) < 0.0001)
+		return;
+
+	Ogre::Ray topLeft = mCamera->getCameraToViewportRay(left, top);
+	Ogre::Ray topRight = mCamera->getCameraToViewportRay(right, top);
+	Ogre::Ray bottomLeft = mCamera->getCameraToViewportRay(left, bottom);
+	Ogre::Ray bottomRight = mCamera->getCameraToViewportRay(right, bottom);
+
+}
+
+void TutorialApplication::deselectObjects()
+{
+
+}
+
+void TutorialApplication::selectObject(Ogre::MovableObject* obj)
+{
+
+}
+
+void swap(float& x, float& y)
+{
+	float temp = x;
+	x = y;
+	y = temp;
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
@@ -269,7 +168,7 @@ extern "C"
 #endif
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
+INT WINAPI WinMain( HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT )
 #else
 int main(int argc, char *argv[])
 #endif
@@ -283,9 +182,7 @@ int main(int argc, char *argv[])
 	} catch (Ogre::Exception& e)
 	{
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
-		MessageBox(NULL, e.getFullDescription().c_str(),
-				"An exception has occured!", MB_OK | MB_ICONERROR
-				| MB_TASKMODAL);
+		MessageBox( NULL, e.getFullDescription().c_str(), "An exception has occured!", MB_OK | MB_ICONERROR | MB_TASKMODAL);
 #else
 		std::cerr << "An exception has occured: "
 				<< e.getFullDescription().c_str() << std::endl;

@@ -18,8 +18,9 @@
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
+#include "SelectionBox.h"
 
-#include <CEGUISystem.h>
+#include <CEGUI.h>
 #include <CEGUISchemeManager.h>
 #include <RendererModules/Ogre/CEGUIOgreRenderer.h>
 
@@ -28,8 +29,7 @@ class TutorialApplication: public BaseApplication
 public:
 	enum QueryFlags
 	{
-	        NINJA_MASK = 1<<0,
-	        ROBOT_MASK = 1<<1
+		NINJA_MASK = 1 << 0, ROBOT_MASK = 1 << 1
 	};
 	TutorialApplication(void);
 	virtual ~TutorialApplication(void);
@@ -37,27 +37,29 @@ public:
 protected:
 	virtual void createScene(void);
 
-	virtual void chooseSceneManager(void);
-	virtual void createFrameListener(void);
-
-	virtual bool frameRenderingQueued(const Ogre::FrameEvent& arg);
+	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
 
 	virtual bool mouseMoved(const OIS::MouseEvent& arg);
 	virtual bool
-	mousePressed(const OIS::MouseEvent& arg, OIS::MouseButtonID id);
+			mousePressed(const OIS::MouseEvent& arg, OIS::MouseButtonID id);
 	virtual bool mouseReleased(const OIS::MouseEvent& arg,
 			OIS::MouseButtonID id);
-	virtual bool keyPressed(const OIS::KeyEvent& arg);
 
-	Ogre::SceneNode *mCurrentObject; //pointer to our currently selected object
-	Ogre::RaySceneQuery* mRayScnQuery; //pointer to our ray scene query
-	CEGUI::Renderer* mGUIRenderer; //our CEGUI renderer
+	void performSelection(const Ogre::Vector2& first,
+			const Ogre::Vector2& second);
+	void deselectObjects();
+	void selectObject(Ogre::MovableObject* obj);
+	SelectionBox* mSelectionBox;
 
-	bool bLMouseDown, bRMouseDown; //true if mouse buttons are held down
-	int mCount; //number of objects created
-	float mRotateSpeed; //the rotation speed for the camera
+private:
+	Ogre::Vector2 mStart, mStop;
+	Ogre::PlaneBoundedVolumeListSceneQuery* mVolQuery;
+	std::list<Ogre::MovableObject*> mSelected;
+	bool mSelecting;
+	CEGUI::OgreRenderer* mGUIRenderer;
 
-	bool bRobotMode; // The current state
+	static void swap(float& x, float& y);
+
 };
 
 #endif // #ifndef __TutorialApplication_h_
