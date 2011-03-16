@@ -23,162 +23,90 @@ TutorialApplication::TutorialApplication(void)
 //-------------------------------------------------------------------------------------
 TutorialApplication::~TutorialApplication(void)
 {
-	mSceneMgr->destroyQuery(mVolQuery);
 
-	if (mSelectionBox)
-	{
-		delete mSelectionBox;
-	}
 }
 
 //-------------------------------------------------------------------------------------
 void TutorialApplication::createScene(void)
 {
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
+	createGrassMesh();
+	mSceneMgr->setAmbientLight(Ogre::ColourValue::White);
 
-	for (int i = 0; i < 10; ++i)
+	mCamera->setPosition(150, 50, 150);
+	mCamera->lookAt(0, 0, 0);
+
+	Ogre::Entity* robot = mSceneMgr->createEntity("robot", "robot.mesh");
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(robot);
+
+	Ogre::Plane plane;
+	plane.normal = Ogre::Vector3::UNIT_Y;
+	plane.d = 0;
+
+	Ogre::MeshManager::getSingleton().createPlane("floor",
+			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+			450.0f, 450.0f, 10, 10, true, 1, 50.0f, 50.0f,
+			Ogre::Vector3::UNIT_Z);
+	Ogre::Entity* planeEnt = mSceneMgr->createEntity("plane", "floor");
+	planeEnt->setMaterialName("Examples/GrassFloor");
+	planeEnt->setCastShadows(false);
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(
+			planeEnt);
+	Ogre::Entity *grass = mSceneMgr->createEntity("grass", "GrassBladesMesh");
+	Ogre::StaticGeometry *sg = mSceneMgr->createStaticGeometry("GrassArea");
+
+	const int size = 375;
+	const int amount = 20;
+	sg->setRegionDimensions(Ogre::Vector3(size, size, size));
+	sg->setOrigin(Ogre::Vector3(-size / 2, 0, -size / 2));
+	for (int x = -size / 2; x < size / 2; x += (size / amount))
 	{
-		for (int j = 0; j < 10; ++j)
+		for (int z = -size / 2; z < size / 2; z += (size / amount))
 		{
-			Ogre::Entity* ent =
-					mSceneMgr->createEntity("Robot"
-							+ Ogre::StringConverter::toString(i + j * 10),
-							"robot.mesh");
-			Ogre::SceneNode* node =
-					mSceneMgr->getRootSceneNode()->createChildSceneNode(
-							Ogre::Vector3(1 * 15, 0, j * 15));
-			node->attachObject(ent);
-			node->setScale(0.1f, 0.1f, 0.1f);
+			Ogre::Real r = size / (float) amount / 2;
+			Ogre::Vector3 pos(x + Ogre::Math::RangeRandom(-r, r), 0, z
+					+ Ogre::Math::RangeRandom(-r, r));
+			Ogre::Vector3 scale(1, Ogre::Math::RangeRandom(0.5, 1.4), 1);
+			Ogre::Quaternion orientation;
+			orientation.FromAngleAxis(Ogre::Degree(Ogre::Math::RangeRandom(0,
+					359)), Ogre::Vector3::UNIT_Y);
+
+			sg->addEntity(grass, pos, orientation, scale);
 		}
 	}
-
-	mCamera->setPosition(-60, 100, -60);
-	mCamera->lookAt(60, 0, 60);
-
-	mGUIRenderer = &CEGUI::OgreRenderer::bootstrapSystem();
-
-	CEGUI::SchemeManager::getSingleton().create(
-			(CEGUI::utf8*) "TaharezLook.scheme");
-	CEGUI::MouseCursor::getSingleton().setImage("TaharezLook", "MouseArrow");
-
-	mSelectionBox = new SelectionBox("SelectionBox");
-	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(
-			mSelectionBox);
-
-	mVolQuery = mSceneMgr->createPlaneBoundedVolumeQuery(
-			Ogre::PlaneBoundedVolumeList());
+	sg->build();
 }
 
-bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
+void TutorialApplication::createGrassMesh(void)
 {
-	return BaseApplication::frameRenderingQueued(evt);
-}
+	const float width = 25;
+	const float height = 30;
+	Ogre::ManualObject mo("GrassObject");
 
-bool TutorialApplication::mouseMoved(const OIS::MouseEvent& arg)
-{
-	CEGUI::System::getSingleton().injectMouseMove(arg.state.X.rel,
-			arg.state.Y.rel);
-	if (mSelecting)
+	Ogre::Vector3 vec(width / 2, 0, 0);
+	Ogre::Quaternion rot;
+	rot.FromAngleAxis(Ogre::Degree(60), Ogre::Vector3::UNIT_Y);
+
+	mo.begin("Examples/GrassBlades", Ogre::RenderOperation::OT_TRIANGLE_LIST);
+	for (int i = 0; i < 3; ++i)
 	{
-		CEGUI::MouseCursor *mouse = CEGUI::MouseCursor::getSingletonPtr();
-		mStop.x = mouse->getPosition().d_x / (float) arg.state.width;
-		mStop.y = mouse->getPosition().d_y / (float) arg.state.height;
+		mo.position(-vec.x, height, -vec.z);
+		mo.textureCoord(0, 0);
 
-		mSelectionBox->setCorners(mStart, mStop);
+		mo.position(vec.x, height, vec.z);
+		mo.textureCoord(1, 0);
+
+		mo.position(-vec.x, 0, -vec.z);
+		mo.textureCoord(0, 1);
+
+		mo.position(vec.x, 0, vec.z);
+		mo.textureCoord(1, 1);
+		int offset = i * 4;
+		mo.triangle(offset, offset + 3, offset + 1);
+		mo.triangle(offset, offset + 2, offset + 3);
+		vec = rot * vec;
 	}
-	return true;
-}
-
-bool TutorialApplication::mousePressed(const OIS::MouseEvent& arg,
-		OIS::MouseButtonID id)
-{
-	if (id == OIS::MB_Left)
-	{
-		CEGUI::MouseCursor *mouse = CEGUI::MouseCursor::getSingletonPtr();
-		mStart.x = mouse->getPosition().d_x / (float) arg.state.width;
-		mStart.y = mouse->getPosition().d_y / (float) arg.state.height;
-		mStop = mStart;
-
-		mSelecting = true;
-		mSelectionBox->clear();
-		mSelectionBox->setVisible(true);
-	}
-
-	return true;
-}
-
-bool TutorialApplication::mouseReleased(const OIS::MouseEvent& arg,
-		OIS::MouseButtonID id)
-{
-	if (id == OIS::MB_Left)
-	{
-		performSelection(mStart, mStop);
-		mSelecting = false;
-		mSelectionBox->setVisible(false);
-	}
-
-	return true;
-}
-
-void TutorialApplication::performSelection(const Ogre::Vector2& first,
-		const Ogre::Vector2& second)
-{
-	float left = first.x, right = second.x, top = first.y, bottom = second.y;
-
-	if (left > right)
-		swap(left, right);
-	if (top > bottom)
-		swap(top, bottom);
-
-	if ((right - left) * (bottom - top) < 0.0001)
-		return;
-
-	Ogre::Ray topLeft = mCamera->getCameraToViewportRay(left, top);
-	Ogre::Ray topRight = mCamera->getCameraToViewportRay(right, top);
-	Ogre::Ray bottomLeft = mCamera->getCameraToViewportRay(left, bottom);
-	Ogre::Ray bottomRight = mCamera->getCameraToViewportRay(right, bottom);
-	Ogre::PlaneBoundedVolume vol;
-	vol.planes.push_back(Ogre::Plane(topLeft.getPoint(3), topRight.getPoint(3),
-			bottomRight.getPoint(3))); // front plane
-	vol.planes.push_back(Ogre::Plane(topLeft.getOrigin(),
-			topLeft.getPoint(100), topRight.getPoint(100))); // top plane
-	vol.planes.push_back(Ogre::Plane(topLeft.getOrigin(), bottomLeft.getPoint(
-			100), topLeft.getPoint(100))); // left plane
-	vol.planes.push_back(Ogre::Plane(bottomLeft.getOrigin(),
-			bottomRight.getPoint(100), bottomLeft.getPoint(100))); // bottom plane
-	vol.planes.push_back(Ogre::Plane(topRight.getOrigin(), topRight.getPoint(
-			100), bottomRight.getPoint(100))); // right plane
-	Ogre::PlaneBoundedVolumeList volList;
-	volList.push_back(vol);
-	mVolQuery->setVolumes(volList);
-	Ogre::SceneQueryResult result = mVolQuery->execute();
-
-	deselectObjects();
-	Ogre::SceneQueryResultMovableList::iterator iter;
-	for (iter = result.movables.begin(); iter != result.movables.end(); ++iter)
-		selectObject(*iter);
-}
-
-void TutorialApplication::deselectObjects()
-{
-	std::list<Ogre::MovableObject*>::iterator iter;
-	for (iter = mSelected.begin(); iter != mSelected.end(); iter++)
-	{
-		(*iter)->getParentSceneNode()->showBoundingBox(false);
-	}
-}
-
-void TutorialApplication::selectObject(Ogre::MovableObject* obj)
-{
-	obj->getParentSceneNode()->showBoundingBox(true);
-	mSelected.push_back(obj);
-}
-
-void TutorialApplication::swap(float& x, float& y)
-{
-	float temp = x;
-	x = y;
-	y = temp;
+	mo.end();
+	mo.convertToMesh("GrassBladesMesh");
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
