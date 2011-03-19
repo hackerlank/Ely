@@ -26,7 +26,15 @@ public:
 
 protected:
 	virtual void createScene(void);
-	virtual void createGrassMesh(void);
+	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+	virtual void createProjector();
+	virtual void makeMaterialReceiveDecal(const Ogre::String& matName);
+
+	Ogre::SceneNode* mProjectorNode;
+	Ogre::Frustum* mDecalFrustum;
+	Ogre::Frustum* mFilterFrustum;
+	float mAnim;
+
 };
 
 #endif // #ifndef __TutorialApplication_h_
