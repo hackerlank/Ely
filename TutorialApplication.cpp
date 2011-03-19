@@ -70,7 +70,7 @@ void TutorialApplication::createScene(void)
 	renderTexture->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Blue);
 	renderTexture->getViewport(0)->setOverlaysEnabled(false);
 
-	Ogre::Rectangle2D *mMiniScreen = new Ogre::Rectangle2D(true);
+	mMiniScreen = new Ogre::Rectangle2D(true);
 	mMiniScreen->setCorners(0.5f, 1.0f, 1.0f, 0.5f);
 	mMiniScreen->setBoundingBox(Ogre::AxisAlignedBox(-100000.0f
 			* Ogre::Vector3::UNIT_SCALE, 100000.0f * Ogre::Vector3::UNIT_SCALE));
