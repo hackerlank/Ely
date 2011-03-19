@@ -18,7 +18,8 @@
 #define __TutorialApplication_h_
 
 #include "BaseApplication.h"
-class TutorialApplication: public BaseApplication
+class TutorialApplication: public BaseApplication,
+		public Ogre::RenderTargetListener
 {
 public:
 	TutorialApplication(void);
@@ -27,14 +28,15 @@ public:
 protected:
 	virtual void createScene(void);
 	virtual bool frameRenderingQueued(const Ogre::FrameEvent& evt);
-	virtual void createProjector();
-	virtual void makeMaterialReceiveDecal(const Ogre::String& matName);
+	virtual void preRenderTargetUpdate(const Ogre::RenderTargetEvent& evt);
+	virtual void postRenderTargetUpdate(const Ogre::RenderTargetEvent& evt);
 
-	Ogre::SceneNode* mProjectorNode;
-	Ogre::Frustum* mDecalFrustum;
-	Ogre::Frustum* mFilterFrustum;
-	float mAnim;
+	Ogre::MovablePlane* mPlane;
+	Ogre::Entity* mPlaneEnt;
+	Ogre::SceneNode* mPlaneNode;
 
+	//This should be taken out of the createScene member and brought here
+	Ogre::Rectangle2D* mMiniScreen;
 };
 
 #endif // #ifndef __TutorialApplication_h_

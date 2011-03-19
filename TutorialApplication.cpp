@@ -36,70 +36,77 @@ void TutorialApplication::createScene(void)
 	mCamera->setPosition(60, 200, 70);
 	mCamera->lookAt(0, 0, 0);
 
-	Ogre::Entity* ent;
-	for (int i = 0; i < 6; i++)
-	{
-		Ogre::SceneNode* headNode =
-				mSceneMgr->getRootSceneNode()->createChildSceneNode();
-		ent = mSceneMgr->createEntity("head" + Ogre::StringConverter::toString(
-				i), "ogrehead.mesh");
-		headNode->attachObject(ent);
+	Ogre::MaterialPtr mat =
+			Ogre::MaterialManager::getSingleton().create("PlaneMat",
+					Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	Ogre::TextureUnitState* tuisTexture =
+			mat->getTechnique(0)->getPass(0)->createTextureUnitState(
+					"grass_1024.jpg");
 
-		Ogre::Radian angle(i + Ogre::Math::TWO_PI / 6);
-		headNode->setPosition(75 * Ogre::Math::Cos(angle), 0, 75
-				* Ogre::Math::Sin(angle));
-	}
-	createProjector();
-	for (unsigned int i = 0; i < ent->getNumSubEntities(); i++)
-	{
-		makeMaterialReceiveDecal(ent->getSubEntity(i)->getMaterialName());
-	}
+	mPlane = new Ogre::MovablePlane("Plane");
+	mPlane->d = 0;
+	mPlane->normal = Ogre::Vector3::UNIT_Y;
+
+	Ogre::MeshManager::getSingleton().createPlane("PlaneMesh",
+			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, *mPlane,
+			120, 120, 1, 1, true, 1, 1, 1, Ogre::Vector3::UNIT_Z);
+	mPlaneEnt = mSceneMgr->createEntity("PlaneEntity", "PlaneMesh");
+	mPlaneEnt->setMaterialName("PlaneMat");
+
+	mPlaneNode = mSceneMgr->getRootSceneNode()->createChildSceneNode();
+	mPlaneNode->attachObject(mPlaneEnt);
+
+	Ogre::TexturePtr rtt_texture =
+			Ogre::TextureManager::getSingleton().createManual("RttTex",
+					Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME,
+					Ogre::TEX_TYPE_2D, mWindow->getWidth(),
+					mWindow->getHeight(), 0, Ogre::PF_R8G8B8,
+					Ogre::TU_RENDERTARGET);
+
+	Ogre::RenderTexture *renderTexture =
+			rtt_texture->getBuffer()->getRenderTarget();
+	renderTexture->addViewport(mCamera);
+	renderTexture->getViewport(0)->setClearEveryFrame(true);
+	renderTexture->getViewport(0)->setBackgroundColour(Ogre::ColourValue::Blue);
+	renderTexture->getViewport(0)->setOverlaysEnabled(false);
+
+	Ogre::Rectangle2D *mMiniScreen = new Ogre::Rectangle2D(true);
+	mMiniScreen->setCorners(0.5f, 1.0f, 1.0f, 0.5f);
+	mMiniScreen->setBoundingBox(Ogre::AxisAlignedBox(-100000.0f
+			* Ogre::Vector3::UNIT_SCALE, 100000.0f * Ogre::Vector3::UNIT_SCALE));
+	Ogre::SceneNode* miniScreenNode =
+			mSceneMgr->getRootSceneNode()->createChildSceneNode(
+					"MiniScreenNode");
+	miniScreenNode->attachObject(mMiniScreen);
+	Ogre::MaterialPtr renderMaterial =
+			Ogre::MaterialManager::getSingleton().create("RttMat",
+					Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME);
+	Ogre::Technique* matTechnique = renderMaterial->createTechnique();
+	matTechnique->createPass();
+	renderMaterial->getTechnique(0)->getPass(0)->setLightingEnabled(false);
+	renderMaterial->getTechnique(0)->getPass(0)->createTextureUnitState(
+			"RttTex");
+	mMiniScreen->setMaterial("RttMat");
+
+	renderTexture->addListener(this);
 }
 
 bool TutorialApplication::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-	mProjectorNode->rotate(Ogre::Vector3::UNIT_Y, Ogre::Degree(
-			evt.timeSinceLastFrame * 10));
+	mPlaneNode->yaw(Ogre::Radian(evt.timeSinceLastFrame));
 	return BaseApplication::frameRenderingQueued(evt);
 }
 
-void TutorialApplication::createProjector()
+void TutorialApplication::preRenderTargetUpdate(
+		const Ogre::RenderTargetEvent& evt)
 {
-	mDecalFrustum = new Ogre::Frustum();
-	mProjectorNode = mSceneMgr->getRootSceneNode()->createChildSceneNode(
-			"DecalProjectorNode");
-	mProjectorNode->attachObject(mDecalFrustum);
-	mProjectorNode->setPosition(0, 5, 0);
-	mFilterFrustum = new Ogre::Frustum();
-	mFilterFrustum->setProjectionType(Ogre::PT_ORTHOGRAPHIC);
-	Ogre::SceneNode *filterNode = mProjectorNode->createChildSceneNode(
-			"DecalFilterNode");
-	filterNode->attachObject(mFilterFrustum);
-	filterNode->setOrientation(Ogre::Quaternion(Ogre::Degree(90),
-			Ogre::Vector3::UNIT_Y));
+	mMiniScreen->setVisible(false);
 }
 
-void TutorialApplication::makeMaterialReceiveDecal(const Ogre::String& matName)
+void TutorialApplication::postRenderTargetUpdate(
+		const Ogre::RenderTargetEvent& evt)
 {
-	Ogre::MaterialPtr
-			mat =
-					(Ogre::MaterialPtr) Ogre::MaterialManager::getSingleton().getByName(
-							matName);
-	Ogre::Pass *pass = mat->getTechnique(0)->createPass();
-	pass->setSceneBlending(Ogre::SBT_TRANSPARENT_ALPHA);
-	pass->setDepthBias(1);
-	pass->setLightingEnabled(false);
-	Ogre::TextureUnitState *texState =
-			pass->createTextureUnitState("decal.png");
-	texState->setProjectiveTexturing(true, mDecalFrustum);
-	texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-	texState->setTextureFiltering(Ogre::FO_POINT, Ogre::FO_LINEAR,
-			Ogre::FO_NONE);
-
-	texState = pass->createTextureUnitState("decal_filter.png");
-	texState->setProjectiveTexturing(true, mFilterFrustum);
-	texState->setTextureAddressingMode(Ogre::TextureUnitState::TAM_CLAMP);
-	texState->setTextureFiltering(Ogre::TFO_NONE);
+	mMiniScreen->setVisible(true);
 }
 
 #if OGRE_PLATFORM == OGRE_PLATFORM_WIN32
