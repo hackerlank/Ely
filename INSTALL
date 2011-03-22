@@ -1,0 +1,53 @@
+### INSTALLING OGRE ON DEBIAN (DEBUG VERSION) ###
+
+Build from source instructions: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Building+Ogre
+
+- download stable version: ogre_src_v1-7-2.tar.bz2
+- extract and make a link: ogre -> /REPOSITORY/KProjects/ogre_src_v1-7-2
+- install cmake and cmake-gui: sudo apt-get install cmake cmake-qt-gui
+- cmake-gui:
+	a) select:
+		* Where is the source code: /REPOSITORY/KProjects/ogre
+		* Where to build the binaries: /REPOSITORY/KProjects/ogre/build
+	b) click on Configure
+	c) set the following options and entries (see OGRE-CMakeCache.txt for full reference)
+		* CMAKE_BUILD_TYPE:STRING=Debug
+		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
+		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
+		* for OGRE related entries check Advanced and select all except the following entries: 
+			OGRE_CONFIG_DOUBLE
+			OGRE_CONFIG_ENABLE_PVRTC
+			OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE
+			OGRE_CONFIG_MEMTRACK_DEBUG
+			OGRE_CONFIG_MEMTRACK_RELEASE
+			OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
+			OGRE_FULL_RPATH
+			OGRE_INSTALL_SAMPLES_SOURCE
+			OGRE_PROFILING
+			OGRE_STATIC
+	d) click again on Configure
+	e) click on Generate
+- cd /REPOSITORY/KProjects/ogre/build
+- make
+- make install
+
+
+
+### BUILDING CEGUI ON DEBIAN (DEBUG VERSION) ###
+
+Download stable version: http://www.cegui.org.uk/wiki/index.php/CEGUI_Downloads_0.7.5 (stable)
+
+(Unstable version is on:svn-path = https://crayzedsgui.svn.sourceforge.net/svnroot/crayzedsgui/cegui_mk2/trunk)
+
+$ cd /REPOSITORY/KProjects
+$ tar xvfz CEGUI-0.7.5.tar.gz
+$ cd CEGUI-0.7.5
+$ ./bootstrap
+$ export Ogre_CFLAGS='-I/REPOSITORY/KProjects/usr/include/OGRE'
+$ export Ogre_LIBS='-L/REPOSITORY/KProjects/usr/lib -Wl,-rpath,/REPOSITORY/KProjects/usr/lib -lOgreMain_d'
+$ ./configure --prefix=/REPOSITORY/KProjects/usr --enable-debug
+$ make
+$ make install
+
+	
+
