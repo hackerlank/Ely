@@ -25,7 +25,7 @@
 <option id="gnu.cpp.compiler.exe.debug.option.optimization.level.2087936536" name="Optimization Level" superClass="gnu.cpp.compiler.exe.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.exe.debug.option.debugging.level.759868743" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 <option id="gnu.cpp.compiler.option.preprocessor.def.265095813" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
-<listOptionValue builtIn="false" value="_DEBUG"/>
+<listOptionValue builtIn="false" value="DEBUG"/>
 </option>
 <option id="gnu.cpp.compiler.option.include.paths.932309155" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 <listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OGRE"/>
@@ -66,7 +66,6 @@
 </toolChain>
 </folderInfo>
 <fileInfo id="cdt.managedbuild.config.gnu.exe.debug.499442956.923257005" name="OGRE-CMakeCache.txt" rcbsApplicability="disable" resourcePath="OGRE-CMakeCache.txt" toolsToInvoke=""/>
-<fileInfo id="cdt.managedbuild.config.gnu.exe.debug.499442956.1137212046" name="BaseApplication.h" rcbsApplicability="disable" resourcePath="BaseApplication.h" toolsToInvoke=""/>
 <sourceEntries>
 <entry excluding="TutorialApplication 7.h|TutorialApplication 7.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 </sourceEntries>
