@@ -68,7 +68,7 @@ $ make install
 		* CMAKE_BUILD_TYPE:STRING=Debug
 		* CMAKE_CXX_FLAGS:STRING=-fPIC
 		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
-		* OGRE_HOME:PATH=/REPOSITORY/KProjects/usr
+		* OGRE_HOME:PATH=/REPOSITORY/KProjects/ogre
 		* OGRE_MEDIA_DIR:PATH=/REPOSITORY/KProjects/usr/share/OGRE/media			
 	d) click again on "Configure"
 	e) click on "Generate"
