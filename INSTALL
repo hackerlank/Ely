@@ -9,7 +9,7 @@ Build from source instructions: http://www.ogre3d.org/tikiwiki/tiki-index.php?pa
 	a) select:
 		* Where is the source code: /REPOSITORY/KProjects/ogre
 		* Where to build the binaries: /REPOSITORY/KProjects/ogre/build
-	b) click on Configure
+	b) click on "Configure"
 	c) set the following options and entries (see OGRE-CMakeCache.txt for full reference)
 		* CMAKE_BUILD_TYPE:STRING=Debug
 		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
@@ -25,8 +25,8 @@ Build from source instructions: http://www.ogre3d.org/tikiwiki/tiki-index.php?pa
 			OGRE_INSTALL_SAMPLES_SOURCE
 			OGRE_PROFILING
 			OGRE_STATIC
-	d) click again on Configure
-	e) click on Generate
+	d) click again on "Configure"
+	e) click on "Generate"
 - cd /REPOSITORY/KProjects/ogre/build
 - make
 - make install
@@ -51,3 +51,27 @@ $ make install
 
 	
 
+### INSTALLING OGREODE ON DEBIAN (DEBUG VERSION) ###
+
+- Download from SVN repository https://ogreaddons.svn.sourceforge.net/svnroot/ogreaddons/trunk/ogreode
+- in the file "/REPOSITORY/KProjects/ogreode/CMake/FindOGRE.cmake" replace the following line 
+		"find_path(OGRE_BUILD NAMES bin/Release/OgreMain.dll HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
+		with
+		"find_path(OGRE_BUILD NAMES lib HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
+- use cmake-gui:
+	a) select:
+		* Where is the source code: /REPOSITORY/KProjects/ogreode
+		* Where to build the binaries: /REPOSITORY/KProjects/ogreode/build
+	b) select the "Advanced" check-box
+	c) click on "Configure"
+	c) set the following options and entries 
+		* CMAKE_BUILD_TYPE:STRING=Debug
+		* CMAKE_CXX_FLAGS:STRING=-fPIC
+		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
+		* OGRE_HOME:PATH=/REPOSITORY/KProjects/usr
+		* OGRE_MEDIA_DIR:PATH=/REPOSITORY/KProjects/usr/share/OGRE/media			
+	d) click again on "Configure"
+	e) click on "Generate"
+- cd /REPOSITORY/KProjects/ogreode/build
+- make
+- make install
