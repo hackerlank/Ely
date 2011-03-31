@@ -53,6 +53,7 @@ $ make install
 
 ### INSTALLING OGREODE ON DEBIAN (DEBUG VERSION) ###
 
+- Install ODE single precision libraries: libode1sp libode-sp-dev
 - Download from SVN repository https://ogreaddons.svn.sourceforge.net/svnroot/ogreaddons/trunk/ogreode
 - in the file "/REPOSITORY/KProjects/ogreode/CMake/FindOGRE.cmake" replace the following line 
 		"find_path(OGRE_BUILD NAMES bin/Release/OgreMain.dll HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
@@ -69,9 +70,12 @@ $ make install
 		* CMAKE_CXX_FLAGS:STRING=-fPIC
 		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
 		* OGRE_HOME:PATH=/REPOSITORY/KProjects/ogre
-		* OGRE_MEDIA_DIR:PATH=/REPOSITORY/KProjects/usr/share/OGRE/media			
+		* OGRE_MEDIA_DIR:PATH=/REPOSITORY/KProjects/usr/share/OGRE/media
 	d) click again on "Configure"
 	e) click on "Generate"
 - cd /REPOSITORY/KProjects/ogreode/build
 - make
 - make install
+
+- After installation in "/REPOSITORY/KProjects/usr/include/OgreOde_Prefab/OgreOde_Prefab.h" delete or comment out the line
+	#include "OgreOde_PrefabPreReqs.h"

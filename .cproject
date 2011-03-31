@@ -31,6 +31,9 @@
 <listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OGRE"/>
 <listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/CEGUI"/>
 <listOptionValue builtIn="false" value="/usr/include/OIS"/>
+<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OgreOde_Core"/>
+<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OgreOde_Loader"/>
+<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OgreOde_Prefab"/>
 </option>
 <option id="gnu.cpp.compiler.option.other.verbose.1296761875" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose" value="false" valueType="boolean"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.129184199" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -50,6 +53,9 @@
 <listOptionValue builtIn="false" value="CEGUIFalagardWRBase"/>
 <listOptionValue builtIn="false" value="CEGUIOgreRenderer"/>
 <listOptionValue builtIn="false" value="CEGUIExpatParser"/>
+<listOptionValue builtIn="false" value="OgreOde_Core_d"/>
+<listOptionValue builtIn="false" value="OgreOde_Loader_d"/>
+<listOptionValue builtIn="false" value="OgreOde_Prefab_d"/>
 </option>
 <option id="gnu.cpp.link.option.paths.890803978" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 <listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/lib"/>
