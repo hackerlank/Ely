@@ -7,159 +7,325 @@
 
 #include "Example.h"
 
+//enable this to test it against PLSM2 instead of TSM.
+//#define _PLSM2
+//
+#ifndef _PLSM2
+
+    static String config_file  ("terrainOgreOde.cfg");// OgreSDK terrain, very small tris
+    //static String config_file  ("landscape.cfg");landy average
+    //static String config_file("landscape1.cfg");// near flat
+    //static String config_file("landscape2.cfg");// totally flat + cliffs + small tris
+    //static String config_file("landscape3.cfg");// same as landy average but huge
+    //static String config_file("landscape4.cfg");// same as landy average
+    //static String config_file("landscape5.cfg");// landy average, but very picky
+    //static String config_file("landscape6.cfg");// near flat
+#else  //_PLSM2
+    static String config_file ("paginglandscape2.cfg");
+#endif //_PLSM2
+
+
 using namespace Ogre;
 using namespace OgreOde;
 using namespace OgreOde_Prefab;
 using namespace OgreOde_Loader;
 
 //------------------------------------------------------------------------------------------------
-static const String carNames[] =
-{ "Jeep", "JeepSway", "Subaru" };
-static const String carFileNames[] =
-{ "jeep.ogreode", "jeep.ogreode", "subaru.ogreode" };
-static int sSelectedCar = 1;
+static const String carNames[] = {
+	"Jeep",
+	"JeepSway",
+	"Subaru"
+};
+static const String carFileNames[] = {
+	"jeep.ogreode",
+	"jeep.ogreode",
+	"subaru.ogreode"
+};
+static int sSelectedCar = 0;
 static int maxNumCar = 3;
 
-//------------------------------------------------------------------------------------------------
-GranTurismOgreFrameListener::GranTurismOgreFrameListener(RenderWindow* win,
-		Camera* cam, Real time_step, Root *root, OgreOde::World *world) :
-	ExampleFrameListener(win, cam), _world(world), _vehicle(0)
-{
-	// Reduce move speed
-	mMoveSpeed = 25;
 
-	dotOgreOdeLoader = new OgreOde_Loader::DotLoader(world);
+//------------------------------------------------------------------------------------------------
+LandscapeFrameListener::LandscapeFrameListener(RenderWindow* win, Camera* cam,
+                                               Root *root) :
+        ExampleFrameListener(win, cam),
+        mSceneMgr (mCamera->getSceneManager()),
+        _world (new OgreOde::World(mSceneMgr)),
+        _terrain(0),
+	    _vehicle(0),
+        _time_step (0.01)
+{
+
+    _world->setGravity(Vector3(0,-9.80665,0));
+    _world->setCFM(10e-5);
+    _world->setERP(0.8);
+    _world->setAutoSleep(true);
+    _world->setContactCorrectionVelocity(1.0);
+
+    dotOgreOdeLoader = new OgreOde_Loader::DotLoader (_world);
+
+
+
+    StepHandler::StepModeType stepModeType;
 
 	const int _stepper_mode_choice = 2;
+    switch(_stepper_mode_choice)
+    {
+    case 0: stepModeType = StepHandler::BasicStep; break;
+    case 1: stepModeType = StepHandler::FastStep; break;
+    case 2: stepModeType = StepHandler::QuickStep; break;
+
+    default: stepModeType = StepHandler::QuickStep; break;
+    }
+
 	const int _stepper_choice = 0;
 	const Ogre::Real time_scale = Ogre::Real(1.0);
 	const Ogre::Real max_frame_time = Ogre::Real(1.0 / 4);
 	const Ogre::Real frame_rate = Ogre::Real(1.0 / 60);
+    switch (_stepper_choice)
+    {
+    case 0:
+        _stepper = new OgreOde::StepHandler(_world,
+            StepHandler::QuickStep,
+            _time_step,
+            max_frame_time,
+            time_scale);
 
-	StepHandler::StepModeType stepModeType;
+        break;
+    case 1:
+        _stepper = new OgreOde::ExactVariableStepHandler(_world,
+            stepModeType,
+            _time_step,
+            max_frame_time,
+            time_scale);
 
-	switch (_stepper_mode_choice)
-	{
-	case 0:
-		stepModeType = StepHandler::BasicStep;
-		break;
-	case 1:
-		stepModeType = StepHandler::FastStep;
-		break;
-	case 2:
-		stepModeType = StepHandler::QuickStep;
-		break;
+        break;
+    case 2:
+        _stepper = new OgreOde::ForwardFixedStepHandler(_world,
+            stepModeType,
+            _time_step,
+            max_frame_time,
+            time_scale);
 
-	default:
-		stepModeType = StepHandler::QuickStep;
-		break;
-	}
+        break;
+    case 3:
+    default:
+        _stepper = new OgreOde::ForwardFixedInterpolatedStepHandler (_world,
+            stepModeType,
+            _time_step,
+            frame_rate,
+            max_frame_time,
+            time_scale);
+        break;
+    }
 
-	switch (_stepper_choice)
-	{
-	case 0:
-		_stepper = new OgreOde::StepHandler(_world, StepHandler::QuickStep,
-				time_step, max_frame_time, time_scale);
+	_stepper->setAutomatic(OgreOde::StepHandler::AutoMode_PostFrame,root);
 
-		break;
-	case 1:
-		_stepper = new OgreOde::ExactVariableStepHandler(_world, stepModeType,
-				time_step, max_frame_time, time_scale);
 
-		break;
-	case 2:
-		_stepper = new OgreOde::ForwardFixedStepHandler(_world, stepModeType,
-				time_step, max_frame_time, time_scale);
+    bool does_center_is_corner = false;
+    Ogre::Vector3 scale = Ogre::Vector3::ZERO;
+    int nodes_per_side = 0;
+    int nodes_per_side_all_pagesW = 0;
+    int nodes_per_side_all_pagesH = 0;
+    bool center;
+    // Terrain Scene Manager should support those...
+    mSceneMgr->getOption("Scale", &scale);
+    mSceneMgr->getOption("PageSize", &nodes_per_side);
 
-		break;
-	case 3:
-	default:
-		_stepper
-				= new OgreOde::ForwardFixedInterpolatedStepHandler(_world,
-						stepModeType, time_step, frame_rate, max_frame_time,
-						time_scale);
-		break;
-	}
+   Ogre::Real worldWidth, worldHeight;
+#ifndef _PLSM2
+    if (nodes_per_side == 0)
+    {
+        Ogre::ConfigFile config;
+        Ogre::String val;
 
-	_stepper->setAutomatic(OgreOde::StepHandler::AutoMode_PostFrame, root);
-	//_stepper->setAutomatic(OgreOde::Stepper::AutoMode_PreFrame, root);
+        config.load(config_file, "OgreOde", "=", true);
+
+        val = config.getSetting( "PageSize" );
+        assert( !val.empty() );
+        nodes_per_side = atoi( val.c_str() );
+
+        val = config.getSetting( "PageWorldX" );
+        assert( !val.empty() );
+        scale.x = atof( val.c_str() ) / nodes_per_side;
+
+        val = config.getSetting( "MaxHeight" );
+        assert( !val.empty() );
+        scale.y = atof( val.c_str() );
+
+        val = config.getSetting( "PageWorldZ" );
+        assert( !val.empty() );
+        scale.z = atof( val.c_str() ) / nodes_per_side;
+
+    }
+    center = false;
+    worldWidth  = scale.x * (nodes_per_side - 1);
+    worldHeight = scale.z * (nodes_per_side - 1);
+    nodes_per_side_all_pagesW = nodes_per_side;
+    nodes_per_side_all_pagesH = nodes_per_side;
+#else
+    center = true;
+
+    int w=0;
+    int h=0;
+
+    mSceneMgr->getOption("Width", &w);
+    mSceneMgr->getOption("Height", &h);
+
+
+    worldWidth  = w * (nodes_per_side - 1) * scale.x;
+    worldHeight = h * (nodes_per_side - 1) * scale.z;
+
+    nodes_per_side_all_pagesW = w * (nodes_per_side);
+    nodes_per_side_all_pagesH = h * (nodes_per_side);
+
+    bool noInterpolation = true;
+    mSceneMgr->setOption("queryNoInterpolation", &noInterpolation);
+    mSceneMgr->setOption("LoadNow", 0);
+#endif
+
+    _terrain = new OgreOde::TerrainGeometry(_world,
+        _world->getDefaultSpace(),
+        scale,
+        nodes_per_side_all_pagesW,
+        nodes_per_side_all_pagesH,
+        worldWidth,
+        worldHeight,
+        center);
+    //_terrain->setHeightListener(this);
+    _world->setCollisionListener(this);
+
+    // Create some boxes to play with
+#ifdef _DEBUG
+    const Ogre::Real boxspace = 24.0;
+#else
+    const Ogre::Real boxspace = 12.0;
+#endif
+    for(Real z = -12.0;z <= 12.0;z += boxspace)
+    {
+        for(Real x = -12.0;x <= 12.0;x += boxspace)
+        {
+            // Create the Ogre box
+            String name = String("Box_") + StringConverter::toString(x) + "_" + StringConverter::toString(z);
+            Entity* box = mSceneMgr->createEntity(name,"crate.mesh");
+            box->setCastShadows(true);
+
+            SceneNode* node = mSceneMgr->getRootSceneNode()->createChildSceneNode(name);
+            node->attachObject(box);
+            node->setScale(0.15,0.15,0.15);
+
+            // Set the position
+            Ogre::Vector3 pos(50 + x,130,50 + z);
+            node->setPosition(pos);
+
+            // Create a box for ODE and attach it to the Ogre version
+            OgreOde::Body* body = new OgreOde::Body(_world);
+            node->attachObject(body);
+            body->setMass(OgreOde::BoxMass(0.5,Vector3(1.5,1.5,1.5)));
+
+            OgreOde::BoxGeometry* geom = new OgreOde::BoxGeometry(Vector3(1.5,1.5,1.5), _world, _world->getDefaultSpace());
+            geom->setBody(body);
+
+        }
+    }
+
+
+	// Reduce move speed
+    mMoveSpeed = 25;
+
+
+    _ray_query = mCamera->getSceneManager()->createRayQuery(ray);
+    _ray_query->setQueryTypeMask(Ogre::SceneManager::WORLD_GEOMETRY_TYPE_MASK );
+    _ray_query->setWorldFragmentType(Ogre::SceneQuery::WFT_SINGLE_INTERSECTION);
+    ray.setDirection(Vector3::NEGATIVE_UNIT_Y);
+
 
 	Root::getSingleton().setFrameSmoothingPeriod(5.0f);
-	//Root::getSingleton().setFrameSmoothingPeriod(0.0f);
 
-	changeCar();
+    changeCar();
 
 	// Load up our UI and display it
-	Overlay* pOver = (Overlay*) OverlayManager::getSingleton().getByName(
-			"OgreOdeDemos/Overlay");
-	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/Name")->setCaption(
-			String("Name: ") + "GranTurismo (car + trimesh)");
-	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/Keys")->setCaption(
-			String("Keys: ")
-					+ "I/K - Accelerate/Brake, J/L - Turn, X - Change drive mode, N - Change Car");
-	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/OtherKeys")->setCaption(
-			String("Extra: ") + "E - Debug Object");
+	Overlay* pOver = (Overlay*)OverlayManager::getSingleton().getByName("OgreOdeDemos/Overlay");
+	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/Name")->setCaption(String("Name: ") + "Landscape (Terrain + vehicle + box)");
+	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/Keys")->setCaption(String("Keys: ") + "I/K - Accelerate/Brake, J/L - Turn, X - Change drive mode, N - Change Car");
+	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/OtherKeys")->setCaption(String("Extra: ") + "E - Debug Object");
 	pOver->show();
 
+
+}
+
+LandscapeFrameListener::~LandscapeFrameListener()
+{
+	delete _stepper;
+	mCamera->getSceneManager()->destroyQuery(_ray_query);
+    delete _terrain;
+    delete _world;
 }
 
 //------------------------------------------------------------------------------------------------
-GranTurismOgreFrameListener::~GranTurismOgreFrameListener()
-{
-	delete _stepper;
-}
-//------------------------------------------------------------------------------------------------
-void GranTurismOgreFrameListener::changeCar()
+void LandscapeFrameListener::changeCar()
 {
 	sSelectedCar = (sSelectedCar + 1) % maxNumCar;
 
 	delete _vehicle;
-	_vehicle
-			= static_cast<OgreOde_Prefab::Vehicle *> (dotOgreOdeLoader->loadObject(
-					carFileNames[sSelectedCar], carNames[sSelectedCar]));
-
+	//_vehicle = new OgreOde_Prefab::Vehicle(carNames[sSelectedCar]);
+	//_vehicle->load(carFileNames[sSelectedCar]);
+	_vehicle = static_cast <OgreOde_Prefab::Vehicle *> (dotOgreOdeLoader->loadObject (carFileNames[sSelectedCar], carNames[sSelectedCar]));
 	// Initially (i.e. in the config file) it's rear wheel drive
 	_drive = 'R';
 
 	// Move the vehicle
 	Vector3 v_pos = mCamera->getPosition() + (mCamera->getDirection() * 15.0);
-	//v_pos.y += 10;
+
+    v_pos.y += 50.0;
+    {
+        ray.setOrigin(v_pos);
+        _ray_query->setRay(ray);
+        RaySceneQueryResult& result = _ray_query->execute();
+        RaySceneQueryResult::iterator i = result.begin();
+        if (i != result.end() && i->worldFragment)
+        {
+            const Ogre::Real height = i->worldFragment->singleIntersection.y;
+            if (v_pos.y < height)
+                v_pos.y = height + 7.0;
+
+        }
+    }
+
 	_vehicle->setPosition(v_pos);
 
 	updateInfo();
 }
 //------------------------------------------------------------------------------------------------
-void GranTurismOgreFrameListener::updateInfo()
+void LandscapeFrameListener::updateInfo()
 {
-	Overlay* pOver = (Overlay*) OverlayManager::getSingleton().getByName(
-			"OgreOdeDemos/Overlay");
-	String newInfo(String("Info: ") + carNames[sSelectedCar]);
-	switch (_drive)
+	Overlay* pOver = (Overlay*)OverlayManager::getSingleton().getByName("OgreOdeDemos/Overlay");
+	String newInfo (String("Info: ") + carNames[sSelectedCar]);
+	switch(_drive)
 	{
-	// Switch from rear to front
-	case 'R':
-		newInfo = newInfo + " & Front wheel drive";
-		break;
+		// Switch from rear to front
+		case 'R':
+			newInfo = newInfo + " & Front wheel drive";
+			break;
 
-		// Switch from front to all
-	case 'F':
-		newInfo = newInfo + " & All wheel drive";
-		break;
+			// Switch from front to all
+		case 'F':
+			newInfo = newInfo + " & All wheel drive";
+			break;
 
-		// Switch from all to rear
-	case '4':
-		newInfo = newInfo + " & Rear wheel drive";
-		break;
+			// Switch from all to rear
+		case '4':
+			newInfo = newInfo + " & Rear wheel drive";
+			break;
 	}
-	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/Info")->setCaption(
-			newInfo);
+	OverlayManager::getSingleton().getOverlayElement("OgreOdeDemos/Info")->setCaption(newInfo);
 }
 //------------------------------------------------------------------------------------------------
-bool GranTurismOgreFrameListener::frameStarted(const FrameEvent& evt)
+bool LandscapeFrameListener::frameStarted(const FrameEvent& evt)
 {
 	Real time = evt.timeSinceLastFrame;
 
-	bool ret = ExampleFrameListener::frameStarted(evt);
+    bool ret = ExampleFrameListener::frameStarted(evt);
 
 	if (mTimeUntilNextToggle <= 0)
 	{
@@ -168,36 +334,37 @@ bool GranTurismOgreFrameListener::frameStarted(const FrameEvent& evt)
 		{
 			_world->setShowDebugGeometries(!_world->getShowDebugGeometries());
 			mTimeUntilNextToggle = 0.5;
-		}
-		// Switch debugging Contacts on or off
-		if (mKeyboard->isKeyDown(OIS::KC_B))
-		{
-			_world->setShowDebugContact(!_world->getShowDebugContact());
-			mTimeUntilNextToggle = 0.5;
-		}
+        }
+        // Switch debugging Contacts on or off
+        if (mKeyboard->isKeyDown(OIS::KC_B))
+        {
+            _world->setShowDebugContact(!_world->getShowDebugContact());
+            mTimeUntilNextToggle = 0.5;
+        }
 
-		if (mKeyboard->isKeyDown(OIS::KC_N))
+
+		if(mKeyboard->isKeyDown(OIS::KC_N))
 		{
 			changeCar();
 			mTimeUntilNextToggle = 0.5;
 		}
 
-		if (mKeyboard->isKeyDown(OIS::KC_U))
+		if(mKeyboard->isKeyDown(OIS::KC_U))
 		{
 			_stepper->pause(false);
 			mTimeUntilNextToggle = 0.5;
 		}
-		if (mKeyboard->isKeyDown(OIS::KC_P))
+        if(mKeyboard->isKeyDown(OIS::KC_P))
 		{
 			_stepper->pause(true);
 			mTimeUntilNextToggle = 0.5;
 		}
 		// Change the drive mode between front, rear and 4wd
-		if ((mKeyboard->isKeyDown(OIS::KC_X)))
+		if ((mKeyboard->isKeyDown(OIS::KC_X)) && _vehicle)
 		{
-			switch (_drive)
+			switch(_drive)
 			{
-			// Switch from rear to front
+				// Switch from rear to front
 			case 'R':
 				_drive = 'F';
 
@@ -236,153 +403,270 @@ bool GranTurismOgreFrameListener::frameStarted(const FrameEvent& evt)
 			mTimeUntilNextToggle = 0.5;
 		}
 	}
-	if (!_stepper->isPaused())
+
+	if(!_stepper->isPaused() && _vehicle)
 	{
 		_vehicle->setInputs(mKeyboard->isKeyDown(OIS::KC_J),
-				mKeyboard->isKeyDown(OIS::KC_L),
-				mKeyboard->isKeyDown(OIS::KC_I),
-				mKeyboard->isKeyDown(OIS::KC_K));
+                            mKeyboard->isKeyDown(OIS::KC_L),
+                            mKeyboard->isKeyDown(OIS::KC_I),
+                            mKeyboard->isKeyDown(OIS::KC_K));
 		_vehicle->update(time);
-
-		// Thanks to Ahmed!
-		const Ogre::Real followFactor = 0.2;
-		const Ogre::Real camHeight = 2.0;
-		const Ogre::Real camDistance = 7.0;
-		const Ogre::Real camLookAhead = 8.0;
-
-		Quaternion q = _vehicle->getSceneNode()->getOrientation();
-		Vector3 toCam = _vehicle->getSceneNode()->getPosition();
-
-		toCam.y += camHeight;
-		toCam.z -= camDistance * q.zAxis().z;
-		toCam.x -= camDistance * q.zAxis().x;
-
-		mCamera->move((toCam - mCamera->getPosition()) * followFactor);
-		mCamera->lookAt(_vehicle->getSceneNode()->getPosition()
-				+ ((_vehicle->getSceneNode()->getOrientation()
-						* Ogre::Vector3::UNIT_Z) * camLookAhead));
 	}
+
+
+	// Thanks to Ahmed!
+    if (_vehicle)
+    {
+	    const Ogre::Real followFactor = 0.05;
+	    const Ogre::Real camHeight = 5.0;
+	    const Ogre::Real camDistance = 10.0;
+	    const Ogre::Real camLookAhead = 6.0;
+
+	    Quaternion q = _vehicle->getSceneNode()->getOrientation();
+	    Vector3 toCam = _vehicle->getSceneNode()->getPosition();
+
+	    toCam.y += camHeight;
+	    toCam.z -= camDistance * q.zAxis().z;
+	    toCam.x -= camDistance * q.zAxis().x;
+
+	    mCamera->move( (toCam - mCamera->getPosition()) * followFactor );
+	    mCamera->lookAt(_vehicle->getSceneNode()->getPosition() + ((_vehicle->getSceneNode()->getOrientation() * Ogre::Vector3::UNIT_Z) * camLookAhead));
+    }
+    if (_average_num_query == 0)
+        _average_num_query = _terrain->getNumQueries();
+    _average_num_query = (_average_num_query*99 + _terrain->getNumQueries()) / 100;
+
+    mDebugText =(
+        (_vehicle?"Vehicle Pos: " + StringConverter::toString(_vehicle->getSceneNode()->getPosition()):String("")) +
+        " nQueries: " + StringConverter::toString(_average_num_query));
+
+    _terrain->resetNumQueries();
+
 	return ret;
 }
+
 //------------------------------------------------------------------------------------------------
-GranTurismOgreApplication::GranTurismOgreApplication()
+Real LandscapeFrameListener::heightAt(const Ogre::Vector3& position)
 {
-	_world = 0;
-	_time_step = 0.01;
-	_track = 0;
+    return _terrain->getHeightAt(position); //this is the get height function
 }
+
+
 //------------------------------------------------------------------------------------------------
-void GranTurismOgreApplication::chooseSceneManager(void)
+bool LandscapeFrameListener::collision(OgreOde::Contact* contact)
 {
-	mSceneMgr = mRoot->createSceneManager(ST_GENERIC, "ExampleGrandTurismo");
+    Geometry * const g1 = contact->getFirstGeometry ();
+    Geometry * const g2 = contact->getSecondGeometry ();
+    const bool isg1Sphere = g1 && g1->getClass () != Geometry::Class_Sphere;
+    const bool isg2Sphere = g2 && g2->getClass () != Geometry::Class_Sphere;
+
+    if((isg1Sphere || isg2Sphere) &&
+        OgreOde_Prefab::Vehicle::handleTyreCollision(contact))
+    {
+            //handled by Vehicle.
+    }
+    else
+    {
+        contact->setBouncyness(0.0);
+        contact->setCoulombFriction(18.0);
+    }
+
+    return true;
 }
+
 //------------------------------------------------------------------------------------------------
-void GranTurismOgreApplication::setupResources(void)
+LandscapeApplication::LandscapeApplication()
+{
+}
+
+//------------------------------------------------------------------------------------------------
+bool LandscapeApplication::setup(void)
+{
+#ifndef _PLSM2
+	mRoot = new Root("plugins_d.cfg", "ogre.cfg", "ogreode_landscape_tsm.log");
+#else //_PLSM2
+	mRoot = new Root("plugins_plsm2.cfg", "plsm2_display.cfg", "ogreode_landscape_plsm2.log");
+#endif //_PLSM2
+
+	setupResources();
+
+	bool carryOn = configure();
+	if (!carryOn) return false;
+
+	chooseSceneManager();
+	createCamera();
+	createViewports();
+
+	// Set default mipmap level (NB some APIs ignore this)
+	TextureManager::getSingleton().setDefaultNumMipmaps(20);
+
+	// Create any resource listeners (for loading screens)
+	createResourceListener();
+	// Load resources
+	loadResources();
+
+	// Create the scene
+	createScene();
+
+	createFrameListener();
+
+	return true;
+
+}
+
+//------------------------------------------------------------------------------------------------
+void LandscapeApplication::chooseSceneManager(void)
+{
+#ifndef _PLSM2
+    mSceneMgr = mRoot->createSceneManager( ST_EXTERIOR_CLOSE, "basicsm" );
+#else //_PLSM2
+	mSceneMgr = mRoot->createSceneManager( "PagingLandScapeSceneManager", "basicsm" );
+	assert(mSceneMgr);
+#endif //_PLSM2
+}
+
+//------------------------------------------------------------------------------------------------
+void LandscapeApplication::setupResources(void)
 {
 	ExampleApplication::setupResources();
+
 	ResourceGroupManager *rsm = ResourceGroupManager::getSingletonPtr();
 	StringVector groups = rsm->getResourceGroups();
-	if (std::find(groups.begin(), groups.end(), String("OgreOde"))
-			== groups.end())
+	if (std::find(groups.begin(), groups.end(), String("OgreOde")) == groups.end())
 	{
-		FileInfoListPtr finfo =
-				ResourceGroupManager::getSingleton().findResourceFileInfo(
-						"Bootstrap", "axes.mesh");
+		FileInfoListPtr finfo =  ResourceGroupManager::getSingleton().findResourceFileInfo (
+		"Bootstrap", "axes.mesh");
 
-		const bool isSDK = (!finfo->empty()) && StringUtil::startsWith(
-				finfo->begin()->archive->getName(),
-				"../../media/packs/ogrecore.zip", true);
+		const bool isSDK =  (!finfo->empty()) &&
+		StringUtil::startsWith (finfo->begin()->archive->getName(), "../../media/packs/ogrecore.zip", true);
 
 		rsm->createResourceGroup("OgreOde");
 		if (isSDK)
 		{
-			rsm->addResourceLocation("../../../ogreode/demos/Media",
-					"FileSystem", "OgreOde");
+			rsm->addResourceLocation("../../../ogreode/demos/Media","FileSystem", "OgreOde");
 		}
 		else
 		{
-			rsm->addResourceLocation(
-					"../../../../../ogreaddons/ogreode/demos/Media",
-					"FileSystem", "OgreOde");
+			rsm->addResourceLocation("../../../../../ogreaddons/ogreode/demos/Media","FileSystem", "OgreOde");
 		}
 	}
-}
-//------------------------------------------------------------------------------------------------
-void GranTurismOgreApplication::createCamera(void)
-{
-	// Create the camera
-	mCamera = mSceneMgr->createCamera("PlayerCam");
+#ifdef _PLSM2
+	if (std::find(groups.begin(), groups.end(), String("PLSM2")) == groups.end())
+	{
+		rsm->createResourceGroup("PLSM2");
+		if (isSDK)
+		{
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2","FileSystem", "PLSM2");
 
-	mCamera->setPosition(Vector3(125, -14, 8));
-	mCamera->lookAt(mCamera->getPosition() + Ogre::Vector3(0, 0, 1));
-	mCamera->setNearClipDistance(1);
-	mCamera->setFarClipDistance(1000);
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/models","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/overlays","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/materials","FileSystem", "PLSM2");
+
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/materials/scripts","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/materials/textures","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/materials/programs","FileSystem", "PLSM2");
+
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/datasrcs","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../paginglandscape/Samples/Media/paginglandscape2/terrains","FileSystem", "PLSM2");
+		}
+		else
+		{
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2","FileSystem", "PLSM2");
+
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/models","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/overlays","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/materials","FileSystem", "PLSM2");
+
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/materials/scripts","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/materials/textures","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/materials/programs","FileSystem", "PLSM2");
+
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/datasrcs","FileSystem", "PLSM2");
+			rsm->addResourceLocation("../../../../../ogreaddons/paginglandscape/Samples/Media/paginglandscape2/terrains","FileSystem", "PLSM2");
+		}
+	}
+#endif //_PLSM2
 }
+
+//------------------------------------------------------------------------------------------------
+void LandscapeApplication::createCamera(void)
+{
+    // Create the camera
+    mCamera = mSceneMgr->createCamera("PlayerCam");
+
+	// Set a nice viewpoint
+	mCamera->setPosition(25,15,25);
+	mCamera->setOrientation(Quaternion(-0.3486, 0.0122, 0.9365, 0.0329));
+
+    mCamera->setNearClipDistance( 1 );
+    mCamera->setFarClipDistance( 1000 );
+}
+
 //------------------------------------------------------------------------------------------------
 // Just override the mandatory create scene method
-void GranTurismOgreApplication::createScene(void)
+void LandscapeApplication::createScene(void)
 {
-	// Set ambient light
-	mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
-	mSceneMgr->setSkyBox(true, "GranTurismOgre/Skybox");
+    // Set ambient light
+    mSceneMgr->setAmbientLight(ColourValue(0.5, 0.5, 0.5));
 
-	// Create a light
-	Light* l = mSceneMgr->createLight("MainLight");
+    // Create a light
+    Light* l = mSceneMgr->createLight("MainLight");
 
 	// Accept default settings: point light, white diffuse, just set position
-	// NB I could attach the light to a SceneNode if I wanted it to move automatically with
-	//  other objects, but I don't
-	l->setPosition(20, 800, 50);
-	l->setSpecularColour(1, 0.9, 0);
-
+    // NB I could attach the light to a SceneNode if I wanted it to move automatically with
+    //  other objects, but I don't
+    l->setPosition(20,800,50);
+	l->setSpecularColour(1,0.9,0);
 	l->setCastShadows(true);
 
+#ifndef _DEBUG
 	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
-	mSceneMgr->setShadowColour(ColourValue(0.5, 0.5, 0.5));
+	mSceneMgr->setShadowColour(ColourValue(0.5,0.5,0.5));
+#else
+	mSceneMgr->setShadowTechnique(SHADOWTYPE_NONE);
+#endif
 
-	_world = new OgreOde::World(mSceneMgr);
+    // Fog
+    // NB it's VERY important to set this before calling setWorldGeometry
+    // because the vertex program picked will be different
+    ColourValue fadeColour(0.93, 0.86, 0.76);
+    mSceneMgr->setFog( FOG_LINEAR, fadeColour, .001, 500, 1000);
+    mWindow->getViewport(0)->setBackgroundColour(fadeColour);
 
-	_world->setGravity(Vector3(0, -9.80665, 0));
-	_world->setCFM(10e-5);
-	_world->setERP(0.8);
-	_world->setAutoSleep(true);
-	_world->setContactCorrectionVelocity(1.0);
+	// Set up the terrain according to our own settings
 
-	// Create something that will step the world automatically
-	_world->setCollisionListener(this);
+	DataStreamPtr cfgFile = ResourceGroupManager::getSingleton().openResource (config_file, "OgreOde");
+    mSceneMgr -> setWorldGeometry( cfgFile );
 
-	SceneNode *track_node =
-			mSceneMgr->getRootSceneNode()->createChildSceneNode("track");
-	Entity *track_mesh = mSceneMgr->createEntity("track", "racingcircuit.mesh");
-	track_node->attachObject(track_mesh);
 
-	OgreOde::EntityInformer ei(track_mesh);
-	_track = ei.createStaticTriangleMesh(_world, _world->getDefaultSpace());
-	track_mesh->setUserAny(Ogre::Any(_track));
+	//String blank("");
+	//mSceneMgr->setOption("CustomMaterialName",&blank);
+
+    // Infinite far plane?
+    if (mRoot->getRenderSystem()->getCapabilities()->hasCapability(RSC_INFINITE_FAR_PLANE))
+    {
+		mCamera->setFarClipDistance(0);
+    }
+
+    // Define the required skyplane
+    Plane plane;
+
+	plane.d = 5000;
+    plane.normal = -Vector3::UNIT_Y;
+
 
 }
+
 //------------------------------------------------------------------------------------------------
 // Create new frame listener
-void GranTurismOgreApplication::createFrameListener(void)
+void LandscapeApplication::createFrameListener(void)
 {
-	mFrameListener = new GranTurismOgreFrameListener(mWindow, mCamera,
-			_time_step, mRoot, _world);
-	mRoot->addFrameListener(mFrameListener);
+    mFrameListener= new LandscapeFrameListener(mWindow, mCamera,mRoot);
+    mRoot->addFrameListener(mFrameListener);
 }
+
 //------------------------------------------------------------------------------------------------
-bool GranTurismOgreApplication::collision(OgreOde::Contact* contact)
+LandscapeApplication::~LandscapeApplication()
 {
-	if (!OgreOde_Prefab::Vehicle::handleTyreCollision(contact))
-	{
-		contact->setBouncyness(0.0);
-		contact->setCoulombFriction(18.0);
-	}
-	return true;
-}
-//------------------------------------------------------------------------------------------------
-GranTurismOgreApplication::~GranTurismOgreApplication()
-{
-	delete _track;
-	delete _world;
 }
 
