@@ -21,7 +21,7 @@ int main(int argc,char* argv[])
 #endif
 {
 	// Create the application and try to run it
-	SimpleScenesApplication app;
+	Example app;
 
 	try
 	{
