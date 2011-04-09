@@ -20,128 +20,77 @@ Example::~Example()
 
 void Example::createScene()
 {
-	//Reference Model
-	Ogre::Entity* ent = mSceneMgr->createEntity("MyEntity", "Sinbad.mesh");
+	Ogre::Plane plane(Vector3::UNIT_Y, -10);
+	Ogre::MeshManager::getSingleton().createPlane("plane",
+			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 1500,
+			1500, 20, 20, true, 1, 5, 5, Vector3::UNIT_Z);
+	Ogre::Entity* ent = mSceneMgr->createEntity("LightPlaneEntity", "plane");
+	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
+	ent->setMaterialName("Examples/BeachStones");
+
 	Ogre::SceneNode* node = mSceneMgr->createSceneNode("Node1");
 	mSceneMgr->getRootSceneNode()->addChild(node);
-	node->attachObject(ent);
 
-	//<Part 1 - Setting the position of a scene node
-	//	node->setPosition(10, 0, 0);
-	//
-	//	Ogre::Entity* ent2 = mSceneMgr->createEntity("MyEntity2", "Sinbad.mesh");
-	//	Ogre::SceneNode* node2 = mSceneMgr->createSceneNode("Node2");
-	//	node->addChild(node2);
-	//	node2->setPosition(0, 10, 20);
-	//	node2->attachObject(ent2);
+	Ogre::Entity* Sinbad = mSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
+	Ogre::SceneNode* SinbadNode = node->createChildSceneNode("SinbadNode");
+	SinbadNode->setScale(3.0f, 3.0f, 3.0f);
+	SinbadNode->setPosition(Ogre::Vector3(0.0f, 4.8f, 0.0f));
+	SinbadNode->attachObject(Sinbad);
+
+	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.6, 0.6, 0.6));
+	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
+	//<Part 1 - Adding a point light
+	//	Ogre::Light* light1 = mSceneMgr->createLight("Light1");
+	//	light1->setType(Ogre::Light::LT_POINT);
+	//	light1->setPosition(0, 100, 0);
+	//	light1->setDiffuseColour(1.0f, 1.0f, 1.0f);
 	// Part 1>
 
-	//<Part 2 - Rotating a scene node
-	//	node->setPosition(10, 10, 0);
-	//	mSceneMgr->getRootSceneNode()->addChild(node);
-	//
-	//	Ogre::Entity* ent2 = mSceneMgr->createEntity("MyEntity2", "Sinbad.mesh");
-	//	Ogre::SceneNode* node2 = mSceneMgr->createSceneNode("Node2");
-	//	node->addChild(node2);
-	//	node2->setPosition(10, 0, 0);
-	//	node2->pitch(Ogre::Radian(Ogre::Math::HALF_PI));
-	//	node2->attachObject(ent2);
-	//
-	//	Ogre::Entity* ent3 = mSceneMgr->createEntity("MyEntity3", "Sinbad.mesh");
-	//	Ogre::SceneNode* node3 = mSceneMgr->createSceneNode("Node3");
-	//	node->addChild(node3);
-	//	node3->translate(20, 0, 0);
-	//	node3->yaw(Ogre::Degree(90.0f));
-	//	node3->attachObject(ent3);
-	//
-	//	Ogre::Entity* ent4 = mSceneMgr->createEntity("MyEntity4", "Sinbad.mesh");
-	//	Ogre::SceneNode* node4 = mSceneMgr->createSceneNode("Node4");
-	//	node->addChild(node4);
-	//	node4->setPosition(30, 0, 0);
-	//	node4->roll(Ogre::Radian(Ogre::Math::HALF_PI));
-	//	node4->attachObject(ent4);
+	//<Part 2 - Adding a spotlight
+	//	Ogre::SceneNode* node2 = node->createChildSceneNode("node2");
+	//	node2->setPosition(0, 100, 0);
+	//	Ogre::Light* light = mSceneMgr->createLight("Light1");
+	//	light->setType(Ogre::Light::LT_SPOTLIGHT);
+	//	light->setDirection(Ogre::Vector3(1, -1, 0));
+	//	light->setSpotlightInnerAngle(Ogre::Degree(5.0f));
+	//	light->setSpotlightOuterAngle(Ogre::Degree(45.0f));
+	//	light->setSpotlightFalloff(0.0f);
+	//	light->setDiffuseColour(Ogre::ColourValue(0.0f, 1.0f, 0.0f));
+	//	node2->attachObject(light);
 	// Part 2>
 
-	//<Part 3 - Scaling a scene node
-	//	node->setPosition(10, 10, 0);
-	//
-	//	Ogre::Entity* ent2 = mSceneMgr->createEntity("MyEntity2", "Sinbad.mesh");
-	//	Ogre::SceneNode* node2 = node->createChildSceneNode("node2");
-	//	node2->setPosition(10, 0, 0);
-	//	node2->attachObject(ent2);
-	//	node2->scale(2.0f, 2.0f, 2.0f);
-	//
-	//	Ogre::Entity* ent3 = mSceneMgr->createEntity("MyEntity3", "Sinbad.mesh");
-	//	Ogre::SceneNode* node3 = node->createChildSceneNode("node3", Ogre::Vector3(
-	//			20, 0, 0));
-	//	node3->attachObject(ent3);
-	//	node3->scale(0.2f, 0.2f, 0.2f);
+	//< Part 1 & Part 2
+	//	Ogre::Entity* LightEnt = mSceneMgr->createEntity("MyEntity", "sphere.mesh");
+	//	Ogre::SceneNode* node3 = node->createChildSceneNode("node3");
+	//	node3->setScale(0.02f, 0.02f, 0.02f);
+	//	node3->setPosition(0, 100, 0);
+	//	node3->attachObject(LightEnt);
+	// Part 1 & Part2>
+
+	//<Part 3 - Directional lights
+	Ogre::Light* light = mSceneMgr->createLight("Light1");
+	light->setType(Ogre::Light::LT_DIRECTIONAL);
+	light->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
+	light->setDirection(Ogre::Vector3(1, -1, 0));
 	// Part 3>
 
-	//<Part 4 - Using a scene graph the clever way
-	//	//	node->setPosition(10,10,0);
-	//
-	//	Ogre::Entity* ent2 =
-	//			mSceneMgr->createEntity("MyEntitysNinja", "ninja.mesh");
-	//	Ogre::SceneNode* node2 = node->createChildSceneNode("node2");
-	//	node2->setPosition(10, 0, 0);
-	//	node2->setScale(0.02f, 0.02f, 0.02f);
-	//	node2->attachObject(ent2);
-	//
-	//	node->setPosition(40, 10, 0);
-	//	node->yaw(Ogre::Degree(180.0f));
-	// Part 4>
+}
 
-	//<Part 5 - Different spaces in a scene
-	//	node->setPosition(0, 0, 400);
-	//	node->yaw(Ogre::Degree(180.0f));
-	//
-	//	Ogre::Entity* ent2 = mSceneMgr->createEntity("MyEntity2", "Sinbad.mesh");
-	//	Ogre::SceneNode* node2 = node->createChildSceneNode("node2");
-	//	node2->setPosition(10, 0, 0);
-	//	node2->translate(0, 0, 10);
-	//	node2->attachObject(ent2);
-	//	Ogre::Entity* ent3 = mSceneMgr->createEntity("MyEntity3", "Sinbad.mesh");
-	//	Ogre::SceneNode* node3 = node->createChildSceneNode("node3");
-	//	node3->setPosition(20, 0, 0);
-	//	//	node3->translate(0, 0, 10);
-	//	node3->translate(0, 0, 10, Ogre::Node::TS_WORLD);
-	//	node3->attachObject(ent3);
-	// Part 5>
+void Example::createCamera()
+{
+	mCamera = mSceneMgr->createCamera("MyCamera1");
+	mCamera->setPosition(0, 100, 200);
+	mCamera->lookAt(0, 0, 0);
+	mCamera->setNearClipDistance(5);
+	//	mCamera->setPolygonMode(Ogre::PM_WIREFRAME);
+}
 
-	//<Part 6 - Translating in local space
-	//	node->setPosition(0, 0, 400);
-	//	node->yaw(Ogre::Degree(180.0f));
-	//
-	//	Ogre::Entity* ent2 = mSceneMgr->createEntity("MyEntity2", "Sinbad.mesh");
-	//	Ogre::SceneNode* node2 = node->createChildSceneNode("node2");
-	//	node2->yaw(Ogre::Degree(45));
-	//	node2->translate(0, 0, 20);
-	//	node2->attachObject(ent2);
-	//
-	//	Ogre::Entity* ent3 = mSceneMgr->createEntity("MyEntity3", "Sinbad.mesh");
-	//	Ogre::SceneNode* node3 = node->createChildSceneNode("node3");
-	//	node3->yaw(Ogre::Degree(45));
-	//	node3->translate(0, 0, 20, Ogre::Node::TS_LOCAL);
-	//	node3->attachObject(ent3);
-	// Part 6>
-
-	//<Part 7 - Rotating in different spaces
-	Ogre::Entity* ent2 = mSceneMgr->createEntity("MyEntity2", "sinbad.mesh");
-	Ogre::SceneNode* node2 =
-			mSceneMgr->getRootSceneNode()->createChildSceneNode("Node2");
-	node2->setPosition(10, 0, 0);
-	node2->yaw(Ogre::Degree(90));
-	node2->roll(Ogre::Degree(90));
-	node2->attachObject(ent2);
-
-	Ogre::Entity* ent3 = mSceneMgr->createEntity("MyEntity3", "Sinbad.mesh");
-	Ogre::SceneNode* node3 = node->createChildSceneNode("node3");
-	node3->setPosition(20, 0, 0);
-	node3->yaw(Ogre::Degree(90), Ogre::Node::TS_WORLD);
-	node3->roll(Ogre::Degree(90), Ogre::Node::TS_WORLD);
-	node3->attachObject(ent3);
-
-	// Part 7>
+void Example::createViewports(void)
+{
+	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
+	vp->setBackgroundColour(ColourValue(0.0f, 0.0f, 1.0f));
+	mCamera->setAspectRatio(Real(vp->getActualWidth()) / Real(
+			vp->getActualHeight()));
 }
 

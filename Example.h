@@ -17,6 +17,8 @@ public:
 	virtual ~Example();
 
 	virtual void createScene();
+	virtual void createCamera();
+	virtual void createViewports(void);
 
 protected:
 
