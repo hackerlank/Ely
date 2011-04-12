@@ -9,13 +9,15 @@
 
 Example::Example()
 {
-	// TODO Auto-generated constructor stub
-
+	FrameListener = NULL;
 }
 
 Example::~Example()
 {
-	// TODO Auto-generated destructor stub
+	if (FrameListener)
+	{
+		delete FrameListener;
+	}
 }
 
 void Example::createScene()
@@ -23,57 +25,25 @@ void Example::createScene()
 	Ogre::Plane plane(Vector3::UNIT_Y, -10);
 	Ogre::MeshManager::getSingleton().createPlane("plane",
 			ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane, 1500,
-			1500, 20, 20, true, 1, 5, 5, Vector3::UNIT_Z);
+			1500, 200, 200, true, 1, 5, 5, Vector3::UNIT_Z);
 	Ogre::Entity* ent = mSceneMgr->createEntity("LightPlaneEntity", "plane");
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
 	ent->setMaterialName("Examples/BeachStones");
 
-	Ogre::SceneNode* node = mSceneMgr->createSceneNode("Node1");
-	mSceneMgr->getRootSceneNode()->addChild(node);
+	//	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
 
-	Ogre::Entity* Sinbad = mSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
-	Ogre::SceneNode* SinbadNode = node->createChildSceneNode("SinbadNode");
-	SinbadNode->setScale(3.0f, 3.0f, 3.0f);
-	SinbadNode->setPosition(Ogre::Vector3(0.0f, 4.8f, 0.0f));
-	SinbadNode->attachObject(Sinbad);
-
-	mSceneMgr->setAmbientLight(Ogre::ColourValue(0.6, 0.6, 0.6));
-	mSceneMgr->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
-
-	//<Part 1 - Adding a point light
-	//	Ogre::Light* light1 = mSceneMgr->createLight("Light1");
-	//	light1->setType(Ogre::Light::LT_POINT);
-	//	light1->setPosition(0, 100, 0);
-	//	light1->setDiffuseColour(1.0f, 1.0f, 1.0f);
-	// Part 1>
-
-	//<Part 2 - Adding a spotlight
-	//	Ogre::SceneNode* node2 = node->createChildSceneNode("node2");
-	//	node2->setPosition(0, 100, 0);
-	//	Ogre::Light* light = mSceneMgr->createLight("Light1");
-	//	light->setType(Ogre::Light::LT_SPOTLIGHT);
-	//	light->setDirection(Ogre::Vector3(1, -1, 0));
-	//	light->setSpotlightInnerAngle(Ogre::Degree(5.0f));
-	//	light->setSpotlightOuterAngle(Ogre::Degree(45.0f));
-	//	light->setSpotlightFalloff(0.0f);
-	//	light->setDiffuseColour(Ogre::ColourValue(0.0f, 1.0f, 0.0f));
-	//	node2->attachObject(light);
-	// Part 2>
-
-	//< Part 1 & Part 2
-	//	Ogre::Entity* LightEnt = mSceneMgr->createEntity("MyEntity", "sphere.mesh");
-	//	Ogre::SceneNode* node3 = node->createChildSceneNode("node3");
-	//	node3->setScale(0.02f, 0.02f, 0.02f);
-	//	node3->setPosition(0, 100, 0);
-	//	node3->attachObject(LightEnt);
-	// Part 1 & Part2>
-
-	//<Part 3 - Directional lights
 	Ogre::Light* light = mSceneMgr->createLight("Light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
-	light->setDiffuseColour(Ogre::ColourValue(1.0f, 1.0f, 1.0f));
 	light->setDirection(Ogre::Vector3(1, -1, 0));
-	// Part 3>
+
+	Ogre::SceneNode* node = mSceneMgr->createSceneNode("Node1");
+	mSceneMgr->getRootSceneNode()->addChild(node);
+	Ogre::Entity* Sinbad = mSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
+	_SinbadNode = node->createChildSceneNode("SinbadNode");
+	_SinbadNode->setScale(3.0f, 3.0f, 3.0f);
+	_SinbadNode->setPosition(Ogre::Vector3(0.0f, 4.8f, 0.0f));
+	_SinbadNode->attachObject(Sinbad);
 
 }
 
@@ -83,14 +53,111 @@ void Example::createCamera()
 	mCamera->setPosition(0, 100, 200);
 	mCamera->lookAt(0, 0, 0);
 	mCamera->setNearClipDistance(5);
-	//	mCamera->setPolygonMode(Ogre::PM_WIREFRAME);
 }
 
-void Example::createViewports(void)
+void Example::createFrameListener(void)
 {
-	Ogre::Viewport* vp = mWindow->addViewport(mCamera);
-	vp->setBackgroundColour(ColourValue(0.0f, 0.0f, 1.0f));
-	mCamera->setAspectRatio(Real(vp->getActualWidth()) / Real(
-			vp->getActualHeight()));
+	FrameListener = new Example4FrameListener(_SinbadNode, mWindow, mCamera);
+	mRoot->addFrameListener(FrameListener);
+}
+
+/*----------------------------------------------------*/
+
+Example4FrameListener::Example4FrameListener()
+{
+}
+
+Example4FrameListener::Example4FrameListener(Ogre::SceneNode *node,
+		RenderWindow* win, Ogre::Camera* cam) :
+	_PolyMode(Ogre::PM_SOLID), _speed(40.0)
+{
+	_node = node;
+
+	size_t windowHnd = 0;
+	std::stringstream windowHndStr;
+	win->getCustomAttribute("WINDOW", &windowHnd);
+	windowHndStr << windowHnd;
+	OIS::ParamList pl;
+	pl.insert(std::make_pair(std::string("WINDOW"), windowHndStr.str()));
+	_man = OIS::InputManager::createInputSystem(pl);
+	_key = static_cast<OIS::Keyboard*> (_man->createInputObject(
+			OIS::OISKeyboard, false));
+	_mouse = static_cast<OIS::Mouse*> (_man->createInputObject(OIS::OISMouse,
+			false));
+
+	_Cam = cam;
+
+	_timer.reset();
+}
+
+Example4FrameListener::~Example4FrameListener()
+{
+	_man->destroyInputObject(_mouse);
+	_man->destroyInputObject(_key);
+	OIS::InputManager::destroyInputSystem(_man);
+}
+
+bool Example4FrameListener::frameStarted(const FrameEvent & evt)
+{
+	//<Part 1
+	//	_node->translate(Ogre::Vector3(0.1, 0, 0));
+	//Part 1>
+	//<Part 2 - Modifying the code to be time based rather than frame based
+	//	_node->translate(Ogre::Vector3(10, 0, 0) * evt.timeSinceLastFrame);
+	//Part 2>
+
+	Ogre::Vector3 direction(0, 0, 0);
+
+	_key->capture();
+	_mouse->capture();
+
+	if (_key->isKeyDown(OIS::KC_ESCAPE))
+	{
+		return false;
+	}
+	if (_key->isKeyDown(OIS::KC_W))
+	{
+		direction = Ogre::Vector3(0, 0, -1);
+	}
+	if (_key->isKeyDown(OIS::KC_S))
+	{
+		direction = Ogre::Vector3(0, 0, 1);
+	}
+	if (_key->isKeyDown(OIS::KC_A))
+	{
+		direction = Ogre::Vector3(-1, 0, 0);
+	}
+	if (_key->isKeyDown(OIS::KC_D))
+	{
+		direction = Ogre::Vector3(1, 0, 0);
+	}
+	if (_key->isKeyDown(OIS::KC_R) && _timer.getMilliseconds() > 250)
+	{
+		if (_PolyMode == PM_SOLID)
+		{
+			_PolyMode = Ogre::PM_WIREFRAME;
+		}
+		else if (_PolyMode == PM_WIREFRAME)
+		{
+			_PolyMode = Ogre::PM_POINTS;
+		}
+		else if (_PolyMode == PM_POINTS)
+		{
+			_PolyMode = Ogre::PM_SOLID;
+		}
+		_Cam->setPolygonMode(_PolyMode);
+		_timer.reset();
+	}
+
+	// <Part 3 - Adding movement to the model
+	//	_node->translate(speed * direction * evt.timeSinceLastFrame);
+	// Part 3>
+	float rotX = _mouse->getMouseState().X.rel * evt.timeSinceLastFrame * -1;
+	float rotY = _mouse->getMouseState().Y.rel * evt.timeSinceLastFrame * -1;
+	_Cam->yaw(Ogre::Radian(rotX));
+	_Cam->pitch(Ogre::Radian(rotY));
+	_Cam->moveRelative(direction * evt.timeSinceLastFrame * _speed);
+
+	return true;
 }
 

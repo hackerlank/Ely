@@ -16,11 +16,37 @@ public:
 	Example();
 	virtual ~Example();
 
+protected:
 	virtual void createScene();
 	virtual void createCamera();
-	virtual void createViewports(void);
+	virtual void createFrameListener(void);
 
-protected:
+private:
+	Ogre::SceneNode* _SinbadNode;
+	Ogre::FrameListener* FrameListener;
+};
+
+class Example4FrameListener: public Ogre::FrameListener
+{
+public:
+	Example4FrameListener();
+	Example4FrameListener(Ogre::SceneNode* node, RenderWindow* win,
+			Ogre::Camera* cam);
+	virtual ~Example4FrameListener();
+
+	virtual bool frameStarted(const FrameEvent& evt);
+
+private:
+	Ogre::SceneNode* _node;
+	Ogre::Camera* _Cam;
+	Ogre::PolygonMode _PolyMode;
+	Ogre::Timer _timer;
+
+	OIS::InputManager* _man;
+	OIS::Keyboard* _key;
+	OIS::Mouse* _mouse;
+
+	float _speed;
 
 };
 
