@@ -30,8 +30,8 @@ void Example::createScene()
 	mSceneMgr->getRootSceneNode()->createChildSceneNode()->attachObject(ent);
 	ent->setMaterialName("Examples/BeachStones");
 
-	//	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
-	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
+	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_ADDITIVE);
+	//	mSceneMgr->setShadowTechnique(SHADOWTYPE_STENCIL_MODULATIVE);
 
 	Ogre::Light* light = mSceneMgr->createLight("Light1");
 	light->setType(Ogre::Light::LT_DIRECTIONAL);
@@ -39,11 +39,23 @@ void Example::createScene()
 
 	Ogre::SceneNode* node = mSceneMgr->createSceneNode("Node1");
 	mSceneMgr->getRootSceneNode()->addChild(node);
-	Ogre::Entity* Sinbad = mSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
+	_SinbadEnt = mSceneMgr->createEntity("Sinbad", "Sinbad.mesh");
 	_SinbadNode = node->createChildSceneNode("SinbadNode");
 	_SinbadNode->setScale(3.0f, 3.0f, 3.0f);
 	_SinbadNode->setPosition(Ogre::Vector3(0.0f, 4.8f, 0.0f));
-	_SinbadNode->attachObject(Sinbad);
+	_SinbadNode->attachObject(_SinbadEnt);
+
+	Ogre::Entity* sword1 = mSceneMgr->createEntity("Sword1", "Sword.mesh");
+	Ogre::Entity* sword2 = mSceneMgr->createEntity("Sword2", "Sword.mesh");
+	_SinbadEnt->attachObjectToBone("Handle.L", sword1);
+	_SinbadEnt->attachObjectToBone("Handle.R", sword2);
+
+	Ogre::AnimationStateSet* set = _SinbadEnt->getAllAnimationStates();
+	Ogre::AnimationStateIterator iter = set->getAnimationStateIterator();
+	while (iter.hasMoreElements())
+	{
+		std::cout << iter.getNext()->getAnimationName() << std::endl;
+	}
 
 }
 
@@ -57,21 +69,29 @@ void Example::createCamera()
 
 void Example::createFrameListener(void)
 {
-	FrameListener = new Example4FrameListener(_SinbadNode, mWindow, mCamera);
+	FrameListener = new Example4FrameListener(_SinbadNode, _SinbadEnt, mWindow,
+			mCamera);
 	mRoot->addFrameListener(FrameListener);
 }
 
 /*----------------------------------------------------*/
 
-Example4FrameListener::Example4FrameListener()
-{
-}
-
 Example4FrameListener::Example4FrameListener(Ogre::SceneNode *node,
-		RenderWindow* win, Ogre::Camera* cam) :
+		Ogre::Entity* ent, RenderWindow* win, Ogre::Camera* cam) :
 	_PolyMode(Ogre::PM_SOLID), _speed(40.0)
 {
 	_node = node;
+
+	_ent = ent;
+	//	_aniState = _ent->getAnimationState("Dance");
+	_aniState = _ent->getAnimationState("RunBase");
+	//	_aniState->setEnabled(true);
+	_aniState->setLoop(false);
+	_aniStateTop = _ent->getAnimationState("RunTop");
+	//	_aniStateTop->setEnabled(true);
+	_aniStateTop->setLoop(false);
+	_WalkingSpeed = 50.0f;
+	_rotation = 0.0f;
 
 	size_t windowHnd = 0;
 	std::stringstream windowHndStr;
@@ -157,6 +177,62 @@ bool Example4FrameListener::frameStarted(const FrameEvent & evt)
 	_Cam->yaw(Ogre::Radian(rotX));
 	_Cam->pitch(Ogre::Radian(rotY));
 	_Cam->moveRelative(direction * evt.timeSinceLastFrame * _speed);
+
+	bool walked = false;
+	Ogre::Vector3 SinbadTranslate(0, 0, 0);
+	if (_key->isKeyDown(OIS::KC_UP))
+	{
+		SinbadTranslate += Ogre::Vector3(0, 0, -1);
+		_rotation = 3.14f;
+		walked = true;
+	}
+	if (_key->isKeyDown(OIS::KC_DOWN))
+	{
+		SinbadTranslate += Ogre::Vector3(0, 0, 1);
+		_rotation = 0.0f;
+		walked = true;
+	}
+	if (_key->isKeyDown(OIS::KC_LEFT))
+	{
+		SinbadTranslate += Ogre::Vector3(-1, 0, 0);
+		_rotation = -1.57f;
+		walked = true;
+	}
+	if (_key->isKeyDown(OIS::KC_RIGHT))
+	{
+		SinbadTranslate += Ogre::Vector3(1, 0, 0);
+		_rotation = 1.57f;
+		walked = true;
+	}
+
+	if (walked)
+	{
+		_aniState->setEnabled(true);
+		_aniStateTop->setEnabled(true);
+		if (_aniState->hasEnded())
+		{
+			_aniState->setTimePosition(0.0f);
+		}
+		if (_aniStateTop->hasEnded())
+		{
+			_aniStateTop->setTimePosition(0.0f);
+		}
+		_aniState->addTime(evt.timeSinceLastFrame);
+		_aniStateTop->addTime(evt.timeSinceLastFrame);
+	}
+	else
+	{
+		_aniState->setTimePosition(0.0f);
+		_aniState->setEnabled(false);
+		_aniStateTop->setTimePosition(0.0f);
+		_aniStateTop->setEnabled(false);
+	}
+	_node->translate(SinbadTranslate * evt.timeSinceLastFrame * _WalkingSpeed);
+	_node->resetOrientation();
+	_node->yaw(Ogre::Radian(_rotation));
+
+	//	_aniState->addTime(evt.timeSinceLastFrame);
+	//	_aniStateTop->addTime(evt.timeSinceLastFrame);
 
 	return true;
 }

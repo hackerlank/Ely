@@ -23,15 +23,15 @@ protected:
 
 private:
 	Ogre::SceneNode* _SinbadNode;
+	Ogre::Entity* _SinbadEnt;
 	Ogre::FrameListener* FrameListener;
 };
 
 class Example4FrameListener: public Ogre::FrameListener
 {
 public:
-	Example4FrameListener();
-	Example4FrameListener(Ogre::SceneNode* node, RenderWindow* win,
-			Ogre::Camera* cam);
+	Example4FrameListener(Ogre::SceneNode* node, Ogre::Entity* ent,
+			RenderWindow* win, Ogre::Camera* cam);
 	virtual ~Example4FrameListener();
 
 	virtual bool frameStarted(const FrameEvent& evt);
@@ -41,6 +41,12 @@ private:
 	Ogre::Camera* _Cam;
 	Ogre::PolygonMode _PolyMode;
 	Ogre::Timer _timer;
+
+	Ogre::Entity* _ent;
+	Ogre::AnimationState* _aniState;
+	Ogre::AnimationState* _aniStateTop;
+	float _WalkingSpeed;
+	float _rotation;
 
 	OIS::InputManager* _man;
 	OIS::Keyboard* _key;
