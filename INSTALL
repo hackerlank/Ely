@@ -5,7 +5,7 @@ Build from source instructions: http://www.ogre3d.org/tikiwiki/tiki-index.php?pa
 - download stable version: ogre_src_v1-7-2.tar.bz2
 - extract and make a link: ogre -> /REPOSITORY/KProjects/ogre_src_v1-7-2
 - install cmake and cmake-gui: sudo apt-get install cmake cmake-qt-gui
-- cmake-gui:
+- cmake-gui (after installing all the dependencies):
 	a) select:
 		* Where is the source code: /REPOSITORY/KProjects/ogre
 		* Where to build the binaries: /REPOSITORY/KProjects/ogre/build
@@ -59,7 +59,7 @@ $ make install
 		"find_path(OGRE_BUILD NAMES bin/Release/OgreMain.dll HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
 		with
 		"find_path(OGRE_BUILD NAMES lib HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
-- use cmake-gui:
+- use cmake-gui (after installing all the dependencies):
 	a) select:
 		* Where is the source code: /REPOSITORY/KProjects/ogreode
 		* Where to build the binaries: /REPOSITORY/KProjects/ogreode/build
@@ -79,3 +79,35 @@ $ make install
 
 - After installation in "/REPOSITORY/KProjects/usr/include/OgreOde_Prefab/OgreOde_Prefab.h" delete or comment out the line
 	#include "OgreOde_PrefabPreReqs.h"
+	
+### INSTALLING BULLET ON DEBIAN (DEBUG VERSION) ###
+
+- svn checkout http://bullet.googlecode.com/svn/trunk/ bullet
+- use cmake-gui (after installing all the dependencies):
+	a) select:
+		* Where is the source code: /REPOSITORY/KProjects/bullet
+		* Where to build the binaries: /REPOSITORY/KProjects/bullet/build
+	b) select the "Advanced" check-box
+	c) click on "Configure"
+	c) set/add the following options and entries 
+		* PKGCONFIG_INSTALL_PREFIX:STRING=/usr/local/lib/pkgconfig/
+		* INCLUDE_INSTALL_DIR:PATH=/REPOSITORY/KProjects/usr/bullet
+		* CMAKE_BUILD_TYPE:STRING=Debug
+		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
+		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
+		* BUILD_CPU_DEMOS:BOOL=OFF
+		* BUILD_DEMOS:BOOL=OFF
+		* BUILD_EXTRAS:BOOL=ON
+		* BUILD_NVIDIA_OPENCL_DEMOS:BOOL=ON
+		* BUILD_SHARED_LIBS:BOOL=ON (to be added)
+	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
+		* INSTALL_EXTRA_LIBS:BOOL=ON
+		* LIB_DESTINATION:STRING=/REPOSITORY/KProjects/usr/lib
+		* USE_CUSTOM_VECTOR_MATH:BOOL=ON
+	d) click again on "Configure"
+	e) click on "Generate"
+- cd /REPOSITORY/KProjects/bullet/build
+- make
+- make install
+After installing move /REPOSITORY/KProjects/usr/bullet to /REPOSITORY/KProjects/usr/include/bullet
+

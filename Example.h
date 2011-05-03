@@ -17,9 +17,6 @@ public:
 protected:
 
 	virtual void createScene();
-	//<Part 1
-	//	virtual void chooseSceneManager(void);
-	// Part 1>
 
 private:
 
