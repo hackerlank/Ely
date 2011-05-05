@@ -90,7 +90,7 @@ $ make install
 	b) select the "Advanced" check-box
 	c) click on "Configure"
 	c) set/add the following options and entries 
-		* PKGCONFIG_INSTALL_PREFIX:STRING=/usr/local/lib/pkgconfig/
+		* PKGCONFIG_INSTALL_PREFIX:STRING=/REPOSITORY/KProjects/usr/lib/pkgconfig/
 		* INCLUDE_INSTALL_DIR:PATH=/REPOSITORY/KProjects/usr/bullet
 		* CMAKE_BUILD_TYPE:STRING=Debug
 		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
