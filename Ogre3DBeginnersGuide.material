@@ -140,20 +140,88 @@ vertex_program MyVertexShader1 glsl
     }
 }
 
-material MyMaterial13
+vertex_program MyVertexShader2 glsl
+  {
+    source Ogre3DBeginnerGuide-VertexShader.glsl
+    profiles vs_1_1 arbvp1
+    default_params
+    {
+      param_named_auto worldViewMatrix worldviewproj_matrix
+      param_named_auto pulseTime time
+    }
+}
+
+//material MyMaterial13
+//{
+//    technique
+//    {
+//        pass
+//        {
+//             vertex_program_ref MyVertexShader1
+//             {
+//             }
+//             fragment_program_ref MyFragmentShader1
+//             {
+//             }
+//        }
+//    }
+//}
+
+//material MyMaterial14
+//{
+//    technique
+//    {
+//        pass
+//        {
+//             vertex_program_ref MyVertexShader1
+//             {
+//             }
+//             fragment_program_ref MyFragmentShader1
+//             {
+//                param_named texture0 int 0
+//             }
+//             texture_unit
+//			 {
+//			 	texture terr_rock6.jpg 2d
+//			 }
+//        }
+//    }
+//}
+
+//material MyMaterial15
+//{
+//    technique
+//    {
+//        pass
+//        {
+//             vertex_program_ref MyVertexShader1
+//             {
+//             }
+//             fragment_program_ref MyFragmentShader1
+//             {
+//             }
+//        }
+//    }
+//}
+
+material MyMaterial17
 {
     technique
     {
         pass
         {
-             vertex_program_ref MyVertexShader1
+             vertex_program_ref MyVertexShader2
              {
              }
              fragment_program_ref MyFragmentShader1
              {
+                param_named texture0 int 0
              }
+             texture_unit
+			 {
+			 	texture terr_rock6.jpg 2d
+			 }
         }
     }
 }
 
- 
