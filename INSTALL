@@ -81,7 +81,7 @@ $ make install
 	#include "OgreOde_PrefabPreReqs.h"
 	
 ### INSTALLING BULLET ON DEBIAN (DEBUG VERSION) ###
-
+ogrebullet
 - svn checkout http://bullet.googlecode.com/svn/trunk/ bullet
 - use cmake-gui (after installing all the dependencies):
 	a) select:
@@ -110,4 +110,20 @@ $ make install
 - make
 - make install
 After installing move /REPOSITORY/KProjects/usr/bullet to /REPOSITORY/KProjects/usr/include/bullet
+
+### INSTALLING OGREBULLET ON DEBIAN (DEBUG VERSION) ###
+
+- svn checkout https://ogreaddons.svn.sourceforge.net/svnroot/ogreaddons/trunk/ogrebullet ogrebullet
+
+$ cd ogrebullet
+$ chmod +x autogen.sh
+$ ./autogen.sh
+$ export CXXFLAGS='-O0 -g3 -Wall'
+$ export OGRE_CFLAGS='-I/REPOSITORY/KProjects/usr/include/OGRE'
+$ export OGRE_LIBS='-L/REPOSITORY/KProjects/usr/lib -Wl,-rpath,/REPOSITORY/KProjects/usr/lib -lOgreMain_d'
+$ export bullet_CFLAGS='-I/REPOSITORY/KProjects/usr/include/bullet -I/REPOSITORY/KProjects/usr/include/bullet/ConvexDecomposition'
+$ export bullet_LIBS='-L/REPOSITORY/KProjects/usr/lib -Wl,-rpath,/REPOSITORY/KProjects/usr/lib -lBulletCollision -lBulletDynamics -lBulletMultiThreaded -lBulletSoftBody -lBulletSoftBodySolvers_CPU -lBulletSoftBodySolvers_OpenCL_Mini -lBulletSoftBodySolvers_OpenCL_NVidia'
+$ ./configure --prefix=/REPOSITORY/KProjects/usr 
+$ make
+$ make install
 
