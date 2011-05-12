@@ -225,3 +225,15 @@ material MyMaterial17
     }
 }
 
+material Ogre3DBeginnersGuide/Comp1
+{
+	technique
+    {
+        pass
+        {
+			 texture_unit
+             {
+             }
+        }
+    }
+}
