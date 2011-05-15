@@ -1,32 +1,15 @@
 #version 330
 
-//<MyMaterial13>
-//out vec4        gl_FragColor;
-
-//void main()
-//{
-//	gl_FragColor = vec4(0,0,1,0);
-//}
-//</MyMaterial13>
-
-//<MyMaterial14>
+//<Ogre3DBeginnersGuide/Comp2>
 in vec2         ouv0;
 out vec4        gl_FragColor;
 uniform sampler2D texture0;
 
 void main()
 {
-    gl_FragColor = texture(texture0,ouv0);
+    vec4 temp_color = texture(texture0,ouv0);
+	float greyvalue = temp_color.r * 0.3 + temp_color.g * 0.59 + temp_color.b * 0.11;
+	gl_FragColor = vec4 (greyvalue, greyvalue, greyvalue, 0);
 }
-//</MyMaterial14>
-
-//<MyMaterial15>
-//in vec4         ocolour;
-//out vec4        gl_FragColor;
-
-//void main()
-//{
-//    gl_FragColor = ocolour;
-//}
-//</MyMaterial15>
+//</Ogre3DBeginnersGuide/Comp2>
 

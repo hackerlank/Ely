@@ -19,4 +19,75 @@ compositor Compositor1
   	}
 }
 		
+compositor Compositor2
+{
+   	technique
+    {
+		texture scene target_width target_height PF_R8G8B8
+		target scene
+        {
+             input previous
+        }
+		target_output
+    	{
+			input none
+			pass render_quad
+			{
+				material Ogre3DBeginnersGuide/Comp2
+				input 0 scene
+			}
+		}
+  	}
+}
 		
+compositor Compositor3
+{
+   	technique
+    {
+		texture scene target_width target_height PF_R8G8B8
+		target scene
+        {
+             input previous
+        }
+		target_output
+    	{
+			input none
+			pass render_quad
+			{
+				material Ogre3DBeginnersGuide/Comp3
+				input 0 scene
+			}
+		}
+  	}
+}
+		
+compositor Compositor4
+{
+	technique
+    {
+        texture scene target_width target_height PF_R8G8B8
+		texture temp target_width target_height PF_R8G8B8
+		target scene
+      	{
+        	input previous
+      	}
+	    target temp
+	    {
+   	    	pass render_quad
+        	{
+        		material Ogre3DBeginnersGuide/Comp2
+        		input 0 scene
+        	}
+      	}
+		target_output
+        {
+        	input none
+            pass render_quad
+            {
+            	material Ogre3DBeginnersGuide/Comp3
+                input 0 temp
+            }
+         }
+	}
+}
+	

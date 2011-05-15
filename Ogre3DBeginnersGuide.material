@@ -1,230 +1,3 @@
-material MyMaterial1
-{
-  technique
-  {
-    pass
-    {
-      texture_unit
-      {
-          texture leaf.png
-      }
-    }
-  }
-}
-
-material MyMaterial3
-{
-  technique
-  {
-    pass
-    {
-       texture_unit
-       {
-         texture terr_rock6.jpg
-       }
-    }
-  }
-}
-
-material MyMaterial4
-{
-    technique
-    {
-        pass
-        {
-             texture_unit
-             {
-                 texture terr_rock6.jpg
-                 tex_address_mode clamp
-             }
-        }
-    }
-}
-
-material MyMaterial5
-{
-    technique
-    {
-        pass
-        {
-             texture_unit
-             {
-                 texture leaf.png
-                 tex_address_mode mirror
-             }
-        }
-    }
-}
-
-material MyMaterial6
-{
-    technique
-    {
-        pass
-        {
-             texture_unit
-             {
-                 texture leaf.png
-                 tex_address_mode border
-             }
-        }
-    }
-}
-
-material MyMaterial7
-{
-    technique
-    {
-        pass
-        {
-             texture_unit
-             {
-                 texture terr_rock6.jpg
-                 tex_address_mode border
-                 tex_border_colour 0.0 0.0 1.0
-             }
-        }
-    }
-}
-
-material MyMaterial8
-{
-    technique
-    {
-        pass
-        {
-             texture_unit
-             {
-                 // texture terr_rock6.jpg
-                 texture ogrelogo.png
-                 // scroll 0.8 0.8
-                 scroll_anim 0 0.05
-             }
-        }
-    }
-}
-
-material MyMaterial11
-{
-    technique
-    {
-        pass
-        {
-             texture_unit texture1
-             {
-               texture terr_rock6.jpg
-               rotate_anim 0.1
-             }
-        }
-    }
-}
-
-material MyMaterial12 : MyMaterial11
-{
-  set_texture_alias texture1 Water02.jpg
-}
-
-fragment_program MyFragmentShader1 glsl
-{
-  source Ogre3DBeginnersGuide-FragmentShader.glsl
-  profiles ps_1_1 arbfp1
-}
-
-vertex_program MyVertexShader1 glsl
-  {
-    source Ogre3DBeginnerGuide-VertexShader.glsl
-    profiles vs_1_1 arbvp1
-    default_params
-    {
-      param_named_auto worldViewMatrix worldviewproj_matrix
-    }
-}
-
-vertex_program MyVertexShader2 glsl
-  {
-    source Ogre3DBeginnerGuide-VertexShader.glsl
-    profiles vs_1_1 arbvp1
-    default_params
-    {
-      param_named_auto worldViewMatrix worldviewproj_matrix
-      param_named_auto pulseTime time
-    }
-}
-
-//material MyMaterial13
-//{
-//    technique
-//    {
-//        pass
-//        {
-//             vertex_program_ref MyVertexShader1
-//             {
-//             }
-//             fragment_program_ref MyFragmentShader1
-//             {
-//             }
-//        }
-//    }
-//}
-
-//material MyMaterial14
-//{
-//    technique
-//    {
-//        pass
-//        {
-//             vertex_program_ref MyVertexShader1
-//             {
-//             }
-//             fragment_program_ref MyFragmentShader1
-//             {
-//                param_named texture0 int 0
-//             }
-//             texture_unit
-//			 {
-//			 	texture terr_rock6.jpg 2d
-//			 }
-//        }
-//    }
-//}
-
-//material MyMaterial15
-//{
-//    technique
-//    {
-//        pass
-//        {
-//             vertex_program_ref MyVertexShader1
-//             {
-//             }
-//             fragment_program_ref MyFragmentShader1
-//             {
-//             }
-//        }
-//    }
-//}
-
-material MyMaterial17
-{
-    technique
-    {
-        pass
-        {
-             vertex_program_ref MyVertexShader2
-             {
-             }
-             fragment_program_ref MyFragmentShader1
-             {
-                param_named texture0 int 0
-             }
-             texture_unit
-			 {
-			 	texture terr_rock6.jpg 2d
-			 }
-        }
-    }
-}
-
 material Ogre3DBeginnersGuide/Comp1
 {
 	technique
@@ -232,6 +5,68 @@ material Ogre3DBeginnersGuide/Comp1
         pass
         {
 			 texture_unit
+             {
+             }
+        }
+    }
+}
+
+vertex_program MyVertexShader glsl
+{
+    source Ogre3DBeginnerGuide-VertexShader.glsl
+    profiles vs_1_1 arbvp1
+    default_params
+    {
+      param_named_auto worldViewMatrix worldviewproj_matrix
+    }
+}
+
+fragment_program MyFragmentShader5 glsl
+{
+  source Ogre3DBeginnersGuide-FragmentShader.glsl
+  profiles ps_1_1 arbfp1
+}
+
+material Ogre3DBeginnersGuide/Comp2
+{
+	technique
+    {
+        pass
+        {
+			 vertex_program_ref MyVertexShader
+             {
+             }          
+			 fragment_program_ref MyFragmentShader5
+             {
+                param_named texture0 int 0
+             }
+             texture_unit
+             {
+             }
+        }
+    }
+}
+
+fragment_program MyFragmentShader6 glsl
+{
+  source Ogre3DBeginnersGuide-FragmentShader3.glsl
+  profiles ps_1_1 arbfp1
+}
+
+material Ogre3DBeginnersGuide/Comp3
+{
+	technique
+    {
+        pass
+        {
+			 vertex_program_ref MyVertexShader
+             {
+             }          
+			 fragment_program_ref MyFragmentShader6
+             {
+                param_named texture0 int 0
+             }
+             texture_unit
              {
              }
         }
