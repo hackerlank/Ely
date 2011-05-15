@@ -23,7 +23,7 @@ vertex_program MyVertexShader glsl
 
 fragment_program MyFragmentShader5 glsl
 {
-  source Ogre3DBeginnersGuide-FragmentShader.glsl
+  source Ogre3DBeginnersGuide-FragmentShader5.glsl
   profiles ps_1_1 arbfp1
 }
 
@@ -49,7 +49,7 @@ material Ogre3DBeginnersGuide/Comp2
 
 fragment_program MyFragmentShader6 glsl
 {
-  source Ogre3DBeginnersGuide-FragmentShader3.glsl
+  source Ogre3DBeginnersGuide-FragmentShader6.glsl
   profiles ps_1_1 arbfp1
 }
 
