@@ -90,4 +90,35 @@ compositor Compositor4
          }
 	}
 }
+
+compositor Compositor5
+{
+   technique
+    {
+        texture scene target_width target_height PF_R8G8B8
+		target scene
+		{
+   			input previous
+		}
+		target scene
+		{
+	      	pass render_quad
+	      	{
+		   		material Ogre3DBeginnersGuide/Comp2
+		        input 0 scene
+	      	}
+		}
+		target_output
+		{	
+	    	input none
+	      	pass render_quad
+	      	{
+		    	material Ogre3DBeginnersGuide/Comp3
+		        input 0 scene
+	      	}
+		}
+	}	
+}
+
+	
 	

@@ -27,10 +27,23 @@ void Example::createScene()
 	//			mCamera->getViewport(), "Compositor3");
 	//	Ogre::CompositorManager::getSingleton().setCompositorEnabled(
 	//			mCamera->getViewport(), "Compositor3", true);
+	//	Ogre::CompositorManager::getSingleton().addCompositor(
+	//			mCamera->getViewport(), "Compositor4");
+	//	Ogre::CompositorManager::getSingleton().setCompositorEnabled(
+	//			mCamera->getViewport(), "Compositor4", true);
+	//	Ogre::CompositorManager::getSingleton().addCompositor(
+	//			mCamera->getViewport(), "Compositor5");
+	//	Ogre::CompositorManager::getSingleton().setCompositorEnabled(
+	//			mCamera->getViewport(), "Compositor5", true);
+
 	Ogre::CompositorManager::getSingleton().addCompositor(
-			mCamera->getViewport(), "Compositor4");
+			mCamera->getViewport(), "Compositor3");
+	Ogre::CompositorManager::getSingleton(). setCompositorEnabled(
+			mCamera->getViewport(), "Compositor3", true);
+	Ogre::CompositorManager::getSingleton().addCompositor(
+			mCamera->getViewport(), "Compositor2");
 	Ogre::CompositorManager::getSingleton().setCompositorEnabled(
-			mCamera->getViewport(), "Compositor4", true);
+			mCamera->getViewport(), "Compositor2", true);
 
 }
 
