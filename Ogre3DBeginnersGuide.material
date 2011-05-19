@@ -72,3 +72,46 @@ material Ogre3DBeginnersGuide/Comp3
         }
     }
 }
+
+material Ogre3DBeginnersGuide/Comp5
+{
+	technique
+    {
+        pass
+        {
+			 vertex_program_ref MyVertexShader
+             {
+             }          
+			 fragment_program_ref MyFragmentShader5
+             {
+                param_named texture0 int 0
+             }			                 
+             texture_unit
+             {
+             }
+        }
+    }
+}
+
+material Ogre3DBeginnersGuide/Comp6
+{
+	technique
+    {
+        pass
+        {
+			 vertex_program_ref MyVertexShader
+             {
+             }          
+			 fragment_program_ref MyFragmentShader5
+             {
+                param_named texture0 int 0
+                //<Ogre3DBeginnersGuide/Comp6>
+                param_named numpixels float 25
+                //</Ogre3DBeginnersGuide/Comp6>
+             }			                 
+             texture_unit
+             {
+             }
+        }
+    }
+}
