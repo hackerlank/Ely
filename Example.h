@@ -45,6 +45,25 @@
 //	CompositorListener1* _listener;
 //};
 
+class CompositorListener2: public Ogre::CompositorInstance::Listener
+{
+public:
+	void notifyMaterialSetup(uint32 pass_id, MaterialPtr &mat);
+
+};
+
+class CompositorListener3: public Ogre::CompositorInstance::Listener
+{
+public:
+	void notifyMaterialSetup(uint32 pass_id, MaterialPtr &mat);
+};
+
+class CompositorListener4: public Ogre::CompositorInstance::Listener
+{
+public:
+	void notifyMaterialSetup(uint32 pass_id, MaterialPtr &mat);
+};
+
 class Example: public ExampleApplication
 {
 public:
@@ -61,7 +80,15 @@ protected:
 private:
 	//	CompositorListener1* compListener;
 	//	Ogre::FrameListener* FrameListener;
-	Ogre::Camera* mCamera2;
+	//	Ogre::Camera* mCamera2;
+	Ogre::Viewport* vp;
+	Ogre::Viewport* vp2;
+	Ogre::Viewport* vp3;
+	Ogre::Viewport* vp4;
+	CompositorListener2* compListener;
+	CompositorListener3* compListener2;
+	CompositorListener4* compListener3;
+
 };
 
 #endif /* EXAMPLE_H_ */

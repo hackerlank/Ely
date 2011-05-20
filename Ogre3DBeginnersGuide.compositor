@@ -162,4 +162,25 @@ compositor Compositor8
   	}
 }
 
+compositor Compositor9
+{
+   technique
+    {
+        texture scene target_width target_height PF_R8G8B8
+        target scene
+        {
+             input previous
+        }
+		
+        target_output
+        {
+             input none
+             pass render_quad
+             {
+                 material Ogre3DBeginnersGuide/Comp7
+                 input 0 scene
+             }
+        }
+    }
+}
 	

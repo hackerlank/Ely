@@ -23,8 +23,14 @@ vertex_program MyVertexShader glsl
 
 fragment_program MyFragmentShader5 glsl
 {
-  source Ogre3DBeginnersGuide-FragmentShader5.glsl
-  profiles ps_1_1 arbfp1
+	source Ogre3DBeginnersGuide-FragmentShader5.glsl
+	profiles ps_1_1 arbfp1
+	//<Ogre3DBeginnersGuide/Comp7>
+	default_params
+	{
+		param_named factors float4 1 1 1 0
+	}
+	//</Ogre3DBeginnersGuide/Comp7>
 }
 
 material Ogre3DBeginnersGuide/Comp2
@@ -108,6 +114,29 @@ material Ogre3DBeginnersGuide/Comp6
                 //<Ogre3DBeginnersGuide/Comp6>
                 param_named numpixels float 25
                 //</Ogre3DBeginnersGuide/Comp6>
+             }			                 
+             texture_unit
+             {
+             }
+        }
+    }
+}
+
+material Ogre3DBeginnersGuide/Comp7
+{
+	technique
+    {
+        pass
+        {
+			 vertex_program_ref MyVertexShader               //<Ogre3DBeginnersGuide/Comp6>
+                param_named numpixels float 25
+                //</Ogre3DBeginnersGuide/Comp6>
+			 
+             {
+             }          
+			 fragment_program_ref MyFragmentShader5
+             {
+                param_named texture0 int 0
              }			                 
              texture_unit
              {

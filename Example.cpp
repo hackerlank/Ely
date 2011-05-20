@@ -11,6 +11,10 @@ Example::Example()
 {
 	//	FrameListener = NULL;
 	//	compListener = NULL;
+	compListener = NULL;
+	compListener2 = NULL;
+	compListener3 = NULL;
+
 }
 
 Example::~Example()
@@ -23,6 +27,18 @@ Example::~Example()
 	//	{
 	//		delete FrameListener;
 	//	}
+	if (compListener)
+	{
+		delete compListener;
+	}
+	if (compListener2)
+	{
+		delete compListener2;
+	}
+	if (compListener3)
+	{
+		delete compListener3;
+	}
 
 }
 
@@ -82,32 +98,76 @@ void Example::createScene()
 	//					mCamera->getViewport())->getCompositor("Compositor8");
 	//	compListener = new CompositorListener1();
 	//	comp->addListener(compListener);
+	Ogre::CompositorManager::getSingleton().addCompositor(vp, "Compositor9");
+	Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp,
+			"Compositor9", true);
+	Ogre::CompositorInstance
+			* comp =
+					Ogre::CompositorManager::getSingleton().getCompositorChain(
+							vp)->getCompositor("Compositor9");
+	compListener = new CompositorListener2();
+	comp->addListener(compListener);
+	Ogre::CompositorManager::getSingleton().addCompositor(vp2, "Compositor9");
+	Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp2,
+			"Compositor9", true);
+	Ogre::CompositorInstance
+			* comp2 =
+					Ogre::CompositorManager::getSingleton().getCompositorChain(
+							vp2)->getCompositor("Compositor9");
+	compListener2 = new CompositorListener3();
+	comp2->addListener(compListener2);
+	Ogre::CompositorManager::getSingleton().addCompositor(vp3, "Compositor9");
+	Ogre::CompositorManager::getSingleton().setCompositorEnabled(vp3,
+			"Compositor9", true);
+	Ogre::CompositorInstance
+			* comp3 =
+					Ogre::CompositorManager::getSingleton().getCompositorChain(
+							vp3)->getCompositor("Compositor9");
+	compListener3 = new CompositorListener4();
+	comp3->addListener(compListener3);
 
 }
 
 void Example::createCamera()
 {
+	//	mCamera = mSceneMgr->createCamera("MyCamera1");
+	//	mCamera->setPosition(0, 10, 20);
+	//	mCamera->lookAt(0, 0, 0);
+	//	mCamera->setNearClipDistance(5);
+	//
+	//	mCamera2 = mSceneMgr->createCamera("MyCamera2");
+	//	mCamera2->setPosition(20, 10, 0);
+	//	mCamera2->lookAt(0, 0, 0);
+	//	mCamera2->setNearClipDistance(5);
+
 	mCamera = mSceneMgr->createCamera("MyCamera1");
 	mCamera->setPosition(0, 10, 20);
 	mCamera->lookAt(0, 0, 0);
 	mCamera->setNearClipDistance(5);
 
-	mCamera2 = mSceneMgr->createCamera("MyCamera2");
-	mCamera2->setPosition(20, 10, 0);
-	mCamera2->lookAt(0, 0, 0);
-	mCamera2->setNearClipDistance(5);
 }
 
 void Example::createViewports()
 {
-	Ogre::Viewport* vp = mWindow->addViewport(mCamera, 0, 0.0, 0.0, 0.5, 1.0);
+	//	Ogre::Viewport* vp = mWindow->addViewport(mCamera, 0, 0.0, 0.0, 0.5, 1.0);
+	//	vp->setBackgroundColour(ColourValue(0.0f, 0.0f, 0.0f));
+	//	Ogre::Viewport* vp2 = mWindow->addViewport(mCamera2, 1, 0.5, 0.0, 0.5, 1.0);
+	//	vp2->setBackgroundColour(ColourValue(0.0f, 0.0f, 0.0f));
+	//	mCamera->setAspectRatio(Real(vp->getActualWidth()) / Real(
+	//			vp->getActualHeight()));
+	//	mCamera2->setAspectRatio(Real(vp2->getActualWidth()) / Real(
+	//			vp2->getActualHeight()));
+
+	vp = mWindow->addViewport(mCamera, 0, 0.0, 0.0, 0.5, 0.5);
 	vp->setBackgroundColour(ColourValue(0.0f, 0.0f, 0.0f));
-	Ogre::Viewport* vp2 = mWindow->addViewport(mCamera2, 1, 0.5, 0.0, 0.5, 1.0);
+	vp2 = mWindow->addViewport(mCamera, 1, 0.5, 0.0, 0.5, 0.5);
 	vp2->setBackgroundColour(ColourValue(0.0f, 0.0f, 0.0f));
+	vp3 = mWindow->addViewport(mCamera, 2, 0.0, 0.5, 0.5, 0.5);
+	vp3->setBackgroundColour(ColourValue(0.0f, 0.0f, 0.0f));
+	vp4 = mWindow->addViewport(mCamera, 3, 0.5, 0.5, 0.5, 0.5);
+	vp4->setBackgroundColour(ColourValue(0.0f, 0.0f, 0.0f));
 	mCamera->setAspectRatio(Real(vp->getActualWidth()) / Real(
 			vp->getActualHeight()));
-	mCamera2->setAspectRatio(Real(vp2->getActualWidth()) / Real(
-			vp2->getActualHeight()));
 
 }
 
@@ -178,3 +238,24 @@ void Example::createViewports()
 //	}
 //	return true;
 //}
+
+//-----------------------------CompositorListener2/3/4-----------------------------------//
+
+void CompositorListener2::notifyMaterialSetup(uint32 pass_id, MaterialPtr &mat)
+{
+	mat->getBestTechnique()->getPass(pass_id)->getFragmentProgramParameters()->setNamedConstant(
+			"factors", Ogre::Vector3(1, 0, 0));
+
+}
+
+void CompositorListener3::notifyMaterialSetup(uint32 pass_id, MaterialPtr &mat)
+{
+	mat->getBestTechnique()->getPass(pass_id)->getFragmentProgramParameters()->setNamedConstant(
+			"factors", Ogre::Vector3(0, 1, 0));
+}
+
+void CompositorListener4::notifyMaterialSetup(uint32 pass_id, MaterialPtr &mat)
+{
+	mat->getBestTechnique()->getPass(pass_id)->getFragmentProgramParameters()->setNamedConstant(
+			"factors", Ogre::Vector3(0, 0, 1));
+}
