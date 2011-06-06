@@ -49,13 +49,6 @@
 <listOptionValue builtIn="false" value="OgreMain_d"/>
 <listOptionValue builtIn="false" value="OgreTerrain_d"/>
 <listOptionValue builtIn="false" value="OIS"/>
-<listOptionValue builtIn="false" value="CEGUIBase"/>
-<listOptionValue builtIn="false" value="CEGUIFalagardWRBase"/>
-<listOptionValue builtIn="false" value="CEGUIOgreRenderer"/>
-<listOptionValue builtIn="false" value="CEGUIExpatParser"/>
-<listOptionValue builtIn="false" value="OgreOde_Core_d"/>
-<listOptionValue builtIn="false" value="OgreOde_Loader_d"/>
-<listOptionValue builtIn="false" value="OgreOde_Prefab_d"/>
 </option>
 <option id="gnu.cpp.link.option.paths.890803978" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 <listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/lib"/>

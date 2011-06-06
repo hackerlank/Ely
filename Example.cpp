@@ -62,7 +62,7 @@ int MyApplication::startup()
 			"Ogre3D Beginners Guide");
 	_sceneManager = _root->createSceneManager(Ogre::ST_GENERIC);
 
-	_listener = new MyFrameListener();
+	_listener = new MyFrameListener(window);
 	_root->addFrameListener(_listener);
 
 	Ogre::Camera* camera = _sceneManager->createCamera("Camera");
@@ -90,17 +90,41 @@ void MyApplication::createScene()
 
 //------------MyFrameListener----------//
 
+MyFrameListener::MyFrameListener(Ogre::RenderWindow *win)
+{
+	OIS::ParamList parameters;
+	unsigned long int windowHandle = 0;
+	std::ostringstream windowHandleString;
+	win->getCustomAttribute("WINDOW", &windowHandle);
+	windowHandleString << windowHandle;
+	parameters.insert(std::make_pair("WINDOW", windowHandleString.str()));
+	_InputManager = OIS::InputManager::createInputSystem(parameters);
+	_Keyboard = static_cast<OIS::Keyboard*> (_InputManager->createInputObject(
+			OIS::OISKeyboard, false));
+}
+
+MyFrameListener::~MyFrameListener()
+{
+	_InputManager->destroyInputObject(_Keyboard);
+	OIS::InputManager::destroyInputSystem(_InputManager);
+}
+
 bool MyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
 {
-	return false;
+	_Keyboard->capture();
+	if (_Keyboard->isKeyDown(OIS::KC_ESCAPE))
+	{
+		return false;
+	}
+	return true;
 }
 
 bool MyFrameListener::frameEnded(const Ogre::FrameEvent& evt)
 {
-	return false;
+	return true;
 }
 
 bool MyFrameListener::frameRenderingQueued(const Ogre::FrameEvent& evt)
 {
-	return false;
+	return true;
 }
