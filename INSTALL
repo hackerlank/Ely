@@ -81,7 +81,7 @@ $ make install
 	#include "OgreOde_PrefabPreReqs.h"
 	
 ### INSTALLING BULLET ON DEBIAN (DEBUG VERSION) ###
-ogrebullet
+
 - svn checkout http://bullet.googlecode.com/svn/trunk/ bullet
 - use cmake-gui (after installing all the dependencies):
 	a) select:
@@ -91,7 +91,7 @@ ogrebullet
 	c) click on "Configure"
 	c) set/add the following options and entries 
 		* PKGCONFIG_INSTALL_PREFIX:STRING=/REPOSITORY/KProjects/usr/lib/pkgconfig/
-		* INCLUDE_INSTALL_DIR:PATH=/REPOSITORY/KProjects/usr/bullet
+		* INCLUDE_INSTALL_DIR:PATH=/REPOSITORY/KProjects/usr/include/bullet
 		* CMAKE_BUILD_TYPE:STRING=Debug
 		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
 		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
