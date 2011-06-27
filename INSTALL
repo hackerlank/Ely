@@ -127,3 +127,28 @@ $ ./configure --prefix=/REPOSITORY/KProjects/usr
 $ make
 $ make install
 
+### INSTALLING SDL's LIBRARIES ON DEBIAN (DEBUG VERSION) ###
+
+**For all libraries (version 1.3)
+#The first time, from the parent directory, issue the command
+hg clone http://hg.libsdl.org/SDL or SDL_net or SDL_mixer
+#To check updates, from inside this directory, issue the command
+hg pull
+#To update, form inside this repository, issue the command
+hg update
+
+<<<SDL>>>
+$ ./autogen.sh
+$ ./configure --prefix=/REPOSITORY/KProjects/usr
+(check any needed library)
+$ make
+$ make install
+
+<<<SDL_net>>> and <<<SDL_mixer>>>
+$ ./autogen.sh
+$ ./configure --prefix=/REPOSITORY/KProjects/usr --with-sdl-prefix=/REPOSITORY/KProjects/usr
+(check any needed library)
+$ make
+$ make install
+
+
