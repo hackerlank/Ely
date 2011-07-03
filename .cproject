@@ -28,12 +28,7 @@
 <listOptionValue builtIn="false" value="DEBUG"/>
 </option>
 <option id="gnu.cpp.compiler.option.include.paths.932309155" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OGRE"/>
-<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/CEGUI"/>
-<listOptionValue builtIn="false" value="/usr/include/OIS"/>
-<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OgreOde_Core"/>
-<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OgreOde_Loader"/>
-<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/OgreOde_Prefab"/>
+<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include"/>
 </option>
 <option id="gnu.cpp.compiler.option.other.verbose.1296761875" name="Verbose (-v)" superClass="gnu.cpp.compiler.option.other.verbose" value="false" valueType="boolean"/>
 <inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.129184199" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>

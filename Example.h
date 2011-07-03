@@ -8,8 +8,8 @@
 #ifndef EXAMPLE_H_
 #define EXAMPLE_H_
 
-#include "Ogre.h"
-#include "OIS.h"
+#include "OGRE/Ogre.h"
+#include <OIS/OIS.h>
 
 class MyFrameListener: public Ogre::FrameListener
 {
@@ -33,6 +33,7 @@ private:
 	Ogre::SceneManager* _sceneManager;
 	Ogre::Root* _root;
 	MyFrameListener* _listener;
+	bool _keepRunning;
 
 public:
 	MyApplication();
@@ -41,7 +42,14 @@ public:
 	void loadResources();
 	int startup();
 	void createScene();
+	void renderOneFrame();
+	inline bool keepRunning();
 
 };
+
+inline bool MyApplication::keepRunning()
+{
+	return _keepRunning;
+}
 
 #endif /* EXAMPLE_H_ */

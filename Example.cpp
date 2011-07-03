@@ -77,9 +77,15 @@ int MyApplication::startup()
 
 	loadResources();
 	createScene();
-	_root->startRendering();
+	//	_root->startRendering();
 
 	return 0;
+}
+
+void MyApplication::renderOneFrame()
+{
+	Ogre::WindowEventUtilities::messagePump();
+	_keepRunning = _root->renderOneFrame();
 }
 
 void MyApplication::createScene()
