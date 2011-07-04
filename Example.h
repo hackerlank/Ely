@@ -14,12 +14,24 @@
 class MyFrameListener: public Ogre::FrameListener
 {
 public:
-	MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam);
+	MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam,
+			Ogre::SceneNode* node);
 	~MyFrameListener();
 
 	bool frameStarted(const Ogre::FrameEvent& evt);
 	bool frameEnded(const Ogre::FrameEvent& evt);
 	bool frameRenderingQueued(const Ogre::FrameEvent& evt);
+	void setNode(Ogre::SceneNode *node)
+	{
+		_node = node;
+	}
+	void setEntAnim(Ogre::Entity *ent)
+	{
+		_aniState = ent->getAnimationState("RunBase");
+		_aniState->setLoop(false);
+		_aniStateTop = ent->getAnimationState("RunTop");
+		_aniStateTop->setLoop(false);
+	}
 
 private:
 	OIS::InputManager* _InputManager;
@@ -27,6 +39,11 @@ private:
 	OIS::Mouse* _Mouse;
 	Ogre::Camera* _Cam;
 	float _movementspeed;
+	float _WalkingSpeed;
+	Ogre::SceneNode* _node;
+	float _rotation;
+	Ogre::AnimationState* _aniState;
+	Ogre::AnimationState* _aniStateTop;
 
 };
 
@@ -37,6 +54,7 @@ private:
 	Ogre::Root* _root;
 	MyFrameListener* _listener;
 	bool _keepRunning;
+	Ogre::SceneNode* _SinbadNode;
 
 public:
 	MyApplication();

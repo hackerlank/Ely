@@ -72,7 +72,7 @@ int MyApplication::startup()
 	camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(
 			viewport->getActualHeight()));
 
-	_listener = new MyFrameListener(window, camera);
+	_listener = new MyFrameListener(window, camera, _SinbadNode);
 	_root->addFrameListener(_listener);
 
 	loadResources();
@@ -90,13 +90,35 @@ void MyApplication::renderOneFrame()
 
 void MyApplication::createScene()
 {
-	Ogre::Entity* ent = _sceneManager->createEntity("Sinbad.mesh");
-	_sceneManager->getRootSceneNode()->attachObject(ent);
+	Ogre::Entity* sinbadEnt = _sceneManager->createEntity("Sinbad.mesh");
+	_SinbadNode = _sceneManager->getRootSceneNode()->createChildSceneNode();
+	_SinbadNode->attachObject(sinbadEnt);
+	_listener->setNode(_SinbadNode);
+	_listener->setEntAnim(sinbadEnt);
+
+	Ogre::Plane plane(Ogre::Vector3::UNIT_Y, -5);
+	Ogre::MeshManager::getSingleton().createPlane("plane",
+			Ogre::ResourceGroupManager::DEFAULT_RESOURCE_GROUP_NAME, plane,
+			1500, 1500, 200, 200, true, 1, 5, 5, Ogre::Vector3::UNIT_Z);
+	Ogre::Entity* ground = _sceneManager->createEntity("LightPlaneEntity",
+			"plane");
+	_sceneManager->getRootSceneNode()->createChildSceneNode()->attachObject(
+			ground);
+	ground->setMaterialName("Examples/BeachStones");
+
+	Ogre::Light* light = _sceneManager->createLight("Light1");
+	light->setType(Ogre::Light::LT_DIRECTIONAL);
+	light->setDirection(Ogre::Vector3(1, -1, 0));
+
+	_sceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
+
 }
 
 //------------MyFrameListener----------//
 
-MyFrameListener::MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam)
+MyFrameListener::MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam,
+		Ogre::SceneNode* node) :
+	_node(node), _rotation(0.0)
 {
 	OIS::ParamList parameters;
 	unsigned long int windowHandle = 0;
@@ -111,7 +133,7 @@ MyFrameListener::MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam)
 	_movementspeed = 50.0f;
 	_Mouse = static_cast<OIS::Mouse*> (_InputManager->createInputObject(
 			OIS::OISMouse, false));
-
+	_WalkingSpeed = 50.0f;
 }
 
 MyFrameListener::~MyFrameListener()
@@ -145,6 +167,60 @@ bool MyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
 	{
 		translate += Ogre::Vector3(1, 0, 0);
 	}
+
+	Ogre::Vector3 SinbadTranslate(0, 0, 0);
+	bool walked = false;
+	if (_Keyboard->isKeyDown(OIS::KC_UP))
+	{
+		SinbadTranslate += Ogre::Vector3(0, 0, -1);
+		_rotation = 3.14f;
+		walked = true;
+	}
+	if (_Keyboard->isKeyDown(OIS::KC_DOWN))
+	{
+		SinbadTranslate += Ogre::Vector3(0, 0, 1);
+		_rotation = 0.0f;
+		walked = true;
+	}
+	if (_Keyboard->isKeyDown(OIS::KC_LEFT))
+	{
+		SinbadTranslate += Ogre::Vector3(-1, 0, 0);
+		_rotation = -1.57f;
+		walked = true;
+	}
+	if (_Keyboard->isKeyDown(OIS::KC_RIGHT))
+	{
+		SinbadTranslate += Ogre::Vector3(1, 0, 0);
+		_rotation = 1.57f;
+		walked = true;
+	}
+
+	_node->translate(SinbadTranslate * evt.timeSinceLastFrame * _WalkingSpeed);
+	_node->resetOrientation();
+	_node->yaw(Ogre::Radian(_rotation));
+	_aniState->addTime(evt.timeSinceLastFrame);
+	_aniStateTop->addTime(evt.timeSinceLastFrame);
+	if (walked)
+	{
+		_aniState->setEnabled(true);
+		_aniStateTop->setEnabled(true);
+		if (_aniState->hasEnded())
+		{
+			_aniState->setTimePosition(0.0f);
+		}
+		if (_aniStateTop->hasEnded())
+		{
+			_aniStateTop->setTimePosition(0.0f);
+		}
+	}
+	else
+	{
+		_aniState->setTimePosition(0.0f);
+		_aniState->setEnabled(false);
+		_aniStateTop->setTimePosition(0.0f);
+		_aniStateTop->setEnabled(false);
+	}
+
 	_Cam->moveRelative(translate * evt.timeSinceLastFrame * _movementspeed);
 	_Mouse->capture();
 	float rotX = _Mouse->getMouseState().X.rel * evt. timeSinceLastFrame * -1;
