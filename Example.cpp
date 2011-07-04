@@ -62,9 +62,6 @@ int MyApplication::startup()
 			"Ogre3D Beginners Guide");
 	_sceneManager = _root->createSceneManager(Ogre::ST_GENERIC);
 
-	_listener = new MyFrameListener(window);
-	_root->addFrameListener(_listener);
-
 	Ogre::Camera* camera = _sceneManager->createCamera("Camera");
 	camera->setPosition(Ogre::Vector3(0, 0, 50));
 	camera->lookAt(Ogre::Vector3(0, 0, 0));
@@ -74,6 +71,9 @@ int MyApplication::startup()
 	viewport->setBackgroundColour(Ogre::ColourValue(0.0, 0.0, 0.0));
 	camera->setAspectRatio(Ogre::Real(viewport->getActualWidth()) / Ogre::Real(
 			viewport->getActualHeight()));
+
+	_listener = new MyFrameListener(window, camera);
+	_root->addFrameListener(_listener);
 
 	loadResources();
 	createScene();
@@ -96,7 +96,7 @@ void MyApplication::createScene()
 
 //------------MyFrameListener----------//
 
-MyFrameListener::MyFrameListener(Ogre::RenderWindow *win)
+MyFrameListener::MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam)
 {
 	OIS::ParamList parameters;
 	unsigned long int windowHandle = 0;
@@ -107,12 +107,18 @@ MyFrameListener::MyFrameListener(Ogre::RenderWindow *win)
 	_InputManager = OIS::InputManager::createInputSystem(parameters);
 	_Keyboard = static_cast<OIS::Keyboard*> (_InputManager->createInputObject(
 			OIS::OISKeyboard, false));
+	_Cam = cam;
+	_movementspeed = 50.0f;
+	_Mouse = static_cast<OIS::Mouse*> (_InputManager->createInputObject(
+			OIS::OISMouse, false));
+
 }
 
 MyFrameListener::~MyFrameListener()
 {
 	_InputManager->destroyInputObject(_Keyboard);
 	OIS::InputManager::destroyInputSystem(_InputManager);
+	_InputManager->destroyInputObject(_Mouse);
 }
 
 bool MyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
@@ -122,6 +128,30 @@ bool MyFrameListener::frameStarted(const Ogre::FrameEvent& evt)
 	{
 		return false;
 	}
+	Ogre::Vector3 translate(0, 0, 0);
+	if (_Keyboard->isKeyDown(OIS::KC_W))
+	{
+		translate += Ogre::Vector3(0, 0, -1);
+	}
+	if (_Keyboard->isKeyDown(OIS::KC_S))
+	{
+		translate += Ogre::Vector3(0, 0, 1);
+	}
+	if (_Keyboard->isKeyDown(OIS::KC_A))
+	{
+		translate += Ogre::Vector3(-1, 0, 0);
+	}
+	if (_Keyboard->isKeyDown(OIS::KC_D))
+	{
+		translate += Ogre::Vector3(1, 0, 0);
+	}
+	_Cam->moveRelative(translate * evt.timeSinceLastFrame * _movementspeed);
+	_Mouse->capture();
+	float rotX = _Mouse->getMouseState().X.rel * evt. timeSinceLastFrame * -1;
+	float rotY = _Mouse->getMouseState().Y.rel * evt. timeSinceLastFrame * -1;
+	_Cam->yaw(Ogre::Radian(rotX));
+	_Cam->pitch(Ogre::Radian(rotY));
+
 	return true;
 }
 

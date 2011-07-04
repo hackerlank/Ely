@@ -14,7 +14,7 @@
 class MyFrameListener: public Ogre::FrameListener
 {
 public:
-	MyFrameListener(Ogre::RenderWindow *win);
+	MyFrameListener(Ogre::RenderWindow *win, Ogre::Camera* cam);
 	~MyFrameListener();
 
 	bool frameStarted(const Ogre::FrameEvent& evt);
@@ -24,6 +24,9 @@ public:
 private:
 	OIS::InputManager* _InputManager;
 	OIS::Keyboard* _Keyboard;
+	OIS::Mouse* _Mouse;
+	Ogre::Camera* _Cam;
+	float _movementspeed;
 
 };
 
