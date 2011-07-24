@@ -26,10 +26,10 @@ fragment_program MyFragmentShader5 glsl
 	source Ogre3DBeginnersGuide-FragmentShader5.glsl
 	profiles ps_1_1 arbfp1
 	//<Ogre3DBeginnersGuide/Comp7>
-	default_params
-	{
-		param_named factors float4 1 1 1 0
-	}
+	//default_params
+	//{
+	//	param_named factors float4 1 1 1 0
+	//}
 	//</Ogre3DBeginnersGuide/Comp7>
 }
 
