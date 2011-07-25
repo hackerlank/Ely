@@ -299,7 +299,38 @@ void MyApplication::createScene()
 	_sceneManager->setShadowTechnique(Ogre::SHADOWTYPE_STENCIL_ADDITIVE);
 
 	Ogre::ParticleSystem* partSystem = _sceneManager->createParticleSystem(
-			"Smoke", "Examples/Smoke");
+			"Smoke", "MySmoke1");
+	Ogre::ParticleSystem* partSystem1 = _sceneManager->createParticleSystem(
+			"Firework1", "Firework");
+	Ogre::ParticleSystem* partSystem2 = _sceneManager->createParticleSystem(
+			"Firework2", "Firework");
+	Ogre::ParticleSystem* partSystem3 = _sceneManager->createParticleSystem(
+			"Firework3", "Firework");
+	Ogre::ParticleSystem* partSystem4 = _sceneManager->createParticleSystem(
+			"Firework4", "Firework");
+	Ogre::ParticleSystem* partSystem5 = _sceneManager->createParticleSystem(
+			"Firework5", "Firework");
+
+	Ogre::SceneNode* node1 =
+			_sceneManager->getRootSceneNode()->createChildSceneNode(
+					Ogre::Vector3(0, 10, 0));
+	Ogre::SceneNode* node2 =
+			_sceneManager->getRootSceneNode()->createChildSceneNode(
+					Ogre::Vector3(10, 11, 0));
+	Ogre::SceneNode* node3 =
+			_sceneManager->getRootSceneNode()->createChildSceneNode(
+					Ogre::Vector3(20, 9, 0));
+	Ogre::SceneNode* node4 =
+			_sceneManager->getRootSceneNode()->createChildSceneNode(
+					Ogre::Vector3(-10, 11, 0));
+	Ogre::SceneNode* node5 =
+			_sceneManager->getRootSceneNode()->createChildSceneNode(
+					Ogre::Vector3(-20, 19, 0));
+	node1->attachObject(partSystem1);
+	node2->attachObject(partSystem2);
+	node3->attachObject(partSystem3);
+	node4->attachObject(partSystem4);
+	node5->attachObject(partSystem5);
 
 	_SinbadNode->attachObject(partSystem);
 
