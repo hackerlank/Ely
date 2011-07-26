@@ -1,6 +1,6 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "Game/AdvancedOgreFramework.h"
+#include "Framework/AdvancedOgreFramework.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 

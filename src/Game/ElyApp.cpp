@@ -2,9 +2,9 @@
 
 #include "Game/ElyApp.h"
 
-#include "Game/MenuState.h"
-#include "Game/GameState.h"
-#include "Game/PauseState.h"
+#include "Framework/MenuState.h"
+#include "Framework/GameState.h"
+#include "Framework/PauseState.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 

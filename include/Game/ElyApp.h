@@ -5,8 +5,8 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "AdvancedOgreFramework.h"
-#include "AppStateManager.h"
+#include "Framework/AdvancedOgreFramework.h"
+#include "Framework/AppStateManager.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
