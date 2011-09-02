@@ -6,20 +6,20 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #include "Framework/AdvancedOgreFramework.h"
-#include "Framework/AppStateManager.h"
+#include "Framework/GameStateManager.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-class ElyApp
+class Ely
 {
 public:
-	ElyApp();
-	~ElyApp();
+	Ely();
+	~Ely();
 
 	void startDemo();
 
 private:
-	AppStateManager* m_pAppStateManager;
+	GameStateManager* m_pGameStateManager;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

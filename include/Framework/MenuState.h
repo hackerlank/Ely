@@ -5,11 +5,11 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "AppState.h"
+#include "GameState.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-class MenuState: public AppState
+class MenuState: public GameState
 {
 public:
 	MenuState();

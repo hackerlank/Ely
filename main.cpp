@@ -21,7 +21,7 @@ INT WINAPI WinMain(HINSTANCE hInst, HINSTANCE, LPSTR strCmdLine, INT)
 int main(int argc, char **argv)
 #endif
 {
-	ElyApp demo;
+	Ely demo;
 	try
 	{
 		demo.startDemo();

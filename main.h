@@ -8,6 +8,6 @@
 #ifndef MAIN_H_
 #define MAIN_H_
 
-#include "Game/ElyApp.h"
+#include "Game/Ely.h"
 
 #endif /* MAIN_H_ */

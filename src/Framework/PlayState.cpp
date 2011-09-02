@@ -1,6 +1,6 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "Framework/GameState.h"
+#include "Framework/PlayState.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
@@ -8,7 +8,7 @@ using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-GameState::GameState()
+PlayState::PlayState()
 {
 	m_MoveSpeed = 0.1f;
 	m_RotateSpeed = 0.3f;
@@ -23,13 +23,13 @@ GameState::GameState()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-GameState::~GameState()
+PlayState::~PlayState()
 {
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::enter()
+void PlayState::enter()
 {
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage(
 			"Entering GameState...");
@@ -62,7 +62,7 @@ void GameState::enter()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool GameState::pause()
+bool PlayState::pause()
 {
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage(
 			"Pausing GameState...");
@@ -72,7 +72,7 @@ bool GameState::pause()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::resume()
+void PlayState::resume()
 {
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage(
 			"Resuming GameState...");
@@ -85,7 +85,7 @@ void GameState::resume()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::exit()
+void PlayState::exit()
 {
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage(
 			"Leaving GameState...");
@@ -99,7 +99,7 @@ void GameState::exit()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::createScene()
+void PlayState::createScene()
 {
 	m_pSceneMgr->createLight("Light")->setPosition(75, 75, 75);
 
@@ -127,7 +127,7 @@ void GameState::createScene()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
+bool PlayState::keyPressed(const OIS::KeyEvent &keyEventRef)
 {
 	if (m_bSettingsMode == true)
 	{
@@ -153,7 +153,7 @@ bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
 	if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(
 			OIS::KC_ESCAPE))
 	{
-		pushAppState(findByName("PauseState"));
+		pushGameState(findByName("PauseState"));
 		return true;
 	}
 
@@ -198,7 +198,7 @@ bool GameState::keyPressed(const OIS::KeyEvent &keyEventRef)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool GameState::keyReleased(const OIS::KeyEvent &keyEventRef)
+bool PlayState::keyReleased(const OIS::KeyEvent &keyEventRef)
 {
 	OgreFramework::getSingletonPtr()->keyPressed(keyEventRef);
 	return true;
@@ -206,7 +206,7 @@ bool GameState::keyReleased(const OIS::KeyEvent &keyEventRef)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool GameState::mouseMoved(const OIS::MouseEvent &evt)
+bool PlayState::mouseMoved(const OIS::MouseEvent &evt)
 {
 	if (OgreFramework::getSingletonPtr()->m_pTrayMgr->injectMouseMove(evt))
 		return true;
@@ -222,7 +222,7 @@ bool GameState::mouseMoved(const OIS::MouseEvent &evt)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool GameState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
+bool PlayState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	if (OgreFramework::getSingletonPtr()->m_pTrayMgr->injectMouseDown(evt, id))
 		return true;
@@ -242,7 +242,7 @@ bool GameState::mousePressed(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool GameState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
+bool PlayState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 {
 	if (OgreFramework::getSingletonPtr()->m_pTrayMgr->injectMouseUp(evt, id))
 		return true;
@@ -261,7 +261,7 @@ bool GameState::mouseReleased(const OIS::MouseEvent &evt, OIS::MouseButtonID id)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::onLeftPressed(const OIS::MouseEvent &evt)
+void PlayState::onLeftPressed(const OIS::MouseEvent &evt)
 {
 	if (m_pCurrentObject)
 	{
@@ -300,7 +300,7 @@ void GameState::onLeftPressed(const OIS::MouseEvent &evt)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::moveCamera()
+void PlayState::moveCamera()
 {
 	if (OgreFramework::getSingletonPtr()->m_pKeyboard->isKeyDown(
 			OIS::KC_LSHIFT))
@@ -310,7 +310,7 @@ void GameState::moveCamera()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::getInput()
+void PlayState::getInput()
 {
 	if (m_bSettingsMode == false)
 	{
@@ -330,7 +330,7 @@ void GameState::getInput()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::update(double timeSinceLastFrame)
+void PlayState::update(double timeSinceLastFrame)
 {
 	m_FrameEvent.timeSinceLastFrame = timeSinceLastFrame;
 	OgreFramework::getSingletonPtr()->m_pTrayMgr->frameRenderingQueued(
@@ -338,7 +338,7 @@ void GameState::update(double timeSinceLastFrame)
 
 	if (m_bQuit == true)
 	{
-		popAppState();
+		popGameState();
 		return;
 	}
 
@@ -392,7 +392,7 @@ void GameState::update(double timeSinceLastFrame)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::buildGUI()
+void PlayState::buildGUI()
 {
 	OgreFramework::getSingletonPtr()->m_pTrayMgr->showFrameStats(
 			OgreBites::TL_BOTTOMLEFT);
@@ -436,7 +436,7 @@ void GameState::buildGUI()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void GameState::itemSelected(OgreBites::SelectMenu* menu)
+void PlayState::itemSelected(OgreBites::SelectMenu* menu)
 {
 	switch (menu->getSelectionIndex())
 	{

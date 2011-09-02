@@ -1,29 +1,29 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "Game/ElyApp.h"
+#include "Game/Ely.h"
 
 #include "Framework/MenuState.h"
-#include "Framework/GameState.h"
+#include "Framework/PlayState.h"
 #include "Framework/PauseState.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-ElyApp::ElyApp()
+Ely::Ely()
 {
-	m_pAppStateManager = 0;
+	m_pGameStateManager = 0;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-ElyApp::~ElyApp()
+Ely::~Ely()
 {
-	delete m_pAppStateManager;
+	delete m_pGameStateManager;
 	delete OgreFramework::getSingletonPtr();
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void ElyApp::startDemo()
+void Ely::startDemo()
 {
 	new OgreFramework();
 	if (!OgreFramework::getSingletonPtr()->initOgre("AdvancedOgreFramework", 0,
@@ -32,13 +32,13 @@ void ElyApp::startDemo()
 
 	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
 
-	m_pAppStateManager = new AppStateManager();
+	m_pGameStateManager = new GameStateManager();
 
-	MenuState::create(m_pAppStateManager, "MenuState");
-	GameState::create(m_pAppStateManager, "GameState");
-	PauseState::create(m_pAppStateManager, "PauseState");
+	MenuState::create(m_pGameStateManager, "MenuState");
+	PlayState::create(m_pGameStateManager, "GameState");
+	PauseState::create(m_pGameStateManager, "PauseState");
 
-	m_pAppStateManager->start(m_pAppStateManager->findByName("MenuState"));
+	m_pGameStateManager->start(m_pGameStateManager->findByName("MenuState"));
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||

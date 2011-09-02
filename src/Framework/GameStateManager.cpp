@@ -1,19 +1,19 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "Framework/AppStateManager.h"
+#include "Framework/GameStateManager.h"
 
 #include <OgreWindowEventUtilities.h>
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-AppStateManager::AppStateManager()
+GameStateManager::GameStateManager()
 {
 	m_bShutdown = false;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-AppStateManager::~AppStateManager()
+GameStateManager::~GameStateManager()
 {
 	state_info si;
 
@@ -33,7 +33,7 @@ AppStateManager::~AppStateManager()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
+void GameStateManager::manageGameState(Ogre::String stateName, GameState* state)
 {
 	try
 	{
@@ -46,14 +46,14 @@ void AppStateManager::manageAppState(Ogre::String stateName, AppState* state)
 		delete state;
 		throw Ogre::Exception(
 				Ogre::Exception::ERR_INTERNAL_ERROR,
-				"Error while trying to manage a new AppState\n"
-						+ Ogre::String(e.what()), "AppStateManager.cpp (39)");
+				"Error while trying to manage a new GameState\n"
+						+ Ogre::String(e.what()), "GameStateManager.cpp (39)");
 	}
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-AppState* AppStateManager::findByName(Ogre::String stateName)
+GameState* GameStateManager::findByName(Ogre::String stateName)
 {
 	std::vector<state_info>::iterator itr;
 
@@ -68,9 +68,9 @@ AppState* AppStateManager::findByName(Ogre::String stateName)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::start(AppState* state)
+void GameStateManager::start(GameState* state)
 {
-	changeAppState(state);
+	changeGameState(state);
 
 	int timeSinceLastFrame = 1;
 	int startTime = 0;
@@ -114,7 +114,7 @@ void AppStateManager::start(AppState* state)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::changeAppState(AppState* state)
+void GameStateManager::changeGameState(GameState* state)
 {
 	if (!m_ActiveStateStack.empty())
 	{
@@ -129,7 +129,7 @@ void AppStateManager::changeAppState(AppState* state)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-bool AppStateManager::pushAppState(AppState* state)
+bool GameStateManager::pushGameState(GameState* state)
 {
 	if (!m_ActiveStateStack.empty())
 	{
@@ -146,7 +146,7 @@ bool AppStateManager::pushAppState(AppState* state)
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::popAppState()
+void GameStateManager::popGameState()
 {
 	if (!m_ActiveStateStack.empty())
 	{
@@ -165,7 +165,7 @@ void AppStateManager::popAppState()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::popAllAndPushAppState(AppState* state)
+void GameStateManager::popAllAndPushGameState(GameState* state)
 {
 	while (!m_ActiveStateStack.empty())
 	{
@@ -173,12 +173,12 @@ void AppStateManager::popAllAndPushAppState(AppState* state)
 		m_ActiveStateStack.pop_back();
 	}
 
-	pushAppState(state);
+	pushGameState(state);
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::pauseAppState()
+void GameStateManager::pauseGameState()
 {
 	if (!m_ActiveStateStack.empty())
 	{
@@ -194,14 +194,14 @@ void AppStateManager::pauseAppState()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::shutdown()
+void GameStateManager::shutdown()
 {
 	m_bShutdown = true;
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void AppStateManager::init(AppState* state)
+void GameStateManager::init(GameState* state)
 {
 	OgreFramework::getSingletonPtr()->m_pKeyboard->setEventCallback(state);
 	OgreFramework::getSingletonPtr()->m_pMouse->setEventCallback(state);

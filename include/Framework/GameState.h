@@ -1,77 +1,161 @@
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#ifndef GAME_STATE_HPP
-#define GAME_STATE_HPP
+#ifndef APP_STATE_HPP
+#define APP_STATE_HPP
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-#include "AppState.h"
+#include "AdvancedOgreFramework.h"
 
-#include "DotSceneLoader.h"
-
-#include <OgreSubEntity.h>
-#include <OgreMaterialManager.h>
+class GameState;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-enum QueryFlags
-{
-	OGRE_HEAD_MASK = 1 << 0, CUBE_MASK = 1 << 1
-};
-
-//|||||||||||||||||||||||||||||||||||||||||||||||
-
-class GameState: public AppState
+/**
+ * \brief Allows a GameStateManager to receive callbacks from a GameState.
+ */
+class GameStateListener
 {
 public:
-	GameState();
-	virtual ~GameState();
+	GameStateListener()
+	{
+	}
+	;
+	virtual ~GameStateListener()
+	{
+	}
+	;
 
-	DECLARE_APPSTATE_CLASS(GameState)
+	/**
+	 * \brief  Store a game state to manage.
+	 *
+	 * @param stateName The state name.
+	 * @param state The game state.
+	 */
+	virtual void manageGameState(Ogre::String stateName, GameState* state) = 0;
 
-	void enter();
-	void createScene();
-	void exit();
-	bool pause();
-	void resume();
+	/**
+	 * \brief Find a state by name.
+	 *
+	 * @param stateName The state name.
+	 * @return The game state.
+	 */
+	virtual GameState* findByName(Ogre::String stateName) = 0;
 
-	void moveCamera();
-	void getInput();
-	void buildGUI();
+	/**
+	 * \brief Request a change to state.
+	 *
+	 * @param state The game state.
+	 */
+	virtual void changeGameState(GameState *state) = 0;
 
-	bool keyPressed(const OIS::KeyEvent &keyEventRef);
-	bool keyReleased(const OIS::KeyEvent &keyEventRef);
+	/**
+	 * \brief Push state onto the stack so make it current.
+	 *
+	 * @param state The game state.
+	 * @return If successful.
+	 */
+	virtual bool pushGameState(GameState* state) = 0;
 
-	bool mouseMoved(const OIS::MouseEvent &arg);
-	bool mousePressed(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
-	bool mouseReleased(const OIS::MouseEvent &arg, OIS::MouseButtonID id);
+	/**
+	 * \brief Pop a game state off the stack.
+	 */
+	virtual void popGameState() = 0;
 
-	void onLeftPressed(const OIS::MouseEvent &evt);
-	void itemSelected(OgreBites::SelectMenu* menu);
+	/**
+	 * \brief Pause current state.
+	 */
+	virtual void pauseGameState() = 0;
 
-	void update(double timeSinceLastFrame);
+	/**
+	 * \brief Cause a shutdown.
+	 */
+	virtual void shutdown() = 0;
 
-private:
-	Ogre::SceneNode* m_pOgreHeadNode;
-	Ogre::Entity* m_pOgreHeadEntity;
-	Ogre::MaterialPtr m_pOgreHeadMat;
-	Ogre::MaterialPtr m_pOgreHeadMatHigh;
-
-	OgreBites::ParamsPanel* m_pDetailsPanel;
-	bool m_bQuit;
-
-	Ogre::Vector3 m_TranslateVector;
-	Ogre::Real m_MoveSpeed;
-	Ogre::Degree m_RotateSpeed;
-	float m_MoveScale;
-	Ogre::Degree m_RotScale;
-
-	Ogre::RaySceneQuery* m_pRSQ;
-	Ogre::SceneNode* m_pCurrentObject;
-	Ogre::Entity* m_pCurrentEntity;
-	bool m_bLMouseDown, m_bRMouseDown;
-	bool m_bSettingsMode;
+	/**
+	 * \brief Unwind stack and push a state.
+	 *
+	 * @param state The game state.
+	 */
+	virtual void popAllAndPushGameState(GameState* state) = 0;
 };
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
+class GameState: public OIS::KeyListener,
+		public OIS::MouseListener,
+		public OgreBites::SdkTrayListener
+{
+public:
+	static void create(GameStateListener* parent, const Ogre::String name)
+	{
+	}
+	;
+
+	void destroy()
+	{
+		delete this;
+	}
+
+	virtual void enter() = 0;
+	virtual void exit() = 0;
+	virtual bool pause()
+	{
+		return true;
+	}
+	virtual void resume()
+	{
+	}
+	;
+	virtual void update(double timeSinceLastFrame) = 0;
+
+protected:
+	GameState()
+	{
+	}
+	;
+
+	GameState* findByName(Ogre::String stateName)
+	{
+		return m_pParent->findByName(stateName);
+	}
+	void changeGameState(GameState* state)
+	{
+		m_pParent->changeGameState(state);
+	}
+	bool pushGameState(GameState* state)
+	{
+		return m_pParent->pushGameState(state);
+	}
+	void popGameState()
+	{
+		m_pParent->popGameState();
+	}
+	void shutdown()
+	{
+		m_pParent->shutdown();
+	}
+	void popAllAndPushGameState(GameState* state)
+	{
+		m_pParent->popAllAndPushGameState(state);
+	}
+
+	GameStateListener* m_pParent;
+
+	Ogre::Camera* m_pCamera;
+	Ogre::SceneManager* m_pSceneMgr;
+	Ogre::FrameEvent m_FrameEvent;
+};
+
+//|||||||||||||||||||||||||||||||||||||||||||||||
+
+#define DECLARE_APPSTATE_CLASS(T)										\
+static void create(GameStateListener* parent, const Ogre::String name)	\
+{																		\
+	T* myGameState = new T();											\
+	myGameState->m_pParent = parent;										\
+	parent->manageGameState(name, myGameState);							\
+}
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 

@@ -147,7 +147,7 @@ void PauseState::update(double timeSinceLastFrame)
 
 	if (m_bQuit == true)
 	{
-		popAppState();
+		popGameState();
 		return;
 	}
 }
@@ -165,7 +165,7 @@ void PauseState::buttonHit(OgreBites::Button *button)
 	else if (button->getName() == "BackToGameBtn")
 		m_bQuit = true;
 	else if (button->getName() == "BackToMenuBtn")
-		popAllAndPushAppState(findByName("MenuState"));
+		popAllAndPushGameState(findByName("MenuState"));
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
