@@ -10,6 +10,12 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+/**
+ * \fn
+ *
+ * All that is done is to create an instance of our application class Ely
+ * and call its go() function. That's it.
+ */
 #if OGRE_PLATFORM == PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WIN32
 #define WIN32_LEAN_AND_MEAN
 #include "windows.h"
@@ -24,7 +30,7 @@ int main(int argc, char **argv)
 	Ely demo;
 	try
 	{
-		demo.startDemo();
+		demo.go();
 	} catch (std::exception& e)
 	{
 #if OGRE_PLATFORM == PLATFORM_WIN32 || OGRE_PLATFORM == OGRE_PLATFORM_WIN32

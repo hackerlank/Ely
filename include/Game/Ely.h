@@ -16,7 +16,7 @@ public:
 	Ely();
 	~Ely();
 
-	void startDemo();
+	void go();
 
 private:
 	GameStateManager* m_pGameStateManager;

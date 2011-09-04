@@ -23,7 +23,7 @@ Ely::~Ely()
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
-void Ely::startDemo()
+void Ely::go()
 {
 	new OgreFramework();
 	if (!OgreFramework::getSingletonPtr()->initOgre("AdvancedOgreFramework", 0,
@@ -35,7 +35,7 @@ void Ely::startDemo()
 	m_pGameStateManager = new GameStateManager();
 
 	MenuState::create(m_pGameStateManager, "MenuState");
-	PlayState::create(m_pGameStateManager, "GameState");
+	PlayState::create(m_pGameStateManager, "PlayState");
 	PauseState::create(m_pGameStateManager, "PauseState");
 
 	m_pGameStateManager->start(m_pGameStateManager->findByName("MenuState"));

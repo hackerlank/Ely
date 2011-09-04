@@ -9,15 +9,37 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+/**
+ * \brief The PauseState class is one of the actual GameState
+ * class implementations.
+ *
+ * By inheriting from GameState it is assured that all states have
+ * the same common functions as enter(), exit(), pause(),
+ * resume() or update().
+ * - DECLARE_GAMESTATE_CLASS(PauseState): This line calls the macro
+ * defined in GameState.h, making this class a valid game state
+ */
 class PauseState: public GameState
 {
 public:
+
+	/**
+	 * \brief Constructor. Initializing values.
+	 */
 	PauseState();
+
+	/**
+	 * \brief Destructor.
+	 */
 	virtual ~PauseState();
 
-	DECLARE_APPSTATE_CLASS(PauseState)
+	DECLARE_GAMESTATE_CLASS(PauseState)
 
+	/**
+	 * \brief Setup the basic values and building the GUI.
+	 */
 	void enter();
+
 	void createScene();
 	void exit();
 
