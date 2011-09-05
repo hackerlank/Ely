@@ -69,7 +69,7 @@ public:
 	GameState* findByName(Ogre::String stateName);
 
 	/**
-	 * \brief Start the game application loop.
+	 * \brief Start the game application main loop.
 	 *
 	 * Main loop of the application that does the following steps:
 	 * -# change to the state specified
