@@ -1,13 +1,13 @@
-/*
- * NonCopyable.cpp
+/**
+ * \file NonCopyable.cpp
  *
- *  Created on: 13/set/2011
- *      Author: marco
+ * \date 13/set/2011
+ * \author Marco Paone
  */
 
 #include "Utilities/NonCopyable.h"
 
-namespace util
+namespace utils
 {
 
 NonCopyable::NonCopyable()
@@ -21,4 +21,4 @@ NonCopyable::~NonCopyable()
 	// TODO Auto-generated destructor stub
 }
 
-} /* namespace util */
+} /* namespace utils */

@@ -1,25 +1,44 @@
-/*
- * Singleton.h
+/**
+ * \file Singleton.h
  *
- *  Created on: 13/set/2011
- *      Author: marco
+ * \date 13/set/2011
+ * \author Marco Paone
  */
 
 #ifndef SINGLETON_H_
 #define SINGLETON_H_
 
 #include <boost/scoped_ptr.hpp>
+#include <boost/thread/once.hpp>
 
 #include "Utilities/NonCopyable.h"
 
-namespace util
+namespace utils
 {
 /**
  * \brief Singleton base class.
  *
- * To implement a Singleton derive your class
+ * To implement a Singleton derive your class from this.
+ * Access members of the class through "MyClass::GetSingleton()": the
+ * first thread that the first time calls this function allocates the
+ * singleton of your class.
+ * Example:
+ * \code
+ * class MyClass: public utils::Singleton<MyClass>
+ * {
+ * 	public:
+ * 		void myMethod(){}
+ * 		...
+ * };
+ *
+ * int main()
+ * {
+ * 	MyClass::GetSingleton().myMethod();
+ * 	return 0;
+ * }
+ * \endcode
  * This class is designed to be thread-safe, so it can be used in a
- * multi-threading environment.
+ * multi-threaded environment.
  */
 template<typename T> class Singleton: public NonCopyable
 {
@@ -53,7 +72,7 @@ private:
 	 *  This is necessary for achieving the thread-safeness of the ResourceManager class.
 	 *  It has to be static, because it needs to allocate the unique instance.
 	 */
-	template<typename S> static void initializeOnce(void); ///< Called by boost::call_once.
+	static void initializeOnce(void); ///< Called by boost::call_once.
 
 	/**
 	 * \brief Pointer operator.
@@ -67,19 +86,37 @@ private:
 	 */
 	T* operator &();
 
-	typedef boost::scoped_ptr<class T> SmartPtr; ///< Smart shared pointer to Singleton.
+//	typedef boost::scoped_ptr<T> SmartPtr; ///< Smart shared pointer to Singleton.
 
-	static SmartPtr instancePtr; ///< The scoped pointer to the unique instance.
+	static boost::scoped_ptr<T> instancePtr; ///< The scoped pointer to the unique instance.
 	static boost::once_flag onceFlag; ///< Flag used by boost::call_once().
 
 };
 
-template<typename T> template<typename S> void Singleton<T>::initializeOnce<S>(void)
+template<typename T> Singleton<T>::~Singleton()
+{
+}
+
+template<typename T> T& Singleton<T>::getSingleton(void)
+{
+	//Thread-safe
+	if (not instancePtr)
+	{
+		boost::call_once(onceFlag, initializeOnce);
+	}
+	return *instancePtr.get();
+}
+
+template<typename T> void Singleton<T>::initializeOnce(void)
 {
 	//Thread-safe
 	instancePtr.reset(new T());
 }
 
-} /* namespace util */
+template<typename T> boost::scoped_ptr<T> Singleton<T>::instancePtr(NULL);
+
+template<typename T> boost::once_flag Singleton<T>::onceFlag = BOOST_ONCE_INIT;
+
+} /* namespace utils */
 
 #endif /* SINGLETON_H_ */

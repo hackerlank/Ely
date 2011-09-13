@@ -1,18 +1,19 @@
-/*
- * NonCopyable.h
+/**
+ * \file NonCopyable.h
  *
- *  Created on: 13/set/2011
- *      Author: marco
+ * \date 13/set/2011
+ * \author Marco Paone
  */
 
 #ifndef NONCOPYABLE_H_
 #define NONCOPYABLE_H_
 
-namespace util
+namespace utils
 {
 
 class NonCopyable
 {
+public:
 	/**
 	 * \brief Default destructor.
 	 *
@@ -57,6 +58,6 @@ private:
 
 };
 
-} /* namespace util */
+} /* namespace utils */
 
 #endif /* NONCOPYABLE_H_ */
