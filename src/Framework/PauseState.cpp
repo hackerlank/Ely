@@ -7,7 +7,8 @@
 using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace framework
+{
 PauseState::PauseState()
 {
 	m_bQuit = false;
@@ -180,5 +181,5 @@ void PauseState::yesNoDialogClosed(const Ogre::DisplayString& question,
 
 	m_bQuestionActive = false;
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||

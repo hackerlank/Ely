@@ -7,7 +7,8 @@
 #include "Framework/PauseState.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace game
+{
 Ely::Ely()
 {
 	m_pGameStateManager = 0;
@@ -18,27 +19,27 @@ Ely::Ely()
 Ely::~Ely()
 {
 	delete m_pGameStateManager;
-	delete OgreFramework::getSingletonPtr();
+	delete framework::OgreFramework::getSingletonPtr();
 }
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 void Ely::go()
 {
-	new OgreFramework();
-	if (!OgreFramework::getSingletonPtr()->initOgre("AdvancedOgreFramework", 0,
+	new framework::OgreFramework();
+	if (!framework::OgreFramework::getSingletonPtr()->initOgre("AdvancedOgreFramework", 0,
 			0))
 		return;
 
-	OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
+	framework::OgreFramework::getSingletonPtr()->m_pLog->logMessage("Demo initialized!");
 
-	m_pGameStateManager = new GameStateManager();
+	m_pGameStateManager = new framework::GameStateManager();
 
-	MenuState::create(m_pGameStateManager, "MenuState");
-	PlayState::create(m_pGameStateManager, "PlayState");
-	PauseState::create(m_pGameStateManager, "PauseState");
+	framework::MenuState::create(m_pGameStateManager, "MenuState");
+	framework::PlayState::create(m_pGameStateManager, "PlayState");
+	framework::PauseState::create(m_pGameStateManager, "PauseState");
 
 	m_pGameStateManager->start(m_pGameStateManager->findByName("MenuState"));
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||

@@ -5,7 +5,8 @@
 #include <OgreWindowEventUtilities.h>
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace framework
+{
 GameStateManager::GameStateManager()
 {
 	m_bShutdown = false;
@@ -209,5 +210,5 @@ void GameStateManager::init(GameState* state)
 
 	OgreFramework::getSingletonPtr()->m_pRenderWnd->resetStatistics();
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||

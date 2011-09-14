@@ -10,6 +10,8 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+namespace game
+{
 /**
  * \brief The Ely class is the central application organizing location.
  *
@@ -44,9 +46,9 @@ public:
 	void go();
 
 private:
-	GameStateManager* m_pGameStateManager;///< The game state manager.
+	framework::GameStateManager* m_pGameStateManager; ///< The game state manager.
 };
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif

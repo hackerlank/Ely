@@ -7,6 +7,8 @@
 
 #include "AdvancedOgreFramework.h"
 
+namespace framework
+{
 class GameState;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -43,7 +45,8 @@ public:
 	 * @param stateName The state name.
 	 * @param state The game state to manage.
 	 */
-	virtual void manageGameState(Ogre::String stateName, GameState* state) = 0;
+	virtual void
+	manageGameState(Ogre::String stateName, GameState* state) = 0;
 
 	/**
 	 * \brief Find a state by name.
@@ -51,7 +54,8 @@ public:
 	 * @param stateName The state name.
 	 * @return The game state to find.
 	 */
-	virtual GameState* findByName(Ogre::String stateName) = 0;
+	virtual GameState*
+	findByName(Ogre::String stateName) = 0;
 
 	/**
 	 * \brief Request a change to state.
@@ -61,7 +65,8 @@ public:
 	 *
 	 * @param state The game state to change to.
 	 */
-	virtual void changeGameState(GameState *state) = 0;
+	virtual void
+	changeGameState(GameState *state) = 0;
 
 	/**
 	 * \brief Push state onto the stack, making it current.
@@ -72,7 +77,8 @@ public:
 	 * @param state The game state to push.
 	 * @return Whether or not successful.
 	 */
-	virtual bool pushGameState(GameState* state) = 0;
+	virtual bool
+	pushGameState(GameState* state) = 0;
 
 	/**
 	 * \brief Pop a game state off the stack.
@@ -80,19 +86,22 @@ public:
 	 * Removes the top active state from the stack, which results
 	 * in returning to the one below
 	 */
-	virtual void popGameState() = 0;
+	virtual void
+	popGameState() = 0;
 
 	/**
 	 * \brief Pause current state.
 	 */
-	virtual void pauseGameState() = 0;
+	virtual void
+	pauseGameState() = 0;
 
 	/**
 	 * \brief Cause a shutdown.
 	 *
 	 * Well, guess what happens here...
 	 */
-	virtual void shutdown() = 0;
+	virtual void
+	shutdown() = 0;
 
 	/**
 	 * \brief Unwind stack and push a state.
@@ -102,7 +111,8 @@ public:
 	 *
 	 * @param state The game state to push.
 	 */
-	virtual void popAllAndPushGameState(GameState* state) = 0;
+	virtual void
+	popAllAndPushGameState(GameState* state) = 0;
 };
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -155,14 +165,16 @@ public:
 	 * A game state needs to be able to load graphics, resources ...
 	 * and initialize itself.
 	 */
-	virtual void enter() = 0;
+	virtual void
+	enter() = 0;
 
 	/**
 	 * \brief Inherit to supply state exit code.
 	 *
 	 * A game state needs to clean up resources when it’s done.
 	 */
-	virtual void exit() = 0;
+	virtual void
+	exit() = 0;
 
 	/**
 	 * \brief Inherit to supply pause code.
@@ -192,7 +204,8 @@ public:
 	 *
 	 * @param timeSinceLastFrame Time interval since last update.
 	 */
-	virtual void update(double timeSinceLastFrame) = 0;
+	virtual void
+	update(double timeSinceLastFrame) = 0;
 
 protected:
 
@@ -209,7 +222,8 @@ protected:
 	 * @param stateName The state name.
 	 * @return The game state.
 	 */
-	GameState* findByName(Ogre::String stateName)
+	GameState*
+	findByName(Ogre::String stateName)
 	{
 		return m_pParent->findByName(stateName);
 	}
@@ -293,7 +307,7 @@ static void create(GameStateListener* parent, const Ogre::String name)	\
 	myGameState->m_pParent = parent;									\
 	parent->manageGameState(name, myGameState);							\
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif

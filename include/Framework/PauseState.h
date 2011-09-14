@@ -8,7 +8,8 @@
 #include "GameState.h"
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace framework
+{
 /**
  * \brief The PauseState class is one of the actual GameState
  * class implementations.
@@ -59,7 +60,7 @@ private:
 	bool m_bQuit;
 	bool m_bQuestionActive;
 };
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif

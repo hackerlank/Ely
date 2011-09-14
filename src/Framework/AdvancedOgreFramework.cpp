@@ -7,7 +7,8 @@
 using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace framework
+{
 template<> OgreFramework* Ogre::Singleton<OgreFramework>::ms_Singleton = 0;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
@@ -183,5 +184,5 @@ bool OgreFramework::mouseReleased(const OIS::MouseEvent &evt,
 void OgreFramework::updateOgre(double timeSinceLastFrame)
 {
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||

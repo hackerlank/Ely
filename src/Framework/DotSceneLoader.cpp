@@ -7,6 +7,8 @@
 //#pragma warning(disable:4390)
 //#pragma warning(disable:4305)
 
+namespace framework
+{
 DotSceneLoader::DotSceneLoader() :
 		mSceneMgr(0), mTerrainGroup(0)
 {
@@ -330,7 +332,7 @@ void DotSceneLoader::processTerrainPage(rapidxml::xml_node<>* XMLNode)
 				Ogre::ResourceGroupManager::getSingleton().openResource(
 						name + Ogre::String(".ohm"), "General");
 		size_t size = stream.get()->size();
-		if (size != (uint)(mapSize * mapSize * 4))
+		if (size != (uint) (mapSize * mapSize * 4))
 		{
 			OGRE_EXCEPT( Ogre::Exception::ERR_INTERNAL_ERROR,
 					"Size of stream does not match terrainsize!",
@@ -642,7 +644,8 @@ void DotSceneLoader::processNode(rapidxml::xml_node<>* XMLNode,
 
 	// Process other attributes
 	Ogre::String id = getAttrib(XMLNode, "id");
-	/*bool isTarget =*/getAttribBool(XMLNode, "isTarget");
+	/*bool isTarget =*/
+	getAttribBool(XMLNode, "isTarget");
 
 	rapidxml::xml_node<>* pElement;
 
@@ -1175,8 +1178,9 @@ Ogre::ColourValue DotSceneLoader::parseColour(rapidxml::xml_node<>* XMLNode)
 					XMLNode->first_attribute("g")->value()),
 			Ogre::StringConverter::parseReal(
 					XMLNode->first_attribute("b")->value()),
-			XMLNode->first_attribute("a") != NULL ? Ogre::StringConverter::parseReal(
-					XMLNode->first_attribute("a")->value()) :
+			XMLNode->first_attribute("a") != NULL ?
+					Ogre::StringConverter::parseReal(
+							XMLNode->first_attribute("a")->value()) :
 					1);
 }
 
@@ -1200,4 +1204,5 @@ void DotSceneLoader::processUserDataReference(rapidxml::xml_node<>* XMLNode,
 {
 	Ogre::String str = XMLNode->first_attribute("id")->value();
 	pEntity->setUserAny(Ogre::Any(str));
+}
 }

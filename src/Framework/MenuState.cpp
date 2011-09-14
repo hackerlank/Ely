@@ -7,7 +7,8 @@
 using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace framework
+{
 MenuState::MenuState()
 {
 	m_bQuit = false;
@@ -157,5 +158,5 @@ void MenuState::buttonHit(OgreBites::Button *button)
 	else if (button->getName() == "EnterBtn")
 		changeGameState(findByName("PlayState"));
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||

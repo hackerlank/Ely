@@ -7,7 +7,8 @@
 using namespace Ogre;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
-
+namespace framework
+{
 PlayState::PlayState()
 {
 	m_MoveSpeed = 0.1f;
@@ -451,5 +452,5 @@ void PlayState::itemSelected(OgreBites::SelectMenu* menu)
 		break;
 	}
 }
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||

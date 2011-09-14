@@ -27,6 +27,8 @@ class TerrainGlobalOptions;
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+namespace framework
+{
 class nodeProperty
 {
 public:
@@ -167,7 +169,7 @@ protected:
 	Ogre::Vector3 mTerrainPosition;
 	Ogre::Vector3 mLightDirection;
 };
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif

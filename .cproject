@@ -57,6 +57,7 @@
 									<listOptionValue builtIn="false" value="OgreMain_d"/>
 									<listOptionValue builtIn="false" value="OgreTerrain_d"/>
 									<listOptionValue builtIn="false" value="OIS"/>
+									<listOptionValue builtIn="false" value="boost_thread-mt"/>
 								</option>
 								<option id="gnu.cpp.link.option.paths.890803978" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/lib"/>

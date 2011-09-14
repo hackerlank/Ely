@@ -9,6 +9,9 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+namespace framework
+{
+
 /**
  * \brief The GameStateManager manages changes in the game states in the game.
  *
@@ -152,7 +155,7 @@ protected:
 	std::vector<state_info> m_States; ///< This holds the states that are being managed.
 	bool m_bShutdown; ///< If this is set to true, the game state manager prepares to exit.
 };
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif

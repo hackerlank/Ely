@@ -80,7 +80,7 @@ public:
 
 	//! Gets human readable description of error.
 	//! \return Pointer to null terminated description of the error.
-	virtual const char *what() const throw ()
+	virtual const char * what() const throw ()
 	{
 		return m_what;
 	}
@@ -89,7 +89,7 @@ public:
 	//! Ch should be the same as char type of xml_document that produced the error.
 	//! \return Pointer to location within the parsed string where error occured.
 	template<class Ch>
-	Ch *where() const
+	Ch * where() const
 	{
 		return reinterpret_cast<Ch *>(m_where);
 	}
@@ -289,8 +289,7 @@ namespace internal
 
 // Struct that contains lookup tables for the parser
 // It must be a template to allow correct linking (because it has static data members, which are defined in a header file).
-template<int Dummy>
-struct lookup_tables
+template<int Dummy> struct lookup_tables
 {
 	static const unsigned char lookup_whitespace[256]; // Whitespace table
 	static const unsigned char lookup_node_name[256]; // Node name table
@@ -307,8 +306,7 @@ struct lookup_tables
 };
 
 // Find length of the string
-template<class Ch>
-inline std::size_t measure(const Ch *p)
+template<class Ch> inline std::size_t measure(const Ch *p)
 {
 	const Ch *tmp = p;
 	while (*tmp)
@@ -317,9 +315,8 @@ inline std::size_t measure(const Ch *p)
 }
 
 // Compare strings for equality
-template<class Ch>
-inline bool compare(const Ch *p1, std::size_t size1, const Ch *p2,
-		std::size_t size2, bool case_sensitive)
+template<class Ch> inline bool compare(const Ch *p1, std::size_t size1,
+		const Ch *p2, std::size_t size2, bool case_sensitive)
 {
 	if (size1 != size2)
 		return false;
@@ -378,14 +375,13 @@ inline bool compare(const Ch *p1, std::size_t size1, const Ch *p2,
 //! to obtain best wasted memory to performance compromise.
 //! To do it, define their values before rapidxml.hpp file is included.
 //! \param Ch Character type of created nodes. 
-template<class Ch = char>
-class memory_pool
+template<class Ch = char> class memory_pool
 {
 
 public:
 
 	//! \cond internal
-	typedef void *(alloc_func)(std::size_t); // Type of user-defined function used to allocate memory
+	typedef void * (alloc_func)(std::size_t); // Type of user-defined function used to allocate memory
 	typedef void (free_func)(void *); // Type of user-defined function used to free memory
 	//! \endcond
 
@@ -414,7 +410,7 @@ public:
 	//! \param name_size Size of name to assign, or 0 to automatically calculate size from name string.
 	//! \param value_size Size of value to assign, or 0 to automatically calculate size from value string.
 	//! \return Pointer to allocated node. This pointer will never be NULL.
-	xml_node<Ch> *allocate_node(node_type type, const Ch *name = 0,
+	xml_node<Ch> * allocate_node(node_type type, const Ch *name = 0,
 			const Ch *value = 0, std::size_t name_size = 0,
 			std::size_t value_size = 0)
 	{
@@ -446,7 +442,7 @@ public:
 	//! \param name_size Size of name to assign, or 0 to automatically calculate size from name string.
 	//! \param value_size Size of value to assign, or 0 to automatically calculate size from value string.
 	//! \return Pointer to allocated attribute. This pointer will never be NULL.
-	xml_attribute<Ch> *allocate_attribute(const Ch *name = 0, const Ch *value =
+	xml_attribute<Ch> * allocate_attribute(const Ch *name = 0, const Ch *value =
 			0, std::size_t name_size = 0, std::size_t value_size = 0)
 	{
 		void *memory = allocate_aligned(sizeof(xml_attribute<Ch> ));
@@ -475,7 +471,7 @@ public:
 	//! \param source String to initialize the allocated memory with, or 0 to not initialize it.
 	//! \param size Number of characters to allocate, or zero to calculate it automatically from source string length; if size is 0, source string must be specified and null terminated.
 	//! \return Pointer to allocated char array. This pointer will never be NULL.
-	Ch *allocate_string(const Ch *source = 0, std::size_t size = 0)
+	Ch * allocate_string(const Ch *source = 0, std::size_t size = 0)
 	{
 		assert(source || size);
 		// Either source or size (or both) must be specified
@@ -497,7 +493,7 @@ public:
 	//! \param source Node to clone.
 	//! \param result Node to put results in, or 0 to automatically allocate result node
 	//! \return Pointer to cloned node. This pointer will never be NULL.
-	xml_node<Ch> *clone_node(const xml_node<Ch> *source, xml_node<Ch> *result =
+	xml_node<Ch> * clone_node(const xml_node<Ch> *source, xml_node<Ch> *result =
 			0)
 	{
 		// Prepare result node
@@ -580,7 +576,7 @@ private:
 		m_end = m_static_memory + sizeof(m_static_memory);
 	}
 
-	char *align(char *ptr)
+	char * align(char *ptr)
 	{
 		std::size_t alignment = ((RAPIDXML_ALIGNMENT
 				- (std::size_t(ptr) & (RAPIDXML_ALIGNMENT - 1)))
@@ -588,7 +584,7 @@ private:
 		return ptr + alignment;
 	}
 
-	char *allocate_raw(std::size_t size)
+	char * allocate_raw(std::size_t size)
 	{
 		// Allocate
 		void *memory;
@@ -609,7 +605,7 @@ private:
 		return static_cast<char *>(memory);
 	}
 
-	void *allocate_aligned(std::size_t size)
+	void * allocate_aligned(std::size_t size)
 	{
 		// Calculate aligned pointer
 		char *result = align(m_ptr);
@@ -658,8 +654,7 @@ private:
 //! Base class for xml_node and xml_attribute implementing common functions: 
 //! name(), name_size(), value(), value_size() and parent().
 //! \param Ch Character type to use
-template<class Ch = char>
-class xml_base
+template<class Ch = char> class xml_base
 {
 
 public:
@@ -682,7 +677,7 @@ public:
 	//! <br><br>
 	//! Use name_size() function to determine length of the name.
 	//! \return Name of node, or empty string if node has no name.
-	Ch *name() const
+	Ch * name() const
 	{
 		return m_name ? m_name : nullstr();
 	}
@@ -701,7 +696,7 @@ public:
 	//! <br><br>
 	//! Use value_size() function to determine length of the value.
 	//! \return Value of node, or empty string if node has no value.
-	Ch *value() const
+	Ch * value() const
 	{
 		return m_value ? m_value : nullstr();
 	}
@@ -779,7 +774,7 @@ public:
 
 	//! Gets node parent.
 	//! \return Pointer to parent node, or 0 if there is no parent.
-	xml_node<Ch> *parent() const
+	xml_node<Ch> * parent() const
 	{
 		return m_parent;
 	}
@@ -787,7 +782,7 @@ public:
 protected:
 
 	// Return empty string
-	static Ch *nullstr()
+	static Ch * nullstr()
 	{
 		static Ch zero = Ch('\0');
 		return &zero;
@@ -806,8 +801,7 @@ protected:
 //! Note that after parse, both name and value of attribute will point to interior of source text used for parsing. 
 //! Thus, this text must persist in memory for the lifetime of attribute.
 //! \param Ch Character type to use.
-template<class Ch = char>
-class xml_attribute: public xml_base<Ch>
+template<class Ch = char> class xml_attribute: public xml_base<Ch>
 {
 
 	friend class xml_node<Ch> ;
@@ -828,14 +822,14 @@ public:
 
 	//! Gets document of which attribute is a child.
 	//! \return Pointer to document that contains this attribute, or 0 if there is no parent document.
-	xml_document<Ch> *document() const
+	xml_document<Ch> * document() const
 	{
 		if (xml_node<Ch> *node = this->parent())
 		{
 			while (node->parent())
 				node = node->parent();
-			return node->type() == node_document ? static_cast<xml_document<Ch> *>(node) :
-					0;
+			return node->type() == node_document ?
+					static_cast<xml_document<Ch> *>(node) : 0;
 		}
 		else
 			return 0;
@@ -846,7 +840,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found attribute, or 0 if not found.
-	xml_attribute<Ch> *previous_attribute(const Ch *name = 0,
+	xml_attribute<Ch> * previous_attribute(const Ch *name = 0,
 			std::size_t name_size = 0, bool case_sensitive = true) const
 	{
 		if (name)
@@ -869,7 +863,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found attribute, or 0 if not found.
-	xml_attribute<Ch> *next_attribute(const Ch *name = 0,
+	xml_attribute<Ch> * next_attribute(const Ch *name = 0,
 			std::size_t name_size = 0, bool case_sensitive = true) const
 	{
 		if (name)
@@ -905,8 +899,7 @@ private:
 //! Note that after parse, both name and value of node, if any, will point interior of source text used for parsing. 
 //! Thus, this text must persist in the memory for the lifetime of node.
 //! \param Ch Character type to use.
-template<class Ch = char>
-class xml_node: public xml_base<Ch>
+template<class Ch = char> class xml_node: public xml_base<Ch>
 {
 
 public:
@@ -937,13 +930,13 @@ public:
 
 	//! Gets document of which node is a child.
 	//! \return Pointer to document that contains this node, or 0 if there is no parent document.
-	xml_document<Ch> *document() const
+	xml_document<Ch> * document() const
 	{
 		xml_node<Ch> *node = const_cast<xml_node<Ch> *>(this);
 		while (node->parent())
 			node = node->parent();
-		return node->type() == node_document ? static_cast<xml_document<Ch> *>(node) :
-				0;
+		return node->type() == node_document ?
+				static_cast<xml_document<Ch> *>(node) : 0;
 	}
 
 	//! Gets first child node, optionally matching node name.
@@ -951,7 +944,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found child, or 0 if not found.
-	xml_node<Ch> *first_node(const Ch *name = 0, std::size_t name_size = 0,
+	xml_node<Ch> * first_node(const Ch *name = 0, std::size_t name_size = 0,
 			bool case_sensitive = true) const
 	{
 		if (name)
@@ -976,7 +969,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found child, or 0 if not found.
-	xml_node<Ch> *last_node(const Ch *name = 0, std::size_t name_size = 0,
+	xml_node<Ch> * last_node(const Ch *name = 0, std::size_t name_size = 0,
 			bool case_sensitive = true) const
 	{
 		assert(m_first_node);
@@ -1003,8 +996,8 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found sibling, or 0 if not found.
-	xml_node<Ch> *previous_sibling(const Ch *name = 0,
-			std::size_t name_size = 0, bool case_sensitive = true) const
+	xml_node<Ch> * previous_sibling(const Ch *name = 0, std::size_t name_size =
+			0, bool case_sensitive = true) const
 	{
 		assert(this->m_parent);
 		// Cannot query for siblings if node has no parent
@@ -1030,7 +1023,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found sibling, or 0 if not found.
-	xml_node<Ch> *next_sibling(const Ch *name = 0, std::size_t name_size = 0,
+	xml_node<Ch> * next_sibling(const Ch *name = 0, std::size_t name_size = 0,
 			bool case_sensitive = true) const
 	{
 		assert(this->m_parent);
@@ -1055,7 +1048,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found attribute, or 0 if not found.
-	xml_attribute<Ch> *first_attribute(const Ch *name = 0,
+	xml_attribute<Ch> * first_attribute(const Ch *name = 0,
 			std::size_t name_size = 0, bool case_sensitive = true) const
 	{
 		if (name)
@@ -1078,7 +1071,7 @@ public:
 	//! \param name_size Size of name, in characters, or 0 to have size calculated automatically from string
 	//! \param case_sensitive Should name comparison be case-sensitive; non case-sensitive comparison works properly only for ASCII characters
 	//! \return Pointer to found attribute, or 0 if not found.
-	xml_attribute<Ch> *last_attribute(const Ch *name = 0,
+	xml_attribute<Ch> * last_attribute(const Ch *name = 0,
 			std::size_t name_size = 0, bool case_sensitive = true) const
 	{
 		if (name)
@@ -1396,8 +1389,8 @@ private:
 //! which are inherited from memory_pool.
 //! To access root node of the document, use the document itself, as if it was an xml_node.
 //! \param Ch Character type to use.
-template<class Ch = char>
-class xml_document: public xml_node<Ch>, public memory_pool<Ch>
+template<class Ch = char> class xml_document: public xml_node<Ch>,
+		public memory_pool<Ch>
 {
 
 public:
@@ -1419,8 +1412,7 @@ public:
 	//! Document can be parsed into multiple times. 
 	//! Each new call to parse removes previous nodes and attributes (if any), but does not clear memory pool.
 	//! \param text XML data to parse; pointer is non-const to denote fact that this data may be modified by the parser.
-	template<int Flags>
-	void parse(Ch *text)
+	template<int Flags> void parse(Ch *text)
 	{
 		assert(text);
 
@@ -1523,8 +1515,7 @@ private:
 	};
 
 	// Detect attribute value character
-	template<Ch Quote>
-	struct attribute_value_pred
+	template<Ch Quote> struct attribute_value_pred
 	{
 		static unsigned char test(Ch ch)
 		{
@@ -1537,8 +1528,7 @@ private:
 	};
 
 	// Detect attribute value character
-	template<Ch Quote>
-	struct attribute_value_pure_pred
+	template<Ch Quote> struct attribute_value_pure_pred
 	{
 		static unsigned char test(Ch ch)
 		{
@@ -1551,8 +1541,8 @@ private:
 	};
 
 	// Insert coded character, using UTF8 or 8-bit ASCII
-	template<int Flags>
-	static void insert_coded_character(Ch *&text, unsigned long code)
+	template<int Flags> static void insert_coded_character(Ch *&text,
+			unsigned long code)
 	{
 		if (Flags & parse_no_utf8)
 		{
@@ -1598,8 +1588,7 @@ private:
 		}
 
 		// Skip characters until predicate evaluates to true
-		template<class StopPred, int Flags>
-		static void skip(Ch *&text)
+		template<class StopPred, int Flags> static void skip(Ch *&text)
 		{
 			Ch *tmp = text;
 			while (StopPred::test(*tmp))
@@ -1610,8 +1599,7 @@ private:
 		// Skip characters until predicate evaluates to true while doing the following:
 		// - replacing XML character entity references with proper characters (&apos; &amp; &quot; &lt; &gt; &#...;)
 		// - condensing whitespace sequences to single space character
-		template<class StopPred, class StopPredPure, int Flags>
-		static Ch *skip_and_expand_character_refs(Ch *&text)
+		template<class StopPred, class StopPredPure, int Flags> static Ch *skip_and_expand_character_refs(Ch *&text)
 		{
 			// If entity translation, whitespace condense and whitespace trimming is disabled, use plain skip
 			if ((Flags & parse_no_entity_translation) &&
@@ -1765,8 +1753,7 @@ private:
 		// Internal parsing functions
 
 		// Parse BOM, if any
-		template<int Flags>
-		void parse_bom(Ch *&text)
+		template<int Flags> void parse_bom(Ch *&text)
 		{
 			// UTF-8?
 			if (static_cast<unsigned char>(text[0]) == 0xEF &&
@@ -1778,8 +1765,7 @@ private:
 		}
 
 		// Parse XML declaration (<?xml...)
-		template<int Flags>
-		xml_node<Ch> *parse_xml_declaration(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_xml_declaration(Ch *&text)
 		{
 			// If parsing of declaration is disabled
 			if (!(Flags & parse_declaration_node))
@@ -1813,8 +1799,7 @@ private:
 		}
 
 		// Parse XML comment (<!--...)
-		template<int Flags>
-		xml_node<Ch> *parse_comment(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_comment(Ch *&text)
 		{
 			// If parsing of comments is disabled
 			if (!(Flags & parse_comment_nodes))
@@ -1854,8 +1839,7 @@ private:
 		}
 
 		// Parse DOCTYPE
-		template<int Flags>
-		xml_node<Ch> *parse_doctype(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_doctype(Ch *&text)
 		{
 			// Remember value start
 			Ch *value = text;
@@ -1920,8 +1904,7 @@ private:
 		}
 
 		// Parse PI
-		template<int Flags>
-		xml_node<Ch> *parse_pi(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_pi(Ch *&text)
 		{
 			// If creation of PI nodes is enabled
 			if (Flags & parse_pi_nodes)
@@ -1980,8 +1963,7 @@ private:
 		// Parse and append data
 		// Return character that ends data.
 		// This is necessary because this character might have been overwritten by a terminating 0
-		template<int Flags>
-		Ch parse_and_append_data(xml_node<Ch> *node, Ch *&text, Ch *contents_start)
+		template<int Flags> Ch parse_and_append_data(xml_node<Ch> *node, Ch *&text, Ch *contents_start)
 		{
 			// Backup to contents start if whitespace trimming is disabled
 			if (!(Flags & parse_trim_whitespace))
@@ -2038,8 +2020,7 @@ private:
 		}
 
 		// Parse CDATA
-		template<int Flags>
-		xml_node<Ch> *parse_cdata(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_cdata(Ch *&text)
 		{
 			// If CDATA is disabled
 			if (Flags & parse_no_data_nodes)
@@ -2077,8 +2058,7 @@ private:
 		}
 
 		// Parse element node
-		template<int Flags>
-		xml_node<Ch> *parse_element(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_element(Ch *&text)
 		{
 			// Create element node
 			xml_node<Ch> *element = this->allocate_node(node_element);
@@ -2121,8 +2101,7 @@ private:
 		}
 
 		// Determine node type, and parse it
-		template<int Flags>
-		xml_node<Ch> *parse_node(Ch *&text)
+		template<int Flags> xml_node<Ch> *parse_node(Ch *&text)
 		{
 			// Parse proper node type
 			switch (text[0])
@@ -2207,8 +2186,7 @@ private:
 		}
 
 		// Parse contents of the node - children, data etc.
-		template<int Flags>
-		void parse_node_contents(Ch *&text, xml_node<Ch> *node)
+		template<int Flags> void parse_node_contents(Ch *&text, xml_node<Ch> *node)
 		{
 			// For all children and text
 			while (1)
@@ -2279,8 +2257,7 @@ private:
 		}
 
 		// Parse XML attributes of the node
-		template<int Flags>
-		void parse_node_attributes(Ch *&text, xml_node<Ch> *node)
+		template<int Flags> void parse_node_attributes(Ch *&text, xml_node<Ch> *node)
 		{
 			// For all attributes 
 			while (attribute_name_pred::test(*text))
@@ -2350,8 +2327,7 @@ namespace internal
 {
 
 // Whitespace (space \n \r \t)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_whitespace[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_whitespace[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 0, 0, 1, 0, 0, // 0
@@ -2373,8 +2349,7 @@ const unsigned char lookup_tables<Dummy>::lookup_whitespace[256] =
 		};
 
 // Node name (anything but space \n \r \t / > ? \0)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_node_name[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_node_name[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, // 0
@@ -2396,8 +2371,7 @@ const unsigned char lookup_tables<Dummy>::lookup_node_name[256] =
 		};
 
 // Text (i.e. PCDATA) (anything but < \0)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_text[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_text[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0
@@ -2420,8 +2394,7 @@ const unsigned char lookup_tables<Dummy>::lookup_text[256] =
 
 // Text (i.e. PCDATA) that does not require processing when ws normalization is disabled 
 // (anything but < \0 &)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_text_pure_no_ws[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_text_pure_no_ws[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0
@@ -2444,8 +2417,7 @@ const unsigned char lookup_tables<Dummy>::lookup_text_pure_no_ws[256] =
 
 // Text (i.e. PCDATA) that does not require processing when ws normalizationis is enabled
 // (anything but < \0 & space \n \r \t)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_text_pure_with_ws[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_text_pure_with_ws[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, // 0
@@ -2467,8 +2439,7 @@ const unsigned char lookup_tables<Dummy>::lookup_text_pure_with_ws[256] =
 		};
 
 // Attribute name (anything but space \n \r \t / < > = ? ! \0)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_attribute_name[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_attribute_name[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 0, 0, 1, 1, 0, 1, 1, // 0
@@ -2490,8 +2461,7 @@ const unsigned char lookup_tables<Dummy>::lookup_attribute_name[256] =
 		};
 
 // Attribute data with single quote (anything but ' \0)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_attribute_data_1[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_attribute_data_1[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0
@@ -2513,8 +2483,7 @@ const unsigned char lookup_tables<Dummy>::lookup_attribute_data_1[256] =
 		};
 
 // Attribute data with single quote that does not require processing (anything but ' \0 &)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_attribute_data_1_pure[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_attribute_data_1_pure[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0
@@ -2536,8 +2505,7 @@ const unsigned char lookup_tables<Dummy>::lookup_attribute_data_1_pure[256] =
 		};
 
 // Attribute data with double quote (anything but " \0)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_attribute_data_2[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_attribute_data_2[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0
@@ -2559,8 +2527,7 @@ const unsigned char lookup_tables<Dummy>::lookup_attribute_data_2[256] =
 		};
 
 // Attribute data with double quote that does not require processing (anything but " \0 &)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_attribute_data_2_pure[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_attribute_data_2_pure[256] =
 {
 // 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, // 0
@@ -2582,8 +2549,7 @@ const unsigned char lookup_tables<Dummy>::lookup_attribute_data_2_pure[256] =
 		};
 
 // Digits (dec and hex, 255 denotes end of numeric character reference)
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_digits[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_digits[256] =
 {
 		// 0   1   2   3   4   5   6   7   8   9   A   B   C   D   E   F
 		255,
@@ -2737,8 +2703,7 @@ const unsigned char lookup_tables<Dummy>::lookup_digits[256] =
 		};
 
 // Upper case conversion
-template<int Dummy>
-const unsigned char lookup_tables<Dummy>::lookup_upcase[256] =
+template<int Dummy> const unsigned char lookup_tables<Dummy>::lookup_upcase[256] =
 {
 		// 0,  1,  2,  3,  4,  5,  6,  7,  8,  9,  A   B   C   D   E   F
 		0, 1, 2, 3, 4, 5, 6, 7,

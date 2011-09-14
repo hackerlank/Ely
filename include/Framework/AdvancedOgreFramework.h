@@ -26,8 +26,11 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+namespace framework
+{
+
 /**
- * \brief This class wrapps the Ogre funcionality.
+ * \brief This class wraps the Ogre functionality.
  *
  * It is a Ogre::Singleton.
  * It has the needed functions to power up Ogre and offers
@@ -61,7 +64,8 @@ public:
 	/**
 	 * \brief Destructor, clearing up.
 	 */
-	virtual ~OgreFramework();
+	virtual
+	~OgreFramework();
 
 	/**
 	 * \brief Powers up Ogre.
@@ -172,9 +176,11 @@ public:
 
 private:
 	OgreFramework(const OgreFramework&);
-	OgreFramework& operator=(const OgreFramework&);
+	OgreFramework&
+	operator=(const OgreFramework&);
 };
 
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif

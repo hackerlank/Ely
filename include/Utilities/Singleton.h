@@ -8,9 +8,7 @@
 #ifndef SINGLETON_H_
 #define SINGLETON_H_
 
-#include <boost/scoped_ptr.hpp>
-#include <boost/thread/once.hpp>
-
+#include "Utilities/Prerequisites.h"
 #include "Utilities/NonCopyable.h"
 
 namespace utils

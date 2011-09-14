@@ -9,6 +9,8 @@
 
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
+namespace framework
+{
 /**
  * \brief The MenuState class is one of the actual GameState
  * class implementations.
@@ -129,7 +131,7 @@ public:
 private:
 	bool m_bQuit;
 };
-
+}
 //|||||||||||||||||||||||||||||||||||||||||||||||
 
 #endif
