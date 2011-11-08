@@ -15,35 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/utilities/UtilitiesPrerequisites.h
+ * \file /Ely/include/utilities/thread/Atomic_test.cpp
  *
- * \date Nov 2, 2011
+ * \date 08/nov/2011
  * \author marco
  */
 
-#ifndef UTILITIESPREREQUISITES_H_
-#define UTILITIESPREREQUISITES_H_
+#include "utilities/thread/Atomic.h"
 
-#include "Ogre.h"
-#include "boost/atomic.hpp"
-
-namespace ely
-{
-
-#ifdef ELY_DOUBLE
-typedef double Real;
-#else
-typedef float Real;
-#endif
-
-typedef Ogre::Radian Radian;
-typedef Ogre::Degree Degree;
-typedef Ogre::Vector3 Vectore3;
-typedef Ogre::Vector2 Vectore2;
-typedef Ogre::Quaternion Quaternion;
-
-class Math;
-
-} // namespace ely
-
-#endif /* UTILITIESPREREQUISITES_H_ */
