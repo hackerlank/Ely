@@ -24,6 +24,10 @@
 #ifndef ATOMIC_H_
 #define ATOMIC_H_
 
+#include "utilities/UtilitiesPrerequisites.h"
+
+#include "boost/atomic.hpp"
+
 namespace ely
 {
 
