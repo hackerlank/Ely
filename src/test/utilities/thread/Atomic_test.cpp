@@ -22,4 +22,7 @@
  */
 
 #include "utilities/thread/Atomic.h"
+#include <boost/test/unit_test.hpp>
+#include "../UtilitiesSuiteFixture.h"
+#include "ThreadSuiteFixture.h"
 
