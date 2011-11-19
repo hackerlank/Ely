@@ -22,8 +22,8 @@ public:
 	Singleton(void)
 	{
 		assert(!ms_Singleton);
-		int offset = (int) (T*) 1 - (int) (Singleton<T>*) (T*) 1;
-		ms_Singleton = (T*) ((int) this + offset);
+		unsigned long int offset = (unsigned long int) (T*) 1 - (unsigned long int) (Singleton<T>*) (T*) 1;
+		ms_Singleton = (T*) ((unsigned long int) this + offset);
 	}
 	~Singleton(void)
 	{
@@ -81,6 +81,7 @@ Texture stone1("stone1");
 
 int main(void)
 {
+	new TextureMgr;
 	TextureMgr::GetSingleton().SetTexture(&stone1);
 	cout << TextureMgr::GetSingleton().GetTexture("stone1")->GetName() << endl;
 	return 0;
