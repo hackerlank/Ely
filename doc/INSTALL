@@ -108,6 +108,7 @@ $ make install
 	e) click on "Generate"
 - cd /REPOSITORY/KProjects/bullet/build
 - make
+- make rebuild_cache
 - make install
 After installing move /REPOSITORY/KProjects/usr/bullet to /REPOSITORY/KProjects/usr/include/bullet
 
