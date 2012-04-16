@@ -99,11 +99,12 @@ $ make install
 		* BUILD_DEMOS:BOOL=OFF
 		* BUILD_EXTRAS:BOOL=ON
 		* BUILD_NVIDIA_OPENCL_DEMOS:BOOL=ON
-		* BUILD_SHARED_LIBS:BOOL=ON (to be added)
 	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
 		* INSTALL_EXTRA_LIBS:BOOL=ON (to be added)
 		* LIB_DESTINATION:STRING=/REPOSITORY/KProjects/usr/lib
 		* USE_CUSTOM_VECTOR_MATH:BOOL=ON
+		Note: possibly set BUILD_SHARED_LIBS:BOOL=ON (to be added)
+		Note: possibly set CMAKE_CXX_FLAGS:STRING=-fPIC
 	d) click again on "Configure"
 	e) click on "Generate"
 - cd /REPOSITORY/KProjects/bullet/build
