@@ -15,35 +15,29 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/utilities/UtilitiesPrerequisites.h
+ * \file /Ely/src/test/ely/ElySuiteFixture.h
  *
- * \date Nov 2, 2011
+ * \date 07/mag/2012 (17:38:09)
  * \author marco
  */
 
-#ifndef UTILITIESPREREQUISITES_H_
-#define UTILITIESPREREQUISITES_H_
+#ifndef ELYSUITEFIXTURE_H_
+#define ELYSUITEFIXTURE_H_
 
-#include "Ogre.h"
-#include "boost/atomic.hpp"
+//#include <climits>
+//
+//struct MathSuiteFixture
+//{
+//	MathSuiteFixture()
+//	{
+//		// TODO
+//	}
+//
+//	~MathSuiteFixture()
+//	{
+//		// TODO
+//	}
+//	static const ely::Real tolerance;
+//};
 
-namespace ely
-{
-
-#ifdef ELY_DOUBLE
-typedef double Real;
-#else
-typedef float Real;
-#endif
-
-typedef Ogre::Radian Radian;
-typedef Ogre::Degree Degree;
-typedef Ogre::Vector3 Vectore3;
-typedef Ogre::Vector2 Vectore2;
-typedef Ogre::Quaternion Quaternion;
-
-class Math;
-
-} // namespace ely
-
-#endif /* UTILITIESPREREQUISITES_H_ */
+#endif /* ELYSUITEFIXTURE_H_ */
