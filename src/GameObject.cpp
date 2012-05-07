@@ -21,7 +21,7 @@
  * \author marco
  */
 
-#include "../include/GameObject.h"
+#include "GameObject.h"
 
 GameObject::GameObject()
 {

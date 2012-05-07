@@ -24,11 +24,57 @@
 #ifndef GAME_H_
 #define GAME_H_
 
-class Game
+#include <pandaFramework.h>
+#include <pandaSystem.h>
+#include <auto_bind.h>
+
+#include <cardMaker.h>
+#include <ambientLight.h>
+#include <directionalLight.h>
+#include <pointLight.h>
+#include <spotlight.h>
+
+#include <boost/shared_ptr.hpp>
+#include <iostream>
+#include <utility>
+
+class FuncInterval;
+
+/**
+ * \brief Application
+ */
+class Game: public PandaFramework
 {
 public:
-	Game();
+	Game(int argc, char* argv[]);
 	virtual ~Game();
+
+	/**
+	 * Put here your own code, such as the loading of your models
+	 */
+	virtual void setup();
+
+	// Generic Task Function interface
+	typedef AsyncTask::DoneStatus (Game::*ApplicationTaskPtr)(
+			GenericAsyncTask* task);
+	typedef std::pair<Game*, ApplicationTaskPtr> ApplicationTaskData;
+	static AsyncTask::DoneStatus applicationTask(GenericAsyncTask* task,
+			void * data);
+
+protected:
+
+	// Effective Tasks composed by a pair of an object and a member function
+//	boost::shared_ptr<ApplicationTaskData> mUpdateTask;
+//	AsyncTask::DoneStatus update(GenericAsyncTask* task = NULL);
+
+	WindowFramework * mWindow;
+	NodePath mRender;
+	NodePath mCamera;
+	PT(ClockObject) mGlobalClock;
+
+	//
+	NodePath mPanda;
+	AnimControlCollection mPandaAnims;
 };
 
 #endif /* GAME_H_ */

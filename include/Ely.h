@@ -24,7 +24,7 @@
 #ifndef ELY_H_
 #define ELY_H_
 
-#include <iostream>
-
+#include <load_prc_file.h>
+#include "Game.h"
 
 #endif /* ELY_H_ */

@@ -25,7 +25,16 @@
 
 int main(int argc, char **argv)
 {
-	std::cout << "Hello! I'm Ely!" << std::endl;
+	// Load your configuration
+	load_prc_file("config.prc");
+	// Open the framework
+	Game* gameApp = new Game(argc, argv);
+	// Set your application up
+	gameApp->setup();
+	// Do the main loop
+	gameApp->main_loop();
+	// Close the framework
+	delete gameApp;
 	return 0;
 }
 
