@@ -15,30 +15,42 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Ely.cpp
+ * \file /Ely/include/Utilitiy.h
  *
- * \date Nov 7, 2011
+ * \date 08/mag/2012 (16:49:10)
  * \author marco
  */
 
-#include "Ely.h"
+#ifndef UTILITIY_H_
+#define UTILITIY_H_
 
-int main(int argc, char **argv)
+#include <referenceCount.h>
+#include <utility>
+
+/**
+ * \brief A pair that can be used with PT
+ */
+template<typename T1, typename T2> struct Pair: public ReferenceCount
 {
-	// Load your configuration
-	load_prc_file("config.prc");
-	// Add code defined configuration
-	load_prc_file_data("", "sync-video #t");
-	//load_prc_file_data("", "want-directtools #t");
-	//load_prc_file_data("", "want-tk #t");
-	// Open the framework
-	Game* gameApp = new Game(argc, argv);
-	// Set your application up
-	gameApp->setup();
-	// Do the main loop
-	gameApp->main_loop();
-	// Close the framework
-	delete gameApp;
-	return 0;
-}
+public:
+	Pair() :
+			mPair()
+	{
+	}
+	Pair(const T1& first, const T2& second) :
+			mPair(first, second)
+	{
+	}
+	T1& first()
+	{
+		return mPair.first;
+	}
+	T2& second()
+	{
+		return mPair.second;
+	}
+private:
+	std::pair<T1, T2> mPair;
+};
 
+#endif /* UTILITIY_H_ */

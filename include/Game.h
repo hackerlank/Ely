@@ -28,51 +28,65 @@
 #include <pandaSystem.h>
 #include <auto_bind.h>
 
-#include <cardMaker.h>
-#include <ambientLight.h>
-#include <directionalLight.h>
-#include <pointLight.h>
-#include <spotlight.h>
+#include <cIntervalManager.h>
+#include <cLerpNodePathInterval.h>
+#include <cMetaInterval.h>
+#include <randomizer.h>
 
-#include <boost/shared_ptr.hpp>
 #include <iostream>
-#include <utility>
+#include "Utilitiy.h"
 
 class FuncInterval;
 
 /**
- * \brief Application
+ * \brief Game
  */
 class Game: public PandaFramework
 {
 public:
+	/**
+	 * \brief Constructor. Initializes the environment.
+	 * @param argc from main()
+	 * @param argv from main()
+	 */
 	Game(int argc, char* argv[]);
+	/**
+	 * \brief Destructor
+	 */
 	virtual ~Game();
 
 	/**
-	 * Put here your own code, such as the loading of your models
+	 * \brief Put here your own custom setup game code.
 	 */
 	virtual void setup();
 
-	// Generic Task Function interface
-	typedef AsyncTask::DoneStatus (Game::*ApplicationTaskPtr)(
-			GenericAsyncTask* task);
-	typedef std::pair<Game*, ApplicationTaskPtr> ApplicationTaskData;
-	static AsyncTask::DoneStatus applicationTask(GenericAsyncTask* task,
+	/**
+	 * \brief Generic Task Function interface
+	 *
+	 *  The effective Tasks are composed by a Pair of
+	 *  an Game object and a member function doing the task.
+	 */
+	typedef AsyncTask::DoneStatus (Game::*GameTaskPtr)(GenericAsyncTask* task);
+	typedef Pair<Game*, GameTaskPtr> GameTaskData;
+	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task,
 			void * data);
 
 protected:
 
-	// Effective Tasks composed by a pair of an object and a member function
-//	boost::shared_ptr<ApplicationTaskData> mUpdateTask;
-//	AsyncTask::DoneStatus update(GenericAsyncTask* task = NULL);
+	/// 1nd task.
+	PT(GameTaskData) m1stTask;
+	AsyncTask::DoneStatus firstTask(GenericAsyncTask* task = NULL);
+	/// 2nd task
+	PT(GameTaskData) m2ndTask;
+	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task = NULL);
 
+	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
 	NodePath mCamera;
 	PT(ClockObject) mGlobalClock;
 
-	//
+	/// Specific members
 	NodePath mPanda;
 	AnimControlCollection mPandaAnims;
 };
