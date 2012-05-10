@@ -34,6 +34,8 @@
 #include <randomizer.h>
 
 #include <iostream>
+
+#include "GameObject.h"
 #include "Utilitiy.h"
 
 class FuncInterval;
@@ -88,6 +90,7 @@ protected:
 
 	/// Specific members
 	NodePath mPanda;
+	PT(GameObject) mPandaGO;
 	AnimControlCollection mPandaAnims;
 };
 

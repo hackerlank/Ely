@@ -29,7 +29,7 @@ Game::Game(int argc, char* argv[]) :
 	// Open the framework
 	open_framework(argc, argv);
 	// Set a nice title
-	set_window_title("Hello World!");
+	set_window_title("Ely");
 	// Open it!
 	mWindow = open_window();
 	// Check whether the window is loaded correctly
@@ -68,7 +68,7 @@ void Game::setup()
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
 	trackBall->set_pos(0, 50, -6);
-	//	self.cam.setPos(0, -50, 6)
+//	mCamera.set_pos(0, -50, 6);
 
 	// add a 1st task
 	m1stTask = new GameTaskData(this, &Game::firstTask);

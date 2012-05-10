@@ -26,6 +26,31 @@
 
 #include <referenceCount.h>
 #include <utility>
+#include <exception>
+#include <string>
+
+/**
+ * \brief An exception during the game.
+ */
+class GameException: public std::exception
+{
+public:
+	GameException(const std::string& what) :
+			exception()
+	{
+		mWhat = what;
+	}
+	virtual ~GameException() throw ()
+	{
+	}
+	virtual const char* what()
+	{
+		return mWhat.c_str();
+	}
+protected:
+	std::string mWhat;
+
+};
 
 /**
  * \brief A pair that can be used with PT

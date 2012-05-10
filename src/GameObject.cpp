@@ -23,14 +23,42 @@
 
 #include "GameObject.h"
 
-GameObject::GameObject()
+GameObject::GameObject(NodePath* nodePath)
 {
-	// TODO Auto-generated constructor stub
-
+	if ((not nodePath) or (nodePath->is_empty()))
+	{
+		throw GameException("NULL or Empty NodePath");
+	}
+	mNodePath = nodePath;
+	mGameObjectId = static_cast<GameObjectId>(mNodePath->get_name());
 }
 
 GameObject::~GameObject()
 {
-	// TODO Auto-generated destructor stub
+	mNodePath->remove_node();
 }
 
+const GameObjectId& GameObject::getGameObjectId() const
+{
+	return mGameObjectId;
+}
+
+void GameObject::setGameObjectId(GameObjectId& gameObjectId)
+{
+	mGameObjectId = gameObjectId;
+}
+
+void GameObject::clearGameObjectComponents()
+{
+	mComponents.clear();
+}
+
+NodePath* GameObject::getNodePath() const
+{
+	return mNodePath;
+}
+
+void GameObject::setNodePath(NodePath* nodePath)
+{
+	mNodePath = nodePath;
+}
