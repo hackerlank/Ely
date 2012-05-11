@@ -60,7 +60,7 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	GameObject(NodePath* nodePath);
+	GameObject(const NodePath& nodePath);
 
 	/**
 	 * \brief Destructor.
@@ -71,12 +71,12 @@ public:
 	 * \brief Return the node path.
 	 * @return the node path.
 	 */
-	NodePath* getNodePath() const;
+	NodePath& getNodePath();
 	/**
 	 * \brief Set the node path.
 	 * @param nodePath the node path to be set.
 	 */
-	void setNodePath(NodePath* nodePath);
+	void setNodePath(NodePath& nodePath);
 
 	/**
 	 * \brief Get the component of that given family.
@@ -108,9 +108,14 @@ public:
 	 */
 	void setGameObjectId(GameObjectId& gameObjectId);
 
+	/**
+	 * \brief NodePath conversion function.
+	 */
+	operator NodePath();
+
 private:
 	///NodePath associated with this object.
-	NodePath* mNodePath;
+	NodePath mNodePath;
 	///Unique identifier for this object.
 	GameObjectId mGameObjectId;
 	///Map of all components.

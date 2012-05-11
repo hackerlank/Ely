@@ -23,19 +23,19 @@
 
 #include "GameObject.h"
 
-GameObject::GameObject(NodePath* nodePath)
+GameObject::GameObject(const NodePath& nodePath)
 {
-	if ((not nodePath) or (nodePath->is_empty()))
+	if ((not nodePath) or (nodePath.is_empty()))
 	{
 		throw GameException("NULL or Empty NodePath");
 	}
 	mNodePath = nodePath;
-	mGameObjectId = static_cast<GameObjectId>(mNodePath->get_name());
+	mGameObjectId = static_cast<GameObjectId>(mNodePath.get_name());
 }
 
 GameObject::~GameObject()
 {
-	mNodePath->remove_node();
+	mNodePath.remove_node();
 }
 
 const GameObjectId& GameObject::getGameObjectId() const
@@ -53,12 +53,18 @@ void GameObject::clearGameObjectComponents()
 	mComponents.clear();
 }
 
-NodePath* GameObject::getNodePath() const
+NodePath& GameObject::getNodePath()
 {
 	return mNodePath;
 }
 
-void GameObject::setNodePath(NodePath* nodePath)
+void GameObject::setNodePath(NodePath& nodePath)
 {
 	mNodePath = nodePath;
 }
+
+GameObject::operator NodePath()
+{
+	return mNodePath;
+}
+
