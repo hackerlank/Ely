@@ -15,16 +15,16 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/gamecomponenttemplate/GameComponentTemplateSuiteFixture.h
+ * \file /Ely/src/test/support/SupportSuiteFixture.h
  *
- * \date 11/mag/2012 (13:12:08)
+ * \date 07/mag/2012 (18:15:46)
  * \author marco
  */
 
-#ifndef GAMECOMPONENTTEMPLATESUITEFIXTURE_H_
-#define GAMECOMPONENTTEMPLATESUITEFIXTURE_H_
+#ifndef SUPPORTSUITEFIXTURE_H_
+#define SUPPORTSUITEFIXTURE_H_
 
 
 
 
-#endif /* GAMECOMPONENTTEMPLATESUITEFIXTURE_H_ */
+#endif /* SUPPORTSUITEFIXTURE_H_ */

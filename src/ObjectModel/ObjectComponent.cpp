@@ -15,12 +15,31 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/gameobjectcomponent/GameObjectComponent_test.cpp
+ * \file /Ely/src/ObjectComponent.cpp
  *
- * \date 09/mag/2012 (16:50:18)
+ * \date 09/mag/2012 (16:09:17)
  * \author marco
  */
 
+#include "ObjectModel/ObjectComponent.h"
 
+ObjectComponent::ObjectComponent()
+{
+	// TODO Auto-generated constructor stub
 
+}
+
+void ObjectComponent::update()
+{
+}
+
+Object* ObjectComponent::getOwnerGameObject()
+{
+	return mOwnerGameObject;
+}
+
+void ObjectComponent::setOwnerGameObject(Object* owner)
+{
+	mOwnerGameObject = owner;
+}
 

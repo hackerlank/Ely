@@ -15,11 +15,16 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/GameComponentTemplate_test.cpp
+ * \file /Ely/src/test/objectmodel/ObjectModelSuiteFixture.h
  *
- * \date 11/mag/2012 (13:09:41)
+ * \date 11/mag/2012 (18:05:46)
  * \author marco
  */
 
-#include "../../include/GameComponentTemplate.h"
+#ifndef OBJECTMODELSUITEFIXTURE_H_
+#define OBJECTMODELSUITEFIXTURE_H_
 
+
+
+
+#endif /* OBJECTMODELSUITEFIXTURE_H_ */

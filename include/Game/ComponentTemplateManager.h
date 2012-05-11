@@ -15,15 +15,20 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GameComponentTemplate.cpp
+ * \file /Ely/include/Game/ComponentTemplateManager.h
  *
- * \date 11/mag/2012 (13:09:41)
+ * \date 11/mag/2012 (17:48:53)
  * \author marco
  */
 
-#include "GameComponentTemplate.h"
+#ifndef COMPONENTTEMPLATEMANAGER_H_
+#define COMPONENTTEMPLATEMANAGER_H_
 
-GameComponentTemplate::GameComponentTemplate()
+class ComponentTemplateManager
 {
-}
+public:
+	ComponentTemplateManager();
+	virtual ~ComponentTemplateManager();
+};
 
+#endif /* COMPONENTTEMPLATEMANAGER_H_ */

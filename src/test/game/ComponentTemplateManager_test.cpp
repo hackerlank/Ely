@@ -15,11 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/firstpersoncamera/FirstPersonCamera_test.cpp
+ * \file /Ely/src/test/ComponentTemplateManager_test.cpp
  *
- * \date 07/mag/2012 (18:15:16)
+ * \date 11/mag/2012 (17:48:53)
  * \author marco
  */
 
-#include "../../../include/FirstPersonCamera.h"
+#include "../../include/Game/ComponentTemplateManager.h"
 

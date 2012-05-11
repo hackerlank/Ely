@@ -15,16 +15,22 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/gameobject/GameObjectSuiteFixture.h
+ * \file /Ely/src/Game/ComponentTemplateManager.cpp
  *
- * \date 07/mag/2012 (18:11:01)
+ * \date 11/mag/2012 (17:48:53)
  * \author marco
  */
 
-#ifndef GAMEOBJECTSUITEFIXTURE_H_
-#define GAMEOBJECTSUITEFIXTURE_H_
+#include "../../include/Game/ComponentTemplateManager.h"
 
+ComponentTemplateManager::ComponentTemplateManager()
+{
+	// TODO Auto-generated constructor stub
 
+}
 
+ComponentTemplateManager::~ComponentTemplateManager()
+{
+	// TODO Auto-generated destructor stub
+}
 
-#endif /* GAMEOBJECTSUITEFIXTURE_H_ */

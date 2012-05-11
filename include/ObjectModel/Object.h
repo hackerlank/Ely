@@ -15,19 +15,19 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GameObject.h
+ * \file /Ely/include/Object.h
  *
  * \date 07/mag/2012 (18:10:37)
  * \author marco
  */
 
-#ifndef GAMEOBJECT_H_
-#define GAMEOBJECT_H_
+#ifndef OBJECT_H_
+#define OBJECT_H_
 
 #include <nodePath.h>
 #include <referenceCount.h>
 #include <pointerTo.h>
-#include "GameObjectComponent.h"
+#include "ObjectComponent.h"
 #include "Utilitiy.h"
 
 #include <iostream>
@@ -37,7 +37,7 @@
  * \brief A unique identifier for GameObjects (by default
  * the name of the NodePath component).
  */
-typedef std::string GameObjectId;
+typedef std::string ObjectId;
 
 /**
  * \brief The game object is the basic entity that can exist in the game world.
@@ -54,18 +54,18 @@ typedef std::string GameObjectId;
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
  */
-class GameObject: public ReferenceCount
+class Object: public ReferenceCount
 {
 public:
 	/**
 	 * \brief Constructor.
 	 */
-	GameObject(const NodePath& nodePath);
+	Object(const NodePath& nodePath);
 
 	/**
 	 * \brief Destructor.
 	 */
-	virtual ~GameObject();
+	virtual ~Object();
 
 	/**
 	 * \brief Return the node path.
@@ -83,15 +83,15 @@ public:
 	 * @param familyID the family of the component.
 	 * @return The component.
 	 */
-	GameObjectComponent* getGameObjectComponent(
-			const GameObjectComponentId& familyID);
+	ObjectComponent* getGameObjectComponent(
+			const ObjectComponentId& familyID);
 	/**
 	 * \brief Set a new component into this object.
 	 * @param newComponent the new component.
 	 * @return The component.
 	 */
-	GameObjectComponent* setGameObjectComponent(
-			GameObjectComponent* newComponent);
+	ObjectComponent* setGameObjectComponent(
+			ObjectComponent* newComponent);
 	/**
 	 * \brief Clears the table of all components of this object.
 	 */
@@ -101,12 +101,12 @@ public:
 	 * \brief Get the id of this object.
 	 * @return The id of this object.
 	 */
-	const GameObjectId& getGameObjectId() const;
+	const ObjectId& getGameObjectId() const;
 	/**
 	 * \brief Set the id of this object.
 	 * @param gameObjectId The id of this object.
 	 */
-	void setGameObjectId(GameObjectId& gameObjectId);
+	void setGameObjectId(ObjectId& gameObjectId);
 
 	/**
 	 * \brief NodePath conversion function.
@@ -117,11 +117,11 @@ private:
 	///NodePath associated with this object.
 	NodePath mNodePath;
 	///Unique identifier for this object.
-	GameObjectId mGameObjectId;
+	ObjectId mGameObjectId;
 	///Map of all components.
-	typedef std::map<const GameObjectComponentId, PT(GameObjectComponent)> ComponentTable;
+	typedef std::map<const ObjectComponentId, PT(ObjectComponent)> ComponentTable;
 	ComponentTable mComponents;
 
 };
 
-#endif /* GAMEOBJECT_H_ */
+#endif /* OBJECT_H_ */

@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GameObjectComponent.h
+ * \file /Ely/include/ObjectComponent.h
  *
  * \date 09/mag/2012 (16:09:17)
  * \author marco
  */
 
-#ifndef GAMEOBJECTCOMPONENT_H_
-#define GAMEOBJECTCOMPONENT_H_
+#ifndef OBJECTCOMPONENT_H_
+#define OBJECTCOMPONENT_H_
 
 #include <referenceCount.h>
 #include <pointerTo.h>
@@ -32,9 +32,9 @@
 /**
  * \brief A unique identifier for GameObjectComponents.
  */
-typedef std::string GameObjectComponentId;
+typedef std::string ObjectComponentId;
 
-class GameObject;
+class Object;
 
 /**
  * \brief Base abstract class to provide a common interface for
@@ -44,28 +44,28 @@ class GameObject;
  * Each component belongs to a family and is derived from a base
  * family component.
  */
-class GameObjectComponent: public ReferenceCount
+class ObjectComponent: public ReferenceCount
 {
 public:
 	/**
 	 * \brief Constructor.
 	 */
-	GameObjectComponent();
+	ObjectComponent();
 	/**
 	 * \brief Destructor (pure virtual).
 	 */
-	virtual ~GameObjectComponent() = 0;
+	virtual ~ObjectComponent() = 0;
 
 	/**
 	 * \brief Get the id of this component.
 	 * @return The id of this component.
 	 */
-	virtual const GameObjectComponentId& componentID() const = 0;
+	virtual const ObjectComponentId& componentID() const = 0;
 	/**
 	 * \brief Get the family id of this component.
 	 * @return The family id of this component.
 	 */
-	virtual const GameObjectComponentId& familyID() const = 0;
+	virtual const ObjectComponentId& familyID() const = 0;
 
 	/**
 	 * \brief Updates the state of the component.
@@ -76,16 +76,16 @@ public:
 	 * \brief Get the owner game object.
 	 * \return The owner game object.
 	 */
-	GameObject* getOwnerGameObject();
+	Object* getOwnerGameObject();
 	/**
 	 * \brief Set the owner game object.
 	 * @param owner The owner game object.
 	 */
-	void setOwnerGameObject(GameObject* owner);
+	void setOwnerGameObject(Object* owner);
 
 private:
 	/// The game object this component is a member of
-	GameObject* mOwnerGameObject;
+	Object* mOwnerGameObject;
 };
 
-#endif /* GAMEOBJECTCOMPONENT_H_ */
+#endif /* OBJECTCOMPONENT_H_ */

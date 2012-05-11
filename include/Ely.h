@@ -25,6 +25,6 @@
 #define ELY_H_
 
 #include <load_prc_file.h>
-#include "Game.h"
+#include "Game/Game.h"
 
 #endif /* ELY_H_ */

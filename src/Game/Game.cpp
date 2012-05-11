@@ -21,7 +21,7 @@
  * \author marco
  */
 
-#include "Game.h"
+#include "Game/Game.h"
 
 Game::Game(int argc, char* argv[]) :
 		PandaFramework()
@@ -65,7 +65,7 @@ void Game::setup()
 	auto_bind(mPanda.node(), mPandaAnims);
 	mPandaAnims.loop("panda_soft", false);
 
-	GameObject go(mWindow->load_model(get_models(), "panda"));
+	Object go(mWindow->load_model(get_models(), "panda"));
 	go.getNodePath().set_hpr(0.0, 0.0, 0.0);
 	((NodePath) go).set_pos(0.0, 0.0, 0.0);
 

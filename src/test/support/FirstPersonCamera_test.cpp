@@ -15,31 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GameObjectComponent.cpp
+ * \file /Ely/src/test/support/FirstPersonCamera_test.cpp
  *
- * \date 09/mag/2012 (16:09:17)
+ * \date 07/mag/2012 (18:15:16)
  * \author marco
  */
 
-#include "GameObjectComponent.h"
-
-GameObjectComponent::GameObjectComponent()
-{
-	// TODO Auto-generated constructor stub
-
-}
-
-void GameObjectComponent::update()
-{
-}
-
-GameObject* GameObjectComponent::getOwnerGameObject()
-{
-	return mOwnerGameObject;
-}
-
-void GameObjectComponent::setOwnerGameObject(GameObject* owner)
-{
-	mOwnerGameObject = owner;
-}
+#include "Support/FirstPersonCamera.h"
 

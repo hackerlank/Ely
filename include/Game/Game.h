@@ -35,7 +35,7 @@
 
 #include <iostream>
 
-#include "GameObject.h"
+#include "ObjectModel/Object.h"
 #include "Utilitiy.h"
 
 class FuncInterval;
@@ -90,7 +90,7 @@ protected:
 
 	/// Specific members
 	NodePath mPanda;
-	PT(GameObject) mPandaGO;
+	PT(Object) mPandaGO;
 	AnimControlCollection mPandaAnims;
 };
 

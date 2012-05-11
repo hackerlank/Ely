@@ -15,16 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/firstpersoncamera/FirstPersonCameraSuiteFixture.h
+ * \file /Ely/src/test/object/Object_test.cpp
  *
- * \date 07/mag/2012 (18:15:46)
+ * \date 07/mag/2012 (18:10:37)
  * \author marco
  */
 
-#ifndef FIRSTPERSONCAMERASUITEFIXTURE_H_
-#define FIRSTPERSONCAMERASUITEFIXTURE_H_
+#include "ObjectModel/Object.h"
 
-
-
-
-#endif /* FIRSTPERSONCAMERASUITEFIXTURE_H_ */

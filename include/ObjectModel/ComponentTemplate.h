@@ -15,41 +15,47 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GameComponentTemplate.h
+ * \file /Ely/include/ComponentTemplate.h
  *
  * \date 11/mag/2012 (13:09:41)
  * \author marco
  */
 
-#ifndef GAMECOMPONENTTEMPLATE_H_
-#define GAMECOMPONENTTEMPLATE_H_
+#ifndef COMPONENTTEMPLATE_H_
+#define COMPONENTTEMPLATE_H_
 
 #include <referenceCount.h>
-#include "GameObjectComponent.h"
+#include "Object.h"
+#include "ObjectComponent.h"
 
-class GameComponentTemplate: public ReferenceCount
+class ComponentTemplate: public ReferenceCount
 {
 public:
 	/**
 	 * \brief Constructor.
 	 */
-	GameComponentTemplate();
+	ComponentTemplate();
 	/**
 	 * \brief Destructor.
 	 */
-	virtual ~GameComponentTemplate() = 0;
+	virtual ~ComponentTemplate() = 0;
 
 	/**
 	 * \brief Get the id of the component created.
 	 * @return The id of the component created.
 	 */
-	virtual const GameObjectComponentId& componentID() const = 0;
+	virtual const ObjectComponentId& componentID() const = 0;
 	/**
 	 * \brief Get the family id of the component created.
 	 * @return The family id of the component created.
 	 */
-	virtual const GameObjectComponentId& familyID() const = 0;
+	virtual const ObjectComponentId& familyID() const = 0;
 
+	/**
+	 * \brief Create the actual component.
+	 * @return The component just created.
+	 */
+	virtual ObjectComponent* makeComponent() = 0;
 };
 
-#endif /* GAMECOMPONENTTEMPLATE_H_ */
+#endif /* COMPONENTTEMPLATE_H_ */

@@ -15,55 +15,55 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GameObject.cpp
+ * \file /Ely/src/Object.cpp
  *
  * \date 07/mag/2012 (18:10:37)
  * \author marco
  */
 
-#include "GameObject.h"
+#include "ObjectModel/Object.h"
 
-GameObject::GameObject(const NodePath& nodePath)
+Object::Object(const NodePath& nodePath)
 {
 	if ((not nodePath) or (nodePath.is_empty()))
 	{
 		throw GameException("NULL or Empty NodePath");
 	}
 	mNodePath = nodePath;
-	mGameObjectId = static_cast<GameObjectId>(mNodePath.get_name());
+	mGameObjectId = static_cast<ObjectId>(mNodePath.get_name());
 }
 
-GameObject::~GameObject()
+Object::~Object()
 {
 	mNodePath.remove_node();
 }
 
-const GameObjectId& GameObject::getGameObjectId() const
+const ObjectId& Object::getGameObjectId() const
 {
 	return mGameObjectId;
 }
 
-void GameObject::setGameObjectId(GameObjectId& gameObjectId)
+void Object::setGameObjectId(ObjectId& gameObjectId)
 {
 	mGameObjectId = gameObjectId;
 }
 
-void GameObject::clearGameObjectComponents()
+void Object::clearGameObjectComponents()
 {
 	mComponents.clear();
 }
 
-NodePath& GameObject::getNodePath()
+NodePath& Object::getNodePath()
 {
 	return mNodePath;
 }
 
-void GameObject::setNodePath(NodePath& nodePath)
+void Object::setNodePath(NodePath& nodePath)
 {
 	mNodePath = nodePath;
 }
 
-GameObject::operator NodePath()
+Object::operator NodePath()
 {
 	return mNodePath;
 }
