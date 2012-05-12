@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game.h
+ * \file /Ely/include/GameManager.h
  *
  * \date 07/mag/2012 (18:07:26)
  * \author marco
@@ -41,9 +41,9 @@
 class FuncInterval;
 
 /**
- * \brief Game
+ * \brief GameManager
  */
-class Game: public PandaFramework
+class GameManager: public PandaFramework
 {
 public:
 	/**
@@ -51,11 +51,11 @@ public:
 	 * @param argc from main()
 	 * @param argv from main()
 	 */
-	Game(int argc, char* argv[]);
+	GameManager(int argc, char* argv[]);
 	/**
 	 * \brief Destructor
 	 */
-	virtual ~Game();
+	virtual ~GameManager();
 
 	/**
 	 * \brief Put here your own custom setup game code.
@@ -66,10 +66,10 @@ public:
 	 * \brief Generic Task Function interface
 	 *
 	 *  The effective Tasks are composed by a Pair of
-	 *  an Game object and a member function doing the task.
+	 *  an GameManager object and a member function doing the task.
 	 */
-	typedef AsyncTask::DoneStatus (Game::*GameTaskPtr)(GenericAsyncTask* task);
-	typedef Pair<Game*, GameTaskPtr> GameTaskData;
+	typedef AsyncTask::DoneStatus (GameManager::*GameTaskPtr)(GenericAsyncTask* task);
+	typedef Pair<GameManager*, GameTaskPtr> GameTaskData;
 	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task,
 			void * data);
 

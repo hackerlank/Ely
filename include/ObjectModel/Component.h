@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/ObjectComponent.h
+ * \file /Ely/include/Component.h
  *
  * \date 09/mag/2012 (16:09:17)
  * \author marco
  */
 
-#ifndef OBJECTCOMPONENT_H_
-#define OBJECTCOMPONENT_H_
+#ifndef COMPONENT_H_
+#define COMPONENT_H_
 
 #include <referenceCount.h>
 #include <pointerTo.h>
@@ -30,42 +30,44 @@
 #include <iostream>
 
 /**
- * \brief A unique identifier for GameObjectComponents.
+ * \brief Component and component family identifier type.
  */
-typedef std::string ObjectComponentId;
+typedef std::string ComponentId;
+typedef std::string ComponentFamilyId;
 
 class Object;
 
 /**
  * \brief Base abstract class to provide a common interface for
- * all game object components.
+ * all object components.
  *
  * Components are organized into class hierarchies called families.
  * Each component belongs to a family and is derived from a base
- * family component.
+ * family component. Any object can have only one component of
+ * each family type.
  */
-class ObjectComponent: public ReferenceCount
+class Component: public ReferenceCount
 {
 public:
 	/**
 	 * \brief Constructor.
 	 */
-	ObjectComponent();
+	Component();
 	/**
 	 * \brief Destructor (pure virtual).
 	 */
-	virtual ~ObjectComponent() = 0;
+	virtual ~Component() = 0;
 
 	/**
 	 * \brief Get the id of this component.
 	 * @return The id of this component.
 	 */
-	virtual const ObjectComponentId& componentID() const = 0;
+	virtual const ComponentId& componentID() const = 0;
 	/**
 	 * \brief Get the family id of this component.
 	 * @return The family id of this component.
 	 */
-	virtual const ObjectComponentId& familyID() const = 0;
+	virtual const ComponentFamilyId& familyID() const = 0;
 
 	/**
 	 * \brief Updates the state of the component.
@@ -73,19 +75,19 @@ public:
 	virtual void update();
 
 	/**
-	 * \brief Get the owner game object.
-	 * \return The owner game object.
+	 * \brief Get the owner object.
+	 * \return The owner object.
 	 */
-	Object* getOwnerGameObject();
+	Object* getOwnerObject();
 	/**
-	 * \brief Set the owner game object.
-	 * @param owner The owner game object.
+	 * \brief Set the owner object.
+	 * @param owner The owner object.
 	 */
-	void setOwnerGameObject(Object* owner);
+	void setOwnerObject(Object* owner);
 
 private:
-	/// The game object this component is a member of
-	Object* mOwnerGameObject;
+	/// The object this component is a member of.
+	Object* mOwnerObject;
 };
 
-#endif /* OBJECTCOMPONENT_H_ */
+#endif /* COMPONENT_H_ */

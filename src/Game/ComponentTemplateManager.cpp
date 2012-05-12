@@ -21,16 +21,56 @@
  * \author marco
  */
 
-#include "../../include/Game/ComponentTemplateManager.h"
+#include "Game/ComponentTemplateManager.h"
 
-ComponentTemplateManager::ComponentTemplateManager()
+PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(ComponentTemplate* componentTmpl)
 {
-	// TODO Auto-generated constructor stub
-
+	if (not componentTmpl)
+	{
+		throw GameException("NULL Component template");
+	}
+	PT(ComponentTemplate) previousCompTmpl = PT(NULL);
+	ComponentId componentId = componentTmpl->componentID();
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
+	if (it != mComponentTemplates.end())
+	{
+		// a previous component template for that component already existed
+		previousCompTmpl = (*it).second;
+		mComponentTemplates.erase(it);
+	}
+	//insert the new component template
+	mComponentTemplates[componentId] = PT(componentTmpl);
+	return previousCompTmpl;
 }
 
-ComponentTemplateManager::~ComponentTemplateManager()
+bool ComponentTemplateManager::removeComponentTemplate(ComponentId componentID)
 {
-	// TODO Auto-generated destructor stub
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
+	if (it == mComponentTemplates.end())
+	{
+		return false;
+	}
+	mComponentTemplates.erase(it);
+	return true;
 }
 
+ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
+		ComponentId componentID)
+{
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
+	if (it == mComponentTemplates.end())
+	{
+		return NULL;
+	}
+	return (*it).second;
+}
+
+Component* ComponentTemplateManager::createComponent(ComponentId componentID)
+{
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
+	if (it == mComponentTemplates.end())
+	{
+		return NULL;
+	}
+	return (*it).second->makeComponent();
+}

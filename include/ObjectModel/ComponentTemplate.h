@@ -26,7 +26,7 @@
 
 #include <referenceCount.h>
 #include "Object.h"
-#include "ObjectComponent.h"
+#include "Component.h"
 
 class ComponentTemplate: public ReferenceCount
 {
@@ -44,18 +44,18 @@ public:
 	 * \brief Get the id of the component created.
 	 * @return The id of the component created.
 	 */
-	virtual const ObjectComponentId& componentID() const = 0;
+	virtual const ComponentId& componentID() const = 0;
 	/**
 	 * \brief Get the family id of the component created.
 	 * @return The family id of the component created.
 	 */
-	virtual const ObjectComponentId& familyID() const = 0;
+	virtual const ComponentFamilyId& familyID() const = 0;
 
 	/**
-	 * \brief Create the actual component.
+	 * \brief Create the actual component of that family.
 	 * @return The component just created.
 	 */
-	virtual ObjectComponent* makeComponent() = 0;
+	virtual Component* makeComponent() = 0;
 };
 
 #endif /* COMPONENTTEMPLATE_H_ */

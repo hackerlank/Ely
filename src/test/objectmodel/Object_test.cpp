@@ -22,4 +22,30 @@
  */
 
 #include "ObjectModel/Object.h"
+#include <boost/test/unit_test.hpp>
+#include "ObjectModelSuiteFixture.h"
 
+struct ObjectTestCaseFixture
+{
+	ObjectTestCaseFixture()
+	{
+		// TODO
+	}
+
+	~ObjectTestCaseFixture()
+	{
+		// TODO
+	}
+};
+
+// ObjectModelSuiteFixture suite
+BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
+
+// Test cases
+BOOST_FIXTURE_TEST_CASE(Object, ObjectTestCaseFixture)
+{
+	BOOST_CHECK(true);
+	BOOST_CHECK_CLOSE(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // ObjectModelSuiteFixture suite

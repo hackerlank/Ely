@@ -27,26 +27,26 @@
 #include <nodePath.h>
 #include <referenceCount.h>
 #include <pointerTo.h>
-#include "ObjectComponent.h"
+#include "Component.h"
 #include "Utilitiy.h"
 
 #include <iostream>
 #include <map>
 
 /**
- * \brief A unique identifier for GameObjects (by default
- * the name of the NodePath component).
+ * \brief Object (instance) identifier type (by default the name
+ * of the NodePath component).
  */
 typedef std::string ObjectId;
 
 /**
- * \brief The game object is the basic entity that can exist in the game world.
+ * \brief The object is the basic entity that can exist in the game world.
  *
- * Because Panda3d is used as game engine, a game object should
+ * Because Panda3d is used as game engine, a object should
  * "compose" the different aspects (visualization, sound, ai,
  * physics, animation, etc...), already existing in Panda3d.
- * An game object can have only one component of a given family.
- * Each game object represents an instance of a PandaNode so the
+ * An object can have only one component of a given family.
+ * Each object represents an instance of a PandaNode so the
  * first and more important component is a NodePath related to
  * this object. This NodePath component is treated differently
  * from the others: it is embedded.
@@ -69,44 +69,51 @@ public:
 
 	/**
 	 * \brief Return the node path.
-	 * @return the node path.
+	 * @return The node path.
 	 */
 	NodePath& getNodePath();
 	/**
 	 * \brief Set the node path.
-	 * @param nodePath the node path to be set.
+	 * @param nodePath The node path to be set.
 	 */
 	void setNodePath(NodePath& nodePath);
 
 	/**
 	 * \brief Get the component of that given family.
-	 * @param familyID the family of the component.
-	 * @return The component.
+	 * @param familyID The family of the component.
+	 * @return The component, or NULL if no component of that
+	 * family exists.
 	 */
-	ObjectComponent* getGameObjectComponent(
-			const ObjectComponentId& familyID);
+	Component* getComponent(
+			const ComponentFamilyId& familyID);
 	/**
 	 * \brief Set a new component into this object.
-	 * @param newComponent the new component.
-	 * @return The component.
+	 *
+	 * It will set the component in the object to the passed component,
+	 * and if a component of that family already existed it'll be
+	 * replaced by this new component (and its ownership released by
+	 * the object).
+	 * @param newComponent The new component to set.
+	 * @return PT(NULL) if there wasn't a component of that family, otherwise
+	 * the previous component.
 	 */
-	ObjectComponent* setGameObjectComponent(
-			ObjectComponent* newComponent);
+	PT(Component) setComponent(
+			Component* newComponent);
 	/**
 	 * \brief Clears the table of all components of this object.
 	 */
-	void clearGameObjectComponents();
+	void clearComponents();
 
 	/**
 	 * \brief Get the id of this object.
 	 * @return The id of this object.
 	 */
-	const ObjectId& getGameObjectId() const;
+	const ObjectId& getObjectId() const;
 	/**
 	 * \brief Set the id of this object.
-	 * @param gameObjectId The id of this object.
+	 * @param objectId The id of this object.
 	 */
-	void setGameObjectId(ObjectId& gameObjectId);
+	void setObjectId(ObjectId& objectId);
 
 	/**
 	 * \brief NodePath conversion function.
@@ -117,9 +124,9 @@ private:
 	///NodePath associated with this object.
 	NodePath mNodePath;
 	///Unique identifier for this object.
-	ObjectId mGameObjectId;
-	///Map of all components.
-	typedef std::map<const ObjectComponentId, PT(ObjectComponent)> ComponentTable;
+	ObjectId mObjectId;
+	///Table of all components indexed by component family type.
+	typedef std::map<const ComponentFamilyId, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
 
 };

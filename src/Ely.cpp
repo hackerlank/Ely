@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	//load_prc_file_data("", "want-directtools #t");
 	//load_prc_file_data("", "want-tk #t");
 	// Open the framework
-	Game* gameApp = new Game(argc, argv);
+	GameManager* gameApp = new GameManager(argc, argv);
 	// Set your application up
 	gameApp->setup();
 	// Do the main loop

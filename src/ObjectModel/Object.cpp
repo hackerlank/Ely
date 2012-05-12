@@ -30,7 +30,7 @@ Object::Object(const NodePath& nodePath)
 		throw GameException("NULL or Empty NodePath");
 	}
 	mNodePath = nodePath;
-	mGameObjectId = static_cast<ObjectId>(mNodePath.get_name());
+	mObjectId = static_cast<ObjectId>(mNodePath.get_name());
 }
 
 Object::~Object()
@@ -38,17 +38,17 @@ Object::~Object()
 	mNodePath.remove_node();
 }
 
-const ObjectId& Object::getGameObjectId() const
+const ObjectId& Object::getObjectId() const
 {
-	return mGameObjectId;
+	return mObjectId;
 }
 
-void Object::setGameObjectId(ObjectId& gameObjectId)
+void Object::setObjectId(ObjectId& objectId)
 {
-	mGameObjectId = gameObjectId;
+	mObjectId = objectId;
 }
 
-void Object::clearGameObjectComponents()
+void Object::clearComponents()
 {
 	mComponents.clear();
 }
@@ -61,6 +61,36 @@ NodePath& Object::getNodePath()
 void Object::setNodePath(NodePath& nodePath)
 {
 	mNodePath = nodePath;
+}
+
+Component* Object::getComponent(const ComponentFamilyId& familyID)
+{
+	ComponentTable::iterator it = mComponents.find(familyID);
+	if (it == mComponents.end())
+	{
+		return NULL;
+	}
+	return (*it).second;
+}
+
+PT(Component) Object::setComponent(Component* newComponent)
+{
+	if (not newComponent)
+	{
+		throw GameException("NULL new Component");
+	}
+	PT(Component) previousComp = PT(NULL);
+	ComponentFamilyId familyId = newComponent->familyID();
+	ComponentTable::iterator it = mComponents.find(familyId);
+	if (it != mComponents.end())
+	{
+		// a previous component of that family already existed
+		previousComp = (*it).second;
+		mComponents.erase(it);
+	}
+	//insert the new component
+	mComponents[familyId] = PT(newComponent);
+	return previousComp;
 }
 
 Object::operator NodePath()

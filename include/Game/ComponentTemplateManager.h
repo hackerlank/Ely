@@ -24,11 +24,56 @@
 #ifndef COMPONENTTEMPLATEMANAGER_H_
 #define COMPONENTTEMPLATEMANAGER_H_
 
-class ComponentTemplateManager
+#include <map>
+#include <pointerTo.h>
+#include "Utilitiy.h"
+#include "ObjectModel/ComponentTemplate.h"
+#include "ObjectModel/Component.h"
+
+/**
+ * \brief Singleton template manager that stores all the component templates.
+ */
+class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {
 public:
-	ComponentTemplateManager();
-	virtual ~ComponentTemplateManager();
+	/**
+	 * \brief Add a component template for a given the component type it can create.
+	 *
+	 * It will add the component template to the internal table and if a
+	 * template for that component type already existed it'll be replaced
+	 * by this new template (and its ownership released by the manager).
+	 * @param componentTmpl The component template to add.
+	 * @return PT(NULL) if there wasn't a template for that component, otherwise
+	 * the previous template.
+	 */
+	PT(ComponentTemplate) addComponentTemplate(ComponentTemplate* componentTmpl);
+
+	/**
+	 * \brief Remove the component template given the component type it can create.
+	 * @param componentID The component type.
+	 * @return True if the component template existed, false otherwise.
+	 */
+	bool removeComponentTemplate(ComponentId componentID);
+
+	/**
+	 * \brief Get the component template given the component type it can create.
+	 * @param componentID The component type.
+	 * @return The component template.
+	 */
+	ComponentTemplate* getComponentTemplate(ComponentId componentID);
+
+	/**
+	 * \brief Create a component given its type.
+	 * @param componentID The component type.
+	 * @return The just created component, or NULL on failure (for any reason).
+	 */
+	Component* createComponent(ComponentId componentID);
+
+private:
+	///Table of component templates indexed by component type.
+	typedef std::map<const ComponentId, PT(ComponentTemplate)> ComponentTemplateTable;
+	ComponentTemplateTable mComponentTemplates;
+
 };
 
 #endif /* COMPONENTTEMPLATEMANAGER_H_ */

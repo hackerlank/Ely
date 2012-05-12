@@ -21,6 +21,6 @@
  * \author marco
  */
 
-#include "ObjectModel/ObjectComponent.h"
+#include "ObjectModel/Component.h"
 
 

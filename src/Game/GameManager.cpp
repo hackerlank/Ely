@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Game.cpp
+ * \file /Ely/src/GameManager.cpp
  *
  * \date 07/mag/2012 (18:07:26)
  * \author marco
@@ -23,7 +23,7 @@
 
 #include "Game/Game.h"
 
-Game::Game(int argc, char* argv[]) :
+GameManager::GameManager(int argc, char* argv[]) :
 		PandaFramework()
 {
 	// Open the framework
@@ -49,13 +49,13 @@ Game::Game(int argc, char* argv[]) :
 	}
 }
 
-Game::~Game()
+GameManager::~GameManager()
 {
 	// Close the framework
 	close_framework();
 }
 
-void Game::setup()
+void GameManager::setup()
 {
 
 	mPanda = mWindow->load_model(get_models(), "panda");
@@ -75,25 +75,25 @@ void Game::setup()
 //	mCamera.set_pos(0, -50, 6);
 
 	// add a 1st task
-	m1stTask = new GameTaskData(this, &Game::firstTask);
-	AsyncTask * task = new GenericAsyncTask("1st task", &Game::gameTask,
+	m1stTask = new GameTaskData(this, &GameManager::firstTask);
+	AsyncTask * task = new GenericAsyncTask("1st task", &GameManager::gameTask,
 			reinterpret_cast<void*>(m1stTask.p()));
 	get_task_mgr().add(task);
 	// add a 2nd task
-	m2ndTask = new GameTaskData(this, &Game::secondTask);
-	task = new GenericAsyncTask("2nd task", &Game::gameTask,
+	m2ndTask = new GameTaskData(this, &GameManager::secondTask);
+	task = new GenericAsyncTask("2nd task", &GameManager::gameTask,
 			reinterpret_cast<void*>(m2ndTask.p()));
 	get_task_mgr().add(task);
 
 }
 
-AsyncTask::DoneStatus Game::gameTask(GenericAsyncTask* task, void * data)
+AsyncTask::DoneStatus GameManager::gameTask(GenericAsyncTask* task, void * data)
 {
 	GameTaskData* appData = reinterpret_cast<GameTaskData*>(data);
 	return ((appData->first())->*(appData->second()))(task);
 }
 
-AsyncTask::DoneStatus Game::firstTask(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
 	if (timeElapsed < 10.0)
@@ -104,7 +104,7 @@ AsyncTask::DoneStatus Game::firstTask(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-AsyncTask::DoneStatus Game::secondTask(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
 	if (timeElapsed < 10.0)
