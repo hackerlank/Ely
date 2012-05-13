@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/FirstPersonCamera.h
+ * \file /Ely/include/Support/FirstPersonCamera.h
  *
  * \date 07/mag/2012 (18:15:16)
  * \author marco

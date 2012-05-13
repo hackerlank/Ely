@@ -15,11 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/game/Game_test.cpp
+ * \file /Ely/src/test/game/GameManager_test.cpp
  *
  * \date 07/mag/2012 (18:07:26)
  * \author marco
  */
 
-#include "../../../include/Game.h"
+#include "Game/GameManager.h"
 

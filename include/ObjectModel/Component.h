@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Component.h
+ * \file /Ely/include/ObjectModel/Component.h
  *
  * \date 09/mag/2012 (16:09:17)
  * \author marco
@@ -27,7 +27,7 @@
 #include <referenceCount.h>
 #include <pointerTo.h>
 
-#include <iostream>
+#include <string>
 
 /**
  * \brief Component and component family identifier type.

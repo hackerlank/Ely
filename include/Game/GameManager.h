@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GameManager.h
+ * \file /Ely/include/Game/GameManager.h
  *
  * \date 07/mag/2012 (18:07:26)
  * \author marco
  */
 
-#ifndef GAME_H_
-#define GAME_H_
+#ifndef GAMEMANGER_H_
+#define GAMEMANGER_H_
 
 #include <pandaFramework.h>
 #include <pandaSystem.h>
@@ -94,4 +94,4 @@ protected:
 	AnimControlCollection mPandaAnims;
 };
 
-#endif /* GAME_H_ */
+#endif /* GAMEMANGER_H_ */

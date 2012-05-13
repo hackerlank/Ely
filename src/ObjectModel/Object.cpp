@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Object.cpp
+ * \file /Ely/src/ObjectModel/Object.cpp
  *
  * \date 07/mag/2012 (18:10:37)
  * \author marco
@@ -23,14 +23,9 @@
 
 #include "ObjectModel/Object.h"
 
-Object::Object(const NodePath& nodePath)
+Object::Object(const ObjectId& objectId)
 {
-	if ((not nodePath) or (nodePath.is_empty()))
-	{
-		throw GameException("NULL or Empty NodePath");
-	}
-	mNodePath = nodePath;
-	mObjectId = static_cast<ObjectId>(mNodePath.get_name());
+	mObjectId = objectId;
 }
 
 Object::~Object()
@@ -77,9 +72,9 @@ PT(Component) Object::setComponent(Component* newComponent)
 {
 	if (not newComponent)
 	{
-		throw GameException("NULL new Component");
+		throw GameException("Object::setComponent: NULL new Component");
 	}
-	PT(Component) previousComp = PT(NULL);
+	PT(Component) previousComp(NULL);
 	ComponentFamilyId familyId = newComponent->familyID();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())
@@ -89,7 +84,7 @@ PT(Component) Object::setComponent(Component* newComponent)
 		mComponents.erase(it);
 	}
 	//insert the new component
-	mComponents[familyId] = PT(newComponent);
+	mComponents[familyId] = PT(Component)(newComponent);
 	return previousComp;
 }
 

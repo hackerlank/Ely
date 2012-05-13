@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/ComponentTemplate.cpp
+ * \file /Ely/src/ObjectModel/ComponentTemplate.cpp
  *
  * \date 11/mag/2012 (13:09:41)
  * \author marco

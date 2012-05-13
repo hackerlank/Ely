@@ -15,11 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/ComponentTemplateManager_test.cpp
+ * \file /Ely/src/test/game/ComponentTemplateManager_test.cpp
  *
  * \date 11/mag/2012 (17:48:53)
  * \author marco
  */
 
-#include "../../include/Game/ComponentTemplateManager.h"
+#include "Game/ComponentTemplateManager.h"
 

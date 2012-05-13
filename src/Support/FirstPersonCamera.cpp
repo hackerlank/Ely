@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/FirstPersonCamera.cpp
+ * \file /Ely/src/Support/FirstPersonCamera.cpp
  *
  * \date 07/mag/2012 (18:15:16)
  * \author marco
  */
 
-#include "../include/FirstPersonCamera.h"
+#include "Support/FirstPersonCamera.h"
 
 FirstPersonCamera::FirstPersonCamera()
 {

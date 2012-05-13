@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/ComponentTemplate.h
+ * \file /Ely/include/ObjectModel/ComponentTemplate.h
  *
  * \date 11/mag/2012 (13:09:41)
  * \author marco
@@ -28,6 +28,9 @@
 #include "Object.h"
 #include "Component.h"
 
+/**
+ * \brief Abstract base class of component templates used to create components.
+ */
 class ComponentTemplate: public ReferenceCount
 {
 public:

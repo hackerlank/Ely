@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/object/Object_test.cpp
+ * \file /Ely/src/test/objectmodel/Object_test.cpp
  *
  * \date 07/mag/2012 (18:10:37)
  * \author marco
@@ -38,14 +38,14 @@ struct ObjectTestCaseFixture
 	}
 };
 
-// ObjectModelSuiteFixture suite
-BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
-
-// Test cases
-BOOST_FIXTURE_TEST_CASE(Object, ObjectTestCaseFixture)
-{
-	BOOST_CHECK(true);
-	BOOST_CHECK_CLOSE(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END() // ObjectModelSuiteFixture suite
+//// ObjectModelSuiteFixture suite
+//BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
+//
+//// Test cases
+//BOOST_FIXTURE_TEST_CASE(Object, ObjectTestCaseFixture)
+//{
+//	BOOST_CHECK(true);
+//	BOOST_CHECK_CLOSE(true);
+//}
+//
+//BOOST_AUTO_TEST_SUITE_END() // ObjectModelSuiteFixture suite

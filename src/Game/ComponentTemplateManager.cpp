@@ -23,13 +23,15 @@
 
 #include "Game/ComponentTemplateManager.h"
 
-PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(ComponentTemplate* componentTmpl)
+PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
+		ComponentTemplate* componentTmpl)
 {
 	if (not componentTmpl)
 	{
-		throw GameException("NULL Component template");
+		throw GameException(
+				"ComponentTemplateManager::addComponentTemplate: NULL Component template");
 	}
-	PT(ComponentTemplate) previousCompTmpl = PT(NULL);
+	PT(ComponentTemplate) previousCompTmpl(NULL);
 	ComponentId componentId = componentTmpl->componentID();
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
 	if (it != mComponentTemplates.end())
@@ -39,7 +41,7 @@ PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(ComponentTe
 		mComponentTemplates.erase(it);
 	}
 	//insert the new component template
-	mComponentTemplates[componentId] = PT(componentTmpl);
+	mComponentTemplates[componentId] = PT(ComponentTemplate)(componentTmpl);
 	return previousCompTmpl;
 }
 

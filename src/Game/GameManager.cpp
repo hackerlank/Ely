@@ -21,7 +21,7 @@
  * \author marco
  */
 
-#include "Game/Game.h"
+#include "Game/GameManager.h"
 
 GameManager::GameManager(int argc, char* argv[]) :
 		PandaFramework()

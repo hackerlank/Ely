@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Object.h
+ * \file /Ely/include/ObjectModel/Object.h
  *
  * \date 07/mag/2012 (18:10:37)
  * \author marco
@@ -30,11 +30,11 @@
 #include "Component.h"
 #include "Utilitiy.h"
 
-#include <iostream>
 #include <map>
+#include <string>
 
 /**
- * \brief Object (instance) identifier type (by default the name
+ * \brief Object instance identifier type (by default the name
  * of the NodePath component).
  */
 typedef std::string ObjectId;
@@ -46,10 +46,7 @@ typedef std::string ObjectId;
  * "compose" the different aspects (visualization, sound, ai,
  * physics, animation, etc...), already existing in Panda3d.
  * An object can have only one component of a given family.
- * Each object represents an instance of a PandaNode so the
- * first and more important component is a NodePath related to
- * this object. This NodePath component is treated differently
- * from the others: it is embedded.
+ * Each object has a NodePath embedded.
  *
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
@@ -60,7 +57,7 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Object(const NodePath& nodePath);
+	Object(const ObjectId& objectId);
 
 	/**
 	 * \brief Destructor.
