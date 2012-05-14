@@ -23,18 +23,83 @@
 
 #include "Game/ObjectTemplateManager.h"
 
-PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(ObjectTemplate* objectTmpl)
+ObjectTemplateManager::ObjectTemplateManager() :
+		id(0)
 {
+}
+
+PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
+		ObjectTemplate* objectTmpl)
+{
+	if (not objectTmpl)
+	{
+		throw GameException(
+				"ObjectTemplateManager::addObjectTemplate: NULL Component template");
+	}
+	PT(ObjectTemplate) previousObjTmpl(NULL);
+	ObjectTemplateId objectTemplId = objectTmpl->getName();
+	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
+	if (it != mObjectTemplates.end())
+	{
+		// a previous component template for that component already existed
+		previousObjTmpl = (*it).second;
+		mObjectTemplates.erase(it);
+	}
+	//insert the new component template
+	mObjectTemplates[objectTemplId] = PT(ObjectTemplate)(objectTmpl);
+	return previousObjTmpl;
+
 }
 
 bool ObjectTemplateManager::removeObjectTemplate(ObjectTemplateId objectType)
 {
+	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
+	if (it == mObjectTemplates.end())
+	{
+		return false;
+	}
+	mObjectTemplates.erase(it);
+	return true;
 }
 
-ObjectTemplate* ObjectTemplateManager::getObjectTemplate(ObjectTemplateId objectType)
+ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
+		ObjectTemplateId objectType)
 {
+	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
+	if (it == mObjectTemplates.end())
+	{
+		return NULL;
+	}
+	return (*it).second;
+}
+
+bool ObjectTemplateManager::readObjectTemplates(const String& filename)
+{
+	return true;
 }
 
 Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 {
+	//retrieve the ObjectTemplate
+	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
+	if (it == mObjectTemplates.end())
+	{
+		return false;
+	}
+	ObjectTemplate* objectTmpl = (*it).second.p();
+	//create the new object
+	ObjectId newId = ObjectId(objectType) + ObjectId(getObjectId());
+	Object* newObj = new Object(newId);
+	//get the component template list
+	ObjectTemplate::ComponentTemplateList compTmplList =
+			objectTmpl->getComponentTemplates();
+	//iterate over the list
+	ObjectTemplate::ComponentTemplateList::iterator it = compTmplList.begin();
+
 }
+
+IdType ObjectTemplateManager::getObjectId()
+{
+	return ++id;
+}
+

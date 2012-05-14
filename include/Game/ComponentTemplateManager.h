@@ -32,6 +32,8 @@
 
 /**
  * \brief Singleton template manager that stores all the component templates.
+ *
+ * Not multi-threaded.
  */
 class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {

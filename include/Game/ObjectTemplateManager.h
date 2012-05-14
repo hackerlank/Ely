@@ -25,6 +25,7 @@
 #define OBJECTTEMPLATEMANAGER_H_
 
 #include <map>
+#include <string>
 #include <nodePath.h>
 #include <pointerTo.h>
 #include "Utilitiy.h"
@@ -32,15 +33,33 @@
 #include "ObjectModel/Object.h"
 #include "ComponentTemplateManager.h"
 
+typedef std::string String;
+
+/**
+ * \brief Type of the generated object counter.
+ */
+typedef unsigned long int IdType;
+
 /**
  * \brief Singleton template manager that stores all the object templates.
+ *
+ * Not multi-threaded.
  */
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
+	ObjectTemplateManager();
 
-	bool readObjectTemplates(
-			ObjectTemplateDescription& objectTmplDescr);
+	/**
+	 * \brief Read the object templates definitions,suitably formatted (xml), from file.
+	 * @param filename The name of the file.
+	 * @return True if all ok, false otherwise.
+	 */
+	bool readObjectTemplates(const String& filename);
+
 	/**
 	 * \brief Add an object template for a given object type it can create.
 	 *
@@ -72,15 +91,22 @@ public:
 	 *
 	 * The type is needed to select the correct template.
 	 * @param objectID The object type.
-	 * @return The just created object, or NULL on failure (for any reason).
+	 * @return The just created object, or NULL if the object cannot be created.
 	 */
 	Object* createObject(ObjectTemplateId objectType);
+
+	/**
+	 * \brief Return an unique id for created objects.
+	 * @return
+	 */
+	IdType getObjectId();
 
 private:
 	///Table of object templates indexed by their name.
 	typedef std::map<const ObjectTemplateId, PT(ObjectTemplate)> ObjectTemplateTable;
 	ObjectTemplateTable mObjectTemplates;
-
+	///The unique id for created objects.
+	IdType id;
 };
 
 #endif /* OBJECTTEMPLATEMANAGER_H_ */
