@@ -40,7 +40,7 @@ typedef std::string ObjectTemplateId;
 /**
  * \brief Class storing all of objects templates used to create an object.
  */
-class ObjectTemplate
+class ObjectTemplate: public ReferenceCount
 {
 public:
 	/**

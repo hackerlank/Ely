@@ -23,11 +23,6 @@
 
 #include "Game/ObjectTemplateManager.h"
 
-ObjectTemplateManager::ObjectTemplateManager() :
-		id(0)
-{
-}
-
 PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		ObjectTemplate* objectTmpl)
 {
@@ -73,7 +68,7 @@ ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
 	return (*it).second;
 }
 
-bool ObjectTemplateManager::readObjectTemplates(const String& filename)
+bool ObjectTemplateManager::readObjectTemplates(const std::string& filename)
 {
 	return true;
 }
@@ -81,21 +76,27 @@ bool ObjectTemplateManager::readObjectTemplates(const String& filename)
 Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 {
 	//retrieve the ObjectTemplate
-	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
-	if (it == mObjectTemplates.end())
+	ObjectTemplateTable::iterator it1 = mObjectTemplates.find(objectType);
+	if (it1 == mObjectTemplates.end())
 	{
 		return false;
 	}
-	ObjectTemplate* objectTmpl = (*it).second.p();
+	ObjectTemplate* objectTmpl = (*it1).second.p();
 	//create the new object
 	ObjectId newId = ObjectId(objectType) + ObjectId(getObjectId());
 	Object* newObj = new Object(newId);
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 			objectTmpl->getComponentTemplates();
-	//iterate over the list
-	ObjectTemplate::ComponentTemplateList::iterator it = compTmplList.begin();
-
+	//iterate over the list and assign components
+	ObjectTemplate::ComponentTemplateList::iterator it2;
+	for (it2 = compTmplList.begin(); it2 != compTmplList.end(); ++it2)
+	{
+		Component* newComp = (*it2)->makeComponent();
+		newObj->setComponent(newComp);
+	}
+	//
+	return newObj;
 }
 
 IdType ObjectTemplateManager::getObjectId()

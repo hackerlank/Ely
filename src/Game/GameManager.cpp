@@ -65,10 +65,6 @@ void GameManager::setup()
 	auto_bind(mPanda.node(), mPandaAnims);
 	mPandaAnims.loop("panda_soft", false);
 
-	Object go(mWindow->load_model(get_models(), "panda"));
-	go.getNodePath().set_hpr(0.0, 0.0, 0.0);
-	((NodePath) go).set_pos(0.0, 0.0, 0.0);
-
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
 	trackBall->set_pos(0, 50, -6);

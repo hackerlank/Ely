@@ -26,6 +26,7 @@
 
 #include <map>
 #include <string>
+#include <sstream>
 #include <nodePath.h>
 #include <pointerTo.h>
 #include "Utilitiy.h"
@@ -33,12 +34,28 @@
 #include "ObjectModel/Object.h"
 #include "ComponentTemplateManager.h"
 
-typedef std::string String;
-
 /**
  * \brief Type of the generated object counter.
  */
-typedef unsigned long int IdType;
+struct IdType
+{
+	unsigned long int i;
+	IdType() :
+			i(0)
+	{
+	}
+	IdType& operator ++()
+	{
+		++i;
+		return *this;
+	}
+	operator std::string()
+	{
+		std::ostringstream oStringI;
+		oStringI << i;
+		return oStringI.str();
+	}
+};
 
 /**
  * \brief Singleton template manager that stores all the object templates.
@@ -49,16 +66,11 @@ class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
 {
 public:
 	/**
-	 * \brief Constructor.
-	 */
-	ObjectTemplateManager();
-
-	/**
 	 * \brief Read the object templates definitions,suitably formatted (xml), from file.
 	 * @param filename The name of the file.
 	 * @return True if all ok, false otherwise.
 	 */
-	bool readObjectTemplates(const String& filename);
+	bool readObjectTemplates(const std::string& filename);
 
 	/**
 	 * \brief Add an object template for a given object type it can create.
