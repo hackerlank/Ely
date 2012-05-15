@@ -93,6 +93,9 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	for (it2 = compTmplList.begin(); it2 != compTmplList.end(); ++it2)
 	{
 		Component* newComp = (*it2)->makeComponent();
+		//set component owner
+		newComp->setOwnerObject(newObj);
+		//set the component into the object
 		newObj->setComponent(newComp);
 	}
 	//

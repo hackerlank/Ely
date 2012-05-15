@@ -53,21 +53,17 @@ public:
 	 * \brief Constructor.
 	 */
 	Component();
-	/**
-	 * \brief Destructor (pure virtual).
-	 */
-	virtual ~Component() = 0;
 
 	/**
 	 * \brief Get the id of this component.
 	 * @return The id of this component.
 	 */
-	virtual const ComponentId& componentID() const = 0;
+	virtual const ComponentId componentID() const = 0;
 	/**
 	 * \brief Get the family id of this component.
 	 * @return The family id of this component.
 	 */
-	virtual const ComponentFamilyId& familyID() const = 0;
+	virtual const ComponentFamilyId familyID() const = 0;
 
 	/**
 	 * \brief Updates the state of the component.

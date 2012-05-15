@@ -38,21 +38,17 @@ public:
 	 * \brief Constructor.
 	 */
 	ComponentTemplate();
-	/**
-	 * \brief Destructor.
-	 */
-	virtual ~ComponentTemplate() = 0;
 
 	/**
 	 * \brief Get the id of the component created.
 	 * @return The id of the component created.
 	 */
-	virtual const ComponentId& componentID() const = 0;
+	virtual const ComponentId componentID() const = 0;
 	/**
 	 * \brief Get the family id of the component created.
 	 * @return The family id of the component created.
 	 */
-	virtual const ComponentFamilyId& familyID() const = 0;
+	virtual const ComponentFamilyId familyID() const = 0;
 
 	/**
 	 * \brief Create the actual component of that family.
