@@ -28,6 +28,8 @@
 #include <string>
 #include <sstream>
 #include <nodePath.h>
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <pointerTo.h>
 #include "Utilitiy.h"
 #include "ObjectModel/ObjectTemplate.h"
@@ -65,6 +67,11 @@ struct IdType
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
 {
 public:
+	/**
+	 * \brief
+	 */
+	ObjectTemplateManager(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	/**
 	 * \brief Read the object templates definitions,suitably formatted (xml), from file.
 	 * @param filename The name of the file.
@@ -112,6 +119,10 @@ public:
 	 * @return
 	 */
 	IdType getObjectId();
+	PandaFramework* getPandaFramework() const;
+	void setPandaFramework(PandaFramework* pandaFramework);
+	WindowFramework* getWindowFramework() const;
+	void setWindowFramework(WindowFramework* windowFramework);
 
 private:
 	///Table of object templates indexed by their name.
@@ -119,6 +130,10 @@ private:
 	ObjectTemplateTable mObjectTemplates;
 	///The unique id for created objects.
 	IdType id;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 };
 
 #endif /* OBJECTTEMPLATEMANAGER_H_ */

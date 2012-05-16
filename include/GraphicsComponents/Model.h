@@ -15,47 +15,66 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Graphics/ModelComponent.h
+ * \file /Ely/include/GraphicsComponents/Model.h
  *
  * \date 15/mag/2012 (15:32:23)
  * \author marco
  */
 
-#ifndef MODELCOMPONENT_H_
-#define MODELCOMPONENT_H_
+#ifndef MODEL_H_
+#define MODEL_H_
 
 #include <string>
-#include <map>
+#include <list>
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <nodePath.h>
 #include <animControlCollection.h>
+#include <auto_bind.h>
+#include <filename.h>
 #include "ObjectModel/Component.h"
+
+class ModelTemplate;
 
 /**
  * \brief Component representing the graphics structure of an object.
  *
  * It contains the references to the model and animations of the object.
  */
-class ModelComponent: public Component
+class Model: public Component
 {
 public:
-	ModelComponent();
-	virtual ~ModelComponent();
-	const virtual ComponentFamilyId familyID();
-	const virtual ComponentId componentID();
-	const std::string& getFilename() const;
-	void setFilename(const std::string& filename);
+	Model();
+	Model(ModelTemplate* tmpl);
+	virtual ~Model();
+
+	virtual const ComponentFamilyId familyID() const;
+	virtual const ComponentId componentID() const;
+
 	const NodePath& getNodePath() const;
 	void setNodePath(const NodePath& nodePath);
+
 	const AnimControlCollection& getAnimations() const;
 	void setAnimations(const AnimControlCollection& animations);
 
+	virtual void preSetup();
+	virtual void postSetup();
+
 private:
-	///The name of the file containing the static model.
-	std::string mFilename;
+	///The template used to construct this component.
+	ModelTemplate* mTmpl;
+	///The name of the model file containing the static model.
+	std::string mModelFile;
+	///The name of the file containing the animations.
+	std::list<std::string> mAnimFiles;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 	///The list of animations associated with this model.
 	AnimControlCollection mAnimations;
 };
 
-#endif /* MODELCOMPONENT_H_ */
+#endif /* MODEL_H_ */

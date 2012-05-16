@@ -24,6 +24,8 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <nodePath.h>
 #include <referenceCount.h>
 #include <pointerTo.h>
@@ -57,7 +59,8 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Object(const ObjectId& objectId);
+	Object(const ObjectId& objectId, PandaFramework* mPandaFramework,
+			WindowFramework* mWindowFramework);
 
 	/**
 	 * \brief Destructor.
@@ -81,8 +84,7 @@ public:
 	 * @return The component, or NULL if no component of that
 	 * family exists.
 	 */
-	Component* getComponent(
-			const ComponentFamilyId& familyID);
+	Component* getComponent(const ComponentFamilyId& familyID);
 	/**
 	 * \brief Set a new component into this object.
 	 *
@@ -94,8 +96,7 @@ public:
 	 * @return PT(NULL) if there wasn't a component of that family, otherwise
 	 * the previous component.
 	 */
-	PT(Component) setComponent(
-			Component* newComponent);
+	PT(Component) setComponent(Component* newComponent);
 	/**
 	 * \brief Clears the table of all components of this object.
 	 */
@@ -125,7 +126,10 @@ private:
 	///Table of all components indexed by component family type.
 	typedef std::map<const ComponentFamilyId, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
-
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 };
 
 #endif /* OBJECT_H_ */

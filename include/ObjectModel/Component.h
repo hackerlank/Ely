@@ -71,6 +71,16 @@ public:
 	virtual void update();
 
 	/**
+	 * \brief Setup the component "before" insertion into an object.
+	 */
+	virtual void preSetup();
+
+	/**
+	 * \brief Setup the component "after" insertion into an object.
+	 */
+	virtual void postSetup();
+
+	/**
 	 * \brief Get the owner object.
 	 * \return The owner object.
 	 */
@@ -81,7 +91,7 @@ public:
 	 */
 	void setOwnerObject(Object* owner);
 
-private:
+protected:
 	/// The object this component is a member of.
 	Object* mOwnerObject;
 };

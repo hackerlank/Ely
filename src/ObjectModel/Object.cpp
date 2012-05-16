@@ -23,9 +23,12 @@
 
 #include "ObjectModel/Object.h"
 
-Object::Object(const ObjectId& objectId)
+Object::Object(const ObjectId& objectId, PandaFramework* mPandaFramework,
+		WindowFramework* mWindowFramework)
 {
 	mObjectId = objectId;
+	mPandaFramework = PandaFramework;
+	mWindowFramework = WindowFramework;
 }
 
 Object::~Object()

@@ -15,11 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/graphics/ModelComponent_test.cpp
+ * \file /Ely/src/test/graphicscomponents/ModelTemplate_test.cpp
  *
- * \date 15/mag/2012 (15:32:23)
+ * \date 16/mag/2012 (16:26:41)
  * \author marco
  */
 
-#include "../../../include/Graphics/ModelComponent.h"
+#include "../../../include/GraphicsComponents/ModelTemplate.h"
 

@@ -15,63 +15,60 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Graphics/ModelComponent.cpp
+ * \file /Ely/src/GraphicsComponents/ModelTemplate.cpp
  *
- * \date 15/mag/2012 (15:32:23)
+ * \date 16/mag/2012 (16:26:41)
  * \author marco
  */
 
-#include "Graphics/ModelComponent.h"
+#include "GraphicsComponents/ModelTemplate.h"
+#include "GraphicsComponents/Model.h"
 
-ModelComponent::ModelComponent()
+ModelTemplate::ModelTemplate()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-ModelComponent::~ModelComponent()
+ModelTemplate::~ModelTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentFamilyId ModelComponent::familyID()
-{
-	return ComponentFamilyId("Model");
-}
-
-const ComponentId ModelComponent::componentID()
+const ComponentId ModelTemplate::componentID() const
 {
 	return ComponentId("Model");
 }
 
-const std::string& ModelComponent::getFilename() const
+const ComponentFamilyId ModelTemplate::familyID() const
 {
-	return mFilename;
+	return ComponentFamilyId("Graphics");
 }
 
-void ModelComponent::setFilename(const std::string& filename)
+Component* ModelTemplate::makeComponent()
 {
-	mFilename = filename;
+	Model* newModel = new Model(this);
+	newModel->preSetup();
+	return newModel;
 }
 
-const NodePath& ModelComponent::getNodePath() const
+void ModelTemplate::setModelFile(const std::list<std::string>& modelFile)
 {
-	return mNodePath;
+	mModelFile = modelFile;
 }
 
-void ModelComponent::setNodePath(const NodePath& nodePath)
+std::string& ModelTemplate::getModelFile() const
 {
-	mNodePath = nodePath;
+	return mModelFile;
 }
 
-const AnimControlCollection& ModelComponent::getAnimations() const
+void ModelTemplate::setAnimFiles(const std::string& animFile)
 {
-	return mAnimations;
+	mAnimFiles = animFile;
 }
 
-void ModelComponent::setAnimations(const AnimControlCollection& animations)
+std::list<std::string>& ModelTemplate::getAnimFiles() const
 {
-	mAnimations = animations;
+	return mAnimFiles;
 }
-
 

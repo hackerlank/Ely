@@ -52,7 +52,7 @@ public:
 
 	/**
 	 * \brief Create the actual component of that family.
-	 * @return The component just created.
+	 * @return The component just created, NULL if component cannot be created.
 	 */
 	virtual Component* makeComponent() = 0;
 };
