@@ -64,15 +64,10 @@ public:
 	void clearComponentTemplates();
 
 	/**
-	 * \brief Set the name of this object template.
+	 * \brief Get a reference to the name of this object template.
 	 * @return The name of this object template.
 	 */
-	ObjectTemplateId getName() const;
-	/**
-	 * \brief Get the name of this object template.
-	 * @param name The name of this object template.
-	 */
-	void setName(ObjectTemplateId name);
+	ObjectTemplateId name();
 
 	/**
 	 * \brief Get the component template list.

@@ -44,7 +44,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 				"ObjectTemplateManager::addObjectTemplate: NULL Component template");
 	}
 	PT(ObjectTemplate) previousObjTmpl(NULL);
-	ObjectTemplateId objectTemplId = objectTmpl->getName();
+	ObjectTemplateId objectTemplId = objectTmpl->name();
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
 	if (it != mObjectTemplates.end())
 	{
@@ -106,7 +106,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	{
 		Component* newComp = (*it2)->makeComponent();
 		//set component owner
-		newComp->setOwnerObject(newObj);
+		newComp->ownerObject() = newObj;
 		//set the component into the object
 		newObj->setComponent(newComp);
 	}
@@ -119,23 +119,12 @@ IdType ObjectTemplateManager::getObjectId()
 	return ++id;
 }
 
-PandaFramework* ObjectTemplateManager::getPandaFramework() const
+PandaFramework*& ObjectTemplateManager::pandaFramework()
 {
 	return mPandaFramework;
 }
 
-void ObjectTemplateManager::setPandaFramework(PandaFramework* pandaFramework)
-{
-	mPandaFramework = pandaFramework;
-}
-
-WindowFramework* ObjectTemplateManager::getWindowFramework() const
+WindowFramework*& ObjectTemplateManager::windowFramework()
 {
 	return mWindowFramework;
 }
-
-void ObjectTemplateManager::setWindowFramework(WindowFramework* windowFramework)
-{
-	mWindowFramework = windowFramework;
-}
-

@@ -33,14 +33,9 @@ ObjectTemplate::~ObjectTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-ObjectTemplateId ObjectTemplate::getName() const
+ObjectTemplateId ObjectTemplate::name()
 {
 	return mName;
-}
-
-void ObjectTemplate::setName(ObjectTemplateId name)
-{
-	mName = name;
 }
 
 void ObjectTemplate::clearComponentTemplates()

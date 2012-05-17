@@ -119,10 +119,11 @@ public:
 	 * @return
 	 */
 	IdType getObjectId();
-	PandaFramework* getPandaFramework() const;
-	void setPandaFramework(PandaFramework* pandaFramework);
-	WindowFramework* getWindowFramework() const;
-	void setWindowFramework(WindowFramework* windowFramework);
+
+	PandaFramework*& pandaFramework();
+
+	WindowFramework*& windowFramework();
+
 
 private:
 	///Table of object templates indexed by their name.

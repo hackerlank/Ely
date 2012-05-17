@@ -57,6 +57,9 @@ GameManager::~GameManager()
 
 void GameManager::setup()
 {
+	// setup component template manager
+
+
 
 	mPanda = mWindow->load_model(get_models(), "panda");
 	mPanda.reparent_to(mWindow->get_render());

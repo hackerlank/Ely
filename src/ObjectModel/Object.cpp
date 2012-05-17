@@ -23,12 +23,12 @@
 
 #include "ObjectModel/Object.h"
 
-Object::Object(const ObjectId& objectId, PandaFramework* mPandaFramework,
-		WindowFramework* mWindowFramework)
+Object::Object(const ObjectId& objectId, PandaFramework* pandaFramework,
+		WindowFramework* windowFramework)
 {
 	mObjectId = objectId;
-	mPandaFramework = PandaFramework;
-	mWindowFramework = WindowFramework;
+	mPandaFramework = pandaFramework;
+	mWindowFramework = windowFramework;
 }
 
 Object::~Object()
@@ -36,14 +36,9 @@ Object::~Object()
 	mNodePath.remove_node();
 }
 
-const ObjectId& Object::getObjectId() const
+ObjectId& Object::objectId()
 {
 	return mObjectId;
-}
-
-void Object::setObjectId(ObjectId& objectId)
-{
-	mObjectId = objectId;
 }
 
 void Object::clearComponents()
@@ -51,14 +46,9 @@ void Object::clearComponents()
 	mComponents.clear();
 }
 
-NodePath& Object::getNodePath()
+NodePath& Object::nodePath()
 {
 	return mNodePath;
-}
-
-void Object::setNodePath(NodePath& nodePath)
-{
-	mNodePath = nodePath;
 }
 
 Component* Object::getComponent(const ComponentFamilyId& familyID)

@@ -51,11 +51,9 @@ public:
 	virtual const ComponentFamilyId familyID() const;
 	virtual const ComponentId componentID() const;
 
-	const NodePath& getNodePath() const;
-	void setNodePath(const NodePath& nodePath);
+	NodePath& nodePath();
 
-	const AnimControlCollection& getAnimations() const;
-	void setAnimations(const AnimControlCollection& animations);
+	AnimControlCollection& animations();
 
 	virtual void preSetup();
 	virtual void postSetup();

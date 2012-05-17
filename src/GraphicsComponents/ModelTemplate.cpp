@@ -52,22 +52,12 @@ Component* ModelTemplate::makeComponent()
 	return newModel;
 }
 
-void ModelTemplate::setModelFile(const std::list<std::string>& modelFile)
-{
-	mModelFile = modelFile;
-}
-
-std::string& ModelTemplate::getModelFile() const
+std::string& ModelTemplate::modelFile()
 {
 	return mModelFile;
 }
 
-void ModelTemplate::setAnimFiles(const std::string& animFile)
-{
-	mAnimFiles = animFile;
-}
-
-std::list<std::string>& ModelTemplate::getAnimFiles() const
+std::list<std::string>& ModelTemplate::animFiles()
 {
 	return mAnimFiles;
 }

@@ -33,7 +33,7 @@ void Component::update()
 {
 }
 
-Object* Component::getOwnerObject()
+Object*& Component::ownerObject()
 {
 	return mOwnerObject;
 }
@@ -46,8 +46,4 @@ void Component::postSetup()
 {
 }
 
-void Component::setOwnerObject(Object* owner)
-{
-	mOwnerObject = owner;
-}
 

@@ -22,6 +22,7 @@
  */
 
 #include "GraphicsComponents/Model.h"
+#include "GraphicsComponents/ModelTemplate.h"
 
 Model::Model()
 {
@@ -48,30 +49,20 @@ const ComponentId Model::componentID() const
 	return ComponentId("Model");
 }
 
-const NodePath& Model::getNodePath() const
+NodePath& Model::nodePath()
 {
 	return mNodePath;
 }
 
-void Model::setNodePath(const NodePath& nodePath)
-{
-	mNodePath = nodePath;
-}
-
-const AnimControlCollection& Model::getAnimations() const
+AnimControlCollection& Model::animations()
 {
 	return mAnimations;
 }
 
-void Model::setAnimations(const AnimControlCollection& animations)
-{
-	mAnimations = animations;
-}
-
 void Model::preSetup()
 {
-	mModelFile = mTmpl->getModelFile();
-	mAnimFiles = mTmpl->getAnimFiles();
+	mModelFile = mTmpl->modelFile();
+	mAnimFiles = mTmpl->animFiles();
 }
 
 void Model::postSetup()
@@ -86,6 +77,6 @@ void Model::postSetup()
 		auto_bind(mNodePath.node(), mAnimations);
 	}
 	//set the NodePath of this component to be the object's one
-	mOwnerObject->setNodePath(mNodePath);
+	mOwnerObject->nodePath() = mNodePath;
 }
 

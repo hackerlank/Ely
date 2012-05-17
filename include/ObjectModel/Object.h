@@ -68,15 +68,10 @@ public:
 	virtual ~Object();
 
 	/**
-	 * \brief Return the node path.
+	 * \brief Return a reference to this object's node path.
 	 * @return The node path.
 	 */
-	NodePath& getNodePath();
-	/**
-	 * \brief Set the node path.
-	 * @param nodePath The node path to be set.
-	 */
-	void setNodePath(NodePath& nodePath);
+	NodePath& nodePath();
 
 	/**
 	 * \brief Get the component of that given family.
@@ -103,15 +98,10 @@ public:
 	void clearComponents();
 
 	/**
-	 * \brief Get the id of this object.
+	 * \brief Get a reference to the id of this object.
 	 * @return The id of this object.
 	 */
-	const ObjectId& getObjectId() const;
-	/**
-	 * \brief Set the id of this object.
-	 * @param objectId The id of this object.
-	 */
-	void setObjectId(ObjectId& objectId);
+	ObjectId& objectId();
 
 	/**
 	 * \brief NodePath conversion function.

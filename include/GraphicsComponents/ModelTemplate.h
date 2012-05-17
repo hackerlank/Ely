@@ -40,11 +40,9 @@ public:
 
 	virtual Component* makeComponent();
 
-	void setModelFile(const std::list<std::string>& modelFile);
-	std::string& getModelFile() const;
+	std::string& modelFile();
 
-	void setAnimFiles(const std::string& animFile);
-	std::list<std::string>& getAnimFiles() const;
+	std::list<std::string>& animFiles();
 
 private:
 	///The name of the model file containing the static model.

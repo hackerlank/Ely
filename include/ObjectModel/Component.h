@@ -81,15 +81,10 @@ public:
 	virtual void postSetup();
 
 	/**
-	 * \brief Get the owner object.
+	 * \brief Get a reference to the owner object.
 	 * \return The owner object.
 	 */
-	Object* getOwnerObject();
-	/**
-	 * \brief Set the owner object.
-	 * @param owner The owner object.
-	 */
-	void setOwnerObject(Object* owner);
+	Object*& ownerObject();
 
 protected:
 	/// The object this component is a member of.
