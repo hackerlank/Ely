@@ -65,10 +65,6 @@ private:
 	std::string mModelFile;
 	///The name of the file containing the animations.
 	std::list<std::string> mAnimFiles;
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 	///The list of animations associated with this model.

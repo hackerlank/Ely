@@ -86,3 +86,13 @@ Object::operator NodePath()
 	return mNodePath;
 }
 
+PandaFramework*& Object::pandaFramework()
+{
+	return mPandaFramework;
+}
+
+WindowFramework*& Object::windowFramework()
+{
+	return mWindowFramework;
+}
+

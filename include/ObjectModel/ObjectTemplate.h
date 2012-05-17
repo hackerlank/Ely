@@ -67,7 +67,7 @@ public:
 	 * \brief Get a reference to the name of this object template.
 	 * @return The name of this object template.
 	 */
-	ObjectTemplateId name();
+	ObjectTemplateId& name();
 
 	/**
 	 * \brief Get the component template list.

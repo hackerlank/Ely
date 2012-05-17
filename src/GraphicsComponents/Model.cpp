@@ -68,12 +68,12 @@ void Model::preSetup()
 void Model::postSetup()
 {
 	//setup model and animations
-	mNodePath = mWindowFramework->load_model(mPandaFramework->get_models(),
-			mModelFile);
+	mNodePath = mOwnerObject->windowFramework()->load_model(
+			mOwnerObject->pandaFramework()->get_models(), mModelFile);
 	std::list<std::string>::iterator it;
 	for (it = mAnimFiles.begin(); it != mAnimFiles.end(); ++it)
 	{
-		mWindowFramework->load_model(mNodePath, Filename(*it));
+		mOwnerObject->windowFramework()->load_model(mNodePath, Filename(*it));
 		auto_bind(mNodePath.node(), mAnimations);
 	}
 	//set the NodePath of this component to be the object's one

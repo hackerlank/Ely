@@ -35,6 +35,9 @@
 
 #include <iostream>
 
+#include "ComponentTemplateManager.h"
+#include "ComponentSuite.h"
+#include "ObjectTemplateManager.h"
 #include "ObjectModel/Object.h"
 #include "Utilitiy.h"
 
@@ -63,15 +66,24 @@ public:
 	virtual void setup();
 
 	/**
+	 * \brief Set the Component template manager up.
+	 */
+	virtual void setupCompTmplMgr();
+	/**
+	 * \brief Set the Object template manager up.
+	 */
+	virtual void setupObjTmplMgr();
+
+	/**
 	 * \brief Generic Task Function interface
 	 *
 	 *  The effective Tasks are composed by a Pair of
 	 *  an GameManager object and a member function doing the task.
 	 */
-	typedef AsyncTask::DoneStatus (GameManager::*GameTaskPtr)(GenericAsyncTask* task);
+	typedef AsyncTask::DoneStatus (GameManager::*GameTaskPtr)(
+			GenericAsyncTask* task);
 	typedef Pair<GameManager*, GameTaskPtr> GameTaskData;
-	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task,
-			void * data);
+	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task, void * data);
 
 protected:
 
@@ -85,12 +97,10 @@ protected:
 	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
-	NodePath mCamera;
-	PT(ClockObject) mGlobalClock;
+	NodePath mCamera;PT(ClockObject) mGlobalClock;
 
 	/// Specific members
-	NodePath mPanda;
-	PT(Object) mPandaGO;
+	NodePath mPanda;PT(Object) mPandaGO;
 	AnimControlCollection mPandaAnims;
 };
 

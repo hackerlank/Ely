@@ -57,9 +57,14 @@ GameManager::~GameManager()
 
 void GameManager::setup()
 {
-	// setup component template manager
+	// create ComponentTemplate and ObjectTemplate managers
+	new ComponentTemplateManager;
+	new ObjectTemplateManager(this, mWindow);
 
-
+	// First: setup component template manager
+	setupCompTmplMgr();
+	// Second: setup object template manager
+	setupObjTmplMgr();
 
 	mPanda = mWindow->load_model(get_models(), "panda");
 	mPanda.reparent_to(mWindow->get_render());
@@ -101,6 +106,22 @@ AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 		return AsyncTask::DS_cont;
 	}
 	return AsyncTask::DS_done;
+}
+
+void GameManager::setupCompTmplMgr()
+{
+	// add all kind of component templates
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new ModelTemplate());
+}
+
+void GameManager::setupObjTmplMgr()
+{
+	// add all kind of object templates
+	//add "Actor" object template
+	ObjectTemplate* actor = new ObjectTemplate(ObjectTemplateId("Actor"));
+	ComponentTemplateManager::GetSingleton().getComponentTemplate(
+			ComponentId("Model"));
 }
 
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)

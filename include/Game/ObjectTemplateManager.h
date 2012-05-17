@@ -120,8 +120,20 @@ public:
 	 */
 	IdType getObjectId();
 
+	/**
+	 * \brief Get a reference to PandaFramework.
+	 *
+	 * PandaFramework should be set before creation of any object.
+	 * @return PandaFramework.
+	 */
 	PandaFramework*& pandaFramework();
 
+	/**
+	 * \brief Get a reference to WindowFramework.
+	 *
+	 * WindowFramework should be set before creation of any object.
+	 * @return WindowFramework.
+	 */
 	WindowFramework*& windowFramework();
 
 

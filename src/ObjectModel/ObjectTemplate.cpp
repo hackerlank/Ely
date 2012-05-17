@@ -33,7 +33,7 @@ ObjectTemplate::~ObjectTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-ObjectTemplateId ObjectTemplate::name()
+ObjectTemplateId& ObjectTemplate::name()
 {
 	return mName;
 }

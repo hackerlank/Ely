@@ -30,9 +30,12 @@
 #include <string>
 
 /**
- * \brief Component and component family identifier type.
+ * \brief Component identifier type.
  */
 typedef std::string ComponentId;
+/**
+ * \brief Component family identifier type.
+ */
 typedef std::string ComponentFamilyId;
 
 class Object;

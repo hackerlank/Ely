@@ -108,6 +108,18 @@ public:
 	 */
 	operator NodePath();
 
+	/**
+	 * \brief Get a reference to PandaFramework.
+	 * @return The PandaFramework.
+	 */
+	PandaFramework*& pandaFramework();
+
+	/**
+	 * \brief Get a reference to WindowFramework.
+	 * @return The WindowFramework.
+	 */
+	WindowFramework*& windowFramework();
+
 private:
 	///NodePath associated with this object.
 	NodePath mNodePath;
