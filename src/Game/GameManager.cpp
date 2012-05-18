@@ -51,19 +51,12 @@ GameManager::GameManager(int argc, char* argv[]) :
 
 GameManager::~GameManager()
 {
-	// delete managers
-	delete mObjTmplMgr;
-	delete mCompTmplMgr;
 	// close the framework
 	close_framework();
 }
 
 void GameManager::setup()
 {
-	// create ComponentTemplate and ObjectTemplate managers
-	mCompTmplMgr = new ComponentTemplateManager();
-	mObjTmplMgr = new ObjectTemplateManager(this, mWindow);
-
 	// First: setup component template manager
 	setupCompTmplMgr();
 	// Second: setup object template manager
@@ -78,13 +71,16 @@ void GameManager::setup()
 	modelTmpl->modelFile() = "panda";
 	modelTmpl->animFiles().clear();
 	modelTmpl->animFiles().push_back("panda-walk");
-	//Panda ("Actor"): create objects
+	modelTmpl->windowFramework() = mWindow;
+	modelTmpl->pandaFramework() = this;
+	//Panda ("Actor"): create an object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("Actor"));
-	mPandaObj->nodePath().reparent_to(mWindow->get_render());
-	mPandaObj->nodePath().set_hpr(-90, 0, 0);
-	dynamic_cast<Model*>(mPandaObj->getComponent(ComponentFamilyId("Graphics")))->animations().loop(
-			"panda_soft", false);
+	Model* pandaObjModel = dynamic_cast<Model*>(mPandaObj->getComponent(
+			ComponentFamilyId("Graphics")));
+	pandaObjModel->nodePath().reparent_to(mWindow->get_render());
+	pandaObjModel->nodePath().set_hpr(-90, 0, 0);
+	pandaObjModel->animations().loop("panda_soft", false);
 //	mPanda = mWindow->load_model(get_models(), "panda");
 //	mPanda.reparent_to(mWindow->get_render());
 //	mPanda.set_hpr(-90, 0, 0);

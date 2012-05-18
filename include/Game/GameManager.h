@@ -87,9 +87,9 @@ public:
 
 protected:
 	/// ComponentTemplate manager
-	ComponentTemplateManager* mCompTmplMgr;
+	ComponentTemplateManager mCompTmplMgr;
 	/// ObjectTemplate manager
-	ObjectTemplateManager* mObjTmplMgr;
+	ObjectTemplateManager mObjTmplMgr;
 
 	/// 1nd task.
 	PT(GameTaskData) m1stTask;

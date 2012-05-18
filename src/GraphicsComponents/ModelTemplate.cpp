@@ -62,3 +62,12 @@ std::list<std::string>& ModelTemplate::animFiles()
 	return mAnimFiles;
 }
 
+PandaFramework*& ModelTemplate::pandaFramework()
+{
+	return mPandaFramework;
+}
+
+WindowFramework*& ModelTemplate::windowFramework()
+{
+	return mWindowFramework;
+}

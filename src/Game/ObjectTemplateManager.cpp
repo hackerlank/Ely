@@ -23,16 +23,8 @@
 
 #include "Game/ObjectTemplateManager.h"
 
-ObjectTemplateManager::ObjectTemplateManager(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+ObjectTemplateManager::ObjectTemplateManager()
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"ObjectTemplateManager::ObjectTemplateManager: invalid PandaFramework or WindowFramework");
-	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 }
 
 PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
@@ -96,7 +88,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	ObjectTemplate* objectTmpl = (*it1).second.p();
 	//create the new object
 	ObjectId newId = ObjectId(objectType) + ObjectId(getObjectId());
-	Object* newObj = new Object(newId, mPandaFramework, mWindowFramework);
+	Object* newObj = new Object(newId);
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 			objectTmpl->getComponentTemplates();
@@ -115,14 +107,4 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 IdType ObjectTemplateManager::getObjectId()
 {
 	return ++id;
-}
-
-PandaFramework*& ObjectTemplateManager::pandaFramework()
-{
-	return mPandaFramework;
-}
-
-WindowFramework*& ObjectTemplateManager::windowFramework()
-{
-	return mWindowFramework;
 }

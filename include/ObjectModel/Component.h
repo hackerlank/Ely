@@ -81,11 +81,6 @@ public:
 	virtual void initialize();
 
 	/**
-	 * \brief Allow a component to be set up the component "after" addition to an object.
-	 */
-	virtual void postAddSetup();
-
-	/**
 	 * \brief Get a reference to the owner object.
 	 * \return The owner object.
 	 */

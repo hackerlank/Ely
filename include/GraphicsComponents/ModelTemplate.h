@@ -44,12 +44,19 @@ public:
 
 	std::list<std::string>& animFiles();
 
+	PandaFramework*& pandaFramework();
+
+	WindowFramework*& windowFramework();
+
 private:
 	///The name of the model file containing the static model.
 	std::string mModelFile;
 	///The name of the file containing the animations.
 	std::list<std::string> mAnimFiles;
-
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 };
 
 #endif /* MODELTEMPLATE_H_ */

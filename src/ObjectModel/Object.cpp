@@ -23,17 +23,13 @@
 
 #include "ObjectModel/Object.h"
 
-Object::Object(const ObjectId& objectId, PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+Object::Object(const ObjectId& objectId)
 {
 	mObjectId = objectId;
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 }
 
 Object::~Object()
 {
-	mNodePath.remove_node();
 }
 
 ObjectId& Object::objectId()
@@ -44,11 +40,6 @@ ObjectId& Object::objectId()
 void Object::clearComponents()
 {
 	mComponents.clear();
-}
-
-NodePath& Object::nodePath()
-{
-	return mNodePath;
 }
 
 Component* Object::getComponent(const ComponentFamilyId& familyID)
@@ -78,25 +69,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 	}
 	//set the component owner
 	newComponent->ownerObject() = this;
-	//post addition setup
-	newComponent->postAddSetup();
 	//insert the new component into the table
 	mComponents[familyId] = PT(Component)(newComponent);
 	return previousComp;
 }
-
-Object::operator NodePath()
-{
-	return mNodePath;
-}
-
-PandaFramework*& Object::pandaFramework()
-{
-	return mPandaFramework;
-}
-
-WindowFramework*& Object::windowFramework()
-{
-	return mWindowFramework;
-}
-

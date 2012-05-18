@@ -51,20 +51,21 @@ public:
 	virtual const ComponentFamilyId familyID() const;
 	virtual const ComponentId componentID() const;
 
+	virtual void update();
+
 	NodePath& nodePath();
+	/**
+	 * \brief NodePath conversion function.
+	 */
+	operator NodePath();
 
 	AnimControlCollection& animations();
 
 	virtual void initialize();
-	virtual void postAddSetup();
 
 private:
 	///The template used to construct this component.
 	ModelTemplate* mTmpl;
-	///The name of the model file containing the static model.
-	std::string mModelFile;
-	///The name of the file containing the animations.
-	std::list<std::string> mAnimFiles;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 	///The list of animations associated with this model.

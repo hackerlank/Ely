@@ -36,7 +36,7 @@ Model::Model(ModelTemplate* tmpl) :
 
 Model::~Model()
 {
-	// TODO Auto-generated destructor stub
+	mNodePath.remove_node();
 }
 
 const ComponentFamilyId Model::familyID() const
@@ -54,29 +54,30 @@ NodePath& Model::nodePath()
 	return mNodePath;
 }
 
+Model::operator NodePath()
+{
+	return mNodePath;
+}
+
 AnimControlCollection& Model::animations()
 {
 	return mAnimations;
 }
 
-void Model::initialize()
+void Model::update()
 {
-	mModelFile = mTmpl->modelFile();
-	mAnimFiles = mTmpl->animFiles();
 }
 
-void Model::postAddSetup()
+void Model::initialize()
 {
 	//setup model and animations
-	mNodePath = mOwnerObject->windowFramework()->load_model(
-			mOwnerObject->pandaFramework()->get_models(), mModelFile);
+	mNodePath = mTmpl->windowFramework()->load_model(
+			mTmpl->pandaFramework()->get_models(), mTmpl->modelFile());
 	std::list<std::string>::iterator it;
-	for (it = mAnimFiles.begin(); it != mAnimFiles.end(); ++it)
+	for (it = mTmpl->animFiles().begin(); it != mTmpl->animFiles().end(); ++it)
 	{
-		mOwnerObject->windowFramework()->load_model(mNodePath, Filename(*it));
+		mTmpl->windowFramework()->load_model(mNodePath, Filename(*it));
 		auto_bind(mNodePath.node(), mAnimations);
 	}
-	//set the NodePath of this component to be the object's one
-	mOwnerObject->nodePath() = mNodePath;
 }
 

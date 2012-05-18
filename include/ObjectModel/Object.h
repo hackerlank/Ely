@@ -59,19 +59,12 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Object(const ObjectId& objectId, PandaFramework* mPandaFramework,
-			WindowFramework* mWindowFramework);
+	Object(const ObjectId& objectId);
 
 	/**
 	 * \brief Destructor.
 	 */
 	virtual ~Object();
-
-	/**
-	 * \brief Return a reference to this object's node path.
-	 * @return The node path.
-	 */
-	NodePath& nodePath();
 
 	/**
 	 * \brief Get the component of that given family.
@@ -103,35 +96,12 @@ public:
 	 */
 	ObjectId& objectId();
 
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
-
-	/**
-	 * \brief Get a reference to PandaFramework.
-	 * @return The PandaFramework.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
-	 * \brief Get a reference to WindowFramework.
-	 * @return The WindowFramework.
-	 */
-	WindowFramework*& windowFramework();
-
 private:
-	///NodePath associated with this object.
-	NodePath mNodePath;
 	///Unique identifier for this object.
 	ObjectId mObjectId;
 	///Table of all components indexed by component family type.
 	typedef std::map<const ComponentFamilyId, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 };
 
 #endif /* OBJECT_H_ */

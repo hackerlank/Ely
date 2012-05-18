@@ -70,8 +70,7 @@ public:
 	/**
 	 * \brief
 	 */
-	ObjectTemplateManager(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
+	ObjectTemplateManager();
 	/**
 	 * \brief Read the object templates definitions,suitably formatted (xml), from file.
 	 * @param filename The name of the file.
@@ -120,33 +119,12 @@ public:
 	 */
 	IdType getObjectId();
 
-	/**
-	 * \brief Get a reference to PandaFramework.
-	 *
-	 * PandaFramework should be set before creation of any object.
-	 * @return PandaFramework.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
-	 * \brief Get a reference to WindowFramework.
-	 *
-	 * WindowFramework should be set before creation of any object.
-	 * @return WindowFramework.
-	 */
-	WindowFramework*& windowFramework();
-
-
 private:
 	///Table of object templates indexed by their name.
 	typedef std::map<const ObjectTemplateId, PT(ObjectTemplate)> ObjectTemplateTable;
 	ObjectTemplateTable mObjectTemplates;
 	///The unique id for created objects.
 	IdType id;
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 };
 
 #endif /* OBJECTTEMPLATEMANAGER_H_ */

@@ -42,8 +42,5 @@ void Component::initialize()
 {
 }
 
-void Component::postAddSetup()
-{
-}
 
 
