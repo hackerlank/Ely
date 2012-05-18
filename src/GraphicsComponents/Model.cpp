@@ -59,13 +59,13 @@ AnimControlCollection& Model::animations()
 	return mAnimations;
 }
 
-void Model::preSetup()
+void Model::initialize()
 {
 	mModelFile = mTmpl->modelFile();
 	mAnimFiles = mTmpl->animFiles();
 }
 
-void Model::postSetup()
+void Model::postAddSetup()
 {
 	//setup model and animations
 	mNodePath = mOwnerObject->windowFramework()->load_model(

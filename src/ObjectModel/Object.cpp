@@ -61,7 +61,7 @@ Component* Object::getComponent(const ComponentFamilyId& familyID)
 	return (*it).second;
 }
 
-PT(Component) Object::setComponent(Component* newComponent)
+PT(Component) Object::addComponent(Component* newComponent)
 {
 	if (not newComponent)
 	{
@@ -76,7 +76,11 @@ PT(Component) Object::setComponent(Component* newComponent)
 		previousComp = (*it).second;
 		mComponents.erase(it);
 	}
-	//insert the new component
+	//set the component owner
+	newComponent->ownerObject() = this;
+	//post addition setup
+	newComponent->postAddSetup();
+	//insert the new component into the table
 	mComponents[familyId] = PT(Component)(newComponent);
 	return previousComp;
 }

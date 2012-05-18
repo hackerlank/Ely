@@ -91,7 +91,7 @@ public:
 	 * @return PT(NULL) if there wasn't a component of that family, otherwise
 	 * the previous component.
 	 */
-	PT(Component) setComponent(Component* newComponent);
+	PT(Component) addComponent(Component* newComponent);
 	/**
 	 * \brief Clears the table of all components of this object.
 	 */

@@ -58,7 +58,7 @@ void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
 	mComponentTemplates.push_back(componentTmpl);
 }
 
-const ComponentTemplate* ObjectTemplate::getComponentTemplate(
+ComponentTemplate* ObjectTemplate::getComponentTemplate(
 		const ComponentId& componentId)
 {
 	ComponentTemplateList::iterator it;

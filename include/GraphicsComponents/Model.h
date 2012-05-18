@@ -55,8 +55,8 @@ public:
 
 	AnimControlCollection& animations();
 
-	virtual void preSetup();
-	virtual void postSetup();
+	virtual void initialize();
+	virtual void postAddSetup();
 
 private:
 	///The template used to construct this component.

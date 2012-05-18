@@ -51,27 +51,46 @@ GameManager::GameManager(int argc, char* argv[]) :
 
 GameManager::~GameManager()
 {
-	// Close the framework
+	// delete managers
+	delete mObjTmplMgr;
+	delete mCompTmplMgr;
+	// close the framework
 	close_framework();
 }
 
 void GameManager::setup()
 {
 	// create ComponentTemplate and ObjectTemplate managers
-	new ComponentTemplateManager;
-	new ObjectTemplateManager(this, mWindow);
+	mCompTmplMgr = new ComponentTemplateManager();
+	mObjTmplMgr = new ObjectTemplateManager(this, mWindow);
 
 	// First: setup component template manager
 	setupCompTmplMgr();
 	// Second: setup object template manager
 	setupObjTmplMgr();
 
-	mPanda = mWindow->load_model(get_models(), "panda");
-	mPanda.reparent_to(mWindow->get_render());
-	mPanda.set_hpr(-90, 0, 0);
-	mWindow->load_model(mPanda, "panda-walk");
-	auto_bind(mPanda.node(), mPandaAnims);
-	mPandaAnims.loop("panda_soft", false);
+	//create game objects
+	//Panda ("Actor"): initialize component templates
+	ModelTemplate* modelTmpl =
+			dynamic_cast<ModelTemplate*>(ObjectTemplateManager::GetSingleton().getObjectTemplate(
+					ObjectTemplateId("Actor"))->getComponentTemplate(
+					ComponentId("Model")));
+	modelTmpl->modelFile() = "panda";
+	modelTmpl->animFiles().clear();
+	modelTmpl->animFiles().push_back("panda-walk");
+	//Panda ("Actor"): create objects
+	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
+			ObjectTemplateId("Actor"));
+	mPandaObj->nodePath().reparent_to(mWindow->get_render());
+	mPandaObj->nodePath().set_hpr(-90, 0, 0);
+	dynamic_cast<Model*>(mPandaObj->getComponent(ComponentFamilyId("Graphics")))->animations().loop(
+			"panda_soft", false);
+//	mPanda = mWindow->load_model(get_models(), "panda");
+//	mPanda.reparent_to(mWindow->get_render());
+//	mPanda.set_hpr(-90, 0, 0);
+//	mWindow->load_model(mPanda, "panda-walk");
+//	auto_bind(mPanda.node(), mPandaAnims);
+//	mPandaAnims.loop("panda_soft", false);
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
@@ -118,10 +137,13 @@ void GameManager::setupCompTmplMgr()
 void GameManager::setupObjTmplMgr()
 {
 	// add all kind of object templates
-	//add "Actor" object template
-	ObjectTemplate* actor = new ObjectTemplate(ObjectTemplateId("Actor"));
-	ComponentTemplateManager::GetSingleton().getComponentTemplate(
-			ComponentId("Model"));
+	//create "Actor" object template
+	ObjectTemplate* actorTmpl = new ObjectTemplate(ObjectTemplateId("Actor"));
+	actorTmpl->addComponentTemplate(
+			ComponentTemplateManager::GetSingleton().getComponentTemplate(
+					ComponentId("Model")));
+	// add "Actor" object template to manager
+	ObjectTemplateManager::GetSingleton().addObjectTemplate(actorTmpl);
 }
 
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)

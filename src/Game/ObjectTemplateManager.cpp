@@ -106,11 +106,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	{
 		Component* newComp = (*it2)->makeComponent();
 		//set the component into the object
-		newObj->setComponent(newComp);
-		//set component owner
-		newComp->ownerObject() = newObj;
-		//post setup
-		newComp->postSetup();
+		newObj->addComponent(newComp);
 	}
 	//
 	return newObj;

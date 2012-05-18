@@ -85,7 +85,7 @@ public:
 	 * @param componentId The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
-	const ComponentTemplate* getComponentTemplate(
+	ComponentTemplate* getComponentTemplate(
 			const ComponentId& componentId);
 
 private:

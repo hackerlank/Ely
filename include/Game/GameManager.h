@@ -86,6 +86,10 @@ public:
 	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task, void * data);
 
 protected:
+	/// ComponentTemplate manager
+	ComponentTemplateManager* mCompTmplMgr;
+	/// ObjectTemplate manager
+	ObjectTemplateManager* mObjTmplMgr;
 
 	/// 1nd task.
 	PT(GameTaskData) m1stTask;
@@ -97,11 +101,15 @@ protected:
 	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
-	NodePath mCamera;PT(ClockObject) mGlobalClock;
+	NodePath mCamera;
+	PT(ClockObject) mGlobalClock;
 
 	/// Specific members
-	NodePath mPanda;PT(Object) mPandaGO;
+	NodePath mPanda;
 	AnimControlCollection mPandaAnims;
+	/// game objects
+	PT(Object) mPandaObj;
+
 };
 
 #endif /* GAMEMANGER_H_ */

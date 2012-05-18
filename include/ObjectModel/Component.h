@@ -74,14 +74,16 @@ public:
 	virtual void update();
 
 	/**
-	 * \brief Setup the component "before" insertion into an object.
+	 * \brief Allow a component to be initialized.
+	 *
+	 * This can be done after creation but "before" insertion into an object.
 	 */
-	virtual void preSetup();
+	virtual void initialize();
 
 	/**
-	 * \brief Setup the component "after" insertion into an object.
+	 * \brief Allow a component to be set up the component "after" addition to an object.
 	 */
-	virtual void postSetup();
+	virtual void postAddSetup();
 
 	/**
 	 * \brief Get a reference to the owner object.

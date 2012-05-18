@@ -48,7 +48,7 @@ const ComponentFamilyId ModelTemplate::familyID() const
 Component* ModelTemplate::makeComponent()
 {
 	Model* newModel = new Model(this);
-	newModel->preSetup();
+	newModel->initialize();
 	return newModel;
 }
 

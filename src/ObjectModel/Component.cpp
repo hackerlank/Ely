@@ -38,11 +38,11 @@ Object*& Component::ownerObject()
 	return mOwnerObject;
 }
 
-void Component::preSetup()
+void Component::initialize()
 {
 }
 
-void Component::postSetup()
+void Component::postAddSetup()
 {
 }
 
