@@ -24,10 +24,20 @@
 #include "GraphicsComponents/ModelTemplate.h"
 #include "GraphicsComponents/Model.h"
 
-ModelTemplate::ModelTemplate()
+ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework)
 {
-	// TODO Auto-generated constructor stub
+	if (not pandaFramework or not windowFramework)
+	{
+		throw GameException(
+				"ModelTemplate::ModelTemplate: invalid PandaFramework or WindowFramework");
 
+	}
+	mPandaFramework = pandaFramework;
+	mWindowFramework = windowFramework;
+	mParent = NodePath();
+	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
+	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
 }
 
 ModelTemplate::~ModelTemplate()
@@ -52,12 +62,12 @@ Component* ModelTemplate::makeComponent()
 	return newModel;
 }
 
-std::string& ModelTemplate::modelFile()
+Filename& ModelTemplate::modelFile()
 {
 	return mModelFile;
 }
 
-std::list<std::string>& ModelTemplate::animFiles()
+std::list<Filename>& ModelTemplate::animFiles()
 {
 	return mAnimFiles;
 }
@@ -71,3 +81,19 @@ WindowFramework*& ModelTemplate::windowFramework()
 {
 	return mWindowFramework;
 }
+
+LVecBase3& ModelTemplate::initOrientation()
+{
+	return mInitOrientation;
+}
+
+LVecBase3& ModelTemplate::initPosition()
+{
+	return mInitPosition;
+}
+
+NodePath& ModelTemplate::parent()
+{
+	return mParent;
+}
+

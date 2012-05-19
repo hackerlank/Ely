@@ -73,11 +73,18 @@ void Model::initialize()
 	//setup model and animations
 	mNodePath = mTmpl->windowFramework()->load_model(
 			mTmpl->pandaFramework()->get_models(), mTmpl->modelFile());
-	std::list<std::string>::iterator it;
+	std::list<Filename>::iterator it;
 	for (it = mTmpl->animFiles().begin(); it != mTmpl->animFiles().end(); ++it)
 	{
-		mTmpl->windowFramework()->load_model(mNodePath, Filename(*it));
+		mTmpl->windowFramework()->load_model(mNodePath, *it);
 		auto_bind(mNodePath.node(), mAnimations);
 	}
+	//setup initial state
+	if (not mTmpl->parent().is_empty())
+	{
+		mNodePath.reparent_to(mTmpl->parent());
+	}
+	mNodePath.set_pos(mTmpl->initPosition());
+	mNodePath.set_hpr(mTmpl->initOrientation());
 }
 

@@ -26,13 +26,18 @@
 
 #include <string>
 #include <list>
+#include <filename.h>
+#include <pandaFramework.h>
+#include <windowFramework.h>
+#include <lvecBase3.h>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 
 class ModelTemplate: public ComponentTemplate
 {
 public:
-	ModelTemplate();
+	ModelTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~ModelTemplate();
 
 	const virtual ComponentId componentID() const;
@@ -40,23 +45,31 @@ public:
 
 	virtual Component* makeComponent();
 
-	std::string& modelFile();
-
-	std::list<std::string>& animFiles();
+	Filename& modelFile();
+	std::list<Filename>& animFiles();
 
 	PandaFramework*& pandaFramework();
-
 	WindowFramework*& windowFramework();
+
+	LVecBase3& initOrientation();
+	LVecBase3& initPosition();
+	NodePath& parent();
 
 private:
 	///The name of the model file containing the static model.
-	std::string mModelFile;
+	Filename mModelFile;
 	///The name of the file containing the animations.
-	std::list<std::string> mAnimFiles;
+	std::list<Filename> mAnimFiles;
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
+	///Parent node path.
+	NodePath mParent;
+	///Initial position.
+	LVecBase3 mInitPosition;
+	///Initial orientation.
+	LVecBase3 mInitOrientation;
 };
 
 #endif /* MODELTEMPLATE_H_ */

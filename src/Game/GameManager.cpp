@@ -63,30 +63,22 @@ void GameManager::setup()
 	setupObjTmplMgr();
 
 	//create game objects
-	//Panda ("Actor"): initialize component templates
+	//Panda ("Actor"): custom initialize component templates
 	ModelTemplate* modelTmpl =
 			dynamic_cast<ModelTemplate*>(ObjectTemplateManager::GetSingleton().getObjectTemplate(
 					ObjectTemplateId("Actor"))->getComponentTemplate(
 					ComponentId("Model")));
-	modelTmpl->modelFile() = "panda";
+	modelTmpl->modelFile() = Filename("panda");
 	modelTmpl->animFiles().clear();
-	modelTmpl->animFiles().push_back("panda-walk");
-	modelTmpl->windowFramework() = mWindow;
-	modelTmpl->pandaFramework() = this;
+	modelTmpl->animFiles().push_back(Filename("panda-walk"));
+	modelTmpl->parent() = mWindow->get_render();
+	modelTmpl->initOrientation() = LVecBase3(-90, 0, 0);
 	//Panda ("Actor"): create an object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("Actor"));
 	Model* pandaObjModel = dynamic_cast<Model*>(mPandaObj->getComponent(
 			ComponentFamilyId("Graphics")));
-	pandaObjModel->nodePath().reparent_to(mWindow->get_render());
-	pandaObjModel->nodePath().set_hpr(-90, 0, 0);
 	pandaObjModel->animations().loop("panda_soft", false);
-//	mPanda = mWindow->load_model(get_models(), "panda");
-//	mPanda.reparent_to(mWindow->get_render());
-//	mPanda.set_hpr(-90, 0, 0);
-//	mWindow->load_model(mPanda, "panda-walk");
-//	auto_bind(mPanda.node(), mPandaAnims);
-//	mPandaAnims.loop("panda_soft", false);
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
@@ -126,8 +118,9 @@ AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 void GameManager::setupCompTmplMgr()
 {
 	// add all kind of component templates
+	//Model template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ModelTemplate());
+			new ModelTemplate(this, mWindow));
 }
 
 void GameManager::setupObjTmplMgr()

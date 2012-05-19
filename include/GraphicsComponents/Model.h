@@ -26,12 +26,9 @@
 
 #include <string>
 #include <list>
-#include <pandaFramework.h>
-#include <windowFramework.h>
 #include <nodePath.h>
 #include <animControlCollection.h>
 #include <auto_bind.h>
-#include <filename.h>
 #include "ObjectModel/Component.h"
 
 class ModelTemplate;
@@ -48,10 +45,11 @@ public:
 	Model(ModelTemplate* tmpl);
 	virtual ~Model();
 
-	virtual const ComponentFamilyId familyID() const;
-	virtual const ComponentId componentID() const;
+	const virtual ComponentFamilyId familyID() const;
+	const virtual ComponentId componentID() const;
 
 	virtual void update();
+	virtual void initialize();
 
 	NodePath& nodePath();
 	/**
@@ -60,8 +58,6 @@ public:
 	operator NodePath();
 
 	AnimControlCollection& animations();
-
-	virtual void initialize();
 
 private:
 	///The template used to construct this component.
