@@ -15,33 +15,19 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/ObjectModel/Component.cpp
+ * \file /Ely/src/Utilities/Tools.cpp
  *
- * \date 09/mag/2012 (16:09:17)
+ * \date 19/mag/2012 (12:39:59)
  * \author marco
  */
 
-#include "ObjectModel/Component.h"
+#include "Utilities/Tools.h"
+#include "Utilities/ComponentSuite.h"
 
-Component::Component()
+void initTypedObjects()
 {
-	// TODO Auto-generated constructor stub
-
+	Component::init_type();
+	ComponentTemplate::init_type();
+	Model::init_type();
+	ModelTemplate::init_type();
 }
-
-void Component::update()
-{
-}
-
-Object*& Component::ownerObject()
-{
-	return mOwnerObject;
-}
-
-void Component::initialize()
-{
-}
-
-//TypedObject semantics: hardcoded
-TypeHandle Component::_type_handle;
-

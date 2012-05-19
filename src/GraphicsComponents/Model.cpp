@@ -88,3 +88,5 @@ void Model::initialize()
 	mNodePath.set_hpr(mTmpl->initOrientation());
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle Model::_type_handle;

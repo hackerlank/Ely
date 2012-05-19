@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/ComponentSuite.h
+ * \file /Ely/include/Utilities/ComponentSuite.h
  *
  * \date 17/mag/2012 (18:22:24)
  * \author marco

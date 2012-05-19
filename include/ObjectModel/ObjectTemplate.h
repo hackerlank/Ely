@@ -29,7 +29,6 @@
 #include <algorithm>
 #include "ComponentTemplate.h"
 #include "Component.h"
-#include "Utilitiy.h"
 
 /**
  * \brief Object template identifier type (this is

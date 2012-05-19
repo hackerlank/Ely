@@ -25,13 +25,14 @@
 #define COMPONENTTEMPLATE_H_
 
 #include <referenceCount.h>
+#include <typedObject.h>
 #include "Object.h"
 #include "Component.h"
 
 /**
  * \brief Abstract base class of component templates used to create components.
  */
-class ComponentTemplate: public ReferenceCount
+class ComponentTemplate: public TypedObject, public ReferenceCount
 {
 public:
 	/**
@@ -55,6 +56,30 @@ public:
 	 * @return The component just created, NULL if component cannot be created.
 	 */
 	virtual Component* makeComponent() = 0;
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedObject::init_type();
+		register_type(_type_handle, "ComponentTemplate", TypedObject::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
 };
 
 #endif /* COMPONENTTEMPLATE_H_ */

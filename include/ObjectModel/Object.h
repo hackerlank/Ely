@@ -30,7 +30,6 @@
 #include <referenceCount.h>
 #include <pointerTo.h>
 #include "Component.h"
-#include "Utilitiy.h"
 
 #include <map>
 #include <string>

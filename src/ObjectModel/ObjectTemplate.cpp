@@ -22,6 +22,7 @@
  */
 
 #include "ObjectModel/ObjectTemplate.h"
+#include "Utilities/Tools.h"
 
 ObjectTemplate::ObjectTemplate(const ObjectTemplateId& name) :
 		mName(name)

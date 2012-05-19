@@ -27,3 +27,5 @@ ComponentTemplate::ComponentTemplate()
 {
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle ComponentTemplate::_type_handle;

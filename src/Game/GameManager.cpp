@@ -57,6 +57,8 @@ GameManager::~GameManager()
 
 void GameManager::setup()
 {
+	//initialize typed objects
+	initTypedObjects();
 	// First: setup component template manager
 	setupCompTmplMgr();
 	// Second: setup object template manager
@@ -64,10 +66,10 @@ void GameManager::setup()
 
 	//create game objects
 	//Panda ("Actor"): custom initialize component templates
-	ModelTemplate* modelTmpl =
-			dynamic_cast<ModelTemplate*>(ObjectTemplateManager::GetSingleton().getObjectTemplate(
-					ObjectTemplateId("Actor"))->getComponentTemplate(
-					ComponentId("Model")));
+	PT(ModelTemplate) modelTmpl =
+			DCAST(ModelTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
+							ObjectTemplateId("Actor"))->getComponentTemplate(
+							ComponentId("Model")));
 	modelTmpl->modelFile() = Filename("panda");
 	modelTmpl->animFiles().clear();
 	modelTmpl->animFiles().push_back(Filename("panda-walk"));
@@ -76,8 +78,8 @@ void GameManager::setup()
 	//Panda ("Actor"): create an object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("Actor"));
-	Model* pandaObjModel = dynamic_cast<Model*>(mPandaObj->getComponent(
-			ComponentFamilyId("Graphics")));
+	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
+					ComponentFamilyId("Graphics")));
 	pandaObjModel->animations().loop("panda_soft", false);
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");

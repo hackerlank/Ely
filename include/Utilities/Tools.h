@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Utilitiy.h
+ * \file /Ely/include/Utilities/Tools.h
  *
  * \date 08/mag/2012 (16:49:10)
  * \author marco
  */
 
-#ifndef UTILITIY_H_
-#define UTILITIY_H_
+#ifndef TOOLS_H_
+#define TOOLS_H_
 
 #include <referenceCount.h>
 #include <utility>
@@ -116,4 +116,7 @@ public:
 
 template<typename T> T* Singleton<T>::ms_Singleton = 0;
 
-#endif /* UTILITIY_H_ */
+///TypedObject semantics: hardcoded
+void initTypedObjects();
+
+#endif /* TOOLS_H_ */

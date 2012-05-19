@@ -36,10 +36,10 @@
 #include <iostream>
 
 #include "ComponentTemplateManager.h"
-#include "ComponentSuite.h"
+#include "Utilities/ComponentSuite.h"
 #include "ObjectTemplateManager.h"
 #include "ObjectModel/Object.h"
-#include "Utilitiy.h"
+#include "Utilities/Tools.h"
 
 class FuncInterval;
 

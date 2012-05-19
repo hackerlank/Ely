@@ -31,7 +31,7 @@
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <pointerTo.h>
-#include "Utilitiy.h"
+#include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
 #include "ComponentTemplateManager.h"

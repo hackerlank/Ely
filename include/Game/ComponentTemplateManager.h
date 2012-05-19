@@ -26,7 +26,7 @@
 
 #include <map>
 #include <pointerTo.h>
-#include "Utilitiy.h"
+#include "Utilities/Tools.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 

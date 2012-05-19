@@ -23,6 +23,7 @@
 
 #include "GraphicsComponents/ModelTemplate.h"
 #include "GraphicsComponents/Model.h"
+#include "Utilities/Tools.h"
 
 ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework)
@@ -97,3 +98,5 @@ NodePath& ModelTemplate::parent()
 	return mParent;
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle ModelTemplate::_type_handle;

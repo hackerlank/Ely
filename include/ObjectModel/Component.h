@@ -26,6 +26,7 @@
 
 #include <referenceCount.h>
 #include <pointerTo.h>
+#include <typedObject.h>
 
 #include <string>
 
@@ -49,7 +50,7 @@ class Object;
  * family component. Any object can have only one component of
  * each family type.
  */
-class Component: public ReferenceCount
+class Component: public TypedObject, public ReferenceCount
 {
 public:
 	/**
@@ -89,6 +90,30 @@ public:
 protected:
 	/// The object this component is a member of.
 	Object* mOwnerObject;
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedObject::init_type();
+		register_type(_type_handle, "Component", TypedObject::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
 };
 
 #endif /* COMPONENT_H_ */
