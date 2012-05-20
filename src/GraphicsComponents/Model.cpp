@@ -90,10 +90,7 @@ bool Model::initialize()
 		auto_bind(mNodePath.node(), mAnimations);
 	}
 	//setup initial state
-	if (not mTmpl->parent().is_empty())
-	{
-		mNodePath.reparent_to(mTmpl->parent());
-	}
+	mNodePath.set_scale(mTmpl->initScaling());
 	mNodePath.set_pos(mTmpl->initPosition());
 	mNodePath.set_hpr(mTmpl->initOrientation());
 	return result;

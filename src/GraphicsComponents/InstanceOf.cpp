@@ -56,28 +56,12 @@ void InstanceOf::update()
 
 bool InstanceOf::initialize()
 {
-	bool result = true;
 	//setup initial state
-	if (not mTmpl->parent().is_empty())
-	{
-		mNodePath = mTmpl->parent().attach_new_node(mComponentId);
-	}
-	else
-	{
-		mNodePath = NodePath(mComponentId);
-	}
-	//the node path that this component is an instance of
-	if (not mTmpl->instanceOf().is_empty())
-	{
-		mTmpl->instanceOf().instance_to(mNodePath);
-	}
-	else
-	{
-		result = false;
-	}
+	mNodePath = NodePath(mComponentId);
+	mNodePath.set_scale(mTmpl->initScaling());
 	mNodePath.set_pos(mTmpl->initPosition());
 	mNodePath.set_hpr(mTmpl->initOrientation());
-	return result;
+	return true;
 }
 
 NodePath& InstanceOf::nodePath()

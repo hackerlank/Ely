@@ -65,6 +65,7 @@ void GameManager::setup()
 	setupObjTmplMgr();
 
 	//Create game objects
+
 	//1st object (Panda: "Actor"): initialize component templates
 	//a1) get a component template...
 	PT(ModelTemplate) modelTmpl =
@@ -76,18 +77,41 @@ void GameManager::setup()
 	//a3) ...customize it as needed (e.g. in data driven manner)
 	modelTmpl->modelFile() = Filename("panda");
 	modelTmpl->animFiles().push_back(Filename("panda-walk"));
-	modelTmpl->parent() = mWindow->get_render();
 	modelTmpl->initOrientation() = LVecBase3(-90, 0, 0);
 	//b1) get the next component template... (and so on)
 	//1st object (Panda: "Actor"): create the object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("Actor"));
-	//2nd object... (and so on)
+
+	//2nd object (PandaI: "InstancedActor"): initialize component templates
+	//a1) get a component template...
+	PT(InstanceOfTemplate) instanceOfTmpl =
+			DCAST(InstanceOfTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
+							ObjectTemplateId("InstancedActor"))->getComponentTemplate(
+							ComponentType("InstanceOf")));
+	//a2) ...reset it to its default state...
+	instanceOfTmpl->reset();
+	//a3) ...customize it as needed (e.g. in data driven manner)
+	instanceOfTmpl->initOrientation() = LVecBase3(-90, 0, 0);
+	instanceOfTmpl->initPosition() = LVecBase3(-10, 0, 0);
+	//b1) get the next component template... (and so on)
+	//2nd object (PandaI: "InstancedActor"): create the object
+	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
+			ObjectTemplateId("InstancedActor"));
 
 	// play with created objects
+	//mPandaObj
 	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
 					ComponentFamilyType("Graphics")));
+	pandaObjModel->nodePath().reparent_to(mWindow->get_render());
 	pandaObjModel->animations().loop("panda_soft", false);
+	//mPandaInstObj
+	PT(InstanceOf) pandaObjInstanceOf =
+			DCAST(InstanceOf, mPandaInstObj->getComponent(
+							ComponentFamilyType("Graphics")));
+	pandaObjInstanceOf->nodePath().reparent_to(mWindow->get_render());
+	pandaObjModel->nodePath().instance_to(pandaObjInstanceOf->nodePath());
+
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
@@ -130,18 +154,35 @@ void GameManager::setupCompTmplMgr()
 	//Model template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ModelTemplate(this, mWindow));
+	//InstanceOf template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new InstanceOfTemplate());
+
 }
 
 void GameManager::setupObjTmplMgr()
 {
+	ObjectTemplate* objTmpl;
 	// add all kind of object templates
-	//create "Actor" object template
-	ObjectTemplate* actorTmpl = new ObjectTemplate(ObjectTemplateId("Actor"));
-	actorTmpl->addComponentTemplate(
+
+	//1 "Actor" object template
+	objTmpl = new ObjectTemplate(ObjectTemplateId("Actor"));
+	//add all component templates
+	objTmpl->addComponentTemplate(
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
 					ComponentType("Model")));
 	// add "Actor" object template to manager
-	ObjectTemplateManager::GetSingleton().addObjectTemplate(actorTmpl);
+	ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmpl);
+
+	//2 "InstancedActor" object template
+	objTmpl = new ObjectTemplate(ObjectTemplateId("InstancedActor"));
+	//add all component templates
+	objTmpl->addComponentTemplate(
+			ComponentTemplateManager::GetSingleton().getComponentTemplate(
+					ComponentType("InstanceOf")));
+	// add "InstancedActor" object template to manager
+	ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmpl);
+
 }
 
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)

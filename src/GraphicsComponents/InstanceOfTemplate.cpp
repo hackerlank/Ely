@@ -26,10 +26,9 @@
 
 InstanceOfTemplate::InstanceOfTemplate()
 {
-	mParent = NodePath();
-	mInstanceOf = NodePath();
 	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
 	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
+	mInitScaling = LVecBase3(1.0, 1.0, 1.0);
 }
 
 InstanceOfTemplate::~InstanceOfTemplate()
@@ -60,10 +59,9 @@ Component* InstanceOfTemplate::makeComponent(ComponentId& compId)
 
 void InstanceOfTemplate::reset()
 {
-	mParent = NodePath();
-	mInstanceOf = NodePath();
 	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
 	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
+	mInitScaling = LVecBase3(1.0, 1.0, 1.0);
 }
 
 LVecBase3& InstanceOfTemplate::initOrientation()
@@ -76,14 +74,9 @@ LVecBase3& InstanceOfTemplate::initPosition()
 	return mInitPosition;
 }
 
-NodePath& InstanceOfTemplate::parent()
+LVecBase3& InstanceOfTemplate::initScaling()
 {
-	return mParent;
-}
-
-NodePath& InstanceOfTemplate::instanceOf()
-{
-	return mInstanceOf;
+	return mInitScaling;
 }
 
 //TypedObject semantics: hardcoded

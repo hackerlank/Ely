@@ -31,14 +31,23 @@ int main(int argc, char **argv)
 	load_prc_file_data("", "sync-video #t");
 	//load_prc_file_data("", "want-directtools #t");
 	//load_prc_file_data("", "want-tk #t");
-	// Open the framework
-	GameManager* gameApp = new GameManager(argc, argv);
-	// Set your application up
-	gameApp->setup();
+
+	// Setup the game framework
+	// ComponentTemplate manager
+	ComponentTemplateManager* componentTmplMgr = new ComponentTemplateManager();
+	// ObjectTemplate manager
+	ObjectTemplateManager* objectTmplMgr = new ObjectTemplateManager();
+	// Game manager
+	GameManager* gameMgr = new GameManager(argc, argv);
+	// Set game up
+	gameMgr->setup();
 	// Do the main loop
-	gameApp->main_loop();
-	// Close the framework
-	delete gameApp;
+	gameMgr->main_loop();
+
+	// Close the game framework
+	delete gameMgr;
+	delete objectTmplMgr;
+	delete componentTmplMgr;
 	return 0;
 }
 

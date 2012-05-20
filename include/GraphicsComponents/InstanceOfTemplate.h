@@ -45,18 +45,15 @@ public:
 
 	LVecBase3& initOrientation();
 	LVecBase3& initPosition();
-	NodePath& parent();
-	NodePath& instanceOf();
+	LVecBase3& initScaling();
 
 private:
-	///Parent node path.
-	NodePath mParent;
-	///Node path this component is instance of.
-	NodePath mInstanceOf;
 	///Initial position.
 	LVecBase3 mInitPosition;
 	///Initial orientation.
 	LVecBase3 mInitOrientation;
+	///Initial scaling.
+	LVecBase3 mInitScaling;
 
 	///TypedObject semantics: hardcoded
 public:

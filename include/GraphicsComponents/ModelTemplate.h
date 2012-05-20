@@ -56,7 +56,7 @@ public:
 
 	LVecBase3& initOrientation();
 	LVecBase3& initPosition();
-	NodePath& parent();
+	LVecBase3& initScaling();
 
 private:
 	///The PandaFramework.
@@ -67,12 +67,12 @@ private:
 	Filename mModelFile;
 	///The name of the file containing the animations.
 	std::list<Filename> mAnimFiles;
-	///Parent node path.
-	NodePath mParent;
 	///Initial position.
 	LVecBase3 mInitPosition;
 	///Initial orientation.
 	LVecBase3 mInitOrientation;
+	///Initial scaling.
+	LVecBase3 mInitScaling;
 
 	///TypedObject semantics: hardcoded
 public:
