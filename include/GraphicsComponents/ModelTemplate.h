@@ -40,10 +40,12 @@ public:
 			WindowFramework* windowFramework);
 	virtual ~ModelTemplate();
 
-	const virtual ComponentId componentID() const;
-	const virtual ComponentFamilyId familyID() const;
+	const virtual ComponentType componentType() const;
+	const virtual ComponentFamilyType familyType() const;
 
 	virtual Component* makeComponent();
+
+	virtual void reset();
 
 	Filename& modelFile();
 	std::list<Filename>& animFiles();
@@ -56,14 +58,14 @@ public:
 	NodePath& parent();
 
 private:
-	///The name of the model file containing the static model.
-	Filename mModelFile;
-	///The name of the file containing the animations.
-	std::list<Filename> mAnimFiles;
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
+	///The name of the model file containing the static model.
+	Filename mModelFile;
+	///The name of the file containing the animations.
+	std::list<Filename> mAnimFiles;
 	///Parent node path.
 	NodePath mParent;
 	///Initial position.

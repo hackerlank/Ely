@@ -33,11 +33,16 @@
 /**
  * \brief Component identifier type.
  */
-typedef std::string ComponentId;
+typedef std::string ComponentType;
 /**
  * \brief Component family identifier type.
  */
-typedef std::string ComponentFamilyId;
+typedef std::string ComponentFamilyType;
+/**
+ * \brief Object instance identifier type (by default the name
+ * of the NodePath component).
+ */
+typedef std::string ComponentId;
 
 class Object;
 
@@ -59,35 +64,39 @@ public:
 	Component();
 
 	/**
-	 * \brief Get the id of this component.
+	 * \brief Get the type of this component.
 	 * @return The id of this component.
 	 */
-	virtual const ComponentId componentID() const = 0;
+	const virtual ComponentType componentType() const = 0;
 	/**
-	 * \brief Get the family id of this component.
+	 * \brief Get the family type of this component.
 	 * @return The family id of this component.
 	 */
-	virtual const ComponentFamilyId familyID() const = 0;
-
+	const virtual ComponentFamilyType familyType() const = 0;
 	/**
 	 * \brief Updates the state of the component.
 	 */
 	virtual void update();
-
 	/**
 	 * \brief Allow a component to be initialized.
 	 *
 	 * This can be done after creation but "before" insertion into an object.
 	 */
 	virtual void initialize();
-
 	/**
 	 * \brief Get a reference to the owner object.
 	 * \return The owner object.
 	 */
 	Object*& ownerObject();
+	/**
+	 * \brief Get a reference to the component unique identifier.
+	 * \return The component unique identifier.
+	 */
+	ComponentId& componentId();
 
 protected:
+	///Unique identifier for this component.
+	ComponentId mComponentId;
 	/// The object this component is a member of.
 	Object* mOwnerObject;
 

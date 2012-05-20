@@ -71,7 +71,7 @@ public:
 	 * @return The component, or NULL if no component of that
 	 * family exists.
 	 */
-	Component* getComponent(const ComponentFamilyId& familyID);
+	Component* getComponent(const ComponentFamilyType& familyID);
 	/**
 	 * \brief Set a new component into this object.
 	 *
@@ -99,7 +99,7 @@ private:
 	///Unique identifier for this object.
 	ObjectId mObjectId;
 	///Table of all components indexed by component family type.
-	typedef std::map<const ComponentFamilyId, PT(Component)> ComponentTable;
+	typedef std::map<const ComponentFamilyType, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
 };
 

@@ -46,14 +46,14 @@ ModelTemplate::~ModelTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentId ModelTemplate::componentID() const
+const ComponentType ModelTemplate::componentType() const
 {
-	return ComponentId("Model");
+	return ComponentType("Model");
 }
 
-const ComponentFamilyId ModelTemplate::familyID() const
+const ComponentFamilyType ModelTemplate::familyType() const
 {
-	return ComponentFamilyId("Graphics");
+	return ComponentFamilyType("Graphics");
 }
 
 Component* ModelTemplate::makeComponent()
@@ -81,6 +81,15 @@ PandaFramework*& ModelTemplate::pandaFramework()
 WindowFramework*& ModelTemplate::windowFramework()
 {
 	return mWindowFramework;
+}
+
+void ModelTemplate::reset()
+{
+	mModelFile = Filename("");
+	mAnimFiles.clear();
+	mParent = NodePath();
+	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
+	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
 }
 
 LVecBase3& ModelTemplate::initOrientation()

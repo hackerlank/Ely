@@ -64,22 +64,29 @@ void GameManager::setup()
 	// Second: setup object template manager
 	setupObjTmplMgr();
 
-	//create game objects
-	//Panda ("Actor"): custom initialize component templates
+	//Create game objects
+	//1st object (Panda: "Actor"): initialize component templates
+	//a1) get a component template...
 	PT(ModelTemplate) modelTmpl =
 			DCAST(ModelTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("Actor"))->getComponentTemplate(
-							ComponentId("Model")));
+							ComponentType("Model")));
+	//a2) ...reset it to its default state...
+	modelTmpl->reset();
+	//a3) ...customize it as needed (e.g. in data driven manner)
 	modelTmpl->modelFile() = Filename("panda");
-	modelTmpl->animFiles().clear();
 	modelTmpl->animFiles().push_back(Filename("panda-walk"));
 	modelTmpl->parent() = mWindow->get_render();
 	modelTmpl->initOrientation() = LVecBase3(-90, 0, 0);
-	//Panda ("Actor"): create an object
+	//b1) get the next component template... (and so on)
+	//1st object (Panda: "Actor"): create the object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("Actor"));
+	//2nd object... (and so on)
+
+	// play with created objects
 	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
-					ComponentFamilyId("Graphics")));
+					ComponentFamilyType("Graphics")));
 	pandaObjModel->animations().loop("panda_soft", false);
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
@@ -132,7 +139,7 @@ void GameManager::setupObjTmplMgr()
 	ObjectTemplate* actorTmpl = new ObjectTemplate(ObjectTemplateId("Actor"));
 	actorTmpl->addComponentTemplate(
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-					ComponentId("Model")));
+					ComponentType("Model")));
 	// add "Actor" object template to manager
 	ObjectTemplateManager::GetSingleton().addObjectTemplate(actorTmpl);
 }

@@ -44,18 +44,23 @@ public:
 	 * \brief Get the id of the component created.
 	 * @return The id of the component created.
 	 */
-	virtual const ComponentId componentID() const = 0;
+	virtual const ComponentType componentType() const = 0;
 	/**
 	 * \brief Get the family id of the component created.
 	 * @return The family id of the component created.
 	 */
-	virtual const ComponentFamilyId familyID() const = 0;
+	virtual const ComponentFamilyType familyType() const = 0;
 
 	/**
 	 * \brief Create the actual component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
 	virtual Component* makeComponent() = 0;
+
+	/**
+	 * \brief (Re)set this component template's members to their default values.
+	 */
+	virtual void reset() = 0;
 
 	///TypedObject semantics: hardcoded
 public:

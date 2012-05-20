@@ -22,6 +22,7 @@
  */
 
 #include "Game/ObjectTemplateManager.h"
+#include "Game/ComponentTemplateManager.h"
 
 ObjectTemplateManager::ObjectTemplateManager()
 {
@@ -87,7 +88,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	}
 	ObjectTemplate* objectTmpl = (*it1).second.p();
 	//create the new object
-	ObjectId newId = ObjectId(objectType) + ObjectId(getObjectId());
+	ObjectId newId = ObjectId(objectType) + ObjectId(getId());
 	Object* newObj = new Object(newId);
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
@@ -96,7 +97,11 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	ObjectTemplate::ComponentTemplateList::iterator it2;
 	for (it2 = compTmplList.begin(); it2 != compTmplList.end(); ++it2)
 	{
-		Component* newComp = (*it2)->makeComponent();
+		//use ComponentTemplateManager to create component
+		ComponentType compId = (*it2)->componentType();
+		Component* newComp =
+				ComponentTemplateManager::GetSingleton().createComponent(
+						compId);
 		//set the component into the object
 		newObj->addComponent(newComp);
 	}
@@ -104,7 +109,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	return newObj;
 }
 
-IdType ObjectTemplateManager::getObjectId()
+IdType ObjectTemplateManager::getId()
 {
 	return ++id;
 }

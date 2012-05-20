@@ -45,8 +45,8 @@ public:
 	Model(ModelTemplate* tmpl);
 	virtual ~Model();
 
-	const virtual ComponentFamilyId familyID() const;
-	const virtual ComponentId componentID() const;
+	const virtual ComponentFamilyType familyType() const;
+	const virtual ComponentType componentType() const;
 
 	virtual void update();
 	virtual void initialize();

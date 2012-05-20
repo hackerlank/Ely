@@ -55,27 +55,34 @@ public:
 	 * @param componentID The component type.
 	 * @return True if the component template existed, false otherwise.
 	 */
-	bool removeComponentTemplate(ComponentId componentID);
+	bool removeComponentTemplate(ComponentType componentID);
 
 	/**
 	 * \brief Get the component template given the component type it can create.
 	 * @param componentID The component type.
 	 * @return The component template.
 	 */
-	ComponentTemplate* getComponentTemplate(ComponentId componentID);
+	ComponentTemplate* getComponentTemplate(ComponentType componentID);
 
 	/**
 	 * \brief Create a component given its type.
 	 * @param componentID The component type.
 	 * @return The just created component, or NULL on failure (for any reason).
 	 */
-	Component* createComponent(ComponentId componentID);
+	Component* createComponent(ComponentType componentID);
+
+	/**
+	 * \brief Return an unique id for created components.
+	 * @return
+	 */
+	IdType getId();
 
 private:
 	///Table of component templates indexed by component type.
-	typedef std::map<const ComponentId, PT(ComponentTemplate)> ComponentTemplateTable;
+	typedef std::map<const ComponentType, PT(ComponentTemplate)> ComponentTemplateTable;
 	ComponentTemplateTable mComponentTemplates;
-
+	///The unique id for created components.
+	IdType id;
 };
 
 #endif /* COMPONENTTEMPLATEMANAGER_H_ */

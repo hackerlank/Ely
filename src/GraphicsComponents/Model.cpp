@@ -39,14 +39,14 @@ Model::~Model()
 	mNodePath.remove_node();
 }
 
-const ComponentFamilyId Model::familyID() const
+const ComponentFamilyType Model::familyType() const
 {
-	return ComponentFamilyId("Graphics");
+	return ComponentFamilyType("Graphics");
 }
 
-const ComponentId Model::componentID() const
+const ComponentType Model::componentType() const
 {
-	return ComponentId("Model");
+	return ComponentType("Model");
 }
 
 NodePath& Model::nodePath()

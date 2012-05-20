@@ -25,39 +25,9 @@
 #define OBJECTTEMPLATEMANAGER_H_
 
 #include <map>
-#include <string>
-#include <sstream>
-#include <nodePath.h>
-#include <pandaFramework.h>
-#include <windowFramework.h>
-#include <pointerTo.h>
 #include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
-#include "ComponentTemplateManager.h"
-
-/**
- * \brief Type of the generated object counter.
- */
-struct IdType
-{
-	unsigned long int i;
-	IdType() :
-			i(0)
-	{
-	}
-	IdType& operator ++()
-	{
-		++i;
-		return *this;
-	}
-	operator std::string()
-	{
-		std::ostringstream oStringI;
-		oStringI << i;
-		return oStringI.str();
-	}
-};
 
 /**
  * \brief Singleton template manager that stores all the object templates.
@@ -117,7 +87,7 @@ public:
 	 * \brief Return an unique id for created objects.
 	 * @return
 	 */
-	IdType getObjectId();
+	IdType getId();
 
 private:
 	///Table of object templates indexed by their name.

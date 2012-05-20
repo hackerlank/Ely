@@ -28,6 +28,7 @@
 #include <utility>
 #include <exception>
 #include <string>
+#include <sstream>
 #include <cassert>
 
 /**
@@ -115,6 +116,29 @@ public:
 };
 
 template<typename T> T* Singleton<T>::ms_Singleton = 0;
+
+/**
+ * \brief Type of the generated object counter.
+ */
+struct IdType
+{
+	unsigned long int i;
+	IdType() :
+			i(0)
+	{
+	}
+	IdType& operator ++()
+	{
+		++i;
+		return *this;
+	}
+	operator std::string()
+	{
+		std::ostringstream oStringI;
+		oStringI << i;
+		return oStringI.str();
+	}
+};
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();

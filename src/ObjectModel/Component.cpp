@@ -42,6 +42,13 @@ void Component::initialize()
 {
 }
 
+ComponentId& Component::componentId()
+{
+	return mComponentId;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle Component::_type_handle;
+
+
 

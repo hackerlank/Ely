@@ -32,7 +32,7 @@ PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 				"ComponentTemplateManager::addComponentTemplate: NULL Component template");
 	}
 	PT(ComponentTemplate) previousCompTmpl(NULL);
-	ComponentId componentId = componentTmpl->componentID();
+	ComponentType componentId = componentTmpl->componentType();
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
 	if (it != mComponentTemplates.end())
 	{
@@ -45,7 +45,8 @@ PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 	return previousCompTmpl;
 }
 
-bool ComponentTemplateManager::removeComponentTemplate(ComponentId componentID)
+bool ComponentTemplateManager::removeComponentTemplate(
+		ComponentType componentID)
 {
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
 	if (it == mComponentTemplates.end())
@@ -57,7 +58,7 @@ bool ComponentTemplateManager::removeComponentTemplate(ComponentId componentID)
 }
 
 ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
-		ComponentId componentID)
+		ComponentType componentID)
 {
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
 	if (it == mComponentTemplates.end())
@@ -67,12 +68,25 @@ ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
 	return (*it).second;
 }
 
-Component* ComponentTemplateManager::createComponent(ComponentId componentID)
+Component* ComponentTemplateManager::createComponent(
+		ComponentType componentType)
 {
-	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(
+			componentType);
 	if (it == mComponentTemplates.end())
 	{
 		return NULL;
 	}
-	return (*it).second->makeComponent();
+	//new unique id
+	ComponentId newId = ComponentId(componentType) + ComponentId(getId());
+	//create component
+	Component* newComp = (*it).second->makeComponent();
+	//set unique id
+	newComp->componentId() = newId;
+	return newComp;
+}
+
+IdType ComponentTemplateManager::getId()
+{
+	return ++id;
 }

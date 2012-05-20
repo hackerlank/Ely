@@ -85,7 +85,7 @@ public:
 	 * @return The component template, NULL if it doesn't exist.
 	 */
 	ComponentTemplate* getComponentTemplate(
-			const ComponentId& componentId);
+			const ComponentType& componentId);
 
 private:
 	///Name identifying this object template.
@@ -96,14 +96,14 @@ private:
 
 struct idIsEqualTo
 {
-	idIsEqualTo(const ComponentId& compId) :
+	idIsEqualTo(const ComponentType& compId) :
 			mComponentID(compId)
 	{
 	}
-	ComponentId mComponentID;
+	ComponentType mComponentID;
 	bool operator()(const ComponentTemplate* componentTmpl)
 	{
-		return componentTmpl->componentID() == mComponentID;
+		return componentTmpl->componentType() == mComponentID;
 	}
 };
 

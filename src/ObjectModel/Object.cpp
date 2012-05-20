@@ -43,7 +43,7 @@ void Object::clearComponents()
 	mComponents.clear();
 }
 
-Component* Object::getComponent(const ComponentFamilyId& familyID)
+Component* Object::getComponent(const ComponentFamilyType& familyID)
 {
 	ComponentTable::iterator it = mComponents.find(familyID);
 	if (it == mComponents.end())
@@ -60,7 +60,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 		throw GameException("Object::setComponent: NULL new Component");
 	}
 	PT(Component) previousComp(NULL);
-	ComponentFamilyId familyId = newComponent->familyID();
+	ComponentFamilyType familyId = newComponent->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())
 	{
