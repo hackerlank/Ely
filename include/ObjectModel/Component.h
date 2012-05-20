@@ -82,7 +82,7 @@ public:
 	 *
 	 * This can be done after creation but "before" insertion into an object.
 	 */
-	virtual void initialize();
+	virtual bool initialize();
 	/**
 	 * \brief Get a reference to the owner object.
 	 * \return The owner object.

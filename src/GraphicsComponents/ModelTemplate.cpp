@@ -36,6 +36,8 @@ ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 	}
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
+	mModelFile = Filename("");
+	mAnimFiles.clear();
 	mParent = NodePath();
 	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
 	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
@@ -56,10 +58,14 @@ const ComponentFamilyType ModelTemplate::familyType() const
 	return ComponentFamilyType("Graphics");
 }
 
-Component* ModelTemplate::makeComponent()
+Component* ModelTemplate::makeComponent(ComponentId& compId)
 {
 	Model* newModel = new Model(this);
-	newModel->initialize();
+	newModel->componentId() = compId;
+	if (not newModel->initialize())
+	{
+		return NULL;
+	}
 	return newModel;
 }
 

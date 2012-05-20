@@ -55,7 +55,7 @@ public:
 	 * \brief Create the actual component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
-	virtual Component* makeComponent() = 0;
+	virtual Component* makeComponent(ComponentId& compId) = 0;
 
 	/**
 	 * \brief (Re)set this component template's members to their default values.

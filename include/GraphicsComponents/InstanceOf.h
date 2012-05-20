@@ -15,36 +15,27 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GraphicsComponents/Model.h
+ * \file /Ely/include/GraphicsComponents/InstanceOf.h
  *
- * \date 15/mag/2012 (15:32:23)
+ * \date 20/mag/2012 (09:42:38)
  * \author marco
  */
 
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef INSTANCEOF_H_
+#define INSTANCEOF_H_
 
-#include <string>
-#include <list>
 #include <nodePath.h>
-#include <animControlCollection.h>
-#include <auto_bind.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 
-class ModelTemplate;
+class InstanceOfTemplate;
 
-/**
- * \brief Component representing the graphics structure of an object.
- *
- * It contains the references to the model and animations of the object.
- */
-class Model: public Component
+class InstanceOf: public Component
 {
 public:
-	Model();
-	Model(ModelTemplate* tmpl);
-	virtual ~Model();
+	InstanceOf();
+	InstanceOf(InstanceOfTemplate* tmpl);
+	virtual ~InstanceOf();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -58,15 +49,11 @@ public:
 	 */
 	operator NodePath();
 
-	AnimControlCollection& animations();
-
 private:
 	///The template used to construct this component.
-	ModelTemplate* mTmpl;
+	InstanceOfTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
-	///The list of animations associated with this model.
-	AnimControlCollection mAnimations;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -77,7 +64,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "Model", Component::get_class_type());
+		register_type(_type_handle, "InstanceOf", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -91,6 +78,7 @@ public:
 
 private:
 	static TypeHandle _type_handle;
+
 };
 
-#endif /* MODEL_H_ */
+#endif /* INSTANCEOF_H_ */

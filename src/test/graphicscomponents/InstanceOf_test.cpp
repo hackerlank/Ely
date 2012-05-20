@@ -15,41 +15,11 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/ObjectModel/Component.cpp
+ * \file /Ely/src/test/graphicscomponents/InstanceOf_test.cpp
  *
- * \date 09/mag/2012 (16:09:17)
+ * \date 20/mag/2012 (09:42:38)
  * \author marco
  */
 
-#include "ObjectModel/Component.h"
-
-Component::Component()
-{
-	// TODO Auto-generated constructor stub
-
-}
-
-void Component::update()
-{
-}
-
-Object*& Component::ownerObject()
-{
-	return mOwnerObject;
-}
-
-bool Component::initialize()
-{
-	return true;
-}
-
-ComponentId& Component::componentId()
-{
-	return mComponentId;
-}
-
-//TypedObject semantics: hardcoded
-TypeHandle Component::_type_handle;
-
-
+#include "../../../include/GraphicsComponents/InstanceOf.h"
 

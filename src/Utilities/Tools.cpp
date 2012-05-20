@@ -30,4 +30,6 @@ void initTypedObjects()
 	ComponentTemplate::init_type();
 	Model::init_type();
 	ModelTemplate::init_type();
+	InstanceOf::init_type();
+	InstanceOfTemplate::init_type();
 }

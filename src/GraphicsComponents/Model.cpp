@@ -68,15 +68,25 @@ void Model::update()
 {
 }
 
-void Model::initialize()
+bool Model::initialize()
 {
+	bool result = true;
 	//setup model and animations
 	mNodePath = mTmpl->windowFramework()->load_model(
 			mTmpl->pandaFramework()->get_models(), mTmpl->modelFile());
+	if (mNodePath.is_empty())
+	{
+		result = false;
+	}
 	std::list<Filename>::iterator it;
 	for (it = mTmpl->animFiles().begin(); it != mTmpl->animFiles().end(); ++it)
 	{
-		mTmpl->windowFramework()->load_model(mNodePath, *it);
+		NodePath resultNP;
+		resultNP = mTmpl->windowFramework()->load_model(mNodePath, *it);
+		if (resultNP.is_empty())
+		{
+			result = false;
+		}
 		auto_bind(mNodePath.node(), mAnimations);
 	}
 	//setup initial state
@@ -86,6 +96,7 @@ void Model::initialize()
 	}
 	mNodePath.set_pos(mTmpl->initPosition());
 	mNodePath.set_hpr(mTmpl->initOrientation());
+	return result;
 }
 
 //TypedObject semantics: hardcoded

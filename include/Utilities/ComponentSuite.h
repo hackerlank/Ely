@@ -30,6 +30,8 @@
 /// List of all components and component templates
 #include "GraphicsComponents/Model.h"
 #include "GraphicsComponents/ModelTemplate.h"
+#include "GraphicsComponents/InstanceOf.h"
+#include "GraphicsComponents/InstanceOfTemplate.h"
 
 
 #endif /* COMPONENTSUITE_H_ */

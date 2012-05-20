@@ -96,14 +96,14 @@ private:
 
 struct idIsEqualTo
 {
-	idIsEqualTo(const ComponentType& compId) :
-			mComponentID(compId)
+	idIsEqualTo(const ComponentType& compType) :
+			mComponentType(compType)
 	{
 	}
-	ComponentType mComponentID;
+	ComponentType mComponentType;
 	bool operator()(const ComponentTemplate* componentTmpl)
 	{
-		return componentTmpl->componentType() == mComponentID;
+		return componentTmpl->componentType() == mComponentType;
 	}
 };
 

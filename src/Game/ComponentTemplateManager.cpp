@@ -78,11 +78,9 @@ Component* ComponentTemplateManager::createComponent(
 		return NULL;
 	}
 	//new unique id
-	ComponentId newId = ComponentId(componentType) + ComponentId(getId());
+	ComponentId newCompId = ComponentId(componentType) + ComponentId(getId());
 	//create component
-	Component* newComp = (*it).second->makeComponent();
-	//set unique id
-	newComp->componentId() = newId;
+	Component* newComp = (*it).second->makeComponent(newCompId);
 	return newComp;
 }
 
