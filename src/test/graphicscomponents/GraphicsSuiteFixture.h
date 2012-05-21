@@ -24,7 +24,24 @@
 #ifndef GRAPHICSSUITEFIXTURE_H_
 #define GRAPHICSSUITEFIXTURE_H_
 
+#include <pandaFramework.h>
+#include <windowFramework.h>
 
+struct GraphicsSuiteFixture
+{
+	GraphicsSuiteFixture()
+	{
+		mPandaFrmwk = new PandaFramework();
+		mWindowFrmwk = mPandaFrmwk->open_window();
+	}
 
+	~GraphicsSuiteFixture()
+	{
+		delete mWindowFrmwk;
+		delete mPandaFrmwk;
+	}
+	PandaFramework* mPandaFrmwk;
+	WindowFramework* mWindowFrmwk;
+};
 
 #endif /* GRAPHICSSUITEFIXTURE_H_ */

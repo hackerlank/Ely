@@ -44,7 +44,7 @@ typedef std::string ObjectId;
  * \brief The object is the basic entity that can exist in the game world.
  *
  * Because Panda3d is used as game engine, a object should
- * "compose" the different aspects (visualization, sound, ai,
+ * "compose" the different aspects (graphics, sound, ai,
  * physics, animation, etc...), already existing in Panda3d.
  * An object can have only one component of a given family.
  * Each object has a NodePath embedded.
@@ -95,7 +95,15 @@ public:
 	 */
 	ObjectId& objectId();
 
+	NodePath& nodePath();
+	/**
+	 * \brief NodePath conversion function.
+	 */
+	operator NodePath();
+
 private:
+	///The NodePath associated to this object.
+	NodePath mNodePath;
 	///Unique identifier for this object.
 	ObjectId mObjectId;
 	///Table of all components indexed by component family type.

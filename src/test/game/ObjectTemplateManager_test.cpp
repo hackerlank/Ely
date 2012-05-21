@@ -22,4 +22,30 @@
  */
 
 #include "Game/ObjectTemplateManager.h"
+#include <boost/test/unit_test.hpp>
+#include "GameSuiteFixture.h"
+
+struct ObjectTemplateManagerTestCaseFixture
+{
+	ObjectTemplateManagerTestCaseFixture()
+	{
+		// TODO
+	}
+
+	~ObjectTemplateManagerTestCaseFixture()
+	{
+		// TODO
+	}
+};
+
+/// Game suite
+BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
+
+/// Test cases
+BOOST_FIXTURE_TEST_CASE(ObjectTemplateManager, ObjectTemplateManagerTestCaseFixture)
+{
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Game suite
 

@@ -22,4 +22,31 @@
  */
 
 #include "GraphicsComponents/Model.h"
+#include <boost/test/unit_test.hpp>
+#include "GraphicsSuiteFixture.h"
+
+struct ModelTestCaseFixture
+{
+	ModelTestCaseFixture()
+	{
+		// TODO
+	}
+
+	~ModelTestCaseFixture()
+	{
+		// TODO
+	}
+};
+
+/// Graphics suite
+BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
+
+/// Test cases
+BOOST_FIXTURE_TEST_CASE(Model, ModelTestCaseFixture)
+{
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Graphics suite
+
 

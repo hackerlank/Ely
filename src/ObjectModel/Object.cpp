@@ -74,3 +74,14 @@ PT(Component) Object::addComponent(Component* newComponent)
 	mComponents[familyId] = PT(Component)(newComponent);
 	return previousComp;
 }
+
+NodePath& Object::nodePath()
+{
+	return mNodePath;
+}
+
+Object::operator NodePath()
+{
+	return mNodePath;
+}
+

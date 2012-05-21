@@ -99,7 +99,7 @@ void GameManager::setup()
 	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("InstancedActor"));
 
-	// play with created objects
+	// Create the scene graph
 	//mPandaObj
 	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
 					ComponentFamilyType("Graphics")));

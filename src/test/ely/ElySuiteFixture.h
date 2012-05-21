@@ -24,20 +24,17 @@
 #ifndef ELYSUITEFIXTURE_H_
 #define ELYSUITEFIXTURE_H_
 
-//#include <climits>
-//
-//struct MathSuiteFixture
-//{
-//	MathSuiteFixture()
-//	{
-//		// TODO
-//	}
-//
-//	~MathSuiteFixture()
-//	{
-//		// TODO
-//	}
-//	static const ely::Real tolerance;
-//};
+struct ElySuiteFixture
+{
+	ElySuiteFixture()
+	{
+		// TODO
+	}
+
+	~ElySuiteFixture()
+	{
+		// TODO
+	}
+};
 
 #endif /* ELYSUITEFIXTURE_H_ */

@@ -22,4 +22,31 @@
  */
 
 #include "Support/FirstPersonCamera.h"
+#include <boost/test/unit_test.hpp>
+#include "SupportSuiteFixture.h"
+
+struct FirstPersonCameraTestCaseFixture
+{
+	FirstPersonCameraTestCaseFixture()
+	{
+		// TODO
+	}
+
+	~FirstPersonCameraTestCaseFixture()
+	{
+		// TODO
+	}
+};
+
+/// Support suite
+BOOST_FIXTURE_TEST_SUITE(Support, SupportSuiteFixture)
+
+/// Test cases
+BOOST_FIXTURE_TEST_CASE(FirstPersonCamera, FirstPersonCameraTestCaseFixture)
+{
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Support suite
+
 

@@ -21,5 +21,32 @@
  * \author marco
  */
 
-#include "../../../include/GraphicsComponents/InstanceOf.h"
+#include "GraphicsComponents/InstanceOf.h"
+#include <boost/test/unit_test.hpp>
+#include "GraphicsSuiteFixture.h"
+
+struct InstanceOfTestCaseFixture
+{
+	InstanceOfTestCaseFixture()
+	{
+		// TODO
+	}
+
+	~InstanceOfTestCaseFixture()
+	{
+		// TODO
+	}
+};
+
+/// Graphics suite
+BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
+
+/// Test cases
+BOOST_FIXTURE_TEST_CASE(InstanceOf, InstanceOfTestCaseFixture)
+{
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Graphics suite
+
 

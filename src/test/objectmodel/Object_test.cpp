@@ -25,27 +25,40 @@
 #include <boost/test/unit_test.hpp>
 #include "ObjectModelSuiteFixture.h"
 
-struct ObjectTestCaseFixture
+struct ObjectTestCaseFixture: public ObjectModelSuiteFixture
 {
 	ObjectTestCaseFixture()
 	{
-		// TODO
+//		mModelTmpl = new ModelTemplate(mPandaFrmwk, mWindowFrmwk);
+//		mModel = new Model(mModelTmpl);
+//		mObject = new Object(ObjectId("Test1Object"));
 	}
 
 	~ObjectTestCaseFixture()
 	{
-		// TODO
+//		delete mObject;
+//		delete mModel;
+//		delete mModelTmpl;
 	}
+//	Model* mModel;
+//	ModelTemplate* mModelTmpl;
+//	Object* mObject;
 };
 
-//// ObjectModelSuiteFixture suite
-//BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
-//
-//// Test cases
-//BOOST_FIXTURE_TEST_CASE(Object, ObjectTestCaseFixture)
-//{
-//	BOOST_CHECK(true);
-//	BOOST_CHECK_CLOSE(true);
-//}
-//
-//BOOST_AUTO_TEST_SUITE_END() // ObjectModelSuiteFixture suite
+/// ObjectModel suite
+BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
+
+/// Test cases
+BOOST_FIXTURE_TEST_CASE(ObjectConstructor, ObjectTestCaseFixture)
+{
+//	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
+//	BOOST_CHECK(mObject->nodePath().is_empty());
+}
+
+BOOST_FIXTURE_TEST_CASE(ObjectComponents, ObjectTestCaseFixture)
+{
+//	mObject->addComponent(mModel);
+//	BOOST_CHECK(mObject->);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

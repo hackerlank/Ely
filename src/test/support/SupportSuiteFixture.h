@@ -24,7 +24,17 @@
 #ifndef SUPPORTSUITEFIXTURE_H_
 #define SUPPORTSUITEFIXTURE_H_
 
+struct SupportSuiteFixture
+{
+	SupportSuiteFixture()
+	{
+		// TODO
+	}
 
-
+	~SupportSuiteFixture()
+	{
+		// TODO
+	}
+};
 
 #endif /* SUPPORTSUITEFIXTURE_H_ */

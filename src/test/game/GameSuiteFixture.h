@@ -24,7 +24,17 @@
 #ifndef GAMESUITEFIXTURE_H_
 #define GAMESUITEFIXTURE_H_
 
+struct GameSuiteFixture
+{
+	GameSuiteFixture()
+	{
+		// TODO
+	}
 
-
+	~GameSuiteFixture()
+	{
+		// TODO
+	}
+};
 
 #endif /* GAMESUITEFIXTURE_H_ */

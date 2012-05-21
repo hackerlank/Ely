@@ -129,7 +129,9 @@
 									<listOptionValue builtIn="false" value="pandabullet"/>
 									<listOptionValue builtIn="false" value="boost_unit_test_framework"/>
 								</option>
-								<option id="gnu.cpp.link.option.paths.1860723394" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths"/>
+								<option id="gnu.cpp.link.option.paths.1860723394" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/usr/lib/panda3d"/>
+								</option>
 								<option id="gnu.cpp.link.option.flags.159163397" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.1488360655" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
