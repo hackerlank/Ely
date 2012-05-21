@@ -140,7 +140,7 @@ AsyncTask::DoneStatus GameManager::gameTask(GenericAsyncTask* task, void * data)
 AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 10.0)
+	if (timeElapsed < 1.0)
 	{
 		std::cout << "firstTask " << timeElapsed << std::endl;
 		return AsyncTask::DS_cont;
@@ -188,11 +188,11 @@ void GameManager::setupObjTmplMgr()
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 10.0)
+	if (timeElapsed < 1.0)
 	{
 		return AsyncTask::DS_cont;
 	}
-	else if (timeElapsed < 20.0)
+	else if (timeElapsed < 2.0)
 	{
 		std::cout << "secondTask " << timeElapsed << std::endl;
 		return AsyncTask::DS_cont;

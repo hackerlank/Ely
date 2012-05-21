@@ -25,24 +25,23 @@
 #include <boost/test/unit_test.hpp>
 #include "ObjectModelSuiteFixture.h"
 
-struct ObjectTestCaseFixture: public ObjectModelSuiteFixture
+#include "GraphicsComponents/Model.h"
+
+struct ObjectTestCaseFixture
 {
 	ObjectTestCaseFixture()
 	{
-//		mModelTmpl = new ModelTemplate(mPandaFrmwk, mWindowFrmwk);
-//		mModel = new Model(mModelTmpl);
-//		mObject = new Object(ObjectId("Test1Object"));
+		mObject = new Object(ObjectId("TestObject"));
+		mModel = new Model();
 	}
 
 	~ObjectTestCaseFixture()
 	{
-//		delete mObject;
-//		delete mModel;
-//		delete mModelTmpl;
+		delete mModel;
+		delete mObject;
 	}
-//	Model* mModel;
-//	ModelTemplate* mModelTmpl;
-//	Object* mObject;
+	Object* mObject;
+	Model* mModel;
 };
 
 /// ObjectModel suite
@@ -51,14 +50,20 @@ BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ObjectConstructor, ObjectTestCaseFixture)
 {
-//	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
-//	BOOST_CHECK(mObject->nodePath().is_empty());
+	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
+	BOOST_CHECK(mObject->numComponents() == 0);
+	BOOST_CHECK(mObject->nodePath().is_empty());
 }
 
 BOOST_FIXTURE_TEST_CASE(ObjectComponents, ObjectTestCaseFixture)
 {
 //	mObject->addComponent(mModel);
-//	BOOST_CHECK(mObject->);
+//	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
+//	BOOST_CHECK(mObject->numComponents() == 1);
+//	mObject->addComponent(mModel);
+//	BOOST_CHECK(mObject->numComponents() == 1);
+//	mObject->clearComponents();
+	BOOST_CHECK(mObject->numComponents() == 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

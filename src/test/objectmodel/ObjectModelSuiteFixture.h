@@ -24,19 +24,15 @@
 #ifndef OBJECTMODELSUITEFIXTURE_H_
 #define OBJECTMODELSUITEFIXTURE_H_
 
-
 struct ObjectModelSuiteFixture
 {
 	ObjectModelSuiteFixture()
 	{
-
 	}
 
 	~ObjectModelSuiteFixture()
 	{
-
 	}
-
 };
 
 #endif /* OBJECTMODELSUITEFIXTURE_H_ */

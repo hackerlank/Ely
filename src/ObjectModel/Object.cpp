@@ -50,7 +50,7 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 	{
 		return NULL;
 	}
-	return (*it).second;
+	return (*it).second.p();
 }
 
 PT(Component) Object::addComponent(Component* newComponent)
@@ -59,7 +59,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 	{
 		throw GameException("Object::setComponent: NULL new Component");
 	}
-	PT(Component) previousComp(NULL);
+	PT(Component) previousComp = NULL;
 	ComponentFamilyType familyId = newComponent->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())
@@ -78,6 +78,11 @@ PT(Component) Object::addComponent(Component* newComponent)
 NodePath& Object::nodePath()
 {
 	return mNodePath;
+}
+
+unsigned int Object::numComponents()
+{
+	return static_cast<unsigned int>(mComponents.size());
 }
 
 Object::operator NodePath()

@@ -90,6 +90,12 @@ public:
 	void clearComponents();
 
 	/**
+	 * \brief Return the number of components.
+	 * @return The number of components.
+	 */
+	unsigned int numComponents();
+
+	/**
 	 * \brief Get a reference to the id of this object.
 	 * @return The id of this object.
 	 */
