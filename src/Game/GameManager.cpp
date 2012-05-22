@@ -98,17 +98,17 @@ void GameManager::setup()
 
 	// Create the scene graph
 	//mPandaObj
-	((NodePath*) mPandaObj.p())->set_hpr(-90, 0, 0);
-	((NodePath*) mPandaObj.p())->reparent_to(mWindow->get_render());
+	((NodePath) (*mPandaObj)).set_hpr(-90, 0, 0);
+	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
 	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
 					ComponentFamilyType("Graphics")));
 	pandaObjModel->animations().loop("panda_soft", false);
 
 	//mPandaInstObj
-	((NodePath*) mPandaInstObj.p())->set_hpr(-90, 0, 0);
-	((NodePath*) mPandaInstObj.p())->set_pos(-10, 0, 0);
-	((NodePath*) mPandaInstObj.p())->reparent_to(mWindow->get_render());
-	((NodePath*) mPandaInstObj.p())->instance_to(*mPandaObj);
+	((NodePath) (*mPandaInstObj)).set_hpr(-90, 0, 0);
+	((NodePath) (*mPandaInstObj)).set_pos(-10, 0, 0);
+	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
+	((NodePath) (*mPandaObj)).instance_to(*mPandaInstObj);
 
 	PT(InstanceOf) pandaObjInstanceOf =
 			DCAST(InstanceOf, mPandaInstObj->getComponent(
@@ -130,23 +130,6 @@ void GameManager::setup()
 			reinterpret_cast<void*>(m2ndTask.p()));
 	get_task_mgr().add(task);
 
-}
-
-AsyncTask::DoneStatus GameManager::gameTask(GenericAsyncTask* task, void * data)
-{
-	GameTaskData* appData = reinterpret_cast<GameTaskData*>(data);
-	return ((appData->first())->*(appData->second()))(task);
-}
-
-AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
-{
-	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 1.0)
-	{
-		std::cout << "firstTask " << timeElapsed << std::endl;
-		return AsyncTask::DS_cont;
-	}
-	return AsyncTask::DS_done;
 }
 
 void GameManager::setupCompTmplMgr()
@@ -186,14 +169,32 @@ void GameManager::setupObjTmplMgr()
 
 }
 
+AsyncTask::DoneStatus GameManager::gameTask(GenericAsyncTask* task, void * data)
+{
+	GameTaskData* appData = reinterpret_cast<GameTaskData*>(data);
+	return ((appData->first())->*(appData->second()))(task);
+}
+
+AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
+{
+	double timeElapsed = mGlobalClock->get_real_time();
+	if (timeElapsed < 5.0)
+	{
+		std::cout << "firstTask " << timeElapsed << std::endl;
+		return AsyncTask::DS_cont;
+	}
+	return AsyncTask::DS_done;
+}
+
+
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 1.0)
+	if (timeElapsed < 5.0)
 	{
 		return AsyncTask::DS_cont;
 	}
-	else if (timeElapsed < 2.0)
+	else if (timeElapsed < 5.0)
 	{
 		std::cout << "secondTask " << timeElapsed << std::endl;
 		return AsyncTask::DS_cont;
