@@ -43,6 +43,10 @@ bool Component::initialize()
 	return true;
 }
 
+void Component::onAddSetup()
+{
+}
+
 ComponentId& Component::componentId()
 {
 	return mComponentId;

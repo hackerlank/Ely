@@ -102,7 +102,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 		Component* newComp =
 				ComponentTemplateManager::GetSingleton().createComponent(
 						compId);
-		//set the component into the object
+		//add the component into the object
 		newObj->addComponent(newComp);
 	}
 	//

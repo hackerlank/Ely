@@ -58,15 +58,19 @@ bool InstanceOf::initialize()
 {
 	//setup initial state
 	mNodePath = NodePath(mComponentId);
-	mNodePath.set_scale(mTmpl->initScaling());
-	mNodePath.set_pos(mTmpl->initPosition());
-	mNodePath.set_hpr(mTmpl->initOrientation());
 	return true;
 }
 
 NodePath& InstanceOf::nodePath()
 {
 	return mNodePath;
+}
+
+void InstanceOf::onAddSetup()
+{
+	//set the node path of the object to the
+	//node path of this model
+	mOwnerObject->nodePath() = mNodePath;
 }
 
 InstanceOf::operator NodePath()

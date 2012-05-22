@@ -54,10 +54,6 @@ public:
 	PandaFramework*& pandaFramework();
 	WindowFramework*& windowFramework();
 
-	LVecBase3& initOrientation();
-	LVecBase3& initPosition();
-	LVecBase3& initScaling();
-
 private:
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
@@ -67,12 +63,6 @@ private:
 	Filename mModelFile;
 	///The name of the file containing the animations.
 	std::list<Filename> mAnimFiles;
-	///Initial position.
-	LVecBase3 mInitPosition;
-	///Initial orientation.
-	LVecBase3 mInitOrientation;
-	///Initial scaling.
-	LVecBase3 mInitScaling;
 
 	///TypedObject semantics: hardcoded
 public:

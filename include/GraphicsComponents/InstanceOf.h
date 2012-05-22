@@ -42,6 +42,7 @@ public:
 
 	virtual void update();
 	virtual bool initialize();
+	virtual void onAddSetup();
 
 	NodePath& nodePath();
 	/**

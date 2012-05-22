@@ -26,9 +26,6 @@
 
 InstanceOfTemplate::InstanceOfTemplate()
 {
-	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
-	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
-	mInitScaling = LVecBase3(1.0, 1.0, 1.0);
 }
 
 InstanceOfTemplate::~InstanceOfTemplate()
@@ -59,24 +56,6 @@ Component* InstanceOfTemplate::makeComponent(ComponentId& compId)
 
 void InstanceOfTemplate::reset()
 {
-	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
-	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
-	mInitScaling = LVecBase3(1.0, 1.0, 1.0);
-}
-
-LVecBase3& InstanceOfTemplate::initOrientation()
-{
-	return mInitOrientation;
-}
-
-LVecBase3& InstanceOfTemplate::initPosition()
-{
-	return mInitPosition;
-}
-
-LVecBase3& InstanceOfTemplate::initScaling()
-{
-	return mInitScaling;
 }
 
 //TypedObject semantics: hardcoded

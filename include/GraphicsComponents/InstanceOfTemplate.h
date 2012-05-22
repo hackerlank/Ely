@@ -43,17 +43,7 @@ public:
 
 	virtual void reset();
 
-	LVecBase3& initOrientation();
-	LVecBase3& initPosition();
-	LVecBase3& initScaling();
-
 private:
-	///Initial position.
-	LVecBase3 mInitPosition;
-	///Initial orientation.
-	LVecBase3 mInitOrientation;
-	///Initial scaling.
-	LVecBase3 mInitScaling;
 
 	///TypedObject semantics: hardcoded
 public:

@@ -77,7 +77,6 @@ void GameManager::setup()
 	//a3) ...customize it as needed (e.g. in data driven manner)
 	modelTmpl->modelFile() = Filename("panda");
 	modelTmpl->animFiles().push_back(Filename("panda-walk"));
-	modelTmpl->initOrientation() = LVecBase3(-90, 0, 0);
 	//b1) get the next component template... (and so on)
 	//1st object (Panda: "Actor"): create the object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
@@ -92,8 +91,6 @@ void GameManager::setup()
 	//a2) ...reset it to its default state...
 	instanceOfTmpl->reset();
 	//a3) ...customize it as needed (e.g. in data driven manner)
-	instanceOfTmpl->initOrientation() = LVecBase3(-90, 0, 0);
-	instanceOfTmpl->initPosition() = LVecBase3(-10, 0, 0);
 	//b1) get the next component template... (and so on)
 	//2nd object (PandaI: "InstancedActor"): create the object
 	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
@@ -101,17 +98,21 @@ void GameManager::setup()
 
 	// Create the scene graph
 	//mPandaObj
+	((NodePath*) mPandaObj.p())->set_hpr(-90, 0, 0);
+	((NodePath*) mPandaObj.p())->reparent_to(mWindow->get_render());
 	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
 					ComponentFamilyType("Graphics")));
-	pandaObjModel->nodePath().reparent_to(mWindow->get_render());
 	pandaObjModel->animations().loop("panda_soft", false);
+
 	//mPandaInstObj
+	((NodePath*) mPandaInstObj.p())->set_hpr(-90, 0, 0);
+	((NodePath*) mPandaInstObj.p())->set_pos(-10, 0, 0);
+	((NodePath*) mPandaInstObj.p())->reparent_to(mWindow->get_render());
+	((NodePath*) mPandaInstObj.p())->instance_to(*mPandaObj);
+
 	PT(InstanceOf) pandaObjInstanceOf =
 			DCAST(InstanceOf, mPandaInstObj->getComponent(
 							ComponentFamilyType("Graphics")));
-	pandaObjInstanceOf->nodePath().reparent_to(mWindow->get_render());
-	pandaObjModel->nodePath().instance_to(pandaObjInstanceOf->nodePath());
-
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());

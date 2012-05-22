@@ -38,9 +38,6 @@ ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 	mWindowFramework = windowFramework;
 	mModelFile = Filename("");
 	mAnimFiles.clear();
-	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
-	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
-	mInitScaling = LVecBase3(1.0, 1.0, 1.0);
 }
 
 ModelTemplate::~ModelTemplate()
@@ -93,24 +90,6 @@ void ModelTemplate::reset()
 {
 	mModelFile = Filename("");
 	mAnimFiles.clear();
-	mInitPosition = LVecBase3(0.0, 0.0, 0.0);
-	mInitOrientation = LVecBase3(0.0, 0.0, 0.0);
-	mInitScaling = LVecBase3(1.0, 1.0, 1.0);
-}
-
-LVecBase3& ModelTemplate::initOrientation()
-{
-	return mInitOrientation;
-}
-
-LVecBase3& ModelTemplate::initPosition()
-{
-	return mInitPosition;
-}
-
-LVecBase3& ModelTemplate::initScaling()
-{
-	return mInitScaling;
 }
 
 //TypedObject semantics: hardcoded

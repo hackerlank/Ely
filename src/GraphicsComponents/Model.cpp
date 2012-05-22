@@ -36,7 +36,6 @@ Model::Model(ModelTemplate* tmpl) :
 
 Model::~Model()
 {
-	mNodePath.remove_node();
 }
 
 const ComponentFamilyType Model::familyType() const
@@ -57,6 +56,13 @@ NodePath& Model::nodePath()
 Model::operator NodePath()
 {
 	return mNodePath;
+}
+
+void Model::onAddSetup()
+{
+	//set the node path of the object to the
+	//node path of this model
+	mOwnerObject->nodePath() = mNodePath;
 }
 
 AnimControlCollection& Model::animations()
@@ -89,10 +95,6 @@ bool Model::initialize()
 		}
 		auto_bind(mNodePath.node(), mAnimations);
 	}
-	//setup initial state
-	mNodePath.set_scale(mTmpl->initScaling());
-	mNodePath.set_pos(mTmpl->initPosition());
-	mNodePath.set_hpr(mTmpl->initOrientation());
 	return result;
 }
 

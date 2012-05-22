@@ -31,6 +31,7 @@ Object::Object(const ObjectId& objectId)
 
 Object::~Object()
 {
+	mNodePath.remove_node();
 }
 
 ObjectId& Object::objectId()
@@ -72,6 +73,8 @@ PT(Component) Object::addComponent(Component* newComponent)
 	newComponent->ownerObject() = this;
 	//insert the new component into the table
 	mComponents[familyId] = PT(Component)(newComponent);
+	//on addition to object component setup
+	mComponents[familyId].p()->onAddSetup();
 	return previousComp;
 }
 

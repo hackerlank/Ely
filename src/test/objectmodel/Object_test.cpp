@@ -57,12 +57,12 @@ BOOST_FIXTURE_TEST_CASE(ObjectConstructor, ObjectTestCaseFixture)
 
 BOOST_FIXTURE_TEST_CASE(ObjectComponents, ObjectTestCaseFixture)
 {
-//	mObject->addComponent(mModel);
-//	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
-//	BOOST_CHECK(mObject->numComponents() == 1);
-//	mObject->addComponent(mModel);
-//	BOOST_CHECK(mObject->numComponents() == 1);
-//	mObject->clearComponents();
+	mObject->addComponent(mModel);
+	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
+	BOOST_CHECK(mObject->numComponents() == 1);
+	mObject->addComponent(mModel);
+	BOOST_CHECK(mObject->numComponents() == 1);
+	mObject->clearComponents();
 	BOOST_CHECK(mObject->numComponents() == 0);
 }
 
