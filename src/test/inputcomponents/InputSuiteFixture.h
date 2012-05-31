@@ -15,25 +15,24 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Utilities/ComponentSuite.h
+ * \file /Ely/src/test/inputcomponents/InputSuiteFixture.h
  *
- * \date 17/mag/2012 (18:22:24)
+ * \date 31/mag/2012 (16:24:12)
  * \author marco
  */
 
-#ifndef COMPONENTSUITE_H_
-#define COMPONENTSUITE_H_
+#ifndef INPUTSUITEFIXTURE_H_
+#define INPUTSUITEFIXTURE_H_
 
-#include "ObjectModel/Component.h"
-#include "ObjectModel/ComponentTemplate.h"
+struct InputSuiteFixture
+{
+	InputSuiteFixture()
+	{
+	}
 
-/// List of all components and component templates
-#include "GraphicsComponents/Model.h"
-#include "GraphicsComponents/ModelTemplate.h"
-#include "GraphicsComponents/InstanceOf.h"
-#include "GraphicsComponents/InstanceOfTemplate.h"
-#include "InputComponents/ControlByEvent.h"
-#include "InputComponents/ControlByEventTemplate.h"
+	~InputSuiteFixture()
+	{
+	}
+};
 
-
-#endif /* COMPONENTSUITE_H_ */
+#endif /* INPUTSUITEFIXTURE_H_ */

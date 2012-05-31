@@ -15,25 +15,36 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Utilities/ComponentSuite.h
+ * \file /Ely/src/test/inputcomponents/ControlByEvent_test.cpp
  *
- * \date 17/mag/2012 (18:22:24)
+ * \date 31/mag/2012 (16:23:02)
  * \author marco
  */
 
-#ifndef COMPONENTSUITE_H_
-#define COMPONENTSUITE_H_
-
-#include "ObjectModel/Component.h"
-#include "ObjectModel/ComponentTemplate.h"
-
-/// List of all components and component templates
-#include "GraphicsComponents/Model.h"
-#include "GraphicsComponents/ModelTemplate.h"
-#include "GraphicsComponents/InstanceOf.h"
-#include "GraphicsComponents/InstanceOfTemplate.h"
 #include "InputComponents/ControlByEvent.h"
-#include "InputComponents/ControlByEventTemplate.h"
+#include <boost/test/unit_test.hpp>
+#include "InputSuiteFixture.h"
 
+struct ControlByEventTestCaseFixture
+{
+	ControlByEventTestCaseFixture()
+	{
+		// TODO
+	}
 
-#endif /* COMPONENTSUITE_H_ */
+	~ControlByEventTestCaseFixture()
+	{
+		// TODO
+	}
+};
+
+/// Input suite
+BOOST_FIXTURE_TEST_SUITE(Input, InputSuiteFixture)
+
+/// Test cases
+BOOST_FIXTURE_TEST_CASE(ControlByEvent, ControlByEventTestCaseFixture)
+{
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Input suite

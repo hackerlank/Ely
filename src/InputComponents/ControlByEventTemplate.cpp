@@ -15,25 +15,44 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Utilities/ComponentSuite.h
+ * \file /Ely/src/InputComponents/ControlByEventTemplate.cpp
  *
- * \date 17/mag/2012 (18:22:24)
+ * \date 31/mag/2012 (16:44:06)
  * \author marco
  */
 
-#ifndef COMPONENTSUITE_H_
-#define COMPONENTSUITE_H_
-
-#include "ObjectModel/Component.h"
-#include "ObjectModel/ComponentTemplate.h"
-
-/// List of all components and component templates
-#include "GraphicsComponents/Model.h"
-#include "GraphicsComponents/ModelTemplate.h"
-#include "GraphicsComponents/InstanceOf.h"
-#include "GraphicsComponents/InstanceOfTemplate.h"
-#include "InputComponents/ControlByEvent.h"
 #include "InputComponents/ControlByEventTemplate.h"
 
+ControlByEventTemplate::ControlByEventTemplate()
+{
+	// TODO Auto-generated constructor stub
 
-#endif /* COMPONENTSUITE_H_ */
+}
+
+ControlByEventTemplate::~ControlByEventTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ControlByEventTemplate::_type_handle;
+
+const ComponentType ControlByEventTemplate::componentType() const
+{
+	return ComponentType("ControlByEvent");
+}
+
+const ComponentFamilyType ControlByEventTemplate::familyType() const
+{
+	return ComponentFamilyType("Input");
+}
+
+Component* ControlByEventTemplate::makeComponent(ComponentId& compId)
+{
+	return NULL;
+}
+
+void ControlByEventTemplate::reset()
+{
+}
+
