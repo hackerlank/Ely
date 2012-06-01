@@ -68,7 +68,7 @@ void GameManager::setup()
 
 	//1st object (Panda: "Actor"): initialize component templates
 	//a1) get a component template...
-	PT(ModelTemplate) modelTmpl =
+	ModelTemplate* modelTmpl =
 			DCAST(ModelTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("Actor"))->getComponentTemplate(
 							ComponentType("Model")));
@@ -84,7 +84,7 @@ void GameManager::setup()
 
 	//2nd object (PandaI: "InstancedActor"): initialize component templates
 	//a1) get a component template...
-	PT(InstanceOfTemplate) instanceOfTmpl =
+	InstanceOfTemplate* instanceOfTmpl =
 			DCAST(InstanceOfTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("InstancedActor"))->getComponentTemplate(
 							ComponentType("InstanceOf")));
@@ -100,7 +100,7 @@ void GameManager::setup()
 	//mPandaObj
 	((NodePath) (*mPandaObj)).set_hpr(-90, 0, 0);
 	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
-	PT(Model) pandaObjModel = DCAST(Model, mPandaObj->getComponent(
+	Model* pandaObjModel = DCAST(Model, mPandaObj->getComponent(
 					ComponentFamilyType("Graphics")));
 	pandaObjModel->animations().loop("panda_soft", false);
 
@@ -109,10 +109,6 @@ void GameManager::setup()
 	((NodePath) (*mPandaInstObj)).set_pos(-10, 0, 0);
 	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
 	((NodePath) (*mPandaObj)).instance_to(*mPandaInstObj);
-
-	PT(InstanceOf) pandaObjInstanceOf =
-			DCAST(InstanceOf, mPandaInstObj->getComponent(
-							ComponentFamilyType("Graphics")));
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());

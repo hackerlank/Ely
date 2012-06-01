@@ -25,28 +25,41 @@
 #include <boost/test/unit_test.hpp>
 #include "GraphicsSuiteFixture.h"
 
+#include "GraphicsComponents/InstanceOfTemplate.h"
+
 struct InstanceOfTestCaseFixture
 {
-	InstanceOfTestCaseFixture()
+	InstanceOfTestCaseFixture() :
+			mInstanceOf(NULL), mCompId("InstanceOf_Test")
 	{
-		// TODO
+		mInstanceOfTmpl = new InstanceOfTemplate();
 	}
 
 	~InstanceOfTestCaseFixture()
 	{
-		// TODO
+		delete mInstanceOfTmpl;
+		if (mInstanceOf)
+		{
+			delete mInstanceOf;
+		}
 	}
+	InstanceOfTemplate* mInstanceOfTmpl;
+	InstanceOf* mInstanceOf;
+	ComponentId mCompId;
 };
 
 /// Graphics suite
 BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(InstanceOf, InstanceOfTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(InstanceOfTemplateMethods, InstanceOfTestCaseFixture)
 {
-	BOOST_CHECK(true);
+	mInstanceOf =
+	DCAST(InstanceOf, mInstanceOfTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mInstanceOf != NULL);
+	BOOST_CHECK(mInstanceOf->componentType() == ComponentId("InstanceOf"));
+	BOOST_CHECK(mInstanceOf->familyType() == ComponentFamilyType("Graphics"));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Graphics suite
-
 

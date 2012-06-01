@@ -25,6 +25,7 @@
 #include <boost/test/unit_test.hpp>
 #include "ObjectModelSuiteFixture.h"
 
+#include "ObjectModel/ObjectTemplate.h"
 #include "GraphicsComponents/Model.h"
 
 struct ObjectTestCaseFixture
@@ -37,7 +38,7 @@ struct ObjectTestCaseFixture
 
 	~ObjectTestCaseFixture()
 	{
-		delete mModel;
+		//delete mModel;: owned by mObject
 		delete mObject;
 	}
 	Object* mObject;
@@ -48,6 +49,11 @@ struct ObjectTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 
 /// Test cases
+BOOST_FIXTURE_TEST_CASE(ObjectTemplateMethods, ObjectTestCaseFixture)
+{
+	BOOST_CHECK(true);
+}
+
 BOOST_FIXTURE_TEST_CASE(ObjectConstructor, ObjectTestCaseFixture)
 {
 	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));

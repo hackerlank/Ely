@@ -25,26 +25,40 @@
 #include <boost/test/unit_test.hpp>
 #include "InputSuiteFixture.h"
 
+#include "InputComponents/ControlByEventTemplate.h"
+
 struct ControlByEventTestCaseFixture
 {
-	ControlByEventTestCaseFixture()
+	ControlByEventTestCaseFixture() :
+			mControl(NULL), mCompId("ControlByEvent_Test")
 	{
-		// TODO
+		mControlTmpl = new ControlByEventTemplate();
 	}
 
 	~ControlByEventTestCaseFixture()
 	{
-		// TODO
+		delete mControlTmpl;
+		if (mControl)
+		{
+			delete mControl;
+		}
 	}
+	ControlByEventTemplate* mControlTmpl;
+	ControlByEvent* mControl;
+	ComponentId mCompId;
 };
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input, InputSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ControlByEvent, ControlByEventTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ControlByEventTemplateMethods, ControlByEventTestCaseFixture)
 {
-	BOOST_CHECK(true);
+	mControl =
+	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mControl != NULL);
+	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
+	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite
