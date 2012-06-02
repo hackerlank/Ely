@@ -51,6 +51,8 @@ struct ControlByEventTestCaseFixture
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input, InputSuiteFixture)
 
+BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES( ControlByEventTemplateMethods, 1 )
+
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ControlByEventTemplateMethods, ControlByEventTestCaseFixture)
 {

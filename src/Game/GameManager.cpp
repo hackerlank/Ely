@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GameManager.cpp
+ * \file /Ely/src/Game/GameManager.cpp
  *
  * \date 07/mag/2012 (18:07:26)
  * \author marco

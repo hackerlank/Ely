@@ -46,11 +46,13 @@ public:
 	 * \brief Type used for the list of the component templates.
 	 */
 	typedef std::list<ComponentTemplate*> ComponentTemplateList;
+
 	/**
 	 * \brief Constructor.
-	 * @param templateId The name of this template.
+	 * @param name The name of this template.
 	 */
 	ObjectTemplate(const ObjectTemplateId& name);
+
 	/**
 	 * \brief Destructor.
 	 */
@@ -79,6 +81,7 @@ public:
 	 * @param componentTmpl The component template.
 	 */
 	void addComponentTemplate(ComponentTemplate* componentTmpl);
+
 	/**
 	 * \brief Get a component template given the component type it can create.
 	 * @param componentId The component type.

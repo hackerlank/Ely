@@ -15,7 +15,7 @@
 *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
 */
 /**
- * \file /Ely/test/Runner.cpp
+ * \file /Ely/src/test/Runner.cpp
  *
  * \date Nov 5, 2011
  * \author marco

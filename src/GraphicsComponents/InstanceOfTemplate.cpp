@@ -26,6 +26,7 @@
 
 InstanceOfTemplate::InstanceOfTemplate()
 {
+	reset();
 }
 
 InstanceOfTemplate::~InstanceOfTemplate()

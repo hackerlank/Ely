@@ -27,7 +27,7 @@
 #include <string>
 #include <list>
 #include <filename.h>
-#include <pandaFramework.h>
+#include "Game/GameManager.h"
 #include <windowFramework.h>
 #include <lvecBase3.h>
 #include <typedObject.h>
@@ -37,7 +37,7 @@
 class ModelTemplate: public ComponentTemplate
 {
 public:
-	ModelTemplate(PandaFramework* pandaFramework,
+	ModelTemplate(GameManager* gameManager,
 			WindowFramework* windowFramework);
 	virtual ~ModelTemplate();
 
@@ -48,15 +48,33 @@ public:
 
 	virtual void reset();
 
+	/**
+	 * \brief Gets/sets the model file name.
+	 * @return A reference to the model file name.
+	 */
 	Filename& modelFile();
+
+	/**
+	 * \brief Gets/sets the list of the animations file names.
+	 * @return A reference to the list of the animations file names.
+	 */
 	std::list<Filename>& animFiles();
 
-	PandaFramework*& pandaFramework();
+	/**
+	 * \brief Gets/sets the GameManager (i.e. PandaFramework).
+	 * @return A reference to the GameManager.
+	 */
+	GameManager*& gameManager();
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
 	WindowFramework*& windowFramework();
 
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
+	///The GameManager (i.e. PandaFramework)..
+	GameManager* mGameManager;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 	///The name of the model file containing the static model.

@@ -25,8 +25,7 @@
 
 Component::Component()
 {
-	// TODO Auto-generated constructor stub
-
+	mOwnerObject = NULL;
 }
 
 void Component::update()
@@ -38,15 +37,6 @@ Object*& Component::ownerObject()
 	return mOwnerObject;
 }
 
-bool Component::initialize()
-{
-	return true;
-}
-
-void Component::onAddSetup()
-{
-}
-
 ComponentId& Component::componentId()
 {
 	return mComponentId;
@@ -54,6 +44,4 @@ ComponentId& Component::componentId()
 
 //TypedObject semantics: hardcoded
 TypeHandle Component::_type_handle;
-
-
 

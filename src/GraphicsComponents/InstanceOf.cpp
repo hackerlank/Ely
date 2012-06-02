@@ -50,10 +50,6 @@ const ComponentType InstanceOf::componentType() const
 	return ComponentType("InstanceOf");
 }
 
-void InstanceOf::update()
-{
-}
-
 bool InstanceOf::initialize()
 {
 	//setup initial state

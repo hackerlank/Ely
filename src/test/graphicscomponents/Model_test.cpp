@@ -33,22 +33,24 @@ struct ModelTestCaseFixture
 	ModelTestCaseFixture() :
 			mModel(NULL), mCompId("Model_Test")
 	{
-//		mPanda = new PandaFramework();
-//		int argc = 0;
-//		char** argv = NULL;
-//		mPanda->open_framework(argc, argv);
-//		mModelTmpl = new ModelTemplate(mPanda, mPanda->open_window());
+		mPanda = new PandaFramework();
+		int argc = 0;
+		char** argv = NULL;
+		mPanda->open_framework(argc, argv);
+		mModelTmpl = new ModelTemplate(mPanda, mPanda->open_window());
+		Model::init_type();
+		ModelTemplate::init_type();
 	}
 
 	~ModelTestCaseFixture()
 	{
-//		if (mModel)
-//		{
-//			delete mModel;
-//		}
-//		delete mModelTmpl;
-//		mPanda->close_framework();
-//		delete mPanda;
+		if (mModel)
+		{
+			delete mModel;
+		}
+		delete mModelTmpl;
+		mPanda->close_framework();
+		delete mPanda;
 	}
 	PandaFramework* mPanda;
 	ModelTemplate* mModelTmpl;
@@ -62,11 +64,13 @@ BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ModelTemplateMethods, ModelTestCaseFixture)
 {
-//	mModel =
-//	DCAST(Model, mModelTmpl->makeComponent(mCompId));
-//	BOOST_REQUIRE(mModel != NULL);
-//	BOOST_CHECK(mModel->componentType() == ComponentId("Model"));
-//	BOOST_CHECK(mModel->familyType() == ComponentFamilyType("Graphics"));
+	mModelTmpl->reset();
+	mModelTmpl->modelFile() = Filename("panda");
+	mModel =
+	DCAST(Model, mModelTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mModel != NULL);
+	BOOST_CHECK(mModel->componentType() == ComponentId("Model"));
+	BOOST_CHECK(mModel->familyType() == ComponentFamilyType("Graphics"));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Graphics suite

@@ -72,18 +72,20 @@ public:
 	 * family exists.
 	 */
 	Component* getComponent(const ComponentFamilyType& familyID);
+
 	/**
 	 * \brief Set a new component into this object.
 	 *
-	 * It will set the component in the object to the passed component,
+	 * It will add the component in the object to the passed component,
 	 * and if a component of that family already existed it'll be
 	 * replaced by this new component (and its ownership released by
 	 * the object).
-	 * @param newComponent The new component to set.
+	 * @param newComponent The new component to add.
 	 * @return PT(NULL) if there wasn't a component of that family, otherwise
 	 * the previous component.
 	 */
 	PT(Component) addComponent(Component* newComponent);
+
 	/**
 	 * \brief Clears the table of all components of this object.
 	 */
@@ -101,6 +103,10 @@ public:
 	 */
 	ObjectId& objectId();
 
+	/**
+	 * \brief Get a reference to the node path of this object.
+	 * @return The node path of this object.
+	 */
 	NodePath& nodePath();
 	/**
 	 * \brief NodePath conversion function.

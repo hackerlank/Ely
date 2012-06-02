@@ -35,9 +35,7 @@
 class ModelTemplate;
 
 /**
- * \brief Component representing the graphics structure of an object.
- *
- * It contains the references to the model and animations of the object.
+ * \brief Component representing the model and animations of an object.
  */
 class Model: public Component
 {
@@ -49,10 +47,13 @@ public:
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
 
-	virtual void update();
 	virtual bool initialize();
 	virtual void onAddSetup();
 
+	/**
+	 * \brief Get a reference to the node path associated to this model.
+	 * @return The node path associated to this model.
+	 */
 	NodePath& nodePath();
 	/**
 	 * \brief NodePath conversion function.

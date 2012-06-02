@@ -70,16 +70,12 @@ AnimControlCollection& Model::animations()
 	return mAnimations;
 }
 
-void Model::update()
-{
-}
-
 bool Model::initialize()
 {
 	bool result = true;
 	//setup model and animations
 	mNodePath = mTmpl->windowFramework()->load_model(
-			mTmpl->pandaFramework()->get_models(), mTmpl->modelFile());
+			mTmpl->gameManager()->get_models(), mTmpl->modelFile());
 	if (mNodePath.is_empty())
 	{
 		result = false;

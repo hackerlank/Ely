@@ -25,6 +25,7 @@
 #define TOOLS_H_
 
 #include <referenceCount.h>
+#include <event.h>
 #include <utility>
 #include <exception>
 #include <string>
@@ -142,5 +143,34 @@ struct IdType
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
+
+/**
+ * \brief Template class to enable methods as event handler.
+ *
+ * This template allows class method to be registered as event handlers
+ * through the define_key method of PandaFramework.
+ * A class should declare the method with the same signature as
+ * EventHandler::EventCallbackFunction, i.e.
+ * \code
+ * 	void handler(const Event *, void *);
+ * \endcode
+ * and then call define_key with a template specialization as in
+ * this example:
+ * \code
+ * 	pandaFrmwk.define_key(&handler<A,*this, &A::handler>);
+ * \endcode
+ * whera A is the class and the handler method is declared as above.
+ *
+ * @param event_name The event name of the key.
+ * @param description A description of the function of the key.
+ * @param handlerMethod The handler method.
+ * @param data User data.
+ */
+template<typename A, A& a, void (A::*pmf)(const Event *, void *)>
+void handler(const string &event_name, const string &description,
+		void (A::*handlerMethod)(const Event *, void *), void *data)
+{
+	(a.*pmf)(i);
+}
 
 #endif /* TOOLS_H_ */

@@ -25,19 +25,18 @@
 #include "GraphicsComponents/Model.h"
 #include "Utilities/Tools.h"
 
-ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
+ModelTemplate::ModelTemplate(GameManager* gameManager,
 		WindowFramework* windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
+	if (not gameManager or not windowFramework)
 	{
 		throw GameException(
 				"ModelTemplate::ModelTemplate: invalid PandaFramework or WindowFramework");
 
 	}
-	mPandaFramework = pandaFramework;
+	mGameManager = gameManager;
 	mWindowFramework = windowFramework;
-	mModelFile = Filename("");
-	mAnimFiles.clear();
+	reset();
 }
 
 ModelTemplate::~ModelTemplate()
@@ -76,9 +75,9 @@ std::list<Filename>& ModelTemplate::animFiles()
 	return mAnimFiles;
 }
 
-PandaFramework*& ModelTemplate::pandaFramework()
+GameManager*& ModelTemplate::gameManager()
 {
-	return mPandaFramework;
+	return mGameManager;
 }
 
 WindowFramework*& ModelTemplate::windowFramework()

@@ -38,9 +38,6 @@ ControlByEvent::~ControlByEvent()
 	// TODO Auto-generated destructor stub
 }
 
-//TypedObject semantics: hardcoded
-TypeHandle ControlByEvent::_type_handle;
-
 const ComponentFamilyType ControlByEvent::familyType() const
 {
 	return ComponentFamilyType("Input");
@@ -57,10 +54,23 @@ void ControlByEvent::update()
 
 bool ControlByEvent::initialize()
 {
-	return true;
+	bool result = true;
+	return result;
 }
 
 void ControlByEvent::onAddSetup()
 {
 }
 
+NodePath& ControlByEvent::nodePath()
+{
+	return mNodePath;
+}
+
+ControlByEvent::operator NodePath()
+{
+	return mNodePath;
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ControlByEvent::_type_handle;

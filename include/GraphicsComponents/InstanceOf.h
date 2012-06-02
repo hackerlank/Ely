@@ -30,6 +30,9 @@
 
 class InstanceOfTemplate;
 
+/**
+ * \brief Component representing an instance of another object.
+ */
 class InstanceOf: public Component
 {
 public:
@@ -40,10 +43,13 @@ public:
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
 
-	virtual void update();
 	virtual bool initialize();
 	virtual void onAddSetup();
 
+	/**
+	 * \brief Get a reference to the node path this component is instance of.
+	 * @return The node path this component is instance of.
+	 */
 	NodePath& nodePath();
 	/**
 	 * \brief NodePath conversion function.

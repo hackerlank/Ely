@@ -82,14 +82,14 @@ public:
 	 *
 	 * This can be done after creation but "before" insertion into an object.
 	 */
-	virtual bool initialize();
+	virtual bool initialize() = 0;
 	/**
 	 * \brief On addition to object setup.
 	 *
 	 * Gives a component the ability to do some setup just "after" this
 	 * component has been added to an object. Optional.
 	 */
-	virtual void onAddSetup();
+	virtual void onAddSetup() = 0;
 	/**
 	 * \brief Get a reference to the owner object.
 	 * \return The owner object.

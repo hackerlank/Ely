@@ -22,20 +22,25 @@
  */
 
 #include "InputComponents/ControlByEventTemplate.h"
+#include "InputComponents/ControlByEvent.h"
+#include "Utilities/Tools.h"
 
-ControlByEventTemplate::ControlByEventTemplate()
+ControlByEventTemplate::ControlByEventTemplate(GameManager* gameManager)
 {
-	// TODO Auto-generated constructor stub
+	if (not gameManager)
+	{
+		throw GameException(
+				"ControlByEventTemplate::ControlByEventTemplate: invalid PandaFramework");
 
+	}
+	mGameManager = gameManager;
+	reset();
 }
 
 ControlByEventTemplate::~ControlByEventTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
-
-//TypedObject semantics: hardcoded
-TypeHandle ControlByEventTemplate::_type_handle;
 
 const ComponentType ControlByEventTemplate::componentType() const
 {
@@ -49,10 +54,78 @@ const ComponentFamilyType ControlByEventTemplate::familyType() const
 
 Component* ControlByEventTemplate::makeComponent(ComponentId& compId)
 {
-	return NULL;
+	ControlByEvent* newControl = new ControlByEvent(this);
+	newControl->componentId() = compId;
+	if (not newControl->initialize())
+	{
+		return NULL;
+	}
+	return newControl;
 }
 
 void ControlByEventTemplate::reset()
 {
+	mForward = std::string("w");
+	mRollLeft = std::string("a");
+	mBackward = std::string("s");
+	mRollRight = std::string("d");
+	mStrafeLeft = std::string("q");
+	mStrafeRight = std::string("e");
+	mUp = std::string("r");
+	mDown = std::string("f");
+	mBoostKey = std::string("shift");
 }
+
+GameManager*& ControlByEventTemplate::gameManager()
+{
+	return mGameManager;
+}
+
+std::string& ControlByEventTemplate::backwardEvent()
+{
+	return mBackward;
+}
+
+std::string& ControlByEventTemplate::boostKey()
+{
+	return mBoostKey;
+}
+
+std::string& ControlByEventTemplate::downEvent()
+{
+	return mDown;
+}
+
+std::string& ControlByEventTemplate::forwardEvent()
+{
+	return mForward;
+}
+
+std::string& ControlByEventTemplate::strafeLeftEvent()
+{
+	return mStrafeLeft;
+}
+
+std::string& ControlByEventTemplate::strafeRightEvent()
+{
+	return mStrafeRight;
+}
+
+std::string& ControlByEventTemplate::rollLeftEvent()
+{
+	return mRollLeft;
+}
+
+std::string& ControlByEventTemplate::rollRightEvent()
+{
+	return mRollRight;
+}
+
+std::string& ControlByEventTemplate::upEvent()
+{
+	return mUp;
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ControlByEventTemplate::_type_handle;
 

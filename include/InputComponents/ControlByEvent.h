@@ -24,10 +24,17 @@
 #ifndef CONTROLBYEVENT_H_
 #define CONTROLBYEVENT_H_
 
+#include <string>
+#include <nodePath.h>
+#include <typedObject.h>
 #include "ObjectModel/Component.h"
 
 class ControlByEventTemplate;
 
+/**
+ * \brief Component representing the control of movement
+ * of an object through keyboard and mouse events.
+ */
 class ControlByEvent: public Component
 {
 public:
@@ -38,11 +45,36 @@ public:
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
 
-	virtual void update();
 	virtual bool initialize();
 	virtual void onAddSetup();
 
+	/**
+	 * \brief Get a reference to the node path controlled by this component.
+	 * @return The node path controlled by this component.
+	 */
+	NodePath& nodePath();
+	/**
+	 * \brief NodePath conversion function.
+	 */
+	operator NodePath();
+
 private:
+	///The template used to construct this component.
+	ControlByEventTemplate* mTmpl;
+	///The NodePath controlled by this component.
+	NodePath mNodePath;
+	///@{
+	///Key controls.
+	bool mForward, mBackward, mLeft, mRight, mUp, mDown, mRollLeft, mRollRight;
+	///@}
+
+	///@{
+	/// Sensitivity settings.
+	float mSpeed, mSpeedFast;
+	float mMovSens, mMovSensFast;
+	float mRollSens;
+	float mSensX, mSensY;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
@@ -53,7 +85,8 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "ControlByEvent", Component::get_class_type());
+		register_type(_type_handle, "ControlByEvent",
+				Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

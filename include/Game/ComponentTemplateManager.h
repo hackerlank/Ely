@@ -38,6 +38,7 @@
 class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {
 public:
+
 	/**
 	 * \brief Add a component template for a given the component type it can create.
 	 *

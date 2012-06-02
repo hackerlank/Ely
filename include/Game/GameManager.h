@@ -55,6 +55,7 @@ public:
 	 * @param argv from main()
 	 */
 	GameManager(int argc, char* argv[]);
+
 	/**
 	 * \brief Destructor
 	 */
@@ -69,6 +70,7 @@ public:
 	 * \brief Set the Component template manager up.
 	 */
 	virtual void setupCompTmplMgr();
+
 	/**
 	 * \brief Set the Object template manager up.
 	 */

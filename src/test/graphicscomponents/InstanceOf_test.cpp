@@ -26,6 +26,7 @@
 #include "GraphicsSuiteFixture.h"
 
 #include "GraphicsComponents/InstanceOfTemplate.h"
+#include "Utilities/Tools.h"
 
 struct InstanceOfTestCaseFixture
 {
@@ -33,6 +34,8 @@ struct InstanceOfTestCaseFixture
 			mInstanceOf(NULL), mCompId("InstanceOf_Test")
 	{
 		mInstanceOfTmpl = new InstanceOfTemplate();
+		InstanceOf::init_type();
+		InstanceOfTemplate::init_type();
 	}
 
 	~InstanceOfTestCaseFixture()

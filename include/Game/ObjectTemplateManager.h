@@ -41,6 +41,7 @@ public:
 	 * \brief
 	 */
 	ObjectTemplateManager();
+
 	/**
 	 * \brief Read the object templates definitions,suitably formatted (xml), from file.
 	 * @param filename The name of the file.
@@ -62,14 +63,14 @@ public:
 
 	/**
 	 * \brief Remove the object template given the object type it can create.
-	 * @param objectID The object type.
+	 * @param objectType The object type.
 	 * @return True if the object template existed, false otherwise.
 	 */
 	bool removeObjectTemplate(ObjectTemplateId objectType);
 
 	/**
 	 * \brief Get the object template given the object type it can create.
-	 * @param objectID The object type.
+	 * @param objectType The object type.
 	 * @return The object template.
 	 */
 	ObjectTemplate* getObjectTemplate(ObjectTemplateId objectType);
@@ -78,7 +79,7 @@ public:
 	 * \brief Create a object given its type and a NodePath.
 	 *
 	 * The type is needed to select the correct template.
-	 * @param objectID The object type.
+	 * @param objectType The object type.
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
 	Object* createObject(ObjectTemplateId objectType);

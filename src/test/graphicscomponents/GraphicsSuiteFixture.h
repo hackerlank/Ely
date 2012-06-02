@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/graphics/GraphicsSuiteFixture.h
+ * \file /Ely/src/test/graphicscomponents/GraphicsSuiteFixture.h
  *
  * \date 15/mag/2012 (15:33:43)
  * \author marco
