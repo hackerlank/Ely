@@ -116,13 +116,19 @@ void GameManager::setup()
 //	mCamera.set_pos(0, -50, 6);
 
 	// add a 1st task
-	m1stTask = new GameTaskData(this, &GameManager::firstTask);
-	AsyncTask * task = new GenericAsyncTask("1st task", &GameManager::gameTask,
+//	m1stTask = new GameTaskData(this, &GameManager::firstTask);
+//	AsyncTask * task = new GenericAsyncTask("1st task", &GameManager::gameTask,
+//			reinterpret_cast<void*>(m1stTask.p()));
+	m1stTask = new TaskInterface<GameManager>::TaskData(this,
+			&GameManager::firstTask);
+	AsyncTask * task = new GenericAsyncTask("1st task",
+			&TaskInterface<GameManager>::task,
 			reinterpret_cast<void*>(m1stTask.p()));
 	get_task_mgr().add(task);
 	// add a 2nd task
-	m2ndTask = new GameTaskData(this, &GameManager::secondTask);
-	task = new GenericAsyncTask("2nd task", &GameManager::gameTask,
+	m2ndTask = new TaskInterface<GameManager>::TaskData(this,
+			&GameManager::secondTask);
+	task = new GenericAsyncTask("2nd task", &TaskInterface<GameManager>::task,
 			reinterpret_cast<void*>(m2ndTask.p()));
 	get_task_mgr().add(task);
 
@@ -165,11 +171,11 @@ void GameManager::setupObjTmplMgr()
 
 }
 
-AsyncTask::DoneStatus GameManager::gameTask(GenericAsyncTask* task, void * data)
-{
-	GameTaskData* appData = reinterpret_cast<GameTaskData*>(data);
-	return ((appData->first())->*(appData->second()))(task);
-}
+//AsyncTask::DoneStatus GameManager::gameTask(GenericAsyncTask* task, void * data)
+//{
+//	GameTaskData* appData = reinterpret_cast<GameTaskData*>(data);
+//	return ((appData->first())->*(appData->second()))(task);
+//}
 
 AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 {
@@ -181,7 +187,6 @@ AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 	}
 	return AsyncTask::DS_done;
 }
-
 
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 {

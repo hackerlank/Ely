@@ -32,7 +32,7 @@ struct ControlByEventTestCaseFixture
 	ControlByEventTestCaseFixture() :
 			mControl(NULL), mCompId("ControlByEvent_Test")
 	{
-		mControlTmpl = new ControlByEventTemplate();
+//		mControlTmpl = new ControlByEventTemplate();
 	}
 
 	~ControlByEventTestCaseFixture()

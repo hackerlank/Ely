@@ -26,6 +26,9 @@
 
 #include <referenceCount.h>
 #include <event.h>
+#include <eventHandler.h>
+#include <asyncTask.h>
+#include <genericAsyncTask.h>
 #include <utility>
 #include <exception>
 #include <string>
@@ -141,8 +144,23 @@ struct IdType
 	}
 };
 
-///TypedObject semantics: hardcoded
-void initTypedObjects();
+/**
+ * \brief Template for generic Task Function interface
+ *
+ *  The effective Tasks are composed by a Pair of
+ *  an object and a method (member function) doing the task.
+ */
+template<typename A> struct TaskInterface
+{
+	typedef AsyncTask::DoneStatus (A::*TaskPtr)(
+			GenericAsyncTask* task);
+	typedef Pair<A*, TaskPtr> TaskData;
+	static AsyncTask::DoneStatus task(GenericAsyncTask* task, void * data)
+	{
+		TaskData* appData = reinterpret_cast<TaskData*>(data);
+		return ((appData->first())->*(appData->second()))(task);
+	}
+};
 
 /**
  * \brief Template class to enable methods as event handler.
@@ -168,9 +186,12 @@ void initTypedObjects();
  */
 template<typename A, A& a, void (A::*pmf)(const Event *, void *)>
 void handler(const string &event_name, const string &description,
-		void (A::*handlerMethod)(const Event *, void *), void *data)
+		EventHandler::EventCallbackFunction *function, void *data)
 {
-	(a.*pmf)(i);
+	(a.*pmf)(event_name, description, function, data);
 }
+
+///TypedObject semantics: hardcoded
+void initTypedObjects();
 
 #endif /* TOOLS_H_ */

@@ -21,8 +21,8 @@
  * \author marco
  */
 
-#ifndef GAMEMANGER_H_
-#define GAMEMANGER_H_
+#ifndef GAMEMANAGER_H_
+#define GAMEMANAGER_H_
 
 #include <pandaFramework.h>
 #include <pandaSystem.h>
@@ -82,18 +82,18 @@ public:
 	 *  The effective Tasks are composed by a Pair of
 	 *  an GameManager object and a member function doing the task.
 	 */
-	typedef AsyncTask::DoneStatus (GameManager::*GameTaskPtr)(
-			GenericAsyncTask* task);
-	typedef Pair<GameManager*, GameTaskPtr> GameTaskData;
-	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task, void * data);
+//	typedef AsyncTask::DoneStatus (GameManager::*GameTaskPtr)(
+//			GenericAsyncTask* task);
+//	typedef Pair<GameManager*, GameTaskPtr> GameTaskData;
+//	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task, void * data);
 
 protected:
 
 	/// 1nd task.
-	PT(GameTaskData) m1stTask;
+	PT(TaskInterface<GameManager>::TaskData) m1stTask;
 	AsyncTask::DoneStatus firstTask(GenericAsyncTask* task = NULL);
 	/// 2nd task
-	PT(GameTaskData) m2ndTask;
+	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task = NULL);
 
 	/// Common members
@@ -109,4 +109,4 @@ protected:
 
 };
 
-#endif /* GAMEMANGER_H_ */
+#endif /* GAMEMANAGER_H_ */

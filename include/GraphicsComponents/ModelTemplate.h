@@ -27,18 +27,17 @@
 #include <string>
 #include <list>
 #include <filename.h>
-#include "Game/GameManager.h"
 #include <windowFramework.h>
 #include <lvecBase3.h>
 #include <typedObject.h>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
+#include "Game/GameManager.h"
 
 class ModelTemplate: public ComponentTemplate
 {
 public:
-	ModelTemplate(GameManager* gameManager,
-			WindowFramework* windowFramework);
+	ModelTemplate(GameManager* gameManager, WindowFramework* windowFramework);
 	virtual ~ModelTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -91,7 +90,8 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "ModelTemplate", ComponentTemplate::get_class_type());
+		register_type(_type_handle, "ModelTemplate",
+				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

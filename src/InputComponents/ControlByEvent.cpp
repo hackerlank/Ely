@@ -26,16 +26,15 @@
 ControlByEvent::ControlByEvent()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
-ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl)
+ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
+		mTmpl(tmpl)
 {
 }
 
 ControlByEvent::~ControlByEvent()
 {
-	// TODO Auto-generated destructor stub
 }
 
 const ComponentFamilyType ControlByEvent::familyType() const
@@ -46,10 +45,6 @@ const ComponentFamilyType ControlByEvent::familyType() const
 const ComponentType ControlByEvent::componentType() const
 {
 	return ComponentType("ControlByEvent");
-}
-
-void ControlByEvent::update()
-{
 }
 
 bool ControlByEvent::initialize()

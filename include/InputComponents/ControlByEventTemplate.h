@@ -24,10 +24,10 @@
 #ifndef CONTROLBYEVENTTEMPLATE_H_
 #define CONTROLBYEVENTTEMPLATE_H_
 
-#include <pandaFramework.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
+#include "Game/GameManager.h"
 
 class ControlByEventTemplate: public ComponentTemplate
 {
