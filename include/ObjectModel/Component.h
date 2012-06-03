@@ -81,8 +81,10 @@ public:
 	/**
 	 * \brief Updates the state of the component.
 	 *
-	 * This overload exploits the Panda framework task management.
-	 * See \ref TaskInterface "TaskInterface".
+	 * This overload allows to exploit the Panda framework task management.
+	 * See TaskInterface.
+	 * @param task The task object.
+	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 	/**

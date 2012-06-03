@@ -180,7 +180,6 @@ struct IdType
 };
 
 /**
- * \anchor TaskInterface
  * \brief Template struct for generic Task Function interface
  *
  * The effective Tasks are composed by a Pair of an object and
@@ -231,25 +230,22 @@ template<typename A> struct TaskInterface
  * A class should declare the method with the same signature as
  * EventHandler::EventCallbackFunction, i.e.
  * \code
- * 	void handler(const Event *, void *);
+ * 	void handlerOfA(const Event *, void *);
  * \endcode
  * and then call define_key with a template specialization as in
  * this example:
  * \code
- * 	pandaFrmwk.define_key(&handler<A,*this, &A::handler>);
+ * 	pandaFrmwk.define_key(event_name, description, &handler<A,*this, &A::handlerOfA>,data);
  * \endcode
- * where A is the class and the handler method is declared as above.
+ * where A is the class and its method handlerOfA is declared as above.
  *
- * @param event_name The event name of the key.
- * @param description A description of the function of the key.
- * @param handlerMethod The handler method.
+ * @param event The event thrown.
  * @param data User data.
  */
 template<typename A, A& a, void (A::*pmf)(const Event *, void *)>
-void handler(const string &event_name, const string &description,
-		EventHandler::EventCallbackFunction *function, void *data)
+void handlerTmpl(const Event* event, void* data)
 {
-	(a.*pmf)(event_name, description, function, data);
+	(a.*pmf)(event, data);
 }
 
 ///TypedObject semantics: hardcoded

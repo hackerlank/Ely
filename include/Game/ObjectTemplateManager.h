@@ -33,7 +33,7 @@
 /**
  * \brief Singleton template manager that stores all the object templates.
  *
- * Not multi-threaded.
+ * Not thread-safe during creation, thread-safe during utilization.
  */
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
 {

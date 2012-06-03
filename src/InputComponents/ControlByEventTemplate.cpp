@@ -71,7 +71,7 @@ void ControlByEventTemplate::reset()
 	mStrafeRight = std::string("e");
 	mUp = std::string("r");
 	mDown = std::string("f");
-	mBoostKey = std::string("shift");
+	mSpeedKey = std::string("shift");
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
@@ -84,9 +84,9 @@ std::string& ControlByEventTemplate::backwardEvent()
 	return mBackward;
 }
 
-std::string& ControlByEventTemplate::boostKey()
+std::string& ControlByEventTemplate::speedKey()
 {
-	return mBoostKey;
+	return mSpeedKey;
 }
 
 std::string& ControlByEventTemplate::downEvent()

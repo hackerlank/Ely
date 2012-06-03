@@ -59,7 +59,6 @@ public:
 	 */
 	///@{
 	std::string& backwardEvent();
-	std::string& boostKey();
 	std::string& downEvent();
 	std::string& forwardEvent();
 	std::string& strafeLeftEvent();
@@ -67,6 +66,7 @@ public:
 	std::string& rollLeftEvent();
 	std::string& rollRightEvent();
 	std::string& upEvent();
+	std::string& speedKey();
 	///@}
 
 private:
@@ -82,7 +82,7 @@ private:
 	std::string mDown;
 	std::string mRollLeft;
 	std::string mRollRight;
-	std::string mBoostKey;
+	std::string mSpeedKey;
 	///@}
 
 	///TypedObject semantics: hardcoded

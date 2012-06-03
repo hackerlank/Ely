@@ -27,6 +27,7 @@
 #include <string>
 #include <nodePath.h>
 #include <typedObject.h>
+#include <event.h>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 
@@ -39,7 +40,7 @@ class ControlByEventTemplate;
  * To each basic movement (forward, backward, left, right etc...)
  * are associated a button event and a control key, which tracks
  * its state (true/false). Event handlers commute basic movements
- * states. A (global) task updates the postion/orientation of
+ * states. A (global) task updates the position/orientation of
  * the controlled object.
  */
 class ControlByEvent: public Component
@@ -73,18 +74,23 @@ public:
 	 * control one specific movement of the object associated to this component.
 	 */
 	///@{
-	std::string& backwardEvent();
-	std::string& boostKey();
-	std::string& downEvent();
-	std::string& forwardEvent();
-	std::string& strafeLeftEvent();
-	std::string& strafeRightEvent();
-	std::string& rollLeftEvent();
-	std::string& rollRightEvent();
-	std::string& upEvent();
+	void backwardHandler(const Event* event, void* data);
+	void downHandler(const Event* event, void* data);
+	void forwardHandler(const Event* event, void* data);
+	void strafeLeftHandler(const Event* event, void* data);
+	void strafeRightHandler(const Event* event, void* data);
+	void rollLeftHandler(const Event* event, void* data);
+	void rollRightHandler(const Event* event, void* data);
+	void upHandler(const Event* event, void* data);
 	///@}
 
-	AsyncTask::DoneStatus update(GenericAsyncTask* task = NULL);
+	/**
+	 * \brief Updates position/orientation of the controlled object.
+	 *
+	 * @param task The task object.
+	 * @return The "done" status.
+	 */
+	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
 private:
 	///The template used to construct this component.
@@ -102,6 +108,7 @@ private:
 	float mRollSens;
 	float mSensX, mSensY;
 	///@}
+	///A task data for update.
 	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
 
 	///TypedObject semantics: hardcoded

@@ -74,7 +74,7 @@ bool Model::initialize()
 	bool result = true;
 	//setup model and animations
 	mNodePath = mTmpl->windowFramework()->load_model(
-			mTmpl->gameManager()->get_models(), mTmpl->modelFile());
+			mTmpl->pandaFramework()->get_models(), mTmpl->modelFile());
 	if (mNodePath.is_empty())
 	{
 		result = false;
