@@ -57,16 +57,6 @@ public:
 	virtual void onAddSetup();
 
 	/**
-	 * \brief Get a reference to the node path controlled by this component.
-	 * @return The node path controlled by this component.
-	 */
-	NodePath& nodePath();
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
-
-	/**
 	 * \name Event handlers.
 	 * \brief The set of handlers associated to the events.
 	 *
@@ -82,6 +72,7 @@ public:
 	void rollLeftHandler(const Event* event, void* data);
 	void rollRightHandler(const Event* event, void* data);
 	void upHandler(const Event* event, void* data);
+	void toggleKeyHandler(const Event* event, void* data);
 	///@}
 
 	/**
@@ -95,8 +86,6 @@ public:
 private:
 	///The template used to construct this component.
 	ControlByEventTemplate* mTmpl;
-	///The NodePath controlled by this component.
-	NodePath mNodePath;
 	///@{
 	///Key controls.
 	bool mForward, mBackward, mLeft, mRight, mUp, mDown, mRollLeft, mRollRight;

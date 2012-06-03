@@ -52,10 +52,18 @@ const ComponentType ControlByEvent::componentType() const
 bool ControlByEvent::initialize()
 {
 	bool result = true;
+	std::string speedKey = mTmpl->speedKey();
+	if (not (speedKey == "control" or speedKey == "alt" or speedKey == "shift"))
+	{
+		speedKey = "shift";
+	}
 	//register the handlers
+	std::string speedKeyEvent = speedKey + "-" + mTmpl->backwardEvent();
+	std::string upKeyEvent = mTmpl->backwardEvent() + "-up";
 	mTmpl->pandaFramework()->define_key(mTmpl->backwardEvent(), "backward",
 			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::backwardHandler>,
 			NULL);
+
 	mTmpl->pandaFramework()->define_key(mTmpl->downEvent(), "down",
 			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::downHandler>,
 			NULL);
@@ -83,26 +91,13 @@ bool ControlByEvent::initialize()
 
 void ControlByEvent::onAddSetup()
 {
-	//set the controlled object: set the node path of
-	//the object to the node path of this control by event
-	mOwnerObject->nodePath() = mNodePath;
-
-	//add the task for the controlled object update
-//	 * 	myData = new TaskInterface<A>::TaskData(this, &A::firstTask);
-//	 * 	AsyncTask* task = new GenericAsyncTask("my task",
-//	 * 							&TaskInterface<A>::taskFunction,
-//	 * 							reinterpret_cast<void*>(myData.p()));
-
-}
-
-NodePath& ControlByEvent::nodePath()
-{
-	return mNodePath;
-}
-
-ControlByEvent::operator NodePath()
-{
-	return mNodePath;
+	//add the task for updating the controlled object
+	mUpdateData = new TaskInterface<ControlByEvent>::TaskData(this,
+			&ControlByEvent::update);
+	AsyncTask* task = new GenericAsyncTask("update task",
+			&TaskInterface<ControlByEvent>::taskFunction,
+			reinterpret_cast<void*>(mUpdateData.p()));
+	mTmpl->pandaFramework()->get_task_mgr().add(task);
 }
 
 void ControlByEvent::backwardHandler(const Event* event, void* data)
