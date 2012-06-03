@@ -25,21 +25,17 @@
 #define GAMEMANAGER_H_
 
 #include <pandaFramework.h>
-#include <pandaSystem.h>
-#include <auto_bind.h>
-
-#include <cIntervalManager.h>
-#include <cLerpNodePathInterval.h>
-#include <cMetaInterval.h>
-#include <randomizer.h>
-
+#include <windowFramework.h>
+#include <nodePath.h>
+#include <clockObject.h>
+#include <asyncTask.h>
+#include <pointerTo.h>
 #include <iostream>
 
-#include "ComponentTemplateManager.h"
-#include "Utilities/ComponentSuite.h"
-#include "ObjectTemplateManager.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
+#include "Game/ComponentTemplateManager.h"
+#include "Game/ObjectTemplateManager.h"
 
 class FuncInterval;
 
@@ -76,25 +72,14 @@ public:
 	 */
 	virtual void setupObjTmplMgr();
 
-	/**
-	 * \brief Generic Task Function interface
-	 *
-	 *  The effective Tasks are composed by a Pair of
-	 *  an GameManager object and a member function doing the task.
-	 */
-//	typedef AsyncTask::DoneStatus (GameManager::*GameTaskPtr)(
-//			GenericAsyncTask* task);
-//	typedef Pair<GameManager*, GameTaskPtr> GameTaskData;
-//	static AsyncTask::DoneStatus gameTask(GenericAsyncTask* task, void * data);
-
 protected:
 
 	/// 1nd task.
 	PT(TaskInterface<GameManager>::TaskData) m1stTask;
-	AsyncTask::DoneStatus firstTask(GenericAsyncTask* task = NULL);
+	AsyncTask::DoneStatus firstTask(GenericAsyncTask* task);
 	/// 2nd task
 	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
-	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task = NULL);
+	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
 	/// Common members
 	WindowFramework * mWindow;

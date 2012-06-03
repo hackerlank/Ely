@@ -28,12 +28,19 @@
 #include <nodePath.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
+#include "Utilities/Tools.h"
 
 class ControlByEventTemplate;
 
 /**
- * \brief Component representing the control of movement
- * of an object through keyboard and mouse events.
+ * \brief Component representing the control of object movement
+ * through keyboard and mouse button events.
+ *
+ * To each basic movement (forward, backward, left, right etc...)
+ * are associated a button event and a control key, which tracks
+ * its state (true/false). Event handlers commute basic movements
+ * states. A (global) task updates the postion/orientation of
+ * the controlled object.
  */
 class ControlByEvent: public Component
 {
@@ -58,6 +65,27 @@ public:
 	 */
 	operator NodePath();
 
+	/**
+	 * \name Event handlers.
+	 * \brief The set of handlers associated to the events.
+	 *
+	 * Each of these events will be associated to an handler that will
+	 * control one specific movement of the object associated to this component.
+	 */
+	///@{
+	std::string& backwardEvent();
+	std::string& boostKey();
+	std::string& downEvent();
+	std::string& forwardEvent();
+	std::string& strafeLeftEvent();
+	std::string& strafeRightEvent();
+	std::string& rollLeftEvent();
+	std::string& rollRightEvent();
+	std::string& upEvent();
+	///@}
+
+	AsyncTask::DoneStatus update(GenericAsyncTask* task = NULL);
+
 private:
 	///The template used to construct this component.
 	ControlByEventTemplate* mTmpl;
@@ -67,7 +95,6 @@ private:
 	///Key controls.
 	bool mForward, mBackward, mLeft, mRight, mUp, mDown, mRollLeft, mRollRight;
 	///@}
-
 	///@{
 	/// Sensitivity settings.
 	float mSpeed, mSpeedFast;
@@ -75,6 +102,7 @@ private:
 	float mRollSens;
 	float mSensX, mSensY;
 	///@}
+	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
 
 	///TypedObject semantics: hardcoded
 public:

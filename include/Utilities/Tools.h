@@ -24,16 +24,51 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
+#include <exception>
+#include <string>
+#include <sstream>
+#include <cassert>
+#include <utility>
+
 #include <referenceCount.h>
 #include <event.h>
 #include <eventHandler.h>
 #include <asyncTask.h>
 #include <genericAsyncTask.h>
-#include <utility>
-#include <exception>
-#include <string>
-#include <sstream>
-#include <cassert>
+#include <pmutex.h>
+
+/**
+ * \brief Implements a mutex lock guard (RAII idiom).
+ *
+ * Directly "stolen" (and adapted) from boost::thread.
+ */
+struct adopt_lock_t
+{
+};
+
+template<typename Mutex>
+class lock_guard
+{
+private:
+	Mutex& m;
+
+	explicit lock_guard(lock_guard&);
+	lock_guard& operator=(lock_guard&);
+public:
+	explicit lock_guard(Mutex& m_) :
+			m(m_)
+	{
+		m.acquire();
+	}
+	lock_guard(Mutex& m_, adopt_lock_t) :
+			m(m_)
+	{
+	}
+	~lock_guard()
+	{
+		m.release();
+	}
+};
 
 /**
  * \brief An exception during the game.
@@ -145,17 +180,43 @@ struct IdType
 };
 
 /**
- * \brief Template for generic Task Function interface
+ * \anchor TaskInterface
+ * \brief Template struct for generic Task Function interface
  *
- *  The effective Tasks are composed by a Pair of
- *  an object and a method (member function) doing the task.
+ * The effective Tasks are composed by a Pair of an object and
+ * a method (member function) doing the effective task.
+ * To register a task:
+ * 1) in class A define a (pointer to) TaskData member:
+ * \code
+ * 	PT(TaskInterface<A>::TaskData) myData;
+ * 	\endcode
+ * 2) and a method (that will execute the real task) with signature:
+ * \code
+ * 	AsyncTask::DoneStatus myTask(GenericAsyncTask* task);
+ * \endcode
+ * 3) in code associate to myData a new TaskData referring to this
+ * class instance and myTask, then create a new GenericAsyncTask
+ * referring to taskFunction and with data parameter equal to
+ * myData (reinterpreted as void*):
+ * \code
+ * 	myData = new TaskInterface<A>::TaskData(this, &A::firstTask);
+ * 	AsyncTask* task = new GenericAsyncTask("my task",
+ * 							&TaskInterface<A>::taskFunction,
+ * 							reinterpret_cast<void*>(myData.p()));
+ * 	\endcode
+ * 4) finally register the async-task to your manager:
+ * \code
+ * 	pandaFramework.get_task_mgr().add(task);
+ * 	\endcode
+ * From now on myTask will execute the task, while being able
+ * to refer directly to data members of the class.
  */
 template<typename A> struct TaskInterface
 {
-	typedef AsyncTask::DoneStatus (A::*TaskPtr)(
-			GenericAsyncTask* task);
+	typedef AsyncTask::DoneStatus (A::*TaskPtr)(GenericAsyncTask* taskFunction);
 	typedef Pair<A*, TaskPtr> TaskData;
-	static AsyncTask::DoneStatus task(GenericAsyncTask* task, void * data)
+	static AsyncTask::DoneStatus taskFunction(GenericAsyncTask* task,
+			void * data)
 	{
 		TaskData* appData = reinterpret_cast<TaskData*>(data);
 		return ((appData->first())->*(appData->second()))(task);
@@ -163,7 +224,7 @@ template<typename A> struct TaskInterface
 };
 
 /**
- * \brief Template class to enable methods as event handler.
+ * \brief Template function to enable methods as event handler.
  *
  * This template allows class method to be registered as event handlers
  * through the define_key method of PandaFramework.
@@ -177,7 +238,7 @@ template<typename A> struct TaskInterface
  * \code
  * 	pandaFrmwk.define_key(&handler<A,*this, &A::handler>);
  * \endcode
- * whera A is the class and the handler method is declared as above.
+ * where A is the class and the handler method is declared as above.
  *
  * @param event_name The event name of the key.
  * @param description A description of the function of the key.

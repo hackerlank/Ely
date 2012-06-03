@@ -26,5 +26,7 @@
 
 #include <load_prc_file.h>
 #include "Game/GameManager.h"
+#include "Game/ComponentTemplateManager.h"
+#include "Game/ObjectTemplateManager.h"
 
 #endif /* ELY_H_ */

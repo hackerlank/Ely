@@ -22,18 +22,16 @@
  */
 
 #include "InputComponents/ControlByEventTemplate.h"
-#include "InputComponents/ControlByEvent.h"
-#include "Utilities/Tools.h"
 
-ControlByEventTemplate::ControlByEventTemplate(GameManager* gameManager)
+ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework)
 {
-	if (not gameManager)
+	if (not pandaFramework)
 	{
 		throw GameException(
 				"ControlByEventTemplate::ControlByEventTemplate: invalid PandaFramework");
 
 	}
-	mGameManager = gameManager;
+	mPandaFramework = pandaFramework;
 	reset();
 }
 
@@ -76,9 +74,9 @@ void ControlByEventTemplate::reset()
 	mBoostKey = std::string("shift");
 }
 
-GameManager*& ControlByEventTemplate::gameManager()
+PandaFramework*& ControlByEventTemplate::pandaFramework()
 {
-	return mGameManager;
+	return mPandaFramework;
 }
 
 std::string& ControlByEventTemplate::backwardEvent()

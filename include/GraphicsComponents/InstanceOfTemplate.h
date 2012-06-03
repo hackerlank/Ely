@@ -29,6 +29,7 @@
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
+#include "GraphicsComponents/InstanceOf.h"
 
 class InstanceOfTemplate: public ComponentTemplate
 {

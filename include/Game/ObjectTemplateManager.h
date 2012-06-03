@@ -28,6 +28,7 @@
 #include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
+#include "Game/ComponentTemplateManager.h"
 
 /**
  * \brief Singleton template manager that stores all the object templates.
@@ -84,18 +85,20 @@ public:
 	 */
 	Object* createObject(ObjectTemplateId objectType);
 
-	/**
-	 * \brief Return an unique id for created objects.
-	 * @return
-	 */
-	IdType getId();
-
 private:
 	///Table of object templates indexed by their name.
 	typedef std::map<const ObjectTemplateId, PT(ObjectTemplate)> ObjectTemplateTable;
 	ObjectTemplateTable mObjectTemplates;
 	///The unique id for created objects.
 	IdType id;
+	/**
+	 * \brief Return an unique id for created objects.
+	 * @return
+	 */
+	IdType getId();
+
+	///The (reentrant) mutex associated with this manager.
+	ReMutex mMutex;
 };
 
 #endif /* OBJECTTEMPLATEMANAGER_H_ */

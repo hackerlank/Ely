@@ -32,6 +32,11 @@ void Component::update()
 {
 }
 
+AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
+{
+	return AsyncTask::DS_done;
+}
+
 Object*& Component::ownerObject()
 {
 	return mOwnerObject;

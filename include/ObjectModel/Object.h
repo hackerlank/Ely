@@ -24,15 +24,16 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
+#include <map>
+#include <string>
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <nodePath.h>
 #include <referenceCount.h>
 #include <pointerTo.h>
-#include "Component.h"
 
-#include <map>
-#include <string>
+#include "Component.h"
+#include "Utilities/Tools.h"
 
 /**
  * \brief Object instance identifier type (by default the name

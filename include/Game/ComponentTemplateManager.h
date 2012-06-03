@@ -26,6 +26,7 @@
 
 #include <map>
 #include <pointerTo.h>
+#include <reMutex.h>
 #include "Utilities/Tools.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
@@ -33,7 +34,7 @@
 /**
  * \brief Singleton template manager that stores all the component templates.
  *
- * Not multi-threaded.
+ * Not thread-safe during creation, thread-safe during utilization.
  */
 class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {
@@ -49,7 +50,8 @@ public:
 	 * @return PT(NULL) if there wasn't a template for that component, otherwise
 	 * the previous template.
 	 */
-	PT(ComponentTemplate) addComponentTemplate(ComponentTemplate* componentTmpl);
+	PT(ComponentTemplate) addComponentTemplate(
+			ComponentTemplate* componentTmpl);
 
 	/**
 	 * \brief Remove the component template given the component type it can create.
@@ -72,18 +74,21 @@ public:
 	 */
 	Component* createComponent(ComponentType componentID);
 
+private:
+
+	///Table of component templates indexed by component type.
+	typedef std::map<const ComponentType, PT(ComponentTemplate)> ComponentTemplateTable;
+	ComponentTemplateTable mComponentTemplates;
+	///The unique id for created components.
+	IdType id;
 	/**
 	 * \brief Return an unique id for created components.
 	 * @return
 	 */
 	IdType getId();
 
-private:
-	///Table of component templates indexed by component type.
-	typedef std::map<const ComponentType, PT(ComponentTemplate)> ComponentTemplateTable;
-	ComponentTemplateTable mComponentTemplates;
-	///The unique id for created components.
-	IdType id;
+	///The (reentrant) mutex associated with this manager.
+	ReMutex mMutex;
 };
 
 #endif /* COMPONENTTEMPLATEMANAGER_H_ */

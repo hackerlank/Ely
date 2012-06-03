@@ -25,14 +25,16 @@
 #define CONTROLBYEVENTTEMPLATE_H_
 
 #include <typedObject.h>
+#include <pandaFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "Game/GameManager.h"
+#include "InputComponents/ControlByEvent.h"
+#include "Utilities/Tools.h"
 
 class ControlByEventTemplate: public ComponentTemplate
 {
 public:
-	ControlByEventTemplate(GameManager* gameManager);
+	ControlByEventTemplate(PandaFramework* pandaFramework);
 	virtual ~ControlByEventTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -43,10 +45,10 @@ public:
 	virtual void reset();
 
 	/**
-	 * \brief Gets/sets the GameManager (i.e. PandaFramework).
-	 * @return A reference to the GameManager.
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
 	 */
-	GameManager*& gameManager();
+	PandaFramework*& pandaFramework();
 
 	/**
 	 * \name Event names getters/setters.
@@ -68,8 +70,8 @@ public:
 	///@}
 
 private:
-	///The GameManager (i.e. PandaFramework).
-	GameManager* mGameManager;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
 	///@{
 	/// Event names.
 	std::string mForward;

@@ -24,11 +24,12 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
+#include <string>
+
 #include <referenceCount.h>
 #include <pointerTo.h>
 #include <typedObject.h>
-
-#include <string>
+#include <genericAsyncTask.h>
 
 /**
  * \brief Component identifier type.
@@ -77,6 +78,13 @@ public:
 	 * \brief Updates the state of the component.
 	 */
 	virtual void update();
+	/**
+	 * \brief Updates the state of the component.
+	 *
+	 * This overload exploits the Panda framework task management.
+	 * See \ref TaskInterface "TaskInterface".
+	 */
+	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 	/**
 	 * \brief Allow a component to be initialized.
 	 *

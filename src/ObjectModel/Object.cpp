@@ -22,7 +22,6 @@
  */
 
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 Object::Object(const ObjectId& objectId)
 {

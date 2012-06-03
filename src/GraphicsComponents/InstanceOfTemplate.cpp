@@ -22,7 +22,6 @@
  */
 
 #include "GraphicsComponents/InstanceOfTemplate.h"
-#include "GraphicsComponents/InstanceOf.h"
 
 InstanceOfTemplate::InstanceOfTemplate()
 {

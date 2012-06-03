@@ -22,7 +22,6 @@
  */
 
 #include "Game/ObjectTemplateManager.h"
-#include "Game/ComponentTemplateManager.h"
 
 ObjectTemplateManager::ObjectTemplateManager()
 {
@@ -31,6 +30,9 @@ ObjectTemplateManager::ObjectTemplateManager()
 PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		ObjectTemplate* objectTmpl)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	if (not objectTmpl)
 	{
 		throw GameException(
@@ -53,6 +55,9 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 
 bool ObjectTemplateManager::removeObjectTemplate(ObjectTemplateId objectType)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
 	{
@@ -65,6 +70,9 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectTemplateId objectType)
 ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
 		ObjectTemplateId objectType)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
 	{
@@ -75,11 +83,17 @@ ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
 
 bool ObjectTemplateManager::readObjectTemplates(const std::string& filename)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	return true;
 }
 
 Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	//retrieve the ObjectTemplate
 	ObjectTemplateTable::iterator it1 = mObjectTemplates.find(objectType);
 	if (it1 == mObjectTemplates.end())

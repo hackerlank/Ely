@@ -33,9 +33,9 @@ struct ModelTestCaseFixture
 	ModelTestCaseFixture() :
 			mModel(NULL), mCompId("Model_Test")
 	{
-		mPanda = new PandaFramework();
 		int argc = 0;
 		char** argv = NULL;
+		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mModelTmpl = new ModelTemplate(mPanda, mPanda->open_window());
 		Model::init_type();
@@ -52,7 +52,7 @@ struct ModelTestCaseFixture
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	PandaFramework* mPanda;
+	GameManager* mPanda;
 	ModelTemplate* mModelTmpl;
 	Model* mModel;
 	ComponentId mCompId;

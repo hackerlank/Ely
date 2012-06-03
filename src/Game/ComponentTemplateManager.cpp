@@ -26,6 +26,9 @@
 PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 		ComponentTemplate* componentTmpl)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	if (not componentTmpl)
 	{
 		throw GameException(
@@ -48,6 +51,9 @@ PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 bool ComponentTemplateManager::removeComponentTemplate(
 		ComponentType componentID)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
 	if (it == mComponentTemplates.end())
 	{
@@ -60,6 +66,9 @@ bool ComponentTemplateManager::removeComponentTemplate(
 ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
 		ComponentType componentID)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
 	if (it == mComponentTemplates.end())
 	{
@@ -71,6 +80,9 @@ ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
 Component* ComponentTemplateManager::createComponent(
 		ComponentType componentType)
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(
 			componentType);
 	if (it == mComponentTemplates.end())

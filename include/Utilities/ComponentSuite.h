@@ -24,6 +24,8 @@
 #ifndef COMPONENTSUITE_H_
 #define COMPONENTSUITE_H_
 
+/// WARNING: include this file only in source files and not into headers.
+
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 

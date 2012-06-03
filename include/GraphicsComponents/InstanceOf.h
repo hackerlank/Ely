@@ -27,6 +27,7 @@
 #include <nodePath.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
+#include "GraphicsComponents/InstanceOfTemplate.h"
 
 class InstanceOfTemplate;
 

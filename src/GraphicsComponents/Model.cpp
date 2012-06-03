@@ -22,7 +22,6 @@
  */
 
 #include "GraphicsComponents/Model.h"
-#include "GraphicsComponents/ModelTemplate.h"
 
 Model::Model()
 {

@@ -27,6 +27,7 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.236323788" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1243285611" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.352063809" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -69,9 +70,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|include|src/test|src|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
+						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -101,6 +102,7 @@
 								<option id="gnu.cpp.compiler.exe.debug.option.debugging.level.228347176" name="Debug Level" superClass="gnu.cpp.compiler.exe.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.477396703" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="BOOST_TEST_DYN_LINK"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.724856430" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
