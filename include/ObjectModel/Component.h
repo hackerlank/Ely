@@ -86,7 +86,7 @@ public:
 	 * @param task The task object.
 	 * @return The "done" status.
 	 */
-	AsyncTask::DoneStatus update(GenericAsyncTask* task);
+	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
 	/**
 	 * \brief Allow a component to be initialized.
 	 *

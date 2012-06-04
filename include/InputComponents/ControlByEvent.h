@@ -72,7 +72,6 @@ public:
 	void rollLeftHandler(const Event* event, void* data);
 	void rollRightHandler(const Event* event, void* data);
 	void upHandler(const Event* event, void* data);
-	void toggleKeyHandler(const Event* event, void* data);
 	///@}
 
 	/**
@@ -81,14 +80,18 @@ public:
 	 * @param task The task object.
 	 * @return The "done" status.
 	 */
-	AsyncTask::DoneStatus update(GenericAsyncTask* task);
+	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
 private:
 	///The template used to construct this component.
 	ControlByEventTemplate* mTmpl;
 	///@{
 	///Key controls.
-	bool mForward, mBackward, mLeft, mRight, mUp, mDown, mRollLeft, mRollRight;
+	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mRollLeft, mRollRight;
+	///@}
+	///@{
+	///Key control values.
+	bool mTrue, mFalse;
 	///@}
 	///@{
 	/// Sensitivity settings.
