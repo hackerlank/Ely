@@ -100,7 +100,7 @@ Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
 	{
 		return false;
 	}
-	ObjectTemplate* objectTmpl = (*it1).second.p();
+	ObjectTemplate* objectTmpl = (*it1).second;
 	//create the new object
 	ObjectId newId = ObjectId(objectType) + ObjectId(getId());
 	Object* newObj = new Object(newId);

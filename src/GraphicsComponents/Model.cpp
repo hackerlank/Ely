@@ -35,6 +35,7 @@ Model::Model(ModelTemplate* tmpl) :
 
 Model::~Model()
 {
+	mNodePath.remove_node();
 }
 
 const ComponentFamilyType Model::familyType() const

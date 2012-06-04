@@ -72,6 +72,8 @@ void ControlByEventTemplate::reset()
 	mUp = std::string("r");
 	mDown = std::string("f");
 	mSpeedKey = std::string("shift");
+	mSpeed = 1.0;
+	mSpeedFast = 5.0;
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
@@ -124,6 +126,15 @@ std::string& ControlByEventTemplate::upEvent()
 	return mUp;
 }
 
+float& ControlByEventTemplate::speed()
+{
+	return mSpeed;
+}
+
+float& ControlByEventTemplate::speedFast()
+{
+	return mSpeedFast;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle ControlByEventTemplate::_type_handle;
-

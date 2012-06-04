@@ -50,7 +50,7 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 	{
 		return NULL;
 	}
-	return (*it).second.p();
+	return (*it).second;
 }
 
 PT(Component) Object::addComponent(Component* newComponent)
@@ -73,7 +73,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 	//insert the new component into the table
 	mComponents[familyId] = PT(Component)(newComponent);
 	//on addition to object component setup
-	mComponents[familyId].p()->onAddSetup();
+	mComponents[familyId]->onAddSetup();
 	return previousComp;
 }
 

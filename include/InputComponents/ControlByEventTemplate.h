@@ -51,7 +51,7 @@ public:
 	PandaFramework*& pandaFramework();
 
 	/**
-	 * \name Event names getters/setters.
+	 * \name Event key names getters/setters.
 	 * \brief Get/set the event names associated to this component.
 	 *
 	 * Each of these events will be associated to an handler that will
@@ -68,21 +68,27 @@ public:
 	std::string& upEvent();
 	std::string& speedKey();
 	///@}
+	/**
+	 * \name Sensitivity parameters getters/setters.
+	 * \brief Get/set the sensitivity parameters associated to this component.
+	 */
+	///@{
+	float& speed();
+	float& speedFast();
+	///@}
+
 
 private:
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
 	///@{
-	/// Event names.
-	std::string mForward;
-	std::string mBackward;
-	std::string mStrafeLeft;
-	std::string mStrafeRight;
-	std::string mUp;
-	std::string mDown;
-	std::string mRollLeft;
-	std::string mRollRight;
-	std::string mSpeedKey;
+	/// Event key names.
+	std::string mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
+			mRollLeft, mRollRight, mSpeedKey;
+	///@}
+	///@{
+	/// Sensitivity parameters.
+	float mSpeed, mSpeedFast;
 	///@}
 
 	///TypedObject semantics: hardcoded

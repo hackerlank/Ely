@@ -28,6 +28,7 @@
 #include <nodePath.h>
 #include <typedObject.h>
 #include <event.h>
+#include <asyncTask.h>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 
@@ -102,6 +103,7 @@ private:
 	///@}
 	///A task data for update.
 	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
+	PT(AsyncTask) mUpdateTask;
 
 	///TypedObject semantics: hardcoded
 public:
