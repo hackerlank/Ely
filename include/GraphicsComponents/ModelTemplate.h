@@ -77,7 +77,7 @@ public:
 
 private:
 	///The PandaFramework.
-	PandaFramework* mPandaFramework
+	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 	///The name of the model file containing the static model.

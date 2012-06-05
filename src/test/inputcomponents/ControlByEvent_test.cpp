@@ -26,23 +26,30 @@
 #include "InputSuiteFixture.h"
 
 #include "InputComponents/ControlByEventTemplate.h"
+#include <pandaFramework.h>
 
 struct ControlByEventTestCaseFixture
 {
 	ControlByEventTestCaseFixture() :
 			mControl(NULL), mCompId("ControlByEvent_Test")
 	{
-//		mControlTmpl = new ControlByEventTemplate();
+		mPanda = new PandaFramework();
+		mControlTmpl = new ControlByEventTemplate(mPanda);
+		ControlByEventTemplate::init_type();
+		ControlByEvent::init_type();
 	}
 
 	~ControlByEventTestCaseFixture()
 	{
-		delete mControlTmpl;
 		if (mControl)
 		{
 			delete mControl;
 		}
+		delete mControlTmpl;
+		mPanda->close_framework();
+		delete mPanda;
 	}
+	PandaFramework* mPanda;
 	ControlByEventTemplate* mControlTmpl;
 	ControlByEvent* mControl;
 	ComponentId mCompId;
@@ -58,6 +65,20 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventTemplateMethods, ControlByEventTestCaseFix
 {
 	mControl =
 	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mControl != NULL);
+	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
+	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
+}
+
+BOOST_FIXTURE_TEST_CASE(ControlByEventMethods, ControlByEventTestCaseFixture)
+{
+	BOOST_REQUIRE(mControl != NULL);
+	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
+	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
+}
+
+BOOST_FIXTURE_TEST_CASE(ControlByEventDestruction, ControlByEventTestCaseFixture)
+{
 	BOOST_REQUIRE(mControl != NULL);
 	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
 	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));

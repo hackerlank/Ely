@@ -65,14 +65,14 @@ public:
 	 * control one specific movement of the object associated to this component.
 	 */
 	///@{
-	void backwardHandler(const Event* event, void* data);
-	void downHandler(const Event* event, void* data);
-	void forwardHandler(const Event* event, void* data);
-	void strafeLeftHandler(const Event* event, void* data);
-	void strafeRightHandler(const Event* event, void* data);
-	void rollLeftHandler(const Event* event, void* data);
-	void rollRightHandler(const Event* event, void* data);
-	void upHandler(const Event* event, void* data);
+	static void backwardHandler(const Event* event, void* data);
+	static void downHandler(const Event* event, void* data);
+	static void forwardHandler(const Event* event, void* data);
+	static void strafeLeftHandler(const Event* event, void* data);
+	static void strafeRightHandler(const Event* event, void* data);
+	static void rollLeftHandler(const Event* event, void* data);
+	static void rollRightHandler(const Event* event, void* data);
+	static void upHandler(const Event* event, void* data);
 	///@}
 
 	/**

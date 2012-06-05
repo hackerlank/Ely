@@ -222,32 +222,6 @@ template<typename A> struct TaskInterface
 	}
 };
 
-/**
- * \brief Template function to enable methods as event handler.
- *
- * This template allows class method to be registered as event handlers
- * through the define_key method of PandaFramework.
- * A class should declare the method with the same signature as
- * EventHandler::EventCallbackFunction, i.e.
- * \code
- * 	void handlerOfA(const Event *, void *);
- * \endcode
- * and then call define_key with a template specialization as in
- * this example:
- * \code
- * 	pandaFrmwk.define_key(event_name, description, &handler<A,*this, &A::handlerOfA>,data);
- * \endcode
- * where A is the class and its method handlerOfA is declared as above.
- *
- * @param event The event thrown.
- * @param data User data.
- */
-template<typename A, A& a, void (A::*pmf)(const Event *, void *)>
-void handlerTmpl(const Event* event, void* data)
-{
-	(a.*pmf)(event, data);
-}
-
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
 

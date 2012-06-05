@@ -22,6 +22,7 @@
  */
 
 #include "InputComponents/ControlByEvent.h"
+#include "InputComponents/ControlByEventTemplate.h"
 
 ControlByEvent::ControlByEvent()
 {
@@ -40,6 +41,10 @@ ControlByEvent::~ControlByEvent()
 	//remove the task
 	mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
 	//undefine key events
+	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
+			(void*) &mTrue);
+	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
+			(void*) &mFalse);
 }
 
 const ComponentFamilyType ControlByEvent::familyType() const
@@ -68,105 +73,81 @@ bool ControlByEvent::initialize()
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "backward",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::backwardHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::backwardHandler, (void*) this);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-backward",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::backwardHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::backwardHandler, (void*) this);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "backward-up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::backwardHandler>,
-			(void*) &mFalse);
+			&ControlByEvent::backwardHandler, (void*) this);
 	//down event keys (e.g. "f", "shift-f", "f-up")
 	keyEvent = mTmpl->downEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "down",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::downHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::downHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-down",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::downHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::downHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "down-up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::downHandler>,
-			(void*) &mFalse);
+			&ControlByEvent::downHandler, (void*) &mFalse);
 	//forward event keys (e.g. "w", "shift-w", "w-up")
 	keyEvent = mTmpl->forwardEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "forward",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::forwardHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::forwardHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-forward",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::forwardHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::forwardHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "forward-up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::forwardHandler>,
-			(void*) &mFalse);
+			&ControlByEvent::forwardHandler, (void*) &mFalse);
 	//strafeLeft event keys (e.g. "a", "shift-a", "a-up")
 	keyEvent = mTmpl->strafeLeftEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "strafeLeft",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::strafeLeftHandler>, (void*) &mTrue);
+			&ControlByEvent::strafeLeftHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-strafeLeft",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::strafeLeftHandler>, (void*) &mTrue);
+			&ControlByEvent::strafeLeftHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "strafeLeft-up",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::strafeLeftHandler>, (void*) &mFalse);
+			&ControlByEvent::strafeLeftHandler, (void*) &mFalse);
 	//strafeRight event keys (e.g. "d", "shift-d", "d-up")
 	keyEvent = mTmpl->strafeRightEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "strafeRight",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::strafeRightHandler>, (void*) &mTrue);
+			&ControlByEvent::strafeRightHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-strafeRight",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::strafeRightHandler>, (void*) &mTrue);
+			&ControlByEvent::strafeRightHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "strafeRight-up",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::strafeRightHandler>, (void*) &mFalse);
+			&ControlByEvent::strafeRightHandler, (void*) &mFalse);
 	//rollLeft event keys (e.g. "q", "shift-q", "q-up")
 	keyEvent = mTmpl->rollLeftEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "rollLeft",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::rollLeftHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::rollLeftHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-rollLeft",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::rollLeftHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::rollLeftHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "rollLeft-up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::rollLeftHandler>,
-			(void*) &mFalse);
+			&ControlByEvent::rollLeftHandler, (void*) &mFalse);
 	//rollRight event keys (e.g. "e", "shift-e", "e-up")
 	keyEvent = mTmpl->rollRightEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "rollRight",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::rollRightHandler>, (void*) &mTrue);
+			&ControlByEvent::rollRightHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-rollRight",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::rollRightHandler>, (void*) &mTrue);
+			&ControlByEvent::rollRightHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "rollRight-up",
-			&handlerTmpl<ControlByEvent, *this,
-					&ControlByEvent::rollRightHandler>, (void*) &mFalse);
+			&ControlByEvent::rollRightHandler, (void*) &mFalse);
 	//up event keys (e.g. "r", "shift-r", "r-up")
 	keyEvent = mTmpl->upEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::upHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::upHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::upHandler>,
-			(void*) &mTrue);
+			&ControlByEvent::upHandler, (void*) &mTrue);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "up-up",
-			&handlerTmpl<ControlByEvent, *this, &ControlByEvent::upHandler>,
-			(void*) &mFalse);
+			&ControlByEvent::upHandler, (void*) &mFalse);
 	//set sensitivity parameters
 	mSpeed = mTmpl->speed();
 	mSpeedFast = mTmpl->speedFast();
@@ -186,6 +167,9 @@ void ControlByEvent::onAddSetup()
 
 void ControlByEvent::backwardHandler(const Event* event, void* data)
 {
+	ControlByEvent* thisObj = (ControlByEvent*) (data);
+	std::string eventName = event->get_name();
+	if (eventName == "")
 	mBackward = (bool) (*data);
 }
 
