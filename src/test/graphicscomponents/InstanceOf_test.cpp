@@ -55,7 +55,7 @@ struct InstanceOfTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(InstanceOfTemplateMethods, InstanceOfTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(InstanceOfTemplateTEST, InstanceOfTestCaseFixture)
 {
 	mInstanceOf =
 	DCAST(InstanceOf, mInstanceOfTmpl->makeComponent(mCompId));

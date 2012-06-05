@@ -54,14 +54,14 @@ BOOST_FIXTURE_TEST_CASE(ObjectTemplateMethods, ObjectTestCaseFixture)
 	BOOST_CHECK(true);
 }
 
-BOOST_FIXTURE_TEST_CASE(ObjectConstructor, ObjectTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ObjectConstructorTEST, ObjectTestCaseFixture)
 {
 	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
 	BOOST_CHECK(mObject->numComponents() == 0);
 	BOOST_CHECK(mObject->nodePath().is_empty());
 }
 
-BOOST_FIXTURE_TEST_CASE(ObjectComponents, ObjectTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ObjectComponentsTEST, ObjectTestCaseFixture)
 {
 	mObject->addComponent(mModel);
 	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);

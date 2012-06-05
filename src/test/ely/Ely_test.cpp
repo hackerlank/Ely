@@ -42,7 +42,7 @@ struct ElyTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Ely, ElySuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ElyTestCase, ElyTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ElyTestCaseTEST, ElyTestCaseFixture)
 {
 	BOOST_CHECK(true);
 }

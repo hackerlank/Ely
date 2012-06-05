@@ -42,7 +42,7 @@ struct FirstPersonCameraTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Support, SupportSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(FirstPersonCamera, FirstPersonCameraTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(FirstPersonCameraTEST, FirstPersonCameraTestCaseFixture)
 {
 	BOOST_CHECK(true);
 }

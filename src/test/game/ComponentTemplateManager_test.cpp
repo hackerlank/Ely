@@ -42,7 +42,7 @@ struct ComponentTemplateManagerTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ComponentTemplateManager, ComponentTemplateManagerTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ComponentTemplateManagerTEST, ComponentTemplateManagerTestCaseFixture)
 {
 	BOOST_CHECK(true);
 }

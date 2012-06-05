@@ -61,18 +61,12 @@ public:
 	 * \name Event handlers.
 	 * \brief The set of handlers associated to the events.
 	 *
-	 * Each of these events will be associated to an handler that will
-	 * control one specific movement of the object associated to this component.
+	 * Because each event will set members to true or false, two
+	 * functions are enough.
 	 */
 	///@{
-	static void backwardHandler(const Event* event, void* data);
-	static void downHandler(const Event* event, void* data);
-	static void forwardHandler(const Event* event, void* data);
-	static void strafeLeftHandler(const Event* event, void* data);
-	static void strafeRightHandler(const Event* event, void* data);
-	static void rollLeftHandler(const Event* event, void* data);
-	static void rollRightHandler(const Event* event, void* data);
-	static void upHandler(const Event* event, void* data);
+	static void setTrue(const Event* event, void* data);
+	static void setFalse(const Event* event, void* data);
 	///@}
 
 	/**

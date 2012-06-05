@@ -27,6 +27,7 @@
 
 #include "InputComponents/ControlByEventTemplate.h"
 #include <pandaFramework.h>
+#include <event.h>
 
 struct ControlByEventTestCaseFixture
 {
@@ -58,10 +59,8 @@ struct ControlByEventTestCaseFixture
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input, InputSuiteFixture)
 
-BOOST_AUTO_TEST_CASE_EXPECTED_FAILURES( ControlByEventTemplateMethods, 1 )
-
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ControlByEventTemplateMethods, ControlByEventTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ControlByEventTemplateTEST, ControlByEventTestCaseFixture)
 {
 	mControl =
 	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
@@ -70,18 +69,38 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventTemplateMethods, ControlByEventTestCaseFix
 	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
 }
 
-BOOST_FIXTURE_TEST_CASE(ControlByEventMethods, ControlByEventTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ControlByEventTEST, ControlByEventTestCaseFixture)
 {
 	BOOST_REQUIRE(mControl != NULL);
-	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
-	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("w"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-w"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("w-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("a"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-a"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("a-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("s"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-s"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("s-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("d"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-d"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("d-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("q"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-q"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("q-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("e"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-e"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("e-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("r"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-r"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("r-up"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("f"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("shift-f"));
+	BOOST_CHECK(mPanda->get_event_handler().has_hook("f-up"));
 }
 
-BOOST_FIXTURE_TEST_CASE(ControlByEventDestruction, ControlByEventTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ControlByEventDestructionTEST, ControlByEventTestCaseFixture)
 {
 	BOOST_REQUIRE(mControl != NULL);
-	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
-	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite

@@ -42,7 +42,7 @@ struct GameManagerTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(GameManager, GameManagerTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(GameManagerTEST, GameManagerTestCaseFixture)
 {
 	BOOST_CHECK(true);
 }
