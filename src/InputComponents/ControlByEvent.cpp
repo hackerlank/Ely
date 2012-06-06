@@ -34,6 +34,8 @@ ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 				false), mUp(false), mDown(false), mRollLeft(false), mRollRight(
 				false), mTrue(true), mFalse(false)
 {
+	mUpdateData = NULL;
+	mUpdateTask = NULL;
 }
 
 ControlByEvent::~ControlByEvent()
@@ -56,7 +58,10 @@ ControlByEvent::~ControlByEvent()
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 			(void*) &this->mUp);
 	//remove the task
-	mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
+	if (mUpdateTask)
+	{
+		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
+	}
 }
 
 const ComponentFamilyType ControlByEvent::familyType() const
