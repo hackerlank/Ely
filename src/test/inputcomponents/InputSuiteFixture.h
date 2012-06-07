@@ -27,61 +27,22 @@
 #include "InputComponents/ControlByEvent.h"
 #include "InputComponents/ControlByEventTemplate.h"
 #include <pandaFramework.h>
+#include <nodePath.h>
+#include <geomNode.h>
+#include <asyncTask.h>
+#include <event.h>
 #include <vector>
 #include <string>
 #include <iostream>
 
 struct InputSuiteFixture
 {
-	InputSuiteFixture() :
-		mControl(NULL), mCompId("ControlByEvent_Test")
+	InputSuiteFixture()
 	{
-		BOOST_TEST_MESSAGE( "setup InputSuiteFixture" );
-		mPanda = new PandaFramework();
-		mControlTmpl = new ControlByEventTemplate(mPanda);
-		ControlByEventTemplate::init_type();
-		ControlByEvent::init_type();
-		mEvents.push_back("w");
-		mEvents.push_back("shift-w");
-		mEvents.push_back("w-up");
-		mEvents.push_back("a");
-		mEvents.push_back("shift-a");
-		mEvents.push_back("a-up");
-		mEvents.push_back("s");
-		mEvents.push_back("shift-s");
-		mEvents.push_back("s-up");
-		mEvents.push_back("d");
-		mEvents.push_back("shift-d");
-		mEvents.push_back("d-up");
-		mEvents.push_back("q");
-		mEvents.push_back("shift-q");
-		mEvents.push_back("q-up");
-		mEvents.push_back("e");
-		mEvents.push_back("shift-e");
-		mEvents.push_back("e-up");
-		mEvents.push_back("r");
-		mEvents.push_back("shift-r");
-		mEvents.push_back("r-up");
-		mEvents.push_back("f");
-		mEvents.push_back("shift-f");
-		mEvents.push_back("f-up");
 	}
 	~InputSuiteFixture()
 	{
-		if (mControl)
-		{
-			delete mControl;
-		}
-		delete mControlTmpl;
-		mPanda->close_framework();
-		delete mPanda;
-		BOOST_TEST_MESSAGE( "teardown InputSuiteFixture" );
 	}
-	PandaFramework* mPanda;
-	ControlByEventTemplate* mControlTmpl;
-	ControlByEvent* mControl;
-	ComponentId mCompId;
-	std::vector<std::string> mEvents;
 };
 
 #endif /* INPUTSUITEFIXTURE_H_ */

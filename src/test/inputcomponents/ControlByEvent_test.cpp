@@ -35,31 +35,98 @@ struct ControlByEventTestCaseFixture
 	}
 };
 
+PandaFramework* mPanda;
+ControlByEventTemplate* mControlTmpl;
+ControlByEvent* mControl;
+ComponentId mCompId;
+std::vector<Event> mEvents;
+
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input,InputSuiteFixture)
 
+BOOST_AUTO_TEST_CASE(startup)
+{
+	mControl = NULL;
+	mCompId = "ControlByEvent_Test";
+	BOOST_TEST_MESSAGE( "startup" );
+	mPanda = new PandaFramework();
+	mControlTmpl = new ControlByEventTemplate(mPanda);
+	ControlByEventTemplate::init_type();
+	ControlByEvent::init_type();
+	mEvents.push_back(Event("w"));
+	mEvents.push_back(Event("shift-w"));
+	mEvents.push_back(Event("w-up"));
+	mEvents.push_back(Event("a"));
+	mEvents.push_back(Event("shift-a"));
+	mEvents.push_back(Event("a-up"));
+	mEvents.push_back(Event("s"));
+	mEvents.push_back(Event("shift-s"));
+	mEvents.push_back(Event("s-up"));
+	mEvents.push_back(Event("d"));
+	mEvents.push_back(Event("shift-d"));
+	mEvents.push_back(Event("d-up"));
+	mEvents.push_back(Event("q"));
+	mEvents.push_back(Event("shift-q"));
+	mEvents.push_back(Event("q-up"));
+	mEvents.push_back(Event("e"));
+	mEvents.push_back(Event("shift-e"));
+	mEvents.push_back(Event("e-up"));
+	mEvents.push_back(Event("r"));
+	mEvents.push_back(Event("shift-r"));
+	mEvents.push_back(Event("r-up"));
+	mEvents.push_back(Event("f"));
+	mEvents.push_back(Event("shift-f"));
+	mEvents.push_back(Event("f-up"));
+}
 /// Test cases
-BOOST_AUTO_TEST_CASE(ControlByEventTEST)
+BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixture)
 {
 	mControl =
 	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mControl != NULL);
-	BOOST_TEST_MESSAGE( "Checking ControlByEventTemplate" );
 	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
 	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
-	BOOST_TEST_MESSAGE( "Checking ControlByEventHandlers" );
-	std::vector<std::string>::iterator iter;
+	std::vector<Event>::iterator iter;
 	for (iter = mEvents.begin(); iter != mEvents.end(); ++iter)
 	{
-		BOOST_CHECK(mPanda->get_event_handler().has_hook(*iter));
+		//check if has event-handler
+		BOOST_REQUIRE(mPanda->get_event_handler().has_hook(iter->get_name()));
 	}
-	delete mControl;
-	BOOST_TEST_MESSAGE( "Checking ControlByEventDestruction" );
+	GeomNode* testGeom = new GeomNode("testGeom");
+	NodePath testNP(testGeom);
+	Object testObj("testObj");
+	testObj.nodePath() = testNP;
+	testObj.nodePath().set_pos(0,0,0);
+	testObj.nodePath().set_hpr(0,0,0);
+	mControl->ownerObject() = &testObj;
+	mControl->onAddSetup();
+	AsyncTask* task = mPanda->get_task_mgr().find_task("ControlByEvent::update");
+	BOOST_REQUIRE(task != NULL);
+	//send all events
 	for (iter = mEvents.begin(); iter != mEvents.end(); ++iter)
 	{
-		BOOST_CHECK(not mPanda->get_event_handler().has_hook(*iter));
+		mPanda->get_event_handler().dispatch_event(&(*iter));
 	}
-	mControl = NULL;
+	//...and execute tasks (==update)
+	mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), 0, 0.0001 );
+}
+
+BOOST_AUTO_TEST_CASE(cleanup)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
+	if (mControl)
+	{
+		delete mControl;
+	}
+	delete mControlTmpl;
+	mPanda->close_framework();
+	delete mPanda;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite
