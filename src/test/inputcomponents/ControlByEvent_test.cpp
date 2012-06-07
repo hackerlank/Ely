@@ -102,19 +102,37 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 	mControl->onAddSetup();
 	AsyncTask* task = mPanda->get_task_mgr().find_task("ControlByEvent::update");
 	BOOST_REQUIRE(task != NULL);
-	//send all events
-	for (iter = mEvents.begin(); iter != mEvents.end(); ++iter)
+	unsigned int i;
+	//send movement events: 3 at a time
+	for (i = 0; i < mEvents.size(); i+=3)
 	{
-		mPanda->get_event_handler().dispatch_event(&(*iter));
+		mPanda->get_event_handler().dispatch_event(&mEvents[i]);//e.g. w
+		mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
+		mPanda->get_event_handler().dispatch_event(&mEvents[i+1]);//e.g. shift-w
+		mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
 	}
-	//...and execute tasks (==update)
-	mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+	//testObject should stay at (nearly) initial position/orientation
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), 0, 0.0001 );
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), 0, 0.0001 );
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), 0, 0.0001 );
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), 0, 0.0001 );
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), 0, 0.0001 );
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), 0, 0.0001 );
+	//send speed events
+	Event speedFast("shift");
+	mPanda->get_event_handler().dispatch_event(&speedFast);
+	mPanda->get_event_handler().dispatch_event(&mEvents[1]);//shift-w
+	mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
+	mPanda->get_event_handler().dispatch_event(&mEvents[7]);//shift-s
+	mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
+	//testObject should stay at (nearly) initial position/orientation
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), 0, 0.0001 );
 }
 
 BOOST_AUTO_TEST_CASE(cleanup)

@@ -75,6 +75,8 @@ public:
 	///@{
 	float& speed();
 	float& speedFast();
+	float& movSens();
+	float& rollSens();
 	///@}
 
 
@@ -89,6 +91,7 @@ private:
 	///@{
 	/// Sensitivity parameters.
 	float mSpeed, mSpeedFast;
+	float mMovSens, mRollSens;
 	///@}
 
 	///TypedObject semantics: hardcoded

@@ -74,6 +74,8 @@ void ControlByEventTemplate::reset()
 	mSpeedKey = std::string("shift");
 	mSpeed = 1.0;
 	mSpeedFast = 5.0;
+	mMovSens = 2.0;
+	mRollSens = 50.0;
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
@@ -136,5 +138,16 @@ float& ControlByEventTemplate::speedFast()
 	return mSpeedFast;
 }
 
+float& ControlByEventTemplate::movSens()
+{
+	return mMovSens;
+}
+
+float& ControlByEventTemplate::rollSens()
+{
+	return mRollSens;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle ControlByEventTemplate::_type_handle;
+

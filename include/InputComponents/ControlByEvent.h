@@ -60,13 +60,11 @@ public:
 	/**
 	 * \name Event handlers.
 	 * \brief The set of handlers associated to the events.
-	 *
-	 * Because each event will set members to true or false, two
-	 * functions are enough.
 	 */
 	///@{
-	static void setTrue(const Event* event, void* data);
-	static void setFalse(const Event* event, void* data);
+	static void setControlTrue(const Event* event, void* data);
+	static void setControlFalse(const Event* event, void* data);
+	static void setSpeed(const Event* event, void* data);
 	///@}
 
 	/**
@@ -90,10 +88,8 @@ private:
 	///@}
 	///@{
 	/// Sensitivity settings.
-	float mSpeed, mSpeedFast;
-	float mMovSens, mMovSensFast;
-	float mRollSens;
-	float mSensX, mSensY;
+	float mSpeed, mSpeedFast, mSpeedActual;
+	float mMovSens, mRollSens;
 	///@}
 	///A task data for update.
 	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;

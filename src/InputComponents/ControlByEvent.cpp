@@ -90,85 +90,95 @@ bool ControlByEvent::initialize()
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "backward",
-			&ControlByEvent::setTrue, (void*) &this->mBackward);
+			&ControlByEvent::setControlTrue, (void*) &this->mBackward);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-backward",
-			&ControlByEvent::setTrue, (void*) &this->mBackward);
+			&ControlByEvent::setControlTrue, (void*) &this->mBackward);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "backward-up",
-			&ControlByEvent::setFalse, (void*) &this->mBackward);
+			&ControlByEvent::setControlFalse, (void*) &this->mBackward);
 
 	//down event keys (e.g. "f", "shift-f", "f-up")
 	keyEvent = mTmpl->downEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "down",
-			&ControlByEvent::setTrue, (void*) &this->mDown);
+			&ControlByEvent::setControlTrue, (void*) &this->mDown);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-down",
-			&ControlByEvent::setTrue, (void*) &this->mDown);
+			&ControlByEvent::setControlTrue, (void*) &this->mDown);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "down-up",
-			&ControlByEvent::setFalse, (void*) &this->mDown);
+			&ControlByEvent::setControlFalse, (void*) &this->mDown);
 	//forward event keys (e.g. "w", "shift-w", "w-up")
 	keyEvent = mTmpl->forwardEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "forward",
-			&ControlByEvent::setTrue, (void*) &this->mForward);
+			&ControlByEvent::setControlTrue, (void*) &this->mForward);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-forward",
-			&ControlByEvent::setTrue, (void*) &this->mForward);
+			&ControlByEvent::setControlTrue, (void*) &this->mForward);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "forward-up",
-			&ControlByEvent::setFalse, (void*) &this->mForward);
+			&ControlByEvent::setControlFalse, (void*) &this->mForward);
 	//strafeLeft event keys (e.g. "a", "shift-a", "a-up")
 	keyEvent = mTmpl->strafeLeftEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "strafeLeft",
-			&ControlByEvent::setTrue, (void*) &this->mStrafeLeft);
+			&ControlByEvent::setControlTrue, (void*) &this->mStrafeLeft);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-strafeLeft",
-			&ControlByEvent::setTrue, (void*) &this->mStrafeLeft);
+			&ControlByEvent::setControlTrue, (void*) &this->mStrafeLeft);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "strafeLeft-up",
-			&ControlByEvent::setFalse, (void*) &this->mStrafeLeft);
+			&ControlByEvent::setControlFalse, (void*) &this->mStrafeLeft);
 	//strafeRight event keys (e.g. "d", "shift-d", "d-up")
 	keyEvent = mTmpl->strafeRightEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "strafeRight",
-			&ControlByEvent::setTrue, (void*) &this->mStrafeRight);
+			&ControlByEvent::setControlTrue, (void*) &this->mStrafeRight);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-strafeRight",
-			&ControlByEvent::setTrue, (void*) &this->mStrafeRight);
+			&ControlByEvent::setControlTrue, (void*) &this->mStrafeRight);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "strafeRight-up",
-			&ControlByEvent::setFalse, (void*) &this->mStrafeRight);
+			&ControlByEvent::setControlFalse, (void*) &this->mStrafeRight);
 	//rollLeft event keys (e.g. "q", "shift-q", "q-up")
 	keyEvent = mTmpl->rollLeftEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "rollLeft",
-			&ControlByEvent::setTrue, (void*) &this->mRollLeft);
+			&ControlByEvent::setControlTrue, (void*) &this->mRollLeft);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-rollLeft",
-			&ControlByEvent::setTrue, (void*) &this->mRollLeft);
+			&ControlByEvent::setControlTrue, (void*) &this->mRollLeft);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "rollLeft-up",
-			&ControlByEvent::setFalse, (void*) &this->mRollLeft);
+			&ControlByEvent::setControlFalse, (void*) &this->mRollLeft);
 	//rollRight event keys (e.g. "e", "shift-e", "e-up")
 	keyEvent = mTmpl->rollRightEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "rollRight",
-			&ControlByEvent::setTrue, (void*) &this->mRollRight);
+			&ControlByEvent::setControlTrue, (void*) &this->mRollRight);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-rollRight",
-			&ControlByEvent::setTrue, (void*) &this->mRollRight);
+			&ControlByEvent::setControlTrue, (void*) &this->mRollRight);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "rollRight-up",
-			&ControlByEvent::setFalse, (void*) &this->mRollRight);
+			&ControlByEvent::setControlFalse, (void*) &this->mRollRight);
 	//up event keys (e.g. "r", "shift-r", "r-up")
 	keyEvent = mTmpl->upEvent();
 	speedKeyEvent = speedKey + "-" + keyEvent;
 	upKeyEvent = keyEvent + "-up";
 	mTmpl->pandaFramework()->define_key(keyEvent, "up",
-			&ControlByEvent::setTrue, (void*) &this->mUp);
+			&ControlByEvent::setControlTrue, (void*) &this->mUp);
 	mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-up",
-			&ControlByEvent::setTrue, (void*) &this->mUp);
+			&ControlByEvent::setControlTrue, (void*) &this->mUp);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "up-up",
-			&ControlByEvent::setFalse, (void*) &this->mUp);
+			&ControlByEvent::setControlFalse, (void*) &this->mUp);
+	//speedKey events (e.g. "shift", "shift-up")
+	upKeyEvent = speedKey + "-up";
+	mTmpl->pandaFramework()->define_key(speedKey, "speedKey",
+			&ControlByEvent::setSpeed, (void*) &this->mSpeedFast);
+	mTmpl->pandaFramework()->define_key(upKeyEvent, "speedKey-up",
+			&ControlByEvent::setSpeed, (void*) &this->mSpeed);
+
 	//set sensitivity parameters
 	mSpeed = mTmpl->speed();
 	mSpeedFast = mTmpl->speedFast();
+	mSpeedActual = mSpeed;
+	mMovSens = mTmpl->movSens();
+	mRollSens = mTmpl->rollSens();
 	return result;
 }
 
@@ -183,20 +193,78 @@ void ControlByEvent::onAddSetup()
 	mTmpl->pandaFramework()->get_task_mgr().add(mUpdateTask);
 }
 
-void ControlByEvent::setTrue(const Event* event, void* data)
+void ControlByEvent::setControlTrue(const Event* event, void* data)
 {
 	bool* boolPtr = (bool*) data;
 	*boolPtr = true;
 }
 
-void ControlByEvent::setFalse(const Event* event, void* data)
+void ControlByEvent::setControlFalse(const Event* event, void* data)
 {
 	bool* boolPtr = (bool*) data;
 	*boolPtr = false;
 }
 
+void ControlByEvent::setSpeed(const Event* event, void* data)
+{
+	mSpeedActual = (float) (*data);
+}
+
 AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 {
+	float dt = task->get_dt();
+
+	//handle keys:
+	NodePath ownerNodePath = mOwnerObject->nodePath();
+	if (mForward)
+	{
+		ownerNodePath.set_y(ownerNodePath,
+				ownerNodePath.get_y(ownerNodePath)
+						+ mMovSens * mSpeedActual * dt);
+	}
+	if (mBackward)
+	{
+		ownerNodePath.set_y(ownerNodePath,
+				ownerNodePath.get_y(ownerNodePath)
+						- mMovSens * mSpeedActual * dt);
+	}
+	if (mStrafeLeft)
+	{
+		ownerNodePath.set_x(ownerNodePath,
+				ownerNodePath.get_x(ownerNodePath)
+						- mMovSens * mSpeedActual * dt);
+	}
+	if (mStrafeRight)
+	{
+		ownerNodePath.set_x(ownerNodePath,
+				ownerNodePath.get_x(ownerNodePath)
+						+ mMovSens * mSpeedActual * dt);
+	}
+	if (mUp)
+	{
+		ownerNodePath.set_z(ownerNodePath,
+				ownerNodePath.get_z(ownerNodePath)
+						+ mMovSens * mSpeedActual * dt);
+	}
+	if (mDown)
+	{
+		ownerNodePath.set_z(ownerNodePath,
+				ownerNodePath.get_z(ownerNodePath)
+						- mMovSens * mSpeedActual * dt);
+	}
+	if (mRollLeft)
+	{
+		ownerNodePath.set_h(ownerNodePath,
+				ownerNodePath.get_h(ownerNodePath)
+						- mRollSens * mSpeedActual * dt);
+	}
+	if (mRollRight)
+	{
+		ownerNodePath.set_h(ownerNodePath,
+				ownerNodePath.get_h(ownerNodePath)
+						+ mRollSens * mSpeedActual * dt);
+	}
+	//
 	return AsyncTask::DS_done;
 }
 
