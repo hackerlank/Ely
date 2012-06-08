@@ -40,7 +40,8 @@ ControlByEventTemplate* mControlTmpl;
 ControlByEvent* mControl;
 ComponentId mCompId;
 std::vector<Event> mEvents;
-const float VAL = 1.0e+10;
+const float VAL = 1.0e+12;
+const float DEG = 89.999;
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input,InputSuiteFixture)
@@ -98,7 +99,7 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 	Object testObj("testObj");
 	testObj.nodePath() = testNP;
 	testObj.nodePath().set_pos(VAL,VAL,VAL);
-	testObj.nodePath().set_hpr(VAL/10.0,VAL/10.0,VAL/10.0);
+	testObj.nodePath().set_hpr(DEG,DEG,DEG);
 	mControl->ownerObject() = &testObj;
 	mControl->onAddSetup();
 	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("ControlByEvent::update"));
@@ -115,12 +116,12 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
 	}
 	//testObject should stay at (nearly) initial position/orientation
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), VAL/10.0, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), VAL/10.0, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), VAL/10.0, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), DEG, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), DEG, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), DEG, 1.0);
 	//send speed events
 	testObj.nodePath().set_pos(VAL,VAL,VAL);
 	Event speedFast("shift");
@@ -132,9 +133,9 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 	mControl->update(task);
 	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
 	//testObject should stay at (nearly) initial position/orientation
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0e-1 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0);
 }
 
 BOOST_AUTO_TEST_CASE(cleanup)
