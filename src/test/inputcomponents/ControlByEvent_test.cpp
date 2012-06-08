@@ -40,6 +40,7 @@ ControlByEventTemplate* mControlTmpl;
 ControlByEvent* mControl;
 ComponentId mCompId;
 std::vector<Event> mEvents;
+const float VAL = 1.0e+10;
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input,InputSuiteFixture)
@@ -96,43 +97,44 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 	NodePath testNP(testGeom);
 	Object testObj("testObj");
 	testObj.nodePath() = testNP;
-	testObj.nodePath().set_pos(0,0,0);
-	testObj.nodePath().set_hpr(0,0,0);
+	testObj.nodePath().set_pos(VAL,VAL,VAL);
+	testObj.nodePath().set_hpr(VAL/10.0,VAL/10.0,VAL/10.0);
 	mControl->ownerObject() = &testObj;
 	mControl->onAddSetup();
-	AsyncTask* task = mPanda->get_task_mgr().find_task("ControlByEvent::update");
+	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("ControlByEvent::update"));
 	BOOST_REQUIRE(task != NULL);
 	unsigned int i;
 	//send movement events: 3 at a time
 	for (i = 0; i < mEvents.size(); i+=3)
 	{
-		mPanda->get_event_handler().dispatch_event(&mEvents[i]);//e.g. w
-		mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+		mPanda->get_event_handler().dispatch_event(&mEvents[i]); //e.g. w
+		mControl->update(task);
 		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
 		mPanda->get_event_handler().dispatch_event(&mEvents[i+1]);//e.g. shift-w
-		mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+		mControl->update(task);
 		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
 	}
 	//testObject should stay at (nearly) initial position/orientation
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), VAL/10.0, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), VAL/10.0, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), VAL/10.0, 1.0e-1 );
 	//send speed events
+	testObj.nodePath().set_pos(VAL,VAL,VAL);
 	Event speedFast("shift");
 	mPanda->get_event_handler().dispatch_event(&speedFast);
 	mPanda->get_event_handler().dispatch_event(&mEvents[1]);//shift-w
-	mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+	mControl->update(task);
 	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
 	mPanda->get_event_handler().dispatch_event(&mEvents[7]);//shift-s
-	mControl->update(dynamic_cast<GenericAsyncTask*>(task));
+	mControl->update(task);
 	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
 	//testObject should stay at (nearly) initial position/orientation
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), 0, 0.0001 );
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), 0, 0.0001 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0e-1 );
+	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0e-1 );
 }
 
 BOOST_AUTO_TEST_CASE(cleanup)

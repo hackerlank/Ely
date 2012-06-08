@@ -65,6 +65,7 @@ public:
 	static void setControlTrue(const Event* event, void* data);
 	static void setControlFalse(const Event* event, void* data);
 	static void setSpeed(const Event* event, void* data);
+	static void setSpeedFast(const Event* event, void* data);
 	///@}
 
 	/**

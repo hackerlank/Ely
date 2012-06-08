@@ -169,9 +169,9 @@ bool ControlByEvent::initialize()
 	//speedKey events (e.g. "shift", "shift-up")
 	upKeyEvent = speedKey + "-up";
 	mTmpl->pandaFramework()->define_key(speedKey, "speedKey",
-			&ControlByEvent::setSpeed, (void*) &this->mSpeedFast);
+			&ControlByEvent::setSpeedFast, (void*) this);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "speedKey-up",
-			&ControlByEvent::setSpeed, (void*) &this->mSpeed);
+			&ControlByEvent::setSpeed, (void*) this);
 
 	//set sensitivity parameters
 	mSpeed = mTmpl->speed();
@@ -207,12 +207,23 @@ void ControlByEvent::setControlFalse(const Event* event, void* data)
 
 void ControlByEvent::setSpeed(const Event* event, void* data)
 {
-	mSpeedActual = (float) (*data);
+	ControlByEvent* _this = (ControlByEvent*) data;
+	_this->mSpeedActual = _this->mSpeed;
+}
+
+void ControlByEvent::setSpeedFast(const Event* event, void* data)
+{
+	ControlByEvent* _this = (ControlByEvent*) data;
+	_this->mSpeedActual = _this->mSpeedFast;
 }
 
 AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 {
 	float dt = task->get_dt();
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
 
 	//handle keys:
 	NodePath ownerNodePath = mOwnerObject->nodePath();
@@ -265,7 +276,7 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 						+ mRollSens * mSpeedActual * dt);
 	}
 	//
-	return AsyncTask::DS_done;
+	return AsyncTask::DS_cont;
 }
 
 //TypedObject semantics: hardcoded
