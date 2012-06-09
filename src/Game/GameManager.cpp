@@ -65,31 +65,41 @@ void GameManager::setup()
 	// Second: setup object template manager
 	setupObjTmplMgr();
 
-	//Create game objects (from a object.xml)
-
 	ComponentTemplate::ParameterTable parameterTable;
+	ComponentTemplate* componentTmpl;
+	//Create game objects (from a object.xml)
 
 	//1st object (Panda: "Actor"): initialize component templates
 	//a11) get first component template...
-	ModelTemplate* modelTmpl =
-			DCAST(ModelTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
-							ObjectTemplateId("Actor"))->getComponentTemplate(
-							ComponentType("Model")));
+	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
+			ObjectTemplateId("Actor"))->getComponentTemplate(
+			ComponentType("Model"));
 	//a12) ...resetParameters it to its default state...
-	modelTmpl->resetParameters();
+	componentTmpl->resetParameters();
 	//a13) ...customize it as needed (e.g. in data driven manner)
-	modelTmpl->modelFile() = Filename("panda");
-	modelTmpl->animFiles().push_back(Filename("panda-walk"));
+	parameterTable.insert(
+			ComponentTemplate::ParameterTable::value_type(
+					std::string("ModelFile"), std::string("panda")));
+	parameterTable.insert(
+			ComponentTemplate::ParameterTable::value_type(
+					std::string("AnimFile"), std::string("panda-walk")));
+	componentTmpl->setParameters(parameterTable);
+	parameterTable.clear();
 	//a21) get next component template...
-	ControlByEventTemplate* controlTmpl =
-			DCAST(ControlByEventTemplate, ObjectTemplateManager::GetSingleton().getObjectTemplate(
-							ObjectTemplateId("Actor"))->getComponentTemplate(
-							ComponentType("ControlByEvent")));
+	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
+			ObjectTemplateId("Actor"))->getComponentTemplate(
+			ComponentType("ControlByEvent"));
 	//a22) ...resetParameters it to its default state...
-	controlTmpl->resetParameters();
+	componentTmpl->resetParameters();
 	//a23) ...customize it as needed (e.g. in data driven manner)
-	controlTmpl->speed() = 200.0;
-	controlTmpl->fastFactor() = 10.0;
+	parameterTable.insert(
+			ComponentTemplate::ParameterTable::value_type(std::string("Speed"),
+					std::string("200.0")));
+	parameterTable.insert(
+			ComponentTemplate::ParameterTable::value_type(
+					std::string("FastFactor"), std::string("10.0")));
+	componentTmpl->setParameters(parameterTable);
+	parameterTable.clear();
 	//a31) get the next component template... (and so on)
 	//1st object (Panda: "Actor"): create the object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
@@ -97,13 +107,14 @@ void GameManager::setup()
 
 	//2nd object (PandaI: "InstancedActor"): initialize component templates
 	//a1) get a component template...
-	InstanceOfTemplate* instanceOfTmpl =
-			DCAST(InstanceOfTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
-							ObjectTemplateId("InstancedActor"))->getComponentTemplate(
-							ComponentType("InstanceOf")));
+	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
+			ObjectTemplateId("InstancedActor"))->getComponentTemplate(
+			ComponentType("InstanceOf"));
 	//a2) ...resetParameters it to its default state...
-	instanceOfTmpl->resetParameters();
+	componentTmpl->resetParameters();
 	//a3) ...customize it as needed (e.g. in data driven manner)
+	componentTmpl->setParameters(parameterTable);
+	parameterTable.clear();
 	//b1) get the next component template... (and so on)
 	//2nd object (PandaI: "InstancedActor"): create the object
 	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
