@@ -34,7 +34,7 @@ ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 	}
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
-	reset();
+	resetParameters();
 }
 
 ModelTemplate::~ModelTemplate()
@@ -78,12 +78,30 @@ PandaFramework*& ModelTemplate::pandaFramework()
 	return mPandaFramework;
 }
 
+void ModelTemplate::setParameters(ParameterTable& parameterTable)
+{
+	ParameterTable::iterator iter;
+	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
+	//set model filename
+	iter = parameterTable.find("Filename");
+	if (iter != parameterTable.end())
+	{
+		mModelFile = Filename(iter->second);
+	}
+	//set animations filenames
+	iterRange = parameterTable.equal_range("animation");
+	for (iter = iterRange.first; iter != iterRange.second; ++iter)
+	{
+		mAnimFiles.push_back(Filename(iter->second));
+	}
+}
+
 WindowFramework*& ModelTemplate::windowFramework()
 {
 	return mWindowFramework;
 }
 
-void ModelTemplate::reset()
+void ModelTemplate::resetParameters()
 {
 	mModelFile = Filename("");
 	mAnimFiles.clear();

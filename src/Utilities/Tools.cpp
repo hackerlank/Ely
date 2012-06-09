@@ -22,10 +22,14 @@
  */
 
 #include "Utilities/Tools.h"
+#include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
 
 void initTypedObjects()
 {
+	Object::init_type();
+	ObjectTemplate::init_type();
 	Component::init_type();
 	ComponentTemplate::init_type();
 	Model::init_type();

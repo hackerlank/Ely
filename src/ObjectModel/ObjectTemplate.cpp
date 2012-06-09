@@ -71,3 +71,5 @@ ComponentTemplate* ObjectTemplate::getComponentTemplate(
 	return *it;
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle ObjectTemplate::_type_handle;

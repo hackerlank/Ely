@@ -24,6 +24,8 @@
 #ifndef CONTROLBYEVENTTEMPLATE_H_
 #define CONTROLBYEVENTTEMPLATE_H_
 
+#include <string>
+#include <cstdlib>
 #include <typedObject.h>
 #include <pandaFramework.h>
 #include "ObjectModel/Component.h"
@@ -42,7 +44,8 @@ public:
 
 	virtual Component* makeComponent(ComponentId& compId);
 
-	virtual void reset();
+	virtual void setParameters(ParameterTable& parameterTable);
+	virtual void resetParameters();
 
 	/**
 	 * \brief Gets/sets the PandaFramework.

@@ -64,7 +64,7 @@ BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ModelTemplateTEST, ModelTestCaseFixture)
 {
-	mModelTmpl->reset();
+	mModelTmpl->resetParameters();
 	mModelTmpl->modelFile() = Filename("panda");
 	mModel =
 	DCAST(Model, mModelTmpl->makeComponent(mCompId));

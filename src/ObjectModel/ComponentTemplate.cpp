@@ -27,5 +27,13 @@ ComponentTemplate::ComponentTemplate()
 {
 }
 
+void ComponentTemplate::setParameters(ParameterTable& parameterTable)
+{
+}
+
+void ComponentTemplate::resetParameters()
+{
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle ComponentTemplate::_type_handle;

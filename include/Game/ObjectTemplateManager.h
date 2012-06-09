@@ -33,7 +33,7 @@
 /**
  * \brief Singleton template manager that stores all the object templates.
  *
- * Not thread-safe during creation, thread-safe during utilization.
+ * Thread-safe during utilization.
  */
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
 {
@@ -44,14 +44,14 @@ public:
 	ObjectTemplateManager();
 
 	/**
-	 * \brief Read the object templates definitions,suitably formatted (xml), from file.
+	 * \brief Reads the object templates definitions,suitably formatted (xml), from file.
 	 * @param filename The name of the file.
 	 * @return True if all ok, false otherwise.
 	 */
 	bool readObjectTemplates(const std::string& filename);
 
 	/**
-	 * \brief Add an object template for a given object type it can create.
+	 * \brief Adds an object template for a given object type it can create.
 	 *
 	 * It will add the object template to the internal table and if a
 	 * template for that object type already existed it'll be replaced
@@ -63,21 +63,21 @@ public:
 	PT(ObjectTemplate) addObjectTemplate(ObjectTemplate* objectTmpl);
 
 	/**
-	 * \brief Remove the object template given the object type it can create.
+	 * \brief Removes the object template given the object type it can create.
 	 * @param objectType The object type.
 	 * @return True if the object template existed, false otherwise.
 	 */
 	bool removeObjectTemplate(ObjectTemplateId objectType);
 
 	/**
-	 * \brief Get the object template given the object type it can create.
+	 * \brief Gets the object template given the object type it can create.
 	 * @param objectType The object type.
 	 * @return The object template.
 	 */
 	ObjectTemplate* getObjectTemplate(ObjectTemplateId objectType);
 
 	/**
-	 * \brief Create a object given its type and a NodePath.
+	 * \brief Creates a object given its type and a NodePath.
 	 *
 	 * The type is needed to select the correct template.
 	 * @param objectType The object type.

@@ -27,6 +27,8 @@
 #include <string>
 #include <list>
 #include <algorithm>
+#include <referenceCount.h>
+#include <typedWritable.h>
 #include "ComponentTemplate.h"
 #include "Component.h"
 #include "Utilities/Tools.h"
@@ -40,7 +42,7 @@ typedef std::string ObjectTemplateId;
 /**
  * \brief Class storing all of objects templates used to create an object.
  */
-class ObjectTemplate: public ReferenceCount
+class ObjectTemplate: public TypedWritable, public ReferenceCount
 {
 public:
 	/**
@@ -66,25 +68,25 @@ public:
 	void clearComponentTemplates();
 
 	/**
-	 * \brief Get a reference to the name of this object template.
+	 * \brief Gets a reference to the name of this object template.
 	 * @return The name of this object template.
 	 */
 	ObjectTemplateId& name();
 
 	/**
-	 * \brief Get the component template list.
+	 * \brief Gets the component template list.
 	 * @return The component template list.
 	 */
 	ComponentTemplateList& getComponentTemplates();
 
 	/**
-	 * \brief Add a component template.
+	 * \brief Adds a component template.
 	 * @param componentTmpl The component template.
 	 */
 	void addComponentTemplate(ComponentTemplate* componentTmpl);
 
 	/**
-	 * \brief Get a component template given the component type it can create.
+	 * \brief Gets a component template given the component type it can create.
 	 * @param componentId The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
@@ -96,6 +98,30 @@ private:
 	ObjectTemplateId mName;
 	///List of all component templates.
 	ComponentTemplateList mComponentTemplates;
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedObject::init_type();
+		register_type(_type_handle, "ObjectTemplate", TypedObject::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
 };
 
 struct idIsEqualTo

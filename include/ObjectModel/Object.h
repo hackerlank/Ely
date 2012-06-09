@@ -30,6 +30,7 @@
 #include <windowFramework.h>
 #include <nodePath.h>
 #include <referenceCount.h>
+#include <typedWritable.h>
 #include <pointerTo.h>
 
 #include "Component.h"
@@ -53,7 +54,7 @@ typedef std::string ObjectId;
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
  */
-class Object: public ReferenceCount
+class Object: public TypedWritable, public ReferenceCount
 {
 public:
 	/**
@@ -67,7 +68,7 @@ public:
 	virtual ~Object();
 
 	/**
-	 * \brief Get the component of that given family.
+	 * \brief Gets the component of that given family.
 	 * @param familyID The family of the component.
 	 * @return The component, or NULL if no component of that
 	 * family exists.
@@ -75,7 +76,7 @@ public:
 	Component* getComponent(const ComponentFamilyType& familyID);
 
 	/**
-	 * \brief Set a new component into this object.
+	 * \brief Sets a new component into this object.
 	 *
 	 * It will add the component in the object to the passed component,
 	 * and if a component of that family already existed it'll be
@@ -93,19 +94,19 @@ public:
 	void clearComponents();
 
 	/**
-	 * \brief Return the number of components.
+	 * \brief Returns the number of components.
 	 * @return The number of components.
 	 */
 	unsigned int numComponents();
 
 	/**
-	 * \brief Get a reference to the id of this object.
+	 * \brief Gets a reference to the id of this object.
 	 * @return The id of this object.
 	 */
 	ObjectId& objectId();
 
 	/**
-	 * \brief Get a reference to the node path of this object.
+	 * \brief Gets a reference to the node path of this object.
 	 * @return The node path of this object.
 	 */
 	NodePath& nodePath();
@@ -122,6 +123,30 @@ private:
 	///Table of all components indexed by component family type.
 	typedef std::map<const ComponentFamilyType, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedObject::init_type();
+		register_type(_type_handle, "Object", TypedObject::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
 };
 
 #endif /* OBJECT_H_ */

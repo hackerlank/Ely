@@ -52,7 +52,7 @@ public:
 	virtual void onAddSetup();
 
 	/**
-	 * \brief Get a reference to the node path associated to this model.
+	 * \brief Gets a reference to the node path associated to this model.
 	 * @return The node path associated to this model.
 	 */
 	NodePath& nodePath();

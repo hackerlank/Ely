@@ -25,7 +25,7 @@
 
 InstanceOfTemplate::InstanceOfTemplate()
 {
-	reset();
+	resetParameters();
 }
 
 InstanceOfTemplate::~InstanceOfTemplate()
@@ -52,10 +52,6 @@ Component* InstanceOfTemplate::makeComponent(ComponentId& compId)
 		return NULL;
 	}
 	return newInstanceOf;
-}
-
-void InstanceOfTemplate::reset()
-{
 }
 
 //TypedObject semantics: hardcoded

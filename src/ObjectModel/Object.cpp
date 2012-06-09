@@ -92,3 +92,5 @@ Object::operator NodePath()
 	return mNodePath;
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle Object::_type_handle;

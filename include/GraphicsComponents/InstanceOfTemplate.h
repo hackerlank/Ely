@@ -42,8 +42,6 @@ public:
 
 	virtual Component* makeComponent(ComponentId& compId);
 
-	virtual void reset();
-
 private:
 
 	///TypedObject semantics: hardcoded

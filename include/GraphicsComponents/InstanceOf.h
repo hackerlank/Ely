@@ -48,7 +48,7 @@ public:
 	virtual void onAddSetup();
 
 	/**
-	 * \brief Get a reference to the node path this component is instance of.
+	 * \brief Gets a reference to the node path this component is instance of.
 	 * @return The node path this component is instance of.
 	 */
 	NodePath& nodePath();

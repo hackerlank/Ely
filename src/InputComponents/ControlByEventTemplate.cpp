@@ -32,7 +32,7 @@ ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework)
 
 	}
 	mPandaFramework = pandaFramework;
-	reset();
+	resetParameters();
 }
 
 ControlByEventTemplate::~ControlByEventTemplate()
@@ -61,7 +61,7 @@ Component* ControlByEventTemplate::makeComponent(ComponentId& compId)
 	return newControl;
 }
 
-void ControlByEventTemplate::reset()
+void ControlByEventTemplate::resetParameters()
 {
 	mForward = std::string("w");
 	mRollLeft = std::string("a");
@@ -141,6 +141,78 @@ float& ControlByEventTemplate::fastFactor()
 float& ControlByEventTemplate::movSens()
 {
 	return mMovSens;
+}
+
+void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
+{
+	ParameterTable::iterator iter;
+	//set event key names
+	iter = parameterTable.find("Forward");
+	if (iter != parameterTable.end())
+	{
+		mForward = iter->second;
+	}
+	iter = parameterTable.find("RollLeft");
+	if (iter != parameterTable.end())
+	{
+		mRollLeft = iter->second;
+	}
+	iter = parameterTable.find("Backward");
+	if (iter != parameterTable.end())
+	{
+		mBackward = iter->second;
+	}
+	iter = parameterTable.find("RollRight");
+	if (iter != parameterTable.end())
+	{
+		mRollRight = iter->second;
+	}
+	iter = parameterTable.find("StrafeLeft");
+	if (iter != parameterTable.end())
+	{
+		mStrafeLeft = iter->second;
+	}
+	iter = parameterTable.find("StrafeRight");
+	if (iter != parameterTable.end())
+	{
+		mStrafeRight = iter->second;
+	}
+	iter = parameterTable.find("Up");
+	if (iter != parameterTable.end())
+	{
+		mUp = iter->second;
+	}
+	iter = parameterTable.find("Down");
+	if (iter != parameterTable.end())
+	{
+		mDown = iter->second;
+	}
+	iter = parameterTable.find("SpeedKey");
+	if (iter != parameterTable.end())
+	{
+		mSpeedKey = iter->second;
+	}
+	//set sensitivity parameters
+	iter = parameterTable.find("Speed");
+	if (iter != parameterTable.end())
+	{
+		mSpeed = (float) atof(iter->second.c_str());
+	}
+	iter = parameterTable.find("FastFactor");
+	if (iter != parameterTable.end())
+	{
+		mFastFactor = (float) atof(iter->second.c_str());
+	}
+	iter = parameterTable.find("MovSens");
+	if (iter != parameterTable.end())
+	{
+		mMovSens = (float) atof(iter->second.c_str());
+	}
+	iter = parameterTable.find("RollSens");
+	if (iter != parameterTable.end())
+	{
+		mRollSens = (float) atof(iter->second.c_str());
+	}
 }
 
 float& ControlByEventTemplate::rollSens()

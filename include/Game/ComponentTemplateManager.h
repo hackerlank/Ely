@@ -34,14 +34,14 @@
 /**
  * \brief Singleton template manager that stores all the component templates.
  *
- * Not thread-safe during creation, thread-safe during utilization.
+ * Thread-safe during utilization.
  */
 class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {
 public:
 
 	/**
-	 * \brief Add a component template for a given the component type it can create.
+	 * \brief Adds a component template for a given the component type it can create.
 	 *
 	 * It will add the component template to the internal table and if a
 	 * template for that component type already existed it'll be replaced
@@ -54,21 +54,21 @@ public:
 			ComponentTemplate* componentTmpl);
 
 	/**
-	 * \brief Remove the component template given the component type it can create.
+	 * \brief Removes the component template given the component type it can create.
 	 * @param componentID The component type.
 	 * @return True if the component template existed, false otherwise.
 	 */
 	bool removeComponentTemplate(ComponentType componentID);
 
 	/**
-	 * \brief Get the component template given the component type it can create.
+	 * \brief Gets the component template given the component type it can create.
 	 * @param componentID The component type.
 	 * @return The component template.
 	 */
 	ComponentTemplate* getComponentTemplate(ComponentType componentID);
 
 	/**
-	 * \brief Create a component given its type.
+	 * \brief Creates a component given its type.
 	 * @param componentID The component type.
 	 * @return The just created component, or NULL on failure (for any reason).
 	 */
@@ -82,7 +82,7 @@ private:
 	///The unique id for created components.
 	IdType id;
 	/**
-	 * \brief Return an unique id for created components.
+	 * \brief Returns an unique id for created components.
 	 * @return
 	 */
 	IdType getId();

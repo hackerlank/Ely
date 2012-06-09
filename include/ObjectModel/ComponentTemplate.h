@@ -24,15 +24,16 @@
 #ifndef COMPONENTTEMPLATE_H_
 #define COMPONENTTEMPLATE_H_
 
+#include <map>
 #include <referenceCount.h>
-#include <typedObject.h>
+#include <typedWritable.h>
 #include "Object.h"
 #include "Component.h"
 
 /**
  * \brief Abstract base class of component templates used to create components.
  */
-class ComponentTemplate: public TypedObject, public ReferenceCount
+class ComponentTemplate: public TypedWritable, public ReferenceCount
 {
 public:
 	/**
@@ -41,26 +42,38 @@ public:
 	ComponentTemplate();
 
 	/**
-	 * \brief Get the id of the component created.
+	 * \brief Gets the id of the component created.
 	 * @return The id of the component created.
 	 */
 	virtual const ComponentType componentType() const = 0;
 	/**
-	 * \brief Get the family id of the component created.
+	 * \brief Gets the family id of the component created.
 	 * @return The family id of the component created.
 	 */
 	virtual const ComponentFamilyType familyType() const = 0;
 
 	/**
-	 * \brief Create the actual component of that family.
+	 * \brief Creates the actual component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
 	virtual Component* makeComponent(ComponentId& compId) = 0;
 
 	/**
-	 * \brief (Re)set this component template's members to their default values.
+	 * \name Parameters management.
+	 * \brief Sets the parameters of the component, that this template is
+	 * prepared to create, to custom values.
+	 * @param parameterTable The table of (parameter,value).
 	 */
-	virtual void reset() = 0;
+	///@{
+	typedef std::multimap<std::string, std::string> ParameterTable;
+	virtual void setParameters(ParameterTable& parameterTable);
+	///@}
+
+	/**
+	 * \brief (Re)sets the parameters of the component, that this template is
+	 * prepared to create, to their default values.
+	 */
+	virtual void resetParameters();
 
 	///TypedObject semantics: hardcoded
 public:
@@ -71,7 +84,8 @@ public:
 	static void init_type()
 	{
 		TypedObject::init_type();
-		register_type(_type_handle, "ComponentTemplate", TypedObject::get_class_type());
+		register_type(_type_handle, "ComponentTemplate",
+				TypedObject::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

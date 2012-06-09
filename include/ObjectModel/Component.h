@@ -28,7 +28,7 @@
 
 #include <referenceCount.h>
 #include <pointerTo.h>
-#include <typedObject.h>
+#include <typedWritable.h>
 #include <genericAsyncTask.h>
 
 /**
@@ -56,7 +56,7 @@ class Object;
  * family component. Any object can have only one component of
  * each family type.
  */
-class Component: public TypedObject, public ReferenceCount
+class Component: public TypedWritable, public ReferenceCount
 {
 public:
 	/**
@@ -65,12 +65,12 @@ public:
 	Component();
 
 	/**
-	 * \brief Get the type of this component.
+	 * \brief Gets the type of this component.
 	 * @return The id of this component.
 	 */
 	const virtual ComponentType componentType() const = 0;
 	/**
-	 * \brief Get the family type of this component.
+	 * \brief Gets the family type of this component.
 	 * @return The family id of this component.
 	 */
 	const virtual ComponentFamilyType familyType() const = 0;
@@ -88,7 +88,7 @@ public:
 	 */
 	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
 	/**
-	 * \brief Allow a component to be initialized.
+	 * \brief Allows a component to be initialized.
 	 *
 	 * This can be done after creation but "before" insertion into an object.
 	 */
@@ -101,12 +101,12 @@ public:
 	 */
 	virtual void onAddSetup() = 0;
 	/**
-	 * \brief Get a reference to the owner object.
+	 * \brief Gets a reference to the owner object.
 	 * \return The owner object.
 	 */
 	Object*& ownerObject();
 	/**
-	 * \brief Get a reference to the component unique identifier.
+	 * \brief Gets a reference to the component unique identifier.
 	 * \return The component unique identifier.
 	 */
 	ComponentId& componentId();

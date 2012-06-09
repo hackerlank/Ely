@@ -26,6 +26,7 @@
 
 #include <string>
 #include <list>
+#include <utility>
 #include <filename.h>
 #include <pandaFramework.h>
 #include <windowFramework.h>
@@ -49,7 +50,8 @@ public:
 
 	virtual Component* makeComponent(ComponentId& compId);
 
-	virtual void reset();
+	virtual void setParameters(ParameterTable& parameterTable);
+	virtual void resetParameters();
 
 	/**
 	 * \brief Gets/sets the model file name.

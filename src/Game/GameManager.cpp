@@ -67,14 +67,16 @@ void GameManager::setup()
 
 	//Create game objects (from a object.xml)
 
+	ComponentTemplate::ParameterTable parameterTable;
+
 	//1st object (Panda: "Actor"): initialize component templates
 	//a11) get first component template...
 	ModelTemplate* modelTmpl =
 			DCAST(ModelTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("Actor"))->getComponentTemplate(
 							ComponentType("Model")));
-	//a12) ...reset it to its default state...
-	modelTmpl->reset();
+	//a12) ...resetParameters it to its default state...
+	modelTmpl->resetParameters();
 	//a13) ...customize it as needed (e.g. in data driven manner)
 	modelTmpl->modelFile() = Filename("panda");
 	modelTmpl->animFiles().push_back(Filename("panda-walk"));
@@ -83,8 +85,8 @@ void GameManager::setup()
 			DCAST(ControlByEventTemplate, ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("Actor"))->getComponentTemplate(
 							ComponentType("ControlByEvent")));
-	//a22) ...reset it to its default state...
-	controlTmpl->reset();
+	//a22) ...resetParameters it to its default state...
+	controlTmpl->resetParameters();
 	//a23) ...customize it as needed (e.g. in data driven manner)
 	controlTmpl->speed() = 200.0;
 	controlTmpl->fastFactor() = 10.0;
@@ -99,8 +101,8 @@ void GameManager::setup()
 			DCAST(InstanceOfTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("InstancedActor"))->getComponentTemplate(
 							ComponentType("InstanceOf")));
-	//a2) ...reset it to its default state...
-	instanceOfTmpl->reset();
+	//a2) ...resetParameters it to its default state...
+	instanceOfTmpl->resetParameters();
 	//a3) ...customize it as needed (e.g. in data driven manner)
 	//b1) get the next component template... (and so on)
 	//2nd object (PandaI: "InstancedActor"): create the object
