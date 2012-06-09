@@ -65,20 +65,30 @@ void GameManager::setup()
 	// Second: setup object template manager
 	setupObjTmplMgr();
 
-	//Create game objects
+	//Create game objects (from a object.xml)
 
 	//1st object (Panda: "Actor"): initialize component templates
-	//a1) get a component template...
+	//a11) get first component template...
 	ModelTemplate* modelTmpl =
 			DCAST(ModelTemplate,ObjectTemplateManager::GetSingleton().getObjectTemplate(
 							ObjectTemplateId("Actor"))->getComponentTemplate(
 							ComponentType("Model")));
-	//a2) ...reset it to its default state...
+	//a12) ...reset it to its default state...
 	modelTmpl->reset();
-	//a3) ...customize it as needed (e.g. in data driven manner)
+	//a13) ...customize it as needed (e.g. in data driven manner)
 	modelTmpl->modelFile() = Filename("panda");
 	modelTmpl->animFiles().push_back(Filename("panda-walk"));
-	//b1) get the next component template... (and so on)
+	//a21) get next component template...
+	ControlByEventTemplate* controlTmpl =
+			DCAST(ControlByEventTemplate, ObjectTemplateManager::GetSingleton().getObjectTemplate(
+							ObjectTemplateId("Actor"))->getComponentTemplate(
+							ComponentType("ControlByEvent")));
+	//a22) ...reset it to its default state...
+	controlTmpl->reset();
+	//a23) ...customize it as needed (e.g. in data driven manner)
+	controlTmpl->speed() = 200.0;
+	controlTmpl->fastFactor() = 10.0;
+	//a31) get the next component template... (and so on)
 	//1st object (Panda: "Actor"): create the object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("Actor"));
@@ -97,7 +107,7 @@ void GameManager::setup()
 	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
 			ObjectTemplateId("InstancedActor"));
 
-	// Create the scene graph
+	// Create the scene graph (from a scene.xml)
 	//mPandaObj
 	((NodePath) (*mPandaObj)).set_hpr(-90, 0, 0);
 	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
@@ -141,6 +151,9 @@ void GameManager::setupCompTmplMgr()
 	//InstanceOf template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new InstanceOfTemplate());
+	//ControlByEvent template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new ControlByEventTemplate(this));
 
 }
 
@@ -155,6 +168,9 @@ void GameManager::setupObjTmplMgr()
 	objTmpl->addComponentTemplate(
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
 					ComponentType("Model")));
+	objTmpl->addComponentTemplate(
+			ComponentTemplateManager::GetSingleton().getComponentTemplate(
+					ComponentType("ControlByEvent")));
 	// add "Actor" object template to manager
 	ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmpl);
 

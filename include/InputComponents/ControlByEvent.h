@@ -89,7 +89,7 @@ private:
 	///@}
 	///@{
 	/// Sensitivity settings.
-	float mSpeed, mSpeedFast, mSpeedActual;
+	float mSpeed, mFastFactor, mSpeedActual;
 	float mMovSens, mRollSens;
 	///@}
 	///A task data for update.

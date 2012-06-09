@@ -72,10 +72,10 @@ void ControlByEventTemplate::reset()
 	mUp = std::string("r");
 	mDown = std::string("f");
 	mSpeedKey = std::string("shift");
-	mSpeed = 1.0;
-	mSpeedFast = 5.0;
+	mSpeed = 100.0;
+	mFastFactor = 5.0;
 	mMovSens = 2.0;
-	mRollSens = 50.0;
+	mRollSens = 15.0;
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
@@ -133,9 +133,9 @@ float& ControlByEventTemplate::speed()
 	return mSpeed;
 }
 
-float& ControlByEventTemplate::speedFast()
+float& ControlByEventTemplate::fastFactor()
 {
-	return mSpeedFast;
+	return mFastFactor;
 }
 
 float& ControlByEventTemplate::movSens()

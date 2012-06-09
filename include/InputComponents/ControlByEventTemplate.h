@@ -74,7 +74,7 @@ public:
 	 */
 	///@{
 	float& speed();
-	float& speedFast();
+	float& fastFactor();
 	float& movSens();
 	float& rollSens();
 	///@}
@@ -90,7 +90,7 @@ private:
 	///@}
 	///@{
 	/// Sensitivity parameters.
-	float mSpeed, mSpeedFast;
+	float mSpeed, mFastFactor;
 	float mMovSens, mRollSens;
 	///@}
 
