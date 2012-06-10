@@ -83,13 +83,13 @@ void ModelTemplate::setParameters(ParameterTable& parameterTable)
 	ParameterTable::iterator iter;
 	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
 	//set model filename
-	iter = parameterTable.find("ModelFile");
+	iter = parameterTable.find("model_file");
 	if (iter != parameterTable.end())
 	{
 		mModelFile = Filename(iter->second);
 	}
 	//set animations filenames
-	iterRange = parameterTable.equal_range("AnimFile");
+	iterRange = parameterTable.equal_range("anim_file");
 	for (iter = iterRange.first; iter != iterRange.second; ++iter)
 	{
 		mAnimFiles.push_back(Filename(iter->second));

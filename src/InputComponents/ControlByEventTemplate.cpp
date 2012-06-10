@@ -147,68 +147,68 @@ void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
 	//set event key names
-	iter = parameterTable.find("Forward");
+	iter = parameterTable.find("forward");
 	if (iter != parameterTable.end())
 	{
 		mForward = iter->second;
 	}
-	iter = parameterTable.find("RollLeft");
+	iter = parameterTable.find("roll_left");
 	if (iter != parameterTable.end())
 	{
 		mRollLeft = iter->second;
 	}
-	iter = parameterTable.find("Backward");
+	iter = parameterTable.find("backward");
 	if (iter != parameterTable.end())
 	{
 		mBackward = iter->second;
 	}
-	iter = parameterTable.find("RollRight");
+	iter = parameterTable.find("roll_right");
 	if (iter != parameterTable.end())
 	{
 		mRollRight = iter->second;
 	}
-	iter = parameterTable.find("StrafeLeft");
+	iter = parameterTable.find("strafe_left");
 	if (iter != parameterTable.end())
 	{
 		mStrafeLeft = iter->second;
 	}
-	iter = parameterTable.find("StrafeRight");
+	iter = parameterTable.find("strafe_right");
 	if (iter != parameterTable.end())
 	{
 		mStrafeRight = iter->second;
 	}
-	iter = parameterTable.find("Up");
+	iter = parameterTable.find("up");
 	if (iter != parameterTable.end())
 	{
 		mUp = iter->second;
 	}
-	iter = parameterTable.find("Down");
+	iter = parameterTable.find("down");
 	if (iter != parameterTable.end())
 	{
 		mDown = iter->second;
 	}
-	iter = parameterTable.find("SpeedKey");
+	iter = parameterTable.find("speed_key");
 	if (iter != parameterTable.end())
 	{
 		mSpeedKey = iter->second;
 	}
 	//set sensitivity parameters
-	iter = parameterTable.find("Speed");
+	iter = parameterTable.find("speed");
 	if (iter != parameterTable.end())
 	{
 		mSpeed = (float) atof(iter->second.c_str());
 	}
-	iter = parameterTable.find("FastFactor");
+	iter = parameterTable.find("fast_factor");
 	if (iter != parameterTable.end())
 	{
 		mFastFactor = (float) atof(iter->second.c_str());
 	}
-	iter = parameterTable.find("MovSens");
+	iter = parameterTable.find("mov_sens");
 	if (iter != parameterTable.end())
 	{
 		mMovSens = (float) atof(iter->second.c_str());
 	}
-	iter = parameterTable.find("RollSens");
+	iter = parameterTable.find("roll_sens");
 	if (iter != parameterTable.end())
 	{
 		mRollSens = (float) atof(iter->second.c_str());

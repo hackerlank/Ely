@@ -95,11 +95,11 @@ void GameManager::setup()
 	componentTmpl->resetParameters();
 	//a23) ...customize it as needed (e.g. in data driven manner)
 	parameterTable.insert(
-			ComponentTemplate::ParameterTable::value_type(std::string("Speed"),
+			ComponentTemplate::ParameterTable::value_type(std::string("speed"),
 					std::string("200.0")));
 	parameterTable.insert(
 			ComponentTemplate::ParameterTable::value_type(
-					std::string("FastFactor"), std::string("10.0")));
+					std::string("fast_factor"), std::string("10.0")));
 	componentTmpl->setParameters(parameterTable);
 	parameterTable.clear();
 	//a31) get the next component template... (and so on)
