@@ -60,9 +60,11 @@ void GameManager::setup()
 {
 	//initialize typed objects
 	initTypedObjects();
-	// First: setup component template manager
+	//setup component template manager
 	setupCompTmplMgr();
-	// Second: setup object template manager
+
+	//SETUP object and game worlds
+	//setup object template manager
 	setupObjTmplMgr();
 
 	ComponentTemplate::ParameterTable parameterTable;
@@ -72,7 +74,7 @@ void GameManager::setup()
 	//1st object (Panda: "Actor"): initialize component templates
 	//a11) get first component template...
 	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
-			ObjectTemplateId("Actor"))->getComponentTemplate(
+			ObjectType("Actor"))->getComponentTemplate(
 			ComponentType("Model"));
 	//a12) ...resetParameters it to its default state...
 	componentTmpl->resetParameters();
@@ -87,7 +89,7 @@ void GameManager::setup()
 	parameterTable.clear();
 	//a21) get next component template...
 	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
-			ObjectTemplateId("Actor"))->getComponentTemplate(
+			ObjectType("Actor"))->getComponentTemplate(
 			ComponentType("ControlByEvent"));
 	//a22) ...resetParameters it to its default state...
 	componentTmpl->resetParameters();
@@ -103,12 +105,12 @@ void GameManager::setup()
 	//a31) get the next component template... (and so on)
 	//1st object (Panda: "Actor"): create the object
 	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
-			ObjectTemplateId("Actor"));
+			ObjectType("Actor"));
 
 	//2nd object (PandaI: "InstancedActor"): initialize component templates
 	//a1) get a component template...
 	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
-			ObjectTemplateId("InstancedActor"))->getComponentTemplate(
+			ObjectType("InstancedActor"))->getComponentTemplate(
 			ComponentType("InstanceOf"));
 	//a2) ...resetParameters it to its default state...
 	componentTmpl->resetParameters();
@@ -118,7 +120,7 @@ void GameManager::setup()
 	//b1) get the next component template... (and so on)
 	//2nd object (PandaI: "InstancedActor"): create the object
 	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
-			ObjectTemplateId("InstancedActor"));
+			ObjectType("InstancedActor"));
 
 	// Create the scene graph (from a scene.xml)
 	//mPandaObj
@@ -176,7 +178,7 @@ void GameManager::setupObjTmplMgr()
 	// add all kind of object templates
 
 	//1 "Actor" object template
-	objTmpl = new ObjectTemplate(ObjectTemplateId("Actor"));
+	objTmpl = new ObjectTemplate(ObjectType("Actor"));
 	//add all component templates
 	objTmpl->addComponentTemplate(
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
@@ -188,7 +190,7 @@ void GameManager::setupObjTmplMgr()
 	ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmpl);
 
 	//2 "InstancedActor" object template
-	objTmpl = new ObjectTemplate(ObjectTemplateId("InstancedActor"));
+	objTmpl = new ObjectTemplate(ObjectType("InstancedActor"));
 	//add all component templates
 	objTmpl->addComponentTemplate(
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(

@@ -31,6 +31,8 @@
 #include <asyncTask.h>
 #include <pointerTo.h>
 #include <iostream>
+#include <string>
+#include <map>
 
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -72,7 +74,23 @@ public:
 	 */
 	virtual void setupObjTmplMgr();
 
+	/**
+	 * \brief Create a Game World loading description from a file (xml).
+	 *
+	 * @param gameWorldXML The description file.
+	 * @return True if all went OK, false otherwise.
+	 */
+	bool createGameWorld(std::string gameWorldXML);
+
 protected:
+
+	///Objects in the game.
+	std::map<ObjectId, PT(Object)> mObjectTable;
+
+	/// Common members
+	WindowFramework * mWindow;
+	NodePath mRender;
+	NodePath mCamera;PT(ClockObject) mGlobalClock;
 
 	/// 1nd task.
 	PT(TaskInterface<GameManager>::TaskData) m1stTask;
@@ -81,16 +99,9 @@ protected:
 	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
-	/// Common members
-	WindowFramework * mWindow;
-	NodePath mRender;
-	NodePath mCamera;
-	PT(ClockObject) mGlobalClock;
-
 	/// Specific members
 	/// game objects
-	PT(Object) mPandaObj;
-	PT(Object) mPandaInstObj;
+	PT(Object) mPandaObj;PT(Object) mPandaInstObj;
 
 };
 

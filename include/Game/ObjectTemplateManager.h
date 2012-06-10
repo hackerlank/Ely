@@ -67,14 +67,14 @@ public:
 	 * @param objectType The object type.
 	 * @return True if the object template existed, false otherwise.
 	 */
-	bool removeObjectTemplate(ObjectTemplateId objectType);
+	bool removeObjectTemplate(ObjectType objectType);
 
 	/**
 	 * \brief Gets the object template given the object type it can create.
 	 * @param objectType The object type.
 	 * @return The object template.
 	 */
-	ObjectTemplate* getObjectTemplate(ObjectTemplateId objectType);
+	ObjectTemplate* getObjectTemplate(ObjectType objectType);
 
 	/**
 	 * \brief Creates a object given its type and a NodePath.
@@ -83,11 +83,11 @@ public:
 	 * @param objectType The object type.
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
-	Object* createObject(ObjectTemplateId objectType);
+	Object* createObject(ObjectType objectType);
 
 private:
 	///Table of object templates indexed by their name.
-	typedef std::map<const ObjectTemplateId, PT(ObjectTemplate)> ObjectTemplateTable;
+	typedef std::map<const ObjectType, PT(ObjectTemplate)> ObjectTemplateTable;
 	ObjectTemplateTable mObjectTemplates;
 	///The unique id for created objects.
 	IdType id;

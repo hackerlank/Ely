@@ -39,7 +39,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 				"ObjectTemplateManager::addObjectTemplate: NULL Component template");
 	}
 	PT(ObjectTemplate) previousObjTmpl(NULL);
-	ObjectTemplateId objectTemplId = objectTmpl->name();
+	ObjectType objectTemplId = objectTmpl->name();
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
 	if (it != mObjectTemplates.end())
 	{
@@ -53,7 +53,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 
 }
 
-bool ObjectTemplateManager::removeObjectTemplate(ObjectTemplateId objectType)
+bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 {
 	//lock (guard) the mutex
 	lock_guard<ReMutex> guard(mMutex);
@@ -68,7 +68,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectTemplateId objectType)
 }
 
 ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
-		ObjectTemplateId objectType)
+		ObjectType objectType)
 {
 	//lock (guard) the mutex
 	lock_guard<ReMutex> guard(mMutex);
@@ -89,7 +89,7 @@ bool ObjectTemplateManager::readObjectTemplates(const std::string& filename)
 	return true;
 }
 
-Object* ObjectTemplateManager::createObject(ObjectTemplateId objectType)
+Object* ObjectTemplateManager::createObject(ObjectType objectType)
 {
 	//lock (guard) the mutex
 	lock_guard<ReMutex> guard(mMutex);

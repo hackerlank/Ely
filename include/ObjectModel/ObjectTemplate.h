@@ -34,10 +34,11 @@
 #include "Utilities/Tools.h"
 
 /**
- * \brief Object template identifier type (this is
- * the type of the object the template can create).
+ * \brief Object type.
+ *
+ * This type identifies the name of template that create these type of objects.
  */
-typedef std::string ObjectTemplateId;
+typedef std::string ObjectType;
 
 /**
  * \brief Class storing all of objects templates used to create an object.
@@ -54,7 +55,7 @@ public:
 	 * \brief Constructor.
 	 * @param name The name of this template.
 	 */
-	ObjectTemplate(const ObjectTemplateId& name);
+	ObjectTemplate(const ObjectType& name);
 
 	/**
 	 * \brief Destructor.
@@ -68,10 +69,11 @@ public:
 	void clearComponentTemplates();
 
 	/**
-	 * \brief Gets a reference to the name of this object template.
+	 * \brief Gets a reference to the name (i.e. the object type) of
+	 * this object template.
 	 * @return The name of this object template.
 	 */
-	ObjectTemplateId& name();
+	ObjectType& name();
 
 	/**
 	 * \brief Gets the component template list.
@@ -95,7 +97,7 @@ public:
 
 private:
 	///Name identifying this object template.
-	ObjectTemplateId mName;
+	ObjectType mName;
 	///List of all component templates.
 	ComponentTemplateList mComponentTemplates;
 

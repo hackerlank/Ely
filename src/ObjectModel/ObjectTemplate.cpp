@@ -23,7 +23,7 @@
 
 #include "ObjectModel/ObjectTemplate.h"
 
-ObjectTemplate::ObjectTemplate(const ObjectTemplateId& name) :
+ObjectTemplate::ObjectTemplate(const ObjectType& name) :
 		mName(name)
 {
 }
@@ -33,7 +33,7 @@ ObjectTemplate::~ObjectTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-ObjectTemplateId& ObjectTemplate::name()
+ObjectType& ObjectTemplate::name()
 {
 	return mName;
 }
