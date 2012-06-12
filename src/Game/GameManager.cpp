@@ -81,10 +81,10 @@ void GameManager::setup()
 	//a13) ...customize it as needed (e.g. in data driven manner)
 	parameterTable.insert(
 			ComponentTemplate::ParameterTable::value_type(
-					std::string("ModelFile"), std::string("panda")));
+					std::string("model_file"), std::string("panda")));
 	parameterTable.insert(
 			ComponentTemplate::ParameterTable::value_type(
-					std::string("AnimFile"), std::string("panda-walk")));
+					std::string("anim_file"), std::string("panda-walk")));
 	componentTmpl->setParameters(parameterTable);
 	parameterTable.clear();
 	//a21) get next component template...
