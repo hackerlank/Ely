@@ -33,6 +33,8 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <cstdio>
+#include "tinyxml2.h"
 
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -72,7 +74,7 @@ public:
 	/**
 	 * \brief Set the Object template manager up.
 	 */
-	virtual void setupObjTmplMgr();
+	virtual void setupGameWorld();
 
 	/**
 	 * \brief Create a Game World loading description from a file (xml).
