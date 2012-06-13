@@ -43,6 +43,18 @@ class ControlByEventTemplate;
  * its state (true/false). Event handlers commute basic movements
  * states. A (global) task updates the position/orientation of
  * the controlled object.
+ * Default control key:
+ * \li \c Forward : "w"
+ * \li \c Backward : "s"
+ * \li \c RollLeft : "a"
+ * \li \c RollRight : "d"
+ * \li \c StrafeLeft : "q"
+ * \li \c StrafeRight : "e"
+ * \li \c Up : "r"
+ * \li \c Down : "f"
+ * If you want to disable a bsic movement put its control key
+ * to null string ("").
+ * You can invert all movements (but up and down);
  */
 class ControlByEvent: public Component
 {
@@ -85,7 +97,7 @@ private:
 	///@}
 	///@{
 	///Key control values.
-	bool mTrue, mFalse;
+	bool mTrue, mFalse, mInverted;
 	///@}
 	///@{
 	/// Sensitivity settings.

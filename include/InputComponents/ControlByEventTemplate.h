@@ -70,6 +70,7 @@ public:
 	std::string& rollRightEvent();
 	std::string& upEvent();
 	std::string& speedKey();
+	std::string& inverted();
 	///@}
 	/**
 	 * \name Sensitivity parameters getters/setters.
@@ -87,9 +88,9 @@ private:
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
 	///@{
-	/// Event key names.
+	/// Event key names and inversion.
 	std::string mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-			mRollLeft, mRollRight, mSpeedKey;
+			mRollLeft, mRollRight, mSpeedKey, mInverted;
 	///@}
 	///@{
 	/// Sensitivity parameters.

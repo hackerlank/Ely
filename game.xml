@@ -20,6 +20,9 @@
 			<Component type="ControlByEvent">
 				<Param speed="200.0"/>
 				<Param fast_factor="10.0"/>
+				<Param inverted="true"/>
+				<Param up=""/>
+				<Param down=""/>
 			</Component>
 		</Object>
 		<Object type="InstancedActor" id="InstancedActor1">

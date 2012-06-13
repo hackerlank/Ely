@@ -76,6 +76,7 @@ void ControlByEventTemplate::resetParameters()
 	mFastFactor = 5.0;
 	mMovSens = 2.0;
 	mRollSens = 15.0;
+	mInverted = std::string("false");;
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
@@ -91,6 +92,11 @@ std::string& ControlByEventTemplate::backwardEvent()
 std::string& ControlByEventTemplate::speedKey()
 {
 	return mSpeedKey;
+}
+
+std::string& ControlByEventTemplate::inverted()
+{
+	return mInverted;
 }
 
 std::string& ControlByEventTemplate::downEvent()
@@ -143,6 +149,11 @@ float& ControlByEventTemplate::movSens()
 	return mMovSens;
 }
 
+float& ControlByEventTemplate::rollSens()
+{
+	return mRollSens;
+}
+
 void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
@@ -192,6 +203,11 @@ void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 	{
 		mSpeedKey = iter->second;
 	}
+	iter = parameterTable.find("inverted");
+	if (iter != parameterTable.end())
+	{
+		mInverted = iter->second;
+	}
 	//set sensitivity parameters
 	iter = parameterTable.find("speed");
 	if (iter != parameterTable.end())
@@ -213,11 +229,6 @@ void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 	{
 		mRollSens = (float) atof(iter->second.c_str());
 	}
-}
-
-float& ControlByEventTemplate::rollSens()
-{
-	return mRollSens;
 }
 
 //TypedObject semantics: hardcoded
