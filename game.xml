@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Game>
-	<!-- Object Template Definitions -->
+	<!-- Object Templates Definition -->
 	<ObjectTmplSet>
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Graphics" type="Model"/>
@@ -10,7 +10,7 @@
 			<ComponentTmpl family="Graphics" type="InstanceOf"/>
 		</ObjectTmpl>
 	</ObjectTmplSet>
-	<!-- Object Definitions -->
+	<!-- Objects Creation -->
 	<ObjectSet>
 		<Object type="Actor" id="Actor1">
 			<Component type="Model">
@@ -25,8 +25,8 @@
 		<Object type="InstancedActor" id="InstancedActor1">
 		</Object>
 	</ObjectSet>
-	<!-- Scene Graph Definition -->
-	<SceneGraph>
+	<!-- Scene Creation -->
+	<Scene>
 		<Object id="Actor1" parent="Render">
 			<Position x="0.0" y="0.0" z="0.0"/>
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
@@ -37,5 +37,5 @@
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="1.0" y="1.0" z="1.0"/>
 		</Object>	
-	</SceneGraph>
+	</Scene>
 </Game>
