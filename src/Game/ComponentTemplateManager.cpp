@@ -96,6 +96,16 @@ Component* ComponentTemplateManager::createComponent(
 	return newComp;
 }
 
+void ComponentTemplateManager::resetComponentTemplatesParams()
+{
+	ComponentTemplateTable::iterator iter;
+	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();
+			++iter)
+	{
+		iter->second->resetParameters();
+	}
+}
+
 IdType ComponentTemplateManager::getId()
 {
 	return ++id;

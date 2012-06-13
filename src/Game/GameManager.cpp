@@ -66,65 +66,9 @@ void GameManager::setup()
 	//setup game world
 	setupGameWorld();
 
-	//SETUP object and game worlds
-	//setup object template manager
-
-	ComponentTemplate::ParameterTable parameterTable;
-	ComponentTemplate* componentTmpl;
-	//Create game objects (from a object.xml)
-
-	//1st object (Panda: "Actor"): initialize component templates
-	//a11) get first component template...
-	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
-			ObjectType("Actor"))->getComponentTemplate(ComponentType("Model"));
-	//a12) ...resetParameters it to its default state...
-	componentTmpl->resetParameters();
-	//a13) ...customize it as needed (e.g. in data driven manner)
-	parameterTable.insert(
-			ComponentTemplate::ParameterTable::value_type(
-					std::string("model_file"), std::string("panda")));
-	parameterTable.insert(
-			ComponentTemplate::ParameterTable::value_type(
-					std::string("anim_file"), std::string("panda-walk")));
-	componentTmpl->setParameters(parameterTable);
-	parameterTable.clear();
-	//a21) get next component template...
-	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
-			ObjectType("Actor"))->getComponentTemplate(
-			ComponentType("ControlByEvent"));
-	//a22) ...resetParameters it to its default state...
-	componentTmpl->resetParameters();
-	//a23) ...customize it as needed (e.g. in data driven manner)
-	parameterTable.insert(
-			ComponentTemplate::ParameterTable::value_type(std::string("speed"),
-					std::string("200.0")));
-	parameterTable.insert(
-			ComponentTemplate::ParameterTable::value_type(
-					std::string("fast_factor"), std::string("10.0")));
-	componentTmpl->setParameters(parameterTable);
-	parameterTable.clear();
-	//a31) get the next component template... (and so on)
-	//1st object (Panda: "Actor"): create the object
-	mPandaObj = ObjectTemplateManager::GetSingleton().createObject(
-			ObjectType("Actor"));
-
-	//2nd object (PandaI: "InstancedActor"): initialize component templates
-	//a1) get a component template...
-	componentTmpl = ObjectTemplateManager::GetSingleton().getObjectTemplate(
-			ObjectType("InstancedActor"))->getComponentTemplate(
-			ComponentType("InstanceOf"));
-	//a2) ...resetParameters it to its default state...
-	componentTmpl->resetParameters();
-	//a3) ...customize it as needed (e.g. in data driven manner)
-	componentTmpl->setParameters(parameterTable);
-	parameterTable.clear();
-	//b1) get the next component template... (and so on)
-	//2nd object (PandaI: "InstancedActor"): create the object
-	mPandaInstObj = ObjectTemplateManager::GetSingleton().createObject(
-			ObjectType("InstancedActor"));
-
 	// Create the scene graph (from a scene.xml)
 	//mPandaObj
+	PT(Object) mPandaObj = mObjectTable["Actor1"];
 	((NodePath) (*mPandaObj)).set_hpr(-90, 0, 0);
 	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
 	Model* pandaObjModel = DCAST(Model, mPandaObj->getComponent(
@@ -132,6 +76,7 @@ void GameManager::setup()
 	pandaObjModel->animations().loop("panda_soft", false);
 
 	//mPandaInstObj
+	PT(Object) mPandaInstObj = mObjectTable["InstancedActor1"];
 	((NodePath) (*mPandaInstObj)).set_hpr(-90, 0, 0);
 	((NodePath) (*mPandaInstObj)).set_pos(-10, 0, 0);
 	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
@@ -199,7 +144,7 @@ void GameManager::setupGameWorld()
 		throw GameException(
 				"GameManager::setupGameWorld: Failed to load/parse " + gameXml);
 	}
-	tinyxml2::XMLElement *game, *objectTmplSet, *scene;
+	tinyxml2::XMLElement *game;
 	//check <Game> tag
 	std::cout << "Checking <Game> tag ..." << std::endl;
 	game = gameDoc.FirstChildElement("Game");
@@ -208,8 +153,12 @@ void GameManager::setupGameWorld()
 		throw GameException(
 				"GameManager::setupGameWorld: No <Game> in " + gameXml);
 	}
+	//////////////////////////////////////////////////////////////
+	//Setup object template manager
+	std::cout << "Setting up Object Template Manager" << std::endl;
 	//check <Game>--<ObjectTmplSet> tag
-	std::cout << "Checking <ObjectTmplSet> tag ..." << std::endl;
+	tinyxml2::XMLElement *objectTmplSet;
+	std::cout << "  Checking <ObjectTmplSet> tag ..." << std::endl;
 	objectTmplSet = game->FirstChildElement("ObjectTmplSet");
 	if (not checkTag(objectTmplSet, "ObjectTmplSet"))
 	{
@@ -229,7 +178,7 @@ void GameManager::setupGameWorld()
 		{
 			continue;
 		}
-		std::cout << "Object of type '" << type << "'" << std::endl;
+		std::cout << "  Adding Object Template for '" << type << "' type" << std::endl;
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(type));
@@ -245,7 +194,7 @@ void GameManager::setupGameWorld()
 			{
 				continue;
 			}
-			std::cout << "Component of family '" << family << "' and type '"
+			std::cout << "    Component of family '" << family << "' and type '"
 					<< type << "'" << std::endl;
 			//... add all component templates
 			objTmplPtr->addComponentTemplate(
@@ -255,46 +204,95 @@ void GameManager::setupGameWorld()
 		// add 'type' object template to manager
 		ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmplPtr);
 	}
-
-	//check <Game>--<Scene> tag
-	std::cout << "Checking <Scene> tag ..." << std::endl;
-	scene = game->FirstChildElement("Scene");
-	if (not checkTag(scene, "Scene"))
+	//////////////////////////////////////////////////////////////
+	//Create game objects
+	std::cout << "Creating Game Objects" << std::endl;
+	//check <Game>--<ObjectSet> tag
+	tinyxml2::XMLElement *objectSet;
+	std::cout << "  Checking <ObjectSet> tag ..." << std::endl;
+	objectSet = game->FirstChildElement("ObjectSet");
+	if (not checkTag(objectSet, "ObjectSet"))
 	{
-		exit(1);
+		throw GameException(
+				"GameManager::setupGameWorld: No <ObjectSet> in " + gameXml);
 	}
-
-	//////////////////////////////////////////77
-//	ObjectTemplate* objTmpl;
-//	// add all kind of object templates
-//
-//	//1 "Actor" object template
-//	objTmpl = new ObjectTemplate(ObjectType("Actor"));
-//	//add all component templates
-//	objTmpl->addComponentTemplate(
-//			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-//					ComponentType("Model")));
-//	objTmpl->addComponentTemplate(
-//			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-//					ComponentType("ControlByEvent")));
-//	// add "Actor" object template to manager
-//	ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmpl);
-//
-//	//2 "InstancedActor" object template
-//	objTmpl = new ObjectTemplate(ObjectType("InstancedActor"));
-//	//add all component templates
-//	objTmpl->addComponentTemplate(
-//			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-//					ComponentType("InstanceOf")));
-//	// add "InstancedActor" object template to manager
-//	ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmpl);
-
+	//reset all component templates parameters to their default values
+	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
+	//cycle through the Object(s)' definitions
+	tinyxml2::XMLElement *object;
+	for (object = objectSet->FirstChildElement("Object"); object != NULL;
+			object = object->NextSiblingElement("Object"))
+	{
+		const char *objType = object->Attribute("type", NULL);
+		if (not objType)
+		{
+			continue;
+		}
+		const char *objId = object->Attribute("id", NULL); //may be NULL
+		std::cout << "  Creating Object '"
+				<< (objId != NULL ? objId : "UNNAMED") << "'" << std::endl;
+		//cycle through the Object Component(s)' to be initialized
+		tinyxml2::XMLElement *component;
+		for (component = object->FirstChildElement("Component");
+				component != NULL;
+				component = component->NextSiblingElement("Component"))
+		{
+			const char *compType = component->Attribute("type", NULL);
+			if (not compType)
+			{
+				continue;
+			}
+			std::cout << "    Initializing Component '" << compType << "'"
+					<< std::endl;
+			ComponentTemplate::ParameterTable parameterTable;
+			// get the related component template and ...
+			ComponentTemplate *componentTmplPtr =
+					ObjectTemplateManager::GetSingleton().getObjectTemplate(
+							ObjectType(objType))->getComponentTemplate(
+							ComponentType(compType));
+			//...reset its parameters to their default values
+			componentTmplPtr->resetParameters();
+			//cycle through the Component Param(s)' to be initialized
+			tinyxml2::XMLElement *param;
+			for (param = component->FirstChildElement("Param"); param != NULL;
+					param = param->NextSiblingElement("Param"))
+			{
+				const tinyxml2::XMLAttribute* attribute =
+						param->FirstAttribute();
+				if (not attribute)
+				{
+					continue;
+				}
+				std::cout << "      Param '" << attribute->Name() << "' = '"
+						<< attribute->Value() << "'" << std::endl;
+				parameterTable.insert(
+						ComponentTemplate::ParameterTable::value_type(
+								attribute->Name(), attribute->Value()));
+			}
+			componentTmplPtr->setParameters(parameterTable);
+		}
+		//create the object
+		Object *objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+				ObjectType(objType));
+		if (objId != NULL)
+		{
+			// replace the internally generated id
+			objectPtr->objectId() = ObjectId(objId);
+		}
+		else
+		{
+			std::cout << "  Set Object name to '" << objectPtr->objectId()
+					<< "'" << std::endl;
+		}
+		//insert the just created object in the table
+		mObjectTable[objectPtr->objectId()] = PT(Object)(objectPtr);
+	}
 }
 
 AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 5.0)
+	if (timeElapsed < 1.0)
 	{
 		std::cout << "firstTask " << timeElapsed << std::endl;
 		return AsyncTask::DS_cont;
@@ -305,11 +303,11 @@ AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 {
 	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 5.0)
+	if (timeElapsed < 1.0)
 	{
 		return AsyncTask::DS_cont;
 	}
-	else if (timeElapsed > 5.0 and timeElapsed < 10.0)
+	else if (timeElapsed > 1.0 and timeElapsed < 2.0)
 	{
 		std::cout << "secondTask " << timeElapsed << std::endl;
 		return AsyncTask::DS_cont;

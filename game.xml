@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 <Game>
-	<!-- Game Object Definitions (Templates) -->
+	<!-- Object Template Definitions -->
 	<ObjectTmplSet>
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Graphics" type="Model"/>
@@ -10,27 +10,32 @@
 			<ComponentTmpl family="Graphics" type="InstanceOf"/>
 		</ObjectTmpl>
 	</ObjectTmplSet>
-	<!-- Scene Graph Definitions -->
-	<Scene>
-		<Object type="Actor" id="Actor1" parent="Render">
-			<Position x="0.0" y="0.0" z="0.0"/>
-			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="1.0" y="1.0" z="1.0"/>
-			<Component family="Graphics" type="Model">
+	<!-- Object Definitions -->
+	<ObjectSet>
+		<Object type="Actor" id="Actor1">
+			<Component type="Model">
 				<Param model_file="panda"/>
 				<Param anim_file="panda-walk"/>
 			</Component>
-			<Component family="Input" type="ControlByEvent">
+			<Component type="ControlByEvent">
 				<Param speed="200.0"/>
 				<Param fast_factor="10.0"/>
 			</Component>
 		</Object>
-		<Object type="InstancedActor" id="InstancedActor1" instance_of="Actor1" parent="Render">
+		<Object type="InstancedActor" id="InstancedActor1">
+		</Object>
+	</ObjectSet>
+	<!-- Scene Graph Definition -->
+	<SceneGraph>
+		<Object id="Actor1" parent="Render">
+			<Position x="0.0" y="0.0" z="0.0"/>
+			<Orientation h="-90.0" p="0.0" r="0.0"/>
+			<Scaling x="1.0" y="1.0" z="1.0"/>
+		</Object>
+		<Object id="InstancedActor1" parent="Render">
 			<Position x="-10.0" y="0.0" z="0.0"/>
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="1.0" y="1.0" z="1.0"/>
-			<Component family="Graphics" type="InstanceOf">
-			</Component>
-		</Object>
-	</Scene>
+		</Object>	
+	</SceneGraph>
 </Game>

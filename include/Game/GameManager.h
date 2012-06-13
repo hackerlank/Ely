@@ -101,10 +101,6 @@ protected:
 	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
-	/// Specific members
-	/// game objects
-	PT(Object) mPandaObj;PT(Object) mPandaInstObj;
-
 };
 
 #endif /* GAMEMANAGER_H_ */

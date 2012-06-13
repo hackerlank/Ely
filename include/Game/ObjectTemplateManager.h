@@ -44,13 +44,6 @@ public:
 	ObjectTemplateManager();
 
 	/**
-	 * \brief Reads the object templates definitions,suitably formatted (xml), from file.
-	 * @param filename The name of the file.
-	 * @return True if all ok, false otherwise.
-	 */
-	bool readObjectTemplates(const std::string& filename);
-
-	/**
 	 * \brief Adds an object template for a given object type it can create.
 	 *
 	 * It will add the object template to the internal table and if a

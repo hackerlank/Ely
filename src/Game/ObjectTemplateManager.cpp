@@ -81,14 +81,6 @@ ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
 	return (*it).second;
 }
 
-bool ObjectTemplateManager::readObjectTemplates(const std::string& filename)
-{
-	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
-
-	return true;
-}
-
 Object* ObjectTemplateManager::createObject(ObjectType objectType)
 {
 	//lock (guard) the mutex

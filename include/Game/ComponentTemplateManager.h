@@ -68,6 +68,11 @@ public:
 	ComponentTemplate* getComponentTemplate(ComponentType componentID);
 
 	/**
+	 * \brief Resets all component templates to their default parameters.
+	 */
+	void resetComponentTemplatesParams();
+
+	/**
 	 * \brief Creates a component given its type.
 	 * @param componentID The component type.
 	 * @return The just created component, or NULL on failure (for any reason).
