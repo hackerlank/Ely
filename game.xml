@@ -30,19 +30,19 @@
 	</ObjectSet>
 	<!-- Scene Creation -->
 	<Scene>
-		<Object id="Actor1">
+		<Node id="Actor1">
 			<Parent>Render</Parent>
 			<InstanceOf></InstanceOf>
 			<Position x="0.0" y="0.0" z="0.0"/>
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="1.0" y="1.0" z="1.0"/>
-		</Object>
-		<Object id="InstancedActor1">
+		</Node>
+		<Node id="InstancedActor1">
 			<Parent>Render</Parent>
 			<InstanceOf>Actor1</InstanceOf>
 			<Position x="-10.0" y="0.0" z="0.0"/>
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="1.0" y="1.0" z="1.0"/>
-		</Object>	
+		</Node>	
 	</Scene>
 </Game>

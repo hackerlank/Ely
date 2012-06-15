@@ -154,6 +154,7 @@ void GameManager::setupGameWorld()
 				"GameManager::setupGameWorld: No <Game> in " + gameXml);
 	}
 	//////////////////////////////////////////////////////////////
+	//<!-- Object Templates Definition -->
 	//Setup object template manager
 	std::cout << "Setting up Object Template Manager" << std::endl;
 	//check <Game>--<ObjectTmplSet> tag
@@ -178,7 +179,8 @@ void GameManager::setupGameWorld()
 		{
 			continue;
 		}
-		std::cout << "  Adding Object Template for '" << type << "' type" << std::endl;
+		std::cout << "  Adding Object Template for '" << type << "' type"
+				<< std::endl;
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(type));
@@ -205,6 +207,7 @@ void GameManager::setupGameWorld()
 		ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmplPtr);
 	}
 	//////////////////////////////////////////////////////////////
+	//<!-- Objects Creation -->
 	//Create game objects
 	std::cout << "Creating Game Objects" << std::endl;
 	//check <Game>--<ObjectSet> tag
@@ -287,30 +290,76 @@ void GameManager::setupGameWorld()
 		//insert the just created object in the table
 		mObjectTable[objectPtr->objectId()] = PT(Object)(objectPtr);
 	}
+	//////////////////////////////////////////////////////////////
+	//<!-- Scene Creation -->
+	//Static scene graph creation
+	std::cout << "Creating Scene" << std::endl;
+	//check <Game>--<Scene> tag
+	tinyxml2::XMLElement *scene;
+	std::cout << "  Checking <Scene> tag ..." << std::endl;
+	scene = game->FirstChildElement("Scene");
+	if (not checkTag(scene, "Scene"))
+	{
+		throw GameException(
+				"GameManager::setupGameWorld: No <Scene> in " + gameXml);
+	}
+	//cycle through the Node(s)' definitions
+	tinyxml2::XMLElement *node;
+
+	for (node = scene->FirstChildElement("Node"); node != NULL;
+			node = node->NextSiblingElement("Node"))
+	{
+		const char *nodeId = node->Attribute("id", NULL);
+		if (not nodeId)
+		{
+			continue;
+		}
+		std::cout << "  Creating Node for object '" << nodeId << "'"
+				<< std::endl;
+		//get the object
+		Object* objectNodePtr = mObjectTable[ObjectId(nodeId)];
+		//cycle through of Node's tags
+		tinyxml2::XMLElement *tag;
+		//Parent (default: None)
+		tag = node->FirstChildElement("Parent");
+		if (tag != NULL)
+		{
+			if (tag == std::string("Render"))
+			{
+				((NodePath) (*objectNodePtr)).reparent_to(
+						mWindow->get_render());
+			}
+			else
+			{
+
+				;
+			}
+		}
+	}
 }
 
-AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
-{
-	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 1.0)
+	AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 	{
-		std::cout << "firstTask " << timeElapsed << std::endl;
-		return AsyncTask::DS_cont;
+		double timeElapsed = mGlobalClock->get_real_time();
+		if (timeElapsed < 1.0)
+		{
+			std::cout << "firstTask " << timeElapsed << std::endl;
+			return AsyncTask::DS_cont;
+		}
+		return AsyncTask::DS_done;
 	}
-	return AsyncTask::DS_done;
-}
 
-AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
-{
-	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 1.0)
+	AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 	{
-		return AsyncTask::DS_cont;
+		double timeElapsed = mGlobalClock->get_real_time();
+		if (timeElapsed < 1.0)
+		{
+			return AsyncTask::DS_cont;
+		}
+		else if (timeElapsed > 1.0 and timeElapsed < 2.0)
+		{
+			std::cout << "secondTask " << timeElapsed << std::endl;
+			return AsyncTask::DS_cont;
+		}
+		return AsyncTask::DS_done;
 	}
-	else if (timeElapsed > 1.0 and timeElapsed < 2.0)
-	{
-		std::cout << "secondTask " << timeElapsed << std::endl;
-		return AsyncTask::DS_cont;
-	}
-	return AsyncTask::DS_done;
-}
