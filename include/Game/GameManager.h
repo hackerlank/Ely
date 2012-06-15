@@ -87,7 +87,8 @@ public:
 protected:
 
 	///Objects in the game.
-	std::map<ObjectId, PT(Object)> mObjectTable;
+	typedef std::map<ObjectId, PT(Object)> ObjectTable;
+	ObjectTable mObjects;
 
 	/// Common members
 	WindowFramework * mWindow;

@@ -68,18 +68,18 @@ void GameManager::setup()
 
 	// Create the scene graph (from a scene.xml)
 	//mPandaObj
-	PT(Object) mPandaObj = mObjectTable["Actor1"];
+	PT(Object) mPandaObj = mObjects["Actor1"];
 	((NodePath) (*mPandaObj)).set_hpr(-90, 0, 0);
-	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
+//	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
 	Model* pandaObjModel = DCAST(Model, mPandaObj->getComponent(
 					ComponentFamilyType("Graphics")));
 	pandaObjModel->animations().loop("panda_soft", false);
 
 	//mPandaInstObj
-	PT(Object) mPandaInstObj = mObjectTable["InstancedActor1"];
+	PT(Object) mPandaInstObj = mObjects["InstancedActor1"];
 	((NodePath) (*mPandaInstObj)).set_hpr(-90, 0, 0);
 	((NodePath) (*mPandaInstObj)).set_pos(-10, 0, 0);
-	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
+//	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
 	((NodePath) (*mPandaObj)).instance_to(*mPandaInstObj);
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
@@ -288,7 +288,7 @@ void GameManager::setupGameWorld()
 					<< "'" << std::endl;
 		}
 		//insert the just created object in the table
-		mObjectTable[objectPtr->objectId()] = PT(Object)(objectPtr);
+		mObjects[objectPtr->objectId()] = PT(Object)(objectPtr);
 	}
 	//////////////////////////////////////////////////////////////
 	//<!-- Scene Creation -->
@@ -317,49 +317,59 @@ void GameManager::setupGameWorld()
 		std::cout << "  Creating Node for object '" << nodeId << "'"
 				<< std::endl;
 		//get the object
-		Object* objectNodePtr = mObjectTable[ObjectId(nodeId)];
-		//cycle through of Node's tags
+		PT(Object) objectNodePtr = mObjects[ObjectId(nodeId)];
+		//cycle through Node's tags
 		tinyxml2::XMLElement *tag;
 		//Parent (default: None)
 		tag = node->FirstChildElement("Parent");
 		if (tag != NULL)
 		{
-			if (tag == std::string("Render"))
+			tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+			if (text != NULL)
 			{
-				((NodePath) (*objectNodePtr)).reparent_to(
-						mWindow->get_render());
-			}
-			else
-			{
-
-				;
+				std::string value = std::string(text->Value());
+				if (value == std::string("Render"))
+				{
+					((NodePath) (*objectNodePtr)).reparent_to(
+							mWindow->get_render());
+				}
+				else
+				{
+					ObjectTable::iterator iter = mObjects.find(
+							ObjectId(text->Value()));
+					if (iter != mObjects.end())
+					{
+						((NodePath) (*objectNodePtr)).reparent_to(
+								*iter->second.p());
+					}
+				}
 			}
 		}
 	}
 }
 
-	AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
+{
+	double timeElapsed = mGlobalClock->get_real_time();
+	if (timeElapsed < 1.0)
 	{
-		double timeElapsed = mGlobalClock->get_real_time();
-		if (timeElapsed < 1.0)
-		{
-			std::cout << "firstTask " << timeElapsed << std::endl;
-			return AsyncTask::DS_cont;
-		}
-		return AsyncTask::DS_done;
+		std::cout << "firstTask " << timeElapsed << std::endl;
+		return AsyncTask::DS_cont;
 	}
+	return AsyncTask::DS_done;
+}
 
-	AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
+{
+	double timeElapsed = mGlobalClock->get_real_time();
+	if (timeElapsed < 1.0)
 	{
-		double timeElapsed = mGlobalClock->get_real_time();
-		if (timeElapsed < 1.0)
-		{
-			return AsyncTask::DS_cont;
-		}
-		else if (timeElapsed > 1.0 and timeElapsed < 2.0)
-		{
-			std::cout << "secondTask " << timeElapsed << std::endl;
-			return AsyncTask::DS_cont;
-		}
-		return AsyncTask::DS_done;
+		return AsyncTask::DS_cont;
 	}
+	else if (timeElapsed > 1.0 and timeElapsed < 2.0)
+	{
+		std::cout << "secondTask " << timeElapsed << std::endl;
+		return AsyncTask::DS_cont;
+	}
+	return AsyncTask::DS_done;
+}
