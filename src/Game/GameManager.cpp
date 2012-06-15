@@ -80,7 +80,7 @@ void GameManager::setup()
 	((NodePath) (*mPandaInstObj)).set_hpr(-90, 0, 0);
 	((NodePath) (*mPandaInstObj)).set_pos(-10, 0, 0);
 //	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
-	((NodePath) (*mPandaObj)).instance_to(*mPandaInstObj);
+//	((NodePath) (*mPandaObj)).instance_to(*mPandaInstObj);
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
@@ -324,23 +324,44 @@ void GameManager::setupGameWorld()
 		tag = node->FirstChildElement("Parent");
 		if (tag != NULL)
 		{
-			tinyxml2::XMLText* text = tag->FirstChild()->ToText();
-			if (text != NULL)
+			if (tag->FirstChild() != NULL)
 			{
-				std::string value = std::string(text->Value());
-				if (value == std::string("Render"))
+				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+				if (text != NULL)
 				{
-					((NodePath) (*objectNodePtr)).reparent_to(
-							mWindow->get_render());
+					std::string value = std::string(text->Value());
+					if (value == std::string("Render"))
+					{
+						objectNodePtr->nodePath().reparent_to(
+								mWindow->get_render());
+					}
+					else
+					{
+						ObjectTable::iterator iter = mObjects.find(
+								ObjectId(value));
+						if (iter != mObjects.end())
+						{
+							objectNodePtr->nodePath().reparent_to(
+									*iter->second.p());
+						}
+					}
 				}
-				else
+			}
+		}
+		//InstanceOf (default: None)
+		tag = node->FirstChildElement("InstanceOf");
+		if (tag != NULL)
+		{
+			if (tag->FirstChild() != NULL)
+			{
+				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+				if (text != NULL)
 				{
-					ObjectTable::iterator iter = mObjects.find(
-							ObjectId(text->Value()));
+					std::string value = std::string(text->Value());
+					ObjectTable::iterator iter = mObjects.find(ObjectId(value));
 					if (iter != mObjects.end())
 					{
-						((NodePath) (*objectNodePtr)).reparent_to(
-								*iter->second.p());
+						iter->second->nodePath().instance_to(*objectNodePtr.p());
 					}
 				}
 			}
