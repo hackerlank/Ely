@@ -58,6 +58,12 @@ GameManager::~GameManager()
 
 void GameManager::setup()
 {
+	//setup camera position
+	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
+	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
+	trackBall->set_pos(0, 50, -6);
+//	mCamera.set_pos(0, -50, 6);
+
 	//initialize typed objects
 	initTypedObjects();
 	//setup component template manager
@@ -75,11 +81,6 @@ void GameManager::setup()
 
 	//InstancedActor1
 	PT(Object) instancedActor1 = mObjects["InstancedActor1"];
-
-	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
-	trackBall->set_pos(0, 50, -6);
-//	mCamera.set_pos(0, -50, 6);
 
 	// add a 1st task
 	m1stTask = new TaskInterface<GameManager>::TaskData(this,

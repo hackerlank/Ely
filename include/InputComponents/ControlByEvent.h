@@ -33,6 +33,7 @@
 #include <graphicsWindow.h>
 #include <windowProperties.h>
 #include <trackball.h>
+#include <transform2sg.h>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 
@@ -126,8 +127,8 @@ private:
 	///@}
 	///A task data for update.
 	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
-	///The trackball node
-	PT(Trackball) mTrackball;
+	///Enabled flag.
+	bool mEnabled;
 
 	///TypedObject semantics: hardcoded
 public:

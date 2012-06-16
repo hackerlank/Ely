@@ -33,7 +33,7 @@ ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 		mTmpl(tmpl), mForward(false), mBackward(false), mStrafeLeft(false), mStrafeRight(
 				false), mUp(false), mDown(false), mRollLeft(false), mRollRight(
 				false), mTrue(true), mFalse(false), mInverted(false), mMouseEnabledH(
-				false), mMouseEnabledP(false)
+				false), mMouseEnabledP(false), mEnabled(false)
 {
 	mUpdateData = NULL;
 	mUpdateTask = NULL;
@@ -49,16 +49,23 @@ ControlByEvent::~ControlByEvent()
 
 void ControlByEvent::disable()
 {
+	if (not mEnabled)
+	{
+		return;
+	}
 	//(re)enable trackball
-	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
-			"**/+Trackball");
-	trackballNP.attach_new_node(mTrackball);
+	mTmpl->windowFramework()->setup_trackball();
 	//show mouse cursor
 	WindowProperties props;
 	props.set_cursor_hidden(false);
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	win->request_properties(props);
 
+	//Remove the task
+	if (mUpdateTask)
+	{
+		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
+	}
 	//Unregister the handlers
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 			(void*) &this->mBackward);
@@ -76,12 +83,8 @@ void ControlByEvent::disable()
 			(void*) &this->mRollRight);
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 			(void*) &this->mUp);
-
-	//Remove the task
-	if (mUpdateTask)
-	{
-		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
-	}
+	//
+	mEnabled = not mEnabled;
 }
 
 const ComponentFamilyType ControlByEvent::familyType() const
@@ -96,10 +99,20 @@ const ComponentType ControlByEvent::componentType() const
 
 void ControlByEvent::enable()
 {
+	if (mEnabled)
+	{
+		return;
+	}
 	//disable the trackball
 	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
 			"**/+Trackball");
-	trackballNP.detach_node();
+	PT(Trackball) trackball = DCAST(Trackball, trackballNP.node());
+	NodePath transform2sgNP = trackballNP.find("**/+Transform2SG");
+	PT(Transform2SG) transform2sg =
+			DCAST(Transform2SG,transform2sgNP.node());
+	trackball->remove_child(transform2sg);
+	trackballNP.remove_node();
+
 	//hide mouse cursor
 	WindowProperties props;
 	props.set_cursor_hidden(true);
@@ -225,6 +238,8 @@ void ControlByEvent::enable()
 			&ControlByEvent::setSpeedFast, (void*) this);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "speedKey-up",
 			&ControlByEvent::setSpeed, (void*) this);
+	//
+	mEnabled = not mEnabled;
 }
 
 bool ControlByEvent::initialize()
@@ -275,10 +290,7 @@ bool ControlByEvent::initialize()
 	mRollSens = mTmpl->rollSens();
 	mSensX = mTmpl->sensX();
 	mSensY = mTmpl->sensY();
-	//the trackball node
-	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
-			"**/+Trackball");
-	mTrackball = DCAST(Trackball, trackballNP.node());
+	//
 	return result;
 }
 
