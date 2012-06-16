@@ -32,15 +32,34 @@ ControlByEvent::ControlByEvent()
 ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 		mTmpl(tmpl), mForward(false), mBackward(false), mStrafeLeft(false), mStrafeRight(
 				false), mUp(false), mDown(false), mRollLeft(false), mRollRight(
-				false), mTrue(true), mFalse(false), mInverted(false)
+				false), mTrue(true), mFalse(false), mInverted(false), mMouseEnabledH(
+				false), mMouseEnabledP(false)
 {
 	mUpdateData = NULL;
 	mUpdateTask = NULL;
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	mCentX = win->get_properties().get_x_size() / 2;
+	mCentY = win->get_properties().get_y_size() / 2;
 }
 
 ControlByEvent::~ControlByEvent()
 {
-	//undefine key events
+	disable();
+}
+
+void ControlByEvent::disable()
+{
+	//(re)enable trackball
+	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
+			"**/+Trackball");
+	trackballNP.attach_new_node(mTrackball);
+	//show mouse cursor
+	WindowProperties props;
+	props.set_cursor_hidden(false);
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	win->request_properties(props);
+
+	//Unregister the handlers
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 			(void*) &this->mBackward);
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
@@ -57,7 +76,8 @@ ControlByEvent::~ControlByEvent()
 			(void*) &this->mRollRight);
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 			(void*) &this->mUp);
-	//remove the task
+
+	//Remove the task
 	if (mUpdateTask)
 	{
 		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
@@ -74,23 +94,29 @@ const ComponentType ControlByEvent::componentType() const
 	return ComponentType("ControlByEvent");
 }
 
-bool ControlByEvent::initialize()
+void ControlByEvent::enable()
 {
-	bool result = true;
-	if (mTmpl->inverted() == std::string("true"))
-	{
-		mInverted = true;
-	}
-	std::string speedKey = mTmpl->speedKey();
-	if (not (speedKey == "control" or speedKey == "alt" or speedKey == "shift"))
-	{
-		speedKey = "shift";
-	}
+	//disable the trackball
+	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
+			"**/+Trackball");
+	trackballNP.detach_node();
+	//hide mouse cursor
+	WindowProperties props;
+	props.set_cursor_hidden(true);
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	win->request_properties(props);
+	//reset mouse to start position
+	win->move_pointer(0, mCentX, mCentY);
+
+	//Add the task for updating the controlled object
+	mTmpl->pandaFramework()->get_task_mgr().add(mUpdateTask);
+
+	//Register the handlers
 	//helper variables
+	std::string speedKey = mSpeedKey;
 	std::string keyEvent, speedKeyEvent, upKeyEvent;
-	//register the handlers
 	//backward event keys (e.g. "s", "shift-s", "s-up")
-	keyEvent = mTmpl->backwardEvent();
+	keyEvent = mBackwardKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -103,7 +129,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mBackward);
 	}
 	//down event keys (e.g. "f", "shift-f", "f-up")
-	keyEvent = mTmpl->downEvent();
+	keyEvent = mDownKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -116,7 +142,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mDown);
 	}
 	//forward event keys (e.g. "w", "shift-w", "w-up")
-	keyEvent = mTmpl->forwardEvent();
+	keyEvent = mForwardKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -129,7 +155,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mForward);
 	}
 	//strafeLeft event keys (e.g. "q", "shift-q", "q-up")
-	keyEvent = mTmpl->strafeLeftEvent();
+	keyEvent = mStrafeLeftKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -142,7 +168,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mStrafeLeft);
 	}
 	//strafeRight event keys (e.g. "e", "shift-e", "e-up")
-	keyEvent = mTmpl->strafeRightEvent();
+	keyEvent = mStrafeRightKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -155,7 +181,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mStrafeRight);
 	}
 	//rollLeft event keys (e.g. "a", "shift-a", "a-up")
-	keyEvent = mTmpl->rollLeftEvent();
+	keyEvent = mRollLeftKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -168,7 +194,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mRollLeft);
 	}
 	//rollRight event keys (e.g. "d", "shift-d", "d-up")
-	keyEvent = mTmpl->rollRightEvent();
+	keyEvent = mRollRightKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -181,7 +207,7 @@ bool ControlByEvent::initialize()
 				&ControlByEvent::setControlFalse, (void*) &this->mRollRight);
 	}
 	//up event keys (e.g. "r", "shift-r", "r-up")
-	keyEvent = mTmpl->upEvent();
+	keyEvent = mUpKey;
 	if (keyEvent != "")
 	{
 		speedKeyEvent = speedKey + "-" + keyEvent;
@@ -199,6 +225,47 @@ bool ControlByEvent::initialize()
 			&ControlByEvent::setSpeedFast, (void*) this);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "speedKey-up",
 			&ControlByEvent::setSpeed, (void*) this);
+}
+
+bool ControlByEvent::initialize()
+{
+	bool result = true;
+	if (mTmpl->inverted() == std::string("true"))
+	{
+		mInverted = true;
+	}
+	//mouse management
+	if (mTmpl->mouseEnabledH() == std::string("true"))
+	{
+		mMouseEnabledH = true;
+	}
+	if (mTmpl->mouseEnabledP() == std::string("true"))
+	{
+		mMouseEnabledP = true;
+	}
+	//backward key
+	mBackwardKey = mTmpl->backwardEvent();
+	//down key
+	mDownKey = mTmpl->downEvent();
+	//forward key
+	mForwardKey = mTmpl->forwardEvent();
+	//strafeLeft key
+	mStrafeLeftKey = mTmpl->strafeLeftEvent();
+	//strafeRight key
+	mStrafeRightKey = mTmpl->strafeRightEvent();
+	//rollLeft key
+	mRollLeftKey = mTmpl->rollLeftEvent();
+	//rollRight key
+	mRollRightKey = mTmpl->rollRightEvent();
+	//up key
+	mUpKey = mTmpl->upEvent();
+	//speedKey
+	mSpeedKey = mTmpl->speedKey();
+	if (not (mSpeedKey == "control" or mSpeedKey == "alt"
+			or mSpeedKey == "shift"))
+	{
+		mSpeedKey = "shift";
+	}
 
 	//set sensitivity parameters
 	mSpeed = mTmpl->speed();
@@ -206,18 +273,25 @@ bool ControlByEvent::initialize()
 	mSpeedActual = mSpeed;
 	mMovSens = mTmpl->movSens();
 	mRollSens = mTmpl->rollSens();
+	mSensX = mTmpl->sensX();
+	mSensY = mTmpl->sensY();
+	//the trackball node
+	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
+			"**/+Trackball");
+	mTrackball = DCAST(Trackball, trackballNP.node());
 	return result;
 }
 
 void ControlByEvent::onAddSetup()
 {
-	//add the task for updating the controlled object
+	//create the task for updating the controlled object
 	mUpdateData = new TaskInterface<ControlByEvent>::TaskData(this,
 			&ControlByEvent::update);
 	mUpdateTask = new GenericAsyncTask("ControlByEvent::update",
 			&TaskInterface<ControlByEvent>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
-	mTmpl->pandaFramework()->get_task_mgr().add(mUpdateTask);
+	//enable the component
+	enable();
 }
 
 void ControlByEvent::setControlTrue(const Event* event, void* data)
@@ -247,6 +321,7 @@ void ControlByEvent::setSpeedFast(const Event* event, void* data)
 AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 {
 	float dt = task->get_dt();
+	NodePath ownerNodePath = mOwnerObject->nodePath();
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
@@ -254,8 +329,29 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 
 	int signOf = (mInverted ? -1 : 1);
 
+	if (mMouseEnabledH or mMouseEnabledP)
+	{
+		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+		MouseData md = win->get_pointer(0);
+		float x = md.get_x();
+		float y = md.get_y();
+
+		if (win->move_pointer(0, mCentX, mCentY))
+		{
+			if (mMouseEnabledH)
+			{
+				ownerNodePath.set_h(
+						ownerNodePath.get_h() - (x - mCentX) * mSensX * signOf);
+			}
+			if (mMouseEnabledP)
+			{
+				ownerNodePath.set_p(
+						ownerNodePath.get_p() - (y - mCentY) * mSensY * signOf);
+			}
+		}
+	}
+
 	//handle keys:
-	NodePath ownerNodePath = mOwnerObject->nodePath();
 	if (mForward)
 	{
 		ownerNodePath.set_y(ownerNodePath,

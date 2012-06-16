@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(startup)
 	mCompId = "ControlByEvent_Test";
 	BOOST_TEST_MESSAGE( "startup" );
 	mPanda = new PandaFramework();
-	mControlTmpl = new ControlByEventTemplate(mPanda);
+	mControlTmpl = new ControlByEventTemplate(mPanda, mPanda->open_window());
 	ControlByEventTemplate::init_type();
 	ControlByEvent::init_type();
 	mEvents.push_back(Event("w"));

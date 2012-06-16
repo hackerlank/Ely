@@ -9,6 +9,9 @@
 		<ObjectTmpl type="InstancedActor">
 			<ComponentTmpl family="Graphics" type="InstanceOf"/>
 		</ObjectTmpl>
+		<ObjectTmpl type="StaticActor">
+			<ComponentTmpl family="Graphics" type="Model"/>
+		</ObjectTmpl>
 	</ObjectTmplSet>
 	<!-- Objects Creation -->
 	<ObjectSet>
@@ -20,12 +23,19 @@
 			<Component type="ControlByEvent">
 				<Param speed="200.0"/>
 				<Param fast_factor="10.0"/>
-				<Param inverted="true"/>
+				<Param inverted="false"/>
 				<Param up=""/>
 				<Param down=""/>
+				<Param mouse_enabled_h="true"/>
+				<Param mouse_enabled_p="false"/>
 			</Component>
 		</Object>
 		<Object type="InstancedActor" id="InstancedActor1">
+		</Object>
+		<Object type="StaticActor" id="Teapot1">
+			<Component type="Model">
+				<Param model_file="teapot"/>
+			</Component>		
 		</Object>
 	</ObjectSet>
 	<!-- Scene Creation -->
@@ -37,12 +47,21 @@
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="1.0" y="1.0" z="1.0"/>
 		</Node>
+<!--		
 		<Node id="InstancedActor1">
 			<Parent>Render</Parent>
 			<InstanceOf>Actor1</InstanceOf>
 			<Position x="-10.0" y="0.0" z="0.0"/>
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="1.0" y="1.0" z="1.0"/>
+			<Scaling x="0.5" y="0.5" z="1.0"/>
+		</Node>
+-->	
+		<Node id="Teapot1">
+			<Parent>Actor1</Parent>
+			<InstanceOf></InstanceOf>
+			<Position x="0.0" y="-10.0" z="0.0"/>
+			<Orientation h="-90.0" p="0.0" r="0.0"/>
+			<Scaling x="0.5" y="0.5" z="0.5"/>
 		</Node>	
 	</Scene>
 </Game>

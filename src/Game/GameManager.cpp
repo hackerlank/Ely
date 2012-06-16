@@ -63,24 +63,18 @@ void GameManager::setup()
 	//setup component template manager
 	setupCompTmplMgr();
 
-	//setup game world
+	//setup game world (static)
 	setupGameWorld();
 
-	// Create the scene graph (from a scene.xml)
-	//mPandaObj
-	PT(Object) mPandaObj = mObjects["Actor1"];
-	((NodePath) (*mPandaObj)).set_hpr(-90, 0, 0);
-//	((NodePath) (*mPandaObj)).reparent_to(mWindow->get_render());
-	Model* pandaObjModel = DCAST(Model, mPandaObj->getComponent(
+	// Manipulate objects
+	//Actor1
+	PT(Object) actor1 = mObjects["Actor1"];
+	Model* pandaObjModel = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Graphics")));
 	pandaObjModel->animations().loop("panda_soft", false);
 
-	//mPandaInstObj
-	PT(Object) mPandaInstObj = mObjects["InstancedActor1"];
-	((NodePath) (*mPandaInstObj)).set_hpr(-90, 0, 0);
-	((NodePath) (*mPandaInstObj)).set_pos(-10, 0, 0);
-//	((NodePath) (*mPandaInstObj)).reparent_to(mWindow->get_render());
-//	((NodePath) (*mPandaObj)).instance_to(*mPandaInstObj);
+	//InstancedActor1
+	PT(Object) instancedActor1 = mObjects["InstancedActor1"];
 
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
@@ -114,7 +108,7 @@ void GameManager::setupCompTmplMgr()
 			new InstanceOfTemplate());
 	//ControlByEvent template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ControlByEventTemplate(this));
+			new ControlByEventTemplate(this, mWindow));
 
 }
 
@@ -361,9 +355,76 @@ void GameManager::setupGameWorld()
 					ObjectTable::iterator iter = mObjects.find(ObjectId(value));
 					if (iter != mObjects.end())
 					{
-						iter->second->nodePath().instance_to(*objectNodePtr.p());
+						iter->second->nodePath().instance_to(
+								*objectNodePtr.p());
 					}
 				}
+			}
+		}
+		//Position (default: (0,0,0))
+		tag = node->FirstChildElement("Position");
+		if (tag != NULL)
+		{
+			const char *coord;
+			coord = tag->Attribute("x", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_x((float) atof(coord));
+			}
+			coord = tag->Attribute("y", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_y((float) atof(coord));
+			}
+			coord = tag->Attribute("z", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_z((float) atof(coord));
+			}
+		}
+		//Orientation (default: (0,0,0))
+		tag = node->FirstChildElement("Orientation");
+		if (tag != NULL)
+		{
+			const char *coord;
+			coord = tag->Attribute("h", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_h((float) atof(coord));
+			}
+			coord = tag->Attribute("p", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_p((float) atof(coord));
+			}
+			coord = tag->Attribute("r", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_r((float) atof(coord));
+			}
+		}
+		//Scaling (default: (1.0,1.0,1.0))
+		tag = node->FirstChildElement("Scaling");
+		if (tag != NULL)
+		{
+			const char *coord;
+			coord = tag->Attribute("x", NULL);
+			if (coord != NULL)
+			{
+				float res = (float) atof(coord);
+				objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
+			}
+			coord = tag->Attribute("y", NULL);
+			if (coord != NULL)
+			{
+				float res = (float) atof(coord);
+				objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
+			}
+			coord = tag->Attribute("z", NULL);
+			if (coord != NULL)
+			{
+				float res = (float) atof(coord);
+				objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
 			}
 		}
 	}

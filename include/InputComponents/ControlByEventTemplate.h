@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <typedObject.h>
 #include <pandaFramework.h>
+#include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "InputComponents/ControlByEvent.h"
@@ -36,7 +37,8 @@
 class ControlByEventTemplate: public ComponentTemplate
 {
 public:
-	ControlByEventTemplate(PandaFramework* pandaFramework);
+	ControlByEventTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~ControlByEventTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -52,6 +54,12 @@ public:
 	 * @return A reference to the PandaFramework.
 	 */
 	PandaFramework*& pandaFramework();
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework*& windowFramework();
 
 	/**
 	 * \name Event key names getters/setters.
@@ -71,6 +79,8 @@ public:
 	std::string& upEvent();
 	std::string& speedKey();
 	std::string& inverted();
+	std::string& mouseEnabledH();
+	std::string& mouseEnabledP();
 	///@}
 	/**
 	 * \name Sensitivity parameters getters/setters.
@@ -81,21 +91,26 @@ public:
 	float& fastFactor();
 	float& movSens();
 	float& rollSens();
+	float& sensX();
+	float& sensY();
 	///@}
-
 
 private:
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 	///@{
-	/// Event key names and inversion.
+	/// Event key names, inversion, mouse enabling.
 	std::string mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-			mRollLeft, mRollRight, mSpeedKey, mInverted;
+			mRollLeft, mRollRight, mSpeedKey, mInverted, mMouseEnabledH,
+			mMouseEnabledP;
 	///@}
 	///@{
 	/// Sensitivity parameters.
 	float mSpeed, mFastFactor;
 	float mMovSens, mRollSens;
+	float mSensX, mSensY;
 	///@}
 
 	///TypedObject semantics: hardcoded

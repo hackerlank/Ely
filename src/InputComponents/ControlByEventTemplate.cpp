@@ -23,15 +23,16 @@
 
 #include "InputComponents/ControlByEventTemplate.h"
 
-ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework)
+ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework)
 {
-	if (not pandaFramework)
+	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"ControlByEventTemplate::ControlByEventTemplate: invalid PandaFramework");
-
+				"ControlByEventTemplate::ControlByEventTemplate: invalid PandaFramework or WindowFramework");
 	}
 	mPandaFramework = pandaFramework;
+	mWindowFramework = windowFramework;
 	resetParameters();
 }
 
@@ -76,12 +77,21 @@ void ControlByEventTemplate::resetParameters()
 	mFastFactor = 5.0;
 	mMovSens = 2.0;
 	mRollSens = 15.0;
-	mInverted = std::string("false");;
+	mSensX = 0.2;
+	mSensY = 0.2;
+	mInverted = std::string("false");
+	mMouseEnabledH = std::string("false");
+	mMouseEnabledP = std::string("false");
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
 {
 	return mPandaFramework;
+}
+
+WindowFramework*& ControlByEventTemplate::windowFramework()
+{
+	return mWindowFramework;
 }
 
 std::string& ControlByEventTemplate::backwardEvent()
@@ -149,14 +159,45 @@ float& ControlByEventTemplate::movSens()
 	return mMovSens;
 }
 
+std::string& ControlByEventTemplate::mouseEnabledH()
+{
+	return mMouseEnabledH;
+}
+
+std::string& ControlByEventTemplate::mouseEnabledP()
+{
+	return mMouseEnabledP;
+}
+
 float& ControlByEventTemplate::rollSens()
 {
 	return mRollSens;
 }
 
+float& ControlByEventTemplate::sensX()
+{
+	return mSensX;
+}
+
+float& ControlByEventTemplate::sensY()
+{
+	return mSensY;
+}
+
 void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
+	//set mouse control
+	iter = parameterTable.find("mouse_enabled_h");
+	if (iter != parameterTable.end())
+	{
+		mMouseEnabledH = iter->second;
+	}
+	iter = parameterTable.find("mouse_enabled_p");
+	if (iter != parameterTable.end())
+	{
+		mMouseEnabledP = iter->second;
+	}
 	//set event key names
 	iter = parameterTable.find("forward");
 	if (iter != parameterTable.end())
@@ -228,6 +269,16 @@ void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 	if (iter != parameterTable.end())
 	{
 		mRollSens = (float) atof(iter->second.c_str());
+	}
+	iter = parameterTable.find("sens_x");
+	if (iter != parameterTable.end())
+	{
+		mSensX = (float) atof(iter->second.c_str());
+	}
+	iter = parameterTable.find("sens_y");
+	if (iter != parameterTable.end())
+	{
+		mSensY = (float) atof(iter->second.c_str());
 	}
 }
 

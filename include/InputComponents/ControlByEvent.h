@@ -29,6 +29,10 @@
 #include <typedObject.h>
 #include <event.h>
 #include <asyncTask.h>
+#include <mouseData.h>
+#include <graphicsWindow.h>
+#include <windowProperties.h>
+#include <trackball.h>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 
@@ -36,7 +40,7 @@ class ControlByEventTemplate;
 
 /**
  * \brief Component representing the control of object movement
- * through keyboard and mouse button events.
+ * through keyboard/mouse button events and mouse movement (optional).
  *
  * To each basic movement (forward, backward, left, right etc...)
  * are associated a button event and a control key, which tracks
@@ -52,8 +56,10 @@ class ControlByEventTemplate;
  * \li \c StrafeRight : "e"
  * \li \c Up : "r"
  * \li \c Down : "f"
- * If you want to disable a bsic movement put its control key
+ * If you want to disable a basic movement put its control key
  * to null string ("").
+ * You can enable mouse movement for head (yaw) and pitch control,
+ * separately.
  * You can invert all movements (but up and down);
  */
 class ControlByEvent: public Component
@@ -88,25 +94,40 @@ public:
 	 */
 	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
+	/**
+	 * \name Enabling/disabling.
+	 * \brief Enables/disables this component.
+	 */
+	///@{
+	void enable();
+	void disable();
+	///@}
+
 private:
 	///The template used to construct this component.
 	ControlByEventTemplate* mTmpl;
 	///@{
-	///Key controls.
-	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mRollLeft, mRollRight;
+	///Key controls and effective keys.
+	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mRollLeft,
+			mRollRight;
+	std::string mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
+			mUpKey, mDownKey, mRollLeftKey, mRollRightKey, mSpeedKey;
 	///@}
 	///@{
 	///Key control values.
-	bool mTrue, mFalse, mInverted;
+	bool mTrue, mFalse, mInverted, mMouseEnabledH, mMouseEnabledP;
 	///@}
 	///@{
 	/// Sensitivity settings.
 	float mSpeed, mFastFactor, mSpeedActual;
 	float mMovSens, mRollSens;
+	float mSensX, mSensY;
+	int mCentX, mCentY;
 	///@}
 	///A task data for update.
-	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
+	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
+	///The trackball node
+	PT(Trackball) mTrackball;
 
 	///TypedObject semantics: hardcoded
 public:
