@@ -28,8 +28,12 @@
 #include <windowFramework.h>
 #include <nodePath.h>
 #include <clockObject.h>
+#include <lmatrix.h>
 #include <asyncTask.h>
 #include <pointerTo.h>
+#include <event.h>
+#include <trackball.h>
+#include <transform2sg.h>
 #include <iostream>
 #include <string>
 #include <map>
@@ -72,28 +76,35 @@ public:
 	virtual void setupCompTmplMgr();
 
 	/**
-	 * \brief Set the Object template manager up.
-	 */
-	virtual void setupGameWorld();
-
-	/**
 	 * \brief Create a Game World loading description from a file (xml).
 	 *
 	 * @param gameWorldXML The description file.
-	 * @return True if all went OK, false otherwise.
 	 */
-	bool createGameWorld(std::string gameWorldXML);
+	virtual void createGameWorld(const std::string& gameWorldXML);
+
+	/**
+	 * \brief Porting of python function direct.showbase.ShowBase.enableMouse.
+	 */
+	void enable_mouse();
+	/**
+	 * \brief Porting of python function direct.showbase.ShowBase.disableMouse.
+	 */
+	void disable_mouse();
 
 protected:
 
-	///Objects in the game.
+	/// Objects in the game.
 	typedef std::map<ObjectId, PT(Object)> ObjectTable;
 	ObjectTable mObjects;
 
 	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
-	NodePath mCamera;PT(ClockObject) mGlobalClock;
+	NodePath mCamera;
+	PT(ClockObject) mGlobalClock;
+
+	/// NodePaths for enable_mouse/disable_mouse.
+	NodePath mTrackBall, mMouse2cam;
 
 	/// 1nd task.
 	PT(TaskInterface<GameManager>::TaskData) m1stTask;
@@ -101,6 +112,8 @@ protected:
 	/// 2nd task
 	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
+
+	static void toggleActor1Control(const Event* event, void* data);
 
 };
 

@@ -40,6 +40,8 @@ GameManager::GameManager(int argc, char* argv[]) :
 
 		mWindow->enable_keyboard(); // Enable keyboard detection
 		mWindow->setup_trackball(); // Enable default camera movement
+		mTrackBall = mWindow->get_mouse().find("**/+Trackball");
+		mMouse2cam = mTrackBall.find("**/+Transform2SG");
 		mRender = mWindow->get_render();
 		mCamera = mWindow->get_camera_group();
 		mGlobalClock = ClockObject::get_global_clock();
@@ -59,10 +61,13 @@ GameManager::~GameManager()
 void GameManager::setup()
 {
 	//setup camera position
+	mCamera.set_pos(0, -50, 20);
+	mCamera.look_at(0, 0, 10);
+	LMatrix4 cameraMat = mCamera.get_transform()->get_mat();
+	cameraMat.invert_in_place();
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
-	trackBall->set_pos(0, 50, -6);
-//	mCamera.set_pos(0, -50, 6);
+	trackBall->set_mat(cameraMat);
 
 	//initialize typed objects
 	initTypedObjects();
@@ -70,14 +75,17 @@ void GameManager::setup()
 	setupCompTmplMgr();
 
 	//setup game world (static)
-	setupGameWorld();
+	createGameWorld(std::string("game.xml"));
 
 	// Manipulate objects
 	//Actor1
 	PT(Object) actor1 = mObjects["Actor1"];
-	Model* pandaObjModel = DCAST(Model, actor1->getComponent(
+	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Graphics")));
-	pandaObjModel->animations().loop("panda_soft", false);
+	actor1Model->animations().loop("panda_soft", false);
+	//enable/disable control by event
+	define_key("c", "enableActor1Control", &GameManager::toggleActor1Control,
+			(void*) this);
 
 	//InstancedActor1
 	PT(Object) instancedActor1 = mObjects["InstancedActor1"];
@@ -123,7 +131,7 @@ static bool checkTag(tinyxml2::XMLElement *tag, const char* tagStr)
 	return true;
 }
 
-void GameManager::setupGameWorld()
+void GameManager::createGameWorld(const std::string& gameWorldXML)
 {
 	//read the game configuration file
 	std::string gameXml = "game.xml";
@@ -456,3 +464,53 @@ AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 	}
 	return AsyncTask::DS_done;
 }
+
+void GameManager::enable_mouse()
+{
+	if (mMouse2cam)
+	{
+		mMouse2cam.reparent_to(mTrackBall);
+	}
+}
+
+void GameManager::disable_mouse()
+{
+	if (mMouse2cam)
+	{
+		mMouse2cam.detach_node();
+	}
+}
+
+void GameManager::toggleActor1Control(const Event* event, void* data)
+{
+	GameManager* gameManager = (GameManager*) data;
+	PT(Object) actor1 = gameManager->mObjects["Actor1"];
+	ControlByEvent* actor1Control = DCAST(ControlByEvent, actor1->getComponent(
+					ComponentFamilyType("Input")));
+	bool isEnabled = actor1Control->isEnabled();
+
+	if (isEnabled)
+	{
+		//if enabled then disable it
+		//disable
+		actor1Control->disable();
+		//reset trackball transform
+		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
+		cameraMat.invert_in_place();
+		PT(Trackball) trackBall =
+				DCAST(Trackball, gameManager->mTrackBall.node());
+		trackBall->set_mat(cameraMat);
+		//(re)enable trackball
+		gameManager->enable_mouse();
+	}
+	else
+	{
+		//if disabled then enable it
+		//disable the trackball
+		gameManager->disable_mouse();
+		//enable
+		actor1Control->enable();
+	}
+
+}
+

@@ -32,8 +32,6 @@
 #include <mouseData.h>
 #include <graphicsWindow.h>
 #include <windowProperties.h>
-#include <trackball.h>
-#include <transform2sg.h>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 
@@ -57,11 +55,12 @@ class ControlByEventTemplate;
  * \li \c StrafeRight : "e"
  * \li \c Up : "r"
  * \li \c Down : "f"
- * If you want to disable a basic movement put its control key
+ * A basic movement can be disabled by putting its control key
  * to null string ("").
- * You can enable mouse movement for head (yaw) and pitch control,
- * separately.
- * You can invert all movements (but up and down);
+ * Mouse movement for HEAD (i.e. YAW) and PITCH control can be enabled,
+ * separately (default: both disabled).
+ * All movements (but up and down) can be inverted (default: not inverted).
+ * This component can be enabled/disabled as a whole (default: enabled).
  */
 class ControlByEvent: public Component
 {
@@ -102,6 +101,7 @@ public:
 	///@{
 	void enable();
 	void disable();
+	bool isEnabled();
 	///@}
 
 private:
@@ -125,10 +125,10 @@ private:
 	float mSensX, mSensY;
 	int mCentX, mCentY;
 	///@}
+	///Enabling flags.
+	bool mEnabled, mIsEnabled;
 	///A task data for update.
 	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
-	///Enabled flag.
-	bool mEnabled;
 
 	///TypedObject semantics: hardcoded
 public:

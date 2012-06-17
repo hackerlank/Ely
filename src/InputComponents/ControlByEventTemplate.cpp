@@ -64,6 +64,7 @@ Component* ControlByEventTemplate::makeComponent(ComponentId& compId)
 
 void ControlByEventTemplate::resetParameters()
 {
+	//set component parameters default values
 	mForward = std::string("w");
 	mRollLeft = std::string("a");
 	mBackward = std::string("s");
@@ -82,6 +83,7 @@ void ControlByEventTemplate::resetParameters()
 	mInverted = std::string("false");
 	mMouseEnabledH = std::string("false");
 	mMouseEnabledP = std::string("false");
+	mEnabled = std::string("true");
 }
 
 PandaFramework*& ControlByEventTemplate::pandaFramework()
@@ -169,6 +171,11 @@ std::string& ControlByEventTemplate::mouseEnabledP()
 	return mMouseEnabledP;
 }
 
+std::string& ControlByEventTemplate::enabled()
+{
+	return mEnabled;
+}
+
 float& ControlByEventTemplate::rollSens()
 {
 	return mRollSens;
@@ -187,6 +194,12 @@ float& ControlByEventTemplate::sensY()
 void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
+	//set (initial) enabling
+	iter = parameterTable.find("enabled");
+	if (iter != parameterTable.end())
+	{
+		mEnabled = iter->second;
+	}
 	//set mouse control
 	iter = parameterTable.find("mouse_enabled_h");
 	if (iter != parameterTable.end())

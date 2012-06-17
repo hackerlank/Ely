@@ -32,9 +32,11 @@ ControlByEvent::ControlByEvent()
 ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 		mTmpl(tmpl), mForward(false), mBackward(false), mStrafeLeft(false), mStrafeRight(
 				false), mUp(false), mDown(false), mRollLeft(false), mRollRight(
-				false), mTrue(true), mFalse(false), mInverted(false), mMouseEnabledH(
-				false), mMouseEnabledP(false), mEnabled(false)
+				false), mTrue(true), mFalse(false), mIsEnabled(false)
 {
+	//initialized by template:
+	//mInverted, mMouseEnabledH, mMouseEnabledP, mEnabled
+
 	mUpdateData = NULL;
 	mUpdateTask = NULL;
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
@@ -49,12 +51,10 @@ ControlByEvent::~ControlByEvent()
 
 void ControlByEvent::disable()
 {
-	if (not mEnabled)
+	if (not mIsEnabled)
 	{
 		return;
 	}
-	//(re)enable trackball
-	mTmpl->windowFramework()->setup_trackball();
 	//show mouse cursor
 	WindowProperties props;
 	props.set_cursor_hidden(false);
@@ -84,7 +84,7 @@ void ControlByEvent::disable()
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 			(void*) &this->mUp);
 	//
-	mEnabled = not mEnabled;
+	mIsEnabled = not mIsEnabled;
 }
 
 const ComponentFamilyType ControlByEvent::familyType() const
@@ -99,19 +99,10 @@ const ComponentType ControlByEvent::componentType() const
 
 void ControlByEvent::enable()
 {
-	if (mEnabled)
+	if (mIsEnabled)
 	{
 		return;
 	}
-	//disable the trackball
-	NodePath trackballNP = mTmpl->windowFramework()->get_mouse().find(
-			"**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, trackballNP.node());
-	NodePath transform2sgNP = trackballNP.find("**/+Transform2SG");
-	PT(Transform2SG) transform2sg =
-			DCAST(Transform2SG,transform2sgNP.node());
-	trackball->remove_child(transform2sg);
-	trackballNP.remove_node();
 
 	//hide mouse cursor
 	WindowProperties props;
@@ -239,25 +230,23 @@ void ControlByEvent::enable()
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "speedKey-up",
 			&ControlByEvent::setSpeed, (void*) this);
 	//
-	mEnabled = not mEnabled;
+	mIsEnabled = not mIsEnabled;
 }
 
 bool ControlByEvent::initialize()
 {
 	bool result = true;
-	if (mTmpl->inverted() == std::string("true"))
-	{
-		mInverted = true;
-	}
-	//mouse management
-	if (mTmpl->mouseEnabledH() == std::string("true"))
-	{
-		mMouseEnabledH = true;
-	}
-	if (mTmpl->mouseEnabledP() == std::string("true"))
-	{
-		mMouseEnabledP = true;
-	}
+	//get settings from template
+	//enabling setting
+	mEnabled = (mTmpl->enabled() == std::string("true") ? true : false);
+	//inverted setting
+	mInverted = (mTmpl->inverted() == std::string("true") ? true : false);
+	//mouse movement setting
+	mMouseEnabledH = (
+			mTmpl->mouseEnabledH() == std::string("true") ? true : false);
+	mMouseEnabledP = (
+			mTmpl->mouseEnabledP() == std::string("true") ? true : false);
+	//key events setting
 	//backward key
 	mBackwardKey = mTmpl->backwardEvent();
 	//down key
@@ -303,7 +292,10 @@ void ControlByEvent::onAddSetup()
 			&TaskInterface<ControlByEvent>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//enable the component
-	enable();
+	if (mEnabled)
+	{
+		enable();
+	}
 }
 
 void ControlByEvent::setControlTrue(const Event* event, void* data)
@@ -328,6 +320,11 @@ void ControlByEvent::setSpeedFast(const Event* event, void* data)
 {
 	ControlByEvent* _this = (ControlByEvent*) data;
 	_this->mSpeedActual = _this->mSpeed * _this->mFastFactor;
+}
+
+bool ControlByEvent::isEnabled()
+{
+	return mIsEnabled;
 }
 
 AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
@@ -418,3 +415,4 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 
 //TypedObject semantics: hardcoded
 TypeHandle ControlByEvent::_type_handle;
+

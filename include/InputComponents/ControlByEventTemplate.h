@@ -81,6 +81,7 @@ public:
 	std::string& inverted();
 	std::string& mouseEnabledH();
 	std::string& mouseEnabledP();
+	std::string& enabled();
 	///@}
 	/**
 	 * \name Sensitivity parameters getters/setters.
@@ -101,10 +102,10 @@ private:
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 	///@{
-	/// Event key names, inversion, mouse enabling.
+	/// Event key names, inversion, mouse enabling, enabling.
 	std::string mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
 			mRollLeft, mRollRight, mSpeedKey, mInverted, mMouseEnabledH,
-			mMouseEnabledP;
+			mMouseEnabledP, mEnabled;
 	///@}
 	///@{
 	/// Sensitivity parameters.

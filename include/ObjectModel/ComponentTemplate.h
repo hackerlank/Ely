@@ -60,8 +60,8 @@ public:
 
 	/**
 	 * \name Parameters management.
-	 * \brief Sets the parameters of the component, that this template is
-	 * prepared to create, to custom values.
+	 * \brief Sets the parameters of the component, this template is
+	 * designed to create, to custom values.
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	///@{
@@ -70,8 +70,8 @@ public:
 	///@}
 
 	/**
-	 * \brief (Re)sets the parameters of the component, that this template is
-	 * prepared to create, to their default values.
+	 * \brief (Re)sets the parameters of the component, this template is
+	 * designed to create, to their default values.
 	 */
 	virtual void resetParameters();
 

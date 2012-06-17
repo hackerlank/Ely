@@ -21,6 +21,7 @@
 				<Param anim_file="panda-walk"/>
 			</Component>
 			<Component type="ControlByEvent">
+				<Param enabled="false"/>
 				<Param speed="200.0"/>
 				<Param fast_factor="10.0"/>
 				<Param inverted="false"/>
