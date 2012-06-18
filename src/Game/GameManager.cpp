@@ -224,28 +224,57 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	}
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
-	//cycle through the Object(s)' definitions
 	tinyxml2::XMLElement *object;
+	//create a priority queue of objects
+	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjects;
 	for (object = objectSet->FirstChildElement("Object"); object != NULL;
 			object = object->NextSiblingElement("Object"))
 	{
+		Orderable<tinyxml2::XMLElement> ordObj;
+		ordObj.setPtr(object);
+		const char *priority = object->Attribute("priority", NULL);
+		priority != NULL ? ordObj.setPrio(atoi(priority)) : ordObj.setPrio(0);
+		orderedObjects.push(ordObj);
+	}
+	//cycle through the Object(s)' definitions in order
+	while (not orderedObjects.empty())
+	{
+		//access top object
+		object = orderedObjects.top().getPtr();
 		const char *objType = object->Attribute("type", NULL);
 		if (not objType)
 		{
+			//no object without type allowed
+			orderedObjects.pop();
 			continue;
 		}
 		const char *objId = object->Attribute("id", NULL); //may be NULL
 		std::cout << "  Creating Object '"
 				<< (objId != NULL ? objId : "UNNAMED") << "'" << std::endl;
-		//cycle through the Object Component(s)' to be initialized
 		tinyxml2::XMLElement *component;
+		//create a priority queue of components
+		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponents;
 		for (component = object->FirstChildElement("Component");
 				component != NULL;
 				component = component->NextSiblingElement("Component"))
 		{
+			Orderable<tinyxml2::XMLElement> ordComp;
+			ordComp.setPtr(component);
+			const char *priority = component->Attribute("priority", NULL);
+			priority != NULL ? ordComp.setPrio(atoi(priority)) :
+					ordComp.setPrio(0);
+			orderedComponents.push(ordComp);
+		}
+		//cycle through the Object Component(s)' to be initialized in order
+		while (not orderedComponents.empty())
+		{
+			//access top component
+			component = orderedComponents.top().getPtr();
 			const char *compType = component->Attribute("type", NULL);
 			if (not compType)
 			{
+				//no component without type allowed
+				orderedComponents.pop();
 				continue;
 			}
 			std::cout << "    Initializing Component '" << compType << "'"
@@ -276,6 +305,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 								attribute->Name(), attribute->Value()));
 			}
 			componentTmplPtr->setParameters(parameterTable);
+			//remove top component from the priority queue
+			orderedComponents.pop();
 		}
 		//create the object
 		Object *objectPtr = ObjectTemplateManager::GetSingleton().createObject(
@@ -292,6 +323,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		}
 		//insert the just created object in the table
 		mObjects[objectPtr->objectId()] = PT(Object)(objectPtr);
+		//remove top object from the priority queue
+		orderedObjects.pop();
 	}
 	//////////////////////////////////////////////////////////////
 	//<!-- Scene Creation -->

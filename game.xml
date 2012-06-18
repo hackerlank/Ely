@@ -15,12 +15,19 @@
 	</ObjectTmplSet>
 	<!-- Objects Creation -->
 	<ObjectSet>
-		<Object type="Actor" id="Actor1">
+		<Object type="InstancedActor" id="InstancedActor1" priority="90">
+		</Object>
+		<Object type="StaticActor" id="Teapot1">
 			<Component type="Model">
+				<Param model_file="teapot"/>
+			</Component>		
+		</Object>
+		<Object type="Actor" id="Actor1" priority="100">
+			<Component type="Model" priority="90">
 				<Param model_file="panda"/>
 				<Param anim_file="panda-walk"/>
 			</Component>
-			<Component type="ControlByEvent">
+			<Component type="ControlByEvent" priority="100">
 				<Param enabled="false"/>
 				<Param speed="200.0"/>
 				<Param fast_factor="10.0"/>
@@ -30,13 +37,6 @@
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
-		</Object>
-		<Object type="InstancedActor" id="InstancedActor1">
-		</Object>
-		<Object type="StaticActor" id="Teapot1">
-			<Component type="Model">
-				<Param model_file="teapot"/>
-			</Component>		
 		</Object>
 	</ObjectSet>
 	<!-- Scene Creation -->

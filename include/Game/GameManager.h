@@ -37,6 +37,7 @@
 #include <iostream>
 #include <string>
 #include <map>
+#include <queue>
 #include <cstdio>
 #include "tinyxml2.h"
 
@@ -78,6 +79,10 @@ public:
 	/**
 	 * \brief Create a Game World loading description from a file (xml).
 	 *
+	 * Objects (inside object sets)  may have a creation priority and
+	 * components (inside objects) may have a initialization priority:
+	 * the higher is priority the earlier is creation/initialization
+	 * (default priority = 0).
 	 * @param gameWorldXML The description file.
 	 */
 	virtual void createGameWorld(const std::string& gameWorldXML);
@@ -97,11 +102,46 @@ protected:
 	typedef std::map<ObjectId, PT(Object)> ObjectTable;
 	ObjectTable mObjects;
 
+	/// Struct that can be ordered based on a priority field.
+	template<typename T> class Orderable
+	{
+	private:
+		T* mPtr;
+		int mPrio;
+	public:
+		Orderable()
+		{
+		}
+		Orderable(T* ptr, int prio) :
+				mPtr(ptr), mPrio(prio)
+		{
+		}
+		int getPrio() const
+		{
+			return mPrio;
+		}
+		void setPrio(int prio)
+		{
+			mPrio = prio;
+		}
+		T* getPtr() const
+		{
+			return mPtr;
+		}
+		void setPtr(T* ptr)
+		{
+			mPtr = ptr;
+		}
+		bool operator <(const Orderable& other) const
+		{
+			return mPrio < other.mPrio;
+		}
+	};
+
 	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
-	NodePath mCamera;
-	PT(ClockObject) mGlobalClock;
+	NodePath mCamera;PT(ClockObject) mGlobalClock;
 
 	/// NodePaths for enable_mouse/disable_mouse.
 	NodePath mTrackBall, mMouse2cam;
