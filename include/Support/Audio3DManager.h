@@ -25,65 +25,50 @@
 #define AUDIO3DMANAGER_H_
 
 #include <pandaFramework.h>
+#include <referenceCount.h>
 #include <pointerTo.h>
 #include <nodePath.h>
 #include <audioManager.h>
 #include <audioSound.h>
 #include <lvector3.h>
+#include <map>
+#include <set>
 #include "Utilities/Tools.h"
 
 /**
  * \brief Porting of python class direct.showbase.Audio3DManager.
  */
-class Audio3DManager
+class Audio3DManager: public ReferenceCount
 {
 public:
-	//    def __init__(self, audio_manager, listener_target = None, root = None, taskPriority = 51)
 	Audio3DManager(AudioManager* audio_manager, NodePath listener_target =
 			NodePath(), NodePath root = NodePath(), int taskPriority = 51);
 	virtual ~Audio3DManager();
 
-//    def loadSfx(self, name):
 	PT(AudioSound) loadSfx(const std::string& name);
-//    def setDistanceFactor(self, factor):
 	void setDistanceFactor(float factor);
-//    def getDistanceFactor(self):
 	float getDistanceFactor();
-//    def setDopplerFactor(self, factor):
 	void setDopplerFactor(float factor);
-//    def getDopplerFactor(self):
 	float getDopplerFactor();
-//    def setDropOffFactor(self, factor):
 	void setDropOffFactor(float factor);
-//    def getDropOffFactor(self):
 	float getDropOffFactor();
-//    def setSoundMinDistance(self, sound, dist):
 	void setSoundMinDistance(AudioSound* sound, float dist);
-//    def getSoundMinDistance(self, sound):
 	float getSoundMinDistance(AudioSound* sound);
-//    def setSoundMaxDistance(self, sound, dist):
 	void setSoundMaxDistance(AudioSound* sound, float dist);
-//    def getSoundMaxDistance(self, sound):
 	float getSoundMaxDistance(AudioSound* sound);
-//    def setSoundVelocity(self, sound, velocity):
 	void setSoundVelocity(AudioSound* sound, const LVector3& factor);
-//    def setSoundVelocityAuto(self, sound):
 	void setSoundVelocityAuto(AudioSound* sound);
-//    def getSoundVelocity(self, sound):
 	LVector3 getSoundVelocity(AudioSound* sound);
-//    def setListenerVelocity(self, velocity):
 	void setListenerVelocity(const LVector3& factor);
-//    def setListenerVelocityAuto(self):
 	void setListenerVelocityAuto();
-//    def getListenerVelocity(self):
 	LVector3 getListenerVelocity();
-//    def attachSoundToObject(self, sound, object):
-//    def detachSound(self, sound):
-//    def getSoundsOnObject(self, object):
-//    def attachListener(self, object):
-//    def detachListener(self):
-//    def update(self, task=None):
-//    def disable(self):
+	bool attachSoundToObject(AudioSound* sound, NodePath object);
+	bool detachSound(AudioSound* sound);
+	std::set<AudioSound*> getSoundsOnObject(NodePath object);
+	bool attachListener(NodePath object);
+	bool detachListener();
+	AsyncTask::DoneStatus update(GenericAsyncTask* task = NULL);
+	void disable();
 
 protected:
 	AudioManager* mAudioMgr;

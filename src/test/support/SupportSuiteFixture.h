@@ -26,6 +26,7 @@
 
 #include <nodePath.h>
 #include <pandaFramework.h>
+#include <windowFramework.h>
 #include <pointerTo.h>
 #include <audioManager.h>
 #include <string>

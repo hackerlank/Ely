@@ -23,7 +23,8 @@
 
 #include "Support/Audio3DManager.h"
 
-Audio3DManager::Audio3DManager()
+Audio3DManager::Audio3DManager(AudioManager* audio_manager,
+		NodePath listener_target, NodePath root, int taskPriority)
 {
 	// TODO Auto-generated constructor stub
 

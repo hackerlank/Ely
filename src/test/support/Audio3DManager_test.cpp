@@ -39,9 +39,10 @@ struct Audio3DManagerTestCaseFixture
 };
 
 PandaFramework* panda;
+WindowFramework* window;
 PT(AudioManager) audio_manager;
 std::string audio_file = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
-NodePath listener_target, render;
+NodePath listener_target, render, camera, object;
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Support,SupportSuiteFixture)
@@ -50,13 +51,30 @@ BOOST_AUTO_TEST_CASE(startup)
 {
 	BOOST_TEST_MESSAGE( "startup" );
 	panda = new PandaFramework();
-	render = panda->open_window()->get_render();
+	window = panda->open_window();
+	render = window->get_render();
+	camera = window->get_camera_group();
+	object = render.attach_new_node("object");
 	audio_manager = AudioManager::create_AudioManager();
 }
+
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(Audio3DManagerTEST,Audio3DManagerTestCaseFixture)
 {
-	BOOST_CHECK(true);
+//	PT(Audio3DManager) audio3dMgr= new Audio3DManager(audio_manager,camera);
+//	BOOST_REQUIRE(not audio3dMgr.is_null());
+//	PT(AudioSound) audioSound = audio3dMgr->loadSfx(audio_file);
+//	BOOST_REQUIRE(not audioSound.is_null());
+//	audio3dMgr->attachSoundToObject(audioSound,object);
+//	BOOST_CHECK(audio3dMgr->getSoundsOnObject(object).size() == 1);
+//	audio3dMgr->detachSound(audioSound);
+//	BOOST_CHECK(audio3dMgr->getSoundsOnObject(object).empty());
 }
 
+BOOST_AUTO_TEST_CASE(cleanup)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
+	panda->close_framework();
+	delete panda;
+}
 BOOST_AUTO_TEST_SUITE_END() // Input suite
