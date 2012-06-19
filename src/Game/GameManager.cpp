@@ -37,7 +37,7 @@ GameManager::GameManager(int argc, char* argv[]) :
 	if (mWindow != (WindowFramework *) NULL)
 	{
 		std::cout << "Opened the window successfully!\n";
-
+		// common setup
 		mWindow->enable_keyboard(); // Enable keyboard detection
 		mWindow->setup_trackball(); // Enable default camera movement
 		mTrackBall = mWindow->get_mouse().find("**/+Trackball");
@@ -45,6 +45,8 @@ GameManager::GameManager(int argc, char* argv[]) :
 		mRender = mWindow->get_render();
 		mCamera = mWindow->get_camera_group();
 		mGlobalClock = ClockObject::get_global_clock();
+		// managers setup
+		mAudioMgr = AudioManager::create_AudioManager();
 	}
 	else
 	{

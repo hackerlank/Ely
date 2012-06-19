@@ -41,6 +41,8 @@
 #include <cstdio>
 #include "tinyxml2.h"
 
+#include <audioManager.h>
+
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 #include "Game/ComponentTemplateManager.h"
@@ -141,7 +143,11 @@ protected:
 	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
-	NodePath mCamera;PT(ClockObject) mGlobalClock;
+	NodePath mCamera;
+	PT(ClockObject) mGlobalClock;
+
+	/// Managers
+	PT(AudioManager) mAudioMgr;
 
 	/// NodePaths for enable_mouse/disable_mouse.
 	NodePath mTrackBall, mMouse2cam;

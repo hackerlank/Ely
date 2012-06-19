@@ -15,32 +15,22 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/support/SupportSuiteFixture.h
+ * \file /Ely/src/Support/Audio3DManager.cpp
  *
- * \date 07/mag/2012 (18:15:46)
+ * \date 19/giu/2012 (09:02:09)
  * \author marco
  */
 
-#ifndef SUPPORTSUITEFIXTURE_H_
-#define SUPPORTSUITEFIXTURE_H_
+#include "Support/Audio3DManager.h"
 
-#include <nodePath.h>
-#include <pandaFramework.h>
-#include <pointerTo.h>
-#include <audioManager.h>
-#include <string>
-
-struct SupportSuiteFixture
+Audio3DManager::Audio3DManager()
 {
-	SupportSuiteFixture()
-	{
-		// TODO
-	}
+	// TODO Auto-generated constructor stub
 
-	~SupportSuiteFixture()
-	{
-		// TODO
-	}
-};
+}
 
-#endif /* SUPPORTSUITEFIXTURE_H_ */
+Audio3DManager::~Audio3DManager()
+{
+	// TODO Auto-generated destructor stub
+}
+
