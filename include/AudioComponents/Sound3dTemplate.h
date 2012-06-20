@@ -24,13 +24,33 @@
 #ifndef SOUND3DTEMPLATE_H_
 #define SOUND3DTEMPLATE_H_
 
-#include "ComponentTemplate.h"
+#include <audioManager.h>
+#include "ObjectModel/Component.h"
+#include "ObjectModel/ComponentTemplate.h"
+#include "AudioComponents/Sound3d.h"
+#include "Utilities/Tools.h"
 
 class Sound3dTemplate: public ComponentTemplate
 {
 public:
 	Sound3dTemplate();
+	Sound3dTemplate(AudioManager* audioMgr);
 	virtual ~Sound3dTemplate();
+
+	const virtual ComponentType componentType() const;
+	const virtual ComponentFamilyType familyType() const;
+
+	virtual Component* makeComponent(ComponentId& compId);
+
+	virtual void setParameters(ParameterTable& parameterTable);
+	virtual void resetParameters();
+
+	/**
+	 * \brief Gets/sets the AudioManager.
+	 * @return A reference to the AudioManager.
+	 */
+	AudioManager*& audioManager();
+
 
 	///TypedObject semantics: hardcoded
 public:

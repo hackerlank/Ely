@@ -46,24 +46,24 @@ struct Sound3dTestCaseFixture
 	}
 };
 
-PandaFramework* panda;
-WindowFramework* window;
-PT(AudioManager) audio_manager;
-std::string audio_file = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
-NodePath listener_target, render, camera, object;
+//PandaFramework* panda;
+//WindowFramework* window;
+//PT(AudioManager) audio_manager;
+//std::string audio_file = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
+//NodePath listener_target, render, camera, object;
 
 /// Input suite
-BOOST_FIXTURE_TEST_SUITE(Sound3d,AudioSuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 
 BOOST_AUTO_TEST_CASE(startup)
 {
 	BOOST_TEST_MESSAGE( "startup" );
-	panda = new PandaFramework();
-	window = panda->open_window();
-	render = window->get_render();
-	camera = window->get_camera_group();
-	object = render.attach_new_node("object");
-	audio_manager = AudioManager::create_AudioManager();
+//	panda = new PandaFramework();
+//	window = panda->open_window();
+//	render = window->get_render();
+//	camera = window->get_camera_group();
+//	object = render.attach_new_node("object");
+//	audio_manager = AudioManager::create_AudioManager();
 }
 
 /// Test cases
@@ -82,7 +82,7 @@ BOOST_FIXTURE_TEST_CASE(Audio3DManagerTEST,Sound3dTestCaseFixture)
 BOOST_AUTO_TEST_CASE(cleanup)
 {
 	BOOST_TEST_MESSAGE( "cleanup" );
-	panda->close_framework();
-	delete panda;
+//	panda->close_framework();
+//	delete panda;
 }
 BOOST_AUTO_TEST_SUITE_END() // Input suite

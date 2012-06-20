@@ -21,7 +21,7 @@
  * \author marco
  */
 
-#include "../../include/AudioComponents/Sound3dTemplate.h"
+#include "AudioComponents/Sound3dTemplate.h"
 
 Sound3dTemplate::Sound3dTemplate()
 {
@@ -34,3 +34,5 @@ Sound3dTemplate::~Sound3dTemplate()
 	// TODO Auto-generated destructor stub
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle Sound3dTemplate::_type_handle;
