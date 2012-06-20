@@ -36,6 +36,7 @@
 #include "GraphicsComponents/InstanceOfTemplate.h"
 #include "InputComponents/ControlByEvent.h"
 #include "InputComponents/ControlByEventTemplate.h"
-
+#include "AudioComponents/Sound3d.h"
+#include "AudioComponents/Sound3dTemplate.h"
 
 #endif /* COMPONENTSUITE_H_ */

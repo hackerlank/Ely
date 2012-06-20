@@ -154,7 +154,6 @@ public:
 
 private:
 	static TypeHandle _type_handle;
-
 };
 
 #endif /* CONTROLBYEVENT_H_ */

@@ -15,29 +15,22 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Utilities/Tools.cpp
+ * \file /Ely/src/AudioComponents/Sound3d.cpp
  *
- * \date 19/mag/2012 (12:39:59)
+ * \date 20/giu/2012 (12:41:32)
  * \author marco
  */
 
-#include "Utilities/Tools.h"
-#include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplate.h"
-#include "Utilities/ComponentSuite.h"
+#include "../../include/AudioComponents/Sound3d.h"
 
-void initTypedObjects()
+Sound3d::Sound3d()
 {
-	Object::init_type();
-	ObjectTemplate::init_type();
-	Component::init_type();
-	ComponentTemplate::init_type();
-	Model::init_type();
-	ModelTemplate::init_type();
-	InstanceOf::init_type();
-	InstanceOfTemplate::init_type();
-	ControlByEvent::init_type();
-	ControlByEventTemplate::init_type();
-	Sound3d::init_type();
-	Sound3dTemplate::init_type();
+	// TODO Auto-generated constructor stub
+
 }
+
+Sound3d::~Sound3d()
+{
+	// TODO Auto-generated destructor stub
+}
+

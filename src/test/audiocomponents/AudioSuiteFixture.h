@@ -15,29 +15,26 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Utilities/Tools.cpp
+ * \file /Ely/src/test/audiocomponents/AudioSuiteFixture.h
  *
- * \date 19/mag/2012 (12:39:59)
+ * \date 20/giu/2012 (12:42:25)
  * \author marco
  */
 
-#include "Utilities/Tools.h"
-#include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplate.h"
-#include "Utilities/ComponentSuite.h"
+#ifndef AUDIOSUITEFIXTURE_H_
+#define AUDIOSUITEFIXTURE_H_
 
-void initTypedObjects()
+struct AudioSuiteFixture
 {
-	Object::init_type();
-	ObjectTemplate::init_type();
-	Component::init_type();
-	ComponentTemplate::init_type();
-	Model::init_type();
-	ModelTemplate::init_type();
-	InstanceOf::init_type();
-	InstanceOfTemplate::init_type();
-	ControlByEvent::init_type();
-	ControlByEventTemplate::init_type();
-	Sound3d::init_type();
-	Sound3dTemplate::init_type();
-}
+	AudioSuiteFixture()
+	{
+		// TODO
+	}
+
+	~AudioSuiteFixture()
+	{
+		// TODO
+	}
+};
+
+#endif /* AUDIOSUITEFIXTURE_H_ */
