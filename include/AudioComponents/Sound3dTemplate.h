@@ -25,6 +25,8 @@
 #define SOUND3DTEMPLATE_H_
 
 #include <audioManager.h>
+#include <string>
+#include <list>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "AudioComponents/Sound3d.h"
@@ -33,7 +35,6 @@
 class Sound3dTemplate: public ComponentTemplate
 {
 public:
-	Sound3dTemplate();
 	Sound3dTemplate(AudioManager* audioMgr);
 	virtual ~Sound3dTemplate();
 
@@ -46,11 +47,22 @@ public:
 	virtual void resetParameters();
 
 	/**
+	 * \brief Gets/sets the list of the sounds file names.
+	 * @return A reference to the list of the sounds file names.
+	 */
+	std::list<std::string>& soundFiles();
+
+	/**
 	 * \brief Gets/sets the AudioManager.
 	 * @return A reference to the AudioManager.
 	 */
 	AudioManager*& audioManager();
 
+private:
+	///The AudioManager used to load dynamically sounds.
+	AudioManager* mAudioMgr;
+	///The names of the sound files.
+	std::list<std::string> mSoundFiles;
 
 	///TypedObject semantics: hardcoded
 public:

@@ -84,7 +84,7 @@ private:
 	WindowFramework* mWindowFramework;
 	///The name of the model file containing the static model.
 	Filename mModelFile;
-	///The name of the file containing the animations.
+	///The names of the files containing the animations.
 	std::list<Filename> mAnimFiles;
 
 	///TypedObject semantics: hardcoded

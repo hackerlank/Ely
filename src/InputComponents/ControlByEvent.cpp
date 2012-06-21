@@ -89,12 +89,12 @@ void ControlByEvent::disable()
 
 const ComponentFamilyType ControlByEvent::familyType() const
 {
-	return ComponentFamilyType("Input");
+	return mTmpl->familyType();
 }
 
 const ComponentType ControlByEvent::componentType() const
 {
-	return ComponentType("ControlByEvent");
+	return mTmpl->componentType();
 }
 
 void ControlByEvent::enable()

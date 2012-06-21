@@ -21,68 +21,65 @@
  * \author marco
  */
 
-#include "AudioComponents/Sound3d.h"
 #include <boost/test/unit_test.hpp>
 #include "AudioSuiteFixture.h"
 
-#include "AudioComponents/Sound3dTemplate.h"
-#include <nodePath.h>
-#include <pandaFramework.h>
-#include <windowFramework.h>
-#include <pointerTo.h>
-#include <audioManager.h>
-#include <string>
-
 struct Sound3dTestCaseFixture
 {
-	Sound3dTestCaseFixture()
+	Sound3dTestCaseFixture() :
+			mCompId("Sound3d_Test")
 	{
-		// TODO
 	}
 
 	~Sound3dTestCaseFixture()
 	{
-		// TODO
 	}
+	PT(Sound3dTemplate) mSound3dTmpl;
+	PT(Sound3d) mSound3d;
+	ComponentId mCompId;
 };
 
-//PandaFramework* panda;
-//WindowFramework* window;
-//PT(AudioManager) audio_manager;
-//std::string audio_file = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
-//NodePath listener_target, render, camera, object;
+PT(AudioManager) audioMgr;
+std::string audioFile = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 
+//startup common to all test cases
 BOOST_AUTO_TEST_CASE(startup)
 {
 	BOOST_TEST_MESSAGE( "startup" );
-//	panda = new PandaFramework();
-//	window = panda->open_window();
-//	render = window->get_render();
-//	camera = window->get_camera_group();
-//	object = render.attach_new_node("object");
-//	audio_manager = AudioManager::create_AudioManager();
+	audioMgr = AudioManager::create_AudioManager();
+	Sound3dTemplate::init_type();
+	Sound3d::init_type();
 }
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(Audio3DManagerTEST,Sound3dTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(Sound3dTESTS,Sound3dTestCaseFixture)
 {
-//	PT(Audio3DManager) audio3dMgr= new Audio3DManager(audio_manager,camera);
-//	BOOST_REQUIRE(not audio3dMgr.is_null());
-//	PT(AudioSound) audioSound = audio3dMgr->loadSfx(audio_file);
-//	BOOST_REQUIRE(not audioSound.is_null());
-//	audio3dMgr->attachSoundToObject(audioSound,object);
-//	BOOST_CHECK(audio3dMgr->getSoundsOnObject(object).size() == 1);
-//	audio3dMgr->detachSound(audioSound);
-//	BOOST_CHECK(audio3dMgr->getSoundsOnObject(object).empty());
+	BOOST_TEST_MESSAGE( "Sound3dTemplateTEST" );
+	mSound3dTmpl = new Sound3dTemplate(audioMgr);
+	BOOST_REQUIRE(mSound3dTmpl != NULL);
+	mSound3dTmpl->resetParameters();
+	BOOST_CHECK(mSound3dTmpl->soundFiles().size() == 0);
+	mSound3dTmpl->soundFiles().push_back(audioFile);
+	BOOST_CHECK(mSound3dTmpl->soundFiles().size() == 1);
+	BOOST_TEST_MESSAGE( "Sound3dTEST" );
+	mSound3d =
+	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mSound3d != NULL);
+	BOOST_CHECK(mSound3d->sounds().size() == 1);
+	BOOST_CHECK(mSound3d->componentType() == ComponentId("Sound3d"));
+	BOOST_CHECK(mSound3d->familyType() == ComponentFamilyType("Audio"));
+	mSound3d->removeSound(audioFile);
+	BOOST_CHECK(mSound3d->sounds().size() == 0);
+	mSound3d->loadSound(audioFile);
+	BOOST_CHECK(mSound3d->sounds().size() == 1);
 }
 
 BOOST_AUTO_TEST_CASE(cleanup)
 {
 	BOOST_TEST_MESSAGE( "cleanup" );
-//	panda->close_framework();
-//	delete panda;
 }
+
 BOOST_AUTO_TEST_SUITE_END() // Input suite

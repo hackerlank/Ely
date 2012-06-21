@@ -24,6 +24,12 @@
 #ifndef AUDIOSUITEFIXTURE_H_
 #define AUDIOSUITEFIXTURE_H_
 
+#include "AudioComponents/Sound3d.h"
+#include "AudioComponents/Sound3dTemplate.h"
+#include <pointerTo.h>
+#include <audioManager.h>
+#include <string>
+
 struct AudioSuiteFixture
 {
 	AudioSuiteFixture()

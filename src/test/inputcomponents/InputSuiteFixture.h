@@ -29,7 +29,7 @@
 #include <pandaFramework.h>
 #include <nodePath.h>
 #include <geomNode.h>
-#include <asyncTask.h>
+#include <genericAsyncTask.h>
 #include <event.h>
 #include <vector>
 #include <string>

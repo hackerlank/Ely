@@ -41,12 +41,12 @@ InstanceOf::~InstanceOf()
 
 const ComponentFamilyType InstanceOf::familyType() const
 {
-	return ComponentFamilyType("Graphics");
+	return mTmpl->familyType();
 }
 
 const ComponentType InstanceOf::componentType() const
 {
-	return ComponentType("InstanceOf");
+	return mTmpl->componentType();
 }
 
 bool InstanceOf::initialize()

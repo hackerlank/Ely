@@ -5,6 +5,7 @@
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Graphics" type="Model"/>
 			<ComponentTmpl family="Input" type="ControlByEvent"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="InstancedActor">
 			<ComponentTmpl family="Graphics" type="InstanceOf"/>
@@ -36,6 +37,9 @@
 			<Component type="Model" priority="100">
 				<Param model_file="panda"/>
 				<Param anim_file="panda-walk"/>
+			</Component>
+			<Component type="Sound3d" priority="90">
+				<Param sound_file="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
 		</Object>
 	</ObjectSet>

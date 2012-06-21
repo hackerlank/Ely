@@ -40,12 +40,12 @@ Model::~Model()
 
 const ComponentFamilyType Model::familyType() const
 {
-	return ComponentFamilyType("Graphics");
+	return mTmpl->familyType();
 }
 
 const ComponentType Model::componentType() const
 {
-	return ComponentType("Model");
+	return mTmpl->componentType();
 }
 
 NodePath& Model::nodePath()
