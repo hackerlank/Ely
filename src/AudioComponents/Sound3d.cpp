@@ -26,7 +26,11 @@
 Sound3d::Sound3d()
 {
 	// TODO Auto-generated constructor stub
+}
 
+Sound3d::Sound3d(Sound3dTemplate* tmpl) :
+		mTmpl(tmpl)
+{
 }
 
 Sound3d::~Sound3d()
@@ -34,5 +38,86 @@ Sound3d::~Sound3d()
 	// TODO Auto-generated destructor stub
 }
 
+const ComponentFamilyType Sound3d::familyType() const
+{
+	return mTmpl->familyType();
+}
+
+const ComponentType Sound3d::componentType() const
+{
+	return mTmpl->componentType();
+}
+
+bool Sound3d::initialize()
+{
+	bool result = true;
+	//set AudioManager
+	mAudioMgr = mTmpl->audioManager();
+	std::list<std::string>::iterator it;
+	for (it = mTmpl->soundFiles().begin(); it != mTmpl->soundFiles().end(); ++it)
+	{
+		addSound(*it);
+	}
+	//
+	return result;
+}
+
+void Sound3d::onAddSetup()
+{
+}
+
+bool Sound3d::addSound(const std::string& fileName)
+{
+}
+
+bool Sound3d::removeSound(const std::string& soundName)
+{
+}
+
+void Sound3d::setSoundMinDistance(AudioSound* sound, float dist)
+{
+}
+
+float Sound3d::getSoundMinDistance(AudioSound* sound)
+{
+}
+
+void Sound3d::setSoundMaxDistance(AudioSound* sound, float dist)
+{
+}
+
+float Sound3d::getSoundMaxDistance(AudioSound* sound)
+{
+}
+
+void Sound3d::setSoundVelocity(AudioSound* sound, const LVector3& velocity)
+{
+}
+
+void Sound3d::setSoundVelocityAuto(AudioSound* sound)
+{
+}
+
+LVector3 Sound3d::getSoundVelocity(AudioSound* sound)
+{
+}
+
+void Sound3d::attachSound(AudioSound* sound)
+{
+}
+
+void Sound3d::detachSound(AudioSound* sound)
+{
+}
+
+SoundTable& Sound3d::sounds()
+{
+}
+
+AsyncTask::DoneStatus Sound3d::update(GenericAsyncTask* task)
+{
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle Sound3d::_type_handle;
+

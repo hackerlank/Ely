@@ -36,9 +36,13 @@ class Sound3dTemplate;
 /**
  * \brief Class manipulating 3d sounds attached to an object.
  *
- * This component both maintains the set of sounds attached to an
- * object and manages dynamic position/velocity update of them.
+ * This component both maintains the set of sounds linked to an
+ * object and manages their automatic position/velocity update.
  * Sounds can be dynamically loaded/unloaded.
+ * Sounds can be dynamically attached/unattached: only attached
+ * sounds will have their position/velocity updated.
+ * In addition sound velocity can be set directly instead of
+ * being automatically updated.
  */
 class Sound3d: public Component
 {
@@ -54,13 +58,15 @@ public:
 	virtual void onAddSetup();
 
 	/**
-	 * \brief Loads a new sound from a file and it to this component.
+	 * \brief Adds a new sound to this component by loading it from a file.
+	 *
 	 * @param fileName The sound file name.
 	 * @return True if successful, false otherwise.
 	 */
-	bool loadSound(const std::string& fileName);
+	bool addSound(const std::string& fileName);
 	/**
 	 * \brief Removes a sound from this component.
+	 *
 	 * @param soundName The sound name.
 	 * @return True if successful, false otherwise.
 	 */
@@ -128,17 +134,21 @@ public:
 	LVector3 getSoundVelocity(AudioSound* sound);
 	/**
 	 * \brief Sound will come from the location of the object it is attached to.
+	 *
+	 * Only attached sounds will have their position/velocity updated.
 	 * @param sound The sound in question.
 	 */
 	void attachSound(AudioSound* sound);
 	/**
 	 * \brief Sound will no longer have it's 3D position updated
+	 *
+	 * Only attached sounds will have their position/velocity updated.
 	 * @param sound The sound in question.
 	 */
 	void detachSound(AudioSound* sound);
 	/**
 	 * \brief Gets a reference to the sound table indexed by the sound name,
-	 * which is the file path.
+	 * which is the sound file path.
 	 */
 	typedef std::map<std::string, PT(AudioSound)> SoundTable;
 	SoundTable& sounds();
