@@ -146,17 +146,17 @@ std::string& ControlByEventTemplate::upEvent()
 	return mUp;
 }
 
-float& ControlByEventTemplate::speed()
+std::string& ControlByEventTemplate::speed()
 {
 	return mSpeed;
 }
 
-float& ControlByEventTemplate::fastFactor()
+std::string& ControlByEventTemplate::fastFactor()
 {
 	return mFastFactor;
 }
 
-float& ControlByEventTemplate::movSens()
+std::string& ControlByEventTemplate::movSens()
 {
 	return mMovSens;
 }
@@ -176,17 +176,17 @@ std::string& ControlByEventTemplate::enabled()
 	return mEnabled;
 }
 
-float& ControlByEventTemplate::rollSens()
+std::string& ControlByEventTemplate::rollSens()
 {
 	return mRollSens;
 }
 
-float& ControlByEventTemplate::sensX()
+std::string& ControlByEventTemplate::sensX()
 {
 	return mSensX;
 }
 
-float& ControlByEventTemplate::sensY()
+std::string& ControlByEventTemplate::sensY()
 {
 	return mSensY;
 }
@@ -266,32 +266,32 @@ void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 	iter = parameterTable.find("speed");
 	if (iter != parameterTable.end())
 	{
-		mSpeed = (float) atof(iter->second.c_str());
+		mSpeed = iter->second;
 	}
 	iter = parameterTable.find("fast_factor");
 	if (iter != parameterTable.end())
 	{
-		mFastFactor = (float) atof(iter->second.c_str());
+		mFastFactor = iter->second;
 	}
 	iter = parameterTable.find("mov_sens");
 	if (iter != parameterTable.end())
 	{
-		mMovSens = (float) atof(iter->second.c_str());
+		mMovSens = iter->second;
 	}
 	iter = parameterTable.find("roll_sens");
 	if (iter != parameterTable.end())
 	{
-		mRollSens = (float) atof(iter->second.c_str());
+		mRollSens = iter->second;
 	}
 	iter = parameterTable.find("sens_x");
 	if (iter != parameterTable.end())
 	{
-		mSensX = (float) atof(iter->second.c_str());
+		mSensX = iter->second;
 	}
 	iter = parameterTable.find("sens_y");
 	if (iter != parameterTable.end())
 	{
-		mSensY = (float) atof(iter->second.c_str());
+		mSensY = iter->second;
 	}
 }
 

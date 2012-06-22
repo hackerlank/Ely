@@ -27,22 +27,27 @@
 #include <audioManager.h>
 #include <audioSound.h>
 #include <pointerTo.h>
+#include <lvector3.h>
+#include <lpoint3.h>
+#include <nodePath.h>
+#include <genericAsyncTask.h>
 #include <map>
+#include <set>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 
 class Sound3dTemplate;
 
 /**
- * \brief Class manipulating 3d sounds attached to an object.
+ * \brief Component manipulating 3d sounds attached to an object.
  *
- * This component both maintains the set of sounds linked to an
+ * This component both maintains the set of sounds attached to an
  * object and manages their automatic position/velocity update.
  * Sounds can be dynamically loaded/unloaded.
- * Sounds can be dynamically attached/unattached: only attached
- * sounds will have their position/velocity updated.
- * In addition sound velocity can be set directly instead of
- * being automatically updated.
+ * Only playing sounds will have their position/velocity updated.
+ * For "static" objects sound position/velocity can be set directly
+ * and is not automatically updated.
+ * All updates is done wrt scene root (e.g. render).
  */
 class Sound3d: public Component
 {
@@ -74,7 +79,8 @@ public:
 
 	/**
 	 * \name Sets/gets Sound Min Distance.
-	 * \brief Controls the distance (in units) that this sound begins to fall off.
+	 * \brief Controls the distance (in units) that these sounds begin
+	 * to fall off.
 	 *
 	 * Also affects the rate it falls off.
 	 * Default is 3.28 (in feet, this is 1 meter).
@@ -85,14 +91,14 @@ public:
 	 * @return The distance.
 	 */
 	///@{
-	void setSoundMinDistance(AudioSound* sound, float dist);
-	float getSoundMinDistance(AudioSound* sound);
+	void setMinDistance(float dist);
+	float getMinDistance();
 	///@}
 
 	/**
 	 * \name Sets/gets Sound Max Distance.
-	 * \brief Controls the maximum distance (in units) that this sound stops
-	 * falling off.
+	 * \brief Controls the maximum distance (in units) that these sounds
+	 * stop falling off.
 	 *
 	 * The sound does not stop at that point, it just doesn't get any quieter.
 	 * You should rarely need to adjust this.
@@ -102,50 +108,17 @@ public:
 	 * @return The distance.
 	 */
 	///@{
-	void setSoundMaxDistance(AudioSound* sound, float dist);
-	float getSoundMaxDistance(AudioSound* sound);
+	void setMaxDistance(float dist);
+	float getMaxDistance();
 	///@}
 
 	/**
-	 * \brief Set the velocity vector (in units/sec) of the sound, for
-	 * calculating doppler shift.
+	 * \brief Set position/velocity for static objects.
 	 *
-	 * This is relative to the sound root (probably render).
-	 * Default: VBase3(0, 0, 0)
-	 * @param sound The sound in question.
-	 * @param velocity The velocity.
+	 * The position is the that of the owner object wrt scene root
+	 * (i.e. render). Velocity is zero.
 	 */
-	void setSoundVelocity(AudioSound* sound, const LVector3& velocity);
-	/**
-	 * \brief If velocity is set to auto, the velocity will be determined by
-	 * the previous position of the object the sound is attached
-	 * to and the frame dt.
-	 *
-	 * Make sure if you use this method that you remember to clear the previous
-	 * transformation between frames.
-	 * @param sound The sound in question.
-	 */
-	void setSoundVelocityAuto(AudioSound* sound);
-	/**
-	 * \brief Get the velocity of the sound.
-	 * @param sound The sound in question.
-	 * @return The velocity.
-	 */
-	LVector3 getSoundVelocity(AudioSound* sound);
-	/**
-	 * \brief Sound will come from the location of the object it is attached to.
-	 *
-	 * Only attached sounds will have their position/velocity updated.
-	 * @param sound The sound in question.
-	 */
-	void attachSound(AudioSound* sound);
-	/**
-	 * \brief Sound will no longer have it's 3D position updated
-	 *
-	 * Only attached sounds will have their position/velocity updated.
-	 * @param sound The sound in question.
-	 */
-	void detachSound(AudioSound* sound);
+	void set3dStaticAttributes();
 	/**
 	 * \brief Gets a reference to the sound table indexed by the sound name,
 	 * which is the sound file path.
@@ -165,10 +138,19 @@ public:
 private:
 	///The template used to construct this component.
 	Sound3dTemplate* mTmpl;
+	///The root of the scene (e.g. render)
+	NodePath mSceneRoot;
 	///The set of sounds attached to this component.
 	SoundTable mSounds;
-	///The AudioManager used to load dynamically sounds.
-	AudioManager* mAudioMgr;
+	///Sounds' characteristics.
+	///@{
+	float mMinDist, mMaxDist;
+	LPoint3 mPosition;
+	///@}
+
+	///A task data for update.
+	PT(TaskInterface<Sound3d>::TaskData) mUpdateData;
+	PT(AsyncTask) mUpdateTask;
 
 	///TypedObject semantics: hardcoded
 public:

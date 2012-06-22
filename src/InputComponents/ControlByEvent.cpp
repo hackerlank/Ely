@@ -272,13 +272,13 @@ bool ControlByEvent::initialize()
 	}
 
 	//set sensitivity parameters
-	mSpeed = mTmpl->speed();
-	mFastFactor = mTmpl->fastFactor();
+	mSpeed = (float) atof(mTmpl->speed().c_str());
+	mFastFactor = (float) atof(mTmpl->fastFactor().c_str());
 	mSpeedActual = mSpeed;
-	mMovSens = mTmpl->movSens();
-	mRollSens = mTmpl->rollSens();
-	mSensX = mTmpl->sensX();
-	mSensY = mTmpl->sensY();
+	mMovSens = (float) atof(mTmpl->movSens().c_str());
+	mRollSens = (float) atof(mTmpl->rollSens().c_str());
+	mSensX = (float) atof(mTmpl->sensX().c_str());
+	mSensY = (float) atof(mTmpl->sensY().c_str());
 	//
 	return result;
 }

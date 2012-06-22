@@ -22,6 +22,7 @@
  */
 
 #include "AudioComponents/Sound3d.h"
+#include "AudioComponents/Sound3dTemplate.h"
 
 Sound3d::Sound3d()
 {
@@ -29,13 +30,19 @@ Sound3d::Sound3d()
 }
 
 Sound3d::Sound3d(Sound3dTemplate* tmpl) :
-		mTmpl(tmpl)
+		mTmpl(tmpl), mMinDist(1.0), mMaxDist(1000000000.0)
 {
+	mSounds.clear();
+	mUpdateData = NULL;
+	mUpdateTask = NULL;
 }
 
 Sound3d::~Sound3d()
 {
-	// TODO Auto-generated destructor stub
+	if (mUpdateTask)
+	{
+		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
+	}
 }
 
 const ComponentFamilyType Sound3d::familyType() const
@@ -51,10 +58,10 @@ const ComponentType Sound3d::componentType() const
 bool Sound3d::initialize()
 {
 	bool result = true;
-	//set AudioManager
-	mAudioMgr = mTmpl->audioManager();
+	//set sound files
 	std::list<std::string>::iterator it;
-	for (it = mTmpl->soundFiles().begin(); it != mTmpl->soundFiles().end(); ++it)
+	for (it = mTmpl->soundFiles().begin(); it != mTmpl->soundFiles().end();
+			++it)
 	{
 		addSound(*it);
 	}
@@ -64,58 +71,117 @@ bool Sound3d::initialize()
 
 void Sound3d::onAddSetup()
 {
+	// update sounds' position/velocity only for dynamic objects
+	if (not mOwnerObject->isStatic())
+	{
+		//create the task for updating the active sounds
+		mUpdateData = new TaskInterface<Sound3d>::TaskData(this,
+				&Sound3d::update);
+		mUpdateTask = new GenericAsyncTask("Sound3d::update",
+				&TaskInterface<Sound3d>::taskFunction,
+				reinterpret_cast<void*>(mUpdateData.p()));
+		//Add the task for updating the controlled object
+		mTmpl->pandaFramework()->get_task_mgr().add(mUpdateTask);
+	}
+	//set the root of the scene
+	mSceneRoot = mTmpl->windowFramework()->get_render();
+	//set 3d attribute (in this case static)
+	set3dStaticAttributes();
 }
 
 bool Sound3d::addSound(const std::string& fileName)
 {
+	bool result = false;
+	PT(AudioSound) sound = mTmpl->audioManager()->get_sound(fileName, true);
+	if (sound)
+	{
+		sounds()[fileName] = sound;
+		result = true;
+	}
+	return result;
 }
 
 bool Sound3d::removeSound(const std::string& soundName)
 {
+	bool result = false;
+	size_t removed = sounds().erase(soundName);
+	if (removed == 1)
+	{
+		result = true;
+	}
+	return result;
 }
 
-void Sound3d::setSoundMinDistance(AudioSound* sound, float dist)
+void Sound3d::setMinDistance(float dist)
 {
+	mMinDist = dist;
+	SoundTable::iterator iter;
+	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	{
+		iter->second->set_3d_min_distance(mMinDist);
+	}
 }
 
-float Sound3d::getSoundMinDistance(AudioSound* sound)
+float Sound3d::getMinDistance()
 {
+	return mMinDist;
 }
 
-void Sound3d::setSoundMaxDistance(AudioSound* sound, float dist)
+void Sound3d::setMaxDistance(float dist)
 {
+	mMaxDist = dist;
+	SoundTable::iterator iter;
+	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	{
+		iter->second->set_3d_max_distance(mMaxDist);
+	}
 }
 
-float Sound3d::getSoundMaxDistance(AudioSound* sound)
+float Sound3d::getMaxDistance()
 {
+	return mMaxDist;
 }
 
-void Sound3d::setSoundVelocity(AudioSound* sound, const LVector3& velocity)
+void Sound3d::set3dStaticAttributes()
 {
+	LPoint3 position = mOwnerObject->nodePath().get_pos(mSceneRoot);
+	SoundTable::iterator iter;
+	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	{
+		iter->second->set_3d_attributes(position.get_x(), position.get_y(),
+				position.get_z(), 0.0, 0.0, 0.0);
+	}
 }
 
-void Sound3d::setSoundVelocityAuto(AudioSound* sound)
+Sound3d::SoundTable& Sound3d::sounds()
 {
-}
-
-LVector3 Sound3d::getSoundVelocity(AudioSound* sound)
-{
-}
-
-void Sound3d::attachSound(AudioSound* sound)
-{
-}
-
-void Sound3d::detachSound(AudioSound* sound)
-{
-}
-
-SoundTable& Sound3d::sounds()
-{
+	return mSounds;
 }
 
 AsyncTask::DoneStatus Sound3d::update(GenericAsyncTask* task)
 {
+	float dt = task->get_dt();
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+	//get the new position
+	LPoint3 newPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
+	//get the velocity (mPosition holds the previous position)
+	LVector3 velocity = (newPosition - mPosition) / dt;
+	//update sounds' velocity and position
+	SoundTable::iterator iter;
+	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	{
+		iter->second->set_3d_attributes(newPosition.get_x(), newPosition.get_y(),
+				newPosition.get_z(), velocity.get_x(), velocity.get_y(),
+				velocity.get_z());
+	}
+	//update actual position
+	mPosition = newPosition;
+	//
+	return AsyncTask::DS_cont;
 }
 
 //TypedObject semantics: hardcoded

@@ -27,6 +27,7 @@
 #include <string>
 #include <list>
 #include <nodePath.h>
+#include <filename.h>
 #include <animControlCollection.h>
 #include <auto_bind.h>
 #include <typedObject.h>

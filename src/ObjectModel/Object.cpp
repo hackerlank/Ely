@@ -23,7 +23,8 @@
 
 #include "ObjectModel/Object.h"
 
-Object::Object(const ObjectId& objectId)
+Object::Object(const ObjectId& objectId) :
+		mIsStatic(false)
 {
 	mObjectId = objectId;
 }
@@ -92,5 +93,11 @@ Object::operator NodePath()
 	return mNodePath;
 }
 
+bool& Object::isStatic()
+{
+	return mIsStatic;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle Object::_type_handle;
+

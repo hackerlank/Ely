@@ -28,6 +28,9 @@
 #include "AudioComponents/Sound3dTemplate.h"
 #include <pointerTo.h>
 #include <audioManager.h>
+#include <audioSound.h>
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <string>
 
 struct AudioSuiteFixture

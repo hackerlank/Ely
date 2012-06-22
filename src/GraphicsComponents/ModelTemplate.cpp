@@ -63,12 +63,12 @@ Component* ModelTemplate::makeComponent(ComponentId& compId)
 	return newModel;
 }
 
-Filename& ModelTemplate::modelFile()
+std::string& ModelTemplate::modelFile()
 {
 	return mModelFile;
 }
 
-std::list<Filename>& ModelTemplate::animFiles()
+std::list<std::string>& ModelTemplate::animFiles()
 {
 	return mAnimFiles;
 }
@@ -94,6 +94,12 @@ void ModelTemplate::setParameters(ParameterTable& parameterTable)
 	{
 		mAnimFiles.push_back(Filename(iter->second));
 	}
+	//set static flag
+	iter = parameterTable.find("is_static");
+	if (iter != parameterTable.end())
+	{
+		mIsStatic = iter->second;
+	}
 }
 
 WindowFramework*& ModelTemplate::windowFramework()
@@ -101,10 +107,16 @@ WindowFramework*& ModelTemplate::windowFramework()
 	return mWindowFramework;
 }
 
+std::string& ModelTemplate::isStatic()
+{
+	return mIsStatic;
+}
+
 void ModelTemplate::resetParameters()
 {
 	mModelFile = Filename("");
 	mAnimFiles.clear();
+	mIsStatic = std::string("false");
 }
 
 //TypedObject semantics: hardcoded

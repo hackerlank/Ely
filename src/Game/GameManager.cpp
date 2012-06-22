@@ -120,6 +120,9 @@ void GameManager::setupCompTmplMgr()
 	//ControlByEvent template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ControlByEventTemplate(this, mWindow));
+	//Sound3d template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new Sound3dTemplate(this, mWindow, mAudioMgr));
 
 }
 

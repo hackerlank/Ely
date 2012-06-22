@@ -25,6 +25,8 @@
 #define SOUND3DTEMPLATE_H_
 
 #include <audioManager.h>
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <string>
 #include <list>
 #include "ObjectModel/Component.h"
@@ -35,7 +37,8 @@
 class Sound3dTemplate: public ComponentTemplate
 {
 public:
-	Sound3dTemplate(AudioManager* audioMgr);
+	Sound3dTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework, AudioManager* audioMgr);
 	virtual ~Sound3dTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -58,9 +61,25 @@ public:
 	 */
 	AudioManager*& audioManager();
 
+	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the GameManager.
+	 */
+	PandaFramework*& pandaFramework();
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework*& windowFramework();
+
 private:
 	///The AudioManager used to load dynamically sounds.
 	AudioManager* mAudioMgr;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 	///The names of the sound files.
 	std::list<std::string> mSoundFiles;
 

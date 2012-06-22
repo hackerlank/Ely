@@ -25,10 +25,11 @@
 #define CONTROLBYEVENT_H_
 
 #include <string>
+#include <cstdlib>
 #include <nodePath.h>
 #include <typedObject.h>
 #include <event.h>
-#include <asyncTask.h>
+#include <genericAsyncTask.h>
 #include <mouseData.h>
 #include <graphicsWindow.h>
 #include <windowProperties.h>
@@ -128,7 +129,8 @@ private:
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
 	///A task data for update.
-	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
+	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
+	PT(AsyncTask) mUpdateTask;
 
 	///TypedObject semantics: hardcoded
 public:

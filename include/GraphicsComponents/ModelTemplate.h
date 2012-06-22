@@ -57,13 +57,19 @@ public:
 	 * \brief Gets/sets the model file name.
 	 * @return A reference to the model file name.
 	 */
-	Filename& modelFile();
+	std::string& modelFile();
 
 	/**
 	 * \brief Gets/sets the list of the animations file names.
 	 * @return A reference to the list of the animations file names.
 	 */
-	std::list<Filename>& animFiles();
+	std::list<std::string>& animFiles();
+
+	/**
+	 * \brief Gets/sets the IsStatic flag.
+	 * @return The IsStatic flag
+	 */
+	std::string& isStatic();
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -83,9 +89,11 @@ private:
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 	///The name of the model file containing the static model.
-	Filename mModelFile;
+	std::string mModelFile;
 	///The names of the files containing the animations.
-	std::list<Filename> mAnimFiles;
+	std::list<std::string> mAnimFiles;
+	///Static flag: if this object doesn't move in the world.
+	std::string mIsStatic;
 
 	///TypedObject semantics: hardcoded
 public:

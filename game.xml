@@ -21,6 +21,7 @@
 		<Object type="StaticActor" id="Teapot1">
 			<Component type="Model">
 				<Param model_file="teapot"/>
+				<Param is_static="true"/>
 			</Component>		
 		</Object>
 		<Object type="Actor" id="Actor1" priority="100">

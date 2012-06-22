@@ -23,14 +23,16 @@
 
 #include "AudioComponents/Sound3dTemplate.h"
 
-Sound3dTemplate::Sound3dTemplate(AudioManager* audioMgr)
+Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework, AudioManager* audioMgr)
 {
-	if (not audioMgr)
+	if (not pandaFramework or not windowFramework or not audioMgr)
 	{
 		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid AudioManager");
-
+				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework or AudioManager");
 	}
+	mPandaFramework = pandaFramework;
+	mWindowFramework = windowFramework;
 	mAudioMgr = audioMgr;
 	resetParameters();
 }
@@ -87,6 +89,16 @@ std::list<std::string>& Sound3dTemplate::soundFiles()
 AudioManager*& Sound3dTemplate::audioManager()
 {
 	return mAudioMgr;
+}
+
+PandaFramework*& Sound3dTemplate::pandaFramework()
+{
+	return mPandaFramework;
+}
+
+WindowFramework*& Sound3dTemplate::windowFramework()
+{
+	return mWindowFramework;
 }
 
 //TypedObject semantics: hardcoded

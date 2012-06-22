@@ -25,7 +25,6 @@
 #define CONTROLBYEVENTTEMPLATE_H_
 
 #include <string>
-#include <cstdlib>
 #include <typedObject.h>
 #include <pandaFramework.h>
 #include <windowFramework.h>
@@ -88,12 +87,12 @@ public:
 	 * \brief Get/set the sensitivity parameters associated to this component.
 	 */
 	///@{
-	float& speed();
-	float& fastFactor();
-	float& movSens();
-	float& rollSens();
-	float& sensX();
-	float& sensY();
+	std::string& speed();
+	std::string& fastFactor();
+	std::string& movSens();
+	std::string& rollSens();
+	std::string& sensX();
+	std::string& sensY();
 	///@}
 
 private:
@@ -109,9 +108,9 @@ private:
 	///@}
 	///@{
 	/// Sensitivity parameters.
-	float mSpeed, mFastFactor;
-	float mMovSens, mRollSens;
-	float mSensX, mSensY;
+	std::string mSpeed, mFastFactor;
+	std::string mMovSens, mRollSens;
+	std::string mSensX, mSensY;
 	///@}
 
 	///TypedObject semantics: hardcoded

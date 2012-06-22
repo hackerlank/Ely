@@ -115,6 +115,15 @@ public:
 	 */
 	operator NodePath();
 
+	/**
+	 * \brief Gets a reference to the static flag.
+	 *
+	 * Thi flag represents if this object doesn't move in the world.
+	 * Various components can set or get this value to implement
+	 * some optimization. By default false (i.e. object is dynamic).
+	 */
+	bool& isStatic();
+
 private:
 	///The NodePath associated to this object.
 	NodePath mNodePath;
@@ -123,6 +132,10 @@ private:
 	///Table of all components indexed by component family type.
 	typedef std::map<const ComponentFamilyType, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
+	///Static flag: if this object doesn't move in the world.
+	///Various components can set or get this value to implement
+	///some optimization.
+	bool mIsStatic;
 
 	///TypedObject semantics: hardcoded
 public:
