@@ -27,10 +27,13 @@
 #include <string>
 #include <list>
 #include <algorithm>
+#include <set>
+#include <utility>
 #include <referenceCount.h>
 #include <typedWritable.h>
 #include "ComponentTemplate.h"
 #include "Component.h"
+#include "ObjectTemplateManager.h"
 #include "Utilities/Tools.h"
 
 /**
@@ -55,7 +58,8 @@ public:
 	 * \brief Constructor.
 	 * @param name The name of this template.
 	 */
-	ObjectTemplate(const ObjectType& name);
+	ObjectTemplate(const ObjectType& name,
+			ObjectTemplateManager* objectTmplMgr);
 
 	/**
 	 * \brief Destructor.
@@ -92,14 +96,47 @@ public:
 	 * @param componentId The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
-	ComponentTemplate* getComponentTemplate(
-			const ComponentType& componentId);
+	ComponentTemplate* getComponentTemplate(const ComponentType& componentId);
+
+	/**
+	 * \brief Gets/sets the ObjectTemplateManager.
+	 * @return A reference to the ObjectTemplateManager.
+	 */
+	ObjectTemplateManager*& objectTmplMgr();
+
+	/**
+	 * \name Parameters management.
+	 * \brief Sets the parameters of the object, this object is
+	 * designed to create, to custom values.
+	 * @param parameterTable The table of (parameter,value).
+	 */
+	void setParameters(ParameterTable& parameterTable);
+
+	/**
+	 * \brief (Re)sets the parameters of the object, this template is
+	 * designed to create, to their default values.
+	 */
+	void resetParameters();
+
+	/**
+	 * \brief Get/set the parameters associated to the object.
+	 * @param The name of the parameter.
+	 * @return The value of the parameter.
+	 */
+	std::string& getParam(const std::string& name);
 
 private:
 	///Name identifying this object template.
 	ObjectType mName;
 	///List of all component templates.
 	ComponentTemplateList mComponentTemplates;
+	///The ObjectTemplateManager.
+	ObjectTemplateManager* mObjectTmplMgr;
+	///@{
+	/// Set of allowed Parameters.
+	std::string mParent, mIsStatic, mPosX, mPosY, mPosZ, mRotH, mRotP, mRotR,
+			mScaleX, mScaleY, mScaleZ;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
@@ -110,7 +147,8 @@ public:
 	static void init_type()
 	{
 		TypedObject::init_type();
-		register_type(_type_handle, "ObjectTemplate", TypedObject::get_class_type());
+		register_type(_type_handle, "ObjectTemplate",
+				TypedObject::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

@@ -81,7 +81,8 @@ void GameManager::setup()
 
 	// Manipulate objects
 	//Actor1
-	PT(Object) actor1 = mObjects["Actor1"];
+	PT(Object) actor1 =
+			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Graphics")));
 	actor1Model->animations().loop("panda_soft", false);
@@ -90,7 +91,8 @@ void GameManager::setup()
 			(void*) this);
 
 	//InstancedActor1
-	PT(Object) instancedActor1 = mObjects["InstancedActor1"];
+	PT(Object) instancedActor1 =
+			ObjectTemplateManager::GetSingleton().createdObjects()["InstancedActor1"];
 
 	// add a 1st task
 	m1stTask = new TaskInterface<GameManager>::TaskData(this,
@@ -191,7 +193,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				<< std::endl;
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
-		objTmplPtr = new ObjectTemplate(ObjectType(type));
+		objTmplPtr = new ObjectTemplate(ObjectType(type),
+				ObjectTemplateManager::GetSingletonPtr());
 		//cycle through the ComponentTmpl(s)' definitions ...
 		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
 				componentTmpl != NULL;
@@ -241,7 +244,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		priority != NULL ? ordObj.setPrio(atoi(priority)) : ordObj.setPrio(0);
 		orderedObjects.push(ordObj);
 	}
-	//cycle through the Object(s)' definitions in order
+	//cycle through the Object(s)' definitions in order of priority
 	while (not orderedObjects.empty())
 	{
 		//access top object
@@ -255,7 +258,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		}
 		const char *objId = object->Attribute("id", NULL); //may be NULL
 		std::cout << "  Creating Object '"
-				<< (objId != NULL ? objId : "UNNAMED") << "'" << std::endl;
+				<< (objId != NULL ? objId : "UNNAMED") << "'..." << std::endl;
 		tinyxml2::XMLElement *component;
 		//create a priority queue of components
 		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponents;
@@ -270,7 +273,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 					ordComp.setPrio(0);
 			orderedComponents.push(ordComp);
 		}
-		//cycle through the Object Component(s)' to be initialized in order
+		//cycle through the Object Component(s)' to be initialized in order of priority
 		while (not orderedComponents.empty())
 		{
 			//access top component
@@ -284,7 +287,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			}
 			std::cout << "    Initializing Component '" << compType << "'"
 					<< std::endl;
-			ComponentTemplate::ParameterTable parameterTable;
+			ParameterTable parameterTable;
 			// get the related component template and ...
 			ComponentTemplate *componentTmplPtr =
 					ObjectTemplateManager::GetSingleton().getObjectTemplate(
@@ -306,175 +309,212 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				std::cout << "      Param '" << attribute->Name() << "' = '"
 						<< attribute->Value() << "'" << std::endl;
 				parameterTable.insert(
-						ComponentTemplate::ParameterTable::value_type(
-								attribute->Name(), attribute->Value()));
+						ParameterTable::value_type(attribute->Name(),
+								attribute->Value()));
 			}
 			componentTmplPtr->setParameters(parameterTable);
 			//remove top component from the priority queue
 			orderedComponents.pop();
 		}
 		//create the object
-		Object *objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-				ObjectType(objType));
-		if (objId != NULL)
+		Object *objectPtr;
+		if ((objId != NULL) and (*objId != std::string("")))
 		{
-			// replace the internally generated id
-			objectPtr->objectId() = ObjectId(objId);
+			// set id with the passed id
+			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+					ObjectType(objType, ObjectId(objId)));
 		}
 		else
 		{
-			std::cout << "  Set Object name to '" << objectPtr->objectId()
-					<< "'" << std::endl;
+			// set id with the internally generated id
+			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+					ObjectType(objType));
 		}
-		//insert the just created object in the table
-		mObjects[objectPtr->objectId()] = PT(Object)(objectPtr);
+		std::cout << "  ...Created Object '" << objectPtr->objectId() << "'"
+				<< std::endl;
+		//////////////////////////////////////////////////////////////
+		//<!-- Object addition to Scene -->
+		ParameterTable objParameterTable;
+		// get the related object template and ...
+		ObjectTemplate *objectTmplPtr =
+				ObjectTemplateManager::GetSingleton().getObjectTemplate(
+						ObjectType(objType));
+		//...reset its parameters to their default values
+		objectTmplPtr->resetParameters();
+		//cycle through the Object Param(s)' to be initialized
+		tinyxml2::XMLElement *objParam;
+		for (objParam = object->FirstChildElement("Param"); objParam != NULL;
+				objParam = objParam->NextSiblingElement("Param"))
+		{
+			const tinyxml2::XMLAttribute* attribute = objParam->FirstAttribute();
+			if (not attribute)
+			{
+				continue;
+			}
+			std::cout << "      Param '" << attribute->Name() << "' = '"
+					<< attribute->Value() << "'" << std::endl;
+			objParameterTable.insert(
+					ParameterTable::value_type(attribute->Name(),
+							attribute->Value()));
+		}
+		objectTmplPtr->setParameters(objParameterTable);
+		//give a chance to object (and its components) to setup
+		//when being added to scene.
+		objectPtr->sceneSetup();
 		//remove top object from the priority queue
 		orderedObjects.pop();
 	}
-	//////////////////////////////////////////////////////////////
-	//<!-- Scene Creation -->
-	//Static scene graph creation
-	std::cout << "Creating Scene" << std::endl;
-	//check <Game>--<Scene> tag
-	tinyxml2::XMLElement *scene;
-	std::cout << "  Checking <Scene> tag ..." << std::endl;
-	scene = game->FirstChildElement("Scene");
-	if (not checkTag(scene, "Scene"))
-	{
-		throw GameException(
-				"GameManager::setupGameWorld: No <Scene> in " + gameXml);
-	}
-	//cycle through the Node(s)' definitions
-	tinyxml2::XMLElement *node;
-
-	for (node = scene->FirstChildElement("Node"); node != NULL;
-			node = node->NextSiblingElement("Node"))
-	{
-		const char *nodeId = node->Attribute("id", NULL);
-		if (not nodeId)
-		{
-			continue;
-		}
-		std::cout << "  Creating Node for object '" << nodeId << "'"
-				<< std::endl;
-		//get the object
-		PT(Object) objectNodePtr = mObjects[ObjectId(nodeId)];
-		//cycle through Node's tags
-		tinyxml2::XMLElement *tag;
-		//Parent (default: None)
-		tag = node->FirstChildElement("Parent");
-		if (tag != NULL)
-		{
-			if (tag->FirstChild() != NULL)
-			{
-				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
-				if (text != NULL)
-				{
-					std::string value = std::string(text->Value());
-					if (value == std::string("Render"))
-					{
-						objectNodePtr->nodePath().reparent_to(
-								mWindow->get_render());
-					}
-					else
-					{
-						ObjectTable::iterator iter = mObjects.find(
-								ObjectId(value));
-						if (iter != mObjects.end())
-						{
-							objectNodePtr->nodePath().reparent_to(
-									*iter->second.p());
-						}
-					}
-				}
-			}
-		}
-		//InstanceOf (default: None)
-		tag = node->FirstChildElement("InstanceOf");
-		if (tag != NULL)
-		{
-			if (tag->FirstChild() != NULL)
-			{
-				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
-				if (text != NULL)
-				{
-					std::string value = std::string(text->Value());
-					ObjectTable::iterator iter = mObjects.find(ObjectId(value));
-					if (iter != mObjects.end())
-					{
-						iter->second->nodePath().instance_to(
-								*objectNodePtr.p());
-					}
-				}
-			}
-		}
-		//Position (default: (0,0,0))
-		tag = node->FirstChildElement("Position");
-		if (tag != NULL)
-		{
-			const char *coord;
-			coord = tag->Attribute("x", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_x((float) atof(coord));
-			}
-			coord = tag->Attribute("y", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_y((float) atof(coord));
-			}
-			coord = tag->Attribute("z", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_z((float) atof(coord));
-			}
-		}
-		//Orientation (default: (0,0,0))
-		tag = node->FirstChildElement("Orientation");
-		if (tag != NULL)
-		{
-			const char *coord;
-			coord = tag->Attribute("h", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_h((float) atof(coord));
-			}
-			coord = tag->Attribute("p", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_p((float) atof(coord));
-			}
-			coord = tag->Attribute("r", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_r((float) atof(coord));
-			}
-		}
-		//Scaling (default: (1.0,1.0,1.0))
-		tag = node->FirstChildElement("Scaling");
-		if (tag != NULL)
-		{
-			const char *coord;
-			coord = tag->Attribute("x", NULL);
-			if (coord != NULL)
-			{
-				float res = (float) atof(coord);
-				objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
-			}
-			coord = tag->Attribute("y", NULL);
-			if (coord != NULL)
-			{
-				float res = (float) atof(coord);
-				objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
-			}
-			coord = tag->Attribute("z", NULL);
-			if (coord != NULL)
-			{
-				float res = (float) atof(coord);
-				objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
-			}
-		}
-	}
+//	//////////////////////////////////////////////////////////////
+//	//<!-- Scene Creation -->
+//	//Static scene graph creation
+//	std::cout << "Creating Scene" << std::endl;
+//	//check <Game>--<Scene> tag
+//	tinyxml2::XMLElement *scene;
+//	std::cout << "  Checking <Scene> tag ..." << std::endl;
+//	scene = game->FirstChildElement("Scene");
+//	if (not checkTag(scene, "Scene"))
+//	{
+//		throw GameException(
+//				"GameManager::setupGameWorld: No <Scene> in " + gameXml);
+//	}
+//	//cycle through the Node(s)' definitions
+//	tinyxml2::XMLElement *node;
+//
+//	for (node = scene->FirstChildElement("Node"); node != NULL;
+//			node = node->NextSiblingElement("Node"))
+//	{
+//		const char *nodeId = node->Attribute("id", NULL);
+//		if (not nodeId)
+//		{
+//			continue;
+//		}
+//		std::cout << "  Creating Node for object '" << nodeId << "'"
+//				<< std::endl;
+//		//get the object
+//		PT(Object) objectNodePtr =
+//				ObjectTemplateManager::GetSingleton().createdObjects()[ObjectId(
+//						nodeId)];
+//		//cycle through Node's tags
+//		tinyxml2::XMLElement *tag;
+//		//Parent (default: None)
+//		tag = node->FirstChildElement("Parent");
+//		if (tag != NULL)
+//		{
+//			if (tag->FirstChild() != NULL)
+//			{
+//				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+//				if (text != NULL)
+//				{
+//					std::string value = std::string(text->Value());
+//					if (value == std::string("Render"))
+//					{
+//						objectNodePtr->nodePath().reparent_to(
+//								mWindow->get_render());
+//					}
+//					else
+//					{
+//						ObjectTemplateManager::ObjectTable::iterator iter =
+//								ObjectTemplateManager::GetSingleton().createdObjects().find(
+//										ObjectId(value));
+//						if (iter
+//								!= ObjectTemplateManager::GetSingleton().createdObjects().end())
+//						{
+//							objectNodePtr->nodePath().reparent_to(
+//									*iter->second.p());
+//						}
+//					}
+//				}
+//			}
+//		}
+//		//InstanceOf (default: None)
+//		tag = node->FirstChildElement("InstanceOf");
+//		if (tag != NULL)
+//		{
+//			if (tag->FirstChild() != NULL)
+//			{
+//				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+//				if (text != NULL)
+//				{
+//					std::string value = std::string(text->Value());
+//					ObjectTemplateManager::ObjectTable::iterator iter =
+//							ObjectTemplateManager::GetSingleton().createdObjects().find(
+//									ObjectId(value));
+//					if (iter
+//							!= ObjectTemplateManager::GetSingleton().createdObjects().end())
+//					{
+//						iter->second->nodePath().instance_to(
+//								*objectNodePtr.p());
+//					}
+//				}
+//			}
+//		}
+//		//Position (default: (0,0,0))
+//		tag = node->FirstChildElement("Position");
+//		if (tag != NULL)
+//		{
+//			const char *coord;
+//			coord = tag->Attribute("x", NULL);
+//			if (coord != NULL)
+//			{
+//				objectNodePtr->nodePath().set_x((float) atof(coord));
+//			}
+//			coord = tag->Attribute("y", NULL);
+//			if (coord != NULL)
+//			{
+//				objectNodePtr->nodePath().set_y((float) atof(coord));
+//			}
+//			coord = tag->Attribute("z", NULL);
+//			if (coord != NULL)
+//			{
+//				objectNodePtr->nodePath().set_z((float) atof(coord));
+//			}
+//		}
+//		//Orientation (default: (0,0,0))
+//		tag = node->FirstChildElement("Orientation");
+//		if (tag != NULL)
+//		{
+//			const char *coord;
+//			coord = tag->Attribute("h", NULL);
+//			if (coord != NULL)
+//			{
+//				objectNodePtr->nodePath().set_h((float) atof(coord));
+//			}
+//			coord = tag->Attribute("p", NULL);
+//			if (coord != NULL)
+//			{
+//				objectNodePtr->nodePath().set_p((float) atof(coord));
+//			}
+//			coord = tag->Attribute("r", NULL);
+//			if (coord != NULL)
+//			{
+//				objectNodePtr->nodePath().set_r((float) atof(coord));
+//			}
+//		}
+//		//Scaling (default: (1.0,1.0,1.0))
+//		tag = node->FirstChildElement("Scaling");
+//		if (tag != NULL)
+//		{
+//			const char *coord;
+//			coord = tag->Attribute("x", NULL);
+//			if (coord != NULL)
+//			{
+//				float res = (float) atof(coord);
+//				objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
+//			}
+//			coord = tag->Attribute("y", NULL);
+//			if (coord != NULL)
+//			{
+//				float res = (float) atof(coord);
+//				objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
+//			}
+//			coord = tag->Attribute("z", NULL);
+//			if (coord != NULL)
+//			{
+//				float res = (float) atof(coord);
+//				objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
+//			}
+//		}
+//	}
 }
 
 AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
@@ -522,7 +562,8 @@ void GameManager::disable_mouse()
 void GameManager::toggleActor1Control(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
-	PT(Object) actor1 = gameManager->mObjects["Actor1"];
+	PT(Object) actor1 =
+			gameManager->ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
 	ControlByEvent* actor1Control = DCAST(ControlByEvent, actor1->getComponent(
 					ComponentFamilyType("Input")));
 	bool isEnabled = actor1Control->isEnabled();

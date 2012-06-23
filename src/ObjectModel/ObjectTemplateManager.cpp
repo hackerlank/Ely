@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Game/ObjectTemplateManager.cpp
+ * \file /Ely/src/ObjectModel/ObjectTemplateManager.cpp
  *
  * \date 13/mag/2012 (10:16:20)
  * \author marco
  */
 
-#include "Game/ObjectTemplateManager.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 ObjectTemplateManager::ObjectTemplateManager()
 {
@@ -67,8 +67,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 	return true;
 }
 
-ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
-		ObjectType objectType)
+ObjectTemplate* ObjectTemplateManager::getObjectTemplate(ObjectType objectType)
 {
 	//lock (guard) the mutex
 	lock_guard<ReMutex> guard(mMutex);
@@ -81,7 +80,8 @@ ObjectTemplate* ObjectTemplateManager::getObjectTemplate(
 	return (*it).second;
 }
 
-Object* ObjectTemplateManager::createObject(ObjectType objectType)
+Object* ObjectTemplateManager::createObject(ObjectType objectType,
+		ObjectId objectId)
 {
 	//lock (guard) the mutex
 	lock_guard<ReMutex> guard(mMutex);
@@ -94,7 +94,15 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType)
 	}
 	ObjectTemplate* objectTmpl = (*it1).second;
 	//create the new object
-	ObjectId newId = ObjectId(objectType) + ObjectId(getId());
+	ObjectId newId;
+	if (objectId == ObjectId(""))
+	{
+		newId = ObjectId(objectType) + ObjectId(getId());
+	}
+	else
+	{
+		newId = objectId;
+	}
 	Object* newObj = new Object(newId);
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
@@ -111,8 +119,15 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType)
 		//add the component into the object
 		newObj->addComponent(newComp);
 	}
+	//insert the just created object in the table of created objects
+	mCreatedObjects[newId()] = PT(Object)(newObj);
 	//
 	return newObj;
+}
+
+const ObjectTemplateManager::ObjectTable& ObjectTemplateManager::createdObjects()
+{
+	return mCreatedObjects;
 }
 
 IdType ObjectTemplateManager::getId()

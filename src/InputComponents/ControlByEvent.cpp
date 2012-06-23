@@ -283,7 +283,7 @@ bool ControlByEvent::initialize()
 	return result;
 }
 
-void ControlByEvent::onAddSetup()
+void ControlByEvent::onAddToObjectSetup()
 {
 	//create the task for updating the controlled object
 	mUpdateData = new TaskInterface<ControlByEvent>::TaskData(this,

@@ -61,7 +61,7 @@ NodePath& InstanceOf::nodePath()
 	return mNodePath;
 }
 
-void InstanceOf::onAddSetup()
+void InstanceOf::onAddToObjectSetup()
 {
 	//set the node path of the object to the
 	//node path of this model

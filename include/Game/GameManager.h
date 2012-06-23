@@ -45,8 +45,8 @@
 
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
-#include "Game/ComponentTemplateManager.h"
-#include "Game/ObjectTemplateManager.h"
+#include "ObjectModel/ComponentTemplateManager.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 class FuncInterval;
 
@@ -99,10 +99,6 @@ public:
 	void disable_mouse();
 
 protected:
-
-	/// Objects in the game.
-	typedef std::map<ObjectId, PT(Object)> ObjectTable;
-	ObjectTable mObjects;
 
 	/// Struct that can be ordered based on a priority field.
 	template<typename T> class Orderable

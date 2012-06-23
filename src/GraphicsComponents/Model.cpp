@@ -58,7 +58,7 @@ Model::operator NodePath()
 	return mNodePath;
 }
 
-void Model::onAddSetup()
+void Model::onAddToObjectSetup()
 {
 	//set the node path of the object to the
 	//node path of this model

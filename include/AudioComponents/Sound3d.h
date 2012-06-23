@@ -60,7 +60,7 @@ public:
 	const virtual ComponentType componentType() const;
 
 	virtual bool initialize();
-	virtual void onAddSetup();
+	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Adds a new sound to this component by loading it from a file.

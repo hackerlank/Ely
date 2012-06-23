@@ -50,7 +50,7 @@ public:
 	const virtual ComponentType componentType() const;
 
 	virtual bool initialize();
-	virtual void onAddSetup();
+	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Gets a reference to the node path associated to this model.

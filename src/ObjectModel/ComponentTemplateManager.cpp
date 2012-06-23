@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Game/ComponentTemplateManager.cpp
+ * \file /Ely/src/ObjectModel/ComponentTemplateManager.cpp
  *
  * \date 11/mag/2012 (17:48:53)
  * \author marco
  */
 
-#include "Game/ComponentTemplateManager.h"
+#include "ObjectModel/ComponentTemplateManager.h"
 
 PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 		ComponentTemplate* componentTmpl)

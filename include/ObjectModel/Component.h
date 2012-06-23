@@ -99,7 +99,14 @@ public:
 	 * Gives a component the ability to do some setup just "after" this
 	 * component has been added to an object. Optional.
 	 */
-	virtual void onAddSetup() = 0;
+	virtual void onAddToObjectSetup();
+	/**
+	 * \brief On object addition to scene setup.
+	 *
+	 * Gives a component the ability to do some setup just "after" the
+	 * object, this component belongs to, has been added to the scene. Optional.
+	 */
+	virtual void onAddToSceneSetup();
 	/**
 	 * \brief Gets a reference to the owner object.
 	 * \return The owner object.

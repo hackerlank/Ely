@@ -23,9 +23,19 @@
 
 #include "ObjectModel/ObjectTemplate.h"
 
-ObjectTemplate::ObjectTemplate(const ObjectType& name) :
+ObjectTemplate::ObjectTemplate(const ObjectType& name,
+		ObjectTemplateManager* objectTmplMgr) :
 		mName(name)
 {
+	if (not objectTmplMgr)
+	{
+		throw GameException(
+				"ObjectTemplate::ObjectTemplate: invalid ObjectTemplateManager");
+
+	}
+	mObjectTmplMgr = objectTmplMgr;
+	//reset parameters
+	resetParameters();
 }
 
 ObjectTemplate::~ObjectTemplate()
@@ -69,6 +79,144 @@ ComponentTemplate* ObjectTemplate::getComponentTemplate(
 		return NULL;
 	}
 	return *it;
+}
+
+ObjectTemplateManager*& ObjectTemplate::objectTmplMgr()
+{
+	return mObjectTmplMgr;
+}
+
+void ObjectTemplate::setParameters(ParameterTable& parameterTable)
+{
+
+	ParameterTable::iterator iter;
+	//parent
+	iter = parameterTable.find("parent");
+	if (iter != parameterTable.end())
+	{
+		mParent = iter->second;
+	}
+	//is static
+	iter = parameterTable.find("is_static");
+	if (iter != parameterTable.end())
+	{
+		mIsStatic = iter->second;
+	}
+	//position
+	iter = parameterTable.find("pos_x");
+	if (iter != parameterTable.end())
+	{
+		mPosX = iter->second;
+	}
+	iter = parameterTable.find("pos_y");
+	if (iter != parameterTable.end())
+	{
+		mPosY = iter->second;
+	}
+	iter = parameterTable.find("pos_z");
+	if (iter != parameterTable.end())
+	{
+		mPosZ = iter->second;
+	}
+	//rotation
+	iter = parameterTable.find("rot_h");
+	if (iter != parameterTable.end())
+	{
+		mRotH = iter->second;
+	}
+	iter = parameterTable.find("rot_p");
+	if (iter != parameterTable.end())
+	{
+		mRotP = iter->second;
+	}
+	iter = parameterTable.find("rot_r");
+	if (iter != parameterTable.end())
+	{
+		mRotR = iter->second;
+	}
+	//scale
+	iter = parameterTable.find("scale_x");
+	if (iter != parameterTable.end())
+	{
+		mScaleX = iter->second;
+	}
+	iter = parameterTable.find("scale_y");
+	if (iter != parameterTable.end())
+	{
+		mScaleY = iter->second;
+	}
+	iter = parameterTable.find("scale_z");
+	if (iter != parameterTable.end())
+	{
+		mScaleZ = iter->second;
+	}
+}
+
+void ObjectTemplate::resetParameters()
+{
+	//set component parameters to their default values
+	mParent = std::string("");
+	mIsStatic = std::string("false");
+	mPosX = std::string("0.0");
+	mPosY = std::string("0.0");
+	mPosZ = std::string("0.0");
+	mRotH = std::string("v");
+	mRotP = std::string("0.0");
+	mRotR = std::string("0.0");
+	mScaleX = std::string("1.0");
+	mScaleY = std::string("1.0");
+	mScaleZ = std::string("1.0");
+}
+
+std::string& ObjectTemplate::getParam(const std::string& name)
+{
+	std::string* str;
+	if (name == std::string("parent"))
+	{
+		str = &mParent;
+	}
+	if (name == std::string("is_static"))
+	{
+		str = &mIsStatic;
+	}
+	if (name == std::string("pos_x"))
+	{
+		str = &mPosX;
+	}
+	if (name == std::string("pos_y"))
+	{
+		str = &mPosY;
+	}
+	if (name == std::string("pos_z"))
+	{
+		str = &mPosZ;
+	}
+	if (name == std::string("rot_h"))
+	{
+		str = &mRotH;
+	}
+	if (name == std::string("rot_p"))
+	{
+		str = &mRotP;
+	}
+	if (name == std::string("rot_r"))
+	{
+		str = &mRotR;
+	}
+	if (name == std::string("scale_x"))
+	{
+		str = &mScaleX;
+	}
+	if (name == std::string("scale_y"))
+	{
+		str = &mScaleY;
+	}
+	if (name == std::string("scale_z"))
+	{
+		str = &mScaleZ;
+	}
+	//
+	return *str;
 }
 
 //TypedObject semantics: hardcoded

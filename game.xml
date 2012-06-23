@@ -14,15 +14,41 @@
 			<ComponentTmpl family="Graphics" type="Model"/>
 		</ObjectTmpl>
 	</ObjectTmplSet>
-	<!-- Objects Creation -->
+	<!-- Objects and Scene Creation -->
 	<ObjectSet>
 		<Object type="InstancedActor" id="InstancedActor1" priority="90">
+			<Param parent="Render"/>
+			<Param is_static="true"/>
+			<Param pos_x="-10.0"/>
+			<Param pos_y="0.0"/>
+			<Param pos_z="0.0"/>
+			<Param rot_h="-90.0"/>
+			<Param rot_p="0.0"/>
+			<Param rot_r="0.0"/>
+			<Param scale_x="0.5"/>
+			<Param scale_y="0.5"/>
+			<Param scale_z="1.0"/>
+<!--		
+			<Parent>Render</Parent>
+			<InstanceOf>Actor1</InstanceOf>
+			<Position x="-10.0" y="0.0" z="0.0"/>
+			<Orientation h="-90.0" p="0.0" r="0.0"/>
+			<Scaling x="0.5" y="0.5" z="1.0"/>
+-->
+			<Component type="InstanceOf">
+				<Param instance_of="Actor1"/>
+			</Component>
 		</Object>
 		<Object type="StaticActor" id="Teapot1">
 			<Component type="Model">
 				<Param model_file="teapot"/>
 				<Param is_static="true"/>
-			</Component>		
+			</Component>
+			<Parent>Actor1</Parent>
+			<InstanceOf></InstanceOf>
+			<Position x="0.0" y="-10.0" z="0.0"/>
+			<Orientation h="-90.0" p="0.0" r="0.0"/>
+			<Scaling x="0.5" y="0.5" z="0.5"/>	
 		</Object>
 		<Object type="Actor" id="Actor1" priority="100">
 			<Component type="ControlByEvent" priority="90">
@@ -42,32 +68,11 @@
 			<Component type="Sound3d" priority="90">
 				<Param sound_file="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
-		</Object>
-	</ObjectSet>
-	<!-- Scene Creation -->
-	<Scene>
-		<Node id="Actor1">
 			<Parent>Render</Parent>
 			<InstanceOf></InstanceOf>
 			<Position x="0.0" y="0.0" z="0.0"/>
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="1.0" y="1.0" z="1.0"/>
-		</Node>
-<!--		
-		<Node id="InstancedActor1">
-			<Parent>Render</Parent>
-			<InstanceOf>Actor1</InstanceOf>
-			<Position x="-10.0" y="0.0" z="0.0"/>
-			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="0.5" y="0.5" z="1.0"/>
-		</Node>
--->	
-		<Node id="Teapot1">
-			<Parent>Actor1</Parent>
-			<InstanceOf></InstanceOf>
-			<Position x="0.0" y="-10.0" z="0.0"/>
-			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="0.5" y="0.5" z="0.5"/>
-		</Node>	
-	</Scene>
+		</Object>
+	</ObjectSet>
 </Game>

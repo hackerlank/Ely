@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game/ObjectTemplateManager.h
+ * \file /Ely/include/ObjectModel/ObjectTemplateManager.h
  *
  * \date 13/mag/2012 (10:16:20)
  * \author marco
@@ -26,13 +26,15 @@
 
 #include <map>
 #include "Utilities/Tools.h"
-#include "ObjectModel/ObjectTemplate.h"
-#include "ObjectModel/Object.h"
-#include "Game/ComponentTemplateManager.h"
+#include "ObjectTemplate.h"
+#include "Object.h"
+#include "ComponentTemplateManager.h"
 
 /**
  * \brief Singleton template manager that stores all the object templates.
  *
+ * This manager takes responsibility to create game objects and maintains
+ * a table of (pointers to) created objects, indexed by ObjectId.
  * Thread-safe during utilization.
  */
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
@@ -76,12 +78,28 @@ public:
 	 * @param objectType The object type.
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
-	Object* createObject(ObjectType objectType);
+	Object* createObject(ObjectType objectType, ObjectId objectId = ObjectId(""));
+
+	/**
+	 * \brief Object templates and object tables typedefs.
+	 */
+	///@{
+	typedef std::map<const ObjectType, PT(ObjectTemplate)> ObjectTemplateTable;
+	typedef std::map<ObjectId, PT(Object)> ObjectTable;
+	///@}
+
+	/**
+	 * \brief Gets/sets the created objects table.
+	 * @return A reference to the ObjectTable.
+	 */
+	const ObjectTable& createdObjects();
 
 private:
 	///Table of object templates indexed by their name.
-	typedef std::map<const ObjectType, PT(ObjectTemplate)> ObjectTemplateTable;
 	ObjectTemplateTable mObjectTemplates;
+	/// The table of created game objects.
+	ObjectTable mCreatedObjects;
+
 	///The unique id for created objects.
 	IdType id;
 	/**

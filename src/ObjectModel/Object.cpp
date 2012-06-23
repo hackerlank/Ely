@@ -23,8 +23,8 @@
 
 #include "ObjectModel/Object.h"
 
-Object::Object(const ObjectId& objectId) :
-		mIsStatic(false)
+Object::Object(const ObjectId& objectId, ObjectTemplate* tmpl) :
+		mTmpl(tmpl), mIsStatic(false)
 {
 	mObjectId = objectId;
 }
@@ -74,7 +74,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 	//insert the new component into the table
 	mComponents[familyId] = PT(Component)(newComponent);
 	//on addition to object component setup
-	mComponents[familyId]->onAddSetup();
+	mComponents[familyId]->onAddToObjectSetup();
 	return previousComp;
 }
 
@@ -91,6 +91,133 @@ unsigned int Object::numComponents()
 Object::operator NodePath()
 {
 	return mNodePath;
+}
+
+void Object::sceneSetup()
+{
+	//////////////////////////////////////////////////////////////
+	//<!-- Scene Creation -->
+	//Static scene graph creation
+	std::cout << "Creating Scene" << std::endl;
+		//Parent (default: None)
+		tag = node->FirstChildElement("Parent");
+		if (tag != NULL)
+		{
+			if (tag->FirstChild() != NULL)
+			{
+				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+				if (text != NULL)
+				{
+					std::string value = std::string(text->Value());
+					if (value == std::string("Render"))
+					{
+						objectNodePtr->nodePath().reparent_to(
+								mWindow->get_render());
+					}
+					else
+					{
+						ObjectTemplateManager::ObjectTable::iterator iter =
+								ObjectTemplateManager::GetSingleton().createdObjects().find(
+										ObjectId(value));
+						if (iter
+								!= ObjectTemplateManager::GetSingleton().createdObjects().end())
+						{
+							objectNodePtr->nodePath().reparent_to(
+									*iter->second.p());
+						}
+					}
+				}
+			}
+		}
+		//InstanceOf (default: None)
+		tag = node->FirstChildElement("InstanceOf");
+		if (tag != NULL)
+		{
+			if (tag->FirstChild() != NULL)
+			{
+				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
+				if (text != NULL)
+				{
+					std::string value = std::string(text->Value());
+					ObjectTemplateManager::ObjectTable::iterator iter =
+							ObjectTemplateManager::GetSingleton().createdObjects().find(
+									ObjectId(value));
+					if (iter
+							!= ObjectTemplateManager::GetSingleton().createdObjects().end())
+					{
+						iter->second->nodePath().instance_to(
+								*objectNodePtr.p());
+					}
+				}
+			}
+		}
+		//Position (default: (0,0,0))
+		tag = node->FirstChildElement("Position");
+		if (tag != NULL)
+		{
+			const char *coord;
+			coord = tag->Attribute("x", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_x((float) atof(coord));
+			}
+			coord = tag->Attribute("y", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_y((float) atof(coord));
+			}
+			coord = tag->Attribute("z", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_z((float) atof(coord));
+			}
+		}
+		//Orientation (default: (0,0,0))
+		tag = node->FirstChildElement("Orientation");
+		if (tag != NULL)
+		{
+			const char *coord;
+			coord = tag->Attribute("h", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_h((float) atof(coord));
+			}
+			coord = tag->Attribute("p", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_p((float) atof(coord));
+			}
+			coord = tag->Attribute("r", NULL);
+			if (coord != NULL)
+			{
+				objectNodePtr->nodePath().set_r((float) atof(coord));
+			}
+		}
+		//Scaling (default: (1.0,1.0,1.0))
+		tag = node->FirstChildElement("Scaling");
+		if (tag != NULL)
+		{
+			const char *coord;
+			coord = tag->Attribute("x", NULL);
+			if (coord != NULL)
+			{
+				float res = (float) atof(coord);
+				objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
+			}
+			coord = tag->Attribute("y", NULL);
+			if (coord != NULL)
+			{
+				float res = (float) atof(coord);
+				objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
+			}
+			coord = tag->Attribute("z", NULL);
+			if (coord != NULL)
+			{
+				float res = (float) atof(coord);
+				objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
+			}
+		}
+	}
 }
 
 bool& Object::isStatic()

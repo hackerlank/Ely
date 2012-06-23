@@ -15,37 +15,36 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/game/ObjectTemplateManager_test.cpp
+ * \file /Ely/src/test/objectmodel/ComponentTemplateManager_test.cpp
  *
- * \date 13/mag/2012 (10:16:20)
+ * \date 11/mag/2012 (17:48:53)
  * \author marco
  */
 
-#include "Game/ObjectTemplateManager.h"
+#include "ObjectModel/ComponentTemplateManager.h"
 #include <boost/test/unit_test.hpp>
-#include "GameSuiteFixture.h"
+#include "ObjectModelSuiteFixture.h"
 
-struct ObjectTemplateManagerTestCaseFixture
+struct ComponentTemplateManagerTestCaseFixture
 {
-	ObjectTemplateManagerTestCaseFixture()
+	ComponentTemplateManagerTestCaseFixture()
 	{
 		// TODO
 	}
 
-	~ObjectTemplateManagerTestCaseFixture()
+	~ComponentTemplateManagerTestCaseFixture()
 	{
 		// TODO
 	}
 };
 
-/// Game suite
-BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
+/// ObjectModel suite
+BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ObjectTemplateManagerTEST, ObjectTemplateManagerTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(ComponentTemplateManagerTEST, ComponentTemplateManagerTestCaseFixture)
 {
 	BOOST_CHECK(true);
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Game suite
-
+BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

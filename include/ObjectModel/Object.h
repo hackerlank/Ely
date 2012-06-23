@@ -33,6 +33,7 @@
 #include <typedWritable.h>
 #include <pointerTo.h>
 
+#include "ObjectTemplate.h"
 #include "Component.h"
 #include "Utilities/Tools.h"
 
@@ -60,7 +61,7 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Object(const ObjectId& objectId);
+	Object(const ObjectId& objectId, ObjectTemplate* tmpl);
 
 	/**
 	 * \brief Destructor.
@@ -100,6 +101,14 @@ public:
 	unsigned int numComponents();
 
 	/**
+	 * \brief On addition to scene setup.
+	 *
+	 * Gives an object the ability to perform the
+	 * addition to scene setup.
+	 */
+	void sceneSetup();
+
+	/**
 	 * \brief Gets a reference to the id of this object.
 	 * @return The id of this object.
 	 */
@@ -125,6 +134,8 @@ public:
 	bool& isStatic();
 
 private:
+	///The template used to construct this component.
+	ObjectTemplate* mTmpl;
 	///The NodePath associated to this object.
 	NodePath mNodePath;
 	///Unique identifier for this object.

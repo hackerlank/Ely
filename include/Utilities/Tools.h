@@ -222,6 +222,14 @@ template<typename A> struct TaskInterface
 	}
 };
 
+/**
+ * \brief Table for parameters management.
+ *
+ * See ObjectTemplate, ComponentTemplate.
+ */
+typedef std::multimap<std::string, std::string> ParameterTable;
+
+
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
 

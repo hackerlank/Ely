@@ -42,6 +42,14 @@ Object*& Component::ownerObject()
 	return mOwnerObject;
 }
 
+void Component::onAddToObjectSetup()
+{
+}
+
+void Component::onAddToSceneSetup()
+{
+}
+
 ComponentId& Component::componentId()
 {
 	return mComponentId;

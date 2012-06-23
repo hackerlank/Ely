@@ -54,26 +54,15 @@ public:
 	virtual void resetParameters();
 
 	/**
-	 * \brief Gets/sets the model file name.
-	 * @return A reference to the model file name.
+	 * \brief Get/set the parameters associated to the object.
+	 * @param The name of the parameter.
+	 * @return The value of the parameter.
 	 */
-	std::string& modelFile();
-
-	/**
-	 * \brief Gets/sets the list of the animations file names.
-	 * @return A reference to the list of the animations file names.
-	 */
-	std::list<std::string>& animFiles();
-
-	/**
-	 * \brief Gets/sets the IsStatic flag.
-	 * @return The IsStatic flag
-	 */
-	std::string& isStatic();
+	std::string& getParam(const std::string& name);
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the GameManager.
+	 * @return A reference to the PandaFramework.
 	 */
 	PandaFramework*& pandaFramework();
 

@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game/ComponentTemplateManager.h
+ * \file /Ely/include/ObjectModel/ComponentTemplateManager.h
  *
  * \date 11/mag/2012 (17:48:53)
  * \author marco
@@ -28,8 +28,8 @@
 #include <pointerTo.h>
 #include <reMutex.h>
 #include "Utilities/Tools.h"
-#include "ObjectModel/ComponentTemplate.h"
-#include "ObjectModel/Component.h"
+#include "ComponentTemplate.h"
+#include "Component.h"
 
 /**
  * \brief Singleton template manager that stores all the component templates.

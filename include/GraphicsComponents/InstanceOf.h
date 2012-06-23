@@ -45,7 +45,7 @@ public:
 	const virtual ComponentType componentType() const;
 
 	virtual bool initialize();
-	virtual void onAddSetup();
+	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Gets a reference to the node path this component is instance of.

@@ -77,7 +77,7 @@ void Sound3dTemplate::setParameters(ParameterTable& parameterTable)
 
 void Sound3dTemplate::resetParameters()
 {
-	//set component parameters default values
+	//set component parameters to their default values
 	mSoundFiles.clear();
 }
 

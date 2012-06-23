@@ -63,16 +63,6 @@ Component* ModelTemplate::makeComponent(ComponentId& compId)
 	return newModel;
 }
 
-std::string& ModelTemplate::modelFile()
-{
-	return mModelFile;
-}
-
-std::list<std::string>& ModelTemplate::animFiles()
-{
-	return mAnimFiles;
-}
-
 PandaFramework*& ModelTemplate::pandaFramework()
 {
 	return mPandaFramework;
@@ -86,13 +76,13 @@ void ModelTemplate::setParameters(ParameterTable& parameterTable)
 	iter = parameterTable.find("model_file");
 	if (iter != parameterTable.end())
 	{
-		mModelFile = Filename(iter->second);
+		mModelFile = iter->second;
 	}
 	//set animations filenames
 	iterRange = parameterTable.equal_range("anim_file");
 	for (iter = iterRange.first; iter != iterRange.second; ++iter)
 	{
-		mAnimFiles.push_back(Filename(iter->second));
+		mAnimFiles.push_back(iter->second);
 	}
 	//set static flag
 	iter = parameterTable.find("is_static");
@@ -107,16 +97,31 @@ WindowFramework*& ModelTemplate::windowFramework()
 	return mWindowFramework;
 }
 
-std::string& ModelTemplate::isStatic()
-{
-	return mIsStatic;
-}
-
 void ModelTemplate::resetParameters()
 {
-	mModelFile = Filename("");
+	//set component parameters to their default values
+	mModelFile = std::string("");
 	mAnimFiles.clear();
 	mIsStatic = std::string("false");
+}
+
+std::string& ModelTemplate::getParam(const std::string& name)
+{
+	std::string* str;
+	if (name == std::string("is_static"))
+	{
+		str = &mIsStatic;
+	}
+	if (name == std::string("model_file"))
+	{
+		str = &mModelFile;
+	}
+	if (name == std::string("anim_files"))
+	{
+		str = &mAnimFiles;
+	}
+	//
+	return *str;
 }
 
 //TypedObject semantics: hardcoded

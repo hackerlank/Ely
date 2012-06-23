@@ -49,6 +49,13 @@ public:
 	virtual void resetParameters();
 
 	/**
+	 * \brief Get/set the parameters associated to the object.
+	 * @param The name of the parameter.
+	 * @return The value of the parameter.
+	 */
+	std::string& getParam(const std::string& name);
+
+	/**
 	 * \brief Gets/sets the PandaFramework.
 	 * @return A reference to the PandaFramework.
 	 */

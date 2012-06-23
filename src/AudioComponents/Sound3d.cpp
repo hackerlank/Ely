@@ -69,7 +69,7 @@ bool Sound3d::initialize()
 	return result;
 }
 
-void Sound3d::onAddSetup()
+void Sound3d::onAddToObjectSetup()
 {
 	// update sounds' position/velocity only for dynamic objects
 	if (not mOwnerObject->isStatic())

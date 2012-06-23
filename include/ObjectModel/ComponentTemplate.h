@@ -29,6 +29,7 @@
 #include <typedWritable.h>
 #include "Object.h"
 #include "Component.h"
+#include "Utilities/Tools.h"
 
 /**
  * \brief Abstract base class of component templates used to create components.
@@ -64,10 +65,7 @@ public:
 	 * designed to create, to custom values.
 	 * @param parameterTable The table of (parameter,value).
 	 */
-	///@{
-	typedef std::multimap<std::string, std::string> ParameterTable;
 	virtual void setParameters(ParameterTable& parameterTable);
-	///@}
 
 	/**
 	 * \brief (Re)sets the parameters of the component, this template is

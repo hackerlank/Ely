@@ -64,7 +64,7 @@ Component* ControlByEventTemplate::makeComponent(ComponentId& compId)
 
 void ControlByEventTemplate::resetParameters()
 {
-	//set component parameters default values
+	//set component parameters to their default values
 	mForward = std::string("w");
 	mRollLeft = std::string("a");
 	mBackward = std::string("s");
@@ -74,12 +74,12 @@ void ControlByEventTemplate::resetParameters()
 	mUp = std::string("r");
 	mDown = std::string("f");
 	mSpeedKey = std::string("shift");
-	mSpeed = 100.0;
-	mFastFactor = 5.0;
-	mMovSens = 2.0;
-	mRollSens = 15.0;
-	mSensX = 0.2;
-	mSensY = 0.2;
+	mSpeed = std::string("100.0");
+	mFastFactor = std::string("5.0");
+	mMovSens = std::string("2.0");
+	mRollSens = std::string("15.0");
+	mSensX = std::string("0.2");
+	mSensY = std::string("0.2");
 	mInverted = std::string("false");
 	mMouseEnabledH = std::string("false");
 	mMouseEnabledP = std::string("false");
@@ -189,6 +189,103 @@ std::string& ControlByEventTemplate::sensX()
 std::string& ControlByEventTemplate::sensY()
 {
 	return mSensY;
+}
+
+std::string& ControlByEventTemplate::getParam(const std::string& name)
+{
+	std::string* str;
+	if (name == std::string("enabled"))
+	{
+		str = &mEnabled;
+	}
+	if (name == std::string("mouse_enabled_h"))
+	{
+		mMouseEnabledH = iter->second;
+	}
+	if (name == std::string("mouse_enabled_p"))
+	{
+		mMouseEnabledP = iter->second;
+	}
+	if (name == std::string("forward"))
+	{
+		mForward = iter->second;
+	}
+	if (name == std::string("roll_left"))
+	{
+		mRollLeft = iter->second;
+	}
+	if (name == std::string("backward"))
+	{
+		mBackward = iter->second;
+	}
+	iter = parameterTable.find("roll_right");
+	if (iter != parameterTable.end())
+	{
+		mRollRight = iter->second;
+	}
+	iter = parameterTable.find("strafe_left");
+	if (iter != parameterTable.end())
+	{
+		mStrafeLeft = iter->second;
+	}
+	iter = parameterTable.find("strafe_right");
+	if (iter != parameterTable.end())
+	{
+		mStrafeRight = iter->second;
+	}
+	iter = parameterTable.find("up");
+	if (iter != parameterTable.end())
+	{
+		mUp = iter->second;
+	}
+	iter = parameterTable.find("down");
+	if (iter != parameterTable.end())
+	{
+		mDown = iter->second;
+	}
+	iter = parameterTable.find("speed_key");
+	if (iter != parameterTable.end())
+	{
+		mSpeedKey = iter->second;
+	}
+	iter = parameterTable.find("inverted");
+	if (iter != parameterTable.end())
+	{
+		mInverted = iter->second;
+	}
+	//set sensitivity parameters
+	iter = parameterTable.find("speed");
+	if (iter != parameterTable.end())
+	{
+		mSpeed = iter->second;
+	}
+	iter = parameterTable.find("fast_factor");
+	if (iter != parameterTable.end())
+	{
+		mFastFactor = iter->second;
+	}
+	iter = parameterTable.find("mov_sens");
+	if (iter != parameterTable.end())
+	{
+		mMovSens = iter->second;
+	}
+	iter = parameterTable.find("roll_sens");
+	if (iter != parameterTable.end())
+	{
+		mRollSens = iter->second;
+	}
+	iter = parameterTable.find("sens_x");
+	if (iter != parameterTable.end())
+	{
+		mSensX = iter->second;
+	}
+	iter = parameterTable.find("sens_y");
+	if (iter != parameterTable.end())
+	{
+		mSensY = iter->second;
+	}
+	//
+	return *str;
 }
 
 void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)

@@ -74,7 +74,7 @@ public:
 	const virtual ComponentType componentType() const;
 
 	virtual bool initialize();
-	virtual void onAddSetup();
+	virtual void onAddToObjectSetup();
 
 	/**
 	 * \name Event handlers.
