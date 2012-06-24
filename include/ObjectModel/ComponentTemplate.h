@@ -24,10 +24,9 @@
 #ifndef COMPONENTTEMPLATE_H_
 #define COMPONENTTEMPLATE_H_
 
-#include <map>
+#include <list>
 #include <referenceCount.h>
 #include <typedWritable.h>
-#include "Object.h"
 #include "Component.h"
 #include "Utilities/Tools.h"
 

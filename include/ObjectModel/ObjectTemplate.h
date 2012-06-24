@@ -28,12 +28,15 @@
 #include <list>
 #include <algorithm>
 #include <utility>
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <referenceCount.h>
 #include <typedWritable.h>
 #include "ComponentTemplate.h"
 #include "Component.h"
-#include "ObjectTemplateManager.h"
 #include "Utilities/Tools.h"
+
+class ObjectTemplateManager;
 
 /**
  * \brief Object type.

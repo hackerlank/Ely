@@ -22,6 +22,7 @@
  */
 
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 Object::Object(const ObjectId& objectId, ObjectTemplate* tmpl) :
 		mTmpl(tmpl), mIsStatic(false)
@@ -100,12 +101,12 @@ void Object::sceneSetup()
 	//find parent into the created objects
 	ObjectTemplateManager::ObjectTable& createdObjects =
 			mTmpl->objectTmplMgr()->createdObjects();
-	ObjectTemplateManager::ObjectTable::iterator iter;
-	iter = createdObjects.find(parentId);
-	if (iter != createdObjects.end())
+	ObjectTemplateManager::ObjectTable::iterator iterObj;
+	iterObj = createdObjects.find(parentId);
+	if (iterObj != createdObjects.end())
 	{
 		//reparent to parent
-		mNodePath.reparent_to(iter->second->nodePath());
+		mNodePath.reparent_to(iterObj->second->nodePath());
 	}
 	else
 	{
@@ -113,83 +114,43 @@ void Object::sceneSetup()
 		mNodePath.reparent_to(mTmpl->windowFramework()->get_render());
 	}
 	//Position (default: (0,0,0))
-
-	tag = node->FirstChildElement("Position");
-	if (tag != NULL)
-	{
-		const char *coord;
-		coord = tag->Attribute("x", NULL);
-		if (coord != NULL)
-		{
-			objectNodePtr->nodePath().set_x((float) atof(coord));
-		}
-		coord = tag->Attribute("y", NULL);
-		if (coord != NULL)
-		{
-			objectNodePtr->nodePath().set_y((float) atof(coord));
-		}
-		coord = tag->Attribute("z", NULL);
-		if (coord != NULL)
-		{
-			objectNodePtr->nodePath().set_z((float) atof(coord));
-		}
-	}
+	float posX = atof(mTmpl->parameter(std::string("pos_x")).c_str());
+	float posY = atof(mTmpl->parameter(std::string("pos_y")).c_str());
+	float posZ = atof(mTmpl->parameter(std::string("pos_z")).c_str());
+	mNodePath.set_x(posX);
+	mNodePath.set_y(posY);
+	mNodePath.set_z(posZ);
 	//Orientation (default: (0,0,0))
-	tag = node->FirstChildElement("Orientation");
-	if (tag != NULL)
-	{
-		const char *coord;
-		coord = tag->Attribute("h", NULL);
-		if (coord != NULL)
-		{
-			objectNodePtr->nodePath().set_h((float) atof(coord));
-		}
-		coord = tag->Attribute("p", NULL);
-		if (coord != NULL)
-		{
-			objectNodePtr->nodePath().set_p((float) atof(coord));
-		}
-		coord = tag->Attribute("r", NULL);
-		if (coord != NULL)
-		{
-			objectNodePtr->nodePath().set_r((float) atof(coord));
-		}
-	}
+	float rotH = atof(mTmpl->parameter(std::string("rot_h")).c_str());
+	float rotP = atof(mTmpl->parameter(std::string("rot_p")).c_str());
+	float rotR = atof(mTmpl->parameter(std::string("rot_r")).c_str());
+	mNodePath.set_h(rotH);
+	mNodePath.set_p(rotP);
+	mNodePath.set_r(rotR);
 	//Scaling (default: (1.0,1.0,1.0))
-	tag = node->FirstChildElement("Scaling");
-	if (tag != NULL)
+	float scaleX = atof(mTmpl->parameter(std::string("scale_x")).c_str());
+	float scaleY = atof(mTmpl->parameter(std::string("scale_y")).c_str());
+	float scaleZ = atof(mTmpl->parameter(std::string("scale_z")).c_str());
+	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
+	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
+	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
+	//give components a chance to set up
+	ComponentTable::iterator iterComp;
+	for (iterComp = mComponents.begin(); iterComp != mComponents.end();
+			++iterComp)
 	{
-		const char *coord;
-		coord = tag->Attribute("x", NULL);
-		if (coord != NULL)
-		{
-			float res = (float) atof(coord);
-			objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
-		}
-		coord = tag->Attribute("y", NULL);
-		if (coord != NULL)
-		{
-			float res = (float) atof(coord);
-			objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
-		}
-		coord = tag->Attribute("z", NULL);
-		if (coord != NULL)
-		{
-			float res = (float) atof(coord);
-			objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
-		}
+		iterComp->second->onAddToSceneSetup();
 	}
-}
 }
 
 ObjectTemplate* Object::objectTmpl()
 {
-return mTmpl;
+	return mTmpl;
 }
 
 bool& Object::isStatic()
 {
-return mIsStatic;
+	return mIsStatic;
 }
 
 //TypedObject semantics: hardcoded
