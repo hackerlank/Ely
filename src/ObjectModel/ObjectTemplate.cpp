@@ -168,56 +168,29 @@ void ObjectTemplate::resetParameters()
 	mScaleZ = std::string("1.0");
 }
 
-std::string& ObjectTemplate::getParam(const std::string& name)
+std::string& ObjectTemplate::parameter(const std::string& paramName)
 {
-	std::string* str;
-	if (name == std::string("parent"))
-	{
-		str = &mParent;
-	}
-	if (name == std::string("is_static"))
-	{
-		str = &mIsStatic;
-	}
-	if (name == std::string("pos_x"))
-	{
-		str = &mPosX;
-	}
-	if (name == std::string("pos_y"))
-	{
-		str = &mPosY;
-	}
-	if (name == std::string("pos_z"))
-	{
-		str = &mPosZ;
-	}
-	if (name == std::string("rot_h"))
-	{
-		str = &mRotH;
-	}
-	if (name == std::string("rot_p"))
-	{
-		str = &mRotP;
-	}
-	if (name == std::string("rot_r"))
-	{
-		str = &mRotR;
-	}
-	if (name == std::string("scale_x"))
-	{
-		str = &mScaleX;
-	}
-	if (name == std::string("scale_y"))
-	{
-		str = &mScaleY;
-	}
-	if (name == std::string("scale_z"))
-	{
-		str = &mScaleZ;
-	}
+	std::string* strPtr = &mUnknown;
+	CASE(paramName,strPtr,"parent",mParent)
+	CASE(paramName,strPtr,"is_static",mIsStatic)
+	CASE(paramName,strPtr,"pos_x",mPosX)
+	CASE(paramName,strPtr,"pos_y",mPosY)
+	CASE(paramName,strPtr,"pos_z",mPosZ)
+	CASE(paramName,strPtr,"rot_h",mRotH)
+	CASE(paramName,strPtr,"rot_p",mRotP)
+	CASE(paramName,strPtr,"rot_r",mRotR)
+	CASE(paramName,strPtr,"scale_x",mScaleX)
+	CASE(paramName,strPtr,"scale_y",mScaleY)
+	CASE(paramName,strPtr,"scale_z",mScaleZ)
 	//
-	return *str;
+	return *strPtr;
 }
 
+std::string& ObjectTemplate::parameter(const std::string& paramName)
+{
+	std::list<std::string>* strListPtr = &mUnknownList;
+	//
+	return *strListPtr;
+}
 //TypedObject semantics: hardcoded
 TypeHandle ObjectTemplate::_type_handle;

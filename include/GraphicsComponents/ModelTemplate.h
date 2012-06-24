@@ -52,13 +52,8 @@ public:
 
 	virtual void setParameters(ParameterTable& parameterTable);
 	virtual void resetParameters();
-
-	/**
-	 * \brief Get/set the parameters associated to the object.
-	 * @param The name of the parameter.
-	 * @return The value of the parameter.
-	 */
-	std::string& getParam(const std::string& name);
+	virtual std::string& parameter(const std::string& paramName);
+	virtual std::list<std::string>& parameterList(const std::string& paramName);
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -77,12 +72,15 @@ private:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
+	///@{
+	/// Set of allowed Parameters.
 	///The name of the model file containing the static model.
 	std::string mModelFile;
 	///The names of the files containing the animations.
 	std::list<std::string> mAnimFiles;
 	///Static flag: if this object doesn't move in the world.
 	std::string mIsStatic;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

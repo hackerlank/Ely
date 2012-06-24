@@ -68,7 +68,7 @@ void Sound3dTemplate::setParameters(ParameterTable& parameterTable)
 	ParameterTable::iterator iter;
 	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
 	//set sounds filenames
-	iterRange = parameterTable.equal_range("sound_file");
+	iterRange = parameterTable.equal_range("sound_files");
 	for (iter = iterRange.first; iter != iterRange.second; ++iter)
 	{
 		mSoundFiles.push_back(iter->second);
@@ -81,9 +81,12 @@ void Sound3dTemplate::resetParameters()
 	mSoundFiles.clear();
 }
 
-std::list<std::string>& Sound3dTemplate::soundFiles()
+std::list<std::string>&  Sound3dTemplate::parameterList(const std::string& paramName)
 {
-	return mSoundFiles;
+	std::list<std::string>* strListPtr = &mUnknownList;
+	CASE(paramName,strListPtr,"sound_files",mSoundFiles)
+	//
+	return *strListPtr;
 }
 
 AudioManager*& Sound3dTemplate::audioManager()

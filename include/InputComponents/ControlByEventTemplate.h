@@ -47,13 +47,7 @@ public:
 
 	virtual void setParameters(ParameterTable& parameterTable);
 	virtual void resetParameters();
-
-	/**
-	 * \brief Get/set the parameters associated to the object.
-	 * @param The name of the parameter.
-	 * @return The value of the parameter.
-	 */
-	std::string& getParam(const std::string& name);
+	virtual std::string& parameter(const std::string& paramName);
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -66,41 +60,6 @@ public:
 	 * @return A reference to the WindowFramework.
 	 */
 	WindowFramework*& windowFramework();
-
-	/**
-	 * \name Event key names getters/setters.
-	 * \brief Get/set the event names associated to this component.
-	 *
-	 * Each of these events will be associated to an handler that will
-	 * control one specific movement of the object associated to this component.
-	 */
-	///@{
-	std::string& backwardEvent();
-	std::string& downEvent();
-	std::string& forwardEvent();
-	std::string& strafeLeftEvent();
-	std::string& strafeRightEvent();
-	std::string& rollLeftEvent();
-	std::string& rollRightEvent();
-	std::string& upEvent();
-	std::string& speedKey();
-	std::string& inverted();
-	std::string& mouseEnabledH();
-	std::string& mouseEnabledP();
-	std::string& enabled();
-	///@}
-	/**
-	 * \name Sensitivity parameters getters/setters.
-	 * \brief Get/set the sensitivity parameters associated to this component.
-	 */
-	///@{
-	std::string& speed();
-	std::string& fastFactor();
-	std::string& movSens();
-	std::string& rollSens();
-	std::string& sensX();
-	std::string& sensY();
-	///@}
 
 private:
 	///The PandaFramework.

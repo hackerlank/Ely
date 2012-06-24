@@ -54,6 +54,31 @@ Component* InstanceOfTemplate::makeComponent(ComponentId& compId)
 	return newInstanceOf;
 }
 
+void InstanceOfTemplate::setParameters(ParameterTable& parameterTable)
+{
+	ParameterTable::iterator iter;
+	//set instance of
+	iter = parameterTable.find("instance_of");
+	if (iter != parameterTable.end())
+	{
+		mInstanceOf = iter->second;
+	}
+}
+
+void InstanceOfTemplate::resetParameters()
+{
+	//set component parameters to their default values
+	mInstanceOf = std::string("");
+}
+
+std::string& InstanceOfTemplate::parameter(const std::string& paramName)
+{
+	std::string* strPtr = &mUnknown;
+	CASE(paramName,strPtr,"instance_of",mInstanceOf)
+	//
+	return *strPtr;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle InstanceOfTemplate::_type_handle;
 

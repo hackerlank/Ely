@@ -27,7 +27,6 @@
 #include <string>
 #include <list>
 #include <algorithm>
-#include <set>
 #include <utility>
 #include <referenceCount.h>
 #include <typedWritable.h>
@@ -119,11 +118,15 @@ public:
 	void resetParameters();
 
 	/**
-	 * \brief Get/set the parameters associated to the object.
+	 * \name Parameters getters/setters.
+	 * \brief Get/set a single parameter associated to the object.
 	 * @param The name of the parameter.
 	 * @return The value of the parameter.
 	 */
-	std::string& getParam(const std::string& name);
+	///@{
+	std::string& parameter(const std::string& paramName);
+	std::list<std::string>& parameterList(const std::string& paramName);
+	///@}
 
 private:
 	///Name identifying this object template.
@@ -135,7 +138,8 @@ private:
 	///@{
 	/// Set of allowed Parameters.
 	std::string mParent, mIsStatic, mPosX, mPosY, mPosZ, mRotH, mRotP, mRotR,
-			mScaleX, mScaleY, mScaleZ;
+			mScaleX, mScaleY, mScaleZ, mUnknown;
+	std::list<std::string> mUnknownList;
 	///@}
 
 	///TypedObject semantics: hardcoded

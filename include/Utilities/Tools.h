@@ -229,6 +229,21 @@ template<typename A> struct TaskInterface
  */
 typedef std::multimap<std::string, std::string> ParameterTable;
 
+/**
+ * \brief Helper macro used for getting parameter references.
+ *
+ * See ObjectTemplate, ComponentTemplate.
+ */
+#define CASE(name,resPtr,value,param) \
+		if (name == std::string(value))\
+		{\
+			resPtr = &param;\
+		}
+#define CASELIST(name,resPtr,value,param) \
+		if (name == std::string(value))\
+		{\
+			resPtr = &param;\
+		}
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();

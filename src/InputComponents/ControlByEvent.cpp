@@ -238,33 +238,39 @@ bool ControlByEvent::initialize()
 	bool result = true;
 	//get settings from template
 	//enabling setting
-	mEnabled = (mTmpl->enabled() == std::string("true") ? true : false);
+	mEnabled =
+			(mTmpl->parameter(std::string("enabled")) == std::string("true") ? true :
+					false);
 	//inverted setting
-	mInverted = (mTmpl->inverted() == std::string("true") ? true : false);
+	mInverted =
+			(mTmpl->parameter(std::string("inverted")) == std::string("true") ? true :
+					false);
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->mouseEnabledH() == std::string("true") ? true : false);
+			mTmpl->parameter(std::string("mouse_enabled_h"))
+					== std::string("true") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->mouseEnabledP() == std::string("true") ? true : false);
+			mTmpl->parameter(std::string("mouse_enabled_p"))
+					== std::string("true") ? true : false);
 	//key events setting
 	//backward key
-	mBackwardKey = mTmpl->backwardEvent();
+	mBackwardKey = mTmpl->parameter(std::string("backward"));
 	//down key
-	mDownKey = mTmpl->downEvent();
+	mDownKey = mTmpl->parameter(std::string("down"));
 	//forward key
-	mForwardKey = mTmpl->forwardEvent();
+	mForwardKey = mTmpl->parameter(std::string("forward"));
 	//strafeLeft key
-	mStrafeLeftKey = mTmpl->strafeLeftEvent();
+	mStrafeLeftKey = mTmpl->parameter(std::string("strafe_left"));
 	//strafeRight key
-	mStrafeRightKey = mTmpl->strafeRightEvent();
+	mStrafeRightKey = mTmpl->parameter(std::string("strafe_right"));
 	//rollLeft key
-	mRollLeftKey = mTmpl->rollLeftEvent();
+	mRollLeftKey = mTmpl->parameter(std::string("roll_left"));
 	//rollRight key
-	mRollRightKey = mTmpl->rollRightEvent();
+	mRollRightKey = mTmpl->parameter(std::string("roll_right"));
 	//up key
-	mUpKey = mTmpl->upEvent();
+	mUpKey = mTmpl->parameter(std::string("up"));
 	//speedKey
-	mSpeedKey = mTmpl->speedKey();
+	mSpeedKey = mTmpl->parameter(std::string("speed_key"));
 	if (not (mSpeedKey == "control" or mSpeedKey == "alt"
 			or mSpeedKey == "shift"))
 	{
@@ -272,13 +278,15 @@ bool ControlByEvent::initialize()
 	}
 
 	//set sensitivity parameters
-	mSpeed = (float) atof(mTmpl->speed().c_str());
-	mFastFactor = (float) atof(mTmpl->fastFactor().c_str());
+	mSpeed = (float) atof(mTmpl->parameter(std::string("speed")).c_str());
+	mFastFactor = (float) atof(
+			mTmpl->parameter(std::string("fast_factor")).c_str());
 	mSpeedActual = mSpeed;
-	mMovSens = (float) atof(mTmpl->movSens().c_str());
-	mRollSens = (float) atof(mTmpl->rollSens().c_str());
-	mSensX = (float) atof(mTmpl->sensX().c_str());
-	mSensY = (float) atof(mTmpl->sensY().c_str());
+	mMovSens = (float) atof(mTmpl->parameter(std::string("mov_sens")).c_str());
+	mRollSens = (float) atof(
+			mTmpl->parameter(std::string("roll_sens")).c_str());
+	mSensX = (float) atof(mTmpl->parameter(std::string("sens_x")).c_str());
+	mSensY = (float) atof(mTmpl->parameter(std::string("sens_y")).c_str());
 	//
 	return result;
 }

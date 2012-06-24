@@ -30,6 +30,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "GraphicsComponents/InstanceOf.h"
+#include "Utilities/Tools.h"
 
 class InstanceOfTemplate: public ComponentTemplate
 {
@@ -42,7 +43,15 @@ public:
 
 	virtual Component* makeComponent(ComponentId& compId);
 
+	virtual void setParameters(ParameterTable& parameterTable);
+	virtual void resetParameters();
+	virtual std::string& parameter(const std::string& paramName);
+
 private:
+	///@{
+	/// Set of allowed Parameters.
+	std::string mInstanceOf;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

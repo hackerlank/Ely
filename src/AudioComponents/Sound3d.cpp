@@ -60,8 +60,8 @@ bool Sound3d::initialize()
 	bool result = true;
 	//set sound files
 	std::list<std::string>::iterator it;
-	for (it = mTmpl->soundFiles().begin(); it != mTmpl->soundFiles().end();
-			++it)
+	for (it = mTmpl->parameterList(std::string("sound_files")).begin();
+			it != mTmpl->parameterList(std::string("sound_files")).end(); ++it)
 	{
 		addSound(*it);
 	}
@@ -92,7 +92,8 @@ void Sound3d::onAddToObjectSetup()
 bool Sound3d::addSound(const std::string& fileName)
 {
 	bool result = false;
-	PT(AudioSound) sound = mTmpl->audioManager()->get_sound(fileName, true);
+	PT(AudioSound) sound = mTmpl->audioManager()->get_sound(fileName,
+			true);
 	if (sound)
 	{
 		sounds()[fileName] = sound;
@@ -174,9 +175,9 @@ AsyncTask::DoneStatus Sound3d::update(GenericAsyncTask* task)
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
 	{
-		iter->second->set_3d_attributes(newPosition.get_x(), newPosition.get_y(),
-				newPosition.get_z(), velocity.get_x(), velocity.get_y(),
-				velocity.get_z());
+		iter->second->set_3d_attributes(newPosition.get_x(),
+				newPosition.get_y(), newPosition.get_z(), velocity.get_x(),
+				velocity.get_y(), velocity.get_z());
 	}
 	//update actual position
 	mPosition = newPosition;

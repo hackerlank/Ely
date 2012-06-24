@@ -73,6 +73,23 @@ public:
 	 */
 	virtual void resetParameters();
 
+	/**
+	 * \brief Get/set the parameters associated to the object.
+	 * @param The name of the parameter.
+	 * @return The value of the parameter.
+	 */
+	///@{
+	virtual std::string& parameter(const std::string& paramName);
+	virtual std::list<std::string>& parameterList(const std::string& paramName);
+	///@}
+
+protected:
+	///@{
+	/// Set of allowed Parameters.
+	std::string mUnknown;
+	std::list<std::string> mUnknownList;
+	///@}
+
 	///TypedObject semantics: hardcoded
 public:
 	static TypeHandle get_class_type()

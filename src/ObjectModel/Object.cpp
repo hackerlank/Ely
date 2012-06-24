@@ -129,28 +129,6 @@ void Object::sceneSetup()
 				}
 			}
 		}
-		//InstanceOf (default: None)
-		tag = node->FirstChildElement("InstanceOf");
-		if (tag != NULL)
-		{
-			if (tag->FirstChild() != NULL)
-			{
-				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
-				if (text != NULL)
-				{
-					std::string value = std::string(text->Value());
-					ObjectTemplateManager::ObjectTable::iterator iter =
-							ObjectTemplateManager::GetSingleton().createdObjects().find(
-									ObjectId(value));
-					if (iter
-							!= ObjectTemplateManager::GetSingleton().createdObjects().end())
-					{
-						iter->second->nodePath().instance_to(
-								*objectNodePtr.p());
-					}
-				}
-			}
-		}
 		//Position (default: (0,0,0))
 		tag = node->FirstChildElement("Position");
 		if (tag != NULL)
@@ -218,6 +196,11 @@ void Object::sceneSetup()
 			}
 		}
 	}
+}
+
+ObjectTemplate* Object::objectTmpl()
+{
+	return mTmpl;
 }
 
 bool& Object::isStatic()

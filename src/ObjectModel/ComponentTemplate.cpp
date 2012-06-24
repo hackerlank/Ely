@@ -35,5 +35,21 @@ void ComponentTemplate::resetParameters()
 {
 }
 
+std::string& ComponentTemplate::parameter(const std::string& name)
+{
+	std::string* strPtr = &mUnknown;
+	//
+	return *strPtr;
+}
+
+std::list<std::string>& ComponentTemplate::parameterList(const std::string& name)
+{
+	std::list<std::string>* strListPtr = &mUnknownList;
+	//
+	return *strListPtr;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle ComponentTemplate::_type_handle;
+
+

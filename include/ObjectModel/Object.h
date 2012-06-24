@@ -125,6 +125,12 @@ public:
 	operator NodePath();
 
 	/**
+	 * \brief Gets a reference to the object template.
+	 * @return The a reference to the object template.
+	 */
+	ObjectTemplate* objectTmpl();
+
+	/**
 	 * \brief Gets a reference to the static flag.
 	 *
 	 * Thi flag represents if this object doesn't move in the world.

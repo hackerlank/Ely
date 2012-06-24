@@ -96,196 +96,30 @@ WindowFramework*& ControlByEventTemplate::windowFramework()
 	return mWindowFramework;
 }
 
-std::string& ControlByEventTemplate::backwardEvent()
+std::string& ControlByEventTemplate::parameter(const std::string& paramName)
 {
-	return mBackward;
-}
-
-std::string& ControlByEventTemplate::speedKey()
-{
-	return mSpeedKey;
-}
-
-std::string& ControlByEventTemplate::inverted()
-{
-	return mInverted;
-}
-
-std::string& ControlByEventTemplate::downEvent()
-{
-	return mDown;
-}
-
-std::string& ControlByEventTemplate::forwardEvent()
-{
-	return mForward;
-}
-
-std::string& ControlByEventTemplate::strafeLeftEvent()
-{
-	return mStrafeLeft;
-}
-
-std::string& ControlByEventTemplate::strafeRightEvent()
-{
-	return mStrafeRight;
-}
-
-std::string& ControlByEventTemplate::rollLeftEvent()
-{
-	return mRollLeft;
-}
-
-std::string& ControlByEventTemplate::rollRightEvent()
-{
-	return mRollRight;
-}
-
-std::string& ControlByEventTemplate::upEvent()
-{
-	return mUp;
-}
-
-std::string& ControlByEventTemplate::speed()
-{
-	return mSpeed;
-}
-
-std::string& ControlByEventTemplate::fastFactor()
-{
-	return mFastFactor;
-}
-
-std::string& ControlByEventTemplate::movSens()
-{
-	return mMovSens;
-}
-
-std::string& ControlByEventTemplate::mouseEnabledH()
-{
-	return mMouseEnabledH;
-}
-
-std::string& ControlByEventTemplate::mouseEnabledP()
-{
-	return mMouseEnabledP;
-}
-
-std::string& ControlByEventTemplate::enabled()
-{
-	return mEnabled;
-}
-
-std::string& ControlByEventTemplate::rollSens()
-{
-	return mRollSens;
-}
-
-std::string& ControlByEventTemplate::sensX()
-{
-	return mSensX;
-}
-
-std::string& ControlByEventTemplate::sensY()
-{
-	return mSensY;
-}
-
-std::string& ControlByEventTemplate::getParam(const std::string& name)
-{
-	std::string* str;
-	if (name == std::string("enabled"))
-	{
-		str = &mEnabled;
-	}
-	if (name == std::string("mouse_enabled_h"))
-	{
-		mMouseEnabledH = iter->second;
-	}
-	if (name == std::string("mouse_enabled_p"))
-	{
-		mMouseEnabledP = iter->second;
-	}
-	if (name == std::string("forward"))
-	{
-		mForward = iter->second;
-	}
-	if (name == std::string("roll_left"))
-	{
-		mRollLeft = iter->second;
-	}
-	if (name == std::string("backward"))
-	{
-		mBackward = iter->second;
-	}
-	iter = parameterTable.find("roll_right");
-	if (iter != parameterTable.end())
-	{
-		mRollRight = iter->second;
-	}
-	iter = parameterTable.find("strafe_left");
-	if (iter != parameterTable.end())
-	{
-		mStrafeLeft = iter->second;
-	}
-	iter = parameterTable.find("strafe_right");
-	if (iter != parameterTable.end())
-	{
-		mStrafeRight = iter->second;
-	}
-	iter = parameterTable.find("up");
-	if (iter != parameterTable.end())
-	{
-		mUp = iter->second;
-	}
-	iter = parameterTable.find("down");
-	if (iter != parameterTable.end())
-	{
-		mDown = iter->second;
-	}
-	iter = parameterTable.find("speed_key");
-	if (iter != parameterTable.end())
-	{
-		mSpeedKey = iter->second;
-	}
-	iter = parameterTable.find("inverted");
-	if (iter != parameterTable.end())
-	{
-		mInverted = iter->second;
-	}
-	//set sensitivity parameters
-	iter = parameterTable.find("speed");
-	if (iter != parameterTable.end())
-	{
-		mSpeed = iter->second;
-	}
-	iter = parameterTable.find("fast_factor");
-	if (iter != parameterTable.end())
-	{
-		mFastFactor = iter->second;
-	}
-	iter = parameterTable.find("mov_sens");
-	if (iter != parameterTable.end())
-	{
-		mMovSens = iter->second;
-	}
-	iter = parameterTable.find("roll_sens");
-	if (iter != parameterTable.end())
-	{
-		mRollSens = iter->second;
-	}
-	iter = parameterTable.find("sens_x");
-	if (iter != parameterTable.end())
-	{
-		mSensX = iter->second;
-	}
-	iter = parameterTable.find("sens_y");
-	if (iter != parameterTable.end())
-	{
-		mSensY = iter->second;
-	}
+	std::string* strPtr = &mUnknown;
+	CASE(paramName,strPtr,"enabled",mEnabled)
+	CASE(paramName,strPtr,"mouse_enabled_h",mMouseEnabledH)
+	CASE(paramName,strPtr,"mouse_enabled_p",mMouseEnabledP)
+	CASE(paramName,strPtr,"forward",mForward)
+	CASE(paramName,strPtr,"roll_left",mRollLeft)
+	CASE(paramName,strPtr,"backward",mBackward)
+	CASE(paramName,strPtr,"roll_right",mRollRight)
+	CASE(paramName,strPtr,"strafe_left",mStrafeLeft)
+	CASE(paramName,strPtr,"strafe_right",mStrafeRight)
+	CASE(paramName,strPtr,"up",mUp)
+	CASE(paramName,strPtr,"down",mDown)
+	CASE(paramName,strPtr,"speed_key",mSpeedKey)
+	CASE(paramName,strPtr,"inverted",mInverted)
+	CASE(paramName,strPtr,"speed",mSpeed)
+	CASE(paramName,strPtr,"fast_factor",mFastFactor)
+	CASE(paramName,strPtr,"mov_sens",mMovSens)
+	CASE(paramName,strPtr,"roll_sens",mRollSens)
+	CASE(paramName,strPtr,"sens_x",mSensX)
+	CASE(paramName,strPtr,"sens_y",mSensY)
 	//
-	return *str;
+	return *strPtr;
 }
 
 void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)

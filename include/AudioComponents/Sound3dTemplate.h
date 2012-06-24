@@ -48,12 +48,7 @@ public:
 
 	virtual void setParameters(ParameterTable& parameterTable);
 	virtual void resetParameters();
-
-	/**
-	 * \brief Gets/sets the list of the sounds file names.
-	 * @return A reference to the list of the sounds file names.
-	 */
-	std::list<std::string>& soundFiles();
+	virtual std::list<std::string>& parameterList(const std::string& paramName);
 
 	/**
 	 * \brief Gets/sets the AudioManager.

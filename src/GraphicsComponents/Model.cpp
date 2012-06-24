@@ -64,8 +64,9 @@ void Model::onAddToObjectSetup()
 	//node path of this model
 	mOwnerObject->nodePath() = mNodePath;
 	//check if this model is static: so should be the object
-	mOwnerObject->isStatic() = (
-			mTmpl->isStatic() == std::string("true") ? true : false);
+	mOwnerObject->isStatic() =
+			(mTmpl->parameter(std::string("is_static")) == std::string("true") ? true :
+					false);
 }
 
 AnimControlCollection& Model::animations()
@@ -79,13 +80,14 @@ bool Model::initialize()
 	//setup model and animations
 	mNodePath = mTmpl->windowFramework()->load_model(
 			mTmpl->pandaFramework()->get_models(),
-			Filename(mTmpl->modelFile()));
+			Filename(mTmpl->parameter(std::string("model_file"))));
 	if (mNodePath.is_empty())
 	{
 		result = false;
 	}
 	std::list<std::string>::iterator it;
-	for (it = mTmpl->animFiles().begin(); it != mTmpl->animFiles().end(); ++it)
+	for (it = mTmpl->parameterList(std::string("anim_files")).begin();
+			it != mTmpl->parameterList(std::string("anim_files")).end(); ++it)
 	{
 		NodePath resultNP;
 		resultNP = mTmpl->windowFramework()->load_model(mNodePath,

@@ -35,7 +35,7 @@
 			<Orientation h="-90.0" p="0.0" r="0.0"/>
 			<Scaling x="0.5" y="0.5" z="1.0"/>
 -->
-			<Component type="InstanceOf">
+			<Component type="InstanceOf" priority="100">
 				<Param instance_of="Actor1"/>
 			</Component>
 		</Object>
@@ -63,10 +63,10 @@
 			</Component>
 			<Component type="Model" priority="100">
 				<Param model_file="panda"/>
-				<Param anim_file="panda-walk"/>
+				<Param anim_files="panda-walk"/>
 			</Component>
 			<Component type="Sound3d" priority="90">
-				<Param sound_file="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
+				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
 			<Parent>Render</Parent>
 			<InstanceOf></InstanceOf>
