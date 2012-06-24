@@ -14,10 +14,11 @@
 			<ComponentTmpl family="Graphics" type="Model"/>
 		</ObjectTmpl>
 	</ObjectTmplSet>
+
 	<!-- Objects and Scene Creation -->
 	<ObjectSet>
 		<Object type="InstancedActor" id="InstancedActor1" priority="90">
-			<Param parent="Render"/>
+			<Param parent="render"/>
 			<Param is_static="true"/>
 			<Param pos_x="-10.0"/>
 			<Param pos_y="0.0"/>
@@ -28,13 +29,6 @@
 			<Param scale_x="0.5"/>
 			<Param scale_y="0.5"/>
 			<Param scale_z="1.0"/>
-<!--		
-			<Parent>Render</Parent>
-			<InstanceOf>Actor1</InstanceOf>
-			<Position x="-10.0" y="0.0" z="0.0"/>
-			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="0.5" y="0.5" z="1.0"/>
--->
 			<Component type="InstanceOf" priority="100">
 				<Param instance_of="Actor1"/>
 			</Component>
@@ -44,11 +38,16 @@
 				<Param model_file="teapot"/>
 				<Param is_static="true"/>
 			</Component>
-			<Parent>Actor1</Parent>
-			<InstanceOf></InstanceOf>
-			<Position x="0.0" y="-10.0" z="0.0"/>
-			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="0.5" y="0.5" z="0.5"/>	
+			<Param parent="Actor1"/>
+			<Param pos_x="0.0"/>
+			<Param pos_y="-10.0"/>
+			<Param pos_z="0.0"/>
+			<Param rot_h="-90.0"/>
+			<Param rot_p="0.0"/>
+			<Param rot_r="0.0"/>
+			<Param scale_x="0.5"/>
+			<Param scale_y="0.5"/>
+			<Param scale_z="0.5"/>
 		</Object>
 		<Object type="Actor" id="Actor1" priority="100">
 			<Component type="ControlByEvent" priority="90">
@@ -68,11 +67,16 @@
 			<Component type="Sound3d" priority="90">
 				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
-			<Parent>Render</Parent>
-			<InstanceOf></InstanceOf>
-			<Position x="0.0" y="0.0" z="0.0"/>
-			<Orientation h="-90.0" p="0.0" r="0.0"/>
-			<Scaling x="1.0" y="1.0" z="1.0"/>
+			<Param parent="render"/>
+			<Param pos_x="0.0"/>
+			<Param pos_y="0.0"/>
+			<Param pos_z="0.0"/>
+			<Param rot_h="-90.0"/>
+			<Param rot_p="0.0"/>
+			<Param rot_r="0.0"/>
+			<Param scale_x="1.0"/>
+			<Param scale_y="1.0"/>
+			<Param scale_z="1.0"/>
 		</Object>
 	</ObjectSet>
 </Game>

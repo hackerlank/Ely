@@ -95,117 +95,101 @@ Object::operator NodePath()
 
 void Object::sceneSetup()
 {
-	//////////////////////////////////////////////////////////////
-	//<!-- Scene Creation -->
-	//Static scene graph creation
-	std::cout << "Creating Scene" << std::endl;
-		//Parent (default: None)
-		tag = node->FirstChildElement("Parent");
-		if (tag != NULL)
+	//Parent (by default render)
+	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
+	//find parent into the created objects
+	ObjectTemplateManager::ObjectTable& createdObjects =
+			mTmpl->objectTmplMgr()->createdObjects();
+	ObjectTemplateManager::ObjectTable::iterator iter;
+	iter = createdObjects.find(parentId);
+	if (iter != createdObjects.end())
+	{
+		//reparent to parent
+		mNodePath.reparent_to(iter->second->nodePath());
+	}
+	else
+	{
+		//reparent to render
+		mNodePath.reparent_to(mTmpl->windowFramework()->get_render());
+	}
+	//Position (default: (0,0,0))
+
+	tag = node->FirstChildElement("Position");
+	if (tag != NULL)
+	{
+		const char *coord;
+		coord = tag->Attribute("x", NULL);
+		if (coord != NULL)
 		{
-			if (tag->FirstChild() != NULL)
-			{
-				tinyxml2::XMLText* text = tag->FirstChild()->ToText();
-				if (text != NULL)
-				{
-					std::string value = std::string(text->Value());
-					if (value == std::string("Render"))
-					{
-						objectNodePtr->nodePath().reparent_to(
-								mWindow->get_render());
-					}
-					else
-					{
-						ObjectTemplateManager::ObjectTable::iterator iter =
-								ObjectTemplateManager::GetSingleton().createdObjects().find(
-										ObjectId(value));
-						if (iter
-								!= ObjectTemplateManager::GetSingleton().createdObjects().end())
-						{
-							objectNodePtr->nodePath().reparent_to(
-									*iter->second.p());
-						}
-					}
-				}
-			}
+			objectNodePtr->nodePath().set_x((float) atof(coord));
 		}
-		//Position (default: (0,0,0))
-		tag = node->FirstChildElement("Position");
-		if (tag != NULL)
+		coord = tag->Attribute("y", NULL);
+		if (coord != NULL)
 		{
-			const char *coord;
-			coord = tag->Attribute("x", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_x((float) atof(coord));
-			}
-			coord = tag->Attribute("y", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_y((float) atof(coord));
-			}
-			coord = tag->Attribute("z", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_z((float) atof(coord));
-			}
+			objectNodePtr->nodePath().set_y((float) atof(coord));
 		}
-		//Orientation (default: (0,0,0))
-		tag = node->FirstChildElement("Orientation");
-		if (tag != NULL)
+		coord = tag->Attribute("z", NULL);
+		if (coord != NULL)
 		{
-			const char *coord;
-			coord = tag->Attribute("h", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_h((float) atof(coord));
-			}
-			coord = tag->Attribute("p", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_p((float) atof(coord));
-			}
-			coord = tag->Attribute("r", NULL);
-			if (coord != NULL)
-			{
-				objectNodePtr->nodePath().set_r((float) atof(coord));
-			}
-		}
-		//Scaling (default: (1.0,1.0,1.0))
-		tag = node->FirstChildElement("Scaling");
-		if (tag != NULL)
-		{
-			const char *coord;
-			coord = tag->Attribute("x", NULL);
-			if (coord != NULL)
-			{
-				float res = (float) atof(coord);
-				objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
-			}
-			coord = tag->Attribute("y", NULL);
-			if (coord != NULL)
-			{
-				float res = (float) atof(coord);
-				objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
-			}
-			coord = tag->Attribute("z", NULL);
-			if (coord != NULL)
-			{
-				float res = (float) atof(coord);
-				objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
-			}
+			objectNodePtr->nodePath().set_z((float) atof(coord));
 		}
 	}
+	//Orientation (default: (0,0,0))
+	tag = node->FirstChildElement("Orientation");
+	if (tag != NULL)
+	{
+		const char *coord;
+		coord = tag->Attribute("h", NULL);
+		if (coord != NULL)
+		{
+			objectNodePtr->nodePath().set_h((float) atof(coord));
+		}
+		coord = tag->Attribute("p", NULL);
+		if (coord != NULL)
+		{
+			objectNodePtr->nodePath().set_p((float) atof(coord));
+		}
+		coord = tag->Attribute("r", NULL);
+		if (coord != NULL)
+		{
+			objectNodePtr->nodePath().set_r((float) atof(coord));
+		}
+	}
+	//Scaling (default: (1.0,1.0,1.0))
+	tag = node->FirstChildElement("Scaling");
+	if (tag != NULL)
+	{
+		const char *coord;
+		coord = tag->Attribute("x", NULL);
+		if (coord != NULL)
+		{
+			float res = (float) atof(coord);
+			objectNodePtr->nodePath().set_sx((res != 0.0 ? res : 1.0));
+		}
+		coord = tag->Attribute("y", NULL);
+		if (coord != NULL)
+		{
+			float res = (float) atof(coord);
+			objectNodePtr->nodePath().set_sy((res != 0.0 ? res : 1.0));
+		}
+		coord = tag->Attribute("z", NULL);
+		if (coord != NULL)
+		{
+			float res = (float) atof(coord);
+			objectNodePtr->nodePath().set_sz((res != 0.0 ? res : 1.0));
+		}
+	}
+}
 }
 
 ObjectTemplate* Object::objectTmpl()
 {
-	return mTmpl;
+return mTmpl;
 }
 
 bool& Object::isStatic()
 {
-	return mIsStatic;
+return mIsStatic;
 }
 
 //TypedObject semantics: hardcoded

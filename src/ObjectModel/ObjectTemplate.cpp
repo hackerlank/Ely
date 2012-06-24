@@ -24,16 +24,20 @@
 #include "ObjectModel/ObjectTemplate.h"
 
 ObjectTemplate::ObjectTemplate(const ObjectType& name,
-		ObjectTemplateManager* objectTmplMgr) :
+		ObjectTemplateManager* objectTmplMgr, PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
 		mName(name)
 {
-	if (not objectTmplMgr)
+	if (not objectTmplMgr or not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"ObjectTemplate::ObjectTemplate: invalid ObjectTemplateManager");
+				"ObjectTemplate::ObjectTemplate: invalid ObjectTemplateManager or "
+						"PandaFramework or WindowFramework");
 
 	}
 	mObjectTmplMgr = objectTmplMgr;
+	mPandaFramework = pandaFramework;
+	mWindowFramework = windowFramework;
 	//reset parameters
 	resetParameters();
 }
@@ -84,6 +88,16 @@ ComponentTemplate* ObjectTemplate::getComponentTemplate(
 ObjectTemplateManager*& ObjectTemplate::objectTmplMgr()
 {
 	return mObjectTmplMgr;
+}
+
+PandaFramework*& ObjectTemplate::pandaFramework()
+{
+	return mPandaFramework;
+}
+
+WindowFramework*& ObjectTemplate::windowFramework()
+{
+	return mWindowFramework;
 }
 
 void ObjectTemplate::setParameters(ParameterTable& parameterTable)
@@ -155,7 +169,7 @@ void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 void ObjectTemplate::resetParameters()
 {
 	//set component parameters to their default values
-	mParent = std::string("");
+	mParent = std::string("render");
 	mIsStatic = std::string("false");
 	mPosX = std::string("0.0");
 	mPosY = std::string("0.0");
@@ -171,17 +185,17 @@ void ObjectTemplate::resetParameters()
 std::string& ObjectTemplate::parameter(const std::string& paramName)
 {
 	std::string* strPtr = &mUnknown;
-	CASE(paramName,strPtr,"parent",mParent)
-	CASE(paramName,strPtr,"is_static",mIsStatic)
-	CASE(paramName,strPtr,"pos_x",mPosX)
-	CASE(paramName,strPtr,"pos_y",mPosY)
-	CASE(paramName,strPtr,"pos_z",mPosZ)
-	CASE(paramName,strPtr,"rot_h",mRotH)
-	CASE(paramName,strPtr,"rot_p",mRotP)
-	CASE(paramName,strPtr,"rot_r",mRotR)
-	CASE(paramName,strPtr,"scale_x",mScaleX)
-	CASE(paramName,strPtr,"scale_y",mScaleY)
-	CASE(paramName,strPtr,"scale_z",mScaleZ)
+	CASE(paramName, strPtr, "parent", mParent)
+	CASE(paramName, strPtr, "is_static", mIsStatic)
+	CASE(paramName, strPtr, "pos_x", mPosX)
+	CASE(paramName, strPtr, "pos_y", mPosY)
+	CASE(paramName, strPtr, "pos_z", mPosZ)
+	CASE(paramName, strPtr, "rot_h", mRotH)
+	CASE(paramName, strPtr, "rot_p", mRotP)
+	CASE(paramName, strPtr, "rot_r", mRotR)
+	CASE(paramName, strPtr, "scale_x", mScaleX)
+	CASE(paramName, strPtr, "scale_y", mScaleY)
+	CASE(paramName, strPtr, "scale_z", mScaleZ)
 	//
 	return *strPtr;
 }
@@ -192,5 +206,6 @@ std::string& ObjectTemplate::parameter(const std::string& paramName)
 	//
 	return *strListPtr;
 }
+
 //TypedObject semantics: hardcoded
 TypeHandle ObjectTemplate::_type_handle;

@@ -67,35 +67,20 @@ void InstanceOf::onAddToObjectSetup()
 	//node path of this instance of
 	mOwnerObject->nodePath() = mNodePath;
 
-	//get the object this component is an instance of
-	//that object is supposed to be already set up and
-	//added to the created objects
+	//get that object this component is an instance of;
+	//that object is supposed to be already created,
+	//set up and added to the created objects table;
+	//if not this component is instance of nothing.
 	ObjectId instanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
-	NodePath instanceOfNP = mOwnerObject->objectTmpl()->objectTmplMgr()->createdObjects();
-
-	//InstanceOf (default: None)
-	tag = node->FirstChildElement("InstanceOf");
-	if (tag != NULL)
+	ObjectTemplateManager::ObjectTable& createdObjects =
+			mOwnerObject->objectTmpl()->objectTmplMgr()->createdObjects();
+	ObjectTemplateManager::ObjectTable::iterator iter;
+	iter = createdObjects.find(instanceOfId);
+	if (iter != createdObjects.end())
 	{
-		if (tag->FirstChild() != NULL)
-		{
-			tinyxml2::XMLText* text = tag->FirstChild()->ToText();
-			if (text != NULL)
-			{
-				std::string value = std::string(text->Value());
-				ObjectTemplateManager::ObjectTable::iterator iter =
-						ObjectTemplateManager::GetSingleton().createdObjects().find(
-								ObjectId(value));
-				if (iter
-						!= ObjectTemplateManager::GetSingleton().createdObjects().end())
-				{
-					iter->second->nodePath().instance_to(*objectNodePtr.p());
-				}
-			}
-		}
+		iter->second->nodePath().instance_to(mOwnerObject->nodePath());
 	}
-
 }
 
 InstanceOf::operator NodePath()

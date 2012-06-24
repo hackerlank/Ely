@@ -25,6 +25,7 @@
 #define OBJECTTEMPLATEMANAGER_H_
 
 #include <map>
+#include <reMutex.h>
 #include "Utilities/Tools.h"
 #include "ObjectTemplate.h"
 #include "Object.h"
@@ -41,7 +42,7 @@ class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
 {
 public:
 	/**
-	 * \brief
+	 * \brief Constructor.
 	 */
 	ObjectTemplateManager();
 

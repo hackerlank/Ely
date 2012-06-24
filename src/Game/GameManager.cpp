@@ -194,7 +194,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(type),
-				ObjectTemplateManager::GetSingletonPtr());
+				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
 		//cycle through the ComponentTmpl(s)' definitions ...
 		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
 				componentTmpl != NULL;
@@ -346,7 +346,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		for (objParam = object->FirstChildElement("Param"); objParam != NULL;
 				objParam = objParam->NextSiblingElement("Param"))
 		{
-			const tinyxml2::XMLAttribute* attribute = objParam->FirstAttribute();
+			const tinyxml2::XMLAttribute* attribute =
+					objParam->FirstAttribute();
 			if (not attribute)
 			{
 				continue;

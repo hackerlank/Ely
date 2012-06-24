@@ -28,6 +28,7 @@
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "GraphicsComponents/InstanceOfTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 class InstanceOfTemplate;
 

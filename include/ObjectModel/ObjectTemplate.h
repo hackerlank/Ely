@@ -57,8 +57,8 @@ public:
 	 * \brief Constructor.
 	 * @param name The name of this template.
 	 */
-	ObjectTemplate(const ObjectType& name,
-			ObjectTemplateManager* objectTmplMgr);
+	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr,
+			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 	/**
 	 * \brief Destructor.
@@ -104,6 +104,18 @@ public:
 	ObjectTemplateManager*& objectTmplMgr();
 
 	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
+	 */
+	PandaFramework*& pandaFramework();
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework*& windowFramework();
+
+	/**
 	 * \name Parameters management.
 	 * \brief Sets the parameters of the object, this object is
 	 * designed to create, to custom values.
@@ -135,6 +147,10 @@ private:
 	ComponentTemplateList mComponentTemplates;
 	///The ObjectTemplateManager.
 	ObjectTemplateManager* mObjectTmplMgr;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 	///@{
 	/// Set of allowed Parameters.
 	std::string mParent, mIsStatic, mPosX, mPosY, mPosZ, mRotH, mRotP, mRotR,
