@@ -24,16 +24,16 @@
 #ifndef GAMESUITEFIXTURE_H_
 #define GAMESUITEFIXTURE_H_
 
+#include "Game/GameManager.h"
+#include <boost/test/unit_test.hpp>
+
 struct GameSuiteFixture
 {
 	GameSuiteFixture()
 	{
-		// TODO
 	}
-
 	~GameSuiteFixture()
 	{
-		// TODO
 	}
 };
 

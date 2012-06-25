@@ -21,8 +21,6 @@
  * \author marco
  */
 
-#include "Game/GameManager.h"
-#include <boost/test/unit_test.hpp>
 #include "GameSuiteFixture.h"
 
 struct GameManagerTestCaseFixture
@@ -41,22 +39,10 @@ struct GameManagerTestCaseFixture
 /// Game suite
 BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
 
-//startup common to all test cases
-BOOST_AUTO_TEST_CASE(startupGameManager)
-{
-	BOOST_TEST_MESSAGE( "startup" );
-}
-
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(GameManagerTEST, GameManagerTestCaseFixture)
+BOOST_AUTO_TEST_CASE(GameManagerTEST)
 {
 	BOOST_CHECK(true);
-}
-
-//cleanup common to all test cases
-BOOST_AUTO_TEST_CASE(cleanupGameManager)
-{
-	BOOST_TEST_MESSAGE( "cleanup" );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Game suite

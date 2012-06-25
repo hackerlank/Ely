@@ -21,42 +21,25 @@
  * \author marco
  */
 
-#include "ObjectModel/ComponentTemplateManager.h"
-#include <boost/test/unit_test.hpp>
 #include "ObjectModelSuiteFixture.h"
 
 struct ComponentTemplateManagerTestCaseFixture
 {
 	ComponentTemplateManagerTestCaseFixture()
 	{
-		// TODO
 	}
-
 	~ComponentTemplateManagerTestCaseFixture()
 	{
-		// TODO
 	}
 };
 
 /// ObjectModel suite
 BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 
-//startup common to all test cases
-BOOST_AUTO_TEST_CASE(startupComponentTemplateManager)
-{
-	BOOST_TEST_MESSAGE( "startup" );
-}
-
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ComponentTemplateManagerTEST, ComponentTemplateManagerTestCaseFixture)
+BOOST_AUTO_TEST_CASE(ComponentTemplateManagerTEST)
 {
 	BOOST_CHECK(true);
-}
-
-//cleanup common to all test cases
-BOOST_AUTO_TEST_CASE(cleanupComponentTemplateManager)
-{
-	BOOST_TEST_MESSAGE( "cleanup" );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

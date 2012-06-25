@@ -21,20 +21,15 @@
  * \author marco
  */
 
-#include "Support/FirstPersonCamera.h"
-#include <boost/test/unit_test.hpp>
 #include "SupportSuiteFixture.h"
 
 struct FirstPersonCameraTestCaseFixture
 {
 	FirstPersonCameraTestCaseFixture()
 	{
-		// TODO
 	}
-
 	~FirstPersonCameraTestCaseFixture()
 	{
-		// TODO
 	}
 };
 
@@ -42,7 +37,7 @@ struct FirstPersonCameraTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Support, SupportSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(FirstPersonCameraTEST, FirstPersonCameraTestCaseFixture)
+BOOST_AUTO_TEST_CASE(FirstPersonCameraTEST)
 {
 	BOOST_CHECK(true);
 }

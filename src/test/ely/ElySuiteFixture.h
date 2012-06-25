@@ -24,16 +24,16 @@
 #ifndef ELYSUITEFIXTURE_H_
 #define ELYSUITEFIXTURE_H_
 
+#include "Ely.h"
+#include <boost/test/unit_test.hpp>
+
 struct ElySuiteFixture
 {
 	ElySuiteFixture()
 	{
-		// TODO
 	}
-
 	~ElySuiteFixture()
 	{
-		// TODO
 	}
 };
 

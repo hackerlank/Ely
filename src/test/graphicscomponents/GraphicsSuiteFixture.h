@@ -24,18 +24,46 @@
 #ifndef GRAPHICSSUITEFIXTURE_H_
 #define GRAPHICSSUITEFIXTURE_H_
 
+#include <boost/test/unit_test.hpp>
 #include <pandaFramework.h>
 #include <windowFramework.h>
+#include "GraphicsComponents/InstanceOf.h"
+#include "GraphicsComponents/InstanceOfTemplate.h"
+#include "GraphicsComponents/ModelTemplate.h"
+#include "GraphicsComponents/Model.h"
+#include "Utilities/Tools.h"
 
 struct GraphicsSuiteFixture
 {
-	GraphicsSuiteFixture()
+	GraphicsSuiteFixture() :
+			mInstanceOf(NULL), mInstanceOfId("InstanceOf_Test"), mInstanceOfTmpl(
+					new InstanceOfTemplate()), mModel(NULL), mModelId(
+					"Model_Test"), mModelTmpl(NULL)
 	{
+		InstanceOf::init_type();
+		InstanceOfTemplate::init_type();
+		int argc = 0;
+		char** argv = NULL;
+		mPanda = new PandaFramework();
+		mPanda->open_framework(argc, argv);
+		mWin = mPanda->open_window();
+		ModelTemplate::init_type();
+		Model::init_type();
 	}
 
 	~GraphicsSuiteFixture()
 	{
+		mPanda->close_framework();
+		delete mPanda;
 	}
+	PT(InstanceOf) mInstanceOf;
+	ComponentId mInstanceOfId;
+	PT(InstanceOfTemplate) mInstanceOfTmpl;
+	PT(Model) mModel;
+	ComponentId mModelId;
+	PT(ModelTemplate) mModelTmpl;
+	PandaFramework* mPanda;
+	WindowFramework* mWin;
 };
 
 #endif /* GRAPHICSSUITEFIXTURE_H_ */

@@ -21,91 +21,32 @@
  * \author marco
  */
 
-#include <boost/test/unit_test.hpp>
 #include "InputSuiteFixture.h"
 
 struct ControlByEventTestCaseFixture
 {
-	ControlByEventTestCaseFixture() :
-			mControl(NULL), mCompId("ControlByEvent_Test"), mControlTmpl(NULL), mObjectTmpl(
-					NULL)
+	ControlByEventTestCaseFixture()
 	{
 	}
-
 	~ControlByEventTestCaseFixture()
 	{
 	}
-	PT(ControlByEvent) mControl;
-	ComponentId mCompId;
-	PT(ControlByEventTemplate) mControlTmpl;
-	PT(ObjectTemplate) mObjectTmpl;
 };
-
-PandaFramework* pandaControlByEvent;
-WindowFramework* mWin0;
-std::vector<Event> mEvents;
-const float VAL = 1.0e+12;
-const float DEG = 89.999;
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Input,InputSuiteFixture)
 
-//startup common to all test cases
-BOOST_AUTO_TEST_CASE(startupControlByEvent)
-{
-	BOOST_TEST_MESSAGE( "startup" );
-	int argc = 0;
-	char** argv = NULL;
-	pandaControlByEvent = new PandaFramework();
-	pandaControlByEvent->open_framework(argc, argv);
-	mWin0 = pandaControlByEvent->open_window();
-	ControlByEventTemplate::init_type();
-	ControlByEvent::init_type();
-	ObjectTemplate::init_type();
-	Object::init_type();
-	mEvents.push_back(Event("w"));
-	mEvents.push_back(Event("shift-w"));
-	mEvents.push_back(Event("w-up"));
-	mEvents.push_back(Event("a"));
-	mEvents.push_back(Event("shift-a"));
-	mEvents.push_back(Event("a-up"));
-	mEvents.push_back(Event("s"));
-	mEvents.push_back(Event("shift-s"));
-	mEvents.push_back(Event("s-up"));
-	mEvents.push_back(Event("d"));
-	mEvents.push_back(Event("shift-d"));
-	mEvents.push_back(Event("d-up"));
-	mEvents.push_back(Event("q"));
-	mEvents.push_back(Event("shift-q"));
-	mEvents.push_back(Event("q-up"));
-	mEvents.push_back(Event("e"));
-	mEvents.push_back(Event("shift-e"));
-	mEvents.push_back(Event("e-up"));
-	mEvents.push_back(Event("r"));
-	mEvents.push_back(Event("shift-r"));
-	mEvents.push_back(Event("r-up"));
-	mEvents.push_back(Event("f"));
-	mEvents.push_back(Event("shift-f"));
-	mEvents.push_back(Event("f-up"));
-}
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixture)
+BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 {
-	ObjectTemplateManager mObjectTmplMgr;
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),pandaControlByEvent,mWin0);
-	mControlTmpl = new ControlByEventTemplate(pandaControlByEvent, mWin0);
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
+	mControlTmpl = new ControlByEventTemplate(mPanda, mWin);
 	mControl =
 	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mControl != NULL);
 	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
 	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
-	std::vector<Event>::iterator iter;
-	for (iter = mEvents.begin(); iter != mEvents.end(); ++iter)
-	{
-		//check if has event-handler
-		BOOST_REQUIRE(pandaControlByEvent->get_event_handler().has_hook(iter->get_name()));
-	}
-	GeomNode* testGeom = new GeomNode("testGeom");
+	PT(GeomNode) testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
 	testObj.nodePath() = testNP;
@@ -113,18 +54,24 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 	testObj.nodePath().set_hpr(DEG,DEG,DEG);
 	mControl->ownerObject() = &testObj;
 	mControl->onAddToObjectSetup();
-	GenericAsyncTask* task = DCAST(GenericAsyncTask,pandaControlByEvent->get_task_mgr().find_task("ControlByEvent::update"));
+	std::vector<Event>::iterator iter;
+	for (iter = mEvents.begin(); iter != mEvents.end(); ++iter)
+	{
+		//check if has event-handler
+		BOOST_REQUIRE(mPanda->get_event_handler().has_hook(iter->get_name()));
+	}
+	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("ControlByEvent::update"));
 	BOOST_REQUIRE(task != NULL);
 	unsigned int i;
 	//send movement events: 3 at a time
 	for (i = 0; i < mEvents.size(); i+=3)
 	{
-		pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[i]); //e.g. w
+		mPanda->get_event_handler().dispatch_event(&mEvents[i]); //e.g. w
 		mControl->update(task);
-		pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
-		pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[i+1]);//e.g. shift-w
+		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
+		mPanda->get_event_handler().dispatch_event(&mEvents[i+1]);//e.g. shift-w
 		mControl->update(task);
-		pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
+		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
 	}
 	//testObject should stay at (nearly) initial position/orientation
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0);
@@ -136,25 +83,17 @@ BOOST_FIXTURE_TEST_CASE(ControlByEventInitializeTEST,ControlByEventTestCaseFixtu
 	//send speed events
 	testObj.nodePath().set_pos(VAL,VAL,VAL);
 	Event speedFast("shift");
-	pandaControlByEvent->get_event_handler().dispatch_event(&speedFast);
-	pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[1]);//shift-w
+	mPanda->get_event_handler().dispatch_event(&speedFast);
+	mPanda->get_event_handler().dispatch_event(&mEvents[1]);//shift-w
 	mControl->update(task);
-	pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[2]);//w-up
-	pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[7]);//shift-s
+	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
+	mPanda->get_event_handler().dispatch_event(&mEvents[7]);//shift-s
 	mControl->update(task);
-	pandaControlByEvent->get_event_handler().dispatch_event(&mEvents[2]);//w-up
+	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
 	//testObject should stay at (nearly) initial position/orientation
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0);
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0);
 	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0);
-}
-
-//cleanup common to all test cases
-BOOST_AUTO_TEST_CASE(cleanupControlByEvent)
-{
-	BOOST_TEST_MESSAGE( "cleanup" );
-	pandaControlByEvent->close_framework();
-	delete pandaControlByEvent;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite

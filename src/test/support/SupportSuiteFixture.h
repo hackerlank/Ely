@@ -24,23 +24,16 @@
 #ifndef SUPPORTSUITEFIXTURE_H_
 #define SUPPORTSUITEFIXTURE_H_
 
-#include <nodePath.h>
-#include <pandaFramework.h>
-#include <windowFramework.h>
-#include <pointerTo.h>
-#include <audioManager.h>
-#include <string>
+#include <boost/test/unit_test.hpp>
+#include "Support/FirstPersonCamera.h"
 
 struct SupportSuiteFixture
 {
 	SupportSuiteFixture()
 	{
-		// TODO
 	}
-
 	~SupportSuiteFixture()
 	{
-		// TODO
 	}
 };
 

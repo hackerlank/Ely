@@ -24,6 +24,7 @@
 #ifndef AUDIOSUITEFIXTURE_H_
 #define AUDIOSUITEFIXTURE_H_
 
+#include <boost/test/unit_test.hpp>
 #include "AudioComponents/Sound3d.h"
 #include "AudioComponents/Sound3dTemplate.h"
 #include <pointerTo.h>
@@ -35,15 +36,33 @@
 
 struct AudioSuiteFixture
 {
-	AudioSuiteFixture()
+	AudioSuiteFixture() :
+		mSound3dTmpl(NULL), mSound3d(NULL), audioMgr(NULL), mCompId(
+				"Sound3d_Test")
 	{
-		// TODO
+		audioFile = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
+		int argc = 0;
+		char** argv = NULL;
+		mPanda = new PandaFramework();
+		mPanda->open_framework(argc, argv);
+		mWin = mPanda->open_window();
+		audioMgr = AudioManager::create_AudioManager();
+		Sound3dTemplate::init_type();
+		Sound3d::init_type();
 	}
 
 	~AudioSuiteFixture()
 	{
-		// TODO
+		mPanda->close_framework();
+				delete mPanda;
 	}
+	PandaFramework* mPanda;
+	WindowFramework* mWin;
+	std::string audioFile;
+	PT(Sound3dTemplate) mSound3dTmpl;
+	PT(Sound3d) mSound3d;
+	PT(AudioManager) audioMgr;
+	ComponentId mCompId;
 };
 
 #endif /* AUDIOSUITEFIXTURE_H_ */

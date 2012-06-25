@@ -25,55 +25,30 @@
 
 struct ObjectTestCaseFixture
 {
-	ObjectTestCaseFixture() :
-			mObject(NULL), mObjectTmpl(NULL), mModel(NULL)
+	ObjectTestCaseFixture()
 	{
 	}
-
 	~ObjectTestCaseFixture()
 	{
 	}
-	PT(Object) mObject;
-	PT(ObjectTemplate) mObjectTmpl;
-	PT(Model) mModel;
 };
-
-PandaFramework* pandaObject;
-WindowFramework* mWin;
 
 /// ObjectModel suite
 BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 
-//startup common to all test cases
-BOOST_AUTO_TEST_CASE(startupObject)
-{
-	BOOST_TEST_MESSAGE( "startup" );
-	pandaObject = new PandaFramework();
-	mWin = pandaObject->open_window();
-	Object::init_type();
-	ObjectTemplate::init_type();
-	Model::init_type();
-}
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(ObjectTemplateMethods, ObjectTestCaseFixture)
+BOOST_AUTO_TEST_CASE(ObjectConstructorTEST)
 {
-	BOOST_CHECK(true);
-}
-
-BOOST_FIXTURE_TEST_CASE(ObjectConstructorTEST, ObjectTestCaseFixture)
-{
-	ObjectTemplateManager mObjectTmplMgr;
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),pandaObject,mWin);
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
 	BOOST_CHECK(mObject->numComponents() == 0);
 	BOOST_CHECK(mObject->nodePath().is_empty());
 }
 
-BOOST_FIXTURE_TEST_CASE(ObjectComponentsTEST, ObjectTestCaseFixture)
+BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 {
-	ObjectTemplateManager mObjectTmplMgr;
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),pandaObject,mWin);
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	mModel = new Model();
 	mObject->addComponent(mModel);
@@ -83,14 +58,6 @@ BOOST_FIXTURE_TEST_CASE(ObjectComponentsTEST, ObjectTestCaseFixture)
 	BOOST_CHECK(mObject->numComponents() == 1);
 	mObject->clearComponents();
 	BOOST_CHECK(mObject->numComponents() == 0);
-}
-
-//cleanup common to all test cases
-BOOST_AUTO_TEST_CASE(cleanupObject)
-{
-	BOOST_TEST_MESSAGE( "cleanup" );
-	pandaObject->close_framework();
-	delete pandaObject;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

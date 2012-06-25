@@ -21,58 +21,33 @@
  * \author marco
  */
 
-#include <boost/test/unit_test.hpp>
 #include "AudioSuiteFixture.h"
 
 struct Sound3dTestCaseFixture
 {
-	Sound3dTestCaseFixture() :
-			mSound3dTmpl(NULL), mSound3d(NULL), audioMgr(NULL), mCompId(
-					"Sound3d_Test")
+	Sound3dTestCaseFixture()
 	{
 	}
 
 	~Sound3dTestCaseFixture()
 	{
 	}
-	PT(Sound3dTemplate) mSound3dTmpl;
-	PT(Sound3d) mSound3d;
-	PT(AudioManager) audioMgr;
-	ComponentId mCompId;
 };
-
-PandaFramework* pandaSound3d;
-WindowFramework* win;
-std::string audioFile = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
 
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 
-//startup common to all test cases
-BOOST_AUTO_TEST_CASE(startupSound3d)
-{
-	BOOST_TEST_MESSAGE( "startup" );
-	int argc = 0;
-	char** argv = NULL;
-	pandaSound3d = new PandaFramework();
-	pandaSound3d->open_framework(argc, argv);
-	win = pandaSound3d->open_window();
-	Sound3dTemplate::init_type();
-	Sound3d::init_type();
-}
-
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(Sound3dTESTS,Sound3dTestCaseFixture)
+BOOST_AUTO_TEST_CASE(Sound3dTEST)
 {
-	audioMgr = AudioManager::create_AudioManager();
-	BOOST_TEST_MESSAGE( "Sound3dTemplateTEST" );
-	mSound3dTmpl = new Sound3dTemplate(pandaSound3d,win,audioMgr);
+	BOOST_TEST_MESSAGE("TESTING Sound3dTemplate");
+	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin,audioMgr);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
 	mSound3dTmpl->resetParameters();
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 0);
 	mSound3dTmpl->parameterList("sound_files").push_back(audioFile);
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 1);
-	BOOST_TEST_MESSAGE( "Sound3dTEST" );
+	BOOST_TEST_MESSAGE("TESTING Sound3d");
 	mSound3d =
 	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mSound3d != NULL);
@@ -83,14 +58,6 @@ BOOST_FIXTURE_TEST_CASE(Sound3dTESTS,Sound3dTestCaseFixture)
 	BOOST_CHECK(mSound3d->sounds().size() == 0);
 	mSound3d->addSound(audioFile);
 	BOOST_CHECK(mSound3d->sounds().size() == 1);
-}
-
-//cleanup common to all test cases
-BOOST_AUTO_TEST_CASE(cleanupSound3d)
-{
-	BOOST_TEST_MESSAGE( "cleanup" );
-	pandaSound3d->close_framework();
-	delete pandaSound3d;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite

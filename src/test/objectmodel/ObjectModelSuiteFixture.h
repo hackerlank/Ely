@@ -25,20 +25,34 @@
 #define OBJECTMODELSUITEFIXTURE_H_
 
 #include <boost/test/unit_test.hpp>
+#include "ObjectModel/ComponentTemplateManager.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplateManager.h"
 #include "GraphicsComponents/Model.h"
 
 struct ObjectModelSuiteFixture
 {
-	ObjectModelSuiteFixture()
+	ObjectModelSuiteFixture() :
+			mObject(NULL), mObjectTmpl(NULL), mModel(NULL)
 	{
+		mPanda = new PandaFramework();
+		mWin = mPanda->open_window();
+		Object::init_type();
+		ObjectTemplate::init_type();
+		Model::init_type();
 	}
-
 	~ObjectModelSuiteFixture()
 	{
+		mPanda->close_framework();
+		delete mPanda;
 	}
+	PT(Object) mObject;
+	PT(ObjectTemplate) mObjectTmpl;
+	PT(Model) mModel;
+	PandaFramework* mPanda;
+	WindowFramework* mWin;
+	ObjectTemplateManager mObjectTmplMgr;
 };
 
 #endif /* OBJECTMODELSUITEFIXTURE_H_ */
