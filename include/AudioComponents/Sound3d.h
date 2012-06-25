@@ -34,6 +34,7 @@
 #include <map>
 #include <set>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
 class Sound3dTemplate;

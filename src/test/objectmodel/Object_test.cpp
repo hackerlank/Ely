@@ -21,33 +21,39 @@
  * \author marco
  */
 
-#include "ObjectModel/Object.h"
-#include <boost/test/unit_test.hpp>
 #include "ObjectModelSuiteFixture.h"
-
-#include "ObjectModel/ObjectTemplate.h"
-#include "GraphicsComponents/Model.h"
 
 struct ObjectTestCaseFixture
 {
-	ObjectTestCaseFixture()
+	ObjectTestCaseFixture() :
+			mObject(NULL), mObjectTmpl(NULL), mModel(NULL)
 	{
-//		mObject = new Object(ObjectId("TestObject"));
-//		mModel = new Model();
 	}
 
 	~ObjectTestCaseFixture()
 	{
-//		//delete mModel;: owned by mObject
-//		delete mObject;
 	}
-//	Object* mObject;
-//	Model* mModel;
+	PT(Object) mObject;
+	PT(ObjectTemplate) mObjectTmpl;
+	PT(Model) mModel;
 };
+
+PandaFramework* pandaObject;
+WindowFramework* mWin;
 
 /// ObjectModel suite
 BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 
+//startup common to all test cases
+BOOST_AUTO_TEST_CASE(startupObject)
+{
+	BOOST_TEST_MESSAGE( "startup" );
+	pandaObject = new PandaFramework();
+	mWin = pandaObject->open_window();
+	Object::init_type();
+	ObjectTemplate::init_type();
+	Model::init_type();
+}
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ObjectTemplateMethods, ObjectTestCaseFixture)
 {
@@ -56,20 +62,35 @@ BOOST_FIXTURE_TEST_CASE(ObjectTemplateMethods, ObjectTestCaseFixture)
 
 BOOST_FIXTURE_TEST_CASE(ObjectConstructorTEST, ObjectTestCaseFixture)
 {
-//	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
-//	BOOST_CHECK(mObject->numComponents() == 0);
-//	BOOST_CHECK(mObject->nodePath().is_empty());
+	ObjectTemplateManager mObjectTmplMgr;
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),pandaObject,mWin);
+	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
+	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
+	BOOST_CHECK(mObject->numComponents() == 0);
+	BOOST_CHECK(mObject->nodePath().is_empty());
 }
 
 BOOST_FIXTURE_TEST_CASE(ObjectComponentsTEST, ObjectTestCaseFixture)
 {
-//	mObject->addComponent(mModel);
-//	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
-//	BOOST_CHECK(mObject->numComponents() == 1);
-//	mObject->addComponent(mModel);
-//	BOOST_CHECK(mObject->numComponents() == 1);
-//	mObject->clearComponents();
-//	BOOST_CHECK(mObject->numComponents() == 0);
+	ObjectTemplateManager mObjectTmplMgr;
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),pandaObject,mWin);
+	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
+	mModel = new Model();
+	mObject->addComponent(mModel);
+	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
+	BOOST_CHECK(mObject->numComponents() == 1);
+	mObject->addComponent(mModel);
+	BOOST_CHECK(mObject->numComponents() == 1);
+	mObject->clearComponents();
+	BOOST_CHECK(mObject->numComponents() == 0);
+}
+
+//cleanup common to all test cases
+BOOST_AUTO_TEST_CASE(cleanupObject)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
+	pandaObject->close_framework();
+	delete pandaObject;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

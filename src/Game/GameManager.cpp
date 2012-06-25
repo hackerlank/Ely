@@ -318,11 +318,11 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		}
 		//create the object
 		Object *objectPtr;
-		if ((objId != NULL) and (*objId != std::string("")))
+		if ((objId != NULL) and (std::string(objId) != std::string("")))
 		{
 			// set id with the passed id
 			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objType, ObjectId(objId)));
+					ObjectType(objType), ObjectId(objId));
 		}
 		else
 		{
@@ -564,7 +564,7 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
 	PT(Object) actor1 =
-			gameManager->ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
+			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
 	ControlByEvent* actor1Control = DCAST(ControlByEvent, actor1->getComponent(
 					ComponentFamilyType("Input")));
 	bool isEnabled = actor1Control->isEnabled();

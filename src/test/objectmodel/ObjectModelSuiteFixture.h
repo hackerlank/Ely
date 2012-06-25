@@ -24,6 +24,12 @@
 #ifndef OBJECTMODELSUITEFIXTURE_H_
 #define OBJECTMODELSUITEFIXTURE_H_
 
+#include <boost/test/unit_test.hpp>
+#include "ObjectModel/ObjectTemplate.h"
+#include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
+#include "GraphicsComponents/Model.h"
+
 struct ObjectModelSuiteFixture
 {
 	ObjectModelSuiteFixture()

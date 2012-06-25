@@ -41,10 +41,22 @@ struct ElyTestCaseFixture
 /// Ely suite
 BOOST_FIXTURE_TEST_SUITE(Ely, ElySuiteFixture)
 
+//startup common to all test cases
+BOOST_AUTO_TEST_CASE(startupEly)
+{
+	BOOST_TEST_MESSAGE( "startup" );
+}
+
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ElyTestCaseTEST, ElyTestCaseFixture)
 {
 	BOOST_CHECK(true);
+}
+
+//cleanup common to all test cases
+BOOST_AUTO_TEST_CASE(cleanupEly)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Ely suite

@@ -34,6 +34,7 @@
 #include <graphicsWindow.h>
 #include <windowProperties.h>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
 class ControlByEventTemplate;

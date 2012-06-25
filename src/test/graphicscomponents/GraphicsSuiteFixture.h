@@ -31,17 +31,11 @@ struct GraphicsSuiteFixture
 {
 	GraphicsSuiteFixture()
 	{
-		mPandaFrmwk = new PandaFramework();
-		mWindowFrmwk = mPandaFrmwk->open_window();
 	}
 
 	~GraphicsSuiteFixture()
 	{
-		delete mWindowFrmwk;
-		delete mPandaFrmwk;
 	}
-	PandaFramework* mPandaFrmwk;
-	WindowFramework* mWindowFrmwk;
 };
 
 #endif /* GRAPHICSSUITEFIXTURE_H_ */

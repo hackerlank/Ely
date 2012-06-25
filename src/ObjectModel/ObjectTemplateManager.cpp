@@ -103,7 +103,7 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 	{
 		newId = objectId;
 	}
-	Object* newObj = new Object(newId);
+	Object* newObj = new Object(newId, objectTmpl);
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 			objectTmpl->getComponentTemplates();
@@ -120,12 +120,12 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 		newObj->addComponent(newComp);
 	}
 	//insert the just created object in the table of created objects
-	mCreatedObjects[newId()] = PT(Object)(newObj);
+	mCreatedObjects[newId] = PT(Object)(newObj);
 	//
 	return newObj;
 }
 
-const ObjectTemplateManager::ObjectTable& ObjectTemplateManager::createdObjects()
+ObjectTemplateManager::ObjectTable& ObjectTemplateManager::createdObjects()
 {
 	return mCreatedObjects;
 }

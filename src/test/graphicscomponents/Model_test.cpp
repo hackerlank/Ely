@@ -30,48 +30,57 @@
 
 struct ModelTestCaseFixture
 {
-	ModelTestCaseFixture()
+	ModelTestCaseFixture() :
+			mModel(NULL), mCompId("Model_Test"), mModelTmpl(NULL)
 	{
-//		mModel=NULL;
-//		mCompId = "Model_Test";
-//		int argc = 0;
-//		char** argv = NULL;
-//		mPanda = new PandaFramework();
-//		mPanda->open_framework(argc, argv);
-//		mModelTmpl = new ModelTemplate(mPanda, mPanda->open_window());
-//		ModelTemplate::init_type();
-//		Model::init_type();
 	}
 
 	~ModelTestCaseFixture()
 	{
-//		if (mModel)
-//		{
-//			delete mModel;
-//		}
-//		delete mModelTmpl;
-//		mPanda->close_framework();
-//		delete mPanda;
 	}
-//	PandaFramework* mPanda;
-//	ModelTemplate* mModelTmpl;
-//	Model* mModel;
-//	ComponentId mCompId;
+	PT(Model) mModel;
+	ComponentId mCompId;
+	PT(ModelTemplate) mModelTmpl;
 };
+
+PandaFramework* pandaModel;
+WindowFramework* winModel;
 
 /// Graphics suite
 BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
 
+//startup common to all test cases
+BOOST_AUTO_TEST_CASE(startupModel)
+{
+	BOOST_TEST_MESSAGE( "startup" );
+	int argc = 0;
+	char** argv = NULL;
+	pandaModel = new PandaFramework();
+	pandaModel->open_framework(argc, argv);
+	winModel = pandaModel->open_window();
+	ModelTemplate::init_type();
+	Model::init_type();
+}
+
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ModelTemplateTEST, ModelTestCaseFixture)
 {
-//	mModelTmpl->resetParameters();
-//	mModelTmpl->modelFile() = Filename("panda");
-//	mModel =
-//	DCAST(Model, mModelTmpl->makeComponent(mCompId));
-//	BOOST_REQUIRE(mModel != NULL);
-//	BOOST_CHECK(mModel->componentType() == ComponentId("Model"));
-//	BOOST_CHECK(mModel->familyType() == ComponentFamilyType("Graphics"));
+	mModelTmpl = new ModelTemplate(pandaModel, pandaModel->open_window());
+	mModelTmpl->resetParameters();
+	mModelTmpl->parameter("model_file") = Filename("panda");
+	mModel =
+	DCAST(Model, mModelTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mModel != NULL);
+	BOOST_CHECK(mModel->componentType() == ComponentId("Model"));
+	BOOST_CHECK(mModel->familyType() == ComponentFamilyType("Graphics"));
+}
+
+//cleanup common to all test cases
+BOOST_AUTO_TEST_CASE(cleanupModel)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
+	pandaModel->close_framework();
+	delete pandaModel;
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Graphics suite

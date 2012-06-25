@@ -41,10 +41,22 @@ struct ObjectTemplateManagerTestCaseFixture
 /// ObjectModel suite
 BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 
+//startup common to all test cases
+BOOST_AUTO_TEST_CASE(startupObjectTemplateManager)
+{
+	BOOST_TEST_MESSAGE( "startup" );
+}
+
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(ObjectTemplateManagerTEST, ObjectTemplateManagerTestCaseFixture)
 {
 	BOOST_CHECK(true);
+}
+
+//cleanup common to all test cases
+BOOST_AUTO_TEST_CASE(cleanupObjectTemplateManager)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // ObjectModel suite

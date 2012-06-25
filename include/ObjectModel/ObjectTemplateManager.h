@@ -93,7 +93,7 @@ public:
 	 * \brief Gets/sets the created objects table.
 	 * @return A reference to the ObjectTable.
 	 */
-	const ObjectTable& createdObjects();
+	ObjectTable& createdObjects();
 
 private:
 	///Table of object templates indexed by their name.

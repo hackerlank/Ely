@@ -200,7 +200,7 @@ std::string& ObjectTemplate::parameter(const std::string& paramName)
 	return *strPtr;
 }
 
-std::string& ObjectTemplate::parameter(const std::string& paramName)
+std::list<std::string>& ObjectTemplate::parameterList(const std::string& paramName)
 {
 	std::list<std::string>* strListPtr = &mUnknownList;
 	//

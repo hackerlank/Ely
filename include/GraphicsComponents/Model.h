@@ -32,6 +32,7 @@
 #include <auto_bind.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 #include "GraphicsComponents/ModelTemplate.h"
 
 class ModelTemplate;

@@ -26,6 +26,7 @@
 
 #include "InputComponents/ControlByEvent.h"
 #include "InputComponents/ControlByEventTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include <pandaFramework.h>
 #include <nodePath.h>
 #include <geomNode.h>

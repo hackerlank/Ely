@@ -31,28 +31,29 @@
 struct InstanceOfTestCaseFixture
 {
 	InstanceOfTestCaseFixture() :
-			mInstanceOf(NULL), mCompId("InstanceOf_Test")
+			mInstanceOf(NULL), mCompId("InstanceOf_Test"), mInstanceOfTmpl(
+					new InstanceOfTemplate())
 	{
-		mInstanceOfTmpl = new InstanceOfTemplate();
-		InstanceOf::init_type();
-		InstanceOfTemplate::init_type();
 	}
 
 	~InstanceOfTestCaseFixture()
 	{
-		delete mInstanceOfTmpl;
-		if (mInstanceOf)
-		{
-			delete mInstanceOf;
-		}
 	}
-	InstanceOfTemplate* mInstanceOfTmpl;
-	InstanceOf* mInstanceOf;
+	PT(InstanceOf) mInstanceOf;
 	ComponentId mCompId;
+	PT(InstanceOfTemplate) mInstanceOfTmpl;
 };
 
 /// Graphics suite
 BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
+
+//startup common to all test cases
+BOOST_AUTO_TEST_CASE(startupInstanceOf)
+{
+	BOOST_TEST_MESSAGE( "startup" );
+	InstanceOf::init_type();
+	InstanceOfTemplate::init_type();
+}
 
 /// Test cases
 BOOST_FIXTURE_TEST_CASE(InstanceOfTemplateTEST, InstanceOfTestCaseFixture)
@@ -62,6 +63,12 @@ BOOST_FIXTURE_TEST_CASE(InstanceOfTemplateTEST, InstanceOfTestCaseFixture)
 	BOOST_REQUIRE(mInstanceOf != NULL);
 	BOOST_CHECK(mInstanceOf->componentType() == ComponentId("InstanceOf"));
 	BOOST_CHECK(mInstanceOf->familyType() == ComponentFamilyType("Graphics"));
+}
+
+//cleanup common to all test cases
+BOOST_AUTO_TEST_CASE(cleanupInstanceOf)
+{
+	BOOST_TEST_MESSAGE( "cleanup" );
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Graphics suite
