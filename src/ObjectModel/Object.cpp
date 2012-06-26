@@ -59,7 +59,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 {
 	if (not newComponent)
 	{
-		throw GameException("Object::setComponent: NULL new Component");
+		throw GameException("Object::addComponent: NULL new Component");
 	}
 	PT(Component) previousComp = NULL;
 	ComponentFamilyType familyId = newComponent->familyType();

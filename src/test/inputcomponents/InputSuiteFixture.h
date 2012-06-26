@@ -39,7 +39,7 @@ struct InputSuiteFixture
 {
 	InputSuiteFixture() :
 			mControl(NULL), mCompId("ControlByEvent_Test"), mControlTmpl(NULL), mObjectTmpl(
-					NULL),VAL(1.0e+12),DEG(89.999)
+					NULL), VAL(1.0e+12), DEG(89.999)
 	{
 		int argc = 0;
 		char** argv = NULL;
@@ -77,13 +77,21 @@ struct InputSuiteFixture
 	}
 	~InputSuiteFixture()
 	{
+		//delete always component before its template
+		if (mControl)
+		{
+			delete mControl;
+		}
+		if (mControlTmpl)
+		{
+			delete mControlTmpl;
+		}
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	PT(ControlByEvent) mControl;
+	ControlByEvent* mControl;
 	ComponentId mCompId;
-	PT(ControlByEventTemplate) mControlTmpl;
-	PT(ObjectTemplate) mObjectTmpl;
+	ControlByEventTemplate* mControlTmpl;PT(ObjectTemplate) mObjectTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	std::vector<Event> mEvents;

@@ -50,7 +50,10 @@ BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 {
 	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
-	mModel = new Model();
+	mModelTmpl = new ModelTemplate(mPanda,mWin);
+	mModelTmpl->parameter("model_file") = "panda";
+	mModel =
+	DCAST(Model, mModelTmpl->makeComponent(ComponentId("TestModel")));
 	mObject->addComponent(mModel);
 	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
 	BOOST_CHECK(mObject->numComponents() == 1);

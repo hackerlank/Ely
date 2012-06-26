@@ -34,22 +34,41 @@
 struct ObjectModelSuiteFixture
 {
 	ObjectModelSuiteFixture() :
-			mObject(NULL), mObjectTmpl(NULL), mModel(NULL)
+			mObject(NULL), mObjectTmpl(NULL), mModel(NULL), mModelTmpl(NULL)
 	{
+		int argc = 0;
+		char** argv = NULL;
 		mPanda = new PandaFramework();
+		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
 		Object::init_type();
 		ObjectTemplate::init_type();
 		Model::init_type();
+		ModelTemplate::init_type();
 	}
 	~ObjectModelSuiteFixture()
 	{
+		//delete objects/components before their templates
+		if (mObject)
+		{
+			delete mObject;
+		}
+		if (mObjectTmpl)
+		{
+			delete mObjectTmpl;
+		}
+		//mModel is deleted by mObject
+		if (mModelTmpl)
+		{
+			delete mModelTmpl;
+		}
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	PT(Object) mObject;
-	PT(ObjectTemplate) mObjectTmpl;
-	PT(Model) mModel;
+	Object* mObject;
+	ObjectTemplate* mObjectTmpl;
+	Model* mModel;
+	ModelTemplate* mModelTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	ObjectTemplateManager mObjectTmplMgr;

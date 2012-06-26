@@ -53,15 +53,32 @@ struct GraphicsSuiteFixture
 
 	~GraphicsSuiteFixture()
 	{
+		//delete components before their templates
+		if (mInstanceOf)
+		{
+			delete mInstanceOf;
+		}
+		if (mInstanceOfTmpl)
+		{
+			delete mInstanceOfTmpl;
+		}
+		if (mModel)
+		{
+			delete mModel;
+		}
+		if (mModelTmpl)
+		{
+			delete mModelTmpl;
+		}
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	PT(InstanceOf) mInstanceOf;
+	InstanceOf* mInstanceOf;
 	ComponentId mInstanceOfId;
-	PT(InstanceOfTemplate) mInstanceOfTmpl;
-	PT(Model) mModel;
+	InstanceOfTemplate* mInstanceOfTmpl;
+	Model* mModel;
 	ComponentId mModelId;
-	PT(ModelTemplate) mModelTmpl;
+	ModelTemplate* mModelTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 };

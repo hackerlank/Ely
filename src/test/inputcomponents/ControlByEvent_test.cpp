@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 	BOOST_REQUIRE(mControl != NULL);
 	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
 	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
-	PT(GeomNode) testGeom = new GeomNode("testGeom");
+	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
 	testObj.nodePath() = testNP;

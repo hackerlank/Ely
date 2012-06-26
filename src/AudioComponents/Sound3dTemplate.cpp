@@ -52,7 +52,7 @@ const ComponentFamilyType Sound3dTemplate::familyType() const
 	return ComponentFamilyType("Audio");
 }
 
-Component* Sound3dTemplate::makeComponent(ComponentId& compId)
+Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
 {
 	Sound3d* newSound3d = new Sound3d(this);
 	newSound3d->componentId() = compId;

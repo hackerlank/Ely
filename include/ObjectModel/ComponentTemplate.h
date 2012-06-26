@@ -56,7 +56,7 @@ public:
 	 * \brief Creates the actual component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
-	virtual Component* makeComponent(ComponentId& compId) = 0;
+	virtual Component* makeComponent(const ComponentId& compId) = 0;
 
 	/**
 	 * \name Parameters management.

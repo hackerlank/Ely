@@ -43,7 +43,7 @@ const ComponentFamilyType InstanceOfTemplate::familyType() const
 	return ComponentFamilyType("Graphics");
 }
 
-Component* InstanceOfTemplate::makeComponent(ComponentId& compId)
+Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 {
 	InstanceOf* newInstanceOf = new InstanceOf(this);
 	newInstanceOf->componentId() = compId;

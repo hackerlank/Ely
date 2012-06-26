@@ -53,14 +53,23 @@ struct AudioSuiteFixture
 
 	~AudioSuiteFixture()
 	{
+		//delete components before their templates
+		if (mSound3d)
+		{
+			delete mSound3d;
+		}
+		if (mSound3dTmpl)
+		{
+			delete mSound3dTmpl;
+		}
 		mPanda->close_framework();
-				delete mPanda;
+		delete mPanda;
 	}
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	std::string audioFile;
-	PT(Sound3dTemplate) mSound3dTmpl;
-	PT(Sound3d) mSound3d;
+	Sound3dTemplate* mSound3dTmpl;
+	Sound3d* mSound3d;
 	PT(AudioManager) audioMgr;
 	ComponentId mCompId;
 };

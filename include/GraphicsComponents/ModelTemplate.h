@@ -48,7 +48,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual Component* makeComponent(ComponentId& compId);
+	virtual Component* makeComponent(const ComponentId& compId);
 
 	virtual void setParameters(ParameterTable& parameterTable);
 	virtual void resetParameters();

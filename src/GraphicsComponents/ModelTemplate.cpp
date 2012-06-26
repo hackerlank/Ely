@@ -52,7 +52,7 @@ const ComponentFamilyType ModelTemplate::familyType() const
 	return ComponentFamilyType("Graphics");
 }
 
-Component* ModelTemplate::makeComponent(ComponentId& compId)
+Component* ModelTemplate::makeComponent(const ComponentId& compId)
 {
 	Model* newModel = new Model(this);
 	newModel->componentId() = compId;

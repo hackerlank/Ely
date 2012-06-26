@@ -51,7 +51,7 @@ const ComponentFamilyType ControlByEventTemplate::familyType() const
 	return ComponentFamilyType("Input");
 }
 
-Component* ControlByEventTemplate::makeComponent(ComponentId& compId)
+Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
 {
 	ControlByEvent* newControl = new ControlByEvent(this);
 	newControl->componentId() = compId;
