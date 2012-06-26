@@ -7,16 +7,19 @@
 			<ComponentTmpl family="Input" type="ControlByEvent"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 		</ObjectTmpl>
+<!--
 		<ObjectTmpl type="InstancedActor">
 			<ComponentTmpl family="Graphics" type="InstanceOf"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="StaticActor">
 			<ComponentTmpl family="Graphics" type="Model"/>
 		</ObjectTmpl>
+-->
 	</ObjectTmplSet>
 
 	<!-- Objects and Scene Creation -->
 	<ObjectSet>
+<!--
 		<Object type="InstancedActor" id="InstancedActor1" priority="90">
 			<Param parent="render"/>
 			<Param is_static="true"/>
@@ -49,6 +52,7 @@
 			<Param scale_y="0.5"/>
 			<Param scale_z="0.5"/>
 		</Object>
+-->
 		<Object type="Actor" id="Actor1" priority="100">
 			<Component type="ControlByEvent" priority="90">
 				<Param enabled="false"/>

@@ -33,6 +33,7 @@
 #include <genericAsyncTask.h>
 #include <map>
 #include <set>
+#include <string>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -128,7 +129,7 @@ public:
 	SoundTable& sounds();
 
 	/**
-	 * \brief Updates position of sounds in the 3D audio system.
+	 * \brief Updates position and velocity of sounds of this components.
 	 *
 	 * Will be called automatically in a task.
 	 * @param task The task.

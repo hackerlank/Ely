@@ -83,12 +83,18 @@ void GameManager::setup()
 	//Actor1
 	PT(Object) actor1 =
 			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
+	//play animation
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Graphics")));
 	actor1Model->animations().loop("panda_soft", false);
 	//enable/disable control by event
 	define_key("c", "enableActor1Control", &GameManager::toggleActor1Control,
 			(void*) this);
+	//play sound
+	Sound3d* actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
+			ComponentFamilyType("Audio")));
+	actor1Sound3d->sounds().begin()->second->set_loop();
+	actor1Sound3d->sounds().begin()->second->play();
 
 	//InstancedActor1
 	PT(Object) instancedActor1 =

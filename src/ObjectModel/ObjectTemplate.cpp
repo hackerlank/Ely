@@ -174,7 +174,7 @@ void ObjectTemplate::resetParameters()
 	mPosX = std::string("0.0");
 	mPosY = std::string("0.0");
 	mPosZ = std::string("0.0");
-	mRotH = std::string("v");
+	mRotH = std::string("0.0");
 	mRotP = std::string("0.0");
 	mRotR = std::string("0.0");
 	mScaleX = std::string("1.0");

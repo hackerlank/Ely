@@ -77,7 +77,11 @@ struct InputSuiteFixture
 	}
 	~InputSuiteFixture()
 	{
-		//delete always component before its template
+		//delete always objects/components before their template
+		if (mObjectTmpl)
+		{
+			delete mObjectTmpl;
+		}
 		if (mControl)
 		{
 			delete mControl;
@@ -91,7 +95,8 @@ struct InputSuiteFixture
 	}
 	ControlByEvent* mControl;
 	ComponentId mCompId;
-	ControlByEventTemplate* mControlTmpl;PT(ObjectTemplate) mObjectTmpl;
+	ControlByEventTemplate* mControlTmpl;
+	ObjectTemplate* mObjectTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	std::vector<Event> mEvents;

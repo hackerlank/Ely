@@ -32,13 +32,16 @@
 #include <audioSound.h>
 #include <pandaFramework.h>
 #include <windowFramework.h>
-#include <string>
+#include <genericAsyncTask.h>
+#include <nodePath.h>
+#include <geomNode.h>
+#include <vector>
 
 struct AudioSuiteFixture
 {
 	AudioSuiteFixture() :
-		mSound3dTmpl(NULL), mSound3d(NULL), audioMgr(NULL), mCompId(
-				"Sound3d_Test")
+			mSound3dTmpl(NULL), mSound3d(NULL), audioMgr(NULL), mCompId(
+					"Sound3d_Test"), mObjectTmpl(NULL)
 	{
 		audioFile = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
 		int argc = 0;
@@ -49,15 +52,17 @@ struct AudioSuiteFixture
 		audioMgr = AudioManager::create_AudioManager();
 		Sound3dTemplate::init_type();
 		Sound3d::init_type();
+		ObjectTemplate::init_type();
 	}
 
 	~AudioSuiteFixture()
 	{
 		//delete components before their templates
-		if (mSound3d)
+		if (mObjectTmpl)
 		{
-			delete mSound3d;
+			delete mObjectTmpl;
 		}
+		//mSound3d is deleted by mObject
 		if (mSound3dTmpl)
 		{
 			delete mSound3dTmpl;
@@ -72,6 +77,7 @@ struct AudioSuiteFixture
 	Sound3d* mSound3d;
 	PT(AudioManager) audioMgr;
 	ComponentId mCompId;
+	ObjectTemplate* mObjectTmpl;
 };
 
 #endif /* AUDIOSUITEFIXTURE_H_ */

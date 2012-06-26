@@ -34,6 +34,11 @@ struct Sound3dTestCaseFixture
 	}
 };
 
+static float posExpected[] =
+{ 0.0, 1.0/60.0, 0.0, 1.0/30.0, 1.0/30.0, 0.0 };
+static float velExpected[] =
+{ 0.0, 1.0, -1.0, 2.0, 0.0, -2.0 };
+
 /// Input suite
 BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 
@@ -58,6 +63,42 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	BOOST_CHECK(mSound3d->sounds().size() == 0);
 	mSound3d->addSound(audioFile);
 	BOOST_CHECK(mSound3d->sounds().size() == 1);
+}
+
+BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
+{
+	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin,audioMgr);
+	BOOST_REQUIRE(mSound3dTmpl != NULL);
+	mSound3dTmpl->resetParameters();
+	mSound3dTmpl->parameterList("sound_files").push_back(audioFile);
+	mSound3d =
+	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mSound3d != NULL);
+	GeomNode* testGeom = new GeomNode("testGeom");
+	NodePath testNP(testGeom);
+	Object testObj("testObj",mObjectTmpl);
+	testObj.nodePath() = testNP;
+	mSound3d->ownerObject() = &testObj;
+	mSound3d->onAddToObjectSetup();
+	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("Sound3d::update"));
+	BOOST_REQUIRE(task != NULL);
+	float posx,posy,posz,velx,vely,velz;
+	//call update: sound pos & vel = 0.0
+	for (unsigned int i = 0; i < (sizeof(posExpected)/sizeof(float)); ++i)
+	{
+		//move object nodepath (in posExpected)
+		testObj.nodePath().set_pos(posExpected[i],posExpected[i],posExpected[i]);
+		//call update (dt = 0.016666667)
+		mSound3d->update(task);
+		//check results
+		mSound3d->sounds()[audioFile]->get_3d_attributes(&posx,&posy,&posz,&velx,&vely,&velz);
+		BOOST_CHECK_CLOSE( posx, posExpected[i], 1.0);
+		BOOST_CHECK_CLOSE( posy, posExpected[i], 1.0);
+		BOOST_CHECK_CLOSE( posz, posExpected[i], 1.0);
+		BOOST_CHECK_CLOSE( velx, velExpected[i], 1.0);
+		BOOST_CHECK_CLOSE( vely, velExpected[i], 1.0);
+		BOOST_CHECK_CLOSE( velz, velExpected[i], 1.0);
+	}
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite
