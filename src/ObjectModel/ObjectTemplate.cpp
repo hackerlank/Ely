@@ -102,68 +102,18 @@ WindowFramework*& ObjectTemplate::windowFramework()
 
 void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 {
-
 	ParameterTable::iterator iter;
-	//parent
-	iter = parameterTable.find("parent");
-	if (iter != parameterTable.end())
-	{
-		mParent = iter->second;
-	}
-	//is static
-	iter = parameterTable.find("is_static");
-	if (iter != parameterTable.end())
-	{
-		mIsStatic = iter->second;
-	}
-	//position
-	iter = parameterTable.find("pos_x");
-	if (iter != parameterTable.end())
-	{
-		mPosX = iter->second;
-	}
-	iter = parameterTable.find("pos_y");
-	if (iter != parameterTable.end())
-	{
-		mPosY = iter->second;
-	}
-	iter = parameterTable.find("pos_z");
-	if (iter != parameterTable.end())
-	{
-		mPosZ = iter->second;
-	}
-	//rotation
-	iter = parameterTable.find("rot_h");
-	if (iter != parameterTable.end())
-	{
-		mRotH = iter->second;
-	}
-	iter = parameterTable.find("rot_p");
-	if (iter != parameterTable.end())
-	{
-		mRotP = iter->second;
-	}
-	iter = parameterTable.find("rot_r");
-	if (iter != parameterTable.end())
-	{
-		mRotR = iter->second;
-	}
-	//scale
-	iter = parameterTable.find("scale_x");
-	if (iter != parameterTable.end())
-	{
-		mScaleX = iter->second;
-	}
-	iter = parameterTable.find("scale_y");
-	if (iter != parameterTable.end())
-	{
-		mScaleY = iter->second;
-	}
-	iter = parameterTable.find("scale_z");
-	if (iter != parameterTable.end())
-	{
-		mScaleZ = iter->second;
-	}
+	CASEITER(parameterTable,iter,"parent",mParent)
+	CASEITER(parameterTable,iter,"is_static",mIsStatic)
+	CASEITER(parameterTable,iter,"pos_x",mPosX)
+	CASEITER(parameterTable,iter,"pos_y",mPosY)
+	CASEITER(parameterTable,iter,"pos_z",mPosZ)
+	CASEITER(parameterTable,iter,"rot_h",mRotH)
+	CASEITER(parameterTable,iter,"rot_p",mRotP)
+	CASEITER(parameterTable,iter,"rot_r",mRotR)
+	CASEITER(parameterTable,iter,"scale_x",mScaleX)
+	CASEITER(parameterTable,iter,"scale_y",mScaleY)
+	CASEITER(parameterTable,iter,"scale_z",mScaleZ)
 }
 
 void ObjectTemplate::resetParameters()

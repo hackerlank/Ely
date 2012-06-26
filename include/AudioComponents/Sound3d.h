@@ -63,6 +63,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Adds a new sound to this component by loading it from a file.

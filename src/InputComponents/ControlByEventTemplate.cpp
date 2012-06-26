@@ -125,105 +125,25 @@ std::string& ControlByEventTemplate::parameter(const std::string& paramName)
 void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
-	//set (initial) enabling
-	iter = parameterTable.find("enabled");
-	if (iter != parameterTable.end())
-	{
-		mEnabled = iter->second;
-	}
-	//set mouse control
-	iter = parameterTable.find("mouse_enabled_h");
-	if (iter != parameterTable.end())
-	{
-		mMouseEnabledH = iter->second;
-	}
-	iter = parameterTable.find("mouse_enabled_p");
-	if (iter != parameterTable.end())
-	{
-		mMouseEnabledP = iter->second;
-	}
-	//set event key names
-	iter = parameterTable.find("forward");
-	if (iter != parameterTable.end())
-	{
-		mForward = iter->second;
-	}
-	iter = parameterTable.find("roll_left");
-	if (iter != parameterTable.end())
-	{
-		mRollLeft = iter->second;
-	}
-	iter = parameterTable.find("backward");
-	if (iter != parameterTable.end())
-	{
-		mBackward = iter->second;
-	}
-	iter = parameterTable.find("roll_right");
-	if (iter != parameterTable.end())
-	{
-		mRollRight = iter->second;
-	}
-	iter = parameterTable.find("strafe_left");
-	if (iter != parameterTable.end())
-	{
-		mStrafeLeft = iter->second;
-	}
-	iter = parameterTable.find("strafe_right");
-	if (iter != parameterTable.end())
-	{
-		mStrafeRight = iter->second;
-	}
-	iter = parameterTable.find("up");
-	if (iter != parameterTable.end())
-	{
-		mUp = iter->second;
-	}
-	iter = parameterTable.find("down");
-	if (iter != parameterTable.end())
-	{
-		mDown = iter->second;
-	}
-	iter = parameterTable.find("speed_key");
-	if (iter != parameterTable.end())
-	{
-		mSpeedKey = iter->second;
-	}
-	iter = parameterTable.find("inverted");
-	if (iter != parameterTable.end())
-	{
-		mInverted = iter->second;
-	}
-	//set sensitivity parameters
-	iter = parameterTable.find("speed");
-	if (iter != parameterTable.end())
-	{
-		mSpeed = iter->second;
-	}
-	iter = parameterTable.find("fast_factor");
-	if (iter != parameterTable.end())
-	{
-		mFastFactor = iter->second;
-	}
-	iter = parameterTable.find("mov_sens");
-	if (iter != parameterTable.end())
-	{
-		mMovSens = iter->second;
-	}
-	iter = parameterTable.find("roll_sens");
-	if (iter != parameterTable.end())
-	{
-		mRollSens = iter->second;
-	}
-	iter = parameterTable.find("sens_x");
-	if (iter != parameterTable.end())
-	{
-		mSensX = iter->second;
-	}
-	iter = parameterTable.find("sens_y");
-	if (iter != parameterTable.end())
-	{
-		mSensY = iter->second;
-	}
+	CASEITER(parameterTable,iter,"enabled",mEnabled)
+	CASEITER(parameterTable,iter,"mouse_enabled_h",mMouseEnabledH)
+	CASEITER(parameterTable,iter,"mouse_enabled_p",mMouseEnabledP)
+	CASEITER(parameterTable,iter,"forward",mForward)
+	CASEITER(parameterTable,iter,"roll_left",mRollLeft)
+	CASEITER(parameterTable,iter,"backward",mBackward)
+	CASEITER(parameterTable,iter,"roll_right",mRollRight)
+	CASEITER(parameterTable,iter,"strafe_left",mStrafeLeft)
+	CASEITER(parameterTable,iter,"strafe_right",mStrafeRight)
+	CASEITER(parameterTable,iter,"up",mUp)
+	CASEITER(parameterTable,iter,"down",mDown)
+	CASEITER(parameterTable,iter,"speed_key",mSpeedKey)
+	CASEITER(parameterTable,iter,"inverted",mInverted)
+	CASEITER(parameterTable,iter,"speed",mSpeed)
+	CASEITER(parameterTable,iter,"fast_factor",mFastFactor)
+	CASEITER(parameterTable,iter,"mov_sens",mMovSens)
+	CASEITER(parameterTable,iter,"roll_sens",mRollSens)
+	CASEITER(parameterTable,iter,"sens_x",mSensX)
+	CASEITER(parameterTable,iter,"sens_y",mSensY)
 }
 
 //TypedObject semantics: hardcoded

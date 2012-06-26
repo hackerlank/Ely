@@ -77,24 +77,9 @@ void ModelTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
 	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
-	//set model filename
-	iter = parameterTable.find("model_file");
-	if (iter != parameterTable.end())
-	{
-		mModelFile = iter->second;
-	}
-	//set animations filenames
-	iterRange = parameterTable.equal_range("anim_files");
-	for (iter = iterRange.first; iter != iterRange.second; ++iter)
-	{
-		mAnimFiles.push_back(iter->second);
-	}
-	//set static flag
-	iter = parameterTable.find("is_static");
-	if (iter != parameterTable.end())
-	{
-		mIsStatic = iter->second;
-	}
+	CASEITER(parameterTable,iter,"model_file",mModelFile)
+	CASEITER(parameterTable,iter,"is_static",mIsStatic)
+	CASERANGE(parameterTable,iter,iterRange,"anim_files",mAnimFiles)
 }
 
 void ModelTemplate::resetParameters()

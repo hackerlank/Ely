@@ -57,12 +57,7 @@ Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 void InstanceOfTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
-	//set instance of
-	iter = parameterTable.find("instance_of");
-	if (iter != parameterTable.end())
-	{
-		mInstanceOf = iter->second;
-	}
+	CASEITER(parameterTable,iter,"instance_of",mInstanceOf)
 }
 
 void InstanceOfTemplate::resetParameters()

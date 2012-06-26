@@ -35,6 +35,7 @@ Sound3d::Sound3d(Sound3dTemplate* tmpl) :
 	mSounds.clear();
 	mUpdateData = NULL;
 	mUpdateTask = NULL;
+	mPosition = LPoint3(0.0, 0.0, 0.0);
 }
 
 Sound3d::~Sound3d()
@@ -85,8 +86,15 @@ void Sound3d::onAddToObjectSetup()
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
-	//set 3d attribute (in this case static)
-	set3dStaticAttributes();
+}
+
+void Sound3d::onAddToSceneSetup()
+{
+	if (mOwnerObject->isStatic())
+	{
+		//set 3d attribute (in this case static)
+		set3dStaticAttributes();
+	}
 }
 
 bool Sound3d::addSound(const std::string& fileName)
@@ -145,12 +153,12 @@ float Sound3d::getMaxDistance()
 
 void Sound3d::set3dStaticAttributes()
 {
-	LPoint3 position = mOwnerObject->nodePath().get_pos(mSceneRoot);
+	mPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
 	{
-		iter->second->set_3d_attributes(position.get_x(), position.get_y(),
-				position.get_z(), 0.0, 0.0, 0.0);
+		iter->second->set_3d_attributes(mPosition.get_x(), mPosition.get_y(),
+				mPosition.get_z(), 0.0, 0.0, 0.0);
 	}
 }
 

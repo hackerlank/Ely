@@ -244,6 +244,18 @@ typedef std::multimap<std::string, std::string> ParameterTable;
 		{\
 			resPtr = &param;\
 		}
+#define CASEITER(table,it,value,param) \
+	it = table.find(value);\
+	if (it != table.end())\
+	{\
+		param = iter->second;\
+	}
+#define CASERANGE(table,it,itrange,value,param) \
+	itrange = table.equal_range(value);\
+	for (it = itrange.first; it != itrange.second; ++it)\
+	{\
+		param.push_back(it->second);\
+	}
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
