@@ -91,7 +91,7 @@ void GameManager::setup()
 	define_key("c", "enableActor1Control", &GameManager::toggleActor1Control,
 			(void*) this);
 	//play sound
-	Sound3d* actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
+	PT(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
 			ComponentFamilyType("Audio")));
 	actor1Sound3d->sounds().begin()->second->set_loop();
 	actor1Sound3d->sounds().begin()->second->play();

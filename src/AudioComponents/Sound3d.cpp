@@ -44,6 +44,15 @@ Sound3d::~Sound3d()
 	{
 		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
 	}
+	//stops every playing sounds
+	SoundTable::iterator iter;
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
+	{
+		if (iter->second->status() == AudioSound::PLAYING)
+		{
+			iter->second->stop();
+		}
+	}
 }
 
 const ComponentFamilyType Sound3d::familyType() const
@@ -155,7 +164,7 @@ void Sound3d::set3dStaticAttributes()
 {
 	mPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;
-	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
 		iter->second->set_3d_attributes(mPosition.get_x(), mPosition.get_y(),
 				mPosition.get_z(), 0.0, 0.0, 0.0);
