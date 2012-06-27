@@ -103,15 +103,20 @@ void Object::sceneSetup()
 			mTmpl->objectTmplMgr()->createdObjects();
 	ObjectTemplateManager::ObjectTable::iterator iterObj;
 	iterObj = createdObjects.find(parentId);
-	if (iterObj != createdObjects.end())
-	{
-		//reparent to parent
-		mNodePath.reparent_to(iterObj->second->nodePath());
-	}
-	else
+	if (iterObj == createdObjects.end() or parentId == ObjectId("render"))
 	{
 		//reparent to render
 		mNodePath.reparent_to(mTmpl->windowFramework()->get_render());
+	}
+	else if (parentId == ObjectId("camera"))
+	{
+		//reparent to camera
+		mNodePath.reparent_to(mTmpl->windowFramework()->get_camera_group());
+	}
+	else
+	{
+		//reparent to parent
+		mNodePath.reparent_to(iterObj->second->nodePath());
 	}
 	//Position (default: (0,0,0))
 	float posX = atof(mTmpl->parameter(std::string("pos_x")).c_str());
