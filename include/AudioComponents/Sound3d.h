@@ -151,9 +151,11 @@ private:
 	LPoint3 mPosition;
 	///@}
 
+	///@{
 	///A task data for update.
 	PT(TaskInterface<Sound3d>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

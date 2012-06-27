@@ -129,9 +129,12 @@ private:
 	///@}
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
+
+	///@}
 	///A task data for update.
 	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

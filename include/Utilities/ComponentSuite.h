@@ -38,5 +38,7 @@
 #include "InputComponents/ControlByEventTemplate.h"
 #include "AudioComponents/Sound3d.h"
 #include "AudioComponents/Sound3dTemplate.h"
+#include "AudioComponents/Listener.h"
+#include "AudioComponents/ListenerTemplate.h"
 
 #endif /* COMPONENTSUITE_H_ */

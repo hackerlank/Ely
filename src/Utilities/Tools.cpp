@@ -40,4 +40,6 @@ void initTypedObjects()
 	ControlByEventTemplate::init_type();
 	Sound3d::init_type();
 	Sound3dTemplate::init_type();
+	Listener::init_type();
+	ListenerTemplate::init_type();
 }
