@@ -96,24 +96,19 @@ Object::operator NodePath()
 
 void Object::sceneSetup()
 {
-	//Parent (by default render)
+	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
 	//find parent into the created objects
 	ObjectTemplateManager::ObjectTable& createdObjects =
 			mTmpl->objectTmplMgr()->createdObjects();
 	ObjectTemplateManager::ObjectTable::iterator iterObj;
 	iterObj = createdObjects.find(parentId);
-	if (iterObj == createdObjects.end() or parentId == ObjectId("render"))
+	if (parentId == ObjectId("render"))
 	{
 		//reparent to render
 		mNodePath.reparent_to(mTmpl->windowFramework()->get_render());
 	}
-	else if (parentId == ObjectId("camera"))
-	{
-		//reparent to camera
-		mNodePath.reparent_to(mTmpl->windowFramework()->get_camera_group());
-	}
-	else
+	else if (iterObj != createdObjects.end())
 	{
 		//reparent to parent
 		mNodePath.reparent_to(iterObj->second->nodePath());
