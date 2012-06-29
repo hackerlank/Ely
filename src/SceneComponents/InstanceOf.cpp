@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GraphicsComponents/InstanceOf.cpp
+ * \file /Ely/src/SceneComponents/InstanceOf.cpp
  *
  * \date 20/mag/2012 (09:42:38)
  * \author marco
  */
 
-#include "GraphicsComponents/InstanceOf.h"
+#include "SceneComponents/InstanceOf.h"
 
 InstanceOf::InstanceOf()
 {

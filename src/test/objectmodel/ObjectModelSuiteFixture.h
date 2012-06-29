@@ -29,7 +29,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
-#include "GraphicsComponents/Model.h"
+#include "SceneComponents/Model.h"
 
 struct ObjectModelSuiteFixture
 {

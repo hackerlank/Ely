@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GraphicsComponents/InstanceOfTemplate.cpp
+ * \file /Ely/src/SceneComponents/InstanceOfTemplate.cpp
  *
  * \date 20/mag/2012 (09:40:59)
  * \author marco
  */
 
-#include "GraphicsComponents/InstanceOfTemplate.h"
+#include "SceneComponents/InstanceOfTemplate.h"
 
 InstanceOfTemplate::InstanceOfTemplate()
 {
@@ -40,7 +40,7 @@ const ComponentType InstanceOfTemplate::componentType() const
 
 const ComponentFamilyType InstanceOfTemplate::familyType() const
 {
-	return ComponentFamilyType("Graphics");
+	return ComponentFamilyType("Scene");
 }
 
 Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)

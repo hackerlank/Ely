@@ -119,7 +119,7 @@ void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 void ObjectTemplate::resetParameters()
 {
 	//set component parameters to their default values
-	mParent = std::string("render");
+	mParent = std::string("");
 	mIsStatic = std::string("false");
 	mPosX = std::string("0.0");
 	mPosY = std::string("0.0");

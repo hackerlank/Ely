@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GraphicsComponents/ModelTemplate.cpp
+ * \file /Ely/src/SceneComponents/ModelTemplate.cpp
  *
  * \date 16/mag/2012 (16:26:41)
  * \author marco
  */
 
-#include "GraphicsComponents/ModelTemplate.h"
+#include "SceneComponents/ModelTemplate.h"
 
 ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework)
@@ -49,7 +49,7 @@ const ComponentType ModelTemplate::componentType() const
 
 const ComponentFamilyType ModelTemplate::familyType() const
 {
-	return ComponentFamilyType("Graphics");
+	return ComponentFamilyType("Scene");
 }
 
 Component* ModelTemplate::makeComponent(const ComponentId& compId)

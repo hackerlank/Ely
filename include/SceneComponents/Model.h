@@ -15,32 +15,37 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GraphicsComponents/InstanceOf.h
+ * \file /Ely/include/SceneComponents/Model.h
  *
- * \date 20/mag/2012 (09:42:38)
+ * \date 15/mag/2012 (15:32:23)
  * \author marco
  */
 
-#ifndef INSTANCEOF_H_
-#define INSTANCEOF_H_
+#ifndef MODEL_H_
+#define MODEL_H_
 
+#include <string>
+#include <list>
 #include <nodePath.h>
+#include <filename.h>
+#include <animControlCollection.h>
+#include <auto_bind.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
-#include "GraphicsComponents/InstanceOfTemplate.h"
-#include "ObjectModel/ObjectTemplateManager.h"
+#include "ObjectModel/Object.h"
+#include "SceneComponents/ModelTemplate.h"
 
-class InstanceOfTemplate;
+class ModelTemplate;
 
 /**
- * \brief Component representing an instance of another object.
+ * \brief Component representing the model and animations of an object.
  */
-class InstanceOf: public Component
+class Model: public Component
 {
 public:
-	InstanceOf();
-	InstanceOf(InstanceOfTemplate* tmpl);
-	virtual ~InstanceOf();
+	Model();
+	Model(ModelTemplate* tmpl);
+	virtual ~Model();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -49,8 +54,8 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets a reference to the node path this component is instance of.
-	 * @return The node path this component is instance of.
+	 * \brief Gets a reference to the node path associated to this model.
+	 * @return The node path associated to this model.
 	 */
 	NodePath& nodePath();
 	/**
@@ -58,11 +63,15 @@ public:
 	 */
 	operator NodePath();
 
+	AnimControlCollection& animations();
+
 private:
 	///The template used to construct this component.
-	InstanceOfTemplate* mTmpl;
+	ModelTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
+	///The list of animations associated with this model.
+	AnimControlCollection mAnimations;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -73,7 +82,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "InstanceOf", Component::get_class_type());
+		register_type(_type_handle, "Model", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -87,7 +96,6 @@ public:
 
 private:
 	static TypeHandle _type_handle;
-
 };
 
-#endif /* INSTANCEOF_H_ */
+#endif /* MODEL_H_ */

@@ -15,37 +15,33 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GraphicsComponents/Model.h
+ * \file /Ely/include/SceneComponents/NodePathWrapper.h
  *
- * \date 15/mag/2012 (15:32:23)
+ * \date 28/giu/2012 (20:16:04)
  * \author marco
  */
 
-#ifndef MODEL_H_
-#define MODEL_H_
+#ifndef NODEPATHWRAPPER_H_
+#define NODEPATHWRAPPER_H_
 
 #include <string>
-#include <list>
 #include <nodePath.h>
-#include <filename.h>
-#include <animControlCollection.h>
-#include <auto_bind.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "GraphicsComponents/ModelTemplate.h"
+#include "SceneComponents/NodePathWrapperTemplate.h"
 
-class ModelTemplate;
+class NodePathWrapperTemplate;
 
 /**
- * \brief Component representing the model and animations of an object.
+ * \brief Component wrapping a predefined NodePath (e.g. render, camera etc...).
  */
-class Model: public Component
+class NodePathWrapper: public Component
 {
 public:
-	Model();
-	Model(ModelTemplate* tmpl);
-	virtual ~Model();
+	NodePathWrapper();
+	NodePathWrapper(NodePathWrapperTemplate* tmpl);
+	virtual ~NodePathWrapper();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -63,15 +59,11 @@ public:
 	 */
 	operator NodePath();
 
-	AnimControlCollection& animations();
-
 private:
 	///The template used to construct this component.
-	ModelTemplate* mTmpl;
+	NodePathWrapperTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
-	///The list of animations associated with this model.
-	AnimControlCollection mAnimations;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -82,7 +74,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "Model", Component::get_class_type());
+		register_type(_type_handle, "NodePathWrapper", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -96,6 +88,7 @@ public:
 
 private:
 	static TypeHandle _type_handle;
+
 };
 
-#endif /* MODEL_H_ */
+#endif /* NODEPATHWRAPPER_H_ */

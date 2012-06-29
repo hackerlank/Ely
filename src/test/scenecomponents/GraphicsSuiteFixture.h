@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/graphicscomponents/GraphicsSuiteFixture.h
+ * \file /Ely/src/test/SceneComponents/GraphicsSuiteFixture.h
  *
  * \date 15/mag/2012 (15:33:43)
  * \author marco
@@ -27,10 +27,10 @@
 #include <boost/test/unit_test.hpp>
 #include <pandaFramework.h>
 #include <windowFramework.h>
-#include "GraphicsComponents/InstanceOf.h"
-#include "GraphicsComponents/InstanceOfTemplate.h"
-#include "GraphicsComponents/ModelTemplate.h"
-#include "GraphicsComponents/Model.h"
+#include "SceneComponents/InstanceOf.h"
+#include "SceneComponents/InstanceOfTemplate.h"
+#include "SceneComponents/ModelTemplate.h"
+#include "SceneComponents/Model.h"
 #include "Utilities/Tools.h"
 
 struct GraphicsSuiteFixture

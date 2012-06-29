@@ -15,28 +15,30 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GraphicsComponents/InstanceOfTemplate.h
+ * \file /Ely/include/SceneComponents/NodePathWrapperTemplate.h
  *
- * \date 20/mag/2012 (09:40:59)
+ * \date 28/giu/2012 (20:15:15)
  * \author marco
  */
 
-#ifndef INSTANCEOFTEMPLATE_H_
-#define INSTANCEOFTEMPLATE_H_
+#ifndef NODEPATHWRAPPERTEMPLATE_H_
+#define NODEPATHWRAPPERTEMPLATE_H_
 
-#include <nodePath.h>
-#include <lvecBase3.h>
-#include <typedObject.h>
-#include "ObjectModel/Component.h"
+#include <string>
+#include <pandaFramework.h>
+#include <windowFramework.h>
+
 #include "ObjectModel/ComponentTemplate.h"
-#include "GraphicsComponents/InstanceOf.h"
+#include "ObjectModel/Component.h"
+#include "SceneComponents/NodePathWrapper.h"
 #include "Utilities/Tools.h"
 
-class InstanceOfTemplate: public ComponentTemplate
+class NodePathWrapperTemplate: public ComponentTemplate
 {
 public:
-	InstanceOfTemplate();
-	virtual ~InstanceOfTemplate();
+	NodePathWrapperTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
+	virtual ~NodePathWrapperTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -47,10 +49,27 @@ public:
 	virtual void resetParameters();
 	virtual std::string& parameter(const std::string& paramName);
 
+	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
+	 */
+	PandaFramework*& pandaFramework();
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework*& windowFramework();
+
 private:
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 	///@{
 	/// Set of allowed Parameters.
-	std::string mInstanceOf;
+	///The wrapped NodePath.
+	std::string mNodePath;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -62,7 +81,8 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "InstanceOfTemplate", ComponentTemplate::get_class_type());
+		register_type(_type_handle, "NodePathWrapperTemplate",
+				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -76,7 +96,6 @@ public:
 
 private:
 	static TypeHandle _type_handle;
-
 };
 
-#endif /* INSTANCEOFTEMPLATE_H_ */
+#endif /* NODEPATHWRAPPERTEMPLATE_H_ */

@@ -98,6 +98,9 @@ Component* ComponentTemplateManager::createComponent(
 
 void ComponentTemplateManager::resetComponentTemplatesParams()
 {
+	//lock (guard) the mutex
+	lock_guard<ReMutex> guard(mMutex);
+
 	ComponentTemplateTable::iterator iter;
 	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();
 			++iter)

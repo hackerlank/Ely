@@ -15,35 +15,28 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/GraphicsComponents/ModelTemplate.h
+ * \file /Ely/include/SceneComponents/InstanceOfTemplate.h
  *
- * \date 16/mag/2012 (16:26:41)
+ * \date 20/mag/2012 (09:40:59)
  * \author marco
  */
 
-#ifndef MODELTEMPLATE_H_
-#define MODELTEMPLATE_H_
+#ifndef INSTANCEOFTEMPLATE_H_
+#define INSTANCEOFTEMPLATE_H_
 
-#include <string>
-#include <list>
-#include <utility>
-#include <filename.h>
-#include <pandaFramework.h>
-#include <windowFramework.h>
+#include <nodePath.h>
 #include <lvecBase3.h>
 #include <typedObject.h>
-
-#include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
-#include "GraphicsComponents/Model.h"
+#include "ObjectModel/ComponentTemplate.h"
+#include "SceneComponents/InstanceOf.h"
 #include "Utilities/Tools.h"
 
-class ModelTemplate: public ComponentTemplate
+class InstanceOfTemplate: public ComponentTemplate
 {
 public:
-	ModelTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
-	virtual ~ModelTemplate();
+	InstanceOfTemplate();
+	virtual ~InstanceOfTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -53,33 +46,11 @@ public:
 	virtual void setParameters(ParameterTable& parameterTable);
 	virtual void resetParameters();
 	virtual std::string& parameter(const std::string& paramName);
-	virtual std::list<std::string>& parameterList(const std::string& paramName);
-
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the PandaFramework.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework*& windowFramework();
 
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 	///@{
 	/// Set of allowed Parameters.
-	///The name of the model file containing the static model.
-	std::string mModelFile;
-	///The names of the files containing the animations.
-	std::list<std::string> mAnimFiles;
-	///Static flag: if this object doesn't move in the world.
-	std::string mIsStatic;
+	std::string mInstanceOf;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -91,8 +62,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "ModelTemplate",
-				ComponentTemplate::get_class_type());
+		register_type(_type_handle, "InstanceOfTemplate", ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -109,4 +79,4 @@ private:
 
 };
 
-#endif /* MODELTEMPLATE_H_ */
+#endif /* INSTANCEOFTEMPLATE_H_ */

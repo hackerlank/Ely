@@ -2,23 +2,32 @@
 <Game>
 	<!-- Object Templates Definition -->
 	<ObjectTmplSet>
+		<!-- template for wrapper around predefined nodepath - Mandatory -->
+		<ObjectTmpl type="Render">
+			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
+		</ObjectTmpl>
 		<ObjectTmpl type="Actor">
-			<ComponentTmpl family="Graphics" type="Model"/>
+			<ComponentTmpl family="Scene" type="Model"/>
 			<ComponentTmpl family="Input" type="ControlByEvent"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 		</ObjectTmpl>
-<!--
 		<ObjectTmpl type="InstancedActor">
-			<ComponentTmpl family="Graphics" type="InstanceOf"/>
+			<ComponentTmpl family="Scene" type="InstanceOf"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="StaticActor">
-			<ComponentTmpl family="Graphics" type="Model"/>
+			<ComponentTmpl family="Scene" type="Model"/>
 		</ObjectTmpl>
--->
 	</ObjectTmplSet>
 
 	<!-- Objects and Scene Creation -->
 	<ObjectSet>
+		<!-- wrapper around render nodepath - Mandatory -->
+		<Object type="Render" id="render" priority="1000">
+			<Component type="NodePathWrapper">
+				<Param nodepath="render"/>
+			</Component>
+			<Param parent=""/>
+		</Object>	
 <!--
 		<Object type="InstancedActor" id="InstancedActor1" priority="90">
 			<Param parent="render"/>

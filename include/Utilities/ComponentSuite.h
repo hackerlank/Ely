@@ -30,10 +30,12 @@
 #include "ObjectModel/ComponentTemplate.h"
 
 /// List of all components and component templates
-#include "GraphicsComponents/Model.h"
-#include "GraphicsComponents/ModelTemplate.h"
-#include "GraphicsComponents/InstanceOf.h"
-#include "GraphicsComponents/InstanceOfTemplate.h"
+#include "SceneComponents/Model.h"
+#include "SceneComponents/ModelTemplate.h"
+#include "SceneComponents/InstanceOf.h"
+#include "SceneComponents/InstanceOfTemplate.h"
+#include "SceneComponents/NodePathWrapper.h"
+#include "SceneComponents/NodePathWrapperTemplate.h"
 #include "InputComponents/ControlByEvent.h"
 #include "InputComponents/ControlByEventTemplate.h"
 #include "AudioComponents/Sound3d.h"

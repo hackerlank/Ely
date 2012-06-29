@@ -103,12 +103,7 @@ void Object::sceneSetup()
 			mTmpl->objectTmplMgr()->createdObjects();
 	ObjectTemplateManager::ObjectTable::iterator iterObj;
 	iterObj = createdObjects.find(parentId);
-	if (parentId == ObjectId("render"))
-	{
-		//reparent to render
-		mNodePath.reparent_to(mTmpl->windowFramework()->get_render());
-	}
-	else if (iterObj != createdObjects.end())
+	if (iterObj != createdObjects.end())
 	{
 		//reparent to parent
 		mNodePath.reparent_to(iterObj->second->nodePath());

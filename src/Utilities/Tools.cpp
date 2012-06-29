@@ -36,6 +36,8 @@ void initTypedObjects()
 	ModelTemplate::init_type();
 	InstanceOf::init_type();
 	InstanceOfTemplate::init_type();
+	NodePathWrapper::init_type();
+	NodePathWrapperTemplate::init_type();
 	ControlByEvent::init_type();
 	ControlByEventTemplate::init_type();
 	Sound3d::init_type();

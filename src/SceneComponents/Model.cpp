@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/GraphicsComponents/Model.cpp
+ * \file /Ely/src/SceneComponents/Model.cpp
  *
  * \date 15/mag/2012 (15:32:23)
  * \author marco
  */
 
-#include "GraphicsComponents/Model.h"
+#include "SceneComponents/Model.h"
 
 Model::Model()
 {

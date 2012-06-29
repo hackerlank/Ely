@@ -85,14 +85,14 @@ void GameManager::setup()
 			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
 	//play animation
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
-					ComponentFamilyType("Graphics")));
+					ComponentFamilyType("Scene")));
 	actor1Model->animations().loop("panda_soft", false);
 	//enable/disable control by event
 	define_key("c", "enableActor1Control", &GameManager::toggleActor1Control,
 			(void*) this);
 	//play sound
 	PT(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
-			ComponentFamilyType("Audio")));
+					ComponentFamilyType("Audio")));
 	actor1Sound3d->sounds().begin()->second->set_loop();
 	actor1Sound3d->sounds().begin()->second->play();
 
@@ -118,19 +118,25 @@ void GameManager::setup()
 
 void GameManager::setupCompTmplMgr()
 {
-	// add all kind of component templates
+	// Add all kind of component templates
 	//Model template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ModelTemplate(this, mWindow));
 	//InstanceOf template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new InstanceOfTemplate());
+	//NodePathWrapper template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new NodePathWrapperTemplate(this, mWindow));
 	//ControlByEvent template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ControlByEventTemplate(this, mWindow));
 	//Sound3d template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new Sound3dTemplate(this, mWindow, mAudioMgr));
+	//Listener template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new ListenerTemplate(this, mWindow, mAudioMgr));
 
 }
 
