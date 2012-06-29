@@ -69,8 +69,8 @@ private:
 	///@{
 	/// Event key names, inversion, mouse enabling, enabling.
 	std::string mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-			mRollLeft, mRollRight, mSpeedKey, mInverted, mMouseEnabledH,
-			mMouseEnabledP, mEnabled;
+			mRollLeft, mRollRight, mSpeedKey, mInvertedKeyBoard, mMouseEnabledH,
+			mMouseEnabledP, mInvertedMouse, mEnabled;
 	///@}
 	///@{
 	/// Sensitivity parameters.

@@ -35,7 +35,7 @@ ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 				false), mTrue(true), mFalse(false), mIsEnabled(false)
 {
 	//initialized by template:
-	//mInverted, mMouseEnabledH, mMouseEnabledP, mEnabled
+	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
 
 	mUpdateData = NULL;
 	mUpdateTask = NULL;
@@ -242,8 +242,11 @@ bool ControlByEvent::initialize()
 			(mTmpl->parameter(std::string("enabled")) == std::string("true") ? true :
 					false);
 	//inverted setting
-	mInverted =
-			(mTmpl->parameter(std::string("inverted")) == std::string("true") ? true :
+	mInvertedKeyboard =
+			(mTmpl->parameter(std::string("inverted_keyboard")) == std::string("true") ? true :
+					false);
+	mInvertedMouse =
+			(mTmpl->parameter(std::string("inverted_mouse")) == std::string("true") ? true :
 					false);
 	//mouse movement setting
 	mMouseEnabledH = (
@@ -344,12 +347,13 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 	dt = 0.016666667; //60 fps
 #endif
 
-	int signOf = (mInverted ? -1 : 1);
+	int signOfKeyboard = (mInvertedKeyboard ? -1 : 1);
 
 	if (mMouseEnabledH or mMouseEnabledP)
 	{
 		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 		MouseData md = win->get_pointer(0);
+		int signOfMouse = (mInvertedMouse ? -1 : 1);
 		float x = md.get_x();
 		float y = md.get_y();
 
@@ -358,12 +362,12 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 			if (mMouseEnabledH)
 			{
 				ownerNodePath.set_h(
-						ownerNodePath.get_h() - (x - mCentX) * mSensX * signOf);
+						ownerNodePath.get_h() - (x - mCentX) * mSensX * signOfMouse);
 			}
 			if (mMouseEnabledP)
 			{
 				ownerNodePath.set_p(
-						ownerNodePath.get_p() - (y - mCentY) * mSensY * signOf);
+						ownerNodePath.get_p() - (y - mCentY) * mSensY * signOfMouse);
 			}
 		}
 	}
@@ -373,25 +377,25 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 	{
 		ownerNodePath.set_y(ownerNodePath,
 				ownerNodePath.get_y(ownerNodePath)
-						- mMovSens * mSpeedActual * dt * signOf);
+						- mMovSens * mSpeedActual * dt * signOfKeyboard);
 	}
 	if (mBackward)
 	{
 		ownerNodePath.set_y(ownerNodePath,
 				ownerNodePath.get_y(ownerNodePath)
-						+ mMovSens * mSpeedActual * dt * signOf);
+						+ mMovSens * mSpeedActual * dt * signOfKeyboard);
 	}
 	if (mStrafeLeft)
 	{
 		ownerNodePath.set_x(ownerNodePath,
 				ownerNodePath.get_x(ownerNodePath)
-						+ mMovSens * mSpeedActual * dt * signOf);
+						+ mMovSens * mSpeedActual * dt * signOfKeyboard);
 	}
 	if (mStrafeRight)
 	{
 		ownerNodePath.set_x(ownerNodePath,
 				ownerNodePath.get_x(ownerNodePath)
-						- mMovSens * mSpeedActual * dt * signOf);
+						- mMovSens * mSpeedActual * dt * signOfKeyboard);
 	}
 	if (mUp)
 	{
@@ -409,13 +413,13 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 	{
 		ownerNodePath.set_h(ownerNodePath,
 				ownerNodePath.get_h(ownerNodePath)
-						+ mRollSens * mSpeedActual * dt * signOf);
+						+ mRollSens * mSpeedActual * dt * signOfKeyboard);
 	}
 	if (mRollRight)
 	{
 		ownerNodePath.set_h(ownerNodePath,
 				ownerNodePath.get_h(ownerNodePath)
-						- mRollSens * mSpeedActual * dt * signOf);
+						- mRollSens * mSpeedActual * dt * signOfKeyboard);
 	}
 	//
 	return AsyncTask::DS_cont;

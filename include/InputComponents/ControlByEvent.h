@@ -118,7 +118,8 @@ private:
 	///@}
 	///@{
 	///Key control values.
-	bool mTrue, mFalse, mInverted, mMouseEnabledH, mMouseEnabledP;
+	bool mTrue, mFalse, mInvertedKeyboard, mInvertedMouse, mMouseEnabledH,
+			mMouseEnabledP;
 	///@}
 	///@{
 	/// Sensitivity settings.
@@ -132,8 +133,7 @@ private:
 
 	///@}
 	///A task data for update.
-	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
+	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
 	///@}
 
 	///TypedObject semantics: hardcoded

@@ -6,12 +6,16 @@
 		<ObjectTmpl type="Render">
 			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
 		</ObjectTmpl>
+		<ObjectTmpl type="Camera">
+			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
+			<ComponentTmpl family="Input" type="ControlByEvent"/>
+		</ObjectTmpl>
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Scene" type="Model"/>
 			<ComponentTmpl family="Input" type="ControlByEvent"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 		</ObjectTmpl>
-		<ObjectTmpl type="InstancedActor">
+		<ObjectTmpl type="Instanced">
 			<ComponentTmpl family="Scene" type="InstanceOf"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="StaticActor">
@@ -28,8 +32,24 @@
 			</Component>
 			<Param parent=""/>
 		</Object>	
-<!--
-		<Object type="InstancedActor" id="InstancedActor1" priority="90">
+		<Object type="Camera" id="camera" priority="1000">
+			<Component type="NodePathWrapper" priority="100">
+				<Param nodepath="camera"/>
+			</Component>
+			<Component type="ControlByEvent">
+				<Param enabled="false"/>
+				<Param speed="200.0"/>
+				<Param fast_factor="10.0"/>
+				<Param inverted_keyboard="true"/>
+				<Param inverted_mouse="false"/>
+				<Param up=""/>
+				<Param down=""/>
+				<Param mouse_enabled_h="true"/>
+				<Param mouse_enabled_p="true"/>
+			</Component>
+			<Param parent=""/>
+		</Object>	
+		<Object type="Instanced" id="InstancedTeapot1">
 			<Param parent="render"/>
 			<Param is_static="true"/>
 			<Param pos_x="-10.0"/>
@@ -41,16 +61,16 @@
 			<Param scale_x="0.5"/>
 			<Param scale_y="0.5"/>
 			<Param scale_z="1.0"/>
-			<Component type="InstanceOf" priority="100">
-				<Param instance_of="Actor1"/>
+			<Component type="InstanceOf">
+				<Param instance_of="Teapot1"/>
 			</Component>
 		</Object>
-		<Object type="StaticActor" id="Teapot1">
-			<Component type="Model">
+		<Object type="StaticActor" id="Teapot1" priority="100">
+			<Component type="Model" priority="100">
 				<Param model_file="teapot"/>
 				<Param is_static="true"/>
 			</Component>
-			<Param parent="Actor1"/>
+			<Param parent=""/>
 			<Param pos_x="0.0"/>
 			<Param pos_y="-10.0"/>
 			<Param pos_z="0.0"/>
@@ -61,13 +81,13 @@
 			<Param scale_y="0.5"/>
 			<Param scale_z="0.5"/>
 		</Object>
--->
-		<Object type="Actor" id="Actor1" priority="100">
-			<Component type="ControlByEvent" priority="90">
+		<Object type="Actor" id="Actor1"  priority="200">
+			<Component type="ControlByEvent">
 				<Param enabled="false"/>
 				<Param speed="200.0"/>
 				<Param fast_factor="10.0"/>
-				<Param inverted="false"/>
+				<Param inverted_keyboard="false"/>
+				<Param inverted_mouse="false"/>
 				<Param up=""/>
 				<Param down=""/>
 				<Param mouse_enabled_h="true"/>
@@ -77,7 +97,7 @@
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
 			</Component>
-			<Component type="Sound3d" priority="90">
+			<Component type="Sound3d">
 				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>

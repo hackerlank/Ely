@@ -80,9 +80,10 @@ void ControlByEventTemplate::resetParameters()
 	mRollSens = std::string("15.0");
 	mSensX = std::string("0.2");
 	mSensY = std::string("0.2");
-	mInverted = std::string("false");
+	mInvertedKeyBoard = std::string("false");
 	mMouseEnabledH = std::string("false");
 	mMouseEnabledP = std::string("false");
+	mInvertedMouse = std::string("false");
 	mEnabled = std::string("true");
 }
 
@@ -111,7 +112,8 @@ std::string& ControlByEventTemplate::parameter(const std::string& paramName)
 	CASE(paramName,strPtr,"up",mUp)
 	CASE(paramName,strPtr,"down",mDown)
 	CASE(paramName,strPtr,"speed_key",mSpeedKey)
-	CASE(paramName,strPtr,"inverted",mInverted)
+	CASE(paramName,strPtr,"inverted_keyboard",mInvertedKeyBoard)
+	CASE(paramName,strPtr,"inverted_mouse",mInvertedMouse)
 	CASE(paramName,strPtr,"speed",mSpeed)
 	CASE(paramName,strPtr,"fast_factor",mFastFactor)
 	CASE(paramName,strPtr,"mov_sens",mMovSens)
@@ -137,7 +139,8 @@ void ControlByEventTemplate::setParameters(ParameterTable& parameterTable)
 	CASEITER(parameterTable,iter,"up",mUp)
 	CASEITER(parameterTable,iter,"down",mDown)
 	CASEITER(parameterTable,iter,"speed_key",mSpeedKey)
-	CASEITER(parameterTable,iter,"inverted",mInverted)
+	CASEITER(parameterTable,iter,"inverted_keyboard",mInvertedKeyBoard)
+	CASEITER(parameterTable,iter,"inverted_mouse",mInvertedMouse)
 	CASEITER(parameterTable,iter,"speed",mSpeed)
 	CASEITER(parameterTable,iter,"fast_factor",mFastFactor)
 	CASEITER(parameterTable,iter,"mov_sens",mMovSens)

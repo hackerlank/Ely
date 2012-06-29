@@ -87,8 +87,8 @@ void GameManager::setup()
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Scene")));
 	actor1Model->animations().loop("panda_soft", false);
-	//enable/disable control by event
-	define_key("c", "enableActor1Control", &GameManager::toggleActor1Control,
+	//enable/disable Actor1 control by event
+	define_key("v", "enableActor1Control", &GameManager::toggleActor1Control,
 			(void*) this);
 	//play sound
 	PT(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
@@ -99,6 +99,10 @@ void GameManager::setup()
 	//InstancedActor1
 	PT(Object) instancedActor1 =
 			ObjectTemplateManager::GetSingleton().createdObjects()["InstancedActor1"];
+
+	//enable/disable camera control by event
+	define_key("c", "enableCameraControl", &GameManager::toggleCameraControl,
+			(void*) this);
 
 	// add a 1st task
 	m1stTask = new TaskInterface<GameManager>::TaskData(this,
@@ -455,3 +459,36 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 
 }
 
+void GameManager::toggleCameraControl(const Event* event, void* data)
+{
+	GameManager* gameManager = (GameManager*) data;
+	PT(Object) camera =
+			ObjectTemplateManager::GetSingleton().createdObjects()["camera"];
+	ControlByEvent* cameraControl = DCAST(ControlByEvent, camera->getComponent(
+					ComponentFamilyType("Input")));
+	bool isEnabled = cameraControl->isEnabled();
+
+	if (isEnabled)
+	{
+		//if enabled then disable it
+		//disable
+		cameraControl->disable();
+		//reset trackball transform
+		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
+		cameraMat.invert_in_place();
+		PT(Trackball) trackBall =
+				DCAST(Trackball, gameManager->mTrackBall.node());
+		trackBall->set_mat(cameraMat);
+		//(re)enable trackball
+		gameManager->enable_mouse();
+	}
+	else
+	{
+		//if disabled then enable it
+		//disable the trackball
+		gameManager->disable_mouse();
+		//enable
+		cameraControl->enable();
+	}
+
+}

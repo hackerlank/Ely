@@ -156,6 +156,7 @@ protected:
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
 	static void toggleActor1Control(const Event* event, void* data);
+	static void toggleCameraControl(const Event* event, void* data);
 
 };
 
