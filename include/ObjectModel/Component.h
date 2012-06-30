@@ -26,9 +26,8 @@
 
 #include <string>
 
-#include <referenceCount.h>
 #include <pointerTo.h>
-#include <typedWritable.h>
+#include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
 
 /**
@@ -56,7 +55,7 @@ class Object;
  * family component. Any object can have only one component of
  * each family type.
  */
-class Component: public TypedWritable, public ReferenceCount
+class Component: public TypedWritableReferenceCount
 {
 public:
 	/**

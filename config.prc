@@ -1,4 +1,4 @@
-model-path $MAIN_DIR/../Models
-model-path $MAIN_DIR/../Sounds
-model-path $MAIN_DIR/../Textures
+model-path /REPOSITORY/KProjects/Eclipse/PandaExternalExamples/Art
+model-path /REPOSITORY/KProjects/Eclipse/PandaExternalExamples/Art
+model-path /REPOSITORY/KProjects/Eclipse/PandaExternalExamples/Art
 show-frame-rate-meter #t

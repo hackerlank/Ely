@@ -25,15 +25,14 @@
 #define COMPONENTTEMPLATE_H_
 
 #include <list>
-#include <referenceCount.h>
-#include <typedWritable.h>
+#include <typedWritableReferenceCount.h>
 #include "Component.h"
 #include "Utilities/Tools.h"
 
 /**
  * \brief Abstract base class of component templates used to create components.
  */
-class ComponentTemplate: public TypedWritable, public ReferenceCount
+class ComponentTemplate: public TypedWritableReferenceCount
 {
 public:
 	/**

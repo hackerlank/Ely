@@ -30,8 +30,7 @@
 #include <utility>
 #include <pandaFramework.h>
 #include <windowFramework.h>
-#include <referenceCount.h>
-#include <typedWritable.h>
+#include <typedWritableReferenceCount.h>
 #include "ComponentTemplate.h"
 #include "Component.h"
 #include "Utilities/Tools.h"
@@ -48,7 +47,7 @@ typedef std::string ObjectType;
 /**
  * \brief Class storing all of objects templates used to create an object.
  */
-class ObjectTemplate: public TypedWritable, public ReferenceCount
+class ObjectTemplate: public TypedWritableReferenceCount
 {
 public:
 	/**

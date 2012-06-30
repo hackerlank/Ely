@@ -29,8 +29,7 @@
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <nodePath.h>
-#include <referenceCount.h>
-#include <typedWritable.h>
+#include <typedWritableReferenceCount.h>
 #include <pointerTo.h>
 
 #include "ObjectTemplate.h"
@@ -55,7 +54,7 @@ typedef std::string ObjectId;
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
  */
-class Object: public TypedWritable, public ReferenceCount
+class Object: public TypedWritableReferenceCount
 {
 public:
 	/**
