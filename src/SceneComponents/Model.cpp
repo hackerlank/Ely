@@ -77,7 +77,7 @@ AnimControlCollection& Model::animations()
 bool Model::initialize()
 {
 	bool result = true;
-	//setup model and animations
+	//setup model
 	mNodePath = mTmpl->windowFramework()->load_model(
 			mTmpl->pandaFramework()->get_models(),
 			Filename(mTmpl->parameter(std::string("model_file"))));
@@ -85,6 +85,7 @@ bool Model::initialize()
 	{
 		result = false;
 	}
+	//setup animations
 	std::list<std::string>::iterator it;
 	for (it = mTmpl->parameterList(std::string("anim_files")).begin();
 			it != mTmpl->parameterList(std::string("anim_files")).end(); ++it)
@@ -96,8 +97,9 @@ bool Model::initialize()
 		{
 			result = false;
 		}
-		auto_bind(mNodePath.node(), mAnimations);
 	}
+	//bind all loaded animations
+	auto_bind(mNodePath.node(), mAnimations);
 	return result;
 }
 
