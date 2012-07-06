@@ -190,6 +190,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.433263550" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -227,9 +228,9 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="src|training|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="anim.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -58,10 +58,10 @@ int main(int argc, char **argv)
 	//physics
 	PT(BulletWorld) physicsWorld = new BulletWorld();
 	//physics: advance the simulation state
-	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
-			reinterpret_cast<void*>(&actualAnim));
-	task->set_delay(3);
-	panda.get_task_mgr().add(task);
+//	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
+//			reinterpret_cast<void*>(&actualAnim));
+//	task->set_delay(3);
+//	panda.get_task_mgr().add(task);
 
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
