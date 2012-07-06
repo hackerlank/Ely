@@ -1,5 +1,19 @@
 ### INSTALLING OGRE ON DEBIAN (DEBUG VERSION) ###
 
+From the site:
+Using Mercurial
+We recommend that you familiarise yourselves with the principles of Mercurial and read our developer notes.
+Cloning the repository:
+hg clone http://bitbucket.org/sinbad/ogre/
+You will clone the whole repository, by default into a folder called ‘ogre’, but by default your working copy will be on the unstable version. To clone directly to the stable version, do this:
+hg clone http://bitbucket.org/sinbad/ogre/ -u v1-7
+Or alternatively just switch branches after you have cloned using the original command, by doing this in the working directory:
+hg update v1-7
+Once you have the repository you can switch to the different branches using that command whenever you like.
+To retrieve the latest code when you already have a clone:
+hg pull --rebase
+This assumes you have the Rebase extension enabled, which is strongly advised if you intend on modifying OGRE. If you don’t have Rebase enabled, do this instead:
+hg pull --update
 Build from source instructions: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Building+Ogre
 
 - download stable version: ogre_src_v1-7-2.tar.bz2
@@ -90,18 +104,18 @@ $ make install
 	b) select the "Advanced" check-box
 	c) click on "Configure"
 	c) set/add the following options and entries 
-		* PKGCONFIG_INSTALL_PREFIX:STRING=/REPOSITORY/KProjects/usr/lib/pkgconfig/
+		* PKGCONFIG_INSTALL_PREFIX:STRING=/REPOSITORY/KProjects/usr/lib/pkgconfig
 		* INCLUDE_INSTALL_DIR:PATH=/REPOSITORY/KProjects/usr/include/bullet
-		* CMAKE_BUILD_TYPE:STRING=Debug
-		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
-		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
 		* BUILD_CPU_DEMOS:BOOL=OFF
 		* BUILD_DEMOS:BOOL=OFF
 		* BUILD_EXTRAS:BOOL=ON
 		* BUILD_NVIDIA_OPENCL_DEMOS:BOOL=ON
-	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
+		* CMAKE_BUILD_TYPE:STRING=Debug
+		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
+		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
 		* INSTALL_EXTRA_LIBS:BOOL=ON (to be added)
 		* LIB_DESTINATION:STRING=/REPOSITORY/KProjects/usr/lib
+	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
 		* USE_CUSTOM_VECTOR_MATH:BOOL=ON
 		Note: possibly set BUILD_SHARED_LIBS:BOOL=ON (to be added)
 		Note: possibly set CMAKE_CXX_FLAGS:STRING=-fPIC
@@ -111,7 +125,16 @@ $ make install
 - make
 - make rebuild_cache
 - make install
-After installing move /REPOSITORY/KProjects/usr/bullet to /REPOSITORY/KProjects/usr/include/bullet
+
+After installing, if necessary, move /REPOSITORY/KProjects/usr/bullet to 
+/REPOSITORY/KProjects/usr/include/bullet
+
+Applications that link to bullet libraries should use these commands to discover which other flags to use:
+	$ export PKG_CONFIG_PATH=/REPOSITORY/KProjects/usr/lib/pkgconfig
+	$ pkg-config bullet --cflags
+	$ pkg-config bullet --libs
+and, if they  add these linker flags:
+	-Wl,-rpath,/REPOSITORY/KProjects/usr/lib
 
 ### INSTALLING OGREBULLET ON DEBIAN (DEBUG VERSION) ###
 

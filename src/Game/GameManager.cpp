@@ -93,7 +93,7 @@ void GameManager::setup()
 	//play sound
 	PT(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
 					ComponentFamilyType("Audio")));
-	actor1Sound3d->sounds().begin()->second->set_loop();
+	actor1Sound3d->sounds().begin()->second->set_loop(true);
 	actor1Sound3d->sounds().begin()->second->play();
 
 	//InstancedActor1
