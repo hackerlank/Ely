@@ -30,17 +30,19 @@
 #include "ObjectModel/ComponentTemplate.h"
 
 /// List of all components and component templates
+#include "AudioComponents/Sound3d.h"
+#include "AudioComponents/Sound3dTemplate.h"
+#include "AudioComponents/Listener.h"
+#include "AudioComponents/ListenerTemplate.h"
+#include "InputComponents/ControlByEvent.h"
+#include "InputComponents/ControlByEventTemplate.h"
+#include "PhysicsComponents/RigidBody.h"
+#include "PhysicsComponents/RigidBodyTemplate.h"
 #include "SceneComponents/Model.h"
 #include "SceneComponents/ModelTemplate.h"
 #include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/InstanceOfTemplate.h"
 #include "SceneComponents/NodePathWrapper.h"
 #include "SceneComponents/NodePathWrapperTemplate.h"
-#include "InputComponents/ControlByEvent.h"
-#include "InputComponents/ControlByEventTemplate.h"
-#include "AudioComponents/Sound3d.h"
-#include "AudioComponents/Sound3dTemplate.h"
-#include "AudioComponents/Listener.h"
-#include "AudioComponents/ListenerTemplate.h"
 
 #endif /* COMPONENTSUITE_H_ */

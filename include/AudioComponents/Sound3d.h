@@ -24,16 +24,12 @@
 #ifndef SOUND3D_H_
 #define SOUND3D_H_
 
-#include <audioManager.h>
 #include <audioSound.h>
 #include <pointerTo.h>
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <nodePath.h>
-#include <genericAsyncTask.h>
-#include <clockObject.h>
 #include <map>
-#include <set>
 #include <string>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"

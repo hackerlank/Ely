@@ -46,7 +46,24 @@ public:
 	virtual ~GamePhysicsManager();
 
 	/**
-	 * \brief Updates 3d attributes of audio components.
+	 * \brief Adds a physics component for updating.
+	 * @param physicsComp The physics component.
+	 */
+	void addToPhysicsUpdate(Component* physicsComp);
+	/**
+	 * \brief Removes a physics component from updating.
+	 * @param physicsComp The physics component.
+	 */
+	void removeFromPhysicsUpdate(Component* physicsComp);
+
+	/**
+	 * \brief Gets a reference to the Bullet world.
+	 * @return The Bullet world.
+	 */
+	BulletWorld* bulletWorld();
+
+	/**
+	 * \brief Updates step simulation and physics components.
 	 *
 	 * Will be called automatically in a task.
 	 * @param task The task.

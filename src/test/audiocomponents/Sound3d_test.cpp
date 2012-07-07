@@ -35,7 +35,7 @@ struct Sound3dTestCaseFixture
 };
 
 static float posExpected[] =
-{ 0.0, 1.0/60.0, 0.0, 1.0/30.0, 1.0/30.0, 0.0 };
+{ 0.0, 1.0 / 60.0, 0.0, 1.0 / 30.0, 1.0 / 30.0, 0.0 };
 static float velExpected[] =
 { 0.0, 1.0, -1.0, 2.0, 0.0, -2.0 };
 
@@ -63,6 +63,11 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	BOOST_CHECK(mSound3d->sounds().size() == 0);
 	mSound3d->addSound(audioFile);
 	BOOST_CHECK(mSound3d->sounds().size() == 1);
+	//add mSound3d to an object so will be automatically destroyed
+	Object testObj("testObj",mObjectTmpl);
+	mSound3d->ownerObject() = &testObj;
+	testObj.addComponent(mSound3d);
+	mSound3d->onAddToObjectSetup();
 }
 
 BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
@@ -74,13 +79,16 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	mSound3d =
 	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mSound3d != NULL);
+	//add mSound3d to an object
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
 	testObj.nodePath() = testNP;
 	mSound3d->ownerObject() = &testObj;
+	testObj.addComponent(mSound3d);
+	BOOST_CHECK(testObj.getComponent("Audio")!=NULL);
 	mSound3d->onAddToObjectSetup();
-	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("Sound3d::update"));
+	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("GameAudioManager::update"));
 	BOOST_REQUIRE(task != NULL);
 	float posx,posy,posz,velx,vely,velz;
 	//call update: sound pos & vel = 0.0
@@ -89,7 +97,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 		//move object nodepath (in posExpected)
 		testObj.nodePath().set_pos(posExpected[i],posExpected[i],posExpected[i]);
 		//call update (dt = 0.016666667)
-		mSound3d->update(task);
+		GameAudioManager::GetSingleton().update(task);
 		//check results
 		mSound3d->sounds()[audioFile]->get_3d_attributes(&posx,&posy,&posz,&velx,&vely,&velz);
 		BOOST_CHECK_CLOSE( posx, posExpected[i], 1.0);

@@ -15,66 +15,44 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/AudioComponents/Listener.h
+ * \file /Ely/include/PhysicsComponents/RigidBody.h
  *
- * \date 27/giu/2012 (16:40:27)
+ * \date 07/lug/2012 (15:58:35)
  * \author marco
  */
 
-#ifndef LISTENER_H_
-#define LISTENER_H_
+#ifndef RIGIDBODY_H_
+#define RIGIDBODY_H_
 
-#include <audioSound.h>
 #include <pointerTo.h>
-#include <lvector3.h>
-#include <lpoint3.h>
 #include <nodePath.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
-class ListenerTemplate;
+class RigidBodyTemplate;
 
 /**
- * \brief Component manipulating the listener for 3d sounds.
+ * \brief Component representing a single rigid body attached to an object.
  */
-class Listener: public Component
+class RigidBody: public Component
 {
 public:
-	Listener();
-	Listener(ListenerTemplate* tmpl);
-	virtual ~Listener();
+	RigidBody();
+	RigidBody(RigidBodyTemplate* tmpl);
+	virtual ~RigidBody();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
-
-	/**
-	 * \brief Set position/velocity for static objects.
-	 *
-	 * The position is the that of the owner object wrt scene root
-	 * (i.e. render). Velocity is zero.
-	 */
-	void set3dStaticAttributes();
-
-	/**
-	 * \brief Updates position and velocity of this component.
-	 *
-	 * Will be called automatically by a audio manager update.
-	 * @param data The custom data.
-	 */
-	virtual void update(void* data);
 
 private:
 	///The template used to construct this component.
-	ListenerTemplate* mTmpl;
+	RigidBodyTemplate* mTmpl;
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
-	///Sounds' characteristics.
-	LPoint3 mPosition;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -85,7 +63,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "Listener", Component::get_class_type());
+		register_type(_type_handle, "RigidBody", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -102,4 +80,4 @@ private:
 
 };
 
-#endif /* LISTENER_H_ */
+#endif /* RIGIDBODY_H_ */

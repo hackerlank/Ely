@@ -24,7 +24,6 @@
 #ifndef LISTENERTEMPLATE_H_
 #define LISTENERTEMPLATE_H_
 
-#include <audioManager.h>
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include "ObjectModel/Component.h"

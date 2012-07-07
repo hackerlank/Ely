@@ -77,7 +77,7 @@ struct InputSuiteFixture
 	}
 	~InputSuiteFixture()
 	{
-		//delete always objects/components before their template
+		//delete always objects/components before their templates
 		if (mObjectTmpl)
 		{
 			delete mObjectTmpl;

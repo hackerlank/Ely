@@ -15,74 +15,65 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/audiocomponents/AudioSuiteFixture.h
+ * \file /Ely/src/test/physicscomponents/PhysicsSuiteFixture.h
  *
- * \date 20/giu/2012 (12:42:25)
+ * \date 07/lug/2012 (17:14:03)
  * \author marco
  */
 
-#ifndef AUDIOSUITEFIXTURE_H_
-#define AUDIOSUITEFIXTURE_H_
+#ifndef PHYSICSSUITEFIXTURE_H_
+#define PHYSICSSUITEFIXTURE_H_
 
 #include <boost/test/unit_test.hpp>
-#include "AudioComponents/Sound3d.h"
-#include "AudioComponents/Sound3dTemplate.h"
-#include "Game/GameAudioManager.h"
-#include <pointerTo.h>
-#include <audioSound.h>
+#include "PhysicsComponents/RigidBody.h"
+#include "PhysicsComponents/RigidBodyTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include <pandaFramework.h>
-#include <windowFramework.h>
-#include <genericAsyncTask.h>
 #include <nodePath.h>
 #include <geomNode.h>
-#include <vector>
+#include <genericAsyncTask.h>
 
-struct AudioSuiteFixture
+struct PhysicsSuiteFixture
 {
-	AudioSuiteFixture() :
-			mSound3dTmpl(NULL), mSound3d(NULL), audioMgr(NULL), mCompId(
-					"Sound3d_Test"), mObjectTmpl(NULL)
+	PhysicsSuiteFixture() :
+			mRigid(NULL), mCompId("RigidBody_Test"), mRigidTmpl(NULL), mObjectTmpl(
+					NULL)
 	{
-		audioFile = "/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav";
 		int argc = 0;
 		char** argv = NULL;
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
-		audioMgr = new GameAudioManager(mPanda);
-		Sound3dTemplate::init_type();
-		Sound3d::init_type();
+		RigidBodyTemplate::init_type();
+		RigidBody::init_type();
 		ObjectTemplate::init_type();
+		Object::init_type();
 	}
-
-	~AudioSuiteFixture()
+	~PhysicsSuiteFixture()
 	{
-		//delete audio manager
-		if (audioMgr)
-		{
-			delete audioMgr;
-		}
-		//delete components before their templates
+		//delete always objects/components before their templates
 		if (mObjectTmpl)
 		{
 			delete mObjectTmpl;
 		}
-		//mSound3d is deleted by testObj
-		if (mSound3dTmpl)
+		if (mRigid)
 		{
-			delete mSound3dTmpl;
+			delete mRigid;
+		}
+		if (mRigidTmpl)
+		{
+			delete mRigidTmpl;
 		}
 		mPanda->close_framework();
 		delete mPanda;
 	}
+	RigidBody* mRigid;
+	ComponentId mCompId;
+	RigidBodyTemplate* mRigidTmpl;
+	ObjectTemplate* mObjectTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
-	std::string audioFile;
-	Sound3dTemplate* mSound3dTmpl;
-	Sound3d* mSound3d;
-	GameAudioManager* audioMgr;
-	ComponentId mCompId;
-	ObjectTemplate* mObjectTmpl;
+	ObjectTemplateManager mObjectTmplMgr;
 };
 
-#endif /* AUDIOSUITEFIXTURE_H_ */
+#endif /* PHYSICSSUITEFIXTURE_H_ */

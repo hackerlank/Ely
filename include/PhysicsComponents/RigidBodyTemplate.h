@@ -15,31 +15,29 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/AudioComponents/Sound3dTemplate.h
+ * \file /Ely/include/PhysicsComponents/RigidBodyTemplate.h
  *
- * \date 20/giu/2012 (12:47:59)
+ * \date 07/lug/2012 (15:56:19)
  * \author marco
  */
 
-#ifndef SOUND3DTEMPLATE_H_
-#define SOUND3DTEMPLATE_H_
+#ifndef RIGIDBODYTEMPLATE_H_
+#define RIGIDBODYTEMPLATE_H_
 
-#include <string>
-#include <list>
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "AudioComponents/Sound3d.h"
-#include "Game/GameAudioManager.h"
+#include "PhysicsComponents/RigidBody.h"
+#include "Game/GamePhysicsManager.h"
 #include "Utilities/Tools.h"
 
-class Sound3dTemplate: public ComponentTemplate
+class RigidBodyTemplate: public ComponentTemplate
 {
 public:
-	Sound3dTemplate(PandaFramework* pandaFramework,
+	RigidBodyTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~Sound3dTemplate();
+	virtual ~RigidBodyTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -48,13 +46,13 @@ public:
 
 	virtual void setParameters(ParameterTable& parameterTable);
 	virtual void resetParameters();
-	virtual std::list<std::string>& parameterList(const std::string& paramName);
+	virtual std::string& parameter(const std::string& paramName);
 
 	/**
-	 * \brief Gets the singleton GameAudioManager.
-	 * @return A reference to the GameAudioManager.
+	 * \brief Gets the singleton GamePhysicsManager.
+	 * @return A reference to the GamePhysicsManager.
 	 */
-	GameAudioManager* gameAudioMgr();
+	GamePhysicsManager* gamePhysicsMgr();
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -73,8 +71,6 @@ private:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
-	///The names of the sound files.
-	std::list<std::string> mSoundFiles;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -86,7 +82,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "Sound3dTemplate",
+		register_type(_type_handle, "RigidBodyTemplate",
 				ComponentTemplate::get_class_type());
 	}
 
@@ -105,4 +101,4 @@ private:
 	static TypeHandle _type_handle;
 };
 
-#endif /* SOUND3DTEMPLATE_H_ */
+#endif /* RIGIDBODYTEMPLATE_H_ */

@@ -44,4 +44,6 @@ void initTypedObjects()
 	Sound3dTemplate::init_type();
 	Listener::init_type();
 	ListenerTemplate::init_type();
+	RigidBody::init_type();
+	RigidBodyTemplate::init_type();
 }
