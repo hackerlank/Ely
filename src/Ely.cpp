@@ -39,12 +39,17 @@ int main(int argc, char **argv)
 	ObjectTemplateManager* objectTmplMgr = new ObjectTemplateManager();
 	// Game manager
 	GameManager* gameMgr = new GameManager(argc, argv);
+	// Other managers (depending on GameManager)
+	GameAudioManager* gameAudioMgr = new GameAudioManager(gameMgr);
+//	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(gameMgr);
 	// Set game up
 	gameMgr->setup();
 	// Do the main loop
 	gameMgr->main_loop();
 
 	// Close the game framework
+//	delete gamePhysicsMgr;
+	delete gameAudioMgr;
 	delete gameMgr;
 	delete objectTmplMgr;
 	delete componentTmplMgr;

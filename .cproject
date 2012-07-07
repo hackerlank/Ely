@@ -34,6 +34,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1389397997" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -113,6 +114,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1872629740" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>

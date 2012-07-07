@@ -24,16 +24,21 @@
 #include "AudioComponents/ListenerTemplate.h"
 
 ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework, AudioManager* audioMgr)
+		WindowFramework* windowFramework)
 {
-	if (not pandaFramework or not windowFramework or not audioMgr)
+	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework or AudioManager");
+				"ListenerTemplate::ListenerTemplate: invalid PandaFramework or WindowFramework");
 	}
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
-	mAudioMgr = audioMgr;
+	if (not GameAudioManager::GetSingletonPtr())
+	{
+		throw GameException(
+				"ListenerTemplate::ListenerTemplate: invalid GameAudioManager");
+	}
+	resetParameters();
 }
 
 ListenerTemplate::~ListenerTemplate()
@@ -62,9 +67,9 @@ Component* ListenerTemplate::makeComponent(const ComponentId& compId)
 	return newListener;
 }
 
-AudioManager*& ListenerTemplate::audioManager()
+GameAudioManager* ListenerTemplate::gameAudioMgr()
 {
-	return mAudioMgr;
+	return GameAudioManager::GetSingletonPtr();
 }
 
 PandaFramework*& ListenerTemplate::pandaFramework()

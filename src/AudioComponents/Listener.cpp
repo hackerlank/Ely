@@ -33,16 +33,15 @@ Listener::Listener()
 Listener::Listener(ListenerTemplate* tmpl) :
 		mTmpl(tmpl)
 {
-	mUpdateData = NULL;
-	mUpdateTask = NULL;
 	mPosition = LPoint3(0.0, 0.0, 0.0);
 }
 
 Listener::~Listener()
 {
-	if (mUpdateTask)
+	// check if game audio manager exists
+	if (mTmpl->gameAudioMgr())
 	{
-		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
+		mTmpl->gameAudioMgr()->removeFromAudioUpdate(this);
 	}
 }
 
@@ -67,14 +66,7 @@ void Listener::onAddToObjectSetup()
 	// update listener position/velocity only for dynamic objects
 	if (not mOwnerObject->isStatic())
 	{
-		//create the task for updating the listener
-		mUpdateData = new TaskInterface<Listener>::TaskData(this,
-				&Listener::update);
-		mUpdateTask = new GenericAsyncTask("Listener::update",
-				&TaskInterface<Listener>::taskFunction,
-				reinterpret_cast<void*>(mUpdateData.p()));
-		//Add the task for updating the controlled object
-		mTmpl->pandaFramework()->get_task_mgr().add(mUpdateTask);
+		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
@@ -96,19 +88,15 @@ void Listener::set3dStaticAttributes()
 			LVector3::forward());
 	LVector3 up = mOwnerObject->nodePath().get_relative_vector(mSceneRoot,
 			LVector3::up());
-	mTmpl->audioManager()->audio_3d_set_listener_attributes(mPosition.get_x(),
-			mPosition.get_y(), mPosition.get_z(), 0.0, 0.0, 0.0,
-			forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
+	mTmpl->gameAudioMgr()->audioMgr()->audio_3d_set_listener_attributes(
+			mPosition.get_x(), mPosition.get_y(), mPosition.get_z(), 0.0, 0.0,
+			0.0, forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
 			up.get_y(), up.get_z());
 }
 
-AsyncTask::DoneStatus Listener::update(GenericAsyncTask* task)
+void Listener::update(void* data)
 {
-	float dt = task->get_dt();
-
-#ifdef TESTING
-	dt = 0.016666667; //60 fps
-#endif
+	float dt = *(reinterpret_cast<float*>(data));
 
 	//get the new position
 	LPoint3 newPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
@@ -119,15 +107,13 @@ AsyncTask::DoneStatus Listener::update(GenericAsyncTask* task)
 	//get the velocity (mPosition holds the previous position)
 	LVector3 velocity = (newPosition - mPosition) / dt;
 	//update listener velocity and position
-	mTmpl->audioManager()->audio_3d_set_listener_attributes(newPosition.get_x(),
-			newPosition.get_y(), newPosition.get_z(), velocity.get_x(),
-			velocity.get_y(), velocity.get_z(), forward.get_x(),
-			forward.get_y(), forward.get_z(), up.get_x(), up.get_y(),
-			up.get_z());
+	mTmpl->gameAudioMgr()->audioMgr()->audio_3d_set_listener_attributes(
+			newPosition.get_x(), newPosition.get_y(), newPosition.get_z(),
+			velocity.get_x(), velocity.get_y(), velocity.get_z(),
+			forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
+			up.get_y(), up.get_z());
 	//update actual position
 	mPosition = newPosition;
-	//
-	return AsyncTask::DS_cont;
 }
 
 //TypedObject semantics: hardcoded

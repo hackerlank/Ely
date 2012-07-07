@@ -45,8 +45,6 @@ GameManager::GameManager(int argc, char* argv[]) :
 		mRender = mWindow->get_render();
 		mCamera = mWindow->get_camera_group();
 		mGlobalClock = ClockObject::get_global_clock();
-		// managers setup
-		mAudioMgr = AudioManager::create_AudioManager();
 	}
 	else
 	{
@@ -137,10 +135,10 @@ void GameManager::setupCompTmplMgr()
 			new ControlByEventTemplate(this, mWindow));
 	//Sound3d template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new Sound3dTemplate(this, mWindow, mAudioMgr));
+			new Sound3dTemplate(this, mWindow));
 	//Listener template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ListenerTemplate(this, mWindow, mAudioMgr));
+			new ListenerTemplate(this, mWindow));
 
 }
 

@@ -27,8 +27,8 @@
 #include <boost/test/unit_test.hpp>
 #include "AudioComponents/Sound3d.h"
 #include "AudioComponents/Sound3dTemplate.h"
+#include "Game/GameAudioManager.h"
 #include <pointerTo.h>
-#include <audioManager.h>
 #include <audioSound.h>
 #include <pandaFramework.h>
 #include <windowFramework.h>
@@ -49,7 +49,7 @@ struct AudioSuiteFixture
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
-		audioMgr = AudioManager::create_AudioManager();
+		audioMgr = new GameAudioManager(mPanda);
 		Sound3dTemplate::init_type();
 		Sound3d::init_type();
 		ObjectTemplate::init_type();
@@ -57,6 +57,11 @@ struct AudioSuiteFixture
 
 	~AudioSuiteFixture()
 	{
+		//delete audio manager
+		if (audioMgr)
+		{
+			delete audioMgr;
+		}
 		//delete components before their templates
 		if (mObjectTmpl)
 		{
@@ -75,7 +80,7 @@ struct AudioSuiteFixture
 	std::string audioFile;
 	Sound3dTemplate* mSound3dTmpl;
 	Sound3d* mSound3d;
-	PT(AudioManager) audioMgr;
+	GameAudioManager* audioMgr;
 	ComponentId mCompId;
 	ObjectTemplate* mObjectTmpl;
 };

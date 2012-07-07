@@ -242,12 +242,12 @@ bool ControlByEvent::initialize()
 			(mTmpl->parameter(std::string("enabled")) == std::string("true") ? true :
 					false);
 	//inverted setting
-	mInvertedKeyboard =
-			(mTmpl->parameter(std::string("inverted_keyboard")) == std::string("true") ? true :
-					false);
-	mInvertedMouse =
-			(mTmpl->parameter(std::string("inverted_mouse")) == std::string("true") ? true :
-					false);
+	mInvertedKeyboard = (
+			mTmpl->parameter(std::string("inverted_keyboard"))
+					== std::string("true") ? true : false);
+	mInvertedMouse = (
+			mTmpl->parameter(std::string("inverted_mouse"))
+					== std::string("true") ? true : false);
 	//mouse movement setting
 	mMouseEnabledH = (
 			mTmpl->parameter(std::string("mouse_enabled_h"))
@@ -340,7 +340,8 @@ bool ControlByEvent::isEnabled()
 
 AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 {
-	float dt = task->get_dt();
+	float dt = ClockObject::get_global_clock()->get_dt();
+
 	NodePath ownerNodePath = mOwnerObject->nodePath();
 
 #ifdef TESTING
@@ -362,12 +363,14 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 			if (mMouseEnabledH)
 			{
 				ownerNodePath.set_h(
-						ownerNodePath.get_h() - (x - mCentX) * mSensX * signOfMouse);
+						ownerNodePath.get_h()
+								- (x - mCentX) * mSensX * signOfMouse);
 			}
 			if (mMouseEnabledP)
 			{
 				ownerNodePath.set_p(
-						ownerNodePath.get_p() - (y - mCentY) * mSensY * signOfMouse);
+						ownerNodePath.get_p()
+								- (y - mCentY) * mSensY * signOfMouse);
 			}
 		}
 	}

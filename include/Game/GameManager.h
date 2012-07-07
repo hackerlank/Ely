@@ -142,9 +142,6 @@ protected:
 	NodePath mCamera;
 	PT(ClockObject) mGlobalClock;
 
-	/// Managers
-	PT(AudioManager) mAudioMgr;
-
 	/// NodePaths for enable_mouse/disable_mouse.
 	NodePath mTrackBall, mMouse2cam;
 

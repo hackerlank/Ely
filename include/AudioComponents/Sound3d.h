@@ -31,6 +31,7 @@
 #include <lpoint3.h>
 #include <nodePath.h>
 #include <genericAsyncTask.h>
+#include <clockObject.h>
 #include <map>
 #include <set>
 #include <string>
@@ -130,13 +131,12 @@ public:
 	SoundTable& sounds();
 
 	/**
-	 * \brief Updates position and velocity of sounds of this components.
+	 * \brief Updates position and velocity of sounds of this component.
 	 *
-	 * Will be called automatically in a task.
-	 * @param task The task.
-	 * @return The "done" status.
+	 * Will be called automatically by a audio manager update.
+	 * @param data The custom data.
 	 */
-	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
+	virtual void update(void* data);
 
 private:
 	///The template used to construct this component.
@@ -149,12 +149,6 @@ private:
 	///@{
 	float mMinDist, mMaxDist;
 	LPoint3 mPosition;
-	///@}
-
-	///@{
-	///A task data for update.
-	PT(TaskInterface<Sound3d>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
 	///@}
 
 	///TypedObject semantics: hardcoded

@@ -75,8 +75,10 @@ public:
 	const virtual ComponentFamilyType familyType() const = 0;
 	/**
 	 * \brief Updates the state of the component.
+	 *
+	 * @param data Generic data.
 	 */
-	virtual void update();
+	virtual void update(void* data);
 	/**
 	 * \brief Updates the state of the component.
 	 *

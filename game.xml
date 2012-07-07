@@ -38,7 +38,7 @@
 			</Component>
 			<Component type="ControlByEvent">
 				<Param enabled="false"/>
-				<Param speed="200.0"/>
+				<Param speed="3.0"/>
 				<Param fast_factor="10.0"/>
 				<Param inverted_keyboard="true"/>
 				<Param inverted_mouse="false"/>
@@ -84,7 +84,7 @@
 		<Object type="Actor" id="Actor1"  priority="200">
 			<Component type="ControlByEvent">
 				<Param enabled="false"/>
-				<Param speed="200.0"/>
+				<Param speed="3.0"/>
 				<Param fast_factor="10.0"/>
 				<Param inverted_keyboard="false"/>
 				<Param inverted_mouse="false"/>

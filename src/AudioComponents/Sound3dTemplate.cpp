@@ -24,16 +24,20 @@
 #include "AudioComponents/Sound3dTemplate.h"
 
 Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework, AudioManager* audioMgr)
+		WindowFramework* windowFramework)
 {
-	if (not pandaFramework or not windowFramework or not audioMgr)
+	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework or AudioManager");
+				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework");
 	}
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
-	mAudioMgr = audioMgr;
+	if (not GameAudioManager::GetSingletonPtr())
+	{
+		throw GameException(
+				"Sound3dTemplate::Sound3dTemplate: invalid GameAudioManager");
+	}
 	resetParameters();
 }
 
@@ -67,7 +71,7 @@ void Sound3dTemplate::setParameters(ParameterTable& parameterTable)
 {
 	ParameterTable::iterator iter;
 	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
-	CASERANGE(parameterTable,iter,iterRange,"sound_files",mSoundFiles)
+	CASERANGE(parameterTable, iter, iterRange, "sound_files", mSoundFiles)
 }
 
 void Sound3dTemplate::resetParameters()
@@ -76,17 +80,18 @@ void Sound3dTemplate::resetParameters()
 	mSoundFiles.clear();
 }
 
-std::list<std::string>&  Sound3dTemplate::parameterList(const std::string& paramName)
+std::list<std::string>& Sound3dTemplate::parameterList(
+		const std::string& paramName)
 {
 	std::list<std::string>* strListPtr = &mUnknownList;
-	CASE(paramName,strListPtr,"sound_files",mSoundFiles)
+	CASE(paramName, strListPtr, "sound_files", mSoundFiles)
 	//
 	return *strListPtr;
 }
 
-AudioManager*& Sound3dTemplate::audioManager()
+GameAudioManager* Sound3dTemplate::gameAudioMgr()
 {
-	return mAudioMgr;
+	return GameAudioManager::GetSingletonPtr();
 }
 
 PandaFramework*& Sound3dTemplate::pandaFramework()

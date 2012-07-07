@@ -15,46 +15,22 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/ObjectModel/Component.cpp
+ * \file /Ely/src/Game/GamePhysicsManager.cpp
  *
- * \date 09/mag/2012 (16:09:17)
+ * \date 07/lug/2012 (10:58:21)
  * \author marco
  */
 
-#include "ObjectModel/Component.h"
+#include "Game/GamePhysicsManager.h"
 
-Component::Component()
+GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
 {
-	mOwnerObject = NULL;
+	// TODO Auto-generated constructor stub
+
 }
 
-void Component::update(void* data)
+GamePhysicsManager::~GamePhysicsManager()
 {
+	// TODO Auto-generated destructor stub
 }
-
-AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
-{
-	return AsyncTask::DS_done;
-}
-
-Object*& Component::ownerObject()
-{
-	return mOwnerObject;
-}
-
-void Component::onAddToObjectSetup()
-{
-}
-
-void Component::onAddToSceneSetup()
-{
-}
-
-ComponentId& Component::componentId()
-{
-	return mComponentId;
-}
-
-//TypedObject semantics: hardcoded
-TypeHandle Component::_type_handle;
 

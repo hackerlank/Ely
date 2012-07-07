@@ -32,13 +32,14 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "AudioComponents/Sound3d.h"
+#include "Game/GameAudioManager.h"
 #include "Utilities/Tools.h"
 
 class Sound3dTemplate: public ComponentTemplate
 {
 public:
 	Sound3dTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework, AudioManager* audioMgr);
+			WindowFramework* windowFramework);
 	virtual ~Sound3dTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -51,10 +52,10 @@ public:
 	virtual std::list<std::string>& parameterList(const std::string& paramName);
 
 	/**
-	 * \brief Gets/sets the AudioManager.
-	 * @return A reference to the AudioManager.
+	 * \brief Gets the singleton GameAudioManager.
+	 * @return A reference to the GameAudioManager.
 	 */
-	AudioManager*& audioManager();
+	GameAudioManager* gameAudioMgr();
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -69,8 +70,6 @@ public:
 	WindowFramework*& windowFramework();
 
 private:
-	///The AudioManager used to load dynamically sounds.
-	AudioManager* mAudioMgr;
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.

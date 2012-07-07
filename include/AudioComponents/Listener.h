@@ -31,6 +31,7 @@
 #include <lpoint3.h>
 #include <nodePath.h>
 #include <genericAsyncTask.h>
+#include <clockObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -63,13 +64,12 @@ public:
 	void set3dStaticAttributes();
 
 	/**
-	 * \brief Updates position and velocity of this components.
+	 * \brief Updates position and velocity of this component.
 	 *
-	 * Will be called automatically in a task.
-	 * @param task The task.
-	 * @return The "done" status.
+	 * Will be called automatically by a audio manager update.
+	 * @param data The custom data.
 	 */
-	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
+	virtual void update(void* data);
 
 private:
 	///The template used to construct this component.
@@ -78,12 +78,6 @@ private:
 	NodePath mSceneRoot;
 	///Sounds' characteristics.
 	LPoint3 mPosition;
-
-	///@{
-	///A task data for update.
-	PT(TaskInterface<Listener>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
-	///@}
 
 	///TypedObject semantics: hardcoded
 public:

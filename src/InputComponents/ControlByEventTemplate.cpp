@@ -74,7 +74,7 @@ void ControlByEventTemplate::resetParameters()
 	mUp = std::string("r");
 	mDown = std::string("f");
 	mSpeedKey = std::string("shift");
-	mSpeed = std::string("100.0");
+	mSpeed = std::string("5.0");
 	mFastFactor = std::string("5.0");
 	mMovSens = std::string("2.0");
 	mRollSens = std::string("15.0");

@@ -33,6 +33,7 @@
 #include <mouseData.h>
 #include <graphicsWindow.h>
 #include <windowProperties.h>
+#include <clockObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
