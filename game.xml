@@ -14,6 +14,7 @@
 			<ComponentTmpl family="Scene" type="Model"/>
 			<ComponentTmpl family="Input" type="ControlByEvent"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
+			<ComponentTmpl family="Physics" type="RigidBody"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="Instanced">
 			<ComponentTmpl family="Scene" type="InstanceOf"/>
@@ -94,6 +95,10 @@
 				<Param mouse_enabled_p="false"/>
 			</Component>
 			<Component type="Model" priority="100">
+				<Param body_type="dynamic"/>
+				<Param shape_type="sphere"/>
+			</Component>
+			<Component type="RigidBody" priority="90">
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
 			</Component>

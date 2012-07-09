@@ -72,6 +72,11 @@ private:
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 
+	///@{
+	/// Physics parameters.
+	std::string mBodyType, mShapeType;
+	///@}
+
 	///TypedObject semantics: hardcoded
 public:
 	static TypeHandle get_class_type()

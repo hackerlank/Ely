@@ -69,16 +69,23 @@ Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
 
 void RigidBodyTemplate::setParameters(ParameterTable& parameterTable)
 {
+	ParameterTable::iterator iter;
+	CASEITER(parameterTable, iter, "body_type", mBodyType)
+	CASEITER(parameterTable, iter, "shape_type", mShapeType)
 }
 
 void RigidBodyTemplate::resetParameters()
 {
 	//set component parameters to their default values
+	mBodyType = std::string("dynamic");
+	mShapeType = std::string("sphere");
 }
 
 std::string& RigidBodyTemplate::parameter(const std::string& paramName)
 {
 	std::string* strPtr = &mUnknown;
+	CASE(paramName,strPtr,"body_type",mBodyType)
+	CASE(paramName,strPtr,"shape_type",mShapeType)
 	//
 	return *strPtr;
 }
