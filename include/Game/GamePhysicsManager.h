@@ -27,7 +27,13 @@
 #include <list>
 #include <algorithm>
 #include <bulletWorld.h>
+#include <bulletDebugNode.h>
 #include <pandaFramework.h>
+
+#ifdef DEBUG
+#include <windowFramework.h>
+#endif
+
 #include <clockObject.h>
 #include <asyncTask.h>
 #include <reMutex.h>
@@ -71,11 +77,34 @@ public:
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
+#ifdef DEBUG
+	/**
+	 * \brief Gets a reference to the Bullet Debug node.
+	 * @return The Bullet Debug node.
+	 */
+	BulletDebugNode* bulletDebugNodePath();
+
+	/**
+	 * \brief Initializes debugging.
+	 */
+	void initDebug(WindowFramework* windowFramework);
+	/**
+	 * \brief Enables/disables debugging.
+	 * @param enable True to enable, false to disable.
+	 */
+	void debug(bool enable);
+#endif
+
 private:
 	/// Bullet world.
 	PT(BulletWorld) mBulletWorld;
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
+
+#ifdef DEBUG
+	/// Bullet Debug node path.
+	NodePath mBulletDebugNodePath;
+#endif
 
 	///@{
 	///List of physics components to be updated.

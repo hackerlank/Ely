@@ -45,6 +45,9 @@ GameManager::GameManager(int argc, char* argv[]) :
 		mRender = mWindow->get_render();
 		mCamera = mWindow->get_camera_group();
 		mGlobalClock = ClockObject::get_global_clock();
+#ifdef DEBUG
+		GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
+#endif
 	}
 	else
 	{

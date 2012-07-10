@@ -95,12 +95,12 @@
 				<Param mouse_enabled_p="false"/>
 			</Component>
 			<Component type="Model" priority="100">
-				<Param body_type="dynamic"/>
-				<Param shape_type="sphere"/>
-			</Component>
-			<Component type="RigidBody" priority="90">
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
+			</Component>
+			<Component type="RigidBody" priority="90">
+				<Param body_type="dynamic"/>
+				<Param shape_type="sphere"/>
 			</Component>
 			<Component type="Sound3d">
 				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>

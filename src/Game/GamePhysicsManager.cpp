@@ -43,6 +43,10 @@ GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
 	mPandaFramework->get_task_mgr().add(mUpdateTask);
+#ifdef DEBUG
+	// set up Bullet Debug Renderer (disabled by default)
+	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
+#endif
 }
 
 GamePhysicsManager::~GamePhysicsManager()
@@ -100,7 +104,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	timeStep = 0.016666667; //60 fps
 #endif
 
-	// call all audio components update functions, passing delta time
+	// call all physics components update functions, passing delta time
 	PhysicsComponentList::iterator iter;
 	for (iter = mPhysicsComponents.begin(); iter != mPhysicsComponents.end();
 			++iter)
@@ -153,3 +157,39 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 
 }
 
+#ifdef DEBUG
+BulletDebugNode* GamePhysicsManager::bulletDebugNodePath()
+{
+	return DCAST(BulletDebugNode,mBulletDebugNodePath.node());
+}
+
+void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
+{
+	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
+	BulletDebugNode* bulletDebugNode =
+			DCAST(BulletDebugNode,mBulletDebugNodePath.node());
+	mBulletWorld->set_debug_node(bulletDebugNode);
+	bulletDebugNode->show_wireframe(true);
+	bulletDebugNode->show_constraints(true);
+	bulletDebugNode->show_bounding_boxes(false);
+	bulletDebugNode->show_normals(false);
+	mBulletDebugNodePath.hide();
+}
+
+void GamePhysicsManager::debug(bool enable)
+{
+	if (enable)
+	{
+		if (mBulletDebugNodePath.is_hidden())
+		{
+			mBulletDebugNodePath.show();
+		}
+	}
+	else
+	{
+		if (not mBulletDebugNodePath.is_hidden())
+		{
+			mBulletDebugNodePath.hide();
+		}
+	}
+#endif

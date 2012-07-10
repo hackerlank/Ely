@@ -41,12 +41,12 @@
 #include <cstdio>
 #include "tinyxml2.h"
 
-#include <audioManager.h>
-
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "GameAudioManager.h"
+#include "GamePhysicsManager.h"
 
 class FuncInterval;
 
