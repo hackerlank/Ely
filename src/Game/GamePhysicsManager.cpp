@@ -192,4 +192,5 @@ void GamePhysicsManager::debug(bool enable)
 			mBulletDebugNodePath.hide();
 		}
 	}
+}
 #endif

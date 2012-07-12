@@ -53,6 +53,8 @@ const ComponentType RigidBody::componentType() const
 bool RigidBody::initialize()
 {
 	bool result = true;
+	//get shape type
+
 	//
 	return result;
 }

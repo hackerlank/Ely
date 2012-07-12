@@ -64,12 +64,12 @@ bool ComponentTemplateManager::removeComponentTemplate(
 }
 
 ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
-		ComponentType componentID)
+		ComponentType componentType)
 {
 	//lock (guard) the mutex
 	lock_guard<ReMutex> guard(mMutex);
 
-	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
 	if (it == mComponentTemplates.end())
 	{
 		return NULL;

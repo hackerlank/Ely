@@ -67,25 +67,37 @@ Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
 	return newRigidBody;
 }
 
-void RigidBodyTemplate::setParameters(ParameterTable& parameterTable)
-{
-	ParameterTable::iterator iter;
-	CASEITER(parameterTable, iter, "body_type", mBodyType)
-	CASEITER(parameterTable, iter, "shape_type", mShapeType)
-}
-
 void RigidBodyTemplate::resetParameters()
 {
 	//set component parameters to their default values
 	mBodyType = std::string("dynamic");
+	mBodyMass = std::string("1.0");
 	mShapeType = std::string("sphere");
+	mCollideMask = std::string("all_on");
+	mCcdMotionThreshold = std::string("");
+	mCcdSweptSphereRadius = std::string("");
+}
+
+void RigidBodyTemplate::setParameters(ParameterTable& parameterTable)
+{
+	ParameterTable::iterator iter;
+	CASEITER(parameterTable, iter, "body_type", mBodyType)
+	CASEITER(parameterTable, iter, "body_mass", mBodyMass)
+	CASEITER(parameterTable, iter, "shape_type", mShapeType)
+	CASEITER(parameterTable, iter, "collide_mask", mCollideMask)
+	CASEITER(parameterTable, iter, "ccd_motion_threshold", mCcdMotionThreshold)
+	CASEITER(parameterTable, iter, "ccd_swept_sphere_radius", mCcdSweptSphereRadius)
 }
 
 std::string& RigidBodyTemplate::parameter(const std::string& paramName)
 {
 	std::string* strPtr = &mUnknown;
-	CASE(paramName,strPtr,"body_type",mBodyType)
-	CASE(paramName,strPtr,"shape_type",mShapeType)
+	CASE(paramName, strPtr, "body_type", mBodyType)
+	CASE(paramName, strPtr, "body_mass", mBodyMass)
+	CASE(paramName, strPtr, "shape_type", mShapeType)
+	CASE(paramName, strPtr, "collide_mask", mCollideMask)
+	CASE(paramName, strPtr, "ccd_motion_threshold", mCcdMotionThreshold)
+	CASE(paramName, strPtr, "ccd_swept_sphere_radius", mCcdSweptSphereRadius)
 	//
 	return *strPtr;
 }

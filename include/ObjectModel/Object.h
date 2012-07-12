@@ -145,9 +145,11 @@ private:
 	NodePath mNodePath;
 	///Unique identifier for this object.
 	ObjectId mObjectId;
+	///@{
 	///Table of all components indexed by component family type.
 	typedef std::map<const ComponentFamilyType, PT(Component)> ComponentTable;
 	ComponentTable mComponents;
+	///@}
 	///Static flag: if this object doesn't move in the world.
 	///Various components can set or get this value to implement
 	///some optimization.

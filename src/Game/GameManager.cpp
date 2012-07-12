@@ -201,16 +201,16 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			objectTmpl != NULL;
 			objectTmpl = objectTmpl->NextSiblingElement("ObjectTmpl"))
 	{
-		const char *type = objectTmpl->Attribute("type", NULL);
-		if (not type)
+		const char *objectType = objectTmpl->Attribute("type", NULL);
+		if (not objectType)
 		{
 			continue;
 		}
-		std::cout << "  Adding Object Template for '" << type << "' type"
+		std::cout << "  Adding Object Template for '" << objectType << "' type"
 				<< std::endl;
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
-		objTmplPtr = new ObjectTemplate(ObjectType(type),
+		objTmplPtr = new ObjectTemplate(ObjectType(objectType),
 				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
 		//cycle through the ComponentTmpl(s)' definitions ...
 		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
@@ -218,18 +218,23 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				componentTmpl = componentTmpl->NextSiblingElement(
 						"ComponentTmpl"))
 		{
-			const char *family = componentTmpl->Attribute("family", NULL);
-			const char *type = componentTmpl->Attribute("type", NULL);
-			if (not family or not type)
+			const char *compFamily = componentTmpl->Attribute("family", NULL);
+			const char *compType = componentTmpl->Attribute("type", NULL);
+			if (not compFamily or not compType)
 			{
 				continue;
 			}
-			std::cout << "    Component of family '" << family << "' and type '"
-					<< type << "'" << std::endl;
+			std::cout << "    Component of family '" << compFamily
+					<< "' and type '" << compType << "'" << std::endl;
 			//... add all component templates
-			objTmplPtr->addComponentTemplate(
+			ComponentTemplate* compTmpl =
 					ComponentTemplateManager::GetSingleton().getComponentTemplate(
-							ComponentType(type)));
+							ComponentType(compType));
+			if (compTmpl == NULL)
+			{
+				continue;
+			}
+			objTmplPtr->addComponentTemplate(compTmpl);
 		}
 		// add 'type' object template to manager
 		ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmplPtr);
@@ -346,6 +351,10 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			// set id with the internally generated id
 			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
 					ObjectType(objType));
+		}
+		if (objectPtr == NULL)
+		{
+			continue;
 		}
 		std::cout << "  ...Created Object '" << objectPtr->objectId() << "'"
 				<< std::endl;

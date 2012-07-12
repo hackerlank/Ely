@@ -26,6 +26,8 @@
 
 #include <pointerTo.h>
 #include <nodePath.h>
+#include <bulletShape.h>
+#include <bulletRigidBodyNode.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -48,11 +50,38 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
+	/**
+	 * \brief The actual component's type.
+	 *
+	 * It may change during the component's lifetime.
+	 */
+	enum BodyType
+	{
+		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
+		STATIC,  //!< STATIC: mass == 0.0, no driven
+		KINEMATIC//!< KINEMATIC: mass == 0.0, user driven
+	};
+
+	/**
+	 * \brief Switches the actual component's type.
+	 * @param bodyType The new component's type.
+	 */
+	void switchType(BodyType bodyType);
+
 private:
 	///The template used to construct this component.
 	RigidBodyTemplate* mTmpl;
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
+	///The Rigid Body Node of this component.
+	PT(BulletRigidBodyNode) mBody;
+	///The (Collision) Shape of this component.
+	PT(BulletShape) mShape;
+	///@{
+	///Physics parameters.
+	float mBodyMass, mCcdMotionThreshold, mCcdSweptSphereRadius;
+	BodyType mBodyType;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

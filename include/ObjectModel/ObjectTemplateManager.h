@@ -25,6 +25,7 @@
 #define OBJECTTEMPLATEMANAGER_H_
 
 #include <map>
+#include <iostream>
 #include <reMutex.h>
 #include "Utilities/Tools.h"
 #include "ObjectTemplate.h"

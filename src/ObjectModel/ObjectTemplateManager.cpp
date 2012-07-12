@@ -90,7 +90,7 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 	ObjectTemplateTable::iterator it1 = mObjectTemplates.find(objectType);
 	if (it1 == mObjectTemplates.end())
 	{
-		return false;
+		return NULL;
 	}
 	ObjectTemplate* objectTmpl = (*it1).second;
 	//create the new object
@@ -112,11 +112,15 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 	for (it2 = compTmplList.begin(); it2 != compTmplList.end(); ++it2)
 	{
 		//use ComponentTemplateManager to create component
-		ComponentType compId = (*it2)->componentType();
+		ComponentType compType = (*it2)->componentType();
 		Component* newComp =
 				ComponentTemplateManager::GetSingleton().createComponent(
-						compId);
+						compType);
 		//add the component into the object
+		if (not newComp)
+		{
+			return NULL;
+		}
 		newObj->addComponent(newComp);
 	}
 	//insert the just created object in the table of created objects
