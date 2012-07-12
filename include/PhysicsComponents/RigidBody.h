@@ -28,6 +28,7 @@
 #include <nodePath.h>
 #include <bulletShape.h>
 #include <bulletRigidBodyNode.h>
+#include <bitMask.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -36,6 +37,17 @@ class RigidBodyTemplate;
 
 /**
  * \brief Component representing a single rigid body attached to an object.
+ *
+ * It, by default, constructs a rigid body with a single collision shape
+ * of type:
+ * \li \c Sphere (default)
+ * \li \c Box
+ * \li \c Cylinder
+ * \li \c Capsule
+ * \li \c Cone
+ * as specified by a component template parameter, and wrapping as tight as
+ * possible, the geometry of the object (specified by the model component).
+ * More complex shapes, can be set through the bullet rigid body node.
  */
 class RigidBody: public Component
 {
@@ -49,6 +61,12 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+
+	/**
+	 * \brief Gets a reference to the bullet rigid body node.
+	 * @return The bullet rigid body node.
+	 */
+	BulletRigidBodyNode* rigidBodyNode();
 
 	/**
 	 * \brief The actual component's type.
@@ -75,12 +93,11 @@ private:
 	NodePath mSceneRoot;
 	///The Rigid Body Node of this component.
 	PT(BulletRigidBodyNode) mBody;
-	///The (Collision) Shape of this component.
-	PT(BulletShape) mShape;
 	///@{
 	///Physics parameters.
 	float mBodyMass, mCcdMotionThreshold, mCcdSweptSphereRadius;
 	BodyType mBodyType;
+	BitMask32 mCollideMask;
 	///@}
 
 	///TypedObject semantics: hardcoded

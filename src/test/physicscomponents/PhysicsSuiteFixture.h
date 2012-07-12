@@ -28,6 +28,7 @@
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GamePhysicsManager.h"
 #include <pandaFramework.h>
 #include <nodePath.h>
 #include <geomNode.h>
@@ -37,13 +38,14 @@ struct PhysicsSuiteFixture
 {
 	PhysicsSuiteFixture() :
 			mRigid(NULL), mCompId("RigidBody_Test"), mRigidTmpl(NULL), mObjectTmpl(
-					NULL)
+					NULL), physicsMgr(NULL)
 	{
 		int argc = 0;
 		char** argv = NULL;
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
+		physicsMgr = new GamePhysicsManager(mPanda);
 		RigidBodyTemplate::init_type();
 		RigidBody::init_type();
 		ObjectTemplate::init_type();
@@ -51,6 +53,11 @@ struct PhysicsSuiteFixture
 	}
 	~PhysicsSuiteFixture()
 	{
+		//delete audio manager
+		if (physicsMgr)
+		{
+			delete physicsMgr;
+		}
 		//delete always objects/components before their templates
 		if (mObjectTmpl)
 		{
@@ -71,9 +78,9 @@ struct PhysicsSuiteFixture
 	ComponentId mCompId;
 	RigidBodyTemplate* mRigidTmpl;
 	ObjectTemplate* mObjectTmpl;
+	GamePhysicsManager* physicsMgr;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
-	ObjectTemplateManager mObjectTmplMgr;
 };
 
 #endif /* PHYSICSSUITEFIXTURE_H_ */

@@ -104,8 +104,8 @@
 				<Param body_mass="1.0"/>
 				<Param shape_type="sphere"/>
 				<Param collide_mask="all_on"/>
-				<Param ccd_motion_threshold="1e-7"/>
-				<Param ccd_swept_sphere_radius="0.5"/>
+				<Param ccd_motion_threshold=""/>
+				<Param ccd_swept_sphere_radius=""/>
 			</Component>
 			<Component type="Sound3d">
 				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>

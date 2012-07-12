@@ -41,7 +41,29 @@ BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
 BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 {
 	BOOST_TEST_MESSAGE("TESTING RigidBodyTemplate");
+	mRigidTmpl = new RigidBodyTemplate(mPanda,mWin);
+	BOOST_REQUIRE(mRigidTmpl != NULL);
+	mRigidTmpl->resetParameters();
+	BOOST_CHECK(mRigidTmpl->parameter("body_type") == std::string("dynamic"));
+	BOOST_CHECK(mRigidTmpl->parameter("body_mass") == std::string("1.0"));
+	BOOST_CHECK(mRigidTmpl->parameter("shape_type") == std::string("sphere"));
+	BOOST_CHECK(mRigidTmpl->parameter("collide_mask") == std::string("all_on"));
+	BOOST_CHECK(mRigidTmpl->parameter("ccd_motion_threshold") == std::string(""));
+	BOOST_CHECK(mRigidTmpl->parameter("ccd_swept_sphere_radius") == std::string(""));
 	BOOST_TEST_MESSAGE("TESTING RigidBody");
+	mRigid =
+	DCAST(RigidBody, mRigidTmpl->makeComponent(mCompId));
+	BOOST_REQUIRE(mRigid != NULL);
+	BOOST_CHECK(mRigid->componentType() == ComponentId("RigidBody"));
+	BOOST_CHECK(mRigid->familyType() == ComponentFamilyType("Physics"));
+	//add mRigid to an object
+	GeomNode* testGeom = new GeomNode("testGeom");
+	NodePath testNP(testGeom);
+	Object testObj("testObj",mObjectTmpl);
+	testObj.nodePath() = testNP;
+	mRigid->ownerObject() = &testObj;
+	testObj.addComponent(mRigid);
+	BOOST_CHECK(mRigid->rigidBodyNode() == DCAST(BulletRigidBodyNode, testObj.nodePath().node()));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Physics suite
