@@ -35,6 +35,7 @@ GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
 	mUpdateTask = NULL;
 	mPandaFramework = pandaFramework;
 	mBulletWorld = new BulletWorld();
+	mBulletWorld->set_gravity(0.0, 0.0, -9.81);
 	//create the task for updating step simulation and physics component
 	mUpdateData = new TaskInterface<GamePhysicsManager>::TaskData(this,
 			&GamePhysicsManager::update);

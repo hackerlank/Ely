@@ -45,9 +45,6 @@ GameManager::GameManager(int argc, char* argv[]) :
 		mRender = mWindow->get_render();
 		mCamera = mWindow->get_camera_group();
 		mGlobalClock = ClockObject::get_global_clock();
-#ifdef DEBUG
-		GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
-#endif
 	}
 	else
 	{
@@ -71,6 +68,10 @@ void GameManager::setup()
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
 	trackBall->set_mat(cameraMat);
+
+#ifdef DEBUG
+		GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
+#endif
 
 	//initialize typed objects
 	initTypedObjects();

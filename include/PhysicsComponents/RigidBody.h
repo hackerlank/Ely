@@ -92,7 +92,7 @@ private:
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
 	///The Rigid Body Node of this component.
-	PT(BulletRigidBodyNode) mBody;
+	PT(BulletRigidBodyNode) mRigidBodyNode;
 	///@{
 	///Physics parameters.
 	float mBodyMass, mCcdMotionThreshold, mCcdSweptSphereRadius;

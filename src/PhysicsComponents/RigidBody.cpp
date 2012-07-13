@@ -63,5 +63,16 @@ void RigidBody::onAddToObjectSetup()
 {
 }
 
+BulletRigidBodyNode* RigidBody::rigidBodyNode()
+{
+	return mRigidBodyNode.p();
+}
+
+void RigidBody::switchType(BodyType bodyType)
+{
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle RigidBody::_type_handle;
+
+

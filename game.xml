@@ -15,7 +15,9 @@
 			<ComponentTmpl family="Scene" type="Model"/>
 			<ComponentTmpl family="Input" type="ControlByEvent"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
-			<ComponentTmpl family="Physics" type="RigidBody"/>
+<!--			
+			<ComponentTmpl family="Physics" type="RigidBody"/> 
+-->
 		</ObjectTmpl>
 		<ObjectTmpl type="Instanced">
 			<ComponentTmpl family="Scene" type="InstanceOf"/>
@@ -99,6 +101,7 @@
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
 			</Component>
+<!--
 			<Component type="RigidBody" priority="90">
 				<Param body_type="dynamic"/>
 				<Param body_mass="1.0"/>
@@ -106,7 +109,8 @@
 				<Param collide_mask="all_on"/>
 				<Param ccd_motion_threshold=""/>
 				<Param ccd_swept_sphere_radius=""/>
-			</Component>
+			</Component> 
+-->
 			<Component type="Sound3d">
 				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
