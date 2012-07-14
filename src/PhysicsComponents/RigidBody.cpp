@@ -51,7 +51,6 @@ const ComponentType RigidBody::componentType() const
 	return mTmpl->componentType();
 }
 
-
 bool RigidBody::initialize()
 {
 	bool result = true;
@@ -78,7 +77,6 @@ bool RigidBody::initialize()
 			mTmpl->parameter(std::string("body_restitution")).c_str());
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
-	mAutomaticShaping = true;
 	if (shapeType == std::string("sphere"))
 	{
 		mShapeType = SPHERE;
@@ -89,7 +87,28 @@ bool RigidBody::initialize()
 			mDim1 > 0.0 ? mAutomaticShaping = false : mAutomaticShaping = true;
 		}
 	}
-	if (shapeType == std::string("box"))
+	else if (shapeType == std::string("plane"))
+	{
+		mShapeType = PLANE;
+		std::string norm_x = mTmpl->parameter(std::string("shape_norm_x"));
+		std::string norm_y = mTmpl->parameter(std::string("shape_norm_y"));
+		std::string norm_z = mTmpl->parameter(std::string("shape_norm_z"));
+		std::string d = mTmpl->parameter(std::string("shape_d"));
+		if ((norm_x != mTmpl->UNKNOWN) and (norm_y != mTmpl->UNKNOWN)
+				and (norm_z != mTmpl->UNKNOWN))
+		{
+			LVector3 normal((float) atof(norm_x.c_str()),
+					(float) atof(norm_y.c_str()), (float) atof(norm_z.c_str()));
+			normal.normalize();
+			mDim1 = normal.get_x();
+			mDim2 = normal.get_y();
+			mDim3 = normal.get_z();
+			mDim4 = (float) atof(d.c_str());
+			normal.length() > 0.0 ? mAutomaticShaping = false :
+					mAutomaticShaping = true;
+		}
+	}
+	else if (shapeType == std::string("box"))
 	{
 		mShapeType = BOX;
 		std::string half_x = mTmpl->parameter(std::string("shape_half_x"));
@@ -105,7 +124,7 @@ bool RigidBody::initialize()
 					false : mAutomaticShaping = true;
 		}
 	}
-	if (shapeType == std::string("cylinder"))
+	else if (shapeType == std::string("cylinder"))
 	{
 		mShapeType = CYLINDER;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
@@ -119,7 +138,7 @@ bool RigidBody::initialize()
 					mAutomaticShaping = true;
 		}
 	}
-	if (shapeType == std::string("capsule"))
+	else if (shapeType == std::string("capsule"))
 	{
 		mShapeType = CAPSULE;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
@@ -133,7 +152,7 @@ bool RigidBody::initialize()
 					mAutomaticShaping = true;
 		}
 	}
-	if (shapeType == std::string("cone"))
+	else if (shapeType == std::string("cone"))
 	{
 		mShapeType = CONE;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
@@ -146,6 +165,11 @@ bool RigidBody::initialize()
 			mDim1 > 0.0 and mDim2 > 0.0 ? mAutomaticShaping = false :
 					mAutomaticShaping = true;
 		}
+	}
+	else //default a sphere with auto shaping
+	{
+		mShapeType = SPHERE;
+		mAutomaticShaping = true;
 	}
 	//get collide mask
 	std::string collideMask = mTmpl->parameter(std::string("collide_mask"));
@@ -224,35 +248,25 @@ BulletShape* RigidBody::createShape(ShapeType shapeType)
 	//get the dimensions of object node path, that should represents
 	//a model (if not all dimensions are set to 1.0)
 	getDimensions(mOwnerObject->nodePath());
-
+	if (not mAutomaticShaping)
+	{
+		//set directly some dimensions
+	}
 }
 
-//def getDimensions(model, scale=None):
-//    # get dimensions of panda
-//    modelScale = scale
-//    minP = LPoint3f()
-//    maxP = LPoint3f()
-//    model.calcTightBounds(minP, maxP)
-//    if modelScale != None:
-//        modelDims = LVector3f(abs(maxP.getX() - minP.getX()),
-//                          abs(maxP.getY() - minP.getY()),
-//                          abs(maxP.getZ() - minP.getZ())) * modelScale
-//    else:
-//        modelDims = LVector3f(abs(maxP.getX() - minP.getX()),
-//                          abs(maxP.getY() - minP.getY()),
-//                          abs(maxP.getZ() - minP.getZ()))
-//    #
-//    modelCenter = LPoint3f(maxP.getX() - minP.getX(),
-//                       maxP.getY() - minP.getY(),
-//                       maxP.getZ() - minP.getZ()) / 2.0
-//    modelRadius = max(modelDims.getX(),
-//                      modelDims.getY(),
-//                      modelDims.getZ()) / 2.0
-//    if modelScale != None:
-//        model.setScale(modelScale)
-//    return (modelDims, modelCenter, modelRadius)
-void RigidBody::getDimensions(NodePath modelNP, LVecBase3 scale)
+void RigidBody::getDimensions(NodePath modelNP)
 {
+	//get "tight" dimensions of panda
+	LPoint3 minP, maxP;
+	mOwnerObject->nodePath().calc_tight_bounds(minP, maxP);
+	//
+	LVecBase3 delta = maxP - minP;
+	//
+	mModelDims = LVector3(abs(delta.get_x()), abs(delta.get_y()),
+			abs(delta.get_z()));
+	mModelCenter = delta / 2.0;
+	mModelRadius = max(max(mModelDims.get_x(), mModelDims.get_y()),
+			mModelDims.get_z()) / 2.0;
 }
 
 BulletRigidBodyNode* RigidBody::rigidBodyNode()

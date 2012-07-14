@@ -63,6 +63,7 @@ BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 	testObj.nodePath() = testNP;
 	mRigid->ownerObject() = &testObj;
 	testObj.addComponent(mRigid);
+	mRigid->onAddToSceneSetup();
 	BOOST_CHECK(mRigid->rigidBodyNode() == DCAST(BulletRigidBodyNode, testObj.nodePath().node()));
 }
 

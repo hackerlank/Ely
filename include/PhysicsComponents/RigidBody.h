@@ -28,6 +28,7 @@
 #include <cstdlib>
 #include <stdint.h>
 #include <cmath>
+#include <algorithm>
 #include <pointerTo.h>
 #include <nodePath.h>
 #include <bulletShape.h>
@@ -92,6 +93,7 @@ public:
 	enum ShapeType
 	{
 		SPHERE, //!< SPHERE (radius)
+		PLANE, //!< PLANE (norm_x, norm_y, norm_z, d)
 		BOX, //!< BOX (half_x, half_y, half_z)
 		CYLINDER, //!< CYLINDER (radius, height, up)
 		CAPSULE, //!< CAPSULE (radius, height, up)
@@ -146,15 +148,13 @@ private:
 	 * related dimensions into mModelDims, mModelCenter, mModelRadius
 	 * member variables.
 	 * @param modelNP The GeomNode node path.
-	 * @param scale The requested scale (default = 1.0)
 	 */
-	void getDimensions(NodePath modelNP,
-			LVecBase3 scale = LVecBase3(1.0, 1.0, 1.0));
+	void getDimensions(NodePath modelNP);
 	LVector3 mModelDims;
 	LPoint3 mModelCenter;
 	float mModelRadius;
 	bool mAutomaticShaping;
-	float mDim1, mDim2, mDim3;
+	float mDim1, mDim2, mDim3, mDim4;
 	std::string mUpAxis;
 	///@}
 
