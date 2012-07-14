@@ -68,7 +68,7 @@ void InstanceOfTemplate::resetParameters()
 
 std::string& InstanceOfTemplate::parameter(const std::string& paramName)
 {
-	std::string* strPtr = &mUnknown;
+	std::string* strPtr = &UNKNOWN;
 	CASE(paramName,strPtr,"instance_of",mInstanceOf)
 	//
 	return *strPtr;

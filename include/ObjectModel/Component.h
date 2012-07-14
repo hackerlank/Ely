@@ -105,7 +105,8 @@ public:
 	 * \brief On object addition to scene setup.
 	 *
 	 * Gives a component the ability to do some setup just "after" the
-	 * object, this component belongs to, has been added to the scene. Optional.
+	 * object, this component belongs to, has been added to the scene
+	 * and set up. Optional.
 	 */
 	virtual void onAddToSceneSetup();
 	/**

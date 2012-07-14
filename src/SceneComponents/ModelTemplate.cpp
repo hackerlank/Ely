@@ -92,7 +92,7 @@ void ModelTemplate::resetParameters()
 
 std::string& ModelTemplate::parameter(const std::string& paramName)
 {
-	std::string* strPtr = &mUnknown;
+	std::string* strPtr = &UNKNOWN;
 	CASE(paramName,strPtr,"is_static",mIsStatic)
 	CASE(paramName,strPtr,"model_file",mModelFile)
 	//
@@ -101,7 +101,7 @@ std::string& ModelTemplate::parameter(const std::string& paramName)
 
 std::list<std::string>&  ModelTemplate::parameterList(const std::string& paramName)
 {
-	std::list<std::string>* strListPtr = &mUnknownList;
+	std::list<std::string>* strListPtr = &UNKNOWNLIST;
 	CASE(paramName,strListPtr,"anim_files",mAnimFiles)
 	//
 	return *strListPtr;

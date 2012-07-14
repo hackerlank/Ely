@@ -105,10 +105,12 @@
 			<Component type="RigidBody" priority="90">
 				<Param body_type="dynamic"/>
 				<Param body_mass="1.0"/>
+				<Param body_friction="0.8"/>
+				<Param body_restitution="0.1"/>
 				<Param shape_type="sphere"/>
 				<Param collide_mask="all_on"/>
-				<Param ccd_motion_threshold=""/>
-				<Param ccd_swept_sphere_radius=""/>
+				<Param ccd_motion_threshold="-1.0"/>
+				<Param ccd_swept_sphere_radius="-1.0"/>
 			</Component> 
 -->
 			<Component type="Sound3d">

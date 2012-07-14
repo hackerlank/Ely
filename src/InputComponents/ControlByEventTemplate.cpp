@@ -99,7 +99,7 @@ WindowFramework*& ControlByEventTemplate::windowFramework()
 
 std::string& ControlByEventTemplate::parameter(const std::string& paramName)
 {
-	std::string* strPtr = &mUnknown;
+	std::string* strPtr = &UNKNOWN;
 	CASE(paramName,strPtr,"enabled",mEnabled)
 	CASE(paramName,strPtr,"mouse_enabled_h",mMouseEnabledH)
 	CASE(paramName,strPtr,"mouse_enabled_p",mMouseEnabledP)

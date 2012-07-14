@@ -83,7 +83,7 @@ void Sound3dTemplate::resetParameters()
 std::list<std::string>& Sound3dTemplate::parameterList(
 		const std::string& paramName)
 {
-	std::list<std::string>* strListPtr = &mUnknownList;
+	std::list<std::string>* strListPtr = &UNKNOWNLIST;
 	CASE(paramName, strListPtr, "sound_files", mSoundFiles)
 	//
 	return *strListPtr;

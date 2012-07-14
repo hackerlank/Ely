@@ -23,7 +23,8 @@
 
 #include "ObjectModel/ComponentTemplate.h"
 
-ComponentTemplate::ComponentTemplate()
+ComponentTemplate::ComponentTemplate() :
+		UNKNOWN(std::string("")), UNKNOWNLIST(std::list<std::string>())
 {
 }
 
@@ -37,19 +38,19 @@ void ComponentTemplate::resetParameters()
 
 std::string& ComponentTemplate::parameter(const std::string& name)
 {
-	std::string* strPtr = &mUnknown;
+	std::string* strPtr = &UNKNOWN;
 	//
 	return *strPtr;
 }
 
-std::list<std::string>& ComponentTemplate::parameterList(const std::string& name)
+std::list<std::string>& ComponentTemplate::parameterList(
+		const std::string& name)
 {
-	std::list<std::string>* strListPtr = &mUnknownList;
+	std::list<std::string>* strListPtr = &UNKNOWNLIST;
 	//
 	return *strListPtr;
 }
 
 //TypedObject semantics: hardcoded
 TypeHandle ComponentTemplate::_type_handle;
-
 

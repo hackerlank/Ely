@@ -81,12 +81,13 @@ public:
 	virtual std::list<std::string>& parameterList(const std::string& paramName);
 	///@}
 
-protected:
 	///@{
 	/// Set of allowed Parameters.
-	std::string mUnknown;
-	std::list<std::string> mUnknownList;
+	std::string UNKNOWN;
+	std::list<std::string> UNKNOWNLIST;
 	///@}
+
+protected:
 
 	///TypedObject semantics: hardcoded
 public:

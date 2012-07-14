@@ -78,7 +78,7 @@ void NodePathWrapperTemplate::resetParameters()
 
 std::string& NodePathWrapperTemplate::parameter(const std::string& paramName)
 {
-	std::string* strPtr = &mUnknown;
+	std::string* strPtr = &UNKNOWN;
 	CASE(paramName,strPtr,"nodepath",mNodePath)
 	//
 	return *strPtr;

@@ -74,8 +74,9 @@ private:
 
 	///@{
 	/// Physics parameters.
-	std::string mBodyType, mBodyMass, mShapeType, mCollideMask,
-			mCcdMotionThreshold, mCcdSweptSphereRadius;
+	std::string mBodyType, mBodyMass, mBodyFriction, mBodyRestitution,
+			mShapeType, mCollideMask, mCcdMotionThreshold,
+			mCcdSweptSphereRadius;
 	///@}
 
 	///TypedObject semantics: hardcoded
