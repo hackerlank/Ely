@@ -38,7 +38,7 @@ Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
 		throw GameException(
 				"Sound3dTemplate::Sound3dTemplate: invalid GameAudioManager");
 	}
-	resetParameters();
+	setParametersDefaults();
 }
 
 Sound3dTemplate::~Sound3dTemplate()
@@ -67,26 +67,10 @@ Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
 	return newSound3d;
 }
 
-void Sound3dTemplate::setParameters(ParameterTable& parameterTable)
+void Sound3dTemplate::setParametersDefaults()
 {
-	ParameterTable::iterator iter;
-	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
-	CASERANGE(parameterTable, iter, iterRange, "sound_files", mSoundFiles)
-}
-
-void Sound3dTemplate::resetParameters()
-{
-	//set component parameters to their default values
-	mSoundFiles.clear();
-}
-
-std::list<std::string>& Sound3dTemplate::parameterList(
-		const std::string& paramName)
-{
-	std::list<std::string>* strListPtr = &UNKNOWNLIST;
-	CASE(paramName, strListPtr, "sound_files", mSoundFiles)
-	//
-	return *strListPtr;
+	//sets the (mandatory) parameters to their default values:
+	//no mandatory parameters
 }
 
 GameAudioManager* Sound3dTemplate::gameAudioMgr()

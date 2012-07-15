@@ -45,9 +45,7 @@ public:
 
 	virtual Component* makeComponent(const ComponentId& compId);
 
-	virtual void setParameters(ParameterTable& parameterTable);
-	virtual void resetParameters();
-	virtual std::string& parameter(const std::string& paramName);
+	virtual void setParametersDefaults();
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -66,18 +64,6 @@ private:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
-	///@{
-	/// Event key names, inversion, mouse enabling, enabling.
-	std::string mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-			mRollLeft, mRollRight, mSpeedKey, mInvertedKeyBoard, mMouseEnabledH,
-			mMouseEnabledP, mInvertedMouse, mEnabled;
-	///@}
-	///@{
-	/// Sensitivity parameters.
-	std::string mSpeed, mFastFactor;
-	std::string mMovSens, mRollSens;
-	std::string mSensX, mSensY;
-	///@}
 
 	///TypedObject semantics: hardcoded
 public:

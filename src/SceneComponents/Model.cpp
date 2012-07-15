@@ -87,8 +87,9 @@ bool Model::initialize()
 	}
 	//setup animations
 	std::list<std::string>::iterator it;
-	for (it = mTmpl->parameterList(std::string("anim_files")).begin();
-			it != mTmpl->parameterList(std::string("anim_files")).end(); ++it)
+	std::list<std::string> animFileList = mTmpl->parameterList(
+			std::string("anim_files"));
+	for (it = animFileList.begin(); it != animFileList.end(); ++it)
 	{
 		NodePath resultNP;
 		resultNP = mTmpl->windowFramework()->load_model(mNodePath,

@@ -81,7 +81,7 @@ bool RigidBody::initialize()
 	{
 		mShapeType = SPHERE;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
-		if (radius != mTmpl->UNKNOWN)
+		if (not radius.empty())
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim1 > 0.0 ? mAutomaticShaping = false : mAutomaticShaping = true;
@@ -94,8 +94,8 @@ bool RigidBody::initialize()
 		std::string norm_y = mTmpl->parameter(std::string("shape_norm_y"));
 		std::string norm_z = mTmpl->parameter(std::string("shape_norm_z"));
 		std::string d = mTmpl->parameter(std::string("shape_d"));
-		if ((norm_x != mTmpl->UNKNOWN) and (norm_y != mTmpl->UNKNOWN)
-				and (norm_z != mTmpl->UNKNOWN))
+		if ((not norm_x.empty()) and (not norm_y.empty())
+				and (not norm_z.empty()))
 		{
 			LVector3 normal((float) atof(norm_x.c_str()),
 					(float) atof(norm_y.c_str()), (float) atof(norm_z.c_str()));
@@ -114,8 +114,8 @@ bool RigidBody::initialize()
 		std::string half_x = mTmpl->parameter(std::string("shape_half_x"));
 		std::string half_y = mTmpl->parameter(std::string("shape_half_y"));
 		std::string half_z = mTmpl->parameter(std::string("shape_half_z"));
-		if ((half_x != mTmpl->UNKNOWN) and (half_y != mTmpl->UNKNOWN)
-				and (half_z != mTmpl->UNKNOWN))
+		if ((not half_x.empty()) and (not half_y.empty())
+				and (not half_z.empty()))
 		{
 			mDim1 = (float) atof(half_x.c_str());
 			mDim2 = (float) atof(half_y.c_str());
@@ -130,7 +130,7 @@ bool RigidBody::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
 		mUpAxis = mTmpl->parameter(std::string("shape_up"));
-		if ((radius != mTmpl->UNKNOWN) and (height != mTmpl->UNKNOWN))
+		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim2 = (float) atof(height.c_str());
@@ -144,7 +144,7 @@ bool RigidBody::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
 		mUpAxis = mTmpl->parameter(std::string("shape_up"));
-		if ((radius != mTmpl->UNKNOWN) and (height != mTmpl->UNKNOWN))
+		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim2 = (float) atof(height.c_str());
@@ -158,7 +158,7 @@ bool RigidBody::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
 		mUpAxis = mTmpl->parameter(std::string("shape_up"));
-		if ((radius != mTmpl->UNKNOWN) and (height != mTmpl->UNKNOWN))
+		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim2 = (float) atof(height.c_str());
@@ -186,7 +186,7 @@ bool RigidBody::initialize()
 		uint32_t mask = (uint32_t) atoi(collideMask.c_str());
 		mCollideMask.set_word(mask);
 #ifdef DEBUG
-		mCollideMask.write(std::cout, 2);
+		mCollideMask.write(std::cout, 0);
 #endif
 	}
 	//get ccd settings: enabled if both are greater than zero (> 0.0)

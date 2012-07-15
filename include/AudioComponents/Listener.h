@@ -37,6 +37,9 @@ class ListenerTemplate;
 
 /**
  * \brief Component manipulating the listener for 3d sounds.
+ *
+ * XML Param(s):
+ * \li \c None
  */
 class Listener: public Component
 {

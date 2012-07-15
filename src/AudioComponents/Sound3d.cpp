@@ -69,8 +69,9 @@ bool Sound3d::initialize()
 	bool result = true;
 	//set sound files
 	std::list<std::string>::iterator it;
-	for (it = mTmpl->parameterList(std::string("sound_files")).begin();
-			it != mTmpl->parameterList(std::string("sound_files")).end(); ++it)
+	std::list<std::string> soundFileList = mTmpl->parameterList(
+			std::string("sound_files"));
+	for (it = soundFileList.begin(); it != soundFileList.end(); ++it)
 	{
 		addSound(*it);
 	}
@@ -101,8 +102,8 @@ void Sound3d::onAddToSceneSetup()
 bool Sound3d::addSound(const std::string& fileName)
 {
 	bool result = false;
-	PT(AudioSound) sound =
-			mTmpl->gameAudioMgr()->audioMgr()->get_sound(fileName, true);
+	PT(AudioSound) sound = mTmpl->gameAudioMgr()->audioMgr()->get_sound(
+			fileName, true);
 	if (sound)
 	{
 		sounds()[fileName] = sound;

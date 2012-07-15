@@ -44,6 +44,8 @@ public:
 
 	virtual Component* makeComponent(const ComponentId& compId);
 
+	virtual void setParametersDefaults();
+
 	/**
 	 * \brief Gets the singleton GameAudioManager.
 	 * @return A reference to the GameAudioManager.

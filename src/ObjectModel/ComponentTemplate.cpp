@@ -23,32 +23,67 @@
 
 #include "ObjectModel/ComponentTemplate.h"
 
-ComponentTemplate::ComponentTemplate() :
-		UNKNOWN(std::string("")), UNKNOWNLIST(std::list<std::string>())
+ComponentTemplate::ComponentTemplate()
 {
+	mParameterTable.clear();
 }
 
 void ComponentTemplate::setParameters(ParameterTable& parameterTable)
 {
+	ParameterTableIter iter;
+	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	//create the parameterTable key set (i.e. the set of parameters
+	//that will overwrite those of mParameterTable with the same name)
+	std::set<std::string> keySet;
+	for (iter = parameterTable.begin(); iter != parameterTable; ++iter)
+	{
+		keySet.insert(iter->first);
+	}
+	//erase from mParameterTable the parameters to be overwritten
+	std::set<std::string>::iterator keySetIter;
+	for (keySetIter = keySet.begin(); keySetIter != keySet; ++keySetIter)
+	{
+		//find the mParameterTable range of values for
+		//the *keySetIter parameter ...
+		iterRange = mParameterTable.equal_range(*keySetIter);
+		//...and erase it
+		mParameterTable.erase(iterRange.first, iterRange.second);
+	}
+	//now mParameterTable is free from parameters to be overwritten
+	//so insert these ones into it from parameterTable
+	mParameterTable.insert(parameterTable.begin(), parameterTable.end());
+
 }
 
-void ComponentTemplate::resetParameters()
+std::string ComponentTemplate::parameter(const std::string& name)
 {
-}
-
-std::string& ComponentTemplate::parameter(const std::string& name)
-{
-	std::string* strPtr = &UNKNOWN;
+	std::string strPtr;
+	ParameterTable::iterator iter;
+	iter = mParameterTable.find(name);
+	//return a reference to a parameter value only if it exists
+	if (iter != mParameterTable.end())
+	{
+		strPtr = iter->second;
+	}
 	//
-	return *strPtr;
+	return strPtr;
 }
 
-std::list<std::string>& ComponentTemplate::parameterList(
-		const std::string& name)
+std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
 {
-	std::list<std::string>* strListPtr = &UNKNOWNLIST;
+	std::list<std::string> strList;
+	ParameterTableIter iter;
+	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	iterRange = mParameterTable.equal_range(name);
+	if (iterRange.first != iterRange.second)
+	{
+		for (iter = iterRange.first; iter != iterRange.second; ++iter)
+		{
+			strList.push_back(iter->second);
+		}
+	}
 	//
-	return *strListPtr;
+	return strList;
 }
 
 //TypedObject semantics: hardcoded

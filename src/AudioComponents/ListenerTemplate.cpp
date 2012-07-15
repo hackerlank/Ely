@@ -38,7 +38,7 @@ ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 		throw GameException(
 				"ListenerTemplate::ListenerTemplate: invalid GameAudioManager");
 	}
-	resetParameters();
+	setParametersDefaults();
 }
 
 ListenerTemplate::~ListenerTemplate()
@@ -65,6 +65,12 @@ Component* ListenerTemplate::makeComponent(const ComponentId& compId)
 		return NULL;
 	}
 	return newListener;
+}
+
+void ListenerTemplate::setParametersDefaults()
+{
+	//sets the (mandatory) parameters to their default values:
+	//no mandatory parameters
 }
 
 GameAudioManager* ListenerTemplate::gameAudioMgr()

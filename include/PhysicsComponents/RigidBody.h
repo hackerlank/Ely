@@ -46,15 +46,30 @@ class RigidBodyTemplate;
  * \brief Component representing a single rigid body attached to an object.
  *
  * It constructs a rigid body with the specified collision shape_type along
- * with relevant parameters, according to this table:
- * \li \c sphere: shape_radius (default shape)
- * \li \c box: shape_half_x, shape_half_y, shape_half_z
- * \li \c cylinder: shape_radius, shape_height, shape_up
- * \li \c capsule: shape_radius, shape_height, shape_up
- * \li \c cone: shape_radius, shape_height, shape_up
+ * with relevant parameters.
  * If any of the relevant parameter is missing, the shape is automatically
  * constructed striving to wrap it as tight as possible around the
  * object geometry (specified by the model component).
+ *
+ * XML Param(s):
+ * \li \c "body_type"  |single|required|"dynamic" ("static","kinematic")
+ * \li \c "body_mass"  |single|required|"1.0"
+ * \li \c "body_friction"  |single|required|"0.8"
+ * \li \c "body_restitution"  |single|required|"0.1"
+ * \li \c "shape_type"  |single|required|"sphere"
+ * \li \c "collide_mask"  |single|required|"all_on"
+ * \li \c "shape_radius"  |single|optional |no default
+ * \li \c "shape_norm_x"  |single|optional |no default
+ * \li \c "shape_norm_y"  |single|optional |no default
+ * \li \c "shape_norm_z"  |single|optional |no default
+ * \li \c "shape_d"  |single|optional |no default
+ * \li \c "shape_half_x"  |single|optional |no default
+ * \li \c "shape_half_y"  |single|optional |no default
+ * \li \c "shape_half_z"  |single|optional |no default
+ * \li \c "shape_height"  |single|optional |no default
+ * \li \c "shape_up"  |single|optional |no default
+ * \li \c "ccd_motion_threshold"  |single|optional |no default
+ * \li \c "ccd_swept_sphere_radius"  |single|optional |no default
  */
 class RigidBody: public Component
 {

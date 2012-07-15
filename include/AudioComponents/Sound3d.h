@@ -47,6 +47,9 @@ class Sound3dTemplate;
  * For "static" objects sound position/velocity can be set directly
  * and is not automatically updated.
  * All updates is done wrt scene root (e.g. render).
+ *
+ * XML Param(s):
+ * \li \c "sound_files" |multiple|optional|no default
  */
 class Sound3d: public Component
 {

@@ -57,6 +57,14 @@ bool NodePathWrapper::initialize()
 	{
 		mNodePath = mTmpl->windowFramework()->get_render();
 	}
+	else if (wrappedNodePath == std::string("render2d"))
+	{
+		mNodePath = mTmpl->windowFramework()->get_render_2d();
+	}
+	else if (wrappedNodePath == std::string("aspect2d"))
+	{
+		mNodePath = mTmpl->windowFramework()->get_aspect_2d();
+	}
 	else if (wrappedNodePath == std::string("camera"))
 	{
 		mNodePath = mTmpl->windowFramework()->get_camera_group();

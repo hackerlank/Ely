@@ -40,7 +40,7 @@ BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
 BOOST_AUTO_TEST_CASE(ModelTemplateTEST)
 {
 	mModelTmpl = new ModelTemplate(mPanda, mPanda->open_window());
-	mModelTmpl->resetParameters();
+	mModelTmpl->setParametersDefaults();
 	mModelTmpl->parameter("model_file") = Filename("panda");
 	mModel =
 	DCAST(Model, mModelTmpl->makeComponent(mModelId));

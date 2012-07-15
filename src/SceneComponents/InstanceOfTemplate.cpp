@@ -25,7 +25,7 @@
 
 InstanceOfTemplate::InstanceOfTemplate()
 {
-	resetParameters();
+	setParametersDefaults();
 }
 
 InstanceOfTemplate::~InstanceOfTemplate()
@@ -54,24 +54,10 @@ Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 	return newInstanceOf;
 }
 
-void InstanceOfTemplate::setParameters(ParameterTable& parameterTable)
+void InstanceOfTemplate::setParametersDefaults()
 {
-	ParameterTable::iterator iter;
-	CASEITER(parameterTable,iter,"instance_of",mInstanceOf)
-}
-
-void InstanceOfTemplate::resetParameters()
-{
-	//set component parameters to their default values
-	mInstanceOf = std::string("");
-}
-
-std::string& InstanceOfTemplate::parameter(const std::string& paramName)
-{
-	std::string* strPtr = &UNKNOWN;
-	CASE(paramName,strPtr,"instance_of",mInstanceOf)
-	//
-	return *strPtr;
+	//sets the (mandatory) parameters to their default values:
+	//no mandatory parameters
 }
 
 //TypedObject semantics: hardcoded

@@ -35,6 +35,9 @@ class NodePathWrapperTemplate;
 
 /**
  * \brief Component wrapping a predefined NodePath (e.g. render, camera etc...).
+ *
+ * XML Param(s):
+ * \li \c "nodepath"  |single|optional|no default
  */
 class NodePathWrapper: public Component
 {

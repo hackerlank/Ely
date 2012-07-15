@@ -25,6 +25,7 @@
 #define TOOLS_H_
 
 #include <exception>
+#include <map>
 #include <string>
 #include <sstream>
 #include <cassert>
@@ -228,34 +229,8 @@ template<typename A> struct TaskInterface
  * See ObjectTemplate, ComponentTemplate.
  */
 typedef std::multimap<std::string, std::string> ParameterTable;
-
-/**
- * \brief Helper macro used for getting parameter references.
- *
- * See ObjectTemplate, ComponentTemplate.
- */
-#define CASE(name,resPtr,value,param) \
-		if (name == std::string(value))\
-		{\
-			resPtr = &param;\
-		}
-#define CASELIST(name,resPtr,value,param) \
-		if (name == std::string(value))\
-		{\
-			resPtr = &param;\
-		}
-#define CASEITER(table,it,value,param) \
-	it = table.find(value);\
-	if (it != table.end())\
-	{\
-		param = iter->second;\
-	}
-#define CASERANGE(table,it,itrange,value,param) \
-	itrange = table.equal_range(value);\
-	for (it = itrange.first; it != itrange.second; ++it)\
-	{\
-		param.push_back(it->second);\
-	}
+typedef std::multimap<std::string, std::string>::iterator ParameterTableIter;
+typedef std::pair<std::string, std::string> ParameterNameValue;
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();

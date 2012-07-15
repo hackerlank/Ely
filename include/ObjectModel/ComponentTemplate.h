@@ -25,6 +25,9 @@
 #define COMPONENTTEMPLATE_H_
 
 #include <list>
+#include <set>
+#include <string>
+#include <utility>
 #include <typedWritableReferenceCount.h>
 #include "Component.h"
 #include "Utilities/Tools.h"
@@ -61,33 +64,35 @@ public:
 	 * \name Parameters management.
 	 * \brief Sets the parameters of the component, this template is
 	 * designed to create, to custom values.
+	 *
+	 * These parameters overwrite (and/or are added to) the parameters defaults
+	 * set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	virtual void setParameters(ParameterTable& parameterTable);
 
 	/**
-	 * \brief (Re)sets the parameters of the component, this template is
-	 * designed to create, to their default values.
+	 * \brief For the component this template is designed to create,
+	 * this function sets the (mandatory) parameters to their default values.
 	 */
-	virtual void resetParameters();
+	virtual void setParametersDefaults() = 0;
 
 	/**
-	 * \brief Get/set the parameters associated to the object.
+	 * \brief Gets the parameter value associated to the object.
 	 * @param The name of the parameter.
-	 * @return The value of the parameter.
+	 * @return The value of the parameter, empty string if none exists.
 	 */
-	///@{
-	virtual std::string& parameter(const std::string& paramName);
-	virtual std::list<std::string>& parameterList(const std::string& paramName);
-	///@}
-
-	///@{
-	/// Set of allowed Parameters.
-	std::string UNKNOWN;
-	std::list<std::string> UNKNOWNLIST;
-	///@}
+	virtual std::string parameter(const std::string& paramName);
+	/**
+	 * \brief Gets the parameter multi-values associated to the object.
+	 * @param The name of the parameter.
+	 * @return The value list  of the parameter, empty list if none exists.
+	 */
+	virtual std::list<std::string> parameterList(const std::string& paramName);
 
 protected:
+	///Parameter table
+	ParameterTable mParameterTable;
 
 	///TypedObject semantics: hardcoded
 public:

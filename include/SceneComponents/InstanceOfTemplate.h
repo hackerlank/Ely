@@ -43,15 +43,9 @@ public:
 
 	virtual Component* makeComponent(const ComponentId& compId);
 
-	virtual void setParameters(ParameterTable& parameterTable);
-	virtual void resetParameters();
-	virtual std::string& parameter(const std::string& paramName);
+	virtual void setParametersDefaults();
 
 private:
-	///@{
-	/// Set of allowed Parameters.
-	std::string mInstanceOf;
-	///@}
 
 	///TypedObject semantics: hardcoded
 public:

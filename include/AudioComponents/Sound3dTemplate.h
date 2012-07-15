@@ -46,9 +46,7 @@ public:
 
 	virtual Component* makeComponent(const ComponentId& compId);
 
-	virtual void setParameters(ParameterTable& parameterTable);
-	virtual void resetParameters();
-	virtual std::list<std::string>& parameterList(const std::string& paramName);
+	virtual void setParametersDefaults();
 
 	/**
 	 * \brief Gets the singleton GameAudioManager.
@@ -73,8 +71,6 @@ private:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
-	///The names of the sound files.
-	std::list<std::string> mSoundFiles;
 
 	///TypedObject semantics: hardcoded
 public:

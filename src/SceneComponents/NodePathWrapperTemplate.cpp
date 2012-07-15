@@ -34,7 +34,7 @@ NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 	}
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
-	resetParameters();
+	setParametersDefaults();
 
 }
 
@@ -64,24 +64,10 @@ Component* NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
 	return newNodePathWrapper;
 }
 
-void NodePathWrapperTemplate::setParameters(ParameterTable& parameterTable)
+void NodePathWrapperTemplate::setParametersDefaults()
 {
-	ParameterTable::iterator iter;
-	CASEITER(parameterTable,iter,"nodepath",mNodePath)
-}
-
-void NodePathWrapperTemplate::resetParameters()
-{
-	//set component parameters to their default values
-	mNodePath = std::string("");
-}
-
-std::string& NodePathWrapperTemplate::parameter(const std::string& paramName)
-{
-	std::string* strPtr = &UNKNOWN;
-	CASE(paramName,strPtr,"nodepath",mNodePath)
-	//
-	return *strPtr;
+	//sets the (mandatory) parameters to their default values:
+	//no mandatory parameters
 }
 
 PandaFramework*& NodePathWrapperTemplate::pandaFramework()

@@ -49,21 +49,34 @@ class ControlByEventTemplate;
  * its state (true/false). Event handlers commute basic movements
  * states. A (global) task updates the position/orientation of
  * the controlled object.
- * Default control key:
- * \li \c Forward : "w"
- * \li \c Backward : "s"
- * \li \c RollLeft : "a"
- * \li \c RollRight : "d"
- * \li \c StrafeLeft : "q"
- * \li \c StrafeRight : "e"
- * \li \c Up : "r"
- * \li \c Down : "f"
- * A basic movement can be disabled by putting its control key
- * to null string ("").
+ * A basic movement is disabled if its control key cannot be interpreted
+ * or is the null string ("").
  * Mouse movement for HEAD (i.e. YAW) and PITCH control can be enabled,
  * separately (default: both disabled).
  * All movements (but up and down) can be inverted (default: not inverted).
  * This component can be enabled/disabled as a whole (default: enabled).
+ *
+ * XML Param(s):
+ * \li \c "enabled"  |single|required|"true"
+ * \li \c "forward"  |single|required|"w"
+ * \li \c "backward"  |single|required|"s"
+ * \li \c "roll_left"  |single|required|"a"
+ * \li \c "roll_right"  |single|required|"d"
+ * \li \c "strafe_left"  |single|required|"q"
+ * \li \c "strafe_right"  |single|required|"e"
+ * \li \c "up"  |single|required|"r"
+ * \li \c "down"  |single|required|"f"
+ * \li \c "speed_key"  |single|required|"shift"
+ * \li \c "speed"  |single|required|"5.0"
+ * \li \c "fast_factor"  |single|required|"5.0"
+ * \li \c "mov_sens"  |single|required|"2.0"
+ * \li \c "roll_sens"  |single|required|"15.0"
+ * \li \c "sens_x"  |single|required|"0.2"
+ * \li \c "sens_y"  |single|required|"0.2"
+ * \li \c "inverted_keyboard"  |single|required|"false"
+ * \li \c "inverted_mouse"  |single|required|"false"
+ * \li \c "mouse_enabled_h"  |single|required|"false"
+ * \li \c "mouse_enabled_p"  |single|required|"false"
  */
 class ControlByEvent: public Component
 {

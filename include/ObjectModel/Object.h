@@ -51,6 +51,9 @@ typedef std::string ObjectId;
  * An object can have only one component of a given family.
  * Each object has a NodePath embedded.
  *
+ * XML Param(s):
+ * \li \c "enabled"  |single|required|"true"
+ *
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
  */

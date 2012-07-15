@@ -39,6 +39,11 @@ class ModelTemplate;
 
 /**
  * \brief Component representing the model and animations of an object.
+ *
+ * XML Param(s):
+ * \li \c "model_file"  |single|optional|no default
+ * \li \c "anim_files"  |multiple|optional|no default
+ * \li \c "is_static"  |single|required|"false"
  */
 class Model: public Component
 {

@@ -34,7 +34,7 @@ ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 	}
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
-	resetParameters();
+	setParametersDefaults();
 }
 
 ModelTemplate::~ModelTemplate()
@@ -73,38 +73,10 @@ WindowFramework*& ModelTemplate::windowFramework()
 	return mWindowFramework;
 }
 
-void ModelTemplate::setParameters(ParameterTable& parameterTable)
+void ModelTemplate::setParametersDefaults()
 {
-	ParameterTable::iterator iter;
-	pair<ParameterTable::iterator, ParameterTable::iterator> iterRange;
-	CASEITER(parameterTable,iter,"model_file",mModelFile)
-	CASEITER(parameterTable,iter,"is_static",mIsStatic)
-	CASERANGE(parameterTable,iter,iterRange,"anim_files",mAnimFiles)
-}
-
-void ModelTemplate::resetParameters()
-{
-	//set component parameters to their default values
-	mModelFile = std::string("");
-	mAnimFiles.clear();
-	mIsStatic = std::string("false");
-}
-
-std::string& ModelTemplate::parameter(const std::string& paramName)
-{
-	std::string* strPtr = &UNKNOWN;
-	CASE(paramName,strPtr,"is_static",mIsStatic)
-	CASE(paramName,strPtr,"model_file",mModelFile)
-	//
-	return *strPtr;
-}
-
-std::list<std::string>&  ModelTemplate::parameterList(const std::string& paramName)
-{
-	std::list<std::string>* strListPtr = &UNKNOWNLIST;
-	CASE(paramName,strListPtr,"anim_files",mAnimFiles)
-	//
-	return *strListPtr;
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("is_static","false"));
 }
 
 //TypedObject semantics: hardcoded

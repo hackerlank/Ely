@@ -105,7 +105,7 @@ void ComponentTemplateManager::resetComponentTemplatesParams()
 	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();
 			++iter)
 	{
-		iter->second->resetParameters();
+		iter->second->setParametersDefaults();
 	}
 }
 
