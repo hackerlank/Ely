@@ -25,7 +25,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 
 Object::Object(const ObjectId& objectId, ObjectTemplate* tmpl) :
-		mTmpl(tmpl), mIsStatic(false)
+		mTmpl(tmpl)
 {
 	mObjectId = objectId;
 }
@@ -59,8 +59,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 {
 	if (not newComponent)
 	{
-		throw GameException(
-				"Object::addComponent: NULL new Component");
+		throw GameException("Object::addComponent: NULL new Component");
 	}
 	PT(Component) previousComp = NULL;
 	ComponentFamilyType familyId = newComponent->familyType();
@@ -99,6 +98,10 @@ void Object::sceneSetup()
 {
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
+	//Is static (by default false)
+	mIsStatic =
+			(mTmpl->parameter(std::string("is_static")) == std::string("true") ? true :
+					false);
 	//find parent into the created objects
 	ObjectTemplateManager::ObjectTable& createdObjects =
 			mTmpl->objectTmplMgr()->createdObjects();

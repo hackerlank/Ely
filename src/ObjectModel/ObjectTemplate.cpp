@@ -39,7 +39,7 @@ ObjectTemplate::ObjectTemplate(const ObjectType& name,
 	mPandaFramework = pandaFramework;
 	mWindowFramework = windowFramework;
 	//reset parameters
-	resetParameters();
+	setParametersDefaults();
 }
 
 ObjectTemplate::~ObjectTemplate()
@@ -102,59 +102,74 @@ WindowFramework*& ObjectTemplate::windowFramework()
 
 void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 {
+	ParameterTableIter iter;
+	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	//create the parameterTable key set (i.e. the set of parameters
+	//that will overwrite those of mParameterTable with the same name)
+	std::set<std::string> keySet;
+	for (iter = parameterTable.begin(); iter != parameterTable; ++iter)
+	{
+		keySet.insert(iter->first);
+	}
+	//erase from mParameterTable the parameters to be overwritten
+	std::set<std::string>::iterator keySetIter;
+	for (keySetIter = keySet.begin(); keySetIter != keySet; ++keySetIter)
+	{
+		//find the mParameterTable range of values for
+		//the *keySetIter parameter ...
+		iterRange = mParameterTable.equal_range(*keySetIter);
+		//...and erase it
+		mParameterTable.erase(iterRange.first, iterRange.second);
+	}
+	//now mParameterTable is free from parameters to be overwritten
+	//so insert these ones into it from parameterTable
+	mParameterTable.insert(parameterTable.begin(), parameterTable.end());
+}
+
+void ObjectTemplate::setParametersDefaults()
+{
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("is_static","false"));
+	mParameterTable.insert(ParameterNameValue("pos_x","0.0"));
+	mParameterTable.insert(ParameterNameValue("pos_y","0.0"));
+	mParameterTable.insert(ParameterNameValue("pos_z","0.0"));
+	mParameterTable.insert(ParameterNameValue("rot_h","0.0"));
+	mParameterTable.insert(ParameterNameValue("rot_p","0.0"));
+	mParameterTable.insert(ParameterNameValue("rot_r","0.0"));
+	mParameterTable.insert(ParameterNameValue("scale_x","1.0"));
+	mParameterTable.insert(ParameterNameValue("scale_y","1.0"));
+	mParameterTable.insert(ParameterNameValue("scale_z","1.0"));
+}
+
+std::string ObjectTemplate::parameter(const std::string& paramName)
+{
+	std::string strPtr;
 	ParameterTable::iterator iter;
-	CASEITER(parameterTable,iter,"parent",mParent)
-	CASEITER(parameterTable,iter,"is_static",mIsStatic)
-	CASEITER(parameterTable,iter,"pos_x",mPosX)
-	CASEITER(parameterTable,iter,"pos_y",mPosY)
-	CASEITER(parameterTable,iter,"pos_z",mPosZ)
-	CASEITER(parameterTable,iter,"rot_h",mRotH)
-	CASEITER(parameterTable,iter,"rot_p",mRotP)
-	CASEITER(parameterTable,iter,"rot_r",mRotR)
-	CASEITER(parameterTable,iter,"scale_x",mScaleX)
-	CASEITER(parameterTable,iter,"scale_y",mScaleY)
-	CASEITER(parameterTable,iter,"scale_z",mScaleZ)
-}
-
-void ObjectTemplate::resetParameters()
-{
-	//set component parameters to their default values
-	mParent = std::string("");
-	mIsStatic = std::string("false");
-	mPosX = std::string("0.0");
-	mPosY = std::string("0.0");
-	mPosZ = std::string("0.0");
-	mRotH = std::string("0.0");
-	mRotP = std::string("0.0");
-	mRotR = std::string("0.0");
-	mScaleX = std::string("1.0");
-	mScaleY = std::string("1.0");
-	mScaleZ = std::string("1.0");
-}
-
-std::string& ObjectTemplate::parameter(const std::string& paramName)
-{
-	std::string* strPtr = &mUnknown;
-	CASE(paramName, strPtr, "parent", mParent)
-	CASE(paramName, strPtr, "is_static", mIsStatic)
-	CASE(paramName, strPtr, "pos_x", mPosX)
-	CASE(paramName, strPtr, "pos_y", mPosY)
-	CASE(paramName, strPtr, "pos_z", mPosZ)
-	CASE(paramName, strPtr, "rot_h", mRotH)
-	CASE(paramName, strPtr, "rot_p", mRotP)
-	CASE(paramName, strPtr, "rot_r", mRotR)
-	CASE(paramName, strPtr, "scale_x", mScaleX)
-	CASE(paramName, strPtr, "scale_y", mScaleY)
-	CASE(paramName, strPtr, "scale_z", mScaleZ)
+	iter = mParameterTable.find(paramName);
+	//return a reference to a parameter value only if it exists
+	if (iter != mParameterTable.end())
+	{
+		strPtr = iter->second;
+	}
 	//
-	return *strPtr;
+	return strPtr;
 }
 
-std::list<std::string>& ObjectTemplate::parameterList(const std::string& paramName)
+std::list<std::string> ObjectTemplate::parameterList(const std::string& paramName)
 {
-	std::list<std::string>* strListPtr = &mUnknownList;
+	std::list<std::string> strList;
+	ParameterTableIter iter;
+	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	iterRange = mParameterTable.equal_range(paramName);
+	if (iterRange.first != iterRange.second)
+	{
+		for (iter = iterRange.first; iter != iterRange.second; ++iter)
+		{
+			strList.push_back(iter->second);
+		}
+	}
 	//
-	return *strListPtr;
+	return strList;
 }
 
 //TypedObject semantics: hardcoded

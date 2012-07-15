@@ -367,7 +367,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				ObjectTemplateManager::GetSingleton().getObjectTemplate(
 						ObjectType(objType));
 		//...reset its parameters to their default values
-		objectTmplPtr->resetParameters();
+		objectTmplPtr->setParametersDefaults();
 		//cycle through the Object Param(s)' to be initialized
 		tinyxml2::XMLElement *objParam;
 		for (objParam = object->FirstChildElement("Param"); objParam != NULL;

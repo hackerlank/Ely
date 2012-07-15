@@ -52,7 +52,6 @@ void ComponentTemplate::setParameters(ParameterTable& parameterTable)
 	//now mParameterTable is free from parameters to be overwritten
 	//so insert these ones into it from parameterTable
 	mParameterTable.insert(parameterTable.begin(), parameterTable.end());
-
 }
 
 std::string ComponentTemplate::parameter(const std::string& name)

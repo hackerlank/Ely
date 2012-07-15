@@ -78,13 +78,13 @@ public:
 	virtual void setParametersDefaults() = 0;
 
 	/**
-	 * \brief Gets the parameter value associated to the object.
+	 * \brief Gets the parameter value associated to the component.
 	 * @param The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
 	virtual std::string parameter(const std::string& paramName);
 	/**
-	 * \brief Gets the parameter multi-values associated to the object.
+	 * \brief Gets the parameter multi-values associated to the component.
 	 * @param The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */

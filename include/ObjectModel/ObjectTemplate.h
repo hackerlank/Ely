@@ -26,6 +26,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 #include <algorithm>
 #include <utility>
 #include <pandaFramework.h>
@@ -119,28 +120,33 @@ public:
 
 	/**
 	 * \name Parameters management.
-	 * \brief Sets the parameters of the object, this object is
+	 * \brief Sets the parameters of the object, this template is
 	 * designed to create, to custom values.
+	 *
+	 * These parameters overwrite (and/or are added to) the parameters defaults
+	 * set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	void setParameters(ParameterTable& parameterTable);
 
 	/**
-	 * \brief (Re)sets the parameters of the object, this template is
-	 * designed to create, to their default values.
+	 * \brief For the object this template is designed to create,
+	 * this function sets the (mandatory) parameters to their default values.
 	 */
-	void resetParameters();
+	void setParametersDefaults();
 
 	/**
-	 * \name Parameters getters/setters.
-	 * \brief Get/set a single parameter associated to the object.
+	 * \brief Gets the parameter value associated to the object.
 	 * @param The name of the parameter.
-	 * @return The value of the parameter.
+	 * @return The value of the parameter, empty string if none exists.
 	 */
-	///@{
-	std::string& parameter(const std::string& paramName);
-	std::list<std::string>& parameterList(const std::string& paramName);
-	///@}
+	std::string parameter(const std::string& paramName);
+	/**
+	 * \brief Gets the parameter multi-values associated to the object.
+	 * @param The name of the parameter.
+	 * @return The value list  of the parameter, empty list if none exists.
+	 */
+	std::list<std::string> parameterList(const std::string& paramName);
 
 private:
 	///Name identifying this object template.
@@ -153,12 +159,8 @@ private:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
-	///@{
-	/// Set of allowed Parameters.
-	std::string mParent, mIsStatic, mPosX, mPosY, mPosZ, mRotH, mRotP, mRotR,
-			mScaleX, mScaleY, mScaleZ, mUnknown;
-	std::list<std::string> mUnknownList;
-	///@}
+	///Parameter table
+	ParameterTable mParameterTable;
 
 	///TypedObject semantics: hardcoded
 public:
