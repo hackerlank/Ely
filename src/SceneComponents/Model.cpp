@@ -115,7 +115,7 @@ bool Model::initialize()
 	{
 		//model is programmatically generated
 		//card (e.g. finite plane)
-		if (mTmpl->parameter(std::string("card")))
+		if (not mTmpl->parameter(std::string("card")).empty())
 		{
 			float left = (float) atof(
 					mTmpl->parameter(std::string("card_left")).c_str());

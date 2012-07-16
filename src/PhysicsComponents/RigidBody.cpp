@@ -133,11 +133,33 @@ bool RigidBody::initialize()
 			}
 		}
 	}
-	else if (shapeType == std::string("cylinder"))
+	else if (shapeType == std::string("cylinder")
+			or shapeType == std::string("capsule")
+			or shapeType == std::string("cone"))
 	{
-		mShapeType = CYLINDER;
+		if (shapeType == std::string("cylinder"))
+		{
+			mShapeType = CYLINDER;
+		}
+		else if (shapeType == std::string("capsule"))
+		{
+			mShapeType = CAPSULE;
+		}
+		else
+		{
+			mShapeType = CONE;
+		}
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
+		if ((not radius.empty()) and (not height.empty()))
+		{
+			mDim1 = (float) atof(radius.c_str());
+			mDim2 = (float) atof(height.c_str());
+			if (mDim1 > 0.0 and mDim2 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
 		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
 		if (upAxis == std::string("x"))
 		{
@@ -151,74 +173,10 @@ bool RigidBody::initialize()
 		{
 			mUpAxis = Z_up;
 		}
-		if ((not radius.empty()) and (not height.empty()))
-		{
-			mDim1 = (float) atof(radius.c_str());
-			mDim2 = (float) atof(height.c_str());
-			if (mDim1 > 0.0 and mDim2 > 0.0)
-			{
-				mAutomaticShaping = false;
-			}
-		}
 	}
-	else if (shapeType == std::string("capsule"))
+	else
 	{
-		mShapeType = CAPSULE;
-		std::string radius = mTmpl->parameter(std::string("shape_radius"));
-		std::string height = mTmpl->parameter(std::string("shape_height"));
-		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
-		if (upAxis == std::string("x"))
-		{
-			mUpAxis = X_up;
-		}
-		else if (upAxis == std::string("y"))
-		{
-			mUpAxis = Y_up;
-		}
-		else
-		{
-			mUpAxis = Z_up;
-		}
-		if ((not radius.empty()) and (not height.empty()))
-		{
-			mDim1 = (float) atof(radius.c_str());
-			mDim2 = (float) atof(height.c_str());
-			if (mDim1 > 0.0 and mDim2 > 0.0)
-			{
-				mAutomaticShaping = false;
-			}
-		}
-	}
-	else if (shapeType == std::string("cone"))
-	{
-		mShapeType = CONE;
-		std::string radius = mTmpl->parameter(std::string("shape_radius"));
-		std::string height = mTmpl->parameter(std::string("shape_height"));
-		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
-		if (upAxis == std::string("x"))
-		{
-			mUpAxis = X_up;
-		}
-		else if (upAxis == std::string("y"))
-		{
-			mUpAxis = Y_up;
-		}
-		else
-		{
-			mUpAxis = Z_up;
-		}
-		if ((not radius.empty()) and (not height.empty()))
-		{
-			mDim1 = (float) atof(radius.c_str());
-			mDim2 = (float) atof(height.c_str());
-			if (mDim1 > 0.0 and mDim2 > 0.0)
-			{
-				mAutomaticShaping = false;
-			}
-		}
-	}
-	else //default a sphere (with auto shaping)
-	{
+		//default a sphere (with auto shaping)
 		mShapeType = SPHERE;
 	}
 	//get collide mask

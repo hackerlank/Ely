@@ -44,10 +44,12 @@
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
 				<Param fast_factor="10.0"/>
+				<Param roll_left=""/>
+				<Param roll_right=""/>
+				<Param strafe_left="a"/>
+				<Param strafe_right="d"/>
 				<Param inverted_keyboard="true"/>
 				<Param inverted_mouse="false"/>
-				<Param up=""/>
-				<Param down=""/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
 			</Component>
@@ -66,7 +68,7 @@
 				<Param instance_of="Teapot1"/>
 				<Param scale_x="0.5"/>
 				<Param scale_y="0.5"/>
-				<Param scale_z="1.0"/>
+				<Param scale_z="3.0"/>
 			</Component>
 		</Object>
 		<Object type="StaticActor" id="Teapot1" priority="100">
