@@ -36,7 +36,10 @@ class InstanceOfTemplate;
  * \brief Component representing an instance of another object.
  *
  * XML Param(s):
- * \li \c "instance_of"  |single|optional|no default
+ * \li \c "instance_of"  |single|no default
+ * \li \c "scale_x"  |single|"1.0"
+ * \li \c "scale_y"  |single|"1.0"
+ * \li \c "scale_z"  |single|"1.0"
  */
 class InstanceOf: public Component
 {

@@ -70,24 +70,24 @@ class RigidBodyTemplate;
  * a plane with normal = (0,0,1) and d = 0.
  *
  * XML Param(s):
- * \li \c "body_type"  |single|required|"dynamic" ("static","kinematic")
- * \li \c "body_mass"  |single|required|"1.0"
- * \li \c "body_friction"  |single|required|"0.8"
- * \li \c "body_restitution"  |single|required|"0.1"
- * \li \c "shape_type"  |single|required|"sphere"
- * \li \c "collide_mask"  |single|required|"all_on"
- * \li \c "shape_radius"  |single|optional |no default (sphere,cylinder,capsule,cone)
- * \li \c "shape_norm_x"  |single|optional |no default (plane)
- * \li \c "shape_norm_y"  |single|optional |no default (plane)
- * \li \c "shape_norm_z"  |single|optional |no default (plane)
- * \li \c "shape_d"  |single|optional |no default (plane)
- * \li \c "shape_half_x"  |single|optional |no default (box)
- * \li \c "shape_half_y"  |single|optional |no default (box)
- * \li \c "shape_half_z"  |single|optional |no default (box)
- * \li \c "shape_height"  |single|optional |no default (cylinder,capsule,cone)
- * \li \c "shape_up"  |single|optional |no default (cylinder,capsule,cone)
- * \li \c "ccd_motion_threshold"  |single|optional |no default
- * \li \c "ccd_swept_sphere_radius"  |single|optional |no default
+ * \li \c "body_type"  |single|"dynamic" ("static","kinematic")
+ * \li \c "body_mass"  |single|"1.0"
+ * \li \c "body_friction"  |single|"0.8"
+ * \li \c "body_restitution"  |single|"0.1"
+ * \li \c "shape_type"  |single|"sphere"
+ * \li \c "collide_mask"  |single|"all_on"
+ * \li \c "shape_radius"  |single|no default (sphere,cylinder,capsule,cone)
+ * \li \c "shape_norm_x"  |single|no default (plane)
+ * \li \c "shape_norm_y"  |single|no default (plane)
+ * \li \c "shape_norm_z"  |single|no default (plane)
+ * \li \c "shape_d"  |single|no default (plane)
+ * \li \c "shape_half_x"  |single|no default (box)
+ * \li \c "shape_half_y"  |single|no default (box)
+ * \li \c "shape_half_z"  |single|no default (box)
+ * \li \c "shape_height"  |single|no default (cylinder,capsule,cone)
+ * \li \c "shape_up"  |single|no default (cylinder,capsule,cone)
+ * \li \c "ccd_motion_threshold"  |single|no default
+ * \li \c "ccd_swept_sphere_radius"  |single|no default
  */
 class RigidBody: public Component
 {
@@ -100,6 +100,7 @@ public:
 	const virtual ComponentType componentType() const;
 
 	virtual bool initialize();
+	virtual void onAddToObjectSetup();
 	virtual void onAddToSceneSetup();
 
 	/**
@@ -139,11 +140,21 @@ public:
 	 */
 	void switchType(BodyType bodyType);
 
+	/**
+	 * \brief Gets a reference to the node path associated to this model.
+	 * @return The node path associated to this model.
+	 */
+	NodePath& nodePath();
+	/**
+	 * \brief NodePath conversion function.
+	 */
+	operator NodePath();
+
 private:
 	///The template used to construct this component.
 	RigidBodyTemplate* mTmpl;
-	///The Rigid Body Node of this component.
-	PT(BulletRigidBodyNode) mRigidBodyNode;
+	///The NodePath associated to this rigid body.
+	NodePath mNodePath;
 	///@{
 	///Physical parameters.
 	float mBodyMass, mBodyFriction, mBodyRestitution;

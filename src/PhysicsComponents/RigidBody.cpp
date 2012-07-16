@@ -38,7 +38,7 @@ RigidBody::RigidBody(RigidBodyTemplate* tmpl) :
 RigidBody::~RigidBody()
 {
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove_rigid_body(
-			mRigidBodyNode);
+			DCAST(BulletRigidBodyNode,mNodePath.node()));
 }
 
 const ComponentFamilyType RigidBody::familyType() const
@@ -251,48 +251,51 @@ bool RigidBody::initialize()
 	return result;
 }
 
-void RigidBody::setPhysicalParameters()
+BulletRigidBodyNode* RigidBody::rigidBodyNode()
 {
-	mRigidBodyNode->set_mass(mBodyMass);
-	mRigidBodyNode->set_friction(mBodyFriction);
-	mRigidBodyNode->set_restitution(mBodyRestitution);
-	if (mCcdEnabled)
-	{
-		mRigidBodyNode->set_ccd_motion_threshold(mCcdMotionThreshold);
-		mRigidBodyNode->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
-	}
+	return DCAST(BulletRigidBodyNode, mNodePath.node());
 }
 
-LVecBase3 RigidBody::startingPosition()
+NodePath& RigidBody::nodePath()
 {
-	LVecBase3 initPos(0.0, 0.0, 0.0);
-	//
-	return initPos;
+	return mNodePath;
 }
 
-void RigidBody::onAddToSceneSetup()
+RigidBody::operator NodePath()
+{
+	return mNodePath;
+}
+
+void RigidBody::onAddToObjectSetup()
 {
 	//create a Rigid Body Node
-	mRigidBodyNode = new BulletRigidBodyNode(std::string(mComponentId).c_str());
+	BulletRigidBodyNode* rigidBodyNode = new BulletRigidBodyNode(
+			std::string(mComponentId).c_str());
 	//set the physics parameters
 	setPhysicalParameters();
 
 	//create and add a Collision Shape
-	mRigidBodyNode->add_shape(createShape(mShapeType));
+	//Note: scaling is applied to a Scene component (Model, InstanceOf ...)
+	//which should has been already created and added to object at this point,
+	// so object nodepath should be the same as of the Scene component one.
+	rigidBodyNode->add_shape(createShape(mShapeType));
 	//attach to Bullet World
 	//<BUG: you must first insert a dynamic body for switching to work
-	mRigidBodyNode->set_mass(1.0);
+	rigidBodyNode->set_mass(1.0);
 	//BUG>
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach_rigid_body(
-			mRigidBodyNode);
+			rigidBodyNode);
 	//switch the body type (take precedence over mass)
 	switchType(mBodyType);
 
 	//create a node path for the rigid body
-	NodePath rigidBodyNP = NodePath(mRigidBodyNode);
+	mNodePath = NodePath(rigidBodyNode);
 	//set collide mask
-	rigidBodyNP.set_collide_mask(mCollideMask);
+	mNodePath.set_collide_mask(mCollideMask);
+}
 
+void RigidBody::onAddToSceneSetup()
+{
 	//reparent the object node path as a child of the rigid body one
 	NodePath actualParent = mOwnerObject->nodePath().get_parent();
 	if (actualParent.is_empty())
@@ -300,12 +303,12 @@ void RigidBody::onAddToSceneSetup()
 		// if any error occurs by default set parent to render
 		actualParent = mTmpl->windowFramework()->get_render();
 	}
-	mOwnerObject->nodePath().reparent_to(rigidBodyNP);
+	mOwnerObject->nodePath().reparent_to(mNodePath);
 	mOwnerObject->nodePath().set_pos(startingPosition());
 	mOwnerObject->nodePath().flatten_light();
 
 	//set the object node path as that of the rigid body
-	mOwnerObject->nodePath() = rigidBodyNP;
+	mOwnerObject->nodePath() = mNodePath;
 	//and reparent it to actual parent
 	mOwnerObject->nodePath().reparent_to(actualParent);
 }
@@ -426,7 +429,7 @@ void RigidBody::getBoundingDimensions(NodePath modelNP)
 {
 	//get "tight" dimensions of panda
 	LPoint3 minP, maxP;
-	mOwnerObject->nodePath().calc_tight_bounds(minP, maxP);
+	modelNP.calc_tight_bounds(minP, maxP);
 	//
 	LVecBase3 delta = maxP - minP;
 	//
@@ -437,9 +440,23 @@ void RigidBody::getBoundingDimensions(NodePath modelNP)
 			mModelDims.get_z()) / 2.0;
 }
 
-BulletRigidBodyNode* RigidBody::rigidBodyNode()
+void RigidBody::setPhysicalParameters()
 {
-	return mRigidBodyNode.p();
+	rigidBodyNode()->set_mass(mBodyMass);
+	rigidBodyNode()->set_friction(mBodyFriction);
+	rigidBodyNode()->set_restitution(mBodyRestitution);
+	if (mCcdEnabled)
+	{
+		rigidBodyNode()->set_ccd_motion_threshold(mCcdMotionThreshold);
+		rigidBodyNode()->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
+	}
+}
+
+LVecBase3 RigidBody::startingPosition()
+{
+	LVecBase3 initPos(0.0, 0.0, 0.0);
+	//
+	return initPos;
 }
 
 void RigidBody::switchType(BodyType bodyType)
@@ -447,25 +464,25 @@ void RigidBody::switchType(BodyType bodyType)
 	switch (bodyType)
 	{
 	case DYNAMIC:
-		mRigidBodyNode->set_mass(mBodyMass);
-		mRigidBodyNode->set_kinematic(false);
-		mRigidBodyNode->set_static(false);
-		mRigidBodyNode->set_deactivation_enabled(true);
-		mRigidBodyNode->set_active(true);
+		rigidBodyNode()->set_mass(mBodyMass);
+		rigidBodyNode()->set_kinematic(false);
+		rigidBodyNode()->set_static(false);
+		rigidBodyNode()->set_deactivation_enabled(true);
+		rigidBodyNode()->set_active(true);
 		break;
 	case STATIC:
-		mRigidBodyNode->set_mass(0.0);
-		mRigidBodyNode->set_kinematic(false);
-		mRigidBodyNode->set_static(true);
-		mRigidBodyNode->set_deactivation_enabled(true);
-		mRigidBodyNode->set_active(false);
+		rigidBodyNode()->set_mass(0.0);
+		rigidBodyNode()->set_kinematic(false);
+		rigidBodyNode()->set_static(true);
+		rigidBodyNode()->set_deactivation_enabled(true);
+		rigidBodyNode()->set_active(false);
 		break;
 	case KINEMATIC:
-		mRigidBodyNode->set_mass(0.0);
-		mRigidBodyNode->set_kinematic(true);
-		mRigidBodyNode->set_static(false);
-		mRigidBodyNode->set_deactivation_enabled(false);
-		mRigidBodyNode->set_active(false);
+		rigidBodyNode()->set_mass(0.0);
+		rigidBodyNode()->set_kinematic(true);
+		rigidBodyNode()->set_static(false);
+		rigidBodyNode()->set_deactivation_enabled(false);
+		rigidBodyNode()->set_active(false);
 		break;
 	default:
 		break;

@@ -53,6 +53,13 @@ bool InstanceOf::initialize()
 {
 	//setup initial state
 	mNodePath = NodePath(mComponentId);
+	//Scaling (default: (1.0,1.0,1.0))
+	float scaleX = atof(mTmpl->parameter(std::string("scale_x")).c_str());
+	float scaleY = atof(mTmpl->parameter(std::string("scale_y")).c_str());
+	float scaleZ = atof(mTmpl->parameter(std::string("scale_z")).c_str());
+	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
+	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
+	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
 	return true;
 }
 

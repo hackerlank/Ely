@@ -77,30 +77,77 @@ AnimControlCollection& Model::animations()
 bool Model::initialize()
 {
 	bool result = true;
-	//setup model
-	mNodePath = mTmpl->windowFramework()->load_model(
-			mTmpl->pandaFramework()->get_models(),
-			Filename(mTmpl->parameter(std::string("model_file"))));
-	if (mNodePath.is_empty())
+	//check if from file
+	mFromFile =
+			(mTmpl->parameter(std::string("from_file"))
+					== std::string("false") ? false : true);
+	if (mFromFile)
 	{
-		result = false;
+		//setup model
+		mNodePath = mTmpl->windowFramework()->load_model(
+				mTmpl->pandaFramework()->get_models(),
+				Filename(mTmpl->parameter(std::string("model_file"))));
+		if (mNodePath.is_empty())
+		{
+			result = false;
+		}
+		//setup animations
+		std::list<std::string>::iterator it;
+		std::list<std::string> animFileList = mTmpl->parameterList(
+				std::string("anim_files"));
+		if (not animFileList.empty())
+		{
+			for (it = animFileList.begin(); it != animFileList.end(); ++it)
+			{
+				NodePath resultNP;
+				resultNP = mTmpl->windowFramework()->load_model(mNodePath,
+						Filename(*it));
+				if (resultNP.is_empty())
+				{
+					result = false;
+				}
+			}
+			//bind all loaded animations
+			auto_bind(mNodePath.node(), mAnimations);
+		}
 	}
-	//setup animations
-	std::list<std::string>::iterator it;
-	std::list<std::string> animFileList = mTmpl->parameterList(
-			std::string("anim_files"));
-	for (it = animFileList.begin(); it != animFileList.end(); ++it)
+	else
 	{
-		NodePath resultNP;
-		resultNP = mTmpl->windowFramework()->load_model(mNodePath,
-				Filename(*it));
-		if (resultNP.is_empty())
+		//model is programmatically generated
+		//card (e.g. finite plane)
+		if (mTmpl->parameter(std::string("card")))
+		{
+			float left = (float) atof(
+					mTmpl->parameter(std::string("card_left")).c_str());
+			float right = (float) atof(
+					mTmpl->parameter(std::string("card_right")).c_str());
+			float bottom = (float) atof(
+					mTmpl->parameter(std::string("card_bottom")).c_str());
+			float top = (float) atof(
+					mTmpl->parameter(std::string("card_top")).c_str());
+			if ((right - left) * (top - bottom) == 0.0)
+			{
+				left = -1.0;
+				right = 1.0;
+				bottom = -1.0;
+				top = 1.0;
+			}
+			CardMaker card("card" + std::string(mComponentId));
+			mNodePath = NodePath(card.generate());
+		}
+		else
 		{
 			result = false;
 		}
 	}
-	//bind all loaded animations
-	auto_bind(mNodePath.node(), mAnimations);
+	//Scaling (default: (1.0,1.0,1.0))
+	float scaleX = atof(mTmpl->parameter(std::string("scale_x")).c_str());
+	float scaleY = atof(mTmpl->parameter(std::string("scale_y")).c_str());
+	float scaleZ = atof(mTmpl->parameter(std::string("scale_z")).c_str());
+	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
+	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
+	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
+	//
 	return result;
 }
 

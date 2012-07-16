@@ -57,7 +57,9 @@ Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 void InstanceOfTemplate::setParametersDefaults()
 {
 	//sets the (mandatory) parameters to their default values:
-	//no mandatory parameters
+	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));
+	mParameterTable.insert(ParameterNameValue("scale_y", "1.0"));
+	mParameterTable.insert(ParameterNameValue("scale_z", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

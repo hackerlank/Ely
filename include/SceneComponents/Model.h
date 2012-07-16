@@ -26,10 +26,12 @@
 
 #include <string>
 #include <list>
+#include <cstdlib>
 #include <nodePath.h>
 #include <filename.h>
 #include <animControlCollection.h>
 #include <auto_bind.h>
+#include <cardMaker.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
@@ -41,9 +43,18 @@ class ModelTemplate;
  * \brief Component representing the model and animations of an object.
  *
  * XML Param(s):
- * \li \c "model_file"  |single|optional|no default
- * \li \c "anim_files"  |multiple|optional|no default
- * \li \c "is_static"  |single|required|"false"
+ * \li \c "from_file"  |single|"true"
+ * \li \c "scale_x"  |single|"1.0"
+ * \li \c "scale_y"  |single|"1.0"
+ * \li \c "scale_z"  |single|"1.0"
+ * \li \c "is_static"  |single|"false"
+ * \li \c "model_file"  |single|no default
+ * \li \c "anim_files"  |multiple|no default
+ * \li \c "card"  |single|no default
+ * \li \c "card_left"  |single|no default
+ * \li \c "card_right"  |single|no default
+ * \li \c "card_bottom"  |single|no default
+ * \li \c "card_top"  |single|no default
  */
 class Model: public Component
 {
@@ -77,6 +88,8 @@ private:
 	NodePath mNodePath;
 	///The list of animations associated with this model.
 	AnimControlCollection mAnimations;
+	///Flag indicating if component is set up from a file or programmatically
+	bool mFromFile;
 
 	///TypedObject semantics: hardcoded
 public:

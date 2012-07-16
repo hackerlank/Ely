@@ -136,9 +136,6 @@ void ObjectTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("rot_h", "0.0"));
 	mParameterTable.insert(ParameterNameValue("rot_p", "0.0"));
 	mParameterTable.insert(ParameterNameValue("rot_r", "0.0"));
-	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));
-	mParameterTable.insert(ParameterNameValue("scale_y", "1.0"));
-	mParameterTable.insert(ParameterNameValue("scale_z", "1.0"));
 }
 
 std::string ObjectTemplate::parameter(const std::string& paramName)

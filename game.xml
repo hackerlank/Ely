@@ -62,17 +62,20 @@
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
-			<Param scale_x="0.5"/>
-			<Param scale_y="0.5"/>
-			<Param scale_z="1.0"/>
 			<Component type="InstanceOf">
 				<Param instance_of="Teapot1"/>
+				<Param scale_x="0.5"/>
+				<Param scale_y="0.5"/>
+				<Param scale_z="1.0"/>
 			</Component>
 		</Object>
 		<Object type="StaticActor" id="Teapot1" priority="100">
 			<Component type="Model" priority="100">
 				<Param model_file="teapot"/>
 				<Param is_static="true"/>
+				<Param scale_x="0.5"/>
+				<Param scale_y="0.5"/>
+				<Param scale_z="0.5"/>
 			</Component>
 			<Param parent=""/>
 			<Param pos_x="0.0"/>
@@ -81,9 +84,6 @@
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
-			<Param scale_x="0.5"/>
-			<Param scale_y="0.5"/>
-			<Param scale_z="0.5"/>
 		</Object>
 		<Object type="Actor" id="Actor1"  priority="200">
 			<Component type="ControlByEvent">
@@ -100,6 +100,9 @@
 			<Component type="Model" priority="100">
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
+				<Param scale_x="1.0"/>
+				<Param scale_y="1.0"/>
+				<Param scale_z="1.0"/>
 			</Component>
 <!--
 			<Component type="RigidBody" priority="90">
@@ -123,9 +126,6 @@
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
-			<Param scale_x="1.0"/>
-			<Param scale_y="1.0"/>
-			<Param scale_z="1.0"/>
 		</Object>
 	</ObjectSet>
 </Game>
