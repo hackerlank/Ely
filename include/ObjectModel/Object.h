@@ -52,7 +52,17 @@ typedef std::string ObjectId;
  * Each object has a NodePath embedded.
  *
  * XML Param(s):
- * \li \c "enabled"  |single|required|"true"
+ * \li \c "parent"  |single|optional|no default
+ * \li \c "is_static"  |single|required|"false"
+ * \li \c "pos_x"  |single|required|"0.0"
+ * \li \c "pos_y"  |single|required|"0.0"
+ * \li \c "pos_z"  |single|required|"0.0"
+ * \li \c "rot_h"  |single|required|"0.0"
+ * \li \c "rot_p"  |single|required|"0.0"
+ * \li \c "rot_r"  |single|required|"0.0"
+ * \li \c "scale_x"  |single|required|"1.0"
+ * \li \c "scale_x"  |single|required|"1.0"
+ * \li \c "scale_x"  |single|required|"1.0"
  *
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.

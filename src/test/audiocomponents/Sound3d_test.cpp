@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	BOOST_TEST_MESSAGE("TESTING Sound3dTemplate");
 	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
-	mSound3dTmpl->resetParameters();
+	mSound3dTmpl->setParametersDefaults();
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 0);
 	mSound3dTmpl->parameterList("sound_files").push_back(audioFile);
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 1);
@@ -74,7 +74,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 {
 	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
-	mSound3dTmpl->resetParameters();
+	mSound3dTmpl->setParametersDefaults();
 	mSound3dTmpl->parameterList("sound_files").push_back(audioFile);
 	mSound3d =
 	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));

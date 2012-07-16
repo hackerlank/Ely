@@ -32,7 +32,14 @@
 #include <pointerTo.h>
 #include <nodePath.h>
 #include <bulletShape.h>
+#include <bulletSphereShape.h>
+#include <bulletBoxShape.h>
+#include <bulletPlaneShape.h>
+#include <bulletCylinderShape.h>
+#include <bulletCapsuleShape.h>
+#include <bulletConeShape.h>
 #include <bulletRigidBodyNode.h>
+#include <bullet_utils.h>
 #include <bitMask.h>
 #include <lvector3.h>
 #include <lpoint3.h>
@@ -47,9 +54,20 @@ class RigidBodyTemplate;
  *
  * It constructs a rigid body with the specified collision shape_type along
  * with relevant parameters.
- * If any of the relevant parameter is missing, the shape is automatically
- * constructed striving to wrap it as tight as possible around the
- * object geometry (specified by the model component).
+ * Collision shapes are:
+ * \li \c "sphere"
+ * \li \c "plane"
+ * \li \c "box"
+ * \li \c "cylinder"
+ * \li \c "capsule"
+ * \li \c "cone"
+ *
+ * In case of "sphere", "box", "cylinder", "capsule", "cone", if any of
+ * the relevant parameters is missing, the shape is automatically
+ * constructed by guessing them through calculation of a tight bounding volume
+ * of object geometry (supposedly specified by the model component).
+ * For "plane" shape, in case of missing parameters, the default is
+ * a plane with normal = (0,0,1) and d = 0.
  *
  * XML Param(s):
  * \li \c "body_type"  |single|required|"dynamic" ("static","kinematic")
@@ -58,16 +76,16 @@ class RigidBodyTemplate;
  * \li \c "body_restitution"  |single|required|"0.1"
  * \li \c "shape_type"  |single|required|"sphere"
  * \li \c "collide_mask"  |single|required|"all_on"
- * \li \c "shape_radius"  |single|optional |no default
- * \li \c "shape_norm_x"  |single|optional |no default
- * \li \c "shape_norm_y"  |single|optional |no default
- * \li \c "shape_norm_z"  |single|optional |no default
- * \li \c "shape_d"  |single|optional |no default
- * \li \c "shape_half_x"  |single|optional |no default
- * \li \c "shape_half_y"  |single|optional |no default
- * \li \c "shape_half_z"  |single|optional |no default
- * \li \c "shape_height"  |single|optional |no default
- * \li \c "shape_up"  |single|optional |no default
+ * \li \c "shape_radius"  |single|optional |no default (sphere,cylinder,capsule,cone)
+ * \li \c "shape_norm_x"  |single|optional |no default (plane)
+ * \li \c "shape_norm_y"  |single|optional |no default (plane)
+ * \li \c "shape_norm_z"  |single|optional |no default (plane)
+ * \li \c "shape_d"  |single|optional |no default (plane)
+ * \li \c "shape_half_x"  |single|optional |no default (box)
+ * \li \c "shape_half_y"  |single|optional |no default (box)
+ * \li \c "shape_half_z"  |single|optional |no default (box)
+ * \li \c "shape_height"  |single|optional |no default (cylinder,capsule,cone)
+ * \li \c "shape_up"  |single|optional |no default (cylinder,capsule,cone)
  * \li \c "ccd_motion_threshold"  |single|optional |no default
  * \li \c "ccd_swept_sphere_radius"  |single|optional |no default
  */
@@ -139,12 +157,6 @@ private:
 	 * \brief Sets physical parameters (helper function).
 	 */
 	void setPhysicalParameters();
-	/**
-	 * \brief Returns a correction vector position for the model to fit
-	 * the collision shape position.
-	 * @return The correction vector.
-	 */
-	LVector3 correctedPosition();
 	///@}
 
 	///Geometric functions and parameters.
@@ -164,13 +176,19 @@ private:
 	 * member variables.
 	 * @param modelNP The GeomNode node path.
 	 */
-	void getDimensions(NodePath modelNP);
+	void getBoundingDimensions(NodePath modelNP);
+	/**
+	 * \brief Returns a starting position, may be due to a correction
+	 * vector position for the model to fit the collision shape position.
+	 * @return The starting position.
+	 */
+	LVecBase3 startingPosition();
 	LVector3 mModelDims;
 	LPoint3 mModelCenter;
 	float mModelRadius;
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
-	std::string mUpAxis;
+	BulletUpAxis mUpAxis;
 	///@}
 
 	///TypedObject semantics: hardcoded

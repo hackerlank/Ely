@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 	BOOST_TEST_MESSAGE("TESTING RigidBodyTemplate");
 	mRigidTmpl = new RigidBodyTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mRigidTmpl != NULL);
-	mRigidTmpl->resetParameters();
+	mRigidTmpl->setParametersDefaults();
 	BOOST_CHECK(mRigidTmpl->parameter("body_type") == std::string("dynamic"));
 	BOOST_CHECK(mRigidTmpl->parameter("body_mass") == std::string("1.0"));
 	BOOST_CHECK(mRigidTmpl->parameter("shape_type") == std::string("sphere"));

@@ -77,6 +77,8 @@ bool RigidBody::initialize()
 			mTmpl->parameter(std::string("body_restitution")).c_str());
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
+	//default auto shaping
+	mAutomaticShaping = true;
 	if (shapeType == std::string("sphere"))
 	{
 		mShapeType = SPHERE;
@@ -84,7 +86,10 @@ bool RigidBody::initialize()
 		if (not radius.empty())
 		{
 			mDim1 = (float) atof(radius.c_str());
-			mDim1 > 0.0 ? mAutomaticShaping = false : mAutomaticShaping = true;
+			if (mDim1 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
 		}
 	}
 	else if (shapeType == std::string("plane"))
@@ -104,8 +109,10 @@ bool RigidBody::initialize()
 			mDim2 = normal.get_y();
 			mDim3 = normal.get_z();
 			mDim4 = (float) atof(d.c_str());
-			normal.length() > 0.0 ? mAutomaticShaping = false :
-					mAutomaticShaping = true;
+			if (normal.length() > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
 		}
 	}
 	else if (shapeType == std::string("box"))
@@ -120,8 +127,10 @@ bool RigidBody::initialize()
 			mDim1 = (float) atof(half_x.c_str());
 			mDim2 = (float) atof(half_y.c_str());
 			mDim3 = (float) atof(half_z.c_str());
-			mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0 ? mAutomaticShaping =
-					false : mAutomaticShaping = true;
+			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
 		}
 	}
 	else if (shapeType == std::string("cylinder"))
@@ -129,13 +138,27 @@ bool RigidBody::initialize()
 		mShapeType = CYLINDER;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
-		mUpAxis = mTmpl->parameter(std::string("shape_up"));
+		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
+		if (upAxis == std::string("x"))
+		{
+			mUpAxis = X_up;
+		}
+		else if (upAxis == std::string("y"))
+		{
+			mUpAxis = Y_up;
+		}
+		else
+		{
+			mUpAxis = Z_up;
+		}
 		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim2 = (float) atof(height.c_str());
-			mDim1 > 0.0 and mDim2 > 0.0 ? mAutomaticShaping = false :
-					mAutomaticShaping = true;
+			if (mDim1 > 0.0 and mDim2 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
 		}
 	}
 	else if (shapeType == std::string("capsule"))
@@ -143,13 +166,27 @@ bool RigidBody::initialize()
 		mShapeType = CAPSULE;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
-		mUpAxis = mTmpl->parameter(std::string("shape_up"));
+		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
+		if (upAxis == std::string("x"))
+		{
+			mUpAxis = X_up;
+		}
+		else if (upAxis == std::string("y"))
+		{
+			mUpAxis = Y_up;
+		}
+		else
+		{
+			mUpAxis = Z_up;
+		}
 		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim2 = (float) atof(height.c_str());
-			mDim1 > 0.0 and mDim2 > 0.0 ? mAutomaticShaping = false :
-					mAutomaticShaping = true;
+			if (mDim1 > 0.0 and mDim2 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
 		}
 	}
 	else if (shapeType == std::string("cone"))
@@ -157,19 +194,32 @@ bool RigidBody::initialize()
 		mShapeType = CONE;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
-		mUpAxis = mTmpl->parameter(std::string("shape_up"));
+		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
+		if (upAxis == std::string("x"))
+		{
+			mUpAxis = X_up;
+		}
+		else if (upAxis == std::string("y"))
+		{
+			mUpAxis = Y_up;
+		}
+		else
+		{
+			mUpAxis = Z_up;
+		}
 		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
 			mDim2 = (float) atof(height.c_str());
-			mDim1 > 0.0 and mDim2 > 0.0 ? mAutomaticShaping = false :
-					mAutomaticShaping = true;
+			if (mDim1 > 0.0 and mDim2 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
 		}
 	}
-	else //default a sphere with auto shaping
+	else //default a sphere (with auto shaping)
 	{
 		mShapeType = SPHERE;
-		mAutomaticShaping = true;
 	}
 	//get collide mask
 	std::string collideMask = mTmpl->parameter(std::string("collide_mask"));
@@ -206,11 +256,18 @@ void RigidBody::setPhysicalParameters()
 	mRigidBodyNode->set_mass(mBodyMass);
 	mRigidBodyNode->set_friction(mBodyFriction);
 	mRigidBodyNode->set_restitution(mBodyRestitution);
+	if (mCcdEnabled)
+	{
+		mRigidBodyNode->set_ccd_motion_threshold(mCcdMotionThreshold);
+		mRigidBodyNode->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
+	}
 }
 
-LVector3 RigidBody::correctedPosition()
+LVecBase3 RigidBody::startingPosition()
 {
-
+	LVecBase3 initPos(0.0, 0.0, 0.0);
+	//
+	return initPos;
 }
 
 void RigidBody::onAddToSceneSetup()
@@ -235,26 +292,137 @@ void RigidBody::onAddToSceneSetup()
 	NodePath rigidBodyNP = NodePath(mRigidBodyNode);
 	//set collide mask
 	rigidBodyNP.set_collide_mask(mCollideMask);
+
 	//reparent the object node path as a child of the rigid body one
-	mOwnerObject->nodePath().set_pos(correctedPosition());
-	mOwnerObject->nodePath().flatten_light();
+	NodePath actualParent = mOwnerObject->nodePath().get_parent();
+	if (actualParent.is_empty())
+	{
+		// if any error occurs by default set parent to render
+		actualParent = mTmpl->windowFramework()->get_render();
+	}
 	mOwnerObject->nodePath().reparent_to(rigidBodyNP);
+	mOwnerObject->nodePath().set_pos(startingPosition());
+	mOwnerObject->nodePath().flatten_light();
+
 	//set the object node path as that of the rigid body
 	mOwnerObject->nodePath() = rigidBodyNP;
+	//and reparent it to actual parent
+	mOwnerObject->nodePath().reparent_to(actualParent);
 }
 
 BulletShape* RigidBody::createShape(ShapeType shapeType)
 {
-	//get the dimensions of object node path, that should represents
-	//a model (if not all dimensions are set to 1.0)
-	getDimensions(mOwnerObject->nodePath());
-	if (not mAutomaticShaping)
+	//get the bounding dimensions of object node path, that
+	//should represents a model
+	getBoundingDimensions(mOwnerObject->nodePath());
+	// create the actual shape
+	BulletShape* collisionShape = NULL;
+	switch (mShapeType)
 	{
-		//set directly some dimensions
+	case SPHERE:
+		if (mAutomaticShaping)
+		{
+			//modify radius
+			mDim1 = mModelRadius;
+		}
+		collisionShape = new BulletSphereShape(mDim1);
+		break;
+	case PLANE:
+		if (mAutomaticShaping)
+		{
+			//modify normal and d
+			mDim1 = 0.0;
+			mDim2 = 0.0;
+			mDim3 = 1.0;
+			mDim4 = 0.0;
+		}
+		collisionShape = new BulletPlaneShape(LVector3(mDim1, mDim2, mDim3),
+				mDim4);
+		break;
+	case BOX:
+		if (mAutomaticShaping)
+		{
+			//modify half dimensions
+			mDim1 = mModelDims.get_x() / 2.0;
+			mDim2 = mModelDims.get_y() / 2.0;
+			mDim3 = mModelDims.get_z() / 2.0;
+		}
+		collisionShape = new BulletBoxShape(LVector3(mDim1, mDim2, mDim3));
+		break;
+	case CYLINDER:
+		if (mAutomaticShaping)
+		{
+			//modify radius and height
+			if (mUpAxis == X_up)
+			{
+				mDim1 = max(mModelDims.get_y(), mModelDims.get_z()) / 2.0;
+				mDim2 = mModelDims.get_x();
+			}
+			else if (mUpAxis == Y_up)
+			{
+				mDim1 = max(mModelDims.get_x(), mModelDims.get_z()) / 2.0;
+				mDim2 = mModelDims.get_y();
+			}
+			else
+			{
+				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
+				mDim2 = mModelDims.get_z();
+			}
+		}
+		collisionShape = new BulletCylinderShape(mDim1, mDim2, mUpAxis);
+		break;
+	case CAPSULE:
+		if (mAutomaticShaping)
+		{
+			//modify radius and height
+			if (mUpAxis == X_up)
+			{
+				mDim1 = max(mModelDims.get_y(), mModelDims.get_z()) / 2.0;
+				mDim2 = mModelDims.get_x();
+			}
+			else if (mUpAxis == Y_up)
+			{
+				mDim1 = max(mModelDims.get_x(), mModelDims.get_z()) / 2.0;
+				mDim2 = mModelDims.get_y();
+			}
+			else
+			{
+				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
+				mDim2 = mModelDims.get_z();
+			}
+		}
+		collisionShape = new BulletCapsuleShape(mDim1, mDim2, mUpAxis);
+		break;
+	case CONE:
+		if (mAutomaticShaping)
+		{
+			//modify radius and height
+			if (mUpAxis == X_up)
+			{
+				mDim1 = max(mModelDims.get_y(), mModelDims.get_z()) / 2.0;
+				mDim2 = mModelDims.get_x();
+			}
+			else if (mUpAxis == Y_up)
+			{
+				mDim1 = max(mModelDims.get_x(), mModelDims.get_z()) / 2.0;
+				mDim2 = mModelDims.get_y();
+			}
+			else
+			{
+				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
+				mDim2 = mModelDims.get_z();
+			}
+		}
+		collisionShape = new BulletConeShape(mDim1, mDim2, mUpAxis);
+		break;
+	default:
+		break;
 	}
+	//
+	return collisionShape;
 }
 
-void RigidBody::getDimensions(NodePath modelNP)
+void RigidBody::getBoundingDimensions(NodePath modelNP)
 {
 	//get "tight" dimensions of panda
 	LPoint3 minP, maxP;
@@ -276,6 +444,32 @@ BulletRigidBodyNode* RigidBody::rigidBodyNode()
 
 void RigidBody::switchType(BodyType bodyType)
 {
+	switch (bodyType)
+	{
+	case DYNAMIC:
+		mRigidBodyNode->set_mass(mBodyMass);
+		mRigidBodyNode->set_kinematic(false);
+		mRigidBodyNode->set_static(false);
+		mRigidBodyNode->set_deactivation_enabled(true);
+		mRigidBodyNode->set_active(true);
+		break;
+	case STATIC:
+		mRigidBodyNode->set_mass(0.0);
+		mRigidBodyNode->set_kinematic(false);
+		mRigidBodyNode->set_static(true);
+		mRigidBodyNode->set_deactivation_enabled(true);
+		mRigidBodyNode->set_active(false);
+		break;
+	case KINEMATIC:
+		mRigidBodyNode->set_mass(0.0);
+		mRigidBodyNode->set_kinematic(true);
+		mRigidBodyNode->set_static(false);
+		mRigidBodyNode->set_deactivation_enabled(false);
+		mRigidBodyNode->set_active(false);
+		break;
+	default:
+		break;
+	}
 }
 
 //TypedObject semantics: hardcoded

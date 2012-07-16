@@ -35,13 +35,13 @@ void ComponentTemplate::setParameters(ParameterTable& parameterTable)
 	//create the parameterTable key set (i.e. the set of parameters
 	//that will overwrite those of mParameterTable with the same name)
 	std::set<std::string> keySet;
-	for (iter = parameterTable.begin(); iter != parameterTable; ++iter)
+	for (iter = parameterTable.begin(); iter != parameterTable.end(); ++iter)
 	{
 		keySet.insert(iter->first);
 	}
 	//erase from mParameterTable the parameters to be overwritten
 	std::set<std::string>::iterator keySetIter;
-	for (keySetIter = keySet.begin(); keySetIter != keySet; ++keySetIter)
+	for (keySetIter = keySet.begin(); keySetIter != keySet.end(); ++keySetIter)
 	{
 		//find the mParameterTable range of values for
 		//the *keySetIter parameter ...

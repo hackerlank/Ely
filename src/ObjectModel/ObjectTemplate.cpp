@@ -107,13 +107,13 @@ void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 	//create the parameterTable key set (i.e. the set of parameters
 	//that will overwrite those of mParameterTable with the same name)
 	std::set<std::string> keySet;
-	for (iter = parameterTable.begin(); iter != parameterTable; ++iter)
+	for (iter = parameterTable.begin(); iter != parameterTable.end(); ++iter)
 	{
 		keySet.insert(iter->first);
 	}
 	//erase from mParameterTable the parameters to be overwritten
 	std::set<std::string>::iterator keySetIter;
-	for (keySetIter = keySet.begin(); keySetIter != keySet; ++keySetIter)
+	for (keySetIter = keySet.begin(); keySetIter != keySet.end(); ++keySetIter)
 	{
 		//find the mParameterTable range of values for
 		//the *keySetIter parameter ...
@@ -129,16 +129,16 @@ void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 void ObjectTemplate::setParametersDefaults()
 {
 	//sets the (mandatory) parameters to their default values.
-	mParameterTable.insert(ParameterNameValue("is_static","false"));
-	mParameterTable.insert(ParameterNameValue("pos_x","0.0"));
-	mParameterTable.insert(ParameterNameValue("pos_y","0.0"));
-	mParameterTable.insert(ParameterNameValue("pos_z","0.0"));
-	mParameterTable.insert(ParameterNameValue("rot_h","0.0"));
-	mParameterTable.insert(ParameterNameValue("rot_p","0.0"));
-	mParameterTable.insert(ParameterNameValue("rot_r","0.0"));
-	mParameterTable.insert(ParameterNameValue("scale_x","1.0"));
-	mParameterTable.insert(ParameterNameValue("scale_y","1.0"));
-	mParameterTable.insert(ParameterNameValue("scale_z","1.0"));
+	mParameterTable.insert(ParameterNameValue("is_static", "false"));
+	mParameterTable.insert(ParameterNameValue("pos_x", "0.0"));
+	mParameterTable.insert(ParameterNameValue("pos_y", "0.0"));
+	mParameterTable.insert(ParameterNameValue("pos_z", "0.0"));
+	mParameterTable.insert(ParameterNameValue("rot_h", "0.0"));
+	mParameterTable.insert(ParameterNameValue("rot_p", "0.0"));
+	mParameterTable.insert(ParameterNameValue("rot_r", "0.0"));
+	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));
+	mParameterTable.insert(ParameterNameValue("scale_y", "1.0"));
+	mParameterTable.insert(ParameterNameValue("scale_z", "1.0"));
 }
 
 std::string ObjectTemplate::parameter(const std::string& paramName)
@@ -155,7 +155,8 @@ std::string ObjectTemplate::parameter(const std::string& paramName)
 	return strPtr;
 }
 
-std::list<std::string> ObjectTemplate::parameterList(const std::string& paramName)
+std::list<std::string> ObjectTemplate::parameterList(
+		const std::string& paramName)
 {
 	std::list<std::string> strList;
 	ParameterTableIter iter;
