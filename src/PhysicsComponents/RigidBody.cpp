@@ -254,21 +254,29 @@ void RigidBody::onAddToObjectSetup()
 
 void RigidBody::onAddToSceneSetup()
 {
-	//reparent the object node path as a child of the rigid body one
-	NodePath actualParent = mOwnerObject->nodePath().get_parent();
-	if (actualParent.is_empty())
+	//get the current pos and hpr of the object node path
+	LPoint3 currentPos = mOwnerObject->nodePath().get_pos();
+	LVecBase3 currentHpr = mOwnerObject->nodePath().get_hpr();
+	//get the current parent of the object node path
+	NodePath currentParent = mOwnerObject->nodePath().get_parent();
+	if (currentParent.is_empty())
 	{
 		// if any error occurs by default set parent to render
-		actualParent = mTmpl->windowFramework()->get_render();
+		currentParent = mTmpl->windowFramework()->get_render();
 	}
+
+	//reparent the object node path as a child of the rigid body's one
 	mOwnerObject->nodePath().reparent_to(mNodePath);
-	mOwnerObject->nodePath().set_pos(startingPosition());
+	//reset to zero (or possibly corrected) pos and hpr of the object node path
+	mOwnerObject->nodePath().set_pos_hpr(startPos(), startHpr());;
 	mOwnerObject->nodePath().flatten_light();
 
-	//set the object node path as that of the rigid body
+	//set the object node path as the rigid body's one
 	mOwnerObject->nodePath() = mNodePath;
+	//reset the actual pos and hpr
+	mOwnerObject->nodePath().set_pos_hpr(currentPos, currentHpr);
 	//and reparent it to actual parent
-	mOwnerObject->nodePath().reparent_to(actualParent);
+	mOwnerObject->nodePath().reparent_to(currentParent);
 }
 
 BulletShape* RigidBody::createShape(ShapeType shapeType)
@@ -410,7 +418,14 @@ void RigidBody::setPhysicalParameters()
 	}
 }
 
-LVecBase3 RigidBody::startingPosition()
+LVecBase3 RigidBody::startPos()
+{
+	LVecBase3 initPos(0.0, 0.0, 0.0);
+	//
+	return initPos;
+}
+
+LVecBase3 RigidBody::startHpr()
 {
 	LVecBase3 initPos(0.0, 0.0, 0.0);
 	//

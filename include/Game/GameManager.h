@@ -152,6 +152,10 @@ protected:
 	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
+#ifdef DEBUG
+	bool mPhysicsDebugEnabled;
+	static void togglePhysicsDebug(const Event* event, void* data);
+#endif
 	static void toggleActor1Control(const Event* event, void* data);
 	static void toggleCameraControl(const Event* event, void* data);
 

@@ -70,7 +70,8 @@ void GameManager::setup()
 	trackBall->set_mat(cameraMat);
 
 #ifdef DEBUG
-		GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
+	GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
+	mPhysicsDebugEnabled = false;
 #endif
 
 	//initialize typed objects
@@ -105,6 +106,11 @@ void GameManager::setup()
 	//enable/disable camera control by event
 	define_key("c", "enableCameraControl", &GameManager::toggleCameraControl,
 			(void*) this);
+
+#ifdef DEBUG
+	define_key("p", "togglePhysicsDebug", &GameManager::togglePhysicsDebug,
+			(void*) this);
+#endif
 
 	// add a 1st task
 	m1stTask = new TaskInterface<GameManager>::TaskData(this,
@@ -143,6 +149,9 @@ void GameManager::setupCompTmplMgr()
 	//Listener template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ListenerTemplate(this, mWindow));
+	//RigidBody template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new RigidBodyTemplate(this, mWindow));
 
 }
 
@@ -469,6 +478,21 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 	}
 
 }
+
+#ifdef DEBUG
+void GameManager::togglePhysicsDebug(const Event* event, void* data)
+{
+	GameManager* gameManager = (GameManager*) data;
+	if (gameManager->mPhysicsDebugEnabled)
+	{
+		GamePhysicsManager::GetSingleton().debug(false);
+	}
+	else
+	{
+		GamePhysicsManager::GetSingleton().debug(true);
+	}
+}
+#endif
 
 void GameManager::toggleCameraControl(const Event* event, void* data)
 {

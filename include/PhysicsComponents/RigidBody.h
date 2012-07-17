@@ -189,11 +189,12 @@ private:
 	 */
 	void getBoundingDimensions(NodePath modelNP);
 	/**
-	 * \brief Returns a starting position, may be due to a correction
+	 * \brief Returns a starting position/orientation, may be due to a correction
 	 * vector position for the model to fit the collision shape position.
 	 * @return The starting position.
 	 */
-	LVecBase3 startingPosition();
+	LVecBase3 startPos();
+	LVecBase3 startHpr();
 	LVector3 mModelDims;
 	LPoint3 mModelCenter;
 	float mModelRadius;
