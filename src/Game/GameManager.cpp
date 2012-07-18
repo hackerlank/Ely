@@ -58,7 +58,7 @@ GameManager::~GameManager()
 	close_framework();
 }
 
-void GameManager::setup()
+void GameManager::initialize()
 {
 	//setup camera position
 	mCamera.set_pos(0, -50, 20);
@@ -76,13 +76,19 @@ void GameManager::setup()
 
 	//initialize typed objects
 	initTypedObjects();
-	//setup component template manager
+	//manageObjects component template manager
 	setupCompTmplMgr();
 
-	//setup game world (static)
+	//manageObjects game world (static)
 	createGameWorld(std::string("game.xml"));
 
 	// Manipulate objects
+	manageObjects();
+}
+
+void GameManager::manageObjects()
+{
+
 	//Actor1
 	PT(Object) actor1 =
 			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
@@ -100,8 +106,17 @@ void GameManager::setup()
 	actor1Sound3d->sounds().begin()->second->play();
 
 	//InstancedActor1
-	PT(Object) instancedActor1 =
-			ObjectTemplateManager::GetSingleton().createdObjects()["InstancedActor1"];
+	PT(Object) plane1 =
+			ObjectTemplateManager::GetSingleton().createdObjects()["Plane1"];
+	Model* plane1Model = DCAST(Model, plane1->getComponent(
+					ComponentFamilyType("Scene")));
+//    ts0 = TextureStage("ts0")
+//    reflTex = app.loader.loadTexture("rock_02.jpg")
+//    plane.setTexture(ts0, reflTex, 1)
+//    plane.setTexScale(ts0, 1000, 1000)
+	TextureStage* planeTS0 = new TextureStage("planeTS0");
+	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
+	plane1Model->nodePath().set_texture(planeTS0, planeTex, 1);
 
 	//enable/disable camera control by event
 	define_key("c", "enableCameraControl", &GameManager::toggleCameraControl,
@@ -395,7 +410,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 							attribute->Value()));
 		}
 		objectTmplPtr->setParameters(objParameterTable);
-		//give a chance to object (and its components) to setup
+		//give a chance to object (and its components) to manageObjects
 		//when being added to scene.
 		objectPtr->sceneSetup();
 		//remove top object from the priority queue

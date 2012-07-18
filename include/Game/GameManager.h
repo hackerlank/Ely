@@ -34,6 +34,8 @@
 #include <event.h>
 #include <trackball.h>
 #include <transform2sg.h>
+#include <textureStage.h>
+#include <texturePool.h>
 #include <iostream>
 #include <string>
 #include <map>
@@ -69,9 +71,9 @@ public:
 	virtual ~GameManager();
 
 	/**
-	 * \brief Put here your own custom setup game code.
+	 * \brief Put here game initialization code.
 	 */
-	virtual void setup();
+	virtual void initialize();
 
 	/**
 	 * \brief Set the Component template manager up.
@@ -144,6 +146,11 @@ protected:
 
 	/// NodePaths for enable_mouse/disable_mouse.
 	NodePath mTrackBall, mMouse2cam;
+
+	/**
+	 * \brief Put here custom game object management code.
+	 */
+	virtual void manageObjects();
 
 	/// 1nd task.
 	PT(TaskInterface<GameManager>::TaskData) m1stTask;

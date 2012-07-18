@@ -22,6 +22,7 @@
 		</ObjectTmpl>
 		<ObjectTmpl type="StaticActor">
 			<ComponentTmpl family="Scene" type="Model"/>
+			<ComponentTmpl family="Physics" type="RigidBody"/> 
 		</ObjectTmpl>
 	</ObjectTmplSet>
 
@@ -78,12 +79,30 @@
 				<Param scale_z="0.5"/>
 			</Component>
 			<Param parent=""/>
-			<Param pos_x="0.0"/>
-			<Param pos_y="-10.0"/>
-			<Param pos_z="0.0"/>
-			<Param rot_h="-90.0"/>
-			<Param rot_p="0.0"/>
-			<Param rot_r="0.0"/>
+		</Object>
+		<Object type="StaticActor" id="Plane1">
+			<Component type="Model" priority="100">
+				<Param from_file="false"/>
+				<Param model_file="teapot"/>
+				<Param is_static="true"/>
+				<Param model_type="card"/>
+				<Param model_card_left="-1000.0"/>
+				<Param model_card_right="1000.0"/>
+				<Param model_card_bottom="-1000.0"/>
+				<Param model_card_top="1000.0"/>
+			</Component>
+			<Component type="RigidBody" priority="90">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="plane"/>
+				<Param shape_norm_x="0.0"/>
+				<Param shape_norm_y="-1.0"/>
+				<Param shape_norm_z="0.0"/>
+				<Param shape_d="0.0"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param rot_p="-90.0"/>
 		</Object>
 		<Object type="Actor" id="Actor1"  priority="200">
 			<Component type="ControlByEvent">
@@ -120,7 +139,7 @@
 			<Param parent="render"/>
 			<Param pos_x="0.0"/>
 			<Param pos_y="0.0"/>
-			<Param pos_z="0.0"/>
+			<Param pos_z="20.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>

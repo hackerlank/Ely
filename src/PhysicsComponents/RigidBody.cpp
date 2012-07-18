@@ -232,10 +232,13 @@ void RigidBody::onAddToObjectSetup()
 	//set the physics parameters
 	setPhysicalParameters();
 
+	//At this point a Scene component (Model, InstanceOf ...) should have
+	//been already created and added to the object, so its node path should
+	//be the same as the object's one.
+	//Note: scaling is applied to a Scene component, so the object node path
+	//has scaling already applied.
+
 	//create and add a Collision Shape
-	//Note: scaling is applied to a Scene component (Model, InstanceOf ...)
-	//which should has been already created and added to object at this point,
-	// so object nodepath should be the same as of the Scene component one.
 	rigidBodyNode->add_shape(createShape(mShapeType));
 	//attach to Bullet World
 	//<BUG: you must first insert a dynamic body for switching to work
@@ -250,33 +253,15 @@ void RigidBody::onAddToObjectSetup()
 	mNodePath = NodePath(rigidBodyNode);
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
-}
-
-void RigidBody::onAddToSceneSetup()
-{
-	//get the current pos and hpr of the object node path
-	LPoint3 currentPos = mOwnerObject->nodePath().get_pos();
-	LVecBase3 currentHpr = mOwnerObject->nodePath().get_hpr();
-	//get the current parent of the object node path
-	NodePath currentParent = mOwnerObject->nodePath().get_parent();
-	if (currentParent.is_empty())
-	{
-		// if any error occurs by default set parent to render
-		currentParent = mTmpl->windowFramework()->get_render();
-	}
 
 	//reparent the object node path as a child of the rigid body's one
 	mOwnerObject->nodePath().reparent_to(mNodePath);
-	//reset to zero (or possibly corrected) pos and hpr of the object node path
+	//correct (or possibly reset to zero) pos and hpr of the object node path
 	mOwnerObject->nodePath().set_pos_hpr(startPos(), startHpr());;
 	mOwnerObject->nodePath().flatten_light();
 
 	//set the object node path as the rigid body's one
 	mOwnerObject->nodePath() = mNodePath;
-	//reset the actual pos and hpr
-	mOwnerObject->nodePath().set_pos_hpr(currentPos, currentHpr);
-	//and reparent it to actual parent
-	mOwnerObject->nodePath().reparent_to(currentParent);
 }
 
 BulletShape* RigidBody::createShape(ShapeType shapeType)

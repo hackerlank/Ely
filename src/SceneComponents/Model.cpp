@@ -114,17 +114,18 @@ bool Model::initialize()
 	else
 	{
 		//model is programmatically generated
+		std::string modelType = mTmpl->parameter(std::string("model_type"));
 		//card (e.g. finite plane)
-		if (not mTmpl->parameter(std::string("card")).empty())
+		if (modelType == std::string("card"))
 		{
 			float left = (float) atof(
-					mTmpl->parameter(std::string("card_left")).c_str());
+					mTmpl->parameter(std::string("model_card_left")).c_str());
 			float right = (float) atof(
-					mTmpl->parameter(std::string("card_right")).c_str());
+					mTmpl->parameter(std::string("model_card_right")).c_str());
 			float bottom = (float) atof(
-					mTmpl->parameter(std::string("card_bottom")).c_str());
+					mTmpl->parameter(std::string("model_card_bottom")).c_str());
 			float top = (float) atof(
-					mTmpl->parameter(std::string("card_top")).c_str());
+					mTmpl->parameter(std::string("model_card_top")).c_str());
 			if ((right - left) * (top - bottom) == 0.0)
 			{
 				left = -1.0;

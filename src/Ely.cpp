@@ -44,7 +44,7 @@ int main(int argc, char **argv)
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(gameMgr);
 
 	// Set the game up
-	gameMgr->setup();
+	gameMgr->initialize();
 	// Do the main loop
 	gameMgr->main_loop();
 

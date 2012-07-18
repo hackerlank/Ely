@@ -50,11 +50,11 @@ class ModelTemplate;
  * \li \c "is_static"  |single|"false"
  * \li \c "model_file"  |single|no default
  * \li \c "anim_files"  |multiple|no default
- * \li \c "card"  |single|no default
- * \li \c "card_left"  |single|no default
- * \li \c "card_right"  |single|no default
- * \li \c "card_bottom"  |single|no default
- * \li \c "card_top"  |single|no default
+ * \li \c "model_type"  |single|no default
+ * \li \c "model_card_left"  |single|no default
+ * \li \c "model_card_right"  |single|no default
+ * \li \c "model_card_bottom"  |single|no default
+ * \li \c "model_card_top"  |single|no default
  */
 class Model: public Component
 {
