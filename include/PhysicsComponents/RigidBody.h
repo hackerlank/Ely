@@ -154,6 +154,8 @@ private:
 	RigidBodyTemplate* mTmpl;
 	///The NodePath associated to this rigid body.
 	NodePath mNodePath;
+	///The NodePath associated to this rigid body.
+	PT(BulletRigidBodyNode) mRigidBodyNode;
 	///@{
 	///Physical parameters.
 	float mBodyMass, mBodyFriction, mBodyRestitution;
@@ -164,7 +166,8 @@ private:
 	float mCcdMotionThreshold, mCcdSweptSphereRadius;
 	bool mCcdEnabled;
 	/**
-	 * \brief Sets physical parameters (helper function).
+	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
+	 * @param rigidBodyNode The bullet rigid body node.
 	 */
 	void setPhysicalParameters();
 	///@}
@@ -187,16 +190,13 @@ private:
 	 * @param modelNP The GeomNode node path.
 	 */
 	void getBoundingDimensions(NodePath modelNP);
-	/**
-	 * \brief Returns a starting position/orientation, may be due to a correction
-	 * vector position for the model to fit the collision shape position.
-	 * @return The starting position.
-	 */
-	LVecBase3 startPos();
-	LVecBase3 startHpr();
 	LVector3 mModelDims;
-	LPoint3 mModelCenter;
 	float mModelRadius;
+	//any model has a local frame and the tight bounding box is computed
+	//wrt it; so mModelDeltaCenter represents a transform (translation) to
+	//be applied to the model node path so that the middle point of the
+	//bounding box will overlap the frame center of the parent's node path .
+	LVector3 mModelDeltaCenter;
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
 	BulletUpAxis mUpAxis;

@@ -134,6 +134,7 @@ bool Model::initialize()
 				top = 1.0;
 			}
 			CardMaker card("card" + std::string(mComponentId));
+			card.set_frame(left, right, bottom, top);
 			mNodePath = NodePath(card.generate());
 		}
 		else

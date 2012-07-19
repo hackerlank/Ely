@@ -144,10 +144,17 @@ private:
 	NodePath mSceneRoot;
 	///The set of sounds attached to this component.
 	SoundTable mSounds;
-	///Sounds' characteristics.
 	///@{
+	/// Sounds' characteristics.
 	float mMinDist, mMaxDist;
 	LPoint3 mPosition;
+	///@}
+	/**
+	 * \name Helpers for adding/removinf to/from updates (multi thread safeness).
+	 */
+	///@{
+	void addToUpdate();
+	void removeFromUpdate();
 	///@}
 
 	///TypedObject semantics: hardcoded

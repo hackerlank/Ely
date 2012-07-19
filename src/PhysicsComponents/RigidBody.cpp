@@ -38,7 +38,7 @@ RigidBody::RigidBody(RigidBodyTemplate* tmpl) :
 RigidBody::~RigidBody()
 {
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove_rigid_body(
-			DCAST(BulletRigidBodyNode,mNodePath.node()));
+			mRigidBodyNode);
 }
 
 const ComponentFamilyType RigidBody::familyType() const
@@ -211,7 +211,7 @@ bool RigidBody::initialize()
 
 BulletRigidBodyNode* RigidBody::rigidBodyNode()
 {
-	return DCAST(BulletRigidBodyNode, mNodePath.node());
+	return mRigidBodyNode.p();
 }
 
 NodePath& RigidBody::nodePath()
@@ -227,8 +227,7 @@ RigidBody::operator NodePath()
 void RigidBody::onAddToObjectSetup()
 {
 	//create a Rigid Body Node
-	BulletRigidBodyNode* rigidBodyNode = new BulletRigidBodyNode(
-			std::string(mComponentId).c_str());
+	mRigidBodyNode = new BulletRigidBodyNode(std::string(mComponentId).c_str());
 	//set the physics parameters
 	setPhysicalParameters();
 
@@ -239,26 +238,29 @@ void RigidBody::onAddToObjectSetup()
 	//has scaling already applied.
 
 	//create and add a Collision Shape
-	rigidBodyNode->add_shape(createShape(mShapeType));
+	mRigidBodyNode->add_shape(createShape(mShapeType));
 	//attach to Bullet World
 	//<BUG: you must first insert a dynamic body for switching to work
-	rigidBodyNode->set_mass(1.0);
+	mRigidBodyNode->set_mass(1.0);
 	//BUG>
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach_rigid_body(
-			rigidBodyNode);
+			mRigidBodyNode);
 	//switch the body type (take precedence over mass)
 	switchType(mBodyType);
 
 	//create a node path for the rigid body
-	mNodePath = NodePath(rigidBodyNode);
+	mNodePath = NodePath(mRigidBodyNode);
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
 
 	//reparent the object node path as a child of the rigid body's one
 	mOwnerObject->nodePath().reparent_to(mNodePath);
 	//correct (or possibly reset to zero) pos and hpr of the object node path
-	mOwnerObject->nodePath().set_pos_hpr(startPos(), startHpr());;
-	mOwnerObject->nodePath().flatten_light();
+	mOwnerObject->nodePath().set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+	if (mOwnerObject->isStatic())
+	{
+		mOwnerObject->nodePath().flatten_light();
+	}
 
 	//set the object node path as the rigid body's one
 	mOwnerObject->nodePath() = mNodePath;
@@ -386,7 +388,7 @@ void RigidBody::getBoundingDimensions(NodePath modelNP)
 	//
 	mModelDims = LVector3(abs(delta.get_x()), abs(delta.get_y()),
 			abs(delta.get_z()));
-	mModelCenter = delta / 2.0;
+	mModelDeltaCenter = -(minP + delta / 2.0);
 	mModelRadius = max(max(mModelDims.get_x(), mModelDims.get_y()),
 			mModelDims.get_z()) / 2.0;
 }
@@ -401,20 +403,6 @@ void RigidBody::setPhysicalParameters()
 		rigidBodyNode()->set_ccd_motion_threshold(mCcdMotionThreshold);
 		rigidBodyNode()->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
 	}
-}
-
-LVecBase3 RigidBody::startPos()
-{
-	LVecBase3 initPos(0.0, 0.0, 0.0);
-	//
-	return initPos;
-}
-
-LVecBase3 RigidBody::startHpr()
-{
-	LVecBase3 initPos(0.0, 0.0, 0.0);
-	//
-	return initPos;
 }
 
 void RigidBody::switchType(BodyType bodyType)

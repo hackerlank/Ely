@@ -110,13 +110,10 @@ void GameManager::manageObjects()
 			ObjectTemplateManager::GetSingleton().createdObjects()["Plane1"];
 	Model* plane1Model = DCAST(Model, plane1->getComponent(
 					ComponentFamilyType("Scene")));
-//    ts0 = TextureStage("ts0")
-//    reflTex = app.loader.loadTexture("rock_02.jpg")
-//    plane.setTexture(ts0, reflTex, 1)
-//    plane.setTexScale(ts0, 1000, 1000)
 	TextureStage* planeTS0 = new TextureStage("planeTS0");
 	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
 	plane1Model->nodePath().set_texture(planeTS0, planeTex, 1);
+	plane1Model->nodePath().set_tex_scale(planeTS0, 1000, 1000);
 
 	//enable/disable camera control by event
 	define_key("c", "enableCameraControl", &GameManager::toggleCameraControl,
@@ -506,6 +503,7 @@ void GameManager::togglePhysicsDebug(const Event* event, void* data)
 	{
 		GamePhysicsManager::GetSingleton().debug(true);
 	}
+	gameManager->mPhysicsDebugEnabled = not gameManager->mPhysicsDebugEnabled;
 }
 #endif
 
