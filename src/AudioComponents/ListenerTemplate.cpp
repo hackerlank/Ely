@@ -69,6 +69,8 @@ Component* ListenerTemplate::makeComponent(const ComponentId& compId)
 
 void ListenerTemplate::setParametersDefaults()
 {
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	//no mandatory parameters
 }

@@ -75,7 +75,7 @@ bool Sound3d::initialize()
 	{
 		PT(AudioSound) sound =
 				mTmpl->gameAudioMgr()->audioMgr()->get_sound(*iter, true);
-		if (sound.is_null())
+		if (not sound.is_null())
 		{
 			sounds()[*iter] = sound;
 		}

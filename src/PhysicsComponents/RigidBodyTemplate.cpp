@@ -69,6 +69,8 @@ Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
 
 void RigidBodyTemplate::setParametersDefaults()
 {
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("body_type","dynamic"));
 	mParameterTable.insert(ParameterNameValue("body_mass","1.0"));

@@ -69,6 +69,8 @@ Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
 
 void Sound3dTemplate::setParametersDefaults()
 {
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	//no mandatory parameters
 }

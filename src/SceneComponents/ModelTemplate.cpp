@@ -75,6 +75,8 @@ WindowFramework*& ModelTemplate::windowFramework()
 
 void ModelTemplate::setParametersDefaults()
 {
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("from_file","true"));
 	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));

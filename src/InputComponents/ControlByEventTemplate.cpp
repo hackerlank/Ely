@@ -64,6 +64,8 @@ Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
 
 void ControlByEventTemplate::setParametersDefaults()
 {
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("enabled","true"));
 	mParameterTable.insert(ParameterNameValue("forward","w"));
