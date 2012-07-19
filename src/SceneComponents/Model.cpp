@@ -63,10 +63,6 @@ void Model::onAddToObjectSetup()
 	//set the node path of the object to the
 	//node path of this model
 	mOwnerObject->nodePath() = mNodePath;
-	//check if this model is static: so should be the object
-	mOwnerObject->isStatic() =
-			(mTmpl->parameter(std::string("is_static")) == std::string("true") ? true :
-					false);
 }
 
 AnimControlCollection& Model::animations()

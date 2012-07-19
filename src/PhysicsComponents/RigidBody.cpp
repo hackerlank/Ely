@@ -56,17 +56,17 @@ bool RigidBody::initialize()
 	bool result = true;
 	//get body type
 	std::string bodyType = mTmpl->parameter(std::string("body_type"));
-	if (bodyType == std::string("dynamic"))
-	{
-		mBodyType = DYNAMIC;
-	}
 	if (bodyType == std::string("static"))
 	{
 		mBodyType = STATIC;
 	}
-	if (bodyType == std::string("kinematic"))
+	else if (bodyType == std::string("kinematic"))
 	{
 		mBodyType = KINEMATIC;
+	}
+	else
+	{
+		mBodyType = DYNAMIC;
 	}
 	//get physical parameters
 	mBodyMass = (float) atof(
@@ -246,6 +246,11 @@ void RigidBody::onAddToObjectSetup()
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach_rigid_body(
 			mRigidBodyNode);
 	//switch the body type (take precedence over mass)
+	//force this component to static if owner object is static
+	if (mOwnerObject->isStatic())
+	{
+		mBodyType = STATIC;
+	}
 	switchType(mBodyType);
 
 	//create a node path for the rigid body

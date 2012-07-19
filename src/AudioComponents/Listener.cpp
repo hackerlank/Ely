@@ -64,7 +64,7 @@ bool Listener::initialize()
 void Listener::onAddToObjectSetup()
 {
 	// update listener position/velocity only for dynamic objects
-	if (not mOwnerObject->isStatic())
+	if (mTmpl->gameAudioMgr() and (not mOwnerObject->isStatic()))
 	{
 		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
 	}
@@ -74,7 +74,7 @@ void Listener::onAddToObjectSetup()
 
 void Listener::onAddToSceneSetup()
 {
-	if (mOwnerObject->isStatic())
+	if (mTmpl->gameAudioMgr() and mOwnerObject->isStatic())
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();

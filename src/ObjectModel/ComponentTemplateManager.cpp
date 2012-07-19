@@ -34,7 +34,8 @@ PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 		throw GameException(
 				"ComponentTemplateManager::addComponentTemplate: NULL Component template");
 	}
-	PT(ComponentTemplate) previousCompTmpl(NULL);
+	PT(ComponentTemplate) previousCompTmpl;
+	previousCompTmpl.clear();
 	ComponentType componentId = componentTmpl->componentType();
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
 	if (it != mComponentTemplates.end())

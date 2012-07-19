@@ -31,8 +31,8 @@ GameAudioManager::GameAudioManager(PandaFramework* pandaFramework)
 				"GameAudioManager::GameAudioManager: invalid PandaFramework");
 	}
 	mAudioComponents.clear();
-	mUpdateData = NULL;
-	mUpdateTask = NULL;
+	mUpdateData.clear();
+	mUpdateTask.clear();
 	mPandaFramework = pandaFramework;
 	mAudioMgr = AudioManager::create_AudioManager();
 	//create the task for updating the active audio components

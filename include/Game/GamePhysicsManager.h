@@ -43,7 +43,7 @@
 /**
  * \brief Singleton manager updating attributes of physics components.
  *
- * Thread-safe during utilization.
+ * Prepared for multi-threading.
  */
 class GamePhysicsManager: public Singleton<GamePhysicsManager>
 {

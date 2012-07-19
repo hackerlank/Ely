@@ -142,7 +142,7 @@ public:
 	/**
 	 * \brief Gets a reference to the static flag.
 	 *
-	 * Thi flag represents if this object doesn't move in the world.
+	 * This flag represents if this object doesn't move in the world.
 	 * Various components can set or get this value to implement
 	 * some optimization. By default false (i.e. object is dynamic).
 	 */

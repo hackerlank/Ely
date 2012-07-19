@@ -47,7 +47,6 @@ class ModelTemplate;
  * \li \c "scale_x"  |single|"1.0"
  * \li \c "scale_y"  |single|"1.0"
  * \li \c "scale_z"  |single|"1.0"
- * \li \c "is_static"  |single|"false"
  * \li \c "model_file"  |single|no default
  * \li \c "anim_files"  |multiple|no default
  * \li \c "model_type"  |single|no default

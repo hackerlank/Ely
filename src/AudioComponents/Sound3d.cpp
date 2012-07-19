@@ -68,18 +68,23 @@ bool Sound3d::initialize()
 {
 	bool result = true;
 	//set sound files
-	std::list<std::string>::iterator it;
+	std::list<std::string>::iterator iter;
 	std::list<std::string> soundFileList = mTmpl->parameterList(
 			std::string("sound_files"));
-	for (it = soundFileList.begin(); it != soundFileList.end(); ++it)
+	for (iter = soundFileList.begin(); iter != soundFileList.end(); ++iter)
 	{
-		addSound(*it);
+		PT(AudioSound) sound =
+				mTmpl->gameAudioMgr()->audioMgr()->get_sound(*iter, true);
+		if (sound.is_null())
+		{
+			sounds()[*iter] = sound;
+		}
 	}
 	//
 	return result;
 }
 
-void Sound3d::addToUpdate()
+void Sound3d::onAddToObjectSetup()
 {
 	// update sounds' position/velocity only for dynamic objects
 	// and if sound table is not empty
@@ -88,20 +93,6 @@ void Sound3d::addToUpdate()
 	{
 		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
 	}
-}
-
-void Sound3d::removeFromUpdate()
-{
-	//remove sounds from update: this must be done for multi-threading safeness
-	if (mTmpl->gameAudioMgr())
-	{
-		mTmpl->gameAudioMgr()->removeFromAudioUpdate(this);
-	}
-}
-
-void Sound3d::onAddToObjectSetup()
-{
-	addToUpdate();
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
 }
@@ -117,9 +108,6 @@ void Sound3d::onAddToSceneSetup()
 
 bool Sound3d::addSound(const std::string& fileName)
 {
-	//this must be done for multi-threading safeness
-	removeFromUpdate();
-
 	//make mSounds modifications
 	bool result = false;
 	PT(AudioSound) sound = mTmpl->gameAudioMgr()->audioMgr()->get_sound(
@@ -129,18 +117,21 @@ bool Sound3d::addSound(const std::string& fileName)
 		sounds()[fileName] = sound;
 		result = true;
 	}
-
-	// (re)add to update
-	addToUpdate();
+	// try to add this component to update only if object is dynamic
+	// and if sound table is not empty
+	if (mTmpl->gameAudioMgr() and (not mOwnerObject->isStatic())
+			and (not mSounds.empty()))
+	{
+		//addToAudioUpdate will safely add this component
+		//to update only if it wasn't previously added
+		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
+	}
 	//
 	return result;
 }
 
 bool Sound3d::removeSound(const std::string& soundName)
 {
-	//this must be done for multi-threading safeness
-	removeFromUpdate();
-
 	//make mSounds modifications
 	bool result = false;
 	size_t removed = sounds().erase(soundName);
@@ -148,27 +139,25 @@ bool Sound3d::removeSound(const std::string& soundName)
 	{
 		result = true;
 	}
-
-	// (re)add to update
-	addToUpdate();
+	// try to remove this component to update if sound table is empty
+	if (mTmpl->gameAudioMgr() and (mSounds.empty()))
+	{
+		//removeFromAudioUpdate will safely remove this component
+		//to update only if it was previously added
+		mTmpl->gameAudioMgr()->removeFromAudioUpdate(this);
+	}
 	//
 	return result;
 }
 
 void Sound3d::setMinDistance(float dist)
 {
-	//this must be done for multi-threading safeness
-	removeFromUpdate();
-
 	mMinDist = dist;
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
 	{
 		iter->second->set_3d_min_distance(mMinDist);
 	}
-
-	// (re)add to update
-	addToUpdate();
 }
 
 float Sound3d::getMinDistance()
@@ -178,18 +167,12 @@ float Sound3d::getMinDistance()
 
 void Sound3d::setMaxDistance(float dist)
 {
-	//this must be done for multi-threading safeness
-	removeFromUpdate();
-
 	mMaxDist = dist;
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
 	{
 		iter->second->set_3d_max_distance(mMaxDist);
 	}
-
-	// (re)add to update
-	addToUpdate();
 }
 
 float Sound3d::getMaxDistance()
@@ -199,9 +182,6 @@ float Sound3d::getMaxDistance()
 
 void Sound3d::set3dStaticAttributes()
 {
-	//this must be done for multi-threading safeness
-	removeFromUpdate();
-
 	mPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
@@ -209,9 +189,6 @@ void Sound3d::set3dStaticAttributes()
 		iter->second->set_3d_attributes(mPosition.get_x(), mPosition.get_y(),
 				mPosition.get_z(), 0.0, 0.0, 0.0);
 	}
-
-	// (re)add to update
-	addToUpdate();
 }
 
 Sound3d::SoundTable& Sound3d::sounds()

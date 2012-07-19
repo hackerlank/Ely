@@ -149,13 +149,6 @@ private:
 	float mMinDist, mMaxDist;
 	LPoint3 mPosition;
 	///@}
-	/**
-	 * \name Helpers for adding/removinf to/from updates (multi thread safeness).
-	 */
-	///@{
-	void addToUpdate();
-	void removeFromUpdate();
-	///@}
 
 	///TypedObject semantics: hardcoded
 public:

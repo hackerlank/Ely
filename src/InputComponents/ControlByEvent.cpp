@@ -37,8 +37,8 @@ ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
 
-	mUpdateData = NULL;
-	mUpdateTask = NULL;
+	mUpdateData.clear();
+	mUpdateTask.clear();
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	mCentX = win->get_properties().get_x_size() / 2;
 	mCentY = win->get_properties().get_y_size() / 2;

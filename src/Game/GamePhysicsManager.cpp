@@ -31,8 +31,8 @@ GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
 				"GamePhysicsManager::GamePhysicsManager: invalid PandaFramework");
 	}
 	mPhysicsComponents.clear();
-	mUpdateData = NULL;
-	mUpdateTask = NULL;
+	mUpdateData.clear();
+	mUpdateTask.clear();
 	mPandaFramework = pandaFramework;
 	mBulletWorld = new BulletWorld();
 	mBulletWorld->set_gravity(0.0, 0.0, -9.81);

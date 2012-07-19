@@ -38,7 +38,8 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		throw GameException(
 				"ObjectTemplateManager::addObjectTemplate: NULL Component template");
 	}
-	PT(ObjectTemplate) previousObjTmpl(NULL);
+	PT(ObjectTemplate) previousObjTmpl;
+	previousObjTmpl.clear();
 	ObjectType objectTemplId = objectTmpl->name();
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
 	if (it != mObjectTemplates.end())

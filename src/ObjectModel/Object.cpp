@@ -61,7 +61,8 @@ PT(Component) Object::addComponent(Component* newComponent)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
-	PT(Component) previousComp = NULL;
+	PT(Component) previousComp;
+	previousComp.clear();
 	ComponentFamilyType familyId = newComponent->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())

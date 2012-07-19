@@ -77,7 +77,6 @@ void ModelTemplate::setParametersDefaults()
 {
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("from_file","true"));
-	mParameterTable.insert(ParameterNameValue("is_static","false"));
 	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));
 	mParameterTable.insert(ParameterNameValue("scale_y", "1.0"));
 	mParameterTable.insert(ParameterNameValue("scale_z", "1.0"));

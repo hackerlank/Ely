@@ -37,7 +37,7 @@
 /**
  * \brief Singleton manager updating 3d attributes of audio components.
  *
- * Thread-safe during utilization.
+ * Prepared for multi-threading.
  */
 class GameAudioManager: public Singleton<GameAudioManager>
 {
