@@ -6,3 +6,5 @@ model-path /REPOSITORY/KProjects/Eclipse/PandaGame/Shaders
 show-frame-rate-meter #t
 lock-to-one-cpu 0
 support-threads 1
+audio-buffering-seconds 5
+audio-preload-threshold 2000000

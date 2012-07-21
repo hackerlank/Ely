@@ -100,12 +100,13 @@ void Listener::update(void* data)
 
 	//get the new position
 	LPoint3 newPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
-	LVector3 forward = mOwnerObject->nodePath().get_relative_vector(mSceneRoot,
+	LVector3 forward = mSceneRoot.get_relative_vector(mOwnerObject->nodePath(),
 			LVector3::forward());
-	LVector3 up = mOwnerObject->nodePath().get_relative_vector(mSceneRoot,
+	LVector3 up = mSceneRoot.get_relative_vector(mOwnerObject->nodePath(),
 			LVector3::up());
 	//get the velocity (mPosition holds the previous position)
-	LVector3 velocity = (newPosition - mPosition) / dt;
+	LVector3 deltaPos = (newPosition - mPosition);
+	LVector3 velocity = deltaPos / dt;
 	//update listener velocity and position
 	mTmpl->gameAudioMgr()->audioMgr()->audio_3d_set_listener_attributes(
 			newPosition.get_x(), newPosition.get_y(), newPosition.get_z(),

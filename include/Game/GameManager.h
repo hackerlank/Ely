@@ -165,6 +165,7 @@ protected:
 #endif
 	static void toggleActor1Control(const Event* event, void* data);
 	static void toggleCameraControl(const Event* event, void* data);
+	bool mControlGrabbed;
 
 };
 

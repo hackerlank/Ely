@@ -66,10 +66,10 @@
 		</Object>	
 		<Object type="InstancedActor" id="InstancedTeapot1">
 			<Param parent="render"/>
-			<Param is_static="true"/>
+			<Param is_static="false"/>
 			<Param pos_x="-10.0"/>
 			<Param pos_y="0.0"/>
-			<Param pos_z="5.0"/>
+			<Param pos_z="3.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -101,7 +101,6 @@
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model" priority="100">
 				<Param from_file="false"/>
-				<Param model_file="teapot"/>
 				<Param is_static="true"/>
 				<Param model_type="card"/>
 				<Param model_card_left="-1000.0"/>
@@ -129,8 +128,8 @@
 				<Param fast_factor="10.0"/>
 				<Param inverted_keyboard="false"/>
 				<Param inverted_mouse="false"/>
-				<Param up=""/>
-				<Param down=""/>
+				<Param up="r"/>
+				<Param down="f"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
@@ -142,7 +141,7 @@
 				<Param scale_z="1.0"/>
 			</Component>
 			<Component type="RigidBody" priority="90">
-				<Param body_type="dynamic"/>
+				<Param body_type="kinematic"/>
 				<Param body_mass="1.0"/>
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.1"/>

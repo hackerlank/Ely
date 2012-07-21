@@ -101,6 +101,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Gets a reference to the bullet rigid body node.

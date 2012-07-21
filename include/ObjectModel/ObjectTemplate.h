@@ -98,7 +98,7 @@ public:
 	 * @param componentId The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
-	ComponentTemplate* getComponentTemplate(const ComponentType& componentId);
+	ComponentTemplate* getComponentTemplate(const ComponentType& componentType);
 
 	/**
 	 * \brief Gets/sets the ObjectTemplateManager.

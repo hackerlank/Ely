@@ -245,12 +245,6 @@ void RigidBody::onAddToObjectSetup()
 	//BUG>
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach_rigid_body(
 			mRigidBodyNode);
-	//switch the body type (take precedence over mass)
-	//force this component to static if owner object is static
-	if (mOwnerObject->isStatic())
-	{
-		mBodyType = STATIC;
-	}
 	switchType(mBodyType);
 
 	//create a node path for the rigid body
@@ -381,6 +375,17 @@ BulletShape* RigidBody::createShape(ShapeType shapeType)
 	}
 	//
 	return collisionShape;
+}
+
+void RigidBody::onAddToSceneSetup()
+{
+	//switch the body type (take precedence over mass)
+	//force this component to static if owner object is static
+	if (mOwnerObject->isStatic())
+	{
+		mBodyType = STATIC;
+	}
+	switchType(mBodyType);
 }
 
 void RigidBody::getBoundingDimensions(NodePath modelNP)

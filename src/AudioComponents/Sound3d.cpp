@@ -203,7 +203,8 @@ void Sound3d::update(void* data)
 	//get the new position
 	LPoint3 newPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
 	//get the velocity (mPosition holds the previous position)
-	LVector3 velocity = (newPosition - mPosition) / dt;
+	LVector3 deltaPos = (newPosition - mPosition);
+	LVector3 velocity = deltaPos / dt;
 	//update sounds' velocity and position
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)

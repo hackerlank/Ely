@@ -88,7 +88,6 @@ void GameManager::initialize()
 
 void GameManager::manageObjects()
 {
-
 	//Actor1
 	PT(Object) actor1 =
 			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
@@ -96,9 +95,6 @@ void GameManager::manageObjects()
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Scene")));
 	actor1Model->animations().loop("panda_soft", false);
-	//enable/disable Actor1 control by event
-	define_key("v", "enableActor1Control", &GameManager::toggleActor1Control,
-			(void*) this);
 	//play sound
 	PT(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
 					ComponentFamilyType("Audio")));
@@ -115,6 +111,10 @@ void GameManager::manageObjects()
 	plane1Model->nodePath().set_texture(planeTS0, planeTex, 1);
 	plane1Model->nodePath().set_tex_scale(planeTS0, 1000, 1000);
 
+	mControlGrabbed = false;
+	//enable/disable Actor1 control by event
+	define_key("v", "enableActor1Control", &GameManager::toggleActor1Control,
+			(void*) this);
 	//enable/disable camera control by event
 	define_key("c", "enableCameraControl", &GameManager::toggleCameraControl,
 			(void*) this);
@@ -294,9 +294,13 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//access top object
 		object = orderedObjects.top().getPtr();
 		const char *objType = object->Attribute("type", NULL);
-		if (not objType)
+		// get the related object template
+		ObjectTemplate *objectTmplPtr =
+				ObjectTemplateManager::GetSingleton().getObjectTemplate(
+						ObjectType(objType));
+		if ((not objType) or (not objectTmplPtr))
 		{
-			//no object without type allowed
+			//no object without type allowed or object type doesn't exist
 			orderedObjects.pop();
 			continue;
 		}
@@ -317,27 +321,34 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 					ordComp.setPrio(0);
 			orderedComponents.push(ordComp);
 		}
+		//reset all object's component parameters to their default values
+		ObjectTemplate::ComponentTemplateList::iterator iter;
+		for (iter = objectTmplPtr->getComponentTemplates().begin();
+				iter != objectTmplPtr->getComponentTemplates().end(); ++iter)
+		{
+			(*iter)->setParametersDefaults();
+		}
+		ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
 		//cycle through the Object Component(s)' to be initialized in order of priority
 		while (not orderedComponents.empty())
 		{
 			//access top component
 			component = orderedComponents.top().getPtr();
 			const char *compType = component->Attribute("type", NULL);
-			if (not compType)
+			// get the related component template
+			ComponentTemplate *componentTmplPtr =
+					objectTmplPtr->getComponentTemplate(
+							ComponentType(compType));
+			if ((not compType) or (not componentTmplPtr))
 			{
-				//no component without type allowed
+				//no component without type allowed or component type doesn't exist
 				orderedComponents.pop();
 				continue;
 			}
 			std::cout << "    Initializing Component '" << compType << "'"
 					<< std::endl;
 			ParameterTable parameterTable;
-			// get the related component template and ...
-			ComponentTemplate *componentTmplPtr =
-					ObjectTemplateManager::GetSingleton().getObjectTemplate(
-							ObjectType(objType))->getComponentTemplate(
-							ComponentType(compType));
-			//...reset its parameters to their default values
+			//reset component' parameters to their default values
 			componentTmplPtr->setParametersDefaults();
 			//cycle through the Component Param(s)' to be initialized
 			tinyxml2::XMLElement *param;
@@ -383,11 +394,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//////////////////////////////////////////////////////////////
 		//<!-- Object addition to Scene -->
 		ParameterTable objParameterTable;
-		// get the related object template and ...
-		ObjectTemplate *objectTmplPtr =
-				ObjectTemplateManager::GetSingleton().getObjectTemplate(
-						ObjectType(objType));
-		//...reset its parameters to their default values
+		//reset object' parameters to their default values
 		objectTmplPtr->setParametersDefaults();
 		//cycle through the Object Param(s)' to be initialized
 		tinyxml2::XMLElement *objParam;
@@ -479,14 +486,18 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 		trackBall->set_mat(cameraMat);
 		//(re)enable trackball
 		gameManager->enable_mouse();
+		//
+		gameManager->mControlGrabbed = false;
 	}
-	else
+	else if (not gameManager->mControlGrabbed)
 	{
 		//if disabled then enable it
 		//disable the trackball
 		gameManager->disable_mouse();
 		//enable
 		actor1Control->enable();
+		//
+		gameManager->mControlGrabbed = true;
 	}
 
 }
@@ -529,14 +540,18 @@ void GameManager::toggleCameraControl(const Event* event, void* data)
 		trackBall->set_mat(cameraMat);
 		//(re)enable trackball
 		gameManager->enable_mouse();
+		//
+		gameManager->mControlGrabbed = false;
 	}
-	else
+	else if (not gameManager->mControlGrabbed)
 	{
 		//if disabled then enable it
 		//disable the trackball
 		gameManager->disable_mouse();
 		//enable
 		cameraControl->enable();
+		//
+		gameManager->mControlGrabbed = true;
 	}
 
 }

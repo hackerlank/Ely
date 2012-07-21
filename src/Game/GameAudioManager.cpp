@@ -106,6 +106,8 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	{
 		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
+	//Update audio manager
+	mAudioMgr->update();
 	//
 	return AsyncTask::DS_cont;
 

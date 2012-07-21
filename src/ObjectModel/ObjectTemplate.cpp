@@ -73,11 +73,11 @@ void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
 }
 
 ComponentTemplate* ObjectTemplate::getComponentTemplate(
-		const ComponentType& componentId)
+		const ComponentType& componentType)
 {
 	ComponentTemplateList::iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
-			idIsEqualTo(componentId));
+			idIsEqualTo(componentType));
 	if (it == mComponentTemplates.end())
 	{
 		return NULL;
