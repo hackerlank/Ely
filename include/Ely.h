@@ -30,5 +30,9 @@
 #include "Game/GamePhysicsManager.h"
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include <iostream>
+#ifdef DEBUG
+#include "thread.h"
+#endif
 
 #endif /* ELY_H_ */

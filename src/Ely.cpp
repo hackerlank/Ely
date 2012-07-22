@@ -42,7 +42,24 @@ int main(int argc, char **argv)
 	// Other managers (depending on GameManager)
 	GameAudioManager* gameAudioMgr = new GameAudioManager(gameMgr);
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(gameMgr);
-
+#ifdef DEBUG
+	if (Thread::is_threading_supported())
+	{
+		std::cout << "Threading support has been compiled in and enabled"
+				<< std::endl;
+	}
+	if (Thread::is_simple_threads())
+	{
+		std::cout << "Panda is currently compiled for \"simple threads\", "
+				"which is to say, cooperative context switching only"
+				<< std::endl;
+	}
+	if (Thread::is_true_threads())
+	{
+		std::cout << "A real threading library is available that "
+				"supports actual OS-implemented threads" << std::endl;
+	}
+#endif
 	// Set the game up
 	gameMgr->initialize();
 	// Do the main loop

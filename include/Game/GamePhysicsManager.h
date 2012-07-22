@@ -37,6 +37,7 @@
 #include <clockObject.h>
 #include <asyncTask.h>
 #include <reMutex.h>
+#include <reMutexHolder.h>
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 

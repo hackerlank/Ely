@@ -57,7 +57,7 @@ GameAudioManager::~GameAudioManager()
 void GameAudioManager::addToAudioUpdate(Component* audioComp)
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
@@ -70,7 +70,7 @@ void GameAudioManager::addToAudioUpdate(Component* audioComp)
 void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
@@ -83,7 +83,7 @@ void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
 AudioManager* GameAudioManager::audioMgr()
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	return mAudioMgr.p();
 }
@@ -91,7 +91,7 @@ AudioManager* GameAudioManager::audioMgr()
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 

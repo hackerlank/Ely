@@ -62,7 +62,7 @@ GamePhysicsManager::~GamePhysicsManager()
 void GamePhysicsManager::addToPhysicsUpdate(Component* physicsComp)
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
@@ -75,7 +75,7 @@ void GamePhysicsManager::addToPhysicsUpdate(Component* physicsComp)
 void GamePhysicsManager::removeFromPhysicsUpdate(Component* physicsComp)
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
@@ -88,7 +88,7 @@ void GamePhysicsManager::removeFromPhysicsUpdate(Component* physicsComp)
 BulletWorld* GamePhysicsManager::bulletWorld()
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	return mBulletWorld.p();
 }
@@ -96,7 +96,7 @@ BulletWorld* GamePhysicsManager::bulletWorld()
 AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	lock_guard<ReMutex> guard(mMutex);
+	ReMutexHolder guard(mMutex);
 
 	float maxSubSteps;
 	float timeStep = ClockObject::get_global_clock()->get_dt();
