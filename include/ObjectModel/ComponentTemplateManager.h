@@ -27,6 +27,7 @@
 #include <map>
 #include <pointerTo.h>
 #include <reMutex.h>
+#include <reMutexHolder.h>
 #include "Utilities/Tools.h"
 #include "ComponentTemplate.h"
 #include "Component.h"

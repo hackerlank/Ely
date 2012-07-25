@@ -27,6 +27,7 @@
 #include <map>
 #include <iostream>
 #include <reMutex.h>
+#include <reMutexHolder.h>
 #include "Utilities/Tools.h"
 #include "ObjectTemplate.h"
 #include "Object.h"
@@ -106,7 +107,7 @@ private:
 	IdType id;
 	/**
 	 * \brief Return an unique id for created objects.
-	 * @return
+	 * @return The unique id.
 	 */
 	IdType getId();
 
