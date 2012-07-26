@@ -21,459 +21,8 @@
  * \author marco
  */
 
-//#include <iostream>
-//#include <vector>
-//#include <load_prc_file.h>
-//#include <auto_bind.h>
-//#include <partBundleHandle.h>
-//#include <character.h>
-//#include <animControlCollection.h>
-//#include <pandaFramework.h>
-//
-//#include <panda3d/bulletWorld.h>
-//// $Id: FSM.java 12 2009-11-09 22:58:47Z gabe.johnson $
-//
-////package org.six11.util.data;
-//
-////import org.six11.util.Debug;
-//
-////import java.util.ArrayList;
-////import java.util.HashMap;
-////import java.util.List;
-////import java.util.Map;
-////import java.util.NoSuchElementException;
-////
-////import javax.swing.event.ChangeEvent;
-////import javax.swing.event.ChangeListener;
-//
-////http://www.java2s.com/Code/Java/Collections-Data-Structure/AprogrammableFiniteStateMachineimplementation.htm
-//
-//#include <string>
-//#include <map>
-//#include <pointerTo.h>
-//#include <typedWritableReferenceCount.h>
-//
-///**
-// * \brief Type of transition function.
-// */
-//typedef void TransitionFunction(void*);
-//
-///**
-// * Create a new transition. See the documentation for addEvent and
-// * addTransition in FSM.
-// */
-//class Transition: public TypedWritableReferenceCount
-//{
-//public:
-//	/**
-//	 * \brief Constructor.
-//	 *
-//	 * Create a transition object that responds to the given event when in
-//	 * the given startState, and puts the FSM into the endState provided.
-//	 */
-//	Transition(std::string evtName, std::string startState,
-//			std::string endState)
-//	{
-//		mEvtName = evtName;
-//		mStartState = startState;
-//		mEndState = endState;
-//	}
-//
-//	/**
-//	 * \brief Destructor.
-//	 */
-//	virtual ~Transition()
-//	{
-//	}
-//
-//	/**
-//	 * \brief Executes just before a transition.
-//	 *
-//	 * Override this to have FSM execute code immediately before following a
-//	 * state transition.
-//	 */
-//	virtual void doBeforeTransition()
-//	{
-//	}
-//
-//	/**
-//	 * \brief Executes just after a transition.
-//	 *
-//	 * Override this to have FSM execute code immediately after following a
-//	 * state transition.
-//	 */
-//	virtual void doAfterTransition()
-//	{
-//	}
-//
-//	std::string& endState() const
-//	{
-//		return mEndState;
-//	}
-//
-//	std::string& evtName() const
-//	{
-//		return mEvtName;
-//	}
-//
-//	std::string& startState() const
-//	{
-//		return mStartState;
-//	}
-//
-//private:
-//	std::string mEvtName;
-//	std::string mStartState;
-//	std::string mEndState;
-//
-//};
-//
-///**
-// * Represents a state with some number of associated transitions.
-// */
-//class State: public TypedWritableReferenceCount
-//{
-//public:
-//
-//	typedef std::map<std::string, PT(Transition)> TransitionTable;
-//	typedef TransitionTable::value_type TransitionTableEntry;
-//
-//	State(TransitionFunction* entryCode, TransitionFunction* exitCode,
-//			TransitionFunction* alwaysRunCode)
-//	{
-//		mAutoTransitionState = NULL;
-//		mTransitions.clear();
-//		mEntryCode = entryCode;
-//		mExitCode = exitCode;
-//		mAlwaysRunCode = alwaysRunCode;
-//	}
-//
-//	void addTransition(Transition* trans)
-//	{
-//		mTransitions.insert(TransitionTableEntry(trans->evtName(), trans));
-//	}
-//
-//	void runEntryCode(void* data)
-//	{
-//		if (mEntryCode != NULL)
-//		{
-//			mEntryCode(data);
-//		}
-//	}
-//
-//	void runExitCode(void* data)
-//	{
-//		if (mExitCode != NULL)
-//		{
-//			mExitCode(data);
-//		}
-//	}
-//
-//	void runAlwaysCode(void* data)
-//	{
-//		if (mAlwaysRunCode != NULL)
-//		{
-//			mAlwaysRunCode(data);
-//		}
-//	}
-//
-//	TransitionFunction*& alwaysRunCode()
-//	{
-//		return mAlwaysRunCode;
-//	}
-//
-//	TransitionFunction*& entryCode()
-//	{
-//		return mEntryCode;
-//	}
-//
-//	TransitionFunction*& exitCode()
-//	{
-//		return mExitCode;
-//	}
-//
-//protected:
-//	TransitionTable mTransitions;
-//	std::string mAutoTransitionState;
-//	TransitionFunction* mEntryCode;
-//	TransitionFunction* mExitCode;
-//	TransitionFunction* mAlwaysRunCode;
-//
-//};
-//
-///**
-// * \brief A programmable Finite State Machine implementation.
-// *
-// * To use this class, establish any number of states with the 'addState' method.
-// * Next, add some FSM.Transition objects (the Transition class is designed to be
-// * used as an superclass for your anonymous implementation). Each Transition object
-// * has two useful methods that can be defined by your implementation:
-// * doBeforeTransition and doAfterTransition. To drive your FSM, simply give it
-// * events using the addEvent method with the name of an event. If there is an
-// * appropriate transition for the current state, the transition's doBefore/doAfter
-// * methods are called and the FSM is put into the new state. It is legal (and highly
-// * useful) for the start/end states of a transition to be the same state.
-// **/
-//class FSM
-//{
-//	// This class implements a Flying Spaghetti Monster
-//
-//public:
-//
-//	typedef std::map<std::string, PT(State)> StateTable;
-//	typedef StateTable::value_type StateTableEntry;
-//
-//	/**
-//	 * \brief Creates a blank FSM with the given name (which is arbitrary).
-//	 */
-//	FSM(const std::string& name)
-//	{
-//		mName = name;
-//		mStates.clear();
-//		mCurrentState = std::string("");
-////    this.changeListeners = new ArrayList<ChangeListener>();
-//	}
-//
-//	/**
-//	 * Turn debugging on/off.
-//	 */
-//	void setDebugMode(bool debug)
-//	{
-//		mDebug = debug;
-//	}
-//
-//	/**
-//	 * \brief Report the current state of the finite state machine.
-//	 */
-//	const std::string& currentState()
-//	{
-//		return mCurrentState;
-//	}
-//
-//	/**
-//	 * \brief Adds a new state with no entry or exit code.
-//	 */
-//	void addState(const std::string& state)
-//	{
-//		addState(state, NULL, NULL, NULL);
-//	}
-//
-//	/**
-//	 * \brief Establishes a new state the FSM is aware of.
-//	 *
-//	 * If the FSM does not currently have any states, this state becomes
-//	 * the current, initial state. This is the only way to put the FSM
-//	 * into an initial state.
-//	 *
-//	 * The entryCode, exitCode, and alwaysRunCode are TransitionFunction that
-//	 * the FSM executes during the course of a transition. entryCode and
-//	 * exitCode are run only if the transition is between two distinct states
-//	 * (i.e. A->B where A != B). alwaysRunCode is executed even if the
-//	 * transition is re-entrant (i.e. A->B where A = B).
-//	 **/
-//	void addState(const std::string& state, TransitionFunction* entryCode,
-//			TransitionFunction* exitCode, TransitionFunction* alwaysRunCode)
-//	{
-//		bool isInitial = (mStates.size() == 0 ? true : false);
-//		if (mStates.count(state) == 0)
-//		{
-//mStates		.insert(StateTableEntry(state,
-//						new State(entryCode, exitCode, alwaysRunCode));
-//			}
-//
-//		if (isInitial)
-//		{
-//			setState(state);
-//		}
-//	}
-//
-//	void setStateEntryCode(const std::string& state,
-//			TransitionFunction* entryCode)
-//	{
-//		if (mStates.count(state) != 0)
-//		{
-//			mStates[state]->entryCode() = entryCode;
-//		}
-//	}
-//
-//	void setStateExitCode(const std::string& state,
-//			TransitionFunction* exitCode)
-//	{
-//		if (mStates.count(state) != 0)
-//		{
-//			mStates[state]->exitCode() = exitCode;
-//		}
-//	}
-//
-//	void setStateAlwaysRunCode(const std::string& state,
-//			TransitionFunction* alwaysRunCode)
-//	{
-//		if (mStates.count(state) != 0)
-//		{
-//			mStates[state]->alwaysRunCode() = alwaysRunCode;
-//		}
-//	}
-//
-//	/**
-//	 * There are cases where a state is meant to be transitional, and the FSM
-//	 * should always immediately transition to some other state. In those cases,
-//	 * use this method to specify the start and end states. After the startState
-//	 * has fully transitioned (and any change events have been fired) the FSM
-//	 * will check to see if there is another state that the FSM should
-//	 * automatically transition to. If there is one, addEvent(endState) is
-//	 * called.
-//	 *
-//	 * Note: this creates a special transition in the lookup table called
-//	 * "(auto)".
-//	 */
-//	void setAutoTransition(const std::string& startState, const std::string& endState)
-//	{
-//		// if (debug) {
-//		// Debug.out("FSM", "Establishing auto transition for " + startState +
-//		// " -> " + endState);
-//		// }
-//		mStates.get(startState).autoTransitionState = endState;
-//		addTransition(new Transition("(auto)", startState, endState));
-//	}
-//
-//	/**
-//	 * Sets the current state without following a transition. This will cause a
-//	 * change event to be fired.
-//	 */
-//	void setState(const std::string& state)
-//	{
-//		setState(state, true);
-//	}
-//
-//	/**
-//	 * Sets the current state without following a transition, and optionally
-//	 * causing a change event to be triggered. During state transitions (with
-//	 * the 'addEvent' method), this method is used with the triggerEvent
-//	 * parameter as false.
-//	 *
-//	 * The FSM executes non-null runnables according to the following logic,
-//	 * given start and end states A and B:
-//	 *
-//	 * <ol>
-//	 * <li>If A and B are distinct, run A's exit code.</li>
-//	 * <li>Record current state as B.</li>
-//	 * <li>Run B's "alwaysRunCode".</li>
-//	 * <li>If A and B are distinct, run B's entry code.</li>
-//	 * </ol>
-//	 */
-//	void setState(String state, boolean triggerEvent)
-//	{
-//		boolean runExtraCode = !state.equals(currentState);
-//		if (runExtraCode && currentState != null)
-//		{
-//			mStates.get(currentState).runExitCode();
-//		}
-//		currentState = state;
-//		mStates.get(currentState).runAlwaysCode();
-//		if (runExtraCode)
-//		{
-//			mStates.get(currentState).runEntryCode();
-//		}
-//		if (triggerEvent)
-//		{
-//			fireChangeEvent();
-//		}
-//	}
-//
-//	/**
-//	 * Establish a new transition. You might use this method something like
-//	 * this:
-//	 *
-//	 * fsm.addTransition(new FSM.Transition("someEvent", "firstState",
-//	 * "secondState") { public void doBeforeTransition() {
-//	 * System.out.println("about to transition..."); } public void
-//	 * doAfterTransition() { fancyOperation(); } });
-//	 */
-//	void addTransition(Transition trans)
-//	{
-//		State st = mStates.get(trans.startState);
-//		if (st == null)
-//		{
-//			throw new NoSuchElementException(
-//					"Missing state: " + trans.startState);
-//		}
-//		st.addTransition(trans);
-//	}
-//
-//	/**
-//	 * Add a change listener -- this is a standard java change listener and is
-//	 * only used to report changes that have already happened. ChangeEvents are
-//	 * only fired AFTER a transition's doAfterTransition is called.
-//	 */
-//	void addChangeListener(ChangeListener cl)
-//	{
-//		if (!changeListeners.contains(cl))
-//		{
-//			changeListeners.add(cl);
-//		}
-//	}
-//
-//	/**
-//	 * Feed the FSM with the named event. If the current state has a transition
-//	 * that responds to the given event, the FSM will performed the transition
-//	 * using the following steps, assume start and end states are A and B:
-//	 *
-//	 * <ol>
-//	 * <li>Execute the transition's "doBeforeTransition" method</li>
-//	 * <li>Run fsm.setState(B) -- see docs for that method</li>
-//	 * <li>Execute the transition's "doAfterTransition" method</li>
-//	 * <li>Fire a change event, notifying interested observers that the
-//	 * transition has completed.</li>
-//	 * <li>Now firmly in state B, see if B has a third state C that we must
-//	 * automatically transition to via addEvent(C).</li>
-//	 * </ol>
-//	 */
-//	void addEvent(String evtName)
-//	{
-//		State state = mStates.get(currentState);
-//		if (state.transitions.containsKey(evtName))
-//		{
-//			Transition trans = state.transitions.get(evtName);
-//			// if (debug) {
-//			// Debug.out("FSM", "Event: " + evtName + ", " + trans.startState +
-//			// " --> " + trans.endState);
-//			// }
-//			trans.doBeforeTransition();
-//			setState(trans.endState, false);
-//			trans.doAfterTransition();
-//			fireChangeEvent();
-//			if (mStates.get(trans.endState).autoTransitionState != null)
-//			{
-//				// if (debug) {
-//				// Debug.out("FSM", "Automatically transitioning from " +
-//				// trans.endState + " to "
-//				// + states.get(trans.endState).autoTransitionState);
-//				// }
-//				addEvent("(auto)");
-//			}
-//		}
-//	}
-//
-//protected:
-//	std::string mName;
-//	std::string mCurrentState;
-//	StateTable mStates;
-//	//  protected List<ChangeListener> changeListeners;
-//	bool mDebug;
-//};
-//
-///**
-// * Fire a change event to registered listeners.
-// */
-//void fireChangeEvent()
-//{
-//	ChangeEvent changeEvent = new ChangeEvent(this);
-//	for (ChangeListener cl : changeListeners)
-//	{
-//		cl.stateChanged(changeEvent);
-//	}
-//}
 #include <string>
+#include <sstream>
 #include <set>
 #include <queue>
 #include <utility>
@@ -488,6 +37,10 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 
+#include "Utilities/Tools.h"
+
+class FSM;
+
 /**
  * \brief The State type.
  */
@@ -499,38 +52,70 @@ typedef std::string State;
 typedef set<State> StateSet;
 
 /**
- * \brief The transition/filter/fromTo function type.
+ * \brief The transition/fromTo function type.
  */
-struct FSMFunction: public ReferenceCount
+typedef boost::function<void(FSM*)> TransitionFunctor;
+class TransitionFunction: public ReferenceCount
 {
-	boost::function<void(void)> mFSMFunction;
+public:
+	TransitionFunction(FSM* fsm, TransitionFunctor functor)
+	{
+		mFsm = fsm;
+		mFunctor = functor;
+	}
+	void operator()()
+	{
+		mFunctor(mFsm);
+	}
+private:
+	FSM* mFsm;
+	TransitionFunctor mFunctor;
 };
-
-/**
- * \brief The transition function type.
- */
-//typedef void TransitionFunction(void*);
-//typedef boost::function<void(void)> TransitionFunction;
 
 /**
  * \brief The filter function type.
  */
-//typedef void FilterFunction(void*);
-//typedef boost::function<void(void)> FilterFunction;
+typedef boost::function<const State&(FSM*, const std::string&)> FilterFunctor;
+class FilterFunction: public ReferenceCount
+{
+public:
+	FilterFunction(FSM* fsm, const std::string& str, FilterFunctor functor)
+	{
+		mFsm = fsm;
+		mFunctor = functor;
+	}
+	const State& operator()(const std::string& state)
+	{
+		return mFunctor(mFsm, state);
+	}
+private:
+	FSM* mFsm;
+	FilterFunctor mFunctor;
+};
 
 /**
- * \brief The FromTo function type.
+ * \brief The (deferred) FSM method type.
  */
-//typedef void FromToFunction(const State&, const State&, void*);
-//typedef boost::function<void(const State&, const State&)> FromToFunction;
+typedef boost::function<void(void)> FSMFunctor;
+class FSMFunction: public ReferenceCount
+{
+public:
+	FSMFunction(FSMFunctor functor)
+	{
+		mFunctor = functor;
+	}
+	void operator()()
+	{
+		mFunctor();
+	}
+private:
+	FSMFunctor mFunctor;
+};
 
-/**
- * \name Function tables indexed by State(s).
- */
 ///@{
-typedef std::map<State, PT(FSMFunction)> TransitionFunctionTable;
-typedef std::map<State, PT(FSMFunction)> FilterFunctionTable;
-typedef std::map<std::pair<State, State>, PT(FSMFunction)> FromToFunctionTable;
+typedef std::map<State, PT(TransitionFunction)> TransitionFunctionTable;
+typedef std::map<State, PT(FilterFunction)> FilterFunctionTable;
+typedef std::map<std::pair<State, State>, PT(TransitionFunction)> FromToFunctionTable;
 ///@}
 
 /**
@@ -544,7 +129,7 @@ typedef std::map<std::pair<State, State>, PT(FSMFunction)> FromToFunctionTable;
  * with a capital letter.  (Also by convention, strings passed to
  * request that are not state names should begin with a lowercase letter.).
  * To define specialized behavior when entering or exiting a
- * particular State, define FSMFunction(s) for enter to and/or
+ * particular State, define StateFunction(s) for enter to and/or
  * exit from the State.
  * Both functions can access the previous state name as
  * mOldState, and the new state name we are transitioning to as
@@ -554,7 +139,7 @@ typedef std::map<std::pair<State, State>, PT(FSMFunction)> FromToFunctionTable;
  * Both functions are optional.  If either function is omitted, the
  * state is still defined, but nothing is done when transitioning
  * into (or out of) the state.
- * Additionally, you may define a filter State FSMFunction for each
+ * Additionally, you may define a filter State StateFunction for each
  * state.  The purpose of this function is to decide what state to
  * transition to next, if any, on receipt of a particular input.  The
  * input is always a State and the return value should either FSM::NullState
@@ -566,38 +151,100 @@ typedef std::map<std::pair<State, State>, PT(FSMFunction)> FromToFunctionTable;
  * unexpected transition.
  * The current state may be queried at any time other than
  * during the handling of the enter() and exit() functions.  During these
- * functions, current state contains the value FSM::NullState (you are
+ * functions, current state contains the value NullState (you are
  * not really in any state during the transition).  However, during a
  * transition you *can* query the outgoing and incoming states,
  * respectively, via oldState() and newState().  At other times,
  * currentState contains the name of the current state.
- * Initially, the FSM is in state FSM::OffState. It does not call
+ * Initially, the FSM is in state OffState. It does not call
  * enter OffState at construction time; it is simply in OffState already
  * by convention.
- * If you need to call code in enterOff() to initialize your FSM
-    properly, call it explicitly in the constructor.  Similarly, when
-    cleanup() is called or the FSM is destructed, the FSM transitions
-    back to 'Off' by convention.  (It does call enterOff() at this
-    point, but does not call exitOff().)
-
-    To implement nested hierarchical FSM's, simply create a nested FSM
-    and store it on the class within the appropriate enterState()
-    function, and clean it up within the corresponding exitState()
-    function.
-
-    There is a way to define specialized transition behavior between
-    two particular states.  This is done by defining a from<X>To<Y>()
-    function, where X is the old state and Y is the new state.  If this
-    is defined, it will be run in place of the exit<X> and enter<Y>
-    functions, so if you want that behavior, you'll have to call them
-    specifically.  Otherwise, you can completely replace that transition's
-    behavior.
-
-    See the code in SampleFSM.py for further examples.
+ * If you need to call code in enter OffState to initialize your FSM
+ * properly, call it explicitly in the constructor.  Similarly, when
+ * cleanup() is called or the FSM is destructed, the FSM transitions
+ * back to OffState by convention.  (It does call enter OffState at this
+ * point, but does not call exit OffState.)
+ * To implement nested hierarchical FSM's, simply create a nested FSM
+ * and store it on the class within the appropriate enter State
+ * function, and clean it up within the corresponding exit State
+ * function.
+ * There is a way to define specialized transition behavior between
+ * two particular states.  This is done by defining a from X To Y
+ * function, where X is the old state and Y is the new state.  If this
+ * is defined, it will be run in place of the exit X and enter Y
+ * functions, so if you want that behavior, you'll have to call them
+ * specifically.  Otherwise, you can completely replace that transition's
+ * behavior.
+ *
  */
 class FSM
 {
+protected:
+	//Protected Interface
+	/**
+	 * \brief This is the default function that is called if there is no
+	 * enter State function for a particular state name.
+	 */
+	virtual void defaultEnter();
+
+	/**
+	 * \brief This is the default function that is called if there is no
+	 * exit State function for a particular state name.
+	 */
+	virtual void defaultExit();
+
+	/**
+	 * \brief This is the function that is called if there is no
+	 * filter State function for a particular state name.
+	 *
+	 * This default filter function behaves in one of two modes:
+	 * \li \c if self.defaultTransitions is None, allow any request
+	 * whose name begins with a capital letter, which is assumed to
+	 * be a direct request to a particular state.  This is similar to
+	 * the old ClassicFSM onUndefTransition=ALLOW, with no explicit
+	 * state transitions listed.
+	 * \li \c if self.defaultTransitions is not None, allow only those
+	 * requests explicitly identified in this map.  This is similar
+	 * to the old ClassicFSM onUndefTransition=DISALLOW, with an
+	 * explicit list of allowed state transitions.
+	 * Specialized FSM's may wish to redefine this default filter
+	 * (for instance, to always return the request itself, thus
+	 * allowing any transition.).
+	 * @param state The destination state.
+	 */
+	virtual void defaultFilter(void);
+
+	/**
+	 * \brief From the off state, we can always go directly to any other
+	 * state.
+	 *
+	 * @param state The destination state.
+	 */
+	void filterOffState(void);
+
+	/**
+	 * \brief Internal function to change unconditionally to the indicated
+	 * state.
+	 *
+	 * @param state The destination state.
+	 */
+	void setState(const State& state);
+	/**
+	 * \name State change broadcasting.
+	 *
+	 * If setBroadcastStateChanges(true), this event will be sent through
+	 * the EventHandler on every state change. The new and old states are
+	 * accessible as mOldState and mNewState, and the transition
+	 * functions will already have been called.
+	 * @param doBroadcast Flag to enable/disable broadcast.
+	 */
+	///@{
+	void setBroadcastStateChanges(bool doBroadcast);
+	Event getStateChangeEvent();
+	///@}
+
 public:
+	//Public Interface
 	/**
 	 * \brief The FSM "Null" State.
 	 */
@@ -615,23 +262,9 @@ public:
 
 	/**
 	 * \brief A convenience function to force the FSM to clean itself up
-	 * by transitioning to the "Off" State.
+	 * by transitioning to the OffState.
 	 */
 	void cleanup();
-
-	/**
-	 * \name State change broadcasting.
-	 *
-	 * If setBroadcastStateChanges(true), this event will be sent through
-	 * the EventHandler on every state change. The new and old states are
-	 * accessible as mOldState and mNewState, and the transition
-	 * functions will already have been called.
-	 * @param doBroadcast Flag to enable/disable broadcast.
-	 */
-	///@{
-	void setBroadcastStateChanges(bool doBroadcast);
-	Event getStateChangeEvent();
-	///@}
 
 	FilterFunction* getCurrentFilter();
 
@@ -702,8 +335,9 @@ public:
 	 * which will queue these requests up and apply when the
 	 * transition is complete).
 	 * @param state The destination state.
+	 * @return True if request is accepted, false otherwise.
 	 */
-	void request(const State& state);
+	bool request(const State& state);
 
 	/**
 	 * \brief Set of unique states to iterate through
@@ -729,23 +363,37 @@ public:
 	 */
 	void requestPrev();
 
-	bool addState(const State& state, TransitionFunction* enterFunc = NULL,
-			TransitionFunction* exitFunc = NULL);
+	/**
+	 * \name FSM construction functions.
+	 *
+	 * The return values indicate if the actions ware successful or not.
+	 */
+	///@{
+	bool addState(const State& state, StateFunction* enterFunc = NULL,
+			StateFunction* exitFunc = NULL);
 	bool removeState(const State& state);
-	bool addFilter(const State& state, FilterFunction* filterFunc);
-	bool removeFilter(const State& state);
-	bool addFromToFunction(const State& stateFrom, const State& stateTo,
-			FromToFunction* fromToFunc);
-	bool removeFromToFunction(const State& stateFrom, const State& stateTo);
+	bool addEnterFunc(const State& state, StateFunction* filterFunc);
+	bool removeEnterFunc(const State& state);
+	bool addExitFunc(const State& state, StateFunction* filterFunc);
+	bool removeExitFunc(const State& state);
+	bool addFilter(const State& state, StateFunction* filterFunc);
+	bool removeFilterFunc(const State& state);
+	bool addFromToFunc(const State& stateFrom, const State& stateTo,
+			StateFunction* fromToFunc);
+	bool removeFromToFunc(const State& stateFrom, const State& stateTo);
+	///@}
 
 protected:
-	///The serial number of this fsm.
-	static int mSerialNum;
+	//Data section
+	///The Global serial number.
+	static int SerialNum;
 	/**
-	 * \brief Return an serial number for this fsm.
+	 * \brief Return a  unique global serial number.
 	 * @return
 	 */
 	int getSerialNum();
+	///The serial number of this fsm.
+	int mSerialNum;
 	///The name of this fsm.
 	std::string mName;
 	///The state set.
@@ -767,66 +415,235 @@ protected:
 	///Flag for notifying on every state change.
 	bool mBroadcastStateChanges;
 
-	///@{
 	///This member records transition requests made by demand() or
 	///forceTransition() while the FSM is in transition between
 	///states.
-	typedef boost::function<void(const State&)> QueuedFunction;
-	std::queue<QueuedFunction> mRequestQueue;
-	///@}
-
-	/**
-	 * \brief This is the default function that is called if there is no
-	 * enter State function for a particular state name.
-	 */
-	virtual void defaultEnter();
-
-	/**
-	 * \brief This is the default function that is called if there is no
-	 * exit State function for a particular state name.
-	 */
-	virtual void defaultExit();
-
-	/**
-	 * \brief This is the function that is called if there is no
-	 * filter State function for a particular state name.
-	 *
-	 * This default filter function behaves in one of two modes:
-	 * \li \c if self.defaultTransitions is None, allow any request
-	 * whose name begins with a capital letter, which is assumed to
-	 * be a direct request to a particular state.  This is similar to
-	 * the old ClassicFSM onUndefTransition=ALLOW, with no explicit
-	 * state transitions listed.
-	 * \li \c if self.defaultTransitions is not None, allow only those
-	 * requests explicitly identified in this map.  This is similar
-	 * to the old ClassicFSM onUndefTransition=DISALLOW, with an
-	 * explicit list of allowed state transitions.
-	 * Specialized FSM's may wish to redefine this default filter
-	 * (for instance, to always return the request itself, thus
-	 * allowing any transition.).
-	 * @param state The destination state.
-	 */
-	virtual void defaultFilter(const State& state);
-
-	/**
-	 * \brief From the off state, we can always go directly to any other
-	 * state.
-	 *
-	 * @param state The destination state.
-	 */
-	void filterOff(const State& state);
-
-	/**
-	 * \brief Internal function to change unconditionally to the indicated
-	 * state.
-	 *
-	 * @param state The destination state.
-	 */
-	void setState(const State& state);
+	std::queue<PT(FSMFunction)> mRequestQueue;
 
 	///The (reentrant) mutex associated with this fsm.
 	ReMutex mMutex;
 };
+////////////////////////////////////////////////////////////////////////
+State FSM::NullState = std::string("NullState");
+State FSM::OffState = std::string("OffState");
+
+FSM::FSM(const std::string& name)
+{
+	//reset all data
+	mEnterFunctions.clear();
+	mExitFunctions.clear();
+	mFilterFunctions.clear();
+	mFromToFunctions.clear();
+	mStates.clear();
+	//set name
+	mName = name;
+	//set serial number
+	mSerialNum = FSM::getSerialNum();
+	//Set up the NullState
+	addState(NullState, NULL, NULL);
+	addFilter(NullState, NULL);
+	//Set up the OffState
+	addState(OffState, NULL, NULL);
+	StateFunction* filterOff = new StateFunction(this,
+			StateFunctor(boost::bind(&FSM::filterOffState, this)));
+	addFilter(OffState, filterOff);
+	mState = OffState;
+	mOldState = NullState;
+	mNewState = NullState;
+	//set broadcast state chage
+	mBroadcastStateChanges = false;
+	//
+}
+
+int FSM::getSerialNum()
+{
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
+	return ++SerialNum;
+}
+
+void FSM::cleanup()
+{
+	ReMutexHolder guard(mMutex);
+
+	if (mState != OffState)
+	{
+		setState(OffState);
+	}
+}
+
+void FSM::setBroadcastStateChanges(bool doBroadcast)
+{
+	mBroadcastStateChanges = doBroadcast;
+}
+
+Event FSM::getStateChangeEvent()
+{
+	std::ostringstream stateChange;
+	stateChange << "FSM-" << mSerialNum << "-" << mName << "-stateChange";
+	return Event(stateChange.str());
+}
+
+StateFunction* FSM::getCurrentFilter()
+{
+	return mFilterFunctions[mState];
+}
+
+const State& FSM::getCurrentOrNextState()
+{
+	ReMutexHolder guard(mMutex);
+
+	if (mState != NullState)
+	{
+		return mState;
+	}
+	return mNewState;
+}
+
+bool FSM::getCurrentStateOrTransition(State& currState, State& toState)
+{
+	ReMutexHolder guard(mMutex);
+
+	if (mState != NullState)
+	{
+		currState = mState;
+		return true;
+	}
+	currState = mOldState;
+	toState = mNewState;
+	return false;
+}
+
+bool FSM::isInTransition()
+{
+	ReMutexHolder guard(mMutex);
+
+	return mState == NullState;
+}
+
+void FSM::forceTransition(const State& state)
+{
+	ReMutexHolder guard(mMutex);
+
+	if (mState == NullState)
+	{
+		// Queue up the request.
+		FSMFunctor fsmFunctor = boost::bind(&FSM::forceTransition,
+				boost::ref(*this), state);
+		FSMFunction* forceTransFunc = new FSMFunction(fsmFunctor);
+		mRequestQueue.push(forceTransFunc);
+		return;
+	}
+	setState(state);
+}
+
+void FSM::demand(const State& state)
+{
+	ReMutexHolder guard(mMutex);
+
+	if (mState == NullState)
+	{
+		// Queue up the request.
+		FSMFunctor fsmFunctor = boost::bind(&FSM::demand, boost::ref(*this),
+				state);
+		FSMFunction* demandFunc = new FSMFunction(fsmFunctor);
+		mRequestQueue.push(demandFunc);
+		return;
+	}
+	//
+	if (request(state) == NullState)
+	{
+		throw GameException(
+				"FSM::demand: Request denied from'" + mState + "' to '" + state
+						+ "'");
+	}
+}
+
+bool FSM::request(const State& state)
+{
+	ReMutexHolder guard(mMutex);
+
+
+}
+
+void FSM::setStateArray(const StateSet& states)
+{
+}
+
+void FSM::requestNext()
+{
+}
+
+void FSM::requestPrev()
+{
+}
+
+bool FSM::addState(const State& state, StateFunction* enterFunc,
+		StateFunction* exitFunc)
+{
+}
+
+bool FSM::removeState(const State& state)
+{
+}
+
+bool FSM::addEnterFunc(const State& state, StateFunction* filterFunc)
+{
+}
+
+bool FSM::removeEnterFunc(const State& state)
+{
+}
+
+bool FSM::addExitFunc(const State& state, StateFunction* filterFunc)
+{
+}
+
+bool FSM::removeExitFunc(const State& state)
+{
+}
+
+bool FSM::addFilter(const State& state, StateFunction* filterFunc)
+{
+}
+
+bool FSM::removeFilterFunc(const State& state)
+{
+}
+
+bool FSM::addFromToFunc(const State& stateFrom, const State& stateTo,
+		StateFunction* fromToFunc)
+{
+}
+
+bool FSM::removeFromToFunc(const State& stateFrom, const State& stateTo)
+{
+}
+
+int FSM::getSerialNum()
+{
+}
+
+void FSM::defaultEnter()
+{
+}
+
+void FSM::defaultExit()
+{
+}
+
+void FSM::defaultFilter(void)
+{
+}
+
+void FSM::filterOffState(void)
+{
+}
+
+void FSM::setState(const State& state)
+{
+}
 
 ////Bind the Model and the Animation
 //// don't use PT or CPT with AnimControlCollection
@@ -942,20 +759,4 @@ protected:
 //	return AsyncTask::DS_again;
 //}
 //
-////////////////////////////////////////////////////////////////////////
-State FSM::NullState = std::string("NullState");
-State FSM::OffState = std::string("OffState");
-
-inline FSM::FSM(const std::string& name) :
-		mName(name), mState("Off"), mBroadcastStateChanges(false)
-{
-}
-
-inline int FSM::getSerialNum()
-{
-	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
-
-	return ++mSerialNum;
-}
 
