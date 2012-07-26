@@ -79,7 +79,7 @@ typedef boost::function<const State&(FSM*, const std::string&)> FilterFunctor;
 class FilterFunction: public ReferenceCount
 {
 public:
-	FilterFunction(FSM* fsm, const std::string& str, FilterFunctor functor)
+	FilterFunction(FSM* fsm, FilterFunctor functor)
 	{
 		mFsm = fsm;
 		mFunctor = functor;
@@ -299,7 +299,7 @@ public:
 	 * exit State function followed by enterState().
 	 * @param state The destination state.
 	 */
-	void forceTransition(const State& state);
+	void forceTransition(const std::string& request);
 
 	/**
 	 * \brief Requests a state transition, by code that does not expect
@@ -312,7 +312,7 @@ public:
 	 * transition finishes.  Multiple requests will queue up in sequence.
 	 * @param state The destination state.
 	 */
-	void demand(const State& state);
+	void demand(const std::string& request);
 
 	/**
 	 * \brief Requests a state transition (or other behavior).
@@ -337,7 +337,7 @@ public:
 	 * @param state The destination state.
 	 * @return True if request is accepted, false otherwise.
 	 */
-	bool request(const State& state);
+	const State& request(const State& state);
 
 	/**
 	 * \brief Set of unique states to iterate through
@@ -369,17 +369,17 @@ public:
 	 * The return values indicate if the actions ware successful or not.
 	 */
 	///@{
-	bool addState(const State& state, StateFunction* enterFunc = NULL,
-			StateFunction* exitFunc = NULL);
+	bool addState(const State& state, TransitionFunction* enterFunc = NULL,
+			TransitionFunction* exitFunc = NULL);
 	bool removeState(const State& state);
-	bool addEnterFunc(const State& state, StateFunction* filterFunc);
+	bool addEnterFunc(const State& state, TransitionFunction* filterFunc);
 	bool removeEnterFunc(const State& state);
-	bool addExitFunc(const State& state, StateFunction* filterFunc);
+	bool addExitFunc(const State& state, TransitionFunction* filterFunc);
 	bool removeExitFunc(const State& state);
-	bool addFilter(const State& state, StateFunction* filterFunc);
+	bool addFilter(const State& state, FilterFunction* filterFunc);
 	bool removeFilterFunc(const State& state);
 	bool addFromToFunc(const State& stateFrom, const State& stateTo,
-			StateFunction* fromToFunc);
+			FilterFunction* fromToFunc);
 	bool removeFromToFunc(const State& stateFrom, const State& stateTo);
 	///@}
 
@@ -444,8 +444,10 @@ FSM::FSM(const std::string& name)
 	addFilter(NullState, NULL);
 	//Set up the OffState
 	addState(OffState, NULL, NULL);
-	StateFunction* filterOff = new StateFunction(this,
-			StateFunctor(boost::bind(&FSM::filterOffState, this)));
+	FilterFunction* filterOff = new FilterFunction(this,
+			FilterFunctor(
+					boost::bind(&FSM::filterOffState, boost::ref(*this), _1,
+							_2)));
 	addFilter(OffState, filterOff);
 	mState = OffState;
 	mOldState = NullState;
@@ -485,8 +487,15 @@ Event FSM::getStateChangeEvent()
 	return Event(stateChange.str());
 }
 
-StateFunction* FSM::getCurrentFilter()
+FilterFunction* FSM::getCurrentFilter()
 {
+	if (mState == NullState)
+	{
+		throw GameException(
+				"FSM::getCurrentFilter: FSM cannot determine current filter while in transition ('"
+						+ mOldState + "' -> '" + mNewState + "').");
+
+	}
 	return mFilterFunctions[mState];
 }
 
@@ -522,7 +531,7 @@ bool FSM::isInTransition()
 	return mState == NullState;
 }
 
-void FSM::forceTransition(const State& state)
+void FSM::forceTransition(const std::string& req)
 {
 	ReMutexHolder guard(mMutex);
 
@@ -530,15 +539,15 @@ void FSM::forceTransition(const State& state)
 	{
 		// Queue up the request.
 		FSMFunctor fsmFunctor = boost::bind(&FSM::forceTransition,
-				boost::ref(*this), state);
+				boost::ref(*this), req);
 		FSMFunction* forceTransFunc = new FSMFunction(fsmFunctor);
 		mRequestQueue.push(forceTransFunc);
 		return;
 	}
-	setState(state);
+	setState(State(req));
 }
 
-void FSM::demand(const State& state)
+void FSM::demand(const std::string& req)
 {
 	ReMutexHolder guard(mMutex);
 
@@ -546,24 +555,23 @@ void FSM::demand(const State& state)
 	{
 		// Queue up the request.
 		FSMFunctor fsmFunctor = boost::bind(&FSM::demand, boost::ref(*this),
-				state);
+				req);
 		FSMFunction* demandFunc = new FSMFunction(fsmFunctor);
 		mRequestQueue.push(demandFunc);
 		return;
 	}
 	//
-	if (request(state) == NullState)
+	if (request(req) == NullState)
 	{
 		throw GameException(
-				"FSM::demand: Request denied from'" + mState + "' to '" + state
+				"FSM::demand: Request denied from'" + mState + "' to '" + req
 						+ "'");
 	}
 }
 
-bool FSM::request(const State& state)
+const State& FSM::request(const State& state)
 {
 	ReMutexHolder guard(mMutex);
-
 
 }
 
@@ -579,8 +587,8 @@ void FSM::requestPrev()
 {
 }
 
-bool FSM::addState(const State& state, StateFunction* enterFunc,
-		StateFunction* exitFunc)
+bool FSM::addState(const State& state, TransitionFunction* enterFunc,
+		TransitionFunction* exitFunc)
 {
 }
 
@@ -588,7 +596,7 @@ bool FSM::removeState(const State& state)
 {
 }
 
-bool FSM::addEnterFunc(const State& state, StateFunction* filterFunc)
+bool FSM::addEnterFunc(const State& state, TransitionFunction* filterFunc)
 {
 }
 
@@ -596,7 +604,7 @@ bool FSM::removeEnterFunc(const State& state)
 {
 }
 
-bool FSM::addExitFunc(const State& state, StateFunction* filterFunc)
+bool FSM::addExitFunc(const State& state, TransitionFunction* filterFunc)
 {
 }
 
@@ -604,7 +612,7 @@ bool FSM::removeExitFunc(const State& state)
 {
 }
 
-bool FSM::addFilter(const State& state, StateFunction* filterFunc)
+bool FSM::addFilter(const State& state, FilterFunction* filterFunc)
 {
 }
 
@@ -613,15 +621,11 @@ bool FSM::removeFilterFunc(const State& state)
 }
 
 bool FSM::addFromToFunc(const State& stateFrom, const State& stateTo,
-		StateFunction* fromToFunc)
+		TransitionFunction* fromToFunc)
 {
 }
 
 bool FSM::removeFromToFunc(const State& stateFrom, const State& stateTo)
-{
-}
-
-int FSM::getSerialNum()
 {
 }
 
