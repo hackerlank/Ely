@@ -25,6 +25,7 @@
 #include <sstream>
 #include <set>
 #include <queue>
+#include <list>
 #include <utility>
 #include <event.h>
 #include <throw_event.h>
@@ -36,86 +37,155 @@
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
+#include <boost/any.hpp>
 
 #include "Utilities/Tools.h"
+
+/**
+ * \brief The Value list type.
+ */
+typedef std::list<boost::any> ValueList;
 
 class FSM;
 
 /**
- * \brief The State type.
+ * \name The Enter/Exit/FromTo boost::function types.
  */
-typedef std::string State;
-
-/**
- * \brief The State set type.
- */
-typedef set<State> StateSet;
-
-/**
- * \brief The transition/fromTo function type.
- */
-typedef boost::function<void(FSM*)> TransitionFunctor;
-class TransitionFunction: public ReferenceCount
-{
-public:
-	TransitionFunction(FSM* fsm, TransitionFunctor functor)
-	{
-		mFsm = fsm;
-		mFunctor = functor;
-	}
-	void operator()()
-	{
-		mFunctor(mFsm);
-	}
-private:
-	FSM* mFsm;
-	TransitionFunctor mFunctor;
-};
-
-/**
- * \brief The filter function type.
- */
-typedef boost::function<const State&(FSM*, const std::string&)> FilterFunctor;
-class FilterFunction: public ReferenceCount
-{
-public:
-	FilterFunction(FSM* fsm, FilterFunctor functor)
-	{
-		mFsm = fsm;
-		mFunctor = functor;
-	}
-	const State& operator()(const std::string& state)
-	{
-		return mFunctor(mFsm, state);
-	}
-private:
-	FSM* mFsm;
-	FilterFunctor mFunctor;
-};
-
-/**
- * \brief The (deferred) FSM method type.
- */
-typedef boost::function<void(void)> FSMFunctor;
-class FSMFunction: public ReferenceCount
-{
-public:
-	FSMFunction(FSMFunctor functor)
-	{
-		mFunctor = functor;
-	}
-	void operator()()
-	{
-		mFunctor();
-	}
-private:
-	FSMFunctor mFunctor;
-};
-
 ///@{
-typedef std::map<State, PT(TransitionFunction)> TransitionFunctionTable;
-typedef std::map<State, PT(FilterFunction)> FilterFunctionTable;
-typedef std::map<std::pair<State, State>, PT(TransitionFunction)> FromToFunctionTable;
+typedef boost::function<void(FSM*, const ValueList&)> EnterFuncPTR;
+typedef boost::function<void(FSM*)> ExitFuncPTR;
+typedef boost::function<void(FSM*, const ValueList&)> FromToFuncPTR;
+///@}
+
+/**
+ * \brief The Filter boost::function type.
+ */
+typedef boost::function<ValueList(FSM*, const ValueList&)> FilterFuncPTR;
+
+/**
+ * \brief The StateTmpl type.
+ *
+ * It can be used where a T is expected and viceversa.
+ */
+template<typename T> struct StateTmpl
+{
+	/**
+	 * \brief Default Constructor.
+	 */
+	StateTmpl()
+	{
+	}
+	/**
+	 * \brief Copy Constructor.
+	 */
+	StateTmpl(const StateTmpl& other) :
+			name(other.name), enter(other.enter), exit(other.exit), filter(
+					other.filter)
+	{
+	}
+	/**
+	 * \brief Default Destructor.
+	 */
+	~StateTmpl()
+	{
+	}
+	/**
+	 * \brief Converting Constructor.
+	 */
+	StateTmpl(const T& _name, EnterFuncPTR _enter = EnterFuncPTR(),
+			ExitFuncPTR _exit = ExitFuncPTR(), FilterFuncPTR _filter =
+					FilterFuncPTR()) :
+			name(_name), enter(_enter), exit(_exit), filter(_filter)
+	{
+	}
+	/**
+	 * \brief Assignment operator.
+	 */
+	StateTmpl& operator=(const StateTmpl& other)
+	{
+		name = other.name;
+		enter = other.enter;
+		exit = other.exit;
+		filter = other.filter;
+		return *this;
+	}
+
+	/**
+	 * \name Strict orderings.
+	 */
+	///@{
+	/// Wrt StateTmpl
+	bool operator<(const StateTmpl& other) const
+	{
+		return name < other.name;
+	}
+	///Wrt std::string
+	bool operator<(const std::string& otherName) const
+	{
+		return name < otherName;
+	}
+	///@}
+	/**
+	 * \name Equality operators.
+	 */
+	///@{
+	///Wrt StateTmpl
+	bool operator==(const StateTmpl& other) const
+	{
+		return name == other.name;
+	}
+	bool operator!=(const StateTmpl& other) const
+	{
+		return name != other.name;
+	}
+	///Wrt std::string
+	bool operator==(const std::string& otherName) const
+	{
+		return name == otherName;
+	}
+	bool operator!=(const std::string& otherName) const
+	{
+		return name != otherName;
+	}
+	///@}
+	///Converting function to std::string.
+	operator std::string() const
+	{
+		return name;
+	}
+
+	/**
+	 * \name Members.
+	 */
+	///@{
+	T name;
+	EnterFuncPTR enter;
+	ExitFuncPTR exit;
+	FilterFuncPTR filter;
+	///@}
+};
+
+/**
+ * \name Global operators: allow T @op@ StateTmpl comparison
+ */
+///@{
+template<typename T> bool operator==(const string& lhs, const StateTmpl<T>& rhs)
+{
+	return lhs == rhs.name;
+}
+template<typename T> bool operator<(const string& lhs, const StateTmpl<T>& rhs)
+{
+	return lhs < rhs.name;
+}
+///@}
+
+/**
+ * \name Common typedefs.
+ */
+///@{
+typedef StateTmpl<std::string> State;
+typedef std::set<State> StateSet;
+typedef std::map<std::pair<State, State>, FromToFuncPTR> FromToFunctionTable;
 ///@}
 
 /**
@@ -125,9 +195,9 @@ typedef std::map<std::pair<State, State>, PT(TransitionFunction)> FromToFunction
  * which consist of a collection of states and transitions, and rules
  * to switch between states according to arbitrary input data.
  * The states of an FSM are defined implicitly.
- * Each state is identified by a string, which by convention begins
- * with a capital letter.  (Also by convention, strings passed to
- * request that are not state names should begin with a lowercase letter.).
+ * Each state is identified by a string.
+ * Also strings are passed as request that are not state names but
+ * arbitrary input.
  * To define specialized behavior when entering or exiting a
  * particular State, define StateFunction(s) for enter to and/or
  * exit from the State.
@@ -185,13 +255,13 @@ protected:
 	 * \brief This is the default function that is called if there is no
 	 * enter State function for a particular state name.
 	 */
-	virtual void defaultEnter();
+	static void defaultEnter(FSM* fsm, const ValueList& data);
 
 	/**
 	 * \brief This is the default function that is called if there is no
 	 * exit State function for a particular state name.
 	 */
-	virtual void defaultExit();
+	static void defaultExit(FSM* fsm);
 
 	/**
 	 * \brief This is the function that is called if there is no
@@ -212,7 +282,7 @@ protected:
 	 * allowing any transition.).
 	 * @param state The destination state.
 	 */
-	virtual void defaultFilter(void);
+	static ValueList defaultFilter(FSM* fsm, const ValueList& data);
 
 	/**
 	 * \brief From the off state, we can always go directly to any other
@@ -220,7 +290,7 @@ protected:
 	 *
 	 * @param state The destination state.
 	 */
-	void filterOffState(void);
+	static ValueList filterOff(FSM* fsm, const ValueList& data);
 
 	/**
 	 * \brief Internal function to change unconditionally to the indicated
@@ -228,7 +298,7 @@ protected:
 	 *
 	 * @param state The destination state.
 	 */
-	void setState(const State& state);
+	void setState(const State& newState, const ValueList& data);
 	/**
 	 * \name State change broadcasting.
 	 *
@@ -246,13 +316,19 @@ protected:
 public:
 	//Public Interface
 	/**
+	 * \brief The FSM method boost::function type.
+	 */
+	typedef boost::function<void(const State&, const ValueList&)> FSMMethodPTR;
+
+	/**
 	 * \brief The FSM "Null" State.
 	 */
-	static State NullState;
+	static State Null;
+
 	/**
 	 * \brief The FSM "Off" State.
 	 */
-	static State OffState;
+	static State Off;
 
 	/**
 	 * \brief Constructor.
@@ -266,7 +342,7 @@ public:
 	 */
 	void cleanup();
 
-	FilterFunction* getCurrentFilter();
+	FilterFuncPTR getCurrentFilter();
 
 	/**
 	 * \brief Returns the current state if we are in a state now, or the
@@ -299,7 +375,7 @@ public:
 	 * exit State function followed by enterState().
 	 * @param state The destination state.
 	 */
-	void forceTransition(const std::string& request);
+	void forceTransition(const State& req, const ValueList& data);
 
 	/**
 	 * \brief Requests a state transition, by code that does not expect
@@ -312,7 +388,7 @@ public:
 	 * transition finishes.  Multiple requests will queue up in sequence.
 	 * @param state The destination state.
 	 */
-	void demand(const std::string& request);
+	void demand(const State& req, const ValueList& data);
 
 	/**
 	 * \brief Requests a state transition (or other behavior).
@@ -337,7 +413,7 @@ public:
 	 * @param state The destination state.
 	 * @return True if request is accepted, false otherwise.
 	 */
-	const State& request(const State& state);
+	const State& request(const State& req, const ValueList& data);
 
 	/**
 	 * \brief Set of unique states to iterate through
@@ -352,7 +428,7 @@ public:
 	 * higher following a specific strict weak ordering criterion set
 	 * on container construction
 	 */
-	void requestNext();
+	const State& requestNext(const ValueList& data);
 
 	/**
 	 * \brief Request the 'previous' state in the predefined state array.
@@ -361,7 +437,7 @@ public:
 	 * higher following a specific strict weak ordering criterion set
 	 * on container construction
 	 */
-	void requestPrev();
+	const State& requestPrev(const ValueList& data);
 
 	/**
 	 * \name FSM construction functions.
@@ -369,17 +445,16 @@ public:
 	 * The return values indicate if the actions ware successful or not.
 	 */
 	///@{
-	bool addState(const State& state, TransitionFunction* enterFunc = NULL,
-			TransitionFunction* exitFunc = NULL);
+	bool addState(const State& state);
 	bool removeState(const State& state);
-	bool addEnterFunc(const State& state, TransitionFunction* filterFunc);
+	bool addEnterFunc(const State& state, const EnterFuncPTR& enterFunc);
 	bool removeEnterFunc(const State& state);
-	bool addExitFunc(const State& state, TransitionFunction* filterFunc);
+	bool addExitFunc(const State& state, const ExitFuncPTR& exitFunc);
 	bool removeExitFunc(const State& state);
-	bool addFilter(const State& state, FilterFunction* filterFunc);
+	bool addFilter(const State& state, const FilterFuncPTR& filterFunc);
 	bool removeFilterFunc(const State& state);
 	bool addFromToFunc(const State& stateFrom, const State& stateTo,
-			FilterFunction* fromToFunc);
+			const FromToFuncPTR& fromToFunc);
 	bool removeFromToFunc(const State& stateFrom, const State& stateTo);
 	///@}
 
@@ -397,12 +472,8 @@ protected:
 	///The name of this fsm.
 	std::string mName;
 	///The state set.
-	StateSet mStates;
-	///The enter/exit functions' tables.
-	TransitionFunctionTable mEnterFunctions, mExitFunctions;
-	///The filter functions' table.
-	FilterFunctionTable mFilterFunctions;
-	///The FromTo functions' table.
+	StateSet mStateSet;
+	///The FromToFunction table
 	FromToFunctionTable mFromToFunctions;
 
 	///@{
@@ -418,40 +489,28 @@ protected:
 	///This member records transition requests made by demand() or
 	///forceTransition() while the FSM is in transition between
 	///states.
-	std::queue<PT(FSMFunction)> mRequestQueue;
+	std::queue<FSMMethodPTR> mRequestQueue;
 
-	///The (reentrant) mutex associated with this fsm.
+	///The (reentrant) mutex associated with this FSM.
 	ReMutex mMutex;
 };
 ////////////////////////////////////////////////////////////////////////
-State FSM::NullState = std::string("NullState");
-State FSM::OffState = std::string("OffState");
+State FSM::Null = State("Null");
+State FSM::Off = State("Off", NULL, NULL, FilterFuncPTR(&FSM::filterOff));
 
 FSM::FSM(const std::string& name)
 {
 	//reset all data
-	mEnterFunctions.clear();
-	mExitFunctions.clear();
-	mFilterFunctions.clear();
+	mStateSet.clear();
 	mFromToFunctions.clear();
-	mStates.clear();
 	//set name
 	mName = name;
 	//set serial number
 	mSerialNum = FSM::getSerialNum();
-	//Set up the NullState
-	addState(NullState, NULL, NULL);
-	addFilter(NullState, NULL);
-	//Set up the OffState
-	addState(OffState, NULL, NULL);
-	FilterFunction* filterOff = new FilterFunction(this,
-			FilterFunctor(
-					boost::bind(&FSM::filterOffState, boost::ref(*this), _1,
-							_2)));
-	addFilter(OffState, filterOff);
-	mState = OffState;
-	mOldState = NullState;
-	mNewState = NullState;
+	//Set initial states
+	mState = FSM::Off;
+	mOldState = FSM::Null;
+	mNewState = FSM::Null;
 	//set broadcast state chage
 	mBroadcastStateChanges = false;
 	//
@@ -469,9 +528,9 @@ void FSM::cleanup()
 {
 	ReMutexHolder guard(mMutex);
 
-	if (mState != OffState)
+	if (mState != FSM::Off)
 	{
-		setState(OffState);
+		setState (OffState);
 	}
 }
 
@@ -487,23 +546,23 @@ Event FSM::getStateChangeEvent()
 	return Event(stateChange.str());
 }
 
-FilterFunction* FSM::getCurrentFilter()
+FilterFuncPTR FSM::getCurrentFilter()
 {
-	if (mState == NullState)
+	if (mState == FSM::Null)
 	{
 		throw GameException(
 				"FSM::getCurrentFilter: FSM cannot determine current filter while in transition ('"
 						+ mOldState + "' -> '" + mNewState + "').");
 
 	}
-	return mFilterFunctions[mState];
+	return mState.filter;
 }
 
 const State& FSM::getCurrentOrNextState()
 {
 	ReMutexHolder guard(mMutex);
 
-	if (mState != NullState)
+	if (mState != FSM::Null)
 	{
 		return mState;
 	}
@@ -514,7 +573,7 @@ bool FSM::getCurrentStateOrTransition(State& currState, State& toState)
 {
 	ReMutexHolder guard(mMutex);
 
-	if (mState != NullState)
+	if (mState != FSM::Null)
 	{
 		currState = mState;
 		return true;
@@ -528,40 +587,38 @@ bool FSM::isInTransition()
 {
 	ReMutexHolder guard(mMutex);
 
-	return mState == NullState;
+	return mState == FSM::Null;
 }
 
-void FSM::forceTransition(const std::string& req)
+void FSM::forceTransition(const std::string& req, void* data)
 {
 	ReMutexHolder guard(mMutex);
 
-	if (mState == NullState)
+	if (mState == FSM::Null)
 	{
-		// Queue up the request.
-		FSMFunctor fsmFunctor = boost::bind(&FSM::forceTransition,
-				boost::ref(*this), req);
-		FSMFunction* forceTransFunc = new FSMFunction(fsmFunctor);
-		mRequestQueue.push(forceTransFunc);
+		// Queue up the request for later calling.
+		FSMMethodPTR forceTransitionPTR = boost::bind(&FSM::forceTransition,
+				boost::ref(*this), req, data);
+		mRequestQueue.push(forceTransitionPTR);
 		return;
 	}
 	setState(State(req));
 }
 
-void FSM::demand(const std::string& req)
+void FSM::demand(const std::string& req, void* data)
 {
 	ReMutexHolder guard(mMutex);
 
 	if (mState == NullState)
 	{
-		// Queue up the request.
-		FSMFunctor fsmFunctor = boost::bind(&FSM::demand, boost::ref(*this),
-				req);
-		FSMFunction* demandFunc = new FSMFunction(fsmFunctor);
-		mRequestQueue.push(demandFunc);
+		// Queue up the request for later calling.
+		FSMMethodPTR demandPTR = boost::bind(&FSM::demand, boost::ref(*this),
+				req, data);
+		mRequestQueue.push(demandPTR);
 		return;
 	}
 	//
-	if (request(req) == NullState)
+	if (request(req, data) == NullState)
 	{
 		throw GameException(
 				"FSM::demand: Request denied from'" + mState + "' to '" + req
@@ -569,198 +626,208 @@ void FSM::demand(const std::string& req)
 	}
 }
 
-const State& FSM::request(const State& state)
+const State& FSM::request(const std::string& req, void* data)
 {
+//    self.fsmLock.acquire()
+//    try:
+//        assert isinstance(request, types.StringTypes)
+//        self.notify.debug("%s.request(%s, %s" % (
+//            self.name, request, str(args)[1:]))
+//
+//        filter = self.getCurrentFilter()
+//        result = filter(request, args)
+//        if result:
+//            if isinstance(result, types.StringTypes):
+//                # If the return val1ue is a string, it's just the name
+//                # of the state.  Wrap it in a tuple for consistency.
+//                result = (result,) + args
+//
+//            # Otherwise, assume it's a (name, *args) tuple
+//            self.__setState(*result)
+//
+//        return result
+//    finally:
+//        self.fsmLock.release()
+
 	ReMutexHolder guard(mMutex);
 
+	FilterFuncPTR filter = getCurrentFilter();
+	State result = filter(req, data);
+	if (mStateSet.find(result) != mStateSet.end())
+	{
+		//the return value is a string, it's just the name
+		//                # of the state.
+	}
 }
 
 void FSM::setStateArray(const StateSet& states)
 {
 }
 
-void FSM::requestNext()
+const State& FSM::requestNext(void* data)
 {
 }
 
-void FSM::requestPrev()
+const State& FSM::requestPrev(void* data)
 {
 }
 
-bool FSM::addState(const State& state, TransitionFunction* enterFunc,
-		TransitionFunction* exitFunc)
+void FSM::defaultEnter(FSM* fsm, void* data)
 {
 }
 
-bool FSM::removeState(const State& state)
+void FSM::defaultExit(FSM* fsm)
 {
 }
 
-bool FSM::addEnterFunc(const State& state, TransitionFunction* filterFunc)
+void FSM::defaultFilter(FSM* fsm, const std::string& req, void* data)
 {
 }
 
-bool FSM::removeEnterFunc(const State& state)
+void FSM::filterOff(FSM* fsm, const std::string& req, void* data)
 {
 }
 
-bool FSM::addExitFunc(const State& state, TransitionFunction* filterFunc)
+void FSM::setState(const State& state, void* data)
 {
 }
 
-bool FSM::removeExitFunc(const State& state)
-{
-}
-
-bool FSM::addFilter(const State& state, FilterFunction* filterFunc)
-{
-}
-
-bool FSM::removeFilterFunc(const State& state)
-{
-}
-
-bool FSM::addFromToFunc(const State& stateFrom, const State& stateTo,
-		TransitionFunction* fromToFunc)
-{
-}
-
-bool FSM::removeFromToFunc(const State& stateFrom, const State& stateTo)
-{
-}
-
-void FSM::defaultEnter()
-{
-}
-
-void FSM::defaultExit()
-{
-}
-
-void FSM::defaultFilter(void)
-{
-}
-
-void FSM::filterOffState(void)
-{
-}
-
-void FSM::setState(const State& state)
-{
-}
-
-////Bind the Model and the Animation
-//// don't use PT or CPT with AnimControlCollection
-//AnimControlCollection anim_collection;
-//AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data);
-//AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 //
-//int main(int argc, char **argv)
-//{
-//	///setup
-//	// Load your configuration
-//	load_prc_file("config.prc");
-//	PandaFramework panda = PandaFramework();
-//	panda.open_framework(argc, argv);
-//	panda.set_window_title("animation training");
-//	WindowFramework* window = panda.open_window();
-//	if (window != (WindowFramework *) NULL)
-//	{
-//		std::cout << "Opened the window successfully!\n";
-//		// common setup
-//		window->enable_keyboard(); // Enable keyboard detection
-//		window->setup_trackball(); // Enable default camera movement
-//	}
-//	//physics
-//	PT(BulletWorld) physicsWorld = new BulletWorld();
-//	//physics: advance the simulation state
-////	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
+//////Bind the Model and the Animation
+////// don't use PT or CPT with AnimControlCollection
+////AnimControlCollection anim_collection;
+////AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data);
+////AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
+////
+////int main(int argc, char **argv)
+////{
+////	///setup
+////	// Load your configuration
+////	load_prc_file("config.prc");
+////	PandaFramework panda = PandaFramework();
+////	panda.open_framework(argc, argv);
+////	panda.set_window_title("animation training");
+////	WindowFramework* window = panda.open_window();
+////	if (window != (WindowFramework *) NULL)
+////	{
+////		std::cout << "Opened the window successfully!\n";
+////		// common setup
+////		window->enable_keyboard(); // Enable keyboard detection
+////		window->setup_trackball(); // Enable default camera movement
+////	}
+////	//physics
+////	PT(BulletWorld) physicsWorld = new BulletWorld();
+////	//physics: advance the simulation state
+//////	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
+//////			reinterpret_cast<void*>(&actualAnim));
+//////	task->set_delay(3);
+//////	panda.get_task_mgr().add(task);
+////
+////	//Load the Actor Model
+////	NodePath Actor = window->load_model(window->get_render(),
+////			"bvw-f2004--airbladepilot/pilot-model");
+////	PT(Character) character =
+////			DCAST(Character, Actor.find("**/+Character").node());
+////	PT(PartBundle) pbundle = character->get_bundle(0);
+////	//Load Animations
+////	std::vector<std::string> animations;
+////	animations.push_back(std::string("pilot-chargeshoot"));
+////	animations.push_back(std::string("pilot-discloop"));
+////	for (unsigned int i = 0; i < animations.size(); ++i)
+////	{
+////		window->load_model(Actor, "bvw-f2004--airbladepilot/" + animations[i]);
+////	}
+////	auto_bind(Actor.node(), anim_collection);
+////	pbundle->set_anim_blend_flag(true);
+////	pbundle->set_control_effect(anim_collection.get_anim(0), 0.5);
+////	pbundle->set_control_effect(anim_collection.get_anim(1), 0.5);
+////	int actualAnim = 0;
+////	//switch among animations
+////	AsyncTask* task = new GenericAsyncTask("check playing", &check_playing,
 ////			reinterpret_cast<void*>(&actualAnim));
 ////	task->set_delay(3);
 ////	panda.get_task_mgr().add(task);
-//
-//	//Load the Actor Model
-//	NodePath Actor = window->load_model(window->get_render(),
-//			"bvw-f2004--airbladepilot/pilot-model");
-//	PT(Character) character =
-//			DCAST(Character, Actor.find("**/+Character").node());
-//	PT(PartBundle) pbundle = character->get_bundle(0);
-//	//Load Animations
-//	std::vector<std::string> animations;
-//	animations.push_back(std::string("pilot-chargeshoot"));
-//	animations.push_back(std::string("pilot-discloop"));
-//	for (unsigned int i = 0; i < animations.size(); ++i)
-//	{
-//		window->load_model(Actor, "bvw-f2004--airbladepilot/" + animations[i]);
-//	}
-//	auto_bind(Actor.node(), anim_collection);
-//	pbundle->set_anim_blend_flag(true);
-//	pbundle->set_control_effect(anim_collection.get_anim(0), 0.5);
-//	pbundle->set_control_effect(anim_collection.get_anim(1), 0.5);
-//	int actualAnim = 0;
-//	//switch among animations
-//	AsyncTask* task = new GenericAsyncTask("check playing", &check_playing,
-//			reinterpret_cast<void*>(&actualAnim));
-//	task->set_delay(3);
-//	panda.get_task_mgr().add(task);
-//	//attach to scene
-//	Actor.reparent_to(window->get_render());
-//	Actor.set_pos(0.0, 100.0, -30.0);
-//
-//	// Do the main loop
-//	panda.main_loop();
-//	// close the framework
-//	panda.close_framework();
-//	return 0;
-//}
-//
-//AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data)
-//{
-//	//Control the Animations
-//	double time = ClockObject::get_global_clock()->get_real_time();
-//	int *actualAnim = reinterpret_cast<int*>(data);
-//	int num = *actualAnim % 3;
-//	if (num == 0)
-//	{
-//		std::cout << time << " - Blending" << std::endl;
-//		if (not anim_collection.get_anim(0)->is_playing())
-//		{
-//			anim_collection.get_anim(0)->play();
-//		}
-//		if (not anim_collection.get_anim(1)->is_playing())
-//		{
-//			anim_collection.get_anim(1)->play();
-//		}
-//	}
-//	else if (num == 1)
-//	{
-//		std::cout << time << " - Playing: " << anim_collection.get_anim_name(0)
-//				<< std::endl;
-//		if (not anim_collection.get_anim(0)->is_playing())
-//		{
-//			anim_collection.get_anim(0)->play();
-//		}
-//		if (anim_collection.get_anim(1)->is_playing())
-//		{
-//			anim_collection.get_anim(1)->stop();
-//		}
-//	}
-//	else
-//	{
-//		std::cout << time << " - Playing: " << anim_collection.get_anim_name(1)
-//				<< std::endl;
-//		anim_collection.get_anim(1)->play();
-//		if (anim_collection.get_anim(0)->is_playing())
-//		{
-//			anim_collection.get_anim(0)->stop();
-//		}
-//		if (not anim_collection.get_anim(1)->is_playing())
-//		{
-//			anim_collection.get_anim(1)->play();
-//		}
-//	}
-//	*actualAnim += 1;
-//	return AsyncTask::DS_again;
-//}
-//
+////	//attach to scene
+////	Actor.reparent_to(window->get_render());
+////	Actor.set_pos(0.0, 100.0, -30.0);
+////
+////	// Do the main loop
+////	panda.main_loop();
+////	// close the framework
+////	panda.close_framework();
+////	return 0;
+////}
+////
+////AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data)
+////{
+////	//Control the Animations
+////	double time = ClockObject::get_global_clock()->get_real_time();
+////	int *actualAnim = reinterpret_cast<int*>(data);
+////	int num = *actualAnim % 3;
+////	if (num == 0)
+////	{
+////		std::cout << time << " - Blending" << std::endl;
+////		if (not anim_collection.get_anim(0)->is_playing())
+////		{
+////			anim_collection.get_anim(0)->play();
+////		}
+////		if (not anim_collection.get_anim(1)->is_playing())
+////		{
+////			anim_collection.get_anim(1)->play();
+////		}
+////	}
+////	else if (num == 1)
+////	{
+////		std::cout << time << " - Playing: " << anim_collection.get_anim_name(0)
+////				<< std::endl;
+////		if (not anim_collection.get_anim(0)->is_playing())
+////		{
+////			anim_collection.get_anim(0)->play();
+////		}
+////		if (anim_collection.get_anim(1)->is_playing())
+////		{
+////			anim_collection.get_anim(1)->stop();
+////		}
+////	}
+////	else
+////	{
+////		std::cout << time << " - Playing: " << anim_collection.get_anim_name(1)
+////				<< std::endl;
+////		anim_collection.get_anim(1)->play();
+////		if (anim_collection.get_anim(0)->is_playing())
+////		{
+////			anim_collection.get_anim(0)->stop();
+////		}
+////		if (not anim_collection.get_anim(1)->is_playing())
+////		{
+////			anim_collection.get_anim(1)->play();
+////		}
+////	}
+////	*actualAnim += 1;
+////	return AsyncTask::DS_again;
+////}
+////
+
+void f1(const State& sta)
+{
+	std::cout << (std::string) sta << std::endl;
+}
+void f2(const std::string& str)
+{
+	std::cout << str << std::endl;
+}
+
+int main(int argc, char **argv)
+{
+	State sa("a"), sb("b"), sc("a");
+	std::string stra = "a", strb = "b", strc = "a";
+	//comparison
+	std::cout << (stra == sc) << std::endl;
+	std::cout << (sb == strc) << std::endl;
+
+	f1(stra);
+	f2(sa);
+
+	return 0;
+}
 
