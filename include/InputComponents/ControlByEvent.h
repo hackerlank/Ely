@@ -33,7 +33,6 @@
 #include <mouseData.h>
 #include <graphicsWindow.h>
 #include <windowProperties.h>
-#include <clockObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -105,10 +104,10 @@ public:
 	/**
 	 * \brief Updates position/orientation of the controlled object.
 	 *
-	 * @param task The task object.
-	 * @return The "done" status.
+	 * Will be called automatically by an input manager update.
+	 * @param data The custom data.
 	 */
-	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
+	virtual void update(void* data);
 
 	/**
 	 * \name Enabling/disabling.
@@ -144,11 +143,6 @@ private:
 	///@}
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
-
-	///@}
-	///A task data for update.
-	PT(TaskInterface<ControlByEvent>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
-	///@}
 
 	///TypedObject semantics: hardcoded
 public:

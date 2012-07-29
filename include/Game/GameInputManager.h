@@ -15,18 +15,17 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game/GameAudioManager.h
+ * \file /Ely/include/Game/GameInputManager.h
  *
- * \date 06/lug/2012 (20:15:17)
+ * \date 29/lug/2012 (10:07:02)
  * \author marco
  */
 
-#ifndef GAMEAUDIOMANAGER_H_
-#define GAMEAUDIOMANAGER_H_
+#ifndef GAMEINPUTMANAGER_H_
+#define GAMEINPUTMANAGER_H_
 
 #include <list>
 #include <algorithm>
-#include <audioManager.h>
 #include <pandaFramework.h>
 #include <clockObject.h>
 #include <asyncTask.h>
@@ -36,35 +35,30 @@
 #include "Utilities/Tools.h"
 
 /**
- * \brief Singleton manager updating audio components.
+ * \brief Singleton manager updating input components.
  *
  * Prepared for multi-threading.
  */
-class GameAudioManager: public Singleton<GameAudioManager>
+class GameInputManager: public Singleton<GameInputManager>
 {
 public:
 
-	GameAudioManager(PandaFramework* pandaFramework);
-	virtual ~GameAudioManager();
-	/**
-	 * \brief Adds an audio component for updating.
-	 * @param audioComp The audio component.
-	 */
-	void addToAudioUpdate(Component* audioComp);
-	/**
-	 * \brief Removes an audio component from updating.
-	 * @param audioComp The audio component.
-	 */
-	void removeFromAudioUpdate(Component* audioComp);
+	GameInputManager(PandaFramework* pandaFramework);
+	virtual ~GameInputManager();
 
 	/**
-	 * \brief Gets a reference to the audio manager.
-	 * @return The audio manager.
+	 * \brief Adds an input component for updating.
+	 * @param inputComp The input component.
 	 */
-	AudioManager* audioMgr();
+	void addToInputUpdate(Component* inputComp);
+	/**
+	 * \brief Removes an input component from updating.
+	 * @param inputComp The input component.
+	 */
+	void removeFromInputUpdate(Component* inputComp);
 
 	/**
-	 * \brief Updates audio components.
+	 * \brief Updates input components.
 	 *
 	 * Will be called automatically in a task.
 	 * @param task The task.
@@ -73,20 +67,18 @@ public:
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
 private:
-	/// Audio manager.
-	PT(AudioManager) mAudioMgr;
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
 
 	///@{
-	///List of audio components to be updated.
-	typedef std::list<Component*> AudioComponentList;
-	AudioComponentList mAudioComponents;
+	///List of input components to be updated.
+	typedef std::list<Component*> InputComponentList;
+	InputComponentList mInputComponents;
 	///@}
 
 	///@{
 	///A task data for update.
-	PT(TaskInterface<GameAudioManager>::TaskData) mUpdateData;
+	PT(TaskInterface<GameInputManager>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
 	///@}
 
@@ -98,4 +90,4 @@ private:
 
 };
 
-#endif /* GAMEAUDIOMANAGER_H_ */
+#endif /* GAMEINPUTMANAGER_H_ */

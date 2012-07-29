@@ -132,7 +132,7 @@ public:
 	/**
 	 * \brief Updates position and velocity of sounds of this component.
 	 *
-	 * Will be called automatically by a audio manager update.
+	 * Will be called automatically by an audio manager update.
 	 * @param data The custom data.
 	 */
 	virtual void update(void* data);

@@ -44,6 +44,7 @@ GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
 	mPandaFramework->get_task_mgr().add(mUpdateTask);
+	mLastTime = ClockObject::get_global_clock()->get_real_time();
 #ifdef DEBUG
 	// set up Bullet Debug Renderer (disabled by default)
 	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
@@ -98,8 +99,14 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	//lock (guard) the mutex
 	ReMutexHolder guard(mMutex);
 
+	float timeStep;
+//	timeStep = ClockObject::get_global_clock()->get_dt();
+	float currTime = ClockObject::get_global_clock()->get_real_time();
+	timeStep = currTime - mLastTime;
+	mLastTime = currTime;
+
 	float maxSubSteps;
-	float timeStep = ClockObject::get_global_clock()->get_dt();
+
 
 #ifdef TESTING
 	timeStep = 0.016666667; //60 fps

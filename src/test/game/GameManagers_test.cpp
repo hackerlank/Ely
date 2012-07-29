@@ -15,22 +15,22 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/game/GameManager_test.cpp
+ * \file /Ely/src/test/game/GameManagers_test.cpp
  *
- * \date 07/mag/2012 (18:07:26)
+ * \date 29/lug/2012 (10:43:00)
  * \author marco
  */
 
 #include "GameSuiteFixture.h"
 
-struct GameManagerTestCaseFixture
+struct GameManagersTestCaseFixture
 {
-	GameManagerTestCaseFixture()
+	GameManagersTestCaseFixture()
 	{
 		// TODO
 	}
 
-	~GameManagerTestCaseFixture()
+	~GameManagersTestCaseFixture()
 	{
 		// TODO
 	}
@@ -40,7 +40,7 @@ struct GameManagerTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
 
 /// Test cases
-BOOST_AUTO_TEST_CASE(GameManagerTEST)
+BOOST_AUTO_TEST_CASE(GameManagersTEST)
 {
 	BOOST_CHECK(true);
 }

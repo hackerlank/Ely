@@ -94,6 +94,11 @@ PandaFramework*& ControlByEventTemplate::pandaFramework()
 	return mPandaFramework;
 }
 
+GameInputManager* ControlByEventTemplate::gameInputMgr()
+{
+	return GameInputManager::GetSingletonPtr();
+}
+
 WindowFramework*& ControlByEventTemplate::windowFramework()
 {
 	return mWindowFramework;

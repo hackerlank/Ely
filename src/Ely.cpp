@@ -41,6 +41,7 @@ int main(int argc, char **argv)
 	GameManager* gameMgr = new GameManager(argc, argv);
 	// Other managers (depending on GameManager)
 	GameAudioManager* gameAudioMgr = new GameAudioManager(gameMgr);
+	GameInputManager* gameInputMgr = new GameInputManager(gameMgr);
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(gameMgr);
 #ifdef DEBUG
 	if (Thread::is_threading_supported())
@@ -67,6 +68,7 @@ int main(int argc, char **argv)
 
 	// Close the game framework
 	delete gamePhysicsMgr;
+	delete gameInputMgr;
 	delete gameAudioMgr;
 	delete gameMgr;
 	delete objectTmplMgr;

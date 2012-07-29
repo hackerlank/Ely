@@ -15,81 +15,72 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Game/GameAudioManager.cpp
+ * \file /Ely/src/Game/GameInputManager.cpp
  *
- * \date 06/lug/2012 (20:15:17)
+ * \date 29/lug/2012 (10:07:02)
  * \author marco
  */
 
-#include "Game/GameAudioManager.h"
+#include "Game/GameInputManager.h"
 
-GameAudioManager::GameAudioManager(PandaFramework* pandaFramework)
+GameInputManager::GameInputManager(PandaFramework* pandaFramework)
 {
 	if (not pandaFramework)
 	{
 		throw GameException(
-				"GameAudioManager::GameAudioManager: invalid PandaFramework");
+				"GameInputManager::GameInputManager: invalid PandaFramework");
 	}
-	mAudioComponents.clear();
+	mInputComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
 	mPandaFramework = pandaFramework;
-	mAudioMgr = AudioManager::create_AudioManager();
-	//create the task for updating the active audio components
-	mUpdateData = new TaskInterface<GameAudioManager>::TaskData(this,
-			&GameAudioManager::update);
-	mUpdateTask = new GenericAsyncTask("GameAudioManager::update",
-			&TaskInterface<GameAudioManager>::taskFunction,
+	//create the task for updating the input components
+	mUpdateData = new TaskInterface<GameInputManager>::TaskData(this,
+			&GameInputManager::update);
+	mUpdateTask = new GenericAsyncTask("GameInputManager::update",
+			&TaskInterface<GameInputManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
 	mPandaFramework->get_task_mgr().add(mUpdateTask);
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
-GameAudioManager::~GameAudioManager()
+GameInputManager::~GameInputManager()
 {
 	if (mUpdateTask)
 	{
 		mPandaFramework->get_task_mgr().remove(mUpdateTask);
 	}
-	mAudioComponents.clear();
+	mInputComponents.clear();
 }
 
-void GameAudioManager::addToAudioUpdate(Component* audioComp)
+void GameInputManager::addToInputUpdate(Component* inputComp)
 {
 	//lock (guard) the mutex
 	ReMutexHolder guard(mMutex);
 
-	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
-			mAudioComponents.end(), audioComp);
-	if (iter == mAudioComponents.end())
+	InputComponentList::iterator iter = find(mInputComponents.begin(),
+			mInputComponents.end(), inputComp);
+	if (iter == mInputComponents.end())
 	{
-		mAudioComponents.push_back(audioComp);
+		mInputComponents.push_back(inputComp);
 	}
 }
 
-void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
+void GameInputManager::removeFromInputUpdate(Component* inputComp)
 {
 	//lock (guard) the mutex
 	ReMutexHolder guard(mMutex);
 
-	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
-			mAudioComponents.end(), audioComp);
-	if (iter != mAudioComponents.end())
+	InputComponentList::iterator iter = find(mInputComponents.begin(),
+			mInputComponents.end(), inputComp);
+	if (iter != mInputComponents.end())
 	{
-		mAudioComponents.remove(audioComp);
+		mInputComponents.remove(inputComp);
 	}
 }
 
-AudioManager* GameAudioManager::audioMgr()
-{
-	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
-
-	return mAudioMgr.p();
-}
-
-AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameInputManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
 	ReMutexHolder guard(mMutex);
@@ -104,17 +95,16 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	dt = 0.016666667; //60 fps
 #endif
 
-	// call all audio components update functions, passing delta time
-	AudioComponentList::iterator iter;
-	for (iter = mAudioComponents.begin(); iter != mAudioComponents.end();
+	// call all input components update functions, passing delta time
+	InputComponentList::iterator iter;
+	for (iter = mInputComponents.begin(); iter != mInputComponents.end();
 			++iter)
 	{
 		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
-	//Update audio manager
-	mAudioMgr->update();
 	//
 	return AsyncTask::DS_cont;
 
 }
+
 

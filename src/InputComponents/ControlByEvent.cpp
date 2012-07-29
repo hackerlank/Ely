@@ -37,8 +37,6 @@ ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
 
-	mUpdateData.clear();
-	mUpdateTask.clear();
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	mCentX = win->get_properties().get_x_size() / 2;
 	mCentY = win->get_properties().get_y_size() / 2;
@@ -61,10 +59,11 @@ void ControlByEvent::disable()
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	win->request_properties(props);
 
-	//Remove the task
-	if (mUpdateTask)
+	//Remove from the input manager update
+	//first check if game audio manager exists
+	if (mTmpl->gameInputMgr())
 	{
-		mTmpl->pandaFramework()->get_task_mgr().remove(mUpdateTask);
+		mTmpl->gameInputMgr()->removeFromInputUpdate(this);
 	}
 	//Unregister the handlers
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
@@ -112,8 +111,12 @@ void ControlByEvent::enable()
 	//reset mouse to start position
 	win->move_pointer(0, mCentX, mCentY);
 
-	//Add the task for updating the controlled object
-	mTmpl->pandaFramework()->get_task_mgr().add(mUpdateTask);
+	//Add to the input manager update
+	//first check if game audio manager exists
+	if (mTmpl->gameInputMgr())
+	{
+		mTmpl->gameInputMgr()->addToInputUpdate(this);
+	}
 
 	//Register the handlers
 	//helper variables
@@ -296,12 +299,6 @@ bool ControlByEvent::initialize()
 
 void ControlByEvent::onAddToObjectSetup()
 {
-	//create the task for updating the controlled object
-	mUpdateData = new TaskInterface<ControlByEvent>::TaskData(this,
-			&ControlByEvent::update);
-	mUpdateTask = new GenericAsyncTask("ControlByEvent::update",
-			&TaskInterface<ControlByEvent>::taskFunction,
-			reinterpret_cast<void*>(mUpdateData.p()));
 	//enable the component
 	if (mEnabled)
 	{
@@ -338,9 +335,9 @@ bool ControlByEvent::isEnabled()
 	return mIsEnabled;
 }
 
-AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
+void ControlByEvent::update(void* data)
 {
-	float dt = ClockObject::get_global_clock()->get_dt();
+	float dt = *(reinterpret_cast<float*>(data));
 
 	NodePath ownerNodePath = mOwnerObject->nodePath();
 
@@ -424,8 +421,6 @@ AsyncTask::DoneStatus ControlByEvent::update(GenericAsyncTask* task)
 				ownerNodePath.get_h(ownerNodePath)
 						- mRollSens * mSpeedActual * dt * signOfKeyboard);
 	}
-	//
-	return AsyncTask::DS_cont;
 }
 
 //TypedObject semantics: hardcoded

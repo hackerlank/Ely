@@ -31,6 +31,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "InputComponents/ControlByEvent.h"
+#include "Game/GameInputManager.h"
 #include "Utilities/Tools.h"
 
 class ControlByEventTemplate: public ComponentTemplate
@@ -46,6 +47,12 @@ public:
 	virtual Component* makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
+
+	/**
+	 * \brief Gets the singleton GameInputManager.
+	 * @return A reference to the GameInputManager.
+	 */
+	GameInputManager* gameInputMgr();
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
