@@ -15,27 +15,28 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/support/SupportSuiteFixture.h
+ * \file /Ely/src/Support/FSM.cpp
  *
- * \date 07/mag/2012 (18:15:46)
+ * \date 02/ago/2012 (09:50:25)
  * \author marco
  */
 
-#ifndef SUPPORTSUITEFIXTURE_H_
-#define SUPPORTSUITEFIXTURE_H_
-
-#include <boost/test/unit_test.hpp>
-#include "Support/FirstPersonCamera.h"
 #include "Support/FSM.h"
 
-struct SupportSuiteFixture
+//specializations' definitions
+//StateKey == std::string
+template<> FSM<std::string>::FSM(const std::string& name) :
+		Null("__Null"), InTransition("__InTransition"), Off("__Off")
 {
-	SupportSuiteFixture()
-	{
-	}
-	~SupportSuiteFixture()
-	{
-	}
-};
-
-#endif /* SUPPORTSUITEFIXTURE_H_ */
+	//any specialization must call this, otherwise no
+	//initialization would take place
+	initialize(name);
+}
+//StateKey == int
+template<> FSM<int>::FSM(const int& name) :
+		Null(0), InTransition(-1), Off(1)
+{
+	//any specialization must call this, otherwise no
+	//initialization would take place
+	initialize(name);
+}

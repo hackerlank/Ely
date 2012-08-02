@@ -15,27 +15,33 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/support/SupportSuiteFixture.h
+ * \file /Ely/src/test/support/FSM_test.cpp
  *
- * \date 07/mag/2012 (18:15:46)
+ * \date 02/ago/2012 (09:50:25)
  * \author marco
  */
 
-#ifndef SUPPORTSUITEFIXTURE_H_
-#define SUPPORTSUITEFIXTURE_H_
+#include "SupportSuiteFixture.h"
 
-#include <boost/test/unit_test.hpp>
-#include "Support/FirstPersonCamera.h"
-#include "Support/FSM.h"
-
-struct SupportSuiteFixture
+struct FSMTestCaseFixture
 {
-	SupportSuiteFixture()
+	FSMTestCaseFixture()
 	{
 	}
-	~SupportSuiteFixture()
+	~FSMTestCaseFixture()
 	{
 	}
 };
 
-#endif /* SUPPORTSUITEFIXTURE_H_ */
+/// Support suite
+BOOST_FIXTURE_TEST_SUITE(Support, SupportSuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(FSMTEST)
+{
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Support suite
+
+
