@@ -262,6 +262,9 @@ protected:
 
 public:
 	//Public Interface
+	/**
+	 * \brief The State set type.
+	 */
 	typedef std::set<StateTmpl<StateKey> > StateSet;
 	/**
 	 * \brief The FromToFunctions' table type.
