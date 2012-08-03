@@ -61,6 +61,7 @@ typedef std::list<boost::any> ValueList;
  * be strict weak ordered) and should be printable to an std::ostream.
  * Also state keys are passed as request that are not state names but
  * arbitrary input that will be first filtered.
+ * FSM use a function "callback" system to define its behavior.
  * To define specialized behavior when entering or exiting a
  * particular State, define "Enter"/"Exit" State Function(s) for
  * enter to and/or exit from the State.
@@ -119,7 +120,7 @@ template<typename StateKey> class FSM
 {
 public:
 	/**
-	 * \name The Enter/Exit/FromTo/Filter boost::function types.
+	 * \name The Enter/Exit/FromTo/Filter callbacks boost::function types.
 	 */
 	///@{
 	typedef boost::function<void(FSM<StateKey>*, const ValueList&)> EnterFuncPTR;
