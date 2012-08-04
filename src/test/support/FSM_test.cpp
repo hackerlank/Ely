@@ -62,11 +62,11 @@ struct F
 		}
 	}
 	//filter method
-	ValueList filter1(const std::string& _curr, const std::string& _to,
-			const ValueList& _data)
+	ValueList filter1(fsm* _fsm, const std::string& _to, const ValueList& _data)
 	{
 		ValueList valueList;
 		valueList.push_front(_to);
+		const std::string _curr = _fsm->getCurrentOrNextState();
 		std::cout << "Filter: current '" << _curr << "' request to '" << _to
 				<< "' -> F::filter1" << std::endl;
 		return valueList;
@@ -88,7 +88,7 @@ struct F2
 		std::string _from, _to;
 		if (not _fsm->getCurrentStateOrTransition(_from, _to))
 		{
-			std::cout << _to;
+			std::cout << "'" << _to << "'";
 		}
 		if (not demandStateOnEnter.empty())
 		{
@@ -139,13 +139,24 @@ void fromTo1(fsm* _fsm, const ValueList& _data)
 				<< std::endl;
 	}
 }
-ValueList filter1(const std::string& _curr, const std::string& _to,
-		const ValueList& _data)
+ValueList filter1(fsm* _fsm, const std::string& _to, const ValueList& _data)
 {
 	ValueList valueList;
 	valueList.push_front(_to);
+	const std::string _curr = _fsm->getCurrentOrNextState();
 	std::cout << "Filter: current '" << _curr << "' request to '" << _to
 			<< "' -> filter1" << std::endl;
+	return valueList;
+}
+
+ValueList filterDenyAll(fsm* _fsm, const std::string& _to,
+		const ValueList& _data)
+{
+	ValueList valueList;
+	const std::string _curr = _fsm->getCurrentOrNextState();
+	valueList.push_front(_fsm->Null);
+	std::cout << "Filter: current '" << _curr << "' request to '" << _to
+			<< "' -> filterDenyAll" << std::endl;
 	return valueList;
 }
 
@@ -153,7 +164,7 @@ ValueList filter1(const std::string& _curr, const std::string& _to,
 BOOST_FIXTURE_TEST_SUITE(Support, SupportSuiteFixture)
 
 /// Test cases
-BOOST_FIXTURE_TEST_CASE(FSMConstructorTEST, FSMTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(FSMConstructor, FSMTestCaseFixture)
 {
 	BOOST_CHECK(fsm1->getCurrentOrNextState() == fsm1->Off);
 	BOOST_CHECK(fsm1->Off == "__Off");
@@ -164,7 +175,7 @@ BOOST_FIXTURE_TEST_CASE(FSMConstructorTEST, FSMTestCaseFixture)
 	BOOST_CHECK(not fsm1->isInTransition());
 }
 
-BOOST_FIXTURE_TEST_CASE(FSMConstructionTEST, FSMTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(FSMAddRemoveCleanupRequest, FSMTestCaseFixture)
 {
 	F f;
 	//test add & cleanup & request
@@ -256,78 +267,100 @@ BOOST_FIXTURE_TEST_CASE(FSMConstructionTEST, FSMTestCaseFixture)
 	BOOST_CHECK(fsm1->getCurrentOrNextState() == fsm1->Off);
 }
 
-BOOST_FIXTURE_TEST_CASE(FSMTransitionTEST, FSMTestCaseFixture)
+BOOST_FIXTURE_TEST_CASE(FSMDemand, FSMTestCaseFixture)
 {
 	//construction
 	F2 f1("s03","");
 	fsm1->addState("s01", boost::ref(f1), boost::bind(&F2::exit2, boost::ref(f1),_1), NULL);
-	F2 f2("","s04");
+	F2 f2("s04","");
 	fsm1->addState("s02", boost::ref(f2), boost::bind(&F2::exit2, boost::ref(f2),_1), NULL);
 	F2 f3("","");
 	fsm1->addState("s03", boost::ref(f3), boost::bind(&F2::exit2, boost::ref(f3),_1), NULL);
-	F2 f4("s03","s01");
+	F2 f4("s03","");
 	fsm1->addState("s04", boost::ref(f4), boost::bind(&F2::exit2, boost::ref(f4),_1), NULL);
-	//expected state transitions sequence: ?
+	//test demand: expected state transitions sequence:
+	//'s01'->'s03'|->'s02'->'s04'->'s03'|->'s01'->'s03'|
 	fsm1->request("s01");
 	std::cout.flush();
 	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
 	fsm1->request("s02");
 	std::cout.flush();
-	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
-	fsm1->request("s02");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
+	fsm1->request("s01");
 	std::cout.flush();
 	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
-//	fsm1->request("s04");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
-//	fsm1->cleanup();
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == fsm1->Off);
-	//test add & remove
-//	fsm1->addState("s01", &enter1, &exit1, &filter1);
-//	fsm1->addState("s02", NULL, NULL, NULL);
-//	fsm1->addState("s03", NULL, NULL, NULL);
-//	fsm1->addFromToFunc("s02","s03", &fromTo1);
-//	fsm1->addState("s02", &enter1, &exit1, &filter1);
-//	fsm1->addState("s03", boost::ref(f), boost::bind(&F::exit1, boost::ref(f),_1),
-//			boost::bind(&F::filter1, boost::ref(f),_1,_2,_3));
-//	fsm1->addState("s04", &enter1, &exit1, &filter1);
-//	fsm1->removeFromToFunc("s02","s03");
-//	fsm1->removeState("s01");
-//	//expected callbacks sequence:
-//	//"s02"->enter1		||
-//	//"s02"->filter1	|| FSM::setState: State 's01' doesn't exist
-//	//"s02"->filter1	|| "s02"->exit1			|| "s03"->F::operator()
-//	//"s03"->F::filter1	|| "s03"->F::exit1		|| "s04"->enter1
-//	fsm1->request("s02");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
-//	fsm1->request("s01");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
-//	fsm1->request("s03");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
-//	fsm1->request("s04");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
-//	//test setStateSet
-//	fsm1->cleanup();
-//	State state1("s01"), state2("s02");
-//	state1.enter = enter1;
-//	state1.exit = exit1;
-//	state1.filter = filter1;
-//	state2.enter = boost::ref(f);
-//	state2.exit = boost::bind(&F::exit1, boost::ref(f),_1);
-//	state2.filter = boost::bind(&F::filter1, boost::ref(f),_1,_2,_3);
-//	fsm::StateSet stateSet;
-//	stateSet.insert(state1);
-//	stateSet.insert(state2);
-//	fsm1->setStateSet(stateSet);
-//	//expected callbacks sequence:
-//	//"s01"->enter1		||
-//	//"s01"->filter1	|| "s01"->exit1			|| "s02"->F::operator()
-//	//"s02"->F::filter1	|| "s02"->F::exit1		||
-//	fsm1->request("s01");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
-//	fsm1->request("s02");
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
-//	fsm1->request(fsm1->Off);
-//	BOOST_CHECK(fsm1->getCurrentOrNextState() == fsm1->Off);
+}
+
+BOOST_FIXTURE_TEST_CASE(FSMForceTransition, FSMTestCaseFixture)
+{
+	//test forceTransition: expected state transitions sequence:
+	fsm1->addState("s01", &enter1, &exit1, &filterDenyAll);
+	fsm1->addState("s02", &enter1, &exit1, &filterDenyAll);
+	fsm1->addState("s03", &enter1, &exit1, &filterDenyAll);
+	//with request:
+	//'s01'->'s01'->'s01'
+	fsm1->request("s01");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->request("s02");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->request("s03");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	//with request:
+	//'s01'->'s02'->'s03'
+	fsm1->forceTransition("s01");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->forceTransition("s02");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
+	fsm1->forceTransition("s03");
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
+}
+
+BOOST_FIXTURE_TEST_CASE(FSMAllowedStateKeys, FSMTestCaseFixture)
+{
+	fsm::AllowedStateKeySet s1,s2,s3,s4;
+	s1.insert("s03");
+	//
+	s2.insert("s01");
+	//
+	s3.insert("s02");
+	s3.insert("s04");
+	//
+	s4.insert("s04");
+	fsm1->addState("s01", &enter1, NULL, NULL, s1);
+	fsm1->addState("s02", &enter1, NULL, NULL, s2);
+	fsm1->addState("s03", &enter1, NULL, NULL, s3);
+	fsm1->addState("s04", &enter1, NULL, NULL, s4);
+	//test
+	fsm1->request("s01");//s01
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->request("s02");//s01
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->request("s03");//s03
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
+	fsm1->request("s01");//s03
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
+	fsm1->request("s02");//s02
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
+	fsm1->request("s03");//s02
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s02");
+	fsm1->request("s01");//s01
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->request("s04");//s01
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s01");
+	fsm1->request("s03");//s03
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
+	fsm1->request("s01");//s03
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s03");
+	fsm1->request("s04");//s04
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
+	fsm1->request("s01");//s04
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
+	fsm1->request("s02");//s04
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
+	fsm1->request("s03");//s04
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
+	fsm1->request("s04");//s04
+	BOOST_CHECK(fsm1->getCurrentOrNextState() == "s04");
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Support suite

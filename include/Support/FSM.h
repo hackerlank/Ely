@@ -130,7 +130,7 @@ public:
 	///The first element of returned ValueList is a state key or Null if
 	///a transition is denied.
 	typedef boost::function<
-			ValueList(const StateKey&, const StateKey&, const ValueList&)> FilterFuncPTR;
+			ValueList(FSM<StateKey>*, const StateKey&, const ValueList&)> FilterFuncPTR;
 	typedef std::set<StateKey> AllowedStateKeySet;
 	///@}
 
@@ -222,8 +222,7 @@ protected:
 	 */
 	///@{
 	static ValueList defaultFilter(FSM<StateKey>* fsm,
-			const StateKey& fromStateKey, const StateKey& toStateKey,
-			const ValueList& data);
+			const StateKey& toStateKey, const ValueList& data);
 	FilterFuncPTR defaultFilterPTR;
 	///@}
 
@@ -237,8 +236,8 @@ protected:
 	 * @param state The destination state.
 	 */
 	///@{
-	static ValueList filterOff(FSM<StateKey>* fsm, const StateKey& fromStateKey,
-			const StateKey& toStateKey, const ValueList& data);
+	static ValueList filterOff(FSM<StateKey>* fsm, const StateKey& toStateKey,
+			const ValueList& data);
 	FilterFuncPTR filterOffPTR;
 	///@}
 
@@ -388,9 +387,10 @@ public:
 	 * state key, the FSM transitions to that state.
 	 * The return value is the same as the return value of the setState()
 	 * function (that is, the state the FSM is currently into).
-	 * If the FSM is currently in transition nothing happen and it
-	 * returns Null, because this function cannot be called during
-	 * transition (implicitly the current state is unchanged).
+	 * This method *cannot* be called by an enter, exit or fromTo function
+	 * (i.e. when we are performing a transition): if this happens it
+	 * returns Null (implicitly the current state is unchanged).
+	 * Moreover this function *cannot* be called in a filter function.
 	 * See demand(), which will queue these requests up and apply when the
 	 * transition is complete.
 	 * @param state The destination state.
@@ -403,6 +403,10 @@ public:
 	/**
 	 * \brief Request the 'next' state in the predefined state array.
 	 *
+	 * This method *cannot* be called by an enter, exit or fromTo function
+	 * (i.e. when we are performing a transition): if this happens it
+	 * returns Null (implicitly the current state is unchanged).
+	 * Moreover this function *cannot* be called in a filter function.
 	 * \note The elements in a StateSet are always sorted from lower to
 	 * higher following the specific strict weak ordering criterion of
 	 * the state key type.
@@ -413,6 +417,10 @@ public:
 	/**
 	 * \brief Request the 'previous' state in the predefined state array.
 	 *
+	 * This method *cannot* be called by an enter, exit or fromTo function
+	 * (i.e. when we are performing a transition): if this happens it
+	 * returns Null (implicitly the current state is unchanged).
+	 * Moreover this function *cannot* be called in a filter function.
 	 * \note The elements in a std::set are always sorted from lower to
 	 * higher following a specific strict weak ordering criterion set
 	 * on container construction
@@ -490,6 +498,9 @@ protected:
 	///Flag for notifying on every state change.
 	bool mBroadcastStateChanges;
 
+	///Flag indicating if a filter is being called.
+	bool mFiltering;
+
 	///This member records transition requests made by demand() or
 	///forceTransition() while the FSM is in transition between
 	///states.
@@ -518,8 +529,9 @@ template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)
 	//reset all data
 	mStateSet.clear();
 	mFromToFunctions.clear();
-	//set broadcast state change
+	//set the various flags
 	mBroadcastStateChanges = false;
+	mFiltering = false;
 	//Set up initial status
 	mStateKey = Off;
 	mOldStateKey = Null;
@@ -527,9 +539,8 @@ template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)
 	//set up bindings of the default functions
 	defaultEnterPTR = &FSM<StateKey>::defaultEnter;
 	defaultExitPTR = &FSM<StateKey>::defaultExit;
-	defaultFilterPTR = boost::bind(&FSM<StateKey>::defaultFilter, this, _1, _2,
-			_3);
-	filterOffPTR = boost::bind(&FSM<StateKey>::filterOff, this, _1, _2, _3);
+	defaultFilterPTR = &FSM<StateKey>::defaultFilter;
+	filterOffPTR = &FSM<StateKey>::filterOff;
 }
 
 template<typename StateKey> int FSM<StateKey>::getSerialNum()
@@ -652,9 +663,19 @@ template<typename StateKey> StateKey FSM<StateKey>::request(
 				<< "FSM::request: Cannot be called in enter/exit/fromTo functions: (state: '"
 				<< mOldStateKey << "')" << std::endl;
 	}
+	else if (mFiltering)
+	{
+		std::cerr
+				<< "FSM::request: Cannot be called in filter functions: (state: '"
+				<< mStateKey << "')" << std::endl;
+	}
 	else
 	{
-		ValueList result = getCurrentFilter()(mStateKey, newStateKey, data);
+		//filtering on
+		mFiltering = true;
+		ValueList result = getCurrentFilter()(this, newStateKey, data);
+		//filtering off
+		mFiltering = false;
 		try
 		{
 			//check first if value is of State key type
@@ -695,6 +716,12 @@ template<typename StateKey> StateKey FSM<StateKey>::requestNext(
 				<< "FSM::requestNext: Cannot be called in enter/exit/fromTo functions: (state: '"
 				<< mOldStateKey << "')" << std::endl;
 	}
+	else if (mFiltering)
+	{
+		std::cerr
+				<< "FSM::requestNext: Cannot be called in filter functions: (state: '"
+				<< mStateKey << "')" << std::endl;
+	}
 	else if (not mStateSet.empty())
 	{
 		//there are one or more states (besides Off)
@@ -725,6 +752,12 @@ template<typename StateKey> StateKey FSM<StateKey>::requestPrev(
 		std::cerr
 				<< "FSM::requestPrev: Cannot be called in enter/exit/fromTo functions: (state: '"
 				<< mOldStateKey << "')" << std::endl;
+	}
+	else if (mFiltering)
+	{
+		std::cerr
+				<< "FSM::requestPrev: Cannot be called in filter functions: (state: '"
+				<< mStateKey << "')" << std::endl;
 	}
 	else if (not mStateSet.empty())
 	{
@@ -881,8 +914,7 @@ template<typename StateKey> void FSM<StateKey>::defaultExit(FSM<StateKey>* fsm)
 }
 
 template<typename StateKey> ValueList FSM<StateKey>::defaultFilter(
-		FSM<StateKey>* fsm, const StateKey& fromStateKey,
-		const StateKey& toStateKey, const ValueList& data)
+		FSM<StateKey>* fsm, const StateKey& toStateKey, const ValueList& data)
 {
 	ValueList answerList = data;
 	//check if to state is Off
@@ -893,6 +925,7 @@ template<typename StateKey> ValueList FSM<StateKey>::defaultFilter(
 		return answerList;
 	}
 	//check allowedStateKeys
+	StateKey fromStateKey = fsm->getCurrentOrNextState();
 	typename StateSet::iterator iter = fsm->mStateSet.find(fromStateKey);
 	if (iter->allowedStateKeys.empty())
 	{
@@ -922,8 +955,7 @@ template<typename StateKey> ValueList FSM<StateKey>::defaultFilter(
 }
 
 template<typename StateKey> ValueList FSM<StateKey>::filterOff(
-		FSM<StateKey>* fsm, const StateKey& fromStateKey,
-		const StateKey& toStateKey, const ValueList& data)
+		FSM<StateKey>* fsm, const StateKey& toStateKey, const ValueList& data)
 {
 	ValueList answerList = data;
 	//from Off we can always go directly to any other state.
