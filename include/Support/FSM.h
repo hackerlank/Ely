@@ -119,6 +119,7 @@ typedef std::list<boost::any> ValueList;
 template<typename StateKey> class FSM
 {
 public:
+	//Public types
 	/**
 	 * \name The Enter/Exit/FromTo/Filter callbacks boost::function types.
 	 */
@@ -133,8 +134,6 @@ public:
 	typedef std::set<StateKey> AllowedStateKeySet;
 	///@}
 
-protected:
-	//Protected Interface
 	/**
 	 * \brief The StateTmpl type.
 	 *
@@ -143,6 +142,11 @@ protected:
 	 * Key type has the same requirements of the key type for associative
 	 * containers (suitable to be strict weak ordered) and should
 	 * be printable on an std::ostream.
+	 * \note To make a type Key printable on an std::ostream, you could
+	 * define a global overloading of the "<<" operator, for example:
+	 * \code
+	 *	std::ostream& operator<<(const std::ostream&, const Key&);
+	 * \endcode
 	 */
 	template<typename Key> struct StateTmpl
 	{
@@ -181,6 +185,8 @@ protected:
 		///@}
 	};
 
+protected:
+	//Protected Interface
 	/**
 	 * \brief This is the default function that is called if there is no
 	 * enter State function for a particular state name.
@@ -395,12 +401,6 @@ public:
 			ValueList());
 
 	/**
-	 * \brief Set of unique states to iterate through
-	 * @param stateSet The state set.
-	 */
-	void setStateArray(const StateSet& stateSet);
-
-	/**
 	 * \brief Request the 'next' state in the predefined state array.
 	 *
 	 * \note The elements in a StateSet are always sorted from lower to
@@ -439,16 +439,22 @@ public:
 	 */
 	///@{
 	bool addState(const StateKey& stateKey,
-			const typename FSM<StateKey>::EnterFuncPTR& enterFunc,
-			const typename FSM<StateKey>::ExitFuncPTR& exitFunc,
-			const typename FSM<StateKey>::FilterFuncPTR& filterFunc,
-			const typename FSM<StateKey>::AllowedStateKeySet& allowedStateKeys =
+			const FSM<StateKey>::EnterFuncPTR& enterFunc,
+			const FSM<StateKey>::ExitFuncPTR& exitFunc,
+			const FSM<StateKey>::FilterFuncPTR& filterFunc,
+			const FSM<StateKey>::AllowedStateKeySet& allowedStateKeys =
 					AllowedStateKeySet());
 	bool removeState(const StateKey& stateKey);
 	bool addFromToFunc(const StateKey& stateFrom, const StateKey& stateTo,
-			const typename FSM<StateKey>::FromToFuncPTR& fromToFunc);
+			const FSM<StateKey>::FromToFuncPTR& fromToFunc);
 	bool removeFromToFunc(const StateKey& stateFrom, const StateKey& stateTo);
 	///@}
+
+	/**
+	 * \brief Set the states' set of this FSM in one shot.
+	 * @param stateSet The state set.
+	 */
+	void setStateSet(const StateSet& stateSet);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -669,7 +675,7 @@ template<typename StateKey> StateKey FSM<StateKey>::request(
 	return acceptedStateKey;
 }
 
-template<typename StateKey> void FSM<StateKey>::setStateArray(
+template<typename StateKey> void FSM<StateKey>::setStateSet(
 		const StateSet& stateSet)
 {
 	ReMutexHolder guard(mMutex);
@@ -848,12 +854,18 @@ template<typename StateKey> StateKey FSM<StateKey>::setState(
 	mStateKey = mNewStateKey;
 	mOldStateKey = Null;
 	mNewStateKey = Null;
-	//call the enqueued requests
-	while (not mRequestQueue.empty())
+	//call only the first enqueued request
+	if (not mRequestQueue.empty())
 	{
-		FSMMethodPTR req = mRequestQueue.front();
-		req();
+		//the correct sequence is:
+		//first: copy the enqueued request
+		FSMMethodPTR enqueuedMethod = mRequestQueue.front();
+		//second: remove it from the queue
 		mRequestQueue.pop();
+		//third: call it
+		enqueuedMethod();
+		//This is because if we would call the enqueued request before
+		//removing it would find itself on the queue again and again.
 	}
 	//
 	return mStateKey;
@@ -921,10 +933,10 @@ template<typename StateKey> ValueList FSM<StateKey>::filterOff(
 
 template<typename StateKey>
 bool FSM<StateKey>::addState(const StateKey& stateKey,
-		const typename FSM<StateKey>::EnterFuncPTR& enterFunc,
-		const typename FSM<StateKey>::ExitFuncPTR& exitFunc,
-		const typename FSM<StateKey>::FilterFuncPTR& filterFunc,
-		const typename FSM<StateKey>::AllowedStateKeySet& allowedStateKeys)
+		const FSM<StateKey>::EnterFuncPTR& enterFunc,
+		const FSM<StateKey>::ExitFuncPTR& exitFunc,
+		const FSM<StateKey>::FilterFuncPTR& filterFunc,
+		const FSM<StateKey>::AllowedStateKeySet& allowedStateKeys)
 {
 	ReMutexHolder guard(mMutex);
 
@@ -992,8 +1004,7 @@ bool FSM<StateKey>::removeState(const StateKey& stateKey)
 
 template<typename StateKey>
 bool FSM<StateKey>::addFromToFunc(const StateKey& stateFrom,
-		const StateKey& stateTo,
-		const typename FSM<StateKey>::FromToFuncPTR& fromToFunc)
+		const StateKey& stateTo, const FSM<StateKey>::FromToFuncPTR& fromToFunc)
 {
 	ReMutexHolder guard(mMutex);
 
@@ -1063,7 +1074,11 @@ template<> FSM<std::string>::FSM(const std::string& name);
 template<> FSM<int>::FSM(const int& name);
 
 //typedefs
+//StateKey == std::string
 typedef FSM<std::string> fsm;
+typedef FSM<std::string>::StateTmpl<std::string> State;
+//StateKey == int
 typedef FSM<int> fsmi;
+typedef FSM<int>::StateTmpl<int> Statei;
 
 #endif /* FSM_H_ */

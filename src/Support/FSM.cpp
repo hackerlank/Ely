@@ -26,15 +26,16 @@
 //specializations' definitions
 //StateKey == std::string
 template<> FSM<std::string>::FSM(const std::string& name) :
-		Null("__Null"), InTransition("__InTransition"), Off("__Off")
+		InTransition("__InTransition"), Null("__Null"), Off("__Off")
 {
+
 	//any specialization must call this, otherwise no
 	//initialization would take place
 	initialize(name);
 }
 //StateKey == int
 template<> FSM<int>::FSM(const int& name) :
-		Null(0), InTransition(-1), Off(1)
+		InTransition(-1), Null(0), Off(1)
 {
 	//any specialization must call this, otherwise no
 	//initialization would take place
