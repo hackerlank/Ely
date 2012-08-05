@@ -519,14 +519,14 @@ FSM::FSM(const std::string& name)
 int FSM::getSerialNum()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return ++SerialNum;
 }
 
 void FSM::cleanup()
 {
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (mState != FSM::Off)
 	{
@@ -560,7 +560,7 @@ FilterFuncPTR FSM::getCurrentFilter()
 
 const State& FSM::getCurrentOrNextState()
 {
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (mState != FSM::Null)
 	{
@@ -571,7 +571,7 @@ const State& FSM::getCurrentOrNextState()
 
 bool FSM::getCurrentStateOrTransition(State& currState, State& toState)
 {
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (mState != FSM::Null)
 	{
@@ -585,14 +585,14 @@ bool FSM::getCurrentStateOrTransition(State& currState, State& toState)
 
 bool FSM::isInTransition()
 {
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return mState == FSM::Null;
 }
 
 void FSM::forceTransition(const std::string& req, void* data)
 {
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (mState == FSM::Null)
 	{
@@ -607,7 +607,7 @@ void FSM::forceTransition(const std::string& req, void* data)
 
 void FSM::demand(const std::string& req, void* data)
 {
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (mState == NullState)
 	{
@@ -649,7 +649,7 @@ const State& FSM::request(const std::string& req, void* data)
 //    finally:
 //        self.fsmLock.release()
 
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	FilterFuncPTR filter = getCurrentFilter();
 	State result = filter(req, data);

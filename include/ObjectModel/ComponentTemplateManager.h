@@ -80,6 +80,12 @@ public:
 	 */
 	Component* createComponent(ComponentType componentID);
 
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
+
 private:
 
 	///Table of component templates indexed by component type.

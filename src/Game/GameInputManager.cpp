@@ -23,7 +23,7 @@
 
 #include "Game/GameInputManager.h"
 
-GameInputManager::GameInputManager()
+GameInputManager::GameInputManager(bool otherThread = false)
 {
 	mInputComponents.clear();
 	mUpdateData.clear();
@@ -35,7 +35,28 @@ GameInputManager::GameInputManager()
 			&TaskInterface<GameInputManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
+#ifdef ELY_THREAD
+	if (not otherThread)
+	{
+		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	}
+	else
+	{
+		AsyncTaskChain *taskChain =
+				AsyncTaskManager::get_global_ptr()->make_task_chain(
+						"GameInputManagerChain");
+		//Changes the number of threads for taskChain.
+		taskChain->set_num_threads(1);
+		//Sets the frame_sync flag.
+		taskChain->set_frame_sync(true);
+		//Specifies the AsyncTaskChain on which mUpdateTask will be running.
+		mUpdateTask->set_task_chain("GameInputManagerChain");
+		//Adds mUpdateTask to the active queue.
+		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	}
+#else
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+#endif
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
@@ -51,7 +72,7 @@ GameInputManager::~GameInputManager()
 void GameInputManager::addToInputUpdate(Component* inputComp)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	InputComponentList::iterator iter = find(mInputComponents.begin(),
 			mInputComponents.end(), inputComp);
@@ -64,7 +85,7 @@ void GameInputManager::addToInputUpdate(Component* inputComp)
 void GameInputManager::removeFromInputUpdate(Component* inputComp)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	InputComponentList::iterator iter = find(mInputComponents.begin(),
 			mInputComponents.end(), inputComp);
@@ -77,7 +98,7 @@ void GameInputManager::removeFromInputUpdate(Component* inputComp)
 AsyncTask::DoneStatus GameInputManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	float dt;
 //	dt = ClockObject::get_global_clock()->get_dt();
@@ -101,4 +122,8 @@ AsyncTask::DoneStatus GameInputManager::update(GenericAsyncTask* task)
 
 }
 
+ReMutex& GameInputManager::getMutex()
+{
+	return mMutex;
+}
 

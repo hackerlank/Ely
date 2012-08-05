@@ -23,7 +23,7 @@
 
 #include "Game/GamePhysicsManager.h"
 
-GamePhysicsManager::GamePhysicsManager()
+GamePhysicsManager::GamePhysicsManager(bool otherThread = false)
 {
 	mPhysicsComponents.clear();
 	mUpdateData.clear();
@@ -37,7 +37,28 @@ GamePhysicsManager::GamePhysicsManager()
 			&TaskInterface<GamePhysicsManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
+#ifdef ELY_THREAD
+	if (not otherThread)
+	{
+		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	}
+	else
+	{
+		AsyncTaskChain *taskChain =
+				AsyncTaskManager::get_global_ptr()->make_task_chain(
+						"GamePhysicsManagerChain");
+		//Changes the number of threads for taskChain.
+		taskChain->set_num_threads(1);
+		//Sets the frame_sync flag.
+		taskChain->set_frame_sync(true);
+		//Specifies the AsyncTaskChain on which mUpdateTask will be running.
+		mUpdateTask->set_task_chain("GamePhysicsManagerChain");
+		//Adds mUpdateTask to the active queue.
+		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	}
+#else
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+#endif
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 #ifdef DEBUG
 	// set up Bullet Debug Renderer (disabled by default)
@@ -57,7 +78,7 @@ GamePhysicsManager::~GamePhysicsManager()
 void GamePhysicsManager::addToPhysicsUpdate(Component* physicsComp)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
@@ -70,7 +91,7 @@ void GamePhysicsManager::addToPhysicsUpdate(Component* physicsComp)
 void GamePhysicsManager::removeFromPhysicsUpdate(Component* physicsComp)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
@@ -88,7 +109,7 @@ BulletWorld* GamePhysicsManager::bulletWorld() const
 AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	float timeStep;
 //	timeStep = ClockObject::get_global_clock()->get_dt();
@@ -156,8 +177,13 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 
 }
 
+ReMutex& GamePhysicsManager::getMutex()
+{
+	return mMutex;
+}
+
 #ifdef DEBUG
-BulletDebugNode* GamePhysicsManager::bulletDebugNodePath()
+BulletDebugNode* GamePhysicsManager::bulletDebugNodePath() const
 {
 	return DCAST(BulletDebugNode,mBulletDebugNodePath.node());
 }
@@ -177,6 +203,9 @@ void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
 
 void GamePhysicsManager::debug(bool enable)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (enable)
 	{
 		if (mBulletDebugNodePath.is_hidden())

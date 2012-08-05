@@ -54,7 +54,7 @@ const ComponentFamilyType ControlByEventTemplate::familyType() const
 Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
 {
 	ControlByEvent* newControl = new ControlByEvent(this);
-	newControl->componentId() = compId;
+	newControl->setComponentId(compId);
 	if (not newControl->initialize())
 	{
 		return NULL;

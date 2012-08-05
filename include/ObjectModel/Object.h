@@ -125,11 +125,11 @@ public:
 	const ObjectId& objectId() const;
 
 	/**
-	 * \brief Gets/sets a reference to the node path of this object.
+	 * \brief Gets/sets the node path of this object.
 	 * @return The node path of this object.
 	 */
 	///@{
-	NodePath getNodePath();
+	NodePath getNodePath() const;
 	void setNodePath(const NodePath& nodePath);
 	///@}
 
@@ -151,7 +151,16 @@ public:
 	 * Various components can set or get this value to implement
 	 * some optimization. By default false (i.e. object is dynamic).
 	 */
-	bool& isStatic();
+	///@{
+	bool isStatic();
+	void setStatic(bool value);
+	///@}
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
 
 private:
 	///The template used to construct this component.

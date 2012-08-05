@@ -92,6 +92,12 @@ public:
 	 */
 	virtual std::list<std::string> parameterList(const std::string& paramName);
 
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
+
 protected:
 	///Parameter table
 	ParameterTable mParameterTable;

@@ -27,7 +27,7 @@ PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 		ComponentTemplate* componentTmpl)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (not componentTmpl)
 	{
@@ -53,7 +53,7 @@ bool ComponentTemplateManager::removeComponentTemplate(
 		ComponentType componentID)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
 	if (it == mComponentTemplates.end())
@@ -68,7 +68,7 @@ ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
 		ComponentType componentType)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
 	if (it == mComponentTemplates.end())
@@ -82,7 +82,7 @@ Component* ComponentTemplateManager::createComponent(
 		ComponentType componentType)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(
 			componentType);
@@ -100,7 +100,7 @@ Component* ComponentTemplateManager::createComponent(
 void ComponentTemplateManager::resetComponentTemplatesParams()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ComponentTemplateTable::iterator iter;
 	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();
@@ -108,6 +108,11 @@ void ComponentTemplateManager::resetComponentTemplatesParams()
 	{
 		iter->second->setParametersDefaults();
 	}
+}
+
+ReMutex& ComponentTemplateManager::getMutex()
+{
+	return mMutex;
 }
 
 IdType ComponentTemplateManager::getId()

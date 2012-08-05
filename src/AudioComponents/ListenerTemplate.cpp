@@ -59,7 +59,7 @@ const ComponentFamilyType ListenerTemplate::familyType() const
 Component* ListenerTemplate::makeComponent(const ComponentId& compId)
 {
 	Listener* newListener = new Listener(this);
-	newListener->componentId() = compId;
+	newListener->setComponentId(compId);
 	if (not newListener->initialize())
 	{
 		return NULL;

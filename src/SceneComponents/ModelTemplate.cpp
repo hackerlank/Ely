@@ -55,7 +55,7 @@ const ComponentFamilyType ModelTemplate::familyType() const
 Component* ModelTemplate::makeComponent(const ComponentId& compId)
 {
 	Model* newModel = new Model(this);
-	newModel->componentId() = compId;
+	newModel->setComponentId(compId);
 	if (not newModel->initialize())
 	{
 		return NULL;

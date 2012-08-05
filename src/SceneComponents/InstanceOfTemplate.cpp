@@ -46,7 +46,7 @@ const ComponentFamilyType InstanceOfTemplate::familyType() const
 Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 {
 	InstanceOf* newInstanceOf = new InstanceOf(this);
-	newInstanceOf->componentId() = compId;
+	newInstanceOf->setComponentId(compId);
 	if (not newInstanceOf->initialize())
 	{
 		return NULL;

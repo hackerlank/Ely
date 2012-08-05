@@ -59,7 +59,7 @@ const ComponentFamilyType Sound3dTemplate::familyType() const
 Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
 {
 	Sound3d* newSound3d = new Sound3d(this);
-	newSound3d->componentId() = compId;
+	newSound3d->setComponentId(compId);
 	if (not newSound3d->initialize())
 	{
 		return NULL;

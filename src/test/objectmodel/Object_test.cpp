@@ -39,7 +39,7 @@ BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 /// Test cases
 BOOST_AUTO_TEST_CASE(ObjectConstructorTEST)
 {
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
 	BOOST_CHECK(mObject->numComponents() == 0);
@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(ObjectConstructorTEST)
 
 BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 {
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	mModelTmpl = new ModelTemplate(mPanda,mWin);
 	mModelTmpl->parameter("model_file") = "panda";

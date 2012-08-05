@@ -31,7 +31,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		ObjectTemplate* objectTmpl)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (not objectTmpl)
 	{
@@ -57,7 +57,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
@@ -71,7 +71,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 ObjectTemplate* ObjectTemplateManager::getObjectTemplate(ObjectType objectType)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
@@ -85,7 +85,7 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	//retrieve the ObjectTemplate
 	ObjectTemplateTable::iterator it1 = mObjectTemplates.find(objectType);
@@ -133,6 +133,11 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 ObjectTemplateManager::ObjectTable& ObjectTemplateManager::createdObjects()
 {
 	return mCreatedObjects;
+}
+
+ReMutex& ObjectTemplateManager::getMutex()
+{
+	return mMutex;
 }
 
 IdType ObjectTemplateManager::getId()

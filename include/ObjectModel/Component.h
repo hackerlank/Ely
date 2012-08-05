@@ -31,6 +31,7 @@
 #include <genericAsyncTask.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
+#include "Utilities/Tools.h"
 
 /**
  * \brief Component identifier type.
@@ -110,17 +111,28 @@ public:
 	 * object, this component belongs to, has been added to the scene
 	 * and set up. Optional.
 	 */
+
 	virtual void onAddToSceneSetup();
 	/**
-	 * \brief Gets a reference to the owner object.
+	 * \brief Gets/sets the owner object.
 	 * \return The owner object.
 	 */
-	Object*& ownerObject();
+	///@{
+	void setOwnerObject(Object* ownerObject);
+	Object* getOwnerObject() const;
+	///@}
+
 	/**
-	 * \brief Gets a reference to the component unique identifier.
+	 * \brief Sets the component unique identifier.
 	 * \return The component unique identifier.
 	 */
-	ComponentId& componentId();
+	void setComponentId(const ComponentId& componentId);
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
 
 protected:
 	///Unique identifier for this component.

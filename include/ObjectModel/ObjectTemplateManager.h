@@ -97,6 +97,12 @@ public:
 	 */
 	ObjectTable& createdObjects();
 
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
+
 private:
 	///Table of object templates indexed by their name.
 	ObjectTemplateTable mObjectTemplates;

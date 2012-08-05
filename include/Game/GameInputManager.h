@@ -43,7 +43,13 @@ class GameInputManager: public Singleton<GameInputManager>
 {
 public:
 
-	GameInputManager();
+	/**
+	 * \Brief Constructor.
+	 * @param otherThread If ELY_THREAD is defined this indicates if
+	 * this manager should run in another thread different from the
+	 * main thread.
+	 */
+	GameInputManager(bool otherThread = false);
 	virtual ~GameInputManager();
 
 	/**
@@ -65,6 +71,12 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
 
 private:
 	///@{

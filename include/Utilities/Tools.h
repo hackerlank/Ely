@@ -38,6 +38,12 @@
 #include <genericAsyncTask.h>
 #include <pmutex.h>
 
+///If ELY_THREAD is defined mutexes are used as protection mechanism.
+#ifdef ELY_THREAD
+#	define HOLDMUTEX(mutex) ReMutexHolder guard(mutex);
+#else
+#	define HOLDMUTEX(mutex)
+#endif
 /**
  * \brief Implements a mutex lock guard (RAII idiom).
  *

@@ -30,6 +30,9 @@ ComponentTemplate::ComponentTemplate()
 
 void ComponentTemplate::setParameters(ParameterTable& parameterTable)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	ParameterTableIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters
@@ -56,6 +59,9 @@ void ComponentTemplate::setParameters(ParameterTable& parameterTable)
 
 std::string ComponentTemplate::parameter(const std::string& name)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	std::string strPtr;
 	ParameterTable::iterator iter;
 	iter = mParameterTable.find(name);
@@ -70,6 +76,9 @@ std::string ComponentTemplate::parameter(const std::string& name)
 
 std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	std::list<std::string> strList;
 	ParameterTableIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
@@ -83,6 +92,11 @@ std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
 	}
 	//
 	return strList;
+}
+
+ReMutex& ComponentTemplate::getMutex()
+{
+	return mMutex;
 }
 
 //TypedObject semantics: hardcoded

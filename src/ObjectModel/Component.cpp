@@ -23,9 +23,9 @@
 
 #include "ObjectModel/Component.h"
 
-Component::Component()
+Component::Component() :
+		mOwnerObject(NULL)
 {
-	mOwnerObject = NULL;
 }
 
 void Component::update(void* data)
@@ -37,8 +37,19 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-Object*& Component::ownerObject()
+void Component::setOwnerObject(Object* ownerObject)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mOwnerObject = ownerObject;
+}
+
+Object* Component::getOwnerObject() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mOwnerObject;
 }
 
@@ -50,9 +61,17 @@ void Component::onAddToSceneSetup()
 {
 }
 
-ComponentId& Component::componentId()
+void Component::setComponentId(const ComponentId& componentId)
 {
-	return mComponentId;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mComponentId = componentId;
+}
+
+ReMutex& Component::getMutex()
+{
+	return mMutex;
 }
 
 //TypedObject semantics: hardcoded

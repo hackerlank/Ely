@@ -43,7 +43,7 @@ const ObjectId& Object::objectId() const
 void Object::clearComponents()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	mComponents.clear();
 }
@@ -51,7 +51,7 @@ void Object::clearComponents()
 Component* Object::getComponent(const ComponentFamilyType& familyID)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ComponentTable::iterator it = mComponents.find(familyID);
 	if (it == mComponents.end())
@@ -64,7 +64,7 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 PT(Component) Object::addComponent(Component* newComponent)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (not newComponent)
 	{
@@ -81,7 +81,7 @@ PT(Component) Object::addComponent(Component* newComponent)
 		mComponents.erase(it);
 	}
 	//set the component owner
-	newComponent->ownerObject() = this;
+	newComponent->setOwnerObject(this);
 	//insert the new component into the table
 	mComponents[familyId] = PT(Component)(newComponent);
 	//on addition to object component setup
@@ -92,15 +92,15 @@ PT(Component) Object::addComponent(Component* newComponent)
 unsigned int Object::numComponents()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return static_cast<unsigned int>(mComponents.size());
 }
 
-NodePath Object::getNodePath()
+NodePath Object::getNodePath() const
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -108,7 +108,7 @@ NodePath Object::getNodePath()
 void Object::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	mNodePath = nodePath;
 }
@@ -116,7 +116,7 @@ void Object::setNodePath(const NodePath& nodePath)
 Object::operator NodePath()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -124,7 +124,7 @@ Object::operator NodePath()
 void Object::sceneSetup()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
@@ -170,14 +170,29 @@ ObjectTemplate* const Object::objectTmpl() const
 	return mTmpl;
 }
 
-bool& Object::isStatic()
+bool Object::isStatic()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return mIsStatic;
 }
 
+
+void Object::setStatic(bool value)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mIsStatic = value;
+}
+
+ReMutex& Object::getMutex()
+{
+	return mMutex;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle Object::_type_handle;
+
 

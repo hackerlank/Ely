@@ -46,7 +46,13 @@ class GameAudioManager: public Singleton<GameAudioManager>
 {
 public:
 
-	GameAudioManager(bool multiThread = false);
+	/**
+	 * \Brief Constructor.
+	 * @param otherThread If ELY_THREAD is defined this indicates if
+	 * this manager should run in another thread different from the
+	 * main thread.
+	 */
+	GameAudioManager(bool otherThread = false);
 	virtual ~GameAudioManager();
 	/**
 	 * \brief Adds an audio component for updating.
@@ -73,6 +79,12 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
 
 private:
 	/// Audio manager.

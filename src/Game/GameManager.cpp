@@ -233,7 +233,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(objectType),
-				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
+				ObjectTemplateManager::GetSingletonPtr());
 		//cycle through the ComponentTmpl(s)' definitions ...
 		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
 				componentTmpl != NULL;

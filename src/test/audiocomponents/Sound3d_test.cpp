@@ -65,7 +65,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	BOOST_CHECK(mSound3d->sounds().size() == 1);
 	//add mSound3d to an object so will be automatically destroyed
 	Object testObj("testObj",mObjectTmpl);
-	mSound3d->ownerObject() = &testObj;
+	mSound3d->setOwnerObject(&testObj);
 	testObj.addComponent(mSound3d);
 	mSound3d->onAddToObjectSetup();
 }
@@ -84,7 +84,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
 	testObj.setNodePath(testNP);
-	mSound3d->ownerObject() = &testObj;
+	mSound3d->setOwnerObject(&testObj);
 	testObj.addComponent(mSound3d);
 	BOOST_CHECK(testObj.getComponent("Audio")!=NULL);
 	mSound3d->onAddToObjectSetup();

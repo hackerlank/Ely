@@ -59,7 +59,7 @@ const ComponentFamilyType RigidBodyTemplate::familyType() const
 Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
 {
 	RigidBody* newRigidBody = new RigidBody(this);
-	newRigidBody->componentId() = compId;
+	newRigidBody->setComponentId(compId);
 	if (not newRigidBody->initialize())
 	{
 		return NULL;

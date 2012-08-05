@@ -49,7 +49,7 @@
 class GamePhysicsManager: public Singleton<GamePhysicsManager>
 {
 public:
-	GamePhysicsManager();
+	GamePhysicsManager(bool otherThread = false);
 	virtual ~GamePhysicsManager();
 
 	/**
@@ -78,12 +78,18 @@ public:
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
+
 #ifdef DEBUG
 	/**
 	 * \brief Gets a reference to the Bullet Debug node.
 	 * @return The Bullet Debug node.
 	 */
-	BulletDebugNode* bulletDebugNodePath();
+	BulletDebugNode* bulletDebugNodePath() const;
 
 	/**
 	 * \brief Initializes debugging.

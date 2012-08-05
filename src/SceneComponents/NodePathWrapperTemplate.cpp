@@ -56,7 +56,7 @@ const ComponentFamilyType NodePathWrapperTemplate::familyType() const
 Component* NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
 {
 	NodePathWrapper* newNodePathWrapper = new NodePathWrapper(this);
-	newNodePathWrapper->componentId() = compId;
+	newNodePathWrapper->setComponentId(compId);
 	if (not newNodePathWrapper->initialize())
 	{
 		return NULL;

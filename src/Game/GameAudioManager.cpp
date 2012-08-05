@@ -23,7 +23,7 @@
 
 #include "Game/GameAudioManager.h"
 
-GameAudioManager::GameAudioManager(bool multiThread)
+GameAudioManager::GameAudioManager(bool otherThread)
 {
 	mAudioComponents.clear();
 	mUpdateData.clear();
@@ -36,7 +36,8 @@ GameAudioManager::GameAudioManager(bool multiThread)
 			&TaskInterface<GameAudioManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
-	if (not multiThread)
+#ifdef ELY_THREAD
+	if (not otherThread)
 	{
 		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 	}
@@ -44,16 +45,19 @@ GameAudioManager::GameAudioManager(bool multiThread)
 	{
 		AsyncTaskChain *taskChain =
 				AsyncTaskManager::get_global_ptr()->make_task_chain(
-						"GameAudioManager");
+						"GameAudioManagerChain");
 		//Changes the number of threads for taskChain.
 		taskChain->set_num_threads(1);
 		//Sets the frame_sync flag.
 		taskChain->set_frame_sync(true);
 		//Specifies the AsyncTaskChain on which mUpdateTask will be running.
-		mUpdateTask->set_task_chain("GameAudioManager");
+		mUpdateTask->set_task_chain("GameAudioManagerChain");
 		//Adds mUpdateTask to the active queue.
 		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 	}
+#else
+	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+#endif
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
@@ -69,7 +73,7 @@ GameAudioManager::~GameAudioManager()
 void GameAudioManager::addToAudioUpdate(Component* audioComp)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
@@ -82,7 +86,7 @@ void GameAudioManager::addToAudioUpdate(Component* audioComp)
 void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
@@ -100,7 +104,7 @@ AudioManager* GameAudioManager::audioMgr() const
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	float dt;
 //	dt = ClockObject::get_global_clock()->get_dt();
@@ -126,3 +130,7 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 
 }
 
+ReMutex& GameAudioManager::getMutex()
+{
+	return mMutex;
+}

@@ -24,20 +24,15 @@
 #include "ObjectModel/ObjectTemplate.h"
 
 ObjectTemplate::ObjectTemplate(const ObjectType& name,
-		ObjectTemplateManager* objectTmplMgr, PandaFramework* pandaFramework,
-		WindowFramework* windowFramework) :
-		mName(name)
+		ObjectTemplateManager* objectTmplMgr) :
+		mName(name), mObjectTmplMgr(objectTmplMgr)
 {
-	if (not objectTmplMgr or not pandaFramework or not windowFramework)
+	if (not objectTmplMgr)
 	{
 		throw GameException(
-				"ObjectTemplate::ObjectTemplate: invalid ObjectTemplateManager or "
-						"PandaFramework or WindowFramework");
+				"ObjectTemplate::ObjectTemplate: invalid ObjectTemplateManager");
 
 	}
-	mObjectTmplMgr = objectTmplMgr;
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	//reset parameters
 	setParametersDefaults();
 }
@@ -55,7 +50,7 @@ const ObjectType& ObjectTemplate::name() const
 void ObjectTemplate::clearComponentTemplates()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	mComponentTemplates.clear();
 }
@@ -63,7 +58,7 @@ void ObjectTemplate::clearComponentTemplates()
 ObjectTemplate::ComponentTemplateList& ObjectTemplate::getComponentTemplates()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	return mComponentTemplates;
 }
@@ -71,7 +66,7 @@ ObjectTemplate::ComponentTemplateList& ObjectTemplate::getComponentTemplates()
 void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	if (not componentTmpl)
 	{
@@ -85,7 +80,7 @@ ComponentTemplate* ObjectTemplate::getComponentTemplate(
 		const ComponentType& componentType)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ComponentTemplateList::iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
@@ -97,25 +92,15 @@ ComponentTemplate* ObjectTemplate::getComponentTemplate(
 	return *it;
 }
 
-ObjectTemplateManager* ObjectTemplate::objectTmplMgr() const
+ObjectTemplateManager* const ObjectTemplate::objectTmplMgr() const
 {
 	return mObjectTmplMgr;
-}
-
-PandaFramework* ObjectTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* ObjectTemplate::windowFramework() const
-{
-	return mWindowFramework;
 }
 
 void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	ParameterTableIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
@@ -144,7 +129,7 @@ void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 void ObjectTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
@@ -161,7 +146,7 @@ void ObjectTemplate::setParametersDefaults()
 std::string ObjectTemplate::parameter(const std::string& paramName)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	std::string strPtr;
 	ParameterTable::iterator iter;
@@ -179,7 +164,7 @@ std::list<std::string> ObjectTemplate::parameterList(
 		const std::string& paramName)
 {
 	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
+	HOLDMUTEX(mMutex)
 
 	std::list<std::string> strList;
 	ParameterTableIter iter;
@@ -194,6 +179,11 @@ std::list<std::string> ObjectTemplate::parameterList(
 	}
 	//
 	return strList;
+}
+
+ReMutex& ComponentTemplate::getMutex()
+{
+	return mMutex;
 }
 
 //TypedObject semantics: hardcoded

@@ -39,7 +39,7 @@ BOOST_FIXTURE_TEST_SUITE(Input,InputSuiteFixture)
 /// Test cases
 BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 {
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
 	mControlTmpl = new ControlByEventTemplate(mPanda, mWin);
 	mControl =
 	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 	testObj.setNodePath(testNP);
 	testObj.getNodePath().set_pos(VAL,VAL,VAL);
 	testObj.getNodePath().set_hpr(DEG,DEG,DEG);
-	mControl->ownerObject() = &testObj;
+	mControl->setOwnerObject(&testObj);
 	mControl->onAddToObjectSetup();
 	std::vector<Event>::iterator iter;
 	for (iter = mEvents.begin(); iter != mEvents.end(); ++iter)

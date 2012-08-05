@@ -62,8 +62,7 @@ public:
 	 * \brief Constructor.
 	 * @param name The name of this template.
 	 */
-	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr,
-			PandaFramework* pandaFramework, WindowFramework* windowFramework);
+	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr);
 
 	/**
 	 * \brief Destructor.
@@ -106,19 +105,7 @@ public:
 	 * \brief Gets/sets the ObjectTemplateManager.
 	 * @return A reference to the ObjectTemplateManager.
 	 */
-	ObjectTemplateManager* objectTmplMgr() const;
-
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the PandaFramework.
-	 */
-	PandaFramework* pandaFramework() const;
-
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework* windowFramework() const;
+	ObjectTemplateManager* const objectTmplMgr() const;
 
 	/**
 	 * \name Parameters management.
@@ -150,17 +137,19 @@ public:
 	 */
 	std::list<std::string> parameterList(const std::string& paramName);
 
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
+
 private:
 	///Name identifying this object template.
 	ObjectType mName;
 	///List of all component templates.
 	ComponentTemplateList mComponentTemplates;
 	///The ObjectTemplateManager.
-	ObjectTemplateManager* mObjectTmplMgr;
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
+	ObjectTemplateManager* const mObjectTmplMgr;
 	///Parameter table
 	ParameterTable mParameterTable;
 
