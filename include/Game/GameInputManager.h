@@ -43,7 +43,7 @@ class GameInputManager: public Singleton<GameInputManager>
 {
 public:
 
-	GameInputManager(PandaFramework* pandaFramework);
+	GameInputManager();
 	virtual ~GameInputManager();
 
 	/**
@@ -67,9 +67,6 @@ public:
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-
 	///@{
 	///List of input components to be updated.
 	typedef std::list<Component*> InputComponentList;

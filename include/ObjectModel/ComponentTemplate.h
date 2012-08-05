@@ -29,6 +29,8 @@
 #include <string>
 #include <utility>
 #include <typedWritableReferenceCount.h>
+#include <reMutex.h>
+#include <reMutexHolder.h>
 #include "Component.h"
 #include "Utilities/Tools.h"
 
@@ -93,6 +95,9 @@ public:
 protected:
 	///Parameter table
 	ParameterTable mParameterTable;
+
+	///The (reentrant) mutex associated with this template.
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:

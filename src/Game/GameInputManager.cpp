@@ -23,17 +23,11 @@
 
 #include "Game/GameInputManager.h"
 
-GameInputManager::GameInputManager(PandaFramework* pandaFramework)
+GameInputManager::GameInputManager()
 {
-	if (not pandaFramework)
-	{
-		throw GameException(
-				"GameInputManager::GameInputManager: invalid PandaFramework");
-	}
 	mInputComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	mPandaFramework = pandaFramework;
 	//create the task for updating the input components
 	mUpdateData = new TaskInterface<GameInputManager>::TaskData(this,
 			&GameInputManager::update);
@@ -41,7 +35,7 @@ GameInputManager::GameInputManager(PandaFramework* pandaFramework)
 			&TaskInterface<GameInputManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
-	mPandaFramework->get_task_mgr().add(mUpdateTask);
+	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
@@ -49,7 +43,7 @@ GameInputManager::~GameInputManager()
 {
 	if (mUpdateTask)
 	{
-		mPandaFramework->get_task_mgr().remove(mUpdateTask);
+		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
 	}
 	mInputComponents.clear();
 }

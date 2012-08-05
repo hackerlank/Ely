@@ -60,11 +60,11 @@ BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
-	testObj.nodePath() = testNP;
+	testObj.setNodePath(testNP);
 	mRigid->ownerObject() = &testObj;
 	testObj.addComponent(mRigid);
 	mRigid->onAddToSceneSetup();
-	BOOST_CHECK(mRigid->rigidBodyNode() == DCAST(BulletRigidBodyNode, testObj.nodePath().node()));
+	BOOST_CHECK(mRigid->rigidBodyNode() == DCAST(BulletRigidBodyNode, testObj.getNodePath().node()));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Physics suite

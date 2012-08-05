@@ -31,7 +31,8 @@
 #include <nodePath.h>
 #include <typedWritableReferenceCount.h>
 #include <pointerTo.h>
-
+#include <reMutex.h>
+#include <reMutexHolder.h>
 #include "ObjectTemplate.h"
 #include "Component.h"
 #include "Utilities/Tools.h"
@@ -121,13 +122,17 @@ public:
 	 * \brief Gets a reference to the id of this object.
 	 * @return The id of this object.
 	 */
-	ObjectId& objectId();
+	const ObjectId& objectId() const;
 
 	/**
-	 * \brief Gets a reference to the node path of this object.
+	 * \brief Gets/sets a reference to the node path of this object.
 	 * @return The node path of this object.
 	 */
-	NodePath& nodePath();
+	///@{
+	NodePath getNodePath();
+	void setNodePath(const NodePath& nodePath);
+	///@}
+
 	/**
 	 * \brief NodePath conversion function.
 	 */
@@ -137,10 +142,10 @@ public:
 	 * \brief Gets a reference to the object template.
 	 * @return The a reference to the object template.
 	 */
-	ObjectTemplate* objectTmpl();
+	ObjectTemplate* const objectTmpl() const;
 
 	/**
-	 * \brief Gets a reference to the static flag.
+	 * \brief Gets/sets a reference to the static flag.
 	 *
 	 * This flag represents if this object doesn't move in the world.
 	 * Various components can set or get this value to implement
@@ -150,7 +155,7 @@ public:
 
 private:
 	///The template used to construct this component.
-	ObjectTemplate* mTmpl;
+	ObjectTemplate* const mTmpl;
 	///The NodePath associated to this object.
 	NodePath mNodePath;
 	///Unique identifier for this object.
@@ -164,6 +169,9 @@ private:
 	///Various components can set or get this value to implement
 	///some optimization.
 	bool mIsStatic;
+
+	///The (reentrant) mutex associated with this object.
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:

@@ -83,7 +83,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
-	testObj.nodePath() = testNP;
+	testObj.setNodePath(testNP);
 	mSound3d->ownerObject() = &testObj;
 	testObj.addComponent(mSound3d);
 	BOOST_CHECK(testObj.getComponent("Audio")!=NULL);
@@ -95,7 +95,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	for (unsigned int i = 0; i < (sizeof(posExpected)/sizeof(float)); ++i)
 	{
 		//move object nodepath (in posExpected)
-		testObj.nodePath().set_pos(posExpected[i],posExpected[i],posExpected[i]);
+		testObj.getNodePath().set_pos(posExpected[i],posExpected[i],posExpected[i]);
 		//call update (dt = 0.016666667)
 		GameAudioManager::GetSingleton().update(task);
 		//check results

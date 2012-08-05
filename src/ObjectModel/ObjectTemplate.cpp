@@ -47,23 +47,32 @@ ObjectTemplate::~ObjectTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-ObjectType& ObjectTemplate::name()
+const ObjectType& ObjectTemplate::name() const
 {
 	return mName;
 }
 
 void ObjectTemplate::clearComponentTemplates()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	mComponentTemplates.clear();
 }
 
 ObjectTemplate::ComponentTemplateList& ObjectTemplate::getComponentTemplates()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	return mComponentTemplates;
 }
 
 void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	if (not componentTmpl)
 	{
 		throw GameException(
@@ -75,6 +84,9 @@ void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
 ComponentTemplate* ObjectTemplate::getComponentTemplate(
 		const ComponentType& componentType)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	ComponentTemplateList::iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
 			idIsEqualTo(componentType));
@@ -85,23 +97,26 @@ ComponentTemplate* ObjectTemplate::getComponentTemplate(
 	return *it;
 }
 
-ObjectTemplateManager*& ObjectTemplate::objectTmplMgr()
+ObjectTemplateManager* ObjectTemplate::objectTmplMgr() const
 {
 	return mObjectTmplMgr;
 }
 
-PandaFramework*& ObjectTemplate::pandaFramework()
+PandaFramework* ObjectTemplate::pandaFramework() const
 {
 	return mPandaFramework;
 }
 
-WindowFramework*& ObjectTemplate::windowFramework()
+WindowFramework* ObjectTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }
 
 void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	ParameterTableIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters
@@ -128,6 +143,9 @@ void ObjectTemplate::setParameters(ParameterTable& parameterTable)
 
 void ObjectTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
@@ -142,6 +160,9 @@ void ObjectTemplate::setParametersDefaults()
 
 std::string ObjectTemplate::parameter(const std::string& paramName)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	std::string strPtr;
 	ParameterTable::iterator iter;
 	iter = mParameterTable.find(paramName);
@@ -157,6 +178,9 @@ std::string ObjectTemplate::parameter(const std::string& paramName)
 std::list<std::string> ObjectTemplate::parameterList(
 		const std::string& paramName)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	std::list<std::string> strList;
 	ParameterTableIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;

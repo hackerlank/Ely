@@ -182,7 +182,7 @@ float Sound3d::getMaxDistance()
 
 void Sound3d::set3dStaticAttributes()
 {
-	mPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
+	mPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
@@ -201,7 +201,7 @@ void Sound3d::update(void* data)
 	float dt = *(reinterpret_cast<float*>(data));
 
 	//get the new position
-	LPoint3 newPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
+	LPoint3 newPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	//get the velocity (mPosition holds the previous position)
 	LVector3 deltaPos = (newPosition - mPosition);
 	LVector3 velocity = deltaPos / dt;

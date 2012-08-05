@@ -83,11 +83,11 @@ void Listener::onAddToSceneSetup()
 
 void Listener::set3dStaticAttributes()
 {
-	mPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
-	LVector3 forward = mOwnerObject->nodePath().get_relative_vector(mSceneRoot,
+	NodePath ownerNodePath = mOwnerObject->getNodePath();
+	mPosition = ownerNodePath.get_pos(mSceneRoot);
+	LVector3 forward = ownerNodePath.get_relative_vector(mSceneRoot,
 			LVector3::forward());
-	LVector3 up = mOwnerObject->nodePath().get_relative_vector(mSceneRoot,
-			LVector3::up());
+	LVector3 up = ownerNodePath.get_relative_vector(mSceneRoot, LVector3::up());
 	mTmpl->gameAudioMgr()->audioMgr()->audio_3d_set_listener_attributes(
 			mPosition.get_x(), mPosition.get_y(), mPosition.get_z(), 0.0, 0.0,
 			0.0, forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
@@ -99,11 +99,11 @@ void Listener::update(void* data)
 	float dt = *(reinterpret_cast<float*>(data));
 
 	//get the new position
-	LPoint3 newPosition = mOwnerObject->nodePath().get_pos(mSceneRoot);
-	LVector3 forward = mSceneRoot.get_relative_vector(mOwnerObject->nodePath(),
+	NodePath ownerNodePath = mOwnerObject->getNodePath();
+	LPoint3 newPosition = ownerNodePath.get_pos(mSceneRoot);
+	LVector3 forward = mSceneRoot.get_relative_vector(ownerNodePath,
 			LVector3::forward());
-	LVector3 up = mSceneRoot.get_relative_vector(mOwnerObject->nodePath(),
-			LVector3::up());
+	LVector3 up = mSceneRoot.get_relative_vector(ownerNodePath, LVector3::up());
 	//get the velocity (mPosition holds the previous position)
 	LVector3 deltaPos = (newPosition - mPosition);
 	LVector3 velocity = deltaPos / dt;

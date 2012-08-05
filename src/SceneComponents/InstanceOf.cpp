@@ -72,7 +72,7 @@ void InstanceOf::onAddToObjectSetup()
 {
 	//set the node path of the object to the
 	//node path of this instance of
-	mOwnerObject->nodePath() = mNodePath;
+	mOwnerObject->setNodePath(mNodePath);
 
 	//get that object this component is an instance of;
 	//that object is supposed to be already created,
@@ -86,7 +86,7 @@ void InstanceOf::onAddToObjectSetup()
 	iter = createdObjects.find(instanceOfId);
 	if (iter != createdObjects.end())
 	{
-		iter->second->nodePath().instance_to(mOwnerObject->nodePath());
+		iter->second->getNodePath().instance_to(mOwnerObject->getNodePath());
 	}
 }
 

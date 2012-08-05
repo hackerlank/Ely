@@ -37,12 +37,12 @@ int main(int argc, char **argv)
 	ComponentTemplateManager* componentTmplMgr = new ComponentTemplateManager();
 	// ObjectTemplate manager
 	ObjectTemplateManager* objectTmplMgr = new ObjectTemplateManager();
-	// Game manager
+	// First create a Game manager: mandatory
 	GameManager* gameMgr = new GameManager(argc, argv);
 	// Other managers (depending on GameManager)
-	GameAudioManager* gameAudioMgr = new GameAudioManager(gameMgr);
-	GameInputManager* gameInputMgr = new GameInputManager(gameMgr);
-	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(gameMgr);
+	GameAudioManager* gameAudioMgr = new GameAudioManager();
+	GameInputManager* gameInputMgr = new GameInputManager();
+	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 #ifdef DEBUG
 	if (Thread::is_threading_supported())
 	{

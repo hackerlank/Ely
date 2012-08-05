@@ -253,23 +253,24 @@ void RigidBody::onAddToObjectSetup()
 	mNodePath.set_collide_mask(mCollideMask);
 
 	//reparent the object node path as a child of the rigid body's one
-	mOwnerObject->nodePath().reparent_to(mNodePath);
+	NodePath ownerNodePath = mOwnerObject->getNodePath();
+	ownerNodePath.reparent_to(mNodePath);
 	//correct (or possibly reset to zero) pos and hpr of the object node path
-	mOwnerObject->nodePath().set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
 	if (mOwnerObject->isStatic())
 	{
-		mOwnerObject->nodePath().flatten_light();
+		ownerNodePath.flatten_light();
 	}
 
-	//set the object node path as the rigid body's one
-	mOwnerObject->nodePath() = mNodePath;
+	//set the object node path as this rigid body's one
+	mOwnerObject->setNodePath(mNodePath);
 }
 
 BulletShape* RigidBody::createShape(ShapeType shapeType)
 {
 	//get the bounding dimensions of object node path, that
 	//should represents a model
-	getBoundingDimensions(mOwnerObject->nodePath());
+	getBoundingDimensions(mOwnerObject->getNodePath());
 	// create the actual shape
 	BulletShape* collisionShape = NULL;
 	switch (mShapeType)

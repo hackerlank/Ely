@@ -23,17 +23,11 @@
 
 #include "Game/GameAudioManager.h"
 
-GameAudioManager::GameAudioManager(PandaFramework* pandaFramework)
+GameAudioManager::GameAudioManager(bool multiThread)
 {
-	if (not pandaFramework)
-	{
-		throw GameException(
-				"GameAudioManager::GameAudioManager: invalid PandaFramework");
-	}
 	mAudioComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	mPandaFramework = pandaFramework;
 	mAudioMgr = AudioManager::create_AudioManager();
 	//create the task for updating the active audio components
 	mUpdateData = new TaskInterface<GameAudioManager>::TaskData(this,
@@ -42,7 +36,24 @@ GameAudioManager::GameAudioManager(PandaFramework* pandaFramework)
 			&TaskInterface<GameAudioManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
-	mPandaFramework->get_task_mgr().add(mUpdateTask);
+	if (not multiThread)
+	{
+		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	}
+	else
+	{
+		AsyncTaskChain *taskChain =
+				AsyncTaskManager::get_global_ptr()->make_task_chain(
+						"GameAudioManager");
+		//Changes the number of threads for taskChain.
+		taskChain->set_num_threads(1);
+		//Sets the frame_sync flag.
+		taskChain->set_frame_sync(true);
+		//Specifies the AsyncTaskChain on which mUpdateTask will be running.
+		mUpdateTask->set_task_chain("GameAudioManager");
+		//Adds mUpdateTask to the active queue.
+		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	}
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
@@ -50,7 +61,7 @@ GameAudioManager::~GameAudioManager()
 {
 	if (mUpdateTask)
 	{
-		mPandaFramework->get_task_mgr().remove(mUpdateTask);
+		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
 	}
 	mAudioComponents.clear();
 }
@@ -81,11 +92,8 @@ void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
 	}
 }
 
-AudioManager* GameAudioManager::audioMgr()
+AudioManager* GameAudioManager::audioMgr() const
 {
-	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
-
 	return mAudioMgr.p();
 }
 

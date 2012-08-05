@@ -45,7 +45,7 @@ struct PhysicsSuiteFixture
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
-		physicsMgr = new GamePhysicsManager(mPanda);
+		physicsMgr = new GamePhysicsManager();
 		RigidBodyTemplate::init_type();
 		RigidBody::init_type();
 		ObjectTemplate::init_type();

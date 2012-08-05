@@ -80,7 +80,7 @@ void NodePathWrapper::onAddToObjectSetup()
 {
 	//set the node path of the object to the
 	//node path of this NodePathWrapper
-	mOwnerObject->nodePath() = mNodePath;
+	mOwnerObject->setNodePath(mNodePath);
 }
 
 NodePath& NodePathWrapper::nodePath()

@@ -23,17 +23,11 @@
 
 #include "Game/GamePhysicsManager.h"
 
-GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
+GamePhysicsManager::GamePhysicsManager()
 {
-	if (not pandaFramework)
-	{
-		throw GameException(
-				"GamePhysicsManager::GamePhysicsManager: invalid PandaFramework");
-	}
 	mPhysicsComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	mPandaFramework = pandaFramework;
 	mBulletWorld = new BulletWorld();
 	mBulletWorld->set_gravity(0.0, 0.0, -9.81);
 	//create the task for updating step simulation and physics component
@@ -43,7 +37,7 @@ GamePhysicsManager::GamePhysicsManager(PandaFramework* pandaFramework)
 			&TaskInterface<GamePhysicsManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
-	mPandaFramework->get_task_mgr().add(mUpdateTask);
+	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 #ifdef DEBUG
 	// set up Bullet Debug Renderer (disabled by default)
@@ -55,7 +49,7 @@ GamePhysicsManager::~GamePhysicsManager()
 {
 	if (mUpdateTask)
 	{
-		mPandaFramework->get_task_mgr().remove(mUpdateTask);
+		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
 	}
 	mPhysicsComponents.clear();
 }
@@ -86,11 +80,8 @@ void GamePhysicsManager::removeFromPhysicsUpdate(Component* physicsComp)
 	}
 }
 
-BulletWorld* GamePhysicsManager::bulletWorld()
+BulletWorld* GamePhysicsManager::bulletWorld() const
 {
-	//lock (guard) the mutex
-	ReMutexHolder guard(mMutex);
-
 	return mBulletWorld.p();
 }
 

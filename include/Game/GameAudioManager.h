@@ -29,7 +29,9 @@
 #include <audioManager.h>
 #include <pandaFramework.h>
 #include <clockObject.h>
+#include <asyncTaskManager.h>
 #include <asyncTask.h>
+#include <asyncTaskChain.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
 #include "ObjectModel/Component.h"
@@ -44,7 +46,7 @@ class GameAudioManager: public Singleton<GameAudioManager>
 {
 public:
 
-	GameAudioManager(PandaFramework* pandaFramework);
+	GameAudioManager(bool multiThread = false);
 	virtual ~GameAudioManager();
 	/**
 	 * \brief Adds an audio component for updating.
@@ -61,7 +63,7 @@ public:
 	 * \brief Gets a reference to the audio manager.
 	 * @return The audio manager.
 	 */
-	AudioManager* audioMgr();
+	AudioManager* audioMgr() const;
 
 	/**
 	 * \brief Updates audio components.
@@ -75,8 +77,6 @@ public:
 private:
 	/// Audio manager.
 	PT(AudioManager) mAudioMgr;
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
 
 	///@{
 	///List of audio components to be updated.

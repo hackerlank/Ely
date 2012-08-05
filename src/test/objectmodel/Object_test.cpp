@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(ObjectConstructorTEST)
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
 	BOOST_CHECK(mObject->numComponents() == 0);
-	BOOST_CHECK(mObject->nodePath().is_empty());
+	BOOST_CHECK(mObject->getNodePath().is_empty());
 }
 
 BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)

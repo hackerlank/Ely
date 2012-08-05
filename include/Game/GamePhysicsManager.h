@@ -49,7 +49,7 @@
 class GamePhysicsManager: public Singleton<GamePhysicsManager>
 {
 public:
-	GamePhysicsManager(PandaFramework* pandaFramework);
+	GamePhysicsManager();
 	virtual ~GamePhysicsManager();
 
 	/**
@@ -67,7 +67,7 @@ public:
 	 * \brief Gets a reference to the Bullet world.
 	 * @return The Bullet world.
 	 */
-	BulletWorld* bulletWorld();
+	BulletWorld* bulletWorld() const;
 
 	/**
 	 * \brief Updates step simulation and physics components.
@@ -99,8 +99,6 @@ public:
 private:
 	/// Bullet world.
 	PT(BulletWorld) mBulletWorld;
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
 
 #ifdef DEBUG
 	/// Bullet Debug node path.

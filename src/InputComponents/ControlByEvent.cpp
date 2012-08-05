@@ -339,7 +339,7 @@ void ControlByEvent::update(void* data)
 {
 	float dt = *(reinterpret_cast<float*>(data));
 
-	NodePath ownerNodePath = mOwnerObject->nodePath();
+	NodePath ownerNodePath = mOwnerObject->getNodePath();
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps

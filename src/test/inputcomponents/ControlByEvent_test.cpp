@@ -49,9 +49,9 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
-	testObj.nodePath() = testNP;
-	testObj.nodePath().set_pos(VAL,VAL,VAL);
-	testObj.nodePath().set_hpr(DEG,DEG,DEG);
+	testObj.setNodePath(testNP);
+	testObj.getNodePath().set_pos(VAL,VAL,VAL);
+	testObj.getNodePath().set_hpr(DEG,DEG,DEG);
 	mControl->ownerObject() = &testObj;
 	mControl->onAddToObjectSetup();
 	std::vector<Event>::iterator iter;
@@ -74,14 +74,14 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 		mPanda->get_event_handler().dispatch_event(&mEvents[i+2]);//e.g. w-up
 	}
 	//testObject should stay at (nearly) initial position/orientation
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_h(), DEG, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_p(), DEG, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_r(), DEG, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_x(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_y(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_z(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_h(), DEG, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_p(), DEG, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_r(), DEG, 1.0);
 	//send speed events
-	testObj.nodePath().set_pos(VAL,VAL,VAL);
+	testObj.getNodePath().set_pos(VAL,VAL,VAL);
 	Event speedFast("shift");
 	mPanda->get_event_handler().dispatch_event(&speedFast);
 	mPanda->get_event_handler().dispatch_event(&mEvents[1]);//shift-w
@@ -91,9 +91,9 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 	mControl->update(task);
 	mPanda->get_event_handler().dispatch_event(&mEvents[2]);//w-up
 	//testObject should stay at (nearly) initial position/orientation
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_x(), VAL, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_y(), VAL, 1.0);
-	BOOST_CHECK_CLOSE( testObj.nodePath().get_z(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_x(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_y(), VAL, 1.0);
+	BOOST_CHECK_CLOSE( testObj.getNodePath().get_z(), VAL, 1.0);
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Input suite

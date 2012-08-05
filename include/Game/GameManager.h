@@ -53,7 +53,9 @@
 class FuncInterval;
 
 /**
- * \brief GameManager
+ * \brief GameManager.
+ *
+ * It runs in the main thread.
  */
 class GameManager: public PandaFramework
 {

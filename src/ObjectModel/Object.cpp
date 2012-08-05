@@ -35,18 +35,24 @@ Object::~Object()
 	mNodePath.remove_node();
 }
 
-ObjectId& Object::objectId()
+const ObjectId& Object::objectId() const
 {
 	return mObjectId;
 }
 
 void Object::clearComponents()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	mComponents.clear();
 }
 
 Component* Object::getComponent(const ComponentFamilyType& familyID)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	ComponentTable::iterator it = mComponents.find(familyID);
 	if (it == mComponents.end())
 	{
@@ -57,6 +63,9 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 
 PT(Component) Object::addComponent(Component* newComponent)
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	if (not newComponent)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
@@ -80,23 +89,43 @@ PT(Component) Object::addComponent(Component* newComponent)
 	return previousComp;
 }
 
-NodePath& Object::nodePath()
+unsigned int Object::numComponents()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
+	return static_cast<unsigned int>(mComponents.size());
+}
+
+NodePath Object::getNodePath()
+{
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	return mNodePath;
 }
 
-unsigned int Object::numComponents()
+void Object::setNodePath(const NodePath& nodePath)
 {
-	return static_cast<unsigned int>(mComponents.size());
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
+	mNodePath = nodePath;
 }
 
 Object::operator NodePath()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	return mNodePath;
 }
 
 void Object::sceneSetup()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
 	//Is static (by default false)
@@ -111,7 +140,7 @@ void Object::sceneSetup()
 	if (iterObj != createdObjects.end())
 	{
 		//reparent to parent
-		mNodePath.reparent_to(iterObj->second->nodePath());
+		mNodePath.reparent_to(iterObj->second->getNodePath());
 	}
 	//Position (default: (0,0,0))
 	float posX = atof(mTmpl->parameter(std::string("pos_x")).c_str());
@@ -136,13 +165,16 @@ void Object::sceneSetup()
 	}
 }
 
-ObjectTemplate* Object::objectTmpl()
+ObjectTemplate* const Object::objectTmpl() const
 {
 	return mTmpl;
 }
 
 bool& Object::isStatic()
 {
+	//lock (guard) the mutex
+	ReMutexHolder guard(mMutex);
+
 	return mIsStatic;
 }
 

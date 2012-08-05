@@ -29,6 +29,8 @@
 #include <pointerTo.h>
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
+#include <reMutex.h>
+#include <reMutexHolder.h>
 
 /**
  * \brief Component identifier type.
@@ -125,6 +127,9 @@ protected:
 	ComponentId mComponentId;
 	/// The object this component is a member of.
 	Object* mOwnerObject;
+
+	///The (reentrant) mutex associated with this component.
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:

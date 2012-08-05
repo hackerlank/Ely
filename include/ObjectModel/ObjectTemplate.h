@@ -32,6 +32,8 @@
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <typedWritableReferenceCount.h>
+#include <reMutex.h>
+#include <reMutexHolder.h>
 #include "ComponentTemplate.h"
 #include "Component.h"
 #include "Utilities/Tools.h"
@@ -79,7 +81,7 @@ public:
 	 * this object template.
 	 * @return The name of this object template.
 	 */
-	ObjectType& name();
+	const ObjectType& name() const;
 
 	/**
 	 * \brief Gets the component template list.
@@ -104,19 +106,19 @@ public:
 	 * \brief Gets/sets the ObjectTemplateManager.
 	 * @return A reference to the ObjectTemplateManager.
 	 */
-	ObjectTemplateManager*& objectTmplMgr();
+	ObjectTemplateManager* objectTmplMgr() const;
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
 	 * @return A reference to the PandaFramework.
 	 */
-	PandaFramework*& pandaFramework();
+	PandaFramework* pandaFramework() const;
 
 	/**
 	 * \brief Gets/sets the WindowFramework.
 	 * @return A reference to the WindowFramework.
 	 */
-	WindowFramework*& windowFramework();
+	WindowFramework* windowFramework() const;
 
 	/**
 	 * \name Parameters management.
@@ -161,6 +163,9 @@ private:
 	WindowFramework* mWindowFramework;
 	///Parameter table
 	ParameterTable mParameterTable;
+
+	///The (reentrant) mutex associated with this template.
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:
