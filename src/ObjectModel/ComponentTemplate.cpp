@@ -28,19 +28,20 @@ ComponentTemplate::ComponentTemplate()
 	mParameterTable.clear();
 }
 
-void ComponentTemplate::setParameters(ParameterTable& parameterTable)
+void ComponentTemplate::setParameters(const ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ParameterTableIter iter;
+	ParameterTableConstIter constIter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters
 	//that will overwrite those of mParameterTable with the same name)
 	std::set<std::string> keySet;
-	for (iter = parameterTable.begin(); iter != parameterTable.end(); ++iter)
+	for (constIter = parameterTable.begin(); constIter != parameterTable.end();
+			++constIter)
 	{
-		keySet.insert(iter->first);
+		keySet.insert(constIter->first);
 	}
 	//erase from mParameterTable the parameters to be overwritten
 	std::set<std::string>::iterator keySetIter;

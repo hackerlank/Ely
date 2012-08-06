@@ -24,15 +24,15 @@
 #include "InputComponents/ControlByEventTemplate.h"
 
 ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+		WindowFramework* windowFramework) :
+		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)
+
 {
 	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
 				"ControlByEventTemplate::ControlByEventTemplate: invalid PandaFramework or WindowFramework");
 	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	setParametersDefaults();
 }
 
@@ -53,6 +53,9 @@ const ComponentFamilyType ControlByEventTemplate::familyType() const
 
 Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	ControlByEvent* newControl = new ControlByEvent(this);
 	newControl->setComponentId(compId);
 	if (not newControl->initialize())
@@ -64,42 +67,40 @@ Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
 
 void ControlByEventTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
-	mParameterTable.insert(ParameterNameValue("enabled","true"));
-	mParameterTable.insert(ParameterNameValue("forward","w"));
-	mParameterTable.insert(ParameterNameValue("backward","s"));
-	mParameterTable.insert(ParameterNameValue("roll_left","a"));
-	mParameterTable.insert(ParameterNameValue("roll_right","d"));
-	mParameterTable.insert(ParameterNameValue("strafe_left","q"));
-	mParameterTable.insert(ParameterNameValue("strafe_right","e"));
-	mParameterTable.insert(ParameterNameValue("up","r"));
-	mParameterTable.insert(ParameterNameValue("down","f"));
-	mParameterTable.insert(ParameterNameValue("speed_key","shift"));
-	mParameterTable.insert(ParameterNameValue("speed","5.0"));
-	mParameterTable.insert(ParameterNameValue("fast_factor","5.0"));
-	mParameterTable.insert(ParameterNameValue("mov_sens","2.0"));
-	mParameterTable.insert(ParameterNameValue("roll_sens","15.0"));
-	mParameterTable.insert(ParameterNameValue("sens_x","0.2"));
-	mParameterTable.insert(ParameterNameValue("sens_y","0.2"));
-	mParameterTable.insert(ParameterNameValue("inverted_keyboard","false"));
-	mParameterTable.insert(ParameterNameValue("inverted_mouse","false"));
-	mParameterTable.insert(ParameterNameValue("mouse_enabled_h","false"));
-	mParameterTable.insert(ParameterNameValue("mouse_enabled_p","false"));
+	mParameterTable.insert(ParameterNameValue("enabled", "true"));
+	mParameterTable.insert(ParameterNameValue("forward", "w"));
+	mParameterTable.insert(ParameterNameValue("backward", "s"));
+	mParameterTable.insert(ParameterNameValue("roll_left", "a"));
+	mParameterTable.insert(ParameterNameValue("roll_right", "d"));
+	mParameterTable.insert(ParameterNameValue("strafe_left", "q"));
+	mParameterTable.insert(ParameterNameValue("strafe_right", "e"));
+	mParameterTable.insert(ParameterNameValue("up", "r"));
+	mParameterTable.insert(ParameterNameValue("down", "f"));
+	mParameterTable.insert(ParameterNameValue("speed_key", "shift"));
+	mParameterTable.insert(ParameterNameValue("speed", "5.0"));
+	mParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
+	mParameterTable.insert(ParameterNameValue("mov_sens", "2.0"));
+	mParameterTable.insert(ParameterNameValue("roll_sens", "15.0"));
+	mParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+	mParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+	mParameterTable.insert(ParameterNameValue("inverted_keyboard", "false"));
+	mParameterTable.insert(ParameterNameValue("inverted_mouse", "false"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
 }
 
-PandaFramework*& ControlByEventTemplate::pandaFramework()
+PandaFramework* const ControlByEventTemplate::pandaFramework() const
 {
 	return mPandaFramework;
 }
 
-GameInputManager* ControlByEventTemplate::gameInputMgr()
-{
-	return GameInputManager::GetSingletonPtr();
-}
-
-WindowFramework*& ControlByEventTemplate::windowFramework()
+WindowFramework* const ControlByEventTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }

@@ -236,6 +236,7 @@ template<typename A> struct TaskInterface
  */
 typedef std::multimap<std::string, std::string> ParameterTable;
 typedef std::multimap<std::string, std::string>::iterator ParameterTableIter;
+typedef std::multimap<std::string, std::string>::const_iterator ParameterTableConstIter;
 typedef std::pair<std::string, std::string> ParameterNameValue;
 
 ///TypedObject semantics: hardcoded

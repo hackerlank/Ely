@@ -71,7 +71,7 @@ public:
 	 * set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
-	virtual void setParameters(ParameterTable& parameterTable);
+	virtual void setParameters(const ParameterTable& parameterTable);
 
 	/**
 	 * \brief For the component this template is designed to create,

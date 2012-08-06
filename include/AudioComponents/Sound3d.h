@@ -66,14 +66,16 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief Adds a new sound to this component by loading it from a file.
+	 * \brief Adds dynamically a new sound to this component by
+	 * loading it from a file.
 	 *
+	 * The file is added only if this component already belongs to an object.
 	 * @param fileName The sound file name.
 	 * @return True if successful, false otherwise.
 	 */
 	bool addSound(const std::string& fileName);
 	/**
-	 * \brief Removes a sound from this component.
+	 * \brief Removes dynamically a sound from this component.
 	 *
 	 * @param soundName The sound name.
 	 * @return True if successful, false otherwise.
@@ -123,11 +125,17 @@ public:
 	 */
 	void set3dStaticAttributes();
 	/**
-	 * \brief Gets a reference to the sound table indexed by the sound name,
-	 * which is the sound file path.
+	 * \brief Gets a pointer to an audio sound given its name, or
+	 * the index in the table (lexicographically ordered by name).
+	 * @param name The sound name.
+	 * @param index The sound index.
+	 * @return The pointer to the audio sound (NULL otherwise).
 	 */
+	///@{
 	typedef std::map<std::string, PT(AudioSound)> SoundTable;
-	SoundTable& sounds();
+	AudioSound* getSound(const std::string& name);
+	AudioSound* getSound(int index);
+	///@}
 
 	/**
 	 * \brief Updates position and velocity of sounds of this component.

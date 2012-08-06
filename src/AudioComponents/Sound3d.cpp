@@ -81,7 +81,7 @@ bool Sound3d::initialize()
 						*iter, true);
 		if (not sound.is_null())
 		{
-			sounds()[*iter] = sound;
+			mSounds[*iter] = sound;
 		}
 	}
 	//
@@ -123,12 +123,17 @@ bool Sound3d::addSound(const std::string& fileName)
 
 	//make mSounds modifications
 	bool result = false;
+	if (not mOwnerObject)
+	{
+		//no owner object:return false
+		return result;
+	}
 	PT(AudioSound) sound =
 			GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(fileName,
 					true);
 	if (sound)
 	{
-		sounds()[fileName] = sound;
+		mSounds[fileName] = sound;
 		result = true;
 	}
 	// try to add this component to update only if object is dynamic
@@ -151,7 +156,7 @@ bool Sound3d::removeSound(const std::string& soundName)
 
 	//make mSounds modifications
 	bool result = false;
-	size_t removed = sounds().erase(soundName);
+	size_t removed = mSounds.erase(soundName);
 	if (removed == 1)
 	{
 		result = true;
@@ -174,7 +179,7 @@ void Sound3d::setMinDistance(float dist)
 
 	mMinDist = dist;
 	SoundTable::iterator iter;
-	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
 		iter->second->set_3d_min_distance(mMinDist);
 	}
@@ -195,7 +200,7 @@ void Sound3d::setMaxDistance(float dist)
 
 	mMaxDist = dist;
 	SoundTable::iterator iter;
-	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
 		iter->second->set_3d_max_distance(mMaxDist);
 	}
@@ -223,9 +228,38 @@ void Sound3d::set3dStaticAttributes()
 	}
 }
 
-Sound3d::SoundTable& Sound3d::sounds()
+AudioSound* Sound3d::getSound(const std::string& name)
 {
-	return mSounds;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	SoundTable::iterator iter = mSounds.find(name);
+	if (iter == mSounds.end())
+	{
+		return NULL;
+	}
+	return iter->second.p();
+}
+
+AudioSound* Sound3d::getSound(int index)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	SoundTable::iterator iter;
+	unsigned int idx;
+	for (idx = 0, iter = mSounds.begin(); idx < mSounds.size(); ++idx, ++iter)
+	{
+		if (idx == (unsigned int) index)
+		{
+			break;
+		}
+	}
+	if (idx == mSounds.size())
+	{
+		return NULL;
+	}
+	return iter->second.p();
 }
 
 void Sound3d::update(void* data)
@@ -243,7 +277,7 @@ void Sound3d::update(void* data)
 	LVector3 velocity = deltaPos / dt;
 	//update sounds' velocity and position
 	SoundTable::iterator iter;
-	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
 		//note on threading: this should be an atomic operation
 		iter->second->set_3d_attributes(newPosition.get_x(),

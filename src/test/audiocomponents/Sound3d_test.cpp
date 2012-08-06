@@ -46,36 +46,42 @@ BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 BOOST_AUTO_TEST_CASE(Sound3dTEST)
 {
 	BOOST_TEST_MESSAGE("TESTING Sound3dTemplate");
-	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin);
+	mSound3dTmpl = new Sound3dTemplate(mWin);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
 	mSound3dTmpl->setParametersDefaults();
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 0);
-	mSound3dTmpl->parameterList("sound_files").push_back(audioFile);
+	ParameterTable parmTable;
+	std::pair<std::string,std::string> audioFiles("sound_files",audioFile);
+	parmTable.insert(audioFiles);
+	mSound3dTmpl->setParameters(parmTable);
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 1);
 	BOOST_TEST_MESSAGE("TESTING Sound3d");
 	mSound3d =
 	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mSound3d != NULL);
-	BOOST_CHECK(mSound3d->sounds().size() == 1);
+	BOOST_CHECK(mSound3d->getSound(1) == NULL);
 	BOOST_CHECK(mSound3d->componentType() == ComponentId("Sound3d"));
 	BOOST_CHECK(mSound3d->familyType() == ComponentFamilyType("Audio"));
 	mSound3d->removeSound(audioFile);
-	BOOST_CHECK(mSound3d->sounds().size() == 0);
-	mSound3d->addSound(audioFile);
-	BOOST_CHECK(mSound3d->sounds().size() == 1);
+	BOOST_CHECK(mSound3d->getSound(0) == NULL);
 	//add mSound3d to an object so will be automatically destroyed
 	Object testObj("testObj",mObjectTmpl);
 	mSound3d->setOwnerObject(&testObj);
 	testObj.addComponent(mSound3d);
 	mSound3d->onAddToObjectSetup();
+	mSound3d->addSound(audioFile);
+	BOOST_CHECK(mSound3d->getSound(1) == NULL);
 }
 
 BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 {
-	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin);
+	mSound3dTmpl = new Sound3dTemplate(mWin);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
 	mSound3dTmpl->setParametersDefaults();
-	mSound3dTmpl->parameterList("sound_files").push_back(audioFile);
+	ParameterTable parmTable;
+	std::pair<std::string,std::string> audioFiles("sound_files",audioFile);
+	parmTable.insert(audioFiles);
+	mSound3dTmpl->setParameters(parmTable);
 	mSound3d =
 	DCAST(Sound3d, mSound3dTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mSound3d != NULL);
@@ -99,7 +105,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 		//call update (dt = 0.016666667)
 		GameAudioManager::GetSingleton().update(task);
 		//check results
-		mSound3d->sounds()[audioFile]->get_3d_attributes(&posx,&posy,&posz,&velx,&vely,&velz);
+		mSound3d->getSound(audioFile)->get_3d_attributes(&posx,&posy,&posz,&velx,&vely,&velz);
 		BOOST_CHECK_CLOSE( posx, posExpected[i], 1.0);
 		BOOST_CHECK_CLOSE( posy, posExpected[i], 1.0);
 		BOOST_CHECK_CLOSE( posz, posExpected[i], 1.0);

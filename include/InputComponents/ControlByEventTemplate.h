@@ -49,22 +49,16 @@ public:
 	virtual void setParametersDefaults();
 
 	/**
-	 * \brief Gets the singleton GameInputManager.
-	 * @return A reference to the GameInputManager.
-	 */
-	GameInputManager* gameInputMgr();
-
-	/**
 	 * \brief Gets/sets the PandaFramework.
 	 * @return A reference to the PandaFramework.
 	 */
-	PandaFramework*& pandaFramework();
+	PandaFramework* const pandaFramework() const;
 
 	/**
 	 * \brief Gets/sets the WindowFramework.
 	 * @return A reference to the WindowFramework.
 	 */
-	WindowFramework*& windowFramework();
+	WindowFramework* const windowFramework() const;
 
 private:
 	///The PandaFramework.

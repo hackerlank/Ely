@@ -29,6 +29,7 @@
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <nodePath.h>
+#include <transformState.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"

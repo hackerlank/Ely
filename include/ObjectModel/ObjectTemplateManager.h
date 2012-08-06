@@ -92,8 +92,8 @@ public:
 	///@}
 
 	/**
-	 * \brief Gets a created object.
-	 * @return A reference to the ObjectTable.
+	 * \brief Gets a created object give its object id.
+	 * @return A pointer to the created object (NULL otherwise).
 	 */
 	Object* getCreatedObject(const ObjectId& objectId);
 

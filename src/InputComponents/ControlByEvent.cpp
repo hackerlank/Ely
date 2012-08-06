@@ -49,6 +49,9 @@ ControlByEvent::~ControlByEvent()
 
 void ControlByEvent::disable()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (not mIsEnabled)
 	{
 		return;
@@ -61,9 +64,9 @@ void ControlByEvent::disable()
 
 	//Remove from the input manager update
 	//first check if game audio manager exists
-	if (mTmpl->gameInputMgr())
+	if (GameInputManager::GetSingletonPtr())
 	{
-		mTmpl->gameInputMgr()->removeFromInputUpdate(this);
+		GameInputManager::GetSingletonPtr()->removeFromInputUpdate(this);
 	}
 	//Unregister the handlers
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
@@ -98,6 +101,9 @@ const ComponentType ControlByEvent::componentType() const
 
 void ControlByEvent::enable()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mIsEnabled)
 	{
 		return;
@@ -113,9 +119,9 @@ void ControlByEvent::enable()
 
 	//Add to the input manager update
 	//first check if game audio manager exists
-	if (mTmpl->gameInputMgr())
+	if (GameInputManager::GetSingletonPtr())
 	{
-		mTmpl->gameInputMgr()->addToInputUpdate(this);
+		GameInputManager::GetSingletonPtr()->addToInputUpdate(this);
 	}
 
 	//Register the handlers
@@ -238,6 +244,9 @@ void ControlByEvent::enable()
 
 bool ControlByEvent::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	//get settings from template
 	//enabling setting
@@ -299,6 +308,9 @@ bool ControlByEvent::initialize()
 
 void ControlByEvent::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//enable the component
 	if (mEnabled)
 	{
@@ -332,11 +344,17 @@ void ControlByEvent::setSpeedFast(const Event* event, void* data)
 
 bool ControlByEvent::isEnabled()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mIsEnabled;
 }
 
 void ControlByEvent::update(void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	float dt = *(reinterpret_cast<float*>(data));
 
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
@@ -346,6 +364,23 @@ void ControlByEvent::update(void* data)
 #endif
 
 	int signOfKeyboard = (mInvertedKeyboard ? -1 : 1);
+
+#ifdef ELY_THREAD
+	CPT(TransformState) ownerTransform = ownerNodePath.get_transform();
+	LPoint3 ownerPos = ownerTransform->get_pos();
+	LVecBase3 ownerHpr = ownerTransform->get_hpr();
+	float newX = ownerPos.get_X();
+	float newY = ownerPos.get_Y();
+	float newZ = ownerPos.get_Z();
+	float newH = ownerHpr.get_X();
+	float newP = ownerHpr.get_Y();
+
+
+
+
+
+
+
 
 	if (mMouseEnabledH or mMouseEnabledP)
 	{
@@ -421,6 +456,82 @@ void ControlByEvent::update(void* data)
 				ownerNodePath.get_h(ownerNodePath)
 						- mRollSens * mSpeedActual * dt * signOfKeyboard);
 	}
+#else
+	if (mMouseEnabledH or mMouseEnabledP)
+	{
+		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+		MouseData md = win->get_pointer(0);
+		int signOfMouse = (mInvertedMouse ? -1 : 1);
+		float x = md.get_x();
+		float y = md.get_y();
+
+		if (win->move_pointer(0, mCentX, mCentY))
+		{
+			if (mMouseEnabledH)
+			{
+				ownerNodePath.set_h(
+						ownerNodePath.get_h()
+						- (x - mCentX) * mSensX * signOfMouse);
+			}
+			if (mMouseEnabledP)
+			{
+				ownerNodePath.set_p(
+						ownerNodePath.get_p()
+						- (y - mCentY) * mSensY * signOfMouse);
+			}
+		}
+	}
+
+	//handle keys:
+	if (mForward)
+	{
+		ownerNodePath.set_y(ownerNodePath,
+				ownerNodePath.get_y(ownerNodePath)
+				- mMovSens * mSpeedActual * dt * signOfKeyboard);
+	}
+	if (mBackward)
+	{
+		ownerNodePath.set_y(ownerNodePath,
+				ownerNodePath.get_y(ownerNodePath)
+				+ mMovSens * mSpeedActual * dt * signOfKeyboard);
+	}
+	if (mStrafeLeft)
+	{
+		ownerNodePath.set_x(ownerNodePath,
+				ownerNodePath.get_x(ownerNodePath)
+				+ mMovSens * mSpeedActual * dt * signOfKeyboard);
+	}
+	if (mStrafeRight)
+	{
+		ownerNodePath.set_x(ownerNodePath,
+				ownerNodePath.get_x(ownerNodePath)
+				- mMovSens * mSpeedActual * dt * signOfKeyboard);
+	}
+	if (mUp)
+	{
+		ownerNodePath.set_z(ownerNodePath,
+				ownerNodePath.get_z(ownerNodePath)
+				+ mMovSens * mSpeedActual * dt);
+	}
+	if (mDown)
+	{
+		ownerNodePath.set_z(ownerNodePath,
+				ownerNodePath.get_z(ownerNodePath)
+				- mMovSens * mSpeedActual * dt);
+	}
+	if (mRollLeft)
+	{
+		ownerNodePath.set_h(ownerNodePath,
+				ownerNodePath.get_h(ownerNodePath)
+				+ mRollSens * mSpeedActual * dt * signOfKeyboard);
+	}
+	if (mRollRight)
+	{
+		ownerNodePath.set_h(ownerNodePath,
+				ownerNodePath.get_h(ownerNodePath)
+				- mRollSens * mSpeedActual * dt * signOfKeyboard);
+	}
+#endif
 }
 
 //TypedObject semantics: hardcoded

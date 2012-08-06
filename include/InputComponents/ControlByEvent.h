@@ -33,6 +33,7 @@
 #include <mouseData.h>
 #include <graphicsWindow.h>
 #include <windowProperties.h>
+#include <transformState.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -91,17 +92,6 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \name Event handlers.
-	 * \brief The set of handlers associated to the events.
-	 */
-	///@{
-	static void setControlTrue(const Event* event, void* data);
-	static void setControlFalse(const Event* event, void* data);
-	static void setSpeed(const Event* event, void* data);
-	static void setSpeedFast(const Event* event, void* data);
-	///@}
-
-	/**
 	 * \brief Updates position/orientation of the controlled object.
 	 *
 	 * Will be called automatically by an input manager update.
@@ -143,6 +133,17 @@ private:
 	///@}
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
+
+	/**
+	 * \name Event handlers.
+	 * \brief The set of handlers associated to the events.
+	 */
+	///@{
+	static void setControlTrue(const Event* event, void* data);
+	static void setControlFalse(const Event* event, void* data);
+	static void setSpeed(const Event* event, void* data);
+	static void setSpeedFast(const Event* event, void* data);
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
