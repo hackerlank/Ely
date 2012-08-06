@@ -133,15 +133,13 @@ void Object::sceneSetup()
 			(mTmpl->parameter(std::string("is_static")) == std::string("true") ? true :
 					false);
 	//find parent into the created objects
-	ObjectTemplateManager::ObjectTable& createdObjects =
-			mTmpl->objectTmplMgr()->createdObjects();
-	ObjectTemplateManager::ObjectTable::iterator iterObj;
-	iterObj = createdObjects.find(parentId);
-	if (iterObj != createdObjects.end())
+	Object* createdObject = mTmpl->objectTmplMgr()->getCreatedObject(parentId);
+	if (createdObject != NULL)
 	{
 		//reparent to parent
-		mNodePath.reparent_to(iterObj->second->getNodePath());
+		mNodePath.reparent_to(createdObject->getNodePath());
 	}
+
 	//Position (default: (0,0,0))
 	float posX = atof(mTmpl->parameter(std::string("pos_x")).c_str());
 	float posY = atof(mTmpl->parameter(std::string("pos_y")).c_str());
@@ -178,7 +176,6 @@ bool Object::isStatic()
 	return mIsStatic;
 }
 
-
 void Object::setStatic(bool value)
 {
 	//lock (guard) the mutex
@@ -194,5 +191,4 @@ ReMutex& Object::getMutex()
 
 //TypedObject semantics: hardcoded
 TypeHandle Object::_type_handle;
-
 

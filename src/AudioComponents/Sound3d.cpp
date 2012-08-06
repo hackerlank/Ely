@@ -39,9 +39,9 @@ Sound3d::Sound3d(Sound3dTemplate* tmpl) :
 Sound3d::~Sound3d()
 {
 	//check if game audio manager exists
-	if (mTmpl->gameAudioMgr())
+	if (GameAudioManager::GetSingletonPtr())
 	{
-		mTmpl->gameAudioMgr()->removeFromAudioUpdate(this);
+		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 	}
 	//stops every playing sounds
 	SoundTable::iterator iter;
@@ -66,6 +66,9 @@ const ComponentType Sound3d::componentType() const
 
 bool Sound3d::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	//set sound files
 	std::list<std::string>::iterator iter;
@@ -74,7 +77,8 @@ bool Sound3d::initialize()
 	for (iter = soundFileList.begin(); iter != soundFileList.end(); ++iter)
 	{
 		PT(AudioSound) sound =
-				mTmpl->gameAudioMgr()->audioMgr()->get_sound(*iter, true);
+				GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
+						*iter, true);
 		if (not sound.is_null())
 		{
 			sounds()[*iter] = sound;
@@ -86,12 +90,15 @@ bool Sound3d::initialize()
 
 void Sound3d::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	// update sounds' position/velocity only for dynamic objects
 	// and if sound table is not empty
-	if (mTmpl->gameAudioMgr() and (not mOwnerObject->isStatic())
+	if (GameAudioManager::GetSingletonPtr() and (not mOwnerObject->isStatic())
 			and (not mSounds.empty()))
 	{
-		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
+		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
@@ -99,6 +106,9 @@ void Sound3d::onAddToObjectSetup()
 
 void Sound3d::onAddToSceneSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mOwnerObject->isStatic())
 	{
 		//set 3d attribute (in this case static)
@@ -108,10 +118,14 @@ void Sound3d::onAddToSceneSetup()
 
 bool Sound3d::addSound(const std::string& fileName)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//make mSounds modifications
 	bool result = false;
-	PT(AudioSound) sound = mTmpl->gameAudioMgr()->audioMgr()->get_sound(
-			fileName, true);
+	PT(AudioSound) sound =
+			GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(fileName,
+					true);
 	if (sound)
 	{
 		sounds()[fileName] = sound;
@@ -119,12 +133,12 @@ bool Sound3d::addSound(const std::string& fileName)
 	}
 	// try to add this component to update only if object is dynamic
 	// and if sound table is not empty
-	if (mTmpl->gameAudioMgr() and (not mOwnerObject->isStatic())
+	if (GameAudioManager::GetSingletonPtr() and (not mOwnerObject->isStatic())
 			and (not mSounds.empty()))
 	{
 		//addToAudioUpdate will safely add this component
 		//to update only if it wasn't previously added
-		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
+		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
 	//
 	return result;
@@ -132,6 +146,9 @@ bool Sound3d::addSound(const std::string& fileName)
 
 bool Sound3d::removeSound(const std::string& soundName)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//make mSounds modifications
 	bool result = false;
 	size_t removed = sounds().erase(soundName);
@@ -140,11 +157,11 @@ bool Sound3d::removeSound(const std::string& soundName)
 		result = true;
 	}
 	// try to remove this component to update if sound table is empty
-	if (mTmpl->gameAudioMgr() and (mSounds.empty()))
+	if (GameAudioManager::GetSingletonPtr() and (mSounds.empty()))
 	{
 		//removeFromAudioUpdate will safely remove this component
 		//to update only if it was previously added
-		mTmpl->gameAudioMgr()->removeFromAudioUpdate(this);
+		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 	}
 	//
 	return result;
@@ -152,6 +169,9 @@ bool Sound3d::removeSound(const std::string& soundName)
 
 void Sound3d::setMinDistance(float dist)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mMinDist = dist;
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
@@ -162,11 +182,17 @@ void Sound3d::setMinDistance(float dist)
 
 float Sound3d::getMinDistance()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mMinDist;
 }
 
 void Sound3d::setMaxDistance(float dist)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mMaxDist = dist;
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
@@ -177,11 +203,17 @@ void Sound3d::setMaxDistance(float dist)
 
 float Sound3d::getMaxDistance()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mMaxDist;
 }
 
 void Sound3d::set3dStaticAttributes()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
@@ -198,9 +230,13 @@ Sound3d::SoundTable& Sound3d::sounds()
 
 void Sound3d::update(void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	float dt = *(reinterpret_cast<float*>(data));
 
 	//get the new position
+	//note on threading: this should be an atomic operation
 	LPoint3 newPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	//get the velocity (mPosition holds the previous position)
 	LVector3 deltaPos = (newPosition - mPosition);
@@ -209,6 +245,7 @@ void Sound3d::update(void* data)
 	SoundTable::iterator iter;
 	for (iter = sounds().begin(); iter != sounds().end(); ++iter)
 	{
+		//note on threading: this should be an atomic operation
 		iter->second->set_3d_attributes(newPosition.get_x(),
 				newPosition.get_y(), newPosition.get_z(), velocity.get_x(),
 				velocity.get_y(), velocity.get_z());

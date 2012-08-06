@@ -39,9 +39,9 @@ Listener::Listener(ListenerTemplate* tmpl) :
 Listener::~Listener()
 {
 	// check if game audio manager exists
-	if (mTmpl->gameAudioMgr())
+	if (GameAudioManager::GetSingletonPtr())
 	{
-		mTmpl->gameAudioMgr()->removeFromAudioUpdate(this);
+		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 	}
 }
 
@@ -57,16 +57,22 @@ const ComponentType Listener::componentType() const
 
 bool Listener::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	return result;
 }
 
 void Listener::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	// update listener position/velocity only for dynamic objects
-	if (mTmpl->gameAudioMgr() and (not mOwnerObject->isStatic()))
+	if (GameAudioManager::GetSingletonPtr() and (not mOwnerObject->isStatic()))
 	{
-		mTmpl->gameAudioMgr()->addToAudioUpdate(this);
+		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
@@ -74,7 +80,10 @@ void Listener::onAddToObjectSetup()
 
 void Listener::onAddToSceneSetup()
 {
-	if (mTmpl->gameAudioMgr() and mOwnerObject->isStatic())
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (GameAudioManager::GetSingletonPtr() and mOwnerObject->isStatic())
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
@@ -83,12 +92,15 @@ void Listener::onAddToSceneSetup()
 
 void Listener::set3dStaticAttributes()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	mPosition = ownerNodePath.get_pos(mSceneRoot);
 	LVector3 forward = ownerNodePath.get_relative_vector(mSceneRoot,
 			LVector3::forward());
 	LVector3 up = ownerNodePath.get_relative_vector(mSceneRoot, LVector3::up());
-	mTmpl->gameAudioMgr()->audioMgr()->audio_3d_set_listener_attributes(
+	GameAudioManager::GetSingletonPtr()->audioMgr()->audio_3d_set_listener_attributes(
 			mPosition.get_x(), mPosition.get_y(), mPosition.get_z(), 0.0, 0.0,
 			0.0, forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
 			up.get_y(), up.get_z());
@@ -96,19 +108,36 @@ void Listener::set3dStaticAttributes()
 
 void Listener::update(void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	float dt = *(reinterpret_cast<float*>(data));
 
-	//get the new position
+	LPoint3 newPosition;
+	LVector3 forward, up, deltaPos, velocity;
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
-	LPoint3 newPosition = ownerNodePath.get_pos(mSceneRoot);
-	LVector3 forward = mSceneRoot.get_relative_vector(ownerNodePath,
+
+	//get the new position
+#ifdef ELY_THREAD
+	//note on threading: this should be an atomic operation
+	CPT(TransformState) ownerTransform = ownerNodePath.get_transform(
+			mSceneRoot);
+	newPosition = ownerTransform->get_pos();
+	forward = LVector3::forward() * ownerTransform->get_mat();
+	up = LVector3::up() * ownerTransform->get_mat();
+#else
+	newPosition = ownerNodePath.get_pos(mSceneRoot);
+	forward = mSceneRoot.get_relative_vector(ownerNodePath,
 			LVector3::forward());
-	LVector3 up = mSceneRoot.get_relative_vector(ownerNodePath, LVector3::up());
+	up = mSceneRoot.get_relative_vector(ownerNodePath, LVector3::up());
+#endif
+
 	//get the velocity (mPosition holds the previous position)
-	LVector3 deltaPos = (newPosition - mPosition);
-	LVector3 velocity = deltaPos / dt;
+	deltaPos = (newPosition - mPosition);
+	velocity = deltaPos / dt;
 	//update listener velocity and position
-	mTmpl->gameAudioMgr()->audioMgr()->audio_3d_set_listener_attributes(
+	//note on threading: this should be an atomic operation
+	GameAudioManager::GetSingletonPtr()->audioMgr()->audio_3d_set_listener_attributes(
 			newPosition.get_x(), newPosition.get_y(), newPosition.get_z(),
 			velocity.get_x(), velocity.get_y(), velocity.get_z(),
 			forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),

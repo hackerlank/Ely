@@ -23,16 +23,14 @@
 
 #include "AudioComponents/ListenerTemplate.h"
 
-ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+ListenerTemplate::ListenerTemplate(WindowFramework* windowFramework) :
+		mWindowFramework(windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
+	if (not windowFramework)
 	{
 		throw GameException(
-				"ListenerTemplate::ListenerTemplate: invalid PandaFramework or WindowFramework");
+				"ListenerTemplate::ListenerTemplate: invalid WindowFramework");
 	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	if (not GameAudioManager::GetSingletonPtr())
 	{
 		throw GameException(
@@ -58,6 +56,9 @@ const ComponentFamilyType ListenerTemplate::familyType() const
 
 Component* ListenerTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	Listener* newListener = new Listener(this);
 	newListener->setComponentId(compId);
 	if (not newListener->initialize())
@@ -69,23 +70,16 @@ Component* ListenerTemplate::makeComponent(const ComponentId& compId)
 
 void ListenerTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	//no mandatory parameters
 }
 
-GameAudioManager* ListenerTemplate::gameAudioMgr()
-{
-	return GameAudioManager::GetSingletonPtr();
-}
-
-PandaFramework*& ListenerTemplate::pandaFramework()
-{
-	return mPandaFramework;
-}
-
-WindowFramework*& ListenerTemplate::windowFramework()
+WindowFramework* const ListenerTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }

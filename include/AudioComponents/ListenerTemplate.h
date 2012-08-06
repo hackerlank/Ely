@@ -35,8 +35,7 @@
 class ListenerTemplate: public ComponentTemplate
 {
 public:
-	ListenerTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
+	ListenerTemplate(WindowFramework* windowFramework);
 	virtual ~ListenerTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -47,28 +46,14 @@ public:
 	virtual void setParametersDefaults();
 
 	/**
-	 * \brief Gets the singleton GameAudioManager.
-	 * @return A reference to the GameAudioManager.
+	 * \brief Gets the WindowFramework.
+	 * @return A pointer to the WindowFramework.
 	 */
-	GameAudioManager* gameAudioMgr();
-
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the GameManager.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework*& windowFramework();
+	WindowFramework* const windowFramework() const;
 
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
 	///The WindowFramework.
-	WindowFramework* mWindowFramework;
+	WindowFramework* const mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

@@ -23,16 +23,14 @@
 
 #include "AudioComponents/Sound3dTemplate.h"
 
-Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+Sound3dTemplate::Sound3dTemplate(WindowFramework* windowFramework) :
+		mWindowFramework(windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
+	if (not windowFramework)
 	{
 		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework");
+				"Sound3dTemplate::Sound3dTemplate: invalid WindowFramework");
 	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	if (not GameAudioManager::GetSingletonPtr())
 	{
 		throw GameException(
@@ -58,6 +56,9 @@ const ComponentFamilyType Sound3dTemplate::familyType() const
 
 Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	Sound3d* newSound3d = new Sound3d(this);
 	newSound3d->setComponentId(compId);
 	if (not newSound3d->initialize())
@@ -69,23 +70,16 @@ Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
 
 void Sound3dTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	//no mandatory parameters
 }
 
-GameAudioManager* Sound3dTemplate::gameAudioMgr()
-{
-	return GameAudioManager::GetSingletonPtr();
-}
-
-PandaFramework*& Sound3dTemplate::pandaFramework()
-{
-	return mPandaFramework;
-}
-
-WindowFramework*& Sound3dTemplate::windowFramework()
+WindowFramework* const Sound3dTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }

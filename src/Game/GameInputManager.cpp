@@ -23,7 +23,7 @@
 
 #include "Game/GameInputManager.h"
 
-GameInputManager::GameInputManager(bool otherThread = false)
+GameInputManager::GameInputManager(bool otherThread)
 {
 	mInputComponents.clear();
 	mUpdateData.clear();

@@ -23,7 +23,7 @@
 
 #include "Game/GamePhysicsManager.h"
 
-GamePhysicsManager::GamePhysicsManager(bool otherThread = false)
+GamePhysicsManager::GamePhysicsManager(bool otherThread)
 {
 	mPhysicsComponents.clear();
 	mUpdateData.clear();

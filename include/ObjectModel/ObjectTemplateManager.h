@@ -92,10 +92,10 @@ public:
 	///@}
 
 	/**
-	 * \brief Gets/sets the created objects table.
+	 * \brief Gets a created object.
 	 * @return A reference to the ObjectTable.
 	 */
-	ObjectTable& createdObjects();
+	Object* getCreatedObject(const ObjectId& objectId);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.

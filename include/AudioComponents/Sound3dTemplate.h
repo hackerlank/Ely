@@ -37,8 +37,7 @@
 class Sound3dTemplate: public ComponentTemplate
 {
 public:
-	Sound3dTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
+	Sound3dTemplate(WindowFramework* windowFramework);
 	virtual ~Sound3dTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -49,28 +48,14 @@ public:
 	virtual void setParametersDefaults();
 
 	/**
-	 * \brief Gets the singleton GameAudioManager.
-	 * @return A reference to the GameAudioManager.
-	 */
-	GameAudioManager* gameAudioMgr();
-
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the GameManager.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
 	 * \brief Gets/sets the WindowFramework.
 	 * @return A reference to the WindowFramework.
 	 */
-	WindowFramework*& windowFramework();
+	WindowFramework* const windowFramework() const;
 
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
 	///The WindowFramework.
-	WindowFramework* mWindowFramework;
+	WindowFramework* const mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

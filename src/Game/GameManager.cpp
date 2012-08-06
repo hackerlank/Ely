@@ -90,7 +90,7 @@ void GameManager::manageObjects()
 {
 	//Actor1
 	PT(Object) actor1 =
-			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
+			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
 	//play animation
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Scene")));
@@ -103,7 +103,7 @@ void GameManager::manageObjects()
 
 	//InstancedActor1
 	PT(Object) plane1 =
-			ObjectTemplateManager::GetSingleton().createdObjects()["Plane1"];
+			ObjectTemplateManager::GetSingleton().getCreatedObject("Plane1");
 	Model* plane1Model = DCAST(Model, plane1->getComponent(
 					ComponentFamilyType("Scene")));
 	TextureStage* planeTS0 = new TextureStage("planeTS0");
@@ -157,10 +157,10 @@ void GameManager::setupCompTmplMgr()
 			new ControlByEventTemplate(this, mWindow));
 	//Sound3d template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new Sound3dTemplate(this, mWindow));
+			new Sound3dTemplate(mWindow));
 	//Listener template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ListenerTemplate(this, mWindow));
+			new ListenerTemplate(mWindow));
 	//RigidBody template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new RigidBodyTemplate(this, mWindow));
@@ -468,7 +468,7 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
 	PT(Object) actor1 =
-			ObjectTemplateManager::GetSingleton().createdObjects()["Actor1"];
+			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
 	ControlByEvent* actor1Control = DCAST(ControlByEvent, actor1->getComponent(
 					ComponentFamilyType("Input")));
 	bool isEnabled = actor1Control->isEnabled();
@@ -522,7 +522,7 @@ void GameManager::toggleCameraControl(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
 	PT(Object) camera =
-			ObjectTemplateManager::GetSingleton().createdObjects()["camera"];
+			ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
 	ControlByEvent* cameraControl = DCAST(ControlByEvent, camera->getComponent(
 					ComponentFamilyType("Input")));
 	bool isEnabled = cameraControl->isEnabled();

@@ -181,7 +181,7 @@ std::list<std::string> ObjectTemplate::parameterList(
 	return strList;
 }
 
-ReMutex& ComponentTemplate::getMutex()
+ReMutex& ObjectTemplate::getMutex()
 {
 	return mMutex;
 }

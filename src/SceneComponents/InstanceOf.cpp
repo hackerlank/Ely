@@ -80,13 +80,12 @@ void InstanceOf::onAddToObjectSetup()
 	//if not this component is instance of nothing.
 	ObjectId instanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
-	ObjectTemplateManager::ObjectTable& createdObjects =
-			mOwnerObject->objectTmpl()->objectTmplMgr()->createdObjects();
-	ObjectTemplateManager::ObjectTable::iterator iter;
-	iter = createdObjects.find(instanceOfId);
-	if (iter != createdObjects.end())
+	Object* createdObject =
+			mOwnerObject->objectTmpl()->objectTmplMgr()->getCreatedObject(
+					instanceOfId);
+	if (createdObject != NULL)
 	{
-		iter->second->getNodePath().instance_to(mOwnerObject->getNodePath());
+		createdObject->getNodePath().instance_to(mOwnerObject->getNodePath());
 	}
 }
 

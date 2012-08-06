@@ -130,9 +130,18 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 	return newObj;
 }
 
-ObjectTemplateManager::ObjectTable& ObjectTemplateManager::createdObjects()
+Object* ObjectTemplateManager::getCreatedObject(const ObjectId& objectId)
 {
-	return mCreatedObjects;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	ObjectTable::iterator iterObj;
+	iterObj = mCreatedObjects.find(objectId);
+	if (iterObj == mCreatedObjects.end())
+	{
+		return NULL;
+	}
+	return iterObj->second.p();
 }
 
 ReMutex& ObjectTemplateManager::getMutex()
