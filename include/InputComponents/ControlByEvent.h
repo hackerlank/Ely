@@ -93,10 +93,6 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
-#ifdef ELY_THREAD
-	virtual void onAddToSceneSetup();
-#endif
-
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.

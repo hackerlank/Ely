@@ -119,7 +119,6 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 
 	float maxSubSteps;
 
-
 #ifdef TESTING
 	timeStep = 0.016666667; //60 fps
 #endif

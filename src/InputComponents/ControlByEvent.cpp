@@ -52,7 +52,7 @@ void ControlByEvent::disable()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (not mIsEnabled)
+	if ((not mIsEnabled) or (not mOwnerObject))
 	{
 		return;
 	}
@@ -104,10 +104,15 @@ void ControlByEvent::enable()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (mIsEnabled)
+	if (mIsEnabled or (not mOwnerObject))
 	{
 		return;
 	}
+
+#ifdef ELY_THREAD
+	//initialize the actual transform
+	mActualTransform = mOwnerObject->getNodePath().get_transform();
+#endif
 
 	//hide mouse cursor
 	WindowProperties props;
@@ -317,13 +322,6 @@ void ControlByEvent::onAddToObjectSetup()
 		enable();
 	}
 }
-
-#ifdef ELY_THREAD
-void ControlByEvent::onAddToSceneSetup()
-{
-	mActualTransform = mOwnerObject->getNodePath().get_transform();
-}
-#endif
 
 void ControlByEvent::setControlTrue(const Event* event, void* data)
 {
