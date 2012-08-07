@@ -321,14 +321,7 @@ void ControlByEvent::onAddToObjectSetup()
 #ifdef ELY_THREAD
 void ControlByEvent::onAddToSceneSetup()
 {
-//	mActualPos = mOwnerObject->getNodePath().get_pos(
-//			mOwnerObject->getNodePath());
-//	mActualHpr = mOwnerObject->getNodePath().get_hpr();
-//	mActualTransform = TransformState::make_pos_hpr(mActualPos, mActualHpr);
-//	mActualTransform = mOwnerObject->getNodePath().get_transform();
-	mActualTransform = TransformState::make_identity();
-//	mActualTransform = mActualTransform->set_hpr(
-//			mOwnerObject->getNodePath().get_transform()->get_hpr());
+	mActualTransform = mOwnerObject->getNodePath().get_transform();
 }
 #endif
 
@@ -401,7 +394,7 @@ void ControlByEvent::update(void* data)
 #else
 				ownerNodePath.set_h(
 						ownerNodePath.get_h()
-								- (x - mCentX) * mSensX * signOfMouse);
+						- (x - mCentX) * mSensX * signOfMouse);
 #endif
 			}
 			if (mMouseEnabledP)
@@ -411,7 +404,7 @@ void ControlByEvent::update(void* data)
 #else
 				ownerNodePath.set_p(
 						ownerNodePath.get_p()
-								- (y - mCentY) * mSensY * signOfMouse);
+						- (y - mCentY) * mSensY * signOfMouse);
 #endif
 			}
 		}
@@ -476,7 +469,7 @@ void ControlByEvent::update(void* data)
 #else
 		ownerNodePath.set_h(
 				ownerNodePath.get_h()
-						+ mRollSens * mSpeedActual * dt * signOfKeyboard);
+				+ mRollSens * mSpeedActual * dt * signOfKeyboard);
 #endif
 	}
 	if (mRollRight)
@@ -486,7 +479,7 @@ void ControlByEvent::update(void* data)
 #else
 		ownerNodePath.set_h(
 				ownerNodePath.get_h()
-						- mRollSens * mSpeedActual * dt * signOfKeyboard);
+				- mRollSens * mSpeedActual * dt * signOfKeyboard);
 #endif
 	}
 #ifdef ELY_THREAD
