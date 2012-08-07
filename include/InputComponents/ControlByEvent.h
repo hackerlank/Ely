@@ -27,6 +27,9 @@
 #include <string>
 #include <cstdlib>
 #include <nodePath.h>
+#ifdef ELY_THREAD
+#	include <pointerTo.h>
+#endif
 #include <typedObject.h>
 #include <event.h>
 #include <genericAsyncTask.h>
@@ -90,6 +93,10 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+#ifdef ELY_THREAD
+	virtual void onAddToSceneSetup();
+#endif
+
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -144,6 +151,11 @@ private:
 	static void setSpeed(const Event* event, void* data);
 	static void setSpeedFast(const Event* event, void* data);
 	///@}
+
+#ifdef ELY_THREAD
+	///Actual transform state.
+	CPT(TransformState) mActualTransform;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:

@@ -318,6 +318,20 @@ void ControlByEvent::onAddToObjectSetup()
 	}
 }
 
+#ifdef ELY_THREAD
+void ControlByEvent::onAddToSceneSetup()
+{
+//	mActualPos = mOwnerObject->getNodePath().get_pos(
+//			mOwnerObject->getNodePath());
+//	mActualHpr = mOwnerObject->getNodePath().get_hpr();
+//	mActualTransform = TransformState::make_pos_hpr(mActualPos, mActualHpr);
+//	mActualTransform = mOwnerObject->getNodePath().get_transform();
+	mActualTransform = TransformState::make_identity();
+//	mActualTransform = mActualTransform->set_hpr(
+//			mOwnerObject->getNodePath().get_transform()->get_hpr());
+}
+#endif
+
 void ControlByEvent::setControlTrue(const Event* event, void* data)
 {
 	bool* boolPtr = (bool*) data;
@@ -366,22 +380,10 @@ void ControlByEvent::update(void* data)
 	int signOfKeyboard = (mInvertedKeyboard ? -1 : 1);
 
 #ifdef ELY_THREAD
-	CPT(TransformState) ownerTransform = ownerNodePath.get_transform();
-	LPoint3 ownerPos = ownerTransform->get_pos();
-	LVecBase3 ownerHpr = ownerTransform->get_hpr();
-	float newX = ownerPos.get_X();
-	float newY = ownerPos.get_Y();
-	float newZ = ownerPos.get_Z();
-	float newH = ownerHpr.get_X();
-	float newP = ownerHpr.get_Y();
-
-
-
-
-
-
-
-
+	float newX = 0, newY = 0, newZ = 0;
+	float newH = 0, newP = 0, newR = 0;
+#endif
+	//handle mouse
 	if (mMouseEnabledH or mMouseEnabledP)
 	{
 		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
@@ -394,143 +396,109 @@ void ControlByEvent::update(void* data)
 		{
 			if (mMouseEnabledH)
 			{
+#ifdef ELY_THREAD
+				newH -= (x - mCentX) * mSensX * signOfMouse;
+#else
 				ownerNodePath.set_h(
 						ownerNodePath.get_h()
 								- (x - mCentX) * mSensX * signOfMouse);
+#endif
 			}
 			if (mMouseEnabledP)
 			{
+#ifdef ELY_THREAD
+				newP -= (y - mCentY) * mSensY * signOfMouse;
+#else
 				ownerNodePath.set_p(
 						ownerNodePath.get_p()
 								- (y - mCentY) * mSensY * signOfMouse);
+#endif
 			}
 		}
 	}
-
 	//handle keys:
 	if (mForward)
 	{
-		ownerNodePath.set_y(ownerNodePath,
-				ownerNodePath.get_y(ownerNodePath)
-						- mMovSens * mSpeedActual * dt * signOfKeyboard);
-	}
-	if (mBackward)
-	{
-		ownerNodePath.set_y(ownerNodePath,
-				ownerNodePath.get_y(ownerNodePath)
-						+ mMovSens * mSpeedActual * dt * signOfKeyboard);
-	}
-	if (mStrafeLeft)
-	{
-		ownerNodePath.set_x(ownerNodePath,
-				ownerNodePath.get_x(ownerNodePath)
-						+ mMovSens * mSpeedActual * dt * signOfKeyboard);
-	}
-	if (mStrafeRight)
-	{
-		ownerNodePath.set_x(ownerNodePath,
-				ownerNodePath.get_x(ownerNodePath)
-						- mMovSens * mSpeedActual * dt * signOfKeyboard);
-	}
-	if (mUp)
-	{
-		ownerNodePath.set_z(ownerNodePath,
-				ownerNodePath.get_z(ownerNodePath)
-						+ mMovSens * mSpeedActual * dt);
-	}
-	if (mDown)
-	{
-		ownerNodePath.set_z(ownerNodePath,
-				ownerNodePath.get_z(ownerNodePath)
-						- mMovSens * mSpeedActual * dt);
-	}
-	if (mRollLeft)
-	{
-		ownerNodePath.set_h(ownerNodePath,
-				ownerNodePath.get_h(ownerNodePath)
-						+ mRollSens * mSpeedActual * dt * signOfKeyboard);
-	}
-	if (mRollRight)
-	{
-		ownerNodePath.set_h(ownerNodePath,
-				ownerNodePath.get_h(ownerNodePath)
-						- mRollSens * mSpeedActual * dt * signOfKeyboard);
-	}
+#ifdef ELY_THREAD
+		newY -= mMovSens * mSpeedActual * dt * signOfKeyboard;
 #else
-	if (mMouseEnabledH or mMouseEnabledP)
-	{
-		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-		MouseData md = win->get_pointer(0);
-		int signOfMouse = (mInvertedMouse ? -1 : 1);
-		float x = md.get_x();
-		float y = md.get_y();
-
-		if (win->move_pointer(0, mCentX, mCentY))
-		{
-			if (mMouseEnabledH)
-			{
-				ownerNodePath.set_h(
-						ownerNodePath.get_h()
-						- (x - mCentX) * mSensX * signOfMouse);
-			}
-			if (mMouseEnabledP)
-			{
-				ownerNodePath.set_p(
-						ownerNodePath.get_p()
-						- (y - mCentY) * mSensY * signOfMouse);
-			}
-		}
-	}
-
-	//handle keys:
-	if (mForward)
-	{
 		ownerNodePath.set_y(ownerNodePath,
-				ownerNodePath.get_y(ownerNodePath)
-				- mMovSens * mSpeedActual * dt * signOfKeyboard);
+				-mMovSens * mSpeedActual * dt * signOfKeyboard);
+#endif
 	}
 	if (mBackward)
 	{
+#ifdef ELY_THREAD
+		newY += mMovSens * mSpeedActual * dt * signOfKeyboard;
+#else
 		ownerNodePath.set_y(ownerNodePath,
-				ownerNodePath.get_y(ownerNodePath)
-				+ mMovSens * mSpeedActual * dt * signOfKeyboard);
+				+mMovSens * mSpeedActual * dt * signOfKeyboard);
+#endif
 	}
 	if (mStrafeLeft)
 	{
+#ifdef ELY_THREAD
+		newX += mMovSens * mSpeedActual * dt * signOfKeyboard;
+#else
 		ownerNodePath.set_x(ownerNodePath,
-				ownerNodePath.get_x(ownerNodePath)
-				+ mMovSens * mSpeedActual * dt * signOfKeyboard);
+				+mMovSens * mSpeedActual * dt * signOfKeyboard);
+#endif
 	}
 	if (mStrafeRight)
 	{
+#ifdef ELY_THREAD
+		newX -= mMovSens * mSpeedActual * dt * signOfKeyboard;
+#else
 		ownerNodePath.set_x(ownerNodePath,
-				ownerNodePath.get_x(ownerNodePath)
-				- mMovSens * mSpeedActual * dt * signOfKeyboard);
+				-mMovSens * mSpeedActual * dt * signOfKeyboard);
+#endif
 	}
 	if (mUp)
 	{
-		ownerNodePath.set_z(ownerNodePath,
-				ownerNodePath.get_z(ownerNodePath)
-				+ mMovSens * mSpeedActual * dt);
+#ifdef ELY_THREAD
+		newZ += mMovSens * mSpeedActual * dt;
+#else
+		ownerNodePath.set_z(ownerNodePath, +mMovSens * mSpeedActual * dt);
+#endif
 	}
 	if (mDown)
 	{
-		ownerNodePath.set_z(ownerNodePath,
-				ownerNodePath.get_z(ownerNodePath)
-				- mMovSens * mSpeedActual * dt);
+#ifdef ELY_THREAD
+		newZ -= mMovSens * mSpeedActual * dt;
+#else
+		ownerNodePath.set_z(ownerNodePath, -mMovSens * mSpeedActual * dt);
+#endif
 	}
 	if (mRollLeft)
 	{
-		ownerNodePath.set_h(ownerNodePath,
-				ownerNodePath.get_h(ownerNodePath)
-				+ mRollSens * mSpeedActual * dt * signOfKeyboard);
+#ifdef ELY_THREAD
+		newH += mRollSens * mSpeedActual * dt * signOfKeyboard;
+#else
+		ownerNodePath.set_h(
+				ownerNodePath.get_h()
+						+ mRollSens * mSpeedActual * dt * signOfKeyboard);
+#endif
 	}
 	if (mRollRight)
 	{
-		ownerNodePath.set_h(ownerNodePath,
-				ownerNodePath.get_h(ownerNodePath)
-				- mRollSens * mSpeedActual * dt * signOfKeyboard);
+#ifdef ELY_THREAD
+		newH -= mRollSens * mSpeedActual * dt * signOfKeyboard;
+#else
+		ownerNodePath.set_h(
+				ownerNodePath.get_h()
+						- mRollSens * mSpeedActual * dt * signOfKeyboard);
+#endif
 	}
+#ifdef ELY_THREAD
+	newH += mActualTransform->get_hpr().get_x();
+	newP += mActualTransform->get_hpr().get_y();
+	newR += mActualTransform->get_hpr().get_z();
+	CPT(TransformState) newTransform = mActualTransform->compose(
+			TransformState::make_identity()->set_pos(
+					LVecBase3(newX, newY, newZ)))->set_hpr(
+			LVecBase3(newH, newP, newR));
+	ownerNodePath.set_transform(newTransform);
+	mActualTransform = newTransform;
 #endif
 }
 

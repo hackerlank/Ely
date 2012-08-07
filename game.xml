@@ -53,10 +53,12 @@
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
 				<Param fast_factor="10.0"/>
+<!--
 				<Param roll_left=""/>
 				<Param roll_right=""/>
 				<Param strafe_left="a"/>
 				<Param strafe_right="d"/>
+-->
 				<Param inverted_keyboard="true"/>
 				<Param inverted_mouse="false"/>
 				<Param mouse_enabled_h="true"/>
