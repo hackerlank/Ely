@@ -325,24 +325,36 @@ void ControlByEvent::onAddToObjectSetup()
 
 void ControlByEvent::setControlTrue(const Event* event, void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool* boolPtr = (bool*) data;
 	*boolPtr = true;
 }
 
 void ControlByEvent::setControlFalse(const Event* event, void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool* boolPtr = (bool*) data;
 	*boolPtr = false;
 }
 
 void ControlByEvent::setSpeed(const Event* event, void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	ControlByEvent* _this = (ControlByEvent*) data;
 	_this->mSpeedActual = _this->mSpeed;
 }
 
 void ControlByEvent::setSpeedFast(const Event* event, void* data)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	ControlByEvent* _this = (ControlByEvent*) data;
 	_this->mSpeedActual = _this->mSpeed * _this->mFastFactor;
 }
