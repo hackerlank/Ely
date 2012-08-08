@@ -49,7 +49,12 @@
 class GamePhysicsManager: public Singleton<GamePhysicsManager>
 {
 public:
-	GamePhysicsManager(bool otherThread = false);
+	/**
+	 * \Brief Constructor.
+	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
+	 * this manager should run in another async task chain.
+	 */
+	GamePhysicsManager(const std::string& asyncTaskChain = std::string(""));
 	virtual ~GamePhysicsManager();
 
 	/**

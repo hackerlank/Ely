@@ -23,7 +23,7 @@
 
 #include "Game/GamePhysicsManager.h"
 
-GamePhysicsManager::GamePhysicsManager(bool otherThread)
+GamePhysicsManager::GamePhysicsManager(const std::string& asyncTaskChain)
 {
 	mPhysicsComponents.clear();
 	mUpdateData.clear();
@@ -38,27 +38,14 @@ GamePhysicsManager::GamePhysicsManager(bool otherThread)
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Add the task for updating the controlled object
 #ifdef ELY_THREAD
-	if (not otherThread)
+	if (not asyncTaskChain.empty())
 	{
-		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	}
-	else
-	{
-		AsyncTaskChain *taskChain =
-				AsyncTaskManager::get_global_ptr()->make_task_chain(
-						"GamePhysicsManagerChain");
-		//Changes the number of threads for taskChain.
-		taskChain->set_num_threads(1);
-		//Sets the frame_sync flag.
-		taskChain->set_frame_sync(true);
 		//Specifies the AsyncTaskChain on which mUpdateTask will be running.
-		mUpdateTask->set_task_chain("GamePhysicsManagerChain");
-		//Adds mUpdateTask to the active queue.
-		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+		mUpdateTask->set_task_chain(asyncTaskChain);
 	}
-#else
-	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 #endif
+	//Adds mUpdateTask to the active queue.
+	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 #ifdef DEBUG
 	// set up Bullet Debug Renderer (disabled by default)

@@ -45,11 +45,10 @@ public:
 
 	/**
 	 * \Brief Constructor.
-	 * @param otherThread If ELY_THREAD is defined this indicates if
-	 * this manager should run in another thread different from the
-	 * main thread.
+	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
+	 * this manager should run in another async task chain.
 	 */
-	GameInputManager(bool otherThread = false);
+	GameInputManager(const std::string& asyncTaskChain = std::string(""));
 	virtual ~GameInputManager();
 
 	/**

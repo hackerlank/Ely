@@ -40,9 +40,24 @@ int main(int argc, char **argv)
 	// First create a Game manager: mandatory
 	GameManager* gameMgr = new GameManager(argc, argv);
 	// Other managers (depending on GameManager)
+#ifdef ELY_THREAD
+	//create (if necessary) other task chains
+	AsyncTaskChain *taskChain =
+			AsyncTaskManager::get_global_ptr()->make_task_chain(
+					"ManagersChain");
+	//Changes the number of threads for taskChain.
+	taskChain->set_num_threads(1);
+	//Sets the frame_sync flag.
+	taskChain->set_frame_sync(true);
+	//
+	GameAudioManager* gameAudioMgr = new GameAudioManager("ManagersChain");
+	GameInputManager* gameInputMgr = new GameInputManager("ManagersChain");
+	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager("ManagersChain");
+#else
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 	GameInputManager* gameInputMgr = new GameInputManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
+#endif
 #ifdef DEBUG
 	if (Thread::is_threading_supported())
 	{
