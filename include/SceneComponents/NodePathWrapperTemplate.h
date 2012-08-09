@@ -36,8 +36,7 @@
 class NodePathWrapperTemplate: public ComponentTemplate
 {
 public:
-	NodePathWrapperTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
+	NodePathWrapperTemplate(WindowFramework* windowFramework);
 	virtual ~NodePathWrapperTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -48,20 +47,12 @@ public:
 	virtual void setParametersDefaults();
 
 	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the PandaFramework.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
 	 * \brief Gets/sets the WindowFramework.
 	 * @return A reference to the WindowFramework.
 	 */
-	WindowFramework*& windowFramework();
+	WindowFramework* const windowFramework() const;
 
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 

@@ -51,6 +51,9 @@ const ComponentType InstanceOf::componentType() const
 
 bool InstanceOf::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//setup initial state
 	mNodePath = NodePath(mComponentId);
 	//Scaling (default: (1.0,1.0,1.0))
@@ -63,13 +66,11 @@ bool InstanceOf::initialize()
 	return true;
 }
 
-NodePath& InstanceOf::nodePath()
-{
-	return mNodePath;
-}
-
 void InstanceOf::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//set the node path of the object to the
 	//node path of this instance of
 	mOwnerObject->setNodePath(mNodePath);
@@ -87,11 +88,6 @@ void InstanceOf::onAddToObjectSetup()
 	{
 		createdObject->getNodePath().instance_to(mOwnerObject->getNodePath());
 	}
-}
-
-InstanceOf::operator NodePath()
-{
-	return mNodePath;
 }
 
 //TypedObject semantics: hardcoded

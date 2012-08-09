@@ -53,6 +53,9 @@ const ComponentType RigidBody::componentType() const
 
 bool RigidBody::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	//get body type
 	std::string bodyType = mTmpl->parameter(std::string("body_type"));
@@ -209,23 +212,11 @@ bool RigidBody::initialize()
 	return result;
 }
 
-BulletRigidBodyNode* RigidBody::rigidBodyNode()
-{
-	return mRigidBodyNode.p();
-}
-
-NodePath& RigidBody::nodePath()
-{
-	return mNodePath;
-}
-
-RigidBody::operator NodePath()
-{
-	return mNodePath;
-}
-
 void RigidBody::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//create a Rigid Body Node
 	mRigidBodyNode = new BulletRigidBodyNode(std::string(mComponentId).c_str());
 	//set the physics parameters
@@ -264,6 +255,69 @@ void RigidBody::onAddToObjectSetup()
 
 	//set the object node path as this rigid body's one
 	mOwnerObject->setNodePath(mNodePath);
+}
+
+void RigidBody::onAddToSceneSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//switch the body type (take precedence over mass)
+	//force this component to static if owner object is static
+	if (mOwnerObject->isStatic())
+	{
+		mBodyType = STATIC;
+	}
+	switchType(mBodyType);
+}
+
+void RigidBody::switchType(BodyType bodyType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	switch (bodyType)
+	{
+	case DYNAMIC:
+		mRigidBodyNode->set_mass(mBodyMass);
+		mRigidBodyNode->set_kinematic(false);
+		mRigidBodyNode->set_static(false);
+		mRigidBodyNode->set_deactivation_enabled(true);
+		mRigidBodyNode->set_active(true);
+		break;
+	case STATIC:
+		mRigidBodyNode->set_mass(0.0);
+		mRigidBodyNode->set_kinematic(false);
+		mRigidBodyNode->set_static(true);
+		mRigidBodyNode->set_deactivation_enabled(true);
+		mRigidBodyNode->set_active(false);
+		break;
+	case KINEMATIC:
+		mRigidBodyNode->set_mass(0.0);
+		mRigidBodyNode->set_kinematic(true);
+		mRigidBodyNode->set_static(false);
+		mRigidBodyNode->set_deactivation_enabled(false);
+		mRigidBodyNode->set_active(false);
+		break;
+	default:
+		break;
+	}
+}
+
+NodePath RigidBody::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNodePath;
+}
+
+void RigidBody::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 BulletShape* RigidBody::createShape(ShapeType shapeType)
@@ -378,17 +432,6 @@ BulletShape* RigidBody::createShape(ShapeType shapeType)
 	return collisionShape;
 }
 
-void RigidBody::onAddToSceneSetup()
-{
-	//switch the body type (take precedence over mass)
-	//force this component to static if owner object is static
-	if (mOwnerObject->isStatic())
-	{
-		mBodyType = STATIC;
-	}
-	switchType(mBodyType);
-}
-
 void RigidBody::getBoundingDimensions(NodePath modelNP)
 {
 	//get "tight" dimensions of panda
@@ -406,43 +449,13 @@ void RigidBody::getBoundingDimensions(NodePath modelNP)
 
 void RigidBody::setPhysicalParameters()
 {
-	rigidBodyNode()->set_mass(mBodyMass);
-	rigidBodyNode()->set_friction(mBodyFriction);
-	rigidBodyNode()->set_restitution(mBodyRestitution);
+	mRigidBodyNode->set_mass(mBodyMass);
+	mRigidBodyNode->set_friction(mBodyFriction);
+	mRigidBodyNode->set_restitution(mBodyRestitution);
 	if (mCcdEnabled)
 	{
-		rigidBodyNode()->set_ccd_motion_threshold(mCcdMotionThreshold);
-		rigidBodyNode()->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
-	}
-}
-
-void RigidBody::switchType(BodyType bodyType)
-{
-	switch (bodyType)
-	{
-	case DYNAMIC:
-		rigidBodyNode()->set_mass(mBodyMass);
-		rigidBodyNode()->set_kinematic(false);
-		rigidBodyNode()->set_static(false);
-		rigidBodyNode()->set_deactivation_enabled(true);
-		rigidBodyNode()->set_active(true);
-		break;
-	case STATIC:
-		rigidBodyNode()->set_mass(0.0);
-		rigidBodyNode()->set_kinematic(false);
-		rigidBodyNode()->set_static(true);
-		rigidBodyNode()->set_deactivation_enabled(true);
-		rigidBodyNode()->set_active(false);
-		break;
-	case KINEMATIC:
-		rigidBodyNode()->set_mass(0.0);
-		rigidBodyNode()->set_kinematic(true);
-		rigidBodyNode()->set_static(false);
-		rigidBodyNode()->set_deactivation_enabled(false);
-		rigidBodyNode()->set_active(false);
-		break;
-	default:
-		break;
+		mRigidBodyNode->set_ccd_motion_threshold(mCcdMotionThreshold);
+		mRigidBodyNode->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
 	}
 }
 

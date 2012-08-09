@@ -48,30 +48,45 @@ const ComponentType Model::componentType() const
 	return mTmpl->componentType();
 }
 
-NodePath& Model::nodePath()
+NodePath Model::getNodePath() const
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mNodePath;
 }
 
-Model::operator NodePath()
+void Model::setNodePath(const NodePath& nodePath)
 {
-	return mNodePath;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 void Model::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//set the node path of the object to the
 	//node path of this model
 	mOwnerObject->setNodePath(mNodePath);
 }
 
-AnimControlCollection& Model::animations()
+AnimControlCollection Model::animations() const
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mAnimations;
 }
 
 bool Model::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	//check if from file
 	mFromFile =

@@ -23,17 +23,17 @@
 
 #include "SceneComponents/NodePathWrapperTemplate.h"
 
-NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+NodePathWrapperTemplate::NodePathWrapperTemplate(
+		WindowFramework* windowFramework) :
+		mWindowFramework(windowFramework)
+
 {
-	if (not pandaFramework or not windowFramework)
+	if (not windowFramework)
 	{
 		throw GameException(
-				"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework or WindowFramework");
+				"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework");
 
 	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	setParametersDefaults();
 
 }
@@ -55,6 +55,9 @@ const ComponentFamilyType NodePathWrapperTemplate::familyType() const
 
 Component* NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	NodePathWrapper* newNodePathWrapper = new NodePathWrapper(this);
 	newNodePathWrapper->setComponentId(compId);
 	if (not newNodePathWrapper->initialize())
@@ -66,18 +69,16 @@ Component* NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
 
 void NodePathWrapperTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	//no mandatory parameters
 }
 
-PandaFramework*& NodePathWrapperTemplate::pandaFramework()
-{
-	return mPandaFramework;
-}
-
-WindowFramework*& NodePathWrapperTemplate::windowFramework()
+WindowFramework* const NodePathWrapperTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }

@@ -30,9 +30,10 @@ ControlByEvent::ControlByEvent()
 }
 
 ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
-		mTmpl(tmpl), mForward(false), mBackward(false), mStrafeLeft(false), mStrafeRight(
-				false), mUp(false), mDown(false), mRollLeft(false), mRollRight(
-				false), mTrue(true), mFalse(false), mIsEnabled(false)
+		mTmpl(tmpl), mForward(this, false), mBackward(this, false), mStrafeLeft(
+				this, false), mStrafeRight(this, false), mUp(this, false), mDown(
+				this, false), mRollLeft(this, false), mRollRight(this, false), mTrue(
+				true), mFalse(false), mIsEnabled(false)
 {
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
@@ -325,37 +326,37 @@ void ControlByEvent::onAddToObjectSetup()
 
 void ControlByEvent::setControlTrue(const Event* event, void* data)
 {
+	ThisBool* thisBool = (ThisBool*) data;
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLDMUTEX(thisBool->ptr->mMutex)
 
-	bool* boolPtr = (bool*) data;
-	*boolPtr = true;
+	thisBool->value = true;
 }
 
 void ControlByEvent::setControlFalse(const Event* event, void* data)
 {
+	ThisBool* thisBool = (ThisBool*) data;
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLDMUTEX(thisBool->ptr->mMutex)
 
-	bool* boolPtr = (bool*) data;
-	*boolPtr = false;
+	thisBool->value = false;
 }
 
 void ControlByEvent::setSpeed(const Event* event, void* data)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	ControlByEvent* _this = (ControlByEvent*) data;
+	//lock (guard) the mutex
+	HOLDMUTEX(_this->mMutex)
+
 	_this->mSpeedActual = _this->mSpeed;
 }
 
 void ControlByEvent::setSpeedFast(const Event* event, void* data)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	ControlByEvent* _this = (ControlByEvent*) data;
+	//lock (guard) the mutex
+	HOLDMUTEX(_this->mMutex)
+
 	_this->mSpeedActual = _this->mSpeed * _this->mFastFactor;
 }
 
@@ -373,6 +374,7 @@ void ControlByEvent::update(void* data)
 	HOLDMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
+	bool modified = false;
 
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 
@@ -406,6 +408,7 @@ void ControlByEvent::update(void* data)
 						ownerNodePath.get_h()
 						- (x - mCentX) * mSensX * signOfMouse);
 #endif
+				modified = true;
 			}
 			if (mMouseEnabledP)
 			{
@@ -416,6 +419,7 @@ void ControlByEvent::update(void* data)
 						ownerNodePath.get_p()
 						- (y - mCentY) * mSensY * signOfMouse);
 #endif
+				modified = true;
 			}
 		}
 	}
@@ -428,6 +432,7 @@ void ControlByEvent::update(void* data)
 		ownerNodePath.set_y(ownerNodePath,
 				-mMovSens * mSpeedActual * dt * signOfKeyboard);
 #endif
+		modified = true;
 	}
 	if (mBackward)
 	{
@@ -437,6 +442,7 @@ void ControlByEvent::update(void* data)
 		ownerNodePath.set_y(ownerNodePath,
 				+mMovSens * mSpeedActual * dt * signOfKeyboard);
 #endif
+		modified = true;
 	}
 	if (mStrafeLeft)
 	{
@@ -446,6 +452,7 @@ void ControlByEvent::update(void* data)
 		ownerNodePath.set_x(ownerNodePath,
 				+mMovSens * mSpeedActual * dt * signOfKeyboard);
 #endif
+		modified = true;
 	}
 	if (mStrafeRight)
 	{
@@ -455,6 +462,7 @@ void ControlByEvent::update(void* data)
 		ownerNodePath.set_x(ownerNodePath,
 				-mMovSens * mSpeedActual * dt * signOfKeyboard);
 #endif
+		modified = true;
 	}
 	if (mUp)
 	{
@@ -463,6 +471,7 @@ void ControlByEvent::update(void* data)
 #else
 		ownerNodePath.set_z(ownerNodePath, +mMovSens * mSpeedActual * dt);
 #endif
+		modified = true;
 	}
 	if (mDown)
 	{
@@ -471,6 +480,7 @@ void ControlByEvent::update(void* data)
 #else
 		ownerNodePath.set_z(ownerNodePath, -mMovSens * mSpeedActual * dt);
 #endif
+		modified = true;
 	}
 	if (mRollLeft)
 	{
@@ -481,6 +491,7 @@ void ControlByEvent::update(void* data)
 				ownerNodePath.get_h()
 				+ mRollSens * mSpeedActual * dt * signOfKeyboard);
 #endif
+		modified = true;
 	}
 	if (mRollRight)
 	{
@@ -491,17 +502,21 @@ void ControlByEvent::update(void* data)
 				ownerNodePath.get_h()
 				- mRollSens * mSpeedActual * dt * signOfKeyboard);
 #endif
+		modified = true;
 	}
 #ifdef ELY_THREAD
-	newH += mActualTransform->get_hpr().get_x();
-	newP += mActualTransform->get_hpr().get_y();
-	newR += mActualTransform->get_hpr().get_z();
-	CPT(TransformState) newTransform = mActualTransform->compose(
-			TransformState::make_identity()->set_pos(
-					LVecBase3(newX, newY, newZ)))->set_hpr(
-			LVecBase3(newH, newP, newR));
-	ownerNodePath.set_transform(newTransform);
-	mActualTransform = newTransform;
+	if (modified)
+	{
+		newH += mActualTransform->get_hpr().get_x();
+		newP += mActualTransform->get_hpr().get_y();
+		newR += mActualTransform->get_hpr().get_z();
+		CPT(TransformState) newTransform = mActualTransform->compose(
+				TransformState::make_identity()->set_pos(
+						LVecBase3(newX, newY, newZ)))->set_hpr(
+				LVecBase3(newH, newP, newR));
+		ownerNodePath.set_transform(newTransform);
+		mActualTransform = newTransform;
+	}
 #endif
 }
 

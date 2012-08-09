@@ -48,7 +48,8 @@ public:
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */
-	GameInputManager(const std::string& asyncTaskChain = std::string(""));
+	GameInputManager(int sort = 0, int priority = 0,
+			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GameInputManager();
 
 	/**

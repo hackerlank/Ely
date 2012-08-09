@@ -53,19 +53,18 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets a reference to the node path associated to this model.
-	 * @return The node path associated to this model.
+	 * \brief Gets/sets the node path of this node path wrapper.
+	 * @return The node path of this this node path wrapper.
 	 */
-	NodePath& nodePath();
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
+	///@{
+	NodePath getNodePath() const;
+	void setNodePath(const NodePath& nodePath);
+	///@}
 
 private:
 	///The template used to construct this component.
 	NodePathWrapperTemplate* mTmpl;
-	///The NodePath associated to this model.
+	///The NodePath associated to this node path wrapper.
 	NodePath mNodePath;
 
 	///TypedObject semantics: hardcoded

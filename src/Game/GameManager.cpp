@@ -108,8 +108,8 @@ void GameManager::manageObjects()
 					ComponentFamilyType("Scene")));
 	TextureStage* planeTS0 = new TextureStage("planeTS0");
 	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
-	plane1Model->nodePath().set_texture(planeTS0, planeTex, 1);
-	plane1Model->nodePath().set_tex_scale(planeTS0, 1000, 1000);
+	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
+	plane1Model->getNodePath().set_tex_scale(planeTS0, 1000, 1000);
 
 	mControlGrabbed = false;
 	//enable/disable Actor1 control by event
@@ -151,7 +151,7 @@ void GameManager::setupCompTmplMgr()
 			new InstanceOfTemplate());
 	//NodePathWrapper template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new NodePathWrapperTemplate(this, mWindow));
+			new NodePathWrapperTemplate(mWindow));
 	//ControlByEvent template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ControlByEventTemplate(this, mWindow));
@@ -163,7 +163,7 @@ void GameManager::setupCompTmplMgr()
 			new ListenerTemplate(mWindow));
 	//RigidBody template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new RigidBodyTemplate(this, mWindow));
+			new RigidBodyTemplate());
 
 }
 

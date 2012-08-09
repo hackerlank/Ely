@@ -54,16 +54,6 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
-	/**
-	 * \brief Gets a reference to the node path this component is instance of.
-	 * @return The node path this component is instance of.
-	 */
-	NodePath& nodePath();
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
-
 private:
 	///The template used to construct this component.
 	InstanceOfTemplate* mTmpl;

@@ -104,12 +104,6 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief Gets a reference to the bullet rigid body node.
-	 * @return The bullet rigid body node.
-	 */
-	BulletRigidBodyNode* rigidBodyNode();
-
-	/**
 	 * \brief The actual component's type.
 	 *
 	 * It may change during the component's lifetime.
@@ -141,14 +135,13 @@ public:
 	void switchType(BodyType bodyType);
 
 	/**
-	 * \brief Gets a reference to the node path associated to this model.
-	 * @return The node path associated to this model.
+	 * \brief Gets/sets the node path of this rigid body.
+	 * @return The node path of this rigid body.
 	 */
-	NodePath& nodePath();
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
+	///@{
+	NodePath getNodePath() const;
+	void setNodePath(const NodePath& nodePath);
+	///@}
 
 private:
 	///The template used to construct this component.

@@ -50,15 +50,16 @@ int main(int argc, char **argv)
 	//Sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//
-	GameAudioManager* gameAudioMgr = new GameAudioManager("ManagersChain");
-	GameInputManager* gameInputMgr = new GameInputManager("ManagersChain");
-	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager("ManagersChain");
+	GameAudioManager* gameAudioMgr = new GameAudioManager();
+	GameInputManager* gameInputMgr = new GameInputManager();
+	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 #else
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 	GameInputManager* gameInputMgr = new GameInputManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 #endif
 #ifdef DEBUG
+	//threading
 	if (Thread::is_threading_supported())
 	{
 		std::cout << "Threading support has been compiled in and enabled"
@@ -74,6 +75,31 @@ int main(int argc, char **argv)
 	{
 		std::cout << "A real threading library is available that "
 				"supports actual OS-implemented threads" << std::endl;
+	}
+	//loop over task chains
+	int numTaskChains =
+			AsyncTaskManager::get_global_ptr()->get_num_task_chains();
+	std::cout << "Number of AsyncTaskChains :" << numTaskChains << std::endl;
+	for (int chain = 0; chain < numTaskChains; ++chain)
+	{
+		AsyncTaskChain* taskChain =
+				AsyncTaskManager::get_global_ptr()->get_task_chain(chain);
+		std::cout << "AsyncTaskChain '" << taskChain->get_name() << "':"
+				<< std::endl;
+		std::cout << "\tNumber of AsyncTasks (Chain)"
+				<< taskChain->get_num_tasks() << std::endl;
+		AsyncTaskCollection taskColl = taskChain->get_tasks();
+		int numTasks = taskColl.get_num_tasks();
+		std::cout << "\tNumber of AsyncTasks (Collection)" << numTasks
+				<< std::endl;
+		for (int task = 0; task < numTasks; ++task)
+		{
+			AsyncTask* asyncTask = taskColl.get_task(task);
+			std::cout << "\t\tAsyncTask: '" << asyncTask->get_name() << "'"
+					<< std::endl;
+			std::cout << "\t\t\tpriority: " << asyncTask->get_priority() << std::endl;
+			std::cout << "\t\t\tsort: " << asyncTask->get_sort() << std::endl;
+		}
 	}
 #endif
 	// Set the game up

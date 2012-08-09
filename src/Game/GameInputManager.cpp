@@ -23,7 +23,8 @@
 
 #include "Game/GameInputManager.h"
 
-GameInputManager::GameInputManager(const std::string& asyncTaskChain = std::string(""))
+GameInputManager::GameInputManager(int sort, int priority,
+		const std::string& asyncTaskChain)
 {
 	mInputComponents.clear();
 	mUpdateData.clear();
@@ -34,6 +35,9 @@ GameInputManager::GameInputManager(const std::string& asyncTaskChain = std::stri
 	mUpdateTask = new GenericAsyncTask("GameInputManager::update",
 			&TaskInterface<GameInputManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
+	//set sort/priority
+	mUpdateTask->set_sort(sort);
+	mUpdateTask->set_priority(priority);
 	//Add the task for updating the controlled object
 #ifdef ELY_THREAD
 	if (not asyncTaskChain.empty())

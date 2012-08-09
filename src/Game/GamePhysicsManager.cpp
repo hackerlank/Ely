@@ -23,7 +23,8 @@
 
 #include "Game/GamePhysicsManager.h"
 
-GamePhysicsManager::GamePhysicsManager(const std::string& asyncTaskChain)
+GamePhysicsManager::GamePhysicsManager(int sort, int priority,
+		const std::string& asyncTaskChain)
 {
 	mPhysicsComponents.clear();
 	mUpdateData.clear();
@@ -36,6 +37,9 @@ GamePhysicsManager::GamePhysicsManager(const std::string& asyncTaskChain)
 	mUpdateTask = new GenericAsyncTask("GamePhysicsManager::update",
 			&TaskInterface<GamePhysicsManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
+	//set sort/priority
+	mUpdateTask->set_sort(sort);
+	mUpdateTask->set_priority(priority);
 	//Add the task for updating the controlled object
 #ifdef ELY_THREAD
 	if (not asyncTaskChain.empty())

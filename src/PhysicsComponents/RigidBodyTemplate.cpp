@@ -23,16 +23,8 @@
 
 #include "PhysicsComponents/RigidBodyTemplate.h"
 
-RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+RigidBodyTemplate::RigidBodyTemplate()
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"RigidBodyTemplate::RigidBodyTemplate: invalid PandaFramework or WindowFramework");
-	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	if (not GamePhysicsManager::GetSingletonPtr())
 	{
 		throw GameException(
@@ -58,6 +50,9 @@ const ComponentFamilyType RigidBodyTemplate::familyType() const
 
 Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	RigidBody* newRigidBody = new RigidBody(this);
 	newRigidBody->setComponentId(compId);
 	if (not newRigidBody->initialize())
@@ -69,6 +64,9 @@ Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
 
 void RigidBodyTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
@@ -78,21 +76,6 @@ void RigidBodyTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("body_restitution","0.1"));
 	mParameterTable.insert(ParameterNameValue("shape_type","sphere"));
 	mParameterTable.insert(ParameterNameValue("collide_mask","all_on"));
-}
-
-GamePhysicsManager* RigidBodyTemplate::gamePhysicsMgr()
-{
-	return GamePhysicsManager::GetSingletonPtr();
-}
-
-PandaFramework*& RigidBodyTemplate::pandaFramework()
-{
-	return mPandaFramework;
-}
-
-WindowFramework*& RigidBodyTemplate::windowFramework()
-{
-	return mWindowFramework;
 }
 
 //TypedObject semantics: hardcoded

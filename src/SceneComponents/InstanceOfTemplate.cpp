@@ -45,6 +45,9 @@ const ComponentFamilyType InstanceOfTemplate::familyType() const
 
 Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	InstanceOf* newInstanceOf = new InstanceOf(this);
 	newInstanceOf->setComponentId(compId);
 	if (not newInstanceOf->initialize())
@@ -56,6 +59,9 @@ Component* InstanceOfTemplate::makeComponent(const ComponentId& compId)
 
 void InstanceOfTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:

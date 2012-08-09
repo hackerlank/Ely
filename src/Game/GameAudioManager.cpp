@@ -23,7 +23,8 @@
 
 #include "Game/GameAudioManager.h"
 
-GameAudioManager::GameAudioManager(const std::string& asyncTaskChain)
+GameAudioManager::GameAudioManager(int sort, int priority,
+		const std::string& asyncTaskChain)
 {
 	mAudioComponents.clear();
 	mUpdateData.clear();
@@ -35,6 +36,9 @@ GameAudioManager::GameAudioManager(const std::string& asyncTaskChain)
 	mUpdateTask = new GenericAsyncTask("GameAudioManager::update",
 			&TaskInterface<GameAudioManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
+	//set sort/priority
+	mUpdateTask->set_sort(sort);
+	mUpdateTask->set_priority(priority);
 	//Add the task for updating the controlled object
 #ifdef ELY_THREAD
 	if (not asyncTaskChain.empty())

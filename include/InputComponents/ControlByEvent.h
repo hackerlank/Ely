@@ -115,10 +115,28 @@ public:
 private:
 	///The template used to construct this component.
 	ControlByEventTemplate* mTmpl;
+
+	///Helper struct to set bool values for a given component.
+	struct ThisBool
+	{
+		ThisBool()
+		{
+		}
+		ThisBool(ControlByEvent* _ptr, bool _value) :
+				ptr(_ptr), value(_value)
+		{
+		}
+		operator bool()
+		{
+			return value;
+		}
+		ControlByEvent* ptr;
+		bool value;
+	};
 	///@{
 	///Key controls and effective keys.
-	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mRollLeft,
-			mRollRight;
+	ThisBool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
+			mRollLeft, mRollRight;
 	std::string mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
 			mUpKey, mDownKey, mRollLeftKey, mRollRightKey, mSpeedKey;
 	///@}

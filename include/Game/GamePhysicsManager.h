@@ -54,7 +54,8 @@ public:
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */
-	GamePhysicsManager(const std::string& asyncTaskChain = std::string(""));
+	GamePhysicsManager(int sort = 0, int priority = 0,
+			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GamePhysicsManager();
 
 	/**
@@ -124,8 +125,7 @@ private:
 
 	///@{
 	///A task data for step simulation update.
-	PT(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
+	PT(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

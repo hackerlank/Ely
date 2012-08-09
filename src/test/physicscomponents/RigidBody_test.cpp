@@ -41,7 +41,7 @@ BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
 BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 {
 	BOOST_TEST_MESSAGE("TESTING RigidBodyTemplate");
-	mRigidTmpl = new RigidBodyTemplate(mPanda,mWin);
+	mRigidTmpl = new RigidBodyTemplate();
 	BOOST_REQUIRE(mRigidTmpl != NULL);
 	mRigidTmpl->setParametersDefaults();
 	BOOST_CHECK(mRigidTmpl->parameter("body_type") == std::string("dynamic"));
@@ -64,7 +64,7 @@ BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 	mRigid->setOwnerObject(&testObj);
 	testObj.addComponent(mRigid);
 	mRigid->onAddToSceneSetup();
-	BOOST_CHECK(mRigid->rigidBodyNode() == DCAST(BulletRigidBodyNode, testObj.getNodePath().node()));
+	BOOST_CHECK(DCAST(BulletRigidBodyNode, testObj.getNodePath().node()));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Physics suite

@@ -69,16 +69,21 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets a reference to the node path associated to this model.
+	 * \brief Gets/sets the node path associated to this model.
 	 * @return The node path associated to this model.
 	 */
-	NodePath& nodePath();
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
+	///@{
+	NodePath getNodePath() const;
+	void setNodePath(const NodePath& nodePath);
+	///@}
 
-	AnimControlCollection& animations();
+	/**
+	 * \brief Gets a reference to AnimControlCollection of this model.
+	 *
+	 * Thread safe.
+	 * @return A reference to AnimControlCollection of this model.
+	 */
+	AnimControlCollection animations() const;
 
 private:
 	///The template used to construct this component.

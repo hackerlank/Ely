@@ -24,16 +24,14 @@
 #include "SceneComponents/ModelTemplate.h"
 
 ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+		WindowFramework* windowFramework) :
+		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)
 {
 	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
 				"ModelTemplate::ModelTemplate: invalid PandaFramework or WindowFramework");
-
 	}
-	mPandaFramework = pandaFramework;
-	mWindowFramework = windowFramework;
 	setParametersDefaults();
 }
 
@@ -54,6 +52,9 @@ const ComponentFamilyType ModelTemplate::familyType() const
 
 Component* ModelTemplate::makeComponent(const ComponentId& compId)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	Model* newModel = new Model(this);
 	newModel->setComponentId(compId);
 	if (not newModel->initialize())
@@ -63,22 +64,25 @@ Component* ModelTemplate::makeComponent(const ComponentId& compId)
 	return newModel;
 }
 
-PandaFramework*& ModelTemplate::pandaFramework()
+PandaFramework* const ModelTemplate::pandaFramework() const
 {
 	return mPandaFramework;
 }
 
-WindowFramework*& ModelTemplate::windowFramework()
+WindowFramework* const ModelTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }
 
 void ModelTemplate::setParametersDefaults()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	mParameterTable.insert(ParameterNameValue("from_file","true"));
+	mParameterTable.insert(ParameterNameValue("from_file", "true"));
 	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));
 	mParameterTable.insert(ParameterNameValue("scale_y", "1.0"));
 	mParameterTable.insert(ParameterNameValue("scale_z", "1.0"));

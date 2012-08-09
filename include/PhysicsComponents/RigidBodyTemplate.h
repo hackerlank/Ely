@@ -35,8 +35,7 @@
 class RigidBodyTemplate: public ComponentTemplate
 {
 public:
-	RigidBodyTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
+	RigidBodyTemplate();
 	virtual ~RigidBodyTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -46,29 +45,7 @@ public:
 
 	virtual void setParametersDefaults();
 
-	/**
-	 * \brief Gets the singleton GamePhysicsManager.
-	 * @return A reference to the GamePhysicsManager.
-	 */
-	GamePhysicsManager* gamePhysicsMgr();
-
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the GameManager.
-	 */
-	PandaFramework*& pandaFramework();
-
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework*& windowFramework();
-
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

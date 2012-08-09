@@ -51,7 +51,8 @@ public:
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */
-	GameAudioManager(const std::string& asyncTaskChain = std::string(""));
+	GameAudioManager(int sort = 0, int priority = 0,
+			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GameAudioManager();
 	/**
 	 * \brief Adds an audio component for updating.
@@ -97,8 +98,7 @@ private:
 
 	///@{
 	///A task data for update.
-	PT(TaskInterface<GameAudioManager>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
+	PT(TaskInterface<GameAudioManager>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

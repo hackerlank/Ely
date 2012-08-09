@@ -49,7 +49,7 @@ struct AudioSuiteFixture
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
-		audioMgr = new GameAudioManager(mPanda);
+		audioMgr = new GameAudioManager();
 		Sound3dTemplate::init_type();
 		Sound3d::init_type();
 		ObjectTemplate::init_type();

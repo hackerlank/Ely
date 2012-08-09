@@ -50,6 +50,9 @@ const ComponentType NodePathWrapper::componentType() const
 
 bool NodePathWrapper::initialize()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	//setup the wrapped NodePath
 	std::string wrappedNodePath = mTmpl->parameter(std::string("nodepath"));
@@ -78,19 +81,28 @@ bool NodePathWrapper::initialize()
 
 void NodePathWrapper::onAddToObjectSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//set the node path of the object to the
 	//node path of this NodePathWrapper
 	mOwnerObject->setNodePath(mNodePath);
 }
 
-NodePath& NodePathWrapper::nodePath()
+NodePath NodePathWrapper::getNodePath() const
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mNodePath;
 }
 
-NodePathWrapper::operator NodePath()
+void NodePathWrapper::setNodePath(const NodePath& nodePath)
 {
-	return mNodePath;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 //TypedObject semantics: hardcoded
