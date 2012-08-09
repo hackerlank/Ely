@@ -40,6 +40,14 @@
 class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {
 public:
+	/**
+	 * \brief Constructor.
+	 */
+	ComponentTemplateManager();
+	/**
+	 * \brief Destructor.
+	 */
+	~ComponentTemplateManager();
 
 	/**
 	 * \brief Adds a component template for a given the component type it can create.

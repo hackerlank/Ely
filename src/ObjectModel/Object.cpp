@@ -32,6 +32,17 @@ Object::Object(const ObjectId& objectId, ObjectTemplate* tmpl) :
 
 Object::~Object()
 {
+	//remove object templates
+	while (mComponents.size() > 0)
+	{
+		ComponentTable::iterator iter = mComponents.begin();
+		ComponentFamilyType compFamilyType = iter->first;
+		std::cout << "Removing component of family type '"
+				<< std::string(compFamilyType) << "'" << std::endl;
+		mComponents.erase(iter);
+	}
+	std::cout << std::endl;
+	//
 	mNodePath.remove_node();
 }
 

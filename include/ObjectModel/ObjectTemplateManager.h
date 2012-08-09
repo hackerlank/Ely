@@ -47,6 +47,10 @@ public:
 	 * \brief Constructor.
 	 */
 	ObjectTemplateManager();
+	/**
+	 * \brief Destructor.
+	 */
+	~ObjectTemplateManager();
 
 	/**
 	 * \brief Adds an object template for a given object type it can create.

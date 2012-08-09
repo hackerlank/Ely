@@ -37,8 +37,11 @@ RigidBody::RigidBody(RigidBodyTemplate* tmpl) :
 
 RigidBody::~RigidBody()
 {
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove_rigid_body(
-			mRigidBodyNode);
+	if (GamePhysicsManager::GetSingletonPtr())
+	{
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove_rigid_body(
+				mRigidBodyNode);
+	}
 }
 
 const ComponentFamilyType RigidBody::familyType() const

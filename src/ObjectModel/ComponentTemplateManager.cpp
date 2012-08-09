@@ -23,6 +23,24 @@
 
 #include "ObjectModel/ComponentTemplateManager.h"
 
+ComponentTemplateManager::ComponentTemplateManager()
+{
+}
+
+ComponentTemplateManager::~ComponentTemplateManager()
+{
+	//remove component templates
+	while (mComponentTemplates.size() > 0)
+	{
+		ComponentTemplateTable::iterator iter = mComponentTemplates.begin();
+		ComponentType compType = iter->first;
+		std::cout << "Removing component template for type '"
+				<< std::string(compType) << "'" << std::endl;
+		mComponentTemplates.erase(iter);
+	}
+	std::cout << std::endl;
+}
+
 PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 		ComponentTemplate* componentTmpl)
 {
@@ -70,7 +88,8 @@ ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(
+			componentType);
 	if (it == mComponentTemplates.end())
 	{
 		return NULL;

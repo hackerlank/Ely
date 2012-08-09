@@ -27,6 +27,29 @@ ObjectTemplateManager::ObjectTemplateManager()
 {
 }
 
+ObjectTemplateManager::~ObjectTemplateManager()
+{
+	//remove created objects
+	while (mCreatedObjects.size() > 0)
+	{
+		ObjectTable::iterator iter = mCreatedObjects.begin();
+		ObjectId objId = iter->first;
+		std::cout << "Removing object '" << std::string(objId) << "'"
+				<< std::endl;
+		mCreatedObjects.erase(iter);
+	}
+	//remove object templates
+	while (mObjectTemplates.size() > 0)
+	{
+		ObjectTemplateTable::iterator iter = mObjectTemplates.begin();
+		ObjectType objType = iter->first;
+		std::cout << "Removing object template for type '"
+				<< std::string(objType) << "'" << std::endl;
+		mObjectTemplates.erase(iter);
+	}
+	std::cout << std::endl;
+}
+
 PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		ObjectTemplate* objectTmpl)
 {

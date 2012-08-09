@@ -50,15 +50,18 @@ int main(int argc, char **argv)
 	//Sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//
-	GameAudioManager* gameAudioMgr = new GameAudioManager();
-	GameInputManager* gameInputMgr = new GameInputManager();
-	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
+	GameAudioManager* gameAudioMgr = new GameAudioManager(20, 0,
+			"ManagersChain");
+	GameInputManager* gameInputMgr = new GameInputManager(20, 0,
+			"ManagersChain");
+	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(20, 0,
+			"ManagersChain");
 #else
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 	GameInputManager* gameInputMgr = new GameInputManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 #endif
-#ifdef DEBUG
+#ifdef ELY_THREAD
 	//threading
 	if (Thread::is_threading_supported())
 	{
@@ -97,7 +100,8 @@ int main(int argc, char **argv)
 			AsyncTask* asyncTask = taskColl.get_task(task);
 			std::cout << "\t\tAsyncTask: '" << asyncTask->get_name() << "'"
 					<< std::endl;
-			std::cout << "\t\t\tpriority: " << asyncTask->get_priority() << std::endl;
+			std::cout << "\t\t\tpriority: " << asyncTask->get_priority()
+					<< std::endl;
 			std::cout << "\t\t\tsort: " << asyncTask->get_sort() << std::endl;
 		}
 	}
