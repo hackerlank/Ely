@@ -41,25 +41,25 @@ int main(int argc, char **argv)
 	GameManager* gameMgr = new GameManager(argc, argv);
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
-	//create (if necessary) other task chains
-	AsyncTaskChain *taskChain =
-			AsyncTaskManager::get_global_ptr()->make_task_chain(
-					"ManagersChain");
-	//Changes the number of threads for taskChain.
-	taskChain->set_num_threads(1);
-	//Sets the frame_sync flag.
+	AsyncTaskChain *taskChain;
+	//Task chain: GameInputManager
+	taskChain = AsyncTaskManager::get_global_ptr()->make_task_chain(
+			"ManagersChain");
+	//changes the number of threads for taskChain.
+	taskChain->set_num_threads(3);
+	//sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//
-	GameAudioManager* gameAudioMgr = new GameAudioManager(20, 0,
-			"ManagersChain");
 	GameInputManager* gameInputMgr = new GameInputManager(20, 0,
 			"ManagersChain");
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(20, 0,
 			"ManagersChain");
+	GameAudioManager* gameAudioMgr = new GameAudioManager(20, 0,
+			"ManagersChain");
 #else
-	GameAudioManager* gameAudioMgr = new GameAudioManager();
 	GameInputManager* gameInputMgr = new GameInputManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
+	GameAudioManager* gameAudioMgr = new GameAudioManager();
 #endif
 #ifdef ELY_THREAD
 	//threading
@@ -112,9 +112,9 @@ int main(int argc, char **argv)
 	gameMgr->main_loop();
 
 	// Close the game framework
+	delete gameAudioMgr;
 	delete gamePhysicsMgr;
 	delete gameInputMgr;
-	delete gameAudioMgr;
 	delete gameMgr;
 	delete objectTmplMgr;
 	delete componentTmplMgr;

@@ -173,9 +173,12 @@ ReMutex& GamePhysicsManager::getMutex()
 }
 
 #ifdef DEBUG
-BulletDebugNode* GamePhysicsManager::bulletDebugNodePath() const
+NodePath GamePhysicsManager::getDebugNodePath() const
 {
-	return DCAST(BulletDebugNode,mBulletDebugNodePath.node());
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mBulletDebugNodePath;
 }
 
 void GamePhysicsManager::initDebug(WindowFramework* windowFramework)

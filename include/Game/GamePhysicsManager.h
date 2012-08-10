@@ -95,7 +95,7 @@ public:
 	 * \brief Gets a reference to the Bullet Debug node.
 	 * @return The Bullet Debug node.
 	 */
-	BulletDebugNode* bulletDebugNodePath() const;
+	NodePath getDebugNodePath() const;
 
 	/**
 	 * \brief Initializes debugging.
