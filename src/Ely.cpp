@@ -46,7 +46,7 @@ int main(int argc, char **argv)
 	taskChain = AsyncTaskManager::get_global_ptr()->make_task_chain(
 			"ManagersChain");
 	//changes the number of threads for taskChain.
-	taskChain->set_num_threads(3);
+	taskChain->set_num_threads(1);
 	//sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//

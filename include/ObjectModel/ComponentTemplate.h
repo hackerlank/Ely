@@ -46,6 +46,11 @@ public:
 	ComponentTemplate();
 
 	/**
+	 * \brief Destructor.
+	 */
+	virtual ~ComponentTemplate();
+
+	/**
 	 * \brief Gets the id of the component created.
 	 * @return The id of the component created.
 	 */

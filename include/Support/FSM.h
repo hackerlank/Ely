@@ -307,6 +307,11 @@ public:
 	FSM(const StateKey& name);
 
 	/**
+	 * \brief Destructor.
+	 */
+	virtual ~FSM();
+
+	/**
 	 * \brief A convenience function to force the FSM to clean itself up
 	 * by transitioning to the OffState.
 	 */
@@ -518,6 +523,12 @@ template<typename StateKey> FSM<StateKey>::FSM(const StateKey& name) :
 	//any specialization must call this, otherwise no
 	//initialization would take place
 	initialize(name);
+}
+
+template<typename StateKey> FSM<StateKey>::~FSM()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
 }
 
 template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)

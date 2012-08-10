@@ -28,6 +28,12 @@ ComponentTemplate::ComponentTemplate()
 	mParameterTable.clear();
 }
 
+ComponentTemplate::~ComponentTemplate()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+}
+
 void ComponentTemplate::setParameters(const ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex

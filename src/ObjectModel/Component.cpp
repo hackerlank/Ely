@@ -28,6 +28,12 @@ Component::Component() :
 {
 }
 
+Component::~Component()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+}
+
 void Component::update(void* data)
 {
 }

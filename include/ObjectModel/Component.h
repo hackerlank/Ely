@@ -67,6 +67,11 @@ public:
 	Component();
 
 	/**
+	 * \brief Destructor.
+	 */
+	virtual ~Component();
+
+	/**
 	 * \brief Gets the type of this component.
 	 * @return The id of this component.
 	 */

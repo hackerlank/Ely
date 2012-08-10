@@ -29,6 +29,9 @@ ComponentTemplateManager::ComponentTemplateManager()
 
 ComponentTemplateManager::~ComponentTemplateManager()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//remove component templates
 	while (mComponentTemplates.size() > 0)
 	{

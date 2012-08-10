@@ -53,6 +53,9 @@ GameInputManager::GameInputManager(int sort, int priority,
 
 GameInputManager::~GameInputManager()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);

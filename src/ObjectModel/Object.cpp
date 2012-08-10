@@ -32,6 +32,9 @@ Object::Object(const ObjectId& objectId, ObjectTemplate* tmpl) :
 
 Object::~Object()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//remove object templates
 	while (mComponents.size() > 0)
 	{

@@ -39,7 +39,8 @@ ObjectTemplate::ObjectTemplate(const ObjectType& name,
 
 ObjectTemplate::~ObjectTemplate()
 {
-	// TODO Auto-generated destructor stub
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
 }
 
 const ObjectType& ObjectTemplate::name() const

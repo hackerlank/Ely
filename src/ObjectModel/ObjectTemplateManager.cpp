@@ -29,6 +29,9 @@ ObjectTemplateManager::ObjectTemplateManager()
 
 ObjectTemplateManager::~ObjectTemplateManager()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//remove created objects
 	while (mCreatedObjects.size() > 0)
 	{
