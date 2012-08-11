@@ -125,7 +125,7 @@
 			<Component type="ControlByEvent">
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
-				<Param fast_factor="10.0"/>
+				<Param fast_factor="15.0"/>
 				<Param inverted_keyboard="false"/>
 				<Param inverted_mouse="false"/>
 				<Param up="r"/>
