@@ -452,7 +452,6 @@ void RigidBody::getBoundingDimensions(NodePath modelNP)
 
 void RigidBody::setPhysicalParameters()
 {
-	mRigidBodyNode->set_mass(mBodyMass);
 	mRigidBodyNode->set_friction(mBodyFriction);
 	mRigidBodyNode->set_restitution(mBodyRestitution);
 	if (mCcdEnabled)
