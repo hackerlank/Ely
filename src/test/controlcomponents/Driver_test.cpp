@@ -15,37 +15,37 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/inputcomponents/ControlByEvent_test.cpp
+ * \file /Ely/src/test/controlcomponents/Driver_test.cpp
  *
  * \date 31/mag/2012 (16:23:02)
  * \author marco
  */
 
-#include "InputSuiteFixture.h"
+#include "ControlSuiteFixture.h"
 
-struct ControlByEventTestCaseFixture
+struct DriverTestCaseFixture
 {
-	ControlByEventTestCaseFixture()
+	DriverTestCaseFixture()
 	{
 	}
-	~ControlByEventTestCaseFixture()
+	~DriverTestCaseFixture()
 	{
 	}
 };
 
-/// Input suite
-BOOST_FIXTURE_TEST_SUITE(Input,InputSuiteFixture)
+/// Control suite
+BOOST_FIXTURE_TEST_SUITE(Control,ControlSuiteFixture)
 
 /// Test cases
-BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
+BOOST_AUTO_TEST_CASE(DriverInitializeTEST)
 {
 	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
-	mControlTmpl = new ControlByEventTemplate(mPanda, mWin);
+	mControlTmpl = new DriverTemplate(mPanda, mWin);
 	mControl =
-	DCAST(ControlByEvent, mControlTmpl->makeComponent(mCompId));
+	DCAST(Driver, mControlTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mControl != NULL);
-	BOOST_CHECK(mControl->componentType() == ComponentId("ControlByEvent"));
-	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Input"));
+	BOOST_CHECK(mControl->componentType() == ComponentId("Driver"));
+	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Control"));
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);
@@ -60,7 +60,7 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 		//check if has event-handler
 		BOOST_REQUIRE(mPanda->get_event_handler().has_hook(iter->get_name()));
 	}
-	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("ControlByEvent::update"));
+	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("Driver::update"));
 	BOOST_REQUIRE(task != NULL);
 	unsigned int i;
 	//send movement events: 3 at a time
@@ -96,4 +96,4 @@ BOOST_AUTO_TEST_CASE(ControlByEventInitializeTEST)
 	BOOST_CHECK_CLOSE( testObj.getNodePath().get_z(), VAL, 1.0);
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Input suite
+BOOST_AUTO_TEST_SUITE_END() // Control suite

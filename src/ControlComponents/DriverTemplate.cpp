@@ -15,15 +15,15 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/InputComponents/ControlByEventTemplate.cpp
+ * \file /Ely/src/ControlComponents/DriverTemplate.cpp
  *
  * \date 31/mag/2012 (16:44:06)
  * \author marco
  */
 
-#include "InputComponents/ControlByEventTemplate.h"
+#include "ControlComponents/DriverTemplate.h"
 
-ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework,
+DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)
 
@@ -31,32 +31,32 @@ ControlByEventTemplate::ControlByEventTemplate(PandaFramework* pandaFramework,
 	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"ControlByEventTemplate::ControlByEventTemplate: invalid PandaFramework or WindowFramework");
+				"DriverTemplate::DriverTemplate: invalid PandaFramework or WindowFramework");
 	}
 	setParametersDefaults();
 }
 
-ControlByEventTemplate::~ControlByEventTemplate()
+DriverTemplate::~DriverTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType ControlByEventTemplate::componentType() const
+const ComponentType DriverTemplate::componentType() const
 {
-	return ComponentType("ControlByEvent");
+	return ComponentType("Driver");
 }
 
-const ComponentFamilyType ControlByEventTemplate::familyType() const
+const ComponentFamilyType DriverTemplate::familyType() const
 {
-	return ComponentFamilyType("Input");
+	return ComponentFamilyType("Control");
 }
 
-Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
+Component* DriverTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ControlByEvent* newControl = new ControlByEvent(this);
+	Driver* newControl = new Driver(this);
 	newControl->setComponentId(compId);
 	if (not newControl->initialize())
 	{
@@ -65,7 +65,7 @@ Component* ControlByEventTemplate::makeComponent(const ComponentId& compId)
 	return newControl;
 }
 
-void ControlByEventTemplate::setParametersDefaults()
+void DriverTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -95,16 +95,16 @@ void ControlByEventTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
 }
 
-PandaFramework* const ControlByEventTemplate::pandaFramework() const
+PandaFramework* const DriverTemplate::pandaFramework() const
 {
 	return mPandaFramework;
 }
 
-WindowFramework* const ControlByEventTemplate::windowFramework() const
+WindowFramework* const DriverTemplate::windowFramework() const
 {
 	return mWindowFramework;
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle ControlByEventTemplate::_type_handle;
+TypeHandle DriverTemplate::_type_handle;
 

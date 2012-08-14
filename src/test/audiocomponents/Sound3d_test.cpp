@@ -39,7 +39,7 @@ static float posExpected[] =
 static float velExpected[] =
 { 0.0, 1.0, -1.0, 2.0, 0.0, -2.0 };
 
-/// Input suite
+/// Audio suite
 BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 
 /// Test cases
@@ -115,4 +115,4 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	}
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Input suite
+BOOST_AUTO_TEST_SUITE_END() // Audio suite

@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/InputComponents/ControlByEvent.h
+ * \file /Ely/include/ControlComponents/Driver.h
  *
  * \date 31/mag/2012 (16:42:14)
  * \author marco
@@ -41,7 +41,7 @@
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
-class ControlByEventTemplate;
+class DriverTemplate;
 
 /**
  * \brief Component representing the control of object movement
@@ -81,12 +81,12 @@ class ControlByEventTemplate;
  * \li \c "mouse_enabled_h"  |single|"false"
  * \li \c "mouse_enabled_p"  |single|"false"
  */
-class ControlByEvent: public Component
+class Driver: public Component
 {
 public:
-	ControlByEvent();
-	ControlByEvent(ControlByEventTemplate* tmpl);
-	virtual ~ControlByEvent();
+	Driver();
+	Driver(DriverTemplate* tmpl);
+	virtual ~Driver();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -97,7 +97,7 @@ public:
 	/**
 	 * \brief Updates position/orientation of the controlled object.
 	 *
-	 * Will be called automatically by an input manager update.
+	 * Will be called automatically by an control manager update.
 	 * @param data The custom data.
 	 */
 	virtual void update(void* data);
@@ -114,7 +114,7 @@ public:
 
 private:
 	///The template used to construct this component.
-	ControlByEventTemplate* mTmpl;
+	DriverTemplate* mTmpl;
 
 	///Helper struct to set bool values for a given component.
 	struct ThisBool
@@ -122,7 +122,7 @@ private:
 		ThisBool()
 		{
 		}
-		ThisBool(ControlByEvent* _ptr, bool _value) :
+		ThisBool(Driver* _ptr, bool _value) :
 				ptr(_ptr), value(_value)
 		{
 		}
@@ -130,7 +130,7 @@ private:
 		{
 			return value;
 		}
-		ControlByEvent* ptr;
+		Driver* ptr;
 		bool value;
 	};
 	///@{
@@ -180,7 +180,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "ControlByEvent",
+		register_type(_type_handle, "Driver",
 				Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const

@@ -38,8 +38,8 @@ void initTypedObjects()
 	InstanceOfTemplate::init_type();
 	NodePathWrapper::init_type();
 	NodePathWrapperTemplate::init_type();
-	ControlByEvent::init_type();
-	ControlByEventTemplate::init_type();
+	Driver::init_type();
+	DriverTemplate::init_type();
 	Sound3d::init_type();
 	Sound3dTemplate::init_type();
 	Listener::init_type();

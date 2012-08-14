@@ -42,7 +42,7 @@ int main(int argc, char **argv)
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
 	AsyncTaskChain *taskChain;
-	//Task chain: GameInputManager
+	//Task chain: GameControlManager
 	taskChain = AsyncTaskManager::get_global_ptr()->make_task_chain(
 			"ManagersChain");
 	//changes the number of threads for taskChain.
@@ -50,14 +50,14 @@ int main(int argc, char **argv)
 	//sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//
-	GameInputManager* gameInputMgr = new GameInputManager(20, 0,
+	GameControlManager* gameControlMgr = new GameControlManager(20, 0,
 			"ManagersChain");
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(30, 0,
 			"ManagersChain");
 	GameAudioManager* gameAudioMgr = new GameAudioManager(60, 0,
 			"ManagersChain");
 #else
-	GameInputManager* gameInputMgr = new GameInputManager();
+	GameControlManager* gameControlMgr = new GameControlManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 #endif
@@ -114,7 +114,7 @@ int main(int argc, char **argv)
 	// Close the game framework
 	delete gameAudioMgr;
 	delete gamePhysicsMgr;
-	delete gameInputMgr;
+	delete gameControlMgr;
 	delete gameMgr;
 	delete objectTmplMgr;
 	delete componentTmplMgr;

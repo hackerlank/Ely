@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/InputComponents/ControlByEventTemplate.h
+ * \file /Ely/include/ControlComponents/DriverTemplate.h
  *
  * \date 31/mag/2012 (16:44:06)
  * \author marco
@@ -30,16 +30,16 @@
 #include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "InputComponents/ControlByEvent.h"
-#include "Game/GameInputManager.h"
+#include "ControlComponents/Driver.h"
+#include "Game/GameControlManager.h"
 #include "Utilities/Tools.h"
 
-class ControlByEventTemplate: public ComponentTemplate
+class DriverTemplate: public ComponentTemplate
 {
 public:
-	ControlByEventTemplate(PandaFramework* pandaFramework,
+	DriverTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~ControlByEventTemplate();
+	virtual ~DriverTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -76,7 +76,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "ControlByEventTemplate",
+		register_type(_type_handle, "DriverTemplate",
 				ComponentTemplate::get_class_type());
 	}
 

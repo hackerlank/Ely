@@ -26,7 +26,7 @@
 
 #include "Game/GameManager.h"
 #include "Game/GameAudioManager.h"
-#include "Game/GameInputManager.h"
+#include "Game/GameControlManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <boost/test/unit_test.hpp>
 

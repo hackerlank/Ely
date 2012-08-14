@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/inputcomponents/InputSuiteFixture.h
+ * \file /Ely/src/test/controlcomponents/ControlSuiteFixture.h
  *
  * \date 31/mag/2012 (16:24:12)
  * \author marco
@@ -25,8 +25,8 @@
 #define INPUTSUITEFIXTURE_H_
 
 #include <boost/test/unit_test.hpp>
-#include "InputComponents/ControlByEvent.h"
-#include "InputComponents/ControlByEventTemplate.h"
+#include "ControlComponents/Driver.h"
+#include "ControlComponents/DriverTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <pandaFramework.h>
 #include <nodePath.h>
@@ -35,10 +35,10 @@
 #include <event.h>
 #include <vector>
 
-struct InputSuiteFixture
+struct ControlSuiteFixture
 {
-	InputSuiteFixture() :
-			mControl(NULL), mCompId("ControlByEvent_Test"), mControlTmpl(NULL), mObjectTmpl(
+	ControlSuiteFixture() :
+			mControl(NULL), mCompId("Driver_Test"), mControlTmpl(NULL), mObjectTmpl(
 					NULL), VAL(1.0e+12), DEG(89.999)
 	{
 		int argc = 0;
@@ -46,8 +46,8 @@ struct InputSuiteFixture
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
-		ControlByEventTemplate::init_type();
-		ControlByEvent::init_type();
+		DriverTemplate::init_type();
+		Driver::init_type();
 		ObjectTemplate::init_type();
 		Object::init_type();
 		mEvents.push_back(Event("w"));
@@ -75,7 +75,7 @@ struct InputSuiteFixture
 		mEvents.push_back(Event("shift-f"));
 		mEvents.push_back(Event("f-up"));
 	}
-	~InputSuiteFixture()
+	~ControlSuiteFixture()
 	{
 		//delete always objects/components before their templates
 		if (mObjectTmpl)
@@ -93,9 +93,9 @@ struct InputSuiteFixture
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	ControlByEvent* mControl;
+	Driver* mControl;
 	ComponentId mCompId;
-	ControlByEventTemplate* mControlTmpl;
+	DriverTemplate* mControlTmpl;
 	ObjectTemplate* mObjectTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;

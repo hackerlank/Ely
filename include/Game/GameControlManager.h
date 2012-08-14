@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game/GameInputManager.h
+ * \file /Ely/include/Game/GameControlManager.h
  *
  * \date 29/lug/2012 (10:07:02)
  * \author marco
@@ -35,11 +35,11 @@
 #include "Utilities/Tools.h"
 
 /**
- * \brief Singleton manager updating input components.
+ * \brief Singleton manager updating control components.
  *
  * Prepared for multi-threading.
  */
-class GameInputManager: public Singleton<GameInputManager>
+class GameControlManager: public Singleton<GameControlManager>
 {
 public:
 
@@ -48,23 +48,23 @@ public:
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */
-	GameInputManager(int sort = 0, int priority = 0,
+	GameControlManager(int sort = 0, int priority = 0,
 			const std::string& asyncTaskChain = std::string(""));
-	virtual ~GameInputManager();
+	virtual ~GameControlManager();
 
 	/**
-	 * \brief Adds an input component for updating.
-	 * @param inputComp The input component.
+	 * \brief Adds an control component for updating.
+	 * @param controlComp The control component.
 	 */
-	void addToInputUpdate(Component* inputComp);
+	void addToControlUpdate(Component* controlComp);
 	/**
-	 * \brief Removes an input component from updating.
-	 * @param inputComp The input component.
+	 * \brief Removes an control component from updating.
+	 * @param controlComp The control component.
 	 */
-	void removeFromInputUpdate(Component* inputComp);
+	void removeFromControlUpdate(Component* controlComp);
 
 	/**
-	 * \brief Updates input components.
+	 * \brief Updates control components.
 	 *
 	 * Will be called automatically in a task.
 	 * @param task The task.
@@ -80,14 +80,14 @@ public:
 
 private:
 	///@{
-	///List of input components to be updated.
-	typedef std::list<Component*> InputComponentList;
-	InputComponentList mInputComponents;
+	///List of control components to be updated.
+	typedef std::list<Component*> ControlComponentList;
+	ControlComponentList mControlComponents;
 	///@}
 
 	///@{
 	///A task data for update.
-	PT(TaskInterface<GameInputManager>::TaskData) mUpdateData;
+	PT(TaskInterface<GameControlManager>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
 	///@}
 

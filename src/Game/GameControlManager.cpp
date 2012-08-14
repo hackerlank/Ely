@@ -15,25 +15,25 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Game/GameInputManager.cpp
+ * \file /Ely/src/Game/GameControlManager.cpp
  *
  * \date 29/lug/2012 (10:07:02)
  * \author marco
  */
 
-#include "Game/GameInputManager.h"
+#include "Game/GameControlManager.h"
 
-GameInputManager::GameInputManager(int sort, int priority,
+GameControlManager::GameControlManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	mInputComponents.clear();
+	mControlComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	//create the task for updating the input components
-	mUpdateData = new TaskInterface<GameInputManager>::TaskData(this,
-			&GameInputManager::update);
-	mUpdateTask = new GenericAsyncTask("GameInputManager::update",
-			&TaskInterface<GameInputManager>::taskFunction,
+	//create the task for updating the control components
+	mUpdateData = new TaskInterface<GameControlManager>::TaskData(this,
+			&GameControlManager::update);
+	mUpdateTask = new GenericAsyncTask("GameControlManager::update",
+			&TaskInterface<GameControlManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//set sort/priority
 	mUpdateTask->set_sort(sort);
@@ -51,7 +51,7 @@ GameInputManager::GameInputManager(int sort, int priority,
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
-GameInputManager::~GameInputManager()
+GameControlManager::~GameControlManager()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -60,36 +60,36 @@ GameInputManager::~GameInputManager()
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
 	}
-	mInputComponents.clear();
+	mControlComponents.clear();
 }
 
-void GameInputManager::addToInputUpdate(Component* inputComp)
+void GameControlManager::addToControlUpdate(Component* controlComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	InputComponentList::iterator iter = find(mInputComponents.begin(),
-			mInputComponents.end(), inputComp);
-	if (iter == mInputComponents.end())
+	ControlComponentList::iterator iter = find(mControlComponents.begin(),
+			mControlComponents.end(), controlComp);
+	if (iter == mControlComponents.end())
 	{
-		mInputComponents.push_back(inputComp);
+		mControlComponents.push_back(controlComp);
 	}
 }
 
-void GameInputManager::removeFromInputUpdate(Component* inputComp)
+void GameControlManager::removeFromControlUpdate(Component* controlComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	InputComponentList::iterator iter = find(mInputComponents.begin(),
-			mInputComponents.end(), inputComp);
-	if (iter != mInputComponents.end())
+	ControlComponentList::iterator iter = find(mControlComponents.begin(),
+			mControlComponents.end(), controlComp);
+	if (iter != mControlComponents.end())
 	{
-		mInputComponents.remove(inputComp);
+		mControlComponents.remove(controlComp);
 	}
 }
 
-AsyncTask::DoneStatus GameInputManager::update(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -104,9 +104,9 @@ AsyncTask::DoneStatus GameInputManager::update(GenericAsyncTask* task)
 	dt = 0.016666667; //60 fps
 #endif
 
-	// call all input components update functions, passing delta time
-	InputComponentList::iterator iter;
-	for (iter = mInputComponents.begin(); iter != mInputComponents.end();
+	// call all control components update functions, passing delta time
+	ControlComponentList::iterator iter;
+	for (iter = mControlComponents.begin(); iter != mControlComponents.end();
 			++iter)
 	{
 		(*iter)->update(reinterpret_cast<void*>(&dt));
@@ -116,7 +116,7 @@ AsyncTask::DoneStatus GameInputManager::update(GenericAsyncTask* task)
 
 }
 
-ReMutex& GameInputManager::getMutex()
+ReMutex& GameControlManager::getMutex()
 {
 	return mMutex;
 }

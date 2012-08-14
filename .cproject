@@ -73,10 +73,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
+						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|include|src/test|training|src|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="threads.cpp|training.cpp|fsm.cpp|anim.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
+						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -155,9 +155,9 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="Ely.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="threads.cpp|training.cpp|fsm.cpp|anim.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
+						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
+						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -232,10 +232,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
+						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|include|src/test|training|src|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="threads.cpp|training.cpp|fsm.cpp|anim.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
+						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -312,10 +312,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry excluding="Ely.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="threads.cpp|training.cpp|fsm.cpp|anim.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
+						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -389,7 +389,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="training/fsm.cpp|training/physics.cpp|training/anim.cpp|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="training/anim.cpp|training/fsm.cpp|src|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -466,10 +466,10 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
+						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|include|src/test|training|src|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry excluding="threads.cpp|training.cpp|fsm.cpp|anim.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
+						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -541,7 +541,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="training/threads.cpp|training/physics.cpp|training/anim.cpp|src/test|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="training/anim.cpp|src/test|training/threads.cpp|src/test/Runner.cpp|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>

@@ -15,21 +15,21 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/InputComponents/ControlByEvent.cpp
+ * \file /Ely/src/ControlComponents/Driver.cpp
  *
  * \date 31/mag/2012 (16:42:14)
  * \author marco
  */
 
-#include "InputComponents/ControlByEvent.h"
-#include "InputComponents/ControlByEventTemplate.h"
+#include "ControlComponents/Driver.h"
+#include "ControlComponents/DriverTemplate.h"
 
-ControlByEvent::ControlByEvent()
+Driver::Driver()
 {
 	// TODO Auto-generated constructor stub
 }
 
-ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
+Driver::Driver(DriverTemplate* tmpl) :
 		mTmpl(tmpl), mForward(this, false), mBackward(this, false), mStrafeLeft(
 				this, false), mStrafeRight(this, false), mUp(this, false), mDown(
 				this, false), mRollLeft(this, false), mRollRight(this, false), mTrue(
@@ -43,12 +43,12 @@ ControlByEvent::ControlByEvent(ControlByEventTemplate* tmpl) :
 	mCentY = win->get_properties().get_y_size() / 2;
 }
 
-ControlByEvent::~ControlByEvent()
+Driver::~Driver()
 {
 	disable();
 }
 
-void ControlByEvent::disable()
+void Driver::disable()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -63,11 +63,11 @@ void ControlByEvent::disable()
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	win->request_properties(props);
 
-	//Remove from the input manager update
+	//Remove from the control manager update
 	//first check if game audio manager exists
-	if (GameInputManager::GetSingletonPtr())
+	if (GameControlManager::GetSingletonPtr())
 	{
-		GameInputManager::GetSingletonPtr()->removeFromInputUpdate(this);
+		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 	}
 	//Unregister the handlers
 	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
@@ -90,17 +90,17 @@ void ControlByEvent::disable()
 	mIsEnabled = not mIsEnabled;
 }
 
-const ComponentFamilyType ControlByEvent::familyType() const
+const ComponentFamilyType Driver::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType ControlByEvent::componentType() const
+const ComponentType Driver::componentType() const
 {
 	return mTmpl->componentType();
 }
 
-void ControlByEvent::enable()
+void Driver::enable()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -123,11 +123,11 @@ void ControlByEvent::enable()
 	//reset mouse to start position
 	win->move_pointer(0, mCentX, mCentY);
 
-	//Add to the input manager update
+	//Add to the control manager update
 	//first check if game audio manager exists
-	if (GameInputManager::GetSingletonPtr())
+	if (GameControlManager::GetSingletonPtr())
 	{
-		GameInputManager::GetSingletonPtr()->addToInputUpdate(this);
+		GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 	}
 
 	//Register the handlers
@@ -141,11 +141,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "backward",
-				&ControlByEvent::setControlTrue, (void*) &this->mBackward);
+				&Driver::setControlTrue, (void*) &this->mBackward);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-backward",
-				&ControlByEvent::setControlTrue, (void*) &this->mBackward);
+				&Driver::setControlTrue, (void*) &this->mBackward);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "backward-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mBackward);
+				&Driver::setControlFalse, (void*) &this->mBackward);
 	}
 	//down event keys (e.g. "f", "shift-f", "f-up")
 	keyEvent = mDownKey;
@@ -154,11 +154,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "down",
-				&ControlByEvent::setControlTrue, (void*) &this->mDown);
+				&Driver::setControlTrue, (void*) &this->mDown);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-down",
-				&ControlByEvent::setControlTrue, (void*) &this->mDown);
+				&Driver::setControlTrue, (void*) &this->mDown);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "down-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mDown);
+				&Driver::setControlFalse, (void*) &this->mDown);
 	}
 	//forward event keys (e.g. "w", "shift-w", "w-up")
 	keyEvent = mForwardKey;
@@ -167,11 +167,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "forward",
-				&ControlByEvent::setControlTrue, (void*) &this->mForward);
+				&Driver::setControlTrue, (void*) &this->mForward);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-forward",
-				&ControlByEvent::setControlTrue, (void*) &this->mForward);
+				&Driver::setControlTrue, (void*) &this->mForward);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "forward-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mForward);
+				&Driver::setControlFalse, (void*) &this->mForward);
 	}
 	//strafeLeft event keys (e.g. "q", "shift-q", "q-up")
 	keyEvent = mStrafeLeftKey;
@@ -180,11 +180,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "strafeLeft",
-				&ControlByEvent::setControlTrue, (void*) &this->mStrafeLeft);
+				&Driver::setControlTrue, (void*) &this->mStrafeLeft);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-strafeLeft",
-				&ControlByEvent::setControlTrue, (void*) &this->mStrafeLeft);
+				&Driver::setControlTrue, (void*) &this->mStrafeLeft);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "strafeLeft-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mStrafeLeft);
+				&Driver::setControlFalse, (void*) &this->mStrafeLeft);
 	}
 	//strafeRight event keys (e.g. "e", "shift-e", "e-up")
 	keyEvent = mStrafeRightKey;
@@ -193,11 +193,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "strafeRight",
-				&ControlByEvent::setControlTrue, (void*) &this->mStrafeRight);
+				&Driver::setControlTrue, (void*) &this->mStrafeRight);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-strafeRight",
-				&ControlByEvent::setControlTrue, (void*) &this->mStrafeRight);
+				&Driver::setControlTrue, (void*) &this->mStrafeRight);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "strafeRight-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mStrafeRight);
+				&Driver::setControlFalse, (void*) &this->mStrafeRight);
 	}
 	//rollLeft event keys (e.g. "a", "shift-a", "a-up")
 	keyEvent = mRollLeftKey;
@@ -206,11 +206,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "rollLeft",
-				&ControlByEvent::setControlTrue, (void*) &this->mRollLeft);
+				&Driver::setControlTrue, (void*) &this->mRollLeft);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-rollLeft",
-				&ControlByEvent::setControlTrue, (void*) &this->mRollLeft);
+				&Driver::setControlTrue, (void*) &this->mRollLeft);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "rollLeft-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mRollLeft);
+				&Driver::setControlFalse, (void*) &this->mRollLeft);
 	}
 	//rollRight event keys (e.g. "d", "shift-d", "d-up")
 	keyEvent = mRollRightKey;
@@ -219,11 +219,11 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "rollRight",
-				&ControlByEvent::setControlTrue, (void*) &this->mRollRight);
+				&Driver::setControlTrue, (void*) &this->mRollRight);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-rollRight",
-				&ControlByEvent::setControlTrue, (void*) &this->mRollRight);
+				&Driver::setControlTrue, (void*) &this->mRollRight);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "rollRight-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mRollRight);
+				&Driver::setControlFalse, (void*) &this->mRollRight);
 	}
 	//up event keys (e.g. "r", "shift-r", "r-up")
 	keyEvent = mUpKey;
@@ -232,23 +232,23 @@ void ControlByEvent::enable()
 		speedKeyEvent = speedKey + "-" + keyEvent;
 		upKeyEvent = keyEvent + "-up";
 		mTmpl->pandaFramework()->define_key(keyEvent, "up",
-				&ControlByEvent::setControlTrue, (void*) &this->mUp);
+				&Driver::setControlTrue, (void*) &this->mUp);
 		mTmpl->pandaFramework()->define_key(speedKeyEvent, "speed-up",
-				&ControlByEvent::setControlTrue, (void*) &this->mUp);
+				&Driver::setControlTrue, (void*) &this->mUp);
 		mTmpl->pandaFramework()->define_key(upKeyEvent, "up-up",
-				&ControlByEvent::setControlFalse, (void*) &this->mUp);
+				&Driver::setControlFalse, (void*) &this->mUp);
 	}
 	//speedKey events (e.g. "shift", "shift-up")
 	upKeyEvent = speedKey + "-up";
 	mTmpl->pandaFramework()->define_key(speedKey, "speedKey",
-			&ControlByEvent::setSpeedFast, (void*) this);
+			&Driver::setSpeedFast, (void*) this);
 	mTmpl->pandaFramework()->define_key(upKeyEvent, "speedKey-up",
-			&ControlByEvent::setSpeed, (void*) this);
+			&Driver::setSpeed, (void*) this);
 	//
 	mIsEnabled = not mIsEnabled;
 }
 
-bool ControlByEvent::initialize()
+bool Driver::initialize()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -312,7 +312,7 @@ bool ControlByEvent::initialize()
 	return result;
 }
 
-void ControlByEvent::onAddToObjectSetup()
+void Driver::onAddToObjectSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -324,7 +324,7 @@ void ControlByEvent::onAddToObjectSetup()
 	}
 }
 
-void ControlByEvent::setControlTrue(const Event* event, void* data)
+void Driver::setControlTrue(const Event* event, void* data)
 {
 	ThisBool* thisBool = (ThisBool*) data;
 	//lock (guard) the mutex
@@ -333,7 +333,7 @@ void ControlByEvent::setControlTrue(const Event* event, void* data)
 	thisBool->value = true;
 }
 
-void ControlByEvent::setControlFalse(const Event* event, void* data)
+void Driver::setControlFalse(const Event* event, void* data)
 {
 	ThisBool* thisBool = (ThisBool*) data;
 	//lock (guard) the mutex
@@ -342,25 +342,25 @@ void ControlByEvent::setControlFalse(const Event* event, void* data)
 	thisBool->value = false;
 }
 
-void ControlByEvent::setSpeed(const Event* event, void* data)
+void Driver::setSpeed(const Event* event, void* data)
 {
-	ControlByEvent* _this = (ControlByEvent*) data;
+	Driver* _this = (Driver*) data;
 	//lock (guard) the mutex
 	HOLDMUTEX(_this->mMutex)
 
 	_this->mSpeedActual = _this->mSpeed;
 }
 
-void ControlByEvent::setSpeedFast(const Event* event, void* data)
+void Driver::setSpeedFast(const Event* event, void* data)
 {
-	ControlByEvent* _this = (ControlByEvent*) data;
+	Driver* _this = (Driver*) data;
 	//lock (guard) the mutex
 	HOLDMUTEX(_this->mMutex)
 
 	_this->mSpeedActual = _this->mSpeed * _this->mFastFactor;
 }
 
-bool ControlByEvent::isEnabled()
+bool Driver::isEnabled()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -368,7 +368,7 @@ bool ControlByEvent::isEnabled()
 	return mIsEnabled;
 }
 
-void ControlByEvent::update(void* data)
+void Driver::update(void* data)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -521,5 +521,5 @@ void ControlByEvent::update(void* data)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle ControlByEvent::_type_handle;
+TypeHandle Driver::_type_handle;
 

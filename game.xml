@@ -10,12 +10,12 @@
 		</ObjectTmpl>
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
-			<ComponentTmpl family="Input" type="ControlByEvent"/>
+			<ComponentTmpl family="Control" type="Driver"/>
 			<ComponentTmpl family="Audio" type="Listener"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Scene" type="Model"/>
-			<ComponentTmpl family="Input" type="ControlByEvent"/>
+			<ComponentTmpl family="Control" type="Driver"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
 		</ObjectTmpl>
@@ -49,7 +49,7 @@
 			<Component type="NodePathWrapper" priority="100">
 				<Param nodepath="camera"/>
 			</Component>
-			<Component type="ControlByEvent">
+			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
 				<Param fast_factor="10.0"/>
@@ -122,7 +122,7 @@
 			<Param rot_p="-90.0"/>
 		</Object>
 		<Object type="Actor" id="Actor1"  priority="100">
-			<Component type="ControlByEvent">
+			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
 				<Param fast_factor="15.0"/>

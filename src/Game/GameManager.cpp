@@ -152,9 +152,9 @@ void GameManager::setupCompTmplMgr()
 	//NodePathWrapper template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new NodePathWrapperTemplate(mWindow));
-	//ControlByEvent template
+	//Driver template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ControlByEventTemplate(this, mWindow));
+			new DriverTemplate(this, mWindow));
 	//Sound3d template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new Sound3dTemplate(mWindow));
@@ -469,8 +469,8 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 	GameManager* gameManager = (GameManager*) data;
 	PT(Object) actor1 =
 			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
-	ControlByEvent* actor1Control = DCAST(ControlByEvent, actor1->getComponent(
-					ComponentFamilyType("Input")));
+	Driver* actor1Control = DCAST(Driver, actor1->getComponent(
+					ComponentFamilyType("Control")));
 	bool isEnabled = actor1Control->isEnabled();
 
 	if (isEnabled)
@@ -523,8 +523,8 @@ void GameManager::toggleCameraControl(const Event* event, void* data)
 	GameManager* gameManager = (GameManager*) data;
 	PT(Object) camera =
 			ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
-	ControlByEvent* cameraControl = DCAST(ControlByEvent, camera->getComponent(
-					ComponentFamilyType("Input")));
+	Driver* cameraControl = DCAST(Driver, camera->getComponent(
+					ComponentFamilyType("Control")));
 	bool isEnabled = cameraControl->isEnabled();
 
 	if (isEnabled)

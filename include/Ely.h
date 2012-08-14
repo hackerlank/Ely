@@ -27,7 +27,7 @@
 #include <load_prc_file.h>
 #include "Game/GameManager.h"
 #include "Game/GameAudioManager.h"
-#include "Game/GameInputManager.h"
+#include "Game/GameControlManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
