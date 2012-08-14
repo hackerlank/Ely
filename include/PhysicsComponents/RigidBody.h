@@ -130,6 +130,8 @@ public:
 
 	/**
 	 * \brief Switches the actual component's type.
+	 *
+	 * It sets the rigid body mass too.
 	 * @param bodyType The new component's type.
 	 */
 	void switchType(BodyType bodyType);
