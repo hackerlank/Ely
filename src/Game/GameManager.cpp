@@ -152,6 +152,9 @@ void GameManager::setupCompTmplMgr()
 	//NodePathWrapper template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new NodePathWrapperTemplate(mWindow));
+	//Terrain template
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new TerrainTemplate(this, mWindow));
 	//Driver template
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new DriverTemplate(this, mWindow));

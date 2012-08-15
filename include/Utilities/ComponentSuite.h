@@ -44,5 +44,7 @@
 #include "SceneComponents/InstanceOfTemplate.h"
 #include "SceneComponents/NodePathWrapper.h"
 #include "SceneComponents/NodePathWrapperTemplate.h"
+#include "SceneComponents/Terrain.h"
+#include "SceneComponents/TerrainTemplate.h"
 
 #endif /* COMPONENTSUITE_H_ */

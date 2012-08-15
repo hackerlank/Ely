@@ -48,40 +48,6 @@ const ComponentType Model::componentType() const
 	return mTmpl->componentType();
 }
 
-NodePath Model::getNodePath() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void Model::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
-}
-
-void Model::onAddToObjectSetup()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//set the node path of the object to the
-	//node path of this model
-	mOwnerObject->setNodePath(mNodePath);
-}
-
-AnimControlCollection Model::animations() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAnimations;
-}
-
 bool Model::initialize()
 {
 	//lock (guard) the mutex
@@ -162,6 +128,40 @@ bool Model::initialize()
 	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
 	//
 	return result;
+}
+
+void Model::onAddToObjectSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//set the node path of the object to the
+	//node path of this model
+	mOwnerObject->setNodePath(mNodePath);
+}
+
+AnimControlCollection Model::animations() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAnimations;
+}
+
+NodePath Model::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNodePath;
+}
+
+void Model::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 //TypedObject semantics: hardcoded

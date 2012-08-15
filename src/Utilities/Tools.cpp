@@ -34,6 +34,8 @@ void initTypedObjects()
 	ComponentTemplate::init_type();
 	Model::init_type();
 	ModelTemplate::init_type();
+	Terrain::init_type();
+	TerrainTemplate::init_type();
 	InstanceOf::init_type();
 	InstanceOfTemplate::init_type();
 	NodePathWrapper::init_type();

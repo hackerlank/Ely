@@ -43,17 +43,17 @@ class ModelTemplate;
  * \brief Component representing the model and animations of an object.
  *
  * XML Param(s):
- * \li \c "from_file"  |single|"true"
- * \li \c "scale_x"  |single|"1.0"
- * \li \c "scale_y"  |single|"1.0"
- * \li \c "scale_z"  |single|"1.0"
- * \li \c "model_file"  |single|no default
- * \li \c "anim_files"  |multiple|no default
- * \li \c "model_type"  |single|no default
- * \li \c "model_card_left"  |single|no default
- * \li \c "model_card_right"  |single|no default
- * \li \c "model_card_bottom"  |single|no default
- * \li \c "model_card_top"  |single|no default
+ * \li \c "from_file"  			|single|"true"
+ * \li \c "scale_x"  			|single|"1.0"
+ * \li \c "scale_y"  			|single|"1.0"
+ * \li \c "scale_z"  			|single|"1.0"
+ * \li \c "model_file"  		|single|no default
+ * \li \c "anim_files"  		|multiple|no default
+ * \li \c "model_type"  		|single|no default
+ * \li \c "model_card_left"  	|single|no default
+ * \li \c "model_card_right"  	|single|no default
+ * \li \c "model_card_bottom"  	|single|no default
+ * \li \c "model_card_top"  	|single|no default
  */
 class Model: public Component
 {

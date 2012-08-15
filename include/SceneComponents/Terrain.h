@@ -15,36 +15,54 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/NodePathWrapper.h
+ * \file /Ely/include/SceneComponents/Terrain.h
  *
- * \date 28/giu/2012 (20:16:04)
+ * \date 15/ago/2012 (10:00:07)
  * \author marco
  */
 
-#ifndef NODEPATHWRAPPER_H_
-#define NODEPATHWRAPPER_H_
+#ifndef TERRAIN_H_
+#define TERRAIN_H_
 
 #include <string>
+#include <list>
+#include <cstdlib>
 #include <nodePath.h>
+#include <filename.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "SceneComponents/NodePathWrapperTemplate.h"
+#include "SceneComponents/TerrainTemplate.h"
 
-class NodePathWrapperTemplate;
+class TerrainTemplate;
 
 /**
- * \brief Component wrapping a predefined NodePath (e.g. render, camera etc...).
+ * \brief Component representing the terrain model of an object.
  *
  * XML Param(s):
- * \li \c "nodepath"  	|single|no default
+ * \li \c "heightfield_file"  		|single|no default
+ * \li \c "height_scale"			|single|"1.0"
+ * \li \c "width_scale"				|single|"1.0"
+ * \li \c "update_interval"			|single|"0.1"
+ * \li \c
+ * \li \c
+ * \li \c
+ * \li \c
+ * \li \c
+ * #        self.terrain = 0.1
+#        self.lastTesselateTime = -1
+        self.terrainHeightScale = 200
+        self.terrainWidthScale = 2
+        terrainNearPercent = 0.1
+        terrainFarPercent = 1.0
+        terrainBlockSize = 64
  */
-class NodePathWrapper: public Component
+class Terrain: public Component
 {
 public:
-	NodePathWrapper();
-	NodePathWrapper(NodePathWrapperTemplate* tmpl);
-	virtual ~NodePathWrapper();
+	Terrain();
+	Terrain(TerrainTemplate* tmpl);
+	virtual ~Terrain();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -53,8 +71,8 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets/sets the node path of this node path wrapper.
-	 * @return The node path of this this node path wrapper.
+	 * \brief Gets/sets the node path associated to this model.
+	 * @return The node path associated to this model.
 	 */
 	///@{
 	NodePath getNodePath() const;
@@ -63,8 +81,8 @@ public:
 
 private:
 	///The template used to construct this component.
-	NodePathWrapperTemplate* mTmpl;
-	///The NodePath associated to this node path wrapper.
+	TerrainTemplate* mTmpl;
+	///The NodePath associated to this model.
 	NodePath mNodePath;
 
 	///TypedObject semantics: hardcoded
@@ -76,7 +94,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "NodePathWrapper", Component::get_class_type());
+		register_type(_type_handle, "Terrain", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -93,4 +111,4 @@ private:
 
 };
 
-#endif /* NODEPATHWRAPPER_H_ */
+#endif /* TERRAIN_H_ */

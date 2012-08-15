@@ -32,6 +32,10 @@
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
 		</ObjectTmpl>
+		<ObjectTmpl type="Terrain">
+			<ComponentTmpl family="Scene" type="Terrain"/>
+			<ComponentTmpl family="Physics" type="RigidBody"/> 
+		</ObjectTmpl>
 	</ObjectTmplSet>
 
 	<!-- ------------------------------------------------ -->
