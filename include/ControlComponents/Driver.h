@@ -25,6 +25,7 @@
 #define CONTROLBYEVENT_H_
 
 #include <string>
+#include <set>
 #include <cstdlib>
 #include <nodePath.h>
 #ifdef ELY_THREAD
@@ -48,12 +49,12 @@ class DriverTemplate;
  * through keyboard/mouse button events and mouse movement (optional).
  *
  * To each basic movement (forward, backward, left, right etc...)
- * are associated a button event and a control key, which tracks
- * its state (true/false). Event handlers commute basic movements
- * states. A (global) task updates the position/orientation of
- * the controlled object.
- * A basic movement is disabled if its control key cannot be interpreted
- * or is the null string ("").
+ * is associated a control key, which tracks its state (true/false).
+ * Event handlers should commute basic movements states by calling
+ * enablers/disablers.
+ * A task updates the position/orientation of the controlled object.
+ * A basic movement is disabled if its control key (from xml config file)
+ * cannot be interpreted as the string "enabled".
  * Mouse movement for HEAD (i.e. YAW) and PITCH control can be enabled,
  * separately (default: both disabled).
  * All movements (but up and down) can be inverted (default: not inverted).
@@ -61,14 +62,14 @@ class DriverTemplate;
  *
  * XML Param(s):
  * \li \c "enabled"  			|single|"true"
- * \li \c "forward"  			|single|"w"
- * \li \c "backward"  			|single|"s"
- * \li \c "roll_left"  			|single|"a"
- * \li \c "roll_right"  		|single|"d"
- * \li \c "strafe_left"  		|single|"q"
- * \li \c "strafe_right"  		|single|"e"
- * \li \c "up"  				|single|"r"
- * \li \c "down"  				|single|"f"
+ * \li \c "forward"  			|single|"enabled"
+ * \li \c "backward"  			|single|"enabled"
+ * \li \c "roll_left"  			|single|"enabled"
+ * \li \c "roll_right"  		|single|"enabled"
+ * \li \c "strafe_left"  		|single|"enabled"
+ * \li \c "strafe_right"  		|single|"enabled"
+ * \li \c "up"  				|single|"enabled"
+ * \li \c "down"  				|single|"enabled"
  * \li \c "speed_key"  			|single|"shift"
  * \li \c "speed"  				|single|"5.0"
  * \li \c "fast_factor"  		|single|"5.0"
@@ -112,6 +113,28 @@ public:
 	bool isEnabled();
 	///@}
 
+	/**
+	 * \name Controls' enablers/disablers.
+	 */
+	///@{
+	void forward(bool enable);
+	void backward(bool enable);
+	void strafeLeft(bool enable);
+	void strafeRight(bool enable);
+	void up(bool enable);
+	void down(bool enable);
+	void rollLeft(bool enable);
+	void rollRight(bool enable);
+	///@}
+
+	/**
+	 * \name Speed setters.
+	 */
+	///@{
+	void setSpeed();
+	void setSpeedFast();
+	///@}
+
 private:
 	///The template used to construct this component.
 	DriverTemplate* mTmpl;
@@ -137,7 +160,7 @@ private:
 	///Key controls and effective keys.
 	ThisBool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
 			mRollLeft, mRollRight;
-	std::string mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
+	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
 			mUpKey, mDownKey, mRollLeftKey, mRollRightKey, mSpeedKey;
 	///@}
 	///@{
@@ -154,17 +177,6 @@ private:
 	///@}
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
-
-	/**
-	 * \name Event handlers.
-	 * \brief The set of handlers associated to the events.
-	 */
-	///@{
-	static void setControlTrue(const Event* event, void* data);
-	static void setControlFalse(const Event* event, void* data);
-	static void setSpeed(const Event* event, void* data);
-	static void setSpeedFast(const Event* event, void* data);
-	///@}
 
 #ifdef ELY_THREAD
 	///Actual transform state.

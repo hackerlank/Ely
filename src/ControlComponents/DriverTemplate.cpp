@@ -74,14 +74,14 @@ void DriverTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("enabled", "true"));
-	mParameterTable.insert(ParameterNameValue("forward", "w"));
-	mParameterTable.insert(ParameterNameValue("backward", "s"));
-	mParameterTable.insert(ParameterNameValue("roll_left", "a"));
-	mParameterTable.insert(ParameterNameValue("roll_right", "d"));
-	mParameterTable.insert(ParameterNameValue("strafe_left", "q"));
-	mParameterTable.insert(ParameterNameValue("strafe_right", "e"));
-	mParameterTable.insert(ParameterNameValue("up", "r"));
-	mParameterTable.insert(ParameterNameValue("down", "f"));
+	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("roll_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("roll_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("down", "enabled"));
 	mParameterTable.insert(ParameterNameValue("speed_key", "shift"));
 	mParameterTable.insert(ParameterNameValue("speed", "5.0"));
 	mParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
