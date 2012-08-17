@@ -30,15 +30,26 @@ Driver::Driver()
 }
 
 Driver::Driver(DriverTemplate* tmpl) :
-		mTmpl(tmpl), mForward(this, false), mBackward(this, false), mStrafeLeft(
-				this, false), mStrafeRight(this, false), mUp(this, false), mDown(
-				this, false), mRollLeft(this, false), mRollRight(this, false), mTrue(
-				true), mFalse(false), mIsEnabled(false)
+		mTmpl(tmpl), mTrue(true), mFalse(false), mIsEnabled(false)
 {
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
-
-	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	mForward = false;
+	mBackward = false;
+	mStrafeLeft = false;
+	mStrafeRight = false;
+	mUp = false;
+	mDown = false;
+	mRollLeft = false;
+	mRollRight = false;
+	//by default we consider mouse moved on every update, because
+	//we want mouse poll by default; this can be changed by calling
+	//the enabler (for example by an handler responding to mouse-move
+	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
+	//	http://www.panda3d.org/forums/viewtopic.php?t=6049)
+	mMouseMove = true;
+	//
+	GraphicsWindow * win = mTmpl->windowFramework()->get_graphics_window();
 	mCentX = win->get_properties().get_x_size() / 2;
 	mCentY = win->get_properties().get_y_size() / 2;
 }
@@ -150,36 +161,34 @@ bool Driver::initialize()
 	mDownKey =
 			(mTmpl->parameter(std::string("down")) == std::string("enabled") ? true :
 					false);
-
 	//forward key
 	mForwardKey =
 			(mTmpl->parameter(std::string("forward"))
 					== std::string("enabled") ? true : false);
-
 	//strafeLeft key
 	mStrafeLeftKey = (
 			mTmpl->parameter(std::string("strafe_left"))
 					== std::string("enabled") ? true : false);
-
 	//strafeRight key
 	mStrafeRightKey = (
 			mTmpl->parameter(std::string("strafe_right"))
 					== std::string("enabled") ? true : false);
-
 	//rollLeft key
 	mRollLeftKey = (
 			mTmpl->parameter(std::string("roll_left"))
 					== std::string("enabled") ? true : false);
-
 	//rollRight key
 	mRollRightKey = (
 			mTmpl->parameter(std::string("roll_right"))
 					== std::string("enabled") ? true : false);
-
 	//up key
 	mUpKey =
 			(mTmpl->parameter(std::string("up")) == std::string("enabled") ? true :
 					false);
+	//mouseMove key
+	mMouseMoveKey = (
+			mTmpl->parameter(std::string("mouse_move"))
+					== std::string("enabled") ? true : false);
 	//speedKey
 	mSpeedKey = mTmpl->parameter(std::string("speed_key"));
 	if (not (mSpeedKey == "control" or mSpeedKey == "alt"
@@ -318,6 +327,17 @@ void Driver::setSpeed()
 	mSpeedActual = mSpeed;
 }
 
+void Driver::mouseMove(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mMouseMoveKey)
+	{
+		mMouseMove = enable;
+	}
+}
+
 void Driver::setSpeedFast()
 {
 	//lock (guard) the mutex
@@ -347,7 +367,7 @@ void Driver::update(void* data)
 	float newH = 0, newP = 0, newR = 0;
 #endif
 	//handle mouse
-	if (mMouseEnabledH or mMouseEnabledP)
+	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
 	{
 		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 		MouseData md = win->get_pointer(0);
@@ -379,6 +399,12 @@ void Driver::update(void* data)
 #endif
 				modified = true;
 			}
+		}
+		//if mMouseMoveKey is true we are controlling mouse movements
+		//so we need to reset mMouseMove to false
+		if (mMouseMoveKey)
+		{
+			mMouseMove = false;
 		}
 	}
 	//handle keys:

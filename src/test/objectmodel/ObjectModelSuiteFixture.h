@@ -30,6 +30,7 @@
 #include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
 #include "SceneComponents/Model.h"
+#include "SceneComponents/ModelTemplate.h"
 
 struct ObjectModelSuiteFixture
 {

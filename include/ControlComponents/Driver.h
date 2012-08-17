@@ -50,13 +50,18 @@ class DriverTemplate;
  *
  * To each basic movement (forward, backward, left, right etc...)
  * is associated a control key, which tracks its state (true/false).
- * Event handlers should commute basic movements states by calling
- * enablers/disablers.
- * A task updates the position/orientation of the controlled object.
- * A basic movement is disabled if its control key (from xml config file)
- * cannot be interpreted as the string "enabled".
+ * This component is designed to work with event handlers: they
+ * should commute basic movements states by calling enablers.
+ * A task updates the position/orientation of the controlled object
+ * based on the value of control keys.
+ * At configuration level (from game.xml config file), any basic movement
+ * can be disabled if its configuration key is empty or cannot be
+ * interpreted as string "enabled".
  * Mouse movement for HEAD (i.e. YAW) and PITCH control can be enabled,
  * separately (default: both disabled).
+ * Mouse movements are polled by default. i.e. its control key is true
+ * on every update, because
+ * it ; this can be changed by calling the enabler.
  * All movements (but up and down) can be inverted (default: not inverted).
  * This component can be enabled/disabled as a whole (default: enabled).
  *
@@ -70,6 +75,7 @@ class DriverTemplate;
  * \li \c "strafe_right"  		|single|"enabled"
  * \li \c "up"  				|single|"enabled"
  * \li \c "down"  				|single|"enabled"
+ * \li \c "mouse_move"  		|single|""
  * \li \c "speed_key"  			|single|"shift"
  * \li \c "speed"  				|single|"5.0"
  * \li \c "fast_factor"  		|single|"5.0"
@@ -114,7 +120,10 @@ public:
 	///@}
 
 	/**
-	 * \name Controls' enablers/disablers.
+	 * \name Controls' enablers.
+	 *
+	 * These routines should be typically called by
+	 * event handlers, but this is not strictly required.
 	 */
 	///@{
 	void forward(bool enable);
@@ -125,6 +134,7 @@ public:
 	void down(bool enable);
 	void rollLeft(bool enable);
 	void rollRight(bool enable);
+	void mouseMove(bool enable);
 	///@}
 
 	/**
@@ -139,29 +149,13 @@ private:
 	///The template used to construct this component.
 	DriverTemplate* mTmpl;
 
-	///Helper struct to set bool values for a given component.
-	struct ThisBool
-	{
-		ThisBool()
-		{
-		}
-		ThisBool(Driver* _ptr, bool _value) :
-				ptr(_ptr), value(_value)
-		{
-		}
-		operator bool()
-		{
-			return value;
-		}
-		Driver* ptr;
-		bool value;
-	};
 	///@{
 	///Key controls and effective keys.
-	ThisBool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-			mRollLeft, mRollRight;
-	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
-			mUpKey, mDownKey, mRollLeftKey, mRollRightKey, mSpeedKey;
+	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
+			mRollLeft, mRollRight, mMouseMove;
+	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
+			mDownKey, mRollLeftKey, mRollRightKey, mMouseMoveKey;
+	std::string mSpeedKey;
 	///@}
 	///@{
 	///Key control values.
@@ -192,8 +186,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "Driver",
-				Component::get_class_type());
+		register_type(_type_handle, "Driver", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

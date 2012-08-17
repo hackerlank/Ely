@@ -143,28 +143,39 @@ void GameManager::manageObjects()
 void GameManager::setupCompTmplMgr()
 {
 	// Add all kind of component templates
-	//Model template
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ModelTemplate(this, mWindow));
-	//InstanceOf template
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new InstanceOfTemplate());
-	//NodePathWrapper template
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new NodePathWrapperTemplate(mWindow));
-	//Terrain template
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new TerrainTemplate(this, mWindow));
-	//Driver template
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new DriverTemplate(this, mWindow));
-	//Sound3d template
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new Sound3dTemplate(mWindow));
-	//Listener template
+	///Audio templates
+	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ListenerTemplate(mWindow));
-	//RigidBody template
+	//Sound3d
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new Sound3dTemplate(mWindow));
+
+	///Behavioral templates
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new ActivityTemplate(this, mWindow));
+
+	///Control templates
+	//Driver
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new DriverTemplate(this, mWindow));
+
+	///Scene templates
+	//InstanceOf
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new InstanceOfTemplate());
+	//Model
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new ModelTemplate(this, mWindow));
+	//NodePathWrapper
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new NodePathWrapperTemplate(mWindow));
+	//Terrain
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new TerrainTemplate(this, mWindow));
+
+	///Physics templates
+	//RigidBody
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new RigidBodyTemplate());
 

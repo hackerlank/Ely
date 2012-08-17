@@ -190,19 +190,21 @@
 #include <cstdlib>
 #include <dlfcn.h>
 #include <iostream>
+#include <string>
 
-typedef void (*FUNC)(int *);
+typedef void (*PFUNC)(int *);
 
 int main(int argc, char **argv)
 {
 	void *lib_handle;
-	FUNC fn;
+	PFUNC pfn1, pfn2, pfn11;
+	std::string* fn1, *fn2, *fn11;
 	int x;
 	char *error;
 
 	lib_handle =
 			dlopen(
-					"/REPOSITORY/KProjects/Eclipse/Ely-testgame-routines/Debug-thread/libtest.so",
+					"/REPOSITORY/KProjects/Eclipse/Ely-procedures/Debug-thread/libtest.so",
 					RTLD_LAZY);
 	if (!lib_handle)
 	{
@@ -210,16 +212,55 @@ int main(int argc, char **argv)
 		exit(1);
 	}
 
-	fn = (FUNC) dlsym(lib_handle, "ctest1");
-
+	//take the name and then the pointer
+	fn1 = (std::string*) dlsym(lib_handle, "event1");
+	if ((error = dlerror()) != NULL)
+	{
+		std::cerr << error << std::endl;
+		exit(1);
+	}
+	pfn1 = (PFUNC) dlsym(lib_handle, fn1->c_str());
 	if ((error = dlerror()) != NULL)
 	{
 		std::cerr << error << std::endl;
 		exit(1);
 	}
 
+	//take the name and then the pointer
+	fn2 = (std::string*) dlsym(lib_handle, "event2");
+	if ((error = dlerror()) != NULL)
+	{
+		std::cerr << error << std::endl;
+		exit(1);
+	}
+	pfn2 = (PFUNC) dlsym(lib_handle, fn2->c_str());
+	if ((error = dlerror()) != NULL)
+	{
+		std::cerr << error << std::endl;
+		exit(1);
+	}
+
+	//take the name and then the pointer
+	fn11 = (std::string*) dlsym(lib_handle, "event3");
+	if ((error = dlerror()) != NULL)
+	{
+		std::cerr << error << std::endl;
+		exit(1);
+	}
+	pfn11 = (PFUNC) dlsym(lib_handle, fn11->c_str());
+	if ((error = dlerror()) != NULL)
+	{
+		std::cerr << error << std::endl;
+		exit(1);
+	}
+
+	//
 	x = 1000;
-	(*fn)(&x);
+	(*pfn1)(&x);
+	x = 1001;
+	(*pfn2)(&x);
+	x = 1002;
+	(*pfn11)(&x);
 
 	dlclose(lib_handle);
 	return 0;

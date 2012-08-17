@@ -70,7 +70,7 @@ public:
 
 private:
 	///The template used to construct this component.
-	ModelTemplate* mTmpl;
+	ActivityTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 
