@@ -1,148 +1,148 @@
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <set>
-#include <queue>
-#include <list>
-#include <utility>
-#include <cstdlib>
-#include <event.h>
-#include <cmath>
-#include <throw_event.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
-#include <conditionVarFull.h>
-#include <genericAsyncTask.h>
-#include <asyncTaskManager.h>
-#include <asyncTaskChain.h>
-#include <genericThread.h>
-#include <pointerTo.h>
-#include <referenceCount.h>
-#include <typedWritableReferenceCount.h>
-#include "Utilities/Tools.h"
+//#include <string>
+//#include <iostream>
+//#include <sstream>
+//#include <set>
+//#include <queue>
+//#include <list>
+//#include <utility>
+//#include <cstdlib>
+//#include <event.h>
+//#include <cmath>
+//#include <throw_event.h>
+//#include <reMutex.h>
+//#include <reMutexHolder.h>
+//#include <conditionVarFull.h>
+//#include <genericAsyncTask.h>
+//#include <asyncTaskManager.h>
+//#include <asyncTaskChain.h>
+//#include <genericThread.h>
+//#include <pointerTo.h>
+//#include <referenceCount.h>
+//#include <typedWritableReferenceCount.h>
+//#include "Utilities/Tools.h"
 
-//the data
-struct MSG
-{
-	MSG() :
-			_ready(false)
-	{
-	}
-	bool _ready;
-	std::string _msg;
-} msg;
-//condition variable with no shared mutex
-struct CVFWithMutex
-{
-	CVFWithMutex()
-	{
-		_cond = new ConditionVarFull(_mutex);
-	}
-	~CVFWithMutex()
-	{
-		delete _cond;
-	}
-	ConditionVarFull& getCV()
-	{
-		return *_cond;
-	}
-	ConditionVarFull* _cond;
-	Mutex _mutex;
-} msgCond;
+////the data
+//struct MSG
+//{
+//	MSG() :
+//			_ready(false)
+//	{
+//	}
+//	bool _ready;
+//	std::string _msg;
+//} msg;
+////condition variable with no shared mutex
+//struct CVFWithMutex
+//{
+//	CVFWithMutex()
+//	{
+//		_cond = new ConditionVarFull(_mutex);
+//	}
+//	~CVFWithMutex()
+//	{
+//		delete _cond;
+//	}
+//	ConditionVarFull& getCV()
+//	{
+//		return *_cond;
+//	}
+//	ConditionVarFull* _cond;
+//	Mutex _mutex;
+//} msgCond;
+//
+//void msgProducer(void* data)
+//{
+//	std::string threadName = Thread::get_current_thread()->get_sync_name();
+//	std::string msgIn;
+//	ConditionVarFull& msgCondIn = msgCond.getCV();
+//	while (std::cin >> msgIn)
+//	{
+//		MutexHolder lock(msgCondIn.get_mutex());
+//		((MSG*) data)->_msg = msgIn;
+//		((MSG*) data)->_ready = true;
+////		msgCondIn.notify_all();
+//		msgCondIn.notify();
+//		std::cout << threadName << " got '" << msgIn << "'" << std::endl;
+//		if (msgIn == "stopp")
+//		{
+//			break;
+//		}
+//	}
+//
+//}
+//
+//void msgConsumer(void* data)
+//{
+//	std::string threadName = Thread::get_current_thread()->get_sync_name();
+//	std::string outMsg;
+//	ConditionVarFull& msgCondIn = msgCond.getCV();
+//	while (true)
+//	{
+//		msgCondIn.get_mutex().acquire();
+//		std::cout << threadName << ": falling asleep" << std::endl;
+//		msgCondIn.wait();
+//		std::cout << threadName << ": awakening" << std::endl;
+//		if (((MSG*) data)->_ready == false)
+//		{
+//			msgCondIn.get_mutex().release();
+//			continue;
+//		}
+//		outMsg = ((MSG*) data)->_msg;
+//		((MSG*) data)->_ready = false;
+//		msgCondIn.get_mutex().release();
+//		//process data
+//		std::cout << threadName << ": " << outMsg << std::endl;
+//		if (outMsg == "stopc")
+//		{
+//			break;
+//		}
+//	}
+//}
+//
+//const int MAXPRODUCERS = 1;
+//const int MAXCONSUMERS = 2;
 
-void msgProducer(void* data)
-{
-	std::string threadName = Thread::get_current_thread()->get_sync_name();
-	std::string msgIn;
-	ConditionVarFull& msgCondIn = msgCond.getCV();
-	while (std::cin >> msgIn)
-	{
-		MutexHolder lock(msgCondIn.get_mutex());
-		((MSG*) data)->_msg = msgIn;
-		((MSG*) data)->_ready = true;
-//		msgCondIn.notify_all();
-		msgCondIn.notify();
-		std::cout << threadName << " got '" << msgIn << "'" << std::endl;
-		if (msgIn == "stopp")
-		{
-			break;
-		}
-	}
-
-}
-
-void msgConsumer(void* data)
-{
-	std::string threadName = Thread::get_current_thread()->get_sync_name();
-	std::string outMsg;
-	ConditionVarFull& msgCondIn = msgCond.getCV();
-	while (true)
-	{
-		msgCondIn.get_mutex().acquire();
-		std::cout << threadName << ": falling asleep" << std::endl;
-		msgCondIn.wait();
-		std::cout << threadName << ": awakening" << std::endl;
-		if (((MSG*) data)->_ready == false)
-		{
-			msgCondIn.get_mutex().release();
-			continue;
-		}
-		outMsg = ((MSG*) data)->_msg;
-		((MSG*) data)->_ready = false;
-		msgCondIn.get_mutex().release();
-		//process data
-		std::cout << threadName << ": " << outMsg << std::endl;
-		if (outMsg == "stopc")
-		{
-			break;
-		}
-	}
-}
-
-const int MAXPRODUCERS = 1;
-const int MAXCONSUMERS = 2;
-
-int main(int argc, char **argv)
-{
-	PT(GenericThread) producers[MAXPRODUCERS];
-	PT(GenericThread) consumers[MAXCONSUMERS];
-	//create producer/consumer threads
-	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
-	{
-		std::ostringstream name;
-		name << "producer" << prod;
-		producers[prod] = new GenericThread(name.str(), name.str(),
-				&msgProducer, (void*) &msg);
-	}
-	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
-	{
-		std::ostringstream name;
-		name << "consumer" << cons;
-		consumers[cons] = new GenericThread(name.str(), name.str(),
-				&msgConsumer, (void*) &msg);
-	}
-	//start producer/consumer threads
-	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
-	{
-		std::cout << producers[prod]->start(TP_normal, true) << std::endl;
-	}
-	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
-	{
-		std::cout << consumers[cons]->start(TP_normal, true) << std::endl;
-	}
-	//join producer/consumer threads
-	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
-	{
-		std::cout << producers[prod]->get_sync_name() << " joined" << std::endl;
-		producers[prod]->join();
-	}
-	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
-	{
-		std::cout << consumers[cons]->get_sync_name() << " joined" << std::endl;
-		consumers[cons]->join();
-	}
-	return 0;
-}
+//int main(int argc, char **argv)
+//{
+//	PT(GenericThread) producers[MAXPRODUCERS];
+//	PT(GenericThread) consumers[MAXCONSUMERS];
+//	//create producer/consumer threads
+//	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
+//	{
+//		std::ostringstream name;
+//		name << "producer" << prod;
+//		producers[prod] = new GenericThread(name.str(), name.str(),
+//				&msgProducer, (void*) &msg);
+//	}
+//	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
+//	{
+//		std::ostringstream name;
+//		name << "consumer" << cons;
+//		consumers[cons] = new GenericThread(name.str(), name.str(),
+//				&msgConsumer, (void*) &msg);
+//	}
+//	//start producer/consumer threads
+//	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
+//	{
+//		std::cout << producers[prod]->start(TP_normal, true) << std::endl;
+//	}
+//	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
+//	{
+//		std::cout << consumers[cons]->start(TP_normal, true) << std::endl;
+//	}
+//	//join producer/consumer threads
+//	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
+//	{
+//		std::cout << producers[prod]->get_sync_name() << " joined" << std::endl;
+//		producers[prod]->join();
+//	}
+//	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
+//	{
+//		std::cout << consumers[cons]->get_sync_name() << " joined" << std::endl;
+//		consumers[cons]->join();
+//	}
+//	return 0;
+//}
 
 //void f(void* data)
 //{
@@ -186,4 +186,41 @@ int main(int argc, char **argv)
 //	}
 //	return 0;
 //}
-//
+
+#include <cstdlib>
+#include <dlfcn.h>
+#include <iostream>
+
+typedef void (*FUNC)(int *);
+
+int main(int argc, char **argv)
+{
+	void *lib_handle;
+	FUNC fn;
+	int x;
+	char *error;
+
+	lib_handle =
+			dlopen(
+					"/REPOSITORY/KProjects/Eclipse/Ely-testgame-routines/Debug-thread/libtest.so",
+					RTLD_LAZY);
+	if (!lib_handle)
+	{
+		std::cerr << dlerror() << std::endl;
+		exit(1);
+	}
+
+	fn = (FUNC) dlsym(lib_handle, "ctest1");
+
+	if ((error = dlerror()) != NULL)
+	{
+		std::cerr << error << std::endl;
+		exit(1);
+	}
+
+	x = 1000;
+	(*fn)(&x);
+
+	dlclose(lib_handle);
+	return 0;
+}

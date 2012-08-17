@@ -354,6 +354,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.other.other.160821945" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 " valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1810908919" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 							<tool id="cdt.managedbuild.tool.gnu.c.compiler.exe.debug.233182865" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.exe.debug">
@@ -378,6 +379,7 @@
 								<option id="gnu.cpp.link.option.paths.2107722468" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
 									<listOptionValue builtIn="false" value="/usr/lib/panda3d"/>
 								</option>
+								<option id="gnu.cpp.link.option.flags.695912117" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="-rdynamic" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.657149590" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>

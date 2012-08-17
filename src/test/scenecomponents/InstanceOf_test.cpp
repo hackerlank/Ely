@@ -21,7 +21,7 @@
  * \author marco
  */
 
-#include "GraphicsSuiteFixture.h"
+#include "SceneSuiteFixture.h"
 
 struct InstanceOfTestCaseFixture
 {
@@ -33,8 +33,8 @@ struct InstanceOfTestCaseFixture
 	}
 };
 
-/// Graphics suite
-BOOST_FIXTURE_TEST_SUITE(Graphics, GraphicsSuiteFixture)
+/// Scene suite
+BOOST_FIXTURE_TEST_SUITE(Scene, SceneSuiteFixture)
 
 /// Test cases
 BOOST_AUTO_TEST_CASE(InstanceOfTemplateTEST)
@@ -46,5 +46,5 @@ BOOST_AUTO_TEST_CASE(InstanceOfTemplateTEST)
 	BOOST_CHECK(mInstanceOf->familyType() == ComponentFamilyType("Graphics"));
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Graphics suite
+BOOST_AUTO_TEST_SUITE_END() // Scene suite
 

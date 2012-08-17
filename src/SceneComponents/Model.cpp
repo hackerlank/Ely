@@ -22,6 +22,7 @@
  */
 
 #include "SceneComponents/Model.h"
+#include "SceneComponents/ModelTemplate.h"
 
 Model::Model()
 {

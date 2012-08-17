@@ -15,41 +15,41 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/SceneComponents/Terrain.cpp
+ * \file /Ely/src/BehavioralComponents/Activity.cpp
  *
- * \date 15/ago/2012 (10:00:08)
+ * \date 17/ago/2012 (09:28:59)
  * \author marco
  */
 
-#include "SceneComponents/Terrain.h"
-#include "SceneComponents/TerrainTemplate.h"
+#include "BehavioralComponents/Activity.h"
+#include "BehavioralComponents/ActivityTemplate.h"
 
-Terrain::Terrain()
+Activity::Activity()
 {
 	// TODO Auto-generated constructor stub
 }
 
-Terrain::Terrain(TerrainTemplate* tmpl) :
-				mTmpl(tmpl)
+Activity::Activity(ActivityTemplate* tmpl) :
+		mTmpl(tmpl)
 {
 }
 
-Terrain::~Terrain()
+Activity::~Activity()
 {
-	mNodePath.remove_node();
+	// TODO Auto-generated destructor stub
 }
 
-const ComponentFamilyType Terrain::familyType() const
+const ComponentFamilyType Activity::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Terrain::componentType() const
+const ComponentType Activity::componentType() const
 {
 	return mTmpl->componentType();
 }
 
-bool Terrain::initialize()
+bool Activity::initialize()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -59,7 +59,7 @@ bool Terrain::initialize()
 	return result;
 }
 
-void Terrain::onAddToObjectSetup()
+void Activity::onAddToObjectSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -69,7 +69,7 @@ void Terrain::onAddToObjectSetup()
 	mOwnerObject->setNodePath(mNodePath);
 }
 
-NodePath Terrain::getNodePath() const
+NodePath Activity::getNodePath() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -77,7 +77,7 @@ NodePath Terrain::getNodePath() const
 	return mNodePath;
 }
 
-void Terrain::setNodePath(const NodePath& nodePath)
+void Activity::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -86,5 +86,5 @@ void Terrain::setNodePath(const NodePath& nodePath)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle Terrain::_type_handle;
+TypeHandle Activity::_type_handle;
 

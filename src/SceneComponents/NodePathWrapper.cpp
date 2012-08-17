@@ -22,6 +22,7 @@
  */
 
 #include "SceneComponents/NodePathWrapper.h"
+#include "SceneComponents/NodePathWrapperTemplate.h"
 
 NodePathWrapper::NodePathWrapper()
 {

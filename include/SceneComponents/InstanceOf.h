@@ -27,7 +27,6 @@
 #include <nodePath.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
-#include "SceneComponents/InstanceOfTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
 class InstanceOfTemplate;

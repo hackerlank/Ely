@@ -15,35 +15,43 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/NodePathWrapper.h
+ * \file /Ely/include/BehavioralComponents/Activity.h
  *
- * \date 28/giu/2012 (20:16:04)
+ * \date 17/ago/2012 (09:28:59)
  * \author marco
  */
 
-#ifndef NODEPATHWRAPPER_H_
-#define NODEPATHWRAPPER_H_
+#ifndef ACTIVITY_H_
+#define ACTIVITY_H_
 
 #include <string>
+#include <list>
 #include <nodePath.h>
+#include <filename.h>
 #include <typedObject.h>
+#include "Support/FSM.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
-class NodePathWrapperTemplate;
+class ActivityTemplate;
 
 /**
- * \brief Component wrapping a predefined NodePath (e.g. render, camera etc...).
+ * \brief Component representing the activity of an object.
+ *
+ * It is composed of a FSM (Finite State Machine) that represents the
+ * game states of the object, and of a set of events (along with their
+ * handlers) it is supposed to respond to.
  *
  * XML Param(s):
- * \li \c "nodepath"  	|single|no default
+ * \li \c "states"  			|multiple|no default
+ * \li \c "events"  			|multiple|no default
  */
-class NodePathWrapper: public Component
+class Activity: public Component
 {
 public:
-	NodePathWrapper();
-	NodePathWrapper(NodePathWrapperTemplate* tmpl);
-	virtual ~NodePathWrapper();
+	Activity();
+	Activity(ActivityTemplate* tmpl);
+	virtual ~Activity();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -52,8 +60,8 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets/sets the node path of this node path wrapper.
-	 * @return The node path of this this node path wrapper.
+	 * \brief Gets/sets the node path associated to this model.
+	 * @return The node path associated to this model.
 	 */
 	///@{
 	NodePath getNodePath() const;
@@ -62,8 +70,8 @@ public:
 
 private:
 	///The template used to construct this component.
-	NodePathWrapperTemplate* mTmpl;
-	///The NodePath associated to this node path wrapper.
+	ModelTemplate* mTmpl;
+	///The NodePath associated to this model.
 	NodePath mNodePath;
 
 	///TypedObject semantics: hardcoded
@@ -75,7 +83,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "NodePathWrapper", Component::get_class_type());
+		register_type(_type_handle, "Activity", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -92,4 +100,4 @@ private:
 
 };
 
-#endif /* NODEPATHWRAPPER_H_ */
+#endif /* ACTIVITY_H_ */

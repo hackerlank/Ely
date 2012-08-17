@@ -15,26 +15,26 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/scenecomponents/Terrain_test.cpp
+ * \file /Ely/src/test/behavioralcomponents/Activity_test.cpp
  *
- * \date 15/ago/2012 (10:00:08)
+ * \date 17/ago/2012 (09:28:59)
  * \author marco
  */
 
-#include "SceneSuiteFixture.h"
+#include "BehavioralSuiteFixture.h"
 
-struct TerrainTestCaseFixture
+struct ActivityTestCaseFixture
 {
-	TerrainTestCaseFixture()
+	ActivityTestCaseFixture()
 	{
 	}
-	~TerrainTestCaseFixture()
+	~ActivityTestCaseFixture()
 	{
 	}
 };
 
-/// Scene suite
-BOOST_FIXTURE_TEST_SUITE(Scene, SceneSuiteFixture)
+/// Behavioral suite
+BOOST_FIXTURE_TEST_SUITE(Behavioral, BehavioralSuiteFixture)
 
 /// Test cases
 BOOST_AUTO_TEST_CASE(TEST)
@@ -43,4 +43,6 @@ BOOST_AUTO_TEST_CASE(TEST)
 	BOOST_CHECK(true);
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Scene suite
+BOOST_AUTO_TEST_SUITE_END() // Behavioral suite
+
+

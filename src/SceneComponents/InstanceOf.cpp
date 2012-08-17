@@ -22,6 +22,7 @@
  */
 
 #include "SceneComponents/InstanceOf.h"
+#include "SceneComponents/InstanceOfTemplate.h"
 
 InstanceOf::InstanceOf()
 {

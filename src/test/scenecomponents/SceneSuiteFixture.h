@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/SceneComponents/GraphicsSuiteFixture.h
+ * \file /Ely/src/test/SceneComponents/SceneSuiteFixture.h
  *
  * \date 15/mag/2012 (15:33:43)
  * \author marco
  */
 
-#ifndef GRAPHICSSUITEFIXTURE_H_
-#define GRAPHICSSUITEFIXTURE_H_
+#ifndef SCENESUITEFIXTURE_H_
+#define SCENESUITEFIXTURE_H_
 
 #include <boost/test/unit_test.hpp>
 #include <pandaFramework.h>
@@ -31,11 +31,13 @@
 #include "SceneComponents/InstanceOfTemplate.h"
 #include "SceneComponents/ModelTemplate.h"
 #include "SceneComponents/Model.h"
+#include "SceneComponents/Terrain.h"
+#include "SceneComponents/TerrainTemplate.h"
 #include "Utilities/Tools.h"
 
-struct GraphicsSuiteFixture
+struct SceneSuiteFixture
 {
-	GraphicsSuiteFixture() :
+	SceneSuiteFixture() :
 			mInstanceOf(NULL), mInstanceOfId("InstanceOf_Test"), mInstanceOfTmpl(
 					new InstanceOfTemplate()), mModel(NULL), mModelId(
 					"Model_Test"), mModelTmpl(NULL)
@@ -51,7 +53,7 @@ struct GraphicsSuiteFixture
 		Model::init_type();
 	}
 
-	~GraphicsSuiteFixture()
+	~SceneSuiteFixture()
 	{
 		//delete components before their templates
 		if (mInstanceOf)
@@ -83,4 +85,4 @@ struct GraphicsSuiteFixture
 	WindowFramework* mWin;
 };
 
-#endif /* GRAPHICSSUITEFIXTURE_H_ */
+#endif /* SCENESUITEFIXTURE_H_ */

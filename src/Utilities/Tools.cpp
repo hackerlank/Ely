@@ -28,24 +28,27 @@
 
 void initTypedObjects()
 {
-	Object::init_type();
-	ObjectTemplate::init_type();
 	Component::init_type();
 	ComponentTemplate::init_type();
-	Model::init_type();
-	ModelTemplate::init_type();
-	Terrain::init_type();
-	TerrainTemplate::init_type();
-	InstanceOf::init_type();
-	InstanceOfTemplate::init_type();
-	NodePathWrapper::init_type();
-	NodePathWrapperTemplate::init_type();
-	Driver::init_type();
-	DriverTemplate::init_type();
-	Sound3d::init_type();
-	Sound3dTemplate::init_type();
+	Object::init_type();
+	ObjectTemplate::init_type();
+	//
 	Listener::init_type();
 	ListenerTemplate::init_type();
+	Sound3d::init_type();
+	Sound3dTemplate::init_type();
+	Activity::init_type();
+	ActivityTemplate::init_type();
+	Driver::init_type();
+	DriverTemplate::init_type();
 	RigidBody::init_type();
 	RigidBodyTemplate::init_type();
+	InstanceOf::init_type();
+	InstanceOfTemplate::init_type();
+	Model::init_type();
+	ModelTemplate::init_type();
+	NodePathWrapper::init_type();
+	NodePathWrapperTemplate::init_type();
+	Terrain::init_type();
+	TerrainTemplate::init_type();
 }

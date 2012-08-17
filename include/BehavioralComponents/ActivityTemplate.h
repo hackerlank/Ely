@@ -15,32 +15,31 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/ModelTemplate.h
+ * \file /Ely/include/BehavioralComponents/ActivityTemplate.h
  *
- * \date 16/mag/2012 (16:26:41)
+ * \date 17/ago/2012 (09:27:08)
  * \author marco
  */
 
-#ifndef MODELTEMPLATE_H_
-#define MODELTEMPLATE_H_
+#ifndef ACTIVITYTEMPLATE_H_
+#define ACTIVITYTEMPLATE_H_
 
 #include <string>
-#include <list>
 #include <utility>
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <typedObject.h>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
-#include "SceneComponents/Model.h"
+#include "BehavioralComponents/Activity.h"
 #include "Utilities/Tools.h"
 
-class ModelTemplate: public ComponentTemplate
+class ActivityTemplate: public ComponentTemplate
 {
 public:
-	ModelTemplate(PandaFramework* pandaFramework,
+	ActivityTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~ModelTemplate();
+	virtual ~ActivityTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -76,7 +75,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "ModelTemplate",
+		register_type(_type_handle, "ActivityTemplate",
 				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
@@ -94,4 +93,4 @@ private:
 
 };
 
-#endif /* MODELTEMPLATE_H_ */
+#endif /* ACTIVITYTEMPLATE_H_ */
