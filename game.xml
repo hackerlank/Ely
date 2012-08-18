@@ -158,8 +158,8 @@
 				<Param fast_factor="15.0"/>
 				<Param inverted_keyboard="false"/>
 				<Param inverted_mouse="false"/>
-				<Param up="r"/>
-				<Param down="f"/>
+				<Param up="enabled"/>
+				<Param down="enabled"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>

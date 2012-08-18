@@ -45,25 +45,26 @@
 class DriverTemplate;
 
 /**
- * \brief Component representing the control of object movement
- * through keyboard/mouse button events and mouse movement (optional).
+ * \brief Component designed for the control of object movement
+ * through keyboard/mouse button events and mouse movement.
  *
- * To each basic movement (forward, backward, left, right etc...)
- * is associated a control key, which tracks its state (true/false).
- * This component is designed to work with event handlers: they
- * should commute basic movements states by calling enablers.
+ * Each basic movement (forward, backward, roll_left, roll_right etc...)
+ * can be enabled/disabled through a corresponding "enabler", which in
+ * turn set a control key true or false.
+ * An event handlers could enable/disable movement calling the "enablers".
  * A task updates the position/orientation of the controlled object
  * based on the value of control keys.
- * At configuration level (from game.xml config file), any basic movement
- * can be disabled if its configuration key is empty or cannot be
- * interpreted as string "enabled".
- * Mouse movement for HEAD (i.e. YAW) and PITCH control can be enabled,
- * separately (default: both disabled).
- * Mouse movements are polled by default. i.e. its control key is true
- * on every update, because
- * it ; this can be changed by calling the enabler.
+ * The component can be enabled/disabled as a whole.
+ * At configuration level (from xml config file), any "enabler" can be
+ * enabled/disabled by setting corresponding configuration key
+ * to "enabled"/"disabled".
+ * Mouse movements tracking are special. Since "mouse move" events are not
+ * defined by default (they can by using ButtonThrower::set_move_event()),
+ * mouse movements are polled by default during the "update" task, that is
+ * the corresponding "enabler" is disabled.
+ * The object HEAD (i.e. YAW) and PITCH control through mouse movements
+ * can be enabled/disabled separately (default: both disabled).
  * All movements (but up and down) can be inverted (default: not inverted).
- * This component can be enabled/disabled as a whole (default: enabled).
  *
  * XML Param(s):
  * \li \c "enabled"  			|single|"true"
@@ -75,7 +76,9 @@ class DriverTemplate;
  * \li \c "strafe_right"  		|single|"enabled"
  * \li \c "up"  				|single|"enabled"
  * \li \c "down"  				|single|"enabled"
- * \li \c "mouse_move"  		|single|""
+ * \li \c "mouse_move"  		|single|"disabled"
+ * \li \c "mouse_enabled_h"  	|single|"false"
+ * \li \c "mouse_enabled_p"  	|single|"false"
  * \li \c "speed_key"  			|single|"shift"
  * \li \c "speed"  				|single|"5.0"
  * \li \c "fast_factor"  		|single|"5.0"
@@ -85,8 +88,6 @@ class DriverTemplate;
  * \li \c "sens_y"  			|single|"0.2"
  * \li \c "inverted_keyboard"  	|single|"false"
  * \li \c "inverted_mouse"  	|single|"false"
- * \li \c "mouse_enabled_h"  	|single|"false"
- * \li \c "mouse_enabled_p"  	|single|"false"
  */
 class Driver: public Component
 {
@@ -120,21 +121,21 @@ public:
 	///@}
 
 	/**
-	 * \name Controls' enablers.
+	 * \name Control keys' enablers.
 	 *
 	 * These routines should be typically called by
 	 * event handlers, but this is not strictly required.
 	 */
 	///@{
-	void forward(bool enable);
-	void backward(bool enable);
-	void strafeLeft(bool enable);
-	void strafeRight(bool enable);
-	void up(bool enable);
-	void down(bool enable);
-	void rollLeft(bool enable);
-	void rollRight(bool enable);
-	void mouseMove(bool enable);
+	void enableForward(bool enable);
+	void enableBackward(bool enable);
+	void enableStrafeLeft(bool enable);
+	void enableStrafeRight(bool enable);
+	void enableUp(bool enable);
+	void enableDown(bool enable);
+	void enableRollLeft(bool enable);
+	void enableRollRight(bool enable);
+	void enableMouseMove(bool enable);
 	///@}
 
 	/**

@@ -231,7 +231,7 @@ bool Driver::isEnabled()
 	return mIsEnabled;
 }
 
-void Driver::forward(bool enable)
+void Driver::enableForward(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -242,7 +242,7 @@ void Driver::forward(bool enable)
 	}
 }
 
-void Driver::backward(bool enable)
+void Driver::enableBackward(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -253,7 +253,7 @@ void Driver::backward(bool enable)
 	}
 }
 
-void Driver::strafeLeft(bool enable)
+void Driver::enableStrafeLeft(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -264,7 +264,7 @@ void Driver::strafeLeft(bool enable)
 	}
 }
 
-void Driver::strafeRight(bool enable)
+void Driver::enableStrafeRight(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -275,7 +275,7 @@ void Driver::strafeRight(bool enable)
 	}
 }
 
-void Driver::up(bool enable)
+void Driver::enableUp(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -286,7 +286,7 @@ void Driver::up(bool enable)
 	}
 }
 
-void Driver::down(bool enable)
+void Driver::enableDown(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -297,7 +297,7 @@ void Driver::down(bool enable)
 	}
 }
 
-void Driver::rollLeft(bool enable)
+void Driver::enableRollLeft(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -308,7 +308,7 @@ void Driver::rollLeft(bool enable)
 	}
 }
 
-void Driver::rollRight(bool enable)
+void Driver::enableRollRight(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -319,15 +319,7 @@ void Driver::rollRight(bool enable)
 	}
 }
 
-void Driver::setSpeed()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mSpeedActual = mSpeed;
-}
-
-void Driver::mouseMove(bool enable)
+void Driver::enableMouseMove(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -336,6 +328,14 @@ void Driver::mouseMove(bool enable)
 	{
 		mMouseMove = enable;
 	}
+}
+
+void Driver::setSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mSpeedActual = mSpeed;
 }
 
 void Driver::setSpeedFast()

@@ -204,7 +204,7 @@ int main(int argc, char **argv)
 
 	lib_handle =
 			dlopen(
-					"/REPOSITORY/KProjects/Eclipse/Ely-procedures/Debug-thread/libtest.so",
+					"/REPOSITORY/KProjects/Eclipse/ely-routines/Debug-thread/libely-routines.so",
 					RTLD_LAZY);
 	if (!lib_handle)
 	{
