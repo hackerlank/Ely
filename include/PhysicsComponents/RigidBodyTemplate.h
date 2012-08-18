@@ -24,8 +24,6 @@
 #ifndef RIGIDBODYTEMPLATE_H_
 #define RIGIDBODYTEMPLATE_H_
 
-#include <pandaFramework.h>
-#include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "PhysicsComponents/RigidBody.h"
@@ -35,7 +33,8 @@
 class RigidBodyTemplate: public ComponentTemplate
 {
 public:
-	RigidBodyTemplate();
+	RigidBodyTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~RigidBodyTemplate();
 
 	const virtual ComponentType componentType() const;

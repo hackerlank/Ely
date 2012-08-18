@@ -28,6 +28,8 @@
 #include <set>
 #include <string>
 #include <utility>
+#include <pandaFramework.h>
+#include <windowFramework.h>
 #include <typedWritableReferenceCount.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
@@ -43,7 +45,8 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	ComponentTemplate();
+	ComponentTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 
 	/**
 	 * \brief Destructor.
@@ -98,6 +101,18 @@ public:
 	virtual std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
+	 */
+	PandaFramework* const pandaFramework() const;
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework* const windowFramework() const;
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -106,6 +121,10 @@ public:
 protected:
 	///Parameter table
 	ParameterTable mParameterTable;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 
 	///The (reentrant) mutex associated with this template.
 	ReMutex mMutex;

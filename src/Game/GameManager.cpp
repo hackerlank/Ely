@@ -146,10 +146,10 @@ void GameManager::setupCompTmplMgr()
 	///Audio templates
 	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new ListenerTemplate(mWindow));
+			new ListenerTemplate(this, mWindow));
 	//Sound3d
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new Sound3dTemplate(mWindow));
+			new Sound3dTemplate(this, mWindow));
 
 	///Behavioral templates
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
@@ -163,13 +163,13 @@ void GameManager::setupCompTmplMgr()
 	///Scene templates
 	//InstanceOf
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new InstanceOfTemplate());
+			new InstanceOfTemplate(this, mWindow));
 	//Model
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ModelTemplate(this, mWindow));
 	//NodePathWrapper
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new NodePathWrapperTemplate(mWindow));
+			new NodePathWrapperTemplate(this, mWindow));
 	//Terrain
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new TerrainTemplate(this, mWindow));
@@ -177,7 +177,7 @@ void GameManager::setupCompTmplMgr()
 	///Physics templates
 	//RigidBody
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new RigidBodyTemplate());
+			new RigidBodyTemplate(this, mWindow));
 
 }
 
@@ -247,7 +247,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//create a new object template
 		ObjectTemplate* objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(objectType),
-				ObjectTemplateManager::GetSingletonPtr());
+				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
 		//cycle through the ComponentTmpl(s)' definitions ...
 		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
 				componentTmpl != NULL;

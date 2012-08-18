@@ -26,7 +26,6 @@
 
 #include <nodePath.h>
 #include <lvecBase3.h>
-#include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "SceneComponents/InstanceOf.h"
@@ -35,7 +34,8 @@
 class InstanceOfTemplate: public ComponentTemplate
 {
 public:
-	InstanceOfTemplate();
+	InstanceOfTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~InstanceOfTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -56,7 +56,8 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "InstanceOfTemplate", ComponentTemplate::get_class_type());
+		register_type(_type_handle, "InstanceOfTemplate",
+				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

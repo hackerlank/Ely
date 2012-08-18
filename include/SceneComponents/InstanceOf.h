@@ -54,8 +54,6 @@ public:
 	virtual void onAddToObjectSetup();
 
 private:
-	///The template used to construct this component.
-	InstanceOfTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 

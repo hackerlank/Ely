@@ -25,9 +25,6 @@
 #define CONTROLBYEVENTTEMPLATE_H_
 
 #include <string>
-#include <typedObject.h>
-#include <pandaFramework.h>
-#include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "ControlComponents/Driver.h"
@@ -48,23 +45,7 @@ public:
 
 	virtual void setParametersDefaults();
 
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the PandaFramework.
-	 */
-	PandaFramework* const pandaFramework() const;
-
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework* const windowFramework() const;
-
 private:
-	///The PandaFramework.
-	PandaFramework* mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

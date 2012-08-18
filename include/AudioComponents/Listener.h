@@ -73,8 +73,6 @@ public:
 	virtual void update(void* data);
 
 private:
-	///The template used to construct this component.
-	ListenerTemplate* mTmpl;
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
 	///Sounds' characteristics.

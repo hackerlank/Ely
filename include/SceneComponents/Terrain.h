@@ -79,8 +79,6 @@ public:
 	///@}
 
 private:
-	///The template used to construct this component.
-	TerrainTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 

@@ -25,9 +25,6 @@
 #define NODEPATHWRAPPERTEMPLATE_H_
 
 #include <string>
-#include <pandaFramework.h>
-#include <windowFramework.h>
-
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/NodePathWrapper.h"
@@ -36,7 +33,8 @@
 class NodePathWrapperTemplate: public ComponentTemplate
 {
 public:
-	NodePathWrapperTemplate(WindowFramework* windowFramework);
+	NodePathWrapperTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~NodePathWrapperTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -46,15 +44,7 @@ public:
 
 	virtual void setParametersDefaults();
 
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework* const windowFramework() const;
-
 private:
-	///The WindowFramework.
-	WindowFramework* mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

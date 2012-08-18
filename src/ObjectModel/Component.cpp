@@ -22,6 +22,8 @@
  */
 
 #include "ObjectModel/Component.h"
+#include "ObjectModel/ComponentTemplate.h"
+#include "ObjectModel/Object.h"
 
 Component::Component() :
 		mOwnerObject(NULL)
@@ -32,6 +34,8 @@ Component::~Component()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+	//unregister events if any
+	unRegisterEvents();
 }
 
 void Component::update(void* data)
@@ -74,6 +78,33 @@ void Component::setComponentId(const ComponentId& componentId)
 
 	mComponentId = componentId;
 }
+
+#ifdef WIN32
+void Component::registerEvents()
+{
+}
+
+void Component::unRegisterEvents()
+{
+}
+#else
+void Component::registerEvents()
+{
+	//register only if some events is present
+	if (not mEventSet.empty()){
+		//Open the event handlers library
+
+	}
+}
+
+void Component::unRegisterEvents()
+{
+
+	if (not mEventSet.empty()){
+		//Close the event handlers library
+	}
+}
+#endif
 
 ReMutex& Component::getMutex()
 {

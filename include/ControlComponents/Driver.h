@@ -147,9 +147,6 @@ public:
 	///@}
 
 private:
-	///The template used to construct this component.
-	DriverTemplate* mTmpl;
-
 	///@{
 	///Key controls and effective keys.
 	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,

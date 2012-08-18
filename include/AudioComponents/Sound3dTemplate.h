@@ -26,8 +26,6 @@
 
 #include <string>
 #include <list>
-#include <pandaFramework.h>
-#include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "AudioComponents/Sound3d.h"
@@ -37,7 +35,8 @@
 class Sound3dTemplate: public ComponentTemplate
 {
 public:
-	Sound3dTemplate(WindowFramework* windowFramework);
+	Sound3dTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~Sound3dTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -47,15 +46,7 @@ public:
 
 	virtual void setParametersDefaults();
 
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework* const windowFramework() const;
-
 private:
-	///The WindowFramework.
-	WindowFramework* const mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

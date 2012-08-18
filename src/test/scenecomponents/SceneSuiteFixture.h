@@ -38,8 +38,7 @@
 struct SceneSuiteFixture
 {
 	SceneSuiteFixture() :
-			mInstanceOf(NULL), mInstanceOfId("InstanceOf_Test"), mInstanceOfTmpl(
-					new InstanceOfTemplate()), mModel(NULL), mModelId(
+			mInstanceOf(NULL), mInstanceOfId("InstanceOf_Test"), mModel(NULL), mModelId(
 					"Model_Test"), mModelTmpl(NULL)
 	{
 		InstanceOf::init_type();
@@ -49,6 +48,7 @@ struct SceneSuiteFixture
 		mPanda = new PandaFramework();
 		mPanda->open_framework(argc, argv);
 		mWin = mPanda->open_window();
+		mInstanceOfTmpl = new InstanceOfTemplate(mPanda, mWin);
 		ModelTemplate::init_type();
 		Model::init_type();
 	}

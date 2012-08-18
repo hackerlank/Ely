@@ -146,8 +146,6 @@ public:
 	virtual void update(void* data);
 
 private:
-	///The template used to construct this component.
-	Sound3dTemplate* mTmpl;
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
 	///The set of sounds attached to this component.

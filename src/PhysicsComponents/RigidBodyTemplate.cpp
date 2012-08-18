@@ -23,8 +23,15 @@
 
 #include "PhysicsComponents/RigidBodyTemplate.h"
 
-RigidBodyTemplate::RigidBodyTemplate()
+RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
+	if (not pandaFramework or not windowFramework)
+	{
+		throw GameException(
+				"RigidBodyTemplate::RigidBodyTemplate: invalid PandaFramework or WindowFramework");
+	}
 	if (not GamePhysicsManager::GetSingletonPtr())
 	{
 		throw GameException(
@@ -70,12 +77,12 @@ void RigidBodyTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
-	mParameterTable.insert(ParameterNameValue("body_type","dynamic"));
-	mParameterTable.insert(ParameterNameValue("body_mass","1.0"));
-	mParameterTable.insert(ParameterNameValue("body_friction","0.8"));
-	mParameterTable.insert(ParameterNameValue("body_restitution","0.1"));
-	mParameterTable.insert(ParameterNameValue("shape_type","sphere"));
-	mParameterTable.insert(ParameterNameValue("collide_mask","all_on"));
+	mParameterTable.insert(ParameterNameValue("body_type", "dynamic"));
+	mParameterTable.insert(ParameterNameValue("body_mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("body_friction", "0.8"));
+	mParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
+	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
 }
 
 //TypedObject semantics: hardcoded

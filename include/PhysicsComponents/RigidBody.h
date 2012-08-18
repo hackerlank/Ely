@@ -146,8 +146,6 @@ public:
 	///@}
 
 private:
-	///The template used to construct this component.
-	RigidBodyTemplate* mTmpl;
 	///The NodePath associated to this rigid body.
 	NodePath mNodePath;
 	///The NodePath associated to this rigid body.

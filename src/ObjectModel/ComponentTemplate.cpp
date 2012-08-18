@@ -23,7 +23,9 @@
 
 #include "ObjectModel/ComponentTemplate.h"
 
-ComponentTemplate::ComponentTemplate()
+ComponentTemplate::ComponentTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)
 {
 	mParameterTable.clear();
 }
@@ -99,6 +101,16 @@ std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
 	}
 	//
 	return strList;
+}
+
+PandaFramework* const ComponentTemplate::pandaFramework() const
+{
+	return mPandaFramework;
+}
+
+WindowFramework* const ComponentTemplate::windowFramework() const
+{
+	return mWindowFramework;
 }
 
 ReMutex& ComponentTemplate::getMutex()

@@ -23,13 +23,14 @@
 
 #include "AudioComponents/Sound3dTemplate.h"
 
-Sound3dTemplate::Sound3dTemplate(WindowFramework* windowFramework) :
-		mWindowFramework(windowFramework)
+Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not windowFramework)
+	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid WindowFramework");
+				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework");
 	}
 	if (not GameAudioManager::GetSingletonPtr())
 	{

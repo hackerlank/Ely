@@ -24,14 +24,21 @@
 #include "ObjectModel/ObjectTemplate.h"
 
 ObjectTemplate::ObjectTemplate(const ObjectType& name,
-		ObjectTemplateManager* objectTmplMgr) :
-		mName(name), mObjectTmplMgr(objectTmplMgr)
+		ObjectTemplateManager* objectTmplMgr, PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		mName(name), mObjectTmplMgr(objectTmplMgr), mPandaFramework(
+				pandaFramework), mWindowFramework(windowFramework)
 {
 	if (not objectTmplMgr)
 	{
 		throw GameException(
 				"ObjectTemplate::ObjectTemplate: invalid ObjectTemplateManager");
 
+	}
+	if (not pandaFramework or not windowFramework)
+	{
+		throw GameException(
+				"ObjectTemplate::ObjectTemplate: invalid PandaFramework or WindowFramework");
 	}
 	//reset parameters
 	setParametersDefaults();

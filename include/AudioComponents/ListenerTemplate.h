@@ -24,8 +24,6 @@
 #ifndef LISTENERTEMPLATE_H_
 #define LISTENERTEMPLATE_H_
 
-#include <pandaFramework.h>
-#include <windowFramework.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "AudioComponents/Listener.h"
@@ -35,7 +33,8 @@
 class ListenerTemplate: public ComponentTemplate
 {
 public:
-	ListenerTemplate(WindowFramework* windowFramework);
+	ListenerTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
 	virtual ~ListenerTemplate();
 
 	const virtual ComponentType componentType() const;
@@ -45,15 +44,7 @@ public:
 
 	virtual void setParametersDefaults();
 
-	/**
-	 * \brief Gets the WindowFramework.
-	 * @return A pointer to the WindowFramework.
-	 */
-	WindowFramework* const windowFramework() const;
-
 private:
-	///The WindowFramework.
-	WindowFramework* const mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

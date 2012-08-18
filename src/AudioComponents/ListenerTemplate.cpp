@@ -23,13 +23,14 @@
 
 #include "AudioComponents/ListenerTemplate.h"
 
-ListenerTemplate::ListenerTemplate(WindowFramework* windowFramework) :
-		mWindowFramework(windowFramework)
+ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not windowFramework)
+	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"ListenerTemplate::ListenerTemplate: invalid WindowFramework");
+				"ListenerTemplate::ListenerTemplate: invalid PandaFramework or WindowFramework");
 	}
 	if (not GameAudioManager::GetSingletonPtr())
 	{

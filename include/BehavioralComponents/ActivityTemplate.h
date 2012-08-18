@@ -26,9 +26,6 @@
 
 #include <string>
 #include <utility>
-#include <pandaFramework.h>
-#include <windowFramework.h>
-#include <typedObject.h>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "BehavioralComponents/Activity.h"
@@ -48,23 +45,7 @@ public:
 
 	virtual void setParametersDefaults();
 
-	/**
-	 * \brief Gets/sets the PandaFramework.
-	 * @return A reference to the PandaFramework.
-	 */
-	PandaFramework* const pandaFramework() const;
-
-	/**
-	 * \brief Gets/sets the WindowFramework.
-	 * @return A reference to the WindowFramework.
-	 */
-	WindowFramework* const windowFramework() const;
-
 private:
-	///The PandaFramework.
-	PandaFramework* const mPandaFramework;
-	///The WindowFramework.
-	WindowFramework* const mWindowFramework;
 
 	///TypedObject semantics: hardcoded
 public:

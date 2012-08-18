@@ -62,7 +62,8 @@ public:
 	 * \brief Constructor.
 	 * @param name The name of this template.
 	 */
-	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr);
+	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr,
+			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 	/**
 	 * \brief Destructor.
@@ -138,6 +139,18 @@ public:
 	std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
+	 */
+	PandaFramework* const pandaFramework() const;
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework* const windowFramework() const;
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -152,6 +165,10 @@ private:
 	ObjectTemplateManager* const mObjectTmplMgr;
 	///Parameter table
 	ParameterTable mParameterTable;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
 
 	///The (reentrant) mutex associated with this template.
 	ReMutex mMutex;

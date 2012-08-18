@@ -24,8 +24,9 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
+#include <iostream>
 #include <string>
-
+#include <set>
 #include <pointerTo.h>
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
@@ -48,6 +49,7 @@ typedef std::string ComponentFamilyType;
 typedef std::string ComponentId;
 
 class Object;
+class ComponentTemplate;
 
 /**
  * \brief Base abstract class to provide a common interface for
@@ -57,6 +59,14 @@ class Object;
  * Each component belongs to a family and is derived from a base
  * family component. Any object can have only one component of
  * each family type.
+ * Each component can be updated directly or indirectly through a
+ * Panda task.
+ * Each component can respond to Panda events (stimuli) by registering
+ * or unregistering them with it. For any event called "<EVENT>" a handler
+ * routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>" is automatically
+ * loaded from a dynamic linked library (referenced by the macro HANDLERS_SO)
+ * at runtime. If this handler doesn't exist or if any error occurs the default
+ * handler (referenced by the macro HANDLERS_DEFAULT_SO) is used.
  */
 class Component: public TypedWritableReferenceCount
 {
@@ -76,17 +86,20 @@ public:
 	 * @return The id of this component.
 	 */
 	const virtual ComponentType componentType() const = 0;
+
 	/**
 	 * \brief Gets the family type of this component.
 	 * @return The family id of this component.
 	 */
 	const virtual ComponentFamilyType familyType() const = 0;
+
 	/**
 	 * \brief Updates the state of the component.
 	 *
 	 * @param data Generic data.
 	 */
 	virtual void update(void* data);
+
 	/**
 	 * \brief Updates the state of the component.
 	 *
@@ -96,12 +109,14 @@ public:
 	 * @return The "done" status.
 	 */
 	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
+
 	/**
 	 * \brief Allows a component to be initialized.
 	 *
 	 * This can be done after creation but "before" insertion into an object.
 	 */
 	virtual bool initialize() = 0;
+
 	/**
 	 * \brief On addition to object setup.
 	 *
@@ -109,6 +124,7 @@ public:
 	 * component has been added to an object. Optional.
 	 */
 	virtual void onAddToObjectSetup();
+
 	/**
 	 * \brief On object addition to scene setup.
 	 *
@@ -116,8 +132,8 @@ public:
 	 * object, this component belongs to, has been added to the scene
 	 * and set up. Optional.
 	 */
-
 	virtual void onAddToSceneSetup();
+
 	/**
 	 * \brief Gets/sets the owner object.
 	 * \return The owner object.
@@ -134,16 +150,40 @@ public:
 	void setComponentId(const ComponentId& componentId);
 
 	/**
+	 * \brief Helper functions to register/unregister events this
+	 * component should respond to.
+	 *
+	 * A handler routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>"
+	 * should exist in a dynamic linked library referenced by HANDLERS_SO.
+	 * If this handler doesn't exist or if any error occurs the default
+	 * handler (contained in HANDLERS_DEFAULT_SO library) is used.
+	 */
+	///@{
+	void registerEvents();
+	void unRegisterEvents();
+	///@}
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
 	ReMutex& getMutex();
 
 protected:
+	///The template used to construct this component.
+	ComponentTemplate* mTmpl;
 	///Unique identifier for this component.
 	ComponentId mComponentId;
-	/// The object this component is a member of.
+	///The object this component is a member of.
 	Object* mOwnerObject;
+	///Set of events this component should respond to.
+	std::set<std::string> mEventSet;
+	///@{
+	///Handles and some typedefs for managing event handlers libraries.
+	LIB_HANDLE mLibHandlers, mLibHandlersDefault;
+	typedef EventHandler::EventCallbackFunction *PHANDLER;
+	typedef std::string* PHANDLERNAME;
+	///@}
 
 	///The (reentrant) mutex associated with this component.
 	ReMutex mMutex;

@@ -23,16 +23,14 @@
 
 #include "SceneComponents/NodePathWrapperTemplate.h"
 
-NodePathWrapperTemplate::NodePathWrapperTemplate(
+NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
-		mWindowFramework(windowFramework)
-
+		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not windowFramework)
+	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(
-				"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework");
-
+				"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework or WindowFramework");
 	}
 	setParametersDefaults();
 

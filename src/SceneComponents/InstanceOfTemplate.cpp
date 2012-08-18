@@ -23,8 +23,15 @@
 
 #include "SceneComponents/InstanceOfTemplate.h"
 
-InstanceOfTemplate::InstanceOfTemplate()
+InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
+	if (not pandaFramework or not windowFramework)
+	{
+		throw GameException(
+				"InstanceOfTemplate::InstanceOfTemplate: invalid PandaFramework or WindowFramework");
+	}
 	setParametersDefaults();
 }
 

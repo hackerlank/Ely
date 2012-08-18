@@ -61,8 +61,6 @@ public:
 	///@}
 
 private:
-	///The template used to construct this component.
-	NodePathWrapperTemplate* mTmpl;
 	///The NodePath associated to this node path wrapper.
 	NodePath mNodePath;
 

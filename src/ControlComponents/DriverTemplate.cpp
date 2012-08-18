@@ -25,8 +25,7 @@
 
 DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
-		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)
-
+		ComponentTemplate(pandaFramework, windowFramework)
 {
 	if (not pandaFramework or not windowFramework)
 	{

@@ -39,7 +39,7 @@ BOOST_FIXTURE_TEST_SUITE(ObjectModel, ObjectModelSuiteFixture)
 /// Test cases
 BOOST_AUTO_TEST_CASE(ObjectConstructorTEST)
 {
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	BOOST_CHECK(mObject->objectId()==ObjectId("TestObject"));
 	BOOST_CHECK(mObject->numComponents() == 0);

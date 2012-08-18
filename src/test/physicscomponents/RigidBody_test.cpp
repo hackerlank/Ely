@@ -41,7 +41,7 @@ BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
 BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 {
 	BOOST_TEST_MESSAGE("TESTING RigidBodyTemplate");
-	mRigidTmpl = new RigidBodyTemplate();
+	mRigidTmpl = new RigidBodyTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mRigidTmpl != NULL);
 	mRigidTmpl->setParametersDefaults();
 	BOOST_CHECK(mRigidTmpl->parameter("body_type") == std::string("dynamic"));

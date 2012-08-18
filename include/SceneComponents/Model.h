@@ -85,8 +85,6 @@ public:
 	AnimControlCollection animations() const;
 
 private:
-	///The template used to construct this component.
-	ModelTemplate* mTmpl;
 	///The NodePath associated to this model.
 	NodePath mNodePath;
 	///The list of animations associated with this model.
