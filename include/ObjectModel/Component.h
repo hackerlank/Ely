@@ -26,7 +26,8 @@
 
 #include <iostream>
 #include <string>
-#include <set>
+#include <map>
+#include <utility>
 #include <pointerTo.h>
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
@@ -166,26 +167,21 @@ protected:
 	Object* mOwnerObject;
 
 	/**
-	 * \name Events management.
+	 * \name Event management data.
 	 */
 	///@{
-	///Set of events this component should respond to.
-	std::set<std::string> mEventSet;
-	///@{
-	///Handles, typedefs, functions for managing event handlers libraries.
+	///Handles, typedefs, for managing event handlers libraries.
 	LIB_HANDLE mHandlerLib;
-	bool mHandlerLibLoaded;
 	typedef EventHandler::EventCallbackFunction* PHANDLER;
 	typedef std::string* PHANDLERNAME;
 	///Table of handlers keyed by event names.
-	std::map<std::string,PHANDLER> mHandlerTable;
-
-	void loadEventHandlers();
-	void unloadEventHandlers();
+	std::map<std::string, PHANDLER> mHandlerTable;
+	bool mHandlersLoaded;
+	bool mHandlersRegistered;
 	///@}
 	/**
-	 * \brief Helper functions to setup register/unregister events this
-	 * component should respond to.
+	 * \name Helper functions to setup, load/unload handlers, register/unregister
+	 * events this component should respond to.
 	 *
 	 * A handler routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>"
 	 * should exist in a dynamic linked library referenced by HANDLERS_SO.
@@ -196,9 +192,10 @@ protected:
 	 */
 	///@{
 	void setupEvents();
-	void registerEvents();
-	void unregisterEvents();
-	///@}
+	void loadEventHandlers();
+	void unloadEventHandlers();
+	void registerEventHandlers();
+	void unregisterEventHandlers();
 	///@}
 
 	///The (reentrant) mutex associated with this component.

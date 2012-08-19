@@ -26,7 +26,7 @@
 #include "ObjectModel/Object.h"
 
 Component::Component() :
-		mOwnerObject(NULL), mHandlerLibLoaded(false)
+		mOwnerObject(NULL), mHandlersRegistered(false), mHandlersLoaded(false)
 {
 }
 
@@ -35,7 +35,7 @@ Component::~Component()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//unregister events (if any)
+	//unload event handlers
 	unloadEventHandlers();
 }
 
@@ -83,37 +83,28 @@ void Component::setComponentId(const ComponentId& componentId)
 #ifdef WIN32
 void Component::loadEventHandlers()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 }
 
 void Component::unloadEventHandlers()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 }
 #else
 void Component::loadEventHandlers()
 {
+	if (mHandlersLoaded)
+	{
+		return;
+	}
 	mHandlerLib = NULL;
-	//register only if some events is present and
-	//this component has been already added to an object
-	if ((not mEventSet.empty()) and mOwnerObject)
+	//some events should be present: check anyway
+	if (not mHandlerTable.empty())
 	{
 		//load the event handlers library
-		if (not mHandlerLibLoaded)
+		mHandlerLib = dlopen(HANDLERS_SO, RTLD_LAZY);
+		if (not mHandlerLib)
 		{
-			mHandlerLib = dlopen(HANDLERS_SO, RTLD_LAZY);
-			if (not mHandlerLib)
-			{
-				std::cerr << "Error loading library: " << dlerror()
-						<< std::endl;
-				return;
-			}
-			//library loaded
-			mHandlerLibLoaded = true;
+			std::cerr << "Error loading library: " << dlerror() << std::endl;
+			return;
 		}
 		// reset errors
 		dlerror();
@@ -125,11 +116,16 @@ void Component::loadEventHandlers()
 		{
 			std::cerr << "Cannot find default handler " << DEFAULT_HANDLER
 			<< dlsymError << std::endl;
+			//Close the event handlers library
+			if (dlclose(mHandlerLib) != 0)
+			{
+				std::cerr << "Error closing library: " << HANDLERS_SO << std::endl;
+			}
 			return;
 		}
-		//register every event
-		std::set<std::string>::iterator iter;
-		for (iter = mEventSet.begin(); iter != mEventSet.end(); ++iter)
+		//load every handler
+		std::map<std::string, PHANDLER>::iterator iter;
+		for (iter = mHandlerTable.begin(); iter != mHandlerTable.end(); ++iter)
 		{
 			//reset errors
 			dlerror();
@@ -144,9 +140,8 @@ void Component::loadEventHandlers()
 			{
 				std::cerr << "Cannot load variable " << variableName
 						<< dlsymError << std::endl;
-				//register default handler for this event
-				mTmpl->pandaFramework()->define_key((*iter), (*iter),
-						pDefaultHandler, (void*) this);
+				//set default handler for this event
+				mHandlerTable[iter->first] = pDefaultHandler;
 				//continue with the next event
 				continue;
 			}
@@ -160,22 +155,86 @@ void Component::loadEventHandlers()
 			{
 				std::cerr << "Cannot load handler " << pHandlerName
 						<< dlsymError << std::endl;
-				//register default handler for this event
-				mTmpl->pandaFramework()->define_key((*iter), (*iter),
-						pDefaultHandler, (void*) this);
+				//set default handler for this event
+				mHandlerTable[iter->first] = pDefaultHandler;
 				//continue with the next event
 				continue;
 			}
-			//register handler for this event
-			mTmpl->pandaFramework()->define_key((*iter), (*iter), pHandler,
-					(void*) this);
+			//set handler for this event
+			mHandlerTable[iter->first] = pHandler;
 		}
 	}
+	//handlers loaded
+	mHandlersLoaded = true;
 }
 
 void Component::unloadEventHandlers()
 {
-	if ((not mEventSet.empty()) and mOwnerObject and mHandlerLibLoaded)
+	if (not mHandlersLoaded)
+	{
+		return;
+	}
+	//handlers should be unregistered: check anyway
+	if (mHandlersRegistered)
+	{
+		unregisterEventHandlers();
+	}
+	mHandlerTable.clear();
+	//Close the event handlers library
+	if (dlclose(mHandlerLib) != 0)
+	{
+		std::cerr << "Error closing library: " << HANDLERS_SO << std::endl;
+	}
+	//handlers unloaded
+	mHandlersLoaded = false;
+}
+#endif
+
+void Component::setupEvents()
+{
+	mHandlerTable.clear();
+	//setup events (if any)
+	std::list<std::string>::iterator iter;
+	std::list<std::string> eventList = mTmpl->parameterList(
+			std::string("events"));
+	if (not eventList.empty())
+	{
+		//populate the handler table with NULL for each event
+		for (iter = eventList.begin(); iter != eventList.end(); ++iter)
+		{
+			std::pair<std::string, PHANDLER> tableItem(*iter, NULL);
+			mHandlerTable.insert(tableItem);
+		}
+		//load event handlers
+		loadEventHandlers();
+	}
+}
+
+void Component::registerEventHandlers()
+{
+	if ((not mHandlersLoaded) or mHandlersRegistered)
+	{
+		return;
+	}
+	//register every handler
+	std::map<std::string, PHANDLER>::iterator iter;
+	for (iter = mHandlerTable.begin(); iter != mHandlerTable.end(); ++iter)
+	{
+		//first==event, second==handler
+		mTmpl->pandaFramework()->define_key(iter->first, iter->first,
+				iter->second, (void*) this);
+	}
+	//handlers registered
+	mHandlersRegistered = true;
+}
+
+void Component::unregisterEventHandlers()
+{
+
+
+
+
+	if ((not mEventSet.empty()) and mOwnerObject and mHandlersRegistered)
 	{
 		//Unregister the handlers
 		mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
@@ -186,23 +245,7 @@ void Component::unloadEventHandlers()
 			std::cerr << "Error closing library: " << HANDLERS_SO << std::endl;
 		}
 		//library unloaded
-		mHandlerLibLoaded = false;
-	}
-}
-#endif
-
-void Component::setupEvents()
-{
-	//setup events (if any)
-	std::list<std::string>::iterator iter;
-	std::list<std::string> eventList = mTmpl->parameterList(
-			std::string("events"));
-	if (not eventList.empty())
-	{
-		for (iter = eventList.begin(); iter != eventList.end(); ++iter)
-		{
-			mEventSet.insert(*iter);
-		}
+		mHandlersRegistered = false;
 	}
 }
 
