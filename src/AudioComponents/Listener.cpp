@@ -30,9 +30,9 @@ Listener::Listener()
 
 }
 
-Listener::Listener(ListenerTemplate* tmpl) :
-		mTmpl(tmpl)
+Listener::Listener(ListenerTemplate* tmpl)
 {
+	mTmpl = tmpl;
 	mPosition = LPoint3(0.0, 0.0, 0.0);
 }
 
@@ -61,6 +61,9 @@ bool Listener::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//setup events (if any)
+	setupEvents();
+	//
 	return result;
 }
 
@@ -76,6 +79,8 @@ void Listener::onAddToObjectSetup()
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
+	//register events (if any)
+	loadEventHandlers();
 }
 
 void Listener::onAddToSceneSetup()

@@ -30,9 +30,9 @@ InstanceOf::InstanceOf()
 
 }
 
-InstanceOf::InstanceOf(InstanceOfTemplate* tmpl) :
-		mTmpl(tmpl)
+InstanceOf::InstanceOf(InstanceOfTemplate* tmpl)
 {
+	mTmpl = tmpl;
 }
 
 InstanceOf::~InstanceOf()

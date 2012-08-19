@@ -242,15 +242,14 @@ typedef std::pair<std::string, std::string> ParameterNameValue;
 ///Macros representing the path to dynamic linked libraries loaded at runtime
 ///Event handlers libraries
 #define HANDLERS_SO "../libElyHandlers.so"
-#define HANDLERS_DEFAULT_SO "../libElyHandlersDefault.so"
+#define DEFAULT_HANDLER "__EVENT_DEFAULT_HANDLER"
 
 ///Some macro dynamic linked libraries loading
 #ifdef WIN32
 #	include <direct.h>
 #	include <windows.h>
 typedef HINSTANCE LIB_HANDLE;
-#endif
-#ifdef __linux
+#else
 #	include <sys/types.h>
 #	include <dlfcn.h>
 typedef void* LIB_HANDLE;

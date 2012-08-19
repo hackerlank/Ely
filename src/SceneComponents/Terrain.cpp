@@ -29,9 +29,9 @@ Terrain::Terrain()
 	// TODO Auto-generated constructor stub
 }
 
-Terrain::Terrain(TerrainTemplate* tmpl) :
-				mTmpl(tmpl)
+Terrain::Terrain(TerrainTemplate* tmpl)
 {
+	mTmpl = tmpl;
 }
 
 Terrain::~Terrain()

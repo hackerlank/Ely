@@ -30,8 +30,9 @@ Driver::Driver()
 }
 
 Driver::Driver(DriverTemplate* tmpl) :
-		mTmpl(tmpl), mTrue(true), mFalse(false), mIsEnabled(false)
+		mTrue(true), mFalse(false), mIsEnabled(false)
 {
+	mTmpl = tmpl;
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
 	mForward = false;

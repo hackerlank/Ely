@@ -80,11 +80,6 @@ void Sound3dTemplate::setParametersDefaults()
 	//no mandatory parameters
 }
 
-WindowFramework* const Sound3dTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle Sound3dTemplate::_type_handle;
 

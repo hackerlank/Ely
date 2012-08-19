@@ -46,7 +46,7 @@ BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 BOOST_AUTO_TEST_CASE(Sound3dTEST)
 {
 	BOOST_TEST_MESSAGE("TESTING Sound3dTemplate");
-	mSound3dTmpl = new Sound3dTemplate(mWin);
+	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
 	mSound3dTmpl->setParametersDefaults();
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 0);
@@ -75,7 +75,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 
 BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 {
-	mSound3dTmpl = new Sound3dTemplate(mWin);
+	mSound3dTmpl = new Sound3dTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
 	mSound3dTmpl->setParametersDefaults();
 	ParameterTable parmTable;

@@ -64,16 +64,6 @@ Component* ActivityTemplate::makeComponent(const ComponentId& compId)
 	return newActivity;
 }
 
-PandaFramework* const ActivityTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* const ActivityTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 void ActivityTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex

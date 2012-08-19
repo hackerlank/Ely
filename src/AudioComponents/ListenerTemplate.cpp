@@ -80,11 +80,6 @@ void ListenerTemplate::setParametersDefaults()
 	//no mandatory parameters
 }
 
-WindowFramework* const ListenerTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle ListenerTemplate::_type_handle;
 

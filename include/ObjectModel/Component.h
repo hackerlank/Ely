@@ -62,11 +62,13 @@ class ComponentTemplate;
  * Each component can be updated directly or indirectly through a
  * Panda task.
  * Each component can respond to Panda events (stimuli) by registering
- * or unregistering them with it. For any event called "<EVENT>" a handler
- * routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>" is automatically
- * loaded from a dynamic linked library (referenced by the macro HANDLERS_SO)
- * at runtime. If this handler doesn't exist or if any error occurs the default
- * handler (referenced by the macro HANDLERS_DEFAULT_SO) is used.
+ * or unregistering them with it. For any event called "<EVENT>" a
+ * global std::string variable named "<EVENT>_<FAMILYTYPE>_<OBJECTID>"
+ * is loaded at runtime from a dynamic linked library (referenced by the
+ * macro HANDLERS_SO) and its value is the name of the function handler
+ * of the same event (contained in the same library too). If this variable
+ * doesn't exist or if any error occurs the default handler (referenced by
+ * the macro DEFAULT_HANDLER_NAME) is used.
  */
 class Component: public TypedWritableReferenceCount
 {
@@ -150,20 +152,6 @@ public:
 	void setComponentId(const ComponentId& componentId);
 
 	/**
-	 * \brief Helper functions to register/unregister events this
-	 * component should respond to.
-	 *
-	 * A handler routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>"
-	 * should exist in a dynamic linked library referenced by HANDLERS_SO.
-	 * If this handler doesn't exist or if any error occurs the default
-	 * handler (contained in HANDLERS_DEFAULT_SO library) is used.
-	 */
-	///@{
-	void registerEvents();
-	void unRegisterEvents();
-	///@}
-
-	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -176,13 +164,41 @@ protected:
 	ComponentId mComponentId;
 	///The object this component is a member of.
 	Object* mOwnerObject;
+
+	/**
+	 * \name Events management.
+	 */
+	///@{
 	///Set of events this component should respond to.
 	std::set<std::string> mEventSet;
 	///@{
-	///Handles and some typedefs for managing event handlers libraries.
-	LIB_HANDLE mLibHandlers, mLibHandlersDefault;
-	typedef EventHandler::EventCallbackFunction *PHANDLER;
+	///Handles, typedefs, functions for managing event handlers libraries.
+	LIB_HANDLE mHandlerLib;
+	bool mHandlerLibLoaded;
+	typedef EventHandler::EventCallbackFunction* PHANDLER;
 	typedef std::string* PHANDLERNAME;
+	///Table of handlers keyed by event names.
+	std::map<std::string,PHANDLER> mHandlerTable;
+
+	void loadEventHandlers();
+	void unloadEventHandlers();
+	///@}
+	/**
+	 * \brief Helper functions to setup register/unregister events this
+	 * component should respond to.
+	 *
+	 * A handler routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>"
+	 * should exist in a dynamic linked library referenced by HANDLERS_SO.
+	 * If this handler doesn't exist or if any error occurs the default
+	 * handler (contained in HANDLERS_DEFAULT_SO library) is used.
+	 * These routines should be used only after the component has
+	 * been added to n object.
+	 */
+	///@{
+	void setupEvents();
+	void registerEvents();
+	void unregisterEvents();
+	///@}
 	///@}
 
 	///The (reentrant) mutex associated with this component.

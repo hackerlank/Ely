@@ -76,10 +76,5 @@ void NodePathWrapperTemplate::setParametersDefaults()
 	//no mandatory parameters
 }
 
-WindowFramework* const NodePathWrapperTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle NodePathWrapperTemplate::_type_handle;

@@ -74,16 +74,6 @@ void TerrainTemplate::setParametersDefaults()
 	//sets the (mandatory) parameters to their default values:
 }
 
-PandaFramework* const TerrainTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* const TerrainTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle TerrainTemplate::_type_handle;
 

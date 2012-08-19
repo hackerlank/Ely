@@ -64,16 +64,6 @@ Component* ModelTemplate::makeComponent(const ComponentId& compId)
 	return newModel;
 }
 
-PandaFramework* const ModelTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* const ModelTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 void ModelTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex

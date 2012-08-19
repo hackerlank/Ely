@@ -39,7 +39,7 @@ BOOST_FIXTURE_TEST_SUITE(Control,ControlSuiteFixture)
 /// Test cases
 BOOST_AUTO_TEST_CASE(DriverInitializeTEST)
 {
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mControlTmpl = new DriverTemplate(mPanda, mWin);
 	mControl =
 	DCAST(Driver, mControlTmpl->makeComponent(mCompId));

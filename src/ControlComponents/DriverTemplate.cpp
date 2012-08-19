@@ -95,16 +95,6 @@ void DriverTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
 }
 
-PandaFramework* const DriverTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* const DriverTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle DriverTemplate::_type_handle;
 

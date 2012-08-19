@@ -30,8 +30,9 @@ Sound3d::Sound3d()
 }
 
 Sound3d::Sound3d(Sound3dTemplate* tmpl) :
-		mTmpl(tmpl), mMinDist(1.0), mMaxDist(1000000000.0)
+		mMinDist(1.0), mMaxDist(1000000000.0)
 {
+	mTmpl = tmpl;
 	mSounds.clear();
 	mPosition = LPoint3(0.0, 0.0, 0.0);
 }
@@ -84,6 +85,8 @@ bool Sound3d::initialize()
 			mSounds[*iter] = sound;
 		}
 	}
+	//setup events (if any)
+	setupEvents();
 	//
 	return result;
 }
@@ -102,6 +105,8 @@ void Sound3d::onAddToObjectSetup()
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
+	//register events (if any)
+	loadEventHandlers();
 }
 
 void Sound3d::onAddToSceneSetup()

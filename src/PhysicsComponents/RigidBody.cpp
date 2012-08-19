@@ -30,9 +30,9 @@ RigidBody::RigidBody()
 
 }
 
-RigidBody::RigidBody(RigidBodyTemplate* tmpl) :
-		mTmpl(tmpl)
+RigidBody::RigidBody(RigidBodyTemplate* tmpl)
 {
+	mTmpl = tmpl;
 }
 
 RigidBody::~RigidBody()

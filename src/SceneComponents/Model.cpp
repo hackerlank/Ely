@@ -29,9 +29,9 @@ Model::Model()
 	// TODO Auto-generated constructor stub
 }
 
-Model::Model(ModelTemplate* tmpl) :
-		mTmpl(tmpl)
+Model::Model(ModelTemplate* tmpl)
 {
+	mTmpl = tmpl;
 }
 
 Model::~Model()

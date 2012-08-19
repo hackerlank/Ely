@@ -48,7 +48,7 @@ BOOST_AUTO_TEST_CASE(ObjectConstructorTEST)
 
 BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 {
-	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr());
+	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	mModelTmpl = new ModelTemplate(mPanda,mWin);
 	mModelTmpl->parameter("model_file") = "panda";

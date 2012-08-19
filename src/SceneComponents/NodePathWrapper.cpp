@@ -29,9 +29,9 @@ NodePathWrapper::NodePathWrapper()
 	// TODO Auto-generated constructor stub
 }
 
-NodePathWrapper::NodePathWrapper(NodePathWrapperTemplate* tmpl) :
-		mTmpl(tmpl)
+NodePathWrapper::NodePathWrapper(NodePathWrapperTemplate* tmpl)
 {
+	mTmpl = tmpl;
 }
 
 NodePathWrapper::~NodePathWrapper()
