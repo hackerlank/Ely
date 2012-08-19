@@ -241,8 +241,8 @@ typedef std::pair<std::string, std::string> ParameterNameValue;
 
 ///Macros representing the path to dynamic linked libraries loaded at runtime
 ///Event handlers libraries
-#define HANDLERS_SO "../libElyHandlers.so"
-#define DEFAULT_HANDLER "__EVENT_DEFAULT_HANDLER"
+#define CALLBACKS_SO "../libElyCallbacks.so"
+#define DEFAULT_CALLBACK "__EVENT_DEFAULT_CALLBACK"
 
 ///Some macro dynamic linked libraries loading
 #ifdef WIN32

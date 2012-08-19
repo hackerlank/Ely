@@ -26,8 +26,9 @@
 #include "ObjectModel/Object.h"
 
 Component::Component() :
-		mOwnerObject(NULL), mHandlersRegistered(false), mHandlersLoaded(false)
+		mOwnerObject(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
 {
+	mCallbackTable.clear();
 }
 
 Component::~Component()
@@ -36,7 +37,7 @@ Component::~Component()
 	HOLDMUTEX(mMutex)
 
 	//unload event handlers
-	unloadEventHandlers();
+	unloadEventCallbacks();
 }
 
 void Component::update(void* data)
@@ -81,118 +82,109 @@ void Component::setComponentId(const ComponentId& componentId)
 }
 
 #ifdef WIN32
-void Component::loadEventHandlers()
+void Component::loadEventCallbacks()
 {
 }
 
-void Component::unloadEventHandlers()
+void Component::unloadEventCallbacks()
 {
 }
 #else
-void Component::loadEventHandlers()
+void Component::loadEventCallbacks()
 {
-	if (mHandlersLoaded)
+	mCallbackLib = NULL;
+	//load the event callbacks library
+	mCallbackLib = dlopen(CALLBACKS_SO, RTLD_LAZY);
+	if (not mCallbackLib)
 	{
+		std::cerr << "Error loading library: " << dlerror() << std::endl;
 		return;
 	}
-	mHandlerLib = NULL;
-	//some events should be present: check anyway
-	if (not mHandlerTable.empty())
+	// reset errors
+	dlerror();
+	//check the default callback
+	PCALLBACK pDefaultCallback = (PCALLBACK) dlsym(mCallbackLib,
+			DEFAULT_CALLBACK);
+	const char* dlsymError = dlerror();
+	if (dlsymError)
 	{
-		//load the event handlers library
-		mHandlerLib = dlopen(HANDLERS_SO, RTLD_LAZY);
-		if (not mHandlerLib)
+		std::cerr << "Cannot find default callback " << DEFAULT_CALLBACK
+		<< dlsymError << std::endl;
+		//Close the event callbacks library
+		if (dlclose(mCallbackLib) != 0)
 		{
-			std::cerr << "Error loading library: " << dlerror() << std::endl;
-			return;
+			std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;
 		}
-		// reset errors
+		return;
+	}
+	//load every callback
+	std::map<std::string, PCALLBACK>::iterator iter;
+	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
+	{
+		//reset errors
 		dlerror();
-		//check the default handler
-		PHANDLER pDefaultHandler = (PHANDLER) dlsym(mHandlerLib,
-				DEFAULT_HANDLER);
-		const char* dlsymError = dlerror();
+		//load the variable whose value is the name
+		//of the callback: <EVENT>_<FAMILYTYPE>_<OBJECTID>
+		std::string variableName = (iter->first) + "_"
+				+ std::string(familyType()) + "_"
+				+ std::string(mOwnerObject->objectId());
+		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) dlsym(mCallbackLib,
+				variableName.c_str());
+		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot find default handler " << DEFAULT_HANDLER
-			<< dlsymError << std::endl;
-			//Close the event handlers library
-			if (dlclose(mHandlerLib) != 0)
-			{
-				std::cerr << "Error closing library: " << HANDLERS_SO << std::endl;
-			}
-			return;
+			std::cerr << "Cannot load variable " << variableName << dlsymError
+					<< std::endl;
+			//set default callback for this event
+			mCallbackTable[iter->first] = pDefaultCallback;
+			//continue with the next event
+			continue;
 		}
-		//load every handler
-		std::map<std::string, PHANDLER>::iterator iter;
-		for (iter = mHandlerTable.begin(); iter != mHandlerTable.end(); ++iter)
+		//reset errors
+		dlerror();
+		//load the callback
+		PCALLBACK pCallback = (PCALLBACK) dlsym(mCallbackLib,
+				pCallbackName->c_str());
+		dlsymError = dlerror();
+		if (dlsymError)
 		{
-			//reset errors
-			dlerror();
-			//load the variable whose value is the name
-			//of the handler: <EVENT>_<FAMILYTYPE>_<OBJECTID>
-			std::string variableName = (*iter) + "_" + std::string(familyType())
-					+ "_" + std::string(mOwnerObject->objectId());
-			PHANDLERNAME pHandlerName = (PHANDLERNAME) dlsym(mHandlerLib,
-					variableName.c_str());
-			dlsymError = dlerror();
-			if (dlsymError)
-			{
-				std::cerr << "Cannot load variable " << variableName
-						<< dlsymError << std::endl;
-				//set default handler for this event
-				mHandlerTable[iter->first] = pDefaultHandler;
-				//continue with the next event
-				continue;
-			}
-			//reset errors
-			dlerror();
-			//load the handler
-			PHANDLER pHandler = (PHANDLER) dlsym(mHandlerLib,
-					pHandlerName->c_str());
-			dlsymError = dlerror();
-			if (dlsymError)
-			{
-				std::cerr << "Cannot load handler " << pHandlerName
-						<< dlsymError << std::endl;
-				//set default handler for this event
-				mHandlerTable[iter->first] = pDefaultHandler;
-				//continue with the next event
-				continue;
-			}
-			//set handler for this event
-			mHandlerTable[iter->first] = pHandler;
+			std::cerr << "Cannot load callback " << pCallbackName << dlsymError
+					<< std::endl;
+			//set default callback for this event
+			mCallbackTable[iter->first] = pDefaultCallback;
+			//continue with the next event
+			continue;
 		}
+		//set callback for this event
+		mCallbackTable[iter->first] = pCallback;
 	}
-	//handlers loaded
-	mHandlersLoaded = true;
+	//callbacks loaded
+	mCallbacksLoaded = true;
 }
 
-void Component::unloadEventHandlers()
+void Component::unloadEventCallbacks()
 {
-	if (not mHandlersLoaded)
+	if (not mCallbacksLoaded)
 	{
 		return;
 	}
-	//handlers should be unregistered: check anyway
-	if (mHandlersRegistered)
+	mCallbackTable.clear();
+	//Close the event callbacks library
+	if (dlclose(mCallbackLib) != 0)
 	{
-		unregisterEventHandlers();
+		std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;
 	}
-	mHandlerTable.clear();
-	//Close the event handlers library
-	if (dlclose(mHandlerLib) != 0)
-	{
-		std::cerr << "Error closing library: " << HANDLERS_SO << std::endl;
-	}
-	//handlers unloaded
-	mHandlersLoaded = false;
+	//callbacks unloaded
+	mCallbacksLoaded = false;
 }
 #endif
 
-void Component::setupEvents()
+void Component::setupEventCallbacks()
 {
-	mHandlerTable.clear();
+	if (mCallbacksLoaded)
+	{
+		return;
+	}
 	//setup events (if any)
 	std::list<std::string>::iterator iter;
 	std::list<std::string> eventList = mTmpl->parameterList(
@@ -202,51 +194,44 @@ void Component::setupEvents()
 		//populate the handler table with NULL for each event
 		for (iter = eventList.begin(); iter != eventList.end(); ++iter)
 		{
-			std::pair<std::string, PHANDLER> tableItem(*iter, NULL);
-			mHandlerTable.insert(tableItem);
+			std::pair<std::string, PCALLBACK> tableItem(*iter, NULL);
+			mCallbackTable.insert(tableItem);
 		}
 		//load event handlers
-		loadEventHandlers();
+		loadEventCallbacks();
 	}
 }
 
-void Component::registerEventHandlers()
+void Component::registerEventCallbacks()
 {
-	if ((not mHandlersLoaded) or mHandlersRegistered)
+	if ((not mCallbacksLoaded) or (not mOwnerObject) or mCallbacksRegistered)
 	{
 		return;
 	}
 	//register every handler
-	std::map<std::string, PHANDLER>::iterator iter;
-	for (iter = mHandlerTable.begin(); iter != mHandlerTable.end(); ++iter)
+	std::map<std::string, PCALLBACK>::iterator iter;
+	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
 	{
 		//first==event, second==handler
 		mTmpl->pandaFramework()->define_key(iter->first, iter->first,
 				iter->second, (void*) this);
 	}
 	//handlers registered
-	mHandlersRegistered = true;
+	mCallbacksRegistered = true;
 }
 
-void Component::unregisterEventHandlers()
+void Component::unregisterEventCallbacks()
 {
-
-
-
-
-	if ((not mEventSet.empty()) and mOwnerObject and mHandlersRegistered)
+	if ((not mCallbacksLoaded) or (not mOwnerObject)
+			or (not mCallbacksRegistered))
 	{
-		//Unregister the handlers
-		mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
-				(void*) this);
-		//Close the event handlers library
-		if (dlclose(mHandlerLib) != 0)
-		{
-			std::cerr << "Error closing library: " << HANDLERS_SO << std::endl;
-		}
-		//library unloaded
-		mHandlersRegistered = false;
+		return;
 	}
+	//Unregister the handlers
+	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
+			(void*) this);
+	//handlers unregistered
+	mCallbacksRegistered = false;
 }
 
 ReMutex& Component::getMutex()

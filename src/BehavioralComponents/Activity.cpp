@@ -55,8 +55,6 @@ bool Activity::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
-	//setup events (if any)
-	setupEvents();
 	//
 	return result;
 }
@@ -69,8 +67,6 @@ void Activity::onAddToObjectSetup()
 	//set the node path of the object to the
 	//node path of this model
 	mOwnerObject->setNodePath(mNodePath);
-	//register events (if any)
-	loadEventHandlers();
 }
 
 NodePath Activity::getNodePath() const

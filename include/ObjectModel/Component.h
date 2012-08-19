@@ -63,13 +63,14 @@ class ComponentTemplate;
  * Each component can be updated directly or indirectly through a
  * Panda task.
  * Each component can respond to Panda events (stimuli) by registering
- * or unregistering them with it. For any event called "<EVENT>" a
- * global std::string variable named "<EVENT>_<FAMILYTYPE>_<OBJECTID>"
- * is loaded at runtime from a dynamic linked library (referenced by the
- * macro HANDLERS_SO) and its value is the name of the function handler
- * of the same event (contained in the same library too). If this variable
- * doesn't exist or if any error occurs the default handler (referenced by
- * the macro DEFAULT_HANDLER_NAME) is used.
+ * or unregistering callbacks for them with the global EventHandler.
+ * For any event called "<EVENT>" a global std::string variable named
+ * "<EVENT>_<FAMILYTYPE>_<OBJECTID>" is loaded at runtime from a
+ * dynamic linked library (referenced by the macro CALLBACKS_SO) and its
+ * value is the name of the callback function (contained in the same library
+ * too) for the same event . If this variable doesn't exist or if any error
+ * occurs the default callback (referenced by the macro DEFAULT_CALLBACK)
+ * is used.
  */
 class Component: public TypedWritableReferenceCount
 {
@@ -166,40 +167,49 @@ protected:
 	///The object this component is a member of.
 	Object* mOwnerObject;
 
+
+	///The (reentrant) mutex associated with this component.
+	ReMutex mMutex;
+
 	/**
 	 * \name Event management data.
 	 */
 	///@{
-	///Handles, typedefs, for managing event handlers libraries.
-	LIB_HANDLE mHandlerLib;
-	typedef EventHandler::EventCallbackFunction* PHANDLER;
-	typedef std::string* PHANDLERNAME;
-	///Table of handlers keyed by event names.
-	std::map<std::string, PHANDLER> mHandlerTable;
-	bool mHandlersLoaded;
-	bool mHandlersRegistered;
+	///Handles, typedefs, for managing libraries of event callbacks.
+	LIB_HANDLE mCallbackLib;
+	typedef EventHandler::EventCallbackFunction* PCALLBACK;
+	typedef std::string* PCALLBACKNAME;
+	///Table of callbacks keyed by event names.
+	std::map<std::string, PCALLBACK> mCallbackTable;
+	bool mCallbacksLoaded;
+	bool mCallbacksRegistered;
 	///@}
 	/**
-	 * \name Helper functions to setup, load/unload handlers, register/unregister
-	 * events this component should respond to.
+	 * \name Helper functions that can be called by the derived components
+	 * to setup, register/unregister callbacks for events this component
+	 * should respond to.
 	 *
-	 * A handler routine called "<EVENT>_<OBJECTID>_<FAMILYTYPE>"
-	 * should exist in a dynamic linked library referenced by HANDLERS_SO.
-	 * If this handler doesn't exist or if any error occurs the default
-	 * handler (contained in HANDLERS_DEFAULT_SO library) is used.
-	 * These routines should be used only after the component has
-	 * been added to n object.
+	 * setupEventCallbacks can be called to initialize the table of callbacks
+	 * associated with each event if any.
+	 * registerEventCallbacks/unregisterEventCallbacks can be used to
+	 * add/remove callbacks to/from the global EventHandler only after the
+	 * component has been added to object.
+	 * All these functions can be called multiple time in a safe way.
 	 */
 	///@{
-	void setupEvents();
-	void loadEventHandlers();
-	void unloadEventHandlers();
-	void registerEventHandlers();
-	void unregisterEventHandlers();
+	void setupEventCallbacks();
+	void registerEventCallbacks();
+	void unregisterEventCallbacks();
 	///@}
 
-	///The (reentrant) mutex associated with this component.
-	ReMutex mMutex;
+private:
+	/**
+	 * \name Helper functions to load/unload event callbacks.
+	 */
+	///@{
+	void loadEventCallbacks();
+	void unloadEventCallbacks();
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
