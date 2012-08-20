@@ -36,7 +36,9 @@ Component::~Component()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//unload event handlers
+	//unregister callbacks if any
+	unregisterEventCallbacks();
+	//unload event callbacks
 	unloadEventCallbacks();
 }
 
@@ -79,6 +81,25 @@ void Component::setComponentId(const ComponentId& componentId)
 	HOLDMUTEX(mMutex)
 
 	mComponentId = componentId;
+}
+
+std::string Component::replaceCharacter(const std::string& source,
+		int character, int replacement)
+{
+	int len = source.size() + 1;
+	char* dest = new char[len];
+	strncpy(dest, source.c_str(), len);
+	//replace hyphens
+	char* pch;
+	pch = strchr(dest, character);
+	while (pch != NULL)
+	{
+		*pch = replacement;
+		pch = strchr(pch + 1, character);
+	}
+	std::string outStr(dest);
+	delete[] dest;
+	return outStr;
 }
 
 #ifdef WIN32
@@ -124,10 +145,12 @@ void Component::loadEventCallbacks()
 		//reset errors
 		dlerror();
 		//load the variable whose value is the name
-		//of the callback: <EVENT>_<FAMILYTYPE>_<OBJECTID>
-		std::string variableName = (iter->first) + "_"
-				+ std::string(familyType()) + "_"
+		//of the callback: <EVENT>_<COMPONENTTYPE>_<OBJECTID>
+		std::string variableTmp = (iter->first) + "_"
+				+ std::string(componentType()) + "_"
 				+ std::string(mOwnerObject->objectId());
+		//replace hyphens
+		std::string variableName = replaceCharacter(variableTmp, '-', '_');
 		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) dlsym(mCallbackLib,
 				variableName.c_str());
 		dlsymError = dlerror();
@@ -164,6 +187,7 @@ void Component::loadEventCallbacks()
 
 void Component::unloadEventCallbacks()
 {
+	//if callbacks not loaded do nothing
 	if (not mCallbacksLoaded)
 	{
 		return;
@@ -181,6 +205,7 @@ void Component::unloadEventCallbacks()
 
 void Component::setupEventCallbacks()
 {
+	//if callbacks already loaded do nothing
 	if (mCallbacksLoaded)
 	{
 		return;
@@ -204,6 +229,8 @@ void Component::setupEventCallbacks()
 
 void Component::registerEventCallbacks()
 {
+	//if callbacks not loaded or owner object not defined or
+	//callbacks already registered do nothing
 	if ((not mCallbacksLoaded) or (not mOwnerObject) or mCallbacksRegistered)
 	{
 		return;
@@ -222,6 +249,8 @@ void Component::registerEventCallbacks()
 
 void Component::unregisterEventCallbacks()
 {
+	//if callbacks not loaded or owner object not defined or
+	//callbacks not registered do nothing
 	if ((not mCallbacksLoaded) or (not mOwnerObject)
 			or (not mCallbacksRegistered))
 	{

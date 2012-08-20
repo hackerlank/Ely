@@ -127,6 +127,8 @@ bool Model::initialize()
 	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
 	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
 	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
+	//setup event callbacks if any
+	setupEventCallbacks();
 	//
 	return result;
 }
@@ -139,6 +141,8 @@ void Model::onAddToObjectSetup()
 	//set the node path of the object to the
 	//node path of this model
 	mOwnerObject->setNodePath(mNodePath);
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 AnimControlCollection Model::animations() const

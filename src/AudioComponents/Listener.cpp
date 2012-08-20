@@ -27,7 +27,6 @@
 Listener::Listener()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
 Listener::Listener(ListenerTemplate* tmpl)
@@ -61,6 +60,8 @@ bool Listener::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//setup event callbacks if any
+	setupEventCallbacks();
 	//
 	return result;
 }
@@ -77,6 +78,8 @@ void Listener::onAddToObjectSetup()
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 void Listener::onAddToSceneSetup()

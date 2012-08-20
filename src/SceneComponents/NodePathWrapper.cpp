@@ -77,6 +77,9 @@ bool NodePathWrapper::initialize()
 	{
 		result = false;
 	}
+	//setup event callbacks if any
+	setupEventCallbacks();
+	//
 	return result;
 }
 
@@ -88,6 +91,8 @@ void NodePathWrapper::onAddToObjectSetup()
 	//set the node path of the object to the
 	//node path of this NodePathWrapper
 	mOwnerObject->setNodePath(mNodePath);
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 NodePath NodePathWrapper::getNodePath() const

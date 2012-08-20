@@ -55,13 +55,16 @@
 			<Component type="NodePathWrapper" priority="100">
 				<Param nodepath="camera"/>
 			</Component>
-			<Component type="Activity">
-				<Param states="forward"/>
-				<Param states="backward"/>
-				<Param states="strafe_left"/>
-				<Param states="strafe_right"/>
-				<Param states="up"/>
-				<Param states="down"/>
+			<Component type="Driver">
+				<Param enabled="false"/>
+				<Param speed="3.0"/>
+				<Param fast_factor="10.0"/>
+				<Param roll_left=""/>
+				<Param roll_right=""/>
+				<Param inverted_keyboard="true"/>
+				<Param inverted_mouse="false"/>
+				<Param mouse_enabled_h="true"/>
+				<Param mouse_enabled_p="true"/>
 				<Param events="w"/>
 				<Param events="w-up"/>
 				<Param events="shift-w"/>
@@ -80,17 +83,6 @@
 				<Param events="f"/>				
 				<Param events="f-up"/>
 				<Param events="shift-f"/>
-			</Component>
-			<Component type="Driver">
-				<Param enabled="false"/>
-				<Param speed="3.0"/>
-				<Param fast_factor="10.0"/>
-				<Param roll_left=""/>
-				<Param roll_right=""/>
-				<Param inverted_keyboard="true"/>
-				<Param inverted_mouse="false"/>
-				<Param mouse_enabled_h="true"/>
-				<Param mouse_enabled_p="true"/>
 			</Component>
 			<Param parent=""/>
 		</Object>	
@@ -152,14 +144,22 @@
 			<Param rot_p="-90.0"/>
 		</Object>
 		<Object type="Actor" id="Actor1"  priority="100">
+<!--
+			<Component type="Activity">
+				<Param states="forward"/>
+				<Param states="backward"/>
+				<Param states="strafe_left"/>
+				<Param states="strafe_right"/>
+				<Param states="up"/>
+				<Param states="down"/>
+			</Component>
+-->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
 				<Param fast_factor="15.0"/>
 				<Param inverted_keyboard="false"/>
 				<Param inverted_mouse="false"/>
-				<Param up="enabled"/>
-				<Param down="enabled"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>

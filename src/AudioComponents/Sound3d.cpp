@@ -85,6 +85,8 @@ bool Sound3d::initialize()
 			mSounds[*iter] = sound;
 		}
 	}
+	//setup event callbacks if any
+	setupEventCallbacks();
 	//
 	return result;
 }
@@ -103,6 +105,8 @@ void Sound3d::onAddToObjectSetup()
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 void Sound3d::onAddToSceneSetup()

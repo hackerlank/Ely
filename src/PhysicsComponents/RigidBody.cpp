@@ -27,7 +27,6 @@
 RigidBody::RigidBody()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
 RigidBody::RigidBody(RigidBodyTemplate* tmpl)
@@ -211,6 +210,8 @@ bool RigidBody::initialize()
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ? mCcdEnabled =
 			true :
 			mCcdEnabled = false;
+	//setup event callbacks if any
+	setupEventCallbacks();
 	//
 	return result;
 }
@@ -258,6 +259,8 @@ void RigidBody::onAddToObjectSetup()
 
 	//set the object node path as this rigid body's one
 	mOwnerObject->setNodePath(mNodePath);
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 void RigidBody::onAddToSceneSetup()

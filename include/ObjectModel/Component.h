@@ -28,6 +28,7 @@
 #include <string>
 #include <map>
 #include <utility>
+#include <cstring>
 #include <pointerTo.h>
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
@@ -65,12 +66,14 @@ class ComponentTemplate;
  * Each component can respond to Panda events (stimuli) by registering
  * or unregistering callbacks for them with the global EventHandler.
  * For any event called "<EVENT>" a global std::string variable named
- * "<EVENT>_<FAMILYTYPE>_<OBJECTID>" is loaded at runtime from a
- * dynamic linked library (referenced by the macro CALLBACKS_SO) and its
- * value is the name of the callback function (contained in the same library
- * too) for the same event . If this variable doesn't exist or if any error
- * occurs the default callback (referenced by the macro DEFAULT_CALLBACK)
- * is used.
+ * "<EVENT>_<COMPONENTTYPE>_<OBJECTID>" (see note) is loaded at runtime
+ * from a dynamic linked library (referenced by the macro CALLBACKS_SO)
+ * and its value is the name of the callback function (contained in the
+ * same library too) for the same event . If this variable doesn't exist
+ * or if any error occurs the default callback (referenced by the macro
+ * DEFAULT_CALLBACK) is used.
+ * \note In the variable string:
+ * \li \c hyphens ("-") are replaced with underscores ("_")
  */
 class Component: public TypedWritableReferenceCount
 {
@@ -172,7 +175,27 @@ protected:
 	ReMutex mMutex;
 
 	/**
-	 * \name Event management data.
+	 * \name Helper interface for event management.
+	 *
+	 * This interface can be called by the derived components to setup
+	 * and register/unregister callbacks for events this component
+	 * should respond to.
+	 * Function setupEventCallbacks can be called to initialize the
+	 * table of callbacks associated with each event if any.
+	 * Functions registerEventCallbacks/unregisterEventCallbacks can
+	 * be used, after the component has been added to object, to
+	 * add/remove callbacks to/from the global EventHandler.
+	 * All these functions can be called multiple time in a safe way.
+	 */
+	///@{
+	void setupEventCallbacks();
+	void registerEventCallbacks();
+	void unregisterEventCallbacks();
+	///@}
+
+private:
+	/**
+	 * \name Event management data types and variables.
 	 */
 	///@{
 	///Handles, typedefs, for managing libraries of event callbacks.
@@ -185,30 +208,13 @@ protected:
 	bool mCallbacksRegistered;
 	///@}
 	/**
-	 * \name Helper functions that can be called by the derived components
-	 * to setup, register/unregister callbacks for events this component
-	 * should respond to.
-	 *
-	 * setupEventCallbacks can be called to initialize the table of callbacks
-	 * associated with each event if any.
-	 * registerEventCallbacks/unregisterEventCallbacks can be used to
-	 * add/remove callbacks to/from the global EventHandler only after the
-	 * component has been added to object.
-	 * All these functions can be called multiple time in a safe way.
-	 */
-	///@{
-	void setupEventCallbacks();
-	void registerEventCallbacks();
-	void unregisterEventCallbacks();
-	///@}
-
-private:
-	/**
 	 * \name Helper functions to load/unload event callbacks.
 	 */
 	///@{
 	void loadEventCallbacks();
 	void unloadEventCallbacks();
+	std::string replaceCharacter(const std::string& source, int character,
+			int replacement);
 	///@}
 
 	///TypedObject semantics: hardcoded

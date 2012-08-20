@@ -27,7 +27,6 @@
 InstanceOf::InstanceOf()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
 InstanceOf::InstanceOf(InstanceOfTemplate* tmpl)
@@ -55,6 +54,7 @@ bool InstanceOf::initialize()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	bool result = true;
 	//setup initial state
 	mNodePath = NodePath(mComponentId);
 	//Scaling (default: (1.0,1.0,1.0))
@@ -64,7 +64,10 @@ bool InstanceOf::initialize()
 	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
 	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
 	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
-	return true;
+	//setup event callbacks if any
+	setupEventCallbacks();
+	//
+	return result;
 }
 
 void InstanceOf::onAddToObjectSetup()
@@ -89,6 +92,8 @@ void InstanceOf::onAddToObjectSetup()
 	{
 		createdObject->getNodePath().instance_to(mOwnerObject->getNodePath());
 	}
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 //TypedObject semantics: hardcoded

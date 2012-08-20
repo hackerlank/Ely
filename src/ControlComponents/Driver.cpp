@@ -60,31 +60,6 @@ Driver::~Driver()
 	disable();
 }
 
-void Driver::disable()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if ((not mIsEnabled) or (not mOwnerObject))
-	{
-		return;
-	}
-	//show mouse cursor
-	WindowProperties props;
-	props.set_cursor_hidden(false);
-	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-	win->request_properties(props);
-
-	//Remove from the control manager update
-	//first check if game audio manager exists
-	if (GameControlManager::GetSingletonPtr())
-	{
-		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
-	}
-	//
-	mIsEnabled = not mIsEnabled;
-}
-
 const ComponentFamilyType Driver::familyType() const
 {
 	return mTmpl->familyType();
@@ -126,6 +101,35 @@ void Driver::enable()
 	}
 	//
 	mIsEnabled = not mIsEnabled;
+	//register event callbacks if any
+	registerEventCallbacks();
+}
+
+void Driver::disable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((not mIsEnabled) or (not mOwnerObject))
+	{
+		return;
+	}
+	//show mouse cursor
+	WindowProperties props;
+	props.set_cursor_hidden(false);
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	win->request_properties(props);
+
+	//Remove from the control manager update
+	//first check if game audio manager exists
+	if (GameControlManager::GetSingletonPtr())
+	{
+		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+	}
+	//
+	mIsEnabled = not mIsEnabled;
+	//unregister event callbacks if any
+	unregisterEventCallbacks();
 }
 
 bool Driver::initialize()
@@ -208,6 +212,8 @@ bool Driver::initialize()
 			mTmpl->parameter(std::string("roll_sens")).c_str());
 	mSensX = (float) atof(mTmpl->parameter(std::string("sens_x")).c_str());
 	mSensY = (float) atof(mTmpl->parameter(std::string("sens_y")).c_str());
+	//setup event callbacks if any
+	setupEventCallbacks();
 	//
 	return result;
 }
