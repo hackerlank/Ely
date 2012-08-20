@@ -213,7 +213,7 @@ bool Driver::initialize()
 	mSensX = (float) atof(mTmpl->parameter(std::string("sens_x")).c_str());
 	mSensY = (float) atof(mTmpl->parameter(std::string("sens_y")).c_str());
 	//setup event callbacks if any
-	setupEventCallbacks();
+	setupEvents();
 	//
 	return result;
 }

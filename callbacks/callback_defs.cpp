@@ -23,8 +23,13 @@
 
 #include "all_configs.h"
 
-//Driver related
+///Driver related
 #include "ControlComponents/Driver.h"
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
 
 void forward(const Event * event, void * data)
 {
@@ -33,3 +38,6 @@ void forward(const Event * event, void * data)
 	driver->enableForward(true);
 }
 
+#ifdef __cplusplus
+}
+#endif

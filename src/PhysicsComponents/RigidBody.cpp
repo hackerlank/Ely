@@ -211,7 +211,7 @@ bool RigidBody::initialize()
 			true :
 			mCcdEnabled = false;
 	//setup event callbacks if any
-	setupEventCallbacks();
+	setupEvents();
 	//
 	return result;
 }

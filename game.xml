@@ -10,13 +10,17 @@
 		</ObjectTmpl>
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
+<!--
 			<ComponentTmpl family="Behavioral" type="Activity"/>
+-->
 			<ComponentTmpl family="Control" type="Driver"/>
 			<ComponentTmpl family="Audio" type="Listener"/>
 		</ObjectTmpl>
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Scene" type="Model"/>
+<!--
 			<ComponentTmpl family="Behavioral" type="Activity"/>
+-->
 			<ComponentTmpl family="Control" type="Driver"/>
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
@@ -55,6 +59,16 @@
 			<Component type="NodePathWrapper" priority="100">
 				<Param nodepath="camera"/>
 			</Component>
+<!--
+			<Component type="Activity">
+				<Param states="forward"/>
+				<Param states="backward"/>
+				<Param states="strafe_left"/>
+				<Param states="strafe_right"/>
+				<Param states="up"/>
+				<Param states="down"/>
+			</Component>
+-->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="3.0"/>

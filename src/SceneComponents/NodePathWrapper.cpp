@@ -78,7 +78,7 @@ bool NodePathWrapper::initialize()
 		result = false;
 	}
 	//setup event callbacks if any
-	setupEventCallbacks();
+	setupEvents();
 	//
 	return result;
 }

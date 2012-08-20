@@ -180,15 +180,15 @@ protected:
 	 * This interface can be called by the derived components to setup
 	 * and register/unregister callbacks for events this component
 	 * should respond to.
-	 * Function setupEventCallbacks can be called to initialize the
-	 * table of callbacks associated with each event if any.
+	 * Function setupEvents can be called to initialize the
+	 * set of events if any.
 	 * Functions registerEventCallbacks/unregisterEventCallbacks can
 	 * be used, after the component has been added to object, to
 	 * add/remove callbacks to/from the global EventHandler.
 	 * All these functions can be called multiple time in a safe way.
 	 */
 	///@{
-	void setupEventCallbacks();
+	void setupEvents();
 	void registerEventCallbacks();
 	void unregisterEventCallbacks();
 	///@}

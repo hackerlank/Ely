@@ -113,6 +113,11 @@ void Component::unloadEventCallbacks()
 #else
 void Component::loadEventCallbacks()
 {
+	//if callbacks loaded do nothing
+	if (mCallbacksLoaded)
+	{
+		return;
+	}
 	mCallbackLib = NULL;
 	//load the event callbacks library
 	mCallbackLib = dlopen(CALLBACKS_SO, RTLD_LAZY);
@@ -203,13 +208,9 @@ void Component::unloadEventCallbacks()
 }
 #endif
 
-void Component::setupEventCallbacks()
+void Component::setupEvents()
 {
-	//if callbacks already loaded do nothing
-	if (mCallbacksLoaded)
-	{
-		return;
-	}
+	mCallbackTable.clear();
 	//setup events (if any)
 	std::list<std::string>::iterator iter;
 	std::list<std::string> eventList = mTmpl->parameterList(
@@ -222,16 +223,20 @@ void Component::setupEventCallbacks()
 			std::pair<std::string, PCALLBACK> tableItem(*iter, NULL);
 			mCallbackTable.insert(tableItem);
 		}
-		//load event handlers
-		loadEventCallbacks();
 	}
 }
 
 void Component::registerEventCallbacks()
 {
+	if (mCallbackTable.empty() or (not mOwnerObject) or mCallbacksRegistered)
+	{
+		return;
+	}
+	//try to load event callbacks if any
+	loadEventCallbacks();
 	//if callbacks not loaded or owner object not defined or
 	//callbacks already registered do nothing
-	if ((not mCallbacksLoaded) or (not mOwnerObject) or mCallbacksRegistered)
+	if (not mCallbacksLoaded)
 	{
 		return;
 	}
@@ -251,7 +256,7 @@ void Component::unregisterEventCallbacks()
 {
 	//if callbacks not loaded or owner object not defined or
 	//callbacks not registered do nothing
-	if ((not mCallbacksLoaded) or (not mOwnerObject)
+	if (mCallbackTable.empty() or (not mCallbacksLoaded) or (not mOwnerObject)
 			or (not mCallbacksRegistered))
 	{
 		return;

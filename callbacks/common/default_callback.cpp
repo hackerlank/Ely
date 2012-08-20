@@ -23,7 +23,7 @@
 
 #include "../all_configs.h"
 
-void __default_callback(const Event * event, void * data)
+void default_callback__(const Event * event, void * data)
 {
 	//get data
 	Component* component = (Component*) data;

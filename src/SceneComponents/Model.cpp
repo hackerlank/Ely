@@ -128,7 +128,7 @@ bool Model::initialize()
 	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
 	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
 	//setup event callbacks if any
-	setupEventCallbacks();
+	setupEvents();
 	//
 	return result;
 }

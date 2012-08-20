@@ -61,7 +61,7 @@ bool Listener::initialize()
 
 	bool result = true;
 	//setup event callbacks if any
-	setupEventCallbacks();
+	setupEvents();
 	//
 	return result;
 }

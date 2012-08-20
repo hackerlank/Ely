@@ -36,9 +36,18 @@ __attribute__((destructor)) void callbacksEnd();
 typedef EventHandler::EventCallbackFunction CALLBACK;
 typedef std::string CALLBACKNAME;
 
-//default callback
-CALLBACK __default_callback;
-
 //extern CALLBACKNAME EVENT_COMPONENTTYPE_OBJECTID;
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+//default callback
+CALLBACK default_callback__;
+
+#ifdef __cplusplus
+}
+#endif
 
 #endif /* ALL_CONFIGS_H_ */

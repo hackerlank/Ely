@@ -86,7 +86,7 @@ bool Sound3d::initialize()
 		}
 	}
 	//setup event callbacks if any
-	setupEventCallbacks();
+	setupEvents();
 	//
 	return result;
 }

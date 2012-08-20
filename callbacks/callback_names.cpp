@@ -23,7 +23,7 @@
 
 #include "all_configs.h"
 
-//camera
+///camera
 //"w""w-up""shift-w"
 CALLBACKNAME w_Driver_camera = "forward";
 CALLBACKNAME w_up_Driver_camera = "";
