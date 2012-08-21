@@ -29,5 +29,12 @@ void forward(const Event * event, void * data)
 {
 	//get data
 	Driver* driver = (Driver*) data;
-	driver->enableForward(true);
+	if (event->get_name().find("-up", 0) == string::npos)
+	{
+		driver->enableForward(true);
+	}
+	else
+	{
+		driver->enableForward(false);
+	}
 }

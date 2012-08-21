@@ -28,12 +28,11 @@ void default_callback__(const Event * event, void * data)
 	//get data
 	Component* component = (Component*) data;
 	std::string evtStr = event->get_name();
-	std::string compTypeStr = std::string(component->familyType());
+	std::string compTypeStr = std::string(component->componentType());
 	std::string objIdStr = std::string(component->getOwnerObject()->objectId());
 	//show message
-	std::cout << "Default Callback called:" << std::endl;
-	std::cout << "\tEVENT: '" << evtStr << "'" << std::endl;
-	std::cout << "\tCOMPONENT: '" << compTypeStr << "'" << std::endl;
-	std::cout << "\tOBJECT: '" << objIdStr << "'" << std::endl;
+	std::cout << "Default Callback called: [EVENT: '" << evtStr
+			<< "'][COMPONENT: '" << compTypeStr << "'][OBJECT: '" << objIdStr
+			<< "']" << std::endl;
 }
 

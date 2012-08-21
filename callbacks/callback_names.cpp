@@ -26,7 +26,7 @@
 ///camera
 //"w""w-up""shift-w"
 CALLBACKNAME w_Driver_camera = "forward";
-CALLBACKNAME w_up_Driver_camera = "";
+CALLBACKNAME w_up_Driver_camera = "forward";
 CALLBACKNAME shift_w_Driver_camera = "";
 //"s""s-up""shift-s"
 //"a""a-up""shift-a"

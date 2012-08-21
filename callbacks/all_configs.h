@@ -25,6 +25,7 @@
 #define ALL_CONFIGS_H_
 
 #include <iostream>
+#include <string>
 #include <ObjectModel/Component.h>
 #include <ObjectModel/Object.h>
 #include "Utilities/Tools.h"
