@@ -1,8 +1,8 @@
-model-path /REPOSITORY/KProjects/Eclipse/PandaExternalExamples/Art
-model-path /REPOSITORY/KProjects/Eclipse/PandaGame/Textures
-model-path /REPOSITORY/KProjects/Eclipse/PandaGame/Models
-model-path /REPOSITORY/KProjects/Eclipse/PandaGame/Sounds
-model-path /REPOSITORY/KProjects/Eclipse/PandaGame/Shaders
+model-path /REPOSITORY/KProjects/WORKSPACE/PandaExternalExamples/Art
+model-path /REPOSITORY/KProjects/WORKSPACE/PandaGame/Textures
+model-path /REPOSITORY/KProjects/WORKSPACE/PandaGame/Models
+model-path /REPOSITORY/KProjects/WORKSPACE/PandaGame/Sounds
+model-path /REPOSITORY/KProjects/WORKSPACE/PandaGame/Shaders
 show-frame-rate-meter #t
 lock-to-one-cpu 0
 support-threads 1
