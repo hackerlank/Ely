@@ -15,29 +15,34 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/behavioralcomponents/BehavioralSuiteFixture.h
+ * \file /Ely/src/test/behaviorcomponents/Activity_test.cpp
  *
- * \date 17/ago/2012 (09:24:25)
+ * \date 17/ago/2012 (09:28:59)
  * \author marco
  */
 
-#ifndef BEHAVIORALSUITEFIXTURE_H_
-#define BEHAVIORALSUITEFIXTURE_H_
+#include "BehaviorSuiteFixture.h"
 
-#include <boost/test/unit_test.hpp>
-#include "BehavioralComponents/Activity.h"
-#include "BehavioralComponents/ActivityTemplate.h"
-#include "Utilities/Tools.h"
-
-struct BehavioralSuiteFixture
+struct ActivityTestCaseFixture
 {
-	BehavioralSuiteFixture()
+	ActivityTestCaseFixture()
 	{
 	}
-
-	~BehavioralSuiteFixture()
+	~ActivityTestCaseFixture()
 	{
 	}
 };
 
-#endif /* BEHAVIORALSUITEFIXTURE_H_ */
+/// Behavior suite
+BOOST_FIXTURE_TEST_SUITE(Behavior, BehaviorSuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(TEST)
+{
+	BOOST_TEST_MESSAGE("TESTING");
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Behavior suite
+
+

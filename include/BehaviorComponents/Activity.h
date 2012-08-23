@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/BehavioralComponents/Activity.h
+ * \file /Ely/include/BehaviorComponents/Activity.h
  *
  * \date 17/ago/2012 (09:28:59)
  * \author marco
@@ -39,12 +39,23 @@ class ActivityTemplate;
  * \brief Component representing the activity of an object.
  *
  * It is composed of a FSM (Finite State Machine) that represents the
- * game states of the object, and of a set of events (along with their
- * handlers) it is supposed to respond to.
+ * game states of the object.
+ * Practically it is a "tiny" wrapper around its embedded FSM (see
+ * FSM).
+ * For any state called "State" three boost::function can be defined
+ * with these names:
+ * \li \c "EnterState"
+ * \li \c "ExitState"
+ * \li \c "FilterState"
+ * Furthermore for a pair of state "StateA", "StateB" a routine can
+ * be defined with this name:
+ * \li \c "FromStateAToStateB"
+ * All these routines are loaded at runtime from a dynamic linked library
+ * (referenced by the macro TRANSITIONS_SO).
+ * For their signatures see FSM.
  *
  * XML Param(s):
  * \li \c "states"  			|multiple|no default
- * \li \c "events"  			|multiple|no default
  */
 class Activity: public Component
 {
@@ -59,6 +70,18 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
+	///////////////////////
+
+	std::string request(const std::string& newStateKey, const ValueList& data =
+			ValueList())
+	{
+		ValueList newData = data;
+		newData.push_front(this);
+		mFSM.request(newStateKey, newData);
+		return "";
+	}
+
+	/////////////////////////
 	/**
 	 * \brief Gets/sets the node path associated to this model.
 	 * @return The node path associated to this model.
@@ -71,6 +94,26 @@ public:
 private:
 	///The NodePath associated to this model.
 	NodePath mNodePath;
+	///The embedded FSM.
+	fsm mFSM;
+
+//	static void Enter(fsm*, const ValueList&)
+//	{
+//	}
+//	static void Exit(fsm*)
+//	{
+//	}
+//	static void Filter(fsm*, const std::string&, const ValueList&)
+//	{
+//	}
+//	static void FromTo(fsm*, const ValueList&)
+//	{
+//	}
+
+///@{
+///Data members
+	std::string mCurrentState, mNewState;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

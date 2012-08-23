@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/BehavioralComponents/Activity.cpp
+ * \file /Ely/src/BehaviorComponents/Activity.cpp
  *
  * \date 17/ago/2012 (09:28:59)
  * \author marco
  */
 
-#include "BehavioralComponents/Activity.h"
-#include "BehavioralComponents/ActivityTemplate.h"
+#include "BehaviorComponents/Activity.h"
+#include "BehaviorComponents/ActivityTemplate.h"
 
 Activity::Activity()
 {

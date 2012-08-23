@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/BehavioralComponents/ActivityTemplate.h
+ * \file /Ely/include/BehaviorComponents/ActivityTemplate.h
  *
  * \date 17/ago/2012 (09:27:08)
  * \author marco
@@ -28,7 +28,7 @@
 #include <utility>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
-#include "BehavioralComponents/Activity.h"
+#include "BehaviorComponents/Activity.h"
 #include "Utilities/Tools.h"
 
 class ActivityTemplate: public ComponentTemplate

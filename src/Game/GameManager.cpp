@@ -151,7 +151,7 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new Sound3dTemplate(this, mWindow));
 
-	///Behavioral templates
+	///Behavior templates
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ActivityTemplate(this, mWindow));
 

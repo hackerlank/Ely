@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/BehavioralComponents/ActivityTemplate.cpp
+ * \file /Ely/src/BehaviorComponents/ActivityTemplate.cpp
  *
  * \date 17/ago/2012 (09:27:08)
  * \author marco
  */
 
-#include "BehavioralComponents/ActivityTemplate.h"
+#include "BehaviorComponents/ActivityTemplate.h"
 
 ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -47,7 +47,7 @@ const ComponentType ActivityTemplate::componentType() const
 
 const ComponentFamilyType ActivityTemplate::familyType() const
 {
-	return ComponentFamilyType("Behavioral");
+	return ComponentFamilyType("Behavior");
 }
 
 Component* ActivityTemplate::makeComponent(const ComponentId& compId)
