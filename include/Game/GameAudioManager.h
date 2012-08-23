@@ -47,7 +47,9 @@ class GameAudioManager: public Singleton<GameAudioManager>
 public:
 
 	/**
-	 * \Brief Constructor.
+	 * \brief Constructor.
+	 * @param sort The task sort.
+	 * @param priority The task priority.
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */

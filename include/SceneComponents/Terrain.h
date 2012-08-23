@@ -43,18 +43,13 @@ class TerrainTemplate;
  * \li \c "height_scale"			|single|"1.0"
  * \li \c "width_scale"				|single|"1.0"
  * \li \c "update_interval"			|single|"0.1"
- * \li \c
- * \li \c
- * \li \c
- * \li \c
- * \li \c
- * #        self.terrain = 0.1
-#        self.lastTesselateTime = -1
-        self.terrainHeightScale = 200
-        self.terrainWidthScale = 2
-        terrainNearPercent = 0.1
-        terrainFarPercent = 1.0
-        terrainBlockSize = 64
+ * \li \c self.terrain = 0.1
+ * \li \c self.lastTesselateTime = -1
+ * \li \c self.terrainHeightScale = 200
+ * \li \c self.terrainWidthScale = 2
+ * \li \c terrainNearPercent = 0.1
+ * \li \c terrainFarPercent = 1.0
+ * \li \c terrainBlockSize = 64
  */
 class Terrain: public Component
 {

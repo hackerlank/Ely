@@ -41,11 +41,11 @@ class Sound3dTemplate;
  * \brief Component manipulating 3d sounds attached to an object.
  *
  * This component both maintains the set of sounds attached to an
- * object and manages their automatic position/velocity update.
- * Sounds can be dynamically loaded/unloaded.
+ * object and manages their automatic position/velocity update.\n
+ * Sounds can be dynamically loaded/unloaded.\n
  * Only playing sounds will have their position/velocity updated.
  * For "static" objects sound position/velocity can be set directly
- * and is not automatically updated.
+ * and is not automatically updated.\n
  * All updates is done wrt scene root (e.g. render).
  *
  * XML Param(s):

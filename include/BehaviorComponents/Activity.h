@@ -39,7 +39,7 @@ class ActivityTemplate;
  * \brief Component representing the activity of an object.
  *
  * It is composed of a embedded fsm (= FSM<std::string>) representing
- * the object game states (i.e. strings).
+ * the object game states (i.e. strings).\n
  * A state transition can be request by delegating its embedded FSM
  * interface functions, like in this sample code:
  * \code
@@ -47,12 +47,14 @@ class ActivityTemplate;
  * \endcode
  * For any state called "State" three "transition" functions can be
  * defined with these signatures:
- * \li \c void EnterState(fsm*, Activity& act, const ValueList& vl);
- * \li \c void ExitState(fsm*, Activity& act);
- * \li \c ValueList FilterState(fsm*, Activity& act, const std::string& state, const ValueList& vl);
+ * - <tt> void EnterState(fsm*, Activity& act, const ValueList& vl);</tt>
+ * - <tt>void ExitState(fsm*, Activity& act);</tt>
+ * - <tt>ValueList FilterState(fsm*, Activity& act, const std::string& state, const ValueList& vl);</tt>
+ *
  * Furthermore for a pair of state "StateA", "StateB" a "transition" function
  * can be defined with this signature:
- * \li \c void FromStateAToStateB(fsm*, Activity& act, const ValueList& vl);
+ * - <tt> void FromStateAToStateB(fsm*, Activity& act, const ValueList& vl);</tt>
+ *
  * All these routines are loaded at runtime from a dynamic linked library
  * (referenced by the macro TRANSITIONS_SO).
  * Inside these routine the Activity* "act" argument passed refers to this

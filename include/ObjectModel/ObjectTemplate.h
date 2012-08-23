@@ -61,6 +61,9 @@ public:
 	/**
 	 * \brief Constructor.
 	 * @param name The name of this template.
+	 * @param objectTmplMgr The ObjectTemplateManager.
+	 * @param pandaFramework The PandaFramework.
+	 * @param windowFramework The WindowFramework.
 	 */
 	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr,
 			PandaFramework* pandaFramework, WindowFramework* windowFramework);
@@ -97,7 +100,7 @@ public:
 
 	/**
 	 * \brief Gets a component template given the component type it can create.
-	 * @param componentId The component type.
+	 * @param componentType The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
 	ComponentTemplate* getComponentTemplate(const ComponentType& componentType);
@@ -127,13 +130,13 @@ public:
 
 	/**
 	 * \brief Gets the parameter value associated to the object.
-	 * @param The name of the parameter.
+	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
 	std::string parameter(const std::string& paramName);
 	/**
 	 * \brief Gets the parameter multi-values associated to the object.
-	 * @param The name of the parameter.
+	 * @param paramName The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
 	std::list<std::string> parameterList(const std::string& paramName);

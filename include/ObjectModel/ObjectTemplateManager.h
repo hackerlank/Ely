@@ -83,6 +83,7 @@ public:
 	 *
 	 * The type is needed to select the correct template.
 	 * @param objectType The object type.
+	 * @param objectId The object id.
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
 	Object* createObject(ObjectType objectType, ObjectId objectId = ObjectId(""));

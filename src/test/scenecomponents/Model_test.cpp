@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/scenesomponents/Model_test.cpp
+ * \file /Ely/src/test/scenecomponents/Model_test.cpp
  *
  * \date 15/mag/2012 (15:32:23)
  * \author marco

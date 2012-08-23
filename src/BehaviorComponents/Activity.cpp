@@ -73,22 +73,6 @@ void Activity::onAddToObjectSetup()
 	registerEventCallbacks();
 }
 
-NodePath Activity::getNodePath() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void Activity::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle Activity::_type_handle;
 
