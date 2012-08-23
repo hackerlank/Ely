@@ -38,21 +38,26 @@ class ActivityTemplate;
 /**
  * \brief Component representing the activity of an object.
  *
- * It is composed of a FSM (Finite State Machine) that represents the
- * game states of the object.
- * Practically it is a "tiny" wrapper around its embedded FSM (see
- * FSM).
- * For any state called "State" three boost::function can be defined
- * with these names:
- * \li \c "EnterState"
- * \li \c "ExitState"
- * \li \c "FilterState"
- * Furthermore for a pair of state "StateA", "StateB" a routine can
- * be defined with this name:
- * \li \c "FromStateAToStateB"
+ * It is composed of a embedded fsm (= FSM<std::string>) representing
+ * the object game states (i.e. strings).
+ * A state transition can be request by delegating its embedded FSM
+ * interface functions, like in this sample code:
+ * \code
+ * 	((fsm)activity).request("stateC", valueList);
+ * \endcode
+ * For any state called "State" three "transition" functions can be
+ * defined with these signatures:
+ * \li \c void EnterState(fsm*, Activity& act, const ValueList& vl);
+ * \li \c void ExitState(fsm*, Activity& act);
+ * \li \c ValueList FilterState(fsm*, Activity& act, const std::string& state, const ValueList& vl);
+ * Furthermore for a pair of state "StateA", "StateB" a "transition" function
+ * can be defined with this signature:
+ * \li \c void FromStateAToStateB(fsm*, Activity& act, const ValueList& vl);
  * All these routines are loaded at runtime from a dynamic linked library
  * (referenced by the macro TRANSITIONS_SO).
- * For their signatures see FSM.
+ * Inside these routine the Activity* "act" argument passed refers to this
+ * component.
+ * For details see FSM.
  *
  * XML Param(s):
  * \li \c "states"  			|multiple|no default
@@ -70,50 +75,14 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
-	///////////////////////
-
-	std::string request(const std::string& newStateKey, const ValueList& data =
-			ValueList())
-	{
-		ValueList newData = data;
-		newData.push_front(this);
-		mFSM.request(newStateKey, newData);
-		return "";
-	}
-
-	/////////////////////////
 	/**
-	 * \brief Gets/sets the node path associated to this model.
-	 * @return The node path associated to this model.
+	 * \brief fsm conversion function.
 	 */
-	///@{
-	NodePath getNodePath() const;
-	void setNodePath(const NodePath& nodePath);
-	///@}
+	operator fsm();
 
 private:
-	///The NodePath associated to this model.
-	NodePath mNodePath;
 	///The embedded FSM.
 	fsm mFSM;
-
-//	static void Enter(fsm*, const ValueList&)
-//	{
-//	}
-//	static void Exit(fsm*)
-//	{
-//	}
-//	static void Filter(fsm*, const std::string&, const ValueList&)
-//	{
-//	}
-//	static void FromTo(fsm*, const ValueList&)
-//	{
-//	}
-
-///@{
-///Data members
-	std::string mCurrentState, mNewState;
-	///@}
 
 	///TypedObject semantics: hardcoded
 public:

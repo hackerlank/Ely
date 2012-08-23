@@ -122,6 +122,10 @@ public:
 	//Public types
 	/**
 	 * \name The Enter/Exit/FromTo/Filter callbacks boost::function types.
+	 *
+	 * 	Enter/FromTo/Filter callbacks have a ValueList parameter representing
+	 * 	custom data that can be passed by the various request/Next/Prev, demand
+	 * 	and forceTransition FSM functions.
 	 */
 	///@{
 	typedef boost::function<void(FSM<StateKey>*, const ValueList&)> EnterFuncPTR;
@@ -190,6 +194,7 @@ protected:
 	/**
 	 * \brief This is the default function that is called if there is no
 	 * enter State function for a particular state name.
+	 * @param data The custom data passed to this callback.
 	 */
 	///@{
 	static void defaultEnter(FSM<StateKey>* fsm, const ValueList& data);
@@ -197,7 +202,7 @@ protected:
 	///@}
 
 	/**
-	 * \brief This is the default function that is called if there is no
+	 * \name This is the default function that is called if there is no
 	 * exit State function for a particular state name.
 	 */
 	///@{
@@ -219,6 +224,7 @@ protected:
 	 * is denied.
 	 *
 	 * @param state The destination state.
+	 * @param data The custom data passed to this callback.
 	 */
 	///@{
 	static ValueList defaultFilter(FSM<StateKey>* fsm,
@@ -234,6 +240,7 @@ protected:
 	 * is denied.
 	 *
 	 * @param state The destination state.
+	 * @param data The custom data passed to this callback.
 	 */
 	///@{
 	static ValueList filterOff(FSM<StateKey>* fsm, const StateKey& toStateKey,
@@ -248,6 +255,7 @@ protected:
 	 * state if possible.
 	 *
 	 * @param state The destination state.
+	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return The current state of this FSM.
 	 */
 	StateKey setState(const StateKey& newStateKey, const ValueList& data =
@@ -362,6 +370,7 @@ public:
 	 * requests will queue up in sequence.
 	 * Nothing is returned, see setState() when an error occurs.
 	 * @param state The destination state.
+	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 */
 	void forceTransition(const StateKey& stateKey, const ValueList& data =
 			ValueList());
@@ -378,6 +387,7 @@ public:
 	 * requests will queue up in sequence.
 	 * Nothing is returned, see request() when an error occurs.
 	 * @param state The destination state.
+	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 */
 	void demand(const StateKey& stateKey, const ValueList& data = ValueList());
 
@@ -399,6 +409,7 @@ public:
 	 * See demand(), which will queue these requests up and apply when the
 	 * transition is complete.
 	 * @param state The destination state.
+	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return The state the FSM is currently into after the request
 	 * or Null if an unauthorized call or an error occurred.
 	 */
@@ -415,6 +426,7 @@ public:
 	 * \note The elements in a StateSet are always sorted from lower to
 	 * higher following the specific strict weak ordering criterion of
 	 * the state key type.
+	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return See request().
 	 */
 	StateKey requestNext(const ValueList& data = ValueList());
@@ -429,6 +441,7 @@ public:
 	 * \note The elements in a std::set are always sorted from lower to
 	 * higher following a specific strict weak ordering criterion set
 	 * on container construction
+	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return See request().
 	 */
 	StateKey requestPrev(const ValueList& data = ValueList());

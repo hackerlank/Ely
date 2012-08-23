@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/SceneComponents/SceneSuiteFixture.h
+ * \file /Ely/src/test/scenecomponents/SceneSuiteFixture.h
  *
  * \date 15/mag/2012 (15:33:43)
  * \author marco
