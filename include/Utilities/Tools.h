@@ -240,9 +240,12 @@ typedef std::multimap<std::string, std::string>::const_iterator ParameterTableCo
 typedef std::pair<std::string, std::string> ParameterNameValue;
 
 ///Macros representing the path to dynamic linked libraries loaded at runtime
-///Event handlers libraries
+///Event callbacks library (See Component)
 #define CALLBACKS_SO "CallbacksLib/libElyCallbacks.so"
 #define DEFAULT_CALLBACK "default_callback__"
+
+///Transition functions library (see Activity component).
+#define TRANSITIONS_SO "TransitionsLib/libElyTransitions.so"
 
 ///Some macro dynamic linked libraries loading
 #ifdef WIN32

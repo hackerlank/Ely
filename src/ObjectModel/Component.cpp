@@ -135,7 +135,7 @@ void Component::loadEventCallbacks()
 	if (dlsymError)
 	{
 		std::cerr << "Cannot find default callback " << DEFAULT_CALLBACK
-		<< dlsymError << std::endl;
+				<< dlsymError << std::endl;
 		//Close the event callbacks library
 		if (dlclose(mCallbackLib) != 0)
 		{

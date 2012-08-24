@@ -124,15 +124,17 @@ public:
 	 * \name The Enter/Exit/FromTo/Filter callbacks boost::function types.
 	 *
 	 * 	Enter/FromTo/Filter callbacks have a ValueList parameter representing
-	 * 	custom data that can be passed by the various request/Next/Prev, demand
-	 * 	and forceTransition FSM functions.
+	 * 	custom data, which can be passed by the various request/Next/Prev,
+	 * 	demand and forceTransition FSM functions.
 	 */
 	///@{
 	typedef boost::function<void(FSM<StateKey>*, const ValueList&)> EnterFuncPTR;
 	typedef boost::function<void(FSM<StateKey>*)> ExitFuncPTR;
 	typedef boost::function<void(FSM<StateKey>*, const ValueList&)> FromToFuncPTR;
-	///The first element of returned ValueList is a state key or Null if
-	///a transition is denied.
+	///For a filter the first element of the returned ValueList is a
+	///state key corresponding to the state to transition to, or the
+	///value pFSM->Null if a transition is denied (here pFSM is the
+	///passed pointer to the FSM).
 	typedef boost::function<
 			ValueList(FSM<StateKey>*, const StateKey&, const ValueList&)> FilterFuncPTR;
 	typedef std::set<StateKey> AllowedStateKeySet;
@@ -374,6 +376,10 @@ public:
 	bool getCurrentStateOrTransition(StateKey& currStateKey,
 			StateKey& toStateKey);
 
+	/**
+	 * \brief Return if a transition is currently active.
+	 * @return If a transition is currently active.
+	 */
 	bool isInTransition();
 
 	/**
@@ -502,6 +508,19 @@ public:
 	 * @param stateSet The state set.
 	 */
 	void setStateSet(const StateSet& stateSet);
+
+	/**
+	 * \brief Return the set of state keys.
+	 * @return The set of state keys.
+	 */
+	std::set<StateKey> getKeyStateSet();
+
+	/**
+	 * \brief Return the number of the states belonging to this FSM
+	 * other than the Off initial state.
+	 * @return The number of the states (Off apart).
+	 */
+	unsigned int getNumStates();
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -761,6 +780,28 @@ template<typename StateKey> void FSM<StateKey>::setStateSet(
 	HOLDMUTEX(mMutex)
 
 	mStateSet = stateSet;
+}
+
+template<typename StateKey> std::set<StateKey> FSM<StateKey>::getKeyStateSet()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	std::set<StateKey> keyStateSet;
+	StateSet::iterator iter;
+	for (iter = mStateSet.begin(); iter != mStateSet.end(); ++iter)
+	{
+		keyStateSet.insert(iter->keyName);
+	}
+	return keyStateSet;
+}
+
+template<typename StateKey> unsigned int FSM<StateKey>::getNumStates()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStateSet.size();
 }
 
 template<typename StateKey> StateKey FSM<StateKey>::requestNext(

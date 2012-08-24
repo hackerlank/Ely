@@ -179,12 +179,12 @@ protected:
 	 *
 	 * This interface can be called by the derived components to setup
 	 * and register/unregister callbacks for events this component
-	 * should respond to.
+	 * should respond to.\n
 	 * Function setupEvents can be called to initialize the
-	 * set of events if any.
+	 * set of events if any.\n
 	 * Functions registerEventCallbacks/unregisterEventCallbacks can
 	 * be used, after the component has been added to object, to
-	 * add/remove callbacks to/from the global EventHandler.
+	 * add/remove callbacks to/from the global EventHandler.\n
 	 * All these functions can be called multiple time in a safe way.
 	 */
 	///@{
@@ -194,25 +194,35 @@ protected:
 	///@}
 
 private:
+	//Event management data types and variables.
+
 	/**
-	 * \name Event management data types and variables.
+	 * \name Handles, typedefs, for managing library of event callbacks.
 	 */
 	///@{
-	///Handles, typedefs, for managing libraries of event callbacks.
 	LIB_HANDLE mCallbackLib;
 	typedef EventHandler::EventCallbackFunction* PCALLBACK;
 	typedef std::string* PCALLBACKNAME;
+	///@}
+
 	///Table of callbacks keyed by event names.
 	std::map<std::string, PCALLBACK> mCallbackTable;
-	bool mCallbacksLoaded;
-	bool mCallbacksRegistered;
-	///@}
+
+	///Helper flags.
+	bool mCallbacksLoaded, mCallbacksRegistered;
+
 	/**
 	 * \name Helper functions to load/unload event callbacks.
 	 */
 	///@{
 	void loadEventCallbacks();
 	void unloadEventCallbacks();
+	/**
+	 * @param source To be replaced string.
+	 * @param character To be replaced character.
+	 * @param replacement Replaced character.
+	 * @return Replaced string.
+	 */
 	std::string replaceCharacter(const std::string& source, int character,
 			int replacement);
 	///@}

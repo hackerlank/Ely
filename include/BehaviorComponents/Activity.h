@@ -26,6 +26,7 @@
 
 #include <string>
 #include <list>
+#include <set>
 #include <nodePath.h>
 #include <filename.h>
 #include <typedObject.h>
@@ -38,7 +39,7 @@ class ActivityTemplate;
 /**
  * \brief Component representing the activity of an object.
  *
- * It is composed of a embedded fsm (= FSM<std::string>) representing
+ * It is composed of a embedded fsm (i.e. FSM<std::string>) representing
  * the object game states (i.e. strings).\n
  * A state transition can be request by delegating its embedded FSM
  * interface functions, like in this sample code:
@@ -47,7 +48,7 @@ class ActivityTemplate;
  * \endcode
  * For any state called "State" three "transition" functions can be
  * defined with these signatures:
- * - <tt> void EnterState(fsm*, Activity& act, const ValueList& vl);</tt>
+ * - <tt>void EnterState(fsm*, Activity& act, const ValueList& vl);</tt>
  * - <tt>void ExitState(fsm*, Activity& act);</tt>
  * - <tt>ValueList FilterState(fsm*, Activity& act, const std::string& state, const ValueList& vl);</tt>
  *
@@ -56,9 +57,9 @@ class ActivityTemplate;
  * - <tt> void FromStateAToStateB(fsm*, Activity& act, const ValueList& vl);</tt>
  *
  * All these routines are loaded at runtime from a dynamic linked library
- * (referenced by the macro TRANSITIONS_SO).
+ * (referenced by the macro TRANSITIONS_SO).\n
  * Inside these routine the Activity* "act" argument passed refers to this
- * component.
+ * component.\n
  * For details see FSM.
  *
  * XML Param(s):
@@ -85,6 +86,31 @@ public:
 private:
 	///The embedded FSM.
 	fsm mFSM;
+
+	//Transition functions library management.
+
+	/**
+	 * \name Handles, typedefs, for managing library of transition functions.
+	 */
+	///@{
+	LIB_HANDLE mTransitionLib;
+	typedef void (*PENTER)(fsm*, Activity&, const ValueList&);
+	typedef void (*PEXIT)(fsm*, Activity&);
+	typedef ValueList (*PFILTER)(fsm*, Activity&, const std::string&,
+			const ValueList&);
+	typedef void (*PFROMTO)(fsm*, Activity&, const ValueList&);
+	///@}
+
+	///Helper flag.
+	bool mTransitionsLoaded;
+
+	/**
+	 * \name Helper functions to load/unload event callbacks.
+	 */
+	///@{
+	void loadTransitionFunctions();
+	void unloadTransitionFunctions();
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
