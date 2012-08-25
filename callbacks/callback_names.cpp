@@ -54,20 +54,20 @@ CALLBACKNAME shift_up_Driver_camera = "speed";
 
 ///Actor1 + Activity related
 //"w""w-up""shift-w"
-CALLBACKNAME w_Activity_Actor1 = "state";
-CALLBACKNAME w_up_Activity_Actor1 = "state";
-CALLBACKNAME shift_w_Activity_Actor1 = "state";
+CALLBACKNAME arrow_up_Activity_Actor1 = "state";
+CALLBACKNAME arrow_up_up_Activity_Actor1 = "state";
+CALLBACKNAME shift_arrow_up_Activity_Actor1 = "state";
 //"s""s-up""shift-s"
-CALLBACKNAME s_Activity_Actor1 = "state";
-CALLBACKNAME s_up_Activity_Actor1 = "state";
-CALLBACKNAME shift_s_Activity_Actor1 = "state";
+CALLBACKNAME arrow_down_Activity_Actor1 = "state";
+CALLBACKNAME arrow_down_up_Activity_Actor1 = "state";
+CALLBACKNAME shift_arrow_down_Activity_Actor1 = "state";
 //"a""a-up""shift-a"
-CALLBACKNAME a_Activity_Actor1 = "state";
-CALLBACKNAME a_up_Activity_Actor1 = "state";
-CALLBACKNAME shift_a_Activity_Actor1 = "state";
+CALLBACKNAME arrow_left_Activity_Actor1 = "state";
+CALLBACKNAME arrow_left_up_Activity_Actor1 = "state";
+CALLBACKNAME shift_arrow_left_Activity_Actor1 = "state";
 //"d""d-up""shift-d"
-CALLBACKNAME d_Activity_Actor1 = "state";
-CALLBACKNAME d_up_Activity_Actor1 = "state";
-CALLBACKNAME shift_d_Activity_Actor1 = "state";
+CALLBACKNAME arrow_right_Activity_Actor1 = "state";
+CALLBACKNAME arrow_right_up_Activity_Actor1 = "state";
+CALLBACKNAME shift_arrow_right_Activity_Actor1 = "state";
 
 

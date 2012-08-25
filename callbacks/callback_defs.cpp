@@ -23,73 +23,120 @@
 
 #include "callback_defs.h"
 
-///Camera + Driver related
-#include "ControlComponents/Driver.h"
-
-void drive(const Event * event, void * data)
+///get key bare event: from key, key-up, shift-key returns key and
+///with *isEnabled false on key-up and true otherwise
+static std::string getBareEvent(const std::string& eventName,
+		bool* isEnabled)
 {
-	//get data
-	Driver* driver = (Driver*) data;
-	bool enable;
-	std::string bareEvent;
 	//analyze the event
-	size_t upPos = event->get_name().find("-up", 0);
+	std::string bareEvent;
+	size_t upPos = eventName.find("-up", 0);
 	if (upPos == string::npos)
 	{
 		//command should be enabled (no "-up" found)
-		enable = true;
+		*isEnabled = true;
 		//event could be of type STR or shift-STR
-		size_t strPos = event->get_name().find("shift-", 0);
+		size_t strPos = eventName.find("shift-", 0);
 		if (strPos == string::npos)
 		{
 			//event is of type STR (no "shift-" found)
-			bareEvent = event->get_name();
+			bareEvent = eventName;
 		}
 		else
 		{
 			//event is of type shift-STR (STR is from
 			//std::string("shift-").length() up to end)
-			bareEvent = event->get_name().substr(
-					std::string("shift-").length());
+			bareEvent = eventName.substr(std::string("shift-").length());
 		}
 	}
 	else
 	{
 		//command should be disabled
-		enable = false;
+		*isEnabled = false;
 		//event is of type STR-up (STR is starts at 0
 		//and is upPos characters long)
-		bareEvent = event->get_name().substr(0, upPos);
+		bareEvent = eventName.substr(0, upPos);
 	}
+	//
+	return bareEvent;
+}
+
+///Driver helper functions for key events in this order:
+//static const char* keys[] =
+//{
+//		"w", //forward
+//		"s", //backward
+//		"a", //strafe_left
+//		"d", //strafe_right
+//		"q", //roll_left
+//		"e", //roll_right
+//		"r", //up
+//		"f", //down
+//};
+#include "ControlComponents/Driver.h"
+static void setDriverCommand(Driver* driver, const std::string& bareEvent,
+		bool enable, const char* keys[])
+{
 	//set the right command
-	if (bareEvent == "w")
+	if (bareEvent == keys[0])
 	{
 		driver->enableForward(enable);
 	}
-	else if (bareEvent == "s")
+	else if (bareEvent == keys[1])
 	{
 		driver->enableBackward(enable);
 	}
-	else if (bareEvent == "a")
+	else if (bareEvent == keys[2])
 	{
 		driver->enableStrafeLeft(enable);
 	}
-	else if (bareEvent == "d")
+	else if (bareEvent == keys[3])
 	{
 		driver->enableStrafeRight(enable);
 	}
-	else if (bareEvent == "r")
+	else if (bareEvent == keys[4])
+	{
+		driver->enableRollLeft(enable);
+	}
+	else if (bareEvent == keys[5])
+	{
+		driver->enableRollRight(enable);
+	}
+	else if (bareEvent == keys[6])
 	{
 		driver->enableUp(enable);
 	}
-	else if (bareEvent == "f")
+	else if (bareEvent == keys[7])
 	{
 		driver->enableDown(enable);
 	}
 	else
 	{
-		PRINTERR("Event not defined: " << event->get_name());
+		PRINTERR("Event not defined: " << bareEvent);
 	}
+}
+
+///Camera + Driver related
+static const char* camera_keys[] =
+{
+		"w", //forward
+		"s", //backward
+		"a", //strafe_left
+		"d", //strafe_right
+		"", //roll_left
+		"", //roll_right
+		"r", //up
+		"f", //down
+};
+void drive(const Event * event, void * data)
+{
+	//get data
+	Driver* driver = (Driver*) data;
+	bool enable;
+	//get bare event
+	std::string bareEvent = getBareEvent(event->get_name(), &enable);
+	//execute command
+	setDriverCommand(driver, bareEvent, enable, camera_keys);
 }
 
 void speed(const Event * event, void * data)
@@ -103,68 +150,50 @@ void speed(const Event * event, void * data)
 
 ///Actor1 + Activity related
 #include "BehaviorComponents/Activity.h"
-
+static const char* Actor1_keys[] =
+{
+		"arrow_up", //forward
+		"arrow_down", //backward
+		"arrow_left", //strafe_left
+		"arrow_right", //strafe_right
+		"", //roll_left
+		"", //roll_right
+		"", //up
+		"", //down
+};
 void state(const Event * event, void * data)
 {
 	//get data
 	Activity* activity = (Activity*) data;
 	bool enable;
-	std::string bareEvent;
-	//analyze the event
-	size_t upPos = event->get_name().find("-up", 0);
-	if (upPos == string::npos)
-	{
-		//command should be enabled (no "-up" found)
-		enable = true;
-		//event could be of type STR or shift-STR
-		size_t strPos = event->get_name().find("shift-", 0);
-		if (strPos == string::npos)
-		{
-			//event is of type STR (no "shift-" found)
-			bareEvent = event->get_name();
-		}
-		else
-		{
-			//event is of type shift-STR (STR is from
-			//std::string("shift-").length() up to end)
-			bareEvent = event->get_name().substr(
-					std::string("shift-").length());
-		}
-	}
-	else
-	{
-		//command should be disabled
-		enable = false;
-		//event is of type STR-up (STR is starts at 0
-		//and is upPos characters long)
-		bareEvent = event->get_name().substr(0, upPos);
-	}
+	//get bare event
+	std::string bareEvent = getBareEvent(event->get_name(), &enable);
 	//get a reference to the actor fsm
 	fsm& actorFSM = (fsm&) (*activity);
 	Object* actorObj = activity->getOwnerObject();
 	//set the right command
-	if (bareEvent == "w")
+	if (bareEvent == "arrow_up")
 	{
 		if (enable)
 		{
 			actorFSM.request("forward");
 		}
 	}
-	else if (bareEvent == "s")
+	else if (bareEvent == "arrow_down")
 	{
 		if (enable)
 		{
 			actorFSM.request("backward");
 		}
 	}
-	else if (bareEvent == "a")
+	else if (bareEvent == "arrow_left")
 	{
 		if (enable)
 		{
 			actorFSM.request("strafe_left");
 		}
 	}
-	else if (bareEvent == "d")
+	else if (bareEvent == "arrow_right")
 	{
 		if (enable)
 		{
@@ -175,4 +204,7 @@ void state(const Event * event, void * data)
 	{
 		PRINTERR("Event not defined: " << event->get_name());
 	}
+	//call the Driver event handler to move actor
+	Driver* actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
+	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
 }
