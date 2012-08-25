@@ -788,7 +788,7 @@ template<typename StateKey> std::set<StateKey> FSM<StateKey>::getKeyStateSet()
 	HOLDMUTEX(mMutex)
 
 	std::set<StateKey> keyStateSet;
-	StateSet::iterator iter;
+	typename StateSet::iterator iter;
 	for (iter = mStateSet.begin(); iter != mStateSet.end(); ++iter)
 	{
 		keyStateSet.insert(iter->keyName);

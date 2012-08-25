@@ -15,26 +15,38 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/common/default_callback.cpp
+ * \file /Ely/transitions/all_configs.h
  *
- * \date 20/ago/2012 (10:14:38)
+ * \date 20/ago/2012 (10:07:25)
  * \author marco
  */
 
-#include "../all_configs.h"
+#ifndef ALL_CONFIGS_H_
+#define ALL_CONFIGS_H_
 
-void default_callback__(const Event * event, void * data)
+#include <iostream>
+#include <string>
+#include "BehaviorComponents/Activity.h"
+#include "ObjectModel/Object.h"
+#include "Utilities/Tools.h"
+
+__attribute__((constructor)) void transitionsInit();
+__attribute__((destructor)) void transitionsEnd();
+
+//generic typedefs
+typedef void ENTER(fsm*, Activity&, const ValueList&);
+typedef void EXIT(fsm*, Activity&);
+typedef ValueList FILTER(fsm*, Activity&, const std::string&,
+		const ValueList&);
+typedef void FROMTO(fsm*, Activity&, const ValueList&);
+
+#ifdef __cplusplus
+extern "C"
 {
-#ifdef DEBUG
-	//get data
-	Component* component = (Component*) data;
-	std::string evtStr = event->get_name();
-	std::string compTypeStr = std::string(component->componentType());
-	std::string objIdStr = std::string(component->getOwnerObject()->objectId());
-	//show message
-	std::cout << "Default Callback called: [EVENT: '" << evtStr
-			<< "'][COMPONENT: '" << compTypeStr << "'][OBJECT: '" << objIdStr
-			<< "']" << std::endl;
 #endif
-}
 
+#ifdef __cplusplus
+}
+#endif
+
+#endif /* ALL_CONFIGS_H_ */

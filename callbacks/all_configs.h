@@ -26,8 +26,8 @@
 
 #include <iostream>
 #include <string>
-#include <ObjectModel/Component.h>
-#include <ObjectModel/Object.h>
+#include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
 __attribute__((constructor)) void callbacksInit();

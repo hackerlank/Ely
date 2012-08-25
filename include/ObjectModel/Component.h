@@ -170,7 +170,6 @@ protected:
 	///The object this component is a member of.
 	Object* mOwnerObject;
 
-
 	///The (reentrant) mutex associated with this component.
 	ReMutex mMutex;
 

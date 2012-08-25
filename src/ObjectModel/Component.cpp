@@ -161,8 +161,8 @@ void Component::loadEventCallbacks()
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load variable " << variableName << ": "
-					<< dlsymError << std::endl;
+			PRINTERR(
+					"Cannot load variable " << variableName << ": " << dlsymError);
 			//set default callback for this event
 			mCallbackTable[iter->first] = pDefaultCallback;
 			//continue with the next event
@@ -176,8 +176,8 @@ void Component::loadEventCallbacks()
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load callback " << pCallbackName << ": "
-					<< dlsymError << std::endl;
+			PRINTERR(
+					"Cannot load callback " << pCallbackName << ": " << dlsymError);
 			//set default callback for this event
 			mCallbackTable[iter->first] = pDefaultCallback;
 			//continue with the next event

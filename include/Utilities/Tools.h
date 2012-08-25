@@ -25,6 +25,7 @@
 #define TOOLS_H_
 
 #include <exception>
+#include <iostream>
 #include <map>
 #include <string>
 #include <sstream>
@@ -38,44 +39,14 @@
 #include <genericAsyncTask.h>
 #include <pmutex.h>
 
-///If ELY_THREAD is defined mutexes are used as protection mechanism.
-#ifdef ELY_THREAD
-#	define HOLDMUTEX(mutex) ReMutexHolder guard(mutex);
+///Macros for generic debug printing
+#ifdef DEBUG
+#	define PRINT(msg) std::cout << msg << std::endl
+#	define PRINTERR(msg) std::cerr << msg << std::endl
 #else
-#	define HOLDMUTEX(mutex)
+#	define PRINT(msg)
+#	define PRINTERR(msg)
 #endif
-/**
- * \brief Implements a mutex lock guard (RAII idiom).
- *
- * Directly "stolen" (and adapted) from boost::thread.
- */
-struct adopt_lock_t
-{
-};
-
-template<typename Mutex>
-class lock_guard
-{
-private:
-	Mutex& m;
-
-	explicit lock_guard(lock_guard&);
-	lock_guard& operator=(lock_guard&);
-public:
-	explicit lock_guard(Mutex& m_) :
-			m(m_)
-	{
-		m.acquire();
-	}
-	lock_guard(Mutex& m_, adopt_lock_t) :
-			m(m_)
-	{
-	}
-	~lock_guard()
-	{
-		m.release();
-	}
-};
 
 /**
  * \brief An exception during the game.
@@ -257,6 +228,46 @@ typedef HINSTANCE LIB_HANDLE;
 #	include <dlfcn.h>
 typedef void* LIB_HANDLE;
 #endif
+
+///If ELY_THREAD is defined mutexes are used as protection mechanism.
+///\note this class is not needed.\see MutexHolder, ReMutexHolder.
+#ifdef ELY_THREAD
+#	define HOLDMUTEX(mutex) ReMutexHolder guard(mutex);
+#else
+#	define HOLDMUTEX(mutex)
+#endif
+/**
+ * \brief Implements a mutex lock guard (RAII idiom).
+ *
+ * Directly "stolen" (and adapted) from boost::thread.
+ */
+struct adopt_lock_t
+{
+};
+
+template<typename Mutex>
+class lock_guard
+{
+private:
+	Mutex& m;
+
+	explicit lock_guard(lock_guard&);
+	lock_guard& operator=(lock_guard&);
+public:
+	explicit lock_guard(Mutex& m_) :
+			m(m_)
+	{
+		m.acquire();
+	}
+	lock_guard(Mutex& m_, adopt_lock_t) :
+			m(m_)
+	{
+	}
+	~lock_guard()
+	{
+		m.release();
+	}
+};
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();

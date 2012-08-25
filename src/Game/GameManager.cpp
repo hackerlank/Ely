@@ -143,6 +143,7 @@ void GameManager::manageObjects()
 void GameManager::setupCompTmplMgr()
 {
 	// Add all kind of component templates
+
 	///Audio templates
 	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(

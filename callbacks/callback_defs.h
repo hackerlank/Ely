@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callback_defs.h
+ * \file /Ely/callbacks/callback_defs.h
  *
  * \date 21/ago/2012 (09:18:56)
  * \author marco
@@ -31,8 +31,12 @@ extern "C"
 {
 #endif
 
-///Driver related
-CALLBACK forward;
+///Camera + Driver related
+CALLBACK drive;
+CALLBACK speed;
+
+///Actor1 + Activity related
+CALLBACK state;
 
 #ifdef __cplusplus
 }

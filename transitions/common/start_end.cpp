@@ -15,26 +15,20 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/common/default_callback.cpp
+ * \file /Ely/transitions/common/start_end.cpp
  *
- * \date 20/ago/2012 (10:14:38)
+ * \date 20/ago/2012 (10:07:54)
  * \author marco
  */
 
 #include "../all_configs.h"
 
-void default_callback__(const Event * event, void * data)
+void transitionsInit()
 {
-#ifdef DEBUG
-	//get data
-	Component* component = (Component*) data;
-	std::string evtStr = event->get_name();
-	std::string compTypeStr = std::string(component->componentType());
-	std::string objIdStr = std::string(component->getOwnerObject()->objectId());
-	//show message
-	std::cout << "Default Callback called: [EVENT: '" << evtStr
-			<< "'][COMPONENT: '" << compTypeStr << "'][OBJECT: '" << objIdStr
-			<< "']" << std::endl;
-#endif
+	std::cout << "transitionsInit executed " << std::endl;
 }
 
+void transitionsEnd()
+{
+	std::cout << "transitionsEnd executed " << std::endl;
+}

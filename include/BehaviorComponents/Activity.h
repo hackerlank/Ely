@@ -30,9 +30,11 @@
 #include <nodePath.h>
 #include <filename.h>
 #include <typedObject.h>
+#include <boost/bind.hpp>
 #include "Support/FSM.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include "Utilities/Tools.h"
 
 class ActivityTemplate;
 
@@ -44,26 +46,31 @@ class ActivityTemplate;
  * A state transition can be request by delegating its embedded FSM
  * interface functions, like in this sample code:
  * \code
- * 	((fsm)activity).request("stateC", valueList);
+ * 	((fsm&)activity).request("stateC", valueList);
  * \endcode
- * For any state called "State" three "transition" functions can be
- * defined with these signatures:
- * - <tt>void EnterState(fsm*, Activity& act, const ValueList& vl);</tt>
- * - <tt>void ExitState(fsm*, Activity& act);</tt>
- * - <tt>ValueList FilterState(fsm*, Activity& act, const std::string& state, const ValueList& vl);</tt>
- *
- * Furthermore for a pair of state "StateA", "StateB" a "transition" function
+ * Given an object with id <OBJECTID>, for any state called <STATE> and
+ * three "transition" functions can be defined with these signatures:
+ * - <tt>void Enter_<STATE>_<OBJECTID>(fsm*, Activity& activity, const ValueList& valueList);</tt>
+ * - <tt>void Exit_<STATE>_<OBJECTID>(fsm*, Activity& activity);</tt>
+ * - <tt>ValueList Filter_<STATE>_<OBJECTID>(fsm*, Activity& activity, const std::string& state, const ValueList& valueList);</tt>
+ * Furthermore for a pair of state <STATEA>, <STATEB> a "transition" function
  * can be defined with this signature:
- * - <tt> void FromStateAToStateB(fsm*, Activity& act, const ValueList& vl);</tt>
+ * - <tt> void <STATEA>_FromTo_<STATEB>_<OBJECTID>(fsm*, Activity& activity, const ValueList& valueList);</tt>
  *
  * All these routines are loaded at runtime from a dynamic linked library
  * (referenced by the macro TRANSITIONS_SO).\n
- * Inside these routine the Activity* "act" argument passed refers to this
+ * Inside these routine the Activity* "activity" argument passed refers to this
  * component.\n
- * For details see FSM.
+ * \see FSM for details.
  *
  * XML Param(s):
- * \li \c "states"  			|multiple|no default
+ * - "states"  			|multiple|no default
+ * - "from_to"			|multiple|no default
+ *
+ * \note given stateA and stateB the value of a parameter "from_to" would be
+ * "stateA_FromTo_stateB".
+ * \note each state name should be a valid C++ identifier, moreover, due to
+ * the previous note, it should not contain the "_FromTo_" substring.
  */
 class Activity: public Component
 {
@@ -81,13 +88,16 @@ public:
 	/**
 	 * \brief fsm conversion function.
 	 */
-	operator fsm();
+	operator fsm&();
 
 private:
 	///The embedded FSM.
 	fsm mFSM;
 
 	//Transition functions library management.
+
+	///Set of "FromTo" transition functions.
+	std::set<std::string> mFromToFunctionSet;
 
 	/**
 	 * \name Handles, typedefs, for managing library of transition functions.

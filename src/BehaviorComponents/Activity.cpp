@@ -24,7 +24,8 @@
 #include "BehaviorComponents/Activity.h"
 #include "BehaviorComponents/ActivityTemplate.h"
 
-Activity::Activity()
+Activity::Activity() :
+		mFSM("FSM")
 {
 	// TODO Auto-generated constructor stub
 }
@@ -56,14 +57,21 @@ bool Activity::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
-	//setup states
 	std::list<std::string>::iterator iter;
+	//setup states
 	std::list<std::string> stateList = mTmpl->parameterList(
 			std::string("states"));
-	//set default transitions for each state
 	for (iter = stateList.begin(); iter != stateList.end(); ++iter)
 	{
+		//set default transitions for each state
 		mFSM.addState(*iter, NULL, NULL, NULL);
+	}
+	//setup FromTo transition function set
+	std::list<std::string> fromToList = mTmpl->parameterList(
+			std::string("from_to"));
+	for (iter = fromToList.begin(); iter != fromToList.end(); ++iter)
+	{
+		mFromToFunctionSet.insert(*iter);
 	}
 	//setup event callbacks if any
 	setupEvents();
@@ -111,18 +119,19 @@ void Activity::loadTransitionFunctions()
 	//for each state load transition functions if any
 	std::set<std::string> stateSet = mFSM.getKeyStateSet();
 	std::set<std::string>::iterator iter;
+	std::string objectId = std::string(mOwnerObject->objectId());
 	for (iter = stateSet.begin(); iter != stateSet.end(); ++iter)
 	{
 		const char* dlsymError;
 		std::string functionName;
 
+		//load enter function (if any): Enter_<STATE>_<OBJECTID>
 		// reset errors
 		dlerror();
-		//load enter function (if any): EnterState
-		functionName = std::string("Enter") + (*iter);
+		functionName = std::string("Enter") + "_" + (*iter) + "_" + objectId;
 		PENTER pEnterFunction = (PENTER) dlsym(mTransitionLib,
 				functionName.c_str());
-		const char* dlsymError = dlerror();
+		dlsymError = dlerror();
 		if (dlsymError)
 		{
 			std::cerr << "Cannot load " << functionName << ": " << dlsymError
@@ -130,81 +139,98 @@ void Activity::loadTransitionFunctions()
 			pEnterFunction = NULL;
 		}
 
+		//load exit function (if any): Exit_<STATE>_<OBJECTID>
 		// reset errors
 		dlerror();
-		//load exit function (if any): ExitState
-		functionName = std::string("Exit") + (*iter);
+		functionName = std::string("Exit") + "_" + (*iter) + "_" + objectId;
 		PEXIT pExitFunction = (PEXIT) dlsym(mTransitionLib,
 				functionName.c_str());
-		const char* dlsymError = dlerror();
+		dlsymError = dlerror();
 		if (dlsymError)
 		{
 			std::cerr << "Cannot load " << functionName << ": " << dlsymError
 					<< std::endl;
 			pExitFunction = NULL;
 		}
-		//////////////////////////////////////////
-		////////TO BE CONTINUED.........
-	}
-	//transitions loaded
-	mTransitionsLoaded = true;
 
-	//////////////////NO GOOD
-	//load every callback
-	std::map<std::string, PCALLBACK>::iterator iter;
-	for (iter = mTransitionTable.begin(); iter != mTransitionTable.end();
+		//load filter function (if any): Filter_<STATE>_<OBJECTID>
+		// reset errors
+		dlerror();
+		functionName = std::string("Filter") + "_" + (*iter) + "_" + objectId;
+		PFILTER pFilterFunction = (PFILTER) dlsym(mTransitionLib,
+				functionName.c_str());
+		dlsymError = dlerror();
+		if (dlsymError)
+		{
+			std::cerr << "Cannot load " << functionName << ": " << dlsymError
+					<< std::endl;
+			pFilterFunction = NULL;
+		}
+		//re-add the state with the current functions
+		mFSM.addState((*iter),
+				boost::bind(pEnterFunction, _1, boost::ref(*this), _2),
+				boost::bind(pExitFunction, _1, boost::ref(*this)),
+				boost::bind(pFilterFunction, _1, boost::ref(*this), _2, _3));
+	}
+
+	//load FromTo transition functions if any
+	for (iter = mFromToFunctionSet.begin(); iter != mFromToFunctionSet.end();
 			++iter)
 	{
-		//reset errors
+		const char* dlsymError;
+		std::string functionName;
+
+		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTID>
+		// reset errors
 		dlerror();
-		//load the variable whose value is the name
-		//of the callback: <EVENT>_<COMPONENTTYPE>_<OBJECTID>
-		std::string variableTmp = (iter->first) + "_"
-				+ std::string(componentType()) + "_"
-				+ std::string(mOwnerObject->objectId());
-		//replace hyphens
-		std::string variableName = replaceCharacter(variableTmp, '-', '_');
-		PCALLBACKNAME pTransitionName = (PCALLBACKNAME) dlsym(mTransitionLib,
-				variableName.c_str());
+		functionName = (*iter) + "_" + objectId;
+		PFROMTO pFromToFunction = (PFROMTO) dlsym(mTransitionLib,
+				functionName.c_str());
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load variable " << variableName << ": "
-					<< dlsymError << std::endl;
-			//set default callback for this event
-			mTransitionTable[iter->first] = pDefaultTransition;
-			//continue with the next event
-			continue;
+			std::cerr << "Cannot load " << functionName << ": " << dlsymError
+					<< std::endl;
+			pFromToFunction = NULL;
 		}
-		//reset errors
-		dlerror();
-		//load the callback
-		PCALLBACK pTransition = (PCALLBACK) dlsym(mTransitionLib,
-				pTransitionName->c_str());
-		dlsymError = dlerror();
-		if (dlsymError)
+		//get the position of the "_FromTo_" substring in (*iter)
+		size_t fromToPos = (*iter).find("_FromTo_");
+		if (fromToPos == string::npos)
 		{
-			std::cerr << "Cannot load callback " << pTransitionName << ": "
-					<< dlsymError << std::endl;
-			//set default callback for this event
-			mTransitionTable[iter->first] = pDefaultTransition;
-			//continue with the next event
+			//the function name doesn't contain "_FromTo_":
+			//continue with the next function
 			continue;
 		}
-		//set callback for this event
-		mTransitionTable[iter->first] = pTransition;
+		//get 2 state names
+		std::string stateFrom = (*iter).substr(0, fromToPos);
+		std::string stateTo = (*iter).substr(
+				fromToPos + std::string("_FromTo_").length());
+		//add the FromTo function
+		mFSM.addFromToFunc(stateFrom, stateTo,
+				boost::bind(pFromToFunction, _1, boost::ref(*this), _2));
 	}
+
+	//transitions loaded
+	mTransitionsLoaded = true;
+}
+
+Activity::operator fsm&()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mFSM;
 }
 
 void Activity::unloadTransitionFunctions()
 {
 	//if transitions not loaded do nothing
-	if (not mTransitionsLoaded)
+	if ((mFSM.getNumStates() == 0) or (not mTransitionsLoaded))
 	{
 		return;
 	}
-	mTransitionTable.clear();
-	//Close the event transitions library
+	mFromToFunctionSet.clear();
+	//Close the transition functions library
 	if (dlclose(mTransitionLib) != 0)
 	{
 		std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;

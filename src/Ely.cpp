@@ -61,7 +61,8 @@ int main(int argc, char **argv)
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 #endif
-#ifdef ELY_THREAD
+
+#if defined (ELY_THREAD) && defined (DEBUG)
 	//threading
 	if (Thread::is_threading_supported())
 	{

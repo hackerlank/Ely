@@ -40,8 +40,8 @@ Object::~Object()
 	{
 		ComponentTable::iterator iter = mComponents.begin();
 		ComponentFamilyType compFamilyType = iter->first;
-		std::cout << "Removing component of family type '"
-				<< std::string(compFamilyType) << "'" << std::endl;
+		PRINT(
+				"Removing component of family type '" << std::string(compFamilyType) << "'");
 		mComponents.erase(iter);
 	}
 	std::cout << std::endl;
@@ -75,7 +75,7 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 	return (*it).second;
 }
 
-PT(Component) Object::addComponent(Component* newComponent)
+PT(Component)Object::addComponent(Component* newComponent)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -143,9 +143,9 @@ void Object::sceneSetup()
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
 	//Is static (by default false)
-	mIsStatic =
-			(mTmpl->parameter(std::string("is_static")) == std::string("true") ? true :
-					false);
+	mIsStatic = (
+			mTmpl->parameter(std::string("is_static")) == std::string("true") ?
+					true : false);
 	//find parent into the created objects
 	Object* createdObject = mTmpl->objectTmplMgr()->getCreatedObject(parentId);
 	if (createdObject != NULL)

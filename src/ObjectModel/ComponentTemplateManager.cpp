@@ -37,14 +37,14 @@ ComponentTemplateManager::~ComponentTemplateManager()
 	{
 		ComponentTemplateTable::iterator iter = mComponentTemplates.begin();
 		ComponentType compType = iter->first;
-		std::cout << "Removing component template for type '"
-				<< std::string(compType) << "'" << std::endl;
+		PRINT(
+				"Removing component template for type '" << std::string(compType) << "'");
 		mComponentTemplates.erase(iter);
 	}
 	std::cout << std::endl;
 }
 
-PT(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
+PT(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
 		ComponentTemplate* componentTmpl)
 {
 	//lock (guard) the mutex
