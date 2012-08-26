@@ -38,6 +38,8 @@
 #include <asyncTask.h>
 #include <genericAsyncTask.h>
 #include <pmutex.h>
+//#include <pointerTo.h>
+#include <threadSafePointerTo.h>
 
 ///Macros for generic debug printing
 #ifdef DEBUG
@@ -229,17 +231,22 @@ typedef HINSTANCE LIB_HANDLE;
 typedef void* LIB_HANDLE;
 #endif
 
-///If ELY_THREAD is defined mutexes are used as protection mechanism.
-///\note this class is not needed.\see MutexHolder, ReMutexHolder.
+///ELY_THREAD
 #ifdef ELY_THREAD
 #	define HOLDMUTEX(mutex) ReMutexHolder guard(mutex);
+#	define SMARTPTR(type) ThreadSafePointerTo< type >
+#	define CSMARTPTR(type) ThreadSafeConstPointerTo< type >
 #else
 #	define HOLDMUTEX(mutex)
+#	define SMARTPTR(type) PointerTo< type >
+#	define CSMARTPTR(type) ConstPointerTo< type >
 #endif
+
 /**
  * \brief Implements a mutex lock guard (RAII idiom).
  *
  * Directly "stolen" (and adapted) from boost::thread.
+ * \note this class is not needed.\see MutexHolder, ReMutexHolder.
  */
 struct adopt_lock_t
 {

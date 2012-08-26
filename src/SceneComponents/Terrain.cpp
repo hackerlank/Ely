@@ -36,6 +36,9 @@ Terrain::Terrain(TerrainTemplate* tmpl)
 
 Terrain::~Terrain()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mNodePath.remove_node();
 }
 

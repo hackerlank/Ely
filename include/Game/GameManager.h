@@ -144,7 +144,7 @@ protected:
 	WindowFramework * mWindow;
 	NodePath mRender;
 	NodePath mCamera;
-	PT(ClockObject) mGlobalClock;
+	SMARTPTR(ClockObject) mGlobalClock;
 
 	/// NodePaths for enable_mouse/disable_mouse.
 	NodePath mTrackBall, mMouse2cam;
@@ -155,10 +155,10 @@ protected:
 	virtual void manageObjects();
 
 	/// 1nd task.
-	PT(TaskInterface<GameManager>::TaskData) m1stTask;
+	SMARTPTR(TaskInterface<GameManager>::TaskData) m1stTask;
 	AsyncTask::DoneStatus firstTask(GenericAsyncTask* task);
 	/// 2nd task
-	PT(TaskInterface<GameManager>::TaskData) m2ndTask;
+	SMARTPTR(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
 #ifdef DEBUG

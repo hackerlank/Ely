@@ -172,7 +172,7 @@ private:
 
 #ifdef ELY_THREAD
 	///Actual transform state.
-	CPT(TransformState) mActualTransform;
+	CSMARTPTR(TransformState) mActualTransform;
 #endif
 
 	///TypedObject semantics: hardcoded

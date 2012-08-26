@@ -57,6 +57,9 @@ Driver::Driver(DriverTemplate* tmpl) :
 
 Driver::~Driver()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	disable();
 }
 

@@ -38,6 +38,9 @@ Activity::Activity(ActivityTemplate* tmpl) :
 
 Activity::~Activity()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	unloadTransitionFunctions();
 }
 

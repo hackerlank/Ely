@@ -36,6 +36,9 @@ NodePathWrapper::NodePathWrapper(NodePathWrapperTemplate* tmpl)
 
 NodePathWrapper::~NodePathWrapper()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	// TODO Auto-generated destructor stub
 }
 

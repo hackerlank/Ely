@@ -90,7 +90,7 @@ public:
 
 private:
 	/// Audio manager.
-	PT(AudioManager) mAudioMgr;
+	SMARTPTR(AudioManager) mAudioMgr;
 
 	///@{
 	///List of audio components to be updated.
@@ -100,7 +100,7 @@ private:
 
 	///@{
 	///A task data for update.
-	PT(TaskInterface<GameAudioManager>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
+	SMARTPTR(TaskInterface<GameAudioManager>::TaskData) mUpdateData;SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

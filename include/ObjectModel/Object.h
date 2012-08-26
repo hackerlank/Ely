@@ -94,10 +94,10 @@ public:
 	 * replaced by this new component (and its ownership released by
 	 * the object).
 	 * @param newComponent The new component to add.
-	 * @return PT(NULL) if there wasn't a component of that family, otherwise
+	 * @return SMARTPTR(NULL) if there wasn't a component of that family, otherwise
 	 * the previous component.
 	 */
-	PT(Component) addComponent(Component* newComponent);
+	SMARTPTR(Component) addComponent(Component* newComponent);
 
 	/**
 	 * \brief Clears the table of all components of this object.
@@ -171,7 +171,7 @@ private:
 	ObjectId mObjectId;
 	///@{
 	///Table of all components indexed by component family type.
-	typedef std::map<const ComponentFamilyType, PT(Component)> ComponentTable;
+	typedef std::map<const ComponentFamilyType, SMARTPTR(Component)> ComponentTable;
 	ComponentTable mComponents;
 	///@}
 	///Static flag: if this object doesn't move in the world.

@@ -75,7 +75,7 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 	return (*it).second;
 }
 
-PT(Component)Object::addComponent(Component* newComponent)
+SMARTPTR(Component)Object::addComponent(Component* newComponent)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -84,7 +84,7 @@ PT(Component)Object::addComponent(Component* newComponent)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
-	PT(Component) previousComp;
+	SMARTPTR(Component) previousComp;
 	previousComp.clear();
 	ComponentFamilyType familyId = newComponent->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
@@ -97,7 +97,7 @@ PT(Component)Object::addComponent(Component* newComponent)
 	//set the component owner
 	newComponent->setOwnerObject(this);
 	//insert the new component into the table
-	mComponents[familyId] = PT(Component)(newComponent);
+	mComponents[familyId] = SMARTPTR(Component)(newComponent);
 	//on addition to object component setup
 	mComponents[familyId]->onAddToObjectSetup();
 	return previousComp;

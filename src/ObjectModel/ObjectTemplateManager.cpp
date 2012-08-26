@@ -53,7 +53,7 @@ ObjectTemplateManager::~ObjectTemplateManager()
 	std::cout << std::endl;
 }
 
-PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
+SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
 		ObjectTemplate* objectTmpl)
 {
 	//lock (guard) the mutex
@@ -64,7 +64,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		throw GameException(
 				"ObjectTemplateManager::addObjectTemplate: NULL Component template");
 	}
-	PT(ObjectTemplate) previousObjTmpl;
+	SMARTPTR(ObjectTemplate) previousObjTmpl;
 	previousObjTmpl.clear();
 	ObjectType objectTemplId = objectTmpl->name();
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
@@ -75,7 +75,7 @@ PT(ObjectTemplate) ObjectTemplateManager::addObjectTemplate(
 		mObjectTemplates.erase(it);
 	}
 	//insert the new component template
-	mObjectTemplates[objectTemplId] = PT(ObjectTemplate)(objectTmpl);
+	mObjectTemplates[objectTemplId] = SMARTPTR(ObjectTemplate)(objectTmpl);
 	return previousObjTmpl;
 
 }
@@ -151,7 +151,7 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 		newObj->addComponent(newComp);
 	}
 	//insert the just created object in the table of created objects
-	mCreatedObjects[newId] = PT(Object)(newObj);
+	mCreatedObjects[newId] = SMARTPTR(Object)(newObj);
 	//
 	return newObj;
 }
@@ -168,6 +168,15 @@ Object* ObjectTemplateManager::getCreatedObject(const ObjectId& objectId)
 		return NULL;
 	}
 	return iterObj->second.p();
+}
+
+bool ObjectTemplateManager::removeCreatedObject(const ObjectId& objectId)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	size_t removedObj = mCreatedObjects.erase(objectId);
+	return (removedObj > 0) ? true : false;
 }
 
 ReMutex& ObjectTemplateManager::getMutex()

@@ -66,7 +66,7 @@ void GameManager::initialize()
 	LMatrix4 cameraMat = mCamera.get_transform()->get_mat();
 	cameraMat.invert_in_place();
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
+	SMARTPTR(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
 	trackBall->set_mat(cameraMat);
 
 #ifdef DEBUG
@@ -89,20 +89,20 @@ void GameManager::initialize()
 void GameManager::manageObjects()
 {
 	//Actor1
-	PT(Object) actor1 =
+	SMARTPTR(Object) actor1 =
 			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
 	//play animation
 	Model* actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Scene")));
 	actor1Model->animations().loop("panda_soft", false);
 	//play sound
-	PT(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
+	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, actor1->getComponent(
 					ComponentFamilyType("Audio")));
 	actor1Sound3d->getSound(0)->set_loop(true);
 	actor1Sound3d->getSound(0)->play();
 
 	//InstancedActor1
-	PT(Object) plane1 =
+	SMARTPTR(Object) plane1 =
 			ObjectTemplateManager::GetSingleton().getCreatedObject("Plane1");
 	Model* plane1Model = DCAST(Model, plane1->getComponent(
 					ComponentFamilyType("Scene")));
@@ -482,7 +482,7 @@ void GameManager::disable_mouse()
 void GameManager::toggleActor1Control(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
-	PT(Object) actor1 =
+	SMARTPTR(Object) actor1 =
 			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
 	Driver* actor1Control = DCAST(Driver, actor1->getComponent(
 					ComponentFamilyType("Control")));
@@ -496,7 +496,7 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 		//reset trackball transform
 		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
 		cameraMat.invert_in_place();
-		PT(Trackball) trackBall =
+		SMARTPTR(Trackball) trackBall =
 				DCAST(Trackball, gameManager->mTrackBall.node());
 		trackBall->set_mat(cameraMat);
 		//(re)enable trackball
@@ -536,7 +536,7 @@ void GameManager::togglePhysicsDebug(const Event* event, void* data)
 void GameManager::toggleCameraControl(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
-	PT(Object) camera =
+	SMARTPTR(Object) camera =
 			ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
 	Driver* cameraControl = DCAST(Driver, camera->getComponent(
 					ComponentFamilyType("Control")));
@@ -550,7 +550,7 @@ void GameManager::toggleCameraControl(const Event* event, void* data)
 		//reset trackball transform
 		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
 		cameraMat.invert_in_place();
-		PT(Trackball) trackBall =
+		SMARTPTR(Trackball) trackBall =
 				DCAST(Trackball, gameManager->mTrackBall.node());
 		trackBall->set_mat(cameraMat);
 		//(re)enable trackball

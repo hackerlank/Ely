@@ -39,6 +39,9 @@ Sound3d::Sound3d(Sound3dTemplate* tmpl) :
 
 Sound3d::~Sound3d()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//check if game audio manager exists
 	if (GameAudioManager::GetSingletonPtr())
 	{

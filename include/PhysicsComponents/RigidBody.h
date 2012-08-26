@@ -149,7 +149,7 @@ private:
 	///The NodePath associated to this rigid body.
 	NodePath mNodePath;
 	///The NodePath associated to this rigid body.
-	PT(BulletRigidBodyNode) mRigidBodyNode;
+	SMARTPTR(BulletRigidBodyNode) mRigidBodyNode;
 	///@{
 	///Physical parameters.
 	float mBodyMass, mBodyFriction, mBodyRestitution;

@@ -89,8 +89,8 @@ private:
 
 	///@{
 	///A task data for update.
-	PT(TaskInterface<GameControlManager>::TaskData) mUpdateData;
-	PT(AsyncTask) mUpdateTask;
+	SMARTPTR(TaskInterface<GameControlManager>::TaskData) mUpdateData;
+	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

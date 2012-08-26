@@ -59,10 +59,10 @@ public:
 	 * template for that object type already existed it'll be replaced
 	 * by this new template (and its ownership released by the manager).
 	 * @param objectTmpl The object template to add.
-	 * @return PT(NULL) if there wasn't a template for that object, otherwise
+	 * @return SMARTPTR(NULL) if there wasn't a template for that object, otherwise
 	 * the previous template.
 	 */
-	PT(ObjectTemplate) addObjectTemplate(ObjectTemplate* objectTmpl);
+	SMARTPTR(ObjectTemplate) addObjectTemplate(ObjectTemplate* objectTmpl);
 
 	/**
 	 * \brief Removes the object template given the object type it can create.
@@ -92,8 +92,8 @@ public:
 	 * \brief Object templates and object tables typedefs.
 	 */
 	///@{
-	typedef std::map<const ObjectType, PT(ObjectTemplate)> ObjectTemplateTable;
-	typedef std::map<ObjectId, PT(Object)> ObjectTable;
+	typedef std::map<const ObjectType, SMARTPTR(ObjectTemplate)> ObjectTemplateTable;
+	typedef std::map<ObjectId, SMARTPTR(Object)> ObjectTable;
 	///@}
 
 	/**
@@ -101,6 +101,12 @@ public:
 	 * @return A pointer to the created object (NULL otherwise).
 	 */
 	Object* getCreatedObject(const ObjectId& objectId);
+
+	/**
+	 * \brief Removes a created object give its object id.
+	 * @return True on successful removal, false otherwise.
+	 */
+	bool removeCreatedObject(const ObjectId& objectId);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.

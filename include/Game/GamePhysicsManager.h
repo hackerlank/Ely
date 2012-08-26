@@ -112,7 +112,7 @@ public:
 
 private:
 	/// Bullet world.
-	PT(BulletWorld) mBulletWorld;
+	SMARTPTR(BulletWorld) mBulletWorld;
 
 #ifdef DEBUG
 	/// Bullet Debug node path.
@@ -127,7 +127,7 @@ private:
 
 	///@{
 	///A task data for step simulation update.
-	PT(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;PT(AsyncTask) mUpdateTask;
+	SMARTPTR(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

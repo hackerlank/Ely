@@ -56,10 +56,10 @@ public:
 	 * template for that component type already existed it'll be replaced
 	 * by this new template (and its ownership released by the manager).
 	 * @param componentTmpl The component template to add.
-	 * @return PT(NULL) if there wasn't a template for that component, otherwise
+	 * @return SMARTPTR(NULL) if there wasn't a template for that component, otherwise
 	 * the previous template.
 	 */
-	PT(ComponentTemplate) addComponentTemplate(
+	SMARTPTR(ComponentTemplate) addComponentTemplate(
 			ComponentTemplate* componentTmpl);
 
 	/**
@@ -97,7 +97,7 @@ public:
 private:
 
 	///Table of component templates indexed by component type.
-	typedef std::map<const ComponentType, PT(ComponentTemplate)> ComponentTemplateTable;
+	typedef std::map<const ComponentType, SMARTPTR(ComponentTemplate)> ComponentTemplateTable;
 	ComponentTemplateTable mComponentTemplates;
 	///The unique id for created components.
 	IdType id;

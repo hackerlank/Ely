@@ -132,7 +132,7 @@ public:
 	 * @return The pointer to the audio sound (NULL otherwise).
 	 */
 	///@{
-	typedef std::map<std::string, PT(AudioSound)> SoundTable;
+	typedef std::map<std::string, SMARTPTR(AudioSound)> SoundTable;
 	AudioSound* getSound(const std::string& name);
 	AudioSound* getSound(int index);
 	///@}

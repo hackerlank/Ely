@@ -36,6 +36,9 @@ RigidBody::RigidBody(RigidBodyTemplate* tmpl)
 
 RigidBody::~RigidBody()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (GamePhysicsManager::GetSingletonPtr())
 	{
 		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove_rigid_body(

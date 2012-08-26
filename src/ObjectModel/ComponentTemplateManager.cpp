@@ -44,7 +44,7 @@ ComponentTemplateManager::~ComponentTemplateManager()
 	std::cout << std::endl;
 }
 
-PT(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
+SMARTPTR(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
 		ComponentTemplate* componentTmpl)
 {
 	//lock (guard) the mutex
@@ -55,7 +55,7 @@ PT(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
 		throw GameException(
 				"ComponentTemplateManager::addComponentTemplate: NULL Component template");
 	}
-	PT(ComponentTemplate) previousCompTmpl;
+	SMARTPTR(ComponentTemplate) previousCompTmpl;
 	previousCompTmpl.clear();
 	ComponentType componentId = componentTmpl->componentType();
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
@@ -66,7 +66,7 @@ PT(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
 		mComponentTemplates.erase(it);
 	}
 	//insert the new component template
-	mComponentTemplates[componentId] = PT(ComponentTemplate)(componentTmpl);
+	mComponentTemplates[componentId] = SMARTPTR(ComponentTemplate)(componentTmpl);
 	return previousCompTmpl;
 }
 

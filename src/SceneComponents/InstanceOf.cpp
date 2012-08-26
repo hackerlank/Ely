@@ -36,6 +36,9 @@ InstanceOf::InstanceOf(InstanceOfTemplate* tmpl)
 
 InstanceOf::~InstanceOf()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mNodePath.remove_node();
 }
 
