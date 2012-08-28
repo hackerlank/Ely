@@ -39,17 +39,14 @@ class TerrainTemplate;
  * \brief Component representing the terrain model of an object.
  *
  * XML Param(s):
- * \li \c "heightfield_file"  		|single|no default
- * \li \c "height_scale"			|single|"1.0"
- * \li \c "width_scale"				|single|"1.0"
- * \li \c "update_interval"			|single|"0.1"
- * \li \c self.terrain = 0.1
- * \li \c self.lastTesselateTime = -1
- * \li \c self.terrainHeightScale = 200
- * \li \c self.terrainWidthScale = 2
- * \li \c terrainNearPercent = 0.1
- * \li \c terrainFarPercent = 1.0
- * \li \c terrainBlockSize = 64
+ * - "heightfield_file"  		|single|no default
+ * - "height_scale"				|single|"1.0"
+ * - "width_scale"				|single|"1.0"
+ * - "update_interval"			|single|"0.1"
+ * - "block_size"				|single|"64"
+ * - "near_percent"				|single|"0.1"
+ * - "far_percent"				|single|"1.0"
+ * - "brute_force"				|single|"true"
  */
 class Terrain: public Component
 {
