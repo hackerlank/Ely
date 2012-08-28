@@ -55,18 +55,18 @@ const ComponentFamilyType RigidBodyTemplate::familyType() const
 	return ComponentFamilyType("Physics");
 }
 
-Component* RigidBodyTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)RigidBodyTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	RigidBody* newRigidBody = new RigidBody(this);
+	SMARTPTR(RigidBody) newRigidBody = new RigidBody(this);
 	newRigidBody->setComponentId(compId);
 	if (not newRigidBody->initialize())
 	{
 		return NULL;
 	}
-	return newRigidBody;
+	return newRigidBody.p();
 }
 
 void RigidBodyTemplate::setParametersDefaults()

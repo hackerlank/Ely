@@ -104,8 +104,8 @@
 
 //int main(int argc, char **argv)
 //{
-//	PT(GenericThread) producers[MAXPRODUCERS];
-//	PT(GenericThread) consumers[MAXCONSUMERS];
+//	SMARTPTR(GenericThread) producers[MAXPRODUCERS];
+//	SMARTPTR(GenericThread) consumers[MAXCONSUMERS];
 //	//create producer/consumer threads
 //	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
 //	{
@@ -161,7 +161,7 @@
 //{
 ////	srand(100);
 //	int inputs[MAXTHREADS];
-//	PT(GenericThread) threads[MAXTHREADS];
+//	SMARTPTR(GenericThread) threads[MAXTHREADS];
 //	//create thread objects
 //	for (int j = 0; j < MAXTHREADS; ++j)
 //	{

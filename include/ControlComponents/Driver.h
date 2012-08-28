@@ -93,7 +93,7 @@ class Driver: public Component
 {
 public:
 	Driver();
-	Driver(DriverTemplate* tmpl);
+	Driver(SMARTPTR(DriverTemplate) tmpl);
 	virtual ~Driver();
 
 	const virtual ComponentFamilyType familyType() const;

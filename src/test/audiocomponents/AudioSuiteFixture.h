@@ -78,11 +78,11 @@ struct AudioSuiteFixture
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	std::string audioFile;
-	Sound3dTemplate* mSound3dTmpl;
-	Sound3d* mSound3d;
+	SMARTPTR(Sound3dTemplate) mSound3dTmpl;
+	SMARTPTR(Sound3d) mSound3d;
 	GameAudioManager* audioMgr;
 	ComponentId mCompId;
-	ObjectTemplate* mObjectTmpl;
+	SMARTPTR(ObjectTemplate) mObjectTmpl;
 };
 
 #endif /* AUDIOSUITEFIXTURE_H_ */

@@ -29,7 +29,7 @@ Driver::Driver()
 	// TODO Auto-generated constructor stub
 }
 
-Driver::Driver(DriverTemplate* tmpl) :
+Driver::Driver(SMARTPTR(DriverTemplate) tmpl) :
 		mTrue(true), mFalse(false), mIsEnabled(false)
 {
 	mTmpl = tmpl;
@@ -50,16 +50,13 @@ Driver::Driver(DriverTemplate* tmpl) :
 	//	http://www.panda3d.org/forums/viewtopic.php?t=6049)
 	mMouseMove = true;
 	//
-	GraphicsWindow * win = mTmpl->windowFramework()->get_graphics_window();
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	mCentX = win->get_properties().get_x_size() / 2;
 	mCentY = win->get_properties().get_y_size() / 2;
 }
 
 Driver::~Driver()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	disable();
 }
 
@@ -70,7 +67,7 @@ const ComponentFamilyType Driver::familyType() const
 
 const ComponentType Driver::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 void Driver::enable()
@@ -504,10 +501,10 @@ void Driver::update(void* data)
 		newH += mActualTransform->get_hpr().get_x();
 		newP += mActualTransform->get_hpr().get_y();
 		newR += mActualTransform->get_hpr().get_z();
-		CPT(TransformState) newTransform = mActualTransform->compose(
+		CSMARTPTR(TransformState) newTransform = mActualTransform->compose(
 				TransformState::make_identity()->set_pos(
 						LVecBase3(newX, newY, newZ)))->set_hpr(
-				LVecBase3(newH, newP, newR));
+				LVecBase3(newH, newP, newR)).p();
 		ownerNodePath.set_transform(newTransform);
 		mActualTransform = newTransform;
 	}

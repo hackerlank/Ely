@@ -64,18 +64,18 @@ public:
 	 * \brief Adds a physics component for updating.
 	 * @param physicsComp The physics component.
 	 */
-	void addToPhysicsUpdate(Component* physicsComp);
+	void addToPhysicsUpdate(SMARTPTR(Component) physicsComp);
 	/**
 	 * \brief Removes a physics component from updating.
 	 * @param physicsComp The physics component.
 	 */
-	void removeFromPhysicsUpdate(Component* physicsComp);
+	void removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp);
 
 	/**
 	 * \brief Gets a reference to the Bullet world.
 	 * @return The Bullet world.
 	 */
-	BulletWorld* bulletWorld() const;
+	SMARTPTR(BulletWorld) bulletWorld() const;
 
 	/**
 	 * \brief Updates step simulation and physics components.
@@ -121,7 +121,7 @@ private:
 
 	///@{
 	///List of physics components to be updated.
-	typedef std::list<Component*> PhysicsComponentList;
+	typedef std::list<SMARTPTR(Component)> PhysicsComponentList;
 	PhysicsComponentList mPhysicsComponents;
 	///@}
 

@@ -146,8 +146,8 @@ public:
 	 * \return The owner object.
 	 */
 	///@{
-	void setOwnerObject(Object* ownerObject);
-	Object* getOwnerObject() const;
+	void setOwnerObject(SMARTPTR(Object) ownerObject);
+	SMARTPTR(Object) getOwnerObject() const;
 	///@}
 
 	/**
@@ -164,11 +164,11 @@ public:
 
 protected:
 	///The template used to construct this component.
-	ComponentTemplate* mTmpl;
+	SMARTPTR(ComponentTemplate) mTmpl;
 	///Unique identifier for this component.
 	ComponentId mComponentId;
 	///The object this component is a member of.
-	Object* mOwnerObject;
+	SMARTPTR(Object) mOwnerObject;
 
 	///The (reentrant) mutex associated with this component.
 	ReMutex mMutex;

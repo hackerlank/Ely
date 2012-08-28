@@ -29,16 +29,13 @@ Model::Model()
 	// TODO Auto-generated constructor stub
 }
 
-Model::Model(ModelTemplate* tmpl)
+Model::Model(SMARTPTR(ModelTemplate) tmpl)
 {
 	mTmpl = tmpl;
 }
 
 Model::~Model()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	mNodePath.remove_node();
 }
 
@@ -49,7 +46,7 @@ const ComponentFamilyType Model::familyType() const
 
 const ComponentType Model::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool Model::initialize()

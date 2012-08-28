@@ -46,7 +46,7 @@ class Listener: public Component
 {
 public:
 	Listener();
-	Listener(ListenerTemplate* tmpl);
+	Listener(SMARTPTR(ListenerTemplate) tmpl);
 	virtual ~Listener();
 
 	const virtual ComponentFamilyType familyType() const;

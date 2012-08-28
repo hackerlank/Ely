@@ -40,7 +40,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual Component* makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 

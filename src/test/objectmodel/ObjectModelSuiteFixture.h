@@ -66,10 +66,10 @@ struct ObjectModelSuiteFixture
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	Object* mObject;
-	ObjectTemplate* mObjectTmpl;
-	Model* mModel;
-	ModelTemplate* mModelTmpl;
+	SMARTPTR(Object) mObject;
+	SMARTPTR(ObjectTemplate) mObjectTmpl;
+	SMARTPTR(Model) mModel;
+	SMARTPTR(ModelTemplate) mModelTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	ObjectTemplateManager mObjectTmplMgr;

@@ -50,18 +50,18 @@ const ComponentFamilyType ActivityTemplate::familyType() const
 	return ComponentFamilyType("Behavior");
 }
 
-Component* ActivityTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)ActivityTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	Activity* newActivity = new Activity(this);
+	SMARTPTR(Activity) newActivity = new Activity(this);
 	newActivity->setComponentId(compId);
 	if (not newActivity->initialize())
 	{
 		return NULL;
 	}
-	return newActivity;
+	return newActivity.p();
 }
 
 void ActivityTemplate::setParametersDefaults()

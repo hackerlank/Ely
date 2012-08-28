@@ -75,12 +75,12 @@ struct SceneSuiteFixture
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	InstanceOf* mInstanceOf;
+	SMARTPTR(InstanceOf) mInstanceOf;
 	ComponentId mInstanceOfId;
-	InstanceOfTemplate* mInstanceOfTmpl;
-	Model* mModel;
+	SMARTPTR(InstanceOfTemplate) mInstanceOfTmpl;
+	SMARTPTR(Model) mModel;
 	ComponentId mModelId;
-	ModelTemplate* mModelTmpl;
+	SMARTPTR(ModelTemplate) mModelTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 };

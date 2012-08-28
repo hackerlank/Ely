@@ -31,6 +31,7 @@
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <typedWritableReferenceCount.h>
+#include <pointerTo.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
 #include "Component.h"
@@ -68,7 +69,7 @@ public:
 	 * \brief Creates the actual component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
-	virtual Component* makeComponent(const ComponentId& compId) = 0;
+	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId) = 0;
 
 	/**
 	 * \name Parameters management.
@@ -79,7 +80,7 @@ public:
 	 * set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
-	virtual void setParameters(const ParameterTable& parameterTable);
+	void setParameters(const ParameterTable& parameterTable);
 
 	/**
 	 * \brief For the component this template is designed to create,
@@ -92,13 +93,13 @@ public:
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
-	virtual std::string parameter(const std::string& paramName);
+	std::string parameter(const std::string& paramName);
 	/**
 	 * \brief Gets the parameter multi-values associated to the component.
 	 * @param paramName The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
-	virtual std::list<std::string> parameterList(const std::string& paramName);
+	std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
 	 * \brief Gets/sets the PandaFramework.

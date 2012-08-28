@@ -69,7 +69,7 @@ GamePhysicsManager::~GamePhysicsManager()
 	mPhysicsComponents.clear();
 }
 
-void GamePhysicsManager::addToPhysicsUpdate(Component* physicsComp)
+void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -82,7 +82,7 @@ void GamePhysicsManager::addToPhysicsUpdate(Component* physicsComp)
 	}
 }
 
-void GamePhysicsManager::removeFromPhysicsUpdate(Component* physicsComp)
+void GamePhysicsManager::removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -95,9 +95,9 @@ void GamePhysicsManager::removeFromPhysicsUpdate(Component* physicsComp)
 	}
 }
 
-BulletWorld* GamePhysicsManager::bulletWorld() const
+SMARTPTR(BulletWorld) GamePhysicsManager::bulletWorld() const
 {
-	return mBulletWorld.p();
+	return mBulletWorld;
 }
 
 AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
@@ -122,7 +122,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	for (iter = mPhysicsComponents.begin(); iter != mPhysicsComponents.end();
 			++iter)
 	{
-		(*iter)->update(reinterpret_cast<void*>(&timeStep));
+		(*iter).p()->update(reinterpret_cast<void*>(&timeStep));
 	}
 	// do physics step simulation
 	// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->
@@ -187,7 +187,7 @@ NodePath GamePhysicsManager::getDebugNodePath() const
 void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
 {
 	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
-	BulletDebugNode* bulletDebugNode =
+	SMARTPTR(BulletDebugNode) bulletDebugNode =
 			DCAST(BulletDebugNode,mBulletDebugNodePath.node());
 	mBulletWorld->set_debug_node(bulletDebugNode);
 	bulletDebugNode->show_wireframe(true);

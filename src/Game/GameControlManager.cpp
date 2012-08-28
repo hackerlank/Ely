@@ -63,7 +63,7 @@ GameControlManager::~GameControlManager()
 	mControlComponents.clear();
 }
 
-void GameControlManager::addToControlUpdate(Component* controlComp)
+void GameControlManager::addToControlUpdate(SMARTPTR(Component) controlComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -76,7 +76,7 @@ void GameControlManager::addToControlUpdate(Component* controlComp)
 	}
 }
 
-void GameControlManager::removeFromControlUpdate(Component* controlComp)
+void GameControlManager::removeFromControlUpdate(SMARTPTR(Component) controlComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -109,7 +109,7 @@ AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 	for (iter = mControlComponents.begin(); iter != mControlComponents.end();
 			++iter)
 	{
-		(*iter)->update(reinterpret_cast<void*>(&dt));
+		(*iter).p()->update(reinterpret_cast<void*>(&dt));
 	}
 	//
 	return AsyncTask::DS_cont;

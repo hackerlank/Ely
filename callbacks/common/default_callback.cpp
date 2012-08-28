@@ -23,11 +23,11 @@
 
 #include "../all_configs.h"
 
-void default_callback__(const Event * event, void * data)
+void default_callback__(const Event* event, void* data)
 {
 #ifdef DEBUG
 	//get data
-	Component* component = (Component*) data;
+	SMARTPTR(Component) component = (Component*) data;
 	std::string evtStr = event->get_name();
 	std::string compTypeStr = std::string(component->componentType());
 	std::string objIdStr = std::string(component->getOwnerObject()->objectId());

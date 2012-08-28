@@ -55,18 +55,18 @@ const ComponentFamilyType ListenerTemplate::familyType() const
 	return ComponentFamilyType("Audio");
 }
 
-Component* ListenerTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component) ListenerTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	Listener* newListener = new Listener(this);
+	SMARTPTR(Listener) newListener = new Listener(this);
 	newListener->setComponentId(compId);
 	if (not newListener->initialize())
 	{
 		return NULL;
 	}
-	return newListener;
+	return newListener.p();
 }
 
 void ListenerTemplate::setParametersDefaults()

@@ -58,7 +58,7 @@ class Model: public Component
 {
 public:
 	Model();
-	Model(ModelTemplate* tmpl);
+	Model(SMARTPTR(ModelTemplate) tmpl);
 	virtual ~Model();
 
 	const virtual ComponentFamilyType familyType() const;

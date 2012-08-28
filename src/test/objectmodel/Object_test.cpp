@@ -54,10 +54,10 @@ BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 	mModelTmpl->parameter("model_file") = "panda";
 	mModel =
 	DCAST(Model, mModelTmpl->makeComponent(ComponentId("TestModel")));
-	mObject->addComponent(mModel);
+	mObject->addComponent(mModel.p());
 	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
 	BOOST_CHECK(mObject->numComponents() == 1);
-	mObject->addComponent(mModel);
+	mObject->addComponent(mModel.p());
 	BOOST_CHECK(mObject->numComponents() == 1);
 	mObject->clearComponents();
 	BOOST_CHECK(mObject->numComponents() == 0);

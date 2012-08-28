@@ -34,9 +34,9 @@ GameManager::GameManager(int argc, char* argv[]) :
 	// Open it!
 	mWindow = open_window();
 	// Check whether the window is loaded correctly
-	if (mWindow != (WindowFramework *) NULL)
+	if (mWindow != (WindowFramework*) NULL)
 	{
-		std::cout << "Opened the window successfully!\n";
+		PRINT("Opened the window successfully!");
 		// common setup
 		mWindow->enable_keyboard(); // Enable keyboard detection
 		mWindow->setup_trackball(); // Enable default camera movement
@@ -48,7 +48,7 @@ GameManager::GameManager(int argc, char* argv[]) :
 	}
 	else
 	{
-		std::cout << "Could not load the window!\n";
+		PRINT("Could not load the window!");
 	}
 }
 
@@ -66,7 +66,7 @@ void GameManager::initialize()
 	LMatrix4 cameraMat = mCamera.get_transform()->get_mat();
 	cameraMat.invert_in_place();
 	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
-	SMARTPTR(Trackball) trackBall = DCAST(Trackball, trackBallNP.node());
+	SMARTPTR(Trackball)trackBall = DCAST(Trackball, trackBallNP.node());
 	trackBall->set_mat(cameraMat);
 
 #ifdef DEBUG
@@ -89,10 +89,10 @@ void GameManager::initialize()
 void GameManager::manageObjects()
 {
 	//Actor1
-	SMARTPTR(Object) actor1 =
-			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
+	SMARTPTR(Object)actor1 =
+	ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
 	//play animation
-	Model* actor1Model = DCAST(Model, actor1->getComponent(
+	SMARTPTR(Model) actor1Model = DCAST(Model, actor1->getComponent(
 					ComponentFamilyType("Scene")));
 	actor1Model->animations().loop("panda_soft", false);
 	//play sound
@@ -103,8 +103,8 @@ void GameManager::manageObjects()
 
 	//InstancedActor1
 	SMARTPTR(Object) plane1 =
-			ObjectTemplateManager::GetSingleton().getCreatedObject("Plane1");
-	Model* plane1Model = DCAST(Model, plane1->getComponent(
+	ObjectTemplateManager::GetSingleton().getCreatedObject("Plane1");
+	SMARTPTR(Model) plane1Model = DCAST(Model, plane1->getComponent(
 					ComponentFamilyType("Scene")));
 	TextureStage* planeTS0 = new TextureStage("planeTS0");
 	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
@@ -182,7 +182,7 @@ void GameManager::setupCompTmplMgr()
 
 }
 
-static bool checkTag(tinyxml2::XMLElement *tag, const char* tagStr)
+static bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
 {
 	if (not tag)
 	{
@@ -198,7 +198,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	std::string gameXml = "game.xml";
 	tinyxml2::XMLDocument gameDoc;
 	//load file
-	std::cout << "Loading '" << gameXml << "'..." << std::endl;
+	PRINT("Loading '" << gameXml << "'...");
 	if (tinyxml2::XML_NO_ERROR != gameDoc.LoadFile(gameXml.c_str()))
 	{
 		fprintf(stderr, "Error detected on '%s':\n", gameXml.c_str());
@@ -208,9 +208,9 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		throw GameException(
 				"GameManager::setupGameWorld: Failed to load/parse " + gameXml);
 	}
-	tinyxml2::XMLElement *game;
+	tinyxml2::XMLElement* game;
 	//check <Game> tag
-	std::cout << "Checking <Game> tag ..." << std::endl;
+	PRINT("Checking <Game> tag ...");
 	game = gameDoc.FirstChildElement("Game");
 	if (not checkTag(game, "Game"))
 	{
@@ -220,10 +220,10 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//////////////////////////////////////////////////////////////
 	//<!-- Object Templates Definition -->
 	//Setup object template manager
-	std::cout << "Setting up Object Template Manager" << std::endl;
+	PRINT("Setting up Object Template Manager");
 	//check <Game>--<ObjectTmplSet> tag
-	tinyxml2::XMLElement *objectTmplSet;
-	std::cout << "  Checking <ObjectTmplSet> tag ..." << std::endl;
+	tinyxml2::XMLElement* objectTmplSet;
+	PRINT("  Checking <ObjectTmplSet> tag ...");
 	objectTmplSet = game->FirstChildElement("ObjectTmplSet");
 	if (not checkTag(objectTmplSet, "ObjectTmplSet"))
 	{
@@ -233,20 +233,19 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	}
 	//cycle through the ObjectTmpl(s)' definitions and
 	// add all kind of object templates
-	tinyxml2::XMLElement *objectTmpl, *componentTmpl;
+	tinyxml2::XMLElement* objectTmpl, *componentTmpl;
 	for (objectTmpl = objectTmplSet->FirstChildElement("ObjectTmpl");
 			objectTmpl != NULL;
 			objectTmpl = objectTmpl->NextSiblingElement("ObjectTmpl"))
 	{
-		const char *objectType = objectTmpl->Attribute("type", NULL);
+		const char* objectType = objectTmpl->Attribute("type", NULL);
 		if (not objectType)
 		{
 			continue;
 		}
-		std::cout << "  Adding Object Template for '" << objectType << "' type"
-				<< std::endl;
+		PRINT("  Adding Object Template for '" << objectType << "' type");
 		//create a new object template
-		ObjectTemplate* objTmplPtr;
+		SMARTPTR(ObjectTemplate)objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(objectType),
 				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
 		//cycle through the ComponentTmpl(s)' definitions ...
@@ -255,18 +254,18 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				componentTmpl = componentTmpl->NextSiblingElement(
 						"ComponentTmpl"))
 		{
-			const char *compFamily = componentTmpl->Attribute("family", NULL);
-			const char *compType = componentTmpl->Attribute("type", NULL);
+			const char* compFamily = componentTmpl->Attribute("family", NULL);
+			const char* compType = componentTmpl->Attribute("type", NULL);
 			if (not compFamily or not compType)
 			{
 				continue;
 			}
-			std::cout << "    Component of family '" << compFamily
-					<< "' and type '" << compType << "'" << std::endl;
+			PRINT(
+					"    Component of family '" << compFamily << "' and type '" << compType << "'");
 			//... add all component templates
-			ComponentTemplate* compTmpl =
-					ComponentTemplateManager::GetSingleton().getComponentTemplate(
-							ComponentType(compType));
+			SMARTPTR(ComponentTemplate)compTmpl =
+			ComponentTemplateManager::GetSingleton().getComponentTemplate(
+					ComponentType(compType));
 			if (compTmpl == NULL)
 			{
 				continue;
@@ -279,10 +278,10 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//////////////////////////////////////////////////////////////
 	//<!-- Objects Creation -->
 	//Create game objects
-	std::cout << "Creating Game Objects" << std::endl;
+	PRINT("Creating Game Objects");
 	//check <Game>--<ObjectSet> tag
-	tinyxml2::XMLElement *objectSet;
-	std::cout << "  Checking <ObjectSet> tag ..." << std::endl;
+	tinyxml2::XMLElement* objectSet;
+	PRINT("  Checking <ObjectSet> tag ...");
 	objectSet = game->FirstChildElement("ObjectSet");
 	if (not checkTag(objectSet, "ObjectSet"))
 	{
@@ -291,7 +290,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	}
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
-	tinyxml2::XMLElement *object;
+	tinyxml2::XMLElement* object;
 	//create a priority queue of objects
 	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjects;
 	for (object = objectSet->FirstChildElement("Object"); object != NULL;
@@ -299,7 +298,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	{
 		Orderable<tinyxml2::XMLElement> ordObj;
 		ordObj.setPtr(object);
-		const char *priority = object->Attribute("priority", NULL);
+		const char* priority = object->Attribute("priority", NULL);
 		priority != NULL ? ordObj.setPrio(atoi(priority)) : ordObj.setPrio(0);
 		orderedObjects.push(ordObj);
 	}
@@ -308,21 +307,21 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	{
 		//access top object
 		object = orderedObjects.top().getPtr();
-		const char *objType = object->Attribute("type", NULL);
+		const char* objType = object->Attribute("type", NULL);
 		// get the related object template
-		ObjectTemplate *objectTmplPtr =
-				ObjectTemplateManager::GetSingleton().getObjectTemplate(
-						ObjectType(objType));
+		SMARTPTR(ObjectTemplate)objectTmplPtr =
+		ObjectTemplateManager::GetSingleton().getObjectTemplate(
+				ObjectType(objType));
 		if ((not objType) or (not objectTmplPtr))
 		{
 			//no object without type allowed or object type doesn't exist
 			orderedObjects.pop();
 			continue;
 		}
-		const char *objId = object->Attribute("id", NULL); //may be NULL
-		std::cout << "  Creating Object '"
-				<< (objId != NULL ? objId : "UNNAMED") << "'..." << std::endl;
-		tinyxml2::XMLElement *component;
+		const char* objId = object->Attribute("id", NULL); //may be NULL
+		PRINT(
+				"  Creating Object '" << (objId != NULL ? objId : "UNNAMED") << "'...");
+		tinyxml2::XMLElement* component;
 		//create a priority queue of components
 		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponents;
 		for (component = object->FirstChildElement("Component");
@@ -331,17 +330,18 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			Orderable<tinyxml2::XMLElement> ordComp;
 			ordComp.setPtr(component);
-			const char *priority = component->Attribute("priority", NULL);
-			priority != NULL ? ordComp.setPrio(atoi(priority)) :
-					ordComp.setPrio(0);
+			const char* priority = component->Attribute("priority", NULL);
+			priority != NULL ?
+					ordComp.setPrio(atoi(priority)) : ordComp.setPrio(0);
 			orderedComponents.push(ordComp);
 		}
 		//reset all object's component parameters to their default values
 		ObjectTemplate::ComponentTemplateList::iterator iter;
-		for (iter = objectTmplPtr->getComponentTemplates().begin();
-				iter != objectTmplPtr->getComponentTemplates().end(); ++iter)
+		ObjectTemplate::ComponentTemplateList compTmplList =
+				objectTmplPtr->getComponentTemplates();
+		for (iter = compTmplList.begin(); iter != compTmplList.end(); ++iter)
 		{
-			(*iter)->setParametersDefaults();
+			(*iter).p()->setParametersDefaults();
 		}
 		ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
 		//cycle through the Object Component(s)' to be initialized in order of priority
@@ -349,24 +349,23 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			//access top component
 			component = orderedComponents.top().getPtr();
-			const char *compType = component->Attribute("type", NULL);
+			const char* compType = component->Attribute("type", NULL);
 			// get the related component template
-			ComponentTemplate *componentTmplPtr =
-					objectTmplPtr->getComponentTemplate(
-							ComponentType(compType));
+			SMARTPTR(ComponentTemplate)componentTmplPtr =
+			objectTmplPtr->getComponentTemplate(
+					ComponentType(compType));
 			if ((not compType) or (not componentTmplPtr))
 			{
 				//no component without type allowed or component type doesn't exist
 				orderedComponents.pop();
 				continue;
 			}
-			std::cout << "    Initializing Component '" << compType << "'"
-					<< std::endl;
+			PRINT( "    Initializing Component '" << compType << "'");
 			ParameterTable parameterTable;
 			//reset component' parameters to their default values
 			componentTmplPtr->setParametersDefaults();
 			//cycle through the Component Param(s)' to be initialized
-			tinyxml2::XMLElement *param;
+			tinyxml2::XMLElement* param;
 			for (param = component->FirstChildElement("Param"); param != NULL;
 					param = param->NextSiblingElement("Param"))
 			{
@@ -376,8 +375,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				{
 					continue;
 				}
-				std::cout << "      Param '" << attribute->Name() << "' = '"
-						<< attribute->Value() << "'" << std::endl;
+				PRINT(
+						"      Param '" << attribute->Name() << "' = '" << attribute->Value() << "'");
 				parameterTable.insert(
 						ParameterTable::value_type(attribute->Name(),
 								attribute->Value()));
@@ -387,7 +386,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			orderedComponents.pop();
 		}
 		//create the object
-		Object *objectPtr;
+		SMARTPTR(Object)objectPtr;
 		if ((objId != NULL) and (std::string(objId) != std::string("")))
 		{
 			// set id with the passed id
@@ -404,15 +403,14 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			continue;
 		}
-		std::cout << "  ...Created Object '" << objectPtr->objectId() << "'"
-				<< std::endl;
+		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//////////////////////////////////////////////////////////////
 		//<!-- Object addition to Scene -->
 		ParameterTable objParameterTable;
 		//reset object' parameters to their default values
 		objectTmplPtr->setParametersDefaults();
 		//cycle through the Object Param(s)' to be initialized
-		tinyxml2::XMLElement *objParam;
+		tinyxml2::XMLElement* objParam;
 		for (objParam = object->FirstChildElement("Param"); objParam != NULL;
 				objParam = objParam->NextSiblingElement("Param"))
 		{
@@ -422,8 +420,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			{
 				continue;
 			}
-			std::cout << "      Param '" << attribute->Name() << "' = '"
-					<< attribute->Value() << "'" << std::endl;
+			PRINT(
+					"      Param '" << attribute->Name() << "' = '" << attribute->Value() << "'");
 			objParameterTable.insert(
 					ParameterTable::value_type(attribute->Name(),
 							attribute->Value()));
@@ -442,7 +440,7 @@ AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
 	double timeElapsed = mGlobalClock->get_real_time();
 	if (timeElapsed < 1.0)
 	{
-		std::cout << "firstTask " << timeElapsed << std::endl;
+		PRINT("firstTask " << timeElapsed);
 		return AsyncTask::DS_cont;
 	}
 	return AsyncTask::DS_done;
@@ -457,7 +455,7 @@ AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
 	}
 	else if (timeElapsed > 1.0 and timeElapsed < 2.0)
 	{
-		std::cout << "secondTask " << timeElapsed << std::endl;
+		PRINT("secondTask " << timeElapsed);
 		return AsyncTask::DS_cont;
 	}
 	return AsyncTask::DS_done;
@@ -482,9 +480,9 @@ void GameManager::disable_mouse()
 void GameManager::toggleActor1Control(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
-	SMARTPTR(Object) actor1 =
-			ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
-	Driver* actor1Control = DCAST(Driver, actor1->getComponent(
+	SMARTPTR(Object)actor1 =
+	ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
+	SMARTPTR(Driver)actor1Control = DCAST(Driver, actor1->getComponent(
 					ComponentFamilyType("Control")));
 	bool isEnabled = actor1Control->isEnabled();
 
@@ -496,8 +494,8 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 		//reset trackball transform
 		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
 		cameraMat.invert_in_place();
-		SMARTPTR(Trackball) trackBall =
-				DCAST(Trackball, gameManager->mTrackBall.node());
+		SMARTPTR(Trackball)trackBall =
+		DCAST(Trackball, gameManager->mTrackBall.node());
 		trackBall->set_mat(cameraMat);
 		//(re)enable trackball
 		gameManager->enable_mouse();
@@ -536,9 +534,9 @@ void GameManager::togglePhysicsDebug(const Event* event, void* data)
 void GameManager::toggleCameraControl(const Event* event, void* data)
 {
 	GameManager* gameManager = (GameManager*) data;
-	SMARTPTR(Object) camera =
-			ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
-	Driver* cameraControl = DCAST(Driver, camera->getComponent(
+	SMARTPTR(Object)camera =
+	ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
+	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
 					ComponentFamilyType("Control")));
 	bool isEnabled = cameraControl->isEnabled();
 
@@ -550,8 +548,8 @@ void GameManager::toggleCameraControl(const Event* event, void* data)
 		//reset trackball transform
 		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
 		cameraMat.invert_in_place();
-		SMARTPTR(Trackball) trackBall =
-				DCAST(Trackball, gameManager->mTrackBall.node());
+		SMARTPTR(Trackball)trackBall =
+		DCAST(Trackball, gameManager->mTrackBall.node());
 		trackBall->set_mat(cameraMat);
 		//(re)enable trackball
 		gameManager->enable_mouse();

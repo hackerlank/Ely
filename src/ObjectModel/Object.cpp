@@ -24,8 +24,8 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
-Object::Object(const ObjectId& objectId, ObjectTemplate* tmpl) :
-		mTmpl(tmpl)
+Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
+mTmpl(tmpl)
 {
 	mObjectId = objectId;
 }
@@ -35,17 +35,6 @@ Object::~Object()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//remove object templates
-	while (mComponents.size() > 0)
-	{
-		ComponentTable::iterator iter = mComponents.begin();
-		ComponentFamilyType compFamilyType = iter->first;
-		PRINT(
-				"Removing component of family type '" << std::string(compFamilyType) << "'");
-		mComponents.erase(iter);
-	}
-	std::cout << std::endl;
-	//
 	mNodePath.remove_node();
 }
 
@@ -59,10 +48,19 @@ void Object::clearComponents()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mComponents.clear();
+	//remove object components
+	while (mComponents.size() > 0)
+	{
+		ComponentTable::iterator iter = mComponents.begin();
+		ComponentFamilyType compFamilyType = iter->first;
+		PRINT(
+				"\tRemoving component of family type '" << std::string(compFamilyType) << "'");
+		mComponents.erase(iter);
+	}
+	std::cout << std::endl;
 }
 
-Component* Object::getComponent(const ComponentFamilyType& familyID)
+SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyID)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -75,7 +73,7 @@ Component* Object::getComponent(const ComponentFamilyType& familyID)
 	return (*it).second;
 }
 
-SMARTPTR(Component)Object::addComponent(Component* newComponent)
+SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -86,7 +84,7 @@ SMARTPTR(Component)Object::addComponent(Component* newComponent)
 	}
 	SMARTPTR(Component) previousComp;
 	previousComp.clear();
-	ComponentFamilyType familyId = newComponent->familyType();
+	ComponentFamilyType familyId = newComponent.p()->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())
 	{
@@ -97,9 +95,9 @@ SMARTPTR(Component)Object::addComponent(Component* newComponent)
 	//set the component owner
 	newComponent->setOwnerObject(this);
 	//insert the new component into the table
-	mComponents[familyId] = SMARTPTR(Component)(newComponent);
+	mComponents[familyId] = newComponent;
 	//on addition to object component setup
-	mComponents[familyId]->onAddToObjectSetup();
+	mComponents[familyId].p()->onAddToObjectSetup();
 	return previousComp;
 }
 
@@ -147,7 +145,7 @@ void Object::sceneSetup()
 			mTmpl->parameter(std::string("is_static")) == std::string("true") ?
 					true : false);
 	//find parent into the created objects
-	Object* createdObject = mTmpl->objectTmplMgr()->getCreatedObject(parentId);
+	SMARTPTR(Object)createdObject = mTmpl->objectTmplMgr()->getCreatedObject(parentId);
 	if (createdObject != NULL)
 	{
 		//reparent to parent
@@ -173,11 +171,11 @@ void Object::sceneSetup()
 	for (iterComp = mComponents.begin(); iterComp != mComponents.end();
 			++iterComp)
 	{
-		iterComp->second->onAddToSceneSetup();
+		iterComp->second.p()->onAddToSceneSetup();
 	}
 }
 
-ObjectTemplate* const Object::objectTmpl() const
+SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 {
 	return mTmpl;
 }

@@ -55,7 +55,7 @@ class Sound3d: public Component
 {
 public:
 	Sound3d();
-	Sound3d(Sound3dTemplate* tmpl);
+	Sound3d(SMARTPTR(Sound3dTemplate) tmpl);
 	virtual ~Sound3d();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -133,8 +133,8 @@ public:
 	 */
 	///@{
 	typedef std::map<std::string, SMARTPTR(AudioSound)> SoundTable;
-	AudioSound* getSound(const std::string& name);
-	AudioSound* getSound(int index);
+	SMARTPTR(AudioSound) getSound(const std::string& name);
+	SMARTPTR(AudioSound) getSound(int index);
 	///@}
 
 	/**

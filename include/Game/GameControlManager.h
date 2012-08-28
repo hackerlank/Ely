@@ -58,12 +58,12 @@ public:
 	 * \brief Adds an control component for updating.
 	 * @param controlComp The control component.
 	 */
-	void addToControlUpdate(Component* controlComp);
+	void addToControlUpdate(SMARTPTR(Component) controlComp);
 	/**
 	 * \brief Removes an control component from updating.
 	 * @param controlComp The control component.
 	 */
-	void removeFromControlUpdate(Component* controlComp);
+	void removeFromControlUpdate(SMARTPTR(Component) controlComp);
 
 	/**
 	 * \brief Updates control components.
@@ -83,7 +83,7 @@ public:
 private:
 	///@{
 	///List of control components to be updated.
-	typedef std::list<Component*> ControlComponentList;
+	typedef std::list<SMARTPTR(Component)> ControlComponentList;
 	ControlComponentList mControlComponents;
 	///@}
 

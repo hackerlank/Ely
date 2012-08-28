@@ -29,16 +29,13 @@ Terrain::Terrain()
 	// TODO Auto-generated constructor stub
 }
 
-Terrain::Terrain(TerrainTemplate* tmpl)
+Terrain::Terrain(SMARTPTR(TerrainTemplate) tmpl)
 {
 	mTmpl = tmpl;
 }
 
 Terrain::~Terrain()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	mNodePath.remove_node();
 }
 
@@ -49,7 +46,7 @@ const ComponentFamilyType Terrain::familyType() const
 
 const ComponentType Terrain::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool Terrain::initialize()

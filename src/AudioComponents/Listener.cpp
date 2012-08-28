@@ -29,7 +29,7 @@ Listener::Listener()
 	// TODO Auto-generated constructor stub
 }
 
-Listener::Listener(ListenerTemplate* tmpl)
+Listener::Listener(SMARTPTR(ListenerTemplate) tmpl)
 {
 	mTmpl = tmpl;
 	mPosition = LPoint3(0.0, 0.0, 0.0);
@@ -37,9 +37,6 @@ Listener::Listener(ListenerTemplate* tmpl)
 
 Listener::~Listener()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	// check if game audio manager exists
 	if (GameAudioManager::GetSingletonPtr())
 	{
@@ -54,7 +51,7 @@ const ComponentFamilyType Listener::familyType() const
 
 const ComponentType Listener::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool Listener::initialize()
@@ -127,8 +124,8 @@ void Listener::update(void* data)
 	//get the new position
 #ifdef ELY_THREAD
 	//note on threading: this should be an atomic operation
-	CPT(TransformState) ownerTransform = ownerNodePath.get_transform(
-			mSceneRoot);
+	CSMARTPTR(TransformState) ownerTransform = ownerNodePath.get_transform(
+			mSceneRoot).p();
 	newPosition = ownerTransform->get_pos();
 	forward = LVector3::forward() * ownerTransform->get_mat();
 	up = LVector3::up() * ownerTransform->get_mat();

@@ -25,13 +25,10 @@
 
 void callbacksInit()
 {
-	//initialize all CALLBACKNAMEs
-
-	//
-	std::cout << "callbacksInit executed " << std::endl;
+	PRINT("callbacksInit executed ");
 }
 
 void callbacksEnd()
 {
-	std::cout << "callbacksEnd executed " << std::endl;
+	PRINT("callbacksEnd executed ");
 }

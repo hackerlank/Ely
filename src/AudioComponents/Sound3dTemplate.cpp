@@ -55,18 +55,18 @@ const ComponentFamilyType Sound3dTemplate::familyType() const
 	return ComponentFamilyType("Audio");
 }
 
-Component* Sound3dTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component) Sound3dTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	Sound3d* newSound3d = new Sound3d(this);
+	SMARTPTR(Sound3d) newSound3d = new Sound3d(this);
 	newSound3d->setComponentId(compId);
 	if (not newSound3d->initialize())
 	{
 		return NULL;
 	}
-	return newSound3d;
+	return newSound3d.p();
 }
 
 void Sound3dTemplate::setParametersDefaults()

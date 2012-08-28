@@ -44,8 +44,8 @@ ComponentTemplateManager::~ComponentTemplateManager()
 	std::cout << std::endl;
 }
 
-SMARTPTR(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
-		ComponentTemplate* componentTmpl)
+SMARTPTR(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
+		SMARTPTR(ComponentTemplate) componentTmpl)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -57,7 +57,7 @@ SMARTPTR(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
 	}
 	SMARTPTR(ComponentTemplate) previousCompTmpl;
 	previousCompTmpl.clear();
-	ComponentType componentId = componentTmpl->componentType();
+	ComponentType componentId = componentTmpl.p()->componentType();
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
 	if (it != mComponentTemplates.end())
 	{
@@ -66,7 +66,7 @@ SMARTPTR(ComponentTemplate)ComponentTemplateManager::addComponentTemplate(
 		mComponentTemplates.erase(it);
 	}
 	//insert the new component template
-	mComponentTemplates[componentId] = SMARTPTR(ComponentTemplate)(componentTmpl);
+	mComponentTemplates[componentId] = componentTmpl;
 	return previousCompTmpl;
 }
 
@@ -85,7 +85,7 @@ bool ComponentTemplateManager::removeComponentTemplate(
 	return true;
 }
 
-ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
+SMARTPTR(ComponentTemplate) ComponentTemplateManager::getComponentTemplate(
 		ComponentType componentType)
 {
 	//lock (guard) the mutex
@@ -100,7 +100,7 @@ ComponentTemplate* ComponentTemplateManager::getComponentTemplate(
 	return (*it).second;
 }
 
-Component* ComponentTemplateManager::createComponent(
+SMARTPTR(Component) ComponentTemplateManager::createComponent(
 		ComponentType componentType)
 {
 	//lock (guard) the mutex
@@ -115,7 +115,7 @@ Component* ComponentTemplateManager::createComponent(
 	//new unique id
 	ComponentId newCompId = ComponentId(componentType) + ComponentId(getId());
 	//create component
-	Component* newComp = (*it).second->makeComponent(newCompId);
+	SMARTPTR(Component) newComp = (*it).second.p()->makeComponent(newCompId);
 	return newComp;
 }
 
@@ -128,7 +128,7 @@ void ComponentTemplateManager::resetComponentTemplatesParams()
 	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();
 			++iter)
 	{
-		iter->second->setParametersDefaults();
+		iter->second.p()->setParametersDefaults();
 	}
 }
 

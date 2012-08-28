@@ -50,18 +50,18 @@ const ComponentFamilyType TerrainTemplate::familyType() const
 	return ComponentFamilyType("Scene");
 }
 
-Component* TerrainTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)TerrainTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	Terrain* newTerrain = new Terrain(this);
+	SMARTPTR(Terrain) newTerrain = new Terrain(this);
 	newTerrain->setComponentId(compId);
 	if (not newTerrain->initialize())
 	{
 		return NULL;
 	}
-	return newTerrain;
+	return newTerrain.p();
 }
 
 void TerrainTemplate::setParametersDefaults()

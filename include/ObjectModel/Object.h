@@ -71,7 +71,7 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Object(const ObjectId& objectId, ObjectTemplate* tmpl);
+	Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate) tmpl);
 
 	/**
 	 * \brief Destructor.
@@ -84,7 +84,7 @@ public:
 	 * @return The component, or NULL if no component of that
 	 * family exists.
 	 */
-	Component* getComponent(const ComponentFamilyType& familyID);
+	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyID);
 
 	/**
 	 * \brief Sets a new component into this object.
@@ -97,7 +97,7 @@ public:
 	 * @return SMARTPTR(NULL) if there wasn't a component of that family, otherwise
 	 * the previous component.
 	 */
-	SMARTPTR(Component) addComponent(Component* newComponent);
+	SMARTPTR(Component) addComponent(SMARTPTR(Component) newComponent);
 
 	/**
 	 * \brief Clears the table of all components of this object.
@@ -142,7 +142,7 @@ public:
 	 * \brief Gets a reference to the object template.
 	 * @return The a reference to the object template.
 	 */
-	ObjectTemplate* const objectTmpl() const;
+	SMARTPTR(ObjectTemplate) const objectTmpl() const;
 
 	/**
 	 * \brief Gets/sets a reference to the static flag.
@@ -164,7 +164,7 @@ public:
 
 private:
 	///The template used to construct this component.
-	ObjectTemplate* const mTmpl;
+	SMARTPTR(ObjectTemplate) const mTmpl;
 	///The NodePath associated to this object.
 	NodePath mNodePath;
 	///Unique identifier for this object.

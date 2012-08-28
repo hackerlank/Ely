@@ -37,8 +37,11 @@ ObjectTemplateManager::~ObjectTemplateManager()
 	{
 		ObjectTable::iterator iter = mCreatedObjects.begin();
 		ObjectId objId = iter->first;
-		std::cout << "Removing object '" << std::string(objId) << "'"
-				<< std::endl;
+		PRINT( "Removing object '" << std::string(objId) << "'");
+		//remove first object components because they
+		//have back references to their owner object
+		iter->second->clearComponents();
+		//
 		mCreatedObjects.erase(iter);
 	}
 	//remove object templates
@@ -46,15 +49,15 @@ ObjectTemplateManager::~ObjectTemplateManager()
 	{
 		ObjectTemplateTable::iterator iter = mObjectTemplates.begin();
 		ObjectType objType = iter->first;
-		std::cout << "Removing object template for type '"
-				<< std::string(objType) << "'" << std::endl;
+		PRINT(
+				"Removing object template for type '" << std::string(objType) << "'");
 		mObjectTemplates.erase(iter);
 	}
 	std::cout << std::endl;
 }
 
 SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
-		ObjectTemplate* objectTmpl)
+		SMARTPTR(ObjectTemplate) objectTmpl)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -75,7 +78,7 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
 		mObjectTemplates.erase(it);
 	}
 	//insert the new component template
-	mObjectTemplates[objectTemplId] = SMARTPTR(ObjectTemplate)(objectTmpl);
+	mObjectTemplates[objectTemplId] = objectTmpl;
 	return previousObjTmpl;
 
 }
@@ -94,7 +97,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 	return true;
 }
 
-ObjectTemplate* ObjectTemplateManager::getObjectTemplate(ObjectType objectType)
+SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType objectType)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -107,7 +110,7 @@ ObjectTemplate* ObjectTemplateManager::getObjectTemplate(ObjectType objectType)
 	return (*it).second;
 }
 
-Object* ObjectTemplateManager::createObject(ObjectType objectType,
+SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId)
 {
 	//lock (guard) the mutex
@@ -119,7 +122,7 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 	{
 		return NULL;
 	}
-	ObjectTemplate* objectTmpl = (*it1).second;
+	SMARTPTR(ObjectTemplate) objectTmpl = (*it1).second;
 	//create the new object
 	ObjectId newId;
 	if (objectId == ObjectId(""))
@@ -130,19 +133,19 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 	{
 		newId = objectId;
 	}
-	Object* newObj = new Object(newId, objectTmpl);
+	SMARTPTR(Object) newObj = new Object(newId, objectTmpl);
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
-			objectTmpl->getComponentTemplates();
+	objectTmpl->getComponentTemplates();
 	//iterate over the list and assign components
 	ObjectTemplate::ComponentTemplateList::iterator it2;
 	for (it2 = compTmplList.begin(); it2 != compTmplList.end(); ++it2)
 	{
 		//use ComponentTemplateManager to create component
-		ComponentType compType = (*it2)->componentType();
-		Component* newComp =
-				ComponentTemplateManager::GetSingleton().createComponent(
-						compType);
+		ComponentType compType = (*it2).p()->componentType();
+		SMARTPTR(Component) newComp =
+		ComponentTemplateManager::GetSingleton().createComponent(
+				compType);
 		//add the component into the object
 		if (not newComp)
 		{
@@ -151,12 +154,12 @@ Object* ObjectTemplateManager::createObject(ObjectType objectType,
 		newObj->addComponent(newComp);
 	}
 	//insert the just created object in the table of created objects
-	mCreatedObjects[newId] = SMARTPTR(Object)(newObj);
+	mCreatedObjects[newId] = newObj;
 	//
 	return newObj;
 }
 
-Object* ObjectTemplateManager::getCreatedObject(const ObjectId& objectId)
+SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -167,7 +170,7 @@ Object* ObjectTemplateManager::getCreatedObject(const ObjectId& objectId)
 	{
 		return NULL;
 	}
-	return iterObj->second.p();
+	return iterObj->second;
 }
 
 bool ObjectTemplateManager::removeCreatedObject(const ObjectId& objectId)
@@ -175,8 +178,19 @@ bool ObjectTemplateManager::removeCreatedObject(const ObjectId& objectId)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	size_t removedObj = mCreatedObjects.erase(objectId);
-	return (removedObj > 0) ? true : false;
+	ObjectTable::iterator iterObj;
+	iterObj = mCreatedObjects.find(objectId);
+	if (iterObj == mCreatedObjects.end())
+	{
+		return false;
+	}
+	PRINT( "Removing object '" << std::string(objectId) << "'");
+	//remove first object components because they
+	//have back references to their owner object
+	iterObj->second->clearComponents();
+	//
+	mCreatedObjects.erase(iterObj);
+	return true;
 }
 
 ReMutex& ObjectTemplateManager::getMutex()

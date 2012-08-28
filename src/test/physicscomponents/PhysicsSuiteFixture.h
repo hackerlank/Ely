@@ -74,10 +74,10 @@ struct PhysicsSuiteFixture
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	RigidBody* mRigid;
+	SMARTPTR(RigidBody) mRigid;
 	ComponentId mCompId;
-	RigidBodyTemplate* mRigidTmpl;
-	ObjectTemplate* mObjectTmpl;
+	SMARTPTR(RigidBodyTemplate) mRigidTmpl;
+	SMARTPTR(ObjectTemplate) mObjectTmpl;
 	GamePhysicsManager* physicsMgr;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;

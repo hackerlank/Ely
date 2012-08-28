@@ -63,7 +63,7 @@ void ObjectTemplate::clearComponentTemplates()
 	mComponentTemplates.clear();
 }
 
-ObjectTemplate::ComponentTemplateList& ObjectTemplate::getComponentTemplates()
+ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -71,7 +71,7 @@ ObjectTemplate::ComponentTemplateList& ObjectTemplate::getComponentTemplates()
 	return mComponentTemplates;
 }
 
-void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
+void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -84,7 +84,7 @@ void ObjectTemplate::addComponentTemplate(ComponentTemplate* componentTmpl)
 	mComponentTemplates.push_back(componentTmpl);
 }
 
-ComponentTemplate* ObjectTemplate::getComponentTemplate(
+SMARTPTR(ComponentTemplate) ObjectTemplate::getComponentTemplate(
 		const ComponentType& componentType)
 {
 	//lock (guard) the mutex

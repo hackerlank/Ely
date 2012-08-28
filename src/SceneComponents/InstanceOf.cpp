@@ -29,16 +29,13 @@ InstanceOf::InstanceOf()
 	// TODO Auto-generated constructor stub
 }
 
-InstanceOf::InstanceOf(InstanceOfTemplate* tmpl)
+InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate) tmpl)
 {
 	mTmpl = tmpl;
 }
 
 InstanceOf::~InstanceOf()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	mNodePath.remove_node();
 }
 
@@ -49,7 +46,7 @@ const ComponentFamilyType InstanceOf::familyType() const
 
 const ComponentType InstanceOf::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool InstanceOf::initialize()
@@ -88,7 +85,7 @@ void InstanceOf::onAddToObjectSetup()
 	//if not this component is instance of nothing.
 	ObjectId instanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
-	Object* createdObject =
+	SMARTPTR(Object) createdObject =
 			mOwnerObject->objectTmpl()->objectTmplMgr()->getCreatedObject(
 					instanceOfId);
 	if (createdObject != NULL)

@@ -25,10 +25,10 @@
 
 void transitionsInit()
 {
-	std::cout << "transitionsInit executed " << std::endl;
+	PRINT("transitionsInit executed ");
 }
 
 void transitionsEnd()
 {
-	std::cout << "transitionsEnd executed " << std::endl;
+	PRINT("transitionsEnd executed ");
 }

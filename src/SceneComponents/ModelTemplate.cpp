@@ -50,18 +50,18 @@ const ComponentFamilyType ModelTemplate::familyType() const
 	return ComponentFamilyType("Scene");
 }
 
-Component* ModelTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)ModelTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	Model* newModel = new Model(this);
+	SMARTPTR(Model) newModel = new Model(this);
 	newModel->setComponentId(compId);
 	if (not newModel->initialize())
 	{
 		return NULL;
 	}
-	return newModel;
+	return newModel.p();
 }
 
 void ModelTemplate::setParametersDefaults()

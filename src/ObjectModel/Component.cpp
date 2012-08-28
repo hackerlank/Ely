@@ -51,7 +51,7 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-void Component::setOwnerObject(Object* ownerObject)
+void Component::setOwnerObject(SMARTPTR(Object) ownerObject)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -59,7 +59,7 @@ void Component::setOwnerObject(Object* ownerObject)
 	mOwnerObject = ownerObject;
 }
 
-Object* Component::getOwnerObject() const
+SMARTPTR(Object) Component::getOwnerObject() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

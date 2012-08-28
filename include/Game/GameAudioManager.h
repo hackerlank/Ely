@@ -60,18 +60,18 @@ public:
 	 * \brief Adds an audio component for updating.
 	 * @param audioComp The audio component.
 	 */
-	void addToAudioUpdate(Component* audioComp);
+	void addToAudioUpdate(SMARTPTR(Component) audioComp);
 	/**
 	 * \brief Removes an audio component from updating.
 	 * @param audioComp The audio component.
 	 */
-	void removeFromAudioUpdate(Component* audioComp);
+	void removeFromAudioUpdate(SMARTPTR(Component) audioComp);
 
 	/**
 	 * \brief Gets a reference to the audio manager.
 	 * @return The audio manager.
 	 */
-	AudioManager* audioMgr() const;
+	SMARTPTR(AudioManager) audioMgr() const;
 
 	/**
 	 * \brief Updates audio components.
@@ -94,7 +94,7 @@ private:
 
 	///@{
 	///List of audio components to be updated.
-	typedef std::list<Component*> AudioComponentList;
+	typedef std::list<SMARTPTR(Component)> AudioComponentList;
 	AudioComponentList mAudioComponents;
 	///@}
 

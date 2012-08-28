@@ -64,7 +64,7 @@ GameAudioManager::~GameAudioManager()
 	mAudioComponents.clear();
 }
 
-void GameAudioManager::addToAudioUpdate(Component* audioComp)
+void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -77,7 +77,7 @@ void GameAudioManager::addToAudioUpdate(Component* audioComp)
 	}
 }
 
-void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
+void GameAudioManager::removeFromAudioUpdate(SMARTPTR(Component) audioComp)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -90,9 +90,9 @@ void GameAudioManager::removeFromAudioUpdate(Component* audioComp)
 	}
 }
 
-AudioManager* GameAudioManager::audioMgr() const
+SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
 {
-	return mAudioMgr.p();
+	return mAudioMgr;
 }
 
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
@@ -115,7 +115,7 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	for (iter = mAudioComponents.begin(); iter != mAudioComponents.end();
 			++iter)
 	{
-		(*iter)->update(reinterpret_cast<void*>(&dt));
+		(*iter).p()->update(reinterpret_cast<void*>(&dt));
 	}
 	//Update audio manager
 	mAudioMgr->update();

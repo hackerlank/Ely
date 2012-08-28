@@ -31,14 +31,13 @@
 #include <sstream>
 #include <cassert>
 #include <utility>
-
 #include <referenceCount.h>
 #include <event.h>
 #include <eventHandler.h>
 #include <asyncTask.h>
 #include <genericAsyncTask.h>
 #include <pmutex.h>
-//#include <pointerTo.h>
+#include <pointerTo.h>
 #include <threadSafePointerTo.h>
 
 ///Macros for generic debug printing
@@ -167,7 +166,7 @@ struct IdType
  * To register a task:
  * 1) in class A define a (pointer to) TaskData member:
  * \code
- * 	PT(TaskInterface<A>::TaskData) myData;
+ * 	SMARTPTR(TaskInterface<A>::TaskData) myData;
  * 	\endcode
  * 2) and a method (that will execute the real task) with signature:
  * \code
@@ -241,12 +240,10 @@ typedef void* LIB_HANDLE;
 #	define SMARTPTR(type) PointerTo< type >
 #	define CSMARTPTR(type) ConstPointerTo< type >
 #endif
-
 /**
  * \brief Implements a mutex lock guard (RAII idiom).
  *
  * Directly "stolen" (and adapted) from boost::thread.
- * \note this class is not needed.\see MutexHolder, ReMutexHolder.
  */
 struct adopt_lock_t
 {

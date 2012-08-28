@@ -55,9 +55,9 @@ int main(int argc, char **argv)
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
 			"bvw-f2004--airbladepilot/pilot-model");
-	PT(Character) character =
+	SMARTPTR(Character) character =
 			DCAST(Character, Actor.find("**/+Character").node());
-	PT(PartBundle) pbundle = character->get_bundle(0);
+	SMARTPTR(PartBundle) pbundle = character->get_bundle(0);
 	//Load Animations
 	std::vector<std::string> animations;
 	animations.push_back(std::string("pilot-chargeshoot"));

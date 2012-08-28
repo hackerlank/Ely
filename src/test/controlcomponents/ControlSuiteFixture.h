@@ -93,10 +93,10 @@ struct ControlSuiteFixture
 		mPanda->close_framework();
 		delete mPanda;
 	}
-	Driver* mControl;
+	SMARTPTR(Driver) mControl;
 	ComponentId mCompId;
-	DriverTemplate* mControlTmpl;
-	ObjectTemplate* mObjectTmpl;
+	SMARTPTR(DriverTemplate) mControlTmpl;
+	SMARTPTR(ObjectTemplate) mObjectTmpl;
 	PandaFramework* mPanda;
 	WindowFramework* mWin;
 	std::vector<Event> mEvents;

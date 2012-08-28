@@ -56,7 +56,7 @@ public:
 	/**
 	 * \brief Type used for the list of the component templates.
 	 */
-	typedef std::list<ComponentTemplate*> ComponentTemplateList;
+	typedef std::list<SMARTPTR(ComponentTemplate)> ComponentTemplateList;
 
 	/**
 	 * \brief Constructor.
@@ -90,20 +90,20 @@ public:
 	 * \brief Gets the component template list.
 	 * @return The component template list.
 	 */
-	ComponentTemplateList& getComponentTemplates();
+	ComponentTemplateList getComponentTemplates();
 
 	/**
 	 * \brief Adds a component template.
 	 * @param componentTmpl The component template.
 	 */
-	void addComponentTemplate(ComponentTemplate* componentTmpl);
+	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/**
 	 * \brief Gets a component template given the component type it can create.
 	 * @param componentType The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
-	ComponentTemplate* getComponentTemplate(const ComponentType& componentType);
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType& componentType);
 
 	/**
 	 * \brief Gets/sets the ObjectTemplateManager.
@@ -209,9 +209,9 @@ struct idIsEqualTo
 	{
 	}
 	ComponentType mComponentType;
-	bool operator()(const ComponentTemplate* componentTmpl)
+	bool operator()(const SMARTPTR(ComponentTemplate) componentTmpl)
 	{
-		return componentTmpl->componentType() == mComponentType;
+		return componentTmpl.p()->componentType() == mComponentType;
 	}
 };
 

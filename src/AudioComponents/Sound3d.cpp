@@ -29,7 +29,7 @@ Sound3d::Sound3d()
 	// TODO Auto-generated constructor stub
 }
 
-Sound3d::Sound3d(Sound3dTemplate* tmpl) :
+Sound3d::Sound3d(SMARTPTR(Sound3dTemplate) tmpl) :
 		mMinDist(1.0), mMaxDist(1000000000.0)
 {
 	mTmpl = tmpl;
@@ -39,9 +39,6 @@ Sound3d::Sound3d(Sound3dTemplate* tmpl) :
 
 Sound3d::~Sound3d()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//check if game audio manager exists
 	if (GameAudioManager::GetSingletonPtr())
 	{
@@ -65,7 +62,7 @@ const ComponentFamilyType Sound3d::familyType() const
 
 const ComponentType Sound3d::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool Sound3d::initialize()
@@ -80,12 +77,12 @@ bool Sound3d::initialize()
 			std::string("sound_files"));
 	for (iter = soundFileList.begin(); iter != soundFileList.end(); ++iter)
 	{
-		PT(AudioSound) sound =
+		SMARTPTR(AudioSound) sound =
 				GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
-						*iter, true);
+						*iter, true).p();
 		if (not sound.is_null())
 		{
-			mSounds[*iter] = sound;
+			mSounds[*iter] = sound.p();
 		}
 	}
 	//setup event callbacks if any
@@ -136,9 +133,9 @@ bool Sound3d::addSound(const std::string& fileName)
 		//no owner object:return false
 		return result;
 	}
-	PT(AudioSound) sound =
+	SMARTPTR(AudioSound) sound =
 			GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(fileName,
-					true);
+					true).p();
 	if (sound)
 	{
 		mSounds[fileName] = sound;
@@ -236,7 +233,7 @@ void Sound3d::set3dStaticAttributes()
 	}
 }
 
-AudioSound* Sound3d::getSound(const std::string& name)
+SMARTPTR(AudioSound) Sound3d::getSound(const std::string& name)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -246,10 +243,10 @@ AudioSound* Sound3d::getSound(const std::string& name)
 	{
 		return NULL;
 	}
-	return iter->second.p();
+	return iter->second;
 }
 
-AudioSound* Sound3d::getSound(int index)
+SMARTPTR(AudioSound) Sound3d::getSound(int index)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -267,7 +264,7 @@ AudioSound* Sound3d::getSound(int index)
 	{
 		return NULL;
 	}
-	return iter->second.p();
+	return iter->second;
 }
 
 void Sound3d::update(void* data)

@@ -55,7 +55,7 @@ class Terrain: public Component
 {
 public:
 	Terrain();
-	Terrain(TerrainTemplate* tmpl);
+	Terrain(SMARTPTR(TerrainTemplate) tmpl);
 	virtual ~Terrain();
 
 	const virtual ComponentFamilyType familyType() const;

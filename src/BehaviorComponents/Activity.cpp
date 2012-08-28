@@ -30,7 +30,7 @@ Activity::Activity() :
 	// TODO Auto-generated constructor stub
 }
 
-Activity::Activity(ActivityTemplate* tmpl) :
+Activity::Activity(SMARTPTR(ActivityTemplate) tmpl) :
 		mFSM("FSM"), mTransitionsLoaded(false)
 {
 	mTmpl = tmpl;
@@ -38,9 +38,6 @@ Activity::Activity(ActivityTemplate* tmpl) :
 
 Activity::~Activity()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	unloadTransitionFunctions();
 }
 
@@ -51,7 +48,7 @@ const ComponentFamilyType Activity::familyType() const
 
 const ComponentType Activity::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool Activity::initialize()

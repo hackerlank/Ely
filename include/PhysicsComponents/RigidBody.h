@@ -93,7 +93,7 @@ class RigidBody: public Component
 {
 public:
 	RigidBody();
-	RigidBody(RigidBodyTemplate* tmpl);
+	RigidBody(SMARTPTR(RigidBodyTemplate) tmpl);
 	virtual ~RigidBody();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -173,7 +173,7 @@ private:
 	 * @param shapeType The shape type.
 	 * @return The created shape.
 	 */
-	BulletShape* createShape(ShapeType shapeType);
+	SMARTPTR(BulletShape) createShape(ShapeType shapeType);
 	/**
 	 * \brief Calculates geometric characteristics of a GeomNode.
 	 *

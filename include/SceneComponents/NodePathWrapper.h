@@ -42,7 +42,7 @@ class NodePathWrapper: public Component
 {
 public:
 	NodePathWrapper();
-	NodePathWrapper(NodePathWrapperTemplate* tmpl);
+	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate) tmpl);
 	virtual ~NodePathWrapper();
 
 	const virtual ComponentFamilyType familyType() const;

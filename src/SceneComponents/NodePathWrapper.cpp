@@ -29,16 +29,13 @@ NodePathWrapper::NodePathWrapper()
 	// TODO Auto-generated constructor stub
 }
 
-NodePathWrapper::NodePathWrapper(NodePathWrapperTemplate* tmpl)
+NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate) tmpl)
 {
 	mTmpl = tmpl;
 }
 
 NodePathWrapper::~NodePathWrapper()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	// TODO Auto-generated destructor stub
 }
 
@@ -49,7 +46,7 @@ const ComponentFamilyType NodePathWrapper::familyType() const
 
 const ComponentType NodePathWrapper::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool NodePathWrapper::initialize()

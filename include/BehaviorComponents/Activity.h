@@ -59,7 +59,7 @@ class ActivityTemplate;
  *
  * All these routines are loaded at runtime from a dynamic linked library
  * (referenced by the macro TRANSITIONS_SO).\n
- * Inside these routine the Activity* "activity" argument passed refers to this
+ * Inside these routine the SMARTPTR(Activity) "activity" argument passed refers to this
  * component.\n
  * \see FSM for details.
  *
@@ -76,7 +76,7 @@ class Activity: public Component
 {
 public:
 	Activity();
-	Activity(ActivityTemplate* tmpl);
+	Activity(SMARTPTR(ActivityTemplate) tmpl);
 	virtual ~Activity();
 
 	const virtual ComponentFamilyType familyType() const;

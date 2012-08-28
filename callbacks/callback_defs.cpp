@@ -74,7 +74,7 @@ static std::string getBareEvent(const std::string& eventName,
 //		"f", //down
 //};
 #include "ControlComponents/Driver.h"
-static void setDriverCommand(Driver* driver, const std::string& bareEvent,
+static void setDriverCommand(SMARTPTR(Driver) driver, const std::string& bareEvent,
 		bool enable, const char* keys[])
 {
 	//set the right command
@@ -128,10 +128,10 @@ static const char* camera_keys[] =
 		"r", //up
 		"f", //down
 };
-void drive(const Event * event, void * data)
+void drive(const Event* event, void* data)
 {
 	//get data
-	Driver* driver = (Driver*) data;
+	SMARTPTR(Driver) driver = (Driver*) data;
 	bool enable;
 	//get bare event
 	std::string bareEvent = getBareEvent(event->get_name(), &enable);
@@ -139,10 +139,10 @@ void drive(const Event * event, void * data)
 	setDriverCommand(driver, bareEvent, enable, camera_keys);
 }
 
-void speed(const Event * event, void * data)
+void speed(const Event* event, void* data)
 {
 	//get data
-	Driver* driver = (Driver*) data;
+	SMARTPTR(Driver) driver = (Driver*) data;
 	//analyze the event: shift or shift-up
 	(event->get_name().find("-up", 0) == string::npos) ?
 			driver->setSpeedFast() : driver->setSpeed();
@@ -164,13 +164,13 @@ static const char* Actor1_keys[] =
 void state(const Event * event, void * data)
 {
 	//get data
-	Activity* activity = (Activity*) data;
+	SMARTPTR(Activity) activity = (Activity*) data;
 	bool enable;
 	//get bare event
 	std::string bareEvent = getBareEvent(event->get_name(), &enable);
 	//get a reference to the actor fsm
 	fsm& actorFSM = (fsm&) (*activity);
-	Object* actorObj = activity->getOwnerObject();
+	SMARTPTR(Object) actorObj = activity->getOwnerObject();
 	//set the right command
 	if (bareEvent == "arrow_up")
 	{
@@ -205,6 +205,6 @@ void state(const Event * event, void * data)
 		PRINTERR("Event not defined: " << event->get_name());
 	}
 	//call the Driver event handler to move actor
-	Driver* actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
+	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
 	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
 }

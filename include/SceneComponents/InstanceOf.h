@@ -44,7 +44,7 @@ class InstanceOf: public Component
 {
 public:
 	InstanceOf();
-	InstanceOf(InstanceOfTemplate* tmpl);
+	InstanceOf(SMARTPTR(InstanceOfTemplate) tmpl);
 	virtual ~InstanceOf();
 
 	const virtual ComponentFamilyType familyType() const;

@@ -29,16 +29,13 @@ RigidBody::RigidBody()
 	// TODO Auto-generated constructor stub
 }
 
-RigidBody::RigidBody(RigidBodyTemplate* tmpl)
+RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate) tmpl)
 {
 	mTmpl = tmpl;
 }
 
 RigidBody::~RigidBody()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	if (GamePhysicsManager::GetSingletonPtr())
 	{
 		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove_rigid_body(
@@ -53,7 +50,7 @@ const ComponentFamilyType RigidBody::familyType() const
 
 const ComponentType RigidBody::componentType() const
 {
-	return mTmpl->componentType();
+	return mTmpl.p()->componentType();
 }
 
 bool RigidBody::initialize()
@@ -329,13 +326,13 @@ void RigidBody::setNodePath(const NodePath& nodePath)
 	mNodePath = nodePath;
 }
 
-BulletShape* RigidBody::createShape(ShapeType shapeType)
+SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 {
 	//get the bounding dimensions of object node path, that
 	//should represents a model
 	getBoundingDimensions(mOwnerObject->getNodePath());
 	// create the actual shape
-	BulletShape* collisionShape = NULL;
+	SMARTPTR(BulletShape) collisionShape = NULL;
 	switch (mShapeType)
 	{
 	case SPHERE:

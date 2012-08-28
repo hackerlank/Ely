@@ -51,18 +51,18 @@ const ComponentFamilyType NodePathWrapperTemplate::familyType() const
 	return ComponentFamilyType("Scene");
 }
 
-Component* NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	NodePathWrapper* newNodePathWrapper = new NodePathWrapper(this);
+	SMARTPTR(NodePathWrapper) newNodePathWrapper = new NodePathWrapper(this);
 	newNodePathWrapper->setComponentId(compId);
 	if (not newNodePathWrapper->initialize())
 	{
 		return NULL;
 	}
-	return newNodePathWrapper;
+	return newNodePathWrapper.p();
 }
 
 void NodePathWrapperTemplate::setParametersDefaults()

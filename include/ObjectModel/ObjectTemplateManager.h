@@ -62,7 +62,7 @@ public:
 	 * @return SMARTPTR(NULL) if there wasn't a template for that object, otherwise
 	 * the previous template.
 	 */
-	SMARTPTR(ObjectTemplate) addObjectTemplate(ObjectTemplate* objectTmpl);
+	SMARTPTR(ObjectTemplate) addObjectTemplate(SMARTPTR(ObjectTemplate) objectTmpl);
 
 	/**
 	 * \brief Removes the object template given the object type it can create.
@@ -76,7 +76,7 @@ public:
 	 * @param objectType The object type.
 	 * @return The object template.
 	 */
-	ObjectTemplate* getObjectTemplate(ObjectType objectType);
+	SMARTPTR(ObjectTemplate) getObjectTemplate(ObjectType objectType);
 
 	/**
 	 * \brief Creates a object given its type and a NodePath.
@@ -86,7 +86,7 @@ public:
 	 * @param objectId The object id.
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
-	Object* createObject(ObjectType objectType, ObjectId objectId = ObjectId(""));
+	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""));
 
 	/**
 	 * \brief Object templates and object tables typedefs.
@@ -98,13 +98,13 @@ public:
 
 	/**
 	 * \brief Gets a created object give its object id.
-	 * @return A pointer to the created object (NULL otherwise).
+	 * @return A pointer to the created object (NULL on error).
 	 */
-	Object* getCreatedObject(const ObjectId& objectId);
+	SMARTPTR(Object) getCreatedObject(const ObjectId& objectId);
 
 	/**
 	 * \brief Removes a created object give its object id.
-	 * @return True on successful removal, false otherwise.
+	 * @return A pointer to the just removed object (NULL on error).
 	 */
 	bool removeCreatedObject(const ObjectId& objectId);
 

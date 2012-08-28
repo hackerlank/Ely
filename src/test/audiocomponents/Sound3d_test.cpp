@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	//add mSound3d to an object so will be automatically destroyed
 	Object testObj("testObj",mObjectTmpl);
 	mSound3d->setOwnerObject(&testObj);
-	testObj.addComponent(mSound3d);
+	testObj.addComponent(mSound3d.p());
 	mSound3d->onAddToObjectSetup();
 	mSound3d->addSound(audioFile);
 	BOOST_CHECK(mSound3d->getSound(1) == NULL);
@@ -91,7 +91,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	Object testObj("testObj",mObjectTmpl);
 	testObj.setNodePath(testNP);
 	mSound3d->setOwnerObject(&testObj);
-	testObj.addComponent(mSound3d);
+	testObj.addComponent(mSound3d.p());
 	BOOST_CHECK(testObj.getComponent("Audio")!=NULL);
 	mSound3d->onAddToObjectSetup();
 	GenericAsyncTask* task = DCAST(GenericAsyncTask,mPanda->get_task_mgr().find_task("GameAudioManager::update"));

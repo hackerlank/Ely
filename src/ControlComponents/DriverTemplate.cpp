@@ -50,18 +50,18 @@ const ComponentFamilyType DriverTemplate::familyType() const
 	return ComponentFamilyType("Control");
 }
 
-Component* DriverTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)DriverTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	Driver* newControl = new Driver(this);
+	SMARTPTR(Driver) newControl = new Driver(this);
 	newControl->setComponentId(compId);
 	if (not newControl->initialize())
 	{
 		return NULL;
 	}
-	return newControl;
+	return newControl.p();
 }
 
 void DriverTemplate::setParametersDefaults()

@@ -60,7 +60,7 @@ public:
 	 * the previous template.
 	 */
 	SMARTPTR(ComponentTemplate) addComponentTemplate(
-			ComponentTemplate* componentTmpl);
+			SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/**
 	 * \brief Removes the component template given the component type it can create.
@@ -74,7 +74,7 @@ public:
 	 * @param componentID The component type.
 	 * @return The component template.
 	 */
-	ComponentTemplate* getComponentTemplate(ComponentType componentID);
+	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentID);
 
 	/**
 	 * \brief Resets all component templates to their default parameters.
@@ -86,7 +86,7 @@ public:
 	 * @param componentID The component type.
 	 * @return The just created component, or NULL on failure (for any reason).
 	 */
-	Component* createComponent(ComponentType componentID);
+	SMARTPTR(Component) createComponent(ComponentType componentID);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
