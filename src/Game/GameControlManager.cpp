@@ -53,9 +53,6 @@ GameControlManager::GameControlManager(int sort, int priority,
 
 GameControlManager::~GameControlManager()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);

@@ -36,7 +36,7 @@ Terrain::Terrain(SMARTPTR(TerrainTemplate) tmpl)
 
 Terrain::~Terrain()
 {
-	mNodePath.remove_node();
+	mTerrain->get_root().remove_node();
 }
 
 const ComponentFamilyType Terrain::familyType() const

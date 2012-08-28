@@ -33,9 +33,6 @@ Component::Component() :
 
 Component::~Component()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//unregister callbacks if any
 	unregisterEventCallbacks();
 	//unload event callbacks

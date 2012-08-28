@@ -46,8 +46,6 @@ ObjectTemplate::ObjectTemplate(const ObjectType& name,
 
 ObjectTemplate::~ObjectTemplate()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
 }
 
 const ObjectType& ObjectTemplate::name() const

@@ -32,9 +32,6 @@ mTmpl(tmpl)
 
 Object::~Object()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	mNodePath.remove_node();
 }
 

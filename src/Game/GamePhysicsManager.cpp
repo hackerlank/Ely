@@ -59,9 +59,6 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 
 GamePhysicsManager::~GamePhysicsManager()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);

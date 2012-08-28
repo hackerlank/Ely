@@ -32,8 +32,6 @@ ComponentTemplate::ComponentTemplate(PandaFramework* pandaFramework,
 
 ComponentTemplate::~ComponentTemplate()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
 }
 
 void ComponentTemplate::setParameters(const ParameterTable& parameterTable)

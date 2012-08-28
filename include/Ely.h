@@ -29,6 +29,7 @@
 #include "Game/GameAudioManager.h"
 #include "Game/GameControlManager.h"
 #include "Game/GamePhysicsManager.h"
+#include "Game/GameSceneManager.h"
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <iostream>

@@ -19,3 +19,21 @@ GameSceneManager::~GameSceneManager()
 	// TODO Auto-generated destructor stub
 }
 
+void GameSceneManager::addToSceneUpdate(SMARTPTR(Component)sceneComp)
+{
+}
+
+void GameSceneManager::removeFromSceneUpdate(SMARTPTR(Component)sceneComp)
+{
+}
+
+AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
+{
+	//
+	return AsyncTask::DS_cont;
+}
+
+ReMutex& GameSceneManager::getMutex()
+{
+	return mMutex;
+}

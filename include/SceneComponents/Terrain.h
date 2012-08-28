@@ -27,6 +27,7 @@
 #include <string>
 #include <list>
 #include <cstdlib>
+#include <geoMipTerrain.h>
 #include <nodePath.h>
 #include <filename.h>
 #include <typedObject.h>
@@ -47,6 +48,10 @@ class TerrainTemplate;
  * - "near_percent"				|single|"0.1"
  * - "far_percent"				|single|"1.0"
  * - "brute_force"				|single|"true"
+ * - "auto_flatten"				|single|"AFM_medium"
+ * - "texture_file"				|single|no default
+ * - "texture_uscale"			|single|"1.0"
+ * - "texture_vscale"			|single|"1.0"
  */
 class Terrain: public Component
 {
@@ -61,18 +66,9 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
-	/**
-	 * \brief Gets/sets the node path associated to this model.
-	 * @return The node path associated to this model.
-	 */
-	///@{
-	NodePath getNodePath() const;
-	void setNodePath(const NodePath& nodePath);
-	///@}
-
 private:
-	///The NodePath associated to this model.
-	NodePath mNodePath;
+	///The GeoMipTerrain associated to this component.
+	SMARTPTR(GeoMipTerrain) mTerrain;
 
 	///TypedObject semantics: hardcoded
 public:

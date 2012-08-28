@@ -52,12 +52,15 @@ int main(int argc, char **argv)
 	//
 	GameControlManager* gameControlMgr = new GameControlManager(20, 0,
 			"ManagersChain");
+	GameSceneManager* gameSceneMgr = new GameSceneManager(25, 0,
+			"ManagersChain");
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(30, 0,
 			"ManagersChain");
 	GameAudioManager* gameAudioMgr = new GameAudioManager(60, 0,
 			"ManagersChain");
 #else
 	GameControlManager* gameControlMgr = new GameControlManager();
+	GameSceneManager* gameSceneMgr = new GameSceneManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 #endif
@@ -115,6 +118,7 @@ int main(int argc, char **argv)
 	// Close the game framework
 	delete gameAudioMgr;
 	delete gamePhysicsMgr;
+	delete gameSceneMgr;
 	delete gameControlMgr;
 	delete gameMgr;
 	delete objectTmplMgr;
