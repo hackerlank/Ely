@@ -100,7 +100,8 @@ private:
 
 	///@{
 	///A task data for update.
-	SMARTPTR(TaskInterface<GameAudioManager>::TaskData) mUpdateData;SMARTPTR(AsyncTask) mUpdateTask;
+	SMARTPTR(TaskInterface<GameAudioManager>::TaskData) mUpdateData;
+	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

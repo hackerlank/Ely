@@ -127,7 +127,8 @@ private:
 
 	///@{
 	///A task data for step simulation update.
-	SMARTPTR(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;SMARTPTR(AsyncTask) mUpdateTask;
+	SMARTPTR(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;
+	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
 	///The last time update was called

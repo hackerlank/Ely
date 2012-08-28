@@ -72,6 +72,14 @@ void TerrainTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("height_scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("width_scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("update_interval", "0.1"));
+	mParameterTable.insert(ParameterNameValue("block_size", "64"));
+	mParameterTable.insert(ParameterNameValue("near_percent", "0.1"));
+	mParameterTable.insert(ParameterNameValue("far_percent", "1.0"));
+	mParameterTable.insert(ParameterNameValue("brute_force", "true"));
 }
 
 //TypedObject semantics: hardcoded
