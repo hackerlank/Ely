@@ -28,7 +28,6 @@
 #include <list>
 #include <cstdlib>
 #include <geoMipTerrain.h>
-#include <nodePath.h>
 #include <filename.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
@@ -45,7 +44,6 @@ class GeoMipTerrainRef;
  * - "heightfield_file"  		|single|no default
  * - "height_scale"				|single|"1.0"
  * - "width_scale"				|single|"1.0"
- * - "update_interval"			|single|"0.1"
  * - "block_size"				|single|"64"
  * - "near_percent"				|single|"0.1"
  * - "far_percent"				|single|"1.0"
