@@ -36,6 +36,8 @@
 
 class TerrainTemplate;
 
+class GeoMipTerrainRef;
+
 /**
  * \brief Component representing the terrain model of an object.
  *
@@ -57,7 +59,7 @@ class Terrain: public Component
 {
 public:
 	Terrain();
-	Terrain(SMARTPTR(TerrainTemplate) tmpl);
+	Terrain(SMARTPTR(TerrainTemplate)tmpl);
 	virtual ~Terrain();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -68,7 +70,7 @@ public:
 
 private:
 	///The GeoMipTerrain associated to this component.
-	SMARTPTR(GeoMipTerrain) mTerrain;
+	SMARTPTR(GeoMipTerrainRef) mTerrain;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -94,6 +96,39 @@ public:
 private:
 	static TypeHandle _type_handle;
 
+};
+
+/**
+ * \brief GeoMipTerrain class with possibility to be reference counted.
+ */
+class GeoMipTerrainRef: public GeoMipTerrain, public ReferenceCount
+{
+public:
+	GeoMipTerrainRef(const std::string& name);
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedObject::init_type();
+		register_type(_type_handle, "GeoMipTerrainRef", TypedObject::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
 };
 
 #endif /* TERRAIN_H_ */

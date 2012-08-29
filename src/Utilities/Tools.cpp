@@ -51,4 +51,5 @@ void initTypedObjects()
 	NodePathWrapperTemplate::init_type();
 	Terrain::init_type();
 	TerrainTemplate::init_type();
+	GeoMipTerrainRef::init_type();
 }

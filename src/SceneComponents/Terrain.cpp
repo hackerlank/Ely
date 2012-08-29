@@ -54,6 +54,22 @@ bool Terrain::initialize()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+// * - "heightfield_file"  		|single|no default
+// * - "height_scale"			|single|"1.0"
+// * - "width_scale"			|single|"1.0"
+// * - "update_interval"		|single|"0.1"
+// * - "block_size"				|single|"64"
+// * - "near_percent"			|single|"0.1"
+// * - "far_percent"			|single|"1.0"
+// * - "brute_force"			|single|"true"
+// * - "auto_flatten"			|single|"AFM_medium"
+// * - "texture_file"			|single|no default
+// * - "texture_uscale"			|single|"1.0"
+// * - "texture_vscale"			|single|"1.0"
+
+	//setup physical parameters
+
+
 	bool result = true;
 	//setup event callbacks if any
 	setupEvents();
@@ -68,27 +84,13 @@ void Terrain::onAddToObjectSetup()
 
 	//set the node path of the object to the
 	//node path of this model
-	mOwnerObject->setNodePath(mNodePath);
+	mOwnerObject->setNodePath(mTerrain->get_root());
 	//register event callbacks if any
 	registerEventCallbacks();
-}
-
-NodePath Terrain::getNodePath() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void Terrain::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
 }
 
 //TypedObject semantics: hardcoded
 TypeHandle Terrain::_type_handle;
 
+//TypedObject semantics: hardcoded
+TypeHandle GeoMipTerrainRef::_type_handle;
