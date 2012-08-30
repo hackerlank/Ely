@@ -29,6 +29,9 @@
 #include <cstdlib>
 #include <geoMipTerrain.h>
 #include <filename.h>
+#include <pnmImage.h>
+#include <texture.h>
+#include <texturePool.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"

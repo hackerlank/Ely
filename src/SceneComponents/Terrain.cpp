@@ -54,20 +54,8 @@ bool Terrain::initialize()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-// * - "heightfield_file"  		|single|no default
-// * - ""			|single|"1.0"
-// * - ""			|single|"1.0"
-// * - ""				|single|"64"
-// * - ""			|single|"0.1"
-// * - ""			|single|"1.0"
-// * - ""			|single|"true"
-// * - ""			|single|"AFM_medium"
-// * - "texture_file"			|single|no default
-// * - "texture_uscale"			|single|"1.0"
-// * - "texture_vscale"			|single|"1.0"
-
 	bool result = true;
-	//set scale
+	//get scale
 	float heightScale = atof(
 			mTmpl->parameter(std::string("height_scale")).c_str());
 	if (heightScale <= 0.0)
@@ -80,7 +68,7 @@ bool Terrain::initialize()
 	{
 		widthScale = 1.0;
 	}
-	//set LOD
+	//get LOD
 	float nearPercent = atof(
 			mTmpl->parameter(std::string("near_percent")).c_str());
 	float farPercent = atof(
@@ -91,17 +79,17 @@ bool Terrain::initialize()
 		farPercent = 1.0;
 		nearPercent = 0.1;
 	}
-	//set block size
+	//get block size
 	int blockSize = atoi(mTmpl->parameter(std::string("block_size")).c_str());
 	if (blockSize <= 0)
 	{
 		blockSize = 64;
 	}
-	//set brute force
+	//get brute force
 	bool bruteForce = (
 			mTmpl->parameter(std::string("brute_force"))
 					== std::string("false") ? false : true);
-	//set auto flatten
+	//get auto flatten
 	std::string autoFlatten = mTmpl->parameter(std::string("auto_flatten"));
 	GeoMipTerrain::AutoFlattenMode flattenMode;
 	if (autoFlatten == "AFM_off")
@@ -120,8 +108,41 @@ bool Terrain::initialize()
 	{
 		flattenMode = GeoMipTerrain::AFM_medium;
 	}
-	//set heightfield file
-
+	//get heightfield image
+	PNMImage heightField(
+			Filename(mTmpl->parameter(std::string("heightfield_file"))));
+	//get texture scale
+	float textureUscale = atof(
+			mTmpl->parameter(std::string("texture_uscale")).c_str());
+	if (textureUscale <= 0.0)
+	{
+		textureUscale = 1.0;
+	}
+	float textureVscale = atof(
+			mTmpl->parameter(std::string("texture_vscale")).c_str());
+	if (textureVscale <= 0.0)
+	{
+		textureVscale = 1.0;
+	}
+	//get texture
+	SMARTPTR(Texture)textureImage = TexturePool::load_texture(
+			Filename(mTmpl->parameter(std::string("texture_file"))));
+	//create the actual terrain
+	//terrain definition
+	mTerrain = new GeoMipTerrainRef(
+			std::string("terrain") + std::string(mComponentId));
+	//set height field
+	if (not mTerrain->set_heightfield(heightField))
+	{
+		result = false;
+	}
+	//sizing
+	float environmentWidthX = (heightField.get_x_size() - 1) * widthScale;
+	float environmentWidthY = (heightField.get_y_size() - 1) * widthScale;
+	float environmentWidth = (environmentWidthX + environmentWidthY) / 2.0;
+	//set terrain properties
+//////////////////////////
+/////////////////////////
 	//setup event callbacks if any
 	setupEvents();
 	//
