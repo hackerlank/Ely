@@ -97,9 +97,9 @@
 				<Param events="shift-up"/>
 			</Component>
 			<Param parent=""/>
-			<Param pos_z="400.0"/>
-			<Param pos_x="512.0"/>
-			<Param pos_y="512.0"/>
+			<Param pos_x="0.0"/>
+			<Param pos_y="-50.0"/>
+			<Param pos_z="20.0"/>
 		</Object>
 
 		<Object type="InstancedActor" id="InstancedTeapot1">
@@ -137,7 +137,7 @@
 			</Component>
 			<Param parent=""/>
 		</Object>
-		
+
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model" priority="100">
 				<Param from_file="false"/>
@@ -219,7 +219,6 @@
 			<Param rot_r="0.0"/>
 		</Object>
 		
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
@@ -227,14 +226,13 @@
 				<Param height_scale="200.0"/>
 				<Param width_scale="2.0"/>
 				<Param brute_force="false"/>
-				<Param auto_flatten="AFM_off"/>
-				<Param focal_point="camera"/>
+				<Param auto_flatten="AFM_strong"/>
+				<Param focal_point="Actor1"/>
 				<Param near_percent="0.1"/>
 				<Param far_percent="0.7"/>
 			</Component>
 			<Param parent="render"/>
 		</Object>
--->
 
 	</ObjectSet>
 </Game>

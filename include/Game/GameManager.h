@@ -143,7 +143,6 @@ protected:
 	/// Common members
 	WindowFramework * mWindow;
 	NodePath mRender;
-	NodePath mCamera;
 	SMARTPTR(ClockObject) mGlobalClock;
 
 	/// NodePaths for enable_mouse/disable_mouse.

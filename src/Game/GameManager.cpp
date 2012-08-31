@@ -40,6 +40,8 @@ GameManager::GameManager(int argc, char* argv[]) :
 		// common setup
 		mWindow->enable_keyboard(); // Enable keyboard detection
 		mRender = mWindow->get_render();
+		mTrackBall = mWindow->get_mouse().find("**/+Trackball");
+		mMouse2cam = mTrackBall.find("**/+Transform2SG");
 		mGlobalClock = ClockObject::get_global_clock();
 	}
 	else
@@ -56,17 +58,16 @@ GameManager::~GameManager()
 
 void GameManager::initialize()
 {
-	mWindow->setup_trackball(); // Enable default camera movement
-	mTrackBall = mWindow->get_mouse().find("**/+Trackball");
-	mMouse2cam = mTrackBall.find("**/+Transform2SG");
-	mCamera = mWindow->get_camera_group();
-	//setup camera position
-	mCamera.set_pos(0, 0, 20);
-	mCamera.look_at(0, 0, 10);
-	LMatrix4 cameraMat = mCamera.get_transform()->get_mat();
-	cameraMat.invert_in_place();
-	SMARTPTR(Trackball)trackBall = DCAST(Trackball, mTrackBall.node());
-	trackBall->set_mat(cameraMat);
+	///<DEFAULT CAMERA CONTROL>
+//	mWindow->setup_trackball(); // Enable default camera movement
+//	//setup camera position
+//	mWindow->get_camera_group().set_pos(0, -50, 20);
+//	mWindow->get_camera_group().look_at(0, 0, 10);
+//	LMatrix4 cameraMat = mWindow->get_camera_group().get_transform()->get_mat();
+//	cameraMat.invert_in_place();
+//	SMARTPTR(Trackball)trackBall = DCAST(Trackball, mTrackBall.node());
+//	trackBall->set_mat(cameraMat);
+	///</DEFAULT CAMERA CONTROL>
 
 #ifdef DEBUG
 	GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
@@ -88,6 +89,11 @@ void GameManager::initialize()
 
 void GameManager::setupGameWorld()
 {
+	//camera
+	SMARTPTR(Object)camera =
+	ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
+	camera->getNodePath().look_at(0, 0, 10);
+
 	//Actor1
 	SMARTPTR(Object)actor1 =
 	ObjectTemplateManager::GetSingleton().getCreatedObject("Actor1");
@@ -112,9 +118,9 @@ void GameManager::setupGameWorld()
 	plane1Model->getNodePath().set_tex_scale(planeTS0, 1000, 1000);
 
 	//Terrain1
-//	SMARTPTR(Object)terrain1 =
-//	ObjectTemplateManager::GetSingleton().getCreatedObject("Terrain1");
-//	terrain1->getNodePath().set_render_mode_wireframe(1);
+	SMARTPTR(Object)terrain1 =
+	ObjectTemplateManager::GetSingleton().getCreatedObject("Terrain1");
+	terrain1->getNodePath().set_render_mode_wireframe(1);
 
 	mControlGrabbed = false;
 	//enable/disable Actor1 control by event
@@ -496,24 +502,78 @@ void GameManager::toggleActor1Control(const Event* event, void* data)
 		//if enabled then disable it
 		//disable
 		actor1Control->disable();
-		//reset trackball transform
-		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
-		cameraMat.invert_in_place();
-		SMARTPTR(Trackball)trackBall =
-		DCAST(Trackball, gameManager->mTrackBall.node());
-		trackBall->set_mat(cameraMat);
-		//(re)enable trackball
-		gameManager->enable_mouse();
+
+		///<DEFAULT CAMERA CONTROL>
+//		//reset trackball transform
+//		LMatrix4 cameraMat = mWindow->get_camera_group().get_transform()->get_mat();
+//		cameraMat.invert_in_place();
+//		SMARTPTR(Trackball)trackBall =
+//		DCAST(Trackball, gameManager->mTrackBall.node());
+//		trackBall->set_mat(cameraMat);
+//		//(re)enable trackball
+//		gameManager->enable_mouse();
+		///</DEFAULT CAMERA CONTROL>
+
 		//
 		gameManager->mControlGrabbed = false;
 	}
 	else if (not gameManager->mControlGrabbed)
 	{
 		//if disabled then enable it
-		//disable the trackball
-		gameManager->disable_mouse();
+
+		///<DEFAULT CAMERA CONTROL>
+//		//disable the trackball
+//		gameManager->disable_mouse();
+		///</DEFAULT CAMERA CONTROL>
+
 		//enable
 		actor1Control->enable();
+		//
+		gameManager->mControlGrabbed = true;
+	}
+
+}
+
+void GameManager::toggleCameraControl(const Event* event, void* data)
+{
+	GameManager* gameManager = (GameManager*) data;
+	SMARTPTR(Object)camera =
+	ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
+	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+					ComponentFamilyType("Control")));
+	bool isEnabled = cameraControl->isEnabled();
+
+	if (isEnabled)
+	{
+		//if enabled then disable it
+		//disable
+		cameraControl->disable();
+
+		///<DEFAULT CAMERA CONTROL>
+//		//reset trackball transform
+//		LMatrix4 cameraMat = mWindow->get_camera_group().get_transform()->get_mat();
+//		cameraMat.invert_in_place();
+//		SMARTPTR(Trackball)trackBall =
+//		DCAST(Trackball, gameManager->mTrackBall.node());
+//		trackBall->set_mat(cameraMat);
+//		//(re)enable trackball
+//		gameManager->enable_mouse();
+		///</DEFAULT CAMERA CONTROL>
+
+		//
+		gameManager->mControlGrabbed = false;
+	}
+	else if (not gameManager->mControlGrabbed)
+	{
+		//if disabled then enable it
+
+		///<DEFAULT CAMERA CONTROL>
+//		//disable the trackball
+//		gameManager->disable_mouse();
+		///</DEFAULT CAMERA CONTROL>
+
+		//enable
+		cameraControl->enable();
 		//
 		gameManager->mControlGrabbed = true;
 	}
@@ -536,40 +596,3 @@ void GameManager::togglePhysicsDebug(const Event* event, void* data)
 }
 #endif
 
-void GameManager::toggleCameraControl(const Event* event, void* data)
-{
-	GameManager* gameManager = (GameManager*) data;
-	SMARTPTR(Object)camera =
-	ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
-	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
-					ComponentFamilyType("Control")));
-	bool isEnabled = cameraControl->isEnabled();
-
-	if (isEnabled)
-	{
-		//if enabled then disable it
-		//disable
-		cameraControl->disable();
-		//reset trackball transform
-		LMatrix4 cameraMat = gameManager->mCamera.get_transform()->get_mat();
-		cameraMat.invert_in_place();
-		SMARTPTR(Trackball)trackBall =
-		DCAST(Trackball, gameManager->mTrackBall.node());
-		trackBall->set_mat(cameraMat);
-		//(re)enable trackball
-		gameManager->enable_mouse();
-		//
-		gameManager->mControlGrabbed = false;
-	}
-	else if (not gameManager->mControlGrabbed)
-	{
-		//if disabled then enable it
-		//disable the trackball
-		gameManager->disable_mouse();
-		//enable
-		cameraControl->enable();
-		//
-		gameManager->mControlGrabbed = true;
-	}
-
-}
