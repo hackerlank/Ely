@@ -103,11 +103,11 @@ bool Terrain::initialize()
 	{
 		flattenMode = GeoMipTerrain::AFM_off;
 	}
-	if (autoFlatten == "AFM_light")
+	else if (autoFlatten == "AFM_light")
 	{
 		flattenMode = GeoMipTerrain::AFM_light;
 	}
-	if (autoFlatten == "AFM_strong")
+	else if (autoFlatten == "AFM_strong")
 	{
 		flattenMode = GeoMipTerrain::AFM_strong;
 	}
@@ -212,7 +212,7 @@ void Terrain::update(void* data)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	float dt = *(reinterpret_cast<float*>(data));
+//	float dt = *(reinterpret_cast<float*>(data));
 
 	//update every frame
 	mTerrain->update();

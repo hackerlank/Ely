@@ -14,7 +14,7 @@
 			<ComponentTmpl family="Control" type="Driver"/>
 			<ComponentTmpl family="Audio" type="Listener"/>
 		</ObjectTmpl>
-		
+<!--		
 		<ObjectTmpl type="Actor">
 			<ComponentTmpl family="Scene" type="Model"/>
 			<ComponentTmpl family="Behavior" type="Activity"/>
@@ -38,12 +38,12 @@
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
 		</ObjectTmpl>
-		
+-->		
 		<ObjectTmpl type="Terrain">
 			<ComponentTmpl family="Scene" type="Terrain"/>
-			<ComponentTmpl family="Physics" type="RigidBody"/> 
+			<!--<ComponentTmpl family="Physics" type="RigidBody"/> --> 
 		</ObjectTmpl>
-		
+
 	</ObjectTmplSet>
 
 	<!-- ------------------------------------------------ -->
@@ -95,7 +95,8 @@
 			</Component>
 			<Param parent=""/>
 		</Object>
-		
+
+<!--	
 		<Object type="InstancedActor" id="InstancedTeapot1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
@@ -212,6 +213,19 @@
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
-		
+-->
+		<Object type="Terrain" id="Terrain1">
+			<Component type="Terrain">
+				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
+				<Param texture_file="terrain.png"/>
+				<Param height_scale="200.0"/>
+				<Param width_scale="2.0"/>
+				<Param brute_force="true"/>
+				<Param auto_flatten="AFM_medium"/>
+				<Param focal_point="camera"/>
+			</Component>
+			<Param parent="render"/>
+			<Param rot_p="-90.0"/>
+		</Object>
 	</ObjectSet>
 </Game>
