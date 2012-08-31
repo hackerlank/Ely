@@ -427,8 +427,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 							attribute->Value()));
 		}
 		objectTmplPtr->setParameters(objParameterTable);
-		//give a chance to object (and its components) to manageObjects
-		//when being added to scene.
+		//give a chance to object (and its components) to customize
+		//themselves when being added to scene.
 		objectPtr->sceneSetup();
 		//remove top object from the priority queue
 		orderedObjects.pop();

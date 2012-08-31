@@ -29,7 +29,7 @@ InstanceOf::InstanceOf()
 	// TODO Auto-generated constructor stub
 }
 
-InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate) tmpl)
+InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl)
 {
 	mTmpl = tmpl;
 }
@@ -85,9 +85,9 @@ void InstanceOf::onAddToObjectSetup()
 	//if not this component is instance of nothing.
 	ObjectId instanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
-	SMARTPTR(Object) createdObject =
-			mOwnerObject->objectTmpl()->objectTmplMgr()->getCreatedObject(
-					instanceOfId);
+	SMARTPTR(Object)createdObject =
+	ObjectTemplateManager::GetSingleton().getCreatedObject(
+			instanceOfId);
 	if (createdObject != NULL)
 	{
 		createdObject->getNodePath().instance_to(mOwnerObject->getNodePath());

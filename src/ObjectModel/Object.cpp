@@ -142,7 +142,7 @@ void Object::sceneSetup()
 			mTmpl->parameter(std::string("is_static")) == std::string("true") ?
 					true : false);
 	//find parent into the created objects
-	SMARTPTR(Object)createdObject = mTmpl->objectTmplMgr()->getCreatedObject(parentId);
+	SMARTPTR(Object)createdObject = ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
 	if (createdObject != NULL)
 	{
 		//reparent to parent

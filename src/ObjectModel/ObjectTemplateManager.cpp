@@ -111,7 +111,10 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType obje
 }
 
 SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
-		ObjectId objectId)
+		ObjectId objectId,
+		bool createWithParams,
+		const ParameterTable& objTmplParams,
+		const ParameterTableMap& compTmplParams)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -143,6 +146,21 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	{
 		//use ComponentTemplateManager to create component
 		ComponentType compType = (*it2).p()->componentType();
+		//check if we have to initialize parameters of this component template
+		if(createWithParams)
+		{
+			//initialize parameters' component template to defaults
+			(*it2).p()->setParametersDefaults();
+			//set parameters for this component template...
+			ParameterTableMap::const_iterator it3;
+			it3 = compTmplParams.find(std::string(compType));
+			if (it3 != compTmplParams.end())
+			{
+				//...if not empty
+				(*it2).p()->setParameters(it3->second);
+			}
+		}
+		//
 		SMARTPTR(Component) newComp =
 		ComponentTemplateManager::GetSingleton().createComponent(
 				compType);
@@ -153,9 +171,24 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		}
 		newObj->addComponent(newComp);
 	}
+	//check if we have to initialize parameters of this object template
+	if(createWithParams)
+	{
+		//initialize parameters' object template to defaults
+		objectTmpl->setParametersDefaults();
+		//set parameters for this object template...
+		if(not objTmplParams.empty())
+		{
+			//...if not empty
+			objectTmpl->setParameters(objTmplParams);
+		}
+		//give a chance to object (and its components) to customize
+		//themselves when being added to scene.
+		newObj->sceneSetup();
+	}
+	//
 	//insert the just created object in the table of created objects
 	mCreatedObjects[newId] = newObj;
-	//
 	return newObj;
 }
 

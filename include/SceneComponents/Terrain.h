@@ -27,14 +27,17 @@
 #include <string>
 #include <list>
 #include <cstdlib>
+#include <algorithm>
 #include <geoMipTerrain.h>
 #include <filename.h>
 #include <pnmImage.h>
 #include <texture.h>
 #include <texturePool.h>
+#include <textureStage.h>
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include "Game/GameSceneManager.h"
 
 class TerrainTemplate;
 
@@ -52,6 +55,7 @@ class GeoMipTerrainRef;
  * - "far_percent"				|single|"1.0"
  * - "brute_force"				|single|"true"
  * - "auto_flatten"				|single|"AFM_medium"
+ * - "focal_point"				|single|"camera"
  * - "texture_file"				|single|no default
  * - "texture_uscale"			|single|"1.0"
  * - "texture_vscale"			|single|"1.0"
@@ -69,9 +73,22 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
+	/**
+	 * \brief Updates the terrain associated to this component.
+	 *
+	 * Will be called automatically by an scene manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
+
 private:
 	///The GeoMipTerrain associated to this component.
 	SMARTPTR(GeoMipTerrainRef) mTerrain;
+
+	///The focal point
+	ObjectId mFocalPoint;
+	///Flag if brute force is enabled.
+	bool mBruteForce;
 
 	///TypedObject semantics: hardcoded
 public:

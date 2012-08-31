@@ -62,7 +62,7 @@ public:
 	 * @return SMARTPTR(NULL) if there wasn't a template for that object, otherwise
 	 * the previous template.
 	 */
-	SMARTPTR(ObjectTemplate) addObjectTemplate(SMARTPTR(ObjectTemplate) objectTmpl);
+	SMARTPTR(ObjectTemplate)addObjectTemplate(SMARTPTR(ObjectTemplate) objectTmpl);
 
 	/**
 	 * \brief Removes the object template given the object type it can create.
@@ -81,12 +81,47 @@ public:
 	/**
 	 * \brief Creates a object given its type and a NodePath.
 	 *
-	 * The type is needed to select the correct template.
+	 * The type is needed to select the correct template.\n
+	 * The object creation process can be made in two different ways:
+	 * -# single thread way:
+	 * 	- the initial parameters' values of each component, are setup
+	 * 	on each component template (through ComponentTemplate::setParameters())
+	 * 	- the object and its components are created (through this function)
+	 * 	- the initial parameters' values of the object, are setup
+	 * 	on the object template (through ObjectTemplate::setParameters())
+	 * 	- Object::sceneSetup() is called to give a chance to object 
+	 * 	(and its components) to customize themselves when being added to scene.
+	 * -# multi threads way:
+	 * 	- all the operations shown in the single threads way are performed 
+	 * 	through this function, by passing it object template and components'
+	 * 	templates parameters directly.
+	 * The third parameter indicates that parameters for the object template
+	 * and for component templates (fourth and fifth parameters) are passed
+	 * directly to this function, in fact choosing between the "single thread"
+	 * or "multi-threads" object creation ways: to create an object in a
+	 * "multi-threads" environment, this parameter should be set true and
+	 * objTmplParams and compTmplParams should be set to initialization
+	 * parameters of object and components respectively. By default the
+	 * creation process is "single thread".
+	 *
+	 * \note this distinction between these two creation way is needed
+	 * because both object templates and component templates are shared
+	 * resource.
+	 *
 	 * @param objectType The object type.
 	 * @param objectId The object id.
+	 * @param createWithParams Indicates if parameters for object and
+	 * component templates are passed directly.
+	 * @param objTmplParams Object template parameter table used to setup the
+	 * object in the scene.
+	 * @param compTmplParams Map of component  templates' parameter tables,
+	 * indexed by component type, used to initialize the object components.
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
-	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""));
+	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""),
+			bool createWithParams = false,
+			const ParameterTable& objTmplParams = ParameterTable(),
+			const ParameterTableMap& compTmplParams = ParameterTableMap());
 
 	/**
 	 * \brief Object templates and object tables typedefs.

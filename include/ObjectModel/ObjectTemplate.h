@@ -120,7 +120,7 @@ public:
 	 * set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
-	void setParameters(ParameterTable& parameterTable);
+	void setParameters(const ParameterTable& parameterTable);
 
 	/**
 	 * \brief For the object this template is designed to create,

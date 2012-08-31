@@ -209,6 +209,7 @@ template<typename A> struct TaskInterface
 typedef std::multimap<std::string, std::string> ParameterTable;
 typedef std::multimap<std::string, std::string>::iterator ParameterTableIter;
 typedef std::multimap<std::string, std::string>::const_iterator ParameterTableConstIter;
+typedef std::map<std::string, ParameterTable> ParameterTableMap;
 typedef std::pair<std::string, std::string> ParameterNameValue;
 
 ///Macros representing the path to dynamic linked libraries loaded at runtime

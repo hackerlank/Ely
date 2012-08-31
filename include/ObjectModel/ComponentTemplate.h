@@ -55,8 +55,8 @@ public:
 	virtual ~ComponentTemplate();
 
 	/**
-	 * \brief Gets the id of the component created.
-	 * @return The id of the component created.
+	 * \brief Gets the type id of the component created.
+	 * @return The type id of the component created.
 	 */
 	virtual const ComponentType componentType() const = 0;
 	/**

@@ -23,6 +23,7 @@
 
 #include "SceneComponents/Terrain.h"
 #include "SceneComponents/TerrainTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 Terrain::Terrain()
 {
@@ -36,6 +37,12 @@ Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
 
 Terrain::~Terrain()
 {
+	//Remove from the scene manager update
+	//first check if game scene manager exists
+	if (GameSceneManager::GetSingletonPtr())
+	{
+		GameSceneManager::GetSingletonPtr()->removeFromSceneUpdate(this);
+	}
 	mTerrain->get_root().remove_node();
 }
 
@@ -86,7 +93,7 @@ bool Terrain::initialize()
 		blockSize = 64;
 	}
 	//get brute force
-	bool bruteForce = (
+	mBruteForce = (
 			mTmpl->parameter(std::string("brute_force"))
 					== std::string("false") ? false : true);
 	//get auto flatten
@@ -108,6 +115,8 @@ bool Terrain::initialize()
 	{
 		flattenMode = GeoMipTerrain::AFM_medium;
 	}
+	//get focal point
+	mFocalPoint = ObjectId(mTmpl->parameter(std::string("focal_point")));
 	//get heightfield image
 	PNMImage heightField(
 			Filename(mTmpl->parameter(std::string("heightfield_file"))));
@@ -140,9 +149,23 @@ bool Terrain::initialize()
 	float environmentWidthX = (heightField.get_x_size() - 1) * widthScale;
 	float environmentWidthY = (heightField.get_y_size() - 1) * widthScale;
 	float environmentWidth = (environmentWidthX + environmentWidthY) / 2.0;
-	//set terrain properties
-//////////////////////////
-/////////////////////////
+	//set terrain properties effectively
+	mTerrain->set_block_size(blockSize);
+	mTerrain->set_near(nearPercent * environmentWidth);
+	mTerrain->set_far(farPercent * environmentWidth);
+	//other properties
+	float terrainLODmin = min<float>(0, mTerrain->get_max_level());
+	mTerrain->set_min_level(terrainLODmin);
+	mTerrain->set_auto_flatten(flattenMode);
+	mTerrain->set_bruteforce(mBruteForce);
+	mTerrain->get_root().set_sx(widthScale);
+	mTerrain->get_root().set_sy(widthScale);
+	mTerrain->get_root().set_sz(heightScale);
+	//terrain texturing
+	mTerrain->get_root().set_tex_scale(TextureStage::get_default(),
+			textureUscale, textureVscale);
+	mTerrain->get_root().set_texture(TextureStage::get_default(), textureImage,
+			1);
 	//setup event callbacks if any
 	setupEvents();
 	//
@@ -157,12 +180,53 @@ void Terrain::onAddToObjectSetup()
 	//set the node path of the object to the
 	//node path of this model
 	mOwnerObject->setNodePath(mTerrain->get_root());
+	//set the focal point
+	SMARTPTR(Object)createdObject =
+	ObjectTemplateManager::GetSingleton().getCreatedObject(
+			mFocalPoint);
+	if (createdObject != NULL)
+	{
+		mTerrain->set_focal_point(createdObject->getNodePath());
+	}
+	else
+	{
+		//set render as focal point
+		createdObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
+				"render");
+		mTerrain->set_focal_point(createdObject->getNodePath());
+	}
+	//Generate the terrain
+	mTerrain->generate();
+	//Add to the scene manager update if not brute force
+	//first check if game scene manager exists
+	if (GameSceneManager::GetSingletonPtr() and (not mBruteForce))
+	{
+		GameSceneManager::GetSingletonPtr()->addToSceneUpdate(this);
+	}
 	//register event callbacks if any
 	registerEventCallbacks();
+}
+
+void Terrain::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+
+	//update every frame
+	mTerrain->update();
 }
 
 //TypedObject semantics: hardcoded
 TypeHandle Terrain::_type_handle;
 
+///GeoMipTerrainRef stuff
+GeoMipTerrainRef::GeoMipTerrainRef(const std::string& name) :
+		GeoMipTerrain(name)
+{
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle GeoMipTerrainRef::_type_handle;
+

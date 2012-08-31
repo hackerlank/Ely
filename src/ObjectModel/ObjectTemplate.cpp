@@ -103,12 +103,12 @@ ObjectTemplateManager* const ObjectTemplate::objectTmplMgr() const
 	return mObjectTmplMgr;
 }
 
-void ObjectTemplate::setParameters(ParameterTable& parameterTable)
+void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ParameterTableIter iter;
+	ParameterTableConstIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters
 	//that will overwrite those of mParameterTable with the same name)
@@ -155,7 +155,7 @@ std::string ObjectTemplate::parameter(const std::string& paramName)
 	HOLDMUTEX(mMutex)
 
 	std::string strPtr;
-	ParameterTable::iterator iter;
+	ParameterTableConstIter::iterator iter;
 	iter = mParameterTable.find(paramName);
 	//return a reference to a parameter value only if it exists
 	if (iter != mParameterTable.end())
