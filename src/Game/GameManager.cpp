@@ -39,11 +39,7 @@ GameManager::GameManager(int argc, char* argv[]) :
 		PRINT("Opened the window successfully!");
 		// common setup
 		mWindow->enable_keyboard(); // Enable keyboard detection
-		mWindow->setup_trackball(); // Enable default camera movement
-		mTrackBall = mWindow->get_mouse().find("**/+Trackball");
-		mMouse2cam = mTrackBall.find("**/+Transform2SG");
 		mRender = mWindow->get_render();
-		mCamera = mWindow->get_camera_group();
 		mGlobalClock = ClockObject::get_global_clock();
 	}
 	else
@@ -60,13 +56,16 @@ GameManager::~GameManager()
 
 void GameManager::initialize()
 {
+	mWindow->setup_trackball(); // Enable default camera movement
+	mTrackBall = mWindow->get_mouse().find("**/+Trackball");
+	mMouse2cam = mTrackBall.find("**/+Transform2SG");
+	mCamera = mWindow->get_camera_group();
 	//setup camera position
-	mCamera.set_pos(0, -50, 20);
+	mCamera.set_pos(0, 0, 20);
 	mCamera.look_at(0, 0, 10);
 	LMatrix4 cameraMat = mCamera.get_transform()->get_mat();
 	cameraMat.invert_in_place();
-	NodePath trackBallNP = mWindow->get_mouse().find("**/+Trackball");
-	SMARTPTR(Trackball)trackBall = DCAST(Trackball, trackBallNP.node());
+	SMARTPTR(Trackball)trackBall = DCAST(Trackball, mTrackBall.node());
 	trackBall->set_mat(cameraMat);
 
 #ifdef DEBUG
@@ -76,17 +75,18 @@ void GameManager::initialize()
 
 	//initialize typed objects
 	initTypedObjects();
+
 	//manageObjects component template manager
 	setupCompTmplMgr();
 
-	//manageObjects game world (static)
+	//create the game world (static definition)
 	createGameWorld(std::string("game.xml"));
 
-	// Manipulate objects
-	manageObjects();
+	//setup the game world
+	setupGameWorld();
 }
 
-void GameManager::manageObjects()
+void GameManager::setupGameWorld()
 {
 	//Actor1
 	SMARTPTR(Object)actor1 =
@@ -110,6 +110,11 @@ void GameManager::manageObjects()
 	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
 	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
 	plane1Model->getNodePath().set_tex_scale(planeTS0, 1000, 1000);
+
+	//Terrain1
+//	SMARTPTR(Object)terrain1 =
+//	ObjectTemplateManager::GetSingleton().getCreatedObject("Terrain1");
+//	terrain1->getNodePath().set_render_mode_wireframe(1);
 
 	mControlGrabbed = false;
 	//enable/disable Actor1 control by event

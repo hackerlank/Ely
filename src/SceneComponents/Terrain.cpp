@@ -164,8 +164,11 @@ bool Terrain::initialize()
 	//terrain texturing
 	mTerrain->get_root().set_tex_scale(TextureStage::get_default(),
 			textureUscale, textureVscale);
-	mTerrain->get_root().set_texture(TextureStage::get_default(), textureImage,
-			1);
+	if (textureImage != NULL)
+	{
+		mTerrain->get_root().set_texture(TextureStage::get_default(),
+				textureImage, 1);
+	}
 	//setup event callbacks if any
 	setupEvents();
 	//

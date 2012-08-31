@@ -16,7 +16,7 @@ GameSceneManager::GameSceneManager(int sort, int priority,
 	//create the task for updating the control components
 	mUpdateData = new TaskInterface<GameSceneManager>::TaskData(this,
 			&GameSceneManager::update);
-	mUpdateTask = new GenericAsyncTask("GameControlManager::update",
+	mUpdateTask = new GenericAsyncTask("GameSceneManager::update",
 			&TaskInterface<GameSceneManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//set sort/priority

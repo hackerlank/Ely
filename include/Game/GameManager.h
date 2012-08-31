@@ -152,7 +152,7 @@ protected:
 	/**
 	 * \brief Put here custom game object management code.
 	 */
-	virtual void manageObjects();
+	virtual void setupGameWorld();
 
 	/// 1nd task.
 	SMARTPTR(TaskInterface<GameManager>::TaskData) m1stTask;
