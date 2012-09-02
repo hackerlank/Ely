@@ -33,7 +33,6 @@ extern "C"
 
 ///Camera + Driver related
 CALLBACK drive;
-CALLBACK speed;
 
 ///Actor1 + Activity related
 CALLBACK state;

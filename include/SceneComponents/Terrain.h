@@ -85,9 +85,16 @@ public:
 private:
 	///The GeoMipTerrain associated to this component.
 	SMARTPTR(GeoMipTerrainRef) mTerrain;
-
-	///The focal point
-	ObjectId mFocalPoint;
+	/**
+	 * \name Focal point stuff.
+	 */
+	///@{
+	///The object to be focal point .
+	ObjectId mFocalPointObject;
+	///The focal point NodePath.
+	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
+	NodePath mFocalPointNP;
+	///@}
 	///Flag if brute force is enabled.
 	bool mBruteForce;
 

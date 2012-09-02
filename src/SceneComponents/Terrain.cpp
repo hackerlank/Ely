@@ -116,7 +116,7 @@ bool Terrain::initialize()
 		flattenMode = GeoMipTerrain::AFM_medium;
 	}
 	//get focal point
-	mFocalPoint = ObjectId(mTmpl->parameter(std::string("focal_point")));
+	mFocalPointObject = ObjectId(mTmpl->parameter(std::string("focal_point")));
 	//get minimum level
 	int minimumLevel = atoi(
 			mTmpl->parameter(std::string("minimum_level")).c_str());
@@ -193,18 +193,14 @@ void Terrain::onAddToObjectSetup()
 	//set the focal point
 	SMARTPTR(Object)createdObject =
 	ObjectTemplateManager::GetSingleton().getCreatedObject(
-			mFocalPoint);
-	if (createdObject != NULL)
-	{
-		mTerrain->set_focal_point(createdObject->getNodePath());
-	}
-	else
+			mFocalPointObject);
+	if (createdObject == NULL)
 	{
 		//set render as focal point
 		createdObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
 				"render");
-		mTerrain->set_focal_point(createdObject->getNodePath());
 	}
+	mFocalPointNP = createdObject->getNodePath();
 	//Generate the terrain
 	mTerrain->generate();
 	//Add to the scene manager update if not brute force
@@ -224,6 +220,9 @@ void Terrain::update(void* data)
 
 //	float dt = *(reinterpret_cast<float*>(data));
 
+	//set focal point
+	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
+	mTerrain->set_focal_point(mFocalPointNP.get_pos());
 	//update every frame
 	mTerrain->update();
 }

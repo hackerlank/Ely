@@ -49,8 +49,8 @@ CALLBACKNAME f_Driver_camera = "drive";
 CALLBACKNAME f_up_Driver_camera = "drive";
 CALLBACKNAME shift_f_Driver_camera = "drive";
 //"shift""shift-up"
-CALLBACKNAME shift_Driver_camera = "speed";
-CALLBACKNAME shift_up_Driver_camera = "speed";
+CALLBACKNAME shift_Driver_camera = "drive";
+CALLBACKNAME shift_up_Driver_camera = "drive";
 
 ///Actor1 + Activity related
 //"arrow_up""arrow_up-up""shift-arrow_up"

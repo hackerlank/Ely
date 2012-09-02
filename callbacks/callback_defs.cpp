@@ -132,19 +132,18 @@ void drive(const Event* event, void* data)
 	//get data
 	SMARTPTR(Driver)driver = (Driver*) data;
 	bool enable;
+	std::string eventName = event->get_name();
+	//check if shift or shift-up key pressed
+	if ((eventName == "shift") or (eventName == "shift-up"))
+	{
+		(eventName.find("-up", 0) == string::npos) ?
+		driver->setSpeedFast() : driver->setSpeed();
+		return;
+	}
 	//get bare event
-	std::string bareEvent = getBareEvent(event->get_name(), &enable);
+	std::string bareEvent = getBareEvent(eventName, &enable);
 	//execute command
 	setDriverCommand(driver, bareEvent, enable, camera_keys);
-}
-
-void speed(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)driver = (Driver*) data;
-	//analyze the event: shift or shift-up
-	(event->get_name().find("-up", 0) == string::npos) ?
-	driver->setSpeedFast() : driver->setSpeed();
 }
 
 ///Actor1 + Activity related
@@ -220,12 +219,13 @@ void state(const Event * event, void * data)
 	}
 	//call the Driver event handler to move actor
 	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
-	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
 	//check if shift or shift-up key pressed
 	if ((eventName == "shift") or (eventName == "shift-up"))
 	{
-		//analyze the event: shift or shift-up
 		(eventName.find("-up", 0) == string::npos) ?
 		actorDrv->setSpeedFast() : actorDrv->setSpeed();
+		return;
 	}
+	//execute command
+	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
 }
