@@ -53,6 +53,8 @@ FILTER Filter_strafe_left_Actor1;
 ENTER Enter_strafe_right_Actor1;
 EXIT Exit_strafe_right_Actor1;
 FILTER Filter_strafe_right_Actor1;
+//up
+//down
 //forward_FromTo_strafe_left
 FROMTO forward_FromTo_strafe_left_Actor1;
 //forward_FromTo_strafe_right

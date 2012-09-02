@@ -53,21 +53,32 @@ CALLBACKNAME shift_Driver_camera = "speed";
 CALLBACKNAME shift_up_Driver_camera = "speed";
 
 ///Actor1 + Activity related
-//"w""w-up""shift-w"
+//"arrow_up""arrow_up-up""shift-arrow_up"
 CALLBACKNAME arrow_up_Activity_Actor1 = "state";
 CALLBACKNAME arrow_up_up_Activity_Actor1 = "state";
 CALLBACKNAME shift_arrow_up_Activity_Actor1 = "state";
-//"s""s-up""shift-s"
+//"arrow_down""arrow_down-up""shift-arrow_down"
 CALLBACKNAME arrow_down_Activity_Actor1 = "state";
 CALLBACKNAME arrow_down_up_Activity_Actor1 = "state";
 CALLBACKNAME shift_arrow_down_Activity_Actor1 = "state";
-//"a""a-up""shift-a"
+//"arrow_left""arrow_left-up""shift-arrow_left"
 CALLBACKNAME arrow_left_Activity_Actor1 = "state";
 CALLBACKNAME arrow_left_up_Activity_Actor1 = "state";
 CALLBACKNAME shift_arrow_left_Activity_Actor1 = "state";
-//"d""d-up""shift-d"
+//"arrow_right""arrow_right-up""shift-arrow_right"
 CALLBACKNAME arrow_right_Activity_Actor1 = "state";
 CALLBACKNAME arrow_right_up_Activity_Actor1 = "state";
 CALLBACKNAME shift_arrow_right_Activity_Actor1 = "state";
+//"page_up""page_up-up""shift-page_up"
+CALLBACKNAME page_up_Activity_Actor1 = "state";
+CALLBACKNAME page_up_up_Activity_Actor1 = "state";
+CALLBACKNAME shift_page_up_Activity_Actor1 = "state";
+//"page_down""page_down-up""shift-page_down"
+CALLBACKNAME page_down_Activity_Actor1 = "state";
+CALLBACKNAME page_down_up_Activity_Actor1 = "state";
+CALLBACKNAME shift_page_down_Activity_Actor1 = "state";
+//"shift""shift-up"
+CALLBACKNAME shift_Activity_Actor1 = "state";
+CALLBACKNAME shift_up_Activity_Actor1 = "state";
 
 

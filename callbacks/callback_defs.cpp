@@ -25,8 +25,7 @@
 
 ///get key bare event: from key, key-up, shift-key returns key and
 ///with *isEnabled false on key-up and true otherwise
-static std::string getBareEvent(const std::string& eventName,
-		bool* isEnabled)
+static std::string getBareEvent(const std::string& eventName, bool* isEnabled)
 {
 	//analyze the event
 	std::string bareEvent;
@@ -74,47 +73,47 @@ static std::string getBareEvent(const std::string& eventName,
 //		"f", //down
 //};
 #include "ControlComponents/Driver.h"
-static void setDriverCommand(SMARTPTR(Driver) driver, const std::string& bareEvent,
-		bool enable, const char* keys[])
+static void setDriverCommand(SMARTPTR(Driver)driver, const std::string& bareEvent,
+bool enable, const char* keys[])
 {
 	//set the right command
-	if (bareEvent == keys[0])
-	{
-		driver->enableForward(enable);
+		if (bareEvent == keys[0])
+		{
+			driver->enableForward(enable);
+		}
+		else if (bareEvent == keys[1])
+		{
+			driver->enableBackward(enable);
+		}
+		else if (bareEvent == keys[2])
+		{
+			driver->enableStrafeLeft(enable);
+		}
+		else if (bareEvent == keys[3])
+		{
+			driver->enableStrafeRight(enable);
+		}
+		else if (bareEvent == keys[4])
+		{
+			driver->enableRollLeft(enable);
+		}
+		else if (bareEvent == keys[5])
+		{
+			driver->enableRollRight(enable);
+		}
+		else if (bareEvent == keys[6])
+		{
+			driver->enableUp(enable);
+		}
+		else if (bareEvent == keys[7])
+		{
+			driver->enableDown(enable);
+		}
+		else
+		{
+			PRINTERR("setDriverCommand: Event not defined: " << bareEvent);
+		}
 	}
-	else if (bareEvent == keys[1])
-	{
-		driver->enableBackward(enable);
-	}
-	else if (bareEvent == keys[2])
-	{
-		driver->enableStrafeLeft(enable);
-	}
-	else if (bareEvent == keys[3])
-	{
-		driver->enableStrafeRight(enable);
-	}
-	else if (bareEvent == keys[4])
-	{
-		driver->enableRollLeft(enable);
-	}
-	else if (bareEvent == keys[5])
-	{
-		driver->enableRollRight(enable);
-	}
-	else if (bareEvent == keys[6])
-	{
-		driver->enableUp(enable);
-	}
-	else if (bareEvent == keys[7])
-	{
-		driver->enableDown(enable);
-	}
-	else
-	{
-		PRINTERR("Event not defined: " << bareEvent);
-	}
-}
 
 ///Camera + Driver related
 static const char* camera_keys[] =
@@ -131,7 +130,7 @@ static const char* camera_keys[] =
 void drive(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver) driver = (Driver*) data;
+	SMARTPTR(Driver)driver = (Driver*) data;
 	bool enable;
 	//get bare event
 	std::string bareEvent = getBareEvent(event->get_name(), &enable);
@@ -142,10 +141,10 @@ void drive(const Event* event, void* data)
 void speed(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver) driver = (Driver*) data;
+	SMARTPTR(Driver)driver = (Driver*) data;
 	//analyze the event: shift or shift-up
 	(event->get_name().find("-up", 0) == string::npos) ?
-			driver->setSpeedFast() : driver->setSpeed();
+	driver->setSpeedFast() : driver->setSpeed();
 }
 
 ///Actor1 + Activity related
@@ -158,16 +157,17 @@ static const char* Actor1_keys[] =
 		"arrow_right", //strafe_right
 		"", //roll_left
 		"", //roll_right
-		"", //up
-		"", //down
+		"page_up", //up
+		"page_down", //down
 };
 void state(const Event * event, void * data)
 {
 	//get data
-	SMARTPTR(Activity) activity = (Activity*) data;
+	SMARTPTR(Activity)activity = (Activity*) data;
 	bool enable;
 	//get bare event
-	std::string bareEvent = getBareEvent(event->get_name(), &enable);
+	std::string eventName = event->get_name();
+	std::string bareEvent = getBareEvent(eventName, &enable);
 	//get a reference to the actor fsm
 	fsm& actorFSM = (fsm&) (*activity);
 	SMARTPTR(Object) actorObj = activity->getOwnerObject();
@@ -200,11 +200,32 @@ void state(const Event * event, void * data)
 			actorFSM.request("strafe_right");
 		}
 	}
+	else if (bareEvent == "page_up")
+	{
+		if (enable)
+		{
+			actorFSM.request("up");
+		}
+	}
+	else if (bareEvent == "page_down")
+	{
+		if (enable)
+		{
+			actorFSM.request("down");
+		}
+	}
 	else
 	{
-		PRINTERR("Event not defined: " << event->get_name());
+		PRINTERR("state: Event not defined for state transition: " << event->get_name());
 	}
 	//call the Driver event handler to move actor
 	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
 	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
+	//check if shift or shift-up key pressed
+	if ((eventName == "shift") or (eventName == "shift-up"))
+	{
+		//analyze the event: shift or shift-up
+		(eventName.find("-up", 0) == string::npos) ?
+		actorDrv->setSpeedFast() : actorDrv->setSpeed();
+	}
 }

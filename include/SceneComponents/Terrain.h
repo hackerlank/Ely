@@ -56,6 +56,7 @@ class GeoMipTerrainRef;
  * - "brute_force"				|single|"true"
  * - "auto_flatten"				|single|"AFM_medium"
  * - "focal_point"				|single|"camera"
+ * - "minimum_level"			|single|"0"
  * - "texture_file"				|single|no default
  * - "texture_uscale"			|single|"1.0"
  * - "texture_vscale"			|single|"1.0"

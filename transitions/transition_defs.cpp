@@ -94,6 +94,8 @@ ValueList Filter_strafe_right_Actor1(fsm*, Activity& activity,
 	valList.push_front(state);
 	return valList;
 }
+//up
+//down
 //forward_FromTo_strafe_left
 void forward_FromTo_strafe_left_Actor1(fsm*, Activity& activity,
 		const ValueList& valueList)

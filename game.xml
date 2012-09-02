@@ -168,6 +168,8 @@
 				<Param states="backward"/>
 				<Param states="strafe_left"/>
 				<Param states="strafe_right"/>
+				<Param states="up"/>
+				<Param states="down"/>
 				<Param from_to="forward_FromTo_strafe_left"/>
 				<Param from_to="forward_FromTo_strafe_right"/>
 				<Param events="arrow_up"/>
@@ -182,6 +184,14 @@
 				<Param events="arrow_right"/>
 				<Param events="arrow_right-up"/>
 				<Param events="shift-arrow_right"/>
+				<Param events="page_up"/>
+				<Param events="page_up-up"/>
+				<Param events="shift-page_up"/>
+				<Param events="page_down"/>
+				<Param events="page_down-up"/>
+				<Param events="shift-page_down"/>
+				<Param events="shift"/>				
+				<Param events="shift-up"/>
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
@@ -213,7 +223,7 @@
 			<Param parent="render"/>
 			<Param pos_x="0.0"/>
 			<Param pos_y="0.0"/>
-			<Param pos_z="8.0"/>
+			<Param pos_z="100.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -226,8 +236,9 @@
 				<Param height_scale="200.0"/>
 				<Param width_scale="2.0"/>
 				<Param brute_force="false"/>
-				<Param auto_flatten="AFM_strong"/>
+				<Param auto_flatten="AFM_off"/>
 				<Param focal_point="Actor1"/>
+				<Param minimum_level="0"/>
 				<Param near_percent="0.1"/>
 				<Param far_percent="0.7"/>
 			</Component>

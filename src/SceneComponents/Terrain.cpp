@@ -117,6 +117,13 @@ bool Terrain::initialize()
 	}
 	//get focal point
 	mFocalPoint = ObjectId(mTmpl->parameter(std::string("focal_point")));
+	//get minimum level
+	int minimumLevel = atoi(
+			mTmpl->parameter(std::string("minimum_level")).c_str());
+	if (minimumLevel <= 0)
+	{
+		minimumLevel = 0;
+	}
 	//get heightfield image
 	PNMImage heightField(
 			Filename(mTmpl->parameter(std::string("heightfield_file"))));
@@ -154,7 +161,7 @@ bool Terrain::initialize()
 	mTerrain->set_near(nearPercent * environmentWidth);
 	mTerrain->set_far(farPercent * environmentWidth);
 	//other properties
-	float terrainLODmin = min<float>(0, mTerrain->get_max_level());
+	float terrainLODmin = min<float>(minimumLevel, mTerrain->get_max_level());
 	mTerrain->set_min_level(terrainLODmin);
 	mTerrain->set_auto_flatten(flattenMode);
 	mTerrain->set_bruteforce(mBruteForce);

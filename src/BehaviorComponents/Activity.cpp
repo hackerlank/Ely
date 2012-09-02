@@ -30,8 +30,8 @@ Activity::Activity() :
 	// TODO Auto-generated constructor stub
 }
 
-Activity::Activity(SMARTPTR(ActivityTemplate) tmpl) :
-		mFSM("FSM"), mTransitionsLoaded(false)
+Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :
+mFSM("FSM"), mTransitionsLoaded(false)
 {
 	mTmpl = tmpl;
 }
@@ -167,13 +167,27 @@ void Activity::loadTransitionFunctions()
 			pFilterFunction = NULL;
 		}
 		//re-add the state with the current functions
-		mFSM.addState((*iter),
-				boost::bind(pEnterFunction, _1, boost::ref(*this), _2),
-				boost::bind(pExitFunction, _1, boost::ref(*this)),
-				boost::bind(pFilterFunction, _1, boost::ref(*this), _2, _3));
+		fsm::EnterFuncPTR enterFunc = NULL;
+		if (pEnterFunction != NULL)
+		{
+			enterFunc = boost::bind(pEnterFunction, _1, boost::ref(*this), _2);
+		}
+		fsm::ExitFuncPTR exitFunc = NULL;
+		if (pExitFunction != NULL)
+		{
+			exitFunc = boost::bind(pExitFunction, _1, boost::ref(*this));
+		}
+		fsm::FilterFuncPTR filterFunc = NULL;
+		if (pFilterFunction != NULL)
+		{
+			filterFunc = boost::bind(pFilterFunction, _1, boost::ref(*this), _2,
+					_3);
+		}
+		//
+		mFSM.addState((*iter), enterFunc, exitFunc, filterFunc);
 	}
 
-	//load FromTo transition functions if any
+//load FromTo transition functions if any
 	for (iter = mFromToFunctionSet.begin(); iter != mFromToFunctionSet.end();
 			++iter)
 	{
@@ -210,13 +224,13 @@ void Activity::loadTransitionFunctions()
 				boost::bind(pFromToFunction, _1, boost::ref(*this), _2));
 	}
 
-	//transitions loaded
+//transitions loaded
 	mTransitionsLoaded = true;
 }
 
 Activity::operator fsm&()
 {
-	//lock (guard) the mutex
+//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	return mFSM;
@@ -224,18 +238,18 @@ Activity::operator fsm&()
 
 void Activity::unloadTransitionFunctions()
 {
-	//if transitions not loaded do nothing
+//if transitions not loaded do nothing
 	if ((mFSM.getNumStates() == 0) or (not mTransitionsLoaded))
 	{
 		return;
 	}
 	mFromToFunctionSet.clear();
-	//Close the transition functions library
+//Close the transition functions library
 	if (dlclose(mTransitionLib) != 0)
 	{
 		std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;
 	}
-	//transitions unloaded
+//transitions unloaded
 	mTransitionsLoaded = false;
 }
 #endif

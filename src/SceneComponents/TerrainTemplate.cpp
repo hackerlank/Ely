@@ -80,6 +80,7 @@ void TerrainTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("brute_force", "true"));
 	mParameterTable.insert(ParameterNameValue("auto_flatten", "AFM_medium"));
 	mParameterTable.insert(ParameterNameValue("focal_point", "camera"));
+	mParameterTable.insert(ParameterNameValue("minimum_level", "0"));
 	mParameterTable.insert(ParameterNameValue("texture_uscale", "1.0"));
 	mParameterTable.insert(ParameterNameValue("texture_vscale", "1.0"));
 }
