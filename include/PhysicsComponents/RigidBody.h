@@ -53,41 +53,43 @@ class RigidBodyTemplate;
  * \brief Component representing a single rigid body attached to an object.
  *
  * It constructs a rigid body with the specified collision shape_type along
- * with relevant parameters.
+ * with relevant parameters.\n
  * Collision shapes are:
- * \li \c "sphere"
- * \li \c "plane"
- * \li \c "box"
- * \li \c "cylinder"
- * \li \c "capsule"
- * \li \c "cone"
- *
+ * - "sphere"
+ * - "plane"
+ * - "box"
+ * - "cylinder"
+ * - "capsule"
+ * - "cone"
  * In case of "sphere", "box", "cylinder", "capsule", "cone", if any of
  * the relevant parameters is missing, the shape is automatically
  * constructed by guessing them through calculation of a tight bounding volume
- * of object geometry (supposedly specified by the model component).
+ * of object geometry (supposedly specified by the model component).\n
  * For "plane" shape, in case of missing parameters, the default is
  * a plane with normal = (0,0,1) and d = 0.
  *
  * XML Param(s):
- * \li \c "body_type"  				|single|"dynamic" ("static","kinematic")
- * \li \c "body_mass"  				|single|"1.0"
- * \li \c "body_friction"  			|single|"0.8"
- * \li \c "body_restitution"  		|single|"0.1"
- * \li \c "shape_type"  			|single|"sphere"
- * \li \c "collide_mask"  			|single|"all_on"
- * \li \c "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
- * \li \c "shape_norm_x"  			|single|no default (plane)
- * \li \c "shape_norm_y"  			|single|no default (plane)
- * \li \c "shape_norm_z"  			|single|no default (plane)
- * \li \c "shape_d"  				|single|no default (plane)
- * \li \c "shape_half_x"  			|single|no default (box)
- * \li \c "shape_half_y"  			|single|no default (box)
- * \li \c "shape_half_z"  			|single|no default (box)
- * \li \c "shape_height"  			|single|no default (cylinder,capsule,cone)
- * \li \c "shape_up"  				|single|no default (cylinder,capsule,cone)
- * \li \c "ccd_motion_threshold"  	|single|no default
- * \li \c "ccd_swept_sphere_radius" |single|no default
+ * - "body_type"  				|single|"dynamic" ("static","kinematic")
+ * - "body_mass"  				|single|"1.0"
+ * - "body_friction"  			|single|"0.8"
+ * - "body_restitution"  		|single|"0.1"
+ * - "shape_type"  				|single|"sphere"
+ * - "collide_mask"  			|single|"all_on"
+ * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
+ * - "shape_norm_x"  			|single|no default (plane)
+ * - "shape_norm_y"  			|single|no default (plane)
+ * - "shape_norm_z"  			|single|no default (plane)
+ * - "shape_d"  				|single|no default (plane)
+ * - "shape_half_x"  			|single|no default (box)
+ * - "shape_half_y"  			|single|no default (box)
+ * - "shape_half_z"  			|single|no default (box)
+ * - "shape_height"  			|single|no default (cylinder,capsule,cone,heightfield)
+ * - "shape_up"  				|single|no default (cylinder,capsule,cone,heightfield)
+ * - "shape_image"  			|single|no default (heightfield)
+ * - "shape_scale_x"  			|single|"1.0" (heightfield)
+ * - "shape_scale_y"  			|single|"1.0" (heightfield)
+ * - "ccd_motion_threshold"  	|single|no default
+ * - "ccd_swept_sphere_radius" 	|single|no default
  */
 class RigidBody: public Component
 {
@@ -125,7 +127,8 @@ public:
 		BOX, //!< BOX (half_x, half_y, half_z)
 		CYLINDER, //!< CYLINDER (radius, height, up)
 		CAPSULE, //!< CAPSULE (radius, height, up)
-		CONE //!< CONE (radius, height, up)
+		CONE, //!< CONE (radius, height, up)
+		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_x, scale_y)
 	};
 
 	/**
