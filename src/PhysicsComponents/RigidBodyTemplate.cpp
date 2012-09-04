@@ -83,6 +83,8 @@ void RigidBodyTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
 	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
+	mParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

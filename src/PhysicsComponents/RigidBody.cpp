@@ -29,7 +29,7 @@ RigidBody::RigidBody()
 	// TODO Auto-generated constructor stub
 }
 
-RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate) tmpl)
+RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate)tmpl)
 {
 	mTmpl = tmpl;
 }
@@ -156,6 +156,7 @@ bool RigidBody::initialize()
 		}
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
+		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
 		if ((not radius.empty()) and (not height.empty()))
 		{
 			mDim1 = (float) atof(radius.c_str());
@@ -165,7 +166,40 @@ bool RigidBody::initialize()
 				mAutomaticShaping = false;
 			}
 		}
+		if (upAxis == std::string("x"))
+		{
+			mUpAxis = X_up;
+		}
+		else if (upAxis == std::string("y"))
+		{
+			mUpAxis = Y_up;
+		}
+		else
+		{
+			mUpAxis = Z_up;
+		}
+	}
+	else if (shapeType == std::string("heightfield"))
+	{
+		mShapeType = HEIGHTFIELD;
+		std::string heightfield_file = mTmpl->parameter(
+				std::string("shape_heightfield_file"));
+		mHeightfieldFile = Filename(heightfield_file);
+		std::string height = mTmpl->parameter(std::string("shape_height"));
+		std::string scale_w = mTmpl->parameter(std::string("shape_scale_w"));
+		std::string scale_d = mTmpl->parameter(std::string("shape_scale_d"));
 		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
+		if ((not height.empty()) and (not scale_w.empty())
+				and (not scale_d.empty()))
+		{
+			mDim1 = (float) atof(height.c_str());
+			mDim2 = (float) atof(scale_w.c_str());
+			mDim3 = (float) atof(scale_d.c_str());
+			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
 		if (upAxis == std::string("x"))
 		{
 			mUpAxis = X_up;
@@ -207,9 +241,8 @@ bool RigidBody::initialize()
 			mTmpl->parameter(std::string("ccd_motion_threshold")).c_str());
 	mCcdSweptSphereRadius = (float) atof(
 			mTmpl->parameter(std::string("ccd_swept_sphere_radius")).c_str());
-	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ? mCcdEnabled =
-			true :
-			mCcdEnabled = false;
+	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
+			mCcdEnabled = true : mCcdEnabled = false;
 	//setup event callbacks if any
 	setupEvents();
 	//
@@ -326,16 +359,17 @@ void RigidBody::setNodePath(const NodePath& nodePath)
 	mNodePath = nodePath;
 }
 
-SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
+SMARTPTR(BulletShape)RigidBody::createShape(ShapeType shapeType)
 {
 	//get the bounding dimensions of object node path, that
 	//should represents a model
 	getBoundingDimensions(mOwnerObject->getNodePath());
 	// create the actual shape
 	SMARTPTR(BulletShape) collisionShape = NULL;
+	LVecBase3 localScale;
 	switch (mShapeType)
 	{
-	case SPHERE:
+		case SPHERE:
 		if (mAutomaticShaping)
 		{
 			//modify radius
@@ -343,7 +377,7 @@ SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 		}
 		collisionShape = new BulletSphereShape(mDim1);
 		break;
-	case PLANE:
+		case PLANE:
 		if (mAutomaticShaping)
 		{
 			//modify normal and d
@@ -355,7 +389,7 @@ SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 		collisionShape = new BulletPlaneShape(LVector3(mDim1, mDim2, mDim3),
 				mDim4);
 		break;
-	case BOX:
+		case BOX:
 		if (mAutomaticShaping)
 		{
 			//modify half dimensions
@@ -365,7 +399,7 @@ SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 		}
 		collisionShape = new BulletBoxShape(LVector3(mDim1, mDim2, mDim3));
 		break;
-	case CYLINDER:
+		case CYLINDER:
 		if (mAutomaticShaping)
 		{
 			//modify radius and height
@@ -387,7 +421,7 @@ SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 		}
 		collisionShape = new BulletCylinderShape(mDim1, mDim2, mUpAxis);
 		break;
-	case CAPSULE:
+		case CAPSULE:
 		if (mAutomaticShaping)
 		{
 			//modify radius and height
@@ -409,7 +443,7 @@ SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 		}
 		collisionShape = new BulletCapsuleShape(mDim1, mDim2, mUpAxis);
 		break;
-	case CONE:
+		case CONE:
 		if (mAutomaticShaping)
 		{
 			//modify radius and height
@@ -431,7 +465,30 @@ SMARTPTR(BulletShape) RigidBody::createShape(ShapeType shapeType)
 		}
 		collisionShape = new BulletConeShape(mDim1, mDim2, mUpAxis);
 		break;
-	default:
+		case HEIGHTFIELD:
+		if (mAutomaticShaping)
+		{
+			//modify height scale_w and scale_d and height
+			mDim1 = 1.0;
+			mDim2 = 1.0;
+			mDim3 = 1.0;
+		}
+		if (mUpAxis == X_up)
+		{
+			localScale = LVecBase3(1.0, mDim1, mDim2);
+		}
+		else if (mUpAxis == Y_up)
+		{
+			localScale = LVecBase3(mDim2, 1.0, mDim1);
+		}
+		else
+		{
+			localScale = LVecBase3(mDim1, mDim2, 1.0);
+		}
+		collisionShape = new BulletHeightfieldShape(mHeightfieldFile, mDim1, mUpAxis);
+		collisionShape->set_local_scale(localScale);
+		break;
+		default:
 		break;
 	}
 	//

@@ -41,9 +41,7 @@
 		
 		<ObjectTmpl type="Terrain">
 			<ComponentTmpl family="Scene" type="Terrain"/>
-<!--
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
---> 
 		</ObjectTmpl>
 
 	</ObjectTmplSet>
@@ -138,6 +136,7 @@
 			<Param parent=""/>
 		</Object>
 
+<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model" priority="100">
 				<Param from_file="false"/>
@@ -161,6 +160,7 @@
 			<Param parent="render"/>
 			<Param rot_p="-90.0"/>
 		</Object>
+-->
 		
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity"  priority="-100">
@@ -230,7 +230,7 @@
 		</Object>
 		
 		<Object type="Terrain" id="Terrain1">
-			<Component type="Terrain">
+			<Component type="Terrain" priority="100">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
 				<Param height_scale="200.0"/>
@@ -242,6 +242,15 @@
 				<Param near_percent="0.1"/>
 				<Param far_percent="0.7"/>
 			</Component>
+			<Component type="RigidBody" priority="90">
+				<Param body_type="static"/>
+				<Param shape_heightfield_file="../PandaGame/Models/heightfield.png"/>
+				<Param shape_type="heightfield"/>
+				<Param shape_height="200.0"/>
+				<Param shape_scale_w="2.0"/>
+				<Param shape_scale_d="2.0"/>
+				<Param shape_up="z"/>
+			</Component> 
 			<Param parent="render"/>
 		</Object>
 

@@ -38,9 +38,13 @@
 #include <bulletCylinderShape.h>
 #include <bulletCapsuleShape.h>
 #include <bulletConeShape.h>
+#include <bulletHeightfieldShape.h>
+#include <lvecBase3.h>
 #include <bulletRigidBodyNode.h>
 #include <bullet_utils.h>
 #include <bitMask.h>
+#include <pnmImage.h>
+#include <filename.h>
 #include <lvector3.h>
 #include <lpoint3.h>
 #include "ObjectModel/Component.h"
@@ -85,9 +89,9 @@ class RigidBodyTemplate;
  * - "shape_half_z"  			|single|no default (box)
  * - "shape_height"  			|single|no default (cylinder,capsule,cone,heightfield)
  * - "shape_up"  				|single|no default (cylinder,capsule,cone,heightfield)
- * - "shape_image"  			|single|no default (heightfield)
- * - "shape_scale_x"  			|single|"1.0" (heightfield)
- * - "shape_scale_y"  			|single|"1.0" (heightfield)
+ * - "shape_heightfield_file" 	|single|no default (heightfield)
+ * - "shape_scale_w"  			|single|"1.0" (heightfield)
+ * - "shape_scale_d"  			|single|"1.0" (heightfield)
  * - "ccd_motion_threshold"  	|single|no default
  * - "ccd_swept_sphere_radius" 	|single|no default
  */
@@ -128,7 +132,7 @@ public:
 		CYLINDER, //!< CYLINDER (radius, height, up)
 		CAPSULE, //!< CAPSULE (radius, height, up)
 		CONE, //!< CONE (radius, height, up)
-		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_x, scale_y)
+		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
 	};
 
 	/**
@@ -196,6 +200,7 @@ private:
 	LVector3 mModelDeltaCenter;
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
+	Filename mHeightfieldFile;
 	BulletUpAxis mUpAxis;
 	///@}
 
