@@ -107,20 +107,20 @@ void GameManager::setupGameWorld()
 	actor1Sound3d->getSound(0)->set_loop(true);
 	actor1Sound3d->getSound(0)->play();
 
-	//InstancedActor1
-	SMARTPTR(Object) plane1 =
-	ObjectTemplateManager::GetSingleton().getCreatedObject("Plane1");
-	SMARTPTR(Model) plane1Model = DCAST(Model, plane1->getComponent(
-					ComponentFamilyType("Scene")));
-	TextureStage* planeTS0 = new TextureStage("planeTS0");
-	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
-	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
-	plane1Model->getNodePath().set_tex_scale(planeTS0, 1000, 1000);
+//	//Plane1
+//	SMARTPTR(Object) plane1 =
+//	ObjectTemplateManager::GetSingleton().getCreatedObject("Plane1");
+//	SMARTPTR(Model) plane1Model = DCAST(Model, plane1->getComponent(
+//					ComponentFamilyType("Scene")));
+//	TextureStage* planeTS0 = new TextureStage("planeTS0");
+//	Texture* planeTex = TexturePool::load_texture("rock_02.jpg");
+//	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
+//	plane1Model->getNodePath().set_tex_scale(planeTS0, 1000, 1000);
 
-	//Terrain1
-	SMARTPTR(Object)terrain1 =
-	ObjectTemplateManager::GetSingleton().getCreatedObject("Terrain1");
-	terrain1->getNodePath().set_render_mode_wireframe(1);
+//	//Terrain1
+//	SMARTPTR(Object)terrain1 =
+//	ObjectTemplateManager::GetSingleton().getCreatedObject("Terrain1");
+//	terrain1->getNodePath().set_render_mode_wireframe(1);
 
 	mControlGrabbed = false;
 	//enable/disable Actor1 control by event

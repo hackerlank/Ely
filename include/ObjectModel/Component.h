@@ -73,7 +73,7 @@ class ComponentTemplate;
  * or if any error occurs the default callback (referenced by the macro
  * DEFAULT_CALLBACK) is used.
  * \note In the variable string:
- * \li \c hyphens ("-") are replaced with underscores ("_")
+ * - hyphens ("-") are replaced with underscores ("_")
  */
 class Component: public TypedWritableReferenceCount
 {

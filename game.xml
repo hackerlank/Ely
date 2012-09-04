@@ -103,9 +103,9 @@
 		<Object type="InstancedActor" id="InstancedTeapot1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
-			<Param pos_x="-10.0"/>
+			<Param pos_x="-200.0"/>
 			<Param pos_y="0.0"/>
-			<Param pos_z="3.0"/>
+			<Param pos_z="200.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -228,14 +228,14 @@
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
-		
+
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain" priority="100">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
 				<Param height_scale="200.0"/>
 				<Param width_scale="2.0"/>
-				<Param brute_force="false"/>
+				<Param brute_force="true"/>
 				<Param auto_flatten="AFM_off"/>
 				<Param focal_point="Actor1"/>
 				<Param minimum_level="0"/>

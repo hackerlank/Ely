@@ -285,7 +285,7 @@ void RigidBody::onAddToObjectSetup()
 	ownerNodePath.reparent_to(mNodePath);
 	//correct (or possibly reset to zero) pos and hpr of the object node path
 	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
-	if (mOwnerObject->isStatic())
+	if (mOwnerObject->isStatic() and (mShapeType != HEIGHTFIELD))//Hack
 	{
 		ownerNodePath.flatten_light();
 	}
