@@ -115,7 +115,7 @@ private:
 	bool mTransitionsLoaded;
 
 	/**
-	 * \name Helper functions to load/unload event callbacks.
+	 * \name Helper functions to load/unload transition functions.
 	 */
 	///@{
 	void loadTransitionFunctions();

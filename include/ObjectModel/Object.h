@@ -50,7 +50,11 @@ typedef std::string ObjectId;
  * "compose" the different aspects (graphics, sound, ai,
  * physics, animation, etc...), already existing in Panda3d.
  * An object can have only one component of a given family.
- * Each object has a NodePath embedded.
+ * Each object has a NodePath embedded.\n
+ * Object can be initialized after it is added to the scene, by
+ * an initialization function, whose name is <OBJECTID>_initialization
+ * loaded at runtime from a dynamic linked library (referenced by the
+ * macro INITIALIZATIONS_SO).
  *
  * XML Param(s):
  * - "parent"  				|single|no default
@@ -71,7 +75,7 @@ public:
 	/**
 	 * \brief Constructor.
 	 */
-	Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate) tmpl);
+	Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl);
 
 	/**
 	 * \brief Destructor.
@@ -157,6 +161,11 @@ public:
 	///@}
 
 	/**
+	 * \brief Initialization function type.
+	 */
+	typedef void (*PINITILIZATION)(Object*);
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -178,6 +187,19 @@ private:
 	///Various components can set or get this value to implement
 	///some optimization.
 	bool mIsStatic;
+
+	///Handle of the library of initialization functions.
+	LIB_HANDLE mInitializationLib;
+	///Helper flag.
+	bool mInitializationsLoaded;
+
+	/**
+	 * \name Helper functions to load/unload initialization functions.
+	 */
+	///@{
+	void loadInitializationFunctions();
+	void unloadInitializationFunctions();
+	///@}
 
 	///The (reentrant) mutex associated with this object.
 	ReMutex mMutex;

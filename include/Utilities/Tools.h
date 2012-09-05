@@ -220,6 +220,9 @@ typedef std::pair<std::string, std::string> ParameterNameValue;
 ///Transition functions library (see Activity component).
 #define TRANSITIONS_SO "TransitionsLib/libElyTransitions.so"
 
+///Initialization functions library (see Object).
+#define INITIALIZATIONS_SO "InitializationsLib/libElyInitializations.so"
+
 ///Some macro dynamic linked libraries loading
 #ifdef WIN32
 #	include <direct.h>
@@ -241,10 +244,12 @@ typedef void* LIB_HANDLE;
 #	define SMARTPTR(type) PointerTo< type >
 #	define CSMARTPTR(type) ConstPointerTo< type >
 #endif
+
 /**
  * \brief Implements a mutex lock guard (RAII idiom).
  *
  * Directly "stolen" (and adapted) from boost::thread.
+ * \note not used: using ReMutexHolder.
  */
 struct adopt_lock_t
 {

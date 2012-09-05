@@ -83,11 +83,11 @@ void GameManager::initialize()
 	//create the game world (static definition)
 	createGameWorld(std::string("game.xml"));
 
-	//setup the game world
-	setupGameWorld();
+	//play the game
+	GamePlay();
 }
 
-void GameManager::setupGameWorld()
+void GameManager::GamePlay()
 {
 	//camera
 	SMARTPTR(Object)camera =

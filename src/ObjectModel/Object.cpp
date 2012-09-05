@@ -25,13 +25,18 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
-mTmpl(tmpl)
+mTmpl(tmpl), mInitializationsLoaded(false)
 {
 	mObjectId = objectId;
 }
 
 Object::~Object()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	unloadInitializationFunctions();
+	//
 	mNodePath.remove_node();
 }
 
@@ -170,7 +175,78 @@ void Object::sceneSetup()
 	{
 		iterComp->second.p()->onAddToSceneSetup();
 	}
+	//load initialization functions library.
+	loadInitializationFunctions();
+	//execute the initialization function (if any)
+	if (mInitializationsLoaded)
+	{
+		const char* dlsymError;
+		std::string functionName;
+
+		//load initialization function (if any): <OBJECTID>_initialization
+		// reset errors
+		dlerror();
+		functionName = std::string(mObjectId) + "_initialization";
+		PINITILIZATION pInitializationFunction = (PINITILIZATION) dlsym(
+				mInitializationLib, functionName.c_str());
+		dlsymError = dlerror();
+		if (dlsymError)
+		{
+			PRINT(
+					"No initialization function '" << functionName << "': " << dlsymError);
+		}
+		else
+		{
+			//call initialization function
+			pInitializationFunction(this);
+		}
+	}
 }
+
+#ifdef WIN32
+void Object::loadInitializationFunctions()
+{
+}
+
+void Activity::unloadInitializationFunctions()
+{
+}
+#else
+void Object::loadInitializationFunctions()
+{
+	//if initializations loaded do nothing
+	if (mInitializationsLoaded)
+	{
+		return;
+	}
+	mInitializationLib = NULL;
+	//load the initialization functions library
+	mInitializationLib = dlopen(INITIALIZATIONS_SO, RTLD_LAZY);
+	if (not mInitializationLib)
+	{
+		std::cerr << "Error loading library: " << dlerror() << std::endl;
+		return;
+	}
+	//initializations loaded
+	mInitializationsLoaded = true;
+}
+
+void Object::unloadInitializationFunctions()
+{
+	//if initializations not loaded do nothing
+	if (not mInitializationsLoaded)
+	{
+		return;
+	}
+	//Close the initialization functions library
+	if (dlclose(mInitializationLib) != 0)
+	{
+		std::cerr << "Error closing library: " << INITIALIZATIONS_SO << std::endl;
+	}
+	//initializations unloaded
+	mInitializationsLoaded = false;
+}
+#endif
 
 SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 {

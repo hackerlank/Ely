@@ -71,7 +71,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -152,7 +152,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="Ely.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -230,7 +230,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -310,7 +310,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|src/Ely.cpp|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="Ely.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -389,7 +389,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/anim.cpp|training/fsm.cpp|callbacks|src|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/anim.cpp|training/fsm.cpp|callbacks|src|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -466,7 +466,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|test/Runner.cpp|src/test|include|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -541,7 +541,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training/anim.cpp|src/test|training/threads.cpp|callbacks|src/test/Runner.cpp|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training/anim.cpp|src/test|training/threads.cpp|callbacks|src/test/Runner.cpp|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -628,7 +628,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|transitions|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -713,7 +713,94 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="callbacks|transitions|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|callbacks|transitions|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="transitions"/>
+					</sourceEntries>
+				</configuration>
+			</storageModule>
+			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
+		</cconfiguration>
+		<cconfiguration id="cdt.managedbuild.config.gnu.so.debug.1425731734.983096358.1522475492">
+			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="cdt.managedbuild.config.gnu.so.debug.1425731734.983096358.1522475492" moduleId="org.eclipse.cdt.core.settings" name="InitializationsLib">
+				<externalSettings>
+					<externalSetting>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="includePath" name="/Ely"/>
+						<entry flags="VALUE_WORKSPACE_PATH" kind="libraryPath" name="/Ely/InitializationsLib"/>
+						<entry flags="RESOLVED" kind="libraryFile" name="ElyInitializations" srcPrefixMapping="" srcRootPath=""/>
+					</externalSetting>
+				</externalSettings>
+				<extensions>
+					<extension id="org.eclipse.cdt.core.ELF" point="org.eclipse.cdt.core.BinaryParser"/>
+					<extension id="org.eclipse.cdt.core.GmakeErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.CWDLocator" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GCCErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GASErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+					<extension id="org.eclipse.cdt.core.GLDErrorParser" point="org.eclipse.cdt.core.ErrorParser"/>
+				</extensions>
+			</storageModule>
+			<storageModule moduleId="cdtBuildSystem" version="4.0.0">
+				<configuration artifactExtension="so" artifactName="ElyInitializations" buildArtefactType="org.eclipse.cdt.build.core.buildArtefactType.sharedLib" buildProperties="org.eclipse.cdt.build.core.buildType=org.eclipse.cdt.build.core.buildType.debug,org.eclipse.cdt.build.core.buildArtefactType=org.eclipse.cdt.build.core.buildArtefactType.sharedLib" cleanCommand="rm -rf" description="Initializations dynamic library build" id="cdt.managedbuild.config.gnu.so.debug.1425731734.983096358.1522475492" name="InitializationsLib" parent="cdt.managedbuild.config.gnu.so.debug">
+					<folderInfo id="cdt.managedbuild.config.gnu.so.debug.1425731734.983096358.1522475492." name="/" resourcePath="">
+						<toolChain id="cdt.managedbuild.toolchain.gnu.so.debug.1638710499" name="Linux GCC" superClass="cdt.managedbuild.toolchain.gnu.so.debug">
+							<targetPlatform id="cdt.managedbuild.target.gnu.platform.so.debug.1131960307" name="Debug Platform" superClass="cdt.managedbuild.target.gnu.platform.so.debug"/>
+							<builder buildPath="${workspace_loc:/Ely/CallbacksLib}" id="cdt.managedbuild.target.gnu.builder.so.debug.114179377" keepEnvironmentInBuildfile="false" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="2" superClass="cdt.managedbuild.target.gnu.builder.so.debug"/>
+							<tool id="cdt.managedbuild.tool.gnu.archiver.base.1250855774" name="GCC Archiver" superClass="cdt.managedbuild.tool.gnu.archiver.base"/>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug.1974320003" name="GCC C++ Compiler" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.so.debug">
+								<option id="gnu.cpp.compiler.so.debug.option.optimization.level.1312721861" name="Optimization Level" superClass="gnu.cpp.compiler.so.debug.option.optimization.level" value="gnu.cpp.compiler.optimization.level.none" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.so.debug.option.debugging.level.322330800" name="Debug Level" superClass="gnu.cpp.compiler.so.debug.option.debugging.level" value="gnu.cpp.compiler.debugging.level.max" valueType="enumerated"/>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1964656767" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="DEBUG"/>
+									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
+									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.include.paths.86725839" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
+									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
+									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.other.pic.1115415610" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.498340803" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.compiler.so.debug.1656691549" name="GCC C Compiler" superClass="cdt.managedbuild.tool.gnu.c.compiler.so.debug">
+								<option defaultValue="gnu.c.optimization.level.none" id="gnu.c.compiler.so.debug.option.optimization.level.1196485830" name="Optimization Level" superClass="gnu.c.compiler.so.debug.option.optimization.level" valueType="enumerated"/>
+								<option id="gnu.c.compiler.so.debug.option.debugging.level.888458000" name="Debug Level" superClass="gnu.c.compiler.so.debug.option.debugging.level" value="gnu.c.debugging.level.max" valueType="enumerated"/>
+								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1017426760" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.c.linker.so.debug.774087660" name="GCC C Linker" superClass="cdt.managedbuild.tool.gnu.c.linker.so.debug">
+								<option defaultValue="true" id="gnu.c.link.so.debug.option.shared.1448890555" name="Shared (-shared)" superClass="gnu.c.link.so.debug.option.shared" valueType="boolean"/>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.so.debug.1006852747" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.so.debug">
+								<option defaultValue="true" id="gnu.cpp.link.so.debug.option.shared.1180838398" name="Shared (-shared)" superClass="gnu.cpp.link.so.debug.option.shared" valueType="boolean"/>
+								<option id="gnu.cpp.link.option.libs.191693652" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
+									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="panda"/>
+									<listOptionValue builtIn="false" value="pandafx"/>
+									<listOptionValue builtIn="false" value="pandaexpress"/>
+									<listOptionValue builtIn="false" value="p3dtoolconfig"/>
+									<listOptionValue builtIn="false" value="p3dtool"/>
+									<listOptionValue builtIn="false" value="p3pystub"/>
+									<listOptionValue builtIn="false" value="p3direct"/>
+									<listOptionValue builtIn="false" value="pandabullet"/>
+								</option>
+								<option id="gnu.cpp.link.option.flags.959655572" name="Linker flags" superClass="gnu.cpp.link.option.flags" value="" valueType="string"/>
+								<option id="gnu.cpp.link.option.paths.521945501" name="Library search path (-L)" superClass="gnu.cpp.link.option.paths" valueType="libPaths">
+									<listOptionValue builtIn="false" value="/usr/lib/panda3d"/>
+								</option>
+								<inputType id="cdt.managedbuild.tool.gnu.cpp.linker.input.957904566" superClass="cdt.managedbuild.tool.gnu.cpp.linker.input">
+									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
+									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
+								</inputType>
+							</tool>
+							<tool id="cdt.managedbuild.tool.gnu.assembler.so.debug.1870162599" name="GCC Assembler" superClass="cdt.managedbuild.tool.gnu.assembler.so.debug">
+								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1541860325" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
+							</tool>
+						</toolChain>
+					</folderInfo>
+					<sourceEntries>
+						<entry excluding="initializations|callbacks|transitions|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="initializations"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="transitions"/>
 					</sourceEntries>
 				</configuration>
