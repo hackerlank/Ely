@@ -103,7 +103,7 @@
 		<Object type="InstancedActor" id="InstancedTeapot1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
-			<Param pos_x="-200.0"/>
+			<Param pos_x="100.0"/>
 			<Param pos_y="0.0"/>
 			<Param pos_z="200.0"/>
 			<Param rot_h="-90.0"/>
@@ -222,7 +222,7 @@
 			</Component>
 			<Param parent="render"/>
 			<Param pos_x="180.0"/>
-			<Param pos_y="350.0"/>
+			<Param pos_y="250.0"/>
 			<Param pos_z="300.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>

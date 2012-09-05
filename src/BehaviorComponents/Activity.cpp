@@ -38,6 +38,9 @@ mFSM("FSM"), mTransitionsLoaded(false)
 
 Activity::~Activity()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	unloadTransitionFunctions();
 }
 

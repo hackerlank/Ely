@@ -37,6 +37,9 @@ Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
 
 Terrain::~Terrain()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//Remove from the scene manager update
 	//first check if game scene manager exists
 	if (GameSceneManager::GetSingletonPtr())

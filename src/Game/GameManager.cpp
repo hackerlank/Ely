@@ -40,8 +40,6 @@ GameManager::GameManager(int argc, char* argv[]) :
 		// common setup
 		mWindow->enable_keyboard(); // Enable keyboard detection
 		mRender = mWindow->get_render();
-		mTrackBall = mWindow->get_mouse().find("**/+Trackball");
-		mMouse2cam = mTrackBall.find("**/+Transform2SG");
 		mGlobalClock = ClockObject::get_global_clock();
 	}
 	else
@@ -60,6 +58,8 @@ void GameManager::initialize()
 {
 	///<DEFAULT CAMERA CONTROL>
 //	mWindow->setup_trackball(); // Enable default camera movement
+//	mTrackBall = mWindow->get_mouse().find("**/+Trackball");
+//  mMouse2cam = mTrackBall.find("**/+Transform2SG");
 //	//setup camera position
 //	mWindow->get_camera_group().set_pos(0, -50, 20);
 //	mWindow->get_camera_group().look_at(0, 0, 10);

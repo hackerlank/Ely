@@ -37,6 +37,9 @@ GameSceneManager::GameSceneManager(int sort, int priority,
 
 GameSceneManager::~GameSceneManager()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);

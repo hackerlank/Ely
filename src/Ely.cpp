@@ -52,9 +52,9 @@ int main(int argc, char **argv)
 	//
 	GameControlManager* gameControlMgr = new GameControlManager(20, 0,
 			"ManagersChain");
-	GameSceneManager* gameSceneMgr = new GameSceneManager(25, 0,
+	GameSceneManager* gameSceneMgr = new GameSceneManager(20, 0,
 			"ManagersChain");
-	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(30, 0,
+	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(20, 0,
 			"ManagersChain");
 	GameAudioManager* gameAudioMgr = new GameAudioManager(60, 0,
 			"ManagersChain");

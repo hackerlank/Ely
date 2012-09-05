@@ -37,6 +37,9 @@ Listener::Listener(SMARTPTR(ListenerTemplate) tmpl)
 
 Listener::~Listener()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	// check if game audio manager exists
 	if (GameAudioManager::GetSingletonPtr())
 	{

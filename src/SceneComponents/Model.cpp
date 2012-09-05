@@ -36,6 +36,9 @@ Model::Model(SMARTPTR(ModelTemplate) tmpl)
 
 Model::~Model()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mNodePath.remove_node();
 }
 
