@@ -92,7 +92,7 @@ void GameManager::setupGameWorld()
 	//camera
 	SMARTPTR(Object)camera =
 	ObjectTemplateManager::GetSingleton().getCreatedObject("camera");
-	camera->getNodePath().look_at(0, 0, 10);
+	camera->getNodePath().look_at(50, 200, 10);
 
 	//Actor1
 	SMARTPTR(Object)actor1 =

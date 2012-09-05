@@ -95,9 +95,9 @@
 				<Param events="shift-up"/>
 			</Component>
 			<Param parent=""/>
-			<Param pos_x="0.0"/>
-			<Param pos_y="-50.0"/>
-			<Param pos_z="20.0"/>
+			<Param pos_x="50.0"/>
+			<Param pos_y="-400.0"/>
+			<Param pos_z="120.0"/>
 		</Object>
 
 		<Object type="InstancedActor" id="InstancedTeapot1">
@@ -210,7 +210,7 @@
 				<Param scale_z="1.0"/>
 			</Component>
 			<Component type="RigidBody" priority="90">
-				<Param body_type="kinematic"/>
+				<Param body_type="dynamic"/>
 				<Param body_mass="1.0"/>
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.1"/>
@@ -221,9 +221,9 @@
 				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>
-			<Param pos_x="0.0"/>
-			<Param pos_y="0.0"/>
-			<Param pos_z="100.0"/>
+			<Param pos_x="180.0"/>
+			<Param pos_y="350.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>

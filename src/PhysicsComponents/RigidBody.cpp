@@ -475,15 +475,15 @@ SMARTPTR(BulletShape)RigidBody::createShape(ShapeType shapeType)
 		}
 		if (mUpAxis == X_up)
 		{
-			localScale = LVecBase3(1.0, mDim1, mDim2);
+			localScale = LVecBase3(1.0, mDim2, mDim3);
 		}
 		else if (mUpAxis == Y_up)
 		{
-			localScale = LVecBase3(mDim2, 1.0, mDim1);
+			localScale = LVecBase3(mDim3, 1.0, mDim2);
 		}
 		else
 		{
-			localScale = LVecBase3(mDim1, mDim2, 1.0);
+			localScale = LVecBase3(mDim2, mDim3, 1.0);
 		}
 		collisionShape = new BulletHeightfieldShape(mHeightfieldFile, mDim1, mUpAxis);
 		collisionShape->set_local_scale(localScale);
