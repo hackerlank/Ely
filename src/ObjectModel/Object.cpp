@@ -187,7 +187,7 @@ void Object::sceneSetup()
 		// reset errors
 		dlerror();
 		functionName = std::string(mObjectId) + "_initialization";
-		PINITILIZATION pInitializationFunction = (PINITILIZATION) dlsym(
+		PINITIALIZATION pInitializationFunction = (PINITIALIZATION) dlsym(
 				mInitializationLib, functionName.c_str());
 		dlsymError = dlerror();
 		if (dlsymError)
@@ -198,7 +198,8 @@ void Object::sceneSetup()
 		else
 		{
 			//call initialization function
-			pInitializationFunction(this);
+			pInitializationFunction(this, mTmpl->getParameterTable(),
+					mTmpl->pandaFramework(), mTmpl->windowFramework());
 		}
 	}
 }
@@ -241,7 +242,8 @@ void Object::unloadInitializationFunctions()
 	//Close the initialization functions library
 	if (dlclose(mInitializationLib) != 0)
 	{
-		std::cerr << "Error closing library: " << INITIALIZATIONS_SO << std::endl;
+		std::cerr << "Error closing library: " << INITIALIZATIONS_SO
+				<< std::endl;
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;

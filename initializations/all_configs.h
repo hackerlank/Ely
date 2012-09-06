@@ -32,6 +32,10 @@
 __attribute__((constructor)) void initializationsInit();
 __attribute__((destructor)) void initializationsEnd();
 
+//generic typedefs
+typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
+		PandaFramework* pandaFramework, WindowFramework* windowFramework);
+
 #ifdef __cplusplus
 extern "C"
 {

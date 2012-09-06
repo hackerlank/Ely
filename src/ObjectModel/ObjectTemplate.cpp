@@ -187,6 +187,24 @@ std::list<std::string> ObjectTemplate::parameterList(
 	return strList;
 }
 
+ParameterTable ObjectTemplate::getParameterTable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mParameterTable;
+}
+
+PandaFramework* const ObjectTemplate::pandaFramework() const
+{
+	return mPandaFramework;
+}
+
+WindowFramework* const ObjectTemplate::windowFramework() const
+{
+	return mWindowFramework;
+}
+
 ReMutex& ObjectTemplate::getMutex()
 {
 	return mMutex;

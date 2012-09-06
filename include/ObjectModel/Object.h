@@ -163,7 +163,8 @@ public:
 	/**
 	 * \brief Initialization function type.
 	 */
-	typedef void (*PINITILIZATION)(Object*);
+	typedef void (*PINITIALIZATION)(SMARTPTR(Object), const ParameterTable& paramTable,
+			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.

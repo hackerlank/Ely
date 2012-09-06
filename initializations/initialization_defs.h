@@ -32,16 +32,16 @@ extern "C"
 #endif
 
 ///camera related
-Object::PINITILIZATION camera_initialization;
+INITIALIZATION camera_initialization;
 
 ///Actor1 related
-Object::PINITILIZATION Actor1_initialization;
+INITIALIZATION Actor1_initialization;
 
 ///Plane1 related
-Object::PINITILIZATION Plane1_initialization;
+INITIALIZATION Plane1_initialization;
 
 ///Terrain1 related
-Object::PINITILIZATION Terrain1_initialization;
+INITIALIZATION Terrain1_initialization;
 
 #ifdef __cplusplus
 }
