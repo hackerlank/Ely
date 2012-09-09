@@ -288,7 +288,7 @@ void RigidBody::onAddToObjectSetup()
 	ownerNodePath.reparent_to(mNodePath);
 	//correct (or possibly reset to zero) pos and hpr of the object node path
 	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
-	if (mOwnerObject->isStatic() and (mShapeType != HEIGHTFIELD))//Hack
+	if (mOwnerObject->isStatic() and (mShapeType != HEIGHTFIELD))	//Hack
 	{
 		ownerNodePath.flatten_light();
 	}
@@ -364,6 +364,26 @@ void RigidBody::setNodePath(const NodePath& nodePath)
 
 SMARTPTR(BulletShape)RigidBody::createShape(ShapeType shapeType)
 {
+	//check if it should use shape of another (already) created object
+	ObjectId useShapeOfId = ObjectId(mTmpl->parameter(std::string("use_shape_of")));
+	if (not useShapeOfId.empty())
+	{
+		SMARTPTR(Object)createdObject =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(
+				useShapeOfId);
+		if (createdObject != NULL)
+		{
+			//object already exists
+			SMARTPTR(RigidBody)rigidBody = DCAST(RigidBody, createdObject->
+					getComponent(ComponentFamilyType("Physics")));
+			if (rigidBody != NULL)
+			{
+				//physics component is a rigid body:
+				//return a reference to its (first and only) shape
+				return rigidBody->mRigidBodyNode->get_shape(0);
+			}
+		}
+	}
 	//get the bounding dimensions of object node path, that
 	//should represents a model
 	getBoundingDimensions(mOwnerObject->getNodePath());

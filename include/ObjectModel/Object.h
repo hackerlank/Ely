@@ -51,6 +51,8 @@ typedef std::string ObjectId;
  * physics, animation, etc...), already existing in Panda3d.
  * An object can have only one component of a given family.
  * Each object has a NodePath embedded.\n
+ * An object is an aggregation of components: a “has a,” or whole/part,
+ * relationship where neither class owns the other.\n
  * Object can be initialized after it is added to the scene, by
  * an initialization function, whose name is <OBJECTID>_initialization
  * loaded at runtime from a dynamic linked library (referenced by the

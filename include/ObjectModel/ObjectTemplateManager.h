@@ -37,7 +37,7 @@
  * \brief Singleton template manager that stores all the object templates.
  *
  * This manager takes responsibility to create game objects and maintains
- * a table of (pointers to) created objects, indexed by ObjectId.
+ * a table of (pointers to) created objects, indexed by ObjectId.\n
  * Thread-safe during utilization.
  */
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>

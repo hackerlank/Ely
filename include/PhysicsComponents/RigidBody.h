@@ -56,8 +56,8 @@ class RigidBodyTemplate;
 /**
  * \brief Component representing a single rigid body attached to an object.
  *
- * It constructs a rigid body with the specified collision shape_type along
- * with relevant parameters.\n
+ * It constructs a rigid body with the single specified collision shape_type
+ * along with relevant parameters.\n
  * Collision shapes are:
  * - "sphere"
  * - "plane"
@@ -65,6 +65,7 @@ class RigidBodyTemplate;
  * - "cylinder"
  * - "capsule"
  * - "cone"
+ * - "heightfield"
  * In case of "sphere", "box", "cylinder", "capsule", "cone", if any of
  * the relevant parameters is missing, the shape is automatically
  * constructed by guessing them through calculation of a tight bounding volume
@@ -78,6 +79,7 @@ class RigidBodyTemplate;
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
  * - "shape_type"  				|single|"sphere"
+ * - "use_shape_of"				|single|no default
  * - "collide_mask"  			|single|"all_on"
  * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
  * - "shape_norm_x"  			|single|no default (plane)
