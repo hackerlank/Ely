@@ -274,8 +274,9 @@ void RigidBody::onAddToObjectSetup()
 	//<BUG: you must first insert a dynamic body for switching to work
 	mRigidBodyNode->set_mass(1.0);
 	//BUG>
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach_rigid_body(
-			mRigidBodyNode);
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+			DCAST(TypedObject, mRigidBodyNode));
+
 	switchType(mBodyType);
 
 	//create a node path for the rigid body

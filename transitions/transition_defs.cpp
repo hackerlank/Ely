@@ -95,7 +95,41 @@ ValueList Filter_strafe_right_Actor1(fsm*, Activity& activity,
 	return valList;
 }
 //up
+void Enter_up_Actor1(fsm*, Activity& activity,
+		const ValueList& valueList)
+{
+	PRINT("Enter_up_Actor1");
+}
+void Exit_up_Actor1(fsm*, Activity& activity)
+{
+	PRINT("Exit_up_Actor1");
+}
+ValueList Filter_up_Actor1(fsm*, Activity& activity,
+		const std::string& state, const ValueList& valueList)
+{
+	ValueList valList = valueList;
+	PRINT("Filter_up_Actor1");
+	valList.push_front(state);
+	return valList;
+}
 //down
+void Enter_down_Actor1(fsm*, Activity& activity,
+		const ValueList& valueList)
+{
+	PRINT("Enter_down_Actor1");
+}
+void Exit_down_Actor1(fsm*, Activity& activity)
+{
+	PRINT("Exit_down_Actor1");
+}
+ValueList Filter_down_Actor1(fsm*, Activity& activity,
+		const std::string& state, const ValueList& valueList)
+{
+	ValueList valList = valueList;
+	PRINT("Filter_down_Actor1");
+	valList.push_front(state);
+	return valList;
+}
 //forward_FromTo_strafe_left
 void forward_FromTo_strafe_left_Actor1(fsm*, Activity& activity,
 		const ValueList& valueList)

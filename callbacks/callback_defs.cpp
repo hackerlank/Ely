@@ -76,7 +76,7 @@ static std::string getBareEvent(const std::string& eventName, bool* isEnabled)
 static void setDriverCommand(SMARTPTR(Driver)driver, const std::string& bareEvent,
 bool enable, const char* keys[])
 {
-	//set the right command
+		//set the right command
 		if (bareEvent == keys[0])
 		{
 			driver->enableForward(enable);
