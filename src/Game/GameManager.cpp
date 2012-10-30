@@ -132,6 +132,14 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new DriverTemplate(this, mWindow));
 
+	///Physics templates
+	//RigidBody
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new RigidBodyTemplate(this, mWindow));
+	//Character
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new CharacterTemplate(this, mWindow));
+
 	///Scene templates
 	//InstanceOf
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
@@ -145,11 +153,6 @@ void GameManager::setupCompTmplMgr()
 	//Terrain
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new TerrainTemplate(this, mWindow));
-
-	///Physics templates
-	//RigidBody
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new RigidBodyTemplate(this, mWindow));
 
 }
 

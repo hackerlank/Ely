@@ -54,7 +54,7 @@ const ComponentFamilyType Listener::familyType() const
 
 const ComponentType Listener::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool Listener::initialize()

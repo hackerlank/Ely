@@ -70,7 +70,7 @@ const ComponentFamilyType Driver::familyType() const
 
 const ComponentType Driver::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 void Driver::enable()

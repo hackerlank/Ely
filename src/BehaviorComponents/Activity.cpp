@@ -51,7 +51,7 @@ const ComponentFamilyType Activity::familyType() const
 
 const ComponentType Activity::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool Activity::initialize()

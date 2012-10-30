@@ -56,7 +56,7 @@ const ComponentFamilyType Terrain::familyType() const
 
 const ComponentType Terrain::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool Terrain::initialize()

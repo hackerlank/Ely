@@ -43,6 +43,8 @@ void initTypedObjects()
 	DriverTemplate::init_type();
 	RigidBody::init_type();
 	RigidBodyTemplate::init_type();
+	Character::init_type();
+	CharacterTemplate::init_type();
 	InstanceOf::init_type();
 	InstanceOfTemplate::init_type();
 	Model::init_type();

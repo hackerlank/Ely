@@ -49,7 +49,7 @@ const ComponentFamilyType Model::familyType() const
 
 const ComponentType Model::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool Model::initialize()

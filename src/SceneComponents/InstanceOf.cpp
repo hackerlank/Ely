@@ -49,7 +49,7 @@ const ComponentFamilyType InstanceOf::familyType() const
 
 const ComponentType InstanceOf::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool InstanceOf::initialize()

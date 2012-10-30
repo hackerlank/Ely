@@ -49,7 +49,7 @@ const ComponentFamilyType NodePathWrapper::familyType() const
 
 const ComponentType NodePathWrapper::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool NodePathWrapper::initialize()

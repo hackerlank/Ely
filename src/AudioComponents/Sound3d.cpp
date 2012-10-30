@@ -65,7 +65,7 @@ const ComponentFamilyType Sound3d::familyType() const
 
 const ComponentType Sound3d::componentType() const
 {
-	return mTmpl.p()->componentType();
+	return mTmpl->componentType();
 }
 
 bool Sound3d::initialize()
