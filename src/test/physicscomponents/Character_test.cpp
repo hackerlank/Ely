@@ -40,15 +40,15 @@ BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
 /// Test cases
 BOOST_AUTO_TEST_CASE(CharacterTEST)
 {
-	BOOST_TEST_MESSAGE("TESTING CharacterTemplate");
-	mCharTmpl = new CharacterTemplate(mPanda,mWin);
+	BOOST_TEST_MESSAGE("TESTING CharacterControllerTemplate");
+	mCharTmpl = new CharacterControllerTemplate(mPanda,mWin);
 	BOOST_REQUIRE(mCharTmpl != NULL);
 	mCharTmpl->setParametersDefaults();
-	BOOST_TEST_MESSAGE("TESTING Character");
+	BOOST_TEST_MESSAGE("TESTING CharacterController");
 	mChar =
-	DCAST(Character, mRigidTmpl->makeComponent(mCompId));
+	DCAST(CharacterController, mRigidTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mChar != NULL);
-	BOOST_CHECK(mChar->componentType() == ComponentId("Character"));
+	BOOST_CHECK(mChar->componentType() == ComponentId("CharacterController"));
 	BOOST_CHECK(mChar->familyType() == ComponentFamilyType("Physics"));
 }
 

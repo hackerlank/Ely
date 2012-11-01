@@ -138,7 +138,7 @@ void GameManager::setupCompTmplMgr()
 			new RigidBodyTemplate(this, mWindow));
 	//Character
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new CharacterTemplate(this, mWindow));
+			new CharacterControllerTemplate(this, mWindow));
 
 	///Scene templates
 	//InstanceOf

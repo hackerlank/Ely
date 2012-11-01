@@ -15,15 +15,15 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/PhysicsComponents/CharacterTemplate.cpp
+ * \file /Ely/src/PhysicsComponents/CharacterControllerTemplate.cpp
  *
  * \date 30/ott/2012 17:01:34
  * \author marco
  */
 
-#include "PhysicsComponents/CharacterTemplate.h"
+#include "PhysicsComponents/CharacterControllerTemplate.h"
 
-CharacterTemplate::CharacterTemplate(PandaFramework* pandaFramework,
+CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
@@ -40,27 +40,27 @@ CharacterTemplate::CharacterTemplate(PandaFramework* pandaFramework,
 	setParametersDefaults();
 }
 
-CharacterTemplate::~CharacterTemplate()
+CharacterControllerTemplate::~CharacterControllerTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType CharacterTemplate::componentType() const
+const ComponentType CharacterControllerTemplate::componentType() const
 {
-	return ComponentType("Character");
+	return ComponentType("CharacterController");
 }
 
-const ComponentFamilyType CharacterTemplate::familyType() const
+const ComponentFamilyType CharacterControllerTemplate::familyType() const
 {
 	return ComponentFamilyType("Physics");
 }
 
-SMARTPTR(Component)CharacterTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)CharacterControllerTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	SMARTPTR(Character) newCharacter = new Character(this);
+	SMARTPTR(CharacterController) newCharacter = new CharacterController(this);
 	newCharacter->setComponentId(compId);
 	if (not newCharacter->initialize())
 	{
@@ -69,7 +69,7 @@ SMARTPTR(Component)CharacterTemplate::makeComponent(const ComponentId& compId)
 	return newCharacter.p();
 }
 
-void CharacterTemplate::setParametersDefaults()
+void CharacterControllerTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -80,5 +80,5 @@ void CharacterTemplate::setParametersDefaults()
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle CharacterTemplate::_type_handle;
+TypeHandle CharacterControllerTemplate::_type_handle;
 

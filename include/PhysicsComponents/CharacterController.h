@@ -15,95 +15,61 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/RigidBody.h
+ * \file /Ely/include/PhysicsComponents/CharacterController.h
  *
- * \date 07/lug/2012 (15:58:35)
+ * \date 30/ott/2012 17:03:49
  * \author marco
  */
 
-#ifndef RIGIDBODY_H_
-#define RIGIDBODY_H_
+#ifndef CHARACTERCONTROLLER_H_
+#define CHARACTERCONTROLLER_H_
 
 #include <string>
 #include <cstdlib>
-#include <stdint.h>
 #include <cmath>
-//#include <algorithm>
 #include <pointerTo.h>
 #include <nodePath.h>
-#include <bitMask.h>
-#include <pnmImage.h>
-#include <filename.h>
 #include <lvecBase3.h>
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <bulletShape.h>
 #include <bulletSphereShape.h>
 #include <bulletBoxShape.h>
-#include <bulletPlaneShape.h>
 #include <bulletCylinderShape.h>
 #include <bulletCapsuleShape.h>
 #include <bulletConeShape.h>
-#include <bulletHeightfieldShape.h>
-#include <bulletRigidBodyNode.h>
+#include <bulletCharacterControllerNode.h>
 #include <bullet_utils.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Utilities/Tools.h"
 
-class RigidBodyTemplate;
+class CharacterControllerTemplate;
 
 /**
- * \brief Component representing a single rigid body attached to an object.
+ * \brief Component representing a character controller attached to an object.
  *
- * It constructs a rigid body with the single specified collision shape_type
- * along with relevant parameters.\n
- * Collision shapes are:
- * - "sphere"
- * - "plane"
- * - "box"
- * - "cylinder"
- * - "capsule"
- * - "cone"
- * - "heightfield"
- * In case of "sphere", "box", "cylinder", "capsule", "cone", if any of
- * the relevant parameters is missing, the shape is automatically
- * constructed by guessing them through calculation of a tight bounding volume
- * of object geometry (supposedly specified by the model component).\n
- * For "plane" shape, in case of missing parameters, the default is
- * a plane with normal = (0,0,1) and d = 0.
+ * It constructs a character controller with the single specified collision
+ * shape_type along with relevant parameters.\n
  *
  * XML Param(s):
- * - "body_type"  				|single|"dynamic" ("static","kinematic")
- * - "body_mass"  				|single|"1.0"
- * - "body_friction"  			|single|"0.8"
- * - "body_restitution"  		|single|"0.1"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
  * - "use_shape_of"				|single|no default
  * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
- * - "shape_norm_x"  			|single|no default (plane)
- * - "shape_norm_y"  			|single|no default (plane)
- * - "shape_norm_z"  			|single|no default (plane)
- * - "shape_d"  				|single|no default (plane)
+ * - "shape_height"  			|single|no default (cylinder,capsule,cone)
+ * - "shape_up"  				|single|no default (cylinder,capsule,cone)
  * - "shape_half_x"  			|single|no default (box)
  * - "shape_half_y"  			|single|no default (box)
  * - "shape_half_z"  			|single|no default (box)
- * - "shape_height"  			|single|no default (cylinder,capsule,cone,heightfield)
- * - "shape_up"  				|single|no default (cylinder,capsule,cone,heightfield)
- * - "shape_heightfield_file" 	|single|no default (heightfield)
- * - "shape_scale_w"  			|single|"1.0" (heightfield)
- * - "shape_scale_d"  			|single|"1.0" (heightfield)
- * - "ccd_motion_threshold"  	|single|no default
- * - "ccd_swept_sphere_radius" 	|single|no default
  */
-class RigidBody: public Component
+class CharacterController: public Component
 {
 public:
-	RigidBody();
-	RigidBody(SMARTPTR(RigidBodyTemplate) tmpl);
-	virtual ~RigidBody();
+	CharacterController();
+	CharacterController(SMARTPTR(CharacterControllerTemplate) tmpl);
+	virtual ~CharacterController();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -113,42 +79,20 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief The actual component's type.
-	 *
-	 * It may change during the component's lifetime.
-	 */
-	enum BodyType
-	{
-		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
-		STATIC, //!< STATIC: mass == 0.0, no driven
-		KINEMATIC //!< KINEMATIC: mass == 0.0, user driven
-	};
-
-	/**
 	 * \brief The shape type.
 	 */
 	enum ShapeType
 	{
 		SPHERE, //!< SPHERE (radius)
-		PLANE, //!< PLANE (norm_x, norm_y, norm_z, d)
 		BOX, //!< BOX (half_x, half_y, half_z)
 		CYLINDER, //!< CYLINDER (radius, height, up)
 		CAPSULE, //!< CAPSULE (radius, height, up)
 		CONE, //!< CONE (radius, height, up)
-		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
 	};
 
 	/**
-	 * \brief Switches the actual component's type.
-	 *
-	 * It sets the rigid body mass too.
-	 * @param bodyType The new component's type.
-	 */
-	void switchType(BodyType bodyType);
-
-	/**
-	 * \brief Gets/sets the node path of this rigid body.
-	 * @return The node path of this rigid body.
+	 * \brief Gets/sets the node path of this character controller.
+	 * @return The node path of this character controller.
 	 */
 	///@{
 	NodePath getNodePath() const;
@@ -156,27 +100,13 @@ public:
 	///@}
 
 private:
-	///The NodePath associated to this rigid body.
+	///The NodePath associated to this character controller.
 	NodePath mNodePath;
-	///The NodePath associated to this rigid body.
-	SMARTPTR(BulletRigidBodyNode) mRigidBodyNode;
-	///@{
-	///Physical parameters.
-	float mBodyMass, mBodyFriction, mBodyRestitution;
-	BodyType mBodyType;
-	ShapeType mShapeType;
-	BitMask32 mCollideMask;
-	//ccd stuff
-	float mCcdMotionThreshold, mCcdSweptSphereRadius;
-	bool mCcdEnabled;
-	/**
-	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
-	 * @param rigidBodyNode The bullet rigid body node.
-	 */
-	void setPhysicalParameters();
-	///@}
+	///The NodePath associated to this character controller.
+	SMARTPTR(BulletCharacterControllerNode) mCharacterNode;
 
 	///Geometric functions and parameters.
+	BitMask32 mCollideMask;
 	///@{
 	/**
 	 * \brief Create a shape given its type.
@@ -184,6 +114,7 @@ private:
 	 * @return The created shape.
 	 */
 	SMARTPTR(BulletShape) createShape(ShapeType shapeType);
+	ShapeType mShapeType;
 	/**
 	 * \brief Calculates geometric characteristics of a GeomNode.
 	 *
@@ -203,7 +134,6 @@ private:
 	LVector3 mModelDeltaCenter;
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
-	Filename mHeightfieldFile;
 	BulletUpAxis mUpAxis;
 	///@}
 
@@ -216,7 +146,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "RigidBody", Component::get_class_type());
+		register_type(_type_handle, "CharacterController", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -233,4 +163,4 @@ private:
 
 };
 
-#endif /* RIGIDBODY_H_ */
+#endif /* CHARACTERCONTROLLER_H_ */

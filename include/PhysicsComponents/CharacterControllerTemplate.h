@@ -15,27 +15,27 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/CharacterTemplate.h
+ * \file /Ely/include/PhysicsComponents/CharacterControllerTemplate.h
  *
  * \date 30/ott/2012 17:01:33
  * \author marco
  */
 
-#ifndef CHARACTERTEMPLATE_H_
-#define CHARACTERTEMPLATE_H_
+#ifndef CHARACTERCONTROLLERTEMPLATE_H_
+#define CHARACTERCONTROLLERTEMPLATE_H_
 
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "PhysicsComponents/Character.h"
+#include "PhysicsComponents/CharacterController.h"
 #include "Game/GamePhysicsManager.h"
 #include "Utilities/Tools.h"
 
-class CharacterTemplate: public ComponentTemplate
+class CharacterControllerTemplate: public ComponentTemplate
 {
 public:
-	CharacterTemplate(PandaFramework* pandaFramework,
+	CharacterControllerTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~CharacterTemplate();
+	virtual ~CharacterControllerTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -56,7 +56,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "CharacterTemplate",
+		register_type(_type_handle, "CharacterControllerTemplate",
 				ComponentTemplate::get_class_type());
 	}
 
@@ -75,4 +75,4 @@ private:
 	static TypeHandle _type_handle;
 };
 
-#endif /* CHARACTERTEMPLATE_H_ */
+#endif /* CHARACTERCONTROLLERTEMPLATE_H_ */

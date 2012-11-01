@@ -27,8 +27,8 @@
 #include <boost/test/unit_test.hpp>
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
-#include "PhysicsComponents/Character.h"
-#include "PhysicsComponents/CharacterTemplate.h"
+#include "PhysicsComponents/CharacterController.h"
+#include "PhysicsComponents/CharacterControllerTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <pandaFramework.h>
@@ -50,8 +50,8 @@ struct PhysicsSuiteFixture
 		physicsMgr = new GamePhysicsManager();
 		RigidBodyTemplate::init_type();
 		RigidBody::init_type();
-		CharacterTemplate::init_type();
-		Character::init_type();
+		CharacterControllerTemplate::init_type();
+		CharacterController::init_type();
 		ObjectTemplate::init_type();
 		Object::init_type();
 	}
@@ -87,10 +87,10 @@ struct PhysicsSuiteFixture
 		delete mPanda;
 	}
 	SMARTPTR(RigidBody) mRigid;
-	SMARTPTR(Character) mChar;
+	SMARTPTR(CharacterController) mChar;
 	ComponentId mCompId;
 	SMARTPTR(RigidBodyTemplate) mRigidTmpl;
-	SMARTPTR(CharacterTemplate) mCharTmpl;
+	SMARTPTR(CharacterControllerTemplate) mCharTmpl;
 	SMARTPTR(ObjectTemplate) mObjectTmpl;
 	GamePhysicsManager* physicsMgr;
 	PandaFramework* mPanda;
