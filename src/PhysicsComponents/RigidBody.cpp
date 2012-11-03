@@ -41,9 +41,12 @@ RigidBody::~RigidBody()
 
 	if (GamePhysicsManager::GetSingletonPtr())
 	{
+		//Remove rigid body from the physics world
 		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
 				DCAST(TypedObject, mRigidBodyNode));
 	}
+	//Remove node path
+	mNodePath.remove_node();
 }
 
 const ComponentFamilyType RigidBody::familyType() const
@@ -462,7 +465,11 @@ SMARTPTR(BulletShape)RigidBody::createShape(ShapeType shapeType)
 			else
 			{
 				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
-				mDim2 = mModelDims.get_z();
+				mDim2 = mModelDims.get_z() - 2*mDim1;
+				if (mDim2 <= 0.0)
+				{
+					mDim2 = 0.0;
+				}
 			}
 		}
 		collisionShape = new BulletCapsuleShape(mDim1, mDim2, mUpAxis);

@@ -22,6 +22,13 @@
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
 		</ObjectTmpl>
+
+		<ObjectTmpl type="Character">
+			<ComponentTmpl family="Scene" type="Model"/>
+			<ComponentTmpl family="Behavior" type="Activity"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
+			<ComponentTmpl family="Physics" type="CharacterController"/> 
+		</ObjectTmpl>
 		
 		<ObjectTmpl type="StaticActor">
 			<ComponentTmpl family="Scene" type="Model"/>
@@ -136,7 +143,6 @@
 			<Param parent=""/>
 		</Object>
 
-<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model" priority="100">
 				<Param from_file="false"/>
@@ -160,7 +166,6 @@
 			<Param parent="render"/>
 			<Param rot_p="-90.0"/>
 		</Object>
--->
 		
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity"  priority="-100">
@@ -229,6 +234,65 @@
 			<Param rot_r="0.0"/>
 		</Object>
 
+		<Object type="Character" id="NPC1"  priority="100">
+			<Component type="Activity"  priority="-100">
+				<Param states="forward"/>
+				<Param states="backward"/>
+				<Param states="strafe_left"/>
+				<Param states="strafe_right"/>
+				<Param states="roll_left"/>
+				<Param states="roll_right"/>
+				<Param states="jump"/>
+				<Param from_to="forward_FromTo_roll_left"/>
+				<Param from_to="forward_FromTo_roll_right"/>
+				<Param events="i"/>
+				<Param events="i-up"/>
+				<Param events="alt-i"/>
+				<Param events="k"/>
+				<Param events="k-up"/>
+				<Param events="alt-k"/>
+				<Param events="j"/>
+				<Param events="j-up"/>
+				<Param events="alt-j"/>
+				<Param events="l"/>
+				<Param events="l-up"/>
+				<Param events="alt-l"/>
+				<Param events="u"/>
+				<Param events="u-up"/>
+				<Param events="alt-u"/>
+				<Param events="o"/>
+				<Param events="o-up"/>
+				<Param events="alt-o"/>
+				<Param events="space"/>				
+				<Param events="space-up"/>
+				<Param events="alt-space"/>
+				<Param events="alt"/>				
+				<Param events="alt-up"/>
+			</Component>
+			<Component type="Model" priority="100">
+				<Param model_file="panda"/>
+				<Param anim_files="panda-walk"/>
+				<Param scale_x="1.0"/>
+				<Param scale_y="1.0"/>
+				<Param scale_z="1.0"/>
+			</Component>
+			<Component type="CharacterController" priority="90">
+				<Param shape_type="capsule"/>
+				<Param linear_speed="10.0"/>
+			</Component> 
+			<Component type="Sound3d">
+				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_click.wav"/>
+			</Component>
+			<Param parent="render"/>
+			<Param pos_x="50.0"/>
+			<Param pos_y="50.0"/>
+			<Param pos_z="200.0"/>
+			<Param rot_h="0.0"/>
+			<Param rot_p="0.0"/>
+			<Param rot_r="0.0"/>
+		</Object>
+
+<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain" priority="100">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
@@ -253,6 +317,7 @@
 			</Component> 
 			<Param parent="render"/>
 		</Object>
+-->
 
 	</ObjectSet>
 </Game>

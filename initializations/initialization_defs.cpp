@@ -162,3 +162,20 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//Terrain1
 //	object->getNodePath().set_render_mode_wireframe(1);
 }
+
+///NPC1 related
+void NPC1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//NPC1
+	//play animation
+	SMARTPTR(Model) npc1Model = DCAST(Model, object->getComponent(
+					ComponentFamilyType("Scene")));
+	npc1Model->animations().loop("panda_soft", false);
+	//play sound
+	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
+					ComponentFamilyType("Audio")));
+	npc1Sound3d->getSound(0)->set_loop(true);
+	npc1Sound3d->getSound(0)->play();
+
+}

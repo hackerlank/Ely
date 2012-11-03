@@ -22,10 +22,11 @@
  */
 
 #include "callback_defs.h"
+#include "Utilities/ComponentSuite.h"
 
 ///get key bare event: from key, key-up, shift-key returns key and
 ///with *isEnabled false on key-up and true otherwise
-static std::string getBareEvent(const std::string& eventName, bool* isEnabled)
+static std::string getBareEvent(const std::string& eventName, const std::string& modifier, bool* isEnabled)
 {
 	//analyze the event
 	std::string bareEvent;
@@ -34,18 +35,18 @@ static std::string getBareEvent(const std::string& eventName, bool* isEnabled)
 	{
 		//command should be enabled (no "-up" found)
 		*isEnabled = true;
-		//event could be of type STR or shift-STR
-		size_t strPos = eventName.find("shift-", 0);
+		//event could be of type STR or modifierSTR
+		size_t strPos = eventName.find(modifier, 0);
 		if (strPos == string::npos)
 		{
-			//event is of type STR (no "shift-" found)
+			//event is of type STR (no modifier found)
 			bareEvent = eventName;
 		}
 		else
 		{
-			//event is of type shift-STR (STR is from
-			//std::string("shift-").length() up to end)
-			bareEvent = eventName.substr(std::string("shift-").length());
+			//event is of type modifierSTR (STR is from
+			//std::string(modifier).length() up to end)
+			bareEvent = eventName.substr(std::string(modifier).length());
 		}
 	}
 	else
@@ -72,11 +73,11 @@ static std::string getBareEvent(const std::string& eventName, bool* isEnabled)
 //		"r", //up
 //		"f", //down
 //};
-#include "ControlComponents/Driver.h"
-static void setDriverCommand(SMARTPTR(Driver)driver, const std::string& bareEvent,
-bool enable, const char* keys[])
+static void setDriverCommand(
+		SMARTPTR(Driver)driver,
+		const std::string& bareEvent, bool enable, const char* keys[])
 {
-		//set the right command
+	//set the right command
 		if (bareEvent == keys[0])
 		{
 			driver->enableForward(enable);
@@ -118,16 +119,16 @@ bool enable, const char* keys[])
 ///Camera + Driver related
 static const char* camera_keys[] =
 {
-		"w", //forward
-		"s", //backward
-		"a", //strafe_left
-		"d", //strafe_right
-		"", //roll_left
-		"", //roll_right
-		"r", //up
-		"f", //down
+	"w", //forward
+	"s", //backward
+	"a", //strafe_left
+	"d", //strafe_right
+	"", //roll_left
+	"", //roll_right
+	"r", //up
+	"f", //down
 };
-void drive(const Event* event, void* data)
+void driveCamera(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)driver = (Driver*) data;
@@ -141,32 +142,31 @@ void drive(const Event* event, void* data)
 		return;
 	}
 	//get bare event
-	std::string bareEvent = getBareEvent(eventName, &enable);
+	std::string bareEvent = getBareEvent(eventName, "shift-", &enable);
 	//execute command
 	setDriverCommand(driver, bareEvent, enable, camera_keys);
 }
 
 ///Actor1 + Activity related
-#include "BehaviorComponents/Activity.h"
 static const char* Actor1_keys[] =
 {
-		"arrow_up", //forward
-		"arrow_down", //backward
-		"arrow_left", //strafe_left
-		"arrow_right", //strafe_right
-		"", //roll_left
-		"", //roll_right
-		"page_up", //up
-		"page_down", //down
+	"arrow_up", //forward
+	"arrow_down", //backward
+	"arrow_left", //strafe_left
+	"arrow_right", //strafe_right
+	"", //roll_left
+	"", //roll_right
+	"page_up", //up
+	"page_down", //down
 };
-void state(const Event * event, void * data)
+void stateActor1(const Event * event, void * data)
 {
 	//get data
 	SMARTPTR(Activity)activity = (Activity*) data;
 	bool enable;
 	//get bare event
 	std::string eventName = event->get_name();
-	std::string bareEvent = getBareEvent(eventName, &enable);
+	std::string bareEvent = getBareEvent(eventName, "shift-", &enable);
 	//get a reference to the actor fsm
 	fsm& actorFSM = (fsm&) (*activity);
 	SMARTPTR(Object) actorObj = activity->getOwnerObject();
@@ -215,7 +215,7 @@ void state(const Event * event, void * data)
 	}
 	else
 	{
-		PRINTERR("state: Event not defined for state transition: " << event->get_name());
+		PRINTERR("stateActor1: Event not defined for state transition: " << event->get_name());
 	}
 	//call the Driver event handler to move actor
 	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
@@ -228,4 +228,152 @@ void state(const Event * event, void * data)
 	}
 	//execute command
 	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
+}
+
+///NPC1 + Activity related
+///CharacterController helper functions for key events in this order:
+//static const char* keys[] =
+//{
+//		"i", //forward
+//		"k", //backward
+//		"u", //strafe_left
+//		"o", //strafe_right
+//		"j", //roll_left
+//		"l", //roll_right
+//		"space", //jump
+//};
+static void setCharacterControllerCommand(
+		SMARTPTR(CharacterController)characterController,
+		const std::string& bareEvent,bool enable, const char* keys[])
+{
+	//set the right command
+	if (bareEvent == keys[0])
+	{
+		characterController->enableForward(enable);
+	}
+	else if (bareEvent == keys[1])
+	{
+		characterController->enableBackward(enable);
+	}
+	else if (bareEvent == keys[2])
+	{
+		characterController->enableStrafeLeft(enable);
+	}
+	else if (bareEvent == keys[3])
+	{
+		characterController->enableStrafeRight(enable);
+	}
+	else if (bareEvent == keys[4])
+	{
+		characterController->enableRollLeft(enable);
+	}
+	else if (bareEvent == keys[5])
+	{
+		characterController->enableRollRight(enable);
+	}
+	else if (bareEvent == keys[6])
+	{
+		characterController->enableJump(enable);
+	}
+	else
+	{
+		PRINTERR("setCharacterControllerCommand: Event not defined: " << bareEvent);
+	}
+}
+static const char* NPC1_keys[] =
+{
+	"i", //forward
+	"k", //backward
+	"u", //strafe_left
+	"o", //strafe_right
+	"j", //roll_left
+	"l", //roll_right
+	"space", //jump
+};
+void stateNPC1(const Event * event, void * data)
+{
+	//get data
+	SMARTPTR(Activity)activity = (Activity*) data;
+	bool enable;
+	//get bare event
+	std::string eventName = event->get_name();
+	std::string bareEvent = getBareEvent(eventName, "alt-", &enable);
+	//get a reference to the character fsm
+	fsm& characterFSM = (fsm&) (*activity);
+	SMARTPTR(Object) characterObj = activity->getOwnerObject();
+	//set the right command
+	if (bareEvent == "i")
+	{
+		if (enable)
+		{
+			characterFSM.request("forward");
+		}
+	}
+	else if (bareEvent == "k")
+	{
+		if (enable)
+		{
+			characterFSM.request("backward");
+		}
+	}
+	else if (bareEvent == "u")
+	{
+		if (enable)
+		{
+			characterFSM.request("strafe_left");
+		}
+	}
+	else if (bareEvent == "o")
+	{
+		if (enable)
+		{
+			characterFSM.request("strafe_right");
+		}
+	}
+	else if (bareEvent == "j")
+	{
+		if (enable)
+		{
+			characterFSM.request("roll_left");
+		}
+	}
+	else if (bareEvent == "l")
+	{
+		if (enable)
+		{
+			characterFSM.request("roll_right");
+		}
+	}
+	else if (bareEvent == "space")
+	{
+		if (enable)
+		{
+			characterFSM.request("jump");
+		}
+	}
+	else
+	{
+		PRINTERR("stateNPC1: Event not defined for state transition: " << event->get_name());
+	}
+	//call the CharcterController event handler to move actor
+	SMARTPTR(CharacterController) characterDrv = DCAST (CharacterController, characterObj->getComponent("Physics"));
+	//check if alt or alt-up key pressed
+	if ((eventName == "alt") or (eventName == "alt-up"))
+	{
+		if (eventName.find("-up", 0) == string::npos)
+		{
+			//fast speeds
+			characterDrv->setLinearSpeed(2.0*characterDrv->getLinearSpeed());
+			characterDrv->setAngularSpeed(2.0*characterDrv->getAngularSpeed());
+		}
+		else
+		{
+			//normal speeds
+			characterDrv->setLinearSpeed(0.5*characterDrv->getLinearSpeed());
+			characterDrv->setAngularSpeed(0.5*characterDrv->getAngularSpeed());
+		}
+		return;
+	}
+	//execute command
+	setCharacterControllerCommand(characterDrv, bareEvent, enable, NPC1_keys);
 }

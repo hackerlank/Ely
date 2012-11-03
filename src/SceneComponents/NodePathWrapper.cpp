@@ -29,7 +29,7 @@ NodePathWrapper::NodePathWrapper()
 	// TODO Auto-generated constructor stub
 }
 
-NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate) tmpl)
+NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl)
 {
 	mTmpl = tmpl;
 }
@@ -39,7 +39,7 @@ NodePathWrapper::~NodePathWrapper()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	// TODO Auto-generated destructor stub
+	mNodePath.remove_node();
 }
 
 const ComponentFamilyType NodePathWrapper::familyType() const

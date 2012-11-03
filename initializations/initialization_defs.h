@@ -43,6 +43,9 @@ INITIALIZATION Plane1_initialization;
 ///Terrain1 related
 INITIALIZATION Terrain1_initialization;
 
+///NPC1 related
+INITIALIZATION NPC1_initialization;
+
 #ifdef __cplusplus
 }
 #endif

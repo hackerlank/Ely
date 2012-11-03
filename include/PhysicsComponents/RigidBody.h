@@ -171,7 +171,6 @@ private:
 	bool mCcdEnabled;
 	/**
 	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
-	 * @param rigidBodyNode The bullet rigid body node.
 	 */
 	void setPhysicalParameters();
 	///@}

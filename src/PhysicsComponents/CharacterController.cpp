@@ -32,6 +32,13 @@ CharacterController::CharacterController()
 CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl)
 {
 	mTmpl = tmpl;
+	mForward = false;
+	mBackward = false;
+	mStrafeLeft = false;
+	mStrafeRight = false;
+	mRollLeft = false;
+	mRollRight = false;
+	mJump = false;
 }
 
 CharacterController::~CharacterController()
@@ -39,11 +46,17 @@ CharacterController::~CharacterController()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//first check if game physics manager exists
 	if (GamePhysicsManager::GetSingletonPtr())
 	{
+		//Remove from the physics manager update
+		GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
+		//Remove character controller from the physics world
 		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-				DCAST(TypedObject, mCharacterNode));
+				DCAST(TypedObject, mCharacterController));
 	}
+	//Remove node path
+	mNodePath.remove_node();
 }
 
 const ComponentFamilyType CharacterController::familyType() const
@@ -62,6 +75,9 @@ bool CharacterController::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//get step height
+	mStepHeight = (float) atof(
+			mTmpl->parameter(std::string("step_height")).c_str());
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
 	//default auto shaping
@@ -161,6 +177,49 @@ bool CharacterController::initialize()
 		mCollideMask.write(std::cout, 0);
 #endif
 	}
+	//set control parameters
+	mLinearSpeed = (float) atof(
+			mTmpl->parameter(std::string("linear_speed")).c_str());
+	mAngularSpeed = (float) atof(
+			mTmpl->parameter(std::string("angular_speed")).c_str());
+	mFallSpeed = (float) atof(
+			mTmpl->parameter(std::string("fall_speed")).c_str());
+	mGravity = (float) atof(mTmpl->parameter(std::string("gravity")).c_str());
+	mJumpSpeed = (float) atof(
+			mTmpl->parameter(std::string("jump_speed")).c_str());
+	mMaxSlope = (float) atof(
+			mTmpl->parameter(std::string("max_slope")).c_str());
+	mMaxJumpHeight = (float) atof(
+			mTmpl->parameter(std::string("max_jump_height")).c_str());
+	//key events setting
+	//backward key
+	mBackwardKey = (
+			mTmpl->parameter(std::string("backward"))
+					== std::string("enabled") ? true : false);
+	//forward key
+	mForwardKey = (
+			mTmpl->parameter(std::string("forward")) == std::string("enabled") ?
+					true : false);
+	//strafeLeft key
+	mStrafeLeftKey = (
+			mTmpl->parameter(std::string("strafe_left"))
+					== std::string("enabled") ? true : false);
+	//strafeRight key
+	mStrafeRightKey = (
+			mTmpl->parameter(std::string("strafe_right"))
+					== std::string("enabled") ? true : false);
+	//rollLeft key
+	mRollLeftKey = (
+			mTmpl->parameter(std::string("roll_left"))
+					== std::string("enabled") ? true : false);
+	//rollRight key
+	mRollRightKey = (
+			mTmpl->parameter(std::string("roll_right"))
+					== std::string("enabled") ? true : false);
+	//jump key
+	mJumpKey = (
+			mTmpl->parameter(std::string("jump")) == std::string("enabled") ?
+					true : false);
 	//setup event callbacks if any
 	setupEvents();
 	//
@@ -172,13 +231,205 @@ void CharacterController::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//At this point a Scene component (Model, InstanceOf ...) should have
+	//been already created and added to the object, so its node path should
+	//be the same as the object's one.
+	//Note: scaling is applied to a Scene component, so the object node path
+	//has scaling already applied.
+
+	//create a Character Controller Node
+	mCharacterController = new BulletCharacterControllerNode(
+			createShape(mShapeType), mStepHeight,
+			std::string(mComponentId).c_str());
+	//set the control parameters
+	setControlParameters();
+
+	//attach it to Bullet World
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+			DCAST(TypedObject, mCharacterController));
+
+	//create a node path for the character controller
+	mNodePath = NodePath(mCharacterController);
+	//set collide mask
+	mNodePath.set_collide_mask(mCollideMask);
+
+	//reparent the object node path as a child of the character controller's one
+	NodePath ownerNodePath = mOwnerObject->getNodePath();
+	ownerNodePath.reparent_to(mNodePath);
+
+	//set the object node path as this character controller's one
+	mOwnerObject->setNodePath(mNodePath);
+	//correct (or possibly reset to zero) pos and hpr of the object node path
+	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+
+	//Add to the physics manager update
+	//first check if game physics manager exists
+	if (GamePhysicsManager::GetSingletonPtr())
+	{
+		GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
+	}
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
-void CharacterController::onAddToSceneSetup()
+void CharacterController::enableForward(bool enable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	if (mForwardKey)
+	{
+		mForward = enable;
+	}
+}
+
+void CharacterController::enableBackward(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mBackwardKey)
+	{
+		mBackward = enable;
+	}
+}
+
+void CharacterController::enableStrafeLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mStrafeLeftKey)
+	{
+		mStrafeLeft = enable;
+	}
+}
+
+void CharacterController::enableStrafeRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mStrafeRightKey)
+	{
+		mStrafeRight = enable;
+	}
+}
+
+void CharacterController::enableRollLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mRollLeftKey)
+	{
+		mRollLeft = enable;
+	}
+}
+
+void CharacterController::enableRollRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mRollRightKey)
+	{
+		mRollRight = enable;
+	}
+}
+
+void CharacterController::enableJump(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mJumpKey)
+	{
+		mJump = enable;
+	}
+}
+
+float CharacterController::getLinearSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mLinearSpeed;
+}
+
+void CharacterController::setLinearSpeed(float speed)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mLinearSpeed = speed;
+}
+
+float CharacterController::getAngularSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAngularSpeed;
+}
+
+void CharacterController::setAngularSpeed(float speed)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAngularSpeed = speed;
+}
+
+void CharacterController::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+	LVector3 speed(0, 0, 0);
+	float omega = 0.0;
+
+	//handle keys:
+	if (mForward)
+	{
+		speed.set_y(-mLinearSpeed);
+	}
+	if (mBackward)
+	{
+		speed.set_y(mLinearSpeed);
+	}
+	if (mStrafeLeft)
+	{
+		speed.set_x(-mLinearSpeed);
+	}
+	if (mStrafeRight)
+	{
+		speed.set_x(mLinearSpeed);
+	}
+	if (mRollLeft)
+	{
+		omega = mAngularSpeed;
+	}
+	if (mRollRight)
+	{
+		omega = -mAngularSpeed;
+	}
+	// set movements
+	mCharacterController->set_linear_movement(speed, true);
+	mCharacterController->set_angular_movement(omega);
+	if (mJump)
+	{
+		if (mCharacterController->is_on_ground())
+		{
+			mCharacterController->do_jump();
+		}
+	}
 }
 
 NodePath CharacterController::getNodePath() const
@@ -215,7 +466,7 @@ SMARTPTR(BulletShape)CharacterController::createShape(ShapeType shapeType)
 			{
 				//physics component is a character controller:
 				//return a reference to its shape
-				return characterController->mCharacterNode->get_shape();
+				return characterController->mCharacterController->get_shape();
 			}
 		}
 	}
@@ -284,7 +535,11 @@ SMARTPTR(BulletShape)CharacterController::createShape(ShapeType shapeType)
 			else
 			{
 				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
-				mDim2 = mModelDims.get_z();
+				mDim2 = mModelDims.get_z() - 2*mDim1;
+				if (mDim2 <= 0.0)
+				{
+					mDim2 = 0.0;
+				}
 			}
 		}
 		collisionShape = new BulletCapsuleShape(mDim1, mDim2, mUpAxis);
@@ -331,6 +586,18 @@ void CharacterController::getBoundingDimensions(NodePath modelNP)
 	mModelDeltaCenter = -(minP + delta / 2.0);
 	mModelRadius = max(max(mModelDims.get_x(), mModelDims.get_y()),
 			mModelDims.get_z()) / 2.0;
+}
+
+void CharacterController::setControlParameters()
+{
+	mCharacterController->set_fall_speed(mFallSpeed);
+	mCharacterController->set_gravity(mGravity);
+	mCharacterController->set_jump_speed(mJumpSpeed);
+	mCharacterController->set_max_slope(mMaxSlope);
+	if (mMaxJumpHeight > 0.0)
+	{
+		mCharacterController->set_max_jump_height(mMaxJumpHeight);
+	}
 }
 
 //TypedObject semantics: hardcoded

@@ -77,6 +77,22 @@ void CharacterControllerTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("step_height", "1.0"));
+	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("fall_speed", "55.0"));
+	mParameterTable.insert(ParameterNameValue("gravity", "29.4"));
+	mParameterTable.insert(ParameterNameValue("jump_speed", "10.0"));
+	mParameterTable.insert(ParameterNameValue("max_slope", "45.0"));
+	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("roll_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("roll_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("jump", "enabled"));
+	mParameterTable.insert(ParameterNameValue("linear_speed", "3.0"));
+	mParameterTable.insert(ParameterNameValue("angular_speed", "120.0"));
 }
 
 //TypedObject semantics: hardcoded

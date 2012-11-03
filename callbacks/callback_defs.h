@@ -32,10 +32,13 @@ extern "C"
 #endif
 
 ///Camera + Driver related
-CALLBACK drive;
+CALLBACK driveCamera;
 
 ///Actor1 + Activity related
-CALLBACK state;
+CALLBACK stateActor1;
+
+///NPC1 + Activity related
+CALLBACK stateNPC1;
 
 #ifdef __cplusplus
 }

@@ -29,6 +29,14 @@
 #include <bulletWorld.h>
 #include <bulletDebugNode.h>
 #include <pandaFramework.h>
+#include <bulletSphereShape.h>
+#include <bulletShape.h>
+#include <bulletBoxShape.h>
+#include <bulletPlaneShape.h>
+#include <bulletCylinderShape.h>
+#include <bulletCapsuleShape.h>
+#include <bulletConeShape.h>
+#include <bulletHeightfieldShape.h>
 
 #ifdef DEBUG
 #include <windowFramework.h>
@@ -109,6 +117,21 @@ public:
 	 */
 	void debug(bool enable);
 #endif
+
+	///Helper functions, data structures
+	/**
+	 * \brief Shape type.
+	 */
+	enum ShapeType
+	{
+		SPHERE, //!< SPHERE (radius)
+		PLANE, //!< PLANE (norm_x, norm_y, norm_z, d)
+		BOX, //!< BOX (half_x, half_y, half_z)
+		CYLINDER, //!< CYLINDER (radius, height, up)
+		CAPSULE, //!< CAPSULE (radius, height, up)
+		CONE, //!< CONE (radius, height, up)
+		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
+	};
 
 private:
 	/// Bullet world.

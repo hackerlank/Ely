@@ -52,8 +52,10 @@ class CharacterControllerTemplate;
  *
  * It constructs a character controller with the single specified collision
  * shape_type along with relevant parameters.\n
+ * The up axis is the Z axis.\n
  *
  * XML Param(s):
+ * - "step_height"  			|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
  * - "use_shape_of"				|single|no default
@@ -63,12 +65,26 @@ class CharacterControllerTemplate;
  * - "shape_half_x"  			|single|no default (box)
  * - "shape_half_y"  			|single|no default (box)
  * - "shape_half_z"  			|single|no default (box)
+ * - "fall_speed"  				|single|"55.0"
+ * - "gravity"  				|single|"29.4" (3G)
+ * - "jump_speed"  				|single|"10.0"
+ * - "max_slope"  				|single|"45.0" (degrees)
+ * - "max_jump_height"  		|single|no default
+ * - "forward"  				|single|"enabled"
+ * - "backward"  				|single|"enabled"
+ * - "roll_left"  				|single|"enabled"
+ * - "roll_right"  				|single|"enabled"
+ * - "strafe_left"  			|single|"enabled"
+ * - "strafe_right"  			|single|"enabled"
+ * - "jump"  					|single|"enabled"
+ * - "linear_speed"  			|single|"3.0"
+ * - "angular_speed"  			|single|"120.0"
  */
 class CharacterController: public Component
 {
 public:
 	CharacterController();
-	CharacterController(SMARTPTR(CharacterControllerTemplate) tmpl);
+	CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl);
 	virtual ~CharacterController();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -76,7 +92,14 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
+
+	/**
+	 * \brief Updates position/orientation of the controlled object.
+	 *
+	 * Will be called automatically by an control manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
 
 	/**
 	 * \brief The shape type.
@@ -84,11 +107,39 @@ public:
 	enum ShapeType
 	{
 		SPHERE, //!< SPHERE (radius)
-		BOX, //!< BOX (half_x, half_y, half_z)
-		CYLINDER, //!< CYLINDER (radius, height, up)
-		CAPSULE, //!< CAPSULE (radius, height, up)
-		CONE, //!< CONE (radius, height, up)
+		BOX,//!< BOX (half_x, half_y, half_z)
+		CYLINDER,//!< CYLINDER (radius, height, up)
+		CAPSULE,//!< CAPSULE (radius, height, up)
+		CONE,//!< CONE (radius, height, up)
 	};
+
+	/**
+	 * \name Control keys' enablers.
+	 *
+	 * These routines should be typically called by event handlers
+	 * or AI algorithms, but this is not strictly required.
+	 */
+	///@{
+	void enableForward(bool enable);
+	void enableBackward(bool enable);
+	void enableStrafeLeft(bool enable);
+	void enableStrafeRight(bool enable);
+	void enableRollLeft(bool enable);
+	void enableRollRight(bool enable);
+	void enableJump(bool enable);
+	///@}
+
+	/**
+	 * \brief Gets/sets the character controller linear/angular speed.
+	 * @param speed The character controller linear/angular speed.
+	 * @return The character controller linear/angular speed.
+	 */
+	///@{
+	float getLinearSpeed();
+	void setLinearSpeed(float speed);
+	float getAngularSpeed();
+	void setAngularSpeed(float speed);
+	///@}
 
 	/**
 	 * \brief Gets/sets the node path of this character controller.
@@ -103,11 +154,12 @@ private:
 	///The NodePath associated to this character controller.
 	NodePath mNodePath;
 	///The NodePath associated to this character controller.
-	SMARTPTR(BulletCharacterControllerNode) mCharacterNode;
+	SMARTPTR(BulletCharacterControllerNode) mCharacterController;
 
 	///Geometric functions and parameters.
-	BitMask32 mCollideMask;
 	///@{
+	BitMask32 mCollideMask;
+	float mStepHeight;
 	/**
 	 * \brief Create a shape given its type.
 	 * @param shapeType The shape type.
@@ -135,6 +187,19 @@ private:
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
 	BulletUpAxis mUpAxis;
+	///@}
+
+	///Control functions and parameters.
+	///@{
+	float mLinearSpeed, mAngularSpeed, mFallSpeed, mGravity, mJumpSpeed, mMaxSlope, mMaxJumpHeight;
+	/**
+	 * \brief Sets control parameters of a character controller node (helper function).
+	 */
+	void setControlParameters();
+	///Key controls and effective keys.
+	bool mForward, mBackward, mStrafeLeft, mStrafeRight,mRollLeft, mRollRight, mJump;
+	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
+	mRollLeftKey, mRollRightKey, mJumpKey;
 	///@}
 
 	///TypedObject semantics: hardcoded
