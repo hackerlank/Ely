@@ -31,6 +31,8 @@ Model::Model()
 
 Model::Model(SMARTPTR(ModelTemplate) tmpl)
 {
+	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+			"Model::Model: invalid GameSceneManager")
 	mTmpl = tmpl;
 }
 

@@ -40,13 +40,19 @@
 #include <pointerTo.h>
 #include <threadSafePointerTo.h>
 
-///Macros for generic debug printing
+///Macros for generic debug
 #ifdef DEBUG
 #	define PRINT(msg) std::cout << msg << std::endl
 #	define PRINTERR(msg) std::cerr << msg << std::endl
+#	define CHECKEXISTENCE(entity,msg) \
+	if (not entity)\
+	{\
+		throw GameException(msg);\
+	}
 #else
 #	define PRINT(msg)
 #	define PRINTERR(msg)
+#	define CHECKEXISTENCE(entity,msg)
 #endif
 
 /**

@@ -29,9 +29,11 @@ Driver::Driver()
 	// TODO Auto-generated constructor stub
 }
 
-Driver::Driver(SMARTPTR(DriverTemplate) tmpl) :
-		mTrue(true), mFalse(false), mIsEnabled(false)
+Driver::Driver(SMARTPTR(DriverTemplate)tmpl) :
+mTrue(true), mFalse(false), mIsEnabled(false)
 {
+	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+			"Driver::Driver: invalid GameControlManager")
 	mTmpl = tmpl;
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
@@ -96,12 +98,8 @@ void Driver::enable()
 	//reset mouse to start position
 	win->move_pointer(0, mCentX, mCentY);
 
-	//Add to the control manager update
-	//first check if game audio manager exists
-	if (GameControlManager::GetSingletonPtr())
-	{
-		GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
-	}
+	//add to the control manager update
+	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 	//
 	mIsEnabled = not mIsEnabled;
 	//register event callbacks if any
@@ -123,10 +121,10 @@ void Driver::disable()
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 	win->request_properties(props);
 
-	//Remove from the control manager update
-	//first check if game audio manager exists
+	//check if control manager exists
 	if (GameControlManager::GetSingletonPtr())
 	{
+		//remove from control manager update
 		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 	}
 	//
@@ -143,9 +141,9 @@ bool Driver::initialize()
 	bool result = true;
 	//get settings from template
 	//enabling setting
-	mEnabled =
-			(mTmpl->parameter(std::string("enabled")) == std::string("true") ? true :
-					false);
+	mEnabled = (
+			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
+					true : false);
 	//inverted setting
 	mInvertedKeyboard = (
 			mTmpl->parameter(std::string("inverted_keyboard"))
@@ -166,13 +164,13 @@ bool Driver::initialize()
 			mTmpl->parameter(std::string("backward"))
 					== std::string("enabled") ? true : false);
 	//down key
-	mDownKey =
-			(mTmpl->parameter(std::string("down")) == std::string("enabled") ? true :
-					false);
+	mDownKey = (
+			mTmpl->parameter(std::string("down")) == std::string("enabled") ?
+					true : false);
 	//forward key
-	mForwardKey =
-			(mTmpl->parameter(std::string("forward"))
-					== std::string("enabled") ? true : false);
+	mForwardKey = (
+			mTmpl->parameter(std::string("forward")) == std::string("enabled") ?
+					true : false);
 	//strafeLeft key
 	mStrafeLeftKey = (
 			mTmpl->parameter(std::string("strafe_left"))
@@ -190,9 +188,9 @@ bool Driver::initialize()
 			mTmpl->parameter(std::string("roll_right"))
 					== std::string("enabled") ? true : false);
 	//up key
-	mUpKey =
-			(mTmpl->parameter(std::string("up")) == std::string("enabled") ? true :
-					false);
+	mUpKey = (
+			mTmpl->parameter(std::string("up")) == std::string("enabled") ?
+					true : false);
 	//mouseMove key
 	mMouseMoveKey = (
 			mTmpl->parameter(std::string("mouse_move"))
@@ -504,7 +502,7 @@ void Driver::update(void* data)
 		newH += mActualTransform->get_hpr().get_x();
 		newP += mActualTransform->get_hpr().get_y();
 		newR += mActualTransform->get_hpr().get_z();
-		CSMARTPTR(TransformState) newTransform = mActualTransform->compose(
+		CSMARTPTR(TransformState)newTransform = mActualTransform->compose(
 				TransformState::make_identity()->set_pos(
 						LVecBase3(newX, newY, newZ)))->set_hpr(
 				LVecBase3(newH, newP, newR)).p();

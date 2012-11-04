@@ -28,7 +28,6 @@
 #include <cstdlib>
 #include <stdint.h>
 #include <cmath>
-//#include <algorithm>
 #include <pointerTo.h>
 #include <nodePath.h>
 #include <bitMask.h>
@@ -38,18 +37,12 @@
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <bulletShape.h>
-#include <bulletSphereShape.h>
-#include <bulletBoxShape.h>
-#include <bulletPlaneShape.h>
-#include <bulletCylinderShape.h>
-#include <bulletCapsuleShape.h>
-#include <bulletConeShape.h>
-#include <bulletHeightfieldShape.h>
 #include <bulletRigidBodyNode.h>
 #include <bullet_utils.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GamePhysicsManager.h"
 #include "Utilities/Tools.h"
 
 class RigidBodyTemplate;
@@ -81,6 +74,7 @@ class RigidBodyTemplate;
  * - "body_restitution"  		|single|"0.1"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
+ * - "shape_size"  				|single|"medium"  (minimum, medium, maximum)
  * - "use_shape_of"				|single|no default
  * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
  * - "shape_norm_x"  			|single|no default (plane)
@@ -125,20 +119,6 @@ public:
 	};
 
 	/**
-	 * \brief The shape type.
-	 */
-	enum ShapeType
-	{
-		SPHERE, //!< SPHERE (radius)
-		PLANE, //!< PLANE (norm_x, norm_y, norm_z, d)
-		BOX, //!< BOX (half_x, half_y, half_z)
-		CYLINDER, //!< CYLINDER (radius, height, up)
-		CAPSULE, //!< CAPSULE (radius, height, up)
-		CONE, //!< CONE (radius, height, up)
-		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
-	};
-
-	/**
 	 * \brief Switches the actual component's type.
 	 *
 	 * It sets the rigid body mass too.
@@ -164,7 +144,8 @@ private:
 	///Physical parameters.
 	float mBodyMass, mBodyFriction, mBodyRestitution;
 	BodyType mBodyType;
-	ShapeType mShapeType;
+	GamePhysicsManager::ShapeType mShapeType;
+	GamePhysicsManager::ShapeSize mShapeSize;
 	BitMask32 mCollideMask;
 	//ccd stuff
 	float mCcdMotionThreshold, mCcdSweptSphereRadius;
@@ -182,17 +163,7 @@ private:
 	 * @param shapeType The shape type.
 	 * @return The created shape.
 	 */
-	SMARTPTR(BulletShape) createShape(ShapeType shapeType);
-	/**
-	 * \brief Calculates geometric characteristics of a GeomNode.
-	 *
-	 * It takes a NodePath, (supposedly) referring to a GeomNode, and
-	 * calculates a tight bounding box surrounding it, hence sets the
-	 * related dimensions into mModelDims, mModelCenter, mModelRadius
-	 * member variables.
-	 * @param modelNP The GeomNode node path.
-	 */
-	void getBoundingDimensions(NodePath modelNP);
+	SMARTPTR(BulletShape) createShape(GamePhysicsManager::ShapeType shapeType);
 	LVector3 mModelDims;
 	float mModelRadius;
 	//any model has a local frame and the tight bounding box is computed

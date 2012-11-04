@@ -27,6 +27,12 @@ NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
+	CHECKEXISTENCE(pandaFramework,
+			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid GameSceneManager")
 	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(

@@ -29,6 +29,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "SceneComponents/InstanceOf.h"
+#include "Game/GameSceneManager.h"
 #include "Utilities/Tools.h"
 
 class InstanceOfTemplate: public ComponentTemplate

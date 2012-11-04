@@ -27,16 +27,13 @@ Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework or WindowFramework");
-	}
-	if (not GameAudioManager::GetSingletonPtr())
-	{
-		throw GameException(
-				"Sound3dTemplate::Sound3dTemplate: invalid GameAudioManager");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"Sound3dTemplate::Sound3dTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+			"Sound3dTemplate::Sound3dTemplate: invalid GameAudioManager")
+	//
 	setParametersDefaults();
 }
 

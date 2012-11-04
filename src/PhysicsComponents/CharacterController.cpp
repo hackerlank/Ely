@@ -31,6 +31,8 @@ CharacterController::CharacterController()
 
 CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl)
 {
+	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+			"CharacterController::CharacterController: invalid GamePhysicsManager")
 	mTmpl = tmpl;
 	mForward = false;
 	mBackward = false;
@@ -46,12 +48,12 @@ CharacterController::~CharacterController()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//first check if game physics manager exists
+	//check if game physics manager exists
 	if (GamePhysicsManager::GetSingletonPtr())
 	{
-		//Remove from the physics manager update
+		//remove from the physics manager update
 		GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
-		//Remove character controller from the physics world
+		//remove character controller from the physics world
 		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
 				DCAST(TypedObject, mCharacterController));
 	}
@@ -80,11 +82,25 @@ bool CharacterController::initialize()
 			mTmpl->parameter(std::string("step_height")).c_str());
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
+	//get shape size
+	std::string shapeSize = mTmpl->parameter(std::string("shape_size"));
+	if (shapeSize == std::string("minimum"))
+	{
+		mShapeSize = GamePhysicsManager::MINIMUN;
+	}
+	else if (shapeSize == std::string("maximum"))
+	{
+		mShapeSize = GamePhysicsManager::MAXIMUM;
+	}
+	else
+	{
+		mShapeSize = GamePhysicsManager::MEDIUM;
+	}
 	//default auto shaping
 	mAutomaticShaping = true;
 	if (shapeType == std::string("sphere"))
 	{
-		mShapeType = SPHERE;
+		mShapeType = GamePhysicsManager::SPHERE;
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		if (not radius.empty())
 		{
@@ -97,7 +113,7 @@ bool CharacterController::initialize()
 	}
 	else if (shapeType == std::string("box"))
 	{
-		mShapeType = BOX;
+		mShapeType = GamePhysicsManager::BOX;
 		std::string half_x = mTmpl->parameter(std::string("shape_half_x"));
 		std::string half_y = mTmpl->parameter(std::string("shape_half_y"));
 		std::string half_z = mTmpl->parameter(std::string("shape_half_z"));
@@ -119,15 +135,15 @@ bool CharacterController::initialize()
 	{
 		if (shapeType == std::string("cylinder"))
 		{
-			mShapeType = CYLINDER;
+			mShapeType = GamePhysicsManager::CYLINDER;
 		}
 		else if (shapeType == std::string("capsule"))
 		{
-			mShapeType = CAPSULE;
+			mShapeType = GamePhysicsManager::CAPSULE;
 		}
 		else
 		{
-			mShapeType = CONE;
+			mShapeType = GamePhysicsManager::CONE;
 		}
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		std::string height = mTmpl->parameter(std::string("shape_height"));
@@ -157,7 +173,7 @@ bool CharacterController::initialize()
 	else
 	{
 		//default a sphere (with auto shaping)
-		mShapeType = SPHERE;
+		mShapeType = GamePhysicsManager::SPHERE;
 	}
 	//get collide mask
 	std::string collideMask = mTmpl->parameter(std::string("collide_mask"));
@@ -263,11 +279,7 @@ void CharacterController::onAddToObjectSetup()
 	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
 
 	//Add to the physics manager update
-	//first check if game physics manager exists
-	if (GamePhysicsManager::GetSingletonPtr())
-	{
-		GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
-	}
+	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
 	//register event callbacks if any
 	registerEventCallbacks();
 }
@@ -448,7 +460,7 @@ void CharacterController::setNodePath(const NodePath& nodePath)
 	mNodePath = nodePath;
 }
 
-SMARTPTR(BulletShape)CharacterController::createShape(ShapeType shapeType)
+SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeType shapeType)
 {
 	//check if it should use shape of another (already) created object
 	ObjectId useShapeOfId = ObjectId(mTmpl->parameter(std::string("use_shape_of")));
@@ -470,122 +482,12 @@ SMARTPTR(BulletShape)CharacterController::createShape(ShapeType shapeType)
 			}
 		}
 	}
-	//get the bounding dimensions of object node path, that
-	//should represents a model
-	getBoundingDimensions(mOwnerObject->getNodePath());
-	// create the actual shape
-	SMARTPTR(BulletShape) collisionShape = NULL;
-	LVecBase3 localScale;
-	switch (mShapeType)
-	{
-		case SPHERE:
-		if (mAutomaticShaping)
-		{
-			//modify radius
-			mDim1 = mModelRadius;
-		}
-		collisionShape = new BulletSphereShape(mDim1);
-		break;
-		case BOX:
-		if (mAutomaticShaping)
-		{
-			//modify half dimensions
-			mDim1 = mModelDims.get_x() / 2.0;
-			mDim2 = mModelDims.get_y() / 2.0;
-			mDim3 = mModelDims.get_z() / 2.0;
-		}
-		collisionShape = new BulletBoxShape(LVector3(mDim1, mDim2, mDim3));
-		break;
-		case CYLINDER:
-		if (mAutomaticShaping)
-		{
-			//modify radius and height
-			if (mUpAxis == X_up)
-			{
-				mDim1 = max(mModelDims.get_y(), mModelDims.get_z()) / 2.0;
-				mDim2 = mModelDims.get_x();
-			}
-			else if (mUpAxis == Y_up)
-			{
-				mDim1 = max(mModelDims.get_x(), mModelDims.get_z()) / 2.0;
-				mDim2 = mModelDims.get_y();
-			}
-			else
-			{
-				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
-				mDim2 = mModelDims.get_z();
-			}
-		}
-		collisionShape = new BulletCylinderShape(mDim1, mDim2, mUpAxis);
-		break;
-		case CAPSULE:
-		if (mAutomaticShaping)
-		{
-			//modify radius and height
-			if (mUpAxis == X_up)
-			{
-				mDim1 = max(mModelDims.get_y(), mModelDims.get_z()) / 2.0;
-				mDim2 = mModelDims.get_x();
-			}
-			else if (mUpAxis == Y_up)
-			{
-				mDim1 = max(mModelDims.get_x(), mModelDims.get_z()) / 2.0;
-				mDim2 = mModelDims.get_y();
-			}
-			else
-			{
-				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
-				mDim2 = mModelDims.get_z() - 2*mDim1;
-				if (mDim2 <= 0.0)
-				{
-					mDim2 = 0.0;
-				}
-			}
-		}
-		collisionShape = new BulletCapsuleShape(mDim1, mDim2, mUpAxis);
-		break;
-		case CONE:
-		if (mAutomaticShaping)
-		{
-			//modify radius and height
-			if (mUpAxis == X_up)
-			{
-				mDim1 = max(mModelDims.get_y(), mModelDims.get_z()) / 2.0;
-				mDim2 = mModelDims.get_x();
-			}
-			else if (mUpAxis == Y_up)
-			{
-				mDim1 = max(mModelDims.get_x(), mModelDims.get_z()) / 2.0;
-				mDim2 = mModelDims.get_y();
-			}
-			else
-			{
-				mDim1 = max(mModelDims.get_x(), mModelDims.get_y()) / 2.0;
-				mDim2 = mModelDims.get_z();
-			}
-		}
-		collisionShape = new BulletConeShape(mDim1, mDim2, mUpAxis);
-		break;
-		default:
-		break;
-	}
-	//
-	return collisionShape;
-}
 
-void CharacterController::getBoundingDimensions(NodePath modelNP)
-{
-	//get "tight" dimensions of panda
-	LPoint3 minP, maxP;
-	modelNP.calc_tight_bounds(minP, maxP);
-	//
-	LVecBase3 delta = maxP - minP;
-	//
-	mModelDims = LVector3(abs(delta.get_x()), abs(delta.get_y()),
-			abs(delta.get_z()));
-	mModelDeltaCenter = -(minP + delta / 2.0);
-	mModelRadius = max(max(mModelDims.get_x(), mModelDims.get_y()),
-			mModelDims.get_z()) / 2.0;
+	// create and return the actual shape
+	return GamePhysicsManager::GetSingletonPtr()->createShape(
+			mOwnerObject->getNodePath(), mShapeType, mShapeSize,
+			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
+			mDim3, mDim4, mAutomaticShaping, mUpAxis);
 }
 
 void CharacterController::setControlParameters()

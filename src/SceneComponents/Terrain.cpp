@@ -32,6 +32,8 @@ Terrain::Terrain()
 
 Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
 {
+	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+			"Terrain::Terrain: invalid GameSceneManager")
 	mTmpl = tmpl;
 }
 
@@ -40,10 +42,10 @@ Terrain::~Terrain()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//Remove from the scene manager update
-	//first check if game scene manager exists
+	//check if game physics manager exists
 	if (GameSceneManager::GetSingletonPtr())
 	{
+		//remove from the scene manager update
 		GameSceneManager::GetSingletonPtr()->removeFromSceneUpdate(this);
 	}
 	mTerrain->get_root().remove_node();
@@ -207,11 +209,8 @@ void Terrain::onAddToObjectSetup()
 	//Generate the terrain
 	mTerrain->generate();
 	//Add to the scene manager update if not brute force
-	//first check if game scene manager exists
-	if (GameSceneManager::GetSingletonPtr() and (not mBruteForce))
-	{
-		GameSceneManager::GetSingletonPtr()->addToSceneUpdate(this);
-	}
+	GameSceneManager::GetSingletonPtr()->addToSceneUpdate(this);
+
 	//register event callbacks if any
 	registerEventCallbacks();
 }

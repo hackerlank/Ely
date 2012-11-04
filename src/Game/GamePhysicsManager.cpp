@@ -175,6 +175,186 @@ ReMutex& GamePhysicsManager::getMutex()
 	return mMutex;
 }
 
+SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
+		ShapeType shapeType, ShapeSize shapeSize, LVector3& modelDims,
+		LVector3& modelDeltaCenter, float& modelRadius,
+		float& dim1, float& dim2, float& dim3, float& dim4,
+		bool automaticShaping, BulletUpAxis upAxis, const Filename& heightfieldFile)
+{
+	// create the actual shape
+	SMARTPTR(BulletShape) collisionShape = NULL;
+	LVecBase3 localScale;
+	//get the bounding dimensions of object node path, that
+	//should represents a model
+	getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+	//
+	switch (shapeType)
+	{
+		case SPHERE:
+		if (automaticShaping)
+		{
+			//modify radius
+			dim1 = modelRadius;
+		}
+		collisionShape = new BulletSphereShape(dim1);
+		break;
+		case PLANE:
+		if (automaticShaping)
+		{
+			//modify normal and d
+			dim1 = 0.0;
+			dim2 = 0.0;
+			dim3 = 1.0;
+			dim4 = 0.0;
+		}
+		collisionShape = new BulletPlaneShape(LVector3(dim1, dim2, dim3),
+				dim4);
+		break;
+		case BOX:
+		if (automaticShaping)
+		{
+			//modify half dimensions
+			dim1 = modelDims.get_x() / 2.0;
+			dim2 = modelDims.get_y() / 2.0;
+			dim3 = modelDims.get_z() / 2.0;
+		}
+		collisionShape = new BulletBoxShape(LVector3(dim1, dim2, dim3));
+		break;
+		case CYLINDER:
+		if (automaticShaping)
+		{
+			//modify radius and height
+			if (upAxis == X_up)
+			{
+				dim1 = getDim(shapeSize, modelDims.get_y(), modelDims.get_z());
+				dim2 = modelDims.get_x();
+			}
+			else if (upAxis == Y_up)
+			{
+				dim1 = getDim(shapeSize, modelDims.get_x(), modelDims.get_z());
+				dim2 = modelDims.get_y();
+			}
+			else
+			{
+				dim1 = getDim(shapeSize, modelDims.get_x(), modelDims.get_y());
+				dim2 = modelDims.get_z();
+			}
+		}
+		collisionShape = new BulletCylinderShape(dim1, dim2, upAxis);
+		break;
+		case CAPSULE:
+		if (automaticShaping)
+		{
+			//modify radius and height
+			if (upAxis == X_up)
+			{
+				dim1 = getDim(shapeSize, modelDims.get_y(), modelDims.get_z());
+				dim2 = modelDims.get_x() - 2 * dim1;
+			}
+			else if (upAxis == Y_up)
+			{
+				dim1 = getDim(shapeSize, modelDims.get_x(), modelDims.get_z());
+				dim2 = modelDims.get_y() - 2 * dim1;
+			}
+			else
+			{
+				dim1 = getDim(shapeSize, modelDims.get_x(), modelDims.get_y());
+				dim2 = modelDims.get_z() - 2 * dim1;
+			}
+		}
+		if (dim2 <= 0.0)
+		{
+			dim2 = 0.0;
+		}
+		collisionShape = new BulletCapsuleShape(dim1, dim2, upAxis);
+		break;
+		case CONE:
+		if (automaticShaping)
+		{
+			//modify radius and height
+			if (upAxis == X_up)
+			{
+				dim1 = getDim(shapeSize, modelDims.get_y(), modelDims.get_z());
+				dim2 = modelDims.get_x();
+			}
+			else if (upAxis == Y_up)
+			{
+				dim1 = getDim(shapeSize, modelDims.get_x(), modelDims.get_z());
+				dim2 = modelDims.get_y();
+			}
+			else
+			{
+				dim1 = getDim(shapeSize, modelDims.get_x(), modelDims.get_y());
+				dim2 = modelDims.get_z();
+			}
+		}
+		collisionShape = new BulletConeShape(dim1, dim2, upAxis);
+		break;
+		case HEIGHTFIELD:
+		if (automaticShaping)
+		{
+			//modify height scale_w and scale_d and height
+			dim1 = 1.0;
+			dim2 = 1.0;
+			dim3 = 1.0;
+		}
+		if (upAxis == X_up)
+		{
+			localScale = LVecBase3(1.0, dim2, dim3);
+		}
+		else if (upAxis == Y_up)
+		{
+			localScale = LVecBase3(dim3, 1.0, dim2);
+		}
+		else
+		{
+			localScale = LVecBase3(dim2, dim3, 1.0);
+		}
+		collisionShape = new BulletHeightfieldShape(heightfieldFile, dim1, upAxis);
+		collisionShape->set_local_scale(localScale);
+		break;
+		default:
+		break;
+	}
+	//
+	return collisionShape;
+}
+
+void GamePhysicsManager::getBoundingDimensions(NodePath modelNP,
+		LVector3& modelDims, LVector3& modelDeltaCenter, float& modelRadius)
+{
+	//get "tight" dimensions of panda
+	LPoint3 minP, maxP;
+	modelNP.calc_tight_bounds(minP, maxP);
+	//
+	LVecBase3 delta = maxP - minP;
+	//
+	modelDims = LVector3(abs(delta.get_x()), abs(delta.get_y()),
+			abs(delta.get_z()));
+	modelDeltaCenter = -(minP + delta / 2.0);
+	modelRadius = max(max(modelDims.get_x(), modelDims.get_y()),
+			modelDims.get_z()) / 2.0;
+}
+
+float GamePhysicsManager::getDim(ShapeSize shapeSize, float d1, float d2)
+{
+	float dim;
+	if (shapeSize == MINIMUN)
+	{
+		dim = min(d1, d2) / 2.0;
+	}
+	else if (shapeSize == MAXIMUM)
+	{
+		dim = max(d1, d2) / 2.0;
+	}
+	else
+	{
+		dim = (d1 + d2) / 4.0;
+	}
+	//
+	return dim;
+}
+
 #ifdef DEBUG
 NodePath GamePhysicsManager::getDebugNodePath() const
 {
@@ -217,4 +397,5 @@ void GamePhysicsManager::debug(bool enable)
 		}
 	}
 }
+
 #endif

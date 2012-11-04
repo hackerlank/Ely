@@ -27,16 +27,13 @@ RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"RigidBodyTemplate::RigidBodyTemplate: invalid PandaFramework or WindowFramework");
-	}
-	if (not GamePhysicsManager::GetSingletonPtr())
-	{
-		throw GameException(
-				"RigidBodyTemplate::RigidBodyTemplate: invalid GamePhysicsManager");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"RigidBodyTemplate::RigidBodyTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"RigidBodyTemplate::RigidBodyTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+			"RigidBodyTemplate::RigidBodyTemplate: invalid GamePhysicsManager")
+	//
 	setParametersDefaults();
 }
 
@@ -82,6 +79,7 @@ void RigidBodyTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("body_friction", "0.8"));
 	mParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
 	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
 	mParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
 	mParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));

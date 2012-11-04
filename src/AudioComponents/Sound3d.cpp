@@ -29,9 +29,11 @@ Sound3d::Sound3d()
 	// TODO Auto-generated constructor stub
 }
 
-Sound3d::Sound3d(SMARTPTR(Sound3dTemplate) tmpl) :
-		mMinDist(1.0), mMaxDist(1000000000.0)
+Sound3d::Sound3d(SMARTPTR(Sound3dTemplate)tmpl) :
+mMinDist(1.0), mMaxDist(1000000000.0)
 {
+	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+			"Sound3d::Sound3d: invalid GameAudioManager")
 	mTmpl = tmpl;
 	mSounds.clear();
 	mPosition = LPoint3(0.0, 0.0, 0.0);
@@ -45,6 +47,7 @@ Sound3d::~Sound3d()
 	//check if game audio manager exists
 	if (GameAudioManager::GetSingletonPtr())
 	{
+		//remove from audio update
 		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 	}
 	//stops every playing sounds
@@ -80,9 +83,9 @@ bool Sound3d::initialize()
 			std::string("sound_files"));
 	for (iter = soundFileList.begin(); iter != soundFileList.end(); ++iter)
 	{
-		SMARTPTR(AudioSound) sound =
-				GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
-						*iter, true).p();
+		SMARTPTR(AudioSound)sound =
+		GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
+				*iter, true).p();
 		if (not sound.is_null())
 		{
 			mSounds[*iter] = sound.p();
@@ -101,8 +104,7 @@ void Sound3d::onAddToObjectSetup()
 
 	// update sounds' position/velocity only for dynamic objects
 	// and if sound table is not empty
-	if (GameAudioManager::GetSingletonPtr() and (not mOwnerObject->isStatic())
-			and (not mSounds.empty()))
+	if ((not mOwnerObject->isStatic()) and (not mSounds.empty()))
 	{
 		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
@@ -136,22 +138,22 @@ bool Sound3d::addSound(const std::string& fileName)
 		//no owner object:return false
 		return result;
 	}
-	SMARTPTR(AudioSound) sound =
-			GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(fileName,
-					true).p();
+	SMARTPTR(AudioSound)sound =
+	GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(fileName,
+			true).p();
 	if (sound)
 	{
+		// sound is added
 		mSounds[fileName] = sound;
 		result = true;
-	}
-	// try to add this component to update only if object is dynamic
-	// and if sound table is not empty
-	if (GameAudioManager::GetSingletonPtr() and (not mOwnerObject->isStatic())
-			and (not mSounds.empty()))
-	{
-		//addToAudioUpdate will safely add this component
-		//to update only if it wasn't previously added
-		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
+		// try to add this component to updating (if not present)
+		// only if object is dynamic
+		if (not mOwnerObject->isStatic())
+		{
+			//addToAudioUpdate will safely add this component
+			//to update only if it wasn't previously added
+			GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
+		}
 	}
 	//
 	return result;
@@ -167,14 +169,15 @@ bool Sound3d::removeSound(const std::string& soundName)
 	size_t removed = mSounds.erase(soundName);
 	if (removed == 1)
 	{
+		// sound is removed
 		result = true;
-	}
-	// try to remove this component to update if sound table is empty
-	if (GameAudioManager::GetSingletonPtr() and (mSounds.empty()))
-	{
-		//removeFromAudioUpdate will safely remove this component
-		//to update only if it was previously added
-		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
+		// try to remove this component from update if sound table is empty
+		if (mSounds.empty())
+		{
+			//removeFromAudioUpdate will safely remove this component
+			//to update only if it was previously added
+			GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
+		}
 	}
 	//
 	return result;
@@ -236,7 +239,7 @@ void Sound3d::set3dStaticAttributes()
 	}
 }
 
-SMARTPTR(AudioSound) Sound3d::getSound(const std::string& name)
+SMARTPTR(AudioSound)Sound3d::getSound(const std::string& name)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -249,7 +252,7 @@ SMARTPTR(AudioSound) Sound3d::getSound(const std::string& name)
 	return iter->second;
 }
 
-SMARTPTR(AudioSound) Sound3d::getSound(int index)
+SMARTPTR(AudioSound)Sound3d::getSound(int index)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

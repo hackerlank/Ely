@@ -96,8 +96,7 @@ ValueList Filter_strafe_right_Actor1(fsm*, Activity& activity,
 	return valList;
 }
 //up
-void Enter_up_Actor1(fsm*, Activity& activity,
-		const ValueList& valueList)
+void Enter_up_Actor1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_up_Actor1");
 }
@@ -105,8 +104,8 @@ void Exit_up_Actor1(fsm*, Activity& activity)
 {
 	PRINT("Exit_up_Actor1");
 }
-ValueList Filter_up_Actor1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
+ValueList Filter_up_Actor1(fsm*, Activity& activity, const std::string& state,
+		const ValueList& valueList)
 {
 	ValueList valList = valueList;
 	PRINT("Filter_up_Actor1");
@@ -114,8 +113,7 @@ ValueList Filter_up_Actor1(fsm*, Activity& activity,
 	return valList;
 }
 //down
-void Enter_down_Actor1(fsm*, Activity& activity,
-		const ValueList& valueList)
+void Enter_down_Actor1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_down_Actor1");
 }
@@ -123,8 +121,8 @@ void Exit_down_Actor1(fsm*, Activity& activity)
 {
 	PRINT("Exit_down_Actor1");
 }
-ValueList Filter_down_Actor1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
+ValueList Filter_down_Actor1(fsm*, Activity& activity, const std::string& state,
+		const ValueList& valueList)
 {
 	ValueList valList = valueList;
 	PRINT("Filter_down_Actor1");
@@ -216,8 +214,7 @@ ValueList Filter_strafe_right_NPC1(fsm*, Activity& activity,
 	return valList;
 }
 //roll_left
-void Enter_roll_left_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
+void Enter_roll_left_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_roll_left_NPC1");
 }
@@ -234,8 +231,7 @@ ValueList Filter_roll_left_NPC1(fsm*, Activity& activity,
 	return valList;
 }
 //roll_right
-void Enter_roll_right_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
+void Enter_roll_right_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_roll_right_NPC1");
 }
@@ -252,8 +248,7 @@ ValueList Filter_roll_right_NPC1(fsm*, Activity& activity,
 	return valList;
 }
 //jump
-void Enter_jump_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
+void Enter_jump_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_jump_NPC1");
 }
@@ -261,11 +256,29 @@ void Exit_jump_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_jump_NPC1");
 }
-ValueList Filter_jump_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
+ValueList Filter_jump_NPC1(fsm*, Activity& activity, const std::string& state,
+		const ValueList& valueList)
 {
 	ValueList valList = valueList;
 	PRINT("Filter_jump_NPC1");
+	valList.push_front(state);
+	return valList;
+}
+//idle
+void Enter_idle_NPC1(fsm*, Activity& activity, const ValueList& valueList)
+{
+	PRINT("Enter_idle_NPC1");
+	PRINT(std::string(activity.getOwnerObject()->objectId()));
+}
+void Exit_idle_NPC1(fsm*, Activity& activity)
+{
+	PRINT("Exit_idle_NPC1");
+}
+ValueList Filter_idle_NPC1(fsm*, Activity& activity, const std::string& state,
+		const ValueList& valueList)
+{
+	ValueList valList = valueList;
+	PRINT("Filter_idle_NPC1");
 	valList.push_front(state);
 	return valList;
 }

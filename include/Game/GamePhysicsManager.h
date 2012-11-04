@@ -25,6 +25,7 @@
 #define GAMEPHYSICSMANAGER_H_
 
 #include <list>
+#include <cmath>
 #include <algorithm>
 #include <bulletWorld.h>
 #include <bulletDebugNode.h>
@@ -37,6 +38,9 @@
 #include <bulletCapsuleShape.h>
 #include <bulletConeShape.h>
 #include <bulletHeightfieldShape.h>
+#include <bullet_utils.h>
+#include <lvector3.h>
+#include <filename.h>
 
 #ifdef DEBUG
 #include <windowFramework.h>
@@ -69,12 +73,12 @@ public:
 	virtual ~GamePhysicsManager();
 
 	/**
-	 * \brief Adds a physics component for updating.
+	 * \brief Adds (if not present) a physics component to updating.
 	 * @param physicsComp The physics component.
 	 */
 	void addToPhysicsUpdate(SMARTPTR(Component) physicsComp);
 	/**
-	 * \brief Removes a physics component from updating.
+	 * \brief Removes (if present) a physics component from updating.
 	 * @param physicsComp The physics component.
 	 */
 	void removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp);
@@ -119,6 +123,7 @@ public:
 #endif
 
 	///Helper functions, data structures
+	///@{
 	/**
 	 * \brief Shape type.
 	 */
@@ -132,6 +137,75 @@ public:
 		CONE, //!< CONE (radius, height, up)
 		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
 	};
+	/**
+	 * \brief Shape size.
+	 */
+	enum ShapeSize
+	{
+		MINIMUN, //!< MINIMUN shape
+		MAXIMUM, //!< MAXIMUM shape
+		MEDIUM, //!< MEDIUM shape
+	};
+	/**
+	 * \brief Creates a wrapping bullet shape for a given model node path.
+	 *
+	 * If automaticShaping is true this method builds a shape based on a
+	 * tight bounding box around the model, with the shape's tightness
+	 * controlled by the shapeSize parameter.\n
+	 * If automaticShaping is false shape is built according to this scheme:
+	 * - BulletSphereShape(dim1)
+	 * - BulletPlaneShape(LVector3(dim1, dim2, dim3), dim4)
+	 * - BulletBoxShape(LVector3(dim1, dim2, dim3))
+	 * - BulletCylinderShape(dim1, dim2, upAxis)
+	 * - BulletCapsuleShape(dim1, dim2, upAxis)
+	 * - BulletConeShape(dim1, dim2, upAxis)
+	 * - BulletHeightfieldShape(heightfieldFile, dim1, upAxis)
+	 *
+	 * @param modelNP The model node path.
+	 * @param shapeType The shape type.
+	 * @param shapeSize The shape size, i.e. its tightness around the model.
+	 * @param modelDims Returns the model bounding box dimensions for each axis.
+	 * @param modelDeltaCenter Returns the middle point of the model bounding box.
+	 * @param modelRadius Returns the radius of the model bounding box.
+	 * @param dim1 Returns/sets the first shape parameter.
+	 * @param dim2 Returns/sets the second shape parameter.
+	 * @param dim3 Returns/sets the third shape parameter.
+	 * @param dim4 Returns/sets the fourth shape parameter.
+	 * @param automaticShaping If true the dimXs are output parameters,
+	 * otherwise input parameter.
+	 * @param upAxis The up axis.
+	 * @param heightfieldFile The height field file.
+	 * @return A (smart) pointer to the created shape.
+	 */
+	SMARTPTR(BulletShape) createShape(NodePath modelNP, ShapeType shapeType, ShapeSize shapeSize,
+			LVector3& modelDims, LVector3& modelDeltaCenter, float& modelRadius,
+			float& dim1, float& dim2, float& dim3, float& dim4, bool automaticShaping = true,
+			BulletUpAxis upAxis=Z_up, const Filename& heightfieldFile = Filename(""));
+	/**
+	 * \brief Calculates geometric characteristics of a GeomNode.
+	 *
+	 * It takes a NodePath, (supposedly) referring to a GeomNode, and
+	 * calculates a tight bounding box surrounding it, hence sets the
+	 * related dimensions into mModelDims, mModelCenter, mModelRadius
+	 * member variables.
+	 *
+	 * @param modelNP The model node path.
+	 * @param modelDims Returns the model bounding box dimensions for each axis.
+	 * @param modelDeltaCenter Returns the model bounding box dimensions for each axis.
+	 * @param modelRadius Returns the radius of the model bounding box.
+	 */
+	void getBoundingDimensions(NodePath modelNP, LVector3& modelDims,
+			LVector3& modelDeltaCenter, float& modelRadius);
+	/**
+	 * \brief Calculates the desired dimension given the shape size.
+	 *
+	 * @param shapeSize
+	 * @param d1 First dimension.
+	 * @param d2 Second dimension.
+	 * @return The desired dimension
+	 */
+	float getDim(ShapeSize shapeSize, float d1, float d2);
+	///@}
 
 private:
 	/// Bullet world.

@@ -27,6 +27,12 @@ TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
+	CHECKEXISTENCE(pandaFramework,
+			"TerrainTemplate::TerrainTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"TerrainTemplate::TerrainTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+			"TerrainTemplate::TerrainTemplate: invalid GameSceneManager")
 	if (not pandaFramework or not windowFramework)
 	{
 		throw GameException(

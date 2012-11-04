@@ -29,8 +29,10 @@ Listener::Listener()
 	// TODO Auto-generated constructor stub
 }
 
-Listener::Listener(SMARTPTR(ListenerTemplate) tmpl)
+Listener::Listener(SMARTPTR(ListenerTemplate)tmpl)
 {
+	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+			"Listener::Listener: invalid GameAudioManager")
 	mTmpl = tmpl;
 	mPosition = LPoint3(0.0, 0.0, 0.0);
 }
@@ -40,9 +42,10 @@ Listener::~Listener()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	// check if game audio manager exists
+	//check if game audio manager exists
 	if (GameAudioManager::GetSingletonPtr())
 	{
+		//remove from audio update
 		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 	}
 }
@@ -75,7 +78,7 @@ void Listener::onAddToObjectSetup()
 	HOLDMUTEX(mMutex)
 
 	// update listener position/velocity only for dynamic objects
-	if (GameAudioManager::GetSingletonPtr() and (not mOwnerObject->isStatic()))
+	if (not mOwnerObject->isStatic())
 	{
 		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
@@ -90,7 +93,7 @@ void Listener::onAddToSceneSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (GameAudioManager::GetSingletonPtr() and mOwnerObject->isStatic())
+	if (mOwnerObject->isStatic())
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
@@ -127,7 +130,7 @@ void Listener::update(void* data)
 	//get the new position
 #ifdef ELY_THREAD
 	//note on threading: this should be an atomic operation
-	CSMARTPTR(TransformState) ownerTransform = ownerNodePath.get_transform(
+	CSMARTPTR(TransformState)ownerTransform = ownerNodePath.get_transform(
 			mSceneRoot).p();
 	newPosition = ownerTransform->get_pos();
 	forward = LVector3::forward() * ownerTransform->get_mat();

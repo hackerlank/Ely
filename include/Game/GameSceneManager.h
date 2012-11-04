@@ -40,12 +40,12 @@ public:
 	virtual ~GameSceneManager();
 
 	/**
-	 * \brief Adds a scene component for updating.
+	 * \brief Adds (if not present) a scene component to updating.
 	 * @param sceneComp The scene component.
 	 */
 	void addToSceneUpdate(SMARTPTR(Component) sceneComp);
 	/**
-	 * \brief Removes a scene component from updating.
+	 * \brief Removes (if present) a scene component from updating.
 	 * @param sceneComp The scene component.
 	 */
 	void removeFromSceneUpdate(SMARTPTR(Component) sceneComp);

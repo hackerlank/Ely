@@ -57,12 +57,12 @@ public:
 			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GameAudioManager();
 	/**
-	 * \brief Adds an audio component for updating.
+	 * \brief Adds (if not present) an audio component to updating.
 	 * @param audioComp The audio component.
 	 */
 	void addToAudioUpdate(SMARTPTR(Component) audioComp);
 	/**
-	 * \brief Removes an audio component from updating.
+	 * \brief Removes (if present) an audio component from updating.
 	 * @param audioComp The audio component.
 	 */
 	void removeFromAudioUpdate(SMARTPTR(Component) audioComp);

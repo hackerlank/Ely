@@ -40,7 +40,6 @@
 #include <transformState.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "Game/GameControlManager.h"
 #include "Utilities/Tools.h"
 
 class DriverTemplate;

@@ -27,16 +27,13 @@ ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"ListenerTemplate::ListenerTemplate: invalid PandaFramework or WindowFramework");
-	}
-	if (not GameAudioManager::GetSingletonPtr())
-	{
-		throw GameException(
-				"ListenerTemplate::ListenerTemplate: invalid GameAudioManager");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"ListenerTemplate::ListenerTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"ListenerTemplate::ListenerTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+			"ListenerTemplate::ListenerTemplate: invalid GameAudioManager")
+	//
 	setParametersDefaults();
 }
 
@@ -55,7 +52,7 @@ const ComponentFamilyType ListenerTemplate::familyType() const
 	return ComponentFamilyType("Audio");
 }
 
-SMARTPTR(Component) ListenerTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)ListenerTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

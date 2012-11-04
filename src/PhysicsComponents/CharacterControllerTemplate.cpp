@@ -27,16 +27,13 @@ CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFr
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"CharacterTemplate::CharacterTemplate: invalid PandaFramework or WindowFramework");
-	}
-	if (not GamePhysicsManager::GetSingletonPtr())
-	{
-		throw GameException(
-				"CharacterTemplate::CharacterTemplate: invalid GamePhysicsManager");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"CharacterTemplate::CharacterTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"CharacterTemplate::CharacterTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+			"CharacterTemplate::CharacterTemplate: invalid GamePhysicsManager")
+	//
 	setParametersDefaults();
 }
 
@@ -80,6 +77,7 @@ void CharacterControllerTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("step_height", "1.0"));
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
 	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
 	mParameterTable.insert(ParameterNameValue("fall_speed", "55.0"));
 	mParameterTable.insert(ParameterNameValue("gravity", "29.4"));
 	mParameterTable.insert(ParameterNameValue("jump_speed", "10.0"));
@@ -91,8 +89,8 @@ void CharacterControllerTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
 	mParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
 	mParameterTable.insert(ParameterNameValue("jump", "enabled"));
-	mParameterTable.insert(ParameterNameValue("linear_speed", "3.0"));
-	mParameterTable.insert(ParameterNameValue("angular_speed", "120.0"));
+	mParameterTable.insert(ParameterNameValue("linear_speed", "10.0"));
+	mParameterTable.insert(ParameterNameValue("angular_speed", "45.0"));
 }
 
 //TypedObject semantics: hardcoded

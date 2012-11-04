@@ -26,7 +26,8 @@
 
 ///get key bare event: from key, key-up, shift-key returns key and
 ///with *isEnabled false on key-up and true otherwise
-static std::string getBareEvent(const std::string& eventName, const std::string& modifier, bool* isEnabled)
+static std::string getBareEvent(const std::string& eventName,
+		const std::string& modifier, bool* isEnabled)
 {
 	//analyze the event
 	std::string bareEvent;
@@ -73,9 +74,8 @@ static std::string getBareEvent(const std::string& eventName, const std::string&
 //		"r", //up
 //		"f", //down
 //};
-static void setDriverCommand(
-		SMARTPTR(Driver)driver,
-		const std::string& bareEvent, bool enable, const char* keys[])
+static void setDriverCommand(SMARTPTR(Driver)driver,
+const std::string& bareEvent, bool enable, const char* keys[])
 {
 	//set the right command
 		if (bareEvent == keys[0])
@@ -118,16 +118,15 @@ static void setDriverCommand(
 
 ///Camera + Driver related
 static const char* camera_keys[] =
-{
-	"w", //forward
-	"s", //backward
-	"a", //strafe_left
-	"d", //strafe_right
-	"", //roll_left
-	"", //roll_right
-	"r", //up
-	"f", //down
-};
+{ "w", //forward
+		"s", //backward
+		"a", //strafe_left
+		"d", //strafe_right
+		"", //roll_left
+		"", //roll_right
+		"r", //up
+		"f", //down
+		};
 void driveCamera(const Event* event, void* data)
 {
 	//get data
@@ -149,16 +148,15 @@ void driveCamera(const Event* event, void* data)
 
 ///Actor1 + Activity related
 static const char* Actor1_keys[] =
-{
-	"arrow_up", //forward
-	"arrow_down", //backward
-	"arrow_left", //strafe_left
-	"arrow_right", //strafe_right
-	"", //roll_left
-	"", //roll_right
-	"page_up", //up
-	"page_down", //down
-};
+{ "arrow_up", //forward
+		"arrow_down", //backward
+		"arrow_left", //strafe_left
+		"arrow_right", //strafe_right
+		"", //roll_left
+		"", //roll_right
+		"page_up", //up
+		"page_down", //down
+		};
 void stateActor1(const Event * event, void * data)
 {
 	//get data
@@ -242,54 +240,52 @@ void stateActor1(const Event * event, void * data)
 //		"l", //roll_right
 //		"space", //jump
 //};
-static void setCharacterControllerCommand(
-		SMARTPTR(CharacterController)characterController,
-		const std::string& bareEvent,bool enable, const char* keys[])
+static void setCharacterControllerCommand(SMARTPTR(CharacterController)characterController,
+const std::string& bareEvent,bool enable, const char* keys[])
 {
 	//set the right command
-	if (bareEvent == keys[0])
-	{
-		characterController->enableForward(enable);
+		if (bareEvent == keys[0])
+		{
+			characterController->enableForward(enable);
+		}
+		else if (bareEvent == keys[1])
+		{
+			characterController->enableBackward(enable);
+		}
+		else if (bareEvent == keys[2])
+		{
+			characterController->enableStrafeLeft(enable);
+		}
+		else if (bareEvent == keys[3])
+		{
+			characterController->enableStrafeRight(enable);
+		}
+		else if (bareEvent == keys[4])
+		{
+			characterController->enableRollLeft(enable);
+		}
+		else if (bareEvent == keys[5])
+		{
+			characterController->enableRollRight(enable);
+		}
+		else if (bareEvent == keys[6])
+		{
+			characterController->enableJump(enable);
+		}
+		else
+		{
+			PRINTERR("setCharacterControllerCommand: Event not defined: " << bareEvent);
+		}
 	}
-	else if (bareEvent == keys[1])
-	{
-		characterController->enableBackward(enable);
-	}
-	else if (bareEvent == keys[2])
-	{
-		characterController->enableStrafeLeft(enable);
-	}
-	else if (bareEvent == keys[3])
-	{
-		characterController->enableStrafeRight(enable);
-	}
-	else if (bareEvent == keys[4])
-	{
-		characterController->enableRollLeft(enable);
-	}
-	else if (bareEvent == keys[5])
-	{
-		characterController->enableRollRight(enable);
-	}
-	else if (bareEvent == keys[6])
-	{
-		characterController->enableJump(enable);
-	}
-	else
-	{
-		PRINTERR("setCharacterControllerCommand: Event not defined: " << bareEvent);
-	}
-}
 static const char* NPC1_keys[] =
-{
-	"i", //forward
-	"k", //backward
-	"u", //strafe_left
-	"o", //strafe_right
-	"j", //roll_left
-	"l", //roll_right
-	"space", //jump
-};
+{ "i", //forward
+		"k", //backward
+		"u", //strafe_left
+		"o", //strafe_right
+		"j", //roll_left
+		"l", //roll_right
+		"space", //jump
+		};
 void stateNPC1(const Event * event, void * data)
 {
 	//get data
@@ -304,52 +300,31 @@ void stateNPC1(const Event * event, void * data)
 	//set the right command
 	if (bareEvent == "i")
 	{
-		if (enable)
-		{
-			characterFSM.request("forward");
-		}
+		enable?characterFSM.request("forward"):characterFSM.request("idle");
 	}
 	else if (bareEvent == "k")
 	{
-		if (enable)
-		{
-			characterFSM.request("backward");
-		}
+		enable?characterFSM.request("backward"):characterFSM.request("idle");
 	}
 	else if (bareEvent == "u")
 	{
-		if (enable)
-		{
-			characterFSM.request("strafe_left");
-		}
+		enable?characterFSM.request("strafe_left"):characterFSM.request("idle");
 	}
 	else if (bareEvent == "o")
 	{
-		if (enable)
-		{
-			characterFSM.request("strafe_right");
-		}
+		enable?characterFSM.request("strafe_right"):characterFSM.request("idle");
 	}
 	else if (bareEvent == "j")
 	{
-		if (enable)
-		{
-			characterFSM.request("roll_left");
-		}
+		enable?characterFSM.request("roll_left"):characterFSM.request("idle");
 	}
 	else if (bareEvent == "l")
 	{
-		if (enable)
-		{
-			characterFSM.request("roll_right");
-		}
+		enable?characterFSM.request("roll_right"):characterFSM.request("idle");
 	}
 	else if (bareEvent == "space")
 	{
-		if (enable)
-		{
-			characterFSM.request("jump");
-		}
+		enable?characterFSM.request("jump"):characterFSM.request("idle");
 	}
 	else
 	{

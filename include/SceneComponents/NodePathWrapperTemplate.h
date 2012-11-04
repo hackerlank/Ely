@@ -28,6 +28,7 @@
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/NodePathWrapper.h"
+#include "Game/GameSceneManager.h"
 #include "Utilities/Tools.h"
 
 class NodePathWrapperTemplate: public ComponentTemplate

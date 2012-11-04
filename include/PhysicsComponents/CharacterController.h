@@ -33,16 +33,12 @@
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <bulletShape.h>
-#include <bulletSphereShape.h>
-#include <bulletBoxShape.h>
-#include <bulletCylinderShape.h>
-#include <bulletCapsuleShape.h>
-#include <bulletConeShape.h>
 #include <bulletCharacterControllerNode.h>
 #include <bullet_utils.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GamePhysicsManager.h"
 #include "Utilities/Tools.h"
 
 class CharacterControllerTemplate;
@@ -58,6 +54,7 @@ class CharacterControllerTemplate;
  * - "step_height"  			|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
+ * - "shape_size"  				|single|"medium"  (min, medium, max)
  * - "use_shape_of"				|single|no default
  * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
  * - "shape_height"  			|single|no default (cylinder,capsule,cone)
@@ -77,8 +74,8 @@ class CharacterControllerTemplate;
  * - "strafe_left"  			|single|"enabled"
  * - "strafe_right"  			|single|"enabled"
  * - "jump"  					|single|"enabled"
- * - "linear_speed"  			|single|"3.0"
- * - "angular_speed"  			|single|"120.0"
+ * - "linear_speed"  			|single|"10.0"
+ * - "angular_speed"  			|single|"45.0"
  */
 class CharacterController: public Component
 {
@@ -100,18 +97,6 @@ public:
 	 * @param data The custom data.
 	 */
 	virtual void update(void* data);
-
-	/**
-	 * \brief The shape type.
-	 */
-	enum ShapeType
-	{
-		SPHERE, //!< SPHERE (radius)
-		BOX,//!< BOX (half_x, half_y, half_z)
-		CYLINDER,//!< CYLINDER (radius, height, up)
-		CAPSULE,//!< CAPSULE (radius, height, up)
-		CONE,//!< CONE (radius, height, up)
-	};
 
 	/**
 	 * \name Control keys' enablers.
@@ -165,18 +150,9 @@ private:
 	 * @param shapeType The shape type.
 	 * @return The created shape.
 	 */
-	SMARTPTR(BulletShape) createShape(ShapeType shapeType);
-	ShapeType mShapeType;
-	/**
-	 * \brief Calculates geometric characteristics of a GeomNode.
-	 *
-	 * It takes a NodePath, (supposedly) referring to a GeomNode, and
-	 * calculates a tight bounding box surrounding it, hence sets the
-	 * related dimensions into mModelDims, mModelCenter, mModelRadius
-	 * member variables.
-	 * @param modelNP The GeomNode node path.
-	 */
-	void getBoundingDimensions(NodePath modelNP);
+	SMARTPTR(BulletShape) createShape(GamePhysicsManager::ShapeType shapeType);
+	GamePhysicsManager::ShapeType mShapeType;
+	GamePhysicsManager::ShapeSize mShapeSize;
 	LVector3 mModelDims;
 	float mModelRadius;
 	//any model has a local frame and the tight bounding box is computed

@@ -27,11 +27,13 @@ InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"InstanceOfTemplate::InstanceOfTemplate: invalid PandaFramework or WindowFramework");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"InstanceOfTemplate::InstanceOfTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"InstanceOfTemplate::InstanceOfTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+			"InstanceOfTemplate::InstanceOfTemplate: invalid GameSceneManager")
+	//
 	setParametersDefaults();
 }
 

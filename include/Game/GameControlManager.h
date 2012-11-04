@@ -55,12 +55,12 @@ public:
 	virtual ~GameControlManager();
 
 	/**
-	 * \brief Adds an control component for updating.
+	 * \brief Adds (if not present) an control component to updating.
 	 * @param controlComp The control component.
 	 */
 	void addToControlUpdate(SMARTPTR(Component) controlComp);
 	/**
-	 * \brief Removes an control component from updating.
+	 * \brief Removes (if present) an control component from updating.
 	 * @param controlComp The control component.
 	 */
 	void removeFromControlUpdate(SMARTPTR(Component) controlComp);

@@ -27,11 +27,11 @@ ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"ActivityTemplate::ActivityTemplate: invalid PandaFramework or WindowFramework");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"ActivityTemplate::ActivityTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"ActivityTemplate::ActivityTemplate: invalid WindowFramework")
+	//
 	setParametersDefaults();
 }
 

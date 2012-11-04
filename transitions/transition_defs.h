@@ -95,6 +95,10 @@ FILTER Filter_roll_right_NPC1;
 ENTER Enter_jump_NPC1;
 EXIT Exit_jump_NPC1;
 FILTER Filter_jump_NPC1;
+//idle
+ENTER Enter_idle_NPC1;
+EXIT Exit_idle_NPC1;
+FILTER Filter_idle_NPC1;
 //forward_FromTo_roll_left
 FROMTO forward_FromTo_roll_left_NPC1;
 //forward_FromTo_roll_right

@@ -23,6 +23,7 @@
 
 #include "initialization_defs.h"
 #include "Utilities/ComponentSuite.h"
+#include "Utilities/Tools.h"
 
 ///common
 static bool controlGrabbed = false;
@@ -74,11 +75,11 @@ void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-	object->getNodePath().look_at(50, 200, 10);
+		object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
-			(void*) object);
-}
+		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+				(void*) object);
+	}
 
 ///Actor1 related
 static void toggleActor1Control(const Event* event, void* data)
@@ -139,7 +140,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//enable/disable Actor1 control by event
 	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
 			(void*) object);
-
 }
 
 ///Plane1 related
@@ -171,7 +171,12 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play animation
 	SMARTPTR(Model) npc1Model = DCAST(Model, object->getComponent(
 					ComponentFamilyType("Scene")));
-	npc1Model->animations().loop("panda_soft", false);
+	npc1Model->animations().loop("Eve", false);
+	int numAnims = npc1Model->animations().get_num_anims();
+	for (int i = 0; i<numAnims;++i)
+	{
+		PRINT("## "<<npc1Model->animations().get_anim_name(i));
+	}
 	//play sound
 	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));

@@ -122,6 +122,7 @@
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.5"/>
 				<Param shape_type="capsule"/>
+				<Param shape_size="minimum"/>
 				<Param collide_mask="all_on"/>
 			</Component> 
 			<Component type="InstanceOf" priority="100">
@@ -219,7 +220,8 @@
 				<Param body_mass="1.0"/>
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.1"/>
-				<Param shape_type="sphere"/>
+				<Param shape_type="capsule"/>
+				<Param shape_size="maximum"/>
 				<Param collide_mask="all_on"/>
 			</Component> 
 			<Component type="Sound3d">
@@ -243,6 +245,7 @@
 				<Param states="roll_left"/>
 				<Param states="roll_right"/>
 				<Param states="jump"/>
+				<Param states="idle"/>
 				<Param from_to="forward_FromTo_roll_left"/>
 				<Param from_to="forward_FromTo_roll_right"/>
 				<Param events="i"/>
@@ -270,14 +273,18 @@
 				<Param events="alt-up"/>
 			</Component>
 			<Component type="Model" priority="100">
-				<Param model_file="panda"/>
-				<Param anim_files="panda-walk"/>
-				<Param scale_x="1.0"/>
-				<Param scale_y="1.0"/>
-				<Param scale_z="1.0"/>
+				<Param model_file="eve/eve"/>
+				<Param anim_files="eve/eve-walk"/>
+				<Param anim_files="eve/eve-run"/>
+				<Param anim_files="eve/eve-jump"/>
+				<Param anim_files="eve/eve-offbalance"/>
+				<Param scale_x="5.0"/>
+				<Param scale_y="5.0"/>
+				<Param scale_z="5.0"/>
 			</Component>
 			<Component type="CharacterController" priority="90">
 				<Param shape_type="capsule"/>
+				<Param shape_size="medium"/>
 				<Param linear_speed="10.0"/>
 			</Component> 
 			<Component type="Sound3d">

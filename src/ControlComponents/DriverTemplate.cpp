@@ -27,11 +27,13 @@ DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"DriverTemplate::DriverTemplate: invalid PandaFramework or WindowFramework");
-	}
+	CHECKEXISTENCE(pandaFramework,
+			"DriverTemplate::DriverTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"DriverTemplate::DriverTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+			"DriverTemplate::DriverTemplate: invalid GameControlManager")
+	//
 	setParametersDefaults();
 }
 
