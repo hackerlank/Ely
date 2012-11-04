@@ -171,7 +171,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play animation
 	SMARTPTR(Model) npc1Model = DCAST(Model, object->getComponent(
 					ComponentFamilyType("Scene")));
-	npc1Model->animations().loop("Eve", false);
+	npc1Model->animations().loop(npc1Model->animations().get_anim_name(0), false);
 	int numAnims = npc1Model->animations().get_num_anims();
 	for (int i = 0; i<numAnims;++i)
 	{

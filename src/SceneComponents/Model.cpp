@@ -66,7 +66,7 @@ bool Model::initialize()
 					== std::string("false") ? false : true);
 	if (mFromFile)
 	{
-		//setup model
+		//setup model (with possible animations)
 		mNodePath = mTmpl->windowFramework()->load_model(
 				mTmpl->pandaFramework()->get_models(),
 				Filename(mTmpl->parameter(std::string("model_file"))));
@@ -74,7 +74,7 @@ bool Model::initialize()
 		{
 			result = false;
 		}
-		//setup animations
+		//setup more animations
 		std::list<std::string>::iterator it;
 		std::list<std::string> animFileList = mTmpl->parameterList(
 				std::string("anim_files"));
@@ -90,9 +90,9 @@ bool Model::initialize()
 					result = false;
 				}
 			}
-			//bind all loaded animations
-			auto_bind(mNodePath.node(), mAnimations);
 		}
+		//bind all loaded animations
+		auto_bind(mNodePath.node(), mAnimations);
 	}
 	else
 	{

@@ -273,11 +273,7 @@
 				<Param events="alt-up"/>
 			</Component>
 			<Component type="Model" priority="100">
-				<Param model_file="eve/eve"/>
-				<Param anim_files="eve/eve-walk"/>
-				<Param anim_files="eve/eve-run"/>
-				<Param anim_files="eve/eve-jump"/>
-				<Param anim_files="eve/eve-offbalance"/>
+				<Param model_file="eve/eve-tireroll"/>
 				<Param scale_x="5.0"/>
 				<Param scale_y="5.0"/>
 				<Param scale_z="5.0"/>
