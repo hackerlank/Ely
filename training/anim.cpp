@@ -43,7 +43,7 @@ BEGIN_PUBLISH
 ////////////////////////////////////////////////////////////////////
 EXPCL_PANDA_CHAN void
 auto_bind(PandaNode *root_node, AnimControlCollection &controls,
-          int hierarchy_match_flags = 0);
+		int hierarchy_match_flags = 0);
 END_PUBLISH
 
 #endif
@@ -60,7 +60,6 @@ typedef pmap<string, AnimBundles> Anims;
 typedef pset<PartBundle *> PartBundles;
 typedef pmap<string, PartBundles> Parts;
 
-
 ////////////////////////////////////////////////////////////////////
 //     Function: bind_anims
 //  Description: A support function for auto_bind(), below.  Given a
@@ -68,56 +67,65 @@ typedef pmap<string, PartBundles> Parts;
 //               share the same name, perform whatever bindings make
 //               sense.
 ////////////////////////////////////////////////////////////////////
-static void
-bind_anims(const PartBundles &parts, const AnimBundles &anims,
-           AnimControlCollection &controls,
-           int hierarchy_match_flags) {
-  PartBundles::const_iterator pbi;
+static void bind_anims(const PartBundles &parts, const AnimBundles &anims,
+		AnimControlCollection &controls, int hierarchy_match_flags)
+{
+	PartBundles::const_iterator pbi;
 
-  for (pbi = parts.begin(); pbi != parts.end(); ++pbi) {
-    PartBundle *part = (*pbi);
-    AnimBundles::const_iterator abi;
-    for (abi = anims.begin(); abi != anims.end(); ++abi) {
-      AnimBundle *anim = (*abi);
-      if (chan_cat.is_info()) {
-        chan_cat.info()
-          << "Attempting to bind " << *part << " to " << *anim << "\n";
-      }
+	for (pbi = parts.begin(); pbi != parts.end(); ++pbi)
+	{
+		PartBundle *part = (*pbi);
+		AnimBundles::const_iterator abi;
+		for (abi = anims.begin(); abi != anims.end(); ++abi)
+		{
+			AnimBundle *anim = (*abi);
+			if (chan_cat.is_info())
+			{
+				chan_cat.info() << "Attempting to bind " << *part << " to "
+						<< *anim << "\n";
+			}
 
-      PT(AnimControl) control =
-        part->bind_anim(anim, hierarchy_match_flags);
-      string name = (*abi)->get_name();
-      if (name.empty()) {
-        name = anim->get_name();
-      }
-      if (control != (AnimControl *)NULL) {
-        if (controls.find_anim(name) != (AnimControl *)NULL) {
-          // That name's already used; synthesize another one.
-          int index = 0;
-          string new_name;
-          do {
-            index++;
-            new_name = name + '.' + format_string(index);
-          } while (controls.find_anim(new_name) != (AnimControl *)NULL);
-          name = new_name;
-        }
+			PT(AnimControl)control =
+			part->bind_anim(anim, hierarchy_match_flags);
+			string name = (*abi)->get_name();
+			if (name.empty())
+			{
+				name = anim->get_name();
+			}
+			if (control != (AnimControl *) NULL)
+			{
+				if (controls.find_anim(name) != (AnimControl *) NULL)
+				{
+					// That name's already used; synthesize another one.
+					int index = 0;
+					string new_name;
+					do
+					{
+						index++;
+						new_name = name + '.' + format_string(index);
+					} while (controls.find_anim(new_name)
+							!= (AnimControl *) NULL);
+					name = new_name;
+				}
 
-        controls.store_anim(control, name);
-      }
+				controls.store_anim(control, name);
+			}
 
-      if (chan_cat.is_info()) {
-        if (control == (AnimControl *)NULL) {
-          chan_cat.info()
-            << "Bind failed.\n";
-        } else {
-          chan_cat.info()
-            << "Bind succeeded, index "
-            << control->get_channel_index() << "; accessible as "
-            << name << "\n";
-        }
-      }
-    }
-  }
+			if (chan_cat.is_info())
+			{
+				if (control == (AnimControl *) NULL)
+				{
+					chan_cat.info() << "Bind failed.\n";
+				}
+				else
+				{
+					chan_cat.info() << "Bind succeeded, index "
+							<< control->get_channel_index()
+							<< "; accessible as " << name << "\n";
+				}
+			}
+		}
+	}
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -126,29 +134,33 @@ bind_anims(const PartBundles &parts, const AnimBundles &anims,
 //               through the hierarchy and finds all of the
 //               PartBundles and AnimBundles.
 ////////////////////////////////////////////////////////////////////
-static void
-r_find_bundles(PandaNode *node, Anims &anims, Parts &parts) {
-  if (node->is_of_type(AnimBundleNode::get_class_type())) {
-    AnimBundleNode *bn = DCAST(AnimBundleNode, node);
-    AnimBundle *bundle = bn->get_bundle();
-    anims[bundle->get_name()].insert(bundle);
+static void r_find_bundles(PandaNode *node, Anims &anims, Parts &parts)
+{
+	if (node->is_of_type(AnimBundleNode::get_class_type()))
+	{
+		AnimBundleNode *bn = DCAST(AnimBundleNode, node);
+		AnimBundle *bundle = bn->get_bundle();
+		anims[bundle->get_name()].insert(bundle);
 
-  } else if (node->is_of_type(PartBundleNode::get_class_type())) {
-    PartBundleNode *bn = DCAST(PartBundleNode, node);
-    int num_bundles = bn->get_num_bundles();
-    for (int i = 0; i < num_bundles; ++i) {
-      PartBundle *bundle = bn->get_bundle(i);
-      parts[bundle->get_name()].insert(bundle);
-    }
-  }
+	}
+	else if (node->is_of_type(PartBundleNode::get_class_type()))
+	{
+		PartBundleNode *bn = DCAST(PartBundleNode, node);
+		int num_bundles = bn->get_num_bundles();
+		for (int i = 0; i < num_bundles; ++i)
+		{
+			PartBundle *bundle = bn->get_bundle(i);
+			parts[bundle->get_name()].insert(bundle);
+		}
+	}
 
-  PandaNode::Children cr = node->get_children();
-  int num_children = cr.get_num_children();
-  for (int i = 0; i < num_children; i++) {
-    r_find_bundles(cr.get_child(i), anims, parts);
-  }
+	PandaNode::Children cr = node->get_children();
+	int num_children = cr.get_num_children();
+	for (int i = 0; i < num_children; i++)
+	{
+		r_find_bundles(cr.get_child(i), anims, parts);
+	}
 }
-
 
 ////////////////////////////////////////////////////////////////////
 //     Function: auto_bind
@@ -159,120 +171,139 @@ r_find_bundles(PandaNode *node, Anims &anims, Parts &parts) {
 //               The list of all resulting AnimControls created is
 //               filled into controls.
 ////////////////////////////////////////////////////////////////////
-void
-auto_bind(PandaNode *root_node, AnimControlCollection &controls,
-          int hierarchy_match_flags) {
-  // First, locate all the bundles in the subgraph.
-  Anims anims;
-  AnimBundles extra_anims;
-  Parts parts;
-  PartBundles extra_parts;
-  r_find_bundles(root_node, anims, parts);
+void auto_bind(PandaNode *root_node, AnimControlCollection &controls,
+		int hierarchy_match_flags)
+{
+	// First, locate all the bundles in the subgraph.
+	Anims anims;
+	AnimBundles extra_anims;
+	Parts parts;
+	PartBundles extra_parts;
+	r_find_bundles(root_node, anims, parts);
 
-  if (chan_cat.is_debug()) {
-    int anim_count = 0;
-    Anims::const_iterator ai;
-    for (ai = anims.begin(); ai != anims.end(); ++ai) {
-      anim_count += (int)(*ai).second.size();
-    }
-    chan_cat.debug()
-      << "Found " << anim_count << " anims:\n";
-    for (ai = anims.begin(); ai != anims.end(); ++ai) {
-      chan_cat.debug(false)
-        << " " << (*ai).first;
-      if ((*ai).second.size() != 1) {
-        chan_cat.debug(false)
-          << "*" << ((*ai).second.size());
-      }
-    }
-    chan_cat.debug(false)
-      << "\n";
+	if (chan_cat.is_debug())
+	{
+		int anim_count = 0;
+		Anims::const_iterator ai;
+		for (ai = anims.begin(); ai != anims.end(); ++ai)
+		{
+			anim_count += (int) (*ai).second.size();
+		}
+		chan_cat.debug() << "Found " << anim_count << " anims:\n";
+		for (ai = anims.begin(); ai != anims.end(); ++ai)
+		{
+			chan_cat.debug(false) << " " << (*ai).first;
+			if ((*ai).second.size() != 1)
+			{
+				chan_cat.debug(false) << "*" << ((*ai).second.size());
+			}
+		}
+		chan_cat.debug(false) << "\n";
 
-    int part_count = 0;
-    Parts::const_iterator pi;
-    for (pi = parts.begin(); pi != parts.end(); ++pi) {
-      part_count += (int)(*pi).second.size();
-    }
-    chan_cat.debug()
-      << "Found " << part_count << " parts:\n";
-    for (pi = parts.begin(); pi != parts.end(); ++pi) {
-      chan_cat.debug(false)
-        << " " << (*pi).first;
-      if ((*pi).second.size() != 1) {
-        chan_cat.debug(false)
-          << "*" << ((*pi).second.size());
-      }
-    }
-    chan_cat.debug(false)
-      << "\n";
-  }
+		int part_count = 0;
+		Parts::const_iterator pi;
+		for (pi = parts.begin(); pi != parts.end(); ++pi)
+		{
+			part_count += (int) (*pi).second.size();
+		}
+		chan_cat.debug() << "Found " << part_count << " parts:\n";
+		for (pi = parts.begin(); pi != parts.end(); ++pi)
+		{
+			chan_cat.debug(false) << " " << (*pi).first;
+			if ((*pi).second.size() != 1)
+			{
+				chan_cat.debug(false) << "*" << ((*pi).second.size());
+			}
+		}
+		chan_cat.debug(false) << "\n";
+	}
 
-  // Now, match up the bundles by name.
+	// Now, match up the bundles by name.
 
-  Anims::const_iterator ai = anims.begin();
-  Parts::const_iterator pi = parts.begin();
+	Anims::const_iterator ai = anims.begin();
+	Parts::const_iterator pi = parts.begin();
 
-  while (ai != anims.end() && pi != parts.end()) {
-    if ((*ai).first < (*pi).first) {
-      // Here's an anim with no matching parts.
-      if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name) {
-        AnimBundles::const_iterator abi;
-        for (abi = (*ai).second.begin(); abi != (*ai).second.end(); ++abi) {
-          extra_anims.insert(*abi);
-        }
-      }
-      ++ai;
+	while (ai != anims.end() && pi != parts.end())
+	{
+		if ((*ai).first < (*pi).first)
+		{
+			// Here's an anim with no matching parts.
+			if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name)
+			{
+				AnimBundles::const_iterator abi;
+				for (abi = (*ai).second.begin(); abi != (*ai).second.end();
+						++abi)
+				{
+					extra_anims.insert(*abi);
+				}
+			}
+			++ai;
 
-    } else if ((*pi).first < (*ai).first) {
-      // And here's a part with no matching anims.
-      if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name) {
-        PartBundles::const_iterator pbi;
-        for (pbi = (*pi).second.begin(); pbi != (*pi).second.end(); ++pbi) {
-          extra_parts.insert(*pbi);
-        }
-      }
-      ++pi;
+		}
+		else if ((*pi).first < (*ai).first)
+		{
+			// And here's a part with no matching anims.
+			if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name)
+			{
+				PartBundles::const_iterator pbi;
+				for (pbi = (*pi).second.begin(); pbi != (*pi).second.end();
+						++pbi)
+				{
+					extra_parts.insert(*pbi);
+				}
+			}
+			++pi;
 
-    } else {
-      // But here we have (at least one) match!
-      bind_anims((*pi).second, (*ai).second, controls,
-                   hierarchy_match_flags);
-      ++pi;
+		}
+		else
+		{
+			// But here we have (at least one) match!
+			bind_anims((*pi).second, (*ai).second, controls,
+					hierarchy_match_flags);
+			++pi;
 
-      // We don't increment the anim counter yet.  That way, the same
-      // anim may bind to multiple parts, if they all share the same
-      // name.
-    }
-  }
+			// We don't increment the anim counter yet.  That way, the same
+			// anim may bind to multiple parts, if they all share the same
+			// name.
+		}
+	}
 
-  if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name) {
-    // Continue searching through the remaining anims and parts.
+	if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name)
+	{
+		// Continue searching through the remaining anims and parts.
 
-    while (ai != anims.end()) {
-      // Here's an anim with no matching parts.
-      if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name) {
-        AnimBundles::const_iterator abi;
-        for (abi = (*ai).second.begin(); abi != (*ai).second.end(); ++abi) {
-          extra_anims.insert(*abi);
-        }
-      }
-      ++ai;
-    }
+		while (ai != anims.end())
+		{
+			// Here's an anim with no matching parts.
+			if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name)
+			{
+				AnimBundles::const_iterator abi;
+				for (abi = (*ai).second.begin(); abi != (*ai).second.end();
+						++abi)
+				{
+					extra_anims.insert(*abi);
+				}
+			}
+			++ai;
+		}
 
-    while (pi != parts.end()) {
-      // And here's a part with no matching anims.
-      if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name) {
-        PartBundles::const_iterator pbi;
-        for (pbi = (*pi).second.begin(); pbi != (*pi).second.end(); ++pbi) {
-          extra_parts.insert(*pbi);
-        }
-      }
-      ++pi;
-    }
+		while (pi != parts.end())
+		{
+			// And here's a part with no matching anims.
+			if (hierarchy_match_flags & PartGroup::HMF_ok_wrong_root_name)
+			{
+				PartBundles::const_iterator pbi;
+				for (pbi = (*pi).second.begin(); pbi != (*pi).second.end();
+						++pbi)
+				{
+					extra_parts.insert(*pbi);
+				}
+			}
+			++pi;
+		}
 
-    bind_anims(extra_parts, extra_anims, controls,
-               hierarchy_match_flags);
-  }
+		bind_anims(extra_parts, extra_anims, controls, hierarchy_match_flags);
+	}
 }
 
 #include <iostream>
@@ -289,7 +320,21 @@ auto_bind(PandaNode *root_node, AnimControlCollection &controls,
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection
 AnimControlCollection anim_collection;
+int idx = 0;
 AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data);
+
+void cycleAnim(const Event* e, void* data)
+{
+	int *pi = (int*) (data);
+	std::cout << idx << std::endl;
+	std::cout << "playing " << anim_collection.get_anim(*pi)->get_name()
+			<< " with name " << anim_collection.get_anim_name(*pi) << std::endl;
+//	anim_collection.get_anim(*pi)->loop(false);
+	anim_collection.stop_all();
+	anim_collection.find_anim(anim_collection.get_anim_name(*pi))->loop(true);
+	++(*pi);
+	(*pi) %= anim_collection.get_num_anims();
+}
 
 int main(int argc, char **argv)
 {
@@ -307,56 +352,137 @@ int main(int argc, char **argv)
 		window->enable_keyboard(); // Enable keyboard detection
 		window->setup_trackball(); // Enable default camera movement
 	}
+	////
+	Parts parts;
+	Anims anims;
+	Parts::const_iterator pbi;
+	Anims::const_iterator abi;
+	parts.clear();
+	anims.clear();
 	//Load the Actor Model
-	NodePath Actor = window->load_model(window->get_render(),
+	NodePath Actor = window->load_model(panda.get_models(),
 			"bvw-f2004--airbladepilot/pilot-model");
-	SMARTPTR(Character) character =
-			DCAST(Character, Actor.find("**/+Character").node());
-	SMARTPTR(PartBundle) pbundle = character->get_bundle(0);
-	//Load Animations
-	std::vector<std::string> animations;
-	animations.push_back(std::string("pilot-chargeshoot"));
-//	animations.push_back(std::string("pilot-crash"));
-//	animations.push_back(std::string("pilot-chargewindup"));
-	animations.push_back(std::string("pilot-discloop"));
-//	animations.push_back(std::string("pilot-discwinddown"));
-//	animations.push_back(std::string("pilot-discwindup"));
-//	animations.push_back(std::string("pilot-firewinddown"));
-//	animations.push_back(std::string("pilot-firewindup"));
-//	animations.push_back(std::string("pilot-idle"));
-//	animations.push_back(std::string("pilot-newdeath"));
-//	animations.push_back(std::string("pilot-newidle"));
-	/*
-	 animations.push_back(std::string("pilot-pain"));
-	 animations.push_back(std::string("pilot-fire"));
-	 animations.push_back(std::string("pilot-charge"));
-	 animations.push_back(std::string("pilot-chargeloop"));
-	 */
-	for (unsigned int i = 0; i < animations.size(); ++i)
+	r_find_bundles(Actor.node(), anims, parts);
+	PT(PartBundle)firstPartBundle;
+	firstPartBundle.clear();
+	if (parts.begin() != parts.end())
 	{
-		window->load_model(Actor, "bvw-f2004--airbladepilot/" + animations[i]);
+		if (parts.begin()->second.begin() != parts.begin()->second.end())
+		{
+			firstPartBundle = *(parts.begin()->second.begin());
+		}
 	}
-	auto_bind(Actor.node(), anim_collection);
-	pbundle->set_anim_blend_flag(true);
-	pbundle->set_control_effect(anim_collection.get_anim(0), 0.5);
-	pbundle->set_control_effect(anim_collection.get_anim(1), 0.5);
-//	anim_collection.get_anim(0)->loop(true);
-//	anim_collection.get_anim(1)->loop(true);
-	int actualAnim = 0;
-	//switch among animations
-	AsyncTask* task = new GenericAsyncTask("check playing", &check_playing,
-			reinterpret_cast<void*>(&actualAnim));
-	task->set_delay(3);
-	panda.get_task_mgr().add(task);
-	// the name of an animation is preceded in the .egg file with <Bundle>:
-	// loop a specific animation
-//	anim_collection.loop(anim_collection.get_anim_name(1), true);
-	// loop all animations
-//	anim_collection.loop_all(true);
-	// play an animation once:
-//	anim_collection.play("panda_soft");
-	// pose
-//	anim_collection.pose("panda_soft", 5);
+	if (firstPartBundle)
+	{
+		PT(AnimBundle)firstAnimBundle;
+		//binds the first AnimBundle (if any) to the first PartBundle
+		if (anims.begin() != anims.end())
+		{
+			if (anims.begin()->second.begin() != anims.begin()->second.end())
+			{
+				firstAnimBundle = *(anims.begin()->second.begin());
+				std::cout << "binding " << firstAnimBundle->get_name()
+				<< std::endl;
+				PT(AnimControl)control = firstPartBundle->bind_anim(firstAnimBundle,
+						PartGroup::HMF_ok_wrong_root_name);
+				anim_collection.store_anim(control,
+						firstAnimBundle->get_name());
+			}
+		}
+//	SMARTPTR(Character)character =
+//	DCAST(Character, Actor.find("**/+Character").node());
+//	SMARTPTR(PartBundle)pbundle = character->get_bundle(0);
+		//Load Animations
+		std::vector<std::string> animations;
+		animations.push_back(std::string("pilot-chargeshoot"));
+		animations.push_back(std::string("pilot-crash"));
+		animations.push_back(std::string("pilot-chargewindup"));
+		animations.push_back(std::string("pilot-discloop"));
+		animations.push_back(std::string("pilot-discwinddown"));
+		animations.push_back(std::string("pilot-discwindup"));
+		animations.push_back(std::string("pilot-firewinddown"));
+		animations.push_back(std::string("pilot-firewindup"));
+		animations.push_back(std::string("pilot-idle"));
+		animations.push_back(std::string("pilot-newdeath"));
+		animations.push_back(std::string("pilot-newidle"));
+		animations.push_back(std::string("pilot-pain"));
+		animations.push_back(std::string("pilot-fire"));
+		animations.push_back(std::string("pilot-charge"));
+		animations.push_back(std::string("pilot-chargeloop"));
+		for (unsigned int i = 0; i < animations.size(); ++i)
+		{
+			parts.clear();
+			anims.clear();
+			NodePath animNP = window->load_model(Actor,
+					"bvw-f2004--airbladepilot/" + animations[i]);
+			r_find_bundles(animNP.node(), anims, parts);
+			AnimBundles::const_iterator abis;
+			for (abi = anims.begin(); abi != anims.end(); ++abi)
+			{
+				for (abis = abi->second.begin(); abis != abi->second.end();
+						++abis)
+				{
+					std::cout << "binding " << (*abis)->get_name() << " with name "
+					<< animations[i] << std::endl;
+					PT(AnimControl)control = firstPartBundle->bind_anim(*abis,
+							PartGroup::HMF_ok_wrong_root_name);
+//					anim_collection.store_anim(control, (*abis)->get_name());
+					anim_collection.store_anim(control, animations[i]);
+				}
+			}
+		}
+		panda.define_key("a", "a", &cycleAnim, (void*) &idx);
+	}
+	///
+//	Parts parts;
+//	Anims anims;
+//	r_find_bundles(Actor.node(), anims, parts);
+//	Parts::const_iterator pbi;
+//	Anims::const_iterator abi;
+////	for (pbi = parts.begin(); pbi != parts.end(); ++pbi)
+////	{
+////		PartBundles::const_iterator pbis;
+////		for (pbis = pbi->second.begin(); pbis != pbi->second.end(); ++pbis)
+////		{
+////			std::cout << (*pbis)->get_name() << std::endl;
+////		}
+////	}
+//	//binds all AnimBundles to the first PartBundle
+//	PT(PartBundle)partBundle = *(parts.begin()->second.begin());
+//	for (abi = anims.begin(); abi != anims.end(); ++abi)
+//	{
+//		AnimBundles::const_iterator abis;
+//		for (abis = abi->second.begin(); abis != abi->second.end(); ++abis)
+//		{
+//			std::cout << "binding " << (*abis)->get_name() << std::endl;
+//			PT(AnimControl)control = partBundle->bind_anim(*abis, PartGroup::HMF_ok_wrong_root_name);
+//			anim_collection.store_anim(control, (*abis)->get_name());
+//		}
+//	}
+
+//	///
+//	auto_bind(Actor.node(), anim_collection, PartGroup::HMF_ok_wrong_root_name);
+//	pbundle->set_anim_blend_flag(true);
+//	pbundle->set_control_effect(anim_collection.get_anim(0), 0.5);
+//	pbundle->set_control_effect(anim_collection.get_anim(1), 0.5);
+////	anim_collection.get_anim(0)->loop(true);
+////	anim_collection.get_anim(1)->loop(true);
+//	int actualAnim = 0;
+//	//switch among animations
+//	AsyncTask* task = new GenericAsyncTask("check playing", &check_playing,
+//			reinterpret_cast<void*>(&actualAnim));
+//	task->set_delay(3);
+//	panda.get_task_mgr().add(task);
+//	// the name of an animation is preceded in the .egg file with <Bundle>:
+//	// loop a specific animation
+////	anim_collection.loop(anim_collection.get_anim_name(1), true);
+//	// loop all animations
+////	anim_collection.loop_all(true);
+//	// play an animation once:
+////	anim_collection.play("panda_soft");
+//	// pose
+////	anim_collection.pose("panda_soft", 5);
+//
 
 	//attach to scene
 	Actor.reparent_to(window->get_render());
