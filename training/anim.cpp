@@ -366,48 +366,66 @@ int main(int argc, char **argv)
 	////
 	Parts parts;
 	Anims anims;
-	Parts::const_iterator pbi;
-	Anims::const_iterator abi;
+	Parts::const_iterator partsIter;
+	Anims::const_iterator animsIter;
+	PartBundles::const_iterator partBundlesIter;
+	AnimBundles::const_iterator animBundlesIter;
 	parts.clear();
 	anims.clear();
 	//Load the Actor Model
 	std::string model_name = "pilot-model";
 	NodePath Actor = window->load_model(panda.get_models(),
 			"bvw-f2004--airbladepilot/" + model_name);
+	//find bundles
 	r_find_bundles(Actor.node(), anims, parts);
 	PT(PartBundle)firstPartBundle;
 	firstPartBundle.clear();
-	//check if there is at least a PartBundle
-	if (parts.begin() != parts.end())
+	//check if there is at least one PartBundle
+	for (partsIter = parts.begin(); partsIter != parts.end(); ++partsIter)
 	{
-		if (parts.begin()->second.begin() != parts.begin()->second.end())
+		for (partBundlesIter = partsIter->second.begin();
+				partBundlesIter != partsIter->second.end(); ++partBundlesIter)
 		{
-			//set the first PartBundle
-			firstPartBundle = *(parts.begin()->second.begin());
+			if (not firstPartBundle)
+			{
+				//set the first PartBundle
+				firstPartBundle = *partBundlesIter;
+				std::cout << "first PartBundle: " << (*partBundlesIter)->get_name() << std::endl;
+			}
+			std::cout << "succeeding PartBundle: " << (*partBundlesIter)->get_name() << std::endl;
 		}
 	}
 	if (firstPartBundle)
 	{
-		//check if there is an AnimBundle within the model file
+		//check if there are AnimBundles within the model file
 		PT(AnimBundle)firstAnimBundle;
-		//binds the first AnimBundle (if any) to the first PartBundle
-		if (anims.begin() != anims.end())
+		std::string default_anim_name = model_name + "default_anim";
+		//binds the AnimBundles (if any) to the first PartBundle
+		for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
 		{
-			if (anims.begin()->second.begin() != anims.begin()->second.end())
+			int j;
+			for (j=0, animBundlesIter = animsIter->second.begin();
+					animBundlesIter != animsIter->second.end();
+					++animBundlesIter, ++j)
 			{
-				std::string default_anim_name = model_name + "default_anim";
-				firstAnimBundle = *(anims.begin()->second.begin());
-				std::cout << "binding " << firstAnimBundle->get_name() <<
-				" with name " << default_anim_name << std::endl;
-				PT(AnimControl)control = firstPartBundle->bind_anim(firstAnimBundle,
+				std::string anim_name;
+				if (j>0)
+				{
+					anim_name = default_anim_name + '.' + format_string(j);
+				}
+				else
+				{
+					anim_name=default_anim_name;
+				}
+				std::cout << "binding " << (*animBundlesIter)->get_name() << " with name "
+				<< anim_name << std::endl;
+				PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
 						PartGroup::HMF_ok_wrong_root_name);
-//				anim_collection.store_anim(control, firstAnimBundle->get_name());
-				anim_collection.store_anim(control, default_anim_name);
+//					anim_collection.store_anim(control, (*animBundlesIter)->get_name());
+				anim_collection.store_anim(control, anim_name);
 			}
 		}
-//	SMARTPTR(Character)character =
-//	DCAST(Character, Actor.find("**/+Character").node());
-//	SMARTPTR(PartBundle)pbundle = character->get_bundle(0);
+
 		//Load Animations
 		std::vector<std::string> animations;
 		animations.push_back(std::string("pilot-chargeshoot"));
@@ -433,17 +451,12 @@ int main(int argc, char **argv)
 			NodePath animNP = window->load_model(Actor,
 					"bvw-f2004--airbladepilot/" + animations[i]);
 			r_find_bundles(animNP.node(), anims, parts);
-			AnimBundles::const_iterator abis;
-			for (abi = anims.begin(); abi != anims.end(); ++abi)
+			for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
 			{
 				int j;
-				for (j=0, abis = abi->second.begin(); abis != abi->second.end();
-						++abis, ++j)
+				for (j=0, animBundlesIter = animsIter->second.begin(); animBundlesIter != animsIter->second.end();
+						++animBundlesIter, ++j)
 				{
-					std::cout << "binding " << (*abis)->get_name() << " with name "
-					<< animations[i] << std::endl;
-					PT(AnimControl)control = firstPartBundle->bind_anim(*abis,
-							PartGroup::HMF_ok_wrong_root_name);
 					std::string anim_name;
 					if (j>0)
 					{
@@ -453,7 +466,11 @@ int main(int argc, char **argv)
 					{
 						anim_name=animations[i];
 					}
-//					anim_collection.store_anim(control, (*abis)->get_name());
+					std::cout << "binding " << (*animBundlesIter)->get_name() << " with name "
+					<< anim_name << std::endl;
+					PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
+							PartGroup::HMF_ok_wrong_root_name);
+//					anim_collection.store_anim(control, (*animBundlesIter)->get_name());
 					anim_collection.store_anim(control, anim_name);
 				}
 			}
@@ -461,32 +478,6 @@ int main(int argc, char **argv)
 		panda.define_key("a", "a", &cycleAnim, (void*) &idx);
 	}
 	///
-
-//	Parts parts;
-//	Anims anims;
-//	r_find_bundles(Actor.node(), anims, parts);
-//	Parts::const_iterator pbi;
-//	Anims::const_iterator abi;
-////	for (pbi = parts.begin(); pbi != parts.end(); ++pbi)
-////	{
-////		PartBundles::const_iterator pbis;
-////		for (pbis = pbi->second.begin(); pbis != pbi->second.end(); ++pbis)
-////		{
-////			std::cout << (*pbis)->get_name() << std::endl;
-////		}
-////	}
-//	//binds all AnimBundles to the first PartBundle
-//	PT(PartBundle)partBundle = *(parts.begin()->second.begin());
-//	for (abi = anims.begin(); abi != anims.end(); ++abi)
-//	{
-//		AnimBundles::const_iterator abis;
-//		for (abis = abi->second.begin(); abis != abi->second.end(); ++abis)
-//		{
-//			std::cout << "binding " << (*abis)->get_name() << std::endl;
-//			PT(AnimControl)control = partBundle->bind_anim(*abis, PartGroup::HMF_ok_wrong_root_name);
-//			anim_collection.store_anim(control, (*abis)->get_name());
-//		}
-//	}
 
 //	///
 //	auto_bind(Actor.node(), anim_collection, PartGroup::HMF_ok_wrong_root_name);

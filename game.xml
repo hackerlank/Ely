@@ -144,6 +144,7 @@
 			<Param parent=""/>
 		</Object>
 
+<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model" priority="100">
 				<Param from_file="false"/>
@@ -167,6 +168,7 @@
 			<Param parent="render"/>
 			<Param rot_p="-90.0"/>
 		</Object>
+-->
 		
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity"  priority="-100">
@@ -225,7 +227,7 @@
 				<Param collide_mask="all_on"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_rollover.wav"/>
+				<Param sound_files="audio/sfx/GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>
 			<Param pos_x="180.0"/>
@@ -284,7 +286,7 @@
 				<Param linear_speed="10.0"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="/usr/share/panda3d/models/audio/sfx/GUI_click.wav"/>
+				<Param sound_files="models/audio/sfx/GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
 			<Param pos_x="50.0"/>
@@ -295,7 +297,6 @@
 			<Param rot_r="0.0"/>
 		</Object>
 
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain" priority="100">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
@@ -304,7 +305,7 @@
 				<Param width_scale="2.0"/>
 				<Param brute_force="true"/>
 				<Param auto_flatten="AFM_off"/>
-				<Param focal_point="Actor1"/>
+				<Param focal_point="camera"/>
 				<Param minimum_level="0"/>
 				<Param near_percent="0.1"/>
 				<Param far_percent="0.7"/>
@@ -320,7 +321,6 @@
 			</Component> 
 			<Param parent="render"/>
 		</Object>
--->
 
 	</ObjectSet>
 </Game>

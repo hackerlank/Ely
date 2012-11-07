@@ -26,10 +26,16 @@
 
 #include <string>
 #include <list>
+#include <set>
+#include <map>
 #include <cstdlib>
 #include <nodePath.h>
 #include <filename.h>
+#include <animControl.h>
 #include <animControlCollection.h>
+#include <animBundleNode.h>
+#include <partBundleNode.h>
+#include <string_utils.h>
 #include <auto_bind.h>
 #include <cardMaker.h>
 #include <typedObject.h>
@@ -40,6 +46,15 @@ class ModelTemplate;
 
 /**
  * \brief Component representing the model and animations of an object.
+ *
+ * In relation to animations', this component accepts one model file, and
+ * a number of animation files; it takes into account only the first
+ * joint's hierarchy (PartBundle) found the model file, and the animations
+ * (AnimBundle) found into the animation files (or model file) are bound to
+ * this only joint's hierarchy.\n
+ * Each animation can be referred by its associated file name. If more
+ * animations exist in any file, the next ones are suffixed  with ".N"
+ * where N=1,2,... .
  *
  * XML Param(s):
  * \li \c "from_file"  			|single|"true"
@@ -87,8 +102,29 @@ public:
 private:
 	///The NodePath associated to this model.
 	NodePath mNodePath;
+	/**
+	 * \brief Animations' related data/functions.
+	 */
+	///@{
 	///The list of animations associated with this model.
 	AnimControlCollection mAnimations;
+	typedef std::set<AnimBundle *> AnimBundles;
+	typedef std::map<string, AnimBundles> Anims;
+	typedef std::set<PartBundle *> PartBundles;
+	typedef std::map<string, PartBundles> Parts;
+	/**
+	 * \brief A support function for auto_bind().
+	 *
+	 * Walks through the hierarchy and finds all of the PartBundles
+	 * and AnimBundles.
+	 * @param node The panda node.
+	 * @param anims Out parameter: the table of AnimBundle sets indexed
+	 * by their names.
+	 * @param parts Out parameter: the table of AnimBundle sets indexed
+	 * by their names.
+	 */
+	void r_find_bundles(PandaNode *node, Anims &anims, Parts &parts);
+	///@}
 	///Flag indicating if component is set up from a file or programmatically
 	bool mFromFile;
 

@@ -29,7 +29,7 @@ Model::Model()
 	// TODO Auto-generated constructor stub
 }
 
-Model::Model(SMARTPTR(ModelTemplate) tmpl)
+Model::Model(SMARTPTR(ModelTemplate)tmpl)
 {
 	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"Model::Model: invalid GameSceneManager")
@@ -54,6 +54,34 @@ const ComponentType Model::componentType() const
 	return mTmpl->componentType();
 }
 
+void Model::r_find_bundles(PandaNode* node, Anims& anims, Parts& parts)
+{
+	if (node->is_of_type(AnimBundleNode::get_class_type()))
+	{
+		AnimBundleNode *bn = DCAST(AnimBundleNode, node);
+		AnimBundle *bundle = bn->get_bundle();
+		anims[bundle->get_name()].insert(bundle);
+
+	}
+	else if (node->is_of_type(PartBundleNode::get_class_type()))
+	{
+		PartBundleNode *bn = DCAST(PartBundleNode, node);
+		int num_bundles = bn->get_num_bundles();
+		for (int i = 0; i < num_bundles; ++i)
+		{
+			PartBundle *bundle = bn->get_bundle(i);
+			parts[bundle->get_name()].insert(bundle);
+		}
+	}
+
+	PandaNode::Children cr = node->get_children();
+	int num_children = cr.get_num_children();
+	for (int i = 0; i < num_children; i++)
+	{
+		r_find_bundles(cr.get_child(i), anims, parts);
+	}
+}
+
 bool Model::initialize()
 {
 	//lock (guard) the mutex
@@ -61,38 +89,124 @@ bool Model::initialize()
 
 	bool result = true;
 	//check if from file
-	mFromFile =
-			(mTmpl->parameter(std::string("from_file"))
-					== std::string("false") ? false : true);
+	mFromFile = (
+			mTmpl->parameter(std::string("from_file")) == std::string("false") ?
+					false : true);
 	if (mFromFile)
 	{
+		// some declarations
+		Parts parts;
+		Anims anims;
+		Parts::const_iterator partsIter;
+		Anims::const_iterator animsIter;
+		PartBundles::const_iterator partBundlesIter;
+		AnimBundles::const_iterator animBundlesIter;
+		parts.clear();
+		anims.clear();
 		//setup model (with possible animations)
+		std::string modelName = mTmpl->parameter(std::string("model_file"));
 		mNodePath = mTmpl->windowFramework()->load_model(
-				mTmpl->pandaFramework()->get_models(),
-				Filename(mTmpl->parameter(std::string("model_file"))));
+				mTmpl->pandaFramework()->get_models(), Filename(modelName));
 		if (mNodePath.is_empty())
 		{
 			result = false;
 		}
-		//setup more animations
-		std::list<std::string>::iterator it;
-		std::list<std::string> animFileList = mTmpl->parameterList(
-				std::string("anim_files"));
-		if (not animFileList.empty())
+		//find all the bundles into mNodePath.node
+		r_find_bundles(mNodePath.node(), anims, parts);
+		PT(PartBundle)firstPartBundle;
+		firstPartBundle.clear();
+		//check if there is at least one PartBundle
+		for (partsIter = parts.begin(); partsIter != parts.end(); ++partsIter)
 		{
-			for (it = animFileList.begin(); it != animFileList.end(); ++it)
+			for (partBundlesIter = partsIter->second.begin();
+					partBundlesIter != partsIter->second.end();
+					++partBundlesIter)
 			{
-				NodePath resultNP;
-				resultNP = mTmpl->windowFramework()->load_model(mNodePath,
-						Filename(*it));
-				if (resultNP.is_empty())
+				if (not firstPartBundle)
 				{
-					result = false;
+					//set the first PartBundle
+					firstPartBundle = *partBundlesIter;
+					PRINT(
+							"First PartBundle: '" << (*partBundlesIter)->get_name() << "'");
+				}
+				else
+				{
+					PRINT(
+							"Next PartBundle: '" << (*partBundlesIter)->get_name() << "'");
 				}
 			}
 		}
-		//bind all loaded animations
-		auto_bind(mNodePath.node(), mAnimations);
+		//proceeds with animations only if there is at least one PartBundle
+		if (firstPartBundle)
+		{
+			//check if there are AnimBundles within the model file
+			//and bind them to the first PartBundle
+			PT(AnimBundle)firstAnimBundle;
+			std::string animName;
+			for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
+			{
+				int j;
+				for (j=0, animBundlesIter = animsIter->second.begin();
+						animBundlesIter != animsIter->second.end();
+						++animBundlesIter, ++j)
+				{
+					if (j>0)
+					{
+						animName = modelName + '.' + format_string(j);
+					}
+					else
+					{
+						animName = modelName;
+					}
+					PRINT("Binding animation '" << (*animBundlesIter)->get_name() << "' with name '"
+							<< animName << "'");
+					PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
+							PartGroup::HMF_ok_wrong_root_name);
+					mAnimations.store_anim(control, animName);
+				}
+			}
+
+			//setup more animations (if any)
+			std::list<std::string>::iterator animFileIter;
+			std::list<std::string> animFileList = mTmpl->parameterList(
+					std::string("anim_files"));
+			for (animFileIter = animFileList.begin(); animFileIter != animFileList.end(); ++animFileIter)
+			{
+				parts.clear();
+				anims.clear();
+				//get the AnimBundle node path
+				std::string baseAnimName = *animFileIter;
+				NodePath animNP = mTmpl->windowFramework()->load_model(mNodePath,
+						Filename(baseAnimName));
+				if (animNP.is_empty())
+				{
+					result = false;
+				}
+				//find all the bundles into animNP.node
+				r_find_bundles(animNP.node(), anims, parts);
+				for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
+				{
+					int j;
+					for (j=0, animBundlesIter = animsIter->second.begin(); animBundlesIter != animsIter->second.end();
+							++animBundlesIter, ++j)
+					{
+						if (j>0)
+						{
+							animName = baseAnimName + '.' + format_string(j);
+						}
+						else
+						{
+							animName = baseAnimName;
+						}
+						PRINT("Binding animation '" << (*animBundlesIter)->get_name() << " with name '"
+								<< animName << "'");
+						PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
+								PartGroup::HMF_ok_wrong_root_name);
+						mAnimations.store_anim(control, animName);
+					}
+				}
+			}
+		}
 	}
 	else
 	{

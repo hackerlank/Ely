@@ -130,12 +130,12 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play animation
 	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
 					ComponentFamilyType("Scene")));
-	actor1Model->animations().loop("panda_soft", false);
+	actor1Model->animations().loop("panda-walk", false);
 	//play sound
 	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));
-	actor1Sound3d->getSound(0)->set_loop(true);
-	actor1Sound3d->getSound(0)->play();
+	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
+	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
 
 	//enable/disable Actor1 control by event
 	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
@@ -171,16 +171,11 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play animation
 	SMARTPTR(Model) npc1Model = DCAST(Model, object->getComponent(
 					ComponentFamilyType("Scene")));
-	npc1Model->animations().loop(npc1Model->animations().get_anim_name(0), false);
-	int numAnims = npc1Model->animations().get_num_anims();
-	for (int i = 0; i<numAnims;++i)
-	{
-		PRINT("## "<<npc1Model->animations().get_anim_name(i));
-	}
+	npc1Model->animations().loop("eve/eve-tireroll", false);
 	//play sound
 	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));
-	npc1Sound3d->getSound(0)->set_loop(true);
-	npc1Sound3d->getSound(0)->play();
+	npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->set_loop(true);
+	npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->play();
 
 }
