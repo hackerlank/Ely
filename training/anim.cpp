@@ -54,11 +54,21 @@ END_PUBLISH
 #include "string_utils.h"
 #include "partGroup.h"
 
-typedef pset<AnimBundle *> AnimBundles;
-typedef pmap<string, AnimBundles> Anims;
+//typedef pset<AnimBundle *> AnimBundles;
+//typedef pmap<string, AnimBundles> Anims;
+//
+//typedef pset<PartBundle *> PartBundles;
+//typedef pmap<string, PartBundles> Parts;
 
-typedef pset<PartBundle *> PartBundles;
-typedef pmap<string, PartBundles> Parts;
+#include <set>
+#include <map>
+#include <cstdlib>
+
+typedef std::set<AnimBundle *> AnimBundles;
+typedef std::map<string, AnimBundles> Anims;
+
+typedef std::set<PartBundle *> PartBundles;
+typedef std::map<string, PartBundles> Parts;
 
 ////////////////////////////////////////////////////////////////////
 //     Function: bind_anims
@@ -352,6 +362,7 @@ int main(int argc, char **argv)
 		window->enable_keyboard(); // Enable keyboard detection
 		window->setup_trackball(); // Enable default camera movement
 	}
+
 	////
 	Parts parts;
 	Anims anims;
@@ -360,33 +371,38 @@ int main(int argc, char **argv)
 	parts.clear();
 	anims.clear();
 	//Load the Actor Model
+	std::string model_name = "pilot-model";
 	NodePath Actor = window->load_model(panda.get_models(),
-			"bvw-f2004--airbladepilot/pilot-model");
+			"bvw-f2004--airbladepilot/" + model_name);
 	r_find_bundles(Actor.node(), anims, parts);
 	PT(PartBundle)firstPartBundle;
 	firstPartBundle.clear();
+	//check if there is at least a PartBundle
 	if (parts.begin() != parts.end())
 	{
 		if (parts.begin()->second.begin() != parts.begin()->second.end())
 		{
+			//set the first PartBundle
 			firstPartBundle = *(parts.begin()->second.begin());
 		}
 	}
 	if (firstPartBundle)
 	{
+		//check if there is an AnimBundle within the model file
 		PT(AnimBundle)firstAnimBundle;
 		//binds the first AnimBundle (if any) to the first PartBundle
 		if (anims.begin() != anims.end())
 		{
 			if (anims.begin()->second.begin() != anims.begin()->second.end())
 			{
+				std::string default_anim_name = model_name + "default_anim";
 				firstAnimBundle = *(anims.begin()->second.begin());
-				std::cout << "binding " << firstAnimBundle->get_name()
-				<< std::endl;
+				std::cout << "binding " << firstAnimBundle->get_name() <<
+				" with name " << default_anim_name << std::endl;
 				PT(AnimControl)control = firstPartBundle->bind_anim(firstAnimBundle,
 						PartGroup::HMF_ok_wrong_root_name);
-				anim_collection.store_anim(control,
-						firstAnimBundle->get_name());
+//				anim_collection.store_anim(control, firstAnimBundle->get_name());
+				anim_collection.store_anim(control, default_anim_name);
 			}
 		}
 //	SMARTPTR(Character)character =
@@ -413,27 +429,39 @@ int main(int argc, char **argv)
 		{
 			parts.clear();
 			anims.clear();
+			//get the AnimBundle node path
 			NodePath animNP = window->load_model(Actor,
 					"bvw-f2004--airbladepilot/" + animations[i]);
 			r_find_bundles(animNP.node(), anims, parts);
 			AnimBundles::const_iterator abis;
 			for (abi = anims.begin(); abi != anims.end(); ++abi)
 			{
-				for (abis = abi->second.begin(); abis != abi->second.end();
-						++abis)
+				int j;
+				for (j=0, abis = abi->second.begin(); abis != abi->second.end();
+						++abis, ++j)
 				{
 					std::cout << "binding " << (*abis)->get_name() << " with name "
 					<< animations[i] << std::endl;
 					PT(AnimControl)control = firstPartBundle->bind_anim(*abis,
 							PartGroup::HMF_ok_wrong_root_name);
+					std::string anim_name;
+					if (j>0)
+					{
+						anim_name = animations[i] + '.' + format_string(j);
+					}
+					else
+					{
+						anim_name=animations[i];
+					}
 //					anim_collection.store_anim(control, (*abis)->get_name());
-					anim_collection.store_anim(control, animations[i]);
+					anim_collection.store_anim(control, anim_name);
 				}
 			}
 		}
 		panda.define_key("a", "a", &cycleAnim, (void*) &idx);
 	}
 	///
+
 //	Parts parts;
 //	Anims anims;
 //	r_find_bundles(Actor.node(), anims, parts);
