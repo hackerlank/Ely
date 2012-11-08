@@ -118,15 +118,16 @@ const std::string& bareEvent, bool enable, const char* keys[])
 
 ///Camera + Driver related
 static const char* camera_keys[] =
-{ "w", //forward
-		"s", //backward
-		"a", //strafe_left
-		"d", //strafe_right
-		"", //roll_left
-		"", //roll_right
-		"r", //up
-		"f", //down
-		};
+{
+	"w", //forward
+	"s", //backward
+	"a", //strafe_left
+	"d", //strafe_right
+	"", //roll_left
+	"", //roll_right
+	"r", //up
+	"f", //down
+};
 void driveCamera(const Event* event, void* data)
 {
 	//get data
@@ -148,15 +149,16 @@ void driveCamera(const Event* event, void* data)
 
 ///Actor1 + Activity related
 static const char* Actor1_keys[] =
-{ "arrow_up", //forward
-		"arrow_down", //backward
-		"arrow_left", //strafe_left
-		"arrow_right", //strafe_right
-		"", //roll_left
-		"", //roll_right
-		"page_up", //up
-		"page_down", //down
-		};
+{
+	"arrow_up", //forward
+	"arrow_down", //backward
+	"arrow_left", //strafe_left
+	"arrow_right", //strafe_right
+	"", //roll_left
+	"", //roll_right
+	"page_up", //up
+	"page_down", //down
+};
 void stateActor1(const Event * event, void * data)
 {
 	//get data
@@ -278,14 +280,15 @@ const std::string& bareEvent,bool enable, const char* keys[])
 		}
 	}
 static const char* NPC1_keys[] =
-{ "i", //forward
-		"k", //backward
-		"u", //strafe_left
-		"o", //strafe_right
-		"j", //roll_left
-		"l", //roll_right
-		"space", //jump
-		};
+{
+	"i", //forward
+	"k", //backward
+	"u", //strafe_left
+	"o", //strafe_right
+	"j", //roll_left
+	"l", //roll_right
+	"space", //jump
+};
 void stateNPC1(const Event * event, void * data)
 {
 	//get data
@@ -338,14 +341,14 @@ void stateNPC1(const Event * event, void * data)
 		if (eventName.find("-up", 0) == string::npos)
 		{
 			//fast speeds
-			characterDrv->setLinearSpeed(2.0*characterDrv->getLinearSpeed());
-			characterDrv->setAngularSpeed(2.0*characterDrv->getAngularSpeed());
+			characterDrv->setLinearSpeed(5.0*characterDrv->getLinearSpeed());
+			characterDrv->setAngularSpeed(5.0*characterDrv->getAngularSpeed());
 		}
 		else
 		{
 			//normal speeds
-			characterDrv->setLinearSpeed(0.5*characterDrv->getLinearSpeed());
-			characterDrv->setAngularSpeed(0.5*characterDrv->getAngularSpeed());
+			characterDrv->setLinearSpeed(0.2*characterDrv->getLinearSpeed());
+			characterDrv->setAngularSpeed(0.2*characterDrv->getAngularSpeed());
 		}
 		return;
 	}

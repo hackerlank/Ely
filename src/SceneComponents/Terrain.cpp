@@ -215,6 +215,12 @@ void Terrain::onAddToObjectSetup()
 	registerEventCallbacks();
 }
 
+void Terrain::onAddToSceneSetup()
+{
+	//save the net pos of terrain root
+	mTerrainRootNetPos = mTerrain->get_root().get_net_transform()->get_pos();
+}
+
 void Terrain::update(void* data)
 {
 	//lock (guard) the mutex
@@ -224,7 +230,8 @@ void Terrain::update(void* data)
 
 	//set focal point
 	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
-	mTerrain->set_focal_point(mFocalPointNP.get_pos());
+	LPoint3 focalPointNetPos = mFocalPointNP.get_net_transform()->get_pos();
+	mTerrain->set_focal_point(focalPointNetPos - mTerrainRootNetPos);
 	//update every frame
 	mTerrain->update();
 }

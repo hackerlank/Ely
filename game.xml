@@ -73,7 +73,7 @@
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="3.0"/>
-				<Param fast_factor="10.0"/>
+				<Param fast_factor="50.0"/>
 				<Param roll_left=""/>
 				<Param roll_right=""/>
 				<Param inverted_keyboard="true"/>
@@ -301,8 +301,8 @@
 			<Component type="Terrain" priority="100">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
-				<Param height_scale="200.0"/>
-				<Param width_scale="2.0"/>
+				<Param height_scale="2000.0"/>
+				<Param width_scale="15.0"/>
 				<Param brute_force="true"/>
 				<Param auto_flatten="AFM_off"/>
 				<Param focal_point="camera"/>
@@ -314,9 +314,9 @@
 				<Param body_type="static"/>
 				<Param shape_heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param shape_type="heightfield"/>
-				<Param shape_height="200.0"/>
-				<Param shape_scale_w="2.0"/>
-				<Param shape_scale_d="2.0"/>
+				<Param shape_height="2000.0"/>
+				<Param shape_scale_w="15.0"/>
+				<Param shape_scale_d="15.0"/>
 				<Param shape_up="z"/>
 			</Component> 
 			<Param parent="render"/>

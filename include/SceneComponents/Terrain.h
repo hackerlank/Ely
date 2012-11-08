@@ -72,6 +72,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates the terrain associated to this component.
@@ -93,6 +94,7 @@ private:
 	///The focal point NodePath.
 	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
 	NodePath mFocalPointNP;
+	LPoint3 mTerrainRootNetPos;
 	///@}
 	///Flag if brute force is enabled.
 	bool mBruteForce;
