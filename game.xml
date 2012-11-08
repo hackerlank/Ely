@@ -72,7 +72,7 @@
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
-				<Param speed="3.0"/>
+				<Param speed="10.0"/>
 				<Param fast_factor="50.0"/>
 				<Param roll_left=""/>
 				<Param roll_right=""/>
@@ -104,7 +104,7 @@
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="-400.0"/>
-			<Param pos_z="120.0"/>
+			<Param pos_z="600.0"/>
 		</Object>
 
 		<Object type="InstancedActor" id="InstancedTeapot1">
@@ -112,7 +112,7 @@
 			<Param is_static="false"/>
 			<Param pos_x="100.0"/>
 			<Param pos_y="0.0"/>
-			<Param pos_z="200.0"/>
+			<Param pos_z="600.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -232,7 +232,7 @@
 			<Param parent="render"/>
 			<Param pos_x="180.0"/>
 			<Param pos_y="250.0"/>
-			<Param pos_z="300.0"/>
+			<Param pos_z="500.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -275,7 +275,11 @@
 				<Param events="alt-up"/>
 			</Component>
 			<Component type="Model" priority="100">
-				<Param model_file="eve/eve-tireroll"/>
+				<Param model_file="eve/eve"/>
+				<Param anim_files="eve/eve-jump"/>
+				<Param anim_files="eve/eve-run"/>
+				<Param anim_files="eve/eve-walk"/>
+				<Param anim_files="eve/eve-offbalance"/>
 				<Param scale_x="5.0"/>
 				<Param scale_y="5.0"/>
 				<Param scale_z="5.0"/>
@@ -283,7 +287,7 @@
 			<Component type="CharacterController" priority="90">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
-				<Param linear_speed="10.0"/>
+				<Param linear_speed="150.0"/>
 			</Component> 
 			<Component type="Sound3d">
 				<Param sound_files="models/audio/sfx/GUI_click.wav"/>
@@ -291,7 +295,7 @@
 			<Param parent="render"/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="50.0"/>
-			<Param pos_z="200.0"/>
+			<Param pos_z="600.0"/>
 			<Param rot_h="0.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>

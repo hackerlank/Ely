@@ -128,9 +128,9 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//Actor1
 	//play animation
-	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
-					ComponentFamilyType("Scene")));
-	actor1Model->animations().loop("panda-walk", false);
+//	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
+//					ComponentFamilyType("Scene")));
+//	actor1Model->animations().loop("panda-walk", false);
 	//play sound
 	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));

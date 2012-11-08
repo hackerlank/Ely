@@ -147,10 +147,18 @@ void forward_FromTo_strafe_right_Actor1(fsm*, Activity& activity,
 void Enter_forward_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_forward_NPC1");
+	SMARTPTR(Object) npc1 = activity.getOwnerObject();
+	SMARTPTR(Model) npc1Model = DCAST(Model, npc1->getComponent(
+					ComponentFamilyType("Scene")));
+	npc1Model->animations().loop("eve/eve-walk", false);
 }
 void Exit_forward_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_forward_NPC1");
+	SMARTPTR(Object) npc1 = activity.getOwnerObject();
+	SMARTPTR(Model) npc1Model = DCAST(Model, npc1->getComponent(
+					ComponentFamilyType("Scene")));
+	npc1Model->animations().stop("eve/eve-walk");
 }
 ValueList Filter_forward_NPC1(fsm*, Activity& activity,
 		const std::string& state, const ValueList& valueList)
@@ -268,7 +276,10 @@ ValueList Filter_jump_NPC1(fsm*, Activity& activity, const std::string& state,
 void Enter_idle_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_idle_NPC1");
-	PRINT(std::string(activity.getOwnerObject()->objectId()));
+	SMARTPTR(Object) npc1 = activity.getOwnerObject();
+	SMARTPTR(Model) npc1Model = DCAST(Model, npc1->getComponent(
+					ComponentFamilyType("Scene")));
+	npc1Model->animations().stop_all();
 }
 void Exit_idle_NPC1(fsm*, Activity& activity)
 {
