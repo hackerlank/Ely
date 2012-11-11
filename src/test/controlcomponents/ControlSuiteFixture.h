@@ -27,6 +27,8 @@
 #include <boost/test/unit_test.hpp>
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/DriverTemplate.h"
+#include "ControlComponents/Chaser.h"
+#include "ControlComponents/ChaserTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <pandaFramework.h>
 #include <nodePath.h>

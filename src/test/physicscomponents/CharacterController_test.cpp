@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/physicscomponents/Character_test.cpp
+ * \file /Ely/src/test/physicscomponents/CharacterController_test.cpp
  *
  * \date 30/ott/2012 17:03:49
  * \author marco
@@ -23,13 +23,13 @@
 
 #include "PhysicsSuiteFixture.h"
 
-struct CharacterTestCaseFixture
+struct CharacterControllerTestCaseFixture
 {
-	CharacterTestCaseFixture()
+	CharacterControllerTestCaseFixture()
 	{
 	}
 
-	~CharacterTestCaseFixture()
+	~CharacterControllerTestCaseFixture()
 	{
 	}
 };
@@ -38,7 +38,7 @@ struct CharacterTestCaseFixture
 BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
 
 /// Test cases
-BOOST_AUTO_TEST_CASE(CharacterTEST)
+BOOST_AUTO_TEST_CASE(CharacterControllerTEST)
 {
 	BOOST_TEST_MESSAGE("TESTING CharacterControllerTemplate");
 	mCharTmpl = new CharacterControllerTemplate(mPanda,mWin);
