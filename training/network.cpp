@@ -44,16 +44,17 @@ class Server
 	QueuedConnectionListener* cListener;
 	QueuedConnectionReader* cReader;
 	ConnectionWriter* cWriter;
-	std::list<PT(Connection)> activeConnections;
+	std::set<PT(Connection)> activeConnections;
 	///@{
-	///A task data for listener Polling.
-	SMARTPTR(TaskInterface<Server>::TaskData) mListenerData;
-	SMARTPTR(AsyncTask) mListenerTask;
-	///@}
-	///@{
-	///A task data for reader Polling.
-	SMARTPTR(TaskInterface<Server>::TaskData) mReaderData;
-	SMARTPTR(AsyncTask) mReaderTask;
+	///A task data for new connections Polling.
+	SMARTPTR(TaskInterface<Server>::TaskData) mNewConnData;
+	SMARTPTR(AsyncTask) mNewConnTask;
+	///A task data for reset connections Polling.
+	SMARTPTR(TaskInterface<Server>::TaskData) mResetConnData;
+	SMARTPTR(AsyncTask) mResetConnTask;
+	///A task data for read connections Polling.
+	SMARTPTR(TaskInterface<Server>::TaskData) mReadConnData;
+	SMARTPTR(AsyncTask) mReadConnTask;
 	///@}
 
 public:
@@ -63,25 +64,35 @@ public:
 		cListener = new QueuedConnectionListener(cManager, 0);
 		cReader = new QueuedConnectionReader(cManager, 0);
 		cWriter = new ConnectionWriter(cManager,0);
+		cReader->set_raw_mode(true);
+		cWriter->set_raw_mode(true);
 		//
 		PT(Connection)tcpSocket = cManager->open_TCP_server_rendezvous(cPort, cBacklog);
 		cListener->add_connection(tcpSocket);
-		//listener polling task
-		mListenerData = new TaskInterface<Server>::TaskData(this,
-				&Server::listenerPolling);
-		mListenerTask = new GenericAsyncTask("Server::listenerPolling",
+		//new connections polling task
+		mNewConnData = new TaskInterface<Server>::TaskData(this,
+				&Server::newConnPolling);
+		mNewConnTask = new GenericAsyncTask("Server::newConnPolling",
 				&TaskInterface<Server>::taskFunction,
-				reinterpret_cast<void*>(mListenerData.p()));
-		mListenerTask->set_sort(-39);
-		AsyncTaskManager::get_global_ptr()->add(mListenerTask);
-		//reader polling task
-		mReaderData = new TaskInterface<Server>::TaskData(this,
-				&Server::readerPolling);
-		mReaderTask = new GenericAsyncTask("Server::readerPolling",
+				reinterpret_cast<void*>(mNewConnData.p()));
+		mNewConnTask->set_sort(-38);
+		AsyncTaskManager::get_global_ptr()->add(mNewConnTask);
+		//reset connections polling task
+		mResetConnData = new TaskInterface<Server>::TaskData(this,
+				&Server::resetConnPolling);
+		mResetConnTask = new GenericAsyncTask("Server::resetConnPolling",
 				&TaskInterface<Server>::taskFunction,
-				reinterpret_cast<void*>(mReaderData.p()));
-		mReaderTask->set_sort(-40);
-		AsyncTaskManager::get_global_ptr()->add(mReaderTask);
+				reinterpret_cast<void*>(mResetConnData.p()));
+		mResetConnTask->set_sort(-39);
+		AsyncTaskManager::get_global_ptr()->add(mNewConnTask);
+		//readConn polling task
+		mReadConnData = new TaskInterface<Server>::TaskData(this,
+				&Server::readConnPolling);
+		mReadConnTask = new GenericAsyncTask("Server::readerPolling",
+				&TaskInterface<Server>::taskFunction,
+				reinterpret_cast<void*>(mReadConnData.p()));
+		mReadConnTask->set_sort(-40);
+		AsyncTaskManager::get_global_ptr()->add(mReadConnTask);
 
 	}
 	~Server()
@@ -90,14 +101,12 @@ public:
 		delete cReader;
 		delete cListener;
 		delete cManager;
-		AsyncTaskManager::get_global_ptr()->remove(mReaderTask);
-		AsyncTaskManager::get_global_ptr()->remove(mListenerTask);
-	}
-	void openTCPServerRendezvous()
-	{
+		AsyncTaskManager::get_global_ptr()->remove(mReadConnTask);
+		AsyncTaskManager::get_global_ptr()->remove(mResetConnTask);
+		AsyncTaskManager::get_global_ptr()->remove(mNewConnTask);
 	}
 
-	AsyncTask::DoneStatus listenerPolling(GenericAsyncTask* task)
+	AsyncTask::DoneStatus newConnPolling(GenericAsyncTask* task)
 	{
 		if (cListener->new_connection_available())
 		{
@@ -106,23 +115,37 @@ public:
 			PT(Connection) newConnection;
 			if (cListener->get_new_connection(rendezvous,netAddress,newConnection))
 			{
-				activeConnections.push_back(newConnection);	// Remember connection
-				cReader->add_connection(newConnection.p());// Begin reading connection}
+				activeConnections.insert(newConnection);
+				cReader->add_connection(newConnection.p());
+				NetAddress addr = newConnection->get_address();
+				PRINT("Connection from address: " << addr.get_ip_string());
 			}
 		}
 		return AsyncTask::DS_cont;
 	}
-	AsyncTask::DoneStatus readerPolling(GenericAsyncTask* task)
+	AsyncTask::DoneStatus resetConnPolling(GenericAsyncTask* task)
+	{
+	    if (cManager.reset_connection_available()) {
+	      PT(Connection) connection;
+	      if (cManager.get_reset_connection(connection)) {
+	    	  PRINT("Lost connection from "<< connection->get_address());
+	        clients.erase(connection);
+	        cManager.close_connection(connection);
+	      }
+	    }
+		return AsyncTask::DS_cont;
+	}
+	AsyncTask::DoneStatus readConnPolling(GenericAsyncTask* task)
 	{
 		if (cReader->data_available())
 		{
-			NetDatagram datagram; // catch the incoming data in this instance
-			// Check the return value; if we were threaded,
-			// someone else could have
-			// snagged this data before we did
+			NetDatagram datagram;
 			if (cReader->get_data(datagram))
 			{
-				//myProcessDataFunction(datagram);
+				std::string inData = datagram.get_message();
+				NetDatagram outData;
+				outData.add_string("echo: " + inData);
+				cWriter->send(outData,datagram.get_connection());
 			}
 		}
 		return AsyncTask::DS_cont;
@@ -136,16 +159,6 @@ int main(int argc, char **argv)
 	load_prc_file("config.prc");
 	PandaFramework panda = PandaFramework();
 	panda.open_framework(argc, argv);
-	panda.set_window_title("animation training");
-	WindowFramework* window = panda.open_window();
-	if (window != (WindowFramework *) NULL)
-	{
-		std::cout << "Opened the window successfully!\n";
-		// common setup
-		window->enable_keyboard(); // Enable keyboard detection
-		window->setup_trackball(); // Enable default camera movement
-	}
-
 	// create server
 	Server* server = new Server(9099, 1000);
 	//
