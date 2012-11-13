@@ -59,7 +59,19 @@ public:
 	 */
 	virtual void update(void* data);
 
+	/**
+	 * \name Enabling/disabling.
+	 * \brief Enables/disables this component.
+	 */
+	///@{
+	void enable();
+	void disable();
+	bool isEnabled();
+	///@}
+
 private:
+	///Enabling flags.
+	bool mEnabled, mIsEnabled;
 
 	///TypedObject semantics: hardcoded
 public:

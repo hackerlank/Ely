@@ -24,7 +24,8 @@
 #include "ControlComponents/ChaserTemplate.h"
 
 ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
 	CHECKEXISTENCE(pandaFramework,
 			"DriverTemplate::ChaserTemplate: invalid PandaFramework")

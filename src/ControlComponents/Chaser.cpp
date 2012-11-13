@@ -40,6 +40,7 @@ Chaser::~Chaser()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	disable();
 }
 
 const ComponentFamilyType Chaser::familyType() const
@@ -50,6 +51,36 @@ const ComponentFamilyType Chaser::familyType() const
 const ComponentType Chaser::componentType() const
 {
 	return mTmpl->componentType();
+}
+
+void Chaser::enable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mIsEnabled or (not mOwnerObject))
+	{
+		return;
+	}
+}
+
+void Chaser::disable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((not mIsEnabled) or (not mOwnerObject))
+	{
+		return;
+	}
+}
+
+bool Chaser::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsEnabled;
 }
 
 bool Chaser::initialize()
@@ -79,4 +110,3 @@ void Chaser::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle Chaser::_type_handle;
-
