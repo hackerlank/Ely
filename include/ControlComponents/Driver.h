@@ -28,9 +28,6 @@
 #include <set>
 #include <cstdlib>
 #include <nodePath.h>
-#ifdef ELY_THREAD
-#	include <pointerTo.h>
-#endif
 #include <typedObject.h>
 #include <event.h>
 #include <genericAsyncTask.h>

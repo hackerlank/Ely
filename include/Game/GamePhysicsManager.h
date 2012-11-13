@@ -27,6 +27,7 @@
 #include <list>
 #include <cmath>
 #include <algorithm>
+#include <pointerTo.h>
 #include <bulletWorld.h>
 #include <bulletDebugNode.h>
 #include <pandaFramework.h>
@@ -43,7 +44,7 @@
 #include <filename.h>
 
 #ifdef DEBUG
-#include <windowFramework.h>
+#	include <windowFramework.h>
 #endif
 
 #include <clockObject.h>

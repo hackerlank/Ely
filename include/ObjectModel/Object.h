@@ -30,7 +30,6 @@
 #include <windowFramework.h>
 #include <nodePath.h>
 #include <typedWritableReferenceCount.h>
-#include <pointerTo.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
 #include "ObjectTemplate.h"

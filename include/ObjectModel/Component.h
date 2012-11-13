@@ -29,7 +29,6 @@
 #include <map>
 #include <utility>
 #include <cstring>
-#include <pointerTo.h>
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
 #include <reMutex.h>

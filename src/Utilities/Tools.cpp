@@ -39,12 +39,14 @@ void initTypedObjects()
 	Sound3dTemplate::init_type();
 	Activity::init_type();
 	ActivityTemplate::init_type();
+	Chaser::init_type();
+	ChaserTemplate::init_type();
 	Driver::init_type();
 	DriverTemplate::init_type();
-	RigidBody::init_type();
-	RigidBodyTemplate::init_type();
 	CharacterController::init_type();
 	CharacterControllerTemplate::init_type();
+	RigidBody::init_type();
+	RigidBodyTemplate::init_type();
 	InstanceOf::init_type();
 	InstanceOfTemplate::init_type();
 	Model::init_type();

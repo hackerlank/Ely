@@ -24,13 +24,66 @@
 #ifndef CHASER_H_
 #define CHASER_H_
 
-#include "Component.h"
+#include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
+#include "Utilities/Tools.h"
 
+class ChaserTemplate;
+
+/**
+ * \brief Component designed to make an object a chaser of another object.
+ *
+ * XML Param(s):
+ * - "chased_object"		|single|no default
+ */
 class Chaser: public Component
 {
 public:
 	Chaser();
+	Chaser(SMARTPTR(ChaserTemplate) tmpl);
 	virtual ~Chaser();
+
+	const virtual ComponentFamilyType familyType() const;
+	const virtual ComponentType componentType() const;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+
+	/**
+	 * \brief Updates position/orientation of the controlled object.
+	 *
+	 * \see OgreBulletDemos.
+	 *
+	 * Will be called automatically by an control manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
+
+private:
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		Component::init_type();
+		register_type(_type_handle, "Chaser", Component::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
 };
 
 #endif /* CHASER_H_ */

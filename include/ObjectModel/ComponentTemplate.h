@@ -31,7 +31,6 @@
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <typedWritableReferenceCount.h>
-#include <pointerTo.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
 #include "Component.h"

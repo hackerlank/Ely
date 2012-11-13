@@ -28,7 +28,6 @@
 #include <cstdlib>
 #include <stdint.h>
 #include <cmath>
-#include <pointerTo.h>
 #include <nodePath.h>
 #include <bitMask.h>
 #include <pnmImage.h>

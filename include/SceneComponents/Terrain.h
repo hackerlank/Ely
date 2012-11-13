@@ -37,6 +37,7 @@
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include "Utilities/Tools.h"
 
 class TerrainTemplate;
 

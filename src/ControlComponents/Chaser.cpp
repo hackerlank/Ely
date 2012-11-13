@@ -22,15 +22,61 @@
  */
 
 #include "ControlComponents/Chaser.h"
+#include "ControlComponents/ChaserTemplate.h"
 
 Chaser::Chaser()
 {
 	// TODO Auto-generated constructor stub
+}
 
+Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
+{
+	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+			"Chaser::Chaser: invalid GameControlManager")
 }
 
 Chaser::~Chaser()
 {
-	// TODO Auto-generated destructor stub
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 }
+
+const ComponentFamilyType Chaser::familyType() const
+{
+	return mTmpl->familyType();
+}
+
+const ComponentType Chaser::componentType() const
+{
+	return mTmpl->componentType();
+}
+
+bool Chaser::initialize()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	bool result = true;
+	//
+	return result;
+}
+
+void Chaser::onAddToObjectSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+}
+
+void Chaser::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle Chaser::_type_handle;
 

@@ -27,7 +27,6 @@
 #include <string>
 #include <cstdlib>
 #include <cmath>
-#include <pointerTo.h>
 #include <nodePath.h>
 #include <lvecBase3.h>
 #include <lvector3.h>
@@ -46,6 +45,7 @@ class CharacterControllerTemplate;
 /**
  * \brief Component representing a character controller attached to an object.
  *
+ * The control is accomplished through physics.\n
  * It constructs a character controller with the single specified collision
  * shape_type along with relevant parameters.\n
  * The up axis is the Z axis.\n

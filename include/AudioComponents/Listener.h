@@ -25,7 +25,6 @@
 #define LISTENER_H_
 
 #include <audioSound.h>
-#include <pointerTo.h>
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <nodePath.h>

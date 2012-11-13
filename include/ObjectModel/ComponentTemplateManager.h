@@ -25,7 +25,6 @@
 #define COMPONENTTEMPLATEMANAGER_H_
 
 #include <map>
-#include <pointerTo.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
 #include "Utilities/Tools.h"

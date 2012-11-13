@@ -30,7 +30,6 @@
 #include <clockObject.h>
 #include <lmatrix.h>
 #include <asyncTask.h>
-#include <pointerTo.h>
 #include <event.h>
 #include <trackball.h>
 #include <transform2sg.h>

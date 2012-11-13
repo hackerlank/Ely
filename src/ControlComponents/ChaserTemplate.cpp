@@ -23,10 +23,17 @@
 
 #include "ControlComponents/ChaserTemplate.h"
 
-ChaserTemplate::ChaserTemplate()
+ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework)
 {
-	// TODO Auto-generated constructor stub
-
+	CHECKEXISTENCE(pandaFramework,
+			"DriverTemplate::ChaserTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"DriverTemplate::ChaserTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+			"DriverTemplate::ChaserTemplate: invalid GameControlManager")
+	//
+	setParametersDefaults();
 }
 
 ChaserTemplate::~ChaserTemplate()
@@ -34,3 +41,39 @@ ChaserTemplate::~ChaserTemplate()
 	// TODO Auto-generated destructor stub
 }
 
+const ComponentType ChaserTemplate::componentType() const
+{
+	return ComponentType("Chaser");
+}
+
+const ComponentFamilyType ChaserTemplate::familyType() const
+{
+	return ComponentFamilyType("Control");
+}
+
+SMARTPTR(Component)ChaserTemplate::makeComponent(const ComponentId& compId)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	SMARTPTR(Chaser) newChaser = new Chaser(this);
+	newChaser->setComponentId(compId);
+	if (not newChaser->initialize())
+	{
+		return NULL;
+	}
+	return newChaser.p();
+}
+
+void ChaserTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ChaserTemplate::_type_handle;

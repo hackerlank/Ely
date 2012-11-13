@@ -35,7 +35,6 @@
 #include <throw_event.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
-#include <pointerTo.h>
 #include <referenceCount.h>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>

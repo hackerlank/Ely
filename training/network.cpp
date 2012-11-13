@@ -23,7 +23,7 @@
 
 #include <iostream>
 #include <string>
-#include <list>
+#include <set>
 #include <load_prc_file.h>
 #include <pandaFramework.h>
 #include <genericAsyncTask.h>
@@ -84,8 +84,8 @@ public:
 				&TaskInterface<Server>::taskFunction,
 				reinterpret_cast<void*>(mResetConnData.p()));
 		mResetConnTask->set_sort(-39);
-		AsyncTaskManager::get_global_ptr()->add(mNewConnTask);
-		//readConn polling task
+		AsyncTaskManager::get_global_ptr()->add(mResetConnTask);
+		//read connections polling task
 		mReadConnData = new TaskInterface<Server>::TaskData(this,
 				&Server::readConnPolling);
 		mReadConnTask = new GenericAsyncTask("Server::readerPolling",
@@ -97,13 +97,13 @@ public:
 	}
 	~Server()
 	{
+		AsyncTaskManager::get_global_ptr()->remove(mReadConnTask);
+		AsyncTaskManager::get_global_ptr()->remove(mResetConnTask);
+		AsyncTaskManager::get_global_ptr()->remove(mNewConnTask);
 		delete cWriter;
 		delete cReader;
 		delete cListener;
 		delete cManager;
-		AsyncTaskManager::get_global_ptr()->remove(mReadConnTask);
-		AsyncTaskManager::get_global_ptr()->remove(mResetConnTask);
-		AsyncTaskManager::get_global_ptr()->remove(mNewConnTask);
 	}
 
 	AsyncTask::DoneStatus newConnPolling(GenericAsyncTask* task)
@@ -125,14 +125,16 @@ public:
 	}
 	AsyncTask::DoneStatus resetConnPolling(GenericAsyncTask* task)
 	{
-	    if (cManager.reset_connection_available()) {
-	      PT(Connection) connection;
-	      if (cManager.get_reset_connection(connection)) {
-	    	  PRINT("Lost connection from "<< connection->get_address());
-	        clients.erase(connection);
-	        cManager.close_connection(connection);
-	      }
-	    }
+		if (cManager->reset_connection_available())
+		{
+			PT(Connection) connection;
+			if (cManager->get_reset_connection(connection))
+			{
+				activeConnections.erase(connection);
+				cManager->close_connection(connection);
+				PRINT("Lost connection from "<< connection->get_address());
+			}
+		}
 		return AsyncTask::DS_cont;
 	}
 	AsyncTask::DoneStatus readConnPolling(GenericAsyncTask* task)

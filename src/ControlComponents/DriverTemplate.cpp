@@ -57,13 +57,13 @@ SMARTPTR(Component)DriverTemplate::makeComponent(const ComponentId& compId)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	SMARTPTR(Driver) newControl = new Driver(this);
-	newControl->setComponentId(compId);
-	if (not newControl->initialize())
+	SMARTPTR(Driver) newDriver = new Driver(this);
+	newDriver->setComponentId(compId);
+	if (not newDriver->initialize())
 	{
 		return NULL;
 	}
-	return newControl.p();
+	return newDriver.p();
 }
 
 void DriverTemplate::setParametersDefaults()
