@@ -33,6 +33,7 @@ Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
 {
 	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GameControlManager")
+	mTmpl = tmpl;
 }
 
 Chaser::~Chaser()
@@ -58,7 +59,7 @@ void Chaser::enable()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (mIsEnabled or (not mOwnerObject))
+	if (mIsEnabled or (not mOwnerObject) or mChasedNodePath.is_empty())
 	{
 		return;
 	}
@@ -76,7 +77,7 @@ void Chaser::disable()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if ((not mIsEnabled) or (not mOwnerObject))
+	if ((not mIsEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
 	{
 		return;
 	}
@@ -107,6 +108,15 @@ bool Chaser::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//get settings from template
+	//enabling setting
+	mEnabled = (
+			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
+					true : false);
+	//distance settings
+	mDistance = (float) atof(mTmpl->parameter(std::string("distance")).c_str());
+	//setup event callbacks if any
+	setupEvents();
 	//
 	return result;
 }
@@ -116,6 +126,52 @@ void Chaser::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//set mChasedNodePath as empty
+	mChasedNodePath = NodePath();
+
+	//set the (node path of) object chased by this component;
+	//that object is supposed to be already created,
+	//set up and added to the created objects table;
+	//if not, this component chases nothing.
+	ObjectId chasedId = ObjectId(
+			mTmpl->parameter(std::string("chased_object")));
+	SMARTPTR(Object)chasedObject =
+	ObjectTemplateManager::GetSingleton().getCreatedObject(
+			chasedId);
+	if (chasedObject != NULL)
+	{
+		mChasedNodePath = chasedObject->getNodePath();
+
+		//set the (node path of) reference object;
+		//that object is supposed to be already created,
+		//set up and added to the created objects table;
+		//if not, this will be the parent of the chased object.
+		ObjectId referenceId = ObjectId(
+				mTmpl->parameter(std::string("reference_object")));
+		SMARTPTR(Object)referenceObject =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(
+				referenceId);
+		if (referenceObject != NULL)
+		{
+			mReferenceNodePath = referenceObject->getNodePath();
+		}
+		else
+		{
+			mReferenceNodePath = mChasedNodePath.get_parent();
+		}
+		//set the chaser position and look-at node
+		if (mDistance <= 0.0)
+		{
+			mDistance = 1.0;
+		}
+		///TODO
+	}
+
+	//enable the component
+	if (mEnabled)
+	{
+		enable();
+	}
 }
 
 void Chaser::update(void* data)

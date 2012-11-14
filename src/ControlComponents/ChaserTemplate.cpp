@@ -74,6 +74,7 @@ void ChaserTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("enabled", "true"));
 }
 
 //TypedObject semantics: hardcoded

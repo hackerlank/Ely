@@ -323,7 +323,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 void GamePhysicsManager::getBoundingDimensions(NodePath modelNP,
 		LVector3& modelDims, LVector3& modelDeltaCenter, float& modelRadius)
 {
-	//get "tight" dimensions of panda
+	//get "tight" dimensions of model
 	LPoint3 minP, maxP;
 	modelNP.calc_tight_bounds(minP, maxP);
 	//

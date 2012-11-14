@@ -24,6 +24,8 @@
 #ifndef CHASER_H_
 #define CHASER_H_
 
+#include <nodePath.h>
+#include <lvector3.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -33,8 +35,13 @@ class ChaserTemplate;
 /**
  * \brief Component designed to make an object a chaser of another object.
  *
+ * The up axis is the "z" axis.
+ *
  * XML Param(s):
+ * - "enabled"  			|single|"true"
  * - "chased_object"		|single|no default
+ * - "reference_object"		|single|no default
+ * - "distance"				|single|no default
  */
 class Chaser: public Component
 {
@@ -70,8 +77,18 @@ public:
 	///@}
 
 private:
+	///The chased object's node path.
+	NodePath mChasedNodePath;
+	///The reference object's node path.
+	NodePath mReferenceNodePath;
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
+	///Chaser distance.
+	float mDistance;
+	///Chaser position.
+	LVector3f mChaserPosition;
+	///Look at node Path.
+	NodePath mLookAtNodePath;
 
 	///TypedObject semantics: hardcoded
 public:
