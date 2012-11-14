@@ -62,6 +62,13 @@ void Chaser::enable()
 	{
 		return;
 	}
+
+	//add to the control manager update
+	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
+	//
+	mIsEnabled = not mIsEnabled;
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 void Chaser::disable()
@@ -73,6 +80,17 @@ void Chaser::disable()
 	{
 		return;
 	}
+
+	//check if control manager exists
+	if (GameControlManager::GetSingletonPtr())
+	{
+		//remove from control manager update
+		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+	}
+	//
+	mIsEnabled = not mIsEnabled;
+	//unregister event callbacks if any
+	unregisterEventCallbacks();
 }
 
 bool Chaser::isEnabled()
