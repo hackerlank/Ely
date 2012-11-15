@@ -64,6 +64,20 @@ void Chaser::enable()
 		return;
 	}
 
+	//check distances
+	if (mDistance <= 0.0)
+	{
+		mDistance = 1.0;
+	}
+	if (mMinDistance <= 0.0)
+	{
+		mMinDistance = 1.0;
+	}
+	//set chaser position
+	mChaserPosition = LPoint3f(0.0, -5.0 * mDistance, mDistance);
+	//set "look at" position
+	mLookAtPosition = LPoint3f(0.0, mDistance, 0.0);
+
 	//add to the control manager update
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 	//
@@ -113,8 +127,12 @@ bool Chaser::initialize()
 	mEnabled = (
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
-	//distance settings
+	//distances' settings
 	mDistance = (float) atof(mTmpl->parameter(std::string("distance")).c_str());
+	mMinDistance = (float) atof(
+			mTmpl->parameter(std::string("min_distance")).c_str());
+	//friction' settings
+	mFriction = (float) atof(mTmpl->parameter(std::string("friction")).c_str());
 	//setup event callbacks if any
 	setupEvents();
 	//
@@ -159,19 +177,28 @@ void Chaser::onAddToObjectSetup()
 		{
 			mReferenceNodePath = mChasedNodePath.get_parent();
 		}
-		//set the chaser position and look-at node
-		if (mDistance <= 0.0)
-		{
-			mDistance = 1.0;
-		}
-		///TODO
 	}
-
 	//enable the component
 	if (mEnabled)
 	{
 		enable();
 	}
+}
+
+void Chaser::onAddToSceneSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((not mEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
+	{
+		return;
+	}
+
+	//set chaser initial position/orientation
+	mOwnerObject->getNodePath().set_pos(mChasedNodePath, mChaserPosition);
+	mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
+			LVector3::up());
 }
 
 void Chaser::update(void* data)
@@ -180,7 +207,47 @@ void Chaser::update(void* data)
 	HOLDMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
+
+	//update chaser position and orientation (see OgreBulletDemos)
+	//position
+	LPoint3f desiredChaserPos = mReferenceNodePath.get_relative_point(
+			mChasedNodePath, mChaserPosition);
+	LPoint3f actualChaserPos = mOwnerObject->getNodePath().get_pos(
+			mReferenceNodePath);
+	mOwnerObject->getNodePath().set_pos(mReferenceNodePath,
+			getChaserPos(desiredChaserPos, actualChaserPos, dt));
+	//orientation
+	LPoint3f desiredLooAtPos = mReferenceNodePath.get_relative_point(
+			mChasedNodePath, mLookAtPosition);
+	mOwnerObject->getNodePath().look_at(mReferenceNodePath, desiredLooAtPos,
+			LVector3::up());
+}
+
+LPoint3f Chaser::getChaserPos(LPoint3f desiredChaserPos,
+		LPoint3f actualChaserPos, float deltaTime)
+{
+	float kReductFactor = mFriction * deltaTime;
+	//calculate difference between desiredChaserPos and actualChaserPos
+	LVector3f deltaPos = actualChaserPos - desiredChaserPos;
+	//converge deltaPos.lenght toward zero: proportionally to deltaPos.lenght
+	if (deltaPos.length_squared() > 0.0)
+	{
+		deltaPos -= deltaPos * kReductFactor;
+	}
+	//move chaser to new position
+	LPoint3f newPos = desiredChaserPos + deltaPos;
+	//correct min distance
+	LPoint3f chasedPos = mChasedNodePath.get_pos(mReferenceNodePath);
+	LVector3f newTargetDir = newPos - chasedPos;
+	if (newTargetDir.length() < mMinDistance)
+	{
+		newTargetDir.normalize();
+		newPos = chasedPos + newTargetDir * mMinDistance;
+	}
+	//
+	return newPos;
 }
 
 //TypedObject semantics: hardcoded
 TypeHandle Chaser::_type_handle;
+

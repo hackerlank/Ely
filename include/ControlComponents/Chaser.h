@@ -26,8 +26,10 @@
 
 #include <nodePath.h>
 #include <lvector3.h>
+#include <lpoint3.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Utilities/Tools.h"
 
 class ChaserTemplate;
@@ -42,6 +44,8 @@ class ChaserTemplate;
  * - "chased_object"		|single|no default
  * - "reference_object"		|single|no default
  * - "distance"				|single|no default
+ * - "min_distance"			|single|no default
+ * - "friction"				|single|"1.0"
  */
 class Chaser: public Component
 {
@@ -55,6 +59,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -83,12 +88,20 @@ private:
 	NodePath mReferenceNodePath;
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
-	///Chaser distance.
-	float mDistance;
-	///Chaser position.
-	LVector3f mChaserPosition;
-	///Look at node Path.
-	NodePath mLookAtNodePath;
+	///Kinematic parameters.
+	float mDistance, mMinDistance, mFriction;
+	///Positions.
+	LPoint3f mChaserPosition, mLookAtPosition;
+	/**
+	 * \brief Calculates the dynamic position of the chaser.
+	 * \see OgreBulletDemos.
+	 * @param desiredChaserPos The desired chaser position (wrt reference).
+	 * @param actualChaserPos The current chaser position (wrt reference).
+	 * @param deltaTime The delta time update.
+	 * @return The dynamic chaser position.
+	 */
+	LPoint3f getChaserPos(LPoint3f desiredChaserPos,
+			LPoint3f actualChaserPos, float deltaTime);
 
 	///TypedObject semantics: hardcoded
 public:

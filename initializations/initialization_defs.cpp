@@ -32,7 +32,9 @@ static bool controlGrabbed = false;
 static void toggleCameraControl(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera = (Object*) data;
-	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+//	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+//					ComponentFamilyType("Control")));
+	SMARTPTR(Chaser)cameraControl = DCAST(Chaser, camera->getComponent(
 					ComponentFamilyType("Control")));
 
 	if (cameraControl->isEnabled())
@@ -75,11 +77,11 @@ void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-		object->getNodePath().look_at(50, 200, 10);
+	object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
 				(void*) object);
-	}
+}
 
 ///Actor1 related
 static void toggleActor1Control(const Event* event, void* data)

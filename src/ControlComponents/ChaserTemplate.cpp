@@ -75,6 +75,7 @@ void ChaserTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("enabled", "true"));
+	mParameterTable.insert(ParameterNameValue("friction", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

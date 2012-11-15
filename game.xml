@@ -11,7 +11,10 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
+			<ComponentTmpl family="Control" type="Chaser"/>
+<!--
 			<ComponentTmpl family="Control" type="Driver"/>
+-->
 			<ComponentTmpl family="Audio" type="Listener"/>
 		</ObjectTmpl>
 		
@@ -66,10 +69,19 @@
 			<Param parent=""/>
 		</Object>
 		
-		<Object type="Camera" id="camera" priority="1000">
+		<Object type="Camera" id="camera" priority="90">
 			<Component type="NodePathWrapper" priority="100">
 				<Param nodepath="camera"/>
 			</Component>
+			<Component type="Chaser">
+				<Param enabled="true"/>
+				<Param chased_object="NPC1"/>
+				<Param reference_object="render"/>
+				<Param distance="10.0"/>
+				<Param min_distance="5.0"/>
+				<Param friction="1.0"/>
+			</Component>
+<!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="10.0"/>
@@ -101,6 +113,7 @@
 				<Param events="shift"/>				
 				<Param events="shift-up"/>
 			</Component>
+-->
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="-400.0"/>
