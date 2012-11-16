@@ -128,6 +128,10 @@ void GameManager::setupCompTmplMgr()
 			new ActivityTemplate(this, mWindow));
 
 	///Control templates
+	//Chaser
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new ChaserTemplate(this, mWindow));
+
 	//Driver
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new DriverTemplate(this, mWindow));

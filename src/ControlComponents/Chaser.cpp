@@ -29,7 +29,7 @@ Chaser::Chaser()
 	// TODO Auto-generated constructor stub
 }
 
-Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
+Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl):mIsEnabled(false)
 {
 	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GameControlManager")
@@ -73,10 +73,12 @@ void Chaser::enable()
 	{
 		mMinDistance = 1.0;
 	}
-	//set chaser position
-	mChaserPosition = LPoint3f(0.0, -5.0 * mDistance, mDistance);
-	//set "look at" position
-	mLookAtPosition = LPoint3f(0.0, mDistance, 0.0);
+	//check if backward located
+	float sign = (mBackward ? 1.0 : -1.0);
+	//set chaser position (wrt chased node)
+	mChaserPosition = LPoint3f(0.0, -5.0 * mDistance * sign, mDistance);
+	//set "look at" position (wrt chased node)
+	mLookAtPosition = LPoint3f(0.0, mDistance * sign, 0.0);
 
 	//add to the control manager update
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
@@ -126,6 +128,10 @@ bool Chaser::initialize()
 	//enabling setting
 	mEnabled = (
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
+					true : false);
+	//backward setting
+	mBackward = (
+			mTmpl->parameter(std::string("backward")) == std::string("true") ?
 					true : false);
 	//distances' settings
 	mDistance = (float) atof(mTmpl->parameter(std::string("distance")).c_str());

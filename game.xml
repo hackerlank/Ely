@@ -74,10 +74,11 @@
 				<Param nodepath="camera"/>
 			</Component>
 			<Component type="Chaser">
-				<Param enabled="true"/>
+				<Param enabled="false"/>
+				<Param backward="false"/>
 				<Param chased_object="NPC1"/>
 				<Param reference_object="render"/>
-				<Param distance="10.0"/>
+				<Param distance="20.0"/>
 				<Param min_distance="5.0"/>
 				<Param friction="1.0"/>
 			</Component>

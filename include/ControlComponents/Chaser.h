@@ -41,6 +41,7 @@ class ChaserTemplate;
  *
  * XML Param(s):
  * - "enabled"  			|single|"true"
+ * - "backward"				|single|"true"
  * - "chased_object"		|single|no default
  * - "reference_object"		|single|no default
  * - "distance"				|single|no default
@@ -86,8 +87,8 @@ private:
 	NodePath mChasedNodePath;
 	///The reference object's node path.
 	NodePath mReferenceNodePath;
-	///Enabling flags.
-	bool mEnabled, mIsEnabled;
+	///Enabling & backward flags.
+	bool mEnabled, mIsEnabled, mBackward;
 	///Kinematic parameters.
 	float mDistance, mMinDistance, mFriction;
 	///Positions.
