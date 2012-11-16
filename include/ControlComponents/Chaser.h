@@ -30,6 +30,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GamePhysicsManager.h"
 #include "Utilities/Tools.h"
 
 class ChaserTemplate;

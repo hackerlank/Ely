@@ -33,6 +33,8 @@ Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl):mIsEnabled(false)
 {
 	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GameControlManager")
+	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+			"Chaser::Chaser: invalid GamePhysicsManager")
 	mTmpl = tmpl;
 }
 
@@ -220,8 +222,17 @@ void Chaser::update(void* data)
 			mChasedNodePath, mChaserPosition);
 	LPoint3f actualChaserPos = mOwnerObject->getNodePath().get_pos(
 			mReferenceNodePath);
-	mOwnerObject->getNodePath().set_pos(mReferenceNodePath,
-			getChaserPos(desiredChaserPos, actualChaserPos, dt));
+	LPoint3f newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+	//correct chaser height (not in OgreBulletDemos)
+	LPoint3f downTo = LPoint3f(newPos.get_x(), newPos.get_y(), -1000000.0);
+	BulletClosestHitRayResult result =
+			GamePhysicsManager::GetSingleton().bulletWorld()->ray_test_closest(
+					newPos, downTo);
+	if (newPos.get_z() - result.get_hit_pos().get_z() < mMinDistance)
+	{
+		newPos.set_z(result.get_hit_pos().get_z() + mMinDistance);
+	}
+	mOwnerObject->getNodePath().set_pos(mReferenceNodePath, newPos);
 	//orientation
 	LPoint3f desiredLooAtPos = mReferenceNodePath.get_relative_point(
 			mChasedNodePath, mLookAtPosition);
