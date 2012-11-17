@@ -71,9 +71,9 @@ void Chaser::enable()
 	{
 		mDistance = 1.0;
 	}
-	if (mMinDistance <= 0.0)
+	if ((mMinDistance <= 0.0) or (mMinDistance > mDistance))
 	{
-		mMinDistance = 1.0;
+		mMinDistance = mDistance;
 	}
 	//check if backward located
 	float sign = (mBackward ? 1.0 : -1.0);
