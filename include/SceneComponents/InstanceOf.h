@@ -28,6 +28,7 @@
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "SceneComponents/Model.h"
 #include "Utilities/Tools.h"
 
 class InstanceOfTemplate;
@@ -54,9 +55,28 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 
+	/**
+	 * \brief Gets/sets the node path associated to this instance of.
+	 * @return The node path associated to this instance of.
+	 */
+	///@{
+	NodePath getNodePath() const;
+	void setNodePath(const NodePath& nodePath);
+	///@}
+
+	/**
+	 * \brief Gets a reference to the instanced object.
+	 * @return The reference to the instanced object.
+	 */
+	///@{
+	SMARTPTR(Object) getInstancedObject() const;
+	///@}
+
 private:
 	///The NodePath associated to this model.
 	NodePath mNodePath;
+	///The instanced object.
+	SMARTPTR(Object) mInstancedObject;
 
 	///TypedObject semantics: hardcoded
 public:

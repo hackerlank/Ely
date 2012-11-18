@@ -54,18 +54,18 @@ const ComponentType Model::componentType() const
 	return mTmpl->componentType();
 }
 
-void Model::r_find_bundles(PandaNode* node, Anims& anims, Parts& parts)
+void Model::r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& parts)
 {
 	if (node->is_of_type(AnimBundleNode::get_class_type()))
 	{
-		AnimBundleNode *bn = DCAST(AnimBundleNode, node);
-		AnimBundle *bundle = bn->get_bundle();
+		SMARTPTR(AnimBundleNode) bn = DCAST(AnimBundleNode, node.p());
+		SMARTPTR(AnimBundle) bundle = bn->get_bundle();
 		anims[bundle->get_name()].insert(bundle);
 
 	}
 	else if (node->is_of_type(PartBundleNode::get_class_type()))
 	{
-		PartBundleNode *bn = DCAST(PartBundleNode, node);
+		SMARTPTR(PartBundleNode) bn = DCAST(PartBundleNode, node.p());
 		int num_bundles = bn->get_num_bundles();
 		for (int i = 0; i < num_bundles; ++i)
 		{
@@ -167,42 +167,53 @@ bool Model::initialize()
 			}
 
 			//setup more animations (if any)
-			std::list<std::string>::iterator animFileIter;
+			std::list<std::string>::iterator iter;
 			std::list<std::string> animFileList = mTmpl->parameterList(
 					std::string("anim_files"));
-			for (animFileIter = animFileList.begin(); animFileIter != animFileList.end(); ++animFileIter)
+			for (iter = animFileList.begin(); iter != animFileList.end(); ++iter)
 			{
-				parts.clear();
-				anims.clear();
-				//get the AnimBundle node path
-				std::string baseAnimName = *animFileIter;
-				NodePath animNP = mTmpl->windowFramework()->load_model(mNodePath,
-						Filename(baseAnimName));
-				if (animNP.is_empty())
+				//any "anim_files" string is a "compound" one, i.e. could have the form:
+				// "anim_file1:anim_file2:...:anim_fileN"
+				std::vector<std::string> animFiles = parseCompoundString(*iter, ':');
+				std::vector<std::string>::const_iterator iterAnimFile;
+				for (iterAnimFile = animFiles.begin(); iterAnimFile != animFiles.end(); ++iterAnimFile)
 				{
-					result = false;
-				}
-				//find all the bundles into animNP.node
-				r_find_bundles(animNP.node(), anims, parts);
-				for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
-				{
-					int j;
-					for (j=0, animBundlesIter = animsIter->second.begin(); animBundlesIter != animsIter->second.end();
-							++animBundlesIter, ++j)
+					//an empty anim file is ignored
+					if (not iterAnimFile->empty())
 					{
-						if (j>0)
+						parts.clear();
+						anims.clear();
+						//get the AnimBundle node path
+						std::string baseAnimName = *iterAnimFile;
+						NodePath animNP = mTmpl->windowFramework()->load_model(mNodePath,
+								Filename(baseAnimName));
+						if (animNP.is_empty())
 						{
-							animName = baseAnimName + '.' + format_string(j);
+							result = false;
 						}
-						else
+						//find all the bundles into animNP.node
+						r_find_bundles(animNP.node(), anims, parts);
+						for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
 						{
-							animName = baseAnimName;
+							int j;
+							for (j=0, animBundlesIter = animsIter->second.begin(); animBundlesIter != animsIter->second.end();
+									++animBundlesIter, ++j)
+							{
+								if (j>0)
+								{
+									animName = baseAnimName + '.' + format_string(j);
+								}
+								else
+								{
+									animName = baseAnimName;
+								}
+								PRINT("Binding animation '" << (*animBundlesIter)->get_name() << " with name '"
+										<< animName << "'");
+								PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
+										PartGroup::HMF_ok_wrong_root_name);
+								mAnimations.store_anim(control, animName);
+							}
 						}
-						PRINT("Binding animation '" << (*animBundlesIter)->get_name() << " with name '"
-								<< animName << "'");
-						PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
-								PartGroup::HMF_ok_wrong_root_name);
-						mAnimations.store_anim(control, animName);
 					}
 				}
 			}

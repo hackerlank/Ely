@@ -236,6 +236,14 @@ void Terrain::update(void* data)
 	mTerrain->update();
 }
 
+SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mTerrain;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle Terrain::_type_handle;
 
@@ -247,4 +255,3 @@ GeoMipTerrainRef::GeoMipTerrainRef(const std::string& name) :
 
 //TypedObject semantics: hardcoded
 TypeHandle GeoMipTerrainRef::_type_handle;
-

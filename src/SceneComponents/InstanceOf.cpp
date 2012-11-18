@@ -90,15 +90,49 @@ void InstanceOf::onAddToObjectSetup()
 	//if not this component is instance of nothing.
 	ObjectId instanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
-	SMARTPTR(Object)createdObject =
-	ObjectTemplateManager::GetSingleton().getCreatedObject(
+	mInstancedObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
 			instanceOfId);
-	if (createdObject != NULL)
+	if (mInstancedObject != NULL)
 	{
-		createdObject->getNodePath().instance_to(mOwnerObject->getNodePath());
+		SMARTPTR(Component) component =
+				mInstancedObject->getComponent(ComponentFamilyType("Scene"));
+		if (component->is_of_type(Model::get_class_type()))
+		{
+			//an instanceable object should have a model component
+			SMARTPTR(Model)model = DCAST(Model, component);
+			if (model)
+			{
+				model->getNodePath().instance_to(
+						mOwnerObject->getNodePath());
+			}
+		}
 	}
 	//register event callbacks if any
 	registerEventCallbacks();
+}
+
+NodePath InstanceOf::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNodePath;
+}
+
+void InstanceOf::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNodePath = nodePath;
+}
+
+SMARTPTR(Object)InstanceOf::getInstancedObject() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mInstancedObject;
 }
 
 //TypedObject semantics: hardcoded

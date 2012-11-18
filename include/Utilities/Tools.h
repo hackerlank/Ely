@@ -31,6 +31,7 @@
 #include <sstream>
 #include <cassert>
 #include <utility>
+#include <vector>
 #include <referenceCount.h>
 #include <event.h>
 #include <eventHandler.h>
@@ -217,6 +218,16 @@ typedef std::multimap<std::string, std::string>::iterator ParameterTableIter;
 typedef std::multimap<std::string, std::string>::const_iterator ParameterTableConstIter;
 typedef std::map<std::string, ParameterTable> ParameterTableMap;
 typedef std::pair<std::string, std::string> ParameterNameValue;
+
+/**
+ * \brief Parse a string composed by substrings separated by a character
+ * separator
+ * @param compoundString The compound string.
+ * @param separator The character separator.
+ * @return The substrings std::vector.
+ */
+std::vector<std::string> parseCompoundString(const std::string& compoundString,
+		char separator);
 
 ///Macros representing the path to dynamic linked libraries loaded at runtime
 ///Event callbacks library (See Component)

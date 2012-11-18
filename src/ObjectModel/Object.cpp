@@ -100,6 +100,15 @@ SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
 	mComponents[familyId] = newComponent;
 	//on addition to object component setup
 	mComponents[familyId].p()->onAddToObjectSetup();
+	//check if the owner object is an already created object
+	ObjectId ownerId = mComponents[familyId]->getOwnerObject()->objectId();
+	if (ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ownerId))
+	{
+		//the owner object is a completely created object
+		//give this component a chance to customize
+		//itself when being added to scene.
+		mComponents[familyId]->onAddToSceneSetup();
+	}
 	return previousComp;
 }
 

@@ -26,6 +26,33 @@
 #include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
 
+std::vector<std::string> parseCompoundString(const std::string& compoundString,
+		char separator)
+{
+	std::vector<std::string> substrings;
+	size_t startPos, endPos, i;
+	for (i = 0, startPos = 0, endPos = compoundString.find_first_of(separator);
+			(endPos != std::string::npos)
+					or (not compoundString.substr(startPos).empty()); endPos =
+					compoundString.find_first_of(separator, startPos))
+	{
+		std::string substring;
+		if (endPos != std::string::npos)
+		{
+			substring = compoundString.substr(startPos, endPos - startPos);
+			startPos = endPos + 1;
+		}
+		else
+		{
+			substring = compoundString.substr(startPos,
+					compoundString.size() - startPos);
+			startPos = compoundString.size();
+		}
+		substrings.push_back(substring);
+	}
+	return substrings;
+}
+
 void initTypedObjects()
 {
 	Component::init_type();

@@ -83,6 +83,14 @@ public:
 	 */
 	virtual void update(void* data);
 
+	/**
+	 * \brief Gets a reference to the GeoMipTerrain.
+	 * @return The reference to the GeoMipTerrain.
+	 */
+	///@{
+	SMARTPTR(GeoMipTerrainRef) getGeoMipTerrain() const;
+	///@}
+
 private:
 	///The GeoMipTerrain associated to this component.
 	SMARTPTR(GeoMipTerrainRef) mTerrain;

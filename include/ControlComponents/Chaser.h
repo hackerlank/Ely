@@ -24,6 +24,7 @@
 #ifndef CHASER_H_
 #define CHASER_H_
 
+#include <cmath>
 #include <nodePath.h>
 #include <lvector3.h>
 #include <lpoint3.h>
@@ -46,14 +47,16 @@ class ChaserTemplate;
  * - "chased_object"		|single|no default
  * - "reference_object"		|single|no default
  * - "distance"				|single|no default
- * - "min_distance"			|single|no default
+ * - "abs_lookat_distance"	|single|no default
+ * - "abs_min_distance"		|single|no default
+ * - "abs_min_height"		|single|no default
  * - "friction"				|single|"1.0"
  */
 class Chaser: public Component
 {
 public:
 	Chaser();
-	Chaser(SMARTPTR(ChaserTemplate) tmpl);
+	Chaser(SMARTPTR(ChaserTemplate)tmpl);
 	virtual ~Chaser();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -83,6 +86,20 @@ public:
 	bool isEnabled();
 	///@}
 
+	/**
+	 * \name Getting/setting parameters.
+	 */
+	///@{
+	float getAbsLookAtDistance() const;
+	void setAbsLookAtDistance(float absLookAtDistance);
+	float getAbsMinDistance() const;
+	void setAbsMinDistance(float absMinDistance);
+	float getAbsMinHeight() const;
+	void setAbsMinHeight(float absMinHeight);
+	float getDistance() const;
+	void setDistance(float distance);
+	///@}
+
 private:
 	///The chased object's node path.
 	NodePath mChasedNodePath;
@@ -91,7 +108,7 @@ private:
 	///Enabling & backward flags.
 	bool mEnabled, mIsEnabled, mBackward;
 	///Kinematic parameters.
-	float mDistance, mMinDistance, mFriction;
+	float mAbsLookAtDistance, mDistance, mAbsMinDistance, mAbsMinHeight, mFriction;
 	///Positions.
 	LPoint3f mChaserPosition, mLookAtPosition;
 	/**

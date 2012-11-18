@@ -26,6 +26,12 @@
 			<ComponentTmpl family="Physics" type="RigidBody"/> 
 		</ObjectTmpl>
 
+		<ObjectTmpl type="HUD">
+			<ComponentTmpl family="Scene" type="Model"/>
+			<ComponentTmpl family="Behavior" type="Activity"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
+		</ObjectTmpl>
+
 		<ObjectTmpl type="Character">
 			<ComponentTmpl family="Scene" type="Model"/>
 			<ComponentTmpl family="Behavior" type="Activity"/>
@@ -61,10 +67,22 @@
 	<!-- ------------------------------------------------ -->
 	<ObjectSet>
 	
-		<!-- wrapper around render nodepath - Mandatory -->
+		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
 		<Object type="Render" id="render" priority="1000">
 			<Component type="NodePathWrapper">
 				<Param nodepath="render"/>
+			</Component>
+			<Param parent=""/>
+		</Object>
+		<Object type="Render" id="render2d" priority="1000">
+			<Component type="NodePathWrapper">
+				<Param nodepath="render2d"/>
+			</Component>
+			<Param parent=""/>
+		</Object>
+		<Object type="Render" id="aspect2d" priority="1000">
+			<Component type="NodePathWrapper">
+				<Param nodepath="aspect2d"/>
 			</Component>
 			<Param parent=""/>
 		</Object>
@@ -78,9 +96,11 @@
 				<Param backward="false"/>
 				<Param chased_object="NPC1"/>
 				<Param reference_object="render"/>
-				<Param distance="20.0"/>
-				<Param min_distance="5.0"/>
-				<Param friction="1.0"/>
+				<Param distance="100.0"/>
+				<Param abs_lookat_distance="50.0"/>
+				<Param abs_min_distance="10.0"/>
+				<Param abs_min_height="10.0"/>
+				<Param friction="10.0"/>
 			</Component>
 <!--
 			<Component type="Driver">
@@ -93,32 +113,19 @@
 				<Param inverted_mouse="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
-				<Param events="w"/>
-				<Param events="w-up"/>
-				<Param events="shift-w"/>
-				<Param events="s"/>
-				<Param events="s-up"/>
-				<Param events="shift-s"/>
-				<Param events="a"/>
-				<Param events="a-up"/>
-				<Param events="shift-a"/>
-				<Param events="d"/>
-				<Param events="d-up"/>
-				<Param events="shift-d"/>
-				<Param events="r"/>
-				<Param events="r-up"/>
-				<Param events="shift-r"/>
-				<Param events="f"/>				
-				<Param events="f-up"/>
-				<Param events="shift-f"/>
-				<Param events="shift"/>				
-				<Param events="shift-up"/>
+				<Param events="w:w-up:shift-w"/>
+				<Param events="s:s-up:shift-s"/>
+				<Param events="a:a-up:shift-a"/>
+				<Param events="d:d-up:shift-d"/>
+				<Param events="r:r-up:shift-r"/>
+				<Param events="f:f-up:shift-f"/>				
+				<Param events="shift:shift-up"/>				
 			</Component>
 -->
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="-400.0"/>
-			<Param pos_z="600.0"/>
+			<Param pos_z="100.0"/>
 		</Object>
 
 		<Object type="InstancedActor" id="InstancedTeapot1">
@@ -158,62 +165,20 @@
 			<Param parent=""/>
 		</Object>
 
-<!--
-		<Object type="StaticActor" id="Plane1">
-			<Component type="Model" priority="100">
-				<Param from_file="false"/>
-				<Param is_static="true"/>
-				<Param model_type="card"/>
-				<Param model_card_left="-1000.0"/>
-				<Param model_card_right="1000.0"/>
-				<Param model_card_bottom="-1000.0"/>
-				<Param model_card_top="1000.0"/>
-			</Component>
-			<Component type="RigidBody" priority="90">
-				<Param body_type="static"/>
-				<Param body_friction="0.9"/>
-				<Param body_restitution="0.2"/>
-				<Param shape_type="plane"/>
-				<Param shape_norm_x="0.0"/>
-				<Param shape_norm_y="-1.0"/>
-				<Param shape_norm_z="0.0"/>
-				<Param shape_d="0.0"/>
-			</Component> 
-			<Param parent="render"/>
-			<Param rot_p="-90.0"/>
-		</Object>
--->
-		
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity"  priority="-100">
-				<Param states="forward"/>
-				<Param states="backward"/>
-				<Param states="strafe_left"/>
-				<Param states="strafe_right"/>
-				<Param states="up"/>
-				<Param states="down"/>
+				<Param states="forward:backward"/>
+				<Param states="strafe_left:strafe_right"/>
+				<Param states="up:down"/>
 				<Param from_to="forward_FromTo_strafe_left"/>
 				<Param from_to="forward_FromTo_strafe_right"/>
-				<Param events="arrow_up"/>
-				<Param events="arrow_up-up"/>
-				<Param events="shift-arrow_up"/>
-				<Param events="arrow_down"/>
-				<Param events="arrow_down-up"/>
-				<Param events="shift-arrow_down"/>
-				<Param events="arrow_left"/>
-				<Param events="arrow_left-up"/>
-				<Param events="shift-arrow_left"/>
-				<Param events="arrow_right"/>
-				<Param events="arrow_right-up"/>
-				<Param events="shift-arrow_right"/>
-				<Param events="page_up"/>
-				<Param events="page_up-up"/>
-				<Param events="shift-page_up"/>
-				<Param events="page_down"/>
-				<Param events="page_down-up"/>
-				<Param events="shift-page_down"/>
-				<Param events="shift"/>				
-				<Param events="shift-up"/>
+				<Param events="arrow_up:arrow_up-up:shift-arrow_up"/>
+				<Param events="arrow_down:arrow_down-up:shift-arrow_down"/>
+				<Param events="arrow_left:arrow_left-up:shift-arrow_left"/>
+				<Param events="arrow_right:arrow_right-up:shift-arrow_right"/>
+				<Param events="page_up:page_up-up:shift-page_up"/>
+				<Param events="page_down:page_down-up:shift-page_down"/>
+				<Param events="shift:shift-up"/>				
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
@@ -252,48 +217,48 @@
 			<Param rot_r="0.0"/>
 		</Object>
 
+		<Object type="HUD" id="hud1">
+			<Component type="Activity"  priority="-100">
+				<Param states="idle"/>
+			</Component>
+			<Component type="Model" priority="100">
+				<Param model_file="misc/lilsmiley"/>
+				<Param scale_x="0.05"/>
+				<Param scale_y="0.05"/>
+				<Param scale_z="0.05"/>
+			</Component>
+			<Component type="Sound3d">
+				<Param sound_files="audio/sfx/GUI_rollover.wav"/>
+			</Component>
+			<Param parent="aspect2d"/>
+			<Param pos_x="0.0"/>
+			<Param pos_y="0.0"/>
+			<Param pos_z="-0.75"/>
+			<Param rot_h="0.0"/>
+			<Param rot_p="0.0"/>
+			<Param rot_r="90.0"/>
+		</Object>
+
 		<Object type="Character" id="NPC1"  priority="100">
 			<Component type="Activity"  priority="-100">
-				<Param states="forward"/>
-				<Param states="backward"/>
-				<Param states="strafe_left"/>
-				<Param states="strafe_right"/>
-				<Param states="roll_left"/>
-				<Param states="roll_right"/>
+				<Param states="forward:backward"/>
+				<Param states="strafe_left:strafe_right"/>
+				<Param states="roll_left:roll_right"/>
 				<Param states="jump"/>
 				<Param states="idle"/>
-				<Param from_to="forward_FromTo_roll_left"/>
-				<Param from_to="forward_FromTo_roll_right"/>
-				<Param events="i"/>
-				<Param events="i-up"/>
-				<Param events="alt-i"/>
-				<Param events="k"/>
-				<Param events="k-up"/>
-				<Param events="alt-k"/>
-				<Param events="j"/>
-				<Param events="j-up"/>
-				<Param events="alt-j"/>
-				<Param events="l"/>
-				<Param events="l-up"/>
-				<Param events="alt-l"/>
-				<Param events="u"/>
-				<Param events="u-up"/>
-				<Param events="alt-u"/>
-				<Param events="o"/>
-				<Param events="o-up"/>
-				<Param events="alt-o"/>
-				<Param events="space"/>				
-				<Param events="space-up"/>
-				<Param events="alt-space"/>
-				<Param events="alt"/>				
-				<Param events="alt-up"/>
+				<Param from_to="forward_FromTo_roll_left:forward_FromTo_roll_right"/>
+				<Param events="i:i-up:alt-i"/>
+				<Param events="k:k-up:alt-k"/>
+				<Param events="j:j-up:alt-j"/>
+				<Param events="l:l-up:alt-l"/>
+				<Param events="u:u-up:alt-u"/>
+				<Param events="o:o-up:alt-o"/>
+				<Param events="space:space-up:alt-space"/>				
+				<Param events="alt:alt-up"/>				
 			</Component>
 			<Component type="Model" priority="100">
 				<Param model_file="eve/eve"/>
-				<Param anim_files="eve/eve-jump"/>
-				<Param anim_files="eve/eve-run"/>
-				<Param anim_files="eve/eve-walk"/>
-				<Param anim_files="eve/eve-offbalance"/>
+				<Param anim_files="eve/eve-jump:eve/eve-run:eve/eve-walk:eve/eve-offbalance"/>
 				<Param scale_x="5.0"/>
 				<Param scale_y="5.0"/>
 				<Param scale_z="5.0"/>
@@ -309,12 +274,13 @@
 			<Param parent="render"/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="50.0"/>
-			<Param pos_z="600.0"/>
+			<Param pos_z="100.0"/>
 			<Param rot_h="0.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
 
+<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain" priority="100">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
@@ -339,6 +305,31 @@
 			</Component> 
 			<Param parent="render"/>
 		</Object>
+-->
 
+		<Object type="StaticActor" id="Plane1">
+			<Component type="Model" priority="100">
+				<Param from_file="false"/>
+				<Param is_static="true"/>
+				<Param model_type="card"/>
+				<Param model_card_left="-1000.0"/>
+				<Param model_card_right="1000.0"/>
+				<Param model_card_bottom="-1000.0"/>
+				<Param model_card_top="1000.0"/>
+			</Component>
+			<Component type="RigidBody" priority="90">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="plane"/>
+				<Param shape_norm_x="0.0"/>
+				<Param shape_norm_y="-1.0"/>
+				<Param shape_norm_z="0.0"/>
+				<Param shape_d="0.0"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param rot_p="-90.0"/>
+		</Object>
+	
 	</ObjectSet>
 </Game>

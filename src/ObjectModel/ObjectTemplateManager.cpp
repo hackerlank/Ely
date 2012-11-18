@@ -186,8 +186,8 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		//themselves when being added to scene.
 		newObj->sceneSetup();
 	}
-	//
-	//insert the just created object in the table of created objects
+	//Now the object is completely existent so insert
+	//it in the table of created objects.
 	mCreatedObjects[newId] = newObj;
 	return newObj;
 }

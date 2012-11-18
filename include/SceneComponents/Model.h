@@ -109,9 +109,9 @@ private:
 	///@{
 	///The list of animations associated with this model.
 	AnimControlCollection mAnimations;
-	typedef std::set<AnimBundle *> AnimBundles;
+	typedef std::set<SMARTPTR(AnimBundle)> AnimBundles;
 	typedef std::map<string, AnimBundles> Anims;
-	typedef std::set<PartBundle *> PartBundles;
+	typedef std::set<SMARTPTR(PartBundle)> PartBundles;
 	typedef std::map<string, PartBundles> Parts;
 	/**
 	 * \brief A support function for auto_bind().
@@ -124,7 +124,7 @@ private:
 	 * @param parts Out parameter: the table of AnimBundle sets indexed
 	 * by their names.
 	 */
-	void r_find_bundles(PandaNode *node, Anims &anims, Parts &parts);
+	void r_find_bundles(SMARTPTR(PandaNode) node, Anims &anims, Parts &parts);
 	///@}
 	///Flag indicating if component is set up from a file or programmatically
 	bool mFromFile;

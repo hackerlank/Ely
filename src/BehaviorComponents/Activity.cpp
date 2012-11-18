@@ -66,15 +66,37 @@ bool Activity::initialize()
 			std::string("states"));
 	for (iter = stateList.begin(); iter != stateList.end(); ++iter)
 	{
-		//set default transitions for each state
-		mFSM.addState(*iter, NULL, NULL, NULL);
+		//any "states" string is a "compound" one, i.e. could have the form:
+		// "state1:state2:...:stateN"
+		std::vector<std::string> states = parseCompoundString(*iter, ':');
+		std::vector<std::string>::const_iterator iterState;
+		for (iterState = states.begin(); iterState != states.end(); ++iterState)
+		{
+			//an empty state is ignored
+			if (not iterState->empty())
+			{
+				//set default transitions for each state
+				mFSM.addState(*iterState, NULL, NULL, NULL);
+			}
+		}
 	}
 	//setup FromTo transition function set
 	std::list<std::string> fromToList = mTmpl->parameterList(
 			std::string("from_to"));
 	for (iter = fromToList.begin(); iter != fromToList.end(); ++iter)
 	{
-		mFromToFunctionSet.insert(*iter);
+		//any "from_to" string is a "compound" one, i.e. could have the form:
+		// "from_to1:from_to2:...:from_toN"
+		std::vector<std::string> fromTos = parseCompoundString(*iter, ':');
+		std::vector<std::string>::const_iterator iterFromTo;
+		for (iterFromTo = fromTos.begin(); iterFromTo != fromTos.end(); ++iterFromTo)
+		{
+			//an empty from_to is ignored
+			if (not iterFromTo->empty())
+			{
+				mFromToFunctionSet.insert(*iterFromTo);
+			}
+		}
 	}
 	//setup event callbacks if any
 	setupEvents();

@@ -48,15 +48,15 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-void Component::setOwnerObject(SMARTPTR(Object) ownerObject)
+void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+		HOLDMUTEX(mMutex)
 
-	mOwnerObject = ownerObject;
-}
+		mOwnerObject = ownerObject;
+	}
 
-SMARTPTR(Object) Component::getOwnerObject() const
+SMARTPTR(Object)Component::getOwnerObject() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -217,8 +217,22 @@ void Component::setupEvents()
 		//populate the callback table with NULL for each event
 		for (iter = eventList.begin(); iter != eventList.end(); ++iter)
 		{
-			std::pair<std::string, PCALLBACK> tableItem(*iter, NULL);
-			mCallbackTable.insert(tableItem);
+			//any "events" string is a "compound" one, i.e. could have the form:
+			// "event1:event2:...:eventN"
+			std::vector<std::string> events = parseCompoundString(*iter, ':');
+			std::vector<std::string>::const_iterator iterEvent;
+			for (iterEvent = events.begin(); iterEvent != events.end();
+					++iterEvent)
+			{
+				//an empty event is ignored
+				if (not iterEvent->empty())
+				{
+					//insert the <event,NULL> pair;
+					std::pair<std::string, PCALLBACK> tableItem(*iterEvent,
+							NULL);
+					mCallbackTable.insert(tableItem);
+				}
+			}
 		}
 	}
 }
