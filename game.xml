@@ -242,17 +242,14 @@
 		<Object type="Character" id="NPC1"  priority="100">
 			<Component type="Activity"  priority="-100">
 				<Param states="forward:backward"/>
-				<Param states="strafe_left:strafe_right"/>
 				<Param states="roll_left:roll_right"/>
+				<Param states="forward_roll_left:forward_roll_right"/>
 				<Param states="jump"/>
 				<Param states="idle"/>
-				<Param from_to="forward_FromTo_roll_left:forward_FromTo_roll_right"/>
 				<Param events="i:i-up:alt-i"/>
 				<Param events="k:k-up:alt-k"/>
 				<Param events="j:j-up:alt-j"/>
 				<Param events="l:l-up:alt-l"/>
-				<Param events="u:u-up:alt-u"/>
-				<Param events="o:o-up:alt-o"/>
 				<Param events="space:space-up:alt-space"/>				
 				<Param events="alt:alt-up"/>				
 			</Component>

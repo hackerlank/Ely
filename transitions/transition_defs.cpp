@@ -162,14 +162,6 @@ void Exit_forward_NPC1(fsm*, Activity& activity)
 					ComponentFamilyType("Scene")));
 	npc1Model->animations().stop("eve/eve-walk");
 }
-ValueList Filter_forward_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_forward_NPC1");
-	valList.push_front(state);
-	return valList;
-}
 //backward
 void Enter_backward_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
@@ -178,50 +170,6 @@ void Enter_backward_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 void Exit_backward_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_backward_NPC1");
-}
-ValueList Filter_backward_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_backward_NPC1");
-	valList.push_front(state);
-	return valList;
-}
-//strafe_left
-void Enter_strafe_left_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("Enter_strafe_left_NPC1");
-}
-void Exit_strafe_left_NPC1(fsm*, Activity& activity)
-{
-	PRINT("Exit_strafe_left_NPC1");
-}
-ValueList Filter_strafe_left_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_strafe_left_NPC1");
-	valList.push_front(state);
-	return valList;
-}
-//strafe_right
-void Enter_strafe_right_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("Enter_strafe_right_NPC1");
-}
-void Exit_strafe_right_NPC1(fsm*, Activity& activity)
-{
-	PRINT("Exit_strafe_right_NPC1");
-}
-ValueList Filter_strafe_right_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_strafe_right_NPC1");
-	valList.push_front(state);
-	return valList;
 }
 //roll_left
 void Enter_roll_left_NPC1(fsm*, Activity& activity, const ValueList& valueList)
@@ -232,14 +180,6 @@ void Exit_roll_left_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_roll_left_NPC1");
 }
-ValueList Filter_roll_left_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_roll_left_NPC1");
-	valList.push_front(state);
-	return valList;
-}
 //roll_right
 void Enter_roll_right_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
@@ -249,13 +189,23 @@ void Exit_roll_right_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_roll_right_NPC1");
 }
-ValueList Filter_roll_right_NPC1(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
+//forward_roll_left
+void Enter_forward_roll_left_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 {
-	ValueList valList = valueList;
-	PRINT("Filter_roll_right_NPC1");
-	valList.push_front(state);
-	return valList;
+	PRINT("Enter_forward_roll_left_NPC1");
+}
+void Exit_forward_roll_left_NPC1(fsm*, Activity& activity)
+{
+	PRINT("Exit_forward_roll_left_NPC1");
+}
+//forward_roll_right
+void Enter_forward_roll_right_NPC1(fsm*, Activity& activity, const ValueList& valueList)
+{
+	PRINT("Enter_forward_roll_right_NPC1");
+}
+void Exit_forward_roll_right_NPC1(fsm*, Activity& activity)
+{
+	PRINT("Exit_forward_roll_right_NPC1");
 }
 //jump
 void Enter_jump_NPC1(fsm*, Activity& activity, const ValueList& valueList)
@@ -265,14 +215,6 @@ void Enter_jump_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 void Exit_jump_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_jump_NPC1");
-}
-ValueList Filter_jump_NPC1(fsm*, Activity& activity, const std::string& state,
-		const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_jump_NPC1");
-	valList.push_front(state);
-	return valList;
 }
 //idle
 void Enter_idle_NPC1(fsm*, Activity& activity, const ValueList& valueList)
@@ -286,24 +228,4 @@ void Enter_idle_NPC1(fsm*, Activity& activity, const ValueList& valueList)
 void Exit_idle_NPC1(fsm*, Activity& activity)
 {
 	PRINT("Exit_idle_NPC1");
-}
-ValueList Filter_idle_NPC1(fsm*, Activity& activity, const std::string& state,
-		const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_idle_NPC1");
-	valList.push_front(state);
-	return valList;
-}
-//forward_FromTo_roll_left
-void forward_FromTo_roll_left_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("forward_FromTo_roll_left_NPC1");
-}
-//forward_FromTo_roll_right
-void forward_FromTo_roll_right_NPC1(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("forward_FromTo_roll_right_NPC1");
 }

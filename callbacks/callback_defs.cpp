@@ -118,16 +118,15 @@ const std::string& bareEvent, bool enable, const char* keys[])
 
 ///Camera + Driver related
 static const char* camera_keys[] =
-{
-	"w", //forward
-	"s", //backward
-	"a", //strafe_left
-	"d", //strafe_right
-	"", //roll_left
-	"", //roll_right
-	"r", //up
-	"f", //down
-};
+{ "w", //forward
+		"s", //backward
+		"a", //strafe_left
+		"d", //strafe_right
+		"", //roll_left
+		"", //roll_right
+		"r", //up
+		"f", //down
+		};
 void driveCamera(const Event* event, void* data)
 {
 	//get data
@@ -149,16 +148,15 @@ void driveCamera(const Event* event, void* data)
 
 ///Actor1 + Activity related
 static const char* Actor1_keys[] =
-{
-	"arrow_up", //forward
-	"arrow_down", //backward
-	"arrow_left", //strafe_left
-	"arrow_right", //strafe_right
-	"", //roll_left
-	"", //roll_right
-	"page_up", //up
-	"page_down", //down
-};
+{ "arrow_up", //forward
+		"arrow_down", //backward
+		"arrow_left", //strafe_left
+		"arrow_right", //strafe_right
+		"", //roll_left
+		"", //roll_right
+		"page_up", //up
+		"page_down", //down
+		};
 void stateActor1(const Event * event, void * data)
 {
 	//get data
@@ -231,127 +229,138 @@ void stateActor1(const Event * event, void * data)
 }
 
 ///NPC1 + Activity related
-///CharacterController helper functions for key events in this order:
-//static const char* keys[] =
-//{
-//		"i", //forward
-//		"k", //backward
-//		"u", //strafe_left
-//		"o", //strafe_right
-//		"j", //roll_left
-//		"l", //roll_right
-//		"space", //jump
-//};
-static void setCharacterControllerCommand(SMARTPTR(CharacterController)characterController,
-const std::string& bareEvent,bool enable, const char* keys[])
-{
-	//set the right command
-		if (bareEvent == keys[0])
-		{
-			characterController->enableForward(enable);
-		}
-		else if (bareEvent == keys[1])
-		{
-			characterController->enableBackward(enable);
-		}
-		else if (bareEvent == keys[2])
-		{
-			characterController->enableStrafeLeft(enable);
-		}
-		else if (bareEvent == keys[3])
-		{
-			characterController->enableStrafeRight(enable);
-		}
-		else if (bareEvent == keys[4])
-		{
-			characterController->enableRollLeft(enable);
-		}
-		else if (bareEvent == keys[5])
-		{
-			characterController->enableRollRight(enable);
-		}
-		else if (bareEvent == keys[6])
-		{
-			characterController->enableJump(enable);
-		}
-		else
-		{
-			PRINTERR("setCharacterControllerCommand: Event not defined: " << bareEvent);
-		}
-	}
-static const char* NPC1_keys[] =
-{
-	"i", //forward
-	"k", //backward
-	"u", //strafe_left
-	"o", //strafe_right
-	"j", //roll_left
-	"l", //roll_right
-	"space", //jump
-};
+static std::string f("i");
+static std::string f_up("i-up");
+static std::string b("k");
+static std::string b_up("k-up");
+static std::string r("l");
+static std::string r_up("l-up");
+static std::string l("j");
+static std::string l_up("j-up");
+
 void stateNPC1(const Event * event, void * data)
 {
 	//get data
 	SMARTPTR(Activity)activity = (Activity*) data;
-	bool enable;
-	//get bare event
+	//get event
 	std::string eventName = event->get_name();
-	std::string bareEvent = getBareEvent(eventName, "alt-", &enable);
-	//get a reference to the character fsm
-	fsm& characterFSM = (fsm&) (*activity);
-	SMARTPTR(Object) characterObj = activity->getOwnerObject();
-	//set the right command
-	if (bareEvent == "i")
+	//get fsm
+	fsm& npc1FSM = (fsm&) (*activity);
+	//get pbject
+	SMARTPTR(Object) npc1 = activity->getOwnerObject();
+	//get character controller
+	SMARTPTR(CharacterController) npc1CharCtrl =
+	DCAST (CharacterController, npc1->getComponent("Physics"));
+	//set transitions
+	std::string currentState = npc1FSM.getCurrentOrNextState();
+	///TODO
+	if (eventName == f)
 	{
-		enable?characterFSM.request("forward"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
-	else if (bareEvent == "k")
+	else if (eventName == f_up)
 	{
-		enable?characterFSM.request("backward"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
-	else if (bareEvent == "u")
+	else if (eventName == b)
 	{
-		enable?characterFSM.request("strafe_left"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
-	else if (bareEvent == "o")
+	else if (eventName == b_up)
 	{
-		enable?characterFSM.request("strafe_right"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
-	else if (bareEvent == "j")
+	else if (eventName == r)
 	{
-		enable?characterFSM.request("roll_left"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
-	else if (bareEvent == "l")
+	else if (eventName == r_up)
 	{
-		enable?characterFSM.request("roll_right"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
-	else if (bareEvent == "space")
+	else if (eventName == l)
 	{
-		enable?characterFSM.request("jump"):characterFSM.request("idle");
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
+	}
+	else if (eventName == l_up)
+	{
+		if ( currentState == "idle")
+		{
+			npc1FSM.request("forward");
+		}
+		else if (currentState == "backward")
+		{
+			npc1FSM.request("idle");
+		}
 	}
 	else
 	{
 		PRINTERR("stateNPC1: Event not defined for state transition: " << event->get_name());
 	}
-	//call the CharcterController event handler to move actor
-	SMARTPTR(CharacterController) characterDrv = DCAST (CharacterController, characterObj->getComponent("Physics"));
-	//check if alt or alt-up key pressed
-	if ((eventName == "alt") or (eventName == "alt-up"))
-	{
-		if (eventName.find("-up", 0) == string::npos)
-		{
-			//fast speeds
-			characterDrv->setLinearSpeed(5.0*characterDrv->getLinearSpeed());
-			characterDrv->setAngularSpeed(5.0*characterDrv->getAngularSpeed());
-		}
-		else
-		{
-			//normal speeds
-			characterDrv->setLinearSpeed(0.2*characterDrv->getLinearSpeed());
-			characterDrv->setAngularSpeed(0.2*characterDrv->getAngularSpeed());
-		}
-		return;
-	}
-	//execute command
-	setCharacterControllerCommand(characterDrv, bareEvent, enable, NPC1_keys);
+//	//check if alt or alt-up key pressed
+//	if ((eventName == "alt") or (eventName == "alt-up"))
+//	{
+//		if (eventName.find("-up", 0) == string::npos)
+//		{
+//			//fast speeds
+//			characterDrv->setLinearSpeed(5.0*characterDrv->getLinearSpeed());
+//			characterDrv->setAngularSpeed(5.0*characterDrv->getAngularSpeed());
+//		}
+//		else
+//		{
+//			//normal speeds
+//			characterDrv->setLinearSpeed(0.2*characterDrv->getLinearSpeed());
+//			characterDrv->setAngularSpeed(0.2*characterDrv->getAngularSpeed());
+//		}
+//		return;
+//	}
 }

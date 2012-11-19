@@ -90,14 +90,6 @@ CALLBACKNAME alt_i_Activity_NPC1 = "stateNPC1";
 CALLBACKNAME k_Activity_NPC1 = "stateNPC1";
 CALLBACKNAME k_up_Activity_NPC1 = "stateNPC1";
 CALLBACKNAME alt_k_Activity_NPC1 = "stateNPC1";
-//"u""u-up""alt-u"
-CALLBACKNAME u_Activity_NPC1 = "stateNPC1";
-CALLBACKNAME u_up_Activity_NPC1 = "stateNPC1";
-CALLBACKNAME alt_u_Activity_NPC1 = "stateNPC1";
-//"o""o-up""alt-o"
-CALLBACKNAME o_Activity_NPC1 = "stateNPC1";
-CALLBACKNAME o_up_Activity_NPC1 = "stateNPC1";
-CALLBACKNAME alt_o_Activity_NPC1 = "stateNPC1";
 //"j""j-up""alt-j"
 CALLBACKNAME j_Activity_NPC1 = "stateNPC1";
 CALLBACKNAME j_up_Activity_NPC1 = "stateNPC1";

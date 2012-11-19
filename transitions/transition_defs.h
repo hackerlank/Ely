@@ -70,39 +70,27 @@ FROMTO forward_FromTo_strafe_right_Actor1;
 //forward
 ENTER Enter_forward_NPC1;
 EXIT Exit_forward_NPC1;
-FILTER Filter_forward_NPC1;
 //backward
 ENTER Enter_backward_NPC1;
 EXIT Exit_backward_NPC1;
-FILTER Filter_backward_NPC1;
-//strafe_left
-ENTER Enter_strafe_left_NPC1;
-EXIT Exit_strafe_left_NPC1;
-FILTER Filter_strafe_left_NPC1;
-//strafe_right
-ENTER Enter_strafe_right_NPC1;
-EXIT Exit_strafe_right_NPC1;
-FILTER Filter_strafe_right_NPC1;
 //roll_left
 ENTER Enter_roll_left_NPC1;
 EXIT Exit_roll_left_NPC1;
-FILTER Filter_roll_left_NPC1;
 //roll_right
 ENTER Enter_roll_right_NPC1;
 EXIT Exit_roll_right_NPC1;
-FILTER Filter_roll_right_NPC1;
+//forward_roll_left
+ENTER Enter_forward_roll_left_NPC1;
+EXIT Exit_forward_roll_left_NPC1;
+//forward_roll_right
+ENTER Enter_forward_roll_right_NPC1;
+EXIT Exit_forward_roll_right_NPC1;
 //jump
 ENTER Enter_jump_NPC1;
 EXIT Exit_jump_NPC1;
-FILTER Filter_jump_NPC1;
 //idle
 ENTER Enter_idle_NPC1;
 EXIT Exit_idle_NPC1;
-FILTER Filter_idle_NPC1;
-//forward_FromTo_roll_left
-FROMTO forward_FromTo_roll_left_NPC1;
-//forward_FromTo_roll_right
-FROMTO forward_FromTo_roll_right_NPC1;
 
 #ifdef __cplusplus
 }
