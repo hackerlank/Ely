@@ -25,6 +25,7 @@
 #define OBJECTTEMPLATE_H_
 
 #include <string>
+#include <vector>
 #include <list>
 #include <set>
 #include <algorithm>
@@ -54,9 +55,9 @@ class ObjectTemplate: public TypedWritableReferenceCount
 {
 public:
 	/**
-	 * \brief Type used for the list of the component templates.
+	 * \brief Type used for the ordered list of the component templates.
 	 */
-	typedef std::list<SMARTPTR(ComponentTemplate)> ComponentTemplateList;
+	typedef std::vector<SMARTPTR(ComponentTemplate)> ComponentTemplateList;
 
 	/**
 	 * \brief Constructor.
@@ -168,7 +169,7 @@ public:
 private:
 	///Name identifying this object template.
 	ObjectType mName;
-	///List of all component templates.
+	///Ordered list of all component templates.
 	ComponentTemplateList mComponentTemplates;
 	///The ObjectTemplateManager.
 	ObjectTemplateManager* const mObjectTmplMgr;

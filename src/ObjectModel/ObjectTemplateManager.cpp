@@ -140,24 +140,23 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	//get the component template list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 	objectTmpl->getComponentTemplates();
-	//iterate over the list and assign components
-	ObjectTemplate::ComponentTemplateList::iterator it2;
-	for (it2 = compTmplList.begin(); it2 != compTmplList.end(); ++it2)
+	//iterate in order over the ordered list and assign components
+	for (unsigned int it2 = 0; it2 < compTmplList.size(); ++it2)
 	{
 		//use ComponentTemplateManager to create component
-		ComponentType compType = (*it2).p()->componentType();
+		ComponentType compType = compTmplList[it2].p()->componentType();
 		//check if we have to initialize parameters of this component template
 		if(createWithParams)
 		{
 			//initialize parameters' component template to defaults
-			(*it2).p()->setParametersDefaults();
+			compTmplList[it2].p()->setParametersDefaults();
 			//set parameters for this component template...
 			ParameterTableMap::const_iterator it3;
 			it3 = compTmplParams.find(std::string(compType));
 			if (it3 != compTmplParams.end())
 			{
 				//...if not empty
-				(*it2).p()->setParameters(it3->second);
+				compTmplList[it2].p()->setParameters(it3->second);
 			}
 		}
 		//

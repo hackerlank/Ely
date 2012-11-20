@@ -6,58 +6,91 @@
 	<ObjectTmplSet>
 		<!-- template for wrapper around predefined nodepath - Mandatory -->
 		<ObjectTmpl type="Render">
-			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
+			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Camera">
-			<ComponentTmpl family="Scene" type="NodePathWrapper"/>
-			<ComponentTmpl family="Control" type="Chaser"/>
+			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
+			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
 <!--
-			<ComponentTmpl family="Control" type="Driver"/>
+			<ComponentTmpl family="Control" type="Driver" priority="60"/>
+				<Param events="forward:stop-forward:fast-forward"/>
+				<Param events="backward:stop-backward:fast-backward"/>
+				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param events="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param events="up:stop-up:fast-up"/>
+				<Param events="down:stop-down:fast-down"/>				
+				<Param events="fast:stop-fast"/>				
+			</ComponentTmpl>
 -->
-			<ComponentTmpl family="Audio" type="Listener"/>
+			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Actor">
-			<ComponentTmpl family="Scene" type="Model"/>
-			<ComponentTmpl family="Behavior" type="Activity"/>
-			<ComponentTmpl family="Control" type="Driver"/>
-			<ComponentTmpl family="Audio" type="Sound3d"/>
-			<ComponentTmpl family="Physics" type="RigidBody"/> 
+			<ComponentTmpl family="Behavior" type="Activity" priority="40"/>
+				<Param states="forward:backward"/>
+				<Param states="strafe_left:strafe_right"/>
+				<Param states="up:down"/>
+				<Param from_to="forward_FromTo_strafe_left"/>
+				<Param from_to="forward_FromTo_strafe_right"/>
+				<Param events="forward:stop-forward:fast-forward"/>
+				<Param events="backward:stop-backward:fast-backward"/>
+				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param events="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param events="up:stop-up:fast-up"/>
+				<Param events="down:stop-down:fast-down"/>
+				<Param events="fast:stop-fast"/>							
+			</ComponentTmpl>
+			<ComponentTmpl family="Control" type="Driver" priority="60"/>
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 
 		<ObjectTmpl type="HUD">
-			<ComponentTmpl family="Scene" type="Model"/>
-			<ComponentTmpl family="Behavior" type="Activity"/>
-			<ComponentTmpl family="Audio" type="Sound3d"/>
+			<ComponentTmpl family="Behavior" type="Activity" priority="40"/>
+				<Param states="forward:backward"/>
+				<Param states="roll_left:roll_right"/>
+				<Param states="forward_roll_left:forward_roll_right"/>
+				<Param states="jump"/>
+				<Param states="idle"/>
+				<Param events="forward:stop-forward:fast-forward"/>
+				<Param events="backward:stop-backward:fast-backward"/>
+				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param events="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param events="jump:stop-jump:fast-jump"/>				
+				<Param events="fast:stop-fast"/>				
+			</ComponentTmpl>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="Character">
-			<ComponentTmpl family="Scene" type="Model"/>
-			<ComponentTmpl family="Behavior" type="Activity"/>
-			<ComponentTmpl family="Audio" type="Sound3d"/>
-			<ComponentTmpl family="Physics" type="CharacterController"/> 
+			<ComponentTmpl family="Behavior" type="Activity" priority="40"/>
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/> 
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="StaticActor">
-			<ComponentTmpl family="Scene" type="Model"/>
-			<ComponentTmpl family="Physics" type="RigidBody"/> 
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 		
 		<!-- templates for instancing -->
 		<ObjectTmpl type="Instanceable">
-			<ComponentTmpl family="Scene" type="Model"/>
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="InstancedActor">
-			<ComponentTmpl family="Scene" type="InstanceOf"/>
-			<ComponentTmpl family="Audio" type="Sound3d"/>
-			<ComponentTmpl family="Physics" type="RigidBody"/> 
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Terrain">
-			<ComponentTmpl family="Scene" type="Terrain"/>
-			<ComponentTmpl family="Physics" type="RigidBody"/> 
+			<ComponentTmpl family="Scene" type="Terrain" priority="100"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 
 	</ObjectTmplSet>
@@ -88,7 +121,7 @@
 		</Object>
 		
 		<Object type="Camera" id="camera" priority="90">
-			<Component type="NodePathWrapper" priority="100">
+			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
 			<Component type="Chaser">
@@ -137,7 +170,7 @@
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
-			<Component type="RigidBody" priority="90">
+			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
 				<Param body_mass="1.0"/>
 				<Param body_friction="0.8"/>
@@ -146,7 +179,7 @@
 				<Param shape_size="minimum"/>
 				<Param collide_mask="all_on"/>
 			</Component> 
-			<Component type="InstanceOf" priority="100">
+			<Component type="InstanceOf">
 				<Param instance_of="Teapot1"/>
 				<Param scale_x="0.5"/>
 				<Param scale_y="0.5"/>
@@ -155,7 +188,7 @@
 		</Object>
 		
 		<Object type="Instanceable" id="Teapot1" priority="100">
-			<Component type="Model" priority="100">
+			<Component type="Model">
 				<Param model_file="teapot"/>
 				<Param is_static="true"/>
 				<Param scale_x="0.5"/>
@@ -166,7 +199,7 @@
 		</Object>
 
 		<Object type="Actor" id="Actor1"  priority="100">
-			<Component type="Activity"  priority="-100">
+			<Component type="Activity">
 				<Param states="forward:backward"/>
 				<Param states="strafe_left:strafe_right"/>
 				<Param states="up:down"/>
@@ -189,14 +222,14 @@
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
-			<Component type="Model" priority="100">
+			<Component type="Model">
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
 				<Param scale_x="1.0"/>
 				<Param scale_y="1.0"/>
 				<Param scale_z="1.0"/>
 			</Component>
-			<Component type="RigidBody" priority="90">
+			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
 				<Param body_mass="1.0"/>
 				<Param body_friction="0.8"/>
@@ -218,10 +251,10 @@
 		</Object>
 
 		<Object type="HUD" id="hud1">
-			<Component type="Activity"  priority="-100">
+			<Component type="Activity">
 				<Param states="idle"/>
 			</Component>
-			<Component type="Model" priority="100">
+			<Component type="Model">
 				<Param model_file="misc/lilsmiley"/>
 				<Param scale_x="0.05"/>
 				<Param scale_y="0.05"/>
@@ -240,7 +273,7 @@
 		</Object>
 
 		<Object type="Character" id="NPC1"  priority="100">
-			<Component type="Activity"  priority="-100">
+			<Component type="Activity">
 				<Param states="forward:backward"/>
 				<Param states="roll_left:roll_right"/>
 				<Param states="forward_roll_left:forward_roll_right"/>
@@ -253,14 +286,14 @@
 				<Param events="space:space-up:alt-space"/>				
 				<Param events="alt:alt-up"/>				
 			</Component>
-			<Component type="Model" priority="100">
+			<Component type="Model">
 				<Param model_file="eve/eve"/>
 				<Param anim_files="eve/eve-jump:eve/eve-run:eve/eve-walk:eve/eve-offbalance"/>
 				<Param scale_x="5.0"/>
 				<Param scale_y="5.0"/>
 				<Param scale_z="5.0"/>
 			</Component>
-			<Component type="CharacterController" priority="90">
+			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
 				<Param linear_speed="150.0"/>
@@ -279,7 +312,7 @@
 
 <!--
 		<Object type="Terrain" id="Terrain1">
-			<Component type="Terrain" priority="100">
+			<Component type="Terrain">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
 				<Param height_scale="2000.0"/>
@@ -291,7 +324,7 @@
 				<Param near_percent="0.1"/>
 				<Param far_percent="0.7"/>
 			</Component>
-			<Component type="RigidBody" priority="90">
+			<Component type="RigidBody">
 				<Param body_type="static"/>
 				<Param shape_heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param shape_type="heightfield"/>
@@ -305,7 +338,7 @@
 -->
 
 		<Object type="StaticActor" id="Plane1">
-			<Component type="Model" priority="100">
+			<Component type="Model">
 				<Param from_file="false"/>
 				<Param is_static="true"/>
 				<Param model_type="card"/>
@@ -314,7 +347,7 @@
 				<Param model_card_bottom="-1000.0"/>
 				<Param model_card_top="1000.0"/>
 			</Component>
-			<Component type="RigidBody" priority="90">
+			<Component type="RigidBody">
 				<Param body_type="static"/>
 				<Param body_friction="0.9"/>
 				<Param body_restitution="0.2"/>
