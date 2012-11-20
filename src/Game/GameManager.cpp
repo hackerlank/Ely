@@ -226,6 +226,21 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		SMARTPTR(ObjectTemplate)objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(objectType),
 				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
+		//////////////
+		//create a priority queue of component templates
+		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponentTmpls;
+		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
+				componentTmpl != NULL;
+				componentTmpl = componentTmpl->NextSiblingElement("ComponentTmpl"))
+		{
+			Orderable<tinyxml2::XMLElement> ordComp;
+			ordComp.setPtr(componentTmpl);
+			const char* priority = componentTmpl->Attribute("priority", NULL);
+			priority != NULL ?
+					ordComp.setPrio(atoi(priority)) : ordComp.setPrio(0);
+			orderedComponentTmpls.push(ordComp);
+		}
+		//////////////
 		//cycle through the ComponentTmpl(s)' definitions ...
 		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
 				componentTmpl != NULL;

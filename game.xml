@@ -13,7 +13,7 @@
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
 			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
 <!--
-			<ComponentTmpl family="Control" type="Driver" priority="60"/>
+			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param events="forward:stop-forward:fast-forward"/>
 				<Param events="backward:stop-backward:fast-backward"/>
 				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
@@ -27,7 +27,7 @@
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Actor">
-			<ComponentTmpl family="Behavior" type="Activity" priority="40"/>
+			<ComponentTmpl family="Behavior" type="Activity" priority="40">
 				<Param states="forward:backward"/>
 				<Param states="strafe_left:strafe_right"/>
 				<Param states="up:down"/>
@@ -48,7 +48,7 @@
 		</ObjectTmpl>
 
 		<ObjectTmpl type="HUD">
-			<ComponentTmpl family="Behavior" type="Activity" priority="40"/>
+			<ComponentTmpl family="Behavior" type="Activity" priority="40">
 				<Param states="forward:backward"/>
 				<Param states="roll_left:roll_right"/>
 				<Param states="forward_roll_left:forward_roll_right"/>
