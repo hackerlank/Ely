@@ -81,6 +81,7 @@ void GameManager::initialize()
 	setupCompTmplMgr();
 
 	//create the game world (static definition)
+//	createGameWorldWithoutParamTables(std::string("game.xml"));
 	createGameWorld(std::string("game.xml"));
 
 	//play the game
@@ -170,7 +171,7 @@ static bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
 	return true;
 }
 
-void GameManager::createGameWorld(const std::string& gameWorldXML)
+void GameManager::createGameWorldWithoutParamTables(const std::string& gameWorldXML)
 {
 	//read the game configuration file
 	tinyxml2::XMLDocument gameDoc;
@@ -183,7 +184,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		fprintf(stderr, "%s\n%s\n", gameDoc.GetErrorStr1(),
 				gameDoc.GetErrorStr2());
 		throw GameException(
-				"GameManager::setupGameWorld: Failed to load/parse " + gameWorldXML);
+				"GameManager::setupGameWorld: Failed to load/parse "
+						+ gameWorldXML);
 	}
 	tinyxml2::XMLElement* gameTAG;
 	//check <Game> tag
@@ -280,7 +282,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	if (not checkTag(objectSet, "ObjectSet"))
 	{
 		throw GameException(
-				"GameManager::setupGameWorld: No <ObjectSet> in " + gameWorldXML);
+				"GameManager::setupGameWorld: No <ObjectSet> in "
+						+ gameWorldXML);
 	}
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
@@ -317,13 +320,12 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		PRINT(
 				"  Creating Object '" << (objIdTAG != NULL ? objIdTAG : "UNNAMED") << "'...");
 		//reset all object's component parameters to their default values
-//		ObjectTemplate::ComponentTemplateList compTmplList =
-//				objectTmplPtr->getComponentTemplates();
-//		for (unsigned int idx = 0; idx != compTmplList.size(); ++idx)
-//		{
-//			compTmplList[idx]->setParametersDefaults();
-//		}
-		ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
+		ObjectTemplate::ComponentTemplateList compTmplList =
+				objectTmplPtr->getComponentTemplates();
+		for (unsigned int idx = 0; idx != compTmplList.size(); ++idx)
+		{
+			compTmplList[idx]->setParametersDefaults();
+		}
 		//cycle through the Object Component(s)' to be initialized in order of priority
 		tinyxml2::XMLElement* componentTAG;
 		for (componentTAG = objectTAG->FirstChildElement("Component");
@@ -347,7 +349,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			//cycle through the Component Param(s)' to be initialized
 			tinyxml2::XMLElement* paramTAG;
 			for (paramTAG = componentTAG->FirstChildElement("Param");
-					paramTAG != NULL; paramTAG = paramTAG->NextSiblingElement("Param"))
+					paramTAG != NULL;
+					paramTAG = paramTAG->NextSiblingElement("Param"))
 			{
 				const tinyxml2::XMLAttribute* attributeTAG =
 						paramTAG->FirstAttribute();
@@ -381,7 +384,6 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			continue;
 		}
-		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//////////////////////////////////////////////////////////////
 		//<!-- Object addition to Scene -->
 		ParameterTable objParameterTable;
@@ -389,7 +391,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		objectTmplPtr->setParametersDefaults();
 		//cycle through the Object Param(s)' to be initialized
 		tinyxml2::XMLElement* objParamTAG;
-		for (objParamTAG = objectTAG->FirstChildElement("Param"); objParamTAG != NULL;
+		for (objParamTAG = objectTAG->FirstChildElement("Param");
+				objParamTAG != NULL;
 				objParamTAG = objParamTAG->NextSiblingElement("Param"))
 		{
 			const tinyxml2::XMLAttribute* attributeTAG =
@@ -408,12 +411,13 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//give a chance to object (and its components) to customize
 		//themselves when being added to scene.
 		objectPtr->sceneSetup();
+		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
 	}
 }
 
-void GameManager::createGameWorldWithParamTables(
+void GameManager::createGameWorld(
 		const std::string& gameWorldXML)
 {
 	//read the game configuration file
@@ -427,7 +431,8 @@ void GameManager::createGameWorldWithParamTables(
 		fprintf(stderr, "%s\n%s\n", gameDoc.GetErrorStr1(),
 				gameDoc.GetErrorStr2());
 		throw GameException(
-				"GameManager::setupGameWorld: Failed to load/parse " + gameWorldXML);
+				"GameManager::setupGameWorld: Failed to load/parse "
+						+ gameWorldXML);
 	}
 	tinyxml2::XMLElement* gameTAG;
 	//check <Game> tag
@@ -524,7 +529,8 @@ void GameManager::createGameWorldWithParamTables(
 	if (not checkTag(objectSet, "ObjectSet"))
 	{
 		throw GameException(
-				"GameManager::setupGameWorld: No <ObjectSet> in " + gameWorldXML);
+				"GameManager::setupGameWorld: No <ObjectSet> in "
+						+ gameWorldXML);
 	}
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
@@ -560,15 +566,7 @@ void GameManager::createGameWorldWithParamTables(
 		const char* objIdTAG = objectTAG->Attribute("id", NULL); //may be NULL
 		PRINT(
 				"  Creating Object '" << (objIdTAG != NULL ? objIdTAG : "UNNAMED") << "'...");
-		//reset all object's component parameters to their default values
-//		ObjectTemplate::ComponentTemplateList compTmplList =
-//				objectTmplPtr->getComponentTemplates();
-//		for (unsigned int idx = 0; idx != compTmplList.size(); ++idx)
-//		{
-//			compTmplList[idx]->setParametersDefaults();
-//		}
-		ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
-		//define a map of ParameterTable for each component template
+		//set a ParameterTable for each component
 		ParameterTableMap compTmplParams;
 		//cycle through the Object Component(s)' to be initialized in order of priority
 		tinyxml2::XMLElement* componentTAG;
@@ -577,25 +575,18 @@ void GameManager::createGameWorldWithParamTables(
 				componentTAG = componentTAG->NextSiblingElement("Component"))
 		{
 			const char* compTypeTAG = componentTAG->Attribute("type", NULL);
-//			// get the related component template
-//			SMARTPTR(ComponentTemplate)componentTmplPtr =
-//			objectTmplPtr->getComponentTemplate(
-//					ComponentType(compTypeTAG));
-//			if ((not compTypeTAG) or (not componentTmplPtr))
 			if ((not compTypeTAG))
 			{
 				//no component without type allowed
-				//but not existent component types are allowed!
+				//but not defined component types are allowed!
 				continue;
 			}
-//			PRINT( "    Initializing Component '" << compTypeTAG << "'");
-//			ParameterTable parameterTable;
-//			//reset component' parameters to their default values
-//			componentTmplPtr->setParametersDefaults();
+			PRINT( "    Initializing Component '" << compTypeTAG << "'");
 			//cycle through the Component Param(s)' to be initialized
 			tinyxml2::XMLElement* paramTAG;
 			for (paramTAG = componentTAG->FirstChildElement("Param");
-					paramTAG != NULL; paramTAG = paramTAG->NextSiblingElement("Param"))
+					paramTAG != NULL;
+					paramTAG = paramTAG->NextSiblingElement("Param"))
 			{
 				const tinyxml2::XMLAttribute* attributeTAG =
 						paramTAG->FirstAttribute();
@@ -610,34 +601,13 @@ void GameManager::createGameWorldWithParamTables(
 								attributeTAG->Value()));
 			}
 		}
-		/////////////////////////////////
-		//create the object
-		SMARTPTR(Object)objectPtr;
-		if ((objIdTAG != NULL) and (std::string(objIdTAG) != std::string("")))
-		{
-			// set id with the passed id
-			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objTypeTAG), ObjectId(objIdTAG));
-		}
-		else
-		{
-			// set id with the internally generated id
-			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objTypeTAG));
-		}
-		if (objectPtr == NULL)
-		{
-			continue;
-		}
-		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//////////////////////////////////////////////////////////////
-		//<!-- Object addition to Scene -->
-		ParameterTable objParameterTable;
-		//reset object' parameters to their default values
-		objectTmplPtr->setParametersDefaults();
+		//set parameters for the object
+		ParameterTable objTmplParams;
 		//cycle through the Object Param(s)' to be initialized
 		tinyxml2::XMLElement* objParamTAG;
-		for (objParamTAG = objectTAG->FirstChildElement("Param"); objParamTAG != NULL;
+		for (objParamTAG = objectTAG->FirstChildElement("Param");
+				objParamTAG != NULL;
 				objParamTAG = objParamTAG->NextSiblingElement("Param"))
 		{
 			const tinyxml2::XMLAttribute* attributeTAG =
@@ -648,14 +618,32 @@ void GameManager::createGameWorldWithParamTables(
 			}
 			PRINT(
 					"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
-			objParameterTable.insert(
+			objTmplParams.insert(
 					ParameterTable::value_type(attributeTAG->Name(),
 							attributeTAG->Value()));
 		}
-		objectTmplPtr->setParameters(objParameterTable);
-		//give a chance to object (and its components) to customize
-		//themselves when being added to scene.
-		objectPtr->sceneSetup();
+		//////////////////////////////////////////////////////////////
+		//create the object effectively
+		SMARTPTR(Object)objectPtr;
+		if ((objIdTAG != NULL) and (std::string(objIdTAG) != std::string("")))
+		{
+			// set id with the passed id
+			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+					ObjectType(objTypeTAG), ObjectId(objIdTAG), true,
+					objTmplParams, compTmplParams);
+		}
+		else
+		{
+			// set id with the internally generated id
+			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+					ObjectType(objTypeTAG), ObjectId(""), true, objTmplParams,
+					compTmplParams);
+		}
+		if (objectPtr == NULL)
+		{
+			continue;
+		}
+		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
 	}

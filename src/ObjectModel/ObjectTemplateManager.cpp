@@ -137,7 +137,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		newId = objectId;
 	}
 	SMARTPTR(Object) newObj = new Object(newId, objectTmpl);
-	//get the component template list
+	//get the component template ordered list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 	objectTmpl->getComponentTemplates();
 	//iterate in order over the ordered list and assign components
@@ -157,7 +157,6 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 			{
 				//...if not empty
 				compTmplList[idx2].p()->setParameters(it3->second);
-				PRINT( "    Initializing Component '" << std::string(compType) << "'");
 			}
 		}
 		//

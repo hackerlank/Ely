@@ -100,26 +100,6 @@
 	<!-- ------------------------------------------------ -->
 	<ObjectSet>
 	
-		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
-		<Object type="Render" id="render" priority="1000">
-			<Component type="NodePathWrapper">
-				<Param nodepath="render"/>
-			</Component>
-			<Param parent=""/>
-		</Object>
-		<Object type="Render" id="render2d" priority="1000">
-			<Component type="NodePathWrapper">
-				<Param nodepath="render2d"/>
-			</Component>
-			<Param parent=""/>
-		</Object>
-		<Object type="Render" id="aspect2d" priority="1000">
-			<Component type="NodePathWrapper">
-				<Param nodepath="aspect2d"/>
-			</Component>
-			<Param parent=""/>
-		</Object>
-		
 		<Object type="Camera" id="camera" priority="90">
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
@@ -361,5 +341,25 @@
 			<Param rot_p="-90.0"/>
 		</Object>
 	
+		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
+		<Object type="Render" id="render" priority="1000">
+			<Component type="NodePathWrapper">
+				<Param nodepath="render"/>
+			</Component>
+			<Param parent=""/>
+		</Object>
+		<Object type="Render" id="render2d" priority="1000">
+			<Component type="NodePathWrapper">
+				<Param nodepath="render2d"/>
+			</Component>
+			<Param parent=""/>
+		</Object>
+		<Object type="Render" id="aspect2d" priority="1000">
+			<Component type="NodePathWrapper">
+				<Param nodepath="aspect2d"/>
+			</Component>
+			<Param parent=""/>
+		</Object>
+		
 	</ObjectSet>
 </Game>
