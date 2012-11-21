@@ -107,12 +107,6 @@ public:
 	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType& componentType);
 
 	/**
-	 * \brief Gets/sets the ObjectTemplateManager.
-	 * @return A reference to the ObjectTemplateManager.
-	 */
-	ObjectTemplateManager* const objectTmplMgr() const;
-
-	/**
 	 * \name Parameters management.
 	 * \brief Sets the parameters of the object, this template is
 	 * designed to create, to custom values.

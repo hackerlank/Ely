@@ -98,11 +98,6 @@ SMARTPTR(ComponentTemplate) ObjectTemplate::getComponentTemplate(
 	return *it;
 }
 
-ObjectTemplateManager* const ObjectTemplate::objectTmplMgr() const
-{
-	return mObjectTmplMgr;
-}
-
 void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex
