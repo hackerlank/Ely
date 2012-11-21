@@ -91,6 +91,7 @@ public:
 	 * @param gameWorldXML The description file.
 	 */
 	virtual void createGameWorld(const std::string& gameWorldXML);
+	virtual void createGameWorldWithParamTables(const std::string& gameWorldXML);
 
 	/**
 	 * \brief Porting of python function direct.showbase.ShowBase.enableMouse.

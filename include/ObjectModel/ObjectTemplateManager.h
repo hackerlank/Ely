@@ -110,8 +110,8 @@ public:
 	 *
 	 * @param objectType The object type.
 	 * @param objectId The object id.
-	 * @param createWithParams Indicates if parameters for object and
-	 * component templates are passed directly.
+	 * @param createWithParamTables Indicates if parameters for object and
+	 * component templates are passed directly through tables.
 	 * @param objTmplParams Object template parameter table used to setup the
 	 * object in the scene.
 	 * @param compTmplParams Map of component  templates' parameter tables,
@@ -119,7 +119,7 @@ public:
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
 	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""),
-			bool createWithParams = false,
+			bool createWithParamTables = false,
 			const ParameterTable& objTmplParams = ParameterTable(),
 			const ParameterTableMap& compTmplParams = ParameterTableMap());
 

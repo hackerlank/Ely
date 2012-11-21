@@ -112,7 +112,7 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType obje
 
 SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId,
-		bool createWithParams,
+		bool createWithParamTables,
 		const ParameterTable& objTmplParams,
 		const ParameterTableMap& compTmplParams)
 {
@@ -141,22 +141,23 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	ObjectTemplate::ComponentTemplateList compTmplList =
 	objectTmpl->getComponentTemplates();
 	//iterate in order over the ordered list and assign components
-	for (unsigned int it2 = 0; it2 < compTmplList.size(); ++it2)
+	for (unsigned int idx2 = 0; idx2 < compTmplList.size(); ++idx2)
 	{
 		//use ComponentTemplateManager to create component
-		ComponentType compType = compTmplList[it2].p()->componentType();
+		ComponentType compType = compTmplList[idx2].p()->componentType();
 		//check if we have to initialize parameters of this component template
-		if(createWithParams)
+		if(createWithParamTables)
 		{
-			//initialize parameters' component template to defaults
-			compTmplList[it2].p()->setParametersDefaults();
+			//set component' parameters to their default values
+			compTmplList[idx2].p()->setParametersDefaults();
 			//set parameters for this component template...
 			ParameterTableMap::const_iterator it3;
 			it3 = compTmplParams.find(std::string(compType));
 			if (it3 != compTmplParams.end())
 			{
 				//...if not empty
-				compTmplList[it2].p()->setParameters(it3->second);
+				compTmplList[idx2].p()->setParameters(it3->second);
+				PRINT( "    Initializing Component '" << std::string(compType) << "'");
 			}
 		}
 		//
@@ -171,7 +172,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		newObj->addComponent(newComp);
 	}
 	//check if we have to initialize parameters of this object template
-	if(createWithParams)
+	if(createWithParamTables)
 	{
 		//initialize parameters' object template to defaults
 		objectTmpl->setParametersDefaults();

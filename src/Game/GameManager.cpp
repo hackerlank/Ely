@@ -173,97 +173,98 @@ static bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
 void GameManager::createGameWorld(const std::string& gameWorldXML)
 {
 	//read the game configuration file
-	std::string gameXml = "game.xml";
 	tinyxml2::XMLDocument gameDoc;
 	//load file
-	PRINT("Loading '" << gameXml << "'...");
-	if (tinyxml2::XML_NO_ERROR != gameDoc.LoadFile(gameXml.c_str()))
+	PRINT("Loading '" << gameWorldXML << "'...");
+	if (tinyxml2::XML_NO_ERROR != gameDoc.LoadFile(gameWorldXML.c_str()))
 	{
-		fprintf(stderr, "Error detected on '%s':\n", gameXml.c_str());
+		fprintf(stderr, "Error detected on '%s':\n", gameWorldXML.c_str());
 		gameDoc.PrintError();
 		fprintf(stderr, "%s\n%s\n", gameDoc.GetErrorStr1(),
 				gameDoc.GetErrorStr2());
 		throw GameException(
-				"GameManager::setupGameWorld: Failed to load/parse " + gameXml);
+				"GameManager::setupGameWorld: Failed to load/parse " + gameWorldXML);
 	}
-	tinyxml2::XMLElement* game;
+	tinyxml2::XMLElement* gameTAG;
 	//check <Game> tag
 	PRINT("Checking <Game> tag ...");
-	game = gameDoc.FirstChildElement("Game");
-	if (not checkTag(game, "Game"))
+	gameTAG = gameDoc.FirstChildElement("Game");
+	if (not checkTag(gameTAG, "Game"))
 	{
 		throw GameException(
-				"GameManager::setupGameWorld: No <Game> in " + gameXml);
+				"GameManager::setupGameWorld: No <Game> in " + gameWorldXML);
 	}
 	//////////////////////////////////////////////////////////////
 	//<!-- Object Templates Definition -->
 	//Setup object template manager
 	PRINT("Setting up Object Template Manager");
 	//check <Game>--<ObjectTmplSet> tag
-	tinyxml2::XMLElement* objectTmplSet;
+	tinyxml2::XMLElement* objectTmplSetTAG;
 	PRINT("  Checking <ObjectTmplSet> tag ...");
-	objectTmplSet = game->FirstChildElement("ObjectTmplSet");
-	if (not checkTag(objectTmplSet, "ObjectTmplSet"))
+	objectTmplSetTAG = gameTAG->FirstChildElement("ObjectTmplSet");
+	if (not checkTag(objectTmplSetTAG, "ObjectTmplSet"))
 	{
 		throw GameException(
 				"GameManager::setupGameWorld: No <ObjectTmplSet> in "
-						+ gameXml);
+						+ gameWorldXML);
 	}
 	//cycle through the ObjectTmpl(s)' definitions and
 	// add all kind of object templates
-	tinyxml2::XMLElement* objectTmpl, *componentTmpl;
-	for (objectTmpl = objectTmplSet->FirstChildElement("ObjectTmpl");
-			objectTmpl != NULL;
-			objectTmpl = objectTmpl->NextSiblingElement("ObjectTmpl"))
+	tinyxml2::XMLElement* objectTmplTAG, *componentTmplTAG;
+	for (objectTmplTAG = objectTmplSetTAG->FirstChildElement("ObjectTmpl");
+			objectTmplTAG != NULL;
+			objectTmplTAG = objectTmplTAG->NextSiblingElement("ObjectTmpl"))
 	{
-		const char* objectType = objectTmpl->Attribute("type", NULL);
-		if (not objectType)
+		const char* objectTypeTAG = objectTmplTAG->Attribute("type", NULL);
+		if (not objectTypeTAG)
 		{
 			continue;
 		}
-		PRINT("  Adding Object Template for '" << objectType << "' type");
+		PRINT("  Adding Object Template for '" << objectTypeTAG << "' type");
 		//create a new object template
 		SMARTPTR(ObjectTemplate)objTmplPtr;
-		objTmplPtr = new ObjectTemplate(ObjectType(objectType),
+		objTmplPtr = new ObjectTemplate(ObjectType(objectTypeTAG),
 				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
-		//////////////
 		//create a priority queue of component templates
-		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponentTmpls;
-		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
-				componentTmpl != NULL;
-				componentTmpl = componentTmpl->NextSiblingElement("ComponentTmpl"))
+		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponentTmplsTAG;
+		for (componentTmplTAG = objectTmplTAG->FirstChildElement(
+				"ComponentTmpl"); componentTmplTAG != NULL; componentTmplTAG =
+				componentTmplTAG->NextSiblingElement("ComponentTmpl"))
 		{
-			Orderable<tinyxml2::XMLElement> ordComp;
-			ordComp.setPtr(componentTmpl);
-			const char* priority = componentTmpl->Attribute("priority", NULL);
-			priority != NULL ?
-					ordComp.setPrio(atoi(priority)) : ordComp.setPrio(0);
-			orderedComponentTmpls.push(ordComp);
+			Orderable<tinyxml2::XMLElement> ordCompTAG;
+			ordCompTAG.setPtr(componentTmplTAG);
+			const char* priorityTAG = componentTmplTAG->Attribute("priority",
+					NULL);
+			priorityTAG != NULL ?
+					ordCompTAG.setPrio(atoi(priorityTAG)) :
+					ordCompTAG.setPrio(0);
+			orderedComponentTmplsTAG.push(ordCompTAG);
 		}
-		//////////////
 		//cycle through the ComponentTmpl(s)' definitions ...
-		for (componentTmpl = objectTmpl->FirstChildElement("ComponentTmpl");
-				componentTmpl != NULL;
-				componentTmpl = componentTmpl->NextSiblingElement(
-						"ComponentTmpl"))
+		while (not orderedComponentTmplsTAG.empty())
 		{
-			const char* compFamily = componentTmpl->Attribute("family", NULL);
-			const char* compType = componentTmpl->Attribute("type", NULL);
-			if (not compFamily or not compType)
+			//access top object
+			componentTmplTAG = orderedComponentTmplsTAG.top().getPtr();
+			const char* compFamilyTAG = componentTmplTAG->Attribute("family",
+					NULL);
+			const char* compTypeTAG = componentTmplTAG->Attribute("type", NULL);
+			if (not compFamilyTAG or not compTypeTAG)
 			{
 				continue;
 			}
 			PRINT(
-					"    Component of family '" << compFamily << "' and type '" << compType << "'");
+					"    Component of family '" << compFamilyTAG << "' and type '" << compTypeTAG << "'");
 			//... add all component templates
 			SMARTPTR(ComponentTemplate)compTmpl =
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-					ComponentType(compType));
+					ComponentType(compTypeTAG));
 			if (compTmpl == NULL)
 			{
 				continue;
 			}
 			objTmplPtr->addComponentTemplate(compTmpl);
+			//remove top object from the priority queue
+			orderedComponentTmplsTAG.pop();
 		}
 		// add 'type' object template to manager
 		ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmplPtr);
@@ -275,122 +276,106 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//check <Game>--<ObjectSet> tag
 	tinyxml2::XMLElement* objectSet;
 	PRINT("  Checking <ObjectSet> tag ...");
-	objectSet = game->FirstChildElement("ObjectSet");
+	objectSet = gameTAG->FirstChildElement("ObjectSet");
 	if (not checkTag(objectSet, "ObjectSet"))
 	{
 		throw GameException(
-				"GameManager::setupGameWorld: No <ObjectSet> in " + gameXml);
+				"GameManager::setupGameWorld: No <ObjectSet> in " + gameWorldXML);
 	}
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
-	tinyxml2::XMLElement* object;
+	tinyxml2::XMLElement* objectTAG;
 	//create a priority queue of objects
-	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjects;
-	for (object = objectSet->FirstChildElement("Object"); object != NULL;
-			object = object->NextSiblingElement("Object"))
+	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjectsTAG;
+	for (objectTAG = objectSet->FirstChildElement("Object"); objectTAG != NULL;
+			objectTAG = objectTAG->NextSiblingElement("Object"))
 	{
-		Orderable<tinyxml2::XMLElement> ordObj;
-		ordObj.setPtr(object);
-		const char* priority = object->Attribute("priority", NULL);
-		priority != NULL ? ordObj.setPrio(atoi(priority)) : ordObj.setPrio(0);
-		orderedObjects.push(ordObj);
+		Orderable<tinyxml2::XMLElement> ordObjTAG;
+		ordObjTAG.setPtr(objectTAG);
+		const char* priorityTAG = objectTAG->Attribute("priority", NULL);
+		priorityTAG != NULL ?
+				ordObjTAG.setPrio(atoi(priorityTAG)) : ordObjTAG.setPrio(0);
+		orderedObjectsTAG.push(ordObjTAG);
 	}
 	//cycle through the Object(s)' definitions in order of priority
-	while (not orderedObjects.empty())
+	while (not orderedObjectsTAG.empty())
 	{
 		//access top object
-		object = orderedObjects.top().getPtr();
-		const char* objType = object->Attribute("type", NULL);
+		objectTAG = orderedObjectsTAG.top().getPtr();
+		const char* objTypeTAG = objectTAG->Attribute("type", NULL);
 		// get the related object template
 		SMARTPTR(ObjectTemplate)objectTmplPtr =
 		ObjectTemplateManager::GetSingleton().getObjectTemplate(
-				ObjectType(objType));
-		if ((not objType) or (not objectTmplPtr))
+				ObjectType(objTypeTAG));
+		if ((not objTypeTAG) or (not objectTmplPtr))
 		{
 			//no object without type allowed or object type doesn't exist
-			orderedObjects.pop();
+			orderedObjectsTAG.pop();
 			continue;
 		}
-		const char* objId = object->Attribute("id", NULL); //may be NULL
+		const char* objIdTAG = objectTAG->Attribute("id", NULL); //may be NULL
 		PRINT(
-				"  Creating Object '" << (objId != NULL ? objId : "UNNAMED") << "'...");
-		tinyxml2::XMLElement* component;
-		//create a priority queue of components
-		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponents;
-		for (component = object->FirstChildElement("Component");
-				component != NULL;
-				component = component->NextSiblingElement("Component"))
-		{
-			Orderable<tinyxml2::XMLElement> ordComp;
-			ordComp.setPtr(component);
-			const char* priority = component->Attribute("priority", NULL);
-			priority != NULL ?
-					ordComp.setPrio(atoi(priority)) : ordComp.setPrio(0);
-			orderedComponents.push(ordComp);
-		}
+				"  Creating Object '" << (objIdTAG != NULL ? objIdTAG : "UNNAMED") << "'...");
 		//reset all object's component parameters to their default values
-		ObjectTemplate::ComponentTemplateList::iterator iter;
-		ObjectTemplate::ComponentTemplateList compTmplList =
-				objectTmplPtr->getComponentTemplates();
-		for (iter = compTmplList.begin(); iter != compTmplList.end(); ++iter)
-		{
-			(*iter).p()->setParametersDefaults();
-		}
+//		ObjectTemplate::ComponentTemplateList compTmplList =
+//				objectTmplPtr->getComponentTemplates();
+//		for (unsigned int idx = 0; idx != compTmplList.size(); ++idx)
+//		{
+//			compTmplList[idx]->setParametersDefaults();
+//		}
 		ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
 		//cycle through the Object Component(s)' to be initialized in order of priority
-		while (not orderedComponents.empty())
+		tinyxml2::XMLElement* componentTAG;
+		for (componentTAG = objectTAG->FirstChildElement("Component");
+				componentTAG != NULL;
+				componentTAG = componentTAG->NextSiblingElement("Component"))
 		{
-			//access top component
-			component = orderedComponents.top().getPtr();
-			const char* compType = component->Attribute("type", NULL);
+			const char* compTypeTAG = componentTAG->Attribute("type", NULL);
 			// get the related component template
 			SMARTPTR(ComponentTemplate)componentTmplPtr =
 			objectTmplPtr->getComponentTemplate(
-					ComponentType(compType));
-			if ((not compType) or (not componentTmplPtr))
+					ComponentType(compTypeTAG));
+			if ((not compTypeTAG) or (not componentTmplPtr))
 			{
 				//no component without type allowed or component type doesn't exist
-				orderedComponents.pop();
 				continue;
 			}
-			PRINT( "    Initializing Component '" << compType << "'");
+			PRINT( "    Initializing Component '" << compTypeTAG << "'");
 			ParameterTable parameterTable;
 			//reset component' parameters to their default values
 			componentTmplPtr->setParametersDefaults();
 			//cycle through the Component Param(s)' to be initialized
-			tinyxml2::XMLElement* param;
-			for (param = component->FirstChildElement("Param"); param != NULL;
-					param = param->NextSiblingElement("Param"))
+			tinyxml2::XMLElement* paramTAG;
+			for (paramTAG = componentTAG->FirstChildElement("Param");
+					paramTAG != NULL; paramTAG = paramTAG->NextSiblingElement("Param"))
 			{
-				const tinyxml2::XMLAttribute* attribute =
-						param->FirstAttribute();
-				if (not attribute)
+				const tinyxml2::XMLAttribute* attributeTAG =
+						paramTAG->FirstAttribute();
+				if (not attributeTAG)
 				{
 					continue;
 				}
 				PRINT(
-						"      Param '" << attribute->Name() << "' = '" << attribute->Value() << "'");
+						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 				parameterTable.insert(
-						ParameterTable::value_type(attribute->Name(),
-								attribute->Value()));
+						ParameterTable::value_type(attributeTAG->Name(),
+								attributeTAG->Value()));
 			}
 			componentTmplPtr->setParameters(parameterTable);
-			//remove top component from the priority queue
-			orderedComponents.pop();
 		}
 		//create the object
 		SMARTPTR(Object)objectPtr;
-		if ((objId != NULL) and (std::string(objId) != std::string("")))
+		if ((objIdTAG != NULL) and (std::string(objIdTAG) != std::string("")))
 		{
 			// set id with the passed id
 			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objType), ObjectId(objId));
+					ObjectType(objTypeTAG), ObjectId(objIdTAG));
 		}
 		else
 		{
 			// set id with the internally generated id
 			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objType));
+					ObjectType(objTypeTAG));
 		}
 		if (objectPtr == NULL)
 		{
@@ -403,28 +388,276 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//reset object' parameters to their default values
 		objectTmplPtr->setParametersDefaults();
 		//cycle through the Object Param(s)' to be initialized
-		tinyxml2::XMLElement* objParam;
-		for (objParam = object->FirstChildElement("Param"); objParam != NULL;
-				objParam = objParam->NextSiblingElement("Param"))
+		tinyxml2::XMLElement* objParamTAG;
+		for (objParamTAG = objectTAG->FirstChildElement("Param"); objParamTAG != NULL;
+				objParamTAG = objParamTAG->NextSiblingElement("Param"))
 		{
-			const tinyxml2::XMLAttribute* attribute =
-					objParam->FirstAttribute();
-			if (not attribute)
+			const tinyxml2::XMLAttribute* attributeTAG =
+					objParamTAG->FirstAttribute();
+			if (not attributeTAG)
 			{
 				continue;
 			}
 			PRINT(
-					"      Param '" << attribute->Name() << "' = '" << attribute->Value() << "'");
+					"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 			objParameterTable.insert(
-					ParameterTable::value_type(attribute->Name(),
-							attribute->Value()));
+					ParameterTable::value_type(attributeTAG->Name(),
+							attributeTAG->Value()));
 		}
 		objectTmplPtr->setParameters(objParameterTable);
 		//give a chance to object (and its components) to customize
 		//themselves when being added to scene.
 		objectPtr->sceneSetup();
 		//remove top object from the priority queue
-		orderedObjects.pop();
+		orderedObjectsTAG.pop();
+	}
+}
+
+void GameManager::createGameWorldWithParamTables(
+		const std::string& gameWorldXML)
+{
+	//read the game configuration file
+	tinyxml2::XMLDocument gameDoc;
+	//load file
+	PRINT("Loading '" << gameWorldXML << "'...");
+	if (tinyxml2::XML_NO_ERROR != gameDoc.LoadFile(gameWorldXML.c_str()))
+	{
+		fprintf(stderr, "Error detected on '%s':\n", gameWorldXML.c_str());
+		gameDoc.PrintError();
+		fprintf(stderr, "%s\n%s\n", gameDoc.GetErrorStr1(),
+				gameDoc.GetErrorStr2());
+		throw GameException(
+				"GameManager::setupGameWorld: Failed to load/parse " + gameWorldXML);
+	}
+	tinyxml2::XMLElement* gameTAG;
+	//check <Game> tag
+	PRINT("Checking <Game> tag ...");
+	gameTAG = gameDoc.FirstChildElement("Game");
+	if (not checkTag(gameTAG, "Game"))
+	{
+		throw GameException(
+				"GameManager::setupGameWorld: No <Game> in " + gameWorldXML);
+	}
+	//////////////////////////////////////////////////////////////
+	//<!-- Object Templates Definition -->
+	//Setup object template manager
+	PRINT("Setting up Object Template Manager");
+	//check <Game>--<ObjectTmplSet> tag
+	tinyxml2::XMLElement* objectTmplSetTAG;
+	PRINT("  Checking <ObjectTmplSet> tag ...");
+	objectTmplSetTAG = gameTAG->FirstChildElement("ObjectTmplSet");
+	if (not checkTag(objectTmplSetTAG, "ObjectTmplSet"))
+	{
+		throw GameException(
+				"GameManager::setupGameWorld: No <ObjectTmplSet> in "
+						+ gameWorldXML);
+	}
+	//cycle through the ObjectTmpl(s)' definitions and
+	// add all kind of object templates
+	tinyxml2::XMLElement* objectTmplTAG, *componentTmplTAG;
+	for (objectTmplTAG = objectTmplSetTAG->FirstChildElement("ObjectTmpl");
+			objectTmplTAG != NULL;
+			objectTmplTAG = objectTmplTAG->NextSiblingElement("ObjectTmpl"))
+	{
+		const char* objectTypeTAG = objectTmplTAG->Attribute("type", NULL);
+		if (not objectTypeTAG)
+		{
+			continue;
+		}
+		PRINT("  Adding Object Template for '" << objectTypeTAG << "' type");
+		//create a new object template
+		SMARTPTR(ObjectTemplate)objTmplPtr;
+		objTmplPtr = new ObjectTemplate(ObjectType(objectTypeTAG),
+				ObjectTemplateManager::GetSingletonPtr(), this, mWindow);
+		//create a priority queue of component templates
+		std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedComponentTmplsTAG;
+		for (componentTmplTAG = objectTmplTAG->FirstChildElement(
+				"ComponentTmpl"); componentTmplTAG != NULL; componentTmplTAG =
+				componentTmplTAG->NextSiblingElement("ComponentTmpl"))
+		{
+			Orderable<tinyxml2::XMLElement> ordCompTAG;
+			ordCompTAG.setPtr(componentTmplTAG);
+			const char* priorityTAG = componentTmplTAG->Attribute("priority",
+					NULL);
+			priorityTAG != NULL ?
+					ordCompTAG.setPrio(atoi(priorityTAG)) :
+					ordCompTAG.setPrio(0);
+			orderedComponentTmplsTAG.push(ordCompTAG);
+		}
+		//cycle through the ComponentTmpl(s)' definitions ...
+		while (not orderedComponentTmplsTAG.empty())
+		{
+			//access top object
+			componentTmplTAG = orderedComponentTmplsTAG.top().getPtr();
+			const char* compFamilyTAG = componentTmplTAG->Attribute("family",
+					NULL);
+			const char* compTypeTAG = componentTmplTAG->Attribute("type", NULL);
+			if (not compFamilyTAG or not compTypeTAG)
+			{
+				continue;
+			}
+			PRINT(
+					"    Component of family '" << compFamilyTAG << "' and type '" << compTypeTAG << "'");
+			//... add all component templates
+			SMARTPTR(ComponentTemplate)compTmpl =
+			ComponentTemplateManager::GetSingleton().getComponentTemplate(
+					ComponentType(compTypeTAG));
+			if (compTmpl == NULL)
+			{
+				continue;
+			}
+			objTmplPtr->addComponentTemplate(compTmpl);
+			//remove top object from the priority queue
+			orderedComponentTmplsTAG.pop();
+		}
+		// add 'type' object template to manager
+		ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmplPtr);
+	}
+	//////////////////////////////////////////////////////////////
+	//<!-- Objects Creation -->
+	//Create game objects
+	PRINT("Creating Game Objects");
+	//check <Game>--<ObjectSet> tag
+	tinyxml2::XMLElement* objectSet;
+	PRINT("  Checking <ObjectSet> tag ...");
+	objectSet = gameTAG->FirstChildElement("ObjectSet");
+	if (not checkTag(objectSet, "ObjectSet"))
+	{
+		throw GameException(
+				"GameManager::setupGameWorld: No <ObjectSet> in " + gameWorldXML);
+	}
+	//reset all component templates parameters to their default values
+	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
+	tinyxml2::XMLElement* objectTAG;
+	//create a priority queue of objects
+	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjectsTAG;
+	for (objectTAG = objectSet->FirstChildElement("Object"); objectTAG != NULL;
+			objectTAG = objectTAG->NextSiblingElement("Object"))
+	{
+		Orderable<tinyxml2::XMLElement> ordObjTAG;
+		ordObjTAG.setPtr(objectTAG);
+		const char* priorityTAG = objectTAG->Attribute("priority", NULL);
+		priorityTAG != NULL ?
+				ordObjTAG.setPrio(atoi(priorityTAG)) : ordObjTAG.setPrio(0);
+		orderedObjectsTAG.push(ordObjTAG);
+	}
+	//cycle through the Object(s)' definitions in order of priority
+	while (not orderedObjectsTAG.empty())
+	{
+		//access top object
+		objectTAG = orderedObjectsTAG.top().getPtr();
+		const char* objTypeTAG = objectTAG->Attribute("type", NULL);
+		// get the related object template
+		SMARTPTR(ObjectTemplate)objectTmplPtr =
+		ObjectTemplateManager::GetSingleton().getObjectTemplate(
+				ObjectType(objTypeTAG));
+		if ((not objTypeTAG) or (not objectTmplPtr))
+		{
+			//no object without type allowed or object type doesn't exist
+			orderedObjectsTAG.pop();
+			continue;
+		}
+		const char* objIdTAG = objectTAG->Attribute("id", NULL); //may be NULL
+		PRINT(
+				"  Creating Object '" << (objIdTAG != NULL ? objIdTAG : "UNNAMED") << "'...");
+		//reset all object's component parameters to their default values
+//		ObjectTemplate::ComponentTemplateList compTmplList =
+//				objectTmplPtr->getComponentTemplates();
+//		for (unsigned int idx = 0; idx != compTmplList.size(); ++idx)
+//		{
+//			compTmplList[idx]->setParametersDefaults();
+//		}
+		ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
+		//define a map of ParameterTable for each component template
+		ParameterTableMap compTmplParams;
+		//cycle through the Object Component(s)' to be initialized in order of priority
+		tinyxml2::XMLElement* componentTAG;
+		for (componentTAG = objectTAG->FirstChildElement("Component");
+				componentTAG != NULL;
+				componentTAG = componentTAG->NextSiblingElement("Component"))
+		{
+			const char* compTypeTAG = componentTAG->Attribute("type", NULL);
+//			// get the related component template
+//			SMARTPTR(ComponentTemplate)componentTmplPtr =
+//			objectTmplPtr->getComponentTemplate(
+//					ComponentType(compTypeTAG));
+//			if ((not compTypeTAG) or (not componentTmplPtr))
+			if ((not compTypeTAG))
+			{
+				//no component without type allowed
+				//but not existent component types are allowed!
+				continue;
+			}
+//			PRINT( "    Initializing Component '" << compTypeTAG << "'");
+//			ParameterTable parameterTable;
+//			//reset component' parameters to their default values
+//			componentTmplPtr->setParametersDefaults();
+			//cycle through the Component Param(s)' to be initialized
+			tinyxml2::XMLElement* paramTAG;
+			for (paramTAG = componentTAG->FirstChildElement("Param");
+					paramTAG != NULL; paramTAG = paramTAG->NextSiblingElement("Param"))
+			{
+				const tinyxml2::XMLAttribute* attributeTAG =
+						paramTAG->FirstAttribute();
+				if (not attributeTAG)
+				{
+					continue;
+				}
+				PRINT(
+						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
+				compTmplParams[compTypeTAG].insert(
+						ParameterTable::value_type(attributeTAG->Name(),
+								attributeTAG->Value()));
+			}
+		}
+		/////////////////////////////////
+		//create the object
+		SMARTPTR(Object)objectPtr;
+		if ((objIdTAG != NULL) and (std::string(objIdTAG) != std::string("")))
+		{
+			// set id with the passed id
+			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+					ObjectType(objTypeTAG), ObjectId(objIdTAG));
+		}
+		else
+		{
+			// set id with the internally generated id
+			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
+					ObjectType(objTypeTAG));
+		}
+		if (objectPtr == NULL)
+		{
+			continue;
+		}
+		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
+		//////////////////////////////////////////////////////////////
+		//<!-- Object addition to Scene -->
+		ParameterTable objParameterTable;
+		//reset object' parameters to their default values
+		objectTmplPtr->setParametersDefaults();
+		//cycle through the Object Param(s)' to be initialized
+		tinyxml2::XMLElement* objParamTAG;
+		for (objParamTAG = objectTAG->FirstChildElement("Param"); objParamTAG != NULL;
+				objParamTAG = objParamTAG->NextSiblingElement("Param"))
+		{
+			const tinyxml2::XMLAttribute* attributeTAG =
+					objParamTAG->FirstAttribute();
+			if (not attributeTAG)
+			{
+				continue;
+			}
+			PRINT(
+					"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
+			objParameterTable.insert(
+					ParameterTable::value_type(attributeTAG->Name(),
+							attributeTAG->Value()));
+		}
+		objectTmplPtr->setParameters(objParameterTable);
+		//give a chance to object (and its components) to customize
+		//themselves when being added to scene.
+		objectPtr->sceneSetup();
+		//remove top object from the priority queue
+		orderedObjectsTAG.pop();
 	}
 }
 
