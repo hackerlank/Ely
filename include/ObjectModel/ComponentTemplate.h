@@ -26,6 +26,7 @@
 
 #include <list>
 #include <set>
+#include <map>
 #include <string>
 #include <utility>
 #include <pandaFramework.h>
@@ -113,6 +114,15 @@ public:
 	WindowFramework* const windowFramework() const;
 
 	/**
+	 * \brief Return the name of the callback associated to events
+	 * of a given type.
+	 * @param eventType The event type.
+	 * @return The name of the callback, or the empty string for
+	 * not existent type.
+	 */
+	std::string getEventTypeCallback(const std::string& eventType);
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -125,6 +135,10 @@ protected:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
+
+	//Event types management data and variables.
+	///Table of callbacks indexed by event types.
+	std::map<std::string, std::string> mEventTypeCallbacks;
 
 	///The (reentrant) mutex associated with this template.
 	ReMutex mMutex;

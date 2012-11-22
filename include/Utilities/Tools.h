@@ -220,7 +220,7 @@ typedef std::map<std::string, ParameterTable> ParameterTableMap;
 typedef std::pair<std::string, std::string> ParameterNameValue;
 
 /**
- * \brief Parse a string composed by substrings separated by a character
+ * \brief Parses a string composed by substrings separated by a character
  * separator
  * @param compoundString The compound string.
  * @param separator The character separator.
@@ -228,6 +228,17 @@ typedef std::pair<std::string, std::string> ParameterNameValue;
  */
 std::vector<std::string> parseCompoundString(const std::string& compoundString,
 		char separator);
+
+/**
+ * \brief Into a given string, replaces any occurrence of a character with
+ * another character.
+ * @param source To be replaced string.
+ * @param character To be replaced character.
+ * @param replacement Replaced character.
+ * @return Replaced string.
+ */
+std::string replaceCharacter(const std::string& source, int character,
+		int replacement);
 
 ///Macros representing the path to dynamic linked libraries loaded at runtime
 ///Event callbacks library (See Component)

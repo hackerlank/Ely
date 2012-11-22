@@ -59,19 +59,24 @@ class ComponentTemplate;
  * Components are organized into class hierarchies called families.
  * Each component belongs to a family and is derived from a base
  * family component. Any object can have only one component of
- * each family type.
+ * each family type.\n
  * Each component can be updated directly or indirectly through a
- * Panda task.
+ * Panda task.\n
  * Each component can respond to Panda events (stimuli) by registering
- * or unregistering callbacks for them with the global EventHandler.
- * For any event called "<EVENT>" a global std::string variable named
- * "<EVENT>_<COMPONENTTYPE>_<OBJECTID>" (see note) is loaded at runtime
- * from a dynamic linked library (referenced by the macro CALLBACKS_SO)
- * and its value is the name of the callback function (contained in the
- * same library too) for the same event . If this variable doesn't exist
+ * or unregistering callbacks for them with the global EventHandler.\n
+ * Each event has a type, and a callback associated.\n
+ * For any event of type "<EVENTTYPE>" associated with a component of type
+ * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, there exists a callback
+ * named "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>" (see note) which is
+ * loaded at runtime from a dynamic linked library (referenced by the
+ * macro CALLBACKS_SO). If this variable doesn't exist
  * or if any error occurs the default callback (referenced by the macro
- * DEFAULT_CALLBACK) is used.
- * \note In the variable string:
+ * DEFAULT_CALLBACK) is used.\n
+ * The name of the callback for a given "event_type" can be queried with:
+ * \code
+ * 	ComponentTemplate::getEventTypeCallback("event_type");
+ * \endcode
+ * \note In the various substrings composing the name:
  * - hyphens ("-") are replaced with underscores ("_")
  */
 class Component: public TypedWritableReferenceCount
@@ -215,14 +220,6 @@ private:
 	///@{
 	void loadEventCallbacks();
 	void unloadEventCallbacks();
-	/**
-	 * @param source To be replaced string.
-	 * @param character To be replaced character.
-	 * @param replacement Replaced character.
-	 * @return Replaced string.
-	 */
-	std::string replaceCharacter(const std::string& source, int character,
-			int replacement);
 	///@}
 
 	///TypedObject semantics: hardcoded

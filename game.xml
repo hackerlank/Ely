@@ -14,13 +14,13 @@
 			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
 <!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
-				<Param events="forward:stop-forward:fast-forward"/>
-				<Param events="backward:stop-backward:fast-backward"/>
-				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
-				<Param events="roll_right:stop-roll_right:fast-roll_right"/>
-				<Param events="up:stop-up:fast-up"/>
-				<Param events="down:stop-down:fast-down"/>				
-				<Param events="fast:stop-fast"/>				
+				<Param event_types="forward:stop-forward:fast-forward"/>
+				<Param event_types="backward:stop-backward:fast-backward"/>
+				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param event_types="up:stop-up:fast-up"/>
+				<Param event_types="down:stop-down:fast-down"/>				
+				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
 -->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
@@ -33,13 +33,13 @@
 				<Param states="up:down"/>
 				<Param from_to="forward_FromTo_strafe_left"/>
 				<Param from_to="forward_FromTo_strafe_right"/>
-				<Param events="forward:stop-forward:fast-forward"/>
-				<Param events="backward:stop-backward:fast-backward"/>
-				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
-				<Param events="roll_right:stop-roll_right:fast-roll_right"/>
-				<Param events="up:stop-up:fast-up"/>
-				<Param events="down:stop-down:fast-down"/>
-				<Param events="fast:stop-fast"/>							
+				<Param event_types="forward:stop-forward:fast-forward"/>
+				<Param event_types="backward:stop-backward:fast-backward"/>
+				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param event_types="up:stop-up:fast-up"/>
+				<Param event_types="down:stop-down:fast-down"/>
+				<Param event_types="fast:stop-fast"/>							
 			</ComponentTmpl>
 			<ComponentTmpl family="Control" type="Driver" priority="60"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
@@ -54,19 +54,26 @@
 				<Param states="forward_roll_left:forward_roll_right"/>
 				<Param states="jump"/>
 				<Param states="idle"/>
-				<Param events="forward:stop-forward:fast-forward"/>
-				<Param events="backward:stop-backward:fast-backward"/>
-				<Param events="roll_left:stop-roll_left:fast-roll_left"/>
-				<Param events="roll_right:stop-roll_right:fast-roll_right"/>
-				<Param events="jump:stop-jump:fast-jump"/>				
-				<Param events="fast:stop-fast"/>				
+				<Param event_types="forward:stop-forward:fast-forward"/>
+				<Param event_types="backward:stop-backward:fast-backward"/>
+				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param event_types="jump:stop-jump:fast-jump"/>				
+				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="Character">
-			<ComponentTmpl family="Behavior" type="Activity" priority="40"/>
+			<ComponentTmpl family="Behavior" type="Activity" priority="40">
+				<Param event_types="forward:stop-forward:fast-forward"/>
+				<Param event_types="backward:stop-backward:fast-backward"/>
+				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param event_types="jump:stop-jump:fast-jump"/>				
+				<Param event_types="fast:stop-fast"/>				
+			</ComponentTmpl>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/> 
@@ -126,13 +133,13 @@
 				<Param inverted_mouse="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
-				<Param events="w:w-up:shift-w"/>
-				<Param events="s:s-up:shift-s"/>
-				<Param events="a:a-up:shift-a"/>
-				<Param events="d:d-up:shift-d"/>
-				<Param events="r:r-up:shift-r"/>
-				<Param events="f:f-up:shift-f"/>				
-				<Param events="shift:shift-up"/>				
+				<Param events="forward@w:stop-forward@w-up:fast-forward@shift-w"/>
+				<Param events="backward@s:stop-backward@s-up:fast-backward@shift-s"/>
+				<Param events="roll_left@a:fast-roll_left@a-up:fast-roll_left@shift-a"/>
+				<Param events="roll_right@d:stop-roll_right@d-up:fast-roll_right@shift-d"/>
+				<Param events="up@r:stop-up@r-up:fast-up@shift-r"/>
+				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
+				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
 -->
 			<Param parent=""/>
@@ -185,13 +192,13 @@
 				<Param states="up:down"/>
 				<Param from_to="forward_FromTo_strafe_left"/>
 				<Param from_to="forward_FromTo_strafe_right"/>
-				<Param events="arrow_up:arrow_up-up:shift-arrow_up"/>
-				<Param events="arrow_down:arrow_down-up:shift-arrow_down"/>
-				<Param events="arrow_left:arrow_left-up:shift-arrow_left"/>
-				<Param events="arrow_right:arrow_right-up:shift-arrow_right"/>
-				<Param events="page_up:page_up-up:shift-page_up"/>
-				<Param events="page_down:page_down-up:shift-page_down"/>
-				<Param events="shift:shift-up"/>				
+				<Param events="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up"/>
+				<Param events="backward@arrow_down:stop-backward@arrow_down-up:fast-backward@shift-arrow_down"/>
+				<Param events="roll_left@arrow_left:stop-roll_left@arrow_left-up:fast-roll_left@shift-arrow_left"/>
+				<Param events="roll_right@arrow_right:stop-roll_right@arrow_right-up:fast-roll_right@shift-arrow_right"/>
+				<Param events="up@page_up:stop-up@page_up-up:fast-up@shift-page_up"/>
+				<Param events="down@page_down:stop-down@page_down-up:fast-down@shift-page_down"/>
+				<Param events="fast@shift:stop-fast@shift-up"/>				
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
@@ -259,12 +266,12 @@
 				<Param states="forward_roll_left:forward_roll_right"/>
 				<Param states="jump"/>
 				<Param states="idle"/>
-				<Param events="i:i-up:alt-i"/>
-				<Param events="k:k-up:alt-k"/>
-				<Param events="j:j-up:alt-j"/>
-				<Param events="l:l-up:alt-l"/>
-				<Param events="space:space-up:alt-space"/>				
-				<Param events="alt:alt-up"/>				
+				<Param events="forward@i:stop-forward@i-up:fast-forward@alt-i"/>
+				<Param events="backward@k:stop-backward@k-up:fast-backward@alt-k"/>
+				<Param events="roll_left@j:stop-roll_left@j-up:fast-roll_left@alt-j"/>
+				<Param events="roll_right@l:stop-roll_right@l-up:fast-roll_right@alt-l"/>
+				<Param events="jump@space:stop-jump@space-up:fast-jump@alt-space"/>				
+				<Param events="fast@alt:stop-fast@alt-up"/>				
 			</Component>
 			<Component type="Model">
 				<Param model_file="eve/eve"/>

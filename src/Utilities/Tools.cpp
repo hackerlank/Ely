@@ -53,6 +53,25 @@ std::vector<std::string> parseCompoundString(const std::string& compoundString,
 	return substrings;
 }
 
+std::string replaceCharacter(const std::string& source,
+		int character, int replacement)
+{
+	int len = source.size() + 1;
+	char* dest = new char[len];
+	strncpy(dest, source.c_str(), len);
+	//replace hyphens
+	char* pch;
+	pch = strchr(dest, character);
+	while (pch != NULL)
+	{
+		*pch = replacement;
+		pch = strchr(pch + 1, character);
+	}
+	std::string outStr(dest);
+	delete[] dest;
+	return outStr;
+}
+
 void initTypedObjects()
 {
 	Component::init_type();
