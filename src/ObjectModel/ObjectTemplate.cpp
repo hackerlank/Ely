@@ -69,20 +69,20 @@ ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates()
 	return mComponentTemplates;
 }
 
-void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl)
+void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate)componentTmpl)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+		HOLDMUTEX(mMutex)
 
-	if (not componentTmpl)
-	{
-		throw GameException(
-				"ObjectTemplate::addComponentTemplate: NULL component template");
+		if (not componentTmpl)
+		{
+			throw GameException(
+					"ObjectTemplate::addComponentTemplate: NULL component template");
+		}
+		mComponentTemplates.push_back(componentTmpl);
 	}
-	mComponentTemplates.push_back(componentTmpl);
-}
 
-SMARTPTR(ComponentTemplate) ObjectTemplate::getComponentTemplate(
+SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
 		const ComponentType& componentType)
 {
 	//lock (guard) the mutex
@@ -198,6 +198,25 @@ PandaFramework* const ObjectTemplate::pandaFramework() const
 WindowFramework* const ObjectTemplate::windowFramework() const
 {
 	return mWindowFramework;
+}
+
+void ObjectTemplate::addEventType(const std::string& eventType,
+		ComponentType componentType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mEventTypeSetTable[componentType].insert(eventType);
+}
+
+bool ObjectTemplate::isEventType(const std::string& eventType,
+		ComponentType componentType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mEventTypeSetTable[componentType].find(eventType)
+			!= mEventTypeSetTable[componentType].end();
 }
 
 ReMutex& ObjectTemplate::getMutex()

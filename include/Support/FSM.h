@@ -296,6 +296,9 @@ protected:
 
 public:
 	//Public Interface
+
+	typedef StateKey StateType;
+
 	/**
 	 * \brief The State set type.
 	 */

@@ -155,6 +155,21 @@ public:
 	WindowFramework* const windowFramework() const;
 
 	/**
+	 * \brief Adds an event type for a given component type.
+	 * @param eventType The event type.
+	 * @param componentType The component type.
+	 */
+	void addEventType(const std::string& eventType, ComponentType componentType);
+
+	/**
+	 * \brief Checks if a string is an allowed event type for a given component type.
+	 * @param The string to check.
+	 * @param componentType The component type.
+	 * @return True if the string is an event type, false otherwise.
+	 */
+	bool isEventType(const std::string& eventType, ComponentType componentType);
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -173,6 +188,9 @@ private:
 	PandaFramework* mPandaFramework;
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
+
+	///The table of event type sets indexed by component type.
+	std::map<ComponentType, std::set<std::string> > mEventTypeSetTable;
 
 	///The (reentrant) mutex associated with this template.
 	ReMutex mMutex;

@@ -66,15 +66,17 @@ class ComponentTemplate;
  * or unregistering callbacks for them with the global EventHandler.\n
  * Each event has a type, and a callback associated.\n
  * For any event of type "<EVENTTYPE>" associated with a component of type
- * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, there exists a callback
- * named "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>" (see note) which is
- * loaded at runtime from a dynamic linked library (referenced by the
- * macro CALLBACKS_SO). If this variable doesn't exist
- * or if any error occurs the default callback (referenced by the macro
- * DEFAULT_CALLBACK) is used.\n
- * The name of the callback for a given "event_type" can be queried with:
+ * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, there exists a
+ * global std::string variable named "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>"
+ * (see note) which is loaded at runtime from a dynamic linked library
+ * (referenced by the macro CALLBACKS_SO) and whose value is the name of
+ * the callback function (contained in the same library too) for the same event
+ * type.\n
+ * If this variable doesn't exist or if any error occurs the default
+ * callback (referenced by the macro DEFAULT_CALLBACK) is used.\n
+ * To check if a "name" is an allowed event type call:
  * \code
- * 	ComponentTemplate::getEventTypeCallback("event_type");
+ * 	ComponentTemplate::isEventType("name");
  * \endcode
  * \note In the various substrings composing the name:
  * - hyphens ("-") are replaced with underscores ("_")
@@ -208,7 +210,9 @@ private:
 	typedef std::string* PCALLBACKNAME;
 	///@}
 
-	///Table of callbacks keyed by event names.
+	///Table of events keyed by event type names.
+	std::map<std::string, std::string> mEventTable;
+	///Table of callbacks keyed by event type names.
 	std::map<std::string, PCALLBACK> mCallbackTable;
 
 	///Helper flags.

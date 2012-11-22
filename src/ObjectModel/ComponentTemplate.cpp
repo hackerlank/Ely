@@ -111,22 +111,6 @@ WindowFramework* const ComponentTemplate::windowFramework() const
 	return mWindowFramework;
 }
 
-std::string ComponentTemplate::getEventTypeCallback(
-		const std::string& eventType)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	std::string result("");
-	std::map<std::string, std::string>::iterator iter =
-			mEventTypeCallbacks.find(eventType);
-	if (iter != mEventTypeCallbacks.end())
-	{
-		result = iter->second;
-	}
-	return result;
-}
-
 ReMutex& ComponentTemplate::getMutex()
 {
 	return mMutex;
