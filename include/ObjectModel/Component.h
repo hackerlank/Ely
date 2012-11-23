@@ -79,7 +79,13 @@ class ComponentTemplate;
  * 	ComponentTemplate::isEventType("name");
  * \endcode
  * \note In the various substrings composing the name:
- * - hyphens ("-") are replaced with underscores ("_")
+ * - hyphens ("-") are replaced with underscores ("_")\n
+ *
+ * XML Param(s):
+ * - "event_types" 		|multiple|no default
+ * - "events"			|multiple|no default
+ * \note "event_types" parameters are specified into the object
+ * template definition.
  */
 class Component: public TypedWritableReferenceCount
 {
@@ -190,7 +196,11 @@ protected:
 	 * Functions registerEventCallbacks/unregisterEventCallbacks can
 	 * be used, after the component has been added to object, to
 	 * add/remove callbacks to/from the global EventHandler.\n
-	 * All these functions can be called multiple time in a safe way.
+	 * All these functions can be called multiple time in a safe way.\n
+	 * \note Because component's events are shared by all object of the same type,
+	 * and because their types are stored into the object template, these
+	 * functions should be called only after the component's owner object
+	 * has been set, for example into onAddToObjectSetup component method.
 	 */
 	///@{
 	void setupEvents();

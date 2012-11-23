@@ -200,23 +200,59 @@ WindowFramework* const ObjectTemplate::windowFramework() const
 	return mWindowFramework;
 }
 
-void ObjectTemplate::addEventType(const std::string& eventType,
-		ComponentType componentType)
+void ObjectTemplate::addComponentParameter(const std::string& parameterName,
+		const std::string& parameterValue, ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mEventTypeSetTable[componentType].insert(eventType);
+	mComponentParameterTables[compType].insert(
+			std::pair<std::string, std::string>(parameterName, parameterValue));
 }
 
-bool ObjectTemplate::isEventType(const std::string& eventType,
-		ComponentType componentType)
+bool ObjectTemplate::isComponentParameter(const std::string& name,
+		const std::string& value, ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mEventTypeSetTable[componentType].find(eventType)
-			!= mEventTypeSetTable[componentType].end();
+	bool result;
+	//
+	ParameterTableIter iter;
+	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	iterRange = mComponentParameterTables[compType].equal_range(name);
+	if (iterRange.first != iterRange.second)
+	{
+		result = (iterRange.second
+				!= find(iterRange.first, iterRange.second, value));
+	}
+	else
+	{
+		result = false;
+	}
+	//
+	return result;
+}
+
+std::list<std::string> ObjectTemplate::componentParameterList(
+		const std::string& paramName, ComponentType compType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	std::list<std::string> strList;
+	ParameterTableIter iter;
+	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	iterRange = mComponentParameterTables[compType].equal_range(paramName);
+	if (iterRange.first != iterRange.second)
+	{
+		for (iter = iterRange.first; iter != iterRange.second; ++iter)
+		{
+			strList.push_back(iter->second);
+		}
+	}
+	//
+	return strList;
 }
 
 ReMutex& ObjectTemplate::getMutex()

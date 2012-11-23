@@ -66,8 +66,6 @@ bool Listener::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
-	//setup event callbacks if any
-	setupEvents();
 	//
 	return result;
 }
@@ -84,6 +82,8 @@ void Listener::onAddToObjectSetup()
 	}
 	//set the root of the scene
 	mSceneRoot = mTmpl->windowFramework()->get_render();
+	//setup event callbacks if any
+	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
 }

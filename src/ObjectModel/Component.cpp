@@ -211,16 +211,18 @@ void Component::setupEvents()
 				if (not iterPair->empty())
 				{
 					//get event type and event
-					std::vector<std::string> typeEvent = parseCompoundString(
-							*iterPair, '@');
-					//an empty event type or an empty event are ignored
-					if ((not typeEvent[0].empty())
-							and (not typeEvent[1].empty()))
+					std::vector<std::string> typeEventPair =
+							parseCompoundString(*iterPair, '@');
+					//ignore a not existent event type (== typeEventPair[0])
+					//or a not existent event (== typeEventPair[1])
+					if (mOwnerObject->objectTmpl()->isComponentParameter(
+							"event_types", typeEventPair[0], componentType())
+							and (not typeEventPair[1].empty()))
 					{
 						//insert event keyed by eventType;
-						mEventTable[typeEvent[0]] = typeEvent[1];
+						mEventTable[typeEventPair[0]] = typeEventPair[1];
 						//insert the NULL callback keyed by eventType;
-						mCallbackTable[typeEvent[0]] = NULL;
+						mCallbackTable[typeEventPair[0]] = NULL;
 					}
 				}
 			}
@@ -246,15 +248,10 @@ void Component::registerEventCallbacks()
 	std::map<std::string, PCALLBACK>::iterator iter;
 	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
 	{
-		//ignore any not existent event type (== iter->first)
-		if (mOwnerObject->objectTmpl()->isEventType(iter->first,
-				componentType()))
-		{
-			//event = mEventTable[iter->first], iter->second==handler
-			mTmpl->pandaFramework()->define_key(mEventTable[iter->first],
-					iter->first + "@" + mEventTable[iter->first], iter->second,
-					(void*) this);
-		}
+		//event = mEventTable[iter->first], iter->second==handler
+		mTmpl->pandaFramework()->define_key(mEventTable[iter->first],
+				iter->first + "@" + mEventTable[iter->first], iter->second,
+				(void*) this);
 	}
 	//handlers registered
 	mCallbacksRegistered = true;

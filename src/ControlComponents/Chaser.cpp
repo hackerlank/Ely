@@ -216,8 +216,6 @@ bool Chaser::initialize()
 			mTmpl->parameter(std::string("abs_min_height")).c_str());
 	//friction' settings
 	mFriction = (float) atof(mTmpl->parameter(std::string("friction")).c_str());
-	//setup event callbacks if any
-	setupEvents();
 	//
 	return result;
 }
@@ -261,6 +259,8 @@ void Chaser::onAddToObjectSetup()
 			mReferenceNodePath = mChasedNodePath.get_parent();
 		}
 	}
+	//setup event callbacks if any
+	setupEvents();
 	//enable the component
 	if (mEnabled)
 	{

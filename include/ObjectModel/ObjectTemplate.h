@@ -27,7 +27,7 @@
 #include <string>
 #include <vector>
 #include <list>
-#include <set>
+#include <utility>
 #include <algorithm>
 #include <utility>
 #include <pandaFramework.h>
@@ -104,7 +104,7 @@ public:
 	 * @param componentType The component type.
 	 * @return The component template, NULL if it doesn't exist.
 	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType& componentType);
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType&componentType);
 
 	/**
 	 * \name Parameters management.
@@ -155,19 +155,36 @@ public:
 	WindowFramework* const windowFramework() const;
 
 	/**
-	 * \brief Adds an event type for a given component type.
-	 * @param eventType The event type.
-	 * @param componentType The component type.
+	 * \brief Adds a common attribute for a given component type of
+	 * this object.
+	 * @param parameterName The parameter name.
+	 * @param parameterValue The parameter value.
+	 * @param componentType The component type the parameter is related to.
 	 */
-	void addEventType(const std::string& eventType, ComponentType componentType);
+	void addComponentParameter(const std::string& parameterName,
+			const std::string& parameterValue, ComponentType compType);
 
 	/**
-	 * \brief Checks if a string is an allowed event type for a given component type.
-	 * @param The string to check.
+	 * \brief Checks if a name/value pair is an allowed parameter/value
+	 * for a given component type of this object.
+	 * @param name The name to check.
+	 * @param value The value to check.
 	 * @param componentType The component type.
-	 * @return True if the string is an event type, false otherwise.
+	 * @return True if the name/value pair match an allowed parameter/value
+	 * for a given component, false otherwise.
 	 */
-	bool isEventType(const std::string& eventType, ComponentType componentType);
+	bool isComponentParameter(const std::string& name, const std::string& value,
+			ComponentType compType);
+
+	/**
+	 * \brief Gets the parameter multi-values associated with the parameter
+	 * associated to the component type of the object.
+	 * @param paramName The name of the parameter.
+	 * @param componentType The component type.
+	 * @return The value list  of the parameter, empty list if none exists.
+	 */
+	std::list<std::string> componentParameterList(const std::string& paramName,
+			ComponentType compType);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -189,8 +206,10 @@ private:
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 
-	///The table of event type sets indexed by component type.
-	std::map<ComponentType, std::set<std::string> > mEventTypeSetTable;
+	///The table of ParameterTables indexed by component type.\n
+	///These represent the allowed common attributes shared by each
+	///component of a given type, belonging to any object of a given type.
+	std::map<ComponentType, ParameterTable> mComponentParameterTables;
 
 	///The (reentrant) mutex associated with this template.
 	ReMutex mMutex;
@@ -228,7 +247,7 @@ struct idIsEqualTo
 	{
 	}
 	ComponentType mComponentType;
-	bool operator()(const SMARTPTR(ComponentTemplate) componentTmpl)
+	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
 	{
 		return componentTmpl.p()->componentType() == mComponentType;
 	}

@@ -43,19 +43,20 @@ class ActivityTemplate;
  *
  * It is composed of a embedded fsm (i.e. FSM<std::string>) representing
  * the object game states (i.e. strings).\n
+ * All objects of the same type share the same activity component's states.
  * A state transition can be request by delegating its embedded FSM
  * interface functions, like in this sample code:
  * \code
  * 	((fsm&)activity).request("stateC", valueList);
  * \endcode
- * Given an object with id <OBJECTID>, for any state called <STATE> and
+ * Given an object with type <OBJECTYPE>, for any state called <STATE> and
  * three "transition" functions can be defined with these signatures:
- * - <tt>void Enter_<STATE>_<OBJECTID>(fsm*, Activity& activity, const ValueList& valueList);</tt>
- * - <tt>void Exit_<STATE>_<OBJECTID>(fsm*, Activity& activity);</tt>
- * - <tt>ValueList Filter_<STATE>_<OBJECTID>(fsm*, Activity& activity, const std::string& state, const ValueList& valueList);</tt>
+ * - <tt>void Enter_<STATE>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);</tt>
+ * - <tt>void Exit_<STATE>_<OBJECTYPE>(fsm*, Activity& activity);</tt>
+ * - <tt>ValueList Filter_<STATE>_<OBJECTYPE>(fsm*, Activity& activity, const std::string& state, const ValueList& valueList);</tt>
  * Furthermore for a pair of state <STATEA>, <STATEB> a "transition" function
  * can be defined with this signature:
- * - <tt> void <STATEA>_FromTo_<STATEB>_<OBJECTID>(fsm*, Activity& activity, const ValueList& valueList);</tt>
+ * - <tt> void <STATEA>_FromTo_<STATEB>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);</tt>
  *
  * All these routines are loaded at runtime from a dynamic linked library
  * (referenced by the macro TRANSITIONS_SO).\n
@@ -66,6 +67,8 @@ class ActivityTemplate;
  * XML Param(s):
  * - "states"  			|multiple|no default
  * - "from_to"			|multiple|no default
+ * \note All these parameters are specified into the object template
+ * definition.
  *
  * \note given stateA and stateB the value of a parameter "from_to" would be
  * "stateA_FromTo_stateB".
@@ -109,6 +112,15 @@ private:
 	typedef ValueList (*PFILTER)(fsm*, Activity&, const std::string&,
 			const ValueList&);
 	typedef void (*PFROMTO)(fsm*, Activity&, const ValueList&);
+	/**
+	 * \brief Helper to setup this activity component FSM.
+	 * \note Because activity's states and transition functions are
+	 * shared by all object of the same type, and because they are
+	 * stored into the object template, this function should be called
+	 * only after the component's owner object has been set, for
+	 * example into onAddToObjectSetup component method.
+	 */
+	void setupFSM();
 	///@}
 
 	///Helper flag.

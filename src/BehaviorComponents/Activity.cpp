@@ -60,10 +60,17 @@ bool Activity::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//
+	return result;
+}
+
+void Activity::setupFSM()
+{
 	std::list<std::string>::iterator iter;
 	//setup states
-	std::list<std::string> stateList = mTmpl->parameterList(
-			std::string("states"));
+	std::list<std::string> stateList =
+			mOwnerObject->objectTmpl()->componentParameterList(
+					std::string("states"), componentType());
 	for (iter = stateList.begin(); iter != stateList.end(); ++iter)
 	{
 		//any "states" string is a "compound" one, i.e. could have the form:
@@ -81,15 +88,17 @@ bool Activity::initialize()
 		}
 	}
 	//setup FromTo transition function set
-	std::list<std::string> fromToList = mTmpl->parameterList(
-			std::string("from_to"));
+	std::list<std::string> fromToList =
+			mOwnerObject->objectTmpl()->componentParameterList(
+					std::string("from_to"), componentType());
 	for (iter = fromToList.begin(); iter != fromToList.end(); ++iter)
 	{
 		//any "from_to" string is a "compound" one, i.e. could have the form:
 		// "from_to1:from_to2:...:from_toN"
 		std::vector<std::string> fromTos = parseCompoundString(*iter, ':');
 		std::vector<std::string>::const_iterator iterFromTo;
-		for (iterFromTo = fromTos.begin(); iterFromTo != fromTos.end(); ++iterFromTo)
+		for (iterFromTo = fromTos.begin(); iterFromTo != fromTos.end();
+				++iterFromTo)
 		{
 			//an empty from_to is ignored
 			if (not iterFromTo->empty())
@@ -98,20 +107,20 @@ bool Activity::initialize()
 			}
 		}
 	}
-	//setup event callbacks if any
-	setupEvents();
-	//
-	return result;
 }
-
 void Activity::onAddToObjectSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//setup the FSM
+	setupFSM();
+
 	//load transitions library
 	loadTransitionFunctions();
 
+	//setup event callbacks if any
+	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
 }
@@ -150,10 +159,11 @@ void Activity::loadTransitionFunctions()
 		const char* dlsymError;
 		std::string functionName;
 
-		//load enter function (if any): Enter_<STATE>_<OBJECTID>
+		//load enter function (if any): Enter_<STATE>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = std::string("Enter") + "_" + (*iter) + "_" + objectId;
+		functionName = std::string("Enter") + "_" + (*iter) + "_"
+				+ mOwnerObject->objectTmpl()->name();
 		PENTER pEnterFunction = (PENTER) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
@@ -164,10 +174,11 @@ void Activity::loadTransitionFunctions()
 			pEnterFunction = NULL;
 		}
 
-		//load exit function (if any): Exit_<STATE>_<OBJECTID>
+		//load exit function (if any): Exit_<STATE>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = std::string("Exit") + "_" + (*iter) + "_" + objectId;
+		functionName = std::string("Exit") + "_" + (*iter) + "_"
+				+ mOwnerObject->objectTmpl()->name();
 		PEXIT pExitFunction = (PEXIT) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
@@ -178,10 +189,11 @@ void Activity::loadTransitionFunctions()
 			pExitFunction = NULL;
 		}
 
-		//load filter function (if any): Filter_<STATE>_<OBJECTID>
+		//load filter function (if any): Filter_<STATE>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = std::string("Filter") + "_" + (*iter) + "_" + objectId;
+		functionName = std::string("Filter") + "_" + (*iter) + "_"
+				+ mOwnerObject->objectTmpl()->name();
 		PFILTER pFilterFunction = (PFILTER) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
@@ -219,10 +231,10 @@ void Activity::loadTransitionFunctions()
 		const char* dlsymError;
 		std::string functionName;
 
-		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTID>
+		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = (*iter) + "_" + objectId;
+		functionName = (*iter) + "_" + mOwnerObject->objectTmpl()->name();
 		PFROMTO pFromToFunction = (PFROMTO) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();

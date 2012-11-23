@@ -236,8 +236,6 @@ bool CharacterController::initialize()
 	mJumpKey = (
 			mTmpl->parameter(std::string("jump")) == std::string("enabled") ?
 					true : false);
-	//setup event callbacks if any
-	setupEvents();
 	//
 	return result;
 }
@@ -280,6 +278,8 @@ void CharacterController::onAddToObjectSetup()
 
 	//Add to the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
+	//setup event callbacks if any
+	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
 }

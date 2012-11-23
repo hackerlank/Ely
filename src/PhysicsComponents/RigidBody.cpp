@@ -266,8 +266,6 @@ bool RigidBody::initialize()
 			mTmpl->parameter(std::string("ccd_swept_sphere_radius")).c_str());
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
 			mCcdEnabled = true : mCcdEnabled = false;
-	//setup event callbacks if any
-	setupEvents();
 	//
 	return result;
 }
@@ -317,6 +315,8 @@ void RigidBody::onAddToObjectSetup()
 
 	//set the object node path as this rigid body's one
 	mOwnerObject->setNodePath(mNodePath);
+	//setup event callbacks if any
+	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
 }

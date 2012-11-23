@@ -181,8 +181,6 @@ bool Terrain::initialize()
 		mTerrain->get_root().set_texture(TextureStage::get_default(),
 				textureImage, 1);
 	}
-	//setup event callbacks if any
-	setupEvents();
 	//
 	return result;
 }
@@ -211,6 +209,8 @@ void Terrain::onAddToObjectSetup()
 	//Add to the scene manager update if not brute force
 	GameSceneManager::GetSingletonPtr()->addToSceneUpdate(this);
 
+	//setup event callbacks if any
+	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
 }
