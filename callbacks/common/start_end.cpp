@@ -25,10 +25,12 @@
 
 void callbacksInit()
 {
-	PRINT("callbacksInit executed ");
+	PRINT("Executing callbacksInit");
+	callAllInits();
 }
 
 void callbacksEnd()
 {
-	PRINT("callbacksEnd executed ");
+	PRINT("Executing callbacksEnd");
+	callAllEnds();
 }

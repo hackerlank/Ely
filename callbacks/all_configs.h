@@ -31,7 +31,10 @@
 #include "Utilities/Tools.h"
 
 __attribute__((constructor)) void callbacksInit();
+void callAllInits();
+
 __attribute__((destructor)) void callbacksEnd();
+void callAllEnds();
 
 //generic typedefs
 typedef EventHandler::EventCallbackFunction CALLBACK;

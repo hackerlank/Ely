@@ -25,10 +25,10 @@
 
 void transitionsInit()
 {
-	PRINT("transitionsInit executed ");
+	PRINT("Executing transitionsInit");
 }
 
 void transitionsEnd()
 {
-	PRINT("transitionsEnd executed ");
+	PRINT("Executing transitionsEnd");
 }

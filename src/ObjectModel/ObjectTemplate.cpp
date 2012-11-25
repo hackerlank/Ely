@@ -206,8 +206,15 @@ void ObjectTemplate::addComponentParameter(const std::string& parameterName,
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mComponentParameterTables[compType].insert(
-			std::pair<std::string, std::string>(parameterName, parameterValue));
+	//any parameter value is a "compound" one, i.e. could have the form:
+	// "value1:value2:...:valueN"
+	std::vector<std::string> values = parseCompoundString(parameterValue, ':');
+	std::vector<std::string>::const_iterator iterValue;
+	for (iterValue = values.begin(); iterValue != values.end(); ++iterValue)
+	{
+		mComponentParameterTables[compType].insert(
+				ParameterTable::value_type(parameterName, *iterValue));
+	}
 }
 
 bool ObjectTemplate::isComponentParameter(const std::string& name,
@@ -224,7 +231,8 @@ bool ObjectTemplate::isComponentParameter(const std::string& name,
 	if (iterRange.first != iterRange.second)
 	{
 		result = (iterRange.second
-				!= find(iterRange.first, iterRange.second, value));
+				!= find(iterRange.first, iterRange.second,
+						ParameterTable::value_type(name, value)));
 	}
 	else
 	{

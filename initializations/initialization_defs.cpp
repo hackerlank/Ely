@@ -170,10 +170,9 @@ void NPC1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTabl
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//NPC1
-	//play animation
-//	SMARTPTR(Model) npc1Model = DCAST(Model, object->getComponent(
-//					ComponentFamilyType("Scene")));
-//	npc1Model->animations().loop("eve/eve-tireroll", false);
+	fsm& npc1FSM = (fsm&) (*DCAST(Activity, object->getComponent(
+			ComponentFamilyType("Behavior"))));
+	npc1FSM.request("idle");
 	//play sound
 	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));

@@ -24,6 +24,28 @@
 #include "callback_defs.h"
 #include "Utilities/ComponentSuite.h"
 
+//common typedefs
+typedef std::pair<std::string, std::string> EventTypeState;
+typedef std::string NextState;
+typedef std::pair<EventTypeState, NextState> TransitionTableItem;
+typedef std::map<EventTypeState, NextState> TransitionTable;
+
+//inits - ends
+//Character + Activity
+static void activityCharacterInit();
+static void activityCharacterEnd();
+
+void callAllInits()
+{
+	activityCharacterInit();
+	//
+}
+void callAllEnds()
+{
+	activityCharacterEnd();
+	//
+}
+
 ///get key bare event: from key, key-up, shift-key returns key and
 ///with *isEnabled false on key-up and true otherwise
 static std::string getBareEvent(const std::string& eventName,
@@ -127,7 +149,7 @@ static const char* camera_keys[] =
 		"r", //up
 		"f", //down
 		};
-void driveCamera(const Event* event, void* data)
+void driverCamera(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)driver = (Driver*) data;
@@ -146,7 +168,7 @@ void driveCamera(const Event* event, void* data)
 	setDriverCommand(driver, bareEvent, enable, camera_keys);
 }
 
-///Actor1 + Activity related
+///Actor + Activity related
 static const char* Actor1_keys[] =
 { "arrow_up", //forward
 		"arrow_down", //backward
@@ -157,7 +179,7 @@ static const char* Actor1_keys[] =
 		"page_up", //up
 		"page_down", //down
 		};
-void stateActor1(const Event * event, void * data)
+void activityActor(const Event * event, void * data)
 {
 	//get data
 	SMARTPTR(Activity)activity = (Activity*) data;
@@ -213,7 +235,7 @@ void stateActor1(const Event * event, void * data)
 	}
 	else
 	{
-		PRINTERR("stateActor1: Event not defined for state transition: " << event->get_name());
+		PRINTERR("activityActor: Event not defined for state transition: " << event->get_name());
 	}
 	//call the Driver event handler to move actor
 	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
@@ -228,139 +250,139 @@ void stateActor1(const Event * event, void * data)
 	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
 }
 
-///NPC1 + Activity related
-static std::string f("i");
-static std::string f_up("i-up");
-static std::string b("k");
-static std::string b_up("k-up");
-static std::string r("l");
-static std::string r_up("l-up");
-static std::string l("j");
-static std::string l_up("j-up");
+///Character + Activity related
+///EventType(s)
+//"forward:stop-forward:fast-forward"
+//"backward:stop-backward:fast-backward"
+//"roll_left:stop-roll_left:fast-roll_left"
+//"roll_right:stop-roll_right:fast-roll_right"
+//"jump:stop-jump:fast-jump"
+//"fast:stop-fast"
+///State(s)
+//"forward:backward"
+//"roll_left:roll_right"
+//"forward_roll_left:forward_roll_right"
+//"jump"
+//"idle"
 
-void stateNPC1(const Event * event, void * data)
+//Transition table: <eventType, currentState> -> nextState
+static TransitionTable activityCharacterTransitionTable;
+static void activityCharacterInit()
+{
+	activityCharacterTransitionTable.clear();
+	//insert transitions
+	//row 1
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("forward", "idle"),
+					NextState("forward")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("forward", "backward"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("forward", "roll_left"),
+					NextState("forward_roll_left")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("forward", "roll_right"),
+					NextState("forward_roll_right")));
+	//row 2
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("stop-forward", "forward"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(
+					EventTypeState("stop-forward", "forward_roll_left"),
+					NextState("roll_left")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(
+					EventTypeState("stop-forward", "forward_roll_right"),
+					NextState("roll_right")));
+	//row 3
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("backward", "idle"),
+					NextState("backward")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("backward", "forward"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("backward", "roll_left"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("backward", "roll_right"),
+					NextState("idle")));
+	//row 4
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("stop-backward", "backward"),
+					NextState("idle")));
+	//row 5
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("roll_right", "idle"),
+					NextState("roll_right")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("roll_right", "forward"),
+					NextState("forward_roll_right")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("roll_right", "roll_left"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(
+					EventTypeState("roll_right", "forward_roll_left"),
+					NextState("forward")));
+	//row 6
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("stop-roll_right", "roll_right"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(
+					EventTypeState("stop-roll_right", "forward_roll_right"),
+					NextState("forward")));
+	//row 7
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("roll_left", "idle"),
+					NextState("roll_left")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("roll_left", "forward"),
+					NextState("forward_roll_left")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("roll_left", "roll_right"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(
+					EventTypeState("roll_left", "forward_roll_right"),
+					NextState("forward")));
+	//row 8
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(EventTypeState("stop-roll_left", "roll_left"),
+					NextState("idle")));
+	activityCharacterTransitionTable.insert(
+			TransitionTableItem(
+					EventTypeState("stop-roll_left", "forward_roll_left"),
+					NextState("forward")));
+}
+static void activityCharacterEnd()
+{
+}
+
+void activityCharacter(const Event * event, void * data)
 {
 	//get data
 	SMARTPTR(Activity)activity = (Activity*) data;
-	//get event
-	std::string eventName = event->get_name();
+	//get event type
+	std::string eventType = activity->getEventType(event->get_name());
 	//get fsm
-	fsm& npc1FSM = (fsm&) (*activity);
-	//get pbject
-	SMARTPTR(Object) npc1 = activity->getOwnerObject();
-	//get character controller
-	SMARTPTR(CharacterController) npc1CharCtrl =
-	DCAST (CharacterController, npc1->getComponent("Physics"));
+	fsm& characterFSM = (fsm&) (*activity);
 	//set transitions
-	std::string currentState = npc1FSM.getCurrentOrNextState();
-	///TODO
-	if (eventName == f)
+	std::string currentState = characterFSM.getCurrentOrNextState();
+	//
+	std::string nextState =
+			activityCharacterTransitionTable[EventTypeState(eventType, currentState)];
+	//
+	if (not nextState.empty())
 	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == f_up)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == b)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == b_up)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == r)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == r_up)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == l)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
-	}
-	else if (eventName == l_up)
-	{
-		if ( currentState == "idle")
-		{
-			npc1FSM.request("forward");
-		}
-		else if (currentState == "backward")
-		{
-			npc1FSM.request("idle");
-		}
+			characterFSM.request(nextState);
 	}
 	else
 	{
-		PRINTERR("stateNPC1: Event not defined for state transition: " << event->get_name());
+		PRINTERR("activityCharacter: Transition not defined for event type '" <<
+				eventType << "' and state '" << currentState << "'");
 	}
-//	//check if alt or alt-up key pressed
-//	if ((eventName == "alt") or (eventName == "alt-up"))
-//	{
-//		if (eventName.find("-up", 0) == string::npos)
-//		{
-//			//fast speeds
-//			characterDrv->setLinearSpeed(5.0*characterDrv->getLinearSpeed());
-//			characterDrv->setAngularSpeed(5.0*characterDrv->getAngularSpeed());
-//		}
-//		else
-//		{
-//			//normal speeds
-//			characterDrv->setLinearSpeed(0.2*characterDrv->getLinearSpeed());
-//			characterDrv->setAngularSpeed(0.2*characterDrv->getAngularSpeed());
-//		}
-//		return;
-//	}
 }

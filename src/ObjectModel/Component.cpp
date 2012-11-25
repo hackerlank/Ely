@@ -221,6 +221,8 @@ void Component::setupEvents()
 					{
 						//insert event keyed by eventType;
 						mEventTable[typeEventPair[0]] = typeEventPair[1];
+						//insert eventType keyed by event;
+						mEventTypeTable[typeEventPair[1]] = typeEventPair[0];
 						//insert the NULL callback keyed by eventType;
 						mCallbackTable[typeEventPair[0]] = NULL;
 					}
@@ -271,6 +273,19 @@ void Component::unregisterEventCallbacks()
 			(void*) this);
 	//handlers unregistered
 	mCallbacksRegistered = false;
+}
+
+std::string Component::getEventType(const std::string& event)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	std::string result("");
+	if (mEventTypeTable.find(event) != mEventTypeTable.end())
+	{
+		result = mEventTypeTable[event];
+	}
+	return result;
 }
 
 ReMutex& Component::getMutex()

@@ -25,10 +25,10 @@
 
 void initializationsInit()
 {
-	PRINT("initializationsInit executed ");
+	PRINT("Executing initializationsInit");
 }
 
 void initializationsEnd()
 {
-	PRINT("initializationsEnd executed ");
+	PRINT("Executing initializationsEnd");
 }

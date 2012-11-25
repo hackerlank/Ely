@@ -1,7 +1,9 @@
 <?xml version="1.0"?>
 <Game>
 	<!-- ------------------------------------------------ -->
+	<!-- ------------------------------------------------ -->
 	<!-- 		Object Templates Definitions              -->
+	<!-- ------------------------------------------------ -->
 	<!-- ------------------------------------------------ -->
 	<ObjectTmplSet>
 		<!-- template for wrapper around predefined nodepath - Mandatory -->
@@ -49,17 +51,9 @@
 
 		<ObjectTmpl type="HUD">
 			<ComponentTmpl family="Behavior" type="Activity" priority="40">
-				<Param states="forward:backward"/>
-				<Param states="roll_left:roll_right"/>
-				<Param states="forward_roll_left:forward_roll_right"/>
-				<Param states="jump"/>
 				<Param states="idle"/>
-				<Param event_types="forward:stop-forward:fast-forward"/>
-				<Param event_types="backward:stop-backward:fast-backward"/>
-				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
-				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
-				<Param event_types="jump:stop-jump:fast-jump"/>				
-				<Param event_types="fast:stop-fast"/>				
+				<Param states="fire"/>
+				<Param event_types="fire:stop-fire"/>
 			</ComponentTmpl>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
@@ -67,6 +61,11 @@
 
 		<ObjectTmpl type="Character">
 			<ComponentTmpl family="Behavior" type="Activity" priority="40">
+				<Param states="forward:backward"/>
+				<Param states="roll_left:roll_right"/>
+				<Param states="forward_roll_left:forward_roll_right"/>
+				<Param states="jump"/>
+				<Param states="idle"/>
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
 				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
@@ -103,8 +102,10 @@
 	</ObjectTmplSet>
 
 	<!-- ------------------------------------------------ -->
+	<!-- ------------------------------------------------ -->
 	<!-- 		Objects and Scene Creation                -->
 	<!-- ------------------------------------------------ -->
+	<!-- ------------------------------------------------ -->	
 	<ObjectSet>
 	
 		<Object type="Camera" id="camera" priority="90">
@@ -120,13 +121,13 @@
 				<Param abs_lookat_distance="50.0"/>
 				<Param abs_min_distance="10.0"/>
 				<Param abs_min_height="10.0"/>
-				<Param friction="10.0"/>
+				<Param friction="1.0"/>
 			</Component>
 <!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param speed="10.0"/>
-				<Param fast_factor="50.0"/>
+				<Param fast_factor="20.0"/>
 				<Param roll_left=""/>
 				<Param roll_right=""/>
 				<Param inverted_keyboard="true"/>
@@ -135,7 +136,7 @@
 				<Param mouse_enabled_p="true"/>
 				<Param events="forward@w:stop-forward@w-up:fast-forward@shift-w"/>
 				<Param events="backward@s:stop-backward@s-up:fast-backward@shift-s"/>
-				<Param events="roll_left@a:fast-roll_left@a-up:fast-roll_left@shift-a"/>
+				<Param events="roll_left@a:stop-roll_left@a-up:fast-roll_left@shift-a"/>
 				<Param events="roll_right@d:stop-roll_right@d-up:fast-roll_right@shift-d"/>
 				<Param events="up@r:stop-up@r-up:fast-up@shift-r"/>
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
@@ -145,7 +146,7 @@
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="-400.0"/>
-			<Param pos_z="100.0"/>
+			<Param pos_z="600.0"/>
 		</Object>
 
 		<Object type="InstancedActor" id="InstancedTeapot1">
@@ -187,11 +188,6 @@
 
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity">
-				<Param states="forward:backward"/>
-				<Param states="strafe_left:strafe_right"/>
-				<Param states="up:down"/>
-				<Param from_to="forward_FromTo_strafe_left"/>
-				<Param from_to="forward_FromTo_strafe_right"/>
 				<Param events="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up"/>
 				<Param events="backward@arrow_down:stop-backward@arrow_down-up:fast-backward@shift-arrow_down"/>
 				<Param events="roll_left@arrow_left:stop-roll_left@arrow_left-up:fast-roll_left@shift-arrow_left"/>
@@ -239,7 +235,7 @@
 
 		<Object type="HUD" id="hud1">
 			<Component type="Activity">
-				<Param states="idle"/>
+				<Param events="fire@mouse1:stop-fire@mouse1-up"/>
 			</Component>
 			<Component type="Model">
 				<Param model_file="misc/lilsmiley"/>
@@ -261,11 +257,6 @@
 
 		<Object type="Character" id="NPC1"  priority="100">
 			<Component type="Activity">
-				<Param states="forward:backward"/>
-				<Param states="roll_left:roll_right"/>
-				<Param states="forward_roll_left:forward_roll_right"/>
-				<Param states="jump"/>
-				<Param states="idle"/>
 				<Param events="forward@i:stop-forward@i-up:fast-forward@alt-i"/>
 				<Param events="backward@k:stop-backward@k-up:fast-backward@alt-k"/>
 				<Param events="roll_left@j:stop-roll_left@j-up:fast-roll_left@alt-j"/>
@@ -283,7 +274,7 @@
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
-				<Param linear_speed="150.0"/>
+				<Param linear_speed="70.0"/>
 			</Component> 
 			<Component type="Sound3d">
 				<Param sound_files="models/audio/sfx/GUI_click.wav"/>
@@ -291,13 +282,12 @@
 			<Param parent="render"/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="50.0"/>
-			<Param pos_z="100.0"/>
+			<Param pos_z="400.0"/>
 			<Param rot_h="0.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
 
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
@@ -322,8 +312,8 @@
 			</Component> 
 			<Param parent="render"/>
 		</Object>
--->
 
+<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
 				<Param from_file="false"/>
@@ -347,6 +337,7 @@
 			<Param parent="render"/>
 			<Param rot_p="-90.0"/>
 		</Object>
+-->
 	
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
 		<Object type="Render" id="render" priority="1000">

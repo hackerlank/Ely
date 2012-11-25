@@ -169,6 +169,13 @@ public:
 	void setComponentId(const ComponentId& componentId);
 
 	/**
+	 * \brief Return the type of an event.
+	 * @param event The event.
+	 * @return The type of the event.
+	 */
+	std::string getEventType(const std::string& event);
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -220,8 +227,10 @@ private:
 	typedef std::string* PCALLBACKNAME;
 	///@}
 
-	///Table of events keyed by event type names.
+	///Table of events keyed by event types.
 	std::map<std::string, std::string> mEventTable;
+	///Table of event types keyed by events.
+	std::map<std::string, std::string> mEventTypeTable;
 	///Table of callbacks keyed by event type names.
 	std::map<std::string, PCALLBACK> mCallbackTable;
 

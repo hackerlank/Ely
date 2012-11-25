@@ -256,6 +256,24 @@ void GameManager::createGameWorldWithoutParamTables(const std::string& gameWorld
 			}
 			PRINT(
 					"    Component of family '" << compFamilyTAG << "' and type '" << compTypeTAG << "'");
+			//cycle through the ComponentTmpl Param(s)' to be initialized
+			tinyxml2::XMLElement* paramTAG;
+			for (paramTAG = componentTmplTAG->FirstChildElement("Param");
+					paramTAG != NULL;
+					paramTAG = paramTAG->NextSiblingElement("Param"))
+			{
+				const tinyxml2::XMLAttribute* attributeTAG =
+						paramTAG->FirstAttribute();
+				if (not attributeTAG)
+				{
+					continue;
+				}
+				PRINT(
+						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
+				//add attribute for this component type of this object.
+				objTmplPtr->addComponentParameter(attributeTAG->Name(),
+						attributeTAG->Value(), compTypeTAG);
+			}
 			//... add all component templates
 			SMARTPTR(ComponentTemplate)compTmpl =
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
@@ -503,6 +521,24 @@ void GameManager::createGameWorld(
 			}
 			PRINT(
 					"    Component of family '" << compFamilyTAG << "' and type '" << compTypeTAG << "'");
+			//cycle through the ComponentTmpl Param(s)' to be initialized
+			tinyxml2::XMLElement* paramTAG;
+			for (paramTAG = componentTmplTAG->FirstChildElement("Param");
+					paramTAG != NULL;
+					paramTAG = paramTAG->NextSiblingElement("Param"))
+			{
+				const tinyxml2::XMLAttribute* attributeTAG =
+						paramTAG->FirstAttribute();
+				if (not attributeTAG)
+				{
+					continue;
+				}
+				PRINT(
+						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
+				//add attribute for this component type of this object.
+				objTmplPtr->addComponentParameter(attributeTAG->Name(),
+						attributeTAG->Value(), compTypeTAG);
+			}
 			//... add all component templates
 			SMARTPTR(ComponentTemplate)compTmpl =
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
