@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/all_configs.h
+ * \file /Ely/initializations/common_configs.h
  *
- * \date 05/set/2012 (20:07:54)
+ * \date 26/nov/2012 12:15:57
  * \author marco
  */
 
-#ifndef ALL_CONFIGS_H_
-#define ALL_CONFIGS_H_
+#ifndef COMMON_CONFIGS_H_
+#define COMMON_CONFIGS_H_
 
 #include <iostream>
 #include <string>
@@ -30,7 +30,10 @@
 #include "Utilities/Tools.h"
 
 __attribute__((constructor)) void initializationsInit();
+void callAllInits();
+
 __attribute__((destructor)) void initializationsEnd();
+void callAllEnds();
 
 //generic typedefs
 typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
@@ -45,4 +48,4 @@ extern "C"
 }
 #endif
 
-#endif /* ALL_CONFIGS_H_ */
+#endif /* COMMON_CONFIGS_H_ */

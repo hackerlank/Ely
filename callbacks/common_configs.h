@@ -15,16 +15,18 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/all_configs.h
+ * \file /Ely/callbacks/common_configs.h
  *
- * \date 20/ago/2012 (10:07:25)
+ * \date 26/nov/2012 10:18:23
  * \author marco
  */
 
-#ifndef ALL_CONFIGS_H_
-#define ALL_CONFIGS_H_
+#ifndef COMMON_CONFIGS_H_
+#define COMMON_CONFIGS_H_
 
 #include <iostream>
+#include <utility>
+#include <map>
 #include <string>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
@@ -54,4 +56,10 @@ CALLBACK default_callback__;
 }
 #endif
 
-#endif /* ALL_CONFIGS_H_ */
+///Common declarations
+typedef std::pair<std::string, std::string> EventTypeState;
+typedef std::string NextState;
+typedef std::pair<EventTypeState, NextState> TransitionTableItem;
+typedef std::map<EventTypeState, NextState> TransitionTable;
+
+#endif /* COMMON_CONFIGS_H_ */

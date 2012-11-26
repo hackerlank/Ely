@@ -15,134 +15,56 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/transitions/callback_defs.cpp
+ * \file /Ely/transitions/defs/Character.cpp
  *
- * \date 20/ago/2012 (12:50:42)
+ * \date 26/nov/2012 12:02:39
  * \author marco
  */
 
-#include "transition_defs.h"
+#include "../common_configs.h"
 #include "Utilities/ComponentSuite.h"
 
-///Actor related
-//forward
-void Enter_forward_Actor(fsm*, Activity& activity, const ValueList& valueList)
-{
-	PRINT("Enter_forward_Actor");
-}
-void Exit_forward_Actor(fsm*, Activity& activity)
-{
-	PRINT("Exit_forward_Actor");
-}
-ValueList Filter_forward_Actor(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_forward_Actor");
-	valList.push_front(state);
-	return valList;
-}
-//backward
-void Enter_backward_Actor(fsm*, Activity& activity, const ValueList& valueList)
-{
-	PRINT("Enter_backward_Actor");
-}
-void Exit_backward_Actor(fsm*, Activity& activity)
-{
-	PRINT("Exit_backward_Actor");
-}
-ValueList Filter_backward_Actor(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_backward_Actor");
-	valList.push_front(state);
-	return valList;
-}
-//strafe_left
-void Enter_strafe_left_Actor(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("Enter_strafe_left_Actor");
-}
-void Exit_strafe_left_Actor(fsm*, Activity& activity)
-{
-	PRINT("Exit_strafe_left_Actor");
-}
-ValueList Filter_strafe_left_Actor(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_strafe_left_Actor");
-	valList.push_front(state);
-	return valList;
-}
-//strafe_right
-void Enter_strafe_right_Actor(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("Enter_strafe_right_Actor");
-}
-void Exit_strafe_right_Actor(fsm*, Activity& activity)
-{
-	PRINT("Exit_strafe_right_Actor");
-}
-ValueList Filter_strafe_right_Actor(fsm*, Activity& activity,
-		const std::string& state, const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_strafe_right_Actor");
-	valList.push_front(state);
-	return valList;
-}
-//up
-void Enter_up_Actor(fsm*, Activity& activity, const ValueList& valueList)
-{
-	PRINT("Enter_up_Actor");
-}
-void Exit_up_Actor(fsm*, Activity& activity)
-{
-	PRINT("Exit_up_Actor");
-}
-ValueList Filter_up_Actor(fsm*, Activity& activity, const std::string& state,
-		const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_up_Actor");
-	valList.push_front(state);
-	return valList;
-}
-//down
-void Enter_down_Actor(fsm*, Activity& activity, const ValueList& valueList)
-{
-	PRINT("Enter_down_Actor");
-}
-void Exit_down_Actor(fsm*, Activity& activity)
-{
-	PRINT("Exit_down_Actor");
-}
-ValueList Filter_down_Actor(fsm*, Activity& activity, const std::string& state,
-		const ValueList& valueList)
-{
-	ValueList valList = valueList;
-	PRINT("Filter_down_Actor");
-	valList.push_front(state);
-	return valList;
-}
-//forward_FromTo_strafe_left
-void forward_FromTo_strafe_left_Actor(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("forward_FromTo_strafe_left_Actor");
-}
-//forward_FromTo_strafe_right
-void forward_FromTo_strafe_right_Actor(fsm*, Activity& activity,
-		const ValueList& valueList)
-{
-	PRINT("forward_FromTo_strafe_right_Actor");
-}
+//ENTER Enter_<STATE>_<OBJECTTYPE>;
+//EXIT Exit_<STATE>_<OBJECTTYPE>;
+//FILTER Filter_<STATE>_<OBJECTTYPE>;
+//FROMTO <STATEA>_FromTo_<STATEB>_<OBJECTTYPE>;
 
-///Character related
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+///Character (Activity) related
+//forward
+ENTER Enter_forward_Character;
+EXIT Exit_forward_Character;
+//backward
+ENTER Enter_backward_Character;
+EXIT Exit_backward_Character;
+//roll_left
+ENTER Enter_roll_left_Character;
+EXIT Exit_roll_left_Character;
+//roll_right
+ENTER Enter_roll_right_Character;
+EXIT Exit_roll_right_Character;
+//forward_roll_left
+ENTER Enter_forward_roll_left_Character;
+EXIT Exit_forward_roll_left_Character;
+//forward_roll_right
+ENTER Enter_forward_roll_right_Character;
+EXIT Exit_forward_roll_right_Character;
+//jump
+ENTER Enter_jump_Character;
+EXIT Exit_jump_Character;
+//idle
+ENTER Enter_idle_Character;
+EXIT Exit_idle_Character;
+
+#ifdef __cplusplus
+}
+#endif
+
+///States' functions
 //forward
 void Enter_forward_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
@@ -328,4 +250,12 @@ void Enter_idle_Character(fsm*, Activity& activity, const ValueList& valueList)
 void Exit_idle_Character(fsm*, Activity& activity)
 {
 	PRINT("Exit_idle_Character");
+}
+
+///Init/end functions: see common_configs.cpp
+void characterInit()
+{
+}
+void characterEnd()
+{
 }

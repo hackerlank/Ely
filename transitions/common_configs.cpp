@@ -15,20 +15,41 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/common/start_end.cpp
+ * \file /Ely/transitions/common_configs.cpp
  *
- * \date 05/set/2012 (20:07:54)
+ * \date 26/nov/2012 11:29:26
  * \author marco
  */
 
-#include "../all_configs.h"
+#include "common_configs.h"
 
-void initializationsInit()
+void transitionsInit()
 {
-	PRINT("Executing initializationsInit");
+	PRINT("Executing transitionsInit");
+	callAllInits();
 }
 
-void initializationsEnd()
+void transitionsEnd()
 {
-	PRINT("Executing initializationsEnd");
+	PRINT("Executing transitionsEnd");
+	callAllEnds();
 }
+
+///Insert declarations of all init/end functions
+extern void actorInit();
+extern void actorEnd();
+extern void characterInit();
+extern void characterEnd();
+
+///Call all init/end functions
+void callAllInits()
+{
+	actorInit();
+	characterInit();
+}
+void callAllEnds()
+{
+	actorEnd();
+	characterEnd();
+}
+

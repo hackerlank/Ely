@@ -15,39 +15,43 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/callback_defs.h
+ * \file /Ely/transitions/common_configs.h
  *
- * \date 05/set/2012 (20:07:54)
+ * \date 26/nov/2012 11:29:07
  * \author marco
  */
 
-#ifndef TRANSITION_DEFS_H_
-#define TRANSITION_DEFS_H_
+#ifndef COMMON_CONFIGS_H_
+#define COMMON_CONFIGS_H_
 
-#include "all_configs.h"
+#include <iostream>
+#include <string>
+#include "BehaviorComponents/Activity.h"
+#include "ObjectModel/Object.h"
+#include "Utilities/Tools.h"
+
+__attribute__((constructor)) void transitionsInit();
+void callAllInits();
+
+__attribute__((destructor)) void transitionsEnd();
+void callAllEnds();
+
+//generic typedefs
+typedef void ENTER(fsm*, Activity&, const ValueList&);
+typedef void EXIT(fsm*, Activity&);
+typedef ValueList FILTER(fsm*, Activity&, const std::string&,
+		const ValueList&);
+typedef void FROMTO(fsm*, Activity&, const ValueList&);
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-///camera related
-INITIALIZATION camera_initialization;
-
-///Actor1 related
-INITIALIZATION Actor1_initialization;
-
-///Plane1 related
-INITIALIZATION Plane1_initialization;
-
-///Terrain1 related
-INITIALIZATION Terrain1_initialization;
-
-///NPC1 related
-INITIALIZATION NPC1_initialization;
-
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* TRANSITION_DEFS_H_ */
+///Common declarations
+
+#endif /* COMMON_CONFIGS_H_ */

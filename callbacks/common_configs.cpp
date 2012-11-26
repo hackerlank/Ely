@@ -15,13 +15,25 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/common/default_callback.cpp
+ * \file /Ely/callbacks/common_configs.cpp
  *
- * \date 20/ago/2012 (10:14:38)
+ * \date 26/nov/2012 10:18:48
  * \author marco
  */
 
-#include "../all_configs.h"
+#include "common_configs.h"
+
+void callbacksInit()
+{
+	PRINT("Executing callbacksInit");
+	callAllInits();
+}
+
+void callbacksEnd()
+{
+	PRINT("Executing callbacksEnd");
+	callAllEnds();
+}
 
 void default_callback__(const Event* event, void* data)
 {
@@ -38,3 +50,24 @@ void default_callback__(const Event* event, void* data)
 #endif
 }
 
+///Insert declarations of all init/end functions
+extern void activityCharacterInit();
+extern void activityCharacterEnd();
+extern void activityActorInit();
+extern void activityActorEnd();
+extern void driverCameraInit();
+extern void driverCameraEnd();
+
+///Call all init/end functions
+void callAllInits()
+{
+	activityCharacterInit();
+	activityActorInit();
+	driverCameraInit();
+}
+void callAllEnds()
+{
+	activityCharacterEnd();
+	activityActorEnd();
+	driverCameraEnd();
+}
