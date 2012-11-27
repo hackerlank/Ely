@@ -25,6 +25,8 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
+///Distributed
+#include "Support/Distributed/DistributedObjectBase.h"
 
 std::vector<std::string> parseCompoundString(const std::string& compoundString,
 		char separator)
@@ -102,4 +104,7 @@ void initTypedObjects()
 	Terrain::init_type();
 	TerrainTemplate::init_type();
 	GeoMipTerrainRef::init_type();
+	//
+	///Distributed
+	DistributedObjectBase::init_type();
 }
