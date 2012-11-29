@@ -29,6 +29,7 @@
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
 									<listOptionValue builtIn="false" value="TESTING"/>
 									<listOptionValue builtIn="false" value="BOOST_TEST_DYN_LINK"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1380109520" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -107,6 +108,7 @@
 								<option id="gnu.cpp.compiler.option.preprocessor.def.2057169612" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.2028032265" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -187,6 +189,7 @@
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="TESTING"/>
 									<listOptionValue builtIn="false" value="BOOST_TEST_DYN_LINK"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.901354201" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -265,6 +268,7 @@
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1309873260" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1948710100" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -342,6 +346,7 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1471434062" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -420,6 +425,7 @@
 								<option id="gnu.cpp.compiler.exe.release.option.debugging.level.1466664603" name="Debug Level" superClass="gnu.cpp.compiler.exe.release.option.debugging.level" value="gnu.cpp.compiler.debugging.level.none" valueType="enumerated"/>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1458845234" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1778096740" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -502,6 +508,7 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1782349979" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -575,6 +582,7 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.1264869920" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -649,6 +657,7 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.86725839" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
@@ -717,6 +726,7 @@
 									<listOptionValue builtIn="false" value="DEBUG"/>
 									<listOptionValue builtIn="false" value="DEBUG_THREADS"/>
 									<listOptionValue builtIn="false" value="ELY_THREAD"/>
+									<listOptionValue builtIn="false" value="WITHIN_PANDA"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.include.paths.938725475" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
