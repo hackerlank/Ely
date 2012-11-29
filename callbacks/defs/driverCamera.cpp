@@ -172,7 +172,7 @@ static const char* camera_keys[] =
 void driverCamera(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)driver = (Driver*) data;
+	SMARTPTR(Driver)driver = reinterpret_cast<Driver*>(data);
 	bool enable;
 	std::string eventName = event->get_name();
 	//check if shift or shift-up key pressed

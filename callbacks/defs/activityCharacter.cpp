@@ -82,7 +82,7 @@ static TransitionTable* transitionTablePtr;
 void activityCharacter(const Event * event, void * data)
 {
 	//get data
-	SMARTPTR(Activity)activity = (Activity*) data;
+	SMARTPTR(Activity)activity = reinterpret_cast<Activity*>(data);
 	//get event type
 	std::string eventType = activity->getEventType(event->get_name());
 	//get fsm

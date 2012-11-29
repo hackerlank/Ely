@@ -42,7 +42,7 @@ INITIALIZATION camera_initialization;
 
 static void toggleCameraControl(const Event* event, void* data)
 {
-	SMARTPTR(Object)camera = (Object*) data;
+	SMARTPTR(Object)camera = reinterpret_cast<Object*>(data);
 //	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
 //					ComponentFamilyType("Control")));
 	SMARTPTR(Chaser)cameraControl = DCAST(Chaser, camera->getComponent(
@@ -88,11 +88,11 @@ void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-		object->getNodePath().look_at(50, 200, 10);
+	object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
-				(void*) object);
-	}
+	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+			static_cast<void*>(object));
+}
 
 void cameraInit()
 {
@@ -116,7 +116,7 @@ INITIALIZATION Actor1_initialization;
 
 static void toggleActor1Control(const Event* event, void* data)
 {
-	SMARTPTR(Object)actor1 = (Object*) data;
+	SMARTPTR(Object)actor1 = reinterpret_cast<Object*>(data);
 	SMARTPTR(Driver)actor1Control = DCAST(Driver, actor1->getComponent(
 					ComponentFamilyType("Control")));
 
@@ -163,16 +163,16 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 //	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
 //					ComponentFamilyType("Scene")));
 //	actor1Model->animations().loop("panda-walk", false);
-		//play sound
-		SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
-						ComponentFamilyType("Audio")));
-		actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
-		actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
+	//play sound
+	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
+					ComponentFamilyType("Audio")));
+	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
+	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
 
-		//enable/disable Actor1 control by event
-		pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
-				(void*) object);
-	}
+	//enable/disable Actor1 control by event
+	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
+			static_cast<void*>(object));
+}
 
 void Actor1Init()
 {

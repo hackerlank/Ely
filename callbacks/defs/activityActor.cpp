@@ -172,7 +172,7 @@ static const char* Actor1_keys[] =
 void activityActor(const Event * event, void * data)
 {
 	//get data
-	SMARTPTR(Activity)activity = (Activity*) data;
+	SMARTPTR(Activity)activity = reinterpret_cast<Activity*>(data);
 	bool enable;
 	//get bare event
 	std::string eventName = event->get_name();

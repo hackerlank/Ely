@@ -30,9 +30,14 @@
 #include <nodePath.h>
 #include <auto_bind.h>
 #include <animControlCollection.h>
+#include <genericAsyncTask.h>
 #include "Utilities/Tools.h"
 
 #include <aiWorld.h>
+#include <aiCharacter.h>
+#include <aiBehaviors.h>
+
+AsyncTask::DoneStatus AIUpdate(GenericAsyncTask* task, void* data);
 
 int main(int argc, char **argv)
 {
@@ -51,21 +56,32 @@ int main(int argc, char **argv)
 		window->setup_trackball(); // Enable default camera movement
 	}
 	///
-	// Seeker
+	//Seeker
 	LVector3f ralphStartPos(-10, 0, 0);
-	NodePath seeker = window->load_model(panda.get_models(), "models/ralph");
-	window->load_model(seeker, "models/ralph");
-	AnimControlCollection anim_collection;
-	auto_bind(seeker.node(), anim_collection);
+	NodePath seeker = window->load_model(panda.get_models(), "ralph/ralph");
+	window->load_model(seeker, "ralph/ralph-run");
+	AnimControlCollection seeker_anims;
+	auto_bind(seeker.node(), seeker_anims);
 	seeker.reparent_to(window->get_render());
-	seeker.set_scale(0.5);
+	seeker.set_scale(1);
 	seeker.set_pos(ralphStartPos);
-	// Target
-	NodePath target = window->load_model(panda.get_models(), "models/arrow");
+	//Target
+	NodePath target = window->load_model(panda.get_models(), "smiley");
 	target.set_color(1, 0, 0);
 	target.set_pos(5, 0, 0);
-	target.set_scale(1);
+	target.set_scale(0.5);
 	target.reparent_to(window->get_render());
+	//Creating AI World
+	AIWorld AIworld(window->get_render());
+	AICharacter AIchar("seeker", seeker, 100, 0.05, 5);
+	AIworld.add_ai_char(&AIchar);
+	AIBehaviors* AIbehaviors = AIchar.get_ai_behaviors();
+	AIbehaviors->seek(target);
+	seeker_anims.loop(seeker_anims.get_anim_name(0), true);
+	//AI World update
+	AsyncTask* task = new GenericAsyncTask("check playing", &AIUpdate,
+			reinterpret_cast<void*>(&AIworld));
+	panda.get_task_mgr().add(task);
 
 	/// Do the main loop
 	panda.main_loop();
@@ -74,3 +90,9 @@ int main(int argc, char **argv)
 	return 0;
 }
 
+AsyncTask::DoneStatus AIUpdate(GenericAsyncTask* task, void* data)
+{
+	AIWorld* AIworld = reinterpret_cast<AIWorld*>(data);
+	AIworld->update();
+	return AsyncTask::DS_again;
+}

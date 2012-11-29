@@ -49,6 +49,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.851579983" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1301268670" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -128,6 +129,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.343149406" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1223806643" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -209,6 +211,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.561904426" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1242837604" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -289,6 +292,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1901193062" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.577421803" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -366,6 +370,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.476766265" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.1572901609" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -445,6 +450,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.release.434449503" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.release">
 								<option id="gnu.cpp.link.option.libs.868973216" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -746,6 +752,7 @@
 							<tool id="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug.1746923108" name="GCC C++ Linker" superClass="cdt.managedbuild.tool.gnu.cpp.linker.exe.debug">
 								<option id="gnu.cpp.link.option.libs.151163075" name="Libraries (-l)" superClass="gnu.cpp.link.option.libs" valueType="libs">
 									<listOptionValue builtIn="false" value="p3framework"/>
+									<listOptionValue builtIn="false" value="pandaai"/>
 									<listOptionValue builtIn="false" value="panda"/>
 									<listOptionValue builtIn="false" value="pandafx"/>
 									<listOptionValue builtIn="false" value="pandaexpress"/>
@@ -785,10 +792,10 @@
 		<project id="Ely.cdt.managedbuild.target.gnu.exe.1582046581" name="Executable" projectType="cdt.managedbuild.target.gnu.exe"/>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
+		<configuration configurationName="Default"/>
 		<configuration configurationName="Debug-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="Default"/>
 		<configuration configurationName="Test-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>

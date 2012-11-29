@@ -37,25 +37,25 @@ mTrue(true), mFalse(false), mIsEnabled(false)
 	mTmpl = tmpl;
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
-		mForward = false;
-		mBackward = false;
-		mStrafeLeft = false;
-		mStrafeRight = false;
-		mUp = false;
-		mDown = false;
-		mRollLeft = false;
-		mRollRight = false;
+	mForward = false;
+	mBackward = false;
+	mStrafeLeft = false;
+	mStrafeRight = false;
+	mUp = false;
+	mDown = false;
+	mRollLeft = false;
+	mRollRight = false;
 	//by default we consider mouse moved on every update, because
 	//we want mouse poll by default; this can be changed by calling
 	//the enabler (for example by an handler responding to mouse-move
 	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
 	//	http://www.panda3d.org/forums/viewtopic.php?t=6049)
-		mMouseMove = true;
+	mMouseMove = true;
 	//
-		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-		mCentX = win->get_properties().get_x_size() / 2;
-		mCentY = win->get_properties().get_y_size() / 2;
-	}
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	mCentX = win->get_properties().get_x_size() / 2;
+	mCentY = win->get_properties().get_y_size() / 2;
+}
 
 Driver::~Driver()
 {
