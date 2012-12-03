@@ -24,7 +24,6 @@
 #ifndef CONTROLBYEVENTTEMPLATE_H_
 #define CONTROLBYEVENTTEMPLATE_H_
 
-#include <string>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "ControlComponents/Driver.h"

@@ -15,27 +15,27 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/InstanceOfTemplate.h
+ * \file /Ely/include/AIComponents/SteeringTemplate.h
  *
- * \date 20/mag/2012 (09:40:59)
+ * \date 03/dic/2012 (13:52:08)
  * \author marco
  */
 
-#ifndef INSTANCEOFTEMPLATE_H_
-#define INSTANCEOFTEMPLATE_H_
+#ifndef STEERINGTEMPLATE_H_
+#define STEERINGTEMPLATE_H_
 
-#include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "SceneComponents/InstanceOf.h"
-#include "Game/GameSceneManager.h"
+#include "ObjectModel/Component.h"
+#include "AIComponents/Steering.h"
+#include "Game/GameAIManager.h"
 #include "Utilities/Tools.h"
 
-class InstanceOfTemplate: public ComponentTemplate
+class SteeringTemplate: public ComponentTemplate
 {
 public:
-	InstanceOfTemplate(PandaFramework* pandaFramework,
+	SteeringTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~InstanceOfTemplate();
+	virtual ~SteeringTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -55,7 +55,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "InstanceOfTemplate",
+		register_type(_type_handle, "SteeringTemplate",
 				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
@@ -73,4 +73,4 @@ private:
 
 };
 
-#endif /* INSTANCEOFTEMPLATE_H_ */
+#endif /* STEERINGTEMPLATE_H_ */

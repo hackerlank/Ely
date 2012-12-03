@@ -33,11 +33,7 @@ ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 			"ModelTemplate::ModelTemplate: invalid WindowFramework")
 	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"ModelTemplate::ModelTemplate: invalid GameSceneManager")
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"ModelTemplate::ModelTemplate: invalid PandaFramework or WindowFramework");
-	}
+	//
 	setParametersDefaults();
 }
 

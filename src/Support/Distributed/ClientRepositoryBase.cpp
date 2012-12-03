@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Support/Distributed/ClientRepositoryBase.cpp
  *
- * \date 27/nov/2012 18:20:38
+ * \date 27/nov/2012 (18:20:38)
  * \author marco
  */
 

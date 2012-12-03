@@ -15,59 +15,58 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/SceneComponents/NodePathWrapperTemplate.cpp
+ * \file /Ely/src/AIComponents/SteeringTemplate.cpp
  *
- * \date 28/giu/2012 (20:15:15)
+ * \date 03/dic/2012 (13:52:08)
  * \author marco
  */
 
-#include "SceneComponents/NodePathWrapperTemplate.h"
+#include "AIComponents/SteeringTemplate.h"
 
-NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
+SteeringTemplate::SteeringTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
 	CHECKEXISTENCE(pandaFramework,
-			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework")
+			"SteeringTemplate::SteeringTemplate: invalid PandaFramework")
 	CHECKEXISTENCE(windowFramework,
-			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
-			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid GameSceneManager")
+			"SteeringTemplate::SteeringTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+			"SteeringTemplate::SteeringTemplate: invalid GameAIManager")
 	//
 	setParametersDefaults();
-
 }
 
-NodePathWrapperTemplate::~NodePathWrapperTemplate()
+SteeringTemplate::~SteeringTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType NodePathWrapperTemplate::componentType() const
+const ComponentType SteeringTemplate::componentType() const
 {
-	return ComponentType("NodePathWrapper");
+	return ComponentType("Steering");
 }
 
-const ComponentFamilyType NodePathWrapperTemplate::familyType() const
+const ComponentFamilyType SteeringTemplate::familyType() const
 {
-	return ComponentFamilyType("Scene");
+	return ComponentFamilyType("AI");
 }
 
-SMARTPTR(Component)NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)SteeringTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	SMARTPTR(NodePathWrapper) newNodePathWrapper = new NodePathWrapper(this);
-	newNodePathWrapper->setComponentId(compId);
-	if (not newNodePathWrapper->initialize())
+	SMARTPTR(Steering) newSteering = new Steering(this);
+	newSteering->setComponentId(compId);
+	if (not newSteering->initialize())
 	{
 		return NULL;
 	}
-	return newNodePathWrapper.p();
+	return newSteering.p();
 }
 
-void NodePathWrapperTemplate::setParametersDefaults()
+void SteeringTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -75,8 +74,7 @@ void NodePathWrapperTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	//no mandatory parameters
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle NodePathWrapperTemplate::_type_handle;
+TypeHandle SteeringTemplate::_type_handle;

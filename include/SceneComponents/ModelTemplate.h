@@ -24,9 +24,6 @@
 #ifndef MODELTEMPLATE_H_
 #define MODELTEMPLATE_H_
 
-#include <string>
-#include <list>
-#include <utility>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/Model.h"

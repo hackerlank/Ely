@@ -17,7 +17,7 @@
 /**
  * \file /Ely/transitions/defs/Character.cpp
  *
- * \date 26/nov/2012 12:02:39
+ * \date 26/nov/2012 (12:02:39)
  * \author marco
  */
 

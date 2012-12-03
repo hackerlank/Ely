@@ -83,12 +83,24 @@ bool Sound3d::initialize()
 			std::string("sound_files"));
 	for (iter = soundFileList.begin(); iter != soundFileList.end(); ++iter)
 	{
-		SMARTPTR(AudioSound)sound =
-		GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
-				*iter, true).p();
-		if (not sound.is_null())
+		//any "sound_files" string is a "compound" one, i.e. could have the form:
+		// "sound_file1:sound_file2:...:sound_fileN"
+		std::vector<std::string> soundFiles = parseCompoundString(*iter, ':');
+		std::vector<std::string>::const_iterator iterSoundFile;
+		for (iterSoundFile = soundFiles.begin(); iterSoundFile != soundFiles.end();
+				++iterSoundFile)
 		{
-			mSounds[*iter] = sound.p();
+			//an empty sound file is ignored
+			if (not iterSoundFile->empty())
+			{
+				SMARTPTR(AudioSound)sound =
+				GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
+						*iterSoundFile, true).p();
+				if (not sound.is_null())
+				{
+					mSounds[*iterSoundFile] = sound.p();
+				}
+			}
 		}
 	}
 	//

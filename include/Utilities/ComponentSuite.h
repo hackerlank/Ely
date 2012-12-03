@@ -30,6 +30,8 @@
 #include "ObjectModel/ComponentTemplate.h"
 
 /// List of all components and component templates
+#include "AIComponents/Steering.h"
+#include "AIComponents/SteeringTemplate.h"
 #include "AudioComponents/Listener.h"
 #include "AudioComponents/ListenerTemplate.h"
 #include "AudioComponents/Sound3d.h"

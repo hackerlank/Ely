@@ -58,17 +58,17 @@ class ModelTemplate;
  * where N=1,2,... .
  *
  * XML Param(s):
- * \li \c "from_file"  			|single|"true"
- * \li \c "scale_x"  			|single|"1.0"
- * \li \c "scale_y"  			|single|"1.0"
- * \li \c "scale_z"  			|single|"1.0"
- * \li \c "model_file"  		|single|no default
- * \li \c "anim_files"  		|multiple|no default
- * \li \c "model_type"  		|single|no default
- * \li \c "model_card_left"  	|single|no default
- * \li \c "model_card_right"  	|single|no default
- * \li \c "model_card_bottom"  	|single|no default
- * \li \c "model_card_top"  	|single|no default
+ * - "from_file"  			|single|"true"
+ * - "scale_x"  			|single|"1.0"
+ * - "scale_y"  			|single|"1.0"
+ * - "scale_z"  			|single|"1.0"
+ * - "model_file"  		|single|no default
+ * - "anim_files"  		|multiple|no default
+ * - "model_type"  		|single|no default
+ * - "model_card_left"  	|single|no default
+ * - "model_card_right"  	|single|no default
+ * - "model_card_bottom"  	|single|no default
+ * - "model_card_top"  	|single|no default
  */
 class Model: public Component
 {

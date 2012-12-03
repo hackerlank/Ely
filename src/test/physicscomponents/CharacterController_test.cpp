@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/physicscomponents/CharacterController_test.cpp
  *
- * \date 30/ott/2012 17:03:49
+ * \date 30/ott/2012 (17:03:49)
  * \author marco
  */
 

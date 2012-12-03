@@ -26,6 +26,8 @@
 GameAudioManager::GameAudioManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
+	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+			"GameAudioManager::GameAudioManager: invalid GameManager")
 	mAudioComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
@@ -121,7 +123,6 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	mAudioMgr->update();
 	//
 	return AsyncTask::DS_cont;
-
 }
 
 ReMutex& GameAudioManager::getMutex()

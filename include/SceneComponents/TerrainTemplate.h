@@ -24,9 +24,6 @@
 #ifndef TERRAINTEMPLATE_H_
 #define TERRAINTEMPLATE_H_
 
-#include <string>
-#include <list>
-#include <utility>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/Terrain.h"

@@ -171,7 +171,8 @@ static bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
 	return true;
 }
 
-void GameManager::createGameWorldWithoutParamTables(const std::string& gameWorldXML)
+void GameManager::createGameWorldWithoutParamTables(
+		const std::string& gameWorldXML)
 {
 	//read the game configuration file
 	tinyxml2::XMLDocument gameDoc;
@@ -435,8 +436,7 @@ void GameManager::createGameWorldWithoutParamTables(const std::string& gameWorld
 	}
 }
 
-void GameManager::createGameWorld(
-		const std::string& gameWorldXML)
+void GameManager::createGameWorld(const std::string& gameWorldXML)
 {
 	//read the game configuration file
 	tinyxml2::XMLDocument gameDoc;
@@ -725,6 +725,22 @@ void GameManager::disable_mouse()
 	{
 		mMouse2cam.detach_node();
 	}
+}
+
+PandaFramework* const GameManager::pandaFramework() const
+{
+	return dynamic_cast<PandaFramework* const >(
+			const_cast<GameManager* const >(this));
+}
+
+WindowFramework* const GameManager::windowFramework() const
+{
+	return mWindow;
+}
+
+ReMutex& GameManager::getMutex()
+{
+	return mMutex;
 }
 
 #ifdef DEBUG

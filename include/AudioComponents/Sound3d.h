@@ -48,7 +48,7 @@ class Sound3dTemplate;
  * All updates is done wrt scene root (e.g. render).
  *
  * XML Param(s):
- * \li \c "sound_files" 		|multiple|no default
+ * - "sound_files" 		|multiple|no default
  */
 class Sound3d: public Component
 {

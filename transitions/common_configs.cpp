@@ -17,7 +17,7 @@
 /**
  * \file /Ely/transitions/common_configs.cpp
  *
- * \date 26/nov/2012 11:29:26
+ * \date 26/nov/2012 (11:29:26)
  * \author marco
  */
 

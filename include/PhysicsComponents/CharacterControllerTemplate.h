@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/PhysicsComponents/CharacterControllerTemplate.h
  *
- * \date 30/ott/2012 17:01:33
+ * \date 30/ott/2012 (17:01:33)
  * \author marco
  */
 

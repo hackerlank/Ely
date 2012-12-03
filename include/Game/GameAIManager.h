@@ -15,18 +15,17 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game/GameControlManager.h
+ * \file /Ely/include/Game/GameAIManager.h
  *
- * \date 29/lug/2012 (10:07:02)
+ * \date 03/dic/2012 (13:57:43)
  * \author marco
  */
 
-#ifndef GAMEINPUTMANAGER_H_
-#define GAMEINPUTMANAGER_H_
+#ifndef GAMEAIMANAGER_H_
+#define GAMEAIMANAGER_H_
 
-#include <list>
-#include <algorithm>
-#include <pandaFramework.h>
+#include <aiWorld.h>
+
 #include <clockObject.h>
 #include <asyncTask.h>
 #include <reMutex.h>
@@ -36,14 +35,13 @@
 #include "Utilities/Tools.h"
 
 /**
- * \brief Singleton manager updating control components.
+ * \brief Singleton manager updating AI components.
  *
  * Prepared for multi-threading.
  */
-class GameControlManager: public Singleton<GameControlManager>
+class GameAIManager: public Singleton<GameAIManager>
 {
 public:
-
 	/**
 	 * \brief Constructor.
 	 * @param sort The task sort.
@@ -51,23 +49,29 @@ public:
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */
-	GameControlManager(int sort = 0, int priority = 0,
+	GameAIManager(int sort = 0, int priority = 0,
 			const std::string& asyncTaskChain = std::string(""));
-	virtual ~GameControlManager();
+	virtual ~GameAIManager();
 
 	/**
-	 * \brief Adds (if not present) an control component to updating.
-	 * @param controlComp The control component.
+	 * \brief Adds (if not present) an AI component to updating.
+	 * @param aiComp The AI component.
 	 */
-	void addToControlUpdate(SMARTPTR(Component) controlComp);
+	void addToAIUpdate(SMARTPTR(Component) aiComp);
 	/**
-	 * \brief Removes (if present) an control component from updating.
-	 * @param controlComp The control component.
+	 * \brief Removes (if present) an AI component from updating.
+	 * @param aiComp The AI component.
 	 */
-	void removeFromControlUpdate(SMARTPTR(Component) controlComp);
+	void removeFromAIUpdate(SMARTPTR(Component) aiComp);
 
 	/**
-	 * \brief Updates control components.
+	 * \brief Gets a reference to the AIWorld.
+	 * @return The AIWorld.
+	 */
+	AIWorld* aiWorld() const;
+
+	/**
+	 * \brief Updates AI components.
 	 *
 	 * Will be called automatically in a task.
 	 * @param task The task.
@@ -82,15 +86,18 @@ public:
 	ReMutex& getMutex();
 
 private:
+	/// AIWorld.
+	AIWorld* mAIWorld;
+
 	///@{
-	///List of control components to be updated.
-	typedef std::list<SMARTPTR(Component)> ControlComponentList;
-	ControlComponentList mControlComponents;
+	///List of AI components to be updated.
+	typedef std::list<SMARTPTR(Component)> AIComponentList;
+	AIComponentList mAIComponents;
 	///@}
 
 	///@{
-	///A task data for update.
-	SMARTPTR(TaskInterface<GameControlManager>::TaskData) mUpdateData;
+	///A task data for step simulation update.
+	SMARTPTR(TaskInterface<GameAIManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
@@ -99,7 +106,6 @@ private:
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
-
 };
 
-#endif /* GAMEINPUTMANAGER_H_ */
+#endif /* GAMEAIMANAGER_H_ */

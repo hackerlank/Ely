@@ -10,6 +10,8 @@
 GameSceneManager::GameSceneManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
+	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+			"GameSceneManager::GameSceneManager: invalid GameManager")
 	mSceneComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();

@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/PhysicsComponents/CharacterController.cpp
  *
- * \date 30/ott/2012 17:03:49
+ * \date 30/ott/2012 (17:03:49)
  * \author marco
  */
 
@@ -270,10 +270,12 @@ void CharacterController::onAddToObjectSetup()
 	//reparent the object node path as a child of the character controller's one
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	ownerNodePath.reparent_to(mNodePath);
+	//optimize
+	mNodePath.flatten_light();
 
-	//set the object node path as this character controller's one
+	//set this character controller node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
-	//correct (or possibly reset to zero) pos and hpr of the object node path
+	//correct (or possibly reset to zero) pos and hpr of the former object node path
 	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
 
 	//Add to the physics manager update

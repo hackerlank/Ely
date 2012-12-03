@@ -15,39 +15,35 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/InstanceOf.h
+ * \file /Ely/include/AIComponents/Steering.h
  *
- * \date 20/mag/2012 (09:42:38)
+ * \date 03/dic/2012 (13:39:59)
  * \author marco
  */
 
-#ifndef INSTANCEOF_H_
-#define INSTANCEOF_H_
+#ifndef STEERING_H_
+#define STEERING_H_
 
-#include <nodePath.h>
-#include <typedObject.h>
+#include <aiCharacter.h>
 #include "ObjectModel/Component.h"
-#include "ObjectModel/ObjectTemplateManager.h"
-#include "SceneComponents/Model.h"
+#include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
-class InstanceOfTemplate;
+class SteeringTemplate;
 
 /**
- * \brief Component representing an instance of another object.
+ * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
  * XML Param(s):
- * - "instance_of"  	|single|no default
- * - "scale_x"  		|single|"1.0"
- * - "scale_y"  		|single|"1.0"
- * - "scale_z"  		|single|"1.0"
+ * - "param1"  			|single|no default
+ * - "param2"  			|multiple|no default
  */
-class InstanceOf: public Component
+class Steering: public Component
 {
 public:
-	InstanceOf();
-	InstanceOf(SMARTPTR(InstanceOfTemplate) tmpl);
-	virtual ~InstanceOf();
+	Steering();
+	Steering(SMARTPTR(SteeringTemplate) tmpl);
+	virtual ~Steering();
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
@@ -56,27 +52,17 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets/sets the node path associated to this instance of.
-	 * @return The node path associated to this instance of.
+	 * \brief Gets/sets the node path associated to this model.
+	 * @return The node path associated to this model.
 	 */
 	///@{
 	NodePath getNodePath() const;
 	void setNodePath(const NodePath& nodePath);
 	///@}
 
-	/**
-	 * \brief Gets a reference to the instanced object.
-	 * @return The reference to the instanced object.
-	 */
-	///@{
-	SMARTPTR(Object) getInstancedObject() const;
-	///@}
-
 private:
-	///The NodePath associated to this model.
+	///The NodePath associated to this Steering.
 	NodePath mNodePath;
-	///The instanced object.
-	SMARTPTR(Object) mInstancedObject;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -87,7 +73,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "InstanceOf", Component::get_class_type());
+		register_type(_type_handle, "Steering", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -104,4 +90,4 @@ private:
 
 };
 
-#endif /* INSTANCEOF_H_ */
+#endif /* STEERING_H_ */

@@ -56,7 +56,7 @@ class FuncInterval;
  *
  * It runs in the main thread.
  */
-class GameManager: public PandaFramework
+class GameManager: public PandaFramework, public Singleton<GameManager>
 {
 public:
 	/**
@@ -90,8 +90,10 @@ public:
 	 * (default priority = 0).
 	 * @param gameWorldXML The description file.
 	 */
+	///@{
 	virtual void createGameWorld(const std::string& gameWorldXML);
 	virtual void createGameWorldWithoutParamTables(const std::string& gameWorldXML);
+	///@}
 
 	/**
 	 * \brief Porting of python function direct.showbase.ShowBase.enableMouse.
@@ -101,6 +103,24 @@ public:
 	 * \brief Porting of python function direct.showbase.ShowBase.disableMouse.
 	 */
 	void disable_mouse();
+
+	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
+	 */
+	PandaFramework* const pandaFramework() const;
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework* const windowFramework() const;
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex
+	 */
+	ReMutex& getMutex();
 
 protected:
 
@@ -165,6 +185,8 @@ protected:
 	static void togglePhysicsDebug(const Event* event, void* data);
 #endif
 
+	///The (reentrant) mutex associated with this manager.
+	ReMutex mMutex;
 };
 
 #endif /* GAMEMANAGER_H_ */

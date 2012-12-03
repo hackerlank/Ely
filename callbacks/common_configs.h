@@ -17,7 +17,7 @@
 /**
  * \file /Ely/callbacks/common_configs.h
  *
- * \date 26/nov/2012 10:18:23
+ * \date 26/nov/2012 (10:18:23)
  * \author marco
  */
 

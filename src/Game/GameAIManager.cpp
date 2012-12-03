@@ -15,27 +15,29 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Game/GameControlManager.cpp
+ * \file /Ely/src/Game/GameAIManager.cpp
  *
- * \date 29/lug/2012 (10:07:02)
+ * \date 03/dic/2012 (13:57:43)
  * \author marco
  */
 
-#include "Game/GameControlManager.h"
+#include "Game/GameAIManager.h"
 
-GameControlManager::GameControlManager(int sort, int priority,
+GameAIManager::GameAIManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
 	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
-			"GameControlManager::GameControlManager: invalid GameManager")
-	mControlComponents.clear();
+			"GameAIManager::GameAIManager: invalid GameManager")
+	mAIComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	//create the task for updating the control components
-	mUpdateData = new TaskInterface<GameControlManager>::TaskData(this,
-			&GameControlManager::update);
-	mUpdateTask = new GenericAsyncTask("GameControlManager::update",
-			&TaskInterface<GameControlManager>::taskFunction,
+	mAIWorld = new AIWorld(
+			GameManager::GetSingletonPtr()->windowFramework()->get_render());
+	//create the task for updating AI components
+	mUpdateData = new TaskInterface<GameAIManager>::TaskData(this,
+			&GameAIManager::update);
+	mUpdateTask = new GenericAsyncTask("GameAIManager::update",
+			&TaskInterface<GameAIManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//set sort/priority
 	mUpdateTask->set_sort(sort);
@@ -53,7 +55,7 @@ GameControlManager::GameControlManager(int sort, int priority,
 	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
-GameControlManager::~GameControlManager()
+GameAIManager::~GameAIManager()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -62,36 +64,43 @@ GameControlManager::~GameControlManager()
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
 	}
-	mControlComponents.clear();
+	mAIComponents.clear();
+	//
+	delete mAIWorld;
 }
 
-void GameControlManager::addToControlUpdate(SMARTPTR(Component)controlComp)
+void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 {
 	//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
+	HOLDMUTEX(mMutex)
 
-		ControlComponentList::iterator iter = find(mControlComponents.begin(),
-				mControlComponents.end(), controlComp);
-		if (iter == mControlComponents.end())
-		{
-			mControlComponents.push_back(controlComp);
-		}
+	AIComponentList::iterator iter = find(mAIComponents.begin(),
+			mAIComponents.end(), aiComp);
+	if (iter == mAIComponents.end())
+	{
+		mAIComponents.push_back(aiComp);
 	}
+}
 
-void GameControlManager::removeFromControlUpdate(SMARTPTR(Component)controlComp)
+void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 {
 	//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
+	HOLDMUTEX(mMutex)
 
-		ControlComponentList::iterator iter = find(mControlComponents.begin(),
-				mControlComponents.end(), controlComp);
-		if (iter != mControlComponents.end())
-		{
-			mControlComponents.remove(controlComp);
-		}
+	AIComponentList::iterator iter = find(mAIComponents.begin(),
+			mAIComponents.end(), aiComp);
+	if (iter != mAIComponents.end())
+	{
+		mAIComponents.remove(aiComp);
 	}
+}
 
-AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
+AIWorld* GameAIManager::aiWorld() const
+{
+	return mAIWorld;
+}
+
+AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -106,19 +115,19 @@ AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 	dt = 0.016666667; //60 fps
 #endif
 
-	// call all control components update functions, passing delta time
-	ControlComponentList::iterator iter;
-	for (iter = mControlComponents.begin(); iter != mControlComponents.end();
+	// call all AI components update functions, passing delta time
+	AIComponentList::iterator iter;
+	for (iter = mAIComponents.begin(); iter != mAIComponents.end();
 			++iter)
 	{
 		(*iter).p()->update(reinterpret_cast<void*>(&dt));
 	}
+
 	//
 	return AsyncTask::DS_cont;
 }
 
-ReMutex& GameControlManager::getMutex()
+ReMutex& GameAIManager::getMutex()
 {
 	return mMutex;
 }
-

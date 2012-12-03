@@ -17,7 +17,7 @@
 /**
  * \file /Ely/callbacks/activityCharacter.cpp
  *
- * \date 26/nov/2012 10:29:22
+ * \date 26/nov/2012 (10:29:22)
  * \author marco
  */
 

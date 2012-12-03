@@ -50,6 +50,8 @@ int main(int argc, char **argv)
 	//sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//
+	GameAIManager* gameAIMgr = new GameAIManager(10, 0,
+			"ManagersChain");
 	GameControlManager* gameControlMgr = new GameControlManager(20, 0,
 			"ManagersChain");
 	GameSceneManager* gameSceneMgr = new GameSceneManager(20, 0,
@@ -59,6 +61,7 @@ int main(int argc, char **argv)
 	GameAudioManager* gameAudioMgr = new GameAudioManager(60, 0,
 			"ManagersChain");
 #else
+	GameAIManager* gameAIMgr = new GameAIManager();
 	GameControlManager* gameControlMgr = new GameControlManager();
 	GameSceneManager* gameSceneMgr = new GameSceneManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
@@ -120,6 +123,7 @@ int main(int argc, char **argv)
 	delete gamePhysicsMgr;
 	delete gameSceneMgr;
 	delete gameControlMgr;
+	delete gameAIMgr;
 	delete gameMgr;
 	delete objectTmplMgr;
 	delete componentTmplMgr;

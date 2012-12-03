@@ -33,11 +33,7 @@ TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
 			"TerrainTemplate::TerrainTemplate: invalid WindowFramework")
 	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"TerrainTemplate::TerrainTemplate: invalid GameSceneManager")
-	if (not pandaFramework or not windowFramework)
-	{
-		throw GameException(
-				"TerrainTemplate::TerrainTemplate: invalid PandaFramework or WindowFramework");
-	}
+	//
 	setParametersDefaults();
 }
 

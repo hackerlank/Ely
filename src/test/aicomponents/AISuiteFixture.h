@@ -15,37 +15,30 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/common_configs.h
+ * \file /Ely/src/test/aicomponents/AISuiteFixture.h
  *
- * \date 26/nov/2012 (12:15:57)
+ * \date 03/dic/2012 (12:59:40)
  * \author marco
  */
 
-#ifndef COMMON_CONFIGS_H_
-#define COMMON_CONFIGS_H_
 
-#include <iostream>
-#include <string>
-#include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
+#ifndef AISUITEFIXTURE_H_
+#define AISUITEFIXTURE_H_
 
-__attribute__((constructor)) void initializationsInit();
-void callAllInits();
+#include <boost/test/unit_test.hpp>
+#include "AIComponents/Steering.h"
+#include "AIComponents/SteeringTemplate.h"
+#include "Game/GameAIManager.h"
 
-__attribute__((destructor)) void initializationsEnd();
-void callAllEnds();
-
-//generic typedefs
-typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
-		PandaFramework* pandaFramework, WindowFramework* windowFramework);
-
-#ifdef __cplusplus
-extern "C"
+struct AISuiteFixture
 {
-#endif
+	AISuiteFixture()
+	{
+	}
 
-#ifdef __cplusplus
-}
-#endif
+	~AISuiteFixture()
+	{
+	}
+};
 
-#endif /* COMMON_CONFIGS_H_ */
+#endif /* AISUITEFIXTURE_H_ */

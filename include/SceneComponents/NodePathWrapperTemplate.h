@@ -24,7 +24,6 @@
 #ifndef NODEPATHWRAPPERTEMPLATE_H_
 #define NODEPATHWRAPPERTEMPLATE_H_
 
-#include <string>
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/NodePathWrapper.h"

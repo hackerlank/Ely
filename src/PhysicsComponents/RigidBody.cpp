@@ -307,13 +307,14 @@ void RigidBody::onAddToObjectSetup()
 	ownerNodePath.reparent_to(mNodePath);
 	//correct (or possibly reset to zero) pos and hpr of the object node path
 	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+	//optimize
 	if (mOwnerObject->isStatic()
 			and (mShapeType != GamePhysicsManager::HEIGHTFIELD))		//Hack
 	{
 		ownerNodePath.flatten_light();
 	}
 
-	//set the object node path as this rigid body's one
+	//set this rigid body node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
 	//setup event callbacks if any
 	setupEvents();

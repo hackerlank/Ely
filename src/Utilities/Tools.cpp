@@ -55,8 +55,8 @@ std::vector<std::string> parseCompoundString(const std::string& compoundString,
 	return substrings;
 }
 
-std::string replaceCharacter(const std::string& source,
-		int character, int replacement)
+std::string replaceCharacter(const std::string& source, int character,
+		int replacement)
 {
 	int len = source.size() + 1;
 	char* dest = new char[len];
@@ -81,6 +81,8 @@ void initTypedObjects()
 	Object::init_type();
 	ObjectTemplate::init_type();
 	//
+	Steering::init_type();
+	SteeringTemplate::init_type();
 	Listener::init_type();
 	ListenerTemplate::init_type();
 	Sound3d::init_type();

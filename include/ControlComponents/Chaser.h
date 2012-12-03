@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/ControlComponents/Chaser.h
  *
- * \date 11/nov/2012 09:45:00
+ * \date 11/nov/2012 (09:45:00)
  * \author marco
  */
 

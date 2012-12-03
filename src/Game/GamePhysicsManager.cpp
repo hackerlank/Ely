@@ -26,6 +26,8 @@
 GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
+	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+			"GamePhysicsManager::GamePhysicsManager: invalid GameManager")
 	mPhysicsComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
@@ -105,16 +107,16 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	float timeStep;
-//	timeStep = ClockObject::get_global_clock()->get_dt();
+	float dt;
+//	dt = ClockObject::get_global_clock()->get_dt();
 	float currTime = ClockObject::get_global_clock()->get_real_time();
-	timeStep = currTime - mLastTime;
+	dt = currTime - mLastTime;
 	mLastTime = currTime;
 
 	float maxSubSteps;
 
 #ifdef TESTING
-	timeStep = 0.016666667; //60 fps
+	dt = 0.016666667; //60 fps
 #endif
 
 	// call all physics components update functions, passing delta time
@@ -122,41 +124,41 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	for (iter = mPhysicsComponents.begin(); iter != mPhysicsComponents.end();
 			++iter)
 	{
-		(*iter).p()->update(reinterpret_cast<void*>(&timeStep));
+		(*iter).p()->update(reinterpret_cast<void*>(&dt));
 	}
 	// do physics step simulation
 	// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->
 	// supposing a minimum of 6,666666667 fps, we have a maximum
 	// timeStep of 0.15 secs so: maxSubSteps <= 60 * 0.15 = 9
-	if (timeStep < 0.016666667)
+	if (dt < 0.016666667)
 	{
 		maxSubSteps = 1;
 	}
-	else if (timeStep < 0.033333333)
+	else if (dt < 0.033333333)
 	{
 		maxSubSteps = 2;
 	}
-	else if (timeStep < 0.05)
+	else if (dt < 0.05)
 	{
 		maxSubSteps = 3;
 	}
-	else if (timeStep < 0.066666668)
+	else if (dt < 0.066666668)
 	{
 		maxSubSteps = 4;
 	}
-	else if (timeStep < 0.083333335)
+	else if (dt < 0.083333335)
 	{
 		maxSubSteps = 5;
 	}
-	else if (timeStep < 0.100000002)
+	else if (dt < 0.100000002)
 	{
 		maxSubSteps = 6;
 	}
-	else if (timeStep < 0.116666669)
+	else if (dt < 0.116666669)
 	{
 		maxSubSteps = 7;
 	}
-	else if (timeStep < 0.133333336)
+	else if (dt < 0.133333336)
 	{
 		maxSubSteps = 8;
 	}
@@ -164,10 +166,9 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	{
 		maxSubSteps = 9;
 	}
-	mBulletWorld->do_physics(timeStep, maxSubSteps);
+	mBulletWorld->do_physics(dt, maxSubSteps);
 	//
 	return AsyncTask::DS_cont;
-
 }
 
 ReMutex& GamePhysicsManager::getMutex()

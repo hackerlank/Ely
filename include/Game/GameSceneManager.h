@@ -16,6 +16,7 @@
 #include <asyncTaskChain.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
+#include "GameManager.h"
 #include "ObjectModel/Component.h"
 #include "Utilities/Tools.h"
 

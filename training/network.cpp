@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/network.cpp
  *
- * \date 11/nov/2012 10:48:06
+ * \date 11/nov/2012 (10:48:06)
  * \author marco
  */
 
