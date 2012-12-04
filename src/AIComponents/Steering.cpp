@@ -65,13 +65,15 @@ bool Steering::initialize()
 	//set AICharacter parameters
 	//type
 	std::string type = mTmpl->parameter(std::string("type"));
-	///TODO
 	if (type == std::string("nodepath"))
 	{
+		//update the nodepath
+		mUpdatePtr = &Steering::updateNodePath;
 	}
 	else
 	{
-		//controller
+		//update the controller
+		mUpdatePtr = &Steering::updateController;
 	}
 	//behavior
 	mBehavior = mTmpl->parameter(std::string("behavior"));
@@ -102,11 +104,7 @@ void Steering::onAddToObjectSetup()
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
 	//...add it to the AIWorld
 	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
-	//get a reference to its AIBehaviors
-	AIBehaviors* behaviors = mAICharacter->get_ai_behaviors();
 	//switch to the indicated behavior
-
-	///TODO
 	if (mBehavior == std::string("flee"))
 	{
 	}
@@ -133,8 +131,8 @@ void Steering::onAddToObjectSetup()
 	}
 	else
 	{
-		//seek
-
+		//seek: default
+		setupSeek();
 	}
 	//Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
@@ -142,6 +140,73 @@ void Steering::onAddToObjectSetup()
 	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
+}
+
+void Steering::setupSeek()
+{
+	//seek
+	//get seek_wt
+	float seekWT = (float) atof(
+			mTmpl->parameter(std::string("seek_wt")).c_str());
+	//check if there is an object this component has to seek;
+	//that object is supposed to be already created,
+	//set up and added to the created objects table;
+	ObjectId targetObjectId = ObjectId(
+			mTmpl->parameter(std::string("target_object")));
+	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
+			targetObjectId);
+	if (targetObject != NULL)
+	{
+		//the target is an object
+		//get a reference to its AIBehaviors and
+		//set the seek target object
+		mAICharacter->get_ai_behaviors()->seek(targetObject->getNodePath(),
+				seekWT);
+	}
+	else
+	{
+		//otherwise this component has to seek a point;
+		float targetX = (float) atof(
+				mTmpl->parameter(std::string("target_x")).c_str());
+		float targetY = (float) atof(
+				mTmpl->parameter(std::string("target_Y")).c_str());
+		float targetZ = (float) atof(
+				mTmpl->parameter(std::string("target_Z")).c_str());
+		mAICharacter->get_ai_behaviors()->seek(
+				LVecBase3f(targetX, targetY, targetZ), seekWT);
+	}
+}
+
+void Steering::setupFlee()
+{
+}
+
+void Steering::setupPursue()
+{
+}
+
+void Steering::setupEvade()
+{
+}
+
+void Steering::setupArrival()
+{
+}
+
+void Steering::setupWander()
+{
+}
+
+void Steering::setupFlock()
+{
+}
+
+void Steering::setupObstacleAvoidance()
+{
+}
+
+void Steering::setupPathFollow()
+{
 }
 
 void Steering::update(void* data)

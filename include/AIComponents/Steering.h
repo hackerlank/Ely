@@ -28,6 +28,7 @@
 #include <aiCharacter.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Utilities/Tools.h"
 
 class SteeringTemplate;
@@ -47,7 +48,7 @@ class SteeringTemplate;
  * - "target_x"			|single|no default (seek)
  * - "target_y"			|single|no default (seek)
  * - "target_z"			|single|no default (seek)
- * - "seek_wt"  		|single|no default (seek)
+ * - "seek_wt"  		|single|"1.0" (seek)
  */
 class Steering: public Component
 {
@@ -81,13 +82,27 @@ private:
 	///The pointer to the real update member function.
 	void (Steering::*mUpdatePtr)(float);
 
-
 	/**
 	 * \name The real update member functions.
 	 */
 	///@{
 	void updateController(float dt);
 	void updateNodePath(float dt);
+	///@}
+
+	/**
+	 * \name The setup behaviors member functions.
+	 */
+	///@{
+	void setupSeek();
+	void setupFlee();
+	void setupPursue();
+	void setupEvade();
+	void setupArrival();
+	void setupWander();
+	void setupFlock();
+	void setupObstacleAvoidance();
+	void setupPathFollow();
 	///@}
 
 	///TypedObject semantics: hardcoded
