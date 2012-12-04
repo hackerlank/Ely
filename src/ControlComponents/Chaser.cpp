@@ -291,6 +291,10 @@ void Chaser::update(void* data)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
 	//update chaser position and orientation (see OgreBulletDemos)
 	//position
 	LPoint3f desiredChaserPos = mReferenceNodePath.get_relative_point(

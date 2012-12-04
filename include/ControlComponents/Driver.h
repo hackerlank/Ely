@@ -119,9 +119,6 @@ public:
 
 	/**
 	 * \name Control keys' enablers.
-	 *
-	 * These routines should be typically called by
-	 * event handlers, but this is not strictly required.
 	 */
 	///@{
 	void enableForward(bool enable);

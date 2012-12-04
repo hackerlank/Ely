@@ -123,6 +123,10 @@ void Listener::update(void* data)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
 	LPoint3 newPosition;
 	LVector3 forward, up, deltaPos, velocity;
 	NodePath ownerNodePath = mOwnerObject->getNodePath();

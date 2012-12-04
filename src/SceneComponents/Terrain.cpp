@@ -228,6 +228,10 @@ void Terrain::update(void* data)
 
 //	float dt = *(reinterpret_cast<float*>(data));
 
+//#ifdef TESTING
+//	dt = 0.016666667; //60 fps
+//#endif
+
 	//set focal point
 	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
 	LPoint3 focalPointNetPos = mFocalPointNP.get_net_transform()->get_pos();

@@ -87,8 +87,8 @@ bool Sound3d::initialize()
 		// "sound_file1:sound_file2:...:sound_fileN"
 		std::vector<std::string> soundFiles = parseCompoundString(*iter, ':');
 		std::vector<std::string>::const_iterator iterSoundFile;
-		for (iterSoundFile = soundFiles.begin(); iterSoundFile != soundFiles.end();
-				++iterSoundFile)
+		for (iterSoundFile = soundFiles.begin();
+				iterSoundFile != soundFiles.end(); ++iterSoundFile)
 		{
 			//an empty sound file is ignored
 			if (not iterSoundFile->empty())
@@ -291,6 +291,10 @@ void Sound3d::update(void* data)
 	HOLDMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
 
 	//get the new position
 	//note on threading: this should be an atomic operation

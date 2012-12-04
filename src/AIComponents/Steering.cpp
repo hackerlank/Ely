@@ -34,6 +34,8 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl)
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"Steering::Steering: invalid GameAIManager")
 	mTmpl = tmpl;
+	mAICharacter = NULL;
+	mUpdatePtr = NULL;
 }
 
 Steering::~Steering()
@@ -41,7 +43,7 @@ Steering::~Steering()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mNodePath.remove_node();
+	delete mAICharacter;
 }
 
 const ComponentFamilyType Steering::familyType() const
@@ -60,6 +62,32 @@ bool Steering::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//set AICharacter parameters
+	//type
+	std::string type = mTmpl->parameter(std::string("type"));
+	///TODO
+	if (type == std::string("nodepath"))
+	{
+	}
+	else
+	{
+		//controller
+	}
+	//behavior
+	mBehavior = mTmpl->parameter(std::string("behavior"));
+	//
+	float floatParam;
+	//mass
+	floatParam = (float) atof(mTmpl->parameter(std::string("mass")).c_str());
+	floatParam > 0.0 ? mMass = floatParam : mMass = 1.0;
+	//movt_force
+	floatParam = (float) atof(
+			mTmpl->parameter(std::string("movt_force")).c_str());
+	floatParam > 0.0 ? mMovtForce = floatParam : mMovtForce = 1.0;
+	//max_force
+	floatParam = (float) atof(
+			mTmpl->parameter(std::string("max_force")).c_str());
+	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
 	//
 	return result;
 }
@@ -69,22 +97,74 @@ void Steering::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//create the AICharacter...
+	mAICharacter = new AICharacter(std::string(mComponentId),
+			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
+	//...add it to the AIWorld
+	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
+	//get a reference to its AIBehaviors
+	AIBehaviors* behaviors = mAICharacter->get_ai_behaviors();
+	//switch to the indicated behavior
+
+	///TODO
+	if (mBehavior == std::string("flee"))
+	{
+	}
+	else if (mBehavior == std::string("pursue"))
+	{
+	}
+	else if (mBehavior == std::string("evade"))
+	{
+	}
+	else if (mBehavior == std::string("arrival"))
+	{
+	}
+	else if (mBehavior == std::string("wander"))
+	{
+	}
+	else if (mBehavior == std::string("flock"))
+	{
+	}
+	else if (mBehavior == std::string("obstacle_avoidance"))
+	{
+	}
+	else if (mBehavior == std::string("path_follow"))
+	{
+	}
+	else
+	{
+		//seek
+
+	}
+	//Add to the AI manager update
+	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+	//setup event callbacks if any
+	setupEvents();
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
-NodePath Steering::getNodePath() const
+void Steering::update(void* data)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mNodePath;
+	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+	//call the designated update member
+	((*this).*mUpdatePtr)(dt);
 }
 
-void Steering::setNodePath(const NodePath& nodePath)
+void Steering::updateController(float dt)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+}
 
-	mNodePath = nodePath;
+void Steering::updateNodePath(float dt)
+{
 }
 
 //TypedObject semantics: hardcoded

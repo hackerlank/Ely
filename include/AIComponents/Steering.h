@@ -24,6 +24,7 @@
 #ifndef STEERING_H_
 #define STEERING_H_
 
+#include <string>
 #include <aiCharacter.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
@@ -35,8 +36,18 @@ class SteeringTemplate;
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
  * XML Param(s):
- * - "param1"  			|single|no default
- * - "param2"  			|multiple|no default
+ * - "type"				|single|"controller" (controller,nodepath)
+ * - "behavior"			|single|"seek" (seek,flee,pursue,evade,arrival,
+ * 										wander,flock,obstacle_avoidance,
+ * 										path_follow)
+ * - "mass"  			|single|"1.0"
+ * - "movt_force"  		|single|"1.0"
+ * - "max_force"  		|single|"1.0"
+ * - "target_object"	|single|no default (seek)
+ * - "target_x"			|single|no default (seek)
+ * - "target_y"			|single|no default (seek)
+ * - "target_z"			|single|no default (seek)
+ * - "seek_wt"  		|single|no default (seek)
  */
 class Steering: public Component
 {
@@ -52,17 +63,32 @@ public:
 	virtual void onAddToObjectSetup();
 
 	/**
-	 * \brief Gets/sets the node path associated to this model.
-	 * @return The node path associated to this model.
+	 * \brief Updates position/orientation of the controlled object.
+	 *
+	 * Will be called automatically by an control manager update.
+	 * @param data The custom data.
 	 */
-	///@{
-	NodePath getNodePath() const;
-	void setNodePath(const NodePath& nodePath);
-	///@}
+	virtual void update(void* data);
 
 private:
-	///The NodePath associated to this Steering.
-	NodePath mNodePath;
+	///The AICharacter associated to this Steering.
+	AICharacter* mAICharacter;
+	///@{
+	///The AICharacter parameters.
+	float mMass, mMovtForce, mMaxForce;
+	std::string mBehavior;
+	///@}
+	///The pointer to the real update member function.
+	void (Steering::*mUpdatePtr)(float);
+
+
+	/**
+	 * \name The real update member functions.
+	 */
+	///@{
+	void updateController(float dt);
+	void updateNodePath(float dt);
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
