@@ -35,6 +35,7 @@
 #include <graphicsWindow.h>
 #include <windowProperties.h>
 #include <transformState.h>
+#include <lvector3.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
@@ -138,6 +139,8 @@ public:
 	///@{
 	void setSpeed();
 	void setSpeedFast();
+	void setSpeedXYZ(LVector3f speedXYZ);
+	void setSpeedH(float speedH);
 	///@}
 
 private:
@@ -157,6 +160,8 @@ private:
 	///@{
 	/// Sensitivity settings.
 	float mSpeed, mFastFactor, mSpeedActual;
+	LVecBase3f mSpeedActualXYZ;
+	float mSpeedActualH;
 	float mMovSens, mRollSens;
 	float mSensX, mSensY;
 	int mCentX, mCentY;

@@ -74,7 +74,7 @@ void SteeringTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	mParameterTable.insert(ParameterNameValue("type", "controller"));
+	mParameterTable.insert(ParameterNameValue("type", "nodepath"));
 	mParameterTable.insert(ParameterNameValue("behavior", "seek"));
 	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
 	mParameterTable.insert(ParameterNameValue("movt_force", "1.0"));

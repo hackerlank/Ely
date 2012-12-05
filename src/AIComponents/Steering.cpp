@@ -36,6 +36,8 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl)
 	mTmpl = tmpl;
 	mAICharacter = NULL;
 	mUpdatePtr = NULL;
+	mCharacterController = NULL;
+	mDriver = NULL;
 }
 
 Steering::~Steering()
@@ -63,18 +65,6 @@ bool Steering::initialize()
 
 	bool result = true;
 	//set AICharacter parameters
-	//type
-	std::string type = mTmpl->parameter(std::string("type"));
-	if (type == std::string("nodepath"))
-	{
-		//update the nodepath
-		mUpdatePtr = &Steering::updateNodePath;
-	}
-	else
-	{
-		//update the controller
-		mUpdatePtr = &Steering::updateController;
-	}
 	//behavior
 	mBehavior = mTmpl->parameter(std::string("behavior"));
 	//
@@ -104,6 +94,44 @@ void Steering::onAddToObjectSetup()
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
 	//...add it to the AIWorld
 	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
+	//get some references (for performance)
+	_ai_char_np = mOwnerObject->getNodePath();
+	_steering = mAICharacter->_steering;
+	_mass = mAICharacter->_mass;
+	_velocity = &(mAICharacter->_velocity);
+
+	//get the type of the updatable item
+	std::string type = mTmpl->parameter(std::string("type"));
+	if ((type == std::string("character_controller"))
+			and (mOwnerObject->getComponent(ComponentFamilyType("Physics"))->is_of_type(
+					CharacterController::get_class_type())))
+	{
+		//update the character_controller
+		mUpdatePtr = &Steering::updateController;
+		//get a reference to the CharacterController component
+		//(which is already created and set up)
+		mCharacterController =
+				DCAST(CharacterController, mOwnerObject->getComponent(
+								ComponentFamilyType("Physics")));
+		mControllerType = CHARACTER_CONTROLLER;
+	}
+	else if ((type == std::string("driver"))
+			and (mOwnerObject->getComponent(ComponentFamilyType("Control"))->is_of_type(
+					Driver::get_class_type())))
+	{
+		//update the driver
+		mUpdatePtr = &Steering::updateController;
+		//get a reference to the Driver component
+		//(which is already created and set up)
+		mDriver = DCAST(Driver, mOwnerObject->getComponent(
+						ComponentFamilyType("Control")));
+		mControllerType = DRIVER;
+	}
+	else
+	{
+		//update the owner object nodepath: default
+		mUpdatePtr = &Steering::updateNodePath;
+	}
 	//switch to the indicated behavior
 	if (mBehavior == std::string("flee"))
 	{
@@ -211,7 +239,7 @@ void Steering::setupPathFollow()
 
 void Steering::update(void* data)
 {
-	//lock (guard) the mutex
+//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
@@ -220,12 +248,56 @@ void Steering::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-	//call the designated update member
+//call the designated update member
 	((*this).*mUpdatePtr)(dt);
 }
 
 void Steering::updateController(float dt)
 {
+	if (!_steering->is_off(_steering->_none))
+	{
+		LVecBase3f old_pos = _ai_char_np.get_pos();
+		LVecBase3f steering_force = _steering->calculate_prioritized();
+		LVecBase3f acceleration = steering_force / _mass;
+		(*_velocity) = acceleration;
+		LVecBase3f direction = _steering->_steering_force;
+		direction.normalize();
+		///<TODO
+		switch (mControllerType)
+		{
+		case CHARACTER_CONTROLLER:
+			LVecBase2f linear(acceleration.get_xy());
+			//
+			mCharacterController->enableLinearMovement(true, linear);
+			mCharacterController->
+			break;
+		case DRIVER:
+			;
+			break;
+		default:
+			break;
+		}
+//		_ai_char_np.set_pos(old_pos + _velocity);
+//		if (steering_force.length() > 0)
+//		{
+//			_ai_char_np.look_at(old_pos + (direction * 5));
+//			_ai_char_np.set_h(_ai_char_np.get_h() + 180);
+//			_ai_char_np.set_p(-_ai_char_np.get_p());
+//			_ai_char_np.set_r(-_ai_char_np.get_r());
+//		}
+		///TODO>
+	}
+	else
+	{
+		_steering->_steering_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_seek_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_flee_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_pursue_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_evade_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_arrival_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_flock_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_wander_force = LVecBase3f(0.0, 0.0, 0.0);
+	}
 }
 
 void Steering::updateNodePath(float dt)

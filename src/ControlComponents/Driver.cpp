@@ -208,6 +208,8 @@ bool Driver::initialize()
 	mFastFactor = (float) atof(
 			mTmpl->parameter(std::string("fast_factor")).c_str());
 	mSpeedActual = mSpeed;
+	mSpeedActualXYZ = LVecBase3f(mSpeedActual, mSpeedActual, mSpeedActual);
+	mSpeedActualH = mSpeedActual;
 	mMovSens = (float) atof(mTmpl->parameter(std::string("mov_sens")).c_str());
 	mRollSens = (float) atof(
 			mTmpl->parameter(std::string("roll_sens")).c_str());
@@ -344,6 +346,8 @@ void Driver::setSpeed()
 	HOLDMUTEX(mMutex)
 
 	mSpeedActual = mSpeed;
+	mSpeedActualXYZ = LVecBase3f(mSpeedActual, mSpeedActual, mSpeedActual);
+	mSpeedActualH = mSpeedActual;
 }
 
 void Driver::setSpeedFast()
@@ -352,6 +356,24 @@ void Driver::setSpeedFast()
 	HOLDMUTEX(mMutex)
 
 	mSpeedActual = mSpeed * mFastFactor;
+	mSpeedActualXYZ = LVecBase3f(mSpeedActual, mSpeedActual, mSpeedActual);
+	mSpeedActualH = mSpeedActual;
+}
+
+void Driver::setSpeedXYZ(LVector3f speedXYZ)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mSpeedActualXYZ = speedXYZ;
+}
+
+void Driver::setSpeedH(float speedH)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mSpeedActualH = speedH;
 }
 
 void Driver::update(void* data)
@@ -419,80 +441,80 @@ void Driver::update(void* data)
 	if (mForward)
 	{
 #ifdef ELY_THREAD
-		newY -= mMovSens * mSpeedActual * dt * signOfKeyboard;
+		newY -= mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard;
 #else
 		ownerNodePath.set_y(ownerNodePath,
-				-mMovSens * mSpeedActual * dt * signOfKeyboard);
+				-mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard);
 #endif
 		modified = true;
 	}
 	if (mBackward)
 	{
 #ifdef ELY_THREAD
-		newY += mMovSens * mSpeedActual * dt * signOfKeyboard;
+		newY += mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard;
 #else
 		ownerNodePath.set_y(ownerNodePath,
-				+mMovSens * mSpeedActual * dt * signOfKeyboard);
+				+mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard);
 #endif
 		modified = true;
 	}
 	if (mStrafeLeft)
 	{
 #ifdef ELY_THREAD
-		newX += mMovSens * mSpeedActual * dt * signOfKeyboard;
+		newX += mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard;
 #else
 		ownerNodePath.set_x(ownerNodePath,
-				+mMovSens * mSpeedActual * dt * signOfKeyboard);
+				+mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard);
 #endif
 		modified = true;
 	}
 	if (mStrafeRight)
 	{
 #ifdef ELY_THREAD
-		newX -= mMovSens * mSpeedActual * dt * signOfKeyboard;
+		newX -= mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard;
 #else
 		ownerNodePath.set_x(ownerNodePath,
-				-mMovSens * mSpeedActual * dt * signOfKeyboard);
+				-mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard);
 #endif
 		modified = true;
 	}
 	if (mUp)
 	{
 #ifdef ELY_THREAD
-		newZ += mMovSens * mSpeedActual * dt;
+		newZ += mMovSens * mSpeedActualXYZ.get_z() * dt;
 #else
-		ownerNodePath.set_z(ownerNodePath, +mMovSens * mSpeedActual * dt);
+		ownerNodePath.set_z(ownerNodePath, +mMovSens * mSpeedActualXYZ.get_z() * dt);
 #endif
 		modified = true;
 	}
 	if (mDown)
 	{
 #ifdef ELY_THREAD
-		newZ -= mMovSens * mSpeedActual * dt;
+		newZ -= mMovSens * mSpeedActualXYZ.get_z() * dt;
 #else
-		ownerNodePath.set_z(ownerNodePath, -mMovSens * mSpeedActual * dt);
+		ownerNodePath.set_z(ownerNodePath, -mMovSens * mSpeedActualXYZ.get_z() * dt);
 #endif
 		modified = true;
 	}
 	if (mRollLeft)
 	{
 #ifdef ELY_THREAD
-		newH += mRollSens * mSpeedActual * dt * signOfKeyboard;
+		newH += mRollSens * mSpeedActualH * dt * signOfKeyboard;
 #else
 		ownerNodePath.set_h(
 				ownerNodePath.get_h()
-				+ mRollSens * mSpeedActual * dt * signOfKeyboard);
+				+ mRollSens * mSpeedActualH * dt * signOfKeyboard);
 #endif
 		modified = true;
 	}
 	if (mRollRight)
 	{
 #ifdef ELY_THREAD
-		newH -= mRollSens * mSpeedActual * dt * signOfKeyboard;
+		newH -= mRollSens * mSpeedActualH * dt * signOfKeyboard;
 #else
 		ownerNodePath.set_h(
 				ownerNodePath.get_h()
-				- mRollSens * mSpeedActual * dt * signOfKeyboard);
+				- mRollSens * mSpeedActualH * dt * signOfKeyboard);
 #endif
 		modified = true;
 	}

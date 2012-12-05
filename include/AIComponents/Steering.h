@@ -26,6 +26,9 @@
 
 #include <string>
 #include <aiCharacter.h>
+#include <nodePath.h>
+#include "ControlComponents/Driver.h"
+#include "PhysicsComponents/CharacterController.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -37,7 +40,8 @@ class SteeringTemplate;
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
  * XML Param(s):
- * - "type"				|single|"controller" (controller,nodepath)
+ * - "type"				|single|"nodepath" (driver, nodepath,
+ * 											character_controller)
  * - "behavior"			|single|"seek" (seek,flee,pursue,evade,arrival,
  * 										wander,flock,obstacle_avoidance,
  * 										path_follow)
@@ -81,6 +85,25 @@ private:
 	///@}
 	///The pointer to the real update member function.
 	void (Steering::*mUpdatePtr)(float);
+	///@{
+	///Controlled items.
+	enum ControllerType
+	{
+		CHARACTER_CONTROLLER,
+		DRIVER,
+	};
+	ControllerType mControllerType;
+	SMARTPTR(CharacterController) mCharacterController;
+	SMARTPTR(Driver) mDriver;
+	///@}
+
+	///@{
+	///Some helper references (used for performance).
+	NodePath _ai_char_np;
+	AIBehaviors *_steering;
+	float _mass;
+	LVecBase3f* _velocity;
+	///@}
 
 	/**
 	 * \name The real update member functions.
