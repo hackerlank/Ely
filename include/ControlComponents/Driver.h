@@ -78,7 +78,8 @@ class DriverTemplate;
  * - "mouse_enabled_h"  	|single|"false"
  * - "mouse_enabled_p"  	|single|"false"
  * - "speed_key"  			|single|"shift"
- * - "speed"  				|single|"5.0"
+ * - "linear_speed"  		|single|"5.0"
+ * - "angular_speed"  		|single|"5.0"
  * - "fast_factor"  		|single|"5.0"
  * - "mov_sens"  			|single|"2.0"
  * - "roll_sens"  			|single|"15.0"
@@ -134,13 +135,15 @@ public:
 	///@}
 
 	/**
-	 * \name Speed setters.
+	 * \name Speeds getters/setters.
 	 */
 	///@{
-	void setSpeed();
-	void setSpeedFast();
-	void setSpeedXYZ(LVector3f speedXYZ);
-	void setSpeedH(float speedH);
+	void setLinearSpeed(LVector3f linearSpeed);
+	LVector3f getLinearSpeed();
+	void setAngularSpeed(float angularSpeed);
+	float getAngularSpeed();
+	void setFastFactor(float factor);
+	float getFastFactor();
 	///@}
 
 private:
@@ -159,7 +162,7 @@ private:
 	///@}
 	///@{
 	/// Sensitivity settings.
-	float mSpeed, mFastFactor, mSpeedActual;
+	float mFastFactor;
 	LVecBase3f mSpeedActualXYZ;
 	float mSpeedActualH;
 	float mMovSens, mRollSens;

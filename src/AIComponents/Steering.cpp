@@ -262,14 +262,18 @@ void Steering::updateController(float dt)
 		(*_velocity) = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
 		direction.normalize();
-		///<TODO
 		switch (mControllerType)
 		{
 		case CHARACTER_CONTROLLER:
-			LVecBase2f linear(acceleration.get_xy());
 			//
-			mCharacterController->enableLinearMovement(true, linear);
-			mCharacterController->
+			mCharacterController->enableForward(true);
+			mCharacterController->enableStrafeRight(true);
+			mCharacterController->setLinearSpeed(acceleration.get_xy());
+			if (steering_force.length() > 0)
+			{
+				mCharacterController->enableRollLeft(true);
+				mCharacterController->setAngularSpeed(direction.get_x());
+			}
 			break;
 		case DRIVER:
 			;

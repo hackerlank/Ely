@@ -126,7 +126,8 @@
 <!--
 			<Component type="Driver">
 				<Param enabled="false"/>
-				<Param speed="10.0"/>
+				<Param linear_speed="10.0"/>
+				<Param angular_speed="10.0"/>
 				<Param fast_factor="20.0"/>
 				<Param roll_left=""/>
 				<Param roll_right=""/>
@@ -198,7 +199,8 @@
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
-				<Param speed="3.0"/>
+				<Param linear_speed="3.0"/>
+				<Param angular_speed="3.0"/>
 				<Param fast_factor="15.0"/>
 				<Param inverted_keyboard="false"/>
 				<Param inverted_mouse="false"/>

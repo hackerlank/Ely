@@ -29,6 +29,7 @@
 #include <cmath>
 #include <nodePath.h>
 #include <lvecBase3.h>
+#include <lvecBase2.h>
 #include <lvector3.h>
 #include <lpoint3.h>
 #include <bulletShape.h>
@@ -115,13 +116,11 @@ public:
 	///@}
 
 	/**
-	 * \brief Gets/sets the character controller linear/angular speed.
-	 * @param speed The character controller linear/angular speed.
-	 * @return The character controller linear/angular speed.
+	 * \name Speeds getters/setters.
 	 */
 	///@{
-	float getLinearSpeed();
-	void setLinearSpeed(float speed);
+	void setLinearSpeed(LVecBase2f speed);
+	LVecBase2f getLinearSpeed();
 	float getAngularSpeed();
 	void setAngularSpeed(float speed);
 	///@}
@@ -167,7 +166,8 @@ private:
 
 	///Control functions and parameters.
 	///@{
-	float mLinearSpeed, mAngularSpeed, mFallSpeed, mGravity, mJumpSpeed, mMaxSlope, mMaxJumpHeight;
+	float mAngularSpeed, mFallSpeed, mGravity, mJumpSpeed, mMaxSlope, mMaxJumpHeight;
+	LVecBase2f mLinearSpeed;
 	/**
 	 * \brief Sets control parameters of a character controller node (helper function).
 	 */

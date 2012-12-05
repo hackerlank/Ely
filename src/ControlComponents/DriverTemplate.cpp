@@ -85,7 +85,8 @@ void DriverTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("down", "enabled"));
 	mParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
 	mParameterTable.insert(ParameterNameValue("speed_key", "shift"));
-	mParameterTable.insert(ParameterNameValue("speed", "5.0"));
+	mParameterTable.insert(ParameterNameValue("linear_speed", "5.0"));
+	mParameterTable.insert(ParameterNameValue("angular_speed", "5.0"));
 	mParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
 	mParameterTable.insert(ParameterNameValue("mov_sens", "2.0"));
 	mParameterTable.insert(ParameterNameValue("roll_sens", "15.0"));

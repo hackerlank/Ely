@@ -204,12 +204,13 @@ bool Driver::initialize()
 	}
 
 	//set sensitivity parameters
-	mSpeed = (float) atof(mTmpl->parameter(std::string("speed")).c_str());
+	float speed = (float) atof(
+			mTmpl->parameter(std::string("linear_speed")).c_str());
+	mSpeedActualXYZ = LVecBase3f(speed, speed, speed);
+	mSpeedActualH = (float) atof(
+			mTmpl->parameter(std::string("angular_speed")).c_str());
 	mFastFactor = (float) atof(
 			mTmpl->parameter(std::string("fast_factor")).c_str());
-	mSpeedActual = mSpeed;
-	mSpeedActualXYZ = LVecBase3f(mSpeedActual, mSpeedActual, mSpeedActual);
-	mSpeedActualH = mSpeedActual;
 	mMovSens = (float) atof(mTmpl->parameter(std::string("mov_sens")).c_str());
 	mRollSens = (float) atof(
 			mTmpl->parameter(std::string("roll_sens")).c_str());
@@ -340,40 +341,52 @@ void Driver::enableMouseMove(bool enable)
 	}
 }
 
-void Driver::setSpeed()
+void Driver::setLinearSpeed(LVector3f linearSpeed)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mSpeedActual = mSpeed;
-	mSpeedActualXYZ = LVecBase3f(mSpeedActual, mSpeedActual, mSpeedActual);
-	mSpeedActualH = mSpeedActual;
+	mSpeedActualXYZ = linearSpeed;
 }
 
-void Driver::setSpeedFast()
+LVector3f Driver::getLinearSpeed()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mSpeedActual = mSpeed * mFastFactor;
-	mSpeedActualXYZ = LVecBase3f(mSpeedActual, mSpeedActual, mSpeedActual);
-	mSpeedActualH = mSpeedActual;
+	return mSpeedActualXYZ;
 }
 
-void Driver::setSpeedXYZ(LVector3f speedXYZ)
+void Driver::setAngularSpeed(float angularSpeed)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mSpeedActualXYZ = speedXYZ;
+	mSpeedActualH = angularSpeed;
 }
 
-void Driver::setSpeedH(float speedH)
+float Driver::getAngularSpeed()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mSpeedActualH = speedH;
+	return mSpeedActualH;
+}
+
+void Driver::setFastFactor(float factor)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mFastFactor = factor;
+}
+
+float Driver::getFastFactor()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mFastFactor;
 }
 
 void Driver::update(void* data)

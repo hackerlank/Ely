@@ -194,8 +194,9 @@ bool CharacterController::initialize()
 #endif
 	}
 	//set control parameters
-	mLinearSpeed = (float) atof(
+	float linearSpeed = (float) atof(
 			mTmpl->parameter(std::string("linear_speed")).c_str());
+	mLinearSpeed = LVecBase2f(linearSpeed, linearSpeed);
 	mAngularSpeed = (float) atof(
 			mTmpl->parameter(std::string("angular_speed")).c_str());
 	mFallSpeed = (float) atof(
@@ -363,7 +364,7 @@ void CharacterController::enableJump(bool enable)
 	}
 }
 
-float CharacterController::getLinearSpeed()
+LVecBase2f CharacterController::getLinearSpeed()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -371,7 +372,7 @@ float CharacterController::getLinearSpeed()
 	return mLinearSpeed;
 }
 
-void CharacterController::setLinearSpeed(float speed)
+void CharacterController::setLinearSpeed(LVecBase2f speed)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -412,19 +413,19 @@ void CharacterController::update(void* data)
 	//handle keys:
 	if (mForward)
 	{
-		speed.set_y(-mLinearSpeed);
+		speed.set_y(-mLinearSpeed.get_y());
 	}
 	if (mBackward)
 	{
-		speed.set_y(mLinearSpeed);
+		speed.set_y(mLinearSpeed.get_y());
 	}
 	if (mStrafeLeft)
 	{
-		speed.set_x(-mLinearSpeed);
+		speed.set_x(-mLinearSpeed.get_x());
 	}
 	if (mStrafeRight)
 	{
-		speed.set_x(mLinearSpeed);
+		speed.set_x(mLinearSpeed.get_x());
 	}
 	if (mRollLeft)
 	{
@@ -474,12 +475,12 @@ SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeT
 		if (createdObject != NULL)
 		{
 			SMARTPTR(Component) component =
-					createdObject->getComponent(ComponentFamilyType("Physics"));
+			createdObject->getComponent(ComponentFamilyType("Physics"));
 			if (component->is_of_type(CharacterController::get_class_type()))
 			{
 				//object already exists
 				SMARTPTR(CharacterController)characterController =
-						DCAST(CharacterController, component);
+				DCAST(CharacterController, component);
 				if (characterController != NULL)
 				{
 					//physics component is a character controller:
