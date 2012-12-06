@@ -94,11 +94,6 @@ void Steering::onAddToObjectSetup()
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
 	//...add it to the AIWorld
 	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
-	//get some references (for performance)
-	_ai_char_np = mOwnerObject->getNodePath();
-	_steering = mAICharacter->_steering;
-	_mass = mAICharacter->_mass;
-	_velocity = &(mAICharacter->_velocity);
 
 	//get the type of the updatable item
 	std::string type = mTmpl->parameter(std::string("controlled_type"));
@@ -254,26 +249,30 @@ void Steering::update(void* data)
 
 void Steering::updateController(float dt)
 {
+	//
+	AIBehaviors *_steering = mAICharacter->_steering;
 	if (!_steering->is_off(_steering->_none))
 	{
-		LVecBase3f old_pos = _ai_char_np.get_pos();
+		LVecBase3f old_pos = mAICharacter->_ai_char_np.get_pos();
 		LVecBase3f steering_force = _steering->calculate_prioritized();
-		LVecBase3f acceleration = steering_force / _mass;
-		(*_velocity) = acceleration;
+		LVecBase3f acceleration = steering_force / mAICharacter->_mass;
+		mAICharacter->_velocity = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
 		direction.normalize();
+
 		switch (mControllerType)
 		{
 		case CHARACTER_CONTROLLER:
-			//
+		{
 			mCharacterController->enableForward(true);
-			mCharacterController->enableStrafeRight(true);
+			mCharacterController->enableStrafeLeft(true);
 			mCharacterController->setLinearSpeed(acceleration.get_xy());
 			if (steering_force.length() > 0)
 			{
 				mCharacterController->enableRollLeft(true);
 				mCharacterController->setAngularSpeed(direction.get_x());
 			}
+		}
 			break;
 		case DRIVER:
 			;

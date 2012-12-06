@@ -182,7 +182,7 @@
 				<Param scale_z="3.0"/>
 			</Component>
 		</Object>
-
+		
 		<Object type="InstancedActorAI" id="InstancedTeapotAI1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
@@ -198,7 +198,7 @@
 				<Param mass="100.0"/>
 				<Param movt_force="0.05"/>
 				<Param max_force="5.0"/>
-				<Param target_object="NPC2"/>
+				<Param target_object="NPC1"/>
 			</Component> 
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>

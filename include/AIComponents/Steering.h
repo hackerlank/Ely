@@ -97,14 +97,6 @@ private:
 	SMARTPTR(Driver) mDriver;
 	///@}
 
-	///@{
-	///Some helper references (used for performance).
-	NodePath _ai_char_np;
-	AIBehaviors *_steering;
-	float _mass;
-	LVecBase3f* _velocity;
-	///@}
-
 	/**
 	 * \name The real update member functions.
 	 */
