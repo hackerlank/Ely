@@ -116,6 +116,10 @@ void GameManager::setupCompTmplMgr()
 {
 	// Add all kind of component templates
 
+	///AI templates
+	//Steering
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new SteeringTemplate(this, mWindow));
 	///Audio templates
 	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(

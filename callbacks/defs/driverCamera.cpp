@@ -169,23 +169,34 @@ static const char* camera_keys[] =
 		"r", //up
 		"f", //down
 		};
+
+static LVector3f oldLinearSpeed;
+static float oldAngularSpeed;
 void driverCamera(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)driver = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
 	bool enable;
 	std::string eventName = event->get_name();
 	//check if shift or shift-up key pressed
-	if ((eventName == "shift") or (eventName == "shift-up"))
+	if (eventName == "shift")
 	{
-		(eventName.find("-up", 0) == string::npos) ?
-		driver->setSpeedFast() : driver->setSpeed();
+		float speedFactor = cameraDrv->getFastFactor();
+		oldLinearSpeed = cameraDrv->getLinearSpeed();
+		oldAngularSpeed = cameraDrv->getAngularSpeed();
+		cameraDrv->setLinearSpeed(oldLinearSpeed * speedFactor);
+		cameraDrv->setAngularSpeed(oldAngularSpeed * speedFactor);
 		return;
+	}
+	else if (eventName == "shift-up")
+	{
+		cameraDrv->setLinearSpeed(oldLinearSpeed);
+		cameraDrv->setAngularSpeed(oldAngularSpeed);
 	}
 	//get bare event
 	std::string bareEvent = getBareEvent(eventName, "shift-", &enable);
 	//execute command
-	setDriverCommand(driver, bareEvent, enable, camera_keys);
+	setDriverCommand(cameraDrv, bareEvent, enable, camera_keys);
 }
 
 ///Init/end functions: see common_configs.cpp

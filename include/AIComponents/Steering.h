@@ -40,7 +40,7 @@ class SteeringTemplate;
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
  * XML Param(s):
- * - "type"				|single|"nodepath" (driver, nodepath,
+ * - "controlled_type"	|single|"nodepath" (driver, nodepath,
  * 											character_controller)
  * - "behavior"			|single|"seek" (seek,flee,pursue,evade,arrival,
  * 										wander,flock,obstacle_avoidance,

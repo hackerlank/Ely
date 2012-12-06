@@ -43,56 +43,98 @@ INITIALIZATION camera_initialization;
 static void toggleCameraControl(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera = reinterpret_cast<Object*>(data);
-//	SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
-//					ComponentFamilyType("Control")));
-	SMARTPTR(Chaser)cameraControl = DCAST(Chaser, camera->getComponent(
-					ComponentFamilyType("Control")));
-
-	if (cameraControl->isEnabled())
+	SMARTPTR(Component) compControl = camera->getComponent(
+			ComponentFamilyType("Control"));
+	if (compControl->is_of_type(Driver::get_class_type()))
 	{
-		//if enabled then disable it
-		//disable
-		cameraControl->disable();
+		SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+						ComponentFamilyType("Control")));
+		if (cameraControl->isEnabled())
+		{
+			//if enabled then disable it
+			//disable
+			cameraControl->disable();
 
-		///<DEFAULT CAMERA CONTROL>
-//		//reset trackball transform
-//		LMatrix4 cameraMat = mWindow->get_camera_group().get_transform()->get_mat();
-//		cameraMat.invert_in_place();
-//		SMARTPTR(Trackball)trackBall =
-//		DCAST(Trackball, gameManager->mTrackBall.node());
-//		trackBall->set_mat(cameraMat);
-//		//(re)enable trackball
-//		gameManager->enable_mouse();
-		///</DEFAULT CAMERA CONTROL>
+			///<DEFAULT CAMERA CONTROL>
+//			//reset trackball transform
+//			LMatrix4 cameraMat = mWindow->get_camera_group().get_transform()->get_mat();
+//			cameraMat.invert_in_place();
+//			SMARTPTR(Trackball)trackBall =
+//			DCAST(Trackball, gameManager->mTrackBall.node());
+//			trackBall->set_mat(cameraMat);
+//			//(re)enable trackball
+//			gameManager->enable_mouse();
+			///</DEFAULT CAMERA CONTROL>
 
-		//
-		controlGrabbed = false;
+			//
+			controlGrabbed = false;
+		}
+		else if (not controlGrabbed)
+		{
+			//if disabled then enable it
+
+			///<DEFAULT CAMERA CONTROL>
+//			//disable the trackball
+//			gameManager->disable_mouse();
+			///</DEFAULT CAMERA CONTROL>
+
+			//enable
+			cameraControl->enable();
+			//
+			controlGrabbed = true;
+		}
+
 	}
-	else if (not controlGrabbed)
+	else if (compControl->is_of_type(Chaser::get_class_type()))
 	{
-		//if disabled then enable it
+		SMARTPTR(Chaser)cameraControl = DCAST(Chaser, camera->getComponent(
+						ComponentFamilyType("Control")));
 
-		///<DEFAULT CAMERA CONTROL>
-//		//disable the trackball
-//		gameManager->disable_mouse();
-		///</DEFAULT CAMERA CONTROL>
+		if (cameraControl->isEnabled())
+		{
+			//if enabled then disable it
+			//disable
+			cameraControl->disable();
 
-		//enable
-		cameraControl->enable();
-		//
-		controlGrabbed = true;
+			///<DEFAULT CAMERA CONTROL>
+//			//reset trackball transform
+//			LMatrix4 cameraMat = mWindow->get_camera_group().get_transform()->get_mat();
+//			cameraMat.invert_in_place();
+//			SMARTPTR(Trackball)trackBall =
+//			DCAST(Trackball, gameManager->mTrackBall.node());
+//			trackBall->set_mat(cameraMat);
+//			//(re)enable trackball
+//			gameManager->enable_mouse();
+			///</DEFAULT CAMERA CONTROL>
+
+			//
+			controlGrabbed = false;
+		}
+		else if (not controlGrabbed)
+		{
+			//if disabled then enable it
+
+			///<DEFAULT CAMERA CONTROL>
+//			//disable the trackball
+//			gameManager->disable_mouse();
+			///</DEFAULT CAMERA CONTROL>
+
+			//enable
+			cameraControl->enable();
+			//
+			controlGrabbed = true;
+		}
 	}
-
 }
 void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-	object->getNodePath().look_at(50, 200, 10);
+		object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
-			static_cast<void*>(object));
-}
+		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+				static_cast<void*>(object));
+	}
 
 void cameraInit()
 {
@@ -163,16 +205,16 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 //	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
 //					ComponentFamilyType("Scene")));
 //	actor1Model->animations().loop("panda-walk", false);
-	//play sound
-	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
-					ComponentFamilyType("Audio")));
-	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
-	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
+		//play sound
+		SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
+						ComponentFamilyType("Audio")));
+		actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
+		actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
 
-	//enable/disable Actor1 control by event
-	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
-			static_cast<void*>(object));
-}
+		//enable/disable Actor1 control by event
+		pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
+				static_cast<void*>(object));
+	}
 
 void Actor1Init()
 {
@@ -198,13 +240,13 @@ void Plane1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//Plane1
-		SMARTPTR(Model) plane1Model = DCAST(Model, object->getComponent(
-						ComponentFamilyType("Scene")));
-		SMARTPTR(TextureStage) planeTS0 = new TextureStage("planeTS0");
-		SMARTPTR(Texture) planeTex = TexturePool::load_texture("rock_02.jpg");
-		plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
-		plane1Model->getNodePath().set_tex_scale(planeTS0, 1000, 1000);
-	}
+	SMARTPTR(Model) plane1Model = DCAST(Model, object->getComponent(
+					ComponentFamilyType("Scene")));
+	SMARTPTR(TextureStage) planeTS0 = new TextureStage("planeTS0");
+	SMARTPTR(Texture) planeTex = TexturePool::load_texture("maps/envir-ground.jpg");
+	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
+	plane1Model->getNodePath().set_tex_scale(planeTS0, 100, 100);
+}
 
 void Plane1Init()
 {
@@ -264,7 +306,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 						ComponentFamilyType("Audio")));
 		npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->set_loop(true);
 		npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->play();
-
 	}
 
 void NPC1Init()

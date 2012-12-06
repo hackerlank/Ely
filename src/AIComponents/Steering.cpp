@@ -101,7 +101,7 @@ void Steering::onAddToObjectSetup()
 	_velocity = &(mAICharacter->_velocity);
 
 	//get the type of the updatable item
-	std::string type = mTmpl->parameter(std::string("type"));
+	std::string type = mTmpl->parameter(std::string("controlled_type"));
 	if ((type == std::string("character_controller"))
 			and (mOwnerObject->getComponent(ComponentFamilyType("Physics"))->is_of_type(
 					CharacterController::get_class_type())))

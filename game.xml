@@ -13,8 +13,9 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
 <!--
+			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
+-->
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -24,7 +25,6 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
--->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -94,6 +94,13 @@
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 		
+		<ObjectTmpl type="InstancedActorAI">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="AI" type="Steering" priority="60"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/> 
+		</ObjectTmpl>
+		
 		<ObjectTmpl type="Terrain">
 			<ComponentTmpl family="Scene" type="Terrain" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
@@ -112,6 +119,7 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
+<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
@@ -123,7 +131,7 @@
 				<Param abs_min_height="10.0"/>
 				<Param friction="1.0"/>
 			</Component>
-<!--
+-->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param linear_speed="10.0"/>
@@ -143,7 +151,6 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
 				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
--->
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="-400.0"/>
@@ -175,10 +182,50 @@
 				<Param scale_z="3.0"/>
 			</Component>
 		</Object>
+
+		<Object type="InstancedActorAI" id="InstancedTeapotAI1">
+			<Param parent="render"/>
+			<Param is_static="false"/>
+			<Param pos_x="120.0"/>
+			<Param pos_y="300.0"/>
+			<Param pos_z="600.0"/>
+			<Param rot_h="-90.0"/>
+			<Param rot_p="0.0"/>
+			<Param rot_r="0.0"/>
+			<Component type="Steering">
+				<Param controlled_type="character_controller"/>
+				<Param behavior="seek"/>
+				<Param mass="100.0"/>
+				<Param movt_force="0.05"/>
+				<Param max_force="5.0"/>
+				<Param target_object="NPC2"/>
+			</Component> 
+			<Component type="CharacterController">
+				<Param shape_type="capsule"/>
+				<Param shape_size="medium"/>
+				<Param linear_speed="700.0"/>
+			</Component> 
+			<Component type="InstanceOf">
+				<Param instance_of="Gorilla1"/>
+				<Param scale_x="3.0"/>
+				<Param scale_y="3.0"/>
+				<Param scale_z="3.0"/>
+			</Component>
+		</Object>
 		
 		<Object type="Instanceable" id="Teapot1" priority="100">
 			<Component type="Model">
 				<Param model_file="teapot"/>
+				<Param is_static="true"/>
+				<Param scale_x="0.5"/>
+				<Param scale_y="0.5"/>
+				<Param scale_z="0.5"/>
+			</Component>
+			<Param parent=""/>
+		</Object>
+		<Object type="Instanceable" id="Gorilla1" priority="100">
+			<Component type="Model">
+				<Param model_file="gorilla/gorilla"/>
 				<Param is_static="true"/>
 				<Param scale_x="0.5"/>
 				<Param scale_y="0.5"/>
@@ -290,6 +337,7 @@
 			<Param rot_r="0.0"/>
 		</Object>
 
+<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
@@ -314,8 +362,8 @@
 			</Component> 
 			<Param parent="render"/>
 		</Object>
+-->
 
-<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
 				<Param from_file="false"/>
@@ -339,7 +387,6 @@
 			<Param parent="render"/>
 			<Param rot_p="-90.0"/>
 		</Object>
--->
 	
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
 		<Object type="Render" id="render" priority="1000">

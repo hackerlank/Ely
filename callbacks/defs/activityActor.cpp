@@ -23,6 +23,7 @@
 
 #include "../common_configs.h"
 #include "Utilities/ComponentSuite.h"
+#include <lvector3.h>
 
 ///Avoid name mangling
 #ifdef __cplusplus
@@ -169,6 +170,9 @@ static const char* Actor1_keys[] =
 		"page_up", //up
 		"page_down", //down
 		};
+
+static LVector3f oldLinearSpeed;
+static float oldAngularSpeed;
 void activityActor(const Event * event, void * data)
 {
 	//get data
@@ -230,16 +234,23 @@ void activityActor(const Event * event, void * data)
 	//call the Driver event handler to move actor
 	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
 	//check if shift or shift-up key pressed
-	if ((eventName == "shift") or (eventName == "shift-up"))
+	if (eventName == "shift")
 	{
-		(eventName.find("-up", 0) == string::npos) ?
-		actorDrv->setSpeedFast() : actorDrv->setSpeed();
+		float speedFactor = actorDrv->getFastFactor();
+		oldLinearSpeed = actorDrv->getLinearSpeed();
+		oldAngularSpeed = actorDrv->getAngularSpeed();
+		actorDrv->setLinearSpeed(oldLinearSpeed * speedFactor);
+		actorDrv->setAngularSpeed(oldAngularSpeed * speedFactor);
 		return;
+	}
+	else if (eventName == "shift-up")
+	{
+		actorDrv->setLinearSpeed(oldLinearSpeed);
+		actorDrv->setAngularSpeed(oldAngularSpeed);
 	}
 	//execute command
 	setDriverCommand(actorDrv, bareEvent, enable, Actor1_keys);
 }
-
 
 ///Init/end functions: see common_configs.cpp
 void activityActorInit()

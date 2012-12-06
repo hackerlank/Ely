@@ -62,13 +62,13 @@ class ModelTemplate;
  * - "scale_x"  			|single|"1.0"
  * - "scale_y"  			|single|"1.0"
  * - "scale_z"  			|single|"1.0"
- * - "model_file"  		|single|no default
- * - "anim_files"  		|multiple|no default
- * - "model_type"  		|single|no default
+ * - "model_file"  			|single|no default
+ * - "anim_files"  			|multiple|no default
+ * - "model_type"  			|single|no default
  * - "model_card_left"  	|single|no default
  * - "model_card_right"  	|single|no default
  * - "model_card_bottom"  	|single|no default
- * - "model_card_top"  	|single|no default
+ * - "model_card_top"  		|single|no default
  */
 class Model: public Component
 {
