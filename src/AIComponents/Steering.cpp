@@ -29,7 +29,7 @@ Steering::Steering()
 	// TODO Auto-generated constructor stub
 }
 
-Steering::Steering(SMARTPTR(SteeringTemplate)tmpl)
+Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"Steering::Steering: invalid GameAIManager")
@@ -45,6 +45,17 @@ Steering::~Steering()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//check if AI manager exists
+	if (GameAIManager::GetSingletonPtr())
+	{
+		//remove from AI manager update
+		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+	}
+	//reset update ptr
+	mUpdatePtr = NULL;
+	//remove from AIWorld
+	GameAIManager::GetSingletonPtr()->aiWorld()->remove_ai_char(
+			std::string(mComponentId));
 	delete mAICharacter;
 }
 
@@ -64,6 +75,10 @@ bool Steering::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//enabling setting
+	mEnabled = (
+			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
+					true : false);
 	//set AICharacter parameters
 	//behavior
 	mBehavior = mTmpl->parameter(std::string("behavior"));
@@ -80,6 +95,16 @@ bool Steering::initialize()
 	floatParam = (float) atof(
 			mTmpl->parameter(std::string("max_force")).c_str());
 	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
+	//the type of the updatable item
+	mType = mTmpl->parameter(std::string("controlled_type"));
+	//target params
+	mTargetObject = mTmpl->parameter(std::string("target_object"));
+	mTargetX = (float) atof(mTmpl->parameter(std::string("target_x")).c_str());
+	mTargetY = (float) atof(mTmpl->parameter(std::string("target_Y")).c_str());
+	mTargetZ = (float) atof(mTmpl->parameter(std::string("target_Z")).c_str());
+	//seek
+	//seek_wt
+	mSeekWT = (float) atof(mTmpl->parameter(std::string("seek_wt")).c_str());
 	//
 	return result;
 }
@@ -89,15 +114,40 @@ void Steering::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//setup event callbacks if any
+	setupEvents();
+}
+
+void Steering::onAddToSceneSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//enable the component
+	if (mEnabled)
+	{
+		enable();
+	}
+}
+
+void Steering::enable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mIsEnabled or (not mOwnerObject))
+	{
+		return;
+	}
+
 	//create the AICharacter...
 	mAICharacter = new AICharacter(std::string(mComponentId),
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
 	//...add it to the AIWorld
 	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
 
-	//get the type of the updatable item
-	std::string type = mTmpl->parameter(std::string("controlled_type"));
-	if ((type == std::string("character_controller"))
+	//check the type of the updatable item
+	if ((mType == std::string("character_controller"))
 			and (mOwnerObject->getComponent(ComponentFamilyType("Physics"))->is_of_type(
 					CharacterController::get_class_type())))
 	{
@@ -110,7 +160,7 @@ void Steering::onAddToObjectSetup()
 								ComponentFamilyType("Physics")));
 		mControllerType = CHARACTER_CONTROLLER;
 	}
-	else if ((type == std::string("driver"))
+	else if ((mType == std::string("driver"))
 			and (mOwnerObject->getComponent(ComponentFamilyType("Control"))->is_of_type(
 					Driver::get_class_type())))
 	{
@@ -157,46 +207,62 @@ void Steering::onAddToObjectSetup()
 		//seek: default
 		setupSeek();
 	}
+
 	//Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
-	//setup event callbacks if any
-	setupEvents();
+	//
+	mIsEnabled = not mIsEnabled;
 	//register event callbacks if any
 	registerEventCallbacks();
+}
+
+void Driver::disable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((not mIsEnabled) or (not mOwnerObject))
+	{
+		return;
+	}
+
+	///TODO
+
+	//
+	mIsEnabled = not mIsEnabled;
+	//unregister event callbacks if any
+	unregisterEventCallbacks();
+}
+
+bool Steering::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsEnabled;
 }
 
 void Steering::setupSeek()
 {
 	//seek
-	//get seek_wt
-	float seekWT = (float) atof(
-			mTmpl->parameter(std::string("seek_wt")).c_str());
 	//check if there is an object this component has to seek;
-	//that object is supposed to be already created,
-	//set up and added to the created objects table;
-	ObjectId targetObjectId = ObjectId(
-			mTmpl->parameter(std::string("target_object")));
+	//that object is supposed to be already created, set up,
+	//added to the scene and added to the created objects table;
+	ObjectId targetObjectId = ObjectId(mTargetObject);
 	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
 			targetObjectId);
 	if (targetObject != NULL)
 	{
-		//the target is an object
-		//get a reference to its AIBehaviors and
-		//set the seek target object
+		//the target is an object get a reference to its
+		//AIBehaviors and set the seek target object
 		mAICharacter->get_ai_behaviors()->seek(targetObject->getNodePath(),
-				seekWT);
+				mSeekWT);
 	}
 	else
 	{
 		//otherwise this component has to seek a point;
-		float targetX = (float) atof(
-				mTmpl->parameter(std::string("target_x")).c_str());
-		float targetY = (float) atof(
-				mTmpl->parameter(std::string("target_Y")).c_str());
-		float targetZ = (float) atof(
-				mTmpl->parameter(std::string("target_Z")).c_str());
 		mAICharacter->get_ai_behaviors()->seek(
-				LVecBase3f(targetX, targetY, targetZ), seekWT);
+				LVecBase3f(mTargetX, mTargetY, mTargetZ), mSeekWT);
 	}
 }
 
@@ -234,7 +300,7 @@ void Steering::setupPathFollow()
 
 void Steering::update(void* data)
 {
-//lock (guard) the mutex
+	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
@@ -243,14 +309,14 @@ void Steering::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-//call the designated update member
+	//call the designated update member
 	((*this).*mUpdatePtr)(dt);
 }
 
 void Steering::updateController(float dt)
 {
 	//
-	AIBehaviors *_steering = mAICharacter->_steering;
+	AIBehaviors *_steering = mAICharacter->get_ai_behaviors();
 	if (!_steering->is_off(_steering->_none))
 	{
 		LVecBase3f old_pos = mAICharacter->_ai_char_np.get_pos();
@@ -266,7 +332,8 @@ void Steering::updateController(float dt)
 		{
 			mCharacterController->enableForward(true);
 			mCharacterController->enableStrafeLeft(true);
-			mCharacterController->setLinearSpeed(acceleration.get_xy());
+			mCharacterController->setLinearSpeed(
+					mAICharacter->get_velocity().get_xy() / dt);
 			if (steering_force.length() > 0)
 			{
 				mCharacterController->enableRollLeft(true);
@@ -288,7 +355,7 @@ void Steering::updateController(float dt)
 //			_ai_char_np.set_p(-_ai_char_np.get_p());
 //			_ai_char_np.set_r(-_ai_char_np.get_r());
 //		}
-		///TODO>
+		///TODO
 	}
 	else
 	{
@@ -305,6 +372,43 @@ void Steering::updateController(float dt)
 
 void Steering::updateNodePath(float dt)
 {
+	AIBehaviors *_steering = mAICharacter->get_ai_behaviors();
+	NodePath _ai_char_np = mAICharacter->get_node_path();
+	if (!_steering->is_off(_steering->_none))
+	{
+
+		LVecBase3f old_pos = _ai_char_np.get_pos();
+
+		LVecBase3f steering_force = _steering->calculate_prioritized();
+
+		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
+
+		mAICharacter->_velocity = acceleration;
+
+		LVecBase3f direction = _steering->_steering_force;
+		direction.normalize();
+
+		_ai_char_np.set_pos(old_pos + mAICharacter->get_velocity());
+
+		if (steering_force.length() > 0)
+		{
+			_ai_char_np.look_at(old_pos + (direction * 5));
+			_ai_char_np.set_h(_ai_char_np.get_h() + 180);
+			_ai_char_np.set_p(-_ai_char_np.get_p());
+			_ai_char_np.set_r(-_ai_char_np.get_r());
+		}
+	}
+	else
+	{
+		_steering->_steering_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_seek_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_flee_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_pursue_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_evade_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_arrival_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_flock_force = LVecBase3f(0.0, 0.0, 0.0);
+		_steering->_wander_force = LVecBase3f(0.0, 0.0, 0.0);
+	}
 }
 
 //TypedObject semantics: hardcoded

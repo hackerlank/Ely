@@ -98,7 +98,9 @@
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="AI" type="Steering" priority="60"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
-			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/> 
+<!--
+			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/>
+--> 
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Terrain">
@@ -183,7 +185,7 @@
 			</Component>
 		</Object>
 		
-		<Object type="InstancedActorAI" id="InstancedTeapotAI1">
+		<Object type="InstancedActorAI" id="Seeker1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
 			<Param pos_x="120.0"/>
@@ -193,18 +195,20 @@
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 			<Component type="Steering">
-				<Param controlled_type="character_controller"/>
+				<Param controlled_type="nodepath"/>
 				<Param behavior="seek"/>
-				<Param mass="100.0"/>
+				<Param mass="10.0"/>
 				<Param movt_force="0.05"/>
 				<Param max_force="5.0"/>
 				<Param target_object="NPC1"/>
-			</Component> 
+			</Component>
+<!--
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
 				<Param linear_speed="700.0"/>
-			</Component> 
+			</Component>
+--> 
 			<Component type="InstanceOf">
 				<Param instance_of="Gorilla1"/>
 				<Param scale_x="3.0"/>

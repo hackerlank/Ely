@@ -40,25 +40,26 @@ class SteeringTemplate;
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
  * XML Param(s):
- * - "controlled_type"	|single|"nodepath" (driver, nodepath,
+ * - "enabled"  			|single|"true"
+ * - "controlled_type"		|single|"nodepath" (driver, nodepath,
  * 											character_controller)
- * - "behavior"			|single|"seek" (seek,flee,pursue,evade,arrival,
- * 										wander,flock,obstacle_avoidance,
- * 										path_follow)
- * - "mass"  			|single|"1.0"
- * - "movt_force"  		|single|"1.0"
- * - "max_force"  		|single|"1.0"
- * - "target_object"	|single|no default (seek)
- * - "target_x"			|single|no default (seek)
- * - "target_y"			|single|no default (seek)
- * - "target_z"			|single|no default (seek)
- * - "seek_wt"  		|single|"1.0" (seek)
+ * - "behavior"				|single|"seek" (seek,flee,pursue,evade,arrival,
+ * 											wander,flock,obstacle_avoidance,
+ * 											path_follow)
+ * - "mass"  				|single|"1.0"
+ * - "movt_force"  			|single|"1.0"
+ * - "max_force"  			|single|"1.0"
+ * - "target_object"		|single|no default (seek)
+ * - "target_x"				|single|no default (seek)
+ * - "target_y"				|single|no default (seek)
+ * - "target_z"				|single|no default (seek)
+ * - "seek_wt"  			|single|"1.0" (seek)
  */
 class Steering: public Component
 {
 public:
 	Steering();
-	Steering(SMARTPTR(SteeringTemplate) tmpl);
+	Steering(SMARTPTR(SteeringTemplate)tmpl);
 	virtual ~Steering();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -66,6 +67,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -75,13 +77,28 @@ public:
 	 */
 	virtual void update(void* data);
 
+	/**
+	 * \name Enabling/disabling.
+	 * \brief Enables/disables this component.
+	 */
+	///@{
+	void enable();
+	void disable();
+	bool isEnabled();
+	///@}
+
 private:
 	///The AICharacter associated to this Steering.
 	AICharacter* mAICharacter;
 	///@{
-	///The AICharacter parameters.
+	///Enabling flags.
+	bool mEnabled, mIsEnabled;
+	///The parameters.
 	float mMass, mMovtForce, mMaxForce;
-	std::string mBehavior;
+	std::string mBehavior, mType, mTargetObject;
+	float mTargetX, mTargetY, mTargetZ;
+	//seek
+	float mSeekWT;
 	///@}
 	///The pointer to the real update member function.
 	void (Steering::*mUpdatePtr)(float);

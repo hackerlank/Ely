@@ -97,7 +97,12 @@ public:
 	 * It will add the component in the object to the passed component,
 	 * and if a component of that family already existed it'll be
 	 * replaced by this new component (and its ownership released by
-	 * the object).
+	 * the object).\n
+	 * \note When you add a component, its template should contain its
+	 * initialization parameters; this means that when you want to add
+	 * a component (perhaps by replacing an old one), you should first
+	 * prepare its template with initialization parameter and then actually
+	 * add the component.
 	 * @param newComponent The new component to add.
 	 * @return SMARTPTR(NULL) if there wasn't a component of that family, otherwise
 	 * the previous component.
