@@ -38,6 +38,8 @@
  * \brief Singleton manager updating AI components.
  *
  * Prepared for multi-threading.
+ * \note AI components handled by this manager should belong only to
+ * objects reparented to the root scene nodepath (i.e. render).
  */
 class GameAIManager: public Singleton<GameAIManager>
 {

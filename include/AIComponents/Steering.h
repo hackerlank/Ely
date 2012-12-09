@@ -26,7 +26,13 @@
 
 #include <string>
 #include <aiCharacter.h>
+#include <seek.h>
+#include <pathFollow.h>
+#include <arrival.h>
 #include <nodePath.h>
+#include <lvecBase3.h>
+#include <lvector3.h>
+#include <cmath>
 #include "ControlComponents/Driver.h"
 #include "PhysicsComponents/CharacterController.h"
 #include "ObjectModel/Component.h"
@@ -39,6 +45,8 @@ class SteeringTemplate;
 /**
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
+ * \note This component should be used only with an object reparented to
+ * the root scene nodepath (i.e. render)
  * XML Param(s):
  * - "enabled"  			|single|"true"
  * - "controlled_type"		|single|"nodepath" (driver, nodepath,
@@ -78,6 +86,23 @@ public:
 	virtual void update(void* data);
 
 	/**
+	 * \brief Switch the steering behavior.
+	 * @param behavior The steering behavior: seek|flee|pursue|
+	 * evade|arrival|wander|flock|obstacle_avoidance|path_follow
+	 */
+	void switchBehavior();
+
+	/**
+	 * \name Parameters' setters.
+	 */
+	///@{
+	void setBehavior(const std::string& behavior);
+	void setTarget(const ObjectId& target);
+	void setTarget(LVecBase3f target);
+	void setSeekWT(float seekWT);
+	///@}
+
+	/**
 	 * \name Enabling/disabling.
 	 * \brief Enables/disables this component.
 	 */
@@ -93,10 +118,13 @@ private:
 	///@{
 	///Enabling flags.
 	bool mEnabled, mIsEnabled;
-	///The parameters.
+	///Fixed parameters.
 	float mMass, mMovtForce, mMaxForce;
-	std::string mBehavior, mType, mTargetObject;
-	float mTargetX, mTargetY, mTargetZ;
+	std::string mType;
+	///Variable parameters.
+	std::string mBehavior;
+	ObjectId mTargetObject;
+	LVecBase3f mTargetPoint;
 	//seek
 	float mSeekWT;
 	///@}
@@ -112,14 +140,21 @@ private:
 	ControllerType mControllerType;
 	SMARTPTR(CharacterController) mCharacterController;
 	SMARTPTR(Driver) mDriver;
+	LVecBase3f calculate_prioritized(AIBehaviors *_steering);
+	void enableMovRot(bool enable);
+	bool mMovRotEnabled;
+	///Used only with character controller.
+	bool mCurrentIsLocal;
+	///Used only with driver.
+	bool mCurrentEnabled;
 	///@}
 
 	/**
 	 * \name The real update member functions.
 	 */
 	///@{
-	void updateController(float dt);
 	void updateNodePath(float dt);
+	void updateController(float dt);
 	///@}
 
 	/**

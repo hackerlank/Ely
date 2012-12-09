@@ -91,6 +91,7 @@ void CharacterControllerTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("jump", "enabled"));
 	mParameterTable.insert(ParameterNameValue("linear_speed", "10.0"));
 	mParameterTable.insert(ParameterNameValue("angular_speed", "45.0"));
+	mParameterTable.insert(ParameterNameValue("is_local", "true"));
 }
 
 //TypedObject semantics: hardcoded

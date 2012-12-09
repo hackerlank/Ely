@@ -240,13 +240,13 @@ void Plane1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//Plane1
-	SMARTPTR(Model) plane1Model = DCAST(Model, object->getComponent(
-					ComponentFamilyType("Scene")));
-	SMARTPTR(TextureStage) planeTS0 = new TextureStage("planeTS0");
-	SMARTPTR(Texture) planeTex = TexturePool::load_texture("maps/envir-ground.jpg");
-	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
-	plane1Model->getNodePath().set_tex_scale(planeTS0, 100, 100);
-}
+		SMARTPTR(Model) plane1Model = DCAST(Model, object->getComponent(
+						ComponentFamilyType("Scene")));
+		SMARTPTR(TextureStage) planeTS0 = new TextureStage("planeTS0");
+		SMARTPTR(Texture) planeTex = TexturePool::load_texture("maps/envir-ground.jpg");
+		plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
+		plane1Model->getNodePath().set_tex_scale(planeTS0, 100, 100);
+	}
 
 void Plane1Init()
 {
@@ -312,5 +312,55 @@ void NPC1Init()
 {
 }
 void NPC1End()
+{
+}
+
+///Seeker1 related
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+INITIALIZATION Seeker1_initialization;
+
+#ifdef __cplusplus
+}
+#endif
+
+static bool aiEnabled = false;
+static void toggleSeeker1Control(const Event* event, void* data)
+{
+	SMARTPTR(Object) seeker1 = reinterpret_cast<Object*>(data);
+	SMARTPTR(Steering)actor1AI = DCAST(Steering, seeker1->getComponent(
+					ComponentFamilyType("AI")));
+
+	if (actor1AI->isEnabled())
+	{
+		//if enabled then disable it
+		actor1AI->disable();
+		//
+		aiEnabled = false;
+	}
+	else if (not aiEnabled)
+	{
+		//if disabled then enable it
+		actor1AI->enable();
+		//
+		aiEnabled = true;
+	}
+}
+void Seeker1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//Seeker1
+	//enable/disable Seeker1 control by event
+	pandaFramework->define_key("b", "enableSeeker1Control", &toggleSeeker1Control,
+			static_cast<void*>(object));
+}
+
+void Seeker1Init()
+{
+}
+void Seeker1End()
 {
 }

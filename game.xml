@@ -96,11 +96,12 @@
 		
 		<ObjectTmpl type="InstancedActorAI">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="AI" type="Steering" priority="60"/>
+			<ComponentTmpl family="AI" type="Steering" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 <!--
 			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/>
---> 
+-->
+			<ComponentTmpl family="Control" type="Driver" priority="60"/>
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Terrain">
@@ -190,12 +191,13 @@
 			<Param is_static="false"/>
 			<Param pos_x="120.0"/>
 			<Param pos_y="300.0"/>
-			<Param pos_z="600.0"/>
+			<Param pos_z="0.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 			<Component type="Steering">
-				<Param controlled_type="nodepath"/>
+				<Param enabled="false"/>
+				<Param controlled_type="driver"/>
 				<Param behavior="seek"/>
 				<Param mass="10.0"/>
 				<Param movt_force="0.05"/>
@@ -206,9 +208,12 @@
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
-				<Param linear_speed="700.0"/>
+				<Param is_local="false"/>
 			</Component>
---> 
+-->
+			<Component type="Driver">
+				<Param enabled="false"/>
+			</Component>
 			<Component type="InstanceOf">
 				<Param instance_of="Gorilla1"/>
 				<Param scale_x="3.0"/>

@@ -38,6 +38,7 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
 	mUpdatePtr = NULL;
 	mCharacterController = NULL;
 	mDriver = NULL;
+	mMovRotEnabled = false;
 }
 
 Steering::~Steering()
@@ -45,18 +46,7 @@ Steering::~Steering()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//check if AI manager exists
-	if (GameAIManager::GetSingletonPtr())
-	{
-		//remove from AI manager update
-		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
-	}
-	//reset update ptr
-	mUpdatePtr = NULL;
-	//remove from AIWorld
-	GameAIManager::GetSingletonPtr()->aiWorld()->remove_ai_char(
-			std::string(mComponentId));
-	delete mAICharacter;
+	disable();
 }
 
 const ComponentFamilyType Steering::familyType() const
@@ -98,10 +88,13 @@ bool Steering::initialize()
 	//the type of the updatable item
 	mType = mTmpl->parameter(std::string("controlled_type"));
 	//target params
-	mTargetObject = mTmpl->parameter(std::string("target_object"));
-	mTargetX = (float) atof(mTmpl->parameter(std::string("target_x")).c_str());
-	mTargetY = (float) atof(mTmpl->parameter(std::string("target_Y")).c_str());
-	mTargetZ = (float) atof(mTmpl->parameter(std::string("target_Z")).c_str());
+	mTargetObject = ObjectId(mTmpl->parameter(std::string("target_object")));
+	mTargetPoint.set_x(
+			(float) atof(mTmpl->parameter(std::string("target_x")).c_str()));
+	mTargetPoint.set_y(
+			(float) atof(mTmpl->parameter(std::string("target_Y")).c_str()));
+	mTargetPoint.set_z(
+			(float) atof(mTmpl->parameter(std::string("target_Z")).c_str()));
 	//seek
 	//seek_wt
 	mSeekWT = (float) atof(mTmpl->parameter(std::string("seek_wt")).c_str());
@@ -158,7 +151,16 @@ void Steering::enable()
 		mCharacterController =
 				DCAST(CharacterController, mOwnerObject->getComponent(
 								ComponentFamilyType("Physics")));
+
+		//save current movement and set it not local (global)
+		mCurrentIsLocal = mCharacterController->getIsLocal();
+		//set current movement global (not local)
+		mCharacterController->setIsLocal(false);
+
+		//set the type
 		mControllerType = CHARACTER_CONTROLLER;
+		//enable movement/rotation
+		enableMovRot(true);
 	}
 	else if ((mType == std::string("driver"))
 			and (mOwnerObject->getComponent(ComponentFamilyType("Control"))->is_of_type(
@@ -170,15 +172,109 @@ void Steering::enable()
 		//(which is already created and set up)
 		mDriver = DCAST(Driver, mOwnerObject->getComponent(
 						ComponentFamilyType("Control")));
+
+		//save current enabling state (needed if disabled)
+		mCurrentEnabled = mDriver->isEnabled();
+		// and enable it anyway
+		mDriver->enable();
+
+		//set the type
 		mControllerType = DRIVER;
+		//enable movement/rotation
+		enableMovRot(true);
 	}
 	else
 	{
 		//update the owner object nodepath: default
 		mUpdatePtr = &Steering::updateNodePath;
 	}
+
 	//switch to the indicated behavior
-	if (mBehavior == std::string("flee"))
+	switchBehavior();
+
+	//Add to the AI manager update
+	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+	//
+	mIsEnabled = not mIsEnabled;
+	//register event callbacks if any
+	registerEventCallbacks();
+}
+
+void Steering::disable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((not mIsEnabled) or (not mOwnerObject))
+	{
+		return;
+	}
+
+	//check the type of the updatable item
+	switch (mControllerType)
+	{
+	case CHARACTER_CONTROLLER:
+		//disable movement/rotation
+		enableMovRot(false);
+		//restore current movement
+		mCharacterController->setIsLocal(mCurrentIsLocal);
+		break;
+	case DRIVER:
+		//disable movement/rotation
+		enableMovRot(false);
+		//restore current enabling state (if disabled)
+		if (not mCurrentEnabled)
+		{
+			mDriver->disable();
+		}
+		break;
+	default:
+		break;
+	}
+	//reset update ptr
+	mUpdatePtr = NULL;
+	//check if AI manager exists
+	if (GameAIManager::GetSingletonPtr())
+	{
+		//remove from AIWorld
+		GameAIManager::GetSingletonPtr()->aiWorld()->remove_ai_char(
+				std::string(mComponentId));
+	}
+	delete mAICharacter;
+	mAICharacter = NULL;
+
+	//check if AI manager exists
+	if (GameAIManager::GetSingletonPtr())
+	{
+		//remove from AI manager update
+		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+	}
+	//
+	mIsEnabled = not mIsEnabled;
+	//unregister event callbacks if any
+	unregisterEventCallbacks();
+}
+
+bool Steering::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsEnabled;
+}
+
+void Steering::switchBehavior()
+{
+	if (not mAICharacter)
+	{
+		return;
+	}
+	//switch to the indicated behavior
+	if (mBehavior == std::string("seek"))
+	{
+		setupSeek();
+	}
+	else if (mBehavior == std::string("flee"))
 	{
 	}
 	else if (mBehavior == std::string("pursue"))
@@ -202,44 +298,38 @@ void Steering::enable()
 	else if (mBehavior == std::string("path_follow"))
 	{
 	}
-	else
-	{
-		//seek: default
-		setupSeek();
-	}
-
-	//Add to the AI manager update
-	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
-	//
-	mIsEnabled = not mIsEnabled;
-	//register event callbacks if any
-	registerEventCallbacks();
 }
 
-void Driver::disable()
+void Steering::setBehavior(const std::string& behavior)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if ((not mIsEnabled) or (not mOwnerObject))
-	{
-		return;
-	}
-
-	///TODO
-
-	//
-	mIsEnabled = not mIsEnabled;
-	//unregister event callbacks if any
-	unregisterEventCallbacks();
+	mBehavior = behavior;
 }
 
-bool Steering::isEnabled()
+void Steering::setTarget(const ObjectId& target)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mIsEnabled;
+	mTargetObject = target;
+}
+
+void Steering::setTarget(LVecBase3f target)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mTargetPoint = target;
+}
+
+void Steering::setSeekWT(float seekWT)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mSeekWT = seekWT;
 }
 
 void Steering::setupSeek()
@@ -261,8 +351,7 @@ void Steering::setupSeek()
 	else
 	{
 		//otherwise this component has to seek a point;
-		mAICharacter->get_ai_behaviors()->seek(
-				LVecBase3f(mTargetX, mTargetY, mTargetZ), mSeekWT);
+		mAICharacter->get_ai_behaviors()->seek(mTargetPoint, mSeekWT);
 	}
 }
 
@@ -313,89 +402,94 @@ void Steering::update(void* data)
 	((*this).*mUpdatePtr)(dt);
 }
 
+void Steering::updateNodePath(float dt)
+{
+	mAICharacter->update();
+}
+
 void Steering::updateController(float dt)
 {
-	//
 	AIBehaviors *_steering = mAICharacter->get_ai_behaviors();
+
 	if (!_steering->is_off(_steering->_none))
 	{
-		LVecBase3f old_pos = mAICharacter->_ai_char_np.get_pos();
-		LVecBase3f steering_force = _steering->calculate_prioritized();
-		LVecBase3f acceleration = steering_force / mAICharacter->_mass;
-		mAICharacter->_velocity = acceleration;
-		LVecBase3f direction = _steering->_steering_force;
-		direction.normalize();
-
+		//enable movement/rotation
+		if (not mMovRotEnabled)
+		{
+			enableMovRot(true);
+		}
+		LVecBase3f steering_force;
+		//select between controllers' types
 		switch (mControllerType)
 		{
 		case CHARACTER_CONTROLLER:
-		{
-			mCharacterController->enableForward(true);
-			mCharacterController->enableStrafeLeft(true);
-			mCharacterController->setLinearSpeed(
-					mAICharacter->get_velocity().get_xy() / dt);
-			if (steering_force.length() > 0)
-			{
-				mCharacterController->enableRollLeft(true);
-				mCharacterController->setAngularSpeed(direction.get_x());
-			}
-		}
+			steering_force = calculate_prioritized(_steering);
 			break;
 		case DRIVER:
-			;
+			steering_force = _steering->calculate_prioritized();
 			break;
 		default:
 			break;
 		}
-//		_ai_char_np.set_pos(old_pos + _velocity);
-//		if (steering_force.length() > 0)
-//		{
-//			_ai_char_np.look_at(old_pos + (direction * 5));
-//			_ai_char_np.set_h(_ai_char_np.get_h() + 180);
-//			_ai_char_np.set_p(-_ai_char_np.get_p());
-//			_ai_char_np.set_r(-_ai_char_np.get_r());
-//		}
-		///TODO
-	}
-	else
-	{
-		_steering->_steering_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_seek_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_flee_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_pursue_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_evade_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_arrival_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_flock_force = LVecBase3f(0.0, 0.0, 0.0);
-		_steering->_wander_force = LVecBase3f(0.0, 0.0, 0.0);
-	}
-}
-
-void Steering::updateNodePath(float dt)
-{
-	AIBehaviors *_steering = mAICharacter->get_ai_behaviors();
-	NodePath _ai_char_np = mAICharacter->get_node_path();
-	if (!_steering->is_off(_steering->_none))
-	{
-
-		LVecBase3f old_pos = _ai_char_np.get_pos();
-
-		LVecBase3f steering_force = _steering->calculate_prioritized();
 
 		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
-
 		mAICharacter->_velocity = acceleration;
-
 		LVecBase3f direction = _steering->_steering_force;
 		direction.normalize();
-
-		_ai_char_np.set_pos(old_pos + mAICharacter->get_velocity());
-
-		if (steering_force.length() > 0)
+		//select between controllers' types
+		switch (mControllerType)
 		{
-			_ai_char_np.look_at(old_pos + (direction * 5));
-			_ai_char_np.set_h(_ai_char_np.get_h() + 180);
-			_ai_char_np.set_p(-_ai_char_np.get_p());
-			_ai_char_np.set_r(-_ai_char_np.get_r());
+		case CHARACTER_CONTROLLER:
+		{
+			mCharacterController->setLinearSpeed(
+					-mAICharacter->get_velocity().get_xy() / dt);
+			if (steering_force.length() > 0)
+			{
+				//0 <= A <= 180.0
+				float H = mAICharacter->get_node_path().get_h();
+				float A = 57.295779513f * acos(direction.get_y());
+				if (direction.get_x() <= 0)
+				{
+					mCharacterController->setAngularSpeed(
+							-(H + (180 - A)) / dt);
+				}
+				else
+				{
+					mCharacterController->setAngularSpeed(
+							-(H - (180 - A)) / dt);
+				}
+			}
+		}
+			break;
+		case DRIVER:
+		{
+			LVector3f _velocity =
+					mAICharacter->get_node_path().get_relative_vector(
+							mTmpl->windowFramework()->get_render(),
+							mAICharacter->get_velocity());
+			mDriver->setLinearSpeed(-_velocity / dt);
+			if (steering_force.length() > 0)
+			{
+
+				///TODO
+
+				//0 <= A <= 180.0
+				float H = mAICharacter->get_node_path().get_h(
+						mTmpl->windowFramework()->get_render());
+				float A = 57.295779513f * acos(direction.get_y());
+				if (direction.get_x() <= 0)
+				{
+					mDriver->setAngularSpeed(-(H + (180 - A)) / dt);
+				}
+				else
+				{
+					mDriver->setAngularSpeed(-(H - (180 - A)) / dt);
+				}
+			}
+		}
+			break;
+		default:
+			break;
 		}
 	}
 	else
@@ -408,7 +502,253 @@ void Steering::updateNodePath(float dt)
 		_steering->_arrival_force = LVecBase3f(0.0, 0.0, 0.0);
 		_steering->_flock_force = LVecBase3f(0.0, 0.0, 0.0);
 		_steering->_wander_force = LVecBase3f(0.0, 0.0, 0.0);
+		//
+		if (mMovRotEnabled)
+		{
+			enableMovRot(false);
+		}
 	}
+}
+
+void Steering::enableMovRot(bool enable)
+{
+	switch (mControllerType)
+	{
+	case CHARACTER_CONTROLLER:
+		mCharacterController->enableForward(enable);
+		mCharacterController->enableStrafeLeft(enable);
+		mCharacterController->enableRollLeft(enable);
+		mMovRotEnabled = enable;
+		break;
+	case DRIVER:
+		mDriver->enableForward(enable);
+		mDriver->enableStrafeRight(enable);
+		mDriver->enableDown(enable);
+		mDriver->enableRollRight(enable);
+		mMovRotEnabled = enable;
+		break;
+	default:
+		break;
+	}
+}
+
+LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
+{
+	LVecBase3f force;
+	if (_steering->is_on(_steering->_seek))
+	{
+		//_seek_obj->do_seek rewritten
+		Seek *_seek_obj = _steering->_seek_obj;
+		LVecBase3f do_seek;
+		{
+			double target_distance =
+					(_seek_obj->_seek_position.get_xy()
+							- _seek_obj->_ai_char->_ai_char_np.get_pos(
+									_seek_obj->_ai_char->_window_render).get_xy()).length();
+			if (int(target_distance) == 0)
+			{
+				_seek_obj->_seek_done = true;
+				_seek_obj->_ai_char->_steering->_steering_force = LVecBase3f(
+						0.0, 0.0, 0.0);
+				_seek_obj->_ai_char->_steering->turn_off("seek");
+				do_seek = LVecBase3f(0.0, 0.0, 0.0);
+			}
+			LVecBase3f desired_force = _seek_obj->_seek_direction
+					* _seek_obj->_ai_char->_movt_force;
+			do_seek = desired_force;
+		}
+		//
+		if (_steering->_conflict)
+		{
+			force = do_seek * _seek_obj->_seek_weight;
+		}
+		else
+		{
+			force = do_seek;
+		}
+		_steering->accumulate_force("seek", force);
+	}
+
+//	if (is_on (_flee_activate))
+//	{
+//		for (_flee_itr = _flee_list.begin(); _flee_itr != _flee_list.end();
+//				_flee_itr++)
+//		{
+//			_flee_itr->flee_activate();
+//		}
+//	}
+//
+//	if (is_on (_flee))
+//	{
+//		for (_flee_itr = _flee_list.begin(); _flee_itr != _flee_list.end();
+//				_flee_itr++)
+//		{
+//			if (_flee_itr->_flee_activate_done)
+//			{
+//				if (_conflict)
+//				{
+//					force = _flee_itr->do_flee() * _flee_itr->_flee_weight;
+//				}
+//				else
+//				{
+//					force = _flee_itr->do_flee();
+//				}
+//				accumulate_force("flee", force);
+//			}
+//		}
+//	}
+//
+//	if (is_on (_pursue))
+//	{
+//		if (_conflict)
+//		{
+//			force = _pursue_obj->do_pursue() * _pursue_obj->_pursue_weight;
+//		}
+//		else
+//		{
+//			force = _pursue_obj->do_pursue();
+//		}
+//		accumulate_force("pursue", force);
+//	}
+//
+//	if (is_on (_evade_activate))
+//	{
+//		for (_evade_itr = _evade_list.begin(); _evade_itr != _evade_list.end();
+//				_evade_itr++)
+//		{
+//			_evade_itr->evade_activate();
+//		}
+//	}
+//
+//	if (is_on (_evade))
+//	{
+//		for (_evade_itr = _evade_list.begin(); _evade_itr != _evade_list.end();
+//				_evade_itr++)
+//		{
+//			if (_evade_itr->_evade_activate_done)
+//			{
+//				if (_conflict)
+//				{
+//					force = (_evade_itr->do_evade())
+//							* (_evade_itr->_evade_weight);
+//				}
+//				else
+//				{
+//					force = _evade_itr->do_evade();
+//				}
+//				accumulate_force("evade", force);
+//			}
+//		}
+//	}
+//
+//	if (is_on (_arrival_activate))
+//	{
+//		_arrival_obj->arrival_activate();
+//	}
+//
+//	if (is_on (_arrival))
+//	{
+//		force = _arrival_obj->do_arrival();
+//		accumulate_force("arrival", force);
+//	}
+//
+//	if (is_on (_flock_activate))
+//	{
+//		flock_activate();
+//	}
+//
+//	if (is_on (_flock))
+//	{
+//		if (_conflict)
+//		{
+//			force = do_flock() * _flock_weight;
+//		}
+//		else
+//		{
+//			force = do_flock();
+//		}
+//		accumulate_force("flock", force);
+//	}
+//
+//	if (is_on (_wander))
+//	{
+//		if (_conflict)
+//		{
+//			force = _wander_obj->do_wander() * _wander_obj->_wander_weight;
+//		}
+//		else
+//		{
+//			force = _wander_obj->do_wander();
+//		}
+//		accumulate_force("wander", force);
+//	}
+//
+//	if (is_on (_obstacle_avoidance_activate))
+//	{
+//		_obstacle_avoidance_obj->obstacle_avoidance_activate();
+//	}
+//
+//	if (is_on (_obstacle_avoidance))
+//	{
+//		if (_conflict)
+//		{
+//			force = _obstacle_avoidance_obj->do_obstacle_avoidance();
+//		}
+//		else
+//		{
+//			force = _obstacle_avoidance_obj->do_obstacle_avoidance();
+//		}
+//		accumulate_force("obstacle_avoidance", force);
+//	}
+
+	if (_steering->_path_follow_obj != NULL)
+	{
+		if (_steering->_path_follow_obj->_start)
+		{
+			_steering->_path_follow_obj->do_follow();
+		}
+	}
+
+	_steering->is_conflict();
+	_steering->_steering_force += _steering->_seek_force
+			* int(_steering->is_on(_steering->_seek))
+			+ _steering->_flee_force * int(_steering->is_on(_steering->_flee))
+			+ _steering->_pursue_force
+					* int(_steering->is_on(_steering->_pursue))
+			+ _steering->_evade_force * int(_steering->is_on(_steering->_evade))
+			+ _steering->_flock_force * int(_steering->is_on(_steering->_flock))
+			+ _steering->_wander_force
+					* int(_steering->is_on(_steering->_wander))
+			+ _steering->_obstacle_avoidance_force
+					* int(_steering->is_on(_steering->_obstacle_avoidance));
+	if (_steering->_steering_force.length()
+			> _steering->_ai_char->get_max_force())
+	{
+		_steering->_steering_force.normalize();
+		_steering->_steering_force = _steering->_steering_force
+				* _steering->_ai_char->get_max_force();
+	}
+
+	if (_steering->is_on(_steering->_arrival))
+	{
+		if (_steering->_seek_obj != NULL)
+		{
+			LVecBase3f dirn = _steering->_steering_force;
+			dirn.normalize();
+			_steering->_steering_force = ((_steering->_steering_force.length()
+					- _steering->_arrival_force.length()) * dirn);
+		}
+
+		if (_steering->_pursue_obj != NULL)
+		{
+			LVecBase3f dirn = _steering->_steering_force;
+			dirn.normalize();
+			_steering->_steering_force = ((_steering->_steering_force.length()
+					- _steering->_arrival_force.length())
+					* _steering->_arrival_obj->_arrival_direction);
+		}
+	}
+	return _steering->_steering_force;
 }
 
 //TypedObject semantics: hardcoded

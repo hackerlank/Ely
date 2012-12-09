@@ -48,20 +48,23 @@ class DriverTemplate;
  *
  * Each basic movement (forward, backward, roll_left, roll_right etc...)
  * can be enabled/disabled through a corresponding "enabler", which in
- * turn set a control key true or false.
+ * turn set a control key true or false.\n
  * An event handlers could enable/disable movement calling the "enablers".
  * A task updates the position/orientation of the controlled object
- * based on the value of control keys.
- * The component can be enabled/disabled as a whole.
+ * based on the value of control keys.\n
+ * The component can be enabled/disabled as a whole.\n
  * At configuration level (from xml config file), any "enabler" can be
  * enabled/disabled by setting corresponding configuration key
- * to "enabled"/"disabled".
+ * to "enabled"/"disabled".\n
  * Mouse movements tracking are special. Since "mouse move" events are not
- * defined by default (they can by using ButtonThrower::set_move_event()),
+ * defined by default (they can by using ButtonThrower::set_move_event(),
+ * \see: http://www.panda3d.org/forums/viewtopic.php?t=9326
+ * 	http://www.panda3d.org/forums/viewtopic.php?t=6049)),
  * mouse movements are polled by default during the "update" task, that is
- * the corresponding "enabler" is disabled.
+ * the corresponding "enabler" is disabled.\n
  * The object HEAD (i.e. YAW) and PITCH control through mouse movements
- * can be enabled/disabled separately (default: both disabled).
+ * can be enabled/disabled separately and if both are disabled (the default)
+ * no control through mouse movements.\n
  * All movements (but up and down) can be inverted (default: not inverted).
  *
  * XML Param(s):

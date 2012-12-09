@@ -197,6 +197,9 @@ bool CharacterController::initialize()
 	float linearSpeed = (float) atof(
 			mTmpl->parameter(std::string("linear_speed")).c_str());
 	mLinearSpeed = LVecBase2f(linearSpeed, linearSpeed);
+	mIsLocal = (
+			mTmpl->parameter(std::string("is_local")) == std::string("false") ?
+					false : true);
 	mAngularSpeed = (float) atof(
 			mTmpl->parameter(std::string("angular_speed")).c_str());
 	mFallSpeed = (float) atof(
@@ -396,6 +399,22 @@ void CharacterController::setAngularSpeed(float speed)
 	mAngularSpeed = speed;
 }
 
+void CharacterController::setIsLocal(bool isLocal)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mIsLocal = isLocal;
+}
+
+bool CharacterController::getIsLocal()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsLocal;
+}
+
 void CharacterController::update(void* data)
 {
 	//lock (guard) the mutex
@@ -436,7 +455,7 @@ void CharacterController::update(void* data)
 		omega = -mAngularSpeed;
 	}
 	// set movements
-	mCharacterController->set_linear_movement(speed, true);
+	mCharacterController->set_linear_movement(speed, mIsLocal);
 	mCharacterController->set_angular_movement(omega);
 	if (mJump)
 	{

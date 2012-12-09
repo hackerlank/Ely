@@ -34,6 +34,7 @@ mTrue(true), mFalse(false), mIsEnabled(false)
 {
 	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
 			"Driver::Driver: invalid GameControlManager")
+
 	mTmpl = tmpl;
 	//initialized by template:
 	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
@@ -49,7 +50,7 @@ mTrue(true), mFalse(false), mIsEnabled(false)
 	//we want mouse poll by default; this can be changed by calling
 	//the enabler (for example by an handler responding to mouse-move
 	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
-	//	http://www.panda3d.org/forums/viewtopic.php?t=6049)
+	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
 	mMouseMove = true;
 	//
 	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
@@ -90,13 +91,17 @@ void Driver::enable()
 	mActualTransform = mOwnerObject->getNodePath().get_transform();
 #endif
 
-	//hide mouse cursor
-	WindowProperties props;
-	props.set_cursor_hidden(true);
-	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-	win->request_properties(props);
-	//reset mouse to start position
-	win->move_pointer(0, mCentX, mCentY);
+	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+	{
+		//we want control through mouse movements
+		//hide mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(true);
+		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+		//reset mouse to start position
+		win->move_pointer(0, mCentX, mCentY);
+	}
 
 	//add to the control manager update
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
@@ -115,11 +120,16 @@ void Driver::disable()
 	{
 		return;
 	}
-	//show mouse cursor
-	WindowProperties props;
-	props.set_cursor_hidden(false);
-	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-	win->request_properties(props);
+
+	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+	{
+		//we have control through mouse movements
+		//show mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(false);
+		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+	}
 
 	//check if control manager exists
 	if (GameControlManager::GetSingletonPtr())

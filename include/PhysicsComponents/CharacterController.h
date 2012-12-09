@@ -77,6 +77,7 @@ class CharacterControllerTemplate;
  * - "jump"  					|single|"enabled"
  * - "linear_speed"  			|single|"10.0"
  * - "angular_speed"  			|single|"45.0"
+ * - "is_local"  				|single|"true"
  */
 class CharacterController: public Component
 {
@@ -126,6 +127,14 @@ public:
 	///@}
 
 	/**
+	 * \name Gets/sets if linear movement is local.
+	 */
+	///@{
+	void setIsLocal(bool isLocal);
+	bool getIsLocal();
+	///@}
+
+	/**
 	 * \brief Gets/sets the node path of this character controller.
 	 * @return The node path of this character controller.
 	 */
@@ -168,6 +177,8 @@ private:
 	///@{
 	float mAngularSpeed, mFallSpeed, mGravity, mJumpSpeed, mMaxSlope, mMaxJumpHeight;
 	LVecBase2f mLinearSpeed;
+	///Flag if linear movement is local.
+	bool mIsLocal;
 	/**
 	 * \brief Sets control parameters of a character controller node (helper function).
 	 */
