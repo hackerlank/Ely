@@ -199,7 +199,7 @@
 				<Param enabled="false"/>
 				<Param controlled_type="driver"/>
 				<Param behavior="seek"/>
-				<Param mass="10.0"/>
+				<Param mass="50.0"/>
 				<Param movt_force="0.05"/>
 				<Param max_force="5.0"/>
 				<Param target_object="NPC1"/>

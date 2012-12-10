@@ -34,7 +34,6 @@ GameSceneManager::GameSceneManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	mLastTime = ClockObject::get_global_clock()->get_real_time();
 }
 
 GameSceneManager::~GameSceneManager()
@@ -80,11 +79,7 @@ AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	float dt;
-//	dt = ClockObject::get_global_clock()->get_dt();
-	float currTime = ClockObject::get_global_clock()->get_real_time();
-	dt = currTime - mLastTime;
-	mLastTime = currTime;
+	float dt = ClockObject::get_global_clock()->get_dt();
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps

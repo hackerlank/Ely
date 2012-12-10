@@ -94,9 +94,6 @@ private:
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
-	///The last time update was called
-	float mLastTime;
-
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 
