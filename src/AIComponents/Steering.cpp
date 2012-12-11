@@ -37,7 +37,6 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
 	mAICharacter = NULL;
 	mUpdatePtr = NULL;
 	mCharacterController = NULL;
-	mDriver = NULL;
 	mMovRotEnabled = false;
 }
 
@@ -92,12 +91,19 @@ bool Steering::initialize()
 	mTargetPoint.set_x(
 			(float) atof(mTmpl->parameter(std::string("target_x")).c_str()));
 	mTargetPoint.set_y(
-			(float) atof(mTmpl->parameter(std::string("target_Y")).c_str()));
+			(float) atof(mTmpl->parameter(std::string("target_y")).c_str()));
 	mTargetPoint.set_z(
-			(float) atof(mTmpl->parameter(std::string("target_Z")).c_str()));
+			(float) atof(mTmpl->parameter(std::string("target_z")).c_str()));
 	//seek
 	//seek_wt
 	mSeekWT = (float) atof(mTmpl->parameter(std::string("seek_wt")).c_str());
+	//flee
+	//panic_distance, relax_distance, flee_wt
+	mPanicDistance = (float) atof(
+			mTmpl->parameter(std::string("panic_distance")).c_str());
+	mRelaxDistance = (float) atof(
+			mTmpl->parameter(std::string("relax_distance")).c_str());
+	mFleeWT = (float) atof(mTmpl->parameter(std::string("flee_wt")).c_str());
 	//
 	return result;
 }
@@ -157,29 +163,6 @@ void Steering::enable()
 		//set current movement global (not local)
 		mCharacterController->setIsLocal(false);
 
-		//set the type
-		mControllerType = CHARACTER_CONTROLLER;
-		//enable movement/rotation
-		enableMovRot(true);
-	}
-	else if ((mType == std::string("driver"))
-			and (mOwnerObject->getComponent(ComponentFamilyType("Control"))->is_of_type(
-					Driver::get_class_type())))
-	{
-		//update the driver
-		mUpdatePtr = &Steering::updateController;
-		//get a reference to the Driver component
-		//(which is already created and set up)
-		mDriver = DCAST(Driver, mOwnerObject->getComponent(
-						ComponentFamilyType("Control")));
-
-		//save current enabling state (needed if disabled)
-		mCurrentEnabled = mDriver->isEnabled();
-		// and enable it anyway
-		mDriver->enable();
-
-		//set the type
-		mControllerType = DRIVER;
 		//enable movement/rotation
 		enableMovRot(true);
 	}
@@ -210,29 +193,13 @@ void Steering::disable()
 		return;
 	}
 
-	//check the type of the updatable item
-	switch (mControllerType)
+	if (mType == std::string("character_controller"))
 	{
-	case CHARACTER_CONTROLLER:
 		//disable movement/rotation
 		enableMovRot(false);
 		//restore current movement
 		mCharacterController->setIsLocal(mCurrentIsLocal);
-		break;
-	case DRIVER:
-		//disable movement/rotation
-		enableMovRot(false);
-		//restore current enabling state (if disabled)
-		if (not mCurrentEnabled)
-		{
-			mDriver->disable();
-		}
-		break;
-	default:
-		break;
 	}
-	//reset update ptr
-	mUpdatePtr = NULL;
 	//check if AI manager exists
 	if (GameAIManager::GetSingletonPtr())
 	{
@@ -249,6 +216,8 @@ void Steering::disable()
 		//remove from AI manager update
 		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 	}
+	//reset update ptr
+	mUpdatePtr = NULL;
 	//
 	mIsEnabled = not mIsEnabled;
 	//unregister event callbacks if any
@@ -276,6 +245,7 @@ void Steering::switchBehavior()
 	}
 	else if (mBehavior == std::string("flee"))
 	{
+		setupFlee();
 	}
 	else if (mBehavior == std::string("pursue"))
 	{
@@ -357,6 +327,26 @@ void Steering::setupSeek()
 
 void Steering::setupFlee()
 {
+	//flee
+	//check if there is an object this component has to flee;
+	//that object is supposed to be already created, set up,
+	//added to the scene and added to the created objects table;
+	ObjectId targetObjectId = ObjectId(mTargetObject);
+	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
+			targetObjectId);
+	if (targetObject != NULL)
+	{
+		//the target is an object get a reference to its
+		//AIBehaviors and set the flee target object
+		mAICharacter->get_ai_behaviors()->flee(targetObject->getNodePath(),
+				mPanicDistance, mRelaxDistance, mFleeWT);
+	}
+	else
+	{
+		//otherwise this component has to flee a point;
+		mAICharacter->get_ai_behaviors()->flee(mTargetPoint, mPanicDistance,
+				mRelaxDistance, mFleeWT);
+	}
 }
 
 void Steering::setupPursue()
@@ -419,77 +409,29 @@ void Steering::updateController(float dt)
 			enableMovRot(true);
 		}
 		LVecBase3f steering_force;
-		//select between controllers' types
-		switch (mControllerType)
-		{
-		case CHARACTER_CONTROLLER:
-			steering_force = calculate_prioritized(_steering);
-			break;
-		case DRIVER:
-			steering_force = _steering->calculate_prioritized();
-			break;
-		default:
-			break;
-		}
-
+		steering_force = calculate_prioritized(_steering);
 		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
 		mAICharacter->_velocity = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
 		direction.normalize();
-		//select between controllers' types
-		switch (mControllerType)
+		mCharacterController->setLinearSpeed(
+				-mAICharacter->get_velocity().get_xy() / dt);
+		if (steering_force.length() > 0)
 		{
-		case CHARACTER_CONTROLLER:
-		{
-			mCharacterController->setLinearSpeed(
-					-mAICharacter->get_velocity().get_xy() / dt);
-			if (steering_force.length() > 0)
+			//0 <= A <= 180.0
+			//the heavier a character is the slower it turns
+			float H = mAICharacter->get_node_path().get_h();
+			float A = 57.295779513f * acos(direction.get_y());
+			if (direction.get_x() <= 0)
 			{
-				//0 <= A <= 180.0
-				float H = mAICharacter->get_node_path().get_h();
-				float A = 57.295779513f * acos(direction.get_y());
-				if (direction.get_x() <= 0)
-				{
-					mCharacterController->setAngularSpeed(
-							-(H + (180 - A)) / dt);
-				}
-				else
-				{
-					mCharacterController->setAngularSpeed(
-							-(H - (180 - A)) / dt);
-				}
+				mCharacterController->setAngularSpeed(
+						-(H + (180 - A)) / (mMass * dt));
 			}
-		}
-			break;
-		case DRIVER:
-		{
-			LVector3f _velocity =
-					mAICharacter->get_node_path().get_relative_vector(
-							mTmpl->windowFramework()->get_render(),
-							mAICharacter->get_velocity());
-			mDriver->setLinearSpeed(-_velocity / dt);
-			if (steering_force.length() > 0)
+			else
 			{
-
-				///TODO
-
-				//0 <= A <= 180.0
-				float H = mAICharacter->get_node_path().get_h(
-						mTmpl->windowFramework()->get_render());
-				float A = 57.295779513f * acos(direction.get_y());
-				if (direction.get_x() <= 0)
-				{
-					mDriver->setAngularSpeed(-(H + (180 - A)) / dt);
-				}
-				else
-				{
-					mDriver->setAngularSpeed(-(H - (180 - A)) / dt);
-				}
+				mCharacterController->setAngularSpeed(
+						-(H - (180 - A)) / (mMass * dt));
 			}
-		}
-			break;
-		default:
-			break;
 		}
 	}
 	else
@@ -512,24 +454,10 @@ void Steering::updateController(float dt)
 
 void Steering::enableMovRot(bool enable)
 {
-	switch (mControllerType)
-	{
-	case CHARACTER_CONTROLLER:
-		mCharacterController->enableForward(enable);
-		mCharacterController->enableStrafeLeft(enable);
-		mCharacterController->enableRollLeft(enable);
-		mMovRotEnabled = enable;
-		break;
-	case DRIVER:
-		mDriver->enableForward(enable);
-		mDriver->enableStrafeRight(enable);
-		mDriver->enableDown(enable);
-		mDriver->enableRollRight(enable);
-		mMovRotEnabled = enable;
-		break;
-	default:
-		break;
-	}
+	mCharacterController->enableForward(enable);
+	mCharacterController->enableStrafeLeft(enable);
+	mCharacterController->enableRollLeft(enable);
+	mMovRotEnabled = enable;
 }
 
 LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
@@ -569,35 +497,96 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 		_steering->accumulate_force("seek", force);
 	}
 
-//	if (is_on (_flee_activate))
-//	{
-//		for (_flee_itr = _flee_list.begin(); _flee_itr != _flee_list.end();
-//				_flee_itr++)
-//		{
-//			_flee_itr->flee_activate();
-//		}
-//	}
-//
-//	if (is_on (_flee))
-//	{
-//		for (_flee_itr = _flee_list.begin(); _flee_itr != _flee_list.end();
-//				_flee_itr++)
-//		{
-//			if (_flee_itr->_flee_activate_done)
-//			{
-//				if (_conflict)
-//				{
-//					force = _flee_itr->do_flee() * _flee_itr->_flee_weight;
-//				}
-//				else
-//				{
-//					force = _flee_itr->do_flee();
-//				}
-//				accumulate_force("flee", force);
-//			}
-//		}
-//	}
-//
+	if (_steering->is_on(_steering->_flee_activate))
+	{
+		for (_steering->_flee_itr = _steering->_flee_list.begin();
+				_steering->_flee_itr != _steering->_flee_list.end();
+				_steering->_flee_itr++)
+		{
+			//TODO
+			//_flee_itr->flee_activate rewritten
+			void Flee::flee_activate() {
+			  LVecBase3f dirn;
+			  double distance;
+
+			  _flee_activate_done = false;
+
+			  dirn = (_ai_char->_ai_char_np.get_pos(_ai_char->_window_render) - _flee_position);
+			  distance = dirn.length();
+
+			  if(distance < _flee_distance) {
+			      _flee_direction = _ai_char->_ai_char_np.get_pos(_ai_char->_window_render) - _flee_position;
+			      _flee_direction.normalize();
+			      _flee_present_pos = _ai_char->_ai_char_np.get_pos(_ai_char->_window_render);
+			      _ai_char->_steering->turn_off("flee_activate");
+			      _ai_char->_steering->turn_on("flee");
+			      _flee_activate_done = true;
+			  }
+			}
+			////////
+
+
+
+
+			_steering->_flee_itr->flee_activate();
+		}
+	}
+
+	if (_steering->is_on(_steering->_flee))
+	{
+		for (_steering->_flee_itr = _steering->_flee_list.begin();
+				_steering->_flee_itr != _steering->_flee_list.end();
+				_steering->_flee_itr++)
+		{
+			if (_steering->_flee_itr->_flee_activate_done)
+			{
+
+
+				//TODO
+				//_flee_itr->do_flee rewritten
+				ListFlee::iterator _flee_itr = _steering->_flee_itr;
+				LVecBase3f Flee::do_flee() {
+				  LVecBase3f dirn;
+				  double distance;
+				  LVecBase3f desired_force;
+
+				  dirn = _ai_char->_ai_char_np.get_pos(_ai_char->_window_render) - _flee_present_pos;
+				  distance = dirn.length();
+				  desired_force = _flee_direction * _ai_char->_movt_force;
+
+				  if(distance > (_flee_distance + _flee_relax_distance)) {
+				    if((_ai_char->_steering->_behaviors_flags | _ai_char->_steering->_flee) == _ai_char->_steering->_flee) {
+				        _ai_char->_steering->_steering_force = LVecBase3f(0.0, 0.0, 0.0);
+				    }
+				    _flee_done = true;
+				    _ai_char->_steering->turn_off("flee");
+				    _ai_char->_steering->turn_on("flee_activate");
+				    return(LVecBase3f(0.0, 0.0, 0.0));
+				  }
+				  else {
+				      return(desired_force);
+				  }
+				}
+				//////////
+
+
+
+
+
+				if (_steering->_conflict)
+				{
+					force = _steering->_flee_itr->do_flee()
+							* _steering->_flee_itr->_flee_weight;
+				}
+				else
+				{
+					force = _steering->_flee_itr->do_flee();
+				}
+				_steering->accumulate_force("flee", force);
+			}
+		}
+	}
+
 //	if (is_on (_pursue))
 //	{
 //		if (_conflict)

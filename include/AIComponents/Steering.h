@@ -27,6 +27,7 @@
 #include <string>
 #include <aiCharacter.h>
 #include <seek.h>
+#include <flee.h>
 #include <pathFollow.h>
 #include <arrival.h>
 #include <nodePath.h>
@@ -49,19 +50,21 @@ class SteeringTemplate;
  * the root scene nodepath (i.e. render)
  * XML Param(s):
  * - "enabled"  			|single|"true"
- * - "controlled_type"		|single|"nodepath" (driver, nodepath,
- * 											character_controller)
+ * - "controlled_type"		|single|"nodepath" (nodepath, character_controller)
  * - "behavior"				|single|"seek" (seek,flee,pursue,evade,arrival,
  * 											wander,flock,obstacle_avoidance,
  * 											path_follow)
  * - "mass"  				|single|"1.0"
  * - "movt_force"  			|single|"1.0"
  * - "max_force"  			|single|"1.0"
- * - "target_object"		|single|no default (seek)
- * - "target_x"				|single|no default (seek)
- * - "target_y"				|single|no default (seek)
- * - "target_z"				|single|no default (seek)
+ * - "target_object"		|single|no default (seek, flee)
+ * - "target_x"				|single|no default (seek, flee)
+ * - "target_y"				|single|no default (seek, flee)
+ * - "target_z"				|single|no default (seek, flee)
  * - "seek_wt"  			|single|"1.0" (seek)
+ * - "panic_distance"		|single|"10.0" (flee)
+ * - "relax_distance"		|single|"10.0" (flee)
+ * - "flee_wt"				|single|"1.0" (flee)
  */
 class Steering: public Component
 {
@@ -125,29 +128,21 @@ private:
 	std::string mBehavior;
 	ObjectId mTargetObject;
 	LVecBase3f mTargetPoint;
-	//seek
-	float mSeekWT;
 	///@}
 	///The pointer to the real update member function.
 	void (Steering::*mUpdatePtr)(float);
 	///@{
-	///Controlled items.
-	enum ControllerType
-	{
-		CHARACTER_CONTROLLER,
-		DRIVER,
-	};
-	ControllerType mControllerType;
+	///Steered character controller items.
 	SMARTPTR(CharacterController) mCharacterController;
-	SMARTPTR(Driver) mDriver;
 	LVecBase3f calculate_prioritized(AIBehaviors *_steering);
 	void enableMovRot(bool enable);
-	bool mMovRotEnabled;
-	///Used only with character controller.
-	bool mCurrentIsLocal;
-	///Used only with driver.
-	bool mCurrentEnabled;
+	bool mMovRotEnabled, mCurrentIsLocal;
 	///@}
+
+	//seek
+	float mSeekWT;
+	//flee
+	float mPanicDistance, mRelaxDistance, mFleeWT;
 
 	/**
 	 * \name The real update member functions.
