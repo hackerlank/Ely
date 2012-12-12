@@ -32,6 +32,7 @@
 #include <arrival.h>
 #include <nodePath.h>
 #include <lvecBase3.h>
+#include <lvecBase2.h>
 #include <lvector3.h>
 #include <cmath>
 #include "ControlComponents/Driver.h"

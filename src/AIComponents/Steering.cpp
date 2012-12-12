@@ -408,8 +408,7 @@ void Steering::updateController(float dt)
 		{
 			enableMovRot(true);
 		}
-		LVecBase3f steering_force;
-		steering_force = calculate_prioritized(_steering);
+		LVecBase3f steering_force = calculate_prioritized(_steering);
 		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
 		mAICharacter->_velocity = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
@@ -454,6 +453,10 @@ void Steering::updateController(float dt)
 
 void Steering::enableMovRot(bool enable)
 {
+	//reset velocities
+	mCharacterController->setLinearSpeed(LVecBase2f::zero());
+	mCharacterController->setAngularSpeed(0.0);
+	//enable/disable movements
 	mCharacterController->enableForward(enable);
 	mCharacterController->enableStrafeLeft(enable);
 	mCharacterController->enableRollLeft(enable);
@@ -465,7 +468,7 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 	LVecBase3f force;
 	if (_steering->is_on(_steering->_seek))
 	{
-		//_seek_obj->do_seek rewritten
+		//<!--_seek_obj->do_seek rewritten
 		Seek *_seek_obj = _steering->_seek_obj;
 		LVecBase3f do_seek;
 		{
@@ -485,7 +488,7 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 					* _seek_obj->_ai_char->_movt_force;
 			do_seek = desired_force;
 		}
-		//
+		//_seek_obj->do_seek rewritten-->
 		if (_steering->_conflict)
 		{
 			force = do_seek * _seek_obj->_seek_weight;
@@ -503,32 +506,32 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 				_steering->_flee_itr != _steering->_flee_list.end();
 				_steering->_flee_itr++)
 		{
-			//TODO
-			//_flee_itr->flee_activate rewritten
-			void Flee::flee_activate() {
-			  LVecBase3f dirn;
-			  double distance;
-
-			  _flee_activate_done = false;
-
-			  dirn = (_ai_char->_ai_char_np.get_pos(_ai_char->_window_render) - _flee_position);
-			  distance = dirn.length();
-
-			  if(distance < _flee_distance) {
-			      _flee_direction = _ai_char->_ai_char_np.get_pos(_ai_char->_window_render) - _flee_position;
-			      _flee_direction.normalize();
-			      _flee_present_pos = _ai_char->_ai_char_np.get_pos(_ai_char->_window_render);
-			      _ai_char->_steering->turn_off("flee_activate");
-			      _ai_char->_steering->turn_on("flee");
-			      _flee_activate_done = true;
-			  }
+			//<!--_flee_itr->flee_activate rewritten
+			ListFlee::iterator _flee_itr = _steering->_flee_itr;
+			{
+				LVecBase2f dirn;
+				double distance;
+				_flee_itr->_flee_activate_done = false;
+				dirn = (_flee_itr->_ai_char->_ai_char_np.get_pos(
+						_flee_itr->_ai_char->_window_render)
+						- _flee_itr->_flee_position).get_xy();
+				distance = dirn.length();
+				if (distance < _flee_itr->_flee_distance)
+				{
+					_flee_itr->_flee_direction =
+							_flee_itr->_ai_char->_ai_char_np.get_pos(
+									_flee_itr->_ai_char->_window_render)
+									- _flee_itr->_flee_position;
+					_flee_itr->_flee_direction.normalize();
+					_flee_itr->_flee_present_pos =
+							_flee_itr->_ai_char->_ai_char_np.get_pos(
+									_flee_itr->_ai_char->_window_render);
+					_flee_itr->_ai_char->_steering->turn_off("flee_activate");
+					_flee_itr->_ai_char->_steering->turn_on("flee");
+					_flee_itr->_flee_activate_done = true;
+				}
 			}
-			////////
-
-
-
-
-			_steering->_flee_itr->flee_activate();
+			//_flee_itr->flee_activate rewritten-->
 		}
 	}
 
@@ -540,47 +543,52 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 		{
 			if (_steering->_flee_itr->_flee_activate_done)
 			{
-
-
-				//TODO
-				//_flee_itr->do_flee rewritten
+				//<!--_flee_itr->do_flee rewritten
 				ListFlee::iterator _flee_itr = _steering->_flee_itr;
-				LVecBase3f Flee::do_flee() {
-				  LVecBase3f dirn;
-				  double distance;
-				  LVecBase3f desired_force;
+				LVecBase3f do_flee;
+				{
+					LVecBase2f dirn;
+					double distance;
+					LVecBase3f desired_force;
 
-				  dirn = _ai_char->_ai_char_np.get_pos(_ai_char->_window_render) - _flee_present_pos;
-				  distance = dirn.length();
-				  desired_force = _flee_direction * _ai_char->_movt_force;
+					dirn = (_flee_itr->_ai_char->_ai_char_np.get_pos(
+							_flee_itr->_ai_char->_window_render)
+							- _flee_itr->_flee_present_pos).get_xy();
+					distance = dirn.length();
+					desired_force = _flee_itr->_flee_direction
+							* _flee_itr->_ai_char->_movt_force;
 
-				  if(distance > (_flee_distance + _flee_relax_distance)) {
-				    if((_ai_char->_steering->_behaviors_flags | _ai_char->_steering->_flee) == _ai_char->_steering->_flee) {
-				        _ai_char->_steering->_steering_force = LVecBase3f(0.0, 0.0, 0.0);
-				    }
-				    _flee_done = true;
-				    _ai_char->_steering->turn_off("flee");
-				    _ai_char->_steering->turn_on("flee_activate");
-				    return(LVecBase3f(0.0, 0.0, 0.0));
-				  }
-				  else {
-				      return(desired_force);
-				  }
+					if (distance
+							> (_flee_itr->_flee_distance
+									+ _flee_itr->_flee_relax_distance))
+					{
+						if ((_flee_itr->_ai_char->_steering->_behaviors_flags
+								| _flee_itr->_ai_char->_steering->_flee)
+								== _flee_itr->_ai_char->_steering->_flee)
+						{
+							_flee_itr->_ai_char->_steering->_steering_force =
+									LVecBase3f(0.0, 0.0, 0.0);
+						}
+						_flee_itr->_flee_done = true;
+						_flee_itr->_ai_char->_steering->turn_off("flee");
+						_flee_itr->_ai_char->_steering->turn_on(
+								"flee_activate");
+						do_flee = LVecBase3f(0.0, 0.0, 0.0);
+					}
+					else
+					{
+						do_flee = desired_force;
+					}
 				}
-				//////////
-
-
-
-
+				//_flee_itr->do_flee rewritten-->
 
 				if (_steering->_conflict)
 				{
-					force = _steering->_flee_itr->do_flee()
-							* _steering->_flee_itr->_flee_weight;
+					force = do_flee * _steering->_flee_itr->_flee_weight;
 				}
 				else
 				{
-					force = _steering->_flee_itr->do_flee();
+					force = do_flee;
 				}
 				_steering->accumulate_force("flee", force);
 			}
