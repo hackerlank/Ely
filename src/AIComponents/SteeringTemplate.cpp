@@ -80,10 +80,9 @@ void SteeringTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
 	mParameterTable.insert(ParameterNameValue("movt_force", "1.0"));
 	mParameterTable.insert(ParameterNameValue("max_force", "1.0"));
-	mParameterTable.insert(ParameterNameValue("seek_wt", "1.0"));
+	mParameterTable.insert(ParameterNameValue("wt", "1.0"));
 	mParameterTable.insert(ParameterNameValue("panic_distance", "10.0"));
 	mParameterTable.insert(ParameterNameValue("relax_distance", "10.0"));
-	mParameterTable.insert(ParameterNameValue("flee_wt", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

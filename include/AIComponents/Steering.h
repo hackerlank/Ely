@@ -28,6 +28,7 @@
 #include <aiCharacter.h>
 #include <seek.h>
 #include <flee.h>
+#include <pursue.h>
 #include <pathFollow.h>
 #include <arrival.h>
 #include <nodePath.h>
@@ -51,21 +52,20 @@ class SteeringTemplate;
  * the root scene nodepath (i.e. render)
  * XML Param(s):
  * - "enabled"  			|single|"true"
- * - "controlled_type"		|single|"nodepath" (nodepath, character_controller)
+ * - "controlled_type"		|single|"nodepath" (nodepath,character_controller)
  * - "behavior"				|single|"seek" (seek,flee,pursue,evade,arrival,
  * 											wander,flock,obstacle_avoidance,
  * 											path_follow)
  * - "mass"  				|single|"1.0"
  * - "movt_force"  			|single|"1.0"
  * - "max_force"  			|single|"1.0"
- * - "target_object"		|single|no default (seek, flee)
- * - "target_x"				|single|no default (seek, flee)
- * - "target_y"				|single|no default (seek, flee)
- * - "target_z"				|single|no default (seek, flee)
- * - "seek_wt"  			|single|"1.0" (seek)
+ * - "target_object"		|single|no default (seek,flee,pursue)
+ * - "target_x"				|single|no default (seek,flee)
+ * - "target_y"				|single|no default (seek,flee)
+ * - "target_z"				|single|no default (seek,flee)
+ * - "wt"  					|single|"1.0" (seek_wt,flee_wt,pursue_wt)
  * - "panic_distance"		|single|"10.0" (flee)
  * - "relax_distance"		|single|"10.0" (flee)
- * - "flee_wt"				|single|"1.0" (flee)
  */
 class Steering: public Component
 {
@@ -103,7 +103,7 @@ public:
 	void setBehavior(const std::string& behavior);
 	void setTarget(const ObjectId& target);
 	void setTarget(LVecBase3f target);
-	void setSeekWT(float seekWT);
+	void setWT(float seekWT);
 	///@}
 
 	/**
@@ -140,10 +140,10 @@ private:
 	bool mMovRotEnabled, mCurrentIsLocal;
 	///@}
 
-	//seek
-	float mSeekWT;
+	//shared (seek_wt,flee_wt,pursue_wt)
+	float mWT;
 	//flee
-	float mPanicDistance, mRelaxDistance, mFleeWT;
+	float mPanicDistance, mRelaxDistance;
 
 	/**
 	 * \name The real update member functions.

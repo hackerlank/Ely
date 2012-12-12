@@ -94,16 +94,14 @@ bool Steering::initialize()
 			(float) atof(mTmpl->parameter(std::string("target_y")).c_str()));
 	mTargetPoint.set_z(
 			(float) atof(mTmpl->parameter(std::string("target_z")).c_str()));
-	//seek
-	//seek_wt
-	mSeekWT = (float) atof(mTmpl->parameter(std::string("seek_wt")).c_str());
+	//shared (seek_wt,flee_wt,pursue_wt)
+	mWT = (float) atof(mTmpl->parameter(std::string("wt")).c_str());
 	//flee
-	//panic_distance, relax_distance, flee_wt
+	//panic_distance, relax_distance,
 	mPanicDistance = (float) atof(
 			mTmpl->parameter(std::string("panic_distance")).c_str());
 	mRelaxDistance = (float) atof(
 			mTmpl->parameter(std::string("relax_distance")).c_str());
-	mFleeWT = (float) atof(mTmpl->parameter(std::string("flee_wt")).c_str());
 	//
 	return result;
 }
@@ -249,6 +247,7 @@ void Steering::switchBehavior()
 	}
 	else if (mBehavior == std::string("pursue"))
 	{
+		setupPursue();
 	}
 	else if (mBehavior == std::string("evade"))
 	{
@@ -294,12 +293,12 @@ void Steering::setTarget(LVecBase3f target)
 	mTargetPoint = target;
 }
 
-void Steering::setSeekWT(float seekWT)
+void Steering::setWT(float WT)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mSeekWT = seekWT;
+	mWT = WT;
 }
 
 void Steering::setupSeek()
@@ -316,12 +315,12 @@ void Steering::setupSeek()
 		//the target is an object get a reference to its
 		//AIBehaviors and set the seek target object
 		mAICharacter->get_ai_behaviors()->seek(targetObject->getNodePath(),
-				mSeekWT);
+				mWT);
 	}
 	else
 	{
 		//otherwise this component has to seek a point;
-		mAICharacter->get_ai_behaviors()->seek(mTargetPoint, mSeekWT);
+		mAICharacter->get_ai_behaviors()->seek(mTargetPoint, mWT);
 	}
 }
 
@@ -339,18 +338,33 @@ void Steering::setupFlee()
 		//the target is an object get a reference to its
 		//AIBehaviors and set the flee target object
 		mAICharacter->get_ai_behaviors()->flee(targetObject->getNodePath(),
-				mPanicDistance, mRelaxDistance, mFleeWT);
+				mPanicDistance, mRelaxDistance, mWT);
 	}
 	else
 	{
 		//otherwise this component has to flee a point;
 		mAICharacter->get_ai_behaviors()->flee(mTargetPoint, mPanicDistance,
-				mRelaxDistance, mFleeWT);
+				mRelaxDistance, mWT);
 	}
 }
 
 void Steering::setupPursue()
 {
+	//pursue
+	//check if there is an object this component has to pursue;
+	//that object is supposed to be already created, set up,
+	//added to the scene and added to the created objects table;
+	//otherwise does nothing.
+	ObjectId targetObjectId = ObjectId(mTargetObject);
+	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
+			targetObjectId);
+	if (targetObject != NULL)
+	{
+		//the target is an object get a reference to its
+		//AIBehaviors and set the pursue target object
+		mAICharacter->get_ai_behaviors()->pursue(targetObject->getNodePath(),
+				mWT);
+	}
 }
 
 void Steering::setupEvade()
@@ -473,9 +487,9 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 		LVecBase3f do_seek;
 		{
 			double target_distance =
-					(_seek_obj->_seek_position.get_xy()
+					(_seek_obj->_seek_position
 							- _seek_obj->_ai_char->_ai_char_np.get_pos(
-									_seek_obj->_ai_char->_window_render).get_xy()).length();
+									_seek_obj->_ai_char->_window_render)).get_xy().length();
 			if (int(target_distance) == 0)
 			{
 				_seek_obj->_seek_done = true;
@@ -484,9 +498,12 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 				_seek_obj->_ai_char->_steering->turn_off("seek");
 				do_seek = LVecBase3f(0.0, 0.0, 0.0);
 			}
-			LVecBase3f desired_force = _seek_obj->_seek_direction
-					* _seek_obj->_ai_char->_movt_force;
-			do_seek = desired_force;
+			else
+			{
+				LVecBase3f desired_force = _seek_obj->_seek_direction
+						* _seek_obj->_ai_char->_movt_force;
+				do_seek = desired_force;
+			}
 		}
 		//_seek_obj->do_seek rewritten-->
 		if (_steering->_conflict)
@@ -595,19 +612,55 @@ LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
 		}
 	}
 
-//	if (is_on (_pursue))
-//	{
-//		if (_conflict)
-//		{
-//			force = _pursue_obj->do_pursue() * _pursue_obj->_pursue_weight;
-//		}
-//		else
-//		{
-//			force = _pursue_obj->do_pursue();
-//		}
-//		accumulate_force("pursue", force);
-//	}
-//
+	if (_steering->is_on(_steering->_pursue))
+	{
+		//<!--_pursue_obj->do_pursue rewritten
+		Pursue *_pursue_obj = _steering->_pursue_obj;
+		LVecBase3f do_pursue;
+		{
+			LVecBase3f present_pos = _pursue_obj->_ai_char->_ai_char_np.get_pos(
+					_pursue_obj->_ai_char->_window_render);
+			double target_distance =
+					(_pursue_obj->_pursue_target.get_pos(
+							_pursue_obj->_ai_char->_window_render) - present_pos).get_xy().length();
+
+			if (int(target_distance) == 0)
+			{
+				_pursue_obj->_pursue_done = true;
+				_pursue_obj->_ai_char->_steering->_steering_force = LVecBase3f(
+						0.0, 0.0, 0.0);
+				_pursue_obj->_ai_char->_steering->_pursue_force = LVecBase3f(
+						0.0, 0.0, 0.0);
+				do_pursue = LVecBase3f(0.0, 0.0, 0.0);
+			}
+			else
+			{
+				_pursue_obj->_pursue_done = false;
+
+				_pursue_obj->_pursue_direction =
+						_pursue_obj->_pursue_target.get_pos(
+								_pursue_obj->_ai_char->_window_render)
+								- present_pos;
+				_pursue_obj->_pursue_direction.normalize();
+
+				LVecBase3f desired_force = _pursue_obj->_pursue_direction
+						* _pursue_obj->_ai_char->_movt_force;
+				do_pursue = desired_force;
+			}
+		}
+		//_pursue_obj->do_pursue rewritten-->
+
+		if (_steering->_conflict)
+		{
+			force = do_pursue * _steering->_pursue_obj->_pursue_weight;
+		}
+		else
+		{
+			force = do_pursue;
+		}
+		_steering->accumulate_force("pursue", force);
+	}
+
 //	if (is_on (_evade_activate))
 //	{
 //		for (_evade_itr = _evade_list.begin(); _evade_itr != _evade_list.end();

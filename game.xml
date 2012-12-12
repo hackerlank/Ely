@@ -98,9 +98,7 @@
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="AI" type="Steering" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
-<!--
 			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/>
--->
 			<ComponentTmpl family="Control" type="Driver" priority="60"/>
 		</ObjectTmpl>
 		
@@ -197,22 +195,20 @@
 			<Param rot_r="0.0"/>
 			<Component type="Steering">
 				<Param enabled="false"/>
-				<Param controlled_type="nodepath"/>
+				<Param controlled_type="character_controller"/>
 				<Param mass="20.0"/>
 				<Param movt_force="0.05"/>
 				<Param max_force="5.0"/>
 				<Param target_object="NPC1"/>
-				<Param behavior="flee"/>
-				<Param panic_distance="2.0"/>
-				<Param relax_distance="3.0"/>
+				<Param behavior="pursue"/>
+				<Param panic_distance="80.0"/>
+				<Param relax_distance="90.0"/>
 			</Component>
-<!--
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
 				<Param is_local="false"/>
 			</Component>
--->
 			<Component type="InstanceOf">
 				<Param instance_of="Gorilla1"/>
 				<Param scale_x="3.0"/>
