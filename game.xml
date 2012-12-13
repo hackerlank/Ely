@@ -184,7 +184,7 @@
 			</Component>
 		</Object>
 		
-		<Object type="InstancedActorAI" id="Seeker1">
+		<Object type="InstancedActorAI" id="Steerer1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
 			<Param pos_x="120.0"/>
@@ -199,10 +199,6 @@
 				<Param mass="20.0"/>
 				<Param movt_force="0.05"/>
 				<Param max_force="5.0"/>
-				<Param target_object="NPC1"/>
-				<Param behavior="pursue"/>
-				<Param panic_distance="80.0"/>
-				<Param relax_distance="90.0"/>
 			</Component>
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>

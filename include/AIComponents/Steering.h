@@ -48,24 +48,20 @@ class SteeringTemplate;
 /**
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
+ * This is a tiny wrapper around an AICharacter object: any AI steering
+ * behavior should be done by getting a reference to it, after having
+ * enabled the whole component.\n
+ * Steering behaviors' initializations can be done as usual into the
+ * initialization library routines.\n
  * \note This component should be used only with an object reparented to
- * the root scene nodepath (i.e. render)
+ * the root scene node path (i.e. render).
+ *
  * XML Param(s):
  * - "enabled"  			|single|"true"
  * - "controlled_type"		|single|"nodepath" (nodepath,character_controller)
- * - "behavior"				|single|"seek" (seek,flee,pursue,evade,arrival,
- * 											wander,flock,obstacle_avoidance,
- * 											path_follow)
  * - "mass"  				|single|"1.0"
  * - "movt_force"  			|single|"1.0"
  * - "max_force"  			|single|"1.0"
- * - "target_object"		|single|no default (seek,flee,pursue)
- * - "target_x"				|single|no default (seek,flee)
- * - "target_y"				|single|no default (seek,flee)
- * - "target_z"				|single|no default (seek,flee)
- * - "wt"  					|single|"1.0" (seek_wt,flee_wt,pursue_wt)
- * - "panic_distance"		|single|"10.0" (flee)
- * - "relax_distance"		|single|"10.0" (flee)
  */
 class Steering: public Component
 {
@@ -90,20 +86,11 @@ public:
 	virtual void update(void* data);
 
 	/**
-	 * \brief Switch the steering behavior.
-	 * @param behavior The steering behavior: seek|flee|pursue|
-	 * evade|arrival|wander|flock|obstacle_avoidance|path_follow
-	 */
-	void switchBehavior();
-
-	/**
-	 * \name Parameters' setters.
+	 * \name Gets the node path of the designed target object.
 	 */
 	///@{
-	void setBehavior(const std::string& behavior);
-	void setTarget(const ObjectId& target);
-	void setTarget(LVecBase3f target);
-	void setWT(float seekWT);
+	NodePath getTargetNodePath(const ObjectId& target);
+	NodePath getTargetNodePath(CSMARTPTR(Object) target);
 	///@}
 
 	/**
@@ -116,6 +103,12 @@ public:
 	bool isEnabled();
 	///@}
 
+	/**
+	 * \brief Returns a reference to the underlined AICharacter.
+	 * @return A reference to the underlined AICharacter.
+	 */
+	AICharacter* const getAiCharacter() const;
+
 private:
 	///The AICharacter associated to this Steering.
 	AICharacter* mAICharacter;
@@ -125,10 +118,6 @@ private:
 	///Fixed parameters.
 	float mMass, mMovtForce, mMaxForce;
 	std::string mType;
-	///Variable parameters.
-	std::string mBehavior;
-	ObjectId mTargetObject;
-	LVecBase3f mTargetPoint;
 	///@}
 	///The pointer to the real update member function.
 	void (Steering::*mUpdatePtr)(float);
@@ -140,32 +129,12 @@ private:
 	bool mMovRotEnabled, mCurrentIsLocal;
 	///@}
 
-	//shared (seek_wt,flee_wt,pursue_wt)
-	float mWT;
-	//flee
-	float mPanicDistance, mRelaxDistance;
-
 	/**
 	 * \name The real update member functions.
 	 */
 	///@{
 	void updateNodePath(float dt);
 	void updateController(float dt);
-	///@}
-
-	/**
-	 * \name The setup behaviors member functions.
-	 */
-	///@{
-	void setupSeek();
-	void setupFlee();
-	void setupPursue();
-	void setupEvade();
-	void setupArrival();
-	void setupWander();
-	void setupFlock();
-	void setupObstacleAvoidance();
-	void setupPathFollow();
 	///@}
 
 	///TypedObject semantics: hardcoded

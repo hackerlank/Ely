@@ -24,6 +24,9 @@
 #include "../common_configs.h"
 #include "Utilities/ComponentSuite.h"
 #include "Utilities/Tools.h"
+#include <nodePath.h>
+#include <aiCharacter.h>
+#include <aiBehaviors.h>
 
 ///common
 static bool controlGrabbed = false;
@@ -321,46 +324,57 @@ extern "C"
 {
 #endif
 
-INITIALIZATION Seeker1_initialization;
+INITIALIZATION Steerer1_initialization;
 
 #ifdef __cplusplus
 }
 #endif
 
 static bool aiEnabled = false;
-static void toggleSeeker1Control(const Event* event, void* data)
+static void toggleSteerer1Control(const Event* event, void* data)
 {
-	SMARTPTR(Object) seeker1 = reinterpret_cast<Object*>(data);
-	SMARTPTR(Steering)actor1AI = DCAST(Steering, seeker1->getComponent(
+	SMARTPTR(Object)steerer1 = reinterpret_cast<Object*>(data);
+	SMARTPTR(Steering)steerer1AI = DCAST(Steering, steerer1->getComponent(
 					ComponentFamilyType("AI")));
 
-	if (actor1AI->isEnabled())
+	if (steerer1AI->isEnabled())
 	{
 		//if enabled then disable it
-		actor1AI->disable();
+		steerer1AI->disable();
 		//
 		aiEnabled = false;
 	}
 	else if (not aiEnabled)
 	{
 		//if disabled then enable it
-		actor1AI->enable();
+		steerer1AI->enable();
+		//enable behaviors
+		NodePath targetObjectNP = steerer1AI->getTargetNodePath(ObjectId("NPC1"));
+		//seek NPC1
+//		steerer1AI->getAiCharacter()->get_ai_behaviors()->seek(targetObjectNP);
+		//flee NPC1
+//		steerer1AI->getAiCharacter()->get_ai_behaviors()->flee(targetObjectNP, 50.0, 200.0);
+		//pursue NPC1
+		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
 		//
 		aiEnabled = true;
 	}
 }
-void Seeker1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+void Steerer1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
-	//Seeker1
-	//enable/disable Seeker1 control by event
-	pandaFramework->define_key("b", "enableSeeker1Control", &toggleSeeker1Control,
-			static_cast<void*>(object));
+	SMARTPTR(Steering)steerer1AI = DCAST(Steering, object->getComponent(
+					ComponentFamilyType("AI")));
+
+	//Steerer1
+	//enable/disable Steerer1 control by event
+	pandaFramework->define_key("b", "enableSteerer1Control",
+			&toggleSteerer1Control, static_cast<void*>(object));
 }
 
-void Seeker1Init()
+void Steerer1Init()
 {
 }
-void Seeker1End()
+void Steerer1End()
 {
 }

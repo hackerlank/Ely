@@ -46,8 +46,8 @@ extern void Terrain1Init();
 extern void Terrain1End();
 extern void NPC1Init();
 extern void NPC1End();
-extern void Seeker1Init();
-extern void Seeker1End();
+extern void Steerer1Init();
+extern void Steerer1End();
 
 ///Call all init/end functions
 void callAllInits()
@@ -57,7 +57,7 @@ void callAllInits()
 	Plane1Init();
 	Terrain1Init();
 	NPC1Init();
-	Seeker1Init();
+	Steerer1Init();
 }
 void callAllEnds()
 {
@@ -66,6 +66,6 @@ void callAllEnds()
 	Plane1End();
 	Terrain1End();
 	NPC1End();
-	Seeker1End();
+	Steerer1End();
 }
 

@@ -69,8 +69,6 @@ bool Steering::initialize()
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
 	//set AICharacter parameters
-	//behavior
-	mBehavior = mTmpl->parameter(std::string("behavior"));
 	//
 	float floatParam;
 	//mass
@@ -86,22 +84,6 @@ bool Steering::initialize()
 	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
 	//the type of the updatable item
 	mType = mTmpl->parameter(std::string("controlled_type"));
-	//target params
-	mTargetObject = ObjectId(mTmpl->parameter(std::string("target_object")));
-	mTargetPoint.set_x(
-			(float) atof(mTmpl->parameter(std::string("target_x")).c_str()));
-	mTargetPoint.set_y(
-			(float) atof(mTmpl->parameter(std::string("target_y")).c_str()));
-	mTargetPoint.set_z(
-			(float) atof(mTmpl->parameter(std::string("target_z")).c_str()));
-	//shared (seek_wt,flee_wt,pursue_wt)
-	mWT = (float) atof(mTmpl->parameter(std::string("wt")).c_str());
-	//flee
-	//panic_distance, relax_distance,
-	mPanicDistance = (float) atof(
-			mTmpl->parameter(std::string("panic_distance")).c_str());
-	mRelaxDistance = (float) atof(
-			mTmpl->parameter(std::string("relax_distance")).c_str());
 	//
 	return result;
 }
@@ -170,9 +152,6 @@ void Steering::enable()
 		mUpdatePtr = &Steering::updateNodePath;
 	}
 
-	//switch to the indicated behavior
-	switchBehavior();
-
 	//Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 	//
@@ -230,166 +209,43 @@ bool Steering::isEnabled()
 	return mIsEnabled;
 }
 
-void Steering::switchBehavior()
+AICharacter* const Steering::getAiCharacter() const
 {
-	if (not mAICharacter)
-	{
-		return;
-	}
-	//switch to the indicated behavior
-	if (mBehavior == std::string("seek"))
-	{
-		setupSeek();
-	}
-	else if (mBehavior == std::string("flee"))
-	{
-		setupFlee();
-	}
-	else if (mBehavior == std::string("pursue"))
-	{
-		setupPursue();
-	}
-	else if (mBehavior == std::string("evade"))
-	{
-	}
-	else if (mBehavior == std::string("arrival"))
-	{
-	}
-	else if (mBehavior == std::string("wander"))
-	{
-	}
-	else if (mBehavior == std::string("flock"))
-	{
-	}
-	else if (mBehavior == std::string("obstacle_avoidance"))
-	{
-	}
-	else if (mBehavior == std::string("path_follow"))
-	{
-	}
+	return mAICharacter;
 }
 
-void Steering::setBehavior(const std::string& behavior)
+NodePath Steering::getTargetNodePath(const ObjectId& target)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mBehavior = behavior;
-}
-
-void Steering::setTarget(const ObjectId& target)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mTargetObject = target;
-}
-
-void Steering::setTarget(LVecBase3f target)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mTargetPoint = target;
-}
-
-void Steering::setWT(float WT)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mWT = WT;
-}
-
-void Steering::setupSeek()
-{
-	//seek
-	//check if there is an object this component has to seek;
+	NodePath objectNodePath("");
+	//check if there is an object with that ObjectId;
 	//that object is supposed to be already created, set up,
 	//added to the scene and added to the created objects table;
-	ObjectId targetObjectId = ObjectId(mTargetObject);
-	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
-			targetObjectId);
+	CSMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
+			target);
 	if (targetObject != NULL)
 	{
-		//the target is an object get a reference to its
-		//AIBehaviors and set the seek target object
-		mAICharacter->get_ai_behaviors()->seek(targetObject->getNodePath(),
-				mWT);
+		objectNodePath = targetObject->getNodePath();
 	}
-	else
-	{
-		//otherwise this component has to seek a point;
-		mAICharacter->get_ai_behaviors()->seek(mTargetPoint, mWT);
+	//
+	return objectNodePath;
+}
+
+NodePath Steering::getTargetNodePath(CSMARTPTR(Object)target)
+{
+	//lock (guard) the mutex
+		HOLDMUTEX(mMutex)
+
+		NodePath objectNodePath("");
+		if (target != NULL)
+		{
+			objectNodePath = target->getNodePath();
+		}
+		//
+		return objectNodePath;
 	}
-}
-
-void Steering::setupFlee()
-{
-	//flee
-	//check if there is an object this component has to flee;
-	//that object is supposed to be already created, set up,
-	//added to the scene and added to the created objects table;
-	ObjectId targetObjectId = ObjectId(mTargetObject);
-	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
-			targetObjectId);
-	if (targetObject != NULL)
-	{
-		//the target is an object get a reference to its
-		//AIBehaviors and set the flee target object
-		mAICharacter->get_ai_behaviors()->flee(targetObject->getNodePath(),
-				mPanicDistance, mRelaxDistance, mWT);
-	}
-	else
-	{
-		//otherwise this component has to flee a point;
-		mAICharacter->get_ai_behaviors()->flee(mTargetPoint, mPanicDistance,
-				mRelaxDistance, mWT);
-	}
-}
-
-void Steering::setupPursue()
-{
-	//pursue
-	//check if there is an object this component has to pursue;
-	//that object is supposed to be already created, set up,
-	//added to the scene and added to the created objects table;
-	//otherwise does nothing.
-	ObjectId targetObjectId = ObjectId(mTargetObject);
-	SMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
-			targetObjectId);
-	if (targetObject != NULL)
-	{
-		//the target is an object get a reference to its
-		//AIBehaviors and set the pursue target object
-		mAICharacter->get_ai_behaviors()->pursue(targetObject->getNodePath(),
-				mWT);
-	}
-}
-
-void Steering::setupEvade()
-{
-}
-
-void Steering::setupArrival()
-{
-}
-
-void Steering::setupWander()
-{
-}
-
-void Steering::setupFlock()
-{
-}
-
-void Steering::setupObstacleAvoidance()
-{
-}
-
-void Steering::setupPathFollow()
-{
-}
 
 void Steering::update(void* data)
 {
@@ -444,6 +300,13 @@ void Steering::updateController(float dt)
 			{
 				mCharacterController->setAngularSpeed(
 						-(H - (180 - A)) / (mMass * dt));
+			}
+		}
+		else
+		{
+			if (mMovRotEnabled)
+			{
+				enableMovRot(false);
 			}
 		}
 	}
