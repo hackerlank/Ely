@@ -288,19 +288,33 @@ void Steering::updateController(float dt)
 		if (steering_force.length() > 0)
 		{
 			//0 <= A <= 180.0
-			//the heavier a character is the slower it turns
+			//the heavier is a character the slower to turn it is
 			float H = mAICharacter->get_node_path().get_h();
 			float A = 57.295779513f * acos(direction.get_y());
-			if (direction.get_x() <= 0)
+			float deltaAngle;
+			if (direction.get_x() <= 0.0)
 			{
-				mCharacterController->setAngularSpeed(
-						-(H + (180 - A)) / (mMass * dt));
+				if (H <= 0.0)
+				{
+					deltaAngle = -H + A - 180;
+				}
+				else
+				{
+					deltaAngle = (A <= H ? -H + A + 180 : -H + A - 180);
+				}
 			}
 			else
 			{
-				mCharacterController->setAngularSpeed(
-						-(H - (180 - A)) / (mMass * dt));
+				if (H >= 0.0)
+				{
+					deltaAngle = -H - A + 180;
+				}
+				else
+				{
+					deltaAngle = (A >= -H ? -H - A + 180 : -H - A - 180);
+				}
 			}
+			mCharacterController->setAngularSpeed(deltaAngle / (mMass * dt));
 		}
 		else
 		{
