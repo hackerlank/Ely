@@ -108,7 +108,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
-	float maxSubSteps;
+	int maxSubSteps;
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
