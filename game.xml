@@ -13,9 +13,8 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
--->
+<!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -25,6 +24,7 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -120,19 +120,21 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
-<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
 				<Param chased_object="NPC1"/>
+				<Param fixed_relative_position="false"/>
 				<Param reference_object="render"/>
-				<Param distance="100.0"/>
-				<Param abs_lookat_distance="50.0"/>
-				<Param abs_min_distance="10.0"/>
-				<Param abs_min_height="10.0"/>
+				<Param abs_max_distance="150.0"/>
+				<Param abs_min_distance="100.0"/>
+				<Param abs_max_height="100.0"/>
+				<Param abs_min_height="50.0"/>
+				<Param abs_lookat_distance="0.0"/>
+				<Param abs_lookat_height="20.0"/>
 				<Param friction="1.0"/>
 			</Component>
--->
+<!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param linear_speed="10.0"/>
@@ -152,6 +154,7 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
 				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
+-->
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="-400.0"/>
@@ -225,7 +228,7 @@
 		</Object>
 		<Object type="Instanceable" id="Gorilla1" priority="100">
 			<Component type="Model">
-				<Param model_file="gorilla/gorilla"/>
+				<Param model_file="gorilla/gorillawalking"/>
 				<Param is_static="true"/>
 				<Param scale_x="0.5"/>
 				<Param scale_y="0.5"/>
@@ -323,7 +326,7 @@
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
-				<Param linear_speed="70.0"/>
+				<Param linear_speed="120.0"/>
 			</Component> 
 			<Component type="Sound3d">
 				<Param sound_files="models/audio/sfx/GUI_click.wav"/>

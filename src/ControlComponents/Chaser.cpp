@@ -56,6 +56,46 @@ const ComponentType Chaser::componentType() const
 	return mTmpl->componentType();
 }
 
+bool Chaser::initialize()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	bool result = true;
+	//get settings from template
+	//enabling setting
+	mEnabled = (
+			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
+					true : false);
+	//backward setting
+	mBackward = (
+			mTmpl->parameter(std::string("backward")) == std::string("true") ?
+					true : false);
+	//fixed relative position setting
+	mFixedRelativePosition = (
+			mTmpl->parameter(std::string("fixed_relative_position"))
+					== std::string("false") ? false : true);
+	//look at distance and height settings
+	mAbsLookAtDistance = (float) atof(
+			mTmpl->parameter(std::string("abs_lookat_distance")).c_str());
+	mAbsLookAtHeight = (float) atof(
+			mTmpl->parameter(std::string("abs_lookat_height")).c_str());
+	//max and min distance settings
+	mAbsMaxDistance = (float) atof(
+			mTmpl->parameter(std::string("abs_max_distance")).c_str());
+	mAbsMinDistance = (float) atof(
+			mTmpl->parameter(std::string("abs_min_distance")).c_str());
+	//max and min height settings
+	mAbsMaxHeight = (float) atof(
+			mTmpl->parameter(std::string("abs_max_height")).c_str());
+	mAbsMinHeight = (float) atof(
+			mTmpl->parameter(std::string("abs_min_height")).c_str());
+	//friction' settings
+	mFriction = (float) atof(mTmpl->parameter(std::string("friction")).c_str());
+	//
+	return result;
+}
+
 void Chaser::enable()
 {
 	//lock (guard) the mutex
@@ -67,24 +107,38 @@ void Chaser::enable()
 	}
 
 	//check kinematic parameters
+	if (mAbsMaxDistance < 0.0)
+	{
+		mAbsMaxDistance = 0.0;
+	}
+	if ((mAbsMinDistance > mAbsMaxDistance) or (mAbsMinDistance < 0.0))
+	{
+		mAbsMinDistance = mAbsMaxDistance;
+	}
+	if (mAbsMaxHeight < 0.0)
+	{
+		mAbsMaxHeight = 0.0;
+	}
+	if ((mAbsMinHeight > mAbsMaxHeight) or (mAbsMinHeight < 0.0))
+	{
+		mAbsMinHeight = mAbsMaxHeight;
+	}
 	if (mAbsLookAtDistance < 0.0)
 	{
-		mAbsLookAtDistance = abs(mDistance);
+		mAbsLookAtDistance = 0.0;
 	}
-	if ((mAbsMinDistance > abs(mDistance)) or (mAbsMinDistance < 0.0))
+	if (mAbsLookAtHeight < 0.0)
 	{
-		mAbsMinDistance = abs(mDistance);
-	}
-	if (mAbsMinHeight <= 0.0)
-	{
-		mAbsMinHeight = abs(mDistance);
+		mAbsLookAtHeight = 0.0;
 	}
 	//check if backward located
 	float sign = (mBackward ? 1.0 : -1.0);
 	//set chaser position (wrt chased node)
-	mChaserPosition = LPoint3f(0.0, -mDistance * sign, mAbsMinHeight * 1.5);
+	mChaserPosition = LPoint3f(0.0, -mAbsMaxDistance * sign,
+			mAbsMinHeight * 1.5);
 	//set "look at" position (wrt chased node)
-	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign, 0.0);
+	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign,
+			mAbsLookAtHeight);
 
 	//add to the control manager update
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
@@ -177,7 +231,7 @@ float Chaser::getDistance() const
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mDistance;
+	return mAbsMaxDistance;
 }
 
 void Chaser::setDistance(float distance)
@@ -185,39 +239,7 @@ void Chaser::setDistance(float distance)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mDistance = distance;
-}
-
-bool Chaser::initialize()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	bool result = true;
-	//get settings from template
-	//enabling setting
-	mEnabled = (
-			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
-					true : false);
-	//backward setting
-	mBackward = (
-			mTmpl->parameter(std::string("backward")) == std::string("true") ?
-					true : false);
-	//look at distance settings
-	mAbsLookAtDistance = (float) atof(
-			mTmpl->parameter(std::string("abs_lookat_distance")).c_str());
-	//distance settings
-	mDistance = (float) atof(mTmpl->parameter(std::string("distance")).c_str());
-	//min distance settings
-	mAbsMinDistance = (float) atof(
-			mTmpl->parameter(std::string("abs_min_distance")).c_str());
-	//min height settings
-	mAbsMinHeight = (float) atof(
-			mTmpl->parameter(std::string("abs_min_height")).c_str());
-	//friction' settings
-	mFriction = (float) atof(mTmpl->parameter(std::string("friction")).c_str());
-	//
-	return result;
+	mAbsMaxDistance = distance;
 }
 
 void Chaser::onAddToObjectSetup()
@@ -297,20 +319,45 @@ void Chaser::update(void* data)
 
 	//update chaser position and orientation (see OgreBulletDemos)
 	//position
-	LPoint3f desiredChaserPos = mReferenceNodePath.get_relative_point(
-			mChasedNodePath, mChaserPosition);
 	LPoint3f actualChaserPos = mReferenceNodePath.get_relative_point(
 			mOwnerObject->getNodePath(), LPoint3f::zero());
-	LPoint3f newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
-	//correct chaser height (not in OgreBulletDemos)
-	LPoint3f downTo = LPoint3f(newPos.get_x(), newPos.get_y(), -1000000.0);
-	BulletClosestHitRayResult result =
-			GamePhysicsManager::GetSingleton().bulletWorld()->ray_test_closest(
-					newPos, downTo);
-	if (newPos.get_z() - result.get_hit_pos().get_z() < mAbsMinHeight)
+	LPoint3f newPos;
+	LPoint3f desiredChaserPos;
+	if (mFixedRelativePosition)
 	{
-		newPos.set_z(result.get_hit_pos().get_z() + mAbsMinHeight);
+		//follow chased node from fixed position wrt it
+		desiredChaserPos = mReferenceNodePath.get_relative_point(
+				mChasedNodePath, mChaserPosition);
+		newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+		correctChaserHeight(newPos);
 	}
+	else
+	{
+		//correct position only if distance < min distance or distance > max distance
+		LPoint3f actualChasedPos = mReferenceNodePath.get_relative_point(
+				mChasedNodePath, LPoint3f::zero());
+		LVector3f distanceDir = actualChaserPos - actualChasedPos;
+		float distance = distanceDir.length();
+		if (distance < mAbsMinDistance)
+		{
+			distanceDir.normalize();
+			desiredChaserPos = actualChasedPos + distanceDir * mAbsMinDistance;
+			newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+			correctChaserHeight(newPos);
+		}
+		else if (distance > mAbsMaxDistance)
+		{
+			distanceDir.normalize();
+			desiredChaserPos = actualChasedPos + distanceDir * mAbsMaxDistance;
+			newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+			correctChaserHeight(newPos);
+		}
+		else
+		{
+			newPos = actualChaserPos;
+		}
+	}
+	//
 	mOwnerObject->getNodePath().set_pos(mReferenceNodePath, newPos);
 	//orientation
 	mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
@@ -343,6 +390,23 @@ LPoint3f Chaser::getChaserPos(LPoint3f desiredChaserPos,
 	return newPos;
 }
 
+void Chaser::correctChaserHeight(LPoint3f& newPos)
+{
+	//correct chaser height (not in OgreBulletDemos)
+	LPoint3f downTo = LPoint3f(newPos.get_x(), newPos.get_y(), -1000000.0);
+	BulletClosestHitRayResult result =
+			GamePhysicsManager::GetSingleton().bulletWorld()->ray_test_closest(
+					newPos, downTo);
+	float hitPosZ = result.get_hit_pos().get_z();
+	if (newPos.get_z() < hitPosZ + mAbsMinHeight)
+	{
+		newPos.set_z(hitPosZ + mAbsMinHeight);
+	}
+	else if (newPos.get_z() > hitPosZ + mAbsMaxHeight)
+	{
+		newPos.set_z(hitPosZ + mAbsMaxHeight);
+	}
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle Chaser::_type_handle;
-

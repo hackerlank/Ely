@@ -76,6 +76,7 @@ void ChaserTemplate::setParametersDefaults()
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("enabled", "true"));
 	mParameterTable.insert(ParameterNameValue("backward", "true"));
+	mParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
 	mParameterTable.insert(ParameterNameValue("friction", "1.0"));
 }
 

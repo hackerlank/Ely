@@ -169,8 +169,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load " << functionName << ": " << dlsymError
-					<< std::endl;
+			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
 			pEnterFunction = NULL;
 		}
 
@@ -184,8 +183,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load " << functionName << ": " << dlsymError
-					<< std::endl;
+			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
 			pExitFunction = NULL;
 		}
 
@@ -199,8 +197,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load " << functionName << ": " << dlsymError
-					<< std::endl;
+			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
 			pFilterFunction = NULL;
 		}
 		//re-add the state with the current functions
@@ -240,8 +237,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = dlerror();
 		if (dlsymError)
 		{
-			std::cerr << "Cannot load " << functionName << ": " << dlsymError
-					<< std::endl;
+			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
 			pFromToFunction = NULL;
 		}
 		//get the position of the "_FromTo_" substring in (*iter)

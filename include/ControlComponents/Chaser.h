@@ -42,15 +42,18 @@ class ChaserTemplate;
  * The up axis is the "z" axis.
  *
  * XML Param(s):
- * - "enabled"  			|single|"true"
- * - "backward"				|single|"true"
- * - "chased_object"		|single|no default
- * - "reference_object"		|single|no default
- * - "distance"				|single|no default
- * - "abs_lookat_distance"	|single|no default
- * - "abs_min_distance"		|single|no default
- * - "abs_min_height"		|single|no default
- * - "friction"				|single|"1.0"
+ * - "enabled"  				|single|"true"
+ * - "backward"					|single|"true"
+ * - "chased_object"			|single|no default
+ * - "fixed_relative_position"	|single|"true"
+ * - "reference_object"			|single|no default
+ * - "abs_max_distance"			|single|no default
+ * - "abs_min_distance"			|single|no default
+ * - "abs_max_height"			|single|no default
+ * - "abs_min_height"			|single|no default
+ * - "abs_lookat_distance"		|single|no default
+ * - "abs_lookat_height"		|single|no default
+ * - "friction"					|single|"1.0"
  */
 class Chaser: public Component
 {
@@ -105,10 +108,11 @@ private:
 	NodePath mChasedNodePath;
 	///The reference object's node path.
 	NodePath mReferenceNodePath;
-	///Enabling & backward flags.
-	bool mEnabled, mIsEnabled, mBackward;
+	///Flags.
+	bool mEnabled, mIsEnabled, mFixedRelativePosition, mBackward;
 	///Kinematic parameters.
-	float mAbsLookAtDistance, mDistance, mAbsMinDistance, mAbsMinHeight, mFriction;
+	float mAbsLookAtDistance, mAbsLookAtHeight, mAbsMaxDistance, mAbsMinDistance,
+	mAbsMinHeight, mAbsMaxHeight, mFriction;
 	///Positions.
 	LPoint3f mChaserPosition, mLookAtPosition;
 	/**
@@ -121,6 +125,11 @@ private:
 	 */
 	LPoint3f getChaserPos(LPoint3f desiredChaserPos,
 			LPoint3f actualChaserPos, float deltaTime);
+	/**
+	 * \brief Correct the dynamic height of the chaser.
+	 * @param newPos The position whose height may be corrected.
+	 */
+	void correctChaserHeight(LPoint3f& newPos);
 
 	///TypedObject semantics: hardcoded
 public:

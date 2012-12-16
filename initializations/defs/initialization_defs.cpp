@@ -27,6 +27,7 @@
 #include <nodePath.h>
 #include <aiCharacter.h>
 #include <aiBehaviors.h>
+#include "ObjectModel/ObjectTemplateManager.h"
 
 ///common
 static bool controlGrabbed = false;
@@ -133,11 +134,11 @@ void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-		object->getNodePath().look_at(50, 200, 10);
+	object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
-				static_cast<void*>(object));
-	}
+	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+			static_cast<void*>(object));
+}
 
 void cameraInit()
 {
@@ -208,16 +209,16 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 //	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
 //					ComponentFamilyType("Scene")));
 //	actor1Model->animations().loop("panda-walk", false);
-		//play sound
-		SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
-						ComponentFamilyType("Audio")));
-		actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
-		actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
+	//play sound
+	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
+					ComponentFamilyType("Audio")));
+	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
+	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
 
-		//enable/disable Actor1 control by event
-		pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
-				static_cast<void*>(object));
-	}
+	//enable/disable Actor1 control by event
+	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
+			static_cast<void*>(object));
+}
 
 void Actor1Init()
 {
@@ -243,13 +244,13 @@ void Plane1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//Plane1
-		SMARTPTR(Model) plane1Model = DCAST(Model, object->getComponent(
-						ComponentFamilyType("Scene")));
-		SMARTPTR(TextureStage) planeTS0 = new TextureStage("planeTS0");
-		SMARTPTR(Texture) planeTex = TexturePool::load_texture("maps/envir-ground.jpg");
-		plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
-		plane1Model->getNodePath().set_tex_scale(planeTS0, 100, 100);
-	}
+	SMARTPTR(Model) plane1Model = DCAST(Model, object->getComponent(
+					ComponentFamilyType("Scene")));
+	SMARTPTR(TextureStage) planeTS0 = new TextureStage("planeTS0");
+	SMARTPTR(Texture) planeTex = TexturePool::load_texture("maps/envir-ground.jpg");
+	plane1Model->getNodePath().set_texture(planeTS0, planeTex, 1);
+	plane1Model->getNodePath().set_tex_scale(planeTS0, 100, 100);
+}
 
 void Plane1Init()
 {
@@ -276,7 +277,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//Terrain1
 //	object->getNodePath().set_render_mode_wireframe(1);
-	}
+}
 
 void Terrain1Init()
 {
@@ -301,15 +302,15 @@ void NPC1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTabl
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//NPC1
-		fsm& npc1FSM = (fsm&) (*DCAST(Activity, object->getComponent(
-								ComponentFamilyType("Behavior"))));
-		npc1FSM.request("idle");
+	fsm& npc1FSM = (fsm&) (*DCAST(Activity, object->getComponent(
+							ComponentFamilyType("Behavior"))));
+	npc1FSM.request("idle");
 	//play sound
-		SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
-						ComponentFamilyType("Audio")));
-		npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->set_loop(true);
-		npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->play();
-	}
+	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
+					ComponentFamilyType("Audio")));
+	npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->set_loop(true);
+	npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->play();
+}
 
 void NPC1Init()
 {
@@ -336,18 +337,24 @@ static void toggleSteerer1Control(const Event* event, void* data)
 	SMARTPTR(Object)steerer1 = reinterpret_cast<Object*>(data);
 	SMARTPTR(Steering)steerer1AI = DCAST(Steering, steerer1->getComponent(
 					ComponentFamilyType("AI")));
-
+	SMARTPTR(Object) gorilla1 = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
+	SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
+					ComponentFamilyType("Scene")));
 	if (steerer1AI->isEnabled())
 	{
-		//if enabled then disable it
+		//enabled then disable it
 		steerer1AI->disable();
+		//stop animation
+		gorilla1Model->animations().stop("gorilla/gorillawalking");
 		//
 		aiEnabled = false;
 	}
 	else if (not aiEnabled)
 	{
-		//if disabled then enable it
+		//disabled then enable it
 		steerer1AI->enable();
+		//play animation
+		bool res = gorilla1Model->animations().loop("gorilla/gorillawalking", false);
 		//enable behaviors
 		NodePath targetObjectNP = steerer1AI->getTargetNodePath(ObjectId("NPC1"));
 		//seek NPC1

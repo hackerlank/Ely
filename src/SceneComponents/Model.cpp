@@ -161,7 +161,7 @@ bool Model::initialize()
 					PRINT("Binding animation '" << (*animBundlesIter)->get_name() << "' with name '"
 							<< animName << "'");
 					PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
-							PartGroup::HMF_ok_wrong_root_name);
+							PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra);
 					mAnimations.store_anim(control, animName);
 				}
 			}
@@ -210,7 +210,7 @@ bool Model::initialize()
 								PRINT("Binding animation '" << (*animBundlesIter)->get_name() << " with name '"
 										<< animName << "'");
 								PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
-										PartGroup::HMF_ok_wrong_root_name);
+										PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra);
 								mAnimations.store_anim(control, animName);
 							}
 						}
