@@ -22,12 +22,14 @@
  */
 
 #include "../common_configs.h"
-#include "Utilities/ComponentSuite.h"
-#include "Utilities/Tools.h"
 #include <nodePath.h>
 #include <aiCharacter.h>
 #include <aiBehaviors.h>
+#include <eventHandler.h>
+#include "Utilities/ComponentSuite.h"
+#include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+
 
 ///common
 static bool controlGrabbed = false;
@@ -134,11 +136,11 @@ void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-	object->getNodePath().look_at(50, 200, 10);
+		object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
-			static_cast<void*>(object));
-}
+		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+				static_cast<void*>(object));
+	}
 
 void cameraInit()
 {
@@ -337,24 +339,23 @@ static void toggleSteerer1Control(const Event* event, void* data)
 	SMARTPTR(Object)steerer1 = reinterpret_cast<Object*>(data);
 	SMARTPTR(Steering)steerer1AI = DCAST(Steering, steerer1->getComponent(
 					ComponentFamilyType("AI")));
-	SMARTPTR(Object) gorilla1 = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
+	SMARTPTR(Object)gorilla1 =
+			ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
 	SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
 					ComponentFamilyType("Scene")));
 	if (steerer1AI->isEnabled())
 	{
-		//enabled then disable it
+		//enabled: then disable it
 		steerer1AI->disable();
-		//stop animation
-		gorilla1Model->animations().stop("gorilla/gorillawalking");
+		//stop any possible animation
+		gorilla1Model->animations().stop_all();
 		//
 		aiEnabled = false;
 	}
 	else if (not aiEnabled)
 	{
-		//disabled then enable it
+		//disabled: then enable it
 		steerer1AI->enable();
-		//play animation
-		bool res = gorilla1Model->animations().loop("gorilla/gorillawalking", false);
 		//enable behaviors
 		NodePath targetObjectNP = steerer1AI->getTargetNodePath(ObjectId("NPC1"));
 		//seek NPC1
@@ -363,10 +364,42 @@ static void toggleSteerer1Control(const Event* event, void* data)
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->flee(targetObjectNP, 50.0, 200.0);
 		//pursue NPC1
 		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
+		//evade NPC1
+//		steerer1AI->getAiCharacter()->get_ai_behaviors()->evade(targetObjectNP, 50.0, 150.0);
+		//arrival NPC1
+		steerer1AI->getAiCharacter()->get_ai_behaviors()->arrival(50.0);
 		//
 		aiEnabled = true;
 	}
 }
+
+static void steerer1SteeringForceOn(const Event* event, void* data)
+{
+	std::string throwerObject = event->get_parameter(1).get_string_value();
+	if (throwerObject == "Steerer1")
+	{
+		SMARTPTR(Object)gorilla1 =
+				ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
+		SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
+						ComponentFamilyType("Scene")));
+		//play animation
+		bool res = gorilla1Model->animations().loop("gorilla/gorillawalking", false);
+	}
+}
+static void steerer1SteeringForceOff(const Event* event, void* data)
+{
+	std::string throwerObject = event->get_parameter(1).get_string_value();
+	if (throwerObject == "Steerer1")
+	{
+		SMARTPTR(Object)gorilla1 =
+				ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
+		SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
+						ComponentFamilyType("Scene")));
+		//stop animation
+		gorilla1Model->animations().stop("gorilla/gorillawalking");
+	}
+}
+
 void Steerer1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
@@ -377,6 +410,11 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//enable/disable Steerer1 control by event
 	pandaFramework->define_key("b", "enableSteerer1Control",
 			&toggleSteerer1Control, static_cast<void*>(object));
+	//respond to Steerer1 events
+	EventHandler::get_global_event_handler()->add_hook("SteeringForceOn",
+			&steerer1SteeringForceOn, static_cast<void*>(object));
+	EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
+			&steerer1SteeringForceOff, static_cast<void*>(object));
 }
 
 void Steerer1Init()

@@ -29,12 +29,15 @@
 #include <seek.h>
 #include <flee.h>
 #include <pursue.h>
+#include <evade.h>
 #include <pathFollow.h>
 #include <arrival.h>
 #include <nodePath.h>
 #include <lvecBase3.h>
 #include <lvecBase2.h>
 #include <lvector3.h>
+#include <throw_event.h>
+#include <eventParameter.h>
 #include <cmath>
 #include "ControlComponents/Driver.h"
 #include "PhysicsComponents/CharacterController.h"
@@ -52,12 +55,18 @@ class SteeringTemplate;
  * behavior should be done by getting a reference to it, after having
  * enabled the whole component.\n
  * Steering behaviors' initializations can be done as usual into the
- * initialization library routines.\n
+ * libraries' routines.\n
+ * This component can throw 2 events (if enabled): "SteeringForceOn" and
+ * "SteeringForceOff" on transitions when it begins its steering behavior
+ * end when it ends it. These events have these parameters (in order):
+ * - a pointer to this component,
+ * - the owner object name of this component.\n
  * \note This component should be used only with an object reparented to
  * the root scene node path (i.e. render).
  *
  * XML Param(s):
  * - "enabled"  			|single|"true"
+ * - "throw_events"			|single|"false"
  * - "controlled_type"		|single|"nodepath" (nodepath,character_controller)
  * - "mass"  				|single|"1.0"
  * - "movt_force"  			|single|"1.0"
@@ -136,6 +145,9 @@ private:
 	void updateNodePath(float dt);
 	void updateController(float dt);
 	///@}
+
+	///Throwing events.
+	bool mThrowEvents, mSteeringForceOnSent, mSteeringForceOffSent;
 
 	///TypedObject semantics: hardcoded
 public:

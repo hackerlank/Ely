@@ -75,6 +75,7 @@ void SteeringTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("enabled", "true"));
+	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
 	mParameterTable.insert(ParameterNameValue("controlled_type", "nodepath"));
 	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
 	mParameterTable.insert(ParameterNameValue("movt_force", "1.0"));
