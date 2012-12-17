@@ -455,45 +455,8 @@ void CharacterController::update(void* data)
 		omega = -mAngularSpeed;
 	}
 	// set movements
-	float maxSubSteps;
-	if (dt < 0.016666667)
-	{
-		maxSubSteps = 1;
-	}
-	else if (dt < 0.033333333)
-	{
-		maxSubSteps = 2;
-	}
-	else if (dt < 0.05)
-	{
-		maxSubSteps = 3;
-	}
-	else if (dt < 0.066666668)
-	{
-		maxSubSteps = 4;
-	}
-	else if (dt < 0.083333335)
-	{
-		maxSubSteps = 5;
-	}
-	else if (dt < 0.100000002)
-	{
-		maxSubSteps = 6;
-	}
-	else if (dt < 0.116666669)
-	{
-		maxSubSteps = 7;
-	}
-	else if (dt < 0.133333336)
-	{
-		maxSubSteps = 8;
-	}
-	else
-	{
-		maxSubSteps = 9;
-	}
-	mCharacterController->set_linear_movement(speed / maxSubSteps, mIsLocal);
-	mCharacterController->set_angular_movement(omega / maxSubSteps);
+	mCharacterController->set_linear_movement(speed, mIsLocal);
+	mCharacterController->set_angular_movement(omega);
 	if (mJump)
 	{
 		if (mCharacterController->is_on_ground())

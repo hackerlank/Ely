@@ -32,6 +32,8 @@
 #include <evade.h>
 #include <pathFollow.h>
 #include <arrival.h>
+#include <wander.h>
+#include <obstacleAvoidance.h>
 #include <nodePath.h>
 #include <lvecBase3.h>
 #include <lvecBase2.h>
@@ -133,7 +135,6 @@ private:
 	///@{
 	///Steered character controller items.
 	SMARTPTR(CharacterController) mCharacterController;
-	LVecBase3f calculate_prioritized(AIBehaviors *_steering);
 	void enableMovRot(bool enable);
 	bool mMovRotEnabled, mCurrentIsLocal;
 	///@}

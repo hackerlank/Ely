@@ -339,16 +339,10 @@ static void toggleSteerer1Control(const Event* event, void* data)
 	SMARTPTR(Object)steerer1 = reinterpret_cast<Object*>(data);
 	SMARTPTR(Steering)steerer1AI = DCAST(Steering, steerer1->getComponent(
 					ComponentFamilyType("AI")));
-	SMARTPTR(Object)gorilla1 =
-			ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
-	SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
-					ComponentFamilyType("Scene")));
 	if (steerer1AI->isEnabled())
 	{
 		//enabled: then disable it
 		steerer1AI->disable();
-		//stop any possible animation
-		gorilla1Model->animations().stop_all();
 		//
 		aiEnabled = false;
 	}
@@ -367,7 +361,7 @@ static void toggleSteerer1Control(const Event* event, void* data)
 		//evade NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->evade(targetObjectNP, 50.0, 150.0);
 		//arrival NPC1
-		steerer1AI->getAiCharacter()->get_ai_behaviors()->arrival(50.0);
+		steerer1AI->getAiCharacter()->get_ai_behaviors()->arrival(100.0);
 		//
 		aiEnabled = true;
 	}
