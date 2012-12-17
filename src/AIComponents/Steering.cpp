@@ -279,7 +279,7 @@ void Steering::updateNodePath(float dt)
 	mAICharacter->update();
 }
 
-static LVecBase3f calculate_prioritized(AIBehaviors *_steering);
+static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt);
 
 void Steering::updateController(float dt)
 {
@@ -292,7 +292,7 @@ void Steering::updateController(float dt)
 		{
 			enableMovRot(true);
 		}
-		LVecBase3f steering_force = calculate_prioritized(_steering);
+		LVecBase3f steering_force = calculate_prioritized(_steering, dt);
 		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
 		mAICharacter->_velocity = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
@@ -401,7 +401,7 @@ static LVecBase3f do_pursue(Pursue *_pursue_obj);
 static void evade_activate(ListEvade::iterator& _evade_itr);
 static LVecBase3f do_evade(ListEvade::iterator& _evade_itr);
 static void arrival_activate(Arrival *_arrival_obj);
-static LVecBase3f do_arrival(Arrival *_arrival_obj);
+static LVecBase3f do_arrival(Arrival *_arrival_obj, float dt);
 static const float _PI = 3.141592654;
 static void flock_activate(AIBehaviors *_steering);
 static LVecBase3f do_flock(AIBehaviors *_steering);
@@ -413,7 +413,7 @@ static LVecBase3f do_obstacle_avoidance(
 static void do_follow(PathFollow *_path_follow_obj);
 
 //
-static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
+static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 {
 	LVecBase3f force;
 
@@ -421,14 +421,11 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 	{
 		if (_steering->_conflict)
 		{
-//			force = _steering->_seek_obj->do_seek()
-//					* _steering->_seek_obj->_seek_weight;
 			force = do_seek(_steering->_seek_obj)
 					* _steering->_seek_obj->_seek_weight;
 		}
 		else
 		{
-//			force = _steering->_seek_obj->do_seek();
 			force = do_seek(_steering->_seek_obj);
 		}
 		_steering->accumulate_force("seek", force);
@@ -440,7 +437,6 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 				_steering->_flee_itr != _steering->_flee_list.end();
 				_steering->_flee_itr++)
 		{
-//			_steering->_flee_itr->flee_activate();
 			flee_activate(_steering->_flee_itr);
 		}
 	}
@@ -455,14 +451,11 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 			{
 				if (_steering->_conflict)
 				{
-//					force = _steering->_flee_itr->do_flee()
-//							* _steering->_flee_itr->_flee_weight;
 					force = do_flee(_steering->_flee_itr)
 							* _steering->_flee_itr->_flee_weight;
 				}
 				else
 				{
-//					force = _steering->_flee_itr->do_flee();
 					force = do_flee(_steering->_flee_itr);
 				}
 				_steering->accumulate_force("flee", force);
@@ -474,14 +467,11 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 	{
 		if (_steering->_conflict)
 		{
-//			force = _steering->_pursue_obj->do_pursue()
-//					* _steering->_pursue_obj->_pursue_weight;
 			force = do_pursue(_steering->_pursue_obj)
 					* _steering->_pursue_obj->_pursue_weight;
 		}
 		else
 		{
-//			force = _steering->_pursue_obj->do_pursue();
 			force = do_pursue(_steering->_pursue_obj);
 		}
 		_steering->accumulate_force("pursue", force);
@@ -493,7 +483,6 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 				_steering->_evade_itr != _steering->_evade_list.end();
 				_steering->_evade_itr++)
 		{
-//			_steering->_evade_itr->evade_activate();
 			evade_activate(_steering->_evade_itr);
 		}
 	}
@@ -508,14 +497,11 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 			{
 				if (_steering->_conflict)
 				{
-//					force = (_steering->_evade_itr->do_evade())
-//							* (_steering->_evade_itr->_evade_weight);
 					force = (do_evade(_steering->_evade_itr))
 							* (_steering->_evade_itr->_evade_weight);
 				}
 				else
 				{
-//					force = _steering->_evade_itr->do_evade();
 					force = do_evade(_steering->_evade_itr);
 				}
 				_steering->accumulate_force("evade", force);
@@ -525,20 +511,17 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 
 	if (_steering->is_on(_steering->_arrival_activate))
 	{
-//		_steering->_arrival_obj->arrival_activate();
 		arrival_activate(_steering->_arrival_obj);
 	}
 
 	if (_steering->is_on(_steering->_arrival))
 	{
-//		force = _steering->_arrival_obj->do_arrival();
-		force = do_arrival(_steering->_arrival_obj);
+		force = do_arrival(_steering->_arrival_obj, dt);
 		_steering->accumulate_force("arrival", force);
 	}
 
 	if (_steering->is_on(_steering->_flock_activate))
 	{
-//		_steering->flock_activate();
 		flock_activate(_steering);
 	}
 
@@ -546,12 +529,10 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 	{
 		if (_steering->_conflict)
 		{
-//			force = _steering->do_flock() * _steering->_flock_weight;
 			force = do_flock(_steering) * _steering->_flock_weight;
 		}
 		else
 		{
-//			force = _steering->do_flock();
 			force = do_flock(_steering);
 		}
 		_steering->accumulate_force("flock", force);
@@ -561,14 +542,11 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 	{
 		if (_steering->_conflict)
 		{
-//			force = _steering->_wander_obj->do_wander()
-//					* _steering->_wander_obj->_wander_weight;
 			force = do_wander(_steering->_wander_obj)
 					* _steering->_wander_obj->_wander_weight;
 		}
 		else
 		{
-//			force = _steering->_wander_obj->do_wander();
 			force = do_wander(_steering->_wander_obj);
 		}
 		_steering->accumulate_force("wander", force);
@@ -576,7 +554,6 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 
 	if (_steering->is_on(_steering->_obstacle_avoidance_activate))
 	{
-//		_steering->_obstacle_avoidance_obj->obstacle_avoidance_activate();
 		obstacle_avoidance_activate(_steering->_obstacle_avoidance_obj);
 	}
 
@@ -584,12 +561,10 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 	{
 		if (_steering->_conflict)
 		{
-//			force = _steering->_obstacle_avoidance_obj->do_obstacle_avoidance();
 			force = do_obstacle_avoidance(_steering->_obstacle_avoidance_obj);
 		}
 		else
 		{
-//			force = _steering->_obstacle_avoidance_obj->do_obstacle_avoidance();
 			force = do_obstacle_avoidance(_steering->_obstacle_avoidance_obj);
 		}
 		_steering->accumulate_force("obstacle_avoidance", force);
@@ -599,7 +574,6 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering)
 	{
 		if (_steering->_path_follow_obj->_start)
 		{
-//			_steering->_path_follow_obj->do_follow();
 			do_follow(_steering->_path_follow_obj);
 		}
 	}
@@ -851,7 +825,7 @@ static void arrival_activate(Arrival *_arrival_obj)
 		}
 	}
 }
-static LVecBase3f do_arrival(Arrival *_arrival_obj)
+static LVecBase3f do_arrival(Arrival *_arrival_obj, float dt)
 {
 	LVecBase3f direction_to_target;
 	double distance;
@@ -896,10 +870,8 @@ static LVecBase3f do_arrival(Arrival *_arrival_obj)
 		_arrival_obj->_arrival_done = false;
 	}
 
-	double u = _arrival_obj->_ai_char->get_velocity().length();
-//	LVecBase3f desired_force = ((u * u) / (2 * distance))
-//			* _arrival_obj->_ai_char->get_mass();
-	LVecBase3f desired_force = ((u * u) / (2.0 * _arrival_obj->_arrival_distance))
+	double u = _arrival_obj->_ai_char->get_velocity().length() * dt;
+	LVecBase3f desired_force = ((u * u) / (2 * distance))
 			* _arrival_obj->_ai_char->get_mass();
 
 	if (_arrival_obj->_ai_char->_steering->_seek_obj != NULL)
@@ -1123,503 +1095,4 @@ static void do_follow(PathFollow *_path_follow_obj)
 {
 }
 
-//LVecBase3f Steering::calculate_prioritized(AIBehaviors *_steering)
-//{
-//	LVecBase3f force;
-//	if (_steering->is_on(_steering->_seek))
-//	{
-//		//<!--_seek_obj->do_seek rewritten
-//		Seek *_seek_obj = _steering->_seek_obj;
-//		LVecBase3f do_seek;
-//		{
-//			double target_distance =
-//					(_seek_obj->_seek_position
-//							- _seek_obj->_ai_char->_ai_char_np.get_pos(
-//									_seek_obj->_ai_char->_window_render)).get_xy().length();
-//			if (int(target_distance) == 0)
-//			{
-//				_seek_obj->_seek_done = true;
-//				_seek_obj->_ai_char->_steering->_steering_force = LVecBase3f(
-//						0.0, 0.0, 0.0);
-//				_seek_obj->_ai_char->_steering->turn_off("seek");
-//				do_seek = LVecBase3f(0.0, 0.0, 0.0);
-//			}
-//			else
-//			{
-//				LVecBase3f desired_force = _seek_obj->_seek_direction
-//						* _seek_obj->_ai_char->_movt_force;
-//				do_seek = desired_force;
-//			}
-//		}
-//		//_seek_obj->do_seek rewritten-->
-//		if (_steering->_conflict)
-//		{
-//			force = do_seek * _seek_obj->_seek_weight;
-//		}
-//		else
-//		{
-//			force = do_seek;
-//		}
-//		_steering->accumulate_force("seek", force);
-//	}
-//
-//	if (_steering->is_on(_steering->_flee_activate))
-//	{
-//		for (_steering->_flee_itr = _steering->_flee_list.begin();
-//				_steering->_flee_itr != _steering->_flee_list.end();
-//				_steering->_flee_itr++)
-//		{
-//			//<!--_flee_itr->flee_activate rewritten
-//			ListFlee::iterator _flee_itr = _steering->_flee_itr;
-//			{
-//				_flee_itr->_flee_activate_done = false;
-//				LVecBase3f dirn = (_flee_itr->_ai_char->_ai_char_np.get_pos(
-//						_flee_itr->_ai_char->_window_render)
-//						- _flee_itr->_flee_position);
-//				double distance = dirn.get_xy().length();
-//				if (distance < _flee_itr->_flee_distance)
-//				{
-//					_flee_itr->_flee_direction =
-//							_flee_itr->_ai_char->_ai_char_np.get_pos(
-//									_flee_itr->_ai_char->_window_render)
-//									- _flee_itr->_flee_position;
-//					_flee_itr->_flee_direction.normalize();
-//					_flee_itr->_flee_present_pos =
-//							_flee_itr->_ai_char->_ai_char_np.get_pos(
-//									_flee_itr->_ai_char->_window_render);
-//					_flee_itr->_ai_char->_steering->turn_off("flee_activate");
-//					_flee_itr->_ai_char->_steering->turn_on("flee");
-//					_flee_itr->_flee_activate_done = true;
-//				}
-//			}
-//			//_flee_itr->flee_activate rewritten-->
-//		}
-//	}
-//
-//	if (_steering->is_on(_steering->_flee))
-//	{
-//		for (_steering->_flee_itr = _steering->_flee_list.begin();
-//				_steering->_flee_itr != _steering->_flee_list.end();
-//				_steering->_flee_itr++)
-//		{
-//			if (_steering->_flee_itr->_flee_activate_done)
-//			{
-//				//<!--_flee_itr->do_flee rewritten
-//				ListFlee::iterator _flee_itr = _steering->_flee_itr;
-//				LVecBase3f do_flee;
-//				{
-//					LVecBase3f dirn = (_flee_itr->_ai_char->_ai_char_np.get_pos(
-//							_flee_itr->_ai_char->_window_render)
-//							- _flee_itr->_flee_present_pos);
-//					double distance = dirn.get_xy().length();
-//					LVecBase3f desired_force = _flee_itr->_flee_direction
-//							* _flee_itr->_ai_char->_movt_force;
-//
-//					if (distance
-//							> (_flee_itr->_flee_distance
-//									+ _flee_itr->_flee_relax_distance))
-//					{
-//						if ((_flee_itr->_ai_char->_steering->_behaviors_flags
-//								| _flee_itr->_ai_char->_steering->_flee)
-//								== _flee_itr->_ai_char->_steering->_flee)
-//						{
-//							_flee_itr->_ai_char->_steering->_steering_force =
-//									LVecBase3f(0.0, 0.0, 0.0);
-//						}
-//						_flee_itr->_flee_done = true;
-//						_flee_itr->_ai_char->_steering->turn_off("flee");
-//						_flee_itr->_ai_char->_steering->turn_on(
-//								"flee_activate");
-//						do_flee = LVecBase3f(0.0, 0.0, 0.0);
-//					}
-//					else
-//					{
-//						do_flee = desired_force;
-//					}
-//				}
-//				//_flee_itr->do_flee rewritten-->
-//
-//				if (_steering->_conflict)
-//				{
-//					force = do_flee * _steering->_flee_itr->_flee_weight;
-//				}
-//				else
-//				{
-//					force = do_flee;
-//				}
-//				_steering->accumulate_force("flee", force);
-//			}
-//		}
-//	}
-//
-//	if (_steering->is_on(_steering->_pursue))
-//	{
-//		//<!--_pursue_obj->do_pursue rewritten
-//		Pursue *_pursue_obj = _steering->_pursue_obj;
-//		LVecBase3f do_pursue;
-//		{
-//			LVecBase3f present_pos = _pursue_obj->_ai_char->_ai_char_np.get_pos(
-//					_pursue_obj->_ai_char->_window_render);
-//			double target_distance =
-//					(_pursue_obj->_pursue_target.get_pos(
-//							_pursue_obj->_ai_char->_window_render) - present_pos).get_xy().length();
-//
-//			if (int(target_distance) == 0)
-//			{
-//				_pursue_obj->_pursue_done = true;
-//				_pursue_obj->_ai_char->_steering->_steering_force = LVecBase3f(
-//						0.0, 0.0, 0.0);
-//				_pursue_obj->_ai_char->_steering->_pursue_force = LVecBase3f(
-//						0.0, 0.0, 0.0);
-//				do_pursue = LVecBase3f(0.0, 0.0, 0.0);
-//			}
-//			else
-//			{
-//				_pursue_obj->_pursue_done = false;
-//
-//				_pursue_obj->_pursue_direction =
-//						_pursue_obj->_pursue_target.get_pos(
-//								_pursue_obj->_ai_char->_window_render)
-//								- present_pos;
-//				_pursue_obj->_pursue_direction.normalize();
-//
-//				LVecBase3f desired_force = _pursue_obj->_pursue_direction
-//						* _pursue_obj->_ai_char->_movt_force;
-//				do_pursue = desired_force;
-//			}
-//		}
-//		//_pursue_obj->do_pursue rewritten-->
-//
-//		if (_steering->_conflict)
-//		{
-//			force = do_pursue * _steering->_pursue_obj->_pursue_weight;
-//		}
-//		else
-//		{
-//			force = do_pursue;
-//		}
-//		_steering->accumulate_force("pursue", force);
-//	}
-//
-//	if (_steering->is_on(_steering->_evade_activate))
-//	{
-//		for (_steering->_evade_itr = _steering->_evade_list.begin();
-//				_steering->_evade_itr != _steering->_evade_list.end();
-//				_steering->_evade_itr++)
-//		{
-//			//<!--_evade_itr->evade_activate rewritten
-//			ListEvade::iterator _evade_itr = _steering->_evade_itr;
-//			{
-//				_evade_itr->_evade_direction =
-//						(_evade_itr->_ai_char->_ai_char_np.get_pos(
-//								_evade_itr->_ai_char->_window_render)
-//								- _evade_itr->_evade_target.get_pos(
-//										_evade_itr->_ai_char->_window_render));
-//				double distance =
-//						_evade_itr->_evade_direction.get_xy().length();
-//				_evade_itr->_evade_activate_done = false;
-//
-//				if (distance < _evade_itr->_evade_distance)
-//				{
-//					_evade_itr->_ai_char->_steering->turn_off("evade_activate");
-//					_evade_itr->_ai_char->_steering->turn_on("evade");
-//					_evade_itr->_evade_activate_done = true;
-//				}
-//			}
-//			//_evade_itr->evade_activate rewritten-->
-//		}
-//	}
-//
-//	if (_steering->is_on(_steering->_evade))
-//	{
-//		for (_steering->_evade_itr = _steering->_evade_list.begin();
-//				_steering->_evade_itr != _steering->_evade_list.end();
-//				_steering->_evade_itr++)
-//		{
-//			if (_steering->_evade_itr->_evade_activate_done)
-//			{
-//				//<!--_evade_itr->do_evade rewritten
-//				ListEvade::iterator _evade_itr = _steering->_evade_itr;
-//				LVecBase3f do_evade;
-//				{
-//					_evade_itr->_evade_direction =
-//							(_evade_itr->_ai_char->_ai_char_np.get_pos(
-//									_evade_itr->_ai_char->_window_render)
-//									- _evade_itr->_evade_target.get_pos(
-//											_evade_itr->_ai_char->_window_render));
-//					double distance =
-//							(_evade_itr->_evade_direction).get_xy().length();
-//
-//					_evade_itr->_evade_direction.normalize();
-//					LVecBase3f desired_force = _evade_itr->_evade_direction
-//							* _evade_itr->_ai_char->_movt_force;
-//
-//					if (distance
-//							> (_evade_itr->_evade_distance
-//									+ _evade_itr->_evade_relax_distance))
-//					{
-//						if ((_evade_itr->_ai_char->_steering->_behaviors_flags
-//								| _evade_itr->_ai_char->_steering->_evade)
-//								== _evade_itr->_ai_char->_steering->_evade)
-//						{
-//							_evade_itr->_ai_char->_steering->_steering_force =
-//									LVecBase3f(0.0, 0.0, 0.0);
-//						}
-//						_evade_itr->_ai_char->_steering->turn_off("evade");
-//						_evade_itr->_ai_char->_steering->turn_on(
-//								"evade_activate");
-//						_evade_itr->_evade_done = true;
-//						do_evade = LVecBase3f(0.0, 0.0, 0.0);
-//					}
-//					else
-//					{
-//						_evade_itr->_evade_done = false;
-//						do_evade = desired_force;
-//					}
-//				}
-//				//_evade_itr->do_evade rewritten-->
-//
-//				if (_steering->_conflict)
-//				{
-//					force = do_evade * (_evade_itr->_evade_weight);
-//				}
-//				else
-//				{
-//					force = do_evade;
-//				}
-//				_steering->accumulate_force("evade", force);
-//			}
-//		}
-//	}
-//
-//	if (_steering->is_on(_steering->_arrival_activate))
-//	{
-//		//<!--_arrival_obj->arrival_activate rewritten
-//		Arrival *_arrival_obj = _steering->_arrival_obj;
-//		{
-//			LVecBase3f dirn;
-//			if (_arrival_obj->_arrival_type)
-//			{
-//				dirn =
-//						(_arrival_obj->_ai_char->_ai_char_np.get_pos(
-//								_arrival_obj->_ai_char->_window_render)
-//								- _arrival_obj->_ai_char->get_ai_behaviors()->_pursue_obj->_pursue_target.get_pos(
-//										_arrival_obj->_ai_char->_window_render));
-//			}
-//			else
-//			{
-//				dirn =
-//						(_arrival_obj->_ai_char->_ai_char_np.get_pos(
-//								_arrival_obj->_ai_char->_window_render)
-//								- _arrival_obj->_ai_char->get_ai_behaviors()->_seek_obj->_seek_position);
-//			}
-//			double distance = dirn.get_xy().length();
-//
-//			if (distance < _arrival_obj->_arrival_distance
-//					&& _arrival_obj->_ai_char->_steering->_steering_force.length()
-//							> 0)
-//			{
-//				_arrival_obj->_ai_char->_steering->turn_off("arrival_activate");
-//				_arrival_obj->_ai_char->_steering->turn_on("arrival");
-//
-//				if (_arrival_obj->_ai_char->_steering->is_on(
-//						_arrival_obj->_ai_char->_steering->_seek))
-//				{
-//					_arrival_obj->_ai_char->_steering->turn_off("seek");
-//				}
-//
-//				if (_arrival_obj->_ai_char->_steering->is_on(
-//						_arrival_obj->_ai_char->_steering->_pursue))
-//				{
-//					_arrival_obj->_ai_char->_steering->pause_ai("pursue");
-//				}
-//			}
-//		}
-//		//_arrival_obj->arrival_activate rewritten-->
-//	}
-//
-//	if (_steering->is_on (_steering->_arrival))
-//	{
-//		//<!--_arrival_obj->do_arrival rewritten
-//		Arrival *_arrival_obj = _steering->_arrival_obj;
-//		LVecBase3f do_arrival;
-//		{
-//			LVecBase3f direction_to_target;
-//			double distance;
-//
-//			if (_arrival_obj->_arrival_type)
-//			{
-//				direction_to_target =
-//						_arrival_obj->_ai_char->get_ai_behaviors()->_pursue_obj->_pursue_target.get_pos(
-//								_arrival_obj->_ai_char->_window_render)
-//								- _arrival_obj->_ai_char->_ai_char_np.get_pos(
-//										_arrival_obj->_ai_char->_window_render);
-//			}
-//			else
-//			{
-//				direction_to_target =
-//						_arrival_obj->_ai_char->get_ai_behaviors()->_seek_obj->_seek_position
-//								- _arrival_obj->_ai_char->_ai_char_np.get_pos(
-//										_arrival_obj->_ai_char->_window_render);
-//			}
-//			distance = direction_to_target.get_xy().length();
-//
-//			_arrival_obj->_arrival_direction = direction_to_target;
-//			_arrival_obj->_arrival_direction.normalize();
-//
-//			if (int(distance) == 0)
-//			{
-//				_arrival_obj->_ai_char->_steering->_steering_force = LVecBase3f(
-//						0.0, 0.0, 0.0);
-//				_arrival_obj->_ai_char->_steering->_arrival_force = LVecBase3f(
-//						0.0, 0.0, 0.0);
-//
-//				if (_arrival_obj->_ai_char->_steering->_seek_obj != NULL)
-//				{
-//					_arrival_obj->_ai_char->_steering->turn_off("arrival");
-//					_arrival_obj->_ai_char->_steering->turn_on(
-//							"arrival_activate");
-//				}
-//				_arrival_obj->_arrival_done = true;
-//				do_arrival = LVecBase3f(0.0, 0.0, 0.0);
-//			}
-//			else
-//			{
-//				_arrival_obj->_arrival_done = false;
-//
-//				double u = _arrival_obj->_ai_char->get_velocity().length();
-//				LVecBase3f desired_force = ((u * u) / (2 * distance))
-//						* _arrival_obj->_ai_char->get_mass();
-//
-//				if (_arrival_obj->_ai_char->_steering->_seek_obj != NULL)
-//				{
-//					do_arrival = desired_force;
-//				}
-//				else
-//				{
-//					if (_arrival_obj->_ai_char->_steering->_pursue_obj != NULL)
-//					{
-//						if (distance > _arrival_obj->_arrival_distance)
-//						{
-//							_arrival_obj->_ai_char->_steering->turn_off(
-//									"arrival");
-//							_arrival_obj->_ai_char->_steering->turn_on(
-//									"arrival_activate");
-//							_arrival_obj->_ai_char->_steering->resume_ai(
-//									"pursue");
-//						}
-//						do_arrival = desired_force;
-//					}
-//					else
-//					{
-//						cout << "Arrival works only with seek and pursue"
-//								<< endl;
-//						do_arrival = LVecBase3f(0.0, 0.0, 0.0);
-//					}
-//				}
-//			}
-//		}
-//		//_arrival_obj->do_arrival rewritten-->
-//		force = do_arrival;
-//		_steering->accumulate_force("arrival", force);
-//	}
-//
-////	if (is_on (_flock_activate))
-////	{
-////		flock_activate();
-////	}
-////
-////	if (is_on (_flock))
-////	{
-////		if (_conflict)
-////		{
-////			force = do_flock() * _flock_weight;
-////		}
-////		else
-////		{
-////			force = do_flock();
-////		}
-////		accumulate_force("flock", force);
-////	}
-////
-////	if (is_on (_wander))
-////	{
-////		if (_conflict)
-////		{
-////			force = _wander_obj->do_wander() * _wander_obj->_wander_weight;
-////		}
-////		else
-////		{
-////			force = _wander_obj->do_wander();
-////		}
-////		accumulate_force("wander", force);
-////	}
-////
-////	if (is_on (_obstacle_avoidance_activate))
-////	{
-////		_obstacle_avoidance_obj->obstacle_avoidance_activate();
-////	}
-////
-////	if (is_on (_obstacle_avoidance))
-////	{
-////		if (_conflict)
-////		{
-////			force = _obstacle_avoidance_obj->do_obstacle_avoidance();
-////		}
-////		else
-////		{
-////			force = _obstacle_avoidance_obj->do_obstacle_avoidance();
-////		}
-////		accumulate_force("obstacle_avoidance", force);
-////	}
-//
-//	if (_steering->_path_follow_obj != NULL)
-//	{
-//		if (_steering->_path_follow_obj->_start)
-//		{
-//			_steering->_path_follow_obj->do_follow();
-//		}
-//	}
-//
-//	_steering->is_conflict();
-//	_steering->_steering_force += _steering->_seek_force
-//			* int(_steering->is_on(_steering->_seek))
-//			+ _steering->_flee_force * int(_steering->is_on(_steering->_flee))
-//			+ _steering->_pursue_force
-//					* int(_steering->is_on(_steering->_pursue))
-//			+ _steering->_evade_force * int(_steering->is_on(_steering->_evade))
-//			+ _steering->_flock_force * int(_steering->is_on(_steering->_flock))
-//			+ _steering->_wander_force
-//					* int(_steering->is_on(_steering->_wander))
-//			+ _steering->_obstacle_avoidance_force
-//					* int(_steering->is_on(_steering->_obstacle_avoidance));
-//	if (_steering->_steering_force.length()
-//			> _steering->_ai_char->get_max_force())
-//	{
-//		_steering->_steering_force.normalize();
-//		_steering->_steering_force = _steering->_steering_force
-//				* _steering->_ai_char->get_max_force();
-//	}
-//
-//	if (_steering->is_on(_steering->_arrival))
-//	{
-//		if (_steering->_seek_obj != NULL)
-//		{
-//			LVecBase3f dirn = _steering->_steering_force;
-//			dirn.normalize();
-//			_steering->_steering_force = ((_steering->_steering_force.length()
-//					- _steering->_arrival_force.length()) * dirn);
-//		}
-//
-//		if (_steering->_pursue_obj != NULL)
-//		{
-//			LVecBase3f dirn = _steering->_steering_force;
-//			dirn.normalize();
-//			_steering->_steering_force = ((_steering->_steering_force.length()
-//					- _steering->_arrival_force.length())
-//					* _steering->_arrival_obj->_arrival_direction);
-//		}
-//	}
-//	return _steering->_steering_force;
-//}
 
