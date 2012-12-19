@@ -101,6 +101,12 @@ public:
 	std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
+	 * \brief Gets the entire parameter table.
+	 * @return The parameter table.
+	 */
+	ParameterTable getParameterTable();
+
+	/**
 	 * \brief Gets/sets the PandaFramework.
 	 * @return A reference to the PandaFramework.
 	 */

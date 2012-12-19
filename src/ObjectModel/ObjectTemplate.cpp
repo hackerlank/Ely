@@ -136,6 +136,7 @@ void ObjectTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("is_static", "false"));
+	mParameterTable.insert(ParameterNameValue("store_params", "false"));
 	mParameterTable.insert(ParameterNameValue("pos_x", "0.0"));
 	mParameterTable.insert(ParameterNameValue("pos_y", "0.0"));
 	mParameterTable.insert(ParameterNameValue("pos_z", "0.0"));

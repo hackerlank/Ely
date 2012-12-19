@@ -114,7 +114,8 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId,
 		bool createWithParamTables,
 		const ParameterTable& objTmplParams,
-		const ParameterTableMap& compTmplParams)
+		const ParameterTableMap& compTmplParams,
+		bool storeParams)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -180,6 +181,16 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		{
 			//...if not empty
 			objectTmpl->setParameters(objTmplParams);
+		}
+		//store object and component templates' parameters into
+		//the created object and before it will be added to the
+		//scene (and initialized).
+		bool storeParamsParam = (
+				objectTmpl->parameter(std::string("store_params")) ==
+				std::string("true") ? true : false);
+		if (storeParams or storeParamsParam)
+		{
+			newObj->storeParameters(objTmplParams, compTmplParams);
 		}
 		//give a chance to object (and its components) to customize
 		//themselves when being added to scene.

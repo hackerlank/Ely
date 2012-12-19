@@ -116,12 +116,16 @@ public:
 	 * object in the scene.
 	 * @param compTmplParams Map of component  templates' parameter tables,
 	 * indexed by component type, used to initialize the object components.
+	 * @param storeParams If to store object and component templates'
+	 * parameters into the created object  and before it will be
+	 * added to the scene (and initialized).
 	 * @return The just created object, or NULL if the object cannot be created.
 	 */
 	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""),
 			bool createWithParamTables = false,
 			const ParameterTable& objTmplParams = ParameterTable(),
-			const ParameterTableMap& compTmplParams = ParameterTableMap());
+			const ParameterTableMap& compTmplParams = ParameterTableMap(),
+			bool storeParams = false);
 
 	/**
 	 * \brief Object templates and object tables typedefs.

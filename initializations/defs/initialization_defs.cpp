@@ -29,7 +29,7 @@
 #include "Utilities/ComponentSuite.h"
 #include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplateManager.h"
-
+#include "ObjectModel/ObjectTemplate.h"
 
 ///common
 static bool controlGrabbed = false;
@@ -136,11 +136,11 @@ void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTa
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-		object->getNodePath().look_at(50, 200, 10);
+	object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-		pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
-				static_cast<void*>(object));
-	}
+	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+			static_cast<void*>(object));
+}
 
 void cameraInit()
 {
@@ -357,11 +357,12 @@ static void toggleSteerer1Control(const Event* event, void* data)
 		//flee NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->flee(targetObjectNP, 50.0, 200.0);
 		//pursue NPC1
-		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
+//		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
 		//evade NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->evade(targetObjectNP, 50.0, 150.0);
 		//arrival NPC1
-		steerer1AI->getAiCharacter()->get_ai_behaviors()->arrival(100.0);
+//		steerer1AI->getAiCharacter()->get_ai_behaviors()->arrival(100.0);
+		//flock
 		//
 		aiEnabled = true;
 	}
@@ -373,7 +374,7 @@ static void steerer1SteeringForceOn(const Event* event, void* data)
 	if (throwerObject == "Steerer1")
 	{
 		SMARTPTR(Object)gorilla1 =
-				ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
+		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
 		SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
 						ComponentFamilyType("Scene")));
 		//play animation
@@ -386,7 +387,7 @@ static void steerer1SteeringForceOff(const Event* event, void* data)
 	if (throwerObject == "Steerer1")
 	{
 		SMARTPTR(Object)gorilla1 =
-				ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
+		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("Gorilla1");
 		SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
 						ComponentFamilyType("Scene")));
 		//stop animation
@@ -409,6 +410,21 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 			&steerer1SteeringForceOn, static_cast<void*>(object));
 	EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
 			&steerer1SteeringForceOff, static_cast<void*>(object));
+	//clone itself a few times (with id = Steerer1_cloneX)
+	int numClones = 10;
+	for (int idx = 0; idx < numClones; ++idx)
+	{
+		//get the object parameter table
+		ParameterTable steerer1ObjParams =
+				object->getStoredObjTmplParams();
+		//get the components' parameter tables
+		ParameterTableMap steerer1CompParams =
+				object->getStoredCompTmplParams();
+		//change x position
+		///TODO
+		steerer1ObjParams.erase("pos_x");
+		steerer1ObjParams.insert(std::pair<std::string,std::string>());
+	}
 }
 
 void Steerer1Init()

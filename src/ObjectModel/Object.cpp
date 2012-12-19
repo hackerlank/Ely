@@ -280,6 +280,41 @@ void Object::setStatic(bool value)
 	mIsStatic = value;
 }
 
+void Object::storeParameters(const ParameterTable& objTmplParams,
+		const ParameterTableMap& compTmplParams)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mObjTmplParams = objTmplParams;
+	mCompTmplParams = compTmplParams;
+}
+
+void Object::freeParameters()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mObjTmplParams.clear();
+	mCompTmplParams.clear();
+}
+
+ParameterTable Object::getStoredObjTmplParams()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mObjTmplParams;
+}
+
+ParameterTableMap Object::getStoredCompTmplParams()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCompTmplParams;
+}
+
 ReMutex& Object::getMutex()
 {
 	return mMutex;

@@ -190,6 +190,7 @@
 		<Object type="InstancedActorAI" id="Steerer1">
 			<Param parent="render"/>
 			<Param is_static="false"/>
+			<Param store_params="true"/>
 			<Param pos_x="120.0"/>
 			<Param pos_y="300.0"/>
 			<Param pos_z="20.0"/>

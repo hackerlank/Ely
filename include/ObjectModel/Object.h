@@ -59,6 +59,7 @@ typedef std::string ObjectId;
  *
  * XML Param(s):
  * - "parent"  				|single|no default
+ * - "store_params"			|single|"false"
  * - "is_static"  			|single|"false"
  * - "pos_x"  				|single|"0.0"
  * - "pos_y"  				|single|"0.0"
@@ -124,7 +125,7 @@ public:
 	 * \brief On addition to scene setup.
 	 *
 	 * Gives an object the ability to perform the
-	 * addition to scene setup.
+	 * addition to scene setup and any required initialization.
 	 */
 	void sceneSetup();
 
@@ -173,6 +174,33 @@ public:
 			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 	/**
+	 * \brief These methods will store/free, in an internal storage, the
+	 * object template and component templates' parameters.\n
+	 * \note These methods are intended to be used during the object
+	 * creation if the object is susceptible to be cloned with clones
+	 * having (more or less) the same parameters values, so they are
+	 * available at once. When done storage can be freed.
+	 * @param objTmplParams The object template parameters table.
+	 * @param compTmplParams The component templates' parameters' table.
+	 */
+	///@{
+	void storeParameters( const ParameterTable& objTmplParams,
+					const ParameterTableMap& compTmplParams);
+	void freeParameters();
+	///@}
+
+	/**
+	 * \brief Returns the object template and component templates'
+	 * parameters tables.
+	 * @return  The object template and component templates'
+	 * parameters tables.
+	 */
+	///@{
+	ParameterTable getStoredObjTmplParams();
+	ParameterTableMap getStoredCompTmplParams();
+	///@}
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex
 	 */
@@ -207,6 +235,10 @@ private:
 	void loadInitializationFunctions();
 	void unloadInitializationFunctions();
 	///@}
+
+	///Parameters tables.
+	ParameterTable mObjTmplParams;
+	ParameterTableMap mCompTmplParams;
 
 	///The (reentrant) mutex associated with this object.
 	ReMutex mMutex;

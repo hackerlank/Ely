@@ -101,6 +101,14 @@ std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
 	return strList;
 }
 
+ParameterTable ComponentTemplate::getParameterTable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mParameterTable;
+}
+
 PandaFramework* const ComponentTemplate::pandaFramework() const
 {
 	return mPandaFramework;
