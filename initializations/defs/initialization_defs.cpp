@@ -22,6 +22,7 @@
  */
 
 #include "../common_configs.h"
+#include <sstream>
 #include <nodePath.h>
 #include <aiCharacter.h>
 #include <aiBehaviors.h>
@@ -357,7 +358,7 @@ static void toggleSteerer1Control(const Event* event, void* data)
 		//flee NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->flee(targetObjectNP, 50.0, 200.0);
 		//pursue NPC1
-//		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
+		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
 		//evade NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->evade(targetObjectNP, 50.0, 150.0);
 		//arrival NPC1
@@ -411,19 +412,40 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
 			&steerer1SteeringForceOff, static_cast<void*>(object));
 	//clone itself a few times (with id = Steerer1_cloneX)
-	int numClones = 10;
-	for (int idx = 0; idx < numClones; ++idx)
+	int numBase = 3;
+	//get the object parameter table
+	ParameterTable steerer1ObjParams =
+			object->getStoredObjTmplParams();
+	steerer1ObjParams.erase("store_params");
+	steerer1ObjParams.insert(std::pair<std::string,
+			std::string>("store_params", "false"));
+	//get the components' parameter tables
+	ParameterTableMap steerer1CompParams =
+		object->getStoredCompTmplParams();
+	//object already added to scene
+	float pox_x = object->getNodePath().get_x();
+	float pox_y = object->getNodePath().get_y();
+	for (int x = 0; x < numBase; ++x)
 	{
-		//get the object parameter table
-		ParameterTable steerer1ObjParams =
-				object->getStoredObjTmplParams();
-		//get the components' parameter tables
-		ParameterTableMap steerer1CompParams =
-				object->getStoredCompTmplParams();
-		//change x position
-		///TODO
-		steerer1ObjParams.erase("pos_x");
-		steerer1ObjParams.insert(std::pair<std::string,std::string>());
+		for (int y = 0; y < numBase; ++y)
+		{
+			std::ostringstream pos_xStr, pos_yStr, idx;
+			//change x,y position
+			steerer1ObjParams.erase("pos_x");
+			steerer1ObjParams.erase("pos_y");
+			pos_xStr << (pox_x + x * 20.0);
+			pos_yStr << (pox_y + y * 20.0);
+			steerer1ObjParams.insert(std::pair<std::string,
+					std::string>("pos_x", pos_xStr.str()));
+			steerer1ObjParams.insert(std::pair<std::string,
+					std::string>("pos_y", pos_yStr.str()));
+			//create the clone
+			idx << x << "_" << y;
+			std::string id = std::string("Steerer1") + "_clone" + idx.str();
+			ObjectTemplateManager::GetSingletonPtr()->createObject(
+					object->objectTmpl()->name(), ObjectId(id), true,
+					steerer1ObjParams, steerer1CompParams, false);
+		}
 	}
 }
 
