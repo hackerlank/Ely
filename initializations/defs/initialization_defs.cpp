@@ -23,14 +23,17 @@
 
 #include "../common_configs.h"
 #include <sstream>
+#include <vector>
 #include <nodePath.h>
 #include <aiCharacter.h>
 #include <aiBehaviors.h>
+#include <flock.h>
 #include <eventHandler.h>
 #include "Utilities/ComponentSuite.h"
 #include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "ObjectModel/ObjectTemplate.h"
+#include "Game/GameAIManager.h"
 
 ///common
 static bool controlGrabbed = false;
@@ -335,6 +338,9 @@ INITIALIZATION Steerer1_initialization;
 #endif
 
 static bool aiEnabled = false;
+static std::vector<SMARTPTR(Object)> flockObjects;
+static Flock * flockPtr;
+static const unsigned int flockId = 1;
 static void toggleSteerer1Control(const Event* event, void* data)
 {
 	SMARTPTR(Object)steerer1 = reinterpret_cast<Object*>(data);
@@ -344,6 +350,9 @@ static void toggleSteerer1Control(const Event* event, void* data)
 	{
 		//enabled: then disable it
 		steerer1AI->disable();
+		//un-flock
+		GameAIManager::GetSingletonPtr()->aiWorld()->remove_flock(flockId);
+		delete flockPtr;
 		//
 		aiEnabled = false;
 	}
@@ -358,12 +367,24 @@ static void toggleSteerer1Control(const Event* event, void* data)
 		//flee NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->flee(targetObjectNP, 50.0, 200.0);
 		//pursue NPC1
-		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
+//		steerer1AI->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP);
 		//evade NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->evade(targetObjectNP, 50.0, 150.0);
 		//arrival NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->arrival(100.0);
 		//flock
+		flockPtr = new Flock(flockId, 270, 10, 2, 4, 0.2);
+		GameAIManager::GetSingletonPtr()->aiWorld()->add_flock(flockPtr);
+		GameAIManager::GetSingletonPtr()->aiWorld()->flock_on(flockId);
+		for (unsigned int i = 0; i < flockObjects.size(); ++i)
+		{
+			SMARTPTR(Steering)steerer = DCAST(Steering,
+					flockObjects[i]->getComponent(ComponentFamilyType("AI")));
+			steerer->enable();
+			flockPtr->add_ai_char(steerer->getAiCharacter());
+			steerer->getAiCharacter()->get_ai_behaviors()->flock(0.5);
+			steerer->getAiCharacter()->get_ai_behaviors()->pursue(targetObjectNP, 0.5);
+		}
 		//
 		aiEnabled = true;
 	}
@@ -411,17 +432,22 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 			&steerer1SteeringForceOn, static_cast<void*>(object));
 	EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
 			&steerer1SteeringForceOff, static_cast<void*>(object));
+	///
+	//flock management
+	//add Steerer1 as first flocker
+	flockObjects.clear();
+	flockObjects.push_back(object);
 	//clone itself a few times (with id = Steerer1_cloneX)
 	int numBase = 3;
 	//get the object parameter table
 	ParameterTable steerer1ObjParams =
-			object->getStoredObjTmplParams();
+	object->getStoredObjTmplParams();
 	steerer1ObjParams.erase("store_params");
 	steerer1ObjParams.insert(std::pair<std::string,
 			std::string>("store_params", "false"));
 	//get the components' parameter tables
 	ParameterTableMap steerer1CompParams =
-		object->getStoredCompTmplParams();
+	object->getStoredCompTmplParams();
 	//object already added to scene
 	float pox_x = object->getNodePath().get_x();
 	float pox_y = object->getNodePath().get_y();
@@ -433,8 +459,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 			//change x,y position
 			steerer1ObjParams.erase("pos_x");
 			steerer1ObjParams.erase("pos_y");
-			pos_xStr << (pox_x + x * 20.0);
-			pos_yStr << (pox_y + y * 20.0);
+			pos_xStr << (pox_x + (x + 1) * 20.0);
+			pos_yStr << (pox_y + (y + 1) * 20.0);
 			steerer1ObjParams.insert(std::pair<std::string,
 					std::string>("pos_x", pos_xStr.str()));
 			steerer1ObjParams.insert(std::pair<std::string,
@@ -442,11 +468,12 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 			//create the clone
 			idx << x << "_" << y;
 			std::string id = std::string("Steerer1") + "_clone" + idx.str();
-			ObjectTemplateManager::GetSingletonPtr()->createObject(
-					object->objectTmpl()->name(), ObjectId(id), true,
-					steerer1ObjParams, steerer1CompParams, false);
+			flockObjects.push_back(ObjectTemplateManager::GetSingletonPtr()->
+					createObject(object->objectTmpl()->name(), ObjectId(id),
+							true, steerer1ObjParams, steerer1CompParams, false));
 		}
 	}
+	///
 }
 
 void Steerer1Init()
