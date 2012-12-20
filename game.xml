@@ -392,7 +392,49 @@
 			<Param parent="render"/>
 			<Param rot_p="-90.0"/>
 		</Object>
-	
+		
+		<Object type="StaticActor" id="beachhouse2">
+			<Component type="Model">
+				<Param from_file="true"/>
+				<Param is_static="true"/>
+				<Param model_file="buildings/beachhouse2"/>
+				<Param scale_x="5.0"/>
+				<Param scale_y="5.0"/>
+				<Param scale_z="5.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param pos_x="0.0"/>
+			<Param pos_y="200.0"/>
+			<Param pos_z="46.0"/>
+		</Object>
+
+		<Object type="StaticActor" id="cityhall">
+			<Component type="Model">
+				<Param from_file="true"/>
+				<Param is_static="true"/>
+				<Param model_file="buildings/cityhall"/>
+				<Param scale_x="3.0"/>
+				<Param scale_y="3.0"/>
+				<Param scale_z="3.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param pos_x="450.0"/>
+			<Param pos_y="300.0"/>
+			<Param pos_z="46.0"/>
+		</Object>
+
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
 		<Object type="Render" id="render" priority="1000">
 			<Component type="NodePathWrapper">
