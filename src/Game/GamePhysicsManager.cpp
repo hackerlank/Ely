@@ -180,9 +180,24 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 	// create the actual shape
 	SMARTPTR(BulletShape) collisionShape = NULL;
 	LVecBase3 localScale;
-	//get the bounding dimensions of object node path, that
-	//should represents a model
-	getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+	if (not modelNP.is_empty())
+	{
+		//get the bounding dimensions of object node path, that
+		//should represents a model
+		getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+	}
+	else
+	{
+		//a bullet shape is requested without an associated model:
+		//automaticShaping should be false...
+		if (automaticShaping)
+		{
+			//...otherwise set some default value
+			modelDims = LVector3(1.0, 1.0, 1.0);
+			modelDeltaCenter = LVector3(1.0, 1.0, 1.0);
+			modelRadius = 1.0;
+		}
+	}
 	//
 	switch (shapeType)
 	{

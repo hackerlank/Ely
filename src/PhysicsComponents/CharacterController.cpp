@@ -78,8 +78,8 @@ bool CharacterController::initialize()
 
 	bool result = true;
 	//get step height
-	mStepHeight = (float) atof(
-			mTmpl->parameter(std::string("step_height")).c_str());
+	mStepHeight = (float) strtof(
+			mTmpl->parameter(std::string("step_height")).c_str(), NULL);
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
 	//get shape size
@@ -104,7 +104,7 @@ bool CharacterController::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		if (not radius.empty())
 		{
-			mDim1 = (float) atof(radius.c_str());
+			mDim1 = (float) strtof(radius.c_str(), NULL);
 			if (mDim1 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -120,9 +120,9 @@ bool CharacterController::initialize()
 		if ((not half_x.empty()) and (not half_y.empty())
 				and (not half_z.empty()))
 		{
-			mDim1 = (float) atof(half_x.c_str());
-			mDim2 = (float) atof(half_y.c_str());
-			mDim3 = (float) atof(half_z.c_str());
+			mDim1 = (float) strtof(half_x.c_str(), NULL);
+			mDim2 = (float) strtof(half_y.c_str(), NULL);
+			mDim3 = (float) strtof(half_z.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -150,8 +150,8 @@ bool CharacterController::initialize()
 		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
 		if ((not radius.empty()) and (not height.empty()))
 		{
-			mDim1 = (float) atof(radius.c_str());
-			mDim2 = (float) atof(height.c_str());
+			mDim1 = (float) strtof(radius.c_str(), NULL);
+			mDim2 = (float) strtof(height.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -187,30 +187,31 @@ bool CharacterController::initialize()
 	}
 	else
 	{
-		uint32_t mask = (uint32_t) atoi(collideMask.c_str());
+		uint32_t mask = (uint32_t) strtol(collideMask.c_str(), NULL, 0);
 		mCollideMask.set_word(mask);
 #ifdef DEBUG
 		mCollideMask.write(std::cout, 0);
 #endif
 	}
 	//set control parameters
-	float linearSpeed = (float) atof(
-			mTmpl->parameter(std::string("linear_speed")).c_str());
+	float linearSpeed = (float) strtof(
+			mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
 	mLinearSpeed = LVecBase2f(linearSpeed, linearSpeed);
 	mIsLocal = (
 			mTmpl->parameter(std::string("is_local")) == std::string("false") ?
 					false : true);
-	mAngularSpeed = (float) atof(
-			mTmpl->parameter(std::string("angular_speed")).c_str());
-	mFallSpeed = (float) atof(
-			mTmpl->parameter(std::string("fall_speed")).c_str());
-	mGravity = (float) atof(mTmpl->parameter(std::string("gravity")).c_str());
-	mJumpSpeed = (float) atof(
-			mTmpl->parameter(std::string("jump_speed")).c_str());
-	mMaxSlope = (float) atof(
-			mTmpl->parameter(std::string("max_slope")).c_str());
-	mMaxJumpHeight = (float) atof(
-			mTmpl->parameter(std::string("max_jump_height")).c_str());
+	mAngularSpeed = (float) strtof(
+			mTmpl->parameter(std::string("angular_speed")).c_str(), NULL);
+	mFallSpeed = (float) strtof(
+			mTmpl->parameter(std::string("fall_speed")).c_str(), NULL);
+	mGravity = (float) strtof(mTmpl->parameter(std::string("gravity")).c_str(),
+			NULL);
+	mJumpSpeed = (float) strtof(
+			mTmpl->parameter(std::string("jump_speed")).c_str(), NULL);
+	mMaxSlope = (float) strtof(
+			mTmpl->parameter(std::string("max_slope")).c_str(), NULL);
+	mMaxJumpHeight = (float) strtof(
+			mTmpl->parameter(std::string("max_jump_height")).c_str(), NULL);
 	//key events setting
 	//backward key
 	mBackwardKey = (
@@ -256,32 +257,38 @@ void CharacterController::onAddToObjectSetup()
 	//has scaling already applied.
 
 	//create a Character Controller Node
+	std::string name = std::string(mComponentId) + "("
+			+ get_type().get_name(this) + ") of "
+			+ std::string(mOwnerObject->objectId()) + "("
+			+ mOwnerObject->objectTmpl()->name() + ")";
 	mCharacterController = new BulletCharacterControllerNode(
 			createShape(mShapeType), mStepHeight,
-			std::string(mComponentId).c_str());
+			name.c_str());
 	//set the control parameters
 	setControlParameters();
 
 	//attach it to Bullet World
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			DCAST(TypedObject, mCharacterController));
+			mCharacterController);
 
 	//create a node path for the character controller
 	mNodePath = NodePath(mCharacterController);
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
 
-	//reparent the object node path as a child of the character controller's one
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
-	ownerNodePath.reparent_to(mNodePath);
-	//optimize
-	mNodePath.flatten_light();
+	if (not ownerNodePath.is_empty())
+	{
+		//reparent the object node path as a child of the character controller's one
+		ownerNodePath.reparent_to(mNodePath);
+		//correct (or possibly reset to zero) pos and hpr of the former object node path
+		ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+		//optimize
+		mNodePath.flatten_light();
+	}
 
 	//set this character controller node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
-	//correct (or possibly reset to zero) pos and hpr of the former object node path
-	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
-
 	//Add to the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
 	//setup event callbacks if any

@@ -92,8 +92,10 @@ void GameManager::GamePlay()
 {
 
 #ifdef DEBUG
-	define_key("p", "togglePhysicsDebug", &GameManager::togglePhysicsDebug,
-			(void*) this);
+	mPhysicsDebugData = new EventCallbackInterface<GameManager>::EventCallbackData(this,
+			&GameManager::togglePhysicsDebug);
+	define_key("p", "togglePhysicsDebug", &EventCallbackInterface<GameManager>::eventCallbackFunction,
+			reinterpret_cast<void*>(mPhysicsDebugData.p()));
 #endif
 
 	// add a 1st task
@@ -110,6 +112,7 @@ void GameManager::GamePlay()
 			&TaskInterface<GameManager>::taskFunction,
 			reinterpret_cast<void*>(m2ndTask.p()));
 	get_task_mgr().add(task);
+
 }
 
 void GameManager::setupCompTmplMgr()
@@ -243,7 +246,7 @@ void GameManager::createGameWorldWithoutParamTables(
 			const char* priorityTAG = componentTmplTAG->Attribute("priority",
 					NULL);
 			priorityTAG != NULL ?
-					ordCompTAG.setPrio(atoi(priorityTAG)) :
+					ordCompTAG.setPrio(strtol(priorityTAG, NULL, 0)) :
 					ordCompTAG.setPrio(0);
 			orderedComponentTmplsTAG.push(ordCompTAG);
 		}
@@ -320,7 +323,7 @@ void GameManager::createGameWorldWithoutParamTables(
 		ordObjTAG.setPtr(objectTAG);
 		const char* priorityTAG = objectTAG->Attribute("priority", NULL);
 		priorityTAG != NULL ?
-				ordObjTAG.setPrio(atoi(priorityTAG)) : ordObjTAG.setPrio(0);
+				ordObjTAG.setPrio(strtol(priorityTAG, NULL, 0)) : ordObjTAG.setPrio(0);
 		orderedObjectsTAG.push(ordObjTAG);
 	}
 	//cycle through the Object(s)' definitions in order of priority
@@ -507,7 +510,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			const char* priorityTAG = componentTmplTAG->Attribute("priority",
 					NULL);
 			priorityTAG != NULL ?
-					ordCompTAG.setPrio(atoi(priorityTAG)) :
+					ordCompTAG.setPrio(strtol(priorityTAG, NULL, 0)) :
 					ordCompTAG.setPrio(0);
 			orderedComponentTmplsTAG.push(ordCompTAG);
 		}
@@ -584,7 +587,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		ordObjTAG.setPtr(objectTAG);
 		const char* priorityTAG = objectTAG->Attribute("priority", NULL);
 		priorityTAG != NULL ?
-				ordObjTAG.setPrio(atoi(priorityTAG)) : ordObjTAG.setPrio(0);
+				ordObjTAG.setPrio(strtol(priorityTAG, NULL, 0)) : ordObjTAG.setPrio(0);
 		orderedObjectsTAG.push(ordObjTAG);
 	}
 	//cycle through the Object(s)' definitions in order of priority
@@ -663,7 +666,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 							attributeTAG->Value()));
 		}
 		//////////////////////////////////////////////////////////////
-		//create the object effectively
+		//create the object actually
 		SMARTPTR(Object)objectPtr;
 		if ((objIdTAG != NULL) and (std::string(objIdTAG) != std::string("")))
 		{
@@ -748,10 +751,9 @@ ReMutex& GameManager::getMutex()
 }
 
 #ifdef DEBUG
-void GameManager::togglePhysicsDebug(const Event* event, void* data)
+void GameManager::togglePhysicsDebug(const Event* event)
 {
-	GameManager* gameManager = (GameManager*) data;
-	if (gameManager->mPhysicsDebugEnabled)
+	if (mPhysicsDebugEnabled)
 	{
 		GamePhysicsManager::GetSingleton().debug(false);
 	}
@@ -759,7 +761,7 @@ void GameManager::togglePhysicsDebug(const Event* event, void* data)
 	{
 		GamePhysicsManager::GetSingleton().debug(true);
 	}
-	gameManager->mPhysicsDebugEnabled = not gameManager->mPhysicsDebugEnabled;
+	mPhysicsDebugEnabled = not mPhysicsDebugEnabled;
 }
 #endif
 

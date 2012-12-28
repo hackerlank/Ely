@@ -60,7 +60,7 @@ typedef std::string ObjectId;
  * XML Param(s):
  * - "parent"  				|single|no default
  * - "store_params"			|single|"false"
- * - "is_static"  			|single|"false"
+ * - "is_steady"  			|single|"false"
  * - "pos_x"  				|single|"0.0"
  * - "pos_y"  				|single|"0.0"
  * - "pos_z"  				|single|"0.0"
@@ -156,15 +156,15 @@ public:
 	SMARTPTR(ObjectTemplate) const objectTmpl() const;
 
 	/**
-	 * \brief Gets/sets a reference to the static flag.
+	 * \brief Gets/sets a reference to the steady flag.
 	 *
 	 * This flag represents if this object doesn't move in the world.
 	 * Various components can set or get this value to implement
 	 * some optimization. By default false (i.e. object is dynamic).
 	 */
 	///@{
-	bool isStatic();
-	void setStatic(bool value);
+	bool isSteady();
+	void setSteady(bool value);
 	///@}
 
 	/**
@@ -202,7 +202,7 @@ public:
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
-	 * @return The internal mutex
+	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
 
@@ -218,10 +218,10 @@ private:
 	typedef std::map<const ComponentFamilyType, SMARTPTR(Component)> ComponentTable;
 	ComponentTable mComponents;
 	///@}
-	///Static flag: if this object doesn't move in the world.
+	///Staedy flag: if this object doesn't move in the world.
 	///Various components can set or get this value to implement
 	///some optimization.
-	bool mIsStatic;
+	bool mIsSteady;
 
 	///Handle of the library of initialization functions.
 	LIB_HANDLE mInitializationLib;

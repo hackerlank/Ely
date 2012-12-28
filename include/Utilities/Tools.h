@@ -174,7 +174,7 @@ struct IdType
  * 1) in class A define a (pointer to) TaskData member:
  * \code
  * 	SMARTPTR(TaskInterface<A>::TaskData) myData;
- * 	\endcode
+ * \endcode
  * 2) and a method (that will execute the real task) with signature:
  * \code
  * 	AsyncTask::DoneStatus myTask(GenericAsyncTask* task);
@@ -184,17 +184,17 @@ struct IdType
  * referring to taskFunction and with data parameter equal to
  * myData (reinterpreted as void*):
  * \code
- * 	myData = new TaskInterface<A>::TaskData(this, &A::firstTask);
+ * 	myData = new TaskInterface<A>::TaskData(this, &A::myTask);
  * 	AsyncTask* task = new GenericAsyncTask("my task",
  * 							&TaskInterface<A>::taskFunction,
  * 							reinterpret_cast<void*>(myData.p()));
- * 	\endcode
+ * \endcode
  * 4) finally register the async-task to your manager:
  * \code
  * 	pandaFramework.get_task_mgr().add(task);
  * 	\endcode
  * From now on myTask will execute the task, while being able
- * to refer directly to data members of the class.
+ * to refer directly to data members of the A class instance.
  */
 template<typename A> struct TaskInterface
 {
@@ -205,6 +205,54 @@ template<typename A> struct TaskInterface
 	{
 		TaskData* appData = reinterpret_cast<TaskData*>(data);
 		return ((appData->first())->*(appData->second()))(task);
+	}
+};
+
+/**
+ * \brief Template struct for generic Event Callback interface
+ *
+ * The effective Event Callbacks are composed by a Pair of an object and
+ * a method (member function) doing the effective task.
+ * To define a event callback:
+ * 1) in class A define a (pointer to) TaskData member:
+ * \code
+ * 	SMARTPTR(EventCallbackInterface<A>::EventCallbackData) myData;
+ * \endcode
+ * 2) and a method (that will execute the real event callback) with signature:
+ * \code
+ * 	void myEventCallback(const Event* event, void* data);
+ * \endcode
+ * 3) in code associate to myData a new EventCallbackData referring to this
+ * class instance and myEventCallback:
+ * \code
+ * 	myData = new EventCallbackInterface<A>::
+ * 			EventCallbackData(this, &A::myEventCallback);
+ * \endcode
+ * 4) finally register this event callback to your global event handler
+ * with data parameter equal to myData (reinterpreted as void*):
+ * \code
+ * 	pandaFramework.define_key("myKey", "myEventCallback",
+ * 		&EventCallbackInterface<A>::eventCallbackFunction,
+ * 			reinterpret_cast<void*>(myData.p()));
+ * \endcode
+ * or
+ * \code
+ * 	EventHandler::get_global_event_handler()->add_hook("myKey",
+ * 		&EventCallbackInterface<A>::eventCallbackFunction,
+ * 			reinterpret_cast<void*>(myData.p()));
+ * \endcode
+ * From now on myEventCallback will execute the event callback, while being able
+ * to refer directly to data members of the A class instance.
+ */
+template<typename A> struct EventCallbackInterface
+{
+	typedef void (A::*EventCallbackPtr)(const Event* event);
+	typedef Pair<A*, EventCallbackPtr> EventCallbackData;
+	static void eventCallbackFunction(const Event* event,
+			void* data)
+	{
+		EventCallbackData* appData = reinterpret_cast<EventCallbackData*>(data);
+		((appData->first())->*(appData->second()))(event);
 	}
 };
 
@@ -306,6 +354,10 @@ public:
 		m.release();
 	}
 };
+
+///Some useful macro (for bullet,...)
+#define PHYSICS_MAX_DISTANCE 1000000000.0
+#define PHYSICS_PI 3.141592654
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();

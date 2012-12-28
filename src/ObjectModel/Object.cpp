@@ -152,8 +152,8 @@ void Object::sceneSetup()
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
 	//Is static (by default false)
-	mIsStatic = (
-			mTmpl->parameter(std::string("is_static")) == std::string("true") ?
+	mIsSteady = (
+			mTmpl->parameter(std::string("is_steady")) == std::string("true") ?
 					true : false);
 	//find parent into the created objects
 	SMARTPTR(Object)createdObject = ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
@@ -164,16 +164,16 @@ void Object::sceneSetup()
 	}
 
 	//Position (default: (0,0,0))
-	float posX = atof(mTmpl->parameter(std::string("pos_x")).c_str());
-	float posY = atof(mTmpl->parameter(std::string("pos_y")).c_str());
-	float posZ = atof(mTmpl->parameter(std::string("pos_z")).c_str());
+	float posX = strtof(mTmpl->parameter(std::string("pos_x")).c_str(), NULL);
+	float posY = strtof(mTmpl->parameter(std::string("pos_y")).c_str(), NULL);
+	float posZ = strtof(mTmpl->parameter(std::string("pos_z")).c_str(), NULL);
 	mNodePath.set_x(posX);
 	mNodePath.set_y(posY);
 	mNodePath.set_z(posZ);
 	//Orientation (default: (0,0,0))
-	float rotH = atof(mTmpl->parameter(std::string("rot_h")).c_str());
-	float rotP = atof(mTmpl->parameter(std::string("rot_p")).c_str());
-	float rotR = atof(mTmpl->parameter(std::string("rot_r")).c_str());
+	float rotH = strtof(mTmpl->parameter(std::string("rot_h")).c_str(), NULL);
+	float rotP = strtof(mTmpl->parameter(std::string("rot_p")).c_str(), NULL);
+	float rotR = strtof(mTmpl->parameter(std::string("rot_r")).c_str(), NULL);
 	mNodePath.set_h(rotH);
 	mNodePath.set_p(rotP);
 	mNodePath.set_r(rotR);
@@ -264,20 +264,20 @@ SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 	return mTmpl;
 }
 
-bool Object::isStatic()
+bool Object::isSteady()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mIsStatic;
+	return mIsSteady;
 }
 
-void Object::setStatic(bool value)
+void Object::setSteady(bool value)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mIsStatic = value;
+	mIsSteady = value;
 }
 
 void Object::storeParameters(const ParameterTable& objTmplParams,

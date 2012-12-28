@@ -112,9 +112,15 @@ void Sound3d::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
 	// update sounds' position/velocity only for dynamic objects
 	// and if sound table is not empty
-	if ((not mOwnerObject->isStatic()) and (not mSounds.empty()))
+	if ((not mOwnerObject->isSteady()) and (not mSounds.empty()))
 	{
 		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
@@ -131,7 +137,13 @@ void Sound3d::onAddToSceneSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (mOwnerObject->isStatic())
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
+	if (mOwnerObject->isSteady())
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
@@ -142,6 +154,12 @@ bool Sound3d::addSound(const std::string& fileName)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return false;
+	}
 
 	//make mSounds modifications
 	bool result = false;
@@ -160,7 +178,7 @@ bool Sound3d::addSound(const std::string& fileName)
 		result = true;
 		// try to add this component to updating (if not present)
 		// only if object is dynamic
-		if (not mOwnerObject->isStatic())
+		if (not mOwnerObject->isSteady())
 		{
 			//addToAudioUpdate will safely add this component
 			//to update only if it wasn't previously added
@@ -241,6 +259,12 @@ void Sound3d::set3dStaticAttributes()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//set only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
 
 	mPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;

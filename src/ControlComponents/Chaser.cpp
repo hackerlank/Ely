@@ -76,22 +76,22 @@ bool Chaser::initialize()
 			mTmpl->parameter(std::string("fixed_relative_position"))
 					== std::string("false") ? false : true);
 	//look at distance and height settings
-	mAbsLookAtDistance = (float) atof(
-			mTmpl->parameter(std::string("abs_lookat_distance")).c_str());
-	mAbsLookAtHeight = (float) atof(
-			mTmpl->parameter(std::string("abs_lookat_height")).c_str());
+	mAbsLookAtDistance = (float) strtof(
+			mTmpl->parameter(std::string("abs_lookat_distance")).c_str(), NULL);
+	mAbsLookAtHeight = (float) strtof(
+			mTmpl->parameter(std::string("abs_lookat_height")).c_str(), NULL);
 	//max and min distance settings
-	mAbsMaxDistance = (float) atof(
-			mTmpl->parameter(std::string("abs_max_distance")).c_str());
-	mAbsMinDistance = (float) atof(
-			mTmpl->parameter(std::string("abs_min_distance")).c_str());
+	mAbsMaxDistance = (float) strtof(
+			mTmpl->parameter(std::string("abs_max_distance")).c_str(), NULL);
+	mAbsMinDistance = (float) strtof(
+			mTmpl->parameter(std::string("abs_min_distance")).c_str(), NULL);
 	//max and min height settings
-	mAbsMaxHeight = (float) atof(
-			mTmpl->parameter(std::string("abs_max_height")).c_str());
-	mAbsMinHeight = (float) atof(
-			mTmpl->parameter(std::string("abs_min_height")).c_str());
+	mAbsMaxHeight = (float) strtof(
+			mTmpl->parameter(std::string("abs_max_height")).c_str(), NULL);
+	mAbsMinHeight = (float) strtof(
+			mTmpl->parameter(std::string("abs_min_height")).c_str(), NULL);
 	//friction' settings
-	mFriction = (float) atof(mTmpl->parameter(std::string("friction")).c_str());
+	mFriction = (float) strtof(mTmpl->parameter(std::string("friction")).c_str(), NULL);
 	//
 	return result;
 }
@@ -102,6 +102,12 @@ void Chaser::enable()
 	HOLDMUTEX(mMutex)
 
 	if (mIsEnabled or (not mOwnerObject) or mChasedNodePath.is_empty())
+	{
+		return;
+	}
+
+	//enable only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
 	{
 		return;
 	}
@@ -154,6 +160,12 @@ void Chaser::disable()
 	HOLDMUTEX(mMutex)
 
 	if ((not mIsEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
+	{
+		return;
+	}
+
+	//disable only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
 	{
 		return;
 	}
@@ -247,6 +259,12 @@ void Chaser::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
 	//set mChasedNodePath as empty
 	mChasedNodePath = NodePath();
 
@@ -296,6 +314,12 @@ void Chaser::onAddToSceneSetup()
 	HOLDMUTEX(mMutex)
 
 	if ((not mEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
+	{
+		return;
+	}
+
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
 	{
 		return;
 	}

@@ -188,7 +188,7 @@ public:
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
-	 * @return The internal mutex
+	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
 

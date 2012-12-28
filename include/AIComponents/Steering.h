@@ -40,9 +40,15 @@
 #include <lvector3.h>
 #include <throw_event.h>
 #include <eventParameter.h>
+#include <bitMask.h>
 #include <cmath>
+#include <cfloat>
+#include <bullet_utils.h>
+#include <bulletWorld.h>
+#include <bulletClosestHitRayResult.h>
 #include "ControlComponents/Driver.h"
 #include "PhysicsComponents/CharacterController.h"
+#include "Game/GamePhysicsManager.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -65,14 +71,18 @@ class SteeringTemplate;
  * - the owner object name of this component.\n
  * \note This component should be used only with an object reparented to
  * the root scene node path (i.e. render).
+ * \note For obstacle avoidance, obstacle collision objects (rigid bodies)
+ * should have the MSB bit set.
  *
  * XML Param(s):
- * - "enabled"  			|single|"true"
- * - "throw_events"			|single|"false"
- * - "controlled_type"		|single|"nodepath" (nodepath,character_controller)
- * - "mass"  				|single|"1.0"
- * - "movt_force"  			|single|"1.0"
- * - "max_force"  			|single|"1.0"
+ * - "enabled"  						|single|"true"
+ * - "throw_events"						|single|"false"
+ * - "controlled_type"					|single|"nodepath" (nodepath,character_controller)
+ * - "mass"  							|single|"1.0"
+ * - "movt_force"  						|single|"1.0"
+ * - "max_force"  						|single|"1.0"
+ * - "obstacle_hit_mask"				|single|"0x80000000"
+ * - "obstacle_max_distance_fraction"	|single|"1.0"
  */
 class Steering: public Component
 {
@@ -134,9 +144,30 @@ private:
 	void (Steering::*mUpdatePtr)(float);
 	///@{
 	///Steered character controller items.
+	SMARTPTR(BulletWorld) mWorld;
 	SMARTPTR(CharacterController) mCharacterController;
 	void enableMovRot(bool enable);
 	bool mMovRotEnabled, mCurrentIsLocal;
+	AIBehaviors *_steering;
+	LVecBase3f calculate_prioritized(float dt);
+	LVecBase3f do_seek();
+	void flee_activate();
+	LVecBase3f do_flee();
+	LVecBase3f do_pursue();
+	void evade_activate();
+	LVecBase3f do_evade();
+	void arrival_activate();
+	LVecBase3f do_arrival(float dt);
+	void flock_activate();
+	LVecBase3f do_flock();
+	LVecBase3f do_wander();
+	void obstacle_avoidance_activate_bullet();
+	LVecBase3f do_obstacle_avoidance_bullet();
+	void do_follow();
+
+	///Obstacle avoidance.
+	float mObstacleMaxDistanceFraction, mObstacleMaxDist, mObstacleMaxDistSquared;
+	BitMask32 mObstacleHitMask;
 	///@}
 
 	/**

@@ -113,6 +113,8 @@ void Activity::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//add even for an empty object node path
+
 	//setup the FSM
 	setupFSM();
 

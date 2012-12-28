@@ -83,12 +83,12 @@ bool RigidBody::initialize()
 		mBodyType = DYNAMIC;
 	}
 	//get physical parameters
-	mBodyMass = (float) atof(
-			mTmpl->parameter(std::string("body_mass")).c_str());
-	mBodyFriction = (float) atof(
-			mTmpl->parameter(std::string("body_friction")).c_str());
-	mBodyRestitution = (float) atof(
-			mTmpl->parameter(std::string("body_restitution")).c_str());
+	mBodyMass = (float) strtof(
+			mTmpl->parameter(std::string("body_mass")).c_str(), NULL);
+	mBodyFriction = (float) strtof(
+			mTmpl->parameter(std::string("body_friction")).c_str(), NULL);
+	mBodyRestitution = (float) strtof(
+			mTmpl->parameter(std::string("body_restitution")).c_str(), NULL);
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
 	//get shape size
@@ -113,7 +113,7 @@ bool RigidBody::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		if (not radius.empty())
 		{
-			mDim1 = (float) atof(radius.c_str());
+			mDim1 = (float) strtof(radius.c_str(), NULL);
 			if (mDim1 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -130,13 +130,14 @@ bool RigidBody::initialize()
 		if ((not norm_x.empty()) and (not norm_y.empty())
 				and (not norm_z.empty()))
 		{
-			LVector3 normal((float) atof(norm_x.c_str()),
-					(float) atof(norm_y.c_str()), (float) atof(norm_z.c_str()));
+			LVector3 normal((float) strtof(norm_x.c_str(), NULL),
+					(float) strtof(norm_y.c_str(), NULL),
+					(float) strtof(norm_z.c_str(), NULL));
 			normal.normalize();
 			mDim1 = normal.get_x();
 			mDim2 = normal.get_y();
 			mDim3 = normal.get_z();
-			mDim4 = (float) atof(d.c_str());
+			mDim4 = (float) strtof(d.c_str(), NULL);
 			if (normal.length() > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -152,9 +153,9 @@ bool RigidBody::initialize()
 		if ((not half_x.empty()) and (not half_y.empty())
 				and (not half_z.empty()))
 		{
-			mDim1 = (float) atof(half_x.c_str());
-			mDim2 = (float) atof(half_y.c_str());
-			mDim3 = (float) atof(half_z.c_str());
+			mDim1 = (float) strtof(half_x.c_str(), NULL);
+			mDim2 = (float) strtof(half_y.c_str(), NULL);
+			mDim3 = (float) strtof(half_z.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -182,8 +183,8 @@ bool RigidBody::initialize()
 		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
 		if ((not radius.empty()) and (not height.empty()))
 		{
-			mDim1 = (float) atof(radius.c_str());
-			mDim2 = (float) atof(height.c_str());
+			mDim1 = (float) strtof(radius.c_str(), NULL);
+			mDim2 = (float) strtof(height.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -215,9 +216,9 @@ bool RigidBody::initialize()
 		if ((not height.empty()) and (not scale_w.empty())
 				and (not scale_d.empty()))
 		{
-			mDim1 = (float) atof(height.c_str());
-			mDim2 = (float) atof(scale_w.c_str());
-			mDim3 = (float) atof(scale_d.c_str());
+			mDim1 = (float) strtof(height.c_str(), NULL);
+			mDim2 = (float) strtof(scale_w.c_str(), NULL);
+			mDim3 = (float) strtof(scale_d.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -253,17 +254,19 @@ bool RigidBody::initialize()
 	}
 	else
 	{
-		uint32_t mask = (uint32_t) atoi(collideMask.c_str());
+		uint32_t mask = (uint32_t) strtol(collideMask.c_str(), NULL, 0);
 		mCollideMask.set_word(mask);
 #ifdef DEBUG
 		mCollideMask.write(std::cout, 0);
 #endif
 	}
 	//get ccd settings: enabled if both are greater than zero (> 0.0)
-	mCcdMotionThreshold = (float) atof(
-			mTmpl->parameter(std::string("ccd_motion_threshold")).c_str());
-	mCcdSweptSphereRadius = (float) atof(
-			mTmpl->parameter(std::string("ccd_swept_sphere_radius")).c_str());
+	mCcdMotionThreshold = (float) strtof(
+			mTmpl->parameter(std::string("ccd_motion_threshold")).c_str(),
+			NULL);
+	mCcdSweptSphereRadius = (float) strtof(
+			mTmpl->parameter(std::string("ccd_swept_sphere_radius")).c_str(),
+			NULL);
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
 			mCcdEnabled = true : mCcdEnabled = false;
 	//
@@ -276,7 +279,11 @@ void RigidBody::onAddToObjectSetup()
 	HOLDMUTEX(mMutex)
 
 	//create a Rigid Body Node
-	mRigidBodyNode = new BulletRigidBodyNode(std::string(mComponentId).c_str());
+	std::string name = std::string(mComponentId) + "("
+			+ get_type().get_name(this) + ") of "
+			+ std::string(mOwnerObject->objectId()) + "("
+			+ mOwnerObject->objectTmpl()->name() + ")";
+	mRigidBodyNode = new BulletRigidBodyNode(name.c_str());
 	//set the physics parameters
 	setPhysicalParameters();
 
@@ -293,7 +300,7 @@ void RigidBody::onAddToObjectSetup()
 	mRigidBodyNode->set_mass(1.0);
 	//BUG>
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			DCAST(TypedObject, mRigidBodyNode));
+			mRigidBodyNode);
 
 	switchType(mBodyType);
 
@@ -302,16 +309,18 @@ void RigidBody::onAddToObjectSetup()
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
 
-	//reparent the object node path as a child of the rigid body's one
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
-	ownerNodePath.reparent_to(mNodePath);
-	//correct (or possibly reset to zero) pos and hpr of the object node path
-	ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
-	//optimize
-	if (mOwnerObject->isStatic()
-			and (mShapeType != GamePhysicsManager::HEIGHTFIELD))		//Hack
+	if (not ownerNodePath.is_empty())
 	{
-		ownerNodePath.flatten_light();
+		//reparent the object node path as a child of the rigid body's one
+		ownerNodePath.reparent_to(mNodePath);
+		//correct (or possibly reset to zero) pos and hpr of the object node path
+		ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+		//optimize
+		if (mShapeType != GamePhysicsManager::HEIGHTFIELD)	//Hack
+		{
+			ownerNodePath.flatten_light();
+		}
 	}
 
 	//set this rigid body node path as the object's one
@@ -329,7 +338,7 @@ void RigidBody::onAddToSceneSetup()
 
 	//switch the body type (take precedence over mass)
 	//force this component to static if owner object is static
-	if (mOwnerObject->isStatic())
+	if (mOwnerObject->isSteady())
 	{
 		mBodyType = STATIC;
 	}
@@ -397,7 +406,7 @@ SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeT
 		if (createdObject != NULL)
 		{
 			SMARTPTR(Component) component =
-					createdObject->getComponent(ComponentFamilyType("Physics"));
+			createdObject->getComponent(ComponentFamilyType("Physics"));
 			if (component->is_of_type(RigidBody::get_class_type()))
 			{
 				//object already exists

@@ -37,21 +37,14 @@ ObjectTemplateManager::~ObjectTemplateManager()
 	{
 		ObjectTable::iterator iter = mCreatedObjects.begin();
 		ObjectId objId = iter->first;
-		PRINT( "Removing object '" << std::string(objId) << "'");
-		//remove first object components because they
-		//have back references to their owner object
-		iter->second->clearComponents();
-		//
-		mCreatedObjects.erase(iter);
+		removeCreatedObject(objId);
 	}
 	//remove object templates
 	while (mObjectTemplates.size() > 0)
 	{
 		ObjectTemplateTable::iterator iter = mObjectTemplates.begin();
 		ObjectType objType = iter->first;
-		PRINT(
-				"Removing object template for type '" << std::string(objType) << "'");
-		mObjectTemplates.erase(iter);
+		removeObjectTemplate(objType);
 	}
 	std::cout << std::endl;
 }
@@ -93,6 +86,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 	{
 		return false;
 	}
+	PRINT( "Removing object template for type '" << objectType << "'");
 	mObjectTemplates.erase(it);
 	return true;
 }

@@ -86,6 +86,12 @@ void Driver::enable()
 		return;
 	}
 
+	//enable only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
 #ifdef ELY_THREAD
 	//initialize the actual transform
 	mActualTransform = mOwnerObject->getNodePath().get_transform();
@@ -117,6 +123,12 @@ void Driver::disable()
 	HOLDMUTEX(mMutex)
 
 	if ((not mIsEnabled) or (not mOwnerObject))
+	{
+		return;
+	}
+
+	//disable only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
 	{
 		return;
 	}
@@ -214,18 +226,18 @@ bool Driver::initialize()
 	}
 
 	//set sensitivity parameters
-	float speed = (float) atof(
-			mTmpl->parameter(std::string("linear_speed")).c_str());
+	float speed = (float) strtof(
+			mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
 	mSpeedActualXYZ = LVecBase3f(speed, speed, speed);
-	mSpeedActualH = (float) atof(
-			mTmpl->parameter(std::string("angular_speed")).c_str());
-	mFastFactor = (float) atof(
-			mTmpl->parameter(std::string("fast_factor")).c_str());
-	mMovSens = (float) atof(mTmpl->parameter(std::string("mov_sens")).c_str());
-	mRollSens = (float) atof(
-			mTmpl->parameter(std::string("roll_sens")).c_str());
-	mSensX = (float) atof(mTmpl->parameter(std::string("sens_x")).c_str());
-	mSensY = (float) atof(mTmpl->parameter(std::string("sens_y")).c_str());
+	mSpeedActualH = (float) strtof(
+			mTmpl->parameter(std::string("angular_speed")).c_str(), NULL);
+	mFastFactor = (float) strtof(
+			mTmpl->parameter(std::string("fast_factor")).c_str(), NULL);
+	mMovSens = (float) strtof(mTmpl->parameter(std::string("mov_sens")).c_str(), NULL);
+	mRollSens = (float) strtof(
+			mTmpl->parameter(std::string("roll_sens")).c_str(), NULL);
+	mSensX = (float) strtof(mTmpl->parameter(std::string("sens_x")).c_str(), NULL);
+	mSensY = (float) strtof(mTmpl->parameter(std::string("sens_y")).c_str(), NULL);
 	//
 	return result;
 }
@@ -234,6 +246,12 @@ void Driver::onAddToObjectSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
 
 	//setup event callbacks if any
 	setupEvents();

@@ -75,8 +75,14 @@ void Listener::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
 	// update listener position/velocity only for dynamic objects
-	if (not mOwnerObject->isStatic())
+	if (not mOwnerObject->isSteady())
 	{
 		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
@@ -93,7 +99,13 @@ void Listener::onAddToSceneSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (mOwnerObject->isStatic())
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
+	if (mOwnerObject->isSteady())
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
@@ -104,6 +116,12 @@ void Listener::set3dStaticAttributes()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//set only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
 
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	mPosition = ownerNodePath.get_pos(mSceneRoot);

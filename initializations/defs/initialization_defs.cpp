@@ -36,8 +36,9 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "Game/GameAIManager.h"
+#include "Support/Picker.h"
 
-///common
+///shared between camera, picker, actor1
 static bool controlGrabbed = false;
 
 ///camera related
@@ -63,7 +64,7 @@ static void toggleCameraControl(const Event* event, void* data)
 						ComponentFamilyType("Control")));
 		if (cameraControl->isEnabled())
 		{
-			//if enabled then disable it
+			//enabled: then disable it
 			//disable
 			cameraControl->disable();
 
@@ -83,7 +84,7 @@ static void toggleCameraControl(const Event* event, void* data)
 		}
 		else if (not controlGrabbed)
 		{
-			//if disabled then enable it
+			//disabled: then enable it
 
 			///<DEFAULT CAMERA CONTROL>
 //			//disable the trackball
@@ -138,14 +139,37 @@ static void toggleCameraControl(const Event* event, void* data)
 		}
 	}
 }
+static void togglePicker(const Event* event, void* data)
+{
+	SMARTPTR(Object)camera = reinterpret_cast<Object*>(data);
+	if (Picker::GetSingletonPtr())
+	{
+		//picker on: remove
+		delete Picker::GetSingletonPtr();
+		//
+		controlGrabbed = false;
+	}
+	else if (not controlGrabbed)
+	{
+		//picker off: add
+		new Picker(camera->objectTmpl()->pandaFramework(),
+				camera->objectTmpl()->windowFramework(),
+				"shift-mouse1", "mouse1-up");
+		//
+		controlGrabbed = true;
+	}
+}
 void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
-	object->getNodePath().look_at(50, 200, 10);
 	//enable/disable camera control by event
-	pandaFramework->define_key("c", "enableCameraControl", &toggleCameraControl,
+	pandaFramework->define_key("c", "toggleCameraControl", &toggleCameraControl,
 			static_cast<void*>(object));
+	//enable/disable a picker
+	pandaFramework->define_key("x", "togglePicker", &togglePicker,
+			static_cast<void*>(object));
+
 }
 
 void cameraInit()
@@ -396,6 +420,8 @@ static void toggleSteerer1Control(const Event* event, void* data)
 //		}
 		//wander NPC1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->wander(10.0, 0, 100.0, 1.0);
+		//obstacle avoidance
+		steerer1AI->getAiCharacter()->get_ai_behaviors()->obstacle_avoidance(1.0);
 		//
 		aiEnabled = true;
 	}
@@ -484,13 +510,13 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 
 	//Steerer1
 	//enable/disable Steerer1 control by event
-		pandaFramework->define_key("b", "enableSteerer1Control",
-				&toggleSteerer1Control, static_cast<void*>(object));
+	pandaFramework->define_key("b", "enableSteerer1Control",
+			&toggleSteerer1Control, static_cast<void*>(object));
 	//respond to Steerer1 events
-		EventHandler::get_global_event_handler()->add_hook("SteeringForceOn",
-				&steerer1SteeringForceOn, static_cast<void*>(object));
-		EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
-				&steerer1SteeringForceOff, static_cast<void*>(object));
+	EventHandler::get_global_event_handler()->add_hook("SteeringForceOn",
+			&steerer1SteeringForceOn, static_cast<void*>(object));
+	EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
+			&steerer1SteeringForceOff, static_cast<void*>(object));
 	///
 	//flock management
 //	createClones(object, flockObjects, 3, 3, 20.0);

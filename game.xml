@@ -157,16 +157,38 @@
 			</Component>
 			<Param parent=""/>
 			<Param pos_x="50.0"/>
-			<Param pos_y="-400.0"/>
-			<Param pos_z="600.0"/>
+			<Param pos_y="-800.0"/>
+			<Param pos_z="400.0"/>
+			<Param rot_p="-15.0"/>
+		</Object>
+		
+		<Object type="Instanceable" id="Smiley1" priority="100">
+			<Component type="Model">
+				<Param model_file="smiley"/>
+				<Param scale_x="1.0"/>
+				<Param scale_y="1.0"/>
+				<Param scale_z="1.0"/>
+			</Component>
+			<Param parent=""/>
+			<Param is_steady="true"/>
+		</Object>
+		<Object type="Instanceable" id="Gorilla1" priority="100">
+			<Component type="Model">
+				<Param model_file="gorilla/gorillawalking"/>
+				<Param scale_x="1.0"/>
+				<Param scale_y="1.0"/>
+				<Param scale_z="1.0"/>
+			</Component>
+			<Param parent=""/>
+			<Param is_steady="true"/>
 		</Object>
 
-		<Object type="InstancedActor" id="InstancedTeapot1">
+		<Object type="InstancedActor" id="InstancedSmiley1">
 			<Param parent="render"/>
-			<Param is_static="false"/>
+			<Param is_steady="false"/>
 			<Param pos_x="100.0"/>
 			<Param pos_y="0.0"/>
-			<Param pos_z="600.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -175,25 +197,25 @@
 				<Param body_mass="1.0"/>
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.5"/>
-				<Param shape_type="capsule"/>
+				<Param shape_type="sphere"/>
 				<Param shape_size="minimum"/>
 				<Param collide_mask="all_on"/>
 			</Component> 
 			<Component type="InstanceOf">
-				<Param instance_of="Teapot1"/>
-				<Param scale_x="0.5"/>
-				<Param scale_y="0.5"/>
-				<Param scale_z="3.0"/>
+				<Param instance_of="Smiley1"/>
+				<Param scale_x="5.0"/>
+				<Param scale_y="5.0"/>
+				<Param scale_z="5.0"/>
 			</Component>
 		</Object>
 		
 		<Object type="InstancedActorAI" id="Steerer1">
 			<Param parent="render"/>
-			<Param is_static="false"/>
+			<Param is_steady="false"/>
 			<Param store_params="true"/>
 			<Param pos_x="120.0"/>
 			<Param pos_y="300.0"/>
-			<Param pos_z="20.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -204,6 +226,8 @@
 				<Param mass="20.0"/>
 				<Param movt_force="0.05"/>
 				<Param max_force="5.0"/>
+				<Param obstacle_hit_mask="0x80000000"/>
+				<Param obstacle_max_distance_fraction="1.5"/>
 			</Component>
 			<Component type="CharacterController">
 				<Param shape_type="capsule"/>
@@ -216,27 +240,6 @@
 				<Param scale_y="3.0"/>
 				<Param scale_z="3.0"/>
 			</Component>
-		</Object>
-		
-		<Object type="Instanceable" id="Teapot1" priority="100">
-			<Component type="Model">
-				<Param model_file="teapot"/>
-				<Param is_static="true"/>
-				<Param scale_x="0.5"/>
-				<Param scale_y="0.5"/>
-				<Param scale_z="0.5"/>
-			</Component>
-			<Param parent=""/>
-		</Object>
-		<Object type="Instanceable" id="Gorilla1" priority="100">
-			<Component type="Model">
-				<Param model_file="gorilla/gorillawalking"/>
-				<Param is_static="true"/>
-				<Param scale_x="0.5"/>
-				<Param scale_y="0.5"/>
-				<Param scale_z="0.5"/>
-			</Component>
-			<Param parent=""/>
 		</Object>
 
 		<Object type="Actor" id="Actor1"  priority="100">
@@ -262,9 +265,9 @@
 			<Component type="Model">
 				<Param model_file="panda"/>
 				<Param anim_files="panda-walk"/>
-				<Param scale_x="1.0"/>
-				<Param scale_y="1.0"/>
-				<Param scale_z="1.0"/>
+				<Param scale_x="3.0"/>
+				<Param scale_y="3.0"/>
+				<Param scale_z="3.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
@@ -281,7 +284,7 @@
 			<Param parent="render"/>
 			<Param pos_x="180.0"/>
 			<Param pos_y="250.0"/>
-			<Param pos_z="500.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -336,18 +339,17 @@
 			<Param parent="render"/>
 			<Param pos_x="50.0"/>
 			<Param pos_y="50.0"/>
-			<Param pos_z="400.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="0.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
 
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
-				<Param height_scale="2000.0"/>
+				<Param height_scale="500.0"/>
 				<Param width_scale="15.0"/>
 				<Param brute_force="true"/>
 				<Param auto_flatten="AFM_off"/>
@@ -360,19 +362,19 @@
 				<Param body_type="static"/>
 				<Param shape_heightfield_file="../PandaGame/Models/heightfield.png"/>
 				<Param shape_type="heightfield"/>
-				<Param shape_height="2000.0"/>
+				<Param shape_height="500.0"/>
 				<Param shape_scale_w="15.0"/>
 				<Param shape_scale_d="15.0"/>
 				<Param shape_up="z"/>
+				<Param collide_mask="0x7FFFFFFF"/>
 			</Component> 
 			<Param parent="render"/>
 		</Object>
--->
 
+<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
 				<Param from_file="false"/>
-				<Param is_static="true"/>
 				<Param model_type="card"/>
 				<Param model_card_left="-1000.0"/>
 				<Param model_card_right="1000.0"/>
@@ -388,19 +390,21 @@
 				<Param shape_norm_y="-1.0"/>
 				<Param shape_norm_z="0.0"/>
 				<Param shape_d="0.0"/>
+				<Param collide_mask="0x7FFFFFFF"/>
 			</Component> 
 			<Param parent="render"/>
+			<Param is_steady="true"/>
 			<Param rot_p="-90.0"/>
 		</Object>
+-->
 		
 		<Object type="StaticActor" id="beachhouse2">
 			<Component type="Model">
 				<Param from_file="true"/>
-				<Param is_static="true"/>
 				<Param model_file="buildings/beachhouse2"/>
-				<Param scale_x="5.0"/>
-				<Param scale_y="5.0"/>
-				<Param scale_z="5.0"/>
+				<Param scale_x="2.0"/>
+				<Param scale_y="2.0"/>
+				<Param scale_z="2.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -409,19 +413,19 @@
 				<Param shape_type="box"/>
 			</Component> 
 			<Param parent="render"/>
+			<Param is_steady="true"/>
 			<Param pos_x="0.0"/>
 			<Param pos_y="200.0"/>
-			<Param pos_z="46.0"/>
+			<Param pos_z="250.0"/>
 		</Object>
 
 		<Object type="StaticActor" id="cityhall">
 			<Component type="Model">
 				<Param from_file="true"/>
-				<Param is_static="true"/>
 				<Param model_file="buildings/cityhall"/>
-				<Param scale_x="3.0"/>
-				<Param scale_y="3.0"/>
-				<Param scale_z="3.0"/>
+				<Param scale_x="2.0"/>
+				<Param scale_y="2.0"/>
+				<Param scale_z="2.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -430,9 +434,10 @@
 				<Param shape_type="box"/>
 			</Component> 
 			<Param parent="render"/>
+			<Param is_steady="true"/>
 			<Param pos_x="450.0"/>
 			<Param pos_y="300.0"/>
-			<Param pos_z="46.0"/>
+			<Param pos_z="250.0"/>
 		</Object>
 
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->

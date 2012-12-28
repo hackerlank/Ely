@@ -118,7 +118,7 @@ public:
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
-	 * @return The internal mutex
+	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
 
@@ -182,7 +182,8 @@ protected:
 
 #ifdef DEBUG
 	bool mPhysicsDebugEnabled;
-	static void togglePhysicsDebug(const Event* event, void* data);
+	SMARTPTR(EventCallbackInterface<GameManager>::EventCallbackData) mPhysicsDebugData;
+	void togglePhysicsDebug(const Event* event);
 #endif
 
 	///The (reentrant) mutex associated with this manager.

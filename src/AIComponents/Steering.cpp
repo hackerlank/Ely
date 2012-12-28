@@ -33,6 +33,10 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"Steering::Steering: invalid GameAIManager")
+	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
+			"invalid GamePhysicsManager")
+	//get bullet world reference
+	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
 	mTmpl = tmpl;
 	mAICharacter = NULL;
 	mUpdatePtr = NULL;
@@ -76,18 +80,44 @@ bool Steering::initialize()
 	//
 	float floatParam;
 	//mass
-	floatParam = (float) atof(mTmpl->parameter(std::string("mass")).c_str());
+	floatParam = (float) strtof(mTmpl->parameter(std::string("mass")).c_str(), NULL);
 	floatParam > 0.0 ? mMass = floatParam : mMass = 1.0;
 	//movt_force
-	floatParam = (float) atof(
-			mTmpl->parameter(std::string("movt_force")).c_str());
+	floatParam = (float) strtof(
+			mTmpl->parameter(std::string("movt_force")).c_str(), NULL);
 	floatParam > 0.0 ? mMovtForce = floatParam : mMovtForce = 1.0;
 	//max_force
-	floatParam = (float) atof(
-			mTmpl->parameter(std::string("max_force")).c_str());
+	floatParam = (float) strtof(
+			mTmpl->parameter(std::string("max_force")).c_str(), NULL);
 	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
 	//the type of the updatable item
 	mType = mTmpl->parameter(std::string("controlled_type"));
+	//obstacle hit mask
+	std::string obstacleHitMask = mTmpl->parameter(std::string("obstacle_hit_mask"));
+	if (obstacleHitMask == std::string("all_on"))
+	{
+		mObstacleHitMask = BitMask32::all_on();
+	}
+	else if (obstacleHitMask == std::string("all_off"))
+	{
+		mObstacleHitMask = BitMask32::all_off();
+	}
+	else
+	{
+		uint32_t mask = (uint32_t) strtol(obstacleHitMask.c_str(), NULL, 0);
+		mObstacleHitMask.set_word(mask);
+#ifdef DEBUG
+		mObstacleHitMask.write(std::cout, 0);
+#endif
+	}
+	//obstacle max distance fraction
+	floatParam =
+			(float) strtof(
+					mTmpl->parameter(
+							std::string("obstacle_max_distance_fraction")).c_str(),
+					NULL);
+	floatParam > 0.0 ? mObstacleMaxDistanceFraction = floatParam :
+			mObstacleMaxDistanceFraction = 1.0;
 	//
 	return result;
 }
@@ -97,6 +127,12 @@ void Steering::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
 	//setup event callbacks if any
 	setupEvents();
 }
@@ -105,6 +141,12 @@ void Steering::onAddToSceneSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
 
 	//enable the component
 	if (mEnabled)
@@ -123,11 +165,19 @@ void Steering::enable()
 		return;
 	}
 
+	//enable only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
+	{
+		return;
+	}
+
 	//create the AICharacter...
 	mAICharacter = new AICharacter(std::string(mComponentId),
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
-	//...add it to the AIWorld
+	//...add it to the AIWorld ...
 	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
+	//...get a reference to its AIBehaviors
+	_steering = mAICharacter->get_ai_behaviors();
 
 	//check the type of the updatable item
 	if ((mType == std::string("character_controller"))
@@ -149,6 +199,11 @@ void Steering::enable()
 		//reset events' sending
 		mSteeringForceOnSent = false;
 		mSteeringForceOffSent = true;
+		//set obstacle avoidance distance and squared
+		mObstacleMaxDist =
+				mObstacleMaxDistanceFraction
+						* mAICharacter->get_node_path().get_bounds()->as_bounding_sphere()->get_radius();
+		mObstacleMaxDistSquared = pow(mObstacleMaxDist, 2);
 		//enable movement/rotation
 		enableMovRot(true);
 	}
@@ -172,6 +227,12 @@ void Steering::disable()
 	HOLDMUTEX(mMutex)
 
 	if ((not mIsEnabled) or (not mOwnerObject))
+	{
+		return;
+	}
+
+	//disable only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
 	{
 		return;
 	}
@@ -279,11 +340,8 @@ void Steering::updateNodePath(float dt)
 	mAICharacter->update();
 }
 
-static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt);
-
 void Steering::updateController(float dt)
 {
-	AIBehaviors *_steering = mAICharacter->get_ai_behaviors();
 
 	if (!_steering->is_off(_steering->_none))
 	{
@@ -292,7 +350,7 @@ void Steering::updateController(float dt)
 		{
 			enableMovRot(true);
 		}
-		LVecBase3f steering_force = calculate_prioritized(_steering, dt);
+		LVecBase3f steering_force = calculate_prioritized(dt);
 		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
 		mAICharacter->_velocity = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
@@ -389,31 +447,9 @@ void Steering::enableMovRot(bool enable)
 	mMovRotEnabled = enable;
 }
 
-//TypedObject semantics: hardcoded
-TypeHandle Steering::_type_handle;
-
-///AIBehaviors::calculate_prioritized rewritten
-//helpers' declarations
-static LVecBase3f do_seek(Seek *_seek_obj);
-static void flee_activate(ListFlee::iterator& _flee_itr);
-static LVecBase3f do_flee(ListFlee::iterator& _flee_itr);
-static LVecBase3f do_pursue(Pursue *_pursue_obj);
-static void evade_activate(ListEvade::iterator& _evade_itr);
-static LVecBase3f do_evade(ListEvade::iterator& _evade_itr);
-static void arrival_activate(Arrival *_arrival_obj);
-static LVecBase3f do_arrival(Arrival *_arrival_obj, float dt);
-static const float _PI = 3.141592654;
-static void flock_activate(AIBehaviors *_steering);
-static LVecBase3f do_flock(AIBehaviors *_steering);
-static LVecBase3f do_wander(Wander * _wander_obj);
-static void obstacle_avoidance_activate(
-		ObstacleAvoidance *_obstacle_avoidance_obj);
-static LVecBase3f do_obstacle_avoidance(
-		ObstacleAvoidance *_obstacle_avoidance_obj);
-static void do_follow(PathFollow *_path_follow_obj);
-
-//
-static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
+///XXX AIBehaviors::<Steering methods> rewritten
+//calculate_prioritized
+LVecBase3f Steering::calculate_prioritized(float dt)
 {
 	LVecBase3f force;
 
@@ -421,12 +457,12 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 	{
 		if (_steering->_conflict)
 		{
-			force = do_seek(_steering->_seek_obj)
+			force = do_seek()
 					* _steering->_seek_obj->_seek_weight;
 		}
 		else
 		{
-			force = do_seek(_steering->_seek_obj);
+			force = do_seek();
 		}
 		_steering->accumulate_force("seek", force);
 	}
@@ -437,7 +473,7 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 				_steering->_flee_itr != _steering->_flee_list.end();
 				_steering->_flee_itr++)
 		{
-			flee_activate(_steering->_flee_itr);
+			flee_activate();
 		}
 	}
 
@@ -451,12 +487,12 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 			{
 				if (_steering->_conflict)
 				{
-					force = do_flee(_steering->_flee_itr)
+					force = do_flee()
 							* _steering->_flee_itr->_flee_weight;
 				}
 				else
 				{
-					force = do_flee(_steering->_flee_itr);
+					force = do_flee();
 				}
 				_steering->accumulate_force("flee", force);
 			}
@@ -467,12 +503,12 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 	{
 		if (_steering->_conflict)
 		{
-			force = do_pursue(_steering->_pursue_obj)
+			force = do_pursue()
 					* _steering->_pursue_obj->_pursue_weight;
 		}
 		else
 		{
-			force = do_pursue(_steering->_pursue_obj);
+			force = do_pursue();
 		}
 		_steering->accumulate_force("pursue", force);
 	}
@@ -483,7 +519,7 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 				_steering->_evade_itr != _steering->_evade_list.end();
 				_steering->_evade_itr++)
 		{
-			evade_activate(_steering->_evade_itr);
+			evade_activate();
 		}
 	}
 
@@ -497,12 +533,12 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 			{
 				if (_steering->_conflict)
 				{
-					force = (do_evade(_steering->_evade_itr))
+					force = (do_evade())
 							* (_steering->_evade_itr->_evade_weight);
 				}
 				else
 				{
-					force = do_evade(_steering->_evade_itr);
+					force = do_evade();
 				}
 				_steering->accumulate_force("evade", force);
 			}
@@ -511,29 +547,29 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 
 	if (_steering->is_on(_steering->_arrival_activate))
 	{
-		arrival_activate(_steering->_arrival_obj);
+		arrival_activate();
 	}
 
 	if (_steering->is_on(_steering->_arrival))
 	{
-		force = do_arrival(_steering->_arrival_obj, dt);
+		force = do_arrival(dt);
 		_steering->accumulate_force("arrival", force);
 	}
 
 	if (_steering->is_on(_steering->_flock_activate))
 	{
-		flock_activate(_steering);
+		flock_activate();
 	}
 
 	if (_steering->is_on(_steering->_flock))
 	{
 		if (_steering->_conflict)
 		{
-			force = do_flock(_steering) * _steering->_flock_weight;
+			force = do_flock() * _steering->_flock_weight;
 		}
 		else
 		{
-			force = do_flock(_steering);
+			force = do_flock();
 		}
 		_steering->accumulate_force("flock", force);
 	}
@@ -542,31 +578,24 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 	{
 		if (_steering->_conflict)
 		{
-			force = do_wander(_steering->_wander_obj)
+			force = do_wander()
 					* _steering->_wander_obj->_wander_weight;
 		}
 		else
 		{
-			force = do_wander(_steering->_wander_obj);
+			force = do_wander();
 		}
 		_steering->accumulate_force("wander", force);
 	}
 
 	if (_steering->is_on(_steering->_obstacle_avoidance_activate))
 	{
-		obstacle_avoidance_activate(_steering->_obstacle_avoidance_obj);
+		obstacle_avoidance_activate_bullet();
 	}
 
 	if (_steering->is_on(_steering->_obstacle_avoidance))
 	{
-		if (_steering->_conflict)
-		{
-			force = do_obstacle_avoidance(_steering->_obstacle_avoidance_obj);
-		}
-		else
-		{
-			force = do_obstacle_avoidance(_steering->_obstacle_avoidance_obj);
-		}
+		force = do_obstacle_avoidance_bullet();
 		_steering->accumulate_force("obstacle_avoidance", force);
 	}
 
@@ -574,7 +603,7 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 	{
 		if (_steering->_path_follow_obj->_start)
 		{
-			do_follow(_steering->_path_follow_obj);
+			do_follow();
 		}
 	}
 
@@ -624,8 +653,9 @@ static LVecBase3f calculate_prioritized(AIBehaviors *_steering, float dt)
 
 //helpers
 //seek
-static LVecBase3f do_seek(Seek *_seek_obj)
+LVecBase3f Steering::do_seek()
 {
+	Seek *_seek_obj = _steering->_seek_obj;
 	double target_distance = (_seek_obj->_seek_position
 			- _seek_obj->_ai_char->_ai_char_np.get_pos(
 					_seek_obj->_ai_char->_window_render)).get_xy().length();
@@ -644,8 +674,9 @@ static LVecBase3f do_seek(Seek *_seek_obj)
 	return (desired_force);
 }
 //flee
-static void flee_activate(ListFlee::iterator& _flee_itr)
+void Steering::flee_activate()
 {
+	ListFlee::iterator& _flee_itr = _steering->_flee_itr;
 	LVecBase3f dirn;
 	double distance;
 
@@ -668,8 +699,9 @@ static void flee_activate(ListFlee::iterator& _flee_itr)
 		_flee_itr->_flee_activate_done = true;
 	}
 }
-static LVecBase3f do_flee(ListFlee::iterator& _flee_itr)
+LVecBase3f Steering::do_flee()
 {
+	ListFlee::iterator& _flee_itr = _steering->_flee_itr;
 	LVecBase3f dirn;
 	double distance;
 	LVecBase3f desired_force;
@@ -701,8 +733,9 @@ static LVecBase3f do_flee(ListFlee::iterator& _flee_itr)
 	}
 }
 //pursue
-static LVecBase3f do_pursue(Pursue *_pursue_obj)
+LVecBase3f Steering::do_pursue()
 {
+	Pursue *_pursue_obj = _steering->_pursue_obj;
 	assert(_pursue_obj->_pursue_target && "pursue target not assigned");
 
 	LVecBase3f present_pos = _pursue_obj->_ai_char->_ai_char_np.get_pos(
@@ -734,8 +767,9 @@ static LVecBase3f do_pursue(Pursue *_pursue_obj)
 	return (desired_force);
 }
 //evade
-static void evade_activate(ListEvade::iterator& _evade_itr)
+void Steering::evade_activate()
 {
+	ListEvade::iterator& _evade_itr = _steering->_evade_itr;
 	_evade_itr->_evade_direction = (_evade_itr->_ai_char->_ai_char_np.get_pos(
 			_evade_itr->_ai_char->_window_render)
 			- _evade_itr->_evade_target.get_pos(
@@ -750,8 +784,9 @@ static void evade_activate(ListEvade::iterator& _evade_itr)
 		_evade_itr->_evade_activate_done = true;
 	}
 }
-static LVecBase3f do_evade(ListEvade::iterator& _evade_itr)
+LVecBase3f Steering::do_evade()
 {
+	ListEvade::iterator& _evade_itr = _steering->_evade_itr;
 	assert(_evade_itr->_evade_target && "evade target not assigned");
 
 	_evade_itr->_evade_direction = _evade_itr->_ai_char->_ai_char_np.get_pos(
@@ -786,8 +821,9 @@ static LVecBase3f do_evade(ListEvade::iterator& _evade_itr)
 	}
 }
 //arrival
-static void arrival_activate(Arrival *_arrival_obj)
+void Steering::arrival_activate()
 {
+	Arrival *_arrival_obj = _steering->_arrival_obj;
 	LVecBase3f dirn;
 	if (_arrival_obj->_arrival_type)
 	{
@@ -825,8 +861,9 @@ static void arrival_activate(Arrival *_arrival_obj)
 		}
 	}
 }
-static LVecBase3f do_arrival(Arrival *_arrival_obj, float dt)
+LVecBase3f Steering::do_arrival(float dt)
 {
+	Arrival *_arrival_obj = _steering->_arrival_obj;
 	LVecBase3f direction_to_target;
 	double distance;
 
@@ -896,7 +933,7 @@ static LVecBase3f do_arrival(Arrival *_arrival_obj, float dt)
 	return (LVecBase3f(0.0, 0.0, 0.0));
 }
 //flock
-static void flock_activate(AIBehaviors *_steering)
+void Steering::flock_activate()
 {
 	if (_steering->is_on(_steering->_seek) || _steering->is_on(_steering->_flee)
 			|| _steering->is_on(_steering->_pursue)
@@ -907,7 +944,7 @@ static void flock_activate(AIBehaviors *_steering)
 		_steering->turn_on("flock");
 	}
 }
-static LVecBase3f do_flock(AIBehaviors *_steering)
+LVecBase3f Steering::do_flock()
 {
 	//! Initialize variables required to compute the flocking force on the ai char.
 	unsigned int neighbor_count = 0;
@@ -935,12 +972,12 @@ static LVecBase3f do_flock(AIBehaviors *_steering)
 			ai_char_heading.normalize();
 
 			//! Check if the current unit is a neighbor.
-			if (dist_vect.get_xy().dot(ai_char_heading.get_xy())
+			if ((dist_vect.get_xy().dot(ai_char_heading.get_xy())
 					> ((dist_vect.get_xy().length())
 							* (ai_char_heading.get_xy().length())
 							* cos(
 									_steering->_flock_group->_flock_vcone_angle
-											* (_PI / 180)))
+											* (PHYSICS_PI / 180))))
 					&& (dist_vect.get_xy().length()
 							< _steering->_flock_group->_flock_vcone_radius))
 			{
@@ -1002,7 +1039,7 @@ static LVecBase3f do_flock(AIBehaviors *_steering)
 			+ cohesion_force * _steering->_flock_group->_cohesion_wt);
 }
 //wander
-double rand_float()
+static double rand_float()
 {
 	const static double rand_max = 0x7fff;
 	return ((rand()) / (rand_max + 1.0));
@@ -1011,8 +1048,9 @@ static double random_clamped()
 {
 	return (rand_float() - rand_float());
 }
-static LVecBase3f do_wander(Wander * _wander_obj)
+LVecBase3f Steering::do_wander()
 {
+	Wander * _wander_obj = _steering->_wander_obj;
 	LVecBase3f present_pos = _wander_obj->_ai_char->get_node_path().get_pos(
 			_wander_obj->_ai_char->get_char_render());
 	// Create the random slices to enable random movement of wander for x,y,z respectively
@@ -1081,65 +1119,29 @@ static LVecBase3f do_wander(Wander * _wander_obj)
 	return desired_force;
 }
 //obstacle avoidance
-static bool obstacle_detection(ObstacleAvoidance *_obstacle_avoidance_obj)
+void Steering::obstacle_avoidance_activate_bullet()
 {
-	// Calculate the volume of the AICharacter with respect to render
-	SMARTPTR(BoundingVolume)np_bounds = _obstacle_avoidance_obj->_ai_char->get_node_path().get_bounds();
-	CSMARTPTR(BoundingSphere) np_sphere = np_bounds->as_bounding_sphere();
-	LVecBase3f avoidance(0.0, 0.0, 0.0);
-	double distance = 0x7fff;
-	double expanded_radius;
-	LVecBase3f to_obstacle;
-	LVecBase3f prev_avoidance;
-	for (unsigned int i = 0;
-			i < _obstacle_avoidance_obj->_ai_char->_world->_obstacles.size();
-			++i)
-	{
-		SMARTPTR(BoundingVolume) bounds = _obstacle_avoidance_obj->_ai_char->_world->_obstacles[i].get_bounds();
-		CSMARTPTR(BoundingSphere) bsphere = bounds->as_bounding_sphere();
-		LVecBase3f near_obstacle =
-				_obstacle_avoidance_obj->_ai_char->_world->_obstacles[i].get_pos()
-						- _obstacle_avoidance_obj->_ai_char->get_node_path().get_pos();
-		// Check if it's the nearest obstacle, If so initialize as the nearest obstacle
-		if ((near_obstacle.get_xy().length() < distance)
-				&& (_obstacle_avoidance_obj->_ai_char->_world->_obstacles[i].get_pos().get_xy()
-						!= _obstacle_avoidance_obj->_ai_char->get_node_path().get_pos().get_xy()))
-		{
-			_obstacle_avoidance_obj->_nearest_obstacle =
-					_obstacle_avoidance_obj->_ai_char->_world->_obstacles[i];
-			distance = near_obstacle.get_xy().length();
-			expanded_radius = bsphere->get_radius() + np_sphere->get_radius();
-		}
-	}
-	LVecBase3f feeler =
-			_obstacle_avoidance_obj->_feeler
-					* _obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
-							_obstacle_avoidance_obj->_ai_char->get_node_path(),
-							LVector3f::forward());
-	feeler.normalize();
-	feeler *= (expanded_radius + np_sphere->get_radius());
-	to_obstacle = _obstacle_avoidance_obj->_nearest_obstacle.get_pos()
-			- _obstacle_avoidance_obj->_ai_char->get_node_path().get_pos();
-	LVector3f line_vector =
+	ObstacleAvoidance *_obstacle_avoidance_obj = _steering->_obstacle_avoidance_obj;
+	//ray cast direction (already normalized)
+	LVecBase3f forwardDirection =
 			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
 					_obstacle_avoidance_obj->_ai_char->get_node_path(),
-					LVector3f::forward());
-	LVecBase3f project = (to_obstacle.dot(line_vector) * line_vector)
-			/ line_vector.length_squared();
-	LVecBase3f perp = project - to_obstacle;
-	// If the nearest obstacle will collide with our AICharacter then send obstacle detection as true
-	if ((_obstacle_avoidance_obj->_nearest_obstacle)
-			&& (perp.length() < expanded_radius - np_sphere->get_radius())
-			&& (project.length() < feeler.length()))
-	{
-		return true;
-	}
-	return false;
-}
-static void obstacle_avoidance_activate(
-		ObstacleAvoidance *_obstacle_avoidance_obj)
-{
-	if (obstacle_detection(_obstacle_avoidance_obj))
+					-LVector3f::forward());
+//	forwardDirection.normalize();
+	//from_pos = _ai_char pos
+	LPoint3f fromPos =
+			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_point(
+					_obstacle_avoidance_obj->_ai_char->get_node_path(),
+					LPoint3f::zero());
+	//to_pos = very far from _ai_char pos along forwardDirection
+	LPoint3f toPos = fromPos + forwardDirection * PHYSICS_MAX_DISTANCE;
+	//detect obstacles
+	BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos, toPos,
+			mObstacleHitMask);
+	//check if hit and at what distance
+	if (result.has_hit()
+			and ((result.get_hit_pos() - fromPos).get_xy().length_squared()
+					< mObstacleMaxDistSquared))
 	{
 		_obstacle_avoidance_obj->_ai_char->_steering->turn_off(
 				"obstacle_avoidance_activate");
@@ -1147,35 +1149,40 @@ static void obstacle_avoidance_activate(
 				"obstacle_avoidance");
 	}
 }
-static LVecBase3f do_obstacle_avoidance(
-		ObstacleAvoidance *_obstacle_avoidance_obj)
+LVecBase3f Steering::do_obstacle_avoidance_bullet()
 {
-	LVecBase3f offset =
-			_obstacle_avoidance_obj->_ai_char->get_node_path().get_pos()
-					- _obstacle_avoidance_obj->_nearest_obstacle.get_pos();
-	SMARTPTR(BoundingVolume)bounds =_obstacle_avoidance_obj->_nearest_obstacle.get_bounds();
-	CSMARTPTR(BoundingSphere)bsphere = bounds->as_bounding_sphere();
-	SMARTPTR(BoundingVolume)np_bounds = _obstacle_avoidance_obj->_ai_char->get_node_path().get_bounds();
-	CSMARTPTR(BoundingSphere)np_sphere = np_bounds->as_bounding_sphere();
-	double distance_needed = offset.get_xy().length() - bsphere->get_radius()
-			- np_sphere->get_radius();
-	if ((obstacle_detection(_obstacle_avoidance_obj)))
+	ObstacleAvoidance *_obstacle_avoidance_obj = _steering->_obstacle_avoidance_obj;
+	//ray cast direction (already normalized)
+	LVecBase3f forwardDirection =
+			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
+					_obstacle_avoidance_obj->_ai_char->get_node_path(),
+					-LVector3f::forward());
+//	forwardDirection.normalize();
+	//from_pos = _ai_char pos
+	LPoint3f fromPos =
+			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_point(
+					_obstacle_avoidance_obj->_ai_char->get_node_path(),
+					LPoint3f::zero());
+	//to_pos = very far from _ai_char pos along forwardDirection
+	LPoint3f toPos = fromPos + forwardDirection * PHYSICS_MAX_DISTANCE;
+	//detect obstacles
+	BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos, toPos,
+			mObstacleHitMask);
+	//check if hit and at what distance
+	if (result.has_hit()
+			and ((result.get_hit_pos() - fromPos).get_xy().length_squared()
+					< mObstacleMaxDistSquared))
 	{
-		LVecBase3f direction =
-				_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
-						_obstacle_avoidance_obj->_ai_char->get_node_path(),
-						LVector3f::forward());
-		direction.normalize();
-		float forward_component = offset.dot(direction);
-		LVecBase3f projection = forward_component * direction;
-		LVecBase3f perpendicular_component = offset - projection;
-		double p = perpendicular_component.length();
-		perpendicular_component.normalize();
-		LVecBase3f avoidance = perpendicular_component;
-		// The more closer the obstacle, the more force it generates
-		avoidance = (avoidance
-				* _obstacle_avoidance_obj->_ai_char->get_max_force()
-				* _obstacle_avoidance_obj->_ai_char->_movt_force) / (p + 0.01);
+		//there is an obstacle to avoid
+		//get normal hit direction (already normalized)
+		LVector3f hitNormal = result.get_hit_normal();
+		//get the forwardDirection normal component
+		LVector3f normalComponent = hitNormal * forwardDirection.dot(hitNormal);
+		//calculate avoidance by reverting the forwardDirection normal component
+		LVecBase3f avoidance = (forwardDirection - 2 * normalComponent)
+				* (mObstacleMaxDist
+						* _obstacle_avoidance_obj->_ai_char->get_max_force()
+						* _obstacle_avoidance_obj->_ai_char->_movt_force);
 		return avoidance;
 	}
 	_obstacle_avoidance_obj->_ai_char->_steering->turn_on(
@@ -1185,8 +1192,11 @@ static LVecBase3f do_obstacle_avoidance(
 	return LVecBase3f(0, 0, 0);
 }
 //follow
-static void do_follow(PathFollow *_path_follow_obj)
+void Steering::do_follow()
 {
+	PathFollow *_path_follow_obj;
 }
 
+//TypedObject semantics: hardcoded
+TypeHandle Steering::_type_handle;
 

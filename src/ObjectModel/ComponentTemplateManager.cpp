@@ -37,9 +37,7 @@ ComponentTemplateManager::~ComponentTemplateManager()
 	{
 		ComponentTemplateTable::iterator iter = mComponentTemplates.begin();
 		ComponentType compType = iter->first;
-		PRINT(
-				"Removing component template for type '" << std::string(compType) << "'");
-		mComponentTemplates.erase(iter);
+		removeComponentTemplate(compType);
 	}
 	std::cout << std::endl;
 }
@@ -71,16 +69,18 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 }
 
 bool ComponentTemplateManager::removeComponentTemplate(
-		ComponentType componentID)
+		ComponentType componentType)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentID);
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
 	if (it == mComponentTemplates.end())
 	{
 		return false;
 	}
+	PRINT(
+			"Removing component template for type '" << componentType << "'");
 	mComponentTemplates.erase(it);
 	return true;
 }

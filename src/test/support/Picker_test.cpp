@@ -15,28 +15,32 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/support/SupportSuiteFixture.h
+ * \file /Ely/src/test/support/Picker_test.cpp
  *
- * \date 07/mag/2012 (18:15:46)
+ * \date 26/dic/2012 (10:58:28)
  * \author marco
  */
 
-#ifndef SUPPORTSUITEFIXTURE_H_
-#define SUPPORTSUITEFIXTURE_H_
+#include "SupportSuiteFixture.h"
 
-#include <boost/test/unit_test.hpp>
-#include "Support/FirstPersonCamera.h"
-#include "Support/FSM.h"
-#include "Support/Picker.h"
-
-struct SupportSuiteFixture
+struct PickerTestCaseFixture
 {
-	SupportSuiteFixture()
+	PickerTestCaseFixture()
 	{
 	}
-	~SupportSuiteFixture()
+	~PickerTestCaseFixture()
 	{
 	}
 };
 
-#endif /* SUPPORTSUITEFIXTURE_H_ */
+/// Support suite
+BOOST_FIXTURE_TEST_SUITE(Support, SupportSuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(TEST)
+{
+	BOOST_TEST_MESSAGE("TESTING");
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Support suite

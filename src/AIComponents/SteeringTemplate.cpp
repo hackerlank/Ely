@@ -80,6 +80,8 @@ void SteeringTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
 	mParameterTable.insert(ParameterNameValue("movt_force", "1.0"));
 	mParameterTable.insert(ParameterNameValue("max_force", "1.0"));
+	mParameterTable.insert(ParameterNameValue("obstacle_hit_mask", "0x80000000"));
+	mParameterTable.insert(ParameterNameValue("obstacle_max_distance_fraction", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

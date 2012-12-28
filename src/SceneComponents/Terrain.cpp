@@ -68,23 +68,23 @@ bool Terrain::initialize()
 
 	bool result = true;
 	//get scale
-	float heightScale = atof(
-			mTmpl->parameter(std::string("height_scale")).c_str());
+	float heightScale = strtof(
+			mTmpl->parameter(std::string("height_scale")).c_str(), NULL);
 	if (heightScale <= 0.0)
 	{
 		heightScale = 1.0;
 	}
-	float widthScale = atof(
-			mTmpl->parameter(std::string("width_scale")).c_str());
+	float widthScale = strtof(
+			mTmpl->parameter(std::string("width_scale")).c_str(), NULL);
 	if (widthScale <= 0.0)
 	{
 		widthScale = 1.0;
 	}
 	//get LOD
-	float nearPercent = atof(
-			mTmpl->parameter(std::string("near_percent")).c_str());
-	float farPercent = atof(
-			mTmpl->parameter(std::string("far_percent")).c_str());
+	float nearPercent = strtof(
+			mTmpl->parameter(std::string("near_percent")).c_str(), NULL);
+	float farPercent = strtof(
+			mTmpl->parameter(std::string("far_percent")).c_str(), NULL);
 	if ((nearPercent <= 0.0) or (farPercent >= 1.0)
 			or (nearPercent >= farPercent))
 	{
@@ -92,7 +92,8 @@ bool Terrain::initialize()
 		nearPercent = 0.1;
 	}
 	//get block size
-	int blockSize = atoi(mTmpl->parameter(std::string("block_size")).c_str());
+	int blockSize = strtol(mTmpl->parameter(std::string("block_size")).c_str(),
+			NULL, 0);
 	if (blockSize <= 0)
 	{
 		blockSize = 64;
@@ -123,8 +124,8 @@ bool Terrain::initialize()
 	//get focal point
 	mFocalPointObject = ObjectId(mTmpl->parameter(std::string("focal_point")));
 	//get minimum level
-	int minimumLevel = atoi(
-			mTmpl->parameter(std::string("minimum_level")).c_str());
+	int minimumLevel = strtol(
+			mTmpl->parameter(std::string("minimum_level")).c_str(), NULL, 0);
 	if (minimumLevel <= 0)
 	{
 		minimumLevel = 0;
@@ -133,14 +134,14 @@ bool Terrain::initialize()
 	PNMImage heightField(
 			Filename(mTmpl->parameter(std::string("heightfield_file"))));
 	//get texture scale
-	float textureUscale = atof(
-			mTmpl->parameter(std::string("texture_uscale")).c_str());
+	float textureUscale = strtof(
+			mTmpl->parameter(std::string("texture_uscale")).c_str(), NULL);
 	if (textureUscale <= 0.0)
 	{
 		textureUscale = 1.0;
 	}
-	float textureVscale = atof(
-			mTmpl->parameter(std::string("texture_vscale")).c_str());
+	float textureVscale = strtof(
+			mTmpl->parameter(std::string("texture_vscale")).c_str(), NULL);
 	if (textureVscale <= 0.0)
 	{
 		textureVscale = 1.0;
