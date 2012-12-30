@@ -156,10 +156,11 @@
 				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
 			<Param parent=""/>
-			<Param pos_x="50.0"/>
-			<Param pos_y="-800.0"/>
-			<Param pos_z="400.0"/>
+			<Param pos_x="750.0"/>
+			<Param pos_y="-300.0"/>
+			<Param pos_z="600.0"/>
 			<Param rot_p="-15.0"/>
+			<Param rot_h="0.0"/>
 		</Object>
 		
 		<Object type="Instanceable" id="Smiley1" priority="100">
@@ -186,10 +187,10 @@
 		<Object type="InstancedActor" id="InstancedSmiley1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
-			<Param pos_x="100.0"/>
-			<Param pos_y="0.0"/>
-			<Param pos_z="300.0"/>
-			<Param rot_h="-90.0"/>
+			<Param pos_x="850.0"/>
+			<Param pos_y="750.0"/>
+			<Param pos_z="400.0"/>
+			<Param rot_h="180.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 			<Component type="RigidBody">
@@ -213,9 +214,9 @@
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
-			<Param pos_x="120.0"/>
-			<Param pos_y="300.0"/>
-			<Param pos_z="300.0"/>
+			<Param pos_x="500.0"/>
+			<Param pos_y="700.0"/>
+			<Param pos_z="350.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -281,11 +282,11 @@
 			<Component type="Sound3d">
 				<Param sound_files="audio/sfx/GUI_rollover.wav"/>
 			</Component>
-			<Param parent="render"/>
-			<Param pos_x="180.0"/>
-			<Param pos_y="250.0"/>
-			<Param pos_z="300.0"/>
-			<Param rot_h="-90.0"/>
+			<Param parent="render"/>			
+			<Param pos_x="800.0"/>
+			<Param pos_y="750.0"/>
+			<Param pos_z="400.0"/>
+			<Param rot_h="180.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
@@ -337,10 +338,10 @@
 				<Param sound_files="models/audio/sfx/GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
-			<Param pos_x="50.0"/>
-			<Param pos_y="50.0"/>
-			<Param pos_z="300.0"/>
-			<Param rot_h="0.0"/>
+			<Param pos_x="750.0"/>
+			<Param pos_y="800.0"/>
+			<Param pos_z="350.0"/>
+			<Param rot_h="180.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
@@ -402,9 +403,9 @@
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="buildings/beachhouse2"/>
-				<Param scale_x="2.0"/>
-				<Param scale_y="2.0"/>
-				<Param scale_z="2.0"/>
+				<Param scale_x="8.0"/>
+				<Param scale_y="8.0"/>
+				<Param scale_z="8.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -414,18 +415,19 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param pos_x="0.0"/>
-			<Param pos_y="200.0"/>
-			<Param pos_z="250.0"/>
+			<Param rot_h="-45.0"/>
+			<Param pos_x="623.0"/>
+			<Param pos_y="849.0"/>
+			<Param pos_z="295.0"/>
 		</Object>
 
 		<Object type="StaticActor" id="cityhall">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="buildings/cityhall"/>
-				<Param scale_x="2.0"/>
-				<Param scale_y="2.0"/>
-				<Param scale_z="2.0"/>
+				<Param scale_x="8.0"/>
+				<Param scale_y="8.0"/>
+				<Param scale_z="8.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -435,9 +437,10 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param pos_x="450.0"/>
-			<Param pos_y="300.0"/>
-			<Param pos_z="250.0"/>
+			<Param rot_h="105.0"/>
+			<Param pos_x="3404.0"/>
+			<Param pos_y="2800.0"/>
+			<Param pos_z="-116.0"/>
 		</Object>
 
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->

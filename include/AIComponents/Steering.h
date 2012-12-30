@@ -34,6 +34,20 @@
 #include <arrival.h>
 #include <wander.h>
 #include <obstacleAvoidance.h>
+
+///XXX: conflicting declaration: ‘NodeArray’
+//aiPathFinder.h: ‘typedef class std::vector<Node*, std::allocator<Node*> > NodeArray’
+//btQuantizedBvh.h: ‘typedef class btAlignedObjectArray<btOptimizedBvhNode> NodeArray’
+#ifndef _PATHFINDER_H
+#define _PATHFINDER_H
+#include <meshNode.h>
+#include <lineSegs.h>
+typedef vector<Node *> NodeArrayAI;//redefined
+typedef vector<NodeArrayAI> NavMesh;
+class EXPCL_PANDAAI PathFinder;
+#endif
+#include <pathFind.h>
+
 #include <nodePath.h>
 #include <lvecBase3.h>
 #include <lvecBase2.h>

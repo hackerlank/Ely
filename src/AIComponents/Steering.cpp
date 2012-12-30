@@ -1194,7 +1194,81 @@ LVecBase3f Steering::do_obstacle_avoidance_bullet()
 //follow
 void Steering::do_follow()
 {
-	PathFollow *_path_follow_obj;
+	PathFollow *_path_follow_obj = _steering->_path_follow_obj;
+	if ((_path_follow_obj->_myClock->get_real_time() - _path_follow_obj->_time)
+			> 0.5)
+	{
+		if (_path_follow_obj->_type == "pathfind")
+		{
+			// This 'if' statement when 'true' causes the path to be re-calculated irrespective of target position.
+			// This is done when _dynamice_avoid is active. More computationally expensive.
+			if (_path_follow_obj->_ai_char->_steering->_path_find_obj->_dynamic_avoid)
+			{
+				_path_follow_obj->_ai_char->_steering->_path_find_obj->do_dynamic_avoid();
+				if (_path_follow_obj->check_if_possible())
+				{
+					_path_follow_obj->_path.clear();
+					_path_follow_obj->_ai_char->_steering->_path_find_obj->path_find(
+							_path_follow_obj->_ai_char->_steering->_path_find_obj->_path_find_target);
+					// Ensure that the path size is not 0.
+					if (_path_follow_obj->_path.size() > 0)
+					{
+						_path_follow_obj->_curr_path_waypoint =
+								_path_follow_obj->_path.size() - 1;
+						_path_follow_obj->_dummy.set_pos(
+								_path_follow_obj->_path[_path_follow_obj->_curr_path_waypoint]);
+					}
+					else
+					{
+						// Refresh the _curr_path_waypoint value if path size is <= 0.
+						_path_follow_obj->_curr_path_waypoint = -1;
+					}
+				}
+			}
+			// This 'if' statement causes the path to be re-calculated only when there is a change in target position.
+			// Less computationally expensive.
+			else if (_path_follow_obj->_ai_char->_steering->_path_find_obj->_path_find_target.get_pos(
+					_path_follow_obj->_ai_char->_window_render)
+					!= _path_follow_obj->_ai_char->_steering->_path_find_obj->_prev_position)
+			{
+				if (_path_follow_obj->check_if_possible())
+				{
+					_path_follow_obj->_path.clear();
+					_path_follow_obj->_ai_char->_steering->_path_find_obj->path_find(
+							_path_follow_obj->_ai_char->_steering->_path_find_obj->_path_find_target);
+					// Ensure that the path size is not 0.
+					if (_path_follow_obj->_path.size() > 0)
+					{
+						_path_follow_obj->_curr_path_waypoint =
+								_path_follow_obj->_path.size() - 1;
+						_path_follow_obj->_dummy.set_pos(
+								_path_follow_obj->_path[_path_follow_obj->_curr_path_waypoint]);
+					}
+					else
+					{
+						// Refresh the _curr_path_waypoint value if path size is 0.
+						_path_follow_obj->_curr_path_waypoint = -1;
+					}
+				}
+			}
+			_path_follow_obj->_time =
+					_path_follow_obj->_myClock->get_real_time();
+		}
+	}
+
+	if (_path_follow_obj->_curr_path_waypoint > 0)
+	{
+		double distance =
+				(_path_follow_obj->_path[_path_follow_obj->_curr_path_waypoint]
+						- _path_follow_obj->_ai_char->_ai_char_np.get_pos(
+								_path_follow_obj->_ai_char->_window_render)).get_xy().length();
+		if (distance < 5)
+		{
+			_path_follow_obj->_curr_path_waypoint--;
+			_path_follow_obj->_dummy.set_pos(
+					_path_follow_obj->_path[_path_follow_obj->_curr_path_waypoint]);
+		}
+	}
 }
 
 //TypedObject semantics: hardcoded
