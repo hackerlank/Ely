@@ -187,25 +187,23 @@ void Picker::pickBody(const Event* event)
 					//- BulletGhostNode
 					if (result.get_node()->is_of_type(BulletRigidBodyNode::get_class_type()))
 					{
-						SMARTPTR(BulletRigidBodyNode) pickedBody =
-						DCAST(BulletRigidBodyNode,result.get_node());
-						if (not(pickedBody->is_static() or pickedBody->is_kinematic()))
+						mPickedBody = DCAST(BulletRigidBodyNode,result.get_node());
+						if (not(mPickedBody->is_static() or mPickedBody->is_kinematic()))
 						{
 							//attach bullet picking body node to world
 							mWorld->attach(mPickingBodyNode);
 							mPickingBodyAttached = true;
 							//
-							pickedBody->set_active(true);
-							mPivotPos = result.get_hit_pos() +
-							result.get_hit_normal() * 0.1;
+							mPickedBody->set_active(true);
+							mPickedBody->set_deactivation_enabled(false);
+							mPivotPos = result.get_hit_pos();
 							//
-							NodePath bodyNP(pickedBody);
+							NodePath bodyNP(mPickedBody);
 							LPoint3f pivotLocalPos = bodyNP.get_relative_point(mRender, mPivotPos);
-							mPickingBody->getNodePath().set_pos(mPivotPos);
 							//create constraint
 							mCsPick = new BulletSphericalConstraint(
 									mPickingBodyNode,
-									pickedBody,
+									mPickedBody,
 									LPoint3f::zero(),
 									pivotLocalPos);
 							//and attach it to the world
@@ -253,6 +251,8 @@ void Picker::pickBody(const Event* event)
 			mPickingBodyAttached = false;
 			//delete constraint
 			mCsPick.clear();
+			mPickedBody->set_deactivation_enabled(true);
+			mPickedBody->set_active(false);
 		}
 	}
 }
@@ -284,7 +284,7 @@ AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 				LVector3f vecPivotNear = mPivotPos - pNear;
 				mPivotPos = pNear + (vecFarNear / vecFarNear.length_squared()) *
 				vecPivotNear.dot(vecFarNear);
-				mPickingBody->getNodePath().set_pos(mPivotPos);
+				mCsPick->set_pivot_b(mPivotPos);
 			}
 		}
 	}

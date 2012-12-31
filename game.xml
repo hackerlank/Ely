@@ -421,6 +421,28 @@
 			<Param pos_z="295.0"/>
 		</Object>
 
+		<Object type="StaticActor" id="gazebo">
+			<Component type="Model">
+				<Param from_file="true"/>
+				<Param model_file="buildings/gazebo"/>
+				<Param scale_x="6.0"/>
+				<Param scale_y="6.0"/>
+				<Param scale_z="6.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot_h="0.0"/>
+			<Param pos_x="675.0"/>
+			<Param pos_y="620.0"/>
+			<Param pos_z="278.0"/>
+		</Object>
+		
 		<Object type="StaticActor" id="cityhall">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -443,6 +465,30 @@
 			<Param pos_z="-116.0"/>
 		</Object>
 
+		<Object type="StaticActor" id="bridge">
+			<Component type="Model">
+				<Param from_file="true"/>
+				<Param model_file="buildings/bridge"/>
+				<Param scale_x="0.33"/>
+				<Param scale_y="0.1"/>
+				<Param scale_z="0.1"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot_h="100.0"/>
+			<Param rot_p="5.0"/>
+			<Param rot_r="3.5"/>
+			<Param pos_x="694.0"/>
+			<Param pos_y="1747.0"/>
+			<Param pos_z="136.0"/>
+		</Object>
+		
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
 		<Object type="Render" id="render" priority="1000">
 			<Component type="NodePathWrapper">

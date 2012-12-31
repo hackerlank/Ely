@@ -93,6 +93,7 @@ private:
 	///@{
 	SMARTPTR(EventCallbackInterface<Picker>::EventCallbackData) mPickBodyData;
 	void pickBody(const Event* event);
+	SMARTPTR(BulletRigidBodyNode) mPickedBody;
 	std::string mPickKeyOn, mPickKeyOff;
 	///@}
 	/**
