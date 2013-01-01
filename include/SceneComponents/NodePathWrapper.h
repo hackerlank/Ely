@@ -36,6 +36,8 @@ class NodePathWrapperTemplate;
 /**
  * \brief Component wrapping a predefined NodePath (e.g. render, camera etc...).
  *
+ * On error default NodePath is render.
+ *
  * XML Param(s):
  * - "nodepath"  		|single|no default
  */
@@ -64,6 +66,9 @@ public:
 private:
 	///The NodePath associated to this node path wrapper.
 	NodePath mNodePath;
+
+	///The wrapped NodePath.
+	std::string mWrappedNodePath;
 
 	///TypedObject semantics: hardcoded
 public:

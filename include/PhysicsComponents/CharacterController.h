@@ -163,6 +163,8 @@ private:
 	GamePhysicsManager::ShapeSize mShapeSize;
 	LVector3 mModelDims;
 	float mModelRadius;
+	//use shape of (another object).
+	ObjectId mUseShapeOfId;
 	//any model has a local frame and the tight bounding box is computed
 	//wrt it; so mModelDeltaCenter represents a transform (translation) to
 	//be applied to the model node path so that the middle point of the

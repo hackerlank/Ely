@@ -359,6 +359,32 @@ public:
 #define PHYSICS_MAX_DISTANCE 1000000000.0
 #define PHYSICS_PI 3.141592654
 
+///Define a standard name usable by components:
+/// "ObjectId_ObjectType_ComponentId_ComponentType"
+#define COMPONENT_STANDARD_NAME \
+	std::string(mOwnerObject->objectId()) + "_" \
+	+ std::string(mOwnerObject->objectTmpl()->name()) + "_" \
+	+ std::string(mComponentId) + "_" \
+	+ get_type().get_name(this)
+
+/**
+ * \brief Get an item from a COMPONENT_STANDARD_NAME.
+ *
+ * @param name The COMPONENT_STANDARD_NAME.
+ * @param item One of: "ObjectId", "ObjectType",
+ * "ComponentId", "ComponentType".
+ * @return The item requested.
+ */
+enum COMPONENT_STANDARD_NAME_ITEM
+{
+	ObjectId_item = 0,
+	ObjectType_item = 1,
+	ComponentId_item = 2,
+	ComponentType_item = 3
+};
+std::string getComponentStandardNameItem(const std::string& name,
+		COMPONENT_STANDARD_NAME_ITEM item);
+
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
 

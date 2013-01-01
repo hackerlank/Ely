@@ -56,6 +56,11 @@ const ComponentType Model::componentType() const
 
 void Model::r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& parts)
 {
+	//on empty node return
+	if (node.is_null())
+	{
+		return;
+	}
 	if (node->is_of_type(AnimBundleNode::get_class_type()))
 	{
 		SMARTPTR(AnimBundleNode) bn = DCAST(AnimBundleNode, node.p());
@@ -92,6 +97,35 @@ bool Model::initialize()
 	mFromFile = (
 			mTmpl->parameter(std::string("from_file")) == std::string("false") ?
 					false : true);
+	//get model
+	mModelName = mTmpl->parameter(std::string("model_file"));
+	//get more animations
+	mAnimFileList = mTmpl->parameterList(std::string("anim_files"));
+	//get model if procedurally generated
+	mModelType = mTmpl->parameter(std::string("model_type"));
+	//get card parameters
+	mCardLeft = (float) strtof(
+			mTmpl->parameter(std::string("model_card_left")).c_str(), NULL);
+	mCardRight = (float) strtof(
+			mTmpl->parameter(std::string("model_card_right")).c_str(), NULL);
+	mCardBottom = (float) strtof(
+			mTmpl->parameter(std::string("model_card_bottom")).c_str(), NULL);
+	mCardTop = (float) strtof(
+			mTmpl->parameter(std::string("model_card_top")).c_str(), NULL);
+	//get scaling (default: (1.0,1.0,1.0))
+	mScaleX = strtof(mTmpl->parameter(std::string("scale_x")).c_str(), NULL);
+	mScaleY = strtof(mTmpl->parameter(std::string("scale_y")).c_str(), NULL);
+	mScaleZ = strtof(mTmpl->parameter(std::string("scale_z")).c_str(), NULL);
+	//
+	return result;
+}
+
+void Model::onAddToObjectSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//build model
 	if (mFromFile)
 	{
 		// some declarations
@@ -104,12 +138,13 @@ bool Model::initialize()
 		parts.clear();
 		anims.clear();
 		//setup model (with possible animations)
-		std::string modelName = mTmpl->parameter(std::string("model_file"));
 		mNodePath = mTmpl->windowFramework()->load_model(
-				mTmpl->pandaFramework()->get_models(), Filename(modelName));
+				mTmpl->pandaFramework()->get_models(), Filename(mModelName));
 		if (mNodePath.is_empty())
 		{
-			result = false;
+			//On error loads our favorite blue triangle.
+			mTmpl->windowFramework()->load_default_model(
+					mTmpl->pandaFramework()->get_models());
 		}
 		//find all the bundles into mNodePath.node
 		r_find_bundles(mNodePath.node(), anims, parts);
@@ -152,11 +187,11 @@ bool Model::initialize()
 				{
 					if (j>0)
 					{
-						animName = modelName + '.' + format_string(j);
+						animName = mModelName + '.' + format_string(j);
 					}
 					else
 					{
-						animName = modelName;
+						animName = mModelName;
 					}
 					PRINT("Binding animation '" << (*animBundlesIter)->get_name() << "' with name '"
 							<< animName << "'");
@@ -168,9 +203,7 @@ bool Model::initialize()
 
 			//setup more animations (if any)
 			std::list<std::string>::iterator iter;
-			std::list<std::string> animFileList = mTmpl->parameterList(
-					std::string("anim_files"));
-			for (iter = animFileList.begin(); iter != animFileList.end(); ++iter)
+			for (iter = mAnimFileList.begin(); iter != mAnimFileList.end(); ++iter)
 			{
 				//any "anim_files" string is a "compound" one, i.e. could have the form:
 				// "anim_file1:anim_file2:...:anim_fileN"
@@ -189,7 +222,7 @@ bool Model::initialize()
 								Filename(baseAnimName));
 						if (animNP.is_empty())
 						{
-							result = false;
+							animNP = NodePath();
 						}
 						//find all the bundles into animNP.node
 						r_find_bundles(animNP.node(), anims, parts);
@@ -222,49 +255,39 @@ bool Model::initialize()
 	else
 	{
 		//model is programmatically generated
-		std::string modelType = mTmpl->parameter(std::string("model_type"));
 		//card (e.g. finite plane)
-		if (modelType == std::string("card"))
+		if (mModelType == std::string("card"))
 		{
-			float left = (float) strtof(
-					mTmpl->parameter(std::string("model_card_left")).c_str(), NULL);
-			float right = (float) strtof(
-					mTmpl->parameter(std::string("model_card_right")).c_str(), NULL);
-			float bottom = (float) strtof(
-					mTmpl->parameter(std::string("model_card_bottom")).c_str(), NULL);
-			float top = (float) strtof(
-					mTmpl->parameter(std::string("model_card_top")).c_str(), NULL);
-			if ((right - left) * (top - bottom) == 0.0)
+			if ((mCardRight - mCardLeft) * (mCardTop - mCardBottom) == 0.0)
 			{
-				left = -1.0;
-				right = 1.0;
-				bottom = -1.0;
-				top = 1.0;
+				mCardLeft = -1.0;
+				mCardRight = 1.0;
+				mCardBottom = -1.0;
+				mCardTop = 1.0;
 			}
-			CardMaker card("card" + std::string(mComponentId));
-			card.set_frame(left, right, bottom, top);
+			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+			std::string name = COMPONENT_STANDARD_NAME;
+			CardMaker card("card" + name);
+			card.set_frame(mCardLeft, mCardRight, mCardBottom, mCardTop);
 			mNodePath = NodePath(card.generate());
 		}
 		else
 		{
-			result = false;
+			//On error loads our favorite blue triangle.
+			mTmpl->windowFramework()->load_default_model(
+					mTmpl->pandaFramework()->get_models());
 		}
 	}
-	//Scaling (default: (1.0,1.0,1.0))
-	float scaleX = strtof(mTmpl->parameter(std::string("scale_x")).c_str(), NULL);
-	float scaleY = strtof(mTmpl->parameter(std::string("scale_y")).c_str(), NULL);
-	float scaleZ = strtof(mTmpl->parameter(std::string("scale_z")).c_str(), NULL);
-	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
-	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
-	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
-	//
-	return result;
-}
 
-void Model::onAddToObjectSetup()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	//set scaling (default: (1.0,1.0,1.0))
+	mNodePath.set_sx((mScaleX != 0.0 ? mScaleX : 1.0));
+	mNodePath.set_sy((mScaleY != 0.0 ? mScaleY : 1.0));
+	mNodePath.set_sz((mScaleZ != 0.0 ? mScaleZ : 1.0));
+
+	//Rename the node
+	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+	std::string name = COMPONENT_STANDARD_NAME;
+	mNodePath.set_name(name);
 
 	//set the node path of the object to the
 	//node path of this model

@@ -269,6 +269,8 @@ bool RigidBody::initialize()
 			NULL);
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
 			mCcdEnabled = true : mCcdEnabled = false;
+	//use shape of (another object)
+	mUseShapeOfId = ObjectId(mTmpl->parameter(std::string("use_shape_of")));
 	//
 	return result;
 }
@@ -279,10 +281,8 @@ void RigidBody::onAddToObjectSetup()
 	HOLDMUTEX(mMutex)
 
 	//create a Rigid Body Node
-	std::string name = std::string(mComponentId) + "("
-			+ get_type().get_name(this) + ") of "
-			+ std::string(mOwnerObject->objectId()) + "("
-			+ mOwnerObject->objectTmpl()->name() + ")";
+	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+	std::string name = COMPONENT_STANDARD_NAME;
 	mRigidBodyNode = new BulletRigidBodyNode(name.c_str());
 	//set the physics parameters
 	setPhysicalParameters();
@@ -397,12 +397,11 @@ void RigidBody::setNodePath(const NodePath& nodePath)
 SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeType)
 {
 	//check if it should use shape of another (already) created object
-	ObjectId useShapeOfId = ObjectId(mTmpl->parameter(std::string("use_shape_of")));
-	if (not useShapeOfId.empty())
+	if (not mUseShapeOfId.empty())
 	{
 		SMARTPTR(Object)createdObject =
 		ObjectTemplateManager::GetSingleton().getCreatedObject(
-				useShapeOfId);
+				mUseShapeOfId);
 		if (createdObject != NULL)
 		{
 			SMARTPTR(Component) component =

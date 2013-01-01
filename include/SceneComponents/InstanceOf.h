@@ -73,10 +73,20 @@ public:
 	///@}
 
 private:
-	///The NodePath associated to this model.
+	///The NodePath associated to this instance of.
 	NodePath mNodePath;
 	///The instanced object.
 	SMARTPTR(Object) mInstancedObject;
+	/**
+	 * \name Main parameters.
+	 */
+	///@{
+	///Instance of object id.
+	ObjectId mInstanceOfId;
+	///@}
+
+	///Scaling  (default: (1.0,1.0,1.0)).
+	float mScaleX, mScaleY, mScaleZ;
 
 	///TypedObject semantics: hardcoded
 public:

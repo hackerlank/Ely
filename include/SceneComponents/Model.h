@@ -103,6 +103,25 @@ public:
 private:
 	///The NodePath associated to this model.
 	NodePath mNodePath;
+
+	///Flag indicating if component is set up from a file or procedurally.
+	bool mFromFile;
+	/**
+	 * \name Main parameters.
+	 */
+	///@{
+	///Model.
+	std::string mModelName;
+	///Animations.
+	std::list<std::string> mAnimFileList;
+	///Scaling  (default: (1.0,1.0,1.0)).
+	float mScaleX, mScaleY, mScaleZ;
+	///Type of model procedurally generated.
+	std::string mModelType;
+	///Card parameters.
+	float mCardLeft, mCardRight, mCardBottom, mCardTop;
+	///@}
+
 	/**
 	 * \brief Animations' related data/functions.
 	 */
@@ -126,8 +145,6 @@ private:
 	 */
 	void r_find_bundles(SMARTPTR(PandaNode) node, Anims &anims, Parts &parts);
 	///@}
-	///Flag indicating if component is set up from a file or programmatically
-	bool mFromFile;
 
 	///TypedObject semantics: hardcoded
 public:

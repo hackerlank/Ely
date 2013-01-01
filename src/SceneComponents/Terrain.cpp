@@ -68,35 +68,35 @@ bool Terrain::initialize()
 
 	bool result = true;
 	//get scale
-	float heightScale = strtof(
+	mHeightScale = strtof(
 			mTmpl->parameter(std::string("height_scale")).c_str(), NULL);
-	if (heightScale <= 0.0)
+	if (mHeightScale <= 0.0)
 	{
-		heightScale = 1.0;
+		mHeightScale = 1.0;
 	}
-	float widthScale = strtof(
+	mWidthScale = strtof(
 			mTmpl->parameter(std::string("width_scale")).c_str(), NULL);
-	if (widthScale <= 0.0)
+	if (mWidthScale <= 0.0)
 	{
-		widthScale = 1.0;
+		mWidthScale = 1.0;
 	}
 	//get LOD
-	float nearPercent = strtof(
+	mNearPercent = strtof(
 			mTmpl->parameter(std::string("near_percent")).c_str(), NULL);
-	float farPercent = strtof(
+	mFarPercent = strtof(
 			mTmpl->parameter(std::string("far_percent")).c_str(), NULL);
-	if ((nearPercent <= 0.0) or (farPercent >= 1.0)
-			or (nearPercent >= farPercent))
+	if ((mNearPercent <= 0.0) or (mFarPercent >= 1.0)
+			or (mNearPercent >= mFarPercent))
 	{
-		farPercent = 1.0;
-		nearPercent = 0.1;
+		mFarPercent = 1.0;
+		mNearPercent = 0.1;
 	}
 	//get block size
-	int blockSize = strtol(mTmpl->parameter(std::string("block_size")).c_str(),
+	mBlockSize = strtol(mTmpl->parameter(std::string("block_size")).c_str(),
 			NULL, 0);
-	if (blockSize <= 0)
+	if (mBlockSize <= 0)
 	{
-		blockSize = 64;
+		mBlockSize = 64;
 	}
 	//get brute force
 	mBruteForce = (
@@ -104,84 +104,50 @@ bool Terrain::initialize()
 					== std::string("false") ? false : true);
 	//get auto flatten
 	std::string autoFlatten = mTmpl->parameter(std::string("auto_flatten"));
-	GeoMipTerrain::AutoFlattenMode flattenMode;
 	if (autoFlatten == "AFM_off")
 	{
-		flattenMode = GeoMipTerrain::AFM_off;
+		mFlattenMode = GeoMipTerrain::AFM_off;
 	}
 	else if (autoFlatten == "AFM_light")
 	{
-		flattenMode = GeoMipTerrain::AFM_light;
+		mFlattenMode = GeoMipTerrain::AFM_light;
 	}
 	else if (autoFlatten == "AFM_strong")
 	{
-		flattenMode = GeoMipTerrain::AFM_strong;
+		mFlattenMode = GeoMipTerrain::AFM_strong;
 	}
 	else
 	{
-		flattenMode = GeoMipTerrain::AFM_medium;
+		mFlattenMode = GeoMipTerrain::AFM_medium;
 	}
 	//get focal point
 	mFocalPointObject = ObjectId(mTmpl->parameter(std::string("focal_point")));
 	//get minimum level
-	int minimumLevel = strtol(
+	mMinimumLevel = strtol(
 			mTmpl->parameter(std::string("minimum_level")).c_str(), NULL, 0);
-	if (minimumLevel <= 0)
+	if (mMinimumLevel <= 0)
 	{
-		minimumLevel = 0;
+		mMinimumLevel = 0;
 	}
 	//get heightfield image
-	PNMImage heightField(
+	mHeightField = PNMImage(
 			Filename(mTmpl->parameter(std::string("heightfield_file"))));
 	//get texture scale
-	float textureUscale = strtof(
+	mTextureUscale = strtof(
 			mTmpl->parameter(std::string("texture_uscale")).c_str(), NULL);
-	if (textureUscale <= 0.0)
+	if (mTextureUscale <= 0.0)
 	{
-		textureUscale = 1.0;
+		mTextureUscale = 1.0;
 	}
-	float textureVscale = strtof(
+	mTextureVscale = strtof(
 			mTmpl->parameter(std::string("texture_vscale")).c_str(), NULL);
-	if (textureVscale <= 0.0)
+	if (mTextureVscale <= 0.0)
 	{
-		textureVscale = 1.0;
+		mTextureVscale = 1.0;
 	}
 	//get texture
-	SMARTPTR(Texture)textureImage = TexturePool::load_texture(
+	mTextureImage = TexturePool::load_texture(
 			Filename(mTmpl->parameter(std::string("texture_file"))));
-	//create the actual terrain
-	//terrain definition
-	mTerrain = new GeoMipTerrainRef(
-			std::string("terrain") + std::string(mComponentId));
-	//set height field
-	if (not mTerrain->set_heightfield(heightField))
-	{
-		result = false;
-	}
-	//sizing
-	float environmentWidthX = (heightField.get_x_size() - 1) * widthScale;
-	float environmentWidthY = (heightField.get_y_size() - 1) * widthScale;
-	float environmentWidth = (environmentWidthX + environmentWidthY) / 2.0;
-	//set terrain properties effectively
-	mTerrain->set_block_size(blockSize);
-	mTerrain->set_near(nearPercent * environmentWidth);
-	mTerrain->set_far(farPercent * environmentWidth);
-	//other properties
-	float terrainLODmin = min<float>(minimumLevel, mTerrain->get_max_level());
-	mTerrain->set_min_level(terrainLODmin);
-	mTerrain->set_auto_flatten(flattenMode);
-	mTerrain->set_bruteforce(mBruteForce);
-	mTerrain->get_root().set_sx(widthScale);
-	mTerrain->get_root().set_sy(widthScale);
-	mTerrain->get_root().set_sz(heightScale);
-	//terrain texturing
-	mTerrain->get_root().set_tex_scale(TextureStage::get_default(),
-			textureUscale, textureVscale);
-	if (textureImage != NULL)
-	{
-		mTerrain->get_root().set_texture(TextureStage::get_default(),
-				textureImage, 1);
-	}
 	//
 	return result;
 }
@@ -190,6 +156,43 @@ void Terrain::onAddToObjectSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//create the actual terrain
+	//terrain definition
+	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+	std::string name = COMPONENT_STANDARD_NAME;
+	mTerrain = new GeoMipTerrainRef(name);
+	//set height field
+	if (not mTerrain->set_heightfield(mHeightField))
+	{
+		//heightField the image is set to an
+		//empty (black) image with 512x512 dimensions.
+		mTerrain->set_heightfield(PNMImage(512, 512));
+	}
+	//sizing
+	float environmentWidthX = (mHeightField.get_x_size() - 1) * mWidthScale;
+	float environmentWidthY = (mHeightField.get_y_size() - 1) * mWidthScale;
+	float environmentWidth = (environmentWidthX + environmentWidthY) / 2.0;
+	//set terrain properties effectively
+	mTerrain->set_block_size(mBlockSize);
+	mTerrain->set_near(mNearPercent * environmentWidth);
+	mTerrain->set_far(mFarPercent * environmentWidth);
+	//other properties
+	float terrainLODmin = min<float>(mMinimumLevel, mTerrain->get_max_level());
+	mTerrain->set_min_level(terrainLODmin);
+	mTerrain->set_auto_flatten(mFlattenMode);
+	mTerrain->set_bruteforce(mBruteForce);
+	mTerrain->get_root().set_sx(mWidthScale);
+	mTerrain->get_root().set_sy(mWidthScale);
+	mTerrain->get_root().set_sz(mHeightScale);
+	//terrain texturing
+	mTerrain->get_root().set_tex_scale(TextureStage::get_default(),
+			mTextureUscale, mTextureVscale);
+	if (mTextureImage != NULL)
+	{
+		mTerrain->get_root().set_texture(TextureStage::get_default(),
+				mTextureImage, 1);
+	}
 
 	//set the node path of the object to the
 	//node path of this model

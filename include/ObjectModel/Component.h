@@ -155,6 +155,7 @@ public:
 
 	/**
 	 * \brief Gets/sets the owner object.
+	 * \param ownerObject The owner object.
 	 * \return The owner object.
 	 */
 	///@{
@@ -163,11 +164,14 @@ public:
 	///@}
 
 	/**
-	 * \brief Sets the component unique identifier.
+	 * \brief Gets/sets the component unique identifier.
+	 * \param componentId The component unique identifier.
 	 * \return The component unique identifier.
 	 */
+	///@{
 	void setComponentId(const ComponentId& componentId);
-
+	ComponentId getComponentId() const;
+	///@}
 	/**
 	 * \brief Return the type of an event.
 	 * @param event The event.

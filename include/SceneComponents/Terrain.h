@@ -94,6 +94,29 @@ public:
 private:
 	///The GeoMipTerrain associated to this component.
 	SMARTPTR(GeoMipTerrainRef) mTerrain;
+
+	/**
+	 * \name Main parameters.
+	 */
+	///@{
+	///Heightfield image.
+	PNMImage mHeightField;
+	///Scale.
+	float mHeightScale, mWidthScale;
+	///LOD.
+	float mNearPercent, mFarPercent;
+	///Block size.
+	int mBlockSize;
+	///Auto flatten.
+	GeoMipTerrain::AutoFlattenMode mFlattenMode;
+	///Minimum level.
+	int mMinimumLevel;
+	///Texture.
+	SMARTPTR(Texture)mTextureImage;
+	///Texture scale.
+	float mTextureUscale, mTextureVscale;
+	///@}
+
 	/**
 	 * \name Focal point stuff.
 	 */

@@ -80,6 +80,14 @@ void Component::setComponentId(const ComponentId& componentId)
 	mComponentId = componentId;
 }
 
+ComponentId Component::getComponentId() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mComponentId;
+}
+
 #ifdef WIN32
 void Component::loadEventCallbacks()
 {

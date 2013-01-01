@@ -110,6 +110,15 @@ private:
 	NodePath mReferenceNodePath;
 	///Flags.
 	bool mEnabled, mIsEnabled, mFixedRelativePosition, mBackward;
+	/**
+	 * \name Main parameters.
+	 */
+	///@{
+	///Chased object id.
+	ObjectId mChasedId;
+	///Reference object id.
+	ObjectId mReferenceId;
+	///@}
 	///Kinematic parameters.
 	float mAbsLookAtDistance, mAbsLookAtHeight, mAbsMaxDistance, mAbsMinDistance,
 	mAbsMinHeight, mAbsMaxHeight, mFriction;

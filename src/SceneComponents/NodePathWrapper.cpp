@@ -61,27 +61,7 @@ bool NodePathWrapper::initialize()
 
 	bool result = true;
 	//setup the wrapped NodePath
-	std::string wrappedNodePath = mTmpl->parameter(std::string("nodepath"));
-	if (wrappedNodePath == std::string("render"))
-	{
-		mNodePath = mTmpl->windowFramework()->get_render();
-	}
-	else if (wrappedNodePath == std::string("render2d"))
-	{
-		mNodePath = mTmpl->windowFramework()->get_render_2d();
-	}
-	else if (wrappedNodePath == std::string("aspect2d"))
-	{
-		mNodePath = mTmpl->windowFramework()->get_aspect_2d();
-	}
-	else if (wrappedNodePath == std::string("camera"))
-	{
-		mNodePath = mTmpl->windowFramework()->get_camera_group();
-	}
-	else
-	{
-		result = false;
-	}
+	mWrappedNodePath = mTmpl->parameter(std::string("nodepath"));
 	//
 	return result;
 }
@@ -90,6 +70,29 @@ void NodePathWrapper::onAddToObjectSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//setup the wrapped NodePath
+	if (mWrappedNodePath == std::string("render"))
+	{
+		mNodePath = mTmpl->windowFramework()->get_render();
+	}
+	else if (mWrappedNodePath == std::string("render2d"))
+	{
+		mNodePath = mTmpl->windowFramework()->get_render_2d();
+	}
+	else if (mWrappedNodePath == std::string("aspect2d"))
+	{
+		mNodePath = mTmpl->windowFramework()->get_aspect_2d();
+	}
+	else if (mWrappedNodePath == std::string("camera"))
+	{
+		mNodePath = mTmpl->windowFramework()->get_camera_group();
+	}
+	else
+	{
+		//default is render
+		mNodePath = mTmpl->windowFramework()->get_render();
+	}
 
 	//set the node path of the object to the
 	//node path of this NodePathWrapper

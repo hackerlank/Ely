@@ -241,6 +241,8 @@ bool CharacterController::initialize()
 	mJumpKey = (
 			mTmpl->parameter(std::string("jump")) == std::string("enabled") ?
 					true : false);
+	//use shape of (another object)
+	mUseShapeOfId = ObjectId(mTmpl->parameter(std::string("use_shape_of")));
 	//
 	return result;
 }
@@ -257,10 +259,8 @@ void CharacterController::onAddToObjectSetup()
 	//has scaling already applied.
 
 	//create a Character Controller Node
-	std::string name = std::string(mComponentId) + "("
-			+ get_type().get_name(this) + ") of "
-			+ std::string(mOwnerObject->objectId()) + "("
-			+ mOwnerObject->objectTmpl()->name() + ")";
+	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+	std::string name = COMPONENT_STANDARD_NAME;
 	mCharacterController = new BulletCharacterControllerNode(
 			createShape(mShapeType), mStepHeight,
 			name.c_str());
@@ -492,12 +492,11 @@ void CharacterController::setNodePath(const NodePath& nodePath)
 SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeType shapeType)
 {
 	//check if it should use shape of another (already) created object
-	ObjectId useShapeOfId = ObjectId(mTmpl->parameter(std::string("use_shape_of")));
-	if (not useShapeOfId.empty())
+	if (not mUseShapeOfId.empty())
 	{
 		SMARTPTR(Object)createdObject =
 		ObjectTemplateManager::GetSingleton().getCreatedObject(
-				useShapeOfId);
+				mUseShapeOfId);
 		if (createdObject != NULL)
 		{
 			SMARTPTR(Component) component =

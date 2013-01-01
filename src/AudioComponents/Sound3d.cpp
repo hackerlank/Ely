@@ -77,11 +77,20 @@ bool Sound3d::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//sound files
+	mSoundFileList = mTmpl->parameterList(std::string("sound_files"));
+	//
+	return result;
+}
+
+void Sound3d::onAddToObjectSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//set sound files
 	std::list<std::string>::iterator iter;
-	std::list<std::string> soundFileList = mTmpl->parameterList(
-			std::string("sound_files"));
-	for (iter = soundFileList.begin(); iter != soundFileList.end(); ++iter)
+	for (iter = mSoundFileList.begin(); iter != mSoundFileList.end(); ++iter)
 	{
 		//any "sound_files" string is a "compound" one, i.e. could have the form:
 		// "sound_file1:sound_file2:...:sound_fileN"
@@ -103,14 +112,6 @@ bool Sound3d::initialize()
 			}
 		}
 	}
-	//
-	return result;
-}
-
-void Sound3d::onAddToObjectSetup()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
 
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())

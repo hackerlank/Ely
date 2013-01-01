@@ -60,15 +60,13 @@ bool InstanceOf::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
-	//setup initial state
-	mNodePath = NodePath(mComponentId);
-	//Scaling (default: (1.0,1.0,1.0))
-	float scaleX = strtof(mTmpl->parameter(std::string("scale_x")).c_str(), NULL);
-	float scaleY = strtof(mTmpl->parameter(std::string("scale_y")).c_str(), NULL);
-	float scaleZ = strtof(mTmpl->parameter(std::string("scale_z")).c_str(), NULL);
-	mNodePath.set_sx((scaleX != 0.0 ? scaleX : 1.0));
-	mNodePath.set_sy((scaleY != 0.0 ? scaleY : 1.0));
-	mNodePath.set_sz((scaleZ != 0.0 ? scaleZ : 1.0));
+	//instance of object id
+	mInstanceOfId = ObjectId(
+			mTmpl->parameter(std::string("instance_of")));
+	//scaling (default: (1.0,1.0,1.0))
+	mScaleX = strtof(mTmpl->parameter(std::string("scale_x")).c_str(), NULL);
+	mScaleY = strtof(mTmpl->parameter(std::string("scale_y")).c_str(), NULL);
+	mScaleZ = strtof(mTmpl->parameter(std::string("scale_z")).c_str(), NULL);
 	//
 	return result;
 }
@@ -78,6 +76,16 @@ void InstanceOf::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//setup initial state
+	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+	std::string name = COMPONENT_STANDARD_NAME;
+	mNodePath = NodePath(name);
+
+	//set scaling (default: (1.0,1.0,1.0))
+	mNodePath.set_sx((mScaleX != 0.0 ? mScaleX : 1.0));
+	mNodePath.set_sy((mScaleY != 0.0 ? mScaleY : 1.0));
+	mNodePath.set_sz((mScaleZ != 0.0 ? mScaleZ : 1.0));
+
 	//set the node path of the object to the
 	//node path of this instance of
 	mOwnerObject->setNodePath(mNodePath);
@@ -86,10 +94,8 @@ void InstanceOf::onAddToObjectSetup()
 	//that object is supposed to be already created,
 	//set up and added to the created objects table;
 	//if not this component is instance of nothing.
-	ObjectId instanceOfId = ObjectId(
-			mTmpl->parameter(std::string("instance_of")));
 	mInstancedObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
-			instanceOfId);
+			mInstanceOfId);
 	if (mInstancedObject != NULL)
 	{
 		SMARTPTR(Component) component =

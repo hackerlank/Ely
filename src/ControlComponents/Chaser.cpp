@@ -92,6 +92,12 @@ bool Chaser::initialize()
 			mTmpl->parameter(std::string("abs_min_height")).c_str(), NULL);
 	//friction' settings
 	mFriction = (float) strtof(mTmpl->parameter(std::string("friction")).c_str(), NULL);
+	//chased object id
+	mChasedId = ObjectId(
+			mTmpl->parameter(std::string("chased_object")));
+	//reference object id
+	mReferenceId = ObjectId(
+			mTmpl->parameter(std::string("reference_object")));
 	//
 	return result;
 }
@@ -272,11 +278,9 @@ void Chaser::onAddToObjectSetup()
 	//that object is supposed to be already created,
 	//set up and added to the created objects table;
 	//if not, this component chases nothing.
-	ObjectId chasedId = ObjectId(
-			mTmpl->parameter(std::string("chased_object")));
 	SMARTPTR(Object)chasedObject =
 	ObjectTemplateManager::GetSingleton().getCreatedObject(
-			chasedId);
+			mChasedId);
 	if (chasedObject != NULL)
 	{
 		mChasedNodePath = chasedObject->getNodePath();
@@ -285,11 +289,9 @@ void Chaser::onAddToObjectSetup()
 		//that object is supposed to be already created,
 		//set up and added to the created objects table;
 		//if not, this will be the parent of the chased object.
-		ObjectId referenceId = ObjectId(
-				mTmpl->parameter(std::string("reference_object")));
 		SMARTPTR(Object)referenceObject =
 		ObjectTemplateManager::GetSingleton().getCreatedObject(
-				referenceId);
+				mReferenceId);
 		if (referenceObject != NULL)
 		{
 			mReferenceNodePath = referenceObject->getNodePath();

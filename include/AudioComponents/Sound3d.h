@@ -149,6 +149,13 @@ private:
 	NodePath mSceneRoot;
 	///The set of sounds attached to this component.
 	SoundTable mSounds;
+	/**
+	 * \name Main parameters.
+	 */
+	///@{
+	std::list<std::string> mSoundFileList;
+	///@}
+
 	///@{
 	/// Sounds' characteristics.
 	float mMinDist, mMaxDist;

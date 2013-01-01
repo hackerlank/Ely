@@ -74,6 +74,12 @@ std::string replaceCharacter(const std::string& source, int character,
 	return outStr;
 }
 
+std::string getComponentStandardNameItem(const std::string& name,
+		COMPONENT_STANDARD_NAME_ITEM item)
+{
+	return parseCompoundString(name, '_')[item];
+}
+
 void initTypedObjects()
 {
 	Component::init_type();
