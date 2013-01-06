@@ -57,9 +57,9 @@ CALLBACK default_callback__;
 #endif
 
 ///Common declarations
-typedef std::pair<std::string, std::string> EventTypeState;
+typedef std::pair<std::string, std::string> StateEventType;
 typedef std::string NextState;
-typedef std::pair<EventTypeState, NextState> TransitionTableItem;
-typedef std::map<EventTypeState, NextState> TransitionTable;
+typedef std::pair<StateEventType, NextState> TransitionTableItem;
+typedef std::map<StateEventType, NextState> TransitionTable;
 
 #endif /* COMMON_CONFIGS_H_ */

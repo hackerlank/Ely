@@ -30,6 +30,7 @@
 #include <utility>
 #include <cstring>
 #include <typedWritableReferenceCount.h>
+#include <eventHandler.h>
 #include <genericAsyncTask.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>

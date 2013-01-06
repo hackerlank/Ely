@@ -308,6 +308,14 @@ void CharacterController::enableForward(bool enable)
 	}
 }
 
+bool CharacterController::isForwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mForward;
+}
+
 void CharacterController::enableBackward(bool enable)
 {
 	//lock (guard) the mutex
@@ -317,6 +325,14 @@ void CharacterController::enableBackward(bool enable)
 	{
 		mBackward = enable;
 	}
+}
+
+bool CharacterController::isBackwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mBackward;
 }
 
 void CharacterController::enableStrafeLeft(bool enable)
@@ -330,6 +346,14 @@ void CharacterController::enableStrafeLeft(bool enable)
 	}
 }
 
+bool CharacterController::isStrafeLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeLeft;
+}
+
 void CharacterController::enableStrafeRight(bool enable)
 {
 	//lock (guard) the mutex
@@ -339,6 +363,14 @@ void CharacterController::enableStrafeRight(bool enable)
 	{
 		mStrafeRight = enable;
 	}
+}
+
+bool CharacterController::isStrafeRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeRight;
 }
 
 void CharacterController::enableRollLeft(bool enable)
@@ -352,6 +384,14 @@ void CharacterController::enableRollLeft(bool enable)
 	}
 }
 
+bool CharacterController::isRollLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollLeft;
+}
+
 void CharacterController::enableRollRight(bool enable)
 {
 	//lock (guard) the mutex
@@ -363,6 +403,14 @@ void CharacterController::enableRollRight(bool enable)
 	}
 }
 
+bool CharacterController::isRollRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollRight;
+}
+
 void CharacterController::enableJump(bool enable)
 {
 	//lock (guard) the mutex
@@ -372,6 +420,14 @@ void CharacterController::enableJump(bool enable)
 	{
 		mJump = enable;
 	}
+}
+
+bool CharacterController::isJumpEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mJump;
 }
 
 LVecBase2f CharacterController::getLinearSpeed()

@@ -148,8 +148,7 @@ void Model::onAddToObjectSetup()
 		}
 		//find all the bundles into mNodePath.node
 		r_find_bundles(mNodePath.node(), anims, parts);
-		PT(PartBundle)firstPartBundle;
-		firstPartBundle.clear();
+		mFirstPartBundle.clear();
 		//check if there is at least one PartBundle
 		for (partsIter = parts.begin(); partsIter != parts.end(); ++partsIter)
 		{
@@ -157,10 +156,10 @@ void Model::onAddToObjectSetup()
 					partBundlesIter != partsIter->second.end();
 					++partBundlesIter)
 			{
-				if (not firstPartBundle)
+				if (not mFirstPartBundle)
 				{
 					//set the first PartBundle
-					firstPartBundle = *partBundlesIter;
+					mFirstPartBundle = *partBundlesIter;
 					PRINT(
 							"First PartBundle: '" << (*partBundlesIter)->get_name() << "'");
 				}
@@ -172,11 +171,11 @@ void Model::onAddToObjectSetup()
 			}
 		}
 		//proceeds with animations only if there is at least one PartBundle
-		if (firstPartBundle)
+		if (mFirstPartBundle)
 		{
 			//check if there are AnimBundles within the model file
 			//and bind them to the first PartBundle
-			PT(AnimBundle)firstAnimBundle;
+			SMARTPTR(AnimBundle)firstAnimBundle;
 			std::string animName;
 			for (animsIter = anims.begin(); animsIter != anims.end(); ++animsIter)
 			{
@@ -195,7 +194,7 @@ void Model::onAddToObjectSetup()
 					}
 					PRINT("Binding animation '" << (*animBundlesIter)->get_name() << "' with name '"
 							<< animName << "'");
-					PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
+					SMARTPTR(AnimControl)control = mFirstPartBundle->bind_anim(*animBundlesIter,
 							PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra);
 					mAnimations.store_anim(control, animName);
 				}
@@ -242,7 +241,7 @@ void Model::onAddToObjectSetup()
 								}
 								PRINT("Binding animation '" << (*animBundlesIter)->get_name() << " with name '"
 										<< animName << "'");
-								PT(AnimControl)control = firstPartBundle->bind_anim(*animBundlesIter,
+								SMARTPTR(AnimControl)control = mFirstPartBundle->bind_anim(*animBundlesIter,
 										PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra);
 								mAnimations.store_anim(control, animName);
 							}
@@ -304,6 +303,14 @@ AnimControlCollection Model::animations() const
 	HOLDMUTEX(mMutex)
 
 	return mAnimations;
+}
+
+SMARTPTR(PartBundle) Model::getPartBundle() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mFirstPartBundle;
 }
 
 NodePath Model::getNodePath() const

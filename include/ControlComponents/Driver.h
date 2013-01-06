@@ -123,18 +123,27 @@ public:
 	///@}
 
 	/**
-	 * \name Control keys' enablers.
+	 * \name Control keys' getters/setters.
 	 */
 	///@{
 	void enableForward(bool enable);
+	bool isForwardEnabled();
 	void enableBackward(bool enable);
+	bool isBackwardEnabled();
 	void enableStrafeLeft(bool enable);
+	bool isStrafeLeftEnabled();
 	void enableStrafeRight(bool enable);
+	bool isStrafeRightEnabled();
 	void enableUp(bool enable);
+	bool isUpEnabled();
 	void enableDown(bool enable);
+	bool isDownEnabled();
 	void enableRollLeft(bool enable);
+	bool isRollLeftEnabled();
 	void enableRollRight(bool enable);
+	bool isRollRightEnabled();
 	void enableMouseMove(bool enable);
+	bool isMouseMoveEnabled();
 	///@}
 
 	/**

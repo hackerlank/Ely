@@ -336,7 +336,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//NPC1
 	fsm& npc1FSM = (fsm&) (*DCAST(Activity, object->getComponent(
 							ComponentFamilyType("Behavior"))));
-	npc1FSM.request("idle");
+	npc1FSM.request("I");
 	//play sound
 	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));

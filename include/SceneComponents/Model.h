@@ -100,6 +100,13 @@ public:
 	 */
 	AnimControlCollection animations() const;
 
+	/**
+	 * \brief Returns a reference to the PartBundle animations are bound to.
+	 *
+	 * @return A reference to the PartBundle animations are bound to.
+	 */
+	SMARTPTR(PartBundle) getPartBundle() const;
+
 private:
 	///The NodePath associated to this model.
 	NodePath mNodePath;
@@ -128,6 +135,7 @@ private:
 	///@{
 	///The list of animations associated with this model.
 	AnimControlCollection mAnimations;
+	SMARTPTR(PartBundle)mFirstPartBundle;
 	typedef std::set<SMARTPTR(AnimBundle)> AnimBundles;
 	typedef std::map<string, AnimBundles> Anims;
 	typedef std::set<SMARTPTR(PartBundle)> PartBundles;

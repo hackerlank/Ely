@@ -31,6 +31,10 @@
 #include <bulletWorld.h>
 #include <bulletDebugNode.h>
 #include <pandaFramework.h>
+#include <nodePath.h>
+#include <nodePathCollection.h>
+#include <transformState.h>
+#include <geomNode.h>
 #include <bulletSphereShape.h>
 #include <bulletShape.h>
 #include <bulletBoxShape.h>
@@ -39,6 +43,8 @@
 #include <bulletCapsuleShape.h>
 #include <bulletConeShape.h>
 #include <bulletHeightfieldShape.h>
+#include <bulletTriangleMesh.h>
+#include <bulletTriangleMeshShape.h>
 #include <bullet_utils.h>
 #include <lvector3.h>
 #include <filename.h>
@@ -138,6 +144,7 @@ public:
 		CAPSULE, //!< CAPSULE (radius, height, up)
 		CONE, //!< CONE (radius, height, up)
 		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
+		TRIANGLEMESH, //!< TRIANGLEMESH (dynamic)
 	};
 	/**
 	 * \brief Shape size.
@@ -162,27 +169,32 @@ public:
 	 * - BulletCapsuleShape(dim1, dim2, upAxis)
 	 * - BulletConeShape(dim1, dim2, upAxis)
 	 * - BulletHeightfieldShape(heightfieldFile, dim1, upAxis)
+	 * - BulletTriangleMeshShape (dynamic)
 	 *
 	 * @param modelNP The model node path.
 	 * @param shapeType The shape type.
 	 * @param shapeSize The shape size, i.e. its tightness around the model.
-	 * @param modelDims Returns the model bounding box dimensions for each axis.
-	 * @param modelDeltaCenter Returns the middle point of the model bounding box.
-	 * @param modelRadius Returns the radius of the model bounding box.
-	 * @param dim1 Returns/sets the first shape parameter.
-	 * @param dim2 Returns/sets the second shape parameter.
-	 * @param dim3 Returns/sets the third shape parameter.
-	 * @param dim4 Returns/sets the fourth shape parameter.
+	 * @param modelDims Returns the model bounding box dimensions for each axis
+	 * (out parameter).
+	 * @param modelDeltaCenter Returns the middle point of the model bounding box
+	 * (out parameter).
+	 * @param modelRadius Returns the radius of the model bounding box
+	 * (out parameter).
+	 * @param dim1 Returns/sets the first shape parameter (in/out parameter).
+	 * @param dim2 Returns/sets the second shape parameter (in/out parameter).
+	 * @param dim3 Returns/sets the third shape parameter (in/out parameter).
+	 * @param dim4 Returns/sets the fourth shape parameter (in/out parameter).
 	 * @param automaticShaping If true the dimXs are output parameters,
 	 * otherwise input parameter.
 	 * @param upAxis The up axis.
 	 * @param heightfieldFile The height field file.
 	 * @return A (smart) pointer to the created shape.
 	 */
-	SMARTPTR(BulletShape) createShape(NodePath modelNP, ShapeType shapeType, ShapeSize shapeSize,
-			LVector3& modelDims, LVector3& modelDeltaCenter, float& modelRadius,
-			float& dim1, float& dim2, float& dim3, float& dim4, bool automaticShaping = true,
-			BulletUpAxis upAxis=Z_up, const Filename& heightfieldFile = Filename(""));
+	SMARTPTR(BulletShape) createShape(NodePath modelNP, ShapeType shapeType,
+			ShapeSize shapeSize, LVector3& modelDims, LVector3& modelDeltaCenter,
+			float& modelRadius,	float& dim1, float& dim2, float& dim3, float& dim4,
+			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
+			const Filename& heightfieldFile = Filename(""), bool dynamic = false);
 	/**
 	 * \brief Calculates geometric characteristics of a GeomNode.
 	 *

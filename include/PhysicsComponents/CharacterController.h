@@ -108,12 +108,19 @@ public:
 	 */
 	///@{
 	void enableForward(bool enable);
+	bool isForwardEnabled();
 	void enableBackward(bool enable);
+	bool isBackwardEnabled();
 	void enableStrafeLeft(bool enable);
+	bool isStrafeLeftEnabled();
 	void enableStrafeRight(bool enable);
+	bool isStrafeRightEnabled();
 	void enableRollLeft(bool enable);
+	bool isRollLeftEnabled();
 	void enableRollRight(bool enable);
+	bool isRollRightEnabled();
 	void enableJump(bool enable);
+	bool isJumpEnabled();
 	///@}
 
 	/**

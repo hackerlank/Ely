@@ -259,9 +259,13 @@ void Component::registerEventCallbacks()
 	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
 	{
 		//event = mEventTable[iter->first], iter->second==handler
-		mTmpl->pandaFramework()->define_key(mEventTable[iter->first],
-				iter->first + "@" + mEventTable[iter->first], iter->second,
-				(void*) this);
+		//
+//		mTmpl->pandaFramework()->define_key(mEventTable[iter->first],
+//				iter->first + "@" + mEventTable[iter->first], iter->second,
+//				static_cast<void*>(this));
+		//
+		EventHandler::get_global_event_handler()->add_hook(mEventTable[iter->first],
+				iter->second, static_cast<void*>(this));
 	}
 	//handlers registered
 	mCallbacksRegistered = true;

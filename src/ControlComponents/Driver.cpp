@@ -281,6 +281,14 @@ void Driver::enableForward(bool enable)
 	}
 }
 
+bool Driver::isForwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mForward;
+}
+
 void Driver::enableBackward(bool enable)
 {
 	//lock (guard) the mutex
@@ -290,6 +298,14 @@ void Driver::enableBackward(bool enable)
 	{
 		mBackward = enable;
 	}
+}
+
+bool Driver::isBackwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mBackward;
 }
 
 void Driver::enableStrafeLeft(bool enable)
@@ -303,6 +319,14 @@ void Driver::enableStrafeLeft(bool enable)
 	}
 }
 
+bool Driver::isStrafeLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeLeft;
+}
+
 void Driver::enableStrafeRight(bool enable)
 {
 	//lock (guard) the mutex
@@ -312,6 +336,14 @@ void Driver::enableStrafeRight(bool enable)
 	{
 		mStrafeRight = enable;
 	}
+}
+
+bool Driver::isStrafeRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeRight;
 }
 
 void Driver::enableUp(bool enable)
@@ -325,6 +357,14 @@ void Driver::enableUp(bool enable)
 	}
 }
 
+bool Driver::isUpEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mUp;
+}
+
 void Driver::enableDown(bool enable)
 {
 	//lock (guard) the mutex
@@ -334,6 +374,14 @@ void Driver::enableDown(bool enable)
 	{
 		mDown = enable;
 	}
+}
+
+bool Driver::isDownEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mDown;
 }
 
 void Driver::enableRollLeft(bool enable)
@@ -347,6 +395,14 @@ void Driver::enableRollLeft(bool enable)
 	}
 }
 
+bool Driver::isRollLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollLeft;
+}
+
 void Driver::enableRollRight(bool enable)
 {
 	//lock (guard) the mutex
@@ -358,6 +414,14 @@ void Driver::enableRollRight(bool enable)
 	}
 }
 
+bool Driver::isRollRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollRight;
+}
+
 void Driver::enableMouseMove(bool enable)
 {
 	//lock (guard) the mutex
@@ -367,6 +431,14 @@ void Driver::enableMouseMove(bool enable)
 	{
 		mMouseMove = enable;
 	}
+}
+
+bool Driver::isMouseMoveEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMouseMove;
 }
 
 void Driver::setLinearSpeed(LVector3f linearSpeed)

@@ -237,6 +237,10 @@ bool RigidBody::initialize()
 			mUpAxis = Z_up;
 		}
 	}
+	else if (shapeType == std::string("triangle_mesh"))
+	{
+		mShapeType = GamePhysicsManager::TRIANGLEMESH;
+	}
 	else
 	{
 		//default a sphere (with auto shaping)
@@ -424,7 +428,8 @@ SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeT
 	return GamePhysicsManager::GetSingletonPtr()->createShape(
 			mOwnerObject->getNodePath(), mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
-			mDim3, mDim4, mAutomaticShaping, mUpAxis, mHeightfieldFile );
+			mDim3, mDim4, mAutomaticShaping, mUpAxis,
+			mHeightfieldFile, not (mBodyType == STATIC));
 }
 
 void RigidBody::setPhysicalParameters()

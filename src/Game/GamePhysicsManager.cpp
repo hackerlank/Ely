@@ -175,27 +175,35 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		ShapeType shapeType, ShapeSize shapeSize, LVector3& modelDims,
 		LVector3& modelDeltaCenter, float& modelRadius,
 		float& dim1, float& dim2, float& dim3, float& dim4,
-		bool automaticShaping, BulletUpAxis upAxis, const Filename& heightfieldFile)
+		bool automaticShaping, BulletUpAxis upAxis,
+		const Filename& heightfieldFile, bool dynamic)
 {
 	// create the actual shape
 	SMARTPTR(BulletShape) collisionShape = NULL;
 	LVecBase3 localScale;
-	if (not modelNP.is_empty())
+	NodePathCollection geomNodes;
+	//some preliminary check
+	if (modelNP.is_empty())
 	{
-		//get the bounding dimensions of object node path, that
-		//should represents a model
-		getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+		//a bullet shape is requested without an associated model:
+		//force automaticShaping to false
+		automaticShaping = false;
 	}
 	else
 	{
-		//a bullet shape is requested without an associated model:
-		//automaticShaping should be false...
-		if (automaticShaping)
+		//check if there are some GeomNode
+		geomNodes = modelNP.find_all_matches("**/+GeomNode");
+		if (not geomNodes.is_empty())
 		{
-			//...otherwise set some default value
-			modelDims = LVector3(1.0, 1.0, 1.0);
-			modelDeltaCenter = LVector3(1.0, 1.0, 1.0);
-			modelRadius = 1.0;
+			//get the bounding dimensions of object node path, that
+			//should represents a model
+			getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+		}
+		else
+		{
+			//a bullet shape is requested without GeomNodes:
+			//force automaticShaping to false
+			automaticShaping = false;
 		}
 	}
 	//
@@ -324,6 +332,28 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		collisionShape = new BulletHeightfieldShape(heightfieldFile, dim1, upAxis);
 		collisionShape->set_local_scale(localScale);
 		break;
+		case TRIANGLEMESH:
+		{
+			//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
+			BulletTriangleMesh* triMesh = new BulletTriangleMesh();
+			//add geoms from geomNodes to the mesh
+			for (int i = 0; i < geomNodes.get_num_paths(); ++i)
+			{
+				SMARTPTR(GeomNode) geomNode = DCAST(GeomNode,
+						geomNodes.get_path(i).node());
+				CSMARTPTR(TransformState) ts = geomNode->get_transform();
+				GeomNode::Geoms geoms = geomNode->get_geoms();
+				for (int j = 0; j < geoms.get_num_geoms(); ++j)
+				{
+					triMesh->add_geom(geoms.get_geom(j), true, ts.p());
+				}
+			}
+			collisionShape = new BulletTriangleMeshShape(triMesh, dynamic);
+			localScale = modelNP.get_scale();
+			collisionShape->set_local_scale(localScale);
+		}
+		break;
+		//
 		default:
 		break;
 	}

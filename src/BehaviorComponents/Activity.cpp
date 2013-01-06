@@ -159,13 +159,14 @@ void Activity::loadTransitionFunctions()
 	for (iter = stateSet.begin(); iter != stateSet.end(); ++iter)
 	{
 		const char* dlsymError;
-		std::string functionName;
+		std::string functionName, functionNameTmp;
 
 		//load enter function (if any): Enter_<STATE>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = std::string("Enter") + "_" + (*iter) + "_"
+		functionNameTmp = std::string("Enter") + "_" + (*iter) + "_"
 				+ mOwnerObject->objectTmpl()->name();
+		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PENTER pEnterFunction = (PENTER) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
@@ -178,8 +179,9 @@ void Activity::loadTransitionFunctions()
 		//load exit function (if any): Exit_<STATE>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = std::string("Exit") + "_" + (*iter) + "_"
+		functionNameTmp = std::string("Exit") + "_" + (*iter) + "_"
 				+ mOwnerObject->objectTmpl()->name();
+		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PEXIT pExitFunction = (PEXIT) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
@@ -192,8 +194,9 @@ void Activity::loadTransitionFunctions()
 		//load filter function (if any): Filter_<STATE>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = std::string("Filter") + "_" + (*iter) + "_"
+		functionNameTmp = std::string("Filter") + "_" + (*iter) + "_"
 				+ mOwnerObject->objectTmpl()->name();
+		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PFILTER pFilterFunction = (PFILTER) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
@@ -228,12 +231,13 @@ void Activity::loadTransitionFunctions()
 			++iter)
 	{
 		const char* dlsymError;
-		std::string functionName;
+		std::string functionName, functionNameTmp;
 
 		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTYPE>
 		// reset errors
 		dlerror();
-		functionName = (*iter) + "_" + mOwnerObject->objectTmpl()->name();
+		functionNameTmp = (*iter) + "_" + mOwnerObject->objectTmpl()->name();
+		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PFROMTO pFromToFunction = (PFROMTO) dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = dlerror();
