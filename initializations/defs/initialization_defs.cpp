@@ -244,8 +244,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play sound
 	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));
-	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->set_loop(true);
-	actor1Sound3d->getSound("audio/sfx/GUI_rollover.wav")->play();
+	actor1Sound3d->getSound("walk-sound")->set_loop(true);
+	actor1Sound3d->getSound("walk-sound")->play();
 
 	//enable/disable Actor1 control by event
 	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
@@ -340,8 +340,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play sound
 	SMARTPTR(Sound3d) npc1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));
-	npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->set_loop(true);
-	npc1Sound3d->getSound("models/audio/sfx/GUI_click.wav")->play();
+	npc1Sound3d->getSound("walk-sound")->set_loop(true);
+	npc1Sound3d->getSound("walk-sound")->play();
 }
 
 void NPC1Init()

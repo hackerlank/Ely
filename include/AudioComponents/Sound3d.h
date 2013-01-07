@@ -48,7 +48,7 @@ class Sound3dTemplate;
  * All updates is done wrt scene root (e.g. render).
  *
  * XML Param(s):
- * - "sound_files" 		|multiple|no default
+ * - "sound_files" 		|multiple|no default (each specified as "sound_name@sound_file")
  */
 class Sound3d: public Component
 {
@@ -69,10 +69,11 @@ public:
 	 * loading it from a file.
 	 *
 	 * The file is added only if this component already belongs to an object.
+	 * @param soundName The sound name.
 	 * @param fileName The sound file name.
 	 * @return True if successful, false otherwise.
 	 */
-	bool addSound(const std::string& fileName);
+	bool addSound(const std::string& soundName, const std::string& fileName);
 	/**
 	 * \brief Removes dynamically a sound from this component.
 	 *
@@ -132,7 +133,7 @@ public:
 	 */
 	///@{
 	typedef std::map<std::string, SMARTPTR(AudioSound)> SoundTable;
-	SMARTPTR(AudioSound) getSound(const std::string& name);
+	SMARTPTR(AudioSound) getSound(const std::string& soundName);
 	SMARTPTR(AudioSound) getSound(int index);
 	///@}
 

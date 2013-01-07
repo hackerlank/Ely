@@ -51,7 +51,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	mSound3dTmpl->setParametersDefaults();
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 0);
 	ParameterTable parmTable;
-	std::pair<std::string,std::string> audioFiles("sound_files",audioFile);
+	std::pair<std::string,std::string> audioFiles("sound_files",audioFile + "@" + audioFile);
 	parmTable.insert(audioFiles);
 	mSound3dTmpl->setParameters(parmTable);
 	BOOST_CHECK(mSound3dTmpl->parameterList("sound_files").size() == 1);
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	mSound3d->setOwnerObject(&testObj);
 	testObj.addComponent(mSound3d.p());
 	mSound3d->onAddToObjectSetup();
-	mSound3d->addSound(audioFile);
+	mSound3d->addSound(audioFile, audioFile);
 	BOOST_CHECK(mSound3d->getSound(1) == NULL);
 }
 
@@ -79,7 +79,7 @@ BOOST_AUTO_TEST_CASE(Sound3dUpdateTEST)
 	BOOST_REQUIRE(mSound3dTmpl != NULL);
 	mSound3dTmpl->setParametersDefaults();
 	ParameterTable parmTable;
-	std::pair<std::string,std::string> audioFiles("sound_files",audioFile);
+	std::pair<std::string,std::string> audioFiles("sound_files",audioFile + "@" + audioFile);
 	parmTable.insert(audioFiles);
 	mSound3dTmpl->setParameters(parmTable);
 	mSound3d =

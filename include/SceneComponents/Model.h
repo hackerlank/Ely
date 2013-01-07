@@ -62,8 +62,9 @@ class ModelTemplate;
  * - "scale_x"  			|single|"1.0"
  * - "scale_y"  			|single|"1.0"
  * - "scale_z"  			|single|"1.0"
- * - "model_file"  			|single|no default
- * - "anim_files"  			|multiple|no default
+ * - "model_file"  			|single|no default (can have this form: [anim_name1@
+ * anim_name2@...@anim_nameN@]model_filename ([] means optional))
+ * - "anim_files"  			|multiple|no default (each specified as "anim_name@anim_file")
  * - "model_type"  			|single|no default
  * - "model_card_left"  	|single|no default
  * - "model_card_right"  	|single|no default

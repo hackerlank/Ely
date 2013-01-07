@@ -175,7 +175,7 @@
 		</Object>
 		<Object type="Instanceable" id="Gorilla1" priority="100">
 			<Component type="Model">
-				<Param model_file="gorilla/gorillawalking"/>
+				<Param model_file="walk@gorilla/gorillawalking"/>
 				<Param scale_x="1.0"/>
 				<Param scale_y="1.0"/>
 				<Param scale_z="1.0"/>
@@ -265,7 +265,7 @@
 			</Component>
 			<Component type="Model">
 				<Param model_file="panda"/>
-				<Param anim_files="panda-walk"/>
+				<Param anim_files="walk@panda-walk"/>
 				<Param scale_x="3.0"/>
 				<Param scale_y="3.0"/>
 				<Param scale_z="3.0"/>
@@ -280,7 +280,7 @@
 				<Param collide_mask="all_on"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="audio/sfx/GUI_rollover.wav"/>
+				<Param sound_files="walk-sound@audio/sfx/GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>			
 			<Param pos_x="800.0"/>
@@ -302,7 +302,7 @@
 				<Param scale_z="0.05"/>
 			</Component>
 			<Component type="Sound3d">
-				<Param sound_files="audio/sfx/GUI_rollover.wav"/>
+				<Param sound_files="video-sound@audio/sfx/GUI_rollover.wav"/>
 			</Component>
 			<Param parent="aspect2d"/>
 			<Param pos_x="0.0"/>
@@ -326,7 +326,7 @@
 			</Component>
 			<Component type="Model">
 				<Param model_file="eve/eve"/>
-				<Param anim_files="eve/eve-jump:eve/eve-run:eve/eve-walk:eve/eve-offbalance"/>
+				<Param anim_files="jump@eve/eve-jump:run@eve/eve-run:walk@eve/eve-walk:offbalance@eve/eve-offbalance"/>
 				<Param scale_x="5.0"/>
 				<Param scale_y="5.0"/>
 				<Param scale_z="5.0"/>
@@ -337,7 +337,7 @@
 				<Param linear_speed="120.0"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="models/audio/sfx/GUI_click.wav"/>
+				<Param sound_files="walk-sound@models/audio/sfx/GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
 			<Param pos_x="750.0"/>

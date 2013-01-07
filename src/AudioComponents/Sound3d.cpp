@@ -93,21 +93,27 @@ void Sound3d::onAddToObjectSetup()
 	for (iter = mSoundFileList.begin(); iter != mSoundFileList.end(); ++iter)
 	{
 		//any "sound_files" string is a "compound" one, i.e. could have the form:
-		// "sound_file1:sound_file2:...:sound_fileN"
-		std::vector<std::string> soundFiles = parseCompoundString(*iter, ':');
-		std::vector<std::string>::const_iterator iterSoundFile;
-		for (iterSoundFile = soundFiles.begin();
-				iterSoundFile != soundFiles.end(); ++iterSoundFile)
+		// "sound_name1@sound_file1:sound_name2@sound_file2:...:sound_nameN@sound_fileN"
+		std::vector<std::string> nameFilePairs = parseCompoundString(*iter, ':');
+		std::vector<std::string>::const_iterator iterPair;
+		for (iterPair = nameFilePairs.begin();
+				iterPair != nameFilePairs.end(); ++iterPair)
 		{
-			//an empty sound file is ignored
-			if (not iterSoundFile->empty())
+			//an empty sound_name@sound_file is ignored
+			if (not iterPair->empty())
 			{
+				//get sound name and sound file name
+				std::vector<std::string> nameFilePair =
+						parseCompoundString(*iterPair, '@');
+				//sound name == nameFilePair[0]
+				//sound file name == nameFilePair[1]
 				SMARTPTR(AudioSound)sound =
 				GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
-						*iterSoundFile, true).p();
+						nameFilePair[1], true).p();
 				if (not sound.is_null())
 				{
-					mSounds[*iterSoundFile] = sound.p();
+					//an empty ("") sound name is allowed
+					mSounds[nameFilePair[0]] = sound.p();
 				}
 			}
 		}
@@ -151,7 +157,7 @@ void Sound3d::onAddToSceneSetup()
 	}
 }
 
-bool Sound3d::addSound(const std::string& fileName)
+bool Sound3d::addSound(const std::string& soundName, const std::string& fileName)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -169,13 +175,14 @@ bool Sound3d::addSound(const std::string& fileName)
 		//no owner object:return false
 		return result;
 	}
+	//get the sound from fileName
 	SMARTPTR(AudioSound)sound =
 	GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(fileName,
 			true).p();
 	if (sound)
 	{
-		// sound is added
-		mSounds[fileName] = sound;
+		//add sound with soundName
+		mSounds[soundName] = sound;
 		result = true;
 		// try to add this component to updating (if not present)
 		// only if object is dynamic
@@ -276,12 +283,12 @@ void Sound3d::set3dStaticAttributes()
 	}
 }
 
-SMARTPTR(AudioSound)Sound3d::getSound(const std::string& name)
+SMARTPTR(AudioSound)Sound3d::getSound(const std::string& soundName)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	SoundTable::iterator iter = mSounds.find(name);
+	SoundTable::iterator iter = mSounds.find(soundName);
 	if (iter == mSounds.end())
 	{
 		return NULL;

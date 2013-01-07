@@ -84,7 +84,7 @@ class ComponentTemplate;
  *
  * XML Param(s):
  * - "event_types" 		|multiple|no default
- * - "events"			|multiple|no default
+ * - "events"			|multiple|no default (each specified as "event_type@event")
  * \note "event_types" parameters are specified into the object
  * template definition.
  */
