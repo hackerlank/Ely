@@ -72,6 +72,7 @@
 				<Param event_types="rr:rr-up:rr-q:rl:rl-up:rl-q"/>
 				<Param event_types="j:j-up:j-q"/>				
 				<Param event_types="q:q-up"/>				
+				<Param event_types="ground:air"/>				
 			</ComponentTmpl>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
@@ -323,6 +324,7 @@
 				<Param events="rl@j:rl-up@j-up:rl-q@alt-j"/>
 				<Param events="j@space:j-up@space-up:j-q@alt-space"/>				
 				<Param events="q@alt:q-up@alt-up"/>				
+				<Param events="ground@OnGround:air@OnAir"/>				
 			</Component>
 			<Component type="Model">
 				<Param model_file="eve/eve"/>
@@ -332,9 +334,11 @@
 				<Param scale_z="5.0"/>
 			</Component>
 			<Component type="CharacterController">
+				<Param throw_events="true"/>
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
 				<Param linear_speed="120.0"/>
+				<Param jump_speed="30.0"/>
 			</Component> 
 			<Component type="Sound3d">
 				<Param sound_files="walk-sound@models/audio/sfx/GUI_click.wav"/>

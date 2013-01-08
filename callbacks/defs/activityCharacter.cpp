@@ -32,6 +32,7 @@ extern "C"
 
 ///Character + Activity related
 CALLBACK activityCharacter;
+CALLBACK groundAirCharacter;
 
 #ifdef __cplusplus
 }
@@ -69,6 +70,9 @@ CALLBACKNAME j_q_Activity_Character = "activityCharacter";
 //q:q-up
 CALLBACKNAME q_Activity_Character = "activityCharacter";
 CALLBACKNAME q_up_Activity_Character = "activityCharacter";
+//ground:air
+CALLBACKNAME ground_Activity_Character = "groundAirCharacter";
+CALLBACKNAME air_Activity_Character = "groundAirCharacter";
 
 ///Character + Activity related functions/variables
 //Transition table: <eventType, currentState> -> nextState
@@ -98,6 +102,29 @@ void activityCharacter(const Event * event, void * data)
 	}
 }
 
+void groundAirCharacter(const Event * event, void * data)
+{
+	//get data
+	SMARTPTR(Object)characterObj = ObjectTemplateManager::GetSingletonPtr()->
+					getCreatedObject(event->get_parameter(1).get_string_value());
+	SMARTPTR(Model) characterModel = DCAST(Model, characterObj->getComponent(
+					ComponentFamilyType("Scene")));
+	if (event->get_name() == "OnGround")
+	{
+		//stop animation
+		characterModel->animations().stop("run");
+	}
+	else if (event->get_name() == "OnAir")
+	{
+		//play animation
+		characterModel->animations().loop("run", true);
+	}
+	else
+	{
+		PRINTERR("groundAirCharacter: unrecognized event");
+	}
+}
+
 #define TABLEINSERT(state,eventType,nextState) \
 	(*transitionTablePtr).insert(TransitionTableItem\
 			(StateEventType(state, eventType), NextState(nextState)))
@@ -121,65 +148,65 @@ void activityCharacterInit()
 	TABLEINSERT("I", "rl-q", "Rl-Q");
 	TABLEINSERT("I", "j", "J");
 	//state F
-	TABLEINSERT("F", "f-up","I");
-	TABLEINSERT("F", "f-q","F-Q");
-	TABLEINSERT("F", "sr","F-Sr");
-	TABLEINSERT("F", "sl","F-Sl");
-	TABLEINSERT("F", "rr","F-Rr");
-	TABLEINSERT("F", "rr-q","F-Rr-Q");
-	TABLEINSERT("F", "rl","F-Rl");
-	TABLEINSERT("F", "rl-q","F-Rl-Q");
-	TABLEINSERT("F", "j","F-J");
-	TABLEINSERT("F", "j-q","F-J-Q");
-	TABLEINSERT("F", "q","F-Q");
+	TABLEINSERT("F", "f-up", "I");
+	TABLEINSERT("F", "f-q", "F-Q");
+	TABLEINSERT("F", "sr", "F-Sr");
+	TABLEINSERT("F", "sl", "F-Sl");
+	TABLEINSERT("F", "rr", "F-Rr");
+	TABLEINSERT("F", "rr-q", "F-Rr-Q");
+	TABLEINSERT("F", "rl", "F-Rl");
+	TABLEINSERT("F", "rl-q", "F-Rl-Q");
+	TABLEINSERT("F", "j", "F-J");
+	TABLEINSERT("F", "j-q", "F-J-Q");
+	TABLEINSERT("F", "q", "F-Q");
 	//state B
-	TABLEINSERT("B", "b-up","I");
-	TABLEINSERT("B", "sr","B-Sr");
-	TABLEINSERT("B", "sl","B-Sl");
-	TABLEINSERT("B", "rr","B-Rr");
-	TABLEINSERT("B", "rl","B-Rl");
+	TABLEINSERT("B", "b-up", "I");
+	TABLEINSERT("B", "sr", "B-Sr");
+	TABLEINSERT("B", "sl", "B-Sl");
+	TABLEINSERT("B", "rr", "B-Rr");
+	TABLEINSERT("B", "rl", "B-Rl");
 	//Sr
-	TABLEINSERT("Sr", "sr-up","I");
-	TABLEINSERT("Sr", "sr-q","Sr-Q");
+	TABLEINSERT("Sr", "sr-up", "I");
+	TABLEINSERT("Sr", "sr-q", "Sr-Q");
 	TABLEINSERT("Sr", "rr", "Sr-Rr");
 	TABLEINSERT("Sr", "rr-q", "Sr-Rr-Q");
 	TABLEINSERT("Sr", "rl", "Sr-Rl");
 	TABLEINSERT("Sr", "rl-q", "Sr-Rl-Q");
-	TABLEINSERT("Sr", "q","Sr-Q");
+	TABLEINSERT("Sr", "q", "Sr-Q");
 	//Sl
-	TABLEINSERT("Sl", "sl-up","I");
-	TABLEINSERT("Sl", "sl-q","Sl-Q");
+	TABLEINSERT("Sl", "sl-up", "I");
+	TABLEINSERT("Sl", "sl-q", "Sl-Q");
 	TABLEINSERT("Sl", "rr", "Sl-Rr");
 	TABLEINSERT("Sl", "rr-q", "Sl-Rr-Q");
 	TABLEINSERT("Sl", "rl", "Sl-Rl");
 	TABLEINSERT("Sl", "rl-q", "Sl-Rl-Q");
-	TABLEINSERT("Sl", "q","Sl-Q");
+	TABLEINSERT("Sl", "q", "Sl-Q");
 	//Rr
-	TABLEINSERT("Rr", "f","F-Rr");
-	TABLEINSERT("Rr", "f-q","F-Rr-Q");
-	TABLEINSERT("Rr", "b","B-Rr");
+	TABLEINSERT("Rr", "f", "F-Rr");
+	TABLEINSERT("Rr", "f-q", "F-Rr-Q");
+	TABLEINSERT("Rr", "b", "B-Rr");
 	TABLEINSERT("Rr", "sr", "Sr-Rr");
 	TABLEINSERT("Rr", "sr-q", "Sr-Rr-Q");
 	TABLEINSERT("Rr", "sl", "Sl-Rr");
 	TABLEINSERT("Rr", "sl-q", "Sr-Rl-Q");
-	TABLEINSERT("Rr", "rr-up","I");
-	TABLEINSERT("Rr", "rr-q","Rr-Q");
-	TABLEINSERT("Rr", "q","Rr-Q");
+	TABLEINSERT("Rr", "rr-up", "I");
+	TABLEINSERT("Rr", "rr-q", "Rr-Q");
+	TABLEINSERT("Rr", "q", "Rr-Q");
 	//Rl
-	TABLEINSERT("Rl", "f","F-Rl");
-	TABLEINSERT("Rl", "f-q","F-Rl-Q");
-	TABLEINSERT("Rl", "b","B-Rl");
+	TABLEINSERT("Rl", "f", "F-Rl");
+	TABLEINSERT("Rl", "f-q", "F-Rl-Q");
+	TABLEINSERT("Rl", "b", "B-Rl");
 	TABLEINSERT("Rl", "sr", "Sr-Rl");
 	TABLEINSERT("Rl", "sr-q", "Sr-Rl-Q");
 	TABLEINSERT("Rl", "sl", "Sl-Rl");
 	TABLEINSERT("Rl", "sl-q", "Sl-Rl-Q");
-	TABLEINSERT("Rl", "rl-up","I");
-	TABLEINSERT("Rl", "rl-q","Rl-Q");
-	TABLEINSERT("Rl", "q","Rl-Q");
+	TABLEINSERT("Rl", "rl-up", "I");
+	TABLEINSERT("Rl", "rl-q", "Rl-Q");
+	TABLEINSERT("Rl", "q", "Rl-Q");
 	//J
-	TABLEINSERT("J", "f","F-J");
-	TABLEINSERT("J", "f-q","F-J-Q");
-	TABLEINSERT("J", "j-up","I");
+	TABLEINSERT("J", "f", "F-J");
+	TABLEINSERT("J", "f-q", "F-J-Q");
+	TABLEINSERT("J", "j-up", "I");
 	//F-Rr
 	TABLEINSERT("F-Rr", "f-up", "Rr");
 	TABLEINSERT("F-Rr", "f-q", "F-Rr-Q");
@@ -193,13 +220,13 @@ void activityCharacterInit()
 	TABLEINSERT("F-Rl", "rl-q", "F-Rl-Q");
 	TABLEINSERT("F-Rl", "q", "F-Rl-Q");
 	//F-J
-	TABLEINSERT("F-J", "f-up","J");
-	TABLEINSERT("F-J", "f-q","F-J-Q");
-	TABLEINSERT("F-J", "j-up","F");
-	TABLEINSERT("F-J", "j-q","F-J-Q");
-	TABLEINSERT("F-J", "q","F-J-Q");
+	TABLEINSERT("F-J", "f-up", "J");
+	TABLEINSERT("F-J", "f-q", "F-J-Q");
+	TABLEINSERT("F-J", "j-up", "F");
+	TABLEINSERT("F-J", "j-q", "F-J-Q");
+	TABLEINSERT("F-J", "q", "F-J-Q");
 	//B-Rr
-	TABLEINSERT("B-Rr", "b-up","Rr");
+	TABLEINSERT("B-Rr", "b-up", "Rr");
 	TABLEINSERT("B-Rr", "rr-up", "B");
 	//B-Rl
 	TABLEINSERT("B-Rl", "b-up", "Rl");

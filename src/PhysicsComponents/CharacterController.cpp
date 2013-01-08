@@ -43,7 +43,7 @@ CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tm
 	mJump = false;
 	//reset events' sending
 	mOnGroundSent = false;
-	mOffGroundSent = false;
+	mOnAirSent = false;
 }
 
 CharacterController::~CharacterController()
@@ -536,7 +536,7 @@ void CharacterController::update(void* data)
 			throw_event(std::string("OnGround"), EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mOnGroundSent = true;
-			mOffGroundSent = false;
+			mOnAirSent = false;
 		}
 		//jump if requested
 		if (mJump)
@@ -547,11 +547,11 @@ void CharacterController::update(void* data)
 	else
 	{
 		//throw OffGround event (if enabled)
-		if (mThrowEvents and (not mOffGroundSent))
+		if (mThrowEvents and (not mOnAirSent))
 		{
-			throw_event(std::string("OffGround"), EventParameter(this),
+			throw_event(std::string("OnAir"), EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
-			mOffGroundSent = true;
+			mOnAirSent = true;
 			mOnGroundSent = false;
 		}
 	}

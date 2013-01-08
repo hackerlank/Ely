@@ -202,7 +202,7 @@ private:
 	///@}
 
 	///Throwing events.
-	bool mThrowEvents, mOnGroundSent, mOffGroundSent;
+	bool mThrowEvents, mOnGroundSent, mOnAirSent;
 
 	///TypedObject semantics: hardcoded
 public:

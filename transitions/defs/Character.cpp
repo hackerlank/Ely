@@ -132,10 +132,6 @@ EXIT Exit_Sl_Rl_Q_Character;
 void Enter_I_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_I_Character");
-	SMARTPTR(Object)npc1 = activity.getOwnerObject();
-	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
-					ComponentFamilyType("Scene")));
-	npc1Model->animations().stop_all();
 }
 void Exit_I_Character(fsm*, Activity& activity)
 {
@@ -284,19 +280,19 @@ void Enter_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
 	PRINT("Enter_J_Character");
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
-	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
-					ComponentFamilyType("Scene")));
+	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
+			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().play("jump");
+	npc1CharCtrl->enableJump(true);
 }
 void Exit_J_Character(fsm*, Activity& activity)
 {
 	PRINT("Exit_J_Character");
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
-	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
-					ComponentFamilyType("Scene")));
+	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
+			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("jump");
+	npc1CharCtrl->enableJump(false);
 }
 //F-Rr
 void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
