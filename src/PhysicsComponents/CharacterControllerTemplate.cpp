@@ -74,6 +74,7 @@ void CharacterControllerTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
 	mParameterTable.insert(ParameterNameValue("step_height", "1.0"));
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
 	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));

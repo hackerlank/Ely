@@ -240,7 +240,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//play animation
 //	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
 //					ComponentFamilyType("Scene")));
-//	actor1Model->animations().loop("panda-walk", false);
+//	actor1Model->animations().loop("walk", false);
 	//play sound
 	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
 					ComponentFamilyType("Audio")));
@@ -437,7 +437,7 @@ static void steerer1SteeringForceOn(const Event* event, void* data)
 		SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
 						ComponentFamilyType("Scene")));
 		//play animation
-		gorilla1Model->animations().loop("gorilla/gorillawalking", false);
+		gorilla1Model->animations().loop("walk", false);
 	}
 }
 static void steerer1SteeringForceOff(const Event* event, void* data)
@@ -450,7 +450,7 @@ static void steerer1SteeringForceOff(const Event* event, void* data)
 		SMARTPTR(Model) gorilla1Model = DCAST(Model, gorilla1->getComponent(
 						ComponentFamilyType("Scene")));
 		//stop animation
-		gorilla1Model->animations().stop("gorilla/gorillawalking");
+		gorilla1Model->animations().stop("walk");
 	}
 }
 

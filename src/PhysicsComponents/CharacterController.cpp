@@ -41,6 +41,9 @@ CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tm
 	mRollLeft = false;
 	mRollRight = false;
 	mJump = false;
+	//reset events' sending
+	mOnGroundSent = false;
+	mOffGroundSent = false;
 }
 
 CharacterController::~CharacterController()
@@ -77,6 +80,10 @@ bool CharacterController::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
+	//throw events setting
+	mThrowEvents = (
+			mTmpl->parameter(std::string("throw_events"))
+					== std::string("true") ? true : false);
 	//get step height
 	mStepHeight = (float) strtof(
 			mTmpl->parameter(std::string("step_height")).c_str(), NULL);
@@ -262,8 +269,7 @@ void CharacterController::onAddToObjectSetup()
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 	std::string name = COMPONENT_STANDARD_NAME;
 	mCharacterController = new BulletCharacterControllerNode(
-			createShape(mShapeType), mStepHeight,
-			name.c_str());
+			createShape(mShapeType), mStepHeight, name.c_str());
 	//set the control parameters
 	setControlParameters();
 
@@ -520,11 +526,33 @@ void CharacterController::update(void* data)
 	// set movements
 	mCharacterController->set_linear_movement(speed, mIsLocal);
 	mCharacterController->set_angular_movement(omega);
-	if (mJump)
+
+	//handle CharacterController ground-air
+	if (mCharacterController->is_on_ground())
 	{
-		if (mCharacterController->is_on_ground())
+		//throw OnGround event (if enabled)
+		if (mThrowEvents and (not mOnGroundSent))
+		{
+			throw_event(std::string("OnGround"), EventParameter(this),
+					EventParameter(std::string(mOwnerObject->objectId())));
+			mOnGroundSent = true;
+			mOffGroundSent = false;
+		}
+		//jump if requested
+		if (mJump)
 		{
 			mCharacterController->do_jump();
+		}
+	}
+	else
+	{
+		//throw OffGround event (if enabled)
+		if (mThrowEvents and (not mOffGroundSent))
+		{
+			throw_event(std::string("OffGround"), EventParameter(this),
+					EventParameter(std::string(mOwnerObject->objectId())));
+			mOffGroundSent = true;
+			mOnGroundSent = false;
 		}
 	}
 }

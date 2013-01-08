@@ -32,6 +32,8 @@
 #include <lvecBase2.h>
 #include <lvector3.h>
 #include <lpoint3.h>
+#include <throw_event.h>
+#include <eventParameter.h>
 #include <bulletShape.h>
 #include <bulletCharacterControllerNode.h>
 #include <bullet_utils.h>
@@ -52,6 +54,7 @@ class CharacterControllerTemplate;
  * The up axis is the Z axis.\n
  *
  * XML Param(s):
+ * - "throw_events"				|single|"false"
  * - "step_height"  			|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
@@ -197,6 +200,9 @@ private:
 	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
 	mRollLeftKey, mRollRightKey, mJumpKey;
 	///@}
+
+	///Throwing events.
+	bool mThrowEvents, mOnGroundSent, mOffGroundSent;
 
 	///TypedObject semantics: hardcoded
 public:
