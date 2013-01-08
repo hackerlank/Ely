@@ -218,9 +218,6 @@ void Model::onAddToObjectSetup()
 				}
 			}
 
-
-
-			///TODO see Sound3d.cpp
 			//setup more animations (if any)
 			std::list<std::string>::iterator iter;
 			for (iter = mAnimFileList.begin(); iter != mAnimFileList.end();
@@ -228,21 +225,25 @@ void Model::onAddToObjectSetup()
 			{
 				//any "anim_files" string is a "compound" one, i.e. could have the form:
 				// "anim_name1@anim_file1:anim_name2@anim_file2:...:anim_nameN@anim_fileN"
-				std::vector<std::string> animFiles = parseCompoundString(*iter,
+				std::vector<std::string> nameFilePairs = parseCompoundString(*iter,
 						':');
-				std::vector<std::string>::const_iterator iterAnimFile;
-				for (iterAnimFile = animFiles.begin();
-						iterAnimFile != animFiles.end(); ++iterAnimFile)
+				std::vector<std::string>::const_iterator iterPair;
+				for (iterPair = nameFilePairs.begin();
+						iterPair != nameFilePairs.end(); ++iterPair)
 				{
-					//an empty anim file is ignored
-					if (not iterAnimFile->empty())
+					//an empty anim_name@anim_file is ignored
+					if (not iterPair->empty())
 					{
 						parts.clear();
 						anims.clear();
+						//get anim name and anim file name
+						std::vector<std::string> nameFilePair =
+								parseCompoundString(*iterPair, '@');
+						//anim name == nameFilePair[0]
+						//anim file name == nameFilePair[1]
 						//get the AnimBundle node path
-						std::string baseAnimName = *iterAnimFile;
 						NodePath animNP = mTmpl->windowFramework()->load_model(
-								mNodePath, Filename(baseAnimName));
+								mNodePath, Filename(nameFilePair[1]));
 						if (animNP.is_empty())
 						{
 							animNP = NodePath();
@@ -260,12 +261,12 @@ void Model::onAddToObjectSetup()
 							{
 								if (j > 0)
 								{
-									animName = baseAnimName + '.'
+									animName = nameFilePair[0] + '.'
 											+ format_string(j);
 								}
 								else
 								{
-									animName = baseAnimName;
+									animName = nameFilePair[0];
 								}
 								PRINT(
 										"Binding animation '" << (*animBundlesIter)->get_name() << " with name '" << animName << "'");

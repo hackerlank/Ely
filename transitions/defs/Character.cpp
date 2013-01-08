@@ -152,7 +152,7 @@ void Enter_F_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-walk", false);
+	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
 }
 void Exit_F_Character(fsm*, Activity& activity)
@@ -165,7 +165,7 @@ void Exit_F_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
 }
 //B
@@ -179,7 +179,7 @@ void Enter_B_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-walk", false);
+	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
 }
 void Exit_B_Character(fsm*, Activity& activity)
@@ -192,7 +192,7 @@ void Exit_B_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
 }
 //Sr
@@ -287,7 +287,7 @@ void Enter_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	//
-	npc1Model->animations().play("eve/eve-jump");
+	npc1Model->animations().play("jump");
 }
 void Exit_J_Character(fsm*, Activity& activity)
 {
@@ -296,7 +296,7 @@ void Exit_J_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	//
-	npc1Model->animations().stop("eve/eve-jump");
+	npc1Model->animations().stop("jump");
 }
 //F-Rr
 void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -309,7 +309,7 @@ void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-walk", false);
+	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
 	npc1CharCtrl->enableRollRight(true);
 }
@@ -323,7 +323,7 @@ void Exit_F_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
 	npc1CharCtrl->enableRollRight(false);
 }
@@ -338,7 +338,7 @@ void Enter_F_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-walk", false);
+	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
 	npc1CharCtrl->enableRollLeft(true);
 }
@@ -352,7 +352,7 @@ void Exit_F_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
 	npc1CharCtrl->enableRollLeft(false);
 }
@@ -370,11 +370,11 @@ void Enter_F_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//enable animation blending
 	npc1Model->getPartBundle()->set_anim_blend_flag(true);
 	npc1Model->getPartBundle()->set_control_effect(
-			npc1Model->animations().find_anim("eve/eve-walk"), 0.5);
+			npc1Model->animations().find_anim("walk"), 0.5);
 	npc1Model->getPartBundle()->set_control_effect(
-			npc1Model->animations().find_anim("eve/eve-jump"), 0.5);
-	npc1Model->animations().loop("eve/eve-walk", false);
-	npc1Model->animations().loop("eve/eve-jump", false);
+			npc1Model->animations().find_anim("jump"), 0.5);
+	npc1Model->animations().loop("walk", false);
+	npc1Model->animations().loop("jump", false);
 	npc1CharCtrl->enableForward(true);
 	npc1CharCtrl->enableJump(true);
 }
@@ -388,8 +388,8 @@ void Exit_F_J_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-jump");
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("jump");
+	npc1Model->animations().stop("walk");
 	//disable animation blending
 	npc1Model->getPartBundle()->set_anim_blend_flag(false);
 	npc1CharCtrl->enableForward(false);
@@ -406,7 +406,7 @@ void Enter_B_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-walk", false);
+	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
 	npc1CharCtrl->enableRollRight(true);
 }
@@ -420,7 +420,7 @@ void Exit_B_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
 	npc1CharCtrl->enableRollRight(false);
 }
@@ -435,7 +435,7 @@ void Enter_B_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-walk", false);
+	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
 	npc1CharCtrl->enableRollLeft(true);
 }
@@ -449,7 +449,7 @@ void Exit_B_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-walk");
+	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
 	npc1CharCtrl->enableRollLeft(false);
 }
@@ -574,7 +574,7 @@ void Enter_F_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-run", false);
+	npc1Model->animations().loop("run", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->enableForward(true);
 }
@@ -588,7 +588,7 @@ void Exit_F_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-run");
+	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 }
@@ -711,7 +711,7 @@ void Enter_F_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-run", false);
+	npc1Model->animations().loop("run", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableForward(true);
@@ -727,7 +727,7 @@ void Exit_F_Rr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-run");
+	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
 	npc1CharCtrl->enableRollRight(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
@@ -744,7 +744,7 @@ void Enter_F_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().loop("eve/eve-run", false);
+	npc1Model->animations().loop("run", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableForward(true);
@@ -760,7 +760,7 @@ void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-run");
+	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
 	npc1CharCtrl->enableRollLeft(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
@@ -780,11 +780,11 @@ void Enter_F_J_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//enable animation blending
 	npc1Model->getPartBundle()->set_anim_blend_flag(true);
 	npc1Model->getPartBundle()->set_control_effect(
-			npc1Model->animations().find_anim("eve/eve-run"), 0.5);
+			npc1Model->animations().find_anim("run"), 0.5);
 	npc1Model->getPartBundle()->set_control_effect(
-			npc1Model->animations().find_anim("eve/eve-jump"), 0.5);
-	npc1Model->animations().loop("eve/eve-run", false);
-	npc1Model->animations().loop("eve/eve-jump", false);
+			npc1Model->animations().find_anim("jump"), 0.5);
+	npc1Model->animations().loop("run", false);
+	npc1Model->animations().loop("jump", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->enableForward(true);
 	npc1CharCtrl->enableJump(true);
@@ -799,8 +799,8 @@ void Exit_F_J_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
 	//
-	npc1Model->animations().stop("eve/eve-jump");
-	npc1Model->animations().stop("eve/eve-run");
+	npc1Model->animations().stop("jump");
+	npc1Model->animations().stop("run");
 	//disable animation blending
 	npc1Model->getPartBundle()->set_anim_blend_flag(false);
 	npc1CharCtrl->enableForward(false);
