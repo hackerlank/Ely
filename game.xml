@@ -418,14 +418,14 @@
 				<Param body_type="static"/>
 				<Param body_friction="0.9"/>
 				<Param body_restitution="0.2"/>
-				<Param shape_type="box"/>
+				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot_h="-45.0"/>
 			<Param pos_x="623.0"/>
 			<Param pos_y="849.0"/>
-			<Param pos_z="295.0"/>
+			<Param pos_z="218.0"/>
 		</Object>
 
 		<Object type="StaticActor" id="gazebo">
@@ -440,14 +440,14 @@
 				<Param body_type="static"/>
 				<Param body_friction="0.9"/>
 				<Param body_restitution="0.2"/>
-				<Param shape_type="box"/>
+				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot_h="0.0"/>
 			<Param pos_x="675.0"/>
 			<Param pos_y="620.0"/>
-			<Param pos_z="278.0"/>
+			<Param pos_z="248.0"/>
 		</Object>
 		
 		<Object type="StaticActor" id="cityhall">
@@ -462,14 +462,14 @@
 				<Param body_type="static"/>
 				<Param body_friction="0.9"/>
 				<Param body_restitution="0.2"/>
-				<Param shape_type="box"/>
+				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot_h="105.0"/>
 			<Param pos_x="3404.0"/>
 			<Param pos_y="2800.0"/>
-			<Param pos_z="-116.0"/>
+			<Param pos_z="-243.0"/>
 		</Object>
 
 		<Object type="StaticActor" id="bridge">

@@ -318,12 +318,15 @@ void RigidBody::onAddToObjectSetup()
 	{
 		//reparent the object node path as a child of the rigid body's one
 		ownerNodePath.reparent_to(mNodePath);
-		//correct (or possibly reset to zero) pos and hpr of the object node path
-		ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+		if (mShapeType != GamePhysicsManager::TRIANGLEMESH)
+		{
+			//correct (or possibly reset to zero) pos and hpr of the object node path
+			ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+		}
 		//optimize
 		if (mShapeType != GamePhysicsManager::HEIGHTFIELD)	//Hack
 		{
-			ownerNodePath.flatten_light();
+			ownerNodePath.flatten_strong();
 		}
 	}
 
