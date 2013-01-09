@@ -36,13 +36,13 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
 	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
 			"invalid GamePhysicsManager")
 	//get bullet world reference
-	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
-	mTmpl = tmpl;
-	mAICharacter = NULL;
-	mUpdatePtr = NULL;
-	mCharacterController = NULL;
-	mMovRotEnabled = false;
-}
+		mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
+		mTmpl = tmpl;
+		mAICharacter = NULL;
+		mUpdatePtr = NULL;
+		mCharacterController = NULL;
+		mMovRotEnabled = false;
+	}
 
 Steering::~Steering()
 {
@@ -80,7 +80,8 @@ bool Steering::initialize()
 	//
 	float floatParam;
 	//mass
-	floatParam = (float) strtof(mTmpl->parameter(std::string("mass")).c_str(), NULL);
+	floatParam = (float) strtof(mTmpl->parameter(std::string("mass")).c_str(),
+			NULL);
 	floatParam > 0.0 ? mMass = floatParam : mMass = 1.0;
 	//movt_force
 	floatParam = (float) strtof(
@@ -93,7 +94,8 @@ bool Steering::initialize()
 	//the type of the updatable item
 	mType = mTmpl->parameter(std::string("controlled_type"));
 	//obstacle hit mask
-	std::string obstacleHitMask = mTmpl->parameter(std::string("obstacle_hit_mask"));
+	std::string obstacleHitMask = mTmpl->parameter(
+			std::string("obstacle_hit_mask"));
 	if (obstacleHitMask == std::string("all_on"))
 	{
 		mObstacleHitMask = BitMask32::all_on();
@@ -116,7 +118,8 @@ bool Steering::initialize()
 					mTmpl->parameter(
 							std::string("obstacle_max_distance_fraction")).c_str(),
 					NULL);
-	floatParam > 0.0 ? mObstacleMaxDistanceFraction = floatParam :
+	floatParam > 0.0 ?
+			mObstacleMaxDistanceFraction = floatParam :
 			mObstacleMaxDistanceFraction = 1.0;
 	//
 	return result;
@@ -457,8 +460,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 	{
 		if (_steering->_conflict)
 		{
-			force = do_seek()
-					* _steering->_seek_obj->_seek_weight;
+			force = do_seek() * _steering->_seek_obj->_seek_weight;
 		}
 		else
 		{
@@ -487,8 +489,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 			{
 				if (_steering->_conflict)
 				{
-					force = do_flee()
-							* _steering->_flee_itr->_flee_weight;
+					force = do_flee() * _steering->_flee_itr->_flee_weight;
 				}
 				else
 				{
@@ -503,8 +504,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 	{
 		if (_steering->_conflict)
 		{
-			force = do_pursue()
-					* _steering->_pursue_obj->_pursue_weight;
+			force = do_pursue() * _steering->_pursue_obj->_pursue_weight;
 		}
 		else
 		{
@@ -578,8 +578,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 	{
 		if (_steering->_conflict)
 		{
-			force = do_wander()
-					* _steering->_wander_obj->_wander_weight;
+			force = do_wander() * _steering->_wander_obj->_wander_weight;
 		}
 		else
 		{
@@ -1121,13 +1120,13 @@ LVecBase3f Steering::do_wander()
 //obstacle avoidance
 void Steering::obstacle_avoidance_activate_bullet()
 {
-	ObstacleAvoidance *_obstacle_avoidance_obj = _steering->_obstacle_avoidance_obj;
+	ObstacleAvoidance *_obstacle_avoidance_obj =
+			_steering->_obstacle_avoidance_obj;
 	//ray cast direction (already normalized)
 	LVecBase3f forwardDirection =
 			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
 					_obstacle_avoidance_obj->_ai_char->get_node_path(),
 					-LVector3f::forward());
-//	forwardDirection.normalize();
 	//from_pos = _ai_char pos
 	LPoint3f fromPos =
 			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_point(
@@ -1138,11 +1137,14 @@ void Steering::obstacle_avoidance_activate_bullet()
 	//detect obstacles
 	BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos, toPos,
 			mObstacleHitMask);
-	//check if hit and at what distance
+	//check if hit along forwardDirection and < mObstacleMaxDist (plane) distance
 	if (result.has_hit()
 			and ((result.get_hit_pos() - fromPos).get_xy().length_squared()
 					< mObstacleMaxDistSquared))
 	{
+		//save hit normal and hit obstacle
+		mOldHitNormal = result.get_hit_normal();
+		mHitObstacle = NodePath(result.get_node());
 		_obstacle_avoidance_obj->_ai_char->_steering->turn_off(
 				"obstacle_avoidance_activate");
 		_obstacle_avoidance_obj->_ai_char->_steering->turn_on(
@@ -1151,39 +1153,72 @@ void Steering::obstacle_avoidance_activate_bullet()
 }
 LVecBase3f Steering::do_obstacle_avoidance_bullet()
 {
-	ObstacleAvoidance *_obstacle_avoidance_obj = _steering->_obstacle_avoidance_obj;
-	//ray cast direction (already normalized)
-	LVecBase3f forwardDirection =
-			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
-					_obstacle_avoidance_obj->_ai_char->get_node_path(),
-					-LVector3f::forward());
-//	forwardDirection.normalize();
+	ObstacleAvoidance *_obstacle_avoidance_obj =
+			_steering->_obstacle_avoidance_obj;
 	//from_pos = _ai_char pos
 	LPoint3f fromPos =
 			_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_point(
 					_obstacle_avoidance_obj->_ai_char->get_node_path(),
 					LPoint3f::zero());
-	//to_pos = very far from _ai_char pos along forwardDirection
-	LPoint3f toPos = fromPos + forwardDirection * PHYSICS_MAX_DISTANCE;
+	//to_pos = very far from _ai_char pos along -mOldHitNormal
+	LPoint3f toPos = fromPos - mOldHitNormal * PHYSICS_MAX_DISTANCE;
 	//detect obstacles
 	BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos, toPos,
 			mObstacleHitMask);
-	//check if hit and at what distance
+	//check ray first along -mOldHitNormal if hit and < mObstacleMaxDist (plane) distance
 	if (result.has_hit()
 			and ((result.get_hit_pos() - fromPos).get_xy().length_squared()
 					< mObstacleMaxDistSquared))
 	{
 		//there is an obstacle to avoid
 		//get normal hit direction (already normalized)
-		LVector3f hitNormal = result.get_hit_normal();
+		mOldHitNormal = result.get_hit_normal();
+		//forward direction (already normalized)
+		LVecBase3f forwardDirection =
+				_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
+						_obstacle_avoidance_obj->_ai_char->get_node_path(),
+						-LVector3f::forward());
 		//get the forwardDirection normal component
-		LVector3f normalComponent = hitNormal * forwardDirection.dot(hitNormal);
+		LVector3f normalComponent = mOldHitNormal
+				* forwardDirection.dot(mOldHitNormal);
 		//calculate avoidance by reverting the forwardDirection normal component
 		LVecBase3f avoidance = (forwardDirection - 2 * normalComponent)
-				* (mObstacleMaxDist
-						* _obstacle_avoidance_obj->_ai_char->get_max_force()
+				* (_obstacle_avoidance_obj->_ai_char->get_max_force()
 						* _obstacle_avoidance_obj->_ai_char->_movt_force);
 		return avoidance;
+	}
+	else
+	{
+		//we are near a corner: check ray with hit obstacle
+		LPoint3f toPos =
+				_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_point(
+						mHitObstacle, LPoint3f::zero());
+		//detect obstacles
+		BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos,
+				toPos, mObstacleHitMask);
+		//check ray first along hit obstacle if hit and < mObstacleMaxDist (plane) distance
+		if (result.has_hit()
+				and ((result.get_hit_pos() - fromPos).get_xy().length_squared()
+						< mObstacleMaxDistSquared))
+		{
+			//there is an obstacle to avoid
+			//get normal hit direction (already normalized)
+			mOldHitNormal = result.get_hit_normal();
+			//forward direction (already normalized)
+			LVecBase3f forwardDirection =
+					_obstacle_avoidance_obj->_ai_char->get_char_render().get_relative_vector(
+							_obstacle_avoidance_obj->_ai_char->get_node_path(),
+							-LVector3f::forward());
+			//get the forwardDirection normal component
+			LVector3f normalComponent = mOldHitNormal
+					* forwardDirection.dot(mOldHitNormal);
+			//calculate avoidance by reverting the forwardDirection normal component
+			LVecBase3f avoidance = (forwardDirection - 2 * normalComponent)
+					* (mObstacleMaxDist
+							* _obstacle_avoidance_obj->_ai_char->get_max_force()
+							* _obstacle_avoidance_obj->_ai_char->_movt_force);
+			return avoidance;
+		}
 	}
 	_obstacle_avoidance_obj->_ai_char->_steering->turn_on(
 			"obstacle_avoidance_activate");

@@ -182,6 +182,8 @@ private:
 	///Obstacle avoidance.
 	float mObstacleMaxDistanceFraction, mObstacleMaxDist, mObstacleMaxDistSquared;
 	BitMask32 mObstacleHitMask;
+	LVector3f mOldHitNormal;
+	NodePath mHitObstacle;
 	///@}
 
 	/**

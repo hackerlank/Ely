@@ -335,6 +335,7 @@
 			</Component>
 			<Component type="CharacterController">
 				<Param throw_events="true"/>
+				<Param collide_mask="0x7FFFFFFF"/>
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
 				<Param linear_speed="120.0"/>
