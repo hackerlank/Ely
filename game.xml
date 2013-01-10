@@ -62,10 +62,10 @@
 		<ObjectTmpl type="Character">
 			<ComponentTmpl family="Behavior" type="Activity" priority="40">
 				<Param states="I:F:B:Sr:Sl:Rr:Rl:J"/>
-				<Param states="F-Rr:F-Rl:F-J:B-Rr:B-Rl"/>
+				<Param states="F-Rr:F-Rl:F-Rr-Rl:Rr-Rl:F-J:B-Rr:B-Rl"/>
 				<Param states="Sr-Rr:Sr-Rl:Sl-Rr:Sl-Rl"/>
 				<Param states="F-Q:Sr-Q:Sl-Q:Rr-Q:Rl-Q"/>
-				<Param states="F-Rr-Q:F-Rl-Q:F-J-Q"/>
+				<Param states="F-Rr-Q:F-Rl-Q:F-Rr-Rl-Q:Rr-Rl-Q:F-J-Q"/>
 				<Param states="Sr-Rr-Q:Sr-Rl-Q:Sl-Rr-Q:Sl-Rl-Q"/>
 				<Param event_types="f:f-up:f-q:b:b-up:b-q"/>
 				<Param event_types="sr:sr-up:sr-q:sl:sl-up:sl-q"/>

@@ -65,6 +65,12 @@ EXIT Exit_F_Rr_Character;
 //F-Rl
 ENTER Enter_F_Rl_Character;
 EXIT Exit_F_Rl_Character;
+//F-Rr-Rl
+ENTER Enter_F_Rr_Rl_Character;
+EXIT Exit_F_Rr_Rl_Character;
+//Rr-Rl
+ENTER Enter_Rr_Rl_Character;
+EXIT Exit_Rr_Rl_Character;
 //F-J
 ENTER Enter_F_J_Character;
 EXIT Exit_F_J_Character;
@@ -107,6 +113,12 @@ EXIT Exit_F_Rr_Q_Character;
 //F-Rl-Q
 ENTER Enter_F_Rl_Q_Character;
 EXIT Exit_F_Rl_Q_Character;
+//F-Rr-Rl-Q
+ENTER Enter_F_Rr_Rl_Q_Character;
+EXIT Exit_F_Rr_Rl_Q_Character;
+//Rr-Rl-Q
+ENTER Enter_Rr_Rl_Q_Character;
+EXIT Exit_Rr_Rl_Q_Character;
 //F-J-Q
 ENTER Enter_F_J_Q_Character;
 EXIT Exit_F_J_Q_Character;
@@ -351,6 +363,28 @@ void Exit_F_Rl_Character(fsm*, Activity& activity)
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
 	npc1CharCtrl->enableRollLeft(false);
+}
+//F-Rr-Rl
+void Enter_F_Rr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
+{
+	PRINT("Enter_F_Rr_Rl_Character");
+	//
+}
+void Exit_F_Rr_Rl_Character(fsm*, Activity& activity)
+{
+	PRINT("Exit_F_Rr_Rl_Character");
+	//
+}
+//Rr-Rl
+void Enter_Rr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
+{
+	PRINT("Enter_Rr_Rl_Character");
+	//
+}
+void Exit_Rr_Rl_Character(fsm*, Activity& activity)
+{
+	PRINT("Exit_Rr_Rl_Character");
+	//
 }
 //F-J
 void Enter_F_J_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -761,6 +795,28 @@ void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 	npc1CharCtrl->enableRollLeft(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
+}
+//F-Rr-Rl-Q
+void Enter_F_Rr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
+{
+	PRINT("Enter_F_Rr_Rl_Q_Character");
+	//
+}
+void Exit_F_Rr_Rl_Q_Character(fsm*, Activity& activity)
+{
+	PRINT("Exit_F_Rr_Rl_Q_Character");
+	//
+}
+//Rr-Rl-Q
+void Enter_Rr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
+{
+	PRINT("Enter_Rr_Rl_Q_Character");
+	//
+}
+void Exit_Rr_Rl_Q_Character(fsm*, Activity& activity)
+{
+	PRINT("Exit_Rr_Rl_Q_Character");
+	//
 }
 //F-J-Q
 void Enter_F_J_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
