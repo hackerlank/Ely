@@ -35,7 +35,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2076796897" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -75,7 +75,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="callbacks|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|net|src/Ely.cpp|transitions|include|initializations|training|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2/xmltest.cpp|callbacks|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|net|src/Ely.cpp|transitions|include|initializations|training|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="Ely.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|ai.cpp|physics.cpp|network.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -115,7 +115,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.552798014" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -155,7 +155,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="net|training/c++cia/chap1.cpp|transitions|src/test|initializations|callbacks|src|training/gpg1/singleton/singleton.cpp|test/Runner.cpp|include|training|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2/xmltest.cpp|net|training/c++cia/chap1.cpp|transitions|src/test|initializations|callbacks|src|training/gpg1/singleton/singleton.cpp|test/Runner.cpp|include|training|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|ai.cpp|physics.cpp|network.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -197,7 +197,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1954983127" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -237,7 +237,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|net|src/Ely.cpp|transitions|include|initializations|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2/xmltest.cpp|training/gpg1/singleton/singleton.cpp|training/c++cia/chap1.cpp|net|src/Ely.cpp|transitions|include|initializations|training|callbacks|src|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="Ely.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|ai.cpp|physics.cpp|network.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -277,7 +277,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.other.160821945" name="Other flags" superClass="gnu.cpp.compiler.option.other.other" value="-c -fmessage-length=0 " valueType="string"/>
@@ -318,7 +318,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="training/anim.cpp|net|training/fsm.cpp|transitions|training/network.cpp|initializations|training/threads.cpp|callbacks|src|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2|training/anim.cpp|net|training/fsm.cpp|transitions|training/network.cpp|initializations|training/threads.cpp|callbacks|src|training/physics.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -354,7 +354,7 @@
 								<option id="gnu.cpp.compiler.option.include.paths.1471434062" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/panda3d/built/include"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
@@ -396,7 +396,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="net|training/c++cia/chap1.cpp|transitions|src/test|initializations|callbacks|src|training/gpg1/singleton/singleton.cpp|test/Runner.cpp|include|training|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2/xmltest.cpp|net|training/c++cia/chap1.cpp|transitions|src/test|initializations|callbacks|src|training/gpg1/singleton/singleton.cpp|test/Runner.cpp|include|training|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|ai.cpp|physics.cpp|network.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
@@ -435,7 +435,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1955724096" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -473,7 +473,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="training/anim.cpp|net|transitions|src/test|training/network.cpp|training/ai.cpp|initializations|training/threads.cpp|callbacks|training/physics.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2/xmltest.cpp|training/anim.cpp|net|transitions|src/test|training/network.cpp|training/ai.cpp|initializations|training/threads.cpp|callbacks|training/physics.cpp|src/test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -519,7 +519,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.2070706663" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
@@ -549,7 +549,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="net|transitions|initializations|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2|net|transitions|initializations|training|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 					</sourceEntries>
 				</configuration>
 			</storageModule>
@@ -593,7 +593,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.821677966" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
@@ -623,7 +623,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="net|transitions|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2|net|transitions|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="transitions"/>
 					</sourceEntries>
 				</configuration>
@@ -668,7 +668,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.other.pic.1115415610" name="Position Independent Code (-fPIC)" superClass="gnu.cpp.compiler.option.other.pic" value="true" valueType="boolean"/>
@@ -698,7 +698,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="net|transitions|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2|net|transitions|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="initializations"/>
 					</sourceEntries>
 				</configuration>
@@ -737,7 +737,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/python2.6"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/${ProjName}/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/bullet"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1785566701" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -777,7 +777,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="net|training/c++cia/chap1.cpp|transitions|src/test|initializations|callbacks|src|training/gpg1/singleton/singleton.cpp|test/Runner.cpp|include|training|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="tinyxml2/xmltest.cpp|net|training/c++cia/chap1.cpp|transitions|src/test|initializations|callbacks|src|training/gpg1/singleton/singleton.cpp|test/Runner.cpp|include|training|src/test/Runner.cpp|training/c++cia/chap02/launching_a_thread.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry excluding="test/Runner.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
 						<entry excluding="threads.cpp|fsm.cpp|anim.cpp|training.cpp|ai.cpp|physics.cpp|network.cpp" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="training"/>
