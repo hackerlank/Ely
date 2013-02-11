@@ -1,9 +1,7 @@
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 
-bin_PROGRAMS = ely
-ely_SOURCES = \
-		Ely.cpp
-
-noinst_LTLIBRARIES = libaicomponents.la \
+noinst_LTLIBRARIES = \
+		libaicomponents.la \
 		libaudiocomponents.la \
 		libbehaviorcomponents.la \
 		libcontrolcomponents.la \
@@ -13,6 +11,14 @@ noinst_LTLIBRARIES = libaicomponents.la \
 		libscenecomponents.la \
 		libsupport.la \
 		libutilities.la
+
+bin_PROGRAMS = ely
+ely_SOURCES = \
+		Ely.cpp
+ely_LDFLAGS = -L$(top_srcdir)/tinyxml2 $(ELY_LDFLAGS)
+ely_LDADD = \
+		libtinyxml2.la \
+		$(noinst_LTLIBRARIES)
 
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \

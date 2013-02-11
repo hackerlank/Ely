@@ -24,6 +24,8 @@
 #ifndef GAMEAIMANAGER_H_
 #define GAMEAIMANAGER_H_
 
+#include "Utilities/Tools.h"
+
 #include <aiWorld.h>
 
 #include <clockObject.h>
@@ -32,7 +34,6 @@
 #include <reMutexHolder.h>
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief Singleton manager updating AI components.

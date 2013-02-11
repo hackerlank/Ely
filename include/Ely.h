@@ -24,6 +24,8 @@
 #ifndef ELY_H_
 #define ELY_H_
 
+#include "Utilities/Tools.h"
+
 #include <load_prc_file.h>
 #include "Game/GameManager.h"
 #include "Game/GameAIManager.h"
@@ -35,7 +37,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <iostream>
 #ifdef DEBUG
-#include "thread.h"
+#include <thread.h>
 #endif
 
 #endif /* ELY_H_ */

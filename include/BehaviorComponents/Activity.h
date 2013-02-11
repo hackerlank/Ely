@@ -24,6 +24,8 @@
 #ifndef ACTIVITY_H_
 #define ACTIVITY_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <list>
 #include <set>
@@ -34,7 +36,6 @@
 #include "Support/FSM.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 class ActivityTemplate;
 

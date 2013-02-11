@@ -24,6 +24,8 @@
 #ifndef FSM_H_
 #define FSM_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <iostream>
 #include <sstream>
@@ -40,8 +42,6 @@
 #include <boost/bind.hpp>
 #include <boost/ref.hpp>
 #include <boost/any.hpp>
-
-#include "Utilities/Tools.h"
 
 /**
  * \brief The Value list type.

@@ -46,10 +46,8 @@ PANDA3D_SEARCH([${PYTHON_CPPFLAGS}])
 #Ely flags
 ELY_CPPFLAGS="${CPPFLAGS} ${BULLET_CPPFLAGS} ${PANDA3D_CPPFLAGS}"
 ELY_LDFLAGS="${LDFLAGS} ${PANDA3D_LDFLAGS}"
-ELY_LIBS="${LIBS} ${PANDA3D_LIBS}"
 AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
-AC_SUBST(ELY_LIBS)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -70,5 +68,11 @@ AC_CONFIG_FILES([
 		tinyxml2/Makefile
 		training/Makefile
 		])
-				
+
+###
+AC_DEFINE([DEBUG],[1])
+AC_DEFINE([DEBUG_THREAD],[1])
+AC_DEFINE([WITHIN_PANDA],[1])
+###
+		
 AC_OUTPUT

@@ -24,6 +24,8 @@
 #ifndef PICKER_H_
 #define PICKER_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <pandaFramework.h>
 #include <windowFramework.h>
@@ -47,7 +49,6 @@
 #include "ObjectModel/Object.h"
 #include "SceneComponents/NodePathWrapper.h"
 #include "PhysicsComponents/RigidBody.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief A class for picking (physics) objects.

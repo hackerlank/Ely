@@ -24,6 +24,8 @@
 #ifndef LISTENER_H_
 #define LISTENER_H_
 
+#include "Utilities/Tools.h"
+
 #include <audioSound.h>
 #include <lvector3.h>
 #include <lpoint3.h>
@@ -31,7 +33,6 @@
 #include <transformState.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 class ListenerTemplate;
 

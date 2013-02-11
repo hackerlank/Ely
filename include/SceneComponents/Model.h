@@ -24,6 +24,8 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <list>
 #include <set>
@@ -41,7 +43,6 @@
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 class ModelTemplate;
 

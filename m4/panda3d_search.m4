@@ -1,6 +1,6 @@
 # PANDA3D_SEARCH
 # --------------
-# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS, PANDA3D_LIBS
+# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS
 # Argument: expected PYTHON_CPPFLAGS
 # Searches SDK first on cmd line flags then on std locations
 #
@@ -23,11 +23,12 @@ if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
 	----------------------------------------])
 fi	
 # check libraries first from cmd line specified ones
-PANDA3D_LDFLAGS="-L/usr/lib/panda3d -L/usr/local/lib/panda3d"
+PANDA3D_LIBSLOC="-L/usr/lib/panda3d -L/usr/local/lib/panda3d"
 PANDA3D_LIBS="-lp3framework -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct"
-LDFLAGS="${LDFLAGS} ${PANDA3D_LDFLAGS}"
+LDFLAGS="${LDFLAGS} ${PANDA3D_LIBSLOC}"
 LIBS="${LIBS} ${PANDA3D_LIBS}"
+PANDA3D_LDFLAGS="${LDFLAGS} ${LIBS}"
 required_libraries=yes
 panda3d_prologue="#include <pandaFramework.h>"
 panda3d_body="
@@ -51,6 +52,7 @@ if test "x${required_libraries}" != xyes; then
 	Check 'config.log' for more information.
 	----------------------------------------])
 fi
+
 CPPFLAGS=${CPPFLAGS_CMDLINE}
 LDFLAGS=${LDFLAGS_CMDLINE}
 LIBS=${LIBS_CMDLINE}

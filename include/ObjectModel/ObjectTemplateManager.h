@@ -24,11 +24,12 @@
 #ifndef OBJECTTEMPLATEMANAGER_H_
 #define OBJECTTEMPLATEMANAGER_H_
 
+#include "Utilities/Tools.h"
+
 #include <map>
 #include <iostream>
 #include <reMutex.h>
 #include <reMutexHolder.h>
-#include "Utilities/Tools.h"
 #include "ObjectTemplate.h"
 #include "Object.h"
 #include "ComponentTemplateManager.h"

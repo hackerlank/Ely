@@ -24,6 +24,8 @@
 #ifndef RIGIDBODY_H_
 #define RIGIDBODY_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <cstdlib>
 #include <stdint.h>
@@ -42,7 +44,6 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "Utilities/Tools.h"
 
 class RigidBodyTemplate;
 

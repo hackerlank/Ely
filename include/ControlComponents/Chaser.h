@@ -24,6 +24,8 @@
 #ifndef CHASER_H_
 #define CHASER_H_
 
+#include "Utilities/Tools.h"
+
 #include <cmath>
 #include <nodePath.h>
 #include <lvector3.h>
@@ -32,7 +34,6 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "Utilities/Tools.h"
 
 class ChaserTemplate;
 

@@ -24,6 +24,8 @@
 #ifndef STEERING_H_
 #define STEERING_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <aiCharacter.h>
 #include <seek.h>
@@ -66,7 +68,6 @@ class EXPCL_PANDAAI PathFinder;
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
-#include "Utilities/Tools.h"
 
 class SteeringTemplate;
 

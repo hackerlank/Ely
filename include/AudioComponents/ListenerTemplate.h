@@ -24,11 +24,12 @@
 #ifndef LISTENERTEMPLATE_H_
 #define LISTENERTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "AudioComponents/Listener.h"
 #include "Game/GameAudioManager.h"
-#include "Utilities/Tools.h"
 
 class ListenerTemplate: public ComponentTemplate
 {

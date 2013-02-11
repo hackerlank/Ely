@@ -24,6 +24,8 @@
 #ifndef GAMEPHYSICSMANAGER_H_
 #define GAMEPHYSICSMANAGER_H_
 
+#include "Utilities/Tools.h"
+
 #include <list>
 #include <cmath>
 #include <algorithm>
@@ -59,7 +61,6 @@
 #include <reMutexHolder.h>
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief Singleton manager updating attributes of physics components.

@@ -24,11 +24,12 @@
 #ifndef TERRAINTEMPLATE_H_
 #define TERRAINTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/Terrain.h"
 #include "Game/GameSceneManager.h"
-#include "Utilities/Tools.h"
 
 class TerrainTemplate: public ComponentTemplate
 {

@@ -24,6 +24,8 @@
 #ifndef GAMEMANAGER_H_
 #define GAMEMANAGER_H_
 
+#include "Utilities/Tools.h"
+
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include <nodePath.h>
@@ -43,7 +45,6 @@
 #include "tinyxml2.h"
 
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "GameAudioManager.h"

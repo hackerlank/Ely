@@ -24,11 +24,12 @@
 #ifndef CONTROLBYEVENTTEMPLATE_H_
 #define CONTROLBYEVENTTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "ControlComponents/Driver.h"
 #include "Game/GameControlManager.h"
-#include "Utilities/Tools.h"
 
 class DriverTemplate: public ComponentTemplate
 {

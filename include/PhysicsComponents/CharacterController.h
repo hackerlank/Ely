@@ -24,6 +24,8 @@
 #ifndef CHARACTERCONTROLLER_H_
 #define CHARACTERCONTROLLER_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <cstdlib>
 #include <cmath>
@@ -41,7 +43,6 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "Utilities/Tools.h"
 
 class CharacterControllerTemplate;
 

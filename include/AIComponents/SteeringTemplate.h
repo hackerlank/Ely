@@ -24,11 +24,12 @@
 #ifndef STEERINGTEMPLATE_H_
 #define STEERINGTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "AIComponents/Steering.h"
 #include "Game/GameAIManager.h"
-#include "Utilities/Tools.h"
 
 class SteeringTemplate: public ComponentTemplate
 {

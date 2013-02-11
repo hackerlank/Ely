@@ -24,6 +24,8 @@
 #ifndef CONTROLBYEVENT_H_
 #define CONTROLBYEVENT_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <set>
 #include <cstdlib>
@@ -38,7 +40,6 @@
 #include <lvector3.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 class DriverTemplate;
 

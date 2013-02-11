@@ -24,6 +24,8 @@
 #ifndef OBJECT_H_
 #define OBJECT_H_
 
+#include "Utilities/Tools.h"
+
 #include <map>
 #include <string>
 #include <pandaFramework.h>
@@ -34,7 +36,6 @@
 #include <reMutexHolder.h>
 #include "ObjectTemplate.h"
 #include "Component.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief Object instance identifier type (by default the name

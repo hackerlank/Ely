@@ -24,6 +24,10 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
+#if HAVE_CONFIG_H
+# include <config.h>
+#endif
+
 #include <exception>
 #include <iostream>
 #include <map>

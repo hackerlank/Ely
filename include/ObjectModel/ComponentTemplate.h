@@ -24,6 +24,8 @@
 #ifndef COMPONENTTEMPLATE_H_
 #define COMPONENTTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include <list>
 #include <set>
 #include <string>
@@ -34,7 +36,6 @@
 #include <reMutex.h>
 #include <reMutexHolder.h>
 #include "Component.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief Abstract base class of component templates used to create components.

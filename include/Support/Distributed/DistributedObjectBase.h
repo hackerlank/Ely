@@ -24,6 +24,8 @@
 #ifndef DISTRIBUTEDOBJECTBASE_H_
 #define DISTRIBUTEDOBJECTBASE_H_
 
+#include "Utilities/Tools.h"
+
 #include <typedWritableReferenceCount.h>
 
 /**

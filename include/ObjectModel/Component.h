@@ -24,6 +24,8 @@
 #ifndef COMPONENT_H_
 #define COMPONENT_H_
 
+#include "Utilities/Tools.h"
+
 #include <iostream>
 #include <string>
 #include <map>
@@ -34,7 +36,6 @@
 #include <genericAsyncTask.h>
 #include <reMutex.h>
 #include <reMutexHolder.h>
-#include "Utilities/Tools.h"
 
 /**
  * \brief Component identifier type.

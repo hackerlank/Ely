@@ -24,11 +24,12 @@
 #ifndef MODELTEMPLATE_H_
 #define MODELTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Component.h"
 #include "SceneComponents/Model.h"
 #include "Game/GameSceneManager.h"
-#include "Utilities/Tools.h"
 
 class ModelTemplate: public ComponentTemplate
 {

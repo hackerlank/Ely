@@ -24,11 +24,12 @@
 #ifndef SOUND3DTEMPLATE_H_
 #define SOUND3DTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "AudioComponents/Sound3d.h"
 #include "Game/GameAudioManager.h"
-#include "Utilities/Tools.h"
 
 class Sound3dTemplate: public ComponentTemplate
 {

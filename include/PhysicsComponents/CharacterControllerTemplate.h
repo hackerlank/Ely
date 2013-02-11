@@ -24,11 +24,12 @@
 #ifndef CHARACTERCONTROLLERTEMPLATE_H_
 #define CHARACTERCONTROLLERTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "PhysicsComponents/CharacterController.h"
 #include "Game/GamePhysicsManager.h"
-#include "Utilities/Tools.h"
 
 class CharacterControllerTemplate: public ComponentTemplate
 {

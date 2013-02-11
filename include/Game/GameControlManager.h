@@ -24,6 +24,8 @@
 #ifndef GAMEINPUTMANAGER_H_
 #define GAMEINPUTMANAGER_H_
 
+#include "Utilities/Tools.h"
+
 #include <list>
 #include <algorithm>
 #include <pandaFramework.h>
@@ -33,7 +35,6 @@
 #include <reMutexHolder.h>
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief Singleton manager updating control components.

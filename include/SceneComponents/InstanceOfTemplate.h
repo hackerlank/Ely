@@ -24,11 +24,12 @@
 #ifndef INSTANCEOFTEMPLATE_H_
 #define INSTANCEOFTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "SceneComponents/InstanceOf.h"
 #include "Game/GameSceneManager.h"
-#include "Utilities/Tools.h"
 
 class InstanceOfTemplate: public ComponentTemplate
 {

@@ -8,6 +8,8 @@
 #ifndef GAMESCENEMANAGER_H_
 #define GAMESCENEMANAGER_H_
 
+#include "Utilities/Tools.h"
+
 #include <list>
 #include <algorithm>
 #include <clockObject.h>
@@ -18,7 +20,6 @@
 #include <reMutexHolder.h>
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
-#include "Utilities/Tools.h"
 
 /**
  * \brief Singleton manager updating scene components.

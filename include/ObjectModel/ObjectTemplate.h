@@ -24,6 +24,8 @@
 #ifndef OBJECTTEMPLATE_H_
 #define OBJECTTEMPLATE_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <vector>
 #include <list>
@@ -37,7 +39,6 @@
 #include <reMutexHolder.h>
 #include "ComponentTemplate.h"
 #include "Component.h"
-#include "Utilities/Tools.h"
 
 class ObjectTemplateManager;
 

@@ -24,6 +24,8 @@
 #ifndef CLIENTREPOSITORYBASE_H_
 #define CLIENTREPOSITORYBASE_H_
 
+#include "Utilities/Tools.h"
+
 #include <cConnectionRepository.h>
 
 /**

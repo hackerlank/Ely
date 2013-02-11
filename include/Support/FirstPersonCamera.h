@@ -24,6 +24,8 @@
 #ifndef FIRSTPERSONCAMERA_H_
 #define FIRSTPERSONCAMERA_H_
 
+#include "Utilities/Tools.h"
+
 class FirstPersonCamera
 {
 public:

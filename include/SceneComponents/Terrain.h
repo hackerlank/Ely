@@ -24,6 +24,8 @@
 #ifndef TERRAIN_H_
 #define TERRAIN_H_
 
+#include "Utilities/Tools.h"
+
 #include <string>
 #include <list>
 #include <cstdlib>
@@ -37,7 +39,6 @@
 #include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 class TerrainTemplate;
 
