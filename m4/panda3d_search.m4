@@ -24,8 +24,9 @@ if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
 fi	
 # check libraries first from cmd line specified ones
 PANDA3D_LIBSLOC="-L/usr/lib/panda3d -L/usr/local/lib/panda3d"
-PANDA3D_LIBS="-lp3framework -lpanda -lpandafx -lpandaexpress \
-			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct"
+PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
+			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet"
+			
 LDFLAGS="${LDFLAGS} ${PANDA3D_LIBSLOC}"
 LIBS="${LIBS} ${PANDA3D_LIBS}"
 PANDA3D_LDFLAGS="${LDFLAGS} ${LIBS}"

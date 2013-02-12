@@ -27,8 +27,31 @@ AC_CONFIG_SRCDIR([src/Ely.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 
 # Checks for programs.
+:${CXXFLAGS=""}
 AC_PROG_CXX
 AC_LANG([C++])
+
+# Default Ely CXXFLAGS
+ELY_CXXFLAGS="-O3 -Wall -c -fmessage-length=0"
+# Check options
+AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
+# DEBUG
+AC_ARG_ENABLE([ely-debug],
+	AS_HELP_STRING([--enable-ely-debug],
+		[enable Ely debug features (disabled by default)]),
+    [ely_debug=${enableval}], [ely_debug=no])
+if test "x${ely_debug}" = xyes; then
+    AC_DEFINE([DEBUG],[1],[debug features enabled])
+    ELY_CXXFLAGS="-O0 -g3 -Wall -c -fmessage-length=0"
+fi
+# ELY_THREAD
+AC_ARG_ENABLE([ely-thread],
+    AS_HELP_STRING([--enable-ely-thread],
+    	[enable Ely threading mode (disabled by default)]),
+    [ely_thread=${enableval}], [ely_thread=no])
+if test "x${ely_thread}" = xyes; then
+    AC_DEFINE([ELY_THREAD],[1],[ely thread enabled])
+fi
 
 # Checks for libraries.
 # FIXME: Replace `main' with a function in `-lboost_unit_test_framework':
@@ -43,10 +66,11 @@ AX_PYTHON_DEVEL([>= '2.6'])
 BULLET_SEARCH
 # panda3d sdk
 PANDA3D_SEARCH([${PYTHON_CPPFLAGS}])
-#Ely flags
-ELY_CPPFLAGS="${CPPFLAGS} ${BULLET_CPPFLAGS} ${PANDA3D_CPPFLAGS}"
-ELY_LDFLAGS="${LDFLAGS} ${PANDA3D_LDFLAGS}"
+ELY_CPPFLAGS="${BULLET_CPPFLAGS} ${PANDA3D_CPPFLAGS}"
+ELY_LDFLAGS="${PANDA3D_LDFLAGS}"
+# Ely flags for Makefiles
 AC_SUBST(ELY_CPPFLAGS)
+AC_SUBST(ELY_CXXFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 
 # Checks for typedefs, structures, and compiler characteristics.
@@ -68,11 +92,5 @@ AC_CONFIG_FILES([
 		tinyxml2/Makefile
 		training/Makefile
 		])
-
-###
-AC_DEFINE([DEBUG],[1])
-AC_DEFINE([DEBUG_THREAD],[1])
-AC_DEFINE([WITHIN_PANDA],[1])
-###
 		
 AC_OUTPUT
