@@ -1,6 +1,6 @@
 # PANDA3D_SEARCH
 # --------------
-# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS
+# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS, PANDA3D_LIBS
 # Argument: expected PYTHON_CPPFLAGS
 # Searches SDK first on cmd line flags then on std locations
 #
@@ -12,7 +12,7 @@ LIBS_CMDLINE=${LIBS}
 AC_MSG_NOTICE([Looking for Panda3d SDK environment...])
 # check headers first from cmd line specified ones
 PANDA3D_CPPFLAGS="-I/usr/include/panda3d -I/usr/local/include/panda3d $1"
-CPPFLAGS="${CPPFLAGS} ${PANDA3D_CPPFLAGS}"
+CPPFLAGS="${PANDA3D_CPPFLAGS} ${CPPFLAGS}"
 AC_CHECK_HEADERS([pandaFramework.h])
 if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
 	AC_MSG_ERROR([
@@ -23,13 +23,12 @@ if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
 	----------------------------------------])
 fi	
 # check libraries first from cmd line specified ones
-PANDA3D_LIBSLOC="-L/usr/lib/panda3d -L/usr/local/lib/panda3d"
+PANDA3D_LDFLAGS="-L/usr/lib/panda3d -L/usr/local/lib/panda3d"
 PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet"
 			
-LDFLAGS="${LDFLAGS} ${PANDA3D_LIBSLOC}"
-LIBS="${LIBS} ${PANDA3D_LIBS}"
-PANDA3D_LDFLAGS="${LDFLAGS} ${LIBS}"
+LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS}"
+LIBS="${PANDA3D_LIBS} ${LIBS}"
 required_libraries=yes
 panda3d_prologue="#include <pandaFramework.h>"
 panda3d_body="

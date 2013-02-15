@@ -26,6 +26,7 @@
 
 #if HAVE_CONFIG_H
 # include <config.h>
+# undef HAVE_PYTHON
 #endif
 
 #include <exception>

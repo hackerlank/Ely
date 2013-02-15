@@ -1,47 +1,48 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
-noinst_LIBRARIES = \
-		libgame.a \
-		libaicomponents.a \
-		libaudiocomponents.a \
-		libbehaviorcomponents.a \
-		libcontrolcomponents.a \
-		libphysicscomponents.a \
-		libscenecomponents.a \
-		libobjectmodel.a \
-		libutilities.a \
-		libsupport.a
+noinst_LTLIBRARIES = \
+		libgame.la \
+		libaicomponents.la \
+		libaudiocomponents.la \
+		libbehaviorcomponents.la \
+		libcontrolcomponents.la \
+		libphysicscomponents.la \
+		libscenecomponents.la \
+		libobjectmodel.la \
+		libutilities.la \
+		libsupport.la
 
 bin_PROGRAMS = ely
 ely_SOURCES = \
 		Ely.cpp
-ely_LDFLAGS = -L$(top_srcdir)/tinyxml2 $(ELY_LDFLAGS)
+ely_LDFLAGS = $(ELY_LDFLAGS)
 ely_LDADD = \
-		$(noinst_LIBRARIES) \
-		-ltinyxml2
+		$(noinst_LTLIBRARIES) \
+		$(top_srcdir)/tinyxml2/libtinyxml2.la \
+		$(ELY_LIBS)
 
-libaicomponents_a_SOURCES = \
+libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \
 		AIComponents/SteeringTemplate.cpp
 
-libaudiocomponents_a_SOURCES = \
+libaudiocomponents_la_SOURCES = \
 		AudioComponents/Listener.cpp \
 		AudioComponents/ListenerTemplate.cpp \
 		AudioComponents/Sound3d.cpp \
 		AudioComponents/Sound3dTemplate.cpp
 
-libbehaviorcomponents_a_SOURCES = \
+libbehaviorcomponents_la_SOURCES = \
 		BehaviorComponents/Activity.cpp \
 		BehaviorComponents/ActivityTemplate.cpp
 
-libcontrolcomponents_a_SOURCES = \
+libcontrolcomponents_la_SOURCES = \
 		ControlComponents/Chaser.cpp \
 		ControlComponents/ChaserTemplate.cpp \
 		ControlComponents/Driver.cpp \
 		ControlComponents/DriverTemplate.cpp
 
-libgame_a_SOURCES = \
+libgame_la_SOURCES = \
 		Game/GameAIManager.cpp \
 		Game/GameAudioManager.cpp \
 		Game/GameControlManager.cpp \
@@ -49,7 +50,7 @@ libgame_a_SOURCES = \
 		Game/GamePhysicsManager.cpp \
 		Game/GameSceneManager.cpp
 
-libobjectmodel_a_SOURCES = \
+libobjectmodel_la_SOURCES = \
 		ObjectModel/Component.cpp \
 		ObjectModel/ComponentTemplate.cpp \
 		ObjectModel/ComponentTemplateManager.cpp \
@@ -57,13 +58,13 @@ libobjectmodel_a_SOURCES = \
 		ObjectModel/ObjectTemplate.cpp \
 		ObjectModel/ObjectTemplateManager.cpp
 
-libphysicscomponents_a_SOURCES = \
+libphysicscomponents_la_SOURCES = \
 		PhysicsComponents/CharacterController.cpp \
 		PhysicsComponents/CharacterControllerTemplate.cpp \
 		PhysicsComponents/RigidBody.cpp \
 		PhysicsComponents/RigidBodyTemplate.cpp
 
-libscenecomponents_a_SOURCES = \
+libscenecomponents_la_SOURCES = \
 		SceneComponents/InstanceOf.cpp \
 		SceneComponents/InstanceOfTemplate.cpp \
 		SceneComponents/Model.cpp \
@@ -73,13 +74,13 @@ libscenecomponents_a_SOURCES = \
 		SceneComponents/Terrain.cpp \
 		SceneComponents/TerrainTemplate.cpp
 
-libsupport_a_SOURCES = \
+libsupport_la_SOURCES = \
 		Support/FirstPersonCamera.cpp \
 		Support/FSM.cpp \
 		Support/Picker.cpp \
 		Support/Distributed/ClientRepositoryBase.cpp \
 		Support/Distributed/DistributedObjectBase.cpp
 
-libutilities_a_SOURCES = \
+libutilities_la_SOURCES = \
 		Utilities/Tools.cpp
 

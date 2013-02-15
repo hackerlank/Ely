@@ -9,7 +9,7 @@ CPPFLAGS_CMDLINE=${CPPFLAGS}
 # check header first from cmd line specified include
 AC_MSG_NOTICE([Looking for Bullet headers...])
 BULLET_CPPFLAGS="-I/usr/include/bullet -I/usr/local/include/bullet"
-CPPFLAGS="${CPPFLAGS} ${BULLET_CPPFLAGS}"
+CPPFLAGS="${BULLET_CPPFLAGS} ${CPPFLAGS}"
 AC_CHECK_HEADERS([Bullet-C-Api.h])
 if test "x${ac_cv_header_Bullet_C_Api_h}" != xyes; then
 	AC_MSG_ERROR([

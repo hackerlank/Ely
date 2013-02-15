@@ -32,7 +32,7 @@ AC_PROG_CXX
 AC_LANG([C++])
 
 # Default Ely CXXFLAGS
-ELY_CXXFLAGS="-O3 -Wall -c -fmessage-length=0"
+ELY_CXXFLAGS="-O3 -Wall -fmessage-length=0"
 # Check options
 AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
 # DEBUG
@@ -42,7 +42,7 @@ AC_ARG_ENABLE([ely-debug],
     [ely_debug=${enableval}], [ely_debug=no])
 if test "x${ely_debug}" = xyes; then
     AC_DEFINE([DEBUG],[1],[debug features enabled])
-    ELY_CXXFLAGS="-O0 -g3 -Wall -c -fmessage-length=0"
+    ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
 fi
 # ELY_THREAD
 AC_ARG_ENABLE([ely-thread],
@@ -66,12 +66,14 @@ AX_PYTHON_DEVEL([>= '2.6'])
 BULLET_SEARCH
 # panda3d sdk
 PANDA3D_SEARCH([${PYTHON_CPPFLAGS}])
+# Ely flags for Makefiles
 ELY_CPPFLAGS="${BULLET_CPPFLAGS} ${PANDA3D_CPPFLAGS}"
 ELY_LDFLAGS="${PANDA3D_LDFLAGS}"
-# Ely flags for Makefiles
-AC_SUBST(ELY_CPPFLAGS)
+ELY_LIBS="${PANDA3D_LIBS}"
 AC_SUBST(ELY_CXXFLAGS)
+AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
+AC_SUBST(ELY_LIBS)
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL

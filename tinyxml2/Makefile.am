@@ -1,9 +1,9 @@
 AM_CPPFLAGS = $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
-noinst_LIBRARIES = \
-		libtinyxml2.a
+noinst_LTLIBRARIES = \
+		libtinyxml2.la
 
-libtinyxml2_a_SOURCES = \
+libtinyxml2_la_SOURCES = \
 		tinyxml2.h  \
 		tinyxml2.cpp
