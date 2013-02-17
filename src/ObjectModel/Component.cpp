@@ -88,15 +88,6 @@ ComponentId Component::getComponentId() const
 	return mComponentId;
 }
 
-#ifdef WIN32
-void Component::loadEventCallbacks()
-{
-}
-
-void Component::unloadEventCallbacks()
-{
-}
-#else
 void Component::loadEventCallbacks()
 {
 	//if callbacks loaded do nothing
@@ -105,27 +96,29 @@ void Component::loadEventCallbacks()
 		return;
 	}
 	mCallbackLib = NULL;
+	// reset errors
+	lt_dlerror();
 	//load the event callbacks library
-	mCallbackLib = dlopen(CALLBACKS_SO, RTLD_LAZY);
-	if (not mCallbackLib)
+	mCallbackLib = lt_dlopen(CALLBACKS_LA);
+	if (mCallbackLib == NULL)
 	{
-		std::cerr << "Error loading library: " << dlerror() << std::endl;
+		std::cerr << "Error loading library: " << lt_dlerror() << std::endl;
 		return;
 	}
 	// reset errors
-	dlerror();
+	lt_dlerror();
 	//check the default callback
-	PCALLBACK pDefaultCallback = (PCALLBACK) dlsym(mCallbackLib,
-			DEFAULT_CALLBACK);
-	const char* dlsymError = dlerror();
+	PCALLBACK pDefaultCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
+			DEFAULT_CALLBACK_NAME);
+	const char* dlsymError = lt_dlerror();
 	if (dlsymError)
 	{
-		std::cerr << "Cannot find default callback " << DEFAULT_CALLBACK
+		std::cerr << "Cannot find default callback " << DEFAULT_CALLBACK_NAME
 				<< dlsymError << std::endl;
 		//Close the event callbacks library
-		if (dlclose(mCallbackLib) != 0)
+		if (lt_dlclose(mCallbackLib) != 0)
 		{
-			std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;
+			std::cerr << "Error closing library: " << CALLBACKS_LA << std::endl;
 		}
 		return;
 	}
@@ -134,7 +127,7 @@ void Component::loadEventCallbacks()
 	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
 	{
 		//reset errors
-		dlerror();
+		lt_dlerror();
 		//load the variable whose value is the name
 		//of the callback: <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>
 		std::string variableTmp = (iter->first) + "_"
@@ -142,9 +135,9 @@ void Component::loadEventCallbacks()
 				+ std::string(mOwnerObject->objectTmpl()->name());
 		//replace hyphens
 		std::string variableName = replaceCharacter(variableTmp, '-', '_');
-		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) dlsym(mCallbackLib,
+		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) lt_dlsym(mCallbackLib,
 				variableName.c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINTERR(
@@ -155,11 +148,11 @@ void Component::loadEventCallbacks()
 			continue;
 		}
 		//reset errors
-		dlerror();
+		lt_dlerror();
 		//load the callback
-		PCALLBACK pCallback = (PCALLBACK) dlsym(mCallbackLib,
+		PCALLBACK pCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
 				pCallbackName->c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINTERR(
@@ -185,14 +178,13 @@ void Component::unloadEventCallbacks()
 	}
 	mCallbackTable.clear();
 	//Close the event callbacks library
-	if (dlclose(mCallbackLib) != 0)
+	if (lt_dlclose(mCallbackLib) != 0)
 	{
-		std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;
+		std::cerr << "Error closing library: " << CALLBACKS_LA << std::endl;
 	}
 	//callbacks unloaded
 	mCallbacksLoaded = false;
 }
-#endif
 
 void Component::setupEvents()
 {
@@ -264,8 +256,9 @@ void Component::registerEventCallbacks()
 //				iter->first + "@" + mEventTable[iter->first], iter->second,
 //				static_cast<void*>(this));
 		//
-		EventHandler::get_global_event_handler()->add_hook(mEventTable[iter->first],
-				iter->second, static_cast<void*>(this));
+		EventHandler::get_global_event_handler()->add_hook(
+				mEventTable[iter->first], iter->second,
+				static_cast<void*>(this));
 	}
 	//handlers registered
 	mCallbacksRegistered = true;

@@ -26,11 +26,9 @@
 int main(int argc, char **argv)
 {
 	// Load your configuration
-	load_prc_file("config.prc");
-	// Add code defined configuration
-	load_prc_file_data("", "sync-video #t");
-	//load_prc_file_data("", "want-directtools #t");
-	//load_prc_file_data("", "want-tk #t");
+	Filename configPrc(std::string());
+	load_prc_file(
+			Filename(std::string(ELY_DATADIR) + std::string("config.prc")));
 
 	// Setup the game framework
 	// ComponentTemplate manager
@@ -50,8 +48,7 @@ int main(int argc, char **argv)
 	//sets the frame_sync flag.
 	taskChain->set_frame_sync(true);
 	//
-	GameAIManager* gameAIMgr = new GameAIManager(10, 0,
-			"ManagersChain");
+	GameAIManager* gameAIMgr = new GameAIManager(10, 0, "ManagersChain");
 	GameControlManager* gameControlMgr = new GameControlManager(20, 0,
 			"ManagersChain");
 	GameSceneManager* gameSceneMgr = new GameSceneManager(20, 0,
@@ -68,7 +65,7 @@ int main(int argc, char **argv)
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
 #endif
 
-#if defined (ELY_THREAD) && defined (DEBUG)
+#if defined (ELY_THREAD) && defined (ELY_DEBUG)
 	//threading
 	if (Thread::is_threading_supported())
 	{

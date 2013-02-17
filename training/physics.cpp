@@ -39,7 +39,7 @@ AnimControlCollection anim_collection;
 AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data);
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 
-int main(int argc, char **argv)
+int physics_main(int argc, char **argv)
 {
 	///setup
 	// Load your configuration

@@ -127,15 +127,6 @@ void Activity::onAddToObjectSetup()
 	registerEventCallbacks();
 }
 
-#ifdef WIN32
-void Activity::loadTransitionFunctions()
-{
-}
-
-void Activity::unloadTransitionFunctions()
-{
-}
-#else
 void Activity::loadTransitionFunctions()
 {
 	//if no states or transitions loaded do nothing
@@ -144,11 +135,13 @@ void Activity::loadTransitionFunctions()
 		return;
 	}
 	mTransitionLib = NULL;
+	// reset errors
+	lt_dlerror();
 	//load the transition functions library
-	mTransitionLib = dlopen(TRANSITIONS_SO, RTLD_LAZY);
-	if (not mTransitionLib)
+	mTransitionLib = lt_dlopen(TRANSITIONS_LA);
+	if (mTransitionLib == NULL)
 	{
-		std::cerr << "Error loading library: " << dlerror() << std::endl;
+		std::cerr << "Error loading library: " << lt_dlerror() << std::endl;
 		return;
 	}
 
@@ -163,13 +156,13 @@ void Activity::loadTransitionFunctions()
 
 		//load enter function (if any): Enter_<STATE>_<OBJECTYPE>
 		// reset errors
-		dlerror();
+		lt_dlerror();
 		functionNameTmp = std::string("Enter") + "_" + (*iter) + "_"
 				+ mOwnerObject->objectTmpl()->name();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
-		PENTER pEnterFunction = (PENTER) dlsym(mTransitionLib,
+		PENTER pEnterFunction = (PENTER) lt_dlsym(mTransitionLib,
 				functionName.c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
@@ -178,13 +171,13 @@ void Activity::loadTransitionFunctions()
 
 		//load exit function (if any): Exit_<STATE>_<OBJECTYPE>
 		// reset errors
-		dlerror();
+		lt_dlerror();
 		functionNameTmp = std::string("Exit") + "_" + (*iter) + "_"
 				+ mOwnerObject->objectTmpl()->name();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
-		PEXIT pExitFunction = (PEXIT) dlsym(mTransitionLib,
+		PEXIT pExitFunction = (PEXIT) lt_dlsym(mTransitionLib,
 				functionName.c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
@@ -193,13 +186,13 @@ void Activity::loadTransitionFunctions()
 
 		//load filter function (if any): Filter_<STATE>_<OBJECTYPE>
 		// reset errors
-		dlerror();
+		lt_dlerror();
 		functionNameTmp = std::string("Filter") + "_" + (*iter) + "_"
 				+ mOwnerObject->objectTmpl()->name();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
-		PFILTER pFilterFunction = (PFILTER) dlsym(mTransitionLib,
+		PFILTER pFilterFunction = (PFILTER) lt_dlsym(mTransitionLib,
 				functionName.c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
@@ -235,12 +228,12 @@ void Activity::loadTransitionFunctions()
 
 		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTYPE>
 		// reset errors
-		dlerror();
+		lt_dlerror();
 		functionNameTmp = (*iter) + "_" + mOwnerObject->objectTmpl()->name();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
-		PFROMTO pFromToFunction = (PFROMTO) dlsym(mTransitionLib,
+		PFROMTO pFromToFunction = (PFROMTO) lt_dlsym(mTransitionLib,
 				functionName.c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
@@ -284,14 +277,13 @@ void Activity::unloadTransitionFunctions()
 	}
 	mFromToFunctionSet.clear();
 	//Close the transition functions library
-	if (dlclose(mTransitionLib) != 0)
+	if (lt_dlclose(mTransitionLib) != 0)
 	{
-		std::cerr << "Error closing library: " << CALLBACKS_SO << std::endl;
+		std::cerr << "Error closing library: " << TRANSITIONS_LA << std::endl;
 	}
 	//transitions unloaded
 	mTransitionsLoaded = false;
 }
-#endif
 
 //TypedObject semantics: hardcoded
 TypeHandle Activity::_type_handle;

@@ -71,11 +71,11 @@ class ComponentTemplate;
  * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, there exists a
  * global std::string variable named "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>"
  * (see note) which is loaded at runtime from a dynamic linked library
- * (referenced by the macro CALLBACKS_SO) and whose value is the name of
+ * (referenced by the macro CALLBACKS_LA) and whose value is the name of
  * the callback function (contained in the same library too) for the same event
  * type.\n
  * If this variable doesn't exist or if any error occurs the default
- * callback (referenced by the macro DEFAULT_CALLBACK) is used.\n
+ * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
  * To check if a "name" is an allowed event type call:
  * \code
  * 	ComponentTemplate::isEventType("name");
@@ -228,7 +228,7 @@ private:
 	 * \name Handles, typedefs, for managing library of event callbacks.
 	 */
 	///@{
-	LIB_HANDLE mCallbackLib;
+	lt_dlhandle mCallbackLib;
 	typedef EventHandler::EventCallbackFunction* PCALLBACK;
 	typedef std::string* PCALLBACKNAME;
 	///@}

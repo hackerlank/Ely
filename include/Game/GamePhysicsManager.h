@@ -51,7 +51,7 @@
 #include <lvector3.h>
 #include <filename.h>
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 #	include <windowFramework.h>
 #endif
 
@@ -113,7 +113,7 @@ public:
 	 */
 	ReMutex& getMutex();
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 	/**
 	 * \brief Gets a reference to the Bullet Debug node.
 	 * @return The Bullet Debug node.
@@ -226,7 +226,7 @@ private:
 	/// Bullet world.
 	SMARTPTR(BulletWorld) mBulletWorld;
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 	/// Bullet Debug node path.
 	NodePath mBulletDebugNodePath;
 #endif

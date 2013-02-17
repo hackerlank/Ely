@@ -37,7 +37,7 @@ void callbacksEnd()
 
 void default_callback__(const Event* event, void* data)
 {
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 	//get data
 	SMARTPTR(Component) component = (Component*) data;
 	std::string evtStr = event->get_name();

@@ -8,3 +8,7 @@ lock-to-one-cpu 0
 support-threads 1
 audio-buffering-seconds 5
 audio-preload-threshold 2000000
+sync-video #t
+#want-directtools #t
+#want-tk #t"
+

@@ -1,0 +1,24 @@
+///Macros representing the path to dynamic linked libraries loaded at runtime
+
+#ifdef ELY_DEVEL
+	/// Ely data directory == $(abs_top_srcdir)
+#	define ELY_DATADIR "@abs_top_srcdir@/"
+	///Event callbacks module == $(abs_top_srcdir)/callbacks/callbacks.la (See Component)
+#	define CALLBACKS_LA "@abs_top_srcdir@/callbacks/callbacks.la"
+	///Transition functions module == $(abs_top_srcdir)/transitions/transitions.la (see Activity component).
+#	define TRANSITIONS_LA "@abs_top_srcdir@/transitions/transitions.la"
+	///Initialization functions module == $(abs_top_srcdir)/initializations/initializations.la (see Object).
+#	define INITIALIZATIONS_LA "@abs_top_srcdir@/initializations/initializations.la"
+#else
+	/// Ely data directory == $(pkgdatadir)
+#	define ELY_DATADIR "@prefix@/share/@PACKAGE@/"
+	///Event callbacks module == $(pkglibdir)/callbacks.la (See Component)
+#	define CALLBACKS_LA "@prefix@/lib/@PACKAGE@/callbacks.la"
+	///Transition functions module == $(pkglibdir)/transitions.la (see Activity component).
+#	define TRANSITIONS_LA "@prefix@/lib/@PACKAGE@/transitions.la"
+	///Initialization functions module == $(pkglibdir)/initializations.la (see Object).
+#	define INITIALIZATIONS_LA "@prefix@/lib/@PACKAGE@/initializations.la"
+#endif
+
+/// the default callback function name
+#define DEFAULT_CALLBACK_NAME "default_callback__"

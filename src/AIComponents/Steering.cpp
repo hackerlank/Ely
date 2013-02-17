@@ -108,7 +108,7 @@ bool Steering::initialize()
 	{
 		uint32_t mask = (uint32_t) strtol(obstacleHitMask.c_str(), NULL, 0);
 		mObstacleHitMask.set_word(mask);
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 		mObstacleHitMask.write(std::cout, 0);
 #endif
 	}

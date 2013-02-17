@@ -25,46 +25,68 @@ LT_INIT([dlopen])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/Ely.cpp])
 AC_CONFIG_HEADERS([include/config.h])
+AC_PREFIX_DEFAULT([/usr])
 
-# Checks for programs.
+# checks for programs.
 :${CXXFLAGS=""}
 AC_PROG_CXX
 AC_LANG([C++])
+# default Ely CXXFLAGS (release mode)
+ELY_CXXFLAGS="-O3 -w -fmessage-length=0"
 
-# Default Ely CXXFLAGS
-ELY_CXXFLAGS="-O3 -Wall -fmessage-length=0"
-# Check options
+# checks/sets options
 AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
-# DEBUG
+# ELY_DEVEL
+AC_ARG_ENABLE([ely-devel],
+	AS_HELP_STRING([--enable-ely-devel],
+		[=yes enable Ely development mode (disabled by default)]),
+    [ely_devel=${enableval}], [ely_devel=no])
+if test "x${ely_devel}" = xyes; then
+    AC_DEFINE([ELY_DEVEL],[1],[development mode enabled])
+fi
+# ELY_DEBUG
 AC_ARG_ENABLE([ely-debug],
 	AS_HELP_STRING([--enable-ely-debug],
-		[enable Ely debug features (disabled by default)]),
+		[=yes enable Ely debug mode (disabled by default)]),
     [ely_debug=${enableval}], [ely_debug=no])
 if test "x${ely_debug}" = xyes; then
-    AC_DEFINE([DEBUG],[1],[debug features enabled])
+    AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
     ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
 fi
+# enables silent rules
+#if test "x${ely_devel}" = xyes || test "x${ely_debug}" = xyes ; then
+#	AM_SILENT_RULES
+#fi
 # ELY_THREAD
 AC_ARG_ENABLE([ely-thread],
     AS_HELP_STRING([--enable-ely-thread],
-    	[enable Ely threading mode (disabled by default)]),
+    	[=yes enable Ely threading mode (disabled by default)]),
     [ely_thread=${enableval}], [ely_thread=no])
 if test "x${ely_thread}" = xyes; then
-    AC_DEFINE([ELY_THREAD],[1],[ely thread enabled])
+    AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
 fi
 
-# Checks for libraries.
-# FIXME: Replace `main' with a function in `-lboost_unit_test_framework':
-#AC_CHECK_LIB([boost_unit_test_framework], [main])
+# checks for libraries.
+AC_SEARCH_LIBS([lt_dlopen], [ltdl])
 
 # checks for standard header files.
-AC_CHECK_HEADERS([stdint.h])
+AC_CHECK_HEADERS([stdint.h ltdl.h])
 AX_CXX_HEADER_STDCXX_98
-# checks for pyhton 2.6 headers files.
+
+# checks Boost Unit Test Framework library (mantainer only)
+#AC_ARG_ENABLE([ely-test],
+#    AS_HELP_STRING([--enable-ely-test],
+#    	[=yes enable Ely test program (disabled by default)]),
+#    [ely_test=${enableval}], [ely_test=no])
+#if test "x${ely_test}" = xyes; then
+#	AX_BOOST_UNIT_TEST_FRAMEWORK
+#fi
+
+# checks Pyhton 2.6.
 AX_PYTHON_DEVEL([>= '2.6'])
-# bullet headers...
+# checks Bullet headers...
 BULLET_SEARCH
-# panda3d sdk
+# checks Panda3d sdk
 PANDA3D_SEARCH([${PYTHON_CPPFLAGS}])
 # Ely flags for Makefiles
 ELY_CPPFLAGS="${BULLET_CPPFLAGS} ${PANDA3D_CPPFLAGS}"
@@ -75,24 +97,26 @@ AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
 
-# Checks for typedefs, structures, and compiler characteristics.
+# checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
 AC_TYPE_SIZE_T
 AC_TYPE_UINT32_T
 
-# Checks for library functions.
+# checks for library functions.
 AC_CHECK_FUNCS([pow sqrt strchr strtol])
 
 AC_CONFIG_FILES([
 		Makefile
+		include/Makefile
+		include/Utilities/Tools_ini.h
 		callbacks/Makefile
 		transitions/Makefile
 		initializations/Makefile
-		include/Makefile
+		tinyxml2/Makefile
 		src/Makefile
 		src/test/Makefile
-		tinyxml2/Makefile
 		training/Makefile
+		doc/Makefile
 		])
-		
+
 AC_OUTPUT

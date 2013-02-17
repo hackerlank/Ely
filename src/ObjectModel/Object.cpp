@@ -194,11 +194,11 @@ void Object::sceneSetup()
 
 		//load initialization function (if any): <OBJECTID>_initialization
 		// reset errors
-		dlerror();
+		lt_dlerror();
 		functionName = std::string(mObjectId) + "_initialization";
-		PINITIALIZATION pInitializationFunction = (PINITIALIZATION) dlsym(
+		PINITIALIZATION pInitializationFunction = (PINITIALIZATION) lt_dlsym(
 				mInitializationLib, functionName.c_str());
-		dlsymError = dlerror();
+		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINT(
@@ -213,15 +213,6 @@ void Object::sceneSetup()
 	}
 }
 
-#ifdef WIN32
-void Object::loadInitializationFunctions()
-{
-}
-
-void Activity::unloadInitializationFunctions()
-{
-}
-#else
 void Object::loadInitializationFunctions()
 {
 	//if initializations loaded do nothing
@@ -230,11 +221,13 @@ void Object::loadInitializationFunctions()
 		return;
 	}
 	mInitializationLib = NULL;
+	// reset errors
+	lt_dlerror();
 	//load the initialization functions library
-	mInitializationLib = dlopen(INITIALIZATIONS_SO, RTLD_LAZY);
-	if (not mInitializationLib)
+	mInitializationLib = lt_dlopen(INITIALIZATIONS_LA);
+	if (mInitializationLib == NULL)
 	{
-		std::cerr << "Error loading library: " << dlerror() << std::endl;
+		std::cerr << "Error loading library: " << lt_dlerror() << std::endl;
 		return;
 	}
 	//initializations loaded
@@ -249,15 +242,14 @@ void Object::unloadInitializationFunctions()
 		return;
 	}
 	//Close the initialization functions library
-	if (dlclose(mInitializationLib) != 0)
+	if (lt_dlclose(mInitializationLib) != 0)
 	{
-		std::cerr << "Error closing library: " << INITIALIZATIONS_SO
+		std::cerr << "Error closing library: " << INITIALIZATIONS_LA
 				<< std::endl;
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;
 }
-#endif
 
 SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 {

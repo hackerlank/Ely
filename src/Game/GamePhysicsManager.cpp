@@ -52,7 +52,7 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 	// set up Bullet Debug Renderer (disabled by default)
 	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
 #endif
@@ -396,7 +396,7 @@ float GamePhysicsManager::getDim(ShapeSize shapeSize, float d1, float d2)
 	return dim;
 }
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 NodePath GamePhysicsManager::getDebugNodePath() const
 {
 	//lock (guard) the mutex

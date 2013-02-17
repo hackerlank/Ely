@@ -196,7 +196,7 @@ bool CharacterController::initialize()
 	{
 		uint32_t mask = (uint32_t) strtol(collideMask.c_str(), NULL, 0);
 		mCollideMask.set_word(mask);
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 		mCollideMask.write(std::cout, 0);
 #endif
 	}

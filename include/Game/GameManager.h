@@ -181,7 +181,7 @@ protected:
 	SMARTPTR(TaskInterface<GameManager>::TaskData) m2ndTask;
 	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 	bool mPhysicsDebugEnabled;
 	SMARTPTR(EventCallbackInterface<GameManager>::EventCallbackData) mPhysicsDebugData;
 	void togglePhysicsDebug(const Event* event);

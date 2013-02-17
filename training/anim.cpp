@@ -346,7 +346,7 @@ void cycleAnim(const Event* e, void* data)
 	(*pi) %= anim_collection.get_num_anims();
 }
 
-int main(int argc, char **argv)
+int anim_main(int argc, char **argv)
 {
 	///setup
 	// Load your configuration

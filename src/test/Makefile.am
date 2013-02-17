@@ -1,3 +1,6 @@
+AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+AM_CXXFLAGS = $(ELY_CXXFLAGS)
+
 common_ely_test_sources =\
 		Runner.cpp \
 		aicomponents/AISuiteFixture.h \
@@ -29,5 +32,5 @@ common_ely_test_sources =\
 		support/Picker_test.cpp \
 		support/SupportSuiteFixture.h
 		
-bin_PROGRAMS = ely_test
+noinst_PROGRAMS = ely_test
 nodist_ely_test_SOURCES = $(common_ely_test_sources)

@@ -46,10 +46,22 @@ GameManager::GameManager(int argc, char* argv[]) :
 	{
 		PRINT("Could not load the window!");
 	}
+	// Libtool initialization
+	if (lt_dlinit() != 0)
+	{
+		throw GameException(
+				"GameManager::initialize: error on Libtool initialization");
+	}
+	LTDL_SET_PRELOADED_SYMBOLS();
 }
 
 GameManager::~GameManager()
 {
+	// Libtool finalization
+	if (lt_dlexit() != 0)
+	{
+		std::cerr << "GameManager::~GameManager: error on Libtool finalization" << std::endl;
+	}
 	// close the framework
 	close_framework();
 }
@@ -69,7 +81,7 @@ void GameManager::initialize()
 //	trackBall->set_mat(cameraMat);
 	///</DEFAULT CAMERA CONTROL>
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 	GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
 	mPhysicsDebugEnabled = false;
 #endif
@@ -82,7 +94,7 @@ void GameManager::initialize()
 
 	//create the game world (static definition)
 //	createGameWorldWithoutParamTables(std::string("game.xml"));
-	createGameWorld(std::string("game.xml"));
+	createGameWorld(std::string(ELY_DATADIR) + std::string("game.xml"));
 
 	//play the game
 	GamePlay();
@@ -91,10 +103,12 @@ void GameManager::initialize()
 void GameManager::GamePlay()
 {
 
-#ifdef DEBUG
-	mPhysicsDebugData = new EventCallbackInterface<GameManager>::EventCallbackData(this,
-			&GameManager::togglePhysicsDebug);
-	define_key("p", "togglePhysicsDebug", &EventCallbackInterface<GameManager>::eventCallbackFunction,
+#ifdef ELY_DEBUG
+	mPhysicsDebugData =
+			new EventCallbackInterface<GameManager>::EventCallbackData(this,
+					&GameManager::togglePhysicsDebug);
+	define_key("p", "togglePhysicsDebug",
+			&EventCallbackInterface<GameManager>::eventCallbackFunction,
 			reinterpret_cast<void*>(mPhysicsDebugData.p()));
 #endif
 
@@ -323,7 +337,8 @@ void GameManager::createGameWorldWithoutParamTables(
 		ordObjTAG.setPtr(objectTAG);
 		const char* priorityTAG = objectTAG->Attribute("priority", NULL);
 		priorityTAG != NULL ?
-				ordObjTAG.setPrio(strtol(priorityTAG, NULL, 0)) : ordObjTAG.setPrio(0);
+				ordObjTAG.setPrio(strtol(priorityTAG, NULL, 0)) :
+				ordObjTAG.setPrio(0);
 		orderedObjectsTAG.push(ordObjTAG);
 	}
 	//cycle through the Object(s)' definitions in order of priority
@@ -587,7 +602,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		ordObjTAG.setPtr(objectTAG);
 		const char* priorityTAG = objectTAG->Attribute("priority", NULL);
 		priorityTAG != NULL ?
-				ordObjTAG.setPrio(strtol(priorityTAG, NULL, 0)) : ordObjTAG.setPrio(0);
+				ordObjTAG.setPrio(strtol(priorityTAG, NULL, 0)) :
+				ordObjTAG.setPrio(0);
 		orderedObjectsTAG.push(ordObjTAG);
 	}
 	//cycle through the Object(s)' definitions in order of priority
@@ -736,8 +752,7 @@ void GameManager::disable_mouse()
 
 PandaFramework* const GameManager::pandaFramework() const
 {
-	return dynamic_cast<PandaFramework* const >(
-			const_cast<GameManager* const >(this));
+	return dynamic_cast<PandaFramework* const >(const_cast<GameManager* const >(this));
 }
 
 WindowFramework* const GameManager::windowFramework() const
@@ -750,7 +765,7 @@ ReMutex& GameManager::getMutex()
 	return mMutex;
 }
 
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 void GameManager::togglePhysicsDebug(const Event* event)
 {
 	if (mPhysicsDebugEnabled)

@@ -154,7 +154,7 @@ public:
 	}
 };
 
-int main(int argc, char **argv)
+int network_main(int argc, char **argv)
 {
 	///setup
 	// Load your configuration

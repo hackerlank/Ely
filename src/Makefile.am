@@ -1,3 +1,5 @@
+SUBDIRS = . test
+
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
@@ -20,7 +22,10 @@ ely_LDFLAGS = $(ELY_LDFLAGS)
 ely_LDADD = \
 		$(noinst_LTLIBRARIES) \
 		$(top_srcdir)/tinyxml2/libtinyxml2.la \
-		$(ELY_LIBS)
+		$(ELY_LIBS) \
+		-dlopen $(top_srcdir)/callbacks/callbacks.la \
+		-dlopen $(top_srcdir)/initializations/initializations.la \
+		-dlopen $(top_srcdir)/transitions/transitions.la
 
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \

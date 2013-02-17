@@ -42,7 +42,8 @@ noinst_HEADERS =\
 		Support/Distributed/ClientRepositoryBase.h \
 		Support/Distributed/DistributedObjectBase.h \
 		Utilities/ComponentSuite.h \
-		Utilities/Tools.h
+		Utilities/Tools.h \
+		Utilities/Tools_ini.h
 
 nodist_noinst_HEADERS =\
 		config.h

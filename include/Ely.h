@@ -27,6 +27,7 @@
 #include "Utilities/Tools.h"
 
 #include <load_prc_file.h>
+#include <filename.h>
 #include "Game/GameManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GameAudioManager.h"
@@ -36,7 +37,7 @@
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <iostream>
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 #include <thread.h>
 #endif
 

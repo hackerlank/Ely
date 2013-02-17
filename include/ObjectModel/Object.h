@@ -56,7 +56,7 @@ typedef std::string ObjectId;
  * Object can be initialized after it is added to the scene, by
  * an initialization function, whose name is <OBJECTID>_initialization
  * loaded at runtime from a dynamic linked library (referenced by the
- * macro INITIALIZATIONS_SO).
+ * macro INITIALIZATIONS_LA).
  *
  * XML Param(s):
  * - "parent"  				|single|no default
@@ -225,7 +225,7 @@ private:
 	bool mIsSteady;
 
 	///Handle of the library of initialization functions.
-	LIB_HANDLE mInitializationLib;
+	lt_dlhandle mInitializationLib;
 	///Helper flag.
 	bool mInitializationsLoaded;
 

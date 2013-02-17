@@ -25,9 +25,11 @@
 #define TOOLS_H_
 
 #if HAVE_CONFIG_H
-# include <config.h>
+# include "config.h"
 # undef HAVE_PYTHON
 #endif
+
+#include "Tools_ini.h"
 
 #include <exception>
 #include <iostream>
@@ -47,7 +49,7 @@
 #include <threadSafePointerTo.h>
 
 ///Macros for generic debug
-#ifdef DEBUG
+#ifdef ELY_DEBUG
 #	define PRINT(msg) std::cout << msg << std::endl
 #	define PRINTERR(msg) std::cerr << msg << std::endl
 #	define CHECKEXISTENCE(entity,msg) \
@@ -293,27 +295,8 @@ std::vector<std::string> parseCompoundString(const std::string& compoundString,
 std::string replaceCharacter(const std::string& source, int character,
 		int replacement);
 
-///Macros representing the path to dynamic linked libraries loaded at runtime
-///Event callbacks library (See Component)
-#define CALLBACKS_SO "CallbacksLib/libElyCallbacks.so"
-#define DEFAULT_CALLBACK "default_callback__"
-
-///Transition functions library (see Activity component).
-#define TRANSITIONS_SO "TransitionsLib/libElyTransitions.so"
-
-///Initialization functions library (see Object).
-#define INITIALIZATIONS_SO "InitializationsLib/libElyInitializations.so"
-
-///Some macro dynamic linked libraries loading
-#ifdef WIN32
-#	include <direct.h>
-#	include <windows.h>
-typedef HINSTANCE LIB_HANDLE;
-#else
-#	include <sys/types.h>
-#	include <dlfcn.h>
-typedef void* LIB_HANDLE;
-#endif
+///Dynamic linked libraries loading (Libtool)
+#include <ltdl.h>
 
 ///ELY_THREAD
 #ifdef ELY_THREAD

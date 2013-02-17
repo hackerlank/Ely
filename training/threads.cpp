@@ -194,7 +194,7 @@
 
 typedef void (*PFUNC)(int *);
 
-int main(int argc, char **argv)
+int threads_main(int argc, char **argv)
 {
 	void *lib_handle;
 	PFUNC pfn1, pfn2, pfn11;

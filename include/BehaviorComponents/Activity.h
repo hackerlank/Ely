@@ -60,7 +60,7 @@ class ActivityTemplate;
  * - <tt> void <STATEA>_FromTo_<STATEB>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);</tt>
  *
  * All these routines are loaded at runtime from a dynamic linked library
- * (referenced by the macro TRANSITIONS_SO).\n
+ * (referenced by the macro TRANSITIONS_LA).\n
  * Inside these routine the SMARTPTR(Activity) "activity" argument passed refers to this
  * component.\n
  * \see FSM for details.
@@ -107,7 +107,7 @@ private:
 	 * \name Handles, typedefs, for managing library of transition functions.
 	 */
 	///@{
-	LIB_HANDLE mTransitionLib;
+	lt_dlhandle mTransitionLib;
 	typedef void (*PENTER)(fsm*, Activity&, const ValueList&);
 	typedef void (*PEXIT)(fsm*, Activity&);
 	typedef ValueList (*PFILTER)(fsm*, Activity&, const std::string&,

@@ -39,7 +39,7 @@
 
 AsyncTask::DoneStatus AIUpdate(GenericAsyncTask* task, void* data);
 
-int main(int argc, char **argv)
+int ai_main(int argc, char **argv)
 {
 	///setup
 	// Load your configuration
