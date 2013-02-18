@@ -18,14 +18,14 @@ noinst_LTLIBRARIES = \
 bin_PROGRAMS = ely
 ely_SOURCES = \
 		Ely.cpp
-ely_LDFLAGS = $(ELY_LDFLAGS)
+ely_LDFLAGS = $(ELY_LDFLAGS) -export-dynamic
 ely_LDADD = \
 		$(noinst_LTLIBRARIES) \
 		$(top_srcdir)/tinyxml2/libtinyxml2.la \
-		$(ELY_LIBS) \
 		-dlopen $(top_srcdir)/callbacks/callbacks.la \
 		-dlopen $(top_srcdir)/initializations/initializations.la \
-		-dlopen $(top_srcdir)/transitions/transitions.la
+		-dlopen $(top_srcdir)/transitions/transitions.la \
+		$(ELY_LIBS)
 
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \

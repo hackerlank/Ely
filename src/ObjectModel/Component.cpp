@@ -178,9 +178,12 @@ void Component::unloadEventCallbacks()
 	}
 	mCallbackTable.clear();
 	//Close the event callbacks library
+	// reset errors
+	lt_dlerror();
 	if (lt_dlclose(mCallbackLib) != 0)
 	{
-		std::cerr << "Error closing library: " << CALLBACKS_LA << std::endl;
+		std::cerr << "Error closing library: " << CALLBACKS_LA << ": "
+				<< lt_dlerror() << std::endl;
 	}
 	//callbacks unloaded
 	mCallbacksLoaded = false;

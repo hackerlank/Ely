@@ -242,10 +242,12 @@ void Object::unloadInitializationFunctions()
 		return;
 	}
 	//Close the initialization functions library
+	// reset errors
+	lt_dlerror();
 	if (lt_dlclose(mInitializationLib) != 0)
 	{
-		std::cerr << "Error closing library: " << INITIALIZATIONS_LA
-				<< std::endl;
+		std::cerr << "Error closing library: " << INITIALIZATIONS_LA << ": "
+				<< lt_dlerror() << std::endl;
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;

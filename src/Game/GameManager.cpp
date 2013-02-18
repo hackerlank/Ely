@@ -52,7 +52,10 @@ GameManager::GameManager(int argc, char* argv[]) :
 		throw GameException(
 				"GameManager::initialize: error on Libtool initialization");
 	}
+
+#ifndef TESTING
 	LTDL_SET_PRELOADED_SYMBOLS();
+#endif
 }
 
 GameManager::~GameManager()

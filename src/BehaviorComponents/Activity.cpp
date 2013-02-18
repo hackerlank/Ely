@@ -277,9 +277,12 @@ void Activity::unloadTransitionFunctions()
 	}
 	mFromToFunctionSet.clear();
 	//Close the transition functions library
+	// reset errors
+	lt_dlerror();
 	if (lt_dlclose(mTransitionLib) != 0)
 	{
-		std::cerr << "Error closing library: " << TRANSITIONS_LA << std::endl;
+		std::cerr << "Error closing library: " << TRANSITIONS_LA << ": "
+				<< lt_dlerror() << std::endl;
 	}
 	//transitions unloaded
 	mTransitionsLoaded = false;
