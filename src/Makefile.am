@@ -88,4 +88,3 @@ libsupport_la_SOURCES = \
 
 libutilities_la_SOURCES = \
 		Utilities/Tools.cpp
-

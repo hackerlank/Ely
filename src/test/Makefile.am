@@ -1,7 +1,9 @@
+# Ely Boost Unit Tests
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
-common_ely_test_sources =\
+noinst_PROGRAMS = ely_test
+nodist_ely_test_SOURCES =\
 		Runner.cpp \
 		aicomponents/AISuiteFixture.h \
 		aicomponents/Steering_test.cpp \
@@ -31,6 +33,21 @@ common_ely_test_sources =\
 		support/FSM_test.cpp \
 		support/Picker_test.cpp \
 		support/SupportSuiteFixture.h
+
+ely_test_CPPFLAGS = -DBOOST_TEST_DYN_LINK -DTESTING $(AM_CPPFLAGS)
+ely_test_LDFLAGS = $(ELY_LDFLAGS)
+ely_test_LDADD = \
+		../libgame.la \
+		../libaudiocomponents.la \
+		../libaicomponents.la \
+		../libbehaviorcomponents.la \
+		../libcontrolcomponents.la \
+		../libphysicscomponents.la \
+		../libscenecomponents.la \
+		../libobjectmodel.la \
+		../libsupport.la \
+		../libutilities.la \
+		$(top_srcdir)/tinyxml2/libtinyxml2.la \
+		$(ELY_LIBS) \
+		-lboost_unit_test_framework
 		
-noinst_PROGRAMS = ely_test
-nodist_ely_test_SOURCES = $(common_ely_test_sources)
