@@ -21,6 +21,7 @@
  * \author marco
  */
 
+#include "Utilities/Tools.h"
 #include <iostream>
 #include <string>
 #include <vector>
@@ -35,8 +36,8 @@
 
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection
-AnimControlCollection anim_collection;
-AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data);
+AnimControlCollection physics_anim_collection;
+AsyncTask::DoneStatus physics_check_playing(GenericAsyncTask* task, void* data);
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 
 int physics_main(int argc, char **argv)
@@ -77,13 +78,13 @@ int physics_main(int argc, char **argv)
 	{
 		window->load_model(Actor, "bvw-f2004--airbladepilot/" + animations[i]);
 	}
-	auto_bind(Actor.node(), anim_collection);
+	auto_bind(Actor.node(), physics_anim_collection);
 	pbundle->set_anim_blend_flag(true);
-	pbundle->set_control_effect(anim_collection.get_anim(0), 0.5);
-	pbundle->set_control_effect(anim_collection.get_anim(1), 0.5);
+	pbundle->set_control_effect(physics_anim_collection.get_anim(0), 0.5);
+	pbundle->set_control_effect(physics_anim_collection.get_anim(1), 0.5);
 	int actualAnim = 0;
 	//switch among animations
-	AsyncTask* task = new GenericAsyncTask("check playing", &check_playing,
+	AsyncTask* task = new GenericAsyncTask("physics_check playing", &physics_check_playing,
 			reinterpret_cast<void*>(&actualAnim));
 	task->set_delay(3);
 	panda.get_task_mgr().add(task);
@@ -98,7 +99,7 @@ int physics_main(int argc, char **argv)
 	return 0;
 }
 
-AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data)
+AsyncTask::DoneStatus physics_check_playing(GenericAsyncTask* task, void* data)
 {
 	//Control the Animations
 	double time = ClockObject::get_global_clock()->get_real_time();
@@ -107,40 +108,40 @@ AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data)
 	if (num == 0)
 	{
 		std::cout << time << " - Blending" << std::endl;
-		if (not anim_collection.get_anim(0)->is_playing())
+		if (not physics_anim_collection.get_anim(0)->is_playing())
 		{
-			anim_collection.get_anim(0)->play();
+			physics_anim_collection.get_anim(0)->play();
 		}
-		if (not anim_collection.get_anim(1)->is_playing())
+		if (not physics_anim_collection.get_anim(1)->is_playing())
 		{
-			anim_collection.get_anim(1)->play();
+			physics_anim_collection.get_anim(1)->play();
 		}
 	}
 	else if (num == 1)
 	{
-		std::cout << time << " - Playing: " << anim_collection.get_anim_name(0)
+		std::cout << time << " - Playing: " << physics_anim_collection.get_anim_name(0)
 				<< std::endl;
-		if (not anim_collection.get_anim(0)->is_playing())
+		if (not physics_anim_collection.get_anim(0)->is_playing())
 		{
-			anim_collection.get_anim(0)->play();
+			physics_anim_collection.get_anim(0)->play();
 		}
-		if (anim_collection.get_anim(1)->is_playing())
+		if (physics_anim_collection.get_anim(1)->is_playing())
 		{
-			anim_collection.get_anim(1)->stop();
+			physics_anim_collection.get_anim(1)->stop();
 		}
 	}
 	else
 	{
-		std::cout << time << " - Playing: " << anim_collection.get_anim_name(1)
+		std::cout << time << " - Playing: " << physics_anim_collection.get_anim_name(1)
 				<< std::endl;
-		anim_collection.get_anim(1)->play();
-		if (anim_collection.get_anim(0)->is_playing())
+		physics_anim_collection.get_anim(1)->play();
+		if (physics_anim_collection.get_anim(0)->is_playing())
 		{
-			anim_collection.get_anim(0)->stop();
+			physics_anim_collection.get_anim(0)->stop();
 		}
-		if (not anim_collection.get_anim(1)->is_playing())
+		if (not physics_anim_collection.get_anim(1)->is_playing())
 		{
-			anim_collection.get_anim(1)->play();
+			physics_anim_collection.get_anim(1)->play();
 		}
 	}
 	*actualAnim += 1;

@@ -12,13 +12,16 @@ noinst_LTLIBRARIES = \
 		libphysicscomponents.la \
 		libscenecomponents.la \
 		libobjectmodel.la \
-		libutilities.la \
-		libsupport.la
+		libutilities.la
+
+noinst_LIBRARIES = libsupport.a
 
 bin_PROGRAMS = ely
 ely_SOURCES = \
 		Ely.cpp
-ely_LDFLAGS = $(ELY_LDFLAGS) -export-dynamic
+ely_LDFLAGS = $(ELY_LDFLAGS) -export-dynamic \
+		-Wl,--whole-archive,$(noinst_LIBRARIES) \
+		-Wl,--no-whole-archive
 ely_LDADD = \
 		$(noinst_LTLIBRARIES) \
 		$(top_srcdir)/tinyxml2/libtinyxml2.la \
@@ -79,12 +82,13 @@ libscenecomponents_la_SOURCES = \
 		SceneComponents/Terrain.cpp \
 		SceneComponents/TerrainTemplate.cpp
 
-libsupport_la_SOURCES = \
+libutilities_la_SOURCES = \
+		Utilities/Tools.cpp
+
+libsupport_a_SOURCES = \
 		Support/FirstPersonCamera.cpp \
 		Support/FSM.cpp \
 		Support/Picker.cpp \
 		Support/Distributed/ClientRepositoryBase.cpp \
 		Support/Distributed/DistributedObjectBase.cpp
 
-libutilities_la_SOURCES = \
-		Utilities/Tools.cpp
