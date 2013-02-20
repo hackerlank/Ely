@@ -23,6 +23,7 @@ ely_LDFLAGS = $(ELY_LDFLAGS) -export-dynamic \
 		-Wl,--whole-archive,$(noinst_LIBRARIES) \
 		-Wl,--no-whole-archive
 ely_LDADD = \
+		$(noinst_LIBRARIES) \
 		$(noinst_LTLIBRARIES) \
 		$(top_srcdir)/tinyxml2/libtinyxml2.la \
 		-dlopen $(top_srcdir)/callbacks/callbacks.la \
