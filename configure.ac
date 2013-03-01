@@ -41,30 +41,26 @@ AC_ARG_ENABLE([ely-devel],
 	AS_HELP_STRING([--enable-ely-devel],
 		[=yes enable Ely development mode (disabled by default)]),
     [ely_devel=${enableval}], [ely_devel=no])
-if test "x${ely_devel}" = xyes; then
-    AC_DEFINE([ELY_DEVEL],[1],[development mode enabled])
-fi
+AS_IF([test "x${ely_devel}" = xyes],
+	[AC_DEFINE([ELY_DEVEL],[1],[development mode enabled])])
 # ELY_DEBUG
 AC_ARG_ENABLE([ely-debug],
 	AS_HELP_STRING([--enable-ely-debug],
 		[=yes enable Ely debug mode (disabled by default)]),
     [ely_debug=${enableval}], [ely_debug=no])
-if test "x${ely_debug}" = xyes; then
-    AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
-    ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
-fi
+AS_IF([test "x${ely_debug}" = xyes],
+	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
+	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"])
 # enables silent rules
-#if test "x${ely_devel}" = xyes || test "x${ely_debug}" = xyes ; then
-#	AM_SILENT_RULES
-#fi
+#AS_IF([test "x${ely_devel}" != xyes -a "x${ely_debug}" != xyes],
+#	[AM_SILENT_RULES])
 # ELY_THREAD
 AC_ARG_ENABLE([ely-thread],
     AS_HELP_STRING([--enable-ely-thread],
     	[=yes enable Ely threading mode (disabled by default)]),
     [ely_thread=${enableval}], [ely_thread=no])
-if test "x${ely_thread}" = xyes; then
-    AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
-fi
+AS_IF([test "x${ely_thread}" = xyes],
+	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])])
 
 # checks for libraries.
 AC_SEARCH_LIBS([lt_dlopen], [ltdl])
@@ -74,13 +70,15 @@ AC_CHECK_HEADERS([stdint.h ltdl.h])
 AX_CXX_HEADER_STDCXX_98
 
 # checks Boost Unit Test Framework library (mantainer only)
-#AC_ARG_ENABLE([ely-test],
-#    AS_HELP_STRING([--enable-ely-test],
-#    	[=yes enable Ely test program (disabled by default)]),
-#    [ely_test=${enableval}], [ely_test=no])
-#if test "x${ely_test}" = xyes; then
-#	AX_BOOST_UNIT_TEST_FRAMEWORK
-#fi
+AC_ARG_ENABLE([ely-test],
+    AS_HELP_STRING([--enable-ely-test],
+    	[=yes enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
+    [ely_test=${enableval}], [ely_test=no])
+AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" = xyes])
+AM_COND_IF([BOOST_TEST],
+	[AX_BOOST_BASE
+	AX_BOOST_UNIT_TEST_FRAMEWORK
+	AC_CONFIG_FILES([src/test/Makefile])])
 
 # checks Pyhton 2.6.
 AX_PYTHON_DEVEL([>= '2.6'])
@@ -114,7 +112,6 @@ AC_CONFIG_FILES([
 		initializations/Makefile
 		tinyxml2/Makefile
 		src/Makefile
-		src/test/Makefile
 		training/Makefile
 		doc/Makefile
 		])
