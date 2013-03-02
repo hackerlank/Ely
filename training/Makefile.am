@@ -3,15 +3,15 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
 ltlibraries = \
-		$(top_srcdir)/src/libgame.la \
-		$(top_srcdir)/src/libaicomponents.la \
-		$(top_srcdir)/src/libaudiocomponents.la \
-		$(top_srcdir)/src/libbehaviorcomponents.la \
-		$(top_srcdir)/src/libcontrolcomponents.la \
-		$(top_srcdir)/src/libphysicscomponents.la \
-		$(top_srcdir)/src/libscenecomponents.la \
-		$(top_srcdir)/src/libobjectmodel.la \
-		$(top_srcdir)/src/libutilities.la
+		$(top_builddir)/src/libgame.la \
+		$(top_builddir)/src/libaicomponents.la \
+		$(top_builddir)/src/libaudiocomponents.la \
+		$(top_builddir)/src/libbehaviorcomponents.la \
+		$(top_builddir)/src/libcontrolcomponents.la \
+		$(top_builddir)/src/libphysicscomponents.la \
+		$(top_builddir)/src/libscenecomponents.la \
+		$(top_builddir)/src/libobjectmodel.la \
+		$(top_builddir)/src/libutilities.la
 
 libraries = libsupport.a
 

@@ -4,6 +4,10 @@ if BOOST_TEST
 BOOSTTESTDIR = src/test
 endif
 
-SUBDIRS = $(BOOSTTESTDIR) include callbacks transitions initializations tinyxml2 src training doc
+if TRAINING_TEST
+TRAININGTESTDIR = training
+endif
+
+SUBDIRS = $(BOOSTTESTDIR) include callbacks transitions initializations tinyxml2 src doc $(TRAININGTESTDIR) 
 
 pkgdata_DATA = game.xml config.prc

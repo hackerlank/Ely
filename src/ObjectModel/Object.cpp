@@ -227,7 +227,8 @@ void Object::loadInitializationFunctions()
 	mInitializationLib = lt_dlopen(INITIALIZATIONS_LA);
 	if (mInitializationLib == NULL)
 	{
-		std::cerr << "Error loading library: " << lt_dlerror() << std::endl;
+		std::cerr << "Error loading library: " << INITIALIZATIONS_LA << ": "
+				<< lt_dlerror() << std::endl;
 		return;
 	}
 	//initializations loaded

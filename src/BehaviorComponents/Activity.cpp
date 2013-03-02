@@ -141,7 +141,8 @@ void Activity::loadTransitionFunctions()
 	mTransitionLib = lt_dlopen(TRANSITIONS_LA);
 	if (mTransitionLib == NULL)
 	{
-		std::cerr << "Error loading library: " << lt_dlerror() << std::endl;
+		std::cerr << "Error loading library: " << TRANSITIONS_LA << ": "
+				<< lt_dlerror() << std::endl;
 		return;
 	}
 

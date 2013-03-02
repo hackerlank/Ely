@@ -2,17 +2,28 @@
 AM_CPPFLAGS = -DBOOST_TEST_DYN_LINK -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
-noinst_LTLIBRARIES = \
-		libtestaicomponents.la \
-		libtestaudiocomponents.la \
-		libtestbehaviorcomponents.la \
-		libtestcontrolcomponents.la \
-		libtestely.la \
-		libtestphysicscomponents.la \
-		libtestscenecomponents.la \
-		libtestgame.la \
-		libtestobjectmodel.la \
-		libtestsupport.la
+noinst_LIBRARIES = \
+		libtestaicomponents.a \
+		libtestaudiocomponents.a \
+		libtestbehaviorcomponents.a \
+		libtestcontrolcomponents.a \
+		libtestely.a \
+		libtestphysicscomponents.a \
+		libtestscenecomponents.a \
+		libtestgame.a \
+		libtestobjectmodel.a \
+		libtestsupport.a
+whole_archives = \
+		-Wl,libtestaicomponents.a \
+		-Wl,libtestaudiocomponents.a \
+		-Wl,libtestbehaviorcomponents.a \
+		-Wl,libtestcontrolcomponents.a \
+		-Wl,libtestely.a \
+		-Wl,libtestphysicscomponents.a \
+		-Wl,libtestscenecomponents.a \
+		-Wl,libtestgame.a \
+		-Wl,libtestobjectmodel.a \
+		-Wl,libtestsupport.a
 
 noinst_PROGRAMS = ely_test
 nodist_ely_test_SOURCES =\
@@ -20,19 +31,22 @@ nodist_ely_test_SOURCES =\
 		$(top_srcdir)/tinyxml2/tinyxml2.cpp \
 		$(top_srcdir)/src/Utilities/Tools.cpp
 		 
-ely_test_LDFLAGS = $(ELY_LDFLAGS)
+ely_test_LDFLAGS = $(ELY_LDFLAGS) \
+		-Wl,--whole-archive \
+		$(whole_archives) \
+		-Wl,--no-whole-archive
 ely_test_LDADD = \
-		$(noinst_LTLIBRARIES) \
+		$(noinst_LIBRARIES) \
 		-lboost_unit_test_framework \
 		$(ELY_LIBS)
 
-libtestaicomponents_la_SOURCES = \
+libtestaicomponents_a_SOURCES = \
 		aicomponents/AISuiteFixture.h \
 		aicomponents/Steering_test.cpp \
 		$(top_srcdir)/src/AIComponents/Steering.cpp  \
 		$(top_srcdir)/src/AIComponents/SteeringTemplate.cpp
 		
-libtestaudiocomponents_la_SOURCES = \
+libtestaudiocomponents_a_SOURCES = \
 		audiocomponents/AudioSuiteFixture.h \
 		audiocomponents/Sound3d_test.cpp \
 		$(top_srcdir)/src/AudioComponents/Listener.cpp \
@@ -40,13 +54,13 @@ libtestaudiocomponents_la_SOURCES = \
 		$(top_srcdir)/src/AudioComponents/Sound3d.cpp \
 		$(top_srcdir)/src/AudioComponents/Sound3dTemplate.cpp
 
-libtestbehaviorcomponents_la_SOURCES = \
+libtestbehaviorcomponents_a_SOURCES = \
 		behaviorcomponents/Activity_test.cpp \
 		behaviorcomponents/BehaviorSuiteFixture.h \
 		$(top_srcdir)/src/BehaviorComponents/Activity.cpp \
 		$(top_srcdir)/src/BehaviorComponents/ActivityTemplate.cpp
 
-libtestcontrolcomponents_la_SOURCES = \
+libtestcontrolcomponents_a_SOURCES = \
 		controlcomponents/Chaser_test.cpp \
 		controlcomponents/ControlSuiteFixture.h \
 		controlcomponents/Driver_test.cpp \
@@ -55,11 +69,11 @@ libtestcontrolcomponents_la_SOURCES = \
 		$(top_srcdir)/src/ControlComponents/Driver.cpp \
 		$(top_srcdir)/src/ControlComponents/DriverTemplate.cpp
 
-libtestely_la_SOURCES = \
+libtestely_a_SOURCES = \
 		ely/ElySuiteFixture.h \
 		ely/Ely_test.cpp
 
-libtestgame_la_SOURCES = \
+libtestgame_a_SOURCES = \
 		game/GameManagers_test.cpp \
 		game/GameSuiteFixture.h \
 		$(top_srcdir)/src/Game/GameAIManager.cpp \
@@ -69,7 +83,7 @@ libtestgame_la_SOURCES = \
 		$(top_srcdir)/src/Game/GameSceneManager.cpp \
 		$(top_srcdir)/src/Game/GameManager.cpp
 
-libtestobjectmodel_la_SOURCES = \
+libtestobjectmodel_a_SOURCES = \
 		objectmodel/ComponentTemplateManager_test.cpp \
 		objectmodel/ObjectModelSuiteFixture.h \
 		objectmodel/ObjectTemplateManager_test.cpp \
@@ -81,7 +95,7 @@ libtestobjectmodel_la_SOURCES = \
 		$(top_srcdir)/src/ObjectModel/ObjectTemplate.cpp \
 		$(top_srcdir)/src/ObjectModel/ObjectTemplateManager.cpp
 
-libtestphysicscomponents_la_SOURCES = \
+libtestphysicscomponents_a_SOURCES = \
 		physicscomponents/CharacterController_test.cpp \
 		physicscomponents/PhysicsSuiteFixture.h \
 		physicscomponents/RigidBody_test.cpp \
@@ -90,7 +104,7 @@ libtestphysicscomponents_la_SOURCES = \
 		$(top_srcdir)/src/PhysicsComponents/RigidBody.cpp \
 		$(top_srcdir)/src/PhysicsComponents/RigidBodyTemplate.cpp
 
-libtestscenecomponents_la_SOURCES = \
+libtestscenecomponents_a_SOURCES = \
 		scenecomponents/InstanceOf_test.cpp \
 		scenecomponents/Model_test.cpp \
 		scenecomponents/SceneSuiteFixture.h \
@@ -104,7 +118,7 @@ libtestscenecomponents_la_SOURCES = \
 		$(top_srcdir)/src/SceneComponents/Terrain.cpp \
 		$(top_srcdir)/src/SceneComponents/TerrainTemplate.cpp
 
-libtestsupport_la_SOURCES = \
+libtestsupport_a_SOURCES = \
 		support/FirstPersonCamera_test.cpp \
 		support/FSM_test.cpp \
 		support/Picker_test.cpp \

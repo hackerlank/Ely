@@ -46,12 +46,6 @@ GameManager::GameManager(int argc, char* argv[]) :
 	{
 		PRINT("Could not load the window!");
 	}
-	// Libtool initialization
-	if (lt_dlinit() != 0)
-	{
-		throw GameException(
-				"GameManager::initialize: error on Libtool initialization");
-	}
 
 #ifndef TESTING
 	LTDL_SET_PRELOADED_SYMBOLS();
@@ -60,11 +54,6 @@ GameManager::GameManager(int argc, char* argv[]) :
 
 GameManager::~GameManager()
 {
-	// Libtool finalization
-	if (lt_dlexit() != 0)
-	{
-		std::cerr << "GameManager::~GameManager: error on Libtool finalization" << std::endl;
-	}
 	// close the framework
 	close_framework();
 }

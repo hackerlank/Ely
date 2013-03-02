@@ -30,6 +30,12 @@ int main(int argc, char **argv)
 	load_prc_file(
 			Filename(std::string(ELY_DATADIR) + std::string("config.prc")));
 
+	// Libtool: initialize libltdl.
+	if (lt_dlinit() != 0)
+	{
+		throw GameException(
+				"Ely::main: Libtool error on libltdl initialization");
+	}
 	// Setup the game framework
 	// ComponentTemplate manager
 	ComponentTemplateManager* componentTmplMgr = new ComponentTemplateManager();
@@ -124,6 +130,11 @@ int main(int argc, char **argv)
 	delete gameMgr;
 	delete objectTmplMgr;
 	delete componentTmplMgr;
+	// Libtool: shut down libltdl and close all modules.
+	if (lt_dlexit() != 0)
+	{
+		std::cerr << "Ely::main: Libtool error on libltdl shutting down" << std::endl;
+	}
 	return 0;
 }
 

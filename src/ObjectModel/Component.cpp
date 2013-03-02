@@ -102,7 +102,8 @@ void Component::loadEventCallbacks()
 	mCallbackLib = lt_dlopen(CALLBACKS_LA);
 	if (mCallbackLib == NULL)
 	{
-		std::cerr << "Error loading library: " << lt_dlerror() << std::endl;
+		std::cerr << "Error loading library: " << CALLBACKS_LA << ": "
+				<< lt_dlerror() << std::endl;
 		return;
 	}
 	// reset errors

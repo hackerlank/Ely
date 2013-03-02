@@ -36,13 +36,13 @@ Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
 	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Steering::Steering: "
 			"invalid GamePhysicsManager")
 	//get bullet world reference
-		mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
-		mTmpl = tmpl;
-		mAICharacter = NULL;
-		mUpdatePtr = NULL;
-		mCharacterController = NULL;
-		mMovRotEnabled = false;
-	}
+	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
+	mTmpl = tmpl;
+	mAICharacter = NULL;
+	mUpdatePtr = NULL;
+	mCharacterController = NULL;
+	mMovRotEnabled = false;
+}
 
 Steering::~Steering()
 {

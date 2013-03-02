@@ -3,12 +3,12 @@
 #ifdef ELY_DEVEL
 	/// Ely data directory == $(abs_top_srcdir)
 #	define ELY_DATADIR "@abs_top_srcdir@/"
-	///Event callbacks module == $(abs_top_srcdir)/callbacks/callbacks.la (See Component)
-#	define CALLBACKS_LA "@abs_top_srcdir@/callbacks/callbacks.la"
-	///Transition functions module == $(abs_top_srcdir)/transitions/transitions.la (see Activity component).
-#	define TRANSITIONS_LA "@abs_top_srcdir@/transitions/transitions.la"
-	///Initialization functions module == $(abs_top_srcdir)/initializations/initializations.la (see Object).
-#	define INITIALIZATIONS_LA "@abs_top_srcdir@/initializations/initializations.la"
+	///Event callbacks module == $(abs_top_builddir)/callbacks/callbacks.la (See Component)
+#	define CALLBACKS_LA "@abs_top_builddir@/callbacks/callbacks.la"
+	///Transition functions module == $(abs_top_builddir)/transitions/transitions.la (see Activity component).
+#	define TRANSITIONS_LA "@abs_top_builddir@/transitions/transitions.la"
+	///Initialization functions module == $(abs_top_builddir)/initializations/initializations.la (see Object).
+#	define INITIALIZATIONS_LA "@abs_top_builddir@/initializations/initializations.la"
 #else
 	/// Ely data directory == $(pkgdatadir)
 #	define ELY_DATADIR "@prefix@/share/@PACKAGE@/"

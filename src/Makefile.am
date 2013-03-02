@@ -12,21 +12,24 @@ noinst_LTLIBRARIES = \
 		libobjectmodel.la \
 		libutilities.la
 
-noinst_LIBRARIES = libsupport.a
+noinst_LIBRARIES = \
+		libsupport.a
+whole_archives = \
+		-Wl,libsupport.a
 
 bin_PROGRAMS = ely
 ely_SOURCES = \
 		Ely.cpp
 ely_LDFLAGS = $(ELY_LDFLAGS) -export-dynamic \
-		-Wl,--whole-archive,$(noinst_LIBRARIES) \
+		-Wl,--whole-archive \
+		$(whole_archives) \
 		-Wl,--no-whole-archive
 ely_LDADD = \
-		$(noinst_LIBRARIES) \
 		$(noinst_LTLIBRARIES) \
-		$(top_srcdir)/tinyxml2/libtinyxml2.la \
-		-dlopen $(top_srcdir)/callbacks/callbacks.la \
-		-dlopen $(top_srcdir)/initializations/initializations.la \
-		-dlopen $(top_srcdir)/transitions/transitions.la \
+		$(top_builddir)/tinyxml2/libtinyxml2.la \
+		-dlopen $(top_builddir)/callbacks/callbacks.la \
+		-dlopen $(top_builddir)/initializations/initializations.la \
+		-dlopen $(top_builddir)/transitions/transitions.la \
 		$(ELY_LIBS)
 
 libaicomponents_la_SOURCES = \

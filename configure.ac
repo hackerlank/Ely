@@ -69,17 +69,6 @@ AC_SEARCH_LIBS([lt_dlopen], [ltdl])
 AC_CHECK_HEADERS([stdint.h ltdl.h])
 AX_CXX_HEADER_STDCXX_98
 
-# checks Boost Unit Test Framework library (mantainer only)
-AC_ARG_ENABLE([ely-test],
-    AS_HELP_STRING([--enable-ely-test],
-    	[=yes enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
-    [ely_test=${enableval}], [ely_test=no])
-AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" = xyes])
-AM_COND_IF([BOOST_TEST],
-	[AX_BOOST_BASE
-	AX_BOOST_UNIT_TEST_FRAMEWORK
-	AC_CONFIG_FILES([src/test/Makefile])])
-
 # checks Pyhton 2.6.
 AX_PYTHON_DEVEL([>= '2.6'])
 # checks Bullet headers...
@@ -94,6 +83,26 @@ AC_SUBST(ELY_CXXFLAGS)
 AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
+
+# checks Boost Unit Test Framework library (mantainer only)
+AC_ARG_ENABLE([ely-test],
+    AS_HELP_STRING([--enable-ely-test],
+    	[=yes enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
+    [ely_test=${enableval}], [ely_test=no])
+AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" = xyes])
+AM_COND_IF([BOOST_TEST],
+	[AX_BOOST_BASE
+	AX_BOOST_UNIT_TEST_FRAMEWORK
+	AC_CONFIG_FILES([src/test/Makefile])])
+
+# checks training tests (mantainer only)
+AC_ARG_ENABLE([ely-training],
+    AS_HELP_STRING([--enable-ely-training],
+    	[=yes enable Ely training test programs - mantainer only (disabled by default)]),
+    [ely_training=${enableval}], [ely_training=no])
+AM_CONDITIONAL([TRAINING_TEST], [test "x${ely_training}" = xyes])
+AM_COND_IF([TRAINING_TEST],
+	[AC_CONFIG_FILES([training/Makefile])])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -112,7 +121,6 @@ AC_CONFIG_FILES([
 		initializations/Makefile
 		tinyxml2/Makefile
 		src/Makefile
-		training/Makefile
 		doc/Makefile
 		])
 
