@@ -84,7 +84,7 @@ AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
 
-# checks Boost Unit Test Framework library (mantainer only)
+# checks for Boost Unit Test Framework tests (mantainer only)
 AC_ARG_ENABLE([ely-test],
     AS_HELP_STRING([--enable-ely-test],
     	[=yes enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
@@ -95,7 +95,7 @@ AM_COND_IF([BOOST_TEST],
 	AX_BOOST_UNIT_TEST_FRAMEWORK
 	AC_CONFIG_FILES([src/test/Makefile])])
 
-# checks training tests (mantainer only)
+# checks for training tests (mantainer only)
 AC_ARG_ENABLE([ely-training],
     AS_HELP_STRING([--enable-ely-training],
     	[=yes enable Ely training test programs - mantainer only (disabled by default)]),
@@ -103,6 +103,20 @@ AC_ARG_ENABLE([ely-training],
 AM_CONDITIONAL([TRAINING_TEST], [test "x${ely_training}" = xyes])
 AM_COND_IF([TRAINING_TEST],
 	[AC_CONFIG_FILES([training/Makefile])])
+
+# checks for Ely ELF executable build (if no boost and no training tests)
+AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" != xyes -a "x${ely_training}" != xyes])
+AM_COND_IF([ELY_ELF],
+	[AC_CONFIG_FILES([
+		include/Makefile
+		include/Utilities/Tools_ini.h
+		callbacks/Makefile
+		transitions/Makefile
+		initializations/Makefile
+		tinyxml2/Makefile
+		src/Makefile
+		doc/Makefile
+		])])
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -114,14 +128,6 @@ AC_CHECK_FUNCS([pow sqrt strchr strtol])
 
 AC_CONFIG_FILES([
 		Makefile
-		include/Makefile
-		include/Utilities/Tools_ini.h
-		callbacks/Makefile
-		transitions/Makefile
-		initializations/Makefile
-		tinyxml2/Makefile
-		src/Makefile
-		doc/Makefile
 		])
 
 AC_OUTPUT

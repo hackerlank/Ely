@@ -2,21 +2,8 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
-ltlibraries = \
-		$(top_builddir)/src/libgame.la \
-		$(top_builddir)/src/libaicomponents.la \
-		$(top_builddir)/src/libaudiocomponents.la \
-		$(top_builddir)/src/libbehaviorcomponents.la \
-		$(top_builddir)/src/libcontrolcomponents.la \
-		$(top_builddir)/src/libphysicscomponents.la \
-		$(top_builddir)/src/libscenecomponents.la \
-		$(top_builddir)/src/libobjectmodel.la \
-		$(top_builddir)/src/libutilities.la
-
-libraries = libsupport.a
-
-noinst_PROGRAMS = training
-nodist_training_SOURCES = \
+noinst_PROGRAMS = ely_training
+nodist_ely_training_SOURCES = \
 		training.cpp \
 		ai.cpp \
 		anim.cpp \
@@ -24,8 +11,6 @@ nodist_training_SOURCES = \
 		physics.cpp \
 		threads.cpp
 		
-training_LDFLAGS = $(ELY_LDFLAGS)
-training_LDADD = \
-		$(LTLIBRARIES) \
-		$(LIBRARIES) \
+ely_training_LDFLAGS = $(ELY_LDFLAGS)
+ely_training_LDADD = \
 		$(ELY_LIBS)
