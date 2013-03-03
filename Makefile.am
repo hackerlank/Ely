@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = include callbacks transitions initializations tinyxml2 src doc
+DIST_SUBDIRS = include callbacks transitions initializations tinyxml2 src doc data
 
 if BOOST_TEST
 BOOSTTESTDIR = src/test
@@ -16,5 +16,3 @@ ELYELFDIRS = $(DIST_SUBDIRS)
 endif 
 
 SUBDIRS = $(BOOSTTESTDIR) $(TRAININGTESTDIR) $(ELYELFDIRS) 
-
-pkgdata_DATA = game.xml config.prc

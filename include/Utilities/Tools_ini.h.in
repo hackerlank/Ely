@@ -1,8 +1,8 @@
 ///Macros representing the path to dynamic linked libraries loaded at runtime
 
 #ifdef ELY_DEVEL
-	/// Ely data directory == $(abs_top_srcdir)
-#	define ELY_DATADIR "@abs_top_srcdir@/"
+	/// Ely data directory == $(abs_top_builddir)/data
+#	define ELY_DATADIR "@abs_top_builddir@/data/"
 	///Event callbacks module == $(abs_top_builddir)/callbacks/callbacks.la (See Component)
 #	define CALLBACKS_LA "@abs_top_builddir@/callbacks/callbacks.la"
 	///Transition functions module == $(abs_top_builddir)/transitions/transitions.la (see Activity component).

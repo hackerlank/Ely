@@ -109,13 +109,15 @@ AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" != xyes -a "x${ely_training}" != 
 AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile
-		include/Utilities/Tools_ini.h
 		callbacks/Makefile
 		transitions/Makefile
 		initializations/Makefile
 		tinyxml2/Makefile
 		src/Makefile
 		doc/Makefile
+		data/Makefile
+		data/config.prc
+		data/game.xml
 		])])
 
 # checks for typedefs, structures, and compiler characteristics.
@@ -128,6 +130,7 @@ AC_CHECK_FUNCS([pow sqrt strchr strtol])
 
 AC_CONFIG_FILES([
 		Makefile
+		include/Utilities/Tools_ini.h
 		])
 
 AC_OUTPUT
