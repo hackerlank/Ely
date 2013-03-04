@@ -43,7 +43,33 @@ noinst_HEADERS =\
 		Support/Distributed/DistributedObjectBase.h \
 		Utilities/ComponentSuite.h \
 		Utilities/Tools.h \
-		Utilities/Tools_ini.h
+		Tools_ini.h
 
 nodist_noinst_HEADERS =\
 		config.h
+
+if !ELY_DEVEL
+substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)|g'
+substLibDir = sed -e 's|@elylibdir[@]|$(pkglibdir)|g'
+substData = sed -e 's/@data[@]\///g'
+substCallbacks = sed -e 's/@callbacks[@]\///g'
+substTransitions = sed -e 's/@transitions[@]\///g'
+substInitializations = sed -e 's/@initializations[@]\///g'
+else
+substDataDir = sed -e 's|@elydatadir[@]|$(abs_top_builddir)|g'
+substLibDir = sed -e 's|@elylibdir[@]|$(abs_top_builddir)|g'
+substData = sed -e 's/@data[@]/data/g'
+substCallbacks = sed -e 's/@callbacks[@]/callbacks/g'
+substTransitions = sed -e 's/@transitions[@]/transitions/g'
+substInitializations = sed -e 's/@initializations[@]/initializations/g'
+endif 
+
+Tools_ini.h : $(abs_top_srcdir)/include/Utilities/Tools_ini.h.in Makefile
+	$(substDataDir) $(abs_top_srcdir)/include/Utilities/$@.in | \
+	$(substLibDir) | \
+	$(substData) | \
+	$(substCallbacks) | \
+	$(substTransitions) | \
+	$(substInitializations) > $@
+
+	

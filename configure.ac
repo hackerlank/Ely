@@ -41,8 +41,7 @@ AC_ARG_ENABLE([ely-devel],
 	AS_HELP_STRING([--enable-ely-devel],
 		[=yes enable Ely development mode (disabled by default)]),
     [ely_devel=${enableval}], [ely_devel=no])
-AS_IF([test "x${ely_devel}" = xyes],
-	[AC_DEFINE([ELY_DEVEL],[1],[development mode enabled])])
+AM_CONDITIONAL([ELY_DEVEL], [test "x${ely_devel}" = xyes])
 # ELY_DEBUG
 AC_ARG_ENABLE([ely-debug],
 	AS_HELP_STRING([--enable-ely-debug],
@@ -130,7 +129,6 @@ AC_CHECK_FUNCS([pow sqrt strchr strtol])
 
 AC_CONFIG_FILES([
 		Makefile
-		include/Utilities/Tools_ini.h
 		])
 
 AC_OUTPUT

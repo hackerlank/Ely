@@ -29,7 +29,7 @@
 # undef HAVE_PYTHON
 #endif
 
-#include "Utilities/Tools_ini.h"
+#include "Tools_ini.h"
 
 #include <exception>
 #include <iostream>
