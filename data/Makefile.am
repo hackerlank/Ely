@@ -2,6 +2,8 @@ SUBDIRS = models shaders sounds textures
 
 dist_pkgdata_DATA = game.xml config.prc
 
+EXTRA_DIST = config.prc.in game.xml.in
+
 if !ELY_DEVEL
 substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)|g'
 else

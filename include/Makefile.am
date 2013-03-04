@@ -48,7 +48,7 @@ nodist_noinst_HEADERS =\
 		config.h \
 		Tools_ini.h
 		
-EXTRA_DIST = $(top_srcdir)/include/Utilities/Tools_ini.h.in
+EXTRA_DIST = Utilities/Tools_ini.h.in
 
 if !ELY_DEVEL
 substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)|g'
