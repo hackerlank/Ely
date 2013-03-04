@@ -166,7 +166,7 @@
 		
 		<Object type="Instanceable" id="Smiley1" priority="100">
 			<Component type="Model">
-				<Param model_file="smiley"/>
+				<Param model_file="smiley.bam"/>
 				<Param scale_x="1.0"/>
 				<Param scale_y="1.0"/>
 				<Param scale_z="1.0"/>
@@ -176,7 +176,7 @@
 		</Object>
 		<Object type="Instanceable" id="Gorilla1" priority="100">
 			<Component type="Model">
-				<Param model_file="walk@gorilla/gorillawalking"/>
+				<Param model_file="walk@gorillawalking.bam"/>
 				<Param scale_x="1.0"/>
 				<Param scale_y="1.0"/>
 				<Param scale_z="1.0"/>
@@ -265,8 +265,8 @@
 				<Param mouse_enabled_p="false"/>
 			</Component>
 			<Component type="Model">
-				<Param model_file="panda"/>
-				<Param anim_files="walk@panda-walk"/>
+				<Param model_file="panda.bam"/>
+				<Param anim_files="walk@panda-walk.bam"/>
 				<Param scale_x="3.0"/>
 				<Param scale_y="3.0"/>
 				<Param scale_z="3.0"/>
@@ -281,7 +281,7 @@
 				<Param collide_mask="all_on"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="walk-sound@audio/sfx/GUI_rollover.wav"/>
+				<Param sound_files="walk-sound@GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>			
 			<Param pos_x="800.0"/>
@@ -297,13 +297,13 @@
 				<Param events="fire@mouse1:stop-fire@mouse1-up"/>
 			</Component>
 			<Component type="Model">
-				<Param model_file="misc/lilsmiley"/>
+				<Param model_file="lilsmiley.bam"/>
 				<Param scale_x="0.05"/>
 				<Param scale_y="0.05"/>
 				<Param scale_z="0.05"/>
 			</Component>
 			<Component type="Sound3d">
-				<Param sound_files="video-sound@sfx/GUI_rollover.wav"/>
+				<Param sound_files="video-sound@GUI_rollover.wav"/>
 			</Component>
 			<Param parent="aspect2d"/>
 			<Param pos_x="0.0"/>
@@ -327,8 +327,8 @@
 				<Param events="ground@OnGround:air@OnAir"/>				
 			</Component>
 			<Component type="Model">
-				<Param model_file="eve/eve"/>
-				<Param anim_files="jump@eve/eve-jump:run@eve/eve-run:walk@eve/eve-walk:offbalance@eve/eve-offbalance"/>
+				<Param model_file="eve.bam"/>
+				<Param anim_files="jump@eve-jump.bam:run@eve-run.bam:walk@eve-walk.bam:offbalance@eve-offbalance.bam"/>
 				<Param scale_x="5.0"/>
 				<Param scale_y="5.0"/>
 				<Param scale_z="5.0"/>
@@ -342,7 +342,7 @@
 				<Param jump_speed="30.0"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="walk-sound@sfx/GUI_click.wav"/>
+				<Param sound_files="walk-sound@GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
 			<Param pos_x="750.0"/>
@@ -409,7 +409,7 @@
 		<Object type="StaticActor" id="beachhouse2">
 			<Component type="Model">
 				<Param from_file="true"/>
-				<Param model_file="buildings/beachhouse2"/>
+				<Param model_file="beachhouse2.bam"/>
 				<Param scale_x="8.0"/>
 				<Param scale_y="8.0"/>
 				<Param scale_z="8.0"/>
@@ -431,7 +431,7 @@
 		<Object type="StaticActor" id="gazebo">
 			<Component type="Model">
 				<Param from_file="true"/>
-				<Param model_file="buildings/gazebo"/>
+				<Param model_file="gazebo.bam"/>
 				<Param scale_x="6.0"/>
 				<Param scale_y="6.0"/>
 				<Param scale_z="6.0"/>
@@ -453,7 +453,7 @@
 		<Object type="StaticActor" id="cityhall">
 			<Component type="Model">
 				<Param from_file="true"/>
-				<Param model_file="buildings/cityhall"/>
+				<Param model_file="cityhall.bam"/>
 				<Param scale_x="8.0"/>
 				<Param scale_y="8.0"/>
 				<Param scale_z="8.0"/>
@@ -475,7 +475,7 @@
 		<Object type="StaticActor" id="bridge">
 			<Component type="Model">
 				<Param from_file="true"/>
-				<Param model_file="buildings/bridge"/>
+				<Param model_file="bridge.bam"/>
 				<Param scale_x="0.33"/>
 				<Param scale_y="0.1"/>
 				<Param scale_z="0.1"/>
