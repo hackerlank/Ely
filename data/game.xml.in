@@ -303,7 +303,7 @@
 				<Param scale_z="0.05"/>
 			</Component>
 			<Component type="Sound3d">
-				<Param sound_files="video-sound@audio/sfx/GUI_rollover.wav"/>
+				<Param sound_files="video-sound@sfx/GUI_rollover.wav"/>
 			</Component>
 			<Param parent="aspect2d"/>
 			<Param pos_x="0.0"/>
@@ -342,7 +342,7 @@
 				<Param jump_speed="30.0"/>
 			</Component> 
 			<Component type="Sound3d">
-				<Param sound_files="walk-sound@models/audio/sfx/GUI_click.wav"/>
+				<Param sound_files="walk-sound@sfx/GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
 			<Param pos_x="750.0"/>
@@ -355,7 +355,7 @@
 
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
-				<Param heightfield_file="../PandaGame/Models/heightfield.png"/>
+				<Param heightfield_file="@elydatadir@/data/textures/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
 				<Param height_scale="500.0"/>
 				<Param width_scale="15.0"/>
@@ -368,7 +368,7 @@
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
-				<Param shape_heightfield_file="../PandaGame/Models/heightfield.png"/>
+				<Param shape_heightfield_file="@elydatadir@/data/textures/heightfield.png"/>
 				<Param shape_type="heightfield"/>
 				<Param shape_height="500.0"/>
 				<Param shape_scale_w="15.0"/>

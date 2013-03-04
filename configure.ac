@@ -115,8 +115,10 @@ AM_COND_IF([ELY_ELF],
 		src/Makefile
 		doc/Makefile
 		data/Makefile
-		data/config.prc
-		data/game.xml
+		data/models/Makefile
+		data/shaders/Makefile
+		data/sounds/Makefile
+		data/textures/Makefile
 		])])
 
 # checks for typedefs, structures, and compiler characteristics.

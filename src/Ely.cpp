@@ -28,7 +28,7 @@ int main(int argc, char **argv)
 	// Load your configuration
 	Filename configPrc(std::string());
 	load_prc_file(
-			Filename(std::string(ELY_DATADIR) + std::string("config.prc")));
+			Filename(std::string(ELY_CONFIGPRC)));
 
 	// Libtool: initialize libltdl.
 	if (lt_dlinit() != 0)

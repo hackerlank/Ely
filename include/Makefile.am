@@ -42,11 +42,13 @@ noinst_HEADERS =\
 		Support/Distributed/ClientRepositoryBase.h \
 		Support/Distributed/DistributedObjectBase.h \
 		Utilities/ComponentSuite.h \
-		Utilities/Tools.h \
-		Tools_ini.h
+		Utilities/Tools.h
 
 nodist_noinst_HEADERS =\
-		config.h
+		config.h \
+		Tools_ini.h
+		
+EXTRA_DIST = $(top_srcdir)/include/Utilities/Tools_ini.h.in
 
 if !ELY_DEVEL
 substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)|g'
@@ -64,8 +66,8 @@ substTransitions = sed -e 's/@transitions[@]/transitions/g'
 substInitializations = sed -e 's/@initializations[@]/initializations/g'
 endif 
 
-Tools_ini.h : $(abs_top_srcdir)/include/Utilities/Tools_ini.h.in Makefile
-	$(substDataDir) $(abs_top_srcdir)/include/Utilities/$@.in | \
+Tools_ini.h : $(top_srcdir)/include/Utilities/Tools_ini.h.in Makefile
+	$(substDataDir) $(top_srcdir)/include/Utilities/$@.in | \
 	$(substLibDir) | \
 	$(substData) | \
 	$(substCallbacks) | \

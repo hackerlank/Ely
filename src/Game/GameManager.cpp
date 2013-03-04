@@ -86,7 +86,7 @@ void GameManager::initialize()
 
 	//create the game world (static definition)
 //	createGameWorldWithoutParamTables(std::string("game.xml"));
-	createGameWorld(std::string(ELY_DATADIR) + std::string("game.xml"));
+	createGameWorld(std::string(ELY_GAMEXML));
 
 	//play the game
 	GamePlay();

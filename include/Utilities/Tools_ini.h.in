@@ -2,6 +2,10 @@
 
 /// Ely data directory
 #define ELY_DATADIR "@elydatadir@/@data@/"
+/// Ely config.prc configuration file path
+#define ELY_CONFIGPRC "@elydatadir@/@data@/config.prc"
+/// Ely game.xml configuration file path
+#define ELY_GAMEXML "@elydatadir@/@data@/game.xml"
 ///Event callbacks module (See Component)
 #define CALLBACKS_LA "@elylibdir@/@callbacks@/callbacks.la"
 ///Transition functions module (see Activity component).

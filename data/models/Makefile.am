@@ -1,23 +1,23 @@
 modelsdir = $(pkgdatadir)/data/models
 dist_models_DATA = \
-		beachhouse2.egg \
-		bh2.png \
-		bridge.egg \
-		cityhall.egg \
-		eve.egg \
-		eveface.png \
-		eve-jump.egg \
-		eve-offbalance.egg \
-		eve.png \
-		eve-run.egg \
-		eve-walk.egg \
-		fh.png \
-		gazebo.egg \
-		gorilla.png \
-		gorillawalking.egg \
-		lilsmiley.egg.pz \
-		material-20-cl.png \
+		buildings/beachhouse2.egg \
+		buildings/bh2.png \
+		buildings/bridge.egg \
+		buildings/cityhall.egg \
+		buildings/fh.png \
+		buildings/gazebo.egg \
+		buildings/material-20-cl.png \
+		buildings/texturemap.png \
+		eve/eve.egg \
+		eve/eveface.png \
+		eve/eve-jump.egg \
+		eve/eve-offbalance.egg \
+		eve/eve.png \
+		eve/eve-run.egg \
+		eve/eve-walk.egg \
+		gorilla/gorilla.png \
+		gorilla/gorillawalking.egg \
+		misc/lilsmiley.egg.pz \
 		panda.egg.pz \
 		panda-walk.egg.pz \
-		smiley.egg.pz \
-		texturemap.png
+		smiley.egg.pz
