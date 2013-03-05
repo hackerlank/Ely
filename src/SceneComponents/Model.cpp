@@ -212,8 +212,8 @@ void Model::onAddToObjectSetup()
 					}
 					PRINT(
 							"Binding animation '" << (*animBundlesIter)->get_name() << "' with name '" << animName << "'");
-					SMARTPTR(AnimControl)control = mFirstPartBundle->bind_anim(*animBundlesIter,
-							PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra);
+					SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
+							PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
 					mAnimations.store_anim(control, animName);
 				}
 			}
@@ -270,8 +270,8 @@ void Model::onAddToObjectSetup()
 								}
 								PRINT(
 										"Binding animation '" << (*animBundlesIter)->get_name() << " with name '" << animName << "'");
-								SMARTPTR(AnimControl)control = mFirstPartBundle->bind_anim(*animBundlesIter,
-										PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra);
+								SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
+										PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
 								mAnimations.store_anim(control, animName);
 							}
 						}
