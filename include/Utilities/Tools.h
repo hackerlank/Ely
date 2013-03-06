@@ -29,7 +29,9 @@
 # undef HAVE_PYTHON
 #endif
 
+#ifndef TESTING
 #include "Tools_ini.h"
+#endif
 
 #include <exception>
 #include <iostream>
@@ -49,7 +51,7 @@
 #include <threadSafePointerTo.h>
 
 ///Macros for generic debug
-#ifdef ELY_DEBUG
+#if defined (ELY_DEBUG) && !defined (TESTING)
 #	define PRINT(msg) std::cout << msg << std::endl
 #	define PRINTERR(msg) std::cerr << msg << std::endl
 #	define CHECKEXISTENCE(entity,msg) \

@@ -1,5 +1,6 @@
 # Ely Boost Unit Tests
-AM_CPPFLAGS = -DBOOST_TEST_DYN_LINK -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+DEFINITIONS = -DTRANSITIONS_LA=\"dummy\" -DCALLBACKS_LA=\"dummy\" -DINITIALIZATIONS_LA=\"dummy\" -DDEFAULT_CALLBACK_NAME=\"dummy\"
+AM_CPPFLAGS = $(DEFINITIONS) -DELY_GAMEXML=\"ELY_GAMEXML\" -DBOOST_TEST_DYN_LINK -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
 noinst_LIBRARIES = \

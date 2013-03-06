@@ -49,20 +49,6 @@ struct ObjectModelSuiteFixture
 	}
 	~ObjectModelSuiteFixture()
 	{
-		//delete objects/components before their templates
-		if (mObject)
-		{
-			delete mObject;
-		}
-		if (mObjectTmpl)
-		{
-			delete mObjectTmpl;
-		}
-		//mModel is deleted by mObject
-		if (mModelTmpl)
-		{
-			delete mModelTmpl;
-		}
 		mPanda->close_framework();
 		delete mPanda;
 	}

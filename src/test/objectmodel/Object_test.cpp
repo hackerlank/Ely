@@ -51,11 +51,13 @@ BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 	mObjectTmpl = new ObjectTemplate(ObjectType("Object_test"),ObjectTemplateManager::GetSingletonPtr(),mPanda,mWin);
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	mModelTmpl = new ModelTemplate(mPanda,mWin);
-	mModelTmpl->parameter("model_file") = "panda";
+	ParameterTable paramTable;
+	paramTable.insert(std::pair<std::string,std::string>("model_file","panda"));
+	mModelTmpl->setParameters(paramTable);
 	mModel =
 	DCAST(Model, mModelTmpl->makeComponent(ComponentId("TestModel")));
 	mObject->addComponent(mModel.p());
-	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Graphics"))==mModel);
+	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Scene"))==mModel);
 	BOOST_CHECK(mObject->numComponents() == 1);
 	mObject->addComponent(mModel.p());
 	BOOST_CHECK(mObject->numComponents() == 1);
