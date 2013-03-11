@@ -23,10 +23,11 @@ if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
 	----------------------------------------])
 fi	
 # check libraries first from cmd line specified ones
+#remaining libraries ì: libp3ptloader 
 PANDA3D_LDFLAGS="-L/usr/lib/panda3d -L/usr/local/lib/panda3d"
 PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
-			-lp3openal_audio -lpandaegg -lp3ptloader -lp3tinydisplay -lp3tinydisplay \
+			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3tinydisplay \
 			-lp3vision -lpandagl -lpandaode -lpandaphysics -lpandaskel"
 			
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS}"
