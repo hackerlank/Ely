@@ -41,7 +41,7 @@ AsyncTask::DoneStatus rn_check_playing(GenericAsyncTask* task, void* data);
 
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 
-int recastnavigation_main(int argc, char **argv)
+int main(int argc, char **argv)
 {
 	///setup
 	// Load your configuration

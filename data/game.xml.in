@@ -338,7 +338,7 @@
 				<Param collide_mask="0x7FFFFFFF"/>
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
-				<Param linear_speed="120.0"/>
+				<Param linear_speed="25.0"/>
 				<Param jump_speed="30.0"/>
 			</Component> 
 			<Component type="Sound3d">

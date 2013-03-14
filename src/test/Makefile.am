@@ -2,6 +2,7 @@
 DEFINITIONS = -DTRANSITIONS_LA=\"dummy\" -DCALLBACKS_LA=\"dummy\" -DINITIALIZATIONS_LA=\"dummy\" -DDEFAULT_CALLBACK_NAME=\"dummy\"
 AM_CPPFLAGS = $(DEFINITIONS) -DELY_GAMEXML=\"ELY_GAMEXML\" -DBOOST_TEST_DYN_LINK -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
+AM_LDFLAGS = $(ELY_LDFLAGS)
 
 noinst_LIBRARIES = \
 		libtestaicomponents.a \
@@ -27,12 +28,13 @@ whole_archives = \
 		-Wl,libtestsupport.a
 
 noinst_PROGRAMS = ely_test
+
+#ely_test
 nodist_ely_test_SOURCES =\
 		Runner.cpp \
 		$(top_srcdir)/tinyxml2/tinyxml2.cpp \
-		$(top_srcdir)/src/Utilities/Tools.cpp
-		 
-ely_test_LDFLAGS = $(ELY_LDFLAGS) \
+		$(top_srcdir)/src/Utilities/Tools.cpp	 
+ely_test_LDFLAGS = $(AM_LDFLAGS) \
 		-Wl,--whole-archive \
 		$(whole_archives) \
 		-Wl,--no-whole-archive

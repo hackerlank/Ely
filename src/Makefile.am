@@ -1,5 +1,8 @@
 AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
+AM_LDFLAGS = $(ELY_LDFLAGS)
+
+bin_PROGRAMS = ely
 
 noinst_LTLIBRARIES = \
 		libgame.la \
@@ -17,10 +20,10 @@ noinst_LIBRARIES = \
 whole_archives = \
 		-Wl,libsupport.a
 
-bin_PROGRAMS = ely
+#ely
 ely_SOURCES = \
 		Ely.cpp
-ely_LDFLAGS = $(ELY_LDFLAGS) -export-dynamic \
+ely_LDFLAGS = $(AM_LDFLAGS) -export-dynamic \
 		-Wl,--whole-archive \
 		$(whole_archives) \
 		-Wl,--no-whole-archive
