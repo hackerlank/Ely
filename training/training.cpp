@@ -3,7 +3,8 @@ int anim_main(int argc, char **argv);
 int network_main(int argc, char **argv);
 int physics_main(int argc, char **argv);
 int threads_main(int argc, char **argv);
-int manual_example(int argc, char **argv);
+int manual_example_main(int argc, char **argv);
+int recastnavigation_main(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
@@ -13,6 +14,7 @@ int main(int argc, char **argv)
 //	result = network_main(argc, argv);
 //	result = physics_main(argc, argv);
 //	result = threads_main(argc, argv);
-	result = manual_example(argc, argv);
+//	result = manual_example_main(argc, argv);
+	result = recastnavigation_main(argc, argv);
 	return result;
 }

@@ -24,7 +24,7 @@
 #include "pandaFramework.h"
 #include "pandaSystem.h"
 
-int manual_example(int argc, char *argv[])
+int manual_example_main(int argc, char *argv[])
 {
 	//open a new window framework
 	PandaFramework framework;

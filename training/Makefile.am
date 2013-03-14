@@ -10,7 +10,8 @@ nodist_ely_training_SOURCES = \
 		network.cpp \
 		physics.cpp \
 		threads.cpp \
-		manual_example.cpp
+		manual_example.cpp \
+		recastnavigation.cpp
 		
 ely_training_LDFLAGS = $(ELY_LDFLAGS)
 ely_training_LDADD = \
