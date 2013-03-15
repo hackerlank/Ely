@@ -32,8 +32,6 @@
 #include <animControlCollection.h>
 #include <pandaFramework.h>
 
-#include <panda3d/bulletWorld.h>
-
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection
 AnimControlCollection rn_anim_collection;
@@ -46,16 +44,16 @@ int main(int argc, char **argv)
 	///setup
 	// Load your configuration
 
-	load_prc_file_data("model-path", baseDir + "data/models");
-	load_prc_file_data("model-path", baseDir + "data/shaders");
-	load_prc_file_data("model-path", baseDir + "data/sounds");
-	load_prc_file_data("model-path", baseDir + "data/textures");
-	load_prc_file_data("show-frame-rate-meter", "#t");
-	load_prc_file_data("lock-to-one-cpu", "0");
-	load_prc_file_data("support-threads", "1");
-	load_prc_file_data("audio-buffering-seconds", "5");
-	load_prc_file_data("audio-preload-threshold", "2000000");
-	load_prc_file_data("sync-video", "#t");
+	load_prc_file_data("", "model-path" + baseDir + "data/models");
+	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "show-frame-rate-meter #t");
+	load_prc_file_data("", "lock-to-one-cpu 0");
+	load_prc_file_data("", "support-threads 1");
+	load_prc_file_data("", "audio-buffering-seconds 5");
+	load_prc_file_data("", "audio-preload-threshold 2000000");
+	load_prc_file_data("", "sync-video #t");
 
 	PandaFramework panda = PandaFramework();
 	panda.open_framework(argc, argv);
@@ -94,7 +92,7 @@ int main(int argc, char **argv)
 	panda.get_task_mgr().add(task);
 	//attach to scene
 	Actor.reparent_to(window->get_render());
-	Actor.set_pos(0.0, 100.0, -30.0);
+	Actor.set_pos(0.0, 0.0, 0.0);
 
 	// Do the main loop
 	panda.main_loop();

@@ -30,6 +30,7 @@ ely_recastnavigation_CPPFLAGS = \
 		-I$(rn_path)/DetourCrowd/Include \
 		-I$(rn_path)/DetourTileCache/Include \
 		-I$(rn_path)/Recast/Include \
+		-I$(rn_path)/RecastDemo/Include \
 		$(AM_CPPFLAGS)
 ely_recastnavigation_LDADD = \
 		$(ELY_LIBS) \
