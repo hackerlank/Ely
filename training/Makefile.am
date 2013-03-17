@@ -20,7 +20,12 @@ ely_training_LDADD = \
 
 #ely_recastnavigation
 nodist_ely_recastnavigation_SOURCES = \
-		recastnavigation.cpp
+		recastnavigation/recastnavigation.cpp \
+		recastnavigation/InputGeom.cpp \
+		recastnavigation/SampleInterfaces.cpp \
+		recastnavigation/PerfTimer.cpp \
+		recastnavigation/MeshLoaderObj.cpp \
+		recastnavigation/ChunkyTriMesh.cpp
 
 rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
 
@@ -30,7 +35,6 @@ ely_recastnavigation_CPPFLAGS = \
 		-I$(rn_path)/DetourCrowd/Include \
 		-I$(rn_path)/DetourTileCache/Include \
 		-I$(rn_path)/Recast/Include \
-		-I$(rn_path)/RecastDemo/Include \
 		$(AM_CPPFLAGS)
 ely_recastnavigation_LDADD = \
 		$(ELY_LIBS) \
