@@ -25,7 +25,11 @@ nodist_ely_recastnavigation_SOURCES = \
 		recastnavigation/SampleInterfaces.cpp \
 		recastnavigation/PerfTimer.cpp \
 		recastnavigation/MeshLoaderObj.cpp \
-		recastnavigation/ChunkyTriMesh.cpp
+		recastnavigation/ChunkyTriMesh.cpp \
+		recastnavigation/Sample.cpp \
+		recastnavigation/Sample_SoloMesh.cpp \
+		recastnavigation/CrowdTool.cpp \
+		recastnavigation/ValueHistory.cpp
 
 rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
 
