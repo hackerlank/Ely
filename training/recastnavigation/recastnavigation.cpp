@@ -70,12 +70,13 @@ inline LVector3f recastToLVector3f(const float* p)
 
 class RN
 {
+	std::string m_meshName;
 	InputGeom* m_geom;
 	BuildContext* m_ctx;
 
-	Sample_SoloMesh* sampleSolo;
+	Sample_SoloMesh* m_sampleSolo;
 
-	CrowdTool* crowdTool;
+	CrowdTool* m_crowdTool;
 
 public:
 	RN();
@@ -102,6 +103,7 @@ bool RN::loadMesh(const std::string& path, const std::string& meshName)
 {
 	bool result = true;
 	m_geom = new InputGeom;
+	m_meshName = meshName;
 	if (not m_geom->loadMesh(m_ctx, (path + meshName).c_str()))
 	{
 		delete m_geom;
@@ -115,19 +117,22 @@ bool RN::loadMesh(const std::string& path, const std::string& meshName)
 void RN::createSoloMeshCrowdSample()
 {
 	//create sample
-	sampleSolo = new Sample_SoloMesh();
+	m_sampleSolo = new Sample_SoloMesh();
 	//set rcContext
-	sampleSolo->setContext(m_ctx);
+	m_sampleSolo->setContext(m_ctx);
 	//handle Mesh Changed
-	sampleSolo->handleMeshChanged(m_geom);
+	m_sampleSolo->handleMeshChanged(m_geom);
 	//set CrowdTool
-	sampleSolo->setTool(new CrowdTool);
+	m_sampleSolo->setTool(new CrowdTool);
 }
 
 bool RN::buildNavMesh()
 {
+	m_ctx->resetLog();
 	//build navigation mesh
-	return sampleSolo->handleBuild();
+	bool result = m_sampleSolo->handleBuild();
+	m_ctx->dumpLog("Build log %s:", m_meshName);
+	return result;
 }
 
 int main(int argc, char **argv)
