@@ -128,6 +128,8 @@ public:
 	CrowdTool();
 	virtual ~CrowdTool();
 	
+	CrowdToolState* getState(){return m_state;}
+
 	virtual int type() { return TOOL_CROWD; }
 	virtual void init(Sample* sample);
 	virtual void reset();

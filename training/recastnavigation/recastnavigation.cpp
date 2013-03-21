@@ -123,7 +123,8 @@ void RN::createSoloMeshCrowdSample()
 	//handle Mesh Changed
 	m_sampleSolo->handleMeshChanged(m_geom);
 	//set CrowdTool
-	m_sampleSolo->setTool(new CrowdTool);
+	m_crowdTool = new CrowdTool;
+	m_sampleSolo->setTool(m_crowdTool);
 }
 
 bool RN::buildNavMesh()
