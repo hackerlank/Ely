@@ -84,7 +84,8 @@ public:
 	bool loadMesh(const std::string& path, const std::string& meshName);
 	void createSoloMeshCrowdSample();
 	bool buildNavMesh();
-
+	//
+	CrowdTool* getCrowdTool(){ return m_crowdTool;}
 };
 
 RN::RN() :
@@ -208,6 +209,13 @@ int main(int argc, char **argv)
 	rn.createSoloMeshCrowdSample();
 	//build navigation mesh
 	rn.buildNavMesh();
+	//add agent pos=(20.2317238,-2.36828613,9.31323242) (y-up)
+	float pos[3];
+	pos[0]=20.2317238;pos[1]=-2.36828613;pos[2]=9.31323242;
+	rn.getCrowdTool()->getState()->addAgent(pos);
+	//set target pos=(17.1919556,-2.37020111,-21.9224129) (y-up)
+	pos[0]=17.1919556;pos[1]=-2.37020111;pos[2]=-21.9224129;
+	rn.getCrowdTool()->getState()->setMoveTarget(pos, false);
 
 	// Do the main loop
 	panda.main_loop();
