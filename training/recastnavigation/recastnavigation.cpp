@@ -53,23 +53,58 @@ AsyncTask::DoneStatus rn_check_playing(GenericAsyncTask* task, void* data);
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
 		"/REPOSITORY/KProjects/WORKSPACE/recastnavigation/RecastDemo/Bin/Meshes/");
-//obj2egg -TR 90,0,0 nav_test.obj -o nav_test_panda.egg
+//convert obj to egg: obj2egg -TR 90,0,0 nav_test.obj -o nav_test_panda.egg
+//triangulate nav_test_panda.egg and...
 std::string meshNameEgg("nav_test_panda.egg");
-std::string meshNameObj("nav_test.obj");
+//...(re)convert egg to obj:
+//egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
+std::string meshNameObj("nav_test_panda.obj");
+
+LPoint3f agentPos(20.2317238, 9.31323242, -2.36828613);
+float agentMaxSpeed = 1.5;
+LPoint3f targetPos(-15.1919556, 0.9224129, -2.37020111);
+
 //https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/z$20axis/recastnavigation/fMqEAqSBOBk/zwOzHmjRsj0J
-inline void LVector3fToRecast(const LVector3f& v, float* p)
+inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
 {
-	p[0] = -v.get_x();
+	p[0] = v.get_x();
 	p[1] = v.get_z();
-	p[2] = v.get_y();
+	p[2] = -v.get_y();
 }
-inline LVector3f recastToLVector3f(const float* p)
+inline LVecBase3f recastToLVecBase3f(const float* p)
 {
-	return LVector3f(-p[0], p[2], p[1]);
+	return LVecBase3f(p[0], -p[2], p[1]);
+}
+
+class Agent
+{
+	int m_agentIdx;
+	NodePath m_pandaNP;
+	NodePath m_render;
+public:
+	Agent(int agentIdx, NodePath pandaNP, NodePath render) :
+			m_agentIdx(agentIdx), m_pandaNP(pandaNP), m_render(render)
+	{
+	}
+	int getIdx()
+	{
+		return m_agentIdx;
+	}
+	void updatePosDir(const float* p, const float* d);
+};
+
+void Agent::updatePosDir(const float* p, const float* d)
+{
+	m_pandaNP.set_pos(recastToLVecBase3f(p));
+//	LVector3f dir = m_pandaNP.get_relative_vector(m_render,
+//			recastToLVecBase3f(d));
+//	LOrientationf orient(dir, 0.0);
+//	m_pandaNP.set_quat(m_pandaNP, orient);
 }
 
 class RN
 {
+	NodePath m_render;
 	std::string m_meshName;
 	InputGeom* m_geom;
 	BuildContext* m_ctx;
@@ -78,18 +113,26 @@ class RN
 
 	CrowdTool* m_crowdTool;
 
+	std::list<Agent*> m_agents;
+
 public:
-	RN();
+	RN(NodePath render);
 	~RN();
+	CrowdTool* getCrowdTool()
+	{
+		return m_crowdTool;
+	}
+	//
 	bool loadMesh(const std::string& path, const std::string& meshName);
 	void createSoloMeshCrowdSample();
 	bool buildNavMesh();
-	//
-	CrowdTool* getCrowdTool(){ return m_crowdTool;}
+	void addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed);
+	void setTarget(LPoint3f pos);
+	static AsyncTask::DoneStatus ai_update(GenericAsyncTask* task, void* data);
 };
 
-RN::RN() :
-		m_geom(0)
+RN::RN(NodePath render) :
+		m_render(render), m_geom(0)
 {
 	//Sample
 	m_ctx = new BuildContext;
@@ -97,6 +140,11 @@ RN::RN() :
 
 RN::~RN()
 {
+	while (m_agents.size() > 0)
+	{
+		delete m_agents.front();
+		m_agents.pop_front();
+	}
 	delete m_ctx;
 }
 
@@ -133,8 +181,52 @@ bool RN::buildNavMesh()
 	m_ctx->resetLog();
 	//build navigation mesh
 	bool result = m_sampleSolo->handleBuild();
-	m_ctx->dumpLog("Build log %s:", m_meshName);
+	m_ctx->dumpLog("Build log %s:", m_meshName.c_str());
 	return result;
+}
+
+void RN::addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed)
+{
+	//get recast p (y-up)
+	float p[3];
+	LVecBase3fToRecast(pos, p);
+	//add recast agent
+	int agentIdx = m_crowdTool->getState()->addAgent(p);
+	//set its desired speed
+	dtCrowdAgentParams ap = m_crowdTool->getState()->getCrowd()->getAgent(
+			agentIdx)->params;
+	ap.maxSpeed = agentMaxSpeed;
+	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
+	//add Agent
+	Agent* agent = new Agent(agentIdx, pandaNP, m_render);
+	m_agents.push_back(agent);
+}
+
+void RN::setTarget(LPoint3f pos)
+{
+	float p[3];
+	LVecBase3fToRecast(pos, p);
+	m_crowdTool->getState()->setMoveTarget(p, false);
+}
+
+AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
+{
+	float dt = ClockObject::get_global_clock()->get_dt();
+
+	RN* thisInst = reinterpret_cast<RN*>(data);
+
+	thisInst->m_sampleSolo->handleUpdate(dt);
+
+	dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
+	std::list<Agent*>::iterator iter;
+	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
+			++iter)
+	{
+		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
+		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
+		(*iter)->updatePosDir(pos, vel);
+	}
+	return AsyncTask::DS_again;
 }
 
 int main(int argc, char **argv)
@@ -164,6 +256,10 @@ int main(int argc, char **argv)
 		window->enable_keyboard(); // Enable keyboard detection
 		window->setup_trackball(); // Enable default camera movement
 	}
+
+	//set camera pos
+	window->get_camera_group().set_pos(60, -60, 50);
+	window->get_camera_group().look_at(0, 0, 0);
 
 	//Load world mesh
 	NodePath worldMesh = window->load_model(window->get_render(),
@@ -199,23 +295,24 @@ int main(int argc, char **argv)
 	//attach to scene
 	Actor.reparent_to(window->get_render());
 	Actor.set_scale(0.3);
-	Actor.set_pos(10.0, 0.0, 0.0);
 
 	//RN
-	RN rn;
+	RN rn(window->get_render());
 	//load mesh
 	rn.loadMesh(rnDir, meshNameObj);
 	//create solo mesh crowd sample
 	rn.createSoloMeshCrowdSample();
 	//build navigation mesh
 	rn.buildNavMesh();
-	//add agent pos=(20.2317238,-2.36828613,9.31323242) (y-up)
-	float pos[3];
-	pos[0]=20.2317238;pos[1]=-2.36828613;pos[2]=9.31323242;
-	rn.getCrowdTool()->getState()->addAgent(pos);
-	//set target pos=(17.1919556,-2.37020111,-21.9224129) (y-up)
-	pos[0]=17.1919556;pos[1]=-2.37020111;pos[2]=-21.9224129;
-	rn.getCrowdTool()->getState()->setMoveTarget(pos, false);
+	//add agent
+	rn.addAgent(Actor, agentPos, agentMaxSpeed);
+	//set target
+	rn.setTarget(targetPos);
+	//set ai update task
+	task = new GenericAsyncTask("ai update", &RN::ai_update,
+			reinterpret_cast<void*>(&rn));
+//	task->set_delay(5);
+	panda.get_task_mgr().add(task);
 
 	// Do the main loop
 	panda.main_loop();
