@@ -62,7 +62,7 @@ std::string meshNameObj("nav_test_panda.obj");
 
 LPoint3f agentPos(20.2317238, 9.31323242, -2.36828613);
 float agentMaxSpeed = 1.5;
-LPoint3f targetPos(-15.1919556, 0.9224129, -2.37020111);
+LPoint3f targetPos(-18.1919556, 0.9224129, -2.37020111);
 
 //https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/z$20axis/recastnavigation/fMqEAqSBOBk/zwOzHmjRsj0J
 inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
@@ -80,31 +80,44 @@ class Agent
 {
 	int m_agentIdx;
 	NodePath m_pandaNP;
-	NodePath m_render;
+	AnimControlCollection* m_anims;
 public:
-	Agent(int agentIdx, NodePath pandaNP, NodePath render) :
-			m_agentIdx(agentIdx), m_pandaNP(pandaNP), m_render(render)
+	Agent(int agentIdx, NodePath pandaNP, AnimControlCollection* anims) :
+			m_agentIdx(agentIdx), m_pandaNP(pandaNP), m_anims(anims)
 	{
 	}
 	int getIdx()
 	{
 		return m_agentIdx;
 	}
-	void updatePosDir(const float* p, const float* d);
+	void updatePosDir(const float* p, const float* v);
 };
 
-void Agent::updatePosDir(const float* p, const float* d)
+void Agent::updatePosDir(const float* p, const float* v)
 {
-	m_pandaNP.set_pos(recastToLVecBase3f(p));
-//	LVector3f dir = m_pandaNP.get_relative_vector(m_render,
-//			recastToLVecBase3f(d));
-//	LOrientationf orient(dir, 0.0);
-//	m_pandaNP.set_quat(m_pandaNP, orient);
+	LVecBase3f vel = recastToLVecBase3f(v);
+	if (vel.length_squared() > 0.1)
+	{
+		m_pandaNP.set_pos(recastToLVecBase3f(p));
+		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
+		m_pandaNP.heads_up(lookAtPos);
+		if (not m_anims->get_anim(1)->is_playing())
+		{
+			m_anims->get_anim(1)->loop(false);
+		}
+	}
+	else
+	{
+		if (m_anims->get_anim(1)->is_playing())
+		{
+			m_anims->get_anim(1)->pose(0);
+			m_anims->get_anim(1)->stop();
+		}
+	}
 }
 
 class RN
 {
-	NodePath m_render;
 	std::string m_meshName;
 	InputGeom* m_geom;
 	BuildContext* m_ctx;
@@ -126,13 +139,14 @@ public:
 	bool loadMesh(const std::string& path, const std::string& meshName);
 	void createSoloMeshCrowdSample();
 	bool buildNavMesh();
-	void addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed);
+	void addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
+			AnimControlCollection* anims = NULL);
 	void setTarget(LPoint3f pos);
 	static AsyncTask::DoneStatus ai_update(GenericAsyncTask* task, void* data);
 };
 
 RN::RN(NodePath render) :
-		m_render(render), m_geom(0)
+		m_geom(0)
 {
 	//Sample
 	m_ctx = new BuildContext;
@@ -185,7 +199,8 @@ bool RN::buildNavMesh()
 	return result;
 }
 
-void RN::addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed)
+void RN::addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
+		AnimControlCollection* anims)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -198,7 +213,7 @@ void RN::addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed)
 	ap.maxSpeed = agentMaxSpeed;
 	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
-	Agent* agent = new Agent(agentIdx, pandaNP, m_render);
+	Agent* agent = new Agent(agentIdx, pandaNP, anims);
 	m_agents.push_back(agent);
 }
 
@@ -283,15 +298,16 @@ int main(int argc, char **argv)
 		window->load_model(Actor, animations[i]);
 	}
 	auto_bind(Actor.node(), rn_anim_collection);
-	pbundle->set_anim_blend_flag(true);
-	pbundle->set_control_effect(rn_anim_collection.get_anim(0), 0.5);
-	pbundle->set_control_effect(rn_anim_collection.get_anim(1), 0.5);
-	int actualAnim = 0;
+	AsyncTask* task;
+//	pbundle->set_anim_blend_flag(true);
+//	pbundle->set_control_effect(rn_anim_collection.get_anim(0), 0.5);
+//	pbundle->set_control_effect(rn_anim_collection.get_anim(1), 0.5);
+//	int actualAnim = 0;
 	//switch among animations
-	AsyncTask* task = new GenericAsyncTask("recastnavigation playing",
-			&rn_check_playing, reinterpret_cast<void*>(&actualAnim));
-	task->set_delay(3);
-	panda.get_task_mgr().add(task);
+//	task = new GenericAsyncTask("recastnavigation playing",
+//			&rn_check_playing, reinterpret_cast<void*>(&actualAnim));
+//	task->set_delay(3);
+//	panda.get_task_mgr().add(task);
 	//attach to scene
 	Actor.reparent_to(window->get_render());
 	Actor.set_scale(0.3);
@@ -305,7 +321,7 @@ int main(int argc, char **argv)
 	//build navigation mesh
 	rn.buildNavMesh();
 	//add agent
-	rn.addAgent(Actor, agentPos, agentMaxSpeed);
+	rn.addAgent(Actor, agentPos, agentMaxSpeed, &rn_anim_collection);
 	//set target
 	rn.setTarget(targetPos);
 	//set ai update task
