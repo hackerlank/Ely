@@ -1,99 +1,3 @@
-### INSTALLING OGRE ON DEBIAN (DEBUG VERSION) ###
-
-From the site:
-Using Mercurial
-We recommend that you familiarise yourselves with the principles of Mercurial and read our developer notes.
-Cloning the repository:
-hg clone http://bitbucket.org/sinbad/ogre/
-You will clone the whole repository, by default into a folder called ‘ogre’, but by default your working copy will be on the unstable version. To clone directly to the stable version, do this:
-hg clone http://bitbucket.org/sinbad/ogre/ -u v1-7
-Or alternatively just switch branches after you have cloned using the original command, by doing this in the working directory:
-hg update v1-7
-Once you have the repository you can switch to the different branches using that command whenever you like.
-To retrieve the latest code when you already have a clone:
-hg pull --rebase
-This assumes you have the Rebase extension enabled, which is strongly advised if you intend on modifying OGRE. If you don’t have Rebase enabled, do this instead:
-hg pull --update
-Build from source instructions: http://www.ogre3d.org/tikiwiki/tiki-index.php?page=Building+Ogre
-
-- download stable version: ogre_src_v1-7-2.tar.bz2
-- extract and make a link: ogre -> /REPOSITORY/KProjects/ogre_src_v1-7-2
-- install cmake and cmake-gui: sudo apt-get install cmake cmake-qt-gui
-- cmake-gui (after installing all the dependencies):
-	a) select:
-		* Where is the source code: /REPOSITORY/KProjects/ogre
-		* Where to build the binaries: /REPOSITORY/KProjects/ogre/build
-	b) click on "Configure"
-	c) set the following options and entries (see OGRE-CMakeCache.txt for full reference)
-		* CMAKE_BUILD_TYPE:STRING=Debug
-		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
-		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
-		* for OGRE related entries check Advanced and select all except the following entries: 
-			OGRE_CONFIG_DOUBLE
-			OGRE_CONFIG_ENABLE_PVRTC
-			OGRE_CONFIG_ENABLE_VIEWPORT_ORIENTATIONMODE
-			OGRE_CONFIG_MEMTRACK_DEBUG
-			OGRE_CONFIG_MEMTRACK_RELEASE
-			OGRE_CONFIG_STRING_USE_CUSTOM_ALLOCATOR
-			OGRE_FULL_RPATH
-			OGRE_INSTALL_SAMPLES_SOURCE
-			OGRE_PROFILING
-			OGRE_STATIC
-	d) click again on "Configure"
-	e) click on "Generate"
-- cd /REPOSITORY/KProjects/ogre/build
-- make
-- make install
-
-
-
-### BUILDING CEGUI ON DEBIAN (DEBUG VERSION) ###
-
-Download stable version: http://www.cegui.org.uk/wiki/index.php/CEGUI_Downloads_0.7.5 (stable)
-
-(Unstable version is on:svn-path = https://crayzedsgui.svn.sourceforge.net/svnroot/crayzedsgui/cegui_mk2/trunk)
-
-$ cd /REPOSITORY/KProjects
-$ tar xvfz CEGUI-0.7.5.tar.gz
-$ cd CEGUI-0.7.5
-$ ./bootstrap
-$ export Ogre_CFLAGS='-I/REPOSITORY/KProjects/usr/include/OGRE'
-$ export Ogre_LIBS='-L/REPOSITORY/KProjects/usr/lib -Wl,-rpath,/REPOSITORY/KProjects/usr/lib -lOgreMain_d'
-$ ./configure --prefix=/REPOSITORY/KProjects/usr --enable-debug
-$ make
-$ make install
-
-	
-
-### INSTALLING OGREODE ON DEBIAN (DEBUG VERSION) ###
-
-- Install ODE single precision libraries: libode1sp libode-sp-dev
-- Download from SVN repository https://ogreaddons.svn.sourceforge.net/svnroot/ogreaddons/trunk/ogreode
-- in the file "/REPOSITORY/KProjects/ogreode/CMake/FindOGRE.cmake" replace the following line 
-		"find_path(OGRE_BUILD NAMES bin/Release/OgreMain.dll HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
-		with
-		"find_path(OGRE_BUILD NAMES lib HINTS ${OGRE_HOME}/build ${OGRE_HOME} PATH_SUFFIXES OGRE)"
-- use cmake-gui (after installing all the dependencies):
-	a) select:
-		* Where is the source code: /REPOSITORY/KProjects/ogreode
-		* Where to build the binaries: /REPOSITORY/KProjects/ogreode/build
-	b) select the "Advanced" check-box
-	c) click on "Configure"
-	c) set the following options and entries 
-		* CMAKE_BUILD_TYPE:STRING=Debug
-		* CMAKE_CXX_FLAGS:STRING=-fPIC
-		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
-		* OGRE_HOME:PATH=/REPOSITORY/KProjects/ogre
-		* OGRE_MEDIA_DIR:PATH=/REPOSITORY/KProjects/usr/share/OGRE/media
-	d) click again on "Configure"
-	e) click on "Generate"
-- cd /REPOSITORY/KProjects/ogreode/build
-- make
-- make install
-
-- After installation in "/REPOSITORY/KProjects/usr/include/OgreOde_Prefab/OgreOde_Prefab.h" delete or comment out the line
-	#include "OgreOde_PrefabPreReqs.h"
-	
 ### INSTALLING BULLET ON DEBIAN (DEBUG VERSION) ###
 
 - svn checkout http://bullet.googlecode.com/svn/trunk/ bullet
@@ -106,19 +10,20 @@ $ make install
 	c) set/add the following options and entries 
 		* PKGCONFIG_INSTALL_PREFIX:STRING=/REPOSITORY/KProjects/usr/lib/pkgconfig
 		* INCLUDE_INSTALL_DIR:PATH=/REPOSITORY/KProjects/usr/include/bullet
-		* BUILD_CPU_DEMOS:BOOL=OFF
-		* BUILD_DEMOS:BOOL=OFF
+		* BUILD_CPU_DEMOS:BOOL=ON
+		* BUILD_DEMOS:BOOL=ON
 		* BUILD_EXTRAS:BOOL=ON
+		* BUILD_MULTITHREADING=ON
 		* BUILD_NVIDIA_OPENCL_DEMOS:BOOL=ON
 		* CMAKE_BUILD_TYPE:STRING=Debug
 		* CMAKE_INSTALL_PREFIX:PATH=/REPOSITORY/KProjects/usr
-		* CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
 		* INSTALL_EXTRA_LIBS:BOOL=ON (to be added)
 		* LIB_DESTINATION:STRING=/REPOSITORY/KProjects/usr/lib
 	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
-		* USE_CUSTOM_VECTOR_MATH:BOOL=ON
+		* USE_CUSTOM_VECTOR_MATH:BOOL=OFF
 		Note: possibly set BUILD_SHARED_LIBS:BOOL=ON (to be added)
 		Note: possibly set CMAKE_CXX_FLAGS:STRING=-fPIC
+		Note: possibly set CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
 	d) click again on "Configure"
 	e) click on "Generate"
 - cd /REPOSITORY/KProjects/bullet/build
@@ -135,45 +40,3 @@ Applications that link to bullet libraries should use these commands to discover
 	$ pkg-config bullet --libs
 and, if they  add these linker flags:
 	-Wl,-rpath,/REPOSITORY/KProjects/usr/lib
-
-### INSTALLING OGREBULLET ON DEBIAN (DEBUG VERSION) ###
-
-- svn checkout https://ogreaddons.svn.sourceforge.net/svnroot/ogreaddons/trunk/ogrebullet ogrebullet
-
-$ cd ogrebullet
-$ chmod +x autogen.sh
-$ ./autogen.sh
-$ export CXXFLAGS='-O0 -g3 -Wall'
-$ export OGRE_CFLAGS='-I/REPOSITORY/KProjects/usr/include/OGRE'
-$ export OGRE_LIBS='-L/REPOSITORY/KProjects/usr/lib -Wl,-rpath,/REPOSITORY/KProjects/usr/lib -lOgreMain_d'
-$ export bullet_CFLAGS='-I/REPOSITORY/KProjects/usr/include/bullet -I/REPOSITORY/KProjects/usr/include/bullet/ConvexDecomposition'
-$ export bullet_LIBS='-L/REPOSITORY/KProjects/usr/lib -Wl,-rpath,/REPOSITORY/KProjects/usr/lib -lBulletCollision -lBulletDynamics -lBulletMultiThreaded -lBulletSoftBody -lBulletSoftBodySolvers_CPU -lBulletSoftBodySolvers_OpenCL_Mini -lBulletSoftBodySolvers_OpenCL_NVidia'
-$ ./configure --prefix=/REPOSITORY/KProjects/usr 
-$ make
-$ make install
-
-### INSTALLING SDL's LIBRARIES ON DEBIAN (DEBUG VERSION) ###
-
-**For all libraries (version 1.3)
-#The first time, from the parent directory, issue the command
-hg clone http://hg.libsdl.org/SDL or SDL_net or SDL_mixer
-#To check updates, from inside this directory, issue the command
-hg pull
-#To update, form inside this repository, issue the command
-hg update
-
-<<<SDL>>>
-$ ./autogen.sh
-$ ./configure --prefix=/REPOSITORY/KProjects/usr
-(check any needed library)
-$ make
-$ make install
-
-<<<SDL_net>>> and <<<SDL_mixer>>>
-$ ./autogen.sh
-$ ./configure --prefix=/REPOSITORY/KProjects/usr --with-sdl-prefix=/REPOSITORY/KProjects/usr
-(check any needed library)
-$ make
-$ make install
-
-
