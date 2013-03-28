@@ -15,9 +15,9 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/recastnavigation.cpp
+ * \file /Ely/training/recastnavigation/recastnavigation-nocrowd.cpp
  *
- * \date 14/mar/2013 10:05:13
+ * \date 28/mar/2013 09:55:20
  * \author marco
  */
 
@@ -31,10 +31,6 @@
 #include <character.h>
 #include <animControlCollection.h>
 #include <pandaFramework.h>
-#include <panda3d/bulletWorld.h>
-#include <bulletTriangleMesh.h>
-#include <bulletTriangleMeshShape.h>
-#include "Support/Picker.h"
 
 //rn
 #include <cstring>
@@ -46,13 +42,10 @@
 #include <DetourCommon.h>
 #include "InputGeom.h"
 #include "Sample_SoloMesh.h"
-#include "CrowdTool.h"
 
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection
 AnimControlCollection rn_anim_collection;
-AsyncTask::DoneStatus rn_check_playing(GenericAsyncTask* task, void* data);
-AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 
 //RN
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
@@ -129,20 +122,14 @@ class RN
 
 	Sample_SoloMesh* m_sampleSolo;
 
-	CrowdTool* m_crowdTool;
-
 	std::list<Agent*> m_agents;
 
 public:
 	RN(NodePath render);
 	~RN();
-	CrowdTool* getCrowdTool()
-	{
-		return m_crowdTool;
-	}
 	//
 	bool loadMesh(const std::string& path, const std::string& meshName);
-	void createSoloMeshCrowdSample();
+	void createSoloMeshSample();
 	bool buildNavMesh();
 	void addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
 			AnimControlCollection* anims = NULL);
@@ -182,7 +169,7 @@ bool RN::loadMesh(const std::string& path, const std::string& meshName)
 	return result;
 }
 
-void RN::createSoloMeshCrowdSample()
+void RN::createSoloMeshSample()
 {
 	//create sample
 	m_sampleSolo = new Sample_SoloMesh();
@@ -190,9 +177,6 @@ void RN::createSoloMeshCrowdSample()
 	m_sampleSolo->setContext(m_ctx);
 	//handle Mesh Changed
 	m_sampleSolo->handleMeshChanged(m_geom);
-	//set CrowdTool
-	m_crowdTool = new CrowdTool;
-	m_sampleSolo->setTool(m_crowdTool);
 }
 
 bool RN::buildNavMesh()
@@ -210,23 +194,13 @@ void RN::addAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
 	//get recast p (y-up)
 	float p[3];
 	LVecBase3fToRecast(pos, p);
-	//add recast agent
-	int agentIdx = m_crowdTool->getState()->addAgent(p);
-	//set its desired speed
-	dtCrowdAgentParams ap = m_crowdTool->getState()->getCrowd()->getAgent(
-			agentIdx)->params;
-	ap.maxSpeed = agentMaxSpeed;
-	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
-	Agent* agent = new Agent(agentIdx, pandaNP, anims);
-	m_agents.push_back(agent);
 }
 
 void RN::setTarget(LPoint3f pos)
 {
 	float p[3];
 	LVecBase3fToRecast(pos, p);
-	m_crowdTool->getState()->setMoveTarget(p, false);
 }
 
 AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
@@ -237,14 +211,10 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 
 	thisInst->m_sampleSolo->handleUpdate(dt);
 
-	dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
 	std::list<Agent*>::iterator iter;
 	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
 			++iter)
 	{
-		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
-		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
-		(*iter)->updatePosDir(pos, vel);
 	}
 	return AsyncTask::DS_again;
 }
@@ -267,7 +237,7 @@ int main(int argc, char **argv)
 
 	PandaFramework panda = PandaFramework();
 	panda.open_framework(argc, argv);
-	panda.set_window_title("recastnavigation training");
+	panda.set_window_title("recastnavigation-nocrowd training");
 	WindowFramework* window = panda.open_window();
 	if (window != (WindowFramework *) NULL)
 	{
@@ -276,9 +246,6 @@ int main(int argc, char **argv)
 		window->enable_keyboard(); // Enable keyboard detection
 		window->setup_trackball(); // Enable default camera movement
 	}
-	//physics
-	SMARTPTR(BulletWorld)mBulletWorld = new BulletWorld();
-	mBulletWorld->set_gravity(0.0, 0.0, -9.81);
 
 	//set camera pos
 	window->get_camera_group().set_pos(60, -60, 50);
@@ -290,47 +257,6 @@ int main(int argc, char **argv)
 	//attach to scene
 	worldMesh.reparent_to(window->get_render());
 	worldMesh.set_pos(0.0, 0.0, 0.0);
-	//attach bullet body
-	//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
-	BulletTriangleMesh* triMesh = new BulletTriangleMesh();
-	//add geoms from geomNodes to the mesh
-	NodePathCollection geomNodes = worldMesh.find_all_matches("**/+GeomNode");
-	for (int i = 0; i < geomNodes.get_num_paths(); ++i)
-	{
-		SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
-				geomNodes.get_path(i).node());
-		CSMARTPTR(TransformState) ts = geomNode->get_transform();
-		GeomNode::Geoms geoms = geomNode->get_geoms();
-		for (int j = 0; j < geoms.get_num_geoms(); ++j)
-		{
-			triMesh->add_geom(geoms.get_geom(j), true, ts.p());
-		}
-	}
-	SMARTPTR(BulletShape)collisionShape =
-	new BulletTriangleMeshShape(triMesh, false);
-	collisionShape->set_local_scale(worldMesh.get_scale());
-	SMARTPTR(BulletRigidBodyNode)mRigidBodyNode =
-	new BulletRigidBodyNode((worldMesh.get_name()+"physics").c_str());
-	mRigidBodyNode->add_shape(collisionShape);
-	mBulletWorld->attach(mRigidBodyNode);
-	//physics debug
-	NodePath mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
-	mBulletDebugNodePath.reparent_to(window->get_render());
-	SMARTPTR(BulletDebugNode)bulletDebugNode =
-	DCAST(BulletDebugNode,mBulletDebugNodePath.node());
-	mBulletWorld->set_debug_node(bulletDebugNode);
-	bulletDebugNode->show_wireframe(true);
-	bulletDebugNode->show_constraints(true);
-	bulletDebugNode->show_bounding_boxes(false);
-	bulletDebugNode->show_normals(false);
-	mBulletDebugNodePath.hide();
-	//physics: advance the simulation state
-	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
-			reinterpret_cast<void*>(mBulletWorld.p()));
-	panda.get_task_mgr().add(task);
-
-	//add a picker
-	new Picker(&panda, window, mBulletWorld,	"shift-mouse1", "mouse1-up");
 
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
@@ -347,15 +273,7 @@ int main(int argc, char **argv)
 		window->load_model(Actor, animations[i]);
 	}
 	auto_bind(Actor.node(), rn_anim_collection);
-//	pbundle->set_anim_blend_flag(true);
-//	pbundle->set_control_effect(rn_anim_collection.get_anim(0), 0.5);
-//	pbundle->set_control_effect(rn_anim_collection.get_anim(1), 0.5);
-//	int actualAnim = 0;
-	//switch among animations
-//	task = new GenericAsyncTask("recastnavigation playing",
-//			&rn_check_playing, reinterpret_cast<void*>(&actualAnim));
-//	task->set_delay(3);
-//	panda.get_task_mgr().add(task);
+	AsyncTask* task;
 	//attach to scene
 	Actor.reparent_to(window->get_render());
 	Actor.set_scale(0.3);
@@ -365,7 +283,7 @@ int main(int argc, char **argv)
 	//load mesh
 	rn.loadMesh(rnDir, meshNameObj);
 	//create solo mesh crowd sample
-	rn.createSoloMeshCrowdSample();
+	rn.createSoloMeshSample();
 	//build navigation mesh
 	rn.buildNavMesh();
 	//add agent
@@ -385,107 +303,3 @@ int main(int argc, char **argv)
 	return 0;
 }
 
-AsyncTask::DoneStatus rn_check_playing(GenericAsyncTask* task, void* data)
-{
-	//Control the Animations
-	double time = ClockObject::get_global_clock()->get_real_time();
-	int *actualAnim = reinterpret_cast<int*>(data);
-	int num = *actualAnim % 3;
-	if (num == 0)
-	{
-		std::cout << time << " - Blending" << std::endl;
-		if (not rn_anim_collection.get_anim(0)->is_playing())
-		{
-			rn_anim_collection.get_anim(0)->play();
-		}
-		if (not rn_anim_collection.get_anim(1)->is_playing())
-		{
-			rn_anim_collection.get_anim(1)->play();
-		}
-	}
-	else if (num == 1)
-	{
-		std::cout << time << " - Playing: "
-				<< rn_anim_collection.get_anim_name(0) << std::endl;
-		if (not rn_anim_collection.get_anim(0)->is_playing())
-		{
-			rn_anim_collection.get_anim(0)->play();
-		}
-		if (rn_anim_collection.get_anim(1)->is_playing())
-		{
-			rn_anim_collection.get_anim(1)->stop();
-		}
-	}
-	else
-	{
-		std::cout << time << " - Playing: "
-				<< rn_anim_collection.get_anim_name(1) << std::endl;
-		rn_anim_collection.get_anim(1)->play();
-		if (rn_anim_collection.get_anim(0)->is_playing())
-		{
-			rn_anim_collection.get_anim(0)->stop();
-		}
-		if (not rn_anim_collection.get_anim(1)->is_playing())
-		{
-			rn_anim_collection.get_anim(1)->play();
-		}
-	}
-	*actualAnim += 1;
-	return AsyncTask::DS_again;
-}
-
-AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	BulletWorld* mBulletWorld = reinterpret_cast<BulletWorld*>(data);
-
-	float dt = ClockObject::get_global_clock()->get_dt();
-
-	int maxSubSteps;
-
-	// do physics step simulation
-	// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->
-	// supposing a minimum of 6,666666667 fps, we have a maximum
-	// timeStep of 0.15 secs so: maxSubSteps <= 60 * 0.15 = 9
-	if (dt < 0.016666667)
-	{
-		maxSubSteps = 1;
-	}
-	else if (dt < 0.033333333)
-	{
-		maxSubSteps = 2;
-	}
-	else if (dt < 0.05)
-	{
-		maxSubSteps = 3;
-	}
-	else if (dt < 0.066666668)
-	{
-		maxSubSteps = 4;
-	}
-	else if (dt < 0.083333335)
-	{
-		maxSubSteps = 5;
-	}
-	else if (dt < 0.100000002)
-	{
-		maxSubSteps = 6;
-	}
-	else if (dt < 0.116666669)
-	{
-		maxSubSteps = 7;
-	}
-	else if (dt < 0.133333336)
-	{
-		maxSubSteps = 8;
-	}
-	else
-	{
-		maxSubSteps = 9;
-	}
-	mBulletWorld->do_physics(dt, maxSubSteps);
-	//
-	return AsyncTask::DS_cont;
-}
