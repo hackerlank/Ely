@@ -99,8 +99,8 @@ AC_ARG_ENABLE([ely-training],
     AS_HELP_STRING([--enable-ely-training],
     	[=yes enable Ely training test programs - mantainer only (disabled by default)]),
     [ely_training=${enableval}], [ely_training=no])
-AM_CONDITIONAL([TRAINING_TEST], [test "x${ely_training}" = xyes])
-AM_COND_IF([TRAINING_TEST],
+AM_CONDITIONAL([TRAINING], [test "x${ely_training}" = xyes])
+AM_COND_IF([TRAINING],
 	[AC_CONFIG_FILES([training/Makefile])])
 
 # checks for Ely ELF executable build (if no boost and no training tests)

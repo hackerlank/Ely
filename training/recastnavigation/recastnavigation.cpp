@@ -31,10 +31,13 @@
 #include <character.h>
 #include <animControlCollection.h>
 #include <pandaFramework.h>
-#include <panda3d/bulletWorld.h>
+#include <bulletWorld.h>
 #include <bulletTriangleMesh.h>
 #include <bulletTriangleMeshShape.h>
-#include "Support/Picker.h"
+#include <bulletSphericalConstraint.h>
+#include <bulletClosestHitRayResult.h>
+#include <bulletRigidBodyNode.h>
+#include <mouseWatcher.h>
 
 //rn
 #include <cstring>
@@ -47,6 +50,151 @@
 #include "InputGeom.h"
 #include "Sample_SoloMesh.h"
 #include "CrowdTool.h"
+
+//Picker
+class Raycaster: public Singleton<Raycaster>
+{
+public:
+	Raycaster(PandaFramework* app, WindowFramework* window, SMARTPTR(BulletWorld)world,
+	const std::string& pickKeyOn, const std::string& pickKeyOff);
+	virtual ~Raycaster();
+
+	void setHitCallback(void (*callback)(Raycaster*, void*), void* data)
+	{
+		mCallback = callback;
+		mData = data;
+	}
+	std::string getHitNode(){return mHitNode;}
+	LPoint3f getHitPos(){return mHitPos;}
+	LPoint3f getFromPos(){return mFromPos;}
+	LPoint3f getToPos(){return mToPos;}
+	LVector3f getHitNormal(){return mHitNormal;}
+	float getHitFraction(){return mHitFraction;}
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex.
+	 */
+	ReMutex& getMutex();
+
+private:
+	///Panda framework.
+	PandaFramework* mApp;
+	///Window framework.
+	WindowFramework* mWindow;
+	///Render, camera node paths.
+	NodePath mRender, mCamera;
+	///Camera lens reference.
+	SMARTPTR(Lens) mCamLens;
+	///Bullet world.
+	SMARTPTR(BulletWorld) mWorld;
+	///Hit results.
+	std::string mHitNode;
+	LPoint3f mHitPos, mFromPos, mToPos;
+	LVector3f mHitNormal;
+	float mHitFraction;
+	///Hit callback.
+	void (*mCallback)(Raycaster*, void*);
+	void* mData;
+	/**
+	 * \name Hit body event callback data.
+	 */
+	///@{
+	SMARTPTR(EventCallbackInterface<Raycaster>::EventCallbackData) mPickBodyData;
+	void hitBody(const Event* event);
+	std::string mPickKeyOn, mPickKeyOff;
+	///@}
+	///The (reentrant) mutex associated with this manager.
+	ReMutex mMutex;
+};
+Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
+		SMARTPTR(BulletWorld)world,
+		const std::string& pickKeyOn, const std::string& pickKeyOff) :
+		mApp(app), mWindow(window), mWorld(world),  mCallback(NULL)
+{
+	//get render, camera node paths
+	mRender = window->get_render();
+	mCamera = window->get_camera_group();
+	mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
+	// setup event callback for picking body
+	mPickKeyOn = pickKeyOn;
+	mPickKeyOff = pickKeyOff;
+	mPickBodyData = new EventCallbackInterface<Raycaster>::EventCallbackData(this,
+			&Raycaster::hitBody);
+	mApp->define_key(mPickKeyOn, "pickBody",
+			&EventCallbackInterface<Raycaster>::eventCallbackFunction,
+			reinterpret_cast<void*>(mPickBodyData.p()));
+	mApp->define_key(mPickKeyOff, "pickBodyUp",
+			&EventCallbackInterface<Raycaster>::eventCallbackFunction,
+			reinterpret_cast<void*>(mPickBodyData.p()));
+}
+
+Raycaster::~Raycaster()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mApp)
+	{
+		// remove event callback for picking body
+		mApp->get_event_handler().remove_hooks_with(
+				reinterpret_cast<void*>(mPickBodyData.p()));
+	}
+}
+
+void Raycaster::hitBody(const Event* event)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	// handle body picking
+	if (mCallback and event->get_name() == mPickKeyOn)
+	{
+		//get the mouse watcher
+		SMARTPTR(MouseWatcher)mwatcher =
+		DCAST(MouseWatcher, mWindow->get_mouse().node());
+		if (mwatcher->has_mouse())
+		{
+			// Get to and from pos in camera coordinates
+			LPoint2f pMouse = mwatcher->get_mouse();
+			//
+			LPoint3f pFrom, pTo;
+			if (mCamLens->extrude(pMouse, pFrom, pTo))
+			{
+				//Transform to global coordinates
+				pFrom = mRender.get_relative_point(mCamera, pFrom);
+				pTo = mRender.get_relative_point(mCamera, pTo);
+				//cast a ray to detect a body
+				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom, pTo,
+						BitMask32::all_on());
+				//
+				if (result.has_hit())
+				{
+					//possible hit objects:
+					//- BulletRigidBodyNode
+					//- BulletCharacterControllerNode
+					//- BulletVehicle
+					//- BulletConstraint
+					//- BulletSoftBodyNode
+					//- BulletGhostNode
+
+					mHitNode = result.get_node()->get_name();
+					mHitPos = result.get_hit_pos();
+					mHitNormal = result.get_hit_normal();
+					mHitFraction = result.get_hit_fraction();
+					mFromPos = result.get_from_pos();
+					mToPos = result.get_to_pos();
+					mCallback(this, mData);
+				}
+			}
+		}
+	}
+}
+
+ReMutex& Raycaster::getMutex()
+{
+	return mMutex;
+}
 
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection
@@ -249,6 +397,19 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 	return AsyncTask::DS_again;
 }
 
+void reTarget(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	rn->setTarget(raycaster->getHitPos());
+	std::cout <<
+			"| panda node: " << raycaster->getHitNode() <<
+			"| hit pos: " << raycaster->getHitPos() <<
+			"| hit normal: " << raycaster->getHitNormal() <<
+			"| hit fraction: " << raycaster->getHitFraction() <<
+			"| from pos: " << raycaster->getFromPos() <<
+			"| to pos: " << raycaster->getToPos() << std::endl;
+}
+
 int main(int argc, char **argv)
 {
 	///setup
@@ -287,8 +448,6 @@ int main(int argc, char **argv)
 	//Load world mesh
 	NodePath worldMesh = window->load_model(window->get_render(),
 			rnDir + meshNameEgg);
-	//attach to scene
-	worldMesh.reparent_to(window->get_render());
 	worldMesh.set_pos(0.0, 0.0, 0.0);
 	//attach bullet body
 	//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
@@ -310,9 +469,20 @@ int main(int argc, char **argv)
 	new BulletTriangleMeshShape(triMesh, false);
 	collisionShape->set_local_scale(worldMesh.get_scale());
 	SMARTPTR(BulletRigidBodyNode)mRigidBodyNode =
-	new BulletRigidBodyNode((worldMesh.get_name()+"physics").c_str());
+	new BulletRigidBodyNode((worldMesh.get_name()+"_physics").c_str());
 	mRigidBodyNode->add_shape(collisionShape);
+	mRigidBodyNode->set_mass(0.0);
+	mRigidBodyNode->set_kinematic(false);
+	mRigidBodyNode->set_static(true);
+	mRigidBodyNode->set_deactivation_enabled(true);
+	mRigidBodyNode->set_active(false);
 	mBulletWorld->attach(mRigidBodyNode);
+	NodePath mRigidBodyNodePath = NodePath(mRigidBodyNode);
+	mRigidBodyNodePath.set_collide_mask(BitMask32::all_on());
+	//attach to scene
+	worldMesh.reparent_to(mRigidBodyNodePath);
+	mRigidBodyNodePath.reparent_to(window->get_render());
+
 	//physics debug
 	NodePath mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
 	mBulletDebugNodePath.reparent_to(window->get_render());
@@ -324,13 +494,11 @@ int main(int argc, char **argv)
 	bulletDebugNode->show_bounding_boxes(false);
 	bulletDebugNode->show_normals(false);
 	mBulletDebugNodePath.hide();
+
 	//physics: advance the simulation state
 	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
 			reinterpret_cast<void*>(mBulletWorld.p()));
 	panda.get_task_mgr().add(task);
-
-	//add a picker
-	new Picker(&panda, window, mBulletWorld,	"shift-mouse1", "mouse1-up");
 
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
@@ -378,10 +546,18 @@ int main(int argc, char **argv)
 //	task->set_delay(5);
 	panda.get_task_mgr().add(task);
 
+	//add a raycaster
+	new Raycaster(&panda, window, mBulletWorld, "shift-mouse1", "mouse1-up");
+	//re-target
+	Raycaster::GetSingletonPtr()->setHitCallback(reTarget,
+			reinterpret_cast<void*>(&rn));
+
 	// Do the main loop
 	panda.main_loop();
 	// close the framework
 	panda.close_framework();
+//	delete objectTmplMgr;
+//	delete componentTmplMgr;
 	return 0;
 }
 
