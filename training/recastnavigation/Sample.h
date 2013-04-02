@@ -22,7 +22,6 @@
 #include "Recast.h"
 #include "SampleInterfaces.h"
 
-
 /// Tool types.
 enum SampleToolType
 {
@@ -51,36 +50,61 @@ enum SamplePolyAreas
 };
 enum SamplePolyFlags
 {
-	SAMPLE_POLYFLAGS_WALK		= 0x01,		// Ability to walk (ground, grass, road)
-	SAMPLE_POLYFLAGS_SWIM		= 0x02,		// Ability to swim (water).
-	SAMPLE_POLYFLAGS_DOOR		= 0x04,		// Ability to move through doors.
-	SAMPLE_POLYFLAGS_JUMP		= 0x08,		// Ability to jump.
-	SAMPLE_POLYFLAGS_DISABLED	= 0x10,		// Disabled polygon
-	SAMPLE_POLYFLAGS_ALL		= 0xffff	// All abilities.
+	SAMPLE_POLYFLAGS_WALK = 0x01,		// Ability to walk (ground, grass, road)
+	SAMPLE_POLYFLAGS_SWIM = 0x02,		// Ability to swim (water).
+	SAMPLE_POLYFLAGS_DOOR = 0x04,		// Ability to move through doors.
+	SAMPLE_POLYFLAGS_JUMP = 0x08,		// Ability to jump.
+	SAMPLE_POLYFLAGS_DISABLED = 0x10,		// Disabled polygon
+	SAMPLE_POLYFLAGS_ALL = 0xffff	// All abilities.
 };
 
 struct SampleTool
 {
-	virtual ~SampleTool() {}
+	virtual ~SampleTool()
+	{
+	}
 	virtual int type() = 0;
 	virtual void init(class Sample* sample) = 0;
 	virtual void reset() = 0;
 	virtual void handleMenu() = 0;
 	virtual void handleClick(const float* s, const float* p, bool shift) = 0;
 	virtual void handleRender() = 0;
-	virtual void handleRenderOverlay(double* proj, double* model, int* view) = 0;
+	virtual void handleRenderOverlay(double* proj, double* model,
+			int* view) = 0;
 	virtual void handleToggle() = 0;
 	virtual void handleStep() = 0;
 	virtual void handleUpdate(const float dt) = 0;
 };
 
-struct SampleToolState {
-	virtual ~SampleToolState() {}
+struct SampleToolState
+{
+	virtual ~SampleToolState()
+	{
+	}
 	virtual void init(class Sample* sample) = 0;
 	virtual void reset() = 0;
 	virtual void handleRender() = 0;
-	virtual void handleRenderOverlay(double* proj, double* model, int* view) = 0;
+	virtual void handleRenderOverlay(double* proj, double* model,
+			int* view) = 0;
 	virtual void handleUpdate(const float dt) = 0;
+};
+
+struct SampleSettings
+{
+	float m_cellSize;
+	float m_cellHeight;
+	float m_agentHeight;
+	float m_agentRadius;
+	float m_agentMaxClimb;
+	float m_agentMaxSlope;
+	float m_regionMinSize;
+	float m_regionMergeSize;
+	bool m_monotonePartitioning;
+	float m_edgeMaxLen;
+	float m_edgeMaxError;
+	float m_vertsPerPoly;
+	float m_detailSampleDist;
+	float m_detailSampleMaxError;
 };
 
 class Sample
@@ -107,22 +131,31 @@ protected:
 	float m_vertsPerPoly;
 	float m_detailSampleDist;
 	float m_detailSampleMaxError;
-	
+
 	SampleTool* m_tool;
 	SampleToolState* m_toolStates[MAX_TOOLS];
-	
+
 	BuildContext* m_ctx;
-	
+
 public:
 	Sample();
 	virtual ~Sample();
-	
-	void setContext(BuildContext* ctx) { m_ctx = ctx; }
-	
+
+	void setContext(BuildContext* ctx)
+	{
+		m_ctx = ctx;
+	}
+
 	void setTool(SampleTool* tool);
-	SampleToolState* getToolState(int type) { return m_toolStates[type]; }
-	void setToolState(int type, SampleToolState* s) { m_toolStates[type] = s; }
-	
+	SampleToolState* getToolState(int type)
+	{
+		return m_toolStates[type];
+	}
+	void setToolState(int type, SampleToolState* s)
+	{
+		m_toolStates[type] = s;
+	}
+
 	virtual void handleSettings();
 	virtual void handleTools();
 	virtual void handleDebugMode();
@@ -135,18 +168,48 @@ public:
 	virtual bool handleBuild();
 	virtual void handleUpdate(const float dt);
 
-	virtual class InputGeom* getInputGeom() { return m_geom; }
-	virtual class dtNavMesh* getNavMesh() { return m_navMesh; }
-	virtual class dtNavMeshQuery* getNavMeshQuery() { return m_navQuery; }
-	virtual class dtCrowd* getCrowd() { return m_crowd; }
-	virtual float getAgentRadius() { return m_agentRadius; }
-	virtual float getAgentHeight() { return m_agentHeight; }
-	virtual float getAgentClimb() { return m_agentMaxClimb; }
+	virtual class InputGeom* getInputGeom()
+	{
+		return m_geom;
+	}
+	virtual class dtNavMesh* getNavMesh()
+	{
+		return m_navMesh;
+	}
+	virtual class dtNavMeshQuery* getNavMeshQuery()
+	{
+		return m_navQuery;
+	}
+	virtual class dtCrowd* getCrowd()
+	{
+		return m_crowd;
+	}
+	virtual float getAgentRadius()
+	{
+		return m_agentRadius;
+	}
+	virtual float getAgentHeight()
+	{
+		return m_agentHeight;
+	}
+	virtual float getAgentClimb()
+	{
+		return m_agentMaxClimb;
+	}
+	void setSampleSettings(const SampleSettings& settings);
+	SampleSettings getSampleSettings();
+
 	virtual const float* getBoundsMin();
 	virtual const float* getBoundsMax();
-	
-	inline unsigned char getNavMeshDrawFlags() const { return m_navMeshDrawFlags; }
-	inline void setNavMeshDrawFlags(unsigned char flags) { m_navMeshDrawFlags = flags; }
+
+	inline unsigned char getNavMeshDrawFlags() const
+	{
+		return m_navMeshDrawFlags;
+	}
+	inline void setNavMeshDrawFlags(unsigned char flags)
+	{
+		m_navMeshDrawFlags = flags;
+	}
 
 	void updateToolStates(const float dt);
 	void initToolStates(Sample* sample);
@@ -157,6 +220,5 @@ public:
 	void resetCommonSettings();
 	void handleCommonSettings();
 };
-
 
 #endif // RECASTSAMPLE_H

@@ -46,6 +46,8 @@ void Agent::updatePosDir(const float* p, const float* v)
 	}
 }
 
+////////////////////////////////////////////////////////////////////
+
 RN::RN() :
 		m_geom(0)
 {
@@ -78,7 +80,7 @@ bool RN::loadMesh(const std::string& path, const std::string& meshName)
 	return result;
 }
 
-void RN::createSoloMeshSample()
+void RN::createSoloMesh()
 {
 	//create sample
 	m_sampleSolo = new Sample_SoloMesh();
@@ -110,8 +112,9 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
 			++iter)
 	{
-		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
 		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
+//		(*iter)->updateVelDir(vel);
+		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
 		(*iter)->updatePosDir(pos, vel);
 	}
 	return AsyncTask::DS_again;
@@ -143,6 +146,16 @@ void RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
 	pandaNP.set_pos(pos);
 	//add Agent to list
 	m_agents.push_back(agent);
+}
+
+void RN::setSettings(const SampleSettings& settings)
+{
+	m_sampleSolo->setSampleSettings(settings);
+}
+
+SampleSettings RN::getSettings()
+{
+	return m_sampleSolo->getSampleSettings();
 }
 
 void RN::setCrowdTarget(LPoint3f pos)

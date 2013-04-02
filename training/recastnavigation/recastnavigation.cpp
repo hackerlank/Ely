@@ -22,6 +22,7 @@
  */
 
 #include "Utilities/Tools.h"
+#include <cmath>
 #include <iostream>
 #include <string>
 #include <vector>
@@ -37,6 +38,8 @@
 #include <bulletSphericalConstraint.h>
 #include <bulletClosestHitRayResult.h>
 #include <bulletRigidBodyNode.h>
+#include <bulletCharacterControllerNode.h>
+#include <bulletCylinderShape.h>
 #include <mouseWatcher.h>
 #include "Raycaster.h"
 
@@ -62,7 +65,7 @@ AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, WindowFramework** window);
 void end(PandaFramework* panda);
 NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
-NodePath createActorModel(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
+NodePath createAgentCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
 //
 void setCrowdTarget(Raycaster* raycaster, void* data);
 
@@ -76,15 +79,20 @@ int main(int argc, char **argv)
 	//Create world mesh
 	NodePath worldMesh = createWorldMesh(mBulletWorld, window);
 
-	//Create actor model
-	NodePath actor = createActorModel(mBulletWorld, window);
+	//Create agent character
+	NodePath character = createAgentCharacter(mBulletWorld, window);
 
 	///RN common
 	RN rn;
 	//load mesh
 	rn.loadMesh(rnDir, meshNameObj);
 	//create solo mesh crowd sample
-	rn.createSoloMeshSample();
+	rn.createSoloMesh();
+	//set sample settings
+	SampleSettings settings = rn.getSettings();
+	settings.m_agentMaxSlope = 60.0;
+	settings.m_agentMaxClimb = 2.5;
+	rn.setSettings(settings);
 	//build navigation mesh
 	rn.buildNavMesh();
 	//set ai update task
@@ -97,7 +105,7 @@ int main(int argc, char **argv)
 	//set crowd tool
 	rn.setCrowdTool();
 	//add agent
-	rn.addCrowdAgent(actor, agentPos, agentMaxSpeed, &rn_anim_collection);
+	rn.addCrowdAgent(character, agentPos, agentMaxSpeed, &rn_anim_collection);
 	//add a crowd raycaster
 	new Raycaster(panda, window, mBulletWorld, "shift-mouse1", "mouse1-up");
 	//re-target
@@ -205,6 +213,18 @@ SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, Window
 			reinterpret_cast<void*>(mBulletWorld.p()));
 	(*panda)->get_task_mgr().add(task);
 
+	//physics debug
+	NodePath mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
+	mBulletDebugNodePath.reparent_to((*window)->get_render());
+	SMARTPTR(BulletDebugNode)bulletDebugNode =
+	DCAST(BulletDebugNode,mBulletDebugNodePath.node());
+	mBulletWorld->set_debug_node(bulletDebugNode);
+	bulletDebugNode->show_wireframe(true);
+	bulletDebugNode->show_constraints(true);
+	bulletDebugNode->show_bounding_boxes(false);
+	bulletDebugNode->show_normals(false);
+	mBulletDebugNodePath.hide();
+
 	return mBulletWorld;
 }
 
@@ -255,22 +275,10 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 	worldMesh.reparent_to(mRigidBodyNodePath);
 	mRigidBodyNodePath.reparent_to(window->get_render());
 
-	//physics debug
-	NodePath mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
-	mBulletDebugNodePath.reparent_to(window->get_render());
-	SMARTPTR(BulletDebugNode)bulletDebugNode =
-	DCAST(BulletDebugNode,mBulletDebugNodePath.node());
-	mBulletWorld->set_debug_node(bulletDebugNode);
-	bulletDebugNode->show_wireframe(true);
-	bulletDebugNode->show_constraints(true);
-	bulletDebugNode->show_bounding_boxes(false);
-	bulletDebugNode->show_normals(false);
-	mBulletDebugNodePath.hide();
-
 	return worldMesh;
 }
 
-NodePath createActorModel(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window)
+NodePath createAgentCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window)
 {
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
@@ -284,10 +292,8 @@ NodePath createActorModel(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* wi
 		window->load_model(Actor, animations[i]);
 	}
 	auto_bind(Actor.node(), rn_anim_collection);
-	//attach to scene
+	Actor.set_scale(0.4);
 	Actor.reparent_to(window->get_render());
-	Actor.set_scale(0.3);
-
 	return Actor;
 }
 

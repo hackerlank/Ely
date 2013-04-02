@@ -28,6 +28,7 @@
 #include <nodePath.h>
 #include <animControlCollection.h>
 #include <genericAsyncTask.h>
+#include <bulletCharacterControllerNode.h>
 
 //rn
 #include <cstring>
@@ -93,8 +94,10 @@ public:
 	//common
 	bool loadMesh(const std::string& path, const std::string& meshName);
 	bool buildNavMesh();
-	void createSoloMeshSample();
+	void createSoloMesh();
 	static AsyncTask::DoneStatus ai_update(GenericAsyncTask* task, void* data);
+	void setSettings(const SampleSettings& settings);
+	SampleSettings getSettings();
 
 	//crowd tool
 	void setCrowdTool();

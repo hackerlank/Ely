@@ -27,7 +27,7 @@
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
 #include "DetourCrowd.h"
-#include "imgui.h"
+//#include "imgui.h"
 //#include "SDL.h"
 //#include "SDL_opengl.h"
 
@@ -36,13 +36,9 @@
 #endif
 
 Sample::Sample() :
-	m_geom(0),
-	m_navMesh(0),
-	m_navQuery(0),
-	m_crowd(0),
-	m_navMeshDrawFlags(DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST),
-	m_tool(0),
-	m_ctx(0)
+		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0), m_navMeshDrawFlags(
+				DU_DRAWNAVMESH_OFFMESHCONS | DU_DRAWNAVMESH_CLOSEDLIST), m_tool(
+				0), m_ctx(0)
 {
 	resetCommonSettings();
 	m_navQuery = dtAllocNavMeshQuery();
@@ -86,19 +82,23 @@ void Sample::handleRender()
 {
 	if (!m_geom)
 		return;
-	
+
 	DebugDrawGL dd;
-		
+
 	// Draw mesh
-	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(), m_geom->getMesh()->getVertCount(),
-					   m_geom->getMesh()->getTris(), m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(), 0, 1.0f);
+	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(),
+			m_geom->getMesh()->getVertCount(), m_geom->getMesh()->getTris(),
+			m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(),
+			0, 1.0f);
 	// Draw bounds
 	const float* bmin = m_geom->getMeshBoundsMin();
 	const float* bmax = m_geom->getMeshBoundsMax();
-	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
+	duDebugDrawBoxWire(&dd, bmin[0], bmin[1], bmin[2], bmax[0], bmax[1],
+			bmax[2], duRGBA(255, 255, 255, 128), 1.0f);
 }
 
-void Sample::handleRenderOverlay(double* /*proj*/, double* /*model*/, int* /*view*/)
+void Sample::handleRenderOverlay(double* /*proj*/, double* /*model*/,
+		int* /*view*/)
 {
 }
 
@@ -109,13 +109,15 @@ void Sample::handleMeshChanged(InputGeom* geom)
 
 const float* Sample::getBoundsMin()
 {
-	if (!m_geom) return 0;
+	if (!m_geom)
+		return 0;
 	return m_geom->getMeshBoundsMin();
 }
 
 const float* Sample::getBoundsMax()
 {
-	if (!m_geom) return 0;
+	if (!m_geom)
+		return 0;
 	return m_geom->getMeshBoundsMax();
 }
 
@@ -212,7 +214,6 @@ void Sample::handleUpdate(const float dt)
 	updateToolStates(dt);
 }
 
-
 void Sample::updateToolStates(const float dt)
 {
 	for (int i = 0; i < MAX_TOOLS; i++)
@@ -258,3 +259,40 @@ void Sample::renderOverlayToolStates(double* proj, double* model, int* view)
 	}
 }
 
+void Sample::setSampleSettings(const SampleSettings& settings)
+{
+	m_cellSize = settings.m_cellSize;
+	m_cellHeight = settings.m_cellHeight;
+	m_agentHeight = settings.m_agentHeight;
+	m_agentRadius = settings.m_agentRadius;
+	m_agentMaxClimb = settings.m_agentMaxClimb;
+	m_agentMaxSlope = settings.m_agentMaxSlope;
+	m_regionMinSize = settings.m_regionMinSize;
+	m_regionMergeSize = settings.m_regionMergeSize;
+	m_monotonePartitioning = settings.m_monotonePartitioning;
+	m_edgeMaxLen = settings.m_edgeMaxLen;
+	m_edgeMaxError = settings.m_edgeMaxError;
+	m_vertsPerPoly = settings.m_vertsPerPoly;
+	m_detailSampleDist = settings.m_detailSampleDist;
+	m_detailSampleMaxError = settings.m_detailSampleMaxError;
+}
+
+SampleSettings Sample::getSampleSettings()
+{
+	SampleSettings settings;
+	settings.m_cellSize = m_cellSize;
+	settings.m_cellHeight = m_cellHeight;
+	settings.m_agentHeight = m_agentHeight;
+	settings.m_agentRadius = m_agentRadius;
+	settings.m_agentMaxClimb = m_agentMaxClimb;
+	settings.m_agentMaxSlope = m_agentMaxSlope;
+	settings.m_regionMinSize = m_regionMinSize;
+	settings.m_regionMergeSize = m_regionMergeSize;
+	settings.m_monotonePartitioning = m_monotonePartitioning;
+	settings.m_edgeMaxLen = m_edgeMaxLen;
+	settings.m_edgeMaxError = m_edgeMaxError;
+	settings.m_vertsPerPoly = m_vertsPerPoly;
+	settings.m_detailSampleDist = m_detailSampleDist;
+	settings.m_detailSampleMaxError = m_detailSampleMaxError;
+	return settings;
+}
