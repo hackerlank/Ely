@@ -23,6 +23,7 @@
 
 #include "RN.h"
 
+#ifdef NO_CHARACTER
 void Agent::updatePosDir(const float* p, const float* v)
 {
 	LVecBase3f vel = RecastToLVecBase3f(v);
@@ -45,6 +46,33 @@ void Agent::updatePosDir(const float* p, const float* v)
 		}
 	}
 }
+#else
+void Agent::updateVel(const float* v)
+{
+	LVecBase3f vel = RecastToLVecBase3f(v);
+	if (vel.length_squared() > 0.1)
+	{
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
+				vel, false);
+		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
+		m_pandaNP.heads_up(lookAtPos);
+		if (not m_anims->get_anim(1)->is_playing())
+		{
+			m_anims->get_anim(1)->loop(false);
+		}
+	}
+	else
+	{
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
+				LVector3f::zero(), false);
+		if (m_anims->get_anim(1)->is_playing())
+		{
+			m_anims->get_anim(1)->pose(0);
+			m_anims->get_anim(1)->stop();
+		}
+	}
+}
+#endif
 
 ////////////////////////////////////////////////////////////////////
 
@@ -99,26 +127,59 @@ bool RN::buildNavMesh()
 	return result;
 }
 
+#ifdef NO_CHARACTER
 AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 {
 	float dt = ClockObject::get_global_clock()->get_dt();
 
 	RN* thisInst = reinterpret_cast<RN*>(data);
 
+	std::list<Agent*>::iterator iter;
+	dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
+
+	//update crowd agents' pos/vel
 	thisInst->m_sampleSolo->handleUpdate(dt);
 
-	dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
-	std::list<Agent*>::iterator iter;
+	//post-update all agent positions
 	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
 			++iter)
 	{
 		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
-//		(*iter)->updateVelDir(vel);
 		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
 		(*iter)->updatePosDir(pos, vel);
 	}
 	return AsyncTask::DS_again;
 }
+#else
+AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
+{
+	float dt = ClockObject::get_global_clock()->get_dt();
+
+	RN* thisInst = reinterpret_cast<RN*>(data);
+
+	std::list<Agent*>::iterator iter;
+	dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
+
+	//pre-update all crowd agents' positions
+	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
+			++iter)
+	{
+		LVecBase3fToRecast((*iter)->getPos(), crowd->getAgent((*iter)->getIdx())->npos);
+	}
+
+	//update crowd agents' pos/vel
+	thisInst->m_sampleSolo->handleUpdate(dt);
+
+	//post-update all agent positions
+	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
+			++iter)
+	{
+		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
+		(*iter)->updateVel(vel);
+	}
+	return AsyncTask::DS_again;
+}
+#endif
 
 void RN::setCrowdTool()
 {

@@ -27,7 +27,11 @@
 #include "CrowdTool.h"
 #include "InputGeom.h"
 #include "Sample.h"
-#include "DetourCrowd.h"
+#ifdef NO_CHARACTER
+#	include "DetourCrowd.h"
+#else
+#	include "DetourCrowdPhysics.h"
+#endif
 #include "DetourDebugDraw.h"
 #include "DetourObstacleAvoidance.h"
 #include "DetourCommon.h"

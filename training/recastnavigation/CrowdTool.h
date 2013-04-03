@@ -23,7 +23,11 @@
 #include "DetourNavMesh.h"
 #include "DetourObstacleAvoidance.h"
 #include "ValueHistory.h"
-#include "DetourCrowd.h"
+#ifdef NO_CHARACTER
+#	include "DetourCrowd.h"
+#else
+#	include "DetourCrowdPhysics.h"
+#endif
 
 // Tool to create crowds.
 

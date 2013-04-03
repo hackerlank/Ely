@@ -26,7 +26,11 @@
 #include "DetourDebugDraw.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
-#include "DetourCrowd.h"
+#ifdef NO_CHARACTER
+#	include "DetourCrowd.h"
+#else
+#	include "DetourCrowdPhysics.h"
+#endif
 //#include "imgui.h"
 //#include "SDL.h"
 //#include "SDL_opengl.h"

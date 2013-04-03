@@ -33,6 +33,7 @@
 //rn
 #include <cstring>
 #include <cmath>
+#include <cstdlib>
 #include <Recast.h>
 #include <DetourNavMesh.h>
 #include <DetourNavMeshQuery.h>
@@ -55,6 +56,16 @@ inline LVecBase3f RecastToLVecBase3f(const float* p)
 	return LVecBase3f(p[0], -p[2], p[1]);
 }
 
+//Movement type
+enum MOVTYPE
+{
+#ifdef NO_CHARACTER
+	RECAST, KINEMATIC
+#else
+	CHARACTER
+#endif
+};
+
 class Agent
 {
 	int m_agentIdx;
@@ -69,7 +80,15 @@ public:
 	{
 		return m_agentIdx;
 	}
+#ifdef NO_CHARACTER
 	void updatePosDir(const float* p, const float* v);
+#else
+	void updateVel(const float* v);
+#endif
+	LPoint3f getPos()
+	{
+		return m_pandaNP.get_pos();
+	}
 };
 
 class RN
@@ -95,9 +114,14 @@ public:
 	bool loadMesh(const std::string& path, const std::string& meshName);
 	bool buildNavMesh();
 	void createSoloMesh();
-	static AsyncTask::DoneStatus ai_update(GenericAsyncTask* task, void* data);
 	void setSettings(const SampleSettings& settings);
 	SampleSettings getSettings();
+	//ai update functions
+#ifdef NO_CHARACTER
+	static AsyncTask::DoneStatus ai_update(GenericAsyncTask* task, void* data);
+#else
+	static AsyncTask::DoneStatus ai_updateCHARACTER(GenericAsyncTask* task, void* data);
+#endif
 
 	//crowd tool
 	void setCrowdTool();
