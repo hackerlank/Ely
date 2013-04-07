@@ -29,6 +29,8 @@
 #include <animControlCollection.h>
 #include <genericAsyncTask.h>
 #include <bulletCharacterControllerNode.h>
+#include <bulletRigidBodyNode.h>
+#include <bulletSphericalConstraint.h>
 
 //rn
 #include <cstring>
@@ -60,7 +62,7 @@ inline LVecBase3f RecastToLVecBase3f(const float* p)
 enum MOVTYPE
 {
 #ifdef NO_CHARACTER
-	RECAST, KINEMATIC
+	RECAST, KINEMATIC, RIGID
 #else
 	CHARACTER
 #endif
@@ -71,9 +73,14 @@ class Agent
 	int m_agentIdx;
 	NodePath m_pandaNP;
 	AnimControlCollection* m_anims;
+	BulletConstraint* m_Cs;
 public:
-	Agent(int agentIdx, NodePath pandaNP, AnimControlCollection* anims) :
-			m_agentIdx(agentIdx), m_pandaNP(pandaNP), m_anims(anims)
+	Agent(int agentIdx, NodePath pandaNP, AnimControlCollection* anims,
+			BulletConstraint* cs = NULL) :
+			m_agentIdx(agentIdx), m_pandaNP(pandaNP), m_anims(anims), m_Cs(cs)
+	{
+	}
+	~Agent()
 	{
 	}
 	int getIdx()
@@ -126,7 +133,7 @@ public:
 	//crowd tool
 	void setCrowdTool();
 	void addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
-			AnimControlCollection* anims = NULL);
+			AnimControlCollection* anims = NULL, BulletConstraint* cs = NULL);
 	void setCrowdTarget(LPoint3f pos);
 
 };

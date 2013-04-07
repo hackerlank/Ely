@@ -82,11 +82,6 @@ private:
 	///Picking logic data.
 	SMARTPTR(BulletSphericalConstraint) mCsPick;
 	LPoint3f mPivotPos;
-	SMARTPTR(RigidBody) mPickingBody;
-	SMARTPTR(BulletRigidBodyNode) mPickingBodyNode;
-	ObjectType mPickingBodyType;
-	ObjectId mPickingBodyId;
-	bool mPickingBodyAttached;
 
 	/**
 	 * \name Pick body event callback data.

@@ -1144,7 +1144,7 @@ void Steering::obstacle_avoidance_activate_bullet()
 	{
 		//save hit normal and hit obstacle
 		mOldHitNormal = result.get_hit_normal();
-		mHitObstacle = NodePath(result.get_node());
+		mHitObstacle = NodePath(const_cast<PandaNode*>(result.get_node()));
 		_obstacle_avoidance_obj->_ai_char->_steering->turn_off(
 				"obstacle_avoidance_activate");
 		_obstacle_avoidance_obj->_ai_char->_steering->turn_on(

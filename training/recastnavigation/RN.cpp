@@ -29,7 +29,14 @@ void Agent::updatePosDir(const float* p, const float* v)
 	LVecBase3f vel = RecastToLVecBase3f(v);
 	if (vel.length_squared() > 0.1)
 	{
-		m_pandaNP.set_pos(RecastToLVecBase3f(p));
+		if (m_Cs)
+		{
+			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(RecastToLVecBase3f(p));
+		}
+		else
+		{
+			m_pandaNP.set_pos(RecastToLVecBase3f(p));
+		}
 		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
 		if (not m_anims->get_anim(1)->is_playing())
@@ -189,7 +196,7 @@ void RN::setCrowdTool()
 }
 
 void RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
-		AnimControlCollection* anims)
+		AnimControlCollection* anims, BulletConstraint* cs)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -202,9 +209,16 @@ void RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
 	ap.maxSpeed = agentMaxSpeed;
 	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
-	Agent* agent = new Agent(agentIdx, pandaNP, anims);
-	//set Agent pos
-	pandaNP.set_pos(pos);
+	Agent* agent = new Agent(agentIdx, pandaNP, anims, cs);
+	if (cs)
+	{
+		DCAST(BulletSphericalConstraint, cs)->set_pivot_b(pos);
+	}
+	else
+	{
+		//set Agent pos
+		pandaNP.set_pos(pos);
+	}
 	//add Agent to list
 	m_agents.push_back(agent);
 }

@@ -22,12 +22,12 @@
 	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
 		* USE_CUSTOM_VECTOR_MATH:BOOL=OFF
 		Note: possibly set BUILD_SHARED_LIBS:BOOL=ON (to be added)
-		Note: possibly set CMAKE_CXX_FLAGS:STRING=-fPIC
-		Note: possibly set CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added)
+		Note: possibly set CMAKE_CXX_FLAGS:STRING=-fPIC (needed for Panda3d)
+		Note: possibly set CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added) (needed for samples)
 	d) click again on "Configure"
 	e) click on "Generate"
 - cd /REPOSITORY/KProjects/bullet/build
-- make
+- make -j2
 - make rebuild_cache
 - make install
 

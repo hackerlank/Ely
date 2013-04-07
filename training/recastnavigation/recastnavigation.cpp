@@ -41,6 +41,7 @@
 #include <bulletClosestHitRayResult.h>
 #include <bulletRigidBodyNode.h>
 #include <bulletCharacterControllerNode.h>
+#include <bulletSphericalConstraint.h>
 #include <bulletCylinderShape.h>
 #include <mouseWatcher.h>
 #include "Raycaster.h"
@@ -68,7 +69,7 @@ SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, Window
 void end(PandaFramework* panda);
 NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
 NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-		MOVTYPE movType, float& agentRadius, float& agentHeight);
+		MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
 //
 void setCrowdTarget(Raycaster* raycaster, void* data);
 
@@ -83,7 +84,7 @@ int main(int argc, char **argv)
 	bool debugPhysics = false;
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "rckd")) != -1)
+	while ((c = getopt(argc, argv, "rcbkd")) != -1)
 	{
 		switch (c)
 		{
@@ -93,6 +94,9 @@ int main(int argc, char **argv)
 			break;
 		case 'k':
 			movType = KINEMATIC;
+			break;
+		case 'b':
+			movType = RIGID;
 			break;
 #else
 		case 'c':
@@ -122,25 +126,26 @@ int main(int argc, char **argv)
 
 	//Create agent
 	float agentRadius, agentHeight;
-	NodePath character = createAgent(mBulletWorld, window, movType, agentRadius, agentHeight);
+	BulletConstraint* cs = NULL;
+	NodePath character = createAgent(mBulletWorld, window, movType, agentRadius, agentHeight, &cs);
 
 	///RN common
-	RN rn;
+	RN* rn = new RN();
 	//load mesh
-	rn.loadMesh(rnDir, meshNameObj);
+	rn->loadMesh(rnDir, meshNameObj);
 	//create solo mesh crowd sample
-	rn.createSoloMesh();
+	rn->createSoloMesh();
 	//set sample settings
-	SampleSettings settings = rn.getSettings();
+	SampleSettings settings = rn->getSettings();
 	settings.m_agentRadius = agentRadius;
 	settings.m_agentHeight = agentHeight;
 	settings.m_agentMaxSlope = 60.0;
 	settings.m_agentMaxClimb = 2.5;
 	settings.m_cellSize = 0.3;
 	settings.m_cellHeight = 0.2;
-	rn.setSettings(settings);
+	rn->setSettings(settings);
 	//build navigation mesh
-	rn.buildNavMesh();
+	rn->buildNavMesh();
 	//set ai update task
 	AsyncTask* task;
 	switch (movType)
@@ -148,13 +153,14 @@ int main(int argc, char **argv)
 #ifdef NO_CHARACTER
 	case RECAST:
 	case KINEMATIC:
+	case RIGID:
 		task = new GenericAsyncTask("ai update", &RN::ai_update,
-				reinterpret_cast<void*>(&rn));
+				reinterpret_cast<void*>(rn));
 		break;
 #else
 	case CHARACTER:
 		task = new GenericAsyncTask("ai update", &RN::ai_updateCHARACTER,
-				reinterpret_cast<void*>(&rn));
+				reinterpret_cast<void*>(rn));
 		break;
 #endif
 	default:
@@ -165,18 +171,19 @@ int main(int argc, char **argv)
 
 	///Crowd tool
 	//set crowd tool
-	rn.setCrowdTool();
+	rn->setCrowdTool();
 	//add agent
-	rn.addCrowdAgent(character, agentPos, agentMaxSpeed, &rn_anim_collection);
+	rn->addCrowdAgent(character, agentPos, agentMaxSpeed, &rn_anim_collection, cs);
 	//add a crowd raycaster
 	new Raycaster(panda, window, mBulletWorld, "shift-mouse1", "mouse1-up");
 	//re-target
 	Raycaster::GetSingletonPtr()->setHitCallback(setCrowdTarget,
-			reinterpret_cast<void*>(&rn));
+			reinterpret_cast<void*>(rn));
 
 	// Do the main loop
 	panda->main_loop();
 	//end
+	delete rn;
 	end(panda);
 	return 0;
 }
@@ -344,7 +351,7 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 }
 
 NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-		MOVTYPE movType, float& agentRadius, float& agentHeight)
+		MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs)
 {
 	NodePath playerNP;
 	//Load the Actor Model
@@ -387,6 +394,27 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_deactivation_enabled(false);
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_active(false);
 		mBulletWorld->attach(playerNP.node());
+		//attach to scene
+		Actor.reparent_to(playerNP);
+		playerNP.reparent_to(window->get_render());
+		break;
+	case RIGID:
+		//https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/physics/recastnavigation/NzK6yGUXqXs/6mT6P-Nu89sJ
+		//Add rigid body
+		playerNP = NodePath(new BulletRigidBodyNode("rigid_body"));
+		DCAST(BulletRigidBodyNode, playerNP.node())->
+				add_shape(new BulletCylinderShape(agentRadius, agentHeight, Z_up),
+						TransformState::make_pos(LPoint3f(0, 0, agentHeight / 2.0)));
+		playerNP.set_collide_mask(BitMask32::all_on());
+		DCAST(BulletRigidBodyNode, playerNP.node())->set_mass(1.0);
+		DCAST(BulletRigidBodyNode, playerNP.node())->set_kinematic(false);
+		DCAST(BulletRigidBodyNode, playerNP.node())->set_static(false);
+		DCAST(BulletRigidBodyNode, playerNP.node())->set_deactivation_enabled(true);
+		DCAST(BulletRigidBodyNode, playerNP.node())->set_active(true);
+		mBulletWorld->attach(playerNP.node());
+		//add a spherical constraint
+		*pcs = new BulletSphericalConstraint(DCAST(BulletRigidBodyNode, playerNP.node()), LPoint3f(0, 0, -0.1));
+		mBulletWorld->attach(*pcs);
 		//attach to scene
 		Actor.reparent_to(playerNP);
 		playerNP.reparent_to(window->get_render());

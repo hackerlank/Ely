@@ -299,14 +299,19 @@ void RigidBody::onAddToObjectSetup()
 
 	//create and add a Collision Shape
 	mRigidBodyNode->add_shape(createShape(mShapeType));
+	//set mass and other body type settings
+	switchType(mBodyType);
 	//attach to Bullet World
-	//<BUG: you must first insert a dynamic body for switching to work
-	mRigidBodyNode->set_mass(1.0);
-	//BUG>
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
 			mRigidBodyNode);
 
-	switchType(mBodyType);
+	///<BUG: if you want to switch the body type (e.g. dynamic to static, static to
+	///dynamic, etc...) after it has been attached to the world, you must first
+	///attach it as a dynamic body and then switch its type:
+	///		mRigidBodyNode->set_mass(1.0);
+	///		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
+	///		switchType(mBodyType);
+	////BUG>
 
 	//create a node path for the rigid body
 	mNodePath = NodePath(mRigidBodyNode);
