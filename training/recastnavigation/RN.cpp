@@ -31,7 +31,8 @@ void Agent::updatePosDir(const float* p, const float* v)
 	{
 		if (m_Cs)
 		{
-			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(RecastToLVecBase3f(p));
+			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(
+					RecastToLVecBase3f(p));
 		}
 		else
 		{
@@ -54,14 +55,14 @@ void Agent::updatePosDir(const float* p, const float* v)
 	}
 }
 #else
-void Agent::updateVel(const float* v)
+void Agent::updateVel(const float* p, const float* v)
 {
-	LVecBase3f vel = RecastToLVecBase3f(v);
-	if (vel.length_squared() > 0.1)
+	m_vel = RecastToLVecBase3f(v);
+	if (m_vel.length_squared() > 0.1)
 	{
 		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
-				vel, false);
-		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
+				m_vel, false);
+		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
 		if (not m_anims->get_anim(1)->is_playing())
 		{
@@ -181,8 +182,9 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
 			++iter)
 	{
+		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
 		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
-		(*iter)->updateVel(vel);
+		(*iter)->updateVel(pos, vel);
 	}
 	return AsyncTask::DS_again;
 }
@@ -195,7 +197,7 @@ void RN::setCrowdTool()
 	m_sampleSolo->setTool(m_crowdTool);
 }
 
-void RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
+int RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
 		AnimControlCollection* anims, BulletConstraint* cs)
 {
 	//get recast p (y-up)
@@ -221,6 +223,20 @@ void RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
 	}
 	//add Agent to list
 	m_agents.push_back(agent);
+
+	return agentIdx;
+}
+
+Agent* RN::getCrowdAgent(int idx)
+{
+	Agent* agent = NULL;
+	std::list<Agent*>::iterator iter = find_if(m_agents.begin(),
+			m_agents.end(), CompareIdx(idx));
+	if (iter != m_agents.end())
+	{
+		agent = (*iter);
+	}
+	return agent;
 }
 
 void RN::setSettings(const SampleSettings& settings)

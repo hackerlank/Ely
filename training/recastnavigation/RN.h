@@ -45,6 +45,8 @@
 #include "Sample_SoloMesh.h"
 #include "CrowdTool.h"
 
+//#define TESTANOMALIES
+
 //RN
 //https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/z$20axis/recastnavigation/fMqEAqSBOBk/zwOzHmjRsj0J
 inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
@@ -72,6 +74,7 @@ class Agent
 {
 	int m_agentIdx;
 	NodePath m_pandaNP;
+	LVector3f m_vel;
 	AnimControlCollection* m_anims;
 	BulletConstraint* m_Cs;
 public:
@@ -90,13 +93,30 @@ public:
 #ifdef NO_CHARACTER
 	void updatePosDir(const float* p, const float* v);
 #else
-	void updateVel(const float* v);
+	void updateVel(const float* p, const float* v);
 #endif
 	LPoint3f getPos()
 	{
 		return m_pandaNP.get_pos();
 	}
+	LVector3f getVel()
+	{
+		return m_vel;
+	}
 };
+
+#ifdef TESTANOMALIES
+struct AgentData{
+	enum MEMBER
+	{
+		POS,
+		VEL
+	};
+	Agent* agent;
+	MEMBER member;
+	std::string msg;
+};
+#endif
 
 class RN
 {
@@ -132,8 +152,22 @@ public:
 
 	//crowd tool
 	void setCrowdTool();
-	void addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
+	int addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
 			AnimControlCollection* anims = NULL, BulletConstraint* cs = NULL);
+	class CompareIdx
+	{
+		int m_idx;
+	public:
+		CompareIdx(int idx)
+		{
+			m_idx=idx;
+		}
+		bool operator()(Agent* ag)
+		{
+			return m_idx == ag->getIdx();
+		}
+	};
+	Agent* getCrowdAgent(int idx);
 	void setCrowdTarget(LPoint3f pos);
 
 };

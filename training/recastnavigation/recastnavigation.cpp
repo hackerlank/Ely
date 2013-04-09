@@ -58,8 +58,10 @@ std::string meshNameEgg("nav_test_panda.egg");
 //...(re)convert egg to obj:
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 std::string meshNameObj("nav_test_panda.obj");
-LPoint3f agentPos(3.35919, 3.75669, 9.95099);
+LPoint3f agentPos(-8.38461, -3.23703, 7.93032);
 float agentMaxSpeed = 1.5;
+const int AI_TASK_SORT = 10;
+const int PHYSICS_TASK_SORT = 20;
 
 //Declarations
 // don't use PT or CPT with AnimControlCollection
@@ -166,19 +168,56 @@ int main(int argc, char **argv)
 	default:
 		break;
 	}
-//	task->set_delay(5);
+	task->set_sort(AI_TASK_SORT);
 	panda->get_task_mgr().add(task);
 
 	///Crowd tool
 	//set crowd tool
 	rn->setCrowdTool();
 	//add agent
-	rn->addCrowdAgent(character, agentPos, agentMaxSpeed, &rn_anim_collection, cs);
+	int agentIdx = rn->addCrowdAgent(character, agentPos, agentMaxSpeed, &rn_anim_collection, cs);
 	//add a crowd raycaster
 	new Raycaster(panda, window, mBulletWorld, "shift-mouse1", "mouse1-up");
 	//re-target
 	Raycaster::GetSingletonPtr()->setHitCallback(setCrowdTarget,
 			reinterpret_cast<void*>(rn));
+
+#ifdef TESTANOMALIES
+	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);
+	AgentData *agentData;
+	//print_data post ai
+	agentData = new AgentData;
+	agentData->msg = std::string("POST AI: ");
+	agentData->agent = rn->getCrowdAgent(agentIdx);
+	agentData->member = AgentData::VEL;
+	task = new GenericAsyncTask("POST AI", &print_data,
+				reinterpret_cast<void*>(agentData));
+	task->set_sort(AI_TASK_SORT + 1);
+	panda->get_task_mgr().add(task);
+	//print_data pre physics
+	agentData = new AgentData;
+	agentData->msg = std::string("PRE PHYSICS: ");
+	agentData->agent = rn->getCrowdAgent(agentIdx);
+	agentData->member = AgentData::POS;
+	task = new GenericAsyncTask("PRE PHYSICS", &print_data,
+				reinterpret_cast<void*>(agentData));
+	task->set_sort(PHYSICS_TASK_SORT - 1);
+	panda->get_task_mgr().add(task);
+	//print_data post physics
+	agentData = new AgentData;
+	agentData->msg = std::string("POST PHYSICS: ");
+	agentData->agent = rn->getCrowdAgent(agentIdx);
+	agentData->member = AgentData::POS;
+	task = new GenericAsyncTask("POST PHYSICS", &print_data,
+				reinterpret_cast<void*>(agentData));
+	task->set_sort(PHYSICS_TASK_SORT + 1);
+	panda->get_task_mgr().add(task);
+	//
+	task = new GenericAsyncTask("DELIMITER", &print_data,
+				reinterpret_cast<void*>(NULL));
+	task->set_sort(PHYSICS_TASK_SORT + 2);
+	panda->get_task_mgr().add(task);
+#endif
 
 	// Do the main loop
 	panda->main_loop();
@@ -280,6 +319,7 @@ SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, Window
 	//physics: advance the simulation state
 	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
 			reinterpret_cast<void*>(mBulletWorld.p()));
+	task->set_sort(PHYSICS_TASK_SORT);
 	(*panda)->get_task_mgr().add(task);
 
 	if (debugPhysics)
@@ -459,3 +499,31 @@ void setCrowdTarget(Raycaster* raycaster, void* data)
 			<< std::endl;
 }
 
+#ifdef TESTANOMALIES
+AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	AgentData* agentData = (AgentData*)data;
+	if (agentData)
+	{
+		switch (agentData->member) {
+			case AgentData::POS:
+				std::cout << agentData->msg << " POS " << agentData->agent->getPos() << std::endl;
+				break;
+			case AgentData::VEL:
+				std::cout << agentData->msg << " VEL " << agentData->agent->getVel() << std::endl;
+				break;
+			default:
+				break;
+		}
+	}
+	else
+	{
+		std::cout << std::endl;
+	}
+	//
+	return AsyncTask::DS_cont;
+}
+#endif
