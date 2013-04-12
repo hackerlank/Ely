@@ -26,18 +26,55 @@
 #ifdef NO_CHARACTER
 void Agent::updatePosDir(const float* p, const float* v)
 {
-	LVecBase3f vel = RecastToLVecBase3f(v);
+	LVector3f vel = RecastToLVecBase3f(v);
+	LPoint3f pos = RecastToLVecBase3f(p);
+	//only for kinematic case
+	//raycast in the near of recast mesh:
+	//float rcConfig::detailSampleMaxError
+	BulletClosestHitRayResult result;
+	LPoint3f kinematicPos;
 	if (vel.length_squared() > 0.1)
 	{
-		if (m_Cs)
+		switch (m_movType)
 		{
-			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(
-					RecastToLVecBase3f(p));
+		case RECAST:
+			m_pandaNP.set_pos(pos);
+			break;
+		case KINEMATIC:
+			//set recast pos anyway
+			kinematicPos = pos;
+
+			///TODO
+			//ray down
+			result = m_world->ray_test_closest(pos, pos + m_rayDown,
+					BitMask32::all_on());
+			if (result.has_hit())
+			{
+				if (result.get_hit_normal().dot(m_rayDown) <= 0.0)
+				{
+					//physic mesh is under recast mesh
+					kinematicPos.set_z(result.get_hit_pos().get_z());
+				}
+				else
+				{
+					//physic mesh is over recast mesh
+					result = m_world->ray_test_closest(pos, pos + m_rayUp,
+							BitMask32::all_on());
+					if (result.has_hit())
+					{
+
+					}
+				}
+			}
+			m_pandaNP.set_pos(kinematicPos);
+			break;
+		case RIGID:
+			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(pos);
+			break;
+		default:
+			break;
 		}
-		else
-		{
-			m_pandaNP.set_pos(RecastToLVecBase3f(p));
-		}
+		//
 		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
 		if (not m_anims->get_anim(1)->is_playing())
@@ -197,8 +234,10 @@ void RN::setCrowdTool()
 	m_sampleSolo->setTool(m_crowdTool);
 }
 
-int RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
-		AnimControlCollection* anims, BulletConstraint* cs)
+int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
+		float agentMaxSpeed, AnimControlCollection* anims, BulletConstraint* cs,
+		BulletWorld* world,
+		float maxError)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -211,7 +250,7 @@ int RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
 	ap.maxSpeed = agentMaxSpeed;
 	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
-	Agent* agent = new Agent(agentIdx, pandaNP, anims, cs);
+	Agent* agent = new Agent(agentIdx, movType, pandaNP, anims, cs, world, maxError);
 	if (cs)
 	{
 		DCAST(BulletSphericalConstraint, cs)->set_pivot_b(pos);
@@ -230,8 +269,8 @@ int RN::addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentMaxSpeed,
 Agent* RN::getCrowdAgent(int idx)
 {
 	Agent* agent = NULL;
-	std::list<Agent*>::iterator iter = find_if(m_agents.begin(),
-			m_agents.end(), CompareIdx(idx));
+	std::list<Agent*>::iterator iter = find_if(m_agents.begin(), m_agents.end(),
+			CompareIdx(idx));
 	if (iter != m_agents.end())
 	{
 		agent = (*iter);

@@ -54,11 +54,11 @@ std::string rnDir(
 		"/REPOSITORY/KProjects/WORKSPACE/recastnavigation/RecastDemo/Bin/Meshes/");
 //convert obj to egg: obj2egg -TR 90,0,0 nav_test.obj -o nav_test_panda.egg
 //triangulate nav_test_panda.egg and...
-std::string meshNameEgg("nav_test_panda.egg");
+std::string meshNameEgg("dungeon_panda.egg");
 //...(re)convert egg to obj:
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
-std::string meshNameObj("nav_test_panda.obj");
-LPoint3f agentPos(-8.38461, -3.23703, 7.93032);
+std::string meshNameObj("dungeon_panda.obj");
+LPoint3f agentPos(0.683336, 8.27605, 10.1);
 float agentMaxSpeed = 1.5;
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
@@ -175,7 +175,10 @@ int main(int argc, char **argv)
 	//set crowd tool
 	rn->setCrowdTool();
 	//add agent
-	int agentIdx = rn->addCrowdAgent(character, agentPos, agentMaxSpeed, &rn_anim_collection, cs);
+	float maxError = rn->getSampleSolo()->getConfig().detailSampleMaxError;
+	int agentIdx = rn->addCrowdAgent(movType, character, agentPos,
+			agentMaxSpeed, &rn_anim_collection, cs,
+			mBulletWorld.p(),);
 	//add a crowd raycaster
 	new Raycaster(panda, window, mBulletWorld, "shift-mouse1", "mouse1-up");
 	//re-target

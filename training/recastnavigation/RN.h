@@ -73,15 +73,29 @@ enum MOVTYPE
 class Agent
 {
 	int m_agentIdx;
+	MOVTYPE m_movType;
 	NodePath m_pandaNP;
 	LVector3f m_vel;
 	AnimControlCollection* m_anims;
 	BulletConstraint* m_Cs;
+	BulletWorld* m_world;
+	float m_maxError;
+	LVector3f m_rayDown, m_rayUp;
 public:
-	Agent(int agentIdx, NodePath pandaNP, AnimControlCollection* anims,
-			BulletConstraint* cs = NULL) :
-			m_agentIdx(agentIdx), m_pandaNP(pandaNP), m_anims(anims), m_Cs(cs)
+	Agent(int agentIdx, MOVTYPE movType, NodePath pandaNP, AnimControlCollection* anims,
+			BulletConstraint* cs = NULL,
+			BulletWorld world=NULL,
+			float maxError = 0.0) :
+			m_agentIdx(agentIdx),
+			m_movType(movType),
+			m_pandaNP(pandaNP),
+			m_anims(anims),
+			m_Cs(cs),
+			m_world(world),
+			m_maxError(maxError)
 	{
+		m_rayDown = LVector3f(0, 0, -m_maxError);
+		m_rayUp = LVector3f(0, 0, m_maxError);
 	}
 	~Agent()
 	{
@@ -137,6 +151,10 @@ public:
 	{
 		return m_crowdTool;
 	}
+	Sample_SoloMesh* getSampleSolo()
+	{
+		return m_sampleSolo;
+	}
 	//common
 	bool loadMesh(const std::string& path, const std::string& meshName);
 	bool buildNavMesh();
@@ -152,8 +170,10 @@ public:
 
 	//crowd tool
 	void setCrowdTool();
-	int addCrowdAgent(NodePath pandaNP, LPoint3f pos, float agentSpeed,
-			AnimControlCollection* anims = NULL, BulletConstraint* cs = NULL);
+	int addCrowdAgent(MOVTYPE movType,NodePath pandaNP, LPoint3f pos, float agentSpeed,
+			AnimControlCollection* anims = NULL,
+			BulletConstraint* cs = NULL, BulletWorld* world = NULL,
+			float maxError = 0.0);
 	class CompareIdx
 	{
 		int m_idx;

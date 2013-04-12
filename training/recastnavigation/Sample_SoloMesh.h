@@ -67,6 +67,11 @@ public:
 	Sample_SoloMesh();
 	virtual ~Sample_SoloMesh();
 	
+	rcConfig& getConfig()
+	{
+		return m_cfg;
+	}
+
 	virtual void handleSettings();
 	virtual void handleTools();
 	virtual void handleDebugMode();
