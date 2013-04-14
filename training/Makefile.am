@@ -53,8 +53,7 @@ nodist_ely_recastnavigation_SOURCES = \
 		$(rn_common_sources)
 
 ely_recastnavigation_CPPFLAGS = \
-		$(rn_common_CPPFLAGS) \
-		-DNO_CHARACTER
+		$(rn_common_CPPFLAGS)
 
 ely_recastnavigation_LDADD = \
 		$(rn_common_LDADD) \
@@ -65,7 +64,8 @@ nodist_ely_recastnavigation_character_SOURCES = \
 		$(rn_common_sources)
 
 ely_recastnavigation_character_CPPFLAGS = \
-		$(rn_common_CPPFLAGS)
+		$(rn_common_CPPFLAGS) \
+		-DWITHCHARACTER
 
 ely_recastnavigation_character_LDADD = \
 		$(rn_common_LDADD) \

@@ -26,7 +26,7 @@
 #include "DetourDebugDraw.h"
 #include "DetourNavMesh.h"
 #include "DetourNavMeshQuery.h"
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 #	include "DetourCrowd.h"
 #else
 #	include "DetourCrowdPhysics.h"

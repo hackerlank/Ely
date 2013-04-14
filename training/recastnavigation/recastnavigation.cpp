@@ -52,16 +52,28 @@
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
 		"/REPOSITORY/KProjects/WORKSPACE/recastnavigation/RecastDemo/Bin/Meshes/");
+///
 //convert obj to egg: obj2egg -TR 90,0,0 nav_test.obj -o nav_test_panda.egg
 //triangulate nav_test_panda.egg and...
-std::string meshNameEgg("dungeon_panda.egg");
 //...(re)convert egg to obj:
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
+
+///dungeon
+std::string meshNameEgg("dungeon_panda.egg");
 std::string meshNameObj("dungeon_panda.obj");
-LPoint3f agentPos(0.683336, 8.27605, 10.1);
-float agentMaxSpeed = 1.5;
+LPoint3f agentPos(2.90322, 5.36927, 9.99819);
+///nav_test
+//std::string meshNameEgg("nav_test_panda.egg");
+//std::string meshNameObj("nav_test_panda.obj");
+//LPoint3f agentPos(-1.17141, 8.40892, 8.23602);
+
+const float agentMaxSpeed = 1.5;
+float playrate;
+
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
+
+BitMask32 allOnButZeroMask, allOffButZeroMask;
 
 //Declarations
 // don't use PT or CPT with AnimControlCollection
@@ -77,8 +89,17 @@ void setCrowdTarget(Raycaster* raycaster, void* data);
 
 int main(int argc, char **argv)
 {
+	allOnButZeroMask = BitMask32::all_on();
+	allOnButZeroMask.clear_bit(0);
+	allOffButZeroMask = BitMask32::all_off();
+	allOffButZeroMask.set_bit(0);
+//	std::cout << allOnButZeroMask << std::endl;
+//	std::cout << allOffButZeroMask << std::endl;
+//	std::cout << (allOnButZeroMask & allOffButZeroMask) << std::endl;
+
+	playrate = agentMaxSpeed / 1.25;
 	///use getopt: -r(recast), -c(character), -k(kinematic with z raycast)
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 	MOVTYPE movType = RECAST;
 #else
 	MOVTYPE movType = CHARACTER;
@@ -90,7 +111,7 @@ int main(int argc, char **argv)
 	{
 		switch (c)
 		{
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 		case 'r':
 			movType = RECAST;
 			break;
@@ -144,7 +165,7 @@ int main(int argc, char **argv)
 	settings.m_agentMaxSlope = 60.0;
 	settings.m_agentMaxClimb = 2.5;
 	settings.m_cellSize = 0.3;
-	settings.m_cellHeight = 0.2;
+	settings.m_cellHeight = 0.1;
 	rn->setSettings(settings);
 	//build navigation mesh
 	rn->buildNavMesh();
@@ -152,7 +173,7 @@ int main(int argc, char **argv)
 	AsyncTask* task;
 	switch (movType)
 	{
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 	case RECAST:
 	case KINEMATIC:
 	case RIGID:
@@ -175,12 +196,18 @@ int main(int argc, char **argv)
 	//set crowd tool
 	rn->setCrowdTool();
 	//add agent
-	float maxError = rn->getSampleSolo()->getConfig().detailSampleMaxError;
+//	float maxError = rn->getSampleSolo()->getConfig().detailSampleMaxError;
+	float maxError = agentHeight;
 	int agentIdx = rn->addCrowdAgent(movType, character, agentPos,
 			agentMaxSpeed, &rn_anim_collection, cs,
-			mBulletWorld.p(),);
+			mBulletWorld.p(), maxError, agentRadius);
 	//add a crowd raycaster
-	new Raycaster(panda, window, mBulletWorld, "shift-mouse1", "mouse1-up");
+//	new Raycaster(panda, window, mBulletWorld,
+//			"shift-mouse1", "mouse1-up", allOffButZeroMask);
+//	new Raycaster(panda, window, mBulletWorld,
+//			"shift-mouse1", "mouse1-up", allOnButZeroMask);
+	new Raycaster(panda, window, mBulletWorld,
+			"shift-mouse1", "mouse1-up", BitMask32::all_on());
 	//re-target
 	Raycaster::GetSingletonPtr()->setHitCallback(setCrowdTarget,
 			reinterpret_cast<void*>(rn));
@@ -386,6 +413,7 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 	mBulletWorld->attach(mRigidBodyNode);
 	NodePath mRigidBodyNodePath = NodePath(mRigidBodyNode);
 	mRigidBodyNodePath.set_collide_mask(BitMask32::all_on());
+//	mRigidBodyNodePath.set_collide_mask(allOffButZeroMask);
 	//attach to scene
 	worldMesh.reparent_to(mRigidBodyNodePath);
 	mRigidBodyNodePath.reparent_to(window->get_render());
@@ -402,8 +430,8 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 			baseDir + "data/models/eve.bam");
 	//Load Animations
 	std::vector<std::string> animations;
-	animations.push_back(std::string(baseDir + "data/models/eve-run.bam"));
 	animations.push_back(std::string(baseDir + "data/models/eve-walk.bam"));
+//	animations.push_back(std::string(baseDir + "data/models/eve-run.bam"));
 	for (unsigned int i = 0; i < animations.size(); ++i)
 	{
 		window->load_model(Actor, animations[i]);
@@ -416,7 +444,7 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 			+ pow((max_point.get_y() - min_point.get_y()),2)) / 2.0;
 	agentHeight = max_point.get_z() - min_point.get_z();
 	//
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 	switch (movType)
 	{
 	case RECAST:
@@ -430,7 +458,8 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 		DCAST(BulletRigidBodyNode, playerNP.node())->
 				add_shape(new BulletCylinderShape(agentRadius, agentHeight, Z_up),
 						TransformState::make_pos(LPoint3f(0, 0, agentHeight / 2.0)));
-		playerNP.set_collide_mask(BitMask32::all_on());
+		playerNP.set_collide_mask(allOffButZeroMask);
+//		playerNP.set_collide_mask(BitMask32::all_on());
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_mass(0.0);
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_kinematic(true);
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_static(false);

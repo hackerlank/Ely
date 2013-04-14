@@ -24,9 +24,10 @@
 #include "Raycaster.h"
 
 Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
-		SMARTPTR(BulletWorld)world,
-		const std::string& pickKeyOn, const std::string& pickKeyOff) :
-		mApp(app), mWindow(window), mWorld(world),  mCallback(NULL)
+		SMARTPTR(BulletWorld)world,	const std::string& pickKeyOn,
+		const std::string& pickKeyOff, BitMask32 bitMask) :
+		mApp(app), mWindow(window), mWorld(world),
+		mCallback(NULL), mBitMask(bitMask)
 {
 	//get render, camera node paths
 	mRender = window->get_render();
@@ -43,6 +44,7 @@ Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
 	mApp->define_key(mPickKeyOff, "pickBodyUp",
 			&EventCallbackInterface<Raycaster>::eventCallbackFunction,
 			reinterpret_cast<void*>(mPickBodyData.p()));
+	//
 }
 
 Raycaster::~Raycaster()
@@ -81,8 +83,8 @@ void Raycaster::hitBody(const Event* event)
 				pFrom = mRender.get_relative_point(mCamera, pFrom);
 				pTo = mRender.get_relative_point(mCamera, pTo);
 				//cast a ray to detect a body
-				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom, pTo,
-						BitMask32::all_on());
+				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom,
+						pTo, mBitMask);
 				//
 				if (result.has_hit())
 				{

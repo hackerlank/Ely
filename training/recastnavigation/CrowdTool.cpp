@@ -27,7 +27,7 @@
 #include "CrowdTool.h"
 #include "InputGeom.h"
 #include "Sample.h"
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 #	include "DetourCrowd.h"
 #else
 #	include "DetourCrowdPhysics.h"

@@ -28,9 +28,12 @@
 #include <nodePath.h>
 #include <animControlCollection.h>
 #include <genericAsyncTask.h>
+#include <bulletWorld.h>
 #include <bulletCharacterControllerNode.h>
 #include <bulletRigidBodyNode.h>
 #include <bulletSphericalConstraint.h>
+#include <bulletTriangleMeshShape.h>
+#include <bulletTriangleMesh.h>
 
 //rn
 #include <cstring>
@@ -60,10 +63,15 @@ inline LVecBase3f RecastToLVecBase3f(const float* p)
 	return LVecBase3f(p[0], -p[2], p[1]);
 }
 
+extern const float agentMaxSpeed;
+extern float playrate;
+extern BitMask32 allOnButZeroMask;
+extern BitMask32 allOffButZeroMask;
+
 //Movement type
 enum MOVTYPE
 {
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 	RECAST, KINEMATIC, RIGID
 #else
 	CHARACTER
@@ -79,23 +87,28 @@ class Agent
 	AnimControlCollection* m_anims;
 	BulletConstraint* m_Cs;
 	BulletWorld* m_world;
-	float m_maxError;
-	LVector3f m_rayDown, m_rayUp;
+	float m_maxError, m_radius;
+	LVector3f m_deltaRayDown, m_deltaRayOrig;
+	BulletClosestHitRayResult m_result;
+	BitMask32 m_rayMask;
 public:
 	Agent(int agentIdx, MOVTYPE movType, NodePath pandaNP, AnimControlCollection* anims,
 			BulletConstraint* cs = NULL,
-			BulletWorld world=NULL,
-			float maxError = 0.0) :
+			BulletWorld* world=NULL,
+			float maxError = 0.0, float radius = 1.0) :
 			m_agentIdx(agentIdx),
 			m_movType(movType),
 			m_pandaNP(pandaNP),
 			m_anims(anims),
 			m_Cs(cs),
 			m_world(world),
-			m_maxError(maxError)
+			m_maxError(maxError),
+			m_radius(radius),
+			m_result(BulletClosestHitRayResult::empty())
 	{
-		m_rayDown = LVector3f(0, 0, -m_maxError);
-		m_rayUp = LVector3f(0, 0, m_maxError);
+		m_deltaRayOrig = LVector3f(0, 0, m_maxError);
+		m_deltaRayDown = LVector3f(0, 0, -10*m_maxError);
+		m_rayMask = allOnButZeroMask;
 	}
 	~Agent()
 	{
@@ -104,7 +117,7 @@ public:
 	{
 		return m_agentIdx;
 	}
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 	void updatePosDir(const float* p, const float* v);
 #else
 	void updateVel(const float* p, const float* v);
@@ -162,7 +175,7 @@ public:
 	void setSettings(const SampleSettings& settings);
 	SampleSettings getSettings();
 	//ai update functions
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 	static AsyncTask::DoneStatus ai_update(GenericAsyncTask* task, void* data);
 #else
 	static AsyncTask::DoneStatus ai_updateCHARACTER(GenericAsyncTask* task, void* data);
@@ -173,7 +186,7 @@ public:
 	int addCrowdAgent(MOVTYPE movType,NodePath pandaNP, LPoint3f pos, float agentSpeed,
 			AnimControlCollection* anims = NULL,
 			BulletConstraint* cs = NULL, BulletWorld* world = NULL,
-			float maxError = 0.0);
+			float maxError = 0.0, float radius = 1.0);
 	class CompareIdx
 	{
 		int m_idx;

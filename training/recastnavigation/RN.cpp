@@ -23,7 +23,7 @@
 
 #include "RN.h"
 
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 void Agent::updatePosDir(const float* p, const float* v)
 {
 	LVector3f vel = RecastToLVecBase3f(v);
@@ -31,7 +31,6 @@ void Agent::updatePosDir(const float* p, const float* v)
 	//only for kinematic case
 	//raycast in the near of recast mesh:
 	//float rcConfig::detailSampleMaxError
-	BulletClosestHitRayResult result;
 	LPoint3f kinematicPos;
 	if (vel.length_squared() > 0.1)
 	{
@@ -43,27 +42,19 @@ void Agent::updatePosDir(const float* p, const float* v)
 		case KINEMATIC:
 			//set recast pos anyway
 			kinematicPos = pos;
-
-			///TODO
+			//correct z
 			//ray down
-			result = m_world->ray_test_closest(pos, pos + m_rayDown,
-					BitMask32::all_on());
-			if (result.has_hit())
+			m_result = m_world->ray_test_closest(kinematicPos + m_deltaRayOrig,
+					kinematicPos + m_deltaRayDown, m_rayMask);
+			if (m_result.has_hit())
 			{
-				if (result.get_hit_normal().dot(m_rayDown) <= 0.0)
+				//check if hit a triangle mesh
+				BulletShape* shape =
+						DCAST(BulletRigidBodyNode, m_result.get_node())->get_shape(0);
+				if (shape->is_of_type(BulletTriangleMeshShape::get_class_type()))
 				{
 					//physic mesh is under recast mesh
-					kinematicPos.set_z(result.get_hit_pos().get_z());
-				}
-				else
-				{
-					//physic mesh is over recast mesh
-					result = m_world->ray_test_closest(pos, pos + m_rayUp,
-							BitMask32::all_on());
-					if (result.has_hit())
-					{
-
-					}
+					kinematicPos.set_z(m_result.get_hit_pos().get_z());
 				}
 			}
 			m_pandaNP.set_pos(kinematicPos);
@@ -77,17 +68,18 @@ void Agent::updatePosDir(const float* p, const float* v)
 		//
 		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
-		if (not m_anims->get_anim(1)->is_playing())
+		if (not m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(1)->loop(false);
+			m_anims->get_anim(0)->set_play_rate(playrate);
+			m_anims->get_anim(0)->loop(true);
 		}
 	}
 	else
 	{
-		if (m_anims->get_anim(1)->is_playing())
+		if (m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(1)->pose(0);
-			m_anims->get_anim(1)->stop();
+//			m_anims->get_anim(0)->pose(0);
+			m_anims->get_anim(0)->stop();
 		}
 	}
 }
@@ -101,19 +93,19 @@ void Agent::updateVel(const float* p, const float* v)
 				m_vel, false);
 		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
-		if (not m_anims->get_anim(1)->is_playing())
+		if (not m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(1)->loop(false);
+			m_anims->get_anim(0)->loop(false);
 		}
 	}
 	else
 	{
 		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
 				LVector3f::zero(), false);
-		if (m_anims->get_anim(1)->is_playing())
+		if (m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(1)->pose(0);
-			m_anims->get_anim(1)->stop();
+			m_anims->get_anim(0)->pose(0);
+			m_anims->get_anim(0)->stop();
 		}
 	}
 }
@@ -172,7 +164,7 @@ bool RN::buildNavMesh()
 	return result;
 }
 
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 {
 	float dt = ClockObject::get_global_clock()->get_dt();
@@ -237,7 +229,7 @@ void RN::setCrowdTool()
 int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 		float agentMaxSpeed, AnimControlCollection* anims, BulletConstraint* cs,
 		BulletWorld* world,
-		float maxError)
+		float maxError, float radius)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -250,7 +242,8 @@ int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 	ap.maxSpeed = agentMaxSpeed;
 	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
-	Agent* agent = new Agent(agentIdx, movType, pandaNP, anims, cs, world, maxError);
+	Agent* agent = new Agent(agentIdx, movType, pandaNP, anims,
+			cs, world, maxError, radius);
 	if (cs)
 	{
 		DCAST(BulletSphericalConstraint, cs)->set_pivot_b(pos);

@@ -42,8 +42,9 @@
 class Raycaster: public Singleton<Raycaster>
 {
 public:
-	Raycaster(PandaFramework* app, WindowFramework* window, SMARTPTR(BulletWorld)world,
-	const std::string& pickKeyOn, const std::string& pickKeyOff);
+	Raycaster(PandaFramework* app, WindowFramework* window,
+			SMARTPTR(BulletWorld)world,	const std::string& pickKeyOn,
+			const std::string& pickKeyOff, BitMask32 bitMask = BitMask32::all_on());
 	virtual ~Raycaster();
 
 	void setHitCallback(void (*callback)(Raycaster*, void*), void* data)
@@ -83,6 +84,7 @@ private:
 	///Hit callback.
 	void (*mCallback)(Raycaster*, void*);
 	void* mData;
+	BitMask32 mBitMask;
 	/**
 	 * \name Hit body event callback data.
 	 */

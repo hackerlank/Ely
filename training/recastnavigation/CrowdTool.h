@@ -23,7 +23,7 @@
 #include "DetourNavMesh.h"
 #include "DetourObstacleAvoidance.h"
 #include "ValueHistory.h"
-#ifdef NO_CHARACTER
+#ifndef WITHCHARACTER
 #	include "DetourCrowd.h"
 #else
 #	include "DetourCrowdPhysics.h"
