@@ -64,7 +64,7 @@ inline LVecBase3f RecastToLVecBase3f(const float* p)
 }
 
 extern const float agentMaxSpeed;
-extern float playrate;
+extern const float rateFactor;
 extern BitMask32 allOnButZeroMask;
 extern BitMask32 allOffButZeroMask;
 

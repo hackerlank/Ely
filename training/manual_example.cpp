@@ -33,6 +33,13 @@ int manual_example_main(int argc, char *argv[])
 	framework.set_window_title("My Panda3D Window");
 	//open the window
 	WindowFramework *window = framework.open_window();
+	if (window != (WindowFramework *) NULL)
+	{
+		std::cout << "Opened the window successfully!\n";
+		// common setup
+		window->enable_keyboard(); // Enable keyboard detection
+		window->setup_trackball(); // Enable default camera movement
+	}
 
 	//here is room for your own code
 

@@ -68,9 +68,9 @@ void Agent::updatePosDir(const float* p, const float* v)
 		//
 		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
+		m_anims->get_anim(0)->set_play_rate(vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(0)->set_play_rate(playrate);
 			m_anims->get_anim(0)->loop(true);
 		}
 	}

@@ -59,16 +59,28 @@ std::string rnDir(
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
 ///dungeon
-std::string meshNameEgg("dungeon_panda.egg");
-std::string meshNameObj("dungeon_panda.obj");
-LPoint3f agentPos(2.90322, 5.36927, 9.99819);
+//std::string meshNameEgg("dungeon_panda.egg");
+//std::string meshNameObj("dungeon_panda.obj");
+//LPoint3f agentPos(2.90322, 5.36927, 9.99819);
 ///nav_test
-//std::string meshNameEgg("nav_test_panda.egg");
-//std::string meshNameObj("nav_test_panda.obj");
-//LPoint3f agentPos(-1.17141, 8.40892, 8.23602);
+std::string meshNameEgg("nav_test_panda.egg");
+std::string meshNameObj("nav_test_panda.obj");
+LPoint3f agentPos(-1.17141, 8.40892, 8.23602);
 
-const float agentMaxSpeed = 1.5;
-float playrate;
+///eve actor
+//std::string actorFile("data/models/eve.bam");
+//std::string anim0File("data/models/eve-walk.bam");
+//std::string anim1File("data/models/eve-run.bam");
+//const float agentMaxSpeed = 1.5;
+//const float rateFactor = 1.25;
+//const float actorScale = 0.4;
+
+///guy actor
+std::string actorFile("data/models/guy.bam");
+std::string anim0File("data/models/guy-walk.bam");
+const float agentMaxSpeed = 2.0;
+const float rateFactor = 2.00;
+const float actorScale = 0.1;
 
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
@@ -97,7 +109,6 @@ int main(int argc, char **argv)
 //	std::cout << allOffButZeroMask << std::endl;
 //	std::cout << (allOnButZeroMask & allOffButZeroMask) << std::endl;
 
-	playrate = agentMaxSpeed / 1.25;
 	///use getopt: -r(recast), -c(character), -k(kinematic with z raycast)
 #ifndef WITHCHARACTER
 	MOVTYPE movType = RECAST;
@@ -427,17 +438,20 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 	NodePath playerNP;
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
-			baseDir + "data/models/eve.bam");
+			baseDir + actorFile);
 	//Load Animations
 	std::vector<std::string> animations;
-	animations.push_back(std::string(baseDir + "data/models/eve-walk.bam"));
-//	animations.push_back(std::string(baseDir + "data/models/eve-run.bam"));
+	animations.push_back(baseDir + anim0File);
+//	animations.push_back(baseDir + anim1File);
 	for (unsigned int i = 0; i < animations.size(); ++i)
 	{
 		window->load_model(Actor, animations[i]);
 	}
-	auto_bind(Actor.node(), rn_anim_collection);
-	Actor.set_scale(0.4);
+	auto_bind(Actor.node(), rn_anim_collection,
+			PartGroup::HMF_ok_wrong_root_name|
+			PartGroup::HMF_ok_part_extra|
+			PartGroup::HMF_ok_anim_extra);
+	Actor.set_scale(actorScale);
 	LPoint3f min_point, max_point;
 	Actor.calc_tight_bounds(min_point, max_point);
 	agentRadius = sqrt(pow((max_point.get_x() - min_point.get_x()),2)

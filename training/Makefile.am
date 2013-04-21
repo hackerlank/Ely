@@ -14,7 +14,16 @@ nodist_ely_training_SOURCES = \
 		network.cpp \
 		physics.cpp \
 		threads.cpp \
-		manual_example.cpp
+		manual_example.cpp \
+		draw_geometry.cpp
+		
+ely_training_CPPFLAGS = \
+		-I$(rn_path)/DebugUtils/Include \
+		$(AM_CPPFLAGS)
+
+ely_training_LDADD = \
+		$(LDADD) \
+		$(rn_path)/DebugUtils/.libs/DebugUtils.a
 		
 #recastnavigation
 rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
