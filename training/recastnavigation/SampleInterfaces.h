@@ -24,6 +24,15 @@
 #include "RecastDump.h"
 #include "PerfTimer.h"
 
+#include <nodePath.h>
+#include <geomVertexFormat.h>
+#include <geomVertexWriter.h>
+#include <geomPoints.h>
+#include <geomLines.h>
+#include <geomTriangles.h>
+#include <geomTristrips.h>
+#include "Utilities/Tools.h"
+
 // These are example implementations of various interfaces used in Recast and Detour.
 
 /// Recast build context.
@@ -66,6 +75,43 @@ protected:
 class DebugDrawGL : public duDebugDraw
 {
 public:
+	virtual void depthMask(bool state);
+	virtual void texture(bool state);
+	virtual void begin(duDebugDrawPrimitives prim, float size = 1.0f);
+	virtual void vertex(const float* pos, unsigned int color);
+	virtual void vertex(const float x, const float y, const float z, unsigned int color);
+	virtual void vertex(const float* pos, unsigned int color, const float* uv);
+	virtual void vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v);
+	virtual void end();
+};
+
+/// Panda3d debug draw implementation.
+class DebugDrawPanda3d : public duDebugDraw
+{
+protected:
+	///The render node path.
+	NodePath m_render;
+	///Creating and filling a GeomVertexData.
+	SMARTPTR(GeomVertexData) m_vertexData;
+	///Create a number of GeomVertexWriters.
+	GeomVertexWriter m_vertex, m_color, m_texcoord;
+	///The current vertex index.
+	int m_vertexIdx;
+	///Depth Mask.
+	bool m_depthMask;
+	///Texture.
+	bool m_texture;
+	///The current GeomPrimitive.
+	SMARTPTR(GeomPrimitive) m_geomPrim;
+	///The current Geom and index.
+	SMARTPTR(Geom) m_geom;
+	int m_geomIdx;
+	///The current GeomNode node path.
+	NodePath m_geomNodeNP;
+public:
+	DebugDrawPanda3d(NodePath render);
+	virtual ~DebugDrawPanda3d();
+
 	virtual void depthMask(bool state);
 	virtual void texture(bool state);
 	virtual void begin(duDebugDrawPrimitives prim, float size = 1.0f);

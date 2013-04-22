@@ -27,12 +27,22 @@
 #include <geomPoints.h>
 #include <geomLines.h>
 #include <geomTriangles.h>
+#include <geomTristrips.h>
 #include "Utilities/Tools.h"
 
 #include <DebugDraw.h>
 #include <RecastDebugDraw.h>
 
 #define DD
+
+inline LVecBase3f RecastToLVecBase3f(const float* p)
+{
+	return LVecBase3f(p[0], -p[2], p[1]);
+}
+inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float z)
+{
+	return LVecBase3f(x, -z, y);
+}
 
 /// Panda3d debug draw implementation.
 class DebugDrawPanda3d : public duDebugDraw
@@ -51,9 +61,9 @@ protected:
 	///Texture.
 	bool m_texture;
 	///The current GeomPrimitive.
-	GeomPrimitive* m_geomPrim;
+	SMARTPTR(GeomPrimitive) m_geomPrim;
 	///The current Geom and index.
-	Geom* m_geom;
+	SMARTPTR(Geom) m_geom;
 	int m_geomIdx;
 	///The current GeomNode node path.
 	NodePath m_geomNodeNP;
@@ -89,6 +99,23 @@ DebugDrawPanda3d::~DebugDrawPanda3d()
 {
 }
 
+inline float red(unsigned int color)
+{
+	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
+}
+inline float green(unsigned int color)
+{
+	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
+}
+inline float blue(unsigned int color)
+{
+	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
+}
+inline float alpha(unsigned int color)
+{
+	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
+}
+
 void DebugDrawPanda3d::depthMask(bool state)
 {
 	m_geomNodeNP.set_depth_write(state);
@@ -103,41 +130,56 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 	switch (prim)
 	{
 	case DU_DRAW_POINTS:
+		m_geomPrim = new GeomPoints(Geom::UH_static);
 		break;
 	case DU_DRAW_LINES:
+		m_geomPrim = new GeomLines(Geom::UH_static);
 		break;
 	case DU_DRAW_TRIS:
 		m_geomPrim = new GeomTriangles(Geom::UH_static);
-		m_vertex.set_row(0);
-		m_color.set_row(0);
-		m_texcoord.set_row(0);;
-		m_vertexIdx = 0;
 		break;
 	case DU_DRAW_QUADS:
+		m_geomPrim = new GeomTristrips(Geom::UH_static);
 		break;
 	};
+	m_vertex.set_row(0);
+	m_color.set_row(0);
+	m_texcoord.set_row(0);;
+	m_vertexIdx = 0;
 }
 
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
 {
+	m_vertex.add_data3f(RecastToLVecBase3f(pos));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
 }
 
 void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
 {
+	m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
 }
 
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
 {
+	m_vertex.add_data3f(RecastToLVecBase3f(pos));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	m_texcoord.add_data2f(uv[0], uv[1]);
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
 }
 
 void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
 {
-	m_vertex.add_data3f(x, y, z);
-	float red = ((float)((color & 0xFF000000) >> 24)) / 255.0;
-	float green = ((float)((color & 0x00FF0000) >> 16)) / 255.0;
-	float blue = ((float)((color & 0x0000FF00) >> 8)) / 255.0;
-	float alpha = ((float)((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
+	m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
 	m_texcoord.add_data2f(u, v);
 	//
 	m_geomPrim->add_vertex(m_vertexIdx);
@@ -177,273 +219,63 @@ int draw_geometry_main(int argc, char *argv[])
 	//here is room for your own code
 
 #ifdef DD
-
-	///The render node path.
-	NodePath m_render;
-	///Creating and filling a GeomVertexData.
-	SMARTPTR(GeomVertexData) m_vertexData;
-	///Create a number of GeomVertexWriters.
-	GeomVertexWriter m_vertex, m_color, m_texcoord;
-	///The current vertex index.
-	int m_vertexIdx;
-	///Depth Mask.
-	bool m_depthMask;
-	///Texture.
-	bool m_texture;
-	///The current GeomPrimitive.
-	GeomPrimitive* m_geomPrim;
-	///The current Geom and index.
-	Geom* m_geom;
-	int m_geomIdx;
-	///The current GeomNode node path.
-	NodePath m_geomNodeNP;
-
 	///<!--Constructor
-//	DebugDrawPanda3d dd(window->get_render());
-
-	m_render = window->get_render();
-	m_vertexData = new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
-					Geom::UH_static);
-	m_vertex = GeomVertexWriter(m_vertexData, "vertex");
-	m_color = GeomVertexWriter(m_vertexData, "color");
-	m_texcoord = GeomVertexWriter(m_vertexData, "texcoord");
-	m_vertexIdx = 0;
-	m_depthMask = true;
-	m_texture = true;
-	m_geomIdx = 0;
-
+	DebugDrawPanda3d dd(window->get_render());
 	///-->
 
 	///<!--begin
-//	dd.begin(DU_DRAW_TRIS);
-
-	duDebugDrawPrimitives prim = DU_DRAW_TRIS;
-	switch (prim)
-	{
-	case DU_DRAW_POINTS:
-		break;
-	case DU_DRAW_LINES:
-		break;
-	case DU_DRAW_TRIS:
-		m_geomPrim = new GeomTriangles(Geom::UH_static);
-		m_vertex.set_row(0);
-		m_color.set_row(0);
-		m_texcoord.set_row(0);;
-		m_vertexIdx = 0;
-		break;
-	case DU_DRAW_QUADS:
-		break;
-	};
-
+	dd.begin(DU_DRAW_TRIS);
 	///-->
 
 	///<!--vertex
 	//Add data
-//	unsigned int blue = 0x0000FFFF;
+	unsigned int color = 0xFFFF00FF;
 	//triangle 1
 	//0
-//	dd.vertex(0, 0, 0, blue, 0, 0);
-
-	float x = 0;
-	float y = 0;
-	float z = 0;
-	unsigned int color = 0x0000FFFF;
-	float u = 0;
-	float v = 0;
-	m_vertex.add_data3f(x, y, z);
-	float red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	float green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	float blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	float alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(0, 0, 0, color, 0, 0);
 	//1
-//	dd.vertex(1, 0, 0, blue, 1, 0);
-
-	x = 1;
-	y = 0;
-	z = 0;
-	color = 0x0000FFFF;
-	u = 1;
-	v = 0;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(1, 0, 0, color, 1, 0);
 	//6
-//	dd.vertex(1, 0, 1, blue, 1, 1);
-
-	x = 1;
-	y = 0;
-	z = 1;
-	color = 0x0000FFFF;
-	u = 1;
-	v = 1;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(1, 0, 1, color, 1, 1);
 	//triangle 2
 	//1
-//	dd.vertex(1, 0, 0, blue, 0, 0);
-
-	x = 1;
-	y = 0;
-	z = 0;
-	color = 0x0000FFFF;
-	u = 0;
-	v = 0;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(1, 0, 0, color, 0, 0);
 	//2
-//	dd.vertex(2, 0, 0, blue, 1, 0);
-
-	x = 2;
-	y = 0;
-	z = 0;
-	color = 0x0000FFFF;
-	u = 1;
-	v = 0;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(2, 0, 0, color, 1, 0);
 	//5
-//	dd.vertex(2, 0, 1, blue, 1, 1);
-
-	x = 2;
-	y = 0;
-	z = 1;
-	color = 0x0000FFFF;
-	u = 1;
-	v = 1;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(2, 0, 1, color, 1, 1);
 	//triangle 3
 	//2
-//	dd.vertex(2, 0, 0, blue, 0, 0);
-
-	x = 2;
-	y = 0;
-	z = 0;
-	color = 0x0000FFFF;
-	u = 0;
-	v = 0;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(2, 0, 0, color, 0, 0);
 	//3
-//	dd.vertex(3, 0, 0, blue, 1, 0);
-
-	x = 3;
-	y = 0;
-	z = 0;
-	color = 0x0000FFFF;
-	u = 1;
-	v = 0;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(3, 0, 0, color, 1, 0);
 	//4
-//	dd.vertex(3, 0, 1, blue, 1, 1);
-
-	x = 3;
-	y = 0;
-	z = 1;
-	color = 0x0000FFFF;
-	u = 1;
-	v = 0;
-	m_vertex.add_data3f(x, y, z);
-	red = ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-	green = ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-	blue = ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-	alpha = ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-	m_color.add_data4f(red, green, blue, alpha);
-	m_texcoord.add_data2f(u, v);
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-
+	dd.vertex(3, 0, 1, color, 1, 1);
 	///-->
 
 	///<!--end
-//	dd.end();
-
-	m_geomPrim->close_primitive();
-	m_geom = new Geom(m_vertexData);
-	m_geom->add_primitive(m_geomPrim);
-	ostringstream idx;
-	idx << m_geomIdx;
-	m_geomNodeNP = NodePath(new GeomNode("geomNode" + idx.str()));
-	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
-	m_geomNodeNP.reparent_to(m_render);
-	++m_geomIdx;
-
+	dd.end();
 	///-->
 #else
+	SMARTPTR(GeomVertexData) vertexData;
+	SMARTPTR(GeomTriangles) prim;
+	GeomVertexWriter vertex, color, texcoord;
+	SMARTPTR(Geom) geom;
+	SMARTPTR(GeomNode) node;
+	NodePath nodePath;
+
 	///<!--Constructor
 	//Creating and filling a GeomVertexData
-	SMARTPTR(GeomVertexData) vertexData = new GeomVertexData("VertexData",
+	vertexData = new GeomVertexData("VertexData",
 			GeomVertexFormat::get_v3c4t2(), Geom::UH_static);
 	//Create a number of GeomVertexWriters
-	GeomVertexWriter vertex, color, texcoord;
 	vertex = GeomVertexWriter(vertexData, "vertex");
 	color = GeomVertexWriter(vertexData, "color");
 	texcoord = GeomVertexWriter(vertexData, "texcoord");
 	///-->
 
 	///<!--begin
-	SMARTPTR(GeomTriangles) prim = new GeomTriangles(Geom::UH_static);
+	prim = new GeomTriangles(Geom::UH_static);
 	vertex.set_row(0);
 	color.set_row(0);
 	texcoord.set_row(0);;
@@ -452,7 +284,6 @@ int draw_geometry_main(int argc, char *argv[])
 
 	///<!--vertex
 	//Add data
-	unsigned int blue = 0x0000FFFF;
 	//triangle 1
 	//0
 	vertex.add_data3f(0, 0, 0);
@@ -514,15 +345,15 @@ int draw_geometry_main(int argc, char *argv[])
 
 	///<!--end
 	prim->close_primitive();
-	SMARTPTR(Geom) geom = new Geom(vertexData);
+	geom = new Geom(vertexData);
 	geom->add_primitive(prim);
 	//Putting your new geometry in the scene graph
 	ostringstream idx;
 	idx << "gnode" << 1;
 	std::cout << idx.str() << std::endl;
-	SMARTPTR(GeomNode) node = new GeomNode(idx.str());
+	node = new GeomNode(idx.str());
 	node->add_geom(geom);
-	NodePath nodePath = window->get_render().attach_new_node(node);
+	nodePath = window->get_render().attach_new_node(node);
 	///-->
 #endif
 

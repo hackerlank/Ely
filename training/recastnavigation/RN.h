@@ -44,6 +44,8 @@
 #include <DetourNavMeshQuery.h>
 #include <DetourNavMeshBuilder.h>
 #include <DetourCommon.h>
+#include <RecastDebugDraw.h>
+#include <DetourDebugDraw.h>
 #include "InputGeom.h"
 #include "Sample_SoloMesh.h"
 #include "CrowdTool.h"
@@ -61,6 +63,10 @@ inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
 inline LVecBase3f RecastToLVecBase3f(const float* p)
 {
 	return LVecBase3f(p[0], -p[2], p[1]);
+}
+inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float z)
+{
+	return LVecBase3f(x, -z, y);
 }
 
 extern const float agentMaxSpeed;

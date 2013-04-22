@@ -48,6 +48,8 @@
 
 #include "RN.h"
 
+#define DD
+
 //Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
@@ -180,6 +182,19 @@ int main(int argc, char **argv)
 	rn->setSettings(settings);
 	//build navigation mesh
 	rn->buildNavMesh();
+
+#ifdef DD
+	DebugDrawPanda3d dd(window->get_render());
+	// Draw mesh
+//	InputGeom* m_geom = rn->getSampleSolo()->getInputGeom();
+//	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(),
+//			m_geom->getMesh()->getVertCount(), m_geom->getMesh()->getTris(),
+//			m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(),
+//			0, 1.0f);
+	dtNavMesh* m_navMesh = rn->getSampleSolo()->getNavMesh();
+	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_OFFMESHCONS);
+#endif
+
 	//set ai update task
 	AsyncTask* task;
 	switch (movType)

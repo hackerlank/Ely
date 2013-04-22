@@ -8,6 +8,7 @@
 #include "RecastDebugDraw.h"
 #include "DetourDebugDraw.h"
 #include "PerfTimer.h"
+#include "RN.h"
 //#include "SDL.h"
 //#include "SDL_opengl.h"
 
@@ -260,6 +261,128 @@ void DebugDrawGL::end()
 //	glEnd();
 //	glLineWidth(1.0f);
 //	glPointSize(1.0f);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
+		m_render(render),
+		m_vertexData(new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
+						Geom::UH_static)),
+		m_vertex(GeomVertexWriter(m_vertexData, "vertex")),
+		m_color(GeomVertexWriter(m_vertexData, "color")),
+		m_texcoord(GeomVertexWriter(m_vertexData, "texcoord")),
+		m_vertexIdx(0),
+		m_depthMask(true),
+		m_texture(true),
+		m_geomIdx(0)
+{
+}
+
+DebugDrawPanda3d::~DebugDrawPanda3d()
+{
+}
+
+inline float red(unsigned int color)
+{
+	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
+}
+inline float green(unsigned int color)
+{
+	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
+}
+inline float blue(unsigned int color)
+{
+	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
+}
+inline float alpha(unsigned int color)
+{
+	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
+}
+
+void DebugDrawPanda3d::depthMask(bool state)
+{
+	m_depthMask = state;
+}
+
+void DebugDrawPanda3d::texture(bool state)
+{
+	m_texture = state;
+}
+
+void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
+{
+	switch (prim)
+	{
+	case DU_DRAW_POINTS:
+		m_geomPrim = new GeomPoints(Geom::UH_static);
+		break;
+	case DU_DRAW_LINES:
+		m_geomPrim = new GeomLines(Geom::UH_static);
+		break;
+	case DU_DRAW_TRIS:
+		m_geomPrim = new GeomTriangles(Geom::UH_static);
+		break;
+	case DU_DRAW_QUADS:
+		m_geomPrim = new GeomTristrips(Geom::UH_static);
+		break;
+	};
+	m_vertex.set_row(0);
+	m_color.set_row(0);
+	m_texcoord.set_row(0);
+	m_vertexIdx = 0;
+}
+
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
+{
+	m_vertex.add_data3f(RecastToLVecBase3f(pos));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
+}
+
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
+{
+	m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
+}
+
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
+{
+	m_vertex.add_data3f(RecastToLVecBase3f(pos));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	m_texcoord.add_data2f(uv[0], uv[1]);
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
+}
+
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+{
+	m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
+	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
+	m_texcoord.add_data2f(u, v);
+	//
+	m_geomPrim->add_vertex(m_vertexIdx);
+	++m_vertexIdx;
+}
+
+void DebugDrawPanda3d::end()
+{
+	m_geomPrim->close_primitive();
+	m_geom = new Geom(m_vertexData);
+	m_geom->add_primitive(m_geomPrim);
+	ostringstream idx;
+	idx << m_geomIdx;
+	m_geomNodeNP = NodePath(new GeomNode("geomNode" + idx.str()));
+	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
+	m_geomNodeNP.reparent_to(m_render);
+//	m_geomNodeNP.set_depth_write(m_depthMask);
+	++m_geomIdx;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
