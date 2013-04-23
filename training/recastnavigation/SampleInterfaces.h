@@ -114,6 +114,11 @@ protected:
 	LVector3f m_quadFirstVertex, m_quadThirdVertex;
 	LVector4f m_quadFirstColor, m_quadThirdColor;
 	LVector2f m_quadFirstUV, m_quadThirdUV;
+
+private:
+	///Helper
+	void doVertex(const LVector3f& vertex, const LVector4f& color,
+			const LVector2f& uv = LVecBase2f::zero());
 public:
 	DebugDrawPanda3d(NodePath render);
 	virtual ~DebugDrawPanda3d();
@@ -127,6 +132,23 @@ public:
 	virtual void vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v);
 	virtual void end();
 };
+
+inline float red(unsigned int color)
+{
+	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
+}
+inline float green(unsigned int color)
+{
+	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
+}
+inline float blue(unsigned int color)
+{
+	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
+}
+inline float alpha(unsigned int color)
+{
+	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
+}
 
 /// stdio file implementation.
 class FileIO : public duFileIO

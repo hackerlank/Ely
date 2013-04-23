@@ -284,23 +284,6 @@ DebugDrawPanda3d::~DebugDrawPanda3d()
 {
 }
 
-inline float red(unsigned int color)
-{
-	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-}
-inline float green(unsigned int color)
-{
-	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-}
-inline float blue(unsigned int color)
-{
-	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-}
-inline float alpha(unsigned int color)
-{
-	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-}
-
 void DebugDrawPanda3d::depthMask(bool state)
 {
 	m_depthMask = state;
@@ -325,7 +308,7 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 		m_geomPrim = new GeomTriangles(Geom::UH_static);
 		break;
 	case DU_DRAW_QUADS:
-		m_geomPrim = new GeomTristrips(Geom::UH_static);
+		m_geomPrim = new GeomTriangles(Geom::UH_static);
 		m_quadCurrIdx = 0;
 		break;
 	};
@@ -336,53 +319,14 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 	m_vertexIdx = 0;
 }
 
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
-{
-	///TODO
-	if (m_prim != DU_DRAW_QUADS)
-	{
-		m_vertex.add_data3f(RecastToLVecBase3f(pos));
-		m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-		//
-		m_geomPrim->add_vertex(m_vertexIdx);
-		++m_vertexIdx;
-	}
-}
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
-{
-	///TODO
-	if (m_prim != DU_DRAW_QUADS)
-	{
-		m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
-		m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-		//
-		m_geomPrim->add_vertex(m_vertexIdx);
-		++m_vertexIdx;
-	}
-}
-
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
-{
-	///TODO
-	if (m_prim != DU_DRAW_QUADS)
-	{
-		m_vertex.add_data3f(RecastToLVecBase3f(pos));
-		m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-		m_texcoord.add_data2f(uv[0], uv[1]);
-		//
-		m_geomPrim->add_vertex(m_vertexIdx);
-		++m_vertexIdx;
-	}
-}
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
+		const LVector2f& uv)
 {
 	if (m_prim != DU_DRAW_QUADS)
 	{
-		m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
-		m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-		m_texcoord.add_data2f(u, v);
+		m_vertex.add_data3f(vertex);
+		m_color.add_data4f(color);
+		m_texcoord.add_data2f(uv);
 		//
 		m_geomPrim->add_vertex(m_vertexIdx);
 		++m_vertexIdx;
@@ -390,9 +334,9 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsig
 	else
 	{
 		int quadCurrIdxMod = m_quadCurrIdx % 4;
-		LVector3f currVertex = Recast3fToLVecBase3f(x, y, z);
-		LVector4f currColor = LVector4f(red(color), green(color), blue(color), alpha(color));
-		LVector2f currUV = LVector2f(u, v);
+		LVector3f currVertex = vertex;
+		LVector4f currColor = color;
+		LVector2f currUV = uv;
 		switch (quadCurrIdxMod)
 		{
 		case 0:
@@ -440,6 +384,32 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsig
 		++m_vertexIdx;
 		///
 	}
+}
+
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
+{
+	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
+			LVector4f(red(color), green(color), blue(color), alpha(color)));
+}
+
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
+{
+	doVertex(Recast3fToLVecBase3f(x, y, z),
+			LVector4f(red(color), green(color), blue(color), alpha(color)));
+}
+
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
+{
+	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f(uv[0], uv[1]));
+}
+
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+{
+	doVertex(Recast3fToLVecBase3f(x, y, z),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f(u, v));
 }
 
 void DebugDrawPanda3d::end()

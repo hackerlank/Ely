@@ -74,6 +74,11 @@ protected:
 	LVector3f m_quadFirstVertex, m_quadThirdVertex;
 	LVector4f m_quadFirstColor, m_quadThirdColor;
 	LVector2f m_quadFirstUV, m_quadThirdUV;
+
+private:
+	///Helper
+	void doVertex(const LVector3f& vertex, const LVector4f& color,
+			const LVector2f& uv = LVecBase2f::zero());
 public:
 	DebugDrawPanda3d(NodePath render);
 	virtual ~DebugDrawPanda3d();
@@ -107,19 +112,19 @@ DebugDrawPanda3d::~DebugDrawPanda3d()
 {
 }
 
-inline float red(unsigned int color)
+static inline float red(unsigned int color)
 {
 	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
 }
-inline float green(unsigned int color)
+static inline float green(unsigned int color)
 {
 	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
 }
-inline float blue(unsigned int color)
+static inline float blue(unsigned int color)
 {
 	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
 }
-inline float alpha(unsigned int color)
+static inline float alpha(unsigned int color)
 {
 	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
 }
@@ -155,45 +160,18 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 	m_prim = prim;
 	m_vertex.set_row(0);
 	m_color.set_row(0);
-	m_texcoord.set_row(0);;
+	m_texcoord.set_row(0);
 	m_vertexIdx = 0;
 }
 
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
-{
-	m_vertex.add_data3f(RecastToLVecBase3f(pos));
-	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-	//
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-}
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
-{
-	m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
-	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-	//
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-}
-
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
-{
-	m_vertex.add_data3f(RecastToLVecBase3f(pos));
-	m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-	m_texcoord.add_data2f(uv[0], uv[1]);
-	//
-	m_geomPrim->add_vertex(m_vertexIdx);
-	++m_vertexIdx;
-}
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
+		const LVector2f& uv)
 {
 	if (m_prim != DU_DRAW_QUADS)
 	{
-		m_vertex.add_data3f(Recast3fToLVecBase3f(x, y, z));
-		m_color.add_data4f(red(color), green(color), blue(color), alpha(color));
-		m_texcoord.add_data2f(u, v);
+		m_vertex.add_data3f(vertex);
+		m_color.add_data4f(color);
+		m_texcoord.add_data2f(uv);
 		//
 		m_geomPrim->add_vertex(m_vertexIdx);
 		++m_vertexIdx;
@@ -201,9 +179,9 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsig
 	else
 	{
 		int quadCurrIdxMod = m_quadCurrIdx % 4;
-		LVector3f currVertex = Recast3fToLVecBase3f(x, y, z);
-		LVector4f currColor = LVector4f(red(color), green(color), blue(color), alpha(color));
-		LVector2f currUV = LVector2f(u, v);
+		LVector3f currVertex = vertex;
+		LVector4f currColor = color;
+		LVector2f currUV = uv;
 		switch (quadCurrIdxMod)
 		{
 		case 0:
@@ -253,6 +231,32 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsig
 	}
 }
 
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
+{
+	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
+			LVector4f(red(color), green(color), blue(color), alpha(color)));
+}
+
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
+{
+	doVertex(Recast3fToLVecBase3f(x, y, z),
+			LVector4f(red(color), green(color), blue(color), alpha(color)));
+}
+
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
+{
+	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f(uv[0], uv[1]));
+}
+
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+{
+	doVertex(Recast3fToLVecBase3f(x, y, z),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f(u, v));
+}
+
 void DebugDrawPanda3d::end()
 {
 	m_geomPrim->close_primitive();
@@ -262,8 +266,8 @@ void DebugDrawPanda3d::end()
 	idx << m_geomIdx;
 	m_geomNodeNP = NodePath(new GeomNode("geomNode" + idx.str()));
 	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
-//	m_geomNodeNP.set_depth_write(m_depthMask);
 	m_geomNodeNP.reparent_to(m_render);
+//	m_geomNodeNP.set_depth_write(m_depthMask);
 	++m_geomIdx;
 }
 
@@ -294,8 +298,8 @@ int draw_geometry_main(int argc, char *argv[])
 	duDebugDrawPrimitives primType;
 //	primType = DU_DRAW_POINTS;
 //	primType = DU_DRAW_LINES;
-//	primType = DU_DRAW_TRIS;
-	primType = DU_DRAW_QUADS;
+	primType = DU_DRAW_TRIS;
+//	primType = DU_DRAW_QUADS;
 
 	///<!--begin
 	dd.begin(primType);
@@ -313,21 +317,21 @@ int draw_geometry_main(int argc, char *argv[])
 		//1
 		dd.vertex(1, 0, 0, color, 1, 0);
 		//6
-		dd.vertex(1, 0, 1, color, 1, 1);
+		dd.vertex(1, 1, 0, color, 1, 1);
 		//triangle 2
 		//1
 		dd.vertex(1, 0, 0, color, 0, 0);
 		//2
 		dd.vertex(2, 0, 0, color, 1, 0);
 		//5
-		dd.vertex(2, 0, 1, color, 1, 1);
+		dd.vertex(2, 1, 0, color, 1, 1);
 		//triangle 3
 		//2
 		dd.vertex(2, 0, 0, color, 0, 0);
 		//3
 		dd.vertex(3, 0, 0, color, 1, 0);
 		//4
-		dd.vertex(3, 0, 1, color, 1, 1);
+		dd.vertex(3, 1, 0, color, 1, 1);
 	}
 	else
 	{
@@ -337,18 +341,18 @@ int draw_geometry_main(int argc, char *argv[])
 		//1
 		dd.vertex(1, 0, 0, color, 1, 0);
 		//6
-		dd.vertex(1, 0, 1, color, 1, 1);
+		dd.vertex(1, 1, 0, color, 1, 1);
 		//7
-		dd.vertex(0, 0, 1, color, 0, 1);
+		dd.vertex(0, 1, 0, color, 0, 1);
 		//quad 2
 		//2
 		dd.vertex(2, 0, 0, color, 0, 0);
 		//3
 		dd.vertex(3, 0, 0, color, 1, 0);
 		//4
-		dd.vertex(3, 0, 1, color, 1, 1);
+		dd.vertex(3, 1, 0, color, 1, 1);
 		//5
-		dd.vertex(2, 0, 1, color, 0, 1);
+		dd.vertex(2, 1, 0, color, 0, 1);
 	}
 	///-->
 
