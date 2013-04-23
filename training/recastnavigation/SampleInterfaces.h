@@ -101,13 +101,19 @@ protected:
 	bool m_depthMask;
 	///Texture.
 	bool m_texture;
-	///The current GeomPrimitive.
+	///The current GeomPrimitive and draw type.
 	SMARTPTR(GeomPrimitive) m_geomPrim;
+	duDebugDrawPrimitives m_prim;
 	///The current Geom and index.
 	SMARTPTR(Geom) m_geom;
 	int m_geomIdx;
 	///The current GeomNode node path.
 	NodePath m_geomNodeNP;
+	///QUADS stuff.
+	int m_quadCurrIdx;
+	LVector3f m_quadFirstVertex, m_quadThirdVertex;
+	LVector4f m_quadFirstColor, m_quadThirdColor;
+	LVector2f m_quadFirstUV, m_quadThirdUV;
 public:
 	DebugDrawPanda3d(NodePath render);
 	virtual ~DebugDrawPanda3d();
