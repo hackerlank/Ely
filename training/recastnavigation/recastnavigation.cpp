@@ -70,19 +70,19 @@ std::string meshNameObj("nav_test_panda.obj");
 LPoint3f agentPos(-1.17141, 8.40892, 8.23602);
 
 ///eve actor
-//std::string actorFile("data/models/eve.bam");
-//std::string anim0File("data/models/eve-walk.bam");
-//std::string anim1File("data/models/eve-run.bam");
-//const float agentMaxSpeed = 1.5;
-//const float rateFactor = 1.25;
-//const float actorScale = 0.4;
+std::string actorFile("data/models/eve.bam");
+std::string anim0File("data/models/eve-walk.bam");
+std::string anim1File("data/models/eve-run.bam");
+const float agentMaxSpeed = 1.5;
+const float rateFactor = 1.25;
+const float actorScale = 0.4;
 
 ///guy actor
-std::string actorFile("data/models/guy.bam");
-std::string anim0File("data/models/guy-walk.bam");
-const float agentMaxSpeed = 2.0;
-const float rateFactor = 2.00;
-const float actorScale = 0.1;
+//std::string actorFile("data/models/guy.bam");
+//std::string anim0File("data/models/guy-walk.bam");
+//const float agentMaxSpeed = 2.0;
+//const float rateFactor = 2.00;
+//const float actorScale = 0.1;
 
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
@@ -192,7 +192,9 @@ int main(int argc, char **argv)
 //			m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(),
 //			0, 1.0f);
 	dtNavMesh* m_navMesh = rn->getSampleSolo()->getNavMesh();
-	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_OFFMESHCONS);
+//	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_OFFMESHCONS);
+//	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_CLOSEDLIST);
+	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_COLOR_TILES);
 #endif
 
 	//set ai update task

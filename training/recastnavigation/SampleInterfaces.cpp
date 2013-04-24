@@ -267,14 +267,9 @@ void DebugDrawGL::end()
 
 DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
 		m_render(render),
-		m_vertexData(new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
-						Geom::UH_static)),
-		m_vertex(GeomVertexWriter(m_vertexData, "vertex")),
-		m_color(GeomVertexWriter(m_vertexData, "color")),
-		m_texcoord(GeomVertexWriter(m_vertexData, "texcoord")),
-		m_vertexIdx(0),
 		m_depthMask(true),
 		m_texture(true),
+		m_vertexIdx(0),
 		m_prim(DU_DRAW_TRIS),
 		m_geomIdx(0)
 {
@@ -296,6 +291,11 @@ void DebugDrawPanda3d::texture(bool state)
 
 void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 {
+	m_vertexData = new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
+					Geom::UH_static);
+	m_vertex = GeomVertexWriter(m_vertexData, "vertex");
+	m_color = GeomVertexWriter(m_vertexData, "color");
+	m_texcoord = GeomVertexWriter(m_vertexData, "texcoord");
 	switch (prim)
 	{
 	case DU_DRAW_POINTS:
@@ -313,9 +313,6 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 		break;
 	};
 	m_prim = prim;
-	m_vertex.set_row(0);
-	m_color.set_row(0);
-	m_texcoord.set_row(0);
 	m_vertexIdx = 0;
 }
 
@@ -422,7 +419,7 @@ void DebugDrawPanda3d::end()
 	m_geomNodeNP = NodePath(new GeomNode("geomNode" + idx.str()));
 	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
 	m_geomNodeNP.reparent_to(m_render);
-//	m_geomNodeNP.set_depth_write(m_depthMask);
+	m_geomNodeNP.set_depth_write(not m_depthMask);
 	++m_geomIdx;
 }
 

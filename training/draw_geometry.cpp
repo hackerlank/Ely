@@ -51,16 +51,16 @@ class DebugDrawPanda3d : public duDebugDraw
 protected:
 	///The render node path.
 	NodePath m_render;
-	///Creating and filling a GeomVertexData.
-	SMARTPTR(GeomVertexData) m_vertexData;
-	///Create a number of GeomVertexWriters.
-	GeomVertexWriter m_vertex, m_color, m_texcoord;
-	///The current vertex index.
-	int m_vertexIdx;
 	///Depth Mask.
 	bool m_depthMask;
 	///Texture.
 	bool m_texture;
+	///The current GeomVertexData.
+	SMARTPTR(GeomVertexData) m_vertexData;
+	///The current vertex index.
+	int m_vertexIdx;
+	///The current GeomVertexWriters.
+	GeomVertexWriter m_vertex, m_color, m_texcoord;
 	///The current GeomPrimitive and draw type.
 	SMARTPTR(GeomPrimitive) m_geomPrim;
 	duDebugDrawPrimitives m_prim;
@@ -95,14 +95,9 @@ public:
 
 DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
 		m_render(render),
-		m_vertexData(new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
-						Geom::UH_static)),
-		m_vertex(GeomVertexWriter(m_vertexData, "vertex")),
-		m_color(GeomVertexWriter(m_vertexData, "color")),
-		m_texcoord(GeomVertexWriter(m_vertexData, "texcoord")),
-		m_vertexIdx(0),
 		m_depthMask(true),
 		m_texture(true),
+		m_vertexIdx(0),
 		m_prim(DU_DRAW_TRIS),
 		m_geomIdx(0)
 {
@@ -141,6 +136,11 @@ void DebugDrawPanda3d::texture(bool state)
 
 void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 {
+	m_vertexData = new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
+					Geom::UH_static);
+	m_vertex = GeomVertexWriter(m_vertexData, "vertex");
+	m_color = GeomVertexWriter(m_vertexData, "color");
+	m_texcoord = GeomVertexWriter(m_vertexData, "texcoord");
 	switch (prim)
 	{
 	case DU_DRAW_POINTS:
@@ -158,9 +158,6 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 		break;
 	};
 	m_prim = prim;
-	m_vertex.set_row(0);
-	m_color.set_row(0);
-	m_texcoord.set_row(0);
 	m_vertexIdx = 0;
 }
 
@@ -301,14 +298,15 @@ int draw_geometry_main(int argc, char *argv[])
 	primType = DU_DRAW_TRIS;
 //	primType = DU_DRAW_QUADS;
 
+	unsigned int color;
+
+	///prim 1
 	///<!--begin
 	dd.begin(primType);
 	///-->
-
 	///<!--vertex
 	//Add data
-	unsigned int color = 0xFFFF00FF;
-
+	color = 0xFFFF00FF;
 	if (primType != DU_DRAW_QUADS)
 	{
 		//triangle 1
@@ -355,10 +353,51 @@ int draw_geometry_main(int argc, char *argv[])
 		dd.vertex(2, 1, 0, color, 0, 1);
 	}
 	///-->
-
 	///<!--end
 	dd.end();
 	///-->
+
+	///prim 2
+	///<!--begin
+	dd.begin(primType);
+	///-->
+	///<!--vertex
+	//Add data
+	color = 0x00FF00FF;
+	if (primType != DU_DRAW_QUADS)
+	{
+		//triangle 1
+		//0
+		dd.vertex(0, 0, 0, color, 0, 0);
+		//6
+		dd.vertex(1, 1, 0, color, 1, 1);
+		//7
+		dd.vertex(0, 1, 0, color, 0, 1);
+		//triangle 2
+		//2
+		dd.vertex(2, 0, 0, color, 0, 0);
+		//4
+		dd.vertex(3, 1, 0, color, 1, 1);
+		//5
+		dd.vertex(2, 1, 0, color, 0, 1);
+	}
+	else
+	{
+		//quad 1
+		//1
+		dd.vertex(1, 0, 0, color, 0, 0);
+		//2
+		dd.vertex(2, 0, 0, color, 1, 0);
+		//5
+		dd.vertex(2, 1, 0, color, 1, 1);
+		//6
+		dd.vertex(1, 1, 0, color, 0, 1);
+	}
+	///-->
+	///<!--end
+	dd.end();
+	///-->
+
 #else
 	SMARTPTR(GeomVertexData) vertexData;
 	SMARTPTR(GeomTriangles) prim;

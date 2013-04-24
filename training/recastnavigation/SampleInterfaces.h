@@ -91,16 +91,16 @@ class DebugDrawPanda3d : public duDebugDraw
 protected:
 	///The render node path.
 	NodePath m_render;
-	///Creating and filling a GeomVertexData.
-	SMARTPTR(GeomVertexData) m_vertexData;
-	///Create a number of GeomVertexWriters.
-	GeomVertexWriter m_vertex, m_color, m_texcoord;
-	///The current vertex index.
-	int m_vertexIdx;
 	///Depth Mask.
 	bool m_depthMask;
 	///Texture.
 	bool m_texture;
+	///The current GeomVertexData.
+	SMARTPTR(GeomVertexData) m_vertexData;
+	///The current vertex index.
+	int m_vertexIdx;
+	///The current GeomVertexWriters.
+	GeomVertexWriter m_vertex, m_color, m_texcoord;
 	///The current GeomPrimitive and draw type.
 	SMARTPTR(GeomPrimitive) m_geomPrim;
 	duDebugDrawPrimitives m_prim;
