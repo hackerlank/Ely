@@ -104,16 +104,20 @@ protected:
 	///The current GeomPrimitive and draw type.
 	SMARTPTR(GeomPrimitive) m_geomPrim;
 	duDebugDrawPrimitives m_prim;
-	///The current Geom and index.
+	///The current Geom.
 	SMARTPTR(Geom) m_geom;
-	int m_geomIdx;
 	///The current GeomNode node path.
 	NodePath m_geomNodeNP;
+	///The GeomNodes' node paths.
+	std::vector<NodePath> m_geomNodeNPCollection;
 	///QUADS stuff.
 	int m_quadCurrIdx;
 	LVector3f m_quadFirstVertex, m_quadThirdVertex;
 	LVector4f m_quadFirstColor, m_quadThirdColor;
 	LVector2f m_quadFirstUV, m_quadThirdUV;
+
+	///The (reentrant) mutex associated with this manager.
+	ReMutex mMutex;
 
 private:
 	///Helper
@@ -131,6 +135,15 @@ public:
 	virtual void vertex(const float* pos, unsigned int color, const float* uv);
 	virtual void vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v);
 	virtual void end();
+
+	NodePath getGeomNode(int i);
+	void removeGeomNodes();
+
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex.
+	 */
+	ReMutex& getMutex();
 };
 
 inline float red(unsigned int color)

@@ -39,8 +39,9 @@ rn_common_sources = \
 		recastnavigation/ChunkyTriMesh.cpp \
 		recastnavigation/Sample.cpp \
 		recastnavigation/Sample_SoloMesh.cpp \
+		recastnavigation/Sample_TileMesh.cpp \
 		recastnavigation/ValueHistory.cpp \
-		recastnavigation/Raycaster.cpp
+		$(top_srcdir)/src/Support/Raycaster.cpp
 		
 rn_common_CPPFLAGS = \
 		-I$(rn_path)/DebugUtils/Include \

@@ -15,9 +15,9 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/recastnavigation/Raycaster.h
+ * \file /Ely/include/Support/Raycaster.h
  *
- * \date 29/mar/2013 (18:03:35)
+ * \date 28/apr/2013 (12:50:35)
  * \author marco
  */
 
@@ -38,26 +38,51 @@
 #include <bulletRigidBodyNode.h>
 #include <mouseWatcher.h>
 
-//Raycaster
+/**
+ * \brief A singleton class for ray casting.
+ *
+ * It registers up to N ray casting callbacks, whose signatures are:
+ *\code
+ * 	void CALLBACK(Raycaster*, void*);
+ * \endcode
+ *
+ * \note Bullet based.
+ */
 class Raycaster: public Singleton<Raycaster>
 {
 public:
+	/**
+	 * \brief The constructor.
+	 *
+	 * \note N is the max number of callbacks (default to 3 for LMR-mouse clicks).
+	 */
 	Raycaster(PandaFramework* app, WindowFramework* window,
-			SMARTPTR(BulletWorld)world,	const std::string& pickKeyOn,
-			const std::string& pickKeyOff, BitMask32 bitMask = BitMask32::all_on());
+			SMARTPTR(BulletWorld)world, int N = 3);
 	virtual ~Raycaster();
 
-	void setHitCallback(void (*callback)(Raycaster*, void*), void* data)
-	{
-		mCallback = callback;
-		mData = data;
-	}
-	std::string getHitNode(){return mHitNode;}
-	LPoint3f getHitPos(){return mHitPos;}
-	LPoint3f getFromPos(){return mFromPos;}
-	LPoint3f getToPos(){return mToPos;}
-	LVector3f getHitNormal(){return mHitNormal;}
-	float getHitFraction(){return mHitFraction;}
+	/**
+	 * \brief Set the i-th callback for ray casting.
+	 *
+	 * @param i The callback index.
+	 * @param callback The i-th callback.
+	 * @param data The data associated with the i-th callback.
+	 * @param hitKey The key for ray casting.
+	 * @param bitMask The Bullet collision mask of the ray.
+	 */
+	void setHitCallback(int i, void (*callback)(Raycaster*, void*), void* data,
+			const std::string& hitKey, BitMask32 bitMask = BitMask32::all_on());
+
+	/**
+	 * \name Functions returning the last ray cast hit results.
+	 */
+	///@{
+	std::string getHitNode();
+	LPoint3f getHitPos();
+	LPoint3f getFromPos();
+	LPoint3f getToPos();
+	LVector3f getHitNormal();
+	float getHitFraction();
+	///@}
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -81,17 +106,20 @@ private:
 	LPoint3f mHitPos, mFromPos, mToPos;
 	LVector3f mHitNormal;
 	float mHitFraction;
-	///Hit callback.
-	void (*mCallback)(Raycaster*, void*);
-	void* mData;
-	BitMask32 mBitMask;
+	///The max number of callbacks.
+	int m_N;
+	///Hit callbacks.
+	typedef void (*RaycasterCallback)(Raycaster*, void*);
+	std::vector<RaycasterCallback> mCallback;
+	std::vector<void*>  mData;
+	std::vector<BitMask32> mBitMask;
 	/**
 	 * \name Hit body event callback data.
 	 */
 	///@{
-	SMARTPTR(EventCallbackInterface<Raycaster>::EventCallbackData) mPickBodyData;
+	std::vector<SMARTPTR(EventCallbackInterface<Raycaster>::EventCallbackData)> mHitBodyData;
 	void hitBody(const Event* event);
-	std::string mPickKeyOn, mPickKeyOff;
+	std::vector<std::string> mHitKey;
 	///@}
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

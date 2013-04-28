@@ -92,7 +92,7 @@ void BuildContext::dumpLog(const char* format, ...)
 	vprintf(format, ap);
 	va_end(ap);
 	printf("\n");
-	
+
 	// Print messages
 	const int TAB_STOPS[4] = { 28, 36, 44, 52 };
 	for (int i = 0; i < m_messageCount; ++i)
@@ -270,27 +270,37 @@ DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
 		m_depthMask(true),
 		m_texture(true),
 		m_vertexIdx(0),
-		m_prim(DU_DRAW_TRIS),
-		m_geomIdx(0)
+		m_prim(DU_DRAW_TRIS)
 {
 }
 
 DebugDrawPanda3d::~DebugDrawPanda3d()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
 }
 
 void DebugDrawPanda3d::depthMask(bool state)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	m_depthMask = state;
 }
 
 void DebugDrawPanda3d::texture(bool state)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	m_texture = state;
 }
 
 void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	m_vertexData = new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
 					Geom::UH_static);
 	m_vertex = GeomVertexWriter(m_vertexData, "vertex");
@@ -385,18 +395,27 @@ void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
 
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
 
 void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
 
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(uv[0], uv[1]));
@@ -404,6 +423,9 @@ void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float*
 
 void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(u, v));
@@ -411,16 +433,48 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsig
 
 void DebugDrawPanda3d::end()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	m_geomPrim->close_primitive();
 	m_geom = new Geom(m_vertexData);
 	m_geom->add_primitive(m_geomPrim);
 	ostringstream idx;
-	idx << m_geomIdx;
-	m_geomNodeNP = NodePath(new GeomNode("geomNode" + idx.str()));
+	idx << m_geomNodeNPCollection.size();
+	m_geomNodeNP = NodePath(new GeomNode("DebugDrawPanda3d_GeomNode_" + idx.str()));
 	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
 	m_geomNodeNP.reparent_to(m_render);
-	m_geomNodeNP.set_depth_write(not m_depthMask);
-	++m_geomIdx;
+	m_geomNodeNP.set_depth_write(m_depthMask);
+	//add to geom node paths.
+	m_geomNodeNPCollection.push_back(m_geomNodeNP);
+}
+
+
+NodePath DebugDrawPanda3d::getGeomNode(int i)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return m_geomNodeNPCollection[i];
+}
+
+void DebugDrawPanda3d::removeGeomNodes()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	std::vector<NodePath>::iterator iter;
+	for (iter = m_geomNodeNPCollection.begin();
+			iter != m_geomNodeNPCollection.end(); ++iter)
+	{
+		(*iter).remove_node();
+	}
+	m_geomNodeNPCollection.clear();
+}
+
+ReMutex& DebugDrawPanda3d::getMutex()
+{
+	return mMutex;
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -477,5 +531,3 @@ bool FileIO::read(void* ptr, const size_t size)
 	fread(ptr, size, 1, m_fp);
 	return true;
 }
-
-

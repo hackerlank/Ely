@@ -15,6 +15,6 @@ int main(int argc, char **argv)
 //	result = physics_main(argc, argv);
 //	result = threads_main(argc, argv);
 //	result = manual_example_main(argc, argv);
-	result = draw_geometry_main(argc, argv);
+//	result = draw_geometry_main(argc, argv);
 	return result;
 }

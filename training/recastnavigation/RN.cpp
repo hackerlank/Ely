@@ -93,6 +93,7 @@ void Agent::updateVel(const float* p, const float* v)
 				m_vel, false);
 		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
+		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())
 		{
 			m_anims->get_anim(0)->loop(false);
@@ -104,7 +105,7 @@ void Agent::updateVel(const float* p, const float* v)
 				LVector3f::zero(), false);
 		if (m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(0)->pose(0);
+//			m_anims->get_anim(0)->pose(0);
 			m_anims->get_anim(0)->stop();
 		}
 	}
@@ -114,10 +115,13 @@ void Agent::updateVel(const float* p, const float* v)
 ////////////////////////////////////////////////////////////////////
 
 RN::RN() :
-		m_geom(0)
+		m_meshName(""),
+		m_geom(0),
+		m_ctx(new BuildContext),
+		m_currentSample(0),
+		m_crowdTool(0),
+		m_agents()
 {
-	//Sample
-	m_ctx = new BuildContext;
 }
 
 RN::~RN()
@@ -130,7 +134,7 @@ RN::~RN()
 	delete m_ctx;
 }
 
-bool RN::loadMesh(const std::string& path, const std::string& meshName)
+bool RN::loadGeomMesh(const std::string& path, const std::string& meshName)
 {
 	bool result = true;
 	m_geom = new InputGeom;
@@ -145,21 +149,21 @@ bool RN::loadMesh(const std::string& path, const std::string& meshName)
 	return result;
 }
 
-void RN::createSoloMesh()
+void RN::createGeomMesh(Sample* currentSample)
 {
 	//create sample
-	m_sampleSolo = new Sample_SoloMesh();
+	m_currentSample = currentSample;
 	//set rcContext
-	m_sampleSolo->setContext(m_ctx);
+	m_currentSample->setContext(m_ctx);
 	//handle Mesh Changed
-	m_sampleSolo->handleMeshChanged(m_geom);
+	m_currentSample->handleMeshChanged(m_geom);
 }
 
 bool RN::buildNavMesh()
 {
 	m_ctx->resetLog();
 	//build navigation mesh
-	bool result = m_sampleSolo->handleBuild();
+	bool result = m_currentSample->handleBuild();
 	m_ctx->dumpLog("Build log %s:", m_meshName.c_str());
 	return result;
 }
@@ -171,19 +175,22 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 
 	RN* thisInst = reinterpret_cast<RN*>(data);
 
-	std::list<Agent*>::iterator iter;
-	dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
-
-	//update crowd agents' pos/vel
-	thisInst->m_sampleSolo->handleUpdate(dt);
-
-	//post-update all agent positions
-	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
-			++iter)
+	if(thisInst->m_crowdTool)
 	{
-		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
-		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
-		(*iter)->updatePosDir(pos, vel);
+		std::list<Agent*>::iterator iter;
+		dtCrowd* crowd = thisInst->m_crowdTool->getState()->getCrowd();
+
+		//update crowd agents' pos/vel
+		thisInst->m_currentSample->handleUpdate(dt);
+
+		//post-update all agent positions
+		for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
+				++iter)
+		{
+			const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
+			const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
+			(*iter)->updatePosDir(pos, vel);
+		}
 	}
 	return AsyncTask::DS_again;
 }
@@ -205,7 +212,7 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 	}
 
 	//update crowd agents' pos/vel
-	thisInst->m_sampleSolo->handleUpdate(dt);
+	thisInst->m_currentSample->handleUpdate(dt);
 
 	//post-update all agent positions
 	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
@@ -223,13 +230,13 @@ void RN::setCrowdTool()
 {
 	//set CrowdTool
 	m_crowdTool = new CrowdTool;
-	m_sampleSolo->setTool(m_crowdTool);
+	m_currentSample->setTool(m_crowdTool);
 }
 
 int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 		float agentMaxSpeed, AnimControlCollection* anims, BulletConstraint* cs,
 		BulletWorld* world,
-		float maxError, float radius)
+		float maxError, float radius, float height)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -251,7 +258,11 @@ int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 	else
 	{
 		//set Agent pos
+#ifndef WITHCHARACTER
 		pandaNP.set_pos(pos);
+#else
+		pandaNP.set_pos(pos + LVector3f(0, 0, (height / 2.0) * 1.1));
+#endif
 	}
 	//add Agent to list
 	m_agents.push_back(agent);
@@ -273,12 +284,12 @@ Agent* RN::getCrowdAgent(int idx)
 
 void RN::setSettings(const SampleSettings& settings)
 {
-	m_sampleSolo->setSampleSettings(settings);
+	m_currentSample->setSampleSettings(settings);
 }
 
 SampleSettings RN::getSettings()
 {
-	return m_sampleSolo->getSampleSettings();
+	return m_currentSample->getSampleSettings();
 }
 
 void RN::setCrowdTarget(LPoint3f pos)

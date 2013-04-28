@@ -43,7 +43,7 @@
 #endif
 
 
-Sample_SoloMesh::Sample_SoloMesh() :
+Sample_SoloMesh::Sample_SoloMesh(NodePath renderDebug) :
 	m_keepInterResults(true),
 	m_totalBuildTimeMs(0),
 	m_triareas(0),
@@ -52,7 +52,8 @@ Sample_SoloMesh::Sample_SoloMesh() :
 	m_cset(0),
 	m_pmesh(0),
 	m_dmesh(0),
-	m_drawMode(DRAWMODE_NAVMESH)
+	m_drawMode(DRAWMODE_NAVMESH),
+	dd(renderDebug)
 {
 //	setTool(new NavMeshTesterTool);
 }
@@ -212,19 +213,21 @@ void Sample_SoloMesh::handleDebugMode()
 
 void Sample_SoloMesh::handleRender()
 {
-//	if (!m_geom || !m_geom->getMesh())
-//		return;
-//
+	if (!m_geom || !m_geom->getMesh())
+		return;
+
 //	DebugDrawGL dd;
-//
+	dd.removeGeomNodes();
+
 //	glEnable(GL_FOG);
 //	glDepthMask(GL_TRUE);
-//
+//	dd.depthMask(true);
+
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
-//
+
 //	if (m_drawMode != DRAWMODE_NAVMESH_TRANS)
 //	{
-//		// Draw mesh
+		// Draw mesh
 //		duDebugDrawTriMeshSlope(&dd, m_geom->getMesh()->getVerts(), m_geom->getMesh()->getVertCount(),
 //								m_geom->getMesh()->getTris(), m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(),
 //								m_agentMaxSlope, texScale);
@@ -233,15 +236,16 @@ void Sample_SoloMesh::handleRender()
 //
 //	glDisable(GL_FOG);
 //	glDepthMask(GL_FALSE);
-//
-//	// Draw bounds
-//	const float* bmin = m_geom->getMeshBoundsMin();
-//	const float* bmax = m_geom->getMeshBoundsMax();
-//	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
-//	dd.begin(DU_DRAW_POINTS, 5.0f);
-//	dd.vertex(bmin[0],bmin[1],bmin[2],duRGBA(255,255,255,128));
-//	dd.end();
-//
+	dd.depthMask(false);
+
+	// Draw bounds
+	const float* bmin = m_geom->getMeshBoundsMin();
+	const float* bmax = m_geom->getMeshBoundsMax();
+	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
+	dd.begin(DU_DRAW_POINTS, 5.0f);
+	dd.vertex(bmin[0],bmin[1],bmin[2],duRGBA(255,255,255,128));
+	dd.end();
+
 //	if (m_navMesh && m_navQuery &&
 //		(m_drawMode == DRAWMODE_NAVMESH ||
 //		m_drawMode == DRAWMODE_NAVMESH_TRANS ||
@@ -250,16 +254,17 @@ void Sample_SoloMesh::handleRender()
 //		m_drawMode == DRAWMODE_NAVMESH_INVIS))
 //	{
 //		if (m_drawMode != DRAWMODE_NAVMESH_INVIS)
-//			duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+			duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
 //		if (m_drawMode == DRAWMODE_NAVMESH_BVTREE)
 //			duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
 //		if (m_drawMode == DRAWMODE_NAVMESH_NODES)
 //			duDebugDrawNavMeshNodes(&dd, *m_navQuery);
-//		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, SAMPLE_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
 //	}
 //
 //	glDepthMask(GL_TRUE);
-//
+	dd.depthMask(true);
+
 //	if (m_chf && m_drawMode == DRAWMODE_COMPACT)
 //		duDebugDrawCompactHeightfieldSolid(&dd, *m_chf);
 //
@@ -318,14 +323,15 @@ void Sample_SoloMesh::handleRender()
 //		duDebugDrawPolyMeshDetail(&dd, *m_dmesh);
 //		glDepthMask(GL_TRUE);
 //	}
-//
+
 //	m_geom->drawConvexVolumes(&dd);
-//
+
 //	if (m_tool)
 //		m_tool->handleRender();
 //	renderToolStates();
 //
 //	glDepthMask(GL_TRUE);
+//	dd.depthMask(true);
 }
 
 void Sample_SoloMesh::handleRenderOverlay(double* proj, double* model, int* view)

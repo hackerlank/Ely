@@ -60,11 +60,13 @@ protected:
 	};
 	
 	DrawMode m_drawMode;
+
+	DebugDrawPanda3d dd;
 	
 	void cleanup();
 		
 public:
-	Sample_SoloMesh();
+	Sample_SoloMesh(NodePath renderDebug = NodePath());
 	virtual ~Sample_SoloMesh();
 	
 	rcConfig& getConfig()

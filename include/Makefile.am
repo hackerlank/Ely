@@ -39,6 +39,7 @@ noinst_HEADERS =\
 		Support/FirstPersonCamera.h \
 		Support/FSM.h \
 		Support/Picker.h \
+		Support/Raycaster.h \
 		Support/Distributed/ClientRepositoryBase.h \
 		Support/Distributed/DistributedObjectBase.h \
 		Utilities/ComponentSuite.h \

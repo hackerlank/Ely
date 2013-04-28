@@ -22,6 +22,7 @@
  */
 
 #include "Utilities/Tools.h"
+#include "Support/Raycaster.h"
 #include <unistd.h>
 #include <cctype>
 #include <cmath>
@@ -44,11 +45,10 @@
 #include <bulletSphericalConstraint.h>
 #include <bulletCylinderShape.h>
 #include <mouseWatcher.h>
-#include "Raycaster.h"
 
 #include "RN.h"
 
-#define DD
+#define DEBUG_DRAW
 
 //Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
@@ -67,22 +67,22 @@ std::string rnDir(
 ///nav_test
 std::string meshNameEgg("nav_test_panda.egg");
 std::string meshNameObj("nav_test_panda.obj");
-LPoint3f agentPos(-1.17141, 8.40892, 8.23602);
+LPoint3f agentPos(4.19123, 9.90642, 8.23602);
 
 ///eve actor
-std::string actorFile("data/models/eve.bam");
-std::string anim0File("data/models/eve-walk.bam");
-std::string anim1File("data/models/eve-run.bam");
-const float agentMaxSpeed = 1.5;
-const float rateFactor = 1.25;
-const float actorScale = 0.4;
+//std::string actorFile("data/models/eve.bam");
+//std::string anim0File("data/models/eve-walk.bam");
+//std::string anim1File("data/models/eve-run.bam");
+//const float agentMaxSpeed = 1.5;
+//const float rateFactor = 1.25;
+//const float actorScale = 0.4;
 
 ///guy actor
-//std::string actorFile("data/models/guy.bam");
-//std::string anim0File("data/models/guy-walk.bam");
-//const float agentMaxSpeed = 2.0;
-//const float rateFactor = 2.00;
-//const float actorScale = 0.1;
+std::string actorFile("data/models/guy.bam");
+std::string anim0File("data/models/guy-walk.bam");
+const float agentMaxSpeed = 2.0;
+const float rateFactor = 2.00;
+const float actorScale = 0.1;
 
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
@@ -97,9 +97,11 @@ SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, Window
 void end(PandaFramework* panda);
 NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
 NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-		MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
+MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
 //
 void setCrowdTarget(Raycaster* raycaster, void* data);
+void buildTile(Raycaster* raycaster, void* data);
+void removeTile(Raycaster* raycaster, void* data);
 
 int main(int argc, char **argv)
 {
@@ -111,7 +113,9 @@ int main(int argc, char **argv)
 //	std::cout << allOffButZeroMask << std::endl;
 //	std::cout << (allOnButZeroMask & allOffButZeroMask) << std::endl;
 
-	///use getopt: -r(recast), -c(character), -k(kinematic with z raycast)
+///use getopt: -r(recast), -c(character), -k(kinematic with z raycast),
+///		-d(debug), -s(solo), t(tile), -o(obstacles)
+	SAMPLETYPE sampleType = SOLO;
 #ifndef WITHCHARACTER
 	MOVTYPE movType = RECAST;
 #else
@@ -120,7 +124,7 @@ int main(int argc, char **argv)
 	bool debugPhysics = false;
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "rcbkd")) != -1)
+	while ((c = getopt(argc, argv, "rcbkdsto")) != -1)
 	{
 		switch (c)
 		{
@@ -135,12 +139,21 @@ int main(int argc, char **argv)
 			movType = RIGID;
 			break;
 #else
-		case 'c':
+			case 'c':
 			movType = CHARACTER;
 			break;
 #endif
 		case 'd':
 			debugPhysics = true;
+			break;
+		case 's':
+			sampleType = SOLO;
+			break;
+		case 't':
+			sampleType = TILE;
+			break;
+		case 'o':
+			sampleType = OBSTACLE;
 			break;
 		case '?':
 			if (isprint(optopt))
@@ -157,20 +170,66 @@ int main(int argc, char **argv)
 	WindowFramework* window;
 	SMARTPTR(BulletWorld)mBulletWorld = start(&panda, argc, argv, &window, debugPhysics);
 
+#ifdef DEBUG_DRAW
+	//set a debug node path
+	NodePath renderDebug = window->get_render().attach_new_node("renderDebug");
+	renderDebug.set_bin("fixed",100);
+	//set transparency attrib on render
+//	renderDebug.set_transparency(TransparencyAttrib::M_alpha);
+#endif
+
 	//Create world mesh
 	NodePath worldMesh = createWorldMesh(mBulletWorld, window);
+//	worldMesh.hide();
+
+	//create a global ray caster
+	new Raycaster(panda, window, mBulletWorld);
 
 	//Create agent
 	float agentRadius, agentHeight;
 	BulletConstraint* cs = NULL;
-	NodePath character = createAgent(mBulletWorld, window, movType, agentRadius, agentHeight, &cs);
+	NodePath character = createAgent(mBulletWorld, window, movType, agentRadius,
+			agentHeight, &cs);
 
 	///RN common
 	RN* rn = new RN();
-	//load mesh
-	rn->loadMesh(rnDir, meshNameObj);
-	//create solo mesh crowd sample
-	rn->createSoloMesh();
+	//load geometry mesh
+	rn->loadGeomMesh(rnDir, meshNameObj);
+
+	TileSettings tileSettings;
+
+	//create nav mesh
+	switch (sampleType)
+	{
+	case SOLO:
+#ifdef DEBUG_DRAW
+		rn->createGeomMesh(new Sample_SoloMesh(renderDebug));
+#else
+		rn->createGeomMesh(new Sample_SoloMesh());
+#endif
+		break;
+	case TILE:
+#ifdef DEBUG_DRAW
+		rn->createGeomMesh(new Sample_TileMesh(renderDebug));
+#else
+		rn->createGeomMesh(new Sample_TileMesh());
+#endif
+		//set tile settings
+		tileSettings =
+				dynamic_cast<Sample_TileMesh*>(rn->getSample())->getTileSettings();
+		tileSettings.m_buildAll = false;
+		tileSettings.m_tileSize = 32;
+		tileSettings.m_maxTiles = 128;
+		tileSettings.m_maxPolysPerTile = 32768;
+		dynamic_cast<Sample_TileMesh*>(rn->getSample())->setTileSettings(
+				tileSettings);
+		break;
+	case OBSTACLE:
+		break;
+	default:
+		break;
+	}
+
 	//set sample settings
 	SampleSettings settings = rn->getSettings();
 	settings.m_agentRadius = agentRadius;
@@ -178,23 +237,27 @@ int main(int argc, char **argv)
 	settings.m_agentMaxSlope = 60.0;
 	settings.m_agentMaxClimb = 2.5;
 	settings.m_cellSize = 0.3;
-	settings.m_cellHeight = 0.1;
+	settings.m_cellHeight = 0.2;
 	rn->setSettings(settings);
+
 	//build navigation mesh
 	rn->buildNavMesh();
 
-#ifdef DD
-	DebugDrawPanda3d dd(window->get_render());
-	// Draw mesh
-//	InputGeom* m_geom = rn->getSampleSolo()->getInputGeom();
-//	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(),
-//			m_geom->getMesh()->getVertCount(), m_geom->getMesh()->getTris(),
-//			m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(),
-//			0, 1.0f);
-	dtNavMesh* m_navMesh = rn->getSampleSolo()->getNavMesh();
-//	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_OFFMESHCONS);
-//	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_CLOSEDLIST);
-	duDebugDrawNavMesh(&dd, *m_navMesh, DU_DRAWNAVMESH_COLOR_TILES);
+	if (sampleType == TILE)
+	{
+		//build first tile around agent pos
+		float pos[3];
+		LVecBase3fToRecast(agentPos, pos);
+		dynamic_cast<Sample_TileMesh*>(rn->getSample())->buildTile(pos);
+		//set buildTile/removeTile callbacks
+		Raycaster::GetSingletonPtr()->setHitCallback(2, buildTile,
+				reinterpret_cast<void*>(rn), "shift-mouse3", BitMask32::all_on());
+		Raycaster::GetSingletonPtr()->setHitCallback(1, removeTile,
+				reinterpret_cast<void*>(rn), "shift-mouse2", BitMask32::all_on());
+	}
+
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
 #endif
 
 	//set ai update task
@@ -209,7 +272,7 @@ int main(int argc, char **argv)
 				reinterpret_cast<void*>(rn));
 		break;
 #else
-	case CHARACTER:
+		case CHARACTER:
 		task = new GenericAsyncTask("ai update", &RN::ai_updateCHARACTER,
 				reinterpret_cast<void*>(rn));
 		break;
@@ -224,21 +287,19 @@ int main(int argc, char **argv)
 	//set crowd tool
 	rn->setCrowdTool();
 	//add agent
-//	float maxError = rn->getSampleSolo()->getConfig().detailSampleMaxError;
+//	float maxError = rn->getSample()->getConfig().detailSampleMaxError;
 	float maxError = agentHeight;
 	int agentIdx = rn->addCrowdAgent(movType, character, agentPos,
-			agentMaxSpeed, &rn_anim_collection, cs,
-			mBulletWorld.p(), maxError, agentRadius);
+			agentMaxSpeed, &rn_anim_collection, cs, mBulletWorld.p(), maxError,
+			agentRadius, agentHeight);
 	//add a crowd raycaster
-//	new Raycaster(panda, window, mBulletWorld,
-//			"shift-mouse1", "mouse1-up", allOffButZeroMask);
-//	new Raycaster(panda, window, mBulletWorld,
-//			"shift-mouse1", "mouse1-up", allOnButZeroMask);
-	new Raycaster(panda, window, mBulletWorld,
-			"shift-mouse1", "mouse1-up", BitMask32::all_on());
-	//re-target
-	Raycaster::GetSingletonPtr()->setHitCallback(setCrowdTarget,
-			reinterpret_cast<void*>(rn));
+//	Raycaster::GetSingletonPtr()->setHitCallback(0, allOffButZeroMask,
+//			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
+//	Raycaster::GetSingletonPtr()->setHitCallback(0, allOnButZeroMask,
+//			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
+	//crowd re-target
+	Raycaster::GetSingletonPtr()->setHitCallback(0, setCrowdTarget,
+			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
 
 #ifdef TESTANOMALIES
 	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);
@@ -249,7 +310,7 @@ int main(int argc, char **argv)
 	agentData->agent = rn->getCrowdAgent(agentIdx);
 	agentData->member = AgentData::VEL;
 	task = new GenericAsyncTask("POST AI", &print_data,
-				reinterpret_cast<void*>(agentData));
+			reinterpret_cast<void*>(agentData));
 	task->set_sort(AI_TASK_SORT + 1);
 	panda->get_task_mgr().add(task);
 	//print_data pre physics
@@ -258,7 +319,7 @@ int main(int argc, char **argv)
 	agentData->agent = rn->getCrowdAgent(agentIdx);
 	agentData->member = AgentData::POS;
 	task = new GenericAsyncTask("PRE PHYSICS", &print_data,
-				reinterpret_cast<void*>(agentData));
+			reinterpret_cast<void*>(agentData));
 	task->set_sort(PHYSICS_TASK_SORT - 1);
 	panda->get_task_mgr().add(task);
 	//print_data post physics
@@ -267,12 +328,12 @@ int main(int argc, char **argv)
 	agentData->agent = rn->getCrowdAgent(agentIdx);
 	agentData->member = AgentData::POS;
 	task = new GenericAsyncTask("POST PHYSICS", &print_data,
-				reinterpret_cast<void*>(agentData));
+			reinterpret_cast<void*>(agentData));
 	task->set_sort(PHYSICS_TASK_SORT + 1);
 	panda->get_task_mgr().add(task);
 	//
 	task = new GenericAsyncTask("DELIMITER", &print_data,
-				reinterpret_cast<void*>(NULL));
+			reinterpret_cast<void*>(NULL));
 	task->set_sort(PHYSICS_TASK_SORT + 2);
 	panda->get_task_mgr().add(task);
 #endif
@@ -450,7 +511,7 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 }
 
 NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-		MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs)
+MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs)
 {
 	NodePath playerNP;
 	//Load the Actor Model
@@ -478,17 +539,17 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 #ifndef WITHCHARACTER
 	switch (movType)
 	{
-	case RECAST:
+		case RECAST:
 		Actor.reparent_to(window->get_render());
 		playerNP = Actor;
 		break;
-	case KINEMATIC:
+		case KINEMATIC:
 		//https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/physics/recastnavigation/NzK6yGUXqXs/6mT6P-Nu89sJ
 		//Add kinematic character
 		playerNP = NodePath(new BulletRigidBodyNode("kinematic"));
 		DCAST(BulletRigidBodyNode, playerNP.node())->
-				add_shape(new BulletCylinderShape(agentRadius, agentHeight, Z_up),
-						TransformState::make_pos(LPoint3f(0, 0, agentHeight / 2.0)));
+		add_shape(new BulletCylinderShape(agentRadius, agentHeight, Z_up),
+				TransformState::make_pos(LPoint3f(0, 0, agentHeight / 2.0)));
 		playerNP.set_collide_mask(allOffButZeroMask);
 //		playerNP.set_collide_mask(BitMask32::all_on());
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_mass(0.0);
@@ -501,13 +562,13 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 		Actor.reparent_to(playerNP);
 		playerNP.reparent_to(window->get_render());
 		break;
-	case RIGID:
+		case RIGID:
 		//https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/physics/recastnavigation/NzK6yGUXqXs/6mT6P-Nu89sJ
 		//Add rigid body
 		playerNP = NodePath(new BulletRigidBodyNode("rigid_body"));
 		DCAST(BulletRigidBodyNode, playerNP.node())->
-				add_shape(new BulletCylinderShape(agentRadius, agentHeight, Z_up),
-						TransformState::make_pos(LPoint3f(0, 0, agentHeight / 2.0)));
+		add_shape(new BulletCylinderShape(agentRadius, agentHeight, Z_up),
+				TransformState::make_pos(LPoint3f(0, 0, agentHeight / 2.0)));
 		playerNP.set_collide_mask(BitMask32::all_on());
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_mass(1.0);
 		DCAST(BulletRigidBodyNode, playerNP.node())->set_kinematic(false);
@@ -522,19 +583,19 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 		Actor.reparent_to(playerNP);
 		playerNP.reparent_to(window->get_render());
 		break;
-	default:
+		default:
 		break;
 	}
 #else
 	switch (movType)
 	{
-	case CHARACTER:
+		case CHARACTER:
 		//https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/physics/recastnavigation/NzK6yGUXqXs/6mT6P-Nu89sJ
 		//Add character controller
 		playerNP = NodePath(new BulletCharacterControllerNode(
 						new BulletCylinderShape(agentRadius, agentHeight, Z_up), 0.4, "NPCAgent"));
 		playerNP.set_collide_mask(BitMask32::all_on());
-		DCAST(BulletCharacterControllerNode, playerNP.node())->set_max_slope(1.047197551);
+		DCAST(BulletCharacterControllerNode, playerNP.node())->set_max_slope(1.570796327);
 		DCAST(BulletCharacterControllerNode, playerNP.node())->set_max_jump_height(agentHeight);
 		mBulletWorld->attach(playerNP.node());
 		//attach to scene
@@ -542,7 +603,7 @@ NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 		Actor.reparent_to(playerNP);
 		playerNP.reparent_to(window->get_render());
 		break;
-	default:
+		default:
 		break;
 	}
 #endif
@@ -562,6 +623,40 @@ void setCrowdTarget(Raycaster* raycaster, void* data)
 			<< std::endl;
 }
 
+void buildTile(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	dynamic_cast<Sample_TileMesh*>(rn->getSample())->buildTile(m_hitPos);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
+void removeTile(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	dynamic_cast<Sample_TileMesh*>(rn->getSample())->removeTile(m_hitPos);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
 #ifdef TESTANOMALIES
 AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data)
 {
@@ -571,15 +666,16 @@ AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data)
 	AgentData* agentData = (AgentData*)data;
 	if (agentData)
 	{
-		switch (agentData->member) {
+		switch (agentData->member)
+		{
 			case AgentData::POS:
-				std::cout << agentData->msg << " POS " << agentData->agent->getPos() << std::endl;
-				break;
+			std::cout << agentData->msg << " POS " << agentData->agent->getPos() << std::endl;
+			break;
 			case AgentData::VEL:
-				std::cout << agentData->msg << " VEL " << agentData->agent->getVel() << std::endl;
-				break;
+			std::cout << agentData->msg << " VEL " << agentData->agent->getVel() << std::endl;
+			break;
 			default:
-				break;
+			break;
 		}
 	}
 	else

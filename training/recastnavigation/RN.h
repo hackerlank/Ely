@@ -48,6 +48,7 @@
 #include <DetourDebugDraw.h>
 #include "InputGeom.h"
 #include "Sample_SoloMesh.h"
+#include "Sample_TileMesh.h"
 #include "CrowdTool.h"
 
 //#define TESTANOMALIES
@@ -73,6 +74,12 @@ extern const float agentMaxSpeed;
 extern const float rateFactor;
 extern BitMask32 allOnButZeroMask;
 extern BitMask32 allOffButZeroMask;
+
+//Sample type
+enum SAMPLETYPE
+{
+	SOLO, TILE, OBSTACLE
+};
 
 //Movement type
 enum MOVTYPE
@@ -157,7 +164,7 @@ class RN
 	InputGeom* m_geom;
 	BuildContext* m_ctx;
 
-	Sample_SoloMesh* m_sampleSolo;
+	Sample* m_currentSample;
 
 	CrowdTool* m_crowdTool;
 
@@ -166,18 +173,19 @@ class RN
 public:
 	RN();
 	~RN();
-	CrowdTool* getNavMeshTool()
+	CrowdTool* getCrowdTool()
 	{
 		return m_crowdTool;
 	}
-	Sample_SoloMesh* getSampleSolo()
+	Sample* getSample()
 	{
-		return m_sampleSolo;
+		return m_currentSample;
 	}
 	//common
-	bool loadMesh(const std::string& path, const std::string& meshName);
+	bool loadGeomMesh(const std::string& path, const std::string& meshName);
 	bool buildNavMesh();
-	void createSoloMesh();
+	void createGeomMesh(Sample* currentSample);
+	void createTileMesh();
 	void setSettings(const SampleSettings& settings);
 	SampleSettings getSettings();
 	//ai update functions
@@ -192,7 +200,7 @@ public:
 	int addCrowdAgent(MOVTYPE movType,NodePath pandaNP, LPoint3f pos, float agentSpeed,
 			AnimControlCollection* anims = NULL,
 			BulletConstraint* cs = NULL, BulletWorld* world = NULL,
-			float maxError = 0.0, float radius = 1.0);
+			float maxError = 0.0, float radius = 1.0, float height = 1.0);
 	class CompareIdx
 	{
 		int m_idx;
@@ -208,6 +216,8 @@ public:
 	};
 	Agent* getCrowdAgent(int idx);
 	void setCrowdTarget(LPoint3f pos);
+
+	//nav mesh tile tool
 
 };
 

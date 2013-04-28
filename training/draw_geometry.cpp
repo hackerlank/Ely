@@ -21,6 +21,7 @@
  * \author marco
  */
 
+/*
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <geomVertexFormat.h>
@@ -499,7 +500,7 @@ int draw_geometry_main(int argc, char *argv[])
 	///-->
 #endif
 
-/*
+
 	//7
 //	vertex.add_data3f(0, 0, 1);
 //	color.add_data4f(0, 0, 1, 1);
@@ -521,7 +522,7 @@ int draw_geometry_main(int argc, char *argv[])
 //	prim->add_vertices(0, 1, 6);
 //	prim->add_vertices(1, 2, 5);
 //	prim->add_vertices(2, 3, 4);
-*/
+
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -529,6 +530,7 @@ int draw_geometry_main(int argc, char *argv[])
 	framework.close_framework();
 	return (0);
 }
+*/
 
 
 
