@@ -149,10 +149,11 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName)
 	return result;
 }
 
-void RN::createGeomMesh(Sample* currentSample)
+void RN::createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType)
 {
-	//create sample
+	//set sample
 	m_currentSample = currentSample;
+	m_sampleType = sampleType;
 	//set rcContext
 	m_currentSample->setContext(m_ctx);
 	//handle Mesh Changed
@@ -192,6 +193,14 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 			(*iter)->updatePosDir(pos, vel);
 		}
 	}
+	//
+	if(m_sampleType == OBSTACLE)
+	{
+		//update tile cache
+		Sample_TempObstacles* sample =
+				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
+		sample->getTileCache()->update(dt,sample->getNavMesh());
+	}
 	return AsyncTask::DS_again;
 }
 #else
@@ -221,6 +230,14 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
 		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
 		(*iter)->updateVel(pos, vel);
+	}
+	//
+	if(m_sampleType == OBSTACLE)
+	{
+		//update tile cache
+		Sample_TempObstacles* sample =
+				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
+		sample->getTileCache()->update(dt,sample->getNavMesh());
 	}
 	return AsyncTask::DS_again;
 }

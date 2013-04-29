@@ -40,6 +40,8 @@ rn_common_sources = \
 		recastnavigation/Sample.cpp \
 		recastnavigation/Sample_SoloMesh.cpp \
 		recastnavigation/Sample_TileMesh.cpp \
+		recastnavigation/Sample_TempObstacles.cpp \
+		recastnavigation/fastlz.c \
 		recastnavigation/ValueHistory.cpp \
 		$(top_srcdir)/src/Support/Raycaster.cpp
 		

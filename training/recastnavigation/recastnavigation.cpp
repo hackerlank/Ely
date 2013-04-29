@@ -48,8 +48,6 @@
 
 #include "RN.h"
 
-#define DEBUG_DRAW
-
 //Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
@@ -70,19 +68,19 @@ std::string meshNameObj("nav_test_panda.obj");
 LPoint3f agentPos(4.19123, 9.90642, 8.23602);
 
 ///eve actor
-//std::string actorFile("data/models/eve.bam");
-//std::string anim0File("data/models/eve-walk.bam");
-//std::string anim1File("data/models/eve-run.bam");
-//const float agentMaxSpeed = 1.5;
-//const float rateFactor = 1.25;
-//const float actorScale = 0.4;
+std::string actorFile("data/models/eve.bam");
+std::string anim0File("data/models/eve-walk.bam");
+std::string anim1File("data/models/eve-run.bam");
+const float agentMaxSpeed = 1.5;
+const float rateFactor = 1.25;
+const float actorScale = 0.4;
 
 ///guy actor
-std::string actorFile("data/models/guy.bam");
-std::string anim0File("data/models/guy-walk.bam");
-const float agentMaxSpeed = 2.0;
-const float rateFactor = 2.00;
-const float actorScale = 0.1;
+//std::string actorFile("data/models/guy.bam");
+//std::string anim0File("data/models/guy-walk.bam");
+//const float agentMaxSpeed = 2.0;
+//const float rateFactor = 2.00;
+//const float actorScale = 0.1;
 
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
@@ -98,10 +96,30 @@ void end(PandaFramework* panda);
 NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
 NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
+
+//CALLBACKS
+const int CALLBACKSNUM = 5;
 //
 void setCrowdTarget(Raycaster* raycaster, void* data);
+const int SET_TARGET_Idx = 0;
+std::string SET_TARGET_Key("shift-mouse1");
+//
 void buildTile(Raycaster* raycaster, void* data);
+const int BUILD_TILE_Idx = 1;
+std::string BUILD_TILE_Key("shift-mouse3");
 void removeTile(Raycaster* raycaster, void* data);
+const int REMOVE_TILE_Idx = 2;
+std::string REMOVE_TILE_Key("shift-alt-mouse3");
+//
+void addObstacle(Raycaster* raycaster, void* data);
+const int ADD_OBSTACLE_Idx = 3;
+std::string ADD_OBSTACLE_Key("shift-mouse2");
+void removeObstacle(Raycaster* raycaster, void* data);
+const int REMOVE_OBSTACLE_Idx = 4;
+std::string REMOVE_OBSTACLE_Key("shift-alt-mouse2");
+//
+
+#define DEBUG_DRAW
 
 int main(int argc, char **argv)
 {
@@ -173,7 +191,7 @@ int main(int argc, char **argv)
 #ifdef DEBUG_DRAW
 	//set a debug node path
 	NodePath renderDebug = window->get_render().attach_new_node("renderDebug");
-	renderDebug.set_bin("fixed",100);
+	renderDebug.set_bin("fixed",10);
 	//set transparency attrib on render
 //	renderDebug.set_transparency(TransparencyAttrib::M_alpha);
 #endif
@@ -196,23 +214,23 @@ int main(int argc, char **argv)
 	//load geometry mesh
 	rn->loadGeomMesh(rnDir, meshNameObj);
 
-	TileSettings tileSettings;
-
 	//create nav mesh
 	switch (sampleType)
 	{
 	case SOLO:
 #ifdef DEBUG_DRAW
-		rn->createGeomMesh(new Sample_SoloMesh(renderDebug));
+		rn->createGeomMesh(new Sample_SoloMesh(renderDebug), SOLO);
 #else
-		rn->createGeomMesh(new Sample_SoloMesh());
+		rn->createGeomMesh(new Sample_SoloMesh(), SOLO);
 #endif
 		break;
 	case TILE:
+	{
+		TileSettings tileSettings;
 #ifdef DEBUG_DRAW
-		rn->createGeomMesh(new Sample_TileMesh(renderDebug));
+		rn->createGeomMesh(new Sample_TileMesh(renderDebug), TILE);
 #else
-		rn->createGeomMesh(new Sample_TileMesh());
+		rn->createGeomMesh(new Sample_TileMesh(), TILE);
 #endif
 		//set tile settings
 		tileSettings =
@@ -223,8 +241,25 @@ int main(int argc, char **argv)
 		tileSettings.m_maxPolysPerTile = 32768;
 		dynamic_cast<Sample_TileMesh*>(rn->getSample())->setTileSettings(
 				tileSettings);
+	}
 		break;
 	case OBSTACLE:
+	{
+		TileSettings tileSettings;
+#ifdef DEBUG_DRAW
+		rn->createGeomMesh(new Sample_TempObstacles(renderDebug), OBSTACLE);
+#else
+		rn->createGeomMesh(new Sample_TempObstacles(), OBSTACLE);
+#endif
+		//set tile settings
+		tileSettings =
+				dynamic_cast<Sample_TempObstacles*>(rn->getSample())->getTileSettings();
+		tileSettings.m_tileSize = 32;
+		tileSettings.m_maxTiles = 128;
+		tileSettings.m_maxPolysPerTile = 32768;
+		dynamic_cast<Sample_TempObstacles*>(rn->getSample())->setTileSettings(
+				tileSettings);
+	}
 		break;
 	default:
 		break;
@@ -243,17 +278,34 @@ int main(int argc, char **argv)
 	//build navigation mesh
 	rn->buildNavMesh();
 
-	if (sampleType == TILE)
+	//set callbacks
+	switch (sampleType)
+	{
+	case TILE:
 	{
 		//build first tile around agent pos
 		float pos[3];
 		LVecBase3fToRecast(agentPos, pos);
 		dynamic_cast<Sample_TileMesh*>(rn->getSample())->buildTile(pos);
 		//set buildTile/removeTile callbacks
-		Raycaster::GetSingletonPtr()->setHitCallback(2, buildTile,
-				reinterpret_cast<void*>(rn), "shift-mouse3", BitMask32::all_on());
-		Raycaster::GetSingletonPtr()->setHitCallback(1, removeTile,
-				reinterpret_cast<void*>(rn), "shift-mouse2", BitMask32::all_on());
+		Raycaster::GetSingletonPtr()->setHitCallback(BUILD_TILE_Idx, buildTile,
+				reinterpret_cast<void*>(rn), BUILD_TILE_Key, BitMask32::all_on());
+		Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_TILE_Idx, removeTile,
+				reinterpret_cast<void*>(rn), REMOVE_TILE_Key, BitMask32::all_on());
+	}
+		break;
+	case OBSTACLE:
+	{
+		//set addObstacle/removeObstacle callbacks
+		Raycaster::GetSingletonPtr()->setHitCallback(ADD_OBSTACLE_Idx, addObstacle,
+				reinterpret_cast<void*>(rn), ADD_OBSTACLE_Key, BitMask32::all_on());
+		Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_OBSTACLE_Idx, removeObstacle,
+				reinterpret_cast<void*>(rn), REMOVE_OBSTACLE_Key, BitMask32::all_on());
+	}
+		break;
+	case SOLO:
+	default:
+		break;
 	}
 
 #ifdef DEBUG_DRAW
@@ -272,7 +324,7 @@ int main(int argc, char **argv)
 				reinterpret_cast<void*>(rn));
 		break;
 #else
-		case CHARACTER:
+	case CHARACTER:
 		task = new GenericAsyncTask("ai update", &RN::ai_updateCHARACTER,
 				reinterpret_cast<void*>(rn));
 		break;
@@ -298,8 +350,8 @@ int main(int argc, char **argv)
 //	Raycaster::GetSingletonPtr()->setHitCallback(0, allOnButZeroMask,
 //			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
 	//crowd re-target
-	Raycaster::GetSingletonPtr()->setHitCallback(0, setCrowdTarget,
-			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
+	Raycaster::GetSingletonPtr()->setHitCallback(SET_TARGET_Idx, setCrowdTarget,
+			reinterpret_cast<void*>(rn), SET_TARGET_Key, BitMask32::all_on());
 
 #ifdef TESTANOMALIES
 	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);
@@ -646,6 +698,42 @@ void removeTile(Raycaster* raycaster, void* data)
 	float m_hitPos[3];
 	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
 	dynamic_cast<Sample_TileMesh*>(rn->getSample())->removeTile(m_hitPos);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
+void addObstacle(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	new obstacle;
+	dynamic_cast<Sample_TempObstacles*>(rn->getSample())->addTempObstacle(m_hitPos);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
+void removeObstacle(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	delete obstacle;
+	dynamic_cast<Sample_TempObstacles*>(rn->getSample())->removeTempObstacle(m_hitPos, m_hitPos);
 	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
 			<< raycaster->getHitPos() << "| hit normal: "
 			<< raycaster->getHitNormal() << "| hit fraction: "

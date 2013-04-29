@@ -63,13 +63,13 @@ public:
 	/**
 	 * \brief Set the i-th callback for ray casting.
 	 *
-	 * @param i The callback index.
+	 * @param index The callback index.
 	 * @param callback The i-th callback.
 	 * @param data The data associated with the i-th callback.
 	 * @param hitKey The key for ray casting.
 	 * @param bitMask The Bullet collision mask of the ray.
 	 */
-	void setHitCallback(int i, void (*callback)(Raycaster*, void*), void* data,
+	void setHitCallback(int index, void (*callback)(Raycaster*, void*), void* data,
 			const std::string& hitKey, BitMask32 bitMask = BitMask32::all_on());
 
 	/**

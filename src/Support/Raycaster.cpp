@@ -66,33 +66,33 @@ Raycaster::~Raycaster()
 	}
 }
 
-void Raycaster::setHitCallback(int i, void (*callback)(Raycaster*, void*),
+void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 		void* data,	const std::string& hitKey, BitMask32 bitMask)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (not ((i >= 0) and (i < m_N)))
+	if (not ((index >= 0) and (index < m_N)))
 	{
 		return;
 	}
-	mCallback[i] = callback;
-	mData[i] = data;
+	mCallback[index] = callback;
+	mData[index] = data;
 	// setup event callback for picking body
-	mHitKey[i] = hitKey;
-	mBitMask[i] = bitMask;
+	mHitKey[index] = hitKey;
+	mBitMask[index] = bitMask;
 	//first remove old hooks
-	if (mHitBodyData[i])
+	if (mHitBodyData[index])
 	{
-		mApp->get_event_handler().remove_hooks(mHitKey[i]);
+		mApp->get_event_handler().remove_hooks(mHitKey[index]);
 	}
-	mHitBodyData[i] = new EventCallbackInterface<Raycaster>::EventCallbackData(this,
+	mHitBodyData[index] = new EventCallbackInterface<Raycaster>::EventCallbackData(this,
 			&Raycaster::hitBody);
 	ostringstream idx;
-	idx << i;
-	mApp->define_key(mHitKey[i], "HitBody_" + idx.str(),
+	idx << index;
+	mApp->define_key(mHitKey[index], "HitBody_" + idx.str(),
 			&EventCallbackInterface<Raycaster>::eventCallbackFunction,
-			reinterpret_cast<void*>(mHitBodyData[i].p()));
+			reinterpret_cast<void*>(mHitBodyData[index].p()));
 }
 
 std::string Raycaster::getHitNode()

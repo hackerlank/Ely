@@ -49,6 +49,7 @@
 #include "InputGeom.h"
 #include "Sample_SoloMesh.h"
 #include "Sample_TileMesh.h"
+#include "Sample_TempObstacles.h"
 #include "CrowdTool.h"
 
 //#define TESTANOMALIES
@@ -164,6 +165,7 @@ class RN
 	InputGeom* m_geom;
 	BuildContext* m_ctx;
 
+	SAMPLETYPE m_sampleType;
 	Sample* m_currentSample;
 
 	CrowdTool* m_crowdTool;
@@ -184,7 +186,7 @@ public:
 	//common
 	bool loadGeomMesh(const std::string& path, const std::string& meshName);
 	bool buildNavMesh();
-	void createGeomMesh(Sample* currentSample);
+	void createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
 	void createTileMesh();
 	void setSettings(const SampleSettings& settings);
 	SampleSettings getSettings();
