@@ -29,6 +29,7 @@
 #include <iostream>
 #include <string>
 #include <vector>
+#include <map>
 #include <load_prc_file.h>
 #include <auto_bind.h>
 #include <partBundleHandle.h>
@@ -48,7 +49,7 @@
 
 #include "RN.h"
 
-//Data constants
+///Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
 		"/REPOSITORY/KProjects/WORKSPACE/recastnavigation/RecastDemo/Bin/Meshes/");
@@ -86,6 +87,11 @@ const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
 
 BitMask32 allOnButZeroMask, allOffButZeroMask;
+
+///Obstacles data
+std::string obstacleName("box.egg");
+NodePath obstacleNP;
+std::map<NodePath, TempObstacle*> obstacleTable;
 
 //Declarations
 // don't use PT or CPT with AnimControlCollection
@@ -201,7 +207,7 @@ int main(int argc, char **argv)
 //	worldMesh.hide();
 
 	//create a global ray caster
-	new Raycaster(panda, window, mBulletWorld);
+	new Raycaster(panda, window, mBulletWorld, CALLBACKSNUM);
 
 	//Create agent
 	float agentRadius, agentHeight;
@@ -210,7 +216,7 @@ int main(int argc, char **argv)
 			agentHeight, &cs);
 
 	///RN common
-	RN* rn = new RN();
+	RN* rn = new RN(window->get_render(), mBulletWorld);
 	//load geometry mesh
 	rn->loadGeomMesh(rnDir, meshNameObj);
 
@@ -296,6 +302,9 @@ int main(int argc, char **argv)
 		break;
 	case OBSTACLE:
 	{
+		//load an obstacle node path
+		obstacleNP = window->load_model(window->get_render(), obstacleName);
+		obstacleTable.clear();
 		//set addObstacle/removeObstacle callbacks
 		Raycaster::GetSingletonPtr()->setHitCallback(ADD_OBSTACLE_Idx, addObstacle,
 				reinterpret_cast<void*>(rn), ADD_OBSTACLE_Key, BitMask32::all_on());
@@ -712,10 +721,24 @@ void removeTile(Raycaster* raycaster, void* data)
 void addObstacle(Raycaster* raycaster, void* data)
 {
 	RN* rn = reinterpret_cast<RN*>(data);
+	TempObstacle* tempObstacle = new TempObstacle(obstacleNP, 0.5,
+			rn->getBulletWorld());
+	tempObstacle->m_nodePath.reparent_to(rn->getRender());
+	tempObstacle->m_nodePath.set_pos(raycaster->getHitPos());
+	//add to obstacle table
+	obstacleTable[tempObstacle->m_nodePath] = tempObstacle;
+	//add detour obstacle
 	float m_hitPos[3];
 	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
-	new obstacle;
-	dynamic_cast<Sample_TempObstacles*>(rn->getSample())->addTempObstacle(m_hitPos);
+	Sample_TempObstacles* sample =
+				dynamic_cast<Sample_TempObstacles*>(rn->getSample());
+	dtTileCache* tileCache = sample->getTileCache();
+	tileCache->addObstacle(m_hitPos, tempObstacle->m_radius,
+					tempObstacle->m_heigth, &tempObstacle->m_ref);
+	tempObstacle->m_tileCache = tileCache;
+	//update tile cache
+	tileCache->update(0, sample->getNavMesh());
+	//
 	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
 			<< raycaster->getHitPos() << "| hit normal: "
 			<< raycaster->getHitNormal() << "| hit fraction: "
@@ -730,19 +753,29 @@ void addObstacle(Raycaster* raycaster, void* data)
 void removeObstacle(Raycaster* raycaster, void* data)
 {
 	RN* rn = reinterpret_cast<RN*>(data);
-	float m_hitPos[3];
-	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
-	delete obstacle;
-	dynamic_cast<Sample_TempObstacles*>(rn->getSample())->removeTempObstacle(m_hitPos, m_hitPos);
+	NodePath hitNP = NodePath(const_cast<PandaNode*>(raycaster->getHitNode()));
+	if(hitNP.get_name() == "TempObstacle")
+	{
+		//delete TempObstacle
+		delete obstacleTable[hitNP];
+		//remove from obstacle table
+		obstacleTable.erase(hitNP);
+		Sample_TempObstacles* sample =
+					dynamic_cast<Sample_TempObstacles*>(rn->getSample());
+		//update tile cache
+		sample->getTileCache()->update(0, sample->getNavMesh());
+
+#ifdef DEBUG_DRAW
+		rn->getSample()->handleRender();
+#endif
+	}
+	//
 	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
 			<< raycaster->getHitPos() << "| hit normal: "
 			<< raycaster->getHitNormal() << "| hit fraction: "
 			<< raycaster->getHitFraction() << "| from pos: "
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
-#ifdef DEBUG_DRAW
-	rn->getSample()->handleRender();
-#endif
 }
 
 #ifdef TESTANOMALIES

@@ -76,7 +76,7 @@ public:
 	 * \name Functions returning the last ray cast hit results.
 	 */
 	///@{
-	std::string getHitNode();
+	const PandaNode* getHitNode();
 	LPoint3f getHitPos();
 	LPoint3f getFromPos();
 	LPoint3f getToPos();
@@ -102,7 +102,7 @@ private:
 	///Bullet world.
 	SMARTPTR(BulletWorld) mWorld;
 	///Hit results.
-	std::string mHitNode;
+	PandaNode* mHitNode;
 	LPoint3f mHitPos, mFromPos, mToPos;
 	LVector3f mHitNormal;
 	float mHitFraction;

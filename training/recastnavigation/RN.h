@@ -32,6 +32,7 @@
 #include <bulletCharacterControllerNode.h>
 #include <bulletRigidBodyNode.h>
 #include <bulletSphericalConstraint.h>
+#include <bulletBoxShape.h>
 #include <bulletTriangleMeshShape.h>
 #include <bulletTriangleMesh.h>
 
@@ -46,6 +47,7 @@
 #include <DetourCommon.h>
 #include <RecastDebugDraw.h>
 #include <DetourDebugDraw.h>
+#include <DetourTileCache.h>
 #include "InputGeom.h"
 #include "Sample_SoloMesh.h"
 #include "Sample_TileMesh.h"
@@ -161,6 +163,9 @@ struct AgentData{
 
 class RN
 {
+	NodePath m_render;
+	SMARTPTR(BulletWorld) m_bulletWorld;
+
 	std::string m_meshName;
 	InputGeom* m_geom;
 	BuildContext* m_ctx;
@@ -173,7 +178,7 @@ class RN
 	std::list<Agent*> m_agents;
 
 public:
-	RN();
+	RN(NodePath render, SMARTPTR(BulletWorld)bulletWorld = NULL);
 	~RN();
 	CrowdTool* getCrowdTool()
 	{
@@ -183,6 +188,19 @@ public:
 	{
 		return m_currentSample;
 	}
+	SAMPLETYPE getSampleType()
+	{
+		return m_sampleType;
+	}
+	NodePath getRender()
+	{
+		return m_render;
+	}
+	SMARTPTR(BulletWorld) getBulletWorld()
+	{
+		return m_bulletWorld;
+	}
+
 	//common
 	bool loadGeomMesh(const std::string& path, const std::string& meshName);
 	bool buildNavMesh();
@@ -218,9 +236,56 @@ public:
 	};
 	Agent* getCrowdAgent(int idx);
 	void setCrowdTarget(LPoint3f pos);
+};
 
-	//nav mesh tile tool
-
+struct TempObstacle
+{
+	NodePath m_nodePath;
+	dtObstacleRef m_ref;
+	float m_radius, m_heigth;
+	SMARTPTR(BulletWorld) m_bulletWorld;
+	dtTileCache* m_tileCache;
+	//
+	TempObstacle(NodePath baseModel, float scale,
+			SMARTPTR(BulletWorld)bulletWorld):
+				m_bulletWorld(bulletWorld)
+	{
+		NodePath modelInst("TempObstacleInst");
+		baseModel.instance_to(modelInst);
+		//
+		modelInst.set_scale(scale);
+		LPoint3f min_point, max_point;
+		modelInst.calc_tight_bounds(min_point, max_point);
+		float dX = max_point.get_x() - min_point.get_x();
+		float dY = max_point.get_y() - min_point.get_y();
+		m_radius = sqrt(pow(dX,2) + pow(dY,2)) / 2.0;
+		m_heigth = max_point.get_z() - min_point.get_z();
+		//
+		m_nodePath = NodePath(new BulletRigidBodyNode("TempObstacleStatic"));
+		DCAST(BulletRigidBodyNode, m_nodePath.node())->
+		add_shape(new BulletBoxShape(LVecBase3f(dX / 2.0, dY / 2.0, m_heigth / 2.0)),
+				TransformState::make_pos(LPoint3f(0, 0, m_heigth / 2.0)));
+		m_nodePath.set_collide_mask(BitMask32::all_on());
+		DCAST(BulletRigidBodyNode, m_nodePath.node())->set_mass(0.0);
+		DCAST(BulletRigidBodyNode, m_nodePath.node())->set_kinematic(false);
+		DCAST(BulletRigidBodyNode, m_nodePath.node())->set_static(true);
+		DCAST(BulletRigidBodyNode, m_nodePath.node())->set_deactivation_enabled(true);
+		DCAST(BulletRigidBodyNode, m_nodePath.node())->set_active(false);
+		m_bulletWorld->attach(m_nodePath.node());
+		//
+		modelInst.reparent_to(m_nodePath);
+		modelInst.set_pos(LVecBase3f(-dX / 2.0, -dY / 2.0, 0));
+		//rename
+		m_nodePath.set_name("TempObstacle");
+	}
+	virtual ~TempObstacle()
+	{
+		//remove panda obstacle
+		m_bulletWorld->remove(m_nodePath.node());
+		m_nodePath.remove_node();
+		//remove recast obstacle
+		m_tileCache->removeObstacle(m_ref);
+	}
 };
 
 #endif /* RN_H_ */

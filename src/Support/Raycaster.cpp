@@ -95,7 +95,7 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 			reinterpret_cast<void*>(mHitBodyData[index].p()));
 }
 
-std::string Raycaster::getHitNode()
+const PandaNode* Raycaster::getHitNode()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -191,7 +191,7 @@ void Raycaster::hitBody(const Event* event)
 					//- BulletSoftBodyNode
 					//- BulletGhostNode
 
-					mHitNode = result.get_node()->get_name();
+					mHitNode = const_cast<PandaNode*>(result.get_node());
 					mHitPos = result.get_hit_pos();
 					mHitNormal = result.get_hit_normal();
 					mHitFraction = result.get_hit_fraction();

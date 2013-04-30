@@ -114,7 +114,9 @@ void Agent::updateVel(const float* p, const float* v)
 
 ////////////////////////////////////////////////////////////////////
 
-RN::RN() :
+RN::RN(NodePath render, SMARTPTR(BulletWorld)bulletWorld) :
+		m_render(render),
+		m_bulletWorld(bulletWorld),
 		m_meshName(""),
 		m_geom(0),
 		m_ctx(new BuildContext),
@@ -193,14 +195,14 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 			(*iter)->updatePosDir(pos, vel);
 		}
 	}
-	//
-	if(m_sampleType == OBSTACLE)
-	{
-		//update tile cache
-		Sample_TempObstacles* sample =
-				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
-		sample->getTileCache()->update(dt,sample->getNavMesh());
-	}
+//	//
+//	if(thisInst->getSampleType() == OBSTACLE)
+//	{
+//		//update tile cache
+//		Sample_TempObstacles* sample =
+//				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
+//		sample->getTileCache()->update(dt,sample->getNavMesh());
+//	}
 	return AsyncTask::DS_again;
 }
 #else
@@ -232,13 +234,13 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 		(*iter)->updateVel(pos, vel);
 	}
 	//
-	if(m_sampleType == OBSTACLE)
-	{
-		//update tile cache
-		Sample_TempObstacles* sample =
-				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
-		sample->getTileCache()->update(dt,sample->getNavMesh());
-	}
+//	if(thisInst->getSampleType() == OBSTACLE)
+//	{
+//		//update tile cache
+//		Sample_TempObstacles* sample =
+//				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
+//		sample->getTileCache()->update(dt,sample->getNavMesh());
+//	}
 	return AsyncTask::DS_again;
 }
 #endif
