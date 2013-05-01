@@ -100,6 +100,7 @@ class Agent
 	MOVTYPE m_movType;
 	NodePath m_pandaNP;
 	LVector3f m_vel;
+	LPoint3f m_oldPos;
 	AnimControlCollection* m_anims;
 	BulletConstraint* m_Cs;
 	BulletWorld* m_world;
@@ -134,9 +135,9 @@ public:
 		return m_agentIdx;
 	}
 #ifndef WITHCHARACTER
-	void updatePosDir(const float* p, const float* v);
+	void updatePosDir(float dt, const float* p, const float* v);
 #else
-	void updateVel(const float* p, const float* v);
+	void updateVel(float dt, const float* p, const float* v);
 #endif
 	LPoint3f getPos()
 	{
@@ -202,7 +203,8 @@ public:
 	}
 
 	//common
-	bool loadGeomMesh(const std::string& path, const std::string& meshName);
+	bool loadGeomMesh(const std::string& path, const std::string& meshName,
+			float scale=1.0);
 	bool buildNavMesh();
 	void createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
 	void createTileMesh();

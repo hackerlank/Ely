@@ -138,12 +138,13 @@ static int parseFace(char* row, int* data, int n, int vcnt)
 	return j;
 }
 
-bool rcMeshLoaderObj::load(const char* filename)
+bool rcMeshLoaderObj::load(const char* filename, float scale)
 {
 	char* buf = 0;
 	FILE* fp = fopen(filename, "rb");
 	if (!fp)
 		return false;
+	m_scale = scale;
 	fseek(fp, 0, SEEK_END);
 	int bufSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);

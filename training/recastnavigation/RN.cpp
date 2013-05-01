@@ -24,7 +24,7 @@
 #include "RN.h"
 
 #ifndef WITHCHARACTER
-void Agent::updatePosDir(const float* p, const float* v)
+void Agent::updatePosDir(float dt, const float* p, const float* v)
 {
 	LVector3f vel = RecastToLVecBase3f(v);
 	LPoint3f pos = RecastToLVecBase3f(p);
@@ -68,7 +68,11 @@ void Agent::updatePosDir(const float* p, const float* v)
 		//
 		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
-		m_anims->get_anim(0)->set_play_rate(vel.length() / rateFactor);
+		//get actual vel
+		LVector3f actualVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
+		m_anims->get_anim(0)->set_play_rate(actualVel.length() / rateFactor);
+		m_oldPos = m_pandaNP.get_pos();
+//		m_anims->get_anim(0)->set_play_rate(vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())
 		{
 			m_anims->get_anim(0)->loop(true);
@@ -84,16 +88,51 @@ void Agent::updatePosDir(const float* p, const float* v)
 	}
 }
 #else
-void Agent::updateVel(const float* p, const float* v)
+void Agent::updateVel(float dt, const float* p, const float* v)
 {
 	m_vel = RecastToLVecBase3f(v);
+	LVector3f direction = m_vel;
 	if (m_vel.length_squared() > 0.1)
 	{
+		//set linear velocity
 		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
 				m_vel, false);
-		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
-		m_pandaNP.heads_up(lookAtPos);
-		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
+		//set angular velocity (in the x-y plane)
+		//0 <= A <= 180.0
+		direction.normalize();
+		float H = m_pandaNP.get_h();
+		float A = 57.295779513f * acos(direction.get_y());
+		float deltaAngle;
+		if (direction.get_x() <= 0.0)
+		{
+			if (H <= 0.0)
+			{
+				deltaAngle = -H + A - 180;
+			}
+			else
+			{
+				deltaAngle = (A <= H ? -H + A + 180 : -H + A - 180);
+			}
+		}
+		else
+		{
+			if (H >= 0.0)
+			{
+				deltaAngle = -H - A + 180;
+			}
+			else
+			{
+				deltaAngle = (A >= -H ? -H - A + 180 : -H - A - 180);
+			}
+		}
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_angular_movement(deltaAngle);
+//		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
+//		m_pandaNP.heads_up(lookAtPos);
+		//get actual vel
+		LVector3f actualVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
+		m_anims->get_anim(0)->set_play_rate(actualVel.length() / rateFactor);
+		m_oldPos = m_pandaNP.get_pos();
+//		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())
 		{
 			m_anims->get_anim(0)->loop(false);
@@ -136,12 +175,13 @@ RN::~RN()
 	delete m_ctx;
 }
 
-bool RN::loadGeomMesh(const std::string& path, const std::string& meshName)
+bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
+		float scale)
 {
 	bool result = true;
 	m_geom = new InputGeom;
 	m_meshName = meshName;
-	if (not m_geom->loadMesh(m_ctx, (path + meshName).c_str()))
+	if (not m_geom->loadMesh(m_ctx, (path + meshName).c_str(), scale))
 	{
 		delete m_geom;
 		m_geom = NULL;
@@ -192,17 +232,10 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 		{
 			const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
 			const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
-			(*iter)->updatePosDir(pos, vel);
+			(*iter)->updatePosDir(dt, pos, vel);
 		}
 	}
-//	//
-//	if(thisInst->getSampleType() == OBSTACLE)
-//	{
-//		//update tile cache
-//		Sample_TempObstacles* sample =
-//				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
-//		sample->getTileCache()->update(dt,sample->getNavMesh());
-//	}
+	//
 	return AsyncTask::DS_again;
 }
 #else
@@ -231,16 +264,9 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 	{
 		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
 		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
-		(*iter)->updateVel(pos, vel);
+		(*iter)->updateVel(dt, pos, vel);
 	}
 	//
-//	if(thisInst->getSampleType() == OBSTACLE)
-//	{
-//		//update tile cache
-//		Sample_TempObstacles* sample =
-//				dynamic_cast<Sample_TempObstacles*>(thisInst->getSample());
-//		sample->getTileCache()->update(dt,sample->getNavMesh());
-//	}
 	return AsyncTask::DS_again;
 }
 #endif

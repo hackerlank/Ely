@@ -25,7 +25,7 @@ public:
 	rcMeshLoaderObj();
 	~rcMeshLoaderObj();
 	
-	bool load(const char* fileName);
+	bool load(const char* fileName, float scale = 1.0);
 
 	inline const float* getVerts() const { return m_verts; }
 	inline const float* getNormals() const { return m_normals; }

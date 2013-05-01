@@ -49,6 +49,8 @@
 
 #include "RN.h"
 
+//#define DEBUG_DRAW
+
 ///Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
@@ -62,11 +64,13 @@ std::string rnDir(
 ///dungeon
 //std::string meshNameEgg("dungeon_panda.egg");
 //std::string meshNameObj("dungeon_panda.obj");
-//LPoint3f agentPos(2.90322, 5.36927, 9.99819);
+//LPoint3f agentPos(2.90322, 5.36927, 1.0);
 ///nav_test
 std::string meshNameEgg("nav_test_panda.egg");
 std::string meshNameObj("nav_test_panda.obj");
-LPoint3f agentPos(4.19123, 9.90642, 8.23602);
+LPoint3f agentPos(4.19123, 9.90642, 8.3);
+///Mesh scale
+float meshScale = 2.0;
 
 ///eve actor
 std::string actorFile("data/models/eve.bam");
@@ -75,7 +79,6 @@ std::string anim1File("data/models/eve-run.bam");
 const float agentMaxSpeed = 1.5;
 const float rateFactor = 1.25;
 const float actorScale = 0.4;
-
 ///guy actor
 //std::string actorFile("data/models/guy.bam");
 //std::string anim0File("data/models/guy-walk.bam");
@@ -99,7 +102,7 @@ AnimControlCollection rn_anim_collection;
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, WindowFramework** window, bool debugPhysics);
 void end(PandaFramework* panda);
-NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window);
+NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale);
 NodePath createAgent(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
 
@@ -125,8 +128,6 @@ const int REMOVE_OBSTACLE_Idx = 4;
 std::string REMOVE_OBSTACLE_Key("shift-alt-mouse2");
 //
 
-#define DEBUG_DRAW
-
 int main(int argc, char **argv)
 {
 	allOnButZeroMask = BitMask32::all_on();
@@ -140,6 +141,7 @@ int main(int argc, char **argv)
 ///use getopt: -r(recast), -c(character), -k(kinematic with z raycast),
 ///		-d(debug), -s(solo), t(tile), -o(obstacles)
 	SAMPLETYPE sampleType = SOLO;
+	agentPos *= meshScale;
 #ifndef WITHCHARACTER
 	MOVTYPE movType = RECAST;
 #else
@@ -203,8 +205,8 @@ int main(int argc, char **argv)
 #endif
 
 	//Create world mesh
-	NodePath worldMesh = createWorldMesh(mBulletWorld, window);
-//	worldMesh.hide();
+	NodePath worldMesh = createWorldMesh(mBulletWorld, window, meshScale);
+	worldMesh.hide();
 
 	//create a global ray caster
 	new Raycaster(panda, window, mBulletWorld, CALLBACKSNUM);
@@ -218,7 +220,7 @@ int main(int argc, char **argv)
 	///RN common
 	RN* rn = new RN(window->get_render(), mBulletWorld);
 	//load geometry mesh
-	rn->loadGeomMesh(rnDir, meshNameObj);
+	rn->loadGeomMesh(rnDir, meshNameObj, meshScale);
 
 	//create nav mesh
 	switch (sampleType)
@@ -527,12 +529,13 @@ void end(PandaFramework* panda)
 	delete panda;
 }
 
-NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window)
+NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale = 1.0)
 {
 	//Load world mesh
 	NodePath worldMesh = window->load_model(window->get_render(),
 			rnDir + meshNameEgg);
 	worldMesh.set_pos(0.0, 0.0, 0.0);
+	worldMesh.set_scale(scale);
 	//attach bullet body
 	//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
 	BulletTriangleMesh* triMesh = new BulletTriangleMesh();
