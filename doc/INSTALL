@@ -21,6 +21,9 @@
 		* LIB_DESTINATION:STRING=/REPOSITORY/KProjects/usr/lib
 	  	* NVIDIA_OPENCL_INCLUDES:PATH=/usr/local/cuda/include
 		* USE_CUSTOM_VECTOR_MATH:BOOL=OFF
+		* GLUT_glut_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libglut.so (may be needed on wheezy)
+		* OPENGL_gl_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libGL.so (may be needed on wheezy)
+		* OPENGL_glu_LIBRARY:FILEPATH=/usr/lib/x86_64-linux-gnu/libGLU.so (may be needed on wheezy)
 		Note: possibly set BUILD_SHARED_LIBS:BOOL=ON (to be added)
 		Note: possibly set CMAKE_CXX_FLAGS:STRING=-fPIC (needed for Panda3d)
 		Note: possibly set CMAKE_INSTALL_RPATH:PATH=/REPOSITORY/KProjects/usr/lib (to be added) (needed for samples)
