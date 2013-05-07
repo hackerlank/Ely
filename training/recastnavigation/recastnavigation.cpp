@@ -49,7 +49,7 @@
 
 #include "RN.h"
 
-//#define DEBUG_DRAW
+#define DEBUG_DRAW
 
 ///Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
@@ -206,7 +206,7 @@ int main(int argc, char **argv)
 
 	//Create world mesh
 	NodePath worldMesh = createWorldMesh(mBulletWorld, window, meshScale);
-	worldMesh.hide();
+//	worldMesh.hide();
 
 	//create a global ray caster
 	new Raycaster(panda, window, mBulletWorld, CALLBACKSNUM);
