@@ -535,7 +535,6 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 	NodePath worldMesh = window->load_model(window->get_render(),
 			rnDir + meshNameEgg);
 	worldMesh.set_pos(0.0, 0.0, 0.0);
-	worldMesh.set_scale(scale);
 	//attach bullet body
 	//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
 	BulletTriangleMesh* triMesh = new BulletTriangleMesh();
@@ -554,9 +553,9 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 	}
 	SMARTPTR(BulletShape)collisionShape =
 	new BulletTriangleMeshShape(triMesh, false);
-	collisionShape->set_local_scale(worldMesh.get_scale());
 	SMARTPTR(BulletRigidBodyNode)mRigidBodyNode =
 	new BulletRigidBodyNode((worldMesh.get_name()+"_physics").c_str());
+	mRigidBodyNode->set_transform(TransformState::make_scale(scale));
 	mRigidBodyNode->add_shape(collisionShape);
 	mRigidBodyNode->set_mass(0.0);
 	mRigidBodyNode->set_kinematic(false);

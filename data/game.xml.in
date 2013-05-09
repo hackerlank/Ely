@@ -370,9 +370,6 @@
 				<Param body_type="static"/>
 				<Param shape_heightfield_file="@elydatadir@/data/textures/heightfield.png"/>
 				<Param shape_type="heightfield"/>
-				<Param shape_height="500.0"/>
-				<Param shape_scale_w="15.0"/>
-				<Param shape_scale_d="15.0"/>
 				<Param shape_up="z"/>
 				<Param collide_mask="0x7FFFFFFF"/>
 			</Component> 

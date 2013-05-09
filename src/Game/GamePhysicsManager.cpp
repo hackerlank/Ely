@@ -180,7 +180,6 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 {
 	// create the actual shape
 	SMARTPTR(BulletShape) collisionShape = NULL;
-	LVecBase3 localScale;
 	NodePathCollection geomNodes;
 	//some preliminary check
 	if (modelNP.is_empty())
@@ -310,27 +309,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		collisionShape = new BulletConeShape(dim1, dim2, upAxis);
 		break;
 		case HEIGHTFIELD:
-		if (automaticShaping)
-		{
-			//modify height scale_w and scale_d and height
-			dim1 = 1.0;
-			dim2 = 1.0;
-			dim3 = 1.0;
-		}
-		if (upAxis == X_up)
-		{
-			localScale = LVecBase3(1.0, dim2, dim3);
-		}
-		else if (upAxis == Y_up)
-		{
-			localScale = LVecBase3(dim3, 1.0, dim2);
-		}
-		else
-		{
-			localScale = LVecBase3(dim2, dim3, 1.0);
-		}
-		collisionShape = new BulletHeightfieldShape(heightfieldFile, dim1, upAxis);
-		collisionShape->set_local_scale(localScale);
+		collisionShape = new BulletHeightfieldShape(heightfieldFile, 1.0, upAxis);
 		break;
 		case TRIANGLEMESH:
 		{
@@ -341,7 +320,10 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			{
 				SMARTPTR(GeomNode) geomNode = DCAST(GeomNode,
 						geomNodes.get_path(i).node());
-				CSMARTPTR(TransformState) ts = geomNode->get_transform();
+				//BulletShape::set_local_scale doesn't work anymore
+				//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
+				CSMARTPTR(TransformState) ts = geomNode->get_transform()->
+						compose(TransformState::make_scale(modelNP.get_scale()));
 				GeomNode::Geoms geoms = geomNode->get_geoms();
 				for (int j = 0; j < geoms.get_num_geoms(); ++j)
 				{
@@ -349,8 +331,6 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 				}
 			}
 			collisionShape = new BulletTriangleMeshShape(triMesh, dynamic);
-			localScale = modelNP.get_scale();
-			collisionShape->set_local_scale(localScale);
 		}
 		break;
 		//
