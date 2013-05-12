@@ -84,9 +84,11 @@ class RigidBodyTemplate;
  * - "shape_half_x"  			|single|no default (box)
  * - "shape_half_y"  			|single|no default (box)
  * - "shape_half_z"  			|single|no default (box)
- * - "shape_height"  			|single|no default (cylinder,capsule,cone)
+ * - "shape_height"  			|single|no default (cylinder,capsule,cone,heightfield)
  * - "shape_up"  				|single|no default (cylinder,capsule,cone,heightfield)
  * - "shape_heightfield_file" 	|single|no default (heightfield)
+ * - "shape_scale_w"  			|single|"1.0" (heightfield)
+ * - "shape_scale_d"  			|single|"1.0" (heightfield)
  * - "ccd_motion_threshold"  	|single|no default
  * - "ccd_swept_sphere_radius" 	|single|no default
  */

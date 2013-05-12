@@ -67,15 +67,21 @@ AC_SEARCH_LIBS([lt_dlopen], [ltdl])
 # checks for standard header files.
 AC_CHECK_HEADERS([stdint.h ltdl.h])
 AX_CXX_HEADER_STDCXX_98
+AX_BOOST_BASE([],[],[
+	AC_MSG_ERROR([
+	----------------------------------------
+	The Boost header files are
+	required to build Ely. Stopping...
+	Check 'config.log' for more information.
+	----------------------------------------])
+])
 
 # checks Pyhton 2.6.
 AX_PYTHON_DEVEL([>= '2.6'])
-# checks Bullet headers...
-BULLET_SEARCH
-# checks Panda3d sdk
+# checks Panda3d sdk environment
 PANDA3D_SEARCH([${PYTHON_CPPFLAGS}])
 # Ely flags for Makefiles
-ELY_CPPFLAGS="${BULLET_CPPFLAGS} ${PANDA3D_CPPFLAGS}"
+ELY_CPPFLAGS="${PANDA3D_CPPFLAGS}"
 ELY_LDFLAGS="${PANDA3D_LDFLAGS}"
 ELY_LIBS="${PANDA3D_LIBS}"
 AC_SUBST(ELY_CXXFLAGS)

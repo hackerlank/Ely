@@ -323,7 +323,7 @@ void RigidBody::onAddToObjectSetup()
 	{
 		//reparent the object node path as a child of the rigid body's one
 		ownerNodePath.reparent_to(mNodePath);
-		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
+		if (mShapeType != GamePhysicsManager::TRIANGLEMESH)
 		{
 			//correct (or possibly reset to zero) pos and hpr of the object node path
 			ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
@@ -332,21 +332,6 @@ void RigidBody::onAddToObjectSetup()
 		if (mShapeType != GamePhysicsManager::HEIGHTFIELD)	//Hack
 		{
 			ownerNodePath.flatten_strong();
-		}
-		//BulletShape::set_local_scale doesn't work anymore
-		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
-		{
-			LVecBase3f ownerScale =
-					ownerNodePath.get_net_transform()->get_scale();
-			LVecBase3f ownerScaleInv = LVecBase3f(1.0 / ownerScale.get_x(),
-					1.0 / ownerScale.get_y(), 1.0 / ownerScale.get_z());
-			CPT(TransformState)ownerTS = ownerNodePath.get_net_transform()->
-					compose(TransformState::make_scale(ownerScaleInv));
-			std::cout << *ownerTS << std::endl;
-			std::cout << (*ownerTS).get_scale() << std::endl;
-			ownerNodePath.set_transform(ownerTS);
-			mNodePath.set_scale(ownerScale);
 		}
 	}
 
