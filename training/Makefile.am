@@ -15,7 +15,8 @@ nodist_ely_training_SOURCES = \
 		physics.cpp \
 		threads.cpp \
 		manual_example.cpp \
-		draw_geometry.cpp
+		draw_geometry.cpp \
+		test_wo_local_scale.cpp
 		
 ely_training_CPPFLAGS = \
 		-I$(rn_path)/DebugUtils/Include \
