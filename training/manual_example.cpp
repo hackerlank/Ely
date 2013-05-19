@@ -18,7 +18,7 @@
  * \file /Ely/training/manual_example.cpp
  *
  * \date 10/mar/2013 (15:39:11)
- * \author marco
+ * \author consultit
  */
 
 #include "pandaFramework.h"

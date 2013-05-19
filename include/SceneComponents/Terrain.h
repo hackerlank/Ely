@@ -18,7 +18,7 @@
  * \file /Ely/include/SceneComponents/Terrain.h
  *
  * \date 15/ago/2012 (10:00:07)
- * \author marco
+ * \author consultit
  */
 
 #ifndef TERRAIN_H_
@@ -51,6 +51,7 @@ class GeoMipTerrainRef;
  * - "heightfield_file"  		|single|no default
  * - "height_scale"				|single|"1.0"
  * - "width_scale"				|single|"1.0"
+ * - "do_scale"					|single|"true" (hack for rigid body)
  * - "block_size"				|single|"64"
  * - "near_percent"				|single|"0.1"
  * - "far_percent"				|single|"1.0"
@@ -92,6 +93,14 @@ public:
 	SMARTPTR(GeoMipTerrainRef) getGeoMipTerrain() const;
 	///@}
 
+	/**
+	 * \brief Gets width and height scale.
+	 */
+	///@{
+	float getWidthScale() const;
+	float getHeightScale() const;
+	///@}
+
 private:
 	///The GeoMipTerrain associated to this component.
 	SMARTPTR(GeoMipTerrainRef) mTerrain;
@@ -104,6 +113,7 @@ private:
 	PNMImage mHeightField;
 	///Scale.
 	float mHeightScale, mWidthScale;
+	bool mDoScale;
 	///LOD.
 	float mNearPercent, mFarPercent;
 	///Block size.

@@ -18,7 +18,7 @@
  * \file /Ely/include/Game/GamePhysicsManager.h
  *
  * \date 07/lug/2012 (10:58:20)
- * \author marco
+ * \author consultit
  */
 
 #ifndef GAMEPHYSICSMANAGER_H_

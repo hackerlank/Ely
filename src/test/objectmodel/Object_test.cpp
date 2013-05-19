@@ -18,7 +18,7 @@
  * \file /Ely/src/test/objectmodel/Object_test.cpp
  *
  * \date 07/mag/2012 (18:10:37)
- * \author marco
+ * \author consultit
  */
 
 #include "ObjectModelSuiteFixture.h"

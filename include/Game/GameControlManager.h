@@ -18,7 +18,7 @@
  * \file /Ely/include/Game/GameControlManager.h
  *
  * \date 29/lug/2012 (10:07:02)
- * \author marco
+ * \author consultit
  */
 
 #ifndef GAMEINPUTMANAGER_H_

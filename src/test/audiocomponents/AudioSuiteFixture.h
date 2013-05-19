@@ -18,7 +18,7 @@
  * \file /Ely/src/test/audiocomponents/AudioSuiteFixture.h
  *
  * \date 20/giu/2012 (12:42:25)
- * \author marco
+ * \author consultit
  */
 
 #ifndef AUDIOSUITEFIXTURE_H_

@@ -18,7 +18,7 @@
  * \file /Ely/training/recastnavigation/RN.cpp
  *
  * \date 29/mar/2013 (18:59:28)
- * \author marco
+ * \author consultit
  */
 
 #include "RN.h"
@@ -68,9 +68,9 @@ void Agent::updatePosDir(float dt, const float* p, const float* v)
 		//
 		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
 		m_pandaNP.heads_up(lookAtPos);
-		//get actual vel
-		LVector3f actualVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
-		m_anims->get_anim(0)->set_play_rate(actualVel.length() / rateFactor);
+		//get current vel
+		LVector3f currentVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
+		m_anims->get_anim(0)->set_play_rate(currentVel.length() / rateFactor);
 		m_oldPos = m_pandaNP.get_pos();
 //		m_anims->get_anim(0)->set_play_rate(vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())
@@ -128,9 +128,9 @@ void Agent::updateVel(float dt, const float* p, const float* v)
 		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_angular_movement(deltaAngle);
 //		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
 //		m_pandaNP.heads_up(lookAtPos);
-		//get actual vel
-		LVector3f actualVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
-		m_anims->get_anim(0)->set_play_rate(actualVel.length() / rateFactor);
+		//get current vel
+		LVector3f currentVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
+		m_anims->get_anim(0)->set_play_rate(currentVel.length() / rateFactor);
 		m_oldPos = m_pandaNP.get_pos();
 //		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())

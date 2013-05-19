@@ -18,7 +18,7 @@
  * \file /Ely/src/Support/FSM.cpp
  *
  * \date 02/ago/2012 (09:50:25)
- * \author marco
+ * \author consultit
  */
 
 #include "Support/FSM.h"

@@ -18,7 +18,7 @@
  * \file /Ely/initializations/common_configs.cpp
  *
  * \date 26/nov/2012 (12:16:12)
- * \author marco
+ * \author consultit
  */
 
 #include "common_configs.h"

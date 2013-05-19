@@ -18,7 +18,7 @@
  * \file /Ely/transitions/defs/Character.cpp
  *
  * \date 26/nov/2012 (12:02:39)
- * \author marco
+ * \author consultit
  */
 
 #include "../common_configs.h"

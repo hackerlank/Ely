@@ -18,7 +18,7 @@
  * \file /Ely/src/test/support/SupportSuiteFixture.h
  *
  * \date 07/mag/2012 (18:15:46)
- * \author marco
+ * \author consultit
  */
 
 #ifndef SUPPORTSUITEFIXTURE_H_

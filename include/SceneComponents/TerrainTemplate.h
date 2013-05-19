@@ -18,7 +18,7 @@
  * \file /Ely/include/SceneComponents/TerrainTemplate.h
  *
  * \date 15/ago/2012 (09:55:34)
- * \author marco
+ * \author consultit
  */
 
 #ifndef TERRAINTEMPLATE_H_

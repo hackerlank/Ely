@@ -18,7 +18,7 @@
  * \file /Ely/src/ControlComponents/Chaser.cpp
  *
  * \date 11/nov/2012 (09:45:00)
- * \author marco
+ * \author consultit
  */
 
 #include "ControlComponents/Chaser.h"
@@ -345,7 +345,7 @@ void Chaser::update(void* data)
 
 	//update chaser position and orientation (see OgreBulletDemos)
 	//position
-	LPoint3f actualChaserPos = mReferenceNodePath.get_relative_point(
+	LPoint3f currentChaserPos = mReferenceNodePath.get_relative_point(
 			mOwnerObject->getNodePath(), LPoint3f::zero());
 	LPoint3f newPos;
 	LPoint3f desiredChaserPos;
@@ -354,33 +354,33 @@ void Chaser::update(void* data)
 		//follow chased node from fixed position wrt it
 		desiredChaserPos = mReferenceNodePath.get_relative_point(
 				mChasedNodePath, mChaserPosition);
-		newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+		newPos = getChaserPos(desiredChaserPos, currentChaserPos, dt);
 		correctChaserHeight(newPos);
 	}
 	else
 	{
 		//correct position only if distance < min distance or distance > max distance
-		LPoint3f actualChasedPos = mReferenceNodePath.get_relative_point(
+		LPoint3f currentChasedPos = mReferenceNodePath.get_relative_point(
 				mChasedNodePath, LPoint3f::zero());
-		LVector3f distanceDir = actualChaserPos - actualChasedPos;
+		LVector3f distanceDir = currentChaserPos - currentChasedPos;
 		float distance = distanceDir.length();
 		if (distance < mAbsMinDistance)
 		{
 			distanceDir.normalize();
-			desiredChaserPos = actualChasedPos + distanceDir * mAbsMinDistance;
-			newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+			desiredChaserPos = currentChasedPos + distanceDir * mAbsMinDistance;
+			newPos = getChaserPos(desiredChaserPos, currentChaserPos, dt);
 			correctChaserHeight(newPos);
 		}
 		else if (distance > mAbsMaxDistance)
 		{
 			distanceDir.normalize();
-			desiredChaserPos = actualChasedPos + distanceDir * mAbsMaxDistance;
-			newPos = getChaserPos(desiredChaserPos, actualChaserPos, dt);
+			desiredChaserPos = currentChasedPos + distanceDir * mAbsMaxDistance;
+			newPos = getChaserPos(desiredChaserPos, currentChaserPos, dt);
 			correctChaserHeight(newPos);
 		}
 		else
 		{
-			newPos = actualChaserPos;
+			newPos = currentChaserPos;
 		}
 	}
 	//
@@ -391,11 +391,11 @@ void Chaser::update(void* data)
 }
 
 LPoint3f Chaser::getChaserPos(LPoint3f desiredChaserPos,
-		LPoint3f actualChaserPos, float deltaTime)
+		LPoint3f currentChaserPos, float deltaTime)
 {
 	float kReductFactor = mFriction * deltaTime;
-	//calculate difference between desiredChaserPos and actualChaserPos
-	LVector3f deltaPos = actualChaserPos - desiredChaserPos;
+	//calculate difference between desiredChaserPos and currentChaserPos
+	LVector3f deltaPos = currentChaserPos - desiredChaserPos;
 	//converge deltaPos.lenght toward zero: proportionally to deltaPos.lenght
 	if (deltaPos.length_squared() > 0.0)
 	{

@@ -18,7 +18,7 @@
  * \file /Ely/src/ControlComponents/DriverTemplate.cpp
  *
  * \date 31/mag/2012 (16:44:06)
- * \author marco
+ * \author consultit
  */
 
 #include "ControlComponents/DriverTemplate.h"

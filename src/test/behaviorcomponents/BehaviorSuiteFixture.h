@@ -18,7 +18,7 @@
  * \file /Ely/src/test/behaviorcomponents/BehaviorSuiteFixture.h
  *
  * \date 17/ago/2012 (09:24:25)
- * \author marco
+ * \author consultit
  */
 
 #ifndef BEHAVIORSUITEFIXTURE_H_

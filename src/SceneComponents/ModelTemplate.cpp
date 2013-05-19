@@ -18,7 +18,7 @@
  * \file /Ely/src/SceneComponents/ModelTemplate.cpp
  *
  * \date 16/mag/2012 (16:26:41)
- * \author marco
+ * \author consultit
  */
 
 #include "SceneComponents/ModelTemplate.h"

@@ -18,7 +18,7 @@
  * \file /Ely/include/ObjectModel/ObjectTemplate.h
  *
  * \date 12/mag/2012 (19:34:28)
- * \author marco
+ * \author consultit
  */
 
 #ifndef OBJECTTEMPLATE_H_

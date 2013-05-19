@@ -18,7 +18,7 @@
  * \file /Ely/initializations/common_configs.h
  *
  * \date 26/nov/2012 (12:15:57)
- * \author marco
+ * \author consultit
  */
 
 #ifndef COMMON_CONFIGS_H_

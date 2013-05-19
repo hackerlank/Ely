@@ -18,7 +18,7 @@
  * \file /Ely/src/Game/GameControlManager.cpp
  *
  * \date 29/lug/2012 (10:07:02)
- * \author marco
+ * \author consultit
  */
 
 #include "Game/GameControlManager.h"

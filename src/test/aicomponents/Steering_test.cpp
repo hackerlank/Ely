@@ -18,7 +18,7 @@
  * \file /Ely/src/test/aicomponents/Steering_test.cpp
  *
  * \date 03/dic/2012 (13:39:59)
- * \author marco
+ * \author consultit
  */
 
 #include "AISuiteFixture.h"

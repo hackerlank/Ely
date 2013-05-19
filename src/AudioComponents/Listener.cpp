@@ -18,7 +18,7 @@
  * \file /Ely/src/AudioComponents/Listener.cpp
  *
  * \date 27/giu/2012 (16:40:27)
- * \author marco
+ * \author consultit
  */
 
 #include "AudioComponents/Listener.h"
@@ -166,7 +166,7 @@ void Listener::update(void* data)
 
 	//get the velocity (mPosition holds the previous position)
 	deltaPos = (newPosition - mPosition);
-	velocity = deltaPos / dt;
+	dt > 0.0 ? velocity = deltaPos / dt : velocity = LVector3::zero();
 	//update listener velocity and position
 	//note on threading: this should be an atomic operation
 	GameAudioManager::GetSingletonPtr()->audioMgr()->audio_3d_set_listener_attributes(
@@ -174,7 +174,7 @@ void Listener::update(void* data)
 			velocity.get_x(), velocity.get_y(), velocity.get_z(),
 			forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
 			up.get_y(), up.get_z());
-	//update actual position
+	//update current position
 	mPosition = newPosition;
 }
 

@@ -18,7 +18,7 @@
  * \file /Ely/src/SceneComponents/Terrain.cpp
  *
  * \date 15/ago/2012 (10:00:08)
- * \author marco
+ * \author consultit
  */
 
 #include "SceneComponents/Terrain.h"
@@ -80,6 +80,9 @@ bool Terrain::initialize()
 	{
 		mWidthScale = 1.0;
 	}
+	mDoScale = (
+			mTmpl->parameter(std::string("do_scale"))
+					== std::string("false") ? false : true);
 	//get LOD
 	mNearPercent = strtof(
 			mTmpl->parameter(std::string("near_percent")).c_str(), NULL);
@@ -157,7 +160,7 @@ void Terrain::onAddToObjectSetup()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//create the actual terrain
+	//create the current terrain
 	//terrain definition
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 	std::string name = COMPONENT_STANDARD_NAME;
@@ -182,9 +185,12 @@ void Terrain::onAddToObjectSetup()
 	mTerrain->set_min_level(terrainLODmin);
 	mTerrain->set_auto_flatten(mFlattenMode);
 	mTerrain->set_bruteforce(mBruteForce);
-	mTerrain->get_root().set_sx(mWidthScale);
-	mTerrain->get_root().set_sy(mWidthScale);
-	mTerrain->get_root().set_sz(mHeightScale);
+	if (mDoScale)
+	{
+		mTerrain->get_root().set_sx(mWidthScale);
+		mTerrain->get_root().set_sy(mWidthScale);
+		mTerrain->get_root().set_sz(mHeightScale);
+	}
 	//terrain texturing
 	mTerrain->get_root().set_tex_scale(TextureStage::get_default(),
 			mTextureUscale, mTextureVscale);
@@ -250,6 +256,21 @@ SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
 	HOLDMUTEX(mMutex)
 
 	return mTerrain;
+}
+
+float Terrain::getWidthScale() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mWidthScale;
+}
+float Terrain::getHeightScale() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mHeightScale;
 }
 
 //TypedObject semantics: hardcoded

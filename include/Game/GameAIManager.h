@@ -18,7 +18,7 @@
  * \file /Ely/include/Game/GameAIManager.h
  *
  * \date 03/dic/2012 (13:57:43)
- * \author marco
+ * \author consultit
  */
 
 #ifndef GAMEAIMANAGER_H_

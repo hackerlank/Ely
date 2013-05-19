@@ -18,7 +18,7 @@
  * \file /Ely/src/Support/Picker.cpp
  *
  * \date 26/dic/2012 (10:58:28)
- * \author marco
+ * \author consultit
  */
 
 #include "Support/Picker.h"

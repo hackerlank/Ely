@@ -18,7 +18,7 @@
  * \file /Ely/src/test/scenecomponents/Terrain_test.cpp
  *
  * \date 15/ago/2012 (10:00:08)
- * \author marco
+ * \author consultit
  */
 
 #include "SceneSuiteFixture.h"

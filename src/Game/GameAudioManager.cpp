@@ -18,7 +18,7 @@
  * \file /Ely/src/Game/GameAudioManager.cpp
  *
  * \date 06/lug/2012 (20:15:17)
- * \author marco
+ * \author consultit
  */
 
 #include "Game/GameAudioManager.h"

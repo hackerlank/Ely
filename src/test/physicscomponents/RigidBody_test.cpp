@@ -18,7 +18,7 @@
  * \file /Ely/src/test/physicscomponents/RigidBody_test.cpp
  *
  * \date 07/lug/2012 (15:58:35)
- * \author marco
+ * \author consultit
  */
 
 #include "PhysicsSuiteFixture.h"

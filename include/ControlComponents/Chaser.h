@@ -18,7 +18,7 @@
  * \file /Ely/include/ControlComponents/Chaser.h
  *
  * \date 11/nov/2012 (09:45:00)
- * \author marco
+ * \author consultit
  */
 
 #ifndef CHASER_H_
@@ -129,12 +129,12 @@ private:
 	 * \brief Calculates the dynamic position of the chaser.
 	 * \see OgreBulletDemos.
 	 * @param desiredChaserPos The desired chaser position (wrt reference).
-	 * @param actualChaserPos The current chaser position (wrt reference).
+	 * @param currentChaserPos The current chaser position (wrt reference).
 	 * @param deltaTime The delta time update.
 	 * @return The dynamic chaser position.
 	 */
 	LPoint3f getChaserPos(LPoint3f desiredChaserPos,
-			LPoint3f actualChaserPos, float deltaTime);
+			LPoint3f currentChaserPos, float deltaTime);
 	/**
 	 * \brief Correct the dynamic height of the chaser.
 	 * @param newPos The position whose height may be corrected.

@@ -18,7 +18,7 @@
  * \file /Ely/include/Support/Distributed/DistributedObjectBase.h
  *
  * \date 27/nov/2012 (17:13:08)
- * \author marco
+ * \author consultit
  */
 
 #ifndef DISTRIBUTEDOBJECTBASE_H_

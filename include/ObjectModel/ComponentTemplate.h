@@ -18,7 +18,7 @@
  * \file /Ely/include/ObjectModel/ComponentTemplate.h
  *
  * \date 11/mag/2012 (13:09:41)
- * \author marco
+ * \author consultit
  */
 
 #ifndef COMPONENTTEMPLATE_H_
@@ -66,7 +66,7 @@ public:
 	virtual const ComponentFamilyType familyType() const = 0;
 
 	/**
-	 * \brief Creates the actual component of that family.
+	 * \brief Creates the current component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
 	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId) = 0;

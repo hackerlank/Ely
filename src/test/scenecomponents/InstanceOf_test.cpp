@@ -18,7 +18,7 @@
  * \file /Ely/src/test/scenecomponents/InstanceOf_test.cpp
  *
  * \date 20/mag/2012 (09:42:38)
- * \author marco
+ * \author consultit
  */
 
 #include "SceneSuiteFixture.h"

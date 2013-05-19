@@ -18,7 +18,7 @@
  * \file /Ely/include/Ely.h
  *
  * \date Nov 7, 2011
- * \author marco
+ * \author consultit
  */
 
 #ifndef ELY_H_

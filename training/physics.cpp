@@ -18,7 +18,7 @@
  * \file /Ely/training/physics.cpp
  *
  * \date 30/giu/2012 (09:56:35)
- * \author marco
+ * \author consultit
  */
 
 #include "Utilities/Tools.h"
@@ -60,7 +60,7 @@ int physics_main(int argc, char **argv)
 	SMARTPTR(BulletWorld) physicsWorld = new BulletWorld();
 	//physics: advance the simulation state
 //	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
-//			reinterpret_cast<void*>(&actualAnim));
+//			reinterpret_cast<void*>(&currentAnim));
 //	task->set_delay(3);
 //	panda.get_task_mgr().add(task);
 
@@ -82,10 +82,10 @@ int physics_main(int argc, char **argv)
 	pbundle->set_anim_blend_flag(true);
 	pbundle->set_control_effect(physics_anim_collection.get_anim(0), 0.5);
 	pbundle->set_control_effect(physics_anim_collection.get_anim(1), 0.5);
-	int actualAnim = 0;
+	int currentAnim = 0;
 	//switch among animations
 	AsyncTask* task = new GenericAsyncTask("physics_check playing", &physics_check_playing,
-			reinterpret_cast<void*>(&actualAnim));
+			reinterpret_cast<void*>(&currentAnim));
 	task->set_delay(3);
 	panda.get_task_mgr().add(task);
 	//attach to scene
@@ -103,8 +103,8 @@ AsyncTask::DoneStatus physics_check_playing(GenericAsyncTask* task, void* data)
 {
 	//Control the Animations
 	double time = ClockObject::get_global_clock()->get_real_time();
-	int *actualAnim = reinterpret_cast<int*>(data);
-	int num = *actualAnim % 3;
+	int *currentAnim = reinterpret_cast<int*>(data);
+	int num = *currentAnim % 3;
 	if (num == 0)
 	{
 		std::cout << time << " - Blending" << std::endl;
@@ -144,7 +144,7 @@ AsyncTask::DoneStatus physics_check_playing(GenericAsyncTask* task, void* data)
 			physics_anim_collection.get_anim(1)->play();
 		}
 	}
-	*actualAnim += 1;
+	*currentAnim += 1;
 	return AsyncTask::DS_again;
 }
 

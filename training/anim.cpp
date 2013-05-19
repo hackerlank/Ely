@@ -18,7 +18,7 @@
  * \file /Ely/training/anim.cpp
  *
  * \date 30/giu/2012 (09:45:19)
- * \author marco
+ * \author consultit
  */
 
 #ifndef AUTO_BIND_H
@@ -486,10 +486,10 @@ int anim_main(int argc, char **argv)
 //	pbundle->set_control_effect(anim_collection.get_anim(1), 0.5);
 ////	anim_collection.get_anim(0)->loop(true);
 ////	anim_collection.get_anim(1)->loop(true);
-//	int actualAnim = 0;
+//	int currentAnim = 0;
 //	//switch among animations
 //	AsyncTask* task = new GenericAsyncTask("check playing", &check_playing,
-//			reinterpret_cast<void*>(&actualAnim));
+//			reinterpret_cast<void*>(&currentAnim));
 //	task->set_delay(3);
 //	panda.get_task_mgr().add(task);
 //	// the name of an animation is preceded in the .egg file with <Bundle>:
@@ -518,8 +518,8 @@ AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data)
 {
 	//Control the Animations
 	double time = ClockObject::get_global_clock()->get_real_time();
-	int *actualAnim = reinterpret_cast<int*>(data);
-	int num = *actualAnim % 3;
+	int *currentAnim = reinterpret_cast<int*>(data);
+	int num = *currentAnim % 3;
 	if (num == 0)
 	{
 		std::cout << time << " - Blending" << std::endl;
@@ -559,24 +559,24 @@ AsyncTask::DoneStatus check_playing(GenericAsyncTask* task, void* data)
 			anim_collection.get_anim(1)->play();
 		}
 	}
-	*actualAnim += 1;
+	*currentAnim += 1;
 //	task->set_delay(3);
 	return AsyncTask::DS_again;
 	//1
-//	if (*actualAnim >= anim_collection.get_num_anims())
+//	if (*currentAnim >= anim_collection.get_num_anims())
 //	{
 //		return AsyncTask::DS_done;
 //	}
 	//2
 //	if (not anim_collection.is_playing())
 //	{
-//		if (*actualAnim >= anim_collection.get_num_anims())
+//		if (*currentAnim >= anim_collection.get_num_anims())
 //		{
-//			*actualAnim = 0;
+//			*currentAnim = 0;
 //		}
-//		std::cout << anim_collection.get_anim_name(*actualAnim) << std::endl;
-//		anim_collection.play(anim_collection.get_anim_name(*actualAnim));
-//		*actualAnim += 1;
+//		std::cout << anim_collection.get_anim_name(*currentAnim) << std::endl;
+//		anim_collection.play(anim_collection.get_anim_name(*currentAnim));
+//		*currentAnim += 1;
 //	}
 //	return AsyncTask::DS_cont;
 }

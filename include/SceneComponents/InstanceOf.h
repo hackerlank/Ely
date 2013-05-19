@@ -18,7 +18,7 @@
  * \file /Ely/include/SceneComponents/InstanceOf.h
  *
  * \date 20/mag/2012 (09:42:38)
- * \author marco
+ * \author consultit
  */
 
 #ifndef INSTANCEOF_H_

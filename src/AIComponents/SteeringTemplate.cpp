@@ -18,7 +18,7 @@
  * \file /Ely/src/AIComponents/SteeringTemplate.cpp
  *
  * \date 03/dic/2012 (13:52:08)
- * \author marco
+ * \author consultit
  */
 
 #include "AIComponents/SteeringTemplate.h"

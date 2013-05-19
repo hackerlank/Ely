@@ -18,7 +18,7 @@
  * \file /Ely/src/test/game/GameManagers_test.cpp
  *
  * \date 29/lug/2012 (10:43:00)
- * \author marco
+ * \author consultit
  */
 
 #include "GameSuiteFixture.h"

@@ -18,7 +18,7 @@
  * \file /Ely/src/ObjectModel/ObjectTemplateManager.cpp
  *
  * \date 13/mag/2012 (10:16:20)
- * \author marco
+ * \author consultit
  */
 
 #include "ObjectModel/ObjectTemplateManager.h"

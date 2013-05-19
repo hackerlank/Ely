@@ -18,7 +18,7 @@
  * \file /Ely/callbacks/activityActor.cpp
  *
  * \date 26/nov/2012 (10:37:44)
- * \author marco
+ * \author consultit
  */
 
 #include "../common_configs.h"

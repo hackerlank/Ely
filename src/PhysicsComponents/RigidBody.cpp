@@ -18,11 +18,12 @@
  * \file /Ely/src/PhysicsComponents/RigidBody.cpp
  *
  * \date 07/lug/2012 (15:58:35)
- * \author marco
+ * \author consultit
  */
 
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
+#include "SceneComponents/Terrain.h"
 
 RigidBody::RigidBody()
 {
@@ -323,15 +324,86 @@ void RigidBody::onAddToObjectSetup()
 	{
 		//reparent the object node path as a child of the rigid body's one
 		ownerNodePath.reparent_to(mNodePath);
-		if (mShapeType != GamePhysicsManager::TRIANGLEMESH)
+		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
 		{
 			//correct (or possibly reset to zero) pos and hpr of the object node path
 			ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
 		}
-		//optimize
-		if (mShapeType != GamePhysicsManager::HEIGHTFIELD)	//Hack
+
+		//BulletShape::set_local_scale doesn't work anymore
+		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
+		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
 		{
-			ownerNodePath.flatten_strong();
+			//check if there is already a scene component
+			SMARTPTR(Component)sceneComp = mOwnerObject->getComponent("Scene");
+			if (sceneComp)
+			{
+				//check if the scene component is a Terrain
+				if (sceneComp->componentType() == "Terrain")
+				{
+					float widthScale = DCAST(Terrain, sceneComp)->getWidthScale();
+					float heightScale = DCAST(Terrain, sceneComp)->getHeightScale();
+					if (mUpAxis == X_up)
+					{
+						mNodePath.set_scale(LVecBase3f(
+								heightScale, widthScale, widthScale));
+					}
+					else if (mUpAxis == Y_up)
+					{
+						mNodePath.set_scale(LVecBase3f(
+								widthScale, heightScale, widthScale));
+					}
+					else //mUpAxis == Z_up
+					{
+						mNodePath.set_scale(LVecBase3f(
+								widthScale, widthScale, heightScale));
+					}
+				}
+			}
+			else
+			{
+				//no scene component: scale manually if requested
+				if (not mAutomaticShaping)
+				{
+					if (mUpAxis == X_up)
+					{
+						mNodePath.set_scale(mDim1, mDim2, mDim3);
+					}
+					else if (mUpAxis == Y_up)
+					{
+						mNodePath.set_scale(mDim3, mDim1, mDim2);
+					}
+					else
+					{
+						mNodePath.set_scale(mDim2, mDim3, mDim1);
+					}
+				}
+			}
+		}
+		//optimize
+		mNodePath.flatten_strong();
+	}
+	else
+	{
+		//when ownerNodePath is empty: every rigid body has a shape but
+		//HEIGHTFIELD, which should have a chance to scale
+		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
+		{
+			if (not mAutomaticShaping)
+			{
+				if (mUpAxis == X_up)
+				{
+					mNodePath.set_scale(mDim1, mDim2, mDim3);
+				}
+				else if (mUpAxis == Y_up)
+				{
+					mNodePath.set_scale(mDim3, mDim1, mDim2);
+				}
+				else
+				{
+					mNodePath.set_scale(mDim2, mDim3, mDim1);
+				}
+			}
 		}
 	}
 
@@ -432,7 +504,7 @@ SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeT
 		}
 	}
 
-	// create and return the actual shape
+	// create and return the current shape
 	return GamePhysicsManager::GetSingletonPtr()->createShape(
 			mOwnerObject->getNodePath(), mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,

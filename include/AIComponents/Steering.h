@@ -18,7 +18,7 @@
  * \file /Ely/include/AIComponents/Steering.h
  *
  * \date 03/dic/2012 (13:39:59)
- * \author marco
+ * \author consultit
  */
 
 #ifndef STEERING_H_

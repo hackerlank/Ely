@@ -18,7 +18,7 @@
  * \file /Ely/src/PhysicsComponents/RigidBodyTemplate.cpp
  *
  * \date 07/lug/2012 (15:56:20)
- * \author marco
+ * \author consultit
  */
 
 #include "PhysicsComponents/RigidBodyTemplate.h"
@@ -81,6 +81,8 @@ void RigidBodyTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
 	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("shape_height", "1.0"));
+	mParameterTable.insert(ParameterNameValue("shape_up", "z"));
 	mParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
 	mParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
 }

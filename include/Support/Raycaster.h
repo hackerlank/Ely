@@ -18,7 +18,7 @@
  * \file /Ely/include/Support/Raycaster.h
  *
  * \date 28/apr/2013 (12:50:35)
- * \author marco
+ * \author consultit
  */
 
 

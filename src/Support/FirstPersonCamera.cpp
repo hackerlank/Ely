@@ -18,7 +18,7 @@
  * \file /Ely/src/Support/FirstPersonCamera.cpp
  *
  * \date 07/mag/2012 (18:15:16)
- * \author marco
+ * \author consultit
  */
 
 #include "Support/FirstPersonCamera.h"

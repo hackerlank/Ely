@@ -18,7 +18,7 @@
  * \file /Ely/src/AudioComponents/Sound3d.cpp
  *
  * \date 20/giu/2012 (12:41:32)
- * \author marco
+ * \author consultit
  */
 
 #include "AudioComponents/Sound3d.h"
@@ -333,7 +333,8 @@ void Sound3d::update(void* data)
 	LPoint3 newPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	//get the velocity (mPosition holds the previous position)
 	LVector3 deltaPos = (newPosition - mPosition);
-	LVector3 velocity = deltaPos / dt;
+	LVector3 velocity;
+	dt > 0.0 ? velocity = deltaPos / dt : velocity = LVector3::zero();
 	//update sounds' velocity and position
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
@@ -343,7 +344,7 @@ void Sound3d::update(void* data)
 				newPosition.get_y(), newPosition.get_z(), velocity.get_x(),
 				velocity.get_y(), velocity.get_z());
 	}
-	//update actual position
+	//update current position
 	mPosition = newPosition;
 }
 

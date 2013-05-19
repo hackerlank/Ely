@@ -18,7 +18,7 @@
  * \file /Ely/src/AudioComponents/ListenerTemplate.cpp
  *
  * \date 27/giu/2012 (16:42:33)
- * \author marco
+ * \author consultit
  */
 
 #include "AudioComponents/ListenerTemplate.h"

@@ -359,6 +359,7 @@
 				<Param texture_file="terrain.png"/>
 				<Param height_scale="500.0"/>
 				<Param width_scale="15.0"/>
+				<Param do_scale="false"/>
 				<Param brute_force="true"/>
 				<Param auto_flatten="AFM_off"/>
 				<Param focal_point="camera"/>

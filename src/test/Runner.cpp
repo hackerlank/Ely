@@ -18,7 +18,7 @@
  * \file /Ely/src/test/Runner.cpp
  *
  * \date Nov 5, 2011
- * \author marco
+ * \author consultit
  */
 
 #define BOOST_TEST_MODULE "Ely Tests"

@@ -18,7 +18,7 @@
  * \file /Ely/include/AudioComponents/Sound3dTemplate.h
  *
  * \date 20/giu/2012 (12:47:59)
- * \author marco
+ * \author consultit
  */
 
 #ifndef SOUND3DTEMPLATE_H_

@@ -18,7 +18,7 @@
  * \file /Ely/include/PhysicsComponents/RigidBodyTemplate.h
  *
  * \date 07/lug/2012 (15:56:19)
- * \author marco
+ * \author consultit
  */
 
 #ifndef RIGIDBODYTEMPLATE_H_

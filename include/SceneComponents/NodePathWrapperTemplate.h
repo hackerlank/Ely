@@ -18,7 +18,7 @@
  * \file /Ely/include/SceneComponents/NodePathWrapperTemplate.h
  *
  * \date 28/giu/2012 (20:15:15)
- * \author marco
+ * \author consultit
  */
 
 #ifndef NODEPATHWRAPPERTEMPLATE_H_

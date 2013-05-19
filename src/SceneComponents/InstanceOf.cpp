@@ -18,7 +18,7 @@
  * \file /Ely/src/SceneComponents/InstanceOf.cpp
  *
  * \date 20/mag/2012 (09:42:38)
- * \author marco
+ * \author consultit
  */
 
 #include "SceneComponents/InstanceOf.h"

@@ -18,7 +18,7 @@
  * \file /Ely/src/PhysicsComponents/CharacterControllerTemplate.cpp
  *
  * \date 30/ott/2012 (17:01:34)
- * \author marco
+ * \author consultit
  */
 
 #include "PhysicsComponents/CharacterControllerTemplate.h"

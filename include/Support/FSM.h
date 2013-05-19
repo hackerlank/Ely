@@ -18,7 +18,7 @@
  * \file /Ely/include/Support/FSM.h
  *
  * \date 02/ago/2012 (09:50:25)
- * \author marco
+ * \author consultit
  */
 
 #ifndef FSM_H_

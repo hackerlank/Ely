@@ -18,7 +18,7 @@
  * \file /Ely/src/ControlComponents/ChaserTemplate.cpp
  *
  * \date 11/nov/2012 (09:43:16)
- * \author marco
+ * \author consultit
  */
 
 #include "ControlComponents/ChaserTemplate.h"

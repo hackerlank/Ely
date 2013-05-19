@@ -18,7 +18,7 @@
  * \file /Ely/include/SceneComponents/InstanceOfTemplate.h
  *
  * \date 20/mag/2012 (09:40:59)
- * \author marco
+ * \author consultit
  */
 
 #ifndef INSTANCEOFTEMPLATE_H_

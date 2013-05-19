@@ -18,7 +18,7 @@
  * \file /Ely/training/recastnavigation.cpp
  *
  * \date 14/mar/2013 10:05:13
- * \author marco
+ * \author consultit
  */
 
 #include "Utilities/Tools.h"

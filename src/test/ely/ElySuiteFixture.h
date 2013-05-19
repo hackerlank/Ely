@@ -18,7 +18,7 @@
  * \file /Ely/src/test/ely/ElySuiteFixture.h
  *
  * \date 07/mag/2012 (17:38:09)
- * \author marco
+ * \author consultit
  */
 
 #ifndef ELYSUITEFIXTURE_H_

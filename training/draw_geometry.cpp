@@ -18,7 +18,7 @@
  * \file /Ely/training/draw_geometry.cpp
  *
  * \date 21/apr/2013 (16:29:04)
- * \author marco
+ * \author consultit
  */
 
 /*

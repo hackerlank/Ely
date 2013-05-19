@@ -18,7 +18,7 @@
  * \file /Ely/include/BehaviorComponents/Activity.h
  *
  * \date 17/ago/2012 (09:28:59)
- * \author marco
+ * \author consultit
  */
 
 #ifndef ACTIVITY_H_

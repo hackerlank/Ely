@@ -18,7 +18,7 @@
  * \file /Ely/include/Utilities/ComponentSuite.h
  *
  * \date 17/mag/2012 (18:22:24)
- * \author marco
+ * \author consultit
  */
 
 #ifndef COMPONENTSUITE_H_

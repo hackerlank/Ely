@@ -18,7 +18,7 @@
  * \file /Ely/src/BehaviorComponents/Activity.cpp
  *
  * \date 17/ago/2012 (09:28:59)
- * \author marco
+ * \author consultit
  */
 
 #include "BehaviorComponents/Activity.h"

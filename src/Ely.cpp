@@ -18,7 +18,7 @@
  * \file /Ely/src/Ely.cpp
  *
  * \date Nov 7, 2011
- * \author marco
+ * \author consultit
  */
 
 #include "Ely.h"
@@ -87,7 +87,7 @@ int main(int argc, char **argv)
 	if (Thread::is_true_threads())
 	{
 		std::cout << "A real threading library is available that "
-				"supports actual OS-implemented threads" << std::endl;
+				"supports current OS-implemented threads" << std::endl;
 	}
 	//loop over task chains
 	int numTaskChains =

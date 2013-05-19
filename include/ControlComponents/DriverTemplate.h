@@ -18,7 +18,7 @@
  * \file /Ely/include/ControlComponents/DriverTemplate.h
  *
  * \date 31/mag/2012 (16:44:06)
- * \author marco
+ * \author consultit
  */
 
 #ifndef CONTROLBYEVENTTEMPLATE_H_

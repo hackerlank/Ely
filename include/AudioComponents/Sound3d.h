@@ -18,7 +18,7 @@
  * \file /Ely/include/AudioComponents/Sound3d.h
  *
  * \date 20/giu/2012 (12:41:32)
- * \author marco
+ * \author consultit
  */
 
 #ifndef SOUND3D_H_

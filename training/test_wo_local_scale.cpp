@@ -18,7 +18,7 @@
  * \file /Ely/training/manual_example.cpp
  *
  * \date 10/mar/2013 (15:39:11)
- * \author marco
+ * \author consultit
  */
 
 #include "pandaFramework.h"
@@ -58,7 +58,7 @@ int test_wo_local_scale(int argc, char *argv[])
 
 	//here is room for your own code
 
-	//create the actual terrain
+	//create the current terrain
 	//terrain definition
 	GeoMipTerrain* terrain = new GeoMipTerrain("terrain");
 	//set height field

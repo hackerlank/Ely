@@ -18,7 +18,7 @@
  * \file /Ely/src/ControlComponents/Driver.cpp
  *
  * \date 31/mag/2012 (16:42:14)
- * \author marco
+ * \author consultit
  */
 
 #include "ControlComponents/Driver.h"
@@ -93,7 +93,7 @@ void Driver::enable()
 	}
 
 #ifdef ELY_THREAD
-	//initialize the actual transform
+	//initialize the current transform
 	mActualTransform = mOwnerObject->getNodePath().get_transform();
 #endif
 

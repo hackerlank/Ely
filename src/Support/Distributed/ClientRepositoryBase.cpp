@@ -18,7 +18,7 @@
  * \file /Ely/src/Support/Distributed/ClientRepositoryBase.cpp
  *
  * \date 27/nov/2012 (18:20:38)
- * \author marco
+ * \author consultit
  */
 
 #include "../../../include/Support/Distributed/ClientRepositoryBase.h"

@@ -18,7 +18,7 @@
  * \file /Ely/src/test/controlcomponents/Driver_test.cpp
  *
  * \date 31/mag/2012 (16:23:02)
- * \author marco
+ * \author consultit
  */
 
 #include "ControlSuiteFixture.h"

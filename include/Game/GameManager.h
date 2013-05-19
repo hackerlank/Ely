@@ -18,7 +18,7 @@
  * \file /Ely/include/Game/GameManager.h
  *
  * \date 07/mag/2012 (18:07:26)
- * \author marco
+ * \author consultit
  */
 
 #ifndef GAMEMANAGER_H_

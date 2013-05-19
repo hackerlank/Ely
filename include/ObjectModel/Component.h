@@ -18,7 +18,7 @@
  * \file /Ely/include/ObjectModel/Component.h
  *
  * \date 09/mag/2012 (16:09:17)
- * \author marco
+ * \author consultit
  */
 
 #ifndef COMPONENT_H_

@@ -18,7 +18,7 @@
  * \file /Ely/include/AudioComponents/Listener.h
  *
  * \date 27/giu/2012 (16:40:27)
- * \author marco
+ * \author consultit
  */
 
 #ifndef LISTENER_H_

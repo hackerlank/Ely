@@ -18,7 +18,7 @@
  * \file /Ely/src/test/support/FirstPersonCamera_test.cpp
  *
  * \date 07/mag/2012 (18:15:16)
- * \author marco
+ * \author consultit
  */
 
 #include "SupportSuiteFixture.h"

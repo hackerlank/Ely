@@ -18,7 +18,7 @@
  * \file /Ely/src/ObjectModel/Object.cpp
  *
  * \date 07/mag/2012 (18:10:37)
- * \author marco
+ * \author consultit
  */
 
 #include "ObjectModel/Object.h"

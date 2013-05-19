@@ -18,7 +18,7 @@
  * \file /Ely/src/test/ely/Ely_test.cpp
  *
  * \date 07/mag/2012 (17:37:09)
- * \author marco
+ * \author consultit
  */
 
 #include "ElySuiteFixture.h"

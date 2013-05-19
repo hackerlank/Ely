@@ -18,7 +18,7 @@
  * \file /Ely/src/test/controlcomponents/ControlSuiteFixture.h
  *
  * \date 31/mag/2012 (16:24:12)
- * \author marco
+ * \author consultit
  */
 
 #ifndef INPUTSUITEFIXTURE_H_

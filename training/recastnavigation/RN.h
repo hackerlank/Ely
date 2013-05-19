@@ -18,7 +18,7 @@
  * \file /Ely/training/recastnavigation/RN.h
  *
  * \date 29/mar/2013 (18:59:07)
- * \author marco
+ * \author consultit
  */
 
 #ifndef RN_H_

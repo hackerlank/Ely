@@ -18,7 +18,7 @@
  * \file /Ely/src/test/objectmodel/ObjectModelSuiteFixture.h
  *
  * \date 11/mag/2012 (18:05:46)
- * \author marco
+ * \author consultit
  */
 
 #ifndef OBJECTMODELSUITEFIXTURE_H_

@@ -18,7 +18,7 @@
  * \file /Ely/src/test/objectmodel/ObjectTemplateManager_test.cpp
  *
  * \date 13/mag/2012 (10:16:20)
- * \author marco
+ * \author consultit
  */
 
 #include "ObjectModelSuiteFixture.h"

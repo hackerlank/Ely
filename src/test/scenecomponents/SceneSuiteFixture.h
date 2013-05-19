@@ -18,7 +18,7 @@
  * \file /Ely/src/test/scenecomponents/SceneSuiteFixture.h
  *
  * \date 15/mag/2012 (15:33:43)
- * \author marco
+ * \author consultit
  */
 
 #ifndef SCENESUITEFIXTURE_H_

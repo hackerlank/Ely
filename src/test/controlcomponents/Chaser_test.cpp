@@ -18,7 +18,7 @@
  * \file /Ely/src/test/controlcomponents/Chaser_test.cpp
  *
  * \date 11/nov/2012 (09:45:01)
- * \author marco
+ * \author consultit
  */
 
 #include "ControlSuiteFixture.h"

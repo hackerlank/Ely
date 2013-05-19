@@ -18,7 +18,7 @@
  * \file /Ely/src/test/physicscomponents/PhysicsSuiteFixture.h
  *
  * \date 07/lug/2012 (17:14:03)
- * \author marco
+ * \author consultit
  */
 
 #ifndef PHYSICSSUITEFIXTURE_H_

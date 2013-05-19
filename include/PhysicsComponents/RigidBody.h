@@ -18,7 +18,7 @@
  * \file /Ely/include/PhysicsComponents/RigidBody.h
  *
  * \date 07/lug/2012 (15:58:35)
- * \author marco
+ * \author consultit
  */
 
 #ifndef RIGIDBODY_H_
@@ -84,8 +84,8 @@ class RigidBodyTemplate;
  * - "shape_half_x"  			|single|no default (box)
  * - "shape_half_y"  			|single|no default (box)
  * - "shape_half_z"  			|single|no default (box)
- * - "shape_height"  			|single|no default (cylinder,capsule,cone,heightfield)
- * - "shape_up"  				|single|no default (cylinder,capsule,cone,heightfield)
+ * - "shape_height"  			|single|"1.0" (cylinder,capsule,cone,heightfield)
+ * - "shape_up"  				|single|"z" (cylinder,capsule,cone,heightfield)
  * - "shape_heightfield_file" 	|single|no default (heightfield)
  * - "shape_scale_w"  			|single|"1.0" (heightfield)
  * - "shape_scale_d"  			|single|"1.0" (heightfield)
@@ -107,7 +107,7 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief The actual component's type.
+	 * \brief The current component's type.
 	 *
 	 * It may change during the component's lifetime.
 	 */
@@ -119,7 +119,7 @@ public:
 	};
 
 	/**
-	 * \brief Switches the actual component's type.
+	 * \brief Switches the current component's type.
 	 *
 	 * It sets the rigid body mass too.
 	 * @param bodyType The new component's type.

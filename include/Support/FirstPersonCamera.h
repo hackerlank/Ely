@@ -18,7 +18,7 @@
  * \file /Ely/include/Support/FirstPersonCamera.h
  *
  * \date 07/mag/2012 (18:15:16)
- * \author marco
+ * \author consultit
  */
 
 #ifndef FIRSTPERSONCAMERA_H_

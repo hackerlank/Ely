@@ -18,7 +18,7 @@
  * \file /Ely/src/test/aicomponents/AISuiteFixture.h
  *
  * \date 03/dic/2012 (12:59:40)
- * \author marco
+ * \author consultit
  */
 
 

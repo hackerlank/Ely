@@ -18,7 +18,7 @@
  * \file /Ely/src/Support/Distributed/DistributedObjectBase.cpp
  *
  * \date 27/nov/2012 (17:13:08)
- * \author marco
+ * \author consultit
  */
 
 #include "Support/Distributed/DistributedObjectBase.h"

@@ -18,7 +18,7 @@
  * \file /Ely/src/PhysicsComponents/CharacterController.cpp
  *
  * \date 30/ott/2012 (17:03:49)
- * \author marco
+ * \author consultit
  */
 
 #include "PhysicsComponents/CharacterController.h"
@@ -600,7 +600,7 @@ SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeT
 		}
 	}
 
-	// create and return the actual shape
+	// create and return the current shape
 	return GamePhysicsManager::GetSingletonPtr()->createShape(
 			mOwnerObject->getNodePath(), mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,

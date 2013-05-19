@@ -18,7 +18,7 @@
  * \file /Ely/src/SceneComponents/TerrainTemplate.cpp
  *
  * \date 15/ago/2012 (09:55:34)
- * \author marco
+ * \author consultit
  */
 
 #include "SceneComponents/TerrainTemplate.h"
@@ -76,6 +76,7 @@ void TerrainTemplate::setParametersDefaults()
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("height_scale", "1.0"));
 	mParameterTable.insert(ParameterNameValue("width_scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("do_scale", "true"));
 	mParameterTable.insert(ParameterNameValue("block_size", "64"));
 	mParameterTable.insert(ParameterNameValue("near_percent", "0.1"));
 	mParameterTable.insert(ParameterNameValue("far_percent", "1.0"));

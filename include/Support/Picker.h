@@ -18,7 +18,7 @@
  * \file /Ely/include/Support/Picker.h
  *
  * \date 26/dic/2012 (10:58:27)
- * \author marco
+ * \author consultit
  */
 
 #ifndef PICKER_H_

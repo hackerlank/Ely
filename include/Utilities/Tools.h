@@ -18,7 +18,7 @@
  * \file /Ely/include/Utilities/Tools.h
  *
  * \date 08/mag/2012 (16:49:10)
- * \author marco
+ * \author consultit
  */
 
 #ifndef TOOLS_H_

@@ -18,7 +18,7 @@
  * \file /Ely/callbacks/driverCamera.cpp
  *
  * \date 26/nov/2012 (11:04:25)
- * \author marco
+ * \author consultit
  */
 
 #include "../common_configs.h"

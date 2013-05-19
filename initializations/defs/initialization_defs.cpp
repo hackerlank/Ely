@@ -18,7 +18,7 @@
  * \file /Ely/initializations/callback_defs.cpp
  *
  * \date 05/set/2012 (20:07:54)
- * \author marco
+ * \author consultit
  */
 
 #include "../common_configs.h"
