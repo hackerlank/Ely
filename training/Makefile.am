@@ -4,7 +4,7 @@ AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 LDADD = $(ELY_LIBS)
 
-noinst_PROGRAMS = ely_training ely_recastnavigation ely_recastnavigation_character
+noinst_PROGRAMS = ely_training ely_recastnavigation ely_recastnavigation_character 
 
 #ely_training
 nodist_ely_training_SOURCES = \
@@ -31,6 +31,7 @@ rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
 
 rn_common_sources = \
 		recastnavigation/recastnavigation.cpp \
+		recastnavigation/recastnavigation_data.cpp \
 		recastnavigation/RN.cpp \
 		recastnavigation/CrowdTool.cpp \
 		recastnavigation/InputGeom.cpp \

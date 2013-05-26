@@ -343,3 +343,317 @@ void RN::setCrowdTarget(LPoint3f pos)
 	LVecBase3fToRecast(pos, p);
 	m_crowdTool->getState()->setMoveTarget(p, false);
 }
+
+///
+///Obstacles data
+std::string obstacleName("box.egg");
+NodePath obstacleNP;
+std::map<NodePath, TempObstacle*> obstacleTable;
+
+//CALLBACKS
+const int CALLBACKSNUM = 5;
+//
+//void setConvexVolume(Raycaster* raycaster, void* data);
+const int SET_CONVEX_VOLUME_Idx = 0;
+std::string SET_CONVEX_VOLUME_Key("shift-mouse1");
+//
+//void continueCallback(const Event* event, void* data);
+//
+//void setCrowdTarget(Raycaster* raycaster, void* data);
+const int SET_CROWD_TARGET_Idx = 0;
+std::string SET_CROWD_TARGET_Key("shift-mouse1");
+//
+//void buildTile(Raycaster* raycaster, void* data);
+const int BUILD_TILE_Idx = 1;
+std::string BUILD_TILE_Key("shift-mouse3");
+//void removeTile(Raycaster* raycaster, void* data);
+const int REMOVE_TILE_Idx = 2;
+std::string REMOVE_TILE_Key("shift-alt-mouse3");
+//
+//void addObstacle(Raycaster* raycaster, void* data);
+const int ADD_OBSTACLE_Idx = 3;
+std::string ADD_OBSTACLE_Key("shift-mouse2");
+//void removeObstacle(Raycaster* raycaster, void* data);
+const int REMOVE_OBSTACLE_Idx = 4;
+std::string REMOVE_OBSTACLE_Key("shift-alt-mouse2");
+//
+
+void setConvexVolume(Raycaster* raycaster, void* data)
+{
+
+}
+
+void App::setContinueCallback(const std::string& event)
+{
+	myData = new EventCallbackInterface<App>::
+	  			EventCallbackData(this, &App::continueCallback);
+	panda->define_key(event, "continue app",
+			  		&EventCallbackInterface<App>::eventCallbackFunction,
+			  			reinterpret_cast<void*>(myData.p()));
+}
+
+void App::continueCallback(const Event* event)
+{
+	//build navigation mesh
+	rn->buildNavMesh();
+
+	//set callbacks
+	switch (sampleType)
+	{
+	case TILE:
+	{
+		//build first tile around agent pos
+		float pos[3];
+		LVecBase3fToRecast(agentPos, pos);
+		dynamic_cast<Sample_TileMesh*>(rn->getSample())->buildTile(pos);
+		//set buildTile/removeTile callbacks
+		Raycaster::GetSingletonPtr()->setHitCallback(BUILD_TILE_Idx, buildTile,
+				reinterpret_cast<void*>(rn), BUILD_TILE_Key,
+				BitMask32::all_on());
+		Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_TILE_Idx,
+				removeTile, reinterpret_cast<void*>(rn), REMOVE_TILE_Key,
+				BitMask32::all_on());
+	}
+		break;
+	case OBSTACLE:
+	{
+		//load an obstacle node path
+		obstacleNP = window->load_model(window->get_render(), obstacleName);
+		obstacleTable.clear();
+		//set addObstacle/removeObstacle callbacks
+		Raycaster::GetSingletonPtr()->setHitCallback(ADD_OBSTACLE_Idx,
+				addObstacle, reinterpret_cast<void*>(rn), ADD_OBSTACLE_Key,
+				BitMask32::all_on());
+		Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_OBSTACLE_Idx,
+				removeObstacle, reinterpret_cast<void*>(rn),
+				REMOVE_OBSTACLE_Key, BitMask32::all_on());
+	}
+		break;
+	case SOLO:
+	default:
+		break;
+	}
+
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+
+	//set ai update task
+	AsyncTask* task;
+	switch (movType)
+	{
+#ifndef WITHCHARACTER
+	case RECAST:
+	case KINEMATIC:
+	case RIGID:
+		task = new GenericAsyncTask("ai update", &RN::ai_update,
+				reinterpret_cast<void*>(rn));
+		break;
+#else
+		case CHARACTER:
+		task = new GenericAsyncTask("ai update", &RN::ai_updateCHARACTER,
+				reinterpret_cast<void*>(rn));
+		break;
+#endif
+	default:
+		break;
+	}
+	task->set_sort(AI_TASK_SORT);
+	panda->get_task_mgr().add(task);
+
+	///Crowd tool
+	//set crowd tool
+	rn->setCrowdTool();
+	//add agent
+//	float maxError = rn->getSample()->getConfig().detailSampleMaxError;
+	float maxError = characterHeight;
+	int agentIdx = rn->addCrowdAgent(movType, character, agentPos,
+			agentMaxSpeed, &rn_anim_collection, cs, mBulletWorld.p(), maxError,
+			characterRadius, characterHeight);
+	//add a crowd raycaster
+//	Raycaster::GetSingletonPtr()->setHitCallback(0, allOffButZeroMask,
+//			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
+//	Raycaster::GetSingletonPtr()->setHitCallback(0, allOnButZeroMask,
+//			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
+	//crowd re-target
+	Raycaster::GetSingletonPtr()->setHitCallback(SET_CROWD_TARGET_Idx,
+			setCrowdTarget, reinterpret_cast<void*>(rn), SET_CROWD_TARGET_Key,
+			BitMask32::all_on());
+
+#ifdef TESTANOMALIES
+	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);
+	AgentData *agentData;
+	//print_data post ai
+	agentData = new AgentData;
+	agentData->msg = std::string("POST AI: ");
+	agentData->agent = rn->getCrowdAgent(agentIdx);
+	agentData->member = AgentData::VEL;
+	task = new GenericAsyncTask("POST AI", &print_data,
+			reinterpret_cast<void*>(agentData));
+	task->set_sort(AI_TASK_SORT + 1);
+	panda->get_task_mgr().add(task);
+	//print_data pre physics
+	agentData = new AgentData;
+	agentData->msg = std::string("PRE PHYSICS: ");
+	agentData->agent = rn->getCrowdAgent(agentIdx);
+	agentData->member = AgentData::POS;
+	task = new GenericAsyncTask("PRE PHYSICS", &print_data,
+			reinterpret_cast<void*>(agentData));
+	task->set_sort(PHYSICS_TASK_SORT - 1);
+	panda->get_task_mgr().add(task);
+	//print_data post physics
+	agentData = new AgentData;
+	agentData->msg = std::string("POST PHYSICS: ");
+	agentData->agent = rn->getCrowdAgent(agentIdx);
+	agentData->member = AgentData::POS;
+	task = new GenericAsyncTask("POST PHYSICS", &print_data,
+			reinterpret_cast<void*>(agentData));
+	task->set_sort(PHYSICS_TASK_SORT + 1);
+	panda->get_task_mgr().add(task);
+	//
+	task = new GenericAsyncTask("DELIMITER", &print_data,
+			reinterpret_cast<void*>(NULL));
+	task->set_sort(PHYSICS_TASK_SORT + 2);
+	panda->get_task_mgr().add(task);
+#endif
+	//remove hook
+	panda->get_event_handler().remove_hooks_with(
+			reinterpret_cast<void*>(myData.p()));
+}
+
+void setCrowdTarget(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	rn->setCrowdTarget(raycaster->getHitPos());
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+}
+
+void buildTile(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	dynamic_cast<Sample_TileMesh*>(rn->getSample())->buildTile(m_hitPos);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
+void removeTile(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	dynamic_cast<Sample_TileMesh*>(rn->getSample())->removeTile(m_hitPos);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
+void addObstacle(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	TempObstacle* tempObstacle = new TempObstacle(obstacleNP, 0.5,
+			rn->getBulletWorld());
+	tempObstacle->m_nodePath.reparent_to(rn->getRender());
+	tempObstacle->m_nodePath.set_pos(raycaster->getHitPos());
+	//add to obstacle table
+	obstacleTable[tempObstacle->m_nodePath] = tempObstacle;
+	//add detour obstacle
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	Sample_TempObstacles* sample =
+				dynamic_cast<Sample_TempObstacles*>(rn->getSample());
+	dtTileCache* tileCache = sample->getTileCache();
+	tileCache->addObstacle(m_hitPos, tempObstacle->m_radius,
+					tempObstacle->m_heigth, &tempObstacle->m_ref);
+	tempObstacle->m_tileCache = tileCache;
+	//update tile cache
+	tileCache->update(0, sample->getNavMesh());
+	//
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getSample()->handleRender();
+#endif
+}
+
+void removeObstacle(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	NodePath hitNP = NodePath(const_cast<PandaNode*>(raycaster->getHitNode()));
+	if(hitNP.get_name() == "TempObstacle")
+	{
+		//delete TempObstacle
+		delete obstacleTable[hitNP];
+		//remove from obstacle table
+		obstacleTable.erase(hitNP);
+		Sample_TempObstacles* sample =
+					dynamic_cast<Sample_TempObstacles*>(rn->getSample());
+		//update tile cache
+		sample->getTileCache()->update(0, sample->getNavMesh());
+
+#ifdef DEBUG_DRAW
+		rn->getSample()->handleRender();
+#endif
+	}
+	//
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+}
+
+#ifdef TESTANOMALIES
+AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	AgentData* agentData = (AgentData*)data;
+	if (agentData)
+	{
+		switch (agentData->member)
+		{
+			case AgentData::POS:
+			std::cout << agentData->msg << " POS " << agentData->agent->getPos() << std::endl;
+			break;
+			case AgentData::VEL:
+			std::cout << agentData->msg << " VEL " << agentData->agent->getVel() << std::endl;
+			break;
+			default:
+			break;
+		}
+	}
+	else
+	{
+		std::cout << std::endl;
+	}
+	//
+	return AsyncTask::DS_cont;
+}
+#endif
+

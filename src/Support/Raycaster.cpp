@@ -60,7 +60,8 @@ Raycaster::~Raycaster()
 		{
 			if (mHitBodyData[i])
 			{
-				mApp->get_event_handler().remove_hooks(mHitKey[i]);
+				mApp->get_event_handler().remove_hooks_with(
+						reinterpret_cast<void*>(mHitBodyData[i].p()));
 			}
 		}
 	}
@@ -84,7 +85,8 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 	//first remove old hooks
 	if (mHitBodyData[index])
 	{
-		mApp->get_event_handler().remove_hooks(mHitKey[index]);
+		mApp->get_event_handler().remove_hooks_with(
+				reinterpret_cast<void*>(mHitBodyData[index].p()));
 	}
 	mHitBodyData[index] = new EventCallbackInterface<Raycaster>::EventCallbackData(this,
 			&Raycaster::hitBody);

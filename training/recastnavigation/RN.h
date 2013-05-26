@@ -24,22 +24,9 @@
 #ifndef RN_H_
 #define RN_H_
 
-#include <lvector3.h>
-#include <nodePath.h>
-#include <animControlCollection.h>
-#include <genericAsyncTask.h>
-#include <bulletWorld.h>
-#include <bulletCharacterControllerNode.h>
-#include <bulletRigidBodyNode.h>
-#include <bulletSphericalConstraint.h>
-#include <bulletBoxShape.h>
-#include <bulletTriangleMeshShape.h>
-#include <bulletTriangleMesh.h>
+#include "recastnavigation_data.h"
 
 //rn
-#include <cstring>
-#include <cmath>
-#include <cstdlib>
 #include <Recast.h>
 #include <DetourNavMesh.h>
 #include <DetourNavMeshQuery.h>
@@ -55,43 +42,13 @@
 #include "CrowdTool.h"
 
 //#define TESTANOMALIES
+#define DEBUG_DRAW
 
 //RN
-//https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/z$20axis/recastnavigation/fMqEAqSBOBk/zwOzHmjRsj0J
-inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
-{
-	p[0] = v.get_x();
-	p[1] = v.get_z();
-	p[2] = -v.get_y();
-}
-inline LVecBase3f RecastToLVecBase3f(const float* p)
-{
-	return LVecBase3f(p[0], -p[2], p[1]);
-}
-inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float z)
-{
-	return LVecBase3f(x, -z, y);
-}
-
-extern const float agentMaxSpeed;
-extern const float rateFactor;
-extern BitMask32 allOnButZeroMask;
-extern BitMask32 allOffButZeroMask;
-
 //Sample type
 enum SAMPLETYPE
 {
 	SOLO, TILE, OBSTACLE
-};
-
-//Movement type
-enum MOVTYPE
-{
-#ifndef WITHCHARACTER
-	RECAST, KINEMATIC, RIGID
-#else
-	CHARACTER
-#endif
 };
 
 class Agent
@@ -288,6 +245,65 @@ struct TempObstacle
 		//remove recast obstacle
 		m_tileCache->removeObstacle(m_ref);
 	}
+};
+
+///Obstacles data
+extern std::string obstacleName;
+extern NodePath obstacleNP;
+extern std::map<NodePath, TempObstacle*> obstacleTable;
+
+//CALLBACKS
+extern const int CALLBACKSNUM;
+//
+void setConvexVolume(Raycaster* raycaster, void* data);
+extern const int SET_CONVEX_VOLUME_Idx;
+extern std::string SET_CONVEX_VOLUME_Key;
+//
+void setCrowdTarget(Raycaster* raycaster, void* data);
+extern const int SET_CROWD_TARGET_Idx;
+extern std::string SET_CROWD_TARGET_Key;
+//
+void buildTile(Raycaster* raycaster, void* data);
+extern const int BUILD_TILE_Idx;
+extern std::string BUILD_TILE_Key;
+void removeTile(Raycaster* raycaster, void* data);
+extern const int REMOVE_TILE_Idx;
+extern std::string REMOVE_TILE_Key;
+//
+void addObstacle(Raycaster* raycaster, void* data);
+extern const int ADD_OBSTACLE_Idx;
+extern std::string ADD_OBSTACLE_Key;
+void removeObstacle(Raycaster* raycaster, void* data);
+extern const int REMOVE_OBSTACLE_Idx;
+extern std::string REMOVE_OBSTACLE_Key;
+//
+
+struct App
+{
+	BitMask32 allOnButZeroMask;
+	BitMask32 allOffButZeroMask;
+	//
+	SAMPLETYPE sampleType;
+	MOVTYPE movType;
+	LPoint3f agentPos;
+	bool debugPhysics;
+	PandaFramework* panda;
+	WindowFramework* window;
+	SMARTPTR(BulletWorld)mBulletWorld;
+#ifdef DEBUG_DRAW
+	NodePath renderDebug;
+#endif
+	NodePath worldMesh;
+	float characterRadius, characterHeight;
+	BulletConstraint* cs;
+	NodePath character;
+	RN* rn;
+	TileSettings tileSettings;
+	SampleSettings settings;
+	//callback
+	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myData;
+	void continueCallback(const Event* event);
+	void setContinueCallback(const std::string& event);
 };
 
 #endif /* RN_H_ */

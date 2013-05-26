@@ -229,7 +229,7 @@ template<typename A> struct TaskInterface
  * \endcode
  * 2) and a method (that will execute the real event callback) with signature:
  * \code
- * 	void myEventCallback(const Event* event, void* data);
+ * 	void myEventCallback(const Event* event);
  * \endcode
  * 3) in code associate to myData a new EventCallbackData referring to this
  * class instance and myEventCallback:
