@@ -445,6 +445,7 @@ void DebugDrawPanda3d::end()
 	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
 	m_geomNodeNP.reparent_to(m_render);
 	m_geomNodeNP.set_depth_write(m_depthMask);
+	m_geomNodeNP.set_transparency(TransparencyAttrib::M_alpha);
 	//add to geom node paths.
 	m_geomNodeNPCollection.push_back(m_geomNodeNP);
 }

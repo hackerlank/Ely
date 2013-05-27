@@ -271,6 +271,13 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 }
 #endif
 
+void RN::setConvexVolumeTool(NodePath renderDebug)
+{
+	//set ConvexVolumeTool
+	m_convexVolumeTool = new ConvexVolumeTool(renderDebug);
+	m_currentSample->setTool(m_convexVolumeTool);
+}
+
 void RN::setCrowdTool()
 {
 	//set CrowdTool
@@ -353,9 +360,12 @@ std::map<NodePath, TempObstacle*> obstacleTable;
 //CALLBACKS
 const int CALLBACKSNUM = 5;
 //
-//void setConvexVolume(Raycaster* raycaster, void* data);
-const int SET_CONVEX_VOLUME_Idx = 0;
-std::string SET_CONVEX_VOLUME_Key("shift-mouse1");
+//void addConvexVolume(Raycaster* raycaster, void* data);
+const int ADD_CONVEX_VOLUME_Idx = 0;
+std::string ADD_CONVEX_VOLUME_Key("shift-mouse3");
+//void removeConvexVolume(Raycaster* raycaster, void* data);
+const int REMOVE_CONVEX_VOLUME_Idx = 1;
+std::string REMOVE_CONVEX_VOLUME_Key("shift-alt-mouse3");
 //
 //void continueCallback(const Event* event, void* data);
 //
@@ -378,9 +388,38 @@ const int REMOVE_OBSTACLE_Idx = 4;
 std::string REMOVE_OBSTACLE_Key("shift-alt-mouse2");
 //
 
-void setConvexVolume(Raycaster* raycaster, void* data)
+void addConvexVolume(Raycaster* raycaster, void* data)
 {
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	rn->getConvexVolumeTool()->handleClick(NULL, m_hitPos, false);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getConvexVolumeTool()->handleRender();
+#endif
+}
 
+void removeConvexVolume(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	rn->getConvexVolumeTool()->handleClick(NULL, m_hitPos, true);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getConvexVolumeTool()->handleRender();
+#endif
 }
 
 void App::setContinueCallback(const std::string& event)

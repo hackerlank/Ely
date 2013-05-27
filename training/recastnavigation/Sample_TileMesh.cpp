@@ -545,7 +545,7 @@ void Sample_TileMesh::handleRender()
 //		glDepthMask(GL_TRUE);
 //	}
 //
-//	m_geom->drawConvexVolumes(&dd);
+	m_geom->drawConvexVolumes(&dd);
 //
 //	if (m_tool)
 //		m_tool->handleRender();

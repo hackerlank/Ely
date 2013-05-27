@@ -31,6 +31,7 @@
 #include <geomLines.h>
 #include <geomTriangles.h>
 #include <geomTristrips.h>
+#include <transparencyAttrib.h>
 #include "Utilities/Tools.h"
 
 // These are example implementations of various interfaces used in Recast and Detour.
@@ -148,19 +149,19 @@ public:
 
 inline float red(unsigned int color)
 {
-	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
+	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
 }
 inline float green(unsigned int color)
 {
-	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
+	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
 }
 inline float blue(unsigned int color)
 {
-	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
+	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
 }
 inline float alpha(unsigned int color)
 {
-	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
+	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
 }
 
 /// stdio file implementation.

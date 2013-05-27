@@ -45,6 +45,7 @@ rn_common_sources = \
 		recastnavigation/Sample_TempObstacles.cpp \
 		recastnavigation/fastlz.c \
 		recastnavigation/ValueHistory.cpp \
+		recastnavigation/ConvexVolumeTool.cpp \
 		$(top_srcdir)/src/Support/Raycaster.cpp
 		
 rn_common_CPPFLAGS = \

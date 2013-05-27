@@ -1072,7 +1072,7 @@ void Sample_TempObstacles::handleRender()
 //	glDepthMask(GL_TRUE);
 	dd.depthMask(true);
 
-//	m_geom->drawConvexVolumes(&dd);
+	m_geom->drawConvexVolumes(&dd);
 //
 //	if (m_tool)
 //		m_tool->handleRender();

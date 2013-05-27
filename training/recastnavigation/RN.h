@@ -40,6 +40,7 @@
 #include "Sample_TileMesh.h"
 #include "Sample_TempObstacles.h"
 #include "CrowdTool.h"
+#include "ConvexVolumeTool.h"
 
 //#define TESTANOMALIES
 #define DEBUG_DRAW
@@ -131,6 +132,7 @@ class RN
 	SAMPLETYPE m_sampleType;
 	Sample* m_currentSample;
 
+	ConvexVolumeTool* m_convexVolumeTool;
 	CrowdTool* m_crowdTool;
 
 	std::list<Agent*> m_agents;
@@ -138,6 +140,10 @@ class RN
 public:
 	RN(NodePath render, SMARTPTR(BulletWorld)bulletWorld = NULL);
 	~RN();
+	ConvexVolumeTool* getConvexVolumeTool()
+	{
+		return m_convexVolumeTool;
+	}
 	CrowdTool* getCrowdTool()
 	{
 		return m_crowdTool;
@@ -173,6 +179,9 @@ public:
 #else
 	static AsyncTask::DoneStatus ai_updateCHARACTER(GenericAsyncTask* task, void* data);
 #endif
+
+	//convex volume tool
+	void setConvexVolumeTool(NodePath renderDebug);
 
 	//crowd tool
 	void setCrowdTool();
@@ -255,9 +264,12 @@ extern std::map<NodePath, TempObstacle*> obstacleTable;
 //CALLBACKS
 extern const int CALLBACKSNUM;
 //
-void setConvexVolume(Raycaster* raycaster, void* data);
-extern const int SET_CONVEX_VOLUME_Idx;
-extern std::string SET_CONVEX_VOLUME_Key;
+void addConvexVolume(Raycaster* raycaster, void* data);
+extern const int ADD_CONVEX_VOLUME_Idx;
+extern std::string ADD_CONVEX_VOLUME_Key;
+void removeConvexVolume(Raycaster* raycaster, void* data);
+extern const int REMOVE_CONVEX_VOLUME_Idx;
+extern std::string REMOVE_CONVEX_VOLUME_Key;
 //
 void setCrowdTarget(Raycaster* raycaster, void* data);
 extern const int SET_CROWD_TARGET_Idx;
