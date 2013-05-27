@@ -344,6 +344,24 @@ SampleSettings RN::getSettings()
 	return m_currentSample->getSampleSettings();
 }
 
+void RN::setCrowdAreaCost(SamplePolyAreas area, float cost)
+{
+	dtQueryFilter* filter = m_crowdTool->getState()->getCrowd()->getEditableFilter();
+	filter->setAreaCost(area, cost);
+}
+
+void RN::setCrowdIncludeFlag(SamplePolyFlags flag)
+{
+	dtQueryFilter* filter = m_crowdTool->getState()->getCrowd()->getEditableFilter();
+	filter->setIncludeFlags(filter->getIncludeFlags() ^ flag);
+}
+
+void RN::setCrowdExcludeFlag(SamplePolyFlags flag)
+{
+	dtQueryFilter* filter = m_crowdTool->getState()->getCrowd()->getEditableFilter();
+	filter->setExcludeFlags(filter->getExcludeFlags() ^ flag);
+}
+
 void RN::setCrowdTarget(LPoint3f pos)
 {
 	float p[3];
@@ -503,6 +521,17 @@ void App::continueCallback(const Event* event)
 	///Crowd tool
 	//set crowd tool
 	rn->setCrowdTool();
+	//set area costs ...
+	rn->setCrowdAreaCost(SAMPLE_POLYAREA_GROUND, 1.0f);
+	rn->setCrowdAreaCost(SAMPLE_POLYAREA_WATER, 10.0f);
+	rn->setCrowdAreaCost(SAMPLE_POLYAREA_ROAD, 1.0f);
+	rn->setCrowdAreaCost(SAMPLE_POLYAREA_DOOR, 1.0f);
+	rn->setCrowdAreaCost(SAMPLE_POLYAREA_GRASS, 2.0f);
+	rn->setCrowdAreaCost(SAMPLE_POLYAREA_JUMP, 1.5f);
+	//... and flags
+	rn->setCrowdIncludeFlag((SamplePolyFlags)(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED));
+	rn->setCrowdExcludeFlag((SamplePolyFlags)(0));
+
 	//add agent
 //	float maxError = rn->getSample()->getConfig().detailSampleMaxError;
 	float maxError = characterHeight;

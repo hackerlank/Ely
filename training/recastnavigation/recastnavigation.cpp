@@ -187,6 +187,8 @@ int main(int argc, char **argv)
 	Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_CONVEX_VOLUME_Idx,
 			removeConvexVolume, reinterpret_cast<void*>(app->rn), REMOVE_CONVEX_VOLUME_Key,
 			BitMask32::all_on());
+	///TODO
+	///app->setAreaTypeCallback("a");
 
 	//set "continue" callback (after the optionally convex volume construction)
 	app->setContinueCallback("c");

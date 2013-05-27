@@ -323,6 +323,7 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 		break;
 	};
 	m_prim = prim;
+	m_size = size;
 	m_vertexIdx = 0;
 }
 
@@ -446,6 +447,7 @@ void DebugDrawPanda3d::end()
 	m_geomNodeNP.reparent_to(m_render);
 	m_geomNodeNP.set_depth_write(m_depthMask);
 	m_geomNodeNP.set_transparency(TransparencyAttrib::M_alpha);
+	m_geomNodeNP.set_render_mode_thickness(m_size);
 	//add to geom node paths.
 	m_geomNodeNPCollection.push_back(m_geomNodeNP);
 }

@@ -105,6 +105,8 @@ protected:
 	///The current GeomPrimitive and draw type.
 	SMARTPTR(GeomPrimitive) m_geomPrim;
 	duDebugDrawPrimitives m_prim;
+	///Size (for points)
+	float m_size;
 	///The current Geom.
 	SMARTPTR(Geom) m_geom;
 	///The current GeomNode node path.

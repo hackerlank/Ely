@@ -189,6 +189,11 @@ public:
 			AnimControlCollection* anims = NULL,
 			BulletConstraint* cs = NULL, BulletWorld* world = NULL,
 			float maxError = 0.0, float radius = 1.0, float height = 1.0);
+	//area costs and flags used by crowd
+	void setCrowdAreaCost(SamplePolyAreas area, float cost);
+	void setCrowdIncludeFlag(SamplePolyFlags flag);
+	void setCrowdExcludeFlag(SamplePolyFlags flag);
+
 	class CompareIdx
 	{
 		int m_idx;
