@@ -191,8 +191,10 @@ public:
 			float maxError = 0.0, float radius = 1.0, float height = 1.0);
 	//area costs and flags used by crowd
 	void setCrowdAreaCost(SamplePolyAreas area, float cost);
-	void setCrowdIncludeFlag(SamplePolyFlags flag);
-	void setCrowdExcludeFlag(SamplePolyFlags flag);
+	void setCrowdIncludeFlag(int flag);
+	int getCrowdIncludeFlag();
+	void setCrowdExcludeFlag(int flag);
+	int getCrowdExcludeFlag();
 
 	class CompareIdx
 	{
@@ -317,10 +319,14 @@ struct App
 	RN* rn;
 	TileSettings tileSettings;
 	SampleSettings settings;
-	//callback
-	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myData;
+	//continue callback
+	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myDataContinue;
 	void continueCallback(const Event* event);
 	void setContinueCallback(const std::string& event);
+	//set convex volume area type callback
+	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myDataAreaType;
+	void areaTypeCallback(const Event* event);
+	void setAreaTypeCallback(const std::string& event);
 };
 
 #endif /* RN_H_ */

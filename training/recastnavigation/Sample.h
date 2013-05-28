@@ -47,6 +47,8 @@ enum SamplePolyAreas
 	SAMPLE_POLYAREA_DOOR,
 	SAMPLE_POLYAREA_GRASS,
 	SAMPLE_POLYAREA_JUMP,
+	//the last is a sentinel
+	SAMPLE_POLYAREA_END
 };
 enum SamplePolyFlags
 {

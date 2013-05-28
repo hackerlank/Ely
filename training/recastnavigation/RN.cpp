@@ -36,10 +36,10 @@ void Agent::updatePosDir(float dt, const float* p, const float* v)
 	{
 		switch (m_movType)
 		{
-		case RECAST:
+			case RECAST:
 			m_pandaNP.set_pos(pos);
 			break;
-		case KINEMATIC:
+			case KINEMATIC:
 			//set recast pos anyway
 			kinematicPos = pos;
 			//correct z
@@ -50,7 +50,7 @@ void Agent::updatePosDir(float dt, const float* p, const float* v)
 			{
 				//check if hit a triangle mesh
 				BulletShape* shape =
-						DCAST(BulletRigidBodyNode, m_result.get_node())->get_shape(0);
+				DCAST(BulletRigidBodyNode, m_result.get_node())->get_shape(0);
 				if (shape->is_of_type(BulletTriangleMeshShape::get_class_type()))
 				{
 					//physic mesh is under recast mesh
@@ -59,10 +59,10 @@ void Agent::updatePosDir(float dt, const float* p, const float* v)
 			}
 			m_pandaNP.set_pos(kinematicPos);
 			break;
-		case RIGID:
+			case RIGID:
 			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(pos);
 			break;
-		default:
+			default:
 			break;
 		}
 		//
@@ -125,7 +125,8 @@ void Agent::updateVel(float dt, const float* p, const float* v)
 				deltaAngle = (A >= -H ? -H - A + 180 : -H - A - 180);
 			}
 		}
-		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_angular_movement(deltaAngle);
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_angular_movement(
+				deltaAngle);
 //		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
 //		m_pandaNP.heads_up(lookAtPos);
 		//get current vel
@@ -154,14 +155,14 @@ void Agent::updateVel(float dt, const float* p, const float* v)
 ////////////////////////////////////////////////////////////////////
 
 RN::RN(NodePath render, SMARTPTR(BulletWorld)bulletWorld) :
-		m_render(render),
-		m_bulletWorld(bulletWorld),
-		m_meshName(""),
-		m_geom(0),
-		m_ctx(new BuildContext),
-		m_currentSample(0),
-		m_crowdTool(0),
-		m_agents()
+m_render(render),
+m_bulletWorld(bulletWorld),
+m_meshName(""),
+m_geom(0),
+m_ctx(new BuildContext),
+m_currentSample(0),
+m_crowdTool(0),
+m_agents()
 {
 }
 
@@ -252,7 +253,8 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 	for (iter = thisInst->m_agents.begin(); iter != thisInst->m_agents.end();
 			++iter)
 	{
-		LVecBase3fToRecast((*iter)->getPos(), crowd->getAgent((*iter)->getIdx())->npos);
+		LVecBase3fToRecast((*iter)->getPos(),
+				crowd->getAgent((*iter)->getIdx())->npos);
 	}
 
 	//update crowd agents' pos/vel
@@ -287,8 +289,7 @@ void RN::setCrowdTool()
 
 int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 		float agentMaxSpeed, AnimControlCollection* anims, BulletConstraint* cs,
-		BulletWorld* world,
-		float maxError, float radius, float height)
+		BulletWorld* world, float maxError, float radius, float height)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -301,8 +302,8 @@ int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 	ap.maxSpeed = agentMaxSpeed;
 	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
-	Agent* agent = new Agent(agentIdx, movType, pandaNP, anims,
-			cs, world, maxError, radius);
+	Agent* agent = new Agent(agentIdx, movType, pandaNP, anims, cs, world,
+			maxError, radius);
 	if (cs)
 	{
 		DCAST(BulletSphericalConstraint, cs)->set_pivot_b(pos);
@@ -346,20 +347,31 @@ SampleSettings RN::getSettings()
 
 void RN::setCrowdAreaCost(SamplePolyAreas area, float cost)
 {
-	dtQueryFilter* filter = m_crowdTool->getState()->getCrowd()->getEditableFilter();
+	dtQueryFilter* filter =
+			m_crowdTool->getState()->getCrowd()->getEditableFilter();
 	filter->setAreaCost(area, cost);
 }
 
-void RN::setCrowdIncludeFlag(SamplePolyFlags flag)
+void RN::setCrowdIncludeFlag(int flag)
 {
-	dtQueryFilter* filter = m_crowdTool->getState()->getCrowd()->getEditableFilter();
-	filter->setIncludeFlags(filter->getIncludeFlags() ^ flag);
+	m_crowdTool->getState()->getCrowd()->getEditableFilter()->setIncludeFlags(
+			flag);
 }
 
-void RN::setCrowdExcludeFlag(SamplePolyFlags flag)
+int RN::getCrowdIncludeFlag()
 {
-	dtQueryFilter* filter = m_crowdTool->getState()->getCrowd()->getEditableFilter();
-	filter->setExcludeFlags(filter->getExcludeFlags() ^ flag);
+	return m_crowdTool->getState()->getCrowd()->getFilter()->getIncludeFlags();
+}
+
+void RN::setCrowdExcludeFlag(int flag)
+{
+	m_crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
+			flag);
+}
+
+int RN::getCrowdExcludeFlag()
+{
+	return m_crowdTool->getState()->getCrowd()->getFilter()->getExcludeFlags();
 }
 
 void RN::setCrowdTarget(LPoint3f pos)
@@ -440,13 +452,39 @@ void removeConvexVolume(Raycaster* raycaster, void* data)
 #endif
 }
 
+void App::setAreaTypeCallback(const std::string& event)
+{
+	myDataAreaType = new EventCallbackInterface<App>::EventCallbackData(this,
+			&App::areaTypeCallback);
+	panda->define_key(event, "toggle area type",
+			&EventCallbackInterface<App>::eventCallbackFunction,
+			reinterpret_cast<void*>(myDataAreaType.p()));
+}
+
+static std::string areaTypes[] =
+		{ "SAMPLE_POLYAREA_GROUND", "SAMPLE_POLYAREA_WATER",
+				"SAMPLE_POLYAREA_ROAD", "SAMPLE_POLYAREA_DOOR",
+				"SAMPLE_POLYAREA_GRASS", "SAMPLE_POLYAREA_JUMP", };
+
+void App::areaTypeCallback(const Event* event)
+{
+	//round robin types
+	int currentType = (int) rn->getConvexVolumeTool()->getAreaType();
+	++currentType;
+	currentType = currentType % (int) SAMPLE_POLYAREA_END;
+	rn->getConvexVolumeTool()->setAreaType((SamplePolyAreas) currentType);
+	//print current area type
+	std::cout << "Current area type: " << areaTypes[(int) currentType]
+			<< std::endl;
+}
+
 void App::setContinueCallback(const std::string& event)
 {
-	myData = new EventCallbackInterface<App>::
-	  			EventCallbackData(this, &App::continueCallback);
+	myDataContinue = new EventCallbackInterface<App>::EventCallbackData(this,
+			&App::continueCallback);
 	panda->define_key(event, "continue app",
-			  		&EventCallbackInterface<App>::eventCallbackFunction,
-			  			reinterpret_cast<void*>(myData.p()));
+			&EventCallbackInterface<App>::eventCallbackFunction,
+			reinterpret_cast<void*>(myDataContinue.p()));
 }
 
 void App::continueCallback(const Event* event)
@@ -503,11 +541,11 @@ void App::continueCallback(const Event* event)
 	case RECAST:
 	case KINEMATIC:
 	case RIGID:
-		task = new GenericAsyncTask("ai update", &RN::ai_update,
-				reinterpret_cast<void*>(rn));
-		break;
+	task = new GenericAsyncTask("ai update", &RN::ai_update,
+			reinterpret_cast<void*>(rn));
+	break;
 #else
-		case CHARACTER:
+	case CHARACTER:
 		task = new GenericAsyncTask("ai update", &RN::ai_updateCHARACTER,
 				reinterpret_cast<void*>(rn));
 		break;
@@ -518,6 +556,7 @@ void App::continueCallback(const Event* event)
 	task->set_sort(AI_TASK_SORT);
 	panda->get_task_mgr().add(task);
 
+	character.show();
 	///Crowd tool
 	//set crowd tool
 	rn->setCrowdTool();
@@ -529,14 +568,14 @@ void App::continueCallback(const Event* event)
 	rn->setCrowdAreaCost(SAMPLE_POLYAREA_GRASS, 2.0f);
 	rn->setCrowdAreaCost(SAMPLE_POLYAREA_JUMP, 1.5f);
 	//... and flags
-	rn->setCrowdIncludeFlag((SamplePolyFlags)(SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED));
-	rn->setCrowdExcludeFlag((SamplePolyFlags)(0));
+	rn->setCrowdIncludeFlag((SAMPLE_POLYFLAGS_ALL ^ SAMPLE_POLYFLAGS_DISABLED));
+	rn->setCrowdExcludeFlag(SAMPLE_POLYFLAGS_DISABLED);
 
 	//add agent
 //	float maxError = rn->getSample()->getConfig().detailSampleMaxError;
 	float maxError = characterHeight;
 	int agentIdx = rn->addCrowdAgent(movType, character, agentPos,
-			agentMaxSpeed, &rn_anim_collection, cs, mBulletWorld.p(), maxError,
+			characterMaxSpeed, &rn_anim_collection, cs, mBulletWorld.p(), maxError,
 			characterRadius, characterHeight);
 	//add a crowd raycaster
 //	Raycaster::GetSingletonPtr()->setHitCallback(0, allOffButZeroMask,
@@ -584,9 +623,11 @@ void App::continueCallback(const Event* event)
 	task->set_sort(PHYSICS_TASK_SORT + 2);
 	panda->get_task_mgr().add(task);
 #endif
-	//remove hook
+	//remove hooks
 	panda->get_event_handler().remove_hooks_with(
-			reinterpret_cast<void*>(myData.p()));
+			reinterpret_cast<void*>(myDataAreaType.p()));
+	panda->get_event_handler().remove_hooks_with(
+			reinterpret_cast<void*>(myDataContinue.p()));
 }
 
 void setCrowdTarget(Raycaster* raycaster, void* data)
@@ -648,10 +689,10 @@ void addObstacle(Raycaster* raycaster, void* data)
 	float m_hitPos[3];
 	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
 	Sample_TempObstacles* sample =
-				dynamic_cast<Sample_TempObstacles*>(rn->getSample());
+			dynamic_cast<Sample_TempObstacles*>(rn->getSample());
 	dtTileCache* tileCache = sample->getTileCache();
 	tileCache->addObstacle(m_hitPos, tempObstacle->m_radius,
-					tempObstacle->m_heigth, &tempObstacle->m_ref);
+			tempObstacle->m_heigth, &tempObstacle->m_ref);
 	tempObstacle->m_tileCache = tileCache;
 	//update tile cache
 	tileCache->update(0, sample->getNavMesh());
@@ -671,14 +712,14 @@ void removeObstacle(Raycaster* raycaster, void* data)
 {
 	RN* rn = reinterpret_cast<RN*>(data);
 	NodePath hitNP = NodePath(const_cast<PandaNode*>(raycaster->getHitNode()));
-	if(hitNP.get_name() == "TempObstacle")
+	if (hitNP.get_name() == "TempObstacle")
 	{
 		//delete TempObstacle
 		delete obstacleTable[hitNP];
 		//remove from obstacle table
 		obstacleTable.erase(hitNP);
 		Sample_TempObstacles* sample =
-					dynamic_cast<Sample_TempObstacles*>(rn->getSample());
+				dynamic_cast<Sample_TempObstacles*>(rn->getSample());
 		//update tile cache
 		sample->getTileCache()->update(0, sample->getNavMesh());
 

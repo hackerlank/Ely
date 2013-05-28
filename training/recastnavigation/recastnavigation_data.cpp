@@ -34,29 +34,29 @@ std::string rnDir(
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
 ///dungeon
-//std::string meshNameEgg("dungeon_panda.egg");
-//std::string meshNameObj("dungeon_panda.obj");
-//LPoint3f agentPos(2.90322, 5.36927, 1.0);
+std::string meshNameEgg("dungeon_panda.egg");
+std::string meshNameObj("dungeon_panda.obj");
+LPoint3f agentPos(0.723763, 17.166, 9.99818);
 ///nav_test
-std::string meshNameEgg("nav_test_panda.egg");
-std::string meshNameObj("nav_test_panda.obj");
-LPoint3f agentPos(4.19123, 9.90642, 8.3);
+//std::string meshNameEgg("nav_test_panda.egg");
+//std::string meshNameObj("nav_test_panda.obj");
+//LPoint3f agentPos(4.19123, 9.90642, 8.3);
 ///Mesh scale
 float meshScale = 2.0;
 
-///eve actor
+///eve character
 std::string actorFile("data/models/eve.bam");
 std::string anim0File("data/models/eve-walk.bam");
 std::string anim1File("data/models/eve-run.bam");
-const float agentMaxSpeed = 1.5;
+const float characterMaxSpeed = 1.5;
 const float rateFactor = 1.25;
-const float actorScale = 0.4;
-///guy actor
+const float characterScale = 0.4;
+///guy character
 //std::string actorFile("data/models/guy.bam");
 //std::string anim0File("data/models/guy-walk.bam");
-//const float agentMaxSpeed = 2.0;
+//const float characterMaxSpeed = 2.0;
 //const float rateFactor = 2.00;
-//const float actorScale = 0.1;
+//const float characterScale = 0.1;
 
 const int AI_TASK_SORT = 10;
 const int PHYSICS_TASK_SORT = 20;
@@ -66,12 +66,6 @@ BitMask32 allOnButZeroMask, allOffButZeroMask;
 //Declarations
 // don't use PT or CPT with AnimControlCollection
 AnimControlCollection rn_anim_collection;
-//AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
-//SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, WindowFramework** window, bool debugPhysics);
-//void end(PandaFramework* panda);
-//NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale);
-//NodePath createCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-//MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
 
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data)
 {
@@ -256,7 +250,7 @@ MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstrain
 			PartGroup::HMF_ok_wrong_root_name|
 			PartGroup::HMF_ok_part_extra|
 			PartGroup::HMF_ok_anim_extra);
-	Actor.set_scale(actorScale);
+	Actor.set_scale(characterScale);
 	LPoint3f min_point, max_point;
 	Actor.calc_tight_bounds(min_point, max_point);
 	characterRadius = sqrt(pow((max_point.get_x() - min_point.get_x()),2)

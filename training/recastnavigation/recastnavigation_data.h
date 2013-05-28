@@ -106,9 +106,9 @@ extern float meshScale;
 extern std::string actorFile;
 extern std::string anim0File;
 extern std::string anim1File;
-extern const float agentMaxSpeed;
+extern const float characterMaxSpeed;
 extern const float rateFactor;
-extern const float actorScale;
+extern const float characterScale;
 ///guy actor
 //extern std::string actorFile;
 //extern std::string anim0File;

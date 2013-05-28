@@ -102,7 +102,7 @@ ConvexVolumeTool::ConvexVolumeTool(NodePath renderDebug) :
 	m_sample(0),
 	m_areaType(SAMPLE_POLYAREA_GRASS),
 	m_polyOffset(0.0f),
-	m_boxHeight(6.0f),
+	m_boxHeight(12.0f),
 	m_boxDescent(1.0f),
 	m_npts(0),
 	m_nhull(0),
@@ -300,12 +300,12 @@ void ConvexVolumeTool::handleRenderOverlay(double* /*proj*/, double* /*model*/, 
 //
 }
 
-void ConvexVolumeTool::setAreaType(int type)
+void ConvexVolumeTool::setAreaType(SamplePolyAreas type)
 {
-	m_areaType = type;
+	m_areaType = (int) type;
 }
 
-int ConvexVolumeTool::getAreaType()
+SamplePolyAreas ConvexVolumeTool::getAreaType()
 {
-	return m_areaType;
+	return (SamplePolyAreas) m_areaType;
 }

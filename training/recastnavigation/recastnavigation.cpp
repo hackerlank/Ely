@@ -99,20 +99,20 @@ int main(int argc, char **argv)
 	app->renderDebug = app->window->get_render().attach_new_node("renderDebug");
 	app->renderDebug.set_bin("fixed", 10);
 	//set transparency attrib on render
-//	renderDebug.set_transparency(TransparencyAttrib::M_alpha);
 #endif
 
 	//Create world mesh
 	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, meshScale);
 //	worldMesh.hide();
 
-//create a global ray caster
+	//create a global ray caster
 	new Raycaster(app->panda, app->window, app->mBulletWorld, CALLBACKSNUM);
 
 	//Create a character
 	app->cs = NULL;
 	app->character = createCharacter(app->mBulletWorld, app->window, app->movType,
 			app->characterRadius, app->characterHeight, &(app->cs));
+	app->character.hide();
 
 	///RN common
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
@@ -187,8 +187,8 @@ int main(int argc, char **argv)
 	Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_CONVEX_VOLUME_Idx,
 			removeConvexVolume, reinterpret_cast<void*>(app->rn), REMOVE_CONVEX_VOLUME_Key,
 			BitMask32::all_on());
-	///TODO
-	///app->setAreaTypeCallback("a");
+	//set convex volume set area type callbacks
+	app->setAreaTypeCallback("a");
 
 	//set "continue" callback (after the optionally convex volume construction)
 	app->setContinueCallback("c");

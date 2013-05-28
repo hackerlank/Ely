@@ -54,8 +54,8 @@ public:
 	virtual void handleRender();
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 
-	void setAreaType(int type);
-	int getAreaType();
+	void setAreaType(SamplePolyAreas type);
+	SamplePolyAreas getAreaType();
 };
 
 #endif // CONVEXVOLUMETOOL_H
