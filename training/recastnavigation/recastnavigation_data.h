@@ -91,11 +91,7 @@ extern std::string rnDir;
 //...(re)convert egg to obj:
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
-///dungeon
-//extern std::string meshNameEgg;
-//extern std::string meshNameObj;
-//extern LPoint3f agentPos;
-///nav_test
+///dungeon || nav_test || ...
 extern std::string meshNameEgg;
 extern std::string meshNameObj;
 extern LPoint3f agentPos;

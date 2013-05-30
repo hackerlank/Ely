@@ -296,6 +296,10 @@ void removeObstacle(Raycaster* raycaster, void* data);
 extern const int REMOVE_OBSTACLE_Idx;
 extern std::string REMOVE_OBSTACLE_Key;
 //
+void switchDoor(Raycaster* raycaster, void* data);
+extern const int SET_SWITCH_DOOR_Idx;
+extern std::string SET_SWITCH_DOOR_Key;
+//
 
 struct App
 {

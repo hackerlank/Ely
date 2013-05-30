@@ -388,7 +388,7 @@ NodePath obstacleNP;
 std::map<NodePath, TempObstacle*> obstacleTable;
 
 //CALLBACKS
-const int CALLBACKSNUM = 5;
+const int CALLBACKSNUM = 6;
 //
 //void addConvexVolume(Raycaster* raycaster, void* data);
 const int ADD_CONVEX_VOLUME_Idx = 0;
@@ -416,6 +416,10 @@ std::string ADD_OBSTACLE_Key("shift-mouse2");
 //void removeObstacle(Raycaster* raycaster, void* data);
 const int REMOVE_OBSTACLE_Idx = 4;
 std::string REMOVE_OBSTACLE_Key("shift-alt-mouse2");
+//
+//void switchDoor(Raycaster* raycaster, void* data);
+const int SET_SWITCH_DOOR_Idx = 5;
+std::string SET_SWITCH_DOOR_Key("d");
 //
 
 void addConvexVolume(Raycaster* raycaster, void* data)
@@ -587,6 +591,11 @@ void App::continueCallback(const Event* event)
 			setCrowdTarget, reinterpret_cast<void*>(rn), SET_CROWD_TARGET_Key,
 			BitMask32::all_on());
 
+	//Switch doors
+	Raycaster::GetSingletonPtr()->setHitCallback(SET_SWITCH_DOOR_Idx,
+			switchDoor, reinterpret_cast<void*>(rn), SET_SWITCH_DOOR_Key,
+			BitMask32::all_on());
+
 #ifdef TESTANOMALIES
 	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);
 	AgentData *agentData;
@@ -734,6 +743,138 @@ void removeObstacle(Raycaster* raycaster, void* data)
 			<< raycaster->getHitFraction() << "| from pos: "
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
+}
+
+static int pointInPoly(int nvert, const float* verts, const float* p)
+{
+	int i, j, c = 0;
+	for (i = 0, j = nvert-1; i < nvert; j = i++)
+	{
+		const float* vi = &verts[i*3];
+		const float* vj = &verts[j*3];
+		if (((vi[2] > p[2]) != (vj[2] > p[2])) &&
+			(p[0] < (vj[0]-vi[0]) * (p[2]-vi[2]) / (vj[2]-vi[2]) + vi[0]) )
+			c = !c;
+	}
+	return c;
+}
+
+static void reverseVector(float* verts, const int nverts)
+{
+	float temp[3];
+	for (int i = 0; i < nverts/2; i++)
+	{
+		dtVcopy(temp, &verts[i*3]);
+		dtVcopy(&verts[i*3], &verts[(nverts - i - 1)*3]);
+		dtVcopy(&verts[(nverts - i - 1)*3], temp);
+	}
+}
+
+void switchDoor(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	//get hit point
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	//check if a convex volume was hit (see: Delete case of ConvexVolumeTool::handleClick)
+	int m_convexVolumeID = -1;
+	const ConvexVolume* vols =
+			rn->getSample()->getInputGeom()->getConvexVolumes();
+	for (int i = 0; i < rn->getSample()->getInputGeom()->getConvexVolumeCount();
+			++i)
+	{
+		if (pointInPoly(vols[i].nverts, vols[i].verts, m_hitPos) &&
+				m_hitPos[1] >= vols[i].hmin && m_hitPos[1] <= vols[i].hmax)
+		{
+			m_convexVolumeID = i;
+			break;
+		}
+	}
+	// Check if the end point is close enough into a convex volume.
+	if (m_convexVolumeID != -1)
+	{
+		///https://groups.google.com/forum/?fromgroups#!searchin/recastnavigation/door/recastnavigation/K2C44OCpxGE/a2Zn6nu0dIIJ
+		const float *m_queryPolyPtr =
+				rn->getSample()->getInputGeom()->getConvexVolumes()[m_convexVolumeID].verts;
+		int nverts =
+				rn->getSample()->getInputGeom()->getConvexVolumes()[m_convexVolumeID].nverts;
+
+		float *m_queryPoly = new float[nverts * 3];
+
+		for (int i = 0; i < nverts * 3; ++i)
+		{
+			m_queryPoly[i] = m_queryPolyPtr[i];
+		}
+
+		reverseVector(m_queryPoly, nverts);
+
+		float m_centerPos[3];
+		m_centerPos[0] = m_centerPos[1] = m_centerPos[2] = 0;
+		for (int i = 0; i < nverts; ++i)
+		{
+			dtVadd(m_centerPos, m_centerPos, &m_queryPoly[i * 3]);
+		}
+		dtVscale(m_centerPos, m_centerPos, 1.0f / nverts);
+
+		dtQueryFilter m_filter;
+		m_filter.setIncludeFlags(SAMPLE_POLYFLAGS_ALL);
+		m_filter.setExcludeFlags(0);
+		dtPolyRef m_startRef;
+		float m_polyPickExt[3] = { 2, 4, 2 };
+		dtStatus status;
+		status = rn->getSample()->getNavMeshQuery()->findNearestPoly(
+				m_centerPos, m_polyPickExt, &m_filter, &m_startRef, 0);
+		if (!dtStatusSucceed(status))
+			return;
+
+		static const int MAX_POLYS = 256;
+		dtPolyRef m_polys[MAX_POLYS];
+		dtPolyRef m_parent[MAX_POLYS];
+		int m_npolys;
+
+		rn->getSample()->getNavMeshQuery()->findPolysAroundShape(m_startRef,
+				m_queryPoly, nverts, &m_filter, m_polys, m_parent, 0, &m_npolys,
+				MAX_POLYS);
+
+		for (int i = 0; i < m_npolys; ++i)
+		{
+			if (rn->getSample()->getNavMeshQuery()->isValidPolyRef(m_polys[i],
+					&m_filter))
+			{
+				unsigned char area = 1;
+				unsigned short flags;
+
+				if (dtStatusSucceed(
+						rn->getSample()->getNavMesh()->getPolyArea(m_polys[i],
+								&area)))
+				{
+					//check if area is a door
+					if (area == SAMPLE_POLYAREA_DOOR)
+					{
+						if (dtStatusSucceed(
+								rn->getSample()->getNavMesh()->getPolyFlags(
+										m_polys[i], &flags)))
+						{
+							flags ^= SAMPLE_POLYFLAGS_DISABLED;
+							rn->getSample()->getNavMesh()->setPolyFlags(
+									m_polys[i], flags);
+						}
+					}
+				}
+			}
+		}
+		delete[] m_queryPoly;
+	}
+	//
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+		rn->getSample()->handleRender();
+#endif
 }
 
 #ifdef TESTANOMALIES

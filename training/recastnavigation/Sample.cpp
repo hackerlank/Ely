@@ -40,9 +40,14 @@
 #endif
 
 Sample::Sample() :
-		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0), m_navMeshDrawFlags(
-				DU_DRAWNAVMESH_OFFMESHCONS | DU_DRAWNAVMESH_CLOSEDLIST), m_tool(
-				0), m_ctx(0)
+		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0),
+		m_navMeshDrawFlags(
+				0
+//				| DU_DRAWNAVMESH_OFFMESHCONS
+//				| DU_DRAWNAVMESH_CLOSEDLIST
+//				| DU_DRAWNAVMESH_COLOR_TILES
+				),
+		m_tool(0), m_ctx(0)
 {
 	resetCommonSettings();
 	m_navQuery = dtAllocNavMeshQuery();

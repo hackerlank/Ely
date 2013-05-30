@@ -173,7 +173,7 @@ int main(int argc, char **argv)
 	app->settings.m_agentRadius = app->characterRadius;
 	app->settings.m_agentHeight = app->characterHeight;
 	app->settings.m_agentMaxSlope = 60.0;
-	app->settings.m_agentMaxClimb = 2.5;
+	app->settings.m_agentMaxClimb = 5.0;
 	app->settings.m_cellSize = 0.3;
 	app->settings.m_cellHeight = 0.2;
 	app->rn->setSettings(app->settings);

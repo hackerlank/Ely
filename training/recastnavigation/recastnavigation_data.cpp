@@ -34,13 +34,13 @@ std::string rnDir(
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
 ///dungeon
-std::string meshNameEgg("dungeon_panda.egg");
-std::string meshNameObj("dungeon_panda.obj");
-LPoint3f agentPos(0.723763, 17.166, 9.99818);
+//std::string meshNameEgg("dungeon_panda.egg");
+//std::string meshNameObj("dungeon_panda.obj");
+//LPoint3f agentPos(0.723763, 17.166, 9.99818);
 ///nav_test
-//std::string meshNameEgg("nav_test_panda.egg");
-//std::string meshNameObj("nav_test_panda.obj");
-//LPoint3f agentPos(4.19123, 9.90642, 8.3);
+std::string meshNameEgg("nav_test_panda.egg");
+std::string meshNameObj("nav_test_panda.obj");
+LPoint3f agentPos(4.19123, 9.90642, 8.3);
 ///Mesh scale
 float meshScale = 2.0;
 
