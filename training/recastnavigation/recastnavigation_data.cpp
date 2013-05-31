@@ -41,8 +41,6 @@ std::string rnDir(
 std::string meshNameEgg("nav_test_panda.egg");
 std::string meshNameObj("nav_test_panda.obj");
 LPoint3f agentPos(4.19123, 9.90642, 8.3);
-///Mesh scale
-float meshScale = 2.0;
 
 ///eve character
 std::string actorFile("data/models/eve.bam");

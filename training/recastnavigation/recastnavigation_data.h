@@ -95,8 +95,6 @@ extern std::string rnDir;
 extern std::string meshNameEgg;
 extern std::string meshNameObj;
 extern LPoint3f agentPos;
-///Mesh scale
-extern float meshScale;
 
 ///eve actor
 extern std::string actorFile;

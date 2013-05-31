@@ -23,6 +23,30 @@
 
 #include "RN.h"
 
+//hack
+inline unsigned int nextPow2(unsigned int v)
+{
+	v--;
+	v |= v >> 1;
+	v |= v >> 2;
+	v |= v >> 4;
+	v |= v >> 8;
+	v |= v >> 16;
+	v++;
+	return v;
+}
+inline unsigned int ilog2(unsigned int v)
+{
+	unsigned int r;
+	unsigned int shift;
+	r = (v > 0xffff) << 4; v >>= r;
+	shift = (v > 0xff) << 3; v >>= shift; r |= shift;
+	shift = (v > 0xf) << 2; v >>= shift; r |= shift;
+	shift = (v > 0x3) << 1; v >>= shift; r |= shift;
+	r |= (v >> 1);
+	return r;
+}
+
 int main(int argc, char **argv)
 {
 	App* app = new App;
@@ -39,9 +63,9 @@ int main(int argc, char **argv)
 //	std::cout << (app->allOnButZeroMask & app->allOffButZeroMask) << std::endl;
 
 ///use getopt: -r(recast), -c(character), -k(kinematic with z raycast),
-///		-d(debug), -s(solo), t(tile), -o(obstacles)
+///		-d(debug), -s(solo), t(tile), -o(obstacles) -l scale
 	app->sampleType = SOLO;
-	app->agentPos = agentPos * meshScale;
+	app->meshScale = 1.0;
 #ifndef WITHCHARACTER
 	app->movType = RECAST;
 #else
@@ -50,7 +74,7 @@ int main(int argc, char **argv)
 	app->debugPhysics = false;
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "rcbkdsto")) != -1)
+	while ((c = getopt(argc, argv, "rcbkdstol:")) != -1)
 	{
 		switch (c)
 		{
@@ -81,8 +105,14 @@ int main(int argc, char **argv)
 		case 'o':
 			app->sampleType = OBSTACLE;
 			break;
+		case 'l':
+			app->meshScale = atof(optarg);
+			break;
 		case '?':
-			if (isprint(optopt))
+			if (optopt == 'l')
+				std::cerr << "Option " << optopt
+						<< " requires a scale argument.\n" << std::endl;
+			else if (isprint(optopt))
 				std::cerr << "Unknown option " << optopt << std::endl;
 			else
 				std::cerr << "Unknown option character " << optopt << std::endl;
@@ -91,6 +121,11 @@ int main(int argc, char **argv)
 			abort();
 		}
 	}
+	if (app->meshScale <= 0.0)
+	{
+		app->meshScale = 1.0;
+	}
+	app->agentPos = agentPos * app->meshScale;
 	//start
 	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window), app->debugPhysics);
 
@@ -102,7 +137,7 @@ int main(int argc, char **argv)
 #endif
 
 	//Create world mesh
-	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, meshScale);
+	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, app->meshScale);
 //	worldMesh.hide();
 
 	//create a global ray caster
@@ -117,7 +152,7 @@ int main(int argc, char **argv)
 	///RN common
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
 	//load geometry mesh
-	app->rn->loadGeomMesh(rnDir, meshNameObj, meshScale);
+	app->rn->loadGeomMesh(rnDir, meshNameObj, app->meshScale);
 
 	//create geom mesh
 	switch (app->sampleType)
@@ -157,9 +192,23 @@ int main(int argc, char **argv)
 		//set tile settings
 		app->tileSettings =
 				dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->getTileSettings();
-		app->tileSettings.m_tileSize = 32;
-		app->tileSettings.m_maxTiles = 128;
-		app->tileSettings.m_maxPolysPerTile = 32768;
+		app->tileSettings.m_tileSize = 64;
+		//evaluate m_maxTiles & m_maxPolysPerTile
+		const float* bmin = app->rn->getSample()->getInputGeom()->getMeshBoundsMin();
+		const float* bmax = app->rn->getSample()->getInputGeom()->getMeshBoundsMax();
+		//		char text[64];
+		int gw = 0, gh = 0;
+		rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
+		const int ts = (int)app->tileSettings.m_tileSize;
+		const int tw = (gw + ts-1) / ts;
+		const int th = (gh + ts-1) / ts;
+		// Max tiles and max polys affect how the tile IDs are caculated.
+		// There are 22 bits available for identifying a tile and a polygon.
+		int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
+		if (tileBits > 14) tileBits = 14;
+		int polyBits = 22 - tileBits;
+		app->tileSettings.m_maxTiles = 1 << tileBits;
+		app->tileSettings.m_maxPolysPerTile = 1 << polyBits;
 		dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->setTileSettings(
 				app->tileSettings);
 	}
@@ -172,10 +221,10 @@ int main(int argc, char **argv)
 	app->settings = app->rn->getSettings();
 	app->settings.m_agentRadius = app->characterRadius;
 	app->settings.m_agentHeight = app->characterHeight;
-	app->settings.m_agentMaxSlope = 60.0;
-	app->settings.m_agentMaxClimb = 5.0;
-	app->settings.m_cellSize = 0.3;
-	app->settings.m_cellHeight = 0.2;
+	app->settings.m_agentMaxSlope = m_agentMaxSlope;
+	app->settings.m_agentMaxClimb = m_agentMaxClimb;
+	app->settings.m_cellSize = m_cellSize;
+	app->settings.m_cellHeight = m_cellHeight;
 	app->rn->setSettings(app->settings);
 
 	//set convex volume tool

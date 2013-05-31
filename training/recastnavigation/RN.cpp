@@ -465,6 +465,11 @@ void App::setAreaTypeCallback(const std::string& event)
 			reinterpret_cast<void*>(myDataAreaType.p()));
 }
 
+float m_agentMaxSlope = 60.0;
+float m_agentMaxClimb = 5.0;
+float m_cellSize = 0.3;
+float m_cellHeight = 0.2;
+
 static std::string areaTypes[] =
 		{ "SAMPLE_POLYAREA_GROUND", "SAMPLE_POLYAREA_WATER",
 				"SAMPLE_POLYAREA_ROAD", "SAMPLE_POLYAREA_DOOR",

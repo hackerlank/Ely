@@ -300,6 +300,10 @@ void switchDoor(Raycaster* raycaster, void* data);
 extern const int SET_SWITCH_DOOR_Idx;
 extern std::string SET_SWITCH_DOOR_Key;
 //
+extern float m_agentMaxSlope;
+extern float m_agentMaxClimb;
+extern float m_cellSize;
+extern float m_cellHeight;
 
 struct App
 {
@@ -317,6 +321,7 @@ struct App
 	NodePath renderDebug;
 #endif
 	NodePath worldMesh;
+	float meshScale;
 	float characterRadius, characterHeight;
 	BulletConstraint* cs;
 	NodePath character;
