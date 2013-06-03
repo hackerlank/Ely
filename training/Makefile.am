@@ -24,7 +24,7 @@ ely_training_CPPFLAGS = \
 
 ely_training_LDADD = \
 		$(LDADD) \
-		$(rn_path)/DebugUtils/.libs/DebugUtils.a
+		$(rn_path)/DebugUtils/.libs/libDebugUtils.a
 		
 #recastnavigation
 rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
@@ -58,10 +58,10 @@ rn_common_CPPFLAGS = \
 
 rn_common_LDADD = \
 		$(LDADD) \
-		$(rn_path)/DebugUtils/.libs/DebugUtils.a \
-		$(rn_path)/Detour/.libs/Detour.a \
-		$(rn_path)/DetourTileCache/.libs/DetourTileCache.a \
-		$(rn_path)/Recast/.libs/Recast.a
+		$(rn_path)/DebugUtils/.libs/libDebugUtils.a \
+		$(rn_path)/Detour/.libs/libDetour.a \
+		$(rn_path)/DetourTileCache/.libs/libDetourTileCache.a \
+		$(rn_path)/Recast/.libs/libRecast.a
 		
 #ely_recastnavigation
 nodist_ely_recastnavigation_SOURCES = \
@@ -72,7 +72,7 @@ ely_recastnavigation_CPPFLAGS = \
 
 ely_recastnavigation_LDADD = \
 		$(rn_common_LDADD) \
-		$(rn_path)/DetourCrowd/.libs/DetourCrowd.a
+		$(rn_path)/DetourCrowd/.libs/libDetourCrowd.a
 
 #ely_recastnavigation_character
 nodist_ely_recastnavigation_character_SOURCES = \
@@ -84,6 +84,6 @@ ely_recastnavigation_character_CPPFLAGS = \
 
 ely_recastnavigation_character_LDADD = \
 		$(rn_common_LDADD) \
-		$(rn_path)/DetourCrowd/.libs/DetourCrowdPhysics.a
+		$(rn_path)/DetourCrowd/.libs/libDetourCrowdPhysics.a
 
 
