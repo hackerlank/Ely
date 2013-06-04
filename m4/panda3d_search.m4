@@ -60,7 +60,7 @@ PANDA3D_LDFLAGS="-L/usr/lib/panda3d -L/usr/lib64/panda3d -L/usr/local/lib/panda3
 PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
 			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
-			-lpandagl -lpandaode -lpandaphysics -lpandaskel"
+			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader"
 			
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3D_LIBS} ${LIBS_CMDLINE}"

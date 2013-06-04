@@ -51,9 +51,6 @@ int main(int argc, char **argv)
 {
 	App* app = new App;
 
-	app->allOnButZeroMask = allOnButZeroMask;
-	app->allOffButZeroMask = allOffButZeroMask;
-	//
 	app->allOnButZeroMask = BitMask32::all_on();
 	app->allOnButZeroMask.clear_bit(0);
 	app->allOffButZeroMask = BitMask32::all_off();
@@ -129,16 +126,15 @@ int main(int argc, char **argv)
 	//start
 	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window), app->debugPhysics);
 
-#ifdef DEBUG_DRAW
-	//set a debug node path
-	app->renderDebug = app->window->get_render().attach_new_node("renderDebug");
-	app->renderDebug.set_bin("fixed", 10);
-	//set transparency attrib on render
-#endif
-
 	//Create world mesh
 	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, app->meshScale);
 //	worldMesh.hide();
+
+#ifdef DEBUG_DRAW
+	//set a debug node path
+	app->renderDebug = app->worldMesh.attach_new_node("renderDebug");
+	app->renderDebug.set_bin("fixed", 10);
+#endif
 
 	//create a global ray caster
 	new Raycaster(app->panda, app->window, app->mBulletWorld, CALLBACKSNUM);
@@ -146,13 +142,13 @@ int main(int argc, char **argv)
 	//Create a character
 	app->cs = NULL;
 	app->character = createCharacter(app->mBulletWorld, app->window, app->movType,
-			app->characterRadius, app->characterHeight, &(app->cs));
+			app->characterRadius, app->characterHeight, &(app->cs), app->worldMesh);
 	app->character.hide();
 
 	///RN common
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
 	//load geometry mesh
-	app->rn->loadGeomMesh(rnDir, meshNameObj, app->meshScale);
+	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale);
 
 	//create geom mesh
 	switch (app->sampleType)

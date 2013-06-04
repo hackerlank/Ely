@@ -32,6 +32,8 @@ std::string rnDir(
 //triangulate nav_test_panda.egg and...
 //...(re)convert egg to obj:
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
+//if egg was not triangulated use instead:
+//egg2obj -C -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
 ///dungeon
 //std::string meshNameEgg("dungeon_panda.egg");
@@ -230,7 +232,8 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 }
 
 NodePath createCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstraint** pcs)
+MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstraint** pcs,
+NodePath mesh)
 {
 	NodePath playerNP;
 	//Load the Actor Model
@@ -259,7 +262,7 @@ MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstrain
 	switch (movType)
 	{
 		case RECAST:
-		Actor.reparent_to(window->get_render());
+		Actor.reparent_to(mesh);
 		playerNP = Actor;
 		break;
 		case KINEMATIC:

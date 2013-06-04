@@ -29,6 +29,22 @@ ely_training_LDADD = \
 #recastnavigation
 rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
 
+noinst_LTLIBRARIES = libeggToObj.la
+
+libeggToObj_la_SOURCES = \
+		recastnavigation/eggToObj/eggToObj.cxx \
+		recastnavigation/eggToObj/programBase.cxx \
+		recastnavigation/eggToObj/withOutputFile.cxx \
+		recastnavigation/eggToObj/eggSingleBase.cxx \
+		recastnavigation/eggToObj/eggToSomething.cxx \
+		recastnavigation/eggToObj/eggReader.cxx \
+		recastnavigation/eggToObj/eggWriter.cxx \
+		recastnavigation/eggToObj/eggBase.cxx \
+		recastnavigation/eggToObj/wordWrapStream.cxx \
+		recastnavigation/eggToObj/wordWrapStreamBuf.cxx \
+		recastnavigation/eggToObj/eggFilter.cxx \
+		recastnavigation/eggToObj/eggConverter.cxx
+
 rn_common_sources = \
 		recastnavigation/recastnavigation.cpp \
 		recastnavigation/recastnavigation_data.cpp \
@@ -61,7 +77,8 @@ rn_common_LDADD = \
 		$(rn_path)/DebugUtils/.libs/libDebugUtils.a \
 		$(rn_path)/Detour/.libs/libDetour.a \
 		$(rn_path)/DetourTileCache/.libs/libDetourTileCache.a \
-		$(rn_path)/Recast/.libs/libRecast.a
+		$(rn_path)/Recast/.libs/libRecast.a \
+		libeggToObj.la
 		
 #ely_recastnavigation
 nodist_ely_recastnavigation_SOURCES = \

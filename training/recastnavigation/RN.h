@@ -41,6 +41,11 @@
 #include "Sample_TempObstacles.h"
 #include "CrowdTool.h"
 #include "ConvexVolumeTool.h"
+#include "eggToObj.h"
+#include <cstdio>
+#include <cstring>
+#include <virtualFileSystem.h>
+#include <filename.h>
 
 //#define TESTANOMALIES
 #define DEBUG_DRAW
@@ -70,7 +75,8 @@ public:
 	Agent(int agentIdx, MOVTYPE movType, NodePath pandaNP, AnimControlCollection* anims,
 			BulletConstraint* cs = NULL,
 			BulletWorld* world=NULL,
-			float maxError = 0.0, float radius = 1.0) :
+			float maxError = 0.0, float radius = 1.0,
+			BitMask32 rayMask=BitMask32::all_on()) :
 			m_agentIdx(agentIdx),
 			m_movType(movType),
 			m_pandaNP(pandaNP),
@@ -79,11 +85,11 @@ public:
 			m_world(world),
 			m_maxError(maxError),
 			m_radius(radius),
-			m_result(BulletClosestHitRayResult::empty())
+			m_result(BulletClosestHitRayResult::empty()),
+			m_rayMask(rayMask)
 	{
 		m_deltaRayOrig = LVector3f(0, 0, m_maxError);
 		m_deltaRayDown = LVector3f(0, 0, -10*m_maxError);
-		m_rayMask = allOnButZeroMask;
 	}
 	~Agent()
 	{
@@ -188,7 +194,8 @@ public:
 	int addCrowdAgent(MOVTYPE movType,NodePath pandaNP, LPoint3f pos, float agentSpeed,
 			AnimControlCollection* anims = NULL,
 			BulletConstraint* cs = NULL, BulletWorld* world = NULL,
-			float maxError = 0.0, float radius = 1.0, float height = 1.0);
+			float maxError = 0.0, float radius = 1.0, float height = 1.0,
+			BitMask32 rayMask=BitMask32::all_on());
 	//area costs and flags used by crowd
 	void setCrowdAreaCost(SamplePolyAreas area, float cost);
 	void setCrowdIncludeFlag(int flag);

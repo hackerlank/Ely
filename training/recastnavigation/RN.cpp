@@ -182,13 +182,40 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
 	bool result = true;
 	m_geom = new InputGeom;
 	m_meshName = meshName;
-	if (not m_geom->loadMesh(m_ctx, (path + meshName).c_str(), scale))
+	//convert egg to obj: see panda3d/pandatool/src/objprogs/eggToObj{.h,.cxx}
+	//input egg file name
+	unsigned int inputNameLength = (path + meshName).length() + 1;
+	char * inputFileName = new char[inputNameLength];
+	strncpy(inputFileName, (path + meshName).c_str(), inputNameLength);
+	//out obj file name
+	char tmpOutFileName[L_tmpnam];
+	tmpnam (tmpOutFileName);
+	//egg2obj -C -cs y-up -o nav_test_panda.obj nav_test_panda.egg
+	int argc = 7;
+	char *argv[7];
+	argv[0] = "egg2obj";
+	argv[1] = "-C";
+	argv[2] = "-cs";
+	argv[3] = "y-up";
+	argv[4] = "-o";
+	argv[5] = tmpOutFileName;
+	argv[6] = inputFileName;
+	EggToObj prog;
+	prog.parse_command_line(argc, argv);
+	prog.run();
+	delete[] inputFileName;
+	//
+	if (not m_geom->loadMesh(m_ctx, tmpOutFileName, scale))
 	{
 		delete m_geom;
 		m_geom = NULL;
 		m_ctx->dumpLog("Geom load log %s:", meshName.c_str());
 		result = false;
 	}
+	//remove tmpOutFile
+	VirtualFileSystem *vfs = VirtualFileSystem::get_global_ptr();
+	Filename obj_filename = Filename::text_filename(std::string(tmpOutFileName));
+	vfs->delete_file(obj_filename);
 	return result;
 }
 
@@ -289,7 +316,8 @@ void RN::setCrowdTool()
 
 int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 		float agentMaxSpeed, AnimControlCollection* anims, BulletConstraint* cs,
-		BulletWorld* world, float maxError, float radius, float height)
+		BulletWorld* world, float maxError, float radius, float height,
+		BitMask32 rayMask)
 {
 	//get recast p (y-up)
 	float p[3];
@@ -303,7 +331,7 @@ int RN::addCrowdAgent(MOVTYPE movType, NodePath pandaNP, LPoint3f pos,
 	m_crowdTool->getState()->getCrowd()->updateAgentParameters(agentIdx, &ap);
 	//add Agent
 	Agent* agent = new Agent(agentIdx, movType, pandaNP, anims, cs, world,
-			maxError, radius);
+			maxError, radius, rayMask);
 	if (cs)
 	{
 		DCAST(BulletSphericalConstraint, cs)->set_pivot_b(pos);
@@ -585,7 +613,7 @@ void App::continueCallback(const Event* event)
 	float maxError = characterHeight;
 	int agentIdx = rn->addCrowdAgent(movType, character, agentPos,
 			characterMaxSpeed, &rn_anim_collection, cs, mBulletWorld.p(), maxError,
-			characterRadius, characterHeight);
+			characterRadius, characterHeight, allOnButZeroMask);
 	//add a crowd raycaster
 //	Raycaster::GetSingletonPtr()->setHitCallback(0, allOffButZeroMask,
 //			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());

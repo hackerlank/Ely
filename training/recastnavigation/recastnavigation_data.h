@@ -123,6 +123,6 @@ SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, Window
 void end(PandaFramework* panda);
 NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale);
 NodePath createCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
+MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs, NodePath mesh);
 
 #endif /* RECASTNAVIGATION_DATA_H_ */
