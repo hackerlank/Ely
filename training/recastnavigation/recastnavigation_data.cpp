@@ -232,8 +232,7 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 }
 
 NodePath createCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
-MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstraint** pcs,
-NodePath mesh)
+MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstraint** pcs)
 {
 	NodePath playerNP;
 	//Load the Actor Model
@@ -262,7 +261,7 @@ NodePath mesh)
 	switch (movType)
 	{
 		case RECAST:
-		Actor.reparent_to(mesh);
+		Actor.reparent_to(window->get_render());
 		playerNP = Actor;
 		break;
 		case KINEMATIC:

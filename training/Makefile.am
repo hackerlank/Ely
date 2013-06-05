@@ -31,19 +31,21 @@ rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
 
 noinst_LTLIBRARIES = libeggToObj.la
 
+pandatool_path = /REPOSITORY/KProjects/panda3d/pandatool/src
+
 libeggToObj_la_SOURCES = \
 		recastnavigation/eggToObj/eggToObj.cxx \
-		recastnavigation/eggToObj/programBase.cxx \
-		recastnavigation/eggToObj/withOutputFile.cxx \
-		recastnavigation/eggToObj/eggSingleBase.cxx \
-		recastnavigation/eggToObj/eggToSomething.cxx \
-		recastnavigation/eggToObj/eggReader.cxx \
-		recastnavigation/eggToObj/eggWriter.cxx \
-		recastnavigation/eggToObj/eggBase.cxx \
-		recastnavigation/eggToObj/wordWrapStream.cxx \
-		recastnavigation/eggToObj/wordWrapStreamBuf.cxx \
-		recastnavigation/eggToObj/eggFilter.cxx \
-		recastnavigation/eggToObj/eggConverter.cxx
+		$(pandatool_path)/progbase/programBase.cxx \
+		$(pandatool_path)/progbase/withOutputFile.cxx \
+		$(pandatool_path)/progbase/wordWrapStream.cxx \
+		$(pandatool_path)/progbase/wordWrapStreamBuf.cxx \
+		$(pandatool_path)/eggbase/eggSingleBase.cxx \
+		$(pandatool_path)/eggbase/eggToSomething.cxx \
+		$(pandatool_path)/eggbase/eggReader.cxx \
+		$(pandatool_path)/eggbase/eggWriter.cxx \
+		$(pandatool_path)/eggbase/eggBase.cxx \
+		$(pandatool_path)/eggbase/eggFilter.cxx \
+		$(pandatool_path)/eggbase/eggConverter.cxx
 
 rn_common_sources = \
 		recastnavigation/recastnavigation.cpp \

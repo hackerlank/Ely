@@ -132,7 +132,7 @@ int main(int argc, char **argv)
 
 #ifdef DEBUG_DRAW
 	//set a debug node path
-	app->renderDebug = app->worldMesh.attach_new_node("renderDebug");
+	app->renderDebug = app->window->get_render().attach_new_node("renderDebug");
 	app->renderDebug.set_bin("fixed", 10);
 #endif
 
@@ -142,7 +142,7 @@ int main(int argc, char **argv)
 	//Create a character
 	app->cs = NULL;
 	app->character = createCharacter(app->mBulletWorld, app->window, app->movType,
-			app->characterRadius, app->characterHeight, &(app->cs), app->worldMesh);
+			app->characterRadius, app->characterHeight, &(app->cs));
 	app->character.hide();
 
 	///RN common
