@@ -58,11 +58,15 @@ int main(int argc, char **argv)
 //	std::cout << app->allOnButZeroMask << std::endl;
 //	std::cout << app->allOffButZeroMask << std::endl;
 //	std::cout << (app->allOnButZeroMask & app->allOffButZeroMask) << std::endl;
+	//
+	allOnButZeroMask = app->allOnButZeroMask;
+	allOffButZeroMask = app->allOffButZeroMask;
 
 ///use getopt: -r(recast), -c(character), -k(kinematic with z raycast),
 ///		-d(debug), -s(solo), t(tile), -o(obstacles) -l scale
 	app->sampleType = SOLO;
 	app->meshScale = 1.0;
+	app->meshPosition = LVecBase3f::zero();
 #ifndef WITHCHARACTER
 	app->movType = RECAST;
 #else
@@ -71,7 +75,7 @@ int main(int argc, char **argv)
 	app->debugPhysics = false;
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "rcbkdstol:")) != -1)
+	while ((c = getopt(argc, argv, "rcbkdstol:x:y:z:")) != -1)
 	{
 		switch (c)
 		{
@@ -105,10 +109,20 @@ int main(int argc, char **argv)
 		case 'l':
 			app->meshScale = atof(optarg);
 			break;
+		case 'x':
+			app->meshPosition.set_x(atof(optarg));
+			break;
+		case 'y':
+			app->meshPosition.set_y(atof(optarg));
+			break;
+		case 'z':
+			app->meshPosition.set_z(atof(optarg));
+			break;
 		case '?':
-			if (optopt == 'l')
+			if ((optopt == 'l') or (optopt == 'x') or (optopt == 'y')
+					or (optopt == 'z'))
 				std::cerr << "Option " << optopt
-						<< " requires a scale argument.\n" << std::endl;
+						<< " requires an argument.\n" << std::endl;
 			else if (isprint(optopt))
 				std::cerr << "Unknown option " << optopt << std::endl;
 			else
@@ -122,13 +136,20 @@ int main(int argc, char **argv)
 	{
 		app->meshScale = 1.0;
 	}
-	app->agentPos = agentPos * app->meshScale;
 	//start
 	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window), app->debugPhysics);
 
 	//Create world mesh
 	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, app->meshScale);
+	app->worldMesh.set_pos(app->meshPosition);
 //	worldMesh.hide();
+	//setup camera trackball
+	NodePath tballnp = app->window->get_mouse().find("**/+Trackball");
+	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	trackball->set_hpr(0, 30, 0);
+	trackball->set_pos(0, 200, -50);
+	//update agent pos
+	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 
 #ifdef DEBUG_DRAW
 	//set a debug node path
@@ -148,7 +169,7 @@ int main(int argc, char **argv)
 	///RN common
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
 	//load geometry mesh
-	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale);
+	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale, app->worldMesh.get_pos());
 
 	//create geom mesh
 	switch (app->sampleType)

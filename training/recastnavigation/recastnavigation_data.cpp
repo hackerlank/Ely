@@ -228,7 +228,7 @@ NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* win
 	worldMesh.reparent_to(mRigidBodyNodePath);
 	mRigidBodyNodePath.reparent_to(window->get_render());
 
-	return worldMesh;
+	return mRigidBodyNodePath;
 }
 
 NodePath createCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,

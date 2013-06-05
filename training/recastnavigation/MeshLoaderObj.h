@@ -19,13 +19,15 @@
 #ifndef MESHLOADER_OBJ
 #define MESHLOADER_OBJ
 
+#include <cstdlib>
+
 class rcMeshLoaderObj
 {
 public:
 	rcMeshLoaderObj();
 	~rcMeshLoaderObj();
 	
-	bool load(const char* fileName, float scale = 1.0);
+	bool load(const char* fileName, float scale = 1.0, float* translation = NULL);
 
 	inline const float* getVerts() const { return m_verts; }
 	inline const float* getNormals() const { return m_normals; }
@@ -40,7 +42,8 @@ private:
 	void addTriangle(int a, int b, int c, int& cap);
 	
 	char m_filename[260];
-	float m_scale;	
+	float m_scale;
+	float m_translation[3];
 	float* m_verts;
 	int* m_tris;
 	float* m_normals;

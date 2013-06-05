@@ -177,7 +177,7 @@ RN::~RN()
 }
 
 bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
-		float scale)
+		float scale, LVector3f translation)
 {
 	bool result = true;
 	m_geom = new InputGeom;
@@ -205,7 +205,9 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
 	prog.run();
 	delete[] inputFileName;
 	//
-	if (not m_geom->loadMesh(m_ctx, tmpOutFileName, scale))
+	float translationRecast[3];
+	LVecBase3fToRecast(translation, translationRecast);
+	if (not m_geom->loadMesh(m_ctx, tmpOutFileName, scale, translationRecast))
 	{
 		delete m_geom;
 		m_geom = NULL;

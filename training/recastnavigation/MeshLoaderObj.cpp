@@ -31,6 +31,10 @@ rcMeshLoaderObj::rcMeshLoaderObj() :
 	m_vertCount(0),
 	m_triCount(0)
 {
+	for (int i = 0; i < 3; ++i)
+	{
+		m_translation[i] = 0.0;
+	}
 }
 
 rcMeshLoaderObj::~rcMeshLoaderObj()
@@ -52,9 +56,9 @@ void rcMeshLoaderObj::addVertex(float x, float y, float z, int& cap)
 		m_verts = nv;
 	}
 	float* dst = &m_verts[m_vertCount*3];
-	*dst++ = x*m_scale;
-	*dst++ = y*m_scale;
-	*dst++ = z*m_scale;
+	*dst++ = x*m_scale + m_translation[0];
+	*dst++ = y*m_scale + m_translation[1];
+	*dst++ = z*m_scale + m_translation[2];
 	m_vertCount++;
 }
 
@@ -138,13 +142,19 @@ static int parseFace(char* row, int* data, int n, int vcnt)
 	return j;
 }
 
-bool rcMeshLoaderObj::load(const char* filename, float scale)
+bool rcMeshLoaderObj::load(const char* filename, float scale, float* translation)
 {
 	char* buf = 0;
 	FILE* fp = fopen(filename, "rb");
 	if (!fp)
 		return false;
 	m_scale = scale;
+	if (translation != NULL)
+	{
+		m_translation[0] = translation[0];
+		m_translation[1] = translation[1];
+		m_translation[2] = translation[2];
+	}
 	fseek(fp, 0, SEEK_END);
 	int bufSize = ftell(fp);
 	fseek(fp, 0, SEEK_SET);

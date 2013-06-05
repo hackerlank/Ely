@@ -60,7 +60,7 @@ public:
 	InputGeom();
 	~InputGeom();
 	
-	bool loadMesh(class rcContext* ctx, const char* filepath, float scale=1.0);
+	bool loadMesh(class rcContext* ctx, const char* filepath, float scale=1.0, float* translation=NULL);
 	
 	bool load(class rcContext* ctx, const char* filepath);
 	bool save(const char* filepath);
