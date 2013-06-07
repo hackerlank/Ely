@@ -2,6 +2,8 @@ noinst_HEADERS =\
 		Ely.h \
 		AIComponents/Steering.h \
 		AIComponents/SteeringTemplate.h \
+		AIComponents/CrowdAgent.h \
+		AIComponents/CrowdAgentTemplate.h \
 		AudioComponents/Listener.h \
 		AudioComponents/ListenerTemplate.h \
 		AudioComponents/Sound3d.h \

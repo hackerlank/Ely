@@ -89,6 +89,8 @@ void initTypedObjects()
 	//
 	Steering::init_type();
 	SteeringTemplate::init_type();
+	CrowdAgent::init_type();
+	CrowdAgentTemplate::init_type();
 	Listener::init_type();
 	ListenerTemplate::init_type();
 	Sound3d::init_type();

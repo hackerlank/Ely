@@ -21,16 +21,63 @@
  * \author consultit
  */
 
-#include "../../include/AIComponents/CrowdAgentTemplate.h"
+#include "AIComponents/CrowdAgentTemplate.h"
 
-CrowdAgentTemplate::CrowdAgentTemplate()
+CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework)
 {
-	// TODO Auto-generated constructor stub
-
+	CHECKEXISTENCE(pandaFramework,
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid PandaFramework")
+	CHECKEXISTENCE(windowFramework,
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GameAIManager")
+	//
+	setParametersDefaults();
 }
 
 CrowdAgentTemplate::~CrowdAgentTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
+
+const ComponentType CrowdAgentTemplate::componentType() const
+{
+	return ComponentType("CrowdAgent");
+}
+
+const ComponentFamilyType CrowdAgentTemplate::familyType() const
+{
+	return ComponentFamilyType("AI");
+}
+
+SMARTPTR(Component)CrowdAgentTemplate::makeComponent(const ComponentId& compId)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	SMARTPTR(CrowdAgent) newCrowdAgent = new CrowdAgent(this);
+	newCrowdAgent->setComponentId(compId);
+	if (not newCrowdAgent->initialize())
+	{
+		return NULL;
+	}
+	return newCrowdAgent.p();
+}
+
+void CrowdAgentTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("enabled", "true"));
+	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
+	mParameterTable.insert(ParameterNameValue("controlled_type", "nodepath"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle CrowdAgentTemplate::_type_handle;
 

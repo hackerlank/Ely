@@ -41,7 +41,9 @@ ely_LDADD = \
 
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \
-		AIComponents/SteeringTemplate.cpp
+		AIComponents/SteeringTemplate.cpp \
+		AIComponents/CrowdAgent.cpp \
+		AIComponents/CrowdAgentTemplate.cpp
 
 libaudiocomponents_la_SOURCES = \
 		AudioComponents/Listener.cpp \

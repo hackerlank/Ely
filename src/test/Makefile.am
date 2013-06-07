@@ -47,7 +47,9 @@ libtestaicomponents_a_SOURCES = \
 		aicomponents/AISuiteFixture.h \
 		aicomponents/Steering_test.cpp \
 		$(top_srcdir)/src/AIComponents/Steering.cpp  \
-		$(top_srcdir)/src/AIComponents/SteeringTemplate.cpp
+		$(top_srcdir)/src/AIComponents/SteeringTemplate.cpp \
+		$(top_srcdir)/src/AIComponents/CrowdAgent.cpp \
+		$(top_srcdir)/src/AIComponents/CrowdAgentTemplate.cpp
 		
 libtestaudiocomponents_a_SOURCES = \
 		audiocomponents/AudioSuiteFixture.h \
