@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<?fileVersion 4.0.0?><cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
+<?fileVersion 4.0.0?>
+
+<cproject storage_type_id="org.eclipse.cdt.core.XmlProjectDescriptionStorage">
 	<storageModule moduleId="org.eclipse.cdt.core.settings">
 		<cconfiguration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1061592952">
 			<storageModule buildSystemId="org.eclipse.cdt.managedbuilder.core.configurationDataProvider" id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1061592952" moduleId="org.eclipse.cdt.core.settings" name="Build (GNU)">
@@ -40,6 +42,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/DetourCrowd/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/DetourTileCache/Include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/DebugUtils/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/recastnavigation"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2093535115" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -93,6 +96,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/recastnavigation"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2133312240" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -146,6 +150,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/recastnavigation"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2071251884" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -199,6 +204,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/recastnavigation"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.601151752" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -255,11 +261,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/Recast/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/Detour/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/DetourCrowd/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/DetourTileCache/Include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/DebugUtils/Include}&quot;"/>
+									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/recastnavigation"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1286370007" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -320,10 +322,10 @@
 		<configuration configurationName="Devel_Debug">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
+		<configuration configurationName="InitializationsLib"/>
 		<configuration configurationName="Release-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="InitializationsLib"/>
 		<configuration configurationName="Build (GNU)"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>

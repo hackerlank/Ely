@@ -74,11 +74,24 @@ inline unsigned int ilog2(unsigned int v)
 
 
 Sample_TileMesh::Sample_TileMesh(NodePath renderDebug) :
-		m_keepInterResults(false), m_buildAll(true), m_totalBuildTimeMs(0), m_triareas(
-				0), m_solid(0), m_chf(0), m_cset(0), m_pmesh(0), m_dmesh(0), m_drawMode(
-				DRAWMODE_NAVMESH), dd(renderDebug), m_maxTiles(0), m_maxPolysPerTile(0), m_tileSize(
-				32), m_tileCol(duRGBA(0, 0, 0, 32)), m_tileBuildTime(0), m_tileMemUsage(
-				0), m_tileTriCount(0)
+		Sample(renderDebug),
+		m_keepInterResults(false),
+		m_buildAll(true),
+		m_totalBuildTimeMs(0),
+		m_triareas(0),
+		m_solid(0),
+		m_chf(0),
+		m_cset(0),
+		m_pmesh(0),
+		m_dmesh(0),
+		m_drawMode(DRAWMODE_NAVMESH),
+		m_maxTiles(0),
+		m_maxPolysPerTile(0),
+		m_tileSize(32),
+		m_tileCol(duRGBA(0, 0, 0, 32)),
+		m_tileBuildTime(0),
+		m_tileMemUsage(0),
+		m_tileTriCount(0)
 {
 	resetCommonSettings();
 	memset(m_tileBmin, 0, sizeof(m_tileBmin));

@@ -140,6 +140,7 @@ public:
 	virtual void end();
 
 	NodePath getGeomNode(int i);
+	int getGeomNodesNum();
 	void removeGeomNodes();
 
 	/**

@@ -61,8 +61,6 @@ protected:
 	
 	DrawMode m_drawMode;
 
-	DebugDrawPanda3d dd;
-	
 	void cleanup();
 		
 public:

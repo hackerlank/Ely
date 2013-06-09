@@ -191,7 +191,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-training=yes --enable-ely-debug=yes CPPFLAGS=&quot;-I/home/marco/trash/usr/include/recastnavigation&quot; LDFLAGS=&quot;-L/home/marco/trash/usr/lib/recastnavigation&quot;"/>
+<option id="user" value="--enable-ely-training=yes --enable-ely-debug=yes CPPFLAGS=&quot;-I/REPOSITORY/KProjects/usr/include/recastnavigation&quot; LDFLAGS=&quot;-L/REPOSITORY/KProjects/usr/lib/recastnavigation&quot;"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>

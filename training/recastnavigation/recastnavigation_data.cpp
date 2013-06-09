@@ -26,7 +26,7 @@
 ///Data constants
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
-		"/REPOSITORY/KProjects/WORKSPACE/recastnavigation/RecastDemo/Bin/Meshes/");
+		"/REPOSITORY/KProjects/usr/share/DCC/recastnavigation/");
 ///
 //convert obj to egg: obj2egg -TR 90,0,0 nav_test.obj -o nav_test_panda.egg
 //triangulate nav_test_panda.egg and...

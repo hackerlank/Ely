@@ -1,6 +1,6 @@
 # PANDA3D_SEARCH
 # --------------
-# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS, PANDA3D_LIBS
+# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS, PANDA3D_LIBS, PANDA3D_RN_PHYSICS_LIBS
 # Argument: expected PYTHON_CPPFLAGS
 # Searches SDK first on cmd line flags then on std locations
 #
@@ -65,8 +65,9 @@ if test "x${ac_cv_header_Recast_h}" != xyes; then
 fi
 # check libraries first from cmd line specified ones
 RN_LDFLAGS="-L/usr/lib/recastnavigation -L/usr/lib64/recastnavigation -L/usr/local/lib/recastnavigation"
-RN_LIBS="-lDebugUtils -lDetourCrowdPhysics -lDetourCrowd \
-		 -lDetour -lDetourTileCache -lRecast"
+RN_LIBS="-lDebugUtils -lDetourCrowd -lDetour -lDetourTileCache -lRecast"
+#RN_PHYSICS_LIBS is not included in PANDA3D_LIBS
+RN_PHYSICS_LIBS="-lDebugUtils -lDetourCrowdPhysics -lDetour -lDetourTileCache -lRecast"
 			
 LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${RN_LIBS} ${LIBS_CMDLINE}"
@@ -81,7 +82,7 @@ rn_body="
   	"  	
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([$rn_prologue],[$rn_body])],
-  AC_MSG_NOTICE([Recast Navigation libraries OK]) 
+  AC_MSG_NOTICE([Recast Navigation libraries... yes]) 
   AC_DEFINE([HAVE_RN], 1, [Recast Navigation enabled]),
   [required_libraries="Recast Navigation"]
 )
@@ -98,6 +99,7 @@ fi
 PANDA3D_THIRDPARTY_CPPFLAGS="${BULLET_CPPFLAGS} ${EIGEN_CPPFLAGS} ${RN_CPPFLAGS}"
 PANDA3D_THIRDPARTY_LDFLAGS="${BULLET_LDFLAGS} ${EIGEN_LDFLAGS} ${RN_LDFLAGS}"
 PANDA3D_THIRDPARTY_LIBS="${BULLET_LIBS} ${EIGEN_LIBS} ${RN_LIBS}"
+PANDA3D_THIRDPARTY_RN_PHYSICS_LIBS="${BULLET_LIBS} ${EIGEN_LIBS} ${RN_PHYSICS_LIBS}"
 #
 ###Panda3d SDK###
 # check headers first from cmd line specified ones
@@ -120,6 +122,10 @@ PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
 			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
 			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${PANDA3D_THIRDPARTY_LIBS}"
+PANDA3D_RN_PHYSICS_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
+			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
+			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
+			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${PANDA3D_THIRDPARTY_RN_PHYSICS_LIBS}"
 			
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3D_LIBS} ${LIBS_CMDLINE}"
@@ -134,7 +140,7 @@ panda3d_body="
   	"  	
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([$panda3d_prologue],[$panda3d_body])],
-  AC_MSG_NOTICE([Panda3d SDK seems OK]) 
+  AC_MSG_NOTICE([Panda3d SDK libraries... yes]) 
   AC_DEFINE([HAVE_PANDA3D], 1, [Panda3d SDK enabled]),
   [required_libraries="Panda3d"]
 )

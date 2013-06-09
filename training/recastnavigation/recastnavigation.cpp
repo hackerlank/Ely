@@ -143,11 +143,11 @@ int main(int argc, char **argv)
 	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, app->meshScale);
 	app->worldMesh.set_pos(app->meshPosition);
 //	worldMesh.hide();
-	//setup camera trackball
+	//setup camera trackball (local coordinate)
 	NodePath tballnp = app->window->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
-	trackball->set_hpr(0, 30, 0);
-	trackball->set_pos(0, 200, -50);
+	trackball->set_pos(0, 200, 0);
+	trackball->set_hpr(0, 15, 0);
 	//update agent pos
 	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 

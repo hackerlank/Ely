@@ -139,8 +139,10 @@ protected:
 
 	BuildContext* m_ctx;
 
+	DebugDrawPanda3d dd;
+
 public:
-	Sample();
+	Sample(NodePath renderDebug = NodePath());
 	virtual ~Sample();
 
 	void setContext(BuildContext* ctx)

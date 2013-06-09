@@ -18,17 +18,7 @@ nodist_ely_training_SOURCES = \
 		draw_geometry.cpp \
 		test_wo_local_scale.cpp
 		
-ely_training_CPPFLAGS = \
-		-I$(rn_path)/DebugUtils/Include \
-		$(AM_CPPFLAGS)
-
-ely_training_LDADD = \
-		$(LDADD) \
-		$(rn_path)/DebugUtils/.libs/libDebugUtils.a
-		
 #recastnavigation
-rn_path = /REPOSITORY/KProjects/WORKSPACE/recastnavigation
-
 noinst_LTLIBRARIES = libeggToObj.la
 
 pandatool_path = /REPOSITORY/KProjects/panda3d/pandatool/src
@@ -66,43 +56,22 @@ rn_common_sources = \
 		recastnavigation/ConvexVolumeTool.cpp \
 		$(top_srcdir)/src/Support/Raycaster.cpp
 		
-rn_common_CPPFLAGS = \
-		-I$(rn_path)/DebugUtils/Include \
-		-I$(rn_path)/Detour/Include \
-		-I$(rn_path)/DetourCrowd/Include \
-		-I$(rn_path)/DetourTileCache/Include \
-		-I$(rn_path)/Recast/Include \
-		$(AM_CPPFLAGS)
-
-rn_common_LDADD = \
-		$(LDADD) \
-		$(rn_path)/DebugUtils/.libs/libDebugUtils.a \
-		$(rn_path)/Detour/.libs/libDetour.a \
-		$(rn_path)/DetourTileCache/.libs/libDetourTileCache.a \
-		$(rn_path)/Recast/.libs/libRecast.a \
-		libeggToObj.la
-		
 #ely_recastnavigation
 nodist_ely_recastnavigation_SOURCES = \
 		$(rn_common_sources)
 
-ely_recastnavigation_CPPFLAGS = \
-		$(rn_common_CPPFLAGS)
-
 ely_recastnavigation_LDADD = \
-		$(rn_common_LDADD) \
-		$(rn_path)/DetourCrowd/.libs/libDetourCrowd.a
-
+		$(LDADD) \
+		libeggToObj.la
+		
 #ely_recastnavigation_character
 nodist_ely_recastnavigation_character_SOURCES = \
 		$(rn_common_sources)
 
 ely_recastnavigation_character_CPPFLAGS = \
-		$(rn_common_CPPFLAGS) \
+		$(AM_CPPFLAGS) \
 		-DWITHCHARACTER
-
+		
 ely_recastnavigation_character_LDADD = \
-		$(rn_common_LDADD) \
-		$(rn_path)/DetourCrowd/.libs/libDetourCrowdPhysics.a
-
-
+		$(ELY_RN_PHYSICS_LIBS) \
+		libeggToObj.la

@@ -88,6 +88,9 @@ AC_SUBST(ELY_CXXFLAGS)
 AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
+#libs for using RN with Physics bullet character
+ELY_RN_PHYSICS_LIBS="${PANDA3D_RN_PHYSICS_LIBS}"
+AC_SUBST(ELY_RN_PHYSICS_LIBS)
 
 # checks for Boost Unit Test Framework tests (mantainer only)
 AC_ARG_ENABLE([ely-test],

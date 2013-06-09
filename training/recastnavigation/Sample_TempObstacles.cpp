@@ -821,6 +821,7 @@ public:
 
 
 Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug) :
+	Sample(renderDebug),
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),
@@ -829,7 +830,6 @@ Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug) :
 	m_cacheLayerCount(0),
 	m_cacheBuildMemUsage(0),
 	m_drawMode(DRAWMODE_NAVMESH),
-	dd(renderDebug),
 	m_maxTiles(0),
 	m_maxPolysPerTile(0),
 	m_tileSize(48)

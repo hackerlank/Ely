@@ -461,6 +461,14 @@ NodePath DebugDrawPanda3d::getGeomNode(int i)
 	return m_geomNodeNPCollection[i];
 }
 
+int DebugDrawPanda3d::getGeomNodesNum()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return m_geomNodeNPCollection.size();
+}
+
 void DebugDrawPanda3d::removeGeomNodes()
 {
 	//lock (guard) the mutex

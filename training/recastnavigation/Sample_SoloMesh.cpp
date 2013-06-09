@@ -44,6 +44,7 @@
 
 
 Sample_SoloMesh::Sample_SoloMesh(NodePath renderDebug) :
+	Sample(renderDebug),
 	m_keepInterResults(true),
 	m_totalBuildTimeMs(0),
 	m_triareas(0),
@@ -52,8 +53,7 @@ Sample_SoloMesh::Sample_SoloMesh(NodePath renderDebug) :
 	m_cset(0),
 	m_pmesh(0),
 	m_dmesh(0),
-	m_drawMode(DRAWMODE_NAVMESH),
-	dd(renderDebug)
+	m_drawMode(DRAWMODE_NAVMESH)
 {
 //	setTool(new NavMeshTesterTool);
 }

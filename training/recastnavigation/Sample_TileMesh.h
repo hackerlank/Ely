@@ -78,8 +78,6 @@ protected:
 
 	DrawMode m_drawMode;
 
-	DebugDrawPanda3d dd;
-
 	int m_maxTiles;
 	int m_maxPolysPerTile;
 	float m_tileSize;
