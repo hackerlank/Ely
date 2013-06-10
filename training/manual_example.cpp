@@ -40,6 +40,11 @@ int manual_example_main(int argc, char *argv[])
 		window->enable_keyboard(); // Enable keyboard detection
 		window->setup_trackball(); // Enable default camera movement
 	}
+	//setup camera trackball (local coordinate)
+	NodePath tballnp = window->get_mouse().find("**/+Trackball");
+	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	trackball->set_pos(0, 200, 0);
+	trackball->set_hpr(0, 15, 0);
 
 	//here is room for your own code
 
