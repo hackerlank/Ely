@@ -21,253 +21,314 @@
  * \author consultit
  */
 
-/*
-#include <pandaFramework.h>
 #include <pandaSystem.h>
-#include <geomVertexFormat.h>
-#include <geomPoints.h>
-#include <geomLines.h>
-#include <geomTriangles.h>
-#include <geomTristrips.h>
-#include <geomTrifans.h>
+#include <pandaFramework.h>
 #include "Utilities/Tools.h"
+#include "Support/Raycaster.h"
+#include <unistd.h>
+#include <cctype>
+#include <cmath>
+#include <cstring>
+#include <cstdlib>
+#include <iostream>
+#include <string>
+#include <vector>
+#include <map>
+#include <load_prc_file.h>
+#include <auto_bind.h>
+#include <partBundleHandle.h>
+#include <geomTriangles.h>
+#include <geomTrifans.h>
+#include <geomTristrips.h>
+#include <character.h>
+#include <animControlCollection.h>
+#include <mouseWatcher.h>
+#include <lvector3.h>
+#include <nodePath.h>
+#include <genericAsyncTask.h>
 
-#include <DebugDraw.h>
-#include <RecastDebugDraw.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#define _USE_MATH_DEFINES
+#include <math.h>
 
-#define DD
-
-inline LVecBase3f RecastToLVecBase3f(const float* p)
+class Panda3dMeshLoader
 {
-	return LVecBase3f(p[0], -p[2], p[1]);
-}
-inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float z)
-{
-	return LVecBase3f(x, -z, y);
-}
+public:
+	Panda3dMeshLoader();
+	~Panda3dMeshLoader();
 
-/// Panda3d debug draw implementation.
-class DebugDrawPanda3d : public duDebugDraw
-{
-protected:
-	///The render node path.
-	NodePath m_render;
-	///Depth Mask.
-	bool m_depthMask;
-	///Texture.
-	bool m_texture;
-	///The current GeomVertexData.
-	SMARTPTR(GeomVertexData) m_vertexData;
-	///The current vertex index.
-	int m_vertexIdx;
-	///The current GeomVertexWriters.
-	GeomVertexWriter m_vertex, m_color, m_texcoord;
-	///The current GeomPrimitive and draw type.
-	SMARTPTR(GeomPrimitive) m_geomPrim;
-	duDebugDrawPrimitives m_prim;
-	///The current Geom and index.
-	SMARTPTR(Geom) m_geom;
-	int m_geomIdx;
-	///The current GeomNode node path.
-	NodePath m_geomNodeNP;
-	///QUADS stuff.
-	int m_quadCurrIdx;
-	LVector3f m_quadFirstVertex, m_quadThirdVertex;
-	LVector4f m_quadFirstColor, m_quadThirdColor;
-	LVector2f m_quadFirstUV, m_quadThirdUV;
+	bool load(const char* fileName, float scale = 1.0,
+			float* translation = NULL);
+
+	inline const float* getVerts() const
+	{
+		return m_verts;
+	}
+	inline const float* getNormals() const
+	{
+		return m_normals;
+	}
+	inline const int* getTris() const
+	{
+		return m_tris;
+	}
+	inline int getVertCount() const
+	{
+		return m_vertCount;
+	}
+	inline int getTriCount() const
+	{
+		return m_triCount;
+	}
+	inline const char* getFileName() const
+	{
+		return m_filename;
+	}
 
 private:
-	///Helper
-	void doVertex(const LVector3f& vertex, const LVector4f& color,
-			const LVector2f& uv = LVecBase2f::zero());
-public:
-	DebugDrawPanda3d(NodePath render);
-	virtual ~DebugDrawPanda3d();
 
-	virtual void depthMask(bool state);
-	virtual void texture(bool state);
-	virtual void begin(duDebugDrawPrimitives prim, float size = 1.0f);
-	virtual void vertex(const float* pos, unsigned int color);
-	virtual void vertex(const float x, const float y, const float z, unsigned int color);
-	virtual void vertex(const float* pos, unsigned int color, const float* uv);
-	virtual void vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v);
-	virtual void end();
+	void addVertex(float x, float y, float z, int& cap);
+	void addTriangle(int a, int b, int c, int& cap);
+
+	char m_filename[260];
+	float m_scale;
+	float m_translation[3];
+	float* m_verts;
+	int* m_tris;
+	float* m_normals;
+	int m_vertCount;
+	int m_triCount;
 };
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
-		m_render(render),
-		m_depthMask(true),
-		m_texture(true),
-		m_vertexIdx(0),
-		m_prim(DU_DRAW_TRIS),
-		m_geomIdx(0)
+Panda3dMeshLoader::Panda3dMeshLoader() :
+		m_scale(1.0f), m_verts(0), m_tris(0), m_normals(0), m_vertCount(0), m_triCount(
+				0)
 {
-}
-
-DebugDrawPanda3d::~DebugDrawPanda3d()
-{
-}
-
-static inline float red(unsigned int color)
-{
-	return ((float) ((color & 0xFF000000) >> 24)) / 255.0;
-}
-static inline float green(unsigned int color)
-{
-	return ((float) ((color & 0x00FF0000) >> 16)) / 255.0;
-}
-static inline float blue(unsigned int color)
-{
-	return ((float) ((color & 0x0000FF00) >> 8)) / 255.0;
-}
-static inline float alpha(unsigned int color)
-{
-	return ((float) ((color & 0x000000FF) >> 0)) / 255.0;
-}
-
-void DebugDrawPanda3d::depthMask(bool state)
-{
-	m_depthMask = state;
-}
-
-void DebugDrawPanda3d::texture(bool state)
-{
-	m_texture = state;
-}
-
-void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
-{
-	m_vertexData = new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
-					Geom::UH_static);
-	m_vertex = GeomVertexWriter(m_vertexData, "vertex");
-	m_color = GeomVertexWriter(m_vertexData, "color");
-	m_texcoord = GeomVertexWriter(m_vertexData, "texcoord");
-	switch (prim)
+	for (int i = 0; i < 3; ++i)
 	{
-	case DU_DRAW_POINTS:
-		m_geomPrim = new GeomPoints(Geom::UH_static);
-		break;
-	case DU_DRAW_LINES:
-		m_geomPrim = new GeomLines(Geom::UH_static);
-		break;
-	case DU_DRAW_TRIS:
-		m_geomPrim = new GeomTriangles(Geom::UH_static);
-		break;
-	case DU_DRAW_QUADS:
-		m_geomPrim = new GeomTriangles(Geom::UH_static);
-		m_quadCurrIdx = 0;
-		break;
-	};
-	m_prim = prim;
-	m_vertexIdx = 0;
-}
-
-void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
-		const LVector2f& uv)
-{
-	if (m_prim != DU_DRAW_QUADS)
-	{
-		m_vertex.add_data3f(vertex);
-		m_color.add_data4f(color);
-		m_texcoord.add_data2f(uv);
-		//
-		m_geomPrim->add_vertex(m_vertexIdx);
-		++m_vertexIdx;
+		m_translation[i] = 0.0;
 	}
-	else
+}
+
+Panda3dMeshLoader::~Panda3dMeshLoader()
+{
+	delete[] m_verts;
+	delete[] m_normals;
+	delete[] m_tris;
+}
+
+void Panda3dMeshLoader::addVertex(float x, float y, float z, int& cap)
+{
+	if (m_vertCount + 1 > cap)
 	{
-		int quadCurrIdxMod = m_quadCurrIdx % 4;
-		LVector3f currVertex = vertex;
-		LVector4f currColor = color;
-		LVector2f currUV = uv;
-		switch (quadCurrIdxMod)
+		cap = !cap ? 8 : cap * 2;
+		float* nv = new float[cap * 3];
+		if (m_vertCount)
+			memcpy(nv, m_verts, m_vertCount * 3 * sizeof(float));
+		delete[] m_verts;
+		m_verts = nv;
+	}
+	float* dst = &m_verts[m_vertCount * 3];
+	*dst++ = x * m_scale + m_translation[0];
+	*dst++ = y * m_scale + m_translation[1];
+	*dst++ = z * m_scale + m_translation[2];
+	m_vertCount++;
+}
+
+void Panda3dMeshLoader::addTriangle(int a, int b, int c, int& cap)
+{
+	if (m_triCount + 1 > cap)
+	{
+		cap = !cap ? 8 : cap * 2;
+		int* nv = new int[cap * 3];
+		if (m_triCount)
+			memcpy(nv, m_tris, m_triCount * 3 * sizeof(int));
+		delete[] m_tris;
+		m_tris = nv;
+	}
+	int* dst = &m_tris[m_triCount * 3];
+	*dst++ = a;
+	*dst++ = b;
+	*dst++ = c;
+	m_triCount++;
+}
+
+static char* parseRow(char* buf, char* bufEnd, char* row, int len)
+{
+	bool cont = false;
+	bool start = true;
+	bool done = false;
+	int n = 0;
+	while (!done && buf < bufEnd)
+	{
+		char c = *buf;
+		buf++;
+		// multirow
+		switch (c)
 		{
-		case 0:
-			m_quadFirstVertex = currVertex;
-			m_quadFirstColor = currColor;
-			m_quadFirstUV = currUV;
-			++m_quadCurrIdx;
+		case '\\':
+			cont = true; // multirow
 			break;
-		case 2:
-			m_quadThirdVertex = currVertex;
-			m_quadThirdColor = currColor;
-			m_quadThirdUV = currUV;
-			++m_quadCurrIdx;
+		case '\n':
+			if (start)
+				break;
+			done = true;
 			break;
-		case 3:
-			//first
-			m_vertex.add_data3f(m_quadFirstVertex);
-			m_color.add_data4f(m_quadFirstColor);
-			m_texcoord.add_data2f(m_quadFirstUV);
-			//
-			m_geomPrim->add_vertex(m_vertexIdx);
-			++m_vertexIdx;
-			//last
-			m_vertex.add_data3f(m_quadThirdVertex);
-			m_color.add_data4f(m_quadThirdColor);
-			m_texcoord.add_data2f(m_quadThirdUV);
-			//
-			m_geomPrim->add_vertex(m_vertexIdx);
-			++m_vertexIdx;
-			m_quadCurrIdx = 0;
+		case '\r':
 			break;
-		case 1:
-			++m_quadCurrIdx;
-			break;
+		case '\t':
+		case ' ':
+			if (start)
+				break;
 		default:
+			start = false;
+			cont = false;
+			row[n++] = c;
+			if (n >= len - 1)
+				done = true;
 			break;
-		};
-		//current vertex
-		///
-		m_vertex.add_data3f(currVertex);
-		m_color.add_data4f(currColor);
-		m_texcoord.add_data2f(currUV);
-		//
-		m_geomPrim->add_vertex(m_vertexIdx);
-		++m_vertexIdx;
-		///
+		}
 	}
+	row[n] = '\0';
+	return buf;
 }
 
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
+static int parseFace(char* row, int* data, int n, int vcnt)
 {
-	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
-			LVector4f(red(color), green(color), blue(color), alpha(color)));
+	int j = 0;
+	while (*row != '\0')
+	{
+		// Skip initial white space
+		while (*row != '\0' && (*row == ' ' || *row == '\t'))
+			row++;
+		char* s = row;
+		// Find vertex delimiter and terminated the string there for conversion.
+		while (*row != '\0' && *row != ' ' && *row != '\t')
+		{
+			if (*row == '/')
+				*row = '\0';
+			row++;
+		}
+		if (*s == '\0')
+			continue;
+		int vi = atoi(s);
+		data[j++] = vi < 0 ? vi + vcnt : vi - 1;
+		if (j >= n)
+			return j;
+	}
+	return j;
 }
 
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
+bool Panda3dMeshLoader::load(const char* filename, float scale,
+		float* translation)
 {
-	doVertex(Recast3fToLVecBase3f(x, y, z),
-			LVector4f(red(color), green(color), blue(color), alpha(color)));
+	char* buf = 0;
+	FILE* fp = fopen(filename, "rb");
+	if (!fp)
+		return false;
+	m_scale = scale;
+	if (translation != NULL)
+	{
+		m_translation[0] = translation[0];
+		m_translation[1] = translation[1];
+		m_translation[2] = translation[2];
+	}
+	fseek(fp, 0, SEEK_END);
+	int bufSize = ftell(fp);
+	fseek(fp, 0, SEEK_SET);
+	buf = new char[bufSize];
+	if (!buf)
+	{
+		fclose(fp);
+		return false;
+	}
+	fread(buf, bufSize, 1, fp);
+	fclose(fp);
+
+	char* src = buf;
+	char* srcEnd = buf + bufSize;
+	char row[512];
+	int face[32];
+	float x, y, z;
+	int nv;
+	int vcap = 0;
+	int tcap = 0;
+
+	while (src < srcEnd)
+	{
+		// Parse one row
+		row[0] = '\0';
+		src = parseRow(src, srcEnd, row, sizeof(row) / sizeof(char));
+		// Skip comments
+		if (row[0] == '#')
+			continue;
+		if (row[0] == 'v' && row[1] != 'n' && row[1] != 't')
+		{
+			// Vertex pos
+			sscanf(row + 1, "%f %f %f", &x, &y, &z);
+			addVertex(x, y, z, vcap);
+		}
+		if (row[0] == 'f')
+		{
+			// Faces
+			nv = parseFace(row + 1, face, 32, m_vertCount);
+			for (int i = 2; i < nv; ++i)
+			{
+				const int a = face[0];
+				const int b = face[i - 1];
+				const int c = face[i];
+				if (a < 0 || a >= m_vertCount || b < 0 || b >= m_vertCount
+						|| c < 0 || c >= m_vertCount)
+					continue;
+				addTriangle(a, b, c, tcap);
+			}
+		}
+	}
+
+	delete[] buf;
+
+	// Calculate normals.
+	m_normals = new float[m_triCount * 3];
+	for (int i = 0; i < m_triCount * 3; i += 3)
+	{
+		const float* v0 = &m_verts[m_tris[i] * 3];
+		const float* v1 = &m_verts[m_tris[i + 1] * 3];
+		const float* v2 = &m_verts[m_tris[i + 2] * 3];
+		float e0[3], e1[3];
+		for (int j = 0; j < 3; ++j)
+		{
+			e0[j] = v1[j] - v0[j];
+			e1[j] = v2[j] - v0[j];
+		}
+		float* n = &m_normals[i];
+		n[0] = e0[1] * e1[2] - e0[2] * e1[1];
+		n[1] = e0[2] * e1[0] - e0[0] * e1[2];
+		n[2] = e0[0] * e1[1] - e0[1] * e1[0];
+		float d = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+		if (d > 0)
+		{
+			d = 1.0f / d;
+			n[0] *= d;
+			n[1] *= d;
+			n[2] *= d;
+		}
+	}
+
+	strncpy(m_filename, filename, sizeof(m_filename));
+	m_filename[sizeof(m_filename) - 1] = '\0';
+
+	return true;
 }
 
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
-{
-	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
-			LVector4f(red(color), green(color), blue(color), alpha(color)),
-			LVector2f(uv[0], uv[1]));
-}
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
-{
-	doVertex(Recast3fToLVecBase3f(x, y, z),
-			LVector4f(red(color), green(color), blue(color), alpha(color)),
-			LVector2f(u, v));
-}
-
-void DebugDrawPanda3d::end()
-{
-	m_geomPrim->close_primitive();
-	m_geom = new Geom(m_vertexData);
-	m_geom->add_primitive(m_geomPrim);
-	ostringstream idx;
-	idx << m_geomIdx;
-	m_geomNodeNP = NodePath(new GeomNode("geomNode" + idx.str()));
-	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
-	m_geomNodeNP.reparent_to(m_render);
-//	m_geomNodeNP.set_depth_write(m_depthMask);
-	++m_geomIdx;
-}
+std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
+std::string rnDir("/REPOSITORY/KProjects/usr/share/DCC/recastnavigation/");
+std::string meshNameEgg("nav_test_panda.egg");
+void processGeomNode(PT(GeomNode)geomNode);
+void processGeom(CPT(Geom)geom);
+void processVertexData(CPT(GeomVertexData)vertexData);
+void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData);
 
 int draw_geometry_main(int argc, char *argv[])
 {
@@ -285,244 +346,46 @@ int draw_geometry_main(int argc, char *argv[])
 		window->enable_keyboard(); // Enable keyboard detection
 		window->setup_trackball(); // Enable default camera movement
 	}
+	//setup camera trackball (local coordinate)
+	NodePath tballnp = window->get_mouse().find("**/+Trackball");
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
+	trackball->set_pos(0, 0, 0);
+	trackball->set_hpr(0, 0, 0);
 
 	//here is room for your own code
+	// Load your configuration
+	load_prc_file_data("", "model-path" + baseDir + "data/models");
+	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "show-frame-rate-meter #t");
+	load_prc_file_data("", "lock-to-one-cpu 0");
+	load_prc_file_data("", "support-threads 1");
+	load_prc_file_data("", "audio-buffering-seconds 5");
+	load_prc_file_data("", "audio-preload-threshold 2000000");
+	load_prc_file_data("", "sync-video #t");
+	//Load world mesh
+	NodePath worldMesh = window->load_model(window->get_render(),
+			rnDir + meshNameEgg);
+	worldMesh.set_pos(0.0, 0.0, 0.0);
 
-#ifdef DD
-	///<!--Constructor
-	DebugDrawPanda3d dd(window->get_render());
-	///-->
-
-	duDebugDrawPrimitives primType;
-//	primType = DU_DRAW_POINTS;
-//	primType = DU_DRAW_LINES;
-	primType = DU_DRAW_TRIS;
-//	primType = DU_DRAW_QUADS;
-
-	unsigned int color;
-
-	///prim 1
-	///<!--begin
-	dd.begin(primType);
-	///-->
-	///<!--vertex
-	//Add data
-	color = 0xFFFF00FF;
-	if (primType != DU_DRAW_QUADS)
+	//When you load a model, you have a handle to the root node
+	//of the model, which is usually a ModelRoot node.
+	//The geometry itself will be stored in a series of GeomNodes,
+	//which will be children of the root node. In order to examine
+	//the vertex data, you must visit the GeomNodes in the model.
+	//One way to do this is to walk through all the GeomNodes like this:
+	NodePathCollection geomNodeCollection = worldMesh.find_all_matches(
+			"**/+GeomNode");
+	int numPaths = geomNodeCollection.get_num_paths();
+	for (int i = 0; i < numPaths; i++)
 	{
-		//triangle 1
-		//0
-		dd.vertex(0, 0, 0, color, 0, 0);
-		//1
-		dd.vertex(1, 0, 0, color, 1, 0);
-		//6
-		dd.vertex(1, 1, 0, color, 1, 1);
-		//triangle 2
-		//1
-		dd.vertex(1, 0, 0, color, 0, 0);
-		//2
-		dd.vertex(2, 0, 0, color, 1, 0);
-		//5
-		dd.vertex(2, 1, 0, color, 1, 1);
-		//triangle 3
-		//2
-		dd.vertex(2, 0, 0, color, 0, 0);
-		//3
-		dd.vertex(3, 0, 0, color, 1, 0);
-		//4
-		dd.vertex(3, 1, 0, color, 1, 1);
+		PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
+		processGeomNode(geomNode);
 	}
-	else
-	{
-		//quad 1
-		//0
-		dd.vertex(0, 0, 0, color, 0, 0);
-		//1
-		dd.vertex(1, 0, 0, color, 1, 0);
-		//6
-		dd.vertex(1, 1, 0, color, 1, 1);
-		//7
-		dd.vertex(0, 1, 0, color, 0, 1);
-		//quad 2
-		//2
-		dd.vertex(2, 0, 0, color, 0, 0);
-		//3
-		dd.vertex(3, 0, 0, color, 1, 0);
-		//4
-		dd.vertex(3, 1, 0, color, 1, 1);
-		//5
-		dd.vertex(2, 1, 0, color, 0, 1);
-	}
-	///-->
-	///<!--end
-	dd.end();
-	///-->
 
-	///prim 2
-	///<!--begin
-	dd.begin(primType);
-	///-->
-	///<!--vertex
-	//Add data
-	color = 0x00FF00FF;
-	if (primType != DU_DRAW_QUADS)
-	{
-		//triangle 1
-		//0
-		dd.vertex(0, 0, 0, color, 0, 0);
-		//6
-		dd.vertex(1, 1, 0, color, 1, 1);
-		//7
-		dd.vertex(0, 1, 0, color, 0, 1);
-		//triangle 2
-		//2
-		dd.vertex(2, 0, 0, color, 0, 0);
-		//4
-		dd.vertex(3, 1, 0, color, 1, 1);
-		//5
-		dd.vertex(2, 1, 0, color, 0, 1);
-	}
-	else
-	{
-		//quad 1
-		//1
-		dd.vertex(1, 0, 0, color, 0, 0);
-		//2
-		dd.vertex(2, 0, 0, color, 1, 0);
-		//5
-		dd.vertex(2, 1, 0, color, 1, 1);
-		//6
-		dd.vertex(1, 1, 0, color, 0, 1);
-	}
-	///-->
-	///<!--end
-	dd.end();
-	///-->
-
-#else
-	SMARTPTR(GeomVertexData) vertexData;
-	SMARTPTR(GeomTriangles) prim;
-	GeomVertexWriter vertex, color, texcoord;
-	SMARTPTR(Geom) geom;
-	SMARTPTR(GeomNode) node;
-	NodePath nodePath;
-
-	///<!--Constructor
-	//Creating and filling a GeomVertexData
-	vertexData = new GeomVertexData("VertexData",
-			GeomVertexFormat::get_v3c4t2(), Geom::UH_static);
-	//Create a number of GeomVertexWriters
-	vertex = GeomVertexWriter(vertexData, "vertex");
-	color = GeomVertexWriter(vertexData, "color");
-	texcoord = GeomVertexWriter(vertexData, "texcoord");
-	///-->
-
-	///<!--begin
-	prim = new GeomTriangles(Geom::UH_static);
-	vertex.set_row(0);
-	color.set_row(0);
-	texcoord.set_row(0);;
-	int vertexIdx = 0;
-	///-->
-
-	///<!--vertex
-	//Add data
-	//triangle 1
-	//0
-	vertex.add_data3f(0, 0, 0);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(0, 0);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//1
-	vertex.add_data3f(1, 0, 0);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(1, 0);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//6
-	vertex.add_data3f(1, 0, 1);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(1, 1);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//triangle 2
-	//1
-	vertex.add_data3f(1, 0, 0);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(0, 0);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//2
-	vertex.add_data3f(2, 0, 0);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(1, 0);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//5
-	vertex.add_data3f(2, 0, 1);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(1, 1);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//triangle 3
-	//2
-	vertex.add_data3f(2, 0, 0);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(0, 0);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//3
-	vertex.add_data3f(3, 0, 0);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(1, 0);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	//4
-	vertex.add_data3f(3, 0, 1);
-	color.add_data4f(0, 0, 1, 1);
-	texcoord.add_data2f(1, 1);
-	prim->add_vertex(vertexIdx);
-	++vertexIdx;
-	///-->
-
-	///<!--end
-	prim->close_primitive();
-	geom = new Geom(vertexData);
-	geom->add_primitive(prim);
-	//Putting your new geometry in the scene graph
-	ostringstream idx;
-	idx << "gnode" << 1;
-	std::cout << idx.str() << std::endl;
-	node = new GeomNode(idx.str());
-	node->add_geom(geom);
-	nodePath = window->get_render().attach_new_node(node);
-	///-->
-#endif
-
-
-	//7
-//	vertex.add_data3f(0, 0, 1);
-//	color.add_data4f(0, 0, 1, 1);
-//	texcoord.add_data2f(0, 1);
-//	prim->add_vertex(vertexIdx);
-//	++vertexIdx;
-	//create one or more GeomPrimitive objects
-	//the first triangle
-//	prim->add_vertex(0);
-//	prim->add_vertex(1);
-//	prim->add_vertex(6);
-//	prim->add_vertex(1);
-//	prim->add_vertex(2);
-//	prim->add_vertex(5);
-//	prim->add_vertex(2);
-//	prim->add_vertex(3);
-//	prim->add_vertex(4);
-	// you can also add a few at once
-//	prim->add_vertices(0, 1, 6);
-//	prim->add_vertices(1, 2, 5);
-//	prim->add_vertices(2, 3, 4);
-
+	//attach to scene
+	worldMesh.reparent_to(window->get_render());
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -530,8 +393,117 @@ int draw_geometry_main(int argc, char *argv[])
 	framework.close_framework();
 	return (0);
 }
-*/
 
+//Once you have a particular GeomNode, you must walk through
+//the list of Geoms stored on that node. Each Geom also has
+//an associated RenderState, which controls the visible
+//appearance of that Geom (e.g. texture, backfacing, etc.).
+///\note: that geomNode->getGeom() is only appropriate if you
+///will be reading, but not modifying, the data. If you intend
+///to modify the geom data in any way (including any nested
+///data like vertices or primitives), you should use
+///geomNode.modifyGeom() instead.
+void processGeomNode(PT(GeomNode)geomNode)
+{
+	int numGeoms = geomNode->get_num_geoms();
+	for (int j = 0; j < numGeoms; j++)
+	{
+		const CPT(Geom)geom = geomNode->get_geom(j);
+//		geom->write(nout);	//outputs basic info on the geom
+//		geomNode->get_geom_state(j)->write(nout, 0);//basic renderstate info
+		processGeom(geom);
+	}
+}
 
+//Each Geom has an associated GeomVertexData, and one or more
+//GeomPrimitives. Some GeomVertexData objects may be shared
+//by more than one Geom, especially if you have used
+//flattenStrong() to optimize a model.
+///\note: As above, get_vertex_data() is only appropriate if
+///you will only be reading, but not modifying, the vertex data.
+///Similarly, getPrimitive() is appropriate only if you will
+///not be modifying the primitive index array. If you intend
+///to modify either one, use modifyVertexData() or modifyPrimitive(),
+///respectively.
+void processGeom(CPT(Geom)geom)
+{
+	const CPT(GeomVertexData)vertexData = geom->get_vertex_data();
+//	vertexData->write(nout);
+//	processVertexData(vertexData);
+	int numPrimitives = geom->get_num_primitives();
+	for(int i=0;i<numPrimitives;i++)
+	{
+		const CPT(GeomPrimitive) primitive = geom->get_primitive(i);
+//		primitive->write(nout,0);
+		processPrimitive(primitive, vertexData);
+	}
+}
 
+//You can use the GeomVertexReader class to examine the vertex data.
+//You should create a GeomVertexReader for each column of the data
+//you intend to read. It is up to you to ensure that a given column
+//exists in the vertex data before you attempt to read it (you can
+//use vdata.hasColumn() to test this).
+void processVertexData(CPT(GeomVertexData)vertexData)
+{
+	GeomVertexReader vertices = GeomVertexReader(vertexData, "vertex");
+	while (!vertices.is_at_end())
+	{
+		LVector3f v = vertices.get_data3f();
+		nout<< "V = " << v  << endl;
+	}
+}
+
+//Each GeomPrimitive may be any of a handful of different classes,
+//according to the primitive type it is; but all GeomPrimitive
+//classes have the same common interface to walk through the
+//list of vertices referenced by the primitives stored within the class.
+//You can use the setRow() method of GeomVertexReader to set the
+//reader to a particular vertex. This affects the next call to getData().
+//In this way, you can extract the vertex data for the vertices in the
+//order that the primitive references them (instead of in order from
+//the beginning to the end of the vertex table, as above).
+///\note: You may find the call to primitive->decompose() useful
+///(as shown in the below example). This call automatically
+///decomposes higher-order primitive types, like GeomTristrips and
+///GeomTrifans, into the equivalent component primitive types,
+///like GeomTriangles; but when called on a GeomTriangles, it returns
+///the GeomTriangles object unchanged. Similarly, GeomLinestrips will
+///be decomposed into GeomLines. This way you can write code that
+///doesn't have to know anything about GeomTristrips and GeomTrifans,
+///which are fairly complex; it can assume it will only get the much
+///simpler GeomTriangles (or, in the case of lines or points, GeomLines
+///and GeomPoints, respectively).
+void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData)
+{
+	nout << "Primitive type: " <<
+			primitive->get_type().get_name() <<endl;
+	if (primitive->is_of_type(GeomTriangles::get_class_type()) or
+			primitive->is_of_type(GeomTrifans::get_class_type()) or
+			primitive->is_of_type(GeomTristrips::get_class_type()))
+	{
+		GeomVertexReader vertices = GeomVertexReader(vertexData, "vertex");
+
+		//Note: There should be primitive = primitive->decompose();
+		//here, it wouldn't work for me but i use the cvs panda and
+		//that could have been broken at this time.
+		CPT(GeomPrimitive)primitiveDec = primitive->decompose();
+		int numPrimitives = primitiveDec->get_num_primitives();
+		nout << "PrimitiveDec type: " <<
+				primitiveDec->get_type().get_name() <<endl;
+		for (int k = 0; k < numPrimitives; k++)
+		{
+			int s = primitiveDec->get_primitive_start(k);
+			int e = primitiveDec->get_primitive_end(k);
+			for (int i = s; i < e; i++)
+			{
+				int vi = primitiveDec->get_vertex(i);
+				vertices.set_row(vi);
+				LVector3f v = vertices.get_data3f();
+				nout << "prim " << k << " has vertex " << vi << ": " << v
+				<< endl;
+			}
+		}
+	}
+}
 
