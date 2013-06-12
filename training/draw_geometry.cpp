@@ -53,6 +53,22 @@
 #define _USE_MATH_DEFINES
 #include <math.h>
 
+//https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/z$20axis/recastnavigation/fMqEAqSBOBk/zwOzHmjRsj0J
+inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
+{
+	p[0] = v.get_x();
+	p[1] = v.get_z();
+	p[2] = -v.get_y();
+}
+inline LVecBase3f RecastToLVecBase3f(const float* p)
+{
+	return LVecBase3f(p[0], -p[2], p[1]);
+}
+inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float z)
+{
+	return LVecBase3f(x, -z, y);
+}
+
 class Panda3dMeshLoader
 {
 public:
@@ -60,6 +76,9 @@ public:
 	~Panda3dMeshLoader();
 
 	bool load(const char* fileName, float scale = 1.0,
+			float* translation = NULL);
+
+	bool load(NodePath model, float scale = 1.0,
 			float* translation = NULL);
 
 	inline const float* getVerts() const
@@ -91,6 +110,11 @@ private:
 
 	void addVertex(float x, float y, float z, int& cap);
 	void addTriangle(int a, int b, int c, int& cap);
+
+	void processGeomNode(PT(GeomNode)geomNode);
+	void processGeom(CPT(Geom)geom);
+	void processVertexData(CPT(GeomVertexData)vertexData);
+	void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData);
 
 	char m_filename[260];
 	float m_scale;
@@ -322,6 +346,120 @@ bool Panda3dMeshLoader::load(const char* filename, float scale,
 	return true;
 }
 
+bool Panda3dMeshLoader::load(NodePath model, float scale,
+		float* translation)
+{
+	m_scale = scale;
+	if (translation != NULL)
+	{
+		m_translation[0] = translation[0];
+		m_translation[1] = translation[1];
+		m_translation[2] = translation[2];
+	}
+	//Walk through all the model's GeomNodes
+	NodePathCollection geomNodeCollection = model.find_all_matches(
+			"**/+GeomNode");
+	int numPaths = geomNodeCollection.get_num_paths();
+	for (int i = 0; i < numPaths; i++)
+	{
+		PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
+		processGeomNode(geomNode);
+	}
+
+	// Calculate normals.
+	m_normals = new float[m_triCount * 3];
+	for (int i = 0; i < m_triCount * 3; i += 3)
+	{
+		const float* v0 = &m_verts[m_tris[i] * 3];
+		const float* v1 = &m_verts[m_tris[i + 1] * 3];
+		const float* v2 = &m_verts[m_tris[i + 2] * 3];
+		float e0[3], e1[3];
+		for (int j = 0; j < 3; ++j)
+		{
+			e0[j] = v1[j] - v0[j];
+			e1[j] = v2[j] - v0[j];
+		}
+		float* n = &m_normals[i];
+		n[0] = e0[1] * e1[2] - e0[2] * e1[1];
+		n[1] = e0[2] * e1[0] - e0[0] * e1[2];
+		n[2] = e0[0] * e1[1] - e0[1] * e1[0];
+		float d = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+		if (d > 0)
+		{
+			d = 1.0f / d;
+			n[0] *= d;
+			n[1] *= d;
+			n[2] *= d;
+		}
+	}
+
+	return true;
+}
+
+void Panda3dMeshLoader::processGeomNode(PT(GeomNode)geomNode)
+{
+	//Walk through the list of GeomNode's Geoms
+	int numGeoms = geomNode->get_num_geoms();
+	for (int j = 0; j < numGeoms; j++)
+	{
+		const CPT(Geom)geom = geomNode->get_geom(j);
+		processGeom(geom);
+	}
+}
+
+void Panda3dMeshLoader::processGeom(CPT(Geom)geom)
+{
+	const CPT(GeomVertexData)vertexData = geom->get_vertex_data();
+	//Process vertices
+	processVertexData(vertexData);
+	int numPrimitives = geom->get_num_primitives();
+	//Walk through the list of Geom's GeomPrimitives
+	for(int i=0;i<numPrimitives;i++)
+	{
+		const CPT(GeomPrimitive) primitive = geom->get_primitive(i);
+		processPrimitive(primitive, vertexData);
+	}
+}
+
+void Panda3dMeshLoader::processVertexData(CPT(GeomVertexData)vertexData)
+{
+	GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+	int vcap = 0;
+	while (!vertexReader.is_at_end())
+	{
+		LVector3f vertex = vertexReader.get_data3f();
+		//add vertex
+		float v[3];
+		LVecBase3fToRecast(vertex, v);
+		addVertex(v[0], v[1], v[2], vcap);
+	}
+}
+
+void Panda3dMeshLoader::processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData)
+{
+	int tcap = 0;
+	if (primitive->is_of_type(GeomTriangles::get_class_type()) or
+			primitive->is_of_type(GeomTrifans::get_class_type()) or
+			primitive->is_of_type(GeomTristrips::get_class_type()))
+	{
+		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+		CPT(GeomPrimitive)primitiveDec = primitive->decompose();
+		int numPrimitives = primitiveDec->get_num_primitives();
+		for (int k = 0; k < numPrimitives; k++)
+		{
+			int s = primitiveDec->get_primitive_start(k);
+			int e = primitiveDec->get_primitive_end(k);
+			//add vertex indices
+			int vi[3];
+			for (int j = s; j < e; ++j)
+			{
+				vi[j-s] = primitiveDec->get_vertex(j);
+			}
+			addTriangle(vi[0], vi[1], vi[2], tcap);
+		}
+	}
+}
+
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir("/REPOSITORY/KProjects/usr/share/DCC/recastnavigation/");
 std::string meshNameEgg("nav_test_panda.egg");
@@ -332,6 +470,17 @@ void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData
 
 int draw_geometry_main(int argc, char *argv[])
 {
+	// Load your configuration
+	load_prc_file_data("", "model-path" + baseDir + "data/models");
+	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "show-frame-rate-meter #t");
+	load_prc_file_data("", "lock-to-one-cpu 0");
+	load_prc_file_data("", "support-threads 1");
+	load_prc_file_data("", "audio-buffering-seconds 5");
+	load_prc_file_data("", "audio-preload-threshold 2000000");
+	load_prc_file_data("", "sync-video #t");
 	//open a new window framework
 	PandaFramework framework;
 	framework.open_framework(argc, argv);
@@ -353,21 +502,10 @@ int draw_geometry_main(int argc, char *argv[])
 	trackball->set_hpr(0, 0, 0);
 
 	//here is room for your own code
-	// Load your configuration
-	load_prc_file_data("", "model-path" + baseDir + "data/models");
-	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
-	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
-	load_prc_file_data("", "model-path" + baseDir + "data/textures");
-	load_prc_file_data("", "show-frame-rate-meter #t");
-	load_prc_file_data("", "lock-to-one-cpu 0");
-	load_prc_file_data("", "support-threads 1");
-	load_prc_file_data("", "audio-buffering-seconds 5");
-	load_prc_file_data("", "audio-preload-threshold 2000000");
-	load_prc_file_data("", "sync-video #t");
 	//Load world mesh
 	NodePath worldMesh = window->load_model(window->get_render(),
 			rnDir + meshNameEgg);
-	worldMesh.set_pos(0.0, 0.0, 0.0);
+	worldMesh.flatten_strong();
 
 	//When you load a model, you have a handle to the root node
 	//of the model, which is usually a ModelRoot node.
@@ -384,7 +522,11 @@ int draw_geometry_main(int argc, char *argv[])
 		processGeomNode(geomNode);
 	}
 
+	Panda3dMeshLoader p3dl;
+	p3dl.load(worldMesh);
+
 	//attach to scene
+	worldMesh.set_pos(0.0, 0.0, 0.0);
 	worldMesh.reparent_to(window->get_render());
 
 	//do the main loop, equal to run() in python
@@ -429,7 +571,7 @@ void processGeom(CPT(Geom)geom)
 {
 	const CPT(GeomVertexData)vertexData = geom->get_vertex_data();
 //	vertexData->write(nout);
-//	processVertexData(vertexData);
+	processVertexData(vertexData);
 	int numPrimitives = geom->get_num_primitives();
 	for(int i=0;i<numPrimitives;i++)
 	{
@@ -446,11 +588,12 @@ void processGeom(CPT(Geom)geom)
 //use vdata.hasColumn() to test this).
 void processVertexData(CPT(GeomVertexData)vertexData)
 {
-	GeomVertexReader vertices = GeomVertexReader(vertexData, "vertex");
-	while (!vertices.is_at_end())
+	GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+	int vertexNum = vertexData->get_num_rows();
+	while (!vertexReader.is_at_end())
 	{
-		LVector3f v = vertices.get_data3f();
-		nout<< "V = " << v  << endl;
+		LVector3f vertex = vertexReader.get_data3f();
+//		nout<< "Vertex = " << vertex  << endl;
 	}
 }
 
@@ -482,8 +625,7 @@ void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData
 			primitive->is_of_type(GeomTrifans::get_class_type()) or
 			primitive->is_of_type(GeomTristrips::get_class_type()))
 	{
-		GeomVertexReader vertices = GeomVertexReader(vertexData, "vertex");
-
+		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
 		//Note: There should be primitive = primitive->decompose();
 		//here, it wouldn't work for me but i use the cvs panda and
 		//that could have been broken at this time.
@@ -498,8 +640,8 @@ void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData
 			for (int i = s; i < e; i++)
 			{
 				int vi = primitiveDec->get_vertex(i);
-				vertices.set_row(vi);
-				LVector3f v = vertices.get_data3f();
+				vertexReader.set_row(vi);
+				LVector3f v = vertexReader.get_data3f();
 				nout << "prim " << k << " has vertex " << vi << ": " << v
 				<< endl;
 			}
