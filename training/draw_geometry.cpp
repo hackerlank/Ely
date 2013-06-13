@@ -114,7 +114,7 @@ private:
 	void processGeomNode(PT(GeomNode)geomNode);
 	void processGeom(CPT(Geom)geom);
 	void processVertexData(CPT(GeomVertexData)vertexData);
-	void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData);
+	void processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex);
 
 	char m_filename[260];
 	float m_scale;
@@ -124,11 +124,17 @@ private:
 	float* m_normals;
 	int m_vertCount;
 	int m_triCount;
+	//
+	std::vector<CPT(Geom)> m_geoms;
+	std::vector<CPT(GeomVertexData)> m_vertexData;
+	std::vector<int> m_startIndices;
+	int m_currentMaxIndex;
+	int vcap, tcap;
 };
 
 Panda3dMeshLoader::Panda3dMeshLoader() :
 		m_scale(1.0f), m_verts(0), m_tris(0), m_normals(0), m_vertCount(0), m_triCount(
-				0)
+				0), m_currentMaxIndex(0), vcap(0), tcap(0)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -357,6 +363,7 @@ bool Panda3dMeshLoader::load(NodePath model, float scale,
 		m_translation[2] = translation[2];
 	}
 	//Walk through all the model's GeomNodes
+	m_currentMaxIndex = 0;
 	NodePathCollection geomNodeCollection = model.find_all_matches(
 			"**/+GeomNode");
 	int numPaths = geomNodeCollection.get_num_paths();
@@ -409,6 +416,9 @@ void Panda3dMeshLoader::processGeomNode(PT(GeomNode)geomNode)
 
 void Panda3dMeshLoader::processGeom(CPT(Geom)geom)
 {
+	//insert geom
+	m_geoms.push_back(geom);
+	unsigned int geomIndex = m_geoms.size() - 1;
 	const CPT(GeomVertexData)vertexData = geom->get_vertex_data();
 	//Process vertices
 	processVertexData(vertexData);
@@ -417,32 +427,55 @@ void Panda3dMeshLoader::processGeom(CPT(Geom)geom)
 	for(int i=0;i<numPrimitives;i++)
 	{
 		const CPT(GeomPrimitive) primitive = geom->get_primitive(i);
-		processPrimitive(primitive, vertexData);
+		processPrimitive(primitive, geomIndex);
 	}
 }
 
 void Panda3dMeshLoader::processVertexData(CPT(GeomVertexData)vertexData)
 {
-	GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
-	int vcap = 0;
-	while (!vertexReader.is_at_end())
+	//check if vertexData already present
+	unsigned int vertexDataNum = m_vertexData.size();
+	unsigned int index = 0;
+	while(index < vertexDataNum)
 	{
-		LVector3f vertex = vertexReader.get_data3f();
-		//add vertex
-		float v[3];
-		LVecBase3fToRecast(vertex, v);
-		addVertex(v[0], v[1], v[2], vcap);
+		if(m_vertexData[index] == vertexData)
+		{
+			break;
+		}
+		++index;
 	}
+	if(index == vertexDataNum)
+	{
+		//vertexData is not present
+		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+		while (!vertexReader.is_at_end())
+		{
+			LVector3f vertex = vertexReader.get_data3f();
+			//add vertex
+			float v[3];
+			LVecBase3fToRecast(vertex, v);
+			addVertex(v[0], v[1], v[2], vcap);
+		}
+		m_startIndices.push_back(m_currentMaxIndex);
+		//increment the max index
+		int vertexNum = vertexData->get_num_rows();
+		m_currentMaxIndex += vertexNum;
+	}
+	else
+	{
+		m_startIndices.push_back(m_startIndices[index]);
+	}
+	//insert vertexData any way
+	m_vertexData.push_back(vertexData);
 }
 
-void Panda3dMeshLoader::processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData)
+void Panda3dMeshLoader::processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex)
 {
-	int tcap = 0;
 	if (primitive->is_of_type(GeomTriangles::get_class_type()) or
 			primitive->is_of_type(GeomTrifans::get_class_type()) or
 			primitive->is_of_type(GeomTristrips::get_class_type()))
 	{
-		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+		//decompose to triangles
 		CPT(GeomPrimitive)primitiveDec = primitive->decompose();
 		int numPrimitives = primitiveDec->get_num_primitives();
 		for (int k = 0; k < numPrimitives; k++)
@@ -453,7 +486,8 @@ void Panda3dMeshLoader::processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVe
 			int vi[3];
 			for (int j = s; j < e; ++j)
 			{
-				vi[j-s] = primitiveDec->get_vertex(j);
+				vi[j-s] = primitiveDec->get_vertex(j) +
+						m_startIndices[geomIndex];
 			}
 			addTriangle(vi[0], vi[1], vi[2], tcap);
 		}
