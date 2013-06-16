@@ -207,7 +207,7 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
 	//
 	float translationRecast[3];
 	LVecBase3fToRecast(translation, translationRecast);
-	if (not m_geom->loadMesh(m_ctx, tmpOutFileName, scale, translationRecast))
+	if (not m_geom->loadMesh(m_ctx, tmpOutFileName, NodePath(), scale, translationRecast))
 	{
 		delete m_geom;
 		m_geom = NULL;
@@ -218,6 +218,24 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
 	VirtualFileSystem *vfs = VirtualFileSystem::get_global_ptr();
 	Filename obj_filename = Filename::text_filename(std::string(tmpOutFileName));
 	vfs->delete_file(obj_filename);
+	return result;
+}
+
+bool RN::loadGeomMesh(NodePath model, float scale, LVector3f translation)
+{
+	bool result = true;
+	m_geom = new InputGeom;
+	m_meshName = model.get_name();
+	//
+	float translationRecast[3];
+	LVecBase3fToRecast(translation, translationRecast);
+	if (not m_geom->loadMesh(m_ctx, NULL, model, scale, translationRecast))
+	{
+		delete m_geom;
+		m_geom = NULL;
+		m_ctx->dumpLog("Geom load log %s:", m_meshName.c_str());
+		result = false;
+	}
 	return result;
 }
 

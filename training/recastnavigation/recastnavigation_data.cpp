@@ -35,14 +35,9 @@ std::string rnDir(
 //if egg was not triangulated use instead:
 //egg2obj -C -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
-///dungeon
-//std::string meshNameEgg("dungeon_panda.egg");
-//std::string meshNameObj("dungeon_panda.obj");
-//LPoint3f agentPos(0.723763, 17.166, 9.99818);
-///nav_test
-std::string meshNameEgg("nav_test_panda.egg");
-std::string meshNameObj("nav_test_panda.obj");
-LPoint3f agentPos(4.19123, 9.90642, 8.3);
+///default world mesh egg
+std::string meshNameEggDefault("nav_test_panda.egg");
+LPoint3f agentPosDefault(4.19123, 9.90642, 8.3);
 
 ///eve character
 std::string actorFile("data/models/eve.bam");
@@ -187,11 +182,17 @@ void end(PandaFramework* panda)
 	delete panda;
 }
 
-NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale = 1.0)
+NodePath createWorldMesh(const std::string& meshNameEgg, SMARTPTR(BulletWorld)mBulletWorld,
+		WindowFramework* window, float scale = 1.0)
 {
 	//Load world mesh
 	NodePath worldMesh = window->load_model(window->get_render(),
 			rnDir + meshNameEgg);
+	if (worldMesh.is_empty())
+	{
+		worldMesh = window->load_model(window->get_render(),
+					rnDir + meshNameEggDefault);
+	}
 	worldMesh.set_pos(0.0, 0.0, 0.0);
 	//attach bullet body
 	//see: https://www.panda3d.org/forums/viewtopic.php?t=13981

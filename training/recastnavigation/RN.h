@@ -174,6 +174,8 @@ public:
 	//common
 	bool loadGeomMesh(const std::string& path, const std::string& meshName,
 			float scale=1.0, LVector3f translation=LVecBase3f::zero());
+	bool loadGeomMesh(NodePath model, float scale=1.0,
+			LVector3f translation=LVecBase3f::zero());
 	bool buildNavMesh();
 	void createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
 	void createTileMesh();

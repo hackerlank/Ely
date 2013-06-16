@@ -21,9 +21,10 @@
  * \author consultit
  */
 
+#include "Utilities/Tools.h"
+
 #include <pandaSystem.h>
 #include <pandaFramework.h>
-#include "Utilities/Tools.h"
 #include "Support/Raycaster.h"
 #include <unistd.h>
 #include <cctype>
@@ -367,6 +368,7 @@ bool Panda3dMeshLoader::load(NodePath model, float scale,
 	NodePathCollection geomNodeCollection = model.find_all_matches(
 			"**/+GeomNode");
 	int numPaths = geomNodeCollection.get_num_paths();
+	PRINT("GeomNodes number: " << numPaths);
 	for (int i = 0; i < numPaths; i++)
 	{
 		PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
@@ -407,6 +409,7 @@ void Panda3dMeshLoader::processGeomNode(PT(GeomNode)geomNode)
 {
 	//Walk through the list of GeomNode's Geoms
 	int numGeoms = geomNode->get_num_geoms();
+	PRINT("\tGeoms number: " << numGeoms);
 	for (int j = 0; j < numGeoms; j++)
 	{
 		const CPT(Geom)geom = geomNode->get_geom(j);
@@ -416,6 +419,11 @@ void Panda3dMeshLoader::processGeomNode(PT(GeomNode)geomNode)
 
 void Panda3dMeshLoader::processGeom(CPT(Geom)geom)
 {
+	//check if there are triangles
+	if (geom->get_primitive_type() != GeomEnums::PT_polygons)
+	{
+		return;
+	}
 	//insert geom
 	m_geoms.push_back(geom);
 	unsigned int geomIndex = m_geoms.size() - 1;
@@ -423,6 +431,7 @@ void Panda3dMeshLoader::processGeom(CPT(Geom)geom)
 	//Process vertices
 	processVertexData(vertexData);
 	int numPrimitives = geom->get_num_primitives();
+	PRINT("\t\tPrimitives number: " << numPrimitives);
 	//Walk through the list of Geom's GeomPrimitives
 	for(int i=0;i<numPrimitives;i++)
 	{
@@ -434,9 +443,9 @@ void Panda3dMeshLoader::processGeom(CPT(Geom)geom)
 void Panda3dMeshLoader::processVertexData(CPT(GeomVertexData)vertexData)
 {
 	//check if vertexData already present
-	unsigned int vertexDataNum = m_vertexData.size();
+	unsigned int vertexDataIndex = m_vertexData.size();
 	unsigned int index = 0;
-	while(index < vertexDataNum)
+	while(index < vertexDataIndex)
 	{
 		if(m_vertexData[index] == vertexData)
 		{
@@ -444,7 +453,7 @@ void Panda3dMeshLoader::processVertexData(CPT(GeomVertexData)vertexData)
 		}
 		++index;
 	}
-	if(index == vertexDataNum)
+	if(index == vertexDataIndex)
 	{
 		//vertexData is not present
 		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
@@ -467,30 +476,34 @@ void Panda3dMeshLoader::processVertexData(CPT(GeomVertexData)vertexData)
 	}
 	//insert vertexData any way
 	m_vertexData.push_back(vertexData);
+	PRINT("\t\t\tVertices number: " << vertexData->get_num_rows() <<
+			" - Start index: " << m_startIndices.back());
 }
 
 void Panda3dMeshLoader::processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex)
 {
-	if (primitive->is_of_type(GeomTriangles::get_class_type()) or
-			primitive->is_of_type(GeomTrifans::get_class_type()) or
-			primitive->is_of_type(GeomTristrips::get_class_type()))
+	PRINT("---");
+	PRINT("\t\t\tPrimitive type: " <<
+			primitive->get_type().get_name() <<
+			" - number: " << primitive->get_num_primitives());
+	//decompose to triangles
+	CPT(GeomPrimitive)primitiveDec = primitive->decompose();
+	int numPrimitives = primitiveDec->get_num_primitives();
+	PRINT("\t\t\tDecomposed Primitive type: " <<
+			primitiveDec->get_type().get_name() <<
+			" - number: " << numPrimitives);
+	for (int k = 0; k < numPrimitives; k++)
 	{
-		//decompose to triangles
-		CPT(GeomPrimitive)primitiveDec = primitive->decompose();
-		int numPrimitives = primitiveDec->get_num_primitives();
-		for (int k = 0; k < numPrimitives; k++)
+		int s = primitiveDec->get_primitive_start(k);
+		int e = primitiveDec->get_primitive_end(k);
+		//add vertex indices
+		int vi[3];
+		for (int j = s; j < e; ++j)
 		{
-			int s = primitiveDec->get_primitive_start(k);
-			int e = primitiveDec->get_primitive_end(k);
-			//add vertex indices
-			int vi[3];
-			for (int j = s; j < e; ++j)
-			{
-				vi[j-s] = primitiveDec->get_vertex(j) +
-						m_startIndices[geomIndex];
-			}
-			addTriangle(vi[0], vi[1], vi[2], tcap);
+			vi[j-s] = primitiveDec->get_vertex(j) +
+					m_startIndices[geomIndex];
 		}
+		addTriangle(vi[0], vi[1], vi[2], tcap);
 	}
 }
 
@@ -585,8 +598,7 @@ void processGeomNode(PT(GeomNode)geomNode)
 	for (int j = 0; j < numGeoms; j++)
 	{
 		const CPT(Geom)geom = geomNode->get_geom(j);
-//		geom->write(nout);	//outputs basic info on the geom
-//		geomNode->get_geom_state(j)->write(nout, 0);//basic renderstate info
+		geomNode->get_geom_state(j)->write(nout, 0);//basic renderstate info
 		processGeom(geom);
 	}
 }
@@ -603,14 +615,13 @@ void processGeomNode(PT(GeomNode)geomNode)
 ///respectively.
 void processGeom(CPT(Geom)geom)
 {
+	geom->write(nout);	//outputs basic info on the geom
 	const CPT(GeomVertexData)vertexData = geom->get_vertex_data();
-//	vertexData->write(nout);
 	processVertexData(vertexData);
 	int numPrimitives = geom->get_num_primitives();
 	for(int i=0;i<numPrimitives;i++)
 	{
 		const CPT(GeomPrimitive) primitive = geom->get_primitive(i);
-//		primitive->write(nout,0);
 		processPrimitive(primitive, vertexData);
 	}
 }
@@ -623,11 +634,13 @@ void processGeom(CPT(Geom)geom)
 void processVertexData(CPT(GeomVertexData)vertexData)
 {
 	GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+	vertexData->write(nout);
 	int vertexNum = vertexData->get_num_rows();
+	nout<< "Ptr = " << vertexData.p() << " -N. " << vertexNum  << endl;
 	while (!vertexReader.is_at_end())
 	{
 		LVector3f vertex = vertexReader.get_data3f();
-//		nout<< "Vertex = " << vertex  << endl;
+		nout<< "Vertex = " << vertex  << endl;
 	}
 }
 
@@ -653,32 +666,30 @@ void processVertexData(CPT(GeomVertexData)vertexData)
 ///and GeomPoints, respectively).
 void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData)
 {
+	primitive->write(nout,0);
+	int numPrimitives = primitive->get_num_primitives();
 	nout << "Primitive type: " <<
-			primitive->get_type().get_name() <<endl;
-	if (primitive->is_of_type(GeomTriangles::get_class_type()) or
-			primitive->is_of_type(GeomTrifans::get_class_type()) or
-			primitive->is_of_type(GeomTristrips::get_class_type()))
+			primitive->get_type().get_name() << " -N. " << numPrimitives << endl;
+	GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+	//Note: There should be primitive = primitive->decompose();
+	//here, it wouldn't work for me but i use the cvs panda and
+	//that could have been broken at this time.
+	CPT(GeomPrimitive)primitiveDec = primitive->decompose();
+	primitiveDec->write(nout,0);
+	numPrimitives = primitiveDec->get_num_primitives();
+	nout << "PrimitiveDec type: " <<
+			primitiveDec->get_type().get_name() << " -N. " << numPrimitives << endl;
+	for (int k = 0; k < numPrimitives; k++)
 	{
-		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
-		//Note: There should be primitive = primitive->decompose();
-		//here, it wouldn't work for me but i use the cvs panda and
-		//that could have been broken at this time.
-		CPT(GeomPrimitive)primitiveDec = primitive->decompose();
-		int numPrimitives = primitiveDec->get_num_primitives();
-		nout << "PrimitiveDec type: " <<
-				primitiveDec->get_type().get_name() <<endl;
-		for (int k = 0; k < numPrimitives; k++)
+		int s = primitiveDec->get_primitive_start(k);
+		int e = primitiveDec->get_primitive_end(k);
+		for (int i = s; i < e; i++)
 		{
-			int s = primitiveDec->get_primitive_start(k);
-			int e = primitiveDec->get_primitive_end(k);
-			for (int i = s; i < e; i++)
-			{
-				int vi = primitiveDec->get_vertex(i);
-				vertexReader.set_row(vi);
-				LVector3f v = vertexReader.get_data3f();
-				nout << "prim " << k << " has vertex " << vi << ": " << v
-				<< endl;
-			}
+			int vi = primitiveDec->get_vertex(i);
+			vertexReader.set_row(vi);
+			LVector3f v = vertexReader.get_data3f();
+			nout << "prim " << k << " has vertex " << vi << ": " << v
+			<< endl;
 		}
 	}
 }

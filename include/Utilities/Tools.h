@@ -24,7 +24,7 @@
 #ifndef TOOLS_H_
 #define TOOLS_H_
 
-#if HAVE_CONFIG_H
+#ifdef HAVE_CONFIG_H
 # include "config.h"
 # undef HAVE_PYTHON
 #endif

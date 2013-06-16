@@ -29,7 +29,10 @@ rcMeshLoaderObj::rcMeshLoaderObj() :
 	m_tris(0),
 	m_normals(0),
 	m_vertCount(0),
-	m_triCount(0)
+	m_triCount(0),
+	m_currentMaxIndex(0),
+	vcap(0),
+	tcap(0)
 {
 	for (int i = 0; i < 3; ++i)
 	{
@@ -238,4 +241,158 @@ bool rcMeshLoaderObj::load(const char* filename, float scale, float* translation
 	m_filename[sizeof(m_filename)-1] = '\0';
 	
 	return true;
+}
+
+bool rcMeshLoaderObj::load(NodePath model, float scale,
+		float* translation)
+{
+	m_scale = scale;
+	if (translation != NULL)
+	{
+		m_translation[0] = translation[0];
+		m_translation[1] = translation[1];
+		m_translation[2] = translation[2];
+	}
+	//Walk through all the model's GeomNodes
+	m_currentMaxIndex = 0;
+	NodePathCollection geomNodeCollection = model.find_all_matches(
+			"**/+GeomNode");
+	int numPaths = geomNodeCollection.get_num_paths();
+	PRINT("GeomNodes number: " << numPaths);
+	for (int i = 0; i < numPaths; i++)
+	{
+		PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
+		processGeomNode(geomNode);
+	}
+
+	// Calculate normals.
+	m_normals = new float[m_triCount * 3];
+	for (int i = 0; i < m_triCount * 3; i += 3)
+	{
+		const float* v0 = &m_verts[m_tris[i] * 3];
+		const float* v1 = &m_verts[m_tris[i + 1] * 3];
+		const float* v2 = &m_verts[m_tris[i + 2] * 3];
+		float e0[3], e1[3];
+		for (int j = 0; j < 3; ++j)
+		{
+			e0[j] = v1[j] - v0[j];
+			e1[j] = v2[j] - v0[j];
+		}
+		float* n = &m_normals[i];
+		n[0] = e0[1] * e1[2] - e0[2] * e1[1];
+		n[1] = e0[2] * e1[0] - e0[0] * e1[2];
+		n[2] = e0[0] * e1[1] - e0[1] * e1[0];
+		float d = sqrtf(n[0] * n[0] + n[1] * n[1] + n[2] * n[2]);
+		if (d > 0)
+		{
+			d = 1.0f / d;
+			n[0] *= d;
+			n[1] *= d;
+			n[2] *= d;
+		}
+	}
+
+	return true;
+}
+
+void rcMeshLoaderObj::processGeomNode(PT(GeomNode)geomNode)
+{
+	//Walk through the list of GeomNode's Geoms
+	int numGeoms = geomNode->get_num_geoms();
+	PRINT("\tGeoms number: " << numGeoms);
+	for (int j = 0; j < numGeoms; j++)
+	{
+		const CPT(Geom)geom = geomNode->get_geom(j);
+		processGeom(geom);
+	}
+}
+
+void rcMeshLoaderObj::processGeom(CPT(Geom)geom)
+{
+	//check if there are triangles
+	if (geom->get_primitive_type() != GeomEnums::PT_polygons)
+	{
+		return;
+	}
+	//insert geom
+	m_geoms.push_back(geom);
+	unsigned int geomIndex = m_geoms.size() - 1;
+	const CPT(GeomVertexData)vertexData = geom->get_vertex_data();
+	//Process vertices
+	processVertexData(vertexData);
+	int numPrimitives = geom->get_num_primitives();
+	PRINT("\t\tPrimitives number: " << numPrimitives);
+	//Walk through the list of Geom's GeomPrimitives
+	for(int i=0;i<numPrimitives;i++)
+	{
+		const CPT(GeomPrimitive) primitive = geom->get_primitive(i);
+		processPrimitive(primitive, geomIndex);
+	}
+}
+
+void rcMeshLoaderObj::processVertexData(CPT(GeomVertexData)vertexData)
+{
+	//check if vertexData already present
+	unsigned int vertexDataIndex = m_vertexData.size();
+	unsigned int index = 0;
+	while(index < vertexDataIndex)
+	{
+		if(m_vertexData[index] == vertexData)
+		{
+			break;
+		}
+		++index;
+	}
+	if(index == vertexDataIndex)
+	{
+		//vertexData is not present
+		GeomVertexReader vertexReader = GeomVertexReader(vertexData, "vertex");
+		while (!vertexReader.is_at_end())
+		{
+			LVector3f vertex = vertexReader.get_data3f();
+			//add vertex
+			float pvertex[3];
+			LVecBase3fToRecast(vertex, pvertex);
+			addVertex(pvertex[0], pvertex[1], pvertex[2], vcap);
+		}
+		m_startIndices.push_back(m_currentMaxIndex);
+		//increment the max index
+		int vertexNum = vertexData->get_num_rows();
+		m_currentMaxIndex += vertexNum;
+	}
+	else
+	{
+		m_startIndices.push_back(m_startIndices[index]);
+	}
+	//insert vertexData any way
+	m_vertexData.push_back(vertexData);
+	PRINT("\t\t\tVertices number: " << vertexData->get_num_rows() <<
+			" - Start index: " << m_startIndices.back());
+}
+
+void rcMeshLoaderObj::processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex)
+{
+	PRINT("---");
+	PRINT("\t\t\tPrimitive type: " <<
+			primitive->get_type().get_name() <<
+			" - number: " << primitive->get_num_primitives());
+	//decompose to triangles
+	CPT(GeomPrimitive)primitiveDec = primitive->decompose();
+	int numPrimitives = primitiveDec->get_num_primitives();
+	PRINT("\t\t\tDecomposed Primitive type: " <<
+			primitiveDec->get_type().get_name() <<
+			" - number: " << numPrimitives);
+	for (int k = 0; k < numPrimitives; k++)
+	{
+		int s = primitiveDec->get_primitive_start(k);
+		int e = primitiveDec->get_primitive_end(k);
+		//add vertex indices
+		int vi[3];
+		for (int j = s; j < e; ++j)
+		{
+			vi[j-s] = primitiveDec->get_vertex(j) +
+					m_startIndices[geomIndex];
+		}
+		addTriangle(vi[0], vi[1], vi[2], tcap);
+	}
 }

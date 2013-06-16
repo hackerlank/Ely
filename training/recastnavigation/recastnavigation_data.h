@@ -92,9 +92,8 @@ extern std::string rnDir;
 //egg2obj -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
 ///dungeon || nav_test || ...
-extern std::string meshNameEgg;
-extern std::string meshNameObj;
-extern LPoint3f agentPos;
+extern std::string meshNameEggDefault;
+extern LPoint3f agentPosDefault;
 
 ///eve actor
 extern std::string actorFile;
@@ -121,7 +120,7 @@ extern AnimControlCollection rn_anim_collection;
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, WindowFramework** window, bool debugPhysics);
 void end(PandaFramework* panda);
-NodePath createWorldMesh(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale);
+NodePath createWorldMesh(const std::string& meshNameEgg, SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window, float scale);
 NodePath createCharacter(SMARTPTR(BulletWorld)mBulletWorld, WindowFramework* window,
 MOVTYPE movType, float& agentRadius, float& agentHeight, BulletConstraint** pcs);
 

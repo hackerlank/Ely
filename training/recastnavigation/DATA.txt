@@ -1,0 +1,23 @@
+NOTE1: mesh scale = 1.0, mesh translation = (0.0, 0.0, 0.0)
+NOTE2: blender models should apply all transforms (Ctrl-A ...) before exporting to egg
+///nav_test (default)
+std::string meshNameEgg("nav_test_panda.egg");
+LPoint3f agentPos(4.19123, 9.90642, 8.3);
+///dungeon
+std::string meshNameEgg("dungeon_panda.egg");
+LPoint3f agentPos(0.723763, 17.166, 9.99818);
+///course1
+std::string meshNameEgg("course1.egg");
+LPoint3f agentPos(-8.576, -10.7233, -0.190552);
+///course2
+std::string meshNameEgg("course2.egg");
+LPoint3f agentPos(-0.601856, -42.1853, 3.8147e-06);
+///street-scene
+std::string meshNameEgg("street-scene.egg");
+LPoint3f agentPos(14.8273, 2.67606, -0.125875);
+///falcon
+std::string meshNameEgg("falcon.egg");
+LPoint3f agentPos(-0.419039, -1.28289, 0);
+///
+std::string meshNameEgg(".egg");
+LPoint3f agentPos(0, 0, 0);

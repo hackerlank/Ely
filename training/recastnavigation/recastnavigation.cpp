@@ -62,11 +62,15 @@ int main(int argc, char **argv)
 	allOnButZeroMask = app->allOnButZeroMask;
 	allOffButZeroMask = app->allOffButZeroMask;
 
-///use getopt: -r(recast), -c(character), -k(kinematic with z raycast),
-///		-d(debug), -s(solo), t(tile), -o(obstacles) -l scale
+///getopt:	-r(recast) -c(character) -b(rigid) -k(kinematic with z raycast)
+///			-d(debug), -s(solo), t(tile), -o(obstacles) -l scale
+///			-x|-y|-z translation.x|.y|.z -m world_mesh_egg
+///			-e|-f|-g agent_pos.x|.y|.z {with scale=1.0 & translation=(0,0,0)}
 	app->sampleType = SOLO;
 	app->meshScale = 1.0;
 	app->meshPosition = LVecBase3f::zero();
+	std::string meshNameEgg = meshNameEggDefault;
+	LPoint3f agentPos = agentPosDefault;
 #ifndef WITHCHARACTER
 	app->movType = RECAST;
 #else
@@ -75,7 +79,7 @@ int main(int argc, char **argv)
 	app->debugPhysics = false;
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "rcbkdstol:x:y:z:")) != -1)
+	while ((c = getopt(argc, argv, "rcbkdstol:x:y:z:m:e:f:g:")) != -1)
 	{
 		switch (c)
 		{
@@ -118,9 +122,22 @@ int main(int argc, char **argv)
 		case 'z':
 			app->meshPosition.set_z(atof(optarg));
 			break;
+		case 'm':
+			meshNameEgg = optarg;
+			break;
+		case 'e':
+			agentPos.set_x(atof(optarg));
+			break;
+		case 'f':
+			agentPos.set_y(atof(optarg));
+			break;
+		case 'g':
+			agentPos.set_z(atof(optarg));
+			break;
 		case '?':
 			if ((optopt == 'l') or (optopt == 'x') or (optopt == 'y')
-					or (optopt == 'z'))
+					or (optopt == 'z') or (optopt == 'm')
+					or (optopt == 'e') or (optopt == 'f') or (optopt == 'g'))
 				std::cerr << "Option " << optopt
 						<< " requires an argument.\n" << std::endl;
 			else if (isprint(optopt))
@@ -136,11 +153,13 @@ int main(int argc, char **argv)
 	{
 		app->meshScale = 1.0;
 	}
+	//set agent pos
+	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 	//start
 	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window), app->debugPhysics);
 
 	//Create world mesh
-	app->worldMesh = createWorldMesh(app->mBulletWorld, app->window, app->meshScale);
+	app->worldMesh = createWorldMesh(meshNameEgg, app->mBulletWorld, app->window, app->meshScale);
 	app->worldMesh.set_pos(app->meshPosition);
 //	worldMesh.hide();
 	//setup camera trackball (local coordinate)
@@ -148,8 +167,6 @@ int main(int argc, char **argv)
 	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
 	trackball->set_hpr(0, 15, 0);
-	//update agent pos
-	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 
 #ifdef DEBUG_DRAW
 	//set a debug node path
@@ -169,7 +186,8 @@ int main(int argc, char **argv)
 	///RN common
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
 	//load geometry mesh
-	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale, app->worldMesh.get_pos());
+//	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale, app->worldMesh.get_pos());
+	app->rn->loadGeomMesh(app->worldMesh, app->meshScale, app->worldMesh.get_pos());
 
 	//create geom mesh
 	switch (app->sampleType)

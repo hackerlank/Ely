@@ -21,6 +21,7 @@
 
 #include "ChunkyTriMesh.h"
 #include "MeshLoaderObj.h"
+#include <nodePath.h>
 
 static const int MAX_CONVEXVOL_PTS = 12;
 struct ConvexVolume
@@ -60,7 +61,7 @@ public:
 	InputGeom();
 	~InputGeom();
 	
-	bool loadMesh(class rcContext* ctx, const char* filepath, float scale=1.0, float* translation=NULL);
+	bool loadMesh(class rcContext* ctx, const char* filepath, NodePath model=NodePath(), float scale=1.0, float* translation=NULL);
 	
 	bool load(class rcContext* ctx, const char* filepath);
 	bool save(const char* filepath);

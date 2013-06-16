@@ -19,7 +19,16 @@
 #ifndef MESHLOADER_OBJ
 #define MESHLOADER_OBJ
 
+#include "Utilities/Tools.h"
+
 #include <cstdlib>
+//Model stuff
+#include "recastnavigation_data.h"
+#include <nodePath.h>
+#include <geomNode.h>
+#include <geom.h>
+#include <geomVertexData.h>
+#include <geomPrimitive.h>
 
 class rcMeshLoaderObj
 {
@@ -28,6 +37,8 @@ public:
 	~rcMeshLoaderObj();
 	
 	bool load(const char* fileName, float scale = 1.0, float* translation = NULL);
+	//Model stuff
+	bool load(NodePath model, float scale = 1.0, float* translation = NULL);
 
 	inline const float* getVerts() const { return m_verts; }
 	inline const float* getNormals() const { return m_normals; }
@@ -40,7 +51,12 @@ private:
 	
 	void addVertex(float x, float y, float z, int& cap);
 	void addTriangle(int a, int b, int c, int& cap);
-	
+	//Model stuff
+	void processGeomNode(PT(GeomNode)geomNode);
+	void processGeom(CPT(Geom)geom);
+	void processVertexData(CPT(GeomVertexData)vertexData);
+	void processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex);
+
 	char m_filename[260];
 	float m_scale;
 	float m_translation[3];
@@ -49,6 +65,12 @@ private:
 	float* m_normals;
 	int m_vertCount;
 	int m_triCount;
+	//Model stuff
+	std::vector<CPT(Geom)> m_geoms;
+	std::vector<CPT(GeomVertexData)> m_vertexData;
+	std::vector<int> m_startIndices;
+	int m_currentMaxIndex;
+	int vcap, tcap;
 };
 
 #endif // MESHLOADER_OBJ
