@@ -16,4 +16,5 @@ config.prc : $(top_srcdir)/data/config.prc.in Makefile
 game.xml : $(top_srcdir)/data/game.xml.in Makefile
 	$(substDataDir) $(top_srcdir)/data/$@.in > $@
 
+CLEANFILES = config.prc game.xml
 		

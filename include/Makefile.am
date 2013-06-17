@@ -77,4 +77,5 @@ Tools_ini.h : $(top_srcdir)/include/Utilities/Tools_ini.h.in Makefile
 	$(substTransitions) | \
 	$(substInitializations) > $@
 
+CLEANFILES = Tools_ini.h
 	
