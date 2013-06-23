@@ -37,6 +37,8 @@
 #include <event.h>
 #include <vector>
 
+using namespace ely;
+
 struct ControlSuiteFixture
 {
 	ControlSuiteFixture() :

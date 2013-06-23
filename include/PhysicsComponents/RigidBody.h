@@ -45,6 +45,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
+namespace ely
+{
 class RigidBodyTemplate;
 
 /**
@@ -96,7 +98,7 @@ class RigidBody: public Component
 {
 public:
 	RigidBody();
-	RigidBody(SMARTPTR(RigidBodyTemplate) tmpl);
+	RigidBody(SMARTPTR(RigidBodyTemplate)tmpl);
 	virtual ~RigidBody();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -114,8 +116,8 @@ public:
 	enum BodyType
 	{
 		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
-		STATIC, //!< STATIC: mass == 0.0, no driven
-		KINEMATIC //!< KINEMATIC: mass == 0.0, user driven
+		STATIC,//!< STATIC: mass == 0.0, no driven
+		KINEMATIC//!< KINEMATIC: mass == 0.0, user driven
 	};
 
 	/**
@@ -204,5 +206,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* RIGIDBODY_H_ */

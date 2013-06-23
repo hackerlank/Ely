@@ -34,6 +34,8 @@
 #include "Object.h"
 #include "ComponentTemplateManager.h"
 
+namespace ely
+{
 /**
  * \brief Singleton template manager that stores all the object templates.
  *
@@ -90,10 +92,10 @@ public:
 	 * 	- the object and its components are created (through this function)
 	 * 	- the initial parameters' values of the object, are setup
 	 * 	on the object template (through ObjectTemplate::setParameters())
-	 * 	- Object::sceneSetup() is called to give a chance to object 
+	 * 	- Object::sceneSetup() is called to give a chance to object
 	 * 	(and its components) to customize themselves when being added to scene.
 	 * -# multi threads way:
-	 * 	- all the operations shown in the single threads way are performed 
+	 * 	- all the operations shown in the single threads way are performed
 	 * 	through this function, by passing it object template and components'
 	 * 	templates parameters directly.
 	 * The third parameter indicates that parameters for the object template
@@ -171,5 +173,6 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+}  // namespace ely
 
 #endif /* OBJECTTEMPLATEMANAGER_H_ */

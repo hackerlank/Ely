@@ -28,6 +28,8 @@
 ///Distributed
 #include "Support/Distributed/DistributedObjectBase.h"
 
+using namespace ely;
+
 std::vector<std::string> parseCompoundString(const std::string& compoundString,
 		char separator)
 {
@@ -91,6 +93,8 @@ void initTypedObjects()
 	SteeringTemplate::init_type();
 	CrowdAgent::init_type();
 	CrowdAgentTemplate::init_type();
+	ely::NavMesh::init_type();
+	NavMeshTemplate::init_type();
 	Listener::init_type();
 	ListenerTemplate::init_type();
 	Sound3d::init_type();

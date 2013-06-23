@@ -25,6 +25,8 @@
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Object.h"
 
+using namespace ely;
+
 Component::Component() :
 		mOwnerObject(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
 {

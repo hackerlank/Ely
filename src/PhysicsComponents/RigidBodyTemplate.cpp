@@ -23,6 +23,8 @@
 
 #include "PhysicsComponents/RigidBodyTemplate.h"
 
+using namespace ely;
+
 RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

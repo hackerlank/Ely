@@ -4,6 +4,8 @@ noinst_HEADERS =\
 		AIComponents/SteeringTemplate.h \
 		AIComponents/CrowdAgent.h \
 		AIComponents/CrowdAgentTemplate.h \
+		AIComponents/NavMesh.h \
+		AIComponents/NavMeshTemplate.h \
 		AudioComponents/Listener.h \
 		AudioComponents/ListenerTemplate.h \
 		AudioComponents/Sound3d.h \

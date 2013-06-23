@@ -23,6 +23,8 @@
 
 #include "AudioComponents/Sound3dTemplate.h"
 
+using namespace ely;
+
 Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

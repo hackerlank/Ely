@@ -62,6 +62,8 @@
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
 
+namespace ely
+{
 /**
  * \brief Singleton manager updating attributes of physics components.
  *
@@ -85,7 +87,7 @@ public:
 	 * \brief Adds (if not present) a physics component to updating.
 	 * @param physicsComp The physics component.
 	 */
-	void addToPhysicsUpdate(SMARTPTR(Component) physicsComp);
+	void addToPhysicsUpdate(SMARTPTR(Component)physicsComp);
 	/**
 	 * \brief Removes (if present) a physics component from updating.
 	 * @param physicsComp The physics component.
@@ -139,13 +141,13 @@ public:
 	enum ShapeType
 	{
 		SPHERE, //!< SPHERE (radius)
-		PLANE, //!< PLANE (norm_x, norm_y, norm_z, d)
-		BOX, //!< BOX (half_x, half_y, half_z)
-		CYLINDER, //!< CYLINDER (radius, height, up)
-		CAPSULE, //!< CAPSULE (radius, height, up)
-		CONE, //!< CONE (radius, height, up)
-		HEIGHTFIELD, //!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
-		TRIANGLEMESH, //!< TRIANGLEMESH (dynamic)
+		PLANE,//!< PLANE (norm_x, norm_y, norm_z, d)
+		BOX,//!< BOX (half_x, half_y, half_z)
+		CYLINDER,//!< CYLINDER (radius, height, up)
+		CAPSULE,//!< CAPSULE (radius, height, up)
+		CONE,//!< CONE (radius, height, up)
+		HEIGHTFIELD,//!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
+		TRIANGLEMESH,//!< TRIANGLEMESH (dynamic)
 	};
 	/**
 	 * \brief Shape size.
@@ -153,8 +155,8 @@ public:
 	enum ShapeSize
 	{
 		MINIMUN, //!< MINIMUN shape
-		MAXIMUM, //!< MAXIMUM shape
-		MEDIUM, //!< MEDIUM shape
+		MAXIMUM,//!< MAXIMUM shape
+		MEDIUM,//!< MEDIUM shape
 	};
 	/**
 	 * \brief Creates a wrapping bullet shape for a given model node path.
@@ -193,7 +195,7 @@ public:
 	 */
 	SMARTPTR(BulletShape) createShape(NodePath modelNP, ShapeType shapeType,
 			ShapeSize shapeSize, LVector3& modelDims, LVector3& modelDeltaCenter,
-			float& modelRadius,	float& dim1, float& dim2, float& dim3, float& dim4,
+			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
 			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
 			const Filename& heightfieldFile = Filename(""), bool dynamic = false);
 	/**
@@ -246,5 +248,6 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+}  // namespace ely
 
 #endif /* GAMEPHYSICSMANAGER_H_ */

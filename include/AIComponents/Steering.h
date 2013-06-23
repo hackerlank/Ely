@@ -44,7 +44,7 @@
 #define _PATHFINDER_H
 #include <meshNode.h>
 #include <lineSegs.h>
-typedef vector<Node *> NodeArrayAI;//redefined
+typedef vector<Node *> NodeArrayAI; //redefined
 typedef vector<NodeArrayAI> NavMesh;
 class EXPCL_PANDAAI PathFinder;
 #endif
@@ -69,6 +69,8 @@ class EXPCL_PANDAAI PathFinder;
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+namespace ely
+{
 class SteeringTemplate;
 
 /**
@@ -223,5 +225,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* STEERING_H_ */

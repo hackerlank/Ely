@@ -23,6 +23,8 @@
 
 #include "Game/GameControlManager.h"
 
+using namespace ely;
+
 GameControlManager::GameControlManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {

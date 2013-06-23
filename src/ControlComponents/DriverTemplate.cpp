@@ -23,6 +23,8 @@
 
 #include "ControlComponents/DriverTemplate.h"
 
+using namespace ely;
+
 DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

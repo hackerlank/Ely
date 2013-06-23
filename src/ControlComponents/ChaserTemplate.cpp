@@ -23,6 +23,8 @@
 
 #include "ControlComponents/ChaserTemplate.h"
 
+using namespace ely;
+
 ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

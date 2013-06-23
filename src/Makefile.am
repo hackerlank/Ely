@@ -43,7 +43,9 @@ libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \
 		AIComponents/SteeringTemplate.cpp \
 		AIComponents/CrowdAgent.cpp \
-		AIComponents/CrowdAgentTemplate.cpp
+		AIComponents/CrowdAgentTemplate.cpp \
+		AIComponents/NavMesh.cpp \
+		AIComponents/NavMeshTemplate.cpp
 
 libaudiocomponents_la_SOURCES = \
 		AudioComponents/Listener.cpp \

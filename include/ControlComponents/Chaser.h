@@ -35,6 +35,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
+namespace ely
+{
 class ChaserTemplate;
 
 /**
@@ -165,5 +167,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* CHASER_H_ */

@@ -37,6 +37,8 @@
 #include <reMutexHolder.h>
 #include "Component.h"
 
+namespace ely
+{
 /**
  * \brief Abstract base class of component templates used to create components.
  */
@@ -69,7 +71,7 @@ public:
 	 * \brief Creates the current component of that family.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId) = 0;
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId) = 0;
 
 	/**
 	 * \name Parameters management.
@@ -161,5 +163,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* COMPONENTTEMPLATE_H_ */

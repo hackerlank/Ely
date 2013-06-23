@@ -25,6 +25,8 @@
 #include "PhysicsComponents/RigidBodyTemplate.h"
 #include "SceneComponents/Terrain.h"
 
+using namespace ely;
+
 RigidBody::RigidBody()
 {
 	// TODO Auto-generated constructor stub

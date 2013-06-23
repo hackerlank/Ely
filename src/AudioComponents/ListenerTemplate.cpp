@@ -23,6 +23,8 @@
 
 #include "AudioComponents/ListenerTemplate.h"
 
+using namespace ely;
+
 ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

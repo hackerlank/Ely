@@ -32,6 +32,8 @@
 #include "ObjectModel/Component.h"
 #include "BehaviorComponents/Activity.h"
 
+namespace ely
+{
 class ActivityTemplate: public ComponentTemplate
 {
 public:
@@ -42,7 +44,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -74,5 +76,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* ACTIVITYTEMPLATE_H_ */

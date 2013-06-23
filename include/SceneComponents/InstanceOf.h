@@ -32,6 +32,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "SceneComponents/Model.h"
 
+namespace ely
+{
 class InstanceOfTemplate;
 
 /**
@@ -47,7 +49,7 @@ class InstanceOf: public Component
 {
 public:
 	InstanceOf();
-	InstanceOf(SMARTPTR(InstanceOfTemplate) tmpl);
+	InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl);
 	virtual ~InstanceOf();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -114,5 +116,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* INSTANCEOF_H_ */

@@ -36,6 +36,8 @@
 #include <geomNode.h>
 #include <genericAsyncTask.h>
 
+using namespace ely;
+
 struct PhysicsSuiteFixture
 {
 	PhysicsSuiteFixture() :

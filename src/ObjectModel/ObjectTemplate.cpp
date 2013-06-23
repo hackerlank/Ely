@@ -23,6 +23,8 @@
 
 #include "ObjectModel/ObjectTemplate.h"
 
+using namespace ely;
+
 ObjectTemplate::ObjectTemplate(const ObjectType& name,
 		ObjectTemplateManager* objectTmplMgr, PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :

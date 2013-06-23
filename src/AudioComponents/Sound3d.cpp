@@ -24,6 +24,8 @@
 #include "AudioComponents/Sound3d.h"
 #include "AudioComponents/Sound3dTemplate.h"
 
+using namespace ely;
+
 Sound3d::Sound3d()
 {
 	// TODO Auto-generated constructor stub

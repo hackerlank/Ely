@@ -41,6 +41,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class DriverTemplate;
 
 /**
@@ -96,7 +98,7 @@ class Driver: public Component
 {
 public:
 	Driver();
-	Driver(SMARTPTR(DriverTemplate) tmpl);
+	Driver(SMARTPTR(DriverTemplate)tmpl);
 	virtual ~Driver();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -163,15 +165,15 @@ private:
 	///@{
 	///Key controls and effective keys.
 	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-			mRollLeft, mRollRight, mMouseMove;
+	mRollLeft, mRollRight, mMouseMove;
 	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
-			mDownKey, mRollLeftKey, mRollRightKey, mMouseMoveKey;
+	mDownKey, mRollLeftKey, mRollRightKey, mMouseMoveKey;
 	std::string mSpeedKey;
 	///@}
 	///@{
 	///Key control values.
 	bool mTrue, mFalse, mInvertedKeyboard, mInvertedMouse, mMouseEnabledH,
-			mMouseEnabledP;
+	mMouseEnabledP;
 	///@}
 	///@{
 	/// Sensitivity settings.
@@ -214,5 +216,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* CONTROLBYEVENT_H_ */

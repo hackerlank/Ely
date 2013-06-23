@@ -23,6 +23,8 @@
 
 #include "Game/GamePhysicsManager.h"
 
+using namespace ely;
+
 GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {

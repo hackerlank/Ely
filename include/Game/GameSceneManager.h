@@ -37,6 +37,8 @@
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
 
+namespace ely
+{
 /**
  * \brief Singleton manager updating scene components.
  *
@@ -61,7 +63,7 @@ public:
 	 * \brief Adds (if not present) a scene component to updating.
 	 * @param sceneComp The scene component.
 	 */
-	void addToSceneUpdate(SMARTPTR(Component) sceneComp);
+	void addToSceneUpdate(SMARTPTR(Component)sceneComp);
 	/**
 	 * \brief Removes (if present) a scene component from updating.
 	 * @param sceneComp The scene component.
@@ -101,5 +103,6 @@ private:
 	ReMutex mMutex;
 
 };
+}  // namespace ely
 
 #endif /* GAMESCENEMANAGER_H_ */

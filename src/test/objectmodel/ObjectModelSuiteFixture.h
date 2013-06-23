@@ -32,6 +32,8 @@
 #include "SceneComponents/Model.h"
 #include "SceneComponents/ModelTemplate.h"
 
+using namespace ely;
+
 struct ObjectModelSuiteFixture
 {
 	ObjectModelSuiteFixture() :

@@ -32,6 +32,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class NodePathWrapperTemplate;
 
 /**
@@ -46,7 +48,7 @@ class NodePathWrapper: public Component
 {
 public:
 	NodePathWrapper();
-	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate) tmpl);
+	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl);
 	virtual ~NodePathWrapper();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -96,5 +98,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* NODEPATHWRAPPER_H_ */

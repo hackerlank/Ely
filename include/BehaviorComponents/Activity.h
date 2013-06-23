@@ -37,6 +37,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class ActivityTemplate;
 
 /**
@@ -80,7 +82,7 @@ class Activity: public Component
 {
 public:
 	Activity();
-	Activity(SMARTPTR(ActivityTemplate) tmpl);
+	Activity(SMARTPTR(ActivityTemplate)tmpl);
 	virtual ~Activity();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -160,5 +162,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* ACTIVITY_H_ */

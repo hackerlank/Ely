@@ -24,6 +24,8 @@
 #include "ControlComponents/Chaser.h"
 #include "ControlComponents/ChaserTemplate.h"
 
+using namespace ely;
+
 Chaser::Chaser()
 {
 	// TODO Auto-generated constructor stub

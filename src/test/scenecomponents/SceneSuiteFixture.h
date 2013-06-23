@@ -35,6 +35,8 @@
 #include "SceneComponents/TerrainTemplate.h"
 #include "Utilities/Tools.h"
 
+using namespace ely;
+
 struct SceneSuiteFixture
 {
 	SceneSuiteFixture() :

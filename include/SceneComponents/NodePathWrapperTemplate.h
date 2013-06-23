@@ -31,6 +31,8 @@
 #include "SceneComponents/NodePathWrapper.h"
 #include "Game/GameSceneManager.h"
 
+namespace ely
+{
 class NodePathWrapperTemplate: public ComponentTemplate
 {
 public:
@@ -41,7 +43,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -72,5 +74,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* NODEPATHWRAPPERTEMPLATE_H_ */

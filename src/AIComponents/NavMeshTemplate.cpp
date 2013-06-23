@@ -15,58 +15,60 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/BehaviorComponents/ActivityTemplate.cpp
+ * \file /Ely/src/AIComponents/NavMeshTemplate.cpp
  *
- * \date 17/ago/2012 (09:27:08)
+ * \date 23/giu/2013 (18:59:22)
  * \author consultit
  */
 
-#include "BehaviorComponents/ActivityTemplate.h"
+#include "AIComponents/NavMeshTemplate.h"
 
 using namespace ely;
 
-ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
+NavMeshTemplate::NavMeshTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
 	CHECKEXISTENCE(pandaFramework,
-			"ActivityTemplate::ActivityTemplate: invalid PandaFramework")
+			"NavMeshTemplate::NavMeshTemplate: invalid PandaFramework")
 	CHECKEXISTENCE(windowFramework,
-			"ActivityTemplate::ActivityTemplate: invalid WindowFramework")
+			"NavMeshTemplate::NavMeshTemplate: invalid WindowFramework")
+	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+			"NavMeshTemplate::NavMeshTemplate: invalid GameAIManager")
 	//
 	setParametersDefaults();
 }
 
-ActivityTemplate::~ActivityTemplate()
+NavMeshTemplate::~NavMeshTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType ActivityTemplate::componentType() const
+const ComponentType NavMeshTemplate::componentType() const
 {
-	return ComponentType("Activity");
+	return ComponentType("NavMesh");
 }
 
-const ComponentFamilyType ActivityTemplate::familyType() const
+const ComponentFamilyType NavMeshTemplate::familyType() const
 {
-	return ComponentFamilyType("Behavior");
+	return ComponentFamilyType("AI");
 }
 
-SMARTPTR(Component)ActivityTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)NavMeshTemplate::makeComponent(const ComponentId& compId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	SMARTPTR(Activity) newActivity = new Activity(this);
-	newActivity->setComponentId(compId);
-	if (not newActivity->initialize())
+	SMARTPTR(NavMesh) newNavMesh = new NavMesh(this);
+	newNavMesh->setComponentId(compId);
+	if (not newNavMesh->initialize())
 	{
 		return NULL;
 	}
-	return newActivity.p();
+	return newNavMesh.p();
 }
 
-void ActivityTemplate::setParametersDefaults()
+void NavMeshTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -77,4 +79,4 @@ void ActivityTemplate::setParametersDefaults()
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle ActivityTemplate::_type_handle;
+TypeHandle NavMeshTemplate::_type_handle;

@@ -24,6 +24,8 @@
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/DriverTemplate.h"
 
+using namespace ely;
+
 Driver::Driver()
 {
 	// TODO Auto-generated constructor stub

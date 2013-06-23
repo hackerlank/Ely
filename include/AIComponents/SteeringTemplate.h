@@ -31,6 +31,8 @@
 #include "AIComponents/Steering.h"
 #include "Game/GameAIManager.h"
 
+namespace ely
+{
 class SteeringTemplate: public ComponentTemplate
 {
 public:
@@ -41,7 +43,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -72,6 +74,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 
-};
+};}  // namespace ely
 
 #endif /* STEERINGTEMPLATE_H_ */

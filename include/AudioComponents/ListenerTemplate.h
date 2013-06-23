@@ -31,6 +31,8 @@
 #include "AudioComponents/Listener.h"
 #include "Game/GameAudioManager.h"
 
+namespace ely
+{
 class ListenerTemplate: public ComponentTemplate
 {
 public:
@@ -41,7 +43,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -75,5 +77,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* LISTENERTEMPLATE_H_ */

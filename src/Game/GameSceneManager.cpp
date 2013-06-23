@@ -23,6 +23,8 @@
 
 #include "Game/GameSceneManager.h"
 
+using namespace ely;
+
 GameSceneManager::GameSceneManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {

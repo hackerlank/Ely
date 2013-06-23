@@ -21,6 +21,29 @@
  * \author consultit
  */
 
+#include "AISuiteFixture.h"
+
+struct CrowdAgentTestCaseFixture
+{
+	CrowdAgentTestCaseFixture()
+	{
+	}
+	~CrowdAgentTestCaseFixture()
+	{
+	}
+};
+
+/// AI suite
+BOOST_FIXTURE_TEST_SUITE(AI, AISuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(TEST)
+{
+	BOOST_TEST_MESSAGE("TESTING");
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // AI suite
 
 
 

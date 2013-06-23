@@ -24,6 +24,8 @@
 #include "AIComponents/Steering.h"
 #include "AIComponents/SteeringTemplate.h"
 
+using namespace ely;
+
 Steering::Steering()
 {
 	// TODO Auto-generated constructor stub
@@ -1037,15 +1039,18 @@ LVecBase3f Steering::do_flock()
 			+ avg_neighbor_heading * _steering->_flock_group->_alignment_wt
 			+ cohesion_force * _steering->_flock_group->_cohesion_wt);
 }
-//wander
-static double rand_float()
+namespace
 {
-	const static double rand_max = 0x7fff;
-	return ((rand()) / (rand_max + 1.0));
-}
-static double random_clamped()
-{
-	return (rand_float() - rand_float());
+	//wander
+	double rand_float()
+	{
+		const static double rand_max = 0x7fff;
+		return ((rand()) / (rand_max + 1.0));
+	}
+	double random_clamped()
+	{
+		return (rand_float() - rand_float());
+	}
 }
 LVecBase3f Steering::do_wander()
 {

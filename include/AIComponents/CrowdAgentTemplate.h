@@ -31,6 +31,8 @@
 #include "AIComponents/CrowdAgent.h"
 #include "Game/GameAIManager.h"
 
+namespace ely
+{
 class CrowdAgentTemplate: public ComponentTemplate
 {
 public:
@@ -41,7 +43,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -73,5 +75,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* CROWDAGENTTEMPLATE_H_ */

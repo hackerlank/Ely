@@ -37,6 +37,8 @@
 #include <geomNode.h>
 #include <vector>
 
+using namespace ely;
+
 struct AudioSuiteFixture
 {
 	AudioSuiteFixture() :

@@ -23,6 +23,8 @@
 
 #include "PhysicsComponents/CharacterControllerTemplate.h"
 
+using namespace ely;
+
 CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

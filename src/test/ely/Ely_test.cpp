@@ -37,7 +37,7 @@ struct ElyTestCaseFixture
 };
 
 /// Ely suite
-BOOST_FIXTURE_TEST_SUITE(Ely, ElySuiteFixture)
+BOOST_FIXTURE_TEST_SUITE(ElyTest, ElySuiteFixture)
 
 /// Test cases
 BOOST_AUTO_TEST_CASE(ElyTestCaseTEST)

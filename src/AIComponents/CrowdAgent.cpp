@@ -24,6 +24,8 @@
 #include "AIComponents/CrowdAgent.h"
 #include "AIComponents/CrowdAgentTemplate.h"
 
+using namespace ely;
+
 CrowdAgent::CrowdAgent()
 {
 	// TODO Auto-generated constructor stub
@@ -41,16 +43,6 @@ CrowdAgent::~CrowdAgent()
 	HOLDMUTEX(mMutex)
 
 	disable();
-}
-
-const ComponentFamilyType CrowdAgent::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-const ComponentType CrowdAgent::componentType() const
-{
-	return mTmpl->componentType();
 }
 
 const ComponentFamilyType CrowdAgent::familyType() const

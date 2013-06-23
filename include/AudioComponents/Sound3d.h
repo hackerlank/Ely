@@ -35,6 +35,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class Sound3dTemplate;
 
 /**
@@ -55,7 +57,7 @@ class Sound3d: public Component
 {
 public:
 	Sound3d();
-	Sound3d(SMARTPTR(Sound3dTemplate) tmpl);
+	Sound3d(SMARTPTR(Sound3dTemplate)tmpl);
 	virtual ~Sound3d();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -189,5 +191,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* SOUND3D_H_ */

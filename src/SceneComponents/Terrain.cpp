@@ -25,6 +25,8 @@
 #include "SceneComponents/TerrainTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+using namespace ely;
+
 Terrain::Terrain()
 {
 	// TODO Auto-generated constructor stub

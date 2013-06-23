@@ -23,6 +23,8 @@
 
 #include "Game/GameAIManager.h"
 
+using namespace ely;
+
 GameAIManager::GameAIManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {

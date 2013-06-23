@@ -40,6 +40,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class TerrainTemplate;
 
 class GeoMipTerrainRef;
@@ -185,7 +187,8 @@ public:
 	static void init_type()
 	{
 		TypedObject::init_type();
-		register_type(_type_handle, "GeoMipTerrainRef", TypedObject::get_class_type());
+		register_type(_type_handle, "GeoMipTerrainRef",
+				TypedObject::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -200,5 +203,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* TERRAIN_H_ */

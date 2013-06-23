@@ -34,6 +34,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class ListenerTemplate;
 
 /**
@@ -46,7 +48,7 @@ class Listener: public Component
 {
 public:
 	Listener();
-	Listener(SMARTPTR(ListenerTemplate) tmpl);
+	Listener(SMARTPTR(ListenerTemplate)tmpl);
 	virtual ~Listener();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -103,5 +105,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* LISTENER_H_ */

@@ -32,6 +32,8 @@
 #include "ObjectModel/Object.h"
 #include "Utilities/Tools.h"
 
+using namespace ely;
+
 __attribute__((constructor)) void callbacksInit();
 void callAllInits();
 

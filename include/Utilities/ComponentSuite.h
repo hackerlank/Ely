@@ -34,6 +34,8 @@
 #include "AIComponents/SteeringTemplate.h"
 #include "AIComponents/CrowdAgent.h"
 #include "AIComponents/CrowdAgentTemplate.h"
+#include "AIComponents/NavMesh.h"
+#include "AIComponents/NavMeshTemplate.h"
 #include "AudioComponents/Listener.h"
 #include "AudioComponents/ListenerTemplate.h"
 #include "AudioComponents/Sound3d.h"

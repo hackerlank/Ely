@@ -24,6 +24,8 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+using namespace ely;
+
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
 mTmpl(tmpl), mInitializationsLoaded(false)
 {

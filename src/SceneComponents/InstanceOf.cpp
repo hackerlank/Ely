@@ -24,6 +24,8 @@
 #include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/InstanceOfTemplate.h"
 
+using namespace ely;
+
 InstanceOf::InstanceOf()
 {
 	// TODO Auto-generated constructor stub

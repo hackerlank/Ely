@@ -23,6 +23,8 @@
 
 #include "SceneComponents/TerrainTemplate.h"
 
+using namespace ely;
+
 TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

@@ -15,37 +15,60 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/InstanceOfTemplate.h
+ * \file /Ely/include/AIComponents/NavMesh.h
  *
- * \date 20/mag/2012 (09:40:59)
+ * \date 23/giu/2013 (18:51:03)
  * \author consultit
  */
 
-#ifndef INSTANCEOFTEMPLATE_H_
-#define INSTANCEOFTEMPLATE_H_
+#ifndef NAVMESH_H_
+#define NAVMESH_H_
 
 #include "Utilities/Tools.h"
 
+#include <string>
+
 #include "ObjectModel/Component.h"
-#include "ObjectModel/ComponentTemplate.h"
-#include "SceneComponents/InstanceOf.h"
-#include "Game/GameSceneManager.h"
+#include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 namespace ely
 {
-class InstanceOfTemplate: public ComponentTemplate
+
+class NavMeshTemplate;
+
+/**
+ * \brief Component implementing dtNavMesh from Recast Navigation library.
+ *
+ * \see https://code.google.com/p/recastnavigation
+ * 		http://digestingduck.blogspot.it
+ * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
+ *
+ * This is a ...
+ *
+ * XML Param(s):
+ * - "param1"  						|single|"true"
+ */
+class NavMesh: public Component
 {
 public:
-	InstanceOfTemplate(PandaFramework* pandaFramework,
-			WindowFramework* windowFramework);
-	virtual ~InstanceOfTemplate();
+	NavMesh();
+	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
+	virtual ~NavMesh();
 
-	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
+	const virtual ComponentType componentType() const;
 
-	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
-
-	virtual void setParametersDefaults();
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+	/**
+	 * \brief Updates position/orientation of the controlled object.
+	 *
+	 * Will be called automatically by an control manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
 
 private:
 
@@ -57,9 +80,8 @@ public:
 	}
 	static void init_type()
 	{
-		ComponentTemplate::init_type();
-		register_type(_type_handle, "InstanceOfTemplate",
-				ComponentTemplate::get_class_type());
+		Component::init_type();
+		register_type(_type_handle, "NavMesh", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -75,6 +97,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
-}  // namespace ely
+} /* namespace ely */
 
-#endif /* INSTANCEOFTEMPLATE_H_ */
+#endif /* NAVMESH_H_ */

@@ -23,6 +23,8 @@
 
 #include "ObjectModel/ComponentTemplate.h"
 
+using namespace ely;
+
 ComponentTemplate::ComponentTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)

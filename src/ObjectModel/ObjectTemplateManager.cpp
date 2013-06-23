@@ -23,6 +23,8 @@
 
 #include "ObjectModel/ObjectTemplateManager.h"
 
+using namespace ely;
+
 ObjectTemplateManager::ObjectTemplateManager()
 {
 }

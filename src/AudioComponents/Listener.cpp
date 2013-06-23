@@ -24,6 +24,8 @@
 #include "AudioComponents/Listener.h"
 #include "AudioComponents/ListenerTemplate.h"
 
+using namespace ely;
+
 Listener::Listener()
 {
 	// TODO Auto-generated constructor stub

@@ -23,6 +23,8 @@
 
 #include "Game/GameAudioManager.h"
 
+using namespace ely;
+
 GameAudioManager::GameAudioManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {

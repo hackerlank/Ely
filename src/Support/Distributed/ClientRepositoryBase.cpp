@@ -21,7 +21,7 @@
  * \author consultit
  */
 
-#include "../../../include/Support/Distributed/ClientRepositoryBase.h"
+#include "Support/Distributed/ClientRepositoryBase.h"
 
 ClientRepositoryBase::ClientRepositoryBase()
 {

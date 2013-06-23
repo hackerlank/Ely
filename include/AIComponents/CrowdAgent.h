@@ -35,6 +35,9 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+namespace ely
+{
+
 class CrowdAgentTemplate;
 
 /**
@@ -116,5 +119,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* CROWDAGENT_H_ */

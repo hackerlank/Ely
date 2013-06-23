@@ -24,6 +24,8 @@
 #include "SceneComponents/NodePathWrapper.h"
 #include "SceneComponents/NodePathWrapperTemplate.h"
 
+using namespace ely;
+
 NodePathWrapper::NodePathWrapper()
 {
 	// TODO Auto-generated constructor stub

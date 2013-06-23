@@ -31,6 +31,8 @@
 #include "SceneComponents/Terrain.h"
 #include "Game/GameSceneManager.h"
 
+namespace ely
+{
 class TerrainTemplate: public ComponentTemplate
 {
 public:
@@ -41,7 +43,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -73,5 +75,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* TERRAINTEMPLATE_H_ */

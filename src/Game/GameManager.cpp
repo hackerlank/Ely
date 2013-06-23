@@ -24,6 +24,8 @@
 #include "Game/GameManager.h"
 #include "Utilities/ComponentSuite.h"
 
+using namespace ely;
+
 GameManager::GameManager(int argc, char* argv[]) :
 		PandaFramework()
 {
@@ -129,6 +131,12 @@ void GameManager::setupCompTmplMgr()
 	//Steering
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new SteeringTemplate(this, mWindow));
+	//CrowdAgent
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new CrowdAgentTemplate(this, mWindow));
+	//NavMesh
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new NavMeshTemplate(this, mWindow));
 	///Audio templates
 	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
@@ -174,14 +182,17 @@ void GameManager::setupCompTmplMgr()
 
 }
 
-static bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
+namespace
 {
-	if (not tag)
+	bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
 	{
-		fprintf(stderr, "<%s> tag not found!\n", tagStr);
-		return false;
+		if (not tag)
+		{
+			fprintf(stderr, "<%s> tag not found!\n", tagStr);
+			return false;
+		}
+		return true;
 	}
-	return true;
 }
 
 void GameManager::createGameWorldWithoutParamTables(

@@ -23,6 +23,8 @@
 
 #include "Support/Picker.h"
 
+using namespace ely;
+
 Picker::Picker(PandaFramework* app, WindowFramework* window,
 		const std::string& pickKeyOn, const std::string& pickKeyOff) :
 		mApp(app), mWindow(window)

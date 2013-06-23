@@ -23,6 +23,8 @@
 
 #include "AIComponents/SteeringTemplate.h"
 
+using namespace ely;
+
 SteeringTemplate::SteeringTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

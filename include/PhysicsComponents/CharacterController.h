@@ -44,6 +44,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
+namespace ely
+{
 class CharacterControllerTemplate;
 
 /**
@@ -230,5 +232,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
+}  // namespace ely
 
 #endif /* CHARACTERCONTROLLER_H_ */

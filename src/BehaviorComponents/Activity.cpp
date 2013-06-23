@@ -24,6 +24,8 @@
 #include "BehaviorComponents/Activity.h"
 #include "BehaviorComponents/ActivityTemplate.h"
 
+using namespace ely;
+
 Activity::Activity() :
 		mFSM("FSM")
 {

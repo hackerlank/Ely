@@ -31,6 +31,8 @@
 #include "PhysicsComponents/CharacterController.h"
 #include "Game/GamePhysicsManager.h"
 
+namespace ely
+{
 class CharacterControllerTemplate: public ComponentTemplate
 {
 public:
@@ -41,7 +43,7 @@ public:
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
 
-	virtual SMARTPTR(Component) makeComponent(const ComponentId& compId);
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 	virtual void setParametersDefaults();
 
@@ -75,5 +77,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* CHARACTERCONTROLLERTEMPLATE_H_ */

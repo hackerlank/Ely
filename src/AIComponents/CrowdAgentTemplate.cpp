@@ -23,8 +23,11 @@
 
 #include "AIComponents/CrowdAgentTemplate.h"
 
+using namespace ely;
+
 CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
-		WindowFramework* windowFramework)
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
 	CHECKEXISTENCE(pandaFramework,
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid PandaFramework")

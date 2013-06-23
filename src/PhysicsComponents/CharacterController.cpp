@@ -24,6 +24,8 @@
 #include "PhysicsComponents/CharacterController.h"
 #include "PhysicsComponents/CharacterControllerTemplate.h"
 
+using namespace ely;
+
 CharacterController::CharacterController()
 {
 	// TODO Auto-generated constructor stub

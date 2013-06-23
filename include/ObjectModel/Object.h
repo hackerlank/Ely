@@ -37,6 +37,8 @@
 #include "ObjectTemplate.h"
 #include "Component.h"
 
+namespace ely
+{
 /**
  * \brief Object instance identifier type (by default the name
  * of the NodePath component).
@@ -186,7 +188,7 @@ public:
 	 */
 	///@{
 	void storeParameters( const ParameterTable& objTmplParams,
-					const ParameterTableMap& compTmplParams);
+			const ParameterTableMap& compTmplParams);
 	void freeParameters();
 	///@}
 
@@ -268,5 +270,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* OBJECT_H_ */

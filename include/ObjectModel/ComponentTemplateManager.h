@@ -32,6 +32,8 @@
 #include "ComponentTemplate.h"
 #include "Component.h"
 
+namespace ely
+{
 /**
  * \brief Singleton template manager that stores all the component templates.
  *
@@ -59,7 +61,7 @@ public:
 	 * @return SMARTPTR(NULL) if there wasn't a template for that component, otherwise
 	 * the previous template.
 	 */
-	SMARTPTR(ComponentTemplate) addComponentTemplate(
+	SMARTPTR(ComponentTemplate)addComponentTemplate(
 			SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/**
@@ -110,5 +112,6 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+}  // namespace ely
 
 #endif /* COMPONENTTEMPLATEMANAGER_H_ */

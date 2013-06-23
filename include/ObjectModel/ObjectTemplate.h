@@ -40,6 +40,8 @@
 #include "ComponentTemplate.h"
 #include "Component.h"
 
+namespace ely
+{
 class ObjectTemplateManager;
 
 /**
@@ -248,10 +250,12 @@ struct idIsEqualTo
 	{
 	}
 	ComponentType mComponentType;
-	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
+	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl
+	)
 	{
 		return componentTmpl.p()->componentType() == mComponentType;
 	}
 };
+}  // namespace ely
 
 #endif /* OBJECTTEMPLATE_H_ */

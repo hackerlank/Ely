@@ -35,6 +35,8 @@
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
 
+namespace ely
+{
 /**
  * \brief Singleton manager updating AI components.
  *
@@ -60,7 +62,7 @@ public:
 	 * \brief Adds (if not present) an AI component to updating.
 	 * @param aiComp The AI component.
 	 */
-	void addToAIUpdate(SMARTPTR(Component) aiComp);
+	void addToAIUpdate(SMARTPTR(Component)aiComp);
 	/**
 	 * \brief Removes (if present) an AI component from updating.
 	 * @param aiComp The AI component.
@@ -107,5 +109,6 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+}  // namespace ely
 
 #endif /* GAMEAIMANAGER_H_ */

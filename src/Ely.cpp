@@ -23,6 +23,8 @@
 
 #include "Ely.h"
 
+using namespace ely;
+
 int main(int argc, char **argv)
 {
 	// Load your configuration

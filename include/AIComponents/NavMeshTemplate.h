@@ -15,30 +15,31 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/SceneComponents/InstanceOfTemplate.h
+ * \file /Ely/include/AIComponents/NavMeshTemplate.h
  *
- * \date 20/mag/2012 (09:40:59)
+ * \date 23/giu/2013 (18:59:22)
  * \author consultit
  */
 
-#ifndef INSTANCEOFTEMPLATE_H_
-#define INSTANCEOFTEMPLATE_H_
+#ifndef NAVMESHTEMPLATE_H_
+#define NAVMESHTEMPLATE_H_
 
 #include "Utilities/Tools.h"
 
-#include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "SceneComponents/InstanceOf.h"
-#include "Game/GameSceneManager.h"
+#include "ObjectModel/Component.h"
+#include "AIComponents/NavMesh.h"
+#include "Game/GameAIManager.h"
 
 namespace ely
 {
-class InstanceOfTemplate: public ComponentTemplate
+
+class NavMeshTemplate: public ComponentTemplate
 {
 public:
-	InstanceOfTemplate(PandaFramework* pandaFramework,
+	NavMeshTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~InstanceOfTemplate();
+	virtual ~NavMeshTemplate();
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
@@ -58,7 +59,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "InstanceOfTemplate",
+		register_type(_type_handle, "NavMeshTemplate",
 				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
@@ -75,6 +76,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
-}  // namespace ely
+} /* namespace ely */
 
-#endif /* INSTANCEOFTEMPLATE_H_ */
+#endif /* NAVMESHTEMPLATE_H_ */

@@ -23,6 +23,8 @@
 
 #include "SceneComponents/InstanceOfTemplate.h"
 
+using namespace ely;
+
 InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

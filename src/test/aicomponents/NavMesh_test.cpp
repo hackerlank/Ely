@@ -15,39 +15,34 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/common_configs.h
+ * \file /Ely/src/test/aicomponents/NavMesh_test.cpp
  *
- * \date 26/nov/2012 (12:15:57)
+ * \date 23/giu/2013 (18:51:03)
  * \author consultit
  */
 
-#ifndef COMMON_CONFIGS_H_
-#define COMMON_CONFIGS_H_
+#include "AIComponents/NavMesh.h"
 
-#include <iostream>
-#include <string>
-#include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
+#include "AISuiteFixture.h"
 
-using namespace ely;
-
-__attribute__((constructor)) void initializationsInit();
-void callAllInits();
-
-__attribute__((destructor)) void initializationsEnd();
-void callAllEnds();
-
-//generic typedefs
-typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
-		PandaFramework* pandaFramework, WindowFramework* windowFramework);
-
-#ifdef __cplusplus
-extern "C"
+struct NavMeshTestCaseFixture
 {
-#endif
+	NavMeshTestCaseFixture()
+	{
+	}
+	~NavMeshTestCaseFixture()
+	{
+	}
+};
 
-#ifdef __cplusplus
+/// AI suite
+BOOST_FIXTURE_TEST_SUITE(AI, AISuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(TEST)
+{
+	BOOST_TEST_MESSAGE("TESTING");
+	BOOST_CHECK(true);
 }
-#endif
 
-#endif /* COMMON_CONFIGS_H_ */
+BOOST_AUTO_TEST_SUITE_END() // AI suite

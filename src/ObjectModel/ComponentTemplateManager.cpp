@@ -23,6 +23,8 @@
 
 #include "ObjectModel/ComponentTemplateManager.h"
 
+using namespace ely;
+
 ComponentTemplateManager::ComponentTemplateManager()
 {
 }

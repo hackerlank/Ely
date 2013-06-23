@@ -23,6 +23,8 @@
 
 #include "SceneComponents/ModelTemplate.h"
 
+using namespace ely;
+
 ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

@@ -24,6 +24,8 @@
 #include "SceneComponents/Model.h"
 #include "SceneComponents/ModelTemplate.h"
 
+using namespace ely;
+
 Model::Model()
 {
 	// TODO Auto-generated constructor stub

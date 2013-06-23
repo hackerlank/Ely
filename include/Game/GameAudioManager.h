@@ -39,6 +39,8 @@
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
 
+namespace ely
+{
 /**
  * \brief Singleton manager updating audio components.
  *
@@ -62,7 +64,7 @@ public:
 	 * \brief Adds (if not present) an audio component to updating.
 	 * @param audioComp The audio component.
 	 */
-	void addToAudioUpdate(SMARTPTR(Component) audioComp);
+	void addToAudioUpdate(SMARTPTR(Component)audioComp);
 	/**
 	 * \brief Removes (if present) an audio component from updating.
 	 * @param audioComp The audio component.
@@ -110,5 +112,6 @@ private:
 	ReMutex mMutex;
 
 };
+}  // namespace ely
 
 #endif /* GAMEAUDIOMANAGER_H_ */

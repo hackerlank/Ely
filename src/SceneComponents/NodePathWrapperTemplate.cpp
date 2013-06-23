@@ -23,6 +23,8 @@
 
 #include "SceneComponents/NodePathWrapperTemplate.h"
 
+using namespace ely;
+
 NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)

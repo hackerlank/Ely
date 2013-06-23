@@ -37,6 +37,8 @@
 #include <reMutex.h>
 #include <reMutexHolder.h>
 
+namespace ely
+{
 /**
  * \brief Component identifier type.
  */
@@ -161,7 +163,7 @@ public:
 	 * \return The owner object.
 	 */
 	///@{
-	void setOwnerObject(SMARTPTR(Object) ownerObject);
+	void setOwnerObject(SMARTPTR(Object)ownerObject);
 	SMARTPTR(Object) getOwnerObject() const;
 	///@}
 
@@ -275,5 +277,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* COMPONENT_H_ */

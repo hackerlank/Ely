@@ -36,6 +36,8 @@
 #include "GameManager.h"
 #include "ObjectModel/Component.h"
 
+namespace ely
+{
 /**
  * \brief Singleton manager updating control components.
  *
@@ -60,7 +62,7 @@ public:
 	 * \brief Adds (if not present) an control component to updating.
 	 * @param controlComp The control component.
 	 */
-	void addToControlUpdate(SMARTPTR(Component) controlComp);
+	void addToControlUpdate(SMARTPTR(Component)controlComp);
 	/**
 	 * \brief Removes (if present) an control component from updating.
 	 * @param controlComp The control component.
@@ -99,5 +101,6 @@ private:
 	ReMutex mMutex;
 
 };
+}  // namespace ely
 
 #endif /* GAMEINPUTMANAGER_H_ */

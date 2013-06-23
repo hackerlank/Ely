@@ -44,6 +44,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
+namespace ely
+{
 class ModelTemplate;
 
 /**
@@ -76,7 +78,7 @@ class Model: public Component
 {
 public:
 	Model();
-	Model(SMARTPTR(ModelTemplate) tmpl);
+	Model(SMARTPTR(ModelTemplate)tmpl);
 	virtual ~Model();
 
 	const virtual ComponentFamilyType familyType() const;
@@ -180,5 +182,6 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+}  // namespace ely
 
 #endif /* MODEL_H_ */
