@@ -251,9 +251,7 @@
 							</tool>
 							<tool errorParsers="" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.autogen.475783628" name="autogen.sh" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.autogen"/>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.1794520819" name="GCC C Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc">
-								<option id="gnu.c.compiler.option.include.paths.1871793950" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/recastnavigation/Recast/Include}&quot;"/>
-								</option>
+								<option id="gnu.c.compiler.option.include.paths.1871793950" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1220822801" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1591196013" name="GCC C++ Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp">
@@ -261,7 +259,7 @@
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
-									<listOptionValue builtIn="false" value="/REPOSITORY/KProjects/usr/include/recastnavigation"/>
+									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1286370007" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>

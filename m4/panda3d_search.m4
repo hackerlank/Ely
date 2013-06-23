@@ -52,7 +52,7 @@ EIGEN_LIBS=""
 ###Recast Navigation###
 # check header first from cmd line specified include
 AC_MSG_NOTICE([Looking for Recast Navigation headers...])
-RN_CPPFLAGS="-I/usr/include/recastnavigation -I/usr/local/include/recastnavigation"
+RN_CPPFLAGS="-I/usr/include/librecastnavigation-dev -I/usr/local/include/librecastnavigation-dev"
 CPPFLAGS="${RN_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADERS([Recast.h])
 if test "x${ac_cv_header_Recast_h}" != xyes; then
@@ -64,10 +64,10 @@ if test "x${ac_cv_header_Recast_h}" != xyes; then
 	----------------------------------------])
 fi
 # check libraries first from cmd line specified ones
-RN_LDFLAGS="-L/usr/lib/recastnavigation -L/usr/lib64/recastnavigation -L/usr/local/lib/recastnavigation"
-RN_LIBS="-lDebugUtils -lDetourCrowd -lDetour -lDetourTileCache -lRecast"
+RN_LDFLAGS=""
+RN_LIBS="-lrecastnavigation"
 #RN_PHYSICS_LIBS is not included in PANDA3D_LIBS
-RN_PHYSICS_LIBS="-lDebugUtils -lDetourCrowdPhysics -lDetour -lDetourTileCache -lRecast"
+RN_PHYSICS_LIBS="-lrecastnavigationphysics"
 			
 LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${RN_LIBS} ${LIBS_CMDLINE}"
