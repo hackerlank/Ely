@@ -13,9 +13,8 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
--->
+<!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -25,6 +24,7 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -121,22 +121,21 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
-<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
 				<Param chased_object="NPC1"/>
 				<Param fixed_relative_position="false"/>
 				<Param reference_object="render"/>
-				<Param abs_max_distance="150.0"/>
+				<Param abs_max_distance="120.0"/>
 				<Param abs_min_distance="100.0"/>
 				<Param abs_max_height="100.0"/>
 				<Param abs_min_height="50.0"/>
 				<Param abs_lookat_distance="0.0"/>
 				<Param abs_lookat_height="20.0"/>
-				<Param friction="1.0"/>
+				<Param friction="5.0"/>
 			</Component>
--->
+<!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param linear_speed="50.0"/>
@@ -156,11 +155,12 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
 				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
+-->
 			<Param parent=""/>
-			<Param pos_x="750.0"/>
-			<Param pos_y="-300.0"/>
-			<Param pos_z="600.0"/>
-			<Param rot_p="-15.0"/>
+			<Param pos_x="-175.0"/>
+			<Param pos_y="-470.0"/>
+			<Param pos_z="480.0"/>
+			<Param rot_p="-28.0"/>
 			<Param rot_h="0.0"/>
 		</Object>
 		
@@ -188,9 +188,9 @@
 		<Object type="InstancedActor" id="InstancedSmiley1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
-			<Param pos_x="850.0"/>
-			<Param pos_y="750.0"/>
-			<Param pos_z="400.0"/>
+			<Param pos_x="-110.0"/>
+			<Param pos_y="-130.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="180.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -215,9 +215,9 @@
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
-			<Param pos_x="500.0"/>
-			<Param pos_y="700.0"/>
-			<Param pos_z="350.0"/>
+			<Param pos_x="-90.0"/>
+			<Param pos_y="-110.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="-90.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -284,9 +284,9 @@
 				<Param sound_files="walk-sound@GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>			
-			<Param pos_x="800.0"/>
-			<Param pos_y="750.0"/>
-			<Param pos_z="400.0"/>
+			<Param pos_x="-140.0"/>
+			<Param pos_y="-165.0"/>
+			<Param pos_z="300.0"/>
 			<Param rot_h="180.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
@@ -345,14 +345,37 @@
 				<Param sound_files="walk-sound@GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
-			<Param pos_x="750.0"/>
-			<Param pos_y="800.0"/>
-			<Param pos_z="350.0"/>
+			<Param pos_x="-175.0"/>
+			<Param pos_y="-170.0"/>
+			<Param pos_z="260.0"/>
 			<Param rot_h="180.0"/>
 			<Param rot_p="0.0"/>
 			<Param rot_r="0.0"/>
 		</Object>
+		
+		<Object type="StaticActor" id="course2">
+			<Component type="Model">
+				<Param from_file="true"/>
+				<Param model_file="course2.bam"/>
+				<Param scale_x="15.0"/>
+				<Param scale_y="15.0"/>
+				<Param scale_z="15.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="triangle_mesh"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot_h="-45.0"/>
+			<Param pos_x="0.0"/>
+			<Param pos_y="0.0"/>
+			<Param pos_z="0.0"/>
+		</Object>
 
+<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elydatadir@/data/textures/heightfield.png"/>
@@ -380,7 +403,6 @@
 			<Param parent="render"/>
 		</Object>
 
-<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
 				<Param from_file="false"/>
@@ -405,7 +427,6 @@
 			<Param is_steady="true"/>
 			<Param rot_p="-90.0"/>
 		</Object>
--->
 		
 		<Object type="StaticActor" id="beachhouse2">
 			<Component type="Model">
@@ -496,6 +517,7 @@
 			<Param pos_y="1747.0"/>
 			<Param pos_z="136.0"/>
 		</Object>
+-->
 		
 		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
 		<Object type="Render" id="render" priority="1000">
