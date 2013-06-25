@@ -1,4 +1,10 @@
-noinst_HEADERS =\
+recastnavigation_headers = \
+		AIComponents/RecastNavigation/common.h \
+		AIComponents/RecastNavigation/InputGeom.h \
+		AIComponents/RecastNavigation/ChunkyTriMesh.h \
+		AIComponents/RecastNavigation/MeshLoaderObj.h
+
+noinst_HEADERS = \
 		Ely.h \
 		AIComponents/Steering.h \
 		AIComponents/SteeringTemplate.h \
@@ -6,6 +12,7 @@ noinst_HEADERS =\
 		AIComponents/CrowdAgentTemplate.h \
 		AIComponents/NavMesh.h \
 		AIComponents/NavMeshTemplate.h \
+		$(recastnavigation_headers) \
 		AudioComponents/Listener.h \
 		AudioComponents/ListenerTemplate.h \
 		AudioComponents/Sound3d.h \

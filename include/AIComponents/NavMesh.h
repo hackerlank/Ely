@@ -27,7 +27,9 @@
 #include "Utilities/Tools.h"
 
 #include <string>
+#include <nodePath.h>
 
+#include "RecastNavigation/InputGeom.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -62,6 +64,7 @@ public:
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 	virtual void onAddToSceneSetup();
+
 	/**
 	 * \brief Updates position/orientation of the controlled object.
 	 *
@@ -71,6 +74,18 @@ public:
 	virtual void update(void* data);
 
 private:
+	/**
+	 * \brief Recast Navigation data.
+	 */
+	///@{
+	InputGeom* m_geom;
+	///@}
+	/**
+	 * \brief Debug stuff.
+	 */
+	///@{
+	BuildContext* m_ctx;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
@@ -97,6 +112,7 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
 } /* namespace ely */
 
 #endif /* NAVMESH_H_ */

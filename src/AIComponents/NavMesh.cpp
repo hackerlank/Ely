@@ -77,8 +77,13 @@ void NavMesh::onAddToObjectSetup()
 		return;
 	}
 
+	//first check if owner Geom is a triangle mesh (from a model component)
+
+
 	//setup event callbacks if any
 	setupEvents();
+	//register event callbacks if any
+	registerEventCallbacks();
 }
 
 void NavMesh::onAddToSceneSetup()

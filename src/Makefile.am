@@ -39,13 +39,19 @@ ely_LDADD = \
 		-dlopen $(top_builddir)/transitions/transitions.la \
 		$(ELY_LIBS)
 
+recastnavigation_sources = \
+		AIComponents/RecastNavigation/InputGeom.cpp \
+		AIComponents/RecastNavigation/ChunkyTriMesh.cpp \
+		AIComponents/RecastNavigation/MeshLoaderObj.cpp
+			
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \
 		AIComponents/SteeringTemplate.cpp \
 		AIComponents/CrowdAgent.cpp \
 		AIComponents/CrowdAgentTemplate.cpp \
 		AIComponents/NavMesh.cpp \
-		AIComponents/NavMeshTemplate.cpp
+		AIComponents/NavMeshTemplate.cpp \
+		$(recastnavigation_sources)
 
 libaudiocomponents_la_SOURCES = \
 		AudioComponents/Listener.cpp \
