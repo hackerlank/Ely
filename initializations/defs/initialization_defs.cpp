@@ -31,7 +31,12 @@
 #include <aiBehaviors.h>
 #include <flock.h>
 #include <eventHandler.h>
-#include "Utilities/ComponentSuite.h"
+#include "ControlComponents/Driver.h"
+#include "ControlComponents/Chaser.h"
+#include "AudioComponents/Sound3d.h"
+#include "SceneComponents/Model.h"
+#include "AIComponents/Steering.h"
+#include "BehaviorComponents/Activity.h"
 #include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "ObjectModel/ObjectTemplate.h"

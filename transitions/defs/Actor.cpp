@@ -22,7 +22,6 @@
  */
 
 #include "../common_configs.h"
-#include "Utilities/ComponentSuite.h"
 
 //ENTER Enter_<STATE>_<OBJECTTYPE>;
 //EXIT Exit_<STATE>_<OBJECTTYPE>;

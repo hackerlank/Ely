@@ -84,7 +84,7 @@ private:
 	 * \brief Debug stuff.
 	 */
 	///@{
-	BuildContext* m_ctx;
+///TODO	BuildContext* m_ctx;
 	///@}
 
 	///TypedObject semantics: hardcoded

@@ -22,7 +22,9 @@
  */
 
 #include "../common_configs.h"
-#include "Utilities/ComponentSuite.h"
+#include "SceneComponents/Model.h"
+#include "BehaviorComponents/Activity.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 ///Avoid name mangling
 #ifdef __cplusplus

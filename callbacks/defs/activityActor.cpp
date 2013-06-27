@@ -22,7 +22,8 @@
  */
 
 #include "../common_configs.h"
-#include "Utilities/ComponentSuite.h"
+#include "BehaviorComponents/Activity.h"
+#include "ControlComponents/Driver.h"
 #include <lvector3.h>
 
 ///Avoid name mangling
