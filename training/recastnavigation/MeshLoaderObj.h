@@ -25,6 +25,8 @@
 //Model stuff
 #include "recastnavigation_data.h"
 #include <nodePath.h>
+#include <modelRoot.h>
+#include <lmatrix.h>
 #include <geomNode.h>
 #include <geom.h>
 #include <geomVertexData.h>
@@ -38,7 +40,7 @@ public:
 	
 	bool load(const char* fileName, float scale = 1.0, float* translation = NULL);
 	//Model stuff
-	bool load(NodePath model, float scale = 1.0, float* translation = NULL);
+	bool load(NodePath model);
 
 	inline const float* getVerts() const { return m_verts; }
 	inline const float* getNormals() const { return m_normals; }
@@ -69,6 +71,7 @@ private:
 	std::vector<CPT(Geom)> m_geoms;
 	std::vector<CPT(GeomVertexData)> m_vertexData;
 	std::vector<int> m_startIndices;
+	LMatrix4f m_currentTranformMat;
 	int m_currentMaxIndex;
 	int vcap, tcap;
 };

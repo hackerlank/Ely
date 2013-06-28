@@ -221,15 +221,13 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
 	return result;
 }
 
-bool RN::loadGeomMesh(NodePath model, float scale, LVector3f translation)
+bool RN::loadGeomMesh(NodePath model)
 {
 	bool result = true;
 	m_geom = new InputGeom;
 	m_meshName = model.get_name();
 	//
-	float translationRecast[3];
-	LVecBase3fToRecast(translation, translationRecast);
-	if (not m_geom->loadMesh(m_ctx, NULL, model, scale, translationRecast))
+	if (not m_geom->loadMesh(m_ctx, NULL, model))
 	{
 		delete m_geom;
 		m_geom = NULL;

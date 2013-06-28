@@ -153,8 +153,6 @@ int main(int argc, char **argv)
 	{
 		app->meshScale = 1.0;
 	}
-	//set agent pos
-	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 	//start
 	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window), app->debugPhysics);
 
@@ -162,6 +160,8 @@ int main(int argc, char **argv)
 	app->worldMesh = createWorldMesh(meshNameEgg, app->mBulletWorld, app->window, app->meshScale);
 	app->worldMesh.set_pos(app->meshPosition);
 //	worldMesh.hide();
+	//set agent pos
+	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = app->window->get_mouse().find("**/+Trackball");
 	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
@@ -187,7 +187,13 @@ int main(int argc, char **argv)
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
 	//load geometry mesh
 //	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale, app->worldMesh.get_pos());
-	app->rn->loadGeomMesh(app->worldMesh, app->meshScale, app->worldMesh.get_pos());
+	///TODO: attach a child model below worldMesh
+	NodePath box = app->window->load_model(app->window->get_render(), "box");
+	box.set_pos(-20, 4, -2.1);
+	box.set_scale(1.5, 1.5, 10.0);
+	box.reparent_to(app->worldMesh);
+	///
+	app->rn->loadGeomMesh(app->worldMesh);
 
 	//create geom mesh
 	switch (app->sampleType)

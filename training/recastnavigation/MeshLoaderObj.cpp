@@ -243,26 +243,39 @@ bool rcMeshLoaderObj::load(const char* filename, float scale, float* translation
 	return true;
 }
 
-bool rcMeshLoaderObj::load(NodePath model, float scale,
-		float* translation)
+bool rcMeshLoaderObj::load(NodePath model)
 {
-	m_scale = scale;
-	if (translation != NULL)
-	{
-		m_translation[0] = translation[0];
-		m_translation[1] = translation[1];
-		m_translation[2] = translation[2];
-	}
-	//Walk through all the model's GeomNodes
+	//reset scale & translation
+	m_scale = 1.0;
+	m_translation[0] = 0.0;
+	m_translation[1] = 0.0;
+	m_translation[2] = 0.0;
+	//reset max index
 	m_currentMaxIndex = 0;
-	NodePathCollection geomNodeCollection = model.find_all_matches(
-			"**/+GeomNode");
-	int numPaths = geomNodeCollection.get_num_paths();
-	PRINT("GeomNodes number: " << numPaths);
-	for (int i = 0; i < numPaths; i++)
+	//all transform are applied wrt model's parent node
+	NodePath referenceNP = model.get_parent();
+
+	//get all ModelRoots for the hierarchy below model
+	NodePathCollection modelRootCollection = model.find_all_matches(
+					"**/+ModelRoot");
+	//iterate over ModelRoots
+	for (int i = 0; i < modelRootCollection.size(); i++)
 	{
-		PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
-		processGeomNode(geomNode);
+		//get current ModelRoot node path
+		NodePath currentModelRoot = modelRootCollection[i];
+		//get current ModelRoot transform
+		m_currentTranformMat = currentModelRoot.get_transform(referenceNP)->get_mat();
+		///Elaborate
+		//Walk through all the currNP's GeomNodes
+		NodePathCollection geomNodeCollection = currentModelRoot.find_all_matches(
+				"**/+GeomNode");
+		int numPaths = geomNodeCollection.get_num_paths();
+		PRINT("GeomNodes number: " << numPaths);
+		for (int i = 0; i < numPaths; i++)
+		{
+			PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
+			processGeomNode(geomNode);
+		}
 	}
 
 	// Calculate normals.
@@ -350,6 +363,7 @@ void rcMeshLoaderObj::processVertexData(CPT(GeomVertexData)vertexData)
 		while (!vertexReader.is_at_end())
 		{
 			LVector3f vertex = vertexReader.get_data3f();
+			m_currentTranformMat.xform_point_in_place(vertex);
 			//add vertex
 			float pvertex[3];
 			LVecBase3fToRecast(vertex, pvertex);

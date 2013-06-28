@@ -145,7 +145,7 @@ bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 	}
 	else if (not model.is_empty())
 	{
-		loadResult = m_mesh->load(model, scale, translation);
+		loadResult = m_mesh->load(model);
 	}
 	else
 	{
