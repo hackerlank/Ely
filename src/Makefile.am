@@ -42,7 +42,9 @@ ely_LDADD = \
 recastnavigation_sources = \
 		AIComponents/RecastNavigation/InputGeom.cpp \
 		AIComponents/RecastNavigation/ChunkyTriMesh.cpp \
-		AIComponents/RecastNavigation/MeshLoaderObj.cpp
+		AIComponents/RecastNavigation/MeshLoaderObj.cpp \
+		AIComponents/RecastNavigation/DebugInterfaces.cpp \
+		AIComponents/RecastNavigation/PerfTimer.cpp
 			
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \

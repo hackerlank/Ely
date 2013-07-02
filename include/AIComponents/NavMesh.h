@@ -30,6 +30,7 @@
 #include <nodePath.h>
 
 #include "RecastNavigation/InputGeom.h"
+#include "RecastNavigation/DebugInterfaces.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -84,7 +85,7 @@ private:
 	 * \brief Debug stuff.
 	 */
 	///@{
-///TODO	BuildContext* m_ctx;
+	BuildContext* m_ctx;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -113,6 +114,6 @@ private:
 
 };
 
-} /* namespace ely */
+} // namespace ely
 
 #endif /* NAVMESH_H_ */

@@ -2,7 +2,9 @@ recastnavigation_headers = \
 		AIComponents/RecastNavigation/common.h \
 		AIComponents/RecastNavigation/InputGeom.h \
 		AIComponents/RecastNavigation/ChunkyTriMesh.h \
-		AIComponents/RecastNavigation/MeshLoaderObj.h
+		AIComponents/RecastNavigation/MeshLoaderObj.h \
+		AIComponents/RecastNavigation/DebugInterfaces.h \
+		AIComponents/RecastNavigation/PerfTimer.h
 
 noinst_HEADERS = \
 		Ely.h \

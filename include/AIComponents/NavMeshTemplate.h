@@ -76,6 +76,6 @@ private:
 	static TypeHandle _type_handle;
 
 };
-} /* namespace ely */
+} // namespace ely
 
 #endif /* NAVMESHTEMPLATE_H_ */

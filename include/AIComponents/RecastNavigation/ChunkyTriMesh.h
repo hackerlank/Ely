@@ -52,6 +52,6 @@ int rcGetChunksOverlappingRect(const rcChunkyTriMesh* cm, float bmin[2], float b
 /// Returns the chunk indices which overlap the input segment.
 int rcGetChunksOverlappingSegment(const rcChunkyTriMesh* cm, float p[2], float q[2], int* ids, const int maxIds);
 
-} /* namespace ely */
+} // namespace ely
 
 #endif // CHUNKYTRIMESH_H

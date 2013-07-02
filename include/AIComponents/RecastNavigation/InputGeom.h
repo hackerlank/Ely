@@ -21,6 +21,8 @@
 
 #include "common.h"
 
+#include <Recast.h>
+#include <DebugDraw.h>
 #include "ChunkyTriMesh.h"
 #include "MeshLoaderObj.h"
 #include <nodePath.h>
@@ -103,6 +105,6 @@ public:
 	///@}
 };
 
-} /* namespace ely */
+} // namespace ely
 
 #endif // INPUTGEOM_H
