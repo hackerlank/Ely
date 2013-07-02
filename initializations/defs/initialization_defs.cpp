@@ -31,6 +31,7 @@
 #include <aiBehaviors.h>
 #include <flock.h>
 #include <eventHandler.h>
+#include <texturePool.h>
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/Chaser.h"
 #include "AudioComponents/Sound3d.h"

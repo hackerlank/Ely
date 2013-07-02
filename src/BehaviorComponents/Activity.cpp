@@ -23,8 +23,10 @@
 
 #include "BehaviorComponents/Activity.h"
 #include "BehaviorComponents/ActivityTemplate.h"
+#include "ObjectModel/Object.h"
 
-using namespace ely;
+namespace ely
+{
 
 Activity::Activity() :
 		mFSM("FSM")
@@ -294,3 +296,4 @@ void Activity::unloadTransitionFunctions()
 //TypedObject semantics: hardcoded
 TypeHandle Activity::_type_handle;
 
+} // namespace ely

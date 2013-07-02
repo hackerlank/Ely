@@ -22,8 +22,11 @@
  */
 
 #include "ControlComponents/DriverTemplate.h"
+#include "ControlComponents/Driver.h"
+#include "Game/GameControlManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -103,3 +106,4 @@ void DriverTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle DriverTemplate::_type_handle;
 
+} // namespace ely

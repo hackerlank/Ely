@@ -22,8 +22,10 @@
  */
 
 #include "Game/GameAudioManager.h"
+#include "Game/GameManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 GameAudioManager::GameAudioManager(int sort, int priority,
 		const std::string& asyncTaskChain)
@@ -126,3 +128,5 @@ ReMutex& GameAudioManager::getMutex()
 {
 	return mMutex;
 }
+
+} // namespace ely

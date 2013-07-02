@@ -24,50 +24,9 @@
 #ifndef STEERING_H_
 #define STEERING_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
 #include <aiCharacter.h>
-#include <seek.h>
-#include <flee.h>
-#include <pursue.h>
-#include <evade.h>
-#include <pathFollow.h>
-#include <arrival.h>
-#include <wander.h>
-#include <obstacleAvoidance.h>
-
-///XXX: conflicting declaration: ‘NodeArray’
-//aiPathFinder.h: ‘typedef class std::vector<Node*, std::allocator<Node*> > NodeArray’
-//btQuantizedBvh.h: ‘typedef class btAlignedObjectArray<btOptimizedBvhNode> NodeArray’
-#ifndef _PATHFINDER_H
-#define _PATHFINDER_H
-#include <meshNode.h>
-#include <lineSegs.h>
-typedef vector<Node *> NodeArrayAI; //redefined
-typedef vector<NodeArrayAI> NavMesh;
-class EXPCL_PANDAAI PathFinder;
-#endif
-#include <pathFind.h>
-
-#include <nodePath.h>
-#include <lvecBase3.h>
-#include <lvecBase2.h>
-#include <lvector3.h>
-#include <throw_event.h>
-#include <eventParameter.h>
-#include <bitMask.h>
-#include <cmath>
-#include <cfloat>
-#include <bullet_utils.h>
-#include <bulletWorld.h>
-#include <bulletClosestHitRayResult.h>
-#include "ControlComponents/Driver.h"
 #include "PhysicsComponents/CharacterController.h"
-#include "Game/GamePhysicsManager.h"
 #include "ObjectModel/Component.h"
-#include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplateManager.h"
 
 namespace ely
 {

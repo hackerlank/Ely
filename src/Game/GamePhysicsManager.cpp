@@ -21,9 +21,23 @@
  * \author consultit
  */
 
+#include <cmath>
+#include <asyncTaskManager.h>
+#include <nodePathCollection.h>
+#include <bulletSphereShape.h>
+#include <bulletPlaneShape.h>
+#include <bulletBoxShape.h>
+#include <bulletCylinderShape.h>
+#include <bulletCapsuleShape.h>
+#include <bulletConeShape.h>
+#include <bulletHeightfieldShape.h>
+#include <bulletTriangleMesh.h>
+#include <bulletTriangleMeshShape.h>
 #include "Game/GamePhysicsManager.h"
+#include "Game/GameManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 		const std::string& asyncTaskChain)
@@ -421,5 +435,7 @@ void GamePhysicsManager::debug(bool enable)
 		}
 	}
 }
+
+} // namespace ely
 
 #endif

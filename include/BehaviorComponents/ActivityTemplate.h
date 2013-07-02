@@ -24,13 +24,7 @@
 #ifndef ACTIVITYTEMPLATE_H_
 #define ACTIVITYTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <utility>
 #include "ObjectModel/ComponentTemplate.h"
-#include "ObjectModel/Component.h"
-#include "BehaviorComponents/Activity.h"
 
 namespace ely
 {

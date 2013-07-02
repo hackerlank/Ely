@@ -23,8 +23,31 @@
 
 #include "AIComponents/Steering.h"
 #include "AIComponents/SteeringTemplate.h"
+#include <seek.h>
+#include <flee.h>
+#include <pursue.h>
+#include <evade.h>
+#include <pathFollow.h>
+#include <arrival.h>
+#include <wander.h>
+#include <obstacleAvoidance.h>
 
-using namespace ely;
+///XXX: conflicting declaration: ‘NodeArray’
+//aiPathFinder.h: ‘typedef class std::vector<Node*, std::allocator<Node*> > NodeArray’
+//btQuantizedBvh.h: ‘typedef class btAlignedObjectArray<btOptimizedBvhNode> NodeArray’
+#ifndef _PATHFINDER_H
+#define _PATHFINDER_H
+#include <meshNode.h>
+#include <lineSegs.h>
+typedef vector<Node *> NodeArrayAI; //redefined
+typedef vector<NodeArrayAI> NavMesh;
+class EXPCL_PANDAAI PathFinder;
+#endif
+#include <pathFind.h>
+#include "Game/GameAIManager.h"
+
+namespace ely
+{
 
 Steering::Steering()
 {
@@ -1039,6 +1062,8 @@ LVecBase3f Steering::do_flock()
 			+ avg_neighbor_heading * _steering->_flock_group->_alignment_wt
 			+ cohesion_force * _steering->_flock_group->_cohesion_wt);
 }
+} //ely
+
 namespace
 {
 	//wander
@@ -1052,6 +1077,9 @@ namespace
 		return (rand_float() - rand_float());
 	}
 }
+
+namespace ely
+{
 LVecBase3f Steering::do_wander()
 {
 	Wander * _wander_obj = _steering->_wander_obj;
@@ -1314,3 +1342,4 @@ void Steering::do_follow()
 //TypedObject semantics: hardcoded
 TypeHandle Steering::_type_handle;
 
+}  // namespace ely

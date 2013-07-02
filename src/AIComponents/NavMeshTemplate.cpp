@@ -22,8 +22,11 @@
  */
 
 #include "AIComponents/NavMeshTemplate.h"
+#include "AIComponents/NavMesh.h"
+#include "Game/GameAIManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 NavMeshTemplate::NavMeshTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -80,3 +83,5 @@ void NavMeshTemplate::setParametersDefaults()
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMeshTemplate::_type_handle;
+
+}  // namespace ely

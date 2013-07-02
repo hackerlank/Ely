@@ -23,8 +23,11 @@
 
 #include "AIComponents/CrowdAgent.h"
 #include "AIComponents/CrowdAgentTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameAIManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 CrowdAgent::CrowdAgent()
 {
@@ -189,3 +192,5 @@ void CrowdAgent::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle CrowdAgent::_type_handle;
+
+}  // namespace ely

@@ -22,8 +22,10 @@
  */
 
 #include "BehaviorComponents/ActivityTemplate.h"
+#include "BehaviorComponents/Activity.h"
 
-using namespace ely;
+namespace ely
+{
 
 ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -78,3 +80,5 @@ void ActivityTemplate::setParametersDefaults()
 
 //TypedObject semantics: hardcoded
 TypeHandle ActivityTemplate::_type_handle;
+
+} // namespace ely

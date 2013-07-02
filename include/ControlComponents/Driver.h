@@ -24,22 +24,8 @@
 #ifndef CONTROLBYEVENT_H_
 #define CONTROLBYEVENT_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <set>
-#include <cstdlib>
-#include <nodePath.h>
-#include <typedObject.h>
-#include <event.h>
-#include <genericAsyncTask.h>
-#include <mouseData.h>
-#include <graphicsWindow.h>
-#include <windowProperties.h>
-#include <transformState.h>
 #include <lvector3.h>
 #include "ObjectModel/Component.h"
-#include "ObjectModel/Object.h"
 
 namespace ely
 {

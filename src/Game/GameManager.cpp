@@ -23,8 +23,10 @@
 
 #include "Game/GameManager.h"
 #include "Utilities/ComponentSuite.h"
+#include "tinyxml2.h"
 
-using namespace ely;
+namespace ely
+{
 
 GameManager::GameManager(int argc, char* argv[]) :
 		PandaFramework()
@@ -181,20 +183,23 @@ void GameManager::setupCompTmplMgr()
 			new TerrainTemplate(this, mWindow));
 
 }
+} //ely
 
 namespace
 {
-	bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
+bool checkTag(tinyxml2::XMLElement* tag, const char* tagStr)
+{
+	if (not tag)
 	{
-		if (not tag)
-		{
-			fprintf(stderr, "<%s> tag not found!\n", tagStr);
-			return false;
-		}
-		return true;
+		fprintf(stderr, "<%s> tag not found!\n", tagStr);
+		return false;
 	}
+	return true;
+}
 }
 
+namespace ely
+{
 void GameManager::createGameWorldWithoutParamTables(
 		const std::string& gameWorldXML)
 {
@@ -783,3 +788,4 @@ void GameManager::togglePhysicsDebug(const Event* event)
 }
 #endif
 
+} // namespace ely

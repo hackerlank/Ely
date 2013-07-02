@@ -23,8 +23,11 @@
 
 #include "AIComponents/NavMesh.h"
 #include "AIComponents/NavMeshTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameAIManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 NavMesh::NavMesh()
 {
@@ -113,3 +116,5 @@ void NavMesh::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMesh::_type_handle;
+
+}  // namespace ely

@@ -22,8 +22,11 @@
  */
 
 #include "AudioComponents/ListenerTemplate.h"
+#include "AudioComponents/Listener.h"
+#include "Game/GameAudioManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -82,3 +85,4 @@ void ListenerTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle ListenerTemplate::_type_handle;
 
+} // namespace ely

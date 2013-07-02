@@ -23,8 +23,11 @@
 
 #include "AudioComponents/Listener.h"
 #include "AudioComponents/ListenerTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameAudioManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 Listener::Listener()
 {
@@ -183,3 +186,4 @@ void Listener::update(void* data)
 //TypedObject semantics: hardcoded
 TypeHandle Listener::_type_handle;
 
+} // namespace ely

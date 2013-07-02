@@ -23,8 +23,12 @@
 
 #include "ControlComponents/Chaser.h"
 #include "ControlComponents/ChaserTemplate.h"
+#include "Game/GameControlManager.h"
+#include "Game/GamePhysicsManager.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 Chaser::Chaser()
 {
@@ -438,3 +442,5 @@ void Chaser::correctChaserHeight(LPoint3f& newPos)
 
 //TypedObject semantics: hardcoded
 TypeHandle Chaser::_type_handle;
+
+} // namespace ely

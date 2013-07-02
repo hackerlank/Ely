@@ -22,8 +22,11 @@
  */
 
 #include "AIComponents/SteeringTemplate.h"
+#include "Game/GameAIManager.h"
+#include "AIComponents/Steering.h"
 
-using namespace ely;
+namespace ely
+{
 
 SteeringTemplate::SteeringTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -88,3 +91,5 @@ void SteeringTemplate::setParametersDefaults()
 
 //TypedObject semantics: hardcoded
 TypeHandle SteeringTemplate::_type_handle;
+
+}  // namespace ely

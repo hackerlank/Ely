@@ -22,8 +22,11 @@
  */
 
 #include "AIComponents/CrowdAgentTemplate.h"
+#include "AIComponents/CrowdAgent.h"
+#include "Game/GameAIManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -84,3 +87,4 @@ void CrowdAgentTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle CrowdAgentTemplate::_type_handle;
 
+}  // namespace ely

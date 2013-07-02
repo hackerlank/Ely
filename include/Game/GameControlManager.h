@@ -25,15 +25,7 @@
 #define GAMEINPUTMANAGER_H_
 
 #include "Utilities/Tools.h"
-
 #include <list>
-#include <algorithm>
-#include <pandaFramework.h>
-#include <clockObject.h>
-#include <asyncTask.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
-#include "GameManager.h"
 #include "ObjectModel/Component.h"
 
 namespace ely

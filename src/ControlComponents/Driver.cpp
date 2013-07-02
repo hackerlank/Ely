@@ -23,8 +23,11 @@
 
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/DriverTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameControlManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 Driver::Driver()
 {
@@ -652,3 +655,4 @@ void Driver::update(void* data)
 //TypedObject semantics: hardcoded
 TypeHandle Driver::_type_handle;
 
+} // namespace ely

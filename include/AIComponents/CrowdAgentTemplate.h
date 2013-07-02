@@ -24,12 +24,7 @@
 #ifndef CROWDAGENTTEMPLATE_H_
 #define CROWDAGENTTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
 #include "ObjectModel/ComponentTemplate.h"
-#include "ObjectModel/Component.h"
-#include "AIComponents/CrowdAgent.h"
-#include "Game/GameAIManager.h"
 
 namespace ely
 {

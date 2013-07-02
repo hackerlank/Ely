@@ -24,16 +24,7 @@
 #ifndef CROWDAGENT_H_
 #define CROWDAGENT_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <nodePath.h>
-#include <throw_event.h>
-#include <eventParameter.h>
-
 #include "ObjectModel/Component.h"
-#include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplateManager.h"
 
 namespace ely
 {

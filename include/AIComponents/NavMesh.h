@@ -24,16 +24,9 @@
 #ifndef NAVMESH_H_
 #define NAVMESH_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <nodePath.h>
-
 #include "RecastNavigation/InputGeom.h"
 #include "RecastNavigation/DebugInterfaces.h"
 #include "ObjectModel/Component.h"
-#include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplateManager.h"
 
 namespace ely
 {

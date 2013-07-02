@@ -22,8 +22,10 @@
  */
 
 #include "Game/GameAIManager.h"
+#include "Game/GameManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 GameAIManager::GameAIManager(int sort, int priority,
 		const std::string& asyncTaskChain)
@@ -128,3 +130,5 @@ ReMutex& GameAIManager::getMutex()
 {
 	return mMutex;
 }
+
+} // namespace ely

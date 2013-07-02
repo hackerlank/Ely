@@ -22,8 +22,11 @@
  */
 
 #include "ControlComponents/ChaserTemplate.h"
+#include "ControlComponents/Chaser.h"
+#include "Game/GameControlManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -84,3 +87,5 @@ void ChaserTemplate::setParametersDefaults()
 
 //TypedObject semantics: hardcoded
 TypeHandle ChaserTemplate::_type_handle;
+
+} // namespace ely

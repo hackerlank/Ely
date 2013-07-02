@@ -24,12 +24,7 @@
 #ifndef CHASERTEMPLATE_H_
 #define CHASERTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
-#include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "ControlComponents/Chaser.h"
-#include "Game/GameControlManager.h"
 
 namespace ely
 {

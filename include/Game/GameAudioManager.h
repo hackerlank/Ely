@@ -25,18 +25,8 @@
 #define GAMEAUDIOMANAGER_H_
 
 #include "Utilities/Tools.h"
-
 #include <list>
-#include <algorithm>
 #include <audioManager.h>
-#include <pandaFramework.h>
-#include <clockObject.h>
-#include <asyncTaskManager.h>
-#include <asyncTask.h>
-#include <asyncTaskChain.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
-#include "GameManager.h"
 #include "ObjectModel/Component.h"
 
 namespace ely

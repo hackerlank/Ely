@@ -23,8 +23,11 @@
 
 #include "AudioComponents/Sound3d.h"
 #include "AudioComponents/Sound3dTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameAudioManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 Sound3d::Sound3d()
 {
@@ -353,3 +356,4 @@ void Sound3d::update(void* data)
 //TypedObject semantics: hardcoded
 TypeHandle Sound3d::_type_handle;
 
+} // namespace ely

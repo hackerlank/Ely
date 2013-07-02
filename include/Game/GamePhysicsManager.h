@@ -25,41 +25,11 @@
 #define GAMEPHYSICSMANAGER_H_
 
 #include "Utilities/Tools.h"
-
 #include <list>
-#include <cmath>
-#include <algorithm>
-#include <pointerTo.h>
 #include <bulletWorld.h>
-#include <bulletDebugNode.h>
-#include <pandaFramework.h>
-#include <nodePath.h>
-#include <nodePathCollection.h>
-#include <transformState.h>
-#include <geomNode.h>
-#include <bulletSphereShape.h>
-#include <bulletShape.h>
-#include <bulletBoxShape.h>
-#include <bulletPlaneShape.h>
-#include <bulletCylinderShape.h>
-#include <bulletCapsuleShape.h>
-#include <bulletConeShape.h>
-#include <bulletHeightfieldShape.h>
-#include <bulletTriangleMesh.h>
-#include <bulletTriangleMeshShape.h>
-#include <bullet_utils.h>
-#include <lvector3.h>
-#include <filename.h>
-
 #ifdef ELY_DEBUG
 #	include <windowFramework.h>
 #endif
-
-#include <clockObject.h>
-#include <asyncTask.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
-#include "GameManager.h"
 #include "ObjectModel/Component.h"
 
 namespace ely

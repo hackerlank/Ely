@@ -22,8 +22,10 @@
  */
 
 #include "Game/GameControlManager.h"
+#include "Game/GameManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 GameControlManager::GameControlManager(int sort, int priority,
 		const std::string& asyncTaskChain)
@@ -119,3 +121,4 @@ ReMutex& GameControlManager::getMutex()
 	return mMutex;
 }
 
+} // namespace ely

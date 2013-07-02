@@ -24,12 +24,7 @@
 #ifndef NAVMESHTEMPLATE_H_
 #define NAVMESHTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
 #include "ObjectModel/ComponentTemplate.h"
-#include "ObjectModel/Component.h"
-#include "AIComponents/NavMesh.h"
-#include "Game/GameAIManager.h"
 
 namespace ely
 {

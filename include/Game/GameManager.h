@@ -25,31 +25,12 @@
 #define GAMEMANAGER_H_
 
 #include "Utilities/Tools.h"
-
 #include <pandaFramework.h>
 #include <windowFramework.h>
-#include <nodePath.h>
 #include <clockObject.h>
-#include <lmatrix.h>
-#include <asyncTask.h>
-#include <event.h>
-#include <trackball.h>
-#include <transform2sg.h>
-#include <textureStage.h>
-#include <texturePool.h>
-#include <iostream>
-#include <string>
-#include <map>
-#include <queue>
-#include <cstdio>
-#include "tinyxml2.h"
 
-#include "ObjectModel/Object.h"
-#include "ObjectModel/ComponentTemplateManager.h"
-#include "ObjectModel/ObjectTemplateManager.h"
-#include "GameAudioManager.h"
-#include "GamePhysicsManager.h"
-
+namespace ely
+{
 class FuncInterval;
 
 /**
@@ -190,5 +171,7 @@ protected:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+
+} // namespace ely
 
 #endif /* GAMEMANAGER_H_ */
