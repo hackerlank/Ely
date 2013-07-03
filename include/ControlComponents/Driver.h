@@ -25,6 +25,7 @@
 #define CONTROLBYEVENT_H_
 
 #include <lvector3.h>
+#include <transformState.h>
 #include "ObjectModel/Component.h"
 
 namespace ely

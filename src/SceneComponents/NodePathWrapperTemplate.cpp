@@ -22,8 +22,11 @@
  */
 
 #include "SceneComponents/NodePathWrapperTemplate.h"
+#include "SceneComponents/NodePathWrapper.h"
+#include "Game/GameSceneManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -82,3 +85,5 @@ void NodePathWrapperTemplate::setParametersDefaults()
 
 //TypedObject semantics: hardcoded
 TypeHandle NodePathWrapperTemplate::_type_handle;
+
+} // namespace ely

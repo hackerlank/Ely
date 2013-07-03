@@ -25,12 +25,7 @@
 #define COMPONENTTEMPLATEMANAGER_H_
 
 #include "Utilities/Tools.h"
-
-#include <map>
-#include <reMutex.h>
-#include <reMutexHolder.h>
 #include "ComponentTemplate.h"
-#include "Component.h"
 
 namespace ely
 {

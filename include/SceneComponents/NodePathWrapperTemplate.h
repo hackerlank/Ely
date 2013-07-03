@@ -24,12 +24,7 @@
 #ifndef NODEPATHWRAPPERTEMPLATE_H_
 #define NODEPATHWRAPPERTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
 #include "ObjectModel/ComponentTemplate.h"
-#include "ObjectModel/Component.h"
-#include "SceneComponents/NodePathWrapper.h"
-#include "Game/GameSceneManager.h"
 
 namespace ely
 {

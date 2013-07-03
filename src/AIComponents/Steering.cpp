@@ -44,6 +44,8 @@ typedef vector<NodeArrayAI> NavMesh;
 class EXPCL_PANDAAI PathFinder;
 #endif
 #include <pathFind.h>
+#include <throw_event.h>
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 
 namespace ely

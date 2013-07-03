@@ -22,8 +22,14 @@
  */
 
 #include "Support/Picker.h"
+#include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
+#include "SceneComponents/NodePathWrapper.h"
+#include "Game/GamePhysicsManager.h"
+#include <mouseWatcher.h>
 
-using namespace ely;
+namespace ely
+{
 
 Picker::Picker(PandaFramework* app, WindowFramework* window,
 		const std::string& pickKeyOn, const std::string& pickKeyOff) :
@@ -236,3 +242,5 @@ ReMutex& Picker::getMutex()
 {
 	return mMutex;
 }
+
+} // namespace ely

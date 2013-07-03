@@ -25,9 +25,10 @@
 #define CLIENTREPOSITORYBASE_H_
 
 #include "Utilities/Tools.h"
-
 #include <cConnectionRepository.h>
 
+namespace ely
+{
 /**
  * This maintains a client-side connection with a Panda server.
  * This base class exists to collect the common code between
@@ -41,5 +42,7 @@ public:
 	ClientRepositoryBase();
 	virtual ~ClientRepositoryBase();
 };
+
+} // namespace ely
 
 #endif /* CLIENTREPOSITORYBASE_H_ */

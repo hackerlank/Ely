@@ -24,8 +24,11 @@
 #include "SceneComponents/Terrain.h"
 #include "SceneComponents/TerrainTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GameSceneManager.h"
+#include <texturePool.h>
 
-using namespace ely;
+namespace ely
+{
 
 Terrain::Terrain()
 {
@@ -286,3 +289,5 @@ GeoMipTerrainRef::GeoMipTerrainRef(const std::string& name) :
 
 //TypedObject semantics: hardcoded
 TypeHandle GeoMipTerrainRef::_type_handle;
+
+} // namespace ely

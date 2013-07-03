@@ -25,7 +25,8 @@
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Object.h"
 
-using namespace ely;
+namespace ely
+{
 
 Component::Component() :
 		mOwnerObject(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
@@ -53,10 +54,10 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
 {
 	//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
+	HOLDMUTEX(mMutex)
 
-		mOwnerObject = ownerObject;
-	}
+	mOwnerObject = ownerObject;
+}
 
 SMARTPTR(Object)Component::getOwnerObject() const
 {
@@ -307,3 +308,4 @@ ReMutex& Component::getMutex()
 //TypedObject semantics: hardcoded
 TypeHandle Component::_type_handle;
 
+} // namespace ely

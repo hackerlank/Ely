@@ -19,19 +19,12 @@
 #ifndef MESHLOADER_OBJ
 #define MESHLOADER_OBJ
 
-#include "Utilities/Tools.h"
-
 #include "common.h"
-
-#include <cstdlib>
 #include <nodePath.h>
-#include <nodePathCollection.h>
-#include <modelRoot.h>
 #include <lmatrix.h>
 #include <geomNode.h>
 #include <geom.h>
 #include <geomVertexData.h>
-#include <geomVertexReader.h>
 #include <geomPrimitive.h>
 
 namespace ely

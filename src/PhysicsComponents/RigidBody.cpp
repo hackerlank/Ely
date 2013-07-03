@@ -23,9 +23,11 @@
 
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "SceneComponents/Terrain.h"
 
-using namespace ely;
+namespace ely
+{
 
 RigidBody::RigidBody()
 {
@@ -528,3 +530,4 @@ void RigidBody::setPhysicalParameters()
 //TypedObject semantics: hardcoded
 TypeHandle RigidBody::_type_handle;
 
+} // namespace ely

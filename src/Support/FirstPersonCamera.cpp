@@ -23,6 +23,9 @@
 
 #include "Support/FirstPersonCamera.h"
 
+namespace ely
+{
+
 FirstPersonCamera::FirstPersonCamera()
 {
 	// TODO Auto-generated constructor stub
@@ -34,3 +37,4 @@ FirstPersonCamera::~FirstPersonCamera()
 	// TODO Auto-generated destructor stub
 }
 
+} // namespace ely

@@ -23,7 +23,8 @@
 
 #include "ObjectModel/ObjectTemplate.h"
 
-using namespace ely;
+namespace ely
+{
 
 ObjectTemplate::ObjectTemplate(const ObjectType& name,
 		ObjectTemplateManager* objectTmplMgr, PandaFramework* pandaFramework,
@@ -273,3 +274,5 @@ ReMutex& ObjectTemplate::getMutex()
 
 //TypedObject semantics: hardcoded
 TypeHandle ObjectTemplate::_type_handle;
+
+} //namespace ely

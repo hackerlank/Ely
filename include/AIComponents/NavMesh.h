@@ -27,6 +27,8 @@
 #include "RecastNavigation/InputGeom.h"
 #include "RecastNavigation/DebugInterfaces.h"
 #include "ObjectModel/Component.h"
+#include <windowFramework.h>
+#include <nodePath.h>
 
 namespace ely
 {
@@ -67,18 +69,33 @@ public:
 	 */
 	virtual void update(void* data);
 
+#ifdef ELY_DEBUG
+	/**
+	 * \brief Gets a reference to the Recast Debug node.
+	 * @return The Recast Debug node.
+	 */
+	NodePath getDebugNodePath() const;
+
+	/**
+	 * \brief Initializes debugging.
+	 */
+	void initDebug(WindowFramework* windowFramework);
+	/**
+	 * \brief Enables/disables debugging.
+	 * @param enable True to enable, false to disable.
+	 */
+	void debug(bool enable);
+#endif
+
 private:
-	/**
-	 * \brief Recast Navigation data.
-	 */
-	///@{
+	/// Input geometry.
 	InputGeom* m_geom;
-	///@}
-	/**
-	 * \brief Debug stuff.
-	 */
-	///@{
+	/// Build context.
 	BuildContext* m_ctx;
+#ifdef ELY_DEBUG
+	/// Recast debug node path.
+	NodePath mRecastDebugNodePath;
+#endif
 	///@}
 
 	///TypedObject semantics: hardcoded

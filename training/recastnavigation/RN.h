@@ -47,6 +47,8 @@
 #include <virtualFileSystem.h>
 #include <filename.h>
 
+using namespace ely;
+
 //#define TESTANOMALIES
 #define DEBUG_DRAW
 

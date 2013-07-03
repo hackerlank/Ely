@@ -27,9 +27,7 @@
 #include "Utilities/Tools.h"
 #include <list>
 #include <bulletWorld.h>
-#ifdef ELY_DEBUG
-#	include <windowFramework.h>
-#endif
+#include <windowFramework.h>
 #include "ObjectModel/Component.h"
 
 namespace ely

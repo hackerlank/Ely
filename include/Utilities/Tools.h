@@ -33,23 +33,18 @@
 #include "Tools_ini.h"
 #endif
 
-#include <exception>
 #include <iostream>
-#include <map>
-#include <string>
-#include <sstream>
-#include <cassert>
-#include <utility>
-#include <vector>
 #include <referenceCount.h>
 #include <event.h>
 #include <eventHandler.h>
-#include <asyncTask.h>
 #include <genericAsyncTask.h>
-#include <pmutex.h>
 #include <pointerTo.h>
 #include <threadSafePointerTo.h>
+/////Dynamic linked libraries loading (Libtool)
+#include <ltdl.h>
 
+namespace ely
+{
 ///Macros for generic debug
 #if defined (ELY_DEBUG) && !defined (TESTING)
 #	define PRINT(msg) std::cout << msg << std::endl
@@ -297,9 +292,6 @@ std::vector<std::string> parseCompoundString(const std::string& compoundString,
 std::string replaceCharacter(const std::string& source, int character,
 		int replacement);
 
-///Dynamic linked libraries loading (Libtool)
-#include <ltdl.h>
-
 ///ELY_THREAD
 #ifdef ELY_THREAD
 #	define HOLDMUTEX(mutex) ReMutexHolder guard(mutex);
@@ -377,5 +369,7 @@ std::string getComponentStandardNameItem(const std::string& name,
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
+
+} // namespace ely
 
 #endif /* TOOLS_H_ */

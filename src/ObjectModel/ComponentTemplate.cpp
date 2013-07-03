@@ -23,7 +23,8 @@
 
 #include "ObjectModel/ComponentTemplate.h"
 
-using namespace ely;
+namespace ely
+{
 
 ComponentTemplate::ComponentTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -129,3 +130,4 @@ ReMutex& ComponentTemplate::getMutex()
 //TypedObject semantics: hardcoded
 TypeHandle ComponentTemplate::_type_handle;
 
+} // namespace ely

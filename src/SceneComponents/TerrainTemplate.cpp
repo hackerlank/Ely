@@ -22,8 +22,11 @@
  */
 
 #include "SceneComponents/TerrainTemplate.h"
+#include "SceneComponents/Terrain.h"
+#include "Game/GameSceneManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -93,3 +96,4 @@ void TerrainTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle TerrainTemplate::_type_handle;
 
+} // namespace ely

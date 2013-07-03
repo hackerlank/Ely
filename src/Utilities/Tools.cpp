@@ -28,7 +28,8 @@
 ///Distributed
 #include "Support/Distributed/DistributedObjectBase.h"
 
-using namespace ely;
+namespace ely
+{
 
 std::vector<std::string> parseCompoundString(const std::string& compoundString,
 		char separator)
@@ -122,3 +123,5 @@ void initTypedObjects()
 	///Distributed
 	DistributedObjectBase::init_type();
 }
+
+} // namespace ely

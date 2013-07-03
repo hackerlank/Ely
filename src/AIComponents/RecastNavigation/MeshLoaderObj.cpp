@@ -16,12 +16,15 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+#include "Utilities/Tools.h"
 #include "AIComponents/RecastNavigation/MeshLoaderObj.h"
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
+#include <nodePathCollection.h>
+#include <geomVertexReader.h>
 
 namespace ely
 {

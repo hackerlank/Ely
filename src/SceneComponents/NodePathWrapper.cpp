@@ -23,8 +23,11 @@
 
 #include "SceneComponents/NodePathWrapper.h"
 #include "SceneComponents/NodePathWrapperTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameSceneManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 NodePathWrapper::NodePathWrapper()
 {
@@ -124,3 +127,4 @@ void NodePathWrapper::setNodePath(const NodePath& nodePath)
 //TypedObject semantics: hardcoded
 TypeHandle NodePathWrapper::_type_handle;
 
+} // namespace ely

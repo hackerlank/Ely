@@ -435,7 +435,6 @@ void GamePhysicsManager::debug(bool enable)
 		}
 	}
 }
+#endif
 
 } // namespace ely
-
-#endif

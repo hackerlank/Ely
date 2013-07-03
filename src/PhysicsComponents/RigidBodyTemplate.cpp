@@ -22,8 +22,11 @@
  */
 
 #include "PhysicsComponents/RigidBodyTemplate.h"
+#include "PhysicsComponents/RigidBody.h"
+#include "Game/GamePhysicsManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -92,3 +95,4 @@ void RigidBodyTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle RigidBodyTemplate::_type_handle;
 
+} // namespace ely

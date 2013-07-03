@@ -37,6 +37,8 @@
 #include <netDatagram.h>
 #include "Utilities/Tools.h"
 
+using namespace ely;
+
 class Server
 {
 	int cPort, cBacklog;

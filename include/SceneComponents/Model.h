@@ -24,25 +24,10 @@
 #ifndef MODEL_H_
 #define MODEL_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
 #include <list>
-#include <set>
-#include <map>
-#include <cstdlib>
 #include <nodePath.h>
-#include <filename.h>
-#include <animControl.h>
 #include <animControlCollection.h>
-#include <animBundleNode.h>
-#include <partBundleNode.h>
-#include <string_utils.h>
-#include <auto_bind.h>
-#include <cardMaker.h>
-#include <typedObject.h>
 #include "ObjectModel/Component.h"
-#include "ObjectModel/Object.h"
 
 namespace ely
 {

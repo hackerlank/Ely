@@ -43,7 +43,7 @@ LPoint3f agentPosDefault(4.19123, 9.90642, 8.3);
 std::string actorFile("data/models/eve.bam");
 std::string anim0File("data/models/eve-walk.bam");
 std::string anim1File("data/models/eve-run.bam");
-const float characterMaxSpeed = 1.5;
+const float characterMaxSpeed = 3;
 const float rateFactor = 1.25;
 const float characterScale = 0.4;
 ///guy character

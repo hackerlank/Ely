@@ -23,6 +23,9 @@
 
 #include "Support/Distributed/DistributedObjectBase.h"
 
+namespace ely
+{
+
 DistributedObjectBase::DistributedObjectBase()
 {
 	// TODO Auto-generated constructor stub
@@ -36,3 +39,5 @@ DistributedObjectBase::~DistributedObjectBase()
 
 //TypedObject semantics: hardcoded
 TypeHandle DistributedObjectBase::_type_handle;
+
+} // namespace ely

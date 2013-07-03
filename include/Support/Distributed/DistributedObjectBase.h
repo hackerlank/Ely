@@ -24,10 +24,10 @@
 #ifndef DISTRIBUTEDOBJECTBASE_H_
 #define DISTRIBUTEDOBJECTBASE_H_
 
-#include "Utilities/Tools.h"
-
 #include <typedWritableReferenceCount.h>
 
+namespace ely
+{
 /**
  * The Distributed Object class is the base class for all network based
  * (i.e. distributed) objects.  These will usually (always?) have a
@@ -63,5 +63,7 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+} // namespace ely
 
 #endif /* DISTRIBUTEDOBJECTBASE_H_ */

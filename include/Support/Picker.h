@@ -25,30 +25,13 @@
 #define PICKER_H_
 
 #include "Utilities/Tools.h"
-
-#include <string>
 #include <pandaFramework.h>
-#include <windowFramework.h>
-#include <nodePath.h>
-#include <graphicsWindow.h>
-#include <mouseWatcher.h>
-#include <lpoint3.h>
-#include <lpoint2.h>
-#include <lvector3.h>
-#include <camera.h>
 #include <lens.h>
-#include <bitMask.h>
 #include <bulletWorld.h>
-#include <bulletRigidBodyNode.h>
 #include <bulletSphericalConstraint.h>
-#include <bulletClosestHitRayResult.h>
-#include "Game/GamePhysicsManager.h"
-#include "ObjectModel/Component.h"
-#include "ObjectModel/ObjectTemplateManager.h"
-#include "ObjectModel/ObjectTemplate.h"
-#include "ObjectModel/Object.h"
-#include "SceneComponents/NodePathWrapper.h"
-#include "PhysicsComponents/RigidBody.h"
+
+namespace ely
+{
 
 /**
  * \brief A class for picking (physics) objects.
@@ -104,5 +87,7 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+
+} // namespace ely
 
 #endif /* PICKER_H_ */

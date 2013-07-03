@@ -24,24 +24,9 @@
 #ifndef CHARACTERCONTROLLER_H_
 #define CHARACTERCONTROLLER_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <cstdlib>
-#include <cmath>
-#include <nodePath.h>
-#include <lvecBase3.h>
-#include <lvecBase2.h>
-#include <lvector3.h>
-#include <lpoint3.h>
-#include <throw_event.h>
-#include <eventParameter.h>
-#include <bulletShape.h>
 #include <bulletCharacterControllerNode.h>
-#include <bullet_utils.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
 namespace ely

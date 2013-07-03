@@ -22,8 +22,10 @@
  */
 
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "ObjectModel/ComponentTemplateManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 ObjectTemplateManager::ObjectTemplateManager()
 {
@@ -241,3 +243,5 @@ IdType ObjectTemplateManager::getId()
 {
 	return ++id;
 }
+
+} // namespace ely

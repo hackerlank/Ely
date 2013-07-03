@@ -24,7 +24,8 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
 mTmpl(tmpl), mInitializationsLoaded(false)
@@ -320,3 +321,4 @@ ReMutex& Object::getMutex()
 //TypedObject semantics: hardcoded
 TypeHandle Object::_type_handle;
 
+} // namespace ely

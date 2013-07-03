@@ -24,21 +24,8 @@
 #ifndef OBJECTTEMPLATE_H_
 #define OBJECTTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <vector>
-#include <list>
-#include <utility>
-#include <algorithm>
-#include <utility>
-#include <pandaFramework.h>
-#include <windowFramework.h>
 #include <typedWritableReferenceCount.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
 #include "ComponentTemplate.h"
-#include "Component.h"
 
 namespace ely
 {
@@ -250,8 +237,7 @@ struct idIsEqualTo
 	{
 	}
 	ComponentType mComponentType;
-	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl
-	)
+	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
 	{
 		return componentTmpl.p()->componentType() == mComponentType;
 	}

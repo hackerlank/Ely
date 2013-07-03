@@ -25,14 +25,8 @@
 #define OBJECTTEMPLATEMANAGER_H_
 
 #include "Utilities/Tools.h"
-
-#include <map>
-#include <iostream>
-#include <reMutex.h>
-#include <reMutexHolder.h>
 #include "ObjectTemplate.h"
 #include "Object.h"
-#include "ComponentTemplateManager.h"
 
 namespace ely
 {

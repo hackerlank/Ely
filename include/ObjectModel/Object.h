@@ -25,17 +25,10 @@
 #define OBJECT_H_
 
 #include "Utilities/Tools.h"
-
-#include <map>
-#include <string>
 #include <pandaFramework.h>
-#include <windowFramework.h>
 #include <nodePath.h>
 #include <typedWritableReferenceCount.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
 #include "ObjectTemplate.h"
-#include "Component.h"
 
 namespace ely
 {

@@ -23,6 +23,9 @@
 
 #include "Support/Distributed/ClientRepositoryBase.h"
 
+namespace ely
+{
+
 ClientRepositoryBase::ClientRepositoryBase()
 {
 	// TODO Auto-generated constructor stub
@@ -34,3 +37,4 @@ ClientRepositoryBase::~ClientRepositoryBase()
 	// TODO Auto-generated destructor stub
 }
 
+} // namespace ely

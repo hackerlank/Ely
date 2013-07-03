@@ -23,8 +23,12 @@
 
 #include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/InstanceOfTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
+#include "SceneComponents/Model.h"
+#include "Game/GameSceneManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 InstanceOf::InstanceOf()
 {
@@ -145,3 +149,5 @@ SMARTPTR(Object)InstanceOf::getInstancedObject() const
 
 //TypedObject semantics: hardcoded
 TypeHandle InstanceOf::_type_handle;
+
+} // namespace ely

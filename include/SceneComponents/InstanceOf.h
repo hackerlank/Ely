@@ -24,13 +24,9 @@
 #ifndef INSTANCEOF_H_
 #define INSTANCEOF_H_
 
-#include "Utilities/Tools.h"
-
 #include <nodePath.h>
-#include <typedObject.h>
 #include "ObjectModel/Component.h"
-#include "ObjectModel/ObjectTemplateManager.h"
-#include "SceneComponents/Model.h"
+#include "ObjectModel/Object.h"
 
 namespace ely
 {

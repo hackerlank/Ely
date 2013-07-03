@@ -22,8 +22,11 @@
  */
 
 #include "SceneComponents/InstanceOfTemplate.h"
+#include "SceneComponents/InstanceOf.h"
+#include "Game/GameSceneManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -84,3 +87,4 @@ void InstanceOfTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle InstanceOfTemplate::_type_handle;
 
+} // namespace ely

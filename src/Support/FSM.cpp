@@ -23,6 +23,8 @@
 
 #include "Support/FSM.h"
 
+namespace ely
+{
 //specializations' definitions
 //StateKey == std::string
 template<> FSM<std::string>::FSM(const std::string& name) :
@@ -40,3 +42,5 @@ template<> FSM<int>::FSM(const int& name) :
 	//initialization would take place
 	initialize(name);
 }
+
+} // namespace ely

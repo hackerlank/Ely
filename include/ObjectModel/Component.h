@@ -25,17 +25,9 @@
 #define COMPONENT_H_
 
 #include "Utilities/Tools.h"
-
-#include <iostream>
-#include <string>
-#include <map>
-#include <utility>
-#include <cstring>
 #include <typedWritableReferenceCount.h>
-#include <eventHandler.h>
 #include <genericAsyncTask.h>
 #include <reMutex.h>
-#include <reMutexHolder.h>
 
 namespace ely
 {

@@ -23,9 +23,11 @@
 
 #include "PhysicsComponents/CharacterController.h"
 #include "PhysicsComponents/CharacterControllerTemplate.h"
+#include "ObjectModel/ObjectTemplateManager.h"
+#include <throw_event.h>
 
-using namespace ely;
-
+namespace ely
+{
 CharacterController::CharacterController()
 {
 	// TODO Auto-generated constructor stub
@@ -624,3 +626,4 @@ void CharacterController::setControlParameters()
 //TypedObject semantics: hardcoded
 TypeHandle CharacterController::_type_handle;
 
+}  // namespace ely

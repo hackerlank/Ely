@@ -24,19 +24,9 @@
 #ifndef TERRAIN_H_
 #define TERRAIN_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
-#include <list>
-#include <cstdlib>
-#include <algorithm>
 #include <geoMipTerrain.h>
-#include <filename.h>
 #include <pnmImage.h>
 #include <texture.h>
-#include <texturePool.h>
-#include <textureStage.h>
-#include <typedObject.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 

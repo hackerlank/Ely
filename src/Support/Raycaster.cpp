@@ -23,6 +23,9 @@
 
 #include "Support/Raycaster.h"
 
+namespace ely
+{
+
 Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
 		SMARTPTR(BulletWorld)world, int N) :
 		mApp(app), mWindow(window), mWorld(world), m_N(N)
@@ -211,7 +214,7 @@ ReMutex& Raycaster::getMutex()
 	return mMutex;
 }
 
-
+} // namespace ely
 
 
 

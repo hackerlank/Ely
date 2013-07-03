@@ -22,8 +22,11 @@
  */
 
 #include "SceneComponents/ModelTemplate.h"
+#include "SceneComponents/Model.h"
+#include "Game/GameSceneManager.h"
 
-using namespace ely;
+namespace ely
+{
 
 ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
@@ -84,3 +87,5 @@ void ModelTemplate::setParametersDefaults()
 
 //TypedObject semantics: hardcoded
 TypeHandle ModelTemplate::_type_handle;
+
+} // namespace ely

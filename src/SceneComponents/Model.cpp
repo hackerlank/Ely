@@ -23,8 +23,14 @@
 
 #include "SceneComponents/Model.h"
 #include "SceneComponents/ModelTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameSceneManager.h"
+#include <animBundleNode.h>
+#include <partBundleNode.h>
+#include <cardMaker.h>
 
-using namespace ely;
+namespace ely
+{
 
 Model::Model()
 {
@@ -362,3 +368,5 @@ void Model::setNodePath(const NodePath& nodePath)
 
 //TypedObject semantics: hardcoded
 TypeHandle Model::_type_handle;
+
+} // namespace ely

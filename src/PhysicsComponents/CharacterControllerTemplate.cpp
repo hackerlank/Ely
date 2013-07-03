@@ -22,9 +22,11 @@
  */
 
 #include "PhysicsComponents/CharacterControllerTemplate.h"
+#include "PhysicsComponents/CharacterController.h"
+#include "Game/GamePhysicsManager.h"
 
-using namespace ely;
-
+namespace ely
+{
 CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
@@ -100,3 +102,4 @@ void CharacterControllerTemplate::setParametersDefaults()
 //TypedObject semantics: hardcoded
 TypeHandle CharacterControllerTemplate::_type_handle;
 
+}  // namespace ely

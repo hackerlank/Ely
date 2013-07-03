@@ -25,23 +25,15 @@
 #define FSM_H_
 
 #include "Utilities/Tools.h"
-
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <set>
 #include <queue>
 #include <list>
-#include <algorithm>
-#include <utility>
 #include <throw_event.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
-#include <referenceCount.h>
 #include <boost/function.hpp>
 #include <boost/bind.hpp>
-#include <boost/ref.hpp>
 #include <boost/any.hpp>
+
+namespace ely
+{
 
 /**
  * \brief The Value list type.
@@ -1220,5 +1212,7 @@ typedef FSM<std::string>::StateTmpl<std::string> State;
 //StateKey == int
 typedef FSM<int> fsmi;
 typedef FSM<int>::StateTmpl<int> Statei;
+
+} // namespace ely
 
 #endif /* FSM_H_ */

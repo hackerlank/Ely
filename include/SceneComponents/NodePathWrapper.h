@@ -24,13 +24,8 @@
 #ifndef NODEPATHWRAPPER_H_
 #define NODEPATHWRAPPER_H_
 
-#include "Utilities/Tools.h"
-
-#include <string>
 #include <nodePath.h>
-#include <typedObject.h>
 #include "ObjectModel/Component.h"
-#include "ObjectModel/Object.h"
 
 namespace ely
 {

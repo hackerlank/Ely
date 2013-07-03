@@ -24,24 +24,12 @@
 #ifndef DEBUGINTERFACES_H_
 #define DEBUGINTERFACES_H_
 
-#include "Utilities/Tools.h"
-
 #include "common.h"
-
 #include <DebugDraw.h>
 #include <Recast.h>
-#include <RecastDump.h>
 #include "PerfTimer.h"
-
 #include <nodePath.h>
-#include <geomNode.h>
-#include <geomVertexFormat.h>
 #include <geomVertexWriter.h>
-#include <geomPoints.h>
-#include <geomLines.h>
-#include <geomTriangles.h>
-#include <geomTristrips.h>
-#include <transparencyAttrib.h>
 
 namespace ely
 {

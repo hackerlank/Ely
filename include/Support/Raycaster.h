@@ -26,17 +26,12 @@
 #define RAYCASTER_H_
 
 #include "Utilities/Tools.h"
-#include <iostream>
-#include <string>
-#include <vector>
 #include <pandaFramework.h>
 #include <bulletWorld.h>
-#include <bulletTriangleMesh.h>
-#include <bulletTriangleMeshShape.h>
-#include <bulletSphericalConstraint.h>
-#include <bulletClosestHitRayResult.h>
-#include <bulletRigidBodyNode.h>
 #include <mouseWatcher.h>
+
+namespace ely
+{
 
 /**
  * \brief A singleton class for ray casting.
@@ -124,5 +119,7 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+
+} // namespace ely
 
 #endif /* RAYCASTER_H_ */

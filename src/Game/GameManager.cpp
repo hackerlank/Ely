@@ -22,6 +22,8 @@
  */
 
 #include "Game/GameManager.h"
+#include "ObjectModel/ComponentTemplateManager.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Utilities/ComponentSuite.h"
 #include "tinyxml2.h"
 

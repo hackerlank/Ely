@@ -24,7 +24,8 @@
 #ifndef FIRSTPERSONCAMERA_H_
 #define FIRSTPERSONCAMERA_H_
 
-#include "Utilities/Tools.h"
+namespace ely
+{
 
 class FirstPersonCamera
 {
@@ -32,5 +33,7 @@ public:
 	FirstPersonCamera();
 	virtual ~FirstPersonCamera();
 };
+
+} // namespace ely
 
 #endif /* FIRSTPERSONCAMERA_H_ */

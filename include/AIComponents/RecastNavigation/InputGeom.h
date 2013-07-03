@@ -20,12 +20,10 @@
 #define INPUTGEOM_H
 
 #include "common.h"
-
 #include <Recast.h>
 #include <DebugDraw.h>
 #include "ChunkyTriMesh.h"
 #include "MeshLoaderObj.h"
-#include <nodePath.h>
 
 namespace ely
 {

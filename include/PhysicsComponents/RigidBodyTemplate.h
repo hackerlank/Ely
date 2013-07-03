@@ -24,12 +24,7 @@
 #ifndef RIGIDBODYTEMPLATE_H_
 #define RIGIDBODYTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
-#include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
-#include "PhysicsComponents/RigidBody.h"
-#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {

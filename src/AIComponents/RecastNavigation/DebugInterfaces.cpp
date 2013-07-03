@@ -29,6 +29,10 @@
 #include "AIComponents/RecastNavigation/DebugInterfaces.h"
 #include <RecastDebugDraw.h>
 #include <DetourDebugDraw.h>
+#include <geomNode.h>
+#include <geomPoints.h>
+#include <geomLines.h>
+#include <geomTriangles.h>
 
 #ifdef WIN32
 #	define snprintf _snprintf

@@ -24,17 +24,9 @@
 #ifndef COMPONENTTEMPLATE_H_
 #define COMPONENTTEMPLATE_H_
 
-#include "Utilities/Tools.h"
-
 #include <list>
-#include <set>
-#include <string>
-#include <utility>
 #include <pandaFramework.h>
-#include <windowFramework.h>
 #include <typedWritableReferenceCount.h>
-#include <reMutex.h>
-#include <reMutexHolder.h>
 #include "Component.h"
 
 namespace ely
