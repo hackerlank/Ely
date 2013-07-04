@@ -114,6 +114,79 @@ void NavMesh::update(void* data)
 
 }
 
+InputGeom* NavMesh::getInputGeom()
+{
+	return mGeom;
+}
+
+dtNavMesh* NavMesh::getNavMesh()
+{
+	return mNavMesh;
+}
+
+dtNavMeshQuery* NavMesh::getNavMeshQuery()
+{
+	return mNavQuery;
+}
+
+dtCrowd* NavMesh::getCrowd()
+{
+	return mCrowd;
+}
+
+virtual float NavMesh::getAgentRadius()
+{
+	return mAgentRadius;
+}
+
+virtual float NavMesh::getAgentHeight()
+{
+	return mAgentHeight;
+}
+
+virtual float NavMesh::getAgentClimb()
+{
+	return mAgentMaxClimb;
+}
+
+void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
+{
+	mCellSize = settings.mCellSize;
+	mCellHeight = settings.mCellHeight;
+	mAgentHeight = settings.mAgentHeight;
+	mAgentRadius = settings.mAgentRadius;
+	mAgentMaxClimb = settings.mAgentMaxClimb;
+	mAgentMaxSlope = settings.mAgentMaxSlope;
+	mRegionMinSize = settings.mRegionMinSize;
+	mRegionMergeSize = settings.mRegionMergeSize;
+	mMonotonePartitioning = settings.mMonotonePartitioning;
+	mEdgeMaxLen = settings.mEdgeMaxLen;
+	mEdgeMaxError = settings.mEdgeMaxError;
+	mVertsPerPoly = settings.mVertsPerPoly;
+	mDetailSampleDist = settings.mDetailSampleDist;
+	mDetailSampleMaxError = settings.mDetailSampleMaxError;
+}
+
+NavMeshSettings NavMesh::getNavMeshSettings()
+{
+	NavMeshSettings settings;
+	settings.mCellSize = mCellSize;
+	settings.mCellHeight = mCellHeight;
+	settings.mAgentHeight = mAgentHeight;
+	settings.mAgentRadius = mAgentRadius;
+	settings.mAgentMaxClimb = mAgentMaxClimb;
+	settings.mAgentMaxSlope = mAgentMaxSlope;
+	settings.mRegionMinSize = mRegionMinSize;
+	settings.mRegionMergeSize = mRegionMergeSize;
+	settings.mMonotonePartitioning = mMonotonePartitioning;
+	settings.mEdgeMaxLen = mEdgeMaxLen;
+	settings.mEdgeMaxError = mEdgeMaxError;
+	settings.mVertsPerPoly = mVertsPerPoly;
+	settings.mDetailSampleDist = mDetailSampleDist;
+	settings.mDetailSampleMaxError = mDetailSampleMaxError;
+	return settings;
+}
+
 //TypedObject semantics: hardcoded
 TypeHandle NavMesh::_type_handle;
 
