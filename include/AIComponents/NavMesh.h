@@ -26,6 +26,7 @@
 
 #include "RecastNavigation/InputGeom.h"
 #include "RecastNavigation/DebugInterfaces.h"
+#include <DetourCrowd.h>
 #include "ObjectModel/Component.h"
 #include <windowFramework.h>
 #include <nodePath.h>
@@ -169,9 +170,9 @@ private:
 	BuildContext* mCtx;
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
-	NodePath mRecastDebugNodePath;
+	NodePath mDebugNodePath;
 	/// Panda3d debug draw implementation.
-	DebugDrawPanda3d mDebugDraw;
+	DebugDrawPanda3d* mDebugDraw;
 #endif
 	/**
 	 * \brief Nav mesh settings data.

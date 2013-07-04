@@ -34,10 +34,11 @@ NavMesh::NavMesh()
 	// TODO Auto-generated constructor stub
 }
 
-NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl)
+NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl): mGeom(0), mNavMesh(0), mNavQuery(0), mCrowd(0), mCtx(0)
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
+
 }
 
 NavMesh::~NavMesh()
@@ -134,17 +135,17 @@ dtCrowd* NavMesh::getCrowd()
 	return mCrowd;
 }
 
-virtual float NavMesh::getAgentRadius()
+float NavMesh::getAgentRadius()
 {
 	return mAgentRadius;
 }
 
-virtual float NavMesh::getAgentHeight()
+float NavMesh::getAgentHeight()
 {
 	return mAgentHeight;
 }
 
-virtual float NavMesh::getAgentClimb()
+float NavMesh::getAgentClimb()
 {
 	return mAgentMaxClimb;
 }
