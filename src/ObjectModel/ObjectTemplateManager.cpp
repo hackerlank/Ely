@@ -136,6 +136,11 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		newId = objectId;
 	}
 	SMARTPTR(Object) newObj = new Object(newId, objectTmpl);
+	//set if object is steady, so components can use this information
+	bool isSteady = (
+			objectTmpl->parameter(std::string("is_steady")) == std::string("true") ?
+					true : false);
+	newObj->setSteady(isSteady);
 	//get the component template ordered list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 	objectTmpl->getComponentTemplates();

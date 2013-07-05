@@ -154,10 +154,6 @@ void Object::sceneSetup()
 
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
-	//Is static (by default false)
-	mIsSteady = (
-			mTmpl->parameter(std::string("is_steady")) == std::string("true") ?
-					true : false);
 	//find parent into the created objects
 	SMARTPTR(Object)createdObject = ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
 	if (createdObject != NULL)

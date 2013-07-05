@@ -71,28 +71,28 @@ GameControlManager::~GameControlManager()
 void GameControlManager::addToControlUpdate(SMARTPTR(Component)controlComp)
 {
 	//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
+	HOLDMUTEX(mMutex)
 
-		ControlComponentList::iterator iter = find(mControlComponents.begin(),
-				mControlComponents.end(), controlComp);
-		if (iter == mControlComponents.end())
-		{
-			mControlComponents.push_back(controlComp);
-		}
+	ControlComponentList::iterator iter = find(mControlComponents.begin(),
+			mControlComponents.end(), controlComp);
+	if (iter == mControlComponents.end())
+	{
+		mControlComponents.push_back(controlComp);
 	}
+}
 
 void GameControlManager::removeFromControlUpdate(SMARTPTR(Component)controlComp)
 {
 	//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
+	HOLDMUTEX(mMutex)
 
-		ControlComponentList::iterator iter = find(mControlComponents.begin(),
-				mControlComponents.end(), controlComp);
-		if (iter != mControlComponents.end())
-		{
-			mControlComponents.remove(controlComp);
-		}
+	ControlComponentList::iterator iter = find(mControlComponents.begin(),
+			mControlComponents.end(), controlComp);
+	if (iter != mControlComponents.end())
+	{
+		mControlComponents.remove(controlComp);
 	}
+}
 
 AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 {
