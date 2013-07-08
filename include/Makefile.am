@@ -4,7 +4,14 @@ recastnavigation_headers = \
 		AIComponents/RecastNavigation/ChunkyTriMesh.h \
 		AIComponents/RecastNavigation/MeshLoaderObj.h \
 		AIComponents/RecastNavigation/DebugInterfaces.h \
-		AIComponents/RecastNavigation/PerfTimer.h
+		AIComponents/RecastNavigation/PerfTimer.h \
+		AIComponents/RecastNavigation/NavMeshType.h \
+		AIComponents/RecastNavigation/NavMeshType_Tile.h \
+		AIComponents/RecastNavigation/NavMeshType_Solo.h \
+		AIComponents/RecastNavigation/NavMeshType_Obstacle.h \
+		AIComponents/RecastNavigation/fastlz.h \
+		AIComponents/RecastNavigation/ConvexVolumeTool.h \
+		AIComponents/RecastNavigation/CrowdTool.h
 
 noinst_HEADERS = \
 		Ely.h \

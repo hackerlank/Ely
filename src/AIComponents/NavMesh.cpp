@@ -34,7 +34,10 @@ NavMesh::NavMesh()
 	// TODO Auto-generated constructor stub
 }
 
-NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl): mGeom(0), mNavMesh(0), mNavQuery(0), mCrowd(0), mCtx(0)
+NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl):
+	mGeom(0),
+	mCtx(new BuildContext),
+	mMeshName("")
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
@@ -45,6 +48,8 @@ NavMesh::~NavMesh()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	delete mCtx;
 }
 
 const ComponentFamilyType NavMesh::familyType() const
@@ -117,76 +122,161 @@ void NavMesh::update(void* data)
 
 InputGeom* NavMesh::getInputGeom()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mGeom;
 }
 
 dtNavMesh* NavMesh::getNavMesh()
 {
-	return mNavMesh;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getNavMesh();
 }
 
 dtNavMeshQuery* NavMesh::getNavMeshQuery()
 {
-	return mNavQuery;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getNavMeshQuery();
 }
 
 dtCrowd* NavMesh::getCrowd()
 {
-	return mCrowd;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getCrowd();
 }
 
 float NavMesh::getAgentRadius()
 {
-	return mAgentRadius;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getAgentRadius();
 }
 
 float NavMesh::getAgentHeight()
 {
-	return mAgentHeight;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getAgentHeight();
 }
 
 float NavMesh::getAgentClimb()
 {
-	return mAgentMaxClimb;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getAgentClimb();
+}
+
+LVecBase3f NavMesh::getBoundsMin()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	CHECKEXISTENCE(mGeom,
+			"NavMesh::getBoundsMin: invalid InputGeom")
+	return RecastToLVecBase3f(mGeom->getMeshBoundsMin());
+}
+
+LVecBase3f NavMesh::getBoundsMax()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	CHECKEXISTENCE(mGeom,
+			"NavMesh::getBoundsMax: invalid InputGeom")
+	return RecastToLVecBase3f(mGeom->getMeshBoundsMax());
 }
 
 void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 {
-	mCellSize = settings.mCellSize;
-	mCellHeight = settings.mCellHeight;
-	mAgentHeight = settings.mAgentHeight;
-	mAgentRadius = settings.mAgentRadius;
-	mAgentMaxClimb = settings.mAgentMaxClimb;
-	mAgentMaxSlope = settings.mAgentMaxSlope;
-	mRegionMinSize = settings.mRegionMinSize;
-	mRegionMergeSize = settings.mRegionMergeSize;
-	mMonotonePartitioning = settings.mMonotonePartitioning;
-	mEdgeMaxLen = settings.mEdgeMaxLen;
-	mEdgeMaxError = settings.mEdgeMaxError;
-	mVertsPerPoly = settings.mVertsPerPoly;
-	mDetailSampleDist = settings.mDetailSampleDist;
-	mDetailSampleMaxError = settings.mDetailSampleMaxError;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mCurrentNavMeshType->setNavMeshSettings(settings);
 }
 
 NavMeshSettings NavMesh::getNavMeshSettings()
 {
-	NavMeshSettings settings;
-	settings.mCellSize = mCellSize;
-	settings.mCellHeight = mCellHeight;
-	settings.mAgentHeight = mAgentHeight;
-	settings.mAgentRadius = mAgentRadius;
-	settings.mAgentMaxClimb = mAgentMaxClimb;
-	settings.mAgentMaxSlope = mAgentMaxSlope;
-	settings.mRegionMinSize = mRegionMinSize;
-	settings.mRegionMergeSize = mRegionMergeSize;
-	settings.mMonotonePartitioning = mMonotonePartitioning;
-	settings.mEdgeMaxLen = mEdgeMaxLen;
-	settings.mEdgeMaxError = mEdgeMaxError;
-	settings.mVertsPerPoly = mVertsPerPoly;
-	settings.mDetailSampleDist = mDetailSampleDist;
-	settings.mDetailSampleMaxError = mDetailSampleMaxError;
-	return settings;
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->getNavMeshSettings();
 }
+
+void NavMesh::resetNavMeshSettings()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentNavMeshType->resetNavMeshSettings();
+}
+
+bool NavMesh::loadMesh(NodePath model)
+{
+	bool result = true;
+	mGeom = new InputGeom;
+	mMeshName = model.get_name();
+	//
+	if (not mGeom->loadMesh(mCtx, NULL, model))
+	{
+		delete mGeom;
+		mGeom = NULL;
+#ifdef ELY_DEBUG
+		mCtx->dumpLog("Geom load log %s:", mMeshName.c_str());
+#endif
+		result = false;
+	}
+	return result;
+}
+
+#ifdef ELY_DEBUG
+	NodePath NavMesh::getDebugNodePath() const
+	{
+		//lock (guard) the mutex
+		HOLDMUTEX(mMutex)
+
+		return mDebugNodePath;
+	}
+
+	void NavMesh::initDebug(NodePath debugNodePath)
+	{
+
+	}
+
+	void NavMesh::debug(bool enable)
+	{
+		//lock (guard) the mutex
+		HOLDMUTEX(mMutex)
+
+		if (mDebugNodePath.is_empty())
+		{
+			return;
+		}
+		if (enable)
+		{
+			if (mDebugNodePath.is_hidden())
+			{
+				mDebugNodePath.show();
+			}
+		}
+		else
+		{
+			if (not mDebugNodePath.is_hidden())
+			{
+				mDebugNodePath.hide();
+			}
+		}
+	}
+#endif
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMesh::_type_handle;

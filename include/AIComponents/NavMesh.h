@@ -24,67 +24,16 @@
 #ifndef NAVMESH_H_
 #define NAVMESH_H_
 
+#include "RecastNavigation/NavMeshType.h"
 #include "RecastNavigation/InputGeom.h"
 #include "RecastNavigation/DebugInterfaces.h"
 #include <DetourCrowd.h>
+#include <DetourTileCache.h>
 #include "ObjectModel/Component.h"
-#include <windowFramework.h>
 #include <nodePath.h>
 
 namespace ely
 {
-
-/**
- * \brief NavMesh polygon area types.
- *
- * These are just area types to use consistent values across the nav mesh.
- * The use should specify these base on his needs.
- */
-enum NavMeshPolyAreas
-{
-	NAVMESH_POLYAREA_GROUND,
-	NAVMESH_POLYAREA_WATER,
-	NAVMESH_POLYAREA_ROAD,
-	NAVMESH_POLYAREA_DOOR,
-	NAVMESH_POLYAREA_GRASS,
-	NAVMESH_POLYAREA_JUMP,
-	//the last is a sentinel
-	NAVMESH_POLYAREA_END
-};
-
-/**
- * \brief NavMesh polygon flags.
- */
-enum NavMeshPolyFlags
-{
-	NAVMESH_POLYFLAGS_WALK = 0x01,		// Ability to walk (ground, grass, road)
-	NAVMESH_POLYFLAGS_SWIM = 0x02,		// Ability to swim (water).
-	NAVMESH_POLYFLAGS_DOOR = 0x04,		// Ability to move through doors.
-	NAVMESH_POLYFLAGS_JUMP = 0x08,		// Ability to jump.
-	NAVMESH_POLYFLAGS_DISABLED = 0x10,		// Disabled polygon
-	NAVMESH_POLYFLAGS_ALL = 0xffff	// All abilities.
-};
-
-/**
- * \brief NavMesh polygon area flags.
- */
-struct NavMeshSettings
-{
-	float mCellSize;
-	float mCellHeight;
-	float mAgentHeight;
-	float mAgentRadius;
-	float mAgentMaxClimb;
-	float mAgentMaxSlope;
-	float mRegionMinSize;
-	float mRegionMergeSize;
-	bool mMonotonePartitioning;
-	float mEdgeMaxLen;
-	float mEdgeMaxError;
-	float mVertsPerPoly;
-	float mDetailSampleDist;
-	float mDetailSampleMaxError;
-};
 
 class NavMeshTemplate;
 
@@ -133,10 +82,11 @@ public:
 	float getAgentRadius();
 	float getAgentHeight();
 	float getAgentClimb();
+	LVecBase3f getBoundsMin();
+	LVecBase3f getBoundsMax();
 	void setNavMeshSettings(const NavMeshSettings& settings);
 	NavMeshSettings getNavMeshSettings();
-	float* getBoundsMin();
-	float* getBoundsMax();
+	void resetNavMeshSettings();
 	///@}
 
 #ifdef ELY_DEBUG
@@ -145,11 +95,10 @@ public:
 	 * @return The Recast Debug node.
 	 */
 	NodePath getDebugNodePath() const;
-
 	/**
 	 * \brief Initializes debugging.
 	 */
-	void initDebug(WindowFramework* windowFramework);
+	void initDebug(NodePath debugNodePath);
 	/**
 	 * \brief Enables/disables debugging.
 	 * @param enable True to enable, false to disable.
@@ -160,39 +109,28 @@ public:
 private:
 	/// Input geometry.
 	InputGeom* mGeom;
-	/// Detour navigation mesh.
-	dtNavMesh* mNavMesh;
-	/// Detour navigation mesh query.
-	dtNavMeshQuery* mNavQuery;
-	/// Crowd core class.
-	dtCrowd* mCrowd;
 	/// Build context.
 	BuildContext* mCtx;
+	/// The mesh name.
+	std::string mMeshName;
+	///@{
+	/// Current mesh type.
+	NAVMESHTYPE mNavMeshType;
+	NavMeshType* mCurrentNavMeshType;
+	///@}
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;
 	/// Panda3d debug draw implementation.
 	DebugDrawPanda3d* mDebugDraw;
 #endif
+
 	/**
-	 * \brief Nav mesh settings data.
+	 * \brief Loads the mesh from a model node path.
+	 * @param model The model's node path.
+	 * @return True if successful, false otherwise.
 	 */
-	///@{
-	float mCellSize;
-	float mCellHeight;
-	float mAgentHeight;
-	float mAgentRadius;
-	float mAgentMaxClimb;
-	float mAgentMaxSlope;
-	float mRegionMinSize;
-	float mRegionMergeSize;
-	bool mMonotonePartitioning;
-	float mEdgeMaxLen;
-	float mEdgeMaxError;
-	float mVertsPerPoly;
-	float mDetailSampleDist;
-	float mDetailSampleMaxError;
-	///@}
+	bool loadMesh(NodePath model);
 
 	///TypedObject semantics: hardcoded
 public:

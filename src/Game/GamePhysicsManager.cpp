@@ -404,6 +404,9 @@ NodePath GamePhysicsManager::getDebugNodePath() const
 
 void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
 	SMARTPTR(BulletDebugNode) bulletDebugNode =
 			DCAST(BulletDebugNode,mBulletDebugNodePath.node());

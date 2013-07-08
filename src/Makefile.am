@@ -44,7 +44,14 @@ recastnavigation_sources = \
 		AIComponents/RecastNavigation/ChunkyTriMesh.cpp \
 		AIComponents/RecastNavigation/MeshLoaderObj.cpp \
 		AIComponents/RecastNavigation/DebugInterfaces.cpp \
-		AIComponents/RecastNavigation/PerfTimer.cpp
+		AIComponents/RecastNavigation/PerfTimer.cpp \
+		AIComponents/RecastNavigation/NavMeshType.cpp \
+		AIComponents/RecastNavigation/NavMeshType_Tile.cpp \
+		AIComponents/RecastNavigation/NavMeshType_Solo.cpp \
+		AIComponents/RecastNavigation/NavMeshType_Obstacle.cpp \
+		AIComponents/RecastNavigation/fastlz.c \
+		AIComponents/RecastNavigation/ConvexVolumeTool.cpp \
+		AIComponents/RecastNavigation/CrowdTool.cpp
 			
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \

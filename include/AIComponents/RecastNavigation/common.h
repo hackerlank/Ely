@@ -44,6 +44,19 @@ inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float
 	return LVecBase3f(x, -z, y);
 }
 
+#ifdef ELY_DEBUG
+#	define CTXLOG(type,msg) \
+		m_ctx->log(type,msg)
+#	define CTXLOG1(type,msg,par) \
+		m_ctx->log(type,msg,par)
+#	define CTXLOG2(type,msg,par1,par2) \
+		m_ctx->log(type,msg,par1,par2)
+#else
+#	define CTXLOG(type,msg)
+#	define CTXLOG1(type,msg,par)
+#	define CTXLOG2(type,msg,par1,par2)
+#endif
+
 } // namespace ely
 
 #endif /* COMMON_H_ */
