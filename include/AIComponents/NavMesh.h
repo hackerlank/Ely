@@ -132,11 +132,20 @@ private:
 	 * @param model The model's node path.
 	 * @return True if successful, false otherwise.
 	 */
-	bool loadMesh(NodePath model);
+	bool loadModelMesh(NodePath model);
 
+	/**
+	 * \brief .
+	 * @param currentSample
+	 * @param sampleType
+	 */
+	void setupModelMesh(NavMeshType* currentSample, NAVMESHTYPE sampleType=SOLO);
+
+	/**
+	 * \brief .
+	 * @return True if successful, false otherwise.
+	 */
 	bool buildNavMesh();
-
-	void createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
 
 	///TypedObject semantics: hardcoded
 public:

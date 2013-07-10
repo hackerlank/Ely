@@ -200,17 +200,17 @@ int main(int argc, char **argv)
 	{
 	case SOLO:
 #ifdef DEBUG_DRAW
-		app->rn->createGeomMesh(new Sample_SoloMesh(app->renderDebug), SOLO);
+		app->rn->setupGeomMesh(new Sample_SoloMesh(app->renderDebug), SOLO);
 #else
-		app->rn->createGeomMesh(new Sample_SoloMesh(), SOLO);
+		app->rn->setupGeomMesh(new Sample_SoloMesh(), SOLO);
 #endif
 		break;
 	case TILE:
 	{
 #ifdef DEBUG_DRAW
-		app->rn->createGeomMesh(new Sample_TileMesh(app->renderDebug), TILE);
+		app->rn->setupGeomMesh(new Sample_TileMesh(app->renderDebug), TILE);
 #else
-		app->rn->createGeomMesh(new Sample_TileMesh(), TILE);
+		app->rn->setupGeomMesh(new Sample_TileMesh(), TILE);
 #endif
 		//set tile settings
 		app->tileSettings =
@@ -226,9 +226,9 @@ int main(int argc, char **argv)
 	case OBSTACLE:
 	{
 #ifdef DEBUG_DRAW
-		app->rn->createGeomMesh(new Sample_TempObstacles(app->renderDebug), OBSTACLE);
+		app->rn->setupGeomMesh(new Sample_TempObstacles(app->renderDebug), OBSTACLE);
 #else
-		app->rn->createGeomMesh(new Sample_TempObstacles(), OBSTACLE);
+		app->rn->setupGeomMesh(new Sample_TempObstacles(), OBSTACLE);
 #endif
 		//set tile settings
 		app->tileSettings =

@@ -136,7 +136,7 @@ void Agent::updateVel(float dt, const float* p, const float* v)
 //		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
 		if (not m_anims->get_anim(0)->is_playing())
 		{
-			m_anims->get_anim(0)->loop(false);
+			m_anims->get_anim(0)->loop(true);
 		}
 	}
 	else
@@ -237,7 +237,7 @@ bool RN::loadGeomMesh(NodePath model)
 	return result;
 }
 
-void RN::createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType)
+void RN::setupGeomMesh(Sample* currentSample, SAMPLETYPE sampleType)
 {
 	//set sample
 	m_currentSample = currentSample;

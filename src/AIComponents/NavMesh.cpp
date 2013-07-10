@@ -236,7 +236,7 @@ void NavMesh::resetNavMeshSettings()
 	return mNavMeshType->resetNavMeshSettings();
 }
 
-bool NavMesh::loadMesh(NodePath model)
+bool NavMesh::loadModelMesh(NodePath model)
 {
 	bool result = true;
 	mGeom = new InputGeom;
