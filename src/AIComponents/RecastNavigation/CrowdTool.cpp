@@ -23,17 +23,8 @@
 #include <float.h>
 #include "AIComponents/RecastNavigation/CrowdTool.h"
 #include "AIComponents/RecastNavigation/DebugInterfaces.h"
-//#include "InputGeom.h"
-//#include "Sample.h"
 #include <DetourDebugDraw.h>
-//#include "DetourObstacleAvoidance.h"
 #include <DetourCommon.h>
-//#include "DetourNode.h"
-//#ifndef WITHCHARACTER
-//#	include <DetourCrowd.h>
-//#else
-//#	include <DetourCrowdPhysics.h>
-//#endif
 
 #ifdef WIN32
 #	define snprintf _snprintf
@@ -561,118 +552,6 @@ void CrowdToolState::handleRender()
 	dd.depthMask(true);
 }
 
-void CrowdToolState::handleRenderOverlay(double* proj, double* model, int* view)
-{
-//	GLdouble x, y, z;
-//
-//	// Draw start and end point labels
-//	if (m_targetRef && gluProject((GLdouble)m_targetPos[0], (GLdouble)m_targetPos[1], (GLdouble)m_targetPos[2],
-//								  model, proj, view, &x, &y, &z))
-//	{
-//		imguiDrawText((int)x, (int)(y+25), IMGUI_ALIGN_CENTER, "TARGET", imguiRGBA(0,0,0,220));
-//	}
-//
-//	char label[32];
-//
-//	if (m_toolParams.m_showNodes)
-//	{
-//		dtCrowd* crowd = m_sample->getCrowd();
-//		if (crowd && crowd->getPathQueue())
-//		{
-//			const dtNavMeshQuery* navquery = crowd->getPathQueue()->getNavQuery();
-//			const dtNodePool* pool = navquery->getNodePool();
-//			if (pool)
-//			{
-//				const float off = 0.5f;
-//				for (int i = 0; i < pool->getHashSize(); ++i)
-//				{
-//					for (dtNodeIndex j = pool->getFirst(i); j != DT_NULL_IDX; j = pool->getNext(j))
-//					{
-//						const dtNode* node = pool->getNodeAtIdx(j+1);
-//						if (!node) continue;
-//
-//						if (gluProject((GLdouble)node->pos[0],(GLdouble)node->pos[1]+off,(GLdouble)node->pos[2],
-//									   model, proj, view, &x, &y, &z))
-//						{
-//							const float heuristic = node->total;// - node->cost;
-//							snprintf(label, 32, "%.2f", heuristic);
-//							imguiDrawText((int)x, (int)y+15, IMGUI_ALIGN_CENTER, label, imguiRGBA(0,0,0,220));
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//	if (m_toolParams.m_showLabels)
-//	{
-//		dtCrowd* crowd = m_sample->getCrowd();
-//		if (crowd)
-//		{
-//			for (int i = 0; i < crowd->getAgentCount(); ++i)
-//			{
-//				const dtCrowdAgent* ag = crowd->getAgent(i);
-//				if (!ag->active) continue;
-//				const float* pos = ag->npos;
-//				const float h = ag->params.height;
-//				if (gluProject((GLdouble)pos[0], (GLdouble)pos[1]+h, (GLdouble)pos[2],
-//							   model, proj, view, &x, &y, &z))
-//				{
-//					snprintf(label, 32, "%d", i);
-//					imguiDrawText((int)x, (int)y+15, IMGUI_ALIGN_CENTER, label, imguiRGBA(0,0,0,220));
-//				}
-//			}
-//		}
-//	}
-//	if (m_agentDebug.idx != -1)
-//	{
-//		dtCrowd* crowd = m_sample->getCrowd();
-//		if (crowd)
-//		{
-//			for (int i = 0; i < crowd->getAgentCount(); i++)
-//			{
-//				if (m_toolParams.m_showDetailAll == false && i != m_agentDebug.idx)
-//					continue;
-//				const dtCrowdAgent* ag =crowd->getAgent(i);
-//				if (!ag->active)
-//					continue;
-//				const float radius = ag->params.radius;
-//				if (m_toolParams.m_showNeis)
-//				{
-//					for (int j = 0; j < ag->nneis; ++j)
-//					{
-//						const dtCrowdAgent* nei = crowd->getAgent(ag->neis[j].idx);
-//						if (!nei->active) continue;
-//
-//						if (gluProject((GLdouble)nei->npos[0], (GLdouble)nei->npos[1]+radius, (GLdouble)nei->npos[2],
-//									   model, proj, view, &x, &y, &z))
-//						{
-//							snprintf(label, 32, "%.3f", ag->neis[j].dist);
-//							imguiDrawText((int)x, (int)y+15, IMGUI_ALIGN_CENTER, label, imguiRGBA(255,255,255,220));
-//						}
-//					}
-//				}
-//			}
-//		}
-//	}
-//
-//
-//	if (m_toolParams.m_showPerfGraph)
-//	{
-//		GraphParams gp;
-//		gp.setRect(300, 10, 500, 200, 8);
-//		gp.setValueRange(0.0f, 2.0f, 4, "ms");
-//
-//		drawGraphBackground(&gp);
-//		drawGraph(&gp, &m_crowdTotalTime, 1, "Total", duRGBA(255,128,0,255));
-//
-//		gp.setRect(300, 10, 500, 50, 8);
-//		gp.setValueRange(0.0f, 2000.0f, 1, "");
-//		drawGraph(&gp, &m_crowdSampleCount, 0, "Sample Count", duRGBA(96,96,96,128));
-//	}
-
-}
-
 void CrowdToolState::handleUpdate(const float dt)
 {
 	if (m_run)
@@ -1148,47 +1027,6 @@ void CrowdTool::handleUpdate(const float dt)
 
 void CrowdTool::handleRender()
 {
-}
-
-void CrowdTool::handleRenderOverlay(double* proj, double* model, int* view)
-{
-//	// Tool help
-//	const int h = view[3];
-//	int ty = h - 40;
-//
-//	if (m_mode == TOOLMODE_CREATE)
-//	{
-//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT,
-//				"LMB: add agent.  Shift+LMB: remove agent.",
-//				imguiRGBA(255, 255, 255, 192));
-//	}
-//	else if (m_mode == TOOLMODE_MOVE_TARGET)
-//	{
-//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT,
-//				"LMB: set move target.  Shift+LMB: adjust set velocity.",
-//				imguiRGBA(255, 255, 255, 192));
-//		ty -= 20;
-//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT,
-//				"Setting velocity will move the agents without pathfinder.",
-//				imguiRGBA(255, 255, 255, 192));
-//	}
-//	else if (m_mode == TOOLMODE_SELECT)
-//	{
-//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "LMB: select agent.",
-//				imguiRGBA(255, 255, 255, 192));
-//	}
-//	ty -= 20;
-//	imguiDrawText(280, ty, IMGUI_ALIGN_LEFT,
-//			"SPACE: Run/Pause simulation.  1: Step simulation.",
-//			imguiRGBA(255, 255, 255, 192));
-//	ty -= 20;
-//
-//	if (m_state && m_state->isRunning())
-//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "- RUNNING -",
-//				imguiRGBA(255, 32, 16, 255));
-//	else
-//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "- PAUSED -",
-//				imguiRGBA(255, 255, 255, 128));
 }
 
 } // namespace ely

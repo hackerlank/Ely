@@ -20,9 +20,6 @@
 #define CROWDTOOL_H
 
 #include "NavMeshType.h"
-//#include "DetourNavMesh.h"
-//#include "DetourObstacleAvoidance.h"
-//#include "ValueHistory.h"
 
 namespace ely
 {
@@ -91,7 +88,6 @@ public:
 	virtual void init(class NavMeshType* sample);
 	virtual void reset();
 	virtual void handleRender();
-	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleUpdate(const float dt);
 
 	inline bool isRunning() const { return m_run; }
@@ -143,7 +139,6 @@ public:
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender();
-	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 };
 
 } // namespace ely

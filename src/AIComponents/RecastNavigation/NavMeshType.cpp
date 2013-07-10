@@ -180,15 +180,6 @@ void NavMeshType::renderToolStates()
 	}
 }
 
-void NavMeshType::renderOverlayToolStates(double* proj, double* model, int* view)
-{
-	for (int i = 0; i < MAX_TOOLS; i++)
-	{
-		if (m_toolStates[i])
-			m_toolStates[i]->handleRenderOverlay(proj, model, view);
-	}
-}
-
 void NavMeshType::setNavMeshSettings(const NavMeshSettings& settings)
 {
 	m_cellSize = settings.m_cellSize;

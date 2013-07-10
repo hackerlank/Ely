@@ -107,8 +107,6 @@ struct NavMeshTypeToolState
 	virtual void init(class NavMeshType* sample) = 0;
 	virtual void reset() = 0;
 	virtual void handleRender() = 0;
-	virtual void handleRenderOverlay(double* proj, double* model,
-			int* view) = 0;
 	virtual void handleUpdate(const float dt) = 0;
 };
 
@@ -238,7 +236,6 @@ public:
 	void initToolStates(NavMeshType* sample);
 	void resetToolStates();
 	void renderToolStates();
-	void renderOverlayToolStates(double* proj, double* model, int* view);
 
 	void resetNavMeshSettings();
 };

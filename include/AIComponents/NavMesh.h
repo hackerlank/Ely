@@ -75,6 +75,8 @@ public:
 	 * \brief Getters/setters.
 	 */
 	///@{
+	NavMeshType* getNavMeshType();
+	NAVMESHTYPE getNavMeshTypeEnum();
 	InputGeom* getInputGeom();
 	dtNavMesh* getNavMesh();
 	dtNavMeshQuery* getNavMeshQuery();
@@ -115,8 +117,8 @@ private:
 	std::string mMeshName;
 	///@{
 	/// Current mesh type.
-	NAVMESHTYPE mNavMeshType;
-	NavMeshType* mCurrentNavMeshType;
+	NAVMESHTYPE mNavMeshTypeEnum;
+	NavMeshType* mNavMeshType;
 	///@}
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
@@ -131,6 +133,10 @@ private:
 	 * @return True if successful, false otherwise.
 	 */
 	bool loadMesh(NodePath model);
+
+	bool buildNavMesh();
+
+	void createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
 
 	///TypedObject semantics: hardcoded
 public:

@@ -179,7 +179,6 @@ public:
 	bool loadGeomMesh(NodePath model);
 	bool buildNavMesh();
 	void createGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
-	void createTileMesh();
 	void setSettings(const SampleSettings& settings);
 	SampleSettings getSettings();
 	//ai update functions

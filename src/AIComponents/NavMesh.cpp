@@ -120,6 +120,22 @@ void NavMesh::update(void* data)
 
 }
 
+NavMeshType* NavMesh::getNavMeshType()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType;
+}
+
+NAVMESHTYPE NavMesh::getNavMeshTypeEnum()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshTypeEnum;
+}
+
 InputGeom* NavMesh::getInputGeom()
 {
 	//lock (guard) the mutex
@@ -133,7 +149,7 @@ dtNavMesh* NavMesh::getNavMesh()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getNavMesh();
+	return mNavMeshType->getNavMesh();
 }
 
 dtNavMeshQuery* NavMesh::getNavMeshQuery()
@@ -141,7 +157,7 @@ dtNavMeshQuery* NavMesh::getNavMeshQuery()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getNavMeshQuery();
+	return mNavMeshType->getNavMeshQuery();
 }
 
 dtCrowd* NavMesh::getCrowd()
@@ -149,7 +165,7 @@ dtCrowd* NavMesh::getCrowd()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getCrowd();
+	return mNavMeshType->getCrowd();
 }
 
 float NavMesh::getAgentRadius()
@@ -157,7 +173,7 @@ float NavMesh::getAgentRadius()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getAgentRadius();
+	return mNavMeshType->getAgentRadius();
 }
 
 float NavMesh::getAgentHeight()
@@ -165,7 +181,7 @@ float NavMesh::getAgentHeight()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getAgentHeight();
+	return mNavMeshType->getAgentHeight();
 }
 
 float NavMesh::getAgentClimb()
@@ -173,7 +189,7 @@ float NavMesh::getAgentClimb()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getAgentClimb();
+	return mNavMeshType->getAgentClimb();
 }
 
 LVecBase3f NavMesh::getBoundsMin()
@@ -201,7 +217,7 @@ void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mCurrentNavMeshType->setNavMeshSettings(settings);
+	mNavMeshType->setNavMeshSettings(settings);
 }
 
 NavMeshSettings NavMesh::getNavMeshSettings()
@@ -209,7 +225,7 @@ NavMeshSettings NavMesh::getNavMeshSettings()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->getNavMeshSettings();
+	return mNavMeshType->getNavMeshSettings();
 }
 
 void NavMesh::resetNavMeshSettings()
@@ -217,7 +233,7 @@ void NavMesh::resetNavMeshSettings()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return mCurrentNavMeshType->resetNavMeshSettings();
+	return mNavMeshType->resetNavMeshSettings();
 }
 
 bool NavMesh::loadMesh(NodePath model)
