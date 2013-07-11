@@ -183,6 +183,13 @@ void Object::sceneSetup()
 	{
 		iterComp->second.p()->onAddToSceneSetup();
 	}
+}
+
+void Object::worldSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//load initialization functions library.
 	loadInitializationFunctions();
 	//execute the initialization function (if any)

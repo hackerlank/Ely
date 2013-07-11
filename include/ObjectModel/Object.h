@@ -126,6 +126,14 @@ public:
 	void sceneSetup();
 
 	/**
+	 * \brief On world creation setup.
+	 *
+	 * Gives an object the ability to perform any given
+	 * initialization after the entire world creation.
+	 */
+	void worldSetup();
+
+	/**
 	 * \brief Gets a reference to the id of this object.
 	 * @return The id of this object.
 	 */

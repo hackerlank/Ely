@@ -79,6 +79,8 @@ void NavMeshTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("navmesh_type", "solo"));
+	mParameterTable.insert(ParameterNameValue("auto_build", "true"));
 	mParameterTable.insert(ParameterNameValue("cell_size", "0.3"));
 	mParameterTable.insert(ParameterNameValue("cell_height", "0.2"));
 	mParameterTable.insert(ParameterNameValue("agent_height", "2.0"));

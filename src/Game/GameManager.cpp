@@ -466,6 +466,16 @@ void GameManager::createGameWorldWithoutParamTables(
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
 	}
+	//give a chance to objects to initialize
+	//themselves after the game world has been created.
+	std::list<SMARTPTR(Object)>::iterator objectPtrIter;
+	std::list<SMARTPTR(Object)> objectList =
+			ObjectTemplateManager::GetSingleton().getCreatedObjects();
+	for (objectPtrIter = objectList.begin();
+			objectPtrIter != objectList.end(); ++objectPtrIter)
+	{
+		(*objectPtrIter)->worldSetup();
+	}
 }
 
 void GameManager::createGameWorld(const std::string& gameWorldXML)
@@ -715,6 +725,16 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
+	}
+	//give a chance to objects to initialize
+	//themselves after the game world has been created.
+	std::list<SMARTPTR(Object)>::iterator objectPtrIter;
+	std::list<SMARTPTR(Object)> objectList =
+			ObjectTemplateManager::GetSingleton().getCreatedObjects();
+	for (objectPtrIter = objectList.begin();
+			objectPtrIter != objectList.end(); ++objectPtrIter)
+	{
+		(*objectPtrIter)->worldSetup();
 	}
 }
 

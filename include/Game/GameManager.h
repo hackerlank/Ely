@@ -70,6 +70,9 @@ public:
 	 * components (inside objects) may have a initialization priority:
 	 * the higher is priority the earlier is creation/initialization
 	 * (default priority = 0).
+	 * Objects' initializations are performed "after" the entire game
+	 * world has been created and in particular hierarchies between
+	 * all objects have been established.
 	 * @param gameWorldXML The description file.
 	 */
 	///@{

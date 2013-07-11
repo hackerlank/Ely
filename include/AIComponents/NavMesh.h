@@ -48,6 +48,8 @@ class NavMeshTemplate;
  * (i.e. is_steady=true) Model components.
  *
  * XML Param(s):
+ * - "navmesh_type"					|single|"solo" (solo|tile|obstacle)
+ * - "auto_build"					|single|"true"
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
  * - "agent_height"					|single|"2.0"
@@ -146,11 +148,12 @@ private:
 	/// is to be built when owner object is added to scene,
 	/// false if it will be built manually by program.
 	/// \note Manual build is necessary when the owner object has
-	/// children objects and an overall navigation mesh should be
-	/// built for them too: parents objects are (created and)
+	/// children objects and an overall navigation mesh should
+	/// consider them too: parents objects are (created and)
 	/// added to scene before their children, so an overall
-	/// navigation mesh is build for a node path and all of its
-	/// children.
+	/// navigation mesh can be built only after hierarchies
+	/// between object have been established, i.e. typically
+	/// during object initialization.
 	bool mAutoBuild;
 	///@}
 #ifdef ELY_DEBUG

@@ -219,6 +219,21 @@ SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId
 	return iterObj->second;
 }
 
+std::list<SMARTPTR(Object)> ObjectTemplateManager::getCreatedObjects()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	std::list<SMARTPTR(Object)> createdObjects;
+	ObjectTable::iterator iterObj;
+	for(iterObj=mCreatedObjects.begin();
+			iterObj!= mCreatedObjects.end();++iterObj)
+	{
+		createdObjects.push_back(iterObj->second);
+	}
+	return createdObjects;
+}
+
 bool ObjectTemplateManager::removeCreatedObject(const ObjectId& objectId)
 {
 	//lock (guard) the mutex

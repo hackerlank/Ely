@@ -70,6 +70,10 @@ bool NavMesh::initialize()
 	bool result = true;
 	//set NavMesh parameters (store internally for future use)
 	//
+	///TODO
+	//type
+	//autobuild
+	///
 	mNavMeshSettings.m_cellSize = (float) strtof(
 			mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
 	mNavMeshSettings.m_cellHeight = (float) strtof(

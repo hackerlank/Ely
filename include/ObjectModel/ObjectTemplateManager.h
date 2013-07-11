@@ -139,6 +139,12 @@ public:
 	SMARTPTR(Object) getCreatedObject(const ObjectId& objectId);
 
 	/**
+	 * \brief Gets a list of all created objects.
+	 * @return A list of pointers to each created object.
+	 */
+	std::list<SMARTPTR(Object)> getCreatedObjects();
+
+	/**
 	 * \brief Removes a created object give its object id.
 	 * @return A pointer to the just removed object (NULL on error).
 	 */
