@@ -237,7 +237,7 @@ bool RN::loadGeomMesh(NodePath model)
 	return result;
 }
 
-void RN::setupGeomMesh(Sample* currentSample, SAMPLETYPE sampleType)
+void RN::setupNavMesh(Sample* currentSample, SAMPLETYPE sampleType)
 {
 	//set sample
 	m_currentSample = currentSample;

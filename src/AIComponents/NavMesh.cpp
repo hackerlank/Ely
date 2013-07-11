@@ -68,9 +68,38 @@ bool NavMesh::initialize()
 	HOLDMUTEX(mMutex)
 
 	bool result = true;
-	//set NavMesh parameters
+	//set NavMesh parameters (store internally for future use)
 	//
-
+	mNavMeshSettings.m_cellSize = (float) strtof(
+			mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
+	mNavMeshSettings.m_cellHeight = (float) strtof(
+			mTmpl->parameter(std::string("cell_height")).c_str(), NULL);
+	mNavMeshSettings.m_agentHeight = (float) strtof(
+			mTmpl->parameter(std::string("agent_height")).c_str(), NULL);
+	mNavMeshSettings.m_agentRadius = (float) strtof(
+			mTmpl->parameter(std::string("agent_radius")).c_str(), NULL);
+	mNavMeshSettings.m_agentMaxClimb = (float) strtof(
+			mTmpl->parameter(std::string("agent_max_climb")).c_str(), NULL);
+	mNavMeshSettings.m_agentMaxSlope = (float) strtof(
+			mTmpl->parameter(std::string("agent_max_slope")).c_str(), NULL);
+	mNavMeshSettings.m_regionMinSize = (float) strtof(
+			mTmpl->parameter(std::string("region_min_size")).c_str(), NULL);
+	mNavMeshSettings.m_regionMergeSize = (float) strtof(
+			mTmpl->parameter(std::string("region_merge_size")).c_str(), NULL);
+	mNavMeshSettings.m_monotonePartitioning = (
+			mTmpl->parameter(std::string("monotone_partitioning"))
+					== std::string("true") ? true : false);
+	mNavMeshSettings.m_edgeMaxLen = (float) strtof(
+			mTmpl->parameter(std::string("edge_max_len")).c_str(), NULL);
+	mNavMeshSettings.m_edgeMaxError = (float) strtof(
+			mTmpl->parameter(std::string("edge_max_error")).c_str(), NULL);
+	mNavMeshSettings.m_vertsPerPoly = (float) strtof(
+			mTmpl->parameter(std::string("verts_per_poly")).c_str(), NULL);
+	mNavMeshSettings.m_detailSampleDist = (float) strtof(
+			mTmpl->parameter(std::string("detail_sample_dist")).c_str(), NULL);
+	mNavMeshSettings.m_detailSampleMaxError = (float) strtof(
+			mTmpl->parameter(std::string("detail_sample_max_error")).c_str(),
+			NULL);
 	//
 	return result;
 }
@@ -85,9 +114,6 @@ void NavMesh::onAddToObjectSetup()
 	{
 		return;
 	}
-
-	//first check if owner Geom is a triangle mesh (from a model component)
-
 
 	//setup event callbacks if any
 	setupEvents();
@@ -105,6 +131,9 @@ void NavMesh::onAddToSceneSetup()
 	{
 		return;
 	}
+	//first: loads the mesh from the owner node path
+	//note: all child model
+
 }
 
 void NavMesh::update(void* data)
@@ -228,14 +257,6 @@ NavMeshSettings NavMesh::getNavMeshSettings()
 	return mNavMeshType->getNavMeshSettings();
 }
 
-void NavMesh::resetNavMeshSettings()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshType->resetNavMeshSettings();
-}
-
 bool NavMesh::loadModelMesh(NodePath model)
 {
 	bool result = true;
@@ -251,6 +272,31 @@ bool NavMesh::loadModelMesh(NodePath model)
 #endif
 		result = false;
 	}
+	return result;
+}
+
+void NavMesh::setupNavMesh(NavMeshType* navMeshType,
+		NAVMESHTYPE navMeshTypeEnum)
+{
+	//set the navigation mesh type
+	mNavMeshType = navMeshType;
+	mNavMeshTypeEnum = navMeshTypeEnum;
+	//set rcContext
+	mNavMeshType->setContext(mCtx);
+	//handle Mesh Changed
+	mNavMeshType->handleMeshChanged(mGeom);
+}
+
+bool NavMesh::buildNavMesh()
+{
+#ifdef ELY_DEBUG
+	mCtx->resetLog();
+#endif
+	//build navigation mesh
+	bool result = mNavMeshType->handleBuild();
+#ifdef ELY_DEBUG
+	mCtx->dumpLog("Build log %s:", mMeshName.c_str());
+#endif
 	return result;
 }
 

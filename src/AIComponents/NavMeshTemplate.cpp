@@ -79,6 +79,22 @@ void NavMeshTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("cell_size", "0.3"));
+	mParameterTable.insert(ParameterNameValue("cell_height", "0.2"));
+	mParameterTable.insert(ParameterNameValue("agent_height", "2.0"));
+	mParameterTable.insert(ParameterNameValue("agent_radius", "0.6"));
+	mParameterTable.insert(ParameterNameValue("agent_max_climb", "0.9"));
+	mParameterTable.insert(ParameterNameValue("agent_max_slope", "45.0"));
+	mParameterTable.insert(ParameterNameValue("region_min_size", "8"));
+	mParameterTable.insert(ParameterNameValue("region_merge_size", "20"));
+	mParameterTable.insert(
+			ParameterNameValue("monotone_partitioning", "false"));
+	mParameterTable.insert(ParameterNameValue("edge_max_len", "12.0"));
+	mParameterTable.insert(ParameterNameValue("edge_max_error", "1.3"));
+	mParameterTable.insert(ParameterNameValue("verts_per_poly", "6.0"));
+	mParameterTable.insert(ParameterNameValue("detail_sample_dist", "6.0"));
+	mParameterTable.insert(
+			ParameterNameValue("detail_sample_max_error", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

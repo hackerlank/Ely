@@ -177,7 +177,7 @@ public:
 	bool loadGeomMesh(const std::string& path, const std::string& meshName,
 			float scale=1.0, LVector3f translation=LVecBase3f::zero());
 	bool loadGeomMesh(NodePath model);
-	void setupGeomMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
+	void setupNavMesh(Sample* currentSample, SAMPLETYPE sampleType=SOLO);
 	bool buildNavMesh();
 	void setSettings(const SampleSettings& settings);
 	SampleSettings getSettings();

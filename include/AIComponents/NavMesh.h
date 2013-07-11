@@ -44,10 +44,24 @@ class NavMeshTemplate;
  * 		http://digestingduck.blogspot.it
  * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
- * This is a ...
+ * This component should be used only in association to stationary
+ * (i.e. is_steady=true) Model components.
  *
  * XML Param(s):
- * - "param1"  						|single|"true"
+ * - "cell_size"					|single|"0.3"
+ * - "cell_height"					|single|"0.2"
+ * - "agent_height"					|single|"2.0"
+ * - "agent_radius"					|single|"0.6"
+ * - "agent_max_climb"				|single|"0.9"
+ * - "agent_max_slope"				|single|"45.0"
+ * - "region_min_size"				|single|"8"
+ * - "region_merge_size"			|single|"20"
+ * - "monotone_partitioning"		|single|"false"
+ * - "edge_max_len"					|single|"12.0"
+ * - "edge_max_error"				|single|"1.3"
+ * - "verts_per_poly"				|single|"6.0"
+ * - "detail_sample_dist"			|single|"6.0"
+ * - "detail_sample_max_error"		|single|"1.0"
  */
 class NavMesh: public Component
 {
@@ -86,10 +100,15 @@ public:
 	float getAgentClimb();
 	LVecBase3f getBoundsMin();
 	LVecBase3f getBoundsMax();
-	void setNavMeshSettings(const NavMeshSettings& settings);
 	NavMeshSettings getNavMeshSettings();
-	void resetNavMeshSettings();
+	void setNavMeshSettings(const NavMeshSettings& settings);
 	///@}
+
+	/**
+	 * \brief Builds the navigation mesh for the loaded model mesh.
+	 * @return True if successful, false otherwise.
+	 */
+	bool buildNavMesh();
 
 #ifdef ELY_DEBUG
 	/**
@@ -120,6 +139,20 @@ private:
 	NAVMESHTYPE mNavMeshTypeEnum;
 	NavMeshType* mNavMeshType;
 	///@}
+	/// NavMeshSettings from template.
+	NavMeshSettings mNavMeshSettings;
+	///@{
+	/// Auto build: true (default) if navigation mesh
+	/// is to be built when owner object is added to scene,
+	/// false if it will be built manually by program.
+	/// \note Manual build is necessary when the owner object has
+	/// children objects and an overall navigation mesh should be
+	/// built for them too: parents objects are (created and)
+	/// added to scene before their children, so an overall
+	/// navigation mesh is build for a node path and all of its
+	/// children.
+	bool mAutoBuild;
+	///@}
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;
@@ -135,17 +168,11 @@ private:
 	bool loadModelMesh(NodePath model);
 
 	/**
-	 * \brief .
-	 * @param currentSample
-	 * @param sampleType
+	 * \brief Sets up the type of navigation mesh for the loaded model mesh.
+	 * @param navMeshType The type of navigation mesh.
+	 * @param navMeshTypeEnum The type of navigation mesh enum.
 	 */
-	void setupModelMesh(NavMeshType* currentSample, NAVMESHTYPE sampleType=SOLO);
-
-	/**
-	 * \brief .
-	 * @return True if successful, false otherwise.
-	 */
-	bool buildNavMesh();
+	void setupNavMesh(NavMeshType* navMeshType, NAVMESHTYPE navMeshTypeEnum=SOLO);
 
 	///TypedObject semantics: hardcoded
 public:
