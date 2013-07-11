@@ -48,6 +48,8 @@ extern void NPC1Init();
 extern void NPC1End();
 extern void Steerer1Init();
 extern void Steerer1End();
+extern void course2Init();
+extern void course2End();
 
 ///Call all init/end functions
 void callAllInits()
@@ -58,6 +60,7 @@ void callAllInits()
 	Terrain1Init();
 	NPC1Init();
 	Steerer1Init();
+	course2Init();
 }
 void callAllEnds()
 {
@@ -67,5 +70,6 @@ void callAllEnds()
 	Terrain1End();
 	NPC1End();
 	Steerer1End();
+	course2End();
 }
 

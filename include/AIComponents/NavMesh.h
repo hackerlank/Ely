@@ -107,6 +107,20 @@ public:
 	///@}
 
 	/**
+	 * \brief Loads the mesh from a model node path.
+	 * @param model The model's node path.
+	 * @return True if successful, false otherwise.
+	 */
+	bool loadModelMesh(NodePath model);
+
+	/**
+	 * \brief Sets up the type of navigation mesh for the loaded model mesh.
+	 * @param navMeshType The type of navigation mesh.
+	 * @param navMeshTypeEnum The type of navigation mesh enum.
+	 */
+	void setupNavMesh(NavMeshType* navMeshType, NAVMESHTYPE navMeshTypeEnum=SOLO);
+
+	/**
 	 * \brief Builds the navigation mesh for the loaded model mesh.
 	 * @return True if successful, false otherwise.
 	 */
@@ -118,10 +132,6 @@ public:
 	 * @return The Recast Debug node.
 	 */
 	NodePath getDebugNodePath() const;
-	/**
-	 * \brief Initializes debugging.
-	 */
-	void initDebug(NodePath debugNodePath);
 	/**
 	 * \brief Enables/disables debugging.
 	 * @param enable True to enable, false to disable.
@@ -152,8 +162,9 @@ private:
 	/// consider them too: parents objects are (created and)
 	/// added to scene before their children, so an overall
 	/// navigation mesh can be built only after hierarchies
-	/// between object have been established, i.e. typically
-	/// during object initialization.
+	/// between objects have been already established, i.e.
+	/// after world creation; typically this kind of navigation
+	/// mesh is built (manually) during object initialization.
 	bool mAutoBuild;
 	///@}
 #ifdef ELY_DEBUG
@@ -162,20 +173,6 @@ private:
 	/// Panda3d debug draw implementation.
 	DebugDrawPanda3d* mDebugDraw;
 #endif
-
-	/**
-	 * \brief Loads the mesh from a model node path.
-	 * @param model The model's node path.
-	 * @return True if successful, false otherwise.
-	 */
-	bool loadModelMesh(NodePath model);
-
-	/**
-	 * \brief Sets up the type of navigation mesh for the loaded model mesh.
-	 * @param navMeshType The type of navigation mesh.
-	 * @param navMeshTypeEnum The type of navigation mesh enum.
-	 */
-	void setupNavMesh(NavMeshType* navMeshType, NAVMESHTYPE navMeshTypeEnum=SOLO);
 
 	///TypedObject semantics: hardcoded
 public:

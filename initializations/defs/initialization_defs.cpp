@@ -37,6 +37,7 @@
 #include "AudioComponents/Sound3d.h"
 #include "SceneComponents/Model.h"
 #include "AIComponents/Steering.h"
+#include "AIComponents/NavMesh.h"
 #include "BehaviorComponents/Activity.h"
 #include "Utilities/Tools.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -532,5 +533,57 @@ void Steerer1Init()
 {
 }
 void Steerer1End()
+{
+}
+
+///course2 related
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+INITIALIZATION course2_initialization;
+
+#ifdef __cplusplus
+}
+#endif
+
+#ifdef ELY_DEBUG
+///debug flag
+static bool debugOn = false;
+
+static void toggleDebugNavMesh(const Event* event, void* data)
+{
+	SMARTPTR(Object)course2 = reinterpret_cast<Object*>(data);
+	SMARTPTR(Component) compAI = course2->getComponent(
+			ComponentFamilyType("AI"));
+	if (compAI->is_of_type(NavMesh::get_class_type()))
+	{
+		SMARTPTR(NavMesh)course2NavMesh = DCAST(NavMesh, course2->getComponent(
+						ComponentFamilyType("AI")));
+		//toggle debug
+		course2NavMesh->debug(not debugOn);
+		//toggle flag
+		debugOn = not debugOn;
+	}
+}
+#endif
+
+void course2_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//course2
+#ifdef ELY_DEBUG
+	//enable/disable navigation mesh debugging by event
+	pandaFramework->define_key("m", "toggleDebugNavMesh", &toggleDebugNavMesh,
+			static_cast<void*>(object));
+#endif
+}
+
+void course2Init()
+{
+}
+
+void course2End()
 {
 }

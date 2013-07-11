@@ -23,6 +23,9 @@
 
 #include "AIComponents/NavMesh.h"
 #include "AIComponents/NavMeshTemplate.h"
+#include "AIComponents/RecastNavigation/NavMeshType_Solo.h"
+#include "AIComponents/RecastNavigation/NavMeshType_Tile.h"
+#include "AIComponents/RecastNavigation/NavMeshType_Obstacle.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameAIManager.h"
 
@@ -70,10 +73,22 @@ bool NavMesh::initialize()
 	bool result = true;
 	//set NavMesh parameters (store internally for future use)
 	//
-	///TODO
-	//type
-	//autobuild
-	///
+	std::string navMeshtypeStr = mTmpl->parameter(std::string("navmesh_type"));
+	if (navMeshtypeStr == "tile")
+	{
+		mNavMeshTypeEnum = TILE;
+	}
+	else if (navMeshtypeStr == "obstacle")
+	{
+		mNavMeshTypeEnum = OBSTACLE;
+	}
+	else
+	{
+		mNavMeshTypeEnum = SOLO;
+	}
+	mAutoBuild = (
+			mTmpl->parameter(std::string("auto_build"))
+					== std::string("false") ? false : true);
 	mNavMeshSettings.m_cellSize = (float) strtof(
 			mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
 	mNavMeshSettings.m_cellHeight = (float) strtof(
@@ -135,9 +150,111 @@ void NavMesh::onAddToSceneSetup()
 	{
 		return;
 	}
-	//first: loads the mesh from the owner node path
-	//note: all child model
 
+#ifdef ELY_DEBUG
+	//set the recast debug node path, parented to owner object's parent
+	NodePath parent = mOwnerObject->getNodePath().get_parent();
+	if (not parent.is_empty())
+	{
+		mDebugNodePath = parent.attach_new_node("RecastDebugNodePath");
+		mDebugNodePath.set_bin("fixed", 10);
+		//by default mDebugNodePath is hidden
+		mDebugNodePath.hide();
+	}
+#endif
+
+	//build navigation mesh if auto build is true
+	if (mAutoBuild)
+	{
+		//load the mesh from the owner node path
+		loadModelMesh(mOwnerObject->getNodePath());
+		//set up the type of navigation mesh
+		switch (mNavMeshTypeEnum)
+		{
+		case SOLO:
+#ifdef ELY_DEBUG
+			setupNavMesh(new NavMeshType_Solo(mDebugNodePath), SOLO);
+#else
+			setupNavMesh(new NavMeshType_Solo(), SOLO);
+#endif
+			break;
+		case TILE:
+		{
+#ifdef ELY_DEBUG
+			setupNavMesh(new NavMeshType_Tile(mDebugNodePath), TILE);
+#else
+			setupNavMesh(new NavMeshType_Tile(), TILE);
+#endif
+			///TODO
+//			//set tile settings
+//			app->tileSettings =
+//					dynamic_cast<Sample_TileMesh*>(app->rn->getSample())->getTileSettings();
+//			app->tileSettings.m_buildAll = false;
+//			app->tileSettings.m_tileSize = 32;
+//			app->tileSettings.m_maxTiles = 128;
+//			app->tileSettings.m_maxPolysPerTile = 32768;
+//			dynamic_cast<Sample_TileMesh*>(app->rn->getSample())->setTileSettings(
+//					app->tileSettings);
+		}
+			break;
+		case OBSTACLE:
+		{
+	#ifdef DEBUG_DRAW
+			setupNavMesh(new NavMeshType_Obstacle(mDebugNodePath), OBSTACLE);
+	#else
+			setupNavMesh(new NavMeshType_Obstacle(), OBSTACLE);
+	#endif
+			///TODO
+//			//set tile settings
+//			app->tileSettings =
+//					dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->getTileSettings();
+//			app->tileSettings.m_tileSize = 64;
+//			//evaluate m_maxTiles & m_maxPolysPerTile
+//			const float* bmin = app->rn->getSample()->getInputGeom()->getMeshBoundsMin();
+//			const float* bmax = app->rn->getSample()->getInputGeom()->getMeshBoundsMax();
+//			//		char text[64];
+//			int gw = 0, gh = 0;
+//			rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
+//			const int ts = (int)app->tileSettings.m_tileSize;
+//			const int tw = (gw + ts-1) / ts;
+//			const int th = (gh + ts-1) / ts;
+//			// Max tiles and max polys affect how the tile IDs are caculated.
+//			// There are 22 bits available for identifying a tile and a polygon.
+//			int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
+//			if (tileBits > 14) tileBits = 14;
+//			int polyBits = 22 - tileBits;
+//			app->tileSettings.m_maxTiles = 1 << tileBits;
+//			app->tileSettings.m_maxPolysPerTile = 1 << polyBits;
+//			dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->setTileSettings(
+//					app->tileSettings);
+		}
+			break;
+		default:
+			break;
+		}
+		//set navigation mesh settings
+		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
+
+		///TODO
+		//set convex volume tool
+//		app->rn->setConvexVolumeTool(app->renderDebug);
+//		//set convex volume add/remove callbacks
+//		Raycaster::GetSingletonPtr()->setHitCallback(ADD_CONVEX_VOLUME_Idx,
+//				addConvexVolume, reinterpret_cast<void*>(app->rn), ADD_CONVEX_VOLUME_Key,
+//				BitMask32::all_on());
+//		Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_CONVEX_VOLUME_Idx,
+//				removeConvexVolume, reinterpret_cast<void*>(app->rn), REMOVE_CONVEX_VOLUME_Key,
+//				BitMask32::all_on());
+//		//set convex volume set area type callbacks
+//		app->setAreaTypeCallback("a");
+
+		//build navigation mesh effectively
+		buildNavMesh();
+
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
 }
 
 void NavMesh::update(void* data)
@@ -311,11 +428,6 @@ bool NavMesh::buildNavMesh()
 		HOLDMUTEX(mMutex)
 
 		return mDebugNodePath;
-	}
-
-	void NavMesh::initDebug(NodePath debugNodePath)
-	{
-
 	}
 
 	void NavMesh::debug(bool enable)

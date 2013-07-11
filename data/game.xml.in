@@ -83,6 +83,12 @@
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
+
+		<ObjectTmpl type="StaticNavMesh">
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
+			<ComponentTmpl family="AI" type="NavMesh" priority="80"/> 
+		</ObjectTmpl>
 		
 		<!-- templates for instancing -->
 		<ObjectTmpl type="Instanceable">
@@ -353,7 +359,7 @@
 			<Param rot_r="0.0"/>
 		</Object>
 		
-		<Object type="StaticActor" id="course2">
+		<Object type="StaticNavMesh" id="course2">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="course2.bam"/>
@@ -366,6 +372,8 @@
 				<Param body_friction="0.9"/>
 				<Param body_restitution="0.2"/>
 				<Param shape_type="triangle_mesh"/>
+			</Component> 
+			<Component type="NavMesh">
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
