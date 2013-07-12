@@ -80,14 +80,6 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief Updates position/orientation of the controlled object.
-	 *
-	 * Will be called automatically by an control manager update.
-	 * @param data The custom data.
-	 */
-	virtual void update(void* data);
-
-	/**
 	 * \brief Getters/setters.
 	 */
 	///@{

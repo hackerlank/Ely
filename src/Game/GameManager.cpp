@@ -91,7 +91,7 @@ void GameManager::initialize()
 	setupCompTmplMgr();
 
 	//create the game world (static definition)
-//	createGameWorldWithoutParamTables(std::string("game.xml"));
+//	createGameWorldWithoutParamTables(std::string(ELY_GAMEXML));
 	createGameWorld(std::string(ELY_GAMEXML));
 
 	//play the game
@@ -437,6 +437,8 @@ void GameManager::createGameWorldWithoutParamTables(
 		}
 		//////////////////////////////////////////////////////////////
 		//<!-- Object addition to Scene -->
+		PRINT( "    Initializing object '" <<
+				(objIdTAG != NULL ? objIdTAG : "UNNAMED") << "' itself" );
 		ParameterTable objParameterTable;
 		//reset object' parameters to their default values
 		objectTmplPtr->setParametersDefaults();
@@ -682,6 +684,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		}
 		//////////////////////////////////////////////////////////////
 		//set parameters for the object
+		PRINT( "    Initializing object '" <<
+				(objIdTAG != NULL ? objIdTAG : "UNNAMED") << "' itself" );
 		ParameterTable objTmplParams;
 		//cycle through the Object Param(s)' to be initialized
 		tinyxml2::XMLElement* objParamTAG;

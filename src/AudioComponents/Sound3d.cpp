@@ -130,9 +130,8 @@ void Sound3d::onAddToObjectSetup()
 		return;
 	}
 
-	// update sounds' position/velocity only for dynamic objects
-	// and if sound table is not empty
-	if ((not mOwnerObject->isSteady()) and (not mSounds.empty()))
+	// update sounds' position/velocity only if sound table is not empty
+	if (not mSounds.empty())
 	{
 		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
@@ -159,6 +158,12 @@ void Sound3d::onAddToSceneSetup()
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
+		//HACK:remove from update static object (as it was
+		//previously added)
+		if (not mSounds.empty())
+		{
+			GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
+		}
 	}
 }
 

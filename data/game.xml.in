@@ -374,7 +374,7 @@
 				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Component type="NavMesh">
-			</Component> 
+			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot_h="-45.0"/>

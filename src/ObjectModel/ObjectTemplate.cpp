@@ -154,7 +154,7 @@ std::string ObjectTemplate::parameter(const std::string& paramName)
 	HOLDMUTEX(mMutex)
 
 	std::string strPtr;
-	ParameterTableConstIter::iterator iter;
+	ParameterTableConstIter iter;
 	iter = mParameterTable.find(paramName);
 	//return a reference to a parameter value only if it exists
 	if (iter != mParameterTable.end())

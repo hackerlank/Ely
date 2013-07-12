@@ -44,7 +44,7 @@ NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl):
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
-
+	mTmpl = tmpl;
 }
 
 NavMesh::~NavMesh()
@@ -255,19 +255,6 @@ void NavMesh::onAddToSceneSetup()
 		mNavMeshType->handleRender();
 #endif
 	}
-}
-
-void NavMesh::update(void* data)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	float dt = *(reinterpret_cast<float*>(data));
-
-#ifdef TESTING
-	dt = 0.016666667; //60 fps
-#endif
-
 }
 
 NavMeshType* NavMesh::getNavMeshType()

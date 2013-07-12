@@ -38,6 +38,7 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):mIsEnabled(false)
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"CrowdAgent::CrowdAgent: invalid GameAIManager")
+	mTmpl = tmpl;
 }
 
 CrowdAgent::~CrowdAgent()

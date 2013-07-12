@@ -69,6 +69,7 @@ public:
 private:
 	static TypeHandle _type_handle;
 
-};}  // namespace ely
+};
+} // namespace ely
 
 #endif /* STEERINGTEMPLATE_H_ */
