@@ -54,6 +54,7 @@ rn_common_sources = \
 		recastnavigation/fastlz.c \
 		recastnavigation/ValueHistory.cpp \
 		recastnavigation/ConvexVolumeTool.cpp \
+		recastnavigation/OffMeshConnectionTool.cpp \
 		$(top_srcdir)/src/Support/Raycaster.cpp
 		
 #ely_recastnavigation

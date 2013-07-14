@@ -325,6 +325,13 @@ void RN::setConvexVolumeTool(NodePath renderDebug)
 	m_currentSample->setTool(m_convexVolumeTool);
 }
 
+void RN::setOffMeshConnectionTool(NodePath renderDebug)
+{
+	//set OffMeshConnectionTool
+	m_offMeshConnectionTool = new OffMeshConnectionTool(renderDebug);
+	m_currentSample->setTool(m_offMeshConnectionTool);
+}
+
 void RN::setCrowdTool()
 {
 	//set CrowdTool
@@ -438,10 +445,17 @@ const int CALLBACKSNUM = 6;
 //
 //void addConvexVolume(Raycaster* raycaster, void* data);
 const int ADD_CONVEX_VOLUME_Idx = 0;
-std::string ADD_CONVEX_VOLUME_Key("shift-mouse3");
+std::string ADD_CONVEX_VOLUME_Key("shift-mouse2");
 //void removeConvexVolume(Raycaster* raycaster, void* data);
 const int REMOVE_CONVEX_VOLUME_Idx = 1;
-std::string REMOVE_CONVEX_VOLUME_Key("shift-alt-mouse3");
+std::string REMOVE_CONVEX_VOLUME_Key("shift-alt-mouse2");
+//
+//void addOffMeshConnection(Raycaster* raycaster, void* data);
+const int ADD_OFF_MESH_CONNECTION_Idx = 0;
+std::string ADD_OFF_MESH_CONNECTION_Key("shift-mouse2");
+//void removeOffMeshConnection(Raycaster* raycaster, void* data);
+const int REMOVE_OFF_MESH_CONNECTION_Idx = 1;
+std::string REMOVE_OFF_MESH_CONNECTION_Key("shift-alt-mouse2");
 //
 //void continueCallback(const Event* event, void* data);
 //
@@ -502,6 +516,40 @@ void removeConvexVolume(Raycaster* raycaster, void* data)
 #endif
 }
 
+void addOffMeshConnection(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	rn->getOffMeshConnectionTool()->handleClick(NULL, m_hitPos, false);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getOffMeshConnectionTool()->handleRender();
+#endif
+}
+
+void removeOffMeshConnection(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	float m_hitPos[3];
+	LVecBase3fToRecast(raycaster->getHitPos(), m_hitPos);
+	rn->getOffMeshConnectionTool()->handleClick(NULL, m_hitPos, true);
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+#ifdef DEBUG_DRAW
+	rn->getOffMeshConnectionTool()->handleRender();
+#endif
+}
+
 void App::setAreaTypeCallback(const std::string& event)
 {
 	myDataAreaType = new EventCallbackInterface<App>::EventCallbackData(this,
@@ -529,7 +577,7 @@ void App::areaTypeCallback(const Event* event)
 	currentType = currentType % (int) SAMPLE_POLYAREA_END;
 	rn->getConvexVolumeTool()->setAreaType((SamplePolyAreas) currentType);
 	//print current area type
-	std::cout << "Current area type: " << areaTypes[(int) currentType]
+	std::cout << "\tCurrent area type: " << areaTypes[(int) currentType]
 			<< std::endl;
 }
 
@@ -543,6 +591,56 @@ void App::setContinueCallback(const std::string& event)
 }
 
 void App::continueCallback(const Event* event)
+{
+	static int contValue = 0;
+	if (contValue == 0)
+	{
+		setConvexVolumeTool();
+		++contValue;
+	}
+	else if (contValue == 1)
+	{
+		setOffMeshConnectionTool();
+		++contValue;
+	}
+	else
+	{
+		doFinalWork();
+		++contValue;
+	}
+}
+
+void App::setConvexVolumeTool()
+{
+	std::cout << "Set Convex Volumes" << std::endl;
+	//set convex volume tool
+	rn->setConvexVolumeTool(renderDebug);
+	//set convex volume add/remove callbacks
+	Raycaster::GetSingletonPtr()->setHitCallback(ADD_CONVEX_VOLUME_Idx,
+			addConvexVolume, reinterpret_cast<void*>(rn), ADD_CONVEX_VOLUME_Key,
+			BitMask32::all_on());
+	Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_CONVEX_VOLUME_Idx,
+			removeConvexVolume, reinterpret_cast<void*>(rn), REMOVE_CONVEX_VOLUME_Key,
+			BitMask32::all_on());
+	//set convex volume set area type callbacks
+	setAreaTypeCallback("a");
+}
+
+void App::setOffMeshConnectionTool()
+{
+	std::cout << "Set Off Mesh Connections" << std::endl;
+	//set off mesh connection tool
+	rn->setOffMeshConnectionTool(renderDebug);
+	//set convex volume add/remove callbacks
+	Raycaster::GetSingletonPtr()->setHitCallback(ADD_OFF_MESH_CONNECTION_Idx,
+			addOffMeshConnection, reinterpret_cast<void*>(rn), ADD_OFF_MESH_CONNECTION_Key,
+			BitMask32::all_on());
+	Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_OFF_MESH_CONNECTION_Idx,
+			removeOffMeshConnection, reinterpret_cast<void*>(rn), REMOVE_OFF_MESH_CONNECTION_Key,
+			BitMask32::all_on());
+}
+
+void App::doFinalWork()
 {
 	//build navigation mesh
 	rn->buildNavMesh();

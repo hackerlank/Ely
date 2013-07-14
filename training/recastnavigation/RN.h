@@ -39,8 +39,9 @@
 #include "Sample_SoloMesh.h"
 #include "Sample_TileMesh.h"
 #include "Sample_TempObstacles.h"
-#include "CrowdTool.h"
 #include "ConvexVolumeTool.h"
+#include "OffMeshConnectionTool.h"
+#include "CrowdTool.h"
 #include "eggToObj.h"
 #include <cstdio>
 #include <cstring>
@@ -138,6 +139,7 @@ class RN
 	Sample* m_currentSample;
 
 	ConvexVolumeTool* m_convexVolumeTool;
+	OffMeshConnectionTool* m_offMeshConnectionTool;
 	CrowdTool* m_crowdTool;
 
 	std::list<Agent*> m_agents;
@@ -148,6 +150,10 @@ public:
 	ConvexVolumeTool* getConvexVolumeTool()
 	{
 		return m_convexVolumeTool;
+	}
+	OffMeshConnectionTool* getOffMeshConnectionTool()
+	{
+		return m_offMeshConnectionTool;
 	}
 	CrowdTool* getCrowdTool()
 	{
@@ -187,6 +193,8 @@ public:
 
 	//convex volume tool
 	void setConvexVolumeTool(NodePath renderDebug);
+	//off mesh connection tool
+	void setOffMeshConnectionTool(NodePath renderDebug);
 
 	//crowd tool
 	void setCrowdTool();
@@ -284,6 +292,13 @@ void removeConvexVolume(Raycaster* raycaster, void* data);
 extern const int REMOVE_CONVEX_VOLUME_Idx;
 extern std::string REMOVE_CONVEX_VOLUME_Key;
 //
+void addOffMeshConnection(Raycaster* raycaster, void* data);
+extern const int ADD_OFF_MESH_CONNECTION_Idx;
+extern std::string ADD_OFF_MESH_CONNECTION_Key;
+void removeOffMeshConnection(Raycaster* raycaster, void* data);
+extern const int REMOVE_OFF_MESH_CONNECTION_Idx;
+extern std::string REMOVE_OFF_MESH_CONNECTION_Key;
+//
 void setCrowdTarget(Raycaster* raycaster, void* data);
 extern const int SET_CROWD_TARGET_Idx;
 extern std::string SET_CROWD_TARGET_Key;
@@ -339,6 +354,9 @@ struct App
 	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myDataContinue;
 	void continueCallback(const Event* event);
 	void setContinueCallback(const std::string& event);
+	void setConvexVolumeTool();
+	void setOffMeshConnectionTool();
+	void doFinalWork();
 	//set convex volume area type callback
 	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myDataAreaType;
 	void areaTypeCallback(const Event* event);

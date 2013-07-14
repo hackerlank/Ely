@@ -268,19 +268,7 @@ int main(int argc, char **argv)
 	app->settings.m_cellHeight = m_cellHeight;
 	app->rn->setSettings(app->settings);
 
-	//set convex volume tool
-	app->rn->setConvexVolumeTool(app->renderDebug);
-	//set convex volume add/remove callbacks
-	Raycaster::GetSingletonPtr()->setHitCallback(ADD_CONVEX_VOLUME_Idx,
-			addConvexVolume, reinterpret_cast<void*>(app->rn), ADD_CONVEX_VOLUME_Key,
-			BitMask32::all_on());
-	Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_CONVEX_VOLUME_Idx,
-			removeConvexVolume, reinterpret_cast<void*>(app->rn), REMOVE_CONVEX_VOLUME_Key,
-			BitMask32::all_on());
-	//set convex volume set area type callbacks
-	app->setAreaTypeCallback("a");
-
-	//set "continue" callback (after the optionally convex volume construction)
+	//set "continue" callback
 	app->setContinueCallback("c");
 
 	// Do the main loop
