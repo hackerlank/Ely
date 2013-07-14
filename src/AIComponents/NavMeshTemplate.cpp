@@ -97,6 +97,11 @@ void NavMeshTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("detail_sample_dist", "6.0"));
 	mParameterTable.insert(
 			ParameterNameValue("detail_sample_max_error", "1.0"));
+	//nav mesh tile
+	mParameterTable.insert(ParameterNameValue("build_all_tiles", "false"));
+	mParameterTable.insert(ParameterNameValue("max_tiles", "128"));
+	mParameterTable.insert(ParameterNameValue("max_polys_per_tile", "32768"));
+	mParameterTable.insert(ParameterNameValue("tile_size", "32"));
 }
 
 //TypedObject semantics: hardcoded

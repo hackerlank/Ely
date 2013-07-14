@@ -136,6 +136,8 @@ void Model::onAddToObjectSetup()
 	//build model
 	if (mFromFile)
 	{
+		PRINT("'" <<getOwnerObject()->objectId()
+				<< "'::'" << mComponentId << "'::onAddToObjectSetup");
 		// some declarations
 		Parts parts;
 		Anims anims;
@@ -181,12 +183,12 @@ void Model::onAddToObjectSetup()
 					//set the first PartBundle
 					mFirstPartBundle = *partBundlesIter;
 					PRINT(
-							"First PartBundle: '" << (*partBundlesIter)->get_name() << "'");
+							"\tFirst PartBundle: '" << (*partBundlesIter)->get_name() << "'");
 				}
 				else
 				{
 					PRINT(
-							"Next PartBundle: '" << (*partBundlesIter)->get_name() << "'");
+							"\tNext PartBundle: '" << (*partBundlesIter)->get_name() << "'");
 				}
 			}
 		}
@@ -219,7 +221,8 @@ void Model::onAddToObjectSetup()
 						++j;
 					}
 					PRINT(
-							"Binding animation '" << (*animBundlesIter)->get_name() << "' with name '" << animName << "'");
+							"\tBinding animation '" << (*animBundlesIter)->get_name() <<
+							"' (from '" << modelFileName << "') with name '" << animName << "'");
 					SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
 							PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
 					mAnimations.store_anim(control, animName);
@@ -277,7 +280,8 @@ void Model::onAddToObjectSetup()
 									animName = nameFilePair[0];
 								}
 								PRINT(
-										"Binding animation '" << (*animBundlesIter)->get_name() << " with name '" << animName << "'");
+										"\tBinding animation '" << (*animBundlesIter)->get_name() <<
+										"' (from '" << nameFilePair[1] << "') with name '" << animName << "'");
 								SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
 										PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
 								mAnimations.store_anim(control, animName);

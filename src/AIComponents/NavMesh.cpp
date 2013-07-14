@@ -119,6 +119,16 @@ bool NavMesh::initialize()
 	mNavMeshSettings.m_detailSampleMaxError = (float) strtof(
 			mTmpl->parameter(std::string("detail_sample_max_error")).c_str(),
 			NULL);
+	//nav mesh tile
+	mNavMeshTileSettings.m_buildAllTiles = (
+			mTmpl->parameter(std::string("build_all_tiles"))
+					== std::string("true") ? true : false);
+	mNavMeshTileSettings.m_maxTiles = (float) strtof(
+			mTmpl->parameter(std::string("max_tiles")).c_str(), NULL);
+	mNavMeshTileSettings.m_maxPolysPerTile = (float) strtof(
+			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL);
+	mNavMeshTileSettings.m_tileSize = (float) strtof(
+			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
 	//
 	return result;
 }
@@ -166,6 +176,8 @@ void NavMesh::onAddToSceneSetup()
 	//build navigation mesh if auto build is true
 	if (mAutoBuild)
 	{
+		PRINT("'" <<getOwnerObject()->objectId()
+				<< "'::'" << mComponentId << "'::onAddToSceneSetup");
 		//load the mesh from the owner node path
 		loadModelMesh(mOwnerObject->getNodePath());
 		//set up the type of navigation mesh
@@ -177,6 +189,8 @@ void NavMesh::onAddToSceneSetup()
 #else
 			setupNavMesh(new NavMeshType_Solo(), SOLO);
 #endif
+			//set navigation mesh settings
+			setNavMeshSettings(mNavMeshSettings);
 			break;
 		case TILE:
 		{
@@ -185,16 +199,10 @@ void NavMesh::onAddToSceneSetup()
 #else
 			setupNavMesh(new NavMeshType_Tile(), TILE);
 #endif
-			///TODO
-//			//set tile settings
-//			app->tileSettings =
-//					dynamic_cast<Sample_TileMesh*>(app->rn->getSample())->getTileSettings();
-//			app->tileSettings.m_buildAll = false;
-//			app->tileSettings.m_tileSize = 32;
-//			app->tileSettings.m_maxTiles = 128;
-//			app->tileSettings.m_maxPolysPerTile = 32768;
-//			dynamic_cast<Sample_TileMesh*>(app->rn->getSample())->setTileSettings(
-//					app->tileSettings);
+			//set navigation mesh settings
+			setNavMeshSettings(mNavMeshSettings);
+			//set navigation mesh tile settings
+			setNavMeshTileSettings(mNavMeshTileSettings);
 		}
 			break;
 		case OBSTACLE:
@@ -204,36 +212,31 @@ void NavMesh::onAddToSceneSetup()
 	#else
 			setupNavMesh(new NavMeshType_Obstacle(), OBSTACLE);
 	#endif
-			///TODO
-//			//set tile settings
-//			app->tileSettings =
-//					dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->getTileSettings();
-//			app->tileSettings.m_tileSize = 64;
-//			//evaluate m_maxTiles & m_maxPolysPerTile
-//			const float* bmin = app->rn->getSample()->getInputGeom()->getMeshBoundsMin();
-//			const float* bmax = app->rn->getSample()->getInputGeom()->getMeshBoundsMax();
-//			//		char text[64];
-//			int gw = 0, gh = 0;
-//			rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
-//			const int ts = (int)app->tileSettings.m_tileSize;
-//			const int tw = (gw + ts-1) / ts;
-//			const int th = (gh + ts-1) / ts;
-//			// Max tiles and max polys affect how the tile IDs are caculated.
-//			// There are 22 bits available for identifying a tile and a polygon.
-//			int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
-//			if (tileBits > 14) tileBits = 14;
-//			int polyBits = 22 - tileBits;
-//			app->tileSettings.m_maxTiles = 1 << tileBits;
-//			app->tileSettings.m_maxPolysPerTile = 1 << polyBits;
-//			dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->setTileSettings(
-//					app->tileSettings);
+			//set navigation mesh settings
+			setNavMeshSettings(mNavMeshSettings);
+			//set navigation mesh tile settings...
+			//	evaluate m_maxTiles & m_maxPolysPerTile from m_tileSize
+			const float* bmin = getInputGeom()->getMeshBoundsMin();
+			const float* bmax = getInputGeom()->getMeshBoundsMax();
+			int gw = 0, gh = 0;
+			rcCalcGridSize(bmin, bmax, mNavMeshSettings.m_cellSize, &gw, &gh);
+			const int ts = (int) mNavMeshTileSettings.m_tileSize;
+			const int tw = (gw + ts - 1) / ts;
+			const int th = (gh + ts - 1) / ts;
+			//	Max tiles and max polys affect how the tile IDs are calculated.
+			// 	There are 22 bits available for identifying a tile and a polygon.
+			int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
+			if (tileBits > 14) tileBits = 14;
+			int polyBits = 22 - tileBits;
+			mNavMeshTileSettings.m_maxTiles = 1 << tileBits;
+			mNavMeshTileSettings.m_maxPolysPerTile = 1 << polyBits;
+			//...effectively
+			setNavMeshTileSettings(mNavMeshTileSettings);
 		}
 			break;
 		default:
 			break;
 		}
-		//set navigation mesh settings
-		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
 
 		///TODO
 		//set convex volume tool
@@ -365,6 +368,113 @@ NavMeshSettings NavMesh::getNavMeshSettings()
 	return mNavMeshType->getNavMeshSettings();
 }
 
+void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mNavMeshTypeEnum == TILE)
+	{
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->setTileSettings(
+				settings);
+	}
+	else if (mNavMeshTypeEnum == OBSTACLE)
+	{
+		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->setTileSettings(
+				settings);
+	}
+}
+
+NavMeshTileSettings NavMesh::getNavMeshTileSettings()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	NavMeshTileSettings settings;
+	if(mNavMeshTypeEnum == TILE)
+	{
+		settings = dynamic_cast<NavMeshType_Tile*>(mNavMeshType)
+				->getTileSettings();
+	}
+	else if (mNavMeshTypeEnum == OBSTACLE)
+	{
+		settings = dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)
+						->getTileSettings();
+	}
+	return settings;
+}
+
+void NavMesh::getTilePos(LPoint3f pos, int& tx, int& ty)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	float recastPos[3];
+	LVecBase3fToRecast(pos, recastPos);
+	if(mNavMeshTypeEnum == TILE)
+	{
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)
+				->getTilePos(recastPos, tx, ty);
+	}
+	else if (mNavMeshTypeEnum == OBSTACLE)
+	{
+		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)
+				->getTilePos(recastPos, tx, ty);
+	}
+}
+
+void NavMesh::buildTile(LPoint3f pos)
+{
+	if (mNavMeshTypeEnum == TILE)
+	{
+		float recastPos[3];
+		LVecBase3fToRecast(pos, recastPos);
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildTile(recastPos);
+		PRINT("'" <<getOwnerObject()->objectId() << "'::'"
+				<< mComponentId << "'::buildTile : " << pos);
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
+void NavMesh::removeTile(LPoint3f pos)
+{
+	if (mNavMeshTypeEnum == TILE)
+	{
+		float recastPos[3];
+		LVecBase3fToRecast(pos, recastPos);
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeTile(recastPos);
+		PRINT("'" <<getOwnerObject()->objectId() << "'::'"
+				<< mComponentId << "'::removeTile : " << pos);
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
+void NavMesh::buildAllTiles()
+{
+	if (mNavMeshTypeEnum == TILE)
+	{
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
+void NavMesh::removeAllTiles()
+{
+	if (mNavMeshTypeEnum == TILE)
+	{
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
 bool NavMesh::loadModelMesh(NodePath model)
 {
 	bool result = true;
@@ -409,38 +519,40 @@ bool NavMesh::buildNavMesh()
 }
 
 #ifdef ELY_DEBUG
-	NodePath NavMesh::getDebugNodePath() const
-	{
-		//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
 
-		return mDebugNodePath;
+NodePath NavMesh::getDebugNodePath() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mDebugNodePath;
+}
+
+void NavMesh::debug(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mDebugNodePath.is_empty())
+	{
+		return;
 	}
-
-	void NavMesh::debug(bool enable)
+	if (enable)
 	{
-		//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
-
-		if (mDebugNodePath.is_empty())
+		if (mDebugNodePath.is_hidden())
 		{
-			return;
-		}
-		if (enable)
-		{
-			if (mDebugNodePath.is_hidden())
-			{
-				mDebugNodePath.show();
-			}
-		}
-		else
-		{
-			if (not mDebugNodePath.is_hidden())
-			{
-				mDebugNodePath.hide();
-			}
+			mDebugNodePath.show();
 		}
 	}
+	else
+	{
+		if (not mDebugNodePath.is_hidden())
+		{
+			mDebugNodePath.hide();
+		}
+	}
+}
+
 #endif
 
 //TypedObject semantics: hardcoded

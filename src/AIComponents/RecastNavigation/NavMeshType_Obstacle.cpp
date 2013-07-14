@@ -289,7 +289,7 @@ int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 {
 	if (!geom || !geom->getMesh() || !geom->getChunkyMesh())
 	{
-		ctx->log(RC_LOG_ERROR, "buildTile: Input mesh is not specified.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildTile: Input mesh is not specified.");
 		return 0;
 	}
 	
@@ -321,12 +321,12 @@ int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 	rc.solid = rcAllocHeightfield();
 	if (!rc.solid)
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'solid'.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'solid'.");
 		return 0;
 	}
 	if (!rcCreateHeightfield(ctx, *rc.solid, tcfg.width, tcfg.height, tcfg.bmin, tcfg.bmax, tcfg.cs, tcfg.ch))
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Could not create solid heightfield.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Could not create solid heightfield.");
 		return 0;
 	}
 	
@@ -336,7 +336,7 @@ int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 	rc.triareas = new unsigned char[chunkyMesh->maxTrisPerChunk];
 	if (!rc.triareas)
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", chunkyMesh->maxTrisPerChunk);
+		CTXLOG1(ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", chunkyMesh->maxTrisPerChunk);
 		return 0;
 	}
 	
@@ -376,19 +376,19 @@ int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 	rc.chf = rcAllocCompactHeightfield();
 	if (!rc.chf)
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
 		return 0;
 	}
 	if (!rcBuildCompactHeightfield(ctx, tcfg.walkableHeight, tcfg.walkableClimb, *rc.solid, *rc.chf))
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
 		return 0;
 	}
 	
 	// Erode the walkable area by agent radius.
 	if (!rcErodeWalkableArea(ctx, tcfg.walkableRadius, *rc.chf))
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Could not erode.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Could not erode.");
 		return 0;
 	}
 	
@@ -404,12 +404,12 @@ int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 	rc.lset = rcAllocHeightfieldLayerSet();
 	if (!rc.lset)
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Out of memory 'lset'.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'lset'.");
 		return 0;
 	}
 	if (!rcBuildHeightfieldLayers(ctx, *rc.chf, tcfg.borderSize, tcfg.walkableHeight, *rc.lset))
 	{
-		ctx->log(RC_LOG_ERROR, "buildNavigation: Could not build heighfield layers.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildNavigation: Could not build heighfield layers.");
 		return 0;
 	}
 	
@@ -851,8 +851,6 @@ void NavMeshType_Obstacle::handleMeshChanged(class InputGeom* geom)
 		m_tool->init(this);
 		m_tmproc->init(m_geom);
 	}
-	resetToolStates();
-	initToolStates(this);
 }
 
 void NavMeshType_Obstacle::addTempObstacle(const float* pos)
@@ -891,7 +889,7 @@ bool NavMeshType_Obstacle::handleBuild()
 	
 	if (!m_geom || !m_geom->getMesh())
 	{
-		CTXLOG(RC_LOG_ERROR, "buildTiledNavigation: No vertices and triangles.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildTiledNavigation: No vertices and triangles.");
 		return false;
 	}
 
@@ -949,13 +947,13 @@ bool NavMeshType_Obstacle::handleBuild()
 	m_tileCache = dtAllocTileCache();
 	if (!m_tileCache)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildTiledNavigation: Could not allocate tile cache.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not allocate tile cache.");
 		return false;
 	}
 	status = m_tileCache->init(&tcparams, m_talloc, m_tcomp, m_tmproc);
 	if (dtStatusFailed(status))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildTiledNavigation: Could not init tile cache.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not init tile cache.");
 		return false;
 	}
 	
@@ -964,7 +962,7 @@ bool NavMeshType_Obstacle::handleBuild()
 	m_navMesh = dtAllocNavMesh();
 	if (!m_navMesh)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildTiledNavigation: Could not allocate navmesh.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not allocate navmesh.");
 		return false;
 	}
 
@@ -979,14 +977,14 @@ bool NavMeshType_Obstacle::handleBuild()
 	status = m_navMesh->init(&params);
 	if (dtStatusFailed(status))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildTiledNavigation: Could not init navmesh.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not init navmesh.");
 		return false;
 	}
 	
 	status = m_navQuery->init(m_navMesh, 2048);
 	if (dtStatusFailed(status))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not init Detour navmesh query");
 		return false;
 	}
 	
@@ -1056,7 +1054,6 @@ bool NavMeshType_Obstacle::handleBuild()
 	
 	if (m_tool)
 		m_tool->init(this);
-	initToolStates(this);
 
 	return true;
 }
@@ -1089,16 +1086,16 @@ dtTileCache* NavMeshType_Obstacle::getTileCache()
 	return m_tileCache;
 }
 
-void NavMeshType_Obstacle::setTileSettings(const TileSettings& settings)
+void NavMeshType_Obstacle::setTileSettings(const NavMeshTileSettings& settings)
 {
 	m_maxTiles = settings.m_maxTiles;
 	m_maxPolysPerTile = settings.m_maxPolysPerTile;
 	m_tileSize = settings.m_tileSize;
 }
 
-TileSettings NavMeshType_Obstacle::getTileSettings()
+NavMeshTileSettings NavMeshType_Obstacle::getTileSettings()
 {
-	TileSettings settings;
+	NavMeshTileSettings settings;
 	settings.m_maxTiles = m_maxTiles;
 	settings.m_maxPolysPerTile = m_maxPolysPerTile;
 	settings.m_tileSize = m_tileSize;

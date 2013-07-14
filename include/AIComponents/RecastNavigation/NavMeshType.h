@@ -32,16 +32,9 @@ namespace ely
 {
 
 /// Tool types.
-enum SampleToolType
+enum NavMeshToolType
 {
 	TOOL_NONE = 0,
-	TOOL_TILE_EDIT,
-	TOOL_TILE_HIGHLIGHT,
-	TOOL_TEMP_OBSTACLE,
-	TOOL_NAVMESH_TESTER,
-	TOOL_NAVMESH_PRUNE,
-	TOOL_OFFMESH_CONNECTION,
-	TOOL_CONVEX_VOLUME,
 	TOOL_CROWD,
 	MAX_TOOLS
 };
@@ -129,6 +122,17 @@ struct NavMeshSettings
 	float m_vertsPerPoly;
 	float m_detailSampleDist;
 	float m_detailSampleMaxError;
+};
+
+/**
+ * \brief NavMesh tile settings.
+ */
+struct NavMeshTileSettings
+{
+	bool m_buildAllTiles;
+	int m_maxTiles;
+	int m_maxPolysPerTile;
+	float m_tileSize;
 };
 
 class NavMeshType
@@ -233,9 +237,6 @@ public:
 	}
 
 	void updateToolStates(const float dt);
-	void initToolStates(NavMeshType* sample);
-	void resetToolStates();
-	void renderToolStates();
 
 	void resetNavMeshSettings();
 };

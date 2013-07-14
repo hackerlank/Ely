@@ -15,36 +15,37 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/common_configs.h
+ * \file /Ely/initializations/defs/Terrain1.cpp
  *
- * \date 26/nov/2012 (12:15:57)
+ * \date 14/lug/2013 (08:47:42)
  * \author consultit
  */
 
-#ifndef COMMON_CONFIGS_H_
-#define COMMON_CONFIGS_H_
+#include "../common_configs.h"
 
-#include "ObjectModel/Object.h"
-
-using namespace ely;
-
-__attribute__((constructor)) void initializationsInit();
-void callAllInits();
-
-__attribute__((destructor)) void initializationsEnd();
-void callAllEnds();
-
-//generic typedefs
-typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
-		PandaFramework* pandaFramework, WindowFramework* windowFramework);
-
+///Terrain1 related
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+INITIALIZATION Terrain1_initialization;
+
 #ifdef __cplusplus
 }
 #endif
 
-#endif /* COMMON_CONFIGS_H_ */
+void Terrain1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//Terrain1
+//	object->getNodePath().set_render_mode_wireframe(1);
+}
+
+void Terrain1Init()
+{
+}
+
+void Terrain1End()
+{
+}

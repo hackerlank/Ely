@@ -282,7 +282,7 @@ bool rcMeshLoaderObj::load(NodePath model)
 		NodePathCollection geomNodeCollection = currentModelRoot.find_all_matches(
 				"**/+GeomNode");
 		int numPaths = geomNodeCollection.get_num_paths();
-		PRINT("GeomNodes number: " << numPaths);
+		PRINT("\tGeomNodes number: " << numPaths);
 		for (int i = 0; i < numPaths; i++)
 		{
 			PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
@@ -324,7 +324,7 @@ void rcMeshLoaderObj::processGeomNode(PT(GeomNode)geomNode)
 {
 	//Walk through the list of GeomNode's Geoms
 	int numGeoms = geomNode->get_num_geoms();
-	PRINT("\tGeoms number: " << numGeoms);
+	PRINT("\t Geoms number: " << numGeoms);
 	for (int j = 0; j < numGeoms; j++)
 	{
 		const CPT(Geom)geom = geomNode->get_geom(j);
@@ -346,7 +346,7 @@ void rcMeshLoaderObj::processGeom(CPT(Geom)geom)
 	//Process vertices
 	processVertexData(vertexData);
 	int numPrimitives = geom->get_num_primitives();
-	PRINT("\t\tPrimitives number: " << numPrimitives);
+	PRINT("\t  Primitives number: " << numPrimitives);
 	//Walk through the list of Geom's GeomPrimitives
 	for(int i=0;i<numPrimitives;i++)
 	{
@@ -392,20 +392,20 @@ void rcMeshLoaderObj::processVertexData(CPT(GeomVertexData)vertexData)
 	}
 	//insert vertexData any way
 	m_vertexData.push_back(vertexData);
-	PRINT("\t\t\tVertices number: " << vertexData->get_num_rows() <<
+	PRINT("\t   Vertices number: " << vertexData->get_num_rows() <<
 			" - Start index: " << m_startIndices.back());
 }
 
 void rcMeshLoaderObj::processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex)
 {
-	PRINT("---");
-	PRINT("\t\t\tPrimitive type: " <<
+	PRINT("\t---");
+	PRINT("\t   Primitive type: " <<
 			primitive->get_type().get_name() <<
 			" - number: " << primitive->get_num_primitives());
 	//decompose to triangles
 	CPT(GeomPrimitive)primitiveDec = primitive->decompose();
 	int numPrimitives = primitiveDec->get_num_primitives();
-	PRINT("\t\t\tDecomposed Primitive type: " <<
+	PRINT("\t   Decomposed Primitive type: " <<
 			primitiveDec->get_type().get_name() <<
 			" - number: " << numPrimitives);
 	for (int k = 0; k < numPrimitives; k++)

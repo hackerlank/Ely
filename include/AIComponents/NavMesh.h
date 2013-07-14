@@ -64,6 +64,10 @@ class NavMeshTemplate;
  * - "verts_per_poly"				|single|"6.0"
  * - "detail_sample_dist"			|single|"6.0"
  * - "detail_sample_max_error"		|single|"1.0"
+ * - "build_all_tiles"				|single|"false"
+ * - "max_tiles"					|single|"128"
+ * - "max_polys_per_tile"			|single|"32768"
+ * - "tile_size"					|single|"32"
  */
 class NavMesh: public Component
 {
@@ -80,9 +84,10 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief Getters/setters.
+	 * \brief Navigation mesh related methods.
 	 */
 	///@{
+	//SOLO TILE OBSTACLE
 	NavMeshType* getNavMeshType();
 	NAVMESHTYPE getNavMeshTypeEnum();
 	InputGeom* getInputGeom();
@@ -96,6 +101,15 @@ public:
 	LVecBase3f getBoundsMax();
 	NavMeshSettings getNavMeshSettings();
 	void setNavMeshSettings(const NavMeshSettings& settings);
+	//TILE OBSTACLE
+	NavMeshTileSettings getNavMeshTileSettings();
+	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
+	void getTilePos(LPoint3f pos, int& tx, int& ty);
+	//TILE
+	void buildTile(LPoint3f pos);
+	void removeTile(LPoint3f pos);
+	void buildAllTiles();
+	void removeAllTiles();
 	///@}
 
 	/**
@@ -145,6 +159,8 @@ private:
 	///@}
 	/// NavMeshSettings from template.
 	NavMeshSettings mNavMeshSettings;
+	/// NavMeshTileSettings from template.
+	NavMeshTileSettings mNavMeshTileSettings;
 	///@{
 	/// Auto build: true (default) if navigation mesh
 	/// is to be built when owner object is added to scene,

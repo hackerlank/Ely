@@ -218,8 +218,6 @@ void NavMeshType_Solo::handleMeshChanged(class InputGeom* geom)
 		m_tool->reset();
 		m_tool->init(this);
 	}
-	resetToolStates();
-	initToolStates(this);
 }
 
 
@@ -227,7 +225,7 @@ bool NavMeshType_Solo::handleBuild()
 {
 	if (!m_geom || !m_geom->getMesh())
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Input mesh is not specified.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Input mesh is not specified.");
 		return false;
 	}
 	
@@ -287,12 +285,12 @@ bool NavMeshType_Solo::handleBuild()
 	m_solid = rcAllocHeightfield();
 	if (!m_solid)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'solid'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'solid'.");
 		return false;
 	}
 	if (!rcCreateHeightfield(m_ctx, *m_solid, m_cfg.width, m_cfg.height, m_cfg.bmin, m_cfg.bmax, m_cfg.cs, m_cfg.ch))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not create solid heightfield.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not create solid heightfield.");
 		return false;
 	}
 	
@@ -302,7 +300,7 @@ bool NavMeshType_Solo::handleBuild()
 	m_triareas = new unsigned char[ntris];
 	if (!m_triareas)
 	{
-		CTXLOG1(RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", ntris);
+		CTXLOG1(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'm_triareas' (%d).", ntris);
 		return false;
 	}
 	
@@ -341,12 +339,12 @@ bool NavMeshType_Solo::handleBuild()
 	m_chf = rcAllocCompactHeightfield();
 	if (!m_chf)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
 		return false;
 	}
 	if (!rcBuildCompactHeightfield(m_ctx, m_cfg.walkableHeight, m_cfg.walkableClimb, *m_solid, *m_chf))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not build compact data.");
 		return false;
 	}
 	
@@ -359,7 +357,7 @@ bool NavMeshType_Solo::handleBuild()
 	// Erode the walkable area by agent radius.
 	if (!rcErodeWalkableArea(m_ctx, m_cfg.walkableRadius, *m_chf))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not erode.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not erode.");
 		return false;
 	}
 
@@ -374,7 +372,7 @@ bool NavMeshType_Solo::handleBuild()
 		// Monotone partitioning does not need distancefield.
 		if (!rcBuildRegionsMonotone(m_ctx, *m_chf, 0, m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
-			CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not build regions.");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not build regions.");
 			return false;
 		}
 	}
@@ -383,14 +381,14 @@ bool NavMeshType_Solo::handleBuild()
 		// Prepare for region partitioning, by calculating distance field along the walkable surface.
 		if (!rcBuildDistanceField(m_ctx, *m_chf))
 		{
-			CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not build distance field.");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not build distance field.");
 			return false;
 		}
 
 		// Partition the walkable surface into simple regions without holes.
 		if (!rcBuildRegions(m_ctx, *m_chf, 0, m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
-			CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not build regions.");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not build regions.");
 			return false;
 		}
 	}
@@ -403,12 +401,12 @@ bool NavMeshType_Solo::handleBuild()
 	m_cset = rcAllocContourSet();
 	if (!m_cset)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'cset'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'cset'.");
 		return false;
 	}
 	if (!rcBuildContours(m_ctx, *m_chf, m_cfg.maxSimplificationError, m_cfg.maxEdgeLen, *m_cset))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not create contours.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not create contours.");
 		return false;
 	}
 	
@@ -420,12 +418,12 @@ bool NavMeshType_Solo::handleBuild()
 	m_pmesh = rcAllocPolyMesh();
 	if (!m_pmesh)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmesh'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'pmesh'.");
 		return false;
 	}
 	if (!rcBuildPolyMesh(m_ctx, *m_cset, m_cfg.maxVertsPerPoly, *m_pmesh))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not triangulate contours.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not triangulate contours.");
 		return false;
 	}
 	
@@ -436,13 +434,13 @@ bool NavMeshType_Solo::handleBuild()
 	m_dmesh = rcAllocPolyMeshDetail();
 	if (!m_dmesh)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmdtl'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'pmdtl'.");
 		return false;
 	}
 
 	if (!rcBuildPolyMeshDetail(m_ctx, *m_pmesh, *m_chf, m_cfg.detailSampleDist, m_cfg.detailSampleMaxError, *m_dmesh))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not build detail mesh.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not build detail mesh.");
 		return false;
 	}
 
@@ -523,7 +521,7 @@ bool NavMeshType_Solo::handleBuild()
 		
 		if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
 		{
-			CTXLOG(RC_LOG_ERROR, "Could not build Detour navmesh.");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "Could not build Detour navmesh.");
 			return false;
 		}
 		
@@ -531,7 +529,7 @@ bool NavMeshType_Solo::handleBuild()
 		if (!m_navMesh)
 		{
 			dtFree(navData);
-			CTXLOG(RC_LOG_ERROR, "Could not create Detour navmesh");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "Could not create Detour navmesh");
 			return false;
 		}
 		
@@ -541,14 +539,14 @@ bool NavMeshType_Solo::handleBuild()
 		if (dtStatusFailed(status))
 		{
 			dtFree(navData);
-			CTXLOG(RC_LOG_ERROR, "Could not init Detour navmesh");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "Could not init Detour navmesh");
 			return false;
 		}
 		
 		status = m_navQuery->init(m_navMesh, 2048);
 		if (dtStatusFailed(status))
 		{
-			CTXLOG(RC_LOG_ERROR, "Could not init Detour navmesh query");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "Could not init Detour navmesh query");
 			return false;
 		}
 	}
@@ -565,7 +563,6 @@ bool NavMeshType_Solo::handleBuild()
 	
 	if (m_tool)
 		m_tool->init(this);
-	initToolStates(this);
 
 	return true;
 }

@@ -71,8 +71,8 @@ public:
 	virtual bool handleBuild();
 	virtual void handleUpdate(const float dt);
 
-	void setTileSettings(const TileSettings& settings);
-	TileSettings getTileSettings();
+	void setTileSettings(const NavMeshTileSettings& settings);
+	NavMeshTileSettings getTileSettings();
 	dtTileCache* getTileCache();
 
 	void getTilePos(const float* pos, int& tx, int& ty);

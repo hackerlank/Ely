@@ -32,37 +32,6 @@
 namespace ely
 {
 
-inline unsigned int nextPow2(unsigned int v)
-{
-	v--;
-	v |= v >> 1;
-	v |= v >> 2;
-	v |= v >> 4;
-	v |= v >> 8;
-	v |= v >> 16;
-	v++;
-	return v;
-}
-
-inline unsigned int ilog2(unsigned int v)
-{
-	unsigned int r;
-	unsigned int shift;
-	r = (v > 0xffff) << 4;
-	v >>= r;
-	shift = (v > 0xff) << 3;
-	v >>= shift;
-	r |= shift;
-	shift = (v > 0xf) << 2;
-	v >>= shift;
-	r |= shift;
-	shift = (v > 0x3) << 1;
-	v >>= shift;
-	r |= shift;
-	r |= (v >> 1);
-	return r;
-}
-
 NavMeshType_Tile::NavMeshType_Tile(NodePath renderDebug) :
 		NavMeshType(renderDebug),
 		m_keepInterResults(false),
@@ -384,15 +353,13 @@ void NavMeshType_Tile::handleMeshChanged(class InputGeom* geom)
 		m_tool->reset();
 		m_tool->init(this);
 	}
-	resetToolStates();
-	initToolStates(this);
 }
 
 bool NavMeshType_Tile::handleBuild()
 {
 	if (!m_geom || !m_geom->getMesh())
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildTiledNavigation: No vertices and triangles.");
 		return false;
 	}
@@ -402,7 +369,7 @@ bool NavMeshType_Tile::handleBuild()
 	m_navMesh = dtAllocNavMesh();
 	if (!m_navMesh)
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildTiledNavigation: Could not allocate navmesh.");
 		return false;
 	}
@@ -419,7 +386,7 @@ bool NavMeshType_Tile::handleBuild()
 	status = m_navMesh->init(&params);
 	if (dtStatusFailed(status))
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildTiledNavigation: Could not init navmesh.");
 		return false;
 	}
@@ -427,7 +394,7 @@ bool NavMeshType_Tile::handleBuild()
 	status = m_navQuery->init(m_navMesh, 2048);
 	if (dtStatusFailed(status))
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildTiledNavigation: Could not init Detour navmesh query");
 		return false;
 	}
@@ -437,7 +404,6 @@ bool NavMeshType_Tile::handleBuild()
 
 	if (m_tool)
 		m_tool->init(this);
-	initToolStates(this);
 
 	return true;
 }
@@ -608,7 +574,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 {
 	if (!m_geom || !m_geom->getMesh() || !m_geom->getChunkyMesh())
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildNavigation: Input mesh is not specified.");
 		return 0;
 	}
@@ -667,13 +633,13 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	m_solid = rcAllocHeightfield();
 	if (!m_solid)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'solid'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'solid'.");
 		return 0;
 	}
 	if (!rcCreateHeightfield(m_ctx, *m_solid, m_cfg.width, m_cfg.height,
 			m_cfg.bmin, m_cfg.bmax, m_cfg.cs, m_cfg.ch))
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildNavigation: Could not create solid heightfield.");
 		return 0;
 	}
@@ -684,7 +650,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	m_triareas = new unsigned char[chunkyMesh->maxTrisPerChunk];
 	if (!m_triareas)
 	{
-		CTXLOG1(RC_LOG_ERROR,
+		CTXLOG1(m_ctx, RC_LOG_ERROR,
 				"buildNavigation: Out of memory 'm_triareas' (%d).",
 				chunkyMesh->maxTrisPerChunk);
 		return 0;
@@ -739,13 +705,13 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	m_chf = rcAllocCompactHeightfield();
 	if (!m_chf)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'chf'.");
 		return 0;
 	}
 	if (!rcBuildCompactHeightfield(m_ctx, m_cfg.walkableHeight,
 			m_cfg.walkableClimb, *m_solid, *m_chf))
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildNavigation: Could not build compact data.");
 		return 0;
 	}
@@ -759,7 +725,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	// Erode the walkable area by agent radius.
 	if (!rcErodeWalkableArea(m_ctx, m_cfg.walkableRadius, *m_chf))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not erode.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not erode.");
 		return 0;
 	}
 
@@ -775,7 +741,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		if (!rcBuildRegionsMonotone(m_ctx, *m_chf, m_cfg.borderSize,
 				m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
-			CTXLOG(RC_LOG_ERROR,
+			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build regions.");
 			return 0;
 		}
@@ -785,7 +751,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		// Prepare for region partitioning, by calculating distance field along the walkable surface.
 		if (!rcBuildDistanceField(m_ctx, *m_chf))
 		{
-			CTXLOG(RC_LOG_ERROR,
+			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build distance field.");
 			return 0;
 		}
@@ -794,7 +760,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		if (!rcBuildRegions(m_ctx, *m_chf, m_cfg.borderSize,
 				m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
-			CTXLOG(RC_LOG_ERROR,
+			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build regions.");
 			return 0;
 		}
@@ -804,13 +770,13 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	m_cset = rcAllocContourSet();
 	if (!m_cset)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'cset'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'cset'.");
 		return 0;
 	}
 	if (!rcBuildContours(m_ctx, *m_chf, m_cfg.maxSimplificationError,
 			m_cfg.maxEdgeLen, *m_cset))
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Could not create contours.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Could not create contours.");
 		return 0;
 	}
 
@@ -823,12 +789,12 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	m_pmesh = rcAllocPolyMesh();
 	if (!m_pmesh)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'pmesh'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'pmesh'.");
 		return 0;
 	}
 	if (!rcBuildPolyMesh(m_ctx, *m_cset, m_cfg.maxVertsPerPoly, *m_pmesh))
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildNavigation: Could not triangulate contours.");
 		return 0;
 	}
@@ -837,14 +803,14 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	m_dmesh = rcAllocPolyMeshDetail();
 	if (!m_dmesh)
 	{
-		CTXLOG(RC_LOG_ERROR, "buildNavigation: Out of memory 'dmesh'.");
+		CTXLOG(m_ctx, RC_LOG_ERROR, "buildNavigation: Out of memory 'dmesh'.");
 		return 0;
 	}
 
 	if (!rcBuildPolyMeshDetail(m_ctx, *m_pmesh, *m_chf, m_cfg.detailSampleDist,
 			m_cfg.detailSampleMaxError, *m_dmesh))
 	{
-		CTXLOG(RC_LOG_ERROR,
+		CTXLOG(m_ctx, RC_LOG_ERROR,
 				"buildNavigation: Could build polymesh detail.");
 		return 0;
 	}
@@ -864,7 +830,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		if (m_pmesh->nverts >= 0xffff)
 		{
 			// The vertex indices are ushorts, and cannot point to more than 0xffff vertices.
-			CTXLOG2(RC_LOG_ERROR, "Too many vertices per tile %d (max: %d).",
+			CTXLOG2(m_ctx, RC_LOG_ERROR, "Too many vertices per tile %d (max: %d).",
 					m_pmesh->nverts, 0xffff);
 			return 0;
 		}
@@ -927,7 +893,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 
 		if (!dtCreateNavMeshData(&params, &navData, &navDataSize))
 		{
-			CTXLOG(RC_LOG_ERROR, "Could not build Detour navmesh.");
+			CTXLOG(m_ctx, RC_LOG_ERROR, "Could not build Detour navmesh.");
 			return 0;
 		}
 	}
@@ -948,27 +914,21 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 	return navData;
 }
 
-void NavMeshType_Tile::setTileSettings(const TileSettings& settings)
+void NavMeshType_Tile::setTileSettings(const NavMeshTileSettings& settings)
 {
-	m_buildAll = settings.m_buildAll;
+	m_buildAll = settings.m_buildAllTiles;
 	m_maxTiles = settings.m_maxTiles;
 	m_maxPolysPerTile = settings.m_maxPolysPerTile;
 	m_tileSize = settings.m_tileSize;
 }
 
-TileSettings NavMeshType_Tile::getTileSettings()
+NavMeshTileSettings NavMeshType_Tile::getTileSettings()
 {
-	TileSettings settings;
-	settings.m_buildAll = m_buildAll;
+	NavMeshTileSettings settings;
+	settings.m_buildAllTiles = m_buildAll;
 	settings.m_maxTiles = m_maxTiles;
 	settings.m_maxPolysPerTile = m_maxPolysPerTile;
 	settings.m_tileSize = m_tileSize;
-	settings.m_tileCol = m_tileCol;
-	settings.m_tileBmin = m_tileBmin;
-	settings.m_tileBmax = m_tileBmax;
-	settings.m_tileBuildTime = m_tileBuildTime;
-	settings.m_tileMemUsage = m_tileMemUsage;
-	settings.m_tileTriCount = m_tileTriCount;
 	return settings;
 }
 

@@ -4,6 +4,12 @@ AM_CXXFLAGS = $(ELY_CXXFLAGS)
 pkglib_LTLIBRARIES = initializations.la
 initializations_la_SOURCES = \
 		common_configs.cpp common_configs.h \
-		defs/initialization_defs.cpp 
+		defs/Actor1.cpp \
+		defs/camera.cpp \
+		defs/course2.cpp \
+		defs/Plane1.cpp \
+		defs/Player1.cpp \
+		defs/Steerer1.cpp \
+		defs/Terrain1.cpp		
 
 initializations_la_LDFLAGS = -module -avoid-version

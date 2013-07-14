@@ -56,6 +56,9 @@
 #include <nodePath.h>
 #include <genericAsyncTask.h>
 
+//#define TESTANOMALIES
+#define DEBUG_DRAW
+
 //https://groups.google.com/forum/?fromgroups=#!searchin/recastnavigation/z$20axis/recastnavigation/fMqEAqSBOBk/zwOzHmjRsj0J
 inline void LVecBase3fToRecast(const LVecBase3f& v, float* p)
 {
@@ -81,6 +84,12 @@ enum MOVTYPE
 	CHARACTER
 #endif
 };
+
+#ifdef DEBUG_DRAW
+#	define PRINTDRAW(msg) std::cout << msg << std::endl
+#else
+#	define PRINTDRAW
+#endif
 
 ///Data constants
 extern std::string baseDir;

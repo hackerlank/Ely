@@ -26,20 +26,6 @@
 namespace ely
 {
 
-struct TileSettings
-{
-	bool m_buildAll;
-	int m_maxTiles;
-	int m_maxPolysPerTile;
-	float m_tileSize;
-	unsigned int m_tileCol;
-	float* m_tileBmin;
-	float* m_tileBmax;
-	float m_tileBuildTime;
-	float m_tileMemUsage;
-	int m_tileTriCount;
-};
-
 class NavMeshType_Tile: public NavMeshType
 {
 protected:
@@ -107,8 +93,8 @@ public:
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
 
-	void setTileSettings(const TileSettings& settings);
-	TileSettings getTileSettings();
+	void setTileSettings(const NavMeshTileSettings& settings);
+	NavMeshTileSettings getTileSettings();
 
 	void getTilePos(const float* pos, int& tx, int& ty);
 

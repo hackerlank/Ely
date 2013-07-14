@@ -49,9 +49,6 @@
 
 using namespace ely;
 
-//#define TESTANOMALIES
-#define DEBUG_DRAW
-
 //RN
 //Sample type
 enum SAMPLETYPE

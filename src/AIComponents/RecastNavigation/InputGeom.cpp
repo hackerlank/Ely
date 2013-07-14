@@ -138,7 +138,7 @@ bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 	m_mesh = new rcMeshLoaderObj;
 	if (!m_mesh)
 	{
-		ctx->log(RC_LOG_ERROR, "loadMesh: Out of memory 'm_mesh'.");
+		CTXLOG(ctx, RC_LOG_ERROR, "loadMesh: Out of memory 'm_mesh'.");
 		return false;
 	}
 	//
@@ -157,7 +157,7 @@ bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 	}
 	if (!loadResult)
 	{
-		ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Could not load '%s'", filepath);
+		CTXLOG1(ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not load '%s'", filepath);
 		return false;
 	}
 
@@ -167,12 +167,12 @@ bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 	m_chunkyMesh = new rcChunkyTriMesh;
 	if (!m_chunkyMesh)
 	{
-		ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Out of memory 'm_chunkyMesh'.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildTiledNavigation: Out of memory 'm_chunkyMesh'.");
 		return false;
 	}
 	if (!rcCreateChunkyTriMesh(m_mesh->getVerts(), m_mesh->getTris(), m_mesh->getTriCount(), 256, m_chunkyMesh))
 	{
-		ctx->log(RC_LOG_ERROR, "buildTiledNavigation: Failed to build chunky mesh.");
+		CTXLOG(ctx, RC_LOG_ERROR, "buildTiledNavigation: Failed to build chunky mesh.");
 		return false;
 	}		
 

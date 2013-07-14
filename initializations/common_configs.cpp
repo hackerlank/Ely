@@ -44,8 +44,8 @@ extern void Plane1Init();
 extern void Plane1End();
 extern void Terrain1Init();
 extern void Terrain1End();
-extern void NPC1Init();
-extern void NPC1End();
+extern void Player1Init();
+extern void Player1End();
 extern void Steerer1Init();
 extern void Steerer1End();
 extern void course2Init();
@@ -58,7 +58,7 @@ void callAllInits()
 	Actor1Init();
 	Plane1Init();
 	Terrain1Init();
-	NPC1Init();
+	Player1Init();
 	Steerer1Init();
 	course2Init();
 }
@@ -68,7 +68,7 @@ void callAllEnds()
 	Actor1End();
 	Plane1End();
 	Terrain1End();
-	NPC1End();
+	Player1End();
 	Steerer1End();
 	course2End();
 }
