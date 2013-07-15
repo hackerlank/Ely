@@ -16,7 +16,8 @@ nodist_ely_training_SOURCES = \
 		threads.cpp \
 		manual_example.cpp \
 		draw_geometry.cpp \
-		test_wo_local_scale.cpp
+		test_wo_local_scale.cpp \
+		meshdrawer.cpp
 		
 #recastnavigation
 noinst_LTLIBRARIES = libeggToObj.la
