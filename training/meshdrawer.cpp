@@ -31,6 +31,8 @@ extern std::string baseDir;
 AsyncTask::DoneStatus drawTask(GenericAsyncTask* task, void* data);
 void stopDrawTask(const Event* e, void* data);
 WindowFramework *windowGlobal;
+const float SIZE = 0.2;
+const int BUDGET = 10000;
 
 int meshdrawer_main(int argc, char *argv[])
 {
@@ -61,14 +63,14 @@ int meshdrawer_main(int argc, char *argv[])
 	}
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
-	trackball->set_pos(0, 10, 0);
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
+	trackball->set_pos(0, 30, -5);
 	trackball->set_hpr(0, 0, 0);
 
 	//here is room for your own code
 	windowGlobal = window;
 	MeshDrawer* generator = new MeshDrawer();
-	generator->set_budget(1000);
+	generator->set_budget(BUDGET);
 	NodePath generatorNode = generator->get_root();
 	generatorNode.reparent_to(window->get_render());
 	//
@@ -103,11 +105,43 @@ AsyncTask::DoneStatus drawTask(GenericAsyncTask* task, void* data)
 			windowGlobal->get_render());
 	//
 	generator->link_segment(LVector3f(0.0, 0.0, 0.0),
-			LVector4f(0.0, 0.0, 1.0, 1.0), 0.01, LVector4f(0.0, 0.0, 1.0, 1.0));
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE, LVector4f(0.0, 0.0, 1.0, 1.0));
 	generator->link_segment(LVector3f(1.0, 0.0, 1.0),
-			LVector4f(0.0, 0.0, 1.0, 1.0), 0.01, LVector4f(0.0, 0.0, 1.0, 1.0));
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE, LVector4f(0.0, 0.0, 1.0, 1.0));
 	generator->link_segment_end(LVector4f(0.0, 0.0, 1.0, 1.0),
 			LVector4f(0.0, 0.0, 1.0, 1.0));
+	//
+	generator->billboard(LVector3f(-1.0, 0.5, 1.0),
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE, LVector4f(0.0, 1.0, 1.0, 1.0));
+	//
+	generator->cross_segment(LVector3f(-2.0, 1.0, 1.0),
+			LVector3f(-2.0, 1.0, 3.0), LVector4f(0.0, 0.0, 1.0, 1.0), SIZE,
+			LVector4f(1.0, 1.0, 0.0, 1.0));
+	//
+	generator->explosion(LVector3f(2.0, -2.0, 5.0),
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE / 50.0,
+			LVector4f(1.0, 0.0, 1.0, 1.0), 20, 500, 0.6);
+	//
+	generator->particle(LVector3f(0.0, -3.0, 5.0),
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE, LVector4f(0.3, 0.7, 1.0, 1.0),
+			45.0);
+	//
+	generator->segment(LVector3f(-6.0, 4.0, 3.0), LVector3f(-8.0, 1.0, 7.0),
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE, LVector4f(0.7, 0.5, 0.3, 1.0));
+	//
+	generator->stream(LVector3f(2.0, 4.0, 7.0), LVector3f(4.0, 4.0, 8.0),
+			LVector4f(0.0, 0.0, 1.0, 1.0), SIZE / 10.0,
+			LVector4f(07, 1.0, 0.2, 1.0), 50, 0.6);
+	//
+	generator->tri(LVector3f(1.0, 7, 5.0), LVector4f(0.0, 1.0, 0.0, 1.0),
+			LVector2f(0.0, 0.5), LVector3f(-2.5, 7, 4.0),
+			LVector4f(1.0, 0.0, 0.0, 1.0), LVector2f(0.0, 0.0),
+			LVector3f(0.0, 7, 3.0), LVector4f(0.0, 0.0, 1.0, 1.0),
+			LVector2f(0.0, 1.0));
+	//
+	generator->uneven_segment(LVector3f(-4.0, -2.0, 5.0),
+			LVector3f(-0.0, -2.0, 9.0), LVector4f(0.0, 0.0, 1.0, 1.0), SIZE,
+			LVector4f(0.7, 0.5, 0.3, 1.0), SIZE * 4.0, LVector4f(0.3, 0.7, 0.5, 1.0));
 	//
 	generator->end();
 
