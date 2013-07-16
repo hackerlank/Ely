@@ -31,18 +31,25 @@
 namespace ely
 {
 
-/// Tool types.
-enum NavMeshToolType
+/// Tool types enum.
+enum NavMeshTypeToolEnum
 {
 	TOOL_NONE = 0,
+	TOOL_TILE_EDIT,
+	TOOL_TILE_HIGHLIGHT,
+	TOOL_TEMP_OBSTACLE,
+	TOOL_NAVMESH_TESTER,
+	TOOL_NAVMESH_PRUNE,
+	TOOL_OFFMESH_CONNECTION,
+	TOOL_CONVEX_VOLUME,
 	TOOL_CROWD,
 	MAX_TOOLS
 };
 
 /**
- * \brief NavMesh type.
+ * \brief NavMesh type enum.
  */
-enum NAVMESHTYPE
+enum NavMeshTypeEnum
 {
 	SOLO, TILE, OBSTACLE
 };
@@ -53,7 +60,7 @@ enum NAVMESHTYPE
  * These are just area types to use consistent values across the nav mesh.
  * The use should specify these base on his needs.
  */
-enum NavMeshPolyAreas
+enum NavMeshPolyAreasEnum
 {
 	NAVMESH_POLYAREA_GROUND,
 	NAVMESH_POLYAREA_WATER,
@@ -67,7 +74,7 @@ enum NavMeshPolyAreas
 /**
  * \brief NavMesh polygon flags.
  */
-enum NavMeshPolyFlags
+enum NavMeshPolyFlagsEnum
 {
 	NAVMESH_POLYFLAGS_WALK = 0x01,		// Ability to walk (ground, grass, road)
 	NAVMESH_POLYFLAGS_SWIM = 0x02,		// Ability to swim (water).
@@ -82,14 +89,15 @@ struct NavMeshTypeTool
 	virtual ~NavMeshTypeTool()
 	{
 	}
+	virtual int type() = 0;
 	virtual void init(class NavMeshType* sample) = 0;
 	virtual void reset() = 0;
 	virtual void handleClick(const float* s, const float* p, bool shift) = 0;
 	virtual void handleRender() = 0;
-	virtual void handleRenderOverlay(double* proj, double* model,
-			int* view) = 0;
+	virtual void handleStep() = 0;
 	virtual void handleToggle() = 0;
 	virtual void handleUpdate(const float dt) = 0;
+
 };
 
 struct NavMeshTypeToolState

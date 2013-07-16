@@ -268,7 +268,7 @@ NavMeshType* NavMesh::getNavMeshType()
 	return mNavMeshType;
 }
 
-NAVMESHTYPE NavMesh::getNavMeshTypeEnum()
+NavMeshTypeEnum NavMesh::getNavMeshTypeEnum()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -494,7 +494,7 @@ bool NavMesh::loadModelMesh(NodePath model)
 }
 
 void NavMesh::setupNavMesh(NavMeshType* navMeshType,
-		NAVMESHTYPE navMeshTypeEnum)
+		NavMeshTypeEnum navMeshTypeEnum)
 {
 	//set the navigation mesh type
 	mNavMeshType = navMeshType;

@@ -133,7 +133,6 @@ public:
 	virtual int type() { return TOOL_CROWD; }
 	virtual void init(NavMeshType* sample);
 	virtual void reset();
-	virtual void handleMenu();
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
 	virtual void handleStep();

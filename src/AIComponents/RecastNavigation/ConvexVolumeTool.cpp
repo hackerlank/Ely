@@ -125,35 +125,6 @@ void ConvexVolumeTool::reset()
 	m_nhull = 0;
 }
 
-void ConvexVolumeTool::handleMenu()
-{
-//	imguiSlider("Shape Height", &m_boxHeight, 0.1f, 20.0f, 0.1f);
-//	imguiSlider("Shape Descent", &m_boxDescent, 0.1f, 20.0f, 0.1f);
-//	imguiSlider("Poly Offset", &m_polyOffset, 0.0f, 10.0f, 0.1f);
-//
-//	imguiSeparator();
-//
-//	imguiLabel("Area Type");
-//	imguiIndent();
-//	if (imguiCheck("Grass", m_areaType == SAMPLE_POLYAREA_GRASS))
-//		m_areaType = SAMPLE_POLYAREA_GRASS;
-//	if (imguiCheck("Road", m_areaType == SAMPLE_POLYAREA_ROAD))
-//		m_areaType = SAMPLE_POLYAREA_ROAD;
-//	if (imguiCheck("Water", m_areaType == SAMPLE_POLYAREA_WATER))
-//		m_areaType = SAMPLE_POLYAREA_WATER;
-//	if (imguiCheck("Door", m_areaType == SAMPLE_POLYAREA_DOOR))
-//		m_areaType = SAMPLE_POLYAREA_DOOR;
-//	imguiUnindent();
-//
-//	imguiSeparator();
-//
-//	if (imguiButton("Clear Shape"))
-//	{
-//		m_npts = 0;
-//		m_nhull = 0;
-//	}
-}
-
 void ConvexVolumeTool::handleClick(const float* /*s*/, const float* p, bool shift)
 {
 	if (!m_sample) return;
@@ -233,6 +204,10 @@ void ConvexVolumeTool::handleClick(const float* /*s*/, const float* p, bool shif
 	
 }
 
+void ConvexVolumeTool::handleStep()
+{
+}
+
 void ConvexVolumeTool::handleToggle()
 {
 }
@@ -280,30 +255,14 @@ void ConvexVolumeTool::handleRender()
 	m_sample->getInputGeom()->drawConvexVolumes(&dd);
 }
 
-void ConvexVolumeTool::handleRenderOverlay(double* /*proj*/, double* /*model*/, int* view)
-{
-//	// Tool help
-//	const int h = view[3];
-//	if (!m_npts)
-//	{
-//		imguiDrawText(280, h-40, IMGUI_ALIGN_LEFT, "LMB: Create new shape.  SHIFT+LMB: Delete existing shape (click inside a shape).", imguiRGBA(255,255,255,192));
-//	}
-//	else
-//	{
-//		imguiDrawText(280, h-40, IMGUI_ALIGN_LEFT, "Click LMB to add new points. Click on the red point to finish the shape.", imguiRGBA(255,255,255,192));
-//		imguiDrawText(280, h-60, IMGUI_ALIGN_LEFT, "The shape will be convex hull of all added points.", imguiRGBA(255,255,255,192));
-//	}
-//
-}
-
-void ConvexVolumeTool::setAreaType(NavMeshPolyAreas type)
+void ConvexVolumeTool::setAreaType(NavMeshPolyAreasEnum type)
 {
 	m_areaType = (int) type;
 }
 
-NavMeshPolyAreas ConvexVolumeTool::getAreaType()
+NavMeshPolyAreasEnum ConvexVolumeTool::getAreaType()
 {
-	return (NavMeshPolyAreas) m_areaType;
+	return (NavMeshPolyAreasEnum) m_areaType;
 }
 
 } // namespace ely

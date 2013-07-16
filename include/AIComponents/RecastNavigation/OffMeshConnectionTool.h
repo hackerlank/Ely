@@ -16,37 +16,31 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
-#ifndef CONVEXVOLUMETOOL_H
-#define CONVEXVOLUMETOOL_H
+#ifndef OFFMESHCONNECTIONTOOL_H
+#define OFFMESHCONNECTIONTOOL_H
 
 #include "NavMeshType.h"
 
 namespace ely
 {
 
-// Tool to create convex volumess for InputGeom
+// Tool to create off-mesh connection for InputGeom
 
-class ConvexVolumeTool : public NavMeshTypeTool
+class OffMeshConnectionTool : public NavMeshTypeTool
 {
 	NavMeshType* m_sample;
-	int m_areaType;
-	float m_polyOffset;
-	float m_boxHeight;
-	float m_boxDescent;
-	
-	static const int MAX_PTS = 12;
-	float m_pts[MAX_PTS*3];
-	int m_npts;
-	int m_hull[MAX_PTS];
-	int m_nhull;
+	float m_hitPos[3];
+	bool m_hitPosSet;
+	bool m_bidir;
+	unsigned char m_oldFlags;
 	
 	DebugDrawPanda3d dd;
 
 public:
-	ConvexVolumeTool(NodePath renderDebug);
-	~ConvexVolumeTool();
+	OffMeshConnectionTool(NodePath renderDebug);
+	~OffMeshConnectionTool();
 	
-	virtual int type() { return TOOL_CONVEX_VOLUME; }
+	virtual int type() { return TOOL_OFFMESH_CONNECTION; }
 	virtual void init(NavMeshType* sample);
 	virtual void reset();
 	virtual void handleClick(const float* s, const float* p, bool shift);
@@ -54,11 +48,8 @@ public:
 	virtual void handleToggle();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender();
-
-	void setAreaType(NavMeshPolyAreasEnum type);
-	NavMeshPolyAreasEnum getAreaType();
 };
 
 } // namespace ely
 
-#endif // CONVEXVOLUMETOOL_H
+#endif // OFFMESHCONNECTIONTOOL_H

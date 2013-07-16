@@ -11,7 +11,8 @@ recastnavigation_headers = \
 		AIComponents/RecastNavigation/NavMeshType_Obstacle.h \
 		AIComponents/RecastNavigation/fastlz.h \
 		AIComponents/RecastNavigation/ConvexVolumeTool.h \
-		AIComponents/RecastNavigation/CrowdTool.h
+		AIComponents/RecastNavigation/CrowdTool.h \
+		AIComponents/RecastNavigation/OffMeshConnectionTool.h
 
 noinst_HEADERS = \
 		Ely.h \

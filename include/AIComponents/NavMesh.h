@@ -89,7 +89,7 @@ public:
 	///@{
 	//SOLO TILE OBSTACLE
 	NavMeshType* getNavMeshType();
-	NAVMESHTYPE getNavMeshTypeEnum();
+	NavMeshTypeEnum getNavMeshTypeEnum();
 	InputGeom* getInputGeom();
 	dtNavMesh* getNavMesh();
 	dtNavMeshQuery* getNavMeshQuery();
@@ -110,6 +110,7 @@ public:
 	void removeTile(LPoint3f pos);
 	void buildAllTiles();
 	void removeAllTiles();
+	//OBSTACLE
 	///@}
 
 	/**
@@ -124,7 +125,7 @@ public:
 	 * @param navMeshType The type of navigation mesh.
 	 * @param navMeshTypeEnum The type of navigation mesh enum.
 	 */
-	void setupNavMesh(NavMeshType* navMeshType, NAVMESHTYPE navMeshTypeEnum=SOLO);
+	void setupNavMesh(NavMeshType* navMeshType, NavMeshTypeEnum navMeshTypeEnum=SOLO);
 
 	/**
 	 * \brief Builds the navigation mesh for the loaded model mesh.
@@ -154,7 +155,7 @@ private:
 	std::string mMeshName;
 	///@{
 	/// Current mesh type.
-	NAVMESHTYPE mNavMeshTypeEnum;
+	NavMeshTypeEnum mNavMeshTypeEnum;
 	NavMeshType* mNavMeshType;
 	///@}
 	/// NavMeshSettings from template.

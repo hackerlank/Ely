@@ -123,6 +123,8 @@ public:
 	{
 	}
 
+	virtual int type() { return TOOL_TILE_EDIT; }
+
 	virtual void init(NavMeshType* sample)
 	{
 		m_sample = (NavMeshType_Tile*) sample;
@@ -130,21 +132,6 @@ public:
 
 	virtual void reset()
 	{
-	}
-
-	virtual void handleMenu()
-	{
-//		imguiLabel("Create Tiles");
-//		if (imguiButton("Create All"))
-//		{
-//			if (m_sample)
-//				m_sample->buildAllTiles();
-//		}
-//		if (imguiButton("Remove All"))
-//		{
-//			if (m_sample)
-//				m_sample->removeAllTiles();
-//		}
 	}
 
 	virtual void handleClick(const float* /*s*/, const float* p, bool shift)
@@ -158,6 +145,10 @@ public:
 			else
 				m_sample->buildTile(m_hitPos);
 		}
+	}
+
+	virtual void handleStep()
+	{
 	}
 
 	virtual void handleToggle()
@@ -185,24 +176,6 @@ public:
 //			glEnd();
 //			glLineWidth(1.0f);
 //		}
-	}
-
-	virtual void handleRenderOverlay(double* proj, double* model, int* view)
-	{
-//		GLdouble x, y, z;
-//		if (m_hitPosSet && gluProject((GLdouble)m_hitPos[0], (GLdouble)m_hitPos[1], (GLdouble)m_hitPos[2],
-//									  model, proj, view, &x, &y, &z))
-//		{
-//			int tx=0, ty=0;
-//			m_sample->getTilePos(m_hitPos, tx, ty);
-//			char text[32];
-//			snprintf(text,32,"(%d,%d)", tx,ty);
-//			imguiDrawText((int)x, (int)y-25, IMGUI_ALIGN_CENTER, text, imguiRGBA(0,0,0,220));
-//		}
-//
-//		// Tool help
-//		const int h = view[3];
-//		imguiDrawText(280, h-40, IMGUI_ALIGN_LEFT, "LMB: Rebuild hit tile.  Shift+LMB: Clear hit tile.", imguiRGBA(255,255,255,192));
 	}
 };
 

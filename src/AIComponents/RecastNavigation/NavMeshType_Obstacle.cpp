@@ -664,6 +664,7 @@ public:
 	{
 	}
 
+	virtual int type() { return TOOL_TILE_HIGHLIGHT; }
 
 	virtual void init(NavMeshType* sample)
 	{
@@ -677,6 +678,10 @@ public:
 		m_hitPosSet = true;
 		rcVcopy(m_hitPos,p);
 	}
+
+	virtual void handleRender() {}
+
+	virtual void handleStep() {}
 
 	virtual void handleToggle() {}
 
@@ -699,6 +704,8 @@ public:
 	{
 	}
 	
+	virtual int type() { return TOOL_TEMP_OBSTACLE; }
+
 	virtual void init(NavMeshType* sample)
 	{
 		m_sample = (NavMeshType_Obstacle*)sample; 
@@ -717,10 +724,10 @@ public:
 		}
 	}
 	
+	virtual void handleStep() {}
 	virtual void handleToggle() {}
 	virtual void handleUpdate(const float /*dt*/) {}
 	virtual void handleRender() {}
-	virtual void handleRenderOverlay(double* /*proj*/, double* /*model*/, int* /*view*/) { }
 };
 
 NavMeshType_Obstacle::NavMeshType_Obstacle(NodePath renderDebug) :

@@ -51,7 +51,8 @@ recastnavigation_sources = \
 		AIComponents/RecastNavigation/NavMeshType_Obstacle.cpp \
 		AIComponents/RecastNavigation/fastlz.c \
 		AIComponents/RecastNavigation/ConvexVolumeTool.cpp \
-		AIComponents/RecastNavigation/CrowdTool.cpp
+		AIComponents/RecastNavigation/CrowdTool.cpp \
+		AIComponents/RecastNavigation/OffMeshConnectionTool.cpp
 			
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \
