@@ -255,7 +255,7 @@ bool rcMeshLoaderObj::load(const char* filename, float scale, float* translation
 	return true;
 }
 
-bool rcMeshLoaderObj::load(NodePath model)
+bool rcMeshLoaderObj::load(NodePath model, NodePath referenceNP)
 {
 	//reset scale & translation
 	m_scale = 1.0;
@@ -264,9 +264,7 @@ bool rcMeshLoaderObj::load(NodePath model)
 	m_translation[2] = 0.0;
 	//reset max index
 	m_currentMaxIndex = 0;
-	//all transform are applied wrt model's parent node
-	NodePath referenceNP = model.get_parent();
-
+	//all transform are applied wrt reference node
 	//get all ModelRoots for the hierarchy below model
 	NodePathCollection modelRootCollection = model.find_all_matches(
 					"**/+ModelRoot");

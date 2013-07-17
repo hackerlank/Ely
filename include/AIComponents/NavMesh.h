@@ -104,17 +104,24 @@ public:
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
 	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
-	void getTilePos(LPoint3f pos, int& tx, int& ty);
+	void getTilePos(const LPoint3f& pos, int& tx, int& ty);
 	//TILE
-	void buildTile(LPoint3f pos);
-	void removeTile(LPoint3f pos);
+	void buildTile(const LPoint3f& pos);
+	void removeTile(const LPoint3f& pos);
 	void buildAllTiles();
 	void removeAllTiles();
 	//OBSTACLE
+	dtTileCache* getTileCache();
+	void addObstacle(SMARTPTR(Object) object);
+	void removeObstacle(SMARTPTR(Object) object);
+	void clearAllObstacles();
 	///@}
 
 	/**
 	 * \brief Loads the mesh from a model node path.
+	 *
+	 * \note: the model's parent node path is the reference wrt
+	 * any calculation are performed.
 	 * @param model The model's node path.
 	 * @return True if successful, false otherwise.
 	 */
@@ -153,6 +160,8 @@ private:
 	BuildContext* mCtx;
 	/// The mesh name.
 	std::string mMeshName;
+	/// The reference node path;
+	NodePath mReferenceNP;
 	///@{
 	/// Current mesh type.
 	NavMeshTypeEnum mNavMeshTypeEnum;
@@ -175,6 +184,8 @@ private:
 	/// after world creation; typically this kind of navigation
 	/// mesh is built (manually) during object initialization.
 	bool mAutoBuild;
+	/// Obstacles table
+	std::map<SMARTPTR(Object), dtObstacleRef> mObstacles;
 	///@}
 #ifdef ELY_DEBUG
 	/// Recast debug node path.

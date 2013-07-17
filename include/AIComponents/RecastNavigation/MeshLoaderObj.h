@@ -37,7 +37,7 @@ public:
 	
 	bool load(const char* fileName, float scale = 1.0, float* translation = NULL);
 	//Model stuff
-	bool load(NodePath model);
+	bool load(NodePath model, NodePath referenceNP);
 
 	inline const float* getVerts() const { return m_verts; }
 	inline const float* getNormals() const { return m_normals; }

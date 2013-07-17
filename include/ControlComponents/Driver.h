@@ -140,7 +140,7 @@ public:
 	 * \name Speeds getters/setters.
 	 */
 	///@{
-	void setLinearSpeed(LVector3f linearSpeed);
+	void setLinearSpeed(const LVector3f& linearSpeed);
 	LVector3f getLinearSpeed();
 	void setAngularSpeed(float angularSpeed);
 	float getAngularSpeed();

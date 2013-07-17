@@ -448,7 +448,7 @@ LVecBase2f CharacterController::getLinearSpeed()
 	return mLinearSpeed;
 }
 
-void CharacterController::setLinearSpeed(LVecBase2f speed)
+void CharacterController::setLinearSpeed(const LVecBase2f& speed)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

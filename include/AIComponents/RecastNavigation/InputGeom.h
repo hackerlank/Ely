@@ -65,7 +65,9 @@ public:
 	InputGeom();
 	~InputGeom();
 	
-	bool loadMesh(class rcContext* ctx, const char* filepath, NodePath model=NodePath(), float scale=1.0, float* translation=NULL);
+	bool loadMesh(class rcContext* ctx, const char* filepath, NodePath model =
+			NodePath(), NodePath referenceNP = NodePath(), float scale = 1.0,
+			float* translation = NULL);
 	
 	bool load(class rcContext* ctx, const char* filepath);
 	bool save(const char* filepath);

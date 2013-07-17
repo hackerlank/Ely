@@ -122,8 +122,9 @@ InputGeom::~InputGeom()
 	delete m_mesh;
 }
 		
+
 bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
-		float scale, float* translation)
+		NodePath referenceNP, float scale, float* translation)
 {
 	if (m_mesh)
 	{
@@ -149,7 +150,7 @@ bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 	}
 	else if (not model.is_empty())
 	{
-		loadResult = m_mesh->load(model);
+		loadResult = m_mesh->load(model, referenceNP);
 	}
 	else
 	{

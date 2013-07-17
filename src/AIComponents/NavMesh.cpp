@@ -240,16 +240,7 @@ void NavMesh::onAddToSceneSetup()
 
 		///TODO
 		//set convex volume tool
-//		app->rn->setConvexVolumeTool(app->renderDebug);
-//		//set convex volume add/remove callbacks
-//		Raycaster::GetSingletonPtr()->setHitCallback(ADD_CONVEX_VOLUME_Idx,
-//				addConvexVolume, reinterpret_cast<void*>(app->rn), ADD_CONVEX_VOLUME_Key,
-//				BitMask32::all_on());
-//		Raycaster::GetSingletonPtr()->setHitCallback(REMOVE_CONVEX_VOLUME_Idx,
-//				removeConvexVolume, reinterpret_cast<void*>(app->rn), REMOVE_CONVEX_VOLUME_Key,
-//				BitMask32::all_on());
-//		//set convex volume set area type callbacks
-//		app->setAreaTypeCallback("a");
+		//set off mesh connection tool
 
 		//build navigation mesh effectively
 		buildNavMesh();
@@ -404,7 +395,7 @@ NavMeshTileSettings NavMesh::getNavMeshTileSettings()
 	return settings;
 }
 
-void NavMesh::getTilePos(LPoint3f pos, int& tx, int& ty)
+void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -423,14 +414,17 @@ void NavMesh::getTilePos(LPoint3f pos, int& tx, int& ty)
 	}
 }
 
-void NavMesh::buildTile(LPoint3f pos)
+void NavMesh::buildTile(const LPoint3f& pos)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mNavMeshTypeEnum == TILE)
 	{
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildTile(recastPos);
-		PRINT("'" <<getOwnerObject()->objectId() << "'::'"
+		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::buildTile : " << pos);
 #ifdef ELY_DEBUG
 		mNavMeshType->handleRender();
@@ -438,14 +432,17 @@ void NavMesh::buildTile(LPoint3f pos)
 	}
 }
 
-void NavMesh::removeTile(LPoint3f pos)
+void NavMesh::removeTile(const LPoint3f& pos)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mNavMeshTypeEnum == TILE)
 	{
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeTile(recastPos);
-		PRINT("'" <<getOwnerObject()->objectId() << "'::'"
+		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::removeTile : " << pos);
 #ifdef ELY_DEBUG
 		mNavMeshType->handleRender();
@@ -455,6 +452,9 @@ void NavMesh::removeTile(LPoint3f pos)
 
 void NavMesh::buildAllTiles()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mNavMeshTypeEnum == TILE)
 	{
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
@@ -466,6 +466,9 @@ void NavMesh::buildAllTiles()
 
 void NavMesh::removeAllTiles()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	if (mNavMeshTypeEnum == TILE)
 	{
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
@@ -475,13 +478,115 @@ void NavMesh::removeAllTiles()
 	}
 }
 
+dtTileCache* NavMesh::getTileCache()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mNavMeshTypeEnum == OBSTACLE)
+	{
+		return dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+	}
+	return NULL;
+}
+
+void NavMesh::addObstacle(SMARTPTR(Object) object)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((mNavMeshTypeEnum == OBSTACLE) and
+			(not mReferenceNP.is_empty()) and object)
+	{
+		//get obstacle dimensions
+		NodePath objectNP = object->getNodePath();
+		LPoint3f min_point, max_point;
+		objectNP.calc_tight_bounds(min_point, max_point);
+		float dX = max_point.get_x() - min_point.get_x();
+		float dY = max_point.get_y() - min_point.get_y();
+		float radius = sqrt(pow(dX,2) + pow(dY,2)) / 2.0;
+		float heigth = max_point.get_z() - min_point.get_z();
+		//calculate pos wrt reference node path
+		LPoint3f pos = objectNP.get_pos(mReferenceNP);
+		//add detour obstacle
+		dtObstacleRef obstacleRef;
+		float recastPos[3];
+		LVecBase3fToRecast(pos, recastPos);
+		dtTileCache* tileCache =
+				dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+		tileCache->addObstacle(recastPos, radius, heigth, &obstacleRef);
+		//update tile cache
+		tileCache->update(0, mNavMeshType->getNavMesh());
+		//add to the obstacles table
+		mObstacles[object] = obstacleRef;
+		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		<< mComponentId << "'::addObstacle: '" << object->objectId()
+		<< "' at pos: " << pos);
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
+void NavMesh::removeObstacle(SMARTPTR(Object) object)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if ((mNavMeshTypeEnum == OBSTACLE) and
+			(not mReferenceNP.is_empty()) and object)
+	{
+		//get obstacle ref
+		dtObstacleRef obstacleRef = mObstacles[object];
+		if (obstacleRef == 0)
+		{
+			//dtObstacleRef cannot be zero
+			return;
+		}
+		//remove recast obstacle
+		dtTileCache* tileCache =
+				dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+		tileCache->removeObstacle(obstacleRef);
+		//update tile cache
+		tileCache->update(0, mNavMeshType->getNavMesh());
+		//remove from obstacle table
+		mObstacles.erase(object);
+		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		<< mComponentId << "'::removeObstacle: '" << object->objectId() << "'");
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
+void NavMesh::clearAllObstacles()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mNavMeshTypeEnum == OBSTACLE)
+	{
+		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->clearAllTempObstacles();
+		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+				<< mComponentId << "'::clearAllObstacles");
+#ifdef ELY_DEBUG
+		mNavMeshType->handleRender();
+#endif
+	}
+}
+
 bool NavMesh::loadModelMesh(NodePath model)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	bool result = true;
 	mGeom = new InputGeom;
 	mMeshName = model.get_name();
+	//get model's parent node path as reference
+	mReferenceNP = model.get_parent();
 	//
-	if (not mGeom->loadMesh(mCtx, NULL, model))
+	if (not mGeom->loadMesh(mCtx, NULL, model, mReferenceNP))
 	{
 		delete mGeom;
 		mGeom = NULL;
@@ -496,6 +601,9 @@ bool NavMesh::loadModelMesh(NodePath model)
 void NavMesh::setupNavMesh(NavMeshType* navMeshType,
 		NavMeshTypeEnum navMeshTypeEnum)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//set the navigation mesh type
 	mNavMeshType = navMeshType;
 	mNavMeshTypeEnum = navMeshTypeEnum;
@@ -507,6 +615,9 @@ void NavMesh::setupNavMesh(NavMeshType* navMeshType,
 
 bool NavMesh::buildNavMesh()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 #ifdef ELY_DEBUG
 	mCtx->resetLog();
 #endif

@@ -446,7 +446,7 @@ bool Driver::isMouseMoveEnabled()
 	return mMouseMove;
 }
 
-void Driver::setLinearSpeed(LVector3f linearSpeed)
+void Driver::setLinearSpeed(const LVector3f& linearSpeed)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
