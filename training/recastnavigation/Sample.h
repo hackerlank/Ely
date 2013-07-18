@@ -76,6 +76,7 @@ struct SampleTool
 	virtual void handleToggle() = 0;
 	virtual void handleStep() = 0;
 	virtual void handleUpdate(const float dt) = 0;
+
 };
 
 struct SampleToolState
@@ -89,6 +90,9 @@ struct SampleToolState
 	virtual void handleRenderOverlay(double* proj, double* model,
 			int* view) = 0;
 	virtual void handleUpdate(const float dt) = 0;
+
+	DebugDrawMeshDrawer* ddM;
+
 };
 
 struct SampleSettings
@@ -151,6 +155,7 @@ public:
 	}
 
 	void setTool(SampleTool* tool);
+	SampleTool* getTool();
 	SampleToolState* getToolState(int type)
 	{
 		return m_toolStates[type];

@@ -75,6 +75,11 @@ void Sample::setTool(SampleTool* tool)
 		m_tool->init(this);
 }
 
+SampleTool* Sample::getTool()
+{
+	return m_tool;
+}
+
 void Sample::handleSettings()
 {
 }

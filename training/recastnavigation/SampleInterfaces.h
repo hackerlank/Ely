@@ -141,15 +141,72 @@ public:
 	int getGeomNodesNum();
 	void removeGeomNodes();
 
-	/**
-	 * \brief Get the mutex to lock the entire structure.
-	 * @return The internal mutex.
-	 */
-	ReMutex& getMutex();
 };
 
 /// MeshDrawer debug draw implementation.
 class DebugDrawMeshDrawer : public duDebugDraw
+{
+protected:
+	///The render node path.
+	NodePath m_render;
+	///The camera node path.
+	NodePath m_camera;
+	///Depth Mask.
+	bool m_depthMask;
+	///Texture.
+	bool m_texture;
+	///Inner MeshDrawers.
+	std::vector<MeshDrawer*> m_generators;
+	///Current MeshDrawer index.
+	int m_meshDrawerIdx;
+	///Current MeshDrawers number.
+	int m_meshDrawersSize;
+	///Budget.
+	int m_budget;
+	///The current GeomPrimitive and draw type.
+	duDebugDrawPrimitives m_prim;
+	enum {DU_NULL_PRIM=-1};
+	///Size (for points and lines).
+	float m_size;
+	///Line previous store.
+	LVecBase3f m_lineVertex;
+	LVecBase4f m_lineColor;
+	LVecBase2f m_lineUV;
+	int m_lineIdx;
+	///Triangle previous store.
+	LVecBase3f m_triVertex[2];
+	LVecBase4f m_triColor[2];
+	LVecBase2f m_triUV[2];
+	int m_triIdx;
+	///Quad previous store.
+	LVecBase3f m_quadVertex[2];
+	LVecBase4f m_quadColor[2];
+	LVecBase2f m_quadUV[2];
+	int m_quadIdx;
+
+private:
+	///Helper
+	void doVertex(const LVector3f& vertex, const LVector4f& color,
+			const LVector2f& uv = LVecBase2f::zero());
+public:
+	DebugDrawMeshDrawer(NodePath render, NodePath camera, int budget=1000);
+	virtual ~DebugDrawMeshDrawer();
+
+	void reset();
+
+	virtual void depthMask(bool state);
+	virtual void texture(bool state);
+	virtual void begin(duDebugDrawPrimitives prim, float size = 1.0f);
+	virtual void vertex(const float* pos, unsigned int color);
+	virtual void vertex(const float x, const float y, const float z, unsigned int color);
+	virtual void vertex(const float* pos, unsigned int color, const float* uv);
+	virtual void vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v);
+	virtual void end();
+
+};
+
+/// MeshDrawer debug draw implementation.
+class DebugDrawMeshDrawerTMP : public duDebugDraw
 {
 protected:
 	///The render node path.
@@ -190,8 +247,8 @@ private:
 	void doVertex(const LVector3f& vertex, const LVector4f& color,
 			const LVector2f& uv = LVecBase2f::zero());
 public:
-	DebugDrawMeshDrawer(NodePath render, NodePath camera, int budget=1000);
-	virtual ~DebugDrawMeshDrawer();
+	DebugDrawMeshDrawerTMP(NodePath render, NodePath camera, int budget=1000);
+	virtual ~DebugDrawMeshDrawerTMP();
 
 	void startDraw();
 	void stopDraw();

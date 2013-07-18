@@ -172,6 +172,8 @@ int main(int argc, char **argv)
 	//set a debug node path
 	app->renderDebug = app->window->get_render().attach_new_node("renderDebug");
 	app->renderDebug.set_bin("fixed", 10);
+	app->ddM = new DebugDrawMeshDrawer(app->renderDebug,
+			app->window->get_camera_group().get_child(0), 50);
 #endif
 
 	//create a global ray caster
@@ -274,6 +276,10 @@ int main(int argc, char **argv)
 	// Do the main loop
 	app->panda->main_loop();
 	//end
+	app->panda->get_task_mgr().remove(app->task);
+#ifdef DEBUG_DRAW
+	delete app->ddM;
+#endif
 	delete app->rn;
 	end(app->panda);
 	delete app;

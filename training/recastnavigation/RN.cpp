@@ -282,6 +282,10 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 		}
 	}
 	//
+#ifdef DEBUG_DRAW
+	thisInst->m_currentSample->renderToolStates();
+#endif
+	//
 	return AsyncTask::DS_again;
 }
 #else
@@ -313,6 +317,10 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
 		(*iter)->updateVel(dt, pos, vel);
 	}
+	//
+#ifdef DEBUG_DRAW
+	thisInst->m_currentSample->renderToolStates();
+#endif
 	//
 	return AsyncTask::DS_again;
 }
@@ -687,15 +695,14 @@ void App::doFinalWork()
 #endif
 
 	//set ai update task
-	AsyncTask* task;
 	switch (movType)
 	{
 #ifndef WITHCHARACTER
 	case RECAST:
 	case KINEMATIC:
 	case RIGID:
-	task = new GenericAsyncTask("ai update", &RN::ai_update,
-			reinterpret_cast<void*>(rn));
+		task = new GenericAsyncTask("ai update", &RN::ai_update,
+				reinterpret_cast<void*>(rn));
 	break;
 #else
 	case CHARACTER:
@@ -744,6 +751,11 @@ void App::doFinalWork()
 	Raycaster::GetSingletonPtr()->setHitCallback(SET_SWITCH_DOOR_Idx,
 			switchDoor, reinterpret_cast<void*>(rn), SET_SWITCH_DOOR_Key,
 			BitMask32::all_on());
+
+#ifdef DEBUG_DRAW
+	SampleToolState* toolState = rn->getSample()->getToolState(TOOL_CROWD);
+	toolState->ddM = ddM;
+#endif
 
 #ifdef TESTANOMALIES
 	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);

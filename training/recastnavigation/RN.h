@@ -340,6 +340,7 @@ struct App
 	SMARTPTR(BulletWorld)mBulletWorld;
 #ifdef DEBUG_DRAW
 	NodePath renderDebug;
+	DebugDrawMeshDrawer *ddM;
 #endif
 	NodePath worldMesh;
 	float meshScale;
@@ -350,6 +351,7 @@ struct App
 	RN* rn;
 	TileSettings tileSettings;
 	SampleSettings settings;
+	AsyncTask* task;
 	//continue callback
 	SMARTPTR(EventCallbackInterface<App>::EventCallbackData) myDataContinue;
 	void continueCallback(const Event* event);
