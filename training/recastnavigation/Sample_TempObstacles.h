@@ -63,7 +63,8 @@ protected:
 	float m_tileSize;
 	
 public:
-	Sample_TempObstacles(NodePath renderDebug=NodePath());
+	Sample_TempObstacles(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~Sample_TempObstacles();
 	
 	virtual void handleSettings();

@@ -98,15 +98,16 @@ static int pointInPoly(int nvert, const float* verts, const float* p)
 }
 
 
-ConvexVolumeTool::ConvexVolumeTool(NodePath renderDebug) :
+ConvexVolumeTool::ConvexVolumeTool(NodePath renderDebug,
+		NodePath camera) :
+	NavMeshTypeTool(renderDebug, camera),
 	m_sample(0),
 	m_areaType(NAVMESH_POLYAREA_GRASS),
 	m_polyOffset(0.0f),
 	m_boxHeight(12.0f),
 	m_boxDescent(1.0f),
 	m_npts(0),
-	m_nhull(0),
-	dd(renderDebug)
+	m_nhull(0)
 {
 }
 

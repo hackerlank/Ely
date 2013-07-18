@@ -82,7 +82,8 @@ class CrowdToolState : public NavMeshTypeToolState
 	bool m_run;
 
 public:
-	CrowdToolState();
+	CrowdToolState(NodePath renderDebug=NodePath(),
+			NodePath camera=NodePath());
 	virtual ~CrowdToolState();
 	
 	virtual void init(class NavMeshType* sample);
@@ -125,7 +126,8 @@ class CrowdTool : public NavMeshTypeTool
 	void updateTick(const float dt);
 	
 public:
-	CrowdTool();
+	CrowdTool(NodePath renderDebug=NodePath(),
+			NodePath camera=NodePath());
 	virtual ~CrowdTool();
 	
 	CrowdToolState* getState(){return m_state;}

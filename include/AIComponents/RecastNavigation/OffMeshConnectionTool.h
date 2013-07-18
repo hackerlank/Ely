@@ -33,11 +33,10 @@ class OffMeshConnectionTool : public NavMeshTypeTool
 	bool m_hitPosSet;
 	bool m_bidir;
 	unsigned char m_oldFlags;
-	
-	DebugDrawPanda3d dd;
 
 public:
-	OffMeshConnectionTool(NodePath renderDebug);
+	OffMeshConnectionTool(NodePath renderDebug=NodePath(),
+			NodePath camera=NodePath());
 	~OffMeshConnectionTool();
 	
 	virtual int type() { return TOOL_OFFMESH_CONNECTION; }

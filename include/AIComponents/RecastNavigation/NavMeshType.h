@@ -86,6 +86,11 @@ enum NavMeshPolyFlagsEnum
 
 struct NavMeshTypeTool
 {
+	NavMeshTypeTool(NodePath renderDebug = NodePath(), NodePath camera =
+			NodePath()) :
+			dd(renderDebug, camera)
+	{
+	}
 	virtual ~NavMeshTypeTool()
 	{
 	}
@@ -98,10 +103,17 @@ struct NavMeshTypeTool
 	virtual void handleToggle() = 0;
 	virtual void handleUpdate(const float dt) = 0;
 
+	DebugDrawMeshDrawer dd;
+
 };
 
 struct NavMeshTypeToolState
 {
+	NavMeshTypeToolState(NodePath renderDebug = NodePath(), NodePath camera =
+			NodePath()) :
+			dd(renderDebug, camera)
+	{
+	}
 	virtual ~NavMeshTypeToolState()
 	{
 	}
@@ -109,6 +121,9 @@ struct NavMeshTypeToolState
 	virtual void reset() = 0;
 	virtual void handleRender() = 0;
 	virtual void handleUpdate(const float dt) = 0;
+
+	DebugDrawMeshDrawer dd;
+
 };
 
 /**
@@ -173,10 +188,11 @@ protected:
 
 	BuildContext* m_ctx;
 
-	DebugDrawPanda3d dd;
+	DebugDrawMeshDrawer dd;
 
 public:
-	NavMeshType(NodePath renderDebug = NodePath());
+	NavMeshType(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~NavMeshType();
 
 	void setContext(BuildContext* ctx)

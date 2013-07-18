@@ -35,12 +35,13 @@
 namespace ely
 {
 
-OffMeshConnectionTool::OffMeshConnectionTool(NodePath renderDebug) :
+OffMeshConnectionTool::OffMeshConnectionTool(NodePath renderDebug,
+		NodePath camera) :
+	NavMeshTypeTool(renderDebug, camera),
 	m_sample(0),
 	m_hitPosSet(0),
 	m_bidir(true),
-	m_oldFlags(0),
-	dd(renderDebug)
+	m_oldFlags(0)
 {
 }
 

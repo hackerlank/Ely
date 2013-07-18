@@ -730,8 +730,8 @@ public:
 	virtual void handleRender() {}
 };
 
-NavMeshType_Obstacle::NavMeshType_Obstacle(NodePath renderDebug) :
-	NavMeshType(renderDebug),
+NavMeshType_Obstacle::NavMeshType_Obstacle(NodePath renderDebug, NodePath camera) :
+	NavMeshType(renderDebug, camera),
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),
@@ -766,7 +766,7 @@ void NavMeshType_Obstacle::handleRender()
 		return;
 
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
+	dd.reset();
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
 //

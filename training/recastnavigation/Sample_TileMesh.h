@@ -98,7 +98,8 @@ protected:
 	dtNavMesh* loadAll(const char* path);
 
 public:
-	Sample_TileMesh(NodePath renderDebug = NodePath());
+	Sample_TileMesh(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~Sample_TileMesh();
 
 	virtual void handleSettings();

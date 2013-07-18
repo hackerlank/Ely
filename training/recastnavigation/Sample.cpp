@@ -39,7 +39,7 @@
 #	define snprintf _snprintf
 #endif
 
-Sample::Sample(NodePath renderDebug) :
+Sample::Sample(NodePath renderDebug, NodePath camera) :
 		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0),
 		m_navMeshDrawFlags(
 				0
@@ -47,7 +47,7 @@ Sample::Sample(NodePath renderDebug) :
 //				| DU_DRAWNAVMESH_CLOSEDLIST
 //				| DU_DRAWNAVMESH_COLOR_TILES
 				),
-		m_tool(0), m_ctx(0), dd(renderDebug)
+		m_tool(0), m_ctx(0), dd(renderDebug, camera)
 {
 	resetCommonSettings();
 	m_navQuery = dtAllocNavMeshQuery();

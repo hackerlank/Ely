@@ -63,7 +63,8 @@ protected:
 	float m_tileSize;
 	
 public:
-	NavMeshType_Obstacle(NodePath renderDebug=NodePath());
+	NavMeshType_Obstacle(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~NavMeshType_Obstacle();
 	
 	virtual void handleRender();

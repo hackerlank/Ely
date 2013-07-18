@@ -125,8 +125,10 @@ private:
 	void doVertex(const LVector3f& vertex, const LVector4f& color,
 			const LVector2f& uv = LVecBase2f::zero());
 public:
-	DebugDrawPanda3d(NodePath render);
+	DebugDrawPanda3d(NodePath render, NodePath);
 	virtual ~DebugDrawPanda3d();
+
+	void reset();
 
 	virtual void depthMask(bool state);
 	virtual void texture(bool state);
@@ -139,7 +141,6 @@ public:
 
 	NodePath getGeomNode(int i);
 	int getGeomNodesNum();
-	void removeGeomNodes();
 
 };
 
@@ -193,65 +194,6 @@ public:
 	virtual ~DebugDrawMeshDrawer();
 
 	void reset();
-
-	virtual void depthMask(bool state);
-	virtual void texture(bool state);
-	virtual void begin(duDebugDrawPrimitives prim, float size = 1.0f);
-	virtual void vertex(const float* pos, unsigned int color);
-	virtual void vertex(const float x, const float y, const float z, unsigned int color);
-	virtual void vertex(const float* pos, unsigned int color, const float* uv);
-	virtual void vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v);
-	virtual void end();
-
-};
-
-/// MeshDrawer debug draw implementation.
-class DebugDrawMeshDrawerTMP : public duDebugDraw
-{
-protected:
-	///The render node path.
-	NodePath m_render;
-	///The camera node path.
-	NodePath m_camera;
-	///Depth Mask.
-	bool m_depthMask;
-	///Texture.
-	bool m_texture;
-	///Inner MeshDrawer.
-	MeshDrawer* m_generator;
-	///Budget.
-	int m_budget;
-	///The current GeomPrimitive and draw type.
-	duDebugDrawPrimitives m_prim;
-	enum {DU_NULL_PRIM=-1};
-	///Size (for points)
-	float m_size;
-	///Line previous store.
-	LVecBase3f m_lineVertex;
-	LVecBase4f m_lineColor;
-	LVecBase2f m_lineUV;
-	int m_lineIdx;
-	///Triangle previous store.
-	LVecBase3f m_triVertex[2];
-	LVecBase4f m_triColor[2];
-	LVecBase2f m_triUV[2];
-	int m_triIdx;
-	///Quad previous store.
-	LVecBase3f m_quadVertex[2];
-	LVecBase4f m_quadColor[2];
-	LVecBase2f m_quadUV[2];
-	int m_quadIdx;
-
-private:
-	///Helper
-	void doVertex(const LVector3f& vertex, const LVector4f& color,
-			const LVector2f& uv = LVecBase2f::zero());
-public:
-	DebugDrawMeshDrawerTMP(NodePath render, NodePath camera, int budget=1000);
-	virtual ~DebugDrawMeshDrawerTMP();
-
-	void startDraw();
-	void stopDraw();
 
 	virtual void depthMask(bool state);
 	virtual void texture(bool state);

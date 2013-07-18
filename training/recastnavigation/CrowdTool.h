@@ -87,7 +87,8 @@ class CrowdToolState : public SampleToolState
 	bool m_run;
 
 public:
-	CrowdToolState();
+	CrowdToolState(NodePath renderDebug=NodePath(),
+			NodePath camera=NodePath());
 	virtual ~CrowdToolState();
 	
 	virtual void init(class Sample* sample);

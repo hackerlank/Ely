@@ -62,6 +62,11 @@ enum SamplePolyFlags
 
 struct SampleTool
 {
+	SampleTool(NodePath renderDebug = NodePath(), NodePath camera =
+			NodePath()) :
+			dd(renderDebug, camera)
+	{
+	}
 	virtual ~SampleTool()
 	{
 	}
@@ -77,10 +82,17 @@ struct SampleTool
 	virtual void handleStep() = 0;
 	virtual void handleUpdate(const float dt) = 0;
 
+	DebugDrawMeshDrawer dd;
+
 };
 
 struct SampleToolState
 {
+	SampleToolState(NodePath renderDebug = NodePath(), NodePath camera =
+			NodePath()) :
+			dd(renderDebug, camera)
+	{
+	}
 	virtual ~SampleToolState()
 	{
 	}
@@ -91,7 +103,7 @@ struct SampleToolState
 			int* view) = 0;
 	virtual void handleUpdate(const float dt) = 0;
 
-	DebugDrawMeshDrawer* ddM;
+	DebugDrawMeshDrawer dd;
 
 };
 
@@ -143,10 +155,11 @@ protected:
 
 	BuildContext* m_ctx;
 
-	DebugDrawPanda3d dd;
+	DebugDrawMeshDrawer dd;
 
 public:
-	Sample(NodePath renderDebug = NodePath());
+	Sample(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~Sample();
 
 	void setContext(BuildContext* ctx)

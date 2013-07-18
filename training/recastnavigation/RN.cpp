@@ -754,7 +754,7 @@ void App::doFinalWork()
 
 #ifdef DEBUG_DRAW
 	SampleToolState* toolState = rn->getSample()->getToolState(TOOL_CROWD);
-	toolState->ddM = ddM;
+	toolState->dd = ddM;
 #endif
 
 #ifdef TESTANOMALIES

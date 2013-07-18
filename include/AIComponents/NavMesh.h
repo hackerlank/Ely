@@ -190,8 +190,8 @@ private:
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;
-	/// Panda3d debug draw implementation.
-	DebugDrawPanda3d* mDebugDraw;
+	/// Recast debug camera.
+	NodePath mDebugCamera;
 #endif
 
 	///TypedObject semantics: hardcoded

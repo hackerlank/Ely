@@ -162,14 +162,20 @@ void NavMesh::onAddToSceneSetup()
 	}
 
 #ifdef ELY_DEBUG
-	//set the recast debug node path, parented to owner object's parent
-	NodePath parent = mOwnerObject->getNodePath().get_parent();
-	if (not parent.is_empty())
+	//set the recast debug node path as child of "render" node path
+	//set the recast debug camera to the first child of "camera" node path
+	SMARTPTR(Object) renderDebug = ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject("render");
+	SMARTPTR(Object) cameraDebug = ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject("camera");
+	if (renderDebug and cameraDebug)
 	{
-		mDebugNodePath = parent.attach_new_node("RecastDebugNodePath");
+		mDebugNodePath = renderDebug->getNodePath().attach_new_node("RecastDebugNodePath");
 		mDebugNodePath.set_bin("fixed", 10);
 		//by default mDebugNodePath is hidden
 		mDebugNodePath.hide();
+		//
+		mDebugCamera = cameraDebug->getNodePath().get_child(0);
 	}
 #endif
 
@@ -185,7 +191,7 @@ void NavMesh::onAddToSceneSetup()
 		{
 		case SOLO:
 #ifdef ELY_DEBUG
-			setupNavMesh(new NavMeshType_Solo(mDebugNodePath), SOLO);
+			setupNavMesh(new NavMeshType_Solo(mDebugNodePath, mDebugCamera), SOLO);
 #else
 			setupNavMesh(new NavMeshType_Solo(), SOLO);
 #endif
@@ -195,7 +201,7 @@ void NavMesh::onAddToSceneSetup()
 		case TILE:
 		{
 #ifdef ELY_DEBUG
-			setupNavMesh(new NavMeshType_Tile(mDebugNodePath), TILE);
+			setupNavMesh(new NavMeshType_Tile(mDebugNodePath, mDebugCamera), TILE);
 #else
 			setupNavMesh(new NavMeshType_Tile(), TILE);
 #endif
@@ -207,8 +213,8 @@ void NavMesh::onAddToSceneSetup()
 			break;
 		case OBSTACLE:
 		{
-	#ifdef DEBUG_DRAW
-			setupNavMesh(new NavMeshType_Obstacle(mDebugNodePath), OBSTACLE);
+	#ifdef ELY_DEBUG
+			setupNavMesh(new NavMeshType_Obstacle(mDebugNodePath, mDebugCamera), OBSTACLE);
 	#else
 			setupNavMesh(new NavMeshType_Obstacle(), OBSTACLE);
 	#endif

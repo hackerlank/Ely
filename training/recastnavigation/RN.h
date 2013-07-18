@@ -340,7 +340,7 @@ struct App
 	SMARTPTR(BulletWorld)mBulletWorld;
 #ifdef DEBUG_DRAW
 	NodePath renderDebug;
-	DebugDrawMeshDrawer *ddM;
+	NodePath cameraDebug;
 #endif
 	NodePath worldMesh;
 	float meshScale;

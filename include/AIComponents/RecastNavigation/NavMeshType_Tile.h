@@ -86,7 +86,8 @@ protected:
 	dtNavMesh* loadAll(const char* path);
 
 public:
-	NavMeshType_Tile(NodePath renderDebug = NodePath());
+	NavMeshType_Tile(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~NavMeshType_Tile();
 
 	virtual void handleRender();

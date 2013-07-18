@@ -265,7 +265,7 @@ void DebugDrawGL::end()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render, NodePath) :
 		m_render(render),
 		m_depthMask(true),
 		m_texture(true),
@@ -441,7 +441,7 @@ int DebugDrawPanda3d::getGeomNodesNum()
 	return m_geomNodeNPCollection.size();
 }
 
-void DebugDrawPanda3d::removeGeomNodes()
+void DebugDrawPanda3d::reset()
 {
 	std::vector<NodePath>::iterator iter;
 	for (iter = m_geomNodeNPCollection.begin();
@@ -595,7 +595,7 @@ void DebugDrawMeshDrawer::vertex(const float* pos, unsigned int color)
 void DebugDrawMeshDrawer::vertex(const float x, const float y, const float z,
 		unsigned int color)
 {
-	doVertex(LVector3f(x, y, z),
+	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f::zero());
 }
@@ -611,152 +611,9 @@ void DebugDrawMeshDrawer::vertex(const float* pos, unsigned int color,
 void DebugDrawMeshDrawer::vertex(const float x, const float y, const float z,
 		unsigned int color, const float u, const float v)
 {
-	doVertex(LVector3f(x, y, z),
+	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(u, v));
-}
-
-////////////////////////////////////////////////////////////////////////////////////////////////////
-
-DebugDrawMeshDrawerTMP::DebugDrawMeshDrawerTMP(NodePath render, NodePath camera,
-		int budget) :
-		m_render(render), m_camera(camera), m_generator(new MeshDrawer())
-{
-	m_generator->set_budget(budget);
-	m_generator->get_root().reparent_to(m_render);
-}
-
-DebugDrawMeshDrawerTMP::~DebugDrawMeshDrawerTMP()
-{
-	delete m_generator;
-}
-
-void DebugDrawMeshDrawerTMP::startDraw()
-{
-	m_generator->begin(m_camera, m_render);
-	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
-}
-
-void DebugDrawMeshDrawerTMP::stopDraw()
-{
-	m_generator->end();
-}
-
-void DebugDrawMeshDrawerTMP::doVertex(const LVector3f& vertex,
-		const LVector4f& color, const LVector2f& uv)
-{
-	switch (m_prim)
-	{
-	case DU_DRAW_POINTS:
-		m_generator->billboard(vertex,
-				LVector4f(uv.get_x(), uv.get_y(), uv.get_x(), uv.get_y()),
-				m_size, color);
-		break;
-	case DU_DRAW_LINES:
-		if ((m_lineIdx % 2) == 1)
-		{
-			m_generator->segment(m_lineVertex[0], vertex,
-					LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), uv.get_x(),
-							uv.get_y()), m_size, color);
-			m_lineIdx = 0;
-		}
-		else
-		{
-			m_lineVertex = vertex;
-			m_lineColor = color;
-			m_lineUV = uv;
-			++m_lineIdx;
-		}
-		break;
-	case DU_DRAW_TRIS:
-		if ((m_triIdx % 3) == 2)
-		{
-			m_generator->tri(m_triVertex[0], m_triColor[0], m_triUV[0],
-					m_triVertex[1], m_triColor[1], m_triUV[1], vertex, color,
-					uv);
-			m_triIdx = 0;
-		}
-		else
-		{
-			m_triVertex[m_triIdx] = vertex;
-			m_triColor[m_triIdx] = color;
-			m_triUV[m_triIdx] = uv;
-			++m_triIdx;
-		}
-		break;
-	case DU_DRAW_QUADS:
-		if ((m_quadIdx % 4) == 3)
-		{
-			m_generator->tri(m_quadVertex[0], m_quadColor[0], m_quadUV[0],
-					m_quadVertex[1], m_quadColor[1], m_quadUV[1],
-					m_quadVertex[2], m_quadColor[2], m_quadUV[2]);
-			m_generator->tri(m_quadVertex[0], m_quadColor[0], LVector2f::zero(),
-					m_quadVertex[2], m_quadColor[2], LVector2f::zero(), vertex,
-					color, uv);
-			m_quadIdx = 0;
-		}
-		else
-		{
-			m_quadVertex[m_quadIdx] = vertex;
-			m_quadColor[m_quadIdx] = color;
-			m_quadUV[m_quadIdx] = uv;
-			++m_quadIdx;
-		}
-		break;
-	};
-}
-
-void DebugDrawMeshDrawerTMP::depthMask(bool state)
-{
-	m_depthMask = state;
-}
-
-void DebugDrawMeshDrawerTMP::texture(bool state)
-{
-	m_texture = state;
-}
-
-void DebugDrawMeshDrawerTMP::begin(duDebugDrawPrimitives prim, float size)
-{
-	m_prim = prim;
-	m_size = size / 100;
-	m_lineIdx = m_triIdx = m_quadIdx = 0;
-}
-
-void DebugDrawMeshDrawerTMP::vertex(const float* pos, unsigned int color)
-{
-	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
-			LVector4f(red(color), green(color), blue(color), alpha(color)),
-			LVector2f::zero());
-}
-
-void DebugDrawMeshDrawerTMP::vertex(const float x, const float y, const float z,
-		unsigned int color)
-{
-	doVertex(LVector3f(x, y, z),
-			LVector4f(red(color), green(color), blue(color), alpha(color)),
-			LVector2f::zero());
-}
-
-void DebugDrawMeshDrawerTMP::vertex(const float* pos, unsigned int color,
-		const float* uv)
-{
-	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
-			LVector4f(red(color), green(color), blue(color), alpha(color)),
-			LVector2f(uv[0], uv[1]));
-}
-
-void DebugDrawMeshDrawerTMP::vertex(const float x, const float y, const float z,
-		unsigned int color, const float u, const float v)
-{
-	doVertex(LVector3f(x, y, z),
-			LVector4f(red(color), green(color), blue(color), alpha(color)),
-			LVector2f(u, v));
-}
-
-void DebugDrawMeshDrawerTMP::end()
-{
-	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////

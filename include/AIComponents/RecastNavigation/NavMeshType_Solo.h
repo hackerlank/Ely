@@ -65,7 +65,8 @@ protected:
 	void cleanup();
 		
 public:
-	NavMeshType_Solo(NodePath renderDebug = NodePath());
+	NavMeshType_Solo(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~NavMeshType_Solo();
 	
 	rcConfig& getConfig()

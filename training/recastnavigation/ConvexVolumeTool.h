@@ -36,11 +36,10 @@ class ConvexVolumeTool : public SampleTool
 	int m_npts;
 	int m_hull[MAX_PTS];
 	int m_nhull;
-	
-	DebugDrawPanda3d dd;
 
 public:
-	ConvexVolumeTool(NodePath renderDebug);
+	ConvexVolumeTool(NodePath renderDebug=NodePath(),
+			NodePath camera=NodePath());
 	~ConvexVolumeTool();
 	
 	virtual int type() { return TOOL_CONVEX_VOLUME; }

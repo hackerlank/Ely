@@ -820,8 +820,8 @@ public:
 
 
 
-Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug) :
-	Sample(renderDebug),
+Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug, NodePath camera) :
+	Sample(renderDebug, camera),
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),

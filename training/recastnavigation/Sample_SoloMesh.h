@@ -64,7 +64,8 @@ protected:
 	void cleanup();
 		
 public:
-	Sample_SoloMesh(NodePath renderDebug = NodePath());
+	Sample_SoloMesh(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath());
 	virtual ~Sample_SoloMesh();
 	
 	rcConfig& getConfig()

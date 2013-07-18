@@ -93,7 +93,9 @@ void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
 namespace ely
 {
 
-CrowdToolState::CrowdToolState() :
+CrowdToolState::CrowdToolState(NodePath renderDebug,
+		NodePath camera) :
+		NavMeshTypeToolState(renderDebug, camera),
 		m_sample(0),
 		m_nav(0),
 		m_crowd(0),
@@ -202,8 +204,8 @@ void CrowdToolState::reset()
 
 void CrowdToolState::handleRender()
 {
-	NodePath render;
-	DebugDrawPanda3d dd(render);
+	//	DebugDrawGL dd;
+	dd.reset();
 
 	const float rad = m_sample->getAgentRadius();
 
@@ -804,8 +806,10 @@ void CrowdToolState::updateTick(const float dt)
 //			getPerfDeltaTimeUsec(startTime, endTime) / 1000.0f);
 }
 
-CrowdTool::CrowdTool() :
-		m_sample(0), m_state(0), m_mode(TOOLMODE_CREATE)
+CrowdTool::CrowdTool(NodePath renderDebug,
+		NodePath camera) :
+	NavMeshTypeTool(renderDebug, camera),
+	m_sample(0), m_state(0), m_mode(TOOLMODE_CREATE)
 {
 }
 

@@ -166,7 +166,7 @@ const char* BuildContext::getLogText(const int i) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render, NodePath) :
 		m_render(render),
 		m_depthMask(true),
 		m_texture(true),
@@ -338,7 +338,7 @@ int DebugDrawPanda3d::getGeomNodesNum()
 	return m_geomNodeNPCollection.size();
 }
 
-void DebugDrawPanda3d::removeGeomNodes()
+void DebugDrawPanda3d::reset()
 {
 	std::vector<NodePath>::iterator iter;
 	for (iter = m_geomNodeNPCollection.begin();
@@ -347,6 +347,170 @@ void DebugDrawPanda3d::removeGeomNodes()
 		(*iter).remove_node();
 	}
 	m_geomNodeNPCollection.clear();
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+DebugDrawMeshDrawer::DebugDrawMeshDrawer(NodePath render, NodePath camera,
+		int budget) :
+		m_render(render), m_camera(camera),
+		m_meshDrawersSize(0), m_budget(budget)
+{
+}
+
+DebugDrawMeshDrawer::~DebugDrawMeshDrawer()
+{
+	for (unsigned int i = 0; i < m_generators.size(); ++i)
+	{
+		delete m_generators[i];
+	}
+}
+
+void DebugDrawMeshDrawer::reset()
+{
+	//reset current MeshDrawer index
+	m_meshDrawerIdx = 0;
+	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
+}
+
+void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
+{
+	//dynamically allocate MeshDrawers if necessary
+	if (m_meshDrawerIdx >= m_meshDrawersSize)
+	{
+		//allocate a new MeshDrawer
+		m_generators.push_back(new MeshDrawer());
+		//common MeshDrawers setup
+		m_generators.back()->set_budget(m_budget);
+		m_generators.back()->set_budget(m_budget);
+		m_generators.back()->get_root().set_transparency(
+				TransparencyAttrib::M_alpha);
+		m_generators.back()->get_root().reparent_to(m_render);
+		//update number of MeshDrawers
+		m_meshDrawersSize = m_generators.size();
+	}
+	//setup current MeshDrawer
+	m_generators[m_meshDrawerIdx]->get_root().set_depth_write(m_depthMask);
+//	m_generator[m_meshDrawerIdx]->get_root().set_render_mode_thickness(size);
+	//begin current MeshDrawer
+	m_generators[m_meshDrawerIdx]->begin(m_camera, m_render);
+	m_prim = prim;
+	m_size = size / 100;
+	m_lineIdx = m_triIdx = m_quadIdx = 0;
+}
+
+void DebugDrawMeshDrawer::end()
+{
+	//end current MeshDrawer
+	m_generators[m_meshDrawerIdx]->end();
+	//increase MeshDrawer index
+	++m_meshDrawerIdx;
+	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
+}
+
+void DebugDrawMeshDrawer::doVertex(const LVector3f& vertex,
+		const LVector4f& color, const LVector2f& uv)
+{
+	switch (m_prim)
+	{
+	case DU_DRAW_POINTS:
+		m_generators[m_meshDrawerIdx]->billboard(vertex,
+				LVector4f(uv.get_x(), uv.get_y(), uv.get_x(), uv.get_y()),
+				m_size, color);
+		break;
+	case DU_DRAW_LINES:
+		if ((m_lineIdx % 2) == 1)
+		{
+			m_generators[m_meshDrawerIdx]->segment(m_lineVertex, vertex,
+					LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), uv.get_x(),
+							uv.get_y()), m_size, color);
+			m_lineIdx = 0;
+		}
+		else
+		{
+			m_lineVertex = vertex;
+			m_lineColor = color;
+			m_lineUV = uv;
+			++m_lineIdx;
+		}
+		break;
+	case DU_DRAW_TRIS:
+		if ((m_triIdx % 3) == 2)
+		{
+			m_generators[m_meshDrawerIdx]->tri(m_triVertex[0], m_triColor[0],
+					m_triUV[0], m_triVertex[1], m_triColor[1], m_triUV[1],
+					vertex, color, uv);
+			m_triIdx = 0;
+		}
+		else
+		{
+			m_triVertex[m_triIdx] = vertex;
+			m_triColor[m_triIdx] = color;
+			m_triUV[m_triIdx] = uv;
+			++m_triIdx;
+		}
+		break;
+	case DU_DRAW_QUADS:
+		if ((m_quadIdx % 4) == 3)
+		{
+			m_generators[m_meshDrawerIdx]->tri(m_quadVertex[0], m_quadColor[0],
+					m_quadUV[0], m_quadVertex[1], m_quadColor[1], m_quadUV[1],
+					m_quadVertex[2], m_quadColor[2], m_quadUV[2]);
+			m_generators[m_meshDrawerIdx]->tri(m_quadVertex[0], m_quadColor[0],
+					LVector2f::zero(), m_quadVertex[2], m_quadColor[2],
+					LVector2f::zero(), vertex, color, uv);
+			m_quadIdx = 0;
+		}
+		else
+		{
+			m_quadVertex[m_quadIdx] = vertex;
+			m_quadColor[m_quadIdx] = color;
+			m_quadUV[m_quadIdx] = uv;
+			++m_quadIdx;
+		}
+		break;
+	};
+}
+
+void DebugDrawMeshDrawer::depthMask(bool state)
+{
+	m_depthMask = state;
+}
+
+void DebugDrawMeshDrawer::texture(bool state)
+{
+	m_texture = state;
+}
+
+void DebugDrawMeshDrawer::vertex(const float* pos, unsigned int color)
+{
+	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f::zero());
+}
+
+void DebugDrawMeshDrawer::vertex(const float x, const float y, const float z,
+		unsigned int color)
+{
+	doVertex(Recast3fToLVecBase3f(x, y, z),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f::zero());
+}
+
+void DebugDrawMeshDrawer::vertex(const float* pos, unsigned int color,
+		const float* uv)
+{
+	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f(uv[0], uv[1]));
+}
+
+void DebugDrawMeshDrawer::vertex(const float x, const float y, const float z,
+		unsigned int color, const float u, const float v)
+{
+	doVertex(Recast3fToLVecBase3f(x, y, z),
+			LVector4f(red(color), green(color), blue(color), alpha(color)),
+			LVector2f(u, v));
 }
 
 }  // namespace ely

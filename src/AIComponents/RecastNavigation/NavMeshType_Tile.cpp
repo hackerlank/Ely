@@ -32,8 +32,8 @@
 namespace ely
 {
 
-NavMeshType_Tile::NavMeshType_Tile(NodePath renderDebug) :
-		NavMeshType(renderDebug),
+NavMeshType_Tile::NavMeshType_Tile(NodePath renderDebug, NodePath camera) :
+		NavMeshType(renderDebug, camera),
 		m_keepInterResults(false),
 		m_buildAll(true),
 		m_totalBuildTimeMs(0),
@@ -212,7 +212,7 @@ void NavMeshType_Tile::handleRender()
 		return;
 
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
+	dd.reset();
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
 
