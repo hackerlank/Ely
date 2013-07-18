@@ -64,7 +64,7 @@ protected:
 	
 public:
 	Sample_TempObstacles(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath());
+			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~Sample_TempObstacles();
 	
 	virtual void handleSettings();

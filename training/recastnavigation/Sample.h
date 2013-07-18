@@ -63,8 +63,8 @@ enum SamplePolyFlags
 struct SampleTool
 {
 	SampleTool(NodePath renderDebug = NodePath(), NodePath camera =
-			NodePath()) :
-			dd(renderDebug, camera)
+			NodePath(), int budget=1000, bool singleMesh=false) :
+			dd(renderDebug, camera, budget, singleMesh)
 	{
 	}
 	virtual ~SampleTool()
@@ -89,8 +89,8 @@ struct SampleTool
 struct SampleToolState
 {
 	SampleToolState(NodePath renderDebug = NodePath(), NodePath camera =
-			NodePath()) :
-			dd(renderDebug, camera)
+			NodePath(), int budget=1000, bool singleMesh=false) :
+			dd(renderDebug, camera, budget, singleMesh)
 	{
 	}
 	virtual ~SampleToolState()
@@ -159,7 +159,7 @@ protected:
 
 public:
 	Sample(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath());
+			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~Sample();
 
 	void setContext(BuildContext* ctx)

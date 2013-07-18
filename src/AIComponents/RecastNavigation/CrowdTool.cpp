@@ -93,9 +93,9 @@ void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
 namespace ely
 {
 
-CrowdToolState::CrowdToolState(NodePath renderDebug,
-		NodePath camera) :
-		NavMeshTypeToolState(renderDebug, camera),
+CrowdToolState::CrowdToolState(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+		NavMeshTypeToolState(renderDebug, camera, budget, singleMesh),
 		m_sample(0),
 		m_nav(0),
 		m_crowd(0),
@@ -806,10 +806,12 @@ void CrowdToolState::updateTick(const float dt)
 //			getPerfDeltaTimeUsec(startTime, endTime) / 1000.0f);
 }
 
-CrowdTool::CrowdTool(NodePath renderDebug,
-		NodePath camera) :
-	NavMeshTypeTool(renderDebug, camera),
-	m_sample(0), m_state(0), m_mode(TOOLMODE_CREATE)
+CrowdTool::CrowdTool(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	NavMeshTypeTool(renderDebug, camera, budget, singleMesh),
+	m_sample(0), m_state(0), m_mode(TOOLMODE_CREATE),
+	m_renderDebug(renderDebug), m_camera(camera),
+	m_budget(budget), m_singleMesh(singleMesh)
 {
 }
 
@@ -830,7 +832,8 @@ void CrowdTool::init(NavMeshType* sample)
 	m_state = (CrowdToolState*) sample->getToolState(type());
 	if (!m_state)
 	{
-		m_state = new CrowdToolState();
+		m_state = new CrowdToolState(m_renderDebug,m_camera,
+				m_budget, m_singleMesh);
 		sample->setToolState(type(), m_state);
 	}
 	m_state->init(sample);

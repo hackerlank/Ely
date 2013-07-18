@@ -73,8 +73,9 @@ inline unsigned int ilog2(unsigned int v)
 }
 
 
-Sample_TileMesh::Sample_TileMesh(NodePath renderDebug, NodePath camera) :
-		Sample(renderDebug, camera),
+Sample_TileMesh::Sample_TileMesh(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+		Sample(renderDebug, camera, budget, singleMesh),
 		m_keepInterResults(false),
 		m_buildAll(true),
 		m_totalBuildTimeMs(0),

@@ -87,7 +87,8 @@ protected:
 
 public:
 	NavMeshType_Tile(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath());
+			NodePath camera = NodePath(),
+			int budget=1000, bool singleMesh=false);
 	virtual ~NavMeshType_Tile();
 
 	virtual void handleRender();
@@ -114,7 +115,10 @@ class NavMeshTileTool: public NavMeshTypeTool
 
 public:
 
-	NavMeshTileTool() :
+	NavMeshTileTool(NodePath renderDebug = NodePath(),
+			NodePath camera = NodePath(),
+			int budget=1000, bool singleMesh=false) :
+			NavMeshTypeTool(renderDebug, camera, budget, singleMesh),
 			m_sample(0), m_hitPosSet(false), m_agentRadius(0)
 	{
 		m_hitPos[0] = m_hitPos[1] = m_hitPos[2] = 0;

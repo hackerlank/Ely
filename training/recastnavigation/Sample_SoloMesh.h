@@ -65,7 +65,7 @@ protected:
 		
 public:
 	Sample_SoloMesh(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath());
+			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~Sample_SoloMesh();
 	
 	rcConfig& getConfig()

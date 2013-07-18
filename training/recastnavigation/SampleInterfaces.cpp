@@ -265,7 +265,7 @@ void DebugDrawGL::end()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render, NodePath) :
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render, NodePath, int, bool) :
 		m_render(render),
 		m_depthMask(true),
 		m_texture(true),
@@ -455,9 +455,9 @@ void DebugDrawPanda3d::reset()
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
 DebugDrawMeshDrawer::DebugDrawMeshDrawer(NodePath render, NodePath camera,
-		int budget) :
-		m_render(render), m_camera(camera),
-		m_meshDrawersSize(0), m_budget(budget)
+		int budget, bool singleMesh) :
+		m_render(render), m_camera(camera),	m_meshDrawersSize(0),
+		m_budget(budget), m_singleMesh(singleMesh)
 {
 }
 
@@ -506,8 +506,11 @@ void DebugDrawMeshDrawer::end()
 {
 	//end current MeshDrawer
 	m_generators[m_meshDrawerIdx]->end();
-	//increase MeshDrawer index
-	++m_meshDrawerIdx;
+	//increase MeshDrawer index only if multiple mesh
+	if (not m_singleMesh)
+	{
+		++m_meshDrawerIdx;
+	}
 	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
 }
 

@@ -32,8 +32,9 @@
 namespace ely
 {
 
-NavMeshType_Tile::NavMeshType_Tile(NodePath renderDebug, NodePath camera) :
-		NavMeshType(renderDebug, camera),
+NavMeshType_Tile::NavMeshType_Tile(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+		NavMeshType(renderDebug, camera, budget, singleMesh),
 		m_keepInterResults(false),
 		m_buildAll(true),
 		m_totalBuildTimeMs(0),

@@ -83,7 +83,7 @@ class CrowdToolState : public NavMeshTypeToolState
 
 public:
 	CrowdToolState(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath());
+			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~CrowdToolState();
 	
 	virtual void init(class NavMeshType* sample);
@@ -125,9 +125,14 @@ class CrowdTool : public NavMeshTypeTool
 	void updateAgentParams();
 	void updateTick(const float dt);
 	
+	NodePath m_renderDebug;
+	NodePath m_camera;
+	int m_budget;
+	bool m_singleMesh;
+
 public:
 	CrowdTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath());
+			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~CrowdTool();
 	
 	CrowdToolState* getState(){return m_state;}

@@ -43,8 +43,9 @@
 #endif
 
 
-Sample_SoloMesh::Sample_SoloMesh(NodePath renderDebug, NodePath camera) :
-	Sample(renderDebug, camera),
+Sample_SoloMesh::Sample_SoloMesh(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	Sample(renderDebug, camera, budget, singleMesh),
 	m_keepInterResults(true),
 	m_totalBuildTimeMs(0),
 	m_triareas(0),

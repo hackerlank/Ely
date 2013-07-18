@@ -35,9 +35,9 @@
 namespace ely
 {
 
-OffMeshConnectionTool::OffMeshConnectionTool(NodePath renderDebug,
-		NodePath camera) :
-	NavMeshTypeTool(renderDebug, camera),
+OffMeshConnectionTool::OffMeshConnectionTool(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	NavMeshTypeTool(renderDebug, camera, budget, singleMesh),
 	m_sample(0),
 	m_hitPosSet(0),
 	m_bidir(true),
@@ -132,7 +132,7 @@ void OffMeshConnectionTool::handleUpdate(const float /*dt*/)
 void OffMeshConnectionTool::handleRender()
 {
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
+	dd.reset();
 	const float s = m_sample->getAgentRadius();
 	
 	if (m_hitPosSet)

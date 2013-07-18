@@ -35,9 +35,9 @@
 #	define snprintf _snprintf
 #endif
 
-OffMeshConnectionTool::OffMeshConnectionTool(NodePath renderDebug,
-		NodePath camera) :
-	SampleTool(renderDebug, camera),
+OffMeshConnectionTool::OffMeshConnectionTool(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	SampleTool(renderDebug, camera, budget, singleMesh),
 	m_sample(0),
 	m_hitPosSet(0),
 	m_bidir(true),
@@ -140,7 +140,7 @@ void OffMeshConnectionTool::handleUpdate(const float /*dt*/)
 void OffMeshConnectionTool::handleRender()
 {
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
+	dd.reset();
 	const float s = m_sample->getAgentRadius();
 	
 	if (m_hitPosSet)

@@ -36,7 +36,7 @@ class OffMeshConnectionTool : public NavMeshTypeTool
 
 public:
 	OffMeshConnectionTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath());
+			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
 	~OffMeshConnectionTool();
 	
 	virtual int type() { return TOOL_OFFMESH_CONNECTION; }

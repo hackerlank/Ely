@@ -125,7 +125,7 @@ private:
 	void doVertex(const LVector3f& vertex, const LVector4f& color,
 			const LVector2f& uv = LVecBase2f::zero());
 public:
-	DebugDrawPanda3d(NodePath render, NodePath);
+	DebugDrawPanda3d(NodePath render, NodePath,	int, bool);
 	virtual ~DebugDrawPanda3d();
 
 	void reset();
@@ -164,6 +164,8 @@ protected:
 	int m_meshDrawersSize;
 	///Budget.
 	int m_budget;
+	///Single mesh flag.
+	bool m_singleMesh;
 	///The current GeomPrimitive and draw type.
 	duDebugDrawPrimitives m_prim;
 	enum {DU_NULL_PRIM=-1};
@@ -190,7 +192,8 @@ private:
 	void doVertex(const LVector3f& vertex, const LVector4f& color,
 			const LVector2f& uv = LVecBase2f::zero());
 public:
-	DebugDrawMeshDrawer(NodePath render, NodePath camera, int budget=1000);
+	DebugDrawMeshDrawer(NodePath render, NodePath camera,
+			int budget=1000, bool singleMesh=false);
 	virtual ~DebugDrawMeshDrawer();
 
 	void reset();

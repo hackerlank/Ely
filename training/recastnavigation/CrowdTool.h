@@ -88,7 +88,7 @@ class CrowdToolState : public SampleToolState
 
 public:
 	CrowdToolState(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath());
+			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~CrowdToolState();
 	
 	virtual void init(class Sample* sample);
@@ -132,7 +132,8 @@ class CrowdTool : public SampleTool
 	void updateTick(const float dt);
 	
 public:
-	CrowdTool();
+	CrowdTool(NodePath renderDebug=NodePath(),
+			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
 	virtual ~CrowdTool();
 	
 	CrowdToolState* getState(){return m_state;}

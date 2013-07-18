@@ -730,8 +730,9 @@ public:
 	virtual void handleRender() {}
 };
 
-NavMeshType_Obstacle::NavMeshType_Obstacle(NodePath renderDebug, NodePath camera) :
-	NavMeshType(renderDebug, camera),
+NavMeshType_Obstacle::NavMeshType_Obstacle(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	NavMeshType(renderDebug, camera, budget, singleMesh),
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),

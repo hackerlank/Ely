@@ -33,8 +33,9 @@
 namespace ely
 {
 
-NavMeshType_Solo::NavMeshType_Solo(NodePath renderDebug, NodePath camera) :
-	NavMeshType(renderDebug, camera),
+NavMeshType_Solo::NavMeshType_Solo(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	NavMeshType(renderDebug, camera, budget, singleMesh),
 	m_keepInterResults(true),
 	m_totalBuildTimeMs(0),
 	m_triareas(0),

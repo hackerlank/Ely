@@ -97,9 +97,9 @@ static void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
 	bmax[2] = p[2] + r;
 }
 
-CrowdToolState::CrowdToolState(NodePath renderDebug,
-		NodePath camera) :
-		SampleToolState(renderDebug, camera),
+CrowdToolState::CrowdToolState(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+		SampleToolState(renderDebug, camera, budget, singleMesh),
 		m_sample(0),
 		m_nav(0),
 		m_crowd(0),
@@ -221,7 +221,7 @@ void CrowdToolState::handleRender()
 	{
 		const dtNavMeshQuery* navquery = crowd->getPathQueue()->getNavQuery();
 		if (navquery)
-			duDebugDrawNavMeshNodes(dd, *navquery);
+			duDebugDrawNavMeshNodes(&dd, *navquery);
 	}
 
 	dd.depthMask(false);
@@ -239,13 +239,13 @@ void CrowdToolState::handleRender()
 			const dtPolyRef* path = ag->corridor.getPath();
 			const int npath = ag->corridor.getPathCount();
 			for (int j = 0; j < npath; ++j)
-				duDebugDrawNavMeshPoly(dd, *nav, path[j],
+				duDebugDrawNavMeshPoly(&dd, *nav, path[j],
 						duRGBA(255, 255, 255, 24));
 		}
 	}
 
 	if (m_targetRef)
-		duDebugDrawCross(dd, m_targetPos[0], m_targetPos[1] + 0.1f,
+		duDebugDrawCross(&dd, m_targetPos[0], m_targetPos[1] + 0.1f,
 				m_targetPos[2], rad, duRGBA(255, 255, 255, 192), 2.0f);
 
 	// Occupancy grid.
@@ -380,9 +380,9 @@ void CrowdToolState::handleRender()
 		if (m_toolParams.m_showCollisionSegments)
 		{
 			const float* center = ag->boundary.getCenter();
-			duDebugDrawCross(dd, center[0], center[1] + radius, center[2],
+			duDebugDrawCross(&dd, center[0], center[1] + radius, center[2],
 					0.2f, duRGBA(192, 0, 128, 255), 2.0f);
-			duDebugDrawCircle(dd, center[0], center[1] + radius, center[2],
+			duDebugDrawCircle(&dd, center[0], center[1] + radius, center[2],
 					ag->params.collisionQueryRange, duRGBA(192, 0, 128, 128),
 					2.0f);
 
@@ -394,7 +394,7 @@ void CrowdToolState::handleRender()
 				if (dtTriArea2D(pos, s, s + 3) < 0.0f)
 					col = duDarkenCol(col);
 
-				duAppendArrow(dd, s[0], s[1] + 0.2f, s[2], s[3], s[4] + 0.2f,
+				duAppendArrow(&dd, s[0], s[1] + 0.2f, s[2], s[3], s[4] + 0.2f,
 						s[5], 0.0f, 0.3f, col);
 			}
 			dd.end();
@@ -402,7 +402,7 @@ void CrowdToolState::handleRender()
 
 		if (m_toolParams.m_showNeis)
 		{
-			duDebugDrawCircle(dd, pos[0], pos[1] + radius, pos[2],
+			duDebugDrawCircle(&dd, pos[0], pos[1] + radius, pos[2],
 					ag->params.collisionQueryRange, duRGBA(0, 192, 128, 128),
 					2.0f);
 
@@ -448,7 +448,7 @@ void CrowdToolState::handleRender()
 		if (m_agentDebug.idx == i)
 			col = duRGBA(255, 0, 0, 128);
 
-		duDebugDrawCircle(dd, pos[0], pos[1], pos[2], radius, col, 2.0f);
+		duDebugDrawCircle(&dd, pos[0], pos[1], pos[2], radius, col, 2.0f);
 	}
 
 	for (int i = 0; i < crowd->getAgentCount(); ++i)
@@ -472,7 +472,7 @@ void CrowdToolState::handleRender()
 		else if (ag->targetState == DT_CROWDAGENT_TARGET_VELOCITY)
 			col = duLerpCol(col, duRGBA(64, 255, 0, 128), 128);
 
-		duDebugDrawCylinder(dd, pos[0] - radius, pos[1] + radius * 0.1f,
+		duDebugDrawCylinder(&dd, pos[0] - radius, pos[1] + radius * 0.1f,
 				pos[2] - radius, pos[0] + radius, pos[1] + height,
 				pos[2] + radius, col);
 	}
@@ -494,7 +494,7 @@ void CrowdToolState::handleRender()
 			const float dy = ag->npos[1] + ag->params.height;
 			const float dz = ag->npos[2];
 
-			duDebugDrawCircle(dd, dx, dy, dz, ag->params.maxSpeed,
+			duDebugDrawCircle(&dd, dx, dy, dz, ag->params.maxSpeed,
 					duRGBA(255, 255, 255, 64), 2.0f);
 
 			dd.begin(DU_DRAW_QUADS);
@@ -541,15 +541,15 @@ void CrowdToolState::handleRender()
 		else if (ag->targetState == DT_CROWDAGENT_TARGET_VELOCITY)
 			col = duLerpCol(col, duRGBA(64, 255, 0, 192), 128);
 
-		duDebugDrawCircle(dd, pos[0], pos[1] + height, pos[2], radius, col,
+		duDebugDrawCircle(&dd, pos[0], pos[1] + height, pos[2], radius, col,
 				2.0f);
 
-		duDebugDrawArrow(dd, pos[0], pos[1] + height, pos[2], pos[0] + dvel[0],
+		duDebugDrawArrow(&dd, pos[0], pos[1] + height, pos[2], pos[0] + dvel[0],
 				pos[1] + height + dvel[1], pos[2] + dvel[2], 0.0f, 0.4f,
 				duRGBA(0, 192, 255, 192),
 				(m_agentDebug.idx == i) ? 2.0f : 1.0f);
 
-		duDebugDrawArrow(dd, pos[0], pos[1] + height, pos[2], pos[0] + vel[0],
+		duDebugDrawArrow(&dd, pos[0], pos[1] + height, pos[2], pos[0] + vel[0],
 				pos[1] + height + vel[1], pos[2] + vel[2], 0.0f, 0.4f,
 				duRGBA(0, 0, 0, 160), 2.0f);
 	}
@@ -911,7 +911,9 @@ void CrowdToolState::updateTick(const float dt)
 			getPerfDeltaTimeUsec(startTime, endTime) / 1000.0f);
 }
 
-CrowdTool::CrowdTool() :
+CrowdTool::CrowdTool(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+		SampleTool(renderDebug, camera, budget, singleMesh),
 		m_sample(0), m_state(0), m_mode(TOOLMODE_CREATE)
 {
 }
@@ -933,7 +935,7 @@ void CrowdTool::init(Sample* sample)
 	m_state = (CrowdToolState*) sample->getToolState(type());
 	if (!m_state)
 	{
-		m_state = new CrowdToolState();
+		m_state = new CrowdToolState(a,b,c,d);
 		sample->setToolState(type(), m_state);
 	}
 	m_state->init(sample);

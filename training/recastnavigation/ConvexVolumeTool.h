@@ -39,7 +39,7 @@ class ConvexVolumeTool : public SampleTool
 
 public:
 	ConvexVolumeTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath());
+			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
 	~ConvexVolumeTool();
 	
 	virtual int type() { return TOOL_CONVEX_VOLUME; }

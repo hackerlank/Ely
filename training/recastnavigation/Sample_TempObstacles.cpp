@@ -820,8 +820,9 @@ public:
 
 
 
-Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug, NodePath camera) :
-	Sample(renderDebug, camera),
+Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug, NodePath camera,
+		int budget, bool singleMesh) :
+	Sample(renderDebug, camera, budget, singleMesh),
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),
