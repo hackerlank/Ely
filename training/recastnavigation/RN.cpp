@@ -541,8 +541,8 @@ void addOffMeshConnection(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getApp()->dd->reset();
-	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->dd));
+	rn->getApp()->ddO->reset();
+	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->ddO));
 #endif
 }
 
@@ -559,8 +559,8 @@ void removeOffMeshConnection(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getApp()->dd->reset();
-	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->dd));
+	rn->getApp()->ddO->reset();
+	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->ddO));
 #endif
 }
 
@@ -626,7 +626,7 @@ void App::continueCallback(const Event* event)
 
 void App::setConvexVolumeTool()
 {
-	std::cout << "Set Convex Volumes" << std::endl;
+	std::cout << "Set Convex Volumes ..." << std::endl;
 	//set convex volume tool
 	rn->setConvexVolumeTool(renderDebug);
 	//set convex volume add/remove callbacks
@@ -642,7 +642,7 @@ void App::setConvexVolumeTool()
 
 void App::setOffMeshConnectionTool()
 {
-	std::cout << "Set Off Mesh Connections" << std::endl;
+	std::cout << "Set Off Mesh Connections ..." << std::endl;
 	//set off mesh connection tool
 	rn->setOffMeshConnectionTool(renderDebug);
 	//set convex volume add/remove callbacks
@@ -656,6 +656,7 @@ void App::setOffMeshConnectionTool()
 
 void App::doFinalWork()
 {
+	std::cout << "... Do Final Work!" << std::endl;
 	//build navigation mesh
 	rn->buildNavMesh();
 

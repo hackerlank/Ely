@@ -353,7 +353,7 @@ struct App
 	NodePath renderDebug;
 	NodePath cameraDebug;
 	/// DebugDrawers.
-	DebugDrawPanda3d* dd;
+	DebugDrawPanda3d* dd, *ddO;
 	DebugDrawMeshDrawer* ddM;
 #endif
 	NodePath worldMesh;
