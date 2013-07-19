@@ -30,6 +30,7 @@
 #include "PerfTimer.h"
 #include <nodePath.h>
 #include <geomVertexWriter.h>
+#include <meshDrawer.h>
 
 namespace ely
 {
@@ -109,7 +110,7 @@ private:
 	void doVertex(const LVector3f& vertex, const LVector4f& color,
 			const LVector2f& uv = LVecBase2f::zero());
 public:
-	DebugDrawPanda3d(NodePath render, NodePath,	int, bool);
+	DebugDrawPanda3d(NodePath render);
 	virtual ~DebugDrawPanda3d();
 
 	void reset();

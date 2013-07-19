@@ -98,9 +98,7 @@ static int pointInPoly(int nvert, const float* verts, const float* p)
 }
 
 
-ConvexVolumeTool::ConvexVolumeTool(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-	SampleTool(renderDebug, camera, budget, singleMesh),
+ConvexVolumeTool::ConvexVolumeTool() :
 	m_sample(0),
 	m_areaType(SAMPLE_POLYAREA_GRASS),
 	m_polyOffset(0.0f),
@@ -246,10 +244,9 @@ void ConvexVolumeTool::handleUpdate(const float /*dt*/)
 {
 }
 
-void ConvexVolumeTool::handleRender()
+void ConvexVolumeTool::handleRender(duDebugDraw& dd)
 {
 //	DebugDrawGL dd;
-	dd.reset();
 	
 	// Find height extents of the shape.
 	float minh = FLT_MAX, maxh = 0;

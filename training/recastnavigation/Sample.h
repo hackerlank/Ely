@@ -62,9 +62,7 @@ enum SamplePolyFlags
 
 struct SampleTool
 {
-	SampleTool(NodePath renderDebug = NodePath(), NodePath camera =
-			NodePath(), int budget=1000, bool singleMesh=false) :
-			dd(renderDebug, camera, budget, singleMesh)
+	SampleTool()
 	{
 	}
 	virtual ~SampleTool()
@@ -75,22 +73,18 @@ struct SampleTool
 	virtual void reset() = 0;
 	virtual void handleMenu() = 0;
 	virtual void handleClick(const float* s, const float* p, bool shift) = 0;
-	virtual void handleRender() = 0;
+	virtual void handleRender(duDebugDraw& dd) = 0;
 	virtual void handleRenderOverlay(double* proj, double* model,
 			int* view) = 0;
 	virtual void handleToggle() = 0;
 	virtual void handleStep() = 0;
 	virtual void handleUpdate(const float dt) = 0;
 
-	DebugDrawMeshDrawer dd;
-
 };
 
 struct SampleToolState
 {
-	SampleToolState(NodePath renderDebug = NodePath(), NodePath camera =
-			NodePath(), int budget=1000, bool singleMesh=false) :
-			dd(renderDebug, camera, budget, singleMesh)
+	SampleToolState()
 	{
 	}
 	virtual ~SampleToolState()
@@ -98,12 +92,10 @@ struct SampleToolState
 	}
 	virtual void init(class Sample* sample) = 0;
 	virtual void reset() = 0;
-	virtual void handleRender() = 0;
+	virtual void handleRender(duDebugDraw& dd) = 0;
 	virtual void handleRenderOverlay(double* proj, double* model,
 			int* view) = 0;
 	virtual void handleUpdate(const float dt) = 0;
-
-	DebugDrawMeshDrawer dd;
 
 };
 
@@ -155,11 +147,8 @@ protected:
 
 	BuildContext* m_ctx;
 
-	DebugDrawMeshDrawer dd;
-
 public:
-	Sample(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
+	Sample();
 	virtual ~Sample();
 
 	void setContext(BuildContext* ctx)
@@ -184,7 +173,7 @@ public:
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
 	virtual void handleStep();
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
@@ -236,7 +225,7 @@ public:
 	void updateToolStates(const float dt);
 	void initToolStates(Sample* sample);
 	void resetToolStates();
-	void renderToolStates();
+	void renderToolStates(duDebugDraw& dd);
 	void renderOverlayToolStates(double* proj, double* model, int* view);
 
 	void resetCommonSettings();

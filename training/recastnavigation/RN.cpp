@@ -283,7 +283,8 @@ AsyncTask::DoneStatus RN::ai_update(GenericAsyncTask* task, void* data)
 	}
 	//
 #ifdef DEBUG_DRAW
-	thisInst->m_currentSample->renderToolStates();
+	thisInst->getApp()->ddM->reset();
+	thisInst->m_currentSample->renderToolStates(*(thisInst->getApp()->ddM));
 #endif
 	//
 	return AsyncTask::DS_again;
@@ -319,7 +320,8 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 	}
 	//
 #ifdef DEBUG_DRAW
-	thisInst->m_currentSample->renderToolStates();
+	thisInst->getApp()->ddM->reset();
+	thisInst->m_currentSample->renderToolStates(*(thisInst->getApp()->ddM));
 #endif
 	//
 	return AsyncTask::DS_again;
@@ -329,14 +331,14 @@ AsyncTask::DoneStatus RN::ai_updateCHARACTER(GenericAsyncTask* task, void* data)
 void RN::setConvexVolumeTool(NodePath renderDebug)
 {
 	//set ConvexVolumeTool
-	m_convexVolumeTool = new ConvexVolumeTool(renderDebug);
+	m_convexVolumeTool = new ConvexVolumeTool();
 	m_currentSample->setTool(m_convexVolumeTool);
 }
 
 void RN::setOffMeshConnectionTool(NodePath renderDebug)
 {
 	//set OffMeshConnectionTool
-	m_offMeshConnectionTool = new OffMeshConnectionTool(renderDebug);
+	m_offMeshConnectionTool = new OffMeshConnectionTool();
 	m_currentSample->setTool(m_offMeshConnectionTool);
 }
 
@@ -503,7 +505,8 @@ void addConvexVolume(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getConvexVolumeTool()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getConvexVolumeTool()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -520,7 +523,8 @@ void removeConvexVolume(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getConvexVolumeTool()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getConvexVolumeTool()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -537,7 +541,8 @@ void addOffMeshConnection(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getOffMeshConnectionTool()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -554,7 +559,8 @@ void removeOffMeshConnection(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getOffMeshConnectionTool()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -691,7 +697,8 @@ void App::doFinalWork()
 	}
 
 #ifdef DEBUG_DRAW
-	rn->getSample()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getSample()->handleRender(*(rn->getApp()->dd));
 #endif
 
 	//set ai update task
@@ -751,11 +758,6 @@ void App::doFinalWork()
 	Raycaster::GetSingletonPtr()->setHitCallback(SET_SWITCH_DOOR_Idx,
 			switchDoor, reinterpret_cast<void*>(rn), SET_SWITCH_DOOR_Key,
 			BitMask32::all_on());
-
-#ifdef DEBUG_DRAW
-	SampleToolState* toolState = rn->getSample()->getToolState(TOOL_CROWD);
-	toolState->dd = ddM;
-#endif
 
 #ifdef TESTANOMALIES
 	AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data);
@@ -825,7 +827,8 @@ void buildTile(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getSample()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getSample()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -842,7 +845,8 @@ void removeTile(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getSample()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getSample()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -874,7 +878,8 @@ void addObstacle(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getSample()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getSample()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -894,7 +899,8 @@ void removeObstacle(Raycaster* raycaster, void* data)
 		sample->getTileCache()->update(0, sample->getNavMesh());
 
 #ifdef DEBUG_DRAW
-		rn->getSample()->handleRender();
+		rn->getApp()->dd->reset();
+		rn->getSample()->handleRender(*(rn->getApp()->dd));
 #endif
 	}
 	//
@@ -1034,7 +1040,8 @@ void switchDoor(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-		rn->getSample()->handleRender();
+	rn->getApp()->dd->reset();
+	rn->getSample()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 

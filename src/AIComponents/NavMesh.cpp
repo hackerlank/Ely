@@ -27,6 +27,7 @@
 #include "AIComponents/RecastNavigation/NavMeshType_Tile.h"
 #include "AIComponents/RecastNavigation/NavMeshType_Obstacle.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
@@ -53,6 +54,11 @@ NavMesh::~NavMesh()
 	HOLDMUTEX(mMutex)
 
 	delete mCtx;
+#ifdef ELY_DEBUG
+	//delete the DebugDrawers
+	delete mDD;
+	delete mDDM;
+#endif
 }
 
 const ComponentFamilyType NavMesh::familyType() const
@@ -177,6 +183,9 @@ void NavMesh::onAddToSceneSetup()
 		//
 		mDebugCamera = cameraDebug->getNodePath().get_child(0);
 	}
+	//create the DebugDrawers
+	mDD = new DebugDrawPanda3d(mDebugNodePath);
+	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
 #endif
 
 	//build navigation mesh if auto build is true
@@ -190,21 +199,13 @@ void NavMesh::onAddToSceneSetup()
 		switch (mNavMeshTypeEnum)
 		{
 		case SOLO:
-#ifdef ELY_DEBUG
-			setupNavMesh(new NavMeshType_Solo(mDebugNodePath, mDebugCamera), SOLO);
-#else
 			setupNavMesh(new NavMeshType_Solo(), SOLO);
-#endif
 			//set navigation mesh settings
 			setNavMeshSettings(mNavMeshSettings);
 			break;
 		case TILE:
 		{
-#ifdef ELY_DEBUG
-			setupNavMesh(new NavMeshType_Tile(mDebugNodePath, mDebugCamera), TILE);
-#else
 			setupNavMesh(new NavMeshType_Tile(), TILE);
-#endif
 			//set navigation mesh settings
 			setNavMeshSettings(mNavMeshSettings);
 			//set navigation mesh tile settings
@@ -213,11 +214,7 @@ void NavMesh::onAddToSceneSetup()
 			break;
 		case OBSTACLE:
 		{
-	#ifdef ELY_DEBUG
-			setupNavMesh(new NavMeshType_Obstacle(mDebugNodePath, mDebugCamera), OBSTACLE);
-	#else
 			setupNavMesh(new NavMeshType_Obstacle(), OBSTACLE);
-	#endif
 			//set navigation mesh settings
 			setNavMeshSettings(mNavMeshSettings);
 			//set navigation mesh tile settings...
@@ -252,7 +249,8 @@ void NavMesh::onAddToSceneSetup()
 		buildNavMesh();
 
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -433,7 +431,8 @@ void NavMesh::buildTile(const LPoint3f& pos)
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::buildTile : " << pos);
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -451,7 +450,8 @@ void NavMesh::removeTile(const LPoint3f& pos)
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::removeTile : " << pos);
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -465,7 +465,8 @@ void NavMesh::buildAllTiles()
 	{
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -479,7 +480,8 @@ void NavMesh::removeAllTiles()
 	{
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -529,7 +531,8 @@ void NavMesh::addObstacle(SMARTPTR(Object) object)
 		<< mComponentId << "'::addObstacle: '" << object->objectId()
 		<< "' at pos: " << pos);
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -560,7 +563,8 @@ void NavMesh::removeObstacle(SMARTPTR(Object) object)
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 		<< mComponentId << "'::removeObstacle: '" << object->objectId() << "'");
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }
@@ -576,7 +580,8 @@ void NavMesh::clearAllObstacles()
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::clearAllObstacles");
 #ifdef ELY_DEBUG
-		mNavMeshType->handleRender();
+		mDD->reset();
+		mNavMeshType->handleRender(*mDD);
 #endif
 	}
 }

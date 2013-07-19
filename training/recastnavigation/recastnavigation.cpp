@@ -172,8 +172,9 @@ int main(int argc, char **argv)
 	//set a debug node path
 	app->renderDebug = app->window->get_render().attach_new_node("renderDebug");
 	app->renderDebug.set_bin("fixed", 10);
+	app->dd = new DebugDrawPanda3d(app->renderDebug);
 	app->ddM = new DebugDrawMeshDrawer(app->renderDebug,
-			app->window->get_camera_group().get_child(0), 50);
+			app->window->get_camera_group().get_child(0));
 #endif
 
 	//create a global ray caster
@@ -187,6 +188,7 @@ int main(int argc, char **argv)
 
 	///RN common
 	app->rn = new RN(app->window->get_render(), app->mBulletWorld);
+	app->rn->setApp(app);
 	//load geometry mesh
 //	app->rn->loadGeomMesh(rnDir, meshNameEgg, app->meshScale, app->worldMesh.get_pos());
 	///TODO: attach a child model below worldMesh
@@ -201,19 +203,11 @@ int main(int argc, char **argv)
 	switch (app->sampleType)
 	{
 	case SOLO:
-#ifdef DEBUG_DRAW
-		app->rn->setupNavMesh(new Sample_SoloMesh(app->renderDebug), SOLO);
-#else
 		app->rn->setupNavMesh(new Sample_SoloMesh(), SOLO);
-#endif
 		break;
 	case TILE:
 	{
-#ifdef DEBUG_DRAW
-		app->rn->setupNavMesh(new Sample_TileMesh(app->renderDebug), TILE);
-#else
 		app->rn->setupNavMesh(new Sample_TileMesh(), TILE);
-#endif
 		//set tile settings
 		app->tileSettings =
 				dynamic_cast<Sample_TileMesh*>(app->rn->getSample())->getTileSettings();
@@ -227,11 +221,7 @@ int main(int argc, char **argv)
 		break;
 	case OBSTACLE:
 	{
-#ifdef DEBUG_DRAW
-		app->rn->setupNavMesh(new Sample_TempObstacles(app->renderDebug), OBSTACLE);
-#else
 		app->rn->setupNavMesh(new Sample_TempObstacles(), OBSTACLE);
-#endif
 		//set tile settings
 		app->tileSettings =
 				dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->getTileSettings();
@@ -278,6 +268,7 @@ int main(int argc, char **argv)
 	//end
 	app->panda->get_task_mgr().remove(app->task);
 #ifdef DEBUG_DRAW
+	delete app->dd;
 	delete app->ddM;
 #endif
 	delete app->rn;

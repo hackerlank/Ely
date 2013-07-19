@@ -82,13 +82,12 @@ class CrowdToolState : public NavMeshTypeToolState
 	bool m_run;
 
 public:
-	CrowdToolState(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
+	CrowdToolState();
 	virtual ~CrowdToolState();
 	
 	virtual void init(class NavMeshType* sample);
 	virtual void reset();
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleUpdate(const float dt);
 
 	inline bool isRunning() const { return m_run; }
@@ -125,14 +124,8 @@ class CrowdTool : public NavMeshTypeTool
 	void updateAgentParams();
 	void updateTick(const float dt);
 	
-	NodePath m_renderDebug;
-	NodePath m_camera;
-	int m_budget;
-	bool m_singleMesh;
-
 public:
-	CrowdTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
+	CrowdTool();
 	virtual ~CrowdTool();
 	
 	CrowdToolState* getState(){return m_state;}
@@ -144,7 +137,7 @@ public:
 	virtual void handleToggle();
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 };
 
 } // namespace ely

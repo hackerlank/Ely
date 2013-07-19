@@ -192,6 +192,9 @@ private:
 	NodePath mDebugNodePath;
 	/// Recast debug camera.
 	NodePath mDebugCamera;
+	/// DebugDrawers.
+	DebugDrawPanda3d* mDD;
+	DebugDrawMeshDrawer* mDDM;
 #endif
 
 	///TypedObject semantics: hardcoded

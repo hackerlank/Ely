@@ -43,9 +43,7 @@
 #endif
 
 
-Sample_SoloMesh::Sample_SoloMesh(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-	Sample(renderDebug, camera, budget, singleMesh),
+Sample_SoloMesh::Sample_SoloMesh() :
 	m_keepInterResults(true),
 	m_totalBuildTimeMs(0),
 	m_triareas(0),
@@ -212,13 +210,12 @@ void Sample_SoloMesh::handleDebugMode()
 //	}
 }
 
-void Sample_SoloMesh::handleRender()
+void Sample_SoloMesh::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
 
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
 
 //	glEnable(GL_FOG);
 //	glDepthMask(GL_TRUE);

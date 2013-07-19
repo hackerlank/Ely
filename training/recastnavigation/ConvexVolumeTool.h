@@ -38,8 +38,7 @@ class ConvexVolumeTool : public SampleTool
 	int m_nhull;
 
 public:
-	ConvexVolumeTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
+	ConvexVolumeTool();
 	~ConvexVolumeTool();
 	
 	virtual int type() { return TOOL_CONVEX_VOLUME; }
@@ -50,7 +49,7 @@ public:
 	virtual void handleToggle();
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 
 	void setAreaType(SamplePolyAreas type);

@@ -39,8 +39,7 @@
 #	define snprintf _snprintf
 #endif
 
-Sample::Sample(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
+Sample::Sample() :
 		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0),
 		m_navMeshDrawFlags(
 				0
@@ -48,7 +47,7 @@ Sample::Sample(NodePath renderDebug, NodePath camera,
 //				| DU_DRAWNAVMESH_CLOSEDLIST
 //				| DU_DRAWNAVMESH_COLOR_TILES
 				),
-		m_tool(0), m_ctx(0), dd(renderDebug, camera, budget, singleMesh)
+		m_tool(0), m_ctx(0)
 {
 	resetCommonSettings();
 	m_navQuery = dtAllocNavMeshQuery();
@@ -93,12 +92,12 @@ void Sample::handleDebugMode()
 {
 }
 
-void Sample::handleRender()
+void Sample::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom)
 		return;
 
-	DebugDrawGL dd;
+//	DebugDrawGL dd;
 
 	// Draw mesh
 	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(),
@@ -256,12 +255,12 @@ void Sample::resetToolStates()
 	}
 }
 
-void Sample::renderToolStates()
+void Sample::renderToolStates(duDebugDraw& dd)
 {
 	for (int i = 0; i < MAX_TOOLS; i++)
 	{
 		if (m_toolStates[i])
-			m_toolStates[i]->handleRender();
+			m_toolStates[i]->handleRender(dd);
 	}
 }
 

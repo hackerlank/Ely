@@ -126,10 +126,14 @@ struct AgentData{
 };
 #endif
 
+class App;
+
 class RN
 {
 	NodePath m_render;
 	SMARTPTR(BulletWorld) m_bulletWorld;
+
+	App* app;
 
 	std::string m_meshName;
 	InputGeom* m_geom;
@@ -175,7 +179,14 @@ public:
 	{
 		return m_bulletWorld;
 	}
-
+	void setApp(App* app)
+	{
+		this->app = app;
+	}
+	App* getApp()
+	{
+		return this->app;
+	}
 	//common
 	bool loadGeomMesh(const std::string& path, const std::string& meshName,
 			float scale=1.0, LVector3f translation=LVecBase3f::zero());
@@ -341,6 +352,9 @@ struct App
 #ifdef DEBUG_DRAW
 	NodePath renderDebug;
 	NodePath cameraDebug;
+	/// DebugDrawers.
+	DebugDrawPanda3d* dd;
+	DebugDrawMeshDrawer* ddM;
 #endif
 	NodePath worldMesh;
 	float meshScale;

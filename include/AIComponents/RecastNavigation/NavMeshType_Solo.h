@@ -65,8 +65,7 @@ protected:
 	void cleanup();
 		
 public:
-	NavMeshType_Solo(NodePath renderDebug = NodePath(),	NodePath camera = NodePath(),
-			int budget=1000, bool singleMesh=false);
+	NavMeshType_Solo();
 	virtual ~NavMeshType_Solo();
 	
 	rcConfig& getConfig()
@@ -74,7 +73,7 @@ public:
 		return m_cfg;
 	}
 
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
 };

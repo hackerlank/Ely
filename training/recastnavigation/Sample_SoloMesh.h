@@ -64,8 +64,7 @@ protected:
 	void cleanup();
 		
 public:
-	Sample_SoloMesh(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
+	Sample_SoloMesh();
 	virtual ~Sample_SoloMesh();
 	
 	rcConfig& getConfig()
@@ -77,7 +76,7 @@ public:
 	virtual void handleTools();
 	virtual void handleDebugMode();
 	
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();

@@ -41,8 +41,7 @@ class ConvexVolumeTool : public NavMeshTypeTool
 	int m_nhull;
 	
 public:
-	ConvexVolumeTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
+	ConvexVolumeTool();
 	~ConvexVolumeTool();
 	
 	virtual int type() { return TOOL_CONVEX_VOLUME; }
@@ -52,7 +51,7 @@ public:
 	virtual void handleStep();
 	virtual void handleToggle();
 	virtual void handleUpdate(const float dt);
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 
 	void setAreaType(NavMeshPolyAreasEnum type);
 	NavMeshPolyAreasEnum getAreaType();

@@ -30,8 +30,7 @@
 namespace ely
 {
 
-NavMeshType::NavMeshType(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
+NavMeshType::NavMeshType() :
 		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0),
 		m_navMeshDrawFlags(
 				0
@@ -39,7 +38,7 @@ NavMeshType::NavMeshType(NodePath renderDebug, NodePath camera,
 //				| DU_DRAWNAVMESH_CLOSEDLIST
 //				| DU_DRAWNAVMESH_COLOR_TILES
 				),
-		m_tool(0), m_ctx(0), dd(renderDebug, camera, budget, singleMesh)
+		m_tool(0), m_ctx(0)
 {
 	resetNavMeshSettings();
 	m_navQuery = dtAllocNavMeshQuery();
@@ -67,7 +66,7 @@ void NavMeshType::setTool(NavMeshTypeTool* tool)
 		m_tool->init(this);
 }
 
-void NavMeshType::handleRender()
+void NavMeshType::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom)
 		return;

@@ -98,14 +98,13 @@ protected:
 	dtNavMesh* loadAll(const char* path);
 
 public:
-	Sample_TileMesh(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
+	Sample_TileMesh();
 	virtual ~Sample_TileMesh();
 
 	virtual void handleSettings();
 	virtual void handleTools();
 	virtual void handleDebugMode();
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();

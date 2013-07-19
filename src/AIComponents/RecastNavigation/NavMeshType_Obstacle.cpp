@@ -30,7 +30,6 @@
 #include "AIComponents/RecastNavigation/fastlz.h"
 #include <Recast.h>
 #include <DetourNavMeshBuilder.h>
-#include <DetourTileCacheBuilder.h>
 #include <DetourDebugDraw.h>
 #include <DetourCommon.h>
 #include <DetourTileCache.h>
@@ -106,14 +105,14 @@ struct FastLZCompressor : public dtTileCacheCompressor
 	{
 		return (int)(bufferSize* 1.05f);
 	}
-	
+
 	virtual dtStatus compress(const unsigned char* buffer, const int bufferSize,
 							  unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize)
 	{
 		*compressedSize = fastlz_compress((const void *const)buffer, bufferSize, compressed);
 		return DT_SUCCESS;
 	}
-	
+
 	virtual dtStatus decompress(const unsigned char* compressed, const int compressedSize,
 								unsigned char* buffer, const int maxBufferSize, int* bufferSize)
 	{
@@ -128,12 +127,12 @@ struct LinearAllocator : public dtTileCacheAlloc
 	int capacity;
 	int top;
 	int high;
-	
+
 	LinearAllocator(const int cap) : buffer(0), capacity(0), top(0), high(0)
 	{
 		resize(cap);
 	}
-	
+
 	virtual ~LinearAllocator()
 	{
 		dtFree(buffer);
@@ -145,13 +144,13 @@ struct LinearAllocator : public dtTileCacheAlloc
 		buffer = (unsigned char*)dtAlloc(cap, DT_ALLOC_PERM);
 		capacity = cap;
 	}
-	
+
 	virtual void reset()
 	{
 		high = dtMax(high, top);
 		top = 0;
 	}
-	
+
 	virtual void* alloc(const int size)
 	{
 		if (!buffer)
@@ -162,7 +161,7 @@ struct LinearAllocator : public dtTileCacheAlloc
 		top += size;
 		return mem;
 	}
-	
+
 	virtual void free(void* /*ptr*/)
 	{
 		// Empty
@@ -185,7 +184,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
 	{
 		m_geom = geom;
 	}
-	
+
 	virtual void process(struct dtNavMeshCreateParams* params,
 						 unsigned char* polyAreas, unsigned short* polyFlags)
 	{
@@ -220,7 +219,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
 			params->offMeshConAreas = m_geom->getOffMeshConnectionAreas();
 			params->offMeshConFlags = m_geom->getOffMeshConnectionFlags();
 			params->offMeshConUserID = m_geom->getOffMeshConnectionId();
-			params->offMeshConCount = m_geom->getOffMeshConnectionCount();	
+			params->offMeshConCount = m_geom->getOffMeshConnectionCount();
 		}
 	}
 };
@@ -679,7 +678,7 @@ public:
 		rcVcopy(m_hitPos,p);
 	}
 
-	virtual void handleRender() {}
+	virtual void handleRender(duDebugDraw& dd) {}
 
 	virtual void handleStep() {}
 
@@ -727,12 +726,10 @@ public:
 	virtual void handleStep() {}
 	virtual void handleToggle() {}
 	virtual void handleUpdate(const float /*dt*/) {}
-	virtual void handleRender() {}
+	virtual void handleRender(duDebugDraw& dd) {}
 };
 
-NavMeshType_Obstacle::NavMeshType_Obstacle(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-	NavMeshType(renderDebug, camera, budget, singleMesh),
+NavMeshType_Obstacle::NavMeshType_Obstacle() :
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),
@@ -761,13 +758,12 @@ NavMeshType_Obstacle::~NavMeshType_Obstacle()
 	dtFreeTileCache(m_tileCache);
 }
 
-void NavMeshType_Obstacle::handleRender()
+void NavMeshType_Obstacle::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
 
 //	DebugDrawGL dd;
-	dd.reset();
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
 //
@@ -837,8 +833,9 @@ void NavMeshType_Obstacle::handleRender()
 //	dd.depthMask(true);
 }
 
-void NavMeshType_Obstacle::renderCachedTile(const int tx, const int ty, const int type)
+void NavMeshType_Obstacle::renderCachedTile(duDebugDraw& dd, const int tx, const int ty, const int type)
 {
+//	DebugDrawGL dd;
 	if (m_tileCache)
 		drawDetail(&dd,m_tileCache,tx,ty,type);
 }

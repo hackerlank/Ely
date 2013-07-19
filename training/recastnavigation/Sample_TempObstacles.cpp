@@ -720,7 +720,7 @@ public:
 
 	virtual void handleUpdate(const float /*dt*/) {}
 	
-	virtual void handleRender()
+	virtual void handleRender(duDebugDraw& dd)
 	{
 //		if (m_hitPosSet)
 //		{
@@ -812,7 +812,7 @@ public:
 	virtual void handleToggle() {}
 	virtual void handleStep() {}
 	virtual void handleUpdate(const float /*dt*/) {}
-	virtual void handleRender() {}
+	virtual void handleRender(duDebugDraw& dd) {}
 	virtual void handleRenderOverlay(double* /*proj*/, double* /*model*/, int* /*view*/) { }
 };
 
@@ -820,9 +820,7 @@ public:
 
 
 
-Sample_TempObstacles::Sample_TempObstacles(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-	Sample(renderDebug, camera, budget, singleMesh),
+Sample_TempObstacles::Sample_TempObstacles() :
 	m_keepInterResults(false),
 	m_tileCache(0),
 	m_cacheBuildTimeMs(0),
@@ -1007,13 +1005,12 @@ void Sample_TempObstacles::handleDebugMode()
 //	}
 }
 
-void Sample_TempObstacles::handleRender()
+void Sample_TempObstacles::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
 
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
 //

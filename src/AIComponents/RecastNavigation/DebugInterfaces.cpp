@@ -166,7 +166,7 @@ const char* BuildContext::getLogText(const int i) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render, NodePath, int, bool) :
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
 		m_render(render),
 		m_depthMask(true),
 		m_texture(true),
@@ -382,7 +382,6 @@ void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 		//allocate a new MeshDrawer
 		m_generators.push_back(new MeshDrawer());
 		//common MeshDrawers setup
-		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->get_root().set_transparency(
 				TransparencyAttrib::M_alpha);

@@ -32,9 +32,7 @@
 namespace ely
 {
 
-NavMeshType_Tile::NavMeshType_Tile(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-		NavMeshType(renderDebug, camera, budget, singleMesh),
+NavMeshType_Tile::NavMeshType_Tile() :
 		m_keepInterResults(false),
 		m_buildAll(true),
 		m_totalBuildTimeMs(0),
@@ -207,13 +205,12 @@ dtNavMesh* NavMeshType_Tile::loadAll(const char* path)
 	return mesh;
 }
 
-void NavMeshType_Tile::handleRender()
+void NavMeshType_Tile::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
 
 //	DebugDrawGL dd;
-	dd.reset();
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
 

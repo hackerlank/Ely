@@ -86,9 +86,7 @@ enum NavMeshPolyFlagsEnum
 
 struct NavMeshTypeTool
 {
-	NavMeshTypeTool(NodePath renderDebug = NodePath(), NodePath camera =
-			NodePath(), int budget=1000, bool singleMesh=false) :
-			dd(renderDebug, camera)
+	NavMeshTypeTool()
 	{
 	}
 	virtual ~NavMeshTypeTool()
@@ -98,20 +96,16 @@ struct NavMeshTypeTool
 	virtual void init(class NavMeshType* sample) = 0;
 	virtual void reset() = 0;
 	virtual void handleClick(const float* s, const float* p, bool shift) = 0;
-	virtual void handleRender() = 0;
+	virtual void handleRender(duDebugDraw& dd) = 0;
 	virtual void handleStep() = 0;
 	virtual void handleToggle() = 0;
 	virtual void handleUpdate(const float dt) = 0;
-
-	DebugDrawMeshDrawer dd;
 
 };
 
 struct NavMeshTypeToolState
 {
-	NavMeshTypeToolState(NodePath renderDebug = NodePath(), NodePath camera =
-			NodePath(), int budget=1000, bool singleMesh=false) :
-			dd(renderDebug, camera)
+	NavMeshTypeToolState()
 	{
 	}
 	virtual ~NavMeshTypeToolState()
@@ -119,10 +113,8 @@ struct NavMeshTypeToolState
 	}
 	virtual void init(class NavMeshType* sample) = 0;
 	virtual void reset() = 0;
-	virtual void handleRender() = 0;
+	virtual void handleRender(duDebugDraw& dd) = 0;
 	virtual void handleUpdate(const float dt) = 0;
-
-	DebugDrawMeshDrawer dd;
 
 };
 
@@ -188,11 +180,8 @@ protected:
 
 	BuildContext* m_ctx;
 
-	DebugDrawPanda3d dd;
-
 public:
-	NavMeshType(NodePath renderDebug = NodePath(), NodePath camera = NodePath(),
-			int budget=1000, bool singleMesh=false);
+	NavMeshType();
 	virtual ~NavMeshType();
 
 	void setContext(BuildContext* ctx)
@@ -212,7 +201,7 @@ public:
 
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
 	virtual void handleUpdate(const float dt);

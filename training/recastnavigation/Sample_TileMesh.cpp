@@ -73,9 +73,7 @@ inline unsigned int ilog2(unsigned int v)
 }
 
 
-Sample_TileMesh::Sample_TileMesh(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-		Sample(renderDebug, camera, budget, singleMesh),
+Sample_TileMesh::Sample_TileMesh() :
 		m_keepInterResults(false),
 		m_buildAll(true),
 		m_totalBuildTimeMs(0),
@@ -436,13 +434,12 @@ void Sample_TileMesh::handleDebugMode()
 //	}
 }
 
-void Sample_TileMesh::handleRender()
+void Sample_TileMesh::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
 
 //	DebugDrawGL dd;
-	dd.removeGeomNodes();
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
 

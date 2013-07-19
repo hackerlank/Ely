@@ -22,6 +22,7 @@
 #include "NavMeshType.h"
 #include "NavMeshType_Tile.h"
 #include <DetourTileCache.h>
+#include <DetourTileCacheBuilder.h>
 
 namespace ely
 {
@@ -63,12 +64,10 @@ protected:
 	float m_tileSize;
 	
 public:
-	NavMeshType_Obstacle(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(),
-			int budget=1000, bool singleMesh=false);
+	NavMeshType_Obstacle();
 	virtual ~NavMeshType_Obstacle();
 	
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
 	virtual void handleUpdate(const float dt);
@@ -79,7 +78,7 @@ public:
 
 	void getTilePos(const float* pos, int& tx, int& ty);
 	
-	void renderCachedTile(const int tx, const int ty, const int type);
+	void renderCachedTile(duDebugDraw& dd, const int tx, const int ty, const int type);
 
 	void addTempObstacle(const float* pos);
 	void removeTempObstacle(const float* sp, const float* sq);

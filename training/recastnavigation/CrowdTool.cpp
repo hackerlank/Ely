@@ -97,9 +97,7 @@ static void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
 	bmax[2] = p[2] + r;
 }
 
-CrowdToolState::CrowdToolState(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-		SampleToolState(renderDebug, camera, budget, singleMesh),
+CrowdToolState::CrowdToolState() :
 		m_sample(0),
 		m_nav(0),
 		m_crowd(0),
@@ -206,10 +204,9 @@ void CrowdToolState::reset()
 {
 }
 
-void CrowdToolState::handleRender()
+void CrowdToolState::handleRender(duDebugDraw& dd)
 {
 //	DebugDrawGL dd;
-	dd.reset();
 	const float rad = m_sample->getAgentRadius();
 
 	dtNavMesh* nav = m_sample->getNavMesh();
@@ -911,9 +908,7 @@ void CrowdToolState::updateTick(const float dt)
 			getPerfDeltaTimeUsec(startTime, endTime) / 1000.0f);
 }
 
-CrowdTool::CrowdTool(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-		SampleTool(renderDebug, camera, budget, singleMesh),
+CrowdTool::CrowdTool() :
 		m_sample(0), m_state(0), m_mode(TOOLMODE_CREATE)
 {
 }
@@ -935,7 +930,7 @@ void CrowdTool::init(Sample* sample)
 	m_state = (CrowdToolState*) sample->getToolState(type());
 	if (!m_state)
 	{
-		m_state = new CrowdToolState(a,b,c,d);
+		m_state = new CrowdToolState();
 		sample->setToolState(type(), m_state);
 	}
 	m_state->init(sample);
@@ -1134,7 +1129,7 @@ void CrowdTool::handleUpdate(const float dt)
 {
 }
 
-void CrowdTool::handleRender()
+void CrowdTool::handleRender(duDebugDraw& dd)
 {
 }
 

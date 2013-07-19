@@ -63,14 +63,13 @@ protected:
 	float m_tileSize;
 	
 public:
-	Sample_TempObstacles(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(), int budget=1000, bool singleMesh=false);
+	Sample_TempObstacles();
 	virtual ~Sample_TempObstacles();
 	
 	virtual void handleSettings();
 	virtual void handleTools();
 	virtual void handleDebugMode();
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();

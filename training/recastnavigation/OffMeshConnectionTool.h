@@ -32,8 +32,7 @@ class OffMeshConnectionTool : public SampleTool
 	unsigned char m_oldFlags;
 
 public:
-	OffMeshConnectionTool(NodePath renderDebug=NodePath(),
-			NodePath camera=NodePath(), int budget=1000, bool singleMesh=false);
+	OffMeshConnectionTool();
 	~OffMeshConnectionTool();
 	
 	virtual int type() { return TOOL_OFFMESH_CONNECTION; }
@@ -44,7 +43,7 @@ public:
 	virtual void handleToggle();
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 };
 

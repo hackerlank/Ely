@@ -86,12 +86,10 @@ protected:
 	dtNavMesh* loadAll(const char* path);
 
 public:
-	NavMeshType_Tile(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(),
-			int budget=1000, bool singleMesh=false);
+	NavMeshType_Tile();
 	virtual ~NavMeshType_Tile();
 
-	virtual void handleRender();
+	virtual void handleRender(duDebugDraw& dd);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
 
@@ -115,10 +113,7 @@ class NavMeshTileTool: public NavMeshTypeTool
 
 public:
 
-	NavMeshTileTool(NodePath renderDebug = NodePath(),
-			NodePath camera = NodePath(),
-			int budget=1000, bool singleMesh=false) :
-			NavMeshTypeTool(renderDebug, camera, budget, singleMesh),
+	NavMeshTileTool() :
 			m_sample(0), m_hitPosSet(false), m_agentRadius(0)
 	{
 		m_hitPos[0] = m_hitPos[1] = m_hitPos[2] = 0;
@@ -164,7 +159,7 @@ public:
 	{
 	}
 
-	virtual void handleRender()
+	virtual void handleRender(duDebugDraw& dd)
 	{
 //		if (m_hitPosSet)
 //		{

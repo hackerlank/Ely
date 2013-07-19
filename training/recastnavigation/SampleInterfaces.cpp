@@ -265,7 +265,7 @@ void DebugDrawGL::end()
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render, NodePath, int, bool) :
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
 		m_render(render),
 		m_depthMask(true),
 		m_texture(true),
@@ -389,23 +389,20 @@ void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
 
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
-		unsigned int color)
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
 {
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
 
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color,
-		const float* uv)
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
 {
 	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(uv[0], uv[1]));
 }
 
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
-		unsigned int color, const float u, const float v)
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
 {
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
@@ -414,14 +411,12 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
 
 void DebugDrawPanda3d::end()
 {
-
 	m_geomPrim->close_primitive();
 	m_geom = new Geom(m_vertexData);
 	m_geom->add_primitive(m_geomPrim);
 	ostringstream idx;
 	idx << m_geomNodeNPCollection.size();
-	m_geomNodeNP = NodePath(
-			new GeomNode("DebugDrawPanda3d_GeomNode_" + idx.str()));
+	m_geomNodeNP = NodePath(new GeomNode("DebugDrawPanda3d_GeomNode_" + idx.str()));
 	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
 	m_geomNodeNP.reparent_to(m_render);
 	m_geomNodeNP.set_depth_write(m_depthMask);
@@ -430,6 +425,7 @@ void DebugDrawPanda3d::end()
 	//add to geom node paths.
 	m_geomNodeNPCollection.push_back(m_geomNodeNP);
 }
+
 
 NodePath DebugDrawPanda3d::getGeomNode(int i)
 {
@@ -456,7 +452,8 @@ void DebugDrawPanda3d::reset()
 
 DebugDrawMeshDrawer::DebugDrawMeshDrawer(NodePath render, NodePath camera,
 		int budget, bool singleMesh) :
-		m_render(render), m_camera(camera),	m_meshDrawersSize(0),
+		m_render(render), m_camera(camera),
+		m_meshDrawersSize(0),
 		m_budget(budget), m_singleMesh(singleMesh)
 {
 }
@@ -484,7 +481,6 @@ void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 		//allocate a new MeshDrawer
 		m_generators.push_back(new MeshDrawer());
 		//common MeshDrawers setup
-		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->get_root().set_transparency(
 				TransparencyAttrib::M_alpha);

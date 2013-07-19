@@ -33,9 +33,7 @@
 namespace ely
 {
 
-NavMeshType_Solo::NavMeshType_Solo(NodePath renderDebug, NodePath camera,
-		int budget, bool singleMesh) :
-	NavMeshType(renderDebug, camera, budget, singleMesh),
+NavMeshType_Solo::NavMeshType_Solo() :
 	m_keepInterResults(true),
 	m_totalBuildTimeMs(0),
 	m_triareas(0),
@@ -72,13 +70,12 @@ void NavMeshType_Solo::cleanup()
 	m_navMesh = 0;
 }
 			
-void NavMeshType_Solo::handleRender()
+void NavMeshType_Solo::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
 
 //	DebugDrawGL dd;
-	dd.reset();
 
 //	glEnable(GL_FOG);
 //	glDepthMask(GL_TRUE);

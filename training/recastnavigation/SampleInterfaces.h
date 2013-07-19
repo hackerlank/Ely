@@ -98,18 +98,18 @@ protected:
 	///Texture.
 	bool m_texture;
 	///The current GeomVertexData.
-	SMARTPTR(GeomVertexData) m_vertexData;
+	PT(GeomVertexData) m_vertexData;
 	///The current vertex index.
 	int m_vertexIdx;
 	///The current GeomVertexWriters.
 	GeomVertexWriter m_vertex, m_color, m_texcoord;
 	///The current GeomPrimitive and draw type.
-	SMARTPTR(GeomPrimitive) m_geomPrim;
+	PT(GeomPrimitive) m_geomPrim;
 	duDebugDrawPrimitives m_prim;
 	///Size (for points)
 	float m_size;
 	///The current Geom.
-	SMARTPTR(Geom) m_geom;
+	PT(Geom) m_geom;
 	///The current GeomNode node path.
 	NodePath m_geomNodeNP;
 	///The GeomNodes' node paths.
@@ -125,7 +125,7 @@ private:
 	void doVertex(const LVector3f& vertex, const LVector4f& color,
 			const LVector2f& uv = LVecBase2f::zero());
 public:
-	DebugDrawPanda3d(NodePath render, NodePath,	int, bool);
+	DebugDrawPanda3d(NodePath render);
 	virtual ~DebugDrawPanda3d();
 
 	void reset();
@@ -193,7 +193,7 @@ private:
 			const LVector2f& uv = LVecBase2f::zero());
 public:
 	DebugDrawMeshDrawer(NodePath render, NodePath camera,
-			int budget=1000, bool singleMesh=false);
+			int budget=50, bool singleMesh=false);
 	virtual ~DebugDrawMeshDrawer();
 
 	void reset();
