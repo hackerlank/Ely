@@ -3,6 +3,8 @@
 #include <cstdio>
 #include <cstdarg>
 #include <cstring>
+#include <cfloat>
+#include <boundingSphere.h>
 #include "SampleInterfaces.h"
 #include "Recast.h"
 #include "RecastDebugDraw.h"
@@ -484,6 +486,8 @@ void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->get_root().set_transparency(
 				TransparencyAttrib::M_alpha);
+		m_generators.back()->get_root().get_child(0).node()->set_bounds(
+				new BoundingSphere(LPoint3f::zero(), FLT_MAX));
 		m_generators.back()->get_root().reparent_to(m_render);
 		//update number of MeshDrawers
 		m_meshDrawersSize = m_generators.size();
@@ -494,7 +498,7 @@ void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 	//begin current MeshDrawer
 	m_generators[m_meshDrawerIdx]->begin(m_camera, m_render);
 	m_prim = prim;
-	m_size = size / 100;
+	m_size = size / 50;
 	m_lineIdx = m_triIdx = m_quadIdx = 0;
 }
 
