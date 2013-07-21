@@ -167,19 +167,25 @@ void Object::sceneSetup()
 	}
 
 	//Position (default: (0,0,0))
-	float posX = strtof(mTmpl->parameter(std::string("pos_x")).c_str(), NULL);
-	float posY = strtof(mTmpl->parameter(std::string("pos_y")).c_str(), NULL);
-	float posZ = strtof(mTmpl->parameter(std::string("pos_z")).c_str(), NULL);
-	mNodePath.set_x(posX);
-	mNodePath.set_y(posY);
-	mNodePath.set_z(posZ);
-	//Orientation (default: (0,0,0))
-	float rotH = strtof(mTmpl->parameter(std::string("rot_h")).c_str(), NULL);
-	float rotP = strtof(mTmpl->parameter(std::string("rot_p")).c_str(), NULL);
-	float rotR = strtof(mTmpl->parameter(std::string("rot_r")).c_str(), NULL);
-	mNodePath.set_h(rotH);
-	mNodePath.set_p(rotP);
-	mNodePath.set_r(rotR);
+	std::vector<std::string> posStr = parseCompoundString(
+			mTmpl->parameter(std::string("pos")), ',');
+	float pos[3];
+	pos[0] = pos[1] = pos[2] = 0.0;
+	for (unsigned int i = 0; (i < 3) and (i < posStr.size()); ++i)
+	{
+		pos[i] = strtof(posStr[i].c_str(), NULL);
+	}
+	mNodePath.set_pos(pos[0], pos[1], pos[2]);
+	//Rotation (default: (0,0,0))
+	std::vector<std::string> rotStr = parseCompoundString(
+			mTmpl->parameter(std::string("rot")), ',');
+	float rot[3];
+	rot[0] = rot[1] = rot[2] = 0.0;
+	for (unsigned int i = 0; (i < 3) and (i < rotStr.size()); ++i)
+	{
+		rot[i] = strtof(rotStr[i].c_str(), NULL);
+	}
+	mNodePath.set_hpr(rot[0], rot[1], rot[2]);
 	//give components a chance to set up
 	ComponentTable::iterator iterComp;
 	for (iterComp = mComponents.begin(); iterComp != mComponents.end();

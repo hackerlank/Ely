@@ -70,9 +70,13 @@ bool InstanceOf::initialize()
 	mInstanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
 	//scaling (default: (1.0,1.0,1.0))
-	mScaleX = strtof(mTmpl->parameter(std::string("scale_x")).c_str(), NULL);
-	mScaleY = strtof(mTmpl->parameter(std::string("scale_y")).c_str(), NULL);
-	mScaleZ = strtof(mTmpl->parameter(std::string("scale_z")).c_str(), NULL);
+	std::vector<std::string> scaleStr = parseCompoundString(
+			mTmpl->parameter(std::string("scale")), ',');
+	mScale[0] = mScale[1] = mScale[2] = 1.0;
+	for (unsigned int i = 0; (i < 3) and (i < scaleStr.size()); ++i)
+	{
+		mScale[i] = strtof(scaleStr[i].c_str(), NULL);
+	}
 	//
 	return result;
 }
@@ -88,9 +92,7 @@ void InstanceOf::onAddToObjectSetup()
 	mNodePath = NodePath(name);
 
 	//set scaling (default: (1.0,1.0,1.0))
-	mNodePath.set_sx((mScaleX != 0.0 ? mScaleX : 1.0));
-	mNodePath.set_sy((mScaleY != 0.0 ? mScaleY : 1.0));
-	mNodePath.set_sz((mScaleZ != 0.0 ? mScaleZ : 1.0));
+	mNodePath.set_scale(mScale[0], mScale[1], mScale[2]);
 
 	//set the node path of the object to the
 	//node path of this instance of

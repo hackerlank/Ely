@@ -47,9 +47,7 @@ class ModelTemplate;
  *
  * XML Param(s):
  * - "from_file"  			|single|"true"
- * - "scale_x"  			|single|"1.0"
- * - "scale_y"  			|single|"1.0"
- * - "scale_z"  			|single|"1.0"
+ * - "scale"  				|single|"1.0,1.0,1.0"
  * - "model_file"  			|single|no default (can have this form: [anim_name1@
  * anim_name2@...@anim_nameN@]model_filename ([] means optional))
  * - "anim_files"  			|multiple|no default (each specified as "anim_name@anim_file")
@@ -111,7 +109,7 @@ private:
 	///Animations.
 	std::list<std::string> mAnimFileList;
 	///Scaling  (default: (1.0,1.0,1.0)).
-	float mScaleX, mScaleY, mScaleZ;
+	float mScale[3];
 	///Type of model procedurally generated.
 	std::string mModelType;
 	///Card parameters.

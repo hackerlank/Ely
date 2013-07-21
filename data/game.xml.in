@@ -163,19 +163,13 @@
 			</Component>
 -->
 			<Param parent=""/>
-			<Param pos_x="-35.0"/>
-			<Param pos_y="-94.0"/>
-			<Param pos_z="96.0"/>
-			<Param rot_p="-28.0"/>
-			<Param rot_h="0.0"/>
+			<Param pos="-35.0,-94.0,96.0"/>
+			<Param rot="0.0,-28.0,0.0"/>
 		</Object>
 		
 		<Object type="Instanceable" id="Smiley1" priority="100">
 			<Component type="Model">
 				<Param model_file="smiley.bam"/>
-				<Param scale_x="0.2"/>
-				<Param scale_y="0.2"/>
-				<Param scale_z="0.2"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="true"/>
@@ -183,9 +177,6 @@
 		<Object type="Instanceable" id="Gorilla1" priority="100">
 			<Component type="Model">
 				<Param model_file="walk@gorillawalking.bam"/>
-				<Param scale_x="0.2"/>
-				<Param scale_y="0.2"/>
-				<Param scale_z="0.2"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="true"/>
@@ -194,12 +185,8 @@
 		<Object type="InstancedActor" id="InstancedSmiley1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
-			<Param pos_x="-22.0"/>
-			<Param pos_y="-26.0"/>
-			<Param pos_z="60.0"/>
-			<Param rot_h="180.0"/>
-			<Param rot_p="0.0"/>
-			<Param rot_r="0.0"/>
+			<Param pos="-22.0,-26.0,60.0"/>
+			<Param rot="180.0,0.0,0.0"/>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
 				<Param body_mass="1.0"/>
@@ -211,9 +198,7 @@
 			</Component> 
 			<Component type="InstanceOf">
 				<Param instance_of="Smiley1"/>
-				<Param scale_x="1.0"/>
-				<Param scale_y="1.0"/>
-				<Param scale_z="1.0"/>
+				<Param scale="1.0,1.0,1.0"/>
 			</Component>
 		</Object>
 		
@@ -221,12 +206,8 @@
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
-			<Param pos_x="-18.0"/>
-			<Param pos_y="-22.0"/>
-			<Param pos_z="60.0"/>
-			<Param rot_h="-90.0"/>
-			<Param rot_p="0.0"/>
-			<Param rot_r="0.0"/>
+			<Param pos="-18.0,-22.0,60.0"/>
+			<Param rot="-90.0,0.0,0.0"/>
 			<Component type="Steering">
 				<Param enabled="false"/>
 				<Param throw_events="true"/>
@@ -244,9 +225,7 @@
 			</Component>
 			<Component type="InstanceOf">
 				<Param instance_of="Gorilla1"/>
-				<Param scale_x="0.6"/>
-				<Param scale_y="0.6"/>
-				<Param scale_z="0.6"/>
+				<Param scale="0.6,0.6,0.6"/>
 			</Component>
 		</Object>
 
@@ -273,9 +252,7 @@
 			<Component type="Model">
 				<Param model_file="panda.bam"/>
 				<Param anim_files="walk@panda-walk.bam"/>
-				<Param scale_x="0.6"/>
-				<Param scale_y="0.6"/>
-				<Param scale_z="0.6"/>
+				<Param scale="0.6,0.6,0.6"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
@@ -290,12 +267,8 @@
 				<Param sound_files="walk-sound@GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>			
-			<Param pos_x="-28.0"/>
-			<Param pos_y="-33.0"/>
-			<Param pos_z="60.0"/>
-			<Param rot_h="180.0"/>
-			<Param rot_p="0.0"/>
-			<Param rot_r="0.0"/>
+			<Param pos="-28.0,-33.0,60.0"/>
+			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 
 		<Object type="HUD" id="hud1">
@@ -304,20 +277,14 @@
 			</Component>
 			<Component type="Model">
 				<Param model_file="lilsmiley.bam"/>
-				<Param scale_x="0.05"/>
-				<Param scale_y="0.05"/>
-				<Param scale_z="0.05"/>
+				<Param scale="0.05,0.05,0.05"/>
 			</Component>
 			<Component type="Sound3d">
 				<Param sound_files="video-sound@GUI_rollover.wav"/>
 			</Component>
 			<Param parent="aspect2d"/>
-			<Param pos_x="0.0"/>
-			<Param pos_y="0.0"/>
-			<Param pos_z="-0.75"/>
-			<Param rot_h="0.0"/>
-			<Param rot_p="0.0"/>
-			<Param rot_r="90.0"/>
+			<Param pos="0.0,0.0,-0.75"/>
+			<Param rot="0.0,0.0,90.0"/>
 		</Object>
 
 		<Object type="Character" id="Player1"  priority="100">
@@ -335,9 +302,7 @@
 			<Component type="Model">
 				<Param model_file="eve.bam"/>
 				<Param anim_files="jump@eve-jump.bam:run@eve-run.bam:walk@eve-walk.bam:offbalance@eve-offbalance.bam"/>
-				<Param scale_x="1.0"/>
-				<Param scale_y="1.0"/>
-				<Param scale_z="1.0"/>
+				<Param scale="1.0,1.0,1.0"/>
 			</Component>
 			<Component type="CharacterController">
 				<Param throw_events="true"/>
@@ -351,21 +316,15 @@
 				<Param sound_files="walk-sound@GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
-			<Param pos_x="-35.0"/>
-			<Param pos_y="-34.0"/>
-			<Param pos_z="52.0"/>
-			<Param rot_h="180.0"/>
-			<Param rot_p="0.0"/>
-			<Param rot_r="0.0"/>
+			<Param pos="-35.0,-34.0,52.0"/>
+			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 		
 		<Object type="StaticNavMesh" id="course2">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="course2.bam"/>
-				<Param scale_x="3.0"/>
-				<Param scale_y="3.0"/>
-				<Param scale_z="3.0"/>
+				<Param scale="3.0,3.0,3.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -377,10 +336,8 @@
 			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot_h="-45.0"/>
-			<Param pos_x="0.0"/>
-			<Param pos_y="0.0"/>
-			<Param pos_z="0.0"/>
+			<Param rot="-45.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
 <!--
@@ -433,16 +390,14 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot_p="-90.0"/>
+			<Param rot="0.0,-90.0,0.0"/>
 		</Object>
 		
 		<Object type="StaticActor" id="beachhouse2">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="beachhouse2.bam"/>
-				<Param scale_x="1.6"/>
-				<Param scale_y="1.6"/>
-				<Param scale_z="1.6"/>
+				<Param scale="1.6,1.6,1.6"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -452,19 +407,15 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot_h="-45.0"/>
-			<Param pos_x="124.6"/>
-			<Param pos_y="169.8"/>
-			<Param pos_z="43.6"/>
+			<Param rot="-45.0,0.0,0.0"/>
+			<Param pos="124.6,169.8,43.6"/>
 		</Object>
 
 		<Object type="StaticActor" id="gazebo">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="gazebo.bam"/>
-				<Param scale_x="1.2"/>
-				<Param scale_y="1.2"/>
-				<Param scale_z="1.2"/>
+				<Param scale="1.2,1.2,1.2"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -474,19 +425,15 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot_h="0.0"/>
-			<Param pos_x="135.0"/>
-			<Param pos_y="124.0"/>
-			<Param pos_z="49.6"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="135.0,124.0,49.6"/>
 		</Object>
 		
 		<Object type="StaticActor" id="cityhall">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="cityhall.bam"/>
-				<Param scale_x="1.6"/>
-				<Param scale_y="1.6"/>
-				<Param scale_z="1.6"/>
+				<Param scale="1.6,1.6,1.6"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -496,19 +443,15 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot_h="105.0"/>
-			<Param pos_x="580.8"/>
-			<Param pos_y="560.0"/>
-			<Param pos_z="-48.6"/>
+			<Param rot="105.0,0.0,0.0"/>
+			<Param pos="580.8,560.0,-48.6"/>
 		</Object>
 
 		<Object type="StaticActor" id="bridge">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="bridge.bam"/>
-				<Param scale_x="0.066"/>
-				<Param scale_y="0.02"/>
-				<Param scale_z="0.02"/>
+				<Param scale="0.066,0.02,0.02"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -518,12 +461,8 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot_h="100.0"/>
-			<Param rot_p="5.0"/>
-			<Param rot_r="3.5"/>
-			<Param pos_x="156.8"/>
-			<Param pos_y="349.4"/>
-			<Param pos_z="27.2"/>
+			<Param rot="100.0,5.0,3.5"/>
+			<Param pos="156.8,349.4,27.2"/>
 		</Object>
 -->
 		

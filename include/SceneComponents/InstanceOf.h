@@ -36,10 +36,8 @@ class InstanceOfTemplate;
  * \brief Component representing an instance of another object.
  *
  * XML Param(s):
- * - "instance_of"  	|single|no default
- * - "scale_x"  		|single|"1.0"
- * - "scale_y"  		|single|"1.0"
- * - "scale_z"  		|single|"1.0"
+ * - "instance_of"  		|single|no default
+ * - "scale"  				|single|"1.0,1.0,1.0"
  */
 class InstanceOf: public Component
 {
@@ -85,7 +83,7 @@ private:
 	///@}
 
 	///Scaling  (default: (1.0,1.0,1.0)).
-	float mScaleX, mScaleY, mScaleZ;
+	float mScale[3];
 
 	///TypedObject semantics: hardcoded
 public:

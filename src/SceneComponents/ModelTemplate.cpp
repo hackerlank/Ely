@@ -80,9 +80,7 @@ void ModelTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("from_file", "true"));
-	mParameterTable.insert(ParameterNameValue("scale_x", "1.0"));
-	mParameterTable.insert(ParameterNameValue("scale_y", "1.0"));
-	mParameterTable.insert(ParameterNameValue("scale_z", "1.0"));
+	mParameterTable.insert(ParameterNameValue("scale", "1.0,1.0,1.0"));
 }
 
 //TypedObject semantics: hardcoded

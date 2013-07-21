@@ -26,6 +26,7 @@
 #include "AIComponents/RecastNavigation/NavMeshType_Solo.h"
 #include "AIComponents/RecastNavigation/NavMeshType_Tile.h"
 #include "AIComponents/RecastNavigation/NavMeshType_Obstacle.h"
+#include "AIComponents/RecastNavigation/ConvexVolumeTool.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
@@ -135,6 +136,8 @@ bool NavMesh::initialize()
 			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL);
 	mNavMeshTileSettings.m_tileSize = (float) strtof(
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
+	//convex volumes
+	mConvexVolumeList = mTmpl->parameterList(std::string("anim_files"));
 	//
 	return result;
 }
@@ -241,8 +244,38 @@ void NavMesh::onAddToSceneSetup()
 			break;
 		}
 
+		//set convex volumes
+		mNavMeshType->setTool(new ConvexVolumeTool());
+		std::list<std::string>::iterator iter;
+		for (iter = mConvexVolumeList.begin(); iter != mConvexVolumeList.end();
+				++iter)
+		{
+			//any "convex_volume" string is a "compound" one, i.e. could have the form:
+			// "x11,y11,z11&x12,y12,z12...&x1P,y1P,z1P@area_type"
+			std::vector<std::string> pointsAreaType = parseCompoundString(*iter,
+					'@');
+			int areaType;
+			if (pointsAreaType.size() < 2)
+			{
+				areaType = NAVMESH_POLYAREA_GROUND;
+			}
+			else
+			{
+				areaType = (
+						not pointsAreaType[1].empty() ?
+								strtol(pointsAreaType[1].c_str(), NULL, 0) :
+								NAVMESH_POLYAREA_GROUND);
+			}
+			//iterate over points
+			std::vector<std::string> points = parseCompoundString(
+					pointsAreaType[0], '&');
+			std::vector<std::string>::const_iterator iterP;
+			//an empty convex volume is ignored
+			///TODO
+
+		}
+		mNavMeshType->setTool(NULL);
 		///TODO
-		//set convex volume tool
 		//set off mesh connection tool
 
 		//build navigation mesh effectively

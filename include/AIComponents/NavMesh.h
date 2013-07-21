@@ -68,6 +68,8 @@ class NavMeshTemplate;
  * - "max_tiles"					|single|"128"
  * - "max_polys_per_tile"			|single|"32768"
  * - "tile_size"					|single|"32"
+ * - "convex_volume"				|multiple|no default (each specified as
+ * 	"x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type")
  */
 class NavMesh: public Component
 {
@@ -171,6 +173,8 @@ private:
 	NavMeshSettings mNavMeshSettings;
 	/// NavMeshTileSettings from template.
 	NavMeshTileSettings mNavMeshTileSettings;
+	///Convex volumes.
+	std::list<std::string> mConvexVolumeList;
 	///@{
 	/// Auto build: true (default) if navigation mesh
 	/// is to be built when owner object is added to scene,

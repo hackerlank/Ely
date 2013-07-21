@@ -140,12 +140,8 @@ void ObjectTemplate::setParametersDefaults()
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("is_steady", "false"));
 	mParameterTable.insert(ParameterNameValue("store_params", "false"));
-	mParameterTable.insert(ParameterNameValue("pos_x", "0.0"));
-	mParameterTable.insert(ParameterNameValue("pos_y", "0.0"));
-	mParameterTable.insert(ParameterNameValue("pos_z", "0.0"));
-	mParameterTable.insert(ParameterNameValue("rot_h", "0.0"));
-	mParameterTable.insert(ParameterNameValue("rot_p", "0.0"));
-	mParameterTable.insert(ParameterNameValue("rot_r", "0.0"));
+	mParameterTable.insert(ParameterNameValue("pos", "0.0,0.0,0.0"));
+	mParameterTable.insert(ParameterNameValue("rot", "0.0,0.0,0.0"));
 }
 
 std::string ObjectTemplate::parameter(const std::string& paramName)
