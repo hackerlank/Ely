@@ -334,7 +334,7 @@ void Sample_SoloMesh::handleRender(duDebugDraw& dd)
 //		glDepthMask(GL_TRUE);
 //	}
 
-	m_geom->drawConvexVolumes(&dd);
+//	m_geom->drawConvexVolumes(&dd);
 
 //	if (m_tool)
 //		m_tool->handleRender();

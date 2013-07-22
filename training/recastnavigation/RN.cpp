@@ -507,6 +507,7 @@ void addConvexVolume(Raycaster* raycaster, void* data)
 #ifdef DEBUG_DRAW
 	rn->getApp()->dd->reset();
 	rn->getConvexVolumeTool()->handleRender(*(rn->getApp()->dd));
+	//not yet Off Mesh Connections
 #endif
 }
 
@@ -525,6 +526,7 @@ void removeConvexVolume(Raycaster* raycaster, void* data)
 #ifdef DEBUG_DRAW
 	rn->getApp()->dd->reset();
 	rn->getConvexVolumeTool()->handleRender(*(rn->getApp()->dd));
+	//not yet Off Mesh Connections
 #endif
 }
 
@@ -541,8 +543,9 @@ void addOffMeshConnection(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getApp()->ddO->reset();
-	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->ddO));
+	rn->getApp()->dd->reset();
+	rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -559,8 +562,9 @@ void removeOffMeshConnection(Raycaster* raycaster, void* data)
 			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
 			<< std::endl;
 #ifdef DEBUG_DRAW
-	rn->getApp()->ddO->reset();
-	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->ddO));
+	rn->getApp()->dd->reset();
+	rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+	rn->getOffMeshConnectionTool()->handleRender(*(rn->getApp()->dd));
 #endif
 }
 
@@ -700,6 +704,8 @@ void App::doFinalWork()
 #ifdef DEBUG_DRAW
 	rn->getApp()->dd->reset();
 	rn->getSample()->handleRender(*(rn->getApp()->dd));
+	rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+	rn->getSample()->getInputGeom()->drawOffMeshConnections(rn->getApp()->dd, true);
 #endif
 
 	//set ai update task
@@ -830,6 +836,8 @@ void buildTile(Raycaster* raycaster, void* data)
 #ifdef DEBUG_DRAW
 	rn->getApp()->dd->reset();
 	rn->getSample()->handleRender(*(rn->getApp()->dd));
+	rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+	rn->getSample()->getInputGeom()->drawOffMeshConnections(rn->getApp()->dd, true);
 #endif
 }
 
@@ -848,6 +856,8 @@ void removeTile(Raycaster* raycaster, void* data)
 #ifdef DEBUG_DRAW
 	rn->getApp()->dd->reset();
 	rn->getSample()->handleRender(*(rn->getApp()->dd));
+	rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+	rn->getSample()->getInputGeom()->drawOffMeshConnections(rn->getApp()->dd, true);
 #endif
 }
 
@@ -881,6 +891,8 @@ void addObstacle(Raycaster* raycaster, void* data)
 #ifdef DEBUG_DRAW
 	rn->getApp()->dd->reset();
 	rn->getSample()->handleRender(*(rn->getApp()->dd));
+	rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+	rn->getSample()->getInputGeom()->drawOffMeshConnections(rn->getApp()->dd, true);
 #endif
 }
 
@@ -902,6 +914,8 @@ void removeObstacle(Raycaster* raycaster, void* data)
 #ifdef DEBUG_DRAW
 		rn->getApp()->dd->reset();
 		rn->getSample()->handleRender(*(rn->getApp()->dd));
+		rn->getSample()->getInputGeom()->drawConvexVolumes(rn->getApp()->dd);
+		rn->getSample()->getInputGeom()->drawOffMeshConnections(rn->getApp()->dd, true);
 #endif
 	}
 	//

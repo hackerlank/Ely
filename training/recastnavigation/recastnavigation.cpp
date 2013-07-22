@@ -173,7 +173,6 @@ int main(int argc, char **argv)
 	app->renderDebug = app->window->get_render().attach_new_node("renderDebug");
 	app->renderDebug.set_bin("fixed", 10);
 	app->dd = new DebugDrawPanda3d(app->renderDebug);
-	app->ddO = new DebugDrawPanda3d(app->renderDebug);
 	app->ddM = new DebugDrawMeshDrawer(app->renderDebug,
 			app->window->get_camera_group().get_child(0), 100);
 #endif
@@ -270,7 +269,6 @@ int main(int argc, char **argv)
 	app->panda->get_task_mgr().remove(app->task);
 #ifdef DEBUG_DRAW
 	delete app->ddM;
-	delete app->ddO;
 	delete app->dd;
 #endif
 	delete app->rn;
