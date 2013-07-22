@@ -191,6 +191,9 @@ void NavMesh::onAddToSceneSetup()
 	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
 #endif
 
+	//set mOwnerObject's parent node path as reference
+	mReferenceNP = mOwnerObject->getNodePath().get_parent();
+
 	//build navigation mesh if auto build is true
 	if (mAutoBuild)
 	{
@@ -274,7 +277,7 @@ void NavMesh::onAddToSceneSetup()
 					std::vector<std::string> points = parseCompoundString(
 							pointsAreaType[0], '&');
 					std::vector<std::string>::const_iterator iterP;
-					float hitPos[3];
+					float recastPos[3];
 					for (iterP = points.begin(); iterP != points.end(); ++iterP)
 					{
 						std::vector<std::string> posStr = parseCompoundString(
@@ -286,13 +289,17 @@ void NavMesh::onAddToSceneSetup()
 						{
 							pos[i] = strtof(posStr[i].c_str(), NULL);
 						}
+						//pos is wrt ownerObject node path
+						LPoint3f refPos = mReferenceNP.get_relative_point(
+								mOwnerObject->getNodePath(),
+								LPoint3f(pos[0], pos[1], pos[2]));
 						//insert convex volume point
-						LVecBase3fToRecast(LVecBase3f(pos[0], pos[1], pos[2]),
-								hitPos);
-						cvTool->handleClick(NULL, hitPos, false);
+						LVecBase3fToRecast(LPoint3f(refPos[0], refPos[1], refPos[2]),
+								recastPos);
+						cvTool->handleClick(NULL, recastPos, false);
 					}
 					//re-insert the last point (to close convex volume)
-					cvTool->handleClick(NULL, hitPos, false);
+					cvTool->handleClick(NULL, recastPos, false);
 				}
 			}
 		}
@@ -306,6 +313,8 @@ void NavMesh::onAddToSceneSetup()
 #ifdef ELY_DEBUG
 		mDD->reset();
 		mNavMeshType->handleRender(*mDD);
+		mNavMeshType->getInputGeom()->drawConvexVolumes(mDD);
+		mNavMeshType->getInputGeom()->drawOffMeshConnections(mDD, true);
 #endif
 	}
 }
@@ -649,8 +658,6 @@ bool NavMesh::loadModelMesh(NodePath model)
 	bool result = true;
 	mGeom = new InputGeom;
 	mMeshName = model.get_name();
-	//get model's parent node path as reference
-	mReferenceNP = model.get_parent();
 	//
 	if (not mGeom->loadMesh(mCtx, NULL, model, mReferenceNP))
 	{

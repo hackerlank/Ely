@@ -823,7 +823,7 @@ void NavMeshType_Obstacle::handleRender(duDebugDraw& dd)
 //	glDepthMask(GL_TRUE);
 	dd.depthMask(true);
 
-	m_geom->drawConvexVolumes(&dd);
+//	m_geom->drawConvexVolumes(&dd);
 //
 //	if (m_tool)
 //		m_tool->handleRender();

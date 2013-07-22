@@ -46,6 +46,8 @@ class NavMeshTemplate;
  *
  * This component should be used only in association to stationary
  * (i.e. is_steady=true) Model components.
+ * \note convex volumes and off mesh connections points are are given wrt
+ * the scaled owner object node path.
  *
  * XML Param(s):
  * - "navmesh_type"					|single|"solo" (solo|tile|obstacle)
@@ -162,7 +164,7 @@ private:
 	BuildContext* mCtx;
 	/// The mesh name.
 	std::string mMeshName;
-	/// The reference node path;
+	/// The reference node path.
 	NodePath mReferenceNP;
 	///@{
 	/// Current mesh type.
