@@ -53,7 +53,7 @@ public:
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender(duDebugDraw& dd);
 
-	void setAreaType(NavMeshPolyAreasEnum type);
+	void setAreaType(int type);
 	NavMeshPolyAreasEnum getAreaType();
 };
 

@@ -211,27 +211,31 @@ void Component::setupEvents()
 			std::vector<std::string> typeEventPairs = parseCompoundString(*iter,
 					':');
 			std::vector<std::string>::const_iterator iterPair;
-			for (iterPair = typeEventPairs.begin();
-					iterPair != typeEventPairs.end(); ++iterPair)
+			for (iterPair = typeEventPairs.begin(); iterPair != typeEventPairs.end();
+					++iterPair)
 			{
 				//an empty eventType@event pair is ignored
 				if (not iterPair->empty())
 				{
 					//get event type and event
-					std::vector<std::string> typeEventPair =
-							parseCompoundString(*iterPair, '@');
-					//ignore a not existent event type (== typeEventPair[0])
-					//or a not existent event (== typeEventPair[1])
-					if (mOwnerObject->objectTmpl()->isComponentParameter(
-							"event_types", typeEventPair[0], componentType())
-							and (not typeEventPair[1].empty()))
+					std::vector<std::string> typeEventPair = parseCompoundString(
+							*iterPair, '@');
+					//check only if there is a pair
+					if(typeEventPair.size() >= 2)
 					{
-						//insert event keyed by eventType;
-						mEventTable[typeEventPair[0]] = typeEventPair[1];
-						//insert eventType keyed by event;
-						mEventTypeTable[typeEventPair[1]] = typeEventPair[0];
-						//insert the NULL callback keyed by eventType;
-						mCallbackTable[typeEventPair[0]] = NULL;
+						//ignore a not existent event type (== typeEventPair[0])
+						//or a not existent event (== typeEventPair[1])
+						if (mOwnerObject->objectTmpl()->isComponentParameter(
+								"event_types", typeEventPair[0], componentType())
+								and (not typeEventPair[1].empty()))
+						{
+							//insert event keyed by eventType;
+							mEventTable[typeEventPair[0]] = typeEventPair[1];
+							//insert eventType keyed by event;
+							mEventTypeTable[typeEventPair[1]] = typeEventPair[0];
+							//insert the NULL callback keyed by eventType;
+							mCallbackTable[typeEventPair[0]] = NULL;
+						}
 					}
 				}
 			}

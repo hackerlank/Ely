@@ -254,41 +254,45 @@ void Model::onAddToObjectSetup()
 						//get anim name and anim file name
 						std::vector<std::string> nameFilePair =
 								parseCompoundString(*iterPair, '@');
-						//anim name == nameFilePair[0]
-						//anim file name == nameFilePair[1]
-						//get the AnimBundle node path
-						NodePath animNP = mTmpl->windowFramework()->load_model(
-								mNodePath, Filename(nameFilePair[1]));
-						if (animNP.is_empty())
+						//check only if there is a pair
+						if (nameFilePair.size() == 2)
 						{
-							animNP = NodePath();
-						}
-						//find all the bundles into animNP.node
-						r_find_bundles(animNP.node(), anims, parts);
-						for (animsIter = anims.begin();
-								animsIter != anims.end(); ++animsIter)
-						{
-							int j;
-							for (j = 0, animBundlesIter =
-									animsIter->second.begin();
-									animBundlesIter != animsIter->second.end();
-									++animBundlesIter, ++j)
+							//anim name == nameFilePair[0]
+							//anim file name == nameFilePair[1]
+							//get the AnimBundle node path
+							NodePath animNP = mTmpl->windowFramework()->load_model(
+									mNodePath, Filename(nameFilePair[1]));
+							if (animNP.is_empty())
 							{
-								if (j > 0)
+								animNP = NodePath();
+							}
+							//find all the bundles into animNP.node
+							r_find_bundles(animNP.node(), anims, parts);
+							for (animsIter = anims.begin();
+									animsIter != anims.end(); ++animsIter)
+							{
+								int j;
+								for (j = 0, animBundlesIter =
+										animsIter->second.begin();
+										animBundlesIter != animsIter->second.end();
+										++animBundlesIter, ++j)
 								{
-									animName = nameFilePair[0] + '.'
-											+ format_string(j);
+									if (j > 0)
+									{
+										animName = nameFilePair[0] + '.'
+												+ format_string(j);
+									}
+									else
+									{
+										animName = nameFilePair[0];
+									}
+									PRINT(
+											"\tBinding animation '" << (*animBundlesIter)->get_name() <<
+											"' (from '" << nameFilePair[1] << "') with name '" << animName << "'");
+									SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
+											PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
+									mAnimations.store_anim(control, animName);
 								}
-								else
-								{
-									animName = nameFilePair[0];
-								}
-								PRINT(
-										"\tBinding animation '" << (*animBundlesIter)->get_name() <<
-										"' (from '" << nameFilePair[1] << "') with name '" << animName << "'");
-								SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
-										PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
-								mAnimations.store_anim(control, animName);
 							}
 						}
 					}

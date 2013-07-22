@@ -333,6 +333,7 @@
 				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Component type="NavMesh">
+				<Param convex_volume="-38.2325,13.2763,40.7907&-25.4596,12.5736,40.7907&-24.2097,19.1708,40.7907&-36.2453,20.203,40.7907@3"/>
 			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>

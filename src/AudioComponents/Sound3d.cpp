@@ -110,15 +110,19 @@ void Sound3d::onAddToObjectSetup()
 				//get sound name and sound file name
 				std::vector<std::string> nameFilePair =
 						parseCompoundString(*iterPair, '@');
-				//sound name == nameFilePair[0]
-				//sound file name == nameFilePair[1]
-				SMARTPTR(AudioSound)sound =
-				GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
-						nameFilePair[1], true).p();
-				if (not sound.is_null())
+				//check only if there is a pair
+				if (nameFilePair.size() == 2)
 				{
-					//an empty ("") sound name is allowed
-					mSounds[nameFilePair[0]] = sound.p();
+					//sound name == nameFilePair[0]
+					//sound file name == nameFilePair[1]
+					SMARTPTR(AudioSound)sound =
+					GameAudioManager::GetSingletonPtr()->audioMgr()->get_sound(
+							nameFilePair[1], true).p();
+					if (not sound.is_null())
+					{
+						//an empty ("") sound name is allowed
+						mSounds[nameFilePair[0]] = sound.p();
+					}
 				}
 			}
 		}

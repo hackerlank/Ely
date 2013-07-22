@@ -253,9 +253,9 @@ void ConvexVolumeTool::handleRender(duDebugDraw& dd)
 	m_sample->getInputGeom()->drawConvexVolumes(&dd);
 }
 
-void ConvexVolumeTool::setAreaType(NavMeshPolyAreasEnum type)
+void ConvexVolumeTool::setAreaType(int type)
 {
-	m_areaType = (int) type;
+	m_areaType = type;
 }
 
 NavMeshPolyAreasEnum ConvexVolumeTool::getAreaType()

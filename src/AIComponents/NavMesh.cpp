@@ -137,7 +137,7 @@ bool NavMesh::initialize()
 	mNavMeshTileSettings.m_tileSize = (float) strtof(
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
 	//convex volumes
-	mConvexVolumeList = mTmpl->parameterList(std::string("anim_files"));
+	mConvexVolumeList = mTmpl->parameterList(std::string("convex_volume"));
 	//
 	return result;
 }
@@ -231,8 +231,11 @@ void NavMesh::onAddToSceneSetup()
 			const int th = (gh + ts - 1) / ts;
 			//	Max tiles and max polys affect how the tile IDs are calculated.
 			// 	There are 22 bits available for identifying a tile and a polygon.
-			int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
-			if (tileBits > 14) tileBits = 14;
+			int tileBits = rcMin((int) ilog2(nextPow2(tw * th)), 14);
+			if (tileBits > 14)
+			{
+				tileBits = 14;
+			}
 			int polyBits = 22 - tileBits;
 			mNavMeshTileSettings.m_maxTiles = 1 << tileBits;
 			mNavMeshTileSettings.m_maxPolysPerTile = 1 << polyBits;
@@ -245,34 +248,53 @@ void NavMesh::onAddToSceneSetup()
 		}
 
 		//set convex volumes
-		mNavMeshType->setTool(new ConvexVolumeTool());
+		ConvexVolumeTool* cvTool = new ConvexVolumeTool();
+		mNavMeshType->setTool(cvTool);
 		std::list<std::string>::iterator iter;
 		for (iter = mConvexVolumeList.begin(); iter != mConvexVolumeList.end();
 				++iter)
 		{
 			//any "convex_volume" string is a "compound" one, i.e. could have the form:
-			// "x11,y11,z11&x12,y12,z12...&x1P,y1P,z1P@area_type"
+			// "x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type"
 			std::vector<std::string> pointsAreaType = parseCompoundString(*iter,
 					'@');
-			int areaType;
-			if (pointsAreaType.size() < 2)
+			//check only if there is a pair
+			if (pointsAreaType.size() == 2)
 			{
-				areaType = NAVMESH_POLYAREA_GROUND;
-			}
-			else
-			{
-				areaType = (
+				int areaType = (
 						not pointsAreaType[1].empty() ?
 								strtol(pointsAreaType[1].c_str(), NULL, 0) :
 								NAVMESH_POLYAREA_GROUND);
+				//set area type
+				cvTool->setAreaType(areaType);
+				//an empty convex volume is ignored
+				if (not pointsAreaType[0].empty())
+				{
+					//iterate over points
+					std::vector<std::string> points = parseCompoundString(
+							pointsAreaType[0], '&');
+					std::vector<std::string>::const_iterator iterP;
+					float hitPos[3];
+					for (iterP = points.begin(); iterP != points.end(); ++iterP)
+					{
+						std::vector<std::string> posStr = parseCompoundString(
+								*iterP, ',');
+						float pos[3];
+						pos[0] = pos[1] = pos[2] = 0.0;
+						for (unsigned int i = 0;
+								(i < 3) and (i < posStr.size()); ++i)
+						{
+							pos[i] = strtof(posStr[i].c_str(), NULL);
+						}
+						//insert convex volume point
+						LVecBase3fToRecast(LVecBase3f(pos[0], pos[1], pos[2]),
+								hitPos);
+						cvTool->handleClick(NULL, hitPos, false);
+					}
+					//re-insert the last point (to close convex volume)
+					cvTool->handleClick(NULL, hitPos, false);
+				}
 			}
-			//iterate over points
-			std::vector<std::string> points = parseCompoundString(
-					pointsAreaType[0], '&');
-			std::vector<std::string>::const_iterator iterP;
-			//an empty convex volume is ignored
-			///TODO
-
 		}
 		mNavMeshType->setTool(NULL);
 		///TODO
@@ -419,15 +441,15 @@ NavMeshTileSettings NavMesh::getNavMeshTileSettings()
 	HOLDMUTEX(mMutex)
 
 	NavMeshTileSettings settings;
-	if(mNavMeshTypeEnum == TILE)
+	if (mNavMeshTypeEnum == TILE)
 	{
-		settings = dynamic_cast<NavMeshType_Tile*>(mNavMeshType)
-				->getTileSettings();
+		settings =
+				dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->getTileSettings();
 	}
 	else if (mNavMeshTypeEnum == OBSTACLE)
 	{
-		settings = dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)
-						->getTileSettings();
+		settings =
+				dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileSettings();
 	}
 	return settings;
 }
@@ -439,15 +461,15 @@ void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 
 	float recastPos[3];
 	LVecBase3fToRecast(pos, recastPos);
-	if(mNavMeshTypeEnum == TILE)
+	if (mNavMeshTypeEnum == TILE)
 	{
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)
-				->getTilePos(recastPos, tx, ty);
+		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->getTilePos(recastPos, tx,
+				ty);
 	}
 	else if (mNavMeshTypeEnum == OBSTACLE)
 	{
-		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)
-				->getTilePos(recastPos, tx, ty);
+		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTilePos(recastPos,
+				tx, ty);
 	}
 }
 
@@ -531,13 +553,13 @@ dtTileCache* NavMesh::getTileCache()
 	return NULL;
 }
 
-void NavMesh::addObstacle(SMARTPTR(Object) object)
+void NavMesh::addObstacle(SMARTPTR(Object)object)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	if ((mNavMeshTypeEnum == OBSTACLE) and
-			(not mReferenceNP.is_empty()) and object)
+	(not mReferenceNP.is_empty()) and object)
 	{
 		//get obstacle dimensions
 		NodePath objectNP = object->getNodePath();
@@ -554,7 +576,7 @@ void NavMesh::addObstacle(SMARTPTR(Object) object)
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
 		dtTileCache* tileCache =
-				dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
 		tileCache->addObstacle(recastPos, radius, heigth, &obstacleRef);
 		//update tile cache
 		tileCache->update(0, mNavMeshType->getNavMesh());
@@ -570,13 +592,13 @@ void NavMesh::addObstacle(SMARTPTR(Object) object)
 	}
 }
 
-void NavMesh::removeObstacle(SMARTPTR(Object) object)
+void NavMesh::removeObstacle(SMARTPTR(Object)object)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	if ((mNavMeshTypeEnum == OBSTACLE) and
-			(not mReferenceNP.is_empty()) and object)
+	(not mReferenceNP.is_empty()) and object)
 	{
 		//get obstacle ref
 		dtObstacleRef obstacleRef = mObstacles[object];
@@ -587,7 +609,7 @@ void NavMesh::removeObstacle(SMARTPTR(Object) object)
 		}
 		//remove recast obstacle
 		dtTileCache* tileCache =
-				dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
 		tileCache->removeObstacle(obstacleRef);
 		//update tile cache
 		tileCache->update(0, mNavMeshType->getNavMesh());
