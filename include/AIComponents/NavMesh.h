@@ -72,6 +72,8 @@ class NavMeshTemplate;
  * - "tile_size"					|single|"32"
  * - "convex_volume"				|multiple|no default (each specified as
  * 	"x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type")
+ * - "offmesh_connection"			|multiple|no default (each specified as
+ * 	"xB,yB,zB&xE,yE,zE@bidirectional")
  */
 class NavMesh: public Component
 {
@@ -177,6 +179,8 @@ private:
 	NavMeshTileSettings mNavMeshTileSettings;
 	///Convex volumes.
 	std::list<std::string> mConvexVolumeList;
+	///Off mesh connections.
+	std::list<std::string> mOffMeshConnectionList;
 	///@{
 	/// Auto build: true (default) if navigation mesh
 	/// is to be built when owner object is added to scene,

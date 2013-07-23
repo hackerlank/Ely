@@ -17,15 +17,8 @@
 //
 
 #define _USE_MATH_DEFINES
-//#include <math.h>
-//#include <stdio.h>
-//#include <string.h>
 #include <float.h>
 #include "AIComponents/RecastNavigation/OffMeshConnectionTool.h"
-//#include "InputGeom.h"
-//#include "Sample.h"
-//#include "Recast.h"
-//#include "RecastDebugDraw.h"
 #include <DetourDebugDraw.h>
 
 #ifdef WIN32

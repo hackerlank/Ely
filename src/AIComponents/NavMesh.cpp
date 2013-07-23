@@ -27,6 +27,7 @@
 #include "AIComponents/RecastNavigation/NavMeshType_Tile.h"
 #include "AIComponents/RecastNavigation/NavMeshType_Obstacle.h"
 #include "AIComponents/RecastNavigation/ConvexVolumeTool.h"
+#include "AIComponents/RecastNavigation/OffMeshConnectionTool.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
@@ -138,6 +139,8 @@ bool NavMesh::initialize()
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
 	//convex volumes
 	mConvexVolumeList = mTmpl->parameterList(std::string("convex_volume"));
+	//off mesh connections
+	mOffMeshConnectionList = mTmpl->parameterList(std::string("offmesh_connection"));
 	//
 	return result;
 }
@@ -304,9 +307,59 @@ void NavMesh::onAddToSceneSetup()
 			}
 		}
 		mNavMeshType->setTool(NULL);
-		///TODO
-		//set off mesh connection tool
-
+		//set off mesh connections
+		OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
+		mNavMeshType->setTool(omcTool);
+		for (iter = mOffMeshConnectionList.begin(); iter != mOffMeshConnectionList.end();
+				++iter)
+		{
+			//any "offmesh_connection" string is a "compound" one, i.e. has the form:
+			// "xB,yB,zB&xE,yE,zE@bidirectional", with bidirectional=true by default.
+			std::vector<std::string> pointsBidir = parseCompoundString(*iter,
+					'@');
+			//check only if there is a pair
+			if (pointsBidir.size() == 2)
+			{
+				bool bidir = (
+						std::string(pointsBidir[1]) == "false" ? false : true);
+				//an empty convex volume is ignored
+				if (not pointsBidir[0].empty())
+				{
+					//iterate over the first 2 points
+					std::vector<std::string> points = parseCompoundString(
+							pointsBidir[0], '&');
+					std::vector<std::string>::const_iterator iterP;
+					//check only if there is at least 2 points
+					if (points.size() == 2)
+					{
+						int i;
+						for (i = 0, iterP = points.begin(); i < 2;
+								++i, ++iterP)
+						{
+							std::vector<std::string> posStr =
+									parseCompoundString(*iterP, ',');
+							float pos[3], recastPos[3];
+							pos[0] = pos[1] = pos[2] = 0.0;
+							for (unsigned int i = 0;
+									(i < 3) and (i < posStr.size()); ++i)
+							{
+								pos[i] = strtof(posStr[i].c_str(), NULL);
+							}
+							//pos is wrt ownerObject node path
+							LPoint3f refPos = mReferenceNP.get_relative_point(
+									mOwnerObject->getNodePath(),
+									LPoint3f(pos[0], pos[1], pos[2]));
+							//insert off mesh connection point
+							LVecBase3fToRecast(
+									LPoint3f(refPos[0], refPos[1], refPos[2]),
+									recastPos);
+							omcTool->handleClick(NULL, recastPos, false);
+						}
+					}
+				}
+			}
+		}
+		mNavMeshType->setTool(NULL);
 		//build navigation mesh effectively
 		buildNavMesh();
 

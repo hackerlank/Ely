@@ -13,8 +13,9 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
 <!--
+			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
+-->
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -24,7 +25,6 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
--->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -127,6 +127,7 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
+<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
@@ -141,7 +142,7 @@
 				<Param abs_lookat_height="4.0"/>
 				<Param friction="5.0"/>
 			</Component>
-<!--
+-->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param linear_speed="10.0"/>
@@ -161,7 +162,6 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
 				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
--->
 			<Param parent=""/>
 			<Param pos="-35.0,-94.0,96.0"/>
 			<Param rot="0.0,-28.0,0.0"/>
@@ -336,6 +336,8 @@
 				<Param convex_volume="-34.7263,-16.0939,40.7907&
 									  -27.0797,-10.7713,40.7907&
 									  -32.7395,-8.40045,40.7907@3"/>
+				<Param offmesh_connection="-33.7841,-4.48785,40.7907&
+									  -52.0533,-29.1533,6.01279@false"/>
 			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>
