@@ -84,6 +84,9 @@ enum NavMeshPolyFlagsEnum
 	NAVMESH_POLYFLAGS_ALL = 0xffff	// All abilities.
 };
 
+///Table giving for each area the corresponding (or'ed) flags.
+typedef std::map<int,int> NavMeshPolyFlagsFromAreas;
+
 struct NavMeshTypeTool
 {
 	NavMeshTypeTool()
@@ -180,6 +183,8 @@ protected:
 
 	BuildContext* m_ctx;
 
+	NavMeshPolyFlagsFromAreas m_flagsAreaTable;
+
 public:
 	NavMeshType();
 	virtual ~NavMeshType();
@@ -236,6 +241,7 @@ public:
 	}
 	void setNavMeshSettings(const NavMeshSettings& settings);
 	NavMeshSettings getNavMeshSettings();
+	void resetNavMeshSettings();
 
 	virtual const float* getBoundsMin();
 	virtual const float* getBoundsMax();
@@ -251,7 +257,11 @@ public:
 
 	void updateToolStates(const float dt);
 
-	void resetNavMeshSettings();
+	void setFlagsAreaTable(const NavMeshPolyFlagsFromAreas& flagsAreaTable)
+	{
+		m_flagsAreaTable = flagsAreaTable;
+	}
+
 };
 
 } // namespace ely

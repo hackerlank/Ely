@@ -172,6 +172,8 @@ struct MeshProcess : public dtTileCacheMeshProcess
 {
 	InputGeom* m_geom;
 
+	NavMeshPolyFlagsFromAreas* m_flagsAreaTable;
+
 	inline MeshProcess() : m_geom(0)
 	{
 	}
@@ -194,19 +196,29 @@ struct MeshProcess : public dtTileCacheMeshProcess
 			if (polyAreas[i] == DT_TILECACHE_WALKABLE_AREA)
 				polyAreas[i] = NAVMESH_POLYAREA_GROUND;
 
-			if (polyAreas[i] == NAVMESH_POLYAREA_GROUND ||
-				polyAreas[i] == NAVMESH_POLYAREA_GRASS ||
-				polyAreas[i] == NAVMESH_POLYAREA_ROAD)
+			//set polyFlags for polyAreas only if m_flagsAreaTable not empty
+			if (not (*m_flagsAreaTable).empty())
 			{
-				polyFlags[i] = NAVMESH_POLYFLAGS_WALK;
+				// get flags from a table indexed by areas
+				polyFlags[i] = (*m_flagsAreaTable)[polyAreas[i]];
 			}
-			else if (polyAreas[i] == NAVMESH_POLYAREA_WATER)
+			else
 			{
-				polyFlags[i] = NAVMESH_POLYFLAGS_SWIM;
-			}
-			else if (polyAreas[i] == NAVMESH_POLYAREA_DOOR)
-			{
-				polyFlags[i] = NAVMESH_POLYFLAGS_WALK | NAVMESH_POLYFLAGS_DOOR;
+				if (polyAreas[i] == NAVMESH_POLYAREA_GROUND
+						|| polyAreas[i] == NAVMESH_POLYAREA_GRASS
+						|| polyAreas[i] == NAVMESH_POLYAREA_ROAD)
+				{
+					polyFlags[i] = NAVMESH_POLYFLAGS_WALK;
+				}
+				else if (polyAreas[i] == NAVMESH_POLYAREA_WATER)
+				{
+					polyFlags[i] = NAVMESH_POLYFLAGS_SWIM;
+				}
+				else if (polyAreas[i] == NAVMESH_POLYAREA_DOOR)
+				{
+					polyFlags[i] = NAVMESH_POLYFLAGS_WALK
+							| NAVMESH_POLYFLAGS_DOOR;
+				}
 			}
 		}
 
@@ -747,6 +759,7 @@ NavMeshType_Obstacle::NavMeshType_Obstacle() :
 	m_talloc = new LinearAllocator(32000);
 	m_tcomp = new FastLZCompressor;
 	m_tmproc = new MeshProcess;
+	m_tmproc->m_flagsAreaTable = &m_flagsAreaTable;
 	
 	setTool(new TempObstacleCreateTool);
 }

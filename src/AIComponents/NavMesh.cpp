@@ -137,6 +137,8 @@ bool NavMesh::initialize()
 			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL);
 	mNavMeshTileSettings.m_tileSize = (float) strtof(
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
+	//area-flags settings
+	mAreaFlagsList = mTmpl->parameterList(std::string("area_flags"));
 	//convex volumes
 	mConvexVolumeList = mTmpl->parameterList(std::string("convex_volume"));
 	//off mesh connections
@@ -253,16 +255,54 @@ void NavMesh::onAddToSceneSetup()
 			break;
 		}
 
+		std::list<std::string>::iterator iterStr;
+		//area flags settings
+		NavMeshPolyFlagsFromAreas polyFlagsFromAreas;
+		for (iterStr = mAreaFlagsList.begin(); iterStr != mAreaFlagsList.end();
+				++iterStr)
+		{
+			//any "area_flags" string is a "compound" one, i.e. could have the form:
+			// "area@flag1|flag2...|flagN"
+			std::vector<std::string> areaFlags = parseCompoundString(*iterStr,
+					'@');
+			//check only if there is a pair
+			if (areaFlags.size() == 2)
+			{
+				//default area: NAVMESH_POLYAREA_GROUND (== 0)
+				int area = (
+						not areaFlags[0].empty() ?
+								strtol(areaFlags[0].c_str(), NULL, 0) :
+								NAVMESH_POLYAREA_GROUND);
+				//iterate over flags
+				std::vector<std::string> flags = parseCompoundString(
+						areaFlags[1], '|');
+				std::vector<std::string>::const_iterator iterF;
+				//default flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
+				int oredFlags = 0x01;
+				for (iterF = flags.begin(); iterF != flags.end(); ++iterF)
+				{
+					int flag = (
+							not (*iterF).empty() ?
+									strtol((*iterF).c_str(), NULL, 0) :
+									NAVMESH_POLYAREA_GROUND);
+					//or flag
+					oredFlags = oredFlags | flag;
+				}
+				//add area with corresponding ored flags
+				polyFlagsFromAreas[area] = oredFlags;
+			}
+		}
+		//set NavMeshType::m_flagsAreaTable
+		mNavMeshType->setFlagsAreaTable(polyFlagsFromAreas);
 		//set convex volumes
 		ConvexVolumeTool* cvTool = new ConvexVolumeTool();
 		mNavMeshType->setTool(cvTool);
-		std::list<std::string>::iterator iter;
-		for (iter = mConvexVolumeList.begin(); iter != mConvexVolumeList.end();
-				++iter)
+		for (iterStr = mConvexVolumeList.begin(); iterStr != mConvexVolumeList.end();
+				++iterStr)
 		{
 			//any "convex_volume" string is a "compound" one, i.e. could have the form:
 			// "x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type"
-			std::vector<std::string> pointsAreaType = parseCompoundString(*iter,
+			std::vector<std::string> pointsAreaType = parseCompoundString(*iterStr,
 					'@');
 			//check only if there is a pair
 			if (pointsAreaType.size() == 2)
@@ -310,12 +350,12 @@ void NavMesh::onAddToSceneSetup()
 		//set off mesh connections
 		OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
 		mNavMeshType->setTool(omcTool);
-		for (iter = mOffMeshConnectionList.begin(); iter != mOffMeshConnectionList.end();
-				++iter)
+		for (iterStr = mOffMeshConnectionList.begin(); iterStr != mOffMeshConnectionList.end();
+				++iterStr)
 		{
 			//any "offmesh_connection" string is a "compound" one, i.e. has the form:
 			// "xB,yB,zB&xE,yE,zE@bidirectional", with bidirectional=true by default.
-			std::vector<std::string> pointsBidir = parseCompoundString(*iter,
+			std::vector<std::string> pointsBidir = parseCompoundString(*iterStr,
 					'@');
 			//check only if there is a pair
 			if (pointsBidir.size() == 2)

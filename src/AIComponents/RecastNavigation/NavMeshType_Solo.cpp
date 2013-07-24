@@ -469,23 +469,32 @@ bool NavMeshType_Solo::handleBuild()
 		{
 			if (m_pmesh->areas[i] == RC_WALKABLE_AREA)
 				m_pmesh->areas[i] = NAVMESH_POLYAREA_GROUND;
-				
-			if (m_pmesh->areas[i] == NAVMESH_POLYAREA_GROUND ||
-				m_pmesh->areas[i] == NAVMESH_POLYAREA_GRASS ||
-				m_pmesh->areas[i] == NAVMESH_POLYAREA_ROAD)
+
+			//set polyFlags for polyAreas only if m_flagsAreaTable not empty
+			if (not m_flagsAreaTable.empty())
 			{
-				m_pmesh->flags[i] = NAVMESH_POLYFLAGS_WALK;
+				// get flags from a table indexed by areas
+				m_pmesh->flags[i] = m_flagsAreaTable[m_pmesh->areas[i]];
 			}
-			else if (m_pmesh->areas[i] == NAVMESH_POLYAREA_WATER)
+			else
 			{
-				m_pmesh->flags[i] = NAVMESH_POLYFLAGS_SWIM;
-			}
-			else if (m_pmesh->areas[i] == NAVMESH_POLYAREA_DOOR)
-			{
-				m_pmesh->flags[i] = NAVMESH_POLYFLAGS_WALK | NAVMESH_POLYFLAGS_DOOR;
+				if (m_pmesh->areas[i] == NAVMESH_POLYAREA_GROUND
+						|| m_pmesh->areas[i] == NAVMESH_POLYAREA_GRASS
+						|| m_pmesh->areas[i] == NAVMESH_POLYAREA_ROAD)
+				{
+					m_pmesh->flags[i] = NAVMESH_POLYFLAGS_WALK;
+				}
+				else if (m_pmesh->areas[i] == NAVMESH_POLYAREA_WATER)
+				{
+					m_pmesh->flags[i] = NAVMESH_POLYFLAGS_SWIM;
+				}
+				else if (m_pmesh->areas[i] == NAVMESH_POLYAREA_DOOR)
+				{
+					m_pmesh->flags[i] = NAVMESH_POLYFLAGS_WALK
+							| NAVMESH_POLYFLAGS_DOOR;
+				}
 			}
 		}
-
 
 		dtNavMeshCreateParams params;
 		memset(&params, 0, sizeof(params));
