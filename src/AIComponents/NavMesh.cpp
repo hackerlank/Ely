@@ -256,7 +256,7 @@ void NavMesh::onAddToSceneSetup()
 		}
 
 		std::list<std::string>::iterator iterStr;
-		//area flags settings
+		//area types with ability flags settings
 		NavMeshPolyFlagsFromAreas polyFlagsFromAreas;
 		for (iterStr = mAreaFlagsList.begin(); iterStr != mAreaFlagsList.end();
 				++iterStr)
@@ -278,7 +278,7 @@ void NavMesh::onAddToSceneSetup()
 						areaFlags[1], '|');
 				std::vector<std::string>::const_iterator iterF;
 				//default flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
-				int oredFlags = 0x01;
+				int oredFlags = (flags.size() == 0 ? 0x01 : 0x0);
 				for (iterF = flags.begin(); iterF != flags.end(); ++iterF)
 				{
 					int flag = (
