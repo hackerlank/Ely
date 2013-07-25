@@ -293,10 +293,10 @@ void NavMesh::onAddToSceneSetup()
 			}
 		}
 		//set NavMeshType::m_flagsAreaTable
-		mNavMeshType->setFlagsAreaTable(polyFlagsFromAreas);
+		setFlagsAreaTable(polyFlagsFromAreas);
 		//set convex volumes
 		ConvexVolumeTool* cvTool = new ConvexVolumeTool();
-		mNavMeshType->setTool(cvTool);
+		setTool(cvTool);
 		for (iterStr = mConvexVolumeList.begin(); iterStr != mConvexVolumeList.end();
 				++iterStr)
 		{
@@ -312,7 +312,7 @@ void NavMesh::onAddToSceneSetup()
 								strtol(pointsAreaType[1].c_str(), NULL, 0) :
 								NAVMESH_POLYAREA_GROUND);
 				//set area type
-				cvTool->setAreaType(areaType);
+				dynamic_cast<ConvexVolumeTool*>(getTool())->setAreaType(areaType);
 				//an empty convex volume is ignored
 				if (not pointsAreaType[0].empty())
 				{
@@ -339,17 +339,17 @@ void NavMesh::onAddToSceneSetup()
 						//insert convex volume point
 						LVecBase3fToRecast(LPoint3f(refPos[0], refPos[1], refPos[2]),
 								recastPos);
-						cvTool->handleClick(NULL, recastPos, false);
+						getTool()->handleClick(NULL, recastPos, false);
 					}
 					//re-insert the last point (to close convex volume)
-					cvTool->handleClick(NULL, recastPos, false);
+					getTool()->handleClick(NULL, recastPos, false);
 				}
 			}
 		}
-		mNavMeshType->setTool(NULL);
+		setTool(NULL);
 		//set off mesh connections
 		OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
-		mNavMeshType->setTool(omcTool);
+		setTool(omcTool);
 		for (iterStr = mOffMeshConnectionList.begin(); iterStr != mOffMeshConnectionList.end();
 				++iterStr)
 		{
@@ -393,13 +393,13 @@ void NavMesh::onAddToSceneSetup()
 							LVecBase3fToRecast(
 									LPoint3f(refPos[0], refPos[1], refPos[2]),
 									recastPos);
-							omcTool->handleClick(NULL, recastPos, false);
+							getTool()->handleClick(NULL, recastPos, false);
 						}
 					}
 				}
 			}
 		}
-		mNavMeshType->setTool(NULL);
+		setTool(NULL);
 		//build navigation mesh effectively
 		buildNavMesh();
 
@@ -518,6 +518,30 @@ NavMeshSettings NavMesh::getNavMeshSettings()
 	HOLDMUTEX(mMutex)
 
 	return mNavMeshType->getNavMeshSettings();
+}
+
+void NavMesh::setTool(NavMeshTypeTool* tool)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshType->setTool(tool);
+}
+
+NavMeshTypeTool* NavMesh::getTool()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getTool();
+}
+
+void NavMesh::setFlagsAreaTable(const NavMeshPolyFlagsFromAreas& flagsAreaTable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshType->setFlagsAreaTable(flagsAreaTable);
 }
 
 void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)

@@ -195,6 +195,7 @@ public:
 	}
 
 	void setTool(NavMeshTypeTool* tool);
+	NavMeshTypeTool* getTool();
 	NavMeshTypeToolState* getToolState(int type)
 	{
 		return m_toolStates[type];

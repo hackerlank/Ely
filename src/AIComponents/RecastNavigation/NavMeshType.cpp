@@ -66,6 +66,11 @@ void NavMeshType::setTool(NavMeshTypeTool* tool)
 		m_tool->init(this);
 }
 
+NavMeshTypeTool* NavMeshType::getTool()
+{
+	return m_tool;
+}
+
 void NavMeshType::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom)

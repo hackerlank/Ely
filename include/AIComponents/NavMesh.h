@@ -109,6 +109,9 @@ public:
 	LVecBase3f getBoundsMax();
 	NavMeshSettings getNavMeshSettings();
 	void setNavMeshSettings(const NavMeshSettings& settings);
+	void setTool(NavMeshTypeTool* tool);
+	NavMeshTypeTool* getTool();
+	void setFlagsAreaTable(const NavMeshPolyFlagsFromAreas& flagsAreaTable);
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
 	void setNavMeshTileSettings(const NavMeshTileSettings& settings);

@@ -29,6 +29,16 @@
 namespace ely
 {
 
+//Movement type
+enum MOVTYPE
+{
+#ifndef WITHCHARACTER
+	RECAST, KINEMATIC, RIGID
+#else
+	CHARACTER
+#endif
+};
+
 class CrowdAgentTemplate;
 
 /**
@@ -44,6 +54,27 @@ class CrowdAgentTemplate;
  * - "enabled"  						|single|"true"
  * - "throw_events"						|single|"false"
  * - "controlled_type"					|single|"nodepath" (nodepath,character_controller)
+ * - "mov_type"							|single|"recast" (recast,kinematic,character)
+ * - "max_acceleration";				|single|"
+	float maxSpeed;						///< Maximum allowed speed. [Limit: >= 0]
+
+	/// Defines how close a collision element must be before it is considered for steering behaviors. [Limits: > 0]
+	float collisionQueryRange;
+
+	float pathOptimizationRange;		///< The path visibility optimization range. [Limit: > 0]
+
+	/// How aggresive the agent manager should be at avoiding collisions with this agent. [Limit: >= 0]
+	float separationWeight;
+
+	/// Flags that impact steering behavior. (See: #UpdateFlags)
+	unsigned char updateFlags;
+
+	/// The index of the avoidance configuration to use for the agent.
+	/// [Limits: 0 <= value <= #DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS]
+	unsigned char obstacleAvoidanceType;
+
+	/// User defined data attached to the agent.
+	void* userData;
  */
 class CrowdAgent: public Component
 {
