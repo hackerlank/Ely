@@ -28,6 +28,7 @@
 #include "AIComponents/RecastNavigation/NavMeshType_Obstacle.h"
 #include "AIComponents/RecastNavigation/ConvexVolumeTool.h"
 #include "AIComponents/RecastNavigation/OffMeshConnectionTool.h"
+#include "AIComponents/RecastNavigation/CrowdTool.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
@@ -137,8 +138,11 @@ bool NavMesh::initialize()
 			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL);
 	mNavMeshTileSettings.m_tileSize = (float) strtof(
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
-	//area-flags settings
-	mAreaFlagsList = mTmpl->parameterList(std::string("area_flags"));
+	//area-flags-cost settings
+	mAreaFlagsCostList = mTmpl->parameterList(std::string("area_flags_cost"));
+	//crowd include/exclude flags
+	mCrowdIncludeFlags = mTmpl->parameter(std::string("crowd_include_flags"));
+	mCrowdExcludeFlags = mTmpl->parameter(std::string("crowd_exclude_flags"));
 	//convex volumes
 	mConvexVolumeList = mTmpl->parameterList(std::string("convex_volume"));
 	//off mesh connections
@@ -204,9 +208,11 @@ void NavMesh::onAddToSceneSetup()
 	{
 		PRINT("'" <<getOwnerObject()->objectId()
 				<< "'::'" << mComponentId << "'::onAddToSceneSetup");
-		//load the mesh from the owner node path
+
+		///load the mesh from the owner node path
 		loadModelMesh(mOwnerObject->getNodePath());
-		//set up the type of navigation mesh
+
+		///set up the type of navigation mesh
 		switch (mNavMeshTypeEnum)
 		{
 		case SOLO:
@@ -256,17 +262,20 @@ void NavMesh::onAddToSceneSetup()
 		}
 
 		std::list<std::string>::iterator iterStr;
+		///set area ability flags and cost (for crowd)
 		//area types with ability flags settings
-		NavMeshPolyFlagsFromAreas polyFlagsFromAreas;
-		for (iterStr = mAreaFlagsList.begin(); iterStr != mAreaFlagsList.end();
+		NavMeshPolyAreaFlags polyAreaFlags;
+		//area types with cost settings (used later)
+		NavMeshPolyAreaCost polyAreaCost;
+		for (iterStr = mAreaFlagsCostList.begin(); iterStr != mAreaFlagsCostList.end();
 				++iterStr)
 		{
 			//any "area_flags" string is a "compound" one, i.e. could have the form:
-			// "area@flag1|flag2...|flagN"
+			// "area@flag1|flag2...|flagN@cost"
 			std::vector<std::string> areaFlags = parseCompoundString(*iterStr,
 					'@');
-			//check only if there is a pair
-			if (areaFlags.size() == 2)
+			//check only if there is a triple
+			if (areaFlags.size() == 3)
 			{
 				//default area: NAVMESH_POLYAREA_GROUND (== 0)
 				int area = (
@@ -284,17 +293,28 @@ void NavMesh::onAddToSceneSetup()
 					int flag = (
 							not (*iterF).empty() ?
 									strtol((*iterF).c_str(), NULL, 0) :
-									NAVMESH_POLYAREA_GROUND);
+									NAVMESH_POLYFLAGS_WALK);
 					//or flag
 					oredFlags = oredFlags | flag;
 				}
-				//add area with corresponding ored flags
-				polyFlagsFromAreas[area] = oredFlags;
+				//add area with corresponding ored ability flags
+				polyAreaFlags[area] = oredFlags;
+
+				//default cost: 1.0
+				float cost = (float) strtof(areaFlags[2].c_str(), NULL);
+				if (cost <= 0.0)
+				{
+					cost = 1.0;
+				}
+				//add area with corresponding cost
+				polyAreaCost[area] = cost;
 			}
 		}
-		//set NavMeshType::m_flagsAreaTable
-		setFlagsAreaTable(polyFlagsFromAreas);
-		//set convex volumes
+		//store flags into NavMeshType::m_flagsAreaTable
+		setFlagsAreaTable(polyAreaFlags);
+		//note: areas' costs are set after crowd tool has been created
+
+		///set convex volumes
 		ConvexVolumeTool* cvTool = new ConvexVolumeTool();
 		setTool(cvTool);
 		for (iterStr = mConvexVolumeList.begin(); iterStr != mConvexVolumeList.end();
@@ -347,7 +367,8 @@ void NavMesh::onAddToSceneSetup()
 			}
 		}
 		setTool(NULL);
-		//set off mesh connections
+
+		///set off mesh connections
 		OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
 		setTool(omcTool);
 		for (iterStr = mOffMeshConnectionList.begin(); iterStr != mOffMeshConnectionList.end();
@@ -400,8 +421,51 @@ void NavMesh::onAddToSceneSetup()
 			}
 		}
 		setTool(NULL);
-		//build navigation mesh effectively
+
+		///build navigation mesh effectively
 		buildNavMesh();
+
+		///set crowd
+		CrowdTool* crowdTool = new CrowdTool();
+		setTool(crowdTool);
+
+		///set areas' costs (previously computed)
+		setCostAreaTable(polyAreaCost);
+
+		///set crowd include & exclude flags
+		std::vector<std::string>::const_iterator iterIEF;
+		std::vector<std::string> ieFlags;
+		//1:iterate over include flags
+		//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
+		int includeOredFlags = (ieFlags.size() == 0 ? NAVMESH_POLYFLAGS_WALK : 0x0);
+		ieFlags = parseCompoundString(mCrowdIncludeFlags, '|');
+		for (iterIEF = ieFlags.begin(); iterIEF != ieFlags.end(); ++iterIEF)
+		{
+			int flag = (
+					not (*iterIEF).empty() ?
+							strtol((*iterIEF).c_str(), NULL, 0) :
+							NAVMESH_POLYFLAGS_WALK);
+			//or flag
+			includeOredFlags = includeOredFlags | flag;
+		}
+		//2:iterate over exclude flags
+		//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
+		int excludeOredFlags = (ieFlags.size() == 0 ? NAVMESH_POLYFLAGS_DISABLED : 0x0);
+		ieFlags = parseCompoundString(mCrowdExcludeFlags, '|');
+		for (iterIEF = ieFlags.begin(); iterIEF != ieFlags.end(); ++iterIEF)
+		{
+			int flag = (
+					not (*iterIEF).empty() ?
+							strtol((*iterIEF).c_str(), NULL, 0) :
+							NAVMESH_POLYFLAGS_DISABLED);
+			//or flag
+			excludeOredFlags = excludeOredFlags | flag;
+		}
+		//set crowd include & exclude flags
+		setCrowdIncludeExcludeFlags(includeOredFlags, excludeOredFlags);
+
+		///Add agents
+
 
 #ifdef ELY_DEBUG
 		mDD->reset();
@@ -536,12 +600,49 @@ NavMeshTypeTool* NavMesh::getTool()
 	return mNavMeshType->getTool();
 }
 
-void NavMesh::setFlagsAreaTable(const NavMeshPolyFlagsFromAreas& flagsAreaTable)
+void NavMesh::setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	mNavMeshType->setFlagsAreaTable(flagsAreaTable);
+}
+
+void NavMesh::setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (not crowdTool)
+	{
+		return;
+	}
+	//
+	dtQueryFilter* filter =
+			crowdTool->getState()->getCrowd()->getEditableFilter();
+	NavMeshPolyAreaCost::const_iterator iterAC;
+	for (iterAC = costAreaTable.begin(); iterAC != costAreaTable.end();
+			++iterAC)
+	{
+		filter->setAreaCost((*iterAC).first, (*iterAC).second);
+	}
+}
+
+void NavMesh::setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (not crowdTool)
+	{
+		return;
+	}
+	crowdTool->getState()->getCrowd()->getEditableFilter()->setIncludeFlags(
+			includeFlags);
+	crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
+			excludeFlags);
 }
 
 void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)

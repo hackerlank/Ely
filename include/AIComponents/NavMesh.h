@@ -35,6 +35,16 @@
 namespace ely
 {
 
+///Movement type
+enum MOVTYPE
+{
+#ifndef WITHCHARACTER
+	RECAST, KINEMATIC, RIGID
+#else
+	CHARACTER
+#endif
+};
+
 class NavMeshTemplate;
 
 /**
@@ -70,8 +80,10 @@ class NavMeshTemplate;
  * - "max_tiles"					|single|"128"
  * - "max_polys_per_tile"			|single|"32768"
  * - "tile_size"					|single|"32"
- * - "area_flags"					|multiple|no default (each specified as
- * "area@flag1|flag2...|flagN")
+ * - "area_flags_cost"				|multiple|no default (each specified as
+ * "area@flag1|flag2...|flagN@cost")
+ * - "crowd_include_flags"			|single|no default (specified as "flag1|flag2...|flagN")
+ * - "crowd_exclude_flags"			|single|no default (specified as "flag1|flag2...|flagN")
  * - "convex_volume"				|multiple|no default (each specified as
  * 	"x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type")
  * - "offmesh_connection"			|multiple|no default (each specified as
@@ -111,7 +123,10 @@ public:
 	void setNavMeshSettings(const NavMeshSettings& settings);
 	void setTool(NavMeshTypeTool* tool);
 	NavMeshTypeTool* getTool();
-	void setFlagsAreaTable(const NavMeshPolyFlagsFromAreas& flagsAreaTable);
+	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable);
+	void setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable);
+	void setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags);
+
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
 	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
@@ -182,8 +197,10 @@ private:
 	NavMeshSettings mNavMeshSettings;
 	/// NavMeshTileSettings from template.
 	NavMeshTileSettings mNavMeshTileSettings;
-	///Area-flags settings.
-	std::list<std::string> mAreaFlagsList;
+	///Area-flags-cost settings.
+	std::list<std::string> mAreaFlagsCostList;
+	///Crowd include & exclude flags settings.
+	std::string mCrowdIncludeFlags, mCrowdExcludeFlags;
 	///Convex volumes.
 	std::list<std::string> mConvexVolumeList;
 	///Off mesh connections.

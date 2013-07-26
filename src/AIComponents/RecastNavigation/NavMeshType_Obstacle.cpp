@@ -172,7 +172,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
 {
 	InputGeom* m_geom;
 
-	NavMeshPolyFlagsFromAreas* m_flagsAreaTable;
+	NavMeshPolyAreaFlags* m_flagsAreaTable;
 
 	inline MeshProcess() : m_geom(0)
 	{

@@ -29,16 +29,6 @@
 namespace ely
 {
 
-//Movement type
-enum MOVTYPE
-{
-#ifndef WITHCHARACTER
-	RECAST, KINEMATIC, RIGID
-#else
-	CHARACTER
-#endif
-};
-
 class CrowdAgentTemplate;
 
 /**

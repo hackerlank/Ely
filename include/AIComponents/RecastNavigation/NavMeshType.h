@@ -85,7 +85,9 @@ enum NavMeshPolyFlagsEnum
 };
 
 ///Table giving for each area the corresponding (or'ed) flags.
-typedef std::map<int,int> NavMeshPolyFlagsFromAreas;
+typedef std::map<int,int> NavMeshPolyAreaFlags;
+///Table giving for each area the corresponding cost (for dtCrowd).
+typedef std::map<int,float> NavMeshPolyAreaCost;
 
 struct NavMeshTypeTool
 {
@@ -183,7 +185,7 @@ protected:
 
 	BuildContext* m_ctx;
 
-	NavMeshPolyFlagsFromAreas m_flagsAreaTable;
+	NavMeshPolyAreaFlags m_flagsAreaTable;
 
 public:
 	NavMeshType();
@@ -258,7 +260,7 @@ public:
 
 	void updateToolStates(const float dt);
 
-	void setFlagsAreaTable(const NavMeshPolyFlagsFromAreas& flagsAreaTable)
+	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable)
 	{
 		m_flagsAreaTable = flagsAreaTable;
 	}
