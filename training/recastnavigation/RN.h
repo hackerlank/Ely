@@ -236,6 +236,7 @@ public:
 	};
 	Agent* getCrowdAgent(int idx);
 	void setCrowdTarget(LPoint3f pos);
+	void setCrowdVelocity(LPoint3f pos);
 };
 
 struct TempObstacle
@@ -313,6 +314,10 @@ extern std::string REMOVE_OFF_MESH_CONNECTION_Key;
 void setCrowdTarget(Raycaster* raycaster, void* data);
 extern const int SET_CROWD_TARGET_Idx;
 extern std::string SET_CROWD_TARGET_Key;
+//
+void setCrowdVelocity(Raycaster* raycaster, void* data);
+extern const int SET_CROWD_VELOCITY_Idx;
+extern std::string SET_CROWD_VELOCITY_Key;
 //
 void buildTile(Raycaster* raycaster, void* data);
 extern const int BUILD_TILE_Idx;

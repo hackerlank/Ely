@@ -27,23 +27,14 @@
 #include "RecastNavigation/NavMeshType.h"
 #include "RecastNavigation/InputGeom.h"
 #include "RecastNavigation/DebugInterfaces.h"
+#include "ObjectModel/Component.h"
+#include "CrowdAgent.h"
 #include <DetourCrowd.h>
 #include <DetourTileCache.h>
-#include "ObjectModel/Component.h"
 #include <nodePath.h>
 
 namespace ely
 {
-
-///Movement type
-enum MOVTYPE
-{
-#ifndef WITHCHARACTER
-	RECAST, KINEMATIC, RIGID
-#else
-	CHARACTER
-#endif
-};
 
 class NavMeshTemplate;
 
@@ -58,9 +49,12 @@ class NavMeshTemplate;
  * (i.e. is_steady=true) Model components.
  * \note convex volumes and off mesh connections points are are given wrt
  * the scaled owner object node path.
+ * \note radius/height of the first registered object owning a CrowdAgent
+ * component will overwrite the xml ones.
  *
  * XML Param(s):
  * - "navmesh_type"					|single|"solo" (solo|tile|obstacle)
+ * - "mov_type"						|single|"recast" (recast|kinematic|rigid|character)
  * - "auto_build"					|single|"true"
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
@@ -104,6 +98,14 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
+	 * \brief Updates position/orientation of crowd agents.
+	 *
+	 * Will be called automatically by an control manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
+
+	/**
 	 * \brief Navigation mesh related methods.
 	 */
 	///@{
@@ -126,7 +128,8 @@ public:
 	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable);
 	void setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable);
 	void setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags);
-
+	AgentMovType getMovType();
+	NodePath getReferenceNP();
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
 	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
@@ -166,6 +169,21 @@ public:
 	 */
 	bool buildNavMesh();
 
+	/**
+	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
+	 * mechanism.
+	 *
+	 * @param crowdAgentObject The object to be added.
+	 */
+	void addCrowdAgent(SMARTPTR(Object) crowdAgentObject);
+	/**
+	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
+	 * mechanism.
+	 *
+	 * @param crowdAgentObject The object to be removed.
+	 */
+	void removeCrowdAgent(SMARTPTR(Object) crowdAgentObject);
+
 #ifdef ELY_DEBUG
 	/**
 	 * \brief Gets a reference to the Recast Debug node.
@@ -180,20 +198,20 @@ public:
 #endif
 
 private:
-	/// Input geometry.
+	///Input geometry.
 	InputGeom* mGeom;
-	/// Build context.
+	///Build context.
 	BuildContext* mCtx;
-	/// The mesh name.
+	///The mesh name.
 	std::string mMeshName;
-	/// The reference node path.
+	///The reference node path.
 	NodePath mReferenceNP;
 	///@{
-	/// Current mesh type.
+	///Current mesh type.
 	NavMeshTypeEnum mNavMeshTypeEnum;
 	NavMeshType* mNavMeshType;
 	///@}
-	/// NavMeshSettings from template.
+	///NavMeshSettings from template.
 	NavMeshSettings mNavMeshSettings;
 	/// NavMeshTileSettings from template.
 	NavMeshTileSettings mNavMeshTileSettings;
@@ -221,6 +239,16 @@ private:
 	/// Obstacles table
 	std::map<SMARTPTR(Object), dtObstacleRef> mObstacles;
 	///@}
+	/**
+	 * \brief Crowd related data.
+	 */
+	///@{
+	///The CrowdAgent components handled by this NavMesh.
+	std::list<SMARTPTR(CrowdAgent)> mCrowdAgents;
+	///The Current movement type.
+	AgentMovType mMovType;
+	///@}
+
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;

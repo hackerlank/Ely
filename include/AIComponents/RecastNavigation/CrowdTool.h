@@ -48,7 +48,7 @@ struct CrowdToolParams
 	bool m_optimizeVis;
 	bool m_optimizeTopo;
 	bool m_obstacleAvoidance;
-	float m_obstacleAvoidanceType;
+	int m_obstacleAvoidanceType;
 	bool m_separation;
 	float m_separationWeight;
 };
@@ -96,11 +96,14 @@ public:
 	dtCrowd* getCrowd(){ return m_crowd; }
 
 	int addAgent(const float* pos);
+	int addAgent(const float* p, const dtCrowdAgentParams* params);
 	void removeAgent(const int idx);
 	void hilightAgent(const int idx);
 	void updateAgentParams();
 	int hitTestAgents(const float* s, const float* p);
 	void setMoveTarget(const float* p, bool adjust);
+	void setMoveTarget(int idx, const float* p);
+	void setMoveVelocity(int idx, const float* v);
 	void updateTick(const float dt);
 
 	inline CrowdToolParams* getToolParams() { return &m_toolParams; }

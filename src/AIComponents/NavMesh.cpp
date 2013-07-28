@@ -203,7 +203,8 @@ void NavMesh::onAddToSceneSetup()
 	//set mOwnerObject's parent node path as reference
 	mReferenceNP = mOwnerObject->getNodePath().get_parent();
 
-	//build navigation mesh if auto build is true
+	//build navigation mesh if auto build is true, otherwise
+	//the same operations must be performed by program.
 	if (mAutoBuild)
 	{
 		PRINT("'" <<getOwnerObject()->objectId()
@@ -464,8 +465,8 @@ void NavMesh::onAddToSceneSetup()
 		//set crowd include & exclude flags
 		setCrowdIncludeExcludeFlags(includeOredFlags, excludeOredFlags);
 
-		///Add agents
-
+		//Add to the AI manager update
+		GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 
 #ifdef ELY_DEBUG
 		mDD->reset();
@@ -679,6 +680,22 @@ NavMeshTileSettings NavMesh::getNavMeshTileSettings()
 				dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileSettings();
 	}
 	return settings;
+}
+
+AgentMovType NavMesh::getMovType()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMovType;
+}
+
+NodePath NavMesh::getReferenceNP()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mReferenceNP;
 }
 
 void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
@@ -920,6 +937,49 @@ bool NavMesh::buildNavMesh()
 	return result;
 }
 
+void NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	SMARTPTR(CrowdAgent)crowdAgent =
+			DCAST(CrowdAgent,crowdAgentObject->getComponent(componentType()));
+	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+	if(iterCA != mCrowdAgents.end())
+	{
+		mCrowdAgents.push_back(crowdAgent);
+	}
+}
+
+void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	SMARTPTR(CrowdAgent)crowdAgent =
+			DCAST(CrowdAgent,crowdAgentObject->getComponent(componentType()));
+	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+	if(iterCA != mCrowdAgents.end())
+	{
+		mCrowdAgents.erase(iterCA);
+	}
+}
+
+void NavMesh::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+}
+
 #ifdef ELY_DEBUG
 
 NodePath NavMesh::getDebugNodePath() const
@@ -959,5 +1019,4 @@ void NavMesh::debug(bool enable)
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMesh::_type_handle;
-
 }  // namespace ely

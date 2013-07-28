@@ -79,9 +79,15 @@ void CrowdAgentTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	mParameterTable.insert(ParameterNameValue("enabled", "true"));
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
-	mParameterTable.insert(ParameterNameValue("controlled_type", "nodepath"));
+	mParameterTable.insert(ParameterNameValue("register_to_navmesh", "none"));
+	mParameterTable.insert(ParameterNameValue("max_acceleration", "8.0"));
+	mParameterTable.insert(ParameterNameValue("max_speed", "3.5"));
+	mParameterTable.insert(ParameterNameValue("collision_query_range", "12.0"));
+	mParameterTable.insert(ParameterNameValue("path_optimization_range", "30.0"));
+	mParameterTable.insert(ParameterNameValue("separation_weight", "2.0"));
+	mParameterTable.insert(ParameterNameValue("update_flags", "0x1b"));
+	mParameterTable.insert(ParameterNameValue("obstacle_avoidance_type", "3"));
 }
 
 //TypedObject semantics: hardcoded

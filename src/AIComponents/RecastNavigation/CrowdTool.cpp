@@ -118,7 +118,7 @@ CrowdToolState::CrowdToolState() :
 	m_toolParams.m_optimizeVis = true;
 	m_toolParams.m_optimizeTopo = true;
 	m_toolParams.m_obstacleAvoidance = true;
-	m_toolParams.m_obstacleAvoidanceType = 3.0f;
+	m_toolParams.m_obstacleAvoidanceType = 3;
 	m_toolParams.m_separation = false;
 	m_toolParams.m_separationWeight = 2.0f;
 
@@ -557,6 +557,29 @@ void CrowdToolState::handleUpdate(const float dt)
 		updateTick(dt);
 }
 
+int CrowdToolState::addAgent(const float* p, const dtCrowdAgentParams* params)
+{
+	if (!m_sample)
+		return -1;
+	dtCrowd* crowd = m_sample->getCrowd();
+
+	int idx = crowd->addAgent(p, params);
+	if (idx != -1)
+	{
+		if (m_targetRef)
+			crowd->requestMoveTarget(idx, m_targetRef, m_targetPos);
+
+#ifdef ELY_DEBUG
+		// Init trail
+		AgentTrail* trail = &m_trails[idx];
+		for (int i = 0; i < AGENT_MAX_TRAIL; ++i)
+			dtVcopy(&trail->trail[i * 3], p);
+		trail->htrail = 0;
+#endif
+	}
+	return idx;
+}
+
 int CrowdToolState::addAgent(const float* p)
 {
 	if (!m_sample)
@@ -591,12 +614,13 @@ int CrowdToolState::addAgent(const float* p)
 	{
 		if (m_targetRef)
 			crowd->requestMoveTarget(idx, m_targetRef, m_targetPos);
-
+#ifdef ELY_DEBUG
 		// Init trail
 		AgentTrail* trail = &m_trails[idx];
 		for (int i = 0; i < AGENT_MAX_TRAIL; ++i)
 			dtVcopy(&trail->trail[i * 3], p);
 		trail->htrail = 0;
+#endif
 	}
 	return idx;
 }
@@ -637,6 +661,39 @@ void calcVel(float* vel, const float* pos, const float* tgt,
 namespace ely
 {
 
+void CrowdToolState::setMoveTarget(int idx, const float* p)
+{
+	if (!m_sample)
+		return;
+
+	// Find nearest point on navmesh and set move request to that location.
+	dtNavMeshQuery* navquery = m_sample->getNavMeshQuery();
+	dtCrowd* crowd = m_sample->getCrowd();
+	const dtQueryFilter* filter = crowd->getFilter();
+	const float* ext = crowd->getQueryExtents();
+
+	navquery->findNearestPoly(p, ext, filter, &m_targetRef, m_targetPos);
+
+	const dtCrowdAgent* ag = crowd->getAgent(idx);
+	if (ag && ag->active)
+		crowd->requestMoveTarget(idx, m_targetRef, m_targetPos);
+}
+
+void CrowdToolState::setMoveVelocity(int idx, const float* v)
+{
+	if (!m_sample)
+		return;
+
+	dtCrowd* crowd = m_sample->getCrowd();
+
+	// Request velocity
+	const dtCrowdAgent* ag = crowd->getAgent(idx);
+	if (ag && ag->active)
+	{
+		crowd->requestMoveVelocity(idx, v);
+	}
+}
+
 void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 {
 	if (!m_sample)
@@ -652,6 +709,8 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 	{
 		float vel[3];
 		// Request velocity
+
+#ifdef ELY_DEBUG
 		if (m_agentDebug.idx != -1)
 		{
 			const dtCrowdAgent* ag = crowd->getAgent(m_agentDebug.idx);
@@ -663,6 +722,7 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 		}
 		else
 		{
+#endif
 			for (int i = 0; i < crowd->getAgentCount(); ++i)
 			{
 				const dtCrowdAgent* ag = crowd->getAgent(i);
@@ -671,12 +731,15 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 				calcVel(vel, ag->npos, p, ag->params.maxSpeed);
 				crowd->requestMoveVelocity(i, vel);
 			}
+#ifdef ELY_DEBUG
 		}
+#endif
 	}
 	else
 	{
 		navquery->findNearestPoly(p, ext, filter, &m_targetRef, m_targetPos);
 
+#ifdef ELY_DEBUG
 		if (m_agentDebug.idx != -1)
 		{
 			const dtCrowdAgent* ag = crowd->getAgent(m_agentDebug.idx);
@@ -686,6 +749,7 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 		}
 		else
 		{
+#endif
 			for (int i = 0; i < crowd->getAgentCount(); ++i)
 			{
 				const dtCrowdAgent* ag = crowd->getAgent(i);
@@ -693,7 +757,9 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 					continue;
 				crowd->requestMoveTarget(i, m_targetRef, m_targetPos);
 			}
+#ifdef ELY_DEBUG
 		}
+#endif
 	}
 }
 
@@ -778,11 +844,13 @@ void CrowdToolState::updateTick(const float dt)
 	if (!nav || !crowd)
 		return;
 
-	rnTimeVal startTime = getPerfTime();
+#ifdef ELY_DEBUG
+
+//	rnTimeVal startTime = getPerfTime();
 
 	crowd->update(dt, &m_agentDebug);
 
-	rnTimeVal endTime = getPerfTime();
+//	rnTimeVal endTime = getPerfTime();
 
 	// Update agent trails
 	for (int i = 0; i < crowd->getAgentCount(); ++i)
@@ -801,6 +869,9 @@ void CrowdToolState::updateTick(const float dt)
 //	m_crowdSampleCount.addSample((float) crowd->getVelocitySampleCount());
 //	m_crowdTotalTime.addSample(
 //			getPerfDeltaTimeUsec(startTime, endTime) / 1000.0f);
+#else
+	crowd->update(dt, NULL);
+#endif
 }
 
 CrowdTool::CrowdTool() :

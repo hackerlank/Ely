@@ -25,11 +25,23 @@
 #define CROWDAGENT_H_
 
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
+#include <DetourCrowd.h>
 
 namespace ely
 {
 
 class CrowdAgentTemplate;
+
+///Agent movement type.
+enum AgentMovType
+{
+#ifndef WITHCHARACTER
+	RECAST, KINEMATIC, RIGID
+#else
+	CHARACTER
+#endif
+};
 
 /**
  * \brief Component implementing dtCrowdAgent from Recast Navigation library.
@@ -41,30 +53,15 @@ class CrowdAgentTemplate;
  * This is a ...
  *
  * XML Param(s):
- * - "enabled"  						|single|"true"
  * - "throw_events"						|single|"false"
- * - "controlled_type"					|single|"nodepath" (nodepath,character_controller)
- * - "mov_type"							|single|"recast" (recast,kinematic,character)
- * - "max_acceleration";				|single|"
-	float maxSpeed;						///< Maximum allowed speed. [Limit: >= 0]
-
-	/// Defines how close a collision element must be before it is considered for steering behaviors. [Limits: > 0]
-	float collisionQueryRange;
-
-	float pathOptimizationRange;		///< The path visibility optimization range. [Limit: > 0]
-
-	/// How aggresive the agent manager should be at avoiding collisions with this agent. [Limit: >= 0]
-	float separationWeight;
-
-	/// Flags that impact steering behavior. (See: #UpdateFlags)
-	unsigned char updateFlags;
-
-	/// The index of the avoidance configuration to use for the agent.
-	/// [Limits: 0 <= value <= #DT_CROWD_MAX_OBSTAVOIDANCE_PARAMS]
-	unsigned char obstacleAvoidanceType;
-
-	/// User defined data attached to the agent.
-	void* userData;
+ * - "register_to_navmesh"				|single|"none"
+ * - "max_acceleration";				|single|"8.0"
+ * - "max_speed"						|single|"3.5"
+ * - "collision_query_range"			|single|"12.0" (* NavMesh::agent_radius)
+ * - "path_optimization_range"			|single|"30.0" (* NavMesh::agent_radius)
+ * - "separation_weight" 				|single|"2.0"
+ * - "update_flags"						|single|"0x1b"
+ * - "obstacle_avoidance_type"			|single|"3" (0,1,2,3)
  */
 class CrowdAgent: public Component
 {
@@ -89,22 +86,52 @@ public:
 	virtual void update(void* data);
 
 	/**
-	 * \name Enabling/disabling.
-	 * \brief Enables/disables this component.
+	 * \name NavMesh & Crowd agent data
+	 * \brief Gets/sets the associated NavMesh & crowd agent data.
 	 */
 	///@{
-	void enable();
-	void disable();
-	bool isEnabled();
+	dtCrowdAgent* getDtAgent();
+	int getIdx();
+	void setMovType(AgentMovType movType);
+	void setParams(const dtCrowdAgentParams& agentParams);
+	dtCrowdAgentParams getParams();
+	void setMoveTarget(const LPoint3f& pos);
+	LPoint3f getMoveTarget();
+	void setMoveVelocity(const LVector3f& vel);
+	LVector3f getMoveVelocity();
+	void setNavMeshObject(SMARTPTR(Object) navMeshObject);
+	SMARTPTR(Object) getNavMeshObject();
+	///@}
+
+	/**
+	 * \brief Adds/removes this object to the NavMesh handling
+	 */
+	///@{
+	void addToNavMesh();
+	void removeFromNavMesh();
 	///@}
 
 private:
 
-	///Enabling flags.
-	bool mEnabled, mIsEnabled;
-
 	///Throwing events.
 	bool mThrowEvents;
+	///The NavMesh owner object.
+	SMARTPTR(Object) mNavMeshObject;
+	std::string mNavMeshObjectId;
+	///Added to handling flag.
+	bool mAddedToHandling;
+	///The movement type.
+	AgentMovType mMovType;
+	///The original reference node path.
+	NodePath mReferenceNP;
+	///The associated dtCrowdAgent data.
+	///@{
+	dtCrowdAgent* mAgent;
+	int mAgentIdx;
+	dtCrowdAgentParams mAgentParams;
+	LPoint3f mCurrentTarget;
+	LVector3f mCurrentVelocity;
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

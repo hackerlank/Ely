@@ -108,6 +108,19 @@
 			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/>
 			<ComponentTmpl family="Control" type="Driver" priority="60"/>
 		</ObjectTmpl>
+
+		<ObjectTmpl type="RecastCrowdAgent">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+		</ObjectTmpl>
+
+		<ObjectTmpl type="KinematicCrowdAgent">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
+		</ObjectTmpl>
 		
 		<ObjectTmpl type="Terrain">
 			<ComponentTmpl family="Scene" type="Terrain" priority="100"/>
@@ -287,7 +300,7 @@
 			<Param rot="0.0,0.0,90.0"/>
 		</Object>
 
-		<Object type="Character" id="Player1"  priority="100">
+		<Object type="Character" id="Player1" priority="100">
 			<Component type="Activity">
 				<Param events="f@i:f-up@i-up:f-q@alt-i"/>
 				<Param events="b@k:b-up@k-up:b-q@alt-k"/>
@@ -320,7 +333,7 @@
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 		
-		<Object type="StaticNavMesh" id="course2">
+		<Object type="StaticNavMesh" id="course2" priority="100">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="course2.bam"/>
@@ -351,6 +364,24 @@
 			<Param is_steady="true"/>
 			<Param rot="-45.0,0.0,0.0"/>
 			<Param pos="0.0,0.0,0.0"/>
+		</Object>
+
+		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="90">
+			<Param parent="render"/>
+			<Param is_steady="false"/>
+			<Param store_params="true"/>
+			<Param pos="-18.0,-22.0,60.0"/>
+			<Param rot="-90.0,0.0,0.0"/>
+			<Component type="CrowdAgent">
+				<Param enabled="false"/>
+			</Component>
+			<Component type="Sound3d">
+				<Param sound_files="walk-sound@GUI_click.wav"/>
+			</Component>
+			<Component type="InstanceOf">
+				<Param instance_of="Gorilla1"/>
+				<Param scale="0.6,0.6,0.6"/>
+			</Component>
 		</Object>
 
 <!--

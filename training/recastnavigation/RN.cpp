@@ -444,6 +444,13 @@ void RN::setCrowdTarget(LPoint3f pos)
 	m_crowdTool->getState()->setMoveTarget(p, false);
 }
 
+void RN::setCrowdVelocity(LPoint3f pos)
+{
+	float p[3];
+	LVecBase3fToRecast(pos, p);
+	m_crowdTool->getState()->setMoveTarget(p, true);
+}
+
 ///
 ///Obstacles data
 std::string obstacleName("box.egg");
@@ -451,7 +458,7 @@ NodePath obstacleNP;
 std::map<NodePath, TempObstacle*> obstacleTable;
 
 //CALLBACKS
-const int CALLBACKSNUM = 6;
+const int CALLBACKSNUM = 7;
 //
 //void addConvexVolume(Raycaster* raycaster, void* data);
 const int ADD_CONVEX_VOLUME_Idx = 0;
@@ -472,6 +479,10 @@ std::string REMOVE_OFF_MESH_CONNECTION_Key("shift-alt-mouse2");
 //void setCrowdTarget(Raycaster* raycaster, void* data);
 const int SET_CROWD_TARGET_Idx = 0;
 std::string SET_CROWD_TARGET_Key("shift-mouse1");
+//
+//void setCrowdVelocity(Raycaster* raycaster, void* data);
+const int SET_CROWD_VELOCITY_Idx = 6;
+std::string SET_CROWD_VELOCITY_Key("control-mouse1");
 //
 //void buildTile(Raycaster* raycaster, void* data);
 const int BUILD_TILE_Idx = 1;
@@ -756,9 +767,13 @@ void App::doFinalWork()
 //			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
 //	Raycaster::GetSingletonPtr()->setHitCallback(0, allOnButZeroMask,
 //			reinterpret_cast<void*>(rn), "shift-mouse1", BitMask32::all_on());
-	//crowd re-target
+	//crowd set target
 	Raycaster::GetSingletonPtr()->setHitCallback(SET_CROWD_TARGET_Idx,
 			setCrowdTarget, reinterpret_cast<void*>(rn), SET_CROWD_TARGET_Key,
+			BitMask32::all_on());
+	//crowd set velocity
+	Raycaster::GetSingletonPtr()->setHitCallback(SET_CROWD_VELOCITY_Idx,
+			setCrowdVelocity, reinterpret_cast<void*>(rn), SET_CROWD_VELOCITY_Key,
 			BitMask32::all_on());
 
 	//Switch doors
@@ -813,6 +828,18 @@ void setCrowdTarget(Raycaster* raycaster, void* data)
 {
 	RN* rn = reinterpret_cast<RN*>(data);
 	rn->setCrowdTarget(raycaster->getHitPos());
+	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
+			<< raycaster->getHitPos() << "| hit normal: "
+			<< raycaster->getHitNormal() << "| hit fraction: "
+			<< raycaster->getHitFraction() << "| from pos: "
+			<< raycaster->getFromPos() << "| to pos: " << raycaster->getToPos()
+			<< std::endl;
+}
+
+void setCrowdVelocity(Raycaster* raycaster, void* data)
+{
+	RN* rn = reinterpret_cast<RN*>(data);
+	rn->setCrowdVelocity(raycaster->getHitPos());
 	std::cout << "| panda node: " << raycaster->getHitNode() << "| hit pos: "
 			<< raycaster->getHitPos() << "| hit normal: "
 			<< raycaster->getHitNormal() << "| hit fraction: "
