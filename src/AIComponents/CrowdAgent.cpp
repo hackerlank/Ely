@@ -47,6 +47,7 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl)
 	mAgentIdx = -1;
 	mNavMeshObject = NULL;
 	mAddedToHandling = false;
+	mMovType = RECAST;
 }
 
 CrowdAgent::~CrowdAgent()
@@ -117,25 +118,43 @@ void CrowdAgent::onAddToObjectSetup()
 	{
 		return;
 	}
-	//get NavMesh from owner object if any
+
+	//set referenceNP to the owner object parent
+	mReferenceNP = mOwnerObject->getNodePath().get_parent();
+
+	//get NavMesh owner object if register_to_navmesh == existent navmesh
 	mNavMeshObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
 			mNavMeshObjectId);
+	//set Agent radius/height of NavMesh settings.
+	if(mNavMeshObject)
+	{
+		LPoint3f min_point, max_point;
+		mOwnerObject->getNodePath().calc_tight_bounds(min_point, max_point);
+		float radius = sqrt(
+				pow((max_point.get_x() - min_point.get_x()), 2)
+						+ pow((max_point.get_y() - min_point.get_y()), 2))
+				/ 2.0;
+		float height = max_point.get_z() - min_point.get_z();
+		// the NavMesh xml agent_radius/height will be overwritten
+		//(may be in an unpredictable order) by the dimensions of
+		//the CrowdAgents at startup, so they should have the
+		//same dimensions to avoid strange results.
+		//get nav mesh component
+		SMARTPTR(NavMesh) navMesh =
+				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+		//note: in threading hold the NavMesh mutex during the whole transaction.
+		HOLDMUTEX(navMesh->getMutex())
+
+		NavMeshSettings settings = navMesh->getNavMeshSettings();
+		settings.m_agentRadius = radius;
+		settings.m_agentHeight = height;
+		navMesh->setNavMeshSettings(settings);
+	}
 
 	//setup event callbacks if any
 	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
-}
-
-void CrowdAgent::onAddToSceneSetup()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//set original referenceNP
-	mReferenceNP = mOwnerObject->getNodePath().get_parent();
-	//add to nav mesh
-	addToNavMesh();
 }
 
 dtCrowdAgent* CrowdAgent::getDtAgent()
@@ -160,6 +179,10 @@ void CrowdAgent::setMovType(AgentMovType movType)
 	HOLDMUTEX(mMutex)
 
 	mMovType = movType;
+	if(mMovType == KINEMATIC)
+	{
+///TODO
+	}
 }
 
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
@@ -333,18 +356,137 @@ void CrowdAgent::removeFromNavMesh()
 	}
 }
 
-void CrowdAgent::update(void* data)
+///TODO
+/*
+
+#ifdef WITHCHARACTER
+void CrowdAgent::updateVel(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	float dt = *(reinterpret_cast<float*>(data));
-
-#ifdef TESTING
-	dt = 0.016666667; //60 fps
+	m_vel = RecastToLVecBase3f(v);
+	LVector3f direction = m_vel;
+	if (m_vel.length_squared() > 0.1)
+	{
+		//set linear velocity
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
+				m_vel, false);
+		//set angular velocity (in the x-y plane)
+		//0 <= A <= 180.0
+		direction.normalize();
+		float H = m_pandaNP.get_h();
+		float A = 57.295779513f * acos(direction.get_y());
+		float deltaAngle;
+		if (direction.get_x() <= 0.0)
+		{
+			if (H <= 0.0)
+			{
+				deltaAngle = -H + A - 180;
+			}
+			else
+			{
+				deltaAngle = (A <= H ? -H + A + 180 : -H + A - 180);
+			}
+		}
+		else
+		{
+			if (H >= 0.0)
+			{
+				deltaAngle = -H - A + 180;
+			}
+			else
+			{
+				deltaAngle = (A >= -H ? -H - A + 180 : -H - A - 180);
+			}
+		}
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_angular_movement(
+				deltaAngle);
+//		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
+//		m_pandaNP.heads_up(lookAtPos);
+		//get current vel
+		LVector3f currentVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
+		m_anims->get_anim(0)->set_play_rate(currentVel.length() / rateFactor);
+		m_oldPos = m_pandaNP.get_pos();
+//		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
+		if (not m_anims->get_anim(0)->is_playing())
+		{
+			m_anims->get_anim(0)->loop(true);
+		}
+	}
+	else
+	{
+		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
+				LVector3f::zero(), false);
+		if (m_anims->get_anim(0)->is_playing())
+		{
+//			m_anims->get_anim(0)->pose(0);
+			m_anims->get_anim(0)->stop();
+		}
+	}
+}
+#else
+void CrowdAgent::updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
+{
+	//only for kinematic case
+	//raycast in the near of recast mesh:
+	//float rcConfig::detailSampleMaxError
+	LPoint3f kinematicPos;
+	if (vel.length_squared() > 0.1)
+	{
+		switch (mMovType)
+		{
+			case RECAST:
+			mOwnerObject->getNodePath().set_pos(pos);
+			break;
+			case KINEMATIC:
+			//set recast pos anyway
+			kinematicPos = pos;
+			//correct z
+			//ray down
+			m_result = m_world->ray_test_closest(kinematicPos + m_deltaRayOrig,
+					kinematicPos + m_deltaRayDown, m_rayMask);
+			if (m_result.has_hit())
+			{
+				//check if hit a triangle mesh
+				BulletShape* shape =
+				DCAST(BulletRigidBodyNode, m_result.get_node())->get_shape(0);
+				if (shape->is_of_type(BulletTriangleMeshShape::get_class_type()))
+				{
+					//physic mesh is under recast mesh
+					kinematicPos.set_z(m_result.get_hit_pos().get_z());
+				}
+			}
+			m_pandaNP.set_pos(kinematicPos);
+			break;
+			case RIGID:
+			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(pos);
+			break;
+			default:
+			break;
+		}
+		//
+		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
+		m_pandaNP.heads_up(lookAtPos);
+		//get current vel
+		LVector3f currentVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
+		m_anims->get_anim(0)->set_play_rate(currentVel.length() / rateFactor);
+		m_oldPos = m_pandaNP.get_pos();
+//		m_anims->get_anim(0)->set_play_rate(vel.length() / rateFactor);
+		if (not m_anims->get_anim(0)->is_playing())
+		{
+			m_anims->get_anim(0)->loop(true);
+		}
+	}
+	else
+	{
+		if (m_anims->get_anim(0)->is_playing())
+		{
+//			m_anims->get_anim(0)->pose(0);
+			m_anims->get_anim(0)->stop();
+		}
+	}
+}
 #endif
 
-}
+*/
 
 //TypedObject semantics: hardcoded
 TypeHandle CrowdAgent::_type_handle;

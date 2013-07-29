@@ -71,7 +71,7 @@ void Component::onAddToObjectSetup()
 {
 }
 
-void Component::onAddToSceneSetup()
+void Component::navMeshSetup()
 {
 }
 

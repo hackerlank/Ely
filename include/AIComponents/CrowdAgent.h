@@ -32,12 +32,13 @@ namespace ely
 {
 
 class CrowdAgentTemplate;
+class NavMesh;
 
 ///Agent movement type.
 enum AgentMovType
 {
 #ifndef WITHCHARACTER
-	RECAST, KINEMATIC, RIGID
+	RECAST, KINEMATIC
 #else
 	CHARACTER
 #endif
@@ -50,11 +51,12 @@ enum AgentMovType
  * 		http://digestingduck.blogspot.it
  * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
- * This is a ...
+ * \note this component should be associated to a "Scene" component, and
+ * should be created after it.
  *
  * XML Param(s):
  * - "throw_events"						|single|"false"
- * - "register_to_navmesh"				|single|"none"
+ * - "register_to_navmesh"				|single|""
  * - "max_acceleration";				|single|"8.0"
  * - "max_speed"						|single|"3.5"
  * - "collision_query_range"			|single|"12.0" (* NavMesh::agent_radius)
@@ -75,15 +77,6 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
-
-	/**
-	 * \brief Updates position/orientation of the controlled object.
-	 *
-	 * Will be called automatically by an control manager update.
-	 * @param data The custom data.
-	 */
-	virtual void update(void* data);
 
 	/**
 	 * \name NavMesh & Crowd agent data
@@ -132,6 +125,32 @@ private:
 	LPoint3f mCurrentTarget;
 	LVector3f mCurrentVelocity;
 	///@}
+
+	///NavMesh is a friend only for calling these methods.
+	friend NavMesh;
+	/**
+	 * \brief Physics data.
+	 */
+	///@{
+	BulletWorld* m_world;
+	float m_maxError;
+	LVector3f m_deltaRayDown, m_deltaRayOrig;
+	BulletClosestHitRayResult m_result;
+	BitMask32 m_rayMask;
+	///@}
+	/**
+	 * \brief Updates position/velocity/orientation of the controlled object.
+	 *
+	 * Will be called automatically by the NavMesh update.
+	 * @param dt The delta frame time.
+	 * @param pos The new position.
+	 * @param vel The new velocity.
+	 */
+#ifdef WITHCHARACTER
+	void updateVel(float dt, const LPoint3f& pos, const LVector3f& vel);
+#else
+	void updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel);
+#endif
 
 	///TypedObject semantics: hardcoded
 public:

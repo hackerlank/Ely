@@ -46,6 +46,11 @@ public:
 	virtual void handleToggle();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender(duDebugDraw& dd);
+
+	void setBidir(bool bidir)
+	{
+		m_bidir = bidir;
+	}
 };
 
 } // namespace ely

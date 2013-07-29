@@ -338,6 +338,8 @@ void GameManager::createGameWorldWithoutParamTables(
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
 	tinyxml2::XMLElement* objectTAG;
+	//store created objects in this queue
+	std::queue<SMARTPTR(Object)> createdObjectQueue;
 	//create a priority queue of objects
 	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjectsTAG;
 	for (objectTAG = objectSet->FirstChildElement("Object"); objectTAG != NULL;
@@ -435,6 +437,7 @@ void GameManager::createGameWorldWithoutParamTables(
 		{
 			continue;
 		}
+		createdObjectQueue.push(objectPtr);
 		//////////////////////////////////////////////////////////////
 		//<!-- Object addition to Scene -->
 		PRINT( "    Initializing object '" <<
@@ -468,15 +471,16 @@ void GameManager::createGameWorldWithoutParamTables(
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
 	}
-	//give a chance to objects to initialize
-	//themselves after the game world has been created.
-	std::list<SMARTPTR(Object)>::iterator objectPtrIter;
-	std::list<SMARTPTR(Object)> objectList =
-			ObjectTemplateManager::GetSingleton().getCreatedObjects();
-	for (objectPtrIter = objectList.begin();
-			objectPtrIter != objectList.end(); ++objectPtrIter)
+	//give a chance to objects to initialize themselves,
+	//in order of creation, after the game world has been created.
+	while(not createdObjectQueue.empty())
 	{
-		(*objectPtrIter)->worldSetup();
+		//get front element
+		SMARTPTR(Object) object = createdObjectQueue.front();
+		//use front element
+		object->worldSetup();
+		//remove front element
+		createdObjectQueue.pop();
 	}
 }
 
@@ -615,6 +619,8 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//reset all component templates parameters to their default values
 	ComponentTemplateManager::GetSingleton().resetComponentTemplatesParams();
 	tinyxml2::XMLElement* objectTAG;
+	//store created objects in this queue
+	std::queue<SMARTPTR(Object)> createdObjectQueue;
 	//create a priority queue of objects
 	std::priority_queue<Orderable<tinyxml2::XMLElement> > orderedObjectsTAG;
 	for (objectTAG = objectSet->FirstChildElement("Object"); objectTAG != NULL;
@@ -726,19 +732,21 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			continue;
 		}
+		createdObjectQueue.push(objectPtr);
 		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
 	}
-	//give a chance to objects to initialize
-	//themselves after the game world has been created.
-	std::list<SMARTPTR(Object)>::iterator objectPtrIter;
-	std::list<SMARTPTR(Object)> objectList =
-			ObjectTemplateManager::GetSingleton().getCreatedObjects();
-	for (objectPtrIter = objectList.begin();
-			objectPtrIter != objectList.end(); ++objectPtrIter)
+	//give a chance to objects to initialize themselves,
+	//in order of creation, after the game world has been created.
+	while(not createdObjectQueue.empty())
 	{
-		(*objectPtrIter)->worldSetup();
+		//get front element
+		SMARTPTR(Object) object = createdObjectQueue.front();
+		//use front element
+		object->worldSetup();
+		//remove front element
+		createdObjectQueue.pop();
 	}
 }
 

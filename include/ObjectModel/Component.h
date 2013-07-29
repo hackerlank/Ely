@@ -147,7 +147,7 @@ public:
 	 * object, this component belongs to, has been added to the scene
 	 * and set up. Optional.
 	 */
-	virtual void onAddToSceneSetup();
+	virtual void navMeshSetup();
 
 	/**
 	 * \brief Gets/sets the owner object.

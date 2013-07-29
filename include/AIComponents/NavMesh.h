@@ -46,16 +46,16 @@ class NavMeshTemplate;
  * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
  * This component should be used only in association to stationary
- * (i.e. is_steady=true) Model components.
+ * (i.e. is_steady=true) "Scene" components.\n
  * \note convex volumes and off mesh connections points are are given wrt
  * the scaled owner object node path.
- * \note radius/height of the first registered object owning a CrowdAgent
- * component will overwrite the xml ones.
+ * \note the xml agent_radius/height will be overwritten (may be in an
+ * unpredictable order) by the dimensions of the CrowdAgents at startup,
+ * so they should have the same dimensions to avoid strange results.
  *
  * XML Param(s):
  * - "navmesh_type"					|single|"solo" (solo|tile|obstacle)
- * - "mov_type"						|single|"recast" (recast|kinematic|rigid|character)
- * - "auto_build"					|single|"true"
+ * - "mov_type"						|single|"recast" (recast|kinematic|character)
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
  * - "agent_height"					|single|"2.0"
@@ -95,7 +95,11 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
+
+	/**
+	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
+	 */
+	void navMeshSetup();
 
 	/**
 	 * \brief Updates position/orientation of crowd agents.
@@ -219,26 +223,14 @@ private:
 	std::list<std::string> mAreaFlagsCostList;
 	///Crowd include & exclude flags settings.
 	std::string mCrowdIncludeFlags, mCrowdExcludeFlags;
+	///The movement type.
+	AgentMovType mMovType;
 	///Convex volumes.
 	std::list<std::string> mConvexVolumeList;
 	///Off mesh connections.
 	std::list<std::string> mOffMeshConnectionList;
-	///@{
-	/// Auto build: true (default) if navigation mesh
-	/// is to be built when owner object is added to scene,
-	/// false if it will be built manually by program.
-	/// \note Manual build is necessary when the owner object has
-	/// children objects and an overall navigation mesh should
-	/// consider them too: parents objects are (created and)
-	/// added to scene before their children, so an overall
-	/// navigation mesh can be built only after hierarchies
-	/// between objects have been already established, i.e.
-	/// after world creation; typically this kind of navigation
-	/// mesh is built (manually) during object initialization.
-	bool mAutoBuild;
 	/// Obstacles table
 	std::map<SMARTPTR(Object), dtObstacleRef> mObstacles;
-	///@}
 	/**
 	 * \brief Crowd related data.
 	 */

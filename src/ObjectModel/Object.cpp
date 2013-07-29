@@ -110,7 +110,7 @@ SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
 		//the owner object is a completely created object
 		//give this component a chance to customize
 		//itself when being added to scene.
-		mComponents[familyId]->onAddToSceneSetup();
+		mComponents[familyId]->navMeshSetup();
 	}
 	return previousComp;
 }
@@ -191,7 +191,7 @@ void Object::sceneSetup()
 	for (iterComp = mComponents.begin(); iterComp != mComponents.end();
 			++iterComp)
 	{
-		iterComp->second.p()->onAddToSceneSetup();
+		iterComp->second.p()->navMeshSetup();
 	}
 }
 
