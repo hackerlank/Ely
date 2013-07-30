@@ -96,6 +96,9 @@ bool NavMesh::initialize()
 	{
 		mNavMeshTypeEnum = SOLO;
 	}
+	mAutoSetup = (
+			mTmpl->parameter(std::string("auto_setup"))
+					== std::string("false") ? false : true);
 	std::string movType = mTmpl->parameter(std::string("mov_type"));
 	if (movType == "kinematic")
 	{
@@ -156,14 +159,14 @@ bool NavMesh::initialize()
 	mNavMeshTileSettings.m_tileSize = (float) strtof(
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
 	//area-flags-cost settings
-	mAreaFlagsCostList = mTmpl->parameterList(std::string("area_flags_cost"));
+	mAreaFlagsCostXmlParam = mTmpl->parameterList(std::string("area_flags_cost"));
 	//crowd include/exclude flags
-	mCrowdIncludeFlags = mTmpl->parameter(std::string("crowd_include_flags"));
-	mCrowdExcludeFlags = mTmpl->parameter(std::string("crowd_exclude_flags"));
+	mCrowdIncludeFlagsXmlParam = mTmpl->parameter(std::string("crowd_include_flags"));
+	mCrowdExcludeFlagsXmlParam = mTmpl->parameter(std::string("crowd_exclude_flags"));
 	//convex volumes
-	mConvexVolumeList = mTmpl->parameterList(std::string("convex_volume"));
+	mConvexVolumeXmlParam = mTmpl->parameterList(std::string("convex_volume"));
 	//off mesh connections
-	mOffMeshConnectionList = mTmpl->parameterList(std::string("offmesh_connection"));
+	mOffMeshConnectionXmlParam = mTmpl->parameterList(std::string("offmesh_connection"));
 	//
 	return result;
 }
@@ -179,6 +182,7 @@ void NavMesh::onAddToObjectSetup()
 		return;
 	}
 
+	///TODO review reference node
 #ifdef ELY_DEBUG
 	//set the recast debug node path as child of "render" node path
 	//set the recast debug camera to the first child of "camera" node path
@@ -200,16 +204,13 @@ void NavMesh::onAddToObjectSetup()
 	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
 #endif
 
-	//set mOwnerObject's parent node path as reference
-	mReferenceNP = mOwnerObject->getNodePath().get_parent();
-
 	//setup event callbacks if any
 	setupEvents();
 	//register event callbacks if any
 	registerEventCallbacks();
 }
 
-void NavMesh::navMeshSetup()
+void NavMesh::onAddToSceneSetup()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -219,6 +220,175 @@ void NavMesh::navMeshSetup()
 	{
 		return;
 	}
+
+	//set mOwnerObject's parent node path as reference
+	mReferenceNP = mOwnerObject->getNodePath().get_parent();
+
+	//setup nav mesh if auto setup is true
+	if(mAutoSetup)
+	{
+		///1: get the input from xml
+		std::list<std::string>::iterator iterStr;
+		///get area ability flags and cost (for crowd)
+		NavMeshPolyAreaFlags flagsAreaTable;
+		flagsAreaTable.clear();
+		NavMeshPolyAreaCost costAreaTable;
+		costAreaTable.clear();
+		for (iterStr = mAreaFlagsCostXmlParam.begin(); iterStr != mAreaFlagsCostXmlParam.end();
+				++iterStr)
+		{
+			//any "area_flags" string is a "compound" one, i.e. could have the form:
+			// "area@flag1|flag2...|flagN@cost"
+			std::vector<std::string> areaFlags = parseCompoundString(*iterStr,
+					'@');
+			//check only if there is a triple
+			if (areaFlags.size() == 3)
+			{
+				//default area: NAVMESH_POLYAREA_GROUND (== 0)
+				int area = (
+						not areaFlags[0].empty() ?
+								strtol(areaFlags[0].c_str(), NULL, 0) :
+								NAVMESH_POLYAREA_GROUND);
+				//iterate over flags
+				std::vector<std::string> flags = parseCompoundString(
+						areaFlags[1], '|');
+				std::vector<std::string>::const_iterator iterF;
+				//default flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
+				int oredFlags = (flags.size() == 0 ? 0x01 : 0x0);
+				for (iterF = flags.begin(); iterF != flags.end(); ++iterF)
+				{
+					int flag = (
+							not (*iterF).empty() ?
+									strtol((*iterF).c_str(), NULL, 0) :
+									NAVMESH_POLYFLAGS_WALK);
+					//or flag
+					oredFlags = oredFlags | flag;
+				}
+				//add area with corresponding ored ability flags
+				flagsAreaTable[area] = oredFlags;
+
+				//default cost: 1.0
+				float cost = (float) strtof(areaFlags[2].c_str(), NULL);
+				if (cost <= 0.0)
+				{
+					cost = 1.0;
+				}
+				//add area with corresponding cost
+				costAreaTable[area] = cost;
+			}
+		}
+		///get crowd include & exclude flags
+		std::vector<std::string>::const_iterator iterIEF;
+		std::vector<std::string> ieFlags;
+		//1:iterate over include flags
+		//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
+		int includeFlags = (ieFlags.size() == 0 ? NAVMESH_POLYFLAGS_WALK : 0x0);
+		ieFlags = parseCompoundString(mCrowdIncludeFlagsXmlParam, '|');
+		for (iterIEF = ieFlags.begin(); iterIEF != ieFlags.end(); ++iterIEF)
+		{
+			int flag = (
+					not (*iterIEF).empty() ?
+							strtol((*iterIEF).c_str(), NULL, 0) :
+							NAVMESH_POLYFLAGS_WALK);
+			//or flag
+			includeFlags = includeFlags | flag;
+		}
+		//2:iterate over exclude flags
+		//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
+		int excludeFlags = (ieFlags.size() == 0 ? NAVMESH_POLYFLAGS_DISABLED : 0x0);
+		ieFlags = parseCompoundString(mCrowdExcludeFlagsXmlParam, '|');
+		for (iterIEF = ieFlags.begin(); iterIEF != ieFlags.end(); ++iterIEF)
+		{
+			int flag = (
+					not (*iterIEF).empty() ?
+							strtol((*iterIEF).c_str(), NULL, 0) :
+							NAVMESH_POLYFLAGS_DISABLED);
+			//or flag
+			excludeFlags = excludeFlags | flag;
+		}
+
+
+
+		///TODO get convex volumes
+		std::list<PointListArea> convexVolumes;
+		for (iterStr = mConvexVolumeXmlParam.begin(); iterStr != mConvexVolumeXmlParam.end();
+				++iterStr)
+		{
+			PointList pointList;
+			int areaType;
+			//any "convex_volume" string is a "compound" one, i.e. could have the form:
+			// "x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type"
+			std::vector<std::string> pointsAreaType = parseCompoundString(*iterStr,
+					'@');
+			//check only if there is a pair
+			if (pointsAreaType.size() != 2)
+			{
+				continue;
+			}
+			//an empty point sequence is ignored
+			if (not pointsAreaType[0].empty())
+			{
+				continue;
+			}
+			//
+			areaType = (
+					not pointsAreaType[1].empty() ?
+							strtol(pointsAreaType[1].c_str(), NULL, 0) :
+							NAVMESH_POLYAREA_GROUND);
+			//iterate over points
+			std::vector<std::string> points = parseCompoundString(
+					pointsAreaType[0], '&');
+			std::vector<std::string>::const_iterator iterP;
+			float recastPos[3];
+			for (iterP = points.begin(); iterP != points.end(); ++iterP)
+			{
+				std::vector<std::string> posStr = parseCompoundString(
+						*iterP, ',');
+				float pos[3];
+				pos[0] = pos[1] = pos[2] = 0.0;
+				for (unsigned int i = 0;
+						(i < 3) and (i < posStr.size()); ++i)
+				{
+					pos[i] = strtof(posStr[i].c_str(), NULL);
+				}
+
+				///TODO review reference node
+				//point is wrt ownerObject node path
+				LPoint3f refPos = mReferenceNP.get_relative_point(
+						mOwnerObject->getNodePath(),
+						LPoint3f(pos[0], pos[1], pos[2]));
+				//insert convex volume point
+				LVecBase3fToRecast(LPoint3f(refPos[0], refPos[1], refPos[2]),
+						recastPos);
+				getTool()->handleClick(NULL, recastPos, false);
+			}
+			//re-insert the last point (to close convex volume)
+			getTool()->handleClick(NULL, recastPos, false);
+		}
+
+
+
+
+
+		///2: add settings fo nav mesh
+		///set area ability flags
+		setFlagsAreaTable(flagsAreaTable);
+		///set area cost (for crowd)
+		setCostAreaTable(costAreaTable);
+		///set crowd include & exclude flags
+		setCrowdIncludeExcludeFlags(includeFlags, excludeFlags);
+		///set convex volumes
+		setConvexVolumes(convexVolumes);
+
+		///3: setup nav mesh
+		navMeshSetup();
+	}
+}
+
+void NavMesh::navMeshSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
 
 	//setup navigation mesh, otherwise the same
 	//operations must be performed by program.
@@ -278,116 +448,46 @@ void NavMesh::navMeshSetup()
 	}
 
 	std::list<std::string>::iterator iterStr;
-	///set area ability flags and cost (for crowd)
-	//area types with ability flags settings
-	NavMeshPolyAreaFlags polyAreaFlags;
-	//area types with cost settings (used later)
-	NavMeshPolyAreaCost polyAreaCost;
-	for (iterStr = mAreaFlagsCostList.begin(); iterStr != mAreaFlagsCostList.end();
-			++iterStr)
-	{
-		//any "area_flags" string is a "compound" one, i.e. could have the form:
-		// "area@flag1|flag2...|flagN@cost"
-		std::vector<std::string> areaFlags = parseCompoundString(*iterStr,
-				'@');
-		//check only if there is a triple
-		if (areaFlags.size() == 3)
-		{
-			//default area: NAVMESH_POLYAREA_GROUND (== 0)
-			int area = (
-					not areaFlags[0].empty() ?
-							strtol(areaFlags[0].c_str(), NULL, 0) :
-							NAVMESH_POLYAREA_GROUND);
-			//iterate over flags
-			std::vector<std::string> flags = parseCompoundString(
-					areaFlags[1], '|');
-			std::vector<std::string>::const_iterator iterF;
-			//default flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
-			int oredFlags = (flags.size() == 0 ? 0x01 : 0x0);
-			for (iterF = flags.begin(); iterF != flags.end(); ++iterF)
-			{
-				int flag = (
-						not (*iterF).empty() ?
-								strtol((*iterF).c_str(), NULL, 0) :
-								NAVMESH_POLYFLAGS_WALK);
-				//or flag
-				oredFlags = oredFlags | flag;
-			}
-			//add area with corresponding ored ability flags
-			polyAreaFlags[area] = oredFlags;
 
-			//default cost: 1.0
-			float cost = (float) strtof(areaFlags[2].c_str(), NULL);
-			if (cost <= 0.0)
-			{
-				cost = 1.0;
-			}
-			//add area with corresponding cost
-			polyAreaCost[area] = cost;
-		}
-	}
-	//store flags into NavMeshType::m_flagsAreaTable
-	setFlagsAreaTable(polyAreaFlags);
-	//note: areas' costs are set after crowd tool has been created
+	///set recast areas' flags table
+	mNavMeshType->setFlagsAreaTable(mPolyAreaFlags);
 
-	///set convex volumes
+	///set recast convex volumes
 	ConvexVolumeTool* cvTool = new ConvexVolumeTool();
 	setTool(cvTool);
-	for (iterStr = mConvexVolumeList.begin(); iterStr != mConvexVolumeList.end();
-			++iterStr)
+	std::list<PointListArea>::iterator iter;
+	for (iter = mConvexVolumes.begin(); iter != mConvexVolumes.end();
+			++iter)
 	{
-		//any "convex_volume" string is a "compound" one, i.e. could have the form:
-		// "x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type"
-		std::vector<std::string> pointsAreaType = parseCompoundString(*iterStr,
-				'@');
-		//check only if there is a pair
-		if (pointsAreaType.size() == 2)
+		PointList points = iter->first;
+		//check if there are at least 3 points
+		if (points.size() < 3)
 		{
-			int areaType = (
-					not pointsAreaType[1].empty() ?
-							strtol(pointsAreaType[1].c_str(), NULL, 0) :
-							NAVMESH_POLYAREA_GROUND);
-			//set area type
-			dynamic_cast<ConvexVolumeTool*>(getTool())->setAreaType(areaType);
-			//an empty convex volume is ignored
-			if (not pointsAreaType[0].empty())
-			{
-				//iterate over points
-				std::vector<std::string> points = parseCompoundString(
-						pointsAreaType[0], '&');
-				std::vector<std::string>::const_iterator iterP;
-				float recastPos[3];
-				for (iterP = points.begin(); iterP != points.end(); ++iterP)
-				{
-					std::vector<std::string> posStr = parseCompoundString(
-							*iterP, ',');
-					float pos[3];
-					pos[0] = pos[1] = pos[2] = 0.0;
-					for (unsigned int i = 0;
-							(i < 3) and (i < posStr.size()); ++i)
-					{
-						pos[i] = strtof(posStr[i].c_str(), NULL);
-					}
-					//pos is wrt ownerObject node path
-					LPoint3f refPos = mReferenceNP.get_relative_point(
-							mOwnerObject->getNodePath(),
-							LPoint3f(pos[0], pos[1], pos[2]));
-					//insert convex volume point
-					LVecBase3fToRecast(LPoint3f(refPos[0], refPos[1], refPos[2]),
-							recastPos);
-					getTool()->handleClick(NULL, recastPos, false);
-				}
-				//re-insert the last point (to close convex volume)
-				getTool()->handleClick(NULL, recastPos, false);
-			}
+			continue;
 		}
+		int area = iter->second;
+
+		//set area type
+		dynamic_cast<ConvexVolumeTool*>(getTool())->setAreaType(area);
+
+		//iterate over points
+		PointList::const_iterator iterP;
+		float recastPos[3];
+		for (iterP = points.begin(); iterP != points.end(); ++iterP)
+		{
+			//insert convex volume point
+			LVecBase3fToRecast(*iterP, recastPos);
+			getTool()->handleClick(NULL, recastPos, false);
+		}
+		//re-insert the last point (to close convex volume)
+		getTool()->handleClick(NULL, recastPos, false);
 	}
 	setTool(NULL);
 
 	///set off mesh connections
 	OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
 	setTool(omcTool);
-	for (iterStr = mOffMeshConnectionList.begin(); iterStr != mOffMeshConnectionList.end();
+	for (iterStr = mOffMeshConnectionXmlParam.begin(); iterStr != mOffMeshConnectionXmlParam.end();
 			++iterStr)
 	{
 		//any "offmesh_connection" string is a "compound" one, i.e. has the form:
@@ -443,44 +543,37 @@ void NavMesh::navMeshSetup()
 	///build navigation mesh effectively
 	buildNavMesh();
 
-	///set crowd
+	///set recast crowd
 	CrowdTool* crowdTool = new CrowdTool();
 	setTool(crowdTool);
 
-	///set areas' costs (previously computed)
-	setCostAreaTable(polyAreaCost);
+	///set recast areas' costs
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (not crowdTool)
+	{
+		return;
+	}
+	//
+	dtQueryFilter* filter =
+			crowdTool->getState()->getCrowd()->getEditableFilter();
+	NavMeshPolyAreaCost::const_iterator iterAC;
+	for (iterAC = mPolyAreaCost.begin(); iterAC != mPolyAreaCost.end();
+			++iterAC)
+	{
+		filter->setAreaCost((*iterAC).first, (*iterAC).second);
+	}
 
-	///set crowd include & exclude flags
-	std::vector<std::string>::const_iterator iterIEF;
-	std::vector<std::string> ieFlags;
-	//1:iterate over include flags
-	//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
-	int includeOredFlags = (ieFlags.size() == 0 ? NAVMESH_POLYFLAGS_WALK : 0x0);
-	ieFlags = parseCompoundString(mCrowdIncludeFlags, '|');
-	for (iterIEF = ieFlags.begin(); iterIEF != ieFlags.end(); ++iterIEF)
+	///set recast crowd include & exclude flags
+	setCrowdIncludeExcludeFlags(mCrowdIncludeFlags, mCrowdExcludeFlags);
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (not crowdTool)
 	{
-		int flag = (
-				not (*iterIEF).empty() ?
-						strtol((*iterIEF).c_str(), NULL, 0) :
-						NAVMESH_POLYFLAGS_WALK);
-		//or flag
-		includeOredFlags = includeOredFlags | flag;
+		return;
 	}
-	//2:iterate over exclude flags
-	//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
-	int excludeOredFlags = (ieFlags.size() == 0 ? NAVMESH_POLYFLAGS_DISABLED : 0x0);
-	ieFlags = parseCompoundString(mCrowdExcludeFlags, '|');
-	for (iterIEF = ieFlags.begin(); iterIEF != ieFlags.end(); ++iterIEF)
-	{
-		int flag = (
-				not (*iterIEF).empty() ?
-						strtol((*iterIEF).c_str(), NULL, 0) :
-						NAVMESH_POLYFLAGS_DISABLED);
-		//or flag
-		excludeOredFlags = excludeOredFlags | flag;
-	}
-	//set flags
-	setCrowdIncludeExcludeFlags(includeOredFlags, excludeOredFlags);
+	crowdTool->getState()->getCrowd()->getEditableFilter()->setIncludeFlags(
+			mCrowdIncludeFlags);
+	crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
+			mCrowdExcludeFlags);
 
 	///Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
@@ -623,7 +716,7 @@ void NavMesh::setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mNavMeshType->setFlagsAreaTable(flagsAreaTable);
+	mPolyAreaFlags = flagsAreaTable;
 }
 
 void NavMesh::setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable)
@@ -631,20 +724,7 @@ void NavMesh::setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (not crowdTool)
-	{
-		return;
-	}
-	//
-	dtQueryFilter* filter =
-			crowdTool->getState()->getCrowd()->getEditableFilter();
-	NavMeshPolyAreaCost::const_iterator iterAC;
-	for (iterAC = costAreaTable.begin(); iterAC != costAreaTable.end();
-			++iterAC)
-	{
-		filter->setAreaCost((*iterAC).first, (*iterAC).second);
-	}
+	mPolyAreaCost = costAreaTable;
 }
 
 void NavMesh::setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags)
@@ -652,15 +732,8 @@ void NavMesh::setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (not crowdTool)
-	{
-		return;
-	}
-	crowdTool->getState()->getCrowd()->getEditableFilter()->setIncludeFlags(
-			includeFlags);
-	crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
-			excludeFlags);
+	mCrowdIncludeFlags = includeFlags;
+	mCrowdExcludeFlags = excludeFlags;
 }
 
 void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
@@ -705,6 +778,28 @@ AgentMovType NavMesh::getMovType()
 	HOLDMUTEX(mMutex)
 
 	return mMovType;
+}
+
+void NavMesh::setMovType(AgentMovType movType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mMovType = movType;
+}
+
+void NavMesh::setConvexVolumes(const std::list<PointListArea>& convexVolumes)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mConvexVolumes = convexVolumes;
+}
+
+void NavMesh::setOffMeshConnections(
+		const std::list<PointPairBidir>& offMeshConnections)
+{
+
 }
 
 NodePath NavMesh::getReferenceNP()

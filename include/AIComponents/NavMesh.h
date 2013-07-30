@@ -49,12 +49,10 @@ class NavMeshTemplate;
  * (i.e. is_steady=true) "Scene" components.\n
  * \note convex volumes and off mesh connections points are are given wrt
  * the scaled owner object node path.
- * \note the xml agent_radius/height will be overwritten (may be in an
- * unpredictable order) by the dimensions of the CrowdAgents at startup,
- * so they should have the same dimensions to avoid strange results.
  *
  * XML Param(s):
  * - "navmesh_type"					|single|"solo" (solo|tile|obstacle)
+ * - "auto_setup"					|single|"true"
  * - "mov_type"						|single|"recast" (recast|kinematic|character)
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
@@ -95,6 +93,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
@@ -109,22 +108,21 @@ public:
 	 */
 	virtual void update(void* data);
 
+	///Helper typedefs.
+	//convex volume
+	typedef std::list<LPoint3f> PointList;
+	typedef std::pair<PointList,int> PointListArea;
+	//off mesh connection
+	typedef std::pair<LPoint3f, LPoint3f> PointPair;
+	typedef std::pair<PointPair,bool> PointPairBidir;
+
 	/**
-	 * \brief Navigation mesh related methods.
+	 * \brief NavMesh related methods.
 	 */
 	///@{
 	//SOLO TILE OBSTACLE
-	NavMeshType* getNavMeshType();
-	NavMeshTypeEnum getNavMeshTypeEnum();
-	InputGeom* getInputGeom();
-	dtNavMesh* getNavMesh();
-	dtNavMeshQuery* getNavMeshQuery();
-	dtCrowd* getCrowd();
-	float getAgentRadius();
-	float getAgentHeight();
-	float getAgentClimb();
-	LVecBase3f getBoundsMin();
-	LVecBase3f getBoundsMax();
+	AgentMovType getMovType();
+	void setMovType(AgentMovType movType);
 	NavMeshSettings getNavMeshSettings();
 	void setNavMeshSettings(const NavMeshSettings& settings);
 	void setTool(NavMeshTypeTool* tool);
@@ -132,7 +130,8 @@ public:
 	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable);
 	void setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable);
 	void setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags);
-	AgentMovType getMovType();
+	void setConvexVolumes(const std::list<PointListArea>& convexVolumes);
+	void setOffMeshConnections(const std::list<PointPairBidir>& offMeshConnections);
 	NodePath getReferenceNP();
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
@@ -148,6 +147,23 @@ public:
 	void addObstacle(SMARTPTR(Object) object);
 	void removeObstacle(SMARTPTR(Object) object);
 	void clearAllObstacles();
+	///@}
+
+	/**
+	 * \brief Recast navmesh related methods.
+	 */
+	///@{
+	NavMeshType* getNavMeshType();
+	NavMeshTypeEnum getNavMeshTypeEnum();
+	InputGeom* getInputGeom();
+	dtNavMesh* getNavMesh();
+	dtNavMeshQuery* getNavMeshQuery();
+	dtCrowd* getCrowd();
+	float getAgentRadius();
+	float getAgentHeight();
+	float getAgentClimb();
+	LVecBase3f getBoundsMin();
+	LVecBase3f getBoundsMax();
 	///@}
 
 	/**
@@ -220,15 +236,35 @@ private:
 	/// NavMeshTileSettings from template.
 	NavMeshTileSettings mNavMeshTileSettings;
 	///Area-flags-cost settings.
-	std::list<std::string> mAreaFlagsCostList;
+	std::list<std::string> mAreaFlagsCostXmlParam;
+	///Area types with ability flags settings.
+	NavMeshPolyAreaFlags mPolyAreaFlags;
+	///Area types with cost settings.
+	NavMeshPolyAreaCost mPolyAreaCost;
 	///Crowd include & exclude flags settings.
-	std::string mCrowdIncludeFlags, mCrowdExcludeFlags;
+	std::string mCrowdIncludeFlagsXmlParam, mCrowdExcludeFlagsXmlParam;
+	int mCrowdIncludeFlags, mCrowdExcludeFlags;
 	///The movement type.
 	AgentMovType mMovType;
 	///Convex volumes.
-	std::list<std::string> mConvexVolumeList;
+	std::list<std::string> mConvexVolumeXmlParam;
+	std::list<PointListArea> mConvexVolumes;
 	///Off mesh connections.
-	std::list<std::string> mOffMeshConnectionList;
+	std::list<std::string> mOffMeshConnectionXmlParam;
+	std::list<PointPairBidir> mOffMeshConnections;
+	///@{
+	/// Auto setup: true (default) if navigation mesh
+	/// is to be setup when owner object is added to scene,
+	/// false if it will be built manually by program.
+	/// \note Manual setup is necessary when the owner object has
+	/// children objects and an overall navigation mesh should
+	/// consider them too: parents objects are (created and)
+	/// added to scene before their children, so an overall
+	/// navigation mesh can be built only after hierarchies
+	/// between objects have been already established, i.e.
+	/// after world creation; typically this kind of navigation
+	/// mesh is built (manually) during object initialization.
+	bool mAutoSetup;
 	/// Obstacles table
 	std::map<SMARTPTR(Object), dtObstacleRef> mObstacles;
 	/**
