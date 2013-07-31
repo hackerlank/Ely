@@ -132,10 +132,10 @@ private:
 	 * \brief Physics data.
 	 */
 	///@{
-	BulletWorld* m_world;
+//	BulletWorld* m_world;
 	float m_maxError;
 	LVector3f m_deltaRayDown, m_deltaRayOrig;
-	BulletClosestHitRayResult m_result;
+//	BulletClosestHitRayResult m_result;
 	BitMask32 m_rayMask;
 	///@}
 	/**

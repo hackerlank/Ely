@@ -96,11 +96,6 @@ public:
 	virtual void onAddToSceneSetup();
 
 	/**
-	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
-	 */
-	void navMeshSetup();
-
-	/**
 	 * \brief Updates position/orientation of crowd agents.
 	 *
 	 * Will be called automatically by an control manager update.
@@ -121,17 +116,25 @@ public:
 	 */
 	///@{
 	//SOLO TILE OBSTACLE
+	void setNavMeshTypeEnum(NavMeshTypeEnum typeEnum);
+	NavMeshTypeEnum getNavMeshTypeEnum();
+	NavMeshType* getNavMeshType();
 	AgentMovType getMovType();
 	void setMovType(AgentMovType movType);
 	NavMeshSettings getNavMeshSettings();
 	void setNavMeshSettings(const NavMeshSettings& settings);
-	void setTool(NavMeshTypeTool* tool);
 	NavMeshTypeTool* getTool();
+	void setTool(NavMeshTypeTool* tool);
 	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable);
+	NavMeshPolyAreaFlags getFlagsAreaTable();
 	void setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable);
+	NavMeshPolyAreaCost getCostAreaTable();
 	void setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags);
+	void getCrowdIncludeExcludeFlags(int& includeFlags, int& excludeFlags);
 	void setConvexVolumes(const std::list<PointListArea>& convexVolumes);
+	std::list<PointListArea> getConvexVolumes();
 	void setOffMeshConnections(const std::list<PointPairBidir>& offMeshConnections);
+	std::list<PointPairBidir> getOffMeshConnections();
 	NodePath getReferenceNP();
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
@@ -150,20 +153,18 @@ public:
 	///@}
 
 	/**
-	 * \brief Recast navmesh related methods.
+	 * \brief Recast nav mesh related methods.
 	 */
 	///@{
-	NavMeshType* getNavMeshType();
-	NavMeshTypeEnum getNavMeshTypeEnum();
-	InputGeom* getInputGeom();
-	dtNavMesh* getNavMesh();
-	dtNavMeshQuery* getNavMeshQuery();
-	dtCrowd* getCrowd();
-	float getAgentRadius();
-	float getAgentHeight();
-	float getAgentClimb();
-	LVecBase3f getBoundsMin();
-	LVecBase3f getBoundsMax();
+	InputGeom* getRecastInputGeom();
+	dtNavMesh* getRecastNavMesh();
+	dtNavMeshQuery* getRecastNavMeshQuery();
+	dtCrowd* getRecastCrowd();
+	float getRecastAgentRadius();
+	float getRecastAgentHeight();
+	float getRecastAgentClimb();
+	LVecBase3f getRecastBoundsMin();
+	LVecBase3f getRecastBoundsMax();
 	///@}
 
 	/**
@@ -177,11 +178,11 @@ public:
 	bool loadModelMesh(NodePath model);
 
 	/**
-	 * \brief Sets up the type of navigation mesh for the loaded model mesh.
-	 * @param navMeshType The type of navigation mesh.
-	 * @param navMeshTypeEnum The type of navigation mesh enum.
+	 * \brief Sets the navigation mesh type for the loaded model mesh.
+	 * @param navMeshType The navigation mesh type.
+	 * @param navMeshTypeEnum The navigation mesh enum type.
 	 */
-	void setupNavMesh(NavMeshType* navMeshType, NavMeshTypeEnum navMeshTypeEnum=SOLO);
+	void setNavMeshType(NavMeshType* navMeshType, NavMeshTypeEnum navMeshTypeEnum=SOLO);
 
 	/**
 	 * \brief Builds the navigation mesh for the loaded model mesh.
@@ -203,6 +204,25 @@ public:
 	 * @param crowdAgentObject The object to be removed.
 	 */
 	void removeCrowdAgent(SMARTPTR(Object) crowdAgentObject);
+
+	/**
+	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
+	 *
+	 * All parameters for navMeshSetup() should be set with these methods:
+	 * - setNavMeshTypeEnum(NavMeshTypeEnum)
+	 * - setMovType(AgentMovType)
+	 * - setNavMeshSettings(NavMeshSettings)
+	 * - setNavMeshTileSettings(NavMeshTileSettings) (only for TILE and OBSTACLE)
+	 * - setFlagsAreaTable(NavMeshPolyAreaFlags)
+	 * - setCostAreaTable(NavMeshPolyAreaCost)
+	 * - setCrowdIncludeExcludeFlags(int, int)
+	 * - setConvexVolumes(std::list<PointListArea>)
+	 * - setOffMeshConnections(std::list<PointPairBidir>)
+	 * After that navMeshSetup() can be called.\n
+	 * This method is written so that the code can be used (with little modification)
+	 * to manually setup the NavMesh in program.
+	 */
+	void navMeshSetup();
 
 #ifdef ELY_DEBUG
 	/**
@@ -273,8 +293,6 @@ private:
 	///@{
 	///The CrowdAgent components handled by this NavMesh.
 	std::list<SMARTPTR(CrowdAgent)> mCrowdAgents;
-	///The Current movement type.
-	AgentMovType mMovType;
 	///@}
 
 #ifdef ELY_DEBUG

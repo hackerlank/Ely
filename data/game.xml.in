@@ -333,7 +333,7 @@
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 		
-		<Object type="StaticNavMesh" id="course2" priority="100">
+		<Object type="StaticNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="course2.bam"/>
@@ -366,7 +366,7 @@
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
-		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="90">
+		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
