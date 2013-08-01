@@ -598,6 +598,25 @@ void NavMesh::navMeshSetup()
 	crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
 			excludeFlags);
 
+	///only for manual setup:
+	///add to recast previously added CrowdAgents
+	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+	std::list<SMARTPTR(CrowdAgent)crowdAgents = getCrowdAgents();
+	for (iterCA = crowdAgents.begin(); iterCA < crowdAgents.end();
+			++iterCA)
+	{
+		//CrowdAgent position is supposed to be wrt reference node path
+		LPoint3f pos = (*iterCA)->getOwnerObject()->
+				getNodePath().get_pos();
+		//get recast p (y-up)
+		float p[3];
+		LVecBase3fToRecast(pos, p);
+		//add recast agent
+		int agentIdx = crowdTool->getState()->addAgent(p);
+		//set the id of CrowdAgent
+		(*iterCA)->setIdx(agentIdx);
+	}
+
 	///Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 
@@ -865,6 +884,14 @@ NodePath NavMesh::getReferenceNP()
 	return mReferenceNP;
 }
 
+std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCrowdAgents;
+}
+
 void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 {
 	//lock (guard) the mutex
@@ -1104,7 +1131,37 @@ bool NavMesh::buildNavMesh()
 	return result;
 }
 
-void NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
+int NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject, LPoint3f pos,
+		const dtCrowdAgentParams& ap)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	int agentIdx = -1;
+	SMARTPTR(CrowdAgent)crowdAgent =
+			DCAST(CrowdAgent,crowdAgentObject->getComponent(componentType()));
+	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+	if(iterCA != mCrowdAgents.end())
+	{
+		mCrowdAgents.push_back(crowdAgent);
+	}
+	//check if there is a crowd tool, i.e. the
+	//recast nav mesh has been completely setup
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(getTool());
+	if (crowdTool)
+	{
+		//get recast p (y-up)
+		float p[3];
+		LVecBase3fToRecast(pos, p);
+		//add recast agent
+		agentIdx = crowdTool->getState()->addAgent(p, &ap);
+	}
+	//
+	return agentIdx;
+}
+
+void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject, int agentIdx)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -1115,27 +1172,49 @@ void NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
 	if(iterCA != mCrowdAgents.end())
 	{
-		//set the mov type of the crowd agent
-		crowdAgent->setMovType(mMovType);
-		mCrowdAgents.push_back(crowdAgent);
+		mCrowdAgents.erase(iterCA);
+	}
+	//check if there is a crowd tool, i.e. the
+	//recast nav mesh has been completely setup
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(getTool());
+	if (crowdTool)
+	{
+		//remove recast agent
+		crowdTool->getState()->removeAgent(agentIdx);
 	}
 }
 
-void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
+void NavMesh::updateParams(int agentIdx, const dtCrowdAgentParams& agentParams)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	SMARTPTR(CrowdAgent)crowdAgent =
-			DCAST(CrowdAgent,crowdAgentObject->getComponent(componentType()));
-	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
-	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
-	if(iterCA != mCrowdAgents.end())
+	//if there is a crowd tool then update
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(navMesh->getTool());
+	if (crowdTool)
 	{
-		//set the mov type of the crowd agent to default (RECAST)
-		crowdAgent->setMovType(RECAST);
-		mCrowdAgents.erase(iterCA);
+		crowdTool->getState()->getCrowd()->
+				updateAgentParameters(mAgentIdx, &mAgentParams);
 	}
+}
+
+void NavMesh::updateMoveTarget(int agentIdx, const LPoint3f& pos)
+{
+	//if there is a crowd tool then update
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(navMesh->getTool());
+	if (crowdTool)
+	{
+		float p[3];
+		LVecBase3fToRecast(pos, p);
+		dynamic_cast<CrowdTool*>(navMesh->getTool())->
+				getState()->setMoveTarget(mAgentIdx, p);
+		mCurrentTarget = pos;
+	}
+}
+
+void NavMesh::updateMoveVelocity(int agentIdx, const LVector3f& vel)
+{
+	float v[3];
+	LVecBase3fToRecast(vel, v);
+	dynamic_cast<CrowdTool*>(navMesh->getTool())->
+			getState()->setMoveVelocity(mAgentIdx,v);
 }
 
 void NavMesh::update(void* data)

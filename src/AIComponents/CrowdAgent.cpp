@@ -46,7 +46,6 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl)
 	mAgent = NULL;
 	mAgentIdx = -1;
 	mNavMeshObject = NULL;
-	mAddedToHandling = false;
 	mMovType = RECAST;
 }
 
@@ -119,36 +118,36 @@ void CrowdAgent::onAddToObjectSetup()
 		return;
 	}
 
-	//set referenceNP to the owner object parent
-	mReferenceNP = mOwnerObject->getNodePath().get_parent();
+	//setup event callbacks if any
+	setupEvents();
+	//register event callbacks if any
+	registerEventCallbacks();
+}
 
-	//get NavMesh owner object if register_to_navmesh == existent navmesh
-	mNavMeshObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
-			mNavMeshObjectId);
-	//set Agent radius/height of NavMesh settings.
-	if(mNavMeshObject)
+void CrowdAgent::onAddToSceneSetup()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//add only for a not empty object node path
+	if (mOwnerObject->getNodePath().is_empty())
 	{
-		LPoint3f min_point, max_point;
-		mOwnerObject->getNodePath().calc_tight_bounds(min_point, max_point);
-		float radius = sqrt(
-				pow((max_point.get_x() - min_point.get_x()), 2)
-						+ pow((max_point.get_y() - min_point.get_y()), 2))
-				/ 2.0;
-		float height = max_point.get_z() - min_point.get_z();
-		// the NavMesh xml agent_radius/height will be overwritten
-		//(may be in an unpredictable order) by the dimensions of
-		//the CrowdAgents at startup, so they should have the
-		//same dimensions to avoid strange results.
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		//note: in threading hold the NavMesh mutex during the whole transaction.
-		HOLDMUTEX(navMesh->getMutex())
+		return;
+	}
 
-		NavMeshSettings settings = navMesh->getNavMeshSettings();
-		settings.m_agentRadius = radius;
-		settings.m_agentHeight = height;
-		navMesh->setNavMeshSettings(settings);
+	///get NavMesh owner object from xml (if any)
+	SMARTPTR(Object) navMeshObject = ObjectTemplateManager::
+			GetSingleton().getCreatedObject(mNavMeshObjectId);
+
+	if(navMeshObject)
+	{
+		///1: get the input from xml
+		///2: add settings for CrowdAgent
+		///set NavMesh object
+		setNavMeshObject(navMeshObject);
+		///set params: already done
+		///3: add to the NavMesh
+		addToNavMesh();
 	}
 
 	//setup event callbacks if any
@@ -173,16 +172,20 @@ int CrowdAgent::getIdx()
 	return mAgentIdx;
 }
 
+void CrowdAgent::setIdx(int idx)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAgentIdx = idx;
+}
+
 void CrowdAgent::setMovType(AgentMovType movType)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	mMovType = movType;
-	if(mMovType == KINEMATIC)
-	{
-///TODO
-	}
 }
 
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
@@ -191,13 +194,12 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 	HOLDMUTEX(mMutex)
 
 	mAgentParams = agentParams;
-	if(mNavMeshObject and mAddedToHandling)
+	if(mNavMeshObject)
 	{
 		//get nav mesh component
 		SMARTPTR(NavMesh) navMesh =
 				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		dynamic_cast<CrowdTool*>(navMesh->getTool())->
-				getState()->getCrowd()->updateAgentParameters(mAgentIdx, &mAgentParams);
+		navMesh->updateParams(mOwnerObject, agentParams);
 	}
 }
 
@@ -206,14 +208,6 @@ dtCrowdAgentParams CrowdAgent::getParams()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if(mNavMeshObject and mAddedToHandling)
-	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		mAgentParams = dynamic_cast<CrowdTool*>(navMesh->getTool())->
-				getState()->getCrowd()->getAgent(mAgentIdx)->params;
-	}
 	return mAgentParams;
 }
 
@@ -222,16 +216,13 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if(mNavMeshObject and mAddedToHandling)
+	mCurrentTarget = pos;
+	if(mNavMeshObject)
 	{
 		//get nav mesh component
 		SMARTPTR(NavMesh) navMesh =
 				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		float p[3];
-		LVecBase3fToRecast(pos, p);
-		dynamic_cast<CrowdTool*>(navMesh->getTool())->
-				getState()->setMoveTarget(mAgentIdx, p);
-		mCurrentTarget = pos;
+		navMesh->updateMoveTarget(mOwnerObject, pos);
 	}
 }
 
@@ -248,16 +239,13 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if(mNavMeshObject and mAddedToHandling)
+	mCurrentVelocity = vel;
+	if(mNavMeshObject)
 	{
 		//get nav mesh component
 		SMARTPTR(NavMesh) navMesh =
 				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		float v[3];
-		LVecBase3fToRecast(vel, v);
-		dynamic_cast<CrowdTool*>(navMesh->getTool())->
-				getState()->setMoveVelocity(mAgentIdx,v);
-		mCurrentVelocity = vel;
+		navMesh->updateMoveVelocity(mOwnerObject, vel);
 	}
 }
 
@@ -290,38 +278,34 @@ void CrowdAgent::addToNavMesh()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if(mNavMeshObject and (not mAddedToHandling))
+	if(getNavMeshObject())
 	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		//add to nav mesh
-		//note: in threading hold the NavMesh mutex during the whole transaction.
-		HOLDMUTEX(navMesh->getMutex())
+		///get NavMesh component
+		SMARTPTR(NavMesh) navMesh = DCAST(NavMesh,
+				getNavMeshObject()->getComponent(componentType()));
 
+		///NavMesh object updates pos/vel wrt its reference node path
 		LPoint3f pos;
-		NodePath referenceNP = navMesh->getReferenceNP();
-		NodePath ownerObjectNP = mOwnerObject->getNodePath();
-		if(referenceNP != mReferenceNP)
+		NodePath navMeshRefNP = navMesh->getReferenceNP();
+		NodePath ownerObjectRefNP = getOwnerObject()->getNodePath().get_parent();
+		if(navMeshRefNP != ownerObjectRefNP)
 		{
-			//the owner object is reparented to the NavMesh reference node path
-			pos = ownerObjectNP.get_pos(referenceNP);
-			ownerObjectNP.reparent_to(referenceNP);
-			ownerObjectNP.set_pos(pos);
+			//the owner object is reparented to the NavMesh
+			//object reference node path
+			pos = getOwnerObject()->getNodePath().get_pos(navMeshRefNP);
+			getOwnerObject()->getNodePath().reparent_to(navMeshRefNP);
+			getOwnerObject()->getNodePath().set_pos(pos);
 		}
 		else
 		{
-			pos = ownerObjectNP.get_pos();
+			pos = getOwnerObject()->getNodePath().get_pos();
 		}
-		//get recast p (y-up)
-		float p[3];
-		LVecBase3fToRecast(pos, p);
-		//add recast agent
-		mAgentIdx = dynamic_cast<CrowdTool*>(navMesh->getTool())
-				->getState()->addAgent(p, &mAgentParams);
-		//add Agent to list
-		navMesh->addCrowdAgent(mOwnerObject);
-		mAddedToHandling = true;
+
+		///set the mov type of the crowd agent
+		setMovType(navMesh->getMovType());
+
+		///add to NavMesh and set the id of CrowdAgent
+		setIdx(navMesh->addCrowdAgent(getOwnerObject(), pos, getParams()));
 	}
 }
 
@@ -330,29 +314,17 @@ void CrowdAgent::removeFromNavMesh()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if(mNavMeshObject and mAddedToHandling)
+	if(mNavMeshObject)
 	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		//remove from nav mesh
-		//note: in threading hold the NavMesh mutex during the whole transaction.
-		HOLDMUTEX(navMesh->getMutex())
+		///get NavMesh component
+		SMARTPTR(NavMesh) navMesh = DCAST(NavMesh,
+				getNavMeshObject()->getComponent(componentType()));
 
-		if(navMesh->getReferenceNP() != mReferenceNP)
-		{
-			//the owner object is reparented to the original reference node path
-			NodePath ownerObjectNP = mOwnerObject->getNodePath();
-			LPoint3f pos = ownerObjectNP.get_pos(mReferenceNP);
-			ownerObjectNP.reparent_to(mReferenceNP);
-			ownerObjectNP.set_pos(pos);
-		}
-		//remove recast agent
-		dynamic_cast<CrowdTool*>(navMesh->getTool())
-				->getState()->removeAgent(mAgentIdx);
-		//remove Agent from list
-		navMesh->removeCrowdAgent(mOwnerObject);
-		mAddedToHandling = false;
+		///remove from NavMesh
+		navMesh->removeCrowdAgent(getOwnerObject(), getIdx());
+
+		///set the mov type of the crowd agent to default (RECAST)
+		setMovType(RECAST);
 	}
 }
 

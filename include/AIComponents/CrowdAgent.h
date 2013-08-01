@@ -53,6 +53,8 @@ enum AgentMovType
  *
  * \note this component should be associated to a "Scene" component, and
  * should be created after it.
+ * \note this component object should have the same reference node
+ * (i.e. parent) of the NavMesh object to which it is added.
  *
  * XML Param(s):
  * - "throw_events"						|single|"false"
@@ -77,6 +79,7 @@ public:
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
 
 	/**
 	 * \name NavMesh & Crowd agent data
@@ -85,6 +88,7 @@ public:
 	///@{
 	dtCrowdAgent* getDtAgent();
 	int getIdx();
+	void setIdx(int idx);
 	void setMovType(AgentMovType movType);
 	void setParams(const dtCrowdAgentParams& agentParams);
 	dtCrowdAgentParams getParams();
@@ -111,16 +115,13 @@ private:
 	///The NavMesh owner object.
 	SMARTPTR(Object) mNavMeshObject;
 	std::string mNavMeshObjectId;
-	///Added to handling flag.
-	bool mAddedToHandling;
 	///The movement type.
 	AgentMovType mMovType;
-	///The original reference node path.
-	NodePath mReferenceNP;
-	///The associated dtCrowdAgent data.
+	///The CrowdAgent index.
+	int mAgentIdx;
+	///The associated recast dtCrowdAgent data.
 	///@{
 	dtCrowdAgent* mAgent;
-	int mAgentIdx;
 	dtCrowdAgentParams mAgentParams;
 	LPoint3f mCurrentTarget;
 	LVector3f mCurrentVelocity;

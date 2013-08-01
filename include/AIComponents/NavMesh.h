@@ -136,6 +136,7 @@ public:
 	void setOffMeshConnections(const std::list<PointPairBidir>& offMeshConnections);
 	std::list<PointPairBidir> getOffMeshConnections();
 	NodePath getReferenceNP();
+	std::list<SMARTPTR(CrowdAgent)> getCrowdAgents();
 	//TILE OBSTACLE
 	NavMeshTileSettings getNavMeshTileSettings();
 	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
@@ -193,17 +194,23 @@ public:
 	/**
 	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
 	 * mechanism.
-	 *
-	 * @param crowdAgentObject The object to be added.
 	 */
-	void addCrowdAgent(SMARTPTR(Object) crowdAgentObject);
+	int NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject, LPoint3f pos,
+			const dtCrowdAgentParams& ap)
 	/**
 	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
 	 * mechanism.
-	 *
-	 * @param crowdAgentObject The object to be removed.
 	 */
-	void removeCrowdAgent(SMARTPTR(Object) crowdAgentObject);
+	void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject, int agentIdx)
+
+	/**
+	 * \brief Recast crowd agents related methods.
+	 */
+	///@{
+	void updateParams(int agentIdx,	const dtCrowdAgentParams& agentParams);
+	void updateMoveTarget(int agentIdx,	const LPoint3f& pos);
+	void updateMoveVelocity(int agentIdx, const LVector3f& vel);
+	///@}
 
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
