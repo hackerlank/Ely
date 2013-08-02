@@ -81,6 +81,14 @@ class RigidBodyTemplate;
  */
 class RigidBody: public Component
 {
+protected:
+	friend class Object;
+	friend class RigidBodyTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	RigidBody();
 	RigidBody(SMARTPTR(RigidBodyTemplate)tmpl);
@@ -88,10 +96,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief The current component's type.

@@ -59,9 +59,6 @@ const ComponentFamilyType NavMeshTemplate::familyType() const
 
 SMARTPTR(Component)NavMeshTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(NavMesh) newNavMesh = new NavMesh(this);
 	newNavMesh->setComponentId(compId);
 	if (not newNavMesh->initialize())

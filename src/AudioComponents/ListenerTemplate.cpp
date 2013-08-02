@@ -59,9 +59,6 @@ const ComponentFamilyType ListenerTemplate::familyType() const
 
 SMARTPTR(Component)ListenerTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Listener) newListener = new Listener(this);
 	newListener->setComponentId(compId);
 	if (not newListener->initialize())

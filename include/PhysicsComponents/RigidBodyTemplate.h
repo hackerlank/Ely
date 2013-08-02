@@ -30,6 +30,11 @@ namespace ely
 {
 class RigidBodyTemplate: public ComponentTemplate
 {
+protected:
+
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
+	virtual void setParametersDefaults();
+
 public:
 	RigidBodyTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
@@ -37,10 +42,6 @@ public:
 
 	const virtual ComponentType componentType() const;
 	const virtual ComponentFamilyType familyType() const;
-
-	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
-
-	virtual void setParametersDefaults();
 
 private:
 

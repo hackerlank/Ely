@@ -51,6 +51,14 @@ class Sound3dTemplate;
  */
 class Sound3d: public Component
 {
+protected:
+	friend class Object;
+	friend class Sound3dTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	Sound3d();
 	Sound3d(SMARTPTR(Sound3dTemplate)tmpl);
@@ -58,10 +66,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Adds dynamically a new sound to this component by

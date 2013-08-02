@@ -59,9 +59,6 @@ const ComponentFamilyType CrowdAgentTemplate::familyType() const
 
 SMARTPTR(Component)CrowdAgentTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(CrowdAgent) newCrowdAgent = new CrowdAgent(this);
 	newCrowdAgent->setComponentId(compId);
 	if (not newCrowdAgent->initialize())

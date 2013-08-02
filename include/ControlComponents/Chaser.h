@@ -53,6 +53,14 @@ class ChaserTemplate;
  */
 class Chaser: public Component
 {
+protected:
+	friend class Object;
+	friend class ChaserTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	Chaser();
 	Chaser(SMARTPTR(ChaserTemplate)tmpl);
@@ -60,10 +68,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.

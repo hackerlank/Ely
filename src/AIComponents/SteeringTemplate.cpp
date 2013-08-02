@@ -59,9 +59,6 @@ const ComponentFamilyType SteeringTemplate::familyType() const
 
 SMARTPTR(Component)SteeringTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Steering) newSteering = new Steering(this);
 	newSteering->setComponentId(compId);
 	if (not newSteering->initialize())

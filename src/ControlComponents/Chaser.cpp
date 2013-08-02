@@ -64,9 +64,6 @@ const ComponentType Chaser::componentType() const
 
 bool Chaser::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//get settings from template
 	//enabling setting
@@ -268,9 +265,6 @@ void Chaser::setDistance(float distance)
 
 void Chaser::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{
@@ -318,9 +312,6 @@ void Chaser::onAddToObjectSetup()
 
 void Chaser::onAddToSceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	if ((not mEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
 	{
 		return;

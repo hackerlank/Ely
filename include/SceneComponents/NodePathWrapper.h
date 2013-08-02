@@ -41,6 +41,13 @@ class NodePathWrapperTemplate;
  */
 class NodePathWrapper: public Component
 {
+protected:
+	friend class Object;
+	friend class NodePathWrapperTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+
 public:
 	NodePathWrapper();
 	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl);
@@ -48,9 +55,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Gets/sets the node path of this node path wrapper.

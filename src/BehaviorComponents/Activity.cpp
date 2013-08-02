@@ -60,9 +60,6 @@ const ComponentType Activity::componentType() const
 
 bool Activity::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//
 	return result;
@@ -114,9 +111,6 @@ void Activity::setupFSM()
 }
 void Activity::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add even for an empty object node path
 
 	//setup the FSM

@@ -57,6 +57,14 @@ class GeoMipTerrainRef;
  */
 class Terrain: public Component
 {
+protected:
+	friend class Object;
+	friend class TerrainTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	Terrain();
 	Terrain(SMARTPTR(TerrainTemplate)tmpl);
@@ -64,10 +72,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates the terrain associated to this component.

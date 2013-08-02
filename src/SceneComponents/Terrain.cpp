@@ -68,9 +68,6 @@ const ComponentType Terrain::componentType() const
 
 bool Terrain::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//get scale
 	mHeightScale = strtof(
@@ -162,9 +159,6 @@ bool Terrain::initialize()
 
 void Terrain::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//create the current terrain
 	//terrain definition
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType

@@ -65,6 +65,17 @@ typedef std::string ObjectId;
  */
 class Object: public TypedWritableReferenceCount
 {
+	friend class ObjectTemplateManager;
+
+	/**
+	 * \brief On addition to scene setup.
+	 *
+	 * Gives an object the ability to perform the
+	 * addition to scene setup and any required initialization.\n
+	 * Called only by ObjectTemplateManager::createObject().
+	 */
+	void sceneSetup();
+
 public:
 	/**
 	 * \brief Constructor.
@@ -112,14 +123,6 @@ public:
 	 * @return The number of components.
 	 */
 	unsigned int numComponents();
-
-	/**
-	 * \brief On addition to scene setup.
-	 *
-	 * Gives an object the ability to perform the
-	 * addition to scene setup and any required initialization.
-	 */
-	void sceneSetup();
 
 	/**
 	 * \brief On world creation setup.

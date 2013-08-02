@@ -62,9 +62,6 @@ const ComponentType InstanceOf::componentType() const
 
 bool InstanceOf::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//instance of object id
 	mInstanceOfId = ObjectId(
@@ -83,9 +80,6 @@ bool InstanceOf::initialize()
 
 void InstanceOf::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//setup initial state
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 	std::string name = COMPONENT_STANDARD_NAME;

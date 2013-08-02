@@ -71,6 +71,13 @@ class ActivityTemplate;
  */
 class Activity: public Component
 {
+protected:
+	friend class Object;
+	friend class ActivityTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+
 public:
 	Activity();
 	Activity(SMARTPTR(ActivityTemplate)tmpl);
@@ -78,9 +85,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief fsm conversion function.

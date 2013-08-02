@@ -112,21 +112,6 @@ ParameterTable ComponentTemplate::getParameterTable()
 	return mParameterTable;
 }
 
-PandaFramework* const ComponentTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* const ComponentTemplate::windowFramework() const
-{
-	return mWindowFramework;
-}
-
-ReMutex& ComponentTemplate::getMutex()
-{
-	return mMutex;
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle ComponentTemplate::_type_handle;
 

@@ -59,9 +59,6 @@ const ComponentFamilyType Sound3dTemplate::familyType() const
 
 SMARTPTR(Component) Sound3dTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Sound3d) newSound3d = new Sound3d(this);
 	newSound3d->setComponentId(compId);
 	if (not newSound3d->initialize())

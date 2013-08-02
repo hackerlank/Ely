@@ -59,9 +59,6 @@ const ComponentFamilyType RigidBodyTemplate::familyType() const
 
 SMARTPTR(Component)RigidBodyTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(RigidBody) newRigidBody = new RigidBody(this);
 	newRigidBody->setComponentId(compId);
 	if (not newRigidBody->initialize())

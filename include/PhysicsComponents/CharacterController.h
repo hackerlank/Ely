@@ -72,6 +72,13 @@ class CharacterControllerTemplate;
  */
 class CharacterController: public Component
 {
+protected:
+	friend class Object;
+	friend class CharacterControllerTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+
 public:
 	CharacterController();
 	CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl);
@@ -79,9 +86,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.

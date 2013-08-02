@@ -58,9 +58,6 @@ const ComponentFamilyType CharacterControllerTemplate::familyType() const
 
 SMARTPTR(Component)CharacterControllerTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(CharacterController) newCharacter = new CharacterController(this);
 	newCharacter->setComponentId(compId);
 	if (not newCharacter->initialize())

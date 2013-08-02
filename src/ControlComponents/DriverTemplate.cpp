@@ -59,9 +59,6 @@ const ComponentFamilyType DriverTemplate::familyType() const
 
 SMARTPTR(Component)DriverTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Driver) newDriver = new Driver(this);
 	newDriver->setComponentId(compId);
 	if (not newDriver->initialize())

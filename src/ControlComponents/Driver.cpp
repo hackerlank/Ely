@@ -162,9 +162,6 @@ void Driver::disable()
 
 bool Driver::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//get settings from template
 	//enabling setting
@@ -249,9 +246,6 @@ bool Driver::initialize()
 
 void Driver::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{

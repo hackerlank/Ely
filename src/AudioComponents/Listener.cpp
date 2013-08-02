@@ -67,9 +67,6 @@ const ComponentType Listener::componentType() const
 
 bool Listener::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//
 	return result;
@@ -77,9 +74,6 @@ bool Listener::initialize()
 
 void Listener::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{
@@ -101,9 +95,6 @@ void Listener::onAddToObjectSetup()
 
 void Listener::onAddToSceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{

@@ -60,9 +60,6 @@ const ComponentFamilyType NodePathWrapperTemplate::familyType() const
 
 SMARTPTR(Component)NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(NodePathWrapper) newNodePathWrapper = new NodePathWrapper(this);
 	newNodePathWrapper->setComponentId(compId);
 	if (not newNodePathWrapper->initialize())

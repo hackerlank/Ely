@@ -89,7 +89,7 @@ SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
 	}
 	SMARTPTR(Component) previousComp;
 	previousComp.clear();
-	ComponentFamilyType familyId = newComponent.p()->familyType();
+	ComponentFamilyType familyId = newComponent->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())
 	{
@@ -102,7 +102,7 @@ SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
 	//insert the new component into the table
 	mComponents[familyId] = newComponent;
 	//on addition to object component setup
-	mComponents[familyId].p()->onAddToObjectSetup();
+	mComponents[familyId]->onAddToObjectSetup();
 	//check if the owner object is an already created object
 	ObjectId ownerId = mComponents[familyId]->getOwnerObject()->objectId();
 	if (ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ownerId))
@@ -149,8 +149,7 @@ Object::operator NodePath()
 
 void Object::sceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	//Called only by ObjectTemplateManager::createObject(). Thread safe.
 
 	//Parent (by default none)
 	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));

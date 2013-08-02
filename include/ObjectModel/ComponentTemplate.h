@@ -36,6 +36,22 @@ namespace ely
  */
 class ComponentTemplate: public TypedWritableReferenceCount
 {
+protected:
+	friend class ComponentTemplateManager;
+	friend class ObjectTemplateManager;
+
+	/**
+	 * \brief Creates the current component of that family.
+	 * @return The component just created, NULL if component cannot be created.
+	 */
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId) = 0;
+
+	/**
+	 * \brief For the component this template is designed to create,
+	 * this function sets the (mandatory) parameters to their default values.
+	 */
+	virtual void setParametersDefaults() = 0;
+
 public:
 	/**
 	 * \brief Constructor.
@@ -60,12 +76,6 @@ public:
 	virtual const ComponentFamilyType familyType() const = 0;
 
 	/**
-	 * \brief Creates the current component of that family.
-	 * @return The component just created, NULL if component cannot be created.
-	 */
-	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId) = 0;
-
-	/**
 	 * \name Parameters management.
 	 * \brief Sets the parameters of the component, this template is
 	 * designed to create, to custom values.
@@ -75,12 +85,6 @@ public:
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	void setParameters(const ParameterTable& parameterTable);
-
-	/**
-	 * \brief For the component this template is designed to create,
-	 * this function sets the (mandatory) parameters to their default values.
-	 */
-	virtual void setParametersDefaults() = 0;
 
 	/**
 	 * \brief Gets the parameter value associated to the component.
@@ -155,6 +159,24 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline PandaFramework* const ComponentTemplate::pandaFramework() const
+{
+	return mPandaFramework;
+}
+
+inline WindowFramework* const ComponentTemplate::windowFramework() const
+{
+	return mWindowFramework;
+}
+
+inline ReMutex& ComponentTemplate::getMutex()
+{
+	return mMutex;
+}
+
 }  // namespace ely
 
 #endif /* COMPONENTTEMPLATE_H_ */

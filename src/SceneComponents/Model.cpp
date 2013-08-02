@@ -97,9 +97,6 @@ void Model::r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& parts)
 
 bool Model::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//check if from file
 	mFromFile = (
@@ -134,9 +131,6 @@ bool Model::initialize()
 
 void Model::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//build model
 	if (mFromFile)
 	{

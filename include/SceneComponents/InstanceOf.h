@@ -41,6 +41,13 @@ class InstanceOfTemplate;
  */
 class InstanceOf: public Component
 {
+protected:
+	friend class Object;
+	friend class InstanceOfTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+
 public:
 	InstanceOf();
 	InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl);
@@ -48,9 +55,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Gets/sets the node path associated to this instance of.

@@ -83,6 +83,13 @@ class DriverTemplate;
  */
 class Driver: public Component
 {
+protected:
+	friend class Object;
+	friend class DriverTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+
 public:
 	Driver();
 	Driver(SMARTPTR(DriverTemplate)tmpl);
@@ -90,9 +97,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.

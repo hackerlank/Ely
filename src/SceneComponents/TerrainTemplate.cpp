@@ -59,9 +59,6 @@ const ComponentFamilyType TerrainTemplate::familyType() const
 
 SMARTPTR(Component)TerrainTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Terrain) newTerrain = new Terrain(this);
 	newTerrain->setComponentId(compId);
 	if (not newTerrain->initialize())

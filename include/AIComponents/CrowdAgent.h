@@ -69,6 +69,14 @@ enum AgentMovType
  */
 class CrowdAgent: public Component
 {
+protected:
+	friend class Object;
+	friend class CrowdAgentTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	CrowdAgent();
 	CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl);
@@ -76,10 +84,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \name NavMesh & Crowd agent data

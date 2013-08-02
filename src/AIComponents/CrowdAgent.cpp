@@ -69,9 +69,6 @@ const ComponentType CrowdAgent::componentType() const
 
 bool CrowdAgent::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//throw events setting
 	mThrowEvents = (
@@ -109,9 +106,6 @@ bool CrowdAgent::initialize()
 
 void CrowdAgent::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{
@@ -126,9 +120,6 @@ void CrowdAgent::onAddToObjectSetup()
 
 void CrowdAgent::onAddToSceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{
@@ -196,10 +187,10 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 	mAgentParams = agentParams;
 	if(mNavMeshObject)
 	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->updateParams(mOwnerObject, agentParams);
+//		//get nav mesh component
+//		SMARTPTR(NavMesh) navMesh =
+//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+//		navMesh->updateParams(mOwnerObject, agentParams);
 	}
 }
 
@@ -219,10 +210,10 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	mCurrentTarget = pos;
 	if(mNavMeshObject)
 	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->updateMoveTarget(mOwnerObject, pos);
+//		//get nav mesh component
+//		SMARTPTR(NavMesh) navMesh =
+//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+//		navMesh->updateMoveTarget(mOwnerObject, pos);
 	}
 }
 
@@ -242,10 +233,10 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	mCurrentVelocity = vel;
 	if(mNavMeshObject)
 	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->updateMoveVelocity(mOwnerObject, vel);
+//		//get nav mesh component
+//		SMARTPTR(NavMesh) navMesh =
+//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+//		navMesh->updateMoveVelocity(mOwnerObject, vel);
 	}
 }
 

@@ -80,9 +80,6 @@ const ComponentType CharacterController::componentType() const
 
 bool CharacterController::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//throw events setting
 	mThrowEvents = (
@@ -260,9 +257,6 @@ bool CharacterController::initialize()
 
 void CharacterController::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//At this point a Scene component (Model, InstanceOf ...) should have
 	//been already created and added to the object, so its node path should
 	//be the same as the object's one.

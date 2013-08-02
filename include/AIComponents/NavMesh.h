@@ -83,6 +83,14 @@ class NavMeshTemplate;
  */
 class NavMesh: public Component
 {
+protected:
+	friend class Object;
+	friend class NavMeshTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	NavMesh();
 	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
@@ -90,10 +98,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates position/orientation of crowd agents.
@@ -195,13 +199,13 @@ public:
 	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
 	 * mechanism.
 	 */
-	int NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject, LPoint3f pos,
-			const dtCrowdAgentParams& ap)
+	int addCrowdAgent(SMARTPTR(Object)crowdAgentObject, LPoint3f pos,
+			const dtCrowdAgentParams& ap);
 	/**
 	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
 	 * mechanism.
 	 */
-	void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject, int agentIdx)
+	void removeCrowdAgent(SMARTPTR(Object)crowdAgentObject, int agentIdx);
 
 	/**
 	 * \brief Recast crowd agents related methods.

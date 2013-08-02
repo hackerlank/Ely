@@ -51,22 +51,6 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mOwnerObject = ownerObject;
-}
-
-SMARTPTR(Object)Component::getOwnerObject() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mOwnerObject;
-}
-
 void Component::onAddToObjectSetup()
 {
 }
@@ -75,20 +59,14 @@ void Component::onAddToSceneSetup()
 {
 }
 
-void Component::setComponentId(const ComponentId& componentId)
+void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mComponentId = componentId;
+	mOwnerObject = ownerObject;
 }
 
-ComponentId Component::getComponentId() const
+SMARTPTR(Object)Component::getOwnerObject() const
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mComponentId;
+	return mOwnerObject;
 }
 
 void Component::loadEventCallbacks()
@@ -302,11 +280,6 @@ std::string Component::getEventType(const std::string& event)
 		result = mEventTypeTable[event];
 	}
 	return result;
-}
-
-ReMutex& Component::getMutex()
-{
-	return mMutex;
 }
 
 //TypedObject semantics: hardcoded

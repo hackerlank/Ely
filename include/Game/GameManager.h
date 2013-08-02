@@ -77,7 +77,6 @@ public:
 	 */
 	///@{
 	virtual void createGameWorld(const std::string& gameWorldXML);
-	virtual void createGameWorldWithoutParamTables(const std::string& gameWorldXML);
 	///@}
 
 	/**

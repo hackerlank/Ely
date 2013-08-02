@@ -59,9 +59,6 @@ const ComponentFamilyType ChaserTemplate::familyType() const
 
 SMARTPTR(Component)ChaserTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Chaser) newChaser = new Chaser(this);
 	newChaser->setComponentId(compId);
 	if (not newChaser->initialize())

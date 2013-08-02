@@ -85,6 +85,52 @@ class ComponentTemplate;
  */
 class Component: public TypedWritableReferenceCount
 {
+protected:
+	friend class Object;
+	friend class ComponentTemplate;
+
+	/**
+	 * \brief Allows a component to be initialized.
+	 *
+	 * This can be done after creation but "before" insertion into an object.\n
+	 * This method for all derived classes are called only by methods of the
+	 * respective ComponentTemplate derived class.
+	 */
+	virtual bool initialize() = 0;
+
+	/**
+	 * \brief Sets the owner object.
+	 *
+	 * This method for all derived classes are called only by object methods.
+	 * \param ownerObject The owner object.
+	 */
+	void setOwnerObject(SMARTPTR(Object)ownerObject);
+
+	/**
+	 * \brief Sets the component unique identifier.
+	 * \param componentId The component unique identifier.
+	 */
+	void setComponentId(const ComponentId& componentId);
+
+	/**
+	 * \brief On addition to object setup.
+	 *
+	 * Gives a component the ability to do some setup just "after" this
+	 * component has been added to an object. Optional.\n
+	 * This method for all derived classes are called only by object methods.
+	 */
+	virtual void onAddToObjectSetup();
+
+	/**
+	 * \brief On object addition to scene setup.
+	 *
+	 * Gives a component the ability to do some setup just "after" the
+	 * object, this component belongs to, has been added to the scene
+	 * and set up. Optional.\n
+	 * This method for all derived classes are called only by object methods.
+	 */
+	virtual void onAddToSceneSetup();
+
 public:
 	/**
 	 * \brief Constructor.
@@ -126,48 +172,17 @@ public:
 	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
 	/**
-	 * \brief Allows a component to be initialized.
-	 *
-	 * This can be done after creation but "before" insertion into an object.
-	 */
-	virtual bool initialize() = 0;
-
-	/**
-	 * \brief On addition to object setup.
-	 *
-	 * Gives a component the ability to do some setup just "after" this
-	 * component has been added to an object. Optional.
-	 */
-	virtual void onAddToObjectSetup();
-
-	/**
-	 * \brief On object addition to scene setup.
-	 *
-	 * Gives a component the ability to do some setup just "after" the
-	 * object, this component belongs to, has been added to the scene
-	 * and set up. Optional.
-	 */
-	virtual void onAddToSceneSetup();
-
-	/**
-	 * \brief Gets/sets the owner object.
-	 * \param ownerObject The owner object.
+	 * \brief Gets the owner object.
 	 * \return The owner object.
 	 */
-	///@{
-	void setOwnerObject(SMARTPTR(Object)ownerObject);
 	SMARTPTR(Object) getOwnerObject() const;
-	///@}
 
 	/**
-	 * \brief Gets/sets the component unique identifier.
-	 * \param componentId The component unique identifier.
+	 * \brief Gets the component unique identifier.
 	 * \return The component unique identifier.
 	 */
-	///@{
-	void setComponentId(const ComponentId& componentId);
 	ComponentId getComponentId() const;
-	///@}
+
 	/**
 	 * \brief Return the type of an event.
 	 * @param event The event.
@@ -269,6 +284,24 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline void Component::setComponentId(const ComponentId& componentId)
+{
+	mComponentId = componentId;
+}
+
+inline ComponentId Component::getComponentId() const
+{
+	return mComponentId;
+}
+
+inline ReMutex& Component::getMutex()
+{
+	return mMutex;
+}
+
 }  // namespace ely
 
 #endif /* COMPONENT_H_ */

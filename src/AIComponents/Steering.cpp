@@ -91,9 +91,6 @@ const ComponentType Steering::componentType() const
 
 bool Steering::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//enabling setting
 	mEnabled = (
@@ -154,9 +151,6 @@ bool Steering::initialize()
 
 void Steering::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{
@@ -169,9 +163,6 @@ void Steering::onAddToObjectSetup()
 
 void Steering::onAddToSceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{

@@ -118,7 +118,7 @@ SMARTPTR(Component) ComponentTemplateManager::createComponent(
 	//new unique id
 	ComponentId newCompId = ComponentId(componentType) + ComponentId(getId());
 	//create component
-	SMARTPTR(Component) newComp = (*it).second.p()->makeComponent(newCompId);
+	SMARTPTR(Component) newComp = (*it).second->makeComponent(newCompId);
 	return newComp;
 }
 

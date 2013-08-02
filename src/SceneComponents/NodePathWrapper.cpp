@@ -61,9 +61,6 @@ const ComponentType NodePathWrapper::componentType() const
 
 bool NodePathWrapper::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//setup the wrapped NodePath
 	mWrappedNodePath = mTmpl->parameter(std::string("nodepath"));
@@ -73,9 +70,6 @@ bool NodePathWrapper::initialize()
 
 void NodePathWrapper::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//setup the wrapped NodePath
 	if (mWrappedNodePath == std::string("render"))
 	{

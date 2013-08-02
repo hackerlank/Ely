@@ -56,9 +56,6 @@ const ComponentFamilyType ActivityTemplate::familyType() const
 
 SMARTPTR(Component)ActivityTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(Activity) newActivity = new Activity(this);
 	newActivity->setComponentId(compId);
 	if (not newActivity->initialize())

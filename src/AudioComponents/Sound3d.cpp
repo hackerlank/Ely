@@ -78,9 +78,6 @@ const ComponentType Sound3d::componentType() const
 
 bool Sound3d::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//sound files
 	mSoundFileList = mTmpl->parameterList(std::string("sound_files"));
@@ -90,9 +87,6 @@ bool Sound3d::initialize()
 
 void Sound3d::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//set sound files
 	std::list<std::string>::iterator iter;
 	for (iter = mSoundFileList.begin(); iter != mSoundFileList.end(); ++iter)
@@ -149,9 +143,6 @@ void Sound3d::onAddToObjectSetup()
 
 void Sound3d::onAddToSceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//add only for a not empty object node path
 	if (mOwnerObject->getNodePath().is_empty())
 	{

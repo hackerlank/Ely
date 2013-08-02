@@ -59,9 +59,6 @@ const ComponentFamilyType InstanceOfTemplate::familyType() const
 
 SMARTPTR(Component)InstanceOfTemplate::makeComponent(const ComponentId& compId)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	SMARTPTR(InstanceOf) newInstanceOf = new InstanceOf(this);
 	newInstanceOf->setComponentId(compId);
 	if (not newInstanceOf->initialize())

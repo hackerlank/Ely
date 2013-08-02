@@ -41,6 +41,14 @@ class ListenerTemplate;
  */
 class Listener: public Component
 {
+protected:
+	friend class Object;
+	friend class ListenerTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	Listener();
 	Listener(SMARTPTR(ListenerTemplate)tmpl);
@@ -48,10 +56,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Set position/velocity for static objects.

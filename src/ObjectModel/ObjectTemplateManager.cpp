@@ -118,6 +118,12 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//check if it is an already created object
+	SMARTPTR(Object) oldObject = getCreatedObject(objectId);
+	if(oldObject)
+	{
+		return oldObject;
+	}
 	//retrieve the ObjectTemplate
 	ObjectTemplateTable::iterator it1 = mObjectTemplates.find(objectType);
 	if (it1 == mObjectTemplates.end())
@@ -148,14 +154,14 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		if(createWithParamTables)
 		{
 			//set component' parameters to their default values
-			compTmplList[idx2].p()->setParametersDefaults();
+			compTmplList[idx2]->setParametersDefaults();
 			//set parameters for this component template...
 			ParameterTableMap::const_iterator it3;
 			it3 = compTmplParams.find(std::string(compType));
 			if (it3 != compTmplParams.end())
 			{
 				//...if not empty
-				compTmplList[idx2].p()->setParameters(it3->second);
+				compTmplList[idx2]->setParameters(it3->second);
 			}
 		}
 		//

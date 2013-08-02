@@ -69,9 +69,6 @@ const ComponentType RigidBody::componentType() const
 
 bool RigidBody::initialize()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	//get body type
 	std::string bodyType = mTmpl->parameter(std::string("body_type"));
@@ -286,9 +283,6 @@ bool RigidBody::initialize()
 
 void RigidBody::onAddToObjectSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//create a Rigid Body Node
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 	std::string name = COMPONENT_STANDARD_NAME;
@@ -421,9 +415,6 @@ void RigidBody::onAddToObjectSetup()
 
 void RigidBody::onAddToSceneSetup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//switch the body type (take precedence over mass)
 	//force this component to static if owner object is static
 	if (mOwnerObject->isSteady())

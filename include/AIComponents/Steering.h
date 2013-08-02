@@ -62,6 +62,14 @@ class SteeringTemplate;
  */
 class Steering: public Component
 {
+protected:
+	friend class Object;
+	friend class SteeringTemplate;
+
+	virtual bool initialize();
+	virtual void onAddToObjectSetup();
+	virtual void onAddToSceneSetup();
+
 public:
 	Steering();
 	Steering(SMARTPTR(SteeringTemplate)tmpl);
@@ -69,10 +77,6 @@ public:
 
 	const virtual ComponentFamilyType familyType() const;
 	const virtual ComponentType componentType() const;
-
-	virtual bool initialize();
-	virtual void onAddToObjectSetup();
-	virtual void onAddToSceneSetup();
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
