@@ -47,12 +47,12 @@ ModelTemplate::~ModelTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType ModelTemplate::componentType() const
+ComponentType ModelTemplate::componentType() const
 {
 	return ComponentType("Model");
 }
 
-const ComponentFamilyType ModelTemplate::familyType() const
+ComponentFamilyType ModelTemplate::familyType() const
 {
 	return ComponentFamilyType("Scene");
 }

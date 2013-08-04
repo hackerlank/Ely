@@ -110,7 +110,7 @@ AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 	for (iter = mControlComponents.begin(); iter != mControlComponents.end();
 			++iter)
 	{
-		(*iter).p()->update(reinterpret_cast<void*>(&dt));
+		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
 	//
 	return AsyncTask::DS_cont;

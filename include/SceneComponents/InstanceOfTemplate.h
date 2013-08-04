@@ -33,15 +33,16 @@ class InstanceOfTemplate: public ComponentTemplate
 protected:
 
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
-	virtual void setParametersDefaults();
 
 public:
 	InstanceOfTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
 	virtual ~InstanceOfTemplate();
 
-	const virtual ComponentType componentType() const;
-	const virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+
+	virtual void setParametersDefaults();
 
 private:
 

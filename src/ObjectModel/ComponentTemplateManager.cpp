@@ -58,7 +58,7 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 	}
 	SMARTPTR(ComponentTemplate) previousCompTmpl;
 	previousCompTmpl.clear();
-	ComponentType componentId = componentTmpl.p()->componentType();
+	ComponentType componentId = componentTmpl->componentType();
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentId);
 	if (it != mComponentTemplates.end())
 	{
@@ -89,12 +89,12 @@ bool ComponentTemplateManager::removeComponentTemplate(
 }
 
 SMARTPTR(ComponentTemplate) ComponentTemplateManager::getComponentTemplate(
-		ComponentType componentType)
+		ComponentType componentType) const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ComponentTemplateTable::iterator it = mComponentTemplates.find(
+	ComponentTemplateTable::const_iterator it = mComponentTemplates.find(
 			componentType);
 	if (it == mComponentTemplates.end())
 	{
@@ -122,6 +122,19 @@ SMARTPTR(Component) ComponentTemplateManager::createComponent(
 	return newComp;
 }
 
+void ComponentTemplateManager::resetComponentTemplateParams(ComponentType componentID)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	ComponentTemplateTable::const_iterator iter = mComponentTemplates.find(
+			componentID);
+	if(iter != mComponentTemplates.end())
+	{
+		iter->second->setParametersDefaults();
+	}
+}
+
 void ComponentTemplateManager::resetComponentTemplatesParams()
 {
 	//lock (guard) the mutex
@@ -131,18 +144,8 @@ void ComponentTemplateManager::resetComponentTemplatesParams()
 	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();
 			++iter)
 	{
-		iter->second.p()->setParametersDefaults();
+		iter->second->setParametersDefaults();
 	}
-}
-
-ReMutex& ComponentTemplateManager::getMutex()
-{
-	return mMutex;
-}
-
-IdType ComponentTemplateManager::getId()
-{
-	return ++id;
 }
 
 } // namespace ely

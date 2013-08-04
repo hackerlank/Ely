@@ -82,8 +82,8 @@ public:
 	CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl);
 	virtual ~CrowdAgent();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \name NavMesh & Crowd agent data
@@ -182,6 +182,81 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
+inline dtCrowdAgent* CrowdAgent::getDtAgent()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAgent;
+}
+
+inline int CrowdAgent::getIdx()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAgentIdx;
+}
+
+inline void CrowdAgent::setIdx(int idx)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAgentIdx = idx;
+}
+
+inline void CrowdAgent::setMovType(AgentMovType movType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mMovType = movType;
+}
+
+inline dtCrowdAgentParams CrowdAgent::getParams()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAgentParams;
+}
+
+inline LPoint3f CrowdAgent::getMoveTarget()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentTarget;
+}
+
+inline LVector3f CrowdAgent::getMoveVelocity()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCurrentVelocity;
+}
+
+inline void CrowdAgent::setNavMeshObject(SMARTPTR(Object)navMeshObject)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshObject = navMeshObject;
+}
+
+inline SMARTPTR(Object) CrowdAgent::getNavMeshObject()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshObject;
+}
+
 }  // namespace ely
 
 #endif /* CROWDAGENT_H_ */

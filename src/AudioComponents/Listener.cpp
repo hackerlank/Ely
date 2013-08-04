@@ -24,6 +24,7 @@
 #include "AudioComponents/Listener.h"
 #include "AudioComponents/ListenerTemplate.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
 
 namespace ely
@@ -55,12 +56,12 @@ Listener::~Listener()
 	}
 }
 
-const ComponentFamilyType Listener::familyType() const
+ComponentFamilyType Listener::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Listener::componentType() const
+ComponentType Listener::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -80,13 +81,15 @@ void Listener::onAddToObjectSetup()
 		return;
 	}
 
-	// update listener position/velocity only for dynamic objects
-	if (not mOwnerObject->isSteady())
-	{
-		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
-	}
 	//set the root of the scene
-	mSceneRoot = mTmpl->windowFramework()->get_render();
+	SMARTPTR(Object) sceneRoot =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(
+				"render");
+	if (sceneRoot)
+	{
+		mSceneRoot = sceneRoot->getNodePath();
+	}
+
 	//setup event callbacks if any
 	setupEvents();
 	//register event callbacks if any
@@ -106,6 +109,12 @@ void Listener::onAddToSceneSetup()
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
 	}
+	else
+	{
+		// update listener position/velocity only for dynamic objects
+		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
+	}
+
 }
 
 void Listener::set3dStaticAttributes()

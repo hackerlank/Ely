@@ -176,6 +176,7 @@
 				<Param events="fast@shift:stop-fast@shift-up"/>
 			</Component>
 			<Param parent=""/>
+			<Param is_steady="false"/>		
 			<Param pos="-35.0,-94.0,96.0"/>
 			<Param rot="0.0,-28.0,0.0"/>
 		</Object>

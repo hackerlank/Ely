@@ -44,12 +44,12 @@ ActivityTemplate::~ActivityTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType ActivityTemplate::componentType() const
+ComponentType ActivityTemplate::componentType() const
 {
 	return ComponentType("Activity");
 }
 
-const ComponentFamilyType ActivityTemplate::familyType() const
+ComponentFamilyType ActivityTemplate::familyType() const
 {
 	return ComponentFamilyType("Behavior");
 }

@@ -51,21 +51,19 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-void Component::onAddToObjectSetup()
-{
-}
-
-void Component::onAddToSceneSetup()
-{
-}
-
 void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	mOwnerObject = ownerObject;
 }
 
 SMARTPTR(Object)Component::getOwnerObject() const
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	return mOwnerObject;
 }
 
@@ -114,7 +112,7 @@ void Component::loadEventCallbacks()
 		//of the callback: <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>
 		std::string variableTmp = (iter->first) + "_"
 				+ std::string(componentType()) + "_"
-				+ std::string(mOwnerObject->objectTmpl()->name());
+				+ std::string(mOwnerObject->objectTmpl()->objectType());
 		//replace hyphens
 		std::string variableName = replaceCharacter(variableTmp, '-', '_');
 		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) lt_dlsym(mCallbackLib,

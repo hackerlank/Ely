@@ -116,7 +116,7 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	for (iter = mAudioComponents.begin(); iter != mAudioComponents.end();
 			++iter)
 	{
-		(*iter).p()->update(reinterpret_cast<void*>(&dt));
+		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
 	//Update audio manager
 	mAudioMgr->update();

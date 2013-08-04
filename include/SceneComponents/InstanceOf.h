@@ -53,8 +53,8 @@ public:
 	InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl);
 	virtual ~InstanceOf();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Gets/sets the node path associated to this instance of.
@@ -114,6 +114,17 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
+inline SMARTPTR(Object)InstanceOf::getInstancedObject() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mInstancedObject;
+}
+
 }  // namespace ely
 
 #endif /* INSTANCEOF_H_ */

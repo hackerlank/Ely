@@ -95,8 +95,8 @@ public:
 	Driver(SMARTPTR(DriverTemplate)tmpl);
 	virtual ~Driver();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -207,6 +207,236 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline bool Driver::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsEnabled;
+}
+
+inline void Driver::enableForward(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mForwardKey)
+	{
+		mForward = enable;
+	}
+}
+
+inline bool Driver::isForwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mForward;
+}
+
+inline void Driver::enableBackward(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mBackwardKey)
+	{
+		mBackward = enable;
+	}
+}
+
+inline bool Driver::isBackwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mBackward;
+}
+
+inline void Driver::enableStrafeLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mStrafeLeftKey)
+	{
+		mStrafeLeft = enable;
+	}
+}
+
+inline bool Driver::isStrafeLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeLeft;
+}
+
+inline void Driver::enableStrafeRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mStrafeRightKey)
+	{
+		mStrafeRight = enable;
+	}
+}
+
+inline bool Driver::isStrafeRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeRight;
+}
+
+inline void Driver::enableUp(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mUpKey)
+	{
+		mUp = enable;
+	}
+}
+
+inline bool Driver::isUpEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mUp;
+}
+
+inline void Driver::enableDown(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mDownKey)
+	{
+		mDown = enable;
+	}
+}
+
+inline bool Driver::isDownEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mDown;
+}
+
+inline void Driver::enableRollLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mRollLeftKey)
+	{
+		mRollLeft = enable;
+	}
+}
+
+inline bool Driver::isRollLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollLeft;
+}
+
+inline void Driver::enableRollRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mRollRightKey)
+	{
+		mRollRight = enable;
+	}
+}
+
+inline bool Driver::isRollRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollRight;
+}
+
+inline void Driver::enableMouseMove(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mMouseMoveKey)
+	{
+		mMouseMove = enable;
+	}
+}
+
+inline bool Driver::isMouseMoveEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMouseMove;
+}
+
+inline void Driver::setLinearSpeed(const LVector3f& linearSpeed)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mSpeedActualXYZ = linearSpeed;
+}
+
+inline LVector3f Driver::getLinearSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mSpeedActualXYZ;
+}
+
+inline void Driver::setAngularSpeed(float angularSpeed)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mSpeedActualH = angularSpeed;
+}
+
+inline float Driver::getAngularSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mSpeedActualH;
+}
+
+inline void Driver::setFastFactor(float factor)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mFastFactor = factor;
+}
+
+inline float Driver::getFastFactor()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mFastFactor;
+}
+
 }  // namespace ely
 
 #endif /* CONTROLBYEVENT_H_ */

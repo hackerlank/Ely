@@ -57,12 +57,12 @@ CrowdAgent::~CrowdAgent()
 	removeFromNavMesh();
 }
 
-const ComponentFamilyType CrowdAgent::familyType() const
+ComponentFamilyType CrowdAgent::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType CrowdAgent::componentType() const
+ComponentType CrowdAgent::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -147,38 +147,6 @@ void CrowdAgent::onAddToSceneSetup()
 	registerEventCallbacks();
 }
 
-dtCrowdAgent* CrowdAgent::getDtAgent()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAgent;
-}
-
-int CrowdAgent::getIdx()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAgentIdx;
-}
-
-void CrowdAgent::setIdx(int idx)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mAgentIdx = idx;
-}
-
-void CrowdAgent::setMovType(AgentMovType movType)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mMovType = movType;
-}
-
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 {
 	//lock (guard) the mutex
@@ -192,14 +160,6 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 //				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
 //		navMesh->updateParams(mOwnerObject, agentParams);
 	}
-}
-
-dtCrowdAgentParams CrowdAgent::getParams()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAgentParams;
 }
 
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
@@ -217,14 +177,6 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	}
 }
 
-LPoint3f CrowdAgent::getMoveTarget()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mCurrentTarget;
-}
-
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 {
 	//lock (guard) the mutex
@@ -238,30 +190,6 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 //				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
 //		navMesh->updateMoveVelocity(mOwnerObject, vel);
 	}
-}
-
-LVector3f CrowdAgent::getMoveVelocity()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mCurrentVelocity;
-}
-
-void CrowdAgent::setNavMeshObject(SMARTPTR(Object)navMeshObject)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshObject = navMeshObject;
-}
-
-SMARTPTR(Object) CrowdAgent::getNavMeshObject()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshObject;
 }
 
 void CrowdAgent::addToNavMesh()

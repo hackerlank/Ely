@@ -47,12 +47,12 @@ SteeringTemplate::~SteeringTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType SteeringTemplate::componentType() const
+ComponentType SteeringTemplate::componentType() const
 {
 	return ComponentType("Steering");
 }
 
-const ComponentFamilyType SteeringTemplate::familyType() const
+ComponentFamilyType SteeringTemplate::familyType() const
 {
 	return ComponentFamilyType("AI");
 }

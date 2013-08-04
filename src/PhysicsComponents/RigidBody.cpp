@@ -57,12 +57,12 @@ RigidBody::~RigidBody()
 	mNodePath.remove_node();
 }
 
-const ComponentFamilyType RigidBody::familyType() const
+ComponentFamilyType RigidBody::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType RigidBody::componentType() const
+ComponentType RigidBody::componentType() const
 {
 	return mTmpl->componentType();
 }

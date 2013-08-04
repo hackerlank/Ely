@@ -51,25 +51,12 @@ ObjectTemplate::~ObjectTemplate()
 {
 }
 
-const ObjectType& ObjectTemplate::name() const
-{
-	return mName;
-}
-
 void ObjectTemplate::clearComponentTemplates()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	mComponentTemplates.clear();
-}
-
-ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mComponentTemplates;
 }
 
 void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate)componentTmpl)
@@ -86,12 +73,12 @@ void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate)componentTm
 	}
 
 SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
-		const ComponentType& componentType)
+		const ComponentType& componentType) const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ComponentTemplateList::iterator it;
+	ComponentTemplateList::const_iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
 			idIsEqualTo(componentType));
 	if (it == mComponentTemplates.end())
@@ -106,6 +93,10 @@ void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	if(parameterTable.empty())
+	{
+		return;
+	}
 	ParameterTableConstIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters
@@ -144,7 +135,7 @@ void ObjectTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("rot", "0.0,0.0,0.0"));
 }
 
-std::string ObjectTemplate::parameter(const std::string& paramName)
+std::string ObjectTemplate::parameter(const std::string& paramName) const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -169,8 +160,8 @@ std::list<std::string> ObjectTemplate::parameterList(
 
 	std::list<std::string> strList;
 	ParameterTableIter iter;
-	pair<ParameterTableIter, ParameterTableIter> iterRange;
-	iterRange = mParameterTable.equal_range(paramName);
+	pair<ParameterTableIter, ParameterTableIter> iterRange =
+			mParameterTable.equal_range(paramName);
 	if (iterRange.first != iterRange.second)
 	{
 		for (iter = iterRange.first; iter != iterRange.second; ++iter)
@@ -180,24 +171,6 @@ std::list<std::string> ObjectTemplate::parameterList(
 	}
 	//
 	return strList;
-}
-
-ParameterTable ObjectTemplate::getParameterTable()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mParameterTable;
-}
-
-PandaFramework* const ObjectTemplate::pandaFramework() const
-{
-	return mPandaFramework;
-}
-
-WindowFramework* const ObjectTemplate::windowFramework() const
-{
-	return mWindowFramework;
 }
 
 void ObjectTemplate::addComponentParameter(const std::string& parameterName,
@@ -225,9 +198,8 @@ bool ObjectTemplate::isComponentParameter(const std::string& name,
 
 	bool result;
 	//
-	ParameterTableIter iter;
-	pair<ParameterTableIter, ParameterTableIter> iterRange;
-	iterRange = mComponentParameterTables[compType].equal_range(name);
+	pair<ParameterTableConstIter, ParameterTableConstIter> iterRange =
+			mComponentParameterTables[compType].equal_range(name);
 	if (iterRange.first != iterRange.second)
 	{
 		result = (iterRange.second
@@ -249,8 +221,8 @@ std::list<std::string> ObjectTemplate::componentParameterList(
 	HOLDMUTEX(mMutex)
 
 	std::list<std::string> strList;
-	ParameterTableIter iter;
-	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	ParameterTableConstIter iter;
+	pair<ParameterTableConstIter, ParameterTableConstIter> iterRange;
 	iterRange = mComponentParameterTables[compType].equal_range(paramName);
 	if (iterRange.first != iterRange.second)
 	{
@@ -261,11 +233,6 @@ std::list<std::string> ObjectTemplate::componentParameterList(
 	}
 	//
 	return strList;
-}
-
-ReMutex& ObjectTemplate::getMutex()
-{
-	return mMutex;
 }
 
 //TypedObject semantics: hardcoded

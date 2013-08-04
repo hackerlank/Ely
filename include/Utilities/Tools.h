@@ -345,7 +345,7 @@ public:
 /// "ObjectId_ObjectType_ComponentId_ComponentType"
 #define COMPONENT_STANDARD_NAME \
 	std::string(mOwnerObject->objectId()) + "_" \
-	+ std::string(mOwnerObject->objectTmpl()->name()) + "_" \
+	+ std::string(mOwnerObject->objectTmpl()->objectType()) + "_" \
 	+ std::string(mComponentId) + "_" \
 	+ get_type().get_name(this)
 

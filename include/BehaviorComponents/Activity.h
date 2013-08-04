@@ -83,8 +83,8 @@ public:
 	Activity(SMARTPTR(ActivityTemplate)tmpl);
 	virtual ~Activity();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief fsm conversion function.
@@ -157,6 +157,9 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
 }  // namespace ely
 
 #endif /* ACTIVITY_H_ */

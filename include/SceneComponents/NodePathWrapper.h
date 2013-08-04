@@ -53,8 +53,8 @@ public:
 	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl);
 	virtual ~NodePathWrapper();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Gets/sets the node path of this node path wrapper.
@@ -97,6 +97,9 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
 }  // namespace ely
 
 #endif /* NODEPATHWRAPPER_H_ */

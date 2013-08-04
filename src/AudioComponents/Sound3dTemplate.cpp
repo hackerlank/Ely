@@ -47,12 +47,12 @@ Sound3dTemplate::~Sound3dTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType Sound3dTemplate::componentType() const
+ComponentType Sound3dTemplate::componentType() const
 {
 	return ComponentType("Sound3d");
 }
 
-const ComponentFamilyType Sound3dTemplate::familyType() const
+ComponentFamilyType Sound3dTemplate::familyType() const
 {
 	return ComponentFamilyType("Audio");
 }

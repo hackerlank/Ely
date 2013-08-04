@@ -47,12 +47,12 @@ ChaserTemplate::~ChaserTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType ChaserTemplate::componentType() const
+ComponentType ChaserTemplate::componentType() const
 {
 	return ComponentType("Chaser");
 }
 
-const ComponentFamilyType ChaserTemplate::familyType() const
+ComponentFamilyType ChaserTemplate::familyType() const
 {
 	return ComponentFamilyType("Control");
 }

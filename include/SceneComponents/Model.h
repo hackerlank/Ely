@@ -71,8 +71,8 @@ public:
 	Model(SMARTPTR(ModelTemplate)tmpl);
 	virtual ~Model();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Gets/sets the node path associated to this model.
@@ -169,6 +169,17 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline AnimControlCollection Model::animations() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAnimations;
+}
+
 }  // namespace ely
 
 #endif /* MODEL_H_ */

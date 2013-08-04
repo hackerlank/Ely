@@ -47,12 +47,12 @@ InstanceOfTemplate::~InstanceOfTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType InstanceOfTemplate::componentType() const
+ComponentType InstanceOfTemplate::componentType() const
 {
 	return ComponentType("InstanceOf");
 }
 
-const ComponentFamilyType InstanceOfTemplate::familyType() const
+ComponentFamilyType InstanceOfTemplate::familyType() const
 {
 	return ComponentFamilyType("Scene");
 }

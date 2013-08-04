@@ -79,12 +79,12 @@ Steering::~Steering()
 	disable();
 }
 
-const ComponentFamilyType Steering::familyType() const
+ComponentFamilyType Steering::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Steering::componentType() const
+ComponentType Steering::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -295,19 +295,6 @@ void Steering::disable()
 	unregisterEventCallbacks();
 }
 
-bool Steering::isEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mIsEnabled;
-}
-
-AICharacter* const Steering::getAiCharacter() const
-{
-	return mAICharacter;
-}
-
 NodePath Steering::getTargetNodePath(const ObjectId& target)
 {
 	//lock (guard) the mutex
@@ -330,16 +317,16 @@ NodePath Steering::getTargetNodePath(const ObjectId& target)
 NodePath Steering::getTargetNodePath(CSMARTPTR(Object)target)
 {
 	//lock (guard) the mutex
-		HOLDMUTEX(mMutex)
+	HOLDMUTEX(mMutex)
 
-		NodePath objectNodePath("");
-		if (target != NULL)
-		{
-			objectNodePath = target->getNodePath();
-		}
-		//
-		return objectNodePath;
+	NodePath objectNodePath("");
+	if (target != NULL)
+	{
+		objectNodePath = target->getNodePath();
 	}
+	//
+	return objectNodePath;
+}
 
 void Steering::update(void* data)
 {
@@ -377,7 +364,7 @@ void Steering::updateController(float dt)
 		LVecBase3f direction = _steering->_steering_force;
 		direction.normalize();
 		mCharacterController->setLinearSpeed(
-				-mAICharacter->get_velocity().get_xy() / dt);
+				-mAICharacter->get_velocity() / dt);
 		if (steering_force.length() > 0)
 		{
 			//0 <= A <= 180.0
@@ -459,7 +446,7 @@ void Steering::updateController(float dt)
 void Steering::enableMovRot(bool enable)
 {
 	//reset velocities
-	mCharacterController->setLinearSpeed(LVecBase2f::zero());
+	mCharacterController->setLinearSpeed(LVecBase3f::zero());
 	mCharacterController->setAngularSpeed(0.0);
 	//enable/disable movements
 	mCharacterController->enableForward(enable);

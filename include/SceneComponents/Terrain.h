@@ -70,8 +70,8 @@ public:
 	Terrain(SMARTPTR(TerrainTemplate)tmpl);
 	virtual ~Terrain();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Updates the terrain associated to this component.
@@ -197,6 +197,32 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mTerrain;
+}
+
+inline float Terrain::getWidthScale() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mWidthScale;
+}
+inline float Terrain::getHeightScale() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mHeightScale;
+}
+
 }  // namespace ely
 
 #endif /* TERRAIN_H_ */

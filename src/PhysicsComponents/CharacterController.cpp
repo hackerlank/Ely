@@ -40,6 +40,8 @@ CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tm
 	mTmpl = tmpl;
 	mForward = false;
 	mBackward = false;
+	mUp = false;
+	mDown = false;
 	mStrafeLeft = false;
 	mStrafeRight = false;
 	mRollLeft = false;
@@ -68,12 +70,12 @@ CharacterController::~CharacterController()
 	mNodePath.remove_node();
 }
 
-const ComponentFamilyType CharacterController::familyType() const
+ComponentFamilyType CharacterController::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType CharacterController::componentType() const
+ComponentType CharacterController::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -204,7 +206,7 @@ bool CharacterController::initialize()
 	//set control parameters
 	float linearSpeed = (float) strtof(
 			mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
-	mLinearSpeed = LVecBase2f(linearSpeed, linearSpeed);
+	mLinearSpeed = LVecBase3f(linearSpeed, linearSpeed, linearSpeed);
 	mIsLocal = (
 			mTmpl->parameter(std::string("is_local")) == std::string("false") ?
 					false : true);
@@ -228,6 +230,14 @@ bool CharacterController::initialize()
 	//forward key
 	mForwardKey = (
 			mTmpl->parameter(std::string("forward")) == std::string("enabled") ?
+					true : false);
+	//up key
+	mUpKey = (
+			mTmpl->parameter(std::string("up"))
+					== std::string("enabled") ? true : false);
+	//down key
+	mDownKey = (
+			mTmpl->parameter(std::string("down")) == std::string("enabled") ?
 					true : false);
 	//strafeLeft key
 	mStrafeLeftKey = (
@@ -301,186 +311,6 @@ void CharacterController::onAddToObjectSetup()
 	registerEventCallbacks();
 }
 
-void CharacterController::enableForward(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mForwardKey)
-	{
-		mForward = enable;
-	}
-}
-
-bool CharacterController::isForwardEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mForward;
-}
-
-void CharacterController::enableBackward(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mBackwardKey)
-	{
-		mBackward = enable;
-	}
-}
-
-bool CharacterController::isBackwardEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mBackward;
-}
-
-void CharacterController::enableStrafeLeft(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mStrafeLeftKey)
-	{
-		mStrafeLeft = enable;
-	}
-}
-
-bool CharacterController::isStrafeLeftEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mStrafeLeft;
-}
-
-void CharacterController::enableStrafeRight(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mStrafeRightKey)
-	{
-		mStrafeRight = enable;
-	}
-}
-
-bool CharacterController::isStrafeRightEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mStrafeRight;
-}
-
-void CharacterController::enableRollLeft(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mRollLeftKey)
-	{
-		mRollLeft = enable;
-	}
-}
-
-bool CharacterController::isRollLeftEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mRollLeft;
-}
-
-void CharacterController::enableRollRight(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mRollRightKey)
-	{
-		mRollRight = enable;
-	}
-}
-
-bool CharacterController::isRollRightEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mRollRight;
-}
-
-void CharacterController::enableJump(bool enable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mJumpKey)
-	{
-		mJump = enable;
-	}
-}
-
-bool CharacterController::isJumpEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mJump;
-}
-
-LVecBase2f CharacterController::getLinearSpeed()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mLinearSpeed;
-}
-
-void CharacterController::setLinearSpeed(const LVecBase2f& speed)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mLinearSpeed = speed;
-}
-
-float CharacterController::getAngularSpeed()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAngularSpeed;
-}
-
-void CharacterController::setAngularSpeed(float speed)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mAngularSpeed = speed;
-}
-
-void CharacterController::setIsLocal(bool isLocal)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mIsLocal = isLocal;
-}
-
-bool CharacterController::getIsLocal()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mIsLocal;
-}
 
 void CharacterController::update(void* data)
 {
@@ -504,6 +334,14 @@ void CharacterController::update(void* data)
 	if (mBackward)
 	{
 		speed.set_y(mLinearSpeed.get_y());
+	}
+	if (mUp)
+	{
+		speed.set_z(mLinearSpeed.get_z());
+	}
+	if (mDown)
+	{
+		speed.set_z(-mLinearSpeed.get_z());
 	}
 	if (mStrafeLeft)
 	{

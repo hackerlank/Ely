@@ -46,12 +46,12 @@ CharacterControllerTemplate::~CharacterControllerTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType CharacterControllerTemplate::componentType() const
+ComponentType CharacterControllerTemplate::componentType() const
 {
 	return ComponentType("CharacterController");
 }
 
-const ComponentFamilyType CharacterControllerTemplate::familyType() const
+ComponentFamilyType CharacterControllerTemplate::familyType() const
 {
 	return ComponentFamilyType("Physics");
 }
@@ -86,6 +86,8 @@ void CharacterControllerTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("max_slope", "45.0"));
 	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
 	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("down", "enabled"));
 	mParameterTable.insert(ParameterNameValue("roll_left", "enabled"));
 	mParameterTable.insert(ParameterNameValue("roll_right", "enabled"));
 	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));

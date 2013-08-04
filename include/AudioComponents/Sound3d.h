@@ -64,8 +64,8 @@ public:
 	Sound3d(SMARTPTR(Sound3dTemplate)tmpl);
 	virtual ~Sound3d();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Adds dynamically a new sound to this component by
@@ -191,6 +191,25 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
+inline float Sound3d::getMinDistance()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMinDist;
+}
+
+inline float Sound3d::getMaxDistance()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMaxDist;
+}
+
 }  // namespace ely
 
 #endif /* SOUND3D_H_ */

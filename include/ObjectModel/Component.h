@@ -94,21 +94,27 @@ protected:
 	 *
 	 * This can be done after creation but "before" insertion into an object.\n
 	 * This method for all derived classes are called only by methods of the
-	 * respective ComponentTemplate derived class.
+	 * respective ComponentTemplate derived class.\n
+	 * \note this method is called only by:
+	 * - a thread that creates an new object, creates the component and adds
+	 * it to the object
+	 * - a thread that creates the component and adds it to an existing object
+	 * in any case this method is executed before the component could be publicly
+	 * accessible to other threads, so other thread cannot access the component
+	 * during its execution, then it doesn't need to hold the mutex.
 	 */
 	virtual bool initialize() = 0;
 
 	/**
-	 * \brief Sets the owner object.
-	 *
-	 * This method for all derived classes are called only by object methods.
-	 * \param ownerObject The owner object.
-	 */
-	void setOwnerObject(SMARTPTR(Object)ownerObject);
-
-	/**
 	 * \brief Sets the component unique identifier.
 	 * \param componentId The component unique identifier.
+	 * \note this method is called only by:
+	 * - a thread that creates an new object, creates the component and adds
+	 * it to the object
+	 * - a thread that creates the component and adds it to an existing object
+	 * in any case this method is executed before the component could be publicly
+	 * accessible to other threads, so other thread cannot access the component
+	 * during its execution, then it doesn't need to hold the mutex.
 	 */
 	void setComponentId(const ComponentId& componentId);
 
@@ -117,7 +123,14 @@ protected:
 	 *
 	 * Gives a component the ability to do some setup just "after" this
 	 * component has been added to an object. Optional.\n
-	 * This method for all derived classes are called only by object methods.
+	 * This method for all derived classes are called only by object methods.\n
+	 * \note this method is called only by:
+	 * - a thread that creates an new object, creates the component and adds
+	 * it to the object
+	 * - a thread that creates the component and adds it to an existing object
+	 * in any case this method is executed before the component could be publicly
+	 * accessible to other threads, so other thread cannot access the component
+	 * during its execution, then it doesn't need to hold the mutex.
 	 */
 	virtual void onAddToObjectSetup();
 
@@ -127,11 +140,19 @@ protected:
 	 * Gives a component the ability to do some setup just "after" the
 	 * object, this component belongs to, has been added to the scene
 	 * and set up. Optional.\n
-	 * This method for all derived classes are called only by object methods.
+	 * This method for all derived classes are called only by object methods.\n
+	 * \note this method is called only by:
+	 * - a thread that creates an new object, creates the component and adds
+	 * it to the object
+	 * - a thread that creates the component and adds it to an existing object
+	 * in any case this method is executed before the component could be publicly
+	 * accessible to other threads, so other thread cannot access the component
+	 * during its execution, then it doesn't need to hold the mutex.
 	 */
 	virtual void onAddToSceneSetup();
 
 public:
+
 	/**
 	 * \brief Constructor.
 	 */
@@ -143,16 +164,24 @@ public:
 	virtual ~Component();
 
 	/**
+	 * \brief Sets the owner object.
+	 *
+	 * This method for all derived classes are called only by object methods.
+	 * \param ownerObject The owner object.
+	 */
+	void setOwnerObject(SMARTPTR(Object)ownerObject);
+
+	/**
 	 * \brief Gets the type of this component.
 	 * @return The id of this component.
 	 */
-	const virtual ComponentType componentType() const = 0;
+	virtual ComponentType componentType() const = 0;
 
 	/**
 	 * \brief Gets the family type of this component.
 	 * @return The family id of this component.
 	 */
-	const virtual ComponentFamilyType familyType() const = 0;
+	virtual ComponentFamilyType familyType() const = 0;
 
 	/**
 	 * \brief Updates the state of the component.
@@ -197,9 +226,9 @@ public:
 	ReMutex& getMutex();
 
 protected:
-	///The template used to construct this component.
+	///The template used to construct this component (read only after creation).
 	SMARTPTR(ComponentTemplate) mTmpl;
-	///Unique identifier for this component.
+	///Unique identifier for this component (read only after creation).
 	ComponentId mComponentId;
 	///The object this component is a member of.
 	SMARTPTR(Object) mOwnerObject;
@@ -295,6 +324,14 @@ inline void Component::setComponentId(const ComponentId& componentId)
 inline ComponentId Component::getComponentId() const
 {
 	return mComponentId;
+}
+
+inline void Component::onAddToObjectSetup()
+{
+}
+
+inline void Component::onAddToSceneSetup()
+{
 }
 
 inline ReMutex& Component::getMutex()

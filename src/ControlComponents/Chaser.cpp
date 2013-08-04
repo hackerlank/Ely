@@ -52,12 +52,12 @@ Chaser::~Chaser()
 	disable();
 }
 
-const ComponentFamilyType Chaser::familyType() const
+ComponentFamilyType Chaser::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Chaser::componentType() const
+ComponentType Chaser::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -191,77 +191,6 @@ void Chaser::disable()
 	unregisterEventCallbacks();
 }
 
-bool Chaser::isEnabled()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mIsEnabled;
-}
-
-float Chaser::getAbsLookAtDistance() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAbsLookAtDistance;
-}
-
-void Chaser::setAbsLookAtDistance(float absLookAtDistance)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mAbsLookAtDistance = absLookAtDistance;
-}
-
-float Chaser::getAbsMinDistance() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAbsMinDistance;
-}
-
-void Chaser::setAbsMinDistance(float absMinDistance)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mAbsMinDistance = absMinDistance;
-}
-
-float Chaser::getAbsMinHeight() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAbsMinHeight;
-}
-
-void Chaser::setAbsMinHeight(float absMinHeight)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mAbsMinHeight = absMinHeight;
-}
-
-float Chaser::getDistance() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAbsMaxDistance;
-}
-
-void Chaser::setDistance(float distance)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mAbsMaxDistance = distance;
-}
 
 void Chaser::onAddToObjectSetup()
 {

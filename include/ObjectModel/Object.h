@@ -65,14 +65,47 @@ typedef std::string ObjectId;
  */
 class Object: public TypedWritableReferenceCount
 {
+private:
 	friend class ObjectTemplateManager;
+
+	/**
+	 * \brief Adds a component to this object.
+	 *
+	 * It will add the component to the object, and if a component of
+	 * that family already existed it'll be replaced by this new component
+	 * (and its ownership released by the object).\n
+	 * \note When you add a component, its template should contain its
+	 * initialization parameters; this means that when you want to add
+	 * a component you should first prepare its template with
+	 * initialization parameter and then actually add the component.
+	 * @param component The new component to add.
+	 * @param existingObject False if this is an object under construction, true
+	 * if it is an already existing object.
+	 * @return SMARTPTR(NULL) if there wasn't a component of that family, otherwise
+	 * the previous component.
+	 */
+	SMARTPTR(Component) addComponent(SMARTPTR(Component) component,
+			bool existingObject=false);
+
+	/**
+	 * \brief Removes a component from this object.
+	 *
+	 * It will remove the component from the object, and its ownership
+	 * released by the object.\n
+	 * @param component The component to remove.
+	 * @return True if successfully removed, false otherwise.
+	 */
+	bool removeComponent(SMARTPTR(Component) component);
 
 	/**
 	 * \brief On addition to scene setup.
 	 *
 	 * Gives an object the ability to perform the
 	 * addition to scene setup and any required initialization.\n
-	 * Called only by ObjectTemplateManager::createObject().
+	 * Called only by ObjectTemplateManager::createObject().\n
+	 * \note this method is called exclusively by the object creation thread,
+	 * i.e. before it will be publicly accessible, so no other thread can access
+	 * the object during its execution, then it doesn't need to hold the mutex.
 	 */
 	void sceneSetup();
 
@@ -88,93 +121,9 @@ public:
 	virtual ~Object();
 
 	/**
-	 * \brief Gets the component of that given family.
-	 * @param familyID The family of the component.
-	 * @return The component, or NULL if no component of that
-	 * family exists.
-	 */
-	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyID);
-
-	/**
-	 * \brief Sets a new component into this object.
-	 *
-	 * It will add the component in the object to the passed component,
-	 * and if a component of that family already existed it'll be
-	 * replaced by this new component (and its ownership released by
-	 * the object).\n
-	 * \note When you add a component, its template should contain its
-	 * initialization parameters; this means that when you want to add
-	 * a component (perhaps by replacing an old one), you should first
-	 * prepare its template with initialization parameter and then actually
-	 * add the component.
-	 * @param newComponent The new component to add.
-	 * @return SMARTPTR(NULL) if there wasn't a component of that family, otherwise
-	 * the previous component.
-	 */
-	SMARTPTR(Component) addComponent(SMARTPTR(Component) newComponent);
-
-	/**
 	 * \brief Clears the table of all components of this object.
 	 */
 	void clearComponents();
-
-	/**
-	 * \brief Returns the number of components.
-	 * @return The number of components.
-	 */
-	unsigned int numComponents();
-
-	/**
-	 * \brief On world creation setup.
-	 *
-	 * Gives an object the ability to perform any given
-	 * initialization after the entire world creation.
-	 */
-	void worldSetup();
-
-	/**
-	 * \brief Gets a reference to the id of this object.
-	 * @return The id of this object.
-	 */
-	const ObjectId& objectId() const;
-
-	/**
-	 * \brief Gets/sets the node path of this object.
-	 * @return The node path of this object.
-	 */
-	///@{
-	NodePath getNodePath() const;
-	void setNodePath(const NodePath& nodePath);
-	///@}
-
-	/**
-	 * \brief NodePath conversion function.
-	 */
-	operator NodePath();
-
-	/**
-	 * \brief Gets a reference to the object template.
-	 * @return The a reference to the object template.
-	 */
-	SMARTPTR(ObjectTemplate) const objectTmpl() const;
-
-	/**
-	 * \brief Gets/sets a reference to the steady flag.
-	 *
-	 * This flag represents if this object doesn't move in the world.
-	 * Various components can set or get this value to implement
-	 * some optimization. By default false (i.e. object is dynamic).
-	 */
-	///@{
-	bool isSteady();
-	void setSteady(bool value);
-	///@}
-
-	/**
-	 * \brief Initialization function type.
-	 */
-	typedef void (*PINITIALIZATION)(SMARTPTR(Object), const ParameterTable& paramTable,
-			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 	/**
 	 * \brief These methods will store/free, in an internal storage, the
@@ -193,14 +142,77 @@ public:
 	///@}
 
 	/**
+	 * \brief Gets the component of that given family.
+	 * @param familyID The family of the component.
+	 * @return The component, or NULL if no component of that
+	 * family exists.
+	 */
+	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyID) const;
+
+	/**
+	 * \brief Returns the number of components.
+	 * @return The number of components.
+	 */
+	unsigned int numComponents() const;
+
+	/**
+	 * \brief On world creation setup.
+	 *
+	 * Gives an object the ability to perform any given
+	 * initialization after the entire world creation.
+	 */
+	void worldSetup();
+
+	/**
+	 * \brief Gets a reference to the id of this object.
+	 * @return The id of this object.
+	 */
+	ObjectId objectId() const;
+
+	/**
+	 * \brief Gets/sets the node path of this object.
+	 * @return The node path of this object.
+	 */
+	///@{
+	NodePath getNodePath() const;
+	void setNodePath(const NodePath& nodePath);
+	///@}
+
+	/**
+	 * \brief NodePath conversion function.
+	 */
+	operator NodePath() const;
+
+	/**
+	 * \brief Gets a reference to the object template.
+	 * @return The a reference to the object template.
+	 */
+	SMARTPTR(ObjectTemplate) const objectTmpl() const;
+
+	/**
+	 * \brief Gets the object steady-ness.
+	 *
+	 * This flag represents if this object doesn't move in the world.
+	 * Various components can set or get this value to implement
+	 * some optimization. By default false (i.e. object is dynamic).
+	 */
+	bool isSteady() const;
+
+	/**
+	 * \brief Initialization function type.
+	 */
+	typedef void (*PINITIALIZATION)(SMARTPTR(Object), const ParameterTable& paramTable,
+			PandaFramework* pandaFramework, WindowFramework* windowFramework);
+
+	/**
 	 * \brief Returns the object template and component templates'
 	 * parameters tables.
 	 * @return  The object template and component templates'
 	 * parameters tables.
 	 */
 	///@{
-	ParameterTable getStoredObjTmplParams();
-	ParameterTableMap getStoredCompTmplParams();
+	ParameterTable getStoredObjTmplParams() const;
+	ParameterTableMap getStoredCompTmplParams() const;
 	///@}
 
 	/**
@@ -214,7 +226,7 @@ private:
 	SMARTPTR(ObjectTemplate) const mTmpl;
 	///The NodePath associated to this object.
 	NodePath mNodePath;
-	///Unique identifier for this object.
+	///Unique identifier for this object (read only after creation).
 	ObjectId mObjectId;
 	///@{
 	///Table of all components indexed by component family type.
@@ -270,6 +282,99 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline ObjectId Object::objectId() const
+{
+	return mObjectId;
+}
+
+inline NodePath Object::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void Object::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNodePath = nodePath;
+}
+
+inline Object::operator NodePath() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline unsigned int Object::numComponents() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return static_cast<unsigned int>(mComponents.size());
+}
+
+inline SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
+{
+	return mTmpl;
+}
+
+inline ReMutex& Object::getMutex()
+{
+	return mMutex;
+}
+
+inline ParameterTable Object::getStoredObjTmplParams() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mObjTmplParams;
+}
+
+inline ParameterTableMap Object::getStoredCompTmplParams() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCompTmplParams;
+}
+
+inline void Object::storeParameters(const ParameterTable& objTmplParams,
+		const ParameterTableMap& compTmplParams)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mObjTmplParams = objTmplParams;
+	mCompTmplParams = compTmplParams;
+}
+
+inline void Object::freeParameters()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mObjTmplParams.clear();
+	mCompTmplParams.clear();
+}
+
+inline bool Object::isSteady() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsSteady;
+}
+
 }  // namespace ely
 
 #endif /* OBJECT_H_ */

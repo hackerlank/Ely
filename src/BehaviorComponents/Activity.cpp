@@ -48,12 +48,12 @@ Activity::~Activity()
 	unloadTransitionFunctions();
 }
 
-const ComponentFamilyType Activity::familyType() const
+ComponentFamilyType Activity::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Activity::componentType() const
+ComponentType Activity::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -157,7 +157,7 @@ void Activity::loadTransitionFunctions()
 		// reset errors
 		lt_dlerror();
 		functionNameTmp = std::string("Enter") + "_" + (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->name();
+				+ mOwnerObject->objectTmpl()->objectType();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PENTER pEnterFunction = (PENTER) lt_dlsym(mTransitionLib,
 				functionName.c_str());
@@ -172,7 +172,7 @@ void Activity::loadTransitionFunctions()
 		// reset errors
 		lt_dlerror();
 		functionNameTmp = std::string("Exit") + "_" + (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->name();
+				+ mOwnerObject->objectTmpl()->objectType();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PEXIT pExitFunction = (PEXIT) lt_dlsym(mTransitionLib,
 				functionName.c_str());
@@ -187,7 +187,7 @@ void Activity::loadTransitionFunctions()
 		// reset errors
 		lt_dlerror();
 		functionNameTmp = std::string("Filter") + "_" + (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->name();
+				+ mOwnerObject->objectTmpl()->objectType();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PFILTER pFilterFunction = (PFILTER) lt_dlsym(mTransitionLib,
 				functionName.c_str());
@@ -228,7 +228,7 @@ void Activity::loadTransitionFunctions()
 		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTYPE>
 		// reset errors
 		lt_dlerror();
-		functionNameTmp = (*iter) + "_" + mOwnerObject->objectTmpl()->name();
+		functionNameTmp = (*iter) + "_" + mOwnerObject->objectTmpl()->objectType();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PFROMTO pFromToFunction = (PFROMTO) lt_dlsym(mTransitionLib,
 				functionName.c_str());

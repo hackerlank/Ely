@@ -96,8 +96,8 @@ public:
 	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
 	virtual ~NavMesh();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Updates position/orientation of crowd agents.
@@ -341,6 +341,271 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
+inline InputGeom* NavMesh::getRecastInputGeom()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mGeom;
+}
+
+inline dtNavMesh* NavMesh::getRecastNavMesh()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getNavMesh();
+}
+
+inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getNavMeshQuery();
+}
+
+inline dtCrowd* NavMesh::getRecastCrowd()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getCrowd();
+}
+
+inline float NavMesh::getRecastAgentRadius()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getAgentRadius();
+}
+
+inline float NavMesh::getRecastAgentHeight()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getAgentHeight();
+}
+
+inline float NavMesh::getRecastAgentClimb()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getAgentClimb();
+}
+
+inline LVecBase3f NavMesh::getRecastBoundsMin()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	CHECKEXISTENCE(mGeom,
+			"NavMesh::getBoundsMin: invalid InputGeom")
+	return RecastToLVecBase3f(mGeom->getMeshBoundsMin());
+}
+
+inline LVecBase3f NavMesh::getRecastBoundsMax()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	CHECKEXISTENCE(mGeom,
+			"NavMesh::getBoundsMax: invalid InputGeom")
+	return RecastToLVecBase3f(mGeom->getMeshBoundsMax());
+}
+
+inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshTypeEnum = typeEnum;
+}
+
+inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshTypeEnum;
+}
+
+inline NavMeshType* NavMesh::getNavMeshType()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType;
+}
+
+inline AgentMovType NavMesh::getMovType()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMovType;
+}
+
+inline void NavMesh::setMovType(AgentMovType movType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mMovType = movType;
+}
+
+inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshSettings = settings;
+}
+
+inline NavMeshSettings NavMesh::getNavMeshSettings()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshSettings;
+}
+
+inline void NavMesh::setTool(NavMeshTypeTool* tool)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshType->setTool(tool);
+}
+
+inline NavMeshTypeTool* NavMesh::getTool()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshType->getTool();
+}
+
+inline void NavMesh::setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mPolyAreaFlags = flagsAreaTable;
+}
+
+inline NavMeshPolyAreaFlags NavMesh::getFlagsAreaTable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mPolyAreaFlags;
+}
+
+inline void NavMesh::setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mPolyAreaCost = costAreaTable;
+}
+
+inline NavMeshPolyAreaCost NavMesh::getCostAreaTable()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mPolyAreaCost;
+}
+
+inline void NavMesh::setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mCrowdIncludeFlags = includeFlags;
+	mCrowdExcludeFlags = excludeFlags;
+}
+
+inline void NavMesh::getCrowdIncludeExcludeFlags(int& includeFlags, int& excludeFlags)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	includeFlags = mCrowdIncludeFlags;
+	excludeFlags = mCrowdExcludeFlags;
+}
+
+inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshTileSettings = settings;
+}
+
+inline NavMeshTileSettings NavMesh::getNavMeshTileSettings()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshTileSettings;
+}
+
+inline void NavMesh::setConvexVolumes(const std::list<PointListArea>& convexVolumes)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mConvexVolumes = convexVolumes;
+}
+
+inline std::list<NavMesh::PointListArea> NavMesh::getConvexVolumes()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mConvexVolumes;
+}
+
+inline void NavMesh::setOffMeshConnections(
+		const std::list<PointPairBidir>& offMeshConnections)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mOffMeshConnections = offMeshConnections;
+}
+
+inline std::list<NavMesh::PointPairBidir> NavMesh::getOffMeshConnections()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mOffMeshConnections;
+}
+
+inline NodePath NavMesh::getReferenceNP()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mReferenceNP;
+}
+
+inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCrowdAgents;
+}
 
 } // namespace ely
 

@@ -47,12 +47,12 @@ DriverTemplate::~DriverTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType DriverTemplate::componentType() const
+ComponentType DriverTemplate::componentType() const
 {
 	return ComponentType("Driver");
 }
 
-const ComponentFamilyType DriverTemplate::familyType() const
+ComponentFamilyType DriverTemplate::familyType() const
 {
 	return ComponentFamilyType("Control");
 }

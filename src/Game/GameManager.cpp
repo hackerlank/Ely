@@ -91,7 +91,6 @@ void GameManager::initialize()
 	setupCompTmplMgr();
 
 	//create the game world (static definition)
-//	createGameWorldWithoutParamTables(std::string(ELY_GAMEXML));
 	createGameWorld(std::string(ELY_GAMEXML));
 
 	//play the game
@@ -437,14 +436,14 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			// set id with the passed id
 			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objTypeTAG), ObjectId(objIdTAG), true,
+					ObjectType(objTypeTAG), ObjectId(objIdTAG),
 					objTmplParams, compTmplParams);
 		}
 		else
 		{
 			// set id with the internally generated id
 			objectPtr = ObjectTemplateManager::GetSingleton().createObject(
-					ObjectType(objTypeTAG), ObjectId(""), true, objTmplParams,
+					ObjectType(objTypeTAG), ObjectId(""), objTmplParams,
 					compTmplParams);
 		}
 		if (objectPtr == NULL)

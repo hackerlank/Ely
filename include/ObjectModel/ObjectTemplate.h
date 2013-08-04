@@ -65,36 +65,10 @@ public:
 	virtual ~ObjectTemplate();
 
 	/**
-	 * \brief Clears the table of all component templates of this
-	 * object template.
+	 * \brief For the object this template is designed to create,
+	 * this function sets the (mandatory) parameters to their default values.
 	 */
-	void clearComponentTemplates();
-
-	/**
-	 * \brief Gets a reference to the name (i.e. the object type) of
-	 * this object template.
-	 * @return The name of this object template.
-	 */
-	const ObjectType& name() const;
-
-	/**
-	 * \brief Gets the component template list.
-	 * @return The component template list.
-	 */
-	ComponentTemplateList getComponentTemplates();
-
-	/**
-	 * \brief Adds a component template.
-	 * @param componentTmpl The component template.
-	 */
-	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
-
-	/**
-	 * \brief Gets a component template given the component type it can create.
-	 * @param componentType The component type.
-	 * @return The component template, NULL if it doesn't exist.
-	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType&componentType);
+	void setParametersDefaults();
 
 	/**
 	 * \name Parameters management.
@@ -108,17 +82,43 @@ public:
 	void setParameters(const ParameterTable& parameterTable);
 
 	/**
-	 * \brief For the object this template is designed to create,
-	 * this function sets the (mandatory) parameters to their default values.
+	 * \brief Clears the table of all component templates of this
+	 * object template.
 	 */
-	void setParametersDefaults();
+	void clearComponentTemplates();
+
+	/**
+	 * \brief Gets a reference to the name (i.e. the object type) of
+	 * this object template.
+	 * @return The name of this object template.
+	 */
+	ObjectType objectType() const;
+
+	/**
+	 * \brief Gets the component template list.
+	 * @return The component template list.
+	 */
+	ComponentTemplateList getComponentTemplates() const;
+
+	/**
+	 * \brief Adds a component template.
+	 * @param componentTmpl The component template.
+	 */
+	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
+
+	/**
+	 * \brief Gets a component template given the component type it can create.
+	 * @param componentType The component type.
+	 * @return The component template, NULL if it doesn't exist.
+	 */
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType&componentType) const;
 
 	/**
 	 * \brief Gets the parameter value associated to the object.
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
-	std::string parameter(const std::string& paramName);
+	std::string parameter(const std::string& paramName) const;
 	/**
 	 * \brief Gets the parameter multi-values associated to the object.
 	 * @param paramName The name of the parameter.
@@ -130,7 +130,7 @@ public:
 	 * \brief Gets the entire parameter table.
 	 * @return The parameter table.
 	 */
-	ParameterTable getParameterTable();
+	ParameterTable getParameterTable() const;
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -189,7 +189,7 @@ private:
 	ComponentTemplateList mComponentTemplates;
 	///The ObjectTemplateManager.
 	ObjectTemplateManager* const mObjectTmplMgr;
-	///Parameter table
+	///Parameter table.
 	ParameterTable mParameterTable;
 	///The PandaFramework.
 	PandaFramework* mPandaFramework;
@@ -239,9 +239,48 @@ struct idIsEqualTo
 	ComponentType mComponentType;
 	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
 	{
-		return componentTmpl.p()->componentType() == mComponentType;
+		return componentTmpl->componentType() == mComponentType;
 	}
 };
+
+///inline definitions
+
+inline ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mComponentTemplates;
+}
+
+inline ParameterTable ObjectTemplate::getParameterTable() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mParameterTable;
+}
+
+inline ObjectType ObjectTemplate::objectType() const
+{
+	return mName;
+}
+
+inline PandaFramework* const ObjectTemplate::pandaFramework() const
+{
+	return mPandaFramework;
+}
+
+inline WindowFramework* const ObjectTemplate::windowFramework() const
+{
+	return mWindowFramework;
+}
+
+inline ReMutex& ObjectTemplate::getMutex()
+{
+	return mMutex;
+}
+
 }  // namespace ely
 
 #endif /* OBJECTTEMPLATE_H_ */

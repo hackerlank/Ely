@@ -66,7 +66,7 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
 	}
 	SMARTPTR(ObjectTemplate) previousObjTmpl;
 	previousObjTmpl.clear();
-	ObjectType objectTemplId = objectTmpl->name();
+	ObjectType objectTemplId = objectTmpl->objectType();
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
 	if (it != mObjectTemplates.end())
 	{
@@ -95,12 +95,12 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 	return true;
 }
 
-SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType objectType)
+SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType objectType) const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
+	ObjectTemplateTable::const_iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
 	{
 		return NULL;
@@ -110,7 +110,6 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType obje
 
 SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId,
-		bool createWithParamTables,
 		const ParameterTable& objTmplParams,
 		const ParameterTableMap& compTmplParams,
 		bool storeParams)
@@ -149,20 +148,17 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	for (unsigned int idx2 = 0; idx2 < compTmplList.size(); ++idx2)
 	{
 		//use ComponentTemplateManager to create component
-		ComponentType compType = compTmplList[idx2].p()->componentType();
-		//check if we have to initialize parameters of this component template
-		if(createWithParamTables)
+		ComponentType compType = compTmplList[idx2]->componentType();
+		//we have to initialize parameters of this component template
+		//set component' parameters to their default values
+		ComponentTemplateManager::GetSingleton().resetComponentTemplateParams(compType);
+		//set parameters for this component template...
+		ParameterTableMap::const_iterator it3;
+		it3 = compTmplParams.find(std::string(compType));
+		if (it3 != compTmplParams.end())
 		{
-			//set component' parameters to their default values
-			compTmplList[idx2]->setParametersDefaults();
-			//set parameters for this component template...
-			ParameterTableMap::const_iterator it3;
-			it3 = compTmplParams.find(std::string(compType));
-			if (it3 != compTmplParams.end())
-			{
-				//...if not empty
-				compTmplList[idx2]->setParameters(it3->second);
-			}
+			//...if not empty
+			compTmplList[idx2]->setParameters(it3->second);
 		}
 		//
 		SMARTPTR(Component) newComp =
@@ -173,45 +169,83 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		{
 			return NULL;
 		}
-		newObj->addComponent(newComp);
+		newObj->addComponent(newComp, false);
 	}
-	//check if we have to initialize parameters of this object template
-	if(createWithParamTables)
+	//we have to initialize parameters of this object template
+	//initialize parameters' object template to defaults
+	objectTmpl->setParametersDefaults();
+	//set parameters for this object template...
+	if(not objTmplParams.empty())
 	{
-		//initialize parameters' object template to defaults
-		objectTmpl->setParametersDefaults();
-		//set parameters for this object template...
-		if(not objTmplParams.empty())
-		{
-			//...if not empty
-			objectTmpl->setParameters(objTmplParams);
-		}
-		//store object and component templates' parameters into
-		//the created object and before it will be added to the
-		//scene (and initialized).
-		bool storeParamsParam = (
-				objectTmpl->parameter(std::string("store_params")) ==
-				std::string("true") ? true : false);
-		if (storeParams or storeParamsParam)
-		{
-			newObj->storeParameters(objTmplParams, compTmplParams);
-		}
-		//give a chance to object (and its components) to customize
-		//themselves when being added to scene.
-		newObj->sceneSetup();
+		//...if not empty
+		objectTmpl->setParameters(objTmplParams);
 	}
+	//store object and component templates' parameters into
+	//the created object and before it will be added to the
+	//scene (and initialized).
+	bool storeParamsParam = (
+			objectTmpl->parameter(std::string("store_params")) ==
+			std::string("true") ? true : false);
+	if (storeParams or storeParamsParam)
+	{
+		newObj->storeParameters(objTmplParams, compTmplParams);
+	}
+	//give a chance to object (and its components) to customize
+	//themselves when being added to scene.
+	newObj->sceneSetup();
 	//Now the object is completely existent so insert
 	//it in the table of created objects.
 	mCreatedObjects[newId] = newObj;
 	return newObj;
 }
 
-SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId)
+bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
+		ComponentType componentType, const ParameterTable& compTmplParams)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ObjectTable::iterator iterObj;
+	//check if it is an already created object
+	SMARTPTR(Object) object = getCreatedObject(objectId);
+	if(not object)
+	{
+		return false;
+	}
+	//get the component template
+	SMARTPTR(ComponentTemplate) componentTemplate =
+	ComponentTemplateManager::GetSingleton().getComponentTemplate(componentType);
+	//we have to initialize parameters of this component template
+	//set component' parameters to their default values
+	componentTemplate->setParametersDefaults();
+	//set parameters for this component template...
+	if (not compTmplParams.empty())
+	{
+		//...if not empty
+		componentTemplate->setParameters(compTmplParams);
+	}
+	//create the new component
+	SMARTPTR(Component) newComp =
+	ComponentTemplateManager::GetSingleton().createComponent(componentType);
+	//add the component into the object
+	if (not newComp)
+	{
+		return false;
+	}
+	object->addComponent(newComp, true);
+	return true;
+}
+
+bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId, ComponentType componentType)
+{
+
+}
+
+SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId) const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	ObjectTable::const_iterator iterObj;
 	iterObj = mCreatedObjects.find(objectId);
 	if (iterObj == mCreatedObjects.end())
 	{
@@ -220,14 +254,14 @@ SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId
 	return iterObj->second;
 }
 
-std::list<SMARTPTR(Object)> ObjectTemplateManager::getCreatedObjects()
+std::list<SMARTPTR(Object)> ObjectTemplateManager::getCreatedObjects() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	std::list<SMARTPTR(Object)> createdObjects;
-	ObjectTable::iterator iterObj;
-	for(iterObj=mCreatedObjects.begin();
+	ObjectTable::const_iterator iterObj;
+	for(iterObj = mCreatedObjects.begin();
 			iterObj!= mCreatedObjects.end();++iterObj)
 	{
 		createdObjects.push_back(iterObj->second);
@@ -253,11 +287,6 @@ bool ObjectTemplateManager::removeCreatedObject(const ObjectId& objectId)
 	//
 	mCreatedObjects.erase(iterObj);
 	return true;
-}
-
-ReMutex& ObjectTemplateManager::getMutex()
-{
-	return mMutex;
 }
 
 IdType ObjectTemplateManager::getId()

@@ -135,7 +135,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	for (iter = mPhysicsComponents.begin(); iter != mPhysicsComponents.end();
 			++iter)
 	{
-		(*iter).p()->update(reinterpret_cast<void*>(&dt));
+		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
 	// do physics step simulation
 	// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->

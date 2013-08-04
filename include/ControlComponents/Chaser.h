@@ -66,8 +66,8 @@ public:
 	Chaser(SMARTPTR(ChaserTemplate)tmpl);
 	virtual ~Chaser();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -164,6 +164,81 @@ public:
 private:
 	static TypeHandle _type_handle;
 };
+
+///inline definitions
+
+inline bool Chaser::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsEnabled;
+}
+
+inline float Chaser::getAbsLookAtDistance() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAbsLookAtDistance;
+}
+
+inline void Chaser::setAbsLookAtDistance(float absLookAtDistance)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAbsLookAtDistance = absLookAtDistance;
+}
+
+inline float Chaser::getAbsMinDistance() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAbsMinDistance;
+}
+
+inline void Chaser::setAbsMinDistance(float absMinDistance)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAbsMinDistance = absMinDistance;
+}
+
+inline float Chaser::getAbsMinHeight() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAbsMinHeight;
+}
+
+inline void Chaser::setAbsMinHeight(float absMinHeight)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAbsMinHeight = absMinHeight;
+}
+
+inline float Chaser::getDistance() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAbsMaxDistance;
+}
+
+inline void Chaser::setDistance(float distance)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAbsMaxDistance = distance;
+}
+
 }  // namespace ely
 
 #endif /* CHASER_H_ */

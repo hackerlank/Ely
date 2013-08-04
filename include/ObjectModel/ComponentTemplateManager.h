@@ -36,6 +36,16 @@ namespace ely
  */
 class ComponentTemplateManager: public Singleton<ComponentTemplateManager>
 {
+private:
+	friend class ObjectTemplateManager;
+
+	/**
+	 * \brief Creates a component given its type.
+	 * @param componentID The component type.
+	 * @return The just created component, or NULL on failure (for any reason).
+	 */
+	SMARTPTR(Component) createComponent(ComponentType componentID);
+
 public:
 	/**
 	 * \brief Constructor.
@@ -71,19 +81,20 @@ public:
 	 * @param componentID The component type.
 	 * @return The component template.
 	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentID);
+	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentID) const;
+
+	/**
+	 * \brief Resets the component template, of the given component type,
+	 * to its default parameters.
+	 *
+	 * @param componentID The component type.
+	 */
+	void resetComponentTemplateParams(ComponentType componentID);
 
 	/**
 	 * \brief Resets all component templates to their default parameters.
 	 */
 	void resetComponentTemplatesParams();
-
-	/**
-	 * \brief Creates a component given its type.
-	 * @param componentID The component type.
-	 * @return The just created component, or NULL on failure (for any reason).
-	 */
-	SMARTPTR(Component) createComponent(ComponentType componentID);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -107,6 +118,19 @@ private:
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
 };
+
+///inline definitions
+
+inline IdType ComponentTemplateManager::getId()
+{
+	return ++id;
+}
+
+inline ReMutex& ComponentTemplateManager::getMutex()
+{
+	return mMutex;
+}
+
 }  // namespace ely
 
 #endif /* COMPONENTTEMPLATEMANAGER_H_ */

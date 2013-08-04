@@ -49,12 +49,12 @@ NodePathWrapper::~NodePathWrapper()
 	mNodePath.remove_node();
 }
 
-const ComponentFamilyType NodePathWrapper::familyType() const
+ComponentFamilyType NodePathWrapper::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType NodePathWrapper::componentType() const
+ComponentType NodePathWrapper::componentType() const
 {
 	return mTmpl->componentType();
 }

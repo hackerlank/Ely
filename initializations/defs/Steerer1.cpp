@@ -173,8 +173,8 @@ static void createClones(SMARTPTR(Object) cloned,
 			idx << x << "_" << y;
 			std::string id = std::string(cloned->objectId()) + "_clone" + idx.str();
 			clones.push_back(ObjectTemplateManager::GetSingletonPtr()->
-					createObject(cloned->objectTmpl()->name(), ObjectId(id),
-							true, steerer1ObjParams, steerer1CompParams, false));
+					createObject(cloned->objectTmpl()->objectType(), ObjectId(id),
+							steerer1ObjParams, steerer1CompParams, false));
 		}
 	}
 }

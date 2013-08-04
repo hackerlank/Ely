@@ -43,11 +43,6 @@ Object::~Object()
 	mNodePath.remove_node();
 }
 
-const ObjectId& Object::objectId() const
-{
-	return mObjectId;
-}
-
 void Object::clearComponents()
 {
 	//lock (guard) the mutex
@@ -65,12 +60,12 @@ void Object::clearComponents()
 	std::cout << std::endl;
 }
 
-SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyID)
+SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyID) const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	ComponentTable::iterator it = mComponents.find(familyID);
+	ComponentTable::const_iterator it = mComponents.find(familyID);
 	if (it == mComponents.end())
 	{
 		return NULL;
@@ -78,18 +73,19 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyID)
 	return (*it).second;
 }
 
-SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
+SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) component,
+		bool existingObject)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (not newComponent)
+	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	SMARTPTR(Component) previousComp;
 	previousComp.clear();
-	ComponentFamilyType familyId = newComponent->familyType();
+	ComponentFamilyType familyId = component->familyType();
 	ComponentTable::iterator it = mComponents.find(familyId);
 	if (it != mComponents.end())
 	{
@@ -98,53 +94,38 @@ SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) newComponent)
 		mComponents.erase(it);
 	}
 	//set the component owner
-	newComponent->setOwnerObject(this);
+	component->setOwnerObject(this);
 	//insert the new component into the table
-	mComponents[familyId] = newComponent;
+	mComponents[familyId] = component;
 	//on addition to object component setup
 	mComponents[familyId]->onAddToObjectSetup();
-	//check if the owner object is an already created object
-	ObjectId ownerId = mComponents[familyId]->getOwnerObject()->objectId();
-	if (ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ownerId))
+	//if this object is an already existing object calls onAddToSceneSetup
+	if (existingObject)
 	{
-		//the owner object is a completely created object
-		//give this component a chance to customize
-		//itself when being added to scene.
 		mComponents[familyId]->onAddToSceneSetup();
 	}
 	return previousComp;
 }
 
-unsigned int Object::numComponents()
+bool Object::removeComponent(SMARTPTR(Component) component)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	return static_cast<unsigned int>(mComponents.size());
-}
-
-NodePath Object::getNodePath() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void Object::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
-}
-
-Object::operator NodePath()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
+	if (not component)
+	{
+		throw GameException("Object::addComponent: NULL new Component");
+	}
+	ComponentFamilyType familyId = component->familyType();
+	ComponentTable::iterator it = mComponents.find(familyId);
+	if (it->second != component)
+	{
+		return false;
+	}
+	//erase component
+	mComponents.erase(it);
+	//
+	return true;
 }
 
 void Object::sceneSetup()
@@ -190,7 +171,7 @@ void Object::sceneSetup()
 	for (iterComp = mComponents.begin(); iterComp != mComponents.end();
 			++iterComp)
 	{
-		iterComp->second.p()->onAddToSceneSetup();
+		iterComp->second->onAddToSceneSetup();
 	}
 }
 
@@ -267,67 +248,6 @@ void Object::unloadInitializationFunctions()
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;
-}
-
-SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
-{
-	return mTmpl;
-}
-
-bool Object::isSteady()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mIsSteady;
-}
-
-void Object::setSteady(bool value)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mIsSteady = value;
-}
-
-void Object::storeParameters(const ParameterTable& objTmplParams,
-		const ParameterTableMap& compTmplParams)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mObjTmplParams = objTmplParams;
-	mCompTmplParams = compTmplParams;
-}
-
-void Object::freeParameters()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mObjTmplParams.clear();
-	mCompTmplParams.clear();
-}
-
-ParameterTable Object::getStoredObjTmplParams()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mObjTmplParams;
-}
-
-ParameterTableMap Object::getStoredCompTmplParams()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mCompTmplParams;
-}
-
-ReMutex& Object::getMutex()
-{
-	return mMutex;
 }
 
 //TypedObject semantics: hardcoded

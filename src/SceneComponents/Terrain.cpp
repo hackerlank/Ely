@@ -56,12 +56,12 @@ Terrain::~Terrain()
 	mTerrain->get_root().remove_node();
 }
 
-const ComponentFamilyType Terrain::familyType() const
+ComponentFamilyType Terrain::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Terrain::componentType() const
+ComponentType Terrain::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -247,29 +247,6 @@ void Terrain::update(void* data)
 	mTerrain->set_focal_point(focalPointNetPos - mTerrainRootNetPos);
 	//update every frame
 	mTerrain->update();
-}
-
-SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mTerrain;
-}
-
-float Terrain::getWidthScale() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mWidthScale;
-}
-float Terrain::getHeightScale() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mHeightScale;
 }
 
 //TypedObject semantics: hardcoded

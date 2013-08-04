@@ -47,12 +47,12 @@ ListenerTemplate::~ListenerTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType ListenerTemplate::componentType() const
+ComponentType ListenerTemplate::componentType() const
 {
 	return ComponentType("Listener");
 }
 
-const ComponentFamilyType ListenerTemplate::familyType() const
+ComponentFamilyType ListenerTemplate::familyType() const
 {
 	return ComponentFamilyType("Audio");
 }

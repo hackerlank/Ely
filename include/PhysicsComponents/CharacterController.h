@@ -61,6 +61,8 @@ class CharacterControllerTemplate;
  * - "max_jump_height"  		|single|no default
  * - "forward"  				|single|"enabled"
  * - "backward"  				|single|"enabled"
+ * - "up"  						|single|"enabled"
+ * - "down"  					|single|"enabled"
  * - "roll_left"  				|single|"enabled"
  * - "roll_right"  				|single|"enabled"
  * - "strafe_left"  			|single|"enabled"
@@ -84,8 +86,8 @@ public:
 	CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl);
 	virtual ~CharacterController();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -106,6 +108,10 @@ public:
 	bool isForwardEnabled();
 	void enableBackward(bool enable);
 	bool isBackwardEnabled();
+	void enableUp(bool enable);
+	bool isUpEnabled();
+	void enableDown(bool enable);
+	bool isDownEnabled();
 	void enableStrafeLeft(bool enable);
 	bool isStrafeLeftEnabled();
 	void enableStrafeRight(bool enable);
@@ -122,8 +128,8 @@ public:
 	 * \name Speeds getters/setters.
 	 */
 	///@{
-	void setLinearSpeed(const LVecBase2f& speed);
-	LVecBase2f getLinearSpeed();
+	void setLinearSpeed(const LVecBase3f& speed);
+	LVecBase3f getLinearSpeed();
 	float getAngularSpeed();
 	void setAngularSpeed(float speed);
 	///@}
@@ -180,7 +186,7 @@ private:
 	///Control functions and parameters.
 	///@{
 	float mAngularSpeed, mFallSpeed, mGravity, mJumpSpeed, mMaxSlope, mMaxJumpHeight;
-	LVecBase2f mLinearSpeed;
+	LVecBase3f mLinearSpeed;
 	///Flag if linear movement is local.
 	bool mIsLocal;
 	/**
@@ -188,8 +194,8 @@ private:
 	 */
 	void setControlParameters();
 	///Key controls and effective keys.
-	bool mForward, mBackward, mStrafeLeft, mStrafeRight,mRollLeft, mRollRight, mJump;
-	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey,
+	bool mForward, mBackward, mUp, mDown, mStrafeLeft, mStrafeRight,mRollLeft, mRollRight, mJump;
+	bool mForwardKey, mBackwardKey, mUpKey, mDownKey, mStrafeLeftKey, mStrafeRightKey,
 	mRollLeftKey, mRollRightKey, mJumpKey;
 	///@}
 
@@ -221,6 +227,228 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
+inline void CharacterController::enableForward(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mForwardKey)
+	{
+		mForward = enable;
+	}
+}
+
+inline bool CharacterController::isForwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mForward;
+}
+
+inline void CharacterController::enableBackward(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mBackwardKey)
+	{
+		mBackward = enable;
+	}
+}
+
+inline bool CharacterController::isBackwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mBackward;
+}
+
+inline void CharacterController::enableUp(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mUpKey)
+	{
+		mUp = enable;
+	}
+}
+
+inline bool CharacterController::isUpEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mUp;
+}
+
+inline void CharacterController::enableDown(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mDownKey)
+	{
+		mDown = enable;
+	}
+}
+
+inline bool CharacterController::isDownEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mDown;
+}
+
+inline void CharacterController::enableStrafeLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mStrafeLeftKey)
+	{
+		mStrafeLeft = enable;
+	}
+}
+
+inline bool CharacterController::isStrafeLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeLeft;
+}
+
+inline void CharacterController::enableStrafeRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mStrafeRightKey)
+	{
+		mStrafeRight = enable;
+	}
+}
+
+inline bool CharacterController::isStrafeRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mStrafeRight;
+}
+
+inline void CharacterController::enableRollLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mRollLeftKey)
+	{
+		mRollLeft = enable;
+	}
+}
+
+inline bool CharacterController::isRollLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollLeft;
+}
+
+inline void CharacterController::enableRollRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mRollRightKey)
+	{
+		mRollRight = enable;
+	}
+}
+
+inline bool CharacterController::isRollRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mRollRight;
+}
+
+inline void CharacterController::enableJump(bool enable)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	if (mJumpKey)
+	{
+		mJump = enable;
+	}
+}
+
+inline bool CharacterController::isJumpEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mJump;
+}
+
+inline LVecBase3f CharacterController::getLinearSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mLinearSpeed;
+}
+
+inline void CharacterController::setLinearSpeed(const LVecBase3f& speed)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mLinearSpeed = speed;
+}
+
+inline float CharacterController::getAngularSpeed()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mAngularSpeed;
+}
+
+inline void CharacterController::setAngularSpeed(float speed)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mAngularSpeed = speed;
+}
+
+inline void CharacterController::setIsLocal(bool isLocal)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mIsLocal = isLocal;
+}
+
+inline bool CharacterController::getIsLocal()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsLocal;
+}
+
 }  // namespace ely
 
 #endif /* CHARACTERCONTROLLER_H_ */

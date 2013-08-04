@@ -47,12 +47,12 @@ NavMeshTemplate::~NavMeshTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType NavMeshTemplate::componentType() const
+ComponentType NavMeshTemplate::componentType() const
 {
 	return ComponentType("NavMesh");
 }
 
-const ComponentFamilyType NavMeshTemplate::familyType() const
+ComponentFamilyType NavMeshTemplate::familyType() const
 {
 	return ComponentFamilyType("AI");
 }

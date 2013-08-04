@@ -47,12 +47,12 @@ CrowdAgentTemplate::~CrowdAgentTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType CrowdAgentTemplate::componentType() const
+ComponentType CrowdAgentTemplate::componentType() const
 {
 	return ComponentType("CrowdAgent");
 }
 
-const ComponentFamilyType CrowdAgentTemplate::familyType() const
+ComponentFamilyType CrowdAgentTemplate::familyType() const
 {
 	return ComponentFamilyType("AI");
 }

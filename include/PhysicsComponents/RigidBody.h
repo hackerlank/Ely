@@ -94,8 +94,8 @@ public:
 	RigidBody(SMARTPTR(RigidBodyTemplate)tmpl);
 	virtual ~RigidBody();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief The current component's type.
@@ -195,6 +195,9 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
 }  // namespace ely
 
 #endif /* RIGIDBODY_H_ */

@@ -24,6 +24,7 @@
 #include "AudioComponents/Sound3d.h"
 #include "AudioComponents/Sound3dTemplate.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
 
 namespace ely
@@ -66,12 +67,12 @@ Sound3d::~Sound3d()
 	}
 }
 
-const ComponentFamilyType Sound3d::familyType() const
+ComponentFamilyType Sound3d::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Sound3d::componentType() const
+ComponentType Sound3d::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -115,7 +116,7 @@ void Sound3d::onAddToObjectSetup()
 					if (not sound.is_null())
 					{
 						//an empty ("") sound name is allowed
-						mSounds[nameFilePair[0]] = sound.p();
+						mSounds[nameFilePair[0]] = sound;
 					}
 				}
 			}
@@ -128,13 +129,14 @@ void Sound3d::onAddToObjectSetup()
 		return;
 	}
 
-	// update sounds' position/velocity only if sound table is not empty
-	if (not mSounds.empty())
-	{
-		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
-	}
 	//set the root of the scene
-	mSceneRoot = mTmpl->windowFramework()->get_render();
+	SMARTPTR(Object) sceneRoot =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(
+				"render");
+	if (sceneRoot)
+	{
+		mSceneRoot = sceneRoot->getNodePath();
+	}
 	//setup event callbacks if any
 	setupEvents();
 	//register event callbacks if any
@@ -149,16 +151,15 @@ void Sound3d::onAddToSceneSetup()
 		return;
 	}
 
-	if (mOwnerObject->isSteady())
+	if (mOwnerObject->isSteady() or mSounds.empty())
 	{
 		//set 3d attribute (in this case static)
 		set3dStaticAttributes();
-		//HACK:remove from update static object (as it was
-		//previously added)
-		if (not mSounds.empty())
-		{
-			GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
-		}
+	}
+	else
+	{
+		// update sounds' position/velocity only if sound table is not empty
+		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
 }
 
@@ -239,14 +240,6 @@ void Sound3d::setMinDistance(float dist)
 	}
 }
 
-float Sound3d::getMinDistance()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mMinDist;
-}
-
 void Sound3d::setMaxDistance(float dist)
 {
 	//lock (guard) the mutex
@@ -258,14 +251,6 @@ void Sound3d::setMaxDistance(float dist)
 	{
 		iter->second->set_3d_max_distance(mMaxDist);
 	}
-}
-
-float Sound3d::getMaxDistance()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mMaxDist;
 }
 
 void Sound3d::set3dStaticAttributes()

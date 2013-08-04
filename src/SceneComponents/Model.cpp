@@ -52,12 +52,12 @@ Model::~Model()
 	mNodePath.remove_node();
 }
 
-const ComponentFamilyType Model::familyType() const
+ComponentFamilyType Model::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType Model::componentType() const
+ComponentType Model::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -338,22 +338,6 @@ void Model::onAddToObjectSetup()
 	registerEventCallbacks();
 }
 
-AnimControlCollection Model::animations() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAnimations;
-}
-
-SMARTPTR(PartBundle)Model::getPartBundle() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mFirstPartBundle;
-}
-
 NodePath Model::getNodePath() const
 {
 	//lock (guard) the mutex
@@ -368,6 +352,14 @@ void Model::setNodePath(const NodePath& nodePath)
 	HOLDMUTEX(mMutex)
 
 	mNodePath = nodePath;
+}
+
+SMARTPTR(PartBundle)Model::getPartBundle() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mFirstPartBundle;
 }
 
 //TypedObject semantics: hardcoded

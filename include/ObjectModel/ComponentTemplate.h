@@ -38,7 +38,6 @@ class ComponentTemplate: public TypedWritableReferenceCount
 {
 protected:
 	friend class ComponentTemplateManager;
-	friend class ObjectTemplateManager;
 
 	/**
 	 * \brief Creates the current component of that family.
@@ -46,13 +45,8 @@ protected:
 	 */
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId) = 0;
 
-	/**
-	 * \brief For the component this template is designed to create,
-	 * this function sets the (mandatory) parameters to their default values.
-	 */
-	virtual void setParametersDefaults() = 0;
-
 public:
+
 	/**
 	 * \brief Constructor.
 	 */
@@ -68,12 +62,18 @@ public:
 	 * \brief Gets the type id of the component created.
 	 * @return The type id of the component created.
 	 */
-	virtual const ComponentType componentType() const = 0;
+	virtual ComponentType componentType() const = 0;
 	/**
 	 * \brief Gets the family id of the component created.
 	 * @return The family id of the component created.
 	 */
-	virtual const ComponentFamilyType familyType() const = 0;
+	virtual ComponentFamilyType familyType() const = 0;
+
+	/**
+	 * \brief For the component this template is designed to create,
+	 * this function sets the (mandatory) parameters to their default values.
+	 */
+	virtual void setParametersDefaults() = 0;
 
 	/**
 	 * \name Parameters management.
@@ -91,7 +91,8 @@ public:
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
-	std::string parameter(const std::string& paramName);
+	std::string parameter(const std::string& paramName) const;
+
 	/**
 	 * \brief Gets the parameter multi-values associated to the component.
 	 * @param paramName The name of the parameter.
@@ -103,7 +104,7 @@ public:
 	 * \brief Gets the entire parameter table.
 	 * @return The parameter table.
 	 */
-	ParameterTable getParameterTable();
+	ParameterTable getParameterTable() const;
 
 	/**
 	 * \brief Gets/sets the PandaFramework.
@@ -124,11 +125,11 @@ public:
 	ReMutex& getMutex();
 
 protected:
-	///Parameter table
+	///Parameter table.
 	ParameterTable mParameterTable;
-	///The PandaFramework.
+	///The PandaFramework .
 	PandaFramework* mPandaFramework;
-	///The WindowFramework.
+	///The WindowFramework .
 	WindowFramework* mWindowFramework;
 
 	///The (reentrant) mutex associated with this template.
@@ -170,6 +171,14 @@ inline PandaFramework* const ComponentTemplate::pandaFramework() const
 inline WindowFramework* const ComponentTemplate::windowFramework() const
 {
 	return mWindowFramework;
+}
+
+inline ParameterTable ComponentTemplate::getParameterTable() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mParameterTable;
 }
 
 inline ReMutex& ComponentTemplate::getMutex()

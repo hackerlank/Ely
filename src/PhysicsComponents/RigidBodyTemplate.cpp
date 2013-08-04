@@ -47,12 +47,12 @@ RigidBodyTemplate::~RigidBodyTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType RigidBodyTemplate::componentType() const
+ComponentType RigidBodyTemplate::componentType() const
 {
 	return ComponentType("RigidBody");
 }
 
-const ComponentFamilyType RigidBodyTemplate::familyType() const
+ComponentFamilyType RigidBodyTemplate::familyType() const
 {
 	return ComponentFamilyType("Physics");
 }

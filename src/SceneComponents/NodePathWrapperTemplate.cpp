@@ -48,12 +48,12 @@ NodePathWrapperTemplate::~NodePathWrapperTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType NodePathWrapperTemplate::componentType() const
+ComponentType NodePathWrapperTemplate::componentType() const
 {
 	return ComponentType("NodePathWrapper");
 }
 
-const ComponentFamilyType NodePathWrapperTemplate::familyType() const
+ComponentFamilyType NodePathWrapperTemplate::familyType() const
 {
 	return ComponentFamilyType("Scene");
 }

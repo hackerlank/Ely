@@ -119,7 +119,7 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 	for (iter = mAIComponents.begin(); iter != mAIComponents.end();
 			++iter)
 	{
-		(*iter).p()->update(reinterpret_cast<void*>(&dt));
+		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
 
 	//

@@ -47,12 +47,12 @@ TerrainTemplate::~TerrainTemplate()
 	// TODO Auto-generated destructor stub
 }
 
-const ComponentType TerrainTemplate::componentType() const
+ComponentType TerrainTemplate::componentType() const
 {
 	return ComponentType("Terrain");
 }
 
-const ComponentFamilyType TerrainTemplate::familyType() const
+ComponentFamilyType TerrainTemplate::familyType() const
 {
 	return ComponentFamilyType("Scene");
 }

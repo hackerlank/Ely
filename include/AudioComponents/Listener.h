@@ -54,8 +54,8 @@ public:
 	Listener(SMARTPTR(ListenerTemplate)tmpl);
 	virtual ~Listener();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Set position/velocity for static objects.
@@ -104,6 +104,9 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
 }  // namespace ely
 
 #endif /* LISTENER_H_ */

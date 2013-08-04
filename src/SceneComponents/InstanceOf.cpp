@@ -50,12 +50,12 @@ InstanceOf::~InstanceOf()
 	mNodePath.remove_node();
 }
 
-const ComponentFamilyType InstanceOf::familyType() const
+ComponentFamilyType InstanceOf::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-const ComponentType InstanceOf::componentType() const
+ComponentType InstanceOf::componentType() const
 {
 	return mTmpl->componentType();
 }
@@ -133,14 +133,6 @@ void InstanceOf::setNodePath(const NodePath& nodePath)
 	HOLDMUTEX(mMutex)
 
 	mNodePath = nodePath;
-}
-
-SMARTPTR(Object)InstanceOf::getInstancedObject() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mInstancedObject;
 }
 
 //TypedObject semantics: hardcoded

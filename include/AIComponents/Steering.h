@@ -75,8 +75,8 @@ public:
 	Steering(SMARTPTR(SteeringTemplate)tmpl);
 	virtual ~Steering();
 
-	const virtual ComponentFamilyType familyType() const;
-	const virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
 
 	/**
 	 * \brief Updates position/orientation of the controlled object.
@@ -188,6 +188,22 @@ private:
 	static TypeHandle _type_handle;
 
 };
+
+///inline definitions
+
+inline bool Steering::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mIsEnabled;
+}
+
+inline AICharacter* const Steering::getAiCharacter() const
+{
+	return mAICharacter;
+}
+
 }  // namespace ely
 
 #endif /* STEERING_H_ */

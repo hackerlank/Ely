@@ -34,15 +34,16 @@ class CharacterControllerTemplate: public ComponentTemplate
 protected:
 
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
-	virtual void setParametersDefaults();
 
 public:
 	CharacterControllerTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
 	virtual ~CharacterControllerTemplate();
 
-	const virtual ComponentType componentType() const;
-	const virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+
+	virtual void setParametersDefaults();
 
 private:
 
