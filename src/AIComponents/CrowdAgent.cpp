@@ -126,17 +126,15 @@ void CrowdAgent::onAddToSceneSetup()
 		return;
 	}
 
-	///get NavMesh owner object from xml (if any)
-	SMARTPTR(Object) navMeshObject = ObjectTemplateManager::
+	///1: get the input from xml
+	///2: add settings for CrowdAgent
+	///set params: already done
+	///set NavMesh object (if any)
+	mNavMeshObject = ObjectTemplateManager::
 			GetSingleton().getCreatedObject(mNavMeshObjectId);
 
-	if(navMeshObject)
+	if(mNavMeshObject)
 	{
-		///1: get the input from xml
-		///2: add settings for CrowdAgent
-		///set NavMesh object
-		setNavMeshObject(navMeshObject);
-		///set params: already done
 		///3: add to the NavMesh
 		addToNavMesh();
 	}
@@ -197,34 +195,34 @@ void CrowdAgent::addToNavMesh()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if(getNavMeshObject())
+	if(mNavMeshObject)
 	{
 		///get NavMesh component
 		SMARTPTR(NavMesh) navMesh = DCAST(NavMesh,
-				getNavMeshObject()->getComponent(componentType()));
+				mNavMeshObject->getComponent(componentType()));
 
 		///NavMesh object updates pos/vel wrt its reference node path
 		LPoint3f pos;
 		NodePath navMeshRefNP = navMesh->getReferenceNP();
-		NodePath ownerObjectRefNP = getOwnerObject()->getNodePath().get_parent();
+		NodePath ownerObjectRefNP = mOwnerObject->getNodePath().get_parent();
 		if(navMeshRefNP != ownerObjectRefNP)
 		{
 			//the owner object is reparented to the NavMesh
 			//object reference node path
-			pos = getOwnerObject()->getNodePath().get_pos(navMeshRefNP);
-			getOwnerObject()->getNodePath().reparent_to(navMeshRefNP);
-			getOwnerObject()->getNodePath().set_pos(pos);
+			pos = mOwnerObject->getNodePath().get_pos(navMeshRefNP);
+			mOwnerObject->getNodePath().reparent_to(navMeshRefNP);
+			mOwnerObject->getNodePath().set_pos(pos);
 		}
 		else
 		{
-			pos = getOwnerObject()->getNodePath().get_pos();
+			pos = mOwnerObject->getNodePath().get_pos();
 		}
 
 		///set the mov type of the crowd agent
-		setMovType(navMesh->getMovType());
+		mMovType = navMesh->getMovType();
 
 		///add to NavMesh and set the id of CrowdAgent
-		setIdx(navMesh->addCrowdAgent(getOwnerObject(), pos, getParams()));
+		mAgentIdx = navMesh->addCrowdAgent(this, pos, mAgentParams);
 	}
 }
 
@@ -240,7 +238,7 @@ void CrowdAgent::removeFromNavMesh()
 				getNavMeshObject()->getComponent(componentType()));
 
 		///remove from NavMesh
-		navMesh->removeCrowdAgent(getOwnerObject(), getIdx());
+		navMesh->removeCrowdAgent(this, getIdx());
 
 		///set the mov type of the crowd agent to default (RECAST)
 		setMovType(RECAST);

@@ -91,6 +91,25 @@ protected:
 	virtual void onAddToObjectSetup();
 	virtual void onAddToSceneSetup();
 
+	friend class CrowdAgent;
+
+	/**
+	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
+	 * mechanism.
+	 * @param crowdAgentObject The CrowdAgent to add.
+	 * @param pos The CrowdAgent object position.
+	 * @param ap The CrowdAgent parameters.
+	 * @return The CrowdAgent index if addition was accomplished, -1 otherwise.
+	 */
+	int addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, LPoint3f pos,
+			const dtCrowdAgentParams& ap);
+	/**
+	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
+	 * mechanism.
+	 * @param crowdAgentObject The CrowdAgent object to remove.
+	 */
+	void removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, int agentIdx);
+
 public:
 	NavMesh();
 	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
@@ -120,30 +139,11 @@ public:
 	 */
 	///@{
 	//SOLO TILE OBSTACLE
-	void setNavMeshTypeEnum(NavMeshTypeEnum typeEnum);
-	NavMeshTypeEnum getNavMeshTypeEnum();
-	NavMeshType* getNavMeshType();
-	AgentMovType getMovType();
-	void setMovType(AgentMovType movType);
-	NavMeshSettings getNavMeshSettings();
-	void setNavMeshSettings(const NavMeshSettings& settings);
-	NavMeshTypeTool* getTool();
-	void setTool(NavMeshTypeTool* tool);
-	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable);
-	NavMeshPolyAreaFlags getFlagsAreaTable();
-	void setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable);
-	NavMeshPolyAreaCost getCostAreaTable();
-	void setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags);
-	void getCrowdIncludeExcludeFlags(int& includeFlags, int& excludeFlags);
-	void setConvexVolumes(const std::list<PointListArea>& convexVolumes);
-	std::list<PointListArea> getConvexVolumes();
-	void setOffMeshConnections(const std::list<PointPairBidir>& offMeshConnections);
-	std::list<PointPairBidir> getOffMeshConnections();
-	NodePath getReferenceNP();
-	std::list<SMARTPTR(CrowdAgent)> getCrowdAgents();
+	AgentMovType getMovType() const;
+	NodePath getReferenceNP() const;
+	std::list<SMARTPTR(CrowdAgent)> getCrowdAgents() const;
+	void setAgentsDimensions(float radius, float height);
 	//TILE OBSTACLE
-	NavMeshTileSettings getNavMeshTileSettings();
-	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
 	void getTilePos(const LPoint3f& pos, int& tx, int& ty);
 	//TILE
 	void buildTile(const LPoint3f& pos);
@@ -190,22 +190,10 @@ public:
 	void setNavMeshType(NavMeshType* navMeshType, NavMeshTypeEnum navMeshTypeEnum=SOLO);
 
 	/**
-	 * \brief Builds the navigation mesh for the loaded model mesh.
+	 * \brief Builds the recast navigation mesh for the loaded model mesh.
 	 * @return True if successful, false otherwise.
 	 */
 	bool buildNavMesh();
-
-	/**
-	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
-	 * mechanism.
-	 */
-	int addCrowdAgent(SMARTPTR(Object)crowdAgentObject, LPoint3f pos,
-			const dtCrowdAgentParams& ap);
-	/**
-	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
-	 * mechanism.
-	 */
-	void removeCrowdAgent(SMARTPTR(Object)crowdAgentObject, int agentIdx);
 
 	/**
 	 * \brief Recast crowd agents related methods.
@@ -219,19 +207,14 @@ public:
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
 	 *
-	 * All parameters for navMeshSetup() should be set with these methods:
-	 * - setNavMeshTypeEnum(NavMeshTypeEnum)
-	 * - setMovType(AgentMovType)
-	 * - setNavMeshSettings(NavMeshSettings)
-	 * - setNavMeshTileSettings(NavMeshTileSettings) (only for TILE and OBSTACLE)
-	 * - setFlagsAreaTable(NavMeshPolyAreaFlags)
-	 * - setCostAreaTable(NavMeshPolyAreaCost)
-	 * - setCrowdIncludeExcludeFlags(int, int)
-	 * - setConvexVolumes(std::list<PointListArea>)
-	 * - setOffMeshConnections(std::list<PointPairBidir>)
-	 * After that navMeshSetup() can be called.\n
-	 * This method is written so that the code can be used (with little modification)
-	 * to manually setup the NavMesh in program.
+	 * All NavMesh settings are established at by xml parameters.\n
+	 * If "auto_setup" xml parameter is true, this method is called
+	 * during component creation.\n
+	 * If "auto_setup" xml parameter is false, this method is not
+	 * called during component creation. So this method can be
+	 * used manually during the program giving the possibility
+	 * to change the CrowdAgents' radius and height before it is
+	 * called effectively.\n
 	 */
 	void navMeshSetup();
 
@@ -255,16 +238,18 @@ private:
 	BuildContext* mCtx;
 	///The mesh name.
 	std::string mMeshName;
-	///The reference node path.
+	///The reference node path (read only after creation).
 	NodePath mReferenceNP;
 	///@{
 	///Current mesh type.
 	NavMeshTypeEnum mNavMeshTypeEnum;
 	NavMeshType* mNavMeshType;
 	///@}
+	///The movement type (read only after creation).
+	AgentMovType mMovType;
 	///NavMeshSettings from template.
 	NavMeshSettings mNavMeshSettings;
-	/// NavMeshTileSettings from template.
+	///NavMeshTileSettings from template.
 	NavMeshTileSettings mNavMeshTileSettings;
 	///Area-flags-cost settings.
 	std::list<std::string> mAreaFlagsCostXmlParam;
@@ -275,17 +260,15 @@ private:
 	///Crowd include & exclude flags settings.
 	std::string mCrowdIncludeFlagsXmlParam, mCrowdExcludeFlagsXmlParam;
 	int mCrowdIncludeFlags, mCrowdExcludeFlags;
-	///The movement type.
-	AgentMovType mMovType;
 	///Convex volumes.
 	std::list<std::string> mConvexVolumeXmlParam;
 	std::list<PointListArea> mConvexVolumes;
 	///Off mesh connections.
 	std::list<std::string> mOffMeshConnectionXmlParam;
 	std::list<PointPairBidir> mOffMeshConnections;
-	///@{
 	/// Auto setup: true (default) if navigation mesh
-	/// is to be setup when owner object is added to scene,
+	/// is to be setup during component creation (specifically
+	/// when the owner object is added to scene),
 	/// false if it will be built manually by program.
 	/// \note Manual setup is necessary when the owner object has
 	/// children objects and an overall navigation mesh should
@@ -294,7 +277,10 @@ private:
 	/// navigation mesh can be built only after hierarchies
 	/// between objects have been already established, i.e.
 	/// after world creation; typically this kind of navigation
-	/// mesh is built (manually) during object initialization.
+	/// mesh is built (manually) during object initialization.\n
+	/// Another reason to manually setup navigation mesh, is
+	/// that CrowdAgents' dimensions can be changed before setup.
+	///\see navMeshSetup() method.
 	bool mAutoSetup;
 	/// Obstacles table
 	std::map<SMARTPTR(Object), dtObstacleRef> mObstacles;
@@ -420,186 +406,26 @@ inline LVecBase3f NavMesh::getRecastBoundsMax()
 	return RecastToLVecBase3f(mGeom->getMeshBoundsMax());
 }
 
-inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
+inline AgentMovType NavMesh::getMovType() const
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshTypeEnum = typeEnum;
-}
-
-inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshTypeEnum;
-}
-
-inline NavMeshType* NavMesh::getNavMeshType()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshType;
-}
-
-inline AgentMovType NavMesh::getMovType()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	return mMovType;
 }
 
-inline void NavMesh::setMovType(AgentMovType movType)
+inline void NavMesh::setAgentsDimensions(float radius, float height)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mMovType = movType;
+	mNavMeshSettings.m_agentRadius = radius;
+	mNavMeshSettings.m_agentHeight = height;
 }
 
-inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
+inline NodePath NavMesh::getReferenceNP() const
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshSettings = settings;
-}
-
-inline NavMeshSettings NavMesh::getNavMeshSettings()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshSettings;
-}
-
-inline void NavMesh::setTool(NavMeshTypeTool* tool)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshType->setTool(tool);
-}
-
-inline NavMeshTypeTool* NavMesh::getTool()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshType->getTool();
-}
-
-inline void NavMesh::setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mPolyAreaFlags = flagsAreaTable;
-}
-
-inline NavMeshPolyAreaFlags NavMesh::getFlagsAreaTable()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mPolyAreaFlags;
-}
-
-inline void NavMesh::setCostAreaTable(const NavMeshPolyAreaCost& costAreaTable)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mPolyAreaCost = costAreaTable;
-}
-
-inline NavMeshPolyAreaCost NavMesh::getCostAreaTable()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mPolyAreaCost;
-}
-
-inline void NavMesh::setCrowdIncludeExcludeFlags(int includeFlags, int excludeFlags)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mCrowdIncludeFlags = includeFlags;
-	mCrowdExcludeFlags = excludeFlags;
-}
-
-inline void NavMesh::getCrowdIncludeExcludeFlags(int& includeFlags, int& excludeFlags)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	includeFlags = mCrowdIncludeFlags;
-	excludeFlags = mCrowdExcludeFlags;
-}
-
-inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshTileSettings = settings;
-}
-
-inline NavMeshTileSettings NavMesh::getNavMeshTileSettings()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshTileSettings;
-}
-
-inline void NavMesh::setConvexVolumes(const std::list<PointListArea>& convexVolumes)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mConvexVolumes = convexVolumes;
-}
-
-inline std::list<NavMesh::PointListArea> NavMesh::getConvexVolumes()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mConvexVolumes;
-}
-
-inline void NavMesh::setOffMeshConnections(
-		const std::list<PointPairBidir>& offMeshConnections)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mOffMeshConnections = offMeshConnections;
-}
-
-inline std::list<NavMesh::PointPairBidir> NavMesh::getOffMeshConnections()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mOffMeshConnections;
-}
-
-inline NodePath NavMesh::getReferenceNP()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	return mReferenceNP;
 }
 
-inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
+inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

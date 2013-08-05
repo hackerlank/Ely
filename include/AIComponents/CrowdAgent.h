@@ -51,10 +51,10 @@ enum AgentMovType
  * 		http://digestingduck.blogspot.it
  * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
- * \note this component should be associated to a "Scene" component, and
- * should be created after it.
- * \note this component object should have the same reference node
- * (i.e. parent) of the NavMesh object to which it is added.
+ * This component should be associated to a "Scene" component.\n
+ * \note the owner object of this component will be reparented, if necessary,
+ * to the same reference node (i.e. parent) of the NavMesh object
+ * to which it is added.
  *
  * XML Param(s):
  * - "throw_events"						|single|"false"
@@ -86,11 +86,11 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
-	 * \name NavMesh & Crowd agent data
+	 * \name NavMesh & recast crowd agent data
 	 * \brief Gets/sets the associated NavMesh & crowd agent data.
 	 */
 	///@{
-	dtCrowdAgent* getDtAgent();
+	dtCrowdAgent* getRecastCrowdAgent();
 	int getIdx();
 	void setIdx(int idx);
 	void setMovType(AgentMovType movType);
@@ -185,7 +185,7 @@ private:
 
 ///inline definitions
 
-inline dtCrowdAgent* CrowdAgent::getDtAgent()
+inline dtCrowdAgent* CrowdAgent::getRecastCrowdAgent()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
