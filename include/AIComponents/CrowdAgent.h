@@ -90,26 +90,18 @@ public:
 	 * \brief Gets/sets the associated NavMesh & crowd agent data.
 	 */
 	///@{
-	dtCrowdAgent* getRecastCrowdAgent();
+	void setMovType(AgentMovType movType);
 	int getIdx();
 	void setIdx(int idx);
-	void setMovType(AgentMovType movType);
+	void setNavMeshObject(SMARTPTR(Object) navMeshObject);
+	SMARTPTR(Object) getNavMeshObject();
+	//
 	void setParams(const dtCrowdAgentParams& agentParams);
 	dtCrowdAgentParams getParams();
 	void setMoveTarget(const LPoint3f& pos);
 	LPoint3f getMoveTarget();
 	void setMoveVelocity(const LVector3f& vel);
 	LVector3f getMoveVelocity();
-	void setNavMeshObject(SMARTPTR(Object) navMeshObject);
-	SMARTPTR(Object) getNavMeshObject();
-	///@}
-
-	/**
-	 * \brief Adds/removes this object to the NavMesh handling
-	 */
-	///@{
-	void addToNavMesh();
-	void removeFromNavMesh();
 	///@}
 
 private:
@@ -123,9 +115,8 @@ private:
 	AgentMovType mMovType;
 	///The CrowdAgent index.
 	int mAgentIdx;
-	///The associated recast dtCrowdAgent data.
+	///The associated dtCrowdAgent data.
 	///@{
-	dtCrowdAgent* mAgent;
 	dtCrowdAgentParams mAgentParams;
 	LPoint3f mCurrentTarget;
 	LVector3f mCurrentVelocity;
@@ -184,14 +175,6 @@ private:
 };
 
 ///inline definitions
-
-inline dtCrowdAgent* CrowdAgent::getRecastCrowdAgent()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mAgent;
-}
 
 inline int CrowdAgent::getIdx()
 {

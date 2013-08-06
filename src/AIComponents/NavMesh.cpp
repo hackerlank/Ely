@@ -43,9 +43,10 @@ NavMesh::NavMesh()
 }
 
 NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl):
-	mGeom(0),
+	mGeom(NULL),
 	mCtx(new BuildContext),
-	mMeshName("")
+	mMeshName(""),
+	mNavMeshType(NULL)
 {
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
@@ -56,6 +57,13 @@ NavMesh::~NavMesh()
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
+
+	//check if AI manager exists
+	if (GameAIManager::GetSingletonPtr())
+	{
+		//remove from AI manager update
+		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+	}
 
 	delete mCtx;
 #ifdef ELY_DEBUG
@@ -207,9 +215,6 @@ void NavMesh::onAddToSceneSetup()
 		//
 		mDebugCamera = cameraDebug->getNodePath().get_child(0);
 	}
-	//create the DebugDrawers
-	mDD = new DebugDrawPanda3d(mDebugNodePath);
-	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
 #endif
 
 	///1: get the input from xml
@@ -424,22 +429,32 @@ void NavMesh::navMeshSetup()
 	PRINT("'" <<mOwnerObject->objectId()
 			<< "'::'" << mComponentId << "'::navMeshSetup");
 
-	///load the mesh from the owner node path
-	loadModelMesh(mOwnerObject->getNodePath());
+	///Remove from the AI manager update (if previously added)
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+
+	///don't load model mesh more than once
+	if (not mGeom)
+	{
+		///load the mesh from the owner node path
+		if (not loadModelMesh(mOwnerObject->getNodePath()))
+		{
+			throw GameException("NavMesh::navMeshSetup: cannot load mesh model");
+		}
+	}
 
 	///set up the type of navigation mesh
 	switch (mNavMeshTypeEnum)
 	{
 	case SOLO:
 	{
-		setNavMeshType(new NavMeshType_Solo(), SOLO);
+		createNavMeshType(new NavMeshType_Solo());
 		//set navigation mesh settings
 		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
 	}
 		break;
 	case TILE:
 	{
-		setNavMeshType(new NavMeshType_Tile(), TILE);
+		createNavMeshType(new NavMeshType_Tile());
 		//set navigation mesh settings
 		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
 		//set navigation mesh tile settings
@@ -449,7 +464,7 @@ void NavMesh::navMeshSetup()
 		break;
 	case OBSTACLE:
 	{
-		setNavMeshType(new NavMeshType_Obstacle(), OBSTACLE);
+		createNavMeshType(new NavMeshType_Obstacle());
 		//set navigation mesh settings
 		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
 		//set navigation mesh tile settings...
@@ -578,35 +593,33 @@ void NavMesh::navMeshSetup()
 	crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
 			mCrowdExcludeFlags);
 
-	///executed only when manual setup:
+	///<this code is executed only when in manual setup:
 	///add to recast previously added CrowdAgents
 	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
-	std::list<SMARTPTR(CrowdAgent)> crowdAgents = getCrowdAgents();
 	for (iterCA = mCrowdAgents.begin(); iterCA != mCrowdAgents.end();
 			++iterCA)
 	{
-		//CrowdAgent position is supposed to be wrt reference node path
-		LPoint3f pos = (*iterCA)->getOwnerObject()->
-				getNodePath().get_pos();
-		//get recast p (y-up)
-		float p[3];
-		LVecBase3fToRecast(pos, p);
-		//add recast agent
-		int agentIdx = crowdTool->getState()->addAgent(p);
-		//set the id of CrowdAgent
-		(*iterCA)->setIdx(agentIdx);
+		///(re-)add the CrowdAgent
+		addCrowdAgent((*iterCA)->getOwnerObject());
 	}
-
-	///Add to the AI manager update
-	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+	///>
 
 #ifdef ELY_DEBUG
+	//delete old DebugDrawers
+	delete mDD;
+	delete mDDM;
+	//create new DebugDrawers
+	mDD = new DebugDrawPanda3d(mDebugNodePath);
+	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
+	//
 	mDD->reset();
 	mNavMeshType->handleRender(*mDD);
 	mNavMeshType->getInputGeom()->drawConvexVolumes(mDD);
 	mNavMeshType->getInputGeom()->drawOffMeshConnections(mDD, true);
 #endif
 
+	///(Re-)Add to the AI manager update
+	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 }
 
 void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
@@ -805,7 +818,7 @@ bool NavMesh::loadModelMesh(NodePath model)
 	mGeom = new InputGeom;
 	mMeshName = model.get_name();
 	//
-	if (not mGeom->loadMesh(mCtx, NULL, model, mReferenceNP))
+	if ((not mGeom) or (not mGeom->loadMesh(mCtx, NULL, model, mReferenceNP)))
 	{
 		delete mGeom;
 		mGeom = NULL;
@@ -817,15 +830,15 @@ bool NavMesh::loadModelMesh(NodePath model)
 	return result;
 }
 
-void NavMesh::setNavMeshType(NavMeshType* navMeshType,
-		NavMeshTypeEnum navMeshTypeEnum)
+void NavMesh::createNavMeshType(NavMeshType* navMeshType)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//delete old navigation mesh type
+	delete mNavMeshType;
 	//set the navigation mesh type
 	mNavMeshType = navMeshType;
-	mNavMeshTypeEnum = navMeshTypeEnum;
 	//set rcContext
 	mNavMeshType->setContext(mCtx);
 	//handle Mesh Changed
@@ -848,17 +861,24 @@ bool NavMesh::buildNavMesh()
 	return result;
 }
 
-int NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, LPoint3f pos,
-		const dtCrowdAgentParams& ap)
+bool NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
 	int agentIdx = -1;
+	SMARTPTR(CrowdAgent)crowdAgent =
+			DCAST(CrowdAgent, crowdAgentObject->getComponent(componentType()));
+	//add to update list
 	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+	//check if CrowdAgent has been already added or not
 	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
-	if(iterCA != mCrowdAgents.end())
+	if(iterCA == mCrowdAgents.end())
 	{
+		//CrowdAgent needs to be added
+		//set CrowdAgent NavMesh reference
+		crowdAgent->setNavMeshObject(mOwnerObject);
+		//add CrowdAgent
 		mCrowdAgents.push_back(crowdAgent);
 	}
 	//check if there is a crowd tool, i.e. the
@@ -866,34 +886,62 @@ int NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, LPoint3f pos,
 	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
 	if (crowdTool)
 	{
+		//NavMesh object updates CrowdAgents pos/vel wrt its reference node path
+		LPoint3f pos;
+		if(mReferenceNP != crowdAgentObject->getNodePath().get_parent())
+		{
+			//the CrowdAgent owner object is reparented to the NavMesh
+			//object reference node path
+			pos = crowdAgentObject->getNodePath().get_pos(mReferenceNP);
+			crowdAgentObject->getNodePath().reparent_to(mReferenceNP);
+			crowdAgentObject->getNodePath().set_pos(pos);
+		}
+		else
+		{
+			pos = crowdAgentObject->getNodePath().get_pos();
+		}
 		//get recast p (y-up)
 		float p[3];
 		LVecBase3fToRecast(pos, p);
 		//add recast agent
+		dtCrowdAgentParams ap = crowdAgent->getParams();
 		agentIdx = crowdTool->getState()->addAgent(p, &ap);
+		//set the index of the crowd agent
+		crowdAgent->setIdx(agentIdx);
+		//set the mov type of the crowd agent
+		crowdAgent->setMovType(mMovType);
 	}
 	//
-	return agentIdx;
+	return (agentIdx != -1);
 }
 
-void NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, int agentIdx)
+void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
-	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
-	if(iterCA != mCrowdAgents.end())
-	{
-		mCrowdAgents.erase(iterCA);
-	}
+	SMARTPTR(CrowdAgent)crowdAgent =
+			DCAST(CrowdAgent, crowdAgentObject->getComponent(componentType()));
 	//check if there is a crowd tool, i.e. the
 	//recast nav mesh has been completely setup
 	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
 	if (crowdTool)
 	{
+		//set the index of the crowd agent to -1
+		crowdAgent->setIdx(-1);
 		//remove recast agent
-		crowdTool->getState()->removeAgent(agentIdx);
+		crowdTool->getState()->removeAgent(crowdAgent->getIdx());
+	}
+	//remove from update list
+	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+	//check if CrowdAgent has been already removed or not
+	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+	if(iterCA != mCrowdAgents.end())
+	{
+		//CrowdAgent needs to be removed
+		mCrowdAgents.erase(iterCA);
+		//set CrowdAgent NavMesh reference to NULL
+		crowdAgent->setNavMeshObject(NULL);
 	}
 }
 

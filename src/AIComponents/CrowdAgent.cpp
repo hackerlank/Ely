@@ -43,7 +43,6 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl)
 			"CrowdAgent::CrowdAgent: invalid GameAIManager")
 	mTmpl = tmpl;
 	//
-	mAgent = NULL;
 	mAgentIdx = -1;
 	mNavMeshObject = NULL;
 	mMovType = RECAST;
@@ -54,7 +53,13 @@ CrowdAgent::~CrowdAgent()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	removeFromNavMesh();
+	if(mNavMeshObject)
+	{
+		///remove from the NavMesh
+		SMARTPTR(NavMesh) navMesh =
+				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+		navMesh->removeCrowdAgent(mOwnerObject);
+	}
 }
 
 ComponentFamilyType CrowdAgent::familyType() const
@@ -135,8 +140,10 @@ void CrowdAgent::onAddToSceneSetup()
 
 	if(mNavMeshObject)
 	{
-		///3: add to the NavMesh
-		addToNavMesh();
+		///3: add to NavMesh
+		SMARTPTR(NavMesh) navMesh =
+				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+		navMesh->addCrowdAgent(mOwnerObject);
 	}
 
 	//setup event callbacks if any
@@ -187,61 +194,6 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 //		SMARTPTR(NavMesh) navMesh =
 //				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
 //		navMesh->updateMoveVelocity(mOwnerObject, vel);
-	}
-}
-
-void CrowdAgent::addToNavMesh()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if(mNavMeshObject)
-	{
-		///get NavMesh component
-		SMARTPTR(NavMesh) navMesh = DCAST(NavMesh,
-				mNavMeshObject->getComponent(componentType()));
-
-		///NavMesh object updates pos/vel wrt its reference node path
-		LPoint3f pos;
-		NodePath navMeshRefNP = navMesh->getReferenceNP();
-		NodePath ownerObjectRefNP = mOwnerObject->getNodePath().get_parent();
-		if(navMeshRefNP != ownerObjectRefNP)
-		{
-			//the owner object is reparented to the NavMesh
-			//object reference node path
-			pos = mOwnerObject->getNodePath().get_pos(navMeshRefNP);
-			mOwnerObject->getNodePath().reparent_to(navMeshRefNP);
-			mOwnerObject->getNodePath().set_pos(pos);
-		}
-		else
-		{
-			pos = mOwnerObject->getNodePath().get_pos();
-		}
-
-		///set the mov type of the crowd agent
-		mMovType = navMesh->getMovType();
-
-		///add to NavMesh and set the id of CrowdAgent
-		mAgentIdx = navMesh->addCrowdAgent(this, pos, mAgentParams);
-	}
-}
-
-void CrowdAgent::removeFromNavMesh()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if(mNavMeshObject)
-	{
-		///get NavMesh component
-		SMARTPTR(NavMesh) navMesh = DCAST(NavMesh,
-				getNavMeshObject()->getComponent(componentType()));
-
-		///remove from NavMesh
-		navMesh->removeCrowdAgent(this, getIdx());
-
-		///set the mov type of the crowd agent to default (RECAST)
-		setMovType(RECAST);
 	}
 }
 

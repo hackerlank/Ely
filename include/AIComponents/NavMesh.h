@@ -91,25 +91,6 @@ protected:
 	virtual void onAddToObjectSetup();
 	virtual void onAddToSceneSetup();
 
-	friend class CrowdAgent;
-
-	/**
-	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
-	 * mechanism.
-	 * @param crowdAgentObject The CrowdAgent to add.
-	 * @param pos The CrowdAgent object position.
-	 * @param ap The CrowdAgent parameters.
-	 * @return The CrowdAgent index if addition was accomplished, -1 otherwise.
-	 */
-	int addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, LPoint3f pos,
-			const dtCrowdAgentParams& ap);
-	/**
-	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
-	 * mechanism.
-	 * @param crowdAgentObject The CrowdAgent object to remove.
-	 */
-	void removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent, int agentIdx);
-
 public:
 	NavMesh();
 	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
@@ -139,11 +120,16 @@ public:
 	 */
 	///@{
 	//SOLO TILE OBSTACLE
+	void setNavMeshTypeEnum(NavMeshTypeEnum typeEnum);
+	NavMeshTypeEnum getNavMeshTypeEnum() const;
+	void setMovType(AgentMovType movType);
 	AgentMovType getMovType() const;
-	NodePath getReferenceNP() const;
-	std::list<SMARTPTR(CrowdAgent)> getCrowdAgents() const;
-	void setAgentsDimensions(float radius, float height);
+	void setNavMeshSettings(const NavMeshSettings& settings);
+	NavMeshSettings getNavMeshSettings() const;
+	std::list<SMARTPTR(CrowdAgent)> getCrowdAgents();
 	//TILE OBSTACLE
+	void setNavMeshTileSettings(const NavMeshTileSettings& settings);
+	NavMeshTileSettings getNavMeshTileSettings() const;
 	void getTilePos(const LPoint3f& pos, int& tx, int& ty);
 	//TILE
 	void buildTile(const LPoint3f& pos);
@@ -161,39 +147,31 @@ public:
 	 * \brief Recast nav mesh related methods.
 	 */
 	///@{
-	InputGeom* getRecastInputGeom();
-	dtNavMesh* getRecastNavMesh();
-	dtNavMeshQuery* getRecastNavMeshQuery();
-	dtCrowd* getRecastCrowd();
-	float getRecastAgentRadius();
-	float getRecastAgentHeight();
-	float getRecastAgentClimb();
-	LVecBase3f getRecastBoundsMin();
-	LVecBase3f getRecastBoundsMax();
+	InputGeom* getRecastInputGeom() const;
+	dtNavMesh* getRecastNavMesh() const;
+	dtNavMeshQuery* getRecastNavMeshQuery() const;
+	dtCrowd* getRecastCrowd() const;
+	float getRecastAgentRadius() const;
+	float getRecastAgentHeight() const;
+	float getRecastAgentClimb() const;
+	LVecBase3f getRecastBoundsMin() const;
+	LVecBase3f getRecastBoundsMax() const;
 	///@}
 
 	/**
-	 * \brief Loads the mesh from a model node path.
-	 *
-	 * \note: the model's parent node path is the reference wrt
-	 * any calculation are performed.
-	 * @param model The model's node path.
-	 * @return True if successful, false otherwise.
+	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
+	 * mechanism.
+	 * @param crowdAgentObject The CrowdAgent object to add.
+	 * @return True if CrowdAgent was added to recast update, false otherwise.
 	 */
-	bool loadModelMesh(NodePath model);
+	bool addCrowdAgent(SMARTPTR(Object)crowdAgentObject);
 
 	/**
-	 * \brief Sets the navigation mesh type for the loaded model mesh.
-	 * @param navMeshType The navigation mesh type.
-	 * @param navMeshTypeEnum The navigation mesh enum type.
+	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
+	 * mechanism.
+	 * @param crowdAgentObject The CrowdAgent object to add.
 	 */
-	void setNavMeshType(NavMeshType* navMeshType, NavMeshTypeEnum navMeshTypeEnum=SOLO);
-
-	/**
-	 * \brief Builds the recast navigation mesh for the loaded model mesh.
-	 * @return True if successful, false otherwise.
-	 */
-	bool buildNavMesh();
+	void removeCrowdAgent(SMARTPTR(Object)crowdAgentObject);
 
 	/**
 	 * \brief Recast crowd agents related methods.
@@ -245,7 +223,7 @@ private:
 	NavMeshTypeEnum mNavMeshTypeEnum;
 	NavMeshType* mNavMeshType;
 	///@}
-	///The movement type (read only after creation).
+	///The movement type.
 	AgentMovType mMovType;
 	///NavMeshSettings from template.
 	NavMeshSettings mNavMeshSettings;
@@ -292,6 +270,29 @@ private:
 	std::list<SMARTPTR(CrowdAgent)> mCrowdAgents;
 	///@}
 
+	/**
+	 * \brief Loads the mesh from a model node path.
+	 *
+	 * \note: the model's parent node path is the reference wrt
+	 * any calculation are performed.
+	 * @param model The model's node path.
+	 * @return True if successful, false otherwise.
+	 */
+	bool loadModelMesh(NodePath model);
+
+	/**
+	 * \brief Creates the navigation mesh type for the loaded model mesh.
+	 * @param navMeshType The navigation mesh type.
+	 * @param navMeshTypeEnum The navigation mesh enum type.
+	 */
+	void createNavMeshType(NavMeshType* navMeshType);
+
+	/**
+	 * \brief Builds the navigation mesh for the loaded model mesh.
+	 * @return True if successful, false otherwise.
+	 */
+	bool buildNavMesh();
+
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;
@@ -328,9 +329,82 @@ private:
 
 };
 
+
 ///inline definitions
 
-inline InputGeom* NavMesh::getRecastInputGeom()
+inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshTypeEnum = typeEnum;
+}
+
+inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshTypeEnum;
+}
+
+inline void NavMesh::setMovType(AgentMovType movType)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mMovType = movType;
+}
+
+inline AgentMovType NavMesh::getMovType() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mMovType;
+}
+
+inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshSettings = settings;
+}
+
+inline NavMeshSettings NavMesh::getNavMeshSettings() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshSettings;
+}
+
+inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	mNavMeshTileSettings = settings;
+}
+
+inline NavMeshTileSettings NavMesh::getNavMeshTileSettings() const
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mNavMeshTileSettings;
+}
+
+inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	return mCrowdAgents;
+}
+
+inline InputGeom* NavMesh::getRecastInputGeom() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -338,7 +412,7 @@ inline InputGeom* NavMesh::getRecastInputGeom()
 	return mGeom;
 }
 
-inline dtNavMesh* NavMesh::getRecastNavMesh()
+inline dtNavMesh* NavMesh::getRecastNavMesh() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -346,7 +420,7 @@ inline dtNavMesh* NavMesh::getRecastNavMesh()
 	return mNavMeshType->getNavMesh();
 }
 
-inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery()
+inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -354,7 +428,7 @@ inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery()
 	return mNavMeshType->getNavMeshQuery();
 }
 
-inline dtCrowd* NavMesh::getRecastCrowd()
+inline dtCrowd* NavMesh::getRecastCrowd() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -362,7 +436,7 @@ inline dtCrowd* NavMesh::getRecastCrowd()
 	return mNavMeshType->getCrowd();
 }
 
-inline float NavMesh::getRecastAgentRadius()
+inline float NavMesh::getRecastAgentRadius() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -370,7 +444,7 @@ inline float NavMesh::getRecastAgentRadius()
 	return mNavMeshType->getAgentRadius();
 }
 
-inline float NavMesh::getRecastAgentHeight()
+inline float NavMesh::getRecastAgentHeight() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -378,7 +452,7 @@ inline float NavMesh::getRecastAgentHeight()
 	return mNavMeshType->getAgentHeight();
 }
 
-inline float NavMesh::getRecastAgentClimb()
+inline float NavMesh::getRecastAgentClimb() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -386,7 +460,7 @@ inline float NavMesh::getRecastAgentClimb()
 	return mNavMeshType->getAgentClimb();
 }
 
-inline LVecBase3f NavMesh::getRecastBoundsMin()
+inline LVecBase3f NavMesh::getRecastBoundsMin() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -396,7 +470,7 @@ inline LVecBase3f NavMesh::getRecastBoundsMin()
 	return RecastToLVecBase3f(mGeom->getMeshBoundsMin());
 }
 
-inline LVecBase3f NavMesh::getRecastBoundsMax()
+inline LVecBase3f NavMesh::getRecastBoundsMax() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -404,33 +478,6 @@ inline LVecBase3f NavMesh::getRecastBoundsMax()
 	CHECKEXISTENCE(mGeom,
 			"NavMesh::getBoundsMax: invalid InputGeom")
 	return RecastToLVecBase3f(mGeom->getMeshBoundsMax());
-}
-
-inline AgentMovType NavMesh::getMovType() const
-{
-	return mMovType;
-}
-
-inline void NavMesh::setAgentsDimensions(float radius, float height)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshSettings.m_agentRadius = radius;
-	mNavMeshSettings.m_agentHeight = height;
-}
-
-inline NodePath NavMesh::getReferenceNP() const
-{
-	return mReferenceNP;
-}
-
-inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mCrowdAgents;
 }
 
 } // namespace ely
