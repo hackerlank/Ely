@@ -81,7 +81,7 @@ bool CrowdAgent::initialize()
 					== std::string("true") ? true : false);
 	//set CrowdAgent parameters
 	//register to navmesh objectId
-	mNavMeshObjectId = mTmpl->parameter(std::string("register_to_navmesh"));
+	mNavMeshObjectId = mTmpl->parameter(std::string("add_to_navmesh"));
 	//agent params
 	mAgentParams.maxAcceleration = (float) strtof(
 			mTmpl->parameter(std::string("max_acceleration")).c_str(), NULL);
@@ -160,10 +160,10 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 	mAgentParams = agentParams;
 	if(mNavMeshObject)
 	{
-//		//get nav mesh component
-//		SMARTPTR(NavMesh) navMesh =
-//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-//		navMesh->updateParams(mOwnerObject, agentParams);
+		//get nav mesh component
+		SMARTPTR(NavMesh) navMesh =
+				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+		navMesh->updateParams(mAgentIdx, agentParams);
 	}
 }
 
@@ -175,10 +175,10 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	mCurrentTarget = pos;
 	if(mNavMeshObject)
 	{
-//		//get nav mesh component
-//		SMARTPTR(NavMesh) navMesh =
-//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-//		navMesh->updateMoveTarget(mOwnerObject, pos);
+		//get nav mesh component
+		SMARTPTR(NavMesh) navMesh =
+				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+		navMesh->updateMoveTarget(mAgentIdx, pos);
 	}
 }
 

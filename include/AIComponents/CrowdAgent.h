@@ -58,7 +58,7 @@ enum AgentMovType
  *
  * XML Param(s):
  * - "throw_events"						|single|"false"
- * - "register_to_navmesh"				|single|""
+ * - "add_to_navmesh"					|single|""
  * - "max_acceleration";				|single|"8.0"
  * - "max_speed"						|single|"3.5"
  * - "collision_query_range"			|single|"12.0" (* NavMesh::agent_radius)
@@ -72,10 +72,24 @@ class CrowdAgent: public Component
 protected:
 	friend class Object;
 	friend class CrowdAgentTemplate;
+	friend class NavMesh;
 
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
 	virtual void onAddToSceneSetup();
+
+	/**
+	 * \name Private getters/setters of NavMesh data.
+	 *
+	 * Called only by NavMesh methods: there is no need
+	 * to hold component mutex.
+	 */
+	///@{
+	void setMovType(AgentMovType movType);
+	void setIdx(int idx);
+	int getIdx();
+	void setNavMeshObject(SMARTPTR(Object) navMeshObject);
+	///@}
 
 public:
 	CrowdAgent();
@@ -86,16 +100,9 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
-	 * \name NavMesh & recast crowd agent data
-	 * \brief Gets/sets the associated NavMesh & crowd agent data.
+	 * \name Getters/setters of CrowdAgent data.
 	 */
 	///@{
-	void setMovType(AgentMovType movType);
-	int getIdx();
-	void setIdx(int idx);
-	void setNavMeshObject(SMARTPTR(Object) navMeshObject);
-	SMARTPTR(Object) getNavMeshObject();
-	//
 	void setParams(const dtCrowdAgentParams& agentParams);
 	dtCrowdAgentParams getParams();
 	void setMoveTarget(const LPoint3f& pos);
@@ -178,26 +185,22 @@ private:
 
 inline int CrowdAgent::getIdx()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	return mAgentIdx;
 }
 
 inline void CrowdAgent::setIdx(int idx)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	mAgentIdx = idx;
 }
 
 inline void CrowdAgent::setMovType(AgentMovType movType)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	mMovType = movType;
+}
+
+inline void CrowdAgent::setNavMeshObject(SMARTPTR(Object)navMeshObject)
+{
+	mNavMeshObject = navMeshObject;
 }
 
 inline dtCrowdAgentParams CrowdAgent::getParams()
@@ -222,22 +225,6 @@ inline LVector3f CrowdAgent::getMoveVelocity()
 	HOLDMUTEX(mMutex)
 
 	return mCurrentVelocity;
-}
-
-inline void CrowdAgent::setNavMeshObject(SMARTPTR(Object)navMeshObject)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNavMeshObject = navMeshObject;
-}
-
-inline SMARTPTR(Object) CrowdAgent::getNavMeshObject()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNavMeshObject;
 }
 
 }  // namespace ely

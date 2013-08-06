@@ -120,8 +120,8 @@ public:
 	 */
 	///@{
 	//SOLO TILE OBSTACLE
-	void setNavMeshTypeEnum(NavMeshTypeEnum typeEnum);
-	NavMeshTypeEnum getNavMeshTypeEnum() const;
+	void setNavMeshType(NavMeshTypeEnum typeEnum);
+	NavMeshTypeEnum getNavMeshType() const;
 	void setMovType(AgentMovType movType);
 	AgentMovType getMovType() const;
 	void setNavMeshSettings(const NavMeshSettings& settings);
@@ -185,14 +185,13 @@ public:
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
 	 *
-	 * All NavMesh settings are established at by xml parameters.\n
-	 * If "auto_setup" xml parameter is true, this method is called
-	 * during component creation.\n
-	 * If "auto_setup" xml parameter is false, this method is not
-	 * called during component creation. So this method can be
-	 * used manually during the program giving the possibility
-	 * to change the CrowdAgents' radius and height before it is
-	 * called effectively.\n
+	 * This method can be called at startup or during program execution
+	 * repeatedly.\n
+	 * Before calling this method NavMeshType, MovType, NavMeshSettings
+	 * and NavMeshTileSettings can be set up.\n
+	 * The other settings: area types, area ability flags, area cost,
+	 * crowd include/exclude flags, convex volumes and off mesh connections,
+	 * can be setup only at construction time.
 	 */
 	void navMeshSetup();
 
@@ -229,7 +228,7 @@ private:
 	NavMeshSettings mNavMeshSettings;
 	///NavMeshTileSettings from template.
 	NavMeshTileSettings mNavMeshTileSettings;
-	///Area-flags-cost settings.
+	///Area with flags and cost xml settings.
 	std::list<std::string> mAreaFlagsCostXmlParam;
 	///Area types with ability flags settings.
 	NavMeshPolyAreaFlags mPolyAreaFlags;
@@ -244,21 +243,10 @@ private:
 	///Off mesh connections.
 	std::list<std::string> mOffMeshConnectionXmlParam;
 	std::list<PointPairBidir> mOffMeshConnections;
-	/// Auto setup: true (default) if navigation mesh
-	/// is to be setup during component creation (specifically
-	/// when the owner object is added to scene),
-	/// false if it will be built manually by program.
-	/// \note Manual setup is necessary when the owner object has
-	/// children objects and an overall navigation mesh should
-	/// consider them too: parents objects are (created and)
-	/// added to scene before their children, so an overall
-	/// navigation mesh can be built only after hierarchies
-	/// between objects have been already established, i.e.
-	/// after world creation; typically this kind of navigation
-	/// mesh is built (manually) during object initialization.\n
-	/// Another reason to manually setup navigation mesh, is
-	/// that CrowdAgents' dimensions can be changed before setup.
-	///\see navMeshSetup() method.
+	///Auto setup: true (default) if navigation mesh
+	///is to be setup during component creation (specifically
+	///when the owner object is added to scene), false if it
+	///will be built manually during program execution.
 	bool mAutoSetup;
 	/// Obstacles table
 	std::map<SMARTPTR(Object), dtObstacleRef> mObstacles;
@@ -332,7 +320,7 @@ private:
 
 ///inline definitions
 
-inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
+inline void NavMesh::setNavMeshType(NavMeshTypeEnum typeEnum)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
@@ -340,7 +328,7 @@ inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
 	mNavMeshTypeEnum = typeEnum;
 }
 
-inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum() const
+inline NavMeshTypeEnum NavMesh::getNavMeshType() const
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

@@ -903,8 +903,12 @@ bool NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 		//get recast p (y-up)
 		float p[3];
 		LVecBase3fToRecast(pos, p);
-		//add recast agent
+		//all crowd agent have the same dimensions: those
+		//registered into the current mNavMeshType
 		dtCrowdAgentParams ap = crowdAgent->getParams();
+		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+		//add recast agent
 		agentIdx = crowdTool->getState()->addAgent(p, &ap);
 		//set the index of the crowd agent
 		crowdAgent->setIdx(agentIdx);
@@ -947,35 +951,50 @@ void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 
 void NavMesh::updateParams(int agentIdx, const dtCrowdAgentParams& agentParams)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//if there is a crowd tool then update
-//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(navMesh->getTool());
-//	if (crowdTool)
-//	{
-//		crowdTool->getState()->getCrowd()->
-//				updateAgentParameters(mAgentIdx, &mAgentParams);
-//	}
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (crowdTool)
+	{
+		//all crowd agent have the same dimensions: those
+		//registered into the current mNavMeshType
+		agentParams.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+		agentParams.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+		crowdTool->getState()->getCrowd()->
+				updateAgentParameters(agentIdx, &agentParams);
+	}
 }
 
 void NavMesh::updateMoveTarget(int agentIdx, const LPoint3f& pos)
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
 	//if there is a crowd tool then update
-//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(navMesh->getTool());
-//	if (crowdTool)
-//	{
-//		float p[3];
-//		LVecBase3fToRecast(pos, p);
-//		dynamic_cast<CrowdTool*>(navMesh->getTool())->
-//				getState()->setMoveTarget(mAgentIdx, p);
-//		mCurrentTarget = pos;
-//	}
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (crowdTool)
+	{
+		float p[3];
+		LVecBase3fToRecast(pos, p);
+		crowdTool->getState()->setMoveTarget(agentIdx, p);
+	}
 }
 
 void NavMesh::updateMoveVelocity(int agentIdx, const LVector3f& vel)
 {
-//	float v[3];
-//	LVecBase3fToRecast(vel, v);
-//	dynamic_cast<CrowdTool*>(navMesh->getTool())->
-//			getState()->setMoveVelocity(mAgentIdx,v);
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//if there is a crowd tool then update
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (crowdTool)
+	{
+		float v[3];
+		LVecBase3fToRecast(vel, v);
+		crowdTool->getState()->setMoveVelocity(agentIdx, v);
+	}
 }
 
 void NavMesh::update(void* data)

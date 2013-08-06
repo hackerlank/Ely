@@ -77,7 +77,7 @@ void CrowdAgentTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
-	mParameterTable.insert(ParameterNameValue("register_to_navmesh", ""));
+	mParameterTable.insert(ParameterNameValue("add_to_navmesh", ""));
 	mParameterTable.insert(ParameterNameValue("max_acceleration", "8.0"));
 	mParameterTable.insert(ParameterNameValue("max_speed", "3.5"));
 	mParameterTable.insert(ParameterNameValue("collision_query_range", "12.0"));
