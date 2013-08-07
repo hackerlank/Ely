@@ -109,6 +109,10 @@ public:
 	LPoint3f getMoveTarget();
 	void setMoveVelocity(const LVector3f& vel);
 	LVector3f getMoveVelocity();
+	//update flags
+	bool paramsUpdate(dtCrowdAgentParams& agentParams);
+	bool targetUpdate(LPoint3f& pos);
+	bool velocityUpdate(LVector3f& vel);
 	///@}
 
 private:
@@ -125,8 +129,11 @@ private:
 	///The associated dtCrowdAgent data.
 	///@{
 	dtCrowdAgentParams mAgentParams;
+	bool mParamsUpdate;
 	LPoint3f mCurrentTarget;
+	bool mTargetUpdate;
 	LVector3f mCurrentVelocity;
+	bool mVelocityUpdate;
 	///@}
 
 	///NavMesh is a friend only for calling these methods.
@@ -225,6 +232,33 @@ inline LVector3f CrowdAgent::getMoveVelocity()
 	HOLDMUTEX(mMutex)
 
 	return mCurrentVelocity;
+}
+
+inline bool CrowdAgent::paramsUpdate(dtCrowdAgentParams& agentParams)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	///\see Manning.CPP.Concurrency.in.Action.Feb.2012
+	return mParamsUpdate;
+}
+
+inline bool CrowdAgent::targetUpdate(LPoint3f& pos)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	///\see Manning.CPP.Concurrency.in.Action.Feb.2012
+	return mTargetUpdate;
+}
+
+inline bool CrowdAgent::velocityUpdate(LVector3f& vel)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	///\see Manning.CPP.Concurrency.in.Action.Feb.2012
+	return mVelocityUpdate;
 }
 
 }  // namespace ely

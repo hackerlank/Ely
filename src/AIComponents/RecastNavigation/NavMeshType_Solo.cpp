@@ -216,6 +216,8 @@ void NavMeshType_Solo::handleMeshChanged(class InputGeom* geom)
 		m_tool->reset();
 		m_tool->init(this);
 	}
+	resetToolStates();
+	initToolStates(this);
 }
 
 
@@ -570,6 +572,7 @@ bool NavMeshType_Solo::handleBuild()
 	
 	if (m_tool)
 		m_tool->init(this);
+	initToolStates(this);
 
 	return true;
 }

@@ -173,15 +173,15 @@ public:
 	 */
 	void removeCrowdAgent(SMARTPTR(Object)crowdAgentObject);
 
-	/**
-	 * \brief Recast crowd agents related methods.
-	 */
-	///@{
-	void updateParams(int agentIdx,	const dtCrowdAgentParams& agentParams);
-	void updateMoveTarget(int agentIdx,	const LPoint3f& pos);
-	void updateMoveVelocity(int agentIdx, const LVector3f& vel);
-	///@}
-
+//	/**
+//	 * \brief Recast crowd agents related methods.
+//	 */
+//	///@{
+//	void updateParams(int agentIdx,	const dtCrowdAgentParams& agentParams);
+//	void updateMoveTarget(int agentIdx,	const LPoint3f& pos);
+//	void updateMoveVelocity(int agentIdx, const LVector3f& vel);
+//	///@}
+//
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
 	 *

@@ -949,54 +949,54 @@ void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 	}
 }
 
-void NavMesh::updateParams(int agentIdx, const dtCrowdAgentParams& agentParams)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//if there is a crowd tool then update
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdTool)
-	{
-		//all crowd agent have the same dimensions: those
-		//registered into the current mNavMeshType
-		dtCrowdAgentParams ap = agentParams;
-		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
-		crowdTool->getState()->getCrowd()->
-				updateAgentParameters(agentIdx, &ap);
-	}
-}
-
-void NavMesh::updateMoveTarget(int agentIdx, const LPoint3f& pos)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//if there is a crowd tool then update
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdTool)
-	{
-		float p[3];
-		LVecBase3fToRecast(pos, p);
-		crowdTool->getState()->setMoveTarget(agentIdx, p);
-	}
-}
-
-void NavMesh::updateMoveVelocity(int agentIdx, const LVector3f& vel)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//if there is a crowd tool then update
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdTool)
-	{
-		float v[3];
-		LVecBase3fToRecast(vel, v);
-		crowdTool->getState()->setMoveVelocity(agentIdx, v);
-	}
-}
+//void NavMesh::updateParams(int agentIdx, const dtCrowdAgentParams& agentParams)
+//{
+//	//lock (guard) the mutex
+//	HOLDMUTEX(mMutex)
+//
+//	//if there is a crowd tool then update
+//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+//	if (crowdTool)
+//	{
+//		//all crowd agent have the same dimensions: those
+//		//registered into the current mNavMeshType
+//		dtCrowdAgentParams ap = agentParams;
+//		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+//		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+//		crowdTool->getState()->getCrowd()->
+//				updateAgentParameters(agentIdx, &ap);
+//	}
+//}
+//
+//void NavMesh::updateMoveTarget(int agentIdx, const LPoint3f& pos)
+//{
+//	//lock (guard) the mutex
+//	HOLDMUTEX(mMutex)
+//
+//	//if there is a crowd tool then update
+//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+//	if (crowdTool)
+//	{
+//		float p[3];
+//		LVecBase3fToRecast(pos, p);
+//		crowdTool->getState()->setMoveTarget(agentIdx, p);
+//	}
+//}
+//
+//void NavMesh::updateMoveVelocity(int agentIdx, const LVector3f& vel)
+//{
+//	//lock (guard) the mutex
+//	HOLDMUTEX(mMutex)
+//
+//	//if there is a crowd tool then update
+//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+//	if (crowdTool)
+//	{
+//		float v[3];
+//		LVecBase3fToRecast(vel, v);
+//		crowdTool->getState()->setMoveVelocity(agentIdx, v);
+//	}
+//}
 
 void NavMesh::update(void* data)
 {
@@ -1010,20 +1010,47 @@ void NavMesh::update(void* data)
 #endif
 
 	//update is done only when there is a crowd tool
-	dtCrowd* crowd = dynamic_cast<CrowdTool*>(mNavMeshType->getTool())
-			->getState()->getCrowd();
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	dtCrowd* crowd = crowdTool->getState()->getCrowd();
 
 	//update crowd agents' pos/vel
 	mNavMeshType->handleUpdate(dt);
 
-	std::list<Agent*>::iterator iter;
+	std::list<CrowdAgent*>::iterator iter;
 	//post-update all agent positions
 	for (iter = mCrowdAgents.begin(); iter != mCrowdAgents.end();
 			++iter)
 	{
-		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
-		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
-		(*iter)->updatePosDir(dt, pos, vel);
+		int agentIdx = (*iter)->getIdx();
+		//check for updates
+		if((*iter)->paramsUpdate())
+		{
+			//all crowd agent have the same dimensions: those
+			//registered into the current mNavMeshType
+			dtCrowdAgentParams ap = (*iter)->getParams();
+			ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+			ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+			crowd->updateAgentParameters(agentIdx, &ap);
+
+		}
+		if((*iter)->targetUpdate())
+		{
+			float p[3];
+			LVecBase3fToRecast((*iter)->getMoveTarget(), p);
+			crowdTool->getState()->setMoveTarget(agentIdx, p);
+		}
+		if((*iter)->velocityUpdate())
+		{
+			float v[3];
+			LVecBase3fToRecast((*iter)->getMoveVelocity(), v);
+			crowdTool->getState()->setMoveVelocity(agentIdx, v);
+		}
+		//
+		const float* vel = crowd->getAgent(agentIdx)->vel;
+		const float* pos = crowd->getAgent(agentIdx)->npos;
+		(*iter)->updatePosDir(dt, RecastToLVecBase3f(pos),
+				RecastToLVecBase3f(vel));
+
 	}
 	//
 #ifdef ELY_DEBUG

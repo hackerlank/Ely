@@ -869,6 +869,8 @@ void NavMeshType_Obstacle::handleMeshChanged(class InputGeom* geom)
 		m_tool->init(this);
 		m_tmproc->init(m_geom);
 	}
+	resetToolStates();
+	initToolStates(this);
 }
 
 void NavMeshType_Obstacle::addTempObstacle(const float* pos)
@@ -1072,6 +1074,7 @@ bool NavMeshType_Obstacle::handleBuild()
 	
 	if (m_tool)
 		m_tool->init(this);
+	initToolStates(this);
 
 	return true;
 }
