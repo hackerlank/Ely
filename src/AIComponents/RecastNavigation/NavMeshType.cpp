@@ -158,6 +158,33 @@ void NavMeshType::updateToolStates(const float dt)
 	}
 }
 
+void NavMeshType::initToolStates(NavMeshType* sample)
+{
+	for (int i = 0; i < MAX_TOOLS; i++)
+	{
+		if (m_toolStates[i])
+			m_toolStates[i]->init(sample);
+	}
+}
+
+void NavMeshType::resetToolStates()
+{
+	for (int i = 0; i < MAX_TOOLS; i++)
+	{
+		if (m_toolStates[i])
+			m_toolStates[i]->reset();
+	}
+}
+
+void Sample::renderToolStates(duDebugDraw& dd)
+{
+	for (int i = 0; i < MAX_TOOLS; i++)
+	{
+		if (m_toolStates[i])
+			m_toolStates[i]->handleRender(dd);
+	}
+}
+
 void NavMeshType::setNavMeshSettings(const NavMeshSettings& settings)
 {
 	m_cellSize = settings.m_cellSize;

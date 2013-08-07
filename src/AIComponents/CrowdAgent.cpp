@@ -158,13 +158,13 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 	HOLDMUTEX(mMutex)
 
 	mAgentParams = agentParams;
-	if(mNavMeshObject)
-	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->updateParams(mAgentIdx, agentParams);
-	}
+//	if(mNavMeshObject)
+//	{
+//		//get nav mesh component
+//		SMARTPTR(NavMesh) navMesh =
+//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+//		navMesh->updateParams(mAgentIdx, agentParams);
+//	}
 }
 
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
@@ -173,13 +173,13 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	HOLDMUTEX(mMutex)
 
 	mCurrentTarget = pos;
-	if(mNavMeshObject)
-	{
-		//get nav mesh component
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->updateMoveTarget(mAgentIdx, pos);
-	}
+//	if(mNavMeshObject)
+//	{
+//		//get nav mesh component
+//		SMARTPTR(NavMesh) navMesh =
+//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
+//		navMesh->updateMoveTarget(mAgentIdx, pos);
+//	}
 }
 
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
@@ -188,13 +188,13 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	HOLDMUTEX(mMutex)
 
 	mCurrentVelocity = vel;
-	if(mNavMeshObject)
-	{
+//	if(mNavMeshObject)
+//	{
 //		//get nav mesh component
 //		SMARTPTR(NavMesh) navMesh =
 //				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
 //		navMesh->updateMoveVelocity(mOwnerObject, vel);
-	}
+//	}
 }
 
 ///TODO

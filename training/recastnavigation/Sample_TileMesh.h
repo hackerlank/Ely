@@ -120,7 +120,7 @@ public:
 	void removeAllTiles();
 };
 
-class NavMeshTileTool: public SampleTool
+class SampleTileTool: public SampleTool
 {
 	Sample_TileMesh* m_sample;
 	float m_hitPos[3];
@@ -129,13 +129,13 @@ class NavMeshTileTool: public SampleTool
 
 public:
 
-	NavMeshTileTool() :
+	SampleTileTool() :
 			m_sample(0), m_hitPosSet(false), m_agentRadius(0)
 	{
 		m_hitPos[0] = m_hitPos[1] = m_hitPos[2] = 0;
 	}
 
-	virtual ~NavMeshTileTool()
+	virtual ~SampleTileTool()
 	{
 	}
 

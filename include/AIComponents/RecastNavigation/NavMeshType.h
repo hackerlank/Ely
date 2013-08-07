@@ -259,6 +259,9 @@ public:
 	}
 
 	void updateToolStates(const float dt);
+	void initToolStates(NavMeshType* sample);
+	void resetToolStates();
+	void renderToolStates(duDebugDraw& dd);
 
 	void setFlagsAreaTable(const NavMeshPolyAreaFlags& flagsAreaTable)
 	{

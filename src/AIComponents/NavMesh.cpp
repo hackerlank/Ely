@@ -960,10 +960,11 @@ void NavMesh::updateParams(int agentIdx, const dtCrowdAgentParams& agentParams)
 	{
 		//all crowd agent have the same dimensions: those
 		//registered into the current mNavMeshType
-		agentParams.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-		agentParams.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+		dtCrowdAgentParams ap = agentParams;
+		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
 		crowdTool->getState()->getCrowd()->
-				updateAgentParameters(agentIdx, &agentParams);
+				updateAgentParameters(agentIdx, &ap);
 	}
 }
 
@@ -1006,6 +1007,28 @@ void NavMesh::update(void* data)
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
+#endif
+
+	//update is done only when there is a crowd tool
+	dtCrowd* crowd = dynamic_cast<CrowdTool*>(mNavMeshType->getTool())
+			->getState()->getCrowd();
+
+	//update crowd agents' pos/vel
+	mNavMeshType->handleUpdate(dt);
+
+	std::list<Agent*>::iterator iter;
+	//post-update all agent positions
+	for (iter = mCrowdAgents.begin(); iter != mCrowdAgents.end();
+			++iter)
+	{
+		const float* vel = crowd->getAgent((*iter)->getIdx())->vel;
+		const float* pos = crowd->getAgent((*iter)->getIdx())->npos;
+		(*iter)->updatePosDir(dt, pos, vel);
+	}
+	//
+#ifdef ELY_DEBUG
+	mDDM->reset();
+	mNavMeshType->renderToolStates(*mDDM);
 #endif
 
 }
