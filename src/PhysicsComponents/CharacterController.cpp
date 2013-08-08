@@ -61,7 +61,9 @@ CharacterController::~CharacterController()
 	if (GamePhysicsManager::GetSingletonPtr())
 	{
 		//remove from the physics manager update
-		GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
+		throw_event(std::string("GamePhysicsManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GamePhysicsManager::REMOVEFROMUPDATE));
 		//remove character controller from the physics world
 		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
 				DCAST(TypedObject, mCharacterController));
@@ -304,7 +306,9 @@ void CharacterController::onAddToObjectSetup()
 	//set this character controller node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
 	//Add to the physics manager update
-	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
+	throw_event(std::string("GamePhysicsManager::handleUpdateRequest"),
+			EventParameter(this),
+			EventParameter(GamePhysicsManager::ADDTOUPDATE));
 	//setup event callbacks if any
 	setupEvents();
 	//register event callbacks if any

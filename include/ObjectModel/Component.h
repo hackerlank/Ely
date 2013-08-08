@@ -151,6 +151,14 @@ protected:
 	 */
 	virtual void onAddToSceneSetup();
 
+	/**
+	 * \brief Sets the owner object.
+	 *
+	 * This method for all derived classes are called only by object methods.
+	 * \param ownerObject The owner object.
+	 */
+	void setOwnerObject(SMARTPTR(Object)ownerObject);
+
 public:
 
 	/**
@@ -162,14 +170,6 @@ public:
 	 * \brief Destructor.
 	 */
 	virtual ~Component();
-
-	/**
-	 * \brief Sets the owner object.
-	 *
-	 * This method for all derived classes are called only by object methods.
-	 * \param ownerObject The owner object.
-	 */
-	void setOwnerObject(SMARTPTR(Object)ownerObject);
 
 	/**
 	 * \brief Gets the type of this component.
@@ -230,7 +230,7 @@ protected:
 	SMARTPTR(ComponentTemplate) mTmpl;
 	///Unique identifier for this component (read only after creation).
 	ComponentId mComponentId;
-	///The object this component is a member of.
+	///The object this component is a member of (read only after component creation).
 	SMARTPTR(Object) mOwnerObject;
 
 	///The (reentrant) mutex associated with this component.

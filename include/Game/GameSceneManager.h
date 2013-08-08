@@ -51,17 +51,6 @@ public:
 	virtual ~GameSceneManager();
 
 	/**
-	 * \brief Adds (if not present) a scene component to updating.
-	 * @param sceneComp The scene component.
-	 */
-	void addToSceneUpdate(SMARTPTR(Component)sceneComp);
-	/**
-	 * \brief Removes (if present) a scene component from updating.
-	 * @param sceneComp The scene component.
-	 */
-	void removeFromSceneUpdate(SMARTPTR(Component) sceneComp);
-
-	/**
 	 * \brief Updates scene components.
 	 *
 	 * Will be called automatically in a task.
@@ -69,6 +58,13 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
+
+	///Helper enum.
+	enum
+	{
+		ADDTOUPDATE,
+		REMOVEFROMUPDATE
+	};
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -89,6 +85,23 @@ private:
 	SMARTPTR(TaskInterface<GameSceneManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
+
+	///@{
+	///Callbacks for components update adding/removing requests.
+	SMARTPTR(EventCallbackInterface<GameSceneManager>::EventCallbackData) mSceneCallbackData;
+	void handleUpdateRequest(const Event* event);
+	///@}
+
+	/**
+	 * \brief Adds (if not present) a scene component to updating.
+	 * @param sceneComp The scene component.
+	 */
+	void addToSceneUpdate(SMARTPTR(Component)sceneComp);
+	/**
+	 * \brief Removes (if present) a scene component from updating.
+	 * @param sceneComp The scene component.
+	 */
+	void removeFromSceneUpdate(SMARTPTR(Component) sceneComp);
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

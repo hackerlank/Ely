@@ -24,8 +24,9 @@
 #include "ControlComponents/Chaser.h"
 #include "ControlComponents/ChaserTemplate.h"
 #include "Game/GameControlManager.h"
-#include "Game/GamePhysicsManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GamePhysicsManager.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -156,7 +157,9 @@ void Chaser::enable()
 			mAbsLookAtHeight);
 
 	//add to the control manager update
-	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
+	throw_event(std::string("GameControlManager::handleUpdateRequest"),
+			EventParameter(this),
+			EventParameter(GameControlManager::ADDTOUPDATE));
 	//
 	mIsEnabled = not mIsEnabled;
 	//register event callbacks if any
@@ -183,7 +186,9 @@ void Chaser::disable()
 	if (GameControlManager::GetSingletonPtr())
 	{
 		//remove from control manager update
-		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+		throw_event(std::string("GameControlManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameControlManager::REMOVEFROMUPDATE));
 	}
 	//
 	mIsEnabled = not mIsEnabled;

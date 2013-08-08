@@ -55,13 +55,13 @@ GameAudioManager::GameAudioManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	//Add event handler for Audio Components' update handling requests.
-	mAudioUpdateData =
+	//Add event handler for update handling requests.
+	mAudioCallbackData =
 			new EventCallbackInterface<GameAudioManager>::EventCallbackData(this,
 					&GameAudioManager::handleUpdateRequest);
 	EventHandler::get_global_event_handler()->add_hook("GameAudioManager::handleUpdateRequest",
 			&EventCallbackInterface<GameAudioManager>::eventCallbackFunction,
-			reinterpret_cast<void*>(mAudioUpdateData.p()));
+			reinterpret_cast<void*>(mAudioCallbackData.p()));
 }
 
 GameAudioManager::~GameAudioManager()

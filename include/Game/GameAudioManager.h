@@ -57,11 +57,6 @@ public:
 	 */
 	SMARTPTR(AudioManager) audioMgr() const;
 
-	enum
-	{
-		ADDTOUPDATE,
-		REMOVEFROMUPDATE
-	};
 	/**
 	 * \brief Updates audio components.
 	 *
@@ -70,6 +65,13 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
+
+	///Helper enum.
+	enum
+	{
+		ADDTOUPDATE,
+		REMOVEFROMUPDATE
+	};
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -95,7 +97,7 @@ private:
 
 	///@{
 	///Callbacks for components update adding/removing requests.
-	SMARTPTR(EventCallbackInterface<GameAudioManager>::EventCallbackData) mAudioUpdateData;
+	SMARTPTR(EventCallbackInterface<GameAudioManager>::EventCallbackData) mAudioCallbackData;
 	void handleUpdateRequest(const Event* event);
 	///@}
 

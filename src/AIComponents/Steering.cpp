@@ -47,6 +47,7 @@ class EXPCL_PANDAAI PathFinder;
 #include <throw_event.h>
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -235,7 +236,9 @@ void Steering::enable()
 	}
 
 	//Add to the AI manager update
-	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+	throw_event(std::string("GameAIManager::handleUpdateRequest"),
+			EventParameter(this),
+			EventParameter(GameAIManager::ADDTOUPDATE));
 	//
 	mIsEnabled = not mIsEnabled;
 	//register event callbacks if any
@@ -285,7 +288,9 @@ void Steering::disable()
 	if (GameAIManager::GetSingletonPtr())
 	{
 		//remove from AI manager update
-		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+		throw_event(std::string("GameAIManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameAIManager::REMOVEFROMUPDATE));
 	}
 	//reset update ptr
 	mUpdatePtr = NULL;

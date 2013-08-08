@@ -205,7 +205,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	//check if it is an already created object
+	//check if it is effectively an already created object
 	SMARTPTR(Object) object = getCreatedObject(objectId);
 	if(not object)
 	{

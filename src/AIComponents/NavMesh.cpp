@@ -33,6 +33,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -67,7 +68,9 @@ NavMesh::~NavMesh()
 	if (GameAIManager::GetSingletonPtr())
 	{
 		//remove from AI manager update
-		GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+		throw_event(std::string("GameAIManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameAIManager::REMOVEFROMUPDATE));
 	}
 
 	delete mCtx;
@@ -435,7 +438,9 @@ void NavMesh::navMeshSetup()
 			<< "'::'" << mComponentId << "'::navMeshSetup");
 
 	///Remove from the AI manager update (if previously added)
-	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+	throw_event(std::string("GameAIManager::handleUpdateRequest"),
+			EventParameter(this),
+			EventParameter(GameAIManager::REMOVEFROMUPDATE));
 
 	///don't load model mesh more than once
 	if (not mGeom)
@@ -624,7 +629,9 @@ void NavMesh::navMeshSetup()
 #endif
 
 	///(Re-)Add to the AI manager update
-	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+	throw_event(std::string("GameAIManager::handleUpdateRequest"),
+			EventParameter(this),
+			EventParameter(GameAIManager::ADDTOUPDATE));
 }
 
 void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)

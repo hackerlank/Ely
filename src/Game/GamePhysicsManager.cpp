@@ -68,6 +68,14 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	//Add event handler for update handling requests.
+	mPhysicsCallbackData =
+			new EventCallbackInterface<GamePhysicsManager>::EventCallbackData(this,
+					&GamePhysicsManager::handleUpdateRequest);
+	EventHandler::get_global_event_handler()->add_hook("GamePhysicsManager::handleUpdateRequest",
+			&EventCallbackInterface<GamePhysicsManager>::eventCallbackFunction,
+			reinterpret_cast<void*>(mPhysicsCallbackData.p()));
+
 #ifdef ELY_DEBUG
 	// set up Bullet Debug Renderer (disabled by default)
 	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
@@ -86,11 +94,33 @@ GamePhysicsManager::~GamePhysicsManager()
 	mPhysicsComponents.clear();
 }
 
-void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
+void GamePhysicsManager::handleUpdateRequest(const Event* event)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//First parameter should be a Physics Component
+	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
+	if (param0->is_of_type(Component::get_class_type()))
+	{
+		SMARTPTR(Component) physicsComp = DCAST(Component, param0);
+		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
+		int param1 = event->get_parameter(1).get_int_value();
+		switch (param1) {
+			case ADDTOUPDATE:
+				addToPhysicsUpdate(physicsComp);
+				break;
+			case REMOVEFROMUPDATE:
+				removeFromPhysicsUpdate(physicsComp);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
+{
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
 	if (iter == mPhysicsComponents.end())
@@ -101,9 +131,6 @@ void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
 
 void GamePhysicsManager::removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
 	if (iter != mPhysicsComponents.end())

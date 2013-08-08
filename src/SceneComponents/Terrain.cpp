@@ -26,6 +26,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameSceneManager.h"
 #include <texturePool.h>
+#include <throw_event.h>
 
 namespace ely
 {
@@ -51,7 +52,9 @@ Terrain::~Terrain()
 	if (GameSceneManager::GetSingletonPtr())
 	{
 		//remove from the scene manager update
-		GameSceneManager::GetSingletonPtr()->removeFromSceneUpdate(this);
+		throw_event(std::string("GameSceneManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameSceneManager::REMOVEFROMUPDATE));
 	}
 	mTerrain->get_root().remove_node();
 }
@@ -215,8 +218,13 @@ void Terrain::onAddToObjectSetup()
 	mFocalPointNP = createdObject->getNodePath();
 	//Generate the terrain
 	mTerrain->generate();
-	//Add to the scene manager update if not brute force
-	GameSceneManager::GetSingletonPtr()->addToSceneUpdate(this);
+	if(not mBruteForce)
+	{
+		//Add to the scene manager update if not brute force
+		throw_event(std::string("GameSceneManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameSceneManager::ADDTOUPDATE));
+	}
 
 	//setup event callbacks if any
 	setupEvents();
@@ -235,11 +243,11 @@ void Terrain::update(void* data)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-//	float dt = *(reinterpret_cast<float*>(data));
+	float dt = *(reinterpret_cast<float*>(data));
 
-//#ifdef TESTING
-//	dt = 0.016666667; //60 fps
-//#endif
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
 
 	//set focal point
 	///see https://www.panda3d.org/forums/viewtopic.php?t=5384

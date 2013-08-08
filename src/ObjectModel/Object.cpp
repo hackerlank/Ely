@@ -95,15 +95,15 @@ SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) component,
 	}
 	//set the component owner
 	component->setOwnerObject(this);
-	//insert the new component into the table
-	mComponents[familyId] = component;
 	//on addition to object component setup
-	mComponents[familyId]->onAddToObjectSetup();
+	component->onAddToObjectSetup();
 	//if this object is an already existing object calls onAddToSceneSetup
 	if (existingObject)
 	{
-		mComponents[familyId]->onAddToSceneSetup();
+		component->onAddToSceneSetup();
 	}
+	//insert the new component into the table
+	mComponents[familyId] = component;
 	return previousComp;
 }
 

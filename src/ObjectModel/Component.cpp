@@ -42,6 +42,16 @@ Component::~Component()
 	unloadEventCallbacks();
 }
 
+void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
+{
+	mOwnerObject = ownerObject;
+}
+
+SMARTPTR(Object)Component::getOwnerObject() const
+{
+	return mOwnerObject;
+}
+
 void Component::update(void* data)
 {
 }
@@ -49,22 +59,6 @@ void Component::update(void* data)
 AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 {
 	return AsyncTask::DS_done;
-}
-
-void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mOwnerObject = ownerObject;
-}
-
-SMARTPTR(Object)Component::getOwnerObject() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mOwnerObject;
 }
 
 void Component::loadEventCallbacks()

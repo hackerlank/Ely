@@ -56,6 +56,13 @@ GameAIManager::GameAIManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	//Add event handler for update handling requests.
+	mAICallbackData =
+			new EventCallbackInterface<GameAIManager>::EventCallbackData(this,
+					&GameAIManager::handleUpdateRequest);
+	EventHandler::get_global_event_handler()->add_hook("GameAIManager::handleUpdateRequest",
+			&EventCallbackInterface<GameAIManager>::eventCallbackFunction,
+			reinterpret_cast<void*>(mAICallbackData.p()));
 }
 
 GameAIManager::~GameAIManager()
@@ -72,11 +79,33 @@ GameAIManager::~GameAIManager()
 	delete mAIWorld;
 }
 
-void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
+void GameAIManager::handleUpdateRequest(const Event* event)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//First parameter should be an AI Component
+	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
+	if (param0->is_of_type(Component::get_class_type()))
+	{
+		SMARTPTR(Component) aiComp = DCAST(Component, param0);
+		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
+		int param1 = event->get_parameter(1).get_int_value();
+		switch (param1) {
+			case ADDTOUPDATE:
+				addToAIUpdate(aiComp);
+				break;
+			case REMOVEFROMUPDATE:
+				removeFromAIUpdate(aiComp);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
+{
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
 			mAIComponents.end(), aiComp);
 	if (iter == mAIComponents.end())
@@ -87,9 +116,6 @@ void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 
 void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
 			mAIComponents.end(), aiComp);
 	if (iter != mAIComponents.end())
