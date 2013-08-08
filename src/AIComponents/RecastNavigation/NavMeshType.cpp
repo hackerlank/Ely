@@ -176,7 +176,7 @@ void NavMeshType::resetToolStates()
 	}
 }
 
-void Sample::renderToolStates(duDebugDraw& dd)
+void NavMeshType::renderToolStates(duDebugDraw& dd)
 {
 	for (int i = 0; i < MAX_TOOLS; i++)
 	{

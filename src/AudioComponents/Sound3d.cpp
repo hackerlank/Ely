@@ -26,6 +26,7 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -54,7 +55,9 @@ Sound3d::~Sound3d()
 	if (GameAudioManager::GetSingletonPtr())
 	{
 		//remove from audio update
-		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
+		throw_event(std::string("GameAudioManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameAudioManager::REMOVEFROMUPDATE));
 	}
 	//stops every playing sounds
 	SoundTable::iterator iter;
@@ -159,7 +162,9 @@ void Sound3d::onAddToSceneSetup()
 	else
 	{
 		// update sounds' position/velocity only if sound table is not empty
-		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
+		throw_event(std::string("GameAudioManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameAudioManager::ADDTOUPDATE));
 	}
 }
 
@@ -194,9 +199,10 @@ bool Sound3d::addSound(const std::string& soundName, const std::string& fileName
 		// only if object is dynamic
 		if (not mOwnerObject->isSteady())
 		{
-			//addToAudioUpdate will safely add this component
-			//to update only if it wasn't previously added
-			GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
+			//add to audio update
+			throw_event(std::string("GameAudioManager::handleUpdateRequest"),
+					EventParameter(this),
+					EventParameter(GameAudioManager::ADDTOUPDATE));
 		}
 	}
 	//
@@ -218,9 +224,10 @@ bool Sound3d::removeSound(const std::string& soundName)
 		// try to remove this component from update if sound table is empty
 		if (mSounds.empty())
 		{
-			//removeFromAudioUpdate will safely remove this component
-			//to update only if it was previously added
-			GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
+			//remove from audio update
+			throw_event(std::string("GameAudioManager::handleUpdateRequest"),
+					EventParameter(this),
+					EventParameter(GameAudioManager::REMOVEFROMUPDATE));
 		}
 	}
 	//

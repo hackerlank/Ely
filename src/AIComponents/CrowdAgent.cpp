@@ -46,9 +46,9 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl)
 	mAgentIdx = -1;
 	mNavMeshObject = NULL;
 	mMovType = RECAST;
-	mParamsUpdate = false;
-	mTargetUpdate = false;
-	mVelocityUpdate = false;
+	mParamsNeedsUpdate = false;
+	mTargetNeedsUpdate = false;
+	mVelocityNeedsUpdate = false;
 }
 
 CrowdAgent::~CrowdAgent()
@@ -161,7 +161,7 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 	HOLDMUTEX(mMutex)
 
 	mAgentParams = agentParams;
-	mParamsUpdate = true;
+	mParamsNeedsUpdate = true;
 //	if(mNavMeshObject)
 //	{
 //		//get nav mesh component
@@ -176,8 +176,8 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mCurrentTarget = pos;
-	mTargetUpdate = true;
+	mMoveTarget = pos;
+	mTargetNeedsUpdate = true;
 //	if(mNavMeshObject)
 //	{
 //		//get nav mesh component
@@ -192,8 +192,8 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	mCurrentVelocity = vel;
-	mVelocityUpdate = true;
+	mMoveVelocity = vel;
+	mVelocityNeedsUpdate = true;
 //	if(mNavMeshObject)
 //	{
 //		//get nav mesh component
@@ -202,9 +202,6 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 //		navMesh->updateMoveVelocity(mOwnerObject, vel);
 //	}
 }
-
-///TODO
-/*
 
 #ifdef WITHCHARACTER
 void CrowdAgent::updateVel(float dt, const LPoint3f& pos, const LVector3f& vel)
@@ -268,11 +265,12 @@ void CrowdAgent::updateVel(float dt, const LPoint3f& pos, const LVector3f& vel)
 			m_anims->get_anim(0)->stop();
 		}
 	}
-	///TODO reset updates flags
+
 }
 #else
 void CrowdAgent::updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
+	/*
 	//only for kinematic case
 	//raycast in the near of recast mesh:
 	//float rcConfig::detailSampleMaxError
@@ -331,11 +329,9 @@ void CrowdAgent::updatePosDir(float dt, const LPoint3f& pos, const LVector3f& ve
 			m_anims->get_anim(0)->stop();
 		}
 	}
-	///TODO reset updates flags
+	*/
 }
 #endif
-
-*/
 
 //TypedObject semantics: hardcoded
 TypeHandle CrowdAgent::_type_handle;

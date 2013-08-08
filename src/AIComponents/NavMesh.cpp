@@ -51,6 +51,11 @@ NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl):
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
 	mTmpl = tmpl;
+#ifdef ELY_DEBUG
+	//reset the DebugDrawers
+	mDD = NULL;
+	mDDM = NULL;
+#endif
 }
 
 NavMesh::~NavMesh()
@@ -1016,41 +1021,42 @@ void NavMesh::update(void* data)
 	//update crowd agents' pos/vel
 	mNavMeshType->handleUpdate(dt);
 
-	std::list<CrowdAgent*>::iterator iter;
+	std::list<SMARTPTR(CrowdAgent)>::const_iterator iter;
 	//post-update all agent positions
 	for (iter = mCrowdAgents.begin(); iter != mCrowdAgents.end();
 			++iter)
 	{
 		int agentIdx = (*iter)->getIdx();
-		//check for updates
-		if((*iter)->paramsUpdate())
+		//give CrowdAgent chance to update its pos/vel
+		const float* vel = crowd->getAgent(agentIdx)->vel;
+		const float* pos = crowd->getAgent(agentIdx)->npos;
+		(*iter)->updatePosDir(dt, RecastToLVecBase3f(pos),
+				RecastToLVecBase3f(vel));
+		//check for settings updates
+		dtCrowdAgentParams ap;
+		LPoint3f moveTarget;
+		LVector3f moveVelocity;
+		if((*iter)->paramsRequestUpdate(ap))
 		{
 			//all crowd agent have the same dimensions: those
 			//registered into the current mNavMeshType
-			dtCrowdAgentParams ap = (*iter)->getParams();
 			ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
 			ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
 			crowd->updateAgentParameters(agentIdx, &ap);
 
 		}
-		if((*iter)->targetUpdate())
+		if((*iter)->targetRequestUpdate(moveTarget))
 		{
 			float p[3];
-			LVecBase3fToRecast((*iter)->getMoveTarget(), p);
+			LVecBase3fToRecast(moveTarget, p);
 			crowdTool->getState()->setMoveTarget(agentIdx, p);
 		}
-		if((*iter)->velocityUpdate())
+		if((*iter)->velocityRequestUpdate(moveVelocity))
 		{
 			float v[3];
-			LVecBase3fToRecast((*iter)->getMoveVelocity(), v);
+			LVecBase3fToRecast(moveVelocity, v);
 			crowdTool->getState()->setMoveVelocity(agentIdx, v);
 		}
-		//
-		const float* vel = crowd->getAgent(agentIdx)->vel;
-		const float* pos = crowd->getAgent(agentIdx)->npos;
-		(*iter)->updatePosDir(dt, RecastToLVecBase3f(pos),
-				RecastToLVecBase3f(vel));
-
 	}
 	//
 #ifdef ELY_DEBUG

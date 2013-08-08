@@ -26,6 +26,7 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -52,7 +53,9 @@ Listener::~Listener()
 	if (GameAudioManager::GetSingletonPtr())
 	{
 		//remove from audio update
-		GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
+		throw_event(std::string("GameAudioManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameAudioManager::REMOVEFROMUPDATE));
 	}
 }
 
@@ -112,9 +115,10 @@ void Listener::onAddToSceneSetup()
 	else
 	{
 		// update listener position/velocity only for dynamic objects
-		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
+		throw_event(std::string("GameAudioManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameAudioManager::ADDTOUPDATE));
 	}
-
 }
 
 void Listener::set3dStaticAttributes()

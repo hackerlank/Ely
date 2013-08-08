@@ -55,6 +55,13 @@ GameAudioManager::GameAudioManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+	//Add event handler for Audio Components' update handling requests.
+	mAudioUpdateData =
+			new EventCallbackInterface<GameAudioManager>::EventCallbackData(this,
+					&GameAudioManager::handleUpdateRequest);
+	EventHandler::get_global_event_handler()->add_hook("GameAudioManager::handleUpdateRequest",
+			&EventCallbackInterface<GameAudioManager>::eventCallbackFunction,
+			reinterpret_cast<void*>(mAudioUpdateData.p()));
 }
 
 GameAudioManager::~GameAudioManager()
@@ -69,11 +76,38 @@ GameAudioManager::~GameAudioManager()
 	mAudioComponents.clear();
 }
 
-void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
+SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
+{
+	return mAudioMgr;
+}
+
+void GameAudioManager::handleUpdateRequest(const Event* event)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//First parameter should be an Audio Component
+	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
+	if (param0->is_of_type(Component::get_class_type()))
+	{
+		SMARTPTR(Component) audioComp = DCAST(Component, param0);
+		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
+		int param1 = event->get_parameter(1).get_int_value();
+		switch (param1) {
+			case ADDTOUPDATE:
+				addToAudioUpdate(audioComp);
+				break;
+			case REMOVEFROMUPDATE:
+				removeFromAudioUpdate(audioComp);
+				break;
+			default:
+				break;
+		}
+	}
+}
+
+void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
+{
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
 	if (iter == mAudioComponents.end())
@@ -84,20 +118,12 @@ void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
 
 void GameAudioManager::removeFromAudioUpdate(SMARTPTR(Component) audioComp)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
 	if (iter != mAudioComponents.end())
 	{
 		mAudioComponents.remove(audioComp);
 	}
-}
-
-SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
-{
-	return mAudioMgr;
 }
 
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
