@@ -49,7 +49,8 @@ AC_ARG_ENABLE([ely-debug],
     [ely_debug=${enableval}], [ely_debug=no])
 AS_IF([test "x${ely_debug}" = xyes],
 	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
-	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"])
+	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"],
+	[AC_DEFINE([NDEBUG],[1],[release mode enabled])])
 # enables silent rules
 #AS_IF([test "x${ely_devel}" != xyes -a "x${ely_debug}" != xyes],
 #	[AM_SILENT_RULES])

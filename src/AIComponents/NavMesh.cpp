@@ -429,6 +429,22 @@ void NavMesh::onAddToSceneSetup()
 
 void NavMesh::navMeshSetup()
 {
+	///Remove from the AI manager update (if previously added)
+	{
+		//lock (guard) the GameAIManager mutex
+		HOLDMUTEX(GameAIManager::GetSingletonPtr()->getMutex())
+
+		//create manually the event for removing
+		SMARTPTR(Event)removeEvent = new Event("GameAIManager::handleUpdateRequest");
+		//param0
+		removeEvent->add_parameter(EventParameter(this));
+		//param1
+		removeEvent->add_parameter(
+				EventParameter(GameAIManager::REMOVEFROMUPDATE));
+		//call the callback synchronously
+		GameAIManager::GetSingletonPtr()->handleUpdateRequest(removeEvent);
+	}
+
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
@@ -436,11 +452,6 @@ void NavMesh::navMeshSetup()
 	//operations must be performed by program.
 	PRINT("'" <<mOwnerObject->objectId()
 			<< "'::'" << mComponentId << "'::navMeshSetup");
-
-	///Remove from the AI manager update (if previously added)
-	throw_event(std::string("GameAIManager::handleUpdateRequest"),
-			EventParameter(this),
-			EventParameter(GameAIManager::REMOVEFROMUPDATE));
 
 	///don't load model mesh more than once
 	if (not mGeom)

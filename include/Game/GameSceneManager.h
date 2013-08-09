@@ -89,9 +89,11 @@ private:
 	///@{
 	///Callbacks for components update adding/removing requests.
 	SMARTPTR(EventCallbackInterface<GameSceneManager>::EventCallbackData) mSceneCallbackData;
+public:
 	void handleUpdateRequest(const Event* event);
 	///@}
 
+private:
 	/**
 	 * \brief Adds (if not present) a scene component to updating.
 	 * @param sceneComp The scene component.

@@ -88,9 +88,11 @@ private:
 	///@{
 	///Callbacks for components update adding/removing requests.
 	SMARTPTR(EventCallbackInterface<GameControlManager>::EventCallbackData) mControlCallbackData;
+public:
 	void handleUpdateRequest(const Event* event);
 	///@}
 
+private:
 	/**
 	 * \brief Adds (if not present) an control component to updating.
 	 * @param controlComp The control component.

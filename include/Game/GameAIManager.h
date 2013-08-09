@@ -98,9 +98,11 @@ private:
 	///@{
 	///Callbacks for components update adding/removing requests.
 	SMARTPTR(EventCallbackInterface<GameAIManager>::EventCallbackData) mAICallbackData;
+public:
 	void handleUpdateRequest(const Event* event);
 	///@}
 
+private:
 	/**
 	 * \brief Adds (if not present) an AI component to updating.
 	 * @param aiComp The AI component.

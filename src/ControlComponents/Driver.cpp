@@ -25,6 +25,7 @@
 #include "ControlComponents/DriverTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameControlManager.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -115,7 +116,9 @@ void Driver::enable()
 	}
 
 	//add to the control manager update
-	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
+	throw_event(std::string("GameControlManager::handleUpdateRequest"),
+			EventParameter(this),
+			EventParameter(GameControlManager::ADDTOUPDATE));
 	//
 	mIsEnabled = not mIsEnabled;
 	//register event callbacks if any
@@ -152,7 +155,9 @@ void Driver::disable()
 	if (GameControlManager::GetSingletonPtr())
 	{
 		//remove from control manager update
-		GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+		throw_event(std::string("GameControlManager::handleUpdateRequest"),
+				EventParameter(this),
+				EventParameter(GameControlManager::REMOVEFROMUPDATE));
 	}
 	//
 	mIsEnabled = not mIsEnabled;

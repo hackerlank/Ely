@@ -98,9 +98,11 @@ private:
 	///@{
 	///Callbacks for components update adding/removing requests.
 	SMARTPTR(EventCallbackInterface<GameAudioManager>::EventCallbackData) mAudioCallbackData;
+public:
 	void handleUpdateRequest(const Event* event);
 	///@}
 
+private:
 	/**
 	 * \brief Adds (if not present) an audio component to updating.
 	 * @param audioComp The audio component.
