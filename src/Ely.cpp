@@ -27,6 +27,9 @@ using namespace ely;
 
 int main(int argc, char **argv)
 {
+#ifdef ELY_DEBUG
+	ConfigVariableManager::get_global_ptr()->list_variables();
+#endif
 	// Load your configuration
 	Filename configPrc(std::string());
 	load_prc_file(
@@ -48,23 +51,11 @@ int main(int argc, char **argv)
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
 	AsyncTaskChain *taskChain;
-	//Task chain: GameControlManager
-	taskChain = AsyncTaskManager::get_global_ptr()->make_task_chain(
-			"ManagersChain");
-	//changes the number of threads for taskChain.
-	taskChain->set_num_threads(4);
-	//sets the frame_sync flag.
-	taskChain->set_frame_sync(true);
-	//
-	GameAIManager* gameAIMgr = new GameAIManager(10, 0, "ManagersChain");
-	GameControlManager* gameControlMgr = new GameControlManager(20, 0,
-			"ManagersChain");
-	GameSceneManager* gameSceneMgr = new GameSceneManager(20, 0,
-			"ManagersChain");
-	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(20, 0,
-			"ManagersChain");
-	GameAudioManager* gameAudioMgr = new GameAudioManager(60, 0,
-			"ManagersChain");
+	GAMESUBMANAGER(GameAIManager, gameAIMgr, 0, 0, taskChain, 2, true)
+	GAMESUBMANAGER(GameControlManager, gameControlMgr, 0, 0, taskChain, 2, true)
+	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, 0, 0, taskChain, 2, true)
+	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, 0, 0, taskChain, 2, true)
+	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, 0, 0, taskChain, 2, true)
 #else
 	GameAIManager* gameAIMgr = new GameAIManager();
 	GameControlManager* gameControlMgr = new GameControlManager();

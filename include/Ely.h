@@ -34,4 +34,19 @@
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+///Define a manager for a given subsystem:
+///@param the manager type
+///@param the manager variable
+///@param the manager sort
+///@param the manager priority
+///@param the task chain variable
+///@param the task chain number of threads and
+///@param the task chain frame_sync flag
+#define GAMESUBMANAGER(_managertype_,_manager_,_sort_,_prio_,_chain_,_threads_,_framesync_) \
+	_chain_ = AsyncTaskManager::get_global_ptr()->make_task_chain(\
+			#_managertype_#_chain_);\
+	_chain_->set_num_threads(_threads_);\
+	_chain_->set_frame_sync(_framesync_);\
+	_managertype_* _manager_ = new _managertype_(_sort_, _prio_, #_managertype_#_chain_);
+
 #endif /* ELY_H_ */
