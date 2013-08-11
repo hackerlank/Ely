@@ -173,15 +173,6 @@ public:
 	 */
 	void removeCrowdAgent(SMARTPTR(Object)crowdAgentObject);
 
-//	/**
-//	 * \brief Recast crowd agents related methods.
-//	 */
-//	///@{
-//	void updateParams(int agentIdx,	const dtCrowdAgentParams& agentParams);
-//	void updateMoveTarget(int agentIdx,	const LPoint3f& pos);
-//	void updateMoveVelocity(int agentIdx, const LVector3f& vel);
-//	///@}
-//
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
 	 *
@@ -281,6 +272,32 @@ private:
 	 */
 	bool buildNavMesh();
 
+	///@{
+	///A task data to do asynchronous NavMesh setup.
+	SMARTPTR(TaskInterface<NavMesh>::TaskData) mUpdateData;
+	SMARTPTR(AsyncTask) mUpdateTask;
+	AsyncTask::DoneStatus navMeshAsyncSetup(GenericAsyncTask* task);
+	bool mAsyncSetupExecuting;
+#ifdef ELY_THREAD
+	std::string mTaskChainName;
+#endif
+	///@}
+
+	///@{
+	///Callbacks for CrowdAgent requests.
+	SMARTPTR(EventCallbackInterface<NavMesh>::EventCallbackData) mCrowdAgentRequestData;
+	void handleCrowdAgentRequest(const Event* event);
+	std::string mCrowdAgentRequestEvent;
+	///@}
+public:
+	enum
+	{
+		UPDATE_PARAMS,
+		UPDATE_TARGET,
+		UPDATE_VELOCITY
+	};
+private:
+
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;
@@ -289,6 +306,12 @@ private:
 	/// DebugDrawers.
 	DebugDrawPanda3d* mDD;
 	DebugDrawMeshDrawer* mDDM;
+	///@{
+	///A task data to do asynchronous debug render.
+	SMARTPTR(TaskInterface<NavMesh>::TaskData) mDebugRenderData;
+	SMARTPTR(AsyncTask) mDebugRenderTask;
+	AsyncTask::DoneStatus debugRender(GenericAsyncTask* task);
+	///@}
 #endif
 
 	///TypedObject semantics: hardcoded

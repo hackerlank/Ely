@@ -110,9 +110,7 @@ public:
 	void setMoveVelocity(const LVector3f& vel);
 	LVector3f getMoveVelocity();
 	//update flags
-	bool paramsRequestUpdate(dtCrowdAgentParams& agentParams);
-	bool targetRequestUpdate(LPoint3f& pos);
-	bool velocityRequestUpdate(LVector3f& vel);
+	void setParamUpdateEvent(const std::string& paramUpdateEvent);
 	///@}
 
 private:
@@ -129,11 +127,9 @@ private:
 	///The associated dtCrowdAgent data.
 	///@{
 	dtCrowdAgentParams mAgentParams;
-	bool mParamsNeedsUpdate;
+	std::string mParamUpdateEvent;
 	LPoint3f mMoveTarget;
-	bool mTargetNeedsUpdate;
 	LVector3f mMoveVelocity;
-	bool mVelocityNeedsUpdate;
 	///@}
 
 	///NavMesh is a friend only for calling these methods.
@@ -234,55 +230,9 @@ inline LVector3f CrowdAgent::getMoveVelocity()
 	return mMoveVelocity;
 }
 
-inline bool CrowdAgent::paramsRequestUpdate(dtCrowdAgentParams& agentParams)
+inline void CrowdAgent::setParamUpdateEvent(const std::string& paramUpdateEvent)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	///\see Manning.CPP.Concurrency.in.Action.Feb.2012
-	if(not mParamsNeedsUpdate)
-	{
-		return false;
-	}
-	//update needed
-	agentParams = mAgentParams;
-	//reset request
-	mParamsNeedsUpdate = false;
-	return true;
-}
-
-inline bool CrowdAgent::targetRequestUpdate(LPoint3f& pos)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	///\see Manning.CPP.Concurrency.in.Action.Feb.2012
-	if(not mTargetNeedsUpdate)
-	{
-		return false;
-	}
-	//update needed
-	pos = mMoveTarget;
-	//reset request
-	mTargetNeedsUpdate = false;
-	return true;
-}
-
-inline bool CrowdAgent::velocityRequestUpdate(LVector3f& vel)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	///\see Manning.CPP.Concurrency.in.Action.Feb.2012
-	if(not mVelocityNeedsUpdate)
-	{
-		return false;
-	}
-	//update needed
-	vel = mMoveVelocity;
-	//reset request
-	mVelocityNeedsUpdate = false;
-	return true;
+	mParamUpdateEvent = paramUpdateEvent;
 }
 
 }  // namespace ely

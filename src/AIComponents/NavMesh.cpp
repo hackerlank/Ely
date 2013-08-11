@@ -52,10 +52,25 @@ NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl):
 	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
 	mTmpl = tmpl;
+	mUpdateData.clear();
+	mUpdateTask.clear();
+	mAsyncSetupExecuting = false;
+#ifdef ELY_THREAD
+	//add the task chain on which navMeshAsyncSetup() will be running
+	mTaskChainName = mComponentId + "-taskChain";
+	AsyncTaskManager::get_global_ptr()->make_task_chain(mTaskChainName);
+	AsyncTaskManager::get_global_ptr()->
+			find_task_chain(mTaskChainName)->set_num_threads(1);
+	AsyncTaskManager::get_global_ptr()->
+				find_task_chain(mTaskChainName)->set_frame_sync(false);
+#endif
+
 #ifdef ELY_DEBUG
 	//reset the DebugDrawers
 	mDD = NULL;
 	mDDM = NULL;
+	mDebugRenderData.clear();
+	mDebugRenderTask.clear();
 #endif
 }
 
@@ -64,6 +79,20 @@ NavMesh::~NavMesh()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	//remove all handled CrowdAgents
+	std::list<SMARTPTR(CrowdAgent)> crowdAgents = mCrowdAgents;
+	std::list<SMARTPTR(CrowdAgent)>::const_iterator iter;
+	for (iter = crowdAgents.begin(); iter != crowdAgents.end();
+			++iter)
+	{
+		removeCrowdAgent((*iter)->getOwnerObject());
+	}
+
+	if (mCrowdAgentRequestData)
+	{
+		EventHandler::get_global_event_handler()->remove_hooks_with(
+				reinterpret_cast<void*>(mCrowdAgentRequestData.p()));
+	}
 	//check if AI manager exists
 	if (GameAIManager::GetSingletonPtr())
 	{
@@ -74,6 +103,12 @@ NavMesh::~NavMesh()
 	}
 
 	delete mCtx;
+
+#ifdef ELY_THREAD
+	//remove the task chain on which navMeshAsyncSetup() has run
+	AsyncTaskManager::get_global_ptr()->remove_task_chain(mTaskChainName);
+#endif
+
 #ifdef ELY_DEBUG
 	//delete the DebugDrawers
 	delete mDD;
@@ -191,6 +226,16 @@ void NavMesh::onAddToObjectSetup()
 	{
 		return;
 	}
+
+	//Add event handler for update handling requests.
+	mCrowdAgentRequestEvent = mOwnerObject->objectId() + "CrowdAgentRequest";
+	mCrowdAgentRequestData.clear();
+	mCrowdAgentRequestData =
+			new EventCallbackInterface<NavMesh>::EventCallbackData(this,
+					&NavMesh::handleCrowdAgentRequest);
+	EventHandler::get_global_event_handler()->add_hook(mCrowdAgentRequestEvent,
+			&EventCallbackInterface<NavMesh>::eventCallbackFunction,
+			reinterpret_cast<void*>(mCrowdAgentRequestData.p()));
 
 	//setup event callbacks if any
 	setupEvents();
@@ -429,6 +474,38 @@ void NavMesh::onAddToSceneSetup()
 
 void NavMesh::navMeshSetup()
 {
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//check if another setup is still executing
+	if(mAsyncSetupExecuting)
+	{
+		return;
+	}
+	//flag execution start
+	mAsyncSetupExecuting = true;
+	//create the task for executing navMeshAsyncSetup()
+	mUpdateData.clear();
+	mUpdateTask.clear();
+	mUpdateData = new TaskInterface<NavMesh>::TaskData(this,
+			&NavMesh::navMeshAsyncSetup);
+	mUpdateTask = new GenericAsyncTask(mComponentId + "NavMesh::navMeshAsyncSetup",
+			&TaskInterface<NavMesh>::taskFunction,
+			reinterpret_cast<void*>(mUpdateData.p()));
+	//set sort/priority
+	mUpdateTask->set_sort(0);
+	mUpdateTask->set_priority(0);
+	//Add the task for updating the controlled object
+#ifdef ELY_THREAD
+	//add the task to the task chain.
+	mUpdateTask->set_task_chain(mTaskChainName);
+#endif
+	//Adds mUpdateTask to the active queue.
+	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
+}
+
+AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
+{
 	///Remove from the AI manager update (if previously added)
 	{
 		//lock (guard) the GameAIManager mutex
@@ -622,6 +699,16 @@ void NavMesh::navMeshSetup()
 	{
 		///(re-)add the CrowdAgent
 		addCrowdAgent((*iterCA)->getOwnerObject());
+		///update move target
+		Event eventTarget(mCrowdAgentRequestEvent);
+		eventTarget.add_parameter(EventParameter(*iterCA));
+		eventTarget.add_parameter(UPDATE_TARGET);
+		handleCrowdAgentRequest(&eventTarget);
+		///update move velocity
+		Event eventVelocity(mCrowdAgentRequestEvent);
+		eventVelocity.add_parameter(EventParameter(*iterCA));
+		eventVelocity.add_parameter(UPDATE_VELOCITY);
+		handleCrowdAgentRequest(&eventVelocity);
 	}
 	///>
 
@@ -632,18 +719,52 @@ void NavMesh::navMeshSetup()
 	//create new DebugDrawers
 	mDD = new DebugDrawPanda3d(mDebugNodePath);
 	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
-	//
-	mDD->reset();
-	mNavMeshType->handleRender(*mDD);
-	mNavMeshType->getInputGeom()->drawConvexVolumes(mDD);
-	mNavMeshType->getInputGeom()->drawOffMeshConnections(mDD, true);
+	///create the task for executing debug render
+	mDebugRenderData.clear();
+	mDebugRenderTask.clear();
+	mDebugRenderData = new TaskInterface<NavMesh>::TaskData(this,
+			&NavMesh::debugRender);
+	mDebugRenderTask = new GenericAsyncTask(mComponentId + "NavMesh::debugRender",
+			&TaskInterface<NavMesh>::taskFunction,
+			reinterpret_cast<void*>(mDebugRenderData.p()));
+	//set sort/priority
+	mDebugRenderTask->set_sort(0);
+	mDebugRenderTask->set_priority(0);
+	//Add the task for updating the controlled object
+#ifdef ELY_THREAD
+	//add the task to the task chain.
+	mDebugRenderTask->set_task_chain("default");
+#endif
+	//Adds mUpdateTask to the active queue.
+	AsyncTaskManager::get_global_ptr()->add(mDebugRenderTask);
 #endif
 
 	///(Re-)Add to the AI manager update
 	throw_event(std::string("GameAIManager::handleUpdateRequest"),
 			EventParameter(this),
 			EventParameter(GameAIManager::ADDTOUPDATE));
+
+	//flag execution end
+	mAsyncSetupExecuting = false;
+	//
+	return AsyncTask::DS_done;
 }
+
+#ifdef ELY_DEBUG
+AsyncTask::DoneStatus NavMesh::debugRender(GenericAsyncTask* task)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//debug render with DebugDrawPanda3d
+	mDD->reset();
+	mNavMeshType->handleRender(*mDD);
+	mNavMeshType->getInputGeom()->drawConvexVolumes(mDD);
+	mNavMeshType->getInputGeom()->drawOffMeshConnections(mDD, true);
+	//
+	return AsyncTask::DS_done;
+}
+#endif
 
 void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 {
@@ -889,13 +1010,21 @@ bool NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	int agentIdx = -1;
+	if(not crowdAgentObject)
+	{
+		return false;
+	}
 	SMARTPTR(CrowdAgent)crowdAgent =
 			DCAST(CrowdAgent, crowdAgentObject->getComponent(componentType()));
+	if(not crowdAgent)
+	{
+		return false;
+	}
+	int agentIdx = -1;
 	//add to update list
 	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
 	//check if CrowdAgent has been already added or not
-	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(),	crowdAgent);
 	if(iterCA == mCrowdAgents.end())
 	{
 		//CrowdAgent needs to be added
@@ -906,8 +1035,9 @@ bool NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 	}
 	//check if there is a crowd tool, i.e. the
 	//recast nav mesh has been completely setup
+	//and check if crowdAgent has not been already added to recast
 	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdTool)
+	if(crowdTool and (crowdAgent->getIdx() == -1))
 	{
 		//NavMesh object updates CrowdAgents pos/vel wrt its reference node path
 		LPoint3f pos;
@@ -937,6 +1067,8 @@ bool NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 		crowdAgent->setIdx(agentIdx);
 		//set the mov type of the crowd agent
 		crowdAgent->setMovType(mMovType);
+		//set the param update event of the crowd agent
+		crowdAgent->setParamUpdateEvent(mCrowdAgentRequestEvent);
 	}
 	//
 	return (agentIdx != -1);
@@ -947,17 +1079,15 @@ void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	if(not crowdAgentObject)
+	{
+		return;
+	}
 	SMARTPTR(CrowdAgent)crowdAgent =
 			DCAST(CrowdAgent, crowdAgentObject->getComponent(componentType()));
-	//check if there is a crowd tool, i.e. the
-	//recast nav mesh has been completely setup
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdTool)
+	if(not crowdAgent)
 	{
-		//set the index of the crowd agent to -1
-		crowdAgent->setIdx(-1);
-		//remove recast agent
-		crowdTool->getState()->removeAgent(crowdAgent->getIdx());
+		return;
 	}
 	//remove from update list
 	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
@@ -970,56 +1100,70 @@ void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
 		//set CrowdAgent NavMesh reference to NULL
 		crowdAgent->setNavMeshObject(NULL);
 	}
+	//check if there is a crowd tool, i.e. the
+	//recast nav mesh has been completely setup
+	//and check if crowdAgent has been already added to recast
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (crowdTool and (crowdAgent->getIdx() != -1))
+	{
+		//remove recast agent
+		crowdTool->getState()->removeAgent(crowdAgent->getIdx());
+		//set the param update event of the crowd agent to null
+		crowdAgent->setParamUpdateEvent("");
+		//set the index of the crowd agent to -1
+		crowdAgent->setIdx(-1);
+	}
 }
 
-//void NavMesh::updateParams(int agentIdx, const dtCrowdAgentParams& agentParams)
-//{
-//	//lock (guard) the mutex
-//	HOLDMUTEX(mMutex)
-//
-//	//if there is a crowd tool then update
-//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-//	if (crowdTool)
-//	{
-//		//all crowd agent have the same dimensions: those
-//		//registered into the current mNavMeshType
-//		dtCrowdAgentParams ap = agentParams;
-//		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-//		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
-//		crowdTool->getState()->getCrowd()->
-//				updateAgentParameters(agentIdx, &ap);
-//	}
-//}
-//
-//void NavMesh::updateMoveTarget(int agentIdx, const LPoint3f& pos)
-//{
-//	//lock (guard) the mutex
-//	HOLDMUTEX(mMutex)
-//
-//	//if there is a crowd tool then update
-//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-//	if (crowdTool)
-//	{
-//		float p[3];
-//		LVecBase3fToRecast(pos, p);
-//		crowdTool->getState()->setMoveTarget(agentIdx, p);
-//	}
-//}
-//
-//void NavMesh::updateMoveVelocity(int agentIdx, const LVector3f& vel)
-//{
-//	//lock (guard) the mutex
-//	HOLDMUTEX(mMutex)
-//
-//	//if there is a crowd tool then update
-//	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-//	if (crowdTool)
-//	{
-//		float v[3];
-//		LVecBase3fToRecast(vel, v);
-//		crowdTool->getState()->setMoveVelocity(agentIdx, v);
-//	}
-//}
+void NavMesh::handleCrowdAgentRequest(const Event* event)
+{
+	//lock (guard) the mutex
+	HOLDMUTEX(mMutex)
+
+	//The first parameter should be a CrowdAgent object
+	//and update only is done when there is a crowd tool
+	//and CrowdAgent has already been added to recast
+	SMARTPTR(CrowdAgent) crowdAgent = DCAST(CrowdAgent,
+			DCAST(Object, event->get_parameter(0).get_ptr())->getComponent(componentType()));
+	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+	if (crowdAgent and crowdTool and (crowdAgent->getIdx() != -1))
+	{
+		dtCrowd* crowd = crowdTool->getState()->getCrowd();
+		//second parameter should be the parameter to update
+		int param1 = event->get_parameter(1).get_int_value();
+		int agentIdx = crowdAgent->getIdx();
+		switch (param1) {
+			case UPDATE_PARAMS:
+			{
+				dtCrowdAgentParams ap = crowdAgent->getParams();
+				//all crowd agent have the same dimensions: those
+				//registered into the current mNavMeshType
+				ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+				ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+				crowd->updateAgentParameters(agentIdx, &ap);
+			}
+				break;
+			case UPDATE_TARGET:
+			{
+				LPoint3f moveTarget = crowdAgent->getMoveTarget();
+				float p[3];
+				LVecBase3fToRecast(moveTarget, p);
+				crowdTool->getState()->setMoveTarget(agentIdx, p);
+			}
+				break;
+			case UPDATE_VELOCITY:
+			{
+				LVector3f moveVelocity = crowdAgent->getMoveVelocity();
+				float v[3];
+				LVecBase3fToRecast(moveVelocity, v);
+				crowdTool->getState()->setMoveVelocity(agentIdx, v);
+			}
+				break;
+			default:
+				break;
+		}
+	}
+}
 
 void NavMesh::update(void* data)
 {
@@ -1050,31 +1194,6 @@ void NavMesh::update(void* data)
 		const float* pos = crowd->getAgent(agentIdx)->npos;
 		(*iter)->updatePosDir(dt, RecastToLVecBase3f(pos),
 				RecastToLVecBase3f(vel));
-		//check for settings updates
-		dtCrowdAgentParams ap;
-		LPoint3f moveTarget;
-		LVector3f moveVelocity;
-		if((*iter)->paramsRequestUpdate(ap))
-		{
-			//all crowd agent have the same dimensions: those
-			//registered into the current mNavMeshType
-			ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-			ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
-			crowd->updateAgentParameters(agentIdx, &ap);
-
-		}
-		if((*iter)->targetRequestUpdate(moveTarget))
-		{
-			float p[3];
-			LVecBase3fToRecast(moveTarget, p);
-			crowdTool->getState()->setMoveTarget(agentIdx, p);
-		}
-		if((*iter)->velocityRequestUpdate(moveVelocity))
-		{
-			float v[3];
-			LVecBase3fToRecast(moveVelocity, v);
-			crowdTool->getState()->setMoveVelocity(agentIdx, v);
-		}
 	}
 	//
 #ifdef ELY_DEBUG
@@ -1099,7 +1218,7 @@ void NavMesh::debug(bool enable)
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
-	if (mDebugNodePath.is_empty())
+	if (mDebugNodePath.is_empty() or mAsyncSetupExecuting)
 	{
 		return;
 	}

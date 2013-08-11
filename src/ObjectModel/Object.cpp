@@ -128,7 +128,7 @@ bool Object::removeComponent(SMARTPTR(Component) component)
 	return true;
 }
 
-void Object::sceneSetup()
+void Object::onAddToSceneSetup()
 {
 	//Called only by ObjectTemplateManager::createObject(). Thread safe.
 

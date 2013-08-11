@@ -46,9 +46,7 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl)
 	mAgentIdx = -1;
 	mNavMeshObject = NULL;
 	mMovType = RECAST;
-	mParamsNeedsUpdate = false;
-	mTargetNeedsUpdate = false;
-	mVelocityNeedsUpdate = false;
+	mParamUpdateEvent = "";
 }
 
 CrowdAgent::~CrowdAgent()
@@ -161,14 +159,12 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 	HOLDMUTEX(mMutex)
 
 	mAgentParams = agentParams;
-	mParamsNeedsUpdate = true;
-//	if(mNavMeshObject)
-//	{
-//		//get nav mesh component
-//		SMARTPTR(NavMesh) navMesh =
-//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-//		navMesh->updateParams(mAgentIdx, agentParams);
-//	}
+	//request NavMesh (if any) to update params for this CrowdAgent
+	if (mNavMeshObject)
+	{
+		throw_event(mParamUpdateEvent, EventParameter(this),
+				EventParameter(NavMesh::UPDATE_PARAMS));
+	}
 }
 
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
@@ -177,14 +173,12 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 	HOLDMUTEX(mMutex)
 
 	mMoveTarget = pos;
-	mTargetNeedsUpdate = true;
-//	if(mNavMeshObject)
-//	{
-//		//get nav mesh component
-//		SMARTPTR(NavMesh) navMesh =
-//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-//		navMesh->updateMoveTarget(mAgentIdx, pos);
-//	}
+	//request NavMesh (if any) to update move target for this CrowdAgent
+	if (mNavMeshObject)
+	{
+		throw_event(mParamUpdateEvent, EventParameter(this),
+				EventParameter(NavMesh::UPDATE_TARGET));
+	}
 }
 
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
@@ -193,14 +187,12 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	HOLDMUTEX(mMutex)
 
 	mMoveVelocity = vel;
-	mVelocityNeedsUpdate = true;
-//	if(mNavMeshObject)
-//	{
-//		//get nav mesh component
-//		SMARTPTR(NavMesh) navMesh =
-//				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-//		navMesh->updateMoveVelocity(mOwnerObject, vel);
-//	}
+	//request NavMesh (if any) to update move velocity for this CrowdAgent
+	if (mNavMeshObject)
+	{
+		throw_event(mParamUpdateEvent, EventParameter(this),
+				EventParameter(NavMesh::UPDATE_VELOCITY));
+	}
 }
 
 #ifdef WITHCHARACTER

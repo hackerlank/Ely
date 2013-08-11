@@ -255,7 +255,9 @@ void Component::unregisterEventCallbacks()
 		return;
 	}
 	//Unregister the handlers
-	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
+//	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
+//			(void*) this);
+	EventHandler::get_global_event_handler()->remove_hooks_with(
 			(void*) this);
 	//handlers unregistered
 	mCallbacksRegistered = false;

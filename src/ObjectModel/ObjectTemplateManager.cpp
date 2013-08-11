@@ -41,7 +41,7 @@ ObjectTemplateManager::~ObjectTemplateManager()
 	{
 		ObjectTable::iterator iter = mCreatedObjects.begin();
 		ObjectId objId = iter->first;
-		removeCreatedObject(objId);
+		destroyObject(objId);
 	}
 	//remove object templates
 	while (mObjectTemplates.size() > 0)
@@ -192,7 +192,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	}
 	//give a chance to object (and its components) to customize
 	//themselves when being added to scene.
-	newObj->sceneSetup();
+	newObj->onAddToSceneSetup();
 	//Now the object is completely existent so insert
 	//it in the table of created objects.
 	mCreatedObjects[newId] = newObj;
@@ -235,11 +235,6 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	return true;
 }
 
-bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId, ComponentType componentType)
-{
-
-}
-
 SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId) const
 {
 	//lock (guard) the mutex
@@ -269,7 +264,7 @@ std::list<SMARTPTR(Object)> ObjectTemplateManager::getCreatedObjects() const
 	return createdObjects;
 }
 
-bool ObjectTemplateManager::removeCreatedObject(const ObjectId& objectId)
+bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 {
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)

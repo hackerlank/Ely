@@ -113,15 +113,6 @@ public:
 			const ParameterTable& compTmplParams = ParameterTable());
 
 	/**
-	 * \brief Removes a component of the given type from an existing object with
-	 * the given object identifier.\n
-	 * @param objectId The given object identifier.
-	 * @param componentType The given component type.
-	 * @return True if successfully removed, false otherwise.
-	 */
-	bool removeComponentFromObject(ObjectId objectId, ComponentType componentType);
-
-	/**
 	 * \brief Object templates and object tables typedefs.
 	 */
 	///@{
@@ -142,10 +133,10 @@ public:
 	std::list<SMARTPTR(Object)> getCreatedObjects() const;
 
 	/**
-	 * \brief Removes a created object give its object id.
-	 * @return A pointer to the just removed object (NULL on error).
+	 * \brief Destroys a created object give its object id.
+	 * @return True if successful, false otherwise.
 	 */
-	bool removeCreatedObject(const ObjectId& objectId);
+	bool destroyObject(const ObjectId& objectId);
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.

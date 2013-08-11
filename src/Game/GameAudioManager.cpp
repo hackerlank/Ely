@@ -56,6 +56,7 @@ GameAudioManager::GameAudioManager(int sort, int priority,
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 	//Add event handler for update handling requests.
+	mAudioCallbackData.clear();
 	mAudioCallbackData =
 			new EventCallbackInterface<GameAudioManager>::EventCallbackData(this,
 					&GameAudioManager::handleUpdateRequest);
@@ -69,6 +70,11 @@ GameAudioManager::~GameAudioManager()
 	//lock (guard) the mutex
 	HOLDMUTEX(mMutex)
 
+	if (mAudioCallbackData)
+	{
+		EventHandler::get_global_event_handler()->remove_hooks_with(
+				reinterpret_cast<void*>(mAudioCallbackData.p()));
+	}
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);

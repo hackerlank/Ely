@@ -107,7 +107,7 @@ private:
 	 * i.e. before it will be publicly accessible, so no other thread can access
 	 * the object during its execution, then it doesn't need to hold the mutex.
 	 */
-	void sceneSetup();
+	void onAddToSceneSetup();
 
 public:
 	/**
