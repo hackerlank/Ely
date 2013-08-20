@@ -28,23 +28,46 @@
 namespace ely
 {
 
-Component::Component() :
-		mOwnerObject(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
+Component::Component()
+#ifdef ELY_THREAD
+	:mDestroying(false)
+#endif
 {
-	mCallbackTable.clear();
+	mTmpl.clear();
+	mComponentId = ComponentId();
+	mOwnerObject.clear();
+	mCallbackLib = NULL;
+	mCallbacksLoaded = false;
+	mCallbacksRegistered = false;
+	cleanupEventTables();
 }
 
 Component::~Component()
 {
-	//unregister callbacks if any
-	unregisterEventCallbacks();
-	//unload event callbacks
-	unloadEventCallbacks();
 }
 
-void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
+void Component::addToObjectSetup()
 {
-	mOwnerObject = ownerObject;
+	//call onAddToObjectSetup
+	onAddToObjectSetup();
+	//setup event tables (if any)
+	setupEventTables();
+	//load event callbacks (if any)
+	loadEventCallbacks();
+	//register event callbacks (if any)
+	registerEventCallbacks();
+}
+
+void Component::removeFromObjectCleanup()
+{
+	//unregister event callbacks (if any)
+	unregisterEventCallbacks();
+	//unload event callbacks (if any)
+	unloadEventCallbacks();
+	//cleanup event tables (if any)
+	cleanupEventTables();
+	//call onRemoveFromObjectCleanup
+	onRemoveFromObjectCleanup();
 }
 
 SMARTPTR(Object)Component::getOwnerObject() const
@@ -52,8 +75,9 @@ SMARTPTR(Object)Component::getOwnerObject() const
 	return mOwnerObject;
 }
 
-void Component::update(void* data)
+void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
 {
+	mOwnerObject = ownerObject;
 }
 
 AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
@@ -61,112 +85,8 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-void Component::loadEventCallbacks()
+void Component::setupEventTables()
 {
-	//if callbacks loaded do nothing
-	if (mCallbacksLoaded)
-	{
-		return;
-	}
-	mCallbackLib = NULL;
-	// reset errors
-	lt_dlerror();
-	//load the event callbacks library
-	mCallbackLib = lt_dlopen(CALLBACKS_LA);
-	if (mCallbackLib == NULL)
-	{
-		std::cerr << "Error loading library: " << CALLBACKS_LA << ": "
-				<< lt_dlerror() << std::endl;
-		return;
-	}
-	// reset errors
-	lt_dlerror();
-	//check the default callback
-	PCALLBACK pDefaultCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
-			DEFAULT_CALLBACK_NAME);
-	const char* dlsymError = lt_dlerror();
-	if (dlsymError)
-	{
-		std::cerr << "Cannot find default callback " << DEFAULT_CALLBACK_NAME
-				<< dlsymError << std::endl;
-		//Close the event callbacks library
-		if (lt_dlclose(mCallbackLib) != 0)
-		{
-			std::cerr << "Error closing library: " << CALLBACKS_LA << std::endl;
-		}
-		return;
-	}
-	//load every callback
-	std::map<std::string, PCALLBACK>::iterator iter;
-	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
-	{
-		//reset errors
-		lt_dlerror();
-		//load the variable whose value is the name
-		//of the callback: <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>
-		std::string variableTmp = (iter->first) + "_"
-				+ std::string(componentType()) + "_"
-				+ std::string(mOwnerObject->objectTmpl()->objectType());
-		//replace hyphens
-		std::string variableName = replaceCharacter(variableTmp, '-', '_');
-		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) lt_dlsym(mCallbackLib,
-				variableName.c_str());
-		dlsymError = lt_dlerror();
-		if (dlsymError)
-		{
-			PRINTERR(
-					"Cannot load variable " << variableName << ": " << dlsymError);
-			//set default callback for this event
-			mCallbackTable[iter->first] = pDefaultCallback;
-			//continue with the next event
-			continue;
-		}
-		//reset errors
-		lt_dlerror();
-		//load the callback
-		PCALLBACK pCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
-				pCallbackName->c_str());
-		dlsymError = lt_dlerror();
-		if (dlsymError)
-		{
-			PRINTERR(
-					"Cannot load callback " << pCallbackName << ": " << dlsymError);
-			//set default callback for this event
-			mCallbackTable[iter->first] = pDefaultCallback;
-			//continue with the next event
-			continue;
-		}
-		//set callback for this event
-		mCallbackTable[iter->first] = pCallback;
-	}
-	//callbacks loaded
-	mCallbacksLoaded = true;
-}
-
-void Component::unloadEventCallbacks()
-{
-	//if callbacks not loaded do nothing
-	if (not mCallbacksLoaded)
-	{
-		return;
-	}
-	mCallbackTable.clear();
-	//Close the event callbacks library
-	// reset errors
-	lt_dlerror();
-	if (lt_dlclose(mCallbackLib) != 0)
-	{
-		std::cerr << "Error closing library: " << CALLBACKS_LA << ": "
-				<< lt_dlerror() << std::endl;
-	}
-	//callbacks unloaded
-	mCallbacksLoaded = false;
-}
-
-void Component::setupEvents()
-{
-	mEventTable.clear();
-	mCallbackTable.clear();
 	//setup events (if any)
 	std::list<std::string>::iterator iter;
 	std::list<std::string> eventList = mTmpl->parameterList(
@@ -213,20 +133,118 @@ void Component::setupEvents()
 	}
 }
 
+void Component::cleanupEventTables()
+{
+	mEventTable.clear();
+	mEventTypeTable.clear();
+	mCallbackTable.clear();
+}
+
+void Component::loadEventCallbacks()
+{
+	//if callbacks already loaded do nothing
+	RETURN_ON_COND(mCallbacksLoaded,)
+
+	// reset errors
+	lt_dlerror();
+	//load the event callbacks library
+	mCallbackLib = lt_dlopen(CALLBACKS_LA);
+	if (mCallbackLib == NULL)
+	{
+		std::cerr << "Error loading library: " << CALLBACKS_LA << ": "
+				<< lt_dlerror() << std::endl;
+		return;
+	}
+	// reset errors
+	lt_dlerror();
+	//check the default callback
+	PCALLBACK pDefaultCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
+			DEFAULT_CALLBACK_NAME);
+	const char* dlsymError = lt_dlerror();
+	if (dlsymError)
+	{
+		std::cerr << "Cannot find default callback " << DEFAULT_CALLBACK_NAME
+				<< dlsymError << std::endl;
+		//Close the event callbacks library
+		if (lt_dlclose(mCallbackLib) != 0)
+		{
+			std::cerr << "Error closing library: " << CALLBACKS_LA << std::endl;
+		}
+		return;
+	}
+	//load every callback
+	std::map<std::string, PCALLBACK>::iterator iter;
+	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
+	{
+		//reset errors
+		lt_dlerror();
+		//load the variable whose value is the name
+		//of the callback: <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>
+		std::string variableTmp = (iter->first) + "_"
+				+ std::string(componentType()) + "_"
+				+ std::string(mOwnerObject->objectTmpl()->objectType());
+		//replace hyphens
+		std::string variableName = replaceCharacter(variableTmp, '-', '_');
+		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) lt_dlsym(mCallbackLib,
+				variableName.c_str());
+		dlsymError = lt_dlerror();
+		if (dlsymError)
+		{
+			PRINT_ERR(
+					"Cannot load variable " << variableName << ": " << dlsymError);
+			//set default callback for this event
+			mCallbackTable[iter->first] = pDefaultCallback;
+			//continue with the next event
+			continue;
+		}
+		//reset errors
+		lt_dlerror();
+		//load the callback
+		PCALLBACK pCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
+				pCallbackName->c_str());
+		dlsymError = lt_dlerror();
+		if (dlsymError)
+		{
+			PRINT_ERR(
+					"Cannot load callback " << pCallbackName << ": " << dlsymError);
+			//set default callback for this event
+			mCallbackTable[iter->first] = pDefaultCallback;
+			//continue with the next event
+			continue;
+		}
+		//set callback for this event
+		mCallbackTable[iter->first] = pCallback;
+	}
+
+	//callbacks loaded
+	mCallbacksLoaded = true;
+}
+
+void Component::unloadEventCallbacks()
+{
+	//if callbacks not loaded do nothing
+	RETURN_ON_COND(not mCallbacksLoaded,)
+
+	//clear callback table
+	mCallbackTable.clear();
+	//Close the event callbacks library
+	// reset errors
+	lt_dlerror();
+	if (lt_dlclose(mCallbackLib) != 0)
+	{
+		std::cerr << "Error closing library: " << CALLBACKS_LA << ": "
+				<< lt_dlerror() << std::endl;
+	}
+
+	//callbacks unloaded
+	mCallbacksLoaded = false;
+}
+
 void Component::registerEventCallbacks()
 {
-	if (mCallbackTable.empty() or (not mOwnerObject) or mCallbacksRegistered)
-	{
-		return;
-	}
-	//try to load event callbacks if any
-	loadEventCallbacks();
-	//if callbacks not loaded or owner object not defined or
-	//callbacks already registered do nothing
-	if (not mCallbacksLoaded)
-	{
-		return;
-	}
+	//if callbacks already registered do nothing
+	RETURN_ON_COND(mCallbacksRegistered,)
+
 	//register every handler
 	std::map<std::string, PCALLBACK>::iterator iter;
 	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
@@ -241,24 +259,22 @@ void Component::registerEventCallbacks()
 				mEventTable[iter->first], iter->second,
 				static_cast<void*>(this));
 	}
+
 	//handlers registered
 	mCallbacksRegistered = true;
 }
 
 void Component::unregisterEventCallbacks()
 {
-	//if callbacks not loaded or owner object not defined or
-	//callbacks not registered do nothing
-	if (mCallbackTable.empty() or (not mCallbacksLoaded) or (not mOwnerObject)
-			or (not mCallbacksRegistered))
-	{
-		return;
-	}
+	//if callbacks not already registered do nothing
+	RETURN_ON_COND(not mCallbacksRegistered,)
+
 	//Unregister the handlers
 //	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 //			(void*) this);
 	EventHandler::get_global_event_handler()->remove_hooks_with(
 			(void*) this);
+
 	//handlers unregistered
 	mCallbacksRegistered = false;
 }
@@ -266,7 +282,7 @@ void Component::unregisterEventCallbacks()
 std::string Component::getEventType(const std::string& event)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	std::string result("");
 	if (mEventTypeTable.find(event) != mEventTypeTable.end())

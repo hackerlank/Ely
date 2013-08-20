@@ -52,6 +52,17 @@ public:
 	virtual ~GamePhysicsManager();
 
 	/**
+	 * \brief Adds (if not present) a physics component to updating.
+	 * @param physicsComp The physics component.
+	 */
+	void addToPhysicsUpdate(SMARTPTR(Component)physicsComp);
+	/**
+	 * \brief Removes (if present) a physics component from updating.
+	 * @param physicsComp The physics component.
+	 */
+	void removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp);
+
+	/**
 	 * \brief Gets a reference to the Bullet world.
 	 * @return The Bullet world.
 	 */
@@ -65,13 +76,6 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
-
-	///Helper enum.
-	enum
-	{
-		ADDTOUPDATE,
-		REMOVEFROMUPDATE
-	};
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -208,25 +212,6 @@ private:
 	SMARTPTR(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
-
-	///@{
-	///Callbacks for components update adding/removing requests.
-	SMARTPTR(EventCallbackInterface<GamePhysicsManager>::EventCallbackData) mPhysicsCallbackData;
-public:
-	void handleUpdateRequest(const Event* event);
-	///@}
-
-private:
-	/**
-	 * \brief Adds (if not present) a physics component to updating.
-	 * @param physicsComp The physics component.
-	 */
-	void addToPhysicsUpdate(SMARTPTR(Component)physicsComp);
-	/**
-	 * \brief Removes (if present) a physics component from updating.
-	 * @param physicsComp The physics component.
-	 */
-	void removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp);
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

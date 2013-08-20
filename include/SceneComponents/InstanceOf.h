@@ -42,11 +42,14 @@ class InstanceOfTemplate;
 class InstanceOf: public Component
 {
 protected:
-	friend class Object;
 	friend class InstanceOfTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
+	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	InstanceOf();
@@ -76,14 +79,17 @@ public:
 private:
 	///The NodePath associated to this instance of.
 	NodePath mNodePath;
-	///The instanced object.
-	SMARTPTR(Object) mInstancedObject;
+
 	/**
 	 * \name Main parameters.
 	 */
 	///@{
 	///Instance of object id.
 	ObjectId mInstanceOfId;
+	///The instanced object.
+	SMARTPTR(Object) mInstancedObject;
+	///Old owner object node path.
+	NodePath mOldObjectNodePath;
 	///@}
 
 	///Scaling  (default: (1.0,1.0,1.0)).
@@ -120,9 +126,43 @@ private:
 inline SMARTPTR(Object)InstanceOf::getInstancedObject() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mInstancedObject;
+}
+
+inline void InstanceOf::reset()
+{
+	//
+	mNodePath = NodePath();
+	mInstanceOfId = ObjectId();
+	mInstancedObject.clear();
+	mOldObjectNodePath = NodePath();
+	mScale[0] = mScale[1] = mScale[2] = 1.0;
+}
+
+inline void InstanceOf::onAddToSceneSetup()
+{
+}
+
+inline void InstanceOf::onRemoveFromSceneCleanup()
+{
+}
+
+inline NodePath InstanceOf::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void InstanceOf::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 }  // namespace ely

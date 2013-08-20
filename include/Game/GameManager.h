@@ -54,9 +54,14 @@ public:
 	virtual ~GameManager();
 
 	/**
-	 * \brief Put here game initialization code.
+	 * \brief Put here game setup code.
 	 */
-	virtual void initialize();
+	virtual void gameSetup();
+
+	/**
+	 * \brief Put here game cleanup code.
+	 */
+	virtual void gameCleanup();
 
 	/**
 	 * \brief Set the Component template manager up.

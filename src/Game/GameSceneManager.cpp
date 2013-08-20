@@ -30,7 +30,7 @@ namespace ely
 GameSceneManager::GameSceneManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
 			"GameSceneManager::GameSceneManager: invalid GameManager")
 	mSceneComponents.clear();
 	mUpdateData.clear();
@@ -54,26 +54,13 @@ GameSceneManager::GameSceneManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	//Add event handler for update handling requests.
-	mSceneCallbackData.clear();
-	mSceneCallbackData =
-			new EventCallbackInterface<GameSceneManager>::EventCallbackData(this,
-					&GameSceneManager::handleUpdateRequest);
-	EventHandler::get_global_event_handler()->add_hook("GameSceneManager::handleUpdateRequest",
-			&EventCallbackInterface<GameSceneManager>::eventCallbackFunction,
-			reinterpret_cast<void*>(mSceneCallbackData.p()));
 }
 
 GameSceneManager::~GameSceneManager()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mSceneCallbackData)
-	{
-		EventHandler::get_global_event_handler()->remove_hooks_with(
-				reinterpret_cast<void*>(mSceneCallbackData.p()));
-	}
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
@@ -81,32 +68,11 @@ GameSceneManager::~GameSceneManager()
 	mSceneComponents.clear();
 }
 
-void GameSceneManager::handleUpdateRequest(const Event* event)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//First parameter should be an Scene Component
-	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
-	if (param0->is_of_type(Component::get_class_type()))
-	{
-		SMARTPTR(Component) sceneComp = DCAST(Component, param0);
-		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
-		int param1 = event->get_parameter(1).get_int_value();
-		switch (param1) {
-			case ADDTOUPDATE:
-				addToSceneUpdate(sceneComp);
-				break;
-			case REMOVEFROMUPDATE:
-				removeFromSceneUpdate(sceneComp);
-				break;
-			default:
-				break;
-		}
-	}
-}
 void GameSceneManager::addToSceneUpdate(SMARTPTR(Component)sceneComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	SceneComponentList::iterator iter = find(mSceneComponents.begin(),
 			mSceneComponents.end(), sceneComp);
 	if (iter == mSceneComponents.end())
@@ -117,6 +83,9 @@ void GameSceneManager::addToSceneUpdate(SMARTPTR(Component)sceneComp)
 
 void GameSceneManager::removeFromSceneUpdate(SMARTPTR(Component)sceneComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	SceneComponentList::iterator iter = find(mSceneComponents.begin(),
 			mSceneComponents.end(), sceneComp);
 	if (iter != mSceneComponents.end())
@@ -128,7 +97,7 @@ void GameSceneManager::removeFromSceneUpdate(SMARTPTR(Component)sceneComp)
 AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 

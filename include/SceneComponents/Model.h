@@ -26,6 +26,7 @@
 
 #include <list>
 #include <nodePath.h>
+#include <partBundle.h>
 #include <animControlCollection.h>
 #include "ObjectModel/Component.h"
 
@@ -60,11 +61,14 @@ class ModelTemplate;
 class Model: public Component
 {
 protected:
-	friend class Object;
 	friend class ModelTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
+	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Model();
@@ -109,13 +113,15 @@ private:
 	 */
 	///@{
 	///Model.
-	std::string mModelName;
+	std::string mModelNameParam;
+	///Old owner object node path.
+	NodePath mOldObjectNodePath;
 	///Animations.
-	std::list<std::string> mAnimFileList;
+	std::list<std::string> mAnimFileListParam;
 	///Scaling  (default: (1.0,1.0,1.0)).
 	float mScale[3];
 	///Type of model procedurally generated.
-	std::string mModelType;
+	std::string mModelTypeParam;
 	///Card parameters.
 	float mCardLeft, mCardRight, mCardBottom, mCardTop;
 	///@}
@@ -172,12 +178,51 @@ private:
 
 ///inline definitions
 
+inline void Model::reset()
+{
+	//
+	mNodePath = NodePath();
+	mFromFile = false;
+	mModelNameParam = std::string("");
+	mOldObjectNodePath = NodePath();
+	mAnimFileListParam.clear();
+	mScale[0] = mScale[1] = mScale[2] = 1.0;
+	mModelTypeParam = std::string("");
+	mCardLeft = mCardRight = mCardBottom = mCardTop = 0.0;
+	mAnimations.clear_anims();
+	mFirstPartBundle.clear();
+}
+
 inline AnimControlCollection Model::animations() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAnimations;
+}
+
+inline void Model::onAddToSceneSetup()
+{
+}
+
+inline void Model::onRemoveFromSceneCleanup()
+{
+}
+
+inline NodePath Model::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void Model::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 }  // namespace ely

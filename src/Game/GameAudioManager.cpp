@@ -30,7 +30,7 @@ namespace ely
 GameAudioManager::GameAudioManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
 			"GameAudioManager::GameAudioManager: invalid GameManager")
 	mAudioComponents.clear();
 	mUpdateData.clear();
@@ -55,26 +55,13 @@ GameAudioManager::GameAudioManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	//Add event handler for update handling requests.
-	mAudioCallbackData.clear();
-	mAudioCallbackData =
-			new EventCallbackInterface<GameAudioManager>::EventCallbackData(this,
-					&GameAudioManager::handleUpdateRequest);
-	EventHandler::get_global_event_handler()->add_hook("GameAudioManager::handleUpdateRequest",
-			&EventCallbackInterface<GameAudioManager>::eventCallbackFunction,
-			reinterpret_cast<void*>(mAudioCallbackData.p()));
 }
 
 GameAudioManager::~GameAudioManager()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mAudioCallbackData)
-	{
-		EventHandler::get_global_event_handler()->remove_hooks_with(
-				reinterpret_cast<void*>(mAudioCallbackData.p()));
-	}
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
@@ -82,38 +69,11 @@ GameAudioManager::~GameAudioManager()
 	mAudioComponents.clear();
 }
 
-SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
-{
-	return mAudioMgr;
-}
-
-void GameAudioManager::handleUpdateRequest(const Event* event)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//First parameter should be an Audio Component
-	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
-	if (param0->is_of_type(Component::get_class_type()))
-	{
-		SMARTPTR(Component) audioComp = DCAST(Component, param0);
-		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
-		int param1 = event->get_parameter(1).get_int_value();
-		switch (param1) {
-			case ADDTOUPDATE:
-				addToAudioUpdate(audioComp);
-				break;
-			case REMOVEFROMUPDATE:
-				removeFromAudioUpdate(audioComp);
-				break;
-			default:
-				break;
-		}
-	}
-}
-
 void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
 	if (iter == mAudioComponents.end())
@@ -124,6 +84,9 @@ void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
 
 void GameAudioManager::removeFromAudioUpdate(SMARTPTR(Component) audioComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
 	if (iter != mAudioComponents.end())
@@ -132,10 +95,15 @@ void GameAudioManager::removeFromAudioUpdate(SMARTPTR(Component) audioComp)
 	}
 }
 
+SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
+{
+	return mAudioMgr;
+}
+
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 

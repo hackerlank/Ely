@@ -28,6 +28,7 @@
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
 #include <reMutex.h>
+#include <conditionVar.h>
 
 namespace ely
 {
@@ -86,8 +87,18 @@ class ComponentTemplate;
 class Component: public TypedWritableReferenceCount
 {
 protected:
-	friend class Object;
 	friend class ComponentTemplate;
+	friend class ObjectTemplateManager;
+
+	/**
+	 * \brief Constructor.
+	 */
+	Component();
+
+	/**
+	 * \brief Resets all component data members.
+	 */
+	virtual void reset() = 0;
 
 	/**
 	 * \brief Allows a component to be initialized.
@@ -95,26 +106,21 @@ protected:
 	 * This can be done after creation but "before" insertion into an object.\n
 	 * This method for all derived classes are called only by methods of the
 	 * respective ComponentTemplate derived class.\n
-	 * \note this method is called only by:
-	 * - a thread that creates an new object, creates the component and adds
-	 * it to the object
-	 * - a thread that creates the component and adds it to an existing object
-	 * in any case this method is executed before the component could be publicly
-	 * accessible to other threads, so other thread cannot access the component
-	 * during its execution, then it doesn't need to hold the mutex.
+	 * This method for all derived classes are called (indirectly) only
+	 * by ObjectTemplateManager methods during its creation and before
+	 * it is publicly available to other threads.\n
 	 */
 	virtual bool initialize() = 0;
 
 	/**
 	 * \brief Sets the component unique identifier.
+	 *
+	 * This method for all derived classes are called only by methods of the
+	 * respective ComponentTemplate derived class.\n
+	 * This method for all derived classes are called (indirectly) only
+	 * by ObjectTemplateManager methods during its creation and before
+	 * it is publicly available to other threads.\n
 	 * \param componentId The component unique identifier.
-	 * \note this method is called only by:
-	 * - a thread that creates an new object, creates the component and adds
-	 * it to the object
-	 * - a thread that creates the component and adds it to an existing object
-	 * in any case this method is executed before the component could be publicly
-	 * accessible to other threads, so other thread cannot access the component
-	 * during its execution, then it doesn't need to hold the mutex.
 	 */
 	void setComponentId(const ComponentId& componentId);
 
@@ -123,16 +129,25 @@ protected:
 	 *
 	 * Gives a component the ability to do some setup just "after" this
 	 * component has been added to an object. Optional.\n
-	 * This method for all derived classes are called only by object methods.\n
-	 * \note this method is called only by:
-	 * - a thread that creates an new object, creates the component and adds
-	 * it to the object
-	 * - a thread that creates the component and adds it to an existing object
-	 * in any case this method is executed before the component could be publicly
-	 * accessible to other threads, so other thread cannot access the component
-	 * during its execution, then it doesn't need to hold the mutex.
+	 * This method for all derived classes are called only by ObjectTemplateManager
+	 * methods during its creation and before it is publicly available to
+	 * other threads.\n
 	 */
-	virtual void onAddToObjectSetup();
+	///@{
+	void addToObjectSetup();
+	virtual void onAddToObjectSetup() = 0;
+	///@}
+
+	/**
+	 * \brief On remove from object cleanup.
+	 *
+	 * Gives a component the ability to do some cleanup just "before" this
+	 * component will be removed from an object. Optional.\n
+	 */
+	///@{
+	void removeFromObjectCleanup();
+	virtual void onRemoveFromObjectCleanup() = 0;
+	///@}
 
 	/**
 	 * \brief On object addition to scene setup.
@@ -140,16 +155,29 @@ protected:
 	 * Gives a component the ability to do some setup just "after" the
 	 * object, this component belongs to, has been added to the scene
 	 * and set up. Optional.\n
-	 * This method for all derived classes are called only by object methods.\n
-	 * \note this method is called only by:
-	 * - a thread that creates an new object, creates the component and adds
-	 * it to the object
-	 * - a thread that creates the component and adds it to an existing object
-	 * in any case this method is executed before the component could be publicly
-	 * accessible to other threads, so other thread cannot access the component
-	 * during its execution, then it doesn't need to hold the mutex.
+	 * This method for all derived classes are called only by ObjectTemplateManager
+	 * methods during its creation and before it is publicly available to
+	 * other threads.\n
+	 * A possible request registration to any "Game*Manager" for updating
+	 * "must" be done in this method as the last thing.\n
 	 */
-	virtual void onAddToSceneSetup();
+	///@{
+	void addToSceneSetup();
+	virtual void onAddToSceneSetup() = 0;
+	///@}
+
+	/**
+	 * \brief On object removal from scene cleanup.
+	 *
+	 * Gives a component the ability to do some cleanup just "before" this
+	 * component will be removed from the scene. Optional.\n
+	 * A possible request for cancellation from any "Game*Manager" for updating
+	 * "must" be done in this method as the first thing (before locking the mutex).\n
+	 */
+	///@{
+	void removeFromSceneCleanup();
+	virtual void onRemoveFromSceneCleanup() = 0;
+	///@}
 
 	/**
 	 * \brief Sets the owner object.
@@ -160,11 +188,6 @@ protected:
 	void setOwnerObject(SMARTPTR(Object)ownerObject);
 
 public:
-
-	/**
-	 * \brief Constructor.
-	 */
-	Component();
 
 	/**
 	 * \brief Destructor.
@@ -232,18 +255,20 @@ protected:
 	ComponentId mComponentId;
 	///The object this component is a member of (read only after component creation).
 	SMARTPTR(Object) mOwnerObject;
+#ifdef ELY_THREAD
+	///Signals this component is going to be destroyed.
+	bool mDestroying;
+#endif
 
 	///The (reentrant) mutex associated with this component.
 	ReMutex mMutex;
 
 	/**
-	 * \name Helper interface for event management.
+	 * \name Helper functions to register/unregister events' callbacks.
 	 *
 	 * This interface can be called by the derived components to setup
 	 * and register/unregister callbacks for events this component
 	 * should respond to.\n
-	 * Function setupEvents can be called to initialize the
-	 * set of events if any.\n
 	 * Functions registerEventCallbacks/unregisterEventCallbacks can
 	 * be used, after the component has been added to object, to
 	 * add/remove callbacks to/from the global EventHandler.\n
@@ -251,17 +276,15 @@ protected:
 	 * \note Because component's events are shared by all object of the same type,
 	 * and because their types are stored into the object template, these
 	 * functions should be called only after the component's owner object
-	 * has been set, for example into onAddToObjectSetup component method.
+	 * has been set, for example into addToObjectSetup component method.
 	 */
 	///@{
-	void setupEvents();
 	void registerEventCallbacks();
 	void unregisterEventCallbacks();
 	///@}
 
 private:
 	//Event management data types and variables.
-
 	/**
 	 * \name Handles, typedefs, for managing library of event callbacks.
 	 */
@@ -282,9 +305,12 @@ private:
 	bool mCallbacksLoaded, mCallbacksRegistered;
 
 	/**
-	 * \name Helper functions to load/unload event callbacks.
+	 * \name Helper functions to setup/cleanup events' tables and
+	 * to load/unload events' callbacks.
 	 */
 	///@{
+	void setupEventTables();
+	void cleanupEventTables();
 	void loadEventCallbacks();
 	void unloadEventCallbacks();
 	///@}
@@ -326,11 +352,26 @@ inline ComponentId Component::getComponentId() const
 	return mComponentId;
 }
 
-inline void Component::onAddToObjectSetup()
+inline void Component::addToSceneSetup()
 {
+	onAddToSceneSetup();
 }
 
-inline void Component::onAddToSceneSetup()
+inline void Component::removeFromSceneCleanup()
+{
+#ifdef ELY_THREAD
+	{
+		//lock (guard) the mutex
+		HOLD_MUTEX(mMutex)
+
+		mDestroying = true;
+	}
+#endif
+
+	onRemoveFromSceneCleanup();
+}
+
+inline void Component::update(void* data)
 {
 }
 

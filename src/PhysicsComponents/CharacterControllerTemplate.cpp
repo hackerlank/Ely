@@ -31,11 +31,11 @@ CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFr
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"CharacterTemplate::CharacterTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"CharacterTemplate::CharacterTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 			"CharacterTemplate::CharacterTemplate: invalid GamePhysicsManager")
 	//
 	setParametersDefaults();
@@ -70,7 +70,7 @@ SMARTPTR(Component)CharacterControllerTemplate::makeComponent(const ComponentId&
 void CharacterControllerTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

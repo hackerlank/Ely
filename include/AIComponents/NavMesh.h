@@ -32,6 +32,7 @@
 #include <DetourCrowd.h>
 #include <DetourTileCache.h>
 #include <nodePath.h>
+#include <conditionVar.h>
 
 namespace ely
 {
@@ -84,12 +85,14 @@ class NavMeshTemplate;
 class NavMesh: public Component
 {
 protected:
-	friend class Object;
 	friend class NavMeshTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	NavMesh();
@@ -159,19 +162,34 @@ public:
 	///@}
 
 	/**
-	 * \brief Adds an object owning a CrowdAgent component to the dtCrowd handling
+	 * \brief Adds a CrowdAgent component to the dtCrowd handling
 	 * mechanism.
+	 *
+	 * If CrowdAgent belongs to any NavMesh it is not added.\n
 	 * @param crowdAgentObject The CrowdAgent object to add.
 	 * @return True if CrowdAgent was added to recast update, false otherwise.
 	 */
-	bool addCrowdAgent(SMARTPTR(Object)crowdAgentObject);
+	bool addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent);
 
 	/**
-	 * \brief Removes an object owning a CrowdAgent component from the dtCrowd handling
+	 * \brief Removes a CrowdAgent component from the dtCrowd handling
 	 * mechanism.
+	 *
+	 * If CrowdAgent doesn't belong to any NavMesh it is not removed.\n
 	 * @param crowdAgentObject The CrowdAgent object to add.
+	 * @return True if CrowdAgent was added to recast update, false otherwise.
 	 */
-	void removeCrowdAgent(SMARTPTR(Object)crowdAgentObject);
+	bool removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent);
+
+	///@{
+	///CrowdAgents' requests handling.
+	void setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
+			const dtCrowdAgentParams& params);
+	void setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
+			const LPoint3f& moveTarget);
+	void setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
+			const LVector3f& moveVelocity);
+	///@}
 
 	/**
 	 * \brief Sets up NavMesh to be ready for CrowdAgents handling.
@@ -186,6 +204,11 @@ public:
 	 */
 	void navMeshSetup();
 
+	/**
+	 * \brief Clean up NavMesh.
+	 */
+	void navMeshCleanup();
+
 #ifdef ELY_DEBUG
 	/**
 	 * \brief Gets a reference to the Recast Debug node.
@@ -198,6 +221,12 @@ public:
 	 */
 	void debug(bool enable);
 #endif
+
+	/**
+	 * \brief Get the static mutex associated with all NavMesh components.
+	 * @return The static mutex.
+	 */
+	static ReMutex& getStaticMutex();
 
 private:
 	///Input geometry.
@@ -226,13 +255,13 @@ private:
 	///Area types with cost settings.
 	NavMeshPolyAreaCost mPolyAreaCost;
 	///Crowd include & exclude flags settings.
-	std::string mCrowdIncludeFlagsXmlParam, mCrowdExcludeFlagsXmlParam;
+	std::string mCrowdIncludeFlagsParam, mCrowdExcludeFlagsParam;
 	int mCrowdIncludeFlags, mCrowdExcludeFlags;
 	///Convex volumes.
-	std::list<std::string> mConvexVolumeXmlParam;
+	std::list<std::string> mConvexVolumesParam;
 	std::list<PointListArea> mConvexVolumes;
 	///Off mesh connections.
-	std::list<std::string> mOffMeshConnectionXmlParam;
+	std::list<std::string> mOffMeshConnectionsParam;
 	std::list<PointPairBidir> mOffMeshConnections;
 	///Auto setup: true (default) if navigation mesh
 	///is to be setup during component creation (specifically
@@ -272,31 +301,24 @@ private:
 	 */
 	bool buildNavMesh();
 
+	/**
+	 * \brief Clean up NavMesh.
+	 */
+	void navMeshReset();
+
 	///@{
 	///A task data to do asynchronous NavMesh setup.
 	SMARTPTR(TaskInterface<NavMesh>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	AsyncTask::DoneStatus navMeshAsyncSetup(GenericAsyncTask* task);
-	bool mAsyncSetupExecuting;
 #ifdef ELY_THREAD
 	std::string mTaskChainName;
+	bool mAsyncSetupExecuting;
 #endif
 	///@}
 
-	///@{
-	///Callbacks for CrowdAgent requests.
-	SMARTPTR(EventCallbackInterface<NavMesh>::EventCallbackData) mCrowdAgentRequestData;
-	void handleCrowdAgentRequest(const Event* event);
-	std::string mCrowdAgentRequestEvent;
-	///@}
-public:
-	enum
-	{
-		UPDATE_PARAMS,
-		UPDATE_TARGET,
-		UPDATE_VELOCITY
-	};
-private:
+	///The (reentrant) mutex associated with all NavMesh components.
+	static ReMutex mStaticMutex;
 
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
@@ -306,11 +328,13 @@ private:
 	/// DebugDrawers.
 	DebugDrawPanda3d* mDD;
 	DebugDrawMeshDrawer* mDDM;
+	/// Debug render with DebugDrawPanda3d.
+	void debugStaticRender();
 	///@{
 	///A task data to do asynchronous debug render.
 	SMARTPTR(TaskInterface<NavMesh>::TaskData) mDebugRenderData;
 	SMARTPTR(AsyncTask) mDebugRenderTask;
-	AsyncTask::DoneStatus debugRender(GenericAsyncTask* task);
+	AsyncTask::DoneStatus debugStaticRenderTask(GenericAsyncTask* task);
 	///@}
 #endif
 
@@ -340,13 +364,54 @@ private:
 
 };
 
-
 ///inline definitions
+
+inline void NavMesh::reset()
+{
+	//
+	mGeom = NULL;
+	mCtx = NULL;
+	mMeshName = std::string("");
+	mReferenceNP = NodePath();
+	mNavMeshTypeEnum = SOLO;
+	mNavMeshType = NULL;
+	mMovType = RECAST;
+	mNavMeshSettings = NavMeshSettings();
+	mNavMeshTileSettings = NavMeshTileSettings();
+	mAreaFlagsCostXmlParam.clear();
+	mPolyAreaFlags.clear();
+	mPolyAreaCost.clear();
+	mCrowdIncludeFlagsParam = std::string("");
+	mCrowdExcludeFlagsParam = std::string("");
+	mCrowdIncludeFlags = mCrowdExcludeFlags = 0;
+	mConvexVolumesParam.clear();
+	mConvexVolumes.clear();
+	mOffMeshConnectionsParam.clear();
+	mOffMeshConnections.clear();
+	mAutoSetup = true;
+	mObstacles.clear();
+	mCrowdAgents.clear();
+	mUpdateData.clear();
+	mUpdateTask.clear();
+#ifdef ELY_THREAD
+	mAsyncSetupExecuting = false;
+	mTaskChainName = std::string("");
+#endif
+
+#ifdef ELY_DEBUG
+	mDebugNodePath = NodePath();
+	mDebugCamera = NodePath();
+	mDD = NULL;
+	mDDM = NULL;
+	mDebugRenderData.clear();
+	mDebugRenderTask.clear();
+#endif
+}
 
 inline void NavMesh::setNavMeshType(NavMeshTypeEnum typeEnum)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mNavMeshTypeEnum = typeEnum;
 }
@@ -354,7 +419,7 @@ inline void NavMesh::setNavMeshType(NavMeshTypeEnum typeEnum)
 inline NavMeshTypeEnum NavMesh::getNavMeshType() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mNavMeshTypeEnum;
 }
@@ -362,7 +427,7 @@ inline NavMeshTypeEnum NavMesh::getNavMeshType() const
 inline void NavMesh::setMovType(AgentMovType movType)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mMovType = movType;
 }
@@ -370,7 +435,7 @@ inline void NavMesh::setMovType(AgentMovType movType)
 inline AgentMovType NavMesh::getMovType() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mMovType;
 }
@@ -378,7 +443,7 @@ inline AgentMovType NavMesh::getMovType() const
 inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mNavMeshSettings = settings;
 }
@@ -386,7 +451,7 @@ inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 inline NavMeshSettings NavMesh::getNavMeshSettings() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mNavMeshSettings;
 }
@@ -394,7 +459,7 @@ inline NavMeshSettings NavMesh::getNavMeshSettings() const
 inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mNavMeshTileSettings = settings;
 }
@@ -402,7 +467,7 @@ inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
 inline NavMeshTileSettings NavMesh::getNavMeshTileSettings() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mNavMeshTileSettings;
 }
@@ -410,7 +475,7 @@ inline NavMeshTileSettings NavMesh::getNavMeshTileSettings() const
 inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mCrowdAgents;
 }
@@ -418,7 +483,7 @@ inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
 inline InputGeom* NavMesh::getRecastInputGeom() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mGeom;
 }
@@ -426,69 +491,72 @@ inline InputGeom* NavMesh::getRecastInputGeom() const
 inline dtNavMesh* NavMesh::getRecastNavMesh() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mNavMeshType->getNavMesh();
+	return (mNavMeshType ? mNavMeshType->getNavMesh() : NULL);
 }
 
 inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mNavMeshType->getNavMeshQuery();
+	return (mNavMeshType ? mNavMeshType->getNavMeshQuery() : NULL);
 }
 
 inline dtCrowd* NavMesh::getRecastCrowd() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mNavMeshType->getCrowd();
+	return (mNavMeshType ? mNavMeshType->getCrowd() : NULL);
 }
 
 inline float NavMesh::getRecastAgentRadius() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mNavMeshType->getAgentRadius();
+	return (mNavMeshType ? mNavMeshType->getAgentRadius() : 0.0);
 }
 
 inline float NavMesh::getRecastAgentHeight() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mNavMeshType->getAgentHeight();
+	return (mNavMeshType ? mNavMeshType->getAgentHeight() : 0.0);
 }
 
 inline float NavMesh::getRecastAgentClimb() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mNavMeshType->getAgentClimb();
+	return (mNavMeshType ? mNavMeshType->getAgentClimb() : 0.0);
 }
 
 inline LVecBase3f NavMesh::getRecastBoundsMin() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	CHECKEXISTENCE(mGeom,
-			"NavMesh::getBoundsMin: invalid InputGeom")
-	return RecastToLVecBase3f(mGeom->getMeshBoundsMin());
+	return (mGeom ?
+			RecastToLVecBase3f(mGeom->getMeshBoundsMin()) : LVecBase3f::zero());
 }
 
 inline LVecBase3f NavMesh::getRecastBoundsMax() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	CHECKEXISTENCE(mGeom,
-			"NavMesh::getBoundsMax: invalid InputGeom")
-	return RecastToLVecBase3f(mGeom->getMeshBoundsMax());
+	return (mGeom ?
+			RecastToLVecBase3f(mGeom->getMeshBoundsMax()) : LVecBase3f::zero());
+}
+
+inline ReMutex& NavMesh::getStaticMutex()
+{
+	return mStaticMutex;
 }
 
 } // namespace ely

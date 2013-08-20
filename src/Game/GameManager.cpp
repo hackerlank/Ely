@@ -64,7 +64,7 @@ GameManager::~GameManager()
 	close_framework();
 }
 
-void GameManager::initialize()
+void GameManager::gameSetup()
 {
 	///<DEFAULT CAMERA CONTROL>
 //	mWindow->setup_trackball(); // Enable default camera movement
@@ -95,6 +95,12 @@ void GameManager::initialize()
 
 	//play the game
 	GamePlay();
+}
+
+void GameManager::gameCleanup()
+{
+	//destroy all created game Objects
+	ObjectTemplateManager::GetSingletonPtr()->destroyAllObjects();
 }
 
 void GameManager::GamePlay()

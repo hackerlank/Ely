@@ -25,7 +25,6 @@
 #include "ControlComponents/DriverTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameControlManager.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -35,41 +34,17 @@ Driver::Driver()
 	// TODO Auto-generated constructor stub
 }
 
-Driver::Driver(SMARTPTR(DriverTemplate)tmpl) :
-mTrue(true), mFalse(false), mIsEnabled(false)
+Driver::Driver(SMARTPTR(DriverTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
 			"Driver::Driver: invalid GameControlManager")
 
 	mTmpl = tmpl;
-	//initialized by template:
-	//mInvertedKeyboard, mInvertedMouse, mMouseEnabledH, mMouseEnabledP, mEnabled
-	mForward = false;
-	mBackward = false;
-	mStrafeLeft = false;
-	mStrafeRight = false;
-	mUp = false;
-	mDown = false;
-	mRollLeft = false;
-	mRollRight = false;
-	//by default we consider mouse moved on every update, because
-	//we want mouse poll by default; this can be changed by calling
-	//the enabler (for example by an handler responding to mouse-move
-	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
-	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
-	mMouseMove = true;
-	//
-	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-	mCentX = win->get_properties().get_x_size() / 2;
-	mCentY = win->get_properties().get_y_size() / 2;
+	reset();
 }
 
 Driver::~Driver()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	disable();
 }
 
 ComponentFamilyType Driver::familyType() const
@@ -82,95 +57,12 @@ ComponentType Driver::componentType() const
 	return mTmpl->componentType();
 }
 
-void Driver::enable()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if (mIsEnabled or (not mOwnerObject))
-	{
-		return;
-	}
-
-	//enable only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
-#ifdef ELY_THREAD
-	//initialize the current transform
-	mActualTransform = mOwnerObject->getNodePath().get_transform();
-#endif
-
-	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
-	{
-		//we want control through mouse movements
-		//hide mouse cursor
-		WindowProperties props;
-		props.set_cursor_hidden(true);
-		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-		win->request_properties(props);
-		//reset mouse to start position
-		win->move_pointer(0, mCentX, mCentY);
-	}
-
-	//add to the control manager update
-	throw_event(std::string("GameControlManager::handleUpdateRequest"),
-			EventParameter(this),
-			EventParameter(GameControlManager::ADDTOUPDATE));
-	//
-	mIsEnabled = not mIsEnabled;
-	//register event callbacks if any
-	registerEventCallbacks();
-}
-
-void Driver::disable()
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if ((not mIsEnabled) or (not mOwnerObject))
-	{
-		return;
-	}
-
-	//disable only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
-	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
-	{
-		//we have control through mouse movements
-		//show mouse cursor
-		WindowProperties props;
-		props.set_cursor_hidden(false);
-		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-		win->request_properties(props);
-	}
-
-	//check if control manager exists
-	if (GameControlManager::GetSingletonPtr())
-	{
-		//remove from control manager update
-		throw_event(std::string("GameControlManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameControlManager::REMOVEFROMUPDATE));
-	}
-	//
-	mIsEnabled = not mIsEnabled;
-	//unregister event callbacks if any
-	unregisterEventCallbacks();
-}
-
 bool Driver::initialize()
 {
 	bool result = true;
 	//get settings from template
 	//enabling setting
-	mEnabled = (
+	mStartEnabled = (
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
 	//inverted setting
@@ -226,10 +118,10 @@ bool Driver::initialize()
 					== std::string("enabled") ? true : false);
 	//speedKey
 	mSpeedKey = mTmpl->parameter(std::string("speed_key"));
-	if (not (mSpeedKey == "control" or mSpeedKey == "alt"
-			or mSpeedKey == "shift"))
+	if (not (mSpeedKey == std::string("control") or mSpeedKey == std::string("alt")
+			or mSpeedKey == std::string("shift")))
 	{
-		mSpeedKey = "shift";
+		mSpeedKey = std::string("shift");
 	}
 
 	//set sensitivity parameters
@@ -251,26 +143,138 @@ bool Driver::initialize()
 
 void Driver::onAddToObjectSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+	//
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	mCentX = win->get_properties().get_x_size() / 2;
+	mCentY = win->get_properties().get_y_size() / 2;
+}
 
-	//setup event callbacks if any
-	setupEvents();
-	//enable the component
+void Driver::onRemoveFromObjectCleanup()
+{
+	//see disable
 	if (mEnabled)
+	{
+		if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+		{
+			//we have control through mouse movements
+			//show mouse cursor
+			WindowProperties props;
+			props.set_cursor_hidden(false);
+			SMARTPTR(GraphicsWindow)win =
+			mTmpl->windowFramework()->get_graphics_window();
+			win->request_properties(props);
+		}
+	}
+	//
+	reset();
+}
+
+void Driver::onAddToSceneSetup()
+{
+	//enable the component (if requested)
+	if (mStartEnabled)
 	{
 		enable();
 	}
+	else
+	{
+		unregisterEventCallbacks();
+	}
 }
 
+void Driver::onRemoveFromSceneCleanup()
+{
+	//remove from control manager update
+	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+}
+
+void Driver::enable()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//if enabled return
+	RETURN_ON_COND(mEnabled,)
+
+#ifdef ELY_THREAD
+	//initialize the current transform
+	mActualTransform = mOwnerObject->getNodePath().get_transform();
+#endif
+
+	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+	{
+		//we want control through mouse movements
+		//hide mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(true);
+		SMARTPTR(GraphicsWindow)win =
+		mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+		//reset mouse to start position
+		win->move_pointer(0, mCentX, mCentY);
+	}
+	//
+	mEnabled = true;
+	//register event callbacks if any
+	registerEventCallbacks();
+
+	//add to the control manager update
+	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
+}
+
+void Driver::disable()
+{
+	{
+		//lock (guard) the mutex
+		HOLD_MUTEX(mMutex)
+
+		//if disabling return
+		RETURN_ON_ASYNC_COND(mDisabling,)
+
+		//if not enabled return
+		RETURN_ON_COND(not mEnabled,)
+
+#ifdef ELY_THREAD
+		mDisabling = true;
+#endif
+	}
+
+	//remove from control manager update
+	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//unregister event callbacks if any
+	unregisterEventCallbacks();
+
+	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+	{
+		//we have control through mouse movements
+		//show mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(false);
+		SMARTPTR(GraphicsWindow) win =
+				mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+	}
+	//
+#ifdef ELY_THREAD
+	mDisabling = false;
+#endif
+	mEnabled = false;
+}
 
 void Driver::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 	bool modified = false;

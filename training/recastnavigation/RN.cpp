@@ -1091,7 +1091,7 @@ void switchDoor(Raycaster* raycaster, void* data)
 AsyncTask::DoneStatus print_data(GenericAsyncTask* task, void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	AgentData* agentData = (AgentData*)data;
 	if (agentData)

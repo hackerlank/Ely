@@ -58,12 +58,14 @@ class GeoMipTerrainRef;
 class Terrain: public Component
 {
 protected:
-	friend class Object;
 	friend class TerrainTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Terrain();
@@ -107,6 +109,8 @@ private:
 	///@{
 	///Heightfield image.
 	PNMImage mHeightField;
+	///Old owner object node path.
+	NodePath mOldObjectNodePath;
 	///Scale.
 	float mHeightScale, mWidthScale;
 	bool mDoScale;
@@ -200,10 +204,34 @@ private:
 
 ///inline definitions
 
+inline void Terrain::reset()
+{
+	//
+	mTerrain.clear();
+	mHeightField = PNMImage();
+	mOldObjectNodePath = NodePath();
+	mHeightScale = mWidthScale = 1.0;
+	mDoScale = false;
+	mNearPercent = 0.0;
+	mFarPercent = 1.0;
+	mBlockSize = 0;
+	mFlattenMode = GeoMipTerrain::AFM_off;
+	mMinimumLevel = 0;
+	mTextureImage.clear();
+	mTextureUscale = mTextureVscale = 1.0;
+	mFocalPointObject = ObjectId();
+	mFocalPointNP = NodePath();
+	mTerrainRootNetPos = LPoint3::zero();
+	mBruteForce = false;
+}
+
 inline SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,NULL)
 
 	return mTerrain;
 }
@@ -211,14 +239,14 @@ inline SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
 inline float Terrain::getWidthScale() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mWidthScale;
 }
 inline float Terrain::getHeightScale() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mHeightScale;
 }

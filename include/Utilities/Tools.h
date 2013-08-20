@@ -48,16 +48,16 @@ namespace ely
 ///Macros for generic debug
 #if defined (ELY_DEBUG) && !defined (TESTING)
 #	define PRINT(msg) std::cout << msg << std::endl
-#	define PRINTERR(msg) std::cerr << msg << std::endl
-#	define CHECKEXISTENCE(entity,msg) \
+#	define PRINT_ERR(msg) std::cerr << msg << std::endl
+#	define CHECK_EXISTENCE(entity,msg) \
 	if (not entity)\
 	{\
 		throw GameException(msg);\
 	}
 #else
 #	define PRINT(msg)
-#	define PRINTERR(msg)
-#	define CHECKEXISTENCE(entity,msg)
+#	define PRINT_ERR(msg)
+#	define CHECK_EXISTENCE(entity,msg)
 #endif
 
 /**
@@ -292,15 +292,27 @@ std::vector<std::string> parseCompoundString(const std::string& compoundString,
 std::string replaceCharacter(const std::string& source, int character,
 		int replacement);
 
+#define RETURN_ON_COND(_flag_,_return_)\
+	if (_flag_)\
+	{\
+		return _return_;\
+	}
+
 ///ELY_THREAD
 #ifdef ELY_THREAD
-#	define HOLDMUTEX(mutex) ReMutexHolder guard(mutex);
-#	define SMARTPTR(type) ThreadSafePointerTo< type >
-#	define CSMARTPTR(type) ThreadSafeConstPointerTo< type >
+#	define HOLD_MUTEX(_mutex_) ReMutexHolder guard(_mutex_);
+#	define SMARTPTR(_type_) ThreadSafePointerTo<_type_>
+#	define CSMARTPTR(_type_) ThreadSafeConstPointerTo<_type_>
+#	define RETURN_ON_ASYNC_COND(_flag_,_return_)\
+	if (_flag_)\
+	{\
+		return _return_;\
+	}
 #else
-#	define HOLDMUTEX(mutex)
-#	define SMARTPTR(type) PointerTo< type >
-#	define CSMARTPTR(type) ConstPointerTo< type >
+#	define HOLD_MUTEX(_mutex_)
+#	define SMARTPTR(_type_) PointerTo<_type_>
+#	define CSMARTPTR(_type_) ConstPointerTo<_type_>
+#	define RETURN_ON_ASYNC_COND(_flag_,_return_)
 #endif
 
 /**

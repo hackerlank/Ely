@@ -109,10 +109,15 @@ int main(int argc, char **argv)
 		}
 	}
 #endif
+
 	// Set the game up
-	gameMgr->initialize();
+	gameMgr->gameSetup();
+
 	// Do the main loop
 	gameMgr->main_loop();
+
+	// Clean the game up
+	gameMgr->gameCleanup();
 
 	// Close the game framework
 	delete gameAudioMgr;

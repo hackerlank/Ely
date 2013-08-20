@@ -33,7 +33,7 @@ ComponentTemplateManager::ComponentTemplateManager()
 ComponentTemplateManager::~ComponentTemplateManager()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//remove component templates
 	while (mComponentTemplates.size() > 0)
@@ -49,7 +49,7 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 		SMARTPTR(ComponentTemplate) componentTmpl)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (not componentTmpl)
 	{
@@ -75,7 +75,7 @@ bool ComponentTemplateManager::removeComponentTemplate(
 		ComponentType componentType)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
 	if (it == mComponentTemplates.end())
@@ -92,7 +92,7 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::getComponentTemplate(
 		ComponentType componentType) const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	ComponentTemplateTable::const_iterator it = mComponentTemplates.find(
 			componentType);
@@ -107,7 +107,7 @@ SMARTPTR(Component) ComponentTemplateManager::createComponent(
 		ComponentType componentType)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(
 			componentType);
@@ -125,7 +125,7 @@ SMARTPTR(Component) ComponentTemplateManager::createComponent(
 void ComponentTemplateManager::resetComponentTemplateParams(ComponentType componentID)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	ComponentTemplateTable::const_iterator iter = mComponentTemplates.find(
 			componentID);
@@ -138,7 +138,7 @@ void ComponentTemplateManager::resetComponentTemplateParams(ComponentType compon
 void ComponentTemplateManager::resetComponentTemplatesParams()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	ComponentTemplateTable::iterator iter;
 	for (iter = mComponentTemplates.begin(); iter != mComponentTemplates.end();

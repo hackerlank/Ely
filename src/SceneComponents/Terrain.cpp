@@ -26,7 +26,6 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameSceneManager.h"
 #include <texturePool.h>
-#include <throw_event.h>
 
 namespace ely
 {
@@ -38,25 +37,15 @@ Terrain::Terrain()
 
 Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"Terrain::Terrain: invalid GameSceneManager")
+
 	mTmpl = tmpl;
+	reset();
 }
 
 Terrain::~Terrain()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//check if game physics manager exists
-	if (GameSceneManager::GetSingletonPtr())
-	{
-		//remove from the scene manager update
-		throw_event(std::string("GameSceneManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameSceneManager::REMOVEFROMUPDATE));
-	}
-	mTerrain->get_root().remove_node();
 }
 
 ComponentFamilyType Terrain::familyType() const
@@ -112,15 +101,15 @@ bool Terrain::initialize()
 					== std::string("false") ? false : true);
 	//get auto flatten
 	std::string autoFlatten = mTmpl->parameter(std::string("auto_flatten"));
-	if (autoFlatten == "AFM_off")
+	if (autoFlatten == std::string("AFM_off"))
 	{
 		mFlattenMode = GeoMipTerrain::AFM_off;
 	}
-	else if (autoFlatten == "AFM_light")
+	else if (autoFlatten == std::string("AFM_light"))
 	{
 		mFlattenMode = GeoMipTerrain::AFM_light;
 	}
-	else if (autoFlatten == "AFM_strong")
+	else if (autoFlatten == std::string("AFM_strong"))
 	{
 		mFlattenMode = GeoMipTerrain::AFM_strong;
 	}
@@ -202,9 +191,10 @@ void Terrain::onAddToObjectSetup()
 				mTextureImage, 1);
 	}
 
-	//set the node path of the object to the
-	//node path of this model
+	//set the object node path to this terrain of node path
+	mOldObjectNodePath = mOwnerObject->getNodePath();
 	mOwnerObject->setNodePath(mTerrain->get_root());
+
 	//set the focal point
 	SMARTPTR(Object)createdObject =
 	ObjectTemplateManager::GetSingleton().getCreatedObject(
@@ -218,30 +208,43 @@ void Terrain::onAddToObjectSetup()
 	mFocalPointNP = createdObject->getNodePath();
 	//Generate the terrain
 	mTerrain->generate();
-	if(not mBruteForce)
-	{
-		//Add to the scene manager update if not brute force
-		throw_event(std::string("GameSceneManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameSceneManager::ADDTOUPDATE));
-	}
+}
 
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+void Terrain::onRemoveFromObjectCleanup()
+{
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(mOldObjectNodePath);
+	//
+	reset();
 }
 
 void Terrain::onAddToSceneSetup()
 {
 	//save the net pos of terrain root
 	mTerrainRootNetPos = mTerrain->get_root().get_net_transform()->get_pos();
+
+	//Add to the scene manager update if not brute force
+	if(not mBruteForce)
+	{
+		//Add to the scene manager update if not brute force
+		GameSceneManager::GetSingletonPtr()->addToSceneUpdate(this);
+	}
+}
+
+void Terrain::onRemoveFromSceneCleanup()
+{
+	//check if not brute force and if game scene manager exists
+	if (not mBruteForce)
+	{
+		//remove from the scene manager update
+		GameSceneManager::GetSingletonPtr()->removeFromSceneUpdate(this);
+	}
 }
 
 void Terrain::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

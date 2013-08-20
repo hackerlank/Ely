@@ -575,7 +575,7 @@ template<typename StateKey> FSM<StateKey>::FSM(const StateKey& name) :
 template<typename StateKey> FSM<StateKey>::~FSM()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 }
 
 template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)
@@ -604,7 +604,7 @@ template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)
 template<typename StateKey> int FSM<StateKey>::getSerialNum()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return ++FSM<StateKey>::SerialNum;
 }
@@ -612,7 +612,7 @@ template<typename StateKey> int FSM<StateKey>::getSerialNum()
 template<typename StateKey> void FSM<StateKey>::cleanup()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey != Off)
 	{
@@ -629,7 +629,7 @@ template<typename StateKey> void FSM<StateKey>::setBroadcastStateChanges(
 		bool doBroadcast)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mBroadcastStateChanges = doBroadcast;
 }
@@ -637,7 +637,7 @@ template<typename StateKey> void FSM<StateKey>::setBroadcastStateChanges(
 template<typename StateKey> std::string FSM<StateKey>::getStateChangeEvent()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	std::ostringstream stateChange;
 	stateChange << "FSM-" << mSerialNum << "-" << mName << "-stateChange";
@@ -647,7 +647,7 @@ template<typename StateKey> std::string FSM<StateKey>::getStateChangeEvent()
 template<typename StateKey> const StateKey& FSM<StateKey>::getCurrentOrNextState()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey != InTransition)
 	{
@@ -660,7 +660,7 @@ template<typename StateKey> bool FSM<StateKey>::getCurrentStateOrTransition(
 		StateKey& currStateKey, StateKey& toStateKey)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey != InTransition)
 	{
@@ -675,7 +675,7 @@ template<typename StateKey> bool FSM<StateKey>::getCurrentStateOrTransition(
 template<typename StateKey> bool FSM<StateKey>::isInTransition()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mStateKey == InTransition;
 }
@@ -684,7 +684,7 @@ template<typename StateKey> void FSM<StateKey>::forceTransition(
 		const StateKey& stateKey, const ValueList& data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey == InTransition)
 	{
@@ -702,7 +702,7 @@ template<typename StateKey> void FSM<StateKey>::demand(const StateKey& stateKey,
 		const ValueList& data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey == InTransition)
 	{
@@ -725,7 +725,7 @@ template<typename StateKey> StateKey FSM<StateKey>::request(
 		const StateKey& newStateKey, const ValueList& data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	StateKey acceptedStateKey = Null;
 	if (mStateKey == InTransition)
@@ -771,7 +771,7 @@ template<typename StateKey> void FSM<StateKey>::setStateSet(
 		const StateSet& stateSet)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mStateSet = stateSet;
 }
@@ -779,7 +779,7 @@ template<typename StateKey> void FSM<StateKey>::setStateSet(
 template<typename StateKey> std::set<StateKey> FSM<StateKey>::getKeyStateSet()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	std::set<StateKey> keyStateSet;
 	typename StateSet::iterator iter;
@@ -793,7 +793,7 @@ template<typename StateKey> std::set<StateKey> FSM<StateKey>::getKeyStateSet()
 template<typename StateKey> unsigned int FSM<StateKey>::getNumStates()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mStateSet.size();
 }
@@ -802,7 +802,7 @@ template<typename StateKey> StateKey FSM<StateKey>::requestNext(
 		const ValueList& data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	StateKey newState = Null;
 	if (mStateKey == InTransition)
@@ -840,7 +840,7 @@ template<typename StateKey> StateKey FSM<StateKey>::requestPrev(
 		const ValueList& data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	StateKey newState = Null;
 	if (mStateKey == InTransition)
@@ -1067,7 +1067,7 @@ bool FSM<StateKey>::addState(const StateKey& stateKey,
 		const FSM<StateKey>::AllowedStateKeySet& allowedStateKeys)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey == InTransition)
 	{
@@ -1105,7 +1105,7 @@ template<typename StateKey>
 bool FSM<StateKey>::removeState(const StateKey& stateKey)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey == InTransition)
 	{
@@ -1137,7 +1137,7 @@ bool FSM<StateKey>::addFromToFunc(const StateKey& stateFrom,
 		const StateKey& stateTo, const FSM<StateKey>::FromToFuncPTR& fromToFunc)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey == InTransition)
 	{
@@ -1173,7 +1173,7 @@ bool FSM<StateKey>::removeFromToFunc(const StateKey& stateFrom,
 		const StateKey& stateTo)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStateKey == InTransition)
 	{

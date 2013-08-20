@@ -32,11 +32,11 @@ ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"DriverTemplate::ChaserTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"DriverTemplate::ChaserTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
 			"DriverTemplate::ChaserTemplate: invalid GameControlManager")
 	//
 	setParametersDefaults();
@@ -71,7 +71,7 @@ SMARTPTR(Component)ChaserTemplate::makeComponent(const ComponentId& compId)
 void ChaserTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

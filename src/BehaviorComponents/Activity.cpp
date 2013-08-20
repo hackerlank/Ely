@@ -35,17 +35,14 @@ Activity::Activity() :
 }
 
 Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :
-mFSM("FSM"), mTransitionsLoaded(false)
+		mFSM("FSM")
 {
 	mTmpl = tmpl;
+	reset();
 }
 
 Activity::~Activity()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	unloadTransitionFunctions();
 }
 
 ComponentFamilyType Activity::familyType() const
@@ -109,6 +106,7 @@ void Activity::setupFSM()
 		}
 	}
 }
+
 void Activity::onAddToObjectSetup()
 {
 	//add even for an empty object node path
@@ -118,11 +116,14 @@ void Activity::onAddToObjectSetup()
 
 	//load transitions library
 	loadTransitionFunctions();
+}
 
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+void Activity::onRemoveFromObjectCleanup()
+{
+	//unload transitions library
+	unloadTransitionFunctions();
+	//
+	reset();
 }
 
 void Activity::loadTransitionFunctions()
@@ -164,7 +165,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
 			pEnterFunction = NULL;
 		}
 
@@ -179,7 +180,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
 			pExitFunction = NULL;
 		}
 
@@ -194,7 +195,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
 			pFilterFunction = NULL;
 		}
 		//re-add the state with the current functions
@@ -235,7 +236,7 @@ void Activity::loadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINTERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
 			pFromToFunction = NULL;
 		}
 		//get the position of the "_FromTo_" substring in (*iter)
@@ -262,7 +263,7 @@ void Activity::loadTransitionFunctions()
 Activity::operator fsm&()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mFSM;
 }

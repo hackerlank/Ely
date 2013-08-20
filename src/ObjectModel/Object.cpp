@@ -28,44 +28,22 @@ namespace ely
 {
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
-mTmpl(tmpl), mInitializationsLoaded(false)
+mTmpl(tmpl), mObjectId(objectId)
 {
-	mObjectId = objectId;
+	reset();
 }
 
 Object::~Object()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	unloadInitializationFunctions();
-	//
-	mNodePath.remove_node();
 }
 
-void Object::clearComponents()
+SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyId) const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	//remove object components
-	while (mComponents.size() > 0)
-	{
-		ComponentTable::iterator iter = mComponents.begin();
-		ComponentFamilyType compFamilyType = iter->first;
-		PRINT(
-				"\tRemoving component of family type '" << std::string(compFamilyType) << "'");
-		mComponents.erase(iter);
-	}
-	std::cout << std::endl;
-}
-
-SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyID) const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	ComponentTable::const_iterator it = mComponents.find(familyID);
+	ComponentOrderedList::const_iterator it =
+			find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
 	if (it == mComponents.end())
 	{
 		return NULL;
@@ -73,52 +51,41 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyID) con
 	return (*it).second;
 }
 
-SMARTPTR(Component)Object::addComponent(SMARTPTR(Component) component,
-		bool existingObject)
+bool Object::addComponent(SMARTPTR(Component) component,
+		const ComponentFamilyType& familyId)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
-	SMARTPTR(Component) previousComp;
-	previousComp.clear();
-	ComponentFamilyType familyId = component->familyType();
-	ComponentTable::iterator it = mComponents.find(familyId);
+	ComponentOrderedList::iterator it =
+			find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
 	if (it != mComponents.end())
 	{
-		// a previous component of that family already existed
-		previousComp = (*it).second;
-		mComponents.erase(it);
+		return false;
 	}
-	//set the component owner
-	component->setOwnerObject(this);
-	//on addition to object component setup
-	component->onAddToObjectSetup();
-	//if this object is an already existing object calls onAddToSceneSetup
-	if (existingObject)
-	{
-		component->onAddToSceneSetup();
-	}
-	//insert the new component into the table
-	mComponents[familyId] = component;
-	return previousComp;
+	//insert the new component into the list at the back end
+	mComponents.push_back(FamilyTypeComponentPair(familyId, component));
+	//
+	return true;
 }
 
-bool Object::removeComponent(SMARTPTR(Component) component)
+bool Object::removeComponent(SMARTPTR(Component) component,
+		const ComponentFamilyType& familyId)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
-	ComponentFamilyType familyId = component->familyType();
-	ComponentTable::iterator it = mComponents.find(familyId);
-	if (it->second != component)
+	ComponentOrderedList::iterator it =
+			find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
+	if ((it == mComponents.end()) or (it->second != component))
 	{
 		return false;
 	}
@@ -126,6 +93,14 @@ bool Object::removeComponent(SMARTPTR(Component) component)
 	mComponents.erase(it);
 	//
 	return true;
+}
+
+void Object::onRemoveObjectCleanup()
+{
+	//unload initialization functions
+	unloadInitializationFunctions();
+	//
+	reset();
 }
 
 void Object::onAddToSceneSetup()
@@ -166,19 +141,23 @@ void Object::onAddToSceneSetup()
 		rot[i] = strtof(rotStr[i].c_str(), NULL);
 	}
 	mNodePath.set_hpr(rot[0], rot[1], rot[2]);
-	//give components a chance to set up
-	ComponentTable::iterator iterComp;
-	for (iterComp = mComponents.begin(); iterComp != mComponents.end();
-			++iterComp)
-	{
-		iterComp->second->onAddToSceneSetup();
-	}
+}
+
+void Object::onRemoveFromSceneCleanup()
+{
+	//set default pos/hpr
+	mNodePath.set_hpr(0.0, 0.0, 0.0);
+	mNodePath.set_pos(0.0, 0.0, 0.0);
+	//detach node path from its parent
+	mNodePath.detach_node();
+	//set steady to false
+	mIsSteady = false;
 }
 
 void Object::worldSetup()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//load initialization functions library.
 	loadInitializationFunctions();
@@ -248,6 +227,7 @@ void Object::unloadInitializationFunctions()
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;
+	mInitializationLib = NULL;
 }
 
 //TypedObject semantics: hardcoded

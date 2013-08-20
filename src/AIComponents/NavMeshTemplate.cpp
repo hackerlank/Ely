@@ -32,11 +32,11 @@ NavMeshTemplate::NavMeshTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"NavMeshTemplate::NavMeshTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"NavMeshTemplate::NavMeshTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMeshTemplate::NavMeshTemplate: invalid GameAIManager")
 	//
 	setParametersDefaults();
@@ -71,7 +71,7 @@ SMARTPTR(Component)NavMeshTemplate::makeComponent(const ComponentId& compId)
 void NavMeshTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

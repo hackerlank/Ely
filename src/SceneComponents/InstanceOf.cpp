@@ -37,17 +37,15 @@ InstanceOf::InstanceOf()
 
 InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"InstanceOf::InstanceOf: invalid GameSceneManager")
+
 	mTmpl = tmpl;
+	reset();
 }
 
 InstanceOf::~InstanceOf()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath.remove_node();
 }
 
 ComponentFamilyType InstanceOf::familyType() const
@@ -88,10 +86,6 @@ void InstanceOf::onAddToObjectSetup()
 	//set scaling (default: (1.0,1.0,1.0))
 	mNodePath.set_scale(mScale[0], mScale[1], mScale[2]);
 
-	//set the node path of the object to the
-	//node path of this instance of
-	mOwnerObject->setNodePath(mNodePath);
-
 	//get that object this component is an instance of;
 	//that object is supposed to be already created,
 	//set up and added to the created objects table;
@@ -102,37 +96,33 @@ void InstanceOf::onAddToObjectSetup()
 	{
 		SMARTPTR(Component) component =
 				mInstancedObject->getComponent(ComponentFamilyType("Scene"));
-		if (component->is_of_type(Model::get_class_type()))
+		//an instanceable object should have a model component
+		if (component and component->is_of_type(Model::get_class_type()))
 		{
-			//an instanceable object should have a model component
-			SMARTPTR(Model)model = DCAST(Model, component);
-			if (model)
-			{
-				model->getNodePath().instance_to(
-						mOwnerObject->getNodePath());
-			}
+			DCAST(Model, component)->getNodePath().instance_to(mNodePath);
 		}
 	}
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+	//set the object node path to this instance of node path
+	mOldObjectNodePath = mOwnerObject->getNodePath();
+	mOwnerObject->setNodePath(mNodePath);
 }
 
-NodePath InstanceOf::getNodePath() const
+void InstanceOf::onRemoveFromObjectCleanup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(mOldObjectNodePath);
 
-	return mNodePath;
-}
+	//detach the first child of this instance of node path (if any)
+	if (mInstancedObject and (mNodePath.get_num_children() > 0))
+	{
+		/// \see NodePath::instance_to() documentation.
+		mNodePath.get_child(0).detach_node();
+	}
 
-void InstanceOf::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
+	//Remove node path
+	mNodePath.remove_node();
+	//
+	reset();
 }
 
 //TypedObject semantics: hardcoded

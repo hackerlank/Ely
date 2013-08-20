@@ -47,7 +47,6 @@ class EXPCL_PANDAAI PathFinder;
 #include <throw_event.h>
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -57,27 +56,19 @@ Steering::Steering()
 	// TODO Auto-generated constructor stub
 }
 
-Steering::Steering(SMARTPTR(SteeringTemplate)tmpl):mIsEnabled(false)
+Steering::Steering(SMARTPTR(SteeringTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
 			"Steering::Steering: invalid GameAIManager")
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Steering::Steering: "
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Steering::Steering: "
 			"invalid GamePhysicsManager")
+
 	mTmpl = tmpl;
-	//get bullet world reference
-	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
-	mAICharacter = NULL;
-	mUpdatePtr = NULL;
-	mCharacterController = NULL;
-	mMovRotEnabled = false;
+	reset();
 }
 
 Steering::~Steering()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	disable();
 }
 
 ComponentFamilyType Steering::familyType() const
@@ -94,7 +85,7 @@ bool Steering::initialize()
 {
 	bool result = true;
 	//enabling setting
-	mEnabled = (
+	mStartEnabled = (
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
 	//throw events setting
@@ -117,7 +108,7 @@ bool Steering::initialize()
 			mTmpl->parameter(std::string("max_force")).c_str(), NULL);
 	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
 	//the type of the updatable item
-	mType = mTmpl->parameter(std::string("controlled_type"));
+	mTypeParam = mTmpl->parameter(std::string("controlled_type"));
 	//obstacle hit mask
 	std::string obstacleHitMask = mTmpl->parameter(
 			std::string("obstacle_hit_mask"));
@@ -152,49 +143,71 @@ bool Steering::initialize()
 
 void Steering::onAddToObjectSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
+	//get bullet world reference
+	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
+}
+
+void Steering::onRemoveFromObjectCleanup()
+{
+	//see disable
+	if (mEnabled)
 	{
-		return;
+		if (mTypeParam == std::string("character_controller"))
+		{
+			//disable movement/rotation
+			enableMovRot(false);
+			//restore current movement
+			mCharacterController->setIsLocal(mCurrentIsLocal);
+			//throw SteeringForceOff event (if enabled)
+			if (mThrowEvents and (not mSteeringForceOffSent))
+			{
+				throw_event(std::string("SteeringForceOff"),
+						EventParameter(this),
+						EventParameter(std::string(mOwnerObject->objectId())));
+			}
+		}
 	}
 
-	//setup event callbacks if any
-	setupEvents();
+	//remove from AIWorld
+	GameAIManager::GetSingletonPtr()->aiWorld()->remove_ai_char(
+			std::string(mComponentId));
+
+	//
+	reset();
 }
 
 void Steering::onAddToSceneSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
 	//enable the component
-	if (mEnabled)
+	if (mStartEnabled)
 	{
 		enable();
 	}
+	else
+	{
+		unregisterEventCallbacks();
+	}
+}
+
+void Steering::onRemoveFromSceneCleanup()
+{
+	//remove from AI manager update
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 }
 
 void Steering::enable()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mIsEnabled or (not mOwnerObject))
-	{
-		return;
-	}
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
 
-	//enable only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+	//if enabled return
+	RETURN_ON_COND(mEnabled,)
 
 	//create the AICharacter...
-	mAICharacter = new AICharacter(std::string(mComponentId),
+	mAICharacter = new AICharacterRef(std::string(mComponentId),
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
 	//...add it to the AIWorld ...
 	GameAIManager::GetSingletonPtr()->aiWorld()->add_ai_char(mAICharacter);
@@ -202,7 +215,7 @@ void Steering::enable()
 	_steering = mAICharacter->get_ai_behaviors();
 
 	//check the type of the updatable item
-	if ((mType == std::string("character_controller"))
+	if ((mTypeParam == std::string("character_controller"))
 			and (mOwnerObject->getComponent(ComponentFamilyType("Physics"))->is_of_type(
 					CharacterController::get_class_type())))
 	{
@@ -211,8 +224,8 @@ void Steering::enable()
 		//get a reference to the CharacterController component
 		//(which is already created and set up)
 		mCharacterController =
-				DCAST(CharacterController, mOwnerObject->getComponent(
-								ComponentFamilyType("Physics")));
+		DCAST(CharacterController, mOwnerObject->getComponent(
+						ComponentFamilyType("Physics")));
 
 		//save current movement and set it not local (global)
 		mCurrentIsLocal = mCharacterController->getIsLocal();
@@ -234,34 +247,45 @@ void Steering::enable()
 		//update the owner object nodepath: default
 		mUpdatePtr = &Steering::updateNodePath;
 	}
-
-	//Add to the AI manager update
-	throw_event(std::string("GameAIManager::handleUpdateRequest"),
-			EventParameter(this),
-			EventParameter(GameAIManager::ADDTOUPDATE));
-	//
-	mIsEnabled = not mIsEnabled;
 	//register event callbacks if any
 	registerEventCallbacks();
+	//
+	mEnabled = true;
+
+	//Add to the AI manager update
+	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 }
 
 void Steering::disable()
 {
+	{
+		//lock (guard) the mutex
+		HOLD_MUTEX(mMutex)
+
+		//if disabling return
+		RETURN_ON_ASYNC_COND(mDisabling,)
+
+		//if not enabled return
+		RETURN_ON_COND(not mEnabled,)
+
+#ifdef ELY_THREAD
+		mDisabling = true;
+#endif
+	}
+
+	//remove from AI manager update
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if ((not mIsEnabled) or (not mOwnerObject))
-	{
-		return;
-	}
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
 
-	//disable only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+	//unregister event callbacks if any
+	unregisterEventCallbacks();
 
-	if (mType == std::string("character_controller"))
+	if (mTypeParam == std::string("character_controller"))
 	{
 		//disable movement/rotation
 		enableMovRot(false);
@@ -274,69 +298,26 @@ void Steering::disable()
 					EventParameter(std::string(mOwnerObject->objectId())));
 		}
 	}
-	//check if AI manager exists
-	if (GameAIManager::GetSingletonPtr())
-	{
-		//remove from AIWorld
-		GameAIManager::GetSingletonPtr()->aiWorld()->remove_ai_char(
-				std::string(mComponentId));
-	}
-	delete mAICharacter;
-	mAICharacter = NULL;
 
-	//check if AI manager exists
-	if (GameAIManager::GetSingletonPtr())
-	{
-		//remove from AI manager update
-		throw_event(std::string("GameAIManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameAIManager::REMOVEFROMUPDATE));
-	}
+	//remove from AIWorld
+	GameAIManager::GetSingletonPtr()->aiWorld()->remove_ai_char(
+			std::string(mComponentId));
+
+	mAICharacter.clear();
+
 	//reset update ptr
 	mUpdatePtr = NULL;
 	//
-	mIsEnabled = not mIsEnabled;
-	//unregister event callbacks if any
-	unregisterEventCallbacks();
-}
-
-NodePath Steering::getTargetNodePath(const ObjectId& target)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	NodePath objectNodePath("");
-	//check if there is an object with that ObjectId;
-	//that object is supposed to be already created, set up,
-	//added to the scene and added to the created objects table;
-	CSMARTPTR(Object)targetObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
-			target);
-	if (targetObject != NULL)
-	{
-		objectNodePath = targetObject->getNodePath();
-	}
-	//
-	return objectNodePath;
-}
-
-NodePath Steering::getTargetNodePath(CSMARTPTR(Object)target)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	NodePath objectNodePath("");
-	if (target != NULL)
-	{
-		objectNodePath = target->getNodePath();
-	}
-	//
-	return objectNodePath;
+#ifdef ELY_THREAD
+	mDisabling = false;
+#endif
+	mEnabled = false;
 }
 
 void Steering::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
@@ -1251,7 +1232,7 @@ void Steering::do_follow()
 	if ((_path_follow_obj->_myClock->get_real_time() - _path_follow_obj->_time)
 			> 0.5)
 	{
-		if (_path_follow_obj->_type == "pathfind")
+		if (_path_follow_obj->_type == std::string("pathfind"))
 		{
 			// This 'if' statement when 'true' causes the path to be re-calculated irrespective of target position.
 			// This is done when _dynamice_avoid is active. More computationally expensive.
@@ -1326,5 +1307,15 @@ void Steering::do_follow()
 
 //TypedObject semantics: hardcoded
 TypeHandle Steering::_type_handle;
+
+///AICharacterRef stuff
+AICharacterRef::AICharacterRef(const std::string& name, NodePath model_np,
+			double mass, double movt_force, double max_force):
+		AICharacter(name, model_np, mass, movt_force, max_force)
+{
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle AICharacterRef::_type_handle;
 
 }  // namespace ely

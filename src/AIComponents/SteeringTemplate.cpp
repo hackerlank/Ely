@@ -32,11 +32,11 @@ SteeringTemplate::SteeringTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"SteeringTemplate::SteeringTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"SteeringTemplate::SteeringTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
 			"SteeringTemplate::SteeringTemplate: invalid GameAIManager")
 	//
 	setParametersDefaults();
@@ -71,7 +71,7 @@ SMARTPTR(Component)SteeringTemplate::makeComponent(const ComponentId& compId)
 void SteeringTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

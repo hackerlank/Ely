@@ -32,11 +32,11 @@ DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"DriverTemplate::DriverTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"DriverTemplate::DriverTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
 			"DriverTemplate::DriverTemplate: invalid GameControlManager")
 	//
 	setParametersDefaults();
@@ -71,7 +71,7 @@ SMARTPTR(Component)DriverTemplate::makeComponent(const ComponentId& compId)
 void DriverTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

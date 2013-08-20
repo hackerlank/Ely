@@ -31,9 +31,9 @@ ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"ActivityTemplate::ActivityTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"ActivityTemplate::ActivityTemplate: invalid WindowFramework")
 	//
 	setParametersDefaults();
@@ -68,7 +68,7 @@ SMARTPTR(Component)ActivityTemplate::makeComponent(const ComponentId& compId)
 void ActivityTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

@@ -36,17 +36,15 @@ NodePathWrapper::NodePathWrapper()
 
 NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"NodePathWrapper::NodePathWrapper: invalid GameSceneManager")
+
 	mTmpl = tmpl;
+	reset();
 }
 
 NodePathWrapper::~NodePathWrapper()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath.remove_node();
 }
 
 ComponentFamilyType NodePathWrapper::familyType() const
@@ -63,7 +61,7 @@ bool NodePathWrapper::initialize()
 {
 	bool result = true;
 	//setup the wrapped NodePath
-	mWrappedNodePath = mTmpl->parameter(std::string("nodepath"));
+	mWrappedNodePathParam = mTmpl->parameter(std::string("nodepath"));
 	//
 	return result;
 }
@@ -71,19 +69,19 @@ bool NodePathWrapper::initialize()
 void NodePathWrapper::onAddToObjectSetup()
 {
 	//setup the wrapped NodePath
-	if (mWrappedNodePath == std::string("render"))
+	if (mWrappedNodePathParam == std::string("render"))
 	{
 		mNodePath = mTmpl->windowFramework()->get_render();
 	}
-	else if (mWrappedNodePath == std::string("render2d"))
+	else if (mWrappedNodePathParam == std::string("render2d"))
 	{
 		mNodePath = mTmpl->windowFramework()->get_render_2d();
 	}
-	else if (mWrappedNodePath == std::string("aspect2d"))
+	else if (mWrappedNodePathParam == std::string("aspect2d"))
 	{
 		mNodePath = mTmpl->windowFramework()->get_aspect_2d();
 	}
-	else if (mWrappedNodePath == std::string("camera"))
+	else if (mWrappedNodePathParam == std::string("camera"))
 	{
 		mNodePath = mTmpl->windowFramework()->get_camera_group();
 	}
@@ -93,29 +91,17 @@ void NodePathWrapper::onAddToObjectSetup()
 		mNodePath = mTmpl->windowFramework()->get_render();
 	}
 
-	//set the node path of the object to the
-	//node path of this NodePathWrapper
+	//set the object node path to this NodePathWrapper of node path
+	mOldObjectNodePath = mOwnerObject->getNodePath();
 	mOwnerObject->setNodePath(mNodePath);
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
 }
 
-NodePath NodePathWrapper::getNodePath() const
+void NodePathWrapper::onRemoveFromObjectCleanup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void NodePathWrapper::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(mOldObjectNodePath);
+	//
+	reset();
 }
 
 //TypedObject semantics: hardcoded

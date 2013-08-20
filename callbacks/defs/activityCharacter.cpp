@@ -99,7 +99,7 @@ void activityCharacter(const Event * event, void * data)
 	}
 	else
 	{
-		PRINTERR("activityCharacter: Transition not defined for event type '" <<
+		PRINT_ERR("activityCharacter: Transition not defined for event type '" <<
 				eventType << "' and state '" << currentState << "'");
 	}
 }
@@ -123,7 +123,7 @@ void groundAirCharacter(const Event * event, void * data)
 	}
 	else
 	{
-		PRINTERR("groundAirCharacter: unrecognized event");
+		PRINT_ERR("groundAirCharacter: unrecognized event");
 	}
 }
 

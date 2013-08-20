@@ -176,7 +176,7 @@ inline WindowFramework* const ComponentTemplate::windowFramework() const
 inline ParameterTable ComponentTemplate::getParameterTable() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mParameterTable;
 }

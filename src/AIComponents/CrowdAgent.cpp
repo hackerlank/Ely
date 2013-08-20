@@ -28,39 +28,34 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
+#include "Game/GamePhysicsManager.h"
+#include <throw_event.h>
+#include <bulletTriangleMesh.h>
+#include <bulletTriangleMeshShape.h>
 
 namespace ely
 {
 
-CrowdAgent::CrowdAgent()
+CrowdAgent::CrowdAgent():
+		mHitResult(BulletClosestHitRayResult::empty())
 {
-	// TODO Auto-generated constructor stub
 }
 
-CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl)
+CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):
+				mHitResult(BulletClosestHitRayResult::empty())
 {
-	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
 			"CrowdAgent::CrowdAgent: invalid GameAIManager")
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+			"CrowdAgent::CrowdAgent: invalid GamePhysicsManager")
+
 	mTmpl = tmpl;
-	//
-	mAgentIdx = -1;
-	mNavMeshObject = NULL;
-	mMovType = RECAST;
-	mParamUpdateEvent = "";
+	mNavMesh.clear();
+	reset();
 }
 
 CrowdAgent::~CrowdAgent()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	if(mNavMeshObject)
-	{
-		///remove from the NavMesh
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->removeCrowdAgent(mOwnerObject);
-	}
 }
 
 ComponentFamilyType CrowdAgent::familyType() const
@@ -82,7 +77,27 @@ bool CrowdAgent::initialize()
 					== std::string("true") ? true : false);
 	//set CrowdAgent parameters
 	//register to navmesh objectId
-	mNavMeshObjectId = mTmpl->parameter(std::string("add_to_navmesh"));
+	mNavMeshObjectId = ObjectId(mTmpl->parameter(std::string("add_to_navmesh")));
+	//move target (default: (0,0,0))
+	std::vector<std::string> targetStr = parseCompoundString(
+			mTmpl->parameter(std::string("move_target")), ',');
+	float target[3];
+	target[0] = target[1] = target[2] = 0.0;
+	for (unsigned int i = 0; (i < 3) and (i < targetStr.size()); ++i)
+	{
+		target[i] = strtof(targetStr[i].c_str(), NULL);
+	}
+	mMoveTarget = LPoint3f(target[0], target[1], target[2]);
+	//move velocity (default: (0,0,0))
+	std::vector<std::string> velocityStr = parseCompoundString(
+			mTmpl->parameter(std::string("move_velocity")), ',');
+	float velocity[3];
+	velocity[0] = velocity[1] = velocity[2] = 0.0;
+	for (unsigned int i = 0; (i < 3) and (i < velocityStr.size()); ++i)
+	{
+		velocity[i] = strtof(velocityStr[i].c_str(), NULL);
+	}
+	mMoveVelocity = LVector3f(velocity[0], velocity[1], velocity[2]);
 	//agent params
 	mAgentParams.maxAcceleration = (float) strtof(
 			mTmpl->parameter(std::string("max_acceleration")).c_str(), NULL);
@@ -106,224 +121,197 @@ bool CrowdAgent::initialize()
 	{
 		mAgentParams.obstacleAvoidanceType = 3;
 	}
+	//get ray mask
+	std::string rayMask = mTmpl->parameter(std::string("ray_mask"));
+	if (rayMask == std::string("all_on"))
+	{
+		mRayMask = BitMask32::all_on();
+	}
+	else if (rayMask == std::string("all_off"))
+	{
+		mRayMask = BitMask32::all_off();
+	}
+	else
+	{
+		uint32_t mask = (uint32_t) strtol(rayMask.c_str(), NULL, 0);
+		mRayMask.set_word(mask);
+	}
 	//
 	return result;
 }
 
 void CrowdAgent::onAddToObjectSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+	//set the bullet physics
+	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
+}
 
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+void CrowdAgent::onRemoveFromObjectCleanup()
+{
+	//
+	mNavMesh.clear();
+	reset();
 }
 
 void CrowdAgent::onAddToSceneSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
 	///1: get the input from xml
 	///2: add settings for CrowdAgent
 	///set params: already done
 	///set NavMesh object (if any)
-	mNavMeshObject = ObjectTemplateManager::
+	SMARTPTR(Object) navMeshObject = ObjectTemplateManager::
 			GetSingleton().getCreatedObject(mNavMeshObjectId);
 
-	if(mNavMeshObject)
+	///3: add to NavMesh update
+	if(navMeshObject)
 	{
-		///3: add to NavMesh
 		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, mNavMeshObject->getComponent(componentType()));
-		navMesh->addCrowdAgent(mOwnerObject);
+				DCAST(NavMesh, navMeshObject->getComponent(familyType()));
+		//
+		if(navMesh)
+		{
+			navMesh->addCrowdAgent(this);
+		}
 	}
+}
 
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+void CrowdAgent::onRemoveFromSceneCleanup()
+{
+	//lock (guard) the NavMesh static mutex
+	HOLD_MUTEX(NavMesh::getStaticMutex())
+
+	///Remove from NavMesh update (if previously added)
+	if(mNavMesh)
+	{
+		mNavMesh->removeCrowdAgent(this);
+	}
 }
 
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	mAgentParams = agentParams;
-	//request NavMesh (if any) to update params for this CrowdAgent
-	if (mNavMeshObject)
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
 	{
-		throw_event(mParamUpdateEvent, EventParameter(this),
-				EventParameter(NavMesh::UPDATE_PARAMS));
+		//lock (guard) the NavMesh static mutex
+		HOLD_MUTEX(NavMesh::getStaticMutex())
+
+		//request NavMesh (if any) to update params for this CrowdAgent
+		if (mNavMesh)
+		{
+			mNavMesh->setCrowdAgentParams(this, agentParams);
+		}
 	}
+	mAgentParams = agentParams;
 }
 
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	mMoveTarget = pos;
-	//request NavMesh (if any) to update move target for this CrowdAgent
-	if (mNavMeshObject)
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
 	{
-		throw_event(mParamUpdateEvent, EventParameter(this),
-				EventParameter(NavMesh::UPDATE_TARGET));
+		//lock (guard) the NavMesh static mutex
+		HOLD_MUTEX(NavMesh::getStaticMutex())
+
+		//request NavMesh (if any) to update move target for this CrowdAgent
+		if (mNavMesh)
+		{
+			mNavMesh->setCrowdAgentTarget(this, pos);
+		}
 	}
+	mMoveTarget = pos;
 }
 
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	{
+		//lock (guard) the NavMesh static mutex
+		HOLD_MUTEX(NavMesh::getStaticMutex())
+
+		//request NavMesh (if any) to update move velocity for this CrowdAgent
+		if (mNavMesh)
+		{
+			mNavMesh->setCrowdAgentVelocity(this, vel);
+		}
+	}
 	mMoveVelocity = vel;
-	//request NavMesh (if any) to update move velocity for this CrowdAgent
-	if (mNavMeshObject)
-	{
-		throw_event(mParamUpdateEvent, EventParameter(this),
-				EventParameter(NavMesh::UPDATE_VELOCITY));
-	}
 }
 
-#ifdef WITHCHARACTER
-void CrowdAgent::updateVel(float dt, const LPoint3f& pos, const LVector3f& vel)
-{
-	m_vel = RecastToLVecBase3f(v);
-	LVector3f direction = m_vel;
-	if (m_vel.length_squared() > 0.1)
-	{
-		//set linear velocity
-		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
-				m_vel, false);
-		//set angular velocity (in the x-y plane)
-		//0 <= A <= 180.0
-		direction.normalize();
-		float H = m_pandaNP.get_h();
-		float A = 57.295779513f * acos(direction.get_y());
-		float deltaAngle;
-		if (direction.get_x() <= 0.0)
-		{
-			if (H <= 0.0)
-			{
-				deltaAngle = -H + A - 180;
-			}
-			else
-			{
-				deltaAngle = (A <= H ? -H + A + 180 : -H + A - 180);
-			}
-		}
-		else
-		{
-			if (H >= 0.0)
-			{
-				deltaAngle = -H - A + 180;
-			}
-			else
-			{
-				deltaAngle = (A >= -H ? -H - A + 180 : -H - A - 180);
-			}
-		}
-		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_angular_movement(
-				deltaAngle);
-//		LPoint3f lookAtPos = RecastToLVecBase3f(p) - m_pandaNP.get_pos() - m_vel * 100000;
-//		m_pandaNP.heads_up(lookAtPos);
-		//get current vel
-		LVector3f currentVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
-		m_anims->get_anim(0)->set_play_rate(currentVel.length() / rateFactor);
-		m_oldPos = m_pandaNP.get_pos();
-//		m_anims->get_anim(0)->set_play_rate(m_vel.length() / rateFactor);
-		if (not m_anims->get_anim(0)->is_playing())
-		{
-			m_anims->get_anim(0)->loop(true);
-		}
-	}
-	else
-	{
-		DCAST(BulletCharacterControllerNode, m_pandaNP.node())->set_linear_movement(
-				LVector3f::zero(), false);
-		if (m_anims->get_anim(0)->is_playing())
-		{
-//			m_anims->get_anim(0)->pose(0);
-			m_anims->get_anim(0)->stop();
-		}
-	}
-
-}
-#else
 void CrowdAgent::updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
-	/*
 	//only for kinematic case
 	//raycast in the near of recast mesh:
-	//float rcConfig::detailSampleMaxError
 	LPoint3f kinematicPos;
-	if (vel.length_squared() > 0.1)
+	NodePath ownerObjectNP = mOwnerObject->getNodePath();
+	if (vel.length_squared() > 0.0)
 	{
 		switch (mMovType)
 		{
 			case RECAST:
-			mOwnerObject->getNodePath().set_pos(pos);
-			break;
+				ownerObjectNP.set_pos(pos);
+				break;
 			case KINEMATIC:
-			//set recast pos anyway
-			kinematicPos = pos;
-			//correct z
-			//ray down
-			m_result = m_world->ray_test_closest(kinematicPos + m_deltaRayOrig,
-					kinematicPos + m_deltaRayDown, m_rayMask);
-			if (m_result.has_hit())
-			{
-				//check if hit a triangle mesh
-				BulletShape* shape =
-				DCAST(BulletRigidBodyNode, m_result.get_node())->get_shape(0);
-				if (shape->is_of_type(BulletTriangleMeshShape::get_class_type()))
+				//set recast pos anyway
+				kinematicPos = pos;
+				//correct z
+				//ray down
+				mHitResult = mBulletWorld->ray_test_closest(kinematicPos + mDeltaRayOrig,
+						kinematicPos + mDeltaRayDown, mRayMask);
+				if (mHitResult.has_hit())
 				{
-					//physic mesh is under recast mesh
-					kinematicPos.set_z(m_result.get_hit_pos().get_z());
+					//check if hit a triangle mesh
+					BulletShape* shape =
+					DCAST(BulletRigidBodyNode, mHitResult.get_node())->get_shape(0);
+					if (shape and shape->is_of_type(BulletTriangleMeshShape::get_class_type()))
+					{
+						//physic mesh is under recast mesh
+						kinematicPos.set_z(mHitResult.get_hit_pos().get_z());
+					}
 				}
-			}
-			m_pandaNP.set_pos(kinematicPos);
-			break;
-			case RIGID:
-			DCAST(BulletSphericalConstraint, m_Cs)->set_pivot_b(pos);
+				ownerObjectNP.set_pos(kinematicPos);
 			break;
 			default:
 			break;
 		}
 		//
-		LPoint3f lookAtPos = m_pandaNP.get_pos() - vel * 100000;
-		m_pandaNP.heads_up(lookAtPos);
-		//get current vel
-		LVector3f currentVel = (m_pandaNP.get_pos() - m_oldPos) / dt;
-		m_anims->get_anim(0)->set_play_rate(currentVel.length() / rateFactor);
-		m_oldPos = m_pandaNP.get_pos();
-//		m_anims->get_anim(0)->set_play_rate(vel.length() / rateFactor);
-		if (not m_anims->get_anim(0)->is_playing())
+		LPoint3f lookAtPos = ownerObjectNP.get_pos() - vel * 100000;
+		ownerObjectNP.heads_up(lookAtPos);
+		//throw CrowdAgentStart event (if enabled)
+		if (mThrowEvents and (not mCrowdAgentStartSent))
 		{
-			m_anims->get_anim(0)->loop(true);
+			throw_event(std::string("CrowdAgentStart"),
+					EventParameter(this),
+					EventParameter(std::string(mOwnerObject->objectId())));
+			mCrowdAgentStartSent = true;
+			mCrowdAgentStopSent = false;
 		}
 	}
 	else
 	{
-		if (m_anims->get_anim(0)->is_playing())
+		//throw CrowdAgentStop event (if enabled)
+		if (mThrowEvents and (not mCrowdAgentStopSent))
 		{
-//			m_anims->get_anim(0)->pose(0);
-			m_anims->get_anim(0)->stop();
+			throw_event(std::string("CrowdAgentStop"),
+					EventParameter(this),
+					EventParameter(std::string(mOwnerObject->objectId())));
+			mCrowdAgentStopSent = true;
+			mCrowdAgentStartSent = false;
 		}
 	}
-	*/
 }
-#endif
 
 //TypedObject semantics: hardcoded
 TypeHandle CrowdAgent::_type_handle;

@@ -39,17 +39,15 @@ Model::Model()
 
 Model::Model(SMARTPTR(ModelTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"Model::Model: invalid GameSceneManager")
+
 	mTmpl = tmpl;
+	reset();
 }
 
 Model::~Model()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath.remove_node();
 }
 
 ComponentFamilyType Model::familyType() const
@@ -103,11 +101,11 @@ bool Model::initialize()
 			mTmpl->parameter(std::string("from_file")) == std::string("false") ?
 					false : true);
 	//get model
-	mModelName = mTmpl->parameter(std::string("model_file"));
+	mModelNameParam = mTmpl->parameter(std::string("model_file"));
 	//get more animations
-	mAnimFileList = mTmpl->parameterList(std::string("anim_files"));
+	mAnimFileListParam = mTmpl->parameterList(std::string("anim_files"));
 	//get model if procedurally generated
-	mModelType = mTmpl->parameter(std::string("model_type"));
+	mModelTypeParam = mTmpl->parameter(std::string("model_type"));
 	//get card parameters
 	mCardLeft = (float) strtof(
 			mTmpl->parameter(std::string("model_card_left")).c_str(), NULL);
@@ -146,10 +144,10 @@ void Model::onAddToObjectSetup()
 		parts.clear();
 		anims.clear();
 		//setup model (with possible animations)
-		//mModelName can have this form: [anim_name1@anim_name2@
+		//mModelNameParam can have this form: [anim_name1@anim_name2@
 		// ...@anim_nameN@]model_filename ([] means optional)
 		std::vector<std::string> animsFileNames = parseCompoundString(
-				mModelName, '@');
+				mModelNameParam, '@');
 		if (animsFileNames.empty())
 		{
 			animsFileNames.push_back("");
@@ -229,7 +227,7 @@ void Model::onAddToObjectSetup()
 
 			//setup more animations (if any)
 			std::list<std::string>::iterator iter;
-			for (iter = mAnimFileList.begin(); iter != mAnimFileList.end();
+			for (iter = mAnimFileListParam.begin(); iter != mAnimFileListParam.end();
 					++iter)
 			{
 				//any "anim_files" string is a "compound" one, i.e. could have the form:
@@ -298,7 +296,7 @@ void Model::onAddToObjectSetup()
 	{
 		//model is programmatically generated
 		//card (e.g. finite plane)
-		if (mModelType == std::string("card"))
+		if (mModelTypeParam == std::string("card"))
 		{
 			if ((mCardRight - mCardLeft) * (mCardTop - mCardBottom) == 0.0)
 			{
@@ -329,35 +327,26 @@ void Model::onAddToObjectSetup()
 	std::string name = COMPONENT_STANDARD_NAME;
 	mNodePath.set_name(name);
 
-	//set the node path of the object to the
-	//node path of this model
+	//set the object node path to this model of node path
+	mOldObjectNodePath = mOwnerObject->getNodePath();
 	mOwnerObject->setNodePath(mNodePath);
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
 }
 
-NodePath Model::getNodePath() const
+void Model::onRemoveFromObjectCleanup()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(mOldObjectNodePath);
 
-	return mNodePath;
-}
-
-void Model::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
+	//Remove node path
+	mNodePath.remove_node();
+	//
+	reset();
 }
 
 SMARTPTR(PartBundle)Model::getPartBundle() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mFirstPartBundle;
 }

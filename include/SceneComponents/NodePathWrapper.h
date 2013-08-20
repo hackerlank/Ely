@@ -42,11 +42,14 @@ class NodePathWrapperTemplate;
 class NodePathWrapper: public Component
 {
 protected:
-	friend class Object;
 	friend class NodePathWrapperTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
+	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	NodePathWrapper();
@@ -70,7 +73,9 @@ private:
 	NodePath mNodePath;
 
 	///The wrapped NodePath.
-	std::string mWrappedNodePath;
+	std::string mWrappedNodePathParam;
+	///Old owner object node path.
+	NodePath mOldObjectNodePath;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -99,6 +104,38 @@ private:
 };
 
 ///inline definitions
+
+inline void NodePathWrapper::reset()
+{
+	//
+	mNodePath = NodePath();
+	mWrappedNodePathParam = std::string("");
+	mOldObjectNodePath = NodePath();
+}
+
+inline void NodePathWrapper::onAddToSceneSetup()
+{
+}
+
+inline void NodePathWrapper::onRemoveFromSceneCleanup()
+{
+}
+
+inline NodePath NodePathWrapper::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void NodePathWrapper::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mNodePath = nodePath;
+}
 
 }  // namespace ely
 

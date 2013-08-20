@@ -69,33 +69,54 @@ private:
 	friend class ObjectTemplateManager;
 
 	/**
+	 * \brief Constructor.
+	 */
+	Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl);
+
+	/**
+	 * \brief Resets all object data members.
+	 */
+	void reset();
+
+	/**
 	 * \brief Adds a component to this object.
 	 *
-	 * It will add the component to the object, and if a component of
-	 * that family already existed it'll be replaced by this new component
-	 * (and its ownership released by the object).\n
-	 * \note When you add a component, its template should contain its
-	 * initialization parameters; this means that when you want to add
-	 * a component you should first prepare its template with
-	 * initialization parameter and then actually add the component.
+	 * It will add the component to the object.\n
 	 * @param component The new component to add.
-	 * @param existingObject False if this is an object under construction, true
-	 * if it is an already existing object.
-	 * @return SMARTPTR(NULL) if there wasn't a component of that family, otherwise
-	 * the previous component.
+	 * @param familyId The family type of the component.
+	 * @return True if successfully removed, false otherwise.
 	 */
-	SMARTPTR(Component) addComponent(SMARTPTR(Component) component,
-			bool existingObject=false);
+	bool addComponent(SMARTPTR(Component) component,
+			const ComponentFamilyType& familyId);
 
 	/**
 	 * \brief Removes a component from this object.
 	 *
-	 * It will remove the component from the object, and its ownership
-	 * released by the object.\n
+	 * It will remove the component from the object.\n
 	 * @param component The component to remove.
 	 * @return True if successfully removed, false otherwise.
 	 */
-	bool removeComponent(SMARTPTR(Component) component);
+	bool removeComponent(SMARTPTR(Component) component,
+			const ComponentFamilyType& familyId);
+
+	///List of all <family,component>s pair stored by insertion order.
+	typedef std::pair<const ComponentFamilyType, SMARTPTR(Component)> FamilyTypeComponentPair;
+	typedef std::list<FamilyTypeComponentPair> ComponentOrderedList;
+	/**
+	 * \brief Gets a reference to the components list.
+	 *
+	 * @return A reference to the components list.
+	 */
+	ComponentOrderedList& getComponents();
+
+	/**
+	 * \brief On remove Object cleanup.
+	 *
+	 * Gives an object the ability to perform the cleanup and any
+	 * required finalization before being definitively destroyed.\n
+	 * Called only by ObjectTemplateManager::destroyObject().\n
+	 */
+	void onRemoveObjectCleanup();
 
 	/**
 	 * \brief On addition to scene setup.
@@ -109,21 +130,24 @@ private:
 	 */
 	void onAddToSceneSetup();
 
-public:
 	/**
-	 * \brief Constructor.
+	 * \brief On remove from scene cleanup.
+	 *
+	 * Gives an object the ability to perform the
+	 * removing from scene cleanup and any required finalization.\n
+	 * Called only by ObjectTemplateManager::destroyObject().\n
+	 * \note this method is called by the object destruction thread,
+	 * i.e. when it is be publicly accessible, so other thread can access
+	 * the object during its execution, then it does need to hold the mutex.
 	 */
-	Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl);
+	void onRemoveFromSceneCleanup();
+
+public:
 
 	/**
 	 * \brief Destructor.
 	 */
 	virtual ~Object();
-
-	/**
-	 * \brief Clears the table of all components of this object.
-	 */
-	void clearComponents();
 
 	/**
 	 * \brief These methods will store/free, in an internal storage, the
@@ -147,7 +171,7 @@ public:
 	 * @return The component, or NULL if no component of that
 	 * family exists.
 	 */
-	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyID) const;
+	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyId) const;
 
 	/**
 	 * \brief Returns the number of components.
@@ -229,11 +253,24 @@ private:
 	///Unique identifier for this object (read only after creation).
 	ObjectId mObjectId;
 	///@{
-	///Table of all components indexed by component family type.
-	typedef std::map<const ComponentFamilyType, SMARTPTR(Component)> ComponentTable;
-	ComponentTable mComponents;
+	ComponentOrderedList mComponents;
+	class IsFamily
+	{
+		ComponentFamilyType mFamilyType;
+	public:
+		IsFamily(const ComponentFamilyType& familyType):mFamilyType(familyType)
+		{
+		}
+		~IsFamily()
+		{
+		}
+		bool operator()(const FamilyTypeComponentPair& familyComponentPair)
+		{
+			return (familyComponentPair.first == mFamilyType);
+		}
+	};
 	///@}
-	///Staedy flag: if this object doesn't move in the world.
+	///Steady flag: if this object doesn't move in the world.
 	///Various components can set or get this value to implement
 	///some optimization.
 	bool mIsSteady;
@@ -293,7 +330,7 @@ inline ObjectId Object::objectId() const
 inline NodePath Object::getNodePath() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -301,7 +338,7 @@ inline NodePath Object::getNodePath() const
 inline void Object::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mNodePath = nodePath;
 }
@@ -309,15 +346,20 @@ inline void Object::setNodePath(const NodePath& nodePath)
 inline Object::operator NodePath() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mNodePath;
+}
+
+inline Object::ComponentOrderedList& Object::getComponents()
+{
+	return mComponents;
 }
 
 inline unsigned int Object::numComponents() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return static_cast<unsigned int>(mComponents.size());
 }
@@ -335,7 +377,7 @@ inline ReMutex& Object::getMutex()
 inline ParameterTable Object::getStoredObjTmplParams() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mObjTmplParams;
 }
@@ -343,7 +385,7 @@ inline ParameterTable Object::getStoredObjTmplParams() const
 inline ParameterTableMap Object::getStoredCompTmplParams() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mCompTmplParams;
 }
@@ -352,7 +394,7 @@ inline void Object::storeParameters(const ParameterTable& objTmplParams,
 		const ParameterTableMap& compTmplParams)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mObjTmplParams = objTmplParams;
 	mCompTmplParams = compTmplParams;
@@ -361,7 +403,7 @@ inline void Object::storeParameters(const ParameterTable& objTmplParams,
 inline void Object::freeParameters()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mObjTmplParams.clear();
 	mCompTmplParams.clear();
@@ -370,9 +412,19 @@ inline void Object::freeParameters()
 inline bool Object::isSteady() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mIsSteady;
+}
+
+inline void Object::reset()
+{
+	//
+	mNodePath = NodePath();
+	mComponents.clear();
+	mIsSteady = false;
+	mInitializationLib = NULL;
+	mInitializationsLoaded = false;
 }
 
 }  // namespace ely

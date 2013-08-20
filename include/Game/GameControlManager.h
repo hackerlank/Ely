@@ -51,6 +51,17 @@ public:
 	virtual ~GameControlManager();
 
 	/**
+	 * \brief Adds (if not present) an control component to updating.
+	 * @param controlComp The control component.
+	 */
+	void addToControlUpdate(SMARTPTR(Component)controlComp);
+	/**
+	 * \brief Removes (if present) an control component from updating.
+	 * @param controlComp The control component.
+	 */
+	void removeFromControlUpdate(SMARTPTR(Component) controlComp);
+
+	/**
 	 * \brief Updates control components.
 	 *
 	 * Will be called automatically in a task.
@@ -58,13 +69,6 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
-
-	///Helper enum.
-	enum
-	{
-		ADDTOUPDATE,
-		REMOVEFROMUPDATE
-	};
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -84,25 +88,6 @@ private:
 	SMARTPTR(TaskInterface<GameControlManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
-
-	///@{
-	///Callbacks for components update adding/removing requests.
-	SMARTPTR(EventCallbackInterface<GameControlManager>::EventCallbackData) mControlCallbackData;
-public:
-	void handleUpdateRequest(const Event* event);
-	///@}
-
-private:
-	/**
-	 * \brief Adds (if not present) an control component to updating.
-	 * @param controlComp The control component.
-	 */
-	void addToControlUpdate(SMARTPTR(Component)controlComp);
-	/**
-	 * \brief Removes (if present) an control component from updating.
-	 * @param controlComp The control component.
-	 */
-	void removeFromControlUpdate(SMARTPTR(Component) controlComp);
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

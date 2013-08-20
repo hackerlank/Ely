@@ -32,11 +32,11 @@ InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"InstanceOfTemplate::InstanceOfTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"InstanceOfTemplate::InstanceOfTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"InstanceOfTemplate::InstanceOfTemplate: invalid GameSceneManager")
 	//
 	setParametersDefaults();
@@ -71,7 +71,7 @@ SMARTPTR(Component)InstanceOfTemplate::makeComponent(const ComponentId& compId)
 void InstanceOfTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

@@ -32,11 +32,11 @@ Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"Sound3dTemplate::Sound3dTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAudioManager::GetSingletonPtr(),
 			"Sound3dTemplate::Sound3dTemplate: invalid GameAudioManager")
 	//
 	setParametersDefaults();
@@ -71,12 +71,12 @@ SMARTPTR(Component) Sound3dTemplate::makeComponent(const ComponentId& compId)
 void Sound3dTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	//no mandatory parameters
+	mParameterTable.insert(ParameterNameValue("scene_root", "render"));
 }
 
 //TypedObject semantics: hardcoded

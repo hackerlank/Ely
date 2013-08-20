@@ -36,15 +36,15 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 		mApp(app), mWindow(window)
 {
 	//some preliminary checks
-	CHECKEXISTENCE(mApp, "Picker::Picker: invalid PandaFramework")
-	CHECKEXISTENCE(mWindow, "Picker::Picker: invalid WindowFramework")
+	CHECK_EXISTENCE(mApp, "Picker::Picker: invalid PandaFramework")
+	CHECK_EXISTENCE(mWindow, "Picker::Picker: invalid WindowFramework")
 	SMARTPTR(Object)render =
 	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("render");
-	CHECKEXISTENCE(render, "Picker::Picker: invalid render object")
+	CHECK_EXISTENCE(render, "Picker::Picker: invalid render object")
 	SMARTPTR(Object)camera =
 	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("camera");
-	CHECKEXISTENCE(camera, "Picker::Picker: invalid camera object")
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
+	CHECK_EXISTENCE(camera, "Picker::Picker: invalid camera object")
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
 			"invalid GamePhysicsManager")
 	//get bullet world reference
 	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
@@ -88,7 +88,7 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 Picker::~Picker()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mApp)
 	{
@@ -106,7 +106,7 @@ Picker::~Picker()
 void Picker::pickBody(const Event* event)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	// handle body picking
 	if (event->get_name() == mPickKeyOn)
@@ -206,7 +206,7 @@ void Picker::pickBody(const Event* event)
 AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	// handle picked body if any
 	if (not mCsPick.is_null())

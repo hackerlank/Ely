@@ -32,11 +32,11 @@ RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"RigidBodyTemplate::RigidBodyTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"RigidBodyTemplate::RigidBodyTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 			"RigidBodyTemplate::RigidBodyTemplate: invalid GamePhysicsManager")
 	//
 	setParametersDefaults();
@@ -71,7 +71,7 @@ SMARTPTR(Component)RigidBodyTemplate::makeComponent(const ComponentId& compId)
 void RigidBodyTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

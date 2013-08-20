@@ -84,11 +84,14 @@ class DriverTemplate;
 class Driver: public Component
 {
 protected:
-	friend class Object;
 	friend class DriverTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
+	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Driver();
@@ -176,7 +179,10 @@ private:
 	int mCentX, mCentY;
 	///@}
 	///Enabling flags.
-	bool mEnabled, mIsEnabled;
+	bool mStartEnabled, mEnabled;
+#ifdef ELY_THREAD
+	bool mDisabling;
+#endif
 
 #ifdef ELY_THREAD
 	///Actual transform state.
@@ -210,18 +216,47 @@ private:
 
 ///inline definitions
 
+inline void Driver::reset()
+{
+	//
+	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
+			mRollLeft = mRollRight = false;
+	//by default we consider mouse moved on every update, because
+	//we want mouse poll by default; this can be changed by calling
+	//the enabler (for example by an handler responding to mouse-move
+	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
+	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
+	mMouseMove = true;
+	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey,
+	mDownKey = mRollLeftKey = mRollRightKey = mMouseMoveKey = false;
+	mSpeedKey = std::string("shift");
+	mTrue = true;
+	mFalse = false;
+	mInvertedKeyboard = mInvertedMouse = mMouseEnabledH = mMouseEnabledP = false;
+	mFastFactor = 0.0;
+	mSpeedActualXYZ = LVecBase3f::zero();
+	mSpeedActualH = 0.0;
+	mMovSens = mRollSens = 0.0;
+	mSensX = mSensY = 0.0;
+	mCentX = mCentY = 0.0;
+	mStartEnabled = mEnabled = false;
+#ifdef ELY_THREAD
+	mDisabling = false;
+#endif
+}
+
 inline bool Driver::isEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mIsEnabled;
+	return mEnabled;
 }
 
 inline void Driver::enableForward(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mForwardKey)
 	{
@@ -232,7 +267,7 @@ inline void Driver::enableForward(bool enable)
 inline bool Driver::isForwardEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mForward;
 }
@@ -240,7 +275,7 @@ inline bool Driver::isForwardEnabled()
 inline void Driver::enableBackward(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mBackwardKey)
 	{
@@ -251,7 +286,7 @@ inline void Driver::enableBackward(bool enable)
 inline bool Driver::isBackwardEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mBackward;
 }
@@ -259,7 +294,7 @@ inline bool Driver::isBackwardEnabled()
 inline void Driver::enableStrafeLeft(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStrafeLeftKey)
 	{
@@ -270,7 +305,7 @@ inline void Driver::enableStrafeLeft(bool enable)
 inline bool Driver::isStrafeLeftEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mStrafeLeft;
 }
@@ -278,7 +313,7 @@ inline bool Driver::isStrafeLeftEnabled()
 inline void Driver::enableStrafeRight(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStrafeRightKey)
 	{
@@ -289,7 +324,7 @@ inline void Driver::enableStrafeRight(bool enable)
 inline bool Driver::isStrafeRightEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mStrafeRight;
 }
@@ -297,7 +332,7 @@ inline bool Driver::isStrafeRightEnabled()
 inline void Driver::enableUp(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mUpKey)
 	{
@@ -308,7 +343,7 @@ inline void Driver::enableUp(bool enable)
 inline bool Driver::isUpEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mUp;
 }
@@ -316,7 +351,7 @@ inline bool Driver::isUpEnabled()
 inline void Driver::enableDown(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mDownKey)
 	{
@@ -327,7 +362,7 @@ inline void Driver::enableDown(bool enable)
 inline bool Driver::isDownEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mDown;
 }
@@ -335,7 +370,7 @@ inline bool Driver::isDownEnabled()
 inline void Driver::enableRollLeft(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mRollLeftKey)
 	{
@@ -346,7 +381,7 @@ inline void Driver::enableRollLeft(bool enable)
 inline bool Driver::isRollLeftEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mRollLeft;
 }
@@ -354,7 +389,7 @@ inline bool Driver::isRollLeftEnabled()
 inline void Driver::enableRollRight(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mRollRightKey)
 	{
@@ -365,7 +400,7 @@ inline void Driver::enableRollRight(bool enable)
 inline bool Driver::isRollRightEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mRollRight;
 }
@@ -373,7 +408,7 @@ inline bool Driver::isRollRightEnabled()
 inline void Driver::enableMouseMove(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mMouseMoveKey)
 	{
@@ -384,7 +419,7 @@ inline void Driver::enableMouseMove(bool enable)
 inline bool Driver::isMouseMoveEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mMouseMove;
 }
@@ -392,7 +427,7 @@ inline bool Driver::isMouseMoveEnabled()
 inline void Driver::setLinearSpeed(const LVector3f& linearSpeed)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mSpeedActualXYZ = linearSpeed;
 }
@@ -400,7 +435,7 @@ inline void Driver::setLinearSpeed(const LVector3f& linearSpeed)
 inline LVector3f Driver::getLinearSpeed()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mSpeedActualXYZ;
 }
@@ -408,7 +443,7 @@ inline LVector3f Driver::getLinearSpeed()
 inline void Driver::setAngularSpeed(float angularSpeed)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mSpeedActualH = angularSpeed;
 }
@@ -416,7 +451,7 @@ inline void Driver::setAngularSpeed(float angularSpeed)
 inline float Driver::getAngularSpeed()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mSpeedActualH;
 }
@@ -424,7 +459,7 @@ inline float Driver::getAngularSpeed()
 inline void Driver::setFastFactor(float factor)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mFastFactor = factor;
 }
@@ -432,7 +467,7 @@ inline void Driver::setFastFactor(float factor)
 inline float Driver::getFastFactor()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mFastFactor;
 }

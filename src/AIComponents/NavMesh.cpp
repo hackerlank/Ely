@@ -33,7 +33,6 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -43,77 +42,17 @@ NavMesh::NavMesh()
 	// TODO Auto-generated constructor stub
 }
 
-NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl):
-	mGeom(NULL),
-	mCtx(new BuildContext),
-	mMeshName(""),
-	mNavMeshType(NULL)
+NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
-	mTmpl = tmpl;
-	mUpdateData.clear();
-	mUpdateTask.clear();
-	mAsyncSetupExecuting = false;
-#ifdef ELY_THREAD
-	//add the task chain on which navMeshAsyncSetup() will be running
-	mTaskChainName = mComponentId + "-taskChain";
-	AsyncTaskManager::get_global_ptr()->make_task_chain(mTaskChainName);
-	AsyncTaskManager::get_global_ptr()->
-			find_task_chain(mTaskChainName)->set_num_threads(1);
-	AsyncTaskManager::get_global_ptr()->
-				find_task_chain(mTaskChainName)->set_frame_sync(false);
-#endif
 
-#ifdef ELY_DEBUG
-	//reset the DebugDrawers
-	mDD = NULL;
-	mDDM = NULL;
-	mDebugRenderData.clear();
-	mDebugRenderTask.clear();
-#endif
+	mTmpl = tmpl;
+	reset();
 }
 
 NavMesh::~NavMesh()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//remove all handled CrowdAgents
-	std::list<SMARTPTR(CrowdAgent)> crowdAgents = mCrowdAgents;
-	std::list<SMARTPTR(CrowdAgent)>::const_iterator iter;
-	for (iter = crowdAgents.begin(); iter != crowdAgents.end();
-			++iter)
-	{
-		removeCrowdAgent((*iter)->getOwnerObject());
-	}
-
-	if (mCrowdAgentRequestData)
-	{
-		EventHandler::get_global_event_handler()->remove_hooks_with(
-				reinterpret_cast<void*>(mCrowdAgentRequestData.p()));
-	}
-	//check if AI manager exists
-	if (GameAIManager::GetSingletonPtr())
-	{
-		//remove from AI manager update
-		throw_event(std::string("GameAIManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameAIManager::REMOVEFROMUPDATE));
-	}
-
-	delete mCtx;
-
-#ifdef ELY_THREAD
-	//remove the task chain on which navMeshAsyncSetup() has run
-	AsyncTaskManager::get_global_ptr()->remove_task_chain(mTaskChainName);
-#endif
-
-#ifdef ELY_DEBUG
-	//delete the DebugDrawers
-	delete mDD;
-	delete mDDM;
-#endif
 }
 
 ComponentFamilyType NavMesh::familyType() const
@@ -132,11 +71,11 @@ bool NavMesh::initialize()
 	//set NavMesh parameters (store internally for future use)
 	//
 	std::string navMeshtypeStr = mTmpl->parameter(std::string("navmesh_type"));
-	if (navMeshtypeStr == "tile")
+	if (navMeshtypeStr == std::string("tile"))
 	{
 		mNavMeshTypeEnum = TILE;
 	}
-	else if (navMeshtypeStr == "obstacle")
+	else if (navMeshtypeStr == std::string("obstacle"))
 	{
 		mNavMeshTypeEnum = OBSTACLE;
 	}
@@ -148,16 +87,16 @@ bool NavMesh::initialize()
 			mTmpl->parameter(std::string("auto_setup"))
 					== std::string("false") ? false : true);
 	std::string movType = mTmpl->parameter(std::string("mov_type"));
-	if (movType == "kinematic")
+	if (movType == std::string("kinematic"))
 	{
-		CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+		CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 				"NavMesh::NavMesh: invalid GamePhysicsManager")
 		mMovType = KINEMATIC;
 	}
 #ifdef WITHCHARACTER
-	else if (movType == "character")
+	else if (movType == std::string("character"))
 	{
-		CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+		CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 				"NavMesh::NavMesh: invalid GamePhysicsManager")
 		mMovType = CHARACTER;
 	}
@@ -209,58 +148,101 @@ bool NavMesh::initialize()
 	//area-flags-cost settings
 	mAreaFlagsCostXmlParam = mTmpl->parameterList(std::string("area_flags_cost"));
 	//crowd include/exclude flags
-	mCrowdIncludeFlagsXmlParam = mTmpl->parameter(std::string("crowd_include_flags"));
-	mCrowdExcludeFlagsXmlParam = mTmpl->parameter(std::string("crowd_exclude_flags"));
+	mCrowdIncludeFlagsParam = mTmpl->parameter(std::string("crowd_include_flags"));
+	mCrowdExcludeFlagsParam = mTmpl->parameter(std::string("crowd_exclude_flags"));
 	//convex volumes
-	mConvexVolumeXmlParam = mTmpl->parameterList(std::string("convex_volume"));
+	mConvexVolumesParam = mTmpl->parameterList(std::string("convex_volume"));
 	//off mesh connections
-	mOffMeshConnectionXmlParam = mTmpl->parameterList(std::string("offmesh_connection"));
+	mOffMeshConnectionsParam = mTmpl->parameterList(std::string("offmesh_connection"));
 	//
 	return result;
 }
 
 void NavMesh::onAddToObjectSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
+	//setup the build context
+	mCtx = new BuildContext;
+}
+
+void NavMesh::onRemoveFromObjectCleanup()
+{
+	//cleanup NavMesh
+	navMeshReset();
+
+	//remove all handled CrowdAgents (if any)
+	std::list<SMARTPTR(CrowdAgent)> crowdAgents = mCrowdAgents;
+	std::list<SMARTPTR(CrowdAgent)>::const_iterator iter;
+	for (iter = crowdAgents.begin(); iter != crowdAgents.end();
+			++iter)
 	{
-		return;
+		removeCrowdAgent(*iter);
 	}
 
-	//Add event handler for update handling requests.
-	mCrowdAgentRequestEvent = mOwnerObject->objectId() + "CrowdAgentRequest";
-	mCrowdAgentRequestData.clear();
-	mCrowdAgentRequestData =
-			new EventCallbackInterface<NavMesh>::EventCallbackData(this,
-					&NavMesh::handleCrowdAgentRequest);
-	EventHandler::get_global_event_handler()->add_hook(mCrowdAgentRequestEvent,
-			&EventCallbackInterface<NavMesh>::eventCallbackFunction,
-			reinterpret_cast<void*>(mCrowdAgentRequestData.p()));
+#ifdef ELY_DEBUG
+	if (not mDebugCamera.is_empty())
+	{
+		//set the recast debug camera to empty node path
+		mDebugCamera = NodePath();
+		//remove the recast debug node path
+		mDebugNodePath.remove_node();
+	}
+	//delete the DebugDrawers
+	delete mDD;
+	delete mDDM;
+#endif
 
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+#ifdef ELY_THREAD
+	//remove the task chain on which navMeshAsyncSetup() has run
+	AsyncTaskManager::get_global_ptr()->remove_task_chain(mTaskChainName);
+#endif
+
+	//delete build context
+	delete mCtx;
+	//
+	reset();
+}
+
+void NavMesh::navMeshReset()
+{
+	//reset NavMeshTypeTool
+	mNavMeshType->setTool(NULL);
+
+	//delete old navigation mesh type
+	delete mNavMeshType;
+
+	//delete old model mesh
+	delete mGeom;
+
 }
 
 void NavMesh::onAddToSceneSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+#ifdef ELY_THREAD
+	//add the task chain on which navMeshAsyncSetup() will be running
+	mTaskChainName = mComponentId + "-taskChain";
+	AsyncTaskManager::get_global_ptr()->make_task_chain(mTaskChainName);
+	AsyncTaskManager::get_global_ptr()->
+			find_task_chain(mTaskChainName)->set_num_threads(1);
+	AsyncTaskManager::get_global_ptr()->
+				find_task_chain(mTaskChainName)->set_frame_sync(false);
+#endif
 
 	//set mOwnerObject's parent node path as reference
 	mReferenceNP = mOwnerObject->getNodePath().get_parent();
 
 #ifdef ELY_DEBUG
+	//reset the DebugDrawers
+	mDD = NULL;
+	mDDM = NULL;
+	mDebugRenderData.clear();
+	mDebugRenderTask.clear();
 	//set the recast debug node path as child of mReferenceNP node path
 	//set the recast debug camera to the first child of "camera" node path
 	SMARTPTR(Object) cameraDebug = ObjectTemplateManager::GetSingletonPtr()->
 			getCreatedObject("camera");
 	if (cameraDebug)
 	{
+		//add a debug node path
 		mDebugNodePath = mReferenceNP.attach_new_node("RecastDebugNodePath");
 		mDebugNodePath.set_bin("fixed", 10);
 		//by default mDebugNodePath is hidden
@@ -324,7 +306,7 @@ void NavMesh::onAddToSceneSetup()
 	std::vector<std::string>::const_iterator iterIEFStr;
 	std::vector<std::string> ieFlagsStr;
 	//1:iterate over include flags
-	ieFlagsStr = parseCompoundString(mCrowdIncludeFlagsXmlParam, '|');
+	ieFlagsStr = parseCompoundString(mCrowdIncludeFlagsParam, '|');
 	//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
 	int includeFlags = (ieFlagsStr.empty() ? NAVMESH_POLYFLAGS_WALK : 0x0);
 	for (iterIEFStr = ieFlagsStr.begin(); iterIEFStr != ieFlagsStr.end();
@@ -338,7 +320,7 @@ void NavMesh::onAddToSceneSetup()
 		includeFlags |= flag;
 	}
 	//2:iterate over exclude flags
-	ieFlagsStr = parseCompoundString(mCrowdExcludeFlagsXmlParam, '|');
+	ieFlagsStr = parseCompoundString(mCrowdExcludeFlagsParam, '|');
 	//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
 	int excludeFlags = (ieFlagsStr.empty() ? NAVMESH_POLYFLAGS_DISABLED : 0x0);
 	for (iterIEFStr = ieFlagsStr.begin(); iterIEFStr != ieFlagsStr.end();
@@ -353,8 +335,8 @@ void NavMesh::onAddToSceneSetup()
 	}
 	///get convex volumes
 	std::list<PointListArea> convexVolumes;
-	for (iterStr = mConvexVolumeXmlParam.begin();
-			iterStr != mConvexVolumeXmlParam.end(); ++iterStr)
+	for (iterStr = mConvexVolumesParam.begin();
+			iterStr != mConvexVolumesParam.end(); ++iterStr)
 	{
 		//any "convex_volume" string is a "compound" one, i.e. could have the form:
 		// "x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type"
@@ -396,8 +378,8 @@ void NavMesh::onAddToSceneSetup()
 	}
 	///get off mesh connections
 	std::list<PointPairBidir> offMeshConnections;
-	for (iterStr = mOffMeshConnectionXmlParam.begin();
-			iterStr != mOffMeshConnectionXmlParam.end(); ++iterStr)
+	for (iterStr = mOffMeshConnectionsParam.begin();
+			iterStr != mOffMeshConnectionsParam.end(); ++iterStr)
 	{
 		//any "offmesh_connection" string is a "compound" one, i.e. has the form:
 		// "xB,yB,zB&xE,yE,zE@bidirectional", with bidirectional=true by default.
@@ -414,7 +396,7 @@ void NavMesh::onAddToSceneSetup()
 			continue;
 		}
 		bool bidir = (
-				std::string(pointPairBidirStr[1]) == "false" ? false : true);
+				std::string(pointPairBidirStr[1]) == std::string("false") ? false : true);
 		//iterate over the first 2 points
 		//each point defaults to LPoint3f::zero()
 		PointPair pointPair(LPoint3f::zero(), LPoint3f::zero());
@@ -472,19 +454,30 @@ void NavMesh::onAddToSceneSetup()
 	}
 }
 
+void NavMesh::onRemoveFromSceneCleanup()
+{
+	//remove from AI manager update
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+}
+
 void NavMesh::navMeshSetup()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	//check if another setup is still executing
-	if(mAsyncSetupExecuting)
-	{
-		return;
-	}
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+#ifdef ELY_THREAD
 	//flag execution start
 	mAsyncSetupExecuting = true;
-	//create the task for executing navMeshAsyncSetup()
+#endif
+
+	//(re)-create the task for executing navMeshAsyncSetup()
+	//the task is executed only once and then removed from AsyncTaskManager
 	mUpdateData.clear();
 	mUpdateTask.clear();
 	mUpdateData = new TaskInterface<NavMesh>::TaskData(this,
@@ -504,31 +497,40 @@ void NavMesh::navMeshSetup()
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 }
 
+void NavMesh::navMeshCleanup()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//reset NavMeshTypeTool
+	mNavMeshType->setTool(NULL);
+
+	//delete old navigation mesh type
+	delete mNavMeshType;
+	mNavMeshType = NULL;
+}
+
 AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 {
-	///Remove from the AI manager update (if previously added)
-	{
-		//lock (guard) the GameAIManager mutex
-		HOLDMUTEX(GameAIManager::GetSingletonPtr()->getMutex())
-
-		//create manually the event for removing
-		SMARTPTR(Event)removeEvent = new Event("GameAIManager::handleUpdateRequest");
-		//param0
-		removeEvent->add_parameter(EventParameter(this));
-		//param1
-		removeEvent->add_parameter(
-				EventParameter(GameAIManager::REMOVEFROMUPDATE));
-		//call the callback synchronously
-		GameAIManager::GetSingletonPtr()->handleUpdateRequest(removeEvent);
-	}
+	//remove from AI manager update
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying, AsyncTask::DS_done)
 
 	//setup navigation mesh, otherwise the same
 	//operations must be performed by program.
-	PRINT("'" <<mOwnerObject->objectId()
-			<< "'::'" << mComponentId << "'::navMeshSetup");
+	PRINT(
+			"'" <<mOwnerObject->objectId() << "'::'" << mComponentId << "'::navMeshSetup");
 
 	///don't load model mesh more than once
 	if (not mGeom)
@@ -536,7 +538,8 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		///load the mesh from the owner node path
 		if (not loadModelMesh(mOwnerObject->getNodePath()))
 		{
-			throw GameException("NavMesh::navMeshSetup: cannot load mesh model");
+			throw GameException(
+					"NavMesh::navMeshSetup: cannot load mesh model");
 		}
 	}
 
@@ -611,7 +614,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 			continue;
 		}
 		int area = iterPLA->second;
-		if(area < 0)
+		if (area < 0)
 		{
 			area = NAVMESH_POLYAREA_GROUND;
 		}
@@ -641,8 +644,8 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
 	mNavMeshType->setTool(omcTool);
 	std::list<PointPairBidir>::iterator iterPPB;
-	for (iterPPB = mOffMeshConnections.begin(); iterPPB != mOffMeshConnections.end();
-			++iterPPB)
+	for (iterPPB = mOffMeshConnections.begin();
+			iterPPB != mOffMeshConnections.end(); ++iterPPB)
 	{
 		PointPair pointPair = iterPPB->first;
 		bool bidir = iterPPB->second;
@@ -656,13 +659,13 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		float recastPos[3];
 		LPoint3f refPos;
 		//compute and insert first recast point
-		refPos = mReferenceNP.get_relative_point(
-				mOwnerObject->getNodePath(), pointPair.first);
+		refPos = mReferenceNP.get_relative_point(mOwnerObject->getNodePath(),
+				pointPair.first);
 		LVecBase3fToRecast(refPos, recastPos);
 		mNavMeshType->getTool()->handleClick(NULL, recastPos, false);
 		//compute and insert second recast point
-		refPos = mReferenceNP.get_relative_point(
-				mOwnerObject->getNodePath(), pointPair.second);
+		refPos = mReferenceNP.get_relative_point(mOwnerObject->getNodePath(),
+				pointPair.second);
 		LVecBase3fToRecast(refPos, recastPos);
 		mNavMeshType->getTool()->handleClick(NULL, recastPos, false);
 	}
@@ -692,39 +695,83 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 			mCrowdExcludeFlags);
 
 	///<this code is executed only when in manual setup:
-	///add to recast previously added CrowdAgents
-	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
-	for (iterCA = mCrowdAgents.begin(); iterCA != mCrowdAgents.end();
-			++iterCA)
+	///add to recast previously added CrowdAgents.
+	//mCrowdAgents could be modified during iteration so use this pattern:
+	std::list<SMARTPTR(CrowdAgent)>::iterator iterCrowdAgents = mCrowdAgents.begin();
+	while (iterCrowdAgents != mCrowdAgents.end())
 	{
-		///(re-)add the CrowdAgent
-		addCrowdAgent((*iterCA)->getOwnerObject());
+		SMARTPTR(CrowdAgent) crowdAgent = *iterCrowdAgents;
+		//NavMesh object updates CrowdAgents pos/vel wrt its reference node path
+		LPoint3f pos;
+		if (mReferenceNP
+				!= crowdAgent->getOwnerObject()->getNodePath().get_parent())
+		{
+			//the CrowdAgent owner object is reparented to the NavMesh
+			//object reference node path
+			pos = crowdAgent->getOwnerObject()->getNodePath().get_pos(
+					mReferenceNP);
+			crowdAgent->getOwnerObject()->getNodePath().reparent_to(
+					mReferenceNP);
+			crowdAgent->getOwnerObject()->getNodePath().set_pos(pos);
+		}
+		else
+		{
+			pos = crowdAgent->getOwnerObject()->getNodePath().get_pos();
+		}
+		//get recast p (y-up)
+		float p[3];
+		LVecBase3fToRecast(pos, p);
+		//all crowd agent have the same dimensions: those
+		//registered into the current mNavMeshType
+		dtCrowdAgentParams ap = crowdAgent->getParams();
+		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+		//add recast agent and set the index of the crowd agent
+		crowdAgent->mAgentIdx = crowdTool->getState()->addAgent(p, &ap);
+		if (crowdAgent->mAgentIdx == -1)
+		{
+			///\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+			iterCrowdAgents = mCrowdAgents.erase(iterCrowdAgents);
+			continue;
+		}
+		//set the mov type of the crowd agent
+		crowdAgent->mMovType = mMovType;
+		//reset events' sending
+		crowdAgent->mCrowdAgentStartSent = false;
+		crowdAgent->mCrowdAgentStopSent = true;
+		//set physics parameters
+		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
+		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
+		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
+		crowdAgent->mHitResult = BulletClosestHitRayResult::empty();
 		///update move target
-		Event eventTarget(mCrowdAgentRequestEvent);
-		eventTarget.add_parameter(EventParameter(*iterCA));
-		eventTarget.add_parameter(UPDATE_TARGET);
-		handleCrowdAgentRequest(&eventTarget);
+		float target[3];
+		LVecBase3fToRecast(crowdAgent->getMoveTarget(), target);
+		crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
 		///update move velocity
-		Event eventVelocity(mCrowdAgentRequestEvent);
-		eventVelocity.add_parameter(EventParameter(*iterCA));
-		eventVelocity.add_parameter(UPDATE_VELOCITY);
-		handleCrowdAgentRequest(&eventVelocity);
+		float velocity[3];
+		LVecBase3fToRecast(crowdAgent->getMoveVelocity(), velocity);
+		crowdTool->getState()->setMoveVelocity(crowdAgent->mAgentIdx, velocity);
+		//increment iterator
+		++iterCrowdAgents;
 	}
 	///>
 
 #ifdef ELY_DEBUG
-	//delete old DebugDrawers
+	//delete old DebugDrawers (if any)
 	delete mDD;
 	delete mDDM;
 	//create new DebugDrawers
 	mDD = new DebugDrawPanda3d(mDebugNodePath);
 	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
 	///create the task for executing debug render
+	//the task is executed only once and then removed from AsyncTaskManager
 	mDebugRenderData.clear();
 	mDebugRenderTask.clear();
 	mDebugRenderData = new TaskInterface<NavMesh>::TaskData(this,
-			&NavMesh::debugRender);
-	mDebugRenderTask = new GenericAsyncTask(mComponentId + "NavMesh::debugRender",
+			&NavMesh::debugStaticRenderTask);
+	mDebugRenderTask = new GenericAsyncTask(
+			mComponentId + "NavMesh::debugRender",
 			&TaskInterface<NavMesh>::taskFunction,
 			reinterpret_cast<void*>(mDebugRenderData.p()));
 	//set sort/priority
@@ -739,28 +786,39 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	AsyncTaskManager::get_global_ptr()->add(mDebugRenderTask);
 #endif
 
-	///(Re-)Add to the AI manager update
-	throw_event(std::string("GameAIManager::handleUpdateRequest"),
-			EventParameter(this),
-			EventParameter(GameAIManager::ADDTOUPDATE));
-
+#ifdef ELY_THREAD
 	//flag execution end
 	mAsyncSetupExecuting = false;
+#endif
+
+	//Add to the AI manager update
+	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 	//
 	return AsyncTask::DS_done;
 }
 
 #ifdef ELY_DEBUG
-AsyncTask::DoneStatus NavMesh::debugRender(GenericAsyncTask* task)
+void NavMesh::debugStaticRender()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//debug render with DebugDrawPanda3d
 	mDD->reset();
 	mNavMeshType->handleRender(*mDD);
 	mNavMeshType->getInputGeom()->drawConvexVolumes(mDD);
 	mNavMeshType->getInputGeom()->drawOffMeshConnections(mDD, true);
+}
+
+AsyncTask::DoneStatus NavMesh::debugStaticRenderTask(GenericAsyncTask* task)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying, AsyncTask::DS_done)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting, AsyncTask::DS_done)
+
+	debugStaticRender();
 	//
 	return AsyncTask::DS_done;
 }
@@ -769,7 +827,16 @@ AsyncTask::DoneStatus NavMesh::debugRender(GenericAsyncTask* task)
 void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	float recastPos[3];
 	LVecBase3fToRecast(pos, recastPos);
@@ -788,7 +855,16 @@ void NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 void NavMesh::buildTile(const LPoint3f& pos)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -798,8 +874,7 @@ void NavMesh::buildTile(const LPoint3f& pos)
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::buildTile : " << pos);
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
@@ -807,7 +882,16 @@ void NavMesh::buildTile(const LPoint3f& pos)
 void NavMesh::removeTile(const LPoint3f& pos)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -817,8 +901,7 @@ void NavMesh::removeTile(const LPoint3f& pos)
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::removeTile : " << pos);
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
@@ -826,14 +909,22 @@ void NavMesh::removeTile(const LPoint3f& pos)
 void NavMesh::buildAllTiles()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
@@ -841,14 +932,22 @@ void NavMesh::buildAllTiles()
 void NavMesh::removeAllTiles()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
@@ -856,7 +955,16 @@ void NavMesh::removeAllTiles()
 dtTileCache* NavMesh::getTileCache()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,NULL)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,NULL)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType, NULL)
 
 	if (mNavMeshTypeEnum == OBSTACLE)
 	{
@@ -867,11 +975,22 @@ dtTileCache* NavMesh::getTileCache()
 
 void NavMesh::addObstacle(SMARTPTR(Object)object)
 {
+	RETURN_ON_COND(not object,)
+
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if ((mNavMeshTypeEnum == OBSTACLE) and
-	(not mReferenceNP.is_empty()) and object)
+			(not mReferenceNP.is_empty()) and object)
 	{
 		//get obstacle dimensions
 		NodePath objectNP = object->getNodePath();
@@ -898,16 +1017,26 @@ void NavMesh::addObstacle(SMARTPTR(Object)object)
 		<< mComponentId << "'::addObstacle: '" << object->objectId()
 		<< "' at pos: " << pos);
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
 
 void NavMesh::removeObstacle(SMARTPTR(Object)object)
 {
+	RETURN_ON_COND(not object,)
+
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if ((mNavMeshTypeEnum == OBSTACLE) and
 	(not mReferenceNP.is_empty()) and object)
@@ -930,8 +1059,7 @@ void NavMesh::removeObstacle(SMARTPTR(Object)object)
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 		<< mComponentId << "'::removeObstacle: '" << object->objectId() << "'");
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
@@ -939,7 +1067,16 @@ void NavMesh::removeObstacle(SMARTPTR(Object)object)
 void NavMesh::clearAllObstacles()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(mNavMeshType,)
 
 	if (mNavMeshTypeEnum == OBSTACLE)
 	{
@@ -947,17 +1084,13 @@ void NavMesh::clearAllObstacles()
 		PRINT("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::clearAllObstacles");
 #ifdef ELY_DEBUG
-		mDD->reset();
-		mNavMeshType->handleRender(*mDD);
+		debugStaticRender();
 #endif
 	}
 }
 
 bool NavMesh::loadModelMesh(NodePath model)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	bool result = true;
 	mGeom = new InputGeom;
 	mMeshName = model.get_name();
@@ -976,9 +1109,6 @@ bool NavMesh::loadModelMesh(NodePath model)
 
 void NavMesh::createNavMeshType(NavMeshType* navMeshType)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 	//delete old navigation mesh type
 	delete mNavMeshType;
 	//set the navigation mesh type
@@ -991,9 +1121,6 @@ void NavMesh::createNavMeshType(NavMeshType* navMeshType)
 
 bool NavMesh::buildNavMesh()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
 #ifdef ELY_DEBUG
 	mCtx->resetLog();
 #endif
@@ -1005,170 +1132,267 @@ bool NavMesh::buildNavMesh()
 	return result;
 }
 
-bool NavMesh::addCrowdAgent(SMARTPTR(Object)crowdAgentObject)
+bool NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	RETURN_ON_COND(not crowdAgent,false)
 
-	if(not crowdAgentObject)
+	int agentIdx;
+	//lock (guard) the static mutex
+	HOLD_MUTEX(mStaticMutex)
 	{
-		return false;
-	}
-	SMARTPTR(CrowdAgent)crowdAgent =
-			DCAST(CrowdAgent, crowdAgentObject->getComponent(componentType()));
-	if(not crowdAgent)
-	{
-		return false;
-	}
-	int agentIdx = -1;
-	//add to update list
-	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
-	//check if CrowdAgent has been already added or not
-	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(),	crowdAgent);
-	if(iterCA == mCrowdAgents.end())
-	{
-		//CrowdAgent needs to be added
-		//set CrowdAgent NavMesh reference
-		crowdAgent->setNavMeshObject(mOwnerObject);
-		//add CrowdAgent
-		mCrowdAgents.push_back(crowdAgent);
-	}
-	//check if there is a crowd tool, i.e. the
-	//recast nav mesh has been completely setup
-	//and check if crowdAgent has not been already added to recast
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if(crowdTool and (crowdAgent->getIdx() == -1))
-	{
-		//NavMesh object updates CrowdAgents pos/vel wrt its reference node path
-		LPoint3f pos;
-		if(mReferenceNP != crowdAgentObject->getNodePath().get_parent())
+		//lock (guard) the mutex
+		HOLD_MUTEX(mMutex)
+
+		//return if destroying
+		RETURN_ON_ASYNC_COND(mDestroying, false)
+
+		//return if crowdAgent belongs to some mesh
+		RETURN_ON_COND(crowdAgent->mNavMesh,false)
+
+		//add to update list
+		std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+		//check if crowdAgent has not been already added
+		iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+		if(iterCA == mCrowdAgents.end())
 		{
-			//the CrowdAgent owner object is reparented to the NavMesh
-			//object reference node path
-			pos = crowdAgentObject->getNodePath().get_pos(mReferenceNP);
-			crowdAgentObject->getNodePath().reparent_to(mReferenceNP);
-			crowdAgentObject->getNodePath().set_pos(pos);
+			//CrowdAgent needs to be added
+			//set CrowdAgent's NavMesh owner object
+			crowdAgent->mNavMesh = this;
+			//add CrowdAgent
+			mCrowdAgents.push_back(crowdAgent);
 		}
-		else
+
+		//return if a NavMesh setup is executing
+		//note: this check must be done before the next one
+		//because mNavMeshType could be in inconsistent state
+		//when a NavMesh setup is executing
+		RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,false)
+
+		//return if NavMesh has not been setup yet
+		RETURN_ON_COND(not mNavMeshType,false)
+
+		//there is a crowd tool because the recast nav mesh
+		//has been completely setup
+		//check if crowdAgent has not been already added to recast
+		CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+		if(crowdAgent->mAgentIdx == -1)
 		{
-			pos = crowdAgentObject->getNodePath().get_pos();
+			//NavMesh object updates CrowdAgents pos/vel wrt its reference node path
+			LPoint3f pos;
+			if(mReferenceNP != crowdAgent->getOwnerObject()->getNodePath().get_parent())
+			{
+				//the CrowdAgent owner object is reparented to the NavMesh
+				//object reference node path
+				pos = crowdAgent->getOwnerObject()->getNodePath().get_pos(mReferenceNP);
+				crowdAgent->getOwnerObject()->getNodePath().reparent_to(mReferenceNP);
+				crowdAgent->getOwnerObject()->getNodePath().set_pos(pos);
+			}
+			else
+			{
+				pos = crowdAgent->getOwnerObject()->getNodePath().get_pos();
+			}
+			//get recast p (y-up)
+			float p[3];
+			LVecBase3fToRecast(pos, p);
+			//all crowd agent have the same dimensions: those
+			//registered into the current mNavMeshType
+			dtCrowdAgentParams ap = crowdAgent->getParams();
+			ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+			ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+			//add recast agent and set the index of the crowd agent
+			crowdAgent->mAgentIdx = crowdTool->getState()->addAgent(p, &ap);
+			if(crowdAgent->mAgentIdx == -1)
+			{
+				//remove agent from update too
+//				mCrowdAgents.erase(
+//						find(mCrowdAgents.begin(), mCrowdAgents.end(),
+//								crowdAgent));
+				if(iterCA == mCrowdAgents.end())
+				{
+					mCrowdAgents.pop_back();
+				}
+				else
+				{
+					mCrowdAgents.erase(iterCA);
+				}
+				return false;
+			}
+			//set the mov type of the crowd agent
+			crowdAgent->mMovType = mMovType;
+			//reset events' sending
+			crowdAgent->mCrowdAgentStartSent = false;
+			crowdAgent->mCrowdAgentStopSent = true;
+			//set physics parameters
+			crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
+			crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
+			crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10*crowdAgent->mMaxError);
+			crowdAgent->mHitResult = BulletClosestHitRayResult::empty();
+			///update move target
+			float target[3];
+			LVecBase3fToRecast(crowdAgent->getMoveTarget(), target);
+			crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
+			///update move velocity
+			float velocity[3];
+			LVecBase3fToRecast(crowdAgent->getMoveVelocity(), velocity);
+			crowdTool->getState()->setMoveVelocity(crowdAgent->mAgentIdx, velocity);
 		}
-		//get recast p (y-up)
-		float p[3];
-		LVecBase3fToRecast(pos, p);
-		//all crowd agent have the same dimensions: those
-		//registered into the current mNavMeshType
-		dtCrowdAgentParams ap = crowdAgent->getParams();
-		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
-		//add recast agent
-		agentIdx = crowdTool->getState()->addAgent(p, &ap);
-		//set the index of the crowd agent
-		crowdAgent->setIdx(agentIdx);
-		//set the mov type of the crowd agent
-		crowdAgent->setMovType(mMovType);
-		//set the param update event of the crowd agent
-		crowdAgent->setParamUpdateEvent(mCrowdAgentRequestEvent);
+		agentIdx = crowdAgent->mAgentIdx;
 	}
 	//
 	return (agentIdx != -1);
 }
 
-void NavMesh::removeCrowdAgent(SMARTPTR(Object)crowdAgentObject)
+bool NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	RETURN_ON_COND(not crowdAgent, false)
 
-	if(not crowdAgentObject)
+	int agentIdx = 0;
+	//lock (guard) the static mutex
+	HOLD_MUTEX(mStaticMutex)
 	{
-		return;
+		//lock (guard) the mutex
+		HOLD_MUTEX(mMutex)
+
+		//return if destroying
+		RETURN_ON_ASYNC_COND(mDestroying, false)
+
+		//return if crowdAgent doesn't belong to any mesh
+		RETURN_ON_COND(not crowdAgent->mNavMesh, false)
+
+		//remove from update list
+		std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
+		//check if CrowdAgent has been already removed or not
+		iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
+		if(iterCA != mCrowdAgents.end())
+		{
+			//CrowdAgent needs to be removed
+			mCrowdAgents.erase(iterCA);
+			//set CrowdAgent NavMesh reference to NULL
+			crowdAgent->mNavMesh.clear();
+		}
+
+		//return if a NavMesh setup is executing
+		//note: this check must be done before the next one
+		//because mNavMeshType could be in inconsistent state
+		//when a NavMesh setup is executing
+		RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,false)
+
+		//return if NavMesh has not been setup yet
+		RETURN_ON_COND(not mNavMeshType,false)
+
+		//there is a crowd tool because the recast nav mesh
+		//has been completely setup
+		//and check if crowdAgent has been already added to recast
+		CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
+		if (crowdAgent->mAgentIdx != -1)
+		{
+			//remove recast agent
+			crowdTool->getState()->removeAgent(crowdAgent->mAgentIdx);
+			//set the index of the crowd agent to -1
+			crowdAgent->mAgentIdx = -1;
+		}
+		agentIdx = crowdAgent->mAgentIdx;
 	}
-	SMARTPTR(CrowdAgent)crowdAgent =
-			DCAST(CrowdAgent, crowdAgentObject->getComponent(componentType()));
-	if(not crowdAgent)
+	//
+	return (agentIdx == -1);
+}
+
+void NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
+		const dtCrowdAgentParams& params)
+{
+	RETURN_ON_COND(not crowdAgent,)
+
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(not mNavMeshType,)
+
+	//there is a crowd tool because the recast nav mesh
+	//has been completely setup
+	//check if crowdAgent has been already added to recast
+	if (crowdAgent->mAgentIdx != -1)
 	{
-		return;
-	}
-	//remove from update list
-	std::list<SMARTPTR(CrowdAgent)>::iterator iterCA;
-	//check if CrowdAgent has been already removed or not
-	iterCA = find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent);
-	if(iterCA != mCrowdAgents.end())
-	{
-		//CrowdAgent needs to be removed
-		mCrowdAgents.erase(iterCA);
-		//set CrowdAgent NavMesh reference to NULL
-		crowdAgent->setNavMeshObject(NULL);
-	}
-	//check if there is a crowd tool, i.e. the
-	//recast nav mesh has been completely setup
-	//and check if crowdAgent has been already added to recast
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdTool and (crowdAgent->getIdx() != -1))
-	{
-		//remove recast agent
-		crowdTool->getState()->removeAgent(crowdAgent->getIdx());
-		//set the param update event of the crowd agent to null
-		crowdAgent->setParamUpdateEvent("");
-		//set the index of the crowd agent to -1
-		crowdAgent->setIdx(-1);
+		//second parameter should be the parameter to update
+		int agentIdx = crowdAgent->mAgentIdx;
+		dtCrowdAgentParams ap = params;
+		//all crowd agent have the same dimensions: those
+		//registered into the current mNavMeshType
+		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+		dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
+				getState()->getCrowd()->updateAgentParameters(crowdAgent->mAgentIdx, &ap);
 	}
 }
 
-void NavMesh::handleCrowdAgentRequest(const Event* event)
+void NavMesh::setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
+		const LPoint3f& moveTarget)
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	RETURN_ON_COND(not crowdAgent,)
 
-	//The first parameter should be a CrowdAgent object
-	//and update only is done when there is a crowd tool
-	//and CrowdAgent has already been added to recast
-	SMARTPTR(CrowdAgent) crowdAgent = DCAST(CrowdAgent,
-			DCAST(Object, event->get_parameter(0).get_ptr())->getComponent(componentType()));
-	CrowdTool* crowdTool = dynamic_cast<CrowdTool*>(mNavMeshType->getTool());
-	if (crowdAgent and crowdTool and (crowdAgent->getIdx() != -1))
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(not mNavMeshType,)
+
+	//there is a crowd tool because the recast nav mesh
+	//has been completely setup
+	//check if crowdAgent has been already added to recast
+	if (crowdAgent->mAgentIdx != -1)
 	{
-		dtCrowd* crowd = crowdTool->getState()->getCrowd();
-		//second parameter should be the parameter to update
-		int param1 = event->get_parameter(1).get_int_value();
-		int agentIdx = crowdAgent->getIdx();
-		switch (param1) {
-			case UPDATE_PARAMS:
-			{
-				dtCrowdAgentParams ap = crowdAgent->getParams();
-				//all crowd agent have the same dimensions: those
-				//registered into the current mNavMeshType
-				ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-				ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
-				crowd->updateAgentParameters(agentIdx, &ap);
-			}
-				break;
-			case UPDATE_TARGET:
-			{
-				LPoint3f moveTarget = crowdAgent->getMoveTarget();
-				float p[3];
-				LVecBase3fToRecast(moveTarget, p);
-				crowdTool->getState()->setMoveTarget(agentIdx, p);
-			}
-				break;
-			case UPDATE_VELOCITY:
-			{
-				LVector3f moveVelocity = crowdAgent->getMoveVelocity();
-				float v[3];
-				LVecBase3fToRecast(moveVelocity, v);
-				crowdTool->getState()->setMoveVelocity(agentIdx, v);
-			}
-				break;
-			default:
-				break;
-		}
+		float p[3];
+		LVecBase3fToRecast(moveTarget, p);
+		dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
+				getState()->setMoveTarget(crowdAgent->mAgentIdx, p);
+	}
+}
+
+void NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
+		const LVector3f& moveVelocity)
+{
+	RETURN_ON_COND(not crowdAgent,)
+
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//return if another setup is executing
+	RETURN_ON_ASYNC_COND(mAsyncSetupExecuting,)
+
+	//return if NavMesh has not been setup yet
+	RETURN_ON_COND(not mNavMeshType,)
+
+	//there is a crowd tool because the recast nav mesh
+	//has been completely setup
+	//check if crowdAgent has been already added to recast
+	if (crowdAgent->mAgentIdx != -1)
+	{
+		float v[3];
+		LVecBase3fToRecast(moveVelocity, v);
+		dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
+				getState()->setMoveVelocity(crowdAgent->mAgentIdx, v);
 	}
 }
 
 void NavMesh::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
@@ -1188,7 +1412,7 @@ void NavMesh::update(void* data)
 	for (iter = mCrowdAgents.begin(); iter != mCrowdAgents.end();
 			++iter)
 	{
-		int agentIdx = (*iter)->getIdx();
+		int agentIdx = (*iter)->mAgentIdx;
 		//give CrowdAgent chance to update its pos/vel
 		const float* vel = crowd->getAgent(agentIdx)->vel;
 		const float* pos = crowd->getAgent(agentIdx)->npos;
@@ -1200,15 +1424,13 @@ void NavMesh::update(void* data)
 	mDDM->reset();
 	mNavMeshType->renderToolStates(*mDDM);
 #endif
-
 }
 
 #ifdef ELY_DEBUG
-
 NodePath NavMesh::getDebugNodePath() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mDebugNodePath;
 }
@@ -1216,9 +1438,12 @@ NodePath NavMesh::getDebugNodePath() const
 void NavMesh::debug(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mDebugNodePath.is_empty() or mAsyncSetupExecuting)
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	if (mDebugNodePath.is_empty())
 	{
 		return;
 	}
@@ -1237,9 +1462,11 @@ void NavMesh::debug(bool enable)
 		}
 	}
 }
-
 #endif
+
+ReMutex NavMesh::mStaticMutex;
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMesh::_type_handle;
+
 }  // namespace ely

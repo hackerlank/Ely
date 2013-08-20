@@ -35,41 +35,15 @@ CharacterController::CharacterController()
 
 CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl)
 {
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 			"CharacterController::CharacterController: invalid GamePhysicsManager")
+
 	mTmpl = tmpl;
-	mForward = false;
-	mBackward = false;
-	mUp = false;
-	mDown = false;
-	mStrafeLeft = false;
-	mStrafeRight = false;
-	mRollLeft = false;
-	mRollRight = false;
-	mJump = false;
-	//reset events' sending
-	mOnGroundSent = false;
-	mOnAirSent = false;
+	reset();
 }
 
 CharacterController::~CharacterController()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//check if game physics manager exists
-	if (GamePhysicsManager::GetSingletonPtr())
-	{
-		//remove from the physics manager update
-		throw_event(std::string("GamePhysicsManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GamePhysicsManager::REMOVEFROMUPDATE));
-		//remove character controller from the physics world
-		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-				DCAST(TypedObject, mCharacterController));
-	}
-	//Remove node path
-	mNodePath.remove_node();
 }
 
 ComponentFamilyType CharacterController::familyType() const
@@ -283,12 +257,13 @@ void CharacterController::onAddToObjectSetup()
 	//set the control parameters
 	setControlParameters();
 
+	//create a node path for the character controller
+	mNodePath = NodePath(mCharacterController);
+
 	//attach it to Bullet World
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
 			mCharacterController);
 
-	//create a node path for the character controller
-	mNodePath = NodePath(mCharacterController);
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
 
@@ -305,21 +280,55 @@ void CharacterController::onAddToObjectSetup()
 
 	//set this character controller node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
-	//Add to the physics manager update
-	throw_event(std::string("GamePhysicsManager::handleUpdateRequest"),
-			EventParameter(this),
-			EventParameter(GamePhysicsManager::ADDTOUPDATE));
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
 }
 
+void CharacterController::onRemoveFromObjectCleanup()
+{
+	NodePath oldObjectNodePath;
+	//set the object node path to the first child of rigid body's one (if any)
+	if(mNodePath.get_num_children() > 0)
+	{
+		oldObjectNodePath = mNodePath.get_child(0);
+		//detach the object node path from the rigid body's one
+		oldObjectNodePath.detach_node();
+	}
+	else
+	{
+		oldObjectNodePath = NodePath();
+	}
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(oldObjectNodePath);
+
+	//check if game physics manager exists
+	GamePhysicsManager* physicsMgrPtr = GamePhysicsManager::GetSingletonPtr();
+	if (physicsMgrPtr)
+	{
+		//remove character controller from the physics world
+		physicsMgrPtr->bulletWorld()->remove(DCAST(TypedObject, mCharacterController));
+	}
+
+	//Remove node path
+	mNodePath.remove_node();
+	//
+	reset();
+}
+
+void CharacterController::onAddToSceneSetup()
+{
+	//Add to the physics manager update
+	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
+}
+
+void CharacterController::onRemoveFromSceneCleanup()
+{
+	//remove from the physics manager update
+	GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
+}
 
 void CharacterController::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
@@ -395,22 +404,6 @@ void CharacterController::update(void* data)
 			mOnGroundSent = false;
 		}
 	}
-}
-
-NodePath CharacterController::getNodePath() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void CharacterController::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
 }
 
 SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeType shapeType)

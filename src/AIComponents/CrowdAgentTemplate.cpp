@@ -24,6 +24,7 @@
 #include "AIComponents/CrowdAgentTemplate.h"
 #include "AIComponents/CrowdAgent.h"
 #include "Game/GameAIManager.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
@@ -32,12 +33,14 @@ CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GameAIManager")
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GamePhysicsManager")
 	//
 	setParametersDefaults();
 }
@@ -71,13 +74,15 @@ SMARTPTR(Component)CrowdAgentTemplate::makeComponent(const ComponentId& compId)
 void CrowdAgentTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
 	mParameterTable.insert(ParameterNameValue("add_to_navmesh", ""));
+	mParameterTable.insert(ParameterNameValue("move_target", "0.0,0.0,0.0"));
+	mParameterTable.insert(ParameterNameValue("move_velocity", "0.0,0.0,0.0"));
 	mParameterTable.insert(ParameterNameValue("max_acceleration", "8.0"));
 	mParameterTable.insert(ParameterNameValue("max_speed", "3.5"));
 	mParameterTable.insert(ParameterNameValue("collision_query_range", "12.0"));
@@ -85,6 +90,7 @@ void CrowdAgentTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("separation_weight", "2.0"));
 	mParameterTable.insert(ParameterNameValue("update_flags", "0x1b"));
 	mParameterTable.insert(ParameterNameValue("obstacle_avoidance_type", "3"));
+	mParameterTable.insert(ParameterNameValue("ray_mask", "all_on"));
 }
 
 //TypedObject semantics: hardcoded

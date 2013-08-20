@@ -82,12 +82,14 @@ class RigidBodyTemplate;
 class RigidBody: public Component
 {
 protected:
-	friend class Object;
 	friend class RigidBodyTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	RigidBody();
@@ -197,6 +199,48 @@ private:
 };
 
 ///inline definitions
+
+inline void RigidBody::reset()
+{
+	//
+	mNodePath = NodePath();
+	mRigidBodyNode.clear();
+	mBodyMass = mBodyFriction = mBodyRestitution = 0.0;
+	mBodyType = DYNAMIC;
+	mShapeType = GamePhysicsManager::SPHERE;
+	mShapeSize = GamePhysicsManager::MEDIUM;
+	mCollideMask = BitMask32::all_off();
+	mCcdMotionThreshold = mCcdSweptSphereRadius = 0.0;
+	mCcdEnabled = false;
+	mModelDims = LVector3::zero();
+	mModelRadius = 0.0;
+	mUseShapeOfId = ObjectId();
+	mModelDeltaCenter = LVector3::zero();
+	mAutomaticShaping = false;
+	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
+	mHeightfieldFile = Filename();
+	mUpAxis = Z_up;
+}
+
+inline void RigidBody::onRemoveFromSceneCleanup()
+{
+}
+
+inline NodePath RigidBody::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void RigidBody::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mNodePath = nodePath;
+}
 
 }  // namespace ely
 

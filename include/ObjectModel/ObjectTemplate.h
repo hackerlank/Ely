@@ -248,7 +248,7 @@ struct idIsEqualTo
 inline ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mComponentTemplates;
 }
@@ -256,7 +256,7 @@ inline ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplat
 inline ParameterTable ObjectTemplate::getParameterTable() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mParameterTable;
 }

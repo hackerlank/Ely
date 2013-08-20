@@ -72,11 +72,14 @@ class ActivityTemplate;
 class Activity: public Component
 {
 protected:
-	friend class Object;
 	friend class ActivityTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
+	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Activity();
@@ -159,6 +162,22 @@ private:
 };
 
 ///inline definitions
+
+inline void Activity::reset()
+{
+	mFSM.cleanup();
+	mFromToFunctionSet.clear();
+	mTransitionLib = NULL;
+	mTransitionsLoaded = false;
+}
+
+inline void Activity::onAddToSceneSetup()
+{
+}
+
+inline void Activity::onRemoveFromSceneCleanup()
+{
+}
 
 }  // namespace ely
 

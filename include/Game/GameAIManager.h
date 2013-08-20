@@ -52,6 +52,17 @@ public:
 	virtual ~GameAIManager();
 
 	/**
+	 * \brief Adds (if not present) an AI component to updating.
+	 * @param aiComp The AI component.
+	 */
+	void addToAIUpdate(SMARTPTR(Component)aiComp);
+	/**
+	 * \brief Removes (if present) an AI component from updating.
+	 * @param aiComp The AI component.
+	 */
+	void removeFromAIUpdate(SMARTPTR(Component) aiComp);
+
+	/**
 	 * \brief Gets a reference to the AIWorld.
 	 * @return The AIWorld.
 	 */
@@ -65,13 +76,6 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
-
-	///Helper enum.
-	enum
-	{
-		ADDTOUPDATE,
-		REMOVEFROMUPDATE
-	};
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -94,25 +98,6 @@ private:
 	SMARTPTR(TaskInterface<GameAIManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
-
-	///@{
-	///Callbacks for components update adding/removing requests.
-	SMARTPTR(EventCallbackInterface<GameAIManager>::EventCallbackData) mAICallbackData;
-public:
-	void handleUpdateRequest(const Event* event);
-	///@}
-
-private:
-	/**
-	 * \brief Adds (if not present) an AI component to updating.
-	 * @param aiComp The AI component.
-	 */
-	void addToAIUpdate(SMARTPTR(Component)aiComp);
-	/**
-	 * \brief Removes (if present) an AI component from updating.
-	 * @param aiComp The AI component.
-	 */
-	void removeFromAIUpdate(SMARTPTR(Component) aiComp);
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

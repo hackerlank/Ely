@@ -27,6 +27,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include <DetourCrowd.h>
+#include <bulletWorld.h>
+#include <bulletClosestHitRayResult.h>
 
 namespace ely
 {
@@ -37,11 +39,8 @@ class NavMesh;
 ///Agent movement type.
 enum AgentMovType
 {
-#ifndef WITHCHARACTER
-	RECAST, KINEMATIC
-#else
-	CHARACTER
-#endif
+	RECAST,
+	KINEMATIC
 };
 
 /**
@@ -52,13 +51,18 @@ enum AgentMovType
  * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
  * This component should be associated to a "Scene" component.\n
- * \note the owner object of this component will be reparented, if necessary,
- * to the same reference node (i.e. parent) of the NavMesh object
- * to which it is added.
+ * Ife enabled, this component will throw a "CrowdAgentStart" event on
+ * starting to move, and a "CrowdAgentStop" event on stopping to move. The
+ * second argument of both is a reference to the owner object.\n
+ * \note the owner object of this component will be reparented (if necessary)
+ * when added to a NavMesh, to the same reference node (i.e. parent) of
+ * the NavMesh owner object.
  *
  * XML Param(s):
  * - "throw_events"						|single|"false"
  * - "add_to_navmesh"					|single|""
+ * - "move_target";						|single|"0.0,0.0,0.0"
+ * - "move_velocity";					|single|"0.0,0.0,0.0"
  * - "max_acceleration";				|single|"8.0"
  * - "max_speed"						|single|"3.5"
  * - "collision_query_range"			|single|"12.0" (* NavMesh::agent_radius)
@@ -66,30 +70,20 @@ enum AgentMovType
  * - "separation_weight" 				|single|"2.0"
  * - "update_flags"						|single|"0x1b"
  * - "obstacle_avoidance_type"			|single|"3" (0,1,2,3)
+ * - "ray_mask"							|single|"all_on"
  */
 class CrowdAgent: public Component
 {
 protected:
-	friend class Object;
 	friend class CrowdAgentTemplate;
 	friend class NavMesh;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
-
-	/**
-	 * \name Private getters/setters of NavMesh data.
-	 *
-	 * Called only by NavMesh methods: there is no need
-	 * to hold component mutex.
-	 */
-	///@{
-	void setMovType(AgentMovType movType);
-	void setIdx(int idx);
-	int getIdx();
-	void setNavMeshObject(SMARTPTR(Object) navMeshObject);
-	///@}
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	CrowdAgent();
@@ -109,17 +103,13 @@ public:
 	LPoint3f getMoveTarget();
 	void setMoveVelocity(const LVector3f& vel);
 	LVector3f getMoveVelocity();
-	//update flags
-	void setParamUpdateEvent(const std::string& paramUpdateEvent);
 	///@}
 
 private:
 
-	///Throwing events.
-	bool mThrowEvents;
 	///The NavMesh owner object.
-	SMARTPTR(Object) mNavMeshObject;
-	std::string mNavMeshObjectId;
+	SMARTPTR(NavMesh) mNavMesh;
+	ObjectId mNavMeshObjectId;
 	///The movement type.
 	AgentMovType mMovType;
 	///The CrowdAgent index.
@@ -127,22 +117,18 @@ private:
 	///The associated dtCrowdAgent data.
 	///@{
 	dtCrowdAgentParams mAgentParams;
-	std::string mParamUpdateEvent;
 	LPoint3f mMoveTarget;
 	LVector3f mMoveVelocity;
 	///@}
-
-	///NavMesh is a friend only for calling these methods.
-	friend NavMesh;
 	/**
 	 * \brief Physics data.
 	 */
 	///@{
-//	BulletWorld* m_world;
-	float m_maxError;
-	LVector3f m_deltaRayDown, m_deltaRayOrig;
-//	BulletClosestHitRayResult m_result;
-	BitMask32 m_rayMask;
+	SMARTPTR(BulletWorld) mBulletWorld;
+	float mMaxError;
+	LVector3f mDeltaRayDown, mDeltaRayOrig;
+	BulletClosestHitRayResult mHitResult;
+	BitMask32 mRayMask;
 	///@}
 	/**
 	 * \brief Updates position/velocity/orientation of the controlled object.
@@ -152,11 +138,10 @@ private:
 	 * @param pos The new position.
 	 * @param vel The new velocity.
 	 */
-#ifdef WITHCHARACTER
-	void updateVel(float dt, const LPoint3f& pos, const LVector3f& vel);
-#else
 	void updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel);
-#endif
+
+	///Throwing events.
+	bool mThrowEvents, mCrowdAgentStartSent, mCrowdAgentStopSent;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -186,30 +171,27 @@ private:
 
 ///inline definitions
 
-inline int CrowdAgent::getIdx()
+inline void CrowdAgent::reset()
 {
-	return mAgentIdx;
-}
-
-inline void CrowdAgent::setIdx(int idx)
-{
-	mAgentIdx = idx;
-}
-
-inline void CrowdAgent::setMovType(AgentMovType movType)
-{
-	mMovType = movType;
-}
-
-inline void CrowdAgent::setNavMeshObject(SMARTPTR(Object)navMeshObject)
-{
-	mNavMeshObject = navMeshObject;
+	//
+	mNavMeshObjectId = ObjectId();
+	mMovType = RECAST;
+	mAgentIdx = -1;
+	mAgentParams = dtCrowdAgentParams();
+	mMoveTarget = LPoint3f::zero();
+	mMoveVelocity = LVector3f::zero();
+	mBulletWorld.clear();
+	mMaxError = 0.0;
+	mDeltaRayDown = mDeltaRayOrig=LVector3f::zero();
+	mHitResult = BulletClosestHitRayResult::empty();
+	mRayMask = BitMask32::all_off();
+	mThrowEvents = mCrowdAgentStartSent = mCrowdAgentStopSent = false;
 }
 
 inline dtCrowdAgentParams CrowdAgent::getParams()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAgentParams;
 }
@@ -217,7 +199,7 @@ inline dtCrowdAgentParams CrowdAgent::getParams()
 inline LPoint3f CrowdAgent::getMoveTarget()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mMoveTarget;
 }
@@ -225,14 +207,9 @@ inline LPoint3f CrowdAgent::getMoveTarget()
 inline LVector3f CrowdAgent::getMoveVelocity()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mMoveVelocity;
-}
-
-inline void CrowdAgent::setParamUpdateEvent(const std::string& paramUpdateEvent)
-{
-	mParamUpdateEvent = paramUpdateEvent;
 }
 
 }  // namespace ely

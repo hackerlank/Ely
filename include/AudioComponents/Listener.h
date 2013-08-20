@@ -28,6 +28,7 @@
 #include <lpoint3.h>
 #include <nodePath.h>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 
 namespace ely
 {
@@ -37,17 +38,19 @@ class ListenerTemplate;
  * \brief Component manipulating the listener for 3d sounds.
  *
  * XML Param(s):
- * - None
+ * - "scene_root" 			|single|"render"
  */
 class Listener: public Component
 {
 protected:
-	friend class Object;
 	friend class ListenerTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Listener();
@@ -76,6 +79,7 @@ public:
 private:
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
+	ObjectId mSceneRootId;
 	///Sounds' characteristics.
 	LPoint3 mPosition;
 
@@ -106,6 +110,14 @@ private:
 };
 
 ///inline definitions
+
+inline void Listener::reset()
+{
+	//
+	mSceneRoot = NodePath();
+	mSceneRootId = ObjectId();
+	mPosition = LPoint3::zero();
+}
 
 }  // namespace ely
 

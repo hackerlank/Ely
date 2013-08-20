@@ -32,11 +32,11 @@ ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"ListenerTemplate::ListenerTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"ListenerTemplate::ListenerTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAudioManager::GetSingletonPtr(),
 			"ListenerTemplate::ListenerTemplate: invalid GameAudioManager")
 	//
 	setParametersDefaults();
@@ -71,12 +71,12 @@ SMARTPTR(Component)ListenerTemplate::makeComponent(const ComponentId& compId)
 void ListenerTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	//no mandatory parameters
+	mParameterTable.insert(ParameterNameValue("scene_root", "render"));
 }
 
 //TypedObject semantics: hardcoded

@@ -32,6 +32,8 @@ namespace ely
 {
 class SteeringTemplate;
 
+class AICharacterRef;
+
 /**
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
@@ -63,12 +65,14 @@ class SteeringTemplate;
 class Steering: public Component
 {
 protected:
-	friend class Object;
 	friend class SteeringTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Steering();
@@ -87,14 +91,6 @@ public:
 	virtual void update(void* data);
 
 	/**
-	 * \name Gets the node path of the designed target object.
-	 */
-	///@{
-	NodePath getTargetNodePath(const ObjectId& target);
-	NodePath getTargetNodePath(CSMARTPTR(Object) target);
-	///@}
-
-	/**
 	 * \name Enabling/disabling.
 	 * \brief Enables/disables this component.
 	 */
@@ -108,20 +104,21 @@ public:
 	 * \brief Returns a reference to the underlined AICharacter.
 	 * @return A reference to the underlined AICharacter.
 	 */
-	AICharacter* const getAiCharacter() const;
+	SMARTPTR(AICharacterRef) getAiCharacter() const;
 
 private:
 	///The AICharacter associated to this Steering.
-	AICharacter* mAICharacter;
+	SMARTPTR(AICharacterRef) mAICharacter;
 	///@{
 	///Enabling flags.
-	bool mEnabled, mIsEnabled;
+	bool mStartEnabled, mEnabled;
+#ifdef ELY_THREAD
+	bool mDisabling;
+#endif
 	///Fixed parameters.
 	float mMass, mMovtForce, mMaxForce;
-	std::string mType;
+	std::string mTypeParam;
 	///@}
-	///The pointer to the real update member function.
-	void (Steering::*mUpdatePtr)(float);
 	///@{
 	///Steered character controller items.
 	SMARTPTR(BulletWorld) mWorld;
@@ -158,6 +155,8 @@ private:
 	///@{
 	void updateNodePath(float dt);
 	void updateController(float dt);
+	///The pointer to the real update member function.
+	void (Steering::*mUpdatePtr)(float);
 	///@}
 
 	///Throwing events.
@@ -189,18 +188,81 @@ private:
 
 };
 
+/**
+ * \brief AICharacter class with possibility to be reference counted.
+ */
+class AICharacterRef: public AICharacter, public TypedWritableReferenceCount
+{
+public:
+	AICharacterRef(const std::string& name, NodePath model_np,
+			double mass, double movt_force, double max_force);
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedObject::init_type();
+		register_type(_type_handle, "AICharacterRef",
+				TypedObject::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+};
+
 ///inline definitions
+
+inline void Steering::reset()
+{
+	//
+	mAICharacter.clear();
+	mStartEnabled = mEnabled = false;
+#ifdef ELY_THREAD
+	mDisabling = false;
+#endif
+	mMass = mMovtForce = mMaxForce;
+	mTypeParam = std::string("");
+	mWorld.clear();
+	mCharacterController.clear();
+	mMovRotEnabled = mCurrentIsLocal = false;
+	_steering = NULL;
+	mObstacleMaxDistanceFraction = mObstacleMaxDist = mObstacleMaxDistSquared = 0.0;
+	mObstacleHitMask = BitMask32::all_off();
+	mOldHitNormal = LVector3f::zero();
+	mHitObstacle = NodePath();
+	mUpdatePtr = NULL;
+	mThrowEvents = mSteeringForceOnSent = mSteeringForceOffSent = false;
+}
 
 inline bool Steering::isEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mIsEnabled;
+	return mEnabled;
 }
 
-inline AICharacter* const Steering::getAiCharacter() const
+inline SMARTPTR(AICharacterRef) Steering::getAiCharacter() const
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,NULL)
+
 	return mAICharacter;
 }
 

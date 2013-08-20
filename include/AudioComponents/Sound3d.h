@@ -29,7 +29,9 @@
 #include <lpoint3.h>
 #include <nodePath.h>
 #include <list>
+#include <cfloat>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 
 namespace ely
 {
@@ -47,17 +49,21 @@ class Sound3dTemplate;
  * All updates is done wrt scene root (e.g. render).
  *
  * XML Param(s):
- * - "sound_files" 		|multiple|no default (each specified as "sound_name@sound_file")
+ * - "scene_root" 			|single|"render"
+ * - "sound_files" 			|multiple|no default (each specified as
+ * "sound_name@sound_file")
  */
 class Sound3d: public Component
 {
 protected:
-	friend class Object;
 	friend class Sound3dTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Sound3d();
@@ -151,13 +157,14 @@ public:
 private:
 	///The root of the scene (e.g. render)
 	NodePath mSceneRoot;
+	ObjectId mSceneRootId;
 	///The set of sounds attached to this component.
 	SoundTable mSounds;
 	/**
 	 * \name Main parameters.
 	 */
 	///@{
-	std::list<std::string> mSoundFileList;
+	std::list<std::string> mSoundFileListParam;
 	///@}
 
 	///@{
@@ -194,10 +201,22 @@ private:
 
 ///inline definitions
 
+inline void Sound3d::reset()
+{
+	//
+	mSceneRoot = NodePath();
+	mSceneRootId = ObjectId();
+	mSounds.clear();
+	mSoundFileListParam.clear();
+	mMinDist = FLT_MIN;
+	mMaxDist = FLT_MAX;
+	mPosition = LPoint3::zero();
+}
+
 inline float Sound3d::getMinDistance()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mMinDist;
 }
@@ -205,7 +224,7 @@ inline float Sound3d::getMinDistance()
 inline float Sound3d::getMaxDistance()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mMaxDist;
 }

@@ -50,6 +50,16 @@ public:
 	GameAudioManager(int sort = 0, int priority = 0,
 			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GameAudioManager();
+	/**
+	 * \brief Adds (if not present) an audio component to updating.
+	 * @param audioComp The audio component.
+	 */
+	void addToAudioUpdate(SMARTPTR(Component)audioComp);
+	/**
+	 * \brief Removes (if present) an audio component from updating.
+	 * @param audioComp The audio component.
+	 */
+	void removeFromAudioUpdate(SMARTPTR(Component) audioComp);
 
 	/**
 	 * \brief Gets a reference to the audio manager.
@@ -65,13 +75,6 @@ public:
 	 * @return The "done" status.
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
-
-	///Helper enum.
-	enum
-	{
-		ADDTOUPDATE,
-		REMOVEFROMUPDATE
-	};
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -94,25 +97,6 @@ private:
 	SMARTPTR(TaskInterface<GameAudioManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
-
-	///@{
-	///Callbacks for components update adding/removing requests.
-	SMARTPTR(EventCallbackInterface<GameAudioManager>::EventCallbackData) mAudioCallbackData;
-public:
-	void handleUpdateRequest(const Event* event);
-	///@}
-
-private:
-	/**
-	 * \brief Adds (if not present) an audio component to updating.
-	 * @param audioComp The audio component.
-	 */
-	void addToAudioUpdate(SMARTPTR(Component)audioComp);
-	/**
-	 * \brief Removes (if present) an audio component from updating.
-	 * @param audioComp The audio component.
-	 */
-	void removeFromAudioUpdate(SMARTPTR(Component) audioComp);
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

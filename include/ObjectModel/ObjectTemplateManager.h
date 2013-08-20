@@ -139,6 +139,11 @@ public:
 	bool destroyObject(const ObjectId& objectId);
 
 	/**
+	 * \brief Destroys all created objects.
+	 */
+	void destroyAllObjects();
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */

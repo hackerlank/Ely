@@ -30,7 +30,7 @@ namespace ely
 GameControlManager::GameControlManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
 			"GameControlManager::GameControlManager: invalid GameManager")
 	mControlComponents.clear();
 	mUpdateData.clear();
@@ -54,26 +54,13 @@ GameControlManager::GameControlManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	//Add event handler for update handling requests.
-	mControlCallbackData.clear();
-	mControlCallbackData =
-			new EventCallbackInterface<GameControlManager>::EventCallbackData(this,
-					&GameControlManager::handleUpdateRequest);
-	EventHandler::get_global_event_handler()->add_hook("GameControlManager::handleUpdateRequest",
-			&EventCallbackInterface<GameControlManager>::eventCallbackFunction,
-			reinterpret_cast<void*>(mControlCallbackData.p()));
 }
 
 GameControlManager::~GameControlManager()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mControlCallbackData)
-	{
-		EventHandler::get_global_event_handler()->remove_hooks_with(
-				reinterpret_cast<void*>(mControlCallbackData.p()));
-	}
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
@@ -81,33 +68,11 @@ GameControlManager::~GameControlManager()
 	mControlComponents.clear();
 }
 
-void GameControlManager::handleUpdateRequest(const Event* event)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//First parameter should be a Control Component
-	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
-	if (param0->is_of_type(Component::get_class_type()))
-	{
-		SMARTPTR(Component) controlComp = DCAST(Component, param0);
-		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
-		int param1 = event->get_parameter(1).get_int_value();
-		switch (param1) {
-			case ADDTOUPDATE:
-				addToControlUpdate(controlComp);
-				break;
-			case REMOVEFROMUPDATE:
-				removeFromControlUpdate(controlComp);
-				break;
-			default:
-				break;
-		}
-	}
-}
-
 void GameControlManager::addToControlUpdate(SMARTPTR(Component)controlComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	ControlComponentList::iterator iter = find(mControlComponents.begin(),
 			mControlComponents.end(), controlComp);
 	if (iter == mControlComponents.end())
@@ -118,6 +83,9 @@ void GameControlManager::addToControlUpdate(SMARTPTR(Component)controlComp)
 
 void GameControlManager::removeFromControlUpdate(SMARTPTR(Component)controlComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	ControlComponentList::iterator iter = find(mControlComponents.begin(),
 			mControlComponents.end(), controlComp);
 	if (iter != mControlComponents.end())
@@ -129,7 +97,7 @@ void GameControlManager::removeFromControlUpdate(SMARTPTR(Component)controlComp)
 AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 

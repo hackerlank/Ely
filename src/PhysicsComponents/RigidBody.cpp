@@ -36,25 +36,15 @@ RigidBody::RigidBody()
 
 RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate)tmpl)
 {
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 			"RigidBody::RigidBody: invalid GamePhysicsManager")
+
 	mTmpl = tmpl;
+	reset();
 }
 
 RigidBody::~RigidBody()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//check if game physics manager exists
-	if (GamePhysicsManager::GetSingletonPtr())
-	{
-		//remove rigid body from the physics world
-		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-				DCAST(TypedObject, mRigidBodyNode));
-	}
-	//Remove node path
-	mNodePath.remove_node();
 }
 
 ComponentFamilyType RigidBody::familyType() const
@@ -300,10 +290,13 @@ void RigidBody::onAddToObjectSetup()
 	mRigidBodyNode->add_shape(createShape(mShapeType));
 	//set mass and other body type settings
 	switchType(mBodyType);
+
+	//create a node path for the rigid body
+	mNodePath = NodePath(mRigidBodyNode);
+
 	//attach to Bullet World
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
 			mRigidBodyNode);
-
 	///<BUG: if you want to switch the body type (e.g. dynamic to static, static to
 	///dynamic, etc...) after it has been attached to the world, you must first
 	///attach it as a dynamic body and then switch its type:
@@ -312,8 +305,6 @@ void RigidBody::onAddToObjectSetup()
 	///		switchType(mBodyType);
 	////BUG>
 
-	//create a node path for the rigid body
-	mNodePath = NodePath(mRigidBodyNode);
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
 
@@ -337,7 +328,7 @@ void RigidBody::onAddToObjectSetup()
 			if (sceneComp)
 			{
 				//check if the scene component is a Terrain
-				if (sceneComp->componentType() == "Terrain")
+				if (sceneComp->componentType() == std::string("Terrain"))
 				{
 					float widthScale = DCAST(Terrain, sceneComp)->getWidthScale();
 					float heightScale = DCAST(Terrain, sceneComp)->getHeightScale();
@@ -407,10 +398,33 @@ void RigidBody::onAddToObjectSetup()
 
 	//set this rigid body node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+}
+
+void RigidBody::onRemoveFromObjectCleanup()
+{
+	NodePath oldObjectNodePath;
+	//set the object node path to the first child of rigid body's one (if any)
+	if(mNodePath.get_num_children() > 0)
+	{
+		oldObjectNodePath = mNodePath.get_child(0);
+		//detach the object node path from the rigid body's one
+		oldObjectNodePath.detach_node();
+	}
+	else
+	{
+		oldObjectNodePath = NodePath();
+	}
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(oldObjectNodePath);
+
+	//remove rigid body from the physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+			DCAST(TypedObject, mRigidBodyNode));
+
+	//Remove node path
+	mNodePath.remove_node();
+	//
+	reset();
 }
 
 void RigidBody::onAddToSceneSetup()
@@ -427,7 +441,10 @@ void RigidBody::onAddToSceneSetup()
 void RigidBody::switchType(BodyType bodyType)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
 
 	switch (bodyType)
 	{
@@ -455,22 +472,6 @@ void RigidBody::switchType(BodyType bodyType)
 	default:
 		break;
 	}
-}
-
-NodePath RigidBody::getNodePath() const
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	return mNodePath;
-}
-
-void RigidBody::setNodePath(const NodePath& nodePath)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	mNodePath = nodePath;
 }
 
 SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeType)

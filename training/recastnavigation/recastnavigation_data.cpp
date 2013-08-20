@@ -65,7 +65,7 @@ AnimControlCollection rn_anim_collection;
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	BulletWorld* mBulletWorld = reinterpret_cast<BulletWorld*>(data);
 

@@ -26,7 +26,6 @@
 #include "Game/GameControlManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -36,21 +35,19 @@ Chaser::Chaser()
 	// TODO Auto-generated constructor stub
 }
 
-Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl):mIsEnabled(false)
+Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GameControlManager")
-	CHECKEXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GamePhysicsManager")
+
 	mTmpl = tmpl;
+	reset();
 }
 
 Chaser::~Chaser()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	disable();
 }
 
 ComponentFamilyType Chaser::familyType() const
@@ -68,7 +65,7 @@ bool Chaser::initialize()
 	bool result = true;
 	//get settings from template
 	//enabling setting
-	mEnabled = (
+	mStartEnabled = (
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
 	//backward setting
@@ -109,18 +106,16 @@ bool Chaser::initialize()
 void Chaser::enable()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mIsEnabled or (not mOwnerObject) or mChasedNodePath.is_empty())
-	{
-		return;
-	}
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
 
-	//enable only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+	//if enabled return
+	RETURN_ON_COND(mEnabled,)
+
+	//if chased node path is empty return
+	RETURN_ON_COND(mChasedNodePath.is_empty(),)
 
 	//check kinematic parameters
 	if (mAbsMaxDistance < 0.0)
@@ -155,59 +150,55 @@ void Chaser::enable()
 	//set "look at" position (wrt chased node)
 	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign,
 			mAbsLookAtHeight);
-
-	//add to the control manager update
-	throw_event(std::string("GameControlManager::handleUpdateRequest"),
-			EventParameter(this),
-			EventParameter(GameControlManager::ADDTOUPDATE));
 	//
-	mIsEnabled = not mIsEnabled;
+	mEnabled = true;
 	//register event callbacks if any
 	registerEventCallbacks();
+
+	//add to the control manager update
+	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 }
 
 void Chaser::disable()
 {
+	{
+		//lock (guard) the mutex
+		HOLD_MUTEX(mMutex)
+
+		//if disabling return
+		RETURN_ON_ASYNC_COND(mDisabling,)
+
+		//if not enabled return
+		RETURN_ON_COND(not mEnabled,)
+
+		//if chased node path is empty return
+		RETURN_ON_COND(mChasedNodePath.is_empty(),)
+
+#ifdef ELY_THREAD
+		mDisabling = true;
+#endif
+	}
+
+	//remove from control manager update
+	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if ((not mIsEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
-	{
-		return;
-	}
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
 
-	//disable only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
-	//check if control manager exists
-	if (GameControlManager::GetSingletonPtr())
-	{
-		//remove from control manager update
-		throw_event(std::string("GameControlManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameControlManager::REMOVEFROMUPDATE));
-	}
-	//
-	mIsEnabled = not mIsEnabled;
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
+	//
+#ifdef ELY_THREAD
+		mDisabling = false;
+#endif
+	mEnabled = false;
 }
-
 
 void Chaser::onAddToObjectSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
-	//set mChasedNodePath as empty
-	mChasedNodePath = NodePath();
-
 	//set the (node path of) object chased by this component;
 	//that object is supposed to be already created,
 	//set up and added to the created objects table;
@@ -235,26 +226,27 @@ void Chaser::onAddToObjectSetup()
 			mReferenceNodePath = mChasedNodePath.get_parent();
 		}
 	}
-	//setup event callbacks if any
-	setupEvents();
-	//enable the component
-	if (mEnabled)
-	{
-		enable();
-	}
+}
+
+void Chaser::onRemoveFromObjectCleanup()
+{
+	//
+	reset();
 }
 
 void Chaser::onAddToSceneSetup()
 {
-	if ((not mEnabled) or (not mOwnerObject) or mChasedNodePath.is_empty())
-	{
-		return;
-	}
+	//if chased node path is empty return
+	RETURN_ON_COND(mChasedNodePath.is_empty(),)
 
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
+	//enable the component (if requested)
+	if (mStartEnabled)
 	{
-		return;
+		enable();
+	}
+	else
+	{
+		unregisterEventCallbacks();
 	}
 
 	//set chaser initial position/orientation
@@ -263,10 +255,16 @@ void Chaser::onAddToSceneSetup()
 			LVector3::up());
 }
 
+void Chaser::onRemoveFromSceneCleanup()
+{
+	//remove from control manager update
+	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
+}
+
 void Chaser::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

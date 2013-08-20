@@ -26,7 +26,6 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -38,25 +37,15 @@ Listener::Listener()
 
 Listener::Listener(SMARTPTR(ListenerTemplate)tmpl)
 {
-	CHECKEXISTENCE(GameAudioManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameAudioManager::GetSingletonPtr(),
 			"Listener::Listener: invalid GameAudioManager")
+
 	mTmpl = tmpl;
-	mPosition = LPoint3(0.0, 0.0, 0.0);
+	reset();
 }
 
 Listener::~Listener()
 {
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//check if game audio manager exists
-	if (GameAudioManager::GetSingletonPtr())
-	{
-		//remove from audio update
-		throw_event(std::string("GameAudioManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameAudioManager::REMOVEFROMUPDATE));
-	}
 }
 
 ComponentFamilyType Listener::familyType() const
@@ -72,41 +61,41 @@ ComponentType Listener::componentType() const
 bool Listener::initialize()
 {
 	bool result = true;
+	//get scene root
+	mSceneRootId = ObjectId(mTmpl->parameter(std::string("scene_root")));
 	//
 	return result;
 }
 
 void Listener::onAddToObjectSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
 	//set the root of the scene
-	SMARTPTR(Object) sceneRoot =
-		ObjectTemplateManager::GetSingleton().getCreatedObject(
-				"render");
+	SMARTPTR(Object)sceneRoot =
+	ObjectTemplateManager::GetSingleton().getCreatedObject(
+			mSceneRootId);
 	if (sceneRoot)
 	{
 		mSceneRoot = sceneRoot->getNodePath();
 	}
+	else if (ObjectTemplateManager::GetSingleton().getCreatedObject("render"))
+	{
+		mSceneRoot = ObjectTemplateManager::GetSingleton().getCreatedObject(
+				"render")->getNodePath();
+	}
+	else
+	{
+		mSceneRoot = NodePath();
+	}
+}
 
-	//setup event callbacks if any
-	setupEvents();
-	//register event callbacks if any
-	registerEventCallbacks();
+void Listener::onRemoveFromObjectCleanup()
+{
+	//
+	reset();
 }
 
 void Listener::onAddToSceneSetup()
 {
-	//add only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
-
 	if (mOwnerObject->isSteady())
 	{
 		//set 3d attribute (in this case static)
@@ -115,22 +104,23 @@ void Listener::onAddToSceneSetup()
 	else
 	{
 		// update listener position/velocity only for dynamic objects
-		throw_event(std::string("GameAudioManager::handleUpdateRequest"),
-				EventParameter(this),
-				EventParameter(GameAudioManager::ADDTOUPDATE));
+		GameAudioManager::GetSingletonPtr()->addToAudioUpdate(this);
 	}
+}
+
+void Listener::onRemoveFromSceneCleanup()
+{
+	//remove from audio update
+	GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 }
 
 void Listener::set3dStaticAttributes()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	//set only for a not empty object node path
-	if (mOwnerObject->getNodePath().is_empty())
-	{
-		return;
-	}
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
 
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	mPosition = ownerNodePath.get_pos(mSceneRoot);
@@ -146,7 +136,7 @@ void Listener::set3dStaticAttributes()
 void Listener::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

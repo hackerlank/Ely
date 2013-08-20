@@ -25,6 +25,7 @@
 #define CHASER_H_
 
 #include <nodePath.h>
+#include <cfloat>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 
@@ -54,12 +55,14 @@ class ChaserTemplate;
 class Chaser: public Component
 {
 protected:
-	friend class Object;
 	friend class ChaserTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
 	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	Chaser();
@@ -109,7 +112,10 @@ private:
 	///The reference object's node path.
 	NodePath mReferenceNodePath;
 	///Flags.
-	bool mEnabled, mIsEnabled, mFixedRelativePosition, mBackward;
+	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward;
+#ifdef ELY_THREAD
+	bool mDisabling;
+#endif
 	/**
 	 * \name Main parameters.
 	 */
@@ -167,18 +173,35 @@ private:
 
 ///inline definitions
 
+inline void Chaser::reset()
+{
+	//
+	mChasedNodePath = NodePath();
+	mReferenceNodePath = NodePath();
+	mStartEnabled = mEnabled = mFixedRelativePosition = mBackward = false;
+#ifdef ELY_THREAD
+	mDisabling = false;
+#endif
+	mChasedId = ObjectId();
+	mReferenceId = ObjectId();
+	mAbsLookAtDistance = mAbsLookAtHeight = mFriction = 0.0;
+	mAbsMaxDistance = mAbsMaxHeight = FLT_MAX;
+	mAbsMinDistance = mAbsMinHeight = FLT_MIN;
+	mChaserPosition = mLookAtPosition = LPoint3f::zero();
+}
+
 inline bool Chaser::isEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	return mIsEnabled;
+	return mEnabled;
 }
 
 inline float Chaser::getAbsLookAtDistance() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAbsLookAtDistance;
 }
@@ -186,7 +209,7 @@ inline float Chaser::getAbsLookAtDistance() const
 inline void Chaser::setAbsLookAtDistance(float absLookAtDistance)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mAbsLookAtDistance = absLookAtDistance;
 }
@@ -194,7 +217,7 @@ inline void Chaser::setAbsLookAtDistance(float absLookAtDistance)
 inline float Chaser::getAbsMinDistance() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAbsMinDistance;
 }
@@ -202,7 +225,7 @@ inline float Chaser::getAbsMinDistance() const
 inline void Chaser::setAbsMinDistance(float absMinDistance)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mAbsMinDistance = absMinDistance;
 }
@@ -210,7 +233,7 @@ inline void Chaser::setAbsMinDistance(float absMinDistance)
 inline float Chaser::getAbsMinHeight() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAbsMinHeight;
 }
@@ -218,7 +241,7 @@ inline float Chaser::getAbsMinHeight() const
 inline void Chaser::setAbsMinHeight(float absMinHeight)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mAbsMinHeight = absMinHeight;
 }
@@ -226,7 +249,7 @@ inline void Chaser::setAbsMinHeight(float absMinHeight)
 inline float Chaser::getDistance() const
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAbsMaxDistance;
 }
@@ -234,7 +257,7 @@ inline float Chaser::getDistance() const
 inline void Chaser::setDistance(float distance)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mAbsMaxDistance = distance;
 }

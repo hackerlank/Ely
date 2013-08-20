@@ -30,7 +30,7 @@ namespace ely
 GameAIManager::GameAIManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECKEXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
 			"GameAIManager::GameAIManager: invalid GameManager")
 	mAIComponents.clear();
 	mUpdateData.clear();
@@ -56,26 +56,13 @@ GameAIManager::GameAIManager(int sort, int priority,
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	//Add event handler for update handling requests.
-	mAICallbackData.clear();
-	mAICallbackData =
-			new EventCallbackInterface<GameAIManager>::EventCallbackData(this,
-					&GameAIManager::handleUpdateRequest);
-	EventHandler::get_global_event_handler()->add_hook("GameAIManager::handleUpdateRequest",
-			&EventCallbackInterface<GameAIManager>::eventCallbackFunction,
-			reinterpret_cast<void*>(mAICallbackData.p()));
 }
 
 GameAIManager::~GameAIManager()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
-	if (mAICallbackData)
-	{
-		EventHandler::get_global_event_handler()->remove_hooks_with(
-				reinterpret_cast<void*>(mAICallbackData.p()));
-	}
 	if (mUpdateTask)
 	{
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
@@ -85,33 +72,11 @@ GameAIManager::~GameAIManager()
 	delete mAIWorld;
 }
 
-void GameAIManager::handleUpdateRequest(const Event* event)
-{
-	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
-
-	//First parameter should be an AI Component
-	TypedWritableReferenceCount* param0 = event->get_parameter(0).get_ptr();
-	if (param0->is_of_type(Component::get_class_type()))
-	{
-		SMARTPTR(Component) aiComp = DCAST(Component, param0);
-		//Second parameter should be ADDTOUPDATE or REMOVEFROMUPDATE
-		int param1 = event->get_parameter(1).get_int_value();
-		switch (param1) {
-			case ADDTOUPDATE:
-				addToAIUpdate(aiComp);
-				break;
-			case REMOVEFROMUPDATE:
-				removeFromAIUpdate(aiComp);
-				break;
-			default:
-				break;
-		}
-	}
-}
-
 void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
 			mAIComponents.end(), aiComp);
 	if (iter == mAIComponents.end())
@@ -122,6 +87,9 @@ void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 
 void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 {
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
 			mAIComponents.end(), aiComp);
 	if (iter != mAIComponents.end())
@@ -138,7 +106,7 @@ AIWorld* GameAIManager::aiWorld() const
 AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 

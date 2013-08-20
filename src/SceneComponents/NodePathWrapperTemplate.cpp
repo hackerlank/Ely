@@ -32,11 +32,11 @@ NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECKEXISTENCE(pandaFramework,
+	CHECK_EXISTENCE(pandaFramework,
 			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework")
-	CHECKEXISTENCE(windowFramework,
+	CHECK_EXISTENCE(windowFramework,
 			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework")
-	CHECKEXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
 			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid GameSceneManager")
 	//
 	setParametersDefaults();
@@ -72,7 +72,7 @@ SMARTPTR(Component)NodePathWrapperTemplate::makeComponent(const ComponentId& com
 void NodePathWrapperTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

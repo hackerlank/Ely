@@ -75,11 +75,14 @@ class CharacterControllerTemplate;
 class CharacterController: public Component
 {
 protected:
-	friend class Object;
 	friend class CharacterControllerTemplate;
 
+	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
+	virtual void onRemoveFromObjectCleanup();
+	virtual void onAddToSceneSetup();
+	virtual void onRemoveFromSceneCleanup();
 
 public:
 	CharacterController();
@@ -230,10 +233,37 @@ private:
 
 ///inline definitions
 
+inline void CharacterController::reset()
+{
+	//
+	mNodePath = NodePath();
+	mCharacterController.clear();
+	mCollideMask = BitMask32::all_off();
+	mStepHeight = 0.0;
+	mShapeType = GamePhysicsManager::SPHERE;
+	mShapeSize = GamePhysicsManager::MEDIUM;
+	mModelDims = LVector3::zero();
+	mModelRadius = 0.0;
+	mUseShapeOfId = ObjectId();
+	mModelDeltaCenter = LVector3::zero();
+	mAutomaticShaping = false;
+	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
+	mUpAxis = Z_up;
+	mAngularSpeed = mFallSpeed = mGravity = mJumpSpeed = mMaxSlope =
+			mMaxJumpHeight = 0.0;
+	mLinearSpeed = LVector3::zero();
+	mIsLocal = false;
+	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
+			mRollLeft = mRollRight = mJump = false;
+	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey, mDownKey =
+			mRollLeftKey = mRollRightKey = mJumpKey = false;
+	mThrowEvents = mOnGroundSent = mOnAirSent = false;
+}
+
 inline void CharacterController::enableForward(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mForwardKey)
 	{
@@ -244,7 +274,7 @@ inline void CharacterController::enableForward(bool enable)
 inline bool CharacterController::isForwardEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mForward;
 }
@@ -252,7 +282,7 @@ inline bool CharacterController::isForwardEnabled()
 inline void CharacterController::enableBackward(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mBackwardKey)
 	{
@@ -263,7 +293,7 @@ inline void CharacterController::enableBackward(bool enable)
 inline bool CharacterController::isBackwardEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mBackward;
 }
@@ -271,7 +301,7 @@ inline bool CharacterController::isBackwardEnabled()
 inline void CharacterController::enableUp(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mUpKey)
 	{
@@ -282,7 +312,7 @@ inline void CharacterController::enableUp(bool enable)
 inline bool CharacterController::isUpEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mUp;
 }
@@ -290,7 +320,7 @@ inline bool CharacterController::isUpEnabled()
 inline void CharacterController::enableDown(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mDownKey)
 	{
@@ -301,7 +331,7 @@ inline void CharacterController::enableDown(bool enable)
 inline bool CharacterController::isDownEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mDown;
 }
@@ -309,7 +339,7 @@ inline bool CharacterController::isDownEnabled()
 inline void CharacterController::enableStrafeLeft(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStrafeLeftKey)
 	{
@@ -320,7 +350,7 @@ inline void CharacterController::enableStrafeLeft(bool enable)
 inline bool CharacterController::isStrafeLeftEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mStrafeLeft;
 }
@@ -328,7 +358,7 @@ inline bool CharacterController::isStrafeLeftEnabled()
 inline void CharacterController::enableStrafeRight(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mStrafeRightKey)
 	{
@@ -339,7 +369,7 @@ inline void CharacterController::enableStrafeRight(bool enable)
 inline bool CharacterController::isStrafeRightEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mStrafeRight;
 }
@@ -347,7 +377,7 @@ inline bool CharacterController::isStrafeRightEnabled()
 inline void CharacterController::enableRollLeft(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mRollLeftKey)
 	{
@@ -358,7 +388,7 @@ inline void CharacterController::enableRollLeft(bool enable)
 inline bool CharacterController::isRollLeftEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mRollLeft;
 }
@@ -366,7 +396,7 @@ inline bool CharacterController::isRollLeftEnabled()
 inline void CharacterController::enableRollRight(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mRollRightKey)
 	{
@@ -377,7 +407,7 @@ inline void CharacterController::enableRollRight(bool enable)
 inline bool CharacterController::isRollRightEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mRollRight;
 }
@@ -385,7 +415,7 @@ inline bool CharacterController::isRollRightEnabled()
 inline void CharacterController::enableJump(bool enable)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	if (mJumpKey)
 	{
@@ -396,7 +426,7 @@ inline void CharacterController::enableJump(bool enable)
 inline bool CharacterController::isJumpEnabled()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mJump;
 }
@@ -404,7 +434,7 @@ inline bool CharacterController::isJumpEnabled()
 inline LVecBase3f CharacterController::getLinearSpeed()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mLinearSpeed;
 }
@@ -412,7 +442,7 @@ inline LVecBase3f CharacterController::getLinearSpeed()
 inline void CharacterController::setLinearSpeed(const LVecBase3f& speed)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mLinearSpeed = speed;
 }
@@ -420,7 +450,7 @@ inline void CharacterController::setLinearSpeed(const LVecBase3f& speed)
 inline float CharacterController::getAngularSpeed()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mAngularSpeed;
 }
@@ -428,7 +458,7 @@ inline float CharacterController::getAngularSpeed()
 inline void CharacterController::setAngularSpeed(float speed)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mAngularSpeed = speed;
 }
@@ -436,7 +466,7 @@ inline void CharacterController::setAngularSpeed(float speed)
 inline void CharacterController::setIsLocal(bool isLocal)
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	mIsLocal = isLocal;
 }
@@ -444,9 +474,25 @@ inline void CharacterController::setIsLocal(bool isLocal)
 inline bool CharacterController::getIsLocal()
 {
 	//lock (guard) the mutex
-	HOLDMUTEX(mMutex)
+	HOLD_MUTEX(mMutex)
 
 	return mIsLocal;
+}
+
+inline NodePath CharacterController::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void CharacterController::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mNodePath = nodePath;
 }
 
 }  // namespace ely
