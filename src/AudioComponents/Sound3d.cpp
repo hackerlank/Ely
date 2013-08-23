@@ -116,7 +116,8 @@ void Sound3d::onAddToObjectSetup()
 	}
 	else if (ObjectTemplateManager::GetSingleton().getCreatedObject("render"))
 	{
-		mSceneRoot = ObjectTemplateManager::GetSingleton().getCreatedObject(
+		mSceneRoot =
+				ObjectTemplateManager::GetSingleton().getCreatedObject(
 				"render")->getNodePath();
 	}
 	else
@@ -145,7 +146,7 @@ void Sound3d::onAddToSceneSetup()
 	if (mOwnerObject->isSteady() or mSounds.empty())
 	{
 		//set 3d attribute (in this case static)
-		set3dStaticAttributes();
+		doSet3dStaticAttributes();
 	}
 	else
 	{
@@ -161,17 +162,17 @@ void Sound3d::onRemoveFromSceneCleanup()
 	GameAudioManager::GetSingletonPtr()->removeFromAudioUpdate(this);
 }
 
-bool Sound3d::addSound(const std::string& soundName, const std::string& fileName)
+Sound3d::Result Sound3d::addSound(const std::string& soundName, const std::string& fileName)
 {
 	{
 		//lock (guard) the mutex
 		HOLD_MUTEX(mMutex)
 
 		//return if destroying
-		RETURN_ON_ASYNC_COND(mDestroying,false)
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 	}
 
-	bool result = false;
+	int result = Result::ERROR;
 	//lock (guard) the mutex
 	HOLD_MUTEX(GameAudioManager::GetSingletonPtr()->getMutex())
 	{
@@ -186,7 +187,7 @@ bool Sound3d::addSound(const std::string& soundName, const std::string& fileName
 		{
 			//add sound with soundName
 			mSounds[soundName] = sound;
-			result = true;
+			result = Result::OK;
 			// try to add this component to updating (if not present)
 			// only if object is dynamic
 			if (not mOwnerObject->isSteady())
@@ -200,17 +201,17 @@ bool Sound3d::addSound(const std::string& soundName, const std::string& fileName
 	return result;
 }
 
-bool Sound3d::removeSound(const std::string& soundName)
+Sound3d::Result Sound3d::removeSound(const std::string& soundName)
 {
 	{
 		//lock (guard) the mutex
 		HOLD_MUTEX(mMutex)
 
 		//return if destroying
-		RETURN_ON_ASYNC_COND(mDestroying,false)
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 	}
 
-	bool result = false;
+	int result = Result::ERROR;
 	//lock (guard) the mutex
 	HOLD_MUTEX(GameAudioManager::GetSingletonPtr()->getMutex())
 	{
@@ -222,7 +223,7 @@ bool Sound3d::removeSound(const std::string& soundName)
 		if (removed == 1)
 		{
 			// sound is removed
-			result = true;
+			result = Result::OK;
 			// try to remove this component from update if sound table is empty
 			if (mSounds.empty())
 			{
@@ -276,6 +277,12 @@ void Sound3d::set3dStaticAttributes()
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
 
+	//do actual set
+	doSet3dStaticAttributes();
+}
+
+void Sound3d::doSet3dStaticAttributes()
+{
 	mPosition = mOwnerObject->getNodePath().get_pos(mSceneRoot);
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)

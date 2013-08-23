@@ -109,7 +109,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	ReMutex& getMutex();
+	Mutex& getMutex();
 
 protected:
 
@@ -175,8 +175,8 @@ protected:
 	void togglePhysicsDebug(const Event* event);
 #endif
 
-	///The (reentrant) mutex associated with this manager.
-	ReMutex mMutex;
+	///The mutex associated with this manager.
+	Mutex mMutex;
 };
 
 } // namespace ely

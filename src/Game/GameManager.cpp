@@ -526,7 +526,7 @@ WindowFramework* const GameManager::windowFramework() const
 	return mWindow;
 }
 
-ReMutex& GameManager::getMutex()
+Mutex& GameManager::getMutex()
 {
 	return mMutex;
 }

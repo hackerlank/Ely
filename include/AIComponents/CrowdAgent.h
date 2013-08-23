@@ -37,10 +37,11 @@ class CrowdAgentTemplate;
 class NavMesh;
 
 ///Agent movement type.
-enum AgentMovType
+enum AgentMovTypeEnum
 {
 	RECAST,
-	KINEMATIC
+	KINEMATIC,
+	AgentMovType_NONE
 };
 
 /**
@@ -111,7 +112,7 @@ private:
 	SMARTPTR(NavMesh) mNavMesh;
 	ObjectId mNavMeshObjectId;
 	///The movement type.
-	AgentMovType mMovType;
+	AgentMovTypeEnum mMovType;
 	///The CrowdAgent index.
 	int mAgentIdx;
 	///The associated dtCrowdAgent data.
@@ -138,10 +139,21 @@ private:
 	 * @param pos The new position.
 	 * @param vel The new velocity.
 	 */
-	void updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel);
+	void doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel);
 
 	///Throwing events.
 	bool mThrowEvents, mCrowdAgentStartSent, mCrowdAgentStopSent;
+
+	///@{
+	///A task data to do asynchronous adding to NavMesh during creation.
+	SMARTPTR(TaskInterface<CrowdAgent>::TaskData) mAddData;
+	SMARTPTR(AsyncTask) mAddTask;
+	AsyncTask::DoneStatus addCrowdAgentAsync(GenericAsyncTask* task);
+	SMARTPTR(NavMesh) mStartNavMesh;
+#ifdef ELY_THREAD
+	std::string mTaskChainName;
+#endif
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:

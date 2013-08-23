@@ -278,7 +278,7 @@ void RigidBody::onAddToObjectSetup()
 	std::string name = COMPONENT_STANDARD_NAME;
 	mRigidBodyNode = new BulletRigidBodyNode(name.c_str());
 	//set the physics parameters
-	setPhysicalParameters();
+	doSetPhysicalParameters();
 
 	//At this point a Scene component (Model, InstanceOf ...) should have
 	//been already created and added to the object, so its node path should
@@ -287,9 +287,9 @@ void RigidBody::onAddToObjectSetup()
 	//has scaling already applied.
 
 	//create and add a Collision Shape
-	mRigidBodyNode->add_shape(createShape(mShapeType));
+	mRigidBodyNode->add_shape(doCreateShape(mShapeType));
 	//set mass and other body type settings
-	switchType(mBodyType);
+	doSwitchBodyType(mBodyType);
 
 	//create a node path for the rigid body
 	mNodePath = NodePath(mRigidBodyNode);
@@ -435,7 +435,8 @@ void RigidBody::onAddToSceneSetup()
 	{
 		mBodyType = STATIC;
 	}
-	switchType(mBodyType);
+	//
+	doSwitchBodyType(mBodyType);
 }
 
 void RigidBody::switchType(BodyType bodyType)
@@ -446,6 +447,11 @@ void RigidBody::switchType(BodyType bodyType)
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
 
+	doSwitchBodyType(bodyType);
+}
+
+void RigidBody::doSwitchBodyType(BodyType bodyType)
+{
 	switch (bodyType)
 	{
 	case DYNAMIC:
@@ -474,7 +480,7 @@ void RigidBody::switchType(BodyType bodyType)
 	}
 }
 
-SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeType)
+SMARTPTR(BulletShape)RigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeType)
 {
 	//check if it should use shape of another (already) created object
 	if (not mUseShapeOfId.empty())
@@ -508,7 +514,7 @@ SMARTPTR(BulletShape)RigidBody::createShape(GamePhysicsManager::ShapeType shapeT
 			mHeightfieldFile, not (mBodyType == STATIC));
 }
 
-void RigidBody::setPhysicalParameters()
+void RigidBody::doSetPhysicalParameters()
 {
 	mRigidBodyNode->set_friction(mBodyFriction);
 	mRigidBodyNode->set_restitution(mBodyRestitution);

@@ -90,13 +90,27 @@ public:
 	 */
 	virtual void update(void* data);
 
+	struct Result: public Component::Result
+	{
+		Result(int value):Component::Result(value)
+		{
+		}
+		enum
+		{
+#ifdef ELY_THREAD
+			STEERING_DISABLING = COMPONENT_RESULT_END + 1,
+			STEERING_RESULT_END
+#endif
+		};
+	};
+
 	/**
 	 * \name Enabling/disabling.
 	 * \brief Enables/disables this component.
 	 */
 	///@{
-	void enable();
-	void disable();
+	Result enable();
+	Result disable();
 	bool isEnabled();
 	///@}
 
@@ -115,6 +129,15 @@ private:
 #ifdef ELY_THREAD
 	bool mDisabling;
 #endif
+
+	/**
+	 * \name Actual enabling/disabling.
+	 */
+	///@{
+	void doEnable();
+	void doDisable();
+	///@}
+
 	///Fixed parameters.
 	float mMass, mMovtForce, mMaxForce;
 	std::string mTypeParam;
@@ -123,22 +146,22 @@ private:
 	///Steered character controller items.
 	SMARTPTR(BulletWorld) mWorld;
 	SMARTPTR(CharacterController) mCharacterController;
-	void enableMovRot(bool enable);
+	void doEnableMovRot(bool enable);
 	bool mMovRotEnabled, mCurrentIsLocal;
 	AIBehaviors *_steering;
-	LVecBase3f calculate_prioritized(float dt);
+	LVecBase3f do_calculate_prioritized(float dt);
 	LVecBase3f do_seek();
-	void flee_activate();
+	void do_flee_activate();
 	LVecBase3f do_flee();
 	LVecBase3f do_pursue();
-	void evade_activate();
+	void do_evade_activate();
 	LVecBase3f do_evade();
-	void arrival_activate();
+	void do_arrival_activate();
 	LVecBase3f do_arrival(float dt);
-	void flock_activate();
+	void do_flock_activate();
 	LVecBase3f do_flock();
 	LVecBase3f do_wander();
-	void obstacle_avoidance_activate_bullet();
+	void do_obstacle_avoidance_activate_bullet();
 	LVecBase3f do_obstacle_avoidance_bullet();
 	void do_follow();
 
@@ -153,8 +176,8 @@ private:
 	 * \name The real update member functions.
 	 */
 	///@{
-	void updateNodePath(float dt);
-	void updateController(float dt);
+	void doUpdateNodePath(float dt);
+	void doUpdateController(float dt);
 	///The pointer to the real update member function.
 	void (Steering::*mUpdatePtr)(float);
 	///@}

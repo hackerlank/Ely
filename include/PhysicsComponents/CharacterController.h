@@ -154,10 +154,18 @@ public:
 	void setNodePath(const NodePath& nodePath);
 	///@}
 
+	/**
+	 * \name BulletCharacterControllerNode reference getter & conversion function.
+	 */
+	///@{
+	SMARTPTR(BulletCharacterControllerNode) getBulletCharacterControllerNode() const;
+	operator SMARTPTR(BulletCharacterControllerNode)() const;
+	///@}
+
 private:
 	///The NodePath associated to this character controller.
 	NodePath mNodePath;
-	///The NodePath associated to this character controller.
+	///The underlying BulletCharacterControllerNode (read-only after creation & before destruction).
 	SMARTPTR(BulletCharacterControllerNode) mCharacterController;
 
 	///Geometric functions and parameters.
@@ -169,7 +177,7 @@ private:
 	 * @param shapeType The shape type.
 	 * @return The created shape.
 	 */
-	SMARTPTR(BulletShape) createShape(GamePhysicsManager::ShapeType shapeType);
+	SMARTPTR(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
 	LVector3 mModelDims;
@@ -195,7 +203,7 @@ private:
 	/**
 	 * \brief Sets control parameters of a character controller node (helper function).
 	 */
-	void setControlParameters();
+	void doSetControlParameters();
 	///Key controls and effective keys.
 	bool mForward, mBackward, mUp, mDown, mStrafeLeft, mStrafeRight,mRollLeft, mRollRight, mJump;
 	bool mForwardKey, mBackwardKey, mUpKey, mDownKey, mStrafeLeftKey, mStrafeRightKey,
@@ -493,6 +501,16 @@ inline void CharacterController::setNodePath(const NodePath& nodePath)
 	HOLD_MUTEX(mMutex)
 
 	mNodePath = nodePath;
+}
+
+inline SMARTPTR(BulletCharacterControllerNode) CharacterController::getBulletCharacterControllerNode() const
+{
+	return mCharacterController;
+}
+
+inline CharacterController::operator SMARTPTR(BulletCharacterControllerNode)() const
+{
+	return mCharacterController;
 }
 
 }  // namespace ely

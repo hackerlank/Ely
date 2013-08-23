@@ -109,13 +109,27 @@ public:
 	 */
 	virtual void update(void* data);
 
+	struct Result: public Component::Result
+	{
+		Result(int value):Component::Result(value)
+		{
+		}
+		enum
+		{
+#ifdef ELY_THREAD
+			DRIVER_DISABLING = COMPONENT_RESULT_END + 1,
+			DRIVER_RESULT_END
+#endif
+		};
+	};
+
 	/**
 	 * \name Enabling/disabling.
 	 * \brief Enables/disables this component.
 	 */
 	///@{
-	void enable();
-	void disable();
+	Result enable();
+	Result disable();
 	bool isEnabled();
 	///@}
 
@@ -183,6 +197,14 @@ private:
 #ifdef ELY_THREAD
 	bool mDisabling;
 #endif
+
+	/**
+	 * \name Actual enabling/disabling.
+	 */
+	///@{
+	void doEnable();
+	void doDisable();
+	///@}
 
 #ifdef ELY_THREAD
 	///Actual transform state.

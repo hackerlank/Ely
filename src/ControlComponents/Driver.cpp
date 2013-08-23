@@ -174,7 +174,7 @@ void Driver::onAddToSceneSetup()
 	//enable the component (if requested)
 	if (mStartEnabled)
 	{
-		enable();
+		doEnable();
 	}
 	else
 	{
@@ -188,17 +188,25 @@ void Driver::onRemoveFromSceneCleanup()
 	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 }
 
-void Driver::enable()
+Driver::Result Driver::enable()
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
 	//if enabled return
-	RETURN_ON_COND(mEnabled,)
+	RETURN_ON_COND(mEnabled, Result::ERROR)
 
+	//actual ebnabling
+	doEnable();
+	//
+	return Result::OK;
+}
+
+void Driver::doEnable()
+{
 #ifdef ELY_THREAD
 	//initialize the current transform
 	mActualTransform = mOwnerObject->getNodePath().get_transform();
@@ -225,17 +233,17 @@ void Driver::enable()
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 }
 
-void Driver::disable()
+Driver::Result Driver::disable()
 {
 	{
 		//lock (guard) the mutex
 		HOLD_MUTEX(mMutex)
 
 		//if disabling return
-		RETURN_ON_ASYNC_COND(mDisabling,)
+		RETURN_ON_ASYNC_COND(mDisabling, Result::DRIVER_DISABLING)
 
 		//if not enabled return
-		RETURN_ON_COND(not mEnabled,)
+		RETURN_ON_COND(not mEnabled, Result::ERROR)
 
 #ifdef ELY_THREAD
 		mDisabling = true;
@@ -249,8 +257,16 @@ void Driver::disable()
 	HOLD_MUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
+	//actual disabling
+	doDisable();
+	//
+	return Result::OK;
+}
+
+void Driver::doDisable()
+{
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
 

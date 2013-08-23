@@ -73,6 +73,16 @@ public:
 	virtual ComponentFamilyType familyType() const;
 	virtual ComponentType componentType() const;
 
+	struct Result: public Component::Result
+	{
+		Result(int value):Component::Result(value)
+		{
+		}
+		enum
+		{
+		};
+	};
+
 	/**
 	 * \brief Adds dynamically a new sound to this component by
 	 * loading it from a file.
@@ -82,14 +92,15 @@ public:
 	 * @param fileName The sound file name.
 	 * @return True if successful, false otherwise.
 	 */
-	bool addSound(const std::string& soundName, const std::string& fileName);
+	Result addSound(const std::string& soundName, const std::string& fileName);
+
 	/**
 	 * \brief Removes dynamically a sound from this component.
 	 *
 	 * @param soundName The sound name.
 	 * @return True if successful, false otherwise.
 	 */
-	bool removeSound(const std::string& soundName);
+	Result removeSound(const std::string& soundName);
 
 	/**
 	 * \name Sets/gets Sound Min Distance.
@@ -172,6 +183,11 @@ private:
 	float mMinDist, mMaxDist;
 	LPoint3 mPosition;
 	///@}
+
+	/**
+	 * \brief Actually sets position/velocity for static objects.
+	 */
+	void doSet3dStaticAttributes();
 
 	///TypedObject semantics: hardcoded
 public:

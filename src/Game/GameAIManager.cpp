@@ -126,7 +126,7 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 	return AsyncTask::DS_cont;
 }
 
-ReMutex& GameAIManager::getMutex()
+Mutex& GameAIManager::getMutex()
 {
 	return mMutex;
 }

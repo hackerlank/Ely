@@ -155,7 +155,7 @@ void Steering::onRemoveFromObjectCleanup()
 		if (mTypeParam == std::string("character_controller"))
 		{
 			//disable movement/rotation
-			enableMovRot(false);
+			doEnableMovRot(false);
 			//restore current movement
 			mCharacterController->setIsLocal(mCurrentIsLocal);
 			//throw SteeringForceOff event (if enabled)
@@ -181,7 +181,7 @@ void Steering::onAddToSceneSetup()
 	//enable the component
 	if (mStartEnabled)
 	{
-		enable();
+		doEnable();
 	}
 	else
 	{
@@ -195,17 +195,25 @@ void Steering::onRemoveFromSceneCleanup()
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 }
 
-void Steering::enable()
+Steering::Result Steering::enable()
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
 	//if enabled return
-	RETURN_ON_COND(mEnabled,)
+	RETURN_ON_COND(mEnabled, Result::ERROR)
 
+	//actual ebnabling
+	doEnable();
+	//
+	return Result::OK;
+}
+
+void Steering::doEnable()
+{
 	//create the AICharacter...
 	mAICharacter = new AICharacterRef(std::string(mComponentId),
 			mOwnerObject->getNodePath(), mMass, mMovtForce, mMaxForce);
@@ -220,7 +228,7 @@ void Steering::enable()
 					CharacterController::get_class_type())))
 	{
 		//update the character_controller
-		mUpdatePtr = &Steering::updateController;
+		mUpdatePtr = &Steering::doUpdateController;
 		//get a reference to the CharacterController component
 		//(which is already created and set up)
 		mCharacterController =
@@ -240,12 +248,12 @@ void Steering::enable()
 						* mAICharacter->get_node_path().get_bounds()->as_bounding_sphere()->get_radius();
 		mObstacleMaxDistSquared = pow(mObstacleMaxDist, 2);
 		//enable movement/rotation
-		enableMovRot(true);
+		doEnableMovRot(true);
 	}
 	else
 	{
 		//update the owner object nodepath: default
-		mUpdatePtr = &Steering::updateNodePath;
+		mUpdatePtr = &Steering::doUpdateNodePath;
 	}
 	//register event callbacks if any
 	registerEventCallbacks();
@@ -256,17 +264,17 @@ void Steering::enable()
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 }
 
-void Steering::disable()
+Steering::Result Steering::disable()
 {
 	{
 		//lock (guard) the mutex
 		HOLD_MUTEX(mMutex)
 
 		//if disabling return
-		RETURN_ON_ASYNC_COND(mDisabling,)
+		RETURN_ON_ASYNC_COND(mDisabling, Result::STEERING_DISABLING)
 
 		//if not enabled return
-		RETURN_ON_COND(not mEnabled,)
+		RETURN_ON_COND(not mEnabled, Result::ERROR)
 
 #ifdef ELY_THREAD
 		mDisabling = true;
@@ -280,15 +288,23 @@ void Steering::disable()
 	HOLD_MUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
+	//actual disabling
+	doDisable();
+	//
+	return Result::OK;
+}
+
+void Steering::doDisable()
+{
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
 
 	if (mTypeParam == std::string("character_controller"))
 	{
 		//disable movement/rotation
-		enableMovRot(false);
+		doEnableMovRot(false);
 		//restore current movement
 		mCharacterController->setIsLocal(mCurrentIsLocal);
 		//throw SteeringForceOff event (if enabled)
@@ -329,12 +345,12 @@ void Steering::update(void* data)
 	((*this).*mUpdatePtr)(dt);
 }
 
-void Steering::updateNodePath(float dt)
+void Steering::doUpdateNodePath(float dt)
 {
 	mAICharacter->update();
 }
 
-void Steering::updateController(float dt)
+void Steering::doUpdateController(float dt)
 {
 
 	if (!_steering->is_off(_steering->_none))
@@ -342,9 +358,9 @@ void Steering::updateController(float dt)
 		//enable movement/rotation
 		if (not mMovRotEnabled)
 		{
-			enableMovRot(true);
+			doEnableMovRot(true);
 		}
-		LVecBase3f steering_force = calculate_prioritized(dt);
+		LVecBase3f steering_force = do_calculate_prioritized(dt);
 		LVecBase3f acceleration = steering_force / mAICharacter->get_mass();
 		mAICharacter->_velocity = acceleration;
 		LVecBase3f direction = _steering->_steering_force;
@@ -395,7 +411,7 @@ void Steering::updateController(float dt)
 		{
 			if (mMovRotEnabled)
 			{
-				enableMovRot(false);
+				doEnableMovRot(false);
 			}
 			//throw SteeringForceOff event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOffSent))
@@ -421,7 +437,7 @@ void Steering::updateController(float dt)
 		//reset movements
 		if (mMovRotEnabled)
 		{
-			enableMovRot(false);
+			doEnableMovRot(false);
 		}
 		//reset events' sending
 		mSteeringForceOnSent = false;
@@ -429,7 +445,7 @@ void Steering::updateController(float dt)
 	}
 }
 
-void Steering::enableMovRot(bool enable)
+void Steering::doEnableMovRot(bool enable)
 {
 	//reset velocities
 	mCharacterController->setLinearSpeed(LVecBase3f::zero());
@@ -442,8 +458,8 @@ void Steering::enableMovRot(bool enable)
 }
 
 ///XXX AIBehaviors::<Steering methods> rewritten
-//calculate_prioritized
-LVecBase3f Steering::calculate_prioritized(float dt)
+//do_calculate_prioritized
+LVecBase3f Steering::do_calculate_prioritized(float dt)
 {
 	LVecBase3f force;
 
@@ -466,7 +482,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 				_steering->_flee_itr != _steering->_flee_list.end();
 				_steering->_flee_itr++)
 		{
-			flee_activate();
+			do_flee_activate();
 		}
 	}
 
@@ -510,7 +526,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 				_steering->_evade_itr != _steering->_evade_list.end();
 				_steering->_evade_itr++)
 		{
-			evade_activate();
+			do_evade_activate();
 		}
 	}
 
@@ -538,7 +554,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 
 	if (_steering->is_on(_steering->_arrival_activate))
 	{
-		arrival_activate();
+		do_arrival_activate();
 	}
 
 	if (_steering->is_on(_steering->_arrival))
@@ -549,7 +565,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 
 	if (_steering->is_on(_steering->_flock_activate))
 	{
-		flock_activate();
+		do_flock_activate();
 	}
 
 	if (_steering->is_on(_steering->_flock))
@@ -580,7 +596,7 @@ LVecBase3f Steering::calculate_prioritized(float dt)
 
 	if (_steering->is_on(_steering->_obstacle_avoidance_activate))
 	{
-		obstacle_avoidance_activate_bullet();
+		do_obstacle_avoidance_activate_bullet();
 	}
 
 	if (_steering->is_on(_steering->_obstacle_avoidance))
@@ -664,7 +680,7 @@ LVecBase3f Steering::do_seek()
 	return (desired_force);
 }
 //flee
-void Steering::flee_activate()
+void Steering::do_flee_activate()
 {
 	ListFlee::iterator& _flee_itr = _steering->_flee_itr;
 	LVecBase3f dirn;
@@ -757,7 +773,7 @@ LVecBase3f Steering::do_pursue()
 	return (desired_force);
 }
 //evade
-void Steering::evade_activate()
+void Steering::do_evade_activate()
 {
 	ListEvade::iterator& _evade_itr = _steering->_evade_itr;
 	_evade_itr->_evade_direction = (_evade_itr->_ai_char->_ai_char_np.get_pos(
@@ -811,7 +827,7 @@ LVecBase3f Steering::do_evade()
 	}
 }
 //arrival
-void Steering::arrival_activate()
+void Steering::do_arrival_activate()
 {
 	Arrival *_arrival_obj = _steering->_arrival_obj;
 	LVecBase3f dirn;
@@ -923,7 +939,7 @@ LVecBase3f Steering::do_arrival(float dt)
 	return (LVecBase3f(0.0, 0.0, 0.0));
 }
 //flock
-void Steering::flock_activate()
+void Steering::do_flock_activate()
 {
 	if (_steering->is_on(_steering->_seek) || _steering->is_on(_steering->_flee)
 			|| _steering->is_on(_steering->_pursue)
@@ -1117,7 +1133,7 @@ LVecBase3f Steering::do_wander()
 	return desired_force;
 }
 //obstacle avoidance
-void Steering::obstacle_avoidance_activate_bullet()
+void Steering::do_obstacle_avoidance_activate_bullet()
 {
 	ObstacleAvoidance *_obstacle_avoidance_obj =
 			_steering->_obstacle_avoidance_obj;

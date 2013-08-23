@@ -103,20 +103,28 @@ bool Chaser::initialize()
 	return result;
 }
 
-void Chaser::enable()
+Chaser::Result Chaser::enable()
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
 	//if enabled return
-	RETURN_ON_COND(mEnabled,)
+	RETURN_ON_COND(mEnabled, Result::ERROR)
 
 	//if chased node path is empty return
-	RETURN_ON_COND(mChasedNodePath.is_empty(),)
+	RETURN_ON_COND(mChasedNodePath.is_empty(), Result::ERROR)
 
+	//actual ebnabling
+	doEnable();
+	//
+	return Result::OK;
+}
+
+void Chaser::doEnable()
+{
 	//check kinematic parameters
 	if (mAbsMaxDistance < 0.0)
 	{
@@ -159,20 +167,20 @@ void Chaser::enable()
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 }
 
-void Chaser::disable()
+Chaser::Result Chaser::disable()
 {
 	{
 		//lock (guard) the mutex
 		HOLD_MUTEX(mMutex)
 
 		//if disabling return
-		RETURN_ON_ASYNC_COND(mDisabling,)
+		RETURN_ON_ASYNC_COND(mDisabling, Result::CHASER_DISABLING)
 
 		//if not enabled return
-		RETURN_ON_COND(not mEnabled,)
+		RETURN_ON_COND(not mEnabled, Result::ERROR)
 
 		//if chased node path is empty return
-		RETURN_ON_COND(mChasedNodePath.is_empty(),)
+		RETURN_ON_COND(mChasedNodePath.is_empty(), Result::ERROR)
 
 #ifdef ELY_THREAD
 		mDisabling = true;
@@ -186,8 +194,16 @@ void Chaser::disable()
 	HOLD_MUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
+	//actual disabling
+	doDisable();
+	//
+	return Result::OK;
+}
+
+void Chaser::doDisable()
+{
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
 	//
@@ -242,7 +258,7 @@ void Chaser::onAddToSceneSetup()
 	//enable the component (if requested)
 	if (mStartEnabled)
 	{
-		enable();
+		doEnable();
 	}
 	else
 	{
@@ -283,8 +299,8 @@ void Chaser::update(void* data)
 		//follow chased node from fixed position wrt it
 		desiredChaserPos = mReferenceNodePath.get_relative_point(
 				mChasedNodePath, mChaserPosition);
-		newPos = getChaserPos(desiredChaserPos, currentChaserPos, dt);
-		correctChaserHeight(newPos);
+		newPos = doGetChaserPos(desiredChaserPos, currentChaserPos, dt);
+		doCorrectChaserHeight(newPos);
 	}
 	else
 	{
@@ -297,15 +313,15 @@ void Chaser::update(void* data)
 		{
 			distanceDir.normalize();
 			desiredChaserPos = currentChasedPos + distanceDir * mAbsMinDistance;
-			newPos = getChaserPos(desiredChaserPos, currentChaserPos, dt);
-			correctChaserHeight(newPos);
+			newPos = doGetChaserPos(desiredChaserPos, currentChaserPos, dt);
+			doCorrectChaserHeight(newPos);
 		}
 		else if (distance > mAbsMaxDistance)
 		{
 			distanceDir.normalize();
 			desiredChaserPos = currentChasedPos + distanceDir * mAbsMaxDistance;
-			newPos = getChaserPos(desiredChaserPos, currentChaserPos, dt);
-			correctChaserHeight(newPos);
+			newPos = doGetChaserPos(desiredChaserPos, currentChaserPos, dt);
+			doCorrectChaserHeight(newPos);
 		}
 		else
 		{
@@ -319,7 +335,7 @@ void Chaser::update(void* data)
 			LVector3::up());
 }
 
-LPoint3f Chaser::getChaserPos(LPoint3f desiredChaserPos,
+LPoint3f Chaser::doGetChaserPos(LPoint3f desiredChaserPos,
 		LPoint3f currentChaserPos, float deltaTime)
 {
 	float kReductFactor = mFriction * deltaTime;
@@ -345,7 +361,7 @@ LPoint3f Chaser::getChaserPos(LPoint3f desiredChaserPos,
 	return newPos;
 }
 
-void Chaser::correctChaserHeight(LPoint3f& newPos)
+void Chaser::doCorrectChaserHeight(LPoint3f& newPos)
 {
 	//correct chaser height (not in OgreBulletDemos)
 	LPoint3f downTo = LPoint3f(newPos.get_x(), newPos.get_y(), -1000000.0);

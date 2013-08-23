@@ -51,7 +51,7 @@ enum NavMeshTypeToolEnum
  */
 enum NavMeshTypeEnum
 {
-	SOLO, TILE, OBSTACLE
+	SOLO, TILE, OBSTACLE, NavMeshType_NONE
 };
 
 /**

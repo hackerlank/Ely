@@ -30,7 +30,7 @@ namespace ely
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
 mTmpl(tmpl), mObjectId(objectId)
 {
-	reset();
+	doReset();
 }
 
 Object::~Object()
@@ -51,12 +51,9 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyId) con
 	return (*it).second;
 }
 
-bool Object::addComponent(SMARTPTR(Component) component,
+bool Object::doAddComponent(SMARTPTR(Component) component,
 		const ComponentFamilyType& familyId)
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
@@ -73,12 +70,9 @@ bool Object::addComponent(SMARTPTR(Component) component,
 	return true;
 }
 
-bool Object::removeComponent(SMARTPTR(Component) component,
+bool Object::doRemoveComponent(SMARTPTR(Component) component,
 		const ComponentFamilyType& familyId)
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
@@ -98,9 +92,9 @@ bool Object::removeComponent(SMARTPTR(Component) component,
 void Object::onRemoveObjectCleanup()
 {
 	//unload initialization functions
-	unloadInitializationFunctions();
+	doUnloadInitializationFunctions();
 	//
-	reset();
+	doReset();
 }
 
 void Object::onAddToSceneSetup()
@@ -114,7 +108,8 @@ void Object::onAddToSceneSetup()
 			mTmpl->parameter(std::string("is_steady")) == std::string("true") ?
 					true : false);
 	//find parent into the created objects
-	SMARTPTR(Object)createdObject = ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
+	SMARTPTR(Object)createdObject =
+			ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
 	if (createdObject != NULL)
 	{
 		//reparent to parent
@@ -156,11 +151,10 @@ void Object::onRemoveFromSceneCleanup()
 
 void Object::worldSetup()
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	//called (indirectly) only by the main thread: mutex lock not needed
 
 	//load initialization functions library.
-	loadInitializationFunctions();
+	doLoadInitializationFunctions();
 	//execute the initialization function (if any)
 	if (mInitializationsLoaded)
 	{
@@ -168,7 +162,7 @@ void Object::worldSetup()
 		std::string functionName;
 
 		//load initialization function (if any): <OBJECTID>_initialization
-		// reset errors
+		// doReset errors
 		lt_dlerror();
 		functionName = std::string(mObjectId) + "_initialization";
 		PINITIALIZATION pInitializationFunction = (PINITIALIZATION) lt_dlsym(
@@ -188,7 +182,7 @@ void Object::worldSetup()
 	}
 }
 
-void Object::loadInitializationFunctions()
+void Object::doLoadInitializationFunctions()
 {
 	//if initializations loaded do nothing
 	if (mInitializationsLoaded)
@@ -196,7 +190,7 @@ void Object::loadInitializationFunctions()
 		return;
 	}
 	mInitializationLib = NULL;
-	// reset errors
+	// doReset errors
 	lt_dlerror();
 	//load the initialization functions library
 	mInitializationLib = lt_dlopen(INITIALIZATIONS_LA);
@@ -210,7 +204,7 @@ void Object::loadInitializationFunctions()
 	mInitializationsLoaded = true;
 }
 
-void Object::unloadInitializationFunctions()
+void Object::doUnloadInitializationFunctions()
 {
 	//if initializations not loaded do nothing
 	if (not mInitializationsLoaded)
@@ -218,7 +212,7 @@ void Object::unloadInitializationFunctions()
 		return;
 	}
 	//Close the initialization functions library
-	// reset errors
+	// doReset errors
 	lt_dlerror();
 	if (lt_dlclose(mInitializationLib) != 0)
 	{

@@ -39,7 +39,7 @@ Component::Component()
 	mCallbackLib = NULL;
 	mCallbacksLoaded = false;
 	mCallbacksRegistered = false;
-	cleanupEventTables();
+	doCleanupEventTables();
 }
 
 Component::~Component()
@@ -51,9 +51,9 @@ void Component::addToObjectSetup()
 	//call onAddToObjectSetup
 	onAddToObjectSetup();
 	//setup event tables (if any)
-	setupEventTables();
+	doSetupEventTables();
 	//load event callbacks (if any)
-	loadEventCallbacks();
+	doLoadEventCallbacks();
 	//register event callbacks (if any)
 	registerEventCallbacks();
 }
@@ -63,9 +63,9 @@ void Component::removeFromObjectCleanup()
 	//unregister event callbacks (if any)
 	unregisterEventCallbacks();
 	//unload event callbacks (if any)
-	unloadEventCallbacks();
+	doUnloadEventCallbacks();
 	//cleanup event tables (if any)
-	cleanupEventTables();
+	doCleanupEventTables();
 	//call onRemoveFromObjectCleanup
 	onRemoveFromObjectCleanup();
 }
@@ -85,7 +85,7 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-void Component::setupEventTables()
+void Component::doSetupEventTables()
 {
 	//setup events (if any)
 	std::list<std::string>::iterator iter;
@@ -133,14 +133,14 @@ void Component::setupEventTables()
 	}
 }
 
-void Component::cleanupEventTables()
+void Component::doCleanupEventTables()
 {
 	mEventTable.clear();
 	mEventTypeTable.clear();
 	mCallbackTable.clear();
 }
 
-void Component::loadEventCallbacks()
+void Component::doLoadEventCallbacks()
 {
 	//if callbacks already loaded do nothing
 	RETURN_ON_COND(mCallbacksLoaded,)
@@ -220,7 +220,7 @@ void Component::loadEventCallbacks()
 	mCallbacksLoaded = true;
 }
 
-void Component::unloadEventCallbacks()
+void Component::doUnloadEventCallbacks()
 {
 	//if callbacks not loaded do nothing
 	RETURN_ON_COND(not mCallbacksLoaded,)

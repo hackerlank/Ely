@@ -124,7 +124,7 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	return AsyncTask::DS_cont;
 }
 
-ReMutex& GameAudioManager::getMutex()
+Mutex& GameAudioManager::getMutex()
 {
 	return mMutex;
 }

@@ -116,7 +116,7 @@ AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 	return AsyncTask::DS_cont;
 }
 
-ReMutex& GameSceneManager::getMutex()
+Mutex& GameSceneManager::getMutex()
 {
 	return mMutex;
 }

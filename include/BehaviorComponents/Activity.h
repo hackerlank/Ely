@@ -90,12 +90,15 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
-	 * \brief fsm conversion function.
+	 * \name FSM reference getter & conversion function.
 	 */
+	///@{
+	fsm& getFSM();
 	operator fsm&();
+	///@}
 
 private:
-	///The embedded FSM.
+	///The underlying FSM (read-only after creation & before destruction).
 	fsm mFSM;
 
 	//Transition functions library management.
@@ -121,7 +124,7 @@ private:
 	 * only after the component's owner object has been set, for
 	 * example into onAddToObjectSetup component method.
 	 */
-	void setupFSM();
+	void doSetupFSM();
 	///@}
 
 	///Helper flag.
@@ -131,8 +134,8 @@ private:
 	 * \name Helper functions to load/unload transition functions.
 	 */
 	///@{
-	void loadTransitionFunctions();
-	void unloadTransitionFunctions();
+	void doLoadTransitionFunctions();
+	void doUnloadTransitionFunctions();
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -177,6 +180,16 @@ inline void Activity::onAddToSceneSetup()
 
 inline void Activity::onRemoveFromSceneCleanup()
 {
+}
+
+inline fsm& Activity::getFSM()
+{
+	return mFSM;
+}
+
+inline Activity::operator fsm&()
+{
+	return mFSM;
 }
 
 }  // namespace ely

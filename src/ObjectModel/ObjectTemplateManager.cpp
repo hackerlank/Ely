@@ -34,7 +34,7 @@ ObjectTemplateManager::ObjectTemplateManager()
 ObjectTemplateManager::~ObjectTemplateManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//remove created objects (if any)
 	while (mCreatedObjects.size() > 0)
@@ -57,7 +57,7 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
 		SMARTPTR(ObjectTemplate) objectTmpl)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (not objectTmpl)
 	{
@@ -83,7 +83,7 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
 bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
@@ -98,7 +98,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType objectType) const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ObjectTemplateTable::const_iterator it = mObjectTemplates.find(objectType);
 	if (it == mObjectTemplates.end())
@@ -115,7 +115,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		bool storeParams)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//check if it is an already created object
 	SMARTPTR(Object) oldObject = getCreatedObject(objectId);
@@ -134,7 +134,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	ObjectId newId;
 	if (objectId == ObjectId(""))
 	{
-		newId = ObjectId(objectType) + ObjectId(getId());
+		newId = ObjectId(objectType) + ObjectId(doGetId());
 	}
 	else
 	{
@@ -163,7 +163,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		}
 		//create the component
 		SMARTPTR(Component) newComp =
-		ComponentTemplateManager::GetSingleton().createComponent(
+		ComponentTemplateManager::GetSingleton().doCreateComponent(
 				compType);
 		//add the component into the object
 		if (not newComp)
@@ -172,7 +172,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		}
 		//add the new component
 		ComponentFamilyType familyId = newComp->familyType();
-		newObj->addComponent(newComp, familyId);
+		newObj->doAddComponent(newComp, familyId);
 		//set the component owner object
 		newComp->setOwnerObject(newObj);
 		//give a chance to component to setup itself when being added to object.
@@ -203,7 +203,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 
 #ifdef ELY_THREAD
 	//Lock all components during this code execution.
-	for (compIter = newObj->getComponents().begin(); compIter != newObj->getComponents().end();
+	for (compIter = newObj->doGetComponents().begin(); compIter != newObj->doGetComponents().end();
 			++compIter)
 	{
 		compIter->second->getMutex().acquire();
@@ -214,7 +214,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 
 		//give a chance to components to setup themselves when being
 		//added to scene in order of insertion. Thread safe.
-		for (compIter = newObj->getComponents().begin(); compIter != newObj->getComponents().end();
+		for (compIter = newObj->doGetComponents().begin(); compIter != newObj->doGetComponents().end();
 				++compIter)
 		{
 			compIter->second->addToSceneSetup();
@@ -225,14 +225,14 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	catch (...)
 	{
 		//Unlock all components.
-		for (compIter = newObj->getComponents().begin(); compIter != newObj->getComponents().end();
+		for (compIter = newObj->doGetComponents().begin(); compIter != newObj->doGetComponents().end();
 				++compIter)
 		{
 			compIter->second->getMutex().release();
 		}
 	}
 	//Unlock all components.
-	for (compIter = newObj->getComponents().begin(); compIter != newObj->getComponents().end();
+	for (compIter = newObj->doGetComponents().begin(); compIter != newObj->doGetComponents().end();
 			++compIter)
 	{
 		compIter->second->getMutex().release();
@@ -248,7 +248,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ObjectTable::iterator objectIter;
 	objectIter = mCreatedObjects.find(objectId);
@@ -261,7 +261,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 	Object::ComponentOrderedList::const_reverse_iterator compRIter;
 	//get a copy of object components because original will be modified
 	//and to avoid dropping of reference count
-	Object::ComponentOrderedList objectComponents = object->getComponents();
+	Object::ComponentOrderedList objectComponents = object->doGetComponents();
 	//on removal from scene components cleanup in reverse order of insertion
 	for (compRIter = objectComponents.rbegin();
 			compRIter != objectComponents.rend(); ++compRIter)
@@ -294,7 +294,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 			//set the old component owner to NULL
 			compRIter->second->setOwnerObject(NULL);
 			//remove old component from object
-			object->removeComponent(compRIter->second, compRIter->first);
+			object->doRemoveComponent(compRIter->second, compRIter->first);
 		}
 		//on object removal cleanup
 		object->onRemoveObjectCleanup();
@@ -326,7 +326,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 void ObjectTemplateManager::destroyAllObjects()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//remove created objects
 	while (mCreatedObjects.size() > 0)
@@ -341,7 +341,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 		ComponentType componentType, const ParameterTable& compTmplParams)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//check if it is effectively an already created object
 	SMARTPTR(Object) object = getCreatedObject(objectId);
@@ -363,7 +363,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	}
 	//create the new component
 	SMARTPTR(Component) newComp =
-	ComponentTemplateManager::GetSingleton().createComponent(componentType);
+	ComponentTemplateManager::GetSingleton().doCreateComponent(componentType);
 	if (not newComp)
 	{
 		return false;
@@ -391,10 +391,10 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 					oldComp->setOwnerObject(NULL);
 
 					//remove old component from object
-					object->removeComponent(oldComp, familyId);
+					object->doRemoveComponent(oldComp, familyId);
 
 					//add the new component to the object
-					object->addComponent(newComp, familyId);
+					object->doAddComponent(newComp, familyId);
 					//set the new component owner
 					newComp->setOwnerObject(object);
 					//on addition to object new component setup
@@ -415,7 +415,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 			HOLD_MUTEX(object->getMutex())
 
 			//add the new component to the object
-			object->addComponent(newComp, familyId);
+			object->doAddComponent(newComp, familyId);
 			//set the new component owner
 			newComp->setOwnerObject(object);
 			//on addition to object new component setup
@@ -431,7 +431,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId) const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ObjectTable::const_iterator iterObj;
 	iterObj = mCreatedObjects.find(objectId);
@@ -445,7 +445,7 @@ SMARTPTR(Object)ObjectTemplateManager::getCreatedObject(const ObjectId& objectId
 std::list<SMARTPTR(Object)> ObjectTemplateManager::getCreatedObjects() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::list<SMARTPTR(Object)> createdObjects;
 	ObjectTable::const_iterator iterObj;
@@ -457,7 +457,7 @@ std::list<SMARTPTR(Object)> ObjectTemplateManager::getCreatedObjects() const
 	return createdObjects;
 }
 
-IdType ObjectTemplateManager::getId()
+IdType ObjectTemplateManager::doGetId()
 {
 	return ++id;
 }

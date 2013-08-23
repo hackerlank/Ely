@@ -74,7 +74,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	ReMutex& getMutex();
+	Mutex& getMutex();
 
 private:
 	///@{
@@ -89,8 +89,8 @@ private:
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
-	///The (reentrant) mutex associated with this manager.
-	ReMutex mMutex;
+	///The mutex associated with this manager.
+	Mutex mMutex;
 
 };
 }  // namespace ely

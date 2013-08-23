@@ -182,7 +182,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	return AsyncTask::DS_cont;
 }
 
-ReMutex& GamePhysicsManager::getMutex()
+Mutex& GamePhysicsManager::getMutex()
 {
 	return mMutex;
 }

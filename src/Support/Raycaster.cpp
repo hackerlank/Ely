@@ -209,7 +209,7 @@ void Raycaster::hitBody(const Event* event)
 	}
 }
 
-ReMutex& Raycaster::getMutex()
+Mutex& Raycaster::getMutex()
 {
 	return mMutex;
 }

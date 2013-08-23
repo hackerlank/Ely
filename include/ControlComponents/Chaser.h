@@ -82,13 +82,27 @@ public:
 	 */
 	virtual void update(void* data);
 
+	struct Result: public Component::Result
+	{
+		Result(int value):Component::Result(value)
+		{
+		}
+		enum
+		{
+#ifdef ELY_THREAD
+			CHASER_DISABLING = COMPONENT_RESULT_END + 1,
+			CHASER_RESULT_END
+#endif
+		};
+	};
+
 	/**
 	 * \name Enabling/disabling.
 	 * \brief Enables/disables this component.
 	 */
 	///@{
-	void enable();
-	void disable();
+	Result enable();
+	Result disable();
 	bool isEnabled();
 	///@}
 
@@ -116,6 +130,15 @@ private:
 #ifdef ELY_THREAD
 	bool mDisabling;
 #endif
+
+	/**
+	 * \name Actual enabling/disabling.
+	 */
+	///@{
+	void doEnable();
+	void doDisable();
+	///@}
+
 	/**
 	 * \name Main parameters.
 	 */
@@ -138,13 +161,13 @@ private:
 	 * @param deltaTime The delta time update.
 	 * @return The dynamic chaser position.
 	 */
-	LPoint3f getChaserPos(LPoint3f desiredChaserPos,
+	LPoint3f doGetChaserPos(LPoint3f desiredChaserPos,
 			LPoint3f currentChaserPos, float deltaTime);
 	/**
 	 * \brief Correct the dynamic height of the chaser.
 	 * @param newPos The position whose height may be corrected.
 	 */
-	void correctChaserHeight(LPoint3f& newPos);
+	void doCorrectChaserHeight(LPoint3f& newPos);
 
 	///TypedObject semantics: hardcoded
 public:

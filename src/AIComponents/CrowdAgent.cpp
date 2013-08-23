@@ -144,10 +144,24 @@ void CrowdAgent::onAddToObjectSetup()
 {
 	//set the bullet physics
 	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
+
+#ifdef ELY_THREAD
+	//add the task chain on which addCrowdAgentAsync() will be running
+	mTaskChainName = mComponentId + "-taskChain";
+	AsyncTaskManager::get_global_ptr()->make_task_chain(mTaskChainName);
+	AsyncTaskManager::get_global_ptr()->
+			find_task_chain(mTaskChainName)->set_num_threads(1);
+	AsyncTaskManager::get_global_ptr()->
+				find_task_chain(mTaskChainName)->set_frame_sync(false);
+#endif
 }
 
 void CrowdAgent::onRemoveFromObjectCleanup()
 {
+#ifdef ELY_THREAD
+	//remove the task chain on which addCrowdAgentAsync() has run
+	AsyncTaskManager::get_global_ptr()->remove_task_chain(mTaskChainName);
+#endif
 	//
 	mNavMesh.clear();
 	reset();
@@ -165,20 +179,47 @@ void CrowdAgent::onAddToSceneSetup()
 	///3: add to NavMesh update
 	if(navMeshObject)
 	{
-		SMARTPTR(NavMesh) navMesh =
-				DCAST(NavMesh, navMeshObject->getComponent(familyType()));
+		mStartNavMesh = DCAST(NavMesh, navMeshObject->getComponent(familyType()));
 		//
-		if(navMesh)
+		if(mStartNavMesh)
 		{
-			navMesh->addCrowdAgent(this);
+			//create the task for executing addCrowdAgentAsync()
+			//the task is executed only once and then removed from AsyncTaskManager
+			mAddData.clear();
+			mAddTask.clear();
+			mAddData = new TaskInterface<CrowdAgent>::TaskData(this,
+					&CrowdAgent::addCrowdAgentAsync);
+			mAddTask = new GenericAsyncTask(mComponentId + "CrowdAgent::addCrowdAgentAsync",
+					&TaskInterface<CrowdAgent>::taskFunction,
+					reinterpret_cast<void*>(mAddData.p()));
+			//set sort/priority
+			mAddTask->set_sort(0);
+			mAddTask->set_priority(0);
+			//Add the task for updating the controlled object
+#ifdef ELY_THREAD
+			//add the task to the task chain.
+			mAddTask->set_task_chain(mTaskChainName);
+#endif
+			//Adds mAddTask to the active queue.
+			AsyncTaskManager::get_global_ptr()->add(mAddTask);
 		}
 	}
+}
+
+AsyncTask::DoneStatus CrowdAgent::addCrowdAgentAsync(GenericAsyncTask* task)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mStartNavMesh->addCrowdAgent(this);
+	//
+	return AsyncTask::DS_done;
 }
 
 void CrowdAgent::onRemoveFromSceneCleanup()
 {
 	//lock (guard) the NavMesh static mutex
-	HOLD_MUTEX(NavMesh::getStaticMutex())
+	HOLD_REMUTEX(NavMesh::getStaticMutex())
 
 	///Remove from NavMesh update (if previously added)
 	if(mNavMesh)
@@ -197,7 +238,7 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 
 	{
 		//lock (guard) the NavMesh static mutex
-		HOLD_MUTEX(NavMesh::getStaticMutex())
+		HOLD_REMUTEX(NavMesh::getStaticMutex())
 
 		//request NavMesh (if any) to update params for this CrowdAgent
 		if (mNavMesh)
@@ -218,7 +259,7 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 
 	{
 		//lock (guard) the NavMesh static mutex
-		HOLD_MUTEX(NavMesh::getStaticMutex())
+		HOLD_REMUTEX(NavMesh::getStaticMutex())
 
 		//request NavMesh (if any) to update move target for this CrowdAgent
 		if (mNavMesh)
@@ -239,7 +280,7 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 
 	{
 		//lock (guard) the NavMesh static mutex
-		HOLD_MUTEX(NavMesh::getStaticMutex())
+		HOLD_REMUTEX(NavMesh::getStaticMutex())
 
 		//request NavMesh (if any) to update move velocity for this CrowdAgent
 		if (mNavMesh)
@@ -250,7 +291,7 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	mMoveVelocity = vel;
 }
 
-void CrowdAgent::updatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
+void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
 	//only for kinematic case
 	//raycast in the near of recast mesh:

@@ -128,10 +128,18 @@ public:
 	void setNodePath(const NodePath& nodePath);
 	///@}
 
+	/**
+	 * \name BulletRigidBodyNode reference getter & conversion function.
+	 */
+	///@{
+	SMARTPTR(BulletRigidBodyNode) getBulletRigidBodyNode() const;
+	operator SMARTPTR(BulletRigidBodyNode)() const;
+	///@}
+
 private:
 	///The NodePath associated to this rigid body.
 	NodePath mNodePath;
-	///The NodePath associated to this rigid body.
+	///The underlying BulletRigidBodyNode (read-only after creation & before destruction).
 	SMARTPTR(BulletRigidBodyNode) mRigidBodyNode;
 	///@{
 	///Physical parameters.
@@ -146,8 +154,14 @@ private:
 	/**
 	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
 	 */
-	void setPhysicalParameters();
+	void doSetPhysicalParameters();
 	///@}
+
+	/**
+	 * \brief Sets body type.
+	 * @param bodyType The body type.
+	 */
+	void doSwitchBodyType(BodyType bodyType);
 
 	///Geometric functions and parameters.
 	///@{
@@ -156,7 +170,7 @@ private:
 	 * @param shapeType The shape type.
 	 * @return The created shape.
 	 */
-	SMARTPTR(BulletShape) createShape(GamePhysicsManager::ShapeType shapeType);
+	SMARTPTR(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
 	LVector3 mModelDims;
 	float mModelRadius;
 	//use shape of (another object).
@@ -240,6 +254,16 @@ inline void RigidBody::setNodePath(const NodePath& nodePath)
 	HOLD_MUTEX(mMutex)
 
 	mNodePath = nodePath;
+}
+
+inline SMARTPTR(BulletRigidBodyNode) RigidBody::getBulletRigidBodyNode() const
+{
+	return mRigidBodyNode;
+}
+
+inline RigidBody::operator SMARTPTR(BulletRigidBodyNode)() const
+{
+	return mRigidBodyNode;
 }
 
 }  // namespace ely

@@ -62,7 +62,7 @@ bool Activity::initialize()
 	return result;
 }
 
-void Activity::setupFSM()
+void Activity::doSetupFSM()
 {
 	std::list<std::string>::iterator iter;
 	//setup states
@@ -112,21 +112,21 @@ void Activity::onAddToObjectSetup()
 	//add even for an empty object node path
 
 	//setup the FSM
-	setupFSM();
+	doSetupFSM();
 
 	//load transitions library
-	loadTransitionFunctions();
+	doLoadTransitionFunctions();
 }
 
 void Activity::onRemoveFromObjectCleanup()
 {
 	//unload transitions library
-	unloadTransitionFunctions();
+	doUnloadTransitionFunctions();
 	//
 	reset();
 }
 
-void Activity::loadTransitionFunctions()
+void Activity::doLoadTransitionFunctions()
 {
 	//if no states or transitions loaded do nothing
 	if ((mFSM.getNumStates() == 0) or mTransitionsLoaded)
@@ -260,15 +260,7 @@ void Activity::loadTransitionFunctions()
 	mTransitionsLoaded = true;
 }
 
-Activity::operator fsm&()
-{
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
-	return mFSM;
-}
-
-void Activity::unloadTransitionFunctions()
+void Activity::doUnloadTransitionFunctions()
 {
 	//if transitions not loaded do nothing
 	if ((mFSM.getNumStates() == 0) or (not mTransitionsLoaded))

@@ -83,6 +83,11 @@ private:
 	///Sounds' characteristics.
 	LPoint3 mPosition;
 
+	/**
+	 * \brief Actually sets position/velocity for static objects.
+	 */
+	void doSet3dStaticAttributes();
+
 	///TypedObject semantics: hardcoded
 public:
 	static TypeHandle get_class_type()

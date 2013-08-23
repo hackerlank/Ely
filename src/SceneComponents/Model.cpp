@@ -60,38 +60,38 @@ ComponentType Model::componentType() const
 	return mTmpl->componentType();
 }
 
-void Model::r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& parts)
+void Model::do_r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& parts)
 {
 	//on empty node return
-		if (node.is_null())
-		{
-			return;
-		}
-		if (node->is_of_type(AnimBundleNode::get_class_type()))
-		{
-			SMARTPTR(AnimBundleNode) bn = DCAST(AnimBundleNode, node.p());
-			SMARTPTR(AnimBundle) bundle = bn->get_bundle();
-			anims[bundle->get_name()].insert(bundle);
+	if (node.is_null())
+	{
+		return;
+	}
+	if (node->is_of_type(AnimBundleNode::get_class_type()))
+	{
+		SMARTPTR(AnimBundleNode) bn = DCAST(AnimBundleNode, node.p());
+		SMARTPTR(AnimBundle) bundle = bn->get_bundle();
+		anims[bundle->get_name()].insert(bundle);
 
-		}
-		else if (node->is_of_type(PartBundleNode::get_class_type()))
+	}
+	else if (node->is_of_type(PartBundleNode::get_class_type()))
+	{
+		SMARTPTR(PartBundleNode) bn = DCAST(PartBundleNode, node.p());
+		int num_bundles = bn->get_num_bundles();
+		for (int i = 0; i < num_bundles; ++i)
 		{
-			SMARTPTR(PartBundleNode) bn = DCAST(PartBundleNode, node.p());
-			int num_bundles = bn->get_num_bundles();
-			for (int i = 0; i < num_bundles; ++i)
-			{
-				PartBundle *bundle = bn->get_bundle(i);
-				parts[bundle->get_name()].insert(bundle);
-			}
-		}
-
-		PandaNode::Children cr = node->get_children();
-		int num_children = cr.get_num_children();
-		for (int i = 0; i < num_children; i++)
-		{
-			r_find_bundles(cr.get_child(i), anims, parts);
+			PartBundle *bundle = bn->get_bundle(i);
+			parts[bundle->get_name()].insert(bundle);
 		}
 	}
+
+	PandaNode::Children cr = node->get_children();
+	int num_children = cr.get_num_children();
+	for (int i = 0; i < num_children; i++)
+	{
+		do_r_find_bundles(cr.get_child(i), anims, parts);
+	}
+}
 
 bool Model::initialize()
 {
@@ -165,7 +165,7 @@ void Model::onAddToObjectSetup()
 					mTmpl->pandaFramework()->get_models());
 		}
 		//find all the bundles into mNodePath.node
-		r_find_bundles(mNodePath.node(), anims, parts);
+		do_r_find_bundles(mNodePath.node(), anims, parts);
 		mFirstPartBundle.clear();
 		//check if there is at least one PartBundle
 		for (partsIter = parts.begin(); partsIter != parts.end(); ++partsIter)
@@ -259,7 +259,7 @@ void Model::onAddToObjectSetup()
 								animNP = NodePath();
 							}
 							//find all the bundles into animNP.node
-							r_find_bundles(animNP.node(), anims, parts);
+							do_r_find_bundles(animNP.node(), anims, parts);
 							for (animsIter = anims.begin();
 									animsIter != anims.end(); ++animsIter)
 							{

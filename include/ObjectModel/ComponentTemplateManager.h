@@ -44,7 +44,7 @@ private:
 	 * @param componentID The component type.
 	 * @return The just created component, or NULL on failure (for any reason).
 	 */
-	SMARTPTR(Component) createComponent(ComponentType componentID);
+	SMARTPTR(Component) doCreateComponent(ComponentType componentID);
 
 public:
 	/**
@@ -115,7 +115,7 @@ private:
 	 */
 	IdType getId();
 
-	///The (reentrant) mutex associated with this manager.
+	///The mutex associated with this manager.
 	ReMutex mMutex;
 };
 

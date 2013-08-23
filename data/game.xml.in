@@ -84,7 +84,7 @@
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 
-		<ObjectTmpl type="StaticNavMesh">
+		<ObjectTmpl type="RecastNavMesh">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 			<ComponentTmpl family="AI" type="NavMesh" priority="80"/> 
@@ -111,8 +111,8 @@
 
 		<ObjectTmpl type="RecastCrowdAgent">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="KinematicCrowdAgent">
@@ -199,7 +199,7 @@
 		<Object type="InstancedActor" id="InstancedSmiley1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
-			<Param pos="-22.0,-26.0,60.0"/>
+			<Param pos="-9.60363,-21.9574,43.9806"/>
 			<Param rot="180.0,0.0,0.0"/>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
@@ -220,7 +220,7 @@
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
-			<Param pos="-18.0,-22.0,60.0"/>
+			<Param pos="-14.5016,-12.6806,42.6722"/>
 			<Param rot="-90.0,0.0,0.0"/>
 			<Component type="Steering">
 				<Param enabled="false"/>
@@ -281,7 +281,7 @@
 				<Param sound_files="walk-sound@GUI_rollover.wav"/>
 			</Component>
 			<Param parent="render"/>			
-			<Param pos="-28.0,-33.0,60.0"/>
+			<Param pos="-4.79419,-15.6691,60.4992"/>
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 
@@ -330,11 +330,11 @@
 				<Param sound_files="walk-sound@GUI_click.wav"/>
 			</Component>
 			<Param parent="render"/>
-			<Param pos="-35.0,-34.0,52.0"/>
+			<Param pos="-26.997,-21.8736,40.7907"/>
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 		
-		<Object type="StaticNavMesh" id="course2" priority="80">
+		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="course2.bam"/>
@@ -363,25 +363,26 @@
 			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot="-45.0,0.0,0.0"/>
+			<Param rot="0.0,0.0,0.0"/>
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
 		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
-			<Param store_params="true"/>
-			<Param pos="-18.0,-22.0,60.0"/>
+			<Param store_params="false"/>
+			<Param pos="-51.23,23.5961,40.6944"/>
 			<Param rot="-90.0,0.0,0.0"/>
-			<Component type="CrowdAgent">
-				<Param enabled="false"/>
+			<Component type="InstanceOf">
+				<Param instance_of="Gorilla1"/>
+				<Param scale="0.6,0.6,0.6"/>
 			</Component>
 			<Component type="Sound3d">
 				<Param sound_files="walk-sound@GUI_click.wav"/>
 			</Component>
-			<Component type="InstanceOf">
-				<Param instance_of="Gorilla1"/>
-				<Param scale="0.6,0.6,0.6"/>
+			<Component type="CrowdAgent">
+				<Param add_to_navmesh="course2"/>
+				<Param move_target="-22.4522,-21.3515,40.7907"/>
 			</Component>
 		</Object>
 

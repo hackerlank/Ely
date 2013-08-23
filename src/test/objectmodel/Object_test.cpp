@@ -56,10 +56,10 @@ BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 	mModelTmpl->setParameters(paramTable);
 	mModel =
 	DCAST(Model, mModelTmpl->makeComponent(ComponentId("TestModel")));
-	mObject->addComponent(mModel.p());
+	mObject->doAddComponent(mModel.p());
 	BOOST_CHECK(mObject->getComponent(ComponentFamilyType("Scene"))==mModel);
 	BOOST_CHECK(mObject->numComponents() == 1);
-	mObject->addComponent(mModel.p());
+	mObject->doAddComponent(mModel.p());
 	BOOST_CHECK(mObject->numComponents() == 1);
 	mObject->clearComponents();
 	BOOST_CHECK(mObject->numComponents() == 0);

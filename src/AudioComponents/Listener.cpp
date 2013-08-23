@@ -79,7 +79,8 @@ void Listener::onAddToObjectSetup()
 	}
 	else if (ObjectTemplateManager::GetSingleton().getCreatedObject("render"))
 	{
-		mSceneRoot = ObjectTemplateManager::GetSingleton().getCreatedObject(
+		mSceneRoot =
+				ObjectTemplateManager::GetSingleton().getCreatedObject(
 				"render")->getNodePath();
 	}
 	else
@@ -99,7 +100,7 @@ void Listener::onAddToSceneSetup()
 	if (mOwnerObject->isSteady())
 	{
 		//set 3d attribute (in this case static)
-		set3dStaticAttributes();
+		doSet3dStaticAttributes();
 	}
 	else
 	{
@@ -122,6 +123,12 @@ void Listener::set3dStaticAttributes()
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
 
+	//do actual set
+	doSet3dStaticAttributes();
+}
+
+void Listener::doSet3dStaticAttributes()
+{
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	mPosition = ownerNodePath.get_pos(mSceneRoot);
 	LVector3 forward = ownerNodePath.get_relative_vector(mSceneRoot,

@@ -300,7 +300,8 @@ std::string replaceCharacter(const std::string& source, int character,
 
 ///ELY_THREAD
 #ifdef ELY_THREAD
-#	define HOLD_MUTEX(_mutex_) ReMutexHolder guard(_mutex_);
+#	define HOLD_MUTEX(_mutex_) MutexHolder guard(_mutex_);
+#	define HOLD_REMUTEX(_remutex_) ReMutexHolder guard(_remutex_);
 #	define SMARTPTR(_type_) ThreadSafePointerTo<_type_>
 #	define CSMARTPTR(_type_) ThreadSafeConstPointerTo<_type_>
 #	define RETURN_ON_ASYNC_COND(_flag_,_return_)\
@@ -310,6 +311,7 @@ std::string replaceCharacter(const std::string& source, int character,
 	}
 #else
 #	define HOLD_MUTEX(_mutex_)
+#	define HOLD_REMUTEX(_remutex_)
 #	define SMARTPTR(_type_) PointerTo<_type_>
 #	define CSMARTPTR(_type_) ConstPointerTo<_type_>
 #	define RETURN_ON_ASYNC_COND(_flag_,_return_)

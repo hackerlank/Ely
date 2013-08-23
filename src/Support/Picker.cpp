@@ -238,7 +238,7 @@ AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 	return AsyncTask::DS_cont;
 }
 
-ReMutex& Picker::getMutex()
+Mutex& Picker::getMutex()
 {
 	return mMutex;
 }

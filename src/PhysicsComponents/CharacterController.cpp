@@ -253,9 +253,9 @@ void CharacterController::onAddToObjectSetup()
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 	std::string name = COMPONENT_STANDARD_NAME;
 	mCharacterController = new BulletCharacterControllerNode(
-			createShape(mShapeType), mStepHeight, name.c_str());
+			doCreateShape(mShapeType), mStepHeight, name.c_str());
 	//set the control parameters
-	setControlParameters();
+	doSetControlParameters();
 
 	//create a node path for the character controller
 	mNodePath = NodePath(mCharacterController);
@@ -406,7 +406,7 @@ void CharacterController::update(void* data)
 	}
 }
 
-SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeType shapeType)
+SMARTPTR(BulletShape)CharacterController::doCreateShape(GamePhysicsManager::ShapeType shapeType)
 {
 	//check if it should use shape of another (already) created object
 	if (not mUseShapeOfId.empty())
@@ -440,7 +440,7 @@ SMARTPTR(BulletShape)CharacterController::createShape(GamePhysicsManager::ShapeT
 			mDim3, mDim4, mAutomaticShaping, mUpAxis);
 }
 
-void CharacterController::setControlParameters()
+void CharacterController::doSetControlParameters()
 {
 	mCharacterController->set_fall_speed(mFallSpeed);
 	mCharacterController->set_gravity(mGravity);

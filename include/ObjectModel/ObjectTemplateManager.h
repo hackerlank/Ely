@@ -161,7 +161,7 @@ private:
 	 * \brief Return an unique id for created objects.
 	 * @return The unique id.
 	 */
-	IdType getId();
+	IdType doGetId();
 
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;

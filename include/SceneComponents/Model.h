@@ -148,7 +148,7 @@ private:
 	 * @param parts Out parameter: the table of AnimBundle sets indexed
 	 * by their names.
 	 */
-	void r_find_bundles(SMARTPTR(PandaNode) node, Anims &anims, Parts &parts);
+	void do_r_find_bundles(SMARTPTR(PandaNode) node, Anims &anims, Parts &parts);
 	///@}
 
 	///TypedObject semantics: hardcoded

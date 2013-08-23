@@ -27,7 +27,7 @@
 #include "Utilities/Tools.h"
 #include <typedWritableReferenceCount.h>
 #include <genericAsyncTask.h>
-#include <reMutex.h>
+#include <pmutex.h>
 #include <conditionVar.h>
 
 namespace ely
@@ -207,6 +207,32 @@ public:
 	virtual ComponentFamilyType familyType() const = 0;
 
 	/**
+	 * \brief The result type a component method can return to signal
+	 * the status of result of the operation or of the component.
+	 *
+	 * Derived component can derive from this to add other result status,
+	 * by starting the enum from COMPONENT_RESULT_END+1.\n
+	 */
+	struct Result
+	{
+		int mResult;
+		enum
+		{
+			OK,
+			ERROR,
+			DESTROYING,
+			COMPONENT_RESULT_END
+		};
+		Result(int value):mResult(value)
+		{
+		}
+		operator int()
+		{
+			return mResult;
+		}
+	};
+
+	/**
 	 * \brief Updates the state of the component.
 	 *
 	 * @param data Generic data.
@@ -246,7 +272,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	ReMutex& getMutex();
+	Mutex& getMutex();
 
 protected:
 	///The template used to construct this component (read only after creation).
@@ -260,8 +286,8 @@ protected:
 	bool mDestroying;
 #endif
 
-	///The (reentrant) mutex associated with this component.
-	ReMutex mMutex;
+	///The mutex associated with this component.
+	Mutex mMutex;
 
 	/**
 	 * \name Helper functions to register/unregister events' callbacks.
@@ -309,10 +335,10 @@ private:
 	 * to load/unload events' callbacks.
 	 */
 	///@{
-	void setupEventTables();
-	void cleanupEventTables();
-	void loadEventCallbacks();
-	void unloadEventCallbacks();
+	void doSetupEventTables();
+	void doCleanupEventTables();
+	void doLoadEventCallbacks();
+	void doUnloadEventCallbacks();
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -375,7 +401,7 @@ inline void Component::update(void* data)
 {
 }
 
-inline ReMutex& Component::getMutex()
+inline Mutex& Component::getMutex()
 {
 	return mMutex;
 }

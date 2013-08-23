@@ -76,7 +76,7 @@ private:
 	/**
 	 * \brief Resets all object data members.
 	 */
-	void reset();
+	void doReset();
 
 	/**
 	 * \brief Adds a component to this object.
@@ -86,7 +86,7 @@ private:
 	 * @param familyId The family type of the component.
 	 * @return True if successfully removed, false otherwise.
 	 */
-	bool addComponent(SMARTPTR(Component) component,
+	bool doAddComponent(SMARTPTR(Component) component,
 			const ComponentFamilyType& familyId);
 
 	/**
@@ -96,7 +96,7 @@ private:
 	 * @param component The component to remove.
 	 * @return True if successfully removed, false otherwise.
 	 */
-	bool removeComponent(SMARTPTR(Component) component,
+	bool doRemoveComponent(SMARTPTR(Component) component,
 			const ComponentFamilyType& familyId);
 
 	///List of all <family,component>s pair stored by insertion order.
@@ -107,7 +107,7 @@ private:
 	 *
 	 * @return A reference to the components list.
 	 */
-	ComponentOrderedList& getComponents();
+	ComponentOrderedList& doGetComponents();
 
 	/**
 	 * \brief On remove Object cleanup.
@@ -183,7 +183,8 @@ public:
 	 * \brief On world creation setup.
 	 *
 	 * Gives an object the ability to perform any given
-	 * initialization after the entire world creation.
+	 * initialization after the entire world creation.\n
+	 * \note Called (indirectly) only by the main thread.
 	 */
 	void worldSetup();
 
@@ -194,18 +195,14 @@ public:
 	ObjectId objectId() const;
 
 	/**
-	 * \brief Gets/sets the node path of this object.
+	 * \brief NodePath getter/setter & conversion function.
 	 * @return The node path of this object.
 	 */
 	///@{
 	NodePath getNodePath() const;
 	void setNodePath(const NodePath& nodePath);
-	///@}
-
-	/**
-	 * \brief NodePath conversion function.
-	 */
 	operator NodePath() const;
+	///@}
 
 	/**
 	 * \brief Gets a reference to the object template.
@@ -243,12 +240,12 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	ReMutex& getMutex();
+	Mutex& getMutex();
 
 private:
 	///The template used to construct this component.
 	SMARTPTR(ObjectTemplate) const mTmpl;
-	///The NodePath associated to this object.
+	///The underlying NodePath (read-only after creation & before destruction).
 	NodePath mNodePath;
 	///Unique identifier for this object (read only after creation).
 	ObjectId mObjectId;
@@ -284,16 +281,16 @@ private:
 	 * \name Helper functions to load/unload initialization functions.
 	 */
 	///@{
-	void loadInitializationFunctions();
-	void unloadInitializationFunctions();
+	void doLoadInitializationFunctions();
+	void doUnloadInitializationFunctions();
 	///@}
 
 	///Parameters tables.
 	ParameterTable mObjTmplParams;
 	ParameterTableMap mCompTmplParams;
 
-	///The (reentrant) mutex associated with this object.
-	ReMutex mMutex;
+	///The mutex associated with this object.
+	Mutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -329,29 +326,23 @@ inline ObjectId Object::objectId() const
 
 inline NodePath Object::getNodePath() const
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
 	return mNodePath;
 }
 
 inline void Object::setNodePath(const NodePath& nodePath)
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	//called only by ObjectTemplateManager methods which
+	//already lock the object mutex
 
 	mNodePath = nodePath;
 }
 
 inline Object::operator NodePath() const
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
 	return mNodePath;
 }
 
-inline Object::ComponentOrderedList& Object::getComponents()
+inline Object::ComponentOrderedList& Object::doGetComponents()
 {
 	return mComponents;
 }
@@ -369,7 +360,7 @@ inline SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 	return mTmpl;
 }
 
-inline ReMutex& Object::getMutex()
+inline Mutex& Object::getMutex()
 {
 	return mMutex;
 }
@@ -417,7 +408,7 @@ inline bool Object::isSteady() const
 	return mIsSteady;
 }
 
-inline void Object::reset()
+inline void Object::doReset()
 {
 	//
 	mNodePath = NodePath();

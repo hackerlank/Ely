@@ -84,14 +84,6 @@ public:
 	virtual void update(void* data);
 
 	/**
-	 * \brief Gets a reference to the GeoMipTerrain.
-	 * @return The reference to the GeoMipTerrain.
-	 */
-	///@{
-	SMARTPTR(GeoMipTerrainRef) getGeoMipTerrain() const;
-	///@}
-
-	/**
 	 * \brief Gets width and height scale.
 	 */
 	///@{
@@ -99,8 +91,16 @@ public:
 	float getHeightScale() const;
 	///@}
 
+	/**
+	 * \name GeoMipTerrain reference getter & conversion function.
+	 */
+	///@{
+	SMARTPTR(GeoMipTerrainRef) getGeoMipTerrain() const;
+	operator SMARTPTR(GeoMipTerrainRef)() const;
+	///@}
+
 private:
-	///The GeoMipTerrain associated to this component.
+	///The underlying GeoMipTerrain (read-only after creation & before destruction).
 	SMARTPTR(GeoMipTerrainRef) mTerrain;
 
 	/**
@@ -225,17 +225,6 @@ inline void Terrain::reset()
 	mBruteForce = false;
 }
 
-inline SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
-{
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,NULL)
-
-	return mTerrain;
-}
-
 inline float Terrain::getWidthScale() const
 {
 	//lock (guard) the mutex
@@ -249,6 +238,16 @@ inline float Terrain::getHeightScale() const
 	HOLD_MUTEX(mMutex)
 
 	return mHeightScale;
+}
+
+inline SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
+{
+	return mTerrain;
+}
+
+inline Terrain::operator SMARTPTR(GeoMipTerrainRef)() const
+{
+	return mTerrain;
 }
 
 }  // namespace ely
