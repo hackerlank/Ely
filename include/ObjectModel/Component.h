@@ -63,10 +63,12 @@ class ComponentTemplate;
  * or unregistering callbacks for them with the global EventHandler.\n
  * Each event has a type, and a callback associated.\n
  * For any event of type "<EVENTTYPE>" associated with a component of type
- * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, there exists a
- * global std::string variable named "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>"
- * (see note) which is loaded at runtime from a dynamic linked library
- * (referenced by the macro CALLBACKS_LA) and whose value is the name of
+ * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, The callback name can be
+ * specified as parameter (as trailing ..."$callbackName") otherwise it is checked
+ * if there exists a name specified as "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>"
+ * (see note) to be used callback name.\n
+ * This name is loaded at runtime from a dynamic linked library
+ * (referenced by the macro CALLBACKS_LA) and its value is the name of
  * the callback function (contained in the same library too) for the same event
  * type.\n
  * If this variable doesn't exist or if any error occurs the default
@@ -324,8 +326,9 @@ private:
 	std::map<std::string, std::string> mEventTable;
 	///Table of event types keyed by events.
 	std::map<std::string, std::string> mEventTypeTable;
-	///Table of callbacks keyed by event type names.
-	std::map<std::string, PCALLBACK> mCallbackTable;
+	///Table of <name,callback> pairs keyed by event type names.
+	typedef std::pair<std::string, PCALLBACK> NameCallbackPair;
+	std::map<std::string, NameCallbackPair> mCallbackTable;
 
 	///Helper flags.
 	bool mCallbacksLoaded, mCallbacksRegistered;

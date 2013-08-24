@@ -97,34 +97,47 @@ void Component::doSetupEventTables()
 		for (iter = eventList.begin(); iter != eventList.end(); ++iter)
 		{
 			//any "events" string is a "compound" one, i.e. could have the form:
-			// "eventType1@event1:eventType2@event2:...:eventTypeN@eventN"
+			// "eventType1@event1:eventType2@event2:...:eventTypeN@eventN$callback"
+			std::vector<std::string> eventsCallbackPairs = parseCompoundString(
+					*iter, '$');
+			//check if there is a pair and set the callback name
+			//as the second element (if any) that could be empty
+			std::string callbackName = std::string("");
+			if (eventsCallbackPairs.size() >= 2)
+			{
+				callbackName = eventsCallbackPairs[1];
+			}
+			//
 			std::vector<std::string> typeEventPairs = parseCompoundString(*iter,
 					':');
 			std::vector<std::string>::const_iterator iterPair;
-			for (iterPair = typeEventPairs.begin(); iterPair != typeEventPairs.end();
-					++iterPair)
+			for (iterPair = typeEventPairs.begin();
+					iterPair != typeEventPairs.end(); ++iterPair)
 			{
 				//an empty eventType@event pair is ignored
 				if (not iterPair->empty())
 				{
 					//get event type and event
-					std::vector<std::string> typeEventPair = parseCompoundString(
-							*iterPair, '@');
+					std::vector<std::string> typeEventPair =
+							parseCompoundString(*iterPair, '@');
 					//check only if there is a pair
-					if(typeEventPair.size() >= 2)
+					if (typeEventPair.size() >= 2)
 					{
 						//ignore a not existent event type (== typeEventPair[0])
 						//or a not existent event (== typeEventPair[1])
 						if (mOwnerObject->objectTmpl()->isComponentParameter(
-								"event_types", typeEventPair[0], componentType())
+								"event_types", typeEventPair[0],
+								componentType())
 								and (not typeEventPair[1].empty()))
 						{
 							//insert event keyed by eventType;
 							mEventTable[typeEventPair[0]] = typeEventPair[1];
 							//insert eventType keyed by event;
-							mEventTypeTable[typeEventPair[1]] = typeEventPair[0];
-							//insert the NULL callback keyed by eventType;
-							mCallbackTable[typeEventPair[0]] = NULL;
+							mEventTypeTable[typeEventPair[1]] =
+									typeEventPair[0];
+							//insert the <callbackName,NULL> pair keyed by eventType;
+							mCallbackTable[typeEventPair[0]] =
+									NameCallbackPair(callbackName, NULL);
 						}
 					}
 				}
@@ -172,28 +185,38 @@ void Component::doLoadEventCallbacks()
 		}
 		return;
 	}
-	//load every callback
-	std::map<std::string, PCALLBACK>::iterator iter;
-	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
+	//load every callback, as specified in callbacks' name table
+	std::map<std::string, NameCallbackPair>::iterator iterCallbackTable;
+	for (iterCallbackTable = mCallbackTable.begin();
+			iterCallbackTable != mCallbackTable.end(); ++iterCallbackTable)
 	{
+		std::string callbackName;
+		if(not (iterCallbackTable->second.first).empty())
+		{
+			//the callback name has been specified as parameter
+			callbackName = iterCallbackTable->second.first;
+		}
+		else
+		{
+			//the callback name has not been specified as parameter:
+			//try the name: <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>
+			std::string callbackNameTmp = (iterCallbackTable->first) + "_"
+					+ std::string(componentType()) + "_"
+					+ std::string(mOwnerObject->objectTmpl()->objectType());
+			//replace hyphens
+			callbackName = replaceCharacter(callbackNameTmp, '-', '_');
+		}
 		//reset errors
 		lt_dlerror();
-		//load the variable whose value is the name
-		//of the callback: <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>
-		std::string variableTmp = (iter->first) + "_"
-				+ std::string(componentType()) + "_"
-				+ std::string(mOwnerObject->objectTmpl()->objectType());
-		//replace hyphens
-		std::string variableName = replaceCharacter(variableTmp, '-', '_');
 		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) lt_dlsym(mCallbackLib,
-				variableName.c_str());
+				callbackName.c_str());
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINT_ERR(
-					"Cannot load variable " << variableName << ": " << dlsymError);
+					"Cannot load variable " << callbackName << ": " << dlsymError);
 			//set default callback for this event
-			mCallbackTable[iter->first] = pDefaultCallback;
+			mCallbackTable[iterCallbackTable->first].second = pDefaultCallback;
 			//continue with the next event
 			continue;
 		}
@@ -208,12 +231,12 @@ void Component::doLoadEventCallbacks()
 			PRINT_ERR(
 					"Cannot load callback " << pCallbackName << ": " << dlsymError);
 			//set default callback for this event
-			mCallbackTable[iter->first] = pDefaultCallback;
+			mCallbackTable[iterCallbackTable->first].second = pDefaultCallback;
 			//continue with the next event
 			continue;
 		}
 		//set callback for this event
-		mCallbackTable[iter->first] = pCallback;
+		mCallbackTable[iterCallbackTable->first].second = pCallback;
 	}
 
 	//callbacks loaded
@@ -225,7 +248,7 @@ void Component::doUnloadEventCallbacks()
 	//if callbacks not loaded do nothing
 	RETURN_ON_COND(not mCallbacksLoaded,)
 
-	//clear callback table
+	//clear callback tables
 	mCallbackTable.clear();
 	//Close the event callbacks library
 	// reset errors
@@ -246,18 +269,21 @@ void Component::registerEventCallbacks()
 	RETURN_ON_COND(mCallbacksRegistered,)
 
 	//register every handler
-	std::map<std::string, PCALLBACK>::iterator iter;
-	for (iter = mCallbackTable.begin(); iter != mCallbackTable.end(); ++iter)
+	std::map<std::string, NameCallbackPair>::iterator iterCallbackTable;
+	for (iterCallbackTable = mCallbackTable.begin();
+			iterCallbackTable != mCallbackTable.end(); ++iterCallbackTable)
 	{
-		//event = mEventTable[iter->first], iter->second==handler
+		//event = mEventTable[iter->first], iter->second.second==handler
 		//
-//		mTmpl->pandaFramework()->define_key(mEventTable[iter->first],
-//				iter->first + "@" + mEventTable[iter->first], iter->second,
-//				static_cast<void*>(this));
+//		mTmpl->pandaFramework()->define_key(
+//				mEventTable[iterCallbackTable->first],
+//				iterCallbackTable->first + "@"
+//						+ mEventTable[iterCallbackTable->first],
+//				iterCallbackTable->second.second, static_cast<void*>(this));
 		//
 		EventHandler::get_global_event_handler()->add_hook(
-				mEventTable[iter->first], iter->second,
-				static_cast<void*>(this));
+				mEventTable[iterCallbackTable->first],
+				iterCallbackTable->second.second, static_cast<void*>(this));
 	}
 
 	//handlers registered
