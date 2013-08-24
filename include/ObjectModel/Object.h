@@ -49,7 +49,8 @@ typedef std::string ObjectId;
  * An object is an aggregation of components: a “has a,” or whole/part,
  * relationship where neither class owns the other.\n
  * Object can be initialized after it is added to the scene, by
- * an initialization function, whose name is <OBJECTID>_initialization
+ * an initialization function, whose name can be specified as parameter
+ * or by a default which is the string "<OBJECTID>_initialization",
  * loaded at runtime from a dynamic linked library (referenced by the
  * macro INITIALIZATIONS_LA).
  *
@@ -59,6 +60,7 @@ typedef std::string ObjectId;
  * - "is_steady"  			|single|"false"
  * - "pos"  				|single|"0.0,0.0,0.0"
  * - "rot"  				|single|"0.0,0.0,0.0"
+ * - "init_func" 			|single|""
  *
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
@@ -276,6 +278,8 @@ private:
 	lt_dlhandle mInitializationLib;
 	///Helper flag.
 	bool mInitializationsLoaded;
+	///Initialization function name (optional).
+	std::string mInititializationFuncName;
 
 	/**
 	 * \name Helper functions to load/unload initialization functions.
@@ -416,6 +420,7 @@ inline void Object::doReset()
 	mIsSteady = false;
 	mInitializationLib = NULL;
 	mInitializationsLoaded = false;
+	mInititializationFuncName = std::string("");
 }
 
 }  // namespace ely

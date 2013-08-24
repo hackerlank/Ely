@@ -37,7 +37,7 @@ class ActivityTemplate;
  *
  * It is composed of a embedded fsm (i.e. FSM<std::string>) representing
  * the object game states (i.e. strings).\n
- * All objects of the same type share the same activity component's states.
+ * All objects of the same type share the same activity component's states.\n
  * A state transition can be request by delegating its embedded FSM
  * interface functions, like in this sample code:
  * \code

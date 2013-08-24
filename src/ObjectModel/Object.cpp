@@ -136,6 +136,8 @@ void Object::onAddToSceneSetup()
 		rot[i] = strtof(rotStr[i].c_str(), NULL);
 	}
 	mNodePath.set_hpr(rot[0], rot[1], rot[2]);
+	//initialization function name
+	mInititializationFuncName = mTmpl->parameter(std::string("init_func"));
 }
 
 void Object::onRemoveFromSceneCleanup()
@@ -164,7 +166,10 @@ void Object::worldSetup()
 		//load initialization function (if any): <OBJECTID>_initialization
 		// doReset errors
 		lt_dlerror();
-		functionName = std::string(mObjectId) + "_initialization";
+		functionName = (
+				not mInititializationFuncName.empty() ?
+						mInititializationFuncName :
+						std::string(mObjectId) + "_initialization");
 		PINITIALIZATION pInitializationFunction = (PINITIALIZATION) lt_dlsym(
 				mInitializationLib, functionName.c_str());
 		dlsymError = lt_dlerror();

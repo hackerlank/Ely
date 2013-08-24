@@ -133,6 +133,7 @@ void ObjectTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("store_params", "false"));
 	mParameterTable.insert(ParameterNameValue("pos", "0.0,0.0,0.0"));
 	mParameterTable.insert(ParameterNameValue("rot", "0.0,0.0,0.0"));
+	mParameterTable.insert(ParameterNameValue("init_func", ""));
 }
 
 std::string ObjectTemplate::parameter(const std::string& paramName) const
