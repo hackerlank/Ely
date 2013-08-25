@@ -8,7 +8,7 @@ initializations_la_SOURCES = \
 		defs/camera.cpp \
 		defs/course2.cpp \
 		defs/Plane1.cpp \
-		defs/Player1.cpp \
+		defs/player0.cpp \
 		defs/Steerer1.cpp \
 		defs/Terrain1.cpp		
 

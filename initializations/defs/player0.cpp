@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/defs/Player1.cpp
+ * \file /Ely/initializations/defs/player0.cpp
  *
  * \date 14/lug/2013 (08:48:01)
  * \author consultit
@@ -31,13 +31,13 @@ extern "C"
 {
 #endif
 
-INITIALIZATION Player1_initialization;
+INITIALIZATION player0_initialization;
 
 #ifdef __cplusplus
 }
 #endif
 
-void Player1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+void player0_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//Player1
@@ -51,10 +51,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	npc1Sound3d->getSound("walk-sound")->play();
 }
 
-void Player1Init()
+void player0Init()
 {
 }
 
-void Player1End()
+void player0End()
 {
 }

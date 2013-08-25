@@ -66,6 +66,8 @@ class ActivityTemplate;
  * - "from_to"			|multiple|no default (each one specified as
  * "state1@state2$fromToName", with second part after "$" optional)
  *
+ * \note "states" and "from_to" parameters are specified into the object
+ * template definition.
  * \note each "-" in any computed string will be replaced by "_".
  */
 class Activity: public Component

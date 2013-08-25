@@ -33,8 +33,8 @@
 				<Param states="forward:backward"/>
 				<Param states="strafe_left:strafe_right"/>
 				<Param states="up:down"/>
-				<Param from_to="forward@_strafe_left"/>
-				<Param from_to="forward_@_strafe_right"/>
+				<Param from_to="forward@strafe_left"/>
+				<Param from_to="forward@strafe_right"/>
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
 				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
