@@ -98,18 +98,19 @@ void Component::doSetupEventTables()
 		{
 			//any "events" string is a "compound" one, i.e. could have the form:
 			// "eventType1@event1:eventType2@event2:...:eventTypeN@eventN$callback"
-			std::vector<std::string> eventsCallbackPairs = parseCompoundString(
+			//parse string as a ((type,event)s,callback) pair
+			std::vector<std::string> typeEventsCallbackPair = parseCompoundString(
 					*iter, '$');
 			//check if there is a pair and set the callback name
 			//as the second element (if any) that could be empty
 			std::string callbackName = std::string("");
-			if (eventsCallbackPairs.size() >= 2)
+			if (typeEventsCallbackPair.size() >= 2)
 			{
-				callbackName = eventsCallbackPairs[1];
+				callbackName = typeEventsCallbackPair[1];
 			}
-			//
-			std::vector<std::string> typeEventPairs = parseCompoundString(*iter,
-					':');
+			//parse first element as (type,event) pair list
+			std::vector<std::string> typeEventPairs = parseCompoundString(
+					typeEventsCallbackPair[0], ':');
 			std::vector<std::string>::const_iterator iterPair;
 			for (iterPair = typeEventPairs.begin();
 					iterPair != typeEventPairs.end(); ++iterPair)

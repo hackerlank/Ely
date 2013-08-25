@@ -72,16 +72,36 @@ void Activity::doSetupFSM()
 	for (iter = stateList.begin(); iter != stateList.end(); ++iter)
 	{
 		//any "states" string is a "compound" one, i.e. could have the form:
-		// "state1:state2:...:stateN"
-		std::vector<std::string> states = parseCompoundString(*iter, ':');
+		// "state1:state2:...:stateN$enterName,exitName,filterName"
+		//parse string as a (states,transitionNameTriple) pair
+		std::vector<std::string> statesFuncNameTriple = parseCompoundString(
+				*iter, '$');
+		TransitionNameTriple transitionNameTriple;
+		//check if there is a pair and set the func-name triple
+		if (statesFuncNameTriple.size() >= 2)
+		{
+			//parse second element as a func-name triple
+			std::vector<std::string> funcNameList = parseCompoundString(
+					statesFuncNameTriple[1], ',');
+			//set only if there is (at least) a triple
+			if (funcNameList.size() >= 3)
+			{
+				transitionNameTriple.mEnter = funcNameList[0];
+				transitionNameTriple.mExit = funcNameList[1];
+				transitionNameTriple.mFilter = funcNameList[2];
+			}
+		}
+		//parse first element as a state list
+		std::vector<std::string> states = parseCompoundString(
+				statesFuncNameTriple[0], ':');
 		std::vector<std::string>::const_iterator iterState;
 		for (iterState = states.begin(); iterState != states.end(); ++iterState)
 		{
 			//an empty state is ignored
 			if (not iterState->empty())
 			{
-				//set default transitions for each state
-				mFSM.addState(*iterState, NULL, NULL, NULL);
+				//set transitions' names for each state
+				mStateTransitionTable[*iterState] = transitionNameTriple;
 			}
 		}
 	}
@@ -145,21 +165,30 @@ void Activity::doLoadTransitionFunctions()
 		return;
 	}
 
-	//for each state load transition functions if any
-	std::set<std::string> stateSet = mFSM.getKeyStateSet();
-	std::set<std::string>::iterator iter;
-	std::string objectId = std::string(mOwnerObject->objectId());
-	for (iter = stateSet.begin(); iter != stateSet.end(); ++iter)
+	//for each state load transition functions' names
+	std::map<std::string, TransitionNameTriple>::const_iterator iterTable;
+	for (iterTable = mStateTransitionTable.begin();
+			iterTable != mStateTransitionTable.end(); ++iterTable)
 	{
 		const char* dlsymError;
 		std::string functionName, functionNameTmp;
 
-		//load enter function (if any): Enter_<STATE>_<OBJECTYPE>
-		// reset errors
+		//reset errors
 		lt_dlerror();
-		functionNameTmp = std::string("Enter") + "_" + (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->objectType();
-		functionName = replaceCharacter(functionNameTmp, '-', '_');
+		//set enter functionName
+		if (not iterTable->second.mEnter.empty())
+		{
+			//set enter function name as specified (if any)
+			functionName = iterTable->second.mEnter.empty();
+		}
+		else
+		{
+			//set enter function name as "Enter_<STATE>_<OBJECTYPE>" (if any)
+			functionNameTmp = std::string("Enter") + "_" + iterTable->first
+					+ "_" + mOwnerObject->objectTmpl()->objectType();
+			functionName = replaceCharacter(functionNameTmp, '-', '_');
+
+		}
 		PENTER pEnterFunction = (PENTER) lt_dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = lt_dlerror();
@@ -169,12 +198,21 @@ void Activity::doLoadTransitionFunctions()
 			pEnterFunction = NULL;
 		}
 
-		//load exit function (if any): Exit_<STATE>_<OBJECTYPE>
-		// reset errors
+		//reset errors
 		lt_dlerror();
-		functionNameTmp = std::string("Exit") + "_" + (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->objectType();
-		functionName = replaceCharacter(functionNameTmp, '-', '_');
+		//set exit functionName
+		if (not iterTable->second.mExit.empty())
+		{
+			//set exit function name as specified (if any)
+			functionName = iterTable->second.mExit.empty();
+		}
+		else
+		{
+			//set exit function name as "Exit_<STATE>_<OBJECTYPE>" (if any)
+			functionNameTmp = std::string("Exit") + "_" + iterTable->first + "_"
+					+ mOwnerObject->objectTmpl()->objectType();
+			functionName = replaceCharacter(functionNameTmp, '-', '_');
+		}
 		PEXIT pExitFunction = (PEXIT) lt_dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = lt_dlerror();
@@ -184,12 +222,21 @@ void Activity::doLoadTransitionFunctions()
 			pExitFunction = NULL;
 		}
 
-		//load filter function (if any): Filter_<STATE>_<OBJECTYPE>
-		// reset errors
+		//reset errors
 		lt_dlerror();
-		functionNameTmp = std::string("Filter") + "_" + (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->objectType();
-		functionName = replaceCharacter(functionNameTmp, '-', '_');
+		//set filter functionName
+		if (not iterTable->second.mFilter.empty())
+		{
+			//set filter function name as specified (if any)
+			functionName = iterTable->second.mFilter.empty();
+		}
+		else
+		{
+			//set filter function name as "Filter_<STATE>_<OBJECTYPE>" (if any)
+			functionNameTmp = std::string("Filter") + "_" + iterTable->first
+					+ "_" + mOwnerObject->objectTmpl()->objectType();
+			functionName = replaceCharacter(functionNameTmp, '-', '_');
+		}
 		PFILTER pFilterFunction = (PFILTER) lt_dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = lt_dlerror();
@@ -198,28 +245,26 @@ void Activity::doLoadTransitionFunctions()
 			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
 			pFilterFunction = NULL;
 		}
-		//re-add the state with the current functions
-		fsm::EnterFuncPTR enterFunc = NULL;
-		if (pEnterFunction != NULL)
-		{
-			enterFunc = boost::bind(pEnterFunction, _1, boost::ref(*this), _2);
-		}
-		fsm::ExitFuncPTR exitFunc = NULL;
-		if (pExitFunction != NULL)
-		{
-			exitFunc = boost::bind(pExitFunction, _1, boost::ref(*this));
-		}
-		fsm::FilterFuncPTR filterFunc = NULL;
-		if (pFilterFunction != NULL)
-		{
-			filterFunc = boost::bind(pFilterFunction, _1, boost::ref(*this), _2,
-					_3);
-		}
-		//
-		mFSM.addState((*iter), enterFunc, exitFunc, filterFunc);
+		//add the state with the current transition functions
+		fsm::EnterFuncPTR enterFunc = (
+				pEnterFunction != NULL ?
+						boost::bind(pEnterFunction, _1, boost::ref(*this), _2) :
+						NULL);
+		fsm::ExitFuncPTR exitFunc = (
+				pExitFunction != NULL ?
+						boost::bind(pExitFunction, _1, boost::ref(*this)) :
+						NULL);
+		fsm::FilterFuncPTR filterFunc = (
+				pFilterFunction != NULL ?
+						boost::bind(pFilterFunction, _1, boost::ref(*this), _2,
+								_3) :
+						NULL);
+		//eventually add state
+		mFSM.addState(iterTable->first, enterFunc, exitFunc, filterFunc);
 	}
 
 	//load FromTo transition functions if any
+	std::set<std::string>::const_iterator iter;
 	for (iter = mFromToFunctionSet.begin(); iter != mFromToFunctionSet.end();
 			++iter)
 	{
@@ -229,7 +274,8 @@ void Activity::doLoadTransitionFunctions()
 		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTYPE>
 		// reset errors
 		lt_dlerror();
-		functionNameTmp = (*iter) + "_" + mOwnerObject->objectTmpl()->objectType();
+		functionNameTmp = (*iter) + "_"
+				+ mOwnerObject->objectTmpl()->objectType();
 		functionName = replaceCharacter(functionNameTmp, '-', '_');
 		PFROMTO pFromToFunction = (PFROMTO) lt_dlsym(mTransitionLib,
 				functionName.c_str());

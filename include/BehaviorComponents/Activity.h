@@ -101,6 +101,18 @@ private:
 	///The underlying FSM (read-only after creation & before destruction).
 	fsm mFSM;
 
+	///Helper data for transition functions keyed by state.
+	struct TransitionNameTriple
+	{
+		TransitionNameTriple():
+		mEnter(""),mExit(""),mFilter("")
+		{}
+		std::string mEnter;
+		std::string mExit;
+		std::string mFilter;
+	};
+	std::map<std::string, TransitionNameTriple> mStateTransitionTable;
+
 	//Transition functions library management.
 
 	///Set of "FromTo" transition functions.
@@ -172,6 +184,7 @@ inline void Activity::reset()
 	mFromToFunctionSet.clear();
 	mTransitionLib = NULL;
 	mTransitionsLoaded = false;
+	mStateTransitionTable.clear();
 }
 
 inline void Activity::onAddToSceneSetup()
