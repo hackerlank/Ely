@@ -44,12 +44,13 @@ class ActivityTemplate;
  * 	((fsm&)activity).request("stateC", valueList);
  * \endcode
  * Given an object with type <OBJECTYPE>, for any state called <STATE> and
- * three "transition" functions can be defined with these signatures:
+ * three "transition" functions can be defined as parameter or, by default,
+ * with these signatures:
  * - <tt>void Enter_<STATE>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);</tt>
  * - <tt>void Exit_<STATE>_<OBJECTYPE>(fsm*, Activity& activity);</tt>
  * - <tt>ValueList Filter_<STATE>_<OBJECTYPE>(fsm*, Activity& activity, const std::string& state, const ValueList& valueList);</tt>
  * Furthermore for a pair of state <STATEA>, <STATEB> a "transition" function
- * can be defined with this signature:
+ * can be defined as parameter or, by default, with this signature:
  * - <tt> void <STATEA>_FromTo_<STATEB>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);</tt>
  *
  * All these routines are loaded at runtime from a dynamic linked library
@@ -59,15 +60,13 @@ class ActivityTemplate;
  * \see FSM for details.
  *
  * XML Param(s):
- * - "states"  			|multiple|no default
- * - "from_to"			|multiple|no default
- * \note All these parameters are specified into the object template
- * definition.
+ * - "states"  			|multiple|no default (each one specified as
+ * "state1:state2:...:stateN$enterName,exitName,filterName",
+ * with second part after "$" optional)
+ * - "from_to"			|multiple|no default (each one specified as
+ * "state1@state2$fromToName", with second part after "$" optional)
  *
- * \note given stateA and stateB the value of a parameter "from_to" would be
- * "stateA_FromTo_stateB".
- * \note each state name should be a valid C++ identifier, moreover, due to
- * the previous note, it should not contain the "_FromTo_" substring.
+ * \note each "-" in any computed string will be replaced by "_".
  */
 class Activity: public Component
 {
@@ -101,7 +100,13 @@ private:
 	///The underlying FSM (read-only after creation & before destruction).
 	fsm mFSM;
 
-	///Helper data for transition functions keyed by state.
+	//Transition functions library management.
+
+	/**
+	 * \name Temporary helper data/functions.
+	 */
+	///@{
+	///Transition functions' names keyed by state.
 	struct TransitionNameTriple
 	{
 		TransitionNameTriple():
@@ -112,11 +117,12 @@ private:
 		std::string mFilter;
 	};
 	std::map<std::string, TransitionNameTriple> mStateTransitionTable;
-
-	//Transition functions library management.
-
-	///Set of "FromTo" transition functions.
-	std::set<std::string> mFromToFunctionSet;
+	///FromTo transition functions' names keyed by state.
+	typedef std::pair<std::string, std::string> StatePair;
+	std::map<StatePair, std::string> mStatePairFromToTable;
+	///Setup helper data.
+	void doSetupHelperData();
+	///@}
 
 	/**
 	 * \name Handles, typedefs, for managing library of transition functions.
@@ -128,15 +134,6 @@ private:
 	typedef ValueList (*PFILTER)(fsm*, Activity&, const std::string&,
 			const ValueList&);
 	typedef void (*PFROMTO)(fsm*, Activity&, const ValueList&);
-	/**
-	 * \brief Helper to setup this activity component FSM.
-	 * \note Because activity's states and transition functions are
-	 * shared by all object of the same type, and because they are
-	 * stored into the object template, this function should be called
-	 * only after the component's owner object has been set, for
-	 * example into onAddToObjectSetup component method.
-	 */
-	void doSetupFSM();
 	///@}
 
 	///Helper flag.
@@ -181,10 +178,8 @@ private:
 inline void Activity::reset()
 {
 	mFSM.cleanup();
-	mFromToFunctionSet.clear();
 	mTransitionLib = NULL;
 	mTransitionsLoaded = false;
-	mStateTransitionTable.clear();
 }
 
 inline void Activity::onAddToSceneSetup()

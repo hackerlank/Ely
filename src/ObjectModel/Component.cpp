@@ -192,7 +192,7 @@ void Component::doLoadEventCallbacks()
 			iterCallbackTable != mCallbackTable.end(); ++iterCallbackTable)
 	{
 		std::string callbackName;
-		if(not (iterCallbackTable->second.first).empty())
+		if(not iterCallbackTable->second.first.empty())
 		{
 			//the callback name has been specified as parameter
 			callbackName = iterCallbackTable->second.first;
@@ -209,28 +209,14 @@ void Component::doLoadEventCallbacks()
 		}
 		//reset errors
 		lt_dlerror();
-		PCALLBACKNAME pCallbackName = (PCALLBACKNAME) lt_dlsym(mCallbackLib,
+		//load the callback
+		PCALLBACK pCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
 				callbackName.c_str());
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
 			PRINT_ERR(
-					"Cannot load variable " << callbackName << ": " << dlsymError);
-			//set default callback for this event
-			mCallbackTable[iterCallbackTable->first].second = pDefaultCallback;
-			//continue with the next event
-			continue;
-		}
-		//reset errors
-		lt_dlerror();
-		//load the callback
-		PCALLBACK pCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
-				pCallbackName->c_str());
-		dlsymError = lt_dlerror();
-		if (dlsymError)
-		{
-			PRINT_ERR(
-					"Cannot load callback " << pCallbackName << ": " << dlsymError);
+					"Cannot load callback " << callbackName << ": " << dlsymError);
 			//set default callback for this event
 			mCallbackTable[iterCallbackTable->first].second = pDefaultCallback;
 			//continue with the next event

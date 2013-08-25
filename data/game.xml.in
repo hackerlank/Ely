@@ -33,8 +33,8 @@
 				<Param states="forward:backward"/>
 				<Param states="strafe_left:strafe_right"/>
 				<Param states="up:down"/>
-				<Param from_to="forward_FromTo_strafe_left"/>
-				<Param from_to="forward_FromTo_strafe_right"/>
+				<Param from_to="forward@_strafe_left"/>
+				<Param from_to="forward_@_strafe_right"/>
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
 				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
@@ -144,7 +144,7 @@
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
-				<Param chased_object="Player1"/>
+				<Param chased_object="player0"/>
 				<Param fixed_relative_position="false"/>
 				<Param reference_object="render"/>
 				<Param abs_max_distance="24.0"/>
@@ -301,17 +301,17 @@
 			<Param rot="0.0,0.0,90.0"/>
 		</Object>
 
-		<Object type="Character" id="Player1" priority="100">
+		<Object type="Character" id="player0" priority="100">
 			<Component type="Activity">
-				<Param events="f@i:f-up@i-up:f-q@alt-i"/>
-				<Param events="b@k:b-up@k-up:b-q@alt-k"/>
-				<Param events="sr@o:sr-up@o-up:sr-q@alt-o"/>
-				<Param events="sl@u:sl-up@u-up:sl-q@alt-u"/>
-				<Param events="rr@l:rr-up@l-up:rr-q@alt-l"/>
-				<Param events="rl@j:rl-up@j-up:rl-q@alt-j"/>
-				<Param events="j@space:j-up@space-up:j-q@alt-space"/>				
-				<Param events="q@alt:q-up@alt-up"/>				
-				<Param events="ground@OnGround:air@OnAir"/>				
+				<Param events="f@i:f-up@i-up:f-q@alt-i$activityPlayer0"/>
+				<Param events="b@k:b-up@k-up:b-q@alt-k$activityPlayer0"/>
+				<Param events="sr@o:sr-up@o-up:sr-q@alt-o$activityPlayer0"/>
+				<Param events="sl@u:sl-up@u-up:sl-q@alt-u$activityPlayer0"/>
+				<Param events="rr@l:rr-up@l-up:rr-q@alt-l$activityPlayer0"/>
+				<Param events="rl@j:rl-up@j-up:rl-q@alt-j$activityPlayer0"/>
+				<Param events="j@space:j-up@space-up:j-q@alt-space$activityPlayer0"/>				
+				<Param events="q@alt:q-up@alt-up$activityPlayer0"/>				
+				<Param events="ground@OnGround:air@OnAir$groundAirPlayer0"/>				
 			</Component>
 			<Component type="Model">
 				<Param model_file="eve.bam"/>

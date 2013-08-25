@@ -61,17 +61,18 @@ class ComponentTemplate;
  * Panda task.\n
  * Each component can respond to Panda events (stimuli) by registering
  * or unregistering callbacks for them with the global EventHandler.\n
- * Each event has a type, and a callback associated.\n
- * For any event of type "<EVENTTYPE>" associated with a component of type
- * <COMPONENTTYPE> of an object of type <OBJECTTYPE>, The callback name can be
- * specified as parameter (as trailing ..."$callbackName") otherwise it is checked
- * if there exists a name specified as "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>"
- * (see note) to be used callback name.\n
- * This name is loaded at runtime from a dynamic linked library
- * (referenced by the macro CALLBACKS_LA) and its value is the name of
- * the callback function (contained in the same library too) for the same event
- * type.\n
- * If this variable doesn't exist or if any error occurs the default
+ * Each event has a type, and a callback associated, and every Components
+ * of a given type, belonging to a given Object type, responds to same
+ * types of event.\n
+ * The callback function name for an event of a given type, can be specified
+ * as parameter (as trailing ..."$callbackName"), or, by default, for any event
+ * of type "<EVENTTYPE>" associated with a component of type <COMPONENTTYPE> of
+ * an object of type <OBJECTTYPE>, the callback function name is checked
+ * as "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>" (this means that by default
+ * all Components respond to that event with the same callback).\n
+ * This callback function is loaded at runtime from a dynamic linked library
+ * (referenced by the macro CALLBACKS_LA).\n
+ * If the callback function doesn't exist or if any error occurs the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
  * To check if a "name" is an allowed event type call:
  * \code
@@ -319,7 +320,7 @@ private:
 	///@{
 	lt_dlhandle mCallbackLib;
 	typedef EventHandler::EventCallbackFunction* PCALLBACK;
-	typedef std::string* PCALLBACKNAME;
+//	typedef std::string* PCALLBACKNAME;
 	///@}
 
 	///Table of events keyed by event types.

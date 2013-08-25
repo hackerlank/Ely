@@ -33,26 +33,26 @@ extern "C"
 #endif
 
 ///Actor + Activity related
-CALLBACK fastActivityActor;
-CALLBACK stopFastActivityActor;
-CALLBACK forwardActivityActor;
-CALLBACK stopForwardActivityActor;
-CALLBACK fastForwardActivityActor;
-CALLBACK backwardActivityActor;
-CALLBACK stopBackwardActivityActor;
-CALLBACK fastBackwardActivityActor;
-CALLBACK rollLeftActivityActor;
-CALLBACK stopRollLeftActivityActor;
-CALLBACK fastRollLeftActivityActor;
-CALLBACK rollRightActivityActor;
-CALLBACK stopRollRightActivityActor;
-CALLBACK fastRollRightActivityActor;
-CALLBACK upActivityActor;
-CALLBACK stopUpActivityActor;
-CALLBACK fastUpActivityActor;
-CALLBACK downActivityActor;
-CALLBACK stopDownActivityActor;
-CALLBACK fastDownActivityActor;
+CALLBACK fast_Activity_Actor;
+CALLBACK stop_fast_Activity_Actor;
+CALLBACK forward_Activity_Actor;
+CALLBACK stop_forward_Activity_Actor;
+CALLBACK fast_forward_Activity_Actor;
+CALLBACK backward_Activity_Actor;
+CALLBACK stop_backward_Activity_Actor;
+CALLBACK fast_backward_Activity_Actor;
+CALLBACK roll_left_Activity_Actor;
+CALLBACK stop_roll_left_Activity_Actor;
+CALLBACK fast_roll_left_Activity_Actor;
+CALLBACK roll_right_Activity_Actor;
+CALLBACK stop_roll_right_Activity_Actor;
+CALLBACK fast_roll_right_Activity_Actor;
+CALLBACK up_Activity_Actor;
+CALLBACK stop_up_Activity_Actor;
+CALLBACK fast_up_Activity_Actor;
+CALLBACK down_Activity_Actor;
+CALLBACK stop_down_Activity_Actor;
+CALLBACK fast_down_Activity_Actor;
 
 #ifdef __cplusplus
 }
@@ -60,10 +60,8 @@ CALLBACK fastDownActivityActor;
 
 ///Actor + Activity related CALLBACKNAMEs & CALLBACKs
 //fast:stop-fast
-CALLBACKNAME fast_Activity_Actor = "fastActivityActor";
-CALLBACKNAME stop_fast_Activity_Actor = "stopFastActivityActor";
 static bool isFast = false;
-void fastActivityActor(const Event* event, void* data)
+void fast_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 //	SMARTPTR(Activity)activity = reinterpret_cast<Activity*>(data);
@@ -81,7 +79,7 @@ void fastActivityActor(const Event* event, void* data)
 		isFast = not isFast;
 	}
 }
-void stopFastActivityActor(const Event* event, void* data)
+void stop_fast_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -97,10 +95,7 @@ void stopFastActivityActor(const Event* event, void* data)
 	}
 }
 //forward:stop-forward:fast-forward
-CALLBACKNAME forward_Activity_Actor = "forwardActivityActor";
-CALLBACKNAME stop_forward_Activity_Actor = "stopForwardActivityActor";
-CALLBACKNAME fast_forward_Activity_Actor = "fastForwardActivityActor";
-void forwardActivityActor(const Event* event, void* data)
+void forward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -109,7 +104,7 @@ void forwardActivityActor(const Event* event, void* data)
 
 	actorDrv->enableForward(true);
 }
-void stopForwardActivityActor(const Event* event, void* data)
+void stop_forward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -118,16 +113,13 @@ void stopForwardActivityActor(const Event* event, void* data)
 
 	actorDrv->enableForward(false);
 }
-void fastForwardActivityActor(const Event* event, void* data)
+void fast_forward_Activity_Actor(const Event* event, void* data)
 {
-	fastActivityActor(event, data);
-	forwardActivityActor(event, data);
+	fast_Activity_Actor(event, data);
+	forward_Activity_Actor(event, data);
 }
 //backward:stop-backward:fast-backward
-CALLBACKNAME backward_Activity_Actor = "backwardActivityActor";
-CALLBACKNAME stop_backward_Activity_Actor = "stopBackwardActivityActor";
-CALLBACKNAME fast_backward_Activity_Actor = "fastBackwardActivityActor";
-void backwardActivityActor(const Event* event, void* data)
+void backward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -136,7 +128,7 @@ void backwardActivityActor(const Event* event, void* data)
 
 	actorDrv->enableBackward(true);
 }
-void stopBackwardActivityActor(const Event* event, void* data)
+void stop_backward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -145,16 +137,13 @@ void stopBackwardActivityActor(const Event* event, void* data)
 
 	actorDrv->enableBackward(false);
 }
-void fastBackwardActivityActor(const Event* event, void* data)
+void fast_backward_Activity_Actor(const Event* event, void* data)
 {
-	fastActivityActor(event, data);
-	backwardActivityActor(event, data);
+	fast_Activity_Actor(event, data);
+	backward_Activity_Actor(event, data);
 }
 //roll_left:stop-roll_left:fast-roll_left
-CALLBACKNAME roll_left_Activity_Actor = "rollLeftActivityActor";
-CALLBACKNAME stop_roll_left_Activity_Actor = "stopRollLeftActivityActor";
-CALLBACKNAME fast_roll_left_Activity_Actor = "fastRollLeftActivityActor";
-void rollLeftActivityActor(const Event* event, void* data)
+void roll_left_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -163,7 +152,7 @@ void rollLeftActivityActor(const Event* event, void* data)
 
 	actorDrv->enableRollLeft(true);
 }
-void stopRollLeftActivityActor(const Event* event, void* data)
+void stop_roll_left_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -172,16 +161,13 @@ void stopRollLeftActivityActor(const Event* event, void* data)
 
 	actorDrv->enableRollLeft(false);
 }
-void fastRollLeftActivityActor(const Event* event, void* data)
+void fast_roll_left_Activity_Actor(const Event* event, void* data)
 {
-	fastActivityActor(event, data);
-	rollLeftActivityActor(event, data);
+	fast_Activity_Actor(event, data);
+	roll_left_Activity_Actor(event, data);
 }
 //roll_right:stop-roll_right:fast-roll_right
-CALLBACKNAME roll_right_Activity_Actor = "rollRightActivityActor";
-CALLBACKNAME stop_roll_right_Activity_Actor = "stopRollRightActivityActor";
-CALLBACKNAME fast_roll_right_Activity_Actor = "fastRollRightActivityActor";
-void rollRightActivityActor(const Event* event, void* data)
+void roll_right_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -190,7 +176,7 @@ void rollRightActivityActor(const Event* event, void* data)
 
 	actorDrv->enableRollRight(true);
 }
-void stopRollRightActivityActor(const Event* event, void* data)
+void stop_roll_right_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -199,16 +185,13 @@ void stopRollRightActivityActor(const Event* event, void* data)
 
 	actorDrv->enableRollRight(false);
 }
-void fastRollRightActivityActor(const Event* event, void* data)
+void fast_roll_right_Activity_Actor(const Event* event, void* data)
 {
-	fastActivityActor(event, data);
-	rollRightActivityActor(event, data);
+	fast_Activity_Actor(event, data);
+	roll_right_Activity_Actor(event, data);
 }
 //up:stop-up:fast-up
-CALLBACKNAME up_Activity_Actor = "upActivityActor";
-CALLBACKNAME stop_up_Activity_Actor = "stopUpActivityActor";
-CALLBACKNAME fast_up_Activity_Actor = "fastUpActivityActor";
-void upActivityActor(const Event* event, void* data)
+void up_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -217,7 +200,7 @@ void upActivityActor(const Event* event, void* data)
 
 	actorDrv->enableUp(true);
 }
-void stopUpActivityActor(const Event* event, void* data)
+void stop_up_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -226,16 +209,13 @@ void stopUpActivityActor(const Event* event, void* data)
 
 	actorDrv->enableUp(false);
 }
-void fastUpActivityActor(const Event* event, void* data)
+void fast_up_Activity_Actor(const Event* event, void* data)
 {
-	fastActivityActor(event, data);
-	upActivityActor(event, data);
+	fast_Activity_Actor(event, data);
+	up_Activity_Actor(event, data);
 }
 //down:stop-down:fast-down
-CALLBACKNAME down_Activity_Actor = "downActivityActor";
-CALLBACKNAME stop_down_Activity_Actor = "stopDownActivityActor";
-CALLBACKNAME fast_down_Activity_Actor = "fastDownActivityActor";
-void downActivityActor(const Event* event, void* data)
+void down_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -244,7 +224,7 @@ void downActivityActor(const Event* event, void* data)
 
 	actorDrv->enableDown(true);
 }
-void stopDownActivityActor(const Event* event, void* data)
+void stop_down_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv =
@@ -253,10 +233,10 @@ void stopDownActivityActor(const Event* event, void* data)
 
 	actorDrv->enableDown(false);
 }
-void fastDownActivityActor(const Event* event, void* data)
+void fast_down_Activity_Actor(const Event* event, void* data)
 {
-	fastActivityActor(event, data);
-	downActivityActor(event, data);
+	fast_Activity_Actor(event, data);
+	down_Activity_Actor(event, data);
 }
 
 ///Init/end functions: see common_configs.cpp

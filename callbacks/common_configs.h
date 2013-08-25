@@ -42,9 +42,6 @@ void callAllEnds();
 
 //generic typedefs
 typedef EventHandler::EventCallbackFunction CALLBACK;
-typedef std::string CALLBACKNAME;
-
-//extern CALLBACKNAME EVENT_COMPONENTTYPE_OBJECTID;
 
 #ifdef __cplusplus
 extern "C"

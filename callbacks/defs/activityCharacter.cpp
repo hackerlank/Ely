@@ -32,54 +32,28 @@ extern "C"
 {
 #endif
 
-///Character + Activity related
-CALLBACK activityCharacter;
-CALLBACK groundAirCharacter;
+///player0 + Activity related
+CALLBACK activityPlayer0;
+CALLBACK groundAirPlayer0;
 
 #ifdef __cplusplus
 }
 #endif
 
-///Character + Activity related CALLBACKNAMEs
 //f:f-up:f-q
-CALLBACKNAME f_Activity_Character = "activityCharacter";
-CALLBACKNAME f_up_Activity_Character = "activityCharacter";
-CALLBACKNAME f_q_Activity_Character = "activityCharacter";
 //b:b-up:b-q
-CALLBACKNAME b_Activity_Character = "activityCharacter";
-CALLBACKNAME b_up_Activity_Character = "activityCharacter";
-CALLBACKNAME b_q_Activity_Character = "activityCharacter";
 //sr:sr-up:sr-q
-CALLBACKNAME sr_Activity_Character = "activityCharacter";
-CALLBACKNAME sr_up_Activity_Character = "activityCharacter";
-CALLBACKNAME sr_q_Activity_Character = "activityCharacter";
 //sl:sl-up:sl-q
-CALLBACKNAME sl_Activity_Character = "activityCharacter";
-CALLBACKNAME sl_up_Activity_Character = "activityCharacter";
-CALLBACKNAME sl_q_Activity_Character = "activityCharacter";
 //rr:rr-up:rr-q
-CALLBACKNAME rr_Activity_Character = "activityCharacter";
-CALLBACKNAME rr_up_Activity_Character = "activityCharacter";
-CALLBACKNAME rr_q_Activity_Character = "activityCharacter";
 //rl:rl-up:rl-q
-CALLBACKNAME rl_Activity_Character = "activityCharacter";
-CALLBACKNAME rl_up_Activity_Character = "activityCharacter";
-CALLBACKNAME rl_q_Activity_Character = "activityCharacter";
 //j:j-up:j-q
-CALLBACKNAME j_Activity_Character = "activityCharacter";
-CALLBACKNAME j_up_Activity_Character = "activityCharacter";
-CALLBACKNAME j_q_Activity_Character = "activityCharacter";
 //q:q-up
-CALLBACKNAME q_Activity_Character = "activityCharacter";
-CALLBACKNAME q_up_Activity_Character = "activityCharacter";
 //ground:air
-CALLBACKNAME ground_Activity_Character = "groundAirCharacter";
-CALLBACKNAME air_Activity_Character = "groundAirCharacter";
 
 ///Character + Activity related functions/variables
 //Transition table: <eventType, currentState> -> nextState
 static TransitionTable* tablePtr;
-void activityCharacter(const Event * event, void * data)
+void activityPlayer0(const Event * event, void * data)
 {
 	//get data
 	SMARTPTR(Activity)activity = reinterpret_cast<Activity*>(data);
@@ -99,12 +73,12 @@ void activityCharacter(const Event * event, void * data)
 	}
 	else
 	{
-		PRINT_ERR("activityCharacter: Transition not defined for event type '" <<
+		PRINT_ERR("activityPlayer0: Transition not defined for event type '" <<
 				eventType << "' and state '" << currentState << "'");
 	}
 }
 
-void groundAirCharacter(const Event * event, void * data)
+void groundAirPlayer0(const Event * event, void * data)
 {
 	//get data
 	SMARTPTR(Object)characterObj = ObjectTemplateManager::GetSingletonPtr()->
@@ -123,7 +97,7 @@ void groundAirCharacter(const Event * event, void * data)
 	}
 	else
 	{
-		PRINT_ERR("groundAirCharacter: unrecognized event");
+		PRINT_ERR("groundAirPlayer0: unrecognized event");
 	}
 }
 

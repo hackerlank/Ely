@@ -62,10 +62,14 @@ bool Activity::initialize()
 	return result;
 }
 
-void Activity::doSetupFSM()
+void Activity::doSetupHelperData()
 {
+	//clear helper data
+	mStateTransitionTable.clear();
+	mStatePairFromToTable.clear();
+	//
 	std::list<std::string>::iterator iter;
-	//setup states
+	//setup transition functions' names table
 	std::list<std::string> stateList =
 			mOwnerObject->objectTmpl()->componentParameterList(
 					std::string("states"), componentType());
@@ -76,8 +80,8 @@ void Activity::doSetupFSM()
 		//parse string as a (states,transitionNameTriple) pair
 		std::vector<std::string> statesFuncNameTriple = parseCompoundString(
 				*iter, '$');
-		TransitionNameTriple transitionNameTriple;
 		//check if there is a pair and set the func-name triple
+		TransitionNameTriple transitionNameTriple;
 		if (statesFuncNameTriple.size() >= 2)
 		{
 			//parse second element as a func-name triple
@@ -105,24 +109,36 @@ void Activity::doSetupFSM()
 			}
 		}
 	}
-	//setup FromTo transition function set
+	//setup FromTo functions' names table
 	std::list<std::string> fromToList =
 			mOwnerObject->objectTmpl()->componentParameterList(
 					std::string("from_to"), componentType());
 	for (iter = fromToList.begin(); iter != fromToList.end(); ++iter)
 	{
 		//any "from_to" string is a "compound" one, i.e. could have the form:
-		// "from_to1:from_to2:...:from_toN"
-		std::vector<std::string> fromTos = parseCompoundString(*iter, ':');
-		std::vector<std::string>::const_iterator iterFromTo;
-		for (iterFromTo = fromTos.begin(); iterFromTo != fromTos.end();
-				++iterFromTo)
+		// "state1@state2$fromToName"
+		//parse string as a (statePair,fromToName) pair
+		std::vector<std::string> statePairFromToName = parseCompoundString(
+				*iter, '$');
+		//check if there is (at least) a pair and set the fromTo name
+		std::string fromToName("");
+		if (statePairFromToName.size() >= 2)
 		{
-			//an empty from_to is ignored
-			if (not iterFromTo->empty())
+			//set second element as FromToName
+			fromToName = statePairFromToName[1];
+		}
+		//parse first element as a state pair
+		std::vector<std::string> statePair = parseCompoundString(*iter, '@');
+		//check if there is (at least) a pair and the states are not empty
+		if (statePair.size() >= 2)
+		{
+			if (statePair[0].empty() or statePair[1].empty())
 			{
-				mFromToFunctionSet.insert(*iterFromTo);
+				continue;
 			}
+			//insert into the FromTo functions' names table
+			mStatePairFromToTable[StatePair(statePair[0], statePair[1])] =
+					fromToName;
 		}
 	}
 }
@@ -132,7 +148,7 @@ void Activity::onAddToObjectSetup()
 	//add even for an empty object node path
 
 	//setup the FSM
-	doSetupFSM();
+	doSetupHelperData();
 
 	//load transitions library
 	doLoadTransitionFunctions();
@@ -149,7 +165,7 @@ void Activity::onRemoveFromObjectCleanup()
 void Activity::doLoadTransitionFunctions()
 {
 	//if no states or transitions loaded do nothing
-	if ((mFSM.getNumStates() == 0) or mTransitionsLoaded)
+	if ((mStateTransitionTable.size() == 0) or mTransitionsLoaded)
 	{
 		return;
 	}
@@ -246,37 +262,52 @@ void Activity::doLoadTransitionFunctions()
 			pFilterFunction = NULL;
 		}
 		//add the state with the current transition functions
-		fsm::EnterFuncPTR enterFunc = (
-				pEnterFunction != NULL ?
-						boost::bind(pEnterFunction, _1, boost::ref(*this), _2) :
-						NULL);
-		fsm::ExitFuncPTR exitFunc = (
-				pExitFunction != NULL ?
-						boost::bind(pExitFunction, _1, boost::ref(*this)) :
-						NULL);
-		fsm::FilterFuncPTR filterFunc = (
-				pFilterFunction != NULL ?
-						boost::bind(pFilterFunction, _1, boost::ref(*this), _2,
-								_3) :
-						NULL);
+		fsm::EnterFuncPTR enterFunc = NULL;
+		if (pEnterFunction != NULL)
+		{
+			enterFunc = boost::bind(pEnterFunction, _1, boost::ref(*this), _2);
+		}
+		fsm::ExitFuncPTR exitFunc = NULL;
+		if (pExitFunction != NULL)
+		{
+			exitFunc = boost::bind(pExitFunction, _1, boost::ref(*this));
+		}
+		fsm::FilterFuncPTR filterFunc = NULL;
+		if (pFilterFunction != NULL)
+		{
+			filterFunc = boost::bind(pFilterFunction, _1, boost::ref(*this), _2,
+					_3);
+		}
 		//eventually add state
 		mFSM.addState(iterTable->first, enterFunc, exitFunc, filterFunc);
 	}
 
 	//load FromTo transition functions if any
-	std::set<std::string>::const_iterator iter;
-	for (iter = mFromToFunctionSet.begin(); iter != mFromToFunctionSet.end();
-			++iter)
+	std::map<StatePair, std::string>::const_iterator iterTable1;
+	for (iterTable1 = mStatePairFromToTable.begin(); iterTable1 != mStatePairFromToTable.end();
+			++iterTable1)
 	{
 		const char* dlsymError;
-		std::string functionName, functionNameTmp;
+		std::string stateA, stateB, functionName, functionNameTmp;
 
-		//load FromTo function: <STATEA>_FromTo_<STATEB>_<OBJECTYPE>
-		// reset errors
+		//reset errors
 		lt_dlerror();
-		functionNameTmp = (*iter) + "_"
-				+ mOwnerObject->objectTmpl()->objectType();
-		functionName = replaceCharacter(functionNameTmp, '-', '_');
+		//set states
+		stateA = iterTable1->first.first;
+		stateB = iterTable1->first.second;
+		//set FromTo functionName
+		if (not iterTable1->second.empty())
+		{
+			//set FromTo function name as specified (if any)
+			functionName = iterTable1->second.empty();
+		}
+		else
+		{
+			//set FromTo function name as "<STATEA>_FromTo_<STATEB>_<OBJECTYPE>" (if any)
+			functionNameTmp = stateA + "_FromTo_" + stateB + "_"
+					+ mOwnerObject->objectTmpl()->objectType();
+			functionName = replaceCharacter(functionNameTmp, '-', '_');
+		}
 		PFROMTO pFromToFunction = (PFROMTO) lt_dlsym(mTransitionLib,
 				functionName.c_str());
 		dlsymError = lt_dlerror();
@@ -285,22 +316,13 @@ void Activity::doLoadTransitionFunctions()
 			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
 			pFromToFunction = NULL;
 		}
-		//get the position of the "_FromTo_" substring in (*iter)
-		size_t fromToPos = (*iter).find("_FromTo_");
-		if (fromToPos == string::npos)
-		{
-			//the function name doesn't contain "_FromTo_":
-			//continue with the next function
-			continue;
-		}
-		//get 2 state names
-		std::string stateFrom = (*iter).substr(0, fromToPos);
-		std::string stateTo = (*iter).substr(
-				fromToPos + std::string("_FromTo_").length());
 		//add the FromTo function
-		mFSM.addFromToFunc(stateFrom, stateTo,
+		mFSM.addFromToFunc(stateA, stateB,
 				boost::bind(pFromToFunction, _1, boost::ref(*this), _2));
 	}
+	//clear no more needed helper data
+	mStateTransitionTable.clear();
+	mStatePairFromToTable.clear();
 
 	//transitions loaded
 	mTransitionsLoaded = true;
@@ -309,11 +331,10 @@ void Activity::doLoadTransitionFunctions()
 void Activity::doUnloadTransitionFunctions()
 {
 	//if transitions not loaded do nothing
-	if ((mFSM.getNumStates() == 0) or (not mTransitionsLoaded))
+	if (not mTransitionsLoaded)
 	{
 		return;
 	}
-	mFromToFunctionSet.clear();
 	//Close the transition functions library
 	// reset errors
 	lt_dlerror();
