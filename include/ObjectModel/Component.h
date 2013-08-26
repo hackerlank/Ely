@@ -61,31 +61,37 @@ class ComponentTemplate;
  * Panda task.\n
  * Each component can respond to Panda events (stimuli) by registering
  * or unregistering callbacks for them with the global EventHandler.\n
- * Each event has a type, and a callback associated, and every Components
- * of a given type, belonging to a given Object type, responds to same
- * types of event.\n
+ * Each event has a type, and a callback associated. Each event type is
+ * defined for a Component on "per ObjectTemplate (i.e. Object type)"
+ * basis, this means that each Object of a given type has, for a given
+ * Component, the same type of event to respond to.\n
  * The callback function name for an event of a given type, can be specified
- * as parameter (as trailing ..."$callbackName"), or, by default, for any event
- * of type "<EVENTTYPE>" associated with a component of type <COMPONENTTYPE> of
- * an object of type <OBJECTTYPE>, the callback function name is checked
- * as "<EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>" (this means that by default
- * all Components respond to that event with the same callback).\n
+ * as parameter (as trailing ..."$callbackName") on a "per Object basis", or,
+ * by default, for an event of type "<EVENTTYPE>" associated with a
+ * component of type <COMPONENTTYPE> belonging to an object of type
+ * <OBJECTTYPE>, the callback function name is considered defined with
+ * this signature:
+ * \code
+ * void <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>(const Event* event, void* data);
+ * \endcode
+ * This means that, by default, a given given type of Component of all
+ * Objects of a given type, will respond to an event type with the same
+ * callback function.\n
  * This callback function is loaded at runtime from a dynamic linked library
  * (referenced by the macro CALLBACKS_LA).\n
  * If the callback function doesn't exist or if any error occurs the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
  * To check if a "name" is an allowed event type call:
  * \code
- * 	ComponentTemplate::isEventType("name");
+ * 	ObjectTemplateManager::isComponentParameter();
  * \endcode
- * \note In the various substrings composing the name:
- * - hyphens ("-") are replaced with underscores ("_")\n
  *
  * XML Param(s):
  * - "event_types" 		|multiple|no default
  * - "events"			|multiple|no default (each specified as "event_type@event")
  * \note "event_types" parameters are specified into the object
  * template definition.
+ * \note each "-" in any computed string will be replaced by "_".
  */
 class Component: public TypedWritableReferenceCount
 {
@@ -320,7 +326,6 @@ private:
 	///@{
 	lt_dlhandle mCallbackLib;
 	typedef EventHandler::EventCallbackFunction* PCALLBACK;
-//	typedef std::string* PCALLBACKNAME;
 	///@}
 
 	///Table of events keyed by event types.
