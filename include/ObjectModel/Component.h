@@ -61,25 +61,24 @@ class ComponentTemplate;
  * Panda task.\n
  * Each component can respond to Panda events (stimuli) by registering
  * or unregistering callbacks for them with the global EventHandler.\n
- * Each event has a type, and a callback associated. Each event type is
- * defined for a Component on "per ObjectTemplate (i.e. Object type)"
- * basis, this means that each Object of a given type has, for a given
- * Component, the same type of event to respond to.\n
- * The callback function name for an event of a given type, can be specified
- * as parameter (as trailing ..."$callbackName") on a "per Object basis", or,
- * by default, for an event of type "<EVENTTYPE>" associated with a
- * component of type <COMPONENTTYPE> belonging to an object of type
- * <OBJECTTYPE>, the callback function name is considered defined with
- * this signature:
+ * Each Object of a given type has, for a given Component, the same
+ * event types to respond to. This means that each event type, for a
+ * Component is defined  on "per ObjectTemplate (i.e. Object type)"
+ * basis.\n
+ * By default, when an event type is defined, it is assumed that an event
+ * with the same value as the event type associated to a callback function
+ * with this signature:
  * \code
  * void <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>(const Event* event, void* data);
  * \endcode
- * This means that, by default, a given given type of Component of all
- * Objects of a given type, will respond to an event type with the same
- * callback function.\n
- * This callback function is loaded at runtime from a dynamic linked library
+ * are defined: this means that, by default, all Components of the same type
+ * (belonging to any Object of that type), will respond to the same event value
+ * with the same callback function.\n
+ * Both the event value and the callback function can be overridden by parameters
+ * on a "per Object basis".\n
+ * The callback functions are loaded at runtime from a dynamic linked library
  * (referenced by the macro CALLBACKS_LA).\n
- * If the callback function doesn't exist or if any error occurs the default
+ * If a callback function doesn't exist or if any error occurs, the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
  * To check if a "name" is an allowed event type call:
  * \code
@@ -87,11 +86,16 @@ class ComponentTemplate;
  * \endcode
  *
  * XML Param(s):
- * - "event_types" 		|multiple|no default
- * - "events"			|multiple|no default (each specified as "event_type@event")
- * \note "event_types" parameters are specified into the object
- * template definition.
- * \note each "-" in any computed string will be replaced by "_".
+ * - "event_types" 		|multiple|no default (each specified as
+ * "evType1:evType2:...:evTypeN" into ObjectTemplate definition)
+ * - "events"			|multiple|no default (each specified as
+ * "evType1@evValue1:evType2@evValue2:...:evTypeN@evValueN$callbackName"
+ *  into Object definition)
+ *
+ * \note in "events" any of evValues or  callbackNamecan be empty
+ * (meaning we want the defaults value).
+ * \note Inside the strings representing the above mentioned predefined
+ * callback function names, any "-" will be replaced by "_".
  */
 class Component: public TypedWritableReferenceCount
 {

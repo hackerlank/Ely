@@ -31,7 +31,7 @@
 namespace ely
 {
 
-std::vector<std::string> parseCompoundString(const std::string& compoundString,
+std::vector<std::string> parseCompoundStringOLD(const std::string& compoundString,
 		char separator)
 {
 	std::vector<std::string> substrings;
@@ -56,6 +56,76 @@ std::vector<std::string> parseCompoundString(const std::string& compoundString,
 		substrings.push_back(substring);
 	}
 	return substrings;
+}
+
+std::vector<std::string> parseCompoundString(
+		const std::string& srcCompoundString, char separator)
+{
+	//erase blanks
+	std::string compoundString = srcCompoundString;
+	compoundString = eraseCharacter(compoundString, ' ');
+	compoundString = eraseCharacter(compoundString, '\t');
+	//parse
+	std::vector<std::string> substrings;
+	int len = compoundString.size() + 1;
+	char* dest = new char[compoundString.size() + 1];
+	strncpy(dest, compoundString.c_str(), len);
+	//find
+	char* pch;
+	char* start = dest;
+	bool stop = false;
+	while (not stop)
+	{
+		std::string substring("");
+		pch = strchr(start, separator);
+		if (pch != NULL)
+		{
+			//insert the substring
+			substring.append(start, pch - start);
+			start = pch + 1;
+			substrings.push_back(substring);
+		}
+		else
+		{
+			if (start < &dest[len - 1])
+			{
+				//insert the last not empty substring
+				substring.append(start, &dest[len - 1] - start);
+				substrings.push_back(substring);
+			}
+			else if (start == &dest[len - 1])
+			{
+				//insert the last empty substring
+				substrings.push_back(substring);
+			}
+			stop = true;
+		}
+	}
+	delete[] dest;
+	//
+	return substrings;
+}
+
+std::string eraseCharacter(const std::string& source, int character)
+{
+	int len = source.size() + 1;
+	char* dest = new char[len];
+	char* start = dest;
+	strncpy(dest, source.c_str(), len);
+	//erase
+	char* pch;
+	pch = strchr(dest, character);
+	while (pch != NULL)
+	{
+		len -= pch - start;
+		memmove(pch, pch + 1, len - 1);
+		start = pch;
+		//continue
+		pch = strchr(pch, character);
+	}
+	std::string outStr(dest);
+	delete[] dest;
+	return outStr;
 }
 
 std::string replaceCharacter(const std::string& source, int character,

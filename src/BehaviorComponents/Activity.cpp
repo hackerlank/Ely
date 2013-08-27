@@ -35,7 +35,7 @@ Activity::Activity() :
 }
 
 Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :
-		mFSM("FSM")
+mFSM("FSM")
 {
 	mTmpl = tmpl;
 	reset();
@@ -60,15 +60,14 @@ bool Activity::initialize()
 	bool result = true;
 	///State transitions.
 	mStateTransitionListParam = mTmpl->parameterList(
-			std::string("state_transitions"));
+			std::string("states_transition"));
 	///FromTo transitions.
-	mFromToTransitionListParam = mTmpl->parameterList(std::string("from_to"));
+	mFromToTransitionListParam = mTmpl->parameterList(
+			std::string("from_to_transition"));
 	//
 	return result;
 }
 
-
-///TODO mixup states and from_to from both ObjectTemplate and Object definitions
 void Activity::doSetupHelperData()
 {
 	//clear helper data
@@ -76,75 +75,133 @@ void Activity::doSetupHelperData()
 	mStatePairFromToTable.clear();
 	//
 	std::list<std::string>::const_iterator iter;
-	//setup transition functions' names table
+	//fill up transition functions' names table
+	//with null string for transition function names
+	std::list<std::string> statesList =
+			mOwnerObject->objectTmpl()->componentParameterList(
+					std::string("states"), componentType());
+	for (iter = statesList.begin(); iter != statesList.end(); ++iter)
+	{
+		//any "states" string is a "compound" one, i.e. could have the form:
+		// "state1:state2:...:stateN"
+		//parse string as a state list
+		std::vector<std::string> states = parseCompoundString(*iter, ':');
+		std::vector<std::string>::const_iterator iterState;
+		for (iterState = states.begin(); iterState != states.end(); ++iterState)
+		{
+			//an empty state is ignored
+			if (not iterState->empty())
+			{
+				//set empty transitions' names for each state
+				mStateTransitionTable[*iterState] = TransitionNameTriple();
+			}
+		}
+	}
+	//override transition functions on a per Object basis
 	for (iter = mStateTransitionListParam.begin();
 			iter != mStateTransitionListParam.end(); ++iter)
 	{
-		//any "states" string is a "compound" one, i.e. could have the form:
+		//any "states_transition" string is a "compound" one, i.e. could
+		//have the form:
 		// "state1:state2:...:stateN$enterName,exitName,filterName"
-		//parse string as a (states,transitionNameTriple) pair
-		std::vector<std::string> statesFuncNameTriple = parseCompoundString(
+		//parse string as a (stateList,transitionNameTriple) pair
+		std::vector<std::string> stateListFuncTriple = parseCompoundString(
 				*iter, '$');
-		//check if there is a pair and set the func-name triple
-		TransitionNameTriple transitionNameTriple;
-		if (statesFuncNameTriple.size() >= 2)
+		//override only if there is (at least) a (stateList,FuncTriple) pair
+		if (stateListFuncTriple.size() >= 2)
 		{
+			TransitionNameTriple transitionNameTriple;
 			//parse second element as a func-name triple
 			std::vector<std::string> funcNameList = parseCompoundString(
-					statesFuncNameTriple[1], ',');
+					stateListFuncTriple[1], ',');
 			//set only if there is (at least) a triple
 			if (funcNameList.size() >= 3)
 			{
+				//any one could be empty
 				transitionNameTriple.mEnter = funcNameList[0];
 				transitionNameTriple.mExit = funcNameList[1];
 				transitionNameTriple.mFilter = funcNameList[2];
 			}
-		}
-		//parse first element as a state list
-		std::vector<std::string> states = parseCompoundString(
-				statesFuncNameTriple[0], ':');
-		std::vector<std::string>::const_iterator iterState;
-		for (iterState = states.begin(); iterState != states.end(); ++iterState)
-		{
-			//ignore a not existent state (== *iterState)
-			if (mOwnerObject->objectTmpl()->isComponentParameter("states",
-					*iterState, componentType()))
+			//parse first element as a state list
+			std::vector<std::string> states = parseCompoundString(
+					stateListFuncTriple[0], ':');
+			std::vector<std::string>::const_iterator iterState;
+			for (iterState = states.begin(); iterState != states.end();
+					++iterState)
 			{
-				//set transitions' names for each state
-				mStateTransitionTable[*iterState] = transitionNameTriple;
+				//ignore a not existent or empty state (== *iterState)
+				if (mOwnerObject->objectTmpl()->isComponentParameter("states",
+						*iterState, componentType())
+						and (not iterState->empty()))
+				{
+					//set transitions' names for each state
+					mStateTransitionTable[*iterState] = transitionNameTriple;
+				}
 			}
 		}
 	}
-	//setup FromTo functions' names table
-	for (iter = mFromToTransitionListParam.begin();
-			iter != mFromToTransitionListParam.end(); ++iter)
+	//fill up FromTo transition functions' names table
+	//with null string for fromTo transition function names
+	std::list<std::string> fromToList =
+			mOwnerObject->objectTmpl()->componentParameterList(
+					std::string("from_to"), componentType());
+	for (iter = fromToList.begin(); iter != fromToList.end(); ++iter)
 	{
 		//any "from_to" string is a "compound" one, i.e. could have the form:
-		// "state1@state2$fromToName"
-		//parse string as a (statePair,fromToName) pair
-		std::vector<std::string> statePairFromToName = parseCompoundString(
-				*iter, '$');
-		//check if there is (at least) a pair and set the fromTo name
-		std::string fromToName("");
-		if (statePairFromToName.size() >= 2)
-		{
-			//set second element as FromToName
-			fromToName = statePairFromToName[1];
-		}
-		//parse first element as a state pair
+		// "state1:state2"
+		//parse string as a state pair
 		std::vector<std::string> statePair = parseCompoundString(*iter, ':');
 		//check if there is (at least) a pair and the states are not empty
 		if (statePair.size() >= 2)
 		{
-			//ignore not existent states (== statePair[i])
+			//ignore not existent or empty states (== statePair[i])
 			if (mOwnerObject->objectTmpl()->isComponentParameter("states",
 					statePair[0], componentType())
+					and (not statePair[0].empty())
 					and mOwnerObject->objectTmpl()->isComponentParameter(
-							"states", statePair[1], componentType()))
+							"states", statePair[1], componentType())
+					and (not statePair[1].empty()))
 			{
-				//insert into the FromTo functions' names table
+				//insert empty name into the FromTo functions' names table
 				mStatePairFromToTable[StatePair(statePair[0], statePair[1])] =
-						fromToName;
+						std::string("");
+			}
+		}
+	}
+	//override FromTo transition functions on a per Object basis
+	for (iter = mFromToTransitionListParam.begin();
+			iter != mFromToTransitionListParam.end(); ++iter)
+	{
+		//any "from_to_transition" string is a "compound" one, i.e.
+		//could have the form:
+		// "state1:state2$fromToName"
+		//parse string as a (statePair,fromToName) pair
+		std::vector<std::string> statePairFromToName = parseCompoundString(
+				*iter, '$');
+		//override only if there is (at least) a (statePair,FromToName) pair
+		if (statePairFromToName.size() >= 2)
+		{
+			//set second element as FromToName
+			//could be empty
+			std::string fromToName = statePairFromToName[1];
+			//parse first element as a state pair
+			std::vector<std::string> statePair = parseCompoundString(*iter,
+					':');
+			//check if there is (at least) a pair
+			if (statePair.size() >= 2)
+			{
+				//ignore not existent or empty states (== statePair[i])
+				if (mOwnerObject->objectTmpl()->isComponentParameter("states",
+						statePair[0], componentType())
+						and (not statePair[0].empty())
+						and mOwnerObject->objectTmpl()->isComponentParameter(
+								"states", statePair[1], componentType())
+						and (not statePair[1].empty()))
+				{
+					//insert into the FromTo functions' names table
+					mStatePairFromToTable[StatePair(statePair[0], statePair[1])] =
+							fromToName;
+				}
 			}
 		}
 	}
@@ -291,8 +348,8 @@ void Activity::doLoadTransitionFunctions()
 
 	//load FromTo transition functions if any
 	std::map<StatePair, std::string>::const_iterator iterTable1;
-	for (iterTable1 = mStatePairFromToTable.begin(); iterTable1 != mStatePairFromToTable.end();
-			++iterTable1)
+	for (iterTable1 = mStatePairFromToTable.begin();
+			iterTable1 != mStatePairFromToTable.end(); ++iterTable1)
 	{
 		const char* dlsymError;
 		std::string stateA, stateB, functionName, functionNameTmp;

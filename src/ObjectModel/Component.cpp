@@ -30,7 +30,8 @@ namespace ely
 
 Component::Component()
 #ifdef ELY_THREAD
-	:mDestroying(false)
+:
+		mDestroying(false)
 #endif
 {
 	mTmpl.clear();
@@ -87,61 +88,82 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 
 void Component::doSetupEventTables()
 {
-	//setup events (if any)
-	std::list<std::string>::iterator iter;
+	std::list<std::string>::const_iterator iter;
+	//fill up event tables with event values == event type,
+	//callbackName == empty string and callback function == NULL
+	std::list<std::string> eventTypesList =
+			mOwnerObject->objectTmpl()->componentParameterList(
+					std::string("event_types"), componentType());
+	for (iter = eventTypesList.begin(); iter != eventTypesList.end(); ++iter)
+	{
+		//any "event_types" string is a "compound" one, i.e. could have the form:
+		// "evType1:evType2:...:evTypeN"
+		//parse string as a event type list
+		std::vector<std::string> eventTypeList = parseCompoundString(*iter,
+				':');
+		std::vector<std::string>::const_iterator iterEventType;
+		for (iterEventType = eventTypeList.begin();
+				iterEventType != eventTypeList.end(); ++iterEventType)
+		{
+			//an empty event type is ignored
+			if (not iterEventType->empty())
+			{
+				//insert event keyed by eventType;
+				mEventTable[*iterEventType] = *iterEventType;
+				//insert eventType keyed by event;
+				mEventTypeTable[*iterEventType] = *iterEventType;
+				//insert the <callbackName,NULL> pair keyed by eventType;
+				mCallbackTable[*iterEventType] = NameCallbackPair(
+						std::string(""), NULL);
+			}
+		}
+	}
+	//override event values and callback functions on a per Object basis
 	std::list<std::string> eventList = mTmpl->parameterList(
 			std::string("events"));
-	if (not eventList.empty())
+	for (iter = eventList.begin(); iter != eventList.end(); ++iter)
 	{
-		//populate the callback table with NULL for each event
-		for (iter = eventList.begin(); iter != eventList.end(); ++iter)
+		//any "events" string is a "compound" one, i.e. could have the form:
+		//"evType1@evValue1:evType2@evValue2:...:evTypeN@evValueN$callbackName"
+		//parse string as a ((evType,evValue)s,callback) pair
+		std::vector<std::string> typeValuesCallback = parseCompoundString(*iter,
+				'$');
+		//check if there is (at least) a pair
+		if (typeValuesCallback.size() >= 2)
 		{
-			//any "events" string is a "compound" one, i.e. could have the form:
-			// "eventType1@event1:eventType2@event2:...:eventTypeN@eventN$callback"
-			//parse string as a ((type,event)s,callback) pair
-			std::vector<std::string> typeEventsCallbackPair = parseCompoundString(
-					*iter, '$');
-			//check if there is a pair and set the callback name
-			//as the second element (if any) that could be empty
-			std::string callbackName = std::string("");
-			if (typeEventsCallbackPair.size() >= 2)
+			//set the callback name as the second element (could be empty)
+			std::string callbackName = typeValuesCallback[1];
+			//parse first element as (evType,evValue) pair list
+			std::vector<std::string> typeValues = parseCompoundString(
+					typeValuesCallback[0], ':');
+			std::vector<std::string>::const_iterator iterTypeValue;
+			for (iterTypeValue = typeValues.begin();
+					iterTypeValue != typeValues.end(); ++iterTypeValue)
 			{
-				callbackName = typeEventsCallbackPair[1];
-			}
-			//parse first element as (type,event) pair list
-			std::vector<std::string> typeEventPairs = parseCompoundString(
-					typeEventsCallbackPair[0], ':');
-			std::vector<std::string>::const_iterator iterPair;
-			for (iterPair = typeEventPairs.begin();
-					iterPair != typeEventPairs.end(); ++iterPair)
-			{
-				//an empty eventType@event pair is ignored
-				if (not iterPair->empty())
+				//get event type and event value
+				std::vector<std::string> typeValue = parseCompoundString(
+						*iterTypeValue, '@');
+				//check if there is (at least) a pair
+				if (typeValue.size() >= 2)
 				{
-					//get event type and event
-					std::vector<std::string> typeEventPair =
-							parseCompoundString(*iterPair, '@');
-					//check only if there is a pair
-					if (typeEventPair.size() >= 2)
+					//ignore a not existent event type (== typeValue[0])
+					if (mOwnerObject->objectTmpl()->isComponentParameter(
+							"event_types", typeValue[0], componentType()))
 					{
-						//ignore a not existent event type (== typeEventPair[0])
-						//or a not existent event (== typeEventPair[1])
-						if (mOwnerObject->objectTmpl()->isComponentParameter(
-								"event_types", typeEventPair[0],
-								componentType())
-								and (not typeEventPair[1].empty()))
+						//change only non empty event value (== typeValue[1])
+						if (not typeValue[1].empty())
 						{
 							//insert event keyed by eventType;
-							mEventTable[typeEventPair[0]] = typeEventPair[1];
+							mEventTable[typeValue[0]] = typeValue[1];
 							//insert eventType keyed by event;
-							mEventTypeTable[typeEventPair[1]] =
-									typeEventPair[0];
-							//insert the <callbackName,NULL> pair keyed by eventType;
-							mCallbackTable[typeEventPair[0]] =
-									NameCallbackPair(callbackName, NULL);
+							mEventTypeTable[typeValue[1]] = typeValue[0];
 						}
+						//insert the <callbackName,NULL> pair keyed by eventType;
+						mCallbackTable[typeValue[0]] = NameCallbackPair(
+								callbackName, NULL);
 					}
 				}
+
 			}
 		}
 	}
@@ -173,7 +195,7 @@ void Component::doLoadEventCallbacks()
 	lt_dlerror();
 	//check the default callback
 	PCALLBACK pDefaultCallback = (PCALLBACK) lt_dlsym(mCallbackLib,
-			DEFAULT_CALLBACK_NAME);
+	DEFAULT_CALLBACK_NAME);
 	const char* dlsymError = lt_dlerror();
 	if (dlsymError)
 	{
@@ -187,12 +209,12 @@ void Component::doLoadEventCallbacks()
 		return;
 	}
 	//load every callback, as specified in callbacks' name table
-	std::map<std::string, NameCallbackPair>::iterator iterCallbackTable;
+	std::map<std::string, NameCallbackPair>::const_iterator iterCallbackTable;
 	for (iterCallbackTable = mCallbackTable.begin();
 			iterCallbackTable != mCallbackTable.end(); ++iterCallbackTable)
 	{
 		std::string callbackName;
-		if(not iterCallbackTable->second.first.empty())
+		if (not iterCallbackTable->second.first.empty())
 		{
 			//the callback name has been specified as parameter
 			callbackName = iterCallbackTable->second.first;
@@ -285,8 +307,7 @@ void Component::unregisterEventCallbacks()
 	//Unregister the handlers
 //	mTmpl->pandaFramework()->get_event_handler().remove_hooks_with(
 //			(void*) this);
-	EventHandler::get_global_event_handler()->remove_hooks_with(
-			(void*) this);
+	EventHandler::get_global_event_handler()->remove_hooks_with((void*) this);
 
 	//handlers unregistered
 	mCallbacksRegistered = false;

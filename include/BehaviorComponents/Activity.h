@@ -43,25 +43,21 @@ class ActivityTemplate;
  * \code
  * 	((fsm&)activity).request("stateC", valueList);
  * \endcode
- * Given an object with type <OBJECTYPE>, for any state called <STATE>
- * three signatures of transition functions are defined by default
+ * Given an object with type <OBJECTYPE>, for any state <STATE> defined
+ * three names of transition functions are defined by default
  * on a "per ObjectTemplate (i.e. Object type)" basis:
- * \code
- * void Enter_<STATE>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);
- * void Exit_<STATE>_<OBJECTYPE>(fsm*, Activity& activity);
- * ValueList Filter_<STATE>_<OBJECTYPE>(fsm*, Activity& activity, const std::string& state, const ValueList& valueList);
- * \endcode
- * These signatures can be overwritten by parameters on a "per Object"
+ * - <tt>Enter_<STATE>_<OBJECTYPE></tt>
+ * - <tt>Exit_<STATE>_<OBJECTYPE></tt>
+ * - <tt>Filter_<STATE>_<OBJECTYPE></tt>
+ * These nameSs can be overridden by parameters on a "per Object"
  * basis.\n
- * Furthermore for a pair of state <STATEA>, <STATEB> a "FromTo"
- * transition function signature can be defined, by default, on a
- * "per ObjectTemplate (i.e. Object type)" basis:
- * \code
- * void <STATEA>_FromTo_<STATEB>_<OBJECTYPE>(fsm*, Activity& activity, const ValueList& valueList);
- * \endcode
- * This signature can be overwritten by parameters on a "per Object"
+ * Furthermore for a pair of state <STATEA>, <STATEB> a "FromTo" transition
+ * function name can be defined, by default, on a "per ObjectTemplate
+ * (i.e. Object type)" basis:
+ * -<tt><STATEA>_FromTo_<STATEB>_<OBJECTYPE></tt>
+ * This name can be overridden by parameters on a "per Object"
  * basis.\n
- * All these routines are loaded at runtime from a dynamic linked library
+ * The transition functions are loaded at runtime from a dynamic linked library
  * (referenced by the macro TRANSITIONS_LA).\n
  * Inside these routine the SMARTPTR(Activity) "activity" argument passed refers to this
  * component.\n
@@ -69,19 +65,20 @@ class ActivityTemplate;
  *
  * XML Param(s):
  * - "states"  				|multiple|no default (each one specified as
- * "state1:state2:...:stateN")
+ * "state1:state2:...:stateN" into ObjectTemplate definition)
  * - "from_to"				|multiple|no default (each one specified as
- * "state1:state2")
- * - "state_transitions"  	|multiple|no default (each one specified as
- * "state1:state2:...:stateN$enterName,exitName,filterName",
- * with second part after "$" optional)
- * - "from_to_transitions"	|multiple|no default (each one specified as
- * "state1:state2$fromToName", with second part after "$" optional)
+ * "state1:state2" into ObjectTemplate definition)
+ * - "states_transition" 	|multiple|no default (each one specified as
+ * "state1:state2:...:stateN$enterName,exitName,filterName"
+ * into Object definition)
+ * - "from_to_transition"	|multiple|no default (each one specified as
+ * "state1:state2$fromToName" into Object definition)
  *
- * \note "states" parameters are specified into object template
- * definitions, while "state_transitions" and "from_to" parameters are
- * specified into object definitions.\n
- * \note each "-" in any computed string will be replaced by "_".
+ * \note in "states_transition" and "from_to_transition" any of
+ * enterName, exitName, filterName, fromToName could be empty (meaning
+ * that we want the defaults).
+ * \note Inside the strings representing the above mentioned predefined
+ * names, any "-" will be replaced by "_".
  */
 class Activity: public Component
 {

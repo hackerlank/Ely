@@ -273,24 +273,33 @@ typedef std::pair<std::string, std::string> ParameterNameValue;
 
 /**
  * \brief Parses a string composed by substrings separated by a character
- * separator
- * @param compoundString The compound string.
+ * separator.\n
+ * \note all blanks are erased before parsing.
+ * @param compoundString The source string.
  * @param separator The character separator.
  * @return The substrings std::vector.
  */
-std::vector<std::string> parseCompoundString(const std::string& compoundString,
+std::vector<std::string> parseCompoundString(const std::string& srcCompoundString,
 		char separator);
 
 /**
  * \brief Into a given string, replaces any occurrence of a character with
  * another character.
- * @param source To be replaced string.
+ * @param source The source string.
  * @param character To be replaced character.
  * @param replacement Replaced character.
- * @return Replaced string.
+ * @return The result string.
  */
 std::string replaceCharacter(const std::string& source, int character,
 		int replacement);
+
+/**
+ * \brief Into a given string, erases any occurrence of a given character.
+ * @param source The source string.
+ * @param character To be erased character.
+ * @return The result string.
+ */
+std::string eraseCharacter(const std::string& source, int character);
 
 #define RETURN_ON_COND(_flag_,_return_)\
 	if (_flag_)\
