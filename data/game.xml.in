@@ -167,13 +167,13 @@
 				<Param inverted_mouse="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
-				<Param events="forward@mouse3:stop-forward@mouse3-up:fast-forward@shift-mouse3"/>
-				<Param events="backward@s:stop-backward@s-up:fast-backward@shift-s"/>
-				<Param events="strafe_left@a:stop-strafe_left@a-up:fast-strafe_left@shift-a"/>
-				<Param events="strafe_right@d:stop-strafe_right@d-up:fast-strafe_right@shift-d"/>
-				<Param events="up@r:stop-up@r-up:fast-up@shift-r"/>
-				<Param events="down@f:stop-down@f-up:fast-down@shift-f"/>				
-				<Param events="fast@shift:stop-fast@shift-up"/>
+				<Param events="forward@mouse3:stop-forward@mouse3-up:fast-forward@shift-mouse3$"/>
+				<Param events="backward@s:stop-backward@s-up:fast-backward@shift-s$"/>
+				<Param events="strafe_left@a:stop-strafe_left@a-up:fast-strafe_left@shift-a$"/>
+				<Param events="strafe_right@d:stop-strafe_right@d-up:fast-strafe_right@shift-d$"/>
+				<Param events="up@r:stop-up@r-up:fast-up@shift-r$"/>
+				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
+				<Param events="fast@shift:stop-fast@shift-up$"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="false"/>		
@@ -245,13 +245,13 @@
 
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity">
-				<Param events="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up"/>
-				<Param events="backward@arrow_down:stop-backward@arrow_down-up:fast-backward@shift-arrow_down"/>
-				<Param events="roll_left@arrow_left:stop-roll_left@arrow_left-up:fast-roll_left@shift-arrow_left"/>
-				<Param events="roll_right@arrow_right:stop-roll_right@arrow_right-up:fast-roll_right@shift-arrow_right"/>
-				<Param events="up@page_up:stop-up@page_up-up:fast-up@shift-page_up"/>
-				<Param events="down@page_down:stop-down@page_down-up:fast-down@shift-page_down"/>
-				<Param events="fast@shift:stop-fast@shift-up"/>				
+				<Param s="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up$"/>
+				<Param events="backward@arrow_down:stop-backward@arrow_down-up:fast-backward@shift-arrow_down$"/>
+				<Param events="roll_left@arrow_left:stop-roll_left@arrow_left-up:fast-roll_left@shift-arrow_left$"/>
+				<Param events="roll_right@arrow_right:stop-roll_right@arrow_right-up:fast-roll_right@shift-arrow_right$"/>
+				<Param events="up@page_up:stop-up@page_up-up:fast-up@shift-page_up$"/>
+				<Param events="down@page_down:stop-down@page_down-up:fast-down@shift-page_down$"/>
+				<Param events="fast@shift:stop-fast@shift-up$"/>				
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
@@ -287,7 +287,7 @@
 
 		<Object type="HUD" id="hud1">
 			<Component type="Activity">
-				<Param events="fire@mouse1:stop-fire@mouse1-up"/>
+				<Param events="fire@mouse1:stop-fire@mouse1-up$"/>
 			</Component>
 			<Component type="Model">
 				<Param model_file="lilsmiley.bam"/>
