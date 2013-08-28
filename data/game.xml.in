@@ -290,7 +290,7 @@
 		<Object type="HUD" id="hud1">
 			<Component type="Activity">
 				<Param events="fire@mouse1:stop-fire@mouse1-up$"/>
-				<Param states_transition="idle:fire$enter,exit,filter"/>
+				<Param states_transition="idle:fire$enter,exitHUD,filter"/>
 				<Param from_to_transition="walk@run:fire@idle$s1TOs2"/>
 			</Component>
 			<Component type="Model">

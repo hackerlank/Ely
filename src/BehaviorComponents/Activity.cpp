@@ -245,7 +245,7 @@ void Activity::doLoadTransitionFunctions()
 		if (not iterTable->second.mEnter.empty())
 		{
 			//set enter function name as specified (if any)
-			functionName = iterTable->second.mEnter.empty();
+			functionName = iterTable->second.mEnter;
 		}
 		else
 		{
@@ -270,7 +270,7 @@ void Activity::doLoadTransitionFunctions()
 		if (not iterTable->second.mExit.empty())
 		{
 			//set exit function name as specified (if any)
-			functionName = iterTable->second.mExit.empty();
+			functionName = iterTable->second.mExit;
 		}
 		else
 		{
@@ -294,7 +294,7 @@ void Activity::doLoadTransitionFunctions()
 		if (not iterTable->second.mFilter.empty())
 		{
 			//set filter function name as specified (if any)
-			functionName = iterTable->second.mFilter.empty();
+			functionName = iterTable->second.mFilter;
 		}
 		else
 		{
@@ -349,7 +349,7 @@ void Activity::doLoadTransitionFunctions()
 		if (not iterTable1->second.empty())
 		{
 			//set FromTo function name as specified (if any)
-			functionName = iterTable1->second.empty();
+			functionName = iterTable1->second;
 		}
 		else
 		{
