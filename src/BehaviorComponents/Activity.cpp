@@ -77,24 +77,16 @@ void Activity::doSetupHelperData()
 	std::list<std::string>::const_iterator iter;
 	//fill up transition functions' names table
 	//with null string for transition function names
-	std::list<std::string> statesList =
-			mOwnerObject->objectTmpl()->componentParameterList(
+	std::list<std::string> states =
+			mOwnerObject->objectTmpl()->componentParameterValues(
 					std::string("states"), componentType());
-	for (iter = statesList.begin(); iter != statesList.end(); ++iter)
+	for (iter = states.begin(); iter != states.end(); ++iter)
 	{
-		//any "states" string is a "compound" one, i.e. could have the form:
-		// "state1:state2:...:stateN"
-		//parse string as a state list
-		std::vector<std::string> states = parseCompoundString(*iter, ':');
-		std::vector<std::string>::const_iterator iterState;
-		for (iterState = states.begin(); iterState != states.end(); ++iterState)
+		//a valid state has a not empty value
+		if (not iter->empty())
 		{
-			//an empty state is ignored
-			if (not iterState->empty())
-			{
-				//set empty transitions' names for each state
-				mStateTransitionTable[*iterState] = TransitionNameTriple();
-			}
+			//set empty transitions' names for each state
+			mStateTransitionTable[*iter] = TransitionNameTriple();
 		}
 	}
 	//override transition functions on a per Object basis
@@ -121,51 +113,45 @@ void Activity::doSetupHelperData()
 				transitionNameTriple.mEnter = funcNameList[0];
 				transitionNameTriple.mExit = funcNameList[1];
 				transitionNameTriple.mFilter = funcNameList[2];
-			}
-			//parse first element as a state list
-			std::vector<std::string> states = parseCompoundString(
-					stateListFuncTriple[0], ':');
-			std::vector<std::string>::const_iterator iterState;
-			for (iterState = states.begin(); iterState != states.end();
-					++iterState)
-			{
-				//ignore a not existent or empty state (== *iterState)
-				if (mOwnerObject->objectTmpl()->isComponentParameter("states",
-						*iterState, componentType())
-						and (not iterState->empty()))
+				//parse first element as a state list
+				std::vector<std::string> states = parseCompoundString(
+						stateListFuncTriple[0], ':');
+				std::vector<std::string>::const_iterator iterState;
+				for (iterState = states.begin(); iterState != states.end();
+						++iterState)
 				{
-					//set transitions' names for each state
-					mStateTransitionTable[*iterState] = transitionNameTriple;
+					//insert only if it is a valid state
+					if (mStateTransitionTable.find(*iterState)
+							!= mStateTransitionTable.end())
+					{
+						//set transitions' names for each state
+						mStateTransitionTable[*iterState] =
+								transitionNameTriple;
+					}
 				}
 			}
 		}
 	}
 	//fill up FromTo transition functions' names table
 	//with null string for fromTo transition function names
-	std::list<std::string> fromToList =
-			mOwnerObject->objectTmpl()->componentParameterList(
+	//only for valid fromTo transitions
+	std::list<std::string> fromTos =
+			mOwnerObject->objectTmpl()->componentParameterValues(
 					std::string("from_to"), componentType());
-	for (iter = fromToList.begin(); iter != fromToList.end(); ++iter)
+	for (iter = fromTos.begin(); iter != fromTos.end(); ++iter)
 	{
-		//any "from_to" string is a "compound" one, i.e. could have the form:
-		// "state1:state2"
-		//parse string as a state pair
-		std::vector<std::string> statePair = parseCompoundString(*iter, ':');
-		//check if there is (at least) a pair and the states are not empty
-		if (statePair.size() >= 2)
+		//parse element as state pair
+		std::vector<std::string> statePair = parseCompoundString(*iter, '@');
+		//a valid fromTo transition must have valid states (== statePair[i])
+		if (mOwnerObject->objectTmpl()->isComponentParameterValue("states",
+				statePair[0], componentType()) and (not statePair[0].empty())
+				and mOwnerObject->objectTmpl()->isComponentParameterValue(
+						"states", statePair[1], componentType())
+				and (not statePair[1].empty()))
 		{
-			//ignore not existent or empty states (== statePair[i])
-			if (mOwnerObject->objectTmpl()->isComponentParameter("states",
-					statePair[0], componentType())
-					and (not statePair[0].empty())
-					and mOwnerObject->objectTmpl()->isComponentParameter(
-							"states", statePair[1], componentType())
-					and (not statePair[1].empty()))
-			{
-				//insert empty name into the FromTo functions' names table
-				mStatePairFromToTable[StatePair(statePair[0], statePair[1])] =
-						std::string("");
-			}
+			//insert empty name into the FromTo functions' names table
+			mStatePairFromToTable[StatePair(statePair[0], statePair[1])] =
+					std::string("");
 		}
 	}
 	//override FromTo transition functions on a per Object basis
@@ -174,29 +160,29 @@ void Activity::doSetupHelperData()
 	{
 		//any "from_to_transition" string is a "compound" one, i.e.
 		//could have the form:
-		// "state1:state2$fromToName"
-		//parse string as a (statePair,fromToName) pair
-		std::vector<std::string> statePairFromToName = parseCompoundString(
-				*iter, '$');
+		// "state11@state21:state12@state22:...:state1N@state2N$fromToName"
+		//parse string as a (statePairs,fromToName) pair
+		std::vector<std::string> statePairsFromTo = parseCompoundString(*iter,
+				'$');
 		//override only if there is (at least) a (statePair,FromToName) pair
-		if (statePairFromToName.size() >= 2)
+		if (statePairsFromTo.size() >= 2)
 		{
-			//set second element as FromToName
-			//could be empty
-			std::string fromToName = statePairFromToName[1];
-			//parse first element as a state pair
-			std::vector<std::string> statePair = parseCompoundString(*iter,
-					':');
-			//check if there is (at least) a pair
-			if (statePair.size() >= 2)
+			//set second element as FromToName (could be empty)
+			std::string fromToName = statePairsFromTo[1];
+			//parse first element as a state pair list
+			std::vector<std::string> statePairs = parseCompoundString(
+					statePairsFromTo[0], ':');
+			std::vector<std::string>::const_iterator iterStatePair;
+			for (iterStatePair = statePairs.begin();
+					iterStatePair != statePairs.end(); ++iterStatePair)
 			{
-				//ignore not existent or empty states (== statePair[i])
-				if (mOwnerObject->objectTmpl()->isComponentParameter("states",
-						statePair[0], componentType())
-						and (not statePair[0].empty())
-						and mOwnerObject->objectTmpl()->isComponentParameter(
-								"states", statePair[1], componentType())
-						and (not statePair[1].empty()))
+				//parse element as a state pair
+				std::vector<std::string> statePair = parseCompoundString(
+						*iterStatePair, '@');
+				//insert only if it is a valid fromTo transition
+				if (mStatePairFromToTable.find(
+						StatePair(statePair[0], statePair[1]))
+						!= mStatePairFromToTable.end())
 				{
 					//insert into the FromTo functions' names table
 					mStatePairFromToTable[StatePair(statePair[0], statePair[1])] =

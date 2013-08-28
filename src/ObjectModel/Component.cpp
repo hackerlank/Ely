@@ -91,31 +91,20 @@ void Component::doSetupEventTables()
 	std::list<std::string>::const_iterator iter;
 	//fill up event tables with event values == event type,
 	//callbackName == empty string and callback function == NULL
-	std::list<std::string> eventTypesList =
-			mOwnerObject->objectTmpl()->componentParameterList(
+	std::list<std::string> eventTypes =
+			mOwnerObject->objectTmpl()->componentParameterValues(
 					std::string("event_types"), componentType());
-	for (iter = eventTypesList.begin(); iter != eventTypesList.end(); ++iter)
+	for (iter = eventTypes.begin(); iter != eventTypes.end(); ++iter)
 	{
-		//any "event_types" string is a "compound" one, i.e. could have the form:
-		// "evType1:evType2:...:evTypeN"
-		//parse string as a event type list
-		std::vector<std::string> eventTypeList = parseCompoundString(*iter,
-				':');
-		std::vector<std::string>::const_iterator iterEventType;
-		for (iterEventType = eventTypeList.begin();
-				iterEventType != eventTypeList.end(); ++iterEventType)
+		//a valid event type must be not empty
+		if (not iter->empty())
 		{
-			//an empty event type is ignored
-			if (not iterEventType->empty())
-			{
-				//insert event keyed by eventType;
-				mEventTable[*iterEventType] = *iterEventType;
-				//insert eventType keyed by event;
-				mEventTypeTable[*iterEventType] = *iterEventType;
-				//insert the <callbackName,NULL> pair keyed by eventType;
-				mCallbackTable[*iterEventType] = NameCallbackPair(
-						std::string(""), NULL);
-			}
+			//insert event keyed by eventType;
+			mEventTable[*iter] = *iter;
+			//insert eventType keyed by event;
+			mEventTypeTable[*iter] = *iter;
+			//insert the <callbackName,NULL> pair keyed by eventType;
+			mCallbackTable[*iter] = NameCallbackPair(std::string(""), NULL);
 		}
 	}
 	//override event values and callback functions on a per Object basis
@@ -146,9 +135,9 @@ void Component::doSetupEventTables()
 				//check if there is (at least) a pair
 				if (typeValue.size() >= 2)
 				{
-					//ignore a not existent event type (== typeValue[0])
-					if (mOwnerObject->objectTmpl()->isComponentParameter(
-							"event_types", typeValue[0], componentType()))
+					//insert only if it is a valid event type (== typeValue[0])
+					if (mEventTable.find(typeValue[0])
+							!= mEventTable.end())
 					{
 						//change only non empty event value (== typeValue[1])
 						if (not typeValue[1].empty())

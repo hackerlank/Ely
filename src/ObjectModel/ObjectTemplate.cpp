@@ -191,7 +191,7 @@ void ObjectTemplate::addComponentParameter(const std::string& parameterName,
 	}
 }
 
-bool ObjectTemplate::isComponentParameter(const std::string& name,
+bool ObjectTemplate::isComponentParameterValue(const std::string& name,
 		const std::string& value, ComponentType compType)
 {
 	//lock (guard) the mutex
@@ -215,7 +215,7 @@ bool ObjectTemplate::isComponentParameter(const std::string& name,
 	return result;
 }
 
-std::list<std::string> ObjectTemplate::componentParameterList(
+std::list<std::string> ObjectTemplate::componentParameterValues(
 		const std::string& paramName, ComponentType compType)
 {
 	//lock (guard) the mutex

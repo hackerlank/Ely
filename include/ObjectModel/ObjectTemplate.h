@@ -163,7 +163,7 @@ public:
 	 * @return True if the name/value pair match an allowed parameter/value
 	 * for a given component, false otherwise.
 	 */
-	bool isComponentParameter(const std::string& name, const std::string& value,
+	bool isComponentParameterValue(const std::string& name, const std::string& value,
 			ComponentType compType);
 
 	/**
@@ -173,7 +173,7 @@ public:
 	 * @param componentType The component type.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
-	std::list<std::string> componentParameterList(const std::string& paramName,
+	std::list<std::string> componentParameterValues(const std::string& paramName,
 			ComponentType compType);
 
 	/**

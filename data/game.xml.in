@@ -51,8 +51,10 @@
 
 		<ObjectTmpl type="HUD">
 			<ComponentTmpl family="Behavior" type="Activity" priority="40">
-				<Param states="idle"/>
-				<Param states="fire"/>
+				<Param states="idle:fire"/>
+				<Param states="walk:run"/>
+				<Param from_to="walk@run:fire@walk"/>
+				<Param from_to="idle@run:fire@idle"/>
 				<Param event_types="fire:stop-fire"/>
 			</ComponentTmpl>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
@@ -288,6 +290,8 @@
 		<Object type="HUD" id="hud1">
 			<Component type="Activity">
 				<Param events="fire@mouse1:stop-fire@mouse1-up$"/>
+				<Param states_transition="idle:fire$enter,exit,filter"/>
+				<Param from_to_transition="walk@run:fire@idle$s1TOs2"/>
 			</Component>
 			<Component type="Model">
 				<Param model_file="lilsmiley.bam"/>
