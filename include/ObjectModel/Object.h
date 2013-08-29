@@ -418,9 +418,6 @@ inline void Object::doReset()
 	mNodePath = NodePath();
 	mComponents.clear();
 	mIsSteady = false;
-	mInitializationLib = NULL;
-	mInitializationsLoaded = false;
-	mInititializationFuncName = std::string("");
 }
 
 }  // namespace ely

@@ -28,7 +28,8 @@ namespace ely
 {
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
-mTmpl(tmpl), mObjectId(objectId)
+		mTmpl(tmpl), mObjectId(objectId), mInitializationLib(NULL),
+		mInitializationsLoaded(false), mInititializationFuncName(std::string(""))
 {
 	doReset();
 }
@@ -91,10 +92,10 @@ bool Object::doRemoveComponent(SMARTPTR(Component) component,
 
 void Object::onRemoveObjectCleanup()
 {
-	//unload initialization functions
-	doUnloadInitializationFunctions();
 	//
 	doReset();
+	//unload initialization functions
+	doUnloadInitializationFunctions();
 }
 
 void Object::onAddToSceneSetup()
@@ -194,7 +195,6 @@ void Object::doLoadInitializationFunctions()
 	{
 		return;
 	}
-	mInitializationLib = NULL;
 	// doReset errors
 	lt_dlerror();
 	//load the initialization functions library
@@ -226,7 +226,6 @@ void Object::doUnloadInitializationFunctions()
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;
-	mInitializationLib = NULL;
 }
 
 //TypedObject semantics: hardcoded

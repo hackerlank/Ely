@@ -28,18 +28,15 @@
 namespace ely
 {
 
-Component::Component()
+Component::Component() :
+		mCallbackLib(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
 #ifdef ELY_THREAD
-:
-		mDestroying(false)
+				, mDestroying(false)
 #endif
 {
 	mTmpl.clear();
 	mComponentId = ComponentId();
 	mOwnerObject.clear();
-	mCallbackLib = NULL;
-	mCallbacksLoaded = false;
-	mCallbacksRegistered = false;
 	doCleanupEventTables();
 }
 
@@ -49,12 +46,12 @@ Component::~Component()
 
 void Component::addToObjectSetup()
 {
-	//call onAddToObjectSetup
-	onAddToObjectSetup();
 	//setup event tables (if any)
 	doSetupEventTables();
 	//load event callbacks (if any)
 	doLoadEventCallbacks();
+	//call onAddToObjectSetup
+	onAddToObjectSetup();
 	//register event callbacks (if any)
 	registerEventCallbacks();
 }
@@ -63,12 +60,12 @@ void Component::removeFromObjectCleanup()
 {
 	//unregister event callbacks (if any)
 	unregisterEventCallbacks();
+	//call onRemoveFromObjectCleanup
+	onRemoveFromObjectCleanup();
 	//unload event callbacks (if any)
 	doUnloadEventCallbacks();
 	//cleanup event tables (if any)
 	doCleanupEventTables();
-	//call onRemoveFromObjectCleanup
-	onRemoveFromObjectCleanup();
 }
 
 SMARTPTR(Object)Component::getOwnerObject() const
@@ -246,8 +243,6 @@ void Component::doUnloadEventCallbacks()
 	//if callbacks not loaded do nothing
 	RETURN_ON_COND(not mCallbacksLoaded,)
 
-	//clear callback tables
-	mCallbackTable.clear();
 	//Close the event callbacks library
 	// reset errors
 	lt_dlerror();

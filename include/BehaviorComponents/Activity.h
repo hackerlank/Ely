@@ -196,8 +196,6 @@ private:
 inline void Activity::reset()
 {
 	mFSM.cleanup();
-	mTransitionLib = NULL;
-	mTransitionsLoaded = false;
 }
 
 inline void Activity::onAddToSceneSetup()

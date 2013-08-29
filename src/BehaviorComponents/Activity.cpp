@@ -29,13 +29,13 @@ namespace ely
 {
 
 Activity::Activity() :
-		mFSM("FSM")
+		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false)
 {
 	// TODO Auto-generated constructor stub
 }
 
 Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :
-mFSM("FSM")
+		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false)
 {
 	mTmpl = tmpl;
 	reset();
@@ -195,8 +195,6 @@ void Activity::doSetupHelperData()
 
 void Activity::onAddToObjectSetup()
 {
-	//add even for an empty object node path
-
 	//setup the FSM
 	doSetupHelperData();
 
@@ -206,10 +204,10 @@ void Activity::onAddToObjectSetup()
 
 void Activity::onRemoveFromObjectCleanup()
 {
-	//unload transitions library
-	doUnloadTransitionFunctions();
 	//
 	reset();
+	//unload transitions library
+	doUnloadTransitionFunctions();
 }
 
 void Activity::doLoadTransitionFunctions()
@@ -219,7 +217,6 @@ void Activity::doLoadTransitionFunctions()
 	{
 		return;
 	}
-	mTransitionLib = NULL;
 	// reset errors
 	lt_dlerror();
 	//load the transition functions library
