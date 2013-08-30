@@ -2,8 +2,6 @@ AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-bin_PROGRAMS = ely
-
 noinst_LTLIBRARIES = \
 		libgame.la \
 		libaicomponents.la \
@@ -17,27 +15,6 @@ noinst_LTLIBRARIES = \
 
 noinst_LIBRARIES = \
 		libsupport.a
-		
-whole_archives = \
-		-Wl,libsupport.a
-
-#ely
-ely_SOURCES = \
-		Ely.cpp
-		
-ely_LDFLAGS = $(AM_LDFLAGS) -export-dynamic \
-		-Wl,--whole-archive \
-		$(whole_archives) \
-		-Wl,--no-whole-archive
-		
-ely_LDADD = \
-		$(noinst_LTLIBRARIES) \
-		$(noinst_LIBRARIES) \
-		$(top_builddir)/tinyxml2/libtinyxml2.la \
-		-dlopen $(top_builddir)/callbacks/callbacks.la \
-		-dlopen $(top_builddir)/initializations/initializations.la \
-		-dlopen $(top_builddir)/transitions/transitions.la \
-		$(ELY_LIBS)
 
 recastnavigation_sources = \
 		AIComponents/RecastNavigation/InputGeom.cpp \

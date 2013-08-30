@@ -1,0 +1,15 @@
+///Macros representing the path to dynamic linked libraries loaded at runtime
+
+/// Ely data directory
+#define ELY_DATADIR "@elydatadir@/"
+
+/// Ely Panda3d config.prc configuration file path
+#define ELY_CONFIGPRC "@elylibdir@/config.prc"
+/// Ely game.xml configuration file path
+#define ELY_CONFIGFILE "@elylibdir@/game.xml"
+///Event callbacks module (See Component)
+#define ELY_CALLBACKS_LA "@elylibdir@/@callbacks@/callbacks.la"
+///Transition functions module (see Activity component).
+#define ELY_TRANSITIONS_LA "@elylibdir@/@transitions@/transitions.la"
+///Initialization functions module (see Object).
+#define ELY_INITIALIZATIONS_LA "@elylibdir@/@initializations@/initializations.la"

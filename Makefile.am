@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = include callbacks transitions initializations tinyxml2 src doc data
+DIST_SUBDIRS = include tinyxml2 src doc ely
 
 if BOOST_TEST
 BOOSTTESTDIR = src/test

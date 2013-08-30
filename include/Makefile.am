@@ -15,7 +15,6 @@ recastnavigation_headers = \
 		AIComponents/RecastNavigation/OffMeshConnectionTool.h
 
 noinst_HEADERS = \
-		Ely.h \
 		AIComponents/Steering.h \
 		AIComponents/SteeringTemplate.h \
 		AIComponents/CrowdAgent.h \
@@ -67,34 +66,6 @@ noinst_HEADERS = \
 		Utilities/Tools.h
 
 nodist_noinst_HEADERS =\
-		config.h \
-		Tools_ini.h
-		
-EXTRA_DIST = Utilities/Tools_ini.h.in
+		config.h
 
-if !ELY_DEVEL
-substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)|g'
-substLibDir = sed -e 's|@elylibdir[@]|$(pkglibdir)|g'
-substData = sed -e 's/@data[@]\///g'
-substCallbacks = sed -e 's/@callbacks[@]\///g'
-substTransitions = sed -e 's/@transitions[@]\///g'
-substInitializations = sed -e 's/@initializations[@]\///g'
-else
-substDataDir = sed -e 's|@elydatadir[@]|$(abs_top_builddir)|g'
-substLibDir = sed -e 's|@elylibdir[@]|$(abs_top_builddir)|g'
-substData = sed -e 's/@data[@]/data/g'
-substCallbacks = sed -e 's/@callbacks[@]/callbacks/g'
-substTransitions = sed -e 's/@transitions[@]/transitions/g'
-substInitializations = sed -e 's/@initializations[@]/initializations/g'
-endif 
-
-Tools_ini.h : $(top_srcdir)/include/Utilities/Tools_ini.h.in Makefile
-	$(substDataDir) $(top_srcdir)/include/Utilities/$@.in | \
-	$(substLibDir) | \
-	$(substData) | \
-	$(substCallbacks) | \
-	$(substTransitions) | \
-	$(substInitializations) > $@
-
-CLEANFILES = Tools_ini.h
 	

@@ -80,9 +80,7 @@ public:
 	 * all objects have been established.
 	 * @param gameWorldXML The description file.
 	 */
-	///@{
 	virtual void createGameWorld(const std::string& gameWorldXML);
-	///@}
 
 	/**
 	 * \brief Porting of python function direct.showbase.ShowBase.enableMouse.
@@ -104,6 +102,22 @@ public:
 	 * @return A reference to the WindowFramework.
 	 */
 	WindowFramework* const windowFramework() const;
+
+	/**
+	 * \name Gets/sets game data infos.
+	 */
+	///@{
+	enum GameDataInfo
+	{
+		DATADIR,       		//!< DATADIR data path
+		CONFIGFILE,    		//!< CONFIGFILE xml configuration file path
+		CALLBACKS,     		//!< CALLBACKS_LA library path
+		TRANSITIONS,   		//!< TRANSITIONS_LA library path
+		INITIALIZATIONS		//!< INITIALIZATIONS_LA library path
+	};
+	void setDataInfo(GameDataInfo info, const std::string& value);
+	std::string getDataInfo(GameDataInfo info);
+	///@}
 
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -162,12 +176,8 @@ protected:
 	 */
 	virtual void GamePlay();
 
-	/// 1nd task.
-	SMARTPTR(TaskInterface<GameManager>::TaskData) m1stTask;
-	AsyncTask::DoneStatus firstTask(GenericAsyncTask* task);
-	/// 2nd task
-	SMARTPTR(TaskInterface<GameManager>::TaskData) m2ndTask;
-	AsyncTask::DoneStatus secondTask(GenericAsyncTask* task);
+	///Game data info DB.
+	std::map<GameDataInfo, std::string> mInfoDB;
 
 #ifdef ELY_DEBUG
 	bool mPhysicsDebugEnabled;
@@ -178,6 +188,18 @@ protected:
 	///The mutex associated with this manager.
 	Mutex mMutex;
 };
+
+///inline definitions
+
+inline void GameManager::setDataInfo(GameDataInfo info, const std::string& value)
+{
+	mInfoDB[info] = value;
+}
+
+inline std::string GameManager::getDataInfo(GameDataInfo info)
+{
+	return mInfoDB[info];
+}
 
 } // namespace ely
 

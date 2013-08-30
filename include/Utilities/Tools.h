@@ -29,10 +29,6 @@
 # undef HAVE_PYTHON
 #endif
 
-#ifndef TESTING
-#include "Tools_ini.h"
-#endif
-
 #include <iostream>
 #include <referenceCount.h>
 #include <event.h>
@@ -392,6 +388,9 @@ std::string getComponentStandardNameItem(const std::string& name,
 
 ///TypedObject semantics: hardcoded
 void initTypedObjects();
+
+/// the default callback function name
+#define DEFAULT_CALLBACK_NAME "default_callback__"
 
 } // namespace ely
 

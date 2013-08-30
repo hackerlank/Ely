@@ -1,7 +1,7 @@
-model-path @elydatadir@/data/models
-model-path @elydatadir@/data/shaders
-model-path @elydatadir@/data/sounds
-model-path @elydatadir@/data/textures
+model-path @elydatadir@/models
+model-path @elydatadir@/shaders
+model-path @elydatadir@/sounds
+model-path @elydatadir@/textures
 show-frame-rate-meter #t
 lock-to-one-cpu 0
 support-threads 1

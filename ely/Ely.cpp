@@ -15,13 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/Ely.cpp
+ * \file /Ely/ely/Ely.cpp
  *
- * \date Nov 7, 2011
+ * \date Aug 30, 2013
  * \author consultit
  */
 
 #include "Ely.h"
+#include "Ely_ini.h"
 
 using namespace ely;
 
@@ -48,6 +49,12 @@ int main(int argc, char **argv)
 	ObjectTemplateManager* objectTmplMgr = new ObjectTemplateManager();
 	// First create a Game manager: mandatory
 	GameManager* gameMgr = new GameManager(argc, argv);
+	// Add game data info
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::DATADIR, ELY_DATADIR);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CONFIGFILE, ELY_CONFIGFILE);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CALLBACKS, ELY_CALLBACKS_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::TRANSITIONS, ELY_TRANSITIONS_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INITIALIZATIONS, ELY_INITIALIZATIONS_LA);
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
 	AsyncTaskChain *taskChain;

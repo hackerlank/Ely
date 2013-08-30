@@ -23,7 +23,7 @@ LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
 AC_CONFIG_MACRO_DIR([m4])
-AC_CONFIG_SRCDIR([src/Ely.cpp])
+AC_CONFIG_SRCDIR([src/ObjectModel/Object.cpp])
 AC_CONFIG_HEADERS([include/config.h])
 AC_PREFIX_DEFAULT([/usr])
 
@@ -119,17 +119,18 @@ AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" != xyes -a "x${ely_training}" != 
 AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile
-		callbacks/Makefile
-		transitions/Makefile
-		initializations/Makefile
 		tinyxml2/Makefile
 		src/Makefile
 		doc/Makefile
-		data/Makefile
-		data/models/Makefile
-		data/shaders/Makefile
-		data/sounds/Makefile
-		data/textures/Makefile
+		ely/Makefile
+		ely/callbacks/Makefile
+		ely/transitions/Makefile
+		ely/initializations/Makefile
+		ely/data/Makefile
+		ely/data/models/Makefile
+		ely/data/shaders/Makefile
+		ely/data/sounds/Makefile
+		ely/data/textures/Makefile
 		])])
 
 # checks for typedefs, structures, and compiler characteristics.

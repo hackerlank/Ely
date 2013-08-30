@@ -24,6 +24,7 @@
 #include "BehaviorComponents/Activity.h"
 #include "BehaviorComponents/ActivityTemplate.h"
 #include "ObjectModel/Object.h"
+#include "Game/GameManager.h"
 
 namespace ely
 {
@@ -220,11 +221,15 @@ void Activity::doLoadTransitionFunctions()
 	// reset errors
 	lt_dlerror();
 	//load the transition functions library
-	mTransitionLib = lt_dlopen(TRANSITIONS_LA);
+	mTransitionLib = lt_dlopen(
+			GameManager::GetSingletonPtr()->getDataInfo(
+					GameManager::TRANSITIONS).c_str());
 	if (mTransitionLib == NULL)
 	{
-		std::cerr << "Error loading library: " << TRANSITIONS_LA << ": "
-				<< lt_dlerror() << std::endl;
+		std::cerr << "Error loading library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::TRANSITIONS) << ": " << lt_dlerror()
+				<< std::endl;
 		return;
 	}
 
@@ -387,8 +392,10 @@ void Activity::doUnloadTransitionFunctions()
 	lt_dlerror();
 	if (lt_dlclose(mTransitionLib) != 0)
 	{
-		std::cerr << "Error closing library: " << TRANSITIONS_LA << ": "
-				<< lt_dlerror() << std::endl;
+		std::cerr << "Error closing library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::TRANSITIONS) << ": " << lt_dlerror()
+				<< std::endl;
 	}
 	//transitions unloaded
 	mTransitionsLoaded = false;

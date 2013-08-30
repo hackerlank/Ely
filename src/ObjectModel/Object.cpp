@@ -23,13 +23,14 @@
 
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GameManager.h"
 
 namespace ely
 {
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
-		mTmpl(tmpl), mObjectId(objectId), mInitializationLib(NULL),
-		mInitializationsLoaded(false), mInititializationFuncName(std::string(""))
+mTmpl(tmpl), mObjectId(objectId), mInitializationLib(NULL),
+mInitializationsLoaded(false), mInititializationFuncName(std::string(""))
 {
 	doReset();
 }
@@ -44,7 +45,7 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyId) con
 	HOLD_MUTEX(mMutex)
 
 	ComponentOrderedList::const_iterator it =
-			find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
+	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
 	if (it == mComponents.end())
 	{
 		return NULL;
@@ -52,15 +53,15 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyId) con
 	return (*it).second;
 }
 
-bool Object::doAddComponent(SMARTPTR(Component) component,
-		const ComponentFamilyType& familyId)
+bool Object::doAddComponent(SMARTPTR(Component)component,
+const ComponentFamilyType& familyId)
 {
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-			find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
+	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
 	if (it != mComponents.end())
 	{
 		return false;
@@ -71,15 +72,15 @@ bool Object::doAddComponent(SMARTPTR(Component) component,
 	return true;
 }
 
-bool Object::doRemoveComponent(SMARTPTR(Component) component,
-		const ComponentFamilyType& familyId)
+bool Object::doRemoveComponent(SMARTPTR(Component)component,
+const ComponentFamilyType& familyId)
 {
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-			find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
+	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
 	if ((it == mComponents.end()) or (it->second != component))
 	{
 		return false;
@@ -110,7 +111,7 @@ void Object::onAddToSceneSetup()
 					true : false);
 	//find parent into the created objects
 	SMARTPTR(Object)createdObject =
-			ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
+	ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
 	if (createdObject != NULL)
 	{
 		//reparent to parent
@@ -198,11 +199,15 @@ void Object::doLoadInitializationFunctions()
 	// doReset errors
 	lt_dlerror();
 	//load the initialization functions library
-	mInitializationLib = lt_dlopen(INITIALIZATIONS_LA);
+	mInitializationLib = lt_dlopen(
+			GameManager::GetSingletonPtr()->getDataInfo(
+					GameManager::INITIALIZATIONS).c_str());
 	if (mInitializationLib == NULL)
 	{
-		std::cerr << "Error loading library: " << INITIALIZATIONS_LA << ": "
-				<< lt_dlerror() << std::endl;
+		std::cerr << "Error loading library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::INITIALIZATIONS) << ": " << lt_dlerror()
+				<< std::endl;
 		return;
 	}
 	//initializations loaded
@@ -221,8 +226,10 @@ void Object::doUnloadInitializationFunctions()
 	lt_dlerror();
 	if (lt_dlclose(mInitializationLib) != 0)
 	{
-		std::cerr << "Error closing library: " << INITIALIZATIONS_LA << ": "
-				<< lt_dlerror() << std::endl;
+		std::cerr << "Error closing library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::INITIALIZATIONS) << ": " << lt_dlerror()
+				<< std::endl;
 	}
 	//initializations unloaded
 	mInitializationsLoaded = false;

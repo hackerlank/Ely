@@ -24,6 +24,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Object.h"
+#include "Game/GameManager.h"
 
 namespace ely
 {
@@ -133,8 +134,7 @@ void Component::doSetupEventTables()
 				if (typeValue.size() >= 2)
 				{
 					//insert only if it is a valid event type (== typeValue[0])
-					if (mEventTable.find(typeValue[0])
-							!= mEventTable.end())
+					if (mEventTable.find(typeValue[0]) != mEventTable.end())
 					{
 						//change only non empty event value (== typeValue[1])
 						if (not typeValue[1].empty())
@@ -170,11 +170,16 @@ void Component::doLoadEventCallbacks()
 	// reset errors
 	lt_dlerror();
 	//load the event callbacks library
-	mCallbackLib = lt_dlopen(CALLBACKS_LA);
+	mCallbackLib =
+			lt_dlopen(
+					GameManager::GetSingletonPtr()->getDataInfo(
+							GameManager::CALLBACKS).c_str());
 	if (mCallbackLib == NULL)
 	{
-		std::cerr << "Error loading library: " << CALLBACKS_LA << ": "
-				<< lt_dlerror() << std::endl;
+		std::cerr << "Error loading library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::CALLBACKS) << ": " << lt_dlerror()
+				<< std::endl;
 		return;
 	}
 	// reset errors
@@ -190,7 +195,9 @@ void Component::doLoadEventCallbacks()
 		//Close the event callbacks library
 		if (lt_dlclose(mCallbackLib) != 0)
 		{
-			std::cerr << "Error closing library: " << CALLBACKS_LA << std::endl;
+			std::cerr << "Error closing library: "
+					<< GameManager::GetSingletonPtr()->getDataInfo(
+							GameManager::CALLBACKS) << std::endl;
 		}
 		return;
 	}
@@ -248,8 +255,10 @@ void Component::doUnloadEventCallbacks()
 	lt_dlerror();
 	if (lt_dlclose(mCallbackLib) != 0)
 	{
-		std::cerr << "Error closing library: " << CALLBACKS_LA << ": "
-				<< lt_dlerror() << std::endl;
+		std::cerr << "Error closing library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::CALLBACKS) << ": " << lt_dlerror()
+				<< std::endl;
 	}
 
 	//callbacks unloaded

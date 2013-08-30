@@ -91,7 +91,7 @@ void GameManager::gameSetup()
 	setupCompTmplMgr();
 
 	//create the game world (static definition)
-	createGameWorld(std::string(ELY_GAMEXML));
+	createGameWorld(mInfoDB[CONFIGFILE]);
 
 	//play the game
 	GamePlay();
@@ -114,21 +114,6 @@ void GameManager::GamePlay()
 			&EventCallbackInterface<GameManager>::eventCallbackFunction,
 			reinterpret_cast<void*>(mPhysicsDebugData.p()));
 #endif
-
-	// add a 1st task
-	m1stTask = new TaskInterface<GameManager>::TaskData(this,
-			&GameManager::firstTask);
-	AsyncTask* task = new GenericAsyncTask("1st task",
-			&TaskInterface<GameManager>::taskFunction,
-			reinterpret_cast<void*>(m1stTask.p()));
-	get_task_mgr().add(task);
-	// add a 2nd task
-	m2ndTask = new TaskInterface<GameManager>::TaskData(this,
-			&GameManager::secondTask);
-	task = new GenericAsyncTask("2nd task",
-			&TaskInterface<GameManager>::taskFunction,
-			reinterpret_cast<void*>(m2ndTask.p()));
-	get_task_mgr().add(task);
 
 }
 
@@ -472,32 +457,6 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		//remove front element
 		createdObjectQueue.pop();
 	}
-}
-
-AsyncTask::DoneStatus GameManager::firstTask(GenericAsyncTask* task)
-{
-	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 1.0)
-	{
-		PRINT("firstTask " << timeElapsed);
-		return AsyncTask::DS_cont;
-	}
-	return AsyncTask::DS_done;
-}
-
-AsyncTask::DoneStatus GameManager::secondTask(GenericAsyncTask* task)
-{
-	double timeElapsed = mGlobalClock->get_real_time();
-	if (timeElapsed < 1.0)
-	{
-		return AsyncTask::DS_cont;
-	}
-	else if (timeElapsed > 1.0 and timeElapsed < 2.0)
-	{
-		PRINT("secondTask " << timeElapsed);
-		return AsyncTask::DS_cont;
-	}
-	return AsyncTask::DS_done;
 }
 
 void GameManager::enable_mouse()
