@@ -393,7 +393,7 @@
 <!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
-				<Param heightfield_file="@elydatadir@/data/textures/heightfield.png"/>
+				<Param heightfield_file="@elydatadir@/textures/heightfield.png"/>
 				<Param texture_file="terrain.png"/>
 				<Param height_scale="100.0"/>
 				<Param width_scale="3.0"/>
@@ -407,7 +407,7 @@
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
-				<Param shape_heightfield_file="@elydatadir@/data/textures/heightfield.png"/>
+				<Param shape_heightfield_file="@elydatadir@/textures/heightfield.png"/>
 				<Param shape_type="heightfield"/>
 				<Param shape_height="100.0"/>
 				<Param shape_scale_w="3.0"/>
