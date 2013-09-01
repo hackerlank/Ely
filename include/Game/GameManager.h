@@ -113,7 +113,8 @@ public:
 		CONFIGFILE,    		//!< CONFIGFILE xml configuration file path
 		CALLBACKS,     		//!< CALLBACKS_LA library path
 		TRANSITIONS,   		//!< TRANSITIONS_LA library path
-		INITIALIZATIONS		//!< INITIALIZATIONS_LA library path
+		INITIALIZATIONS,	//!< INITIALIZATIONS_LA library path
+		INSTANCEUPDATES		//!< INSTANCEUPDATES_LA library path
 	};
 	void setDataInfo(GameDataInfo info, const std::string& value);
 	std::string getDataInfo(GameDataInfo info);

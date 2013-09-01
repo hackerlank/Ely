@@ -55,6 +55,7 @@ int main(int argc, char **argv)
 	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CALLBACKS, ELY_CALLBACKS_LA);
 	GameManager::GetSingletonPtr()->setDataInfo(GameManager::TRANSITIONS, ELY_TRANSITIONS_LA);
 	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INITIALIZATIONS, ELY_INITIALIZATIONS_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INSTANCEUPDATES, ELY_INSTANCEUPDATES_LA);
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
 	AsyncTaskChain *taskChain;
@@ -63,12 +64,14 @@ int main(int argc, char **argv)
 	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, 0, 0, taskChain, 2, true)
 	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, 0, 0, taskChain, 2, true)
 	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, 0, 0, taskChain, 2, true)
+	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, 10, 0, taskChain, 2, true)
 #else
 	GameAIManager* gameAIMgr = new GameAIManager();
 	GameControlManager* gameControlMgr = new GameControlManager();
 	GameSceneManager* gameSceneMgr = new GameSceneManager();
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
+	GameBehaviorManager* gameBehaviorMgr = new GameBehaviorManager();
 #endif
 
 #if defined (ELY_THREAD) && defined (ELY_DEBUG)
@@ -127,6 +130,7 @@ int main(int argc, char **argv)
 	gameMgr->gameCleanup();
 
 	// Close the game framework
+	delete gameBehaviorMgr;
 	delete gameAudioMgr;
 	delete gamePhysicsMgr;
 	delete gameSceneMgr;

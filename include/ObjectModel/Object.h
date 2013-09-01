@@ -51,8 +51,8 @@ typedef std::string ObjectId;
  * Object can be initialized after it is added to the scene, by
  * an initialization function, whose name can be specified as parameter
  * or by a default which is the string "<OBJECTID>_initialization",
- * loaded at runtime from a dynamic linked library (referenced by the
- * macro INITIALIZATIONS_LA).
+ * loaded at runtime from a dynamic linked library
+ * (\see GameManager::GameDataInfo::INITIALIZATIONS).
  *
  * XML Param(s):
  * - "parent"  				|single|no default

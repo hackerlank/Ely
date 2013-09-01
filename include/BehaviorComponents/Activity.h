@@ -37,6 +37,9 @@ class ActivityTemplate;
  *
  * It is composed of a embedded fsm (i.e. FSM<std::string>) representing
  * the object game states (i.e. strings).\n
+ * Moreover it gives an object instance the chance to do custom update through a
+ * function loaded at runtime from a dynamic linked library
+ * (\see GameManager::GameDataInfo::INSTANCEUPDATES).\n
  * All objects of the same type share the same activity component's states.\n
  * A state transition can be request by delegating its embedded FSM
  * interface functions, like in this sample code:
@@ -58,7 +61,7 @@ class ActivityTemplate;
  * This name can be overridden by parameters on a "per Object"
  * basis.\n
  * The transition functions are loaded at runtime from a dynamic linked library
- * (referenced by the macro TRANSITIONS_LA).\n
+ * (\see GameManager::GameDataInfo::TRANSITIONS).\n
  * Inside these routine the SMARTPTR(Activity) "activity" argument passed refers to this
  * component.\n
  * \see FSM for details.
@@ -75,6 +78,7 @@ class ActivityTemplate;
  * - "from_to_transition"	|multiple|no default (each one specified as
  * "state11@state21:state12@state22:...:state1N@state2N$fromToName" into
  * Object definition)
+ * - "instance_update" 		|single|""
  *
  * \note in "states_transition" and "from_to_transition" any of
  * enterName, exitName, filterName, fromToName could be empty (meaning
@@ -113,13 +117,11 @@ public:
 private:
 	///The underlying FSM (read-only after creation & before destruction).
 	fsm mFSM;
-
 	//Transition functions library management.
 	///State transitions.
 	std::list<std::string> mStateTransitionListParam;
 	///FromTo transitions.
 	std::list<std::string> mFromToTransitionListParam;
-
 	/**
 	 * \name Temporary helper data/functions.
 	 */
@@ -141,7 +143,6 @@ private:
 	///Setup helper data.
 	void doSetupHelperData();
 	///@}
-
 	/**
 	 * \name Handles, typedefs, for managing library of transition functions.
 	 */
@@ -153,16 +154,34 @@ private:
 			const ValueList&);
 	typedef void (*PFROMTO)(fsm*, Activity&, const ValueList&);
 	///@}
-
 	///Helper flag.
 	bool mTransitionsLoaded;
-
 	/**
 	 * \name Helper functions to load/unload transition functions.
 	 */
 	///@{
 	void doLoadTransitionFunctions();
 	void doUnloadTransitionFunctions();
+	///@}
+
+	//Update management data types, variables and functions.
+	/**
+	 * \name Handles, typedefs, for managing library of instances' update functions.
+	 */
+	///@{
+	lt_dlhandle mInstanceUpdateLib;
+	typedef void* (*PINSTANCEUPDATE)(void*);
+	///@}
+	///Instance update function.
+	PINSTANCEUPDATE mInstanceUpdate;
+	///Instance update function name.
+	std::string mInstanceUpdateName;
+	/**
+	 * \name Helper functions to load/unload instance update function.
+	 */
+	///@{
+	void doLoadInstanceUpdate();
+	void doUnloadInstanceUpdate();
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -196,14 +215,6 @@ private:
 inline void Activity::reset()
 {
 	mFSM.cleanup();
-}
-
-inline void Activity::onAddToSceneSetup()
-{
-}
-
-inline void Activity::onRemoveFromSceneCleanup()
-{
 }
 
 inline fsm& Activity::getFSM()

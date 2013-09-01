@@ -28,6 +28,7 @@
 #include "Game/GameManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GameAudioManager.h"
+#include "Game/GameBehaviorManager.h"
 #include "Game/GameControlManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Game/GameSceneManager.h"

@@ -30,7 +30,7 @@ namespace ely
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
 mTmpl(tmpl), mObjectId(objectId), mInitializationLib(NULL),
-mInitializationsLoaded(false), mInititializationFuncName(std::string(""))
+mInitializationsLoaded(false), mInititializationFuncName("")
 {
 	doReset();
 }

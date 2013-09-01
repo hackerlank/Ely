@@ -34,6 +34,7 @@ noinst_HEADERS = \
 		ControlComponents/DriverTemplate.h \
 		Game/GameAIManager.h \
 		Game/GameAudioManager.h \
+		Game/GameBehaviorManager.h \
 		Game/GameControlManager.h \
 		Game/GameManager.h \
 		Game/GamePhysicsManager.h \

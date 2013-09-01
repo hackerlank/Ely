@@ -59,6 +59,7 @@ libcontrolcomponents_la_SOURCES = \
 libgame_la_SOURCES = \
 		Game/GameAIManager.cpp \
 		Game/GameAudioManager.cpp \
+		Game/GameBehaviorManager.cpp \
 		Game/GameControlManager.cpp \
 		Game/GameManager.cpp \
 		Game/GamePhysicsManager.cpp \

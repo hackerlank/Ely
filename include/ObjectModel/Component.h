@@ -77,7 +77,7 @@ class ComponentTemplate;
  * Both the event value and the callback function can be overridden by parameters
  * on a "per Object basis".\n
  * The callback functions are loaded at runtime from a dynamic linked library
- * (referenced by the macro CALLBACKS_LA).\n
+ * (\see GameManager::GameDataInfo::CALLBACKS).\n
  * If a callback function doesn't exist or if any error occurs, the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
  * To check if a "name" is an allowed event type call:

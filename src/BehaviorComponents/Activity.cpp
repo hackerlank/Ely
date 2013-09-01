@@ -24,19 +24,22 @@
 #include "BehaviorComponents/Activity.h"
 #include "BehaviorComponents/ActivityTemplate.h"
 #include "ObjectModel/Object.h"
+#include "Game/GameBehaviorManager.h"
 #include "Game/GameManager.h"
 
 namespace ely
 {
 
 Activity::Activity() :
-		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false)
+		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false),
+		mInstanceUpdateLib(NULL), mInstanceUpdate(NULL), mInstanceUpdateName("")
 {
 	// TODO Auto-generated constructor stub
 }
 
 Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :
-		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false)
+		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false),
+		mInstanceUpdateLib(NULL), mInstanceUpdate(NULL), mInstanceUpdateName("")
 {
 	mTmpl = tmpl;
 	reset();
@@ -59,12 +62,14 @@ ComponentType Activity::componentType() const
 bool Activity::initialize()
 {
 	bool result = true;
-	///State transitions.
+	//State transitions.
 	mStateTransitionListParam = mTmpl->parameterList(
 			std::string("states_transition"));
-	///FromTo transitions.
+	//FromTo transitions.
 	mFromToTransitionListParam = mTmpl->parameterList(
 			std::string("from_to_transition"));
+	//update function name
+	mInstanceUpdateName = mTmpl->parameter(std::string("instance_update"));
 	//
 	return result;
 }
@@ -201,14 +206,42 @@ void Activity::onAddToObjectSetup()
 
 	//load transitions library
 	doLoadTransitionFunctions();
+	//load instance update function (if any)
+	if (not mInstanceUpdateName.empty())
+	{
+		doLoadInstanceUpdate();
+	}
 }
 
 void Activity::onRemoveFromObjectCleanup()
 {
 	//
 	reset();
+
+	//unload instance update function (if any)
+	if (not mInstanceUpdateName.empty())
+	{
+		doUnloadInstanceUpdate();
+	}
 	//unload transitions library
 	doUnloadTransitionFunctions();
+}
+
+void Activity::onAddToSceneSetup()
+{
+	if ((not mInstanceUpdateName.empty()) and mInstanceUpdate)
+	{
+		GameBehaviorManager::GetSingletonPtr()->addToBehaviorUpdate(this);
+	}
+}
+
+void Activity::onRemoveFromSceneCleanup()
+{
+	if ((not mInstanceUpdateName.empty()) and mInstanceUpdate)
+	{
+		//remove from behavior update
+		GameBehaviorManager::GetSingletonPtr()->removeFromBehaviorUpdate(this);
+	}
 }
 
 void Activity::doLoadTransitionFunctions()
@@ -399,6 +432,64 @@ void Activity::doUnloadTransitionFunctions()
 	}
 	//transitions unloaded
 	mTransitionsLoaded = false;
+}
+
+void Activity::doLoadInstanceUpdate()
+{
+	//if instance updates already loaded do nothing
+	RETURN_ON_COND(mInstanceUpdate,)
+
+	// reset errors
+	lt_dlerror();
+	//load the instance updates library
+	mInstanceUpdateLib =
+			lt_dlopen(
+					GameManager::GetSingletonPtr()->getDataInfo(
+							GameManager::INSTANCEUPDATES).c_str());
+	if (mInstanceUpdateLib == NULL)
+	{
+		std::cerr << "Error loading library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::INSTANCEUPDATES) << ": " << lt_dlerror()
+				<< std::endl;
+		return;
+	}
+	// reset errors
+	lt_dlerror();
+	//set the instance update function (if any)
+	if (not mInstanceUpdateName.empty())
+	{
+		mInstanceUpdate = (PINSTANCEUPDATE) lt_dlsym(mInstanceUpdateLib,
+				mInstanceUpdateName.c_str());
+		const char* dlsymError = lt_dlerror();
+		if (dlsymError)
+		{
+			PRINT_ERR("Cannot find instance update function" << mInstanceUpdateName
+					<< dlsymError);
+			mInstanceUpdate = NULL;
+			//cannot load instance update function
+			return;
+		}
+	}
+}
+
+void Activity::doUnloadInstanceUpdate()
+{
+	//if instance updates not loaded do nothing
+	RETURN_ON_COND(not mInstanceUpdate,)
+
+	//Close the event instance updates library
+	// reset errors
+	lt_dlerror();
+	if (lt_dlclose(mInstanceUpdateLib) != 0)
+	{
+		std::cerr << "Error closing library: "
+				<< GameManager::GetSingletonPtr()->getDataInfo(
+						GameManager::INSTANCEUPDATES) << ": " << lt_dlerror()
+				<< std::endl;
+	}
+	//
+	mInstanceUpdate = NULL;
 }
 
 //TypedObject semantics: hardcoded

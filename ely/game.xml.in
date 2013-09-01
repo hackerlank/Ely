@@ -315,7 +315,8 @@
 				<Param events="rl@j:rl-up@j-up:rl-q@alt-j$activityPlayer0"/>
 				<Param events="j@space:j-up@space-up:j-q@alt-space$activityPlayer0"/>				
 				<Param events="q@alt:q-up@alt-up$activityPlayer0"/>				
-				<Param events="ground@OnGround:air@OnAir$groundAirPlayer0"/>				
+				<Param events="ground@OnGround:air@OnAir$groundAirPlayer0"/>
+				<Param instance_update="updatePlayer0"/>		
 			</Component>
 			<Component type="Model">
 				<Param model_file="eve.bam"/>

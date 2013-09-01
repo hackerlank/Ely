@@ -13,3 +13,5 @@
 #define ELY_TRANSITIONS_LA "@elylibdir@/@transitions@/transitions.la"
 ///Initialization functions module (see Object).
 #define ELY_INITIALIZATIONS_LA "@elylibdir@/@initializations@/initializations.la"
+///Inastance update functions module (see Component).
+#define ELY_INSTANCEUPDATES_LA "@elylibdir@/@initializations@/instanceupdates.la"
