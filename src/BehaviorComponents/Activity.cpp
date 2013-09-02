@@ -295,7 +295,7 @@ void Activity::doLoadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR_DEBUG("Cannot load " << functionName << ": " << dlsymError);
 			pEnterFunction = NULL;
 		}
 
@@ -319,7 +319,7 @@ void Activity::doLoadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR_DEBUG("Cannot load " << functionName << ": " << dlsymError);
 			pExitFunction = NULL;
 		}
 
@@ -343,7 +343,7 @@ void Activity::doLoadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR_DEBUG("Cannot load " << functionName << ": " << dlsymError);
 			pFilterFunction = NULL;
 		}
 		//add the state with the current transition functions
@@ -398,7 +398,7 @@ void Activity::doLoadTransitionFunctions()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_ERR("Cannot load " << functionName << ": " << dlsymError);
+			PRINT_ERR_DEBUG("Cannot load " << functionName << ": " << dlsymError);
 			pFromToFunction = NULL;
 		}
 		//add the FromTo function
@@ -464,9 +464,10 @@ void Activity::doLoadInstanceUpdate()
 		const char* dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_ERR("Cannot find instance update function" << mInstanceUpdateName
-					<< dlsymError);
-			mInstanceUpdate = NULL;
+			PRINT_ERR_DEBUG(
+					"Cannot find instance update function \"" <<
+					mInstanceUpdateName << "\": "<< dlsymError);
+			//mInstanceUpdate == NULL;
 			//cannot load instance update function
 			return;
 		}
@@ -490,6 +491,24 @@ void Activity::doUnloadInstanceUpdate()
 	}
 	//
 	mInstanceUpdate = NULL;
+}
+
+void Activity::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+#ifdef ELY_DEBUG
+	RETURN_ON_COND(not mInstanceUpdate,)
+#endif
+	//update should be called if and only if mInstanceUpdate != NULL
+	mInstanceUpdate(dt, *this);
 }
 
 //TypedObject semantics: hardcoded

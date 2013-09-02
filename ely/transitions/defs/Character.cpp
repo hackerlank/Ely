@@ -24,7 +24,6 @@
 #include "../common_configs.h"
 #include "PhysicsComponents/CharacterController.h"
 #include "SceneComponents/Model.h"
-#include <partBundle.h>
 
 //ENTER Enter_<STATE>_<OBJECTTYPE>;
 //EXIT Exit_<STATE>_<OBJECTTYPE>;
@@ -145,16 +144,16 @@ EXIT Exit_Sl_Rl_Q_Character;
 //I
 void Enter_I_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_I_Character");
+	PRINT_DEBUG("Enter_I_Character");
 }
 void Exit_I_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_I_Character");
+	PRINT_DEBUG("Exit_I_Character");
 }
 //F
 void Enter_F_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Character");
+	PRINT_DEBUG("Enter_F_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -167,7 +166,7 @@ void Enter_F_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_F_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Character");
+	PRINT_DEBUG("Exit_F_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -181,7 +180,7 @@ void Exit_F_Character(fsm*, Activity& activity)
 //B
 void Enter_B_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_B_Character");
+	PRINT_DEBUG("Enter_B_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -194,7 +193,7 @@ void Enter_B_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_B_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_B_Character");
+	PRINT_DEBUG("Exit_B_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -208,7 +207,7 @@ void Exit_B_Character(fsm*, Activity& activity)
 //Sr
 void Enter_Sr_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sr_Character");
+	PRINT_DEBUG("Enter_Sr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -218,7 +217,7 @@ void Enter_Sr_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sr_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sr_Character");
+	PRINT_DEBUG("Exit_Sr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -229,7 +228,7 @@ void Exit_Sr_Character(fsm*, Activity& activity)
 //Sl
 void Enter_Sl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sl_Character");
+	PRINT_DEBUG("Enter_Sl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -239,7 +238,7 @@ void Enter_Sl_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sl_Character");
+	PRINT_DEBUG("Exit_Sl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -250,7 +249,7 @@ void Exit_Sl_Character(fsm*, Activity& activity)
 //Rr
 void Enter_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Rr_Character");
+	PRINT_DEBUG("Enter_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -260,7 +259,7 @@ void Enter_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Rr_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Rr_Character");
+	PRINT_DEBUG("Exit_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -271,7 +270,7 @@ void Exit_Rr_Character(fsm*, Activity& activity)
 //Rl
 void Enter_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Rl_Character");
+	PRINT_DEBUG("Enter_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -281,7 +280,7 @@ void Enter_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Rl_Character");
+	PRINT_DEBUG("Exit_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
@@ -292,7 +291,7 @@ void Exit_Rl_Character(fsm*, Activity& activity)
 //J
 void Enter_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_J_Character");
+	PRINT_DEBUG("Enter_J_Character");
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
@@ -301,7 +300,7 @@ void Enter_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_J_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_J_Character");
+	PRINT_DEBUG("Exit_J_Character");
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent("Physics"));
@@ -311,7 +310,7 @@ void Exit_J_Character(fsm*, Activity& activity)
 //F-Rr
 void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Rr_Character");
+	PRINT_DEBUG("Enter_F_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -325,7 +324,7 @@ void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_F_Rr_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Rr_Character");
+	PRINT_DEBUG("Exit_F_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -340,7 +339,7 @@ void Exit_F_Rr_Character(fsm*, Activity& activity)
 //F-Rl
 void Enter_F_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Rl_Character");
+	PRINT_DEBUG("Enter_F_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -354,7 +353,7 @@ void Enter_F_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_F_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Rl_Character");
+	PRINT_DEBUG("Exit_F_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -369,29 +368,29 @@ void Exit_F_Rl_Character(fsm*, Activity& activity)
 //F-Rr-Rl
 void Enter_F_Rr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Rr_Rl_Character");
+	PRINT_DEBUG("Enter_F_Rr_Rl_Character");
 	//
 }
 void Exit_F_Rr_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Rr_Rl_Character");
+	PRINT_DEBUG("Exit_F_Rr_Rl_Character");
 	//
 }
 //Rr-Rl
 void Enter_Rr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Rr_Rl_Character");
+	PRINT_DEBUG("Enter_Rr_Rl_Character");
 	//
 }
 void Exit_Rr_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Rr_Rl_Character");
+	PRINT_DEBUG("Exit_Rr_Rl_Character");
 	//
 }
 //F-J
 void Enter_F_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_J_Character");
+	PRINT_DEBUG("Enter_F_J_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -412,7 +411,7 @@ void Enter_F_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_F_J_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_J_Character");
+	PRINT_DEBUG("Exit_F_J_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -430,7 +429,7 @@ void Exit_F_J_Character(fsm*, Activity& activity)
 //B-Rr
 void Enter_B_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_B_Rr_Character");
+	PRINT_DEBUG("Enter_B_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -444,7 +443,7 @@ void Enter_B_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_B_Rr_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_B_Rr_Character");
+	PRINT_DEBUG("Exit_B_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -459,7 +458,7 @@ void Exit_B_Rr_Character(fsm*, Activity& activity)
 //B-Rl
 void Enter_B_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_B_Rl_Character");
+	PRINT_DEBUG("Enter_B_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -473,7 +472,7 @@ void Enter_B_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_B_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_B_Rl_Character");
+	PRINT_DEBUG("Exit_B_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -488,7 +487,7 @@ void Exit_B_Rl_Character(fsm*, Activity& activity)
 //Sr-Rr
 void Enter_Sr_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sr_Rr_Character");
+	PRINT_DEBUG("Enter_Sr_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -501,7 +500,7 @@ void Enter_Sr_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sr_Rr_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sr_Rr_Character");
+	PRINT_DEBUG("Exit_Sr_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -515,7 +514,7 @@ void Exit_Sr_Rr_Character(fsm*, Activity& activity)
 //Sr-Rl
 void Enter_Sr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sr_Rl_Character");
+	PRINT_DEBUG("Enter_Sr_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -528,7 +527,7 @@ void Enter_Sr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sr_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sr_Rl_Character");
+	PRINT_DEBUG("Exit_Sr_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -542,7 +541,7 @@ void Exit_Sr_Rl_Character(fsm*, Activity& activity)
 //Sl-Rr
 void Enter_Sl_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sl_Rr_Character");
+	PRINT_DEBUG("Enter_Sl_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -555,7 +554,7 @@ void Enter_Sl_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sl_Rr_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sl_Rr_Character");
+	PRINT_DEBUG("Exit_Sl_Rr_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -569,7 +568,7 @@ void Exit_Sl_Rr_Character(fsm*, Activity& activity)
 //Sl-Rl
 void Enter_Sl_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sl_Rl_Character");
+	PRINT_DEBUG("Enter_Sl_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -582,7 +581,7 @@ void Enter_Sl_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sl_Rl_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sl_Rl_Character");
+	PRINT_DEBUG("Exit_Sl_Rl_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -598,7 +597,7 @@ static float angularSpeedFactor = 3.0;
 //F-Q
 void Enter_F_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Q_Character");
+	PRINT_DEBUG("Enter_F_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -612,7 +611,7 @@ void Enter_F_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_F_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Q_Character");
+	PRINT_DEBUG("Exit_F_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -627,7 +626,7 @@ void Exit_F_Q_Character(fsm*, Activity& activity)
 //Sr-Q
 void Enter_Sr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sr_Q_Character");
+	PRINT_DEBUG("Enter_Sr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -640,7 +639,7 @@ void Enter_Sr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sr_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sr_Q_Character");
+	PRINT_DEBUG("Exit_Sr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -654,7 +653,7 @@ void Exit_Sr_Q_Character(fsm*, Activity& activity)
 //Sl-Q
 void Enter_Sl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sl_Q_Character");
+	PRINT_DEBUG("Enter_Sl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -667,7 +666,7 @@ void Enter_Sl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Sl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sl_Q_Character");
+	PRINT_DEBUG("Exit_Sl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -681,7 +680,7 @@ void Exit_Sl_Q_Character(fsm*, Activity& activity)
 //Rr-Q
 void Enter_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Rr_Q_Character");
+	PRINT_DEBUG("Enter_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -694,7 +693,7 @@ void Enter_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Rr_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Rr_Q_Character");
+	PRINT_DEBUG("Exit_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -708,7 +707,7 @@ void Exit_Rr_Q_Character(fsm*, Activity& activity)
 //Rl-Q
 void Enter_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Rl_Q_Character");
+	PRINT_DEBUG("Enter_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -721,7 +720,7 @@ void Enter_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_Rl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Rl_Q_Character");
+	PRINT_DEBUG("Exit_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -735,7 +734,7 @@ void Exit_Rl_Q_Character(fsm*, Activity& activity)
 //F-Rr-Q
 void Enter_F_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Rr_Q_Character");
+	PRINT_DEBUG("Enter_F_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -751,7 +750,7 @@ void Enter_F_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 }
 void Exit_F_Rr_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Rr_Q_Character");
+	PRINT_DEBUG("Exit_F_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -768,7 +767,7 @@ void Exit_F_Rr_Q_Character(fsm*, Activity& activity)
 //F-Rl-Q
 void Enter_F_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Rl_Q_Character");
+	PRINT_DEBUG("Enter_F_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -784,7 +783,7 @@ void Enter_F_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 }
 void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Rl_Q_Character");
+	PRINT_DEBUG("Exit_F_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -801,29 +800,29 @@ void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 //F-Rr-Rl-Q
 void Enter_F_Rr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_Rr_Rl_Q_Character");
+	PRINT_DEBUG("Enter_F_Rr_Rl_Q_Character");
 	//
 }
 void Exit_F_Rr_Rl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_Rr_Rl_Q_Character");
+	PRINT_DEBUG("Exit_F_Rr_Rl_Q_Character");
 	//
 }
 //Rr-Rl-Q
 void Enter_Rr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Rr_Rl_Q_Character");
+	PRINT_DEBUG("Enter_Rr_Rl_Q_Character");
 	//
 }
 void Exit_Rr_Rl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Rr_Rl_Q_Character");
+	PRINT_DEBUG("Exit_Rr_Rl_Q_Character");
 	//
 }
 //F-J-Q
 void Enter_F_J_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_F_J_Q_Character");
+	PRINT_DEBUG("Enter_F_J_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -845,7 +844,7 @@ void Enter_F_J_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 }
 void Exit_F_J_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_F_J_Q_Character");
+	PRINT_DEBUG("Exit_F_J_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -864,7 +863,7 @@ void Exit_F_J_Q_Character(fsm*, Activity& activity)
 //Sr-Rr-Q
 void Enter_Sr_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sr_Rr_Q_Character");
+	PRINT_DEBUG("Enter_Sr_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -879,7 +878,7 @@ void Enter_Sr_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 }
 void Exit_Sr_Rr_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sr_Rr_Q_Character");
+	PRINT_DEBUG("Exit_Sr_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -895,7 +894,7 @@ void Exit_Sr_Rr_Q_Character(fsm*, Activity& activity)
 //Sr-Rl-Q
 void Enter_Sr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sr_Rl_Q_Character");
+	PRINT_DEBUG("Enter_Sr_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -910,7 +909,7 @@ void Enter_Sr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 }
 void Exit_Sr_Rl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sr_Rl_Q_Character");
+	PRINT_DEBUG("Exit_Sr_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -926,7 +925,7 @@ void Exit_Sr_Rl_Q_Character(fsm*, Activity& activity)
 //Sl-Rr-Q
 void Enter_Sl_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sl_Rr_Q_Character");
+	PRINT_DEBUG("Enter_Sl_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -941,7 +940,7 @@ void Enter_Sl_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 }
 void Exit_Sl_Rr_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sl_Rr_Q_Character");
+	PRINT_DEBUG("Exit_Sl_Rr_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -957,7 +956,7 @@ void Exit_Sl_Rr_Q_Character(fsm*, Activity& activity)
 //Sl-Rl-Q
 void Enter_Sl_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_Sl_Rl_Q_Character");
+	PRINT_DEBUG("Enter_Sl_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
@@ -972,7 +971,7 @@ void Enter_Sl_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 }
 void Exit_Sl_Rl_Q_Character(fsm*, Activity& activity)
 {
-	PRINT("Exit_Sl_Rl_Q_Character");
+	PRINT_DEBUG("Exit_Sl_Rl_Q_Character");
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(

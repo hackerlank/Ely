@@ -230,7 +230,7 @@ void Component::doLoadEventCallbacks()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_ERR(
+			PRINT_ERR_DEBUG(
 					"Cannot load callback " << callbackName << ": " << dlsymError);
 			//set default callback for this event
 			mCallbackTable[iterCallbackTable->first].second = pDefaultCallback;

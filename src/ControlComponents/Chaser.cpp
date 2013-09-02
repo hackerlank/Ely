@@ -37,9 +37,9 @@ Chaser::Chaser()
 
 Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GameControlManager")
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"Chaser::Chaser: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;

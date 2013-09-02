@@ -82,7 +82,7 @@ bool ComponentTemplateManager::removeComponentTemplate(
 	{
 		return false;
 	}
-	PRINT(
+	PRINT_DEBUG(
 			"Removing component template for type '" << componentType << "'");
 	mComponentTemplates.erase(it);
 	return true;

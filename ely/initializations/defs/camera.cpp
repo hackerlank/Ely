@@ -25,11 +25,12 @@
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/Chaser.h"
 #include "Support/Picker.h"
-#include "Game/GameManager.h"
 
 ///shared between camera, picker, actor1
-static bool controlGrabbed = false;
-
+namespace
+{
+bool controlGrabbed = false;
+}
 ///camera related
 #ifdef __cplusplus
 extern "C"
@@ -42,7 +43,9 @@ INITIALIZATION camera_initialization;
 }
 #endif
 
-static void toggleCameraControl(const Event* event, void* data)
+namespace
+{
+void toggleCameraControl(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera = reinterpret_cast<Object*>(data);
 	SMARTPTR(Component) compControl = camera->getComponent(
@@ -150,6 +153,7 @@ static void togglePicker(const Event* event, void* data)
 		//
 		controlGrabbed = true;
 	}
+}
 }
 void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)

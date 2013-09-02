@@ -30,7 +30,7 @@ namespace ely
 GameControlManager::GameControlManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameControlManager::GameControlManager: invalid GameManager")
 	mControlComponents.clear();
 	mUpdateData.clear();

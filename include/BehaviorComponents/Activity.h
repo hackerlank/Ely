@@ -114,6 +114,14 @@ public:
 	operator fsm&();
 	///@}
 
+	/**
+	 * \brief Updates this component.
+	 *
+	 * Will be called automatically by a behavior manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
+
 private:
 	///The underlying FSM (read-only after creation & before destruction).
 	fsm mFSM;
@@ -170,7 +178,7 @@ private:
 	 */
 	///@{
 	lt_dlhandle mInstanceUpdateLib;
-	typedef void* (*PINSTANCEUPDATE)(void*);
+	typedef void* (*PINSTANCEUPDATE)(float dt, Activity& activity);
 	///@}
 	///Instance update function.
 	PINSTANCEUPDATE mInstanceUpdate;

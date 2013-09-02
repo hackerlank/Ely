@@ -24,11 +24,7 @@
 #ifndef COMMON_CONFIGS_H_
 #define COMMON_CONFIGS_H_
 
-#include <iostream>
-#include <string>
 #include "BehaviorComponents/Activity.h"
-#include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 
 using namespace ely;
 
@@ -37,13 +33,6 @@ void callAllInits();
 
 __attribute__((destructor)) void transitionsEnd();
 void callAllEnds();
-
-//generic typedefs
-typedef void ENTER(fsm*, Activity&, const ValueList&);
-typedef void EXIT(fsm*, Activity&);
-typedef ValueList FILTER(fsm*, Activity&, const std::string&,
-		const ValueList&);
-typedef void FROMTO(fsm*, Activity&, const ValueList&);
 
 #ifdef __cplusplus
 extern "C"
@@ -55,5 +44,10 @@ extern "C"
 #endif
 
 ///Common declarations
+typedef void ENTER(fsm*, Activity&, const ValueList&);
+typedef void EXIT(fsm*, Activity&);
+typedef ValueList FILTER(fsm*, Activity&, const std::string&,
+		const ValueList&);
+typedef void FROMTO(fsm*, Activity&, const ValueList&);
 
 #endif /* COMMON_CONFIGS_H_ */

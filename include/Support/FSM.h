@@ -349,7 +349,7 @@ public:
 	 * for a state.
 	 * @return The current or next state.
 	 */
-	const StateKey& getCurrentOrNextState() const;
+	StateKey getCurrentOrNextState() const;
 
 	/**
 	 * \brief Returns the current (and the next) state.
@@ -644,7 +644,7 @@ template<typename StateKey> std::string FSM<StateKey>::getStateChangeEvent() con
 	return stateChange.str();
 }
 
-template<typename StateKey> const StateKey& FSM<StateKey>::getCurrentOrNextState() const
+template<typename StateKey> StateKey FSM<StateKey>::getCurrentOrNextState() const
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)

@@ -24,6 +24,8 @@
 #include "../common_configs.h"
 #include "ControlComponents/Driver.h"
 
+using namespace ely;
+
 ///Avoid name mangling
 #ifdef __cplusplus
 extern "C"
@@ -58,7 +60,10 @@ CALLBACK fast_down_Driver_Camera;
 
 ///Camera + Driver related CALLBACKNAMEs & CALLBACKs
 //fast:stop-fast
-static bool isFast = false;
+namespace
+{
+bool isFast = false;
+}
 void fast_Driver_Camera(const Event* event, void* data)
 {
 	//get data

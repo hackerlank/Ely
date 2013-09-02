@@ -26,6 +26,8 @@
 #include "BehaviorComponents/Activity.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+using namespace ely;
+
 ///Avoid name mangling
 #ifdef __cplusplus
 extern "C"
@@ -52,7 +54,10 @@ CALLBACK groundAirPlayer0;
 
 ///Character + Activity related functions/variables
 //Transition table: <eventType, currentState> -> nextState
-static TransitionTable* tablePtr;
+namespace
+{
+TransitionTable* tablePtr;
+}
 void activityPlayer0(const Event * event, void * data)
 {
 	//get data
@@ -73,7 +78,7 @@ void activityPlayer0(const Event * event, void * data)
 	}
 	else
 	{
-		PRINT_ERR("activityPlayer0: Transition not defined for event type '" <<
+		PRINT_ERR_DEBUG("activityPlayer0: Transition not defined for event type '" <<
 				eventType << "' and state '" << currentState << "'");
 	}
 }
@@ -97,7 +102,7 @@ void groundAirPlayer0(const Event * event, void * data)
 	}
 	else
 	{
-		PRINT_ERR("groundAirPlayer0: unrecognized event");
+		PRINT_ERR_DEBUG("groundAirPlayer0: unrecognized event");
 	}
 }
 

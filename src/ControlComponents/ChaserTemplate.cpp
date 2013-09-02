@@ -32,11 +32,11 @@ ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"DriverTemplate::ChaserTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"DriverTemplate::ChaserTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
 			"DriverTemplate::ChaserTemplate: invalid GameControlManager")
 	//
 	setParametersDefaults();

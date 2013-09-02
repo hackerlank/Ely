@@ -1,4 +1,4 @@
-DIST_SUBDIRS = callbacks transitions initializations data 
+DIST_SUBDIRS = callbacks transitions initializations instanceupdates data 
 
 # if !BOOST_TEST and !TRAINING then ELY_ELF 
 if ELY_ELF
@@ -65,12 +65,14 @@ substLibDir = sed -e 's|@elylibdir[@]|$(pkglibdir)|g'
 substCallbacks = sed -e 's/@callbacks[@]\///g'
 substTransitions = sed -e 's/@transitions[@]\///g'
 substInitializations = sed -e 's/@initializations[@]\///g'
+substInstanceupdates = sed -e 's/@instanceupdates[@]\///g'
 else
 substDataDir = sed -e 's|@elydatadir[@]|$(abs_top_srcdir)/ely/data|g'
 substLibDir = sed -e 's|@elylibdir[@]|$(abs_top_builddir)/ely|g'
 substCallbacks = sed -e 's/@callbacks[@]/callbacks/g'
 substTransitions = sed -e 's/@transitions[@]/transitions/g'
 substInitializations = sed -e 's/@initializations[@]/initializations/g'
+substInstanceupdates = sed -e 's/@instanceupdates[@]/instanceupdates/g'
 endif 
 
 Ely_ini.h : $(top_srcdir)/ely/Ely_ini.h.in Makefile
@@ -78,7 +80,8 @@ Ely_ini.h : $(top_srcdir)/ely/Ely_ini.h.in Makefile
 	$(substLibDir) | \
 	$(substCallbacks) | \
 	$(substTransitions) | \
-	$(substInitializations) > $@
+	$(substInitializations) | \
+	$(substInstanceupdates) > $@
 
 config.prc : $(top_srcdir)/ely/config.prc.in Makefile
 	$(substDataDir) $(top_srcdir)/ely/$@.in > $@

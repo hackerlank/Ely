@@ -31,9 +31,9 @@ ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"ActivityTemplate::ActivityTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"ActivityTemplate::ActivityTemplate: invalid WindowFramework")
 	//
 	setParametersDefaults();

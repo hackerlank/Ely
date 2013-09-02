@@ -30,7 +30,7 @@ namespace ely
 GameAIManager::GameAIManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameAIManager::GameAIManager: invalid GameManager")
 	mAIComponents.clear();
 	mUpdateData.clear();

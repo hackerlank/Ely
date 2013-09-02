@@ -120,7 +120,7 @@ public:
 				activeConnections.insert(newConnection);
 				cReader->add_connection(newConnection.p());
 				NetAddress addr = newConnection->get_address();
-				PRINT("Connection from address: " << addr.get_ip_string());
+				PRINT_DEBUG("Connection from address: " << addr.get_ip_string());
 			}
 		}
 		return AsyncTask::DS_cont;
@@ -134,7 +134,7 @@ public:
 			{
 				activeConnections.erase(connection);
 				cManager->close_connection(connection);
-				PRINT("Lost connection from "<< connection->get_address());
+				PRINT_DEBUG("Lost connection from "<< connection->get_address());
 			}
 		}
 		return AsyncTask::DS_cont;

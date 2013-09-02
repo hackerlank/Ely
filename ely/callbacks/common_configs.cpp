@@ -22,16 +22,19 @@
  */
 
 #include "common_configs.h"
+#include "ObjectModel/Object.h"
+
+using namespace ely;
 
 void callbacksInit()
 {
-	PRINT("Executing callbacksInit");
+	PRINT_DEBUG("Executing callbacksInit");
 	callAllInits();
 }
 
 void callbacksEnd()
 {
-	PRINT("Executing callbacksEnd");
+	PRINT_DEBUG("Executing callbacksEnd");
 	callAllEnds();
 }
 

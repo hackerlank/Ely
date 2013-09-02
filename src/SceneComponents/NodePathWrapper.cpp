@@ -36,7 +36,7 @@ NodePathWrapper::NodePathWrapper()
 
 NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
 			"NodePathWrapper::NodePathWrapper: invalid GameSceneManager")
 
 	mTmpl = tmpl;

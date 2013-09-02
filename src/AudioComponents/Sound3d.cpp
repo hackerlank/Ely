@@ -37,7 +37,7 @@ Sound3d::Sound3d()
 
 Sound3d::Sound3d(SMARTPTR(Sound3dTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameAudioManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
 			"Sound3d::Sound3d: invalid GameAudioManager")
 
 	mTmpl = tmpl;

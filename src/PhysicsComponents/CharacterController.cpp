@@ -35,7 +35,7 @@ CharacterController::CharacterController()
 
 CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"CharacterController::CharacterController: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;

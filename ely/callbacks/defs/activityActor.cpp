@@ -22,9 +22,11 @@
  */
 
 #include "../common_configs.h"
+#include "ObjectModel/Object.h"
 #include "BehaviorComponents/Activity.h"
 #include "ControlComponents/Driver.h"
-#include <lvector3.h>
+
+using namespace ely;
 
 ///Avoid name mangling
 #ifdef __cplusplus
@@ -60,7 +62,11 @@ CALLBACK fast_down_Activity_Actor;
 
 ///Actor + Activity related CALLBACKNAMEs & CALLBACKs
 //fast:stop-fast
-static bool isFast = false;
+namespace
+{
+bool isFast = false;
+}
+
 void fast_Activity_Actor(const Event* event, void* data)
 {
 	//get data

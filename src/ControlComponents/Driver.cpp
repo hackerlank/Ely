@@ -36,7 +36,7 @@ Driver::Driver()
 
 Driver::Driver(SMARTPTR(DriverTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameControlManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
 			"Driver::Driver: invalid GameControlManager")
 
 	mTmpl = tmpl;

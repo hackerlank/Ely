@@ -177,7 +177,7 @@ void Object::worldSetup()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT(
+			PRINT_DEBUG(
 					"No initialization function '" << functionName << "': " << dlsymError);
 		}
 		else

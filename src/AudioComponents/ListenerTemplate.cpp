@@ -32,11 +32,11 @@ ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"ListenerTemplate::ListenerTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"ListenerTemplate::ListenerTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameAudioManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
 			"ListenerTemplate::ListenerTemplate: invalid GameAudioManager")
 	//
 	setParametersDefaults();

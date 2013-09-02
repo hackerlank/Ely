@@ -34,10 +34,6 @@ void callAllInits();
 __attribute__((destructor)) void initializationsEnd();
 void callAllEnds();
 
-//generic typedefs
-typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
-		PandaFramework* pandaFramework, WindowFramework* windowFramework);
-
 #ifdef __cplusplus
 extern "C"
 {
@@ -46,5 +42,9 @@ extern "C"
 #ifdef __cplusplus
 }
 #endif
+
+///Common declarations
+typedef void INITIALIZATION(SMARTPTR(Object), const ParameterTable& paramTable,
+		PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 #endif /* COMMON_CONFIGS_H_ */

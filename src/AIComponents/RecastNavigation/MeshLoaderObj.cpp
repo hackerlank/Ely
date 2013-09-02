@@ -280,7 +280,7 @@ bool rcMeshLoaderObj::load(NodePath model, NodePath referenceNP)
 		NodePathCollection geomNodeCollection = currentModelRoot.find_all_matches(
 				"**/+GeomNode");
 		int numPaths = geomNodeCollection.get_num_paths();
-		PRINT("\tGeomNodes number: " << numPaths);
+		PRINT_DEBUG("\tGeomNodes number: " << numPaths);
 		for (int i = 0; i < numPaths; i++)
 		{
 			PT(GeomNode)geomNode = DCAST(GeomNode,geomNodeCollection.get_path(i).node());
@@ -322,7 +322,7 @@ void rcMeshLoaderObj::processGeomNode(PT(GeomNode)geomNode)
 {
 	//Walk through the list of GeomNode's Geoms
 	int numGeoms = geomNode->get_num_geoms();
-	PRINT("\t Geoms number: " << numGeoms);
+	PRINT_DEBUG("\t Geoms number: " << numGeoms);
 	for (int j = 0; j < numGeoms; j++)
 	{
 		const CPT(Geom)geom = geomNode->get_geom(j);
@@ -344,7 +344,7 @@ void rcMeshLoaderObj::processGeom(CPT(Geom)geom)
 	//Process vertices
 	processVertexData(vertexData);
 	int numPrimitives = geom->get_num_primitives();
-	PRINT("\t  Primitives number: " << numPrimitives);
+	PRINT_DEBUG("\t  Primitives number: " << numPrimitives);
 	//Walk through the list of Geom's GeomPrimitives
 	for(int i=0;i<numPrimitives;i++)
 	{
@@ -390,20 +390,20 @@ void rcMeshLoaderObj::processVertexData(CPT(GeomVertexData)vertexData)
 	}
 	//insert vertexData any way
 	m_vertexData.push_back(vertexData);
-	PRINT("\t   Vertices number: " << vertexData->get_num_rows() <<
+	PRINT_DEBUG("\t   Vertices number: " << vertexData->get_num_rows() <<
 			" - Start index: " << m_startIndices.back());
 }
 
 void rcMeshLoaderObj::processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex)
 {
-	PRINT("\t---");
-	PRINT("\t   Primitive type: " <<
+	PRINT_DEBUG("\t---");
+	PRINT_DEBUG("\t   Primitive type: " <<
 			primitive->get_type().get_name() <<
 			" - number: " << primitive->get_num_primitives());
 	//decompose to triangles
 	CPT(GeomPrimitive)primitiveDec = primitive->decompose();
 	int numPrimitives = primitiveDec->get_num_primitives();
-	PRINT("\t   Decomposed Primitive type: " <<
+	PRINT_DEBUG("\t   Decomposed Primitive type: " <<
 			primitiveDec->get_type().get_name() <<
 			" - number: " << numPrimitives);
 	for (int k = 0; k < numPrimitives; k++)

@@ -43,17 +43,17 @@ namespace ely
 {
 ///Macros for generic debug
 #if defined (ELY_DEBUG) && !defined (TESTING)
-#	define PRINT(msg) std::cout << msg << std::endl
-#	define PRINT_ERR(msg) std::cerr << msg << std::endl
-#	define CHECK_EXISTENCE(entity,msg) \
+#	define PRINT_DEBUG(msg) std::cout << msg << std::endl
+#	define PRINT_ERR_DEBUG(msg) std::cerr << msg << std::endl
+#	define CHECK_EXISTENCE_DEBUG(entity,msg) \
 	if (not entity)\
 	{\
 		throw GameException(msg);\
 	}
 #else
-#	define PRINT(msg)
-#	define PRINT_ERR(msg)
-#	define CHECK_EXISTENCE(entity,msg)
+#	define PRINT_DEBUG(msg)
+#	define PRINT_ERR_DEBUG(msg)
+#	define CHECK_EXISTENCE_DEBUG(entity,msg)
 #endif
 
 /**

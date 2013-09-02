@@ -90,7 +90,7 @@ bool ObjectTemplateManager::removeObjectTemplate(ObjectType objectType)
 	{
 		return false;
 	}
-	PRINT( "Removing object template for type '" << objectType << "'");
+	PRINT_DEBUG( "Removing object template for type '" << objectType << "'");
 	mObjectTemplates.erase(it);
 	return true;
 }
@@ -256,7 +256,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 	{
 		return false;
 	}
-	PRINT( "Removing object '" << std::string(objectId) << "'");
+	PRINT_DEBUG( "Removing object '" << std::string(objectId) << "'");
 	SMARTPTR(Object) object = objectIter->second;
 	Object::ComponentOrderedList::const_reverse_iterator compRIter;
 	//get a copy of object components because original will be modified

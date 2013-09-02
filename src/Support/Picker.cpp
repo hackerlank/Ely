@@ -36,15 +36,15 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 		mApp(app), mWindow(window)
 {
 	//some preliminary checks
-	CHECK_EXISTENCE(mApp, "Picker::Picker: invalid PandaFramework")
-	CHECK_EXISTENCE(mWindow, "Picker::Picker: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(mApp, "Picker::Picker: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(mWindow, "Picker::Picker: invalid WindowFramework")
 	SMARTPTR(Object)render =
 	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("render");
-	CHECK_EXISTENCE(render, "Picker::Picker: invalid render object")
+	CHECK_EXISTENCE_DEBUG(render, "Picker::Picker: invalid render object")
 	SMARTPTR(Object)camera =
 	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("camera");
-	CHECK_EXISTENCE(camera, "Picker::Picker: invalid camera object")
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
+	CHECK_EXISTENCE_DEBUG(camera, "Picker::Picker: invalid camera object")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
 			"invalid GamePhysicsManager")
 	//get bullet world reference
 	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
@@ -156,7 +156,7 @@ void Picker::pickBody(const Event* event)
 									pivotLocalPos);
 							//and attach it to the world
 							mWorld->attach(mCsPick);
-							PRINT(result.get_node()->get_type().get_name() <<
+							PRINT_DEBUG(result.get_node()->get_type().get_name() <<
 									"| panda node: " << result.get_node()->get_name() <<
 									"| hit pos: " << result.get_hit_pos() <<
 									"| hit normal: " << result.get_hit_normal() <<
@@ -166,7 +166,7 @@ void Picker::pickBody(const Event* event)
 						}
 						else
 						{
-							PRINT(result.get_node()->get_type().get_name() <<
+							PRINT_DEBUG(result.get_node()->get_type().get_name() <<
 									"| panda node: " << result.get_node()->get_name() <<
 									"| hit pos: " << result.get_hit_pos() <<
 									"| hit normal: " << result.get_hit_normal() <<
@@ -177,7 +177,7 @@ void Picker::pickBody(const Event* event)
 					}
 					else
 					{
-						PRINT(result.get_node()->get_type().get_name() <<
+						PRINT_DEBUG(result.get_node()->get_type().get_name() <<
 								"| panda node: " << result.get_node()->get_name() <<
 								"| hit pos: " << result.get_hit_pos() <<
 								"| hit normal: " << result.get_hit_normal() <<

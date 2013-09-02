@@ -22,7 +22,6 @@
  */
 
 #include "../common_configs.h"
-#include <flock.h>
 #include "SceneComponents/Model.h"
 #include "AIComponents/Steering.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -40,11 +39,13 @@ INITIALIZATION Steerer1_initialization;
 }
 #endif
 
-static bool aiEnabled = false;
-static std::vector<SMARTPTR(Object)> flockObjects;
-static Flock * flockPtr;
-static const unsigned int flockId = 1;
-static void toggleSteerer1Control(const Event* event, void* data)
+namespace
+{
+bool aiEnabled = false;
+std::vector<SMARTPTR(Object)> flockObjects;
+Flock * flockPtr;
+const unsigned int flockId = 1;
+void toggleSteerer1Control(const Event* event, void* data)
 {
 	SMARTPTR(Object)steerer1 = reinterpret_cast<Object*>(data);
 	SMARTPTR(Steering)steerer1AI = DCAST(Steering, steerer1->getComponent(
@@ -106,7 +107,7 @@ static void toggleSteerer1Control(const Event* event, void* data)
 	}
 }
 
-static void steerer1SteeringForceOn(const Event* event, void* data)
+void steerer1SteeringForceOn(const Event* event, void* data)
 {
 	std::string throwerObject = event->get_parameter(1).get_string_value();
 	if (throwerObject == "Steerer1")
@@ -119,7 +120,7 @@ static void steerer1SteeringForceOn(const Event* event, void* data)
 		gorilla1Model->animations().loop("walk", false);
 	}
 }
-static void steerer1SteeringForceOff(const Event* event, void* data)
+void steerer1SteeringForceOff(const Event* event, void* data)
 {
 	std::string throwerObject = event->get_parameter(1).get_string_value();
 	if (throwerObject == "Steerer1")
@@ -133,8 +134,7 @@ static void steerer1SteeringForceOff(const Event* event, void* data)
 	}
 }
 
-static void createClones(SMARTPTR(Object) cloned,
-		std::vector<SMARTPTR(Object)>& clones,
+void createClones(SMARTPTR(Object)cloned, std::vector<SMARTPTR(Object)>& clones,
 		int numX, int numY, float deltaPos)
 {
 	//add cloned as first flocker
@@ -146,7 +146,7 @@ static void createClones(SMARTPTR(Object) cloned,
 	cloned->getStoredObjTmplParams();
 	steerer1ObjParams.erase("store_params");
 	steerer1ObjParams.insert(std::pair<std::string,
-			std::string>("store_params", "false"));
+	std::string>("store_params", "false"));
 	//get the components' parameter tables
 	ParameterTableMap steerer1CompParams =
 	cloned->getStoredCompTmplParams();
@@ -164,38 +164,39 @@ static void createClones(SMARTPTR(Object) cloned,
 			steerer1ObjParams.erase("pos_x");
 			steerer1ObjParams.erase("pos_y");
 			pos_xStr << pox_x + ((float(rand())/float(RAND_MAX) - 0.5) +
-					float(x + 1)) * deltaPos;
+			float(x + 1)) * deltaPos;
 			pos_yStr << pox_y + ((float(rand())/float(RAND_MAX) - 0.5) +
-					float(y + 1)) * deltaPos;
+			float(y + 1)) * deltaPos;
 			steerer1ObjParams.insert(std::pair<std::string,
-					std::string>("pos_x", pos_xStr.str()));
+			std::string>("pos_x", pos_xStr.str()));
 			steerer1ObjParams.insert(std::pair<std::string,
-					std::string>("pos_y", pos_yStr.str()));
+			std::string>("pos_y", pos_yStr.str()));
 			//create the clone
 			idx << x << "_" << y;
 			std::string id = std::string(cloned->objectId()) + "_clone" + idx.str();
 			clones.push_back(ObjectTemplateManager::GetSingletonPtr()->
-					createObject(cloned->objectTmpl()->objectType(), ObjectId(id),
-							steerer1ObjParams, steerer1CompParams, false));
+			createObject(cloned->objectTmpl()->objectType(), ObjectId(id),
+					steerer1ObjParams, steerer1CompParams, false));
 		}
 	}
+}
 }
 
 void Steerer1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	SMARTPTR(Steering)steerer1AI = DCAST(Steering, object->getComponent(
-					ComponentFamilyType("AI")));
+			ComponentFamilyType("AI")));
 
 	//Steerer1
 	//enable/disable Steerer1 control by event
 	pandaFramework->define_key("b", "enableSteerer1Control",
-			&toggleSteerer1Control, static_cast<void*>(object));
+	&toggleSteerer1Control, static_cast<void*>(object));
 	//respond to Steerer1 events
 	EventHandler::get_global_event_handler()->add_hook("SteeringForceOn",
-			&steerer1SteeringForceOn, static_cast<void*>(object));
+	&steerer1SteeringForceOn, static_cast<void*>(object));
 	EventHandler::get_global_event_handler()->add_hook("SteeringForceOff",
-			&steerer1SteeringForceOff, static_cast<void*>(object));
+	&steerer1SteeringForceOff, static_cast<void*>(object));
 	///
 	//flock management
 //	createClones(object, flockObjects, 3, 3, 20.0);
@@ -208,7 +209,4 @@ void Steerer1Init()
 void Steerer1End()
 {
 }
-
-
-
 

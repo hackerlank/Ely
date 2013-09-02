@@ -71,34 +71,34 @@ FROMTO forward_FromTo_strafe_right_Actor;
 //forward
 void Enter_forward_Actor(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_forward_Actor");
+	PRINT_DEBUG("Enter_forward_Actor");
 }
 void Exit_forward_Actor(fsm*, Activity& activity)
 {
-	PRINT("Exit_forward_Actor");
+	PRINT_DEBUG("Exit_forward_Actor");
 }
 ValueList Filter_forward_Actor(fsm*, Activity& activity,
 		const std::string& state, const ValueList& valueList)
 {
 	ValueList valList = valueList;
-	PRINT("Filter_forward_Actor");
+	PRINT_DEBUG("Filter_forward_Actor");
 	valList.push_front(state);
 	return valList;
 }
 //backward
 void Enter_backward_Actor(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_backward_Actor");
+	PRINT_DEBUG("Enter_backward_Actor");
 }
 void Exit_backward_Actor(fsm*, Activity& activity)
 {
-	PRINT("Exit_backward_Actor");
+	PRINT_DEBUG("Exit_backward_Actor");
 }
 ValueList Filter_backward_Actor(fsm*, Activity& activity,
 		const std::string& state, const ValueList& valueList)
 {
 	ValueList valList = valueList;
-	PRINT("Filter_backward_Actor");
+	PRINT_DEBUG("Filter_backward_Actor");
 	valList.push_front(state);
 	return valList;
 }
@@ -106,17 +106,17 @@ ValueList Filter_backward_Actor(fsm*, Activity& activity,
 void Enter_strafe_left_Actor(fsm*, Activity& activity,
 		const ValueList& valueList)
 {
-	PRINT("Enter_strafe_left_Actor");
+	PRINT_DEBUG("Enter_strafe_left_Actor");
 }
 void Exit_strafe_left_Actor(fsm*, Activity& activity)
 {
-	PRINT("Exit_strafe_left_Actor");
+	PRINT_DEBUG("Exit_strafe_left_Actor");
 }
 ValueList Filter_strafe_left_Actor(fsm*, Activity& activity,
 		const std::string& state, const ValueList& valueList)
 {
 	ValueList valList = valueList;
-	PRINT("Filter_strafe_left_Actor");
+	PRINT_DEBUG("Filter_strafe_left_Actor");
 	valList.push_front(state);
 	return valList;
 }
@@ -124,51 +124,51 @@ ValueList Filter_strafe_left_Actor(fsm*, Activity& activity,
 void Enter_strafe_right_Actor(fsm*, Activity& activity,
 		const ValueList& valueList)
 {
-	PRINT("Enter_strafe_right_Actor");
+	PRINT_DEBUG("Enter_strafe_right_Actor");
 }
 void Exit_strafe_right_Actor(fsm*, Activity& activity)
 {
-	PRINT("Exit_strafe_right_Actor");
+	PRINT_DEBUG("Exit_strafe_right_Actor");
 }
 ValueList Filter_strafe_right_Actor(fsm*, Activity& activity,
 		const std::string& state, const ValueList& valueList)
 {
 	ValueList valList = valueList;
-	PRINT("Filter_strafe_right_Actor");
+	PRINT_DEBUG("Filter_strafe_right_Actor");
 	valList.push_front(state);
 	return valList;
 }
 //up
 void Enter_up_Actor(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_up_Actor");
+	PRINT_DEBUG("Enter_up_Actor");
 }
 void Exit_up_Actor(fsm*, Activity& activity)
 {
-	PRINT("Exit_up_Actor");
+	PRINT_DEBUG("Exit_up_Actor");
 }
 ValueList Filter_up_Actor(fsm*, Activity& activity, const std::string& state,
 		const ValueList& valueList)
 {
 	ValueList valList = valueList;
-	PRINT("Filter_up_Actor");
+	PRINT_DEBUG("Filter_up_Actor");
 	valList.push_front(state);
 	return valList;
 }
 //down
 void Enter_down_Actor(fsm*, Activity& activity, const ValueList& valueList)
 {
-	PRINT("Enter_down_Actor");
+	PRINT_DEBUG("Enter_down_Actor");
 }
 void Exit_down_Actor(fsm*, Activity& activity)
 {
-	PRINT("Exit_down_Actor");
+	PRINT_DEBUG("Exit_down_Actor");
 }
 ValueList Filter_down_Actor(fsm*, Activity& activity, const std::string& state,
 		const ValueList& valueList)
 {
 	ValueList valList = valueList;
-	PRINT("Filter_down_Actor");
+	PRINT_DEBUG("Filter_down_Actor");
 	valList.push_front(state);
 	return valList;
 }
@@ -176,13 +176,13 @@ ValueList Filter_down_Actor(fsm*, Activity& activity, const std::string& state,
 void forward_FromTo_strafe_left_Actor(fsm*, Activity& activity,
 		const ValueList& valueList)
 {
-	PRINT("forward_FromTo_strafe_left_Actor");
+	PRINT_DEBUG("forward_FromTo_strafe_left_Actor");
 }
 //forward_FromTo_strafe_right
 void forward_FromTo_strafe_right_Actor(fsm*, Activity& activity,
 		const ValueList& valueList)
 {
-	PRINT("forward_FromTo_strafe_right_Actor");
+	PRINT_DEBUG("forward_FromTo_strafe_right_Actor");
 }
 
 ///Init/end functions: see common_configs.cpp

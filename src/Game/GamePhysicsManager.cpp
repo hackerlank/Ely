@@ -42,7 +42,7 @@ namespace ely
 GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GamePhysicsManager::GamePhysicsManager: invalid GameManager")
 	mPhysicsComponents.clear();
 	mUpdateData.clear();

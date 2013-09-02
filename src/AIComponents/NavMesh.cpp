@@ -50,7 +50,7 @@ NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl)
 :mAsyncSetupVar(mMutex), mAsyncSetupComplete(true)
 #endif
 {
-	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 			"NavMesh::NavMesh: invalid GameAIManager")
 
 	mTmpl = tmpl;
@@ -95,14 +95,14 @@ bool NavMesh::initialize()
 	std::string movType = mTmpl->parameter(std::string("mov_type"));
 	if (movType == std::string("kinematic"))
 	{
-		CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 				"NavMesh::NavMesh: invalid GamePhysicsManager")
 		mMovType = KINEMATIC;
 	}
 #ifdef WITHCHARACTER
 	else if (movType == std::string("character"))
 	{
-		CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 				"NavMesh::NavMesh: invalid GamePhysicsManager")
 		mMovType = CHARACTER;
 	}
@@ -547,7 +547,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 
 	//setup navigation mesh, otherwise the same
 	//operations must be performed by program.
-	PRINT(
+	PRINT_DEBUG(
 			"'" <<mOwnerObject->objectId() << "'::'" << mComponentId << "'::navMeshSetup");
 
 	///don't load model mesh more than once
@@ -897,7 +897,7 @@ NavMesh::Result NavMesh::buildTile(const LPoint3f& pos)
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildTile(recastPos);
-		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::buildTile : " << pos);
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
@@ -926,7 +926,7 @@ NavMesh::Result NavMesh::removeTile(const LPoint3f& pos)
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
 		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeTile(recastPos);
-		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::removeTile : " << pos);
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
@@ -1047,7 +1047,7 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 		tileCache->update(0, mNavMeshType->getNavMesh());
 		//add to the obstacles table
 		mObstacles[object] = obstacleRef;
-		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 		<< mComponentId << "'::addObstacle: '" << object->objectId()
 		<< "' at pos: " << pos);
 #ifdef ELY_DEBUG
@@ -1090,7 +1090,7 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 		tileCache->update(0, mNavMeshType->getNavMesh());
 		//remove from obstacle table
 		mObstacles.erase(object);
-		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 		<< mComponentId << "'::removeObstacle: '" << object->objectId() << "'");
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
@@ -1117,7 +1117,7 @@ NavMesh::Result NavMesh::clearAllObstacles()
 	if (mNavMeshTypeEnum == OBSTACLE)
 	{
 		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->clearAllTempObstacles();
-		PRINT("'" << getOwnerObject()->objectId() << "'::'"
+		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::clearAllObstacles");
 #ifdef ELY_DEBUG
 		doDebugStaticRender();

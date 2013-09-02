@@ -15,46 +15,35 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/common_configs.h
+ * \file /Ely/instanceupdates/common_configs.h
  *
- * \date 26/nov/2012 (10:18:23)
+ * \date 01/set/2013 (20:20:07)
  * \author consultit
  */
 
-#ifndef COMMON_CONFIGS_H_
-#define COMMON_CONFIGS_H_
+#ifndef INSTANCEUPDATES_CONFIGS_H_
+#define INSTANCEUPDATES_CONFIGS_H_
 
-#include <eventHandler.h>
+#include "BehaviorComponents/Activity.h"
 
-__attribute__((constructor)) void callbacksInit();
+using namespace ely;
+
+__attribute__((constructor)) void instanceupdatesInit();
 void callAllInits();
 
-__attribute__((destructor)) void callbacksEnd();
+__attribute__((destructor)) void instanceupdatesEnd();
 void callAllEnds();
-
-//generic typedefs
-typedef EventHandler::EventCallbackFunction CALLBACK;
 
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-//default callback
-CALLBACK default_callback__;
-
 #ifdef __cplusplus
 }
 #endif
 
 ///Common declarations
-typedef std::pair<std::string, std::string> StateEventType;
-typedef std::string NextState;
-typedef std::pair<StateEventType, NextState> TransitionTableItem;
-typedef std::map<StateEventType, NextState> TransitionTable;
+typedef void INSTANCEUPDATE(float, Activity&);
 
-#define TABLEINSERT(tablePtr,state,eventType,nextState) \
-	(*tablePtr).insert(TransitionTableItem\
-			(StateEventType(state, eventType), NextState(nextState)))
-
-#endif /* COMMON_CONFIGS_H_ */
+#endif /* INSTANCEUPDATES_CONFIGS_H_ */

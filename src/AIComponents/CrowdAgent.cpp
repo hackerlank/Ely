@@ -44,9 +44,9 @@ CrowdAgent::CrowdAgent():
 CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):
 				mHitResult(BulletClosestHitRayResult::empty())
 {
-	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 			"CrowdAgent::CrowdAgent: invalid GameAIManager")
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"CrowdAgent::CrowdAgent: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;

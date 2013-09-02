@@ -24,12 +24,12 @@
 #include "../common_configs.h"
 #include "ControlComponents/Driver.h"
 #include "AudioComponents/Sound3d.h"
-#include "SceneComponents/Model.h"
-#include "Game/GameManager.h"
 
 ///shared between camera, picker, actor1
-static bool controlGrabbed = false;
-
+namespace
+{
+bool controlGrabbed = false;
+}
 ///Actor1 related
 #ifdef __cplusplus
 extern "C"
@@ -42,9 +42,11 @@ INITIALIZATION Actor1_initialization;
 }
 #endif
 
-static void toggleActor1Control(const Event* event, void* data)
+namespace
 {
-	SMARTPTR(Object)actor1 = reinterpret_cast<Object*>(data);
+void toggleActor1Control(const Event* event, void* data)
+{
+	SMARTPTR(Object)actor1= reinterpret_cast<Object*>(data);
 	SMARTPTR(Driver)actor1Control = DCAST(Driver, actor1->getComponent(
 					ComponentFamilyType("Control")));
 	///<DEFAULT CAMERA CONTROL>
@@ -85,23 +87,24 @@ static void toggleActor1Control(const Event* event, void* data)
 		controlGrabbed = true;
 	}
 }
+}
 void Actor1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
-	//Actor1
-	//play animation
+//Actor1
+//play animation
 //	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
 //					ComponentFamilyType("Scene")));
 //	actor1Model->animations().loop("walk", false);
-	//play sound
-	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
-					ComponentFamilyType("Audio")));
-	actor1Sound3d->getSound("walk-sound")->set_loop(true);
-	actor1Sound3d->getSound("walk-sound")->play();
+//play sound
+SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
+		ComponentFamilyType("Audio")));
+actor1Sound3d->getSound("walk-sound")->set_loop(true);
+actor1Sound3d->getSound("walk-sound")->play();
 
-	//enable/disable Actor1 control by event
-	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
-			static_cast<void*>(object));
+//enable/disable Actor1 control by event
+pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
+static_cast<void*>(object));
 }
 
 void Actor1Init()

@@ -125,6 +125,7 @@ AM_COND_IF([ELY_ELF],
 		ely/Makefile
 		ely/callbacks/Makefile
 		ely/transitions/Makefile
+		ely/instanceupdates/Makefile
 		ely/initializations/Makefile
 		ely/data/Makefile
 		ely/data/models/Makefile

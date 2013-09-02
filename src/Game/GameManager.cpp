@@ -42,7 +42,7 @@ GameManager::GameManager(int argc, char* argv[]) :
 	// Check whether the window is loaded correctly
 	if (mWindow != (WindowFramework*) NULL)
 	{
-		PRINT("Opened the window successfully!");
+		PRINT_DEBUG("Opened the window successfully!");
 		// common setup
 		mWindow->enable_keyboard(); // Enable keyboard detection
 		mRender = mWindow->get_render();
@@ -50,7 +50,7 @@ GameManager::GameManager(int argc, char* argv[]) :
 	}
 	else
 	{
-		PRINT("Could not load the window!");
+		PRINT_DEBUG("Could not load the window!");
 	}
 
 #ifndef TESTING
@@ -198,7 +198,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//read the game configuration file
 	tinyxml2::XMLDocument gameDoc;
 	//load file
-	PRINT("Loading '" << gameWorldXML << "'...");
+	PRINT_DEBUG("Loading '" << gameWorldXML << "'...");
 	if (tinyxml2::XML_NO_ERROR != gameDoc.LoadFile(gameWorldXML.c_str()))
 	{
 		fprintf(stderr, "Error detected on '%s':\n", gameWorldXML.c_str());
@@ -211,7 +211,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	}
 	tinyxml2::XMLElement* gameTAG;
 	//check <Game> tag
-	PRINT("Checking <Game> tag ...");
+	PRINT_DEBUG("Checking <Game> tag ...");
 	gameTAG = gameDoc.FirstChildElement("Game");
 	if (not checkTag(gameTAG, "Game"))
 	{
@@ -221,10 +221,10 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//////////////////////////////////////////////////////////////
 	//<!-- Object Templates Definition -->
 	//Setup object template manager
-	PRINT("Setting up Object Template Manager");
+	PRINT_DEBUG("Setting up Object Template Manager");
 	//check <Game>--<ObjectTmplSet> tag
 	tinyxml2::XMLElement* objectTmplSetTAG;
-	PRINT("  Checking <ObjectTmplSet> tag ...");
+	PRINT_DEBUG("  Checking <ObjectTmplSet> tag ...");
 	objectTmplSetTAG = gameTAG->FirstChildElement("ObjectTmplSet");
 	if (not checkTag(objectTmplSetTAG, "ObjectTmplSet"))
 	{
@@ -244,7 +244,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		{
 			continue;
 		}
-		PRINT("  Adding Object Template for '" << objectTypeTAG << "' type");
+		PRINT_DEBUG("  Adding Object Template for '" << objectTypeTAG << "' type");
 		//create a new object template
 		SMARTPTR(ObjectTemplate)objTmplPtr;
 		objTmplPtr = new ObjectTemplate(ObjectType(objectTypeTAG),
@@ -276,7 +276,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			{
 				continue;
 			}
-			PRINT(
+			PRINT_DEBUG(
 					"    Component of family '" << compFamilyTAG << "' and type '" << compTypeTAG << "'");
 			//cycle through the ComponentTmpl Param(s)' to be initialized
 			tinyxml2::XMLElement* paramTAG;
@@ -290,7 +290,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				{
 					continue;
 				}
-				PRINT(
+				PRINT_DEBUG(
 						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 				//add attribute for this component type of this object.
 				objTmplPtr->addComponentParameter(attributeTAG->Name(),
@@ -314,10 +314,10 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 	//////////////////////////////////////////////////////////////
 	//<!-- Objects Creation -->
 	//Create game objects
-	PRINT("Creating Game Objects");
+	PRINT_DEBUG("Creating Game Objects");
 	//check <Game>--<ObjectSet> tag
 	tinyxml2::XMLElement* objectSet;
-	PRINT("  Checking <ObjectSet> tag ...");
+	PRINT_DEBUG("  Checking <ObjectSet> tag ...");
 	objectSet = gameTAG->FirstChildElement("ObjectSet");
 	if (not checkTag(objectSet, "ObjectSet"))
 	{
@@ -360,7 +360,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			continue;
 		}
 		const char* objIdTAG = objectTAG->Attribute("id", NULL); //may be NULL
-		PRINT(
+		PRINT_DEBUG(
 				"  Creating Object '" << (objIdTAG != NULL ? objIdTAG : "UNNAMED") << "'...");
 		//set a ParameterTable for each component
 		ParameterTableMap compTmplParams;
@@ -377,7 +377,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				//but not defined component types are allowed!
 				continue;
 			}
-			PRINT( "    Initializing Component '" << compTypeTAG << "'");
+			PRINT_DEBUG( "    Initializing Component '" << compTypeTAG << "'");
 			//cycle through the Component Param(s)' to be initialized
 			tinyxml2::XMLElement* paramTAG;
 			for (paramTAG = componentTAG->FirstChildElement("Param");
@@ -390,7 +390,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				{
 					continue;
 				}
-				PRINT(
+				PRINT_DEBUG(
 						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 				compTmplParams[compTypeTAG].insert(
 						ParameterTable::value_type(attributeTAG->Name(),
@@ -399,7 +399,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		}
 		//////////////////////////////////////////////////////////////
 		//set parameters for the object
-		PRINT( "    Initializing object '" <<
+		PRINT_DEBUG( "    Initializing object '" <<
 				(objIdTAG != NULL ? objIdTAG : "UNNAMED") << "' itself" );
 		ParameterTable objTmplParams;
 		//cycle through the Object Param(s)' to be initialized
@@ -414,7 +414,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			{
 				continue;
 			}
-			PRINT(
+			PRINT_DEBUG(
 					"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 			objTmplParams.insert(
 					ParameterTable::value_type(attributeTAG->Name(),
@@ -442,7 +442,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 			continue;
 		}
 		createdObjectQueue.push(objectPtr);
-		PRINT( "  ...Created Object '" << objectPtr->objectId() << "'");
+		PRINT_DEBUG( "  ...Created Object '" << objectPtr->objectId() << "'");
 		//remove top object from the priority queue
 		orderedObjectsTAG.pop();
 	}

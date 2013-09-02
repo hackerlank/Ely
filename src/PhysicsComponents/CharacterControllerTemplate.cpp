@@ -31,11 +31,11 @@ CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFr
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"CharacterTemplate::CharacterTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"CharacterTemplate::CharacterTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"CharacterTemplate::CharacterTemplate: invalid GamePhysicsManager")
 	//
 	setParametersDefaults();

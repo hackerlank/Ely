@@ -25,13 +25,13 @@
 
 void transitionsInit()
 {
-	PRINT("Executing transitionsInit");
+	PRINT_DEBUG("Executing transitionsInit");
 	callAllInits();
 }
 
 void transitionsEnd()
 {
-	PRINT("Executing transitionsEnd");
+	PRINT_DEBUG("Executing transitionsEnd");
 	callAllEnds();
 }
 

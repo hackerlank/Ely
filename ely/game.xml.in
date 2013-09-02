@@ -307,6 +307,7 @@
 
 		<Object type="Character" id="player0" priority="100">
 			<Component type="Activity">
+				<Param instance_update="playerUpdate"/>		
 				<Param events="f@i:f-up@i-up:f-q@alt-i$activityPlayer0"/>
 				<Param events="b@k:b-up@k-up:b-q@alt-k$activityPlayer0"/>
 				<Param events="sr@o:sr-up@o-up:sr-q@alt-o$activityPlayer0"/>
@@ -316,7 +317,6 @@
 				<Param events="j@space:j-up@space-up:j-q@alt-space$activityPlayer0"/>				
 				<Param events="q@alt:q-up@alt-up$activityPlayer0"/>				
 				<Param events="ground@OnGround:air@OnAir$groundAirPlayer0"/>
-				<Param instance_update="updatePlayer0"/>		
 			</Component>
 			<Component type="Model">
 				<Param model_file="eve.bam"/>

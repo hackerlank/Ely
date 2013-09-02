@@ -37,7 +37,7 @@ InstanceOf::InstanceOf()
 
 InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
 			"InstanceOf::InstanceOf: invalid GameSceneManager")
 
 	mTmpl = tmpl;

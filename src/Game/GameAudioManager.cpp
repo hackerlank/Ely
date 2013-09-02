@@ -30,7 +30,7 @@ namespace ely
 GameAudioManager::GameAudioManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameAudioManager::GameAudioManager: invalid GameManager")
 	mAudioComponents.clear();
 	mUpdateData.clear();

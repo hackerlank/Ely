@@ -32,11 +32,11 @@ TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"TerrainTemplate::TerrainTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"TerrainTemplate::TerrainTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
 			"TerrainTemplate::TerrainTemplate: invalid GameSceneManager")
 	//
 	setParametersDefaults();

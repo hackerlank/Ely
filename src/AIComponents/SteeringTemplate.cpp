@@ -32,11 +32,11 @@ SteeringTemplate::SteeringTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"SteeringTemplate::SteeringTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"SteeringTemplate::SteeringTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 			"SteeringTemplate::SteeringTemplate: invalid GameAIManager")
 	//
 	setParametersDefaults();

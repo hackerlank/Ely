@@ -33,13 +33,13 @@ CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GameAIManager")
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GamePhysicsManager")
 	//
 	setParametersDefaults();

@@ -15,61 +15,37 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/common_configs.cpp
+ * \file /Ely/transitions/common_configs.cpp
  *
- * \date 26/nov/2012 (12:16:12)
+ * \date 26/nov/2012 (11:29:26)
  * \author consultit
  */
 
 #include "common_configs.h"
 
-void initializationsInit()
+void instanceupdatesInit()
 {
-	PRINT_DEBUG("Executing initializationsInit");
+	PRINT_DEBUG("Executing instanceupdatesInit");
 	callAllInits();
 }
 
-void initializationsEnd()
+void instanceupdatesEnd()
 {
-	PRINT_DEBUG("Executing initializationsEnd");
+	PRINT_DEBUG("Executing instanceupdatesEnd");
 	callAllEnds();
 }
 
 ///Insert declarations of all init/end functions
-extern void cameraInit();
-extern void cameraEnd();
-extern void Actor1Init();
-extern void Actor1End();
-extern void Plane1Init();
-extern void Plane1End();
-extern void Terrain1Init();
-extern void Terrain1End();
-extern void player0Init();
-extern void player0End();
-extern void Steerer1Init();
-extern void Steerer1End();
-extern void course2Init();
-extern void course2End();
+extern void playerInit();
+extern void playerEnd();
 
 ///Call all init/end functions
 void callAllInits()
 {
-	cameraInit();
-	Actor1Init();
-	Plane1Init();
-	Terrain1Init();
-	player0Init();
-	Steerer1Init();
-	course2Init();
+	playerInit();
 }
 void callAllEnds()
 {
-	cameraEnd();
-	Actor1End();
-	Plane1End();
-	Terrain1End();
-	player0End();
-	Steerer1End();
-	course2End();
+	playerEnd();
 }
 

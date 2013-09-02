@@ -36,7 +36,7 @@ RigidBody::RigidBody()
 
 RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"RigidBody::RigidBody: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;

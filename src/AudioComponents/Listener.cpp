@@ -37,7 +37,7 @@ Listener::Listener()
 
 Listener::Listener(SMARTPTR(ListenerTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameAudioManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
 			"Listener::Listener: invalid GameAudioManager")
 
 	mTmpl = tmpl;

@@ -30,7 +30,7 @@ namespace ely
 GameBehaviorManager::GameBehaviorManager(int sort, int priority,
 		const std::string& asyncTaskChain)
 {
-	CHECK_EXISTENCE(GameManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameBehaviorManager::GameBehaviorManager: invalid GameManager")
 	mBehaviorComponents.clear();
 	mUpdateData.clear();

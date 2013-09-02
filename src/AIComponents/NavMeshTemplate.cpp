@@ -32,11 +32,11 @@ NavMeshTemplate::NavMeshTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"NavMeshTemplate::NavMeshTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"NavMeshTemplate::NavMeshTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 			"NavMeshTemplate::NavMeshTemplate: invalid GameAIManager")
 	//
 	setParametersDefaults();

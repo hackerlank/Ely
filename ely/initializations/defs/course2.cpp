@@ -38,9 +38,11 @@ INITIALIZATION course2_initialization;
 
 #ifdef ELY_DEBUG
 ///debug flag
-static bool debugOn = false;
+namespace
+{
+bool debugOn = false;
 
-static void toggleDebugNavMesh(const Event* event, void* data)
+void toggleDebugNavMesh(const Event* event, void* data)
 {
 	SMARTPTR(Object)course2 = reinterpret_cast<Object*>(data);
 	SMARTPTR(Component) compAI = course2->getComponent(
@@ -56,6 +58,7 @@ static void toggleDebugNavMesh(const Event* event, void* data)
 	}
 }
 #endif
+}
 
 void course2_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)

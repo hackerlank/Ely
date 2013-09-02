@@ -58,9 +58,9 @@ Steering::Steering()
 
 Steering::Steering(SMARTPTR(SteeringTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameAIManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 			"Steering::Steering: invalid GameAIManager")
-	CHECK_EXISTENCE(GamePhysicsManager::GetSingletonPtr(), "Steering::Steering: "
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(), "Steering::Steering: "
 			"invalid GamePhysicsManager")
 
 	mTmpl = tmpl;

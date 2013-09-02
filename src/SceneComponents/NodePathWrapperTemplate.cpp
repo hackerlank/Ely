@@ -32,11 +32,11 @@ NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	CHECK_EXISTENCE(pandaFramework,
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
 			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework")
-	CHECK_EXISTENCE(windowFramework,
+	CHECK_EXISTENCE_DEBUG(windowFramework,
 			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework")
-	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
 			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid GameSceneManager")
 	//
 	setParametersDefaults();

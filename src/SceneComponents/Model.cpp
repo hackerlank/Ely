@@ -39,7 +39,7 @@ Model::Model()
 
 Model::Model(SMARTPTR(ModelTemplate)tmpl)
 {
-	CHECK_EXISTENCE(GameSceneManager::GetSingletonPtr(),
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
 			"Model::Model: invalid GameSceneManager")
 
 	mTmpl = tmpl;
@@ -132,7 +132,7 @@ void Model::onAddToObjectSetup()
 	//build model
 	if (mFromFile)
 	{
-		PRINT("'" <<getOwnerObject()->objectId()
+		PRINT_DEBUG("'" <<getOwnerObject()->objectId()
 				<< "'::'" << mComponentId << "'::onAddToObjectSetup");
 		// some declarations
 		Parts parts;
@@ -178,12 +178,12 @@ void Model::onAddToObjectSetup()
 				{
 					//set the first PartBundle
 					mFirstPartBundle = *partBundlesIter;
-					PRINT(
+					PRINT_DEBUG(
 							"\tFirst PartBundle: '" << (*partBundlesIter)->get_name() << "'");
 				}
 				else
 				{
-					PRINT(
+					PRINT_DEBUG(
 							"\tNext PartBundle: '" << (*partBundlesIter)->get_name() << "'");
 				}
 			}
@@ -216,7 +216,7 @@ void Model::onAddToObjectSetup()
 						animName = modelFileName + '.' + format_string(j);
 						++j;
 					}
-					PRINT(
+					PRINT_DEBUG(
 							"\tBinding animation '" << (*animBundlesIter)->get_name() <<
 							"' (from '" << modelFileName << "') with name '" << animName << "'");
 					SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
@@ -278,7 +278,7 @@ void Model::onAddToObjectSetup()
 									{
 										animName = nameFilePair[0];
 									}
-									PRINT(
+									PRINT_DEBUG(
 											"\tBinding animation '" << (*animBundlesIter)->get_name() <<
 											"' (from '" << nameFilePair[1] << "') with name '" << animName << "'");
 									SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
