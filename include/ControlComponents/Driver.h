@@ -58,28 +58,30 @@ class DriverTemplate;
  * All movements (but up and down) can be inverted (default: not inverted).
  *
  * XML Param(s):
- * - "enabled"  			|single|"true"
- * - "forward"  			|single|"enabled"
- * - "backward"  			|single|"enabled"
- * - "roll_left"  			|single|"enabled"
- * - "roll_right"  			|single|"enabled"
- * - "strafe_left"  		|single|"enabled"
- * - "strafe_right"  		|single|"enabled"
- * - "up"  					|single|"enabled"
- * - "down"  				|single|"enabled"
- * - "mouse_move"  			|single|"disabled"
- * - "mouse_enabled_h"  	|single|"false"
- * - "mouse_enabled_p"  	|single|"false"
- * - "speed_key"  			|single|"shift"
- * - "linear_speed"  		|single|"5.0"
- * - "angular_speed"  		|single|"5.0"
- * - "fast_factor"  		|single|"5.0"
- * - "mov_sens"  			|single|"2.0"
- * - "roll_sens"  			|single|"15.0"
- * - "sens_x"  				|single|"0.2"
- * - "sens_y"  				|single|"0.2"
- * - "inverted_keyboard"  	|single|"false"
- * - "inverted_mouse"  		|single|"false"
+ * - "enabled"  				|single|"true"
+ * - "forward"  				|single|"enabled"
+ * - "backward"  				|single|"enabled"
+ * - "roll_left"  				|single|"enabled"
+ * - "roll_right"  				|single|"enabled"
+ * - "strafe_left"  			|single|"enabled"
+ * - "strafe_right"  			|single|"enabled"
+ * - "up"  						|single|"enabled"
+ * - "down"  					|single|"enabled"
+ * - "mouse_move"  				|single|"disabled"
+ * - "mouse_enabled_h"  		|single|"false"
+ * - "mouse_enabled_p"  		|single|"false"
+ * - "speed_key"  				|single|"shift"
+ * - "max_linear_speed"  		|single|"5.0"
+ * - "max_angular_speed"  		|single|"5.0"
+ * - "linear_accel"  			|single|"5.0"
+ * - "angular_accel"  			|single|"5.0"
+ * - "linear_friction"  		|single|"0.1"
+ * - "angular_friction"  		|single|"0.1"
+ * - "fast_factor"  			|single|"5.0"
+ * - "sens_x"  					|single|"0.2"
+ * - "sens_y"  					|single|"0.2"
+ * - "inverted_keyboard"  		|single|"false"
+ * - "inverted_mouse"  			|single|"false"
  */
 class Driver: public Component
 {
@@ -161,15 +163,32 @@ public:
 	 * \name Speeds getters/setters.
 	 */
 	///@{
-	void setLinearSpeed(const LVector3f& linearSpeed);
-	LVector3f getLinearSpeed();
-	void setAngularSpeed(float angularSpeed);
-	float getAngularSpeed();
+	//max values
+	void setMaxLinearSpeed(const LVector3f& linearSpeed);
+	void setMaxAngularSpeed(float angularSpeed);
+	LVector3f getMaxSpeeds(float& angularSpeed);
+	void setLinearAccel(const LVector3f& linearAccel);
+	void setAngularAccel(float angularAccel);
+	LVector3f getAccels(float& angularAccel);
 	void setFastFactor(float factor);
 	float getFastFactor();
+	void setLinearFriction(float linearFriction);
+	void setAngularFriction(float angularFriction);
+	void getFrictions(float& linearFriction, float& angularFriction);
+	//speed current values
+	LVector3f getCurrentSpeeds(float& angularSpeed);
 	///@}
 
 private:
+	///Enabling flags.
+	bool mStartEnabled, mEnabled;
+	///Movement type.
+	enum
+	{
+		KINEMATIC,
+		DYNAMIC
+	};
+	int mMovementType;
 	///@{
 	///Key controls and effective keys.
 	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
@@ -180,20 +199,21 @@ private:
 	///@}
 	///@{
 	///Key control values.
-	bool mTrue, mFalse, mInvertedKeyboard, mInvertedMouse, mMouseEnabledH,
-	mMouseEnabledP;
+	bool mTrue, mFalse, mMouseEnabledH,	mMouseEnabledP;
+	int mSignOfKeyboard, mSignOfMouse;
 	///@}
 	///@{
 	/// Sensitivity settings.
 	float mFastFactor;
-	LVecBase3f mSpeedActualXYZ;
-	float mSpeedActualH;
-	float mMovSens, mRollSens;
+	LVecBase3f mActualSpeedXYZ, mMaxSpeedXYZ, mMaxSpeedSquaredXYZ;
+	float mActualSpeedH, mMaxSpeedH, mMaxSpeedSquaredH;
+	LVecBase3f mActualAccelXYZ;
+	float mActualAccelH;
+	LVecBase3f mFrictionXYZ;
+	float mFrictionH;
 	float mSensX, mSensY;
 	int mCentX, mCentY;
 	///@}
-	///Enabling flags.
-	bool mStartEnabled, mEnabled;
 #ifdef ELY_THREAD
 	bool mDisabling;
 #endif
@@ -241,6 +261,7 @@ private:
 inline void Driver::reset()
 {
 	//
+	mStartEnabled = mEnabled = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
 			mRollLeft = mRollRight = false;
 	//by default we consider mouse moved on every update, because
@@ -254,14 +275,13 @@ inline void Driver::reset()
 	mSpeedKey = std::string("shift");
 	mTrue = true;
 	mFalse = false;
-	mInvertedKeyboard = mInvertedMouse = mMouseEnabledH = mMouseEnabledP = false;
+	mMouseEnabledH = mMouseEnabledP = false;
+	///TODO
 	mFastFactor = 0.0;
-	mSpeedActualXYZ = LVecBase3f::zero();
-	mSpeedActualH = 0.0;
-	mMovSens = mRollSens = 0.0;
+	mActualSpeedXYZ = LVecBase3f::zero();
+	mActualSpeedH = 0.0;
 	mSensX = mSensY = 0.0;
 	mCentX = mCentY = 0.0;
-	mStartEnabled = mEnabled = false;
 #ifdef ELY_THREAD
 	mDisabling = false;
 #endif
@@ -446,36 +466,96 @@ inline bool Driver::isMouseMoveEnabled()
 	return mMouseMove;
 }
 
-inline void Driver::setLinearSpeed(const LVector3f& linearSpeed)
+///TODO
+inline void Driver::setMaxLinearSpeed(const LVector3f& maxLinearSpeed)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	mSpeedActualXYZ = linearSpeed;
+	mMaxSpeedXYZ = maxLinearSpeed;
+	mMaxSpeedSquaredXYZ = LVector3f(
+			maxLinearSpeed.get_x() * maxLinearSpeed.get_x(),
+			maxLinearSpeed.get_y() * maxLinearSpeed.get_y(),
+			maxLinearSpeed.get_z() * maxLinearSpeed.get_z());
 }
 
-inline LVector3f Driver::getLinearSpeed()
+inline void Driver::setMaxAngularSpeed(float maxAngularSpeed)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	return mSpeedActualXYZ;
+	mMaxSpeedH = maxAngularSpeed;
+	mMaxSpeedSquaredH = maxAngularSpeed * maxAngularSpeed;
 }
 
-inline void Driver::setAngularSpeed(float angularSpeed)
+inline LVector3f Driver::getMaxSpeeds(float& maxAngularSpeed)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	mSpeedActualH = angularSpeed;
+	maxAngularSpeed = mMaxSpeedH;
+	return mMaxSpeedXYZ;
 }
 
-inline float Driver::getAngularSpeed()
+inline void Driver::setLinearAccel(const LVector3f& linearAccel)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	return mSpeedActualH;
+	mActualAccelXYZ = linearAccel;
+}
+
+inline void Driver::setAngularAccel(float angularAccel)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mActualAccelH = angularAccel;
+}
+
+inline LVector3f Driver::getAccels(float& angularAccel)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	angularAccel = mActualAccelH;
+	return mActualAccelXYZ;
+}
+
+inline void Driver::setLinearFriction(float linearFriction)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mFrictionXYZ = linearFriction;
+}
+
+inline void Driver::setMaxAngularSpeed(float maxAngularSpeed)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+}
+
+inline void Driver::setAngularFriction(float angularFriction)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+}
+
+inline void Driver::getFrictions(float& linearFriction, float& angularFriction)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+}
+
+inline LVector3f Driver::getCurrentSpeeds(float& angularSpeed)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
 }
 
 inline void Driver::setFastFactor(float factor)

@@ -37,7 +37,7 @@ Driver::Driver()
 Driver::Driver(SMARTPTR(DriverTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
-			"Driver::Driver: invalid GameControlManager")
+	"Driver::Driver: invalid GameControlManager")
 
 	mTmpl = tmpl;
 	reset();
@@ -66,12 +66,12 @@ bool Driver::initialize()
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
 	//inverted setting
-	mInvertedKeyboard = (
+	mSignOfKeyboard = (
 			mTmpl->parameter(std::string("inverted_keyboard"))
-					== std::string("true") ? true : false);
-	mInvertedMouse = (
+					== std::string("true") ? -1 : 1);
+	mSignOfMouse = (
 			mTmpl->parameter(std::string("inverted_mouse"))
-					== std::string("true") ? true : false);
+					== std::string("true") ? -1 : 1);
 	//mouse movement setting
 	mMouseEnabledH = (
 			mTmpl->parameter(std::string("mouse_enabled_h"))
@@ -118,7 +118,8 @@ bool Driver::initialize()
 					== std::string("enabled") ? true : false);
 	//speedKey
 	mSpeedKey = mTmpl->parameter(std::string("speed_key"));
-	if (not (mSpeedKey == std::string("control") or mSpeedKey == std::string("alt")
+	if (not (mSpeedKey == std::string("control")
+			or mSpeedKey == std::string("alt")
 			or mSpeedKey == std::string("shift")))
 	{
 		mSpeedKey = std::string("shift");
@@ -126,17 +127,54 @@ bool Driver::initialize()
 
 	//set sensitivity parameters
 	float speed = (float) strtof(
-			mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
-	mSpeedActualXYZ = LVecBase3f(speed, speed, speed);
-	mSpeedActualH = (float) strtof(
-			mTmpl->parameter(std::string("angular_speed")).c_str(), NULL);
+			mTmpl->parameter(std::string("max_linear_speed")).c_str(), NULL);
+	mActualSpeedXYZ = LVecBase3f(speed, speed, speed);
+	mActualSpeedH = (float) strtof(
+			mTmpl->parameter(std::string("max_angular_speed")).c_str(), NULL);
+	mMaxSpeedXYZ = speed;
+	mMaxSpeedSquaredXYZ = mMaxSpeedXYZ * mMaxSpeedXYZ;
+	mMaxSpeedH = mActualSpeedH;
+	mMaxSpeedSquaredH = mMaxSpeedH * mMaxSpeedH;
+	float accel = (float) strtof(
+			mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
+	mActualAccelXYZ = LVecBase3f(accel, accel, accel);
+	mActualAccelH = (float) strtof(
+			mTmpl->parameter(std::string("angular_accel")).c_str(), NULL);
+	mFrictionXYZ = 1 - (float) strtof(
+			mTmpl->parameter(std::string("linear_friction")).c_str(), NULL);
+	mFrictionH = 1 - (float) strtof(
+			mTmpl->parameter(std::string("angular_friction")).c_str(), NULL);
+	if ((mFrictionXYZ < 0.0) or (mFrictionXYZ > 1.0))
+	{
+		mFrictionXYZ = 0.1;
+	}
+	if ((mFrictionH < 0.0) or (mFrictionH > 1.0))
+	{
+		mFrictionH = 0.1;
+	}
+	//get first movement type...
+	std::string movementType = mTmpl->parameter(std::string("movement_type"));
+	if (movementType == "dynamic")
+	{
+		mMovementType = DYNAMIC;
+	}
+	else
+	{
+		mMovementType = KINEMATIC;
+	}
+	//...tweak if not kinematic
+	if (mMovementType == DYNAMIC)
+	{
+		//reset speeds
+		mActualSpeedXYZ = LVector3f::zero();
+		mActualSpeedH = 0.0;
+	}
 	mFastFactor = (float) strtof(
 			mTmpl->parameter(std::string("fast_factor")).c_str(), NULL);
-	mMovSens = (float) strtof(mTmpl->parameter(std::string("mov_sens")).c_str(), NULL);
-	mRollSens = (float) strtof(
-			mTmpl->parameter(std::string("roll_sens")).c_str(), NULL);
-	mSensX = (float) strtof(mTmpl->parameter(std::string("sens_x")).c_str(), NULL);
-	mSensY = (float) strtof(mTmpl->parameter(std::string("sens_y")).c_str(), NULL);
+	mSensX = (float) strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+			NULL);
+	mSensY = (float) strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+			NULL);
 	//
 	return result;
 }
@@ -276,8 +314,8 @@ void Driver::doDisable()
 		//show mouse cursor
 		WindowProperties props;
 		props.set_cursor_hidden(false);
-		SMARTPTR(GraphicsWindow) win =
-				mTmpl->windowFramework()->get_graphics_window();
+		SMARTPTR(GraphicsWindow)win =
+		mTmpl->windowFramework()->get_graphics_window();
 		win->request_properties(props);
 	}
 	//
@@ -287,21 +325,176 @@ void Driver::doDisable()
 	mEnabled = false;
 }
 
+//void Driver::update(void* data)
+//{
+//	//lock (guard) the mutex
+//	HOLD_MUTEX(mMutex)
+//
+//	float dt = *(reinterpret_cast<float*>(data));
+//	bool modified = false;
+//
+//	NodePath ownerNodePath = mOwnerObject->getNodePath();
+//
+//#ifdef TESTING
+//	dt = 0.016666667; //60 fps
+//#endif
+//
+//	int signOfKeyboard = (mInvertedKeyboard ? -1 : 1);
+//
+//#ifdef ELY_THREAD
+//	float newX = 0, newY = 0, newZ = 0;
+//	float newH = 0, newP = 0, newR = 0;
+//#endif
+//	//handle mouse
+//	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
+//	{
+//		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+//		MouseData md = win->get_pointer(0);
+//		int signOfMouse = (mInvertedMouse ? -1 : 1);
+//		float x = md.get_x();
+//		float y = md.get_y();
+//
+//		if (win->move_pointer(0, mCentX, mCentY))
+//		{
+//			if (mMouseEnabledH)
+//			{
+//#ifdef ELY_THREAD
+//				newH -= (x - mCentX) * mSensX * signOfMouse;
+//#else
+//				ownerNodePath.set_h(
+//						ownerNodePath.get_h()
+//						- (x - mCentX) * mSensX * signOfMouse);
+//#endif
+//				modified = true;
+//			}
+//			if (mMouseEnabledP)
+//			{
+//#ifdef ELY_THREAD
+//				newP -= (y - mCentY) * mSensY * signOfMouse;
+//#else
+//				ownerNodePath.set_p(
+//						ownerNodePath.get_p()
+//						- (y - mCentY) * mSensY * signOfMouse);
+//#endif
+//				modified = true;
+//			}
+//		}
+//		//if mMouseMoveKey is true we are controlling mouse movements
+//		//so we need to reset mMouseMove to false
+//		if (mMouseMoveKey)
+//		{
+//			mMouseMove = false;
+//		}
+//	}
+//	//handle keys:
+//	if (mForward)
+//	{
+//#ifdef ELY_THREAD
+//		newY -= mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard;
+//#else
+//		ownerNodePath.set_y(ownerNodePath,
+//				-mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard);
+//#endif
+//		modified = true;
+//	}
+//	if (mBackward)
+//	{
+//#ifdef ELY_THREAD
+//		newY += mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard;
+//#else
+//		ownerNodePath.set_y(ownerNodePath,
+//				+mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard);
+//#endif
+//		modified = true;
+//	}
+//	if (mStrafeLeft)
+//	{
+//#ifdef ELY_THREAD
+//		newX += mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard;
+//#else
+//		ownerNodePath.set_x(ownerNodePath,
+//				+mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard);
+//#endif
+//		modified = true;
+//	}
+//	if (mStrafeRight)
+//	{
+//#ifdef ELY_THREAD
+//		newX -= mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard;
+//#else
+//		ownerNodePath.set_x(ownerNodePath,
+//				-mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard);
+//#endif
+//		modified = true;
+//	}
+//	if (mUp)
+//	{
+//#ifdef ELY_THREAD
+//		newZ += mMovSens * mActualSpeedXYZ.get_z() * dt;
+//#else
+//		ownerNodePath.set_z(ownerNodePath, +mMovSens * mActualSpeedXYZ.get_z() * dt);
+//#endif
+//		modified = true;
+//	}
+//	if (mDown)
+//	{
+//#ifdef ELY_THREAD
+//		newZ -= mMovSens * mActualSpeedXYZ.get_z() * dt;
+//#else
+//		ownerNodePath.set_z(ownerNodePath, -mMovSens * mActualSpeedXYZ.get_z() * dt);
+//#endif
+//		modified = true;
+//	}
+//	if (mRollLeft)
+//	{
+//#ifdef ELY_THREAD
+//		newH += mRollSens * mActualSpeedH * dt * signOfKeyboard;
+//#else
+//		ownerNodePath.set_h(
+//				ownerNodePath.get_h()
+//				+ mRollSens * mActualSpeedH * dt * signOfKeyboard);
+//#endif
+//		modified = true;
+//	}
+//	if (mRollRight)
+//	{
+//#ifdef ELY_THREAD
+//		newH -= mRollSens * mActualSpeedH * dt * signOfKeyboard;
+//#else
+//		ownerNodePath.set_h(
+//				ownerNodePath.get_h()
+//				- mRollSens * mActualSpeedH * dt * signOfKeyboard);
+//#endif
+//		modified = true;
+//	}
+//#ifdef ELY_THREAD
+//	if (modified)
+//	{
+//		newH += mActualTransform->get_hpr().get_x();
+//		newP += mActualTransform->get_hpr().get_y();
+//		newR += mActualTransform->get_hpr().get_z();
+//		CSMARTPTR(TransformState)newTransform = mActualTransform->compose(
+//				TransformState::make_identity()->set_pos(
+//						LVecBase3(newX, newY, newZ)))->set_hpr(
+//				LVecBase3(newH, newP, newR)).p();
+//		ownerNodePath.set_transform(newTransform);
+//		mActualTransform = newTransform;
+//	}
+//#endif
+//}
+
 void Driver::update(void* data)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
-	bool modified = false;
 
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
-
-	int signOfKeyboard = (mInvertedKeyboard ? -1 : 1);
 
 #ifdef ELY_THREAD
 	float newX = 0, newY = 0, newZ = 0;
@@ -312,7 +505,6 @@ void Driver::update(void* data)
 	{
 		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 		MouseData md = win->get_pointer(0);
-		int signOfMouse = (mInvertedMouse ? -1 : 1);
 		float x = md.get_x();
 		float y = md.get_y();
 
@@ -321,24 +513,22 @@ void Driver::update(void* data)
 			if (mMouseEnabledH)
 			{
 #ifdef ELY_THREAD
-				newH -= (x - mCentX) * mSensX * signOfMouse;
+				newH -= (x - mCentX) * mSensX * mSignOfMouse;
 #else
 				ownerNodePath.set_h(
 						ownerNodePath.get_h()
-						- (x - mCentX) * mSensX * signOfMouse);
+						- (x - mCentX) * mSensX * mSignOfMouse);
 #endif
-				modified = true;
 			}
 			if (mMouseEnabledP)
 			{
 #ifdef ELY_THREAD
-				newP -= (y - mCentY) * mSensY * signOfMouse;
+				newP -= (y - mCentY) * mSensY * mSignOfMouse;
 #else
 				ownerNodePath.set_p(
 						ownerNodePath.get_p()
-						- (y - mCentY) * mSensY * signOfMouse);
+						- (y - mCentY) * mSensY * mSignOfMouse);
 #endif
-				modified = true;
 			}
 		}
 		//if mMouseMoveKey is true we are controlling mouse movements
@@ -348,101 +538,175 @@ void Driver::update(void* data)
 			mMouseMove = false;
 		}
 	}
-	//handle keys:
-	if (mForward)
-	{
+	//update position/orientation
 #ifdef ELY_THREAD
-		newY -= mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard;
+	newY += mActualSpeedXYZ.get_y() * dt * mSignOfKeyboard;
+	newX += mActualSpeedXYZ.get_x() * dt * mSignOfKeyboard;
+	newZ += mActualSpeedXYZ.get_z() * dt;
+	newH += mActualSpeedH * dt * mSignOfKeyboard;
+	newH += mActualTransform->get_hpr().get_x();
+	newP += mActualTransform->get_hpr().get_y();
+	newR += mActualTransform->get_hpr().get_z();
+	//make transform
+	CSMARTPTR(TransformState)newTransform = mActualTransform->compose(
+			TransformState::make_identity()->set_pos(
+					LVecBase3(newX, newY, newZ)))->set_hpr(
+			LVecBase3(newH, newP, newR)).p();
+	ownerNodePath.set_transform(newTransform);
+	mActualTransform = newTransform;
 #else
-		ownerNodePath.set_y(ownerNodePath,
-				-mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard);
+	ownerNodePath.set_y(ownerNodePath,
+			mActualSpeedXYZ.get_y() * dt * mSignOfKeyboard);
+	ownerNodePath.set_x(ownerNodePath,
+			mActualSpeedXYZ.get_x() * dt * mSignOfKeyboard);
+	ownerNodePath.set_z(ownerNodePath,
+			mActualSpeedXYZ.get_z() * dt);
+	ownerNodePath.set_h(ownerNodePath.get_h()
+			+ mActualSpeedH * dt * mSignOfKeyboard);
 #endif
-		modified = true;
-	}
-	if (mBackward)
+
+	//update speeds
+	bool moveOn = false;
+	LVector3f signedAccelXYZ = LVector3f::zero();
+	float signedAccelH = 0.0;
+	///TODO optimize if flow
+	//y axis
+	if (mForward or mBackward)
 	{
-#ifdef ELY_THREAD
-		newY += mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard;
-#else
-		ownerNodePath.set_y(ownerNodePath,
-				+mMovSens * mSpeedActualXYZ.get_y() * dt * signOfKeyboard);
-#endif
-		modified = true;
+		if (mForward)
+		{
+			mActualSpeedXYZ.set_y(
+				mActualSpeedXYZ.get_y() - mActualAccelXYZ.get_y() * dt);
+			if (mActualSpeedXYZ.get_y() < -mMaxSpeedXYZ)
+			{
+				mActualSpeedXYZ.set_y(-mMaxSpeedXYZ);
+			}
+		}
+		if (mBackward)
+		{
+			mActualSpeedXYZ.set_y(
+					mActualSpeedXYZ.get_y() + mActualAccelXYZ.get_y() * dt);
+			if (mActualSpeedXYZ.get_y() > mMaxSpeedXYZ)
+			{
+				mActualSpeedXYZ.set_y(mMaxSpeedXYZ);
+			}
+		}
 	}
-	if (mStrafeLeft)
+	else if (mActualSpeedXYZ.get_y() != 0.0)
 	{
-#ifdef ELY_THREAD
-		newX += mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard;
-#else
-		ownerNodePath.set_x(ownerNodePath,
-				+mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard);
-#endif
-		modified = true;
+		if (mActualSpeedXYZ.get_y() * mActualSpeedXYZ.get_y() <
+				mMaxSpeedSquaredXYZ * 0.01)
+		{
+			mActualSpeedXYZ.set_y(0.0);
+		}
+		else
+		{
+			mActualSpeedXYZ.set_y(
+					mActualSpeedXYZ.get_y() * mFrictionXYZ);
+		}
 	}
-	if (mStrafeRight)
+	//x axis
+	if (mStrafeLeft or mStrafeRight)
 	{
-#ifdef ELY_THREAD
-		newX -= mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard;
-#else
-		ownerNodePath.set_x(ownerNodePath,
-				-mMovSens * mSpeedActualXYZ.get_x() * dt * signOfKeyboard);
-#endif
-		modified = true;
+		if (mStrafeLeft)
+		{
+			mActualSpeedXYZ.set_x(
+					mActualSpeedXYZ.get_x() + mActualAccelXYZ.get_x() * dt);
+			if (mActualSpeedXYZ.get_x() > mMaxSpeedXYZ)
+			{
+				mActualSpeedXYZ.set_x(mMaxSpeedXYZ);
+			}
+		}
+		if (mStrafeRight)
+		{
+			mActualSpeedXYZ.set_x(
+					mActualSpeedXYZ.get_x() - mActualAccelXYZ.get_x() * dt);
+			if (mActualSpeedXYZ.get_x() < -mMaxSpeedXYZ)
+			{
+				mActualSpeedXYZ.set_x(-mMaxSpeedXYZ);
+			}
+		}
 	}
-	if (mUp)
+	else if (mActualSpeedXYZ.get_x() != 0.0)
 	{
-#ifdef ELY_THREAD
-		newZ += mMovSens * mSpeedActualXYZ.get_z() * dt;
-#else
-		ownerNodePath.set_z(ownerNodePath, +mMovSens * mSpeedActualXYZ.get_z() * dt);
-#endif
-		modified = true;
+		if (mActualSpeedXYZ.get_x() * mActualSpeedXYZ.get_x() <
+				mMaxSpeedSquaredXYZ * 0.01)
+		{
+			mActualSpeedXYZ.set_x(0.0);
+		}
+		else
+		{
+			mActualSpeedXYZ.set_x(
+					mActualSpeedXYZ.get_x() * mFrictionXYZ);
+		}
 	}
-	if (mDown)
+	//z axis
+	if (mUp or mDown)
 	{
-#ifdef ELY_THREAD
-		newZ -= mMovSens * mSpeedActualXYZ.get_z() * dt;
-#else
-		ownerNodePath.set_z(ownerNodePath, -mMovSens * mSpeedActualXYZ.get_z() * dt);
-#endif
-		modified = true;
+		if (mUp)
+		{
+			mActualSpeedXYZ.set_z(
+					mActualSpeedXYZ.get_z() + mActualAccelXYZ.get_z() * dt);
+			if (mActualSpeedXYZ.get_z() > mMaxSpeedXYZ)
+			{
+				mActualSpeedXYZ.set_z(mMaxSpeedXYZ);
+			}
+		}
+		if (mDown)
+		{
+			mActualSpeedXYZ.set_z(
+					mActualSpeedXYZ.get_z() - mActualAccelXYZ.get_z() * dt);
+			if (mActualSpeedXYZ.get_z() < -mMaxSpeedXYZ)
+			{
+				mActualSpeedXYZ.set_z(-mMaxSpeedXYZ);
+			}
+		}
 	}
-	if (mRollLeft)
+	else if (mActualSpeedXYZ.get_z() != 0.0)
 	{
-#ifdef ELY_THREAD
-		newH += mRollSens * mSpeedActualH * dt * signOfKeyboard;
-#else
-		ownerNodePath.set_h(
-				ownerNodePath.get_h()
-				+ mRollSens * mSpeedActualH * dt * signOfKeyboard);
-#endif
-		modified = true;
+		if (mActualSpeedXYZ.get_z() * mActualSpeedXYZ.get_z() <
+				mMaxSpeedSquaredXYZ * 0.01)
+		{
+			mActualSpeedXYZ.set_z(0.0);
+		}
+		else
+		{
+			mActualSpeedXYZ.set_z(
+					mActualSpeedXYZ.get_z() * mFrictionXYZ);
+		}
 	}
-	if (mRollRight)
+	//rotation
+	if (mRollLeft or mRollRight)
 	{
-#ifdef ELY_THREAD
-		newH -= mRollSens * mSpeedActualH * dt * signOfKeyboard;
-#else
-		ownerNodePath.set_h(
-				ownerNodePath.get_h()
-				- mRollSens * mSpeedActualH * dt * signOfKeyboard);
-#endif
-		modified = true;
+		if (mRollLeft)
+		{
+			mActualSpeedH += mActualAccelH * dt;
+			if (mActualSpeedH > mMaxSpeedH)
+			{
+				mActualSpeedH = mMaxSpeedH;
+			}
+		}
+		if (mRollRight)
+		{
+			mActualSpeedH -= mActualAccelH * dt;
+			if (mActualSpeedH < -mMaxSpeedH)
+			{
+				mActualSpeedH = -mMaxSpeedH;
+			}
+		}
 	}
-#ifdef ELY_THREAD
-	if (modified)
+	else if (mActualSpeedH != 0.0)
 	{
-		newH += mActualTransform->get_hpr().get_x();
-		newP += mActualTransform->get_hpr().get_y();
-		newR += mActualTransform->get_hpr().get_z();
-		CSMARTPTR(TransformState)newTransform = mActualTransform->compose(
-				TransformState::make_identity()->set_pos(
-						LVecBase3(newX, newY, newZ)))->set_hpr(
-				LVecBase3(newH, newP, newR)).p();
-		ownerNodePath.set_transform(newTransform);
-		mActualTransform = newTransform;
+		if (mActualSpeedH * mActualSpeedH <
+				mMaxSpeedSquaredH * 0.01)
+		{
+			mActualSpeedH = 0.0;
+		}
+		else
+		{
+			mActualSpeedH *= mFrictionH;
+		}
 	}
-#endif
 }
 
 //TypedObject semantics: hardcoded
