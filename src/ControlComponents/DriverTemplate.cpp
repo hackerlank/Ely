@@ -86,20 +86,21 @@ void DriverTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("up", "enabled"));
 	mParameterTable.insert(ParameterNameValue("down", "enabled"));
 	mParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
 	mParameterTable.insert(ParameterNameValue("speed_key", "shift"));
+	mParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
+	mParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
 	mParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
 	mParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
 	mParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
 	mParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
 	mParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
 	mParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
+	mParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
 	mParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
 	mParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
 	mParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
-	mParameterTable.insert(ParameterNameValue("inverted_keyboard", "false"));
-	mParameterTable.insert(ParameterNameValue("inverted_mouse", "false"));
-	mParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
-	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
 }
 
 //TypedObject semantics: hardcoded

@@ -80,8 +80,9 @@ void fast_Activity_Actor(const Event* event, void* data)
 	if (not isFast)
 	{
 		float speedFactor = actorDrv->getFastFactor();
-		actorDrv->setLinearSpeed(actorDrv->getLinearSpeed() * speedFactor);
-		actorDrv->setAngularSpeed(actorDrv->getAngularSpeed() * speedFactor);
+		float maxAngularSpeed;
+		actorDrv->setMaxLinearSpeed(actorDrv->getMaxSpeeds(maxAngularSpeed) * speedFactor);
+		actorDrv->setMaxAngularSpeed(maxAngularSpeed * speedFactor);
 		isFast = not isFast;
 	}
 }
@@ -95,8 +96,9 @@ void stop_fast_Activity_Actor(const Event* event, void* data)
 	if (isFast)
 	{
 		float speedFactor = actorDrv->getFastFactor();
-		actorDrv->setLinearSpeed(actorDrv->getLinearSpeed() / speedFactor);
-		actorDrv->setAngularSpeed(actorDrv->getAngularSpeed() / speedFactor);
+		float maxAngularSpeed;
+		actorDrv->setMaxLinearSpeed(actorDrv->getMaxSpeeds(maxAngularSpeed) / speedFactor);
+		actorDrv->setMaxAngularSpeed(maxAngularSpeed / speedFactor);
 		isFast = not isFast;
 	}
 }

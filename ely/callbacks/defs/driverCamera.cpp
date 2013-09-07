@@ -47,6 +47,12 @@ CALLBACK fast_strafe_left_Driver_Camera;
 CALLBACK strafe_right_Driver_Camera;
 CALLBACK stop_strafe_right_Driver_Camera;
 CALLBACK fast_strafe_right_Driver_Camera;
+CALLBACK roll_left_Driver_Camera;
+CALLBACK stop_roll_left_Driver_Camera;
+CALLBACK fast_roll_left_Driver_Camera;
+CALLBACK roll_right_Driver_Camera;
+CALLBACK stop_roll_right_Driver_Camera;
+CALLBACK fast_roll_right_Driver_Camera;
 CALLBACK up_Driver_Camera;
 CALLBACK stop_up_Driver_Camera;
 CALLBACK fast_up_Driver_Camera;
@@ -72,8 +78,13 @@ void fast_Driver_Camera(const Event* event, void* data)
 	if (not isFast)
 	{
 		float speedFactor = cameraDrv->getFastFactor();
-		cameraDrv->setLinearSpeed(cameraDrv->getLinearSpeed() * speedFactor);
-		cameraDrv->setAngularSpeed(cameraDrv->getAngularSpeed() * speedFactor);
+		float maxAngularSpeed, angularAccel, senX, sensY;
+		cameraDrv->setMaxLinearSpeed(cameraDrv->getMaxSpeeds(maxAngularSpeed) * speedFactor);
+		cameraDrv->setMaxAngularSpeed(maxAngularSpeed * speedFactor);
+		cameraDrv->setLinearAccel(cameraDrv->getAccels(angularAccel) * speedFactor);
+		cameraDrv->setAngularAccel(angularAccel * speedFactor);
+		cameraDrv->getSens(senX, sensY);
+		cameraDrv->setSens(senX * speedFactor, sensY * speedFactor);
 		isFast = not isFast;
 	}
 }
@@ -85,8 +96,13 @@ void stop_fast_Driver_Camera(const Event* event, void* data)
 	if (isFast)
 	{
 		float speedFactor = cameraDrv->getFastFactor();
-		cameraDrv->setLinearSpeed(cameraDrv->getLinearSpeed() / speedFactor);
-		cameraDrv->setAngularSpeed(cameraDrv->getAngularSpeed() / speedFactor);
+		float maxAngularSpeed, angularAccel, senX, sensY;
+		cameraDrv->setMaxLinearSpeed(cameraDrv->getMaxSpeeds(maxAngularSpeed) / speedFactor);
+		cameraDrv->setMaxAngularSpeed(maxAngularSpeed / speedFactor);
+		cameraDrv->setLinearAccel(cameraDrv->getAccels(angularAccel) / speedFactor);
+		cameraDrv->setAngularAccel(angularAccel / speedFactor);
+		cameraDrv->getSens(senX, sensY);
+		cameraDrv->setSens(senX / speedFactor, sensY / speedFactor);
 		isFast = not isFast;
 	}
 }
@@ -169,6 +185,46 @@ void fast_strafe_right_Driver_Camera(const Event* event, void* data)
 {
 	fast_Driver_Camera(event, data);
 	strafe_right_Driver_Camera(event, data);
+}
+//roll_left:stop-roll_left:fast-roll_left
+void roll_left_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enableRollLeft(true);
+}
+void stop_roll_left_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enableRollLeft(false);
+}
+void fast_roll_left_Driver_Camera(const Event* event, void* data)
+{
+	fast_Driver_Camera(event, data);
+	roll_left_Driver_Camera(event, data);
+}
+//roll_right:stop-roll_right:fast-roll_right
+void roll_right_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enableRollRight(true);
+}
+void stop_roll_right_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enableRollRight(false);
+}
+void fast_roll_right_Driver_Camera(const Event* event, void* data)
+{
+	fast_Driver_Camera(event, data);
+	roll_right_Driver_Camera(event, data);
 }
 //up:stop-up:fast-up
 void up_Driver_Camera(const Event* event, void* data)

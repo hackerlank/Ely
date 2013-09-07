@@ -66,11 +66,11 @@ bool Driver::initialize()
 			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
 					true : false);
 	//inverted setting
-	mSignOfKeyboard = (
-			mTmpl->parameter(std::string("inverted_keyboard"))
+	mSignOfTranslation = (
+			mTmpl->parameter(std::string("inverted_translation"))
 					== std::string("true") ? -1 : 1);
 	mSignOfMouse = (
-			mTmpl->parameter(std::string("inverted_mouse"))
+			mTmpl->parameter(std::string("inverted_rotation"))
 					== std::string("true") ? -1 : 1);
 	//mouse movement setting
 	mMouseEnabledH = (
@@ -128,53 +128,62 @@ bool Driver::initialize()
 	//set sensitivity parameters
 	float speed = (float) strtof(
 			mTmpl->parameter(std::string("max_linear_speed")).c_str(), NULL);
-	mActualSpeedXYZ = LVecBase3f(speed, speed, speed);
-	mActualSpeedH = (float) strtof(
+	mMaxSpeedXYZ = LVecBase3f(speed, speed, speed);
+	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
+			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
+			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
+	mMaxSpeedH = (float) strtof(
 			mTmpl->parameter(std::string("max_angular_speed")).c_str(), NULL);
-	mMaxSpeedXYZ = speed;
-	mMaxSpeedSquaredXYZ = mMaxSpeedXYZ * mMaxSpeedXYZ;
-	mMaxSpeedH = mActualSpeedH;
 	mMaxSpeedSquaredH = mMaxSpeedH * mMaxSpeedH;
+	//
 	float accel = (float) strtof(
 			mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
-	mActualAccelXYZ = LVecBase3f(accel, accel, accel);
-	mActualAccelH = (float) strtof(
+	mAccelXYZ = LVecBase3f(accel, accel, accel);
+	mAccelH = (float) strtof(
 			mTmpl->parameter(std::string("angular_accel")).c_str(), NULL);
-	mFrictionXYZ = 1 - (float) strtof(
-			mTmpl->parameter(std::string("linear_friction")).c_str(), NULL);
-	mFrictionH = 1 - (float) strtof(
-			mTmpl->parameter(std::string("angular_friction")).c_str(), NULL);
-	if ((mFrictionXYZ < 0.0) or (mFrictionXYZ > 1.0))
+	//reset speeds
+	mActualSpeedXYZ = LVector3f::zero();
+	mActualSpeedH = 0.0;
+	//
+	float linearFriction = 1
+			- (float) strtof(
+					mTmpl->parameter(std::string("linear_friction")).c_str(),
+					NULL);
+	mFrictionXYZ = LVector3f(linearFriction, linearFriction, linearFriction);
+	if ((mFrictionXYZ.get_x() < 0.0) or (mFrictionXYZ.get_x() > 1.0))
 	{
-		mFrictionXYZ = 0.1;
+		mFrictionXYZ.set_x(0.1);
 	}
+	if ((mFrictionXYZ.get_y() < 0.0) or (mFrictionXYZ.get_y() > 1.0))
+	{
+		mFrictionXYZ.set_y(0.1);
+	}
+	if ((mFrictionXYZ.get_z() < 0.0) or (mFrictionXYZ.get_z() > 1.0))
+	{
+		mFrictionXYZ.set_z(0.1);
+	}
+	mFrictionH = 1
+			- (float) strtof(
+					mTmpl->parameter(std::string("angular_friction")).c_str(),
+					NULL);
 	if ((mFrictionH < 0.0) or (mFrictionH > 1.0))
 	{
 		mFrictionH = 0.1;
 	}
-	//get first movement type...
-	std::string movementType = mTmpl->parameter(std::string("movement_type"));
-	if (movementType == "dynamic")
+	mStopThreshold = (float) strtof(
+			mTmpl->parameter(std::string("stop_threshold")).c_str(),
+			NULL);
+	if ((mStopThreshold < 0.0) or (mStopThreshold > 1.0))
 	{
-		mMovementType = DYNAMIC;
+		mStopThreshold = 0.01;
 	}
-	else
-	{
-		mMovementType = KINEMATIC;
-	}
-	//...tweak if not kinematic
-	if (mMovementType == DYNAMIC)
-	{
-		//reset speeds
-		mActualSpeedXYZ = LVector3f::zero();
-		mActualSpeedH = 0.0;
-	}
+
 	mFastFactor = (float) strtof(
 			mTmpl->parameter(std::string("fast_factor")).c_str(), NULL);
 	mSensX = (float) strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
-			NULL);
+	NULL);
 	mSensY = (float) strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
-			NULL);
+	NULL);
 	//
 	return result;
 }
@@ -325,164 +334,6 @@ void Driver::doDisable()
 	mEnabled = false;
 }
 
-//void Driver::update(void* data)
-//{
-//	//lock (guard) the mutex
-//	HOLD_MUTEX(mMutex)
-//
-//	float dt = *(reinterpret_cast<float*>(data));
-//	bool modified = false;
-//
-//	NodePath ownerNodePath = mOwnerObject->getNodePath();
-//
-//#ifdef TESTING
-//	dt = 0.016666667; //60 fps
-//#endif
-//
-//	int signOfKeyboard = (mInvertedKeyboard ? -1 : 1);
-//
-//#ifdef ELY_THREAD
-//	float newX = 0, newY = 0, newZ = 0;
-//	float newH = 0, newP = 0, newR = 0;
-//#endif
-//	//handle mouse
-//	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
-//	{
-//		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-//		MouseData md = win->get_pointer(0);
-//		int signOfMouse = (mInvertedMouse ? -1 : 1);
-//		float x = md.get_x();
-//		float y = md.get_y();
-//
-//		if (win->move_pointer(0, mCentX, mCentY))
-//		{
-//			if (mMouseEnabledH)
-//			{
-//#ifdef ELY_THREAD
-//				newH -= (x - mCentX) * mSensX * signOfMouse;
-//#else
-//				ownerNodePath.set_h(
-//						ownerNodePath.get_h()
-//						- (x - mCentX) * mSensX * signOfMouse);
-//#endif
-//				modified = true;
-//			}
-//			if (mMouseEnabledP)
-//			{
-//#ifdef ELY_THREAD
-//				newP -= (y - mCentY) * mSensY * signOfMouse;
-//#else
-//				ownerNodePath.set_p(
-//						ownerNodePath.get_p()
-//						- (y - mCentY) * mSensY * signOfMouse);
-//#endif
-//				modified = true;
-//			}
-//		}
-//		//if mMouseMoveKey is true we are controlling mouse movements
-//		//so we need to reset mMouseMove to false
-//		if (mMouseMoveKey)
-//		{
-//			mMouseMove = false;
-//		}
-//	}
-//	//handle keys:
-//	if (mForward)
-//	{
-//#ifdef ELY_THREAD
-//		newY -= mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard;
-//#else
-//		ownerNodePath.set_y(ownerNodePath,
-//				-mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard);
-//#endif
-//		modified = true;
-//	}
-//	if (mBackward)
-//	{
-//#ifdef ELY_THREAD
-//		newY += mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard;
-//#else
-//		ownerNodePath.set_y(ownerNodePath,
-//				+mMovSens * mActualSpeedXYZ.get_y() * dt * signOfKeyboard);
-//#endif
-//		modified = true;
-//	}
-//	if (mStrafeLeft)
-//	{
-//#ifdef ELY_THREAD
-//		newX += mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard;
-//#else
-//		ownerNodePath.set_x(ownerNodePath,
-//				+mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard);
-//#endif
-//		modified = true;
-//	}
-//	if (mStrafeRight)
-//	{
-//#ifdef ELY_THREAD
-//		newX -= mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard;
-//#else
-//		ownerNodePath.set_x(ownerNodePath,
-//				-mMovSens * mActualSpeedXYZ.get_x() * dt * signOfKeyboard);
-//#endif
-//		modified = true;
-//	}
-//	if (mUp)
-//	{
-//#ifdef ELY_THREAD
-//		newZ += mMovSens * mActualSpeedXYZ.get_z() * dt;
-//#else
-//		ownerNodePath.set_z(ownerNodePath, +mMovSens * mActualSpeedXYZ.get_z() * dt);
-//#endif
-//		modified = true;
-//	}
-//	if (mDown)
-//	{
-//#ifdef ELY_THREAD
-//		newZ -= mMovSens * mActualSpeedXYZ.get_z() * dt;
-//#else
-//		ownerNodePath.set_z(ownerNodePath, -mMovSens * mActualSpeedXYZ.get_z() * dt);
-//#endif
-//		modified = true;
-//	}
-//	if (mRollLeft)
-//	{
-//#ifdef ELY_THREAD
-//		newH += mRollSens * mActualSpeedH * dt * signOfKeyboard;
-//#else
-//		ownerNodePath.set_h(
-//				ownerNodePath.get_h()
-//				+ mRollSens * mActualSpeedH * dt * signOfKeyboard);
-//#endif
-//		modified = true;
-//	}
-//	if (mRollRight)
-//	{
-//#ifdef ELY_THREAD
-//		newH -= mRollSens * mActualSpeedH * dt * signOfKeyboard;
-//#else
-//		ownerNodePath.set_h(
-//				ownerNodePath.get_h()
-//				- mRollSens * mActualSpeedH * dt * signOfKeyboard);
-//#endif
-//		modified = true;
-//	}
-//#ifdef ELY_THREAD
-//	if (modified)
-//	{
-//		newH += mActualTransform->get_hpr().get_x();
-//		newP += mActualTransform->get_hpr().get_y();
-//		newR += mActualTransform->get_hpr().get_z();
-//		CSMARTPTR(TransformState)newTransform = mActualTransform->compose(
-//				TransformState::make_identity()->set_pos(
-//						LVecBase3(newX, newY, newZ)))->set_hpr(
-//				LVecBase3(newH, newP, newR)).p();
-//		ownerNodePath.set_transform(newTransform);
-//		mActualTransform = newTransform;
-//	}
-//#endif
-//}
-
 void Driver::update(void* data)
 {
 	//lock (guard) the mutex
@@ -540,10 +391,10 @@ void Driver::update(void* data)
 	}
 	//update position/orientation
 #ifdef ELY_THREAD
-	newY += mActualSpeedXYZ.get_y() * dt * mSignOfKeyboard;
-	newX += mActualSpeedXYZ.get_x() * dt * mSignOfKeyboard;
+	newY += mActualSpeedXYZ.get_y() * dt * mSignOfTranslation;
+	newX += mActualSpeedXYZ.get_x() * dt * mSignOfTranslation;
 	newZ += mActualSpeedXYZ.get_z() * dt;
-	newH += mActualSpeedH * dt * mSignOfKeyboard;
+	newH += mActualSpeedH * dt * mSignOfMouse;
 	newH += mActualTransform->get_hpr().get_x();
 	newP += mActualTransform->get_hpr().get_y();
 	newR += mActualTransform->get_hpr().get_z();
@@ -556,154 +407,229 @@ void Driver::update(void* data)
 	mActualTransform = newTransform;
 #else
 	ownerNodePath.set_y(ownerNodePath,
-			mActualSpeedXYZ.get_y() * dt * mSignOfKeyboard);
+			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
 	ownerNodePath.set_x(ownerNodePath,
-			mActualSpeedXYZ.get_x() * dt * mSignOfKeyboard);
+			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
 	ownerNodePath.set_z(ownerNodePath,
 			mActualSpeedXYZ.get_z() * dt);
 	ownerNodePath.set_h(ownerNodePath.get_h()
-			+ mActualSpeedH * dt * mSignOfKeyboard);
+			+ mActualSpeedH * dt * mSignOfMouse);
 #endif
 
 	//update speeds
 	bool moveOn = false;
 	LVector3f signedAccelXYZ = LVector3f::zero();
 	float signedAccelH = 0.0;
-	///TODO optimize if flow
 	//y axis
-	if (mForward or mBackward)
+	if (mForward)
 	{
-		if (mForward)
+		if(mAccelXYZ.get_y() != 0)
 		{
+			//accelerate
 			mActualSpeedXYZ.set_y(
-				mActualSpeedXYZ.get_y() - mActualAccelXYZ.get_y() * dt);
-			if (mActualSpeedXYZ.get_y() < -mMaxSpeedXYZ)
+				mActualSpeedXYZ.get_y() - mAccelXYZ.get_y() * dt);
+			if (mActualSpeedXYZ.get_y() < -mMaxSpeedXYZ.get_y())
 			{
-				mActualSpeedXYZ.set_y(-mMaxSpeedXYZ);
+				//limit speed
+				mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
 			}
 		}
-		if (mBackward)
+		else
 		{
+			//kinematic
+			mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
+		}
+	}
+	else if (mBackward)
+	{
+		if(mAccelXYZ.get_y() != 0)
+		{
+			//accelerate
 			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() + mActualAccelXYZ.get_y() * dt);
-			if (mActualSpeedXYZ.get_y() > mMaxSpeedXYZ)
+					mActualSpeedXYZ.get_y() + mAccelXYZ.get_y() * dt);
+			if (mActualSpeedXYZ.get_y() > mMaxSpeedXYZ.get_y())
 			{
-				mActualSpeedXYZ.set_y(mMaxSpeedXYZ);
+				//limit speed
+				mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
 			}
+		}
+		else
+		{
+			//kinematic
+			mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
 		}
 	}
 	else if (mActualSpeedXYZ.get_y() != 0.0)
 	{
 		if (mActualSpeedXYZ.get_y() * mActualSpeedXYZ.get_y() <
-				mMaxSpeedSquaredXYZ * 0.01)
+				mMaxSpeedSquaredXYZ.get_y() * mStopThreshold)
 		{
+			//stop
 			mActualSpeedXYZ.set_y(0.0);
 		}
 		else
 		{
+			//decelerate
 			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() * mFrictionXYZ);
+					mActualSpeedXYZ.get_y() * mFrictionXYZ.get_y());
 		}
 	}
 	//x axis
-	if (mStrafeLeft or mStrafeRight)
+	if (mStrafeLeft)
 	{
-		if (mStrafeLeft)
+		if(mAccelXYZ.get_x() != 0)
 		{
+			//accelerate
 			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() + mActualAccelXYZ.get_x() * dt);
-			if (mActualSpeedXYZ.get_x() > mMaxSpeedXYZ)
+					mActualSpeedXYZ.get_x() + mAccelXYZ.get_x() * dt);
+			if (mActualSpeedXYZ.get_x() > mMaxSpeedXYZ.get_x())
 			{
-				mActualSpeedXYZ.set_x(mMaxSpeedXYZ);
+				//limit speed
+				mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
 			}
 		}
-		if (mStrafeRight)
+		else
 		{
+			//kinematic
+			mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
+		}
+	}
+	else if (mStrafeRight)
+	{
+		if(mAccelXYZ.get_x() != 0)
+		{
+			//accelerate
 			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() - mActualAccelXYZ.get_x() * dt);
-			if (mActualSpeedXYZ.get_x() < -mMaxSpeedXYZ)
+				mActualSpeedXYZ.get_x() - mAccelXYZ.get_x() * dt);
+			if (mActualSpeedXYZ.get_x() < -mMaxSpeedXYZ.get_x())
 			{
-				mActualSpeedXYZ.set_x(-mMaxSpeedXYZ);
+				//limit speed
+				mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_x());
 			}
+		}
+		else
+		{
+			//kinematic
+			mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_y());
 		}
 	}
 	else if (mActualSpeedXYZ.get_x() != 0.0)
 	{
 		if (mActualSpeedXYZ.get_x() * mActualSpeedXYZ.get_x() <
-				mMaxSpeedSquaredXYZ * 0.01)
+				mMaxSpeedSquaredXYZ.get_x() * mStopThreshold)
 		{
+			//stop
 			mActualSpeedXYZ.set_x(0.0);
 		}
 		else
 		{
+			//decelerate
 			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() * mFrictionXYZ);
+					mActualSpeedXYZ.get_x() * mFrictionXYZ.get_x());
 		}
 	}
 	//z axis
-	if (mUp or mDown)
+	if (mUp)
 	{
-		if (mUp)
+		if(mAccelXYZ.get_z() != 0)
 		{
+			//accelerate
 			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() + mActualAccelXYZ.get_z() * dt);
-			if (mActualSpeedXYZ.get_z() > mMaxSpeedXYZ)
+					mActualSpeedXYZ.get_z() + mAccelXYZ.get_z() * dt);
+			if (mActualSpeedXYZ.get_z() > mMaxSpeedXYZ.get_z())
 			{
-				mActualSpeedXYZ.set_z(mMaxSpeedXYZ);
+				//limit speed
+				mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
 			}
 		}
-		if (mDown)
+		else
 		{
+			//kinematic
+			mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
+		}
+	}
+	else if (mDown)
+	{
+		if(mAccelXYZ.get_z() != 0)
+		{
+			//accelerate
 			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() - mActualAccelXYZ.get_z() * dt);
-			if (mActualSpeedXYZ.get_z() < -mMaxSpeedXYZ)
+				mActualSpeedXYZ.get_z() - mAccelXYZ.get_z() * dt);
+			if (mActualSpeedXYZ.get_z() < -mMaxSpeedXYZ.get_z())
 			{
-				mActualSpeedXYZ.set_z(-mMaxSpeedXYZ);
+				//limit speed
+				mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
 			}
+		}
+		else
+		{
+			//kinematic
+			mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
 		}
 	}
 	else if (mActualSpeedXYZ.get_z() != 0.0)
 	{
 		if (mActualSpeedXYZ.get_z() * mActualSpeedXYZ.get_z() <
-				mMaxSpeedSquaredXYZ * 0.01)
+				mMaxSpeedSquaredXYZ.get_z() * mStopThreshold)
 		{
+			//stop
 			mActualSpeedXYZ.set_z(0.0);
 		}
 		else
 		{
+			//decelerate
 			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() * mFrictionXYZ);
+					mActualSpeedXYZ.get_z() * mFrictionXYZ.get_z());
 		}
 	}
 	//rotation
-	if (mRollLeft or mRollRight)
+	if (mRollLeft)
 	{
-		if (mRollLeft)
+		if(mAccelH != 0)
 		{
-			mActualSpeedH += mActualAccelH * dt;
+			//accelerate
+			mActualSpeedH += mAccelH * dt;
 			if (mActualSpeedH > mMaxSpeedH)
 			{
+				//limit speed
 				mActualSpeedH = mMaxSpeedH;
 			}
 		}
-		if (mRollRight)
+		else
 		{
-			mActualSpeedH -= mActualAccelH * dt;
+			//kinematic
+			mActualSpeedH = mMaxSpeedH;
+		}
+	}
+	else if (mRollRight)
+	{
+		if(mAccelH != 0)
+		{
+			//accelerate
+			mActualSpeedH -= mAccelH * dt;
 			if (mActualSpeedH < -mMaxSpeedH)
 			{
+				//limit speed
 				mActualSpeedH = -mMaxSpeedH;
 			}
+		}
+		else
+		{
+			//kinematic
+			mActualSpeedH = -mMaxSpeedH;
 		}
 	}
 	else if (mActualSpeedH != 0.0)
 	{
 		if (mActualSpeedH * mActualSpeedH <
-				mMaxSpeedSquaredH * 0.01)
+				mMaxSpeedSquaredH * mStopThreshold)
 		{
+			//stop
 			mActualSpeedH = 0.0;
 		}
 		else
 		{
+			//decelerate
 			mActualSpeedH *= mFrictionH;
 		}
 	}

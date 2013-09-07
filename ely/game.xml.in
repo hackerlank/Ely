@@ -21,6 +21,8 @@
 				<Param event_types="backward:stop-backward:fast-backward"/>
 				<Param event_types="strafe_left:stop-strafe_left:fast-strafe_left"/>
 				<Param event_types="strafe_right:stop-strafe_right:fast-strafe_right"/>
+				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
+				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
 				<Param event_types="up:stop-up:fast-up"/>
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
@@ -108,7 +110,6 @@
 			<ComponentTmpl family="AI" type="Steering" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/>
-			<ComponentTmpl family="Control" type="Driver" priority="60"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="RecastCrowdAgent">
@@ -160,19 +161,28 @@
 -->
 			<Component type="Driver">
 				<Param enabled="false"/>
-				<Param linear_speed="10.0"/>
-				<Param angular_speed="10.0"/>
+				<Param max_linear_speed="40.0"/>
+				<Param max_angular_speed="40.0"/>
+				<Param linear_accel="30.0"/>
+				<Param angular_accel="30.0"/>
+				<Param linear_friction="0.025"/>
+				<Param angular_friction="0.025"/>
+				<Param stop_threshold="0.0"/>
 				<Param fast_factor="5.0"/>
-				<Param roll_left=""/>
-				<Param roll_right=""/>
-				<Param inverted_keyboard="true"/>
-				<Param inverted_mouse="false"/>
+				<Param sens_x="0.05"/>
+				<Param sens_y="0.05"/>
+				<Param roll_left="enabled"/>
+				<Param roll_right="enabled"/>
+				<Param inverted_translation="true"/>
+				<Param inverted_rotation="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
 				<Param events="forward@mouse3:stop-forward@mouse3-up:fast-forward@shift-mouse3$"/>
 				<Param events="backward@s:stop-backward@s-up:fast-backward@shift-s$"/>
 				<Param events="strafe_left@a:stop-strafe_left@a-up:fast-strafe_left@shift-a$"/>
 				<Param events="strafe_right@d:stop-strafe_right@d-up:fast-strafe_right@shift-d$"/>
+				<Param events="roll_left@q:stop-roll_left@q-up:fast-roll_left@shift-q$"/>
+				<Param events="roll_right@e:stop-roll_right@e-up:fast-roll_right@shift-e$"/>
 				<Param events="up@r:stop-up@r-up:fast-up@shift-r$"/>
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
@@ -257,11 +267,11 @@
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
-				<Param linear_speed="3.0"/>
-				<Param angular_speed="3.0"/>
+				<Param max_linear_speed="3.0"/>
+				<Param max_angular_speed="3.0"/>
 				<Param fast_factor="15.0"/>
-				<Param inverted_keyboard="false"/>
-				<Param inverted_mouse="false"/>
+				<Param inverted_translation="false"/>
+				<Param inverted_rotation="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
