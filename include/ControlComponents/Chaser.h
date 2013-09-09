@@ -166,8 +166,9 @@ private:
 	/**
 	 * \brief Correct the dynamic height of the chaser.
 	 * @param newPos The position whose height may be corrected.
+	 * @param baseHeight The corrected height cannot be shorter than this.
 	 */
-	void doCorrectChaserHeight(LPoint3f& newPos);
+	void doCorrectChaserHeight(LPoint3f& newPos, float baseHeight);
 
 	///TypedObject semantics: hardcoded
 public:

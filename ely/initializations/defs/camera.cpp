@@ -27,10 +27,8 @@
 #include "Support/Picker.h"
 
 ///shared between camera, picker, actor1
-namespace
-{
 bool controlGrabbed = false;
-}
+
 ///camera related
 #ifdef __cplusplus
 extern "C"

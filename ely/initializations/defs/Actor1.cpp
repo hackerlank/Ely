@@ -26,10 +26,8 @@
 #include "AudioComponents/Sound3d.h"
 
 ///shared between camera, picker, actor1
-namespace
-{
-bool controlGrabbed = false;
-}
+extern bool controlGrabbed;
+
 ///Actor1 related
 #ifdef __cplusplus
 extern "C"

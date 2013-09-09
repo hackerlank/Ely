@@ -13,9 +13,8 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
--->
+<!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -27,10 +26,12 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="Actor">
+<!--
 			<ComponentTmpl family="Behavior" type="Activity" priority="40">
 				<Param states="forward:backward"/>
 				<Param states="strafe_left:strafe_right"/>
@@ -46,9 +47,10 @@
 				<Param event_types="fast:stop-fast"/>							
 			</ComponentTmpl>
 			<ComponentTmpl family="Control" type="Driver" priority="60"/>
+--> 
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
-			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="HUD">
@@ -143,22 +145,21 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
-<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
 				<Param chased_object="player0"/>
-				<Param fixed_relative_position="false"/>
+				<Param fixed_relative_position="true"/>
 				<Param reference_object="render"/>
-				<Param abs_max_distance="24.0"/>
+				<Param abs_max_distance="30.0"/>
 				<Param abs_min_distance="20.0"/>
 				<Param abs_max_height="20.0"/>
 				<Param abs_min_height="10.0"/>
-				<Param abs_lookat_distance="0.0"/>
+				<Param abs_lookat_distance="10.0"/>
 				<Param abs_lookat_height="4.0"/>
 				<Param friction="5.0"/>
 			</Component>
--->
+<!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param max_linear_speed="40.0"/>
@@ -187,6 +188,7 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
 			</Component>
+-->
 			<Param parent=""/>
 			<Param is_steady="false"/>		
 			<Param pos="-35.0,-94.0,96.0"/>
@@ -256,8 +258,9 @@
 		</Object>
 
 		<Object type="Actor" id="Actor1"  priority="100">
+<!--
 			<Component type="Activity">
-				<Param s="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up$"/>
+				<Param events="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up$"/>
 				<Param events="backward@arrow_down:stop-backward@arrow_down-up:fast-backward@shift-arrow_down$"/>
 				<Param events="roll_left@arrow_left:stop-roll_left@arrow_left-up:fast-roll_left@shift-arrow_left$"/>
 				<Param events="roll_right@arrow_right:stop-roll_right@arrow_right-up:fast-roll_right@shift-arrow_right$"/>
@@ -267,14 +270,15 @@
 			</Component>
 			<Component type="Driver">
 				<Param enabled="false"/>
-				<Param max_linear_speed="3.0"/>
-				<Param max_angular_speed="3.0"/>
+				<Param max_linear_speed="15.0"/>
+				<Param max_angular_speed="30.0"/>
 				<Param fast_factor="15.0"/>
 				<Param inverted_translation="false"/>
 				<Param inverted_rotation="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
+--> 
 			<Component type="Model">
 				<Param model_file="panda.bam"/>
 				<Param anim_files="walk@panda-walk.bam"/>
@@ -288,7 +292,7 @@
 				<Param shape_type="capsule"/>
 				<Param shape_size="maximum"/>
 				<Param collide_mask="all_on"/>
-			</Component> 
+			</Component>
 			<Component type="Sound3d">
 				<Param sound_files="walk-sound@GUI_rollover.wav"/>
 			</Component>

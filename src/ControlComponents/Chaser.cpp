@@ -259,16 +259,15 @@ void Chaser::onAddToSceneSetup()
 	if (mStartEnabled)
 	{
 		doEnable();
+		//when enabled set chaser initial position/orientation
+		mOwnerObject->getNodePath().set_pos(mChasedNodePath, mChaserPosition);
+		mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
+				LVector3::up());
 	}
 	else
 	{
 		unregisterEventCallbacks();
 	}
-
-	//set chaser initial position/orientation
-	mOwnerObject->getNodePath().set_pos(mChasedNodePath, mChaserPosition);
-	mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
-			LVector3::up());
 }
 
 void Chaser::onRemoveFromSceneCleanup()
@@ -300,7 +299,9 @@ void Chaser::update(void* data)
 		desiredChaserPos = mReferenceNodePath.get_relative_point(
 				mChasedNodePath, mChaserPosition);
 		newPos = doGetChaserPos(desiredChaserPos, currentChaserPos, dt);
-		doCorrectChaserHeight(newPos);
+		LPoint3f currentChasedPos = mReferenceNodePath.get_relative_point(
+				mChasedNodePath, LPoint3f::zero());
+		doCorrectChaserHeight(newPos, currentChasedPos.get_z());
 	}
 	else
 	{
@@ -314,14 +315,14 @@ void Chaser::update(void* data)
 			distanceDir.normalize();
 			desiredChaserPos = currentChasedPos + distanceDir * mAbsMinDistance;
 			newPos = doGetChaserPos(desiredChaserPos, currentChaserPos, dt);
-			doCorrectChaserHeight(newPos);
+			doCorrectChaserHeight(newPos, currentChasedPos.get_z());
 		}
 		else if (distance > mAbsMaxDistance)
 		{
 			distanceDir.normalize();
 			desiredChaserPos = currentChasedPos + distanceDir * mAbsMaxDistance;
 			newPos = doGetChaserPos(desiredChaserPos, currentChaserPos, dt);
-			doCorrectChaserHeight(newPos);
+			doCorrectChaserHeight(newPos, currentChasedPos.get_z());
 		}
 		else
 		{
@@ -361,14 +362,14 @@ LPoint3f Chaser::doGetChaserPos(LPoint3f desiredChaserPos,
 	return newPos;
 }
 
-void Chaser::doCorrectChaserHeight(LPoint3f& newPos)
+void Chaser::doCorrectChaserHeight(LPoint3f& newPos, float baseHeight)
 {
 	//correct chaser height (not in OgreBulletDemos)
 	LPoint3f downTo = LPoint3f(newPos.get_x(), newPos.get_y(), -1000000.0);
 	BulletClosestHitRayResult result =
 			GamePhysicsManager::GetSingleton().bulletWorld()->ray_test_closest(
 					newPos, downTo);
-	float hitPosZ = result.get_hit_pos().get_z();
+	float hitPosZ = max(result.get_hit_pos().get_z(), baseHeight);
 	if (newPos.get_z() < hitPosZ + mAbsMinHeight)
 	{
 		newPos.set_z(hitPosZ + mAbsMinHeight);
