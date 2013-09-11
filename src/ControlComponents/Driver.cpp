@@ -199,18 +199,15 @@ void Driver::onAddToObjectSetup()
 void Driver::onRemoveFromObjectCleanup()
 {
 	//see disable
-	if (mEnabled)
+	if (mEnabled and (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey))
 	{
-		if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
-		{
-			//we have control through mouse movements
-			//show mouse cursor
-			WindowProperties props;
-			props.set_cursor_hidden(false);
-			SMARTPTR(GraphicsWindow)win =
-			mTmpl->windowFramework()->get_graphics_window();
-			win->request_properties(props);
-		}
+		//we have control through mouse movements
+		//show mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(false);
+		SMARTPTR(GraphicsWindow)win =
+		mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
 	}
 	//
 	reset();
@@ -331,6 +328,7 @@ void Driver::doDisable()
 #ifdef ELY_THREAD
 	mDisabling = false;
 #endif
+	//
 	mEnabled = false;
 }
 

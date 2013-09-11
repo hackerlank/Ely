@@ -201,7 +201,7 @@ private:
 	///@}
 	///@{
 	///Key control values.
-	bool mTrue, mFalse, mMouseEnabledH,	mMouseEnabledP;
+	bool mMouseEnabledH,	mMouseEnabledP;
 	int mSignOfTranslation, mSignOfMouse;
 	///@}
 	///@{
@@ -276,8 +276,6 @@ inline void Driver::reset()
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey,
 	mDownKey = mRollLeftKey = mRollRightKey = mMouseMoveKey = false;
 	mSpeedKey = std::string("shift");
-	mTrue = true;
-	mFalse = false;
 	mMouseEnabledH = mMouseEnabledP = false;
 	mSignOfTranslation = mSignOfMouse = 1;
 	mFastFactor = 0.0;
