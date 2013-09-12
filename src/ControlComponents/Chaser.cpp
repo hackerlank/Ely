@@ -76,11 +76,6 @@ bool Chaser::initialize()
 	mFixedRelativePosition = (
 			mTmpl->parameter(std::string("fixed_relative_position"))
 					== std::string("false") ? false : true);
-	//look at distance and height settings
-	mAbsLookAtDistance = (float) strtof(
-			mTmpl->parameter(std::string("abs_lookat_distance")).c_str(), NULL);
-	mAbsLookAtHeight = (float) strtof(
-			mTmpl->parameter(std::string("abs_lookat_height")).c_str(), NULL);
 	//max and min distance settings
 	mAbsMaxDistance = (float) strtof(
 			mTmpl->parameter(std::string("abs_max_distance")).c_str(), NULL);
@@ -92,15 +87,135 @@ bool Chaser::initialize()
 	mAbsMinHeight = (float) strtof(
 			mTmpl->parameter(std::string("abs_min_height")).c_str(), NULL);
 	//friction' settings
-	mFriction = (float) strtof(mTmpl->parameter(std::string("friction")).c_str(), NULL);
+	mFriction = (float) strtof(
+			mTmpl->parameter(std::string("friction")).c_str(), NULL);
 	//chased object id
-	mChasedId = ObjectId(
-			mTmpl->parameter(std::string("chased_object")));
+	mChasedId = ObjectId(mTmpl->parameter(std::string("chased_object")));
 	//reference object id
-	mReferenceId = ObjectId(
-			mTmpl->parameter(std::string("reference_object")));
+	mReferenceId = ObjectId(mTmpl->parameter(std::string("reference_object")));
+	//fixed look at
+	mFixedLookAt = (
+			mTmpl->parameter(std::string("fixed_lookat"))
+					== std::string("false") ? false : true);
+	//look at distance and height settings
+	mAbsLookAtDistance = (float) strtof(
+			mTmpl->parameter(std::string("abs_lookat_distance")).c_str(), NULL);
+	mAbsLookAtHeight = (float) strtof(
+			mTmpl->parameter(std::string("abs_lookat_height")).c_str(), NULL);
+	//mouse movement setting
+	mMouseEnabledH = (
+			mTmpl->parameter(std::string("mouse_enabled_h"))
+					== std::string("true") ? true : false);
+	mMouseEnabledP = (
+			mTmpl->parameter(std::string("mouse_enabled_p"))
+					== std::string("true") ? true : false);
+	//headLeft key
+	mHeadLeftKey = (
+			mTmpl->parameter(std::string("head_left"))
+					== std::string("enabled") ? true : false);
+	//headRight key
+	mHeadRightKey = (
+			mTmpl->parameter(std::string("head_right"))
+					== std::string("enabled") ? true : false);
+	//pitchUp key
+	mPitchUpKey = (
+			mTmpl->parameter(std::string("pitch_up"))
+					== std::string("enabled") ? true : false);
+	//pitchDown key
+	mPitchDownKey = (
+			mTmpl->parameter(std::string("pitch_down"))
+					== std::string("enabled") ? true : false);
+	//inverted setting
+	mSignOfMouse = (
+			mTmpl->parameter(std::string("inverted_rotation"))
+					== std::string("true") ? -1 : 1);
+	//set sensitivity parameters
+	mSensX = (float) strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+	NULL);
+	mRollSensX = mSensX * 375.0;
+	mSensY = (float) strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+	NULL);
+	mRollSensY = mSensY * 375.0;
 	//
 	return result;
+}
+
+void Chaser::onAddToObjectSetup()
+{
+	//set the (node path of) object chased by this component;
+	//that object is supposed to be already created,
+	//set up and added to the created objects table;
+	//if not, this component chases nothing.
+	SMARTPTR(Object)chasedObject =
+	ObjectTemplateManager::GetSingleton().getCreatedObject(
+			mChasedId);
+	if (chasedObject != NULL)
+	{
+		mChasedNodePath = chasedObject->getNodePath();
+
+		//set the (node path of) reference object;
+		//that object is supposed to be already created,
+		//set up and added to the created objects table;
+		//if not, this will be the parent of the chased object.
+		SMARTPTR(Object)referenceObject =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(
+				mReferenceId);
+		if (referenceObject != NULL)
+		{
+			mReferenceNodePath = referenceObject->getNodePath();
+		}
+		else
+		{
+			mReferenceNodePath = mChasedNodePath.get_parent();
+		}
+	}
+	//
+	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
+	mCentX = win->get_properties().get_x_size() / 2;
+	mCentY = win->get_properties().get_y_size() / 2;
+}
+
+void Chaser::onRemoveFromObjectCleanup()
+{
+	//see disable
+	if (mEnabled and (not mFixedLookAt) and (mMouseEnabledH or mMouseEnabledP))
+	{
+		//we have control through mouse movements
+		//show mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(false);
+		SMARTPTR(GraphicsWindow)win =
+		mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+	}
+	//
+	reset();
+}
+
+void Chaser::onAddToSceneSetup()
+{
+	//if chased node path is empty return
+	RETURN_ON_COND(mChasedNodePath.is_empty(),)
+
+	//enable the component (if requested)
+	if (mStartEnabled)
+	{
+		doEnable();
+		//when enabled set chaser initial position/orientation
+		mOwnerObject->getNodePath().set_pos(mChasedNodePath, mChaserPosition);
+		mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
+				LVector3::up());
+	}
+	else
+	{
+		unregisterEventCallbacks();
+	}
+}
+
+void Chaser::onRemoveFromSceneCleanup()
+{
+	//remove from control manager update
+	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 }
 
 Chaser::Result Chaser::enable()
@@ -159,6 +274,19 @@ void Chaser::doEnable()
 	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign,
 			mAbsLookAtHeight);
 	//
+	if ((not mFixedLookAt) and (mMouseEnabledH or mMouseEnabledP))
+	{
+		//we want control through mouse movements
+		//hide mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(true);
+		SMARTPTR(GraphicsWindow)win =
+		mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+		//reset mouse to start position
+		win->move_pointer(0, mCentX, mCentY);
+	}
+	//
 	mEnabled = true;
 	//register event callbacks if any
 	registerEventCallbacks();
@@ -206,75 +334,25 @@ void Chaser::doDisable()
 {
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
+
+	if ((not mFixedLookAt) and (mMouseEnabledH or mMouseEnabledP))
+	{
+		//we have control through mouse movements
+		//show mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(false);
+		SMARTPTR(GraphicsWindow)win =
+		mTmpl->windowFramework()->get_graphics_window();
+		win->request_properties(props);
+	}
 	//
 #ifdef ELY_THREAD
-		mDisabling = false;
+	mDisabling = false;
 #endif
+	//
 	mEnabled = false;
 }
 
-void Chaser::onAddToObjectSetup()
-{
-	//set the (node path of) object chased by this component;
-	//that object is supposed to be already created,
-	//set up and added to the created objects table;
-	//if not, this component chases nothing.
-	SMARTPTR(Object)chasedObject =
-	ObjectTemplateManager::GetSingleton().getCreatedObject(
-			mChasedId);
-	if (chasedObject != NULL)
-	{
-		mChasedNodePath = chasedObject->getNodePath();
-
-		//set the (node path of) reference object;
-		//that object is supposed to be already created,
-		//set up and added to the created objects table;
-		//if not, this will be the parent of the chased object.
-		SMARTPTR(Object)referenceObject =
-		ObjectTemplateManager::GetSingleton().getCreatedObject(
-				mReferenceId);
-		if (referenceObject != NULL)
-		{
-			mReferenceNodePath = referenceObject->getNodePath();
-		}
-		else
-		{
-			mReferenceNodePath = mChasedNodePath.get_parent();
-		}
-	}
-}
-
-void Chaser::onRemoveFromObjectCleanup()
-{
-	//
-	reset();
-}
-
-void Chaser::onAddToSceneSetup()
-{
-	//if chased node path is empty return
-	RETURN_ON_COND(mChasedNodePath.is_empty(),)
-
-	//enable the component (if requested)
-	if (mStartEnabled)
-	{
-		doEnable();
-		//when enabled set chaser initial position/orientation
-		mOwnerObject->getNodePath().set_pos(mChasedNodePath, mChaserPosition);
-		mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
-				LVector3::up());
-	}
-	else
-	{
-		unregisterEventCallbacks();
-	}
-}
-
-void Chaser::onRemoveFromSceneCleanup()
-{
-	//remove from control manager update
-	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
-}
 
 void Chaser::update(void* data)
 {
@@ -332,8 +410,67 @@ void Chaser::update(void* data)
 	//
 	mOwnerObject->getNodePath().set_pos(mReferenceNodePath, newPos);
 	//orientation
-	mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
-			LVector3::up());
+	if (mFixedLookAt)
+	{
+		//look at fixed location
+		mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
+				LVector3::up());
+	}
+	else
+	{
+		//adjust look at with mouse and/or events
+		//handle mouse
+		if (mMouseEnabledH or mMouseEnabledP)
+		{
+			GraphicsWindow* win =
+					mTmpl->windowFramework()->get_graphics_window();
+			MouseData md = win->get_pointer(0);
+			float x = md.get_x();
+			float y = md.get_y();
+
+			if (win->move_pointer(0, mCentX, mCentY))
+			{
+				if (mMouseEnabledH)
+				{
+					mOwnerObject->getNodePath().set_h(
+							mOwnerObject->getNodePath().get_h()
+									- (x - mCentX) * mSensX * mSignOfMouse);
+				}
+				if (mMouseEnabledP)
+				{
+					mOwnerObject->getNodePath().set_p(
+							mOwnerObject->getNodePath().get_p()
+									- (y - mCentY) * mSensY * mSignOfMouse);
+				}
+			}
+		}
+
+		//handle keys:
+		if (mHeadLeft)
+		{
+			mOwnerObject->getNodePath().set_h(
+					mOwnerObject->getNodePath().get_h()
+							+ mRollSensX * dt * mSignOfMouse);
+		}
+		if (mHeadRight)
+		{
+			mOwnerObject->getNodePath().set_h(
+					mOwnerObject->getNodePath().get_h()
+							- mRollSensX * dt * mSignOfMouse);
+		}
+		if (mPitchUp)
+		{
+			mOwnerObject->getNodePath().set_p(
+					mOwnerObject->getNodePath().get_p()
+							+ mRollSensY * dt * mSignOfMouse);
+		}
+		if (mPitchDown)
+		{
+			mOwnerObject->getNodePath().set_p(
+					mOwnerObject->getNodePath().get_p()
+							- mRollSensY * dt * mSignOfMouse);
+		}
+	}
 }
 
 LPoint3f Chaser::doGetChaserPos(LPoint3f desiredChaserPos,

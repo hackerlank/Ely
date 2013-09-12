@@ -251,11 +251,6 @@ Driver::Result Driver::enable()
 
 void Driver::doEnable()
 {
-#ifdef ELY_THREAD
-	//initialize the current transform
-	mActualTransform = mOwnerObject->getNodePath().get_transform();
-#endif
-
 	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
 	{
 		//we want control through mouse movements
@@ -345,10 +340,6 @@ void Driver::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-#ifdef ELY_THREAD
-	float newX = 0, newY = 0, newZ = 0;
-	float newH = 0, newP = 0, newR = 0;
-#endif
 	//handle mouse
 	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
 	{
@@ -361,23 +352,15 @@ void Driver::update(void* data)
 		{
 			if (mMouseEnabledH)
 			{
-#ifdef ELY_THREAD
-				newH -= (x - mCentX) * mSensX * mSignOfMouse;
-#else
 				ownerNodePath.set_h(
 						ownerNodePath.get_h()
 						- (x - mCentX) * mSensX * mSignOfMouse);
-#endif
 			}
 			if (mMouseEnabledP)
 			{
-#ifdef ELY_THREAD
-				newP -= (y - mCentY) * mSensY * mSignOfMouse;
-#else
 				ownerNodePath.set_p(
 						ownerNodePath.get_p()
 						- (y - mCentY) * mSensY * mSignOfMouse);
-#endif
 			}
 		}
 		//if mMouseMoveKey is true we are controlling mouse movements
@@ -388,22 +371,6 @@ void Driver::update(void* data)
 		}
 	}
 	//update position/orientation
-#ifdef ELY_THREAD
-	newY += mActualSpeedXYZ.get_y() * dt * mSignOfTranslation;
-	newX += mActualSpeedXYZ.get_x() * dt * mSignOfTranslation;
-	newZ += mActualSpeedXYZ.get_z() * dt;
-	newH += mActualSpeedH * dt * mSignOfMouse;
-	newH += mActualTransform->get_hpr().get_x();
-	newP += mActualTransform->get_hpr().get_y();
-	newR += mActualTransform->get_hpr().get_z();
-	//make transform
-	CSMARTPTR(TransformState)newTransform = mActualTransform->compose(
-			TransformState::make_identity()->set_pos(
-					LVecBase3(newX, newY, newZ)))->set_hpr(
-			LVecBase3(newH, newP, newR)).p();
-	ownerNodePath.set_transform(newTransform);
-	mActualTransform = newTransform;
-#else
 	ownerNodePath.set_y(ownerNodePath,
 			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
 	ownerNodePath.set_x(ownerNodePath,
@@ -412,12 +379,9 @@ void Driver::update(void* data)
 			mActualSpeedXYZ.get_z() * dt);
 	ownerNodePath.set_h(ownerNodePath.get_h()
 			+ mActualSpeedH * dt * mSignOfMouse);
-#endif
 
 	//update speeds
-	bool moveOn = false;
 	LVector3f signedAccelXYZ = LVector3f::zero();
-	float signedAccelH = 0.0;
 	//y axis
 	if (mForward)
 	{

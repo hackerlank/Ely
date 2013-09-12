@@ -13,8 +13,9 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
 <!--
+			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
+-->
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -26,7 +27,6 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
--->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -145,6 +145,7 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
+<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
@@ -155,11 +156,14 @@
 				<Param abs_min_distance="20.0"/>
 				<Param abs_max_height="20.0"/>
 				<Param abs_min_height="10.0"/>
+				<Param friction="5.0"/>
+				<Param fixed_lookat="true"/>
+				<Param mouse_enabled_h="true"/>
+				<Param mouse_enabled_p="true"/>
 				<Param abs_lookat_distance="10.0"/>
 				<Param abs_lookat_height="4.0"/>
-				<Param friction="5.0"/>
 			</Component>
-<!--
+-->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param max_linear_speed="40.0"/>
@@ -188,7 +192,6 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
 			</Component>
--->
 			<Param parent=""/>
 			<Param is_steady="false"/>		
 			<Param pos="-35.0,-94.0,96.0"/>

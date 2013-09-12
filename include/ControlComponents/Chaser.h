@@ -48,9 +48,19 @@ class ChaserTemplate;
  * - "abs_min_distance"			|single|no default
  * - "abs_max_height"			|single|no default
  * - "abs_min_height"			|single|no default
+ * - "friction"					|single|"1.0"
+ * - "fixed_lookat"				|single|"true"
  * - "abs_lookat_distance"		|single|no default
  * - "abs_lookat_height"		|single|no default
- * - "friction"					|single|"1.0"
+ * - "mouse_enabled_h"  		|single|"false"
+ * - "mouse_enabled_p"  		|single|"false"
+ * - "head_left"  				|single|"enabled"
+ * - "head_right"  				|single|"enabled"
+ * - "pitch_up"  				|single|"enabled"
+ * - "pitch_down"  				|single|"enabled"
+ * - "sens_x"  					|single|"0.2"
+ * - "sens_y"  					|single|"0.2"
+ * - "inverted_rotation"		|single|"false"
  */
 class Chaser: public Component
 {
@@ -110,14 +120,32 @@ public:
 	 * \name Getting/setting parameters.
 	 */
 	///@{
-	float getAbsLookAtDistance() const;
-	void setAbsLookAtDistance(float absLookAtDistance);
+	float getMaxDistance() const;
+	void setMaxDistance(float absMaxDistance);
 	float getAbsMinDistance() const;
 	void setAbsMinDistance(float absMinDistance);
+	float getAbsMaxHeight() const;
+	void setAbsMaxHeight(float absMaxHeight);
 	float getAbsMinHeight() const;
 	void setAbsMinHeight(float absMinHeight);
-	float getDistance() const;
-	void setDistance(float distance);
+	float getAbsLookAtDistance() const;
+	void setAbsLookAtDistance(float absLookAtDistance);
+	float getAbsLookAtHeight() const;
+	void setAbsLookAtHeight(float absLookAtHeight);
+	///@}
+
+	/**
+	 * \name Control keys' getters/setters.
+	 */
+	///@{
+	void enableHeadLeft(bool enable);
+	bool isHeadLeftEnabled();
+	void enableHeadRight(bool enable);
+	bool isHeadRightEnabled();
+	void enablePitchUp(bool enable);
+	bool isPitchUpEnabled();
+	void enablePitchDown(bool enable);
+	bool isPitchDownEnabled();
 	///@}
 
 private:
@@ -126,11 +154,11 @@ private:
 	///The reference object's node path.
 	NodePath mReferenceNodePath;
 	///Flags.
-	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward;
+	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward,
+	mFixedLookAt;
 #ifdef ELY_THREAD
 	bool mDisabling;
 #endif
-
 	/**
 	 * \name Actual enabling/disabling.
 	 */
@@ -138,7 +166,6 @@ private:
 	void doEnable();
 	void doDisable();
 	///@}
-
 	/**
 	 * \name Main parameters.
 	 */
@@ -153,6 +180,22 @@ private:
 	mAbsMinHeight, mAbsMaxHeight, mFriction;
 	///Positions.
 	LPoint3f mChaserPosition, mLookAtPosition;
+	///@{
+	///Key controls and effective keys.
+	bool mHeadLeft, mHeadRight, mPitchUp, mPitchDown;
+	bool mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey;
+	///@}
+	///@{
+	///Key control values.
+	bool mMouseEnabledH,	mMouseEnabledP;
+	int mSignOfMouse;
+	///@}
+	///@{
+	/// Sensitivity settings.
+	float mSensX, mSensY, mRollSensX, mRollSensY;
+	int mCentX, mCentY;
+	///@}
+
 	/**
 	 * \brief Calculates the dynamic position of the chaser.
 	 * \see OgreBulletDemos.
@@ -203,6 +246,7 @@ inline void Chaser::reset()
 	mChasedNodePath = NodePath();
 	mReferenceNodePath = NodePath();
 	mStartEnabled = mEnabled = mFixedRelativePosition = mBackward = false;
+	mFixedLookAt = true;
 #ifdef ELY_THREAD
 	mDisabling = false;
 #endif
@@ -212,6 +256,12 @@ inline void Chaser::reset()
 	mAbsMaxDistance = mAbsMaxHeight = FLT_MAX;
 	mAbsMinDistance = mAbsMinHeight = FLT_MIN;
 	mChaserPosition = mLookAtPosition = LPoint3f::zero();
+	mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey = false;
+	mHeadLeft = mHeadRight = mPitchUp = mPitchDown = mMouseEnabledH =
+			mMouseEnabledP = false;
+	mSignOfMouse = 1;
+	mSensX = mSensY = 0.0;
+	mCentX = mCentY = 0.0;
 }
 
 inline bool Chaser::isEnabled()
@@ -222,20 +272,20 @@ inline bool Chaser::isEnabled()
 	return mEnabled;
 }
 
-inline float Chaser::getAbsLookAtDistance() const
+inline float Chaser::getMaxDistance() const
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	return mAbsLookAtDistance;
+	return mAbsMaxDistance;
 }
 
-inline void Chaser::setAbsLookAtDistance(float absLookAtDistance)
+inline void Chaser::setMaxDistance(float absMaxDistance)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	mAbsLookAtDistance = absLookAtDistance;
+	mAbsMaxDistance = absMaxDistance;
 }
 
 inline float Chaser::getAbsMinDistance() const
@@ -254,6 +304,22 @@ inline void Chaser::setAbsMinDistance(float absMinDistance)
 	mAbsMinDistance = absMinDistance;
 }
 
+inline float Chaser::getAbsMaxHeight() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mAbsMaxHeight;
+}
+
+inline void Chaser::setAbsMaxHeight(float absMaxHeight)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mAbsMaxHeight = absMaxHeight;
+}
+
 inline float Chaser::getAbsMinHeight() const
 {
 	//lock (guard) the mutex
@@ -270,20 +336,112 @@ inline void Chaser::setAbsMinHeight(float absMinHeight)
 	mAbsMinHeight = absMinHeight;
 }
 
-inline float Chaser::getDistance() const
+inline float Chaser::getAbsLookAtDistance() const
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	return mAbsMaxDistance;
+	return mAbsLookAtDistance;
 }
 
-inline void Chaser::setDistance(float distance)
+inline void Chaser::setAbsLookAtDistance(float absLookAtDistance)
 {
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	mAbsMaxDistance = distance;
+	mAbsLookAtDistance = absLookAtDistance;
+}
+
+inline float Chaser::getAbsLookAtHeight() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mAbsLookAtHeight;
+}
+
+inline void Chaser::setAbsLookAtHeight(float absLookAtHeight)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mAbsLookAtHeight = absLookAtHeight;
+}
+
+inline void Chaser::enableHeadLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	if (mHeadLeftKey)
+	{
+		mHeadLeft = enable;
+	}
+}
+
+inline bool Chaser::isHeadLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mHeadLeft;
+}
+
+inline void Chaser::enableHeadRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	if (mHeadRightKey)
+	{
+		mHeadRight = enable;
+	}
+}
+
+inline bool Chaser::isHeadRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mHeadRight;
+}
+
+inline void Chaser::enablePitchUp(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	if (mPitchUpKey)
+	{
+		mPitchUp = enable;
+	}
+}
+
+inline bool Chaser::isPitchUpEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mPitchUp;
+}
+
+inline void Chaser::enablePitchDown(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	if (mPitchDownKey)
+	{
+		mPitchDown = enable;
+	}
+}
+
+inline bool Chaser::isPitchDownEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mPitchDown;
 }
 
 }  // namespace ely

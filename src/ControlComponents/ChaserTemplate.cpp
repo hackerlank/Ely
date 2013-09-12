@@ -80,6 +80,16 @@ void ChaserTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("backward", "true"));
 	mParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
 	mParameterTable.insert(ParameterNameValue("friction", "1.0"));
+	mParameterTable.insert(ParameterNameValue("fixed_lookat", "true"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
+	mParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+	mParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+	mParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+	mParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
 }
 
 //TypedObject semantics: hardcoded

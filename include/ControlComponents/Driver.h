@@ -219,8 +219,6 @@ private:
 	///@}
 #ifdef ELY_THREAD
 	bool mDisabling;
-	///Actual transform state.
-	CSMARTPTR(TransformState) mActualTransform;
 #endif
 
 	/**
@@ -287,7 +285,6 @@ inline void Driver::reset()
 	mCentX = mCentY = 0.0;
 #ifdef ELY_THREAD
 	mDisabling = false;
-	mActualTransform = TransformState::make_identity().p();
 #endif
 }
 
