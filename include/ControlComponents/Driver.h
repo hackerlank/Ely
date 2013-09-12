@@ -219,6 +219,8 @@ private:
 	///@}
 #ifdef ELY_THREAD
 	bool mDisabling;
+	///Actual transform state.
+	CSMARTPTR(TransformState) mActualTransform;
 #endif
 
 	/**
@@ -228,11 +230,6 @@ private:
 	void doEnable();
 	void doDisable();
 	///@}
-
-#ifdef ELY_THREAD
-	///Actual transform state.
-	CSMARTPTR(TransformState) mActualTransform;
-#endif
 
 	///TypedObject semantics: hardcoded
 public:
