@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/driverCamera.cpp
+ * \file /Ely/callbacks/controlCamera.cpp
  *
  * \date 26/nov/2012 (11:04:25)
  * \author consultit
@@ -23,6 +23,7 @@
 
 #include "../common_configs.h"
 #include "ControlComponents/Driver.h"
+#include "ControlComponents/Chaser.h"
 
 using namespace ely;
 
@@ -60,11 +61,23 @@ CALLBACK down_Driver_Camera;
 CALLBACK stop_down_Driver_Camera;
 CALLBACK fast_down_Driver_Camera;
 
+///Camera + Chaser related
+CALLBACK head_left_Chaser_Camera;
+CALLBACK stop_head_left_Chaser_Camera;
+CALLBACK head_right_Chaser_Camera;
+CALLBACK stop_head_right_Chaser_Camera;
+CALLBACK pitch_up_Chaser_Camera;
+CALLBACK stop_pitch_up_Chaser_Camera;
+CALLBACK pitch_down_Chaser_Camera;
+CALLBACK stop_pitch_down_Chaser_Camera;
+CALLBACK hold_lookat_Chaser_Camera;
+CALLBACK stop_hold_lookat_Chaser_Camera;
+
 #ifdef __cplusplus
 }
 #endif
 
-///Camera + Driver related CALLBACKNAMEs & CALLBACKs
+///Camera + Driver related CALLBACKs
 //fast:stop-fast
 namespace
 {
@@ -267,11 +280,83 @@ void fast_down_Driver_Camera(const Event* event, void* data)
 	down_Driver_Camera(event, data);
 }
 
+///Camera + Chaser related
+void head_left_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enableHeadLeft(true);
+}
+void stop_head_left_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enableHeadLeft(false);
+}
+void head_right_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enableHeadRight(true);
+}
+void stop_head_right_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enableHeadRight(false);
+}
+void pitch_up_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enablePitchUp(true);
+}
+void stop_pitch_up_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enablePitchUp(false);
+}
+void pitch_down_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enablePitchDown(true);
+}
+void stop_pitch_down_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->enablePitchDown(false);
+}
+void hold_lookat_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->holdLookAt(true);
+}
+void stop_hold_lookat_Chaser_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
+
+	cameraChs->holdLookAt(false);
+}
+
 ///Init/end functions: see common_configs.cpp
-void driverCameraInit()
+void controlCameraInit()
 {
 }
-void driverCameraEnd()
+void controlCameraEnd()
 {
 }
 

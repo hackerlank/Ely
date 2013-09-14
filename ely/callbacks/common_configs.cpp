@@ -58,19 +58,19 @@ extern void activityCharacterInit();
 extern void activityCharacterEnd();
 extern void activityActorInit();
 extern void activityActorEnd();
-extern void driverCameraInit();
-extern void driverCameraEnd();
+extern void controlCameraInit();
+extern void controlCameraEnd();
 
 ///Call all init/end functions
 void callAllInits()
 {
 	activityCharacterInit();
 	activityActorInit();
-	driverCameraInit();
+	controlCameraInit();
 }
 void callAllEnds()
 {
 	activityCharacterEnd();
 	activityActorEnd();
-	driverCameraEnd();
+	controlCameraEnd();
 }

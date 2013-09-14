@@ -418,57 +418,77 @@ void Chaser::update(void* data)
 	}
 	else
 	{
-		//adjust look at with mouse and/or events
+		//adjust look at with mouse and/or key events
 		//handle mouse
+		float deltaH = 0.0, deltaP = 0.0, deltaR = 0.0;
+		bool wantRotate = false;
 		if (mMouseEnabledH or mMouseEnabledP)
 		{
 			GraphicsWindow* win =
 					mTmpl->windowFramework()->get_graphics_window();
 			MouseData md = win->get_pointer(0);
-			float x = md.get_x();
-			float y = md.get_y();
+			float deltaX = md.get_x() - mCentX;
+			float deltaY = md.get_y() - mCentY;
 
 			if (win->move_pointer(0, mCentX, mCentY))
 			{
-				if (mMouseEnabledH)
+				if (mMouseEnabledH and (deltaX != 0.0))
 				{
-					mOwnerObject->getNodePath().set_h(
-							mOwnerObject->getNodePath().get_h()
-									- (x - mCentX) * mSensX * mSignOfMouse);
+					deltaH -= deltaX * mSensX * mSignOfMouse;
+					wantRotate = true;
 				}
-				if (mMouseEnabledP)
+				if (mMouseEnabledP and (deltaY != 0.0))
 				{
-					mOwnerObject->getNodePath().set_p(
-							mOwnerObject->getNodePath().get_p()
-									- (y - mCentY) * mSensY * mSignOfMouse);
+					deltaP -= deltaY * mSensY * mSignOfMouse;
+					wantRotate = true;
 				}
 			}
 		}
 
 		//handle keys:
-		if (mHeadLeft)
+		if (mHeadLeft and (not mHeadRight))
 		{
-			mOwnerObject->getNodePath().set_h(
-					mOwnerObject->getNodePath().get_h()
-							+ mRollSensX * dt * mSignOfMouse);
+			deltaH += mRollSensX * dt * mSignOfMouse;
+			wantRotate = true;
 		}
-		if (mHeadRight)
+		else if (mHeadRight and (not mHeadLeft))
 		{
-			mOwnerObject->getNodePath().set_h(
-					mOwnerObject->getNodePath().get_h()
-							- mRollSensX * dt * mSignOfMouse);
+			deltaH -= mRollSensX * dt * mSignOfMouse;
+			wantRotate = true;
 		}
-		if (mPitchUp)
+		if (mPitchUp and (not mPitchDown))
 		{
-			mOwnerObject->getNodePath().set_p(
-					mOwnerObject->getNodePath().get_p()
-							+ mRollSensY * dt * mSignOfMouse);
+			deltaP += mRollSensY * dt * mSignOfMouse;
+			wantRotate = true;
 		}
-		if (mPitchDown)
+		else if (mPitchDown and (not mPitchUp))
 		{
-			mOwnerObject->getNodePath().set_p(
-					mOwnerObject->getNodePath().get_p()
-							- mRollSensY * dt * mSignOfMouse);
+			deltaP -= mRollSensY * dt * mSignOfMouse;
+			wantRotate = true;
+		}
+
+		//update look at
+		if (wantRotate)
+		{
+			//want rotate: update to desired look up
+			mOwnerObject->getNodePath().set_hpr(
+					mOwnerObject->getNodePath().get_hpr()
+							+ LVecBase3f(deltaH, deltaP, deltaR));
+		}
+		else if (not mHoldLookAt)
+		{
+			//don't want rotate: return to look up to fixed location
+			LVecBase3f currentHPR = mOwnerObject->getNodePath().get_hpr();
+			mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
+					LVector3::up());
+			LVecBase3f targetHPR = mOwnerObject->getNodePath().get_hpr();
+			LVecBase3f deltaHPR = currentHPR - targetHPR;
+			float kReductFactor = mFriction * dt;
+			if (deltaHPR.length_squared() > 0.0)
+			{
+				deltaHPR -= deltaHPR * kReductFactor;
+			}
+			mOwnerObject->getNodePath().set_hpr(targetHPR + deltaHPR);
 		}
 	}
 }

@@ -6,6 +6,6 @@ callbacks_la_SOURCES = \
 		common_configs.cpp common_configs.h \
 		defs/activityActor.cpp \
 		defs/activityCharacter.cpp \
-		defs/driverCamera.cpp
+		defs/controlCamera.cpp
 
 callbacks_la_LDFLAGS = -module -avoid-version

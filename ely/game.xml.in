@@ -13,9 +13,14 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
+			<ComponentTmpl family="Control" type="Chaser" priority="60">
+				<Param event_types="head_left:stop-head_left"/>
+				<Param event_types="head_right:stop-head_right"/>
+				<Param event_types="pitch_up:stop-pitch_up"/>
+				<Param event_types="pitch_down:stop-pitch_down"/>
+				<Param event_types="hold_lookat:stop-hold_lookat"/>
+			</ComponentTmpl>
 <!--
-			<ComponentTmpl family="Control" type="Chaser" priority="60"/>
--->
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -27,6 +32,7 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -145,7 +151,6 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
-<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
@@ -157,13 +162,18 @@
 				<Param abs_max_height="20.0"/>
 				<Param abs_min_height="10.0"/>
 				<Param friction="5.0"/>
-				<Param fixed_lookat="true"/>
+				<Param fixed_lookat="false"/>
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
 				<Param abs_lookat_distance="10.0"/>
 				<Param abs_lookat_height="4.0"/>
+				<Param events="head_left@a:stop-head_left@a-up$"/>
+				<Param events="head_right@d:stop-head_right@d-up$"/>
+				<Param events="pitch_up@w:stop-pitch_up@w-up$"/>
+				<Param events="pitch_down@s:stop-pitch_down@s-up$"/>
+				<Param events="hold_lookat@shift:stop-hold_lookat@shift-up$"/>
 			</Component>
--->
+<!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param max_linear_speed="40.0"/>
@@ -192,6 +202,7 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
 			</Component>
+-->
 			<Param parent=""/>
 			<Param is_steady="false"/>		
 			<Param pos="-35.0,-94.0,96.0"/>
@@ -346,7 +357,7 @@
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
 				<Param linear_speed="5.0"/>
-				<Param jump_speed="6.0"/>
+				<Param jump_speed="10.0"/>
 			</Component> 
 			<Component type="Sound3d">
 				<Param sound_files="walk-sound@GUI_click.wav"/>

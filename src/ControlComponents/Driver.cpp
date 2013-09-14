@@ -345,22 +345,22 @@ void Driver::update(void* data)
 	{
 		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
 		MouseData md = win->get_pointer(0);
-		float x = md.get_x();
-		float y = md.get_y();
+		float deltaX = md.get_x() - mCentX;
+		float deltaY = md.get_y() - mCentY;
 
 		if (win->move_pointer(0, mCentX, mCentY))
 		{
-			if (mMouseEnabledH)
+			if (mMouseEnabledH and (deltaX != 0.0))
 			{
 				ownerNodePath.set_h(
 						ownerNodePath.get_h()
-						- (x - mCentX) * mSensX * mSignOfMouse);
+						- deltaX * mSensX * mSignOfMouse);
 			}
-			if (mMouseEnabledP)
+			if (mMouseEnabledP and (deltaY != 0.0))
 			{
 				ownerNodePath.set_p(
 						ownerNodePath.get_p()
-						- (y - mCentY) * mSensY * mSignOfMouse);
+						- deltaY * mSensY * mSignOfMouse);
 			}
 		}
 		//if mMouseMoveKey is true we are controlling mouse movements
@@ -381,9 +381,8 @@ void Driver::update(void* data)
 			+ mActualSpeedH * dt * mSignOfMouse);
 
 	//update speeds
-	LVector3f signedAccelXYZ = LVector3f::zero();
 	//y axis
-	if (mForward)
+	if (mForward and (not mBackward))
 	{
 		if(mAccelXYZ.get_y() != 0)
 		{
@@ -402,7 +401,7 @@ void Driver::update(void* data)
 			mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
 		}
 	}
-	else if (mBackward)
+	else if (mBackward and (not mForward))
 	{
 		if(mAccelXYZ.get_y() != 0)
 		{
@@ -437,7 +436,7 @@ void Driver::update(void* data)
 		}
 	}
 	//x axis
-	if (mStrafeLeft)
+	if (mStrafeLeft and (not mStrafeRight))
 	{
 		if(mAccelXYZ.get_x() != 0)
 		{
@@ -456,7 +455,7 @@ void Driver::update(void* data)
 			mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
 		}
 	}
-	else if (mStrafeRight)
+	else if (mStrafeRight and (not mStrafeLeft))
 	{
 		if(mAccelXYZ.get_x() != 0)
 		{
@@ -491,7 +490,7 @@ void Driver::update(void* data)
 		}
 	}
 	//z axis
-	if (mUp)
+	if (mUp and (not mDown))
 	{
 		if(mAccelXYZ.get_z() != 0)
 		{
@@ -510,7 +509,7 @@ void Driver::update(void* data)
 			mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
 		}
 	}
-	else if (mDown)
+	else if (mDown and (not mUp))
 	{
 		if(mAccelXYZ.get_z() != 0)
 		{
@@ -545,7 +544,7 @@ void Driver::update(void* data)
 		}
 	}
 	//rotation
-	if (mRollLeft)
+	if (mRollLeft and (not mRollRight))
 	{
 		if(mAccelH != 0)
 		{
@@ -563,7 +562,7 @@ void Driver::update(void* data)
 			mActualSpeedH = mMaxSpeedH;
 		}
 	}
-	else if (mRollRight)
+	else if (mRollRight and (not mRollLeft))
 	{
 		if(mAccelH != 0)
 		{

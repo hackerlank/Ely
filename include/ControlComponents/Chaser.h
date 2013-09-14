@@ -132,6 +132,8 @@ public:
 	void setAbsLookAtDistance(float absLookAtDistance);
 	float getAbsLookAtHeight() const;
 	void setAbsLookAtHeight(float absLookAtHeight);
+	void setFriction(float friction);
+	float getFriction() const;
 	///@}
 
 	/**
@@ -146,6 +148,7 @@ public:
 	bool isPitchUpEnabled();
 	void enablePitchDown(bool enable);
 	bool isPitchDownEnabled();
+	void holdLookAt(bool enable);
 	///@}
 
 private:
@@ -155,7 +158,7 @@ private:
 	NodePath mReferenceNodePath;
 	///Flags.
 	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward,
-	mFixedLookAt;
+	mFixedLookAt, mHoldLookAt;
 #ifdef ELY_THREAD
 	bool mDisabling;
 #endif
@@ -245,7 +248,8 @@ inline void Chaser::reset()
 	//
 	mChasedNodePath = NodePath();
 	mReferenceNodePath = NodePath();
-	mStartEnabled = mEnabled = mFixedRelativePosition = mBackward = false;
+	mStartEnabled = mEnabled = mFixedRelativePosition = mBackward =
+			mHoldLookAt = false;
 	mFixedLookAt = true;
 #ifdef ELY_THREAD
 	mDisabling = false;
@@ -368,6 +372,22 @@ inline void Chaser::setAbsLookAtHeight(float absLookAtHeight)
 	mAbsLookAtHeight = absLookAtHeight;
 }
 
+inline void Chaser::setFriction(float friction)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mFriction = friction;
+}
+
+inline float Chaser::getFriction() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mFriction;
+}
+
 inline void Chaser::enableHeadLeft(bool enable)
 {
 	//lock (guard) the mutex
@@ -442,6 +462,14 @@ inline bool Chaser::isPitchDownEnabled()
 	HOLD_MUTEX(mMutex)
 
 	return mPitchDown;
+}
+
+inline void Chaser::holdLookAt(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mHoldLookAt = enable;
 }
 
 }  // namespace ely
