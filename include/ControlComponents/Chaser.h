@@ -156,6 +156,8 @@ private:
 	NodePath mChasedNodePath;
 	///The reference object's node path.
 	NodePath mReferenceNodePath;
+	///Auxiliary node path to track the fixed look at.
+	NodePath mFixedLookAtNodePath;
 	///Flags.
 	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward,
 	mFixedLookAt, mHoldLookAt;
@@ -248,6 +250,7 @@ inline void Chaser::reset()
 	//
 	mChasedNodePath = NodePath();
 	mReferenceNodePath = NodePath();
+	mFixedLookAtNodePath = NodePath();
 	mStartEnabled = mEnabled = mFixedRelativePosition = mBackward =
 			mHoldLookAt = false;
 	mFixedLookAt = true;

@@ -45,7 +45,7 @@ const float TIMETHRESHOLD = 3.0; //seconds
 ///player custom update
 void playerUpdate(float dt, Activity& activity)
 {
-	PRINT_DEBUG(static_cast<fsm&>(activity).getCurrentOrNextState());
+//	PRINT_DEBUG(static_cast<fsm&>(activity).getCurrentOrNextState());
 
 //	fsm& playerFSM = (fsm&) activity;
 //	std::string currentState;

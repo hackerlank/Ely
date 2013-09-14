@@ -287,6 +287,9 @@ void Chaser::doEnable()
 		win->move_pointer(0, mCentX, mCentY);
 	}
 	//
+	mFixedLookAtNodePath = mOwnerObject->getNodePath().get_parent().attach_new_node(
+			"fixedLookAtNP");
+	//
 	mEnabled = true;
 	//register event callbacks if any
 	registerEventCallbacks();
@@ -335,6 +338,9 @@ void Chaser::doDisable()
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
 
+	//
+	mFixedLookAtNodePath.remove_node();
+	//
 	if ((not mFixedLookAt) and (mMouseEnabledH or mMouseEnabledP))
 	{
 		//we have control through mouse movements
@@ -478,17 +484,16 @@ void Chaser::update(void* data)
 		else if (not mHoldLookAt)
 		{
 			//don't want rotate: return to look up to fixed location
-			LVecBase3f currentHPR = mOwnerObject->getNodePath().get_hpr();
-			mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
+			mFixedLookAtNodePath.set_pos(mOwnerObject->getNodePath().get_pos());
+			mFixedLookAtNodePath.look_at(mChasedNodePath, mLookAtPosition,
 					LVector3::up());
-			LVecBase3f targetHPR = mOwnerObject->getNodePath().get_hpr();
-			LVecBase3f deltaHPR = currentHPR - targetHPR;
+			LVecBase3f deltaHPR = mOwnerObject->getNodePath().get_hpr(mFixedLookAtNodePath);
 			float kReductFactor = mFriction * dt;
 			if (deltaHPR.length_squared() > 0.0)
 			{
 				deltaHPR -= deltaHPR * kReductFactor;
 			}
-			mOwnerObject->getNodePath().set_hpr(targetHPR + deltaHPR);
+			mOwnerObject->getNodePath().set_hpr(mFixedLookAtNodePath, deltaHPR);
 		}
 	}
 }
