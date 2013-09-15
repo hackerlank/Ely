@@ -15,35 +15,26 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/game/GameManagers_test.cpp
+ * \file /Ely/include/PhysicsComponents/VehicleTemplate.h
  *
- * \date 29/lug/2012 (10:43:00)
+ * \date 15/set/2013 (10:45:28)
  * \author consultit
  */
 
-#include "GameSuiteFixture.h"
+#ifndef VEHICLETEMPLATE_H_
+#define VEHICLETEMPLATE_H_
 
-struct GameManagersTestCaseFixture
+#include "ComponentTemplate.h"
+
+namespace ely
 {
-	GameManagersTestCaseFixture()
-	{
-		// TODO
-	}
 
-	~GameManagersTestCaseFixture()
-	{
-		// TODO
-	}
+class VehicleTemplate: public ely::ComponentTemplate
+{
+public:
+	VehicleTemplate();
+	virtual ~VehicleTemplate();
 };
 
-/// Game suite
-BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
-
-/// Test cases
-BOOST_AUTO_TEST_CASE(GameManagersTEST)
-{
-	BOOST_TEST_MESSAGE("TESTING");
-	BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END() // Game suite
+} /* namespace ely */
+#endif /* VEHICLETEMPLATE_H_ */

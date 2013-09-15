@@ -15,35 +15,26 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/game/GameManagers_test.cpp
+ * \file /Ely/src/PhysicsComponents/Vehicle.cpp
  *
- * \date 29/lug/2012 (10:43:00)
+ * \date 15/set/2013 (10:40:11)
  * \author consultit
  */
 
-#include "GameSuiteFixture.h"
+#include "../../include/PhysicsComponents/Vehicle.h"
 
-struct GameManagersTestCaseFixture
+namespace ely
 {
-	GameManagersTestCaseFixture()
-	{
-		// TODO
-	}
 
-	~GameManagersTestCaseFixture()
-	{
-		// TODO
-	}
-};
-
-/// Game suite
-BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
-
-/// Test cases
-BOOST_AUTO_TEST_CASE(GameManagersTEST)
+Vehicle::Vehicle()
 {
-	BOOST_TEST_MESSAGE("TESTING");
-	BOOST_CHECK(true);
+	// TODO Auto-generated constructor stub
+
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Game suite
+Vehicle::~Vehicle()
+{
+	// TODO Auto-generated destructor stub
+}
+
+} /* namespace ely */

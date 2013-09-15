@@ -15,35 +15,38 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/game/GameManagers_test.cpp
+ * \file /Ely/src/test/audiocomponents/Listener_test.cpp
  *
- * \date 29/lug/2012 (10:43:00)
+ * \date 15/set/2013 (10:56:52)
  * \author consultit
  */
 
-#include "GameSuiteFixture.h"
+#include "AudioSuiteFixture.h"
 
-struct GameManagersTestCaseFixture
+struct ListenerTestCaseFixture
 {
-	GameManagersTestCaseFixture()
+	ListenerTestCaseFixture()
 	{
-		// TODO
 	}
-
-	~GameManagersTestCaseFixture()
+	~ListenerTestCaseFixture()
 	{
-		// TODO
 	}
 };
 
-/// Game suite
-BOOST_FIXTURE_TEST_SUITE(Game, GameSuiteFixture)
+/// Audio suite
+BOOST_FIXTURE_TEST_SUITE(Audio, AudioSuiteFixture)
 
 /// Test cases
-BOOST_AUTO_TEST_CASE(GameManagersTEST)
+BOOST_AUTO_TEST_CASE(TEST)
 {
 	BOOST_TEST_MESSAGE("TESTING");
 	BOOST_CHECK(true);
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Game suite
+BOOST_AUTO_TEST_SUITE_END() // Audio suite
+
+
+
+
+
+

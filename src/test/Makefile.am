@@ -45,14 +45,19 @@ ely_test_LDADD = \
 
 libtestaicomponents_a_SOURCES = \
 		aicomponents/AISuiteFixture.h \
+		aicomponents/CrowdAgent_test.cpp \
+		aicomponents/NavMesh_test.cpp \
 		aicomponents/Steering_test.cpp \
 		$(top_srcdir)/src/AIComponents/Steering.cpp  \
 		$(top_srcdir)/src/AIComponents/SteeringTemplate.cpp \
 		$(top_srcdir)/src/AIComponents/CrowdAgent.cpp \
-		$(top_srcdir)/src/AIComponents/CrowdAgentTemplate.cpp
+		$(top_srcdir)/src/AIComponents/CrowdAgentTemplate.cpp \
+		$(top_srcdir)/src/AIComponents/NavMesh.cpp \
+		$(top_srcdir)/src/AIComponents/NavMeshTemplate.cpp
 		
 libtestaudiocomponents_a_SOURCES = \
 		audiocomponents/AudioSuiteFixture.h \
+		audiocomponents/Listener_test.cpp \
 		audiocomponents/Sound3d_test.cpp \
 		$(top_srcdir)/src/AudioComponents/Listener.cpp \
 		$(top_srcdir)/src/AudioComponents/ListenerTemplate.cpp \
@@ -60,14 +65,14 @@ libtestaudiocomponents_a_SOURCES = \
 		$(top_srcdir)/src/AudioComponents/Sound3dTemplate.cpp
 
 libtestbehaviorcomponents_a_SOURCES = \
-		behaviorcomponents/Activity_test.cpp \
 		behaviorcomponents/BehaviorSuiteFixture.h \
+		behaviorcomponents/Activity_test.cpp \
 		$(top_srcdir)/src/BehaviorComponents/Activity.cpp \
 		$(top_srcdir)/src/BehaviorComponents/ActivityTemplate.cpp
 
 libtestcontrolcomponents_a_SOURCES = \
-		controlcomponents/Chaser_test.cpp \
 		controlcomponents/ControlSuiteFixture.h \
+		controlcomponents/Chaser_test.cpp \
 		controlcomponents/Driver_test.cpp \
 		$(top_srcdir)/src/ControlComponents/Chaser.cpp \
 		$(top_srcdir)/src/ControlComponents/ChaserTemplate.cpp \
@@ -79,18 +84,19 @@ libtestely_a_SOURCES = \
 		ely/Ely_test.cpp
 
 libtestgame_a_SOURCES = \
-		game/GameManagers_test.cpp \
 		game/GameSuiteFixture.h \
+		game/GameManagers_test.cpp \
 		$(top_srcdir)/src/Game/GameAIManager.cpp \
 		$(top_srcdir)/src/Game/GameAudioManager.cpp \
+		$(top_srcdir)/src/Game/GameBehaviorManager.cpp \
 		$(top_srcdir)/src/Game/GameControlManager.cpp \
+		$(top_srcdir)/src/Game/GameManager.cpp \
 		$(top_srcdir)/src/Game/GamePhysicsManager.cpp \
-		$(top_srcdir)/src/Game/GameSceneManager.cpp \
-		$(top_srcdir)/src/Game/GameManager.cpp
+		$(top_srcdir)/src/Game/GameSceneManager.cpp
 
 libtestobjectmodel_a_SOURCES = \
-		objectmodel/ComponentTemplateManager_test.cpp \
 		objectmodel/ObjectModelSuiteFixture.h \
+		objectmodel/ComponentTemplateManager_test.cpp \
 		objectmodel/ObjectTemplateManager_test.cpp \
 		objectmodel/Object_test.cpp \
 		$(top_srcdir)/src/ObjectModel/Component.cpp \
@@ -101,18 +107,21 @@ libtestobjectmodel_a_SOURCES = \
 		$(top_srcdir)/src/ObjectModel/ObjectTemplateManager.cpp
 
 libtestphysicscomponents_a_SOURCES = \
-		physicscomponents/CharacterController_test.cpp \
 		physicscomponents/PhysicsSuiteFixture.h \
+		physicscomponents/CharacterController_test.cpp \
 		physicscomponents/RigidBody_test.cpp \
+		physicscomponents/Vehicle_test.cpp \
 		$(top_srcdir)/src/PhysicsComponents/CharacterController.cpp \
 		$(top_srcdir)/src/PhysicsComponents/CharacterControllerTemplate.cpp \
 		$(top_srcdir)/src/PhysicsComponents/RigidBody.cpp \
-		$(top_srcdir)/src/PhysicsComponents/RigidBodyTemplate.cpp
+		$(top_srcdir)/src/PhysicsComponents/RigidBodyTemplate.cpp \
+		$(top_srcdir)/src/PhysicsComponents/Vehicle.cpp \
+		$(top_srcdir)/src/PhysicsComponents/VehicleTemplate.cpp
 
 libtestscenecomponents_a_SOURCES = \
+		scenecomponents/SceneSuiteFixture.h \
 		scenecomponents/InstanceOf_test.cpp \
 		scenecomponents/Model_test.cpp \
-		scenecomponents/SceneSuiteFixture.h \
 		scenecomponents/Terrain_test.cpp \
 		$(top_srcdir)/src/SceneComponents/InstanceOf.cpp \
 		$(top_srcdir)/src/SceneComponents/InstanceOfTemplate.cpp \
@@ -124,12 +133,15 @@ libtestscenecomponents_a_SOURCES = \
 		$(top_srcdir)/src/SceneComponents/TerrainTemplate.cpp
 
 libtestsupport_a_SOURCES = \
+		support/SupportSuiteFixture.h \
 		support/FirstPersonCamera_test.cpp \
 		support/FSM_test.cpp \
 		support/Picker_test.cpp \
-		support/SupportSuiteFixture.h \
+		support/RayCaster_test.cpp \
+		support/Distributed_test.cpp \
 		$(top_srcdir)/src/Support/FirstPersonCamera.cpp \
 		$(top_srcdir)/src/Support/FSM.cpp \
 		$(top_srcdir)/src/Support/Picker.cpp \
+		$(top_srcdir)/src/Support/RayCaster.cpp \
 		$(top_srcdir)/src/Support/Distributed/ClientRepositoryBase.cpp \
 		$(top_srcdir)/src/Support/Distributed/DistributedObjectBase.cpp

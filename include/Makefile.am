@@ -49,6 +49,8 @@ noinst_HEADERS = \
 		PhysicsComponents/CharacterControllerTemplate.h \
 		PhysicsComponents/RigidBody.h \
 		PhysicsComponents/RigidBodyTemplate.h \
+		PhysicsComponents/Vehicle.h \
+		PhysicsComponents/VehicleTemplate.h \
 		SceneComponents/InstanceOf.h \
 		SceneComponents/InstanceOfTemplate.h \
 		SceneComponents/Model.h \
