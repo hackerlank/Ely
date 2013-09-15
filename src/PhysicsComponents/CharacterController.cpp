@@ -376,7 +376,7 @@ void CharacterController::update(void* data)
 	mCharacterController->set_linear_movement(speed, mIsLocal);
 	mCharacterController->set_angular_movement(omega);
 
-	//handle CharacterController ground-air
+	//handle CharacterController ground-air events
 	if (mCharacterController->is_on_ground())
 	{
 		//throw OnGround event (if enabled)
@@ -395,7 +395,7 @@ void CharacterController::update(void* data)
 	}
 	else
 	{
-		//throw OffGround event (if enabled)
+		//throw OnAir event (if enabled)
 		if (mThrowEvents and (not mOnAirSent))
 		{
 			throw_event(std::string("OnAir"), EventParameter(this),

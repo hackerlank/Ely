@@ -21,20 +21,66 @@
  * \author consultit
  */
 
-#include "../../include/PhysicsComponents/VehicleTemplate.h"
+#include "PhysicsComponents/VehicleTemplate.h"
+#include "PhysicsComponents/Vehicle.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
 
-VehicleTemplate::VehicleTemplate()
+VehicleTemplate::VehicleTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
-	// TODO Auto-generated constructor stub
-
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"VehicleTemplate::VehicleTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"VehicleTemplate::VehicleTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+			"VehicleTemplate::VehicleTemplate: invalid GamePhysicsManager")
+	//
+	setParametersDefaults();
 }
 
 VehicleTemplate::~VehicleTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
+
+ComponentType VehicleTemplate::componentType() const
+{
+	return ComponentType("Vehicle");
+}
+
+ComponentFamilyType VehicleTemplate::familyType() const
+{
+	return ComponentFamilyType("Physics");
+}
+
+SMARTPTR(Component)VehicleTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Vehicle) newVehicle = new Vehicle(this);
+	newVehicle->setComponentId(compId);
+	if (not newVehicle->initialize())
+	{
+		return NULL;
+	}
+	return newVehicle.p();
+}
+
+void VehicleTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
+
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle VehicleTemplate::_type_handle;
 
 } /* namespace ely */

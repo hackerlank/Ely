@@ -24,6 +24,7 @@
 #ifndef VEHICLE_H_
 #define VEHICLE_H_
 
+#include <bulletVehicle.h>
 #include "ObjectModel/Component.h"
 
 namespace ely
@@ -69,7 +70,7 @@ class VehicleTemplate;
  * - "angular_speed"  			|single|"45.0"
  * - "is_local"  				|single|"true"
  */
-class Vehicle: public ely::Component
+class Vehicle: public Component
 {
 protected:
 	friend class VehicleTemplate;
@@ -107,14 +108,84 @@ public:
 	///@}
 
 	/**
-	 * \name BulletCharacterControllerNode reference getter & conversion function.
+	 * \name BulletVehicle reference getter & conversion function.
 	 */
 	///@{
-	SMARTPTR(BulletCharacterControllerNode) getBulletCharacterControllerNode() const;
-	operator SMARTPTR(BulletCharacterControllerNode)() const;
+	SMARTPTR(BulletVehicle) getBulletVehicle() const;
+	operator SMARTPTR(BulletVehicle)() const;
 	///@}
 
+private:
+	///The NodePath associated to this vehicle.
+	NodePath mNodePath;
+	///The underlying BulletVehicle (read-only after creation & before destruction).
+	SMARTPTR(BulletVehicle) mVehicle;
+
+	///Throwing events.
+	bool mThrowEvents, mOnStartSent, mOnStopSent;
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		Component::init_type();
+		register_type(_type_handle, "Vehicle", Component::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+
 };
+
+///inline definitions
+
+inline void Vehicle::reset()
+{
+	//
+	mNodePath = NodePath();
+	mVehicle.clear();
+
+	mThrowEvents = mOnStart = mOnStop = false;
+}
+
+inline NodePath Vehicle::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void Vehicle::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	mNodePath = nodePath;
+}
+
+inline SMARTPTR(BulletVehicle) Vehicle::getBulletVehicle() const
+{
+	return mVehicle;
+}
+
+inline Vehicle::operator SMARTPTR(BulletVehicle)() const
+{
+	return mVehicle;
+}
 
 } /* namespace ely */
 #endif /* VEHICLE_H_ */
