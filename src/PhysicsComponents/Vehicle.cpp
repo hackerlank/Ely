@@ -71,6 +71,12 @@ bool Vehicle::initialize()
 
 void Vehicle::onAddToObjectSetup()
 {
+	//create the chassis
+	//set a ParameterTable for each component
+	ParameterTableMap compTmplParams;
+	compTmplParams["RigidBody"].insert(
+		ParameterTable::value_type("", ""));
+
 
 	//create a node path for the vehicle
 	mNodePath = NodePath(mVehicle);
