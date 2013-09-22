@@ -144,28 +144,25 @@ private:
 	 */
 	void onRemoveFromSceneCleanup();
 
+	/**
+	 * \brief This methods will store, in an internal storage, the
+	 * object template and component templates' parameters.\n
+	 * \note This method is intended to be used during the object
+	 * creation if the object is susceptible to be cloned with clones
+	 * having (more or less) the same parameters values, so they are
+	 * available at once.
+	 * @param objTmplParams The object template parameters table.
+	 * @param compTmplParams The component templates' parameters' table.
+	 */
+	void storeParameters( const ParameterTable& objTmplParams,
+			const ParameterTableMap& compTmplParams);
+
 public:
 
 	/**
 	 * \brief Destructor.
 	 */
 	virtual ~Object();
-
-	/**
-	 * \brief These methods will store/free, in an internal storage, the
-	 * object template and component templates' parameters.\n
-	 * \note These methods are intended to be used during the object
-	 * creation if the object is susceptible to be cloned with clones
-	 * having (more or less) the same parameters values, so they are
-	 * available at once. When done storage can be freed.
-	 * @param objTmplParams The object template parameters table.
-	 * @param compTmplParams The component templates' parameters' table.
-	 */
-	///@{
-	void storeParameters( const ParameterTable& objTmplParams,
-			const ParameterTableMap& compTmplParams);
-	void freeParameters();
-	///@}
 
 	/**
 	 * \brief Gets the component of that given family.
@@ -186,7 +183,6 @@ public:
 	 *
 	 * Gives an object the ability to perform any given
 	 * initialization after the entire world creation.\n
-	 * \note Called (indirectly) only by the main thread.
 	 */
 	void worldSetup();
 
@@ -239,6 +235,14 @@ public:
 	///@}
 
 	/**
+	 * \brief This method will free the stored object template
+	 * and component templates' parameters.\n
+	 * \note This method is intended to be used when done with
+	 * the parameters' storage.
+	 */
+	void freeParameters();
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
@@ -280,6 +284,8 @@ private:
 	bool mInitializationsLoaded;
 	///Initialization function name (optional).
 	std::string mInititializationFuncName;
+	///Initialization function.
+	PINITIALIZATION mInitializationFunction;
 
 	/**
 	 * \name Helper functions to load/unload initialization functions.
@@ -388,9 +394,6 @@ inline ParameterTableMap Object::getStoredCompTmplParams() const
 inline void Object::storeParameters(const ParameterTable& objTmplParams,
 		const ParameterTableMap& compTmplParams)
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
 	mObjTmplParams = objTmplParams;
 	mCompTmplParams = compTmplParams;
 }

@@ -182,7 +182,6 @@ void initTypedObjects()
 	RigidBody::init_type();
 	RigidBodyTemplate::init_type();
 	Vehicle::init_type();
-	VehicleTemplate::init_type();
 	InstanceOf::init_type();
 	InstanceOfTemplate::init_type();
 	Model::init_type();

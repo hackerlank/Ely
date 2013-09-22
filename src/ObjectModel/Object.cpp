@@ -30,7 +30,8 @@ namespace ely
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
 mTmpl(tmpl), mObjectId(objectId), mInitializationLib(NULL),
-mInitializationsLoaded(false), mInititializationFuncName("")
+mInitializationsLoaded(false), mInititializationFuncName(""),
+mInitializationFunction(NULL)
 {
 	doReset();
 }
@@ -138,25 +139,10 @@ void Object::onAddToSceneSetup()
 		rot[i] = strtof(rotStr[i].c_str(), NULL);
 	}
 	mNodePath.set_hpr(rot[0], rot[1], rot[2]);
-	//initialization function name
+
+	///set initialization function (if any)
+	//get initialization function name
 	mInititializationFuncName = mTmpl->parameter(std::string("init_func"));
-}
-
-void Object::onRemoveFromSceneCleanup()
-{
-	//set default pos/hpr
-	mNodePath.set_hpr(0.0, 0.0, 0.0);
-	mNodePath.set_pos(0.0, 0.0, 0.0);
-	//detach node path from its parent
-	mNodePath.detach_node();
-	//set steady to false
-	mIsSteady = false;
-}
-
-void Object::worldSetup()
-{
-	//called (indirectly) only by the main thread: mutex lock not needed
-
 	//load initialization functions library.
 	doLoadInitializationFunctions();
 	//execute the initialization function (if any)
@@ -172,7 +158,7 @@ void Object::worldSetup()
 				not mInititializationFuncName.empty() ?
 						mInititializationFuncName :
 						std::string(mObjectId) + "_initialization");
-		PINITIALIZATION pInitializationFunction = (PINITIALIZATION) lt_dlsym(
+		mInitializationFunction = (PINITIALIZATION) lt_dlsym(
 				mInitializationLib, functionName.c_str());
 		dlsymError = lt_dlerror();
 		if (dlsymError)
@@ -180,12 +166,29 @@ void Object::worldSetup()
 			PRINT_DEBUG(
 					"No initialization function '" << functionName << "': " << dlsymError);
 		}
-		else
-		{
-			//call initialization function
-			pInitializationFunction(this, mTmpl->getParameterTable(),
-					mTmpl->pandaFramework(), mTmpl->windowFramework());
-		}
+	}
+}
+
+void Object::onRemoveFromSceneCleanup()
+{
+	//set default pos/hpr
+	mNodePath.set_hpr(0.0, 0.0, 0.0);
+	mNodePath.set_pos(0.0, 0.0, 0.0);
+	//detach node path from its parent
+	mNodePath.detach_node();
+	//set steady to false
+	mIsSteady = false;
+}
+
+void Object::worldSetup()
+{
+	//this method is thread safe because
+	//mInitializationFunction is read-only when called
+	if (mInitializationFunction)
+	{
+		//call initialization function
+		mInitializationFunction(this, mTmpl->getParameterTable(),
+				mTmpl->pandaFramework(), mTmpl->windowFramework());
 	}
 }
 

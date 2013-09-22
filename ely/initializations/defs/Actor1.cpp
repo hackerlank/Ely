@@ -89,20 +89,20 @@ void toggleActor1Control(const Event* event, void* data)
 void Actor1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
-//Actor1
-//play animation
-//	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
-//					ComponentFamilyType("Scene")));
-//	actor1Model->animations().loop("walk", false);
-//play sound
-SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
-		ComponentFamilyType("Audio")));
-actor1Sound3d->getSound("walk-sound")->set_loop(true);
-actor1Sound3d->getSound("walk-sound")->play();
+	//Actor1
+	//play animation
+	//	SMARTPTR(Model) actor1Model = DCAST(Model, object->getComponent(
+	//					ComponentFamilyType("Scene")));
+	//	actor1Model->animations().loop("walk", false);
+	//play sound
+	SMARTPTR(Sound3d) actor1Sound3d = DCAST(Sound3d, object->getComponent(
+			ComponentFamilyType("Audio")));
+	actor1Sound3d->getSound("walk-sound")->set_loop(true);
+	actor1Sound3d->getSound("walk-sound")->play();
 
-//enable/disable Actor1 control by event
-pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
-static_cast<void*>(object));
+	//enable/disable Actor1 control by event
+	pandaFramework->define_key("v", "enableActor1Control", &toggleActor1Control,
+	static_cast<void*>(object));
 }
 
 void Actor1Init()

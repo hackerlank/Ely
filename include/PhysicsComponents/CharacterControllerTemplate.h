@@ -24,7 +24,6 @@
 #ifndef CHARACTERCONTROLLERTEMPLATE_H_
 #define CHARACTERCONTROLLERTEMPLATE_H_
 
-#include "ObjectModel/Component.h"
 #include "ObjectModel/ComponentTemplate.h"
 
 namespace ely

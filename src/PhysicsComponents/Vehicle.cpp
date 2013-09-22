@@ -22,7 +22,8 @@
  */
 
 #include "PhysicsComponents/Vehicle.h"
-#include "PhysicsComponents/VehicleTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GamePhysicsManager.h"
 #include <throw_event.h>
 
 namespace ely
@@ -38,7 +39,7 @@ Vehicle::Vehicle(SMARTPTR(VehicleTemplate)tmpl)
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"Vehicle::Vehicle: invalid GamePhysicsManager")
 
-	mTmpl = tmpl;
+//	mTmpl = tmpl;
 	reset();
 }
 
@@ -79,7 +80,7 @@ void Vehicle::onAddToObjectSetup()
 
 
 	//create a node path for the vehicle
-	mNodePath = NodePath(mVehicle);
+//	mNodePath = NodePath(mVehicle);
 
 	//attach it to Bullet World
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
