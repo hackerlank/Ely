@@ -78,7 +78,8 @@ libphysicscomponents_la_SOURCES = \
 		PhysicsComponents/CharacterControllerTemplate.cpp \
 		PhysicsComponents/RigidBody.cpp \
 		PhysicsComponents/RigidBodyTemplate.cpp \
-		PhysicsComponents/Vehicle.cpp
+		PhysicsComponents/Vehicle.cpp \
+		PhysicsComponents/VehicleTemplate.cpp
 
 libscenecomponents_la_SOURCES = \
 		SceneComponents/InstanceOf.cpp \

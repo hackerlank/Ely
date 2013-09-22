@@ -51,6 +51,7 @@
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
 #include "PhysicsComponents/Vehicle.h"
+#include "PhysicsComponents/VehicleTemplate.h"
 #include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/InstanceOfTemplate.h"
 #include "SceneComponents/Model.h"

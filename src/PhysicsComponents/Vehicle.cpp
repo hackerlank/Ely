@@ -22,6 +22,7 @@
  */
 
 #include "PhysicsComponents/Vehicle.h"
+#include "PhysicsComponents/VehicleTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GamePhysicsManager.h"
 #include <throw_event.h>
@@ -39,7 +40,7 @@ Vehicle::Vehicle(SMARTPTR(VehicleTemplate)tmpl)
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 			"Vehicle::Vehicle: invalid GamePhysicsManager")
 
-//	mTmpl = tmpl;
+	mTmpl = tmpl;
 	reset();
 }
 

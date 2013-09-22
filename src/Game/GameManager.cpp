@@ -122,15 +122,16 @@ void GameManager::setupCompTmplMgr()
 	// Add all kind of component templates
 
 	///AI templates
-	//Steering
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new SteeringTemplate(this, mWindow));
 	//CrowdAgent
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new CrowdAgentTemplate(this, mWindow));
 	//NavMesh
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new NavMeshTemplate(this, mWindow));
+	//Steering
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new SteeringTemplate(this, mWindow));
+
 	///Audio templates
 	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
@@ -153,12 +154,15 @@ void GameManager::setupCompTmplMgr()
 			new DriverTemplate(this, mWindow));
 
 	///Physics templates
-	//RigidBody
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new RigidBodyTemplate(this, mWindow));
 	//Character
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new CharacterControllerTemplate(this, mWindow));
+	//RigidBody
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new RigidBodyTemplate(this, mWindow));
+	//Vehicle
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new VehicleTemplate(this, mWindow));
 
 	///Scene templates
 	//InstanceOf

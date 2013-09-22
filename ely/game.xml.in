@@ -95,12 +95,6 @@
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
-
-		<ObjectTmpl type="RecastNavMesh">
-			<ComponentTmpl family="Scene" type="Model" priority="100"/>
-			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
-			<ComponentTmpl family="AI" type="NavMesh" priority="80"/> 
-		</ObjectTmpl>
 		
 		<!-- templates for instancing -->
 		<ObjectTmpl type="Instanceable">
@@ -120,6 +114,7 @@
 			<ComponentTmpl family="Physics" type="CharacterController" priority="90"/>
 		</ObjectTmpl>
 
+		<!-- templates for AI navmesh -->
 		<ObjectTmpl type="RecastCrowdAgent">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
@@ -132,7 +127,24 @@
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
 		</ObjectTmpl>
+
+		<ObjectTmpl type="RecastNavMesh">
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
+			<ComponentTmpl family="AI" type="NavMesh" priority="80"/> 
+		</ObjectTmpl>
+
+		<!-- templates for vehicles -->
+		<ObjectTmpl type="Car">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="Physics" type="Vehicle" priority="90"/>
+		</ObjectTmpl>
 		
+		<ObjectTmpl type="CarWheel">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+		</ObjectTmpl>
+		
+		<!-- templates for terrains -->
 		<ObjectTmpl type="Terrain">
 			<ComponentTmpl family="Scene" type="Terrain" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
