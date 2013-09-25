@@ -24,7 +24,7 @@
 #include "recastnavigation_data.h"
 
 ///Data constants
-std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
+std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 std::string rnDir(
 		"/REPOSITORY/KProjects/usr/share/DCC/recastnavigation/");
 ///
