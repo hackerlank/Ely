@@ -14,6 +14,8 @@ AM_LDFLAGS = $(ELY_LDFLAGS)
 noinst_HEADERS = \
 		Ely.h
 	
+BUILT_SOURCES = Ely_ini.h
+
 nodist_noinst_HEADERS =\
 		Ely_ini.h
 
@@ -39,7 +41,6 @@ whole_archives = \
 
 #ely
 ely_SOURCES = \
-		Ely_ini.h \
 		Ely.cpp
 		
 ely_LDFLAGS = $(AM_LDFLAGS) -export-dynamic \
