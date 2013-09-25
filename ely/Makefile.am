@@ -39,6 +39,7 @@ whole_archives = \
 
 #ely
 ely_SOURCES = \
+		Ely_ini.h \
 		Ely.cpp
 		
 ely_LDFLAGS = $(AM_LDFLAGS) -export-dynamic \
