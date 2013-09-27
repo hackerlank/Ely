@@ -75,11 +75,11 @@ bool RigidBody::initialize()
 		mBodyType = DYNAMIC;
 	}
 	//get physical parameters
-	mBodyMass = (float) strtof(
+	mBodyMass = strtof(
 			mTmpl->parameter(std::string("body_mass")).c_str(), NULL);
-	mBodyFriction = (float) strtof(
+	mBodyFriction = strtof(
 			mTmpl->parameter(std::string("body_friction")).c_str(), NULL);
-	mBodyRestitution = (float) strtof(
+	mBodyRestitution = strtof(
 			mTmpl->parameter(std::string("body_restitution")).c_str(), NULL);
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
@@ -105,7 +105,7 @@ bool RigidBody::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		if (not radius.empty())
 		{
-			mDim1 = (float) strtof(radius.c_str(), NULL);
+			mDim1 = strtof(radius.c_str(), NULL);
 			if (mDim1 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -122,14 +122,14 @@ bool RigidBody::initialize()
 		if ((not norm_x.empty()) and (not norm_y.empty())
 				and (not norm_z.empty()))
 		{
-			LVector3 normal((float) strtof(norm_x.c_str(), NULL),
-					(float) strtof(norm_y.c_str(), NULL),
-					(float) strtof(norm_z.c_str(), NULL));
+			LVector3 normal(strtof(norm_x.c_str(), NULL),
+					strtof(norm_y.c_str(), NULL),
+					strtof(norm_z.c_str(), NULL));
 			normal.normalize();
 			mDim1 = normal.get_x();
 			mDim2 = normal.get_y();
 			mDim3 = normal.get_z();
-			mDim4 = (float) strtof(d.c_str(), NULL);
+			mDim4 = strtof(d.c_str(), NULL);
 			if (normal.length() > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -145,9 +145,9 @@ bool RigidBody::initialize()
 		if ((not half_x.empty()) and (not half_y.empty())
 				and (not half_z.empty()))
 		{
-			mDim1 = (float) strtof(half_x.c_str(), NULL);
-			mDim2 = (float) strtof(half_y.c_str(), NULL);
-			mDim3 = (float) strtof(half_z.c_str(), NULL);
+			mDim1 = strtof(half_x.c_str(), NULL);
+			mDim2 = strtof(half_y.c_str(), NULL);
+			mDim3 = strtof(half_z.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -175,8 +175,8 @@ bool RigidBody::initialize()
 		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
 		if ((not radius.empty()) and (not height.empty()))
 		{
-			mDim1 = (float) strtof(radius.c_str(), NULL);
-			mDim2 = (float) strtof(height.c_str(), NULL);
+			mDim1 = strtof(radius.c_str(), NULL);
+			mDim2 = strtof(height.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -208,9 +208,9 @@ bool RigidBody::initialize()
 		if ((not height.empty()) and (not scale_w.empty())
 				and (not scale_d.empty()))
 		{
-			mDim1 = (float) strtof(height.c_str(), NULL);
-			mDim2 = (float) strtof(scale_w.c_str(), NULL);
-			mDim3 = (float) strtof(scale_d.c_str(), NULL);
+			mDim1 = strtof(height.c_str(), NULL);
+			mDim2 = strtof(scale_w.c_str(), NULL);
+			mDim3 = strtof(scale_d.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -257,10 +257,10 @@ bool RigidBody::initialize()
 #endif
 	}
 	//get ccd settings: enabled if both are greater than zero (> 0.0)
-	mCcdMotionThreshold = (float) strtof(
+	mCcdMotionThreshold = strtof(
 			mTmpl->parameter(std::string("ccd_motion_threshold")).c_str(),
 			NULL);
-	mCcdSweptSphereRadius = (float) strtof(
+	mCcdSweptSphereRadius = strtof(
 			mTmpl->parameter(std::string("ccd_swept_sphere_radius")).c_str(),
 			NULL);
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?

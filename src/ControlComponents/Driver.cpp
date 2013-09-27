@@ -126,27 +126,27 @@ bool Driver::initialize()
 	}
 
 	//set sensitivity parameters
-	float speed = (float) strtof(
+	float speed = strtof(
 			mTmpl->parameter(std::string("max_linear_speed")).c_str(), NULL);
 	mMaxSpeedXYZ = LVecBase3f(speed, speed, speed);
 	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
 			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
 			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
-	mMaxSpeedH = (float) strtof(
+	mMaxSpeedH = strtof(
 			mTmpl->parameter(std::string("max_angular_speed")).c_str(), NULL);
 	mMaxSpeedSquaredH = mMaxSpeedH * mMaxSpeedH;
 	//
-	float accel = (float) strtof(
+	float accel = strtof(
 			mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
 	mAccelXYZ = LVecBase3f(accel, accel, accel);
-	mAccelH = (float) strtof(
+	mAccelH = strtof(
 			mTmpl->parameter(std::string("angular_accel")).c_str(), NULL);
 	//reset speeds
 	mActualSpeedXYZ = LVector3f::zero();
 	mActualSpeedH = 0.0;
 	//
 	float linearFriction = 1
-			- (float) strtof(
+			- strtof(
 					mTmpl->parameter(std::string("linear_friction")).c_str(),
 					NULL);
 	mFrictionXYZ = LVector3f(linearFriction, linearFriction, linearFriction);
@@ -163,14 +163,14 @@ bool Driver::initialize()
 		mFrictionXYZ.set_z(0.1);
 	}
 	mFrictionH = 1
-			- (float) strtof(
+			- strtof(
 					mTmpl->parameter(std::string("angular_friction")).c_str(),
 					NULL);
 	if ((mFrictionH < 0.0) or (mFrictionH > 1.0))
 	{
 		mFrictionH = 0.1;
 	}
-	mStopThreshold = (float) strtof(
+	mStopThreshold = strtof(
 			mTmpl->parameter(std::string("stop_threshold")).c_str(),
 			NULL);
 	if ((mStopThreshold < 0.0) or (mStopThreshold > 1.0))
@@ -178,11 +178,11 @@ bool Driver::initialize()
 		mStopThreshold = 0.01;
 	}
 
-	mFastFactor = (float) strtof(
+	mFastFactor = strtof(
 			mTmpl->parameter(std::string("fast_factor")).c_str(), NULL);
-	mSensX = (float) strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+	mSensX = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
 	NULL);
-	mSensY = (float) strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+	mSensY = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
 	NULL);
 	//
 	return result;

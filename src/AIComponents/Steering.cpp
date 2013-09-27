@@ -96,15 +96,15 @@ bool Steering::initialize()
 	//
 	float floatParam;
 	//mass
-	floatParam = (float) strtof(mTmpl->parameter(std::string("mass")).c_str(),
+	floatParam = strtof(mTmpl->parameter(std::string("mass")).c_str(),
 			NULL);
 	floatParam > 0.0 ? mMass = floatParam : mMass = 1.0;
 	//movt_force
-	floatParam = (float) strtof(
+	floatParam = strtof(
 			mTmpl->parameter(std::string("movt_force")).c_str(), NULL);
 	floatParam > 0.0 ? mMovtForce = floatParam : mMovtForce = 1.0;
 	//max_force
-	floatParam = (float) strtof(
+	floatParam = strtof(
 			mTmpl->parameter(std::string("max_force")).c_str(), NULL);
 	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
 	//the type of the updatable item
@@ -130,7 +130,7 @@ bool Steering::initialize()
 	}
 	//obstacle max distance fraction
 	floatParam =
-			(float) strtof(
+			strtof(
 					mTmpl->parameter(
 							std::string("obstacle_max_distance_fraction")).c_str(),
 					NULL);

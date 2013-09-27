@@ -77,6 +77,14 @@ void VehicleTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
+	mParameterTable.insert(ParameterNameValue("chassis_scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("chassis_shape_type", "box"));
+	mParameterTable.insert(ParameterNameValue("chassis_shape_size", "medium"));
+	mParameterTable.insert(ParameterNameValue("chassis_mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("chassis_friction", "0.8"));
+	mParameterTable.insert(ParameterNameValue("chassis_restitution", "0.1"));
+	mParameterTable.insert(ParameterNameValue("chassis_collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("wheels_number", "4"));
 }
 
 //TypedObject semantics: hardcoded

@@ -64,7 +64,7 @@ bool CharacterController::initialize()
 			mTmpl->parameter(std::string("throw_events"))
 					== std::string("true") ? true : false);
 	//get step height
-	mStepHeight = (float) strtof(
+	mStepHeight = strtof(
 			mTmpl->parameter(std::string("step_height")).c_str(), NULL);
 	//get shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
@@ -90,7 +90,7 @@ bool CharacterController::initialize()
 		std::string radius = mTmpl->parameter(std::string("shape_radius"));
 		if (not radius.empty())
 		{
-			mDim1 = (float) strtof(radius.c_str(), NULL);
+			mDim1 = strtof(radius.c_str(), NULL);
 			if (mDim1 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -106,9 +106,9 @@ bool CharacterController::initialize()
 		if ((not half_x.empty()) and (not half_y.empty())
 				and (not half_z.empty()))
 		{
-			mDim1 = (float) strtof(half_x.c_str(), NULL);
-			mDim2 = (float) strtof(half_y.c_str(), NULL);
-			mDim3 = (float) strtof(half_z.c_str(), NULL);
+			mDim1 = strtof(half_x.c_str(), NULL);
+			mDim2 = strtof(half_y.c_str(), NULL);
+			mDim3 = strtof(half_z.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -136,8 +136,8 @@ bool CharacterController::initialize()
 		std::string upAxis = mTmpl->parameter(std::string("shape_up"));
 		if ((not radius.empty()) and (not height.empty()))
 		{
-			mDim1 = (float) strtof(radius.c_str(), NULL);
-			mDim2 = (float) strtof(height.c_str(), NULL);
+			mDim1 = strtof(radius.c_str(), NULL);
+			mDim2 = strtof(height.c_str(), NULL);
 			if (mDim1 > 0.0 and mDim2 > 0.0)
 			{
 				mAutomaticShaping = false;
@@ -180,23 +180,23 @@ bool CharacterController::initialize()
 #endif
 	}
 	//set control parameters
-	float linearSpeed = (float) strtof(
+	float linearSpeed = strtof(
 			mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
 	mLinearSpeed = LVecBase3f(linearSpeed, linearSpeed, linearSpeed);
 	mIsLocal = (
 			mTmpl->parameter(std::string("is_local")) == std::string("false") ?
 					false : true);
-	mAngularSpeed = (float) strtof(
+	mAngularSpeed = strtof(
 			mTmpl->parameter(std::string("angular_speed")).c_str(), NULL);
-	mFallSpeed = (float) strtof(
+	mFallSpeed = strtof(
 			mTmpl->parameter(std::string("fall_speed")).c_str(), NULL);
-	mGravity = (float) strtof(mTmpl->parameter(std::string("gravity")).c_str(),
+	mGravity = strtof(mTmpl->parameter(std::string("gravity")).c_str(),
 			NULL);
-	mJumpSpeed = (float) strtof(
+	mJumpSpeed = strtof(
 			mTmpl->parameter(std::string("jump_speed")).c_str(), NULL);
-	mMaxSlope = (float) strtof(
+	mMaxSlope = strtof(
 			mTmpl->parameter(std::string("max_slope")).c_str(), NULL);
-	mMaxJumpHeight = (float) strtof(
+	mMaxJumpHeight = strtof(
 			mTmpl->parameter(std::string("max_jump_height")).c_str(), NULL);
 	//key events setting
 	//backward key

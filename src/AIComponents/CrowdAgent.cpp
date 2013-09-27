@@ -99,15 +99,15 @@ bool CrowdAgent::initialize()
 	}
 	mMoveVelocity = LVector3f(velocity[0], velocity[1], velocity[2]);
 	//agent params
-	mAgentParams.maxAcceleration = (float) strtof(
+	mAgentParams.maxAcceleration = strtof(
 			mTmpl->parameter(std::string("max_acceleration")).c_str(), NULL);
-	mAgentParams.maxSpeed = (float) strtof(
+	mAgentParams.maxSpeed = strtof(
 			mTmpl->parameter(std::string("max_speed")).c_str(), NULL);
-	mAgentParams.collisionQueryRange = (float) strtof(
+	mAgentParams.collisionQueryRange = strtof(
 			mTmpl->parameter(std::string("collision_query_range")).c_str(), NULL);
-	mAgentParams.pathOptimizationRange = (float) strtof(
+	mAgentParams.pathOptimizationRange = strtof(
 			mTmpl->parameter(std::string("path_optimization_range")).c_str(), NULL);
-	mAgentParams.separationWeight = (float) strtof(
+	mAgentParams.separationWeight = strtof(
 			mTmpl->parameter(std::string("separation_weight")).c_str(), NULL);
 	mAgentParams.updateFlags = strtol(
 			mTmpl->parameter(std::string("update_flags")).c_str(), NULL, 0);

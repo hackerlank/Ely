@@ -183,11 +183,11 @@ inline void Model::reset()
 	//
 	mNodePath = NodePath();
 	mFromFile = false;
-	mModelNameParam = std::string("");
+	mModelNameParam.clear();
 	mOldObjectNodePath = NodePath();
 	mAnimFileListParam.clear();
 	mScale[0] = mScale[1] = mScale[2] = 1.0;
-	mModelTypeParam = std::string("");
+	mModelTypeParam.clear();
 	mCardLeft = mCardRight = mCardBottom = mCardTop = 0.0;
 	mAnimations.clear_anims();
 	mFirstPartBundle.clear();

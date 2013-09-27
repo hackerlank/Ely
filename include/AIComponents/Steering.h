@@ -257,7 +257,7 @@ inline void Steering::reset()
 	mDisabling = false;
 #endif
 	mMass = mMovtForce = mMaxForce;
-	mTypeParam = std::string("");
+	mTypeParam.clear();
 	mWorld.clear();
 	mCharacterController.clear();
 	mMovRotEnabled = mCurrentIsLocal = false;

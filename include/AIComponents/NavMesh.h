@@ -421,7 +421,7 @@ inline void NavMesh::reset()
 	mNavMeshTypeEnum = SOLO;
 	mGeom = NULL;
 	mCtx = NULL;
-	mMeshName = std::string("");
+	mMeshName.clear();
 	mReferenceNP = NodePath();
 	mMovType = RECAST;
 	mNavMeshSettings = NavMeshSettings();
@@ -429,8 +429,8 @@ inline void NavMesh::reset()
 	mAreaFlagsCostXmlParam.clear();
 	mPolyAreaFlags.clear();
 	mPolyAreaCost.clear();
-	mCrowdIncludeFlagsParam = std::string("");
-	mCrowdExcludeFlagsParam = std::string("");
+	mCrowdIncludeFlagsParam.clear();
+	mCrowdExcludeFlagsParam.clear();
 	mCrowdIncludeFlags = mCrowdExcludeFlags = 0;
 	mConvexVolumesParam.clear();
 	mConvexVolumes.clear();
@@ -442,7 +442,7 @@ inline void NavMesh::reset()
 	mUpdateData.clear();
 	mUpdateTask.clear();
 #ifdef ELY_THREAD
-	mTaskChainName = std::string("");
+	mTaskChainName.clear();
 #endif
 
 #ifdef ELY_DEBUG

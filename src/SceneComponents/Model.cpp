@@ -107,13 +107,13 @@ bool Model::initialize()
 	//get model if procedurally generated
 	mModelTypeParam = mTmpl->parameter(std::string("model_type"));
 	//get card parameters
-	mCardLeft = (float) strtof(
+	mCardLeft = strtof(
 			mTmpl->parameter(std::string("model_card_left")).c_str(), NULL);
-	mCardRight = (float) strtof(
+	mCardRight = strtof(
 			mTmpl->parameter(std::string("model_card_right")).c_str(), NULL);
-	mCardBottom = (float) strtof(
+	mCardBottom = strtof(
 			mTmpl->parameter(std::string("model_card_bottom")).c_str(), NULL);
-	mCardTop = (float) strtof(
+	mCardTop = strtof(
 			mTmpl->parameter(std::string("model_card_top")).c_str(), NULL);
 	//get scaling (default: (1.0,1.0,1.0))
 	std::vector<std::string> scaleStr = parseCompoundString(

@@ -111,45 +111,45 @@ bool NavMesh::initialize()
 	{
 		mMovType = RECAST;
 	}
-	mNavMeshSettings.m_cellSize = (float) strtof(
+	mNavMeshSettings.m_cellSize = strtof(
 			mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
-	mNavMeshSettings.m_cellHeight = (float) strtof(
+	mNavMeshSettings.m_cellHeight = strtof(
 			mTmpl->parameter(std::string("cell_height")).c_str(), NULL);
-	mNavMeshSettings.m_agentHeight = (float) strtof(
+	mNavMeshSettings.m_agentHeight = strtof(
 			mTmpl->parameter(std::string("agent_height")).c_str(), NULL);
-	mNavMeshSettings.m_agentRadius = (float) strtof(
+	mNavMeshSettings.m_agentRadius = strtof(
 			mTmpl->parameter(std::string("agent_radius")).c_str(), NULL);
-	mNavMeshSettings.m_agentMaxClimb = (float) strtof(
+	mNavMeshSettings.m_agentMaxClimb = strtof(
 			mTmpl->parameter(std::string("agent_max_climb")).c_str(), NULL);
-	mNavMeshSettings.m_agentMaxSlope = (float) strtof(
+	mNavMeshSettings.m_agentMaxSlope = strtof(
 			mTmpl->parameter(std::string("agent_max_slope")).c_str(), NULL);
-	mNavMeshSettings.m_regionMinSize = (float) strtof(
+	mNavMeshSettings.m_regionMinSize = strtof(
 			mTmpl->parameter(std::string("region_min_size")).c_str(), NULL);
-	mNavMeshSettings.m_regionMergeSize = (float) strtof(
+	mNavMeshSettings.m_regionMergeSize = strtof(
 			mTmpl->parameter(std::string("region_merge_size")).c_str(), NULL);
 	mNavMeshSettings.m_monotonePartitioning = (
 			mTmpl->parameter(std::string("monotone_partitioning"))
 					== std::string("true") ? true : false);
-	mNavMeshSettings.m_edgeMaxLen = (float) strtof(
+	mNavMeshSettings.m_edgeMaxLen = strtof(
 			mTmpl->parameter(std::string("edge_max_len")).c_str(), NULL);
-	mNavMeshSettings.m_edgeMaxError = (float) strtof(
+	mNavMeshSettings.m_edgeMaxError = strtof(
 			mTmpl->parameter(std::string("edge_max_error")).c_str(), NULL);
-	mNavMeshSettings.m_vertsPerPoly = (float) strtof(
+	mNavMeshSettings.m_vertsPerPoly = strtof(
 			mTmpl->parameter(std::string("verts_per_poly")).c_str(), NULL);
-	mNavMeshSettings.m_detailSampleDist = (float) strtof(
+	mNavMeshSettings.m_detailSampleDist = strtof(
 			mTmpl->parameter(std::string("detail_sample_dist")).c_str(), NULL);
-	mNavMeshSettings.m_detailSampleMaxError = (float) strtof(
+	mNavMeshSettings.m_detailSampleMaxError = strtof(
 			mTmpl->parameter(std::string("detail_sample_max_error")).c_str(),
 			NULL);
 	//nav mesh tile
 	mNavMeshTileSettings.m_buildAllTiles = (
 			mTmpl->parameter(std::string("build_all_tiles"))
 					== std::string("true") ? true : false);
-	mNavMeshTileSettings.m_maxTiles = (float) strtof(
+	mNavMeshTileSettings.m_maxTiles = strtof(
 			mTmpl->parameter(std::string("max_tiles")).c_str(), NULL);
-	mNavMeshTileSettings.m_maxPolysPerTile = (float) strtof(
+	mNavMeshTileSettings.m_maxPolysPerTile = strtof(
 			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL);
-	mNavMeshTileSettings.m_tileSize = (float) strtof(
+	mNavMeshTileSettings.m_tileSize = strtof(
 			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
 	//area-flags-cost settings
 	mAreaFlagsCostXmlParam = mTmpl->parameterList(std::string("area_flags_cost"));
@@ -290,7 +290,7 @@ void NavMesh::onAddToSceneSetup()
 			flagsAreaTable[area] = oredFlags;
 
 			//default cost: 1.0
-			float cost = (float) strtof(areaFlagsCostStr[2].c_str(), NULL);
+			float cost = strtof(areaFlagsCostStr[2].c_str(), NULL);
 			if (cost <= 0.0)
 			{
 				cost = 1.0;

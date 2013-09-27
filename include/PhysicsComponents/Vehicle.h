@@ -32,7 +32,7 @@ namespace ely
 class VehicleTemplate;
 
 /**
- * \brief Component representing a vehicle attached to an object.
+ * \brief Component making an Object to behave as a vehicle.
  *
  * The control is accomplished through physics.\n
  * It constructs a vehicle with a "chassis" and a series of "wheels":
@@ -48,30 +48,30 @@ class VehicleTemplate;
  * XML Param(s):
  * - "throw_events"					|single|"false"
  * - "chassis_object_template"		|single|no default
- * - "chassis_shape_type"  			|single|"box"
- * - "chassis_shape_size"  			|single|"medium"  (min, medium, max)
  * - "chassis_model"  				|single|no default
  * - "chassis_scale"  				|single|"1.0"
+ * - "chassis_shape_type"  			|single|"box"
+ * - "chassis_shape_size"  			|single|"medium"  (min, medium, max)
  * - "chassis_mass"  				|single|"1.0"
  * - "chassis_friction"  			|single|"0.8"
  * - "chassis_restitution"  		|single|"0.1"
  * - "chassis_collide_mask"			|single|"all_on"
  * - "wheels_number"  				|single|"4"
  * - "wheel_object_template"		|single|no default
- * - "wheel_model"  				|single|no default ("model@wheelIdx")
- * - "wheel_is_front"				|single|no default ("value@wheelIdx" with
+ * - "wheel_model"  				|multiple|no default ("model@wheelIdx")
+ * - "wheel_scale"  				|multiple|"1.0" ("scale@wheelIdx")
+ * - "wheel_is_front"				|multiple|"false" ("value@wheelIdx" with
  * value=true,false)
- * - "wheel_radius"					|single|no default ("radius@wheelIdx")
- * - "wheel_connection_point_ratio"	|single|no default ("rx,ry,rz@wheelIdx")
+ * - "wheel_connection_point_ratio"	|multiple|no default ("rx,ry,rz@wheelIdx")
  * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
- * - "wheel_axle"					|single|no default ("ax,ay,az@wheelIdx")
- * - "wheel_direction"				|single|no default ("dx,dy,dz@wheelIdx")
- * - "wheel_suspension_travel"		|single|"40.0" ("st@wheelIdx")
- * - "wheel_suspension_stiffness"	|single|"40.0" ("ss@wheelIdx")
- * - "wheel_damping_relaxation"		|single|"2.0"  ("dr@wheelIdx")
- * - "wheel_damping_compression"	|single|"4.0"  ("dc@wheelIdx")
- * - "wheel_friction_slip"			|single|"100.0"  ("fs@wheelIdx")
- * - "wheel_roll_influence"			|single|"0.1"  ("ri@wheelIdx")
+ * - "wheel_axle"					|multiple|no default ("ax,ay,az@wheelIdx")
+ * - "wheel_direction"				|multiple|no default ("dx,dy,dz@wheelIdx")
+ * - "wheel_suspension_travel"		|multiple|"40.0" ("st@wheelIdx")
+ * - "wheel_suspension_stiffness"	|multiple|"40.0" ("ss@wheelIdx")
+ * - "wheel_damping_relaxation"		|multiple|"2.0"  ("dr@wheelIdx")
+ * - "wheel_damping_compression"	|multiple|"4.0"  ("dc@wheelIdx")
+ * - "wheel_friction_slip"			|multiple|"100.0"  ("fs@wheelIdx")
+ * - "wheel_roll_influence"			|multiple|"0.1"  ("ri@wheelIdx")
  *
  *
  *
@@ -129,15 +129,6 @@ public:
 	virtual void update(void* data);
 
 	/**
-	 * \brief Gets/sets the node path of this vehicle.
-	 * @return The node path of this vehicle.
-	 */
-	///@{
-	NodePath getNodePath() const;
-	void setNodePath(const NodePath& nodePath);
-	///@}
-
-	/**
 	 * \name BulletVehicle reference getter & conversion function.
 	 */
 	///@{
@@ -145,21 +136,47 @@ public:
 	operator SMARTPTR(BulletVehicle)() const;
 	///@}
 
+	/**
+	 * \name Getters of inner Objects composing this vehicle.
+	 */
+	///@{
+	SMARTPTR(Object) getChassisObject() const;
+	std::vector<SMARTPTR(Object)> getWheelObjects() const;
+	///@}
+
 private:
-	///The NodePath associated to this vehicle.
-	NodePath mNodePath;
 	///The underlying BulletVehicle (read-only after creation & before destruction).
 	SMARTPTR(BulletVehicle) mVehicle;
 	/**
 	 * \name Chassis data.
 	 */
 	///@{
-	std::string mChassisTmpl;
 	SMARTPTR(Object) mChassis;
-	std::string  mChassisShapeTypeParam, mChassisShapeSizeParam,
-		mChassisModelParam, mChassisScaleParam, mChassisMassParam,
-		mChassisFrictionParam, mChassisRestitutionParam,
-		mChassisCollideMaskParam;
+	std::string mChassisTmpl;
+	std::string
+	//model params
+	mChassisModelParam, mChassisScaleParam,
+	//rigid body params
+	mChassisShapeTypeParam, mChassisShapeSizeParam, mChassisMassParam,
+	mChassisFrictionParam, mChassisRestitutionParam, mChassisCollideMaskParam;
+	///@}
+
+	/**
+	 * \name Wheels' data.
+	 */
+	///@{
+	std::vector<SMARTPTR(Object)> mWheels;
+	int mWheelNumber;
+	std::string mWheelTmpl;
+	std::vector<std::string> mWheelModelParam, mWheelScaleParam;
+	std::vector<bool> mWheelIsFront;
+	std::vector<LVecBase3f> mWheelConnectionPointRatio;
+	std::vector<LVector3f> mWheelAxle, mWheelDirection;
+	std::vector<float> mWheelRadius, mWheelSuspensionTravel,
+	mWheelSuspensionStiffness, mWheelDampingRelaxation,
+	mWheelDampingCompression, mWheelFrictionSlip, mWheelRollInfluence;
+	//helper
+	int idxClamp(int value, int min, int max);
 	///@}
 
 	///Throwing events.
@@ -196,26 +213,44 @@ private:
 inline void Vehicle::reset()
 {
 	//
-	mNodePath = NodePath();
 	mVehicle.clear();
-
+	mChassis.clear();
+	mChassisTmpl.clear();
+	mChassisModelParam.clear();
+	mChassisScaleParam.clear();
+	mChassisShapeTypeParam.clear();
+	mChassisShapeSizeParam.clear();
+	mChassisMassParam.clear();
+	mChassisFrictionParam.clear();
+	mChassisRestitutionParam.clear();
+	mChassisCollideMaskParam.clear();
+	mWheels.clear();
+	mWheelNumber = 0;
+	mWheelTmpl.clear();
+	mWheelModelParam.clear();
+	mWheelScaleParam.clear();
+	mWheelIsFront.clear();
+	mWheelConnectionPointRatio.clear();
+	mWheelAxle.clear();
+	mWheelDirection.clear();
+	mWheelRadius.clear();
+	mWheelSuspensionTravel.clear();
+	mWheelSuspensionStiffness.clear();
+	mWheelDampingRelaxation.clear();
+	mWheelDampingCompression.clear();
+	mWheelFrictionSlip.clear();
+	mWheelRollInfluence.clear();
 	mThrowEvents = mOnStartSent = mOnStopSent = false;
 }
 
-inline NodePath Vehicle::getNodePath() const
+inline SMARTPTR(Object) Vehicle::getChassisObject() const
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
-	return mNodePath;
+	return mChassis;
 }
 
-inline void Vehicle::setNodePath(const NodePath& nodePath)
+inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 {
-	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
-
-	mNodePath = nodePath;
+	return mWheels;
 }
 
 inline SMARTPTR(BulletVehicle) Vehicle::getBulletVehicle() const
@@ -226,6 +261,20 @@ inline SMARTPTR(BulletVehicle) Vehicle::getBulletVehicle() const
 inline Vehicle::operator SMARTPTR(BulletVehicle)() const
 {
 	return mVehicle;
+}
+
+inline int Vehicle::idxClamp(int value, int min, int max)
+{
+	int clamped = value;
+	if (value > max)
+	{
+		clamped = max;
+	}
+	else if (value < min)
+	{
+		clamped = min;
+	}
+	return clamped;
 }
 
 } /* namespace ely */

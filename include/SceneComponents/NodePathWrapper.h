@@ -109,7 +109,7 @@ inline void NodePathWrapper::reset()
 {
 	//
 	mNodePath = NodePath();
-	mWrappedNodePathParam = std::string("");
+	mWrappedNodePathParam.clear();
 	mOldObjectNodePath = NodePath();
 }
 
