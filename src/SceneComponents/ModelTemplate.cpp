@@ -71,7 +71,7 @@ SMARTPTR(Component)ModelTemplate::makeComponent(const ComponentId& compId)
 void ModelTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

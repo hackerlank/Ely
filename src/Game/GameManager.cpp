@@ -154,12 +154,14 @@ void GameManager::setupCompTmplMgr()
 			new DriverTemplate(this, mWindow));
 
 	///Physics templates
-	//Character
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new CharacterControllerTemplate(this, mWindow));
 	//RigidBody
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new RigidBodyTemplate(this, mWindow));
+
+	///PhysicsControl templates
+	//Character
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new CharacterControllerTemplate(this, mWindow));
 	//Vehicle
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new VehicleTemplate(this, mWindow));
@@ -487,11 +489,6 @@ PandaFramework* const GameManager::pandaFramework() const
 WindowFramework* const GameManager::windowFramework() const
 {
 	return mWindow;
-}
-
-Mutex& GameManager::getMutex()
-{
-	return mMutex;
 }
 
 #ifdef ELY_DEBUG

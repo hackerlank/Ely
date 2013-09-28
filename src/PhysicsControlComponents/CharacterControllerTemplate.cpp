@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/PhysicsComponents/CharacterControllerTemplate.cpp
+ * \file /Ely/src/PhysicsControlComponents/CharacterControllerTemplate.cpp
  *
  * \date 30/ott/2012 (17:01:34)
  * \author consultit
  */
 
-#include "PhysicsComponents/CharacterControllerTemplate.h"
-#include "PhysicsComponents/CharacterController.h"
+#include "PhysicsControlComponents/CharacterControllerTemplate.h"
+#include "PhysicsControlComponents/CharacterController.h"
 #include "Game/GamePhysicsManager.h"
 
 namespace ely
@@ -53,7 +53,7 @@ ComponentType CharacterControllerTemplate::componentType() const
 
 ComponentFamilyType CharacterControllerTemplate::familyType() const
 {
-	return ComponentFamilyType("Physics");
+	return ComponentFamilyType("PhysicsControl");
 }
 
 SMARTPTR(Component)CharacterControllerTemplate::makeComponent(const ComponentId& compId)
@@ -70,7 +70,7 @@ SMARTPTR(Component)CharacterControllerTemplate::makeComponent(const ComponentId&
 void CharacterControllerTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
@@ -80,6 +80,7 @@ void CharacterControllerTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
 	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
 	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
+	mParameterTable.insert(ParameterNameValue("shape_up", "z"));
 	mParameterTable.insert(ParameterNameValue("fall_speed", "55.0"));
 	mParameterTable.insert(ParameterNameValue("gravity", "29.4"));
 	mParameterTable.insert(ParameterNameValue("jump_speed", "10.0"));

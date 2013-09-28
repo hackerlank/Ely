@@ -83,7 +83,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 private:
 	///Panda framework.
@@ -117,8 +117,15 @@ private:
 	std::vector<std::string> mHitKey;
 	///@}
 	///The mutex associated with this manager.
-	Mutex mMutex;
+	ReMutex mMutex;
 };
+
+///inline definiitons
+
+ReMutex& Raycaster::getMutex()
+{
+	return mMutex;
+}
 
 } // namespace ely
 

@@ -9,6 +9,7 @@ noinst_LTLIBRARIES = \
 		libbehaviorcomponents.la \
 		libcontrolcomponents.la \
 		libphysicscomponents.la \
+		libphysicscontrolcomponents.la \
 		libscenecomponents.la \
 		libobjectmodel.la \
 		libutilities.la
@@ -74,12 +75,14 @@ libobjectmodel_la_SOURCES = \
 		ObjectModel/ObjectTemplateManager.cpp
 
 libphysicscomponents_la_SOURCES = \
-		PhysicsComponents/CharacterController.cpp \
-		PhysicsComponents/CharacterControllerTemplate.cpp \
 		PhysicsComponents/RigidBody.cpp \
-		PhysicsComponents/RigidBodyTemplate.cpp \
-		PhysicsComponents/Vehicle.cpp \
-		PhysicsComponents/VehicleTemplate.cpp
+		PhysicsComponents/RigidBodyTemplate.cpp
+
+libphysicscontrolcomponents_la_SOURCES = \
+		PhysicsControlComponents/CharacterController.cpp \
+		PhysicsControlComponents/CharacterControllerTemplate.cpp \
+		PhysicsControlComponents/Vehicle.cpp \
+		PhysicsControlComponents/VehicleTemplate.cpp
 
 libscenecomponents_la_SOURCES = \
 		SceneComponents/InstanceOf.cpp \

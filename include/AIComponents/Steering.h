@@ -25,7 +25,7 @@
 #define STEERING_H_
 
 #include <aiCharacter.h>
-#include "PhysicsComponents/CharacterController.h"
+#include "PhysicsControlComponents/CharacterController.h"
 #include "ObjectModel/Component.h"
 
 namespace ely
@@ -273,7 +273,7 @@ inline void Steering::reset()
 inline bool Steering::isEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mEnabled;
 }
@@ -281,7 +281,7 @@ inline bool Steering::isEnabled()
 inline SMARTPTR(AICharacterRef) Steering::getAiCharacter() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,NULL)

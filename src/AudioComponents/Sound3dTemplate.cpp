@@ -71,7 +71,7 @@ SMARTPTR(Component) Sound3dTemplate::makeComponent(const ComponentId& compId)
 void Sound3dTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

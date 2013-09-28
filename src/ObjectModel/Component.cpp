@@ -309,7 +309,7 @@ void Component::unregisterEventCallbacks()
 std::string Component::getEventType(const std::string& event)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::string result("");
 	if (mEventTypeTable.find(event) != mEventTypeTable.end())

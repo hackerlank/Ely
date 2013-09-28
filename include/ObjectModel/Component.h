@@ -285,7 +285,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 protected:
 	///The template used to construct this component (read only after creation).
@@ -300,7 +300,7 @@ protected:
 #endif
 
 	///The mutex associated with this component.
-	Mutex mMutex;
+	ReMutex mMutex;
 
 	/**
 	 * \name Helper functions to register/unregister events' callbacks.
@@ -401,7 +401,7 @@ inline void Component::removeFromSceneCleanup()
 #ifdef ELY_THREAD
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		mDestroying = true;
 	}
@@ -414,7 +414,7 @@ inline void Component::update(void* data)
 {
 }
 
-inline Mutex& Component::getMutex()
+inline ReMutex& Component::getMutex()
 {
 	return mMutex;
 }

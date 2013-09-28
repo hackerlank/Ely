@@ -11,6 +11,7 @@ noinst_LIBRARIES = \
 		libtestcontrolcomponents.a \
 		libtestely.a \
 		libtestphysicscomponents.a \
+		libtestphysicscontrolcomponents.a \
 		libtestscenecomponents.a \
 		libtestgame.a \
 		libtestobjectmodel.a \
@@ -22,6 +23,7 @@ whole_archives = \
 		-Wl,libtestcontrolcomponents.a \
 		-Wl,libtestely.a \
 		-Wl,libtestphysicscomponents.a \
+		-Wl,libtestphysicscontrolcomponents.a \
 		-Wl,libtestscenecomponents.a \
 		-Wl,libtestgame.a \
 		-Wl,libtestobjectmodel.a \
@@ -108,15 +110,18 @@ libtestobjectmodel_a_SOURCES = \
 
 libtestphysicscomponents_a_SOURCES = \
 		physicscomponents/PhysicsSuiteFixture.h \
-		physicscomponents/CharacterController_test.cpp \
 		physicscomponents/RigidBody_test.cpp \
-		physicscomponents/Vehicle_test.cpp \
-		$(top_srcdir)/src/PhysicsComponents/CharacterController.cpp \
-		$(top_srcdir)/src/PhysicsComponents/CharacterControllerTemplate.cpp \
 		$(top_srcdir)/src/PhysicsComponents/RigidBody.cpp \
-		$(top_srcdir)/src/PhysicsComponents/RigidBodyTemplate.cpp \
-		$(top_srcdir)/src/PhysicsComponents/Vehicle.cpp \
-		$(top_srcdir)/src/PhysicsComponents/VehicleTemplate.cpp
+		$(top_srcdir)/src/PhysicsComponents/RigidBodyTemplate.cpp
+
+libtestphysicscontrolcomponents_a_SOURCES = \
+		physicscomponents/PhysicsControlSuiteFixture.h \
+		physicscomponents/CharacterController_test.cpp \
+		physicscomponents/Vehicle_test.cpp \
+		$(top_srcdir)/src/PhysicsControlComponents/CharacterController.cpp \
+		$(top_srcdir)/src/PhysicsControlComponents/CharacterControllerTemplate.cpp \
+		$(top_srcdir)/src/PhysicsControlComponents/Vehicle.cpp \
+		$(top_srcdir)/src/PhysicsControlComponents/VehicleTemplate.cpp
 
 libtestscenecomponents_a_SOURCES = \
 		scenecomponents/SceneSuiteFixture.h \

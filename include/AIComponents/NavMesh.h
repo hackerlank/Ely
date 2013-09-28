@@ -225,7 +225,7 @@ public:
 	Result navMeshCleanup();
 
 	/**
-	 * \name GeoMipTerrain reference getter & conversion function.
+	 * \name NavMeshType reference getter & conversion function.
 	 */
 	///@{
 	NavMeshType* getNavMeshType() const;
@@ -361,6 +361,7 @@ private:
 #ifdef ELY_THREAD
 	std::string mTaskChainName;
 	ConditionVar mAsyncSetupVar;
+	Mutex mAsyncSetupMutex;
 	bool mAsyncSetupComplete;
 #endif
 	///@}
@@ -458,7 +459,7 @@ inline void NavMesh::reset()
 inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
@@ -469,7 +470,7 @@ inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
 inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NavMeshType_NONE)
@@ -480,7 +481,7 @@ inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum() const
 inline void NavMesh::setMovType(AgentMovTypeEnum movType)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
@@ -491,7 +492,7 @@ inline void NavMesh::setMovType(AgentMovTypeEnum movType)
 inline AgentMovTypeEnum NavMesh::getMovType() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, AgentMovType_NONE)
@@ -502,7 +503,7 @@ inline AgentMovTypeEnum NavMesh::getMovType() const
 inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
@@ -513,7 +514,7 @@ inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 inline NavMeshSettings NavMesh::getNavMeshSettings() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NavMeshSettings())
@@ -524,7 +525,7 @@ inline NavMeshSettings NavMesh::getNavMeshSettings() const
 inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
@@ -535,7 +536,7 @@ inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
 inline NavMeshTileSettings NavMesh::getNavMeshTileSettings() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NavMeshTileSettings())
@@ -546,7 +547,7 @@ inline NavMeshTileSettings NavMesh::getNavMeshTileSettings() const
 inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, std::list<SMARTPTR(CrowdAgent)>())
@@ -557,7 +558,7 @@ inline std::list<SMARTPTR(CrowdAgent)> NavMesh::getCrowdAgents()
 inline InputGeom* NavMesh::getRecastInputGeom() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NULL)
@@ -568,7 +569,7 @@ inline InputGeom* NavMesh::getRecastInputGeom() const
 inline dtNavMesh* NavMesh::getRecastNavMesh() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NULL)
@@ -579,7 +580,7 @@ inline dtNavMesh* NavMesh::getRecastNavMesh() const
 inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NULL)
@@ -590,7 +591,7 @@ inline dtNavMeshQuery* NavMesh::getRecastNavMeshQuery() const
 inline dtCrowd* NavMesh::getRecastCrowd() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NULL)
@@ -601,7 +602,7 @@ inline dtCrowd* NavMesh::getRecastCrowd() const
 inline float NavMesh::getRecastAgentRadius() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, 0.0)
@@ -612,7 +613,7 @@ inline float NavMesh::getRecastAgentRadius() const
 inline float NavMesh::getRecastAgentHeight() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, 0.0)
@@ -623,7 +624,7 @@ inline float NavMesh::getRecastAgentHeight() const
 inline float NavMesh::getRecastAgentClimb() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, 0.0)
@@ -634,7 +635,7 @@ inline float NavMesh::getRecastAgentClimb() const
 inline LVecBase3f NavMesh::getRecastBoundsMin() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, LVecBase3f::zero())
@@ -646,7 +647,7 @@ inline LVecBase3f NavMesh::getRecastBoundsMin() const
 inline LVecBase3f NavMesh::getRecastBoundsMax() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, LVecBase3f::zero())
@@ -658,7 +659,7 @@ inline LVecBase3f NavMesh::getRecastBoundsMax() const
 inline NavMeshType* NavMesh::getNavMeshType() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNavMeshType;
 }
@@ -666,7 +667,7 @@ inline NavMeshType* NavMesh::getNavMeshType() const
 inline NavMesh::operator NavMeshType*() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNavMeshType;
 }

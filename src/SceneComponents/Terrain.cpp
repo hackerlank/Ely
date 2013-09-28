@@ -245,7 +245,7 @@ void Terrain::onRemoveFromSceneCleanup()
 void Terrain::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

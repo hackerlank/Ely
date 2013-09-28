@@ -39,7 +39,7 @@ namespace ely
 
 NavMesh::NavMesh()
 #ifdef ELY_THREAD
-:mAsyncSetupVar(mMutex), mAsyncSetupComplete(true)
+:mAsyncSetupVar(mAsyncSetupMutex), mAsyncSetupComplete(true)
 #endif
 {
 	// TODO Auto-generated constructor stub
@@ -47,7 +47,7 @@ NavMesh::NavMesh()
 
 NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl)
 #ifdef ELY_THREAD
-:mAsyncSetupVar(mMutex), mAsyncSetupComplete(true)
+:mAsyncSetupVar(mAsyncSetupMutex), mAsyncSetupComplete(true)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
@@ -460,7 +460,7 @@ void NavMesh::onRemoveFromSceneCleanup()
 NavMesh::Result NavMesh::navMeshSetup()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, NavMesh::Result::DESTROYING)
@@ -473,16 +473,6 @@ NavMesh::Result NavMesh::navMeshSetup()
 
 void NavMesh::doNavMeshSetup()
 {
-#ifdef ELY_THREAD
-	//check condition var
-	while (not mAsyncSetupComplete)
-	{
-		//another Async Setup is going on: wait
-		mAsyncSetupVar.wait();
-	}
-	mAsyncSetupComplete = false;
-#endif
-
 	//(re)-create the task for executing navMeshAsyncSetup()
 	//the task is executed only once and then removed from AsyncTaskManager
 	mUpdateData.clear();
@@ -507,7 +497,7 @@ void NavMesh::doNavMeshSetup()
 NavMesh::Result NavMesh::navMeshCleanup()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -536,14 +526,30 @@ void NavMesh::doNavMeshCleanup()
 
 AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 {
+#ifdef ELY_THREAD
+	HOLD_MUTEX(mAsyncSetupMutex)
+
+	//check condition var
+	while (not mAsyncSetupComplete)
+	{
+		//another Async Setup is going on: wait
+		mAsyncSetupVar.wait();
+	}
+#endif
+
 	//remove from AI manager update
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, AsyncTask::DS_done)
+
+#ifdef ELY_THREAD
+	//we can effectively begin setup
+	mAsyncSetupComplete = false;
+#endif
 
 	//setup navigation mesh, otherwise the same
 	//operations must be performed by program.
@@ -834,7 +840,7 @@ void NavMesh::doDebugStaticRender()
 AsyncTask::DoneStatus NavMesh::debugStaticRenderTask(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, AsyncTask::DS_done)
@@ -851,7 +857,7 @@ AsyncTask::DoneStatus NavMesh::debugStaticRenderTask(GenericAsyncTask* task)
 NavMesh::Result NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -881,7 +887,7 @@ NavMesh::Result NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 NavMesh::Result NavMesh::buildTile(const LPoint3f& pos)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -910,7 +916,7 @@ NavMesh::Result NavMesh::buildTile(const LPoint3f& pos)
 NavMesh::Result NavMesh::removeTile(const LPoint3f& pos)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -939,7 +945,7 @@ NavMesh::Result NavMesh::removeTile(const LPoint3f& pos)
 NavMesh::Result NavMesh::buildAllTiles()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -964,7 +970,7 @@ NavMesh::Result NavMesh::buildAllTiles()
 NavMesh::Result NavMesh::removeAllTiles()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -989,7 +995,7 @@ NavMesh::Result NavMesh::removeAllTiles()
 dtTileCache* NavMesh::getTileCache()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, NULL)
@@ -1012,7 +1018,7 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 	RETURN_ON_COND(not object, Result::ERROR)
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1063,7 +1069,7 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 	RETURN_ON_COND(not object, Result::ERROR)
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1103,7 +1109,7 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 NavMesh::Result NavMesh::clearAllObstacles()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1179,7 +1185,7 @@ NavMesh::Result NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 	HOLD_REMUTEX(mStaticMutex)
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//return if destroying
 		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1311,7 +1317,7 @@ NavMesh::Result NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 	HOLD_REMUTEX(mStaticMutex)
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//return if destroying
 		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1374,7 +1380,7 @@ NavMesh::Result NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1410,7 +1416,7 @@ NavMesh::Result NavMesh::setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1441,7 +1447,7 @@ NavMesh::Result NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -1469,7 +1475,7 @@ NavMesh::Result NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
 void NavMesh::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
@@ -1507,7 +1513,7 @@ void NavMesh::update(void* data)
 NodePath NavMesh::getDebugNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NodePath())
@@ -1518,7 +1524,7 @@ NodePath NavMesh::getDebugNodePath() const
 NavMesh::Result NavMesh::debug(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)

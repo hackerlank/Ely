@@ -281,7 +281,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 #endif //ELY_THREAD
 
 		//lock (guard) the object mutex
-		HOLD_MUTEX(object->getMutex())
+		HOLD_REMUTEX(object->getMutex())
 
 		//on removal from scene object cleanup
 		object->onRemoveFromSceneCleanup();
@@ -377,13 +377,13 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 		oldComp->removeFromSceneCleanup();
 
 		//lock (guard) the old component mutex
-		HOLD_MUTEX(oldComp->getMutex())
+		HOLD_REMUTEX(oldComp->getMutex())
 		{
 			//lock (guard) the new component mutex
-			HOLD_MUTEX(newComp->getMutex())
+			HOLD_REMUTEX(newComp->getMutex())
 			{
 				//lock (guard) the object mutex
-				HOLD_MUTEX(object->getMutex())
+				HOLD_REMUTEX(object->getMutex())
 				{
 					//on removal from object old component cleanup
 					oldComp->removeFromObjectCleanup();
@@ -409,10 +409,10 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	}
 	{
 		//lock (guard) the new component mutex
-		HOLD_MUTEX(newComp->getMutex())
+		HOLD_REMUTEX(newComp->getMutex())
 		{
 			//lock (guard) the object mutex
-			HOLD_MUTEX(object->getMutex())
+			HOLD_REMUTEX(object->getMutex())
 
 			//add the new component to the object
 			object->doAddComponent(newComp, familyId);

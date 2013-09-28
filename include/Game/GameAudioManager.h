@@ -80,7 +80,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 private:
 	/// Audio manager.
@@ -99,9 +99,17 @@ private:
 	///@}
 
 	///The mutex associated with this manager.
-	Mutex mMutex;
+	ReMutex mMutex;
 
 };
+
+///inline definitions
+
+inline ReMutex& GameAudioManager::getMutex()
+{
+	return mMutex;
+}
+
 }  // namespace ely
 
 #endif /* GAMEAUDIOMANAGER_H_ */

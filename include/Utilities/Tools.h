@@ -306,7 +306,7 @@ std::string eraseCharacter(const std::string& source, int character);
 ///ELY_THREAD
 #ifdef ELY_THREAD
 #	define HOLD_MUTEX(_mutex_) MutexHolder guard(_mutex_);
-#	define HOLD_REMUTEX(_remutex_) ReMutexHolder guard(_remutex_);
+#	define HOLD_REMUTEX(_remutex_) ReMutexHolder reguard(_remutex_);
 #	define SMARTPTR(_type_) ThreadSafePointerTo<_type_>
 #	define CSMARTPTR(_type_) ThreadSafeConstPointerTo<_type_>
 #	define RETURN_ON_ASYNC_COND(_flag_,_return_)\
@@ -356,9 +356,8 @@ public:
 	}
 };
 
-///Some useful macro (for bullet,...)
-#define PHYSICS_MAX_DISTANCE 1000000000.0
-#define PHYSICS_PI 3.141592654
+///Some useful macro
+#define MATH_PI 3.141592654
 
 ///Define a standard name usable by components:
 /// "ObjectId_ObjectType_ComponentId_ComponentType"

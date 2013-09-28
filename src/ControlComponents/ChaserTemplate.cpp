@@ -71,7 +71,7 @@ SMARTPTR(Component)ChaserTemplate::makeComponent(const ComponentId& compId)
 void ChaserTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

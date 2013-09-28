@@ -15,15 +15,16 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/PhysicsComponents/Vehicle.cpp
+ * \file /Ely/src/PhysicsControlComponents/Vehicle.cpp
  *
  * \date 15/set/2013 (10:40:11)
  * \author consultit
  */
 
-#include "PhysicsComponents/Vehicle.h"
-#include "PhysicsComponents/VehicleTemplate.h"
+#include "PhysicsControlComponents/Vehicle.h"
+#include "PhysicsControlComponents/VehicleTemplate.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <throw_event.h>
 
@@ -66,18 +67,20 @@ bool Vehicle::initialize()
 	mThrowEvents = (
 			mTmpl->parameter(std::string("throw_events"))
 					== std::string("true") ? true : false);
-	//chassis
-	mChassisTmpl = mTmpl->parameter(std::string("chassis_object_template"));
-	//chassis model
-	mChassisModelParam = mTmpl->parameter(std::string("chassis_model"));
-	mChassisScaleParam = mTmpl->parameter(std::string("chassis_scale"));
-	//chassis rigid body
-	mChassisShapeTypeParam= mTmpl->parameter(std::string("chassis_shape_type"));
-	mChassisShapeSizeParam = mTmpl->parameter(std::string("chassis_shape_size"));
-	mChassisMassParam = mTmpl->parameter(std::string("chassis_mass"));
-	mChassisFrictionParam = mTmpl->parameter(std::string("chassis_friction"));
-	mChassisRestitutionParam = mTmpl->parameter(std::string("chassis_restitution"));
-	mChassisCollideMaskParam = mTmpl->parameter(std::string("chassis_collide_mask"));
+	//up axis
+	std::string upAxis = mTmpl->parameter(std::string("up_axis"));
+	if (upAxis == std::string("x"))
+	{
+		mUpAxis = X_up;
+	}
+	else if (upAxis == std::string("y"))
+	{
+		mUpAxis = Y_up;
+	}
+	else
+	{
+		mUpAxis = Z_up;
+	}
 	//wheels
 	mWheelTmpl = mTmpl->parameter(std::string("wheel_object_template"));
 	//wheel number
@@ -265,12 +268,12 @@ bool Vehicle::initialize()
 
 void Vehicle::onAddToObjectSetup()
 {
-	//create the chassis
-	//set a ParameterTable for each component
-	ParameterTableMap compTmplParams;
-	compTmplParams["RigidBody"].insert(
-		ParameterTable::value_type("", ""));
-
+	//setup the chassis: at this point "Scene" (Model or InstanceOf)
+	//and "Physics" (RigidBody) components should already have
+	//been already setup. The RigidBody has been added to physics
+	//update: it must be removed and then re-added in association
+	//with this Vehicle component. Moreover the Object node path
+	//is the RigidBody one.
 
 	//create a node path for the vehicle
 //	mNodePath = NodePath(mVehicle);
@@ -330,7 +333,7 @@ void Vehicle::onRemoveFromSceneCleanup()
 void Vehicle::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

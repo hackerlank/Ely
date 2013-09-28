@@ -22,7 +22,7 @@
  */
 
 #include "../common_configs.h"
-#include "PhysicsComponents/CharacterController.h"
+#include "PhysicsControlComponents/CharacterController.h"
 #include "SceneComponents/Model.h"
 
 //ENTER Enter_<STATE>_<OBJECTTYPE>;

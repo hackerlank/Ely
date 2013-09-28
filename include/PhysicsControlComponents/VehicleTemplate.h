@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/VehicleTemplate.h
+ * \file /Ely/include/PhysicsControlComponents/VehicleTemplate.h
  *
  * \date 22/set/2013 (11:04:35)
  * \author consultit

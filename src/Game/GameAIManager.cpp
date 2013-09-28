@@ -61,7 +61,7 @@ GameAIManager::GameAIManager(int sort, int priority,
 GameAIManager::~GameAIManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpdateTask)
 	{
@@ -75,7 +75,7 @@ GameAIManager::~GameAIManager()
 void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
 			mAIComponents.end(), aiComp);
@@ -88,7 +88,7 @@ void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
 			mAIComponents.end(), aiComp);
@@ -106,7 +106,7 @@ AIWorld* GameAIManager::aiWorld() const
 AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -124,11 +124,6 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& GameAIManager::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

@@ -59,7 +59,7 @@ GameControlManager::GameControlManager(int sort, int priority,
 GameControlManager::~GameControlManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpdateTask)
 	{
@@ -71,7 +71,7 @@ GameControlManager::~GameControlManager()
 void GameControlManager::addToControlUpdate(SMARTPTR(Component)controlComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ControlComponentList::iterator iter = find(mControlComponents.begin(),
 			mControlComponents.end(), controlComp);
@@ -84,7 +84,7 @@ void GameControlManager::addToControlUpdate(SMARTPTR(Component)controlComp)
 void GameControlManager::removeFromControlUpdate(SMARTPTR(Component)controlComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ControlComponentList::iterator iter = find(mControlComponents.begin(),
 			mControlComponents.end(), controlComp);
@@ -97,7 +97,7 @@ void GameControlManager::removeFromControlUpdate(SMARTPTR(Component)controlComp)
 AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -114,11 +114,6 @@ AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 	}
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& GameControlManager::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

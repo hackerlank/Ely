@@ -166,7 +166,7 @@ Sound3d::Result Sound3d::addSound(const std::string& soundName, const std::strin
 {
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//return if destroying
 		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -174,10 +174,10 @@ Sound3d::Result Sound3d::addSound(const std::string& soundName, const std::strin
 
 	int result = Result::ERROR;
 	//lock (guard) the mutex
-	HOLD_MUTEX(GameAudioManager::GetSingletonPtr()->getMutex())
+	HOLD_REMUTEX(GameAudioManager::GetSingletonPtr()->getMutex())
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//get the sound from fileName
 		SMARTPTR(AudioSound)sound =
@@ -205,7 +205,7 @@ Sound3d::Result Sound3d::removeSound(const std::string& soundName)
 {
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//return if destroying
 		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -213,10 +213,10 @@ Sound3d::Result Sound3d::removeSound(const std::string& soundName)
 
 	int result = Result::ERROR;
 	//lock (guard) the mutex
-	HOLD_MUTEX(GameAudioManager::GetSingletonPtr()->getMutex())
+	HOLD_REMUTEX(GameAudioManager::GetSingletonPtr()->getMutex())
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//make mSounds modifications
 		size_t removed = mSounds.erase(soundName);
@@ -240,7 +240,7 @@ Sound3d::Result Sound3d::removeSound(const std::string& soundName)
 void Sound3d::setMinDistance(float dist)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
@@ -256,7 +256,7 @@ void Sound3d::setMinDistance(float dist)
 void Sound3d::setMaxDistance(float dist)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
@@ -272,7 +272,7 @@ void Sound3d::setMaxDistance(float dist)
 void Sound3d::set3dStaticAttributes()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
@@ -295,7 +295,7 @@ void Sound3d::doSet3dStaticAttributes()
 SMARTPTR(AudioSound)Sound3d::getSound(const std::string& soundName)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,NULL)
@@ -311,7 +311,7 @@ SMARTPTR(AudioSound)Sound3d::getSound(const std::string& soundName)
 SMARTPTR(AudioSound)Sound3d::getSound(int index)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,NULL)
@@ -335,7 +335,7 @@ SMARTPTR(AudioSound)Sound3d::getSound(int index)
 void Sound3d::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

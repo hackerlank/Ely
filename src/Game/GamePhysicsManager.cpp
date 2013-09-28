@@ -77,7 +77,7 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 GamePhysicsManager::~GamePhysicsManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpdateTask)
 	{
@@ -89,7 +89,7 @@ GamePhysicsManager::~GamePhysicsManager()
 void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
@@ -102,7 +102,7 @@ void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
 void GamePhysicsManager::removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
 			mPhysicsComponents.end(), physicsComp);
@@ -120,7 +120,7 @@ SMARTPTR(BulletWorld) GamePhysicsManager::bulletWorld() const
 AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -180,11 +180,6 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	mBulletWorld->do_physics(dt, maxSubSteps);
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& GamePhysicsManager::getMutex()
-{
-	return mMutex;
 }
 
 SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
@@ -397,7 +392,7 @@ float GamePhysicsManager::getDim(ShapeSize shapeSize, float d1, float d2)
 NodePath GamePhysicsManager::getDebugNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mBulletDebugNodePath;
 }
@@ -405,7 +400,7 @@ NodePath GamePhysicsManager::getDebugNodePath() const
 void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
 	SMARTPTR(BulletDebugNode) bulletDebugNode =
@@ -421,7 +416,7 @@ void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
 void GamePhysicsManager::debug(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (enable)
 	{

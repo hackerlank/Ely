@@ -203,7 +203,7 @@ inline void CrowdAgent::reset()
 inline dtCrowdAgentParams CrowdAgent::getParams()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mAgentParams;
 }
@@ -211,7 +211,7 @@ inline dtCrowdAgentParams CrowdAgent::getParams()
 inline LPoint3f CrowdAgent::getMoveTarget()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mMoveTarget;
 }
@@ -219,7 +219,7 @@ inline LPoint3f CrowdAgent::getMoveTarget()
 inline LVector3f CrowdAgent::getMoveVelocity()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mMoveVelocity;
 }

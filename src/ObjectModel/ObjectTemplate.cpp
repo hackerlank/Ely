@@ -54,7 +54,7 @@ ObjectTemplate::~ObjectTemplate()
 void ObjectTemplate::clearComponentTemplates()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mComponentTemplates.clear();
 }
@@ -62,7 +62,7 @@ void ObjectTemplate::clearComponentTemplates()
 void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate)componentTmpl)
 {
 	//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		if (not componentTmpl)
 		{
@@ -76,7 +76,7 @@ SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
 		const ComponentType& componentType) const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ComponentTemplateList::const_iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
@@ -91,7 +91,7 @@ SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
 void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if(parameterTable.empty())
 	{
@@ -124,7 +124,7 @@ void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 void ObjectTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
@@ -139,7 +139,7 @@ void ObjectTemplate::setParametersDefaults()
 std::string ObjectTemplate::parameter(const std::string& paramName) const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::string strPtr;
 	ParameterTableConstIter iter;
@@ -157,7 +157,7 @@ std::list<std::string> ObjectTemplate::parameterList(
 		const std::string& paramName)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::list<std::string> strList;
 	ParameterTableIter iter;
@@ -178,7 +178,7 @@ void ObjectTemplate::addComponentParameter(const std::string& parameterName,
 		const std::string& parameterValue, ComponentType compType)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//any parameter value is a "compound" one, i.e. could have the form:
 	// "value1:value2:...:valueN"
@@ -195,7 +195,7 @@ bool ObjectTemplate::isComponentParameterValue(const std::string& name,
 		const std::string& value, ComponentType compType)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	bool result;
 	//
@@ -219,7 +219,7 @@ std::list<std::string> ObjectTemplate::componentParameterValues(
 		const std::string& paramName, ComponentType compType)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::list<std::string> strList;
 	ParameterTableConstIter iter;

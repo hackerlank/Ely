@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/physicscomponents/CharacterController_test.cpp
+ * \file /Ely/src/test/physicscontrolcomponents/CharacterController_test.cpp
  *
  * \date 30/ott/2012 (17:03:49)
  * \author consultit
  */
 
-#include "PhysicsSuiteFixture.h"
+#include "PhysicsControlSuiteFixture.h"
 
 struct CharacterControllerTestCaseFixture
 {
@@ -34,8 +34,8 @@ struct CharacterControllerTestCaseFixture
 	}
 };
 
-/// Physics suite
-BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
+/// PhysicsControl suite
+BOOST_FIXTURE_TEST_SUITE(PhysicsControl, PhysicsControlSuiteFixture)
 
 /// Test cases
 BOOST_AUTO_TEST_CASE(CharacterControllerTEST)
@@ -52,4 +52,4 @@ BOOST_AUTO_TEST_CASE(CharacterControllerTEST)
 	BOOST_CHECK(mChar->familyType() == ComponentFamilyType("Physics"));
 }
 
-BOOST_AUTO_TEST_SUITE_END() // Physics suite
+BOOST_AUTO_TEST_SUITE_END() // PhysicsControl suite

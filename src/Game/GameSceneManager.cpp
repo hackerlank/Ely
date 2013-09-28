@@ -59,7 +59,7 @@ GameSceneManager::GameSceneManager(int sort, int priority,
 GameSceneManager::~GameSceneManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpdateTask)
 	{
@@ -71,7 +71,7 @@ GameSceneManager::~GameSceneManager()
 void GameSceneManager::addToSceneUpdate(SMARTPTR(Component)sceneComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	SceneComponentList::iterator iter = find(mSceneComponents.begin(),
 			mSceneComponents.end(), sceneComp);
@@ -84,7 +84,7 @@ void GameSceneManager::addToSceneUpdate(SMARTPTR(Component)sceneComp)
 void GameSceneManager::removeFromSceneUpdate(SMARTPTR(Component)sceneComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	SceneComponentList::iterator iter = find(mSceneComponents.begin(),
 			mSceneComponents.end(), sceneComp);
@@ -97,7 +97,7 @@ void GameSceneManager::removeFromSceneUpdate(SMARTPTR(Component)sceneComp)
 AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -114,11 +114,6 @@ AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 	}
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& GameSceneManager::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

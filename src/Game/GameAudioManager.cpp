@@ -60,7 +60,7 @@ GameAudioManager::GameAudioManager(int sort, int priority,
 GameAudioManager::~GameAudioManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpdateTask)
 	{
@@ -72,7 +72,7 @@ GameAudioManager::~GameAudioManager()
 void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
@@ -85,7 +85,7 @@ void GameAudioManager::addToAudioUpdate(SMARTPTR(Component) audioComp)
 void GameAudioManager::removeFromAudioUpdate(SMARTPTR(Component) audioComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	AudioComponentList::iterator iter = find(mAudioComponents.begin(),
 			mAudioComponents.end(), audioComp);
@@ -103,7 +103,7 @@ SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -122,11 +122,6 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	mAudioMgr->update();
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& GameAudioManager::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

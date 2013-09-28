@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/Vehicle.h
+ * \file /Ely/include/PhysicsControlComponents/Vehicle.h
  *
  * \date 15/set/2013 (10:40:10)
  * \author consultit
@@ -26,6 +26,7 @@
 
 #include <bulletVehicle.h>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 
 namespace ely
 {
@@ -35,27 +36,19 @@ class VehicleTemplate;
  * \brief Component making an Object to behave as a vehicle.
  *
  * The control is accomplished through physics.\n
- * It constructs a vehicle with a "chassis" and a series of "wheels":
- * both of which represented by Objects whose templates are passed as
- * parameters.\n
- * Both chassis and wheels objects are constructed on vehicle construction
- * and destroyed during vehicle destruction.\n
- * Chassis object should have at least a "RigidBody" and a
- * "Model"/"InstanceOf" component; wheel object should have at
- * least a "Model"/"InstanceOf" component.\n
- * The up axis is the Z axis.\n
+ * It constructs a vehicle with a "chassis" represented by a RigidBody
+ * component, presumably associated to a Scene component (Model or
+ * InstanceOf).\n
+ * The "wheels" are represented by a series of Objects whose templates
+ * are passed as parameters. Wheels Objects are constructed on
+ * vehicle construction and destroyed during vehicle destruction.\n
+ * Wheel object should have, at least, a Scene (Model or InstanceOf)
+ * component.\n
+ * The default up axis is the Z axis.\n
  *
  * XML Param(s):
  * - "throw_events"					|single|"false"
- * - "chassis_object_template"		|single|no default
- * - "chassis_model"  				|single|no default
- * - "chassis_scale"  				|single|"1.0"
- * - "chassis_shape_type"  			|single|"box"
- * - "chassis_shape_size"  			|single|"medium"  (min, medium, max)
- * - "chassis_mass"  				|single|"1.0"
- * - "chassis_friction"  			|single|"0.8"
- * - "chassis_restitution"  		|single|"0.1"
- * - "chassis_collide_mask"			|single|"all_on"
+ * - "up_axis"						|single|"z" (x,y,z)
  * - "wheels_number"  				|single|"4"
  * - "wheel_object_template"		|single|no default
  * - "wheel_model"  				|multiple|no default ("model@wheelIdx")
@@ -137,29 +130,16 @@ public:
 	///@}
 
 	/**
-	 * \name Getters of inner Objects composing this vehicle.
+	 * \name Gets the inner wheels' Objects added to this vehicle.
 	 */
-	///@{
-	SMARTPTR(Object) getChassisObject() const;
 	std::vector<SMARTPTR(Object)> getWheelObjects() const;
-	///@}
 
 private:
 	///The underlying BulletVehicle (read-only after creation & before destruction).
 	SMARTPTR(BulletVehicle) mVehicle;
-	/**
-	 * \name Chassis data.
-	 */
-	///@{
-	SMARTPTR(Object) mChassis;
-	std::string mChassisTmpl;
-	std::string
-	//model params
-	mChassisModelParam, mChassisScaleParam,
-	//rigid body params
-	mChassisShapeTypeParam, mChassisShapeSizeParam, mChassisMassParam,
-	mChassisFrictionParam, mChassisRestitutionParam, mChassisCollideMaskParam;
-	///@}
+
+	///The up axis.
+	BulletUpAxis mUpAxis;
 
 	/**
 	 * \name Wheels' data.
@@ -214,16 +194,6 @@ inline void Vehicle::reset()
 {
 	//
 	mVehicle.clear();
-	mChassis.clear();
-	mChassisTmpl.clear();
-	mChassisModelParam.clear();
-	mChassisScaleParam.clear();
-	mChassisShapeTypeParam.clear();
-	mChassisShapeSizeParam.clear();
-	mChassisMassParam.clear();
-	mChassisFrictionParam.clear();
-	mChassisRestitutionParam.clear();
-	mChassisCollideMaskParam.clear();
 	mWheels.clear();
 	mWheelNumber = 0;
 	mWheelTmpl.clear();
@@ -241,11 +211,6 @@ inline void Vehicle::reset()
 	mWheelFrictionSlip.clear();
 	mWheelRollInfluence.clear();
 	mThrowEvents = mOnStartSent = mOnStopSent = false;
-}
-
-inline SMARTPTR(Object) Vehicle::getChassisObject() const
-{
-	return mChassis;
 }
 
 inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const

@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/PhysicsComponents/VehicleTemplate.cpp
+ * \file /Ely/src/PhysicsControlComponents/VehicleTemplate.cpp
  *
  * \date 22/set/2013 (11:04:35)
  * \author consultit
  */
 
-#include "PhysicsComponents/VehicleTemplate.h"
-#include "PhysicsComponents/Vehicle.h"
+#include "PhysicsControlComponents/VehicleTemplate.h"
+#include "PhysicsControlComponents/Vehicle.h"
 #include "Game/GamePhysicsManager.h"
 
 namespace ely
@@ -54,7 +54,7 @@ ComponentType VehicleTemplate::componentType() const
 
 ComponentFamilyType VehicleTemplate::familyType() const
 {
-	return ComponentFamilyType("Physics");
+	return ComponentFamilyType("PhysicsControl");
 }
 
 SMARTPTR(Component)VehicleTemplate::makeComponent(const ComponentId& compId)
@@ -71,19 +71,13 @@ SMARTPTR(Component)VehicleTemplate::makeComponent(const ComponentId& compId)
 void VehicleTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
-	mParameterTable.insert(ParameterNameValue("chassis_scale", "1.0"));
-	mParameterTable.insert(ParameterNameValue("chassis_shape_type", "box"));
-	mParameterTable.insert(ParameterNameValue("chassis_shape_size", "medium"));
-	mParameterTable.insert(ParameterNameValue("chassis_mass", "1.0"));
-	mParameterTable.insert(ParameterNameValue("chassis_friction", "0.8"));
-	mParameterTable.insert(ParameterNameValue("chassis_restitution", "0.1"));
-	mParameterTable.insert(ParameterNameValue("chassis_collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("up_axis", "z"));
 	mParameterTable.insert(ParameterNameValue("wheels_number", "4"));
 }
 

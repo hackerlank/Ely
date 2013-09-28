@@ -59,7 +59,7 @@ GameBehaviorManager::GameBehaviorManager(int sort, int priority,
 GameBehaviorManager::~GameBehaviorManager()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpdateTask)
 	{
@@ -71,7 +71,7 @@ GameBehaviorManager::~GameBehaviorManager()
 void GameBehaviorManager::addToBehaviorUpdate(SMARTPTR(Component)behaviorComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	BehaviorComponentList::iterator iter = find(mBehaviorComponents.begin(),
 			mBehaviorComponents.end(), behaviorComp);
@@ -84,7 +84,7 @@ void GameBehaviorManager::addToBehaviorUpdate(SMARTPTR(Component)behaviorComp)
 void GameBehaviorManager::removeFromBehaviorUpdate(SMARTPTR(Component)behaviorComp)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	BehaviorComponentList::iterator iter = find(mBehaviorComponents.begin(),
 			mBehaviorComponents.end(), behaviorComp);
@@ -97,7 +97,7 @@ void GameBehaviorManager::removeFromBehaviorUpdate(SMARTPTR(Component)behaviorCo
 AsyncTask::DoneStatus GameBehaviorManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -115,11 +115,6 @@ AsyncTask::DoneStatus GameBehaviorManager::update(GenericAsyncTask* task)
 
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& GameBehaviorManager::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

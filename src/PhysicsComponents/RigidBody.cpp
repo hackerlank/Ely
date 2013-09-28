@@ -442,7 +442,7 @@ void RigidBody::onAddToSceneSetup()
 void RigidBody::switchType(BodyType bodyType)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)

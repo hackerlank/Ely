@@ -126,7 +126,7 @@ private:
 inline SMARTPTR(Object)InstanceOf::getInstancedObject() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mInstancedObject;
 }
@@ -152,7 +152,7 @@ inline void InstanceOf::onRemoveFromSceneCleanup()
 inline NodePath InstanceOf::getNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -160,7 +160,7 @@ inline NodePath InstanceOf::getNodePath() const
 inline void InstanceOf::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mNodePath = nodePath;
 }

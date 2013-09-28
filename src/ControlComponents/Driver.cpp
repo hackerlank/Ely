@@ -235,7 +235,7 @@ void Driver::onRemoveFromSceneCleanup()
 Driver::Result Driver::enable()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -276,7 +276,7 @@ Driver::Result Driver::disable()
 {
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//if disabling return
 		RETURN_ON_ASYNC_COND(mDisabling, Result::DRIVER_DISABLING)
@@ -293,7 +293,7 @@ Driver::Result Driver::disable()
 	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -330,7 +330,7 @@ void Driver::doDisable()
 void Driver::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

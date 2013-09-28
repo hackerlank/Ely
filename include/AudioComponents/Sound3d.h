@@ -232,7 +232,7 @@ inline void Sound3d::reset()
 inline float Sound3d::getMinDistance()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mMinDist;
 }
@@ -240,7 +240,7 @@ inline float Sound3d::getMinDistance()
 inline float Sound3d::getMaxDistance()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mMaxDist;
 }

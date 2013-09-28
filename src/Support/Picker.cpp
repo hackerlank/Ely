@@ -88,7 +88,7 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 Picker::~Picker()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mApp)
 	{
@@ -106,7 +106,7 @@ Picker::~Picker()
 void Picker::pickBody(const Event* event)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	// handle body picking
 	if (event->get_name() == mPickKeyOn)
@@ -206,7 +206,7 @@ void Picker::pickBody(const Event* event)
 AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	// handle picked body if any
 	if (not mCsPick.is_null())
@@ -236,11 +236,6 @@ AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 	}
 	//
 	return AsyncTask::DS_cont;
-}
-
-Mutex& Picker::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

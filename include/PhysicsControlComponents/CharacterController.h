@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/CharacterController.h
+ * \file /Ely/include/PhysicsControlComponents/CharacterController.h
  *
  * \date 30/ott/2012 (17:03:49)
  * \author consultit
@@ -48,16 +48,16 @@ class CharacterControllerTemplate;
  * - "shape_type"  				|single|"sphere"
  * - "shape_size"  				|single|"medium"  (min, medium, max)
  * - "use_shape_of"				|single|no default
- * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
- * - "shape_height"  			|single|no default (cylinder,capsule,cone)
- * - "shape_up"  				|single|no default (cylinder,capsule,cone)
- * - "shape_half_x"  			|single|no default (box)
- * - "shape_half_y"  			|single|no default (box)
- * - "shape_half_z"  			|single|no default (box)
+ * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)
+ * - "shape_height"  			|single|no default (for cylinder,capsule,cone)
+ * - "shape_up"  				|single|"z" ((x,y,z) for cylinder,capsule,cone)
+ * - "shape_half_x"  			|single|no default (for box)
+ * - "shape_half_y"  			|single|no default (for box)
+ * - "shape_half_z"  			|single|no default (for box)
  * - "fall_speed"  				|single|"55.0"
- * - "gravity"  				|single|"29.4" (3G)
+ * - "gravity"  				|single|"29.4" (==3G)
  * - "jump_speed"  				|single|"10.0"
- * - "max_slope"  				|single|"45.0" (degrees)
+ * - "max_slope"  				|single|"45.0" (measured in degrees)
  * - "max_jump_height"  		|single|no default
  * - "forward"  				|single|"enabled"
  * - "backward"  				|single|"enabled"
@@ -271,7 +271,7 @@ inline void CharacterController::reset()
 inline void CharacterController::enableForward(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mForwardKey)
 	{
@@ -282,7 +282,7 @@ inline void CharacterController::enableForward(bool enable)
 inline bool CharacterController::isForwardEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mForward;
 }
@@ -290,7 +290,7 @@ inline bool CharacterController::isForwardEnabled()
 inline void CharacterController::enableBackward(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mBackwardKey)
 	{
@@ -301,7 +301,7 @@ inline void CharacterController::enableBackward(bool enable)
 inline bool CharacterController::isBackwardEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mBackward;
 }
@@ -309,7 +309,7 @@ inline bool CharacterController::isBackwardEnabled()
 inline void CharacterController::enableUp(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mUpKey)
 	{
@@ -320,7 +320,7 @@ inline void CharacterController::enableUp(bool enable)
 inline bool CharacterController::isUpEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mUp;
 }
@@ -328,7 +328,7 @@ inline bool CharacterController::isUpEnabled()
 inline void CharacterController::enableDown(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mDownKey)
 	{
@@ -339,7 +339,7 @@ inline void CharacterController::enableDown(bool enable)
 inline bool CharacterController::isDownEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mDown;
 }
@@ -347,7 +347,7 @@ inline bool CharacterController::isDownEnabled()
 inline void CharacterController::enableStrafeLeft(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mStrafeLeftKey)
 	{
@@ -358,7 +358,7 @@ inline void CharacterController::enableStrafeLeft(bool enable)
 inline bool CharacterController::isStrafeLeftEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mStrafeLeft;
 }
@@ -366,7 +366,7 @@ inline bool CharacterController::isStrafeLeftEnabled()
 inline void CharacterController::enableStrafeRight(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mStrafeRightKey)
 	{
@@ -377,7 +377,7 @@ inline void CharacterController::enableStrafeRight(bool enable)
 inline bool CharacterController::isStrafeRightEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mStrafeRight;
 }
@@ -385,7 +385,7 @@ inline bool CharacterController::isStrafeRightEnabled()
 inline void CharacterController::enableRollLeft(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mRollLeftKey)
 	{
@@ -396,7 +396,7 @@ inline void CharacterController::enableRollLeft(bool enable)
 inline bool CharacterController::isRollLeftEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mRollLeft;
 }
@@ -404,7 +404,7 @@ inline bool CharacterController::isRollLeftEnabled()
 inline void CharacterController::enableRollRight(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mRollRightKey)
 	{
@@ -415,7 +415,7 @@ inline void CharacterController::enableRollRight(bool enable)
 inline bool CharacterController::isRollRightEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mRollRight;
 }
@@ -423,7 +423,7 @@ inline bool CharacterController::isRollRightEnabled()
 inline void CharacterController::enableJump(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mJumpKey)
 	{
@@ -434,7 +434,7 @@ inline void CharacterController::enableJump(bool enable)
 inline bool CharacterController::isJumpEnabled()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mJump;
 }
@@ -442,7 +442,7 @@ inline bool CharacterController::isJumpEnabled()
 inline LVecBase3f CharacterController::getLinearSpeed()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mLinearSpeed;
 }
@@ -450,7 +450,7 @@ inline LVecBase3f CharacterController::getLinearSpeed()
 inline void CharacterController::setLinearSpeed(const LVecBase3f& speed)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mLinearSpeed = speed;
 }
@@ -458,7 +458,7 @@ inline void CharacterController::setLinearSpeed(const LVecBase3f& speed)
 inline float CharacterController::getAngularSpeed()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mAngularSpeed;
 }
@@ -466,7 +466,7 @@ inline float CharacterController::getAngularSpeed()
 inline void CharacterController::setAngularSpeed(float speed)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mAngularSpeed = speed;
 }
@@ -474,7 +474,7 @@ inline void CharacterController::setAngularSpeed(float speed)
 inline void CharacterController::setIsLocal(bool isLocal)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mIsLocal = isLocal;
 }
@@ -482,7 +482,7 @@ inline void CharacterController::setIsLocal(bool isLocal)
 inline bool CharacterController::getIsLocal()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mIsLocal;
 }
@@ -490,7 +490,7 @@ inline bool CharacterController::getIsLocal()
 inline NodePath CharacterController::getNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -498,7 +498,7 @@ inline NodePath CharacterController::getNodePath() const
 inline void CharacterController::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mNodePath = nodePath;
 }

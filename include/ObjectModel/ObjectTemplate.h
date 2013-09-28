@@ -180,7 +180,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 private:
 	///Name identifying this object template.
@@ -202,7 +202,7 @@ private:
 	std::map<ComponentType, ParameterTable> mComponentParameterTables;
 
 	///The mutex associated with this template.
-	Mutex mMutex;
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -248,7 +248,7 @@ struct idIsEqualTo
 inline ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mComponentTemplates;
 }
@@ -256,7 +256,7 @@ inline ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplat
 inline ParameterTable ObjectTemplate::getParameterTable() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mParameterTable;
 }
@@ -276,7 +276,7 @@ inline WindowFramework* const ObjectTemplate::windowFramework() const
 	return mWindowFramework;
 }
 
-inline Mutex& ObjectTemplate::getMutex()
+inline ReMutex& ObjectTemplate::getMutex()
 {
 	return mMutex;
 }

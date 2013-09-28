@@ -228,14 +228,14 @@ inline void Terrain::reset()
 inline float Terrain::getWidthScale() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mWidthScale;
 }
 inline float Terrain::getHeightScale() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mHeightScale;
 }

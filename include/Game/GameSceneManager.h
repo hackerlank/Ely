@@ -74,7 +74,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 private:
 
@@ -91,9 +91,17 @@ private:
 	///@}
 
 	///The mutex associated with this manager.
-	Mutex mMutex;
+	ReMutex mMutex;
 
 };
+
+///inline definitions
+
+inline ReMutex& GameSceneManager::getMutex()
+{
+	return mMutex;
+}
+
 }  // namespace ely
 
 #endif /* GAMESCENEMANAGER_H_ */

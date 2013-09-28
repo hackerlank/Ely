@@ -124,7 +124,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 protected:
 
@@ -187,7 +187,7 @@ protected:
 #endif
 
 	///The mutex associated with this manager.
-	Mutex mMutex;
+	ReMutex mMutex;
 };
 
 ///inline definitions
@@ -200,6 +200,11 @@ inline void GameManager::setDataInfo(GameDataInfo info, const std::string& value
 inline std::string GameManager::getDataInfo(GameDataInfo info)
 {
 	return mInfoDB[info];
+}
+
+inline ReMutex& GameManager::getMutex()
+{
+	return mMutex;
 }
 
 } // namespace ely

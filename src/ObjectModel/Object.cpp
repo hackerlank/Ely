@@ -43,7 +43,7 @@ Object::~Object()
 SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyId) const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	ComponentOrderedList::const_iterator it =
 	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));

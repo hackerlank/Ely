@@ -221,7 +221,7 @@ void Chaser::onRemoveFromSceneCleanup()
 Chaser::Result Chaser::enable()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -302,7 +302,7 @@ Chaser::Result Chaser::disable()
 {
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//if disabling return
 		RETURN_ON_ASYNC_COND(mDisabling, Result::CHASER_DISABLING)
@@ -322,7 +322,7 @@ Chaser::Result Chaser::disable()
 	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -363,7 +363,7 @@ void Chaser::doDisable()
 void Chaser::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

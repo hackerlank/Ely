@@ -246,7 +246,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 private:
 	///The template used to construct this component.
@@ -300,7 +300,7 @@ private:
 	ParameterTableMap mCompTmplParams;
 
 	///The mutex associated with this object.
-	Mutex mMutex;
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -360,7 +360,7 @@ inline Object::ComponentOrderedList& Object::doGetComponents()
 inline unsigned int Object::numComponents() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return static_cast<unsigned int>(mComponents.size());
 }
@@ -370,7 +370,7 @@ inline SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 	return mTmpl;
 }
 
-inline Mutex& Object::getMutex()
+inline ReMutex& Object::getMutex()
 {
 	return mMutex;
 }
@@ -378,7 +378,7 @@ inline Mutex& Object::getMutex()
 inline ParameterTable Object::getStoredObjTmplParams() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mObjTmplParams;
 }
@@ -386,7 +386,7 @@ inline ParameterTable Object::getStoredObjTmplParams() const
 inline ParameterTableMap Object::getStoredCompTmplParams() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mCompTmplParams;
 }
@@ -401,7 +401,7 @@ inline void Object::storeParameters(const ParameterTable& objTmplParams,
 inline void Object::freeParameters()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mObjTmplParams.clear();
 	mCompTmplParams.clear();
@@ -410,7 +410,7 @@ inline void Object::freeParameters()
 inline bool Object::isSteady() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mIsSteady;
 }

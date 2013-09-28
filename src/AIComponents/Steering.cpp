@@ -198,7 +198,7 @@ void Steering::onRemoveFromSceneCleanup()
 Steering::Result Steering::enable()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -268,7 +268,7 @@ Steering::Result Steering::disable()
 {
 	{
 		//lock (guard) the mutex
-		HOLD_MUTEX(mMutex)
+		HOLD_REMUTEX(mMutex)
 
 		//if disabling return
 		RETURN_ON_ASYNC_COND(mDisabling, Result::STEERING_DISABLING)
@@ -285,7 +285,7 @@ Steering::Result Steering::disable()
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
@@ -333,7 +333,7 @@ void Steering::doDisable()
 void Steering::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 
@@ -983,7 +983,7 @@ LVecBase3f Steering::do_flock()
 							* (ai_char_heading.get_xy().length())
 							* cos(
 									_steering->_flock_group->_flock_vcone_angle
-											* (PHYSICS_PI / 180))))
+											* (MATH_PI / 180))))
 					&& (dist_vect.get_xy().length()
 							< _steering->_flock_group->_flock_vcone_radius))
 			{
@@ -1148,7 +1148,7 @@ void Steering::do_obstacle_avoidance_activate_bullet()
 					_obstacle_avoidance_obj->_ai_char->get_node_path(),
 					LPoint3f::zero());
 	//to_pos = very far from _ai_char pos along forwardDirection
-	LPoint3f toPos = fromPos + forwardDirection * PHYSICS_MAX_DISTANCE;
+	LPoint3f toPos = fromPos + forwardDirection * FLT_MAX;
 	//detect obstacles
 	BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos, toPos,
 			mObstacleHitMask);
@@ -1176,7 +1176,7 @@ LVecBase3f Steering::do_obstacle_avoidance_bullet()
 					_obstacle_avoidance_obj->_ai_char->get_node_path(),
 					LPoint3f::zero());
 	//to_pos = very far from _ai_char pos along -mOldHitNormal
-	LPoint3f toPos = fromPos - mOldHitNormal * PHYSICS_MAX_DISTANCE;
+	LPoint3f toPos = fromPos - mOldHitNormal * FLT_MAX;
 	//detect obstacles
 	BulletClosestHitRayResult result = mWorld->ray_test_closest(fromPos, toPos,
 			mObstacleHitMask);

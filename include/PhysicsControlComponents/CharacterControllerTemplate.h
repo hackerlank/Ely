@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/CharacterControllerTemplate.h
+ * \file /Ely/include/PhysicsControlComponents/CharacterControllerTemplate.h
  *
  * \date 30/ott/2012 (17:01:33)
  * \author consultit

@@ -45,12 +45,12 @@ noinst_HEADERS = \
 		ObjectModel/Object.h \
 		ObjectModel/ObjectTemplate.h \
 		ObjectModel/ObjectTemplateManager.h \
-		PhysicsComponents/CharacterController.h \
-		PhysicsComponents/CharacterControllerTemplate.h \
 		PhysicsComponents/RigidBody.h \
 		PhysicsComponents/RigidBodyTemplate.h \
-		PhysicsComponents/Vehicle.h \
-		PhysicsComponents/VehicleTemplate.h \
+		PhysicsControlComponents/CharacterController.h \
+		PhysicsControlComponents/CharacterControllerTemplate.h \
+		PhysicsControlComponents/Vehicle.h \
+		PhysicsControlComponents/VehicleTemplate.h \
 		SceneComponents/InstanceOf.h \
 		SceneComponents/InstanceOfTemplate.h \
 		SceneComponents/Model.h \

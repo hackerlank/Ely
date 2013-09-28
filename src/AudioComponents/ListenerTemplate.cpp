@@ -71,7 +71,7 @@ SMARTPTR(Component)ListenerTemplate::makeComponent(const ComponentId& compId)
 void ListenerTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

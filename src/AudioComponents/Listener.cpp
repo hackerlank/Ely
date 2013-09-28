@@ -118,7 +118,7 @@ void Listener::onRemoveFromSceneCleanup()
 void Listener::set3dStaticAttributes()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
@@ -143,7 +143,7 @@ void Listener::doSet3dStaticAttributes()
 void Listener::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

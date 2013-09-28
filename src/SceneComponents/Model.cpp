@@ -346,7 +346,7 @@ void Model::onRemoveFromObjectCleanup()
 SMARTPTR(PartBundle)Model::getPartBundle() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mFirstPartBundle;
 }

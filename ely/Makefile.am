@@ -29,6 +29,7 @@ ely_ltlibraries = \
 		$(top_builddir)/src/libbehaviorcomponents.la \
 		$(top_builddir)/src/libcontrolcomponents.la \
 		$(top_builddir)/src/libphysicscomponents.la \
+		$(top_builddir)/src/libphysicscontrolcomponents.la \
 		$(top_builddir)/src/libscenecomponents.la \
 		$(top_builddir)/src/libobjectmodel.la \
 		$(top_builddir)/src/libutilities.la

@@ -63,16 +63,16 @@ class RigidBodyTemplate;
  * - "shape_type"  				|single|"sphere"
  * - "shape_size"  				|single|"medium"  (minimum, medium, maximum)
  * - "use_shape_of"				|single|no default
- * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
- * - "shape_norm_x"  			|single|no default (plane)
- * - "shape_norm_y"  			|single|no default (plane)
- * - "shape_norm_z"  			|single|no default (plane)
- * - "shape_d"  				|single|no default (plane)
- * - "shape_half_x"  			|single|no default (box)
- * - "shape_half_y"  			|single|no default (box)
- * - "shape_half_z"  			|single|no default (box)
- * - "shape_height"  			|single|"1.0" (cylinder,capsule,cone,heightfield)
- * - "shape_up"  				|single|"z" (cylinder,capsule,cone,heightfield)
+ * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)
+ * - "shape_norm_x"  			|single|no default (for plane)
+ * - "shape_norm_y"  			|single|no default (for plane)
+ * - "shape_norm_z"  			|single|no default (for plane)
+ * - "shape_d"  				|single|no default (for plane)
+ * - "shape_half_x"  			|single|no default (for box)
+ * - "shape_half_y"  			|single|no default (for box)
+ * - "shape_half_z"  			|single|no default (for box)
+ * - "shape_height"  			|single|"1.0" (for cylinder,capsule,cone,heightfield)
+ * - "shape_up"  				|single|"z" ((x,y,z) for cylinder,capsule,cone,heightfield)
  * - "shape_heightfield_file" 	|single|no default (heightfield)
  * - "shape_scale_w"  			|single|"1.0" (heightfield)
  * - "shape_scale_d"  			|single|"1.0" (heightfield)
@@ -243,7 +243,7 @@ inline void RigidBody::onRemoveFromSceneCleanup()
 inline NodePath RigidBody::getNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -251,7 +251,7 @@ inline NodePath RigidBody::getNodePath() const
 inline void RigidBody::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mNodePath = nodePath;
 }

@@ -124,7 +124,7 @@ inline void NodePathWrapper::onRemoveFromSceneCleanup()
 inline NodePath NodePathWrapper::getNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -132,7 +132,7 @@ inline NodePath NodePathWrapper::getNodePath() const
 inline void NodePathWrapper::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mNodePath = nodePath;
 }

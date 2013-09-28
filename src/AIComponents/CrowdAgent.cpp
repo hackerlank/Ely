@@ -209,7 +209,7 @@ void CrowdAgent::onAddToSceneSetup()
 AsyncTask::DoneStatus CrowdAgent::addCrowdAgentAsync(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mStartNavMesh->addCrowdAgent(this);
 	//
@@ -231,7 +231,7 @@ void CrowdAgent::onRemoveFromSceneCleanup()
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
@@ -252,7 +252,7 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)
@@ -273,7 +273,7 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying,)

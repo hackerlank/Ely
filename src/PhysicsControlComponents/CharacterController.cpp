@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/PhysicsComponents/CharacterController.cpp
+ * \file /Ely/src/PhysicsControlComponents/CharacterController.cpp
  *
  * \date 30/ott/2012 (17:03:49)
  * \author consultit
  */
 
-#include "PhysicsComponents/CharacterController.h"
-#include "PhysicsComponents/CharacterControllerTemplate.h"
+#include "PhysicsControlComponents/CharacterController.h"
+#include "PhysicsControlComponents/CharacterControllerTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <throw_event.h>
 
@@ -328,7 +328,7 @@ void CharacterController::onRemoveFromSceneCleanup()
 void CharacterController::update(void* data)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	float dt = *(reinterpret_cast<float*>(data));
 

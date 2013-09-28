@@ -54,7 +54,7 @@ Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
 Raycaster::~Raycaster()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (mApp)
 	{
@@ -74,7 +74,7 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 		void* data,	const std::string& hitKey, BitMask32 bitMask)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if (not ((index >= 0) and (index < m_N)))
 	{
@@ -103,7 +103,7 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 const PandaNode* Raycaster::getHitNode()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mHitNode;
 }
@@ -111,7 +111,7 @@ const PandaNode* Raycaster::getHitNode()
 LPoint3f Raycaster::getHitPos()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mHitPos;
 }
@@ -119,7 +119,7 @@ LPoint3f Raycaster::getHitPos()
 LPoint3f Raycaster::getFromPos()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mFromPos;
 }
@@ -127,7 +127,7 @@ LPoint3f Raycaster::getFromPos()
 LPoint3f Raycaster::getToPos()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mToPos;
 }
@@ -135,7 +135,7 @@ LPoint3f Raycaster::getToPos()
 LVector3f Raycaster::getHitNormal()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mHitNormal;
 }
@@ -143,7 +143,7 @@ LVector3f Raycaster::getHitNormal()
 float Raycaster::getHitFraction()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mHitFraction;
 }
@@ -151,7 +151,7 @@ float Raycaster::getHitFraction()
 void Raycaster::hitBody(const Event* event)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//get OnPickKey index (if any)
 	std::string eventName = event->get_name();
@@ -207,11 +207,6 @@ void Raycaster::hitBody(const Event* event)
 			}
 		}
 	}
-}
-
-Mutex& Raycaster::getMutex()
-{
-	return mMutex;
 }
 
 } // namespace ely

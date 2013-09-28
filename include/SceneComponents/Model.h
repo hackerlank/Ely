@@ -196,7 +196,7 @@ inline void Model::reset()
 inline AnimControlCollection Model::animations() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mAnimations;
 }
@@ -212,7 +212,7 @@ inline void Model::onRemoveFromSceneCleanup()
 inline NodePath Model::getNodePath() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mNodePath;
 }
@@ -220,7 +220,7 @@ inline NodePath Model::getNodePath() const
 inline void Model::setNodePath(const NodePath& nodePath)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	mNodePath = nodePath;
 }

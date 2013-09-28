@@ -22,7 +22,7 @@
  */
 
 #include "../common_configs.h"
-#include "PhysicsComponents/CharacterController.h"
+#include "PhysicsControlComponents/CharacterController.h"
 
 ///player related
 #ifdef __cplusplus

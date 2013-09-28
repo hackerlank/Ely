@@ -122,7 +122,7 @@ public:
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
-	Mutex& getMutex();
+	ReMutex& getMutex();
 
 protected:
 	///Parameter table.
@@ -133,7 +133,7 @@ protected:
 	WindowFramework* mWindowFramework;
 
 	///The mutex associated with this template.
-	Mutex mMutex;
+	ReMutex mMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -176,12 +176,12 @@ inline WindowFramework* const ComponentTemplate::windowFramework() const
 inline ParameterTable ComponentTemplate::getParameterTable() const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	return mParameterTable;
 }
 
-inline Mutex& ComponentTemplate::getMutex()
+inline ReMutex& ComponentTemplate::getMutex()
 {
 	return mMutex;
 }

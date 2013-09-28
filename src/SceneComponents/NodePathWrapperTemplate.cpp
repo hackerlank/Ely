@@ -72,7 +72,7 @@ SMARTPTR(Component)NodePathWrapperTemplate::makeComponent(const ComponentId& com
 void NodePathWrapperTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();

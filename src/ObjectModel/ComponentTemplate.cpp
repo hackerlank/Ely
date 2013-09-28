@@ -40,7 +40,7 @@ ComponentTemplate::~ComponentTemplate()
 void ComponentTemplate::setParameters(const ParameterTable& parameterTable)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	if(parameterTable.empty())
 	{
@@ -74,7 +74,7 @@ void ComponentTemplate::setParameters(const ParameterTable& parameterTable)
 std::string ComponentTemplate::parameter(const std::string& name) const
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::string strPtr;
 	ParameterTable::const_iterator iter;
@@ -91,7 +91,7 @@ std::string ComponentTemplate::parameter(const std::string& name) const
 std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
 {
 	//lock (guard) the mutex
-	HOLD_MUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	std::list<std::string> strList;
 	ParameterTableIter iter;
