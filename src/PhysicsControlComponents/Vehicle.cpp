@@ -60,6 +60,10 @@ ComponentType Vehicle::componentType() const
 	return mTmpl->componentType();
 }
 
+////
+
+////
+
 bool Vehicle::initialize()
 {
 	bool result = true;
@@ -270,10 +274,11 @@ void Vehicle::onAddToObjectSetup()
 {
 	//setup the chassis: at this point "Scene" (Model or InstanceOf)
 	//and "Physics" (RigidBody) components should already have
-	//been already setup. The RigidBody has been added to physics
-	//update: it must be removed and then re-added in association
-	//with this Vehicle component. Moreover the Object node path
-	//is the RigidBody one.
+	//been already setup.
+	//The RigidBody has been added to physics update: it must be removed
+	//and then re-added in association with this Vehicle component.
+	//Moreover the Object node path is the RigidBody one.
+
 
 	//create a node path for the vehicle
 //	mNodePath = NodePath(mVehicle);

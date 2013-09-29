@@ -126,9 +126,6 @@ public:
 		enum
 		{
 			NAVMESHTYPE_NULL = COMPONENT_RESULT_END + 1,
-#ifdef ELY_THREAD
-			NAVMESH_ASYNC_SETUP_NOT_COMPLETE,
-#endif
 			NAVMESH_RESULT_END
 		};
 	};
@@ -362,6 +359,7 @@ private:
 	std::string mTaskChainName;
 	ConditionVar mAsyncSetupVar;
 	Mutex mAsyncSetupMutex;
+	int mAsyncSetupCallCounter;
 	bool mAsyncSetupComplete;
 #endif
 	///@}
@@ -444,6 +442,7 @@ inline void NavMesh::reset()
 	mUpdateTask.clear();
 #ifdef ELY_THREAD
 	mTaskChainName.clear();
+	mAsyncSetupCallCounter = 0;
 #endif
 
 #ifdef ELY_DEBUG

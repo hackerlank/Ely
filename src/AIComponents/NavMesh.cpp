@@ -455,6 +455,21 @@ void NavMesh::onRemoveFromSceneCleanup()
 {
 	//remove from AI manager update
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+
+#ifdef ELY_THREAD
+	HOLD_MUTEX(mAsyncSetupMutex)
+
+	//Note: at this point mDestroying is true so no more
+	//NavMeshAsyncSetup will be called.
+	//Wait for all NavMeshAsyncSetup calls to finish their execution
+	while (mAsyncSetupCallCounter > 0)
+	{
+		//notify one NavMeshAsyncSetup to finish its execution
+		mAsyncSetupVar.notify();
+		//wait for more executions to finish
+		mAsyncSetupVar.wait();
+	}
+#endif
 }
 
 NavMesh::Result NavMesh::navMeshSetup()
@@ -489,6 +504,11 @@ void NavMesh::doNavMeshSetup()
 #ifdef ELY_THREAD
 	//add the task to the task chain.
 	mUpdateTask->set_task_chain(mTaskChainName);
+	{
+		HOLD_MUTEX(mAsyncSetupMutex)
+
+		++mAsyncSetupCallCounter;
+	}
 #endif
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
@@ -501,9 +521,6 @@ NavMesh::Result NavMesh::navMeshCleanup()
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -819,6 +836,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 #ifdef ELY_THREAD
 	//Async Setup is complete
 	mAsyncSetupComplete = true;
+	--mAsyncSetupCallCounter;
 	//notify one thread that Async Setup is complete
 	mAsyncSetupVar.notify();
 #endif
@@ -862,9 +880,6 @@ NavMesh::Result NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -892,9 +907,6 @@ NavMesh::Result NavMesh::buildTile(const LPoint3f& pos)
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -920,9 +932,6 @@ NavMesh::Result NavMesh::removeTile(const LPoint3f& pos)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -950,9 +959,6 @@ NavMesh::Result NavMesh::buildAllTiles()
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -974,9 +980,6 @@ NavMesh::Result NavMesh::removeAllTiles()
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -1022,9 +1025,6 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -1074,9 +1074,6 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -1113,9 +1110,6 @@ NavMesh::Result NavMesh::clearAllObstacles()
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -1195,12 +1189,6 @@ NavMesh::Result NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 
 		//do real adding to update list
 		doAddCrowdAgentToUpdateList(crowdAgent);
-
-		//return if async-setup is not complete
-		//note: this check must be done before the next one
-		//because mNavMeshType could be in inconsistent state
-		//when a NavMesh setup is executing
-		RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 		//return if NavMesh has not been setup yet
 		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -1328,12 +1316,6 @@ NavMesh::Result NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 		//remove from update list
 		doRemoveCrowdAgentFromUpdateList(crowdAgent);
 
-		//return if async-setup is not complete
-		//note: this check must be done before the next one
-		//because mNavMeshType could be in inconsistent state
-		//when a NavMesh setup is executing
-		RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 		//return if NavMesh has not been setup yet
 		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -1385,9 +1367,6 @@ NavMesh::Result NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -1421,9 +1400,6 @@ NavMesh::Result NavMesh::setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
-
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
@@ -1451,9 +1427,6 @@ NavMesh::Result NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
@@ -1531,9 +1504,6 @@ NavMesh::Result NavMesh::debug(bool enable)
 
 	//return if mDebugNodePath is empty
 	RETURN_ON_COND(mDebugNodePath.is_empty(), Result::ERROR)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, Result::NAVMESH_ASYNC_SETUP_NOT_COMPLETE)
 
 	if (enable)
 	{
