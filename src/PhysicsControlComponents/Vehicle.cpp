@@ -292,10 +292,12 @@ void Vehicle::onAddToObjectSetup()
 		return;
 	}
 	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(&(*rigidBodyComp));
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
 	//create BulletVehicle
 	mVehicle = new BulletVehicle(
-			GamePhysicsManager::GetSingletonPtr()->bulletWorld(),&(*rigidBodyComp));
+			GamePhysicsManager::GetSingletonPtr()->bulletWorld(),
+			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
 	//set up axis
 	mVehicle->set_coordinate_system(mUpAxis);
 	//add BulletVehicle to physics world
@@ -308,19 +310,18 @@ void Vehicle::onRemoveFromObjectCleanup()
 	//remove BulletVehicle from physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
 	//check if there is a RigidBody component
-	SMARTPTR(Component)rigidBodyComp = DCAST(RigidBody,
+	SMARTPTR(RigidBody)rigidBodyComp = DCAST(RigidBody,
 			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
 	if (not rigidBodyComp)
 	{
-		PRINT_ERR_DEBUG(
-				"Vehicle::onRemoveFromObjectCleanup: '" <<
+		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '" <<
 				mOwnerObject->objectId() <<
 				"' hasn't a RigidBody Component");
 		return;
 	}
 	//re-add rigid body to the physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			&(*rigidBodyComp));
+			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
 	//
 	reset();
 }
