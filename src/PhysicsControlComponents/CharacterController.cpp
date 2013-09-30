@@ -286,7 +286,7 @@ void CharacterController::onRemoveFromObjectCleanup()
 {
 	NodePath oldObjectNodePath;
 	//set the object node path to the first child of rigid body's one (if any)
-	if(mNodePath.get_num_children() > 0)
+	if (mNodePath.get_num_children() > 0)
 	{
 		oldObjectNodePath = mNodePath.get_child(0);
 		//detach the object node path from the rigid body's one
@@ -304,7 +304,7 @@ void CharacterController::onRemoveFromObjectCleanup()
 	if (physicsMgrPtr)
 	{
 		//remove character controller from the physics world
-		physicsMgrPtr->bulletWorld()->remove(DCAST(TypedObject, mCharacterController));
+		physicsMgrPtr->bulletWorld()->remove(mCharacterController);
 	}
 
 	//Remove node path

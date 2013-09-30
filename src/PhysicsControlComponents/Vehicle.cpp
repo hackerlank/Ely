@@ -23,40 +23,36 @@
 
 #include "PhysicsControlComponents/Vehicle.h"
 #include "PhysicsControlComponents/VehicleTemplate.h"
+#include "PhysicsComponents/RigidBody.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <throw_event.h>
 
-namespace ely
-{
+namespace ely {
 
-Vehicle::Vehicle()
-{
+Vehicle::Vehicle() {
 	// TODO Auto-generated constructor stub
 }
 
 Vehicle::Vehicle(SMARTPTR(VehicleTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
-			"Vehicle::Vehicle: invalid GamePhysicsManager")
+	"Vehicle::Vehicle: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;
 	reset();
 }
 
-Vehicle::~Vehicle()
-{
+Vehicle::~Vehicle() {
 	// TODO Auto-generated destructor stub
 }
 
-ComponentFamilyType Vehicle::familyType() const
-{
+ComponentFamilyType Vehicle::familyType() const {
 	return mTmpl->familyType();
 }
 
-ComponentType Vehicle::componentType() const
-{
+ComponentType Vehicle::componentType() const {
 	return mTmpl->componentType();
 }
 
@@ -64,8 +60,7 @@ ComponentType Vehicle::componentType() const
 
 ////
 
-bool Vehicle::initialize()
-{
+bool Vehicle::initialize() {
 	bool result = true;
 	//throw events setting
 	mThrowEvents = (
@@ -73,25 +68,20 @@ bool Vehicle::initialize()
 					== std::string("true") ? true : false);
 	//up axis
 	std::string upAxis = mTmpl->parameter(std::string("up_axis"));
-	if (upAxis == std::string("x"))
-	{
+	if (upAxis == std::string("x")) {
 		mUpAxis = X_up;
-	}
-	else if (upAxis == std::string("y"))
-	{
+	} else if (upAxis == std::string("y")) {
 		mUpAxis = Y_up;
-	}
-	else
-	{
+	} else {
 		mUpAxis = Z_up;
 	}
 	//wheels
 	mWheelTmpl = mTmpl->parameter(std::string("wheel_object_template"));
 	//wheel number
-	mWheelNumber = strtol(mTmpl->parameter(std::string("wheels_number")).c_str(),
+	mWheelNumber = strtol(
+			mTmpl->parameter(std::string("wheels_number")).c_str(),
 			NULL, 0);
-	if(mWheelNumber < 0)
-	{
+	if (mWheelNumber < 0) {
 		mWheelNumber = 0;
 	}
 	//
@@ -100,9 +90,8 @@ bool Vehicle::initialize()
 	//wheels' models
 	mWheelModelParam.resize(mWheelNumber, std::string(""));
 	paramList = mTmpl->parameterList(std::string("wheel_model"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> modelIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(modelIdx[1].c_str(), NULL, 0), 0,
@@ -111,9 +100,8 @@ bool Vehicle::initialize()
 	}
 	mWheelScaleParam.resize(mWheelNumber, std::string("1.0"));
 	paramList = mTmpl->parameterList(std::string("wheel_scale"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> scaleIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(scaleIdx[1].c_str(), NULL, 0), 0,
@@ -123,9 +111,8 @@ bool Vehicle::initialize()
 	//wheel is front
 	mWheelIsFront.resize(mWheelNumber, false);
 	paramList = mTmpl->parameterList(std::string("wheel_is_front"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> valueIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(valueIdx[1].c_str(), NULL, 0), 0,
@@ -135,37 +122,33 @@ bool Vehicle::initialize()
 	}
 	//wheel connection point ratio
 	mWheelConnectionPointRatio.resize(mWheelNumber, LVecBase3f::zero());
-	paramList = mTmpl->parameterList(std::string("wheel_connection_point_ratio"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	paramList = mTmpl->parameterList(
+			std::string("wheel_connection_point_ratio"));
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> rxryrzIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(rxryrzIdx[1].c_str(), NULL, 0), 0,
 				mWheelNumber - 1);
 		std::vector<std::string> rxryrz = parseCompoundString(*paramListIter,
 				',');
-		for (unsigned int i = 0; i < rxryrz.size() and i < 3; ++i)
-		{
-			mWheelConnectionPointRatio[idx][i] = strtof(
-					rxryrz[i].c_str(),
-					NULL);
+		for (unsigned int i = 0; i < rxryrz.size() and i < 3; ++i) {
+			mWheelConnectionPointRatio[idx][i] = strtof(rxryrz[i].c_str(),
+			NULL);
 		}
 	}
 	//wheel axle
 	mWheelAxle.resize(mWheelNumber, LVector3f::zero());
 	paramList = mTmpl->parameterList(std::string("wheel_axle"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> axayazIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(axayazIdx[1].c_str(), NULL, 0), 0,
 				mWheelNumber - 1);
 		std::vector<std::string> axayaz = parseCompoundString(*paramListIter,
 				',');
-		for (unsigned int i = 0; i < axayaz.size() and i < 3; ++i)
-		{
+		for (unsigned int i = 0; i < axayaz.size() and i < 3; ++i) {
 			mWheelAxle[idx][i] = strtof(axayaz[i].c_str(),
 			NULL);
 		}
@@ -173,17 +156,15 @@ bool Vehicle::initialize()
 	//wheel direction
 	mWheelDirection.resize(mWheelNumber, LVector3f::zero());
 	paramList = mTmpl->parameterList(std::string("wheel_direction"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> dxdydzIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(dxdydzIdx[1].c_str(), NULL, 0), 0,
 				mWheelNumber - 1);
 		std::vector<std::string> dxdydz = parseCompoundString(*paramListIter,
 				',');
-		for (unsigned int i = 0; i < dxdydz.size() and i < 3; ++i)
-		{
+		for (unsigned int i = 0; i < dxdydz.size() and i < 3; ++i) {
 			mWheelDirection[idx][i] = strtof(dxdydz[i].c_str(),
 			NULL);
 		}
@@ -191,9 +172,8 @@ bool Vehicle::initialize()
 	//wheel suspension travel
 	mWheelSuspensionTravel.resize(mWheelNumber, 40.0);
 	paramList = mTmpl->parameterList(std::string("wheel_suspension_travel"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> stIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(stIdx[1].c_str(), NULL, 0), 0,
@@ -204,9 +184,8 @@ bool Vehicle::initialize()
 	//wheel suspension stiffness
 	mWheelSuspensionStiffness.resize(mWheelNumber, 40.0);
 	paramList = mTmpl->parameterList(std::string("wheel_suspension_stiffness"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> ssIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(ssIdx[1].c_str(), NULL, 0), 0,
@@ -217,9 +196,8 @@ bool Vehicle::initialize()
 	//wheel damping relaxation
 	mWheelDampingRelaxation.resize(mWheelNumber, 2.0);
 	paramList = mTmpl->parameterList(std::string("wheel_damping_relaxation"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> drIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(drIdx[1].c_str(), NULL, 0), 0,
@@ -230,9 +208,8 @@ bool Vehicle::initialize()
 	//wheel damping compression
 	mWheelDampingCompression.resize(mWheelNumber, 4.0);
 	paramList = mTmpl->parameterList(std::string("wheel_damping_compression"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> dcIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(dcIdx[1].c_str(), NULL, 0), 0,
@@ -243,9 +220,8 @@ bool Vehicle::initialize()
 	//wheel friction slip
 	mWheelFrictionSlip.resize(mWheelNumber, 100.0);
 	paramList = mTmpl->parameterList(std::string("wheel_friction_slip"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> fsIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(fsIdx[1].c_str(), NULL, 0), 0,
@@ -256,9 +232,8 @@ bool Vehicle::initialize()
 	//wheel roll influence
 	mWheelRollInfluence.resize(mWheelNumber, 0.1);
 	paramList = mTmpl->parameterList(std::string("wheel_roll_influence"));
-	for(paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
+	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
+			++paramListIter) {
 		std::vector<std::string> riIdx = parseCompoundString(*paramListIter,
 				'@');
 		int idx = idxClamp(strtol(riIdx[1].c_str(), NULL, 0), 0,
@@ -275,68 +250,63 @@ void Vehicle::onAddToObjectSetup()
 	//setup the chassis: at this point "Scene" (Model or InstanceOf)
 	//and "Physics" (RigidBody) components should already have
 	//been already setup.
-	//The RigidBody has been added to physics update: it must be removed
+	//The RigidBody has been added to physics: it must be removed
 	//and then re-added in association with this Vehicle component.
 	//Moreover the Object node path is the RigidBody one.
 
-
-	//create a node path for the vehicle
-//	mNodePath = NodePath(mVehicle);
-
-	//attach it to Bullet World
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			mVehicle);
-
-	//set this character controller node path as the object's one
-//	mOwnerObject->setNodePath(mNodePath);
+	//check if there is a RigidBody component
+	SMARTPTR(RigidBody)rigidBodyComp = DCAST(RigidBody,
+			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
+	if (not rigidBodyComp)
+	{
+		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '" <<
+				mOwnerObject->objectId() <<
+				"' hasn't a RigidBody Component");
+		return;
+	}
+	//remove rigid body from the physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(&(*(rigidBodyComp.p())));
+	//create BulletVehicle
+	mVehicle = new BulletVehicle(
+			GamePhysicsManager::GetSingletonPtr()->bulletWorld(),*(rigidBodyComp));
+	//set up axis
+	mVehicle->set_coordinate_system(mUpAxis);
+	//add BulletVehicle to physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
+	//
 }
 
-void Vehicle::onRemoveFromObjectCleanup()
-{
-	NodePath oldObjectNodePath;
-	//set the object node path to the first child of rigid body's one (if any)
-//	if(mNodePath.get_num_children() > 0)
-//	{
-//		oldObjectNodePath = mNodePath.get_child(0);
-//		//detach the object node path from the rigid body's one
-//		oldObjectNodePath.detach_node();
-//	}
-//	else
-//	{
-//		oldObjectNodePath = NodePath();
-//	}
-	//set the object node path to the old one
-	mOwnerObject->setNodePath(oldObjectNodePath);
-
-	//check if game physics manager exists
-	GamePhysicsManager* physicsMgrPtr = GamePhysicsManager::GetSingletonPtr();
-	if (physicsMgrPtr)
-	{
-		//remove character controller from the physics world
-		physicsMgrPtr->bulletWorld()->remove(DCAST(TypedObject, mVehicle));
+void Vehicle::onRemoveFromObjectCleanup() {
+	//remove BulletVehicle from physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
+	//check if there is a RigidBody component
+	SMARTPTR(Component)rigidBodyComp =
+	mOwnerObject->getComponent(ComponentFamilyType("Physics"));
+	if ((not rigidBodyComp)
+			or (not rigidBodyComp->is_of_type(RigidBody::get_class_type()))) {
+		PRINT_ERR_DEBUG("Vehicle::onRemoveFromObjectCleanup: '" <<
+				mOwnerObject->objectId() <<
+				"' hasn't a RigidBody Component");
+		return;
 	}
-
-	//Remove node path
-//	mNodePath.remove_node();
+	//re-add rigid body to the physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+			static_cast<SMARTPTR(BulletRigidBodyNode)>(rigidBodyComp));
 	//
 	reset();
 }
 
-void Vehicle::onAddToSceneSetup()
-{
+void Vehicle::onAddToSceneSetup() {
 	//Add to the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
 }
 
-void Vehicle::onRemoveFromSceneCleanup()
-{
+void Vehicle::onRemoveFromSceneCleanup() {
 	//remove from the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
 }
 
-
-void Vehicle::update(void* data)
-{
+void Vehicle::update(void* data) {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
@@ -350,22 +320,17 @@ void Vehicle::update(void* data)
 	float omega = 0.0;
 
 	//handle Vehicle start-stop events
-	if (mVehicle->get_current_speed_km_hour() == 0.0)
-	{
+	if (mVehicle->get_current_speed_km_hour() == 0.0) {
 		//throw mOnStart event (if enabled)
-		if (mThrowEvents and (not mOnStartSent))
-		{
+		if (mThrowEvents and (not mOnStartSent)) {
 			throw_event(std::string("OnStart"), EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mOnStartSent = true;
 			mOnStopSent = false;
 		}
-	}
-	else
-	{
+	} else {
 		//throw OnStop event (if enabled)
-		if (mThrowEvents and (not mOnStopSent))
-		{
+		if (mThrowEvents and (not mOnStopSent)) {
 			throw_event(std::string("OnStop"), EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mOnStopSent = true;
