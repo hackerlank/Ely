@@ -95,8 +95,8 @@ public:
 	 * \name GeoMipTerrain reference getter & conversion function.
 	 */
 	///@{
-	SMARTPTR(GeoMipTerrainRef) getGeoMipTerrain() const;
-	operator SMARTPTR(GeoMipTerrainRef)() const;
+	GeoMipTerrainRef& getGeoMipTerrain();
+	operator GeoMipTerrainRef&();
 	///@}
 
 private:
@@ -240,14 +240,14 @@ inline float Terrain::getHeightScale() const
 	return mHeightScale;
 }
 
-inline SMARTPTR(GeoMipTerrainRef)Terrain::getGeoMipTerrain() const
+inline GeoMipTerrainRef& Terrain::getGeoMipTerrain()
 {
-	return mTerrain;
+	return *mTerrain;
 }
 
-inline Terrain::operator SMARTPTR(GeoMipTerrainRef)() const
+inline Terrain::operator GeoMipTerrainRef&()
 {
-	return mTerrain;
+	return *mTerrain;
 }
 
 }  // namespace ely

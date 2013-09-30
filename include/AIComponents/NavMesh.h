@@ -225,8 +225,8 @@ public:
 	 * \name NavMeshType reference getter & conversion function.
 	 */
 	///@{
-	NavMeshType* getNavMeshType() const;
-	operator NavMeshType*() const;
+	NavMeshType& getNavMeshType();
+	operator NavMeshType&();
 	///@}
 
 #ifdef ELY_DEBUG
@@ -655,20 +655,14 @@ inline LVecBase3f NavMesh::getRecastBoundsMax() const
 			RecastToLVecBase3f(mGeom->getMeshBoundsMax()) : LVecBase3f::zero());
 }
 
-inline NavMeshType* NavMesh::getNavMeshType() const
+inline NavMeshType& NavMesh::getNavMeshType()
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mNavMeshType;
+	return *mNavMeshType;
 }
 
-inline NavMesh::operator NavMeshType*() const
+inline NavMesh::operator NavMeshType&()
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mNavMeshType;
+	return *mNavMeshType;
 }
 
 inline ReMutex& NavMesh::getStaticMutex()

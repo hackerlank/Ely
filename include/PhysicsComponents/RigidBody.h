@@ -132,8 +132,8 @@ public:
 	 * \name BulletRigidBodyNode reference getter & conversion function.
 	 */
 	///@{
-	SMARTPTR(BulletRigidBodyNode) getBulletRigidBodyNode() const;
-	operator SMARTPTR(BulletRigidBodyNode)() const;
+	BulletRigidBodyNode& getBulletRigidBodyNode();
+	operator BulletRigidBodyNode&();
 	///@}
 
 private:
@@ -256,14 +256,14 @@ inline void RigidBody::setNodePath(const NodePath& nodePath)
 	mNodePath = nodePath;
 }
 
-inline SMARTPTR(BulletRigidBodyNode) RigidBody::getBulletRigidBodyNode() const
+inline BulletRigidBodyNode& RigidBody::getBulletRigidBodyNode()
 {
-	return mRigidBodyNode;
+	return *mRigidBodyNode;
 }
 
-inline RigidBody::operator SMARTPTR(BulletRigidBodyNode)() const
+inline RigidBody::operator BulletRigidBodyNode&()
 {
-	return mRigidBodyNode;
+	return *mRigidBodyNode;
 }
 
 }  // namespace ely

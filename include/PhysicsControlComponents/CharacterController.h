@@ -158,8 +158,8 @@ public:
 	 * \name BulletCharacterControllerNode reference getter & conversion function.
 	 */
 	///@{
-	SMARTPTR(BulletCharacterControllerNode) getBulletCharacterControllerNode() const;
-	operator SMARTPTR(BulletCharacterControllerNode)() const;
+	BulletCharacterControllerNode& getBulletCharacterControllerNode();
+	operator BulletCharacterControllerNode&();
 	///@}
 
 private:
@@ -503,14 +503,14 @@ inline void CharacterController::setNodePath(const NodePath& nodePath)
 	mNodePath = nodePath;
 }
 
-inline SMARTPTR(BulletCharacterControllerNode) CharacterController::getBulletCharacterControllerNode() const
+inline BulletCharacterControllerNode& CharacterController::getBulletCharacterControllerNode()
 {
-	return mCharacterController;
+	return *mCharacterController;
 }
 
-inline CharacterController::operator SMARTPTR(BulletCharacterControllerNode)() const
+inline CharacterController::operator BulletCharacterControllerNode&()
 {
-	return mCharacterController;
+	return *mCharacterController;
 }
 
 }  // namespace ely

@@ -125,8 +125,8 @@ public:
 	 * \name BulletVehicle reference getter & conversion function.
 	 */
 	///@{
-	SMARTPTR(BulletVehicle) getBulletVehicle() const;
-	operator SMARTPTR(BulletVehicle)() const;
+	BulletVehicle& getBulletVehicle();
+	operator BulletVehicle&();
 	///@}
 
 	/**
@@ -218,14 +218,14 @@ inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 	return mWheels;
 }
 
-inline SMARTPTR(BulletVehicle) Vehicle::getBulletVehicle() const
+inline BulletVehicle& Vehicle::getBulletVehicle()
 {
-	return mVehicle;
+	return *mVehicle;
 }
 
-inline Vehicle::operator SMARTPTR(BulletVehicle)() const
+inline Vehicle::operator BulletVehicle&()
 {
-	return mVehicle;
+	return *mVehicle;
 }
 
 inline int Vehicle::idxClamp(int value, int min, int max)
