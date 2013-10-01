@@ -61,10 +61,6 @@ ComponentType Vehicle::componentType() const
 	return mTmpl->componentType();
 }
 
-////
-
-////
-
 bool Vehicle::initialize()
 {
 	bool result = true;
@@ -268,6 +264,33 @@ bool Vehicle::initialize()
 		mWheelRollInfluence[idx] = strtof(riIdx[0].c_str(),
 		NULL);
 	}
+	//physics parameter
+	mMaxEngineForce = strtof(
+			mTmpl->parameter(std::string("max_engine_force")).c_str(), NULL);
+	mMaxBrakeForce = strtof(
+			mTmpl->parameter(std::string("max_brake_force")).c_str(), NULL);
+	mSteeringClamp = strtof(
+			mTmpl->parameter(std::string("steering_clamp")).c_str(), NULL);
+	mSteeringIncrement = strtof(
+			mTmpl->parameter(std::string("steering_increment")).c_str(), NULL);
+	mSteeringDecrement = strtof(
+			mTmpl->parameter(std::string("steering_decrement")).c_str(), NULL);
+	//forward key
+	mForwardKey = (
+			mTmpl->parameter(std::string("forward")) == std::string("enabled") ?
+					true : false);
+	//backward key
+	mBackwardKey = (
+			mTmpl->parameter(std::string("backward"))
+					== std::string("enabled") ? true : false);
+	//turn left key
+	mForwardKey = (
+			mTmpl->parameter(std::string("turn_left"))
+					== std::string("enabled") ? true : false);
+	//turn right key
+	mBackwardKey = (
+			mTmpl->parameter(std::string("turn_right"))
+					== std::string("enabled") ? true : false);
 	//
 	return result;
 }

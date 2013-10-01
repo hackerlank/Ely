@@ -317,31 +317,85 @@ inline bool Vehicle::isTurnRightEnabled()
 	return mTurnRight;
 }
 
-inline 	void setMaxEngineForce(float force)
+inline void Vehicle::setMaxEngineForce(float force)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	m mTurnRight;
+	mMaxEngineForce = force;
 }
 
-inline 	float getMaxEngineForce();
+inline float Vehicle::getMaxEngineForce()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mTurnRight;
+	return mMaxEngineForce;
 }
 
-inline 	void setMaxBrakeForce(float force);
-inline 	float getMaxBrakeForce();
-inline 	void setSteeringClamp(float clamp);
-inline 	float getSteeringClamp();
-inline 	void setSteeringIncrement(float increment);
-inline 	float getSteeringIncrement();
-inline 	void setSteeringDecrement(float decrement);
-inline 	float getSteeringDecrement();
+inline void Vehicle::setMaxBrakeForce(float force)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
 
+	mMaxBrakeForce = force;
+}
+
+inline float Vehicle::getMaxBrakeForce()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mMaxBrakeForce;
+}
+
+inline void Vehicle::setSteeringClamp(float clamp)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mSteeringClamp = clamp;
+}
+
+inline float Vehicle::getSteeringClamp()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mSteeringClamp;
+}
+
+inline void Vehicle::setSteeringIncrement(float increment)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mSteeringIncrement = increment;
+}
+
+inline float Vehicle::getSteeringIncrement()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mSteeringIncrement;
+}
+
+inline void Vehicle::setSteeringDecrement(float decrement)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mSteeringDecrement = decrement;
+}
+
+inline float Vehicle::getSteeringDecrement()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mSteeringDecrement;
+}
 
 inline BulletVehicle& Vehicle::getBulletVehicle()
 {
