@@ -65,33 +65,15 @@ class VehicleTemplate;
  * - "wheel_damping_compression"	|multiple|"4.0"  ("dc@wheelIdx")
  * - "wheel_friction_slip"			|multiple|"100.0"  ("fs@wheelIdx")
  * - "wheel_roll_influence"			|multiple|"0.1"  ("ri@wheelIdx")
- *
- *
- *
- * - "use_shape_of"				|single|no default
- * - "shape_radius"  			|single|no default (sphere,cylinder,capsule,cone)
- * - "shape_height"  			|single|no default (cylinder,capsule,cone)
- * - "shape_up"  				|single|no default (cylinder,capsule,cone)
- * - "shape_half_x"  			|single|no default (box)
- * - "shape_half_y"  			|single|no default (box)
- * - "shape_half_z"  			|single|no default (box)
- * - "fall_speed"  				|single|"55.0"
- * - "gravity"  				|single|"29.4" (3G)
- * - "jump_speed"  				|single|"10.0"
- * - "max_slope"  				|single|"45.0" (degrees)
- * - "max_jump_height"  		|single|no default
- * - "forward"  				|single|"enabled"
- * - "backward"  				|single|"enabled"
- * - "up"  						|single|"enabled"
- * - "down"  					|single|"enabled"
- * - "roll_left"  				|single|"enabled"
- * - "roll_right"  				|single|"enabled"
- * - "strafe_left"  			|single|"enabled"
- * - "strafe_right"  			|single|"enabled"
- * - "jump"  					|single|"enabled"
- * - "linear_speed"  			|single|"10.0"
- * - "angular_speed"  			|single|"45.0"
- * - "is_local"  				|single|"true"
+ * - "max_engine_force"				|single|no default
+ * - "max_brake_force"				|single|no default
+ * - "steering_clamp"				|single|"45.0" (in degree)
+ * - "steering_increment"			|single|"120.0" (in degree/sec)
+ * - "steering_decrement"			|single|"60.0" (in degree/sec)
+ * - "forward"  					|single|"enabled"
+ * - "backward"  					|single|"enabled"
+ * - "turn_left"					|single|"enabled"
+ * - "turn_right"  					|single|"enabled"
  */
 class Vehicle: public Component
 {
@@ -120,6 +102,39 @@ public:
 	 * @param data The custom data.
 	 */
 	virtual void update(void* data);
+
+	/**
+	 * \name Control keys' enablers.
+	 *
+	 * These routines should be typically called by event handlers
+	 * or AI algorithms, but this is not strictly required.
+	 */
+	///@{
+	void enableForward(bool enable);
+	bool isForwardEnabled();
+	void enableBackward(bool enable);
+	bool isBackwardEnabled();
+	void enableTurnLeft(bool enable);
+	bool isTurnLeftEnabled();
+	void enableTurnRight(bool enable);
+	bool isTurnRightEnabled();
+	///@}
+
+	/**
+	 * \name Speeds getters/setters.
+	 */
+	///@{
+	void setMaxEngineForce(float force);
+	float getMaxEngineForce();
+	void setMaxBrakeForce(float force);
+	float getMaxBrakeForce();
+	void setSteeringClamp(float clamp);
+	float getSteeringClamp();
+	void setSteeringIncrement(float increment);
+	float getSteeringIncrement();
+	void setSteeringDecrement(float decrement);
+	float getSteeringDecrement();
+	///@}
 
 	/**
 	 * \name BulletVehicle reference getter & conversion function.
@@ -157,6 +172,15 @@ private:
 	mWheelDampingCompression, mWheelFrictionSlip, mWheelRollInfluence;
 	//helper
 	int idxClamp(int value, int min, int max);
+	///@}
+
+	///Control and physics functions and parameters.
+	///@{
+	float mMaxEngineForce, mMaxBrakeForce, mSteering, mSteeringClamp,
+	mSteeringIncrement, mSteeringDecrement;
+	///Key controls and effective keys.
+	bool mForward, mBackward, mTurnLeft, mTurnRight;
+	bool mForwardKey, mBackwardKey, mTurnLeftKey, mTurnRightKey;
 	///@}
 
 	///Throwing events.
@@ -210,13 +234,114 @@ inline void Vehicle::reset()
 	mWheelDampingCompression.clear();
 	mWheelFrictionSlip.clear();
 	mWheelRollInfluence.clear();
+	mMaxEngineForce = mMaxBrakeForce = mSteering = mSteeringClamp =
+			mSteeringIncrement = mSteeringDecrement = 0.0;
+	mForward = mBackward = mTurnLeft = mTurnRight = mForwardKey = mBackwardKey =
+			mTurnLeftKey = mTurnRightKey = false;
 	mThrowEvents = mOnStartSent = mOnStopSent = false;
 }
 
-inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
+inline void Vehicle::enableForward(bool enable)
 {
-	return mWheels;
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mForwardKey)
+	{
+		mForward = enable;
+	}
 }
+
+inline bool Vehicle::isForwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mForward;
+}
+
+inline void Vehicle::enableBackward(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mBackwardKey)
+	{
+		mBackward = enable;
+	}
+}
+
+inline bool Vehicle::isBackwardEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mBackward;
+}
+
+inline void Vehicle::enableTurnLeft(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mTurnLeftKey)
+	{
+		mTurnLeft = enable;
+	}
+}
+
+inline bool Vehicle::isTurnLeftEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mTurnLeft;
+}
+
+inline void Vehicle::enableTurnRight(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mTurnRightKey)
+	{
+		mTurnRight = enable;
+	}
+}
+
+inline bool Vehicle::isTurnRightEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mTurnRight;
+}
+
+inline 	void setMaxEngineForce(float force)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	m mTurnRight;
+}
+
+inline 	float getMaxEngineForce();
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mTurnRight;
+}
+
+inline 	void setMaxBrakeForce(float force);
+inline 	float getMaxBrakeForce();
+inline 	void setSteeringClamp(float clamp);
+inline 	float getSteeringClamp();
+inline 	void setSteeringIncrement(float increment);
+inline 	float getSteeringIncrement();
+inline 	void setSteeringDecrement(float decrement);
+inline 	float getSteeringDecrement();
+
 
 inline BulletVehicle& Vehicle::getBulletVehicle()
 {
@@ -226,6 +351,14 @@ inline BulletVehicle& Vehicle::getBulletVehicle()
 inline Vehicle::operator BulletVehicle&()
 {
 	return *mVehicle;
+}
+
+inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mWheels;
 }
 
 inline int Vehicle::idxClamp(int value, int min, int max)

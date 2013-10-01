@@ -79,6 +79,13 @@ void VehicleTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
 	mParameterTable.insert(ParameterNameValue("up_axis", "z"));
 	mParameterTable.insert(ParameterNameValue("wheels_number", "4"));
+	mParameterTable.insert(ParameterNameValue("steering_clamp", "45.0"));
+	mParameterTable.insert(ParameterNameValue("steering_increment", "120.0"));
+	mParameterTable.insert(ParameterNameValue("steering_decrement", "60.0"));
+	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("turn_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("turn_right", "enabled"));
 }
 
 //TypedObject semantics: hardcoded
