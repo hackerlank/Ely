@@ -224,7 +224,7 @@ void Steering::doEnable()
 
 	//check the type of the updatable item
 	if ((mTypeParam == std::string("character_controller"))
-			and (mOwnerObject->getComponent(ComponentFamilyType("Physics"))->is_of_type(
+			and (mOwnerObject->getComponent(ComponentFamilyType("PhysicsControl"))->is_of_type(
 					CharacterController::get_class_type())))
 	{
 		//update the character_controller
@@ -233,7 +233,7 @@ void Steering::doEnable()
 		//(which is already created and set up)
 		mCharacterController =
 		DCAST(CharacterController, mOwnerObject->getComponent(
-						ComponentFamilyType("Physics")));
+						ComponentFamilyType("PhysicsControl")));
 
 		//save current movement and set it not local (global)
 		mCurrentIsLocal = mCharacterController->getIsLocal();

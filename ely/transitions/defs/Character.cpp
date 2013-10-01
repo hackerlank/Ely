@@ -159,7 +159,7 @@ void Enter_F_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
@@ -172,7 +172,7 @@ void Exit_F_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
@@ -186,7 +186,7 @@ void Enter_B_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
@@ -199,7 +199,7 @@ void Exit_B_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
@@ -211,7 +211,7 @@ void Enter_Sr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(true);
 }
@@ -221,7 +221,7 @@ void Exit_Sr_Character(fsm*, Activity& activity)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(false);
 }
@@ -232,7 +232,7 @@ void Enter_Sl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(true);
 }
@@ -242,7 +242,7 @@ void Exit_Sl_Character(fsm*, Activity& activity)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(false);
 }
@@ -253,7 +253,7 @@ void Enter_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableRollRight(true);
 }
@@ -263,7 +263,7 @@ void Exit_Rr_Character(fsm*, Activity& activity)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableRollRight(false);
 }
@@ -274,7 +274,7 @@ void Enter_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableRollLeft(true);
 }
@@ -284,7 +284,7 @@ void Exit_Rl_Character(fsm*, Activity& activity)
 	//
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableRollLeft(false);
 }
@@ -294,7 +294,7 @@ void Enter_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 	PRINT_DEBUG("Enter_J_Character");
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableJump(true);
 }
@@ -303,7 +303,7 @@ void Exit_J_Character(fsm*, Activity& activity)
 	PRINT_DEBUG("Exit_J_Character");
 	SMARTPTR(Object)npc1 = activity.getOwnerObject();
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableJump(false);
 }
@@ -316,7 +316,7 @@ void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
@@ -330,7 +330,7 @@ void Exit_F_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
@@ -345,7 +345,7 @@ void Enter_F_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
@@ -359,7 +359,7 @@ void Exit_F_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
@@ -396,7 +396,7 @@ void Enter_F_J_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	//enable animation blending
 	npc1Model->getPartBundle()->set_anim_blend_flag(true);
@@ -417,7 +417,7 @@ void Exit_F_J_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("jump");
 	npc1Model->animations().stop("walk");
@@ -435,7 +435,7 @@ void Enter_B_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
@@ -449,7 +449,7 @@ void Exit_B_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
@@ -464,7 +464,7 @@ void Enter_B_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
@@ -478,7 +478,7 @@ void Exit_B_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
@@ -493,7 +493,7 @@ void Enter_Sr_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(true);
 	npc1CharCtrl->enableRollRight(true);
@@ -506,7 +506,7 @@ void Exit_Sr_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(false);
 	npc1CharCtrl->enableRollRight(false);
@@ -520,7 +520,7 @@ void Enter_Sr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(true);
 	npc1CharCtrl->enableRollLeft(true);
@@ -533,7 +533,7 @@ void Exit_Sr_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(false);
 	npc1CharCtrl->enableRollLeft(false);
@@ -547,7 +547,7 @@ void Enter_Sl_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(true);
 	npc1CharCtrl->enableRollRight(true);
@@ -560,7 +560,7 @@ void Exit_Sl_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(false);
 	npc1CharCtrl->enableRollRight(false);
@@ -574,7 +574,7 @@ void Enter_Sl_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(true);
 	npc1CharCtrl->enableRollLeft(true);
@@ -587,7 +587,7 @@ void Exit_Sl_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(false);
 	npc1CharCtrl->enableRollLeft(false);
@@ -603,7 +603,7 @@ void Enter_F_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("run", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
@@ -617,7 +617,7 @@ void Exit_F_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
@@ -632,7 +632,7 @@ void Enter_Sr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->enableStrafeRight(true);
@@ -645,7 +645,7 @@ void Exit_Sr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeRight(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
@@ -659,7 +659,7 @@ void Enter_Sl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->enableStrafeLeft(true);
@@ -672,7 +672,7 @@ void Exit_Sl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableStrafeLeft(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
@@ -686,7 +686,7 @@ void Enter_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableRollRight(true);
@@ -699,7 +699,7 @@ void Exit_Rr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableRollRight(false);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
@@ -713,7 +713,7 @@ void Enter_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableRollLeft(true);
@@ -726,7 +726,7 @@ void Exit_Rl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->enableRollLeft(false);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
@@ -740,7 +740,7 @@ void Enter_F_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("run", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
@@ -756,7 +756,7 @@ void Exit_F_Rr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
@@ -773,7 +773,7 @@ void Enter_F_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().loop("run", false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
@@ -789,7 +789,7 @@ void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
@@ -828,7 +828,7 @@ void Enter_F_J_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	//enable animation blending
 	npc1Model->getPartBundle()->set_anim_blend_flag(true);
@@ -850,7 +850,7 @@ void Exit_F_J_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1Model->animations().stop("jump");
 	npc1Model->animations().stop("run");
@@ -869,7 +869,7 @@ void Enter_Sr_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
@@ -884,7 +884,7 @@ void Exit_Sr_Rr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
@@ -900,7 +900,7 @@ void Enter_Sr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
@@ -915,7 +915,7 @@ void Exit_Sr_Rl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
@@ -931,7 +931,7 @@ void Enter_Sl_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
@@ -946,7 +946,7 @@ void Exit_Sl_Rr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
@@ -962,7 +962,7 @@ void Enter_Sl_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
@@ -977,7 +977,7 @@ void Exit_Sl_Rl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(Model)npc1Model = DCAST(Model, npc1->getComponent(
 					ComponentFamilyType("Scene")));
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
-			npc1->getComponent("Physics"));
+			npc1->getComponent("PhysicsControl"));
 	//
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);

@@ -416,19 +416,14 @@ SMARTPTR(BulletShape)CharacterController::doCreateShape(GamePhysicsManager::Shap
 				mUseShapeOfId);
 		if (createdObject != NULL)
 		{
-			SMARTPTR(Component) component =
-			createdObject->getComponent(ComponentFamilyType("Physics"));
-			if (component->is_of_type(CharacterController::get_class_type()))
+			//object already exists
+			SMARTPTR(CharacterController)characterController = DCAST(CharacterController,
+					createdObject->getComponent(ComponentFamilyType("PhysicsControl")));
+			if (characterController != NULL)
 			{
-				//object already exists
-				SMARTPTR(CharacterController)characterController =
-				DCAST(CharacterController, component);
-				if (characterController != NULL)
-				{
-					//physics component is a character controller:
-					//return a reference to its shape
-					return characterController->mCharacterController->get_shape();
-				}
+				//physics component is a character controller:
+				//return a reference to its shape
+				return characterController->mCharacterController->get_shape();
 			}
 		}
 	}

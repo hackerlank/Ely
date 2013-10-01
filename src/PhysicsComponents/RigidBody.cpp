@@ -490,18 +490,14 @@ SMARTPTR(BulletShape)RigidBody::doCreateShape(GamePhysicsManager::ShapeType shap
 				mUseShapeOfId);
 		if (createdObject != NULL)
 		{
-			SMARTPTR(Component) component =
-			createdObject->getComponent(ComponentFamilyType("Physics"));
-			if (component->is_of_type(RigidBody::get_class_type()))
+			//object already exists
+			SMARTPTR(RigidBody)rigidBody = DCAST(RigidBody,
+					createdObject->getComponent(ComponentFamilyType("Physics")));
+			if (rigidBody != NULL)
 			{
-				//object already exists
-				SMARTPTR(RigidBody)rigidBody = DCAST(RigidBody, component);
-				if (rigidBody != NULL)
-				{
-					//physics component is a rigid body:
-					//return a reference to its (first and only) shape
-					return rigidBody->mRigidBodyNode->get_shape(0);
-				}
+				//physics component is a rigid body:
+				//return a reference to its (first and only) shape
+				return rigidBody->mRigidBodyNode->get_shape(0);
 			}
 		}
 	}
