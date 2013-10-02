@@ -49,22 +49,22 @@ class VehicleTemplate;
  * XML Param(s):
  * - "throw_events"					|single|"false"
  * - "up_axis"						|single|"z" (x,y,z)
- * - "wheels_number"  				|single|"4"
+ * - "wheels_number"  				|single|"4" (N)
  * - "wheel_object_template"		|single|no default
- * - "wheel_model"  				|multiple|no default ("model@wheelIdx")
- * - "wheel_scale"  				|multiple|"1.0" ("scale@wheelIdx")
- * - "wheel_is_front"				|multiple|"false" ("value@wheelIdx" with
- * value=true,false)
- * - "wheel_connection_point_ratio"	|multiple|no default ("rx,ry,rz@wheelIdx")
+ * - "wheel_model"  				|single|no default ("model1,...,modelN")
+ * - "wheel_scale"  				|single|"1.0" ("scale1,...,scaleN")
+ * - "wheel_is_front"				|single|"false" ("value1,...,valueN" with
+ * valueX=true,false)
+ * - "wheel_connection_point_ratio"	|single|"1.0,1.0,1.0" ("rx1,ry1,rz1$...$rxN,ryN,rzN")
  * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
- * - "wheel_axle"					|multiple|"1.0,0.0,0.0" ("ax,ay,az@wheelIdx")
- * - "wheel_direction"				|multiple|"0.0,0.0,-1.0" ("dx,dy,dz@wheelIdx")
- * - "wheel_suspension_travel"		|multiple|"40.0" ("st@wheelIdx")
- * - "wheel_suspension_stiffness"	|multiple|"40.0" ("ss@wheelIdx")
- * - "wheel_damping_relaxation"		|multiple|"2.0"  ("dr@wheelIdx")
- * - "wheel_damping_compression"	|multiple|"4.0"  ("dc@wheelIdx")
- * - "wheel_friction_slip"			|multiple|"100.0"  ("fs@wheelIdx")
- * - "wheel_roll_influence"			|multiple|"0.1"  ("ri@wheelIdx")
+ * - "wheel_axle"					|single|"1.0,0.0,0.0" ("ax1,ay1,az1$...$axN,ayN,azN")
+ * - "wheel_direction"				|single|"0.0,0.0,-1.0" ("dx1,dy1,dz1$...$dxN,dyN,dzN")
+ * - "wheel_suspension_travel"		|single|"40.0" ("st1,...,stN")
+ * - "wheel_suspension_stiffness"	|single|"40.0" ("ss1,...,ssN")
+ * - "wheel_damping_relaxation"		|single|"2.0"  ("dr1,...,drN")
+ * - "wheel_damping_compression"	|single|"4.0"  ("dc1,...,dcN")
+ * - "wheel_friction_slip"			|single|"100.0"  ("fs1,...,fsN")
+ * - "wheel_roll_influence"			|single|"0.1"  ("ri1,...,riN")
  * - "max_engine_force"				|single|no default
  * - "max_brake_force"				|single|no default
  * - "steering_clamp"				|single|"45.0" (in degree)
@@ -171,7 +171,7 @@ private:
 	mWheelSuspensionStiffness, mWheelDampingRelaxation,
 	mWheelDampingCompression, mWheelFrictionSlip, mWheelRollInfluence;
 	//helpers
-	int idxClamp(int value, int min, int max);
+	///TODO change member names
 	LVector3f vehicleDims, vehicleDeltaCenter;
 	float vehicleRadius;
 	///@}
@@ -417,20 +417,6 @@ inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 	HOLD_REMUTEX(mMutex)
 
 	return mWheelObjects;
-}
-
-inline int Vehicle::idxClamp(int value, int min, int max)
-{
-	int clamped = value;
-	if (value > max)
-	{
-		clamped = max;
-	}
-	else if (value < min)
-	{
-		clamped = min;
-	}
-	return clamped;
 }
 
 } /* namespace ely */

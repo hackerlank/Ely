@@ -93,48 +93,54 @@ bool Vehicle::initialize()
 		mWheelNumber = 0;
 	}
 	//
-	std::list<std::string> paramList;
-	std::list<std::string>::const_iterator paramListIter;
-	//wheels' models
-	mWheelModelParam.resize(mWheelNumber, std::string(""));
-	paramList = mTmpl->parameterList(std::string("wheel_model"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	std::string param;
+	unsigned int idx;
+	std::vector<std::string> paramValuesStr;
+	//wheels' model params
+	param = mTmpl->parameter(std::string("wheel_model"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> modelIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(modelIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelModelParam[idx] = modelIdx[0];
+		paramValuesStr.resize(mWheelNumber, "");
 	}
-	mWheelScaleParam.resize(mWheelNumber, std::string("1.0"));
-	paramList = mTmpl->parameterList(std::string("wheel_scale"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	mWheelModelParam = paramValuesStr;
+	//wheels' scale params
+	param = mTmpl->parameter(std::string("wheel_scale"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> scaleIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(scaleIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelScaleParam[idx] = scaleIdx[0];
+		paramValuesStr.resize(mWheelNumber, "1.0");
 	}
+	mWheelScaleParam = paramValuesStr;
 	//wheel is front
-	mWheelIsFront.resize(mWheelNumber, false);
-	paramList = mTmpl->parameterList(std::string("wheel_is_front"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_is_front"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> valueIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(valueIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelIsFront[idx] =
-				(valueIdx[0] == std::string("true") ? true : false);
+		paramValuesStr.resize(mWheelNumber, "false");
 	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		mWheelIsFront[idx] =
+				(paramValuesStr[idx] == std::string("true") ? true : false);
+	}
+
+	///TODO
 	//wheel connection point ratio
 	mWheelConnectionPointRatio.resize(mWheelNumber, LVecBase3f::zero());
-	paramList = mTmpl->parameterList(
-			std::string("wheel_connection_point_ratio"));
+
+	param = mTmpl->parameter(std::string("wheel_connection_point_ratio"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
+	{
+		paramValuesStr.resize(mWheelNumber, "false");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		mWheelIsFront[idx] =
+				(paramValuesStr[idx] == std::string("true") ? true : false);
+	}
+
 	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
 			++paramListIter)
 	{
@@ -150,6 +156,8 @@ bool Vehicle::initialize()
 			NULL);
 		}
 	}
+
+
 	//wheel axle
 	mWheelAxle.resize(mWheelNumber, LVector3f(1.0, 0.0, 0.0));
 	paramList = mTmpl->parameterList(std::string("wheel_axle"));
