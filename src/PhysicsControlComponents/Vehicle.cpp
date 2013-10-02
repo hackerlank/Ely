@@ -121,118 +121,139 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		mWheelIsFront[idx] =
-				(paramValuesStr[idx] == std::string("true") ? true : false);
+		mWheelIsFront.push_back(
+				paramValuesStr[idx] == std::string("true") ? true : false);
 	}
-
-	///TODO
 	//wheel connection point ratio
-	mWheelConnectionPointRatio.resize(mWheelNumber, LVecBase3f::zero());
-
 	param = mTmpl->parameter(std::string("wheel_connection_point_ratio"));
-	paramValuesStr = parseCompoundString(param, ',');
+	paramValuesStr = parseCompoundString(param, '$');
 	if(paramValuesStr.size() < mWheelNumber)
 	{
-		paramValuesStr.resize(mWheelNumber, "false");
+		paramValuesStr.resize(mWheelNumber, "1.0,1.0,1.0");
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		mWheelIsFront[idx] =
-				(paramValuesStr[idx] == std::string("true") ? true : false);
-	}
-
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
-	{
-		std::vector<std::string> rxryrzIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(rxryrzIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		std::vector<std::string> rxryrz = parseCompoundString(*paramListIter,
-				',');
-		for (unsigned int i = 0; i < rxryrz.size() and i < 3; ++i)
+		std::vector<std::string> paramValuesStrExt = parseCompoundString(
+				paramValuesStr[idx], ',');
+		if (paramValuesStrExt.size() < 3)
 		{
-			mWheelConnectionPointRatio[idx][i] = strtof(rxryrz[i].c_str(),
-			NULL);
+			paramValuesStrExt.resize(3, "1.0");
 		}
+		LVecBase3f values;
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
+			if (values[i] < 0.0)
+			{
+				values[i] = -values[i];
+			}
+		}
+		mWheelConnectionPointRatio.push_back(values);
 	}
-
-
 	//wheel axle
-	mWheelAxle.resize(mWheelNumber, LVector3f(1.0, 0.0, 0.0));
-	paramList = mTmpl->parameterList(std::string("wheel_axle"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_axle"));
+	paramValuesStr = parseCompoundString(param, '$');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> axayazIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(axayazIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		std::vector<std::string> axayaz = parseCompoundString(*paramListIter,
-				',');
-		for (unsigned int i = 0; i < axayaz.size() and i < 3; ++i)
+		paramValuesStr.resize(mWheelNumber, "1.0,0.0,0.0");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		std::vector<std::string> paramValuesStrExt = parseCompoundString(
+				paramValuesStr[idx], ',');
+		if (paramValuesStrExt.size() < 3)
 		{
-			mWheelAxle[idx][i] = strtof(axayaz[i].c_str(),
-			NULL);
+			paramValuesStrExt.resize(3, "0.0");
 		}
+		LVector3f values;
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
+			values.normalize();
+			if (values.length_squared() == 0.0)
+			{
+				values = LVector3f(1.0, 0.0, 0.0);
+			}
+		}
+		mWheelAxle.push_back(values);
 	}
 	//wheel direction
-	mWheelDirection.resize(mWheelNumber, LVector3f(0.0, 0.0, -1.0));
-	paramList = mTmpl->parameterList(std::string("wheel_direction"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_direction"));
+	paramValuesStr = parseCompoundString(param, '$');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> dxdydzIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(dxdydzIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		std::vector<std::string> dxdydz = parseCompoundString(*paramListIter,
-				',');
-		for (unsigned int i = 0; i < dxdydz.size() and i < 3; ++i)
+		paramValuesStr.resize(mWheelNumber, "0.0,0.0,-1.0");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		std::vector<std::string> paramValuesStrExt = parseCompoundString(
+				paramValuesStr[idx], ',');
+		if (paramValuesStrExt.size() < 3)
 		{
-			mWheelDirection[idx][i] = strtof(dxdydz[i].c_str(),
-			NULL);
+			paramValuesStrExt.resize(3, "0.0");
 		}
+		LVector3f values;
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
+			values.normalize();
+			if (values.length_squared() == 0.0)
+			{
+				values = LVector3f(0.0, 0.0, -1.0);
+			}
+		}
+		mWheelDirection.push_back(values);
 	}
 	//wheel suspension travel
-	mWheelSuspensionTravel.resize(mWheelNumber, 40.0);
-	paramList = mTmpl->parameterList(std::string("wheel_suspension_travel"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_suspension_travel"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> stIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(stIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelSuspensionTravel[idx] = strtof(stIdx[0].c_str(),
-		NULL);
+		paramValuesStr.resize(mWheelNumber, "40.0");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		float value = strtof(paramValuesStr[idx].c_str(), NULL);
+		if(value < 0.0)
+		{
+			value = -value;
+		}
+		mWheelSuspensionTravel.push_back(value);
 	}
 	//wheel suspension stiffness
-	mWheelSuspensionStiffness.resize(mWheelNumber, 40.0);
-	paramList = mTmpl->parameterList(std::string("wheel_suspension_stiffness"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_suspension_stiffness"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> ssIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(ssIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelSuspensionStiffness[idx] = strtof(ssIdx[0].c_str(),
-		NULL);
+		paramValuesStr.resize(mWheelNumber, "40.0");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		float value = strtof(paramValuesStr[idx].c_str(), NULL);
+		if(value < 0.0)
+		{
+			value = -value;
+		}
+		mWheelSuspensionStiffness.push_back(value);
 	}
 	//wheel damping relaxation
-	mWheelDampingRelaxation.resize(mWheelNumber, 2.0);
-	paramList = mTmpl->parameterList(std::string("wheel_damping_relaxation"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_damping_relaxation"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if(paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> drIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(drIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelDampingRelaxation[idx] = strtof(drIdx[0].c_str(),
-		NULL);
+		paramValuesStr.resize(mWheelNumber, "2.0");
 	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		float value = strtof(paramValuesStr[idx].c_str(), NULL);
+		if(value < 0.0)
+		{
+			value = -value;
+		}
+		mWheelDampingRelaxation.push_back(value);
+	}
+
+	///TODO
 	//wheel damping compression
 	mWheelDampingCompression.resize(mWheelNumber, 4.0);
 	paramList = mTmpl->parameterList(std::string("wheel_damping_compression"));
