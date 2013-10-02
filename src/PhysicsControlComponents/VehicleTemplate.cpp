@@ -86,6 +86,30 @@ void VehicleTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
 	mParameterTable.insert(ParameterNameValue("turn_left", "enabled"));
 	mParameterTable.insert(ParameterNameValue("turn_right", "enabled"));
+
+
+	 * - "wheel_scale"  				|multiple|"1.0" ("scale@wheelIdx")
+	 * - "wheel_is_front"				|multiple|"false" ("value@wheelIdx" with
+	 * value=true,false)
+	 * - "wheel_connection_point_ratio"	|multiple|no default ("rx,ry,rz@wheelIdx")
+	 * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
+	 * - "wheel_axle"					|multiple|"1.0,0.0,0.0" ("ax,ay,az@wheelIdx")
+	 * - "wheel_direction"				|multiple|"0.0,0.0,-1.0" ("dx,dy,dz@wheelIdx")
+	 * - "wheel_suspension_travel"		|multiple|"40.0" ("st@wheelIdx")
+	 * - "wheel_suspension_stiffness"	|multiple|"40.0" ("ss@wheelIdx")
+	 * - "wheel_damping_relaxation"		|multiple|"2.0"  ("dr@wheelIdx")
+	 * - "wheel_damping_compression"	|multiple|"4.0"  ("dc@wheelIdx")
+	 * - "wheel_friction_slip"			|multiple|"100.0"  ("fs@wheelIdx")
+	 * - "wheel_roll_influence"			|multiple|"0.1"  ("ri@wheelIdx")
+	 * - "max_engine_force"				|single|no default
+	 * - "max_brake_force"				|single|no default
+	 * - "steering_clamp"				|single|"45.0" (in degree)
+	 * - "steering_increment"			|single|"120.0" (in degree/sec)
+	 * - "steering_decrement"			|single|"60.0" (in degree/sec)
+	 * - "forward"  					|single|"enabled"
+	 * - "backward"  					|single|"enabled"
+	 * - "turn_left"					|single|"enabled"
+	 * - "turn_right"  					|single|"enabled"
 }
 
 //TypedObject semantics: hardcoded

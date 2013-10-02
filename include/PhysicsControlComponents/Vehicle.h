@@ -57,8 +57,8 @@ class VehicleTemplate;
  * value=true,false)
  * - "wheel_connection_point_ratio"	|multiple|no default ("rx,ry,rz@wheelIdx")
  * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
- * - "wheel_axle"					|multiple|no default ("ax,ay,az@wheelIdx")
- * - "wheel_direction"				|multiple|no default ("dx,dy,dz@wheelIdx")
+ * - "wheel_axle"					|multiple|"1.0,0.0,0.0" ("ax,ay,az@wheelIdx")
+ * - "wheel_direction"				|multiple|"0.0,0.0,-1.0" ("dx,dy,dz@wheelIdx")
  * - "wheel_suspension_travel"		|multiple|"40.0" ("st@wheelIdx")
  * - "wheel_suspension_stiffness"	|multiple|"40.0" ("ss@wheelIdx")
  * - "wheel_damping_relaxation"		|multiple|"2.0"  ("dr@wheelIdx")
@@ -160,7 +160,7 @@ private:
 	 * \name Wheels' data.
 	 */
 	///@{
-	std::vector<SMARTPTR(Object)> mWheels;
+	std::vector<SMARTPTR(Object)> mWheelObjects;
 	int mWheelNumber;
 	std::string mWheelTmpl;
 	std::vector<std::string> mWheelModelParam, mWheelScaleParam;
@@ -170,8 +170,10 @@ private:
 	std::vector<float> mWheelRadius, mWheelSuspensionTravel,
 	mWheelSuspensionStiffness, mWheelDampingRelaxation,
 	mWheelDampingCompression, mWheelFrictionSlip, mWheelRollInfluence;
-	//helper
+	//helpers
 	int idxClamp(int value, int min, int max);
+	LVector3f vehicleDims, vehicleDeltaCenter;
+	float vehicleRadius;
 	///@}
 
 	///Control and physics functions and parameters.
@@ -218,7 +220,7 @@ inline void Vehicle::reset()
 {
 	//
 	mVehicle.clear();
-	mWheels.clear();
+	mWheelObjects.clear();
 	mWheelNumber = 0;
 	mWheelTmpl.clear();
 	mWheelModelParam.clear();
@@ -234,6 +236,8 @@ inline void Vehicle::reset()
 	mWheelDampingCompression.clear();
 	mWheelFrictionSlip.clear();
 	mWheelRollInfluence.clear();
+	vehicleDims = vehicleDeltaCenter = LVector3f::zero();
+	vehicleRadius = 0.0;
 	mMaxEngineForce = mMaxBrakeForce = mSteering = mSteeringClamp =
 			mSteeringIncrement = mSteeringDecrement = 0.0;
 	mForward = mBackward = mTurnLeft = mTurnRight = mForwardKey = mBackwardKey =
@@ -412,7 +416,7 @@ inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mWheels;
+	return mWheelObjects;
 }
 
 inline int Vehicle::idxClamp(int value, int min, int max)

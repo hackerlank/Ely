@@ -151,7 +151,7 @@ bool Vehicle::initialize()
 		}
 	}
 	//wheel axle
-	mWheelAxle.resize(mWheelNumber, LVector3f::zero());
+	mWheelAxle.resize(mWheelNumber, LVector3f(1.0, 0.0, 0.0));
 	paramList = mTmpl->parameterList(std::string("wheel_axle"));
 	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
 			++paramListIter)
@@ -169,7 +169,7 @@ bool Vehicle::initialize()
 		}
 	}
 	//wheel direction
-	mWheelDirection.resize(mWheelNumber, LVector3f::zero());
+	mWheelDirection.resize(mWheelNumber, LVector3f(0.0, 0.0, -1.0));
 	paramList = mTmpl->parameterList(std::string("wheel_direction"));
 	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
 			++paramListIter)
@@ -323,9 +323,13 @@ void Vehicle::onAddToObjectSetup()
 			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
 	//set up axis
 	mVehicle->set_coordinate_system(mUpAxis);
+	//get chassis dimensions from Scene component node path,
+	//which is child of RigidBody component node path;
+	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+			rigidBodyComp->getNodePath().get_child(0),
+			vehicleDims, vehicleDeltaCenter, vehicleRadius);
 	//add BulletVehicle to physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
-	//
 }
 
 void Vehicle::onRemoveFromObjectCleanup()
@@ -351,6 +355,122 @@ void Vehicle::onRemoveFromObjectCleanup()
 
 void Vehicle::onAddToSceneSetup()
 {
+	//wheels' objects procedure creation
+	//check if there is a valid wheel Object template
+	SMARTPTR(ObjectTemplate)wheelTmpl =
+	ObjectTemplateManager::GetSingletonPtr()->
+	getObjectTemplate(ObjectType(mWheelTmpl));
+
+	if(not wheelTmpl)
+	{
+		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '"
+				<< mWheelTmpl <<
+				"' Object template doesn't exist");
+		return;
+	}
+
+	//check if wheel template has a Model or InstanceOf
+	std::string sceneComp, sceneCompParam;
+	SMARTPTR(ComponentTemplate) compTmpl =
+	wheelTmpl->getComponentTemplate(ComponentType("Model"));
+	if(compTmpl)
+	{
+		sceneComp = "Model";
+		sceneCompParam = "model_file";
+	}
+	else
+	{
+		compTmpl = wheelTmpl->getComponentTemplate(ComponentType("InstanceOf"));
+		if (compTmpl)
+		{
+			sceneComp = "InstanceOf";
+			sceneCompParam = "instance_of";
+		}
+		else
+		{
+			PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '"
+					<< mWheelTmpl <<
+					"' Object template hasn't a required 'Scene' component");
+		}
+	}
+	//prepare parameters tables and create the wheels' objects
+	//owner object's parent == wheels' parent
+	std::string parentId = mOwnerObject->objectTmpl()->parameter(std::string("parent"));
+	for(unsigned int idx = 0; idx < mWheelNumber; ++idx)
+	{
+		//for each wheel:
+		//set an object ParameterTable
+		ParameterTable objTmplParam;
+		//Object parent param
+		objTmplParam.insert(
+				ParameterTable::value_type("parent", parentId));
+		//set a component ParameterTableMap
+		ParameterTableMap compTmplParams;
+		//Scene component model param
+		compTmplParams[sceneComp].insert(
+				ParameterTable::value_type(sceneCompParam, mWheelModelParam[idx]));
+		//Scene component scale param
+		compTmplParams[sceneComp].insert(
+				ParameterTable::value_type("scale", mWheelScaleParam[idx]));
+		//actually create the wheel object
+		std::ostringstream idxStr;
+		idxStr << idx;
+		mWheelObjects[idx] = ObjectTemplateManager::GetSingletonPtr()->
+				createObject(ObjectType(mWheelTmpl),
+						ObjectId(mComponentId + "Wheel" + idxStr),
+						objTmplParam, compTmplParams, false);
+	}
+	//add wheels to BulletVehicle
+	for(unsigned int idx = 0; idx < mWheelNumber; ++idx)
+	{
+		//get the wheel radius from the Scene component
+	}
+
+
+
+//    wheelFR = app.render.attachNewNode("wheelFR")
+//    wheel.instanceTo(wheelFR)
+//    wOffset = LVector3f(-vehicleDims.getX() / 2.0 * 0.8,
+//                        vehicleDims.getY() / 2.0 * 0.65,
+//                        - vehicleDims.getZ() / 2.0 * 0.8)
+//    wheelBodyFR = createWheel(True, wheelDims.getZ() / 2.0,
+//                              LPoint3f(wOffset))
+//
+//                              def createWheel(isFront, radius,
+//                                              connectionPointCs,
+//                                              axleCs=LVector3f(1, 0, 0),
+//                                              directionCs=Vec3(0, 0, -1),
+//                                              suspensionTravelCm=40.0, suspensionStiffness=40.0,
+//                                              dampingRelaxation=2.3, dampingCompression=4.4,
+//                                              frictionSlip=100.0, rollInfluence=0.1):
+//                                  wheelBody = vehicle.createWheel()
+//                                  wheelBody.setFrontWheel(isFront)
+//                                  wheelBody.setWheelRadius(radius)
+//                                  wheelBody.setChassisConnectionPointCs(connectionPointCs)
+//                                  wheelBody.setWheelAxleCs(axleCs)
+//                                  wheelBody.setWheelDirectionCs(directionCs)
+//                                  wheelBody.setMaxSuspensionTravelCm(suspensionTravelCm)
+//                                  wheelBody.setSuspensionStiffness(suspensionStiffness)
+//                                  wheelBody.setWheelsDampingRelaxation(dampingRelaxation)
+//                                  wheelBody.setWheelsDampingCompression(dampingCompression)
+//                                  wheelBody.setFrictionSlip(frictionSlip)
+//                                  wheelBody.setRollInfluence(rollInfluence)
+//                                  return wheelBody
+//
+//    wheelBodyFR.setNode(wheelFR.node())
+
+
+
+
+
+
+
+
+
+
+
+
+
 	//Add to the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
 }
