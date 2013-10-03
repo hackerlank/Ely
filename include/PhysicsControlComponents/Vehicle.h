@@ -53,8 +53,10 @@ class VehicleTemplate;
  * - "wheel_object_template"		|single|no default
  * - "wheel_model"  				|single|no default ("model1,...,modelN")
  * - "wheel_scale"  				|single|"1.0" ("scale1,...,scaleN")
- * - "wheel_is_front"				|single|"false" ("value1,...,valueN" with
- * valueX=true,false)
+ * - "wheel_is_front"				|single|"false" ("bool1,...,boolN")
+ * - "wheel_set_steering"			|single|"false" ("bool1,...,boolN")
+ * - "wheel_apply_engine_force"		|single|"false" ("bool1,...,boolN")
+ * - "wheel_set_brake_front"		|single|"false" ("bool1,...,boolN")
  * - "wheel_connection_point_ratio"	|single|"1.0,1.0,1.0" ("rx1,ry1,rz1$...$rxN,ryN,rzN")
  * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
  * - "wheel_axle"					|single|"1.0,0.0,0.0" ("ax1,ay1,az1$...$axN,ayN,azN")
@@ -72,6 +74,7 @@ class VehicleTemplate;
  * - "steering_decrement"			|single|"60.0" (in degree/sec)
  * - "forward"  					|single|"enabled"
  * - "backward"  					|single|"enabled"
+ * - "brake"  						|single|"enabled"
  * - "turn_left"					|single|"enabled"
  * - "turn_right"  					|single|"enabled"
  */
@@ -164,16 +167,16 @@ private:
 	int mWheelNumber;
 	std::string mWheelTmpl;
 	std::vector<std::string> mWheelModelParam, mWheelScaleParam;
-	std::vector<bool> mWheelIsFront;
+	std::vector<bool> mWheelIsFront, mWheelSetSteering, mWheelApplyEngineForce,
+	mWheelSetBrakeForce;
 	std::vector<LVecBase3f> mWheelConnectionPointRatio;
 	std::vector<LVector3f> mWheelAxle, mWheelDirection;
 	std::vector<float> mWheelRadius, mWheelSuspensionTravel,
 	mWheelSuspensionStiffness, mWheelDampingRelaxation,
 	mWheelDampingCompression, mWheelFrictionSlip, mWheelRollInfluence;
 	//helpers
-	///TODO change member names
-	LVector3f vehicleDims, vehicleDeltaCenter;
-	float vehicleRadius;
+	LVector3f mVehicleDims, mVehicleDeltaCenter;
+	float mVehicleRadius;
 	///@}
 
 	///Control and physics functions and parameters.
@@ -181,8 +184,8 @@ private:
 	float mMaxEngineForce, mMaxBrakeForce, mSteering, mSteeringClamp,
 	mSteeringIncrement, mSteeringDecrement;
 	///Key controls and effective keys.
-	bool mForward, mBackward, mTurnLeft, mTurnRight;
-	bool mForwardKey, mBackwardKey, mTurnLeftKey, mTurnRightKey;
+	bool mForward, mBackward, mBrake, mTurnLeft, mTurnRight;
+	bool mForwardKey, mBackwardKey, mBrakeKey, mTurnLeftKey, mTurnRightKey;
 	///@}
 
 	///Throwing events.
@@ -236,12 +239,12 @@ inline void Vehicle::reset()
 	mWheelDampingCompression.clear();
 	mWheelFrictionSlip.clear();
 	mWheelRollInfluence.clear();
-	vehicleDims = vehicleDeltaCenter = LVector3f::zero();
-	vehicleRadius = 0.0;
+	mVehicleDims = mVehicleDeltaCenter = LVector3f::zero();
+	mVehicleRadius = 0.0;
 	mMaxEngineForce = mMaxBrakeForce = mSteering = mSteeringClamp =
 			mSteeringIncrement = mSteeringDecrement = 0.0;
-	mForward = mBackward = mTurnLeft = mTurnRight = mForwardKey = mBackwardKey =
-			mTurnLeftKey = mTurnRightKey = false;
+	mForward = mBackward = mBrake = mTurnLeft = mTurnRight = mForwardKey =
+			mBackwardKey = mBrakeKey = mTurnLeftKey = mTurnRightKey = false;
 	mThrowEvents = mOnStartSent = mOnStopSent = false;
 }
 

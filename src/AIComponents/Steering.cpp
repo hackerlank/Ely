@@ -48,6 +48,12 @@ class EXPCL_PANDAAI PathFinder;
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 
+namespace
+{
+const std::string FORCEOFFEVENT("OnSteeringForceOff");
+const std::string FORCEONEVENT("OnSteeringForceOn");
+}  // namespace
+
 namespace ely
 {
 
@@ -161,7 +167,7 @@ void Steering::onRemoveFromObjectCleanup()
 			//throw SteeringForceOff event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOffSent))
 			{
-				throw_event(std::string("SteeringForceOff"),
+				throw_event(FORCEOFFEVENT,
 						EventParameter(this),
 						EventParameter(std::string(mOwnerObject->objectId())));
 			}
@@ -310,7 +316,7 @@ void Steering::doDisable()
 		//throw SteeringForceOff event (if enabled)
 		if (mThrowEvents and (not mSteeringForceOffSent))
 		{
-			throw_event(std::string("SteeringForceOff"), EventParameter(this),
+			throw_event(FORCEOFFEVENT, EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 		}
 	}
@@ -400,7 +406,7 @@ void Steering::doUpdateController(float dt)
 			//throw SteeringForceOn event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOnSent))
 			{
-				throw_event(std::string("SteeringForceOn"),
+				throw_event(FORCEONEVENT,
 						EventParameter(this),
 						EventParameter(std::string(mOwnerObject->objectId())));
 				mSteeringForceOnSent = true;
@@ -416,7 +422,7 @@ void Steering::doUpdateController(float dt)
 			//throw SteeringForceOff event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOffSent))
 			{
-				throw_event(std::string("SteeringForceOff"),
+				throw_event(FORCEOFFEVENT,
 						EventParameter(this),
 						EventParameter(std::string(mOwnerObject->objectId())));
 				mSteeringForceOffSent = true;

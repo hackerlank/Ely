@@ -27,7 +27,14 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
+#include <bulletWheel.h>
 #include <throw_event.h>
+
+namespace
+{
+const std::string STARTEVENT("OnStartVehicle");
+const std::string STOPEVENT("OnStopVehicle");
+}  // namespace
 
 namespace ely
 {
@@ -99,7 +106,7 @@ bool Vehicle::initialize()
 	//wheels' model params
 	param = mTmpl->parameter(std::string("wheel_model"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "");
 	}
@@ -107,7 +114,7 @@ bool Vehicle::initialize()
 	//wheels' scale params
 	param = mTmpl->parameter(std::string("wheel_scale"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0");
 	}
@@ -115,7 +122,7 @@ bool Vehicle::initialize()
 	//wheel is front
 	param = mTmpl->parameter(std::string("wheel_is_front"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -124,10 +131,46 @@ bool Vehicle::initialize()
 		mWheelIsFront.push_back(
 				paramValuesStr[idx] == std::string("true") ? true : false);
 	}
+	//wheel set steering
+	param = mTmpl->parameter(std::string("wheel_set_steering"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if (paramValuesStr.size() < mWheelNumber)
+	{
+		paramValuesStr.resize(mWheelNumber, "false");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		mWheelSetSteering.push_back(
+				paramValuesStr[idx] == std::string("true") ? true : false);
+	}
+	//wheel apply engine force
+	param = mTmpl->parameter(std::string("wheel_apply_engine_force"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if (paramValuesStr.size() < mWheelNumber)
+	{
+		paramValuesStr.resize(mWheelNumber, "false");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		mWheelApplyEngineForce.push_back(
+				paramValuesStr[idx] == std::string("true") ? true : false);
+	}
+	//wheel set brake front
+	param = mTmpl->parameter(std::string("wheel_set_brake_front"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if (paramValuesStr.size() < mWheelNumber)
+	{
+		paramValuesStr.resize(mWheelNumber, "false");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		mWheelSetBrakeForce.push_back(
+				paramValuesStr[idx] == std::string("true") ? true : false);
+	}
 	//wheel connection point ratio
 	param = mTmpl->parameter(std::string("wheel_connection_point_ratio"));
 	paramValuesStr = parseCompoundString(param, '$');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0,1.0,1.0");
 	}
@@ -153,7 +196,7 @@ bool Vehicle::initialize()
 	//wheel axle
 	param = mTmpl->parameter(std::string("wheel_axle"));
 	paramValuesStr = parseCompoundString(param, '$');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0,0.0,0.0");
 	}
@@ -180,7 +223,7 @@ bool Vehicle::initialize()
 	//wheel direction
 	param = mTmpl->parameter(std::string("wheel_direction"));
 	paramValuesStr = parseCompoundString(param, '$');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "0.0,0.0,-1.0");
 	}
@@ -207,14 +250,14 @@ bool Vehicle::initialize()
 	//wheel suspension travel
 	param = mTmpl->parameter(std::string("wheel_suspension_travel"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "40.0");
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
 		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if(value < 0.0)
+		if (value < 0.0)
 		{
 			value = -value;
 		}
@@ -223,14 +266,14 @@ bool Vehicle::initialize()
 	//wheel suspension stiffness
 	param = mTmpl->parameter(std::string("wheel_suspension_stiffness"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "40.0");
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
 		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if(value < 0.0)
+		if (value < 0.0)
 		{
 			value = -value;
 		}
@@ -239,59 +282,66 @@ bool Vehicle::initialize()
 	//wheel damping relaxation
 	param = mTmpl->parameter(std::string("wheel_damping_relaxation"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if(paramValuesStr.size() < mWheelNumber)
+	if (paramValuesStr.size() < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "2.0");
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
 		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if(value < 0.0)
+		if (value < 0.0)
 		{
 			value = -value;
 		}
 		mWheelDampingRelaxation.push_back(value);
 	}
-
-	///TODO
 	//wheel damping compression
-	mWheelDampingCompression.resize(mWheelNumber, 4.0);
-	paramList = mTmpl->parameterList(std::string("wheel_damping_compression"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_damping_compression"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if (paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> dcIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(dcIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelDampingCompression[idx] = strtof(dcIdx[0].c_str(),
-		NULL);
+		paramValuesStr.resize(mWheelNumber, "4.0");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		float value = strtof(paramValuesStr[idx].c_str(), NULL);
+		if (value < 0.0)
+		{
+			value = -value;
+		}
+		mWheelDampingCompression.push_back(value);
 	}
 	//wheel friction slip
-	mWheelFrictionSlip.resize(mWheelNumber, 100.0);
-	paramList = mTmpl->parameterList(std::string("wheel_friction_slip"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_friction_slip"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if (paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> fsIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(fsIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelFrictionSlip[idx] = strtof(fsIdx[0].c_str(),
-		NULL);
+		paramValuesStr.resize(mWheelNumber, "100.0");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		float value = strtof(paramValuesStr[idx].c_str(), NULL);
+		if (value < 0.0)
+		{
+			value = -value;
+		}
+		mWheelFrictionSlip.push_back(value);
 	}
 	//wheel roll influence
-	mWheelRollInfluence.resize(mWheelNumber, 0.1);
-	paramList = mTmpl->parameterList(std::string("wheel_roll_influence"));
-	for (paramListIter = paramList.begin(); paramListIter != paramList.end();
-			++paramListIter)
+	param = mTmpl->parameter(std::string("wheel_roll_influence"));
+	paramValuesStr = parseCompoundString(param, ',');
+	if (paramValuesStr.size() < mWheelNumber)
 	{
-		std::vector<std::string> riIdx = parseCompoundString(*paramListIter,
-				'@');
-		int idx = idxClamp(strtol(riIdx[1].c_str(), NULL, 0), 0,
-				mWheelNumber - 1);
-		mWheelRollInfluence[idx] = strtof(riIdx[0].c_str(),
-		NULL);
+		paramValuesStr.resize(mWheelNumber, "0.1");
+	}
+	for (idx = 0; idx < mWheelNumber; ++idx)
+	{
+		float value = strtof(paramValuesStr[idx].c_str(), NULL);
+		if (value < 0.0)
+		{
+			value = -value;
+		}
+		mWheelRollInfluence.push_back(value);
 	}
 	//physics parameter
 	mMaxEngineForce = strtof(
@@ -312,12 +362,16 @@ bool Vehicle::initialize()
 	mBackwardKey = (
 			mTmpl->parameter(std::string("backward"))
 					== std::string("enabled") ? true : false);
+	//brake key
+	mBrakeKey = (
+			mTmpl->parameter(std::string("brake")) == std::string("enabled") ?
+					true : false);
 	//turn left key
-	mForwardKey = (
+	mTurnLeftKey = (
 			mTmpl->parameter(std::string("turn_left"))
 					== std::string("enabled") ? true : false);
 	//turn right key
-	mBackwardKey = (
+	mTurnRightKey = (
 			mTmpl->parameter(std::string("turn_right"))
 					== std::string("enabled") ? true : false);
 	//
@@ -356,7 +410,7 @@ void Vehicle::onAddToObjectSetup()
 	//which is child of RigidBody component node path;
 	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
 			rigidBodyComp->getNodePath().get_child(0),
-			vehicleDims, vehicleDeltaCenter, vehicleRadius);
+			mVehicleDims, mVehicleDeltaCenter, mVehicleRadius);
 	//add BulletVehicle to physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
 }
@@ -399,12 +453,13 @@ void Vehicle::onAddToSceneSetup()
 	}
 
 	//check if wheel template has a Model or InstanceOf
-	std::string sceneComp, sceneCompParam;
+	ComponentType sceneCompType;
+	std::string sceneCompParam;
 	SMARTPTR(ComponentTemplate) compTmpl =
 	wheelTmpl->getComponentTemplate(ComponentType("Model"));
 	if(compTmpl)
 	{
-		sceneComp = "Model";
+		sceneCompType = ComponentType("Model");
 		sceneCompParam = "model_file";
 	}
 	else
@@ -412,7 +467,7 @@ void Vehicle::onAddToSceneSetup()
 		compTmpl = wheelTmpl->getComponentTemplate(ComponentType("InstanceOf"));
 		if (compTmpl)
 		{
-			sceneComp = "InstanceOf";
+			sceneCompType = ComponentType("InstanceOf");
 			sceneCompParam = "instance_of";
 		}
 		else
@@ -436,10 +491,10 @@ void Vehicle::onAddToSceneSetup()
 		//set a component ParameterTableMap
 		ParameterTableMap compTmplParams;
 		//Scene component model param
-		compTmplParams[sceneComp].insert(
+		compTmplParams[sceneCompType].insert(
 				ParameterTable::value_type(sceneCompParam, mWheelModelParam[idx]));
 		//Scene component scale param
-		compTmplParams[sceneComp].insert(
+		compTmplParams[sceneCompType].insert(
 				ParameterTable::value_type("scale", mWheelScaleParam[idx]));
 		//actually create the wheel object
 		std::ostringstream idxStr;
@@ -452,53 +507,48 @@ void Vehicle::onAddToSceneSetup()
 	//add wheels to BulletVehicle
 	for(unsigned int idx = 0; idx < mWheelNumber; ++idx)
 	{
-		//get the wheel radius from the Scene component
+		//get the wheel radius from the object component:
+		//the radius is taken along the up axis
+		LVector3f wheelDims, wheelDeltaCenter;
+		float wheelMaxRadius;
+		GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+				mWheelObjects[idx]->getNodePath(),
+				wheelDims, wheelDeltaCenter, wheelMaxRadius);
+		//evaluate wheel radius
+		if (mUpAxis == X_up)
+		{
+			mWheelRadius[idx] = wheelDims.get_x() / 2.0;
+		}
+		else if (mUpAxis == Y_up)
+		{
+			mWheelRadius[idx] = wheelDims.get_y() / 2.0;
+		}
+		else //mUpAxis == Z_up
+		{
+			mWheelRadius[idx] = wheelDims.get_z() / 2.0;
+		}
+		//evaluate wheel connection point
+		LPoint3f wheelConnectionPoint(
+				mVehicleDims.get_x() / 2.0 * mWheelConnectionPointRatio[idx].get_x(),
+				mVehicleDims.get_y() / 2.0 * mWheelConnectionPointRatio[idx].get_y(),
+				mVehicleDims.get_z() / 2.0 * mWheelConnectionPointRatio[idx].get_z()
+		);
+		//create effectively the wheel
+		BulletWheel wheel = mVehicle->create_wheel();
+		wheel.set_front_wheel(mWheelIsFront[idx]);
+		wheel.set_wheel_radius(mWheelRadius[idx]);
+		wheel.set_chassis_connection_point_cs(wheelConnectionPoint);
+		wheel.set_wheel_axle_cs(mWheelAxle[idx]);
+		wheel.set_wheel_direction_cs(mWheelDirection[idx]);
+		wheel.set_max_suspension_travel_cm(mWheelSuspensionTravel[idx]);
+		wheel.set_suspension_stiffness(mWheelSuspensionStiffness[idx]);
+		wheel.set_wheels_damping_relaxation(mWheelDampingRelaxation[idx]);
+		wheel.set_wheels_damping_compression(mWheelDampingCompression[idx]);
+		wheel.set_friction_slip(mWheelFrictionSlip[idx]);
+		wheel.set_roll_influence(mWheelRollInfluence[idx]);
+		//set the wheel node path
+		wheel.set_node(mWheelObjects[idx]->getNodePath().node());
 	}
-
-
-
-//    wheelFR = app.render.attachNewNode("wheelFR")
-//    wheel.instanceTo(wheelFR)
-//    wOffset = LVector3f(-vehicleDims.getX() / 2.0 * 0.8,
-//                        vehicleDims.getY() / 2.0 * 0.65,
-//                        - vehicleDims.getZ() / 2.0 * 0.8)
-//    wheelBodyFR = createWheel(True, wheelDims.getZ() / 2.0,
-//                              LPoint3f(wOffset))
-//
-//                              def createWheel(isFront, radius,
-//                                              connectionPointCs,
-//                                              axleCs=LVector3f(1, 0, 0),
-//                                              directionCs=Vec3(0, 0, -1),
-//                                              suspensionTravelCm=40.0, suspensionStiffness=40.0,
-//                                              dampingRelaxation=2.3, dampingCompression=4.4,
-//                                              frictionSlip=100.0, rollInfluence=0.1):
-//                                  wheelBody = vehicle.createWheel()
-//                                  wheelBody.setFrontWheel(isFront)
-//                                  wheelBody.setWheelRadius(radius)
-//                                  wheelBody.setChassisConnectionPointCs(connectionPointCs)
-//                                  wheelBody.setWheelAxleCs(axleCs)
-//                                  wheelBody.setWheelDirectionCs(directionCs)
-//                                  wheelBody.setMaxSuspensionTravelCm(suspensionTravelCm)
-//                                  wheelBody.setSuspensionStiffness(suspensionStiffness)
-//                                  wheelBody.setWheelsDampingRelaxation(dampingRelaxation)
-//                                  wheelBody.setWheelsDampingCompression(dampingCompression)
-//                                  wheelBody.setFrictionSlip(frictionSlip)
-//                                  wheelBody.setRollInfluence(rollInfluence)
-//                                  return wheelBody
-//
-//    wheelBodyFR.setNode(wheelFR.node())
-
-
-
-
-
-
-
-
-
-
-
-
 
 	//Add to the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
@@ -521,30 +571,85 @@ void Vehicle::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-	LVector3 speed(0, 0, 0);
-	float omega = 0.0;
-
-	//handle Vehicle start-stop events
-	if (mVehicle->get_current_speed_km_hour() == 0.0)
+	//update vehicle
+	//process input
+	float engineForce = 0.0;
+	float brakeForce = 0.0;
+	//handle keys:
+	if (mForward)
 	{
-		//throw mOnStart event (if enabled)
-		if (mThrowEvents and (not mOnStartSent))
-		{
-			throw_event(std::string("OnStart"), EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
-			mOnStartSent = true;
-			mOnStopSent = false;
-		}
+		engineForce = mMaxEngineForce;
+	}
+	else if (mBackward)
+	{
+		engineForce = -mMaxEngineForce;
+	}
+	if (mBrake)
+	{
+		brakeForce = mMaxBrakeForce;
+	}
+	if (mTurnLeft)
+	{
+		mSteering += dt * mSteeringIncrement;
+		mSteering = min(mSteering, mSteeringClamp);
+	}
+	else if (mTurnRight)
+	{
+		mSteering -= dt * mSteeringIncrement;
+		mSteering = max(mSteering, -mSteeringClamp);
 	}
 	else
 	{
-		//throw OnStop event (if enabled)
-		if (mThrowEvents and (not mOnStopSent))
+		if (mSteering < 0.0)
 		{
-			throw_event(std::string("OnStop"), EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
-			mOnStopSent = true;
-			mOnStartSent = false;
+			mSteering = min(mSteering + mSteeringDecrement * dt, float(0.0));
+		}
+		else if (mSteering > 0.0)
+		{
+			mSteering = max(mSteering - mSteeringDecrement * dt, float(0.0));
+		}
+	}
+	//Apply steering, engine and brake forces to wheels
+	for (int idx = 0; idx < mWheelNumber; ++idx)
+	{
+		if (mWheelSetSteering[idx])
+		{
+			mVehicle->set_steering_value(mSteering, idx);
+		}
+		if (mWheelApplyEngineForce[idx])
+		{
+			mVehicle->apply_engine_force(mSteering, idx);
+		}
+		if (mWheelSetBrakeForce[idx])
+		{
+			mVehicle->set_brake(mSteering, idx);
+		}
+	}
+
+	if (mThrowEvents)
+	{
+		//handle Vehicle start-stop events
+		if (mVehicle->get_current_speed_km_hour() == 0.0)
+		{
+			//throw mOnStart event (if enabled)
+			if (not mOnStartSent)
+			{
+				throw_event(STARTEVENT, EventParameter(this),
+						EventParameter(std::string(mOwnerObject->objectId())));
+				mOnStartSent = true;
+				mOnStopSent = false;
+			}
+		}
+		else
+		{
+			//throw OnStop event (if enabled)
+			if (not mOnStopSent)
+			{
+				throw_event(STOPEVENT, EventParameter(this),
+						EventParameter(std::string(mOwnerObject->objectId())));
+				mOnStopSent = true;
+				mOnStartSent = false;
+			}
 		}
 	}
 }

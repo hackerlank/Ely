@@ -33,6 +33,12 @@
 #include <bulletTriangleMesh.h>
 #include <bulletTriangleMeshShape.h>
 
+namespace
+{
+const std::string STARTEVENT("OnStartCrowdAgent");
+const std::string STOPEVENT("OnStopCrowdAgent");
+}  // namespace
+
 namespace ely
 {
 
@@ -333,7 +339,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		//throw CrowdAgentStart event (if enabled)
 		if (mThrowEvents and (not mCrowdAgentStartSent))
 		{
-			throw_event(std::string("CrowdAgentStart"),
+			throw_event(STARTEVENT,
 					EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mCrowdAgentStartSent = true;
@@ -345,7 +351,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		//throw CrowdAgentStop event (if enabled)
 		if (mThrowEvents and (not mCrowdAgentStopSent))
 		{
-			throw_event(std::string("CrowdAgentStop"),
+			throw_event(STOPEVENT,
 					EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mCrowdAgentStopSent = true;

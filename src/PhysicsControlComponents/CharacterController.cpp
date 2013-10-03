@@ -26,6 +26,12 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <throw_event.h>
 
+namespace
+{
+const std::string ONGROUNDEVENT("OnGroundCharacterController");
+const std::string ONAIREVENT("OnAirCharacterController");
+}  // namespace
+
 namespace ely
 {
 CharacterController::CharacterController()
