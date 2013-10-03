@@ -57,7 +57,9 @@ enum AgentMovTypeEnum
  * second argument of both is a reference to the owner object.\n
  * \note the owner object of this component will be reparented (if necessary)
  * when added to a NavMesh, to the same reference node (i.e. parent) of
- * the NavMesh owner object.
+ * the NavMesh owner object.\n
+ * This component can throw (if enabled) "OnStartCrowdAgent" and "OnStopCrowdAgent"
+ * events.
  *
  * XML Param(s):
  * - "throw_events"						|single|"false"

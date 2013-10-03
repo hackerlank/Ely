@@ -432,6 +432,49 @@
 			</Component>
 		</Object>
 
+		<Object type="Car" id="auto1" priority="90">
+			<Param parent="render"/>
+			<Param is_steady="false"/>
+			<Param store_params="false"/>
+			<Param pos="-51.23,23.5961,40.6944"/>
+			<Param rot="-90.0,0.0,0.0"/>
+			<Component type="Model">
+				<Param model_file="panda.bam"/>
+				<Param anim_files="walk@panda-walk.bam"/>
+				<Param scale="0.6,0.6,0.6"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="dynamic"/>
+				<Param body_mass="1.0"/>
+				<Param body_friction="0.8"/>
+				<Param body_restitution="0.1"/>
+				<Param shape_type="capsule"/>
+				<Param shape_size="maximum"/>
+				<Param collide_mask="all_on"/>
+			</Component>
+			<Component type="Vehicle">
+				<Param wheels_number="4"/>
+				<Param wheel_object_template="CarWheel"/>
+				<Param wheel_model="wheel1,wheel1,wheel1,wheel1"/>
+				<Param wheel_scale="1.0,1.0,1.0,1.0"/>
+				<Param wheel_is_front="1.0,1.0,1.0,1.0"/>
+				<Param wheel_set_steering="1.0,1.0,1.0,1.0"/>
+				<Param wheel_apply_engine_force="1.0,1.0,1.0,1.0"/>
+				<Param wheel_set_brake_front="1.0,1.0,1.0,1.0"/>
+				<Param wheel_connection_point_ratio="1.0,1.0,1.0,1.0"/>
+				<Param max_engine_force="1.0"/>
+				<Param max_brake_force="1.0"/>
+			</Component>
+		</Object>
+		
+		<Object type="Instanceable" id="wheel1" priority="100">
+			<Component type="Model">
+				<Param model_file="walk@gorillawalking.bam"/>
+			</Component>
+			<Param parent=""/>
+			<Param is_steady="true"/>
+		</Object>
+
 <!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">

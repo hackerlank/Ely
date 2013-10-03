@@ -47,6 +47,9 @@ class AICharacterRef;
  * end when it ends it. These events have these parameters (in order):
  * - a pointer to this component,
  * - the owner object name of this component.\n
+ * This component can throw (if enabled) "OnSteeringForceOn" and "OnSteeringForceOff"
+ * events.
+ *
  * \note This component should be used only with an object reparented to
  * the root scene node path (i.e. render).
  * \note For obstacle avoidance, obstacle collision objects (rigid bodies)

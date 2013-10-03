@@ -45,6 +45,8 @@ class VehicleTemplate;
  * Wheel object should have, at least, a Scene (Model or InstanceOf)
  * component.\n
  * The default up axis is the Z axis.\n
+ * This component can throw (if enabled) "OnStartVehicle" and
+ * "OnStopVehicle" events.
  *
  * XML Param(s):
  * - "throw_events"					|single|"false"

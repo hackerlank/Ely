@@ -40,6 +40,8 @@ class CharacterControllerTemplate;
  * It constructs a character controller with the single specified collision
  * shape_type along with relevant parameters.\n
  * The up axis is the Z axis.\n
+ * This component can throw (if enabled) "OnGroundCharacterController" and
+ * "OnAirCharacterController" events.
  *
  * XML Param(s):
  * - "throw_events"				|single|"false"
