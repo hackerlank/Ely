@@ -225,12 +225,16 @@ inline void Vehicle::reset()
 {
 	//
 	mVehicle.clear();
+	mUpAxis = Z_up;
 	mWheelObjects.clear();
 	mWheelNumber = 0;
 	mWheelTmpl.clear();
 	mWheelModelParam.clear();
 	mWheelScaleParam.clear();
 	mWheelIsFront.clear();
+	mWheelSetSteering.clear();
+	mWheelApplyEngineForce.clear();
+	mWheelSetBrake.clear();
 	mWheelConnectionPointRatio.clear();
 	mWheelAxle.clear();
 	mWheelDirection.clear();

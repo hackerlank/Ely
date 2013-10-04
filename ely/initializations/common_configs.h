@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/common_configs.h
+ * \file /Ely/ely/initializations/common_configs.h
  *
  * \date 26/nov/2012 (12:15:57)
  * \author consultit

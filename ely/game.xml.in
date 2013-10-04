@@ -138,7 +138,13 @@
 		<ObjectTmpl type="Car">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
-			<ComponentTmpl family="PhysicsControl" type="Vehicle" priority="80"/>
+			<ComponentTmpl family="PhysicsControl" type="Vehicle" priority="80">
+				<Param event_types="forward:stop-forward"/>
+				<Param event_types="backward:stop-backward"/>
+				<Param event_types="turn_left:stop-turn_left"/>
+				<Param event_types="turn_right:stop-turn_right"/>
+				<Param event_types="brake:stop-brake"/>
+			</ComponentTmpl>
 		</ObjectTmpl>
 		
 		<ObjectTmpl type="CarWheel">
@@ -468,6 +474,11 @@
 				<Param brake="enabled"/>
 				<Param turn_left="enabled"/>
 				<Param turn_right="enabled"/>
+				<Param events="forward@arrow_up:stop-forward@arrow_up-up$"/>
+				<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
+				<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
+				<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
+				<Param events="brake@b:stop-brake@b-up$"/>
 			</Component>
 		</Object>
 		

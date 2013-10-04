@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/callback_defs.cpp
+ * \file /Ely/ely/initializations/callback_defs.cpp
  *
  * \date 05/set/2012 (20:07:54)
  * \author consultit

@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/defs/Terrain1.cpp
+ * \file /Ely/ely/initializations/defs/Terrain1.cpp
  *
  * \date 14/lug/2013 (08:47:42)
  * \author consultit

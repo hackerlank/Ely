@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/transitions/common_configs.cpp
+ * \file /Ely/ely/transitions/common_configs.cpp
  *
  * \date 26/nov/2012 (11:29:26)
  * \author consultit

@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/transitions/defs/Actor.cpp
+ * \file /Ely/ely/transitions/defs/Actor.cpp
  *
  * \date 26/nov/2012 (11:37:57)
  * \author consultit

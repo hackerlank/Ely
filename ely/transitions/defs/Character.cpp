@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/transitions/defs/Character.cpp
+ * \file /Ely/ely/transitions/defs/Character.cpp
  *
  * \date 26/nov/2012 (12:02:39)
  * \author consultit

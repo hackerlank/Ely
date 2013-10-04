@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/defs/player0.cpp
+ * \file /Ely/ely/initializations/defs/player0.cpp
  *
  * \date 14/lug/2013 (08:48:01)
  * \author consultit

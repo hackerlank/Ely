@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/common_configs.cpp
+ * \file /Ely/ely/callbacks/common_configs.cpp
  *
  * \date 26/nov/2012 (10:18:48)
  * \author consultit
@@ -60,6 +60,8 @@ extern void activityActorInit();
 extern void activityActorEnd();
 extern void controlCameraInit();
 extern void controlCameraEnd();
+extern void vehicleCarInit();
+extern void vehicleCarEnd();
 
 ///Call all init/end functions
 void callAllInits()
@@ -67,10 +69,12 @@ void callAllInits()
 	activityCharacterInit();
 	activityActorInit();
 	controlCameraInit();
+	vehicleCarInit();
 }
 void callAllEnds()
 {
 	activityCharacterEnd();
 	activityActorEnd();
 	controlCameraEnd();
+	vehicleCarEnd();
 }

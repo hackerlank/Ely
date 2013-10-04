@@ -15,15 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/controlCamera.cpp
+ * \file /Ely/ely/callbacks/vehicleCar.cpp
  *
- * \date 26/nov/2012 (11:04:25)
+ * \date 04/ott/2013 (16:45:21)
  * \author consultit
  */
 
 #include "../common_configs.h"
-#include "ControlComponents/Driver.h"
-#include "ControlComponents/Chaser.h"
+#include "PhysicsControlComponents/Vehicle.h"
 
 using namespace ely;
 
@@ -33,60 +32,23 @@ extern "C"
 {
 #endif
 
-///Camera + Driver related
-CALLBACK fast_Driver_Camera;
-CALLBACK stop_fast_Driver_Camera;
-CALLBACK forward_Driver_Camera;
-CALLBACK stop_forward_Driver_Camera;
-CALLBACK fast_forward_Driver_Camera;
-CALLBACK backward_Driver_Camera;
-CALLBACK stop_backward_Driver_Camera;
-CALLBACK fast_backward_Driver_Camera;
-CALLBACK strafe_left_Driver_Camera;
-CALLBACK stop_strafe_left_Driver_Camera;
-CALLBACK fast_strafe_left_Driver_Camera;
-CALLBACK strafe_right_Driver_Camera;
-CALLBACK stop_strafe_right_Driver_Camera;
-CALLBACK fast_strafe_right_Driver_Camera;
-CALLBACK roll_left_Driver_Camera;
-CALLBACK stop_roll_left_Driver_Camera;
-CALLBACK fast_roll_left_Driver_Camera;
-CALLBACK roll_right_Driver_Camera;
-CALLBACK stop_roll_right_Driver_Camera;
-CALLBACK fast_roll_right_Driver_Camera;
-CALLBACK up_Driver_Camera;
-CALLBACK stop_up_Driver_Camera;
-CALLBACK fast_up_Driver_Camera;
-CALLBACK down_Driver_Camera;
-CALLBACK stop_down_Driver_Camera;
-CALLBACK fast_down_Driver_Camera;
-
-///Camera + Chaser related
-CALLBACK head_left_Chaser_Camera;
-CALLBACK stop_head_left_Chaser_Camera;
-CALLBACK head_right_Chaser_Camera;
-CALLBACK stop_head_right_Chaser_Camera;
-CALLBACK pitch_up_Chaser_Camera;
-CALLBACK stop_pitch_up_Chaser_Camera;
-CALLBACK pitch_down_Chaser_Camera;
-CALLBACK stop_pitch_down_Chaser_Camera;
-CALLBACK hold_lookat_Chaser_Camera;
-CALLBACK stop_hold_lookat_Chaser_Camera;
+///Car + Vehicle related
+CALLBACK forward_Vehicle_Car;
+CALLBACK stop_forward_Vehicle_Car;
+<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
+<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
+<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
+<Param events="brake@b:stop-brake@b-up;
 
 #ifdef __cplusplus
 }
 #endif
 
-///Camera + Driver related CALLBACKs
-//fast:stop-fast
-namespace
-{
-bool isFast = false;
-}
-void fast_Driver_Camera(const Event* event, void* data)
+///Car + Vehicle related CALLBACKs
+void driveCar(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
 	if (not isFast)
 	{
@@ -353,10 +315,13 @@ void stop_hold_lookat_Chaser_Camera(const Event* event, void* data)
 }
 
 ///Init/end functions: see common_configs.cpp
-void controlCameraInit()
+void vehicleCarInit()
 {
 }
-void controlCameraEnd()
+void vehicleCarEnd()
 {
 }
+
+
+
 

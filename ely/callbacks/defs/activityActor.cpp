@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/callbacks/activityActor.cpp
+ * \file /Ely/ely/callbacks/activityActor.cpp
  *
  * \date 26/nov/2012 (10:37:44)
  * \author consultit

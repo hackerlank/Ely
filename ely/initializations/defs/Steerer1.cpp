@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/defs/Steerer1.cpp
+ * \file /Ely/ely/initializations/defs/Steerer1.cpp
  *
  * \date 14/lug/2013 (08:48:24)
  * \author consultit

@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/initializations/defs/course2.cpp
+ * \file /Ely/ely/initializations/defs/course2.cpp
  *
  * \date 14/lug/2013 (08:49:04)
  * \author consultit
