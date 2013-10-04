@@ -119,6 +119,8 @@ public:
 	bool isForwardEnabled();
 	void enableBackward(bool enable);
 	bool isBackwardEnabled();
+	void enableBrake(bool enable);
+	bool isBrakeEnabled();
 	void enableTurnLeft(bool enable);
 	bool isTurnLeftEnabled();
 	void enableTurnRight(bool enable);
@@ -166,7 +168,7 @@ private:
 	 */
 	///@{
 	std::vector<SMARTPTR(Object)> mWheelObjects;
-	int mWheelNumber;
+	unsigned int mWheelNumber;
 	std::string mWheelTmpl;
 	std::vector<std::string> mWheelModelParam, mWheelScaleParam;
 	std::vector<bool> mWheelIsFront, mWheelSetSteering, mWheelApplyEngineForce,
@@ -290,6 +292,25 @@ inline bool Vehicle::isBackwardEnabled()
 	HOLD_REMUTEX(mMutex)
 
 	return mBackward;
+}
+
+inline void Vehicle::enableBrake(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mBrakeKey)
+	{
+		mBrake = enable;
+	}
+}
+
+inline bool Vehicle::isBrakeEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mBrake;
 }
 
 inline void Vehicle::enableTurnLeft(bool enable)

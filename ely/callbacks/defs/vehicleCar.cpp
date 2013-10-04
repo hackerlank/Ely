@@ -35,283 +35,90 @@ extern "C"
 ///Car + Vehicle related
 CALLBACK forward_Vehicle_Car;
 CALLBACK stop_forward_Vehicle_Car;
-<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
-<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
-<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
-<Param events="brake@b:stop-brake@b-up;
+CALLBACK backward_Vehicle_Car;
+CALLBACK stop_backward_Vehicle_Car;
+CALLBACK turn_left_Vehicle_Car;
+CALLBACK stop_turn_left_Vehicle_Car;
+CALLBACK turn_right_Vehicle_Car;
+CALLBACK stop_turn_right_Vehicle_Car;
+CALLBACK brake_Vehicle_Car;
+CALLBACK stop_brake_Vehicle_Car;
 
 #ifdef __cplusplus
 }
 #endif
 
 ///Car + Vehicle related CALLBACKs
-void driveCar(const Event* event, void* data)
+void forward_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	if (not isFast)
-	{
-		float speedFactor = cameraDrv->getFastFactor();
-		float maxAngularSpeed, angularAccel, senX, sensY;
-		cameraDrv->setMaxLinearSpeed(cameraDrv->getMaxSpeeds(maxAngularSpeed) * speedFactor);
-		cameraDrv->setMaxAngularSpeed(maxAngularSpeed * speedFactor);
-		cameraDrv->setLinearAccel(cameraDrv->getAccels(angularAccel) * speedFactor);
-		cameraDrv->setAngularAccel(angularAccel * speedFactor);
-		cameraDrv->getSens(senX, sensY);
-		cameraDrv->setSens(senX * speedFactor, sensY * speedFactor);
-		isFast = not isFast;
-	}
+	vehicleCar->enableForward(true);
 }
-void stop_fast_Driver_Camera(const Event* event, void* data)
+
+void stop_forward_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	if (isFast)
-	{
-		float speedFactor = cameraDrv->getFastFactor();
-		float maxAngularSpeed, angularAccel, senX, sensY;
-		cameraDrv->setMaxLinearSpeed(cameraDrv->getMaxSpeeds(maxAngularSpeed) / speedFactor);
-		cameraDrv->setMaxAngularSpeed(maxAngularSpeed / speedFactor);
-		cameraDrv->setLinearAccel(cameraDrv->getAccels(angularAccel) / speedFactor);
-		cameraDrv->setAngularAccel(angularAccel / speedFactor);
-		cameraDrv->getSens(senX, sensY);
-		cameraDrv->setSens(senX / speedFactor, sensY / speedFactor);
-		isFast = not isFast;
-	}
+	vehicleCar->enableForward(false);
 }
-//forward:stop-forward:fast-forward
-void forward_Driver_Camera(const Event* event, void* data)
+void backward_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableForward(true);
+	vehicleCar->enableBackward(true);
 }
-void stop_forward_Driver_Camera(const Event* event, void* data)
+void stop_backward_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableForward(false);
+	vehicleCar->enableBackward(false);
 }
-void fast_forward_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	forward_Driver_Camera(event, data);
-}
-//backward:stop-backward:fast-backward
-void backward_Driver_Camera(const Event* event, void* data)
+void turn_left_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableBackward(true);
+	vehicleCar->enableTurnLeft(true);
 }
-void stop_backward_Driver_Camera(const Event* event, void* data)
+void stop_turn_left_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableBackward(false);
+	vehicleCar->enableTurnLeft(false);
 }
-void fast_backward_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	backward_Driver_Camera(event, data);
-}
-//strafe_left:stop-strafe_left:fast-strafe_left
-void strafe_left_Driver_Camera(const Event* event, void* data)
+void turn_right_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableStrafeLeft(true);
+	vehicleCar->enableTurnRight(true);
 }
-void stop_strafe_left_Driver_Camera(const Event* event, void* data)
+void stop_turn_right_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableStrafeLeft(false);
+	vehicleCar->enableTurnRight(false);
 }
-void fast_strafe_left_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	strafe_left_Driver_Camera(event, data);
-}
-//strafe_right:stop-strafe_right:fast-strafe_right
-void strafe_right_Driver_Camera(const Event* event, void* data)
+void brake_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableStrafeRight(true);
+	vehicleCar->enableBrake(true);
 }
-void stop_strafe_right_Driver_Camera(const Event* event, void* data)
+void stop_brake_Vehicle_Car(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+	SMARTPTR(Vehicle) vehicleCar = reinterpret_cast<Vehicle*>(data);
 
-	cameraDrv->enableStrafeRight(false);
-}
-void fast_strafe_right_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	strafe_right_Driver_Camera(event, data);
-}
-//roll_left:stop-roll_left:fast-roll_left
-void roll_left_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableRollLeft(true);
-}
-void stop_roll_left_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableRollLeft(false);
-}
-void fast_roll_left_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	roll_left_Driver_Camera(event, data);
-}
-//roll_right:stop-roll_right:fast-roll_right
-void roll_right_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableRollRight(true);
-}
-void stop_roll_right_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableRollRight(false);
-}
-void fast_roll_right_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	roll_right_Driver_Camera(event, data);
-}
-//up:stop-up:fast-up
-void up_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableUp(true);
-}
-void stop_up_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableUp(false);
-}
-void fast_up_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	up_Driver_Camera(event, data);
-}
-//down:stop-down:fast-down
-void down_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableDown(true);
-}
-void stop_down_Driver_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
-
-	cameraDrv->enableDown(false);
-}
-void fast_down_Driver_Camera(const Event* event, void* data)
-{
-	fast_Driver_Camera(event, data);
-	down_Driver_Camera(event, data);
-}
-
-///Camera + Chaser related
-void head_left_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enableHeadLeft(true);
-}
-void stop_head_left_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enableHeadLeft(false);
-}
-void head_right_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enableHeadRight(true);
-}
-void stop_head_right_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enableHeadRight(false);
-}
-void pitch_up_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enablePitchUp(true);
-}
-void stop_pitch_up_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enablePitchUp(false);
-}
-void pitch_down_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enablePitchDown(true);
-}
-void stop_pitch_down_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->enablePitchDown(false);
-}
-void hold_lookat_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->holdLookAt(true);
-}
-void stop_hold_lookat_Chaser_Camera(const Event* event, void* data)
-{
-	//get data
-	SMARTPTR(Chaser) cameraChs = reinterpret_cast<Chaser*>(data);
-
-	cameraChs->holdLookAt(false);
+	vehicleCar->enableBrake(false);
 }
 
 ///Init/end functions: see common_configs.cpp

@@ -103,10 +103,16 @@ bool Vehicle::initialize()
 	std::string param;
 	unsigned int idx;
 	std::vector<std::string> paramValuesStr;
+	unsigned int valueNum;
 	//wheels' model params
 	param = mTmpl->parameter(std::string("wheel_model"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "");
 	}
@@ -114,7 +120,12 @@ bool Vehicle::initialize()
 	//wheels' scale params
 	param = mTmpl->parameter(std::string("wheel_scale"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0");
 	}
@@ -122,7 +133,12 @@ bool Vehicle::initialize()
 	//wheel is front
 	param = mTmpl->parameter(std::string("wheel_is_front"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -134,7 +150,12 @@ bool Vehicle::initialize()
 	//wheel set steering
 	param = mTmpl->parameter(std::string("wheel_set_steering"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -146,7 +167,12 @@ bool Vehicle::initialize()
 	//wheel apply engine force
 	param = mTmpl->parameter(std::string("wheel_apply_engine_force"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -158,7 +184,12 @@ bool Vehicle::initialize()
 	//wheel set brake
 	param = mTmpl->parameter(std::string("wheel_set_brake"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -170,7 +201,12 @@ bool Vehicle::initialize()
 	//wheel connection point ratio
 	param = mTmpl->parameter(std::string("wheel_connection_point_ratio"));
 	paramValuesStr = parseCompoundString(param, '$');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0,1.0,1.0");
 	}
@@ -196,7 +232,12 @@ bool Vehicle::initialize()
 	//wheel axle
 	param = mTmpl->parameter(std::string("wheel_axle"));
 	paramValuesStr = parseCompoundString(param, '$');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0,0.0,0.0");
 	}
@@ -223,7 +264,12 @@ bool Vehicle::initialize()
 	//wheel direction
 	param = mTmpl->parameter(std::string("wheel_direction"));
 	paramValuesStr = parseCompoundString(param, '$');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "0.0,0.0,-1.0");
 	}
@@ -250,7 +296,12 @@ bool Vehicle::initialize()
 	//wheel suspension travel
 	param = mTmpl->parameter(std::string("wheel_suspension_travel"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "40.0");
 	}
@@ -266,7 +317,12 @@ bool Vehicle::initialize()
 	//wheel suspension stiffness
 	param = mTmpl->parameter(std::string("wheel_suspension_stiffness"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "40.0");
 	}
@@ -282,7 +338,12 @@ bool Vehicle::initialize()
 	//wheel damping relaxation
 	param = mTmpl->parameter(std::string("wheel_damping_relaxation"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "2.0");
 	}
@@ -298,7 +359,12 @@ bool Vehicle::initialize()
 	//wheel damping compression
 	param = mTmpl->parameter(std::string("wheel_damping_compression"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "4.0");
 	}
@@ -314,7 +380,12 @@ bool Vehicle::initialize()
 	//wheel friction slip
 	param = mTmpl->parameter(std::string("wheel_friction_slip"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "100.0");
 	}
@@ -330,7 +401,12 @@ bool Vehicle::initialize()
 	//wheel roll influence
 	param = mTmpl->parameter(std::string("wheel_roll_influence"));
 	paramValuesStr = parseCompoundString(param, ',');
-	if (paramValuesStr.size() < mWheelNumber)
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < mWheelNumber))
+	{
+		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
+	}
+	else if (valueNum < mWheelNumber)
 	{
 		paramValuesStr.resize(mWheelNumber, "0.1");
 	}
@@ -424,9 +500,6 @@ void Vehicle::onRemoveFromObjectCleanup()
 			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
 	if (not rigidBodyComp)
 	{
-		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '" <<
-				mOwnerObject->objectId() <<
-				"' hasn't a RigidBody Component");
 		return;
 	}
 	//re-add rigid body to the physics world
@@ -501,12 +574,10 @@ void Vehicle::onAddToSceneSetup()
 		idxStr << idx;
 		mWheelObjects[idx] = ObjectTemplateManager::GetSingletonPtr()->
 				createObject(ObjectType(mWheelTmpl),
-						ObjectId(mComponentId + "Wheel" + idxStr),
+						ObjectId(mComponentId + std::string("Wheel") + idxStr.str()),
 						objTmplParam, compTmplParams, false);
-	}
-	//add wheels to BulletVehicle
-	for(unsigned int idx = 0; idx < mWheelNumber; ++idx)
-	{
+
+		//add wheel to BulletVehicle
 		//get the wheel radius from the object component:
 		//the radius is taken along the up axis
 		LVector3f wheelDims, wheelDeltaCenter;
@@ -556,6 +627,26 @@ void Vehicle::onAddToSceneSetup()
 
 void Vehicle::onRemoveFromSceneCleanup()
 {
+	//check if there is a valid wheel Object template
+	SMARTPTR(ObjectTemplate)wheelTmpl =
+	ObjectTemplateManager::GetSingletonPtr()->
+	getObjectTemplate(ObjectType(mWheelTmpl));
+
+	if(not wheelTmpl)
+	{
+		return;
+	}
+
+	//wheels' objects procedure destruction
+	for (unsigned int idx = 0; idx < mWheelNumber; ++idx)
+	{
+		//reset the wheel node path
+		mVehicle->get_wheel(idx).set_node(NULL);
+		//remove wheel object
+		ObjectTemplateManager::GetSingletonPtr()->destroyObject(
+				mWheelObjects[idx]->objectId());
+	}
+
 	//remove from the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
 }
@@ -610,7 +701,7 @@ void Vehicle::update(void* data)
 		}
 	}
 	//Apply steering, engine and brake forces to wheels
-	for (int idx = 0; idx < mWheelNumber; ++idx)
+	for (unsigned int idx = 0; idx < mWheelNumber; ++idx)
 	{
 		if (mWheelSetSteering[idx])
 		{
