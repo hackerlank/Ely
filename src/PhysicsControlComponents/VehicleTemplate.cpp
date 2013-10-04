@@ -83,7 +83,7 @@ void VehicleTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("wheel_is_front", "false"));
 	mParameterTable.insert(ParameterNameValue("wheel_set_steering", "false"));
 	mParameterTable.insert(ParameterNameValue("wheel_apply_engine_force", "false"));
-	mParameterTable.insert(ParameterNameValue("wheel_set_brake_front", "false"));
+	mParameterTable.insert(ParameterNameValue("wheel_set_brake", "false"));
 	mParameterTable.insert(ParameterNameValue("wheel_connection_point_ratio", "1.0,1.0,1.0"));
 	mParameterTable.insert(ParameterNameValue("wheel_axle", "1.0,0.0,0.0"));
 	mParameterTable.insert(ParameterNameValue("wheel_direction", "0.0,0.0,-1.0"));

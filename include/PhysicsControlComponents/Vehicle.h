@@ -58,7 +58,7 @@ class VehicleTemplate;
  * - "wheel_is_front"				|single|"false" ("bool1,...,boolN")
  * - "wheel_set_steering"			|single|"false" ("bool1,...,boolN")
  * - "wheel_apply_engine_force"		|single|"false" ("bool1,...,boolN")
- * - "wheel_set_brake_front"		|single|"false" ("bool1,...,boolN")
+ * - "wheel_set_brake"				|single|"false" ("bool1,...,boolN")
  * - "wheel_connection_point_ratio"	|single|"1.0,1.0,1.0" ("rx1,ry1,rz1$...$rxN,ryN,rzN")
  * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
  * - "wheel_axle"					|single|"1.0,0.0,0.0" ("ax1,ay1,az1$...$axN,ayN,azN")
@@ -70,7 +70,7 @@ class VehicleTemplate;
  * - "wheel_friction_slip"			|single|"100.0"  ("fs1,...,fsN")
  * - "wheel_roll_influence"			|single|"0.1"  ("ri1,...,riN")
  * - "max_engine_force"				|single|no default
- * - "max_brake_force"				|single|no default
+ * - "max_brake"					|single|no default
  * - "steering_clamp"				|single|"45.0" (in degree)
  * - "steering_increment"			|single|"120.0" (in degree/sec)
  * - "steering_decrement"			|single|"60.0" (in degree/sec)
@@ -170,7 +170,7 @@ private:
 	std::string mWheelTmpl;
 	std::vector<std::string> mWheelModelParam, mWheelScaleParam;
 	std::vector<bool> mWheelIsFront, mWheelSetSteering, mWheelApplyEngineForce,
-	mWheelSetBrakeForce;
+	mWheelSetBrake;
 	std::vector<LVecBase3f> mWheelConnectionPointRatio;
 	std::vector<LVector3f> mWheelAxle, mWheelDirection;
 	std::vector<float> mWheelRadius, mWheelSuspensionTravel,
@@ -183,7 +183,7 @@ private:
 
 	///Control and physics functions and parameters.
 	///@{
-	float mMaxEngineForce, mMaxBrakeForce, mSteering, mSteeringClamp,
+	float mMaxEngineForce, mMaxBrake, mSteering, mSteeringClamp,
 	mSteeringIncrement, mSteeringDecrement;
 	///Key controls and effective keys.
 	bool mForward, mBackward, mBrake, mTurnLeft, mTurnRight;
@@ -243,7 +243,7 @@ inline void Vehicle::reset()
 	mWheelRollInfluence.clear();
 	mVehicleDims = mVehicleDeltaCenter = LVector3f::zero();
 	mVehicleRadius = 0.0;
-	mMaxEngineForce = mMaxBrakeForce = mSteering = mSteeringClamp =
+	mMaxEngineForce = mMaxBrake = mSteering = mSteeringClamp =
 			mSteeringIncrement = mSteeringDecrement = 0.0;
 	mForward = mBackward = mBrake = mTurnLeft = mTurnRight = mForwardKey =
 			mBackwardKey = mBrakeKey = mTurnLeftKey = mTurnRightKey = false;
@@ -347,7 +347,7 @@ inline void Vehicle::setMaxBrakeForce(float force)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mMaxBrakeForce = force;
+	mMaxBrake = force;
 }
 
 inline float Vehicle::getMaxBrakeForce()
@@ -355,7 +355,7 @@ inline float Vehicle::getMaxBrakeForce()
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mMaxBrakeForce;
+	return mMaxBrake;
 }
 
 inline void Vehicle::setSteeringClamp(float clamp)

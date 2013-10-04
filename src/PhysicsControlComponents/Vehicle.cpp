@@ -155,8 +155,8 @@ bool Vehicle::initialize()
 		mWheelApplyEngineForce.push_back(
 				paramValuesStr[idx] == std::string("true") ? true : false);
 	}
-	//wheel set brake front
-	param = mTmpl->parameter(std::string("wheel_set_brake_front"));
+	//wheel set brake
+	param = mTmpl->parameter(std::string("wheel_set_brake"));
 	paramValuesStr = parseCompoundString(param, ',');
 	if (paramValuesStr.size() < mWheelNumber)
 	{
@@ -164,7 +164,7 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		mWheelSetBrakeForce.push_back(
+		mWheelSetBrake.push_back(
 				paramValuesStr[idx] == std::string("true") ? true : false);
 	}
 	//wheel connection point ratio
@@ -346,8 +346,8 @@ bool Vehicle::initialize()
 	//physics parameter
 	mMaxEngineForce = strtof(
 			mTmpl->parameter(std::string("max_engine_force")).c_str(), NULL);
-	mMaxBrakeForce = strtof(
-			mTmpl->parameter(std::string("max_brake_force")).c_str(), NULL);
+	mMaxBrake = strtof(
+			mTmpl->parameter(std::string("max_brake")).c_str(), NULL);
 	mSteeringClamp = strtof(
 			mTmpl->parameter(std::string("steering_clamp")).c_str(), NULL);
 	mSteeringIncrement = strtof(
@@ -574,7 +574,7 @@ void Vehicle::update(void* data)
 	//update vehicle
 	//process input
 	float engineForce = 0.0;
-	float brakeForce = 0.0;
+	float brake = 0.0;
 	//handle keys:
 	if (mForward)
 	{
@@ -586,7 +586,7 @@ void Vehicle::update(void* data)
 	}
 	if (mBrake)
 	{
-		brakeForce = mMaxBrakeForce;
+		brake = mMaxBrake;
 	}
 	if (mTurnLeft)
 	{
@@ -618,11 +618,11 @@ void Vehicle::update(void* data)
 		}
 		if (mWheelApplyEngineForce[idx])
 		{
-			mVehicle->apply_engine_force(mSteering, idx);
+			mVehicle->apply_engine_force(engineForce, idx);
 		}
-		if (mWheelSetBrakeForce[idx])
+		if (mWheelSetBrake[idx])
 		{
-			mVehicle->set_brake(mSteering, idx);
+			mVehicle->set_brake(brake, idx);
 		}
 	}
 
