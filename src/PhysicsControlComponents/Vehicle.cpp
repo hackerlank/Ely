@@ -222,10 +222,6 @@ bool Vehicle::initialize()
 		for (unsigned int i = 0; i < 3; ++i)
 		{
 			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
-			if (values[i] < 0.0)
-			{
-				values[i] = -values[i];
-			}
 		}
 		mWheelConnectionPointRatio.push_back(values);
 	}
@@ -253,11 +249,11 @@ bool Vehicle::initialize()
 		for (unsigned int i = 0; i < 3; ++i)
 		{
 			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
-			values.normalize();
-			if (values.length_squared() == 0.0)
-			{
-				values = LVector3f(1.0, 0.0, 0.0);
-			}
+		}
+		values.normalize();
+		if (values.length_squared() == 0.0)
+		{
+			values = LVector3f(1.0, 0.0, 0.0);
 		}
 		mWheelAxle.push_back(values);
 	}
@@ -285,11 +281,11 @@ bool Vehicle::initialize()
 		for (unsigned int i = 0; i < 3; ++i)
 		{
 			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
-			values.normalize();
-			if (values.length_squared() == 0.0)
-			{
-				values = LVector3f(0.0, 0.0, -1.0);
-			}
+		}
+		values.normalize();
+		if (values.length_squared() == 0.0)
+		{
+			values = LVector3f(0.0, 0.0, -1.0);
 		}
 		mWheelDirection.push_back(values);
 	}
@@ -466,6 +462,7 @@ void Vehicle::onAddToObjectSetup()
 	//check if there is a RigidBody component
 	SMARTPTR(RigidBody)rigidBodyComp = DCAST(RigidBody,
 			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
+
 	if (not rigidBodyComp)
 	{
 		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '" <<
@@ -473,9 +470,7 @@ void Vehicle::onAddToObjectSetup()
 				"' hasn't a RigidBody Component");
 		return;
 	}
-	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
+
 	//create BulletVehicle
 	mVehicle = new BulletVehicle(
 			GamePhysicsManager::GetSingletonPtr()->bulletWorld(),
@@ -493,18 +488,15 @@ void Vehicle::onAddToObjectSetup()
 
 void Vehicle::onRemoveFromObjectCleanup()
 {
-	//remove BulletVehicle from physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
 	//check if there is a RigidBody component
 	SMARTPTR(RigidBody)rigidBodyComp = DCAST(RigidBody,
 			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
-	if (not rigidBodyComp)
-	{
-		return;
-	}
-	//re-add rigid body to the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
+
+	RETURN_ON_COND(not rigidBodyComp,)
+
+	//remove BulletVehicle from physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
+
 	//
 	reset();
 }
@@ -551,7 +543,9 @@ void Vehicle::onAddToSceneSetup()
 		}
 	}
 	//prepare parameters tables and create the wheels' objects
-	//owner object's parent == wheels' parent
+	mWheelObjects.resize(mWheelNumber);
+	mWheelRadius.resize(mWheelNumber);
+	//owner wheels' parent == object's parent
 	std::string parentId = mOwnerObject->objectTmpl()->parameter(std::string("parent"));
 	for(unsigned int idx = 0; idx < mWheelNumber; ++idx)
 	{
@@ -632,10 +626,7 @@ void Vehicle::onRemoveFromSceneCleanup()
 	ObjectTemplateManager::GetSingletonPtr()->
 	getObjectTemplate(ObjectType(mWheelTmpl));
 
-	if(not wheelTmpl)
-	{
-		return;
-	}
+	RETURN_ON_COND(not wheelTmpl,)
 
 	//wheels' objects procedure destruction
 	for (unsigned int idx = 0; idx < mWheelNumber; ++idx)

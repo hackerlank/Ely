@@ -64,11 +64,19 @@ bool InstanceOf::initialize()
 	//instance of object id
 	mInstanceOfId = ObjectId(
 			mTmpl->parameter(std::string("instance_of")));
-	//scaling (default: (1.0,1.0,1.0))
+	//scaling
 	std::vector<std::string> scaleStr = parseCompoundString(
 			mTmpl->parameter(std::string("scale")), ',');
-	mScale[0] = mScale[1] = mScale[2] = 1.0;
-	for (unsigned int i = 0; (i < 3) and (i < scaleStr.size()); ++i)
+	unsigned int valueNum = scaleStr.size();
+	if ((valueNum > 0) and (valueNum < 3))
+	{
+		scaleStr.resize(3, scaleStr[0]);
+	}
+	else if (valueNum < 3)
+	{
+		scaleStr.resize(3, "1.0");
+	}
+	for (unsigned int i = 0; i < 3; ++i)
 	{
 		mScale[i] = strtof(scaleStr[i].c_str(), NULL);
 	}

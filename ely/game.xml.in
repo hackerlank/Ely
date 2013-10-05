@@ -13,6 +13,7 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
+<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60">
 				<Param event_types="head_left:stop-head_left"/>
 				<Param event_types="head_right:stop-head_right"/>
@@ -20,7 +21,7 @@
 				<Param event_types="pitch_down:stop-pitch_down"/>
 				<Param event_types="hold_lookat:stop-hold_lookat"/>
 			</ComponentTmpl>
-<!--
+-->
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -32,7 +33,6 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
--->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -165,11 +165,16 @@
 	<!-- ------------------------------------------------ -->
 	<!-- ------------------------------------------------ -->	
 	<ObjectSet>
+
+		<!-- -------------- -->
+		<!-- CAMERA OBJECTS -->
+		<!-- -------------- -->
 	
 		<Object type="Camera" id="camera" priority="90">
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
+<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
@@ -192,7 +197,7 @@
 				<Param events="pitch_down@s:stop-pitch_down@s-up$"/>
 				<Param events="hold_lookat@shift:stop-hold_lookat@shift-up$"/>
 			</Component>
-<!--
+-->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param max_linear_speed="40.0"/>
@@ -221,12 +226,15 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
 			</Component>
--->
 			<Param parent=""/>
 			<Param is_steady="false"/>		
 			<Param pos="-35.0,-94.0,96.0"/>
 			<Param rot="0.0,-28.0,0.0"/>
 		</Object>
+
+		<!-- ------------- -->
+		<!-- WORLD OBJECTS -->
+		<!-- ------------- -->
 		
 		<Object type="Instanceable" id="Smiley1" priority="100">
 			<Component type="Model">
@@ -293,10 +301,10 @@
 		<Object type="Actor" id="Actor1"  priority="100">
 <!--
 			<Component type="Activity">
-				<Param events="forward@arrow_up:stop-forward@arrow_up-up:fast-forward@shift-arrow_up$"/>
-				<Param events="backward@arrow_down:stop-backward@arrow_down-up:fast-backward@shift-arrow_down$"/>
-				<Param events="roll_left@arrow_left:stop-roll_left@arrow_left-up:fast-roll_left@shift-arrow_left$"/>
-				<Param events="roll_right@arrow_right:stop-roll_right@arrow_right-up:fast-roll_right@shift-arrow_right$"/>
+				<Param events="forward@h:stop-forward@h-up:fast-forward@shift-h$"/>
+				<Param events="backward@b:stop-backward@b-up:fast-backward@shift-b$"/>
+				<Param events="roll_left@v:stop-roll_left@v-up:fast-roll_left@shift-v$"/>
+				<Param events="roll_right@n:stop-roll_right@n-up:fast-roll_right@shift-n$"/>
 				<Param events="up@page_up:stop-up@page_up-up:fast-up@shift-page_up$"/>
 				<Param events="down@page_down:stop-down@page_down-up:fast-down@shift-page_down$"/>
 				<Param events="fast@shift:stop-fast@shift-up$"/>				
@@ -385,7 +393,85 @@
 			<Param pos="-26.997,-21.8736,40.7907"/>
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
+
+<!--
+		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
+			<Param parent="render"/>
+			<Param is_steady="false"/>
+			<Param store_params="false"/>
+			<Param pos="-51.23,23.5961,40.6944"/>
+			<Param rot="-90.0,0.0,0.0"/>
+			<Component type="InstanceOf">
+				<Param instance_of="Gorilla1"/>
+				<Param scale="0.6,0.6,0.6"/>
+			</Component>
+			<Component type="Sound3d">
+				<Param sound_files="walk-sound@GUI_click.wav"/>
+			</Component>
+			<Component type="CrowdAgent">
+				<Param add_to_navmesh="course2"/>
+				<Param move_target="-22.4522,-21.3515,40.7907"/>
+			</Component>
+		</Object>
+-->
+		<Object type="Car" id="auto1" priority="90">
+			<Param parent="render"/>
+			<Param is_steady="false"/>
+			<Param store_params="false"/>
+			<Param pos="-51.23,23.5961,40.6944"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Component type="Model">
+				<Param model_file="vehicle.bam"/>
+				<Param scale="5.0,5.0,5.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="dynamic"/>
+				<Param body_mass="800.0"/>
+				<Param body_friction="0.8"/>
+				<Param body_restitution="0.1"/>
+				<Param shape_type="box"/>
+				<Param shape_size="maximum"/>
+				<Param collide_mask="all_on"/>
+			</Component>
+			<Component type="Vehicle">
+				<Param wheels_number="4"/>
+				<Param wheel_object_template="CarWheel"/>
+				<Param wheel_model="wheel1,wheel1,wheel1,wheel1"/>
+				<Param wheel_scale="5.0,5.0,5.0,5.0"/>
+				<Param wheel_is_front="true,true,false,false"/>
+				<Param wheel_set_steering="true,true,false,false"/>
+				<Param wheel_apply_engine_force="false,false,true,true"/>
+				<Param wheel_set_brake="false,false,true,true"/>
+				<Param wheel_connection_point_ratio="-0.8,0.65,-0.8$0.8,0.65,-0.8$-0.8,-0.7,-0.8$0.8,-0.7,-0.8"/>
+				<Param max_engine_force="2000.0"/>
+				<Param max_brake="1000.0"/>
+				<Param forward="enabled"/>
+				<Param backward="enabled"/>
+				<Param brake="enabled"/>
+				<Param turn_left="enabled"/>
+				<Param turn_right="enabled"/>
+				<Param events="forward@arrow_up:stop-forward@arrow_up-up$"/>
+				<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
+				<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
+				<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
+				<Param events="brake@b:stop-brake@b-up$"/>
+			</Component>
+		</Object>
 		
+		<Object type="Instanceable" id="wheel1" priority="100">
+			<Component type="Model">
+				<Param model_file="wheel.bam"/>
+				<Param scale="5.0,5.0,5.0"/>
+			</Component>
+			<Param parent=""/>
+			<Param is_steady="true"/>
+		</Object>
+
+		<!-- ------------------- -->
+		<!-- ENVIRONMENT OBJECTS -->
+		<!-- ------------------- -->
+		
+<!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -419,79 +505,6 @@
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
-		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
-			<Param parent="render"/>
-			<Param is_steady="false"/>
-			<Param store_params="false"/>
-			<Param pos="-51.23,23.5961,40.6944"/>
-			<Param rot="-90.0,0.0,0.0"/>
-			<Component type="InstanceOf">
-				<Param instance_of="Gorilla1"/>
-				<Param scale="0.6,0.6,0.6"/>
-			</Component>
-			<Component type="Sound3d">
-				<Param sound_files="walk-sound@GUI_click.wav"/>
-			</Component>
-			<Component type="CrowdAgent">
-				<Param add_to_navmesh="course2"/>
-				<Param move_target="-22.4522,-21.3515,40.7907"/>
-			</Component>
-		</Object>
-
-		<Object type="Car" id="auto1" priority="90">
-			<Param parent="render"/>
-			<Param is_steady="false"/>
-			<Param store_params="false"/>
-			<Param pos="-51.23,23.5961,40.6944"/>
-			<Param rot="180.0,0.0,0.0"/>
-			<Component type="Model">
-				<Param model_file="vehicle.bam"/>
-				<Param scale="5.0,5.0,5.0"/>
-			</Component>
-			<Component type="RigidBody">
-				<Param body_type="dynamic"/>
-				<Param body_mass="800.0"/>
-				<Param body_friction="0.8"/>
-				<Param body_restitution="0.1"/>
-				<Param shape_type="box"/>
-				<Param shape_size="medium"/>
-				<Param collide_mask="all_on"/>
-			</Component>
-			<Component type="Vehicle">
-				<Param wheels_number="4"/>
-				<Param wheel_object_template="CarWheel"/>
-				<Param wheel_model="wheel1,wheel1,wheel1,wheel1"/>
-				<Param wheel_scale="5.0,5.0,5.0,5.0"/>
-				<Param wheel_is_front="true,true,false,false"/>
-				<Param wheel_set_steering="true,true,false,false"/>
-				<Param wheel_apply_engine_force="false,false,true,true"/>
-				<Param wheel_set_brake="false,false,true,true"/>
-				<Param wheel_connection_point_ratio="-0.8,0.65,-0.8$0.8,0.65,-0.8$-0.8,-0.7,-0.8$0.8,-0.7,-0.8"/>
-				<Param max_engine_force="2000.0"/>
-				<Param max_brake="1000.0"/>
-				<Param forward="enabled"/>
-				<Param backward="disabled"/>
-				<Param brake="enabled"/>
-				<Param turn_left="enabled"/>
-				<Param turn_right="enabled"/>
-				<Param events="forward@arrow_up:stop-forward@arrow_up-up$"/>
-				<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
-				<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
-				<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
-				<Param events="brake@b:stop-brake@b-up$"/>
-			</Component>
-		</Object>
-		
-		<Object type="Instanceable" id="wheel1" priority="100">
-			<Component type="Model">
-				<Param model_file="wheel.bam"/>
-				<Param scale="5.0,5.0,5.0"/>
-			</Component>
-			<Param parent=""/>
-			<Param is_steady="true"/>
-		</Object>
-
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elydatadir@/textures/heightfield.png"/>
@@ -517,31 +530,6 @@
 				<Param collide_mask="0x7FFFFFFF"/>
 			</Component> 
 			<Param parent="render"/>
-		</Object>
-
-		<Object type="StaticActor" id="Plane1">
-			<Component type="Model">
-				<Param from_file="false"/>
-				<Param model_type="card"/>
-				<Param model_card_left="-1000.0"/>
-				<Param model_card_right="1000.0"/>
-				<Param model_card_bottom="-1000.0"/>
-				<Param model_card_top="1000.0"/>
-			</Component>
-			<Component type="RigidBody">
-				<Param body_type="static"/>
-				<Param body_friction="0.9"/>
-				<Param body_restitution="0.2"/>
-				<Param shape_type="plane"/>
-				<Param shape_norm_x="0.0"/>
-				<Param shape_norm_y="-1.0"/>
-				<Param shape_norm_z="0.0"/>
-				<Param shape_d="0.0"/>
-				<Param collide_mask="0x7FFFFFFF"/>
-			</Component> 
-			<Param parent="render"/>
-			<Param is_steady="true"/>
-			<Param rot="0.0,-90.0,0.0"/>
 		</Object>
 		
 		<Object type="StaticActor" id="beachhouse2">
@@ -616,8 +604,36 @@
 			<Param pos="156.8,349.4,27.2"/>
 		</Object>
 -->
+
+		<Object type="StaticActor" id="Plane1">
+			<Component type="Model">
+				<Param from_file="false"/>
+				<Param model_type="card"/>
+				<Param model_card_left="-1000.0"/>
+				<Param model_card_right="1000.0"/>
+				<Param model_card_bottom="-1000.0"/>
+				<Param model_card_top="1000.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="plane"/>
+				<Param shape_norm_x="0.0"/>
+				<Param shape_norm_y="-1.0"/>
+				<Param shape_norm_z="0.0"/>
+				<Param shape_d="0.0"/>
+				<Param collide_mask="0x7FFFFFFF"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,-90.0,0.0"/>
+		</Object>
 		
-		<!-- wrapper around render(s) nodepath(s) - Mandatory -->
+		<!-- ----------------- -->
+		<!-- MANDATORY OBJECTS -->
+		<!-- ----------------- -->
+
 		<Object type="Render" id="render" priority="1000">
 			<Component type="NodePathWrapper">
 				<Param nodepath="render"/>

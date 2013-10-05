@@ -100,13 +100,13 @@ bool Model::initialize()
 	mFromFile = (
 			mTmpl->parameter(std::string("from_file")) == std::string("false") ?
 					false : true);
-	//get model
+	//model
 	mModelNameParam = mTmpl->parameter(std::string("model_file"));
-	//get more animations
+	//more animations
 	mAnimFileListParam = mTmpl->parameterList(std::string("anim_files"));
-	//get model if procedurally generated
+	//model if procedurally generated
 	mModelTypeParam = mTmpl->parameter(std::string("model_type"));
-	//get card parameters
+	//card parameters
 	mCardLeft = strtof(
 			mTmpl->parameter(std::string("model_card_left")).c_str(), NULL);
 	mCardRight = strtof(
@@ -115,11 +115,19 @@ bool Model::initialize()
 			mTmpl->parameter(std::string("model_card_bottom")).c_str(), NULL);
 	mCardTop = strtof(
 			mTmpl->parameter(std::string("model_card_top")).c_str(), NULL);
-	//get scaling (default: (1.0,1.0,1.0))
+	//scaling
 	std::vector<std::string> scaleStr = parseCompoundString(
 			mTmpl->parameter(std::string("scale")), ',');
-	mScale[0] = mScale[1] = mScale[2] = 1.0;
-	for (unsigned int i = 0; (i < 3) and (i < scaleStr.size()); ++i)
+	unsigned int valueNum = scaleStr.size();
+	if ((valueNum > 0) and (valueNum < 3))
+	{
+		scaleStr.resize(3, scaleStr[0]);
+	}
+	else if (valueNum < 3)
+	{
+		scaleStr.resize(3, "1.0");
+	}
+	for (unsigned int i = 0; i < 3; ++i)
 	{
 		mScale[i] = strtof(scaleStr[i].c_str(), NULL);
 	}
