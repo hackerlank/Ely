@@ -470,6 +470,8 @@ void Vehicle::onAddToObjectSetup()
 				"' hasn't a RigidBody Component");
 		return;
 	}
+	//for vehicle disable deactivation
+	static_cast<BulletRigidBodyNode&>(*rigidBodyComp).set_deactivation_enabled(false);
 
 	//create BulletVehicle
 	mVehicle = new BulletVehicle(
@@ -477,10 +479,9 @@ void Vehicle::onAddToObjectSetup()
 			&(static_cast<BulletRigidBodyNode&>(*rigidBodyComp)));
 	//set up axis
 	mVehicle->set_coordinate_system(mUpAxis);
-	//get chassis dimensions from Scene component node path,
-	//which is child of RigidBody component node path;
+	//get chassis dimensions from owner object node path,
 	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
-			rigidBodyComp->getNodePath().get_child(0),
+			mOwnerObject->getNodePath(),
 			mVehicleDims, mVehicleDeltaCenter, mVehicleRadius);
 	//add BulletVehicle to physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
@@ -497,13 +498,16 @@ void Vehicle::onRemoveFromObjectCleanup()
 	//remove BulletVehicle from physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
 
+	//re-add temporarily BulletRigidBodyNode of physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+			&(rigidBodyComp->getBulletRigidBodyNode()));
+
 	//
 	reset();
 }
 
 void Vehicle::onAddToSceneSetup()
 {
-	//wheels' objects procedure creation
 	//check if there is a valid wheel Object template
 	SMARTPTR(ObjectTemplate)wheelTmpl =
 	ObjectTemplateManager::GetSingletonPtr()->
@@ -517,6 +521,7 @@ void Vehicle::onAddToSceneSetup()
 		return;
 	}
 
+	//wheels' objects procedure creation
 	//check if wheel template has a Model or InstanceOf
 	ComponentType sceneCompType;
 	std::string sceneCompParam;
@@ -566,10 +571,13 @@ void Vehicle::onAddToSceneSetup()
 		//actually create the wheel object
 		std::ostringstream idxStr;
 		idxStr << idx;
+		//object creation
 		mWheelObjects[idx] = ObjectTemplateManager::GetSingletonPtr()->
 				createObject(ObjectType(mWheelTmpl),
 						ObjectId(mComponentId + std::string("Wheel") + idxStr.str()),
 						objTmplParam, compTmplParams, false);
+		//object initialization
+		mWheelObjects[idx]->worldSetup();
 
 		//add wheel to BulletVehicle
 		//get the wheel radius from the object component:
@@ -628,6 +636,9 @@ void Vehicle::onRemoveFromSceneCleanup()
 
 	RETURN_ON_COND(not wheelTmpl,)
 
+	//remove from the physics manager update
+	GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
+
 	//wheels' objects procedure destruction
 	for (unsigned int idx = 0; idx < mWheelNumber; ++idx)
 	{
@@ -637,9 +648,6 @@ void Vehicle::onRemoveFromSceneCleanup()
 		ObjectTemplateManager::GetSingletonPtr()->destroyObject(
 				mWheelObjects[idx]->objectId());
 	}
-
-	//remove from the physics manager update
-	GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
 }
 
 void Vehicle::update(void* data)

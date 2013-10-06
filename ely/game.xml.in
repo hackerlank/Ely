@@ -258,7 +258,7 @@
 			<Param rot="180.0,0.0,0.0"/>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
-				<Param body_mass="1.0"/>
+				<Param body_mass="4.0"/>
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.5"/>
 				<Param shape_type="sphere"/>
@@ -267,7 +267,7 @@
 			</Component> 
 			<Component type="InstanceOf">
 				<Param instance_of="Smiley1"/>
-				<Param scale="1.0,1.0,1.0"/>
+				<Param scale="2.0,2.0,2.0"/>
 			</Component>
 		</Object>
 		
@@ -430,21 +430,20 @@
 				<Param body_friction="0.8"/>
 				<Param body_restitution="0.1"/>
 				<Param shape_type="box"/>
-				<Param shape_size="maximum"/>
 				<Param collide_mask="all_on"/>
 			</Component>
 			<Component type="Vehicle">
 				<Param wheels_number="4"/>
 				<Param wheel_object_template="CarWheel"/>
 				<Param wheel_model="wheel1,wheel1,wheel1,wheel1"/>
-				<Param wheel_scale="5.0,5.0,5.0,5.0"/>
+				<Param wheel_scale="1.0"/>
 				<Param wheel_is_front="true,true,false,false"/>
 				<Param wheel_set_steering="true,true,false,false"/>
 				<Param wheel_apply_engine_force="false,false,true,true"/>
 				<Param wheel_set_brake="false,false,true,true"/>
-				<Param wheel_connection_point_ratio="-0.8,0.65,-0.8$0.8,0.65,-0.8$-0.8,-0.7,-0.8$0.8,-0.7,-0.8"/>
-				<Param max_engine_force="2000.0"/>
-				<Param max_brake="1000.0"/>
+				<Param wheel_connection_point_ratio="-0.8,-0.7,-0.8$0.8,-0.7,-0.8$-0.8,0.65,-0.8$0.8,0.65,-0.8"/>
+				<Param max_engine_force="-2000.0"/>
+				<Param max_brake="500.0"/>
 				<Param forward="enabled"/>
 				<Param backward="enabled"/>
 				<Param brake="enabled"/>
@@ -454,14 +453,14 @@
 				<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
 				<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
 				<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
-				<Param events="brake@b:stop-brake@b-up$"/>
+				<Param events="brake@m:stop-brake@m-up$"/>
 			</Component>
 		</Object>
 		
 		<Object type="Instanceable" id="wheel1" priority="100">
 			<Component type="Model">
 				<Param model_file="wheel.bam"/>
-				<Param scale="5.0,5.0,5.0"/>
+				<Param scale="5.0"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="true"/>
