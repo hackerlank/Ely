@@ -29,7 +29,7 @@ namespace ely
 {
 
 Object::Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl) :
-mTmpl(tmpl), mObjectId(objectId), mInitializationLib(NULL),
+mTmpl(tmpl), mObjectId(objectId), mOwner(NULL),mInitializationLib(NULL),
 mInitializationsLoaded(false), mInititializationFuncName(""),
 mInitializationFunction(NULL)
 {

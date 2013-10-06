@@ -575,7 +575,7 @@ void Vehicle::onAddToSceneSetup()
 		mWheelObjects[idx] = ObjectTemplateManager::GetSingletonPtr()->
 				createObject(ObjectType(mWheelTmpl),
 						ObjectId(mComponentId + std::string("Wheel") + idxStr.str()),
-						objTmplParam, compTmplParams, false);
+						objTmplParam, compTmplParams, false, mOwnerObject);
 		//object initialization
 		mWheelObjects[idx]->worldSetup();
 

@@ -243,6 +243,16 @@ public:
 	void freeParameters();
 
 	/**
+	 * \brief Gets/sets this object's owner, i.e. the object responsible
+	 * of its lifetime.
+	 * @param owner The owner object.
+	 */
+	///@{
+	SMARTPTR(Object) getOwner() const;
+	void setOwner(SMARTPTR(Object) owner);
+	///@}
+
+	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
@@ -255,6 +265,8 @@ private:
 	NodePath mNodePath;
 	///Unique identifier for this object (read only after creation).
 	ObjectId mObjectId;
+	///The owner of this object (responsible for its lifetime).
+	SMARTPTR(Object) mOwner;
 	///@{
 	ComponentOrderedList mComponents;
 	class IsFamily
@@ -421,6 +433,23 @@ inline void Object::doReset()
 	mNodePath = NodePath();
 	mComponents.clear();
 	mIsSteady = false;
+}
+
+inline void Object::setOwner(SMARTPTR(Object) owner)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mOwner = owner;
+}
+
+
+inline SMARTPTR(Object) Object::getOwner() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mOwner;
 }
 
 }  // namespace ely

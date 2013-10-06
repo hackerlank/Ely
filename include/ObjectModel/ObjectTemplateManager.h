@@ -95,7 +95,7 @@ public:
 	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""),
 			const ParameterTable& objTmplParams = ParameterTable(),
 			const ParameterTableMap& compTmplParams = ParameterTableMap(),
-			bool storeParams = false);
+			bool storeParams = false, SMARTPTR(Object) owner = NULL);
 
 	/**
 	 * \brief Adds a component of the given type to an existing object with

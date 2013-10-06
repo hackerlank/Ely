@@ -112,7 +112,8 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId,
 		const ParameterTable& objTmplParams,
 		const ParameterTableMap& compTmplParams,
-		bool storeParams)
+		bool storeParams,
+		SMARTPTR(Object)owner)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -142,6 +143,8 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	}
 	//create the new object
 	SMARTPTR(Object) newObj = new Object(newId, objectTmpl);
+	//set the owner if any
+	newObj->setOwner(owner);
 	//get the component template ordered list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 	objectTmpl->getComponentTemplates();
@@ -328,7 +331,29 @@ void ObjectTemplateManager::destroyAllObjects()
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	//remove created objects
+	//try to remove created objects obeying to ownership
+	ObjectTable::iterator iter = mCreatedObjects.begin();
+	do
+	{
+		ObjectId objId = iter->first;
+		if (iter->second->getOwner())
+		{
+			//object has owner: go on
+			++iter;
+		}
+		else
+		{
+			//object has no owner: remove it
+			destroyObject(objId);
+			if (not mCreatedObjects.size() > 0)
+			{
+				//no more objects
+				break;
+			}
+			iter = mCreatedObjects.begin();
+		}
+	} while ((mCreatedObjects.size() > 0) and (iter != mCreatedObjects.end()));
+	//remove remaining (zombie) objects
 	while (mCreatedObjects.size() > 0)
 	{
 		ObjectTable::iterator iter = mCreatedObjects.begin();
