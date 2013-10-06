@@ -331,29 +331,23 @@ void ObjectTemplateManager::destroyAllObjects()
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	//try to remove created objects obeying to ownership
-	ObjectTable::iterator iter = mCreatedObjects.begin();
-	do
+	//get not owned objects
+	ObjectTable::iterator iter;
+	std::vector<ObjectId> notOwnedObjectIds;
+	for (iter = mCreatedObjects.begin(); iter != mCreatedObjects.end(); ++iter)
 	{
-		ObjectId objId = iter->first;
-		if (iter->second->getOwner())
+		if (not iter->second->getOwner())
 		{
-			//object has owner: go on
-			++iter;
+			//object has no owner: insert id
+			notOwnedObjectIds.push_back(iter->first);
 		}
-		else
-		{
-			//object has no owner: remove it
-			destroyObject(objId);
-			if (not mCreatedObjects.size() > 0)
-			{
-				//no more objects
-				break;
-			}
-			iter = mCreatedObjects.begin();
-		}
-	} while ((mCreatedObjects.size() > 0) and (iter != mCreatedObjects.end()));
-	//remove remaining (zombie) objects
+	}
+	//remove not owned objects
+	for (unsigned int i = 0; i < notOwnedObjectIds.size(); ++i)
+	{
+		destroyObject(notOwnedObjectIds[i]);
+	}
+	//remove any remaining (zombie) objects: should be none
 	while (mCreatedObjects.size() > 0)
 	{
 		ObjectTable::iterator iter = mCreatedObjects.begin();
