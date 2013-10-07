@@ -24,7 +24,6 @@
 #include "ControlComponents/Chaser.h"
 #include "ControlComponents/ChaserTemplate.h"
 #include "Game/GameControlManager.h"
-#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
 namespace ely
@@ -358,7 +357,6 @@ void Chaser::doDisable()
 	//
 	mEnabled = false;
 }
-
 
 void Chaser::update(void* data)
 {

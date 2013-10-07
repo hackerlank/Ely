@@ -28,6 +28,7 @@
 #include <cfloat>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 
 namespace ely
 {
@@ -149,6 +150,14 @@ public:
 	void enablePitchDown(bool enable);
 	bool isPitchDownEnabled();
 	void holdLookAt(bool enable);
+	///@}
+
+	/**
+	 * \name Gets/sets chased object.
+	 */
+	///@{
+	ObjectId getChasedObject();
+	void setChasedObject(const ObjectId& objectId);
 	///@}
 
 private:
@@ -473,6 +482,49 @@ inline void Chaser::holdLookAt(bool enable)
 	HOLD_REMUTEX(mMutex)
 
 	mHoldLookAt = enable;
+}
+
+inline ObjectId Chaser::getChasedObject()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mChasedId;
+}
+
+inline void Chaser::setChasedObject(const ObjectId& objectId)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//set the (node path of) object chased by this component;
+	//that object is supposed to be already created,
+	//set up and added to the created objects table;
+	//if not, this component chases nothing.
+	mChasedId = objectId;
+	SMARTPTR(Object)chasedObject =
+	ObjectTemplateManager::GetSingleton().getCreatedObject(
+			mChasedId);
+	if (chasedObject != NULL)
+	{
+		mChasedNodePath = chasedObject->getNodePath();
+
+		//set the (node path of) reference object;
+		//that object is supposed to be already created,
+		//set up and added to the created objects table;
+		//if not, this will be the parent of the chased object.
+		SMARTPTR(Object)referenceObject =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(
+				mReferenceId);
+		if (referenceObject != NULL)
+		{
+			mReferenceNodePath = referenceObject->getNodePath();
+		}
+		else
+		{
+			mReferenceNodePath = mChasedNodePath.get_parent();
+		}
+	}
 }
 
 }  // namespace ely

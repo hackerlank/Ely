@@ -13,7 +13,6 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60">
 				<Param event_types="head_left:stop-head_left"/>
 				<Param event_types="head_right:stop-head_right"/>
@@ -21,7 +20,7 @@
 				<Param event_types="pitch_down:stop-pitch_down"/>
 				<Param event_types="hold_lookat:stop-hold_lookat"/>
 			</ComponentTmpl>
--->
+<!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -33,6 +32,7 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -174,17 +174,16 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
-<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
-				<Param chased_object="player0"/>
+				<Param chased_object="auto1"/>
 				<Param fixed_relative_position="false"/>
 				<Param reference_object="render"/>
-				<Param abs_max_distance="15.0"/>
-				<Param abs_min_distance="8.0"/>
-				<Param abs_max_height="6.0"/>
-				<Param abs_min_height="3.0"/>
+				<Param abs_max_distance="25.0"/>
+				<Param abs_min_distance="18.0"/>
+				<Param abs_max_height="8.0"/>
+				<Param abs_min_height="5.0"/>
 				<Param friction="5.0"/>
 				<Param fixed_lookat="false"/>
 				<Param mouse_enabled_h="true"/>
@@ -197,7 +196,7 @@
 				<Param events="pitch_down@s:stop-pitch_down@s-up$"/>
 				<Param events="hold_lookat@shift:stop-hold_lookat@shift-up$"/>
 			</Component>
--->
+<!--
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param max_linear_speed="40.0"/>
@@ -226,6 +225,7 @@
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
 			</Component>
+-->
 			<Param parent=""/>
 			<Param is_steady="false"/>		
 			<Param pos="-35.0,-94.0,96.0"/>
@@ -394,7 +394,6 @@
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 
-<!--
 		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -413,16 +412,16 @@
 				<Param move_target="-22.4522,-21.3515,40.7907"/>
 			</Component>
 		</Object>
--->
+
 		<Object type="Car" id="auto1" priority="90">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="false"/>
-			<Param pos="-51.23,23.5961,40.6944"/>
+			<Param pos="-38.0555,-5.94453,45.7907"/>
 			<Param rot="0.0,0.0,0.0"/>
 			<Component type="Model">
 				<Param model_file="vehicle.bam"/>
-				<Param scale="5.0,5.0,5.0"/>
+				<Param scale="3.0,3.0,3.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
@@ -442,8 +441,8 @@
 				<Param wheel_apply_engine_force="false,false,true,true"/>
 				<Param wheel_set_brake="false,false,true,true"/>
 				<Param wheel_connection_point_ratio="-0.8,-0.7,-0.8$0.8,-0.7,-0.8$-0.8,0.65,-0.8$0.8,0.65,-0.8"/>
-				<Param max_engine_force="-2000.0"/>
-				<Param max_brake="500.0"/>
+				<Param max_engine_force="-1500.0"/>
+				<Param max_brake="350.0"/>
 				<Param forward="enabled"/>
 				<Param backward="enabled"/>
 				<Param brake="enabled"/>
@@ -460,7 +459,7 @@
 		<Object type="Instanceable" id="wheel1" priority="100">
 			<Component type="Model">
 				<Param model_file="wheel.bam"/>
-				<Param scale="5.0"/>
+				<Param scale="3.0"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="true"/>
@@ -470,7 +469,6 @@
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 		
-<!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -504,6 +502,7 @@
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
+<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elydatadir@/textures/heightfield.png"/>
@@ -602,7 +601,6 @@
 			<Param rot="100.0,5.0,3.5"/>
 			<Param pos="156.8,349.4,27.2"/>
 		</Object>
--->
 
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
@@ -628,6 +626,7 @@
 			<Param is_steady="true"/>
 			<Param rot="0.0,-90.0,0.0"/>
 		</Object>
+-->
 		
 		<!-- ----------------- -->
 		<!-- MANDATORY OBJECTS -->

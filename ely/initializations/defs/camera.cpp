@@ -132,7 +132,7 @@ void toggleCameraControl(const Event* event, void* data)
 		}
 	}
 }
-static void togglePicker(const Event* event, void* data)
+void togglePicker(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera = reinterpret_cast<Object*>(data);
 	if (Picker::GetSingletonPtr())
@@ -152,6 +152,23 @@ static void togglePicker(const Event* event, void* data)
 		controlGrabbed = true;
 	}
 }
+
+std::vector<ObjectId> *chasedIdsPtr;
+unsigned int idx = 0, chasedListSize;
+void toggleChasedObject(const Event* event, void* data)
+{
+	SMARTPTR(Object)camera= reinterpret_cast<Object*>(data);
+	SMARTPTR(Chaser) chaserComp = DCAST(Chaser, camera->getComponent(
+					ComponentFamilyType("Control")));
+	if(chaserComp)
+	{
+		++idx;
+		idx = idx % chasedListSize;
+		PRINT_DEBUG("Chased object: " << (*chasedIdsPtr)[idx]);
+		chaserComp->setChasedObject((*chasedIdsPtr)[idx]);
+	}
+}
+
 }
 void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
@@ -163,15 +180,22 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//enable/disable a picker
 	pandaFramework->define_key("x", "togglePicker", &togglePicker,
 			static_cast<void*>(object));
-
+	//toggle chased object
+	pandaFramework->define_key("z", "toggleChasedObject", &toggleChasedObject,
+			static_cast<void*>(object));
 }
 
 void cameraInit()
 {
+	chasedIdsPtr = new std::vector<ObjectId>();
+	chasedIdsPtr->push_back(ObjectId("auto1"));
+	chasedIdsPtr->push_back(ObjectId("player0"));
+	chasedListSize = chasedIdsPtr->size();
 }
 
 void cameraEnd()
 {
+	delete chasedIdsPtr;
 }
 
 
