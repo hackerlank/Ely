@@ -121,8 +121,8 @@ public:
 	 * \name Getting/setting parameters.
 	 */
 	///@{
-	float getMaxDistance() const;
-	void setMaxDistance(float absMaxDistance);
+	float getAbsMaxDistance() const;
+	void setAbsMaxDistance(float absMaxDistance);
 	float getAbsMinDistance() const;
 	void setAbsMinDistance(float absMinDistance);
 	float getAbsMaxHeight() const;
@@ -288,7 +288,7 @@ inline bool Chaser::isEnabled()
 	return mEnabled;
 }
 
-inline float Chaser::getMaxDistance() const
+inline float Chaser::getAbsMaxDistance() const
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -296,7 +296,7 @@ inline float Chaser::getMaxDistance() const
 	return mAbsMaxDistance;
 }
 
-inline void Chaser::setMaxDistance(float absMaxDistance)
+inline void Chaser::setAbsMaxDistance(float absMaxDistance)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)

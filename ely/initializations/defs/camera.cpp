@@ -153,7 +153,15 @@ void togglePicker(const Event* event, void* data)
 	}
 }
 
-std::vector<ObjectId> *chasedIdsPtr;
+struct ChasedObjectData
+{
+	float abs_max_distance;
+	float abs_min_distance;
+	float abs_max_height;
+	float abs_min_height;
+	ObjectId id;
+};
+std::vector<ChasedObjectData> *chasedDataPtr;
 unsigned int idx = 0, chasedListSize;
 void toggleChasedObject(const Event* event, void* data)
 {
@@ -164,8 +172,14 @@ void toggleChasedObject(const Event* event, void* data)
 	{
 		++idx;
 		idx = idx % chasedListSize;
-		PRINT_DEBUG("Chased object: " << (*chasedIdsPtr)[idx]);
-		chaserComp->setChasedObject((*chasedIdsPtr)[idx]);
+		PRINT_DEBUG("Chased object: " << (*chasedDataPtr)[idx].id);
+		HOLD_REMUTEX(chaserComp->getMutex())
+
+		chaserComp->setChasedObject((*chasedDataPtr)[idx].id);
+		chaserComp->setAbsMaxDistance((*chasedDataPtr)[idx].abs_max_distance);
+		chaserComp->setAbsMinDistance((*chasedDataPtr)[idx].abs_min_distance);
+		chaserComp->setAbsMaxHeight((*chasedDataPtr)[idx].abs_max_height);
+		chaserComp->setAbsMinHeight((*chasedDataPtr)[idx].abs_min_height);
 	}
 }
 
@@ -187,15 +201,15 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 
 void cameraInit()
 {
-	chasedIdsPtr = new std::vector<ObjectId>();
-	chasedIdsPtr->push_back(ObjectId("auto1"));
-	chasedIdsPtr->push_back(ObjectId("player0"));
-	chasedListSize = chasedIdsPtr->size();
+	chasedDataPtr = new std::vector<ChasedObjectData>();
+	chasedDataPtr->push_back({25.0,18.0,8.0,5.0,ObjectId("auto1")});
+	chasedDataPtr->push_back({15.0,8.0,6.0,3.0,ObjectId("player0")});
+	chasedListSize = chasedDataPtr->size();
 }
 
 void cameraEnd()
 {
-	delete chasedIdsPtr;
+	delete chasedDataPtr;
 }
 
 

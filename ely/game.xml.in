@@ -178,7 +178,7 @@
 				<Param enabled="false"/>
 				<Param backward="false"/>
 				<Param chased_object="auto1"/>
-				<Param fixed_relative_position="false"/>
+				<Param fixed_relative_position="true"/>
 				<Param reference_object="render"/>
 				<Param abs_max_distance="25.0"/>
 				<Param abs_min_distance="18.0"/>
@@ -418,7 +418,7 @@
 			<Param is_steady="false"/>
 			<Param store_params="false"/>
 			<Param pos="-38.0555,-5.94453,45.7907"/>
-			<Param rot="0.0,0.0,0.0"/>
+			<Param rot="180.0,0.0,0.0"/>
 			<Component type="Model">
 				<Param model_file="vehicle.bam"/>
 				<Param scale="3.0,3.0,3.0"/>
@@ -452,7 +452,7 @@
 				<Param events="backward@arrow_down:stop-backward@arrow_down-up$"/>
 				<Param events="turn_left@arrow_left:stop-turn_left@arrow_left-up$"/>
 				<Param events="turn_right@arrow_right:stop-turn_right@arrow_right-up$"/>
-				<Param events="brake@m:stop-brake@m-up$"/>
+				<Param events="brake@0:stop-brake@0-up$"/>
 			</Component>
 		</Object>
 		
