@@ -120,11 +120,13 @@ public:
 	std::string getDataInfo(GameDataInfo info);
 	///@}
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 protected:
 
@@ -186,8 +188,10 @@ protected:
 	void togglePhysicsDebug(const Event* event);
 #endif
 
+#ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
+#endif
 };
 
 ///inline definitions
@@ -202,10 +206,12 @@ inline std::string GameManager::getDataInfo(GameDataInfo info)
 	return mInfoDB[info];
 }
 
+#ifdef ELY_THREAD
 inline ReMutex& GameManager::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 } // namespace ely
 

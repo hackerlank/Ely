@@ -45,11 +45,13 @@ public:
 			const std::string& pickKeyOn, const std::string& pickKeyOff);
 	virtual ~Picker();
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 	///Panda framework.
@@ -84,15 +86,20 @@ private:
 	SMARTPTR(AsyncTask) mMovePickedTask;
 	///@}
 
-	///The mutex associated with this manager.
+#ifdef ELY_THREAD
+	///The mutex associated with this picker.
 	ReMutex mMutex;
+#endif
 };
 
 ///inline definitions
+
+#ifdef ELY_THREAD
 ReMutex& Picker::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 } // namespace ely
 

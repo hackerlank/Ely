@@ -96,11 +96,13 @@ public:
 	 */
 	void resetComponentTemplatesParams();
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 
@@ -115,8 +117,10 @@ private:
 	 */
 	IdType getId();
 
+#ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
+#endif
 };
 
 ///inline definitions
@@ -126,10 +130,12 @@ inline IdType ComponentTemplateManager::getId()
 	return ++id;
 }
 
+#ifdef ELY_THREAD
 inline ReMutex& ComponentTemplateManager::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 }  // namespace ely
 

@@ -143,11 +143,13 @@ public:
 	 */
 	void destroyAllObjects();
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 	///Table of object templates indexed by their name.
@@ -163,16 +165,20 @@ private:
 	 */
 	IdType doGetId();
 
+#ifdef ELY_THREAD
 	///The (reentrant) mutex associated with this manager.
 	ReMutex mMutex;
+#endif
 };
 
 ///inline definitions
 
+#ifdef ELY_THREAD
 inline ReMutex& ObjectTemplateManager::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 }  // namespace ely
 

@@ -118,11 +118,13 @@ public:
 	 */
 	WindowFramework* const windowFramework() const;
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 protected:
 	///Parameter table.
@@ -132,8 +134,10 @@ protected:
 	///The WindowFramework .
 	WindowFramework* mWindowFramework;
 
+#ifdef ELY_THREAD
 	///The mutex associated with this template.
 	ReMutex mMutex;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:
@@ -181,10 +185,12 @@ inline ParameterTable ComponentTemplate::getParameterTable() const
 	return mParameterTable;
 }
 
+#ifdef ELY_THREAD
 inline ReMutex& ComponentTemplate::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 }  // namespace ely
 

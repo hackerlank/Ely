@@ -252,11 +252,13 @@ public:
 	void setOwner(SMARTPTR(Object) owner);
 	///@}
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 	///The template used to construct this component.
@@ -311,8 +313,10 @@ private:
 	ParameterTable mObjTmplParams;
 	ParameterTableMap mCompTmplParams;
 
+#ifdef ELY_THREAD
 	///The mutex associated with this object.
 	ReMutex mMutex;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:
@@ -382,10 +386,12 @@ inline SMARTPTR(ObjectTemplate)const Object::objectTmpl() const
 	return mTmpl;
 }
 
+#ifdef ELY_THREAD
 inline ReMutex& Object::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 inline ParameterTable Object::getStoredObjTmplParams() const
 {

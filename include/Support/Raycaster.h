@@ -79,11 +79,13 @@ public:
 	float getHitFraction();
 	///@}
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 	///Panda framework.
@@ -116,16 +118,21 @@ private:
 	void hitBody(const Event* event);
 	std::vector<std::string> mHitKey;
 	///@}
-	///The mutex associated with this manager.
+
+#ifdef ELY_THREAD
+	///The mutex associated with this ray caster.
 	ReMutex mMutex;
+#endif
 };
 
 ///inline definiitons
 
+#ifdef ELY_THREAD
 ReMutex& Raycaster::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 } // namespace ely
 

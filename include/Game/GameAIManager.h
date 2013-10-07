@@ -77,11 +77,13 @@ public:
 	 */
 	AsyncTask::DoneStatus update(GenericAsyncTask* task);
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 	/// AIWorld.
@@ -99,16 +101,20 @@ private:
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
+#ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
+#endif
 };
 
 ///inline definitions
 
+#ifdef ELY_THREAD
 inline ReMutex& GameAIManager::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 }  // namespace ely
 

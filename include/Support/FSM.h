@@ -516,11 +516,13 @@ public:
 	 */
 	unsigned int getNumStates() const;
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 protected:
 	//Data section
@@ -558,8 +560,10 @@ protected:
 	///states.
 	std::queue<FSMMethodPTR> mRequestQueue;
 
+#ifdef ELY_THREAD
 	///The (reentrant) mutex associated with this FSM.
 	ReMutex mMutex;
+#endif
 };
 ////////////////////////////////////////////////////////////////////////
 template<typename StateKey> int FSM<StateKey>::SerialNum = 0;
@@ -1194,10 +1198,12 @@ bool FSM<StateKey>::removeFromToFunc(const StateKey& stateFrom,
 	return true;
 }
 
+#ifdef ELY_THREAD
 template<typename StateKey> ReMutex& FSM<StateKey>::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 //specializations' declarations
 //StateKey == std::string

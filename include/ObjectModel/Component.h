@@ -281,11 +281,13 @@ public:
 	 */
 	std::string getEventType(const std::string& event);
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 protected:
 	///The template used to construct this component (read only after creation).
@@ -299,8 +301,10 @@ protected:
 	bool mDestroying;
 #endif
 
+#ifdef ELY_THREAD
 	///The mutex associated with this component.
 	ReMutex mMutex;
+#endif
 
 	/**
 	 * \name Helper functions to register/unregister events' callbacks.
@@ -414,10 +418,12 @@ inline void Component::update(void* data)
 {
 }
 
+#ifdef ELY_THREAD
 inline ReMutex& Component::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 }  // namespace ely
 

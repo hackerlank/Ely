@@ -176,11 +176,13 @@ public:
 	std::list<std::string> componentParameterValues(const std::string& paramName,
 			ComponentType compType);
 
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+#endif
 
 private:
 	///Name identifying this object template.
@@ -201,8 +203,10 @@ private:
 	///component of a given type, belonging to any object of a given type.
 	std::map<ComponentType, ParameterTable> mComponentParameterTables;
 
+#ifdef ELY_THREAD
 	///The mutex associated with this template.
 	ReMutex mMutex;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:
@@ -276,10 +280,12 @@ inline WindowFramework* const ObjectTemplate::windowFramework() const
 	return mWindowFramework;
 }
 
+#ifdef ELY_THREAD
 inline ReMutex& ObjectTemplate::getMutex()
 {
 	return mMutex;
 }
+#endif
 
 }  // namespace ely
 
