@@ -76,7 +76,9 @@ libobjectmodel_la_SOURCES = \
 
 libphysicscomponents_la_SOURCES = \
 		PhysicsComponents/RigidBody.cpp \
-		PhysicsComponents/RigidBodyTemplate.cpp
+		PhysicsComponents/RigidBodyTemplate.cpp \
+		PhysicsComponents/SoftBody.cpp \
+		PhysicsComponents/SoftBodyTemplate.cpp
 
 libphysicscontrolcomponents_la_SOURCES = \
 		PhysicsControlComponents/CharacterController.cpp \

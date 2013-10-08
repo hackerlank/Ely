@@ -157,6 +157,9 @@ void GameManager::setupCompTmplMgr()
 	//RigidBody
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new RigidBodyTemplate(this, mWindow));
+	//SoftBody
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new SoftBodyTemplate(this, mWindow));
 
 	///PhysicsControl templates
 	//Character

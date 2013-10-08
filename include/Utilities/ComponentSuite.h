@@ -48,6 +48,8 @@
 #include "ControlComponents/DriverTemplate.h"
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
+#include "PhysicsComponents/SoftBody.h"
+#include "PhysicsComponents/SoftBodyTemplate.h"
 #include "PhysicsControlComponents/CharacterController.h"
 #include "PhysicsControlComponents/CharacterControllerTemplate.h"
 #include "PhysicsControlComponents/Vehicle.h"

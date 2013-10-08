@@ -181,6 +181,8 @@ void initTypedObjects()
 	CharacterControllerTemplate::init_type();
 	RigidBody::init_type();
 	RigidBodyTemplate::init_type();
+	SoftBody::init_type();
+	SoftBodyTemplate::init_type();
 	Vehicle::init_type();
 	VehicleTemplate::init_type();
 	InstanceOf::init_type();

@@ -47,6 +47,8 @@ noinst_HEADERS = \
 		ObjectModel/ObjectTemplateManager.h \
 		PhysicsComponents/RigidBody.h \
 		PhysicsComponents/RigidBodyTemplate.h \
+		PhysicsComponents/SoftBody.h \
+		PhysicsComponents/SoftBodyTemplate.h \
 		PhysicsControlComponents/CharacterController.h \
 		PhysicsControlComponents/CharacterControllerTemplate.h \
 		PhysicsControlComponents/Vehicle.h \
