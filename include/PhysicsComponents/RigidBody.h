@@ -47,6 +47,7 @@ class RigidBodyTemplate;
  * - "capsule"
  * - "cone"
  * - "heightfield"
+ * - "triangle mesh"
  * In case of "sphere", "box", "cylinder", "capsule", "cone", if any of
  * the relevant parameters is missing, the shape is automatically
  * constructed by guessing them through calculation of a tight bounding volume

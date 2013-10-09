@@ -18,25 +18,15 @@ class SoftBodyTemplate;
 /**
  * \brief Component representing a single soft body attached to an object.
  *
- * It constructs a soft body with the single specified collision shape_type
- * along with relevant parameters.\n
- * Collision shapes are:
- * - "sphere"
- * - "plane"
- * - "box"
- * - "cylinder"
- * - "capsule"
- * - "cone"
- * - "heightfield"
- * In case of "sphere", "box", "cylinder", "capsule", "cone", if any of
- * the relevant parameters is missing, the shape is automatically
- * constructed by guessing them through calculation of a tight bounding volume
- * of object geometry (supposedly specified by the model component).\n
- * For "plane" shape, in case of missing parameters, the default is
- * a plane with normal = (0,0,1) and d = 0.
+ * It constructs a soft body with relevant parameters.\n
+ * Soft body types are:
+ * - "rope"
+ * - "patch"
+ * - "triangles"
+ * - "tetrahedron"
  *
  * XML Param(s):
- * - "body_type"  				|single|"dynamic" ("static","kinematic")
+ * - "body_type"  				|single|"rope" ("patch","triangles","tetrahedron")
  * - "body_mass"  				|single|"1.0"
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
