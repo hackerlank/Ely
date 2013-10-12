@@ -22,15 +22,27 @@ class SoftBodyTemplate;
  * Soft body types are:
  * - "rope"
  * - "patch"
+ * - "ellipsoid"
  * - "triangles"
  * - "tetrahedron"
  *
  * XML Param(s):
- * - "body_type"  				|single|"rope" ("patch","triangles","tetrahedron")
+ * - "body_type"  				|single|"rope" (rope,patch,ellipsoid,tri_mesh,tet_mesh)
  * - "body_mass"  				|single|"1.0"
+ * - "collide_mask"  			|single|"all_on"
+ * - "air_density"  			|single|"1.2"
+ * - "water_density"  			|single|"0.0"
+ * - "water_normal"  			|single|"0.0,0.0,0.0"
+ * - "water_offset"  			|single|"0.0"
+ * - "fixeds"  					|single|no default (for rope,patch)
+ * - "point_1"  				|single|no default (for rope,patch,ellipsoid)
+ * - "point_2"  				|single|no default (for rope,patch)
+ * - "point_3"  				|single|no default (for patch)
+ * - "point_4"  				|single|no default (for patch)
+ *
+ *
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
- * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
  * - "shape_size"  				|single|"medium"  (minimum, medium, maximum)
  * - "use_shape_of"				|single|no default
@@ -79,21 +91,22 @@ public:
 	{
 		ROPE,
 		PATCH,
-		TRIANGLES,
-		TETRAHEDRON
+		ELLIPSOID,
+		TRIMESH,
+		TETMESH
 	};
 
 	/**
 	 * \brief Switches the current component's type.
 	 *
-	 * It sets the rigid body mass too.
+	 * It sets the soft body mass too.
 	 * @param bodyType The new component's type.
 	 */
 	void switchType(BodyType bodyType);
 
 	/**
-	 * \brief Gets/sets the node path of this rigid body.
-	 * @return The node path of this rigid body.
+	 * \brief Gets/sets the node path of this soft body.
+	 * @return The node path of this soft body.
 	 */
 	///@{
 	NodePath getNodePath() const;
@@ -109,7 +122,7 @@ public:
 	///@}
 
 private:
-	///The NodePath associated to this rigid body.
+	///The NodePath associated to this soft body.
 	NodePath mNodePath;
 	///The underlying BulletSoftBodyNode (read-only after creation & before destruction).
 	SMARTPTR(BulletSoftBodyNode) mSoftBodyNode;
@@ -124,7 +137,7 @@ private:
 	float mCcdMotionThreshold, mCcdSweptSphereRadius;
 	bool mCcdEnabled;
 	/**
-	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
+	 * \brief Sets physical parameters of a bullet soft body node (helper function).
 	 */
 	void doSetPhysicalParameters();
 	///@}

@@ -60,17 +60,9 @@ void SoftBodyTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
-	mParameterTable.insert(ParameterNameValue("body_type", "dynamic"));
-	mParameterTable.insert(ParameterNameValue("body_mass", "1.0"));
-	mParameterTable.insert(ParameterNameValue("body_friction", "0.8"));
-	mParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
-	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
-	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
-	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
-	mParameterTable.insert(ParameterNameValue("shape_height", "1.0"));
-	mParameterTable.insert(ParameterNameValue("shape_up", "z"));
-	mParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
-	mParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
+	mParameterTable.insert(ParameterNameValue("", ""));
+	mParameterTable.insert(ParameterNameValue("", ""));
+	mParameterTable.insert(ParameterNameValue("", ""));
 }
 
 //TypedObject semantics: hardcoded
