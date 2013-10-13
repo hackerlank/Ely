@@ -273,7 +273,7 @@ void NavMesh::onAddToSceneSetup()
 							NAVMESH_POLYAREA_GROUND);
 			//iterate over flags
 			std::vector<std::string> flags = parseCompoundString(
-					areaFlagsCostStr[1], '|');
+					areaFlagsCostStr[1], ':');
 			std::vector<std::string>::const_iterator iterF;
 			//default flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
 			int oredFlags = (flags.size() == 0 ? 0x01 : 0x0);
@@ -303,7 +303,7 @@ void NavMesh::onAddToSceneSetup()
 	std::vector<std::string>::const_iterator iterIEFStr;
 	std::vector<std::string> ieFlagsStr;
 	//1:iterate over include flags
-	ieFlagsStr = parseCompoundString(mCrowdIncludeFlagsParam, '|');
+	ieFlagsStr = parseCompoundString(mCrowdIncludeFlagsParam, ':');
 	//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
 	int includeFlags = (ieFlagsStr.empty() ? NAVMESH_POLYFLAGS_WALK : 0x0);
 	for (iterIEFStr = ieFlagsStr.begin(); iterIEFStr != ieFlagsStr.end();
@@ -317,7 +317,7 @@ void NavMesh::onAddToSceneSetup()
 		includeFlags |= flag;
 	}
 	//2:iterate over exclude flags
-	ieFlagsStr = parseCompoundString(mCrowdExcludeFlagsParam, '|');
+	ieFlagsStr = parseCompoundString(mCrowdExcludeFlagsParam, ':');
 	//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
 	int excludeFlags = (ieFlagsStr.empty() ? NAVMESH_POLYFLAGS_DISABLED : 0x0);
 	for (iterIEFStr = ieFlagsStr.begin(); iterIEFStr != ieFlagsStr.end();
@@ -336,7 +336,7 @@ void NavMesh::onAddToSceneSetup()
 			iterStr != mConvexVolumesParam.end(); ++iterStr)
 	{
 		//any "convex_volume" string is a "compound" one, i.e. could have the form:
-		// "x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type"
+		// "x1,y1,z1:x2,y2,z2...:xN,yN,zN@area_type"
 		std::vector<std::string> pointsAreaTypeStr = parseCompoundString(
 				*iterStr, '@');
 		//check only if there is (at least) a pair
@@ -357,7 +357,7 @@ void NavMesh::onAddToSceneSetup()
 		//iterate over points
 		PointList pointList;
 		std::vector<std::string> pointsStr = parseCompoundString(
-				pointsAreaTypeStr[0], '&');
+				pointsAreaTypeStr[0], ':');
 		std::vector<std::string>::const_iterator iterP;
 		for (iterP = pointsStr.begin(); iterP != pointsStr.end(); ++iterP)
 		{
@@ -379,7 +379,7 @@ void NavMesh::onAddToSceneSetup()
 			iterStr != mOffMeshConnectionsParam.end(); ++iterStr)
 	{
 		//any "offmesh_connection" string is a "compound" one, i.e. has the form:
-		// "xB,yB,zB&xE,yE,zE@bidirectional", with bidirectional=true by default.
+		// "xB,yB,zB:xE,yE,zE@bidirectional", with bidirectional=true by default.
 		std::vector<std::string> pointPairBidirStr = parseCompoundString(
 				*iterStr, '@');
 		//check only if there is (at least) a pair
@@ -398,7 +398,7 @@ void NavMesh::onAddToSceneSetup()
 		//each point defaults to LPoint3f::zero()
 		PointPair pointPair(LPoint3f::zero(), LPoint3f::zero());
 		std::vector<std::string> pointsStr = parseCompoundString(
-				pointPairBidirStr[0], '&');
+				pointPairBidirStr[0], ':');
 		std::vector<std::string>::const_iterator iterPStr;
 		int k;
 		for (k = 0, iterPStr = pointsStr.begin();

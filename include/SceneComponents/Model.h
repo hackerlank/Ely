@@ -83,7 +83,6 @@ public:
 
 	/**
 	 * \brief Gets/sets the node path associated to this model.
-	 * @return The node path associated to this model.
 	 */
 	///@{
 	NodePath getNodePath() const;

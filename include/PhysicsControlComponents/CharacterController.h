@@ -149,7 +149,6 @@ public:
 
 	/**
 	 * \brief Gets/sets the node path of this character controller.
-	 * @return The node path of this character controller.
 	 */
 	///@{
 	NodePath getNodePath() const;

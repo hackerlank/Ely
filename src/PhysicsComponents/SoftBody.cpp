@@ -58,7 +58,7 @@ bool SoftBody::initialize()
 		mBodyType = DYNAMIC;
 	}
 	//get physical parameters
-	mBodyMass = strtof(
+	mBodyTotalMass = strtof(
 			mTmpl->parameter(std::string("body_mass")).c_str(), NULL);
 	mBodyFriction = strtof(
 			mTmpl->parameter(std::string("body_friction")).c_str(), NULL);
@@ -438,7 +438,7 @@ void SoftBody::doSwitchBodyType(BodyType bodyType)
 	switch (bodyType)
 	{
 	case DYNAMIC:
-		mSoftBodyNode->set_mass(mBodyMass);
+		mSoftBodyNode->set_mass(mBodyTotalMass);
 		mSoftBodyNode->set_kinematic(false);
 		mSoftBodyNode->set_static(false);
 		mSoftBodyNode->set_deactivation_enabled(true);

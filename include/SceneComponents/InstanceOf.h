@@ -63,7 +63,6 @@ public:
 
 	/**
 	 * \brief Gets/sets the node path associated to this instance of.
-	 * @return The node path associated to this instance of.
 	 */
 	///@{
 	NodePath getNodePath() const;

@@ -89,13 +89,14 @@ class ComponentTemplate;
  * - "event_types" 		|multiple|no default (each specified as
  * "evType1:evType2:...:evTypeN" into ObjectTemplate definition)
  * - "events"			|multiple|no default (each specified as
- * "evType1@evValue1:evType2@evValue2:...:evTypeN@evValueN$callbackName"
+ * "evType1@evValue1[:evType2@evValue2:...:evTypeN@evValueN]$callbackName"
  *  into Object definition)
  *
  * \note in "events" any of evValues or  callbackNamecan be empty
  * (meaning we want the defaults value).
  * \note Inside the strings representing the above mentioned predefined
  * callback function names, any "-" will be replaced by "_".
+ * \note parts inside [] are optional.\n
  */
 class Component: public TypedWritableReferenceCount
 {

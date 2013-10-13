@@ -1,0 +1,5 @@
+XML Parameters separators
+"," -> Object, CrowdAgent, Sound3d, Activity, SoftBody, Vehicle, InstanceOf, Model
+"@" -> Component, NavMesh, Sound3d, Activity, Model
+"$" -> Component, Activity, Vehicle
+":" -> Component, Sound3d, Activity, Model, NavMesh

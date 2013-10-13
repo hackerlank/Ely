@@ -485,15 +485,15 @@
 				<Param area_flags_cost="0@0x01@1.0"/>
 				<Param area_flags_cost="1@0x02@10.0"/>
 				<Param area_flags_cost="2@0x01@1.0"/>
-				<Param area_flags_cost="3@0x01|0x04@1.0"/>
+				<Param area_flags_cost="3@0x01:0x04@1.0"/>
 				<Param area_flags_cost="4@0x01@2.0"/>
 				<Param area_flags_cost="5@@1.5"/>
-				<Param crowd_include_flags="0x01|0x02|0x04|0x08"/>
+				<Param crowd_include_flags="0x01:0x02:0x04:0x08"/>
 				<Param crowd_exclude_flags="0x10"/>
-				<Param convex_volume="-34.7263,-16.0939,40.7907&
-									  -27.0797,-10.7713,40.7907&
+				<Param convex_volume="-34.7263,-16.0939,40.7907:
+									  -27.0797,-10.7713,40.7907:
 									  -32.7395,-8.40045,40.7907@3"/>
-				<Param offmesh_connection="-33.7841,-4.48785,40.7907&
+				<Param offmesh_connection="-33.7841,-4.48785,40.7907:
 									  -52.0533,-29.1533,6.01279@false"/>
 			</Component>
 			<Param parent="render"/>

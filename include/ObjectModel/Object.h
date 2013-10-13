@@ -64,6 +64,7 @@ typedef std::string ObjectId;
  *
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.
+ * \note parts inside [] are optional.\n
  */
 class Object: public TypedWritableReferenceCount
 {
@@ -194,7 +195,6 @@ public:
 
 	/**
 	 * \brief NodePath getter/setter & conversion function.
-	 * @return The node path of this object.
 	 */
 	///@{
 	NodePath getNodePath() const;

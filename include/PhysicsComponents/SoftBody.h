@@ -39,7 +39,8 @@ class SoftBodyTemplate;
  * - "water_density"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
  * - "water_offset"  			|single|"0.0"
- * - "anchor_objects"			|multiple|no default
+ * - "anchor_objects"			|multiple|no default (each one specified as
+ * "objectId1[:objectId2:...:objectIdN]")
  * - "point_1"  				|single|no default (for rope,patch,ellipsoid)
  * - "point_2"  				|single|no default (for rope,patch)
  * - "point_3"  				|single|no default (for patch)
@@ -50,6 +51,8 @@ class SoftBodyTemplate;
  * - "num_thickness"  			|single|"0.4" (for rope)
  * - "num_slices"  				|single|"8" (for rope)
  * - "num_subdiv"  				|single|"4" (for rope)
+ * - "num_subdiv"  				|single|"4" (for rope)
+ * - "texture_file"				|single|no default
  *
  * \note parts inside [] are optional.\n
  */
@@ -88,16 +91,7 @@ public:
 	};
 
 	/**
-	 * \brief Switches the current component's type.
-	 *
-	 * It sets the soft body mass too.
-	 * @param bodyType The new component's type.
-	 */
-	void switchType(BodyType bodyType);
-
-	/**
 	 * \brief Gets/sets the node path of this soft body.
-	 * @return The node path of this soft body.
 	 */
 	///@{
 	NodePath getNodePath() const;
@@ -119,7 +113,7 @@ private:
 	SMARTPTR(BulletSoftBodyNode) mSoftBodyNode;
 	///@{
 	///Physical parameters.
-	float mBodyMass, mBodyFriction, mBodyRestitution;
+	float mBodyTotalMass, mBodyFriction, mBodyRestitution;
 	BodyType mBodyType;
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
@@ -127,6 +121,28 @@ private:
 	//ccd stuff
 	float mCcdMotionThreshold, mCcdSweptSphereRadius;
 	bool mCcdEnabled;
+
+ * - "body_total_mass"  		|single|"1.0"
+ * - "collide_mask"  			|single|"all_on"
+ * - "air_density"  			|single|"1.2"
+ * - "water_density"  			|single|"0.0"
+ * - "water_normal"  			|single|"0.0,0.0,0.0"
+ * - "water_offset"  			|single|"0.0"
+ * - "anchor_objects"			|multiple|no default (each one specified as
+ * "objectId1[:objectId2:...:objectIdN]")
+ * - "point_1"  				|single|no default (for rope,patch,ellipsoid)
+ * - "point_2"  				|single|no default (for rope,patch)
+ * - "point_3"  				|single|no default (for patch)
+ * - "point_4"  				|single|no default (for patch)
+ * - "res_1"  					|single|no default (for rope,patch)
+ * - "res_2"  					|single|no default (for patch)
+ * - "fixeds"  					|single|no default (for rope,patch)
+ * - "num_thickness"  			|single|"0.4" (for rope)
+ * - "num_slices"  				|single|"8" (for rope)
+ * - "num_subdiv"  				|single|"4" (for rope)
+ * - "num_subdiv"  				|single|"4" (for rope)
+ * - "texture_file"				|single|no default
+
 	/**
 	 * \brief Sets physical parameters of a bullet soft body node (helper function).
 	 */
@@ -195,7 +211,7 @@ inline void SoftBody::reset()
 	//
 	mNodePath = NodePath();
 	mSoftBodyNode.clear();
-	mBodyMass = mBodyFriction = mBodyRestitution = 0.0;
+	mBodyTotalMass = mBodyFriction = mBodyRestitution = 0.0;
 	mBodyType = ROPE;
 	mShapeType = GamePhysicsManager::SPHERE;
 	mShapeSize = GamePhysicsManager::MEDIUM;

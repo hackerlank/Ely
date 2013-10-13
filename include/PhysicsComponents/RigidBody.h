@@ -124,7 +124,6 @@ public:
 
 	/**
 	 * \brief Gets/sets the node path of this rigid body.
-	 * @return The node path of this rigid body.
 	 */
 	///@{
 	NodePath getNodePath() const;

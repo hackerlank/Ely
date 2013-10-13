@@ -63,7 +63,6 @@ public:
 
 	/**
 	 * \brief Gets/sets the node path of this node path wrapper.
-	 * @return The node path of this this node path wrapper.
 	 */
 	///@{
 	NodePath getNodePath() const;
