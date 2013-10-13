@@ -56,13 +56,13 @@ class RigidBodyTemplate;
  * a plane with normal = (0,0,1) and d = 0.
  *
  * XML Param(s):
- * - "body_type"  				|single|"dynamic" ("static","kinematic")
+ * - "body_type"  				|single|"dynamic" (values: static|kinematic)
  * - "body_mass"  				|single|"1.0"
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
- * - "shape_size"  				|single|"medium"  (minimum, medium, maximum)
+ * - "shape_size"  				|single|"medium"  (values: minimum|medium|maximum)
  * - "use_shape_of"				|single|no default
  * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)
  * - "shape_norm_x"  			|single|no default (for plane)
@@ -73,12 +73,14 @@ class RigidBodyTemplate;
  * - "shape_half_y"  			|single|no default (for box)
  * - "shape_half_z"  			|single|no default (for box)
  * - "shape_height"  			|single|"1.0" (for cylinder,capsule,cone,heightfield)
- * - "shape_up"  				|single|"z" ((x,y,z) for cylinder,capsule,cone,heightfield)
- * - "shape_heightfield_file" 	|single|no default (heightfield)
- * - "shape_scale_w"  			|single|"1.0" (heightfield)
- * - "shape_scale_d"  			|single|"1.0" (heightfield)
+ * - "shape_up"  				|single|"z" (values: x|y|z for cylinder,capsule,cone,heightfield)
+ * - "shape_heightfield_file" 	|single|no default (for heightfield)
+ * - "shape_scale_w"  			|single|"1.0" (for heightfield)
+ * - "shape_scale_d"  			|single|"1.0" (for heightfield)
  * - "ccd_motion_threshold"  	|single|no default
  * - "ccd_swept_sphere_radius" 	|single|no default
+ *
+ * \note parts inside [] are optional.\n
  */
 class RigidBody: public Component
 {

@@ -62,6 +62,8 @@ class ChaserTemplate;
  * - "sens_x"  					|single|"0.2"
  * - "sens_y"  					|single|"0.2"
  * - "inverted_rotation"		|single|"false"
+ *
+ * \note parts inside [] are optional.\n
  */
 class Chaser: public Component
 {

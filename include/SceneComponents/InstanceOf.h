@@ -38,6 +38,8 @@ class InstanceOfTemplate;
  * XML Param(s):
  * - "instance_of"  		|single|no default
  * - "scale"  				|single|"1.0,1.0,1.0"
+ *
+ * \note parts inside [] are optional.\n
  */
 class InstanceOf: public Component
 {

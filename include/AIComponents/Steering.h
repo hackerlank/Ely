@@ -58,12 +58,15 @@ class AICharacterRef;
  * XML Param(s):
  * - "enabled"  						|single|"true"
  * - "throw_events"						|single|"false"
- * - "controlled_type"					|single|"nodepath" (nodepath,character_controller)
+ * - "controlled_type"					|single|"nodepath" (values:
+ * nodepath|character_controller)
  * - "mass"  							|single|"1.0"
  * - "movt_force"  						|single|"1.0"
  * - "max_force"  						|single|"1.0"
  * - "obstacle_hit_mask"				|single|"0x80000000"
  * - "obstacle_max_distance_fraction"	|single|"1.0"
+ *
+ * \note parts inside [] are optional.\n
  */
 class Steering: public Component
 {

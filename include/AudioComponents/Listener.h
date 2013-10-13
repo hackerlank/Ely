@@ -39,6 +39,8 @@ class ListenerTemplate;
  *
  * XML Param(s):
  * - "scene_root" 			|single|"render"
+ *
+ * \note parts inside [] are optional.\n
  */
 class Listener: public Component
 {

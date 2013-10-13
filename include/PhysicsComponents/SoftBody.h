@@ -18,7 +18,11 @@ class SoftBodyTemplate;
 /**
  * \brief Component representing a single soft body attached to an object.
  *
- * It constructs a soft body with relevant parameters.\n
+ * It constructs a soft body with relevant parameters. Not all the
+ * parameters can be specified on creation. Others settings
+ * could be made in programs by directly referring to the underlying
+ * BulletSoftBodyNode.\n
+ * \note rope is visualized as nurbs curse; patch is visualized as GeomNode.\n
  * Soft body types are:
  * - "rope"
  * - "patch"
@@ -27,40 +31,27 @@ class SoftBodyTemplate;
  * - "tetrahedron"
  *
  * XML Param(s):
- * - "body_type"  				|single|"rope" (rope,patch,ellipsoid,tri_mesh,tet_mesh)
- * - "body_mass"  				|single|"1.0"
+ * - "body_type"  				|single|"rope" (values: rope|patch|
+ * ellipsoid|tri_mesh|tet_mesh)
+ * - "body_total_mass"  		|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "air_density"  			|single|"1.2"
  * - "water_density"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
  * - "water_offset"  			|single|"0.0"
- * - "fixeds"  					|single|no default (for rope,patch)
+ * - "anchor_objects"			|multiple|no default
  * - "point_1"  				|single|no default (for rope,patch,ellipsoid)
  * - "point_2"  				|single|no default (for rope,patch)
  * - "point_3"  				|single|no default (for patch)
  * - "point_4"  				|single|no default (for patch)
+ * - "res_1"  					|single|no default (for rope,patch)
+ * - "res_2"  					|single|no default (for patch)
+ * - "fixeds"  					|single|no default (for rope,patch)
+ * - "num_thickness"  			|single|"0.4" (for rope)
+ * - "num_slices"  				|single|"8" (for rope)
+ * - "num_subdiv"  				|single|"4" (for rope)
  *
- *
- * - "body_friction"  			|single|"0.8"
- * - "body_restitution"  		|single|"0.1"
- * - "shape_type"  				|single|"sphere"
- * - "shape_size"  				|single|"medium"  (minimum, medium, maximum)
- * - "use_shape_of"				|single|no default
- * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)
- * - "shape_norm_x"  			|single|no default (for plane)
- * - "shape_norm_y"  			|single|no default (for plane)
- * - "shape_norm_z"  			|single|no default (for plane)
- * - "shape_d"  				|single|no default (for plane)
- * - "shape_half_x"  			|single|no default (for box)
- * - "shape_half_y"  			|single|no default (for box)
- * - "shape_half_z"  			|single|no default (for box)
- * - "shape_height"  			|single|"1.0" (for cylinder,capsule,cone,heightfield)
- * - "shape_up"  				|single|"z" ((x,y,z) for cylinder,capsule,cone,heightfield)
- * - "shape_heightfield_file" 	|single|no default (heightfield)
- * - "shape_scale_w"  			|single|"1.0" (heightfield)
- * - "shape_scale_d"  			|single|"1.0" (heightfield)
- * - "ccd_motion_threshold"  	|single|no default
- * - "ccd_swept_sphere_radius" 	|single|no default
+ * \note parts inside [] are optional.\n
  */
 class SoftBody: public Component
 {

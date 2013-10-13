@@ -52,9 +52,9 @@ class NavMeshTemplate;
  * the scaled owner object node path.
  *
  * XML Param(s):
- * - "navmesh_type"					|single|"solo" (solo|tile|obstacle)
+ * - "navmesh_type"					|single|"solo" (values: solo|tile|obstacle)
  * - "auto_setup"					|single|"true"
- * - "mov_type"						|single|"recast" (recast|kinematic|character)
+ * - "mov_type"						|single|"recast" (values: recast|kinematic|character)
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
  * - "agent_height"					|single|"2.0"
@@ -73,14 +73,18 @@ class NavMeshTemplate;
  * - "max_tiles"					|single|"128"
  * - "max_polys_per_tile"			|single|"32768"
  * - "tile_size"					|single|"32"
- * - "area_flags_cost"				|multiple|no default (each specified as
- * "area@flag1|flag2...|flagN@cost")
- * - "crowd_include_flags"			|single|no default (specified as "flag1|flag2...|flagN")
- * - "crowd_exclude_flags"			|single|no default (specified as "flag1|flag2...|flagN")
- * - "convex_volume"				|multiple|no default (each specified as
- * 	"x1,y1,z1&x2,y2,z2...&xN,yN,zN@area_type")
- * - "offmesh_connection"			|multiple|no default (each specified as
+ * - "area_flags_cost"				|multiple|no default (each one specified as
+ * "area@flag1[|flag2...|flagN]@cost")
+ * - "crowd_include_flags"			|single|no default (specified as
+ * "flag1[|flag2...|flagN]")
+ * - "crowd_exclude_flags"			|single|no default (specified as
+ * "flag1[|flag2...|flagN]")
+ * - "convex_volume"				|multiple|no default (each one specified as
+ * 	"x1,y1,z1[&x2,y2,z2...&xN,yN,zN]@area_type")
+ * - "offmesh_connection"			|multiple|no default (each one specified as
  * 	"xB,yB,zB&xE,yE,zE@bidirectional")
+ *
+ * \note parts inside [] are optional.\n
  */
 class NavMesh: public Component
 {

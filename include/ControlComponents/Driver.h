@@ -89,6 +89,8 @@ class DriverTemplate;
  * - "fast_factor"  			|single|"5.0"
  * - "sens_x"  					|single|"0.2"
  * - "sens_y"  					|single|"0.2"
+ *
+ * \note parts inside [] are optional.\n
  */
 class Driver: public Component
 {

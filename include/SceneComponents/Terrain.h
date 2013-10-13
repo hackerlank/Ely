@@ -54,6 +54,8 @@ class GeoMipTerrainRef;
  * - "texture_file"				|single|no default
  * - "texture_uscale"			|single|"1.0"
  * - "texture_vscale"			|single|"1.0"
+ *
+ * \note parts inside [] are optional.\n
  */
 class Terrain: public Component
 {

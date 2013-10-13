@@ -38,6 +38,8 @@ class NodePathWrapperTemplate;
  *
  * XML Param(s):
  * - "nodepath"  		|single|no default
+ *
+ * \note parts inside [] are optional.\n
  */
 class NodePathWrapper: public Component
 {

@@ -48,11 +48,11 @@ class CharacterControllerTemplate;
  * - "step_height"  			|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
- * - "shape_size"  				|single|"medium"  (min, medium, max)
+ * - "shape_size"  				|single|"medium"  (values min|medium|max)
  * - "use_shape_of"				|single|no default
  * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)
  * - "shape_height"  			|single|no default (for cylinder,capsule,cone)
- * - "shape_up"  				|single|"z" ((x,y,z) for cylinder,capsule,cone)
+ * - "shape_up"  				|single|"z" (values: x|y|z for cylinder,capsule,cone)
  * - "shape_half_x"  			|single|no default (for box)
  * - "shape_half_y"  			|single|no default (for box)
  * - "shape_half_z"  			|single|no default (for box)

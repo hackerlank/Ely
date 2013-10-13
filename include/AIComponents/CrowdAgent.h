@@ -72,8 +72,10 @@ enum AgentMovTypeEnum
  * - "path_optimization_range"			|single|"30.0" (* NavMesh::agent_radius)
  * - "separation_weight" 				|single|"2.0"
  * - "update_flags"						|single|"0x1b"
- * - "obstacle_avoidance_type"			|single|"3" (0,1,2,3)
+ * - "obstacle_avoidance_type"			|single|"3" (values: 0|1|2|3)
  * - "ray_mask"							|single|"all_on"
+ *
+ * \note parts inside [] are optional.\n
  */
 class CrowdAgent: public Component
 {

@@ -51,24 +51,28 @@ class VehicleTemplate;
  * XML Param(s):
  * - "throw_events"					|single|"false"
  * - "up_axis"						|single|"z" (x,y,z)
- * - "wheels_number"  				|single|"4" (N)
+ * - "wheels_number"  				|single|"4" (== N)
  * - "wheel_object_template"		|single|no default
- * - "wheel_model"  				|single|no default ("model1,...,modelN")
- * - "wheel_scale"  				|single|"1.0" ("scale1,...,scaleN")
- * - "wheel_is_front"				|single|"false" ("bool1,...,boolN")
- * - "wheel_set_steering"			|single|"false" ("bool1,...,boolN")
- * - "wheel_apply_engine_force"		|single|"false" ("bool1,...,boolN")
- * - "wheel_set_brake"				|single|"false" ("bool1,...,boolN")
- * - "wheel_connection_point_ratio"	|single|"1.0,1.0,1.0" ("rx1,ry1,rz1$...$rxN,ryN,rzN")
+ * - "wheel_model"  				|single|no default (specified as
+ * "model1[,...,modelN]")
+ * - "wheel_scale"  				|single|"1.0" (specified as "scale1[,...,scaleN]")
+ * - "wheel_is_front"				|single|"false" (specified as "bool1[,...,boolN]")
+ * - "wheel_set_steering"			|single|"false" (specified as "bool1[,...,boolN]")
+ * - "wheel_apply_engine_force"		|single|"false" (specified as "bool1[,...,boolN]")
+ * - "wheel_set_brake"				|single|"false" (specified as "bool1[,...,boolN]")
+ * - "wheel_connection_point_ratio"	|single|"1.0,1.0,1.0" (specified as
+ * "rx1,ry1,rz1[$...$rxN,ryN,rzN]")
  * (pointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
- * - "wheel_axle"					|single|"1.0,0.0,0.0" ("ax1,ay1,az1$...$axN,ayN,azN")
- * - "wheel_direction"				|single|"0.0,0.0,-1.0" ("dx1,dy1,dz1$...$dxN,dyN,dzN")
- * - "wheel_suspension_travel"		|single|"40.0" ("st1,...,stN")
- * - "wheel_suspension_stiffness"	|single|"40.0" ("ss1,...,ssN")
- * - "wheel_damping_relaxation"		|single|"2.0"  ("dr1,...,drN")
- * - "wheel_damping_compression"	|single|"4.0"  ("dc1,...,dcN")
- * - "wheel_friction_slip"			|single|"100.0"  ("fs1,...,fsN")
- * - "wheel_roll_influence"			|single|"0.1"  ("ri1,...,riN")
+ * - "wheel_axle"					|single|"1.0,0.0,0.0" (specified as
+ * "ax1,ay1,az1[$...$axN,ayN,azN]")
+ * - "wheel_direction"				|single|"0.0,0.0,-1.0" (specified as
+ * "dx1,dy1,dz1[$...$dxN,dyN,dzN]")
+ * - "wheel_suspension_travel"		|single|"40.0" (specified as "st1[,...,stN]")
+ * - "wheel_suspension_stiffness"	|single|"40.0" (specified as "ss1[,...,ssN]")
+ * - "wheel_damping_relaxation"		|single|"2.0"  (specified as "dr1[,...,drN]")
+ * - "wheel_damping_compression"	|single|"4.0"  (specified as "dc1[,...,dcN]")
+ * - "wheel_friction_slip"			|single|"100.0"  (specified as "fs1[,...,fsN]")
+ * - "wheel_roll_influence"			|single|"0.1"  (specified as "ri1[,...,riN]")
  * - "max_engine_force"				|single|no default
  * - "max_brake"					|single|no default
  * - "steering_clamp"				|single|"45.0" (in degree)
@@ -79,6 +83,8 @@ class VehicleTemplate;
  * - "brake"  						|single|"enabled"
  * - "turn_left"					|single|"enabled"
  * - "turn_right"  					|single|"enabled"
+ *
+ * \note parts inside [] are optional.\n
  */
 class Vehicle: public Component
 {

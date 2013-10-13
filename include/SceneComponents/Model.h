@@ -50,13 +50,16 @@ class ModelTemplate;
  * - "from_file"  			|single|"true"
  * - "scale"  				|single|"1.0,1.0,1.0"
  * - "model_file"  			|single|no default (can have this form: [anim_name1@
- * anim_name2@...@anim_nameN@]model_filename ([] means optional))
- * - "anim_files"  			|multiple|no default (each specified as "anim_name@anim_file")
+ * anim_name2@...@anim_nameN@]model_filename)
+ * - "anim_files"  			|multiple|no default (each one specified as
+ * "anim_name1@anim_file1[:anim_name2@anim_file2:...:anim_nameN@anim_fileN]"])
  * - "model_type"  			|single|no default
  * - "model_card_left"  	|single|no default
  * - "model_card_right"  	|single|no default
  * - "model_card_bottom"  	|single|no default
  * - "model_card_top"  		|single|no default
+ *
+ * \note parts inside [] are optional.\n
  */
 class Model: public Component
 {
