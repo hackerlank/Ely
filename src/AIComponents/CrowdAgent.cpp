@@ -84,26 +84,34 @@ bool CrowdAgent::initialize()
 	//set CrowdAgent parameters
 	//register to navmesh objectId
 	mNavMeshObjectId = ObjectId(mTmpl->parameter(std::string("add_to_navmesh")));
-	//move target (default: (0,0,0))
-	std::vector<std::string> targetStr = parseCompoundString(
-			mTmpl->parameter(std::string("move_target")), ',');
-	float target[3];
-	target[0] = target[1] = target[2] = 0.0;
-	for (unsigned int i = 0; (i < 3) and (i < targetStr.size()); ++i)
+	//
+	std::string param;
+	unsigned int idx, valueNum;
+	std::vector<std::string> paramValuesStr;
+	//move target
+	param = mTmpl->parameter(std::string("move_target"));
+	paramValuesStr = parseCompoundString(param , ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
 	{
-		target[i] = strtof(targetStr[i].c_str(), NULL);
+		paramValuesStr.resize(3, "0.0");
 	}
-	mMoveTarget = LPoint3f(target[0], target[1], target[2]);
-	//move velocity (default: (0,0,0))
-	std::vector<std::string> velocityStr = parseCompoundString(
-			mTmpl->parameter(std::string("move_velocity")), ',');
-	float velocity[3];
-	velocity[0] = velocity[1] = velocity[2] = 0.0;
-	for (unsigned int i = 0; (i < 3) and (i < velocityStr.size()); ++i)
+	for (idx = 0; idx < 3; ++idx)
 	{
-		velocity[i] = strtof(velocityStr[i].c_str(), NULL);
+		mMoveTarget[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
-	mMoveVelocity = LVector3f(velocity[0], velocity[1], velocity[2]);
+	//move velocity
+	param = mTmpl->parameter(std::string("move_velocity"));
+	paramValuesStr = parseCompoundString(param , ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
+	{
+		paramValuesStr.resize(3, "0.0");
+	}
+	for (idx = 0; idx < 3; ++idx)
+	{
+		mMoveVelocity[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+	}
 	//agent params
 	mAgentParams.maxAcceleration = strtof(
 			mTmpl->parameter(std::string("max_acceleration")).c_str(), NULL);

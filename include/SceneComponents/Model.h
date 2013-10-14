@@ -48,15 +48,22 @@ class ModelTemplate;
  *
  * XML Param(s):
  * - "from_file"  			|single|"true"
- * - "scale"  				|single|"1.0,1.0,1.0" (specified
+ * - "scale"  				|single|"1.0" (specified
  * as "scalex[,scaley,scalez]")
  * - "model_file"  			|single|no default (can have this form: [anim_name1@
  * anim_name2@...@anim_nameN@]model_filename)
  * - "anim_files"  			|multiple|no default (each one specified as
  * "anim_name1@anim_file1[:anim_name2@anim_file2:...:anim_nameN@anim_fileN]"])
- * - "model_type"  			|single|no default (card)
+ * - "model_type"  			|single|no default (card,rope)
  * - "card_points"  		|single|"-1.0,1.0,-1.0,1.0" (specified
- * as "left[,right,bottom,top]")
+ * as "left,right,bottom,top")
+ * - "rope_render_mode"  	|single|"tube"
+ * - "rope_normal_mode"  	|single|"none"
+ * - "rope_uv_mode"  		|single|"parametric"
+ * - "rope_num_subdiv"  	|single|"4"
+ * - "rope_num_slices"  	|single|"8"
+ * - "rope_thickness"  		|single|"0.4"
+ * - "rope_uv_scale"  		|single|"1.0"
  *
  * \note parts inside [] are optional.\n
  */

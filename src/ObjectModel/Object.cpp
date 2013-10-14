@@ -119,26 +119,38 @@ void Object::onAddToSceneSetup()
 		mNodePath.reparent_to(createdObject->getNodePath());
 	}
 
-	//Position (default: (0,0,0))
-	std::vector<std::string> posStr = parseCompoundString(
-			mTmpl->parameter(std::string("pos")), ',');
-	float pos[3];
-	pos[0] = pos[1] = pos[2] = 0.0;
-	for (unsigned int i = 0; (i < 3) and (i < posStr.size()); ++i)
+	//
+	std::string param;
+	unsigned int idx, valueNum;
+	std::vector<std::string> paramValuesStr;
+	//position
+	param = mTmpl->parameter(std::string("pos"));
+	paramValuesStr = parseCompoundString(param , ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
 	{
-		pos[i] = strtof(posStr[i].c_str(), NULL);
+		paramValuesStr.resize(3, "0.0");
 	}
-	mNodePath.set_pos(pos[0], pos[1], pos[2]);
-	//Rotation (default: (0,0,0))
-	std::vector<std::string> rotStr = parseCompoundString(
-			mTmpl->parameter(std::string("rot")), ',');
-	float rot[3];
-	rot[0] = rot[1] = rot[2] = 0.0;
-	for (unsigned int i = 0; (i < 3) and (i < rotStr.size()); ++i)
+	LPoint3f pos;
+	for (idx = 0; idx < 3; ++idx)
 	{
-		rot[i] = strtof(rotStr[i].c_str(), NULL);
+		pos[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
-	mNodePath.set_hpr(rot[0], rot[1], rot[2]);
+	mNodePath.set_pos(pos);
+	//rotation
+	param = mTmpl->parameter(std::string("rot"));
+	paramValuesStr = parseCompoundString(param , ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
+	{
+		paramValuesStr.resize(3, "0.0");
+	}
+	LVecBase3f rot;
+	for (idx = 0; idx < 3; ++idx)
+	{
+		rot[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+	}
+	mNodePath.set_hpr(rot);
 
 	///set initialization function (if any)
 	//get initialization function name

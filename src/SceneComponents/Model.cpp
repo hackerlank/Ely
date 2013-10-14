@@ -130,11 +130,7 @@ bool Model::initialize()
 	param = mTmpl->parameter(std::string("card_points"));
 	paramValuesStr = parseCompoundString(param , ',');
 	valueNum = paramValuesStr.size();
-	if ((valueNum > 0) and (valueNum < 4))
-	{
-		paramValuesStr.resize(4, paramValuesStr[0]);
-	}
-	else if (valueNum < 4)
+	if (valueNum < 4)
 	{
 		paramValuesStr.resize(4, "0.0");
 	}
@@ -317,17 +313,19 @@ void Model::onAddToObjectSetup()
 		//card (e.g. finite plane)
 		if (mModelTypeParam == std::string("card"))
 		{
-			if ((mCardRight - mCardLeft) * (mCardTop - mCardBottom) == 0.0)
+			if ((mCardPoints[1] - mCardPoints[0])
+					* (mCardPoints[3] - mCardPoints[2]) == 0.0)
 			{
-				mCardLeft = -1.0;
-				mCardRight = 1.0;
-				mCardBottom = -1.0;
-				mCardTop = 1.0;
+				mCardPoints[0] = -1.0;
+				mCardPoints[1] = 1.0;
+				mCardPoints[2] = -1.0;
+				mCardPoints[3] = 1.0;
 			}
 			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 			std::string name = COMPONENT_STANDARD_NAME;
 			CardMaker card("card" + name);
-			card.set_frame(mCardLeft, mCardRight, mCardBottom, mCardTop);
+			card.set_frame(mCardPoints[0], mCardPoints[1], mCardPoints[2],
+					mCardPoints[3]);
 			mNodePath = NodePath(card.generate());
 		}
 		else

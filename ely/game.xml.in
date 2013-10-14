@@ -606,10 +606,7 @@
 			<Component type="Model">
 				<Param from_file="false"/>
 				<Param model_type="card"/>
-				<Param model_card_left="-1000.0"/>
-				<Param model_card_right="1000.0"/>
-				<Param model_card_bottom="-1000.0"/>
-				<Param model_card_top="1000.0"/>
+				<Param card_points="-1000.0,1000.0,-1000.0,1000.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
