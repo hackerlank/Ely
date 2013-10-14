@@ -101,9 +101,8 @@ bool Vehicle::initialize()
 	}
 	//
 	std::string param;
-	unsigned int idx;
+	unsigned int idx, valueNum;
 	std::vector<std::string> paramValuesStr;
-	unsigned int valueNum;
 	//wheels' model params
 	param = mTmpl->parameter(std::string("wheel_model"));
 	paramValuesStr = parseCompoundString(param, ',');

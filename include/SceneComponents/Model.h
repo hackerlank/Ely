@@ -48,16 +48,15 @@ class ModelTemplate;
  *
  * XML Param(s):
  * - "from_file"  			|single|"true"
- * - "scale"  				|single|"1.0,1.0,1.0"
+ * - "scale"  				|single|"1.0,1.0,1.0" (specified
+ * as "scalex[,scaley,scalez]")
  * - "model_file"  			|single|no default (can have this form: [anim_name1@
  * anim_name2@...@anim_nameN@]model_filename)
  * - "anim_files"  			|multiple|no default (each one specified as
  * "anim_name1@anim_file1[:anim_name2@anim_file2:...:anim_nameN@anim_fileN]"])
- * - "model_type"  			|single|no default
- * - "model_card_left"  	|single|no default
- * - "model_card_right"  	|single|no default
- * - "model_card_bottom"  	|single|no default
- * - "model_card_top"  		|single|no default
+ * - "model_type"  			|single|no default (card)
+ * - "card_points"  		|single|"-1.0,1.0,-1.0,1.0" (specified
+ * as "left[,right,bottom,top]")
  *
  * \note parts inside [] are optional.\n
  */
@@ -125,7 +124,7 @@ private:
 	///Type of model procedurally generated.
 	std::string mModelTypeParam;
 	///Card parameters.
-	float mCardLeft, mCardRight, mCardBottom, mCardTop;
+	std::vector<float> mCardPoints;
 	///@}
 
 	/**
@@ -190,7 +189,7 @@ inline void Model::reset()
 	mAnimFileListParam.clear();
 	mScale[0] = mScale[1] = mScale[2] = 1.0;
 	mModelTypeParam.clear();
-	mCardLeft = mCardRight = mCardBottom = mCardTop = 0.0;
+	mCardPoints.clear();
 	mAnimations.clear_anims();
 	mFirstPartBundle.clear();
 }

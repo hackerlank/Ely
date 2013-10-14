@@ -78,6 +78,7 @@ void ModelTemplate::setParametersDefaults()
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("from_file", "true"));
 	mParameterTable.insert(ParameterNameValue("scale", "1.0,1.0,1.0"));
+	mParameterTable.insert(ParameterNameValue("card_points", "-1.0,1.0,-1.0,1.0"));
 }
 
 //TypedObject semantics: hardcoded

@@ -8,8 +8,10 @@
 #ifndef SOFTBODY_H_
 #define SOFTBODY_H_
 
+#include <bulletRigidBodyNode.h>
 #include <bulletSoftBodyNode.h>
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
 
 namespace ely
 {
@@ -41,16 +43,13 @@ class SoftBodyTemplate;
  * - "water_offset"  			|single|"0.0"
  * - "anchor_objects"			|multiple|no default (each one specified as
  * "objectId1[:objectId2:...:objectIdN]")
- * - "point_1"  				|single|no default (for rope,patch,ellipsoid)
- * - "point_2"  				|single|no default (for rope,patch)
- * - "point_3"  				|single|no default (for patch)
- * - "point_4"  				|single|no default (for patch)
- * - "res_1"  					|single|no default (for rope,patch)
- * - "res_2"  					|single|no default (for patch)
+ * - "points"  					|single|no default (for rope,patch,ellipsoid
+ * specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
+ * - "resolutions"  			|single|no default (for rope,patch specified
+ * as "resolution1[:resolution2]")
  * - "fixeds"  					|single|no default (for rope,patch)
- * - "num_thickness"  			|single|"0.4" (for rope)
+ * - "thickness"  				|single|"0.4" (for rope)
  * - "num_slices"  				|single|"8" (for rope)
- * - "num_subdiv"  				|single|"4" (for rope)
  * - "num_subdiv"  				|single|"4" (for rope)
  * - "texture_file"				|single|no default
  *
@@ -111,71 +110,23 @@ private:
 	NodePath mNodePath;
 	///The underlying BulletSoftBodyNode (read-only after creation & before destruction).
 	SMARTPTR(BulletSoftBodyNode) mSoftBodyNode;
+
 	///@{
 	///Physical parameters.
-	float mBodyTotalMass, mBodyFriction, mBodyRestitution;
 	BodyType mBodyType;
-	GamePhysicsManager::ShapeType mShapeType;
-	GamePhysicsManager::ShapeSize mShapeSize;
+	float mBodyTotalMass, air_density, water_density, water_offset;
+	LVector3f water_normal;
 	BitMask32 mCollideMask;
-	//ccd stuff
-	float mCcdMotionThreshold, mCcdSweptSphereRadius;
-	bool mCcdEnabled;
-
- * - "body_total_mass"  		|single|"1.0"
- * - "collide_mask"  			|single|"all_on"
- * - "air_density"  			|single|"1.2"
- * - "water_density"  			|single|"0.0"
- * - "water_normal"  			|single|"0.0,0.0,0.0"
- * - "water_offset"  			|single|"0.0"
- * - "anchor_objects"			|multiple|no default (each one specified as
- * "objectId1[:objectId2:...:objectIdN]")
- * - "point_1"  				|single|no default (for rope,patch,ellipsoid)
- * - "point_2"  				|single|no default (for rope,patch)
- * - "point_3"  				|single|no default (for patch)
- * - "point_4"  				|single|no default (for patch)
- * - "res_1"  					|single|no default (for rope,patch)
- * - "res_2"  					|single|no default (for patch)
- * - "fixeds"  					|single|no default (for rope,patch)
- * - "num_thickness"  			|single|"0.4" (for rope)
- * - "num_slices"  				|single|"8" (for rope)
- * - "num_subdiv"  				|single|"4" (for rope)
- * - "num_subdiv"  				|single|"4" (for rope)
- * - "texture_file"				|single|no default
-
-	/**
-	 * \brief Sets physical parameters of a bullet soft body node (helper function).
-	 */
-	void doSetPhysicalParameters();
 	///@}
 
-	/**
-	 * \brief Sets body type.
-	 * @param bodyType The body type.
-	 */
-	void doSwitchBodyType(BodyType bodyType);
-
-	///Geometric functions and parameters.
 	///@{
-	/**
-	 * \brief Create a shape given its type.
-	 * @param shapeType The shape type.
-	 * @return The created shape.
-	 */
-	SMARTPTR(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
-	LVector3 mModelDims;
-	float mModelRadius;
-	//use shape of (another object).
-	ObjectId mUseShapeOfId;
-	//any model has a local frame and the tight bounding box is computed
-	//wrt it; so mModelDeltaCenter represents a transform (translation) to
-	//be applied to the model node path so that the middle point of the
-	//bounding box will overlap the frame center of the parent's node path .
-	LVector3 mModelDeltaCenter;
-	bool mAutomaticShaping;
-	float mDim1, mDim2, mDim3, mDim4;
-	Filename mHeightfieldFile;
-	BulletUpAxis mUpAxis;
+	///Geometric and structural parameters.
+	std::vector<ObjectId> anchor_objects;
+	std::vector<LPoint3f> points;
+	std::vector<int> resolutions;
+	int fixeds, num_slices, num_subdiv;
+	float thickness;
+	SMARTPTR(Texture)mTextureImage;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -211,21 +162,16 @@ inline void SoftBody::reset()
 	//
 	mNodePath = NodePath();
 	mSoftBodyNode.clear();
-	mBodyTotalMass = mBodyFriction = mBodyRestitution = 0.0;
 	mBodyType = ROPE;
-	mShapeType = GamePhysicsManager::SPHERE;
-	mShapeSize = GamePhysicsManager::MEDIUM;
+	mBodyTotalMass = air_density = water_density = water_offset = 0.0;
+	water_normal = LVector3::zero();
 	mCollideMask = BitMask32::all_off();
-	mCcdMotionThreshold = mCcdSweptSphereRadius = 0.0;
-	mCcdEnabled = false;
-	mModelDims = LVector3::zero();
-	mModelRadius = 0.0;
-	mUseShapeOfId = ObjectId();
-	mModelDeltaCenter = LVector3::zero();
-	mAutomaticShaping = false;
-	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
-	mHeightfieldFile = Filename();
-	mUpAxis = Z_up;
+	anchor_objects.clear();
+	points.clear();
+	resolutions.clear();
+	fixeds = num_slices = num_subdiv = 0;
+	thickness = 0.0;
+	mTextureImage.clear();
 }
 
 inline void SoftBody::onRemoveFromSceneCleanup()

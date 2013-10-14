@@ -106,30 +106,41 @@ bool Model::initialize()
 	mAnimFileListParam = mTmpl->parameterList(std::string("anim_files"));
 	//model if procedurally generated
 	mModelTypeParam = mTmpl->parameter(std::string("model_type"));
-	//card parameters
-	mCardLeft = strtof(
-			mTmpl->parameter(std::string("model_card_left")).c_str(), NULL);
-	mCardRight = strtof(
-			mTmpl->parameter(std::string("model_card_right")).c_str(), NULL);
-	mCardBottom = strtof(
-			mTmpl->parameter(std::string("model_card_bottom")).c_str(), NULL);
-	mCardTop = strtof(
-			mTmpl->parameter(std::string("model_card_top")).c_str(), NULL);
+	//
+	std::string param;
+	unsigned int idx, valueNum;
+	std::vector<std::string> paramValuesStr;
 	//scaling
-	std::vector<std::string> scaleStr = parseCompoundString(
-			mTmpl->parameter(std::string("scale")), ',');
-	unsigned int valueNum = scaleStr.size();
+	param = mTmpl->parameter(std::string("scale"));
+	paramValuesStr = parseCompoundString(param , ',');
+	valueNum = paramValuesStr.size();
 	if ((valueNum > 0) and (valueNum < 3))
 	{
-		scaleStr.resize(3, scaleStr[0]);
+		paramValuesStr.resize(3, paramValuesStr[0]);
 	}
 	else if (valueNum < 3)
 	{
-		scaleStr.resize(3, "1.0");
+		paramValuesStr.resize(3, "1.0");
 	}
-	for (unsigned int i = 0; i < 3; ++i)
+	for (idx = 0; idx < 3; ++idx)
 	{
-		mScale[i] = strtof(scaleStr[i].c_str(), NULL);
+		mScale[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+	}
+	//card parameters
+	param = mTmpl->parameter(std::string("card_points"));
+	paramValuesStr = parseCompoundString(param , ',');
+	valueNum = paramValuesStr.size();
+	if ((valueNum > 0) and (valueNum < 4))
+	{
+		paramValuesStr.resize(4, paramValuesStr[0]);
+	}
+	else if (valueNum < 4)
+	{
+		paramValuesStr.resize(4, "0.0");
+	}
+	for (idx = 0; idx < 4; ++idx)
+	{
+		mCardPoints.push_back(strtof(paramValuesStr[idx].c_str(), NULL));
 	}
 	//
 	return result;
