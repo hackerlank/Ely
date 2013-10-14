@@ -79,6 +79,10 @@ void ModelTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("from_file", "true"));
 	mParameterTable.insert(ParameterNameValue("scale", "1.0"));
 	mParameterTable.insert(ParameterNameValue("card_points", "-1.0,1.0,-1.0,1.0"));
+	mParameterTable.insert(ParameterNameValue("rope_render_mode", "tube"));
+	mParameterTable.insert(ParameterNameValue("rope_num_subdiv", "4"));
+	mParameterTable.insert(ParameterNameValue("rope_num_slices", "8"));
+	mParameterTable.insert(ParameterNameValue("rope_thickness", "0.4"));
 }
 
 //TypedObject semantics: hardcoded

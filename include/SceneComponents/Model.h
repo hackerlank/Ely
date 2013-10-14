@@ -28,6 +28,7 @@
 #include <nodePath.h>
 #include <partBundle.h>
 #include <animControlCollection.h>
+#include <ropeNode.h>
 #include "ObjectModel/Component.h"
 
 namespace ely
@@ -48,22 +49,20 @@ class ModelTemplate;
  *
  * XML Param(s):
  * - "from_file"  			|single|"true"
- * - "scale"  				|single|"1.0" (specified
- * as "scalex[,scaley,scalez]")
+ * - "scale"  				|single|"1.0" (specified as "scaleX[,scaleY,scaleZ]")
  * - "model_file"  			|single|no default (can have this form: [anim_name1@
  * anim_name2@...@anim_nameN@]model_filename)
  * - "anim_files"  			|multiple|no default (each one specified as
  * "anim_name1@anim_file1[:anim_name2@anim_file2:...:anim_nameN@anim_fileN]"])
- * - "model_type"  			|single|no default (card,rope)
- * - "card_points"  		|single|"-1.0,1.0,-1.0,1.0" (specified
- * as "left,right,bottom,top")
+ * - "model_type"  			|single|no default (values: card|rope_node|sheet_node|geom_node)
+ * - "card_points"  		|single|"-1.0,1.0,-1.0,1.0" (specified as
+ * "left,right,bottom,top")
  * - "rope_render_mode"  	|single|"tube"
- * - "rope_normal_mode"  	|single|"none"
- * - "rope_uv_mode"  		|single|"parametric"
  * - "rope_num_subdiv"  	|single|"4"
  * - "rope_num_slices"  	|single|"8"
  * - "rope_thickness"  		|single|"0.4"
- * - "rope_uv_scale"  		|single|"1.0"
+ * - "sheet_num_u_subdiv"  	|single|"2"
+ * - "sheet_num_v_subdiv"  	|single|"2"
  *
  * \note parts inside [] are optional.\n
  */
@@ -126,12 +125,18 @@ private:
 	NodePath mOldObjectNodePath;
 	///Animations.
 	std::list<std::string> mAnimFileListParam;
-	///Scaling  (default: (1.0,1.0,1.0)).
-	float mScale[3];
+	///Scaling.
+	LVecBase3f mScale;
 	///Type of model procedurally generated.
 	std::string mModelTypeParam;
 	///Card parameters.
 	std::vector<float> mCardPoints;
+	///Rope parameters.
+	RopeNode::RenderMode mRopeRenderMode;
+	int mRopeNumSubdiv, mRopeNumSlices;
+	float mRopeThickness;
+	///Sheet parameters.
+	int mSheetNumUSubdiv, mSheetNumVSubdiv;
 	///@}
 
 	/**
@@ -194,9 +199,13 @@ inline void Model::reset()
 	mModelNameParam.clear();
 	mOldObjectNodePath = NodePath();
 	mAnimFileListParam.clear();
-	mScale[0] = mScale[1] = mScale[2] = 1.0;
+	mScale = LVecBase3f::zero();
 	mModelTypeParam.clear();
 	mCardPoints.clear();
+	mRopeRenderMode = RopeNode::RM_tube;
+	mRopeNumSubdiv = mRopeNumSlices = 0;
+	mSheetNumUSubdiv = mSheetNumVSubdiv = 0;
+	mRopeThickness = 0.0;
 	mAnimations.clear_anims();
 	mFirstPartBundle.clear();
 }

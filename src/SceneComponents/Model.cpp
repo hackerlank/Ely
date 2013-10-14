@@ -28,6 +28,8 @@
 #include <animBundleNode.h>
 #include <partBundleNode.h>
 #include <cardMaker.h>
+#include <sheetNode.h>
+#include <geomNode.h>
 
 namespace ely
 {
@@ -96,7 +98,7 @@ void Model::do_r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& part
 bool Model::initialize()
 {
 	bool result = true;
-	//check if from file
+	//check if model is from file
 	mFromFile = (
 			mTmpl->parameter(std::string("from_file")) == std::string("false") ?
 					false : true);
@@ -104,7 +106,7 @@ bool Model::initialize()
 	mModelNameParam = mTmpl->parameter(std::string("model_file"));
 	//more animations
 	mAnimFileListParam = mTmpl->parameterList(std::string("anim_files"));
-	//model if procedurally generated
+	//model only when is procedurally generated (i.e. not from file)
 	mModelTypeParam = mTmpl->parameter(std::string("model_type"));
 	//
 	std::string param;
@@ -138,6 +140,59 @@ bool Model::initialize()
 	{
 		mCardPoints.push_back(strtof(paramValuesStr[idx].c_str(), NULL));
 	}
+	//rope parameters
+	param = mTmpl->parameter(std::string("rope_render_mode"));
+	if (param == std::string("thread"))
+	{
+		mRopeRenderMode = RopeNode::RM_thread;
+	}
+	else if (param == std::string("tape"))
+	{
+		mRopeRenderMode = RopeNode::RM_tape;
+	}
+	else if (param == std::string("billboard"))
+	{
+		mRopeRenderMode = RopeNode::RM_billboard;
+	}
+	else
+	{
+		mRopeRenderMode = RopeNode::RM_tube;
+	}
+	//
+	mRopeNumSubdiv = strtol(
+			mTmpl->parameter(std::string("rope_num_subdiv")).c_str(), NULL, 0);
+	if (mRopeNumSubdiv <= 0)
+	{
+		mRopeNumSubdiv = 4;
+	}
+	//
+	mRopeNumSlices = strtol(
+			mTmpl->parameter(std::string("rope_num_slices")).c_str(), NULL, 0);
+	if (mRopeNumSlices <= 0)
+	{
+		mRopeNumSlices = 8;
+	}
+	//
+	mRopeThickness = strtof(
+			mTmpl->parameter(std::string("rope_thickness")).c_str(), NULL);
+	if (mRopeThickness <= 0.0)
+	{
+		mRopeThickness = 0.4;
+	}
+	//sheet parameters
+	mSheetNumUSubdiv = strtol(
+			mTmpl->parameter(std::string("sheet_num_u_subdiv")).c_str(), NULL, 0);
+	if (mSheetNumUSubdiv <= 0)
+	{
+		mSheetNumUSubdiv = 2;
+	}
+	//
+	mSheetNumVSubdiv = strtol(
+			mTmpl->parameter(std::string("sheet_num_v_subdiv")).c_str(), NULL, 0);
+	if (mSheetNumVSubdiv <= 0)
+	{
+		mSheetNumVSubdiv = 2;
+	}
 	//
 	return result;
 }
@@ -147,8 +202,8 @@ void Model::onAddToObjectSetup()
 	//build model
 	if (mFromFile)
 	{
-		PRINT_DEBUG("'" <<getOwnerObject()->objectId()
-				<< "'::'" << mComponentId << "'::onAddToObjectSetup");
+		PRINT_DEBUG(
+				"'" <<getOwnerObject()->objectId() << "'::'" << mComponentId << "'::onAddToObjectSetup");
 		// some declarations
 		Parts parts;
 		Anims anims;
@@ -232,23 +287,22 @@ void Model::onAddToObjectSetup()
 						++j;
 					}
 					PRINT_DEBUG(
-							"\tBinding animation '" << (*animBundlesIter)->get_name() <<
-							"' (from '" << modelFileName << "') with name '" << animName << "'");
+							"\tBinding animation '" << (*animBundlesIter)->get_name() << "' (from '" << modelFileName << "') with name '" << animName << "'");
 					SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
-							PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
+									PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
 					mAnimations.store_anim(control, animName);
 				}
 			}
 
 			//setup more animations (if any)
 			std::list<std::string>::iterator iter;
-			for (iter = mAnimFileListParam.begin(); iter != mAnimFileListParam.end();
-					++iter)
+			for (iter = mAnimFileListParam.begin();
+					iter != mAnimFileListParam.end(); ++iter)
 			{
 				//any "anim_files" string is a "compound" one, i.e. could have the form:
 				// "anim_name1@anim_file1:anim_name2@anim_file2:...:anim_nameN@anim_fileN"
-				std::vector<std::string> nameFilePairs = parseCompoundString(*iter,
-						':');
+				std::vector<std::string> nameFilePairs = parseCompoundString(
+						*iter, ':');
 				std::vector<std::string>::const_iterator iterPair;
 				for (iterPair = nameFilePairs.begin();
 						iterPair != nameFilePairs.end(); ++iterPair)
@@ -267,8 +321,10 @@ void Model::onAddToObjectSetup()
 							//anim name == nameFilePair[0]
 							//anim file name == nameFilePair[1]
 							//get the AnimBundle node path
-							NodePath animNP = mTmpl->windowFramework()->load_model(
-									mNodePath, Filename(nameFilePair[1]));
+							NodePath animNP =
+									mTmpl->windowFramework()->load_model(
+											mNodePath,
+											Filename(nameFilePair[1]));
 							if (animNP.is_empty())
 							{
 								animNP = NodePath();
@@ -281,7 +337,8 @@ void Model::onAddToObjectSetup()
 								int j;
 								for (j = 0, animBundlesIter =
 										animsIter->second.begin();
-										animBundlesIter != animsIter->second.end();
+										animBundlesIter
+												!= animsIter->second.end();
 										++animBundlesIter, ++j)
 								{
 									if (j > 0)
@@ -294,10 +351,9 @@ void Model::onAddToObjectSetup()
 										animName = nameFilePair[0];
 									}
 									PRINT_DEBUG(
-											"\tBinding animation '" << (*animBundlesIter)->get_name() <<
-											"' (from '" << nameFilePair[1] << "') with name '" << animName << "'");
+											"\tBinding animation '" << (*animBundlesIter)->get_name() << "' (from '" << nameFilePair[1] << "') with name '" << animName << "'");
 									SMARTPTR(AnimControl)control = (mFirstPartBundle->bind_anim(*animBundlesIter,
-											PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
+													PartGroup::HMF_ok_wrong_root_name|PartGroup::HMF_ok_part_extra|PartGroup::HMF_ok_anim_extra)).p();
 									mAnimations.store_anim(control, animName);
 								}
 							}
@@ -310,9 +366,9 @@ void Model::onAddToObjectSetup()
 	else
 	{
 		//model is programmatically generated
-		//card (e.g. finite plane)
 		if (mModelTypeParam == std::string("card"))
 		{
+			//card (e.g. finite plane)
 			if ((mCardPoints[1] - mCardPoints[0])
 					* (mCardPoints[3] - mCardPoints[2]) == 0.0)
 			{
@@ -322,22 +378,48 @@ void Model::onAddToObjectSetup()
 				mCardPoints[3] = 1.0;
 			}
 			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
-			std::string name = COMPONENT_STANDARD_NAME;
-			CardMaker card("card" + name);
+			CardMaker card(COMPONENT_STANDARD_NAME+ "_card");
 			card.set_frame(mCardPoints[0], mCardPoints[1], mCardPoints[2],
 					mCardPoints[3]);
 			mNodePath = NodePath(card.generate());
 		}
+		else if (mModelTypeParam == std::string("rope_node"))
+		{
+			//rope_node: this is a RopeNode to which NurbsCurveEvaluator should be associated.
+			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+			SMARTPTR(RopeNode)ropeNode = new RopeNode(COMPONENT_STANDARD_NAME + "_rope_node");
+			ropeNode->set_render_mode(mRopeRenderMode);
+			ropeNode->set_num_subdiv(mRopeNumSubdiv);
+			ropeNode->set_num_slices(mRopeNumSlices);
+			ropeNode->set_thickness(mRopeThickness);
+			mNodePath = NodePath(ropeNode);
+		}
+		else if (mModelTypeParam == std::string("sheet_node"))
+		{
+			//rope_node: this is a SheetNode to which NurbsSurfaceEvaluator should be associated.
+			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+			SMARTPTR(SheetNode)sheetNode = new SheetNode(COMPONENT_STANDARD_NAME + "_sheet_node");
+			sheetNode->set_num_u_subdiv(mSheetNumUSubdiv);
+			sheetNode->set_num_v_subdiv(mSheetNumVSubdiv);
+			mNodePath = NodePath(sheetNode);
+		}
+		else if (mModelTypeParam == std::string("geom_node"))
+		{
+			//geom_node: this is a GeomNode to which Geoms should be added.
+			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+			SMARTPTR(GeomNode) geomNode = new GeomNode(COMPONENT_STANDARD_NAME + "_geom_node");
+			mNodePath = NodePath(geomNode);
+		}
 		else
 		{
 			//On error loads our favorite blue triangle.
-			mTmpl->windowFramework()->load_default_model(
+			mNodePath = mTmpl->windowFramework()->load_default_model(
 					mTmpl->pandaFramework()->get_models());
 		}
 	}
 
-	//set scaling (default: (1.0,1.0,1.0))
-	mNodePath.set_scale(mScale[0], mScale[1], mScale[2]);
+	//set scaling
+	mNodePath.set_scale(mScale);
 
 	//Rename the node
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType

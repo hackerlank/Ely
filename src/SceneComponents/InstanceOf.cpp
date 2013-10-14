@@ -95,8 +95,8 @@ void InstanceOf::onAddToObjectSetup()
 	std::string name = COMPONENT_STANDARD_NAME;
 	mNodePath = NodePath(name);
 
-	//set scaling (default: (1.0,1.0,1.0))
-	mNodePath.set_scale(mScale[0], mScale[1], mScale[2]);
+	//set scaling
+	mNodePath.set_scale(mScale);
 
 	//get that object this component is an instance of;
 	//that object is supposed to be already created,

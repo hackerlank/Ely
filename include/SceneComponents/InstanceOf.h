@@ -94,8 +94,8 @@ private:
 	NodePath mOldObjectNodePath;
 	///@}
 
-	///Scaling  (default: (1.0,1.0,1.0)).
-	float mScale[3];
+	///Scaling.
+	LVecBase3f mScale;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -140,7 +140,7 @@ inline void InstanceOf::reset()
 	mInstanceOfId = ObjectId();
 	mInstancedObject.clear();
 	mOldObjectNodePath = NodePath();
-	mScale[0] = mScale[1] = mScale[2] = 1.0;
+	mScale = LVecBase3f::zero();
 }
 
 inline void InstanceOf::onAddToSceneSetup()
