@@ -62,15 +62,14 @@ bool InstanceOf::initialize()
 {
 	bool result = true;
 	//instance of object id
-	mInstanceOfId = ObjectId(
-			mTmpl->parameter(std::string("instance_of")));
+	mInstanceOfId = ObjectId(mTmpl->parameter(std::string("instance_of")));
 	//
 	std::string param;
 	unsigned int idx, valueNum;
 	std::vector<std::string> paramValuesStr;
 	//scaling
 	param = mTmpl->parameter(std::string("scale"));
-	paramValuesStr = parseCompoundString(param , ',');
+	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if ((valueNum > 0) and (valueNum < 3))
 	{
@@ -82,7 +81,8 @@ bool InstanceOf::initialize()
 	}
 	for (idx = 0; idx < 3; ++idx)
 	{
-		mScale[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+		float scaleValue = strtof(paramValuesStr[idx].c_str(), NULL);
+		mScale[idx] = (scaleValue >= 0.0 ? scaleValue : -scaleValue);
 	}
 	//
 	return result;

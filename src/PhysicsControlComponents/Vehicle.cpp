@@ -124,7 +124,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0");
 	}
@@ -137,7 +137,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -154,7 +154,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -171,7 +171,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -188,7 +188,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "false");
 	}
@@ -205,7 +205,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0,1.0,1.0");
 	}
@@ -232,7 +232,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "1.0,0.0,0.0");
 	}
@@ -264,7 +264,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "0.0,0.0,-1.0");
 	}
@@ -296,7 +296,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "40.0");
 	}
@@ -317,7 +317,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "40.0");
 	}
@@ -338,7 +338,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "2.0");
 	}
@@ -359,7 +359,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "4.0");
 	}
@@ -380,7 +380,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "100.0");
 	}
@@ -401,7 +401,7 @@ bool Vehicle::initialize()
 	{
 		paramValuesStr.resize(mWheelNumber, paramValuesStr[0]);
 	}
-	else if (valueNum < mWheelNumber)
+	else if (valueNum == 0)
 	{
 		paramValuesStr.resize(mWheelNumber, "0.1");
 	}

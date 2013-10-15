@@ -106,7 +106,7 @@ bool Model::initialize()
 	mModelNameParam = mTmpl->parameter(std::string("model_file"));
 	//more animations
 	mAnimFileListParam = mTmpl->parameterList(std::string("anim_files"));
-	//model only when is procedurally generated (i.e. not from file)
+	//if model not from file then get which type
 	mModelTypeParam = mTmpl->parameter(std::string("model_type"));
 	//
 	std::string param;
@@ -126,7 +126,8 @@ bool Model::initialize()
 	}
 	for (idx = 0; idx < 3; ++idx)
 	{
-		mScale[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+		float scaleValue = strtof(paramValuesStr[idx].c_str(), NULL);
+		mScale[idx] = (scaleValue >= 0.0 ? scaleValue : -scaleValue);
 	}
 	//card parameters
 	param = mTmpl->parameter(std::string("card_points"));
@@ -385,7 +386,8 @@ void Model::onAddToObjectSetup()
 		}
 		else if (mModelTypeParam == std::string("rope_node"))
 		{
-			//rope_node: this is a RopeNode to which NurbsCurveEvaluator should be associated.
+			///rope_node: this is a generic RopeNode to which
+			///a NurbsCurveEvaluator could be associated.
 			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 			SMARTPTR(RopeNode)ropeNode = new RopeNode(COMPONENT_STANDARD_NAME + "_rope_node");
 			ropeNode->set_render_mode(mRopeRenderMode);
@@ -396,7 +398,8 @@ void Model::onAddToObjectSetup()
 		}
 		else if (mModelTypeParam == std::string("sheet_node"))
 		{
-			//rope_node: this is a SheetNode to which NurbsSurfaceEvaluator should be associated.
+			///sheet_node: this is a generic SheetNode to which
+			///a NurbsSurfaceEvaluator could be associated.
 			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 			SMARTPTR(SheetNode)sheetNode = new SheetNode(COMPONENT_STANDARD_NAME + "_sheet_node");
 			sheetNode->set_num_u_subdiv(mSheetNumUSubdiv);
@@ -405,14 +408,15 @@ void Model::onAddToObjectSetup()
 		}
 		else if (mModelTypeParam == std::string("geom_node"))
 		{
-			//geom_node: this is a GeomNode to which Geoms should be added.
+			///geom_node: this is a generic GeomNode to which
+			///one or more Geoms could be added.
 			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 			SMARTPTR(GeomNode) geomNode = new GeomNode(COMPONENT_STANDARD_NAME + "_geom_node");
 			mNodePath = NodePath(geomNode);
 		}
 		else
 		{
-			//On error loads our favorite blue triangle.
+			///On error loads our favorite blue triangle.
 			mNodePath = mTmpl->windowFramework()->load_default_model(
 					mTmpl->pandaFramework()->get_models());
 		}

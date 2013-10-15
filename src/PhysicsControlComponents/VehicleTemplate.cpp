@@ -98,6 +98,7 @@ void VehicleTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("steering_decrement", "60.0"));
 	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
 	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("brake", "enabled"));
 	mParameterTable.insert(ParameterNameValue("turn_left", "enabled"));
 	mParameterTable.insert(ParameterNameValue("turn_right", "enabled"));
 }

@@ -73,7 +73,7 @@ void toggleSteerer1Control(const Event* event, void* data)
 		steerer1AI->enable();
 		//enable behaviors
 		SMARTPTR(Object )targetObject =
-		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId("Player1"));
+		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId("player0"));
 		NodePath targetObjectNP = targetObject->getNodePath();
 		//seek Player1
 //		steerer1AI->getAiCharacter()->get_ai_behaviors()->seek(targetObjectNP);

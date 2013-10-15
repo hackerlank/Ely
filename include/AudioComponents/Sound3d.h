@@ -50,8 +50,7 @@ class Sound3dTemplate;
  *
  * XML Param(s):
  * - "scene_root" 			|single|"render"
- * - "sound_files" 			|multiple|no default (each one specified as
- * "sound_name1@sound_file1[:sound_name2@sound_file2:...:sound_nameN@sound_fileN]")
+ * - "sound_files" 			|multiple|no default (each one specified as "sound_name1@sound_file1[:sound_name2@sound_file2:...:sound_nameN@sound_fileN]")
  *
  * \note parts inside [] are optional.\n
  */

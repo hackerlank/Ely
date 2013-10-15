@@ -73,16 +73,11 @@ class NavMeshTemplate;
  * - "max_tiles"					|single|"128"
  * - "max_polys_per_tile"			|single|"32768"
  * - "tile_size"					|single|"32"
- * - "area_flags_cost"				|multiple|no default (each one specified as
- * "area@flag1[:flag2...:flagN]@cost" note: flags are or-ed)
- * - "crowd_include_flags"			|single|no default (specified as
- * "flag1[:flag2...:flagN]" note: flags are or-ed)
- * - "crowd_exclude_flags"			|single|no default (specified as
- * "flag1[:flag2...:flagN]" note: flags are or-ed)
- * - "convex_volume"				|multiple|no default (each one specified as
- * 	"x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type")
- * - "offmesh_connection"			|multiple|no default (each one specified as
- * 	"xB,yB,zB:xE,yE,zE@bidirectional")
+ * - "area_flags_cost"				|multiple|no default (each one specified as "area@flag1[:flag2...:flagN]@cost" note: flags are or-ed)
+ * - "crowd_include_flags"			|single|no default (specified as "flag1[:flag2...:flagN]" note: flags are or-ed)
+ * - "crowd_exclude_flags"			|single|no default (specified as "flag1[:flag2...:flagN]" note: flags are or-ed)
+ * - "convex_volume"				|multiple|no default (each one specified as "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type")
+ * - "offmesh_connection"			|multiple|no default (each one specified as	"xB,yB,zB:xE,yE,zE@bidirectional")
  *
  * \note parts inside [] are optional.\n
  */

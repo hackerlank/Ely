@@ -67,17 +67,10 @@ class ActivityTemplate;
  * \see FSM for details.
  *
  * XML Param(s):
- * - "states"  				|multiple|no default (each one specified as
- * "state1[:state2:...:stateN]" into ObjectTemplate definition)
- * - "from_to"				|multiple|no default (each one specified as
- * "state11@state21[:state12@state22:...:state1N@state2N]" into
- * ObjectTemplate definition)
- * - "states_transition" 	|multiple|no default (each one specified as
- * "state1[:state2:...:stateN]$enterName,exitName,filterName"
- * into Object definition)
- * - "from_to_transition"	|multiple|no default (each one specified as
- * "state11@state21[:state12@state22:...:state1N@state2N]$fromToName" into
- * Object definition)
+ * - "states"  				|multiple|no default (each one specified as "state1[:state2:...:stateN]" into ObjectTemplate definition)
+ * - "from_to"				|multiple|no default (each one specified as "state11@state21[:state12@state22:...:state1N@state2N]" into ObjectTemplate definition)
+ * - "states_transition" 	|multiple|no default (each one specified as "state1[:state2:...:stateN]$enterName,exitName,filterName" into Object definition)
+ * - "from_to_transition"	|multiple|no default (each one specified as "state11@state21[:state12@state22:...:state1N@state2N]$fromToName" into Object definition)
  * - "instance_update" 		|single|""
  *
  * \note in "states_transition" and "from_to_transition" any of

@@ -33,20 +33,16 @@ class SoftBodyTemplate;
  * - "tetrahedron"
  *
  * XML Param(s):
- * - "body_type"  				|single|"rope" (values: rope|patch|
- * ellipsoid|tri_mesh|tet_mesh)
+ * - "body_type"  				|single|"rope" (values: rope|patch|ellipsoid|tri_mesh|tet_mesh)
  * - "body_total_mass"  		|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "air_density"  			|single|"1.2"
  * - "water_density"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
  * - "water_offset"  			|single|"0.0"
- * - "anchor_objects"			|multiple|no default (each one specified as
- * "objectId1[:objectId2:...:objectIdN]")
- * - "points"  					|single|no default (for rope,patch,ellipsoid
- * specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
- * - "resolutions"  			|single|no default (for rope,patch specified
- * as "resolution1[:resolution2]")
+ * - "anchor_objects"			|multiple|no default (each one specified as "objectId1[:objectId2:...:objectIdN]")
+ * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
+ * - "resolutions"  			|single|no default (for rope,patch specified as "resolution1[:resolution2]")
  * - "fixeds"  					|single|no default (for rope,patch)
  * - "thickness"  				|single|"0.4" (for rope)
  * - "num_slices"  				|single|"8" (for rope)

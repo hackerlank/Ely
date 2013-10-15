@@ -37,8 +37,7 @@ class InstanceOfTemplate;
  *
  * XML Param(s):
  * - "instance_of"  		|single|no default
- * - "scale"  				|single|"1.0" (specified
- * as "scalex[,scaley,scalez]")
+ * - "scale"  				|single|"1.0" (specified as "scalex[,scaley,scalez]")
  *
  * \note parts inside [] are optional.\n
  */
