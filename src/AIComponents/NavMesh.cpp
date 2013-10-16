@@ -99,67 +99,95 @@ bool NavMesh::initialize()
 				"NavMesh::NavMesh: invalid GamePhysicsManager")
 		mMovType = KINEMATIC;
 	}
-#ifdef WITHCHARACTER
-	else if (movType == std::string("character"))
-	{
-		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
-				"NavMesh::NavMesh: invalid GamePhysicsManager")
-		mMovType = CHARACTER;
-	}
-#endif
 	else
 	{
 		mMovType = RECAST;
 	}
-	mNavMeshSettings.m_cellSize = strtof(
-			mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
-	mNavMeshSettings.m_cellHeight = strtof(
-			mTmpl->parameter(std::string("cell_height")).c_str(), NULL);
-	mNavMeshSettings.m_agentHeight = strtof(
-			mTmpl->parameter(std::string("agent_height")).c_str(), NULL);
-	mNavMeshSettings.m_agentRadius = strtof(
-			mTmpl->parameter(std::string("agent_radius")).c_str(), NULL);
-	mNavMeshSettings.m_agentMaxClimb = strtof(
-			mTmpl->parameter(std::string("agent_max_climb")).c_str(), NULL);
-	mNavMeshSettings.m_agentMaxSlope = strtof(
-			mTmpl->parameter(std::string("agent_max_slope")).c_str(), NULL);
-	mNavMeshSettings.m_regionMinSize = strtof(
-			mTmpl->parameter(std::string("region_min_size")).c_str(), NULL);
-	mNavMeshSettings.m_regionMergeSize = strtof(
-			mTmpl->parameter(std::string("region_merge_size")).c_str(), NULL);
+	//
+	float value;
+	int valueInt;
+	//cell size
+	value = strtof(mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
+	mNavMeshSettings.m_cellSize = (value >= 0.0 ? value : -value);
+	//cell height
+	value = strtof(mTmpl->parameter(std::string("cell_height")).c_str(), NULL);
+	mNavMeshSettings.m_cellHeight = (value >= 0.0 ? value : -value);
+	//agent height
+	value = strtof(mTmpl->parameter(std::string("agent_height")).c_str(), NULL);
+	mNavMeshSettings.m_agentHeight = (value >= 0.0 ? value : -value);
+	//agent radius
+	value = strtof(mTmpl->parameter(std::string("agent_radius")).c_str(), NULL);
+	mNavMeshSettings.m_agentRadius = (value >= 0.0 ? value : -value);
+	//agent max climb
+	value = strtof(mTmpl->parameter(std::string("agent_max_climb")).c_str(),
+	NULL);
+	mNavMeshSettings.m_agentMaxClimb = (value >= 0.0 ? value : -value);
+	//agent max slope
+	value = strtof(mTmpl->parameter(std::string("agent_max_slope")).c_str(),
+	NULL);
+	mNavMeshSettings.m_agentMaxSlope = (value >= 0.0 ? value : -value);
+	//region min size
+	value = strtof(mTmpl->parameter(std::string("region_min_size")).c_str(),
+	NULL);
+	mNavMeshSettings.m_regionMinSize = (value >= 0.0 ? value : -value);
+	//region merge size
+	value = strtof(mTmpl->parameter(std::string("region_merge_size")).c_str(),
+	NULL);
+	mNavMeshSettings.m_regionMergeSize = (value >= 0.0 ? value : -value);
+	//monotone partitioning
 	mNavMeshSettings.m_monotonePartitioning = (
 			mTmpl->parameter(std::string("monotone_partitioning"))
 					== std::string("true") ? true : false);
-	mNavMeshSettings.m_edgeMaxLen = strtof(
-			mTmpl->parameter(std::string("edge_max_len")).c_str(), NULL);
-	mNavMeshSettings.m_edgeMaxError = strtof(
-			mTmpl->parameter(std::string("edge_max_error")).c_str(), NULL);
-	mNavMeshSettings.m_vertsPerPoly = strtof(
-			mTmpl->parameter(std::string("verts_per_poly")).c_str(), NULL);
-	mNavMeshSettings.m_detailSampleDist = strtof(
-			mTmpl->parameter(std::string("detail_sample_dist")).c_str(), NULL);
-	mNavMeshSettings.m_detailSampleMaxError = strtof(
+	//edge max len
+	value = strtof(mTmpl->parameter(std::string("edge_max_len")).c_str(), NULL);
+	mNavMeshSettings.m_edgeMaxLen = (value >= 0.0 ? value : -value);
+	//edge max error
+	value = strtof(mTmpl->parameter(std::string("edge_max_error")).c_str(),
+	NULL);
+	mNavMeshSettings.m_edgeMaxError = (value >= 0.0 ? value : -value);
+	//verts per poly
+	value = strtof(mTmpl->parameter(std::string("verts_per_poly")).c_str(),
+	NULL);
+	mNavMeshSettings.m_vertsPerPoly = (value >= 0.0 ? value : -value);
+	//detail sample dist
+	value = strtof(mTmpl->parameter(std::string("detail_sample_dist")).c_str(),
+	NULL);
+	mNavMeshSettings.m_detailSampleDist = (value >= 0.0 ? value : -value);
+	//detail sample max error
+	value = strtof(
 			mTmpl->parameter(std::string("detail_sample_max_error")).c_str(),
 			NULL);
-	//nav mesh tile
+	mNavMeshSettings.m_detailSampleMaxError = (value >= 0.0 ? value : -value);
+	//build all tiles
 	mNavMeshTileSettings.m_buildAllTiles = (
 			mTmpl->parameter(std::string("build_all_tiles"))
 					== std::string("true") ? true : false);
-	mNavMeshTileSettings.m_maxTiles = strtof(
-			mTmpl->parameter(std::string("max_tiles")).c_str(), NULL);
-	mNavMeshTileSettings.m_maxPolysPerTile = strtof(
-			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL);
-	mNavMeshTileSettings.m_tileSize = strtof(
-			mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
+	//max tiles
+	valueInt = strtol(mTmpl->parameter(std::string("max_tiles")).c_str(), NULL,
+			0);
+	mNavMeshTileSettings.m_maxTiles = (valueInt >= 0 ? valueInt : -valueInt);
+	//max polys per tile
+	valueInt = strtol(
+			mTmpl->parameter(std::string("max_polys_per_tile")).c_str(), NULL,
+			0);
+	mNavMeshTileSettings.m_maxPolysPerTile = (
+			valueInt >= 0 ? valueInt : -valueInt);
+	//tile size
+	value = strtof(mTmpl->parameter(std::string("tile_size")).c_str(), NULL);
+	mNavMeshTileSettings.m_tileSize = (value >= 0.0 ? value : -value);
 	//area-flags-cost settings
-	mAreaFlagsCostXmlParam = mTmpl->parameterList(std::string("area_flags_cost"));
+	mAreaFlagsCostXmlParam = mTmpl->parameterList(
+			std::string("area_flags_cost"));
 	//crowd include/exclude flags
-	mCrowdIncludeFlagsParam = mTmpl->parameter(std::string("crowd_include_flags"));
-	mCrowdExcludeFlagsParam = mTmpl->parameter(std::string("crowd_exclude_flags"));
+	mCrowdIncludeFlagsParam = mTmpl->parameter(
+			std::string("crowd_include_flags"));
+	mCrowdExcludeFlagsParam = mTmpl->parameter(
+			std::string("crowd_exclude_flags"));
 	//convex volumes
 	mConvexVolumesParam = mTmpl->parameterList(std::string("convex_volume"));
 	//off mesh connections
-	mOffMeshConnectionsParam = mTmpl->parameterList(std::string("offmesh_connection"));
+	mOffMeshConnectionsParam = mTmpl->parameterList(
+			std::string("offmesh_connection"));
 	//
 	return result;
 }

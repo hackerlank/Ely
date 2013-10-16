@@ -100,19 +100,17 @@ bool Steering::initialize()
 					== std::string("true") ? true : false);
 	//set AICharacter parameters
 	//
-	float floatParam;
+	float value;
 	//mass
-	floatParam = strtof(mTmpl->parameter(std::string("mass")).c_str(),
-			NULL);
-	floatParam > 0.0 ? mMass = floatParam : mMass = 1.0;
-	//movt_force
-	floatParam = strtof(
-			mTmpl->parameter(std::string("movt_force")).c_str(), NULL);
-	floatParam > 0.0 ? mMovtForce = floatParam : mMovtForce = 1.0;
-	//max_force
-	floatParam = strtof(
-			mTmpl->parameter(std::string("max_force")).c_str(), NULL);
-	floatParam > 0.0 ? mMaxForce = floatParam : mMaxForce = 1.0;
+	value = strtof(mTmpl->parameter(std::string("mass")).c_str(),
+	NULL);
+	mMass = (value >= 0.0 ? value : -value);
+	//movt force
+	value = strtof(mTmpl->parameter(std::string("movt_force")).c_str(), NULL);
+	mMovtForce = (value >= 0.0 ? value : -value);
+	//max force
+	value = strtof(mTmpl->parameter(std::string("max_force")).c_str(), NULL);
+	mMaxForce = (value >= 0.0 ? value : -value);
 	//the type of the updatable item
 	mTypeParam = mTmpl->parameter(std::string("controlled_type"));
 	//obstacle hit mask
@@ -135,14 +133,12 @@ bool Steering::initialize()
 #endif
 	}
 	//obstacle max distance fraction
-	floatParam =
+	value =
 			strtof(
 					mTmpl->parameter(
 							std::string("obstacle_max_distance_fraction")).c_str(),
 					NULL);
-	floatParam > 0.0 ?
-			mObstacleMaxDistanceFraction = floatParam :
-			mObstacleMaxDistanceFraction = 1.0;
+	mObstacleMaxDistanceFraction = (value >= 0.0 ? value : -value);
 	//
 	return result;
 }

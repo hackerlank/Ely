@@ -83,14 +83,15 @@ bool CrowdAgent::initialize()
 					== std::string("true") ? true : false);
 	//set CrowdAgent parameters
 	//register to navmesh objectId
-	mNavMeshObjectId = ObjectId(mTmpl->parameter(std::string("add_to_navmesh")));
+	mNavMeshObjectId = ObjectId(
+			mTmpl->parameter(std::string("add_to_navmesh")));
 	//
 	std::string param;
 	unsigned int idx, valueNum;
 	std::vector<std::string> paramValuesStr;
 	//move target
 	param = mTmpl->parameter(std::string("move_target"));
-	paramValuesStr = parseCompoundString(param , ',');
+	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if (valueNum < 3)
 	{
@@ -102,7 +103,7 @@ bool CrowdAgent::initialize()
 	}
 	//move velocity
 	param = mTmpl->parameter(std::string("move_velocity"));
-	paramValuesStr = parseCompoundString(param , ',');
+	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if (valueNum < 3)
 	{
@@ -112,17 +113,30 @@ bool CrowdAgent::initialize()
 	{
 		mMoveVelocity[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
-	//agent params
-	mAgentParams.maxAcceleration = strtof(
-			mTmpl->parameter(std::string("max_acceleration")).c_str(), NULL);
-	mAgentParams.maxSpeed = strtof(
-			mTmpl->parameter(std::string("max_speed")).c_str(), NULL);
-	mAgentParams.collisionQueryRange = strtof(
-			mTmpl->parameter(std::string("collision_query_range")).c_str(), NULL);
-	mAgentParams.pathOptimizationRange = strtof(
-			mTmpl->parameter(std::string("path_optimization_range")).c_str(), NULL);
-	mAgentParams.separationWeight = strtof(
-			mTmpl->parameter(std::string("separation_weight")).c_str(), NULL);
+	//
+	float value;
+	//max acceleration
+	value = strtof(mTmpl->parameter(std::string("max_acceleration")).c_str(),
+			NULL);
+	mAgentParams.maxAcceleration = (value >= 0.0 ? value : -value);
+	//max speed
+	value = strtof(mTmpl->parameter(std::string("max_speed")).c_str(), NULL);
+	mAgentParams.maxSpeed = (value >= 0.0 ? value : -value);
+	//collision query range
+	value = strtof(
+			mTmpl->parameter(std::string("collision_query_range")).c_str(),
+			NULL);
+	mAgentParams.collisionQueryRange = (value >= 0.0 ? value : -value);
+	//path optimization range
+	value = strtof(
+			mTmpl->parameter(std::string("path_optimization_range")).c_str(),
+			NULL);
+	mAgentParams.pathOptimizationRange = (value >= 0.0 ? value : -value);
+	//separation weight
+	value = strtof(mTmpl->parameter(std::string("separation_weight")).c_str(),
+			NULL);
+	mAgentParams.separationWeight = (value >= 0.0 ? value : -value);
+	//update flags
 	mAgentParams.updateFlags = strtol(
 			mTmpl->parameter(std::string("update_flags")).c_str(), NULL, 0);
 	if (mAgentParams.updateFlags <= 0)
@@ -130,7 +144,8 @@ bool CrowdAgent::initialize()
 		mAgentParams.updateFlags = 0x1b;
 	}
 	mAgentParams.obstacleAvoidanceType = strtol(
-			mTmpl->parameter(std::string("obstacle_avoidance_type")).c_str(), NULL, 0);
+			mTmpl->parameter(std::string("obstacle_avoidance_type")).c_str(),
+			NULL, 0);
 	if (mAgentParams.obstacleAvoidanceType < 0)
 	{
 		mAgentParams.obstacleAvoidanceType = 3;

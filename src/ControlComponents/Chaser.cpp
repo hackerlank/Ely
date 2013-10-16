@@ -75,19 +75,27 @@ bool Chaser::initialize()
 	mFixedRelativePosition = (
 			mTmpl->parameter(std::string("fixed_relative_position"))
 					== std::string("false") ? false : true);
-	//max and min distance settings
-	mAbsMaxDistance = strtof(
-			mTmpl->parameter(std::string("abs_max_distance")).c_str(), NULL);
-	mAbsMinDistance = strtof(
-			mTmpl->parameter(std::string("abs_min_distance")).c_str(), NULL);
-	//max and min height settings
-	mAbsMaxHeight = strtof(
-			mTmpl->parameter(std::string("abs_max_height")).c_str(), NULL);
-	mAbsMinHeight = strtof(
-			mTmpl->parameter(std::string("abs_min_height")).c_str(), NULL);
-	//friction' settings
-	mFriction = strtof(
-			mTmpl->parameter(std::string("friction")).c_str(), NULL);
+	//
+	float value;
+	//abs max distance
+	value = strtof(mTmpl->parameter(std::string("abs_max_distance")).c_str(),
+			NULL);
+	mAbsMaxDistance = (value >= 0.0 ? value : -value);
+	//abs min distance
+	value = strtof(mTmpl->parameter(std::string("abs_min_distance")).c_str(),
+			NULL);
+	mAbsMinDistance = (value >= 0.0 ? value : -value);
+	//abs max height
+	value = strtof(mTmpl->parameter(std::string("abs_max_height")).c_str(),
+			NULL);
+	mAbsMaxHeight = (value >= 0.0 ? value : -value);
+	//abs min height
+	value = strtof(mTmpl->parameter(std::string("abs_min_height")).c_str(),
+			NULL);
+	mAbsMinHeight = (value >= 0.0 ? value : -value);
+	//friction
+	value = strtof(mTmpl->parameter(std::string("friction")).c_str(), NULL);
+	mFriction = (value >= 0.0 ? value : -value);
 	//chased object id
 	mChasedId = ObjectId(mTmpl->parameter(std::string("chased_object")));
 	//reference object id
@@ -96,11 +104,14 @@ bool Chaser::initialize()
 	mFixedLookAt = (
 			mTmpl->parameter(std::string("fixed_lookat"))
 					== std::string("false") ? false : true);
-	//look at distance and height settings
-	mAbsLookAtDistance = strtof(
-			mTmpl->parameter(std::string("abs_lookat_distance")).c_str(), NULL);
-	mAbsLookAtHeight = strtof(
-			mTmpl->parameter(std::string("abs_lookat_height")).c_str(), NULL);
+	//abs lookat distance
+	value = strtof(mTmpl->parameter(std::string("abs_lookat_distance")).c_str(),
+			NULL);
+	mAbsLookAtDistance = (value >= 0.0 ? value : -value);
+	//abs lookat height
+	value = strtof(mTmpl->parameter(std::string("abs_lookat_height")).c_str(),
+			NULL);
+	mAbsLookAtHeight = (value >= 0.0 ? value : -value);
 	//mouse movement setting
 	mMouseEnabledH = (
 			mTmpl->parameter(std::string("mouse_enabled_h"))
@@ -124,16 +135,19 @@ bool Chaser::initialize()
 	mPitchDownKey = (
 			mTmpl->parameter(std::string("pitch_down"))
 					== std::string("enabled") ? true : false);
-	//inverted setting
+	//inverted rotation
 	mSignOfMouse = (
 			mTmpl->parameter(std::string("inverted_rotation"))
 					== std::string("true") ? -1 : 1);
-	//set sensitivity parameters
-	mSensX = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+	//sens x
+	value = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
 	NULL);
+	mSensX = (value >= 0.0 ? value : -value);
 	mRollSensX = mSensX * 375.0;
-	mSensY = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+	//sens y
+	value = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
 	NULL);
+	mSensY = (value >= 0.0 ? value : -value);
 	mRollSensY = mSensY * 375.0;
 	//
 	return result;

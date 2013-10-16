@@ -34,20 +34,16 @@ class SoftBodyTemplate;
  *
  * XML Param(s):
  * - "body_type"  				|single|"rope" (values: rope|patch|ellipsoid|tri_mesh|tet_mesh)
- * - "body_total_mass"  		|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
+ * - "body_total_mass"  		|single|"1.0"
  * - "air_density"  			|single|"1.2"
  * - "water_density"  			|single|"0.0"
- * - "water_normal"  			|single|"0.0,0.0,0.0"
  * - "water_offset"  			|single|"0.0"
+ * - "water_normal"  			|single|"0.0,0.0,0.0"
  * - "anchor_objects"			|multiple|no default (each one specified as "objectId1[:objectId2:...:objectIdN]")
  * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
- * - "resolutions"  			|single|no default (for rope,patch specified as "resolution1[:resolution2]")
+ * - "res"  					|single|no default (for rope,patch specified as "res1[:res2]")
  * - "fixeds"  					|single|no default (for rope,patch)
- * - "thickness"  				|single|"0.4" (for rope)
- * - "num_slices"  				|single|"8" (for rope)
- * - "num_subdiv"  				|single|"4" (for rope)
- * - "texture_file"				|single|no default
  *
  * \note parts inside [] are optional.\n
  */
@@ -110,19 +106,17 @@ private:
 	///@{
 	///Physical parameters.
 	BodyType mBodyType;
-	float mBodyTotalMass, air_density, water_density, water_offset;
-	LVector3f water_normal;
 	BitMask32 mCollideMask;
+	float mBodyTotalMass, mAirDensity, mWaterDensity, mWaterOffset;
+	LVector3f mWaterNormal;
 	///@}
 
 	///@{
 	///Geometric and structural parameters.
-	std::vector<ObjectId> anchor_objects;
-	std::vector<LPoint3f> points;
-	std::vector<int> resolutions;
-	int fixeds, num_slices, num_subdiv;
-	float thickness;
-	SMARTPTR(Texture)mTextureImage;
+	std::vector<ObjectId> mAnchorObjects;
+	std::vector<LPoint3f> mPoints;
+	std::vector<int> mRes;
+	int mFixeds;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -159,15 +153,13 @@ inline void SoftBody::reset()
 	mNodePath = NodePath();
 	mSoftBodyNode.clear();
 	mBodyType = ROPE;
-	mBodyTotalMass = air_density = water_density = water_offset = 0.0;
-	water_normal = LVector3::zero();
 	mCollideMask = BitMask32::all_off();
-	anchor_objects.clear();
-	points.clear();
-	resolutions.clear();
-	fixeds = num_slices = num_subdiv = 0;
-	thickness = 0.0;
-	mTextureImage.clear();
+	mBodyTotalMass = mAirDensity = mWaterDensity = mWaterOffset = 0.0;
+	mWaterNormal = LVector3::zero();
+	mAnchorObjects.clear();
+	mPoints.clear();
+	mRes.clear();
+	mFixeds = 0;
 }
 
 inline void SoftBody::onRemoveFromSceneCleanup()
@@ -199,5 +191,6 @@ inline SoftBody::operator BulletSoftBodyNode&()
 {
 	return *mSoftBodyNode;
 }
+
 } /* namespace ely */
 #endif /* SOFTBODY_H_ */
