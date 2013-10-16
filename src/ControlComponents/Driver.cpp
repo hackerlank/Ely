@@ -25,6 +25,7 @@
 #include "ControlComponents/DriverTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameControlManager.h"
+#include <cmath>
 
 namespace ely
 {
@@ -125,65 +126,59 @@ bool Driver::initialize()
 		mSpeedKey = std::string("shift");
 	}
 
-	//set sensitivity parameters
-	float speed = strtof(
-			mTmpl->parameter(std::string("max_linear_speed")).c_str(), NULL);
-	mMaxSpeedXYZ = LVecBase3f(speed, speed, speed);
+	//
+	float value, absValue;
+	//max linear speed
+	value = strtof(mTmpl->parameter(std::string("max_linear_speed")).c_str(),
+	NULL);
+	absValue = (value >= 0.0 ? value : -value);
+	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
 	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
 			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
 			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
-	mMaxSpeedH = strtof(
-			mTmpl->parameter(std::string("max_angular_speed")).c_str(), NULL);
+	//max angular speed
+	value = strtof(mTmpl->parameter(std::string("max_angular_speed")).c_str(),
+	NULL);
+	mMaxSpeedH = (value >= 0.0 ? value : -value);
 	mMaxSpeedSquaredH = mMaxSpeedH * mMaxSpeedH;
-	//
-	float accel = strtof(
-			mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
-	mAccelXYZ = LVecBase3f(accel, accel, accel);
-	mAccelH = strtof(
-			mTmpl->parameter(std::string("angular_accel")).c_str(), NULL);
-	//reset speeds
+	//linear accel
+	value = strtof(mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
+	absValue = (value >= 0.0 ? value : -value);
+	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
+	//angular accel
+	value = strtof(mTmpl->parameter(std::string("angular_accel")).c_str(),
+	NULL);
+	mAccelH = (value >= 0.0 ? value : -value);
+	//reset actual speeds
 	mActualSpeedXYZ = LVector3f::zero();
 	mActualSpeedH = 0.0;
-	//
-	float linearFriction = 1
-			- strtof(
-					mTmpl->parameter(std::string("linear_friction")).c_str(),
-					NULL);
-	mFrictionXYZ = LVector3f(linearFriction, linearFriction, linearFriction);
-	if ((mFrictionXYZ.get_x() < 0.0) or (mFrictionXYZ.get_x() > 1.0))
-	{
-		mFrictionXYZ.set_x(0.1);
-	}
-	if ((mFrictionXYZ.get_y() < 0.0) or (mFrictionXYZ.get_y() > 1.0))
-	{
-		mFrictionXYZ.set_y(0.1);
-	}
-	if ((mFrictionXYZ.get_z() < 0.0) or (mFrictionXYZ.get_z() > 1.0))
-	{
-		mFrictionXYZ.set_z(0.1);
-	}
-	mFrictionH = 1
-			- strtof(
-					mTmpl->parameter(std::string("angular_friction")).c_str(),
-					NULL);
-	if ((mFrictionH < 0.0) or (mFrictionH > 1.0))
-	{
-		mFrictionH = 0.1;
-	}
-	mStopThreshold = strtof(
-			mTmpl->parameter(std::string("stop_threshold")).c_str(),
+	//linear friction [0.0, 1.0]
+	value = 1 - strtof(mTmpl->parameter(std::string("linear_friction")).c_str(),
+	NULL);
+	absValue = (value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	mFrictionXYZ = LVector3f(absValue, absValue, absValue);
+	//angular friction [0.0, 1.0]
+	value = 1
+			- strtof(mTmpl->parameter(std::string("angular_friction")).c_str(),
 			NULL);
-	if ((mStopThreshold < 0.0) or (mStopThreshold > 1.0))
-	{
-		mStopThreshold = 0.01;
-	}
-
-	mFastFactor = strtof(
-			mTmpl->parameter(std::string("fast_factor")).c_str(), NULL);
-	mSensX = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+	mFrictionH = (value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	//stop threshold [0.0, 1.0]
+	value = strtof(mTmpl->parameter(std::string("stop_threshold")).c_str(),
 	NULL);
-	mSensY = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+	mStopThreshold =
+			(value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	//fast factor
+	value = strtof(mTmpl->parameter(std::string("fast_factor")).c_str(),
 	NULL);
+	mFastFactor = (value >= 0.0 ? value : -value);
+	//sens x
+	value = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+	NULL);
+	mSensX = (value >= 0.0 ? value : -value);
+	//sens_y
+	value = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+	NULL);
+	mSensY = (value >= 0.0 ? value : -value);
 	//
 	return result;
 }

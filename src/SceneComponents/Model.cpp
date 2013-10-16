@@ -112,9 +112,11 @@ bool Model::initialize()
 	std::string param;
 	unsigned int idx, valueNum;
 	std::vector<std::string> paramValuesStr;
-	//scaling
+	float value;
+	int valueInt;
+	//scale
 	param = mTmpl->parameter(std::string("scale"));
-	paramValuesStr = parseCompoundString(param , ',');
+	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if ((valueNum > 0) and (valueNum < 3))
 	{
@@ -126,12 +128,12 @@ bool Model::initialize()
 	}
 	for (idx = 0; idx < 3; ++idx)
 	{
-		float scaleValue = strtof(paramValuesStr[idx].c_str(), NULL);
-		mScale[idx] = (scaleValue >= 0.0 ? scaleValue : -scaleValue);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mScale[idx] = (value >= 0.0 ? value : -value);
 	}
-	//card parameters
+	//card points
 	param = mTmpl->parameter(std::string("card_points"));
-	paramValuesStr = parseCompoundString(param , ',');
+	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if (valueNum < 4)
 	{
@@ -141,7 +143,7 @@ bool Model::initialize()
 	{
 		mCardPoints.push_back(strtof(paramValuesStr[idx].c_str(), NULL));
 	}
-	//rope parameters
+	//rope render mode
 	param = mTmpl->parameter(std::string("rope_render_mode"));
 	if (param == std::string("thread"))
 	{
@@ -159,41 +161,28 @@ bool Model::initialize()
 	{
 		mRopeRenderMode = RopeNode::RM_tube;
 	}
-	//
-	mRopeNumSubdiv = strtol(
-			mTmpl->parameter(std::string("rope_num_subdiv")).c_str(), NULL, 0);
-	if (mRopeNumSubdiv <= 0)
-	{
-		mRopeNumSubdiv = 4;
-	}
-	//
-	mRopeNumSlices = strtol(
-			mTmpl->parameter(std::string("rope_num_slices")).c_str(), NULL, 0);
-	if (mRopeNumSlices <= 0)
-	{
-		mRopeNumSlices = 8;
-	}
-	//
-	mRopeThickness = strtof(
-			mTmpl->parameter(std::string("rope_thickness")).c_str(), NULL);
-	if (mRopeThickness <= 0.0)
-	{
-		mRopeThickness = 0.4;
-	}
-	//sheet parameters
-	mSheetNumUSubdiv = strtol(
-			mTmpl->parameter(std::string("sheet_num_u_subdiv")).c_str(), NULL, 0);
-	if (mSheetNumUSubdiv <= 0)
-	{
-		mSheetNumUSubdiv = 2;
-	}
-	//
-	mSheetNumVSubdiv = strtol(
-			mTmpl->parameter(std::string("sheet_num_v_subdiv")).c_str(), NULL, 0);
-	if (mSheetNumVSubdiv <= 0)
-	{
-		mSheetNumVSubdiv = 2;
-	}
+	//rope num subdiv
+	valueInt = strtol(mTmpl->parameter(std::string("rope_num_subdiv")).c_str(),
+	NULL, 0);
+	mRopeNumSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//rope num slices
+	valueInt = strtol(mTmpl->parameter(std::string("rope_num_slices")).c_str(),
+	NULL, 0);
+	mRopeNumSlices = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//rope thickness
+	value = strtof(mTmpl->parameter(std::string("rope_thickness")).c_str(),
+	NULL);
+	mRopeThickness = (value >= 0.0 ? value : -value);
+	//sheet num u subdiv
+	valueInt = strtol(
+			mTmpl->parameter(std::string("sheet_num_u_subdiv")).c_str(), NULL,
+			0);
+	mSheetNumUSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//sheet num v subdiv
+	valueInt = strtol(
+			mTmpl->parameter(std::string("sheet_num_v_subdiv")).c_str(), NULL,
+			0);
+	mSheetNumVSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
 	//
 	return result;
 }

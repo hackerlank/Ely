@@ -67,7 +67,8 @@ bool InstanceOf::initialize()
 	std::string param;
 	unsigned int idx, valueNum;
 	std::vector<std::string> paramValuesStr;
-	//scaling
+	float value;
+	//scale
 	param = mTmpl->parameter(std::string("scale"));
 	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
@@ -81,8 +82,8 @@ bool InstanceOf::initialize()
 	}
 	for (idx = 0; idx < 3; ++idx)
 	{
-		float scaleValue = strtof(paramValuesStr[idx].c_str(), NULL);
-		mScale[idx] = (scaleValue >= 0.0 ? scaleValue : -scaleValue);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mScale[idx] = (value >= 0.0 ? value : -value);
 	}
 	//
 	return result;

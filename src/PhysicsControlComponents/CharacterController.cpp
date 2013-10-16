@@ -69,12 +69,14 @@ bool CharacterController::initialize()
 	mThrowEvents = (
 			mTmpl->parameter(std::string("throw_events"))
 					== std::string("true") ? true : false);
-	//get step height
-	mStepHeight = strtof(
-			mTmpl->parameter(std::string("step_height")).c_str(), NULL);
-	//get shape type
+	//
+	float value, absValue;
+	//step height
+	value = strtof(mTmpl->parameter(std::string("step_height")).c_str(), NULL);
+	mStepHeight = (value >= 0.0 ? value : -value);
+	//shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
-	//get shape size
+	//shape size
 	std::string shapeSize = mTmpl->parameter(std::string("shape_size"));
 	if (shapeSize == std::string("minimum"))
 	{
@@ -185,25 +187,35 @@ bool CharacterController::initialize()
 		mCollideMask.write(std::cout, 0);
 #endif
 	}
-	//set control parameters
-	float linearSpeed = strtof(
-			mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
-	mLinearSpeed = LVecBase3f(linearSpeed, linearSpeed, linearSpeed);
+	//linear speed
+	value = strtof(mTmpl->parameter(std::string("linear_speed")).c_str(), NULL);
+	absValue = (value >= 0.0 ? value : -value);
+	mLinearSpeed = LVecBase3f(absValue, absValue, absValue);
+	//is local
 	mIsLocal = (
 			mTmpl->parameter(std::string("is_local")) == std::string("false") ?
 					false : true);
-	mAngularSpeed = strtof(
-			mTmpl->parameter(std::string("angular_speed")).c_str(), NULL);
-	mFallSpeed = strtof(
-			mTmpl->parameter(std::string("fall_speed")).c_str(), NULL);
-	mGravity = strtof(mTmpl->parameter(std::string("gravity")).c_str(),
-			NULL);
-	mJumpSpeed = strtof(
-			mTmpl->parameter(std::string("jump_speed")).c_str(), NULL);
-	mMaxSlope = strtof(
-			mTmpl->parameter(std::string("max_slope")).c_str(), NULL);
-	mMaxJumpHeight = strtof(
-			mTmpl->parameter(std::string("max_jump_height")).c_str(), NULL);
+	//angular speed
+	value = strtof(mTmpl->parameter(std::string("angular_speed")).c_str(),
+	NULL);
+	mAngularSpeed = (value >= 0.0 ? value : -value);
+	//fall speed
+	value = strtof(mTmpl->parameter(std::string("fall_speed")).c_str(), NULL);
+	mFallSpeed = (value >= 0.0 ? value : -value);
+	//gravity
+	value = strtof(mTmpl->parameter(std::string("gravity")).c_str(),
+	NULL);
+	mGravity = (value >= 0.0 ? value : -value);
+	//jump speed
+	value = strtof(mTmpl->parameter(std::string("jump_speed")).c_str(), NULL);
+	mJumpSpeed = (value >= 0.0 ? value : -value);
+	//max slope
+	value = strtof(mTmpl->parameter(std::string("max_slope")).c_str(), NULL);
+	mMaxSlope = (value >= 0.0 ? value : -value);
+	//max jump height
+	value = strtof(mTmpl->parameter(std::string("max_jump_height")).c_str(),
+	NULL);
+	mMaxJumpHeight = (value >= 0.0 ? value : -value);
 	//key events setting
 	//backward key
 	mBackwardKey = (
@@ -215,8 +227,8 @@ bool CharacterController::initialize()
 					true : false);
 	//up key
 	mUpKey = (
-			mTmpl->parameter(std::string("up"))
-					== std::string("enabled") ? true : false);
+			mTmpl->parameter(std::string("up")) == std::string("enabled") ?
+					true : false);
 	//down key
 	mDownKey = (
 			mTmpl->parameter(std::string("down")) == std::string("enabled") ?

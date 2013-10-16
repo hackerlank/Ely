@@ -26,6 +26,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameSceneManager.h"
 #include <texturePool.h>
+#include <cmath>
 
 namespace ely
 {
@@ -61,45 +62,41 @@ ComponentType Terrain::componentType() const
 bool Terrain::initialize()
 {
 	bool result = true;
-	//get scale
-	mHeightScale = strtof(
-			mTmpl->parameter(std::string("height_scale")).c_str(), NULL);
-	if (mHeightScale <= 0.0)
-	{
-		mHeightScale = 1.0;
-	}
-	mWidthScale = strtof(
-			mTmpl->parameter(std::string("width_scale")).c_str(), NULL);
-	if (mWidthScale <= 0.0)
-	{
-		mWidthScale = 1.0;
-	}
+	//
+	float value;
+	int valueInt;
+	//height scale
+	value = strtof(mTmpl->parameter(std::string("height_scale")).c_str(), NULL);
+	mHeightScale = (value >= 0.0 ? value : -value);
+	//width scale
+	value = strtof(mTmpl->parameter(std::string("width_scale")).c_str(), NULL);
+	mWidthScale = (value >= 0.0 ? value : -value);
+	//do scale
 	mDoScale = (
-			mTmpl->parameter(std::string("do_scale"))
-					== std::string("false") ? false : true);
-	//get LOD
-	mNearPercent = strtof(
-			mTmpl->parameter(std::string("near_percent")).c_str(), NULL);
-	mFarPercent = strtof(
-			mTmpl->parameter(std::string("far_percent")).c_str(), NULL);
-	if ((mNearPercent <= 0.0) or (mFarPercent >= 1.0)
-			or (mNearPercent >= mFarPercent))
+			mTmpl->parameter(std::string("do_scale")) == std::string("false") ?
+					false : true);
+	//LOD
+	//near percent [0.0, 1.0]
+	value = strtof(mTmpl->parameter(std::string("near_percent")).c_str(),
+	NULL);
+	mNearPercent = (value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	//far percent [0.0, 1.0]
+	value = strtof(mTmpl->parameter(std::string("far_percent")).c_str(),
+	NULL);
+	mFarPercent = (value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	if (mNearPercent > mFarPercent)
 	{
-		mFarPercent = 1.0;
-		mNearPercent = 0.1;
+		mFarPercent = mNearPercent;
 	}
-	//get block size
-	mBlockSize = strtol(mTmpl->parameter(std::string("block_size")).c_str(),
-			NULL, 0);
-	if (mBlockSize <= 0)
-	{
-		mBlockSize = 64;
-	}
-	//get brute force
+	//block size
+	valueInt = strtol(mTmpl->parameter(std::string("block_size")).c_str(),
+	NULL, 0);
+	mBlockSize = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//brute force
 	mBruteForce = (
 			mTmpl->parameter(std::string("brute_force"))
 					== std::string("false") ? false : true);
-	//get auto flatten
+	//auto flatten
 	std::string autoFlatten = mTmpl->parameter(std::string("auto_flatten"));
 	if (autoFlatten == std::string("AFM_off"))
 	{
@@ -117,31 +114,23 @@ bool Terrain::initialize()
 	{
 		mFlattenMode = GeoMipTerrain::AFM_medium;
 	}
-	//get focal point
+	//focal point
 	mFocalPointObject = ObjectId(mTmpl->parameter(std::string("focal_point")));
-	//get minimum level
-	mMinimumLevel = strtol(
-			mTmpl->parameter(std::string("minimum_level")).c_str(), NULL, 0);
-	if (mMinimumLevel <= 0)
-	{
-		mMinimumLevel = 0;
-	}
-	//get heightfield image
+	//minimum level
+	valueInt = strtol(mTmpl->parameter(std::string("minimum_level")).c_str(),
+			NULL, 0);
+	mMinimumLevel = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//heightfield file
 	mHeightField = PNMImage(
 			Filename(mTmpl->parameter(std::string("heightfield_file"))));
-	//get texture scale
-	mTextureUscale = strtof(
-			mTmpl->parameter(std::string("texture_uscale")).c_str(), NULL);
-	if (mTextureUscale <= 0.0)
-	{
-		mTextureUscale = 1.0;
-	}
-	mTextureVscale = strtof(
-			mTmpl->parameter(std::string("texture_vscale")).c_str(), NULL);
-	if (mTextureVscale <= 0.0)
-	{
-		mTextureVscale = 1.0;
-	}
+	//texture uscale
+	value = strtof(mTmpl->parameter(std::string("texture_uscale")).c_str(),
+			NULL);
+	mTextureUscale = (value >= 0.0 ? value : -value);
+	//texture vscale
+	value = strtof(mTmpl->parameter(std::string("texture_vscale")).c_str(),
+			NULL);
+	mTextureVscale = (value >= 0.0 ? value : -value);
 	//get texture
 	mTextureImage = TexturePool::load_texture(
 			Filename(mTmpl->parameter(std::string("texture_file"))));

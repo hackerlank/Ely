@@ -74,16 +74,22 @@ bool RigidBody::initialize()
 	{
 		mBodyType = DYNAMIC;
 	}
-	//get physical parameters
-	mBodyMass = strtof(
-			mTmpl->parameter(std::string("body_mass")).c_str(), NULL);
-	mBodyFriction = strtof(
-			mTmpl->parameter(std::string("body_friction")).c_str(), NULL);
-	mBodyRestitution = strtof(
-			mTmpl->parameter(std::string("body_restitution")).c_str(), NULL);
-	//get shape type
+	//
+	float value;
+	//body mass
+	value = strtof(mTmpl->parameter(std::string("body_mass")).c_str(), NULL);
+	mBodyMass = (value >= 0.0 ? value : -value);
+	//body friction
+	value = strtof(mTmpl->parameter(std::string("body_friction")).c_str(),
+			NULL);
+	mBodyFriction = (value >= 0.0 ? value : -value);
+	//body restitution
+	value = strtof(mTmpl->parameter(std::string("body_restitution")).c_str(),
+			NULL);
+	mBodyRestitution = (value >= 0.0 ? value : -value);
+	//shape type
 	std::string shapeType = mTmpl->parameter(std::string("shape_type"));
-	//get shape size
+	//shape size
 	std::string shapeSize = mTmpl->parameter(std::string("shape_size"));
 	if (shapeSize == std::string("minimum"))
 	{
@@ -123,8 +129,7 @@ bool RigidBody::initialize()
 				and (not norm_z.empty()))
 		{
 			LVector3 normal(strtof(norm_x.c_str(), NULL),
-					strtof(norm_y.c_str(), NULL),
-					strtof(norm_z.c_str(), NULL));
+					strtof(norm_y.c_str(), NULL), strtof(norm_z.c_str(), NULL));
 			normal.normalize();
 			mDim1 = normal.get_x();
 			mDim2 = normal.get_y();
@@ -238,7 +243,7 @@ bool RigidBody::initialize()
 		//default a sphere (with auto shaping)
 		mShapeType = GamePhysicsManager::SPHERE;
 	}
-	//get collide mask
+	//collide mask
 	std::string collideMask = mTmpl->parameter(std::string("collide_mask"));
 	if (collideMask == std::string("all_on"))
 	{
@@ -256,13 +261,17 @@ bool RigidBody::initialize()
 		mCollideMask.write(std::cout, 0);
 #endif
 	}
-	//get ccd settings: enabled if both are greater than zero (> 0.0)
-	mCcdMotionThreshold = strtof(
+	//ccd settings: enabled if both are greater than zero (> 0.0)
+	//ccd motion threshold
+	value = strtof(
 			mTmpl->parameter(std::string("ccd_motion_threshold")).c_str(),
 			NULL);
-	mCcdSweptSphereRadius = strtof(
+	mCcdMotionThreshold = (value >= 0.0 ? value : -value);
+	//ccd swept sphere radius
+	value = strtof(
 			mTmpl->parameter(std::string("ccd_swept_sphere_radius")).c_str(),
 			NULL);
+	mCcdSweptSphereRadius = (value >= 0.0 ? value : -value);
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
 			mCcdEnabled = true : mCcdEnabled = false;
 	//use shape of (another object)

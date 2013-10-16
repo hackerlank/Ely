@@ -65,7 +65,7 @@ bool SoftBody::initialize()
 	{
 		mBodyType = ROPE;
 	}
-	//get collide mask
+	//collide mask
 	std::string collideMask = mTmpl->parameter(std::string("collide_mask"));
 	if (collideMask == std::string("all_on"))
 	{
@@ -87,20 +87,26 @@ bool SoftBody::initialize()
 	std::string param;
 	unsigned int idx, valueNum;
 	std::vector<std::string> paramValuesStr;
+	float value;
+	int valueInt;
 	//body total mass
-	mBodyTotalMass = strtof(
+	value = strtof(
 			mTmpl->parameter(std::string("body_total_mass")).c_str(),
 			NULL);
+	mBodyTotalMass = (value >= 0.0 ? value : -value);
 	//air density
-	mAirDensity = strtof(mTmpl->parameter(std::string("air_density")).c_str(),
+	value = strtof(mTmpl->parameter(std::string("air_density")).c_str(),
 			NULL);
+	mAirDensity = (value >= 0.0 ? value : -value);
 	//water density
-	mWaterDensity = strtof(
+	value = strtof(
 			mTmpl->parameter(std::string("water_density")).c_str(),
 			NULL);
+	mWaterDensity = (value >= 0.0 ? value : -value);
 	//water offset
-	mWaterOffset = strtof(mTmpl->parameter(std::string("water_offset")).c_str(),
+	value = strtof(mTmpl->parameter(std::string("water_offset")).c_str(),
 			NULL);
+	mWaterOffset = (value >= 0.0 ? value : -value);
 	//water normal
 	param = mTmpl->parameter(std::string("water_normal"));
 	paramValuesStr = parseCompoundString(param, ',');
@@ -146,7 +152,8 @@ bool SoftBody::initialize()
 	valueNum = paramValuesStr.size();
 	for (idx = 0; (idx < valueNum) and (idx < 2); ++idx)
 	{
-		mRes.push_back(strtol(paramValuesStr[idx].c_str(), NULL, 0));
+		valueInt = strtol(paramValuesStr[idx].c_str(), NULL, 0);
+		mRes.push_back(valueInt >= 0 ? valueInt : -valueInt);
 	}
 	//fixeds
 	mFixeds = strtol(mTmpl->parameter(std::string("fixeds")).c_str(), NULL, 0);

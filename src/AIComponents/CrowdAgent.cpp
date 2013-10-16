@@ -115,9 +115,11 @@ bool CrowdAgent::initialize()
 	}
 	//
 	float value;
+	int valueInt;
+	char valueChar;
 	//max acceleration
 	value = strtof(mTmpl->parameter(std::string("max_acceleration")).c_str(),
-			NULL);
+	NULL);
 	mAgentParams.maxAcceleration = (value >= 0.0 ? value : -value);
 	//max speed
 	value = strtof(mTmpl->parameter(std::string("max_speed")).c_str(), NULL);
@@ -134,22 +136,18 @@ bool CrowdAgent::initialize()
 	mAgentParams.pathOptimizationRange = (value >= 0.0 ? value : -value);
 	//separation weight
 	value = strtof(mTmpl->parameter(std::string("separation_weight")).c_str(),
-			NULL);
+	NULL);
 	mAgentParams.separationWeight = (value >= 0.0 ? value : -value);
 	//update flags
-	mAgentParams.updateFlags = strtol(
-			mTmpl->parameter(std::string("update_flags")).c_str(), NULL, 0);
-	if (mAgentParams.updateFlags <= 0)
-	{
-		mAgentParams.updateFlags = 0x1b;
-	}
-	mAgentParams.obstacleAvoidanceType = strtol(
+	valueInt = strtol(mTmpl->parameter(std::string("update_flags")).c_str(),
+			NULL, 0);
+	mAgentParams.updateFlags = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//obstacle avoidance type
+	valueInt = strtol(
 			mTmpl->parameter(std::string("obstacle_avoidance_type")).c_str(),
 			NULL, 0);
-	if (mAgentParams.obstacleAvoidanceType < 0)
-	{
-		mAgentParams.obstacleAvoidanceType = 3;
-	}
+	mAgentParams.obstacleAvoidanceType =
+			(valueInt >= 0.0 ? valueInt : -valueInt);
 	//get ray mask
 	std::string rayMask = mTmpl->parameter(std::string("ray_mask"));
 	if (rayMask == std::string("all_on"))

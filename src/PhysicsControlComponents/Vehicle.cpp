@@ -91,14 +91,13 @@ bool Vehicle::initialize()
 	}
 	//wheels
 	mWheelTmpl = mTmpl->parameter(std::string("wheel_object_template"));
-	//wheel number
-	mWheelNumber = strtol(
-			mTmpl->parameter(std::string("wheels_number")).c_str(),
-			NULL, 0);
-	if (mWheelNumber < 0)
-	{
-		mWheelNumber = 0;
-	}
+	//
+	float value;
+	int valueInt;
+	//wheels number
+	valueInt = strtol(mTmpl->parameter(std::string("wheels_number")).c_str(),
+	NULL, 0);
+	mWheelNumber = (valueInt >= 0.0 ? valueInt : -valueInt);
 	//
 	std::string param;
 	unsigned int idx, valueNum;
@@ -302,12 +301,8 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if (value < 0.0)
-		{
-			value = -value;
-		}
-		mWheelSuspensionTravel.push_back(value);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mWheelSuspensionTravel.push_back(value >= 0.0 ? value : -value);
 	}
 	//wheel suspension stiffness
 	param = mTmpl->parameter(std::string("wheel_suspension_stiffness"));
@@ -323,12 +318,8 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if (value < 0.0)
-		{
-			value = -value;
-		}
-		mWheelSuspensionStiffness.push_back(value);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mWheelSuspensionStiffness.push_back(value >= 0.0 ? value : -value);
 	}
 	//wheel damping relaxation
 	param = mTmpl->parameter(std::string("wheel_damping_relaxation"));
@@ -344,12 +335,8 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if (value < 0.0)
-		{
-			value = -value;
-		}
-		mWheelDampingRelaxation.push_back(value);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mWheelDampingRelaxation.push_back(value >= 0.0 ? value : -value);
 	}
 	//wheel damping compression
 	param = mTmpl->parameter(std::string("wheel_damping_compression"));
@@ -365,12 +352,8 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if (value < 0.0)
-		{
-			value = -value;
-		}
-		mWheelDampingCompression.push_back(value);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mWheelDampingCompression.push_back(value >= 0.0 ? value : -value);
 	}
 	//wheel friction slip
 	param = mTmpl->parameter(std::string("wheel_friction_slip"));
@@ -386,12 +369,8 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if (value < 0.0)
-		{
-			value = -value;
-		}
-		mWheelFrictionSlip.push_back(value);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mWheelFrictionSlip.push_back(value >= 0.0 ? value : -value);
 	}
 	//wheel roll influence
 	param = mTmpl->parameter(std::string("wheel_roll_influence"));
@@ -407,24 +386,29 @@ bool Vehicle::initialize()
 	}
 	for (idx = 0; idx < mWheelNumber; ++idx)
 	{
-		float value = strtof(paramValuesStr[idx].c_str(), NULL);
-		if (value < 0.0)
-		{
-			value = -value;
-		}
-		mWheelRollInfluence.push_back(value);
+		value = strtof(paramValuesStr[idx].c_str(), NULL);
+		mWheelRollInfluence.push_back(value >= 0.0 ? value : -value);
 	}
-	//physics parameter
+	//max engine force
 	mMaxEngineForce = strtof(
 			mTmpl->parameter(std::string("max_engine_force")).c_str(), NULL);
-	mMaxBrake = strtof(
-			mTmpl->parameter(std::string("max_brake")).c_str(), NULL);
-	mSteeringClamp = strtof(
-			mTmpl->parameter(std::string("steering_clamp")).c_str(), NULL);
-	mSteeringIncrement = strtof(
-			mTmpl->parameter(std::string("steering_increment")).c_str(), NULL);
-	mSteeringDecrement = strtof(
-			mTmpl->parameter(std::string("steering_decrement")).c_str(), NULL);
+	//max brake
+	mMaxBrake = strtof(mTmpl->parameter(std::string("max_brake")).c_str(),
+	NULL);
+	//steering clamp [0.0,90.0]
+	value = strtof(mTmpl->parameter(std::string("steering_clamp")).c_str(),
+	NULL) / 90.0;
+	mSteeringClamp =
+			(value >= 0.0 ?
+					(value - floor(value)) * 90.0 : (ceil(value) - value) * 90.0);
+	//steering increment
+	value = strtof(mTmpl->parameter(std::string("steering_increment")).c_str(),
+	NULL);
+	mSteeringIncrement = (value >= 0.0 ? value : -value);
+	//steering decrement
+	value = strtof(mTmpl->parameter(std::string("steering_decrement")).c_str(),
+	NULL);
+	mSteeringDecrement = (value >= 0.0 ? value : -value);
 	//forward key
 	mForwardKey = (
 			mTmpl->parameter(std::string("forward")) == std::string("enabled") ?
