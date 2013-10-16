@@ -169,7 +169,7 @@ bool CharacterController::initialize()
 		//default a sphere (with auto shaping)
 		mShapeType = GamePhysicsManager::SPHERE;
 	}
-	//get collide mask
+	//collide mask
 	std::string collideMask = mTmpl->parameter(std::string("collide_mask"));
 	if (collideMask == std::string("all_on"))
 	{

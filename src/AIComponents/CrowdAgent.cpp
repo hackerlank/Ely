@@ -148,7 +148,7 @@ bool CrowdAgent::initialize()
 			NULL, 0);
 	mAgentParams.obstacleAvoidanceType =
 			(valueInt >= 0.0 ? valueInt : -valueInt);
-	//get ray mask
+	//ray mask
 	std::string rayMask = mTmpl->parameter(std::string("ray_mask"));
 	if (rayMask == std::string("all_on"))
 	{

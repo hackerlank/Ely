@@ -89,7 +89,7 @@ bool Vehicle::initialize()
 	{
 		mUpAxis = Z_up;
 	}
-	//wheels
+	//wheel object template
 	mWheelTmpl = mTmpl->parameter(std::string("wheel_object_template"));
 	//
 	float value;
@@ -115,7 +115,7 @@ bool Vehicle::initialize()
 		paramValuesStr.resize(mWheelNumber, "");
 	}
 	mWheelModelParam = paramValuesStr;
-	//wheels' scale params
+	//wheel scale
 	param = mTmpl->parameter(std::string("wheel_scale"));
 	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
@@ -219,7 +219,8 @@ bool Vehicle::initialize()
 		LVecBase3f values;
 		for (unsigned int i = 0; i < 3; ++i)
 		{
-			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
+			value = strtof(paramValuesStrExt[i].c_str(), NULL);
+			values[i] = (value >= 0.0 ? value : -value);
 		}
 		mWheelConnectionPointRatio.push_back(values);
 	}

@@ -43,7 +43,7 @@ ComponentType SoftBody::componentType() const
 bool SoftBody::initialize()
 {
 	bool result = true;
-	//get body type
+	//body type
 	std::string bodyType = mTmpl->parameter(std::string("body_type"));
 	if (bodyType == std::string("patch"))
 	{

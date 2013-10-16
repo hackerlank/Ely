@@ -75,7 +75,7 @@ bool NavMesh::initialize()
 {
 	bool result = true;
 	//set NavMesh parameters (store internally for future use)
-	//
+	//navmesh type
 	std::string navMeshtypeStr = mTmpl->parameter(std::string("navmesh_type"));
 	if (navMeshtypeStr == std::string("tile"))
 	{
@@ -89,9 +89,11 @@ bool NavMesh::initialize()
 	{
 		mNavMeshTypeEnum = SOLO;
 	}
+	//auto setup
 	mAutoSetup = (
 			mTmpl->parameter(std::string("auto_setup"))
 					== std::string("false") ? false : true);
+	//mov type
 	std::string movType = mTmpl->parameter(std::string("mov_type"));
 	if (movType == std::string("kinematic"))
 	{
