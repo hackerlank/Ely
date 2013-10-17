@@ -60,9 +60,13 @@ void SoftBodyTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
-	mParameterTable.insert(ParameterNameValue("", ""));
-	mParameterTable.insert(ParameterNameValue("", ""));
-	mParameterTable.insert(ParameterNameValue("", ""));
+	mParameterTable.insert(ParameterNameValue("body_type", "rope"));
+	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("body_total_mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("air_density", "1.2"));
+	mParameterTable.insert(ParameterNameValue("water_density", "0.0"));
+	mParameterTable.insert(ParameterNameValue("water_offset", "0.0"));
+	mParameterTable.insert(ParameterNameValue("water_normal", "0.0,0.0,0.0"));
 }
 
 //TypedObject semantics: hardcoded

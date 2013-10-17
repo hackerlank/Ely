@@ -162,6 +162,10 @@ inline void SoftBody::reset()
 	mFixeds = 0;
 }
 
+inline void SoftBody::onAddToSceneSetup()
+{
+}
+
 inline void SoftBody::onRemoveFromSceneCleanup()
 {
 }

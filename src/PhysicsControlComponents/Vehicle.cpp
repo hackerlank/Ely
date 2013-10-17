@@ -219,8 +219,7 @@ bool Vehicle::initialize()
 		LVecBase3f values;
 		for (unsigned int i = 0; i < 3; ++i)
 		{
-			value = strtof(paramValuesStrExt[i].c_str(), NULL);
-			values[i] = (value >= 0.0 ? value : -value);
+			values[i] = strtof(paramValuesStrExt[i].c_str(), NULL);
 		}
 		mWheelConnectionPointRatio.push_back(values);
 	}

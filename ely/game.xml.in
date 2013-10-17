@@ -152,7 +152,7 @@
 		</ObjectTmpl>
 
 		<!-- templates for soft bodies -->
-		<ObjectTmpl type="Terrain">
+		<ObjectTmpl type="SoftObject">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="SoftBody" priority="90"/> 
 		</ObjectTmpl>
@@ -470,6 +470,20 @@
 			<Param parent=""/>
 			<Param is_steady="true"/>
 		</Object>
+		
+		<Object type="SoftObject" id="rope1">
+			<Component type="Model">
+				<Param from_file="false"/>
+				<Param model_type="rope_node"/>
+			</Component>
+			<Component type="SoftBody">
+				<Param body_type="rope"/>
+				<Param points="-47.75,17.2,50.8:-47.75,25.2,50.8"/>
+				<Param res="8"/>
+				<Param fixeds="1"/>
+			</Component>
+		</Object>
+		
 
 		<!-- ------------------- -->
 		<!-- ENVIRONMENT OBJECTS -->

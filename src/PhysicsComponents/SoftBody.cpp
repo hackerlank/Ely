@@ -8,6 +8,9 @@
 #include "PhysicsComponents/SoftBody.h"
 #include "PhysicsComponents/SoftBodyTemplate.h"
 #include "Game/GamePhysicsManager.h"
+#include "SceneComponents/Model.h"
+#include <bulletSoftBodyWorldInfo.h>
+#include <nurbsCurveEvaluator.h>
 
 namespace ely
 {
@@ -120,12 +123,17 @@ bool SoftBody::initialize()
 		mWaterNormal[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
 	//anchor objects
-	param = mTmpl->parameter(std::string("anchor_objects"));
-	paramValuesStr = parseCompoundString(param, ':');
-	valueNum = paramValuesStr.size();
-	for (idx = 0; idx < valueNum; ++idx)
+	std::list<std::string> paramList = mTmpl->parameterList(std::string("anchor_objects"));
+	std::list<std::string>::iterator iter;
+	for (iter = paramList.begin(); iter != paramList.end(); ++iter)
 	{
-		mAnchorObjects.push_back(ObjectId(paramValuesStr[idx]));
+		param = *iter;
+		paramValuesStr = parseCompoundString(param, ':');
+		valueNum = paramValuesStr.size();
+		for (idx = 0; idx < valueNum; ++idx)
+		{
+			mAnchorObjects.push_back(ObjectId(paramValuesStr[idx]));
+		}
 	}
 	//points
 	param = mTmpl->parameter(std::string("points"));
@@ -163,32 +171,71 @@ bool SoftBody::initialize()
 
 void SoftBody::onAddToObjectSetup()
 {
-	///TODO
+	//At this point a Scene component (Model) should have been already
+	//created and added to the object, so its node path should
+	//be the same as the object's one.
+
+	//Soft body world information
+	BulletSoftBodyWorldInfo info =
+			GamePhysicsManager::GetSingletonPtr()->bulletWorld()->get_world_info();
+	info.set_air_density(mAirDensity);
+	info.set_water_density(mWaterDensity);
+	info.set_water_offset(mWaterOffset);
+	info.set_water_normal(mWaterNormal);
 
 	//create a Soft Body Node
-	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
-	std::string name = COMPONENT_STANDARD_NAME;
-//	mSoftBodyNode = new BulletSoftBodyNode(name.c_str());
+	if (mBodyType == PATCH)
+	{
 
-	//At this point a Scene component (Model, InstanceOf ...) should have
-	//been already created and added to the object, so its node path should
-	//be the same as the object's one.
-	//Note: scaling is applied to a Scene component, so the object node path
-	//has scaling already applied.
+	}
+	else if (mBodyType == ELLIPSOID)
+	{
 
-	//create a node path for the rigid body
+	}
+	else if (mBodyType == TRIMESH)
+	{
+
+	}
+	else if (mBodyType == TETMESH)
+	{
+
+	}
+	else
+	{
+		//ROPE
+		//get points
+		if (mPoints.size() < 2)
+		{
+			mPoints.resize(2, LPoint3f::zero());
+		}
+		//create rope
+		mSoftBodyNode = BulletSoftBodyNode::make_rope(info, mPoints[0],
+				mPoints[1], mRes[0], mFixeds);
+		//link with NURBS curve
+		SMARTPTR(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
+		curve->reset(mRes[0] + 2);
+		mSoftBodyNode->link_curve(curve);
+		//visualize with RopeNode
+		SMARTPTR(Model)model = DCAST(Model,
+				mOwnerObject->getComponent(ComponentFamilyType("Scene")));
+		if (model)
+		{
+			SMARTPTR(RopeNode) ropeNode = DCAST(RopeNode,
+					model->getNodePath().node());
+			if (ropeNode)
+			{
+				ropeNode->set_curve(curve);
+			}
+		}
+	}
+	//set total mass
+	mSoftBodyNode->set_total_mass(mBodyTotalMass);
+
+	//create a node path for the soft body
 	mNodePath = NodePath(mSoftBodyNode);
 
 	//attach to Bullet World
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			mSoftBodyNode);
-	///<BUG: if you want to switch the body type (e.g. dynamic to static, static to
-	///dynamic, etc...) after it has been attached to the world, you must first
-	///attach it as a dynamic body and then switch its type:
-	///		mSoftBodyNode->set_mass(1.0);
-	///		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mSoftBodyNode);
-	///		switchType(mBodyType);
-	////BUG>
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mSoftBodyNode);
 
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
@@ -196,13 +243,10 @@ void SoftBody::onAddToObjectSetup()
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	if (not ownerNodePath.is_empty())
 	{
-		//reparent the object node path as a child of the rigid body's one
+		//reparent the object node path as a child of the soft body's one
 		ownerNodePath.reparent_to(mNodePath);
 		//optimize
 		mNodePath.flatten_strong();
-	}
-	else
-	{
 	}
 
 	//set this rigid body node path as the object's one
@@ -234,17 +278,6 @@ void SoftBody::onRemoveFromObjectCleanup()
 	mNodePath.remove_node();
 	//
 	reset();
-}
-
-void SoftBody::onAddToSceneSetup()
-{
-	//switch the body type (take precedence over mass)
-	//force this component to static if owner object is static
-	if (mOwnerObject->isSteady())
-	{
-		mBodyType = ROPE;
-	}
-	//
 }
 
 //TypedObject semantics: hardcoded
