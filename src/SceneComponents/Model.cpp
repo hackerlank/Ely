@@ -30,6 +30,7 @@
 #include <cardMaker.h>
 #include <sheetNode.h>
 #include <geomNode.h>
+#include <texturePool.h>
 
 namespace ely
 {
@@ -161,6 +162,34 @@ bool Model::initialize()
 	{
 		mRopeRenderMode = RopeNode::RM_tube;
 	}
+	//rope uv mode
+	param = mTmpl->parameter(std::string("rope_uv_mode"));
+	if (param == std::string("parametric"))
+	{
+		mRopeUVMode = RopeNode::UV_parametric;
+	}
+	else if (param == std::string("distance"))
+	{
+		mRopeUVMode = RopeNode::UV_distance;
+	}
+	else if (param == std::string("distance2"))
+	{
+		mRopeUVMode = RopeNode::UV_distance2;
+	}
+	else
+	{
+		mRopeUVMode = RopeNode::UV_none;
+	}
+	//rope normal mode
+	param = mTmpl->parameter(std::string("rope_normal_mode"));
+	if (param == std::string("vertex"))
+	{
+		mRopeNormalMode = RopeNode::NM_vertex;
+	}
+	else
+	{
+		mRopeNormalMode = RopeNode::NM_none;
+	}
 	//rope num subdiv
 	valueInt = strtol(mTmpl->parameter(std::string("rope_num_subdiv")).c_str(),
 	NULL, 0);
@@ -183,6 +212,17 @@ bool Model::initialize()
 			mTmpl->parameter(std::string("sheet_num_v_subdiv")).c_str(), NULL,
 			0);
 	mSheetNumVSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
+	//texture
+	mTextureImage = TexturePool::load_texture(
+			Filename(mTmpl->parameter(std::string("texture_file"))));
+	//texture uscale
+	value = strtof(mTmpl->parameter(std::string("texture_uscale")).c_str(),
+			NULL);
+	mTextureUscale = (value >= 0.0 ? value : -value);
+	//texture vscale
+	value = strtof(mTmpl->parameter(std::string("texture_vscale")).c_str(),
+			NULL);
+	mTextureVscale = (value >= 0.0 ? value : -value);
 	//
 	return result;
 }
@@ -380,6 +420,8 @@ void Model::onAddToObjectSetup()
 			//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 			SMARTPTR(RopeNode)ropeNode = new RopeNode(COMPONENT_STANDARD_NAME + "_rope_node");
 			ropeNode->set_render_mode(mRopeRenderMode);
+			ropeNode->set_uv_mode(mRopeUVMode);
+			ropeNode->set_normal_mode(mRopeNormalMode);
 			ropeNode->set_num_subdiv(mRopeNumSubdiv);
 			ropeNode->set_num_slices(mRopeNumSlices);
 			ropeNode->set_thickness(mRopeThickness);
@@ -408,6 +450,14 @@ void Model::onAddToObjectSetup()
 			///On error loads our favorite blue triangle.
 			mNodePath = mTmpl->windowFramework()->load_default_model(
 					mTmpl->pandaFramework()->get_models());
+		}
+		//texturing
+		SMARTPTR(TextureStage) textureStage0 =
+		new TextureStage(COMPONENT_STANDARD_NAME + "_TextureStage0");
+		mNodePath.set_tex_scale(textureStage0, mTextureUscale, mTextureVscale);
+		if (mTextureImage != NULL)
+		{
+			mNodePath.set_texture(textureStage0, mTextureImage, 1);
 		}
 	}
 

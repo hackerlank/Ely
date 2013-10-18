@@ -40,8 +40,6 @@ extern void cameraInit();
 extern void cameraEnd();
 extern void Actor1Init();
 extern void Actor1End();
-extern void Plane1Init();
-extern void Plane1End();
 extern void Terrain1Init();
 extern void Terrain1End();
 extern void player0Init();
@@ -56,7 +54,6 @@ void callAllInits()
 {
 	cameraInit();
 	Actor1Init();
-	Plane1Init();
 	Terrain1Init();
 	player0Init();
 	Steerer1Init();
@@ -66,7 +63,6 @@ void callAllEnds()
 {
 	cameraEnd();
 	Actor1End();
-	Plane1End();
 	Terrain1End();
 	player0End();
 	Steerer1End();

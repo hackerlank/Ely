@@ -26,25 +26,27 @@
 #include <string>
 #include <vector>
 #include <load_prc_file.h>
-#include <auto_bind.h>
-#include <partBundleHandle.h>
-#include <character.h>
-#include <animControlCollection.h>
 #include <pandaFramework.h>
-
-#include <panda3d/bulletWorld.h>
+#include <texture.h>
+#include <texturePool.h>
+#include <nurbsCurveEvaluator.h>
+#include <ropeNode.h>
+#include <bulletWorld.h>
+#include <bulletRigidBodyNode.h>
+#include <bulletSoftBodyNode.h>
+#include <bulletSoftBodyWorldInfo.h>
 
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection
 AnimControlCollection physics_anim_collection;
-AsyncTask::DoneStatus physics_check_playing(GenericAsyncTask* task, void* data);
 AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data);
 
 int physics_main(int argc, char **argv)
 {
 	///setup
 	// Load your configuration
-	load_prc_file("config.prc");
+	load_prc_file("/REPOSITORY/KProjects/WORKSPACE/Ely/"
+			"build-Devel_Debug_Thread/ely/config.prc");
 	PandaFramework panda = PandaFramework();
 	panda.open_framework(argc, argv);
 	panda.set_window_title("animation training");
@@ -57,40 +59,55 @@ int physics_main(int argc, char **argv)
 		window->setup_trackball(); // Enable default camera movement
 	}
 	//physics
-	SMARTPTR(BulletWorld) physicsWorld = new BulletWorld();
+	SMARTPTR(BulletWorld)physicsWorld = new BulletWorld();
+	physicsWorld->set_gravity(0.0, 0.0, -9.81);
 	//physics: advance the simulation state
-//	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
-//			reinterpret_cast<void*>(&currentAnim));
-//	task->set_delay(3);
-//	panda.get_task_mgr().add(task);
-
-	//Load the Actor Model
-	NodePath Actor = window->load_model(window->get_render(),
-			"bvw-f2004--airbladepilot/pilot-model");
-	SMARTPTR(Character) character =
-			DCAST(Character, Actor.find("**/+Character").node());
-	SMARTPTR(PartBundle) pbundle = character->get_bundle(0);
-	//Load Animations
-	std::vector<std::string> animations;
-	animations.push_back(std::string("pilot-chargeshoot"));
-	animations.push_back(std::string("pilot-discloop"));
-	for (unsigned int i = 0; i < animations.size(); ++i)
-	{
-		window->load_model(Actor, "bvw-f2004--airbladepilot/" + animations[i]);
-	}
-	auto_bind(Actor.node(), physics_anim_collection);
-	pbundle->set_anim_blend_flag(true);
-	pbundle->set_control_effect(physics_anim_collection.get_anim(0), 0.5);
-	pbundle->set_control_effect(physics_anim_collection.get_anim(1), 0.5);
-	int currentAnim = 0;
-	//switch among animations
-	AsyncTask* task = new GenericAsyncTask("physics_check playing", &physics_check_playing,
-			reinterpret_cast<void*>(&currentAnim));
-	task->set_delay(3);
+	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
+			reinterpret_cast<void*>(physicsWorld.p()));
 	panda.get_task_mgr().add(task);
+
+	//RopeNode
+	PT(Texture)textureImage = TexturePool::load_texture(
+			Filename(std::string("iron.jpg")));
+	PT(RopeNode)ropeNode = new RopeNode("rope_node");
+	ropeNode->set_render_mode(RopeNode::RM_tube);
+	ropeNode->set_uv_mode(RopeNode::UV_parametric);
+	ropeNode->set_normal_mode(RopeNode::NM_none);
+	ropeNode->set_num_subdiv(4);
+	ropeNode->set_num_slices(8);
+	ropeNode->set_thickness(0.4);
+	NodePath ropeNP = NodePath(ropeNode);
+	PT(TextureStage)textureStage0 =
+	new TextureStage("TextureStage0");
+	ropeNP.set_tex_scale(textureStage0, 1.0, 1.0);
+	ropeNP.set_texture(textureStage0, textureImage, 1);
+
+	//Soft body world information
+	BulletSoftBodyWorldInfo info = physicsWorld->get_world_info();
+	info.set_air_density(1.2);
+	info.set_water_density(0);
+	info.set_water_offset(0);
+	info.set_water_normal(LVector3f::zero());
+	//create soft rope
+	PT(BulletSoftBodyNode)softRopeNode = BulletSoftBodyNode::make_rope(info, LPoint3f(-2, -1, 8),
+			LPoint3f(8, -1, 8), 16, 1);
+	//link with NURBS curve
+	SMARTPTR(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
+	curve->reset(16 + 2);
+	softRopeNode->link_curve(curve);
+	//visualize with RopeNode
+	ropeNode->set_curve(curve);
+	softRopeNode->set_total_mass(1.0);
+	NodePath softRopeNP = NodePath(softRopeNode);
+	//attach to Bullet World
+	physicsWorld->attach(softRopeNode);
+	//set collide mask
+	softRopeNP.set_collide_mask(BitMask32::all_on());
+
 	//attach to scene
-	Actor.reparent_to(window->get_render());
-	Actor.set_pos(0.0, 100.0, -30.0);
+	softRopeNP.reparent_to(window->get_render());
+	ropeNP.reparent_to(window->get_render());
+//	ropeNP.reparent_to(softRopeNP);
 
 	// Do the main loop
 	panda.main_loop();
@@ -99,54 +116,59 @@ int physics_main(int argc, char **argv)
 	return 0;
 }
 
-AsyncTask::DoneStatus physics_check_playing(GenericAsyncTask* task, void* data)
+AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data)
 {
-	//Control the Animations
-	double time = ClockObject::get_global_clock()->get_real_time();
-	int *currentAnim = reinterpret_cast<int*>(data);
-	int num = *currentAnim % 3;
-	if (num == 0)
+	//lock (guard) the mutex
+	HOLD_MUTEX(mMutex)
+
+	BulletWorld* physicsWorld = reinterpret_cast<BulletWorld*>(data);
+
+	float dt = ClockObject::get_global_clock()->get_dt();
+
+	int maxSubSteps;
+
+	// do physics step simulation
+	// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->
+	// supposing a minimum of 6,666666667 fps, we have a maximum
+	// timeStep of 0.15 secs so: maxSubSteps <= 60 * 0.15 = 9
+	if (dt < 0.016666667)
 	{
-		std::cout << time << " - Blending" << std::endl;
-		if (not physics_anim_collection.get_anim(0)->is_playing())
-		{
-			physics_anim_collection.get_anim(0)->play();
-		}
-		if (not physics_anim_collection.get_anim(1)->is_playing())
-		{
-			physics_anim_collection.get_anim(1)->play();
-		}
+		maxSubSteps = 1;
 	}
-	else if (num == 1)
+	else if (dt < 0.033333333)
 	{
-		std::cout << time << " - Playing: " << physics_anim_collection.get_anim_name(0)
-				<< std::endl;
-		if (not physics_anim_collection.get_anim(0)->is_playing())
-		{
-			physics_anim_collection.get_anim(0)->play();
-		}
-		if (physics_anim_collection.get_anim(1)->is_playing())
-		{
-			physics_anim_collection.get_anim(1)->stop();
-		}
+		maxSubSteps = 2;
+	}
+	else if (dt < 0.05)
+	{
+		maxSubSteps = 3;
+	}
+	else if (dt < 0.066666668)
+	{
+		maxSubSteps = 4;
+	}
+	else if (dt < 0.083333335)
+	{
+		maxSubSteps = 5;
+	}
+	else if (dt < 0.100000002)
+	{
+		maxSubSteps = 6;
+	}
+	else if (dt < 0.116666669)
+	{
+		maxSubSteps = 7;
+	}
+	else if (dt < 0.133333336)
+	{
+		maxSubSteps = 8;
 	}
 	else
 	{
-		std::cout << time << " - Playing: " << physics_anim_collection.get_anim_name(1)
-				<< std::endl;
-		physics_anim_collection.get_anim(1)->play();
-		if (physics_anim_collection.get_anim(0)->is_playing())
-		{
-			physics_anim_collection.get_anim(0)->stop();
-		}
-		if (not physics_anim_collection.get_anim(1)->is_playing())
-		{
-			physics_anim_collection.get_anim(1)->play();
-		}
+		maxSubSteps = 9;
 	}
-	*currentAnim += 1;
-	return AsyncTask::DS_again;
+	physicsWorld->do_physics(dt, maxSubSteps);
+	//
+	return AsyncTask::DS_cont;
 }
-
-
 

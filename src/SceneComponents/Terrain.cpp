@@ -123,6 +123,9 @@ bool Terrain::initialize()
 	//heightfield file
 	mHeightField = PNMImage(
 			Filename(mTmpl->parameter(std::string("heightfield_file"))));
+	//texture
+	mTextureImage = TexturePool::load_texture(
+			Filename(mTmpl->parameter(std::string("texture_file"))));
 	//texture uscale
 	value = strtof(mTmpl->parameter(std::string("texture_uscale")).c_str(),
 			NULL);
@@ -131,9 +134,6 @@ bool Terrain::initialize()
 	value = strtof(mTmpl->parameter(std::string("texture_vscale")).c_str(),
 			NULL);
 	mTextureVscale = (value >= 0.0 ? value : -value);
-	//get texture
-	mTextureImage = TexturePool::load_texture(
-			Filename(mTmpl->parameter(std::string("texture_file"))));
 	//
 	return result;
 }
@@ -172,12 +172,13 @@ void Terrain::onAddToObjectSetup()
 		mTerrain->get_root().set_sz(mHeightScale);
 	}
 	//terrain texturing
-	mTerrain->get_root().set_tex_scale(TextureStage::get_default(),
+	SMARTPTR(TextureStage) textureStage0 =
+			new TextureStage(COMPONENT_STANDARD_NAME + "_TextureStage0");
+	mTerrain->get_root().set_tex_scale(textureStage0,
 			mTextureUscale, mTextureVscale);
 	if (mTextureImage != NULL)
 	{
-		mTerrain->get_root().set_texture(TextureStage::get_default(),
-				mTextureImage, 1);
+		mTerrain->get_root().set_texture(textureStage0,	mTextureImage, 1);
 	}
 
 	//set the object node path to this terrain of node path

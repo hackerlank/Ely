@@ -122,19 +122,6 @@ bool SoftBody::initialize()
 	{
 		mWaterNormal[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
-	//anchor objects
-	std::list<std::string> paramList = mTmpl->parameterList(std::string("anchor_objects"));
-	std::list<std::string>::iterator iter;
-	for (iter = paramList.begin(); iter != paramList.end(); ++iter)
-	{
-		param = *iter;
-		paramValuesStr = parseCompoundString(param, ':');
-		valueNum = paramValuesStr.size();
-		for (idx = 0; idx < valueNum; ++idx)
-		{
-			mAnchorObjects.push_back(ObjectId(paramValuesStr[idx]));
-		}
-	}
 	//points
 	param = mTmpl->parameter(std::string("points"));
 	paramValuesStr = parseCompoundString(param, ':');
@@ -278,6 +265,35 @@ void SoftBody::onRemoveFromObjectCleanup()
 	mNodePath.remove_node();
 	//
 	reset();
+}
+
+void SoftBody::onAddToSceneSetup()
+{
+	///HACK: rope node's parent node path correction (see bullet samples)
+	if (mBodyType == ROPE)
+	{
+		if (mNodePath.get_num_children() > 0)
+		{
+			//the child should be the rope node: reparent
+			//to the owner object node path
+			mRopeNodePath = mNodePath.get_child(0);
+			mRopeNodePath.reparent_to(mOwnerObject->getNodePath().get_parent());
+		}
+	}
+}
+
+void SoftBody::onRemoveFromSceneCleanup()
+{
+	///HACK: rope node's parent node path correction (see bullet samples)
+	if (mBodyType == ROPE)
+	{
+		if (not mRopeNodePath.is_empty())
+		{
+			//the child should be the rope node: reparent
+			//to this node path
+			mRopeNodePath.reparent_to(mNodePath);
+		}
+	}
 }
 
 //TypedObject semantics: hardcoded

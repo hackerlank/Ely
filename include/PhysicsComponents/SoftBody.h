@@ -40,7 +40,6 @@ class SoftBodyTemplate;
  * - "water_density"  			|single|"0.0"
  * - "water_offset"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
- * - "anchor_objects"			|multiple|no default (each one specified as "objectId1[:objectId2:...:objectIdN]")
  * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
  * - "res"  					|single|no default (for rope,patch specified as "res1[:res2]")
  * - "fixeds"  					|single|no default (for rope,patch)
@@ -113,11 +112,13 @@ private:
 
 	///@{
 	///Geometric and structural parameters.
-	std::vector<ObjectId> mAnchorObjects;
 	std::vector<LPoint3f> mPoints;
 	std::vector<int> mRes;
 	int mFixeds;
 	///@}
+
+	///HACK: rope node's parent node path correction (see bullet samples).
+	NodePath mRopeNodePath;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -156,18 +157,10 @@ inline void SoftBody::reset()
 	mCollideMask = BitMask32::all_off();
 	mBodyTotalMass = mAirDensity = mWaterDensity = mWaterOffset = 0.0;
 	mWaterNormal = LVector3::zero();
-	mAnchorObjects.clear();
 	mPoints.clear();
 	mRes.clear();
 	mFixeds = 0;
-}
-
-inline void SoftBody::onAddToSceneSetup()
-{
-}
-
-inline void SoftBody::onRemoveFromSceneCleanup()
-{
+	mRopeNodePath = NodePath();
 }
 
 inline NodePath SoftBody::getNodePath() const

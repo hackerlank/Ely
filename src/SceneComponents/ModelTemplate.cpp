@@ -80,11 +80,15 @@ void ModelTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("scale", "1.0"));
 	mParameterTable.insert(ParameterNameValue("card_points", "-1.0,1.0,-1.0,1.0"));
 	mParameterTable.insert(ParameterNameValue("rope_render_mode", "tube"));
+	mParameterTable.insert(ParameterNameValue("rope_uv_mode", "parametric"));
+	mParameterTable.insert(ParameterNameValue("rope_normal_mode", "none"));
 	mParameterTable.insert(ParameterNameValue("rope_num_subdiv", "4"));
 	mParameterTable.insert(ParameterNameValue("rope_num_slices", "8"));
 	mParameterTable.insert(ParameterNameValue("rope_thickness", "0.4"));
 	mParameterTable.insert(ParameterNameValue("sheet_num_u_subdiv", "2"));
 	mParameterTable.insert(ParameterNameValue("sheet_num_v_subdiv", "2"));
+	mParameterTable.insert(ParameterNameValue("texture_uscale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("texture_vscale", "1.0"));
 }
 
 //TypedObject semantics: hardcoded

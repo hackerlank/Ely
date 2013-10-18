@@ -29,6 +29,7 @@
 #include <partBundle.h>
 #include <animControlCollection.h>
 #include <ropeNode.h>
+#include <texture.h>
 #include "ObjectModel/Component.h"
 
 namespace ely
@@ -48,18 +49,23 @@ class ModelTemplate;
  * where N=1,2,... .
  *
  * XML Param(s):
- * - "from_file"  			|single|"true"
- * - "scale"  				|single|"1.0" (specified as "scaleX[,scaleY,scaleZ]")
- * - "model_file"  			|single|no default (can have this form: [anim_name1@anim_name2@...@anim_nameN@]model_filename)
- * - "anim_files"  			|multiple|no default (each one specified as "anim_name1@anim_file1[:anim_name2@anim_file2:...:anim_nameN@anim_fileN]"])
- * - "model_type"  			|single|no default (values: card|rope_node|sheet_node|geom_node)
- * - "card_points"  		|single|"-1.0,1.0,-1.0,1.0" (specified as "left,right,bottom,top")
- * - "rope_render_mode"  	|single|"tube"
- * - "rope_num_subdiv"  	|single|"4"
- * - "rope_num_slices"  	|single|"8"
- * - "rope_thickness"  		|single|"0.4"
- * - "sheet_num_u_subdiv"  	|single|"2"
- * - "sheet_num_v_subdiv"  	|single|"2"
+ * - "from_file"  				|single|"true"
+ * - "scale"  					|single|"1.0" (specified as "scaleX[,scaleY,scaleZ]")
+ * - "model_file"  				|single|no default (can have this form: [anim_name1@anim_name2@...@anim_nameN@]model_filename)
+ * - "anim_files"  				|multiple|no default (each one specified as "anim_name1@anim_file1[:anim_name2@anim_file2:...:anim_nameN@anim_fileN]"])
+ * - "model_type"  				|single|no default (values: card|rope_node|sheet_node|geom_node)
+ * - "card_points"  			|single|"-1.0,1.0,-1.0,1.0" (specified as "left,right,bottom,top")
+ * - "rope_render_mode"  		|single|"tube"
+ * - "rope_uv_mode"  			|single|"parametric"
+ * - "rope_normal_mode"  		|single|"none"
+ * - "rope_num_subdiv"  		|single|"4"
+ * - "rope_num_slices"  		|single|"8"
+ * - "rope_thickness"  			|single|"0.4"
+ * - "sheet_num_u_subdiv"  		|single|"2"
+ * - "sheet_num_v_subdiv"  		|single|"2"
+ * - "texture_file"				|single|no default
+ * - "texture_uscale"			|single|"1.0"
+ * - "texture_vscale"			|single|"1.0"
  *
  * \note parts inside [] are optional.\n
  */
@@ -130,10 +136,16 @@ private:
 	std::vector<float> mCardPoints;
 	///Rope parameters.
 	RopeNode::RenderMode mRopeRenderMode;
+	RopeNode::UVMode mRopeUVMode;
+	RopeNode::NormalMode mRopeNormalMode;
 	int mRopeNumSubdiv, mRopeNumSlices;
 	float mRopeThickness;
 	///Sheet parameters.
 	int mSheetNumUSubdiv, mSheetNumVSubdiv;
+	///Texture.
+	SMARTPTR(Texture)mTextureImage;
+	///Texture scale.
+	float mTextureUscale, mTextureVscale;
 	///@}
 
 	/**
@@ -200,6 +212,8 @@ inline void Model::reset()
 	mModelTypeParam.clear();
 	mCardPoints.clear();
 	mRopeRenderMode = RopeNode::RM_tube;
+	mRopeUVMode = RopeNode::UV_none;
+	mRopeNormalMode = RopeNode::NM_none;
 	mRopeNumSubdiv = mRopeNumSlices = 0;
 	mSheetNumUSubdiv = mSheetNumVSubdiv = 0;
 	mRopeThickness = 0.0;
