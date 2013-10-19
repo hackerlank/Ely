@@ -67,9 +67,9 @@ int physics_main(int argc, char **argv)
 	panda.get_task_mgr().add(task);
 
 	//RopeNode
-	PT(Texture)textureImage = TexturePool::load_texture(
+	SMARTPTR(Texture)textureImage = TexturePool::load_texture(
 			Filename(std::string("iron.jpg")));
-	PT(RopeNode)ropeNode = new RopeNode("rope_node");
+	SMARTPTR(RopeNode)ropeNode = new RopeNode("rope_node");
 	ropeNode->set_render_mode(RopeNode::RM_tube);
 	ropeNode->set_uv_mode(RopeNode::UV_parametric);
 	ropeNode->set_normal_mode(RopeNode::NM_none);
@@ -77,10 +77,12 @@ int physics_main(int argc, char **argv)
 	ropeNode->set_num_slices(8);
 	ropeNode->set_thickness(0.4);
 	NodePath ropeNP = NodePath(ropeNode);
-	PT(TextureStage)textureStage0 =
+	SMARTPTR(TextureStage)textureStage0 =
 	new TextureStage("TextureStage0");
 	ropeNP.set_tex_scale(textureStage0, 1.0, 1.0);
 	ropeNP.set_texture(textureStage0, textureImage, 1);
+	ropeNP.set_scale(1.0);
+	ropeNP.set_name("rope");
 
 	//Soft body world information
 	BulletSoftBodyWorldInfo info = physicsWorld->get_world_info();
@@ -89,14 +91,14 @@ int physics_main(int argc, char **argv)
 	info.set_water_offset(0);
 	info.set_water_normal(LVector3f::zero());
 	//create soft rope
-	PT(BulletSoftBodyNode)softRopeNode = BulletSoftBodyNode::make_rope(info, LPoint3f(-2, -1, 8),
+	SMARTPTR(BulletSoftBodyNode)softRopeNode = BulletSoftBodyNode::make_rope(info, LPoint3f(-2, -1, 8),
 			LPoint3f(8, -1, 8), 16, 1);
 	//link with NURBS curve
 	SMARTPTR(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
 	curve->reset(16 + 2);
 	softRopeNode->link_curve(curve);
 	//visualize with RopeNode
-	ropeNode->set_curve(curve);
+	DCAST(RopeNode, ropeNP.node())->set_curve(curve);
 	softRopeNode->set_total_mass(1.0);
 	NodePath softRopeNP = NodePath(softRopeNode);
 	//attach to Bullet World
@@ -105,9 +107,11 @@ int physics_main(int argc, char **argv)
 	softRopeNP.set_collide_mask(BitMask32::all_on());
 
 	//attach to scene
+	ropeNP.reparent_to(softRopeNP);
+//	softRopeNP.flatten_strong();
+	softRopeNP.set_pos(0, 0, 0);
 	softRopeNP.reparent_to(window->get_render());
 	ropeNP.reparent_to(window->get_render());
-//	ropeNP.reparent_to(softRopeNP);
 
 	// Do the main loop
 	panda.main_loop();

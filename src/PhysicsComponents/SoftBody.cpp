@@ -202,17 +202,12 @@ void SoftBody::onAddToObjectSetup()
 		SMARTPTR(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
 		curve->reset(mRes[0] + 2);
 		mSoftBodyNode->link_curve(curve);
-		//visualize with RopeNode
-		SMARTPTR(Model)model = DCAST(Model,
-				mOwnerObject->getComponent(ComponentFamilyType("Scene")));
-		if (model)
+		//visualize with RopeNode (if any)
+		SMARTPTR(RopeNode)ropeNode = DCAST(RopeNode,
+				mOwnerObject->getNodePath().node());
+		if (ropeNode)
 		{
-			SMARTPTR(RopeNode) ropeNode = DCAST(RopeNode,
-					model->getNodePath().node());
-			if (ropeNode)
-			{
-				ropeNode->set_curve(curve);
-			}
+			ropeNode->set_curve(curve);
 		}
 	}
 	//set total mass
@@ -232,8 +227,6 @@ void SoftBody::onAddToObjectSetup()
 	{
 		//reparent the object node path as a child of the soft body's one
 		ownerNodePath.reparent_to(mNodePath);
-		//optimize
-		mNodePath.flatten_strong();
 	}
 
 	//set this rigid body node path as the object's one
@@ -272,10 +265,9 @@ void SoftBody::onAddToSceneSetup()
 	///HACK: rope node's parent node path correction (see bullet samples)
 	if (mBodyType == ROPE)
 	{
-		if (mNodePath.get_num_children() > 0)
+		if (DCAST(RopeNode,	mNodePath.get_child(0).node()))
 		{
-			//the child should be the rope node: reparent
-			//to the owner object node path
+			//the child is the rope node: reparent to the owner object node path
 			mRopeNodePath = mNodePath.get_child(0);
 			mRopeNodePath.reparent_to(mOwnerObject->getNodePath().get_parent());
 		}
@@ -289,8 +281,7 @@ void SoftBody::onRemoveFromSceneCleanup()
 	{
 		if (not mRopeNodePath.is_empty())
 		{
-			//the child should be the rope node: reparent
-			//to this node path
+			//the child is the rope node reparent to this node path
 			mRopeNodePath.reparent_to(mNodePath);
 		}
 	}

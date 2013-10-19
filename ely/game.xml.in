@@ -242,7 +242,6 @@
 		<!-- WORLD OBJECTS -->
 		<!-- ------------- -->
 
-<!--		
 		<Object type="Instanceable" id="Smiley1" priority="100">
 			<Component type="Model">
 				<Param model_file="smiley.bam"/>
@@ -306,6 +305,7 @@
 		</Object>
 
 		<Object type="Actor" id="Actor1"  priority="100">
+<!--		
 			<Component type="Activity">
 				<Param events="forward@h:stop-forward@h-up:fast-forward@shift-h$"/>
 				<Param events="backward@b:stop-backward@b-up:fast-backward@shift-b$"/>
@@ -325,6 +325,7 @@
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
+-->
 			<Component type="Model">
 				<Param model_file="panda.bam"/>
 				<Param anim_files="walk@panda-walk.bam"/>
@@ -469,7 +470,6 @@
 			<Param parent=""/>
 			<Param is_steady="true"/>
 		</Object>
--->
 		
 		<Object type="SoftObject" id="rope1">
 			<Component type="Model">
@@ -485,6 +485,7 @@
 				<Param res="8"/>
 				<Param fixeds="1"/>
 			</Component>
+			<Param parent="render"/>
 		</Object>
 		
 
@@ -492,7 +493,6 @@
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 
-<!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -526,6 +526,7 @@
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
+<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elydatadir@/textures/heightfield.png"/>
