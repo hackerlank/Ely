@@ -13,7 +13,6 @@
 		
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60">
 				<Param event_types="head_left:stop-head_left"/>
 				<Param event_types="head_right:stop-head_right"/>
@@ -21,7 +20,7 @@
 				<Param event_types="pitch_down:stop-pitch_down"/>
 				<Param event_types="hold_lookat:stop-hold_lookat"/>
 			</ComponentTmpl>
--->
+<!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -33,6 +32,7 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -180,7 +180,6 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
-<!--
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
@@ -203,7 +202,6 @@
 				<Param events="pitch_down@s:stop-pitch_down@s-up$"/>
 				<Param events="hold_lookat@shift:stop-hold_lookat@shift-up$"/>
 			</Component>
--->
 			<Component type="Driver">
 				<Param enabled="false"/>
 				<Param max_linear_speed="40.0"/>
@@ -305,7 +303,6 @@
 		</Object>
 
 		<Object type="Actor" id="Actor1"  priority="100">
-<!--		
 			<Component type="Activity">
 				<Param events="forward@h:stop-forward@h-up:fast-forward@shift-h$"/>
 				<Param events="backward@b:stop-backward@b-up:fast-backward@shift-b$"/>
@@ -325,7 +322,6 @@
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="false"/>
 			</Component>
--->
 			<Component type="Model">
 				<Param model_file="panda.bam"/>
 				<Param anim_files="walk@panda-walk.bam"/>

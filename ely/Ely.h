@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Ely.h
+ * \file /Ely/ely/Ely.h
  *
  * \date 30 8, 2013
  * \author consultit
@@ -36,18 +36,19 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 
 ///Define a manager for a given subsystem:
-///@param the manager type
-///@param the manager variable
-///@param the manager sort
-///@param the manager priority
-///@param the task chain variable
-///@param the task chain number of threads and
-///@param the task chain frame_sync flag
-#define GAMESUBMANAGER(_managertype_,_manager_,_sort_,_prio_,_chain_,_threads_,_framesync_) \
-	_chain_ = AsyncTaskManager::get_global_ptr()->make_task_chain(\
-			#_managertype_#_chain_);\
+///@param _chain_ the task chain variable/name
+///@param _threads_ the task chain number of threads
+///@param _framesync_ the task chain frame_sync flag
+///@param _managertype_ the manager type
+///@param _manager_ the manager variable
+///@param _sort_ the manager sort
+///@param _prio_ the manager priority
+#define TASKCHAIN(_chain_,_threads_,_framesync_) \
+	AsyncTaskChain* _chain_ = AsyncTaskManager::get_global_ptr()->\
+	make_task_chain(#_chain_);\
 	_chain_->set_num_threads(_threads_);\
-	_chain_->set_frame_sync(_framesync_);\
-	_managertype_* _manager_ = new _managertype_(_sort_, _prio_, #_managertype_#_chain_);
+	_chain_->set_frame_sync(_framesync_);
+#define GAMESUBMANAGER(_managertype_,_manager_,_sort_,_prio_,_chain_) \
+	_managertype_* _manager_ = new _managertype_(_sort_, _prio_, #_chain_);
 
 #endif /* ELY_H_ */
