@@ -10,6 +10,7 @@
 #include "Game/GamePhysicsManager.h"
 #include "SceneComponents/Model.h"
 #include <bulletSoftBodyWorldInfo.h>
+#include <bulletHelper.h>
 #include <nurbsCurveEvaluator.h>
 
 namespace ely
@@ -93,22 +94,20 @@ bool SoftBody::initialize()
 	float value;
 	int valueInt;
 	//body total mass
-	value = strtof(
-			mTmpl->parameter(std::string("body_total_mass")).c_str(),
-			NULL);
+	value = strtof(mTmpl->parameter(std::string("body_total_mass")).c_str(),
+	NULL);
 	mBodyTotalMass = (value >= 0.0 ? value : -value);
 	//air density
 	value = strtof(mTmpl->parameter(std::string("air_density")).c_str(),
-			NULL);
+	NULL);
 	mAirDensity = (value >= 0.0 ? value : -value);
 	//water density
-	value = strtof(
-			mTmpl->parameter(std::string("water_density")).c_str(),
-			NULL);
+	value = strtof(mTmpl->parameter(std::string("water_density")).c_str(),
+	NULL);
 	mWaterDensity = (value >= 0.0 ? value : -value);
 	//water offset
 	value = strtof(mTmpl->parameter(std::string("water_offset")).c_str(),
-			NULL);
+	NULL);
 	mWaterOffset = (value >= 0.0 ? value : -value);
 	//water normal
 	param = mTmpl->parameter(std::string("water_normal"));
@@ -152,6 +151,10 @@ bool SoftBody::initialize()
 	}
 	//fixeds
 	mFixeds = strtol(mTmpl->parameter(std::string("fixeds")).c_str(), NULL, 0);
+	//gendiags
+	mGendiags = (
+			mTmpl->parameter(std::string("gendiags")) == std::string("false") ?
+					false : true);
 	//
 	return result;
 }
@@ -173,7 +176,36 @@ void SoftBody::onAddToObjectSetup()
 	//create a Soft Body Node
 	if (mBodyType == PATCH)
 	{
-
+		//get points
+		if (mPoints.size() < 4)
+		{
+			mPoints.resize(4, LPoint3f::zero());
+		}
+		//get res
+		if (mRes.size() < 2)
+		{
+			mRes.resize(2, 0);
+		}
+		//create rope
+		mSoftBodyNode = BulletSoftBodyNode::make_patch(info, mPoints[0],
+				mPoints[1], mPoints[2], mPoints[3], mRes[0], mRes[1], mFixeds,
+				mGendiags);
+		//link with Geom
+		CSMARTPTR(GeomVertexFormat) format = GeomVertexFormat::get_v3n3t2();
+		SMARTPTR(Geom) geom =
+				BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
+		mSoftBodyNode->link_geom(geom);
+		//visualize with GeomNode (if any)
+		SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
+				mOwnerObject->getNodePath().node());
+		if (geomNode)
+		{
+			geomNode->add_geom(geom);
+		}
+		//Now we want to have a texture and texture coordinates.
+		//The geom's format has already a column for texcoords, so we just need
+		//to write texcoords using a GeomVertexRewriter.
+		BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
 	}
 	else if (mBodyType == ELLIPSOID)
 	{
@@ -194,6 +226,11 @@ void SoftBody::onAddToObjectSetup()
 		if (mPoints.size() < 2)
 		{
 			mPoints.resize(2, LPoint3f::zero());
+		}
+		//get res
+		if (mRes.size() < 1)
+		{
+			mRes.resize(1, 0);
 		}
 		//create rope
 		mSoftBodyNode = BulletSoftBodyNode::make_rope(info, mPoints[0],

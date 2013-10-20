@@ -184,7 +184,7 @@
 				<Param enabled="false"/>
 				<Param backward="false"/>
 				<Param chased_object="auto1"/>
-				<Param fixed_relative_position="true"/>
+				<Param fixed_relative_position="false"/>
 				<Param reference_object="render"/>
 				<Param abs_max_distance="25.0"/>
 				<Param abs_min_distance="18.0"/>
@@ -444,7 +444,7 @@
 				<Param wheel_set_brake="false,false,true,true"/>
 				<Param wheel_connection_point_ratio="-0.8,-0.7,-0.8$0.8,-0.7,-0.8$-0.8,0.65,-0.8$0.8,0.65,-0.8"/>
 				<Param max_engine_force="-1500.0"/>
-				<Param max_brake="350.0"/>
+				<Param max_brake="800.0"/>
 				<Param forward="enabled"/>
 				<Param backward="enabled"/>
 				<Param brake="enabled"/>
@@ -467,6 +467,7 @@
 			<Param is_steady="true"/>
 		</Object>
 		
+<!--		
 		<Object type="SoftObject" id="rope1">
 			<Component type="Model">
 				<Param from_file="false"/>
@@ -483,8 +484,26 @@
 			</Component>
 			<Param parent="render"/>
 		</Object>
+-->
 		
-
+		<Object type="SoftObject" id="cover1">
+			<Component type="Model">
+				<Param from_file="false"/>
+				<Param model_type="geom_node"/>
+				<Param texture_file="panda.jpg"/>
+				<Param texture_uscale="1.0"/>
+				<Param texture_vscale="1.0"/>
+			</Component>
+			<Component type="SoftBody">
+				<Param body_type="patch"/>
+				<Param points="-35.2,-15.5,50.8:-29.2,-15.5,50.8:-35.2,-21.5,50.8:-29.2,-21.5,50.8"/>
+				<Param res="31:31"/>
+				<Param fixeds="3"/>
+				<Param gendiags="true"/>
+			</Component>
+			<Param parent="render"/>
+		</Object>
+		
 		<!-- ------------------- -->
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->

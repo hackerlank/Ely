@@ -989,6 +989,7 @@ void CrowdTool::handleToggle()
 
 void CrowdTool::handleUpdate(const float dt)
 {
+	rcIgnoreUnused(dt);
 }
 
 void CrowdTool::handleRender(duDebugDraw& dd)

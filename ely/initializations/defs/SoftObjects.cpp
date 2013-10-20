@@ -15,37 +15,53 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/Terrain1.cpp
+ * \file /Ely/ely/initializations/defs/SoftObjects.cpp
  *
- * \date 14/lug/2013 (08:47:42)
+ * \date 20/ott/2013 (10:01:07)
  * \author consultit
  */
 
 #include "../common_configs.h"
+#include "PhysicsComponents/SoftBody.h"
+#include <bulletSoftBodyMaterial.h>
+#include <bulletShape.h>
 
-///Terrain1 related
+///Soft objects related
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-INITIALIZATION Terrain1_initialization;
+INITIALIZATION cover1_initialization;
 
 #ifdef __cplusplus
 }
 #endif
 
-void Terrain1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+///cover1
+void cover1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
-	//Terrain1
-//	object->getNodePath().set_render_mode_wireframe(1);
+	//get SoftBody
+	SMARTPTR(SoftBody) softBody =
+			DCAST(SoftBody, object->getComponent(ComponentFamilyType("Physics")));
+	if(softBody)
+	{
+		HOLD_REMUTEX(softBody->getMutex())
+
+		BulletSoftBodyNode& bulletSoftBodyNode = *softBody;
+		BulletSoftBodyMaterial material = bulletSoftBodyNode.append_material();
+    	material.setLinearStiffness(0.4);
+    	bulletSoftBodyNode.generate_bending_constraints(2, &material);
+    	bulletSoftBodyNode.get_shape(0)->set_margin(0.5);
+	}
 }
 
-void Terrain1Init()
+///init/end
+void softObjectsInit()
 {
 }
 
-void Terrain1End()
+void softObjectsEnd()
 {
 }

@@ -36,36 +36,36 @@ void initializationsEnd()
 }
 
 ///Insert declarations of all init/end functions
-extern void cameraInit();
-extern void cameraEnd();
 extern void Actor1Init();
 extern void Actor1End();
-extern void Terrain1Init();
-extern void Terrain1End();
+extern void cameraInit();
+extern void cameraEnd();
+extern void environmentObjectsInit();
+extern void environmentObjectsEnd();
 extern void player0Init();
 extern void player0End();
+extern void softObjectsInit();
+extern void softObjectsEnd();
 extern void Steerer1Init();
 extern void Steerer1End();
-extern void course2Init();
-extern void course2End();
 
 ///Call all init/end functions
 void callAllInits()
 {
-	cameraInit();
 	Actor1Init();
-	Terrain1Init();
+	cameraInit();
+	environmentObjectsInit();
 	player0Init();
+	softObjectsInit();
 	Steerer1Init();
-	course2Init();
 }
 void callAllEnds()
 {
-	cameraEnd();
 	Actor1End();
-	Terrain1End();
+	cameraEnd();
+	environmentObjectsEnd();
 	player0End();
+	softObjectsEnd();
 	Steerer1End();
-	course2End();
 }
 

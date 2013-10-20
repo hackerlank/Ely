@@ -15,29 +15,39 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/course2.cpp
+ * \file /Ely/ely/initializations/defs/EnvironmentObjects.cpp
  *
- * \date 14/lug/2013 (08:49:04)
+ * \date 20/ott/2013 (10:00:47)
  * \author consultit
  */
 
 #include "../common_configs.h"
 #include "AIComponents/NavMesh.h"
 
-///course2 related
+///Environment objects related
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
+INITIALIZATION Terrain1_initialization;
 INITIALIZATION course2_initialization;
 
 #ifdef __cplusplus
 }
 #endif
 
+///Terrain1
+void Terrain1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//Terrain1
+//	object->getNodePath().set_render_mode_wireframe(1);
+}
+
+///course2
 #ifdef ELY_DEBUG
-///debug flag
+//debug flag
 namespace
 {
 bool debugOn = false;
@@ -57,8 +67,8 @@ void toggleDebugNavMesh(const Event* event, void* data)
 		debugOn = not debugOn;
 	}
 }
-#endif
 }
+#endif
 
 void course2_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
@@ -71,14 +81,11 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 #endif
 }
 
-void course2Init()
+///init/end
+void environmentObjectsInit()
 {
 }
 
-void course2End()
+void environmentObjectsEnd()
 {
 }
-
-
-
-

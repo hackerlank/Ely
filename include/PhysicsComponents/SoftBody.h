@@ -20,10 +20,9 @@ class SoftBodyTemplate;
 /**
  * \brief Component representing a single soft body attached to an object.
  *
- * It constructs a soft body with relevant parameters. Not all the
- * parameters can be specified on creation. Others settings
- * could be made in programs by directly referring to the underlying
- * BulletSoftBodyNode.\n
+ * It constructs a soft body with basic parameters.\n
+ * Others settings could be made in programs by directly referring to the
+ * underlying BulletSoftBodyNode.\n
  * \note rope is visualized as nurbs curse; patch is visualized as GeomNode.\n
  * Soft body types are:
  * - "rope"
@@ -43,6 +42,7 @@ class SoftBodyTemplate;
  * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
  * - "res"  					|single|no default (for rope,patch specified as "res1[:res2]")
  * - "fixeds"  					|single|no default (for rope,patch)
+ * - "gendiags"  				|single|true (for patch)
  *
  * \note parts inside [] are optional.\n
  */
@@ -115,6 +115,7 @@ private:
 	std::vector<LPoint3f> mPoints;
 	std::vector<int> mRes;
 	int mFixeds;
+	bool mGendiags;
 	///@}
 
 	///HACK: rope node's parent node path correction (see bullet samples).
@@ -161,6 +162,7 @@ inline void SoftBody::reset()
 	mRes.clear();
 	mFixeds = 0;
 	mRopeNodePath = NodePath();
+	mGendiags = true;
 }
 
 inline NodePath SoftBody::getNodePath() const

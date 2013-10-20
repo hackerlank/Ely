@@ -6,9 +6,9 @@ initializations_la_SOURCES = \
 		common_configs.cpp common_configs.h \
 		defs/Actor1.cpp \
 		defs/camera.cpp \
-		defs/course2.cpp \
+		defs/EnvironmentObjects.cpp \
 		defs/player0.cpp \
-		defs/Steerer1.cpp \
-		defs/Terrain1.cpp		
+		defs/SoftObjects.cpp \
+		defs/Steerer1.cpp
 
 initializations_la_LDFLAGS = -module -avoid-version
