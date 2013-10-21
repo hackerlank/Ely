@@ -255,10 +255,10 @@
 			<Param is_steady="true"/>
 		</Object>
 
-		<Object type="InstancedActor" id="InstancedSmiley1">
+		<Object type="InstancedActor" id="ball1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
-			<Param pos="-9.60363,-21.9574,43.9806"/>
+			<Param pos="-9.60363,-21.9574,70.9806"/>
 			<Param rot="180.0,0.0,0.0"/>
 			<Component type="RigidBody">
 				<Param body_type="dynamic"/>
@@ -484,7 +484,6 @@
 			</Component>
 			<Param parent="render"/>
 		</Object>
--->
 		
 		<Object type="SoftObject" id="cover1">
 			<Component type="Model">
@@ -503,11 +502,33 @@
 			</Component>
 			<Param parent="render"/>
 		</Object>
+-->
+		
+		<Object type="SoftObject" id="softBall1">
+			<Component type="Model">
+				<Param from_file="false"/>
+				<Param model_type="geom_node"/>
+				<Param texture_file="panda.jpg"/>
+				<Param texture_uscale="1.0"/>
+				<Param texture_vscale="1.0"/>
+			</Component>
+			<Component type="SoftBody">
+				<Param body_type="ellipsoid"/>
+				<Param points="0.0,0.0,0.0"/>
+				<Param res="128"/>
+				<Param radius="1.5,1.5,1.5"/>
+				<Param body_total_mass="30.0"/>
+				<Param body_mass_from_faces="true"/>
+			</Component>
+			<Param parent="render"/>
+			<Param pos="-38.0,-5.9,70.8"/>
+		</Object>
 		
 		<!-- ------------------- -->
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 
+<!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -541,7 +562,6 @@
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elydatadir@/textures/heightfield.png"/>
@@ -640,6 +660,7 @@
 			<Param rot="100.0,5.0,3.5"/>
 			<Param pos="156.8,349.4,27.2"/>
 		</Object>
+-->
 
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
@@ -665,7 +686,6 @@
 			<Param is_steady="true"/>
 			<Param rot="0.0,-90.0,0.0"/>
 		</Object>
--->
 		
 		<!-- ----------------- -->
 		<!-- MANDATORY OBJECTS -->

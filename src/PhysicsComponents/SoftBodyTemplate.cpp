@@ -63,11 +63,13 @@ void SoftBodyTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("body_type", "rope"));
 	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
 	mParameterTable.insert(ParameterNameValue("body_total_mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("body_mass_from_faces", "false"));
 	mParameterTable.insert(ParameterNameValue("air_density", "1.2"));
 	mParameterTable.insert(ParameterNameValue("water_density", "0.0"));
 	mParameterTable.insert(ParameterNameValue("water_offset", "0.0"));
 	mParameterTable.insert(ParameterNameValue("water_normal", "0.0,0.0,0.0"));
 	mParameterTable.insert(ParameterNameValue("gendiags", "true"));
+	mParameterTable.insert(ParameterNameValue("radius", "1.0,1.0,1.0"));
 }
 
 //TypedObject semantics: hardcoded

@@ -24,6 +24,7 @@
 #include "../common_configs.h"
 #include "PhysicsComponents/SoftBody.h"
 #include <bulletSoftBodyMaterial.h>
+#include <bulletSoftBodyConfig.h>
 #include <bulletShape.h>
 
 ///Soft objects related
@@ -33,6 +34,7 @@ extern "C"
 #endif
 
 INITIALIZATION cover1_initialization;
+INITIALIZATION softBall1_initialization;
 
 #ifdef __cplusplus
 }
@@ -54,6 +56,27 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
     	material.setLinearStiffness(0.4);
     	bulletSoftBodyNode.generate_bending_constraints(2, &material);
     	bulletSoftBodyNode.get_shape(0)->set_margin(0.5);
+	}
+}
+
+///softBall1
+void softBall1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//get SoftBody
+	SMARTPTR(SoftBody) softBody =
+			DCAST(SoftBody, object->getComponent(ComponentFamilyType("Physics")));
+	if(softBody)
+	{
+		HOLD_REMUTEX(softBody->getMutex())
+
+		BulletSoftBodyNode& bulletSoftBodyNode = *softBody;
+		bulletSoftBodyNode.set_name("softBall1-Ellipsoid");
+		bulletSoftBodyNode.get_material(0).setLinearStiffness(0.1);
+		bulletSoftBodyNode.get_cfg().set_dynamic_friction_coefficient(1.0);
+		bulletSoftBodyNode.get_cfg().set_damping_coefficient(0.001);
+		bulletSoftBodyNode.get_cfg().set_pressure_coefficient(1500.0);
+		bulletSoftBodyNode.set_pose(true, false);
 	}
 }
 

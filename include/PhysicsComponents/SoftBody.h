@@ -35,14 +35,16 @@ class SoftBodyTemplate;
  * - "body_type"  				|single|"rope" (values: rope|patch|ellipsoid|tri_mesh|tet_mesh)
  * - "collide_mask"  			|single|"all_on"
  * - "body_total_mass"  		|single|"1.0"
+ * - "body_mass_from_faces"		|single|"false"
  * - "air_density"  			|single|"1.2"
  * - "water_density"  			|single|"0.0"
  * - "water_offset"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
  * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
- * - "res"  					|single|no default (for rope,patch specified as "res1[:res2]")
+ * - "res"  					|single|no default (for rope,patch,ellipsoid specified as "res1[:res2]")
  * - "fixeds"  					|single|no default (for rope,patch)
  * - "gendiags"  				|single|true (for patch)
+ * - "radius"					|single|"1.0,1.0,1.0" (for ellipsoid)
  *
  * \note parts inside [] are optional.\n
  */
@@ -107,6 +109,7 @@ private:
 	BodyType mBodyType;
 	BitMask32 mCollideMask;
 	float mBodyTotalMass, mAirDensity, mWaterDensity, mWaterOffset;
+	bool mBodyMassFromFaces;
 	LVector3f mWaterNormal;
 	///@}
 
@@ -116,6 +119,7 @@ private:
 	std::vector<int> mRes;
 	int mFixeds;
 	bool mGendiags;
+	LVecBase3f mRadius;
 	///@}
 
 	///HACK: rope node's parent node path correction (see bullet samples).
@@ -157,12 +161,14 @@ inline void SoftBody::reset()
 	mBodyType = ROPE;
 	mCollideMask = BitMask32::all_off();
 	mBodyTotalMass = mAirDensity = mWaterDensity = mWaterOffset = 0.0;
+	mBodyMassFromFaces = false;
 	mWaterNormal = LVector3::zero();
 	mPoints.clear();
 	mRes.clear();
 	mFixeds = 0;
-	mRopeNodePath = NodePath();
 	mGendiags = true;
+	mRadius = LVecBase3f::zero();
+	mRopeNodePath = NodePath();
 }
 
 inline NodePath SoftBody::getNodePath() const

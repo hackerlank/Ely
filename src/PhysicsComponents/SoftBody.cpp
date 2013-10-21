@@ -97,6 +97,10 @@ bool SoftBody::initialize()
 	value = strtof(mTmpl->parameter(std::string("body_total_mass")).c_str(),
 	NULL);
 	mBodyTotalMass = (value >= 0.0 ? value : -value);
+	//body mass from faces
+	mBodyMassFromFaces = (
+			mTmpl->parameter(std::string("body_mass_from_faces"))
+					== std::string("true") ? true : false);
 	//air density
 	value = strtof(mTmpl->parameter(std::string("air_density")).c_str(),
 	NULL);
@@ -155,6 +159,18 @@ bool SoftBody::initialize()
 	mGendiags = (
 			mTmpl->parameter(std::string("gendiags")) == std::string("false") ?
 					false : true);
+	//radius
+	param = mTmpl->parameter(std::string("radius"));
+	paramValuesStr = parseCompoundString(param, ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
+	{
+		paramValuesStr.resize(3, "0.0");
+	}
+	for (idx = 0; idx < 3; ++idx)
+	{
+		mRadius[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+	}
 	//
 	return result;
 }
@@ -209,7 +225,36 @@ void SoftBody::onAddToObjectSetup()
 	}
 	else if (mBodyType == ELLIPSOID)
 	{
-
+		//get points
+		if (mPoints.size() < 1)
+		{
+			mPoints.resize(1, LPoint3f::zero());
+		}
+		//get res
+		if (mRes.size() < 1)
+		{
+			mRes.resize(1, 0);
+		}
+		//create ellipsoid
+		mSoftBodyNode = BulletSoftBodyNode::make_ellipsoid(info, mPoints[0],
+				mRadius, mRes[0]);
+		//link with Geom
+		CSMARTPTR(GeomVertexFormat) format = GeomVertexFormat::get_v3n3t2();
+		SMARTPTR(Geom) geom =
+				BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
+		mSoftBodyNode->link_geom(geom);
+		//visualize with GeomNode (if any)
+		SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
+				mOwnerObject->getNodePath().node());
+		if (geomNode)
+		{
+			geomNode->add_geom(geom);
+		}
+		//Now we want to have a texture and texture coordinates.
+		//The geom's format has already a column for texcoords, so we just need
+		//to write texcoords using a GeomVertexRewriter.
+		//Note: the following static function is to be written!!!
+//		BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 	}
 	else if (mBodyType == TRIMESH)
 	{
@@ -248,7 +293,7 @@ void SoftBody::onAddToObjectSetup()
 		}
 	}
 	//set total mass
-	mSoftBodyNode->set_total_mass(mBodyTotalMass);
+	mSoftBodyNode->set_total_mass(mBodyTotalMass, mBodyMassFromFaces);
 
 	//create a node path for the soft body
 	mNodePath = NodePath(mSoftBodyNode);
