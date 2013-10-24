@@ -8,6 +8,7 @@
 #ifndef SOFTBODY_H_
 #define SOFTBODY_H_
 
+#include <fstream>
 #include <bulletRigidBodyNode.h>
 #include <bulletSoftBodyNode.h>
 #include "ObjectModel/Component.h"
@@ -28,15 +29,14 @@ class SoftBodyTemplate;
  * - "rope"
  * - "patch"
  * - "ellipsoid"
- * - "triangles"
- * - "tetrahedron"
+ * - "tetra(hedron) mesh"
  *
  * XML Param(s):
- * - "body_type"  				|single|"rope" (values: rope|patch|ellipsoid|tri_mesh|tet_mesh)
- * - "collide_mask"  			|single|"all_on"
- * - "body_total_mass"  		|single|"1.0"
+ * - "body_type"				|single|"rope" (values: rope|patch|ellipsoid|tri_mesh|tetra_mesh)
+ * - "collide_mask"				|single|"all_on"
+ * - "body_total_mass"			|single|"1.0"
  * - "body_mass_from_faces"		|single|"false"
- * - "air_density"  			|single|"1.2"
+ * - "air_density"				|single|"1.2"
  * - "water_density"  			|single|"0.0"
  * - "water_offset"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
@@ -45,6 +45,7 @@ class SoftBodyTemplate;
  * - "fixeds"  					|single|no default (for rope,patch)
  * - "gendiags"  				|single|true (for patch)
  * - "radius"					|single|"1.0,1.0,1.0" (for ellipsoid)
+ * - "tetra_data_files"			|single|no default (for tetra_mesh specified as "elems,faces,nodes")
  *
  * \note parts inside [] are optional.\n
  */
@@ -78,8 +79,7 @@ public:
 		ROPE,
 		PATCH,
 		ELLIPSOID,
-		TRIMESH,
-		TETMESH
+		TETRAMESH
 	};
 
 	/**
@@ -114,12 +114,13 @@ private:
 	///@}
 
 	///@{
-	///Geometric and structural parameters.
+	///Geometric, structural and other parameters.
 	std::vector<LPoint3f> mPoints;
 	std::vector<int> mRes;
 	int mFixeds;
 	bool mGendiags;
 	LVecBase3f mRadius;
+	std::map<std::string, fstream> mTetraDataFiles;
 	///@}
 
 	///HACK: rope node's parent node path correction (see bullet samples).
@@ -168,6 +169,7 @@ inline void SoftBody::reset()
 	mFixeds = 0;
 	mGendiags = true;
 	mRadius = LVecBase3f::zero();
+	mTetraDataFiles.clear();
 	mRopeNodePath = NodePath();
 }
 

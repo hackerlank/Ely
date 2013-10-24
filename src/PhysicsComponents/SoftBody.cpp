@@ -57,13 +57,9 @@ bool SoftBody::initialize()
 	{
 		mBodyType = ELLIPSOID;
 	}
-	else if (bodyType == std::string("tri_mesh"))
-	{
-		mBodyType = TRIMESH;
-	}
 	else if (bodyType == std::string("tet_mesh"))
 	{
-		mBodyType = TETMESH;
+		mBodyType = TETRAMESH;
 	}
 	else
 	{
@@ -171,6 +167,16 @@ bool SoftBody::initialize()
 	{
 		mRadius[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
+	//tetra data files
+	param = mTmpl->parameter(std::string("tetra_data_files"));
+	paramValuesStr = parseCompoundString(param, ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum >= 3)
+	{
+		mTetraDataFiles["elems"] = paramValuesStr[0];
+		mTetraDataFiles["faces"] = paramValuesStr[1];
+		mTetraDataFiles["nodes"] = paramValuesStr[2];
+	}
 	//
 	return result;
 }
@@ -256,13 +262,12 @@ void SoftBody::onAddToObjectSetup()
 		//Note: the following static function is to be written!!!
 //		BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 	}
-	else if (mBodyType == TRIMESH)
+	else if (mBodyType == TETRAMESH)
 	{
-
-	}
-	else if (mBodyType == TETMESH)
-	{
-
+		if (mTetraDataFiles.size() == 3)
+		{
+			///TODO
+		}
 	}
 	else
 	{
