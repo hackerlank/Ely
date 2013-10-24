@@ -8,7 +8,6 @@
 #ifndef SOFTBODY_H_
 #define SOFTBODY_H_
 
-#include <fstream>
 #include <bulletRigidBodyNode.h>
 #include <bulletSoftBodyNode.h>
 #include "ObjectModel/Component.h"
@@ -120,7 +119,7 @@ private:
 	int mFixeds;
 	bool mGendiags;
 	LVecBase3f mRadius;
-	std::map<std::string, fstream> mTetraDataFiles;
+	std::map<std::string, std::string> mTetraDataFileNames;
 	///@}
 
 	///HACK: rope node's parent node path correction (see bullet samples).
@@ -169,7 +168,7 @@ inline void SoftBody::reset()
 	mFixeds = 0;
 	mGendiags = true;
 	mRadius = LVecBase3f::zero();
-	mTetraDataFiles.clear();
+	mTetraDataFileNames.clear();
 	mRopeNodePath = NodePath();
 }
 

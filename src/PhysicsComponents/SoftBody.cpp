@@ -12,6 +12,7 @@
 #include <bulletSoftBodyWorldInfo.h>
 #include <bulletHelper.h>
 #include <nurbsCurveEvaluator.h>
+#include <fstream>
 
 namespace ely
 {
@@ -173,9 +174,9 @@ bool SoftBody::initialize()
 	valueNum = paramValuesStr.size();
 	if (valueNum >= 3)
 	{
-		mTetraDataFiles["elems"] = paramValuesStr[0];
-		mTetraDataFiles["faces"] = paramValuesStr[1];
-		mTetraDataFiles["nodes"] = paramValuesStr[2];
+		mTetraDataFileNames["elems"] = paramValuesStr[0];
+		mTetraDataFileNames["faces"] = paramValuesStr[1];
+		mTetraDataFileNames["nodes"] = paramValuesStr[2];
 	}
 	//
 	return result;
@@ -264,7 +265,7 @@ void SoftBody::onAddToObjectSetup()
 	}
 	else if (mBodyType == TETRAMESH)
 	{
-		if (mTetraDataFiles.size() == 3)
+		if (mTetraDataFileNames.size() == 3)
 		{
 			///TODO
 		}
