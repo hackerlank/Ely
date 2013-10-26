@@ -112,7 +112,11 @@ AC_ARG_ENABLE([ely-training],
 AM_CONDITIONAL([TRAINING], [test "x${ely_training}" = xyes])
 AM_COND_IF([TRAINING],
 	[AM_PROG_CC_C_O
-	AC_CONFIG_FILES([training/Makefile])])
+	AC_CONFIG_FILES([
+		training/Makefile
+		training/recastnavigation/Makefile
+		training/interrogate/Makefile
+		])])
 
 # checks for Ely ELF executable build (if no boost and no training tests)
 AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" != xyes -a "x${ely_training}" != xyes])
