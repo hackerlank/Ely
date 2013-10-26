@@ -23,10 +23,21 @@
 
 #include "testinterrogate.h"
 
-DemoClass::DemoClass(void) {}
-DemoClass::~DemoClass(void) {}
+DemoClass::DemoClass(void)
+{
+}
+DemoClass::~DemoClass(void)
+{
+}
 
 const char *DemoClass::sayHello()
 {
-    return "Hello World!";
+	return "Hello World!";
+}
+
+void DemoClass::someVectorOperation(LVecBase3f *vec)
+{
+	printf("Vector = LVecBase3f(%f,%f,%f)\n", vec->get_x(), vec->get_y(),
+			vec->get_z());
+	vec->set_x(vec->get_x() + 5.0f);
 }

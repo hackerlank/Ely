@@ -25,11 +25,13 @@
 
 // Include the config of the panda3d installation.
 // This will ensure we have the same settings.
-#include "dtool_config.h"
+#include <dtool_config.h>
 #undef DO_MEMORY_USAGE
 
 // Import panda base
-#include "pandabase.h"
+#include <pandabase.h>
+
+#include <lvector3.h>
 
 class EXPCL_PANDASKEL DemoClass
 {
@@ -40,6 +42,7 @@ PUBLISHED:
     ~DemoClass(void);
 
     static const char* sayHello();
+    static void someVectorOperation(LVecBase3f *vec);
 };
 
 #endif /* TESTINTERROGATE_H_ */

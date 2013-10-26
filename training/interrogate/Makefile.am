@@ -2,12 +2,11 @@
 #see https://www.panda3d.org/forums/viewtopic.php?f=12&t=16164
 AM_CPPFLAGS = -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
-AM_LDFLAGS = $(ELY_LDFLAGS)
-LDADD = $(ELY_LIBS)
+AM_LDFLAGS = -module -avoid-version $(ELY_LDFLAGS)
 
-noinst_LTLIBRARIES = libtestinterrogate.la
+lib_LTLIBRARIES = testinterrogate.la
 
-libtestinterrogate_la_LDFLAGS = -module -avoid-version
+testinterrogate_la_LIBADD = $(ELY_LIBS)
 
 MODLIB_NAME = testinterrogate
 
@@ -22,7 +21,7 @@ INTERR_MODULE_CMD = $(INTERR_CMD)_module
 INTERR_MODULE_OPTS = -python-native \
 		-module $(MODLIB_NAME) -library $(MODLIB_NAME)
 
-libtestinterrogate_la_SOURCES = \
+testinterrogate_la_SOURCES = \
 		testinterrogate.cpp \
 		testinterrogate_igate.cpp \
 		testinterrogate_module.cpp
