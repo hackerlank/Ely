@@ -267,7 +267,60 @@ void SoftBody::onAddToObjectSetup()
 	{
 		if (mTetraDataFileNames.size() == 3)
 		{
-			///TODO
+			std::map<std::string, std::string>::const_iterator iter;
+			//get files
+			std::map<std::string, std::ifstream> files;
+			std::map<std::string, int> lengths;
+			std::map<std::string, char*> buffers;
+			bool goodness = true;
+			for (iter = mTetraDataFileNames.begin();
+					iter != mTetraDataFileNames.end(); ++iter)
+			{
+				files[iter->first].open(iter->second.c_str(), ios_base::in);
+				if (not files[iter->first].good())
+				{
+					goodness = false;
+					break;
+				}
+				//get file's length
+				files[iter->first].seekg (0, files[iter->first].end);
+				lengths[iter->first] = files[iter->first].tellg();
+				files[iter->first].seekg (0, files[iter->first].beg);
+			}
+			//check files' goodness
+			if(goodness)
+			{
+				//setup files' buffers and read data as blocks
+				for (iter = mTetraDataFileNames.begin();
+						iter != mTetraDataFileNames.end(); ++iter)
+				{
+					buffers[iter->first] = new char[lengths[iter->first]];
+					files[iter->first].read(buffers[iter->first],
+							lengths[iter->first]);
+					PRINT_DEBUG(buffers[iter->first]);
+				}
+				//create tetra mesh
+				mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info,
+						buffers["elems"], buffers["faces"], buffers["nodes"]);
+
+				///TODO
+				//link with Geom
+				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+				SMARTPTR(Geom)geom =
+				BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
+				mSoftBodyNode->link_geom(geom);
+				//visualize with GeomNode (if any)
+				SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
+						mOwnerObject->getNodePath().node());
+				if (geomNode)
+				{
+					geomNode->add_geom(geom);
+				}
+				//Now we want to have a texture and texture coordinates.
+				//The geom's format has already a column for texcoords, so we just need
+				//to write texcoords using a GeomVertexRewriter.
+				BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+			}
 		}
 	}
 	else
