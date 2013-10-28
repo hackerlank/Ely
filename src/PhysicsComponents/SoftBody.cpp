@@ -1,8 +1,24 @@
 /*
- * SoftBody.cpp
+ *   This file is part of Ely.
  *
- *  Created on: 08/ott/2013
- *      Author: marco
+ *   Ely is free software: you can redistribute it and/or modify
+ *   it under the terms of the GNU General Public License as published by
+ *   the Free Software Foundation, either version 3 of the License, or
+ *   (at your option) any later version.
+ *
+ *   Ely is distributed in the hope that it will be useful,
+ *   but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *   MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *   GNU General Public License for more details.
+ *
+ *   You should have received a copy of the GNU General Public License
+ *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
+ */
+/**
+ * \file /Ely/src/PhysicsComponents/SoftBody.cpp
+ *
+ * \date 08/ott/20132 (08:00:35)
+ * \author consultit
  */
 
 #include "PhysicsComponents/SoftBody.h"
@@ -58,7 +74,11 @@ bool SoftBody::initialize()
 	{
 		mBodyType = ELLIPSOID;
 	}
-	else if (bodyType == std::string("tet_mesh"))
+	else if (bodyType == std::string("tri_mesh"))
+	{
+		mBodyType = TRIMESH;
+	}
+	else if (bodyType == std::string("tetra_mesh"))
 	{
 		mBodyType = TETRAMESH;
 	}
@@ -263,47 +283,50 @@ void SoftBody::onAddToObjectSetup()
 		//Note: the following static function is to be written!!!
 //		BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 	}
+	else if (mBodyType == TRIMESH)
+	{
+
+	}
 	else if (mBodyType == TETRAMESH)
 	{
+		bool goodness = true;
 		if (mTetraDataFileNames.size() == 3)
 		{
 			std::map<std::string, std::string>::const_iterator iter;
 			//get files
-			std::map<std::string, std::ifstream> files;
+			std::map<std::string, std::ifstream*> files;
 			std::map<std::string, int> lengths;
 			std::map<std::string, char*> buffers;
-			bool goodness = true;
 			for (iter = mTetraDataFileNames.begin();
 					iter != mTetraDataFileNames.end(); ++iter)
 			{
-				files[iter->first].open(iter->second.c_str(), ios_base::in);
-				if (not files[iter->first].good())
+				files[iter->first] = new std::ifstream();
+				files[iter->first]->open(iter->second.c_str(),
+						std::ifstream::in);
+				if (not files[iter->first]->good())
 				{
 					goodness = false;
-					break;
+					continue;
 				}
 				//get file's length
-				files[iter->first].seekg (0, files[iter->first].end);
-				lengths[iter->first] = files[iter->first].tellg();
-				files[iter->first].seekg (0, files[iter->first].beg);
+				files[iter->first]->seekg(0, files[iter->first]->end);
+				lengths[iter->first] = files[iter->first]->tellg();
+				files[iter->first]->seekg(0, files[iter->first]->beg);
 			}
 			//check files' goodness
-			if(goodness)
+			if (goodness)
 			{
 				//setup files' buffers and read data as blocks
 				for (iter = mTetraDataFileNames.begin();
 						iter != mTetraDataFileNames.end(); ++iter)
 				{
 					buffers[iter->first] = new char[lengths[iter->first]];
-					files[iter->first].read(buffers[iter->first],
+					files[iter->first]->read(buffers[iter->first],
 							lengths[iter->first]);
-					PRINT_DEBUG(buffers[iter->first]);
 				}
 				//create tetra mesh
 				mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info,
 						buffers["elems"], buffers["faces"], buffers["nodes"]);
-
-				///TODO
 				//link with Geom
 				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 				SMARTPTR(Geom)geom =
@@ -319,8 +342,26 @@ void SoftBody::onAddToObjectSetup()
 				//Now we want to have a texture and texture coordinates.
 				//The geom's format has already a column for texcoords, so we just need
 				//to write texcoords using a GeomVertexRewriter.
-				BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+				//Note: the following static function is to be written!!!
+//				BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
 			}
+			//clear data
+			for (iter = mTetraDataFileNames.begin();
+					iter != mTetraDataFileNames.end(); ++iter)
+			{
+				//clear buffers
+				delete buffers[iter->first];
+				//close and clear files
+				files[iter->first]->close();
+				delete files[iter->first];
+			}
+		}
+		///TODO
+		if ((mTetraDataFileNames.size() < 3) or (not goodness))
+		{
+			//create null tetra mesh
+			mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info,
+			NULL, NULL, NULL);
 		}
 	}
 	else

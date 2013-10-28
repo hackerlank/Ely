@@ -35,6 +35,7 @@ extern "C"
 
 INITIALIZATION cover1_initialization;
 INITIALIZATION softBall1_initialization;
+INITIALIZATION softCube1_initialization;
 
 #ifdef __cplusplus
 }
@@ -77,6 +78,29 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 		bulletSoftBodyNode.get_cfg().set_damping_coefficient(0.001);
 		bulletSoftBodyNode.get_cfg().set_pressure_coefficient(1500.0);
 		bulletSoftBodyNode.set_pose(true, false);
+	}
+}
+
+///softCube1
+void softCube1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//get SoftBody
+	SMARTPTR(SoftBody) softBody =
+			DCAST(SoftBody, object->getComponent(ComponentFamilyType("Physics")));
+	if(softBody)
+	{
+		HOLD_REMUTEX(softBody->getMutex())
+
+		BulletSoftBodyNode& bulletSoftBodyNode = *softBody;
+		bulletSoftBodyNode.set_name("softCube1-Tetramesh");
+		bulletSoftBodyNode.get_shape(0)->set_margin(0.01);
+		bulletSoftBodyNode.get_material(0).setLinearStiffness(0.1);
+		bulletSoftBodyNode.get_cfg().set_positions_solver_iterations(1);
+		bulletSoftBodyNode.get_cfg().clear_all_collision_flags();
+		bulletSoftBodyNode.get_cfg().set_collision_flag(BulletSoftBodyConfig::CF_cluster_soft_soft, true);
+		bulletSoftBodyNode.get_cfg().set_collision_flag(BulletSoftBodyConfig::CF_cluster_rigid_soft, true);
+		bulletSoftBodyNode.generate_clusters(6);
 	}
 }
 
