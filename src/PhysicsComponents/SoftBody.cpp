@@ -356,12 +356,15 @@ void SoftBody::onAddToObjectSetup()
 				delete files[iter->first];
 			}
 		}
-		///TODO
 		if ((mTetraDataFileNames.size() < 3) or (not goodness))
 		{
+			//default 1-cube
+			char nodeBuf[] =
+			{ 8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
+					1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1 };
 			//create null tetra mesh
-			mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info,
-			NULL, NULL, NULL);
+			mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info, NULL,
+					NULL, nodeBuf);
 		}
 	}
 	else

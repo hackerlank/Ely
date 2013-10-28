@@ -4,6 +4,9 @@ dist_models_DATA = \
 		bridge.bam \
 		cityhall.bam \
 		course2.bam \
+		cube.1.ele \
+		cube.1.face \
+		cube.1.node \
 		eve.bam \
 		eve-jump.bam \
 		eve-offbalance.bam \
