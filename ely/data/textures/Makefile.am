@@ -13,6 +13,7 @@ dist_textures_DATA = \
 		lilsmiley.rgba \
 		m0cm0.png \
 		material-20-cl.png \
+		panda.jpg \
 		terrain.png \
 		texturemap.png \
 		Tire_tex.png

@@ -1,6 +1,7 @@
 modelsdir = $(pkgdatadir)/data/models
 dist_models_DATA = \
 		beachhouse2.bam \
+		board.bam \
 		bridge.bam \
 		cityhall.bam \
 		course2.bam \
