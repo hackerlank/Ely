@@ -28,6 +28,7 @@
 #include <bulletSoftBodyWorldInfo.h>
 #include <bulletHelper.h>
 #include <nurbsCurveEvaluator.h>
+#include <geomTriangles.h>
 #include <fstream>
 
 namespace ely
@@ -358,8 +359,12 @@ void SoftBody::onAddToObjectSetup()
 				LPoint3f(0.0,1.0,0.0),
 				LPoint3f(0.0,0.0,1.0)
 			};
-			int index[]={
-					///TODO
+			int index[]=
+			{
+				0,1,2,
+				0,1,3,
+				1,2,3,
+				0,3,2
 			};
 			CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3();
 			SMARTPTR(GeomVertexData) vdata;
@@ -370,18 +375,13 @@ void SoftBody::onAddToObjectSetup()
 				vertex.add_data3(point[i]);
 			}
 			SMARTPTR(GeomTriangles) prim = new GeomTriangles(Geom::UH_static);
-			///TODO
-			prim->add_vertex(0);
-			prim->add_vertex(1);
-			prim->add_vertex(2);
-			prim->close_primitive();
-			//
-			prim->add_vertex(2);
-			prim->add_vertex(1);
-			prim->add_vertex(3);
-			prim->close_primitive();
-
-			PT(Geom) geom;
+			for (int i = 0; i < 4; ++i)
+			{
+				prim->add_vertex(index[3*i + 0]);
+				prim->add_vertex(index[3*i + 1]);
+				prim->add_vertex(index[3*i + 2]);
+				prim->close_primitive();
+			}
 			geom = new Geom(vdata);
 			geom->add_primitive(prim);
 		}
@@ -481,7 +481,7 @@ void SoftBody::onAddToObjectSetup()
 		}
 		if ((mTetraDataFileNames.size() < 3) or (not goodness))
 		{
-			//default 1-cube
+			//default tetramesh
 			char nodeBuf[] =
 			{	8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
 				1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1};
