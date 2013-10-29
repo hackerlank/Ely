@@ -56,11 +56,13 @@ class SoftBodyTemplate;
  * - "water_density"  			|single|"0.0"
  * - "water_offset"  			|single|"0.0"
  * - "water_normal"  			|single|"0.0,0.0,0.0"
+ * - "show_model"				|single|false (for patch,ellipsoid,tetra_mesh)
  * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
  * - "res"  					|single|no default (for rope,patch,ellipsoid specified as "res1[:res2]")
  * - "fixeds"  					|single|no default (for rope,patch)
  * - "gendiags"  				|single|true (for patch)
  * - "radius"					|single|"1.0,1.0,1.0" (for ellipsoid)
+ * - "randomize_constraints"	|single|true (for tri_mesh)
  * - "tetra_data_files"			|single|no default (for tetra_mesh specified as "elems,faces,nodes")
  *
  * \note parts inside [] are optional.\n
@@ -132,11 +134,13 @@ private:
 
 	///@{
 	///Geometric, structural and other parameters.
+	bool mShowModel;
 	std::vector<LPoint3f> mPoints;
 	std::vector<int> mRes;
 	int mFixeds;
 	bool mGendiags;
 	LVecBase3f mRadius;
+	bool mRandomizeConstraints;
 	std::map<std::string, std::string> mTetraDataFileNames;
 	///@}
 
@@ -181,11 +185,13 @@ inline void SoftBody::reset()
 	mBodyTotalMass = mAirDensity = mWaterDensity = mWaterOffset = 0.0;
 	mBodyMassFromFaces = false;
 	mWaterNormal = LVector3::zero();
+	mShowModel = false;
 	mPoints.clear();
 	mRes.clear();
 	mFixeds = 0;
 	mGendiags = true;
 	mRadius = LVecBase3f::zero();
+	mRandomizeConstraints = true;
 	mTetraDataFileNames.clear();
 	mRopeNodePath = NodePath();
 }

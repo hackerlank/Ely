@@ -142,6 +142,10 @@ bool SoftBody::initialize()
 	{
 		mWaterNormal[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
+	//show model
+	mShowModel = (
+			mTmpl->parameter(std::string("show_model")) == std::string("true") ?
+					true : false);
 	//points
 	param = mTmpl->parameter(std::string("points"));
 	paramValuesStr = parseCompoundString(param, ':');
@@ -188,6 +192,10 @@ bool SoftBody::initialize()
 	{
 		mRadius[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
 	}
+	//randomize constraints
+	mRandomizeConstraints = (
+			mTmpl->parameter(std::string("randomize_constraints"))
+					== std::string("false") ? false : true);
 	//tetra data files
 	param = mTmpl->parameter(std::string("tetra_data_files"));
 	paramValuesStr = parseCompoundString(param, ',');
@@ -229,26 +237,48 @@ void SoftBody::onAddToObjectSetup()
 		{
 			mRes.resize(2, 0);
 		}
-		//create rope
+		//create patch
 		mSoftBodyNode = BulletSoftBodyNode::make_patch(info, mPoints[0],
 				mPoints[1], mPoints[2], mPoints[3], mRes[0], mRes[1], mFixeds,
 				mGendiags);
-		//link with Geom
-		CSMARTPTR(GeomVertexFormat) format = GeomVertexFormat::get_v3n3t2();
-		SMARTPTR(Geom) geom =
-				BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
-		mSoftBodyNode->link_geom(geom);
-		//visualize with GeomNode (if any)
-		SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
-				mOwnerObject->getNodePath().node());
-		if (geomNode)
+		//visualize
+		SMARTPTR(Geom)geom;
+		SMARTPTR(GeomNode)geomNode;
+		if (mShowModel)
 		{
-			geomNode->add_geom(geom);
+			//visualize with model GeomNode (if any)
+			geomNode =
+					DCAST(GeomNode,
+							mOwnerObject->getNodePath().find_all_matches(
+									"**/+GeomNode").get_path(0).node());
+			if (geomNode)
+			{
+				geom = geomNode->modify_geom(0).p();
+			}
+			else
+			{
+				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+				geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
+				//make texcoords for patch.
+				BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+			}
 		}
-		//Now we want to have a texture and texture coordinates.
-		//The geom's format has already a column for texcoords, so we just need
-		//to write texcoords using a GeomVertexRewriter.
-		BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+		else
+		{
+			CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+			geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
+			//make texcoords for patch.
+			BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+			//visualize with GeomNode (if any)
+			geomNode = DCAST(GeomNode,
+					mOwnerObject->getNodePath().node());
+			if (geomNode)
+			{
+				geomNode->add_geom(geom);
+			}
+		}
+		//link with Geom
+		mSoftBodyNode->link_geom(geom);
 	}
 	else if (mBodyType == ELLIPSOID)
 	{
@@ -265,27 +295,100 @@ void SoftBody::onAddToObjectSetup()
 		//create ellipsoid
 		mSoftBodyNode = BulletSoftBodyNode::make_ellipsoid(info, mPoints[0],
 				mRadius, mRes[0]);
-		//link with Geom
-		CSMARTPTR(GeomVertexFormat) format = GeomVertexFormat::get_v3n3t2();
-		SMARTPTR(Geom) geom =
-				BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
-		mSoftBodyNode->link_geom(geom);
-		//visualize with GeomNode (if any)
-		SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
-				mOwnerObject->getNodePath().node());
-		if (geomNode)
+		//visualize
+		SMARTPTR(Geom)geom;
+		SMARTPTR(GeomNode)geomNode;
+		if (mShowModel)
 		{
-			geomNode->add_geom(geom);
+			//visualize with model GeomNode (if any)
+			geomNode =
+					DCAST(GeomNode,
+							mOwnerObject->getNodePath().find_all_matches(
+									"**/+GeomNode").get_path(0).node());
+			if (geomNode)
+			{
+				geom = geomNode->modify_geom(0).p();
+			}
+			else
+			{
+				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+				geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
+				//make texcoords for ellipsoid: to be written!!!
+//				BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+			}
 		}
-		//Now we want to have a texture and texture coordinates.
-		//The geom's format has already a column for texcoords, so we just need
-		//to write texcoords using a GeomVertexRewriter.
-		//Note: the following static function is to be written!!!
-//		BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+		else
+		{
+			CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+			geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
+			//make texcoords for ellipsoid: to be written!!!
+//			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+			//visualize with GeomNode (if any)
+			geomNode = DCAST(GeomNode,
+					mOwnerObject->getNodePath().node());
+			if (geomNode)
+			{
+				geomNode->add_geom(geom);
+			}
+		}
+		//link with Geom
+		mSoftBodyNode->link_geom(geom);
 	}
 	else if (mBodyType == TRIMESH)
 	{
+		//get and visualize with model GeomNode (if any)
+		SMARTPTR(Geom)geom;
+		SMARTPTR(GeomNode)geomNode;
+		//get and visualize with model GeomNode (if any)
+		geomNode =
+		DCAST(GeomNode,
+				mOwnerObject->getNodePath().find_all_matches(
+						"**/+GeomNode").get_path(0).node());
+		if (geomNode)
+		{
+			geom = geomNode->modify_geom(0).p();
+		}
+		else
+		{
+			//default trimesh
+			LPoint3f point[] =
+			{
+				LPoint3f(0.0,0.0,0.0),
+				LPoint3f(1.0,0.0,0.0),
+				LPoint3f(0.0,1.0,0.0),
+				LPoint3f(0.0,0.0,1.0)
+			};
+			int index[]={
+					///TODO
+			};
+			CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3();
+			SMARTPTR(GeomVertexData) vdata;
+			vdata = new GeomVertexData("defaultTriMesh", format, Geom::UH_static);
+			GeomVertexWriter vertex;
+			for (int i = 0; i < 4; ++i)
+			{
+				vertex.add_data3(point[i]);
+			}
+			SMARTPTR(GeomTriangles) prim = new GeomTriangles(Geom::UH_static);
+			///TODO
+			prim->add_vertex(0);
+			prim->add_vertex(1);
+			prim->add_vertex(2);
+			prim->close_primitive();
+			//
+			prim->add_vertex(2);
+			prim->add_vertex(1);
+			prim->add_vertex(3);
+			prim->close_primitive();
 
+			PT(Geom) geom;
+			geom = new Geom(vdata);
+			geom->add_primitive(prim);
+		}
+		//create trimesh
+		mSoftBodyNode = BulletSoftBodyNode::make_tri_mesh(info, geom, mRandomizeConstraints);
+		//link with Geom
+		mSoftBodyNode->link_geom(geom);
 	}
 	else if (mBodyType == TETRAMESH)
 	{
@@ -327,23 +430,43 @@ void SoftBody::onAddToObjectSetup()
 				//create tetra mesh
 				mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info,
 						buffers["elems"], buffers["faces"], buffers["nodes"]);
-				//link with Geom
-				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
-				SMARTPTR(Geom)geom =
-				BulletHelper::make_geom_from_faces(mSoftBodyNode, format, true).p();
-				mSoftBodyNode->link_geom(geom);
-				//visualize with GeomNode (if any)
-				SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
-						mOwnerObject->getNodePath().node());
-				if (geomNode)
+				//visualize
+				SMARTPTR(Geom)geom;
+				SMARTPTR(GeomNode)geomNode;
+				if (mShowModel)
 				{
-					geomNode->add_geom(geom);
+					//visualize with model GeomNode (if any)
+					geomNode = DCAST(GeomNode,
+							mOwnerObject->getNodePath().find_all_matches(
+									"**/+GeomNode").get_path(0).node());
+					if (geomNode)
+					{
+						geom = geomNode->modify_geom(0).p();
+					}
+					else
+					{
+						CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+						geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
+						//make texcoords for tetramesh: to be written!!!
+//						BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+					}
 				}
-				//Now we want to have a texture and texture coordinates.
-				//The geom's format has already a column for texcoords, so we just need
-				//to write texcoords using a GeomVertexRewriter.
-				//Note: the following static function is to be written!!!
-//				BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+				else
+				{
+					CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+					geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
+					//make texcoords for tetramesh: to be written!!!
+//					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+					//visualize with GeomNode (if any)
+					geomNode = DCAST(GeomNode,
+							mOwnerObject->getNodePath().node());
+					if (geomNode)
+					{
+						geomNode->add_geom(geom);
+					}
+				}
+				//link with Geom
+				mSoftBodyNode->link_geom(geom);
 			}
 			//clear data
 			for (iter = mTetraDataFileNames.begin();
@@ -360,8 +483,8 @@ void SoftBody::onAddToObjectSetup()
 		{
 			//default 1-cube
 			char nodeBuf[] =
-			{ 8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
-					1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1 };
+			{	8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
+				1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1};
 			//create null tetra mesh
 			mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info, NULL,
 					NULL, nodeBuf);

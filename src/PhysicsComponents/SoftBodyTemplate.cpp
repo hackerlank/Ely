@@ -84,8 +84,10 @@ void SoftBodyTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("water_density", "0.0"));
 	mParameterTable.insert(ParameterNameValue("water_offset", "0.0"));
 	mParameterTable.insert(ParameterNameValue("water_normal", "0.0,0.0,0.0"));
+	mParameterTable.insert(ParameterNameValue("show_model", "false"));
 	mParameterTable.insert(ParameterNameValue("gendiags", "true"));
 	mParameterTable.insert(ParameterNameValue("radius", "1.0,1.0,1.0"));
+	mParameterTable.insert(ParameterNameValue("randomize_constraints", "true"));
 }
 
 //TypedObject semantics: hardcoded

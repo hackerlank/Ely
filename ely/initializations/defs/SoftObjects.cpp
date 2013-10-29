@@ -36,6 +36,7 @@ extern "C"
 INITIALIZATION cover1_initialization;
 INITIALIZATION softBall1_initialization;
 INITIALIZATION softCube1_initialization;
+INITIALIZATION softModel1_initialization;
 
 #ifdef __cplusplus
 }
@@ -101,6 +102,26 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 		bulletSoftBodyNode.get_cfg().set_collision_flag(BulletSoftBodyConfig::CF_cluster_soft_soft, true);
 		bulletSoftBodyNode.get_cfg().set_collision_flag(BulletSoftBodyConfig::CF_cluster_rigid_soft, true);
 		bulletSoftBodyNode.generate_clusters(6);
+	}
+}
+
+///softModel1
+void softModel1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//get SoftBody
+	SMARTPTR(SoftBody) softBody =
+			DCAST(SoftBody, object->getComponent(ComponentFamilyType("Physics")));
+	if(softBody)
+	{
+		HOLD_REMUTEX(softBody->getMutex())
+
+		BulletSoftBodyNode& bulletSoftBodyNode = *softBody;
+		bulletSoftBodyNode.set_name("softModel1-Trimesh");
+		bulletSoftBodyNode.generate_bending_constraints(2);
+		bulletSoftBodyNode.get_cfg().set_positions_solver_iterations(2);
+		bulletSoftBodyNode.get_cfg().set_collision_flag(BulletSoftBodyConfig::CF_vertex_face_soft_soft,true);
+		bulletSoftBodyNode.randomize_constraints();
 	}
 }
 

@@ -522,7 +522,6 @@
 			<Param parent="render"/>
 			<Param pos="-38.0,-5.9,70.8"/>
 		</Object>
--->
 
 		<Object type="SoftObject" id="softCube1">
 			<Component type="Model">
@@ -541,7 +540,23 @@
 			<Param parent="render"/>
 			<Param pos="-38.0,-5.9,80.8"/>
 		</Object>
-		
+-->
+	
+		<Object type="SoftObject" id="softModel1">
+			<Component type="Model">
+				<Param model_file="eve.bam"/>
+				<Param scale="1.0,1.0,1.0"/>
+			</Component>
+			<Component type="SoftBody">
+				<Param body_type="tri_mesh"/>
+				<Param randomize_constraints="true"/>
+				<Param body_total_mass="50.0"/>
+				<Param body_mass_from_faces="true"/>
+			</Component>
+			<Param parent="render"/>
+			<Param pos="-38.0,-5.9,90.8"/>
+		</Object>
+
 		<!-- ------------------- -->
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
