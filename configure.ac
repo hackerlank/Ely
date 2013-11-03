@@ -39,27 +39,27 @@ AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
 # ELY_DEVEL
 AC_ARG_ENABLE([ely-devel],
 	AS_HELP_STRING([--enable-ely-devel],
-		[=yes enable Ely development mode (disabled by default)]),
+		[@<:@=yes@:>@ enable Ely development mode (disabled by default)]),
     [ely_devel=${enableval}], [ely_devel=no])
-AM_CONDITIONAL([ELY_DEVEL], [test "x${ely_devel}" = xyes])
+AM_CONDITIONAL([ELY_DEVEL], [test "x${ely_devel}" != xno])
 # ELY_DEBUG
 AC_ARG_ENABLE([ely-debug],
 	AS_HELP_STRING([--enable-ely-debug],
-		[=yes enable Ely debug mode (disabled by default)]),
+		[@<:@=yes@:>@ enable Ely debug mode (disabled by default)]),
     [ely_debug=${enableval}], [ely_debug=no])
-AS_IF([test "x${ely_debug}" = xyes],
+AS_IF([test "x${ely_debug}" != xno],
 	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
 	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"],
 	[AC_DEFINE([NDEBUG],[1],[release mode enabled])])
 # enables silent rules
-#AS_IF([test "x${ely_devel}" != xyes -a "x${ely_debug}" != xyes],
+#AS_IF([test "x${ely_devel}" = xno -a "x${ely_debug}" = xno],
 #	[AM_SILENT_RULES])
 # ELY_THREAD
 AC_ARG_ENABLE([ely-thread],
     AS_HELP_STRING([--enable-ely-thread],
-    	[=yes enable Ely threading mode (disabled by default)]),
+    	[@<:@=yes@:>@ enable Ely threading mode (disabled by default)]),
     [ely_thread=${enableval}], [ely_thread=no])
-AS_IF([test "x${ely_thread}" = xyes],
+AS_IF([test "x${ely_thread}" != xno],
 	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])])
 
 # checks for libraries.
@@ -96,9 +96,9 @@ AC_SUBST(ELY_RN_PHYSICS_LIBS)
 # checks for Boost Unit Test Framework tests (mantainer only)
 AC_ARG_ENABLE([ely-test],
     AS_HELP_STRING([--enable-ely-test],
-    	[=yes enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
+    	[@<:@=yes@:>@ enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
     [ely_test=${enableval}], [ely_test=no])
-AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" = xyes])
+AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" != xno])
 AM_COND_IF([BOOST_TEST],
 	[AX_BOOST_BASE
 	AX_BOOST_UNIT_TEST_FRAMEWORK
@@ -107,9 +107,9 @@ AM_COND_IF([BOOST_TEST],
 # checks for training tests (mantainer only)
 AC_ARG_ENABLE([ely-training],
     AS_HELP_STRING([--enable-ely-training],
-    	[=yes enable Ely training test programs - mantainer only (disabled by default)]),
+    	[@<:@=yes@:>@ enable Ely training test programs - mantainer only (disabled by default)]),
     [ely_training=${enableval}], [ely_training=no])
-AM_CONDITIONAL([TRAINING], [test "x${ely_training}" = xyes])
+AM_CONDITIONAL([TRAINING], [test "x${ely_training}" != xno])
 AM_COND_IF([TRAINING],
 	[AM_PROG_CC_C_O
 	AC_CONFIG_FILES([
@@ -119,7 +119,7 @@ AM_COND_IF([TRAINING],
 		])])
 
 # checks for Ely ELF executable build (if no boost and no training tests)
-AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" != xyes -a "x${ely_training}" != xyes])
+AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" = xno -a "x${ely_training}" = xno])
 AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile
