@@ -116,6 +116,7 @@ AM_COND_IF([TRAINING],
 		training/Makefile
 		training/recastnavigation/Makefile
 		training/interrogate/Makefile
+		training/opensteer/Makefile
 		])])
 
 # checks for Ely ELF executable build (if no boost and no training tests)

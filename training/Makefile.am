@@ -4,7 +4,9 @@ AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 LDADD = $(ELY_LIBS)
 
-SUBDIRS = recastnavigation interrogate
+#SUBDIRS = recastnavigation
+#SUBDIRS = interrogate
+SUBDIRS = opensteer
 
 noinst_PROGRAMS = ely_training 
 
