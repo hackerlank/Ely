@@ -36,25 +36,73 @@
 // ------------------------------------------------------------------------
 
 
-#include "OpenSteer/OpenSteerDemo.h"        // OpenSteerDemo application
-#include "OpenSteer/Draw.h"                 // OpenSteerDemo graphics
+#include <pandaFramework.h>
+#include <pandaSystem.h>
+#include <load_prc_file.h>
+
+//#include "OpenSteer/OpenSteerDemo.h"        // OpenSteerDemo application
+//#include "OpenSteer/Draw.h"                 // OpenSteerDemo graphics
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
 
+AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data);
 
-int main (int argc, char **argv) 
+extern std::string baseDir;
+
+int main(int argc, char *argv[])
 {
-    // initialize OpenSteerDemo application
-    OpenSteer::OpenSteerDemo::initialize ();
+	// Load your configuration
+	load_prc_file_data("", "model-path" + baseDir + "data/models");
+	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "show-frame-rate-meter #t");
+	load_prc_file_data("", "lock-to-one-cpu 0");
+	load_prc_file_data("", "support-threads 1");
+	load_prc_file_data("", "audio-buffering-seconds 5");
+	load_prc_file_data("", "audio-preload-threshold 2000000");
+	load_prc_file_data("", "sync-video #t");
+	//open a new window framework
+	PandaFramework framework;
+	framework.open_framework(argc, argv);
+	//set the window title to My Panda3D Window
+	framework.set_window_title("My Panda3D Window");
+	//open the window
+	WindowFramework *window = framework.open_window();
+	if (window != (WindowFramework *) NULL)
+	{
+		std::cout << "Opened the window successfully!\n";
+		// common setup
+		window->enable_keyboard(); // Enable keyboard detection
+		window->setup_trackball(); // Enable default camera movement
+	}
+	//setup camera trackball (local coordinate)
+	NodePath tballnp = window->get_mouse().find("**/+Trackball");
+	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	trackball->set_pos(0, 200, 0);
+	trackball->set_hpr(0, 15, 0);
 
-    // initialize graphics
-    OpenSteer::initializeGraphics (argc, argv);
+	//here is room for your own code
+	//add opensteer update task
+	AsyncTask* task = new GenericAsyncTask("opensteer update", &opensteer_update,
+			reinterpret_cast<void*>(NULL));
+	AsyncTaskManager::get_global_ptr()->add(task);
 
-    // run the main event processing loop
-    OpenSteer::runGraphics ();  
-    return EXIT_SUCCESS;
+
+
+	//do the main loop, equal to run() in python
+	framework.main_loop();
+	//close the window framework
+	framework.close_framework();
+	return (0);
 }
 
+std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
+
+AsyncTask::DoneStatus opensteer_update (GenericAsyncTask* task, void* data)
+{
+	return AsyncTask::DS_cont;
+}
 
 // ------------------------------------------------------------------------
