@@ -518,10 +518,10 @@ void processPrimitive(CPT(GeomPrimitive)primitive, CPT(GeomVertexData)vertexData
 int draw_geometry_main(int argc, char *argv[])
 {
 	// Load your configuration
-	load_prc_file_data("", "model-path" + baseDir + "data/models");
-	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
-	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
-	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "model-path " + baseDir + "data/models");
+	load_prc_file_data("", "model-path " + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path " + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path " + baseDir + "data/textures");
 	load_prc_file_data("", "show-frame-rate-meter #t");
 	load_prc_file_data("", "lock-to-one-cpu 0");
 	load_prc_file_data("", "support-threads 1");

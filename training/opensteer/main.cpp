@@ -35,13 +35,13 @@
 //
 // ------------------------------------------------------------------------
 
-
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <load_prc_file.h>
 
 //#include "OpenSteer/OpenSteerDemo.h"        // OpenSteerDemo application
 //#include "OpenSteer/Draw.h"                 // OpenSteerDemo graphics
+#include "OneTurning.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -53,10 +53,10 @@ extern std::string baseDir;
 int main(int argc, char *argv[])
 {
 	// Load your configuration
-	load_prc_file_data("", "model-path" + baseDir + "data/models");
-	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
-	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
-	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "model-path " + baseDir + "data/models");
+	load_prc_file_data("", "model-path " + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path " + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path " + baseDir + "data/textures");
 	load_prc_file_data("", "show-frame-rate-meter #t");
 	load_prc_file_data("", "lock-to-one-cpu 0");
 	load_prc_file_data("", "support-threads 1");
@@ -79,17 +79,22 @@ int main(int argc, char *argv[])
 	}
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
 	trackball->set_hpr(0, 15, 0);
 
 	//here is room for your own code
+	//load actor
+	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
+	ely.reparent_to(window->get_render());
+
+	//opensteer plugin
+	OneTurningPlugInPanda3d gOneTurningPlugIn;
+
 	//add opensteer update task
-	AsyncTask* task = new GenericAsyncTask("opensteer update", &opensteer_update,
-			reinterpret_cast<void*>(NULL));
+	AsyncTask* task = new GenericAsyncTask("opensteer update",
+			&opensteer_update, reinterpret_cast<void*>(NULL));
 	AsyncTaskManager::get_global_ptr()->add(task);
-
-
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -99,8 +104,14 @@ int main(int argc, char *argv[])
 }
 
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
+namespace OpenSteer
+{
+bool enableAnnotation = false;
+//bool updatePhaseActive = false;
+bool drawPhaseActive = false;
+}
 
-AsyncTask::DoneStatus opensteer_update (GenericAsyncTask* task, void* data)
+AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 {
 	return AsyncTask::DS_cont;
 }

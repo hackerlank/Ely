@@ -9,4 +9,4 @@ noinst_PROGRAMS = ely_opensteer
 #ely_opensteer
 nodist_ely_opensteer_SOURCES = \
 		main.cpp \
-		OneTurning.cpp
+		Draw.cpp
