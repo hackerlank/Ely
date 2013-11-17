@@ -80,7 +80,7 @@ int main(int argc, char *argv[])
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
 	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
-	trackball->set_pos(0, 200, 0);
+	trackball->set_pos(0, 50, 0);
 	trackball->set_hpr(0, 15, 0);
 
 	//here is room for your own code
@@ -90,10 +90,12 @@ int main(int argc, char *argv[])
 
 	//opensteer plugin
 	OneTurningPlugInPanda3d gOneTurningPlugIn;
+	gOneTurningPlugIn.open();
+	gOneTurningPlugIn.gOneTurning->setActor(ely);
 
 	//add opensteer update task
 	AsyncTask* task = new GenericAsyncTask("opensteer update",
-			&opensteer_update, reinterpret_cast<void*>(NULL));
+			&opensteer_update, reinterpret_cast<void*>(&gOneTurningPlugIn));
 	AsyncTaskManager::get_global_ptr()->add(task);
 
 	//do the main loop, equal to run() in python
@@ -113,6 +115,18 @@ bool drawPhaseActive = false;
 
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 {
+	OneTurningPlugInPanda3d* selectedPlugIn =
+			reinterpret_cast<OneTurningPlugInPanda3d*>(data);
+
+	float elapsedTime = ClockObject::get_global_clock()->get_dt();
+	double currentTime = ClockObject::get_global_clock()->get_real_time();
+
+	// service queued reset request, if any
+//    doDelayedResetPlugInXXX ();
+
+	// invoke selected PlugIn's Update method
+	selectedPlugIn->update(currentTime, elapsedTime);
+
 	return AsyncTask::DS_cont;
 }
 

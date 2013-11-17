@@ -39,8 +39,11 @@
 #include <sstream>
 #include "OpenSteer/SimpleVehicle.h"
 #include "OpenSteer/PlugIn.h"
+#include <nodePath.h>
 //#include "OpenSteer/OpenSteerDemo.h"
 //#include "OpenSteer/Color.h"
+
+#include "common.h"
 
 //namespace {
 
@@ -53,7 +56,8 @@ class OneTurningPanda3d: public SimpleVehicle
 public:
 
 	// constructor
-	OneTurningPanda3d()
+	OneTurningPanda3d(NodePath actor = NodePath()) :
+			mActor(actor)
 	{
 		reset();
 	}
@@ -74,14 +78,27 @@ public:
 		applySteeringForce(Vec3(-2, 0, -3), elapsedTime);
 		annotationVelocityAcceleration();
 		recordTrailVertex(currentTime, position());
+		//update actor
+		LPoint3f pos = OpenSteerVec3ToLVecBase3f(position());
+		mActor.set_pos(pos);
+		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(forward()),
+				OpenSteerVec3ToLVecBase3f(up()));
 	}
 
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
-//            drawBasic2dCircularVehicle (*this, gGray50);
+		drawBasic2dCircularVehicle(*this, gGray50);
 		drawTrail();
 	}
+
+	void setActor(NodePath actor)
+	{
+		mActor = actor;
+	}
+
+protected:
+	NodePath mActor;
 };
 
 // ----------------------------------------------------------------------------
