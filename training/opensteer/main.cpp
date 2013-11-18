@@ -42,9 +42,11 @@
 //#include "OpenSteer/OpenSteerDemo.h"        // OpenSteerDemo application
 //#include "OpenSteer/Draw.h"                 // OpenSteerDemo graphics
 #include "OneTurning.h"
+#include "LowSpeedTurn.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
+#include <sstream>
 
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data);
 
@@ -86,16 +88,37 @@ int main(int argc, char *argv[])
 	//here is room for your own code
 	//load actor
 	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
-	ely.reparent_to(window->get_render());
 
-	//opensteer plugin
-	OneTurningPlugInPanda3d gOneTurningPlugIn;
-	gOneTurningPlugIn.open();
-	gOneTurningPlugIn.gOneTurning->setActor(ely);
+	//current plugin
+	OpenSteer::PlugIn* selectedPlugIn = NULL;
+
+	//OneTurning plugin
+//	ely::OneTurningPlugIn gOneTurningPlugIn;
+//	selectedPlugIn = &gOneTurningPlugIn;
+//	gOneTurningPlugIn.open();
+//	//view actor
+//	NodePath elyInst = window->get_render().attach_new_node("OneTurning");
+//	ely.instance_to(elyInst);
+//	gOneTurningPlugIn.gOneTurning->setActor(elyInst);
+
+	//LowSpeedTurn plugin
+	ely::LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;
+	selectedPlugIn = &gLowSpeedTurnPlugIn;
+	gLowSpeedTurnPlugIn.open();
+	for (int i = 0; i < ely::lstCount; i++)
+	{
+		//view actor
+		ostringstream num;
+		num << i;
+		std::string instName = "LowSpeedTurn-" + num.str();
+		NodePath elyInst = window->get_render().attach_new_node(instName);
+		ely.instance_to(elyInst);
+		gLowSpeedTurnPlugIn.all[i]->setActor(elyInst);
+	}
 
 	//add opensteer update task
 	AsyncTask* task = new GenericAsyncTask("opensteer update",
-			&opensteer_update, reinterpret_cast<void*>(&gOneTurningPlugIn));
+			&opensteer_update, reinterpret_cast<void*>(selectedPlugIn));
 	AsyncTaskManager::get_global_ptr()->add(task);
 
 	//do the main loop, equal to run() in python
@@ -115,8 +138,8 @@ bool drawPhaseActive = false;
 
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 {
-	OneTurningPlugInPanda3d* selectedPlugIn =
-			reinterpret_cast<OneTurningPlugInPanda3d*>(data);
+	OpenSteer::PlugIn* selectedPlugIn =
+			reinterpret_cast<OpenSteer::PlugIn*>(data);
 
 	float elapsedTime = ClockObject::get_global_clock()->get_dt();
 	double currentTime = ClockObject::get_global_clock()->get_real_time();

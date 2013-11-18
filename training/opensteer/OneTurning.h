@@ -45,19 +45,19 @@
 
 #include "common.h"
 
-//namespace {
+namespace ely
+{
 
 using namespace OpenSteer;
 
 // ----------------------------------------------------------------------------
 
-class OneTurningPanda3d: public SimpleVehicle
+class _OneTurning: public SimpleVehicle
 {
 public:
 
 	// constructor
-	OneTurningPanda3d(NodePath actor = NodePath()) :
-			mActor(actor)
+	_OneTurning()
 	{
 		reset();
 	}
@@ -78,11 +78,6 @@ public:
 		applySteeringForce(Vec3(-2, 0, -3), elapsedTime);
 		annotationVelocityAcceleration();
 		recordTrailVertex(currentTime, position());
-		//update actor
-		LPoint3f pos = OpenSteerVec3ToLVecBase3f(position());
-		mActor.set_pos(pos);
-		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(forward()),
-				OpenSteerVec3ToLVecBase3f(up()));
 	}
 
 	// draw this character/vehicle into the scene
@@ -91,20 +86,14 @@ public:
 		drawBasic2dCircularVehicle(*this, gGray50);
 		drawTrail();
 	}
-
-	void setActor(NodePath actor)
-	{
-		mActor = actor;
-	}
-
-protected:
-	NodePath mActor;
 };
+
+typedef ActorMixin<_OneTurning> OneTurning;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
-class OneTurningPlugInPanda3d: public PlugIn
+class OneTurningPlugIn: public PlugIn
 {
 public:
 
@@ -119,13 +108,13 @@ public:
 	}
 
 	// be more "nice" to avoid a compiler warning
-	virtual ~OneTurningPlugInPanda3d()
+	virtual ~OneTurningPlugIn()
 	{
 	}
 
 	void open(void)
 	{
-		gOneTurning = new OneTurningPanda3d;
+		gOneTurning = new OneTurning;
 //            OpenSteerDemo::selectedVehicle = gOneTurning;
 		theVehicle.push_back(gOneTurning);
 
@@ -180,12 +169,12 @@ public:
 		return (const AVGroup&) theVehicle;
 	}
 
-	OneTurningPanda3d* gOneTurning;
-	std::vector<OneTurningPanda3d*> theVehicle; // for allVehicles
+	OneTurning* gOneTurning;
+	std::vector<OneTurning*> theVehicle; // for allVehicles
 };
 
 //    OneTurningPlugInPanda3d gOneTurningPlugIn;
 
 // ----------------------------------------------------------------------------
 
-//} // anonymous namespace
+}// ely namespace

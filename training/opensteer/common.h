@@ -24,6 +24,11 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#include <nodePath.h>
+#include <OpenSteer/Vec3.h>
+
+namespace ely
+{
 //LVecBase3f-OpenSteer::Vec3 conversion functions
 inline OpenSteer::Vec3 LVecBase3fToOpenSteerVec3(const LVecBase3f& v)
 {
@@ -32,6 +37,32 @@ inline OpenSteer::Vec3 LVecBase3fToOpenSteerVec3(const LVecBase3f& v)
 inline LVecBase3f OpenSteerVec3ToLVecBase3f(const OpenSteer::Vec3& v)
 {
 	return LVecBase3f(v.x, -v.z, v.y);
+}
+
+template<class Super>
+class ActorMixin: public Super
+{
+public:
+
+	void update(const float currentTime, const float elapsedTime)
+	{
+		Super::update(currentTime, elapsedTime);
+		//update actor
+		LPoint3f pos = OpenSteerVec3ToLVecBase3f(Super::position());
+		mActor.set_pos(pos);
+		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(Super::forward()),
+				OpenSteerVec3ToLVecBase3f(Super::up()));
+	}
+
+	void setActor(NodePath actor)
+	{
+		mActor = actor;
+	}
+
+protected:
+	NodePath mActor;
+
+};
 }
 
 #endif /* COMMON_H_ */
