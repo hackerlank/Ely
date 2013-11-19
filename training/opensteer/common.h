@@ -24,6 +24,7 @@
 #ifndef COMMON_H_
 #define COMMON_H_
 
+#include <algorithm>
 #include <nodePath.h>
 #include <OpenSteer/Vec3.h>
 
@@ -57,6 +58,10 @@ public:
 	void setActor(NodePath actor)
 	{
 		mActor = actor;
+		// set size of bounding sphere
+		LPoint3f minP, maxP;
+		actor.calc_tight_bounds(minP, maxP);
+		Super::setRadius((maxP - minP).length() / 2.0);
 	}
 
 protected:

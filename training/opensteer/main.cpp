@@ -108,10 +108,10 @@ int main(int argc, char *argv[])
 	for (int i = 0; i < ely::lstCount; i++)
 	{
 		//view actor
-		ostringstream num;
-		num << i;
-		std::string instName = "LowSpeedTurn-" + num.str();
-		NodePath elyInst = window->get_render().attach_new_node(instName);
+		std::string instNum =
+				dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
+		NodePath elyInst = window->get_render().attach_new_node(
+				"LowSpeedTurn-" + instNum);
 		ely.instance_to(elyInst);
 		gLowSpeedTurnPlugIn.all[i]->setActor(elyInst);
 	}
