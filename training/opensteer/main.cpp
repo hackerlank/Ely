@@ -133,7 +133,7 @@ namespace OpenSteer
 {
 bool enableAnnotation = false;
 //bool updatePhaseActive = false;
-bool drawPhaseActive = false;
+bool drawPhaseActive = true;
 }
 
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
