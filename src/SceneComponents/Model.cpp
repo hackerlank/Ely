@@ -132,97 +132,103 @@ bool Model::initialize()
 		value = strtof(paramValuesStr[idx].c_str(), NULL);
 		mScale[idx] = (value >= 0.0 ? value : -value);
 	}
-	//card points
-	param = mTmpl->parameter(std::string("card_points"));
-	paramValuesStr = parseCompoundString(param, ',');
-	valueNum = paramValuesStr.size();
-	if (valueNum < 4)
+	//
+	if(not mFromFile)
 	{
-		paramValuesStr.resize(4, "0.0");
+		//card points
+		param = mTmpl->parameter(std::string("card_points"));
+		paramValuesStr = parseCompoundString(param, ',');
+		valueNum = paramValuesStr.size();
+		if (valueNum < 4)
+		{
+			paramValuesStr.resize(4, "0.0");
+		}
+		for (idx = 0; idx < 4; ++idx)
+		{
+			mCardPoints.push_back(strtof(paramValuesStr[idx].c_str(), NULL));
+		}
+		//rope render mode
+		param = mTmpl->parameter(std::string("rope_render_mode"));
+		if (param == std::string("thread"))
+		{
+			mRopeRenderMode = RopeNode::RM_thread;
+		}
+		else if (param == std::string("tape"))
+		{
+			mRopeRenderMode = RopeNode::RM_tape;
+		}
+		else if (param == std::string("billboard"))
+		{
+			mRopeRenderMode = RopeNode::RM_billboard;
+		}
+		else
+		{
+			mRopeRenderMode = RopeNode::RM_tube;
+		}
+		//rope uv mode
+		param = mTmpl->parameter(std::string("rope_uv_mode"));
+		if (param == std::string("parametric"))
+		{
+			mRopeUVMode = RopeNode::UV_parametric;
+		}
+		else if (param == std::string("distance"))
+		{
+			mRopeUVMode = RopeNode::UV_distance;
+		}
+		else if (param == std::string("distance2"))
+		{
+			mRopeUVMode = RopeNode::UV_distance2;
+		}
+		else
+		{
+			mRopeUVMode = RopeNode::UV_none;
+		}
+		//rope normal mode
+		param = mTmpl->parameter(std::string("rope_normal_mode"));
+		if (param == std::string("vertex"))
+		{
+			mRopeNormalMode = RopeNode::NM_vertex;
+		}
+		else
+		{
+			mRopeNormalMode = RopeNode::NM_none;
+		}
+		//rope num subdiv
+		valueInt = strtol(
+				mTmpl->parameter(std::string("rope_num_subdiv")).c_str(),
+				NULL, 0);
+		mRopeNumSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
+		//rope num slices
+		valueInt = strtol(
+				mTmpl->parameter(std::string("rope_num_slices")).c_str(),
+				NULL, 0);
+		mRopeNumSlices = (valueInt >= 0.0 ? valueInt : -valueInt);
+		//rope thickness
+		value = strtof(mTmpl->parameter(std::string("rope_thickness")).c_str(),
+		NULL);
+		mRopeThickness = (value >= 0.0 ? value : -value);
+		//sheet num u subdiv
+		valueInt = strtol(
+				mTmpl->parameter(std::string("sheet_num_u_subdiv")).c_str(),
+				NULL, 0);
+		mSheetNumUSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
+		//sheet num v subdiv
+		valueInt = strtol(
+				mTmpl->parameter(std::string("sheet_num_v_subdiv")).c_str(),
+				NULL, 0);
+		mSheetNumVSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
+		//texture
+		mTextureImage = TexturePool::load_texture(
+				Filename(mTmpl->parameter(std::string("texture_file"))));
+		//texture uscale
+		value = strtof(mTmpl->parameter(std::string("texture_uscale")).c_str(),
+		NULL);
+		mTextureUscale = (value >= 0.0 ? value : -value);
+		//texture vscale
+		value = strtof(mTmpl->parameter(std::string("texture_vscale")).c_str(),
+		NULL);
+		mTextureVscale = (value >= 0.0 ? value : -value);
 	}
-	for (idx = 0; idx < 4; ++idx)
-	{
-		mCardPoints.push_back(strtof(paramValuesStr[idx].c_str(), NULL));
-	}
-	//rope render mode
-	param = mTmpl->parameter(std::string("rope_render_mode"));
-	if (param == std::string("thread"))
-	{
-		mRopeRenderMode = RopeNode::RM_thread;
-	}
-	else if (param == std::string("tape"))
-	{
-		mRopeRenderMode = RopeNode::RM_tape;
-	}
-	else if (param == std::string("billboard"))
-	{
-		mRopeRenderMode = RopeNode::RM_billboard;
-	}
-	else
-	{
-		mRopeRenderMode = RopeNode::RM_tube;
-	}
-	//rope uv mode
-	param = mTmpl->parameter(std::string("rope_uv_mode"));
-	if (param == std::string("parametric"))
-	{
-		mRopeUVMode = RopeNode::UV_parametric;
-	}
-	else if (param == std::string("distance"))
-	{
-		mRopeUVMode = RopeNode::UV_distance;
-	}
-	else if (param == std::string("distance2"))
-	{
-		mRopeUVMode = RopeNode::UV_distance2;
-	}
-	else
-	{
-		mRopeUVMode = RopeNode::UV_none;
-	}
-	//rope normal mode
-	param = mTmpl->parameter(std::string("rope_normal_mode"));
-	if (param == std::string("vertex"))
-	{
-		mRopeNormalMode = RopeNode::NM_vertex;
-	}
-	else
-	{
-		mRopeNormalMode = RopeNode::NM_none;
-	}
-	//rope num subdiv
-	valueInt = strtol(mTmpl->parameter(std::string("rope_num_subdiv")).c_str(),
-	NULL, 0);
-	mRopeNumSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
-	//rope num slices
-	valueInt = strtol(mTmpl->parameter(std::string("rope_num_slices")).c_str(),
-	NULL, 0);
-	mRopeNumSlices = (valueInt >= 0.0 ? valueInt : -valueInt);
-	//rope thickness
-	value = strtof(mTmpl->parameter(std::string("rope_thickness")).c_str(),
-	NULL);
-	mRopeThickness = (value >= 0.0 ? value : -value);
-	//sheet num u subdiv
-	valueInt = strtol(
-			mTmpl->parameter(std::string("sheet_num_u_subdiv")).c_str(), NULL,
-			0);
-	mSheetNumUSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
-	//sheet num v subdiv
-	valueInt = strtol(
-			mTmpl->parameter(std::string("sheet_num_v_subdiv")).c_str(), NULL,
-			0);
-	mSheetNumVSubdiv = (valueInt >= 0.0 ? valueInt : -valueInt);
-	//texture
-	mTextureImage = TexturePool::load_texture(
-			Filename(mTmpl->parameter(std::string("texture_file"))));
-	//texture uscale
-	value = strtof(mTmpl->parameter(std::string("texture_uscale")).c_str(),
-			NULL);
-	mTextureUscale = (value >= 0.0 ? value : -value);
-	//texture vscale
-	value = strtof(mTmpl->parameter(std::string("texture_vscale")).c_str(),
-			NULL);
-	mTextureVscale = (value >= 0.0 ? value : -value);
 	//
 	return result;
 }
@@ -395,7 +401,7 @@ void Model::onAddToObjectSetup()
 	}
 	else
 	{
-		//model is programmatically generated
+		//not from file: model is programmatically generated
 		if (mModelTypeParam == std::string("card"))
 		{
 			//card (e.g. finite plane)

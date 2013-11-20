@@ -34,7 +34,7 @@
 #include <geomPoints.h>
 #include <geomLines.h>
 #include <geomTriangles.h>
-#include <boundingSphere.h>
+#include <omniBoundingVolume.h>
 
 #ifdef WIN32
 #	define snprintf _snprintf
@@ -388,7 +388,8 @@ void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 		m_generators.back()->get_root().set_transparency(
 				TransparencyAttrib::M_alpha);
 		m_generators.back()->get_root().get_child(0).node()->set_bounds(
-				new BoundingSphere(LPoint3f::zero(), FLT_MAX));
+				new OmniBoundingVolume());
+		m_generators.back()->get_root().get_child(0).node()->set_final(true);
 		m_generators.back()->get_root().reparent_to(m_render);
 		//update number of MeshDrawers
 		m_meshDrawersSize = m_generators.size();
