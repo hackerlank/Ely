@@ -27,6 +27,7 @@
 #include <algorithm>
 #include <nodePath.h>
 #include <OpenSteer/Vec3.h>
+#include <OpenSteer/Color.h>
 
 namespace ely
 {
@@ -38,6 +39,15 @@ inline OpenSteer::Vec3 LVecBase3fToOpenSteerVec3(const LVecBase3f& v)
 inline LVecBase3f OpenSteerVec3ToLVecBase3f(const OpenSteer::Vec3& v)
 {
 	return LVecBase3f(v.x, -v.z, v.y);
+}
+//LVecBase4f-OpenSteer::Color conversion functions
+inline OpenSteer::Color LVecBase4fToOpenSteerColor(const LVecBase4f& c)
+{
+	return OpenSteer::Color(c.get_x(), c.get_y(), c.get_z(), c.get_w());
+}
+inline LVecBase4f OpenSteerColorToLVecBase4f(const OpenSteer::Color& c)
+{
+	return LVecBase4f(c.r(), c.g(), c.b(), c.a());
 }
 
 template<class Super>

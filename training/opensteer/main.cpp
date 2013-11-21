@@ -41,6 +41,7 @@
 
 //#include "OpenSteer/OpenSteerDemo.h"        // OpenSteerDemo application
 //#include "OpenSteer/Draw.h"                 // OpenSteerDemo graphics
+#include "DrawMeshDrawer.h"
 #include "OneTurning.h"
 #include "LowSpeedTurn.h"
 
@@ -51,6 +52,9 @@
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data);
 
 extern std::string baseDir;
+
+//global drawers
+ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d, *currentDrawer;
 
 int main(int argc, char *argv[])
 {
@@ -89,6 +93,10 @@ int main(int argc, char *argv[])
 	//load actor
 	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
 
+	//create global drawers
+	gDrawer3d = new ely::DrawMeshDrawer(window->get_render(),window->get_camera_group());
+	gDrawer2d = new ely::DrawMeshDrawer(window->get_aspect_2d(),window->get_camera_group());
+
 	//current plugin
 	OpenSteer::PlugIn* selectedPlugIn = NULL;
 
@@ -125,6 +133,9 @@ int main(int argc, char *argv[])
 	framework.main_loop();
 	//close the window framework
 	framework.close_framework();
+	//delete global drawers
+	delete gDrawer3d;
+	delete gDrawer2d;
 	return (0);
 }
 

@@ -10,4 +10,5 @@ noinst_PROGRAMS = ely_opensteer
 nodist_ely_opensteer_SOURCES = \
 		main.cpp \
 		Draw.cpp \
+		DrawMeshDrawer.cpp \
 		LowSpeedTurn.cpp
