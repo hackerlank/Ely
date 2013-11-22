@@ -94,35 +94,35 @@ int main(int argc, char *argv[])
 	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
 
 	//create global drawers
-	gDrawer3d = new ely::DrawMeshDrawer(window->get_render(),window->get_camera_group());
-	gDrawer2d = new ely::DrawMeshDrawer(window->get_aspect_2d(),window->get_camera_group());
+	gDrawer3d = new ely::DrawMeshDrawer(window->get_render(),window->get_camera_group().get_child(0));
+	gDrawer2d = new ely::DrawMeshDrawer(window->get_aspect_2d(),window->get_camera_group().get_child(0));
 
 	//current plugin
 	OpenSteer::PlugIn* selectedPlugIn = NULL;
 
 	//OneTurning plugin
-//	ely::OneTurningPlugIn gOneTurningPlugIn;
-//	selectedPlugIn = &gOneTurningPlugIn;
-//	gOneTurningPlugIn.open();
-//	//view actor
-//	NodePath elyInst = window->get_render().attach_new_node("OneTurning");
-//	ely.instance_to(elyInst);
-//	gOneTurningPlugIn.gOneTurning->setActor(elyInst);
+	ely::OneTurningPlugIn gOneTurningPlugIn;
+	selectedPlugIn = &gOneTurningPlugIn;
+	gOneTurningPlugIn.open();
+	//view actor
+	NodePath elyInst = window->get_render().attach_new_node("OneTurning");
+	ely.instance_to(elyInst);
+	gOneTurningPlugIn.gOneTurning->setActor(elyInst);
 
 	//LowSpeedTurn plugin
-	ely::LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;
-	selectedPlugIn = &gLowSpeedTurnPlugIn;
-	gLowSpeedTurnPlugIn.open();
-	for (int i = 0; i < ely::lstCount; i++)
-	{
-		//view actor
-		std::string instNum =
-				dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
-		NodePath elyInst = window->get_render().attach_new_node(
-				"LowSpeedTurn-" + instNum);
-		ely.instance_to(elyInst);
-		gLowSpeedTurnPlugIn.all[i]->setActor(elyInst);
-	}
+//	ely::LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;
+//	selectedPlugIn = &gLowSpeedTurnPlugIn;
+//	gLowSpeedTurnPlugIn.open();
+//	for (int i = 0; i < ely::lstCount; i++)
+//	{
+//		//view actor
+//		std::string instNum =
+//				dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
+//		NodePath elyInst = window->get_render().attach_new_node(
+//				"LowSpeedTurn-" + instNum);
+//		ely.instance_to(elyInst);
+//		gLowSpeedTurnPlugIn.all[i]->setActor(elyInst);
+//	}
 
 	//add opensteer update task
 	AsyncTask* task = new GenericAsyncTask("opensteer update",
@@ -143,7 +143,7 @@ std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 namespace OpenSteer
 {
 bool enableAnnotation = false;
-//bool updatePhaseActive = false;
+bool updatePhaseActive = false;
 bool drawPhaseActive = true;
 }
 
@@ -155,11 +155,18 @@ AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 	float elapsedTime = ClockObject::get_global_clock()->get_dt();
 	double currentTime = ClockObject::get_global_clock()->get_real_time();
 
+	//reset drawers
+	gDrawer2d->reset();
+	gDrawer3d->reset();
+
 	// service queued reset request, if any
 //    doDelayedResetPlugInXXX ();
 
 	// invoke selected PlugIn's Update method
 	selectedPlugIn->update(currentTime, elapsedTime);
+
+	// invoke selected PlugIn's Redraw method
+	selectedPlugIn->redraw(currentTime, elapsedTime);
 
 	return AsyncTask::DS_cont;
 }

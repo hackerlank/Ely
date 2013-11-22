@@ -44,13 +44,11 @@
 //#include "OpenSteer/Color.h"
 
 #include "common.h"
-#include "DrawMeshDrawer.h"
 
 namespace ely
 {
 
 using namespace OpenSteer;
-extern DrawMeshDrawer *gDrawer3d, *gDrawer2d;
 
 // ----------------------------------------------------------------------------
 
@@ -130,10 +128,6 @@ public:
 
 	void update(const float currentTime, const float elapsedTime)
 	{
-		//reset drawers
-		gDrawer2d->reset();
-		gDrawer3d->reset();
-
 		// update simulation of test vehicle
 		gOneTurning->update(currentTime, elapsedTime);
 	}

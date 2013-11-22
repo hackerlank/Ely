@@ -23,6 +23,7 @@
 
 #include "DrawMeshDrawer.h"
 #include "common.h"
+#include <omniBoundingVolume.h>
 
 namespace ely
 {
@@ -30,7 +31,8 @@ namespace ely
 DrawMeshDrawer::DrawMeshDrawer(NodePath render, NodePath camera, int budget,
 		bool singleMesh) :
 		m_render(render), m_camera(camera), m_meshDrawersSize(0), m_budget(
-				budget), m_singleMesh(singleMesh)
+				budget), m_singleMesh(singleMesh), m_size(1.0 / 50.0), m_twoSided(
+				false)
 {
 }
 
@@ -49,7 +51,7 @@ void DrawMeshDrawer::reset()
 	m_prim = NULL_PRIM;
 }
 
-void DrawMeshDrawer::begin(DrawPrimitive prim, float size)
+void DrawMeshDrawer::begin(DrawPrimitive prim)
 {
 	//dynamically allocate MeshDrawers if necessary
 	if (m_meshDrawerIdx >= m_meshDrawersSize)
@@ -70,15 +72,23 @@ void DrawMeshDrawer::begin(DrawPrimitive prim, float size)
 	//setup current MeshDrawer
 	m_generators[m_meshDrawerIdx]->get_root().set_depth_write(m_depthMask);
 //	m_generator[m_meshDrawerIdx]->get_root().set_render_mode_thickness(size);
+	m_generators[m_meshDrawerIdx]->get_root().set_two_sided(m_twoSided);
 	//begin current MeshDrawer
 	m_generators[m_meshDrawerIdx]->begin(m_camera, m_render);
 	m_prim = prim;
-	m_size = size / 50;
 	m_lineIdx = m_triIdx = m_quadIdx = 0;
+	m_triStripUp = true;
 }
 
 void DrawMeshDrawer::end()
 {
+	//close line loop (if any)
+	if (m_prim == DRAW_LINELOOP and (m_lineVertex != m_vertexLoop0))
+	{
+		m_generators[m_meshDrawerIdx]->segment(m_lineVertex, m_vertexLoop0,
+				LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), m_uvLoop0.get_x(),
+						m_uvLoop0.get_y()), m_size, m_colorLoop0);
+	}
 	//end current MeshDrawer
 	m_generators[m_meshDrawerIdx]->end();
 	//increase MeshDrawer index only if multiple mesh
@@ -114,6 +124,38 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 			++m_lineIdx;
 		}
 		break;
+	case DRAW_LINESTRIP:
+		if ((m_lineIdx % 2) == 1)
+		{
+			m_generators[m_meshDrawerIdx]->segment(m_lineVertex, vertex,
+					LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), uv.get_x(),
+							uv.get_y()), m_size, m_color);
+			m_lineVertex = vertex;
+		}
+		else
+		{
+			m_lineVertex = vertex;
+			m_lineColor = m_color;
+			m_lineUV = uv;
+			++m_lineIdx;
+		}
+		break;
+	case DRAW_LINELOOP:
+		if ((m_lineIdx % 2) == 1)
+		{
+			m_generators[m_meshDrawerIdx]->segment(m_lineVertex, vertex,
+					LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), uv.get_x(),
+							uv.get_y()), m_size, m_color);
+			m_lineVertex = vertex;
+		}
+		else
+		{
+			m_lineVertex = m_vertexLoop0 = vertex;
+			m_lineColor = m_colorLoop0 = m_color;
+			m_lineUV = m_uvLoop0 = uv;
+			++m_lineIdx;
+		}
+		break;
 	case DRAW_TRIS:
 		if ((m_triIdx % 3) == 2)
 		{
@@ -121,6 +163,55 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 					m_triUV[0], m_triVertex[1], m_triColor[1], m_triUV[1],
 					vertex, m_color, uv);
 			m_triIdx = 0;
+		}
+		else
+		{
+			m_triVertex[m_triIdx] = vertex;
+			m_triColor[m_triIdx] = m_color;
+			m_triUV[m_triIdx] = uv;
+			++m_triIdx;
+		}
+		break;
+	case DRAW_TRIFAN:
+		if ((m_triIdx % 3) == 2)
+		{
+			m_generators[m_meshDrawerIdx]->tri(m_triVertex[0], m_triColor[0],
+					m_triUV[0], m_triVertex[1], m_triColor[1], m_triUV[1],
+					vertex, m_color, uv);
+			//store last vertex into vertex[1]
+			m_triVertex[1] = vertex;
+			m_triColor[1] = m_color;
+			m_triUV[1] = uv;
+		}
+		else
+		{
+			m_triVertex[m_triIdx] = vertex;
+			m_triColor[m_triIdx] = m_color;
+			m_triUV[m_triIdx] = uv;
+			++m_triIdx;
+		}
+		break;
+	case DRAW_TRISTRIP:
+		if ((m_triIdx % 3) == 2)
+		{
+			m_generators[m_meshDrawerIdx]->tri(m_triVertex[0], m_triColor[0],
+					m_triUV[0], m_triVertex[1], m_triColor[1], m_triUV[1],
+					vertex, m_color, uv);
+			//slide vertices and toggle stripUp
+			if (m_triStripUp)
+			{
+				m_triVertex[0] = vertex;
+				m_triColor[0] = m_color;
+				m_triUV[0] = uv;
+				m_triStripUp = false;
+			}
+			else
+			{
+				m_triVertex[1] = vertex;
+				m_triColor[1] = m_color;
+				m_triUV[1] = uv;
+				m_triStripUp = true;
+			}
 		}
 		else
 		{

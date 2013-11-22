@@ -34,7 +34,15 @@ class DrawMeshDrawer
 public:
 	enum DrawPrimitive
 	{
-		DRAW_POINTS, DRAW_LINES, DRAW_TRIS, DRAW_QUADS, NULL_PRIM
+		DRAW_POINTS,
+		DRAW_LINES,
+		DRAW_LINELOOP,
+		DRAW_LINESTRIP,
+		DRAW_TRIS,
+		DRAW_TRIFAN,
+		DRAW_TRISTRIP,
+		DRAW_QUADS,
+		NULL_PRIM
 	};
 protected:
 	///The render node path.
@@ -59,17 +67,20 @@ protected:
 	DrawPrimitive m_prim;
 	///Size (for points and lines).
 	float m_size;
+	///Two sided draw.
+	bool m_twoSided;
 	///Vertex color.
 	LVector4f m_color;
 	///Line previous store.
-	LVecBase3f m_lineVertex;
-	LVecBase4f m_lineColor;
-	LVecBase2f m_lineUV;
+	LVecBase3f m_lineVertex, m_vertexLoop0;
+	LVecBase4f m_lineColor, m_colorLoop0;
+	LVecBase2f m_lineUV, m_uvLoop0;
 	int m_lineIdx;
 	///Triangle previous store.
 	LVecBase3f m_triVertex[2];
 	LVecBase4f m_triColor[2];
 	LVecBase2f m_triUV[2];
+	bool m_triStripUp;
 	int m_triIdx;
 	///Quad previous store.
 	LVecBase3f m_quadVertex[2];
@@ -84,20 +95,21 @@ public:
 
 	void reset();
 
-	void begin(DrawPrimitive prim, float size = 1.0f);
-	void vertex(const LVector3f& vertex, const LVector2f& uv = LVector2f::zero());
+	void begin(DrawPrimitive prim);
+	void vertex(const LVector3f& vertex, const LVector2f& uv =
+			LVector2f::zero());
 	void end();
 	void setColor(const LVector4f& color)
 	{
 		m_color = color;
 	}
-	LVector4f getColor()
+	void setSize(float size)
 	{
-		return m_color;
+		m_size = size / 50.0;
 	}
 	void setTwoSided(bool enable)
 	{
-		m_generators[m_meshDrawerIdx]->get_root().set_two_sided(enable);
+		m_twoSided = enable;
 	}
 	void depthMask(bool state)
 	{

@@ -377,7 +377,11 @@ void OpenSteer::drawCircleOrDisk(const float radius, const Vec3& axis,
 	gDrawer3d->setColor(ely::OpenSteerColorToLVecBase4f(color));
 
 	// begin drawing a triangle fan (for disk) or line loop (for circle)
-	glBegin(filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
+//	glBegin(filled ? GL_TRIANGLE_FAN : GL_LINE_LOOP);
+	gDrawer3d->begin(
+			filled ?
+					ely::DrawMeshDrawer::DRAW_TRIFAN :
+					ely::DrawMeshDrawer::DRAW_LINELOOP);
 
 	// for the filled case, first emit the center point
 	if (filled)
@@ -399,7 +403,8 @@ void OpenSteer::drawCircleOrDisk(const float radius, const Vec3& axis,
 	}
 
 	// close drawing operation
-	glEnd();
+//	glEnd();
+	gDrawer3d->end();
 	if (filled)
 		endDoubleSidedDrawing();
 }
@@ -451,10 +456,12 @@ void OpenSteer::drawXZArc(const Vec3& start, const Vec3& center,
 	const float step = arcAngle / segments;
 
 	// set drawing color
-	glColor3f(color.r(), color.g(), color.b());
+//	glColor3f(color.r(), color.g(), color.b());
+	gDrawer3d->setColor(ely::OpenSteerColorToLVecBase4f(color));
 
 	// begin drawing a series of connected line segments
-	glBegin(GL_LINE_STRIP);
+//	glBegin (GL_LINE_STRIP);
+	gDrawer3d->begin(ely::DrawMeshDrawer::DRAW_LINESTRIP);
 
 	// draw each segment along arc
 	float sin = 0, cos = 0;
@@ -468,7 +475,8 @@ void OpenSteer::drawXZArc(const Vec3& start, const Vec3& center,
 	}
 
 	// close drawing operation
-	glEnd();
+//	glEnd();
+	gDrawer3d->end();
 }
 
 // ------------------------------------------------------------------------
@@ -648,10 +656,12 @@ void OpenSteer::drawXZLineGrid(const float size, const int subsquares,
 	const float spacing = size / subsquares;
 
 	// set grid drawing color
-	glColor3f(color.r(), color.g(), color.b());
+//	glColor3f(color.r(), color.g(), color.b());
+	gDrawer3d->setColor(ely::OpenSteerColorToLVecBase4f(color));
 
 	// draw a square XZ grid with the given size and line count
-	glBegin(GL_LINES);
+//	glBegin (GL_LINES);
+	gDrawer3d->begin(ely::DrawMeshDrawer::DRAW_LINES);
 	float q = -half;
 	for (int i = 0; i < (subsquares + 1); i++)
 	{
@@ -667,7 +677,8 @@ void OpenSteer::drawXZLineGrid(const float size, const int subsquares,
 
 		q += spacing;
 	}
-	glEnd();
+//	glEnd();
+	gDrawer3d->end();
 }
 
 // ------------------------------------------------------------------------
@@ -806,12 +817,14 @@ void OpenSteer::drawReticle(float w, float h)
 	draw2dLine(Vec3(w - a, h, 0), Vec3(w - b, h, 0), gWhite, w, h);
 	draw2dLine(Vec3(w, h - a, 0), Vec3(w, h - b, 0), gWhite, w, h);
 
-	glLineWidth(3);
+//	glLineWidth(3);
+	gDrawer3d->setSize(3);
 	draw2dLine(Vec3(w + a, h, 0), Vec3(w + b, h, 0), gBlack, w, h);
 	draw2dLine(Vec3(w, h + a, 0), Vec3(w, h + b, 0), gBlack, w, h);
 	draw2dLine(Vec3(w - a, h, 0), Vec3(w - b, h, 0), gBlack, w, h);
 	draw2dLine(Vec3(w, h - a, 0), Vec3(w, h - b, 0), gBlack, w, h);
-	glLineWidth(1);
+//	glLineWidth(1);
+	gDrawer3d->setSize(1);
 }
 
 // ------------------------------------------------------------------------
@@ -846,23 +859,23 @@ void OpenSteer::checkForDrawError(const char * locationDescription)
 OpenSteer::Vec3 OpenSteer::directionFromCameraToScreenPosition(int x, int y,
 		int h)
 {
-	// Get window height, viewport, modelview and projection matrices
-	GLint vp[4];
-	GLdouble mMat[16], pMat[16];
-	glGetIntegerv(GL_VIEWPORT, vp);
-	glGetDoublev(GL_MODELVIEW_MATRIX, mMat);
-	glGetDoublev(GL_PROJECTION_MATRIX, pMat);
-	GLdouble un0x, un0y, un0z, un1x, un1y, un1z;
-
-	// Unproject mouse position at near and far clipping planes
-	gluUnProject(x, h - y, 0, mMat, pMat, vp, &un0x, &un0y, &un0z);
-	gluUnProject(x, h - y, 1, mMat, pMat, vp, &un1x, &un1y, &un1z);
-
-	// "direction" is the normalized difference between these far and near
-	// unprojected points.  Its parallel to the "eye-mouse" selection line.
-	const Vec3 diffNearFar(un1x - un0x, un1y - un0y, un1z - un0z);
-	const Vec3 direction = diffNearFar.normalize();
-	return direction;
+//	// Get window height, viewport, modelview and projection matrices
+//	GLint vp[4];
+//	GLdouble mMat[16], pMat[16];
+//	glGetIntegerv(GL_VIEWPORT, vp);
+//	glGetDoublev(GL_MODELVIEW_MATRIX, mMat);
+//	glGetDoublev(GL_PROJECTION_MATRIX, pMat);
+//	GLdouble un0x, un0y, un0z, un1x, un1y, un1z;
+//
+//	// Unproject mouse position at near and far clipping planes
+//	gluUnProject(x, h - y, 0, mMat, pMat, vp, &un0x, &un0y, &un0z);
+//	gluUnProject(x, h - y, 1, mMat, pMat, vp, &un1x, &un1y, &un1z);
+//
+//	// "direction" is the normalized difference between these far and near
+//	// unprojected points.  Its parallel to the "eye-mouse" selection line.
+//	const Vec3 diffNearFar(un1x - un0x, un1y - un0y, un1z - un0z);
+//	const Vec3 direction = diffNearFar.normalize();
+//	return direction;
 }
 
 namespace
@@ -1368,43 +1381,43 @@ void OpenSteer::draw2dTextAt3dLocation(const char& text, const Vec3& location,
 	// the 3d point.
 
 	// set text color and raster position
-	glColor3f(color.r(), color.g(), color.b());
-	glRasterPos3f(location.x, location.y, location.z);
+//	glColor3f(color.r(), color.g(), color.b());
+//	glRasterPos3f(location.x, location.y, location.z);
 
 	// switch into 2d screen space in case we need to handle a new-line
-	GLint rasterPosition[4];
-	glGetIntegerv(GL_CURRENT_RASTER_POSITION, rasterPosition);
-	const GLint originalMatrixMode = begin2dDrawing(w, h);
+//	GLint rasterPosition[4];
+//	glGetIntegerv(GL_CURRENT_RASTER_POSITION, rasterPosition);
+//	const GLint originalMatrixMode = begin2dDrawing(w, h);
 
 	//xxx uncommenting this causes the "2d" version to print the wrong thing
 	//xxx with it out the first line of a multi-line "3d" string jiggles
 	//glRasterPos2i (rasterPosition[0], rasterPosition[1]);
 
 	// loop over each character in string (until null terminator)
-	int lines = 0;
-	for (const char* p = &text; *p; p++)
-	{
-		if (*p == '\n')
-		{
-			// handle new-line character, reset raster position
-			lines++;
-			const int fontHeight = 15; // for GLUT_BITMAP_9_BY_15
-			const int vOffset = lines * (fontHeight + 1);
-			glRasterPos2i(rasterPosition[0], rasterPosition[1] - vOffset);
-		}
-		else
-		{
-			// otherwise draw character bitmap
-#ifndef HAVE_NO_GLUT
-			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *p);
-#else
-			// no character drawing with GLUT presently
-#endif
-		}
-	}
+//	int lines = 0;
+//	for (const char* p = &text; *p; p++)
+//	{
+//		if (*p == '\n')
+//		{
+//			// handle new-line character, reset raster position
+//			lines++;
+//			const int fontHeight = 15; // for GLUT_BITMAP_9_BY_15
+//			const int vOffset = lines * (fontHeight + 1);
+//			glRasterPos2i(rasterPosition[0], rasterPosition[1] - vOffset);
+//		}
+//		else
+//		{
+//			// otherwise draw character bitmap
+//#ifndef HAVE_NO_GLUT
+//			glutBitmapCharacter(GLUT_BITMAP_9_BY_15, *p);
+//#else
+//			// no character drawing with GLUT presently
+//#endif
+//		}
+//	}
 
 	// switch back out of 2d screen space
-	end2dDrawing(originalMatrixMode);
+//	end2dDrawing(originalMatrixMode);
 }
 
 void OpenSteer::draw2dTextAt3dLocation(const std::ostringstream& text,
@@ -1416,19 +1429,19 @@ void OpenSteer::draw2dTextAt3dLocation(const std::ostringstream& text,
 void OpenSteer::draw2dTextAt2dLocation(const char& text, const Vec3 location,
 		const Color& color, float w, float h)
 {
-	const GLint originalMatrixMode = begin2dDrawing(w, h);
+//	const GLint originalMatrixMode = begin2dDrawing(w, h);
 
 	// draw text at specified location (which is now interpreted as
 	// relative to screen space) and color
-	draw2dTextAt3dLocation(text, location, color, w, h);
+//	draw2dTextAt3dLocation(text, location, color, w, h);
 
-	end2dDrawing(originalMatrixMode);
+//	end2dDrawing(originalMatrixMode);
 }
 
 void OpenSteer::draw2dTextAt2dLocation(const std::ostringstream& text,
 		const Vec3 location, const Color& color, float w, float h)
 {
-	draw2dTextAt2dLocation(*text.str().c_str(), location, color, w, h);
+//	draw2dTextAt2dLocation(*text.str().c_str(), location, color, w, h);
 }
 
 // ----------------------------------------------------------------------------
