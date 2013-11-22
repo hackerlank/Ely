@@ -876,6 +876,7 @@ OpenSteer::Vec3 OpenSteer::directionFromCameraToScreenPosition(int x, int y,
 //	const Vec3 diffNearFar(un1x - un0x, un1y - un0y, un1z - un0z);
 //	const Vec3 direction = diffNearFar.normalize();
 //	return direction;
+	return OpenSteer::Vec3();
 }
 
 namespace

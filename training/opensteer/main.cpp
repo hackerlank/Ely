@@ -142,7 +142,7 @@ int main(int argc, char *argv[])
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 namespace OpenSteer
 {
-bool enableAnnotation = false;
+bool enableAnnotation = true;
 bool updatePhaseActive = false;
 bool drawPhaseActive = true;
 }

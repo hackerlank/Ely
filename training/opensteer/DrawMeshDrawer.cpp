@@ -24,6 +24,7 @@
 #include "DrawMeshDrawer.h"
 #include "common.h"
 #include <omniBoundingVolume.h>
+#include <textNode.h>
 
 namespace ely
 {
@@ -32,8 +33,9 @@ DrawMeshDrawer::DrawMeshDrawer(NodePath render, NodePath camera, int budget,
 		bool singleMesh) :
 		m_render(render), m_camera(camera), m_meshDrawersSize(0), m_budget(
 				budget), m_singleMesh(singleMesh), m_size(1.0 / 50.0), m_twoSided(
-				false)
+				false), m_textNodesSize(0)
 {
+	reset();
 }
 
 DrawMeshDrawer::~DrawMeshDrawer()
@@ -49,6 +51,8 @@ void DrawMeshDrawer::reset()
 	//reset current MeshDrawer index
 	m_meshDrawerIdx = 0;
 	m_prim = NULL_PRIM;
+	//reset current TextNode index
+	m_textNodeIdx = 0;
 }
 
 void DrawMeshDrawer::begin(DrawPrimitive prim)
@@ -240,7 +244,39 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 			++m_quadIdx;
 		}
 		break;
+	case NULL_PRIM:
+	default:
+		break;
 	};
+}
+
+void DrawMeshDrawer::drawText(const std::string& text, const LPoint3f& location,
+		const LVecBase4& color)
+{
+	///TODO
+	//dynamically allocate TextNodes if necessary
+	if (m_textNodeIdx >= m_textNodesSize)
+	{
+		//allocate a new TextNode
+		std::string textNum =
+				dynamic_cast<ostringstream&>(ostringstream().operator <<(
+						m_textNodeIdx)).str();
+		PT(TextNode) textNode = new TextNode("TextNode-" + textNum);
+		m_textNodes.push_back(NodePath(textNode));
+		//common TextNodes setup
+		m_textNodes.back().reparent_to(m_render);
+		//update number of TextNodes
+		m_textNodesSize = m_textNodes.size();
+	}
+	//setup current MeshDrawer
+	m_generators[m_meshDrawerIdx]->get_root().set_depth_write(m_depthMask);
+//	m_generator[m_meshDrawerIdx]->get_root().set_render_mode_thickness(size);
+	m_generators[m_meshDrawerIdx]->get_root().set_two_sided(m_twoSided);
+	//begin current MeshDrawer
+	m_generators[m_meshDrawerIdx]->begin(m_camera, m_render);
+	m_prim = prim;
+	m_lineIdx = m_triIdx = m_quadIdx = 0;
+	m_triStripUp = true;
 }
 
 }  // namespace ely

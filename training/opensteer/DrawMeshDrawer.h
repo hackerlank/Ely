@@ -87,40 +87,47 @@ protected:
 	LVecBase4f m_quadColor[2];
 	LVecBase2f m_quadUV[2];
 	int m_quadIdx;
+	///Inner TextNode node paths.
+	std::vector<NodePath> m_textNodes;
+	///Current TextNode index.
+	int m_textNodeIdx;
+	///Current TextNodes number.
+	int m_textNodesSize;
 
-public:
-	DrawMeshDrawer(NodePath render, NodePath camera, int budget = 50,
-			bool singleMesh = false);
-	virtual ~DrawMeshDrawer();
+	public:
+		DrawMeshDrawer(NodePath render, NodePath camera, int budget = 50,
+				bool singleMesh = false);
+		virtual ~DrawMeshDrawer();
 
-	void reset();
+		void reset();
 
-	void begin(DrawPrimitive prim);
-	void vertex(const LVector3f& vertex, const LVector2f& uv =
-			LVector2f::zero());
-	void end();
-	void setColor(const LVector4f& color)
-	{
-		m_color = color;
-	}
-	void setSize(float size)
-	{
-		m_size = size / 50.0;
-	}
-	void setTwoSided(bool enable)
-	{
-		m_twoSided = enable;
-	}
-	void depthMask(bool state)
-	{
-		m_depthMask = state;
-	}
-	void texture(bool state)
-	{
-		m_texture = state;
-	}
-
-};
+		void begin(DrawPrimitive prim);
+		void vertex(const LVector3f& vertex, const LVector2f& uv =
+				LVector2f::zero());
+		void end();
+		void setColor(const LVector4f& color)
+		{
+			m_color = color;
+		}
+		void setSize(float size)
+		{
+			m_size = size / 50.0;
+		}
+		void setTwoSided(bool enable)
+		{
+			m_twoSided = enable;
+		}
+		void depthMask(bool state)
+		{
+			m_depthMask = state;
+		}
+		void texture(bool state)
+		{
+			m_texture = state;
+		}
+		void drawText(const std::string& text, const LPoint3f& location,
+				const LVecBase4& color);
+	};
 }
 
 #endif /* DRAWMESHDRAWER_H_ */

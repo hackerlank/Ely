@@ -359,6 +359,7 @@ DebugDrawMeshDrawer::DebugDrawMeshDrawer(NodePath render, NodePath camera,
 		m_meshDrawersSize(0),
 		m_budget(budget), m_singleMesh(singleMesh)
 {
+	reset();
 }
 
 DebugDrawMeshDrawer::~DebugDrawMeshDrawer()
