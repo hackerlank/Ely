@@ -80,10 +80,9 @@
 
 #include "common.h"
 
-//DrawMeshDrawer
 #include "DrawMeshDrawer.h"
 
-extern ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
+extern ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
 
 // ----------------------------------------------------------------------------
 
@@ -205,6 +204,32 @@ inline void iDrawQuadrangle(const OpenSteer::Vec3& a, const OpenSteer::Vec3& b,
 	}
 //	glEnd();
 	gDrawer3d->end();
+}
+
+///
+inline void iDrawQuadrangleStreamBegin()
+{
+	OpenSteer::warnIfInUpdatePhase("iDrawQuadrangle");
+//	glBegin(GL_QUADS);
+	gDrawerGrid3d->begin(ely::DrawMeshDrawer::DRAW_QUADS);
+}
+
+inline void iDrawQuadrangleStream(const OpenSteer::Vec3& a,
+		const OpenSteer::Vec3& b, const OpenSteer::Vec3& c,
+		const OpenSteer::Vec3& d, const OpenSteer::Color& color)
+{
+//	glColor3f(color.r(), color.g(), color.b());
+	gDrawerGrid3d->setColor(ely::OpenSteerColorToLVecBase4f(color));
+	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(a));
+	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(b));
+	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(c));
+	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(d));
+}
+
+inline void iDrawQuadrangleStreamEnd()
+{
+//	glEnd();
+	gDrawerGrid3d->end();
 }
 
 // ------------------------------------------------------------------------
@@ -613,11 +638,19 @@ void OpenSteer::drawXZCheckerboardGrid(const float size, const int subsquares,
 	const float half = size / 2;
 	const float spacing = size / subsquares;
 
-	beginDoubleSidedDrawing();
+	///<---
+//	beginDoubleSidedDrawing();
+	///--->
+	///<+++
+	gDrawerGrid3d->setTwoSided(true);
+	///+++>
 	{
 		bool flag1 = false;
 		float p = -half;
 		Vec3 corner;
+		///<+++
+		iDrawQuadrangleStreamBegin();
+		///+++>
 		for (int i = 0; i < subsquares; i++)
 		{
 			bool flag2 = flag1;
@@ -626,17 +659,32 @@ void OpenSteer::drawXZCheckerboardGrid(const float size, const int subsquares,
 			{
 				corner.set(p, 0, q);
 				corner += center;
-				iDrawQuadrangle(corner, corner + Vec3(spacing, 0, 0),
+				///<---
+//				iDrawQuadrangle(corner, corner + Vec3(spacing, 0, 0),
+//						corner + Vec3(spacing, 0, spacing),
+//						corner + Vec3(0, 0, spacing), flag2 ? color1 : color2);
+				///--->
+				///<+++
+				iDrawQuadrangleStream(corner, corner + Vec3(spacing, 0, 0),
 						corner + Vec3(spacing, 0, spacing),
 						corner + Vec3(0, 0, spacing), flag2 ? color1 : color2);
+				///+++>
 				flag2 = !flag2;
 				q += spacing;
 			}
 			flag1 = !flag1;
 			p += spacing;
 		}
+		///<+++
+		iDrawQuadrangleStreamEnd();
+		///+++>
 	}
-	endDoubleSidedDrawing();
+	///<---
+//	endDoubleSidedDrawing();
+	///--->
+	///<+++
+	gDrawerGrid3d->setTwoSided(false);
+	///+++>
 }
 
 // ------------------------------------------------------------------------
@@ -1419,6 +1467,9 @@ void OpenSteer::draw2dTextAt3dLocation(const char& text, const Vec3& location,
 
 	// switch back out of 2d screen space
 //	end2dDrawing(originalMatrixMode);
+	gDrawer3d->drawText(std::string(&text),
+			ely::OpenSteerVec3ToLVecBase3f(location),
+			ely::OpenSteerColorToLVecBase4f(color));
 }
 
 void OpenSteer::draw2dTextAt3dLocation(const std::ostringstream& text,
@@ -1437,12 +1488,15 @@ void OpenSteer::draw2dTextAt2dLocation(const char& text, const Vec3 location,
 //	draw2dTextAt3dLocation(text, location, color, w, h);
 
 //	end2dDrawing(originalMatrixMode);
+	gDrawer2d->drawText(std::string(&text),
+			ely::OpenSteerVec3ToLVecBase3f(location),
+			ely::OpenSteerColorToLVecBase4f(color));
 }
 
 void OpenSteer::draw2dTextAt2dLocation(const std::ostringstream& text,
 		const Vec3 location, const Color& color, float w, float h)
 {
-//	draw2dTextAt2dLocation(*text.str().c_str(), location, color, w, h);
+	draw2dTextAt2dLocation(*text.str().c_str(), location, color, w, h);
 }
 
 // ----------------------------------------------------------------------------
@@ -1681,6 +1735,31 @@ void drawSphereObstacle(const SphereObstacle& so, const float maxEdgeLength,
 	}
 	drawSphere(so.center, so.radius, maxEdgeLength, filled, color, front, back,
 			viewpoint);
+}
+
+void gridUtility(const Vec3& gridTarget, const float size, const int subsquares)
+{
+	// round off target to the nearest multiple of 2 (because the
+	// checkboard grid with a pitch of 1 tiles with a period of 2)
+	// then lower the grid a bit to put it under 2d annotation lines
+//	const Vec3 gridCenter((round(gridTarget.x * 0.5f) * 2),
+//			(round(gridTarget.y * 0.5f) * 2) - .05f,
+//			(round(gridTarget.z * 0.5f) * 2));
+	float pitch = (size / (float) subsquares) * 2.0;
+	float pitchInv = 1.0 / pitch;
+	const Vec3 gridCenter((round(gridTarget.x * pitchInv) * pitch),
+			(round(gridTarget.y * pitchInv) * pitch) - .05f,
+			(round(gridTarget.z * pitchInv) * pitch));
+
+	// colors for checkboard
+	const Color gray1(0.27f);
+	const Color gray2(0.30f);
+
+	// draw 50x50 checkerboard grid with 50 squares along each side
+	drawXZCheckerboardGrid(size, subsquares, gridCenter, gray1, gray2);
+
+	// alternate style
+	// drawXZLineGrid (50, 50, gridCenter, gBlack);
 }
 
 } // namespace OpenSteer

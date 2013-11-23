@@ -83,9 +83,9 @@ protected:
 	bool m_triStripUp;
 	int m_triIdx;
 	///Quad previous store.
-	LVecBase3f m_quadVertex[2];
-	LVecBase4f m_quadColor[2];
-	LVecBase2f m_quadUV[2];
+	LVecBase3f m_quadVertex[3];
+	LVecBase4f m_quadColor[3];
+	LVecBase2f m_quadUV[3];
 	int m_quadIdx;
 	///Inner TextNode node paths.
 	std::vector<NodePath> m_textNodes;
@@ -93,41 +93,47 @@ protected:
 	int m_textNodeIdx;
 	///Current TextNodes number.
 	int m_textNodesSize;
+	///Text scale.
+	float m_textScale;
 
-	public:
-		DrawMeshDrawer(NodePath render, NodePath camera, int budget = 50,
-				bool singleMesh = false);
-		virtual ~DrawMeshDrawer();
+public:
+	DrawMeshDrawer(NodePath render, NodePath camera, int budget = 50,
+			float textScale = 0.75, bool singleMesh = false);
+	virtual ~DrawMeshDrawer();
 
-		void reset();
+	void reset();
 
-		void begin(DrawPrimitive prim);
-		void vertex(const LVector3f& vertex, const LVector2f& uv =
-				LVector2f::zero());
-		void end();
-		void setColor(const LVector4f& color)
-		{
-			m_color = color;
-		}
-		void setSize(float size)
-		{
-			m_size = size / 50.0;
-		}
-		void setTwoSided(bool enable)
-		{
-			m_twoSided = enable;
-		}
-		void depthMask(bool state)
-		{
-			m_depthMask = state;
-		}
-		void texture(bool state)
-		{
-			m_texture = state;
-		}
-		void drawText(const std::string& text, const LPoint3f& location,
-				const LVecBase4& color);
-	};
+	void begin(DrawPrimitive prim);
+	void vertex(const LVector3f& vertex, const LVector2f& uv =
+			LVector2f::zero());
+	void end();
+	void setColor(const LVector4f& color)
+	{
+		m_color = color;
+	}
+	void setSize(float size)
+	{
+		m_size = size / 50.0;
+	}
+	void setTwoSided(bool enable)
+	{
+		m_twoSided = enable;
+	}
+	void depthMask(bool state)
+	{
+		m_depthMask = state;
+	}
+	void texture(bool state)
+	{
+		m_texture = state;
+	}
+	void drawText(const std::string& text, const LPoint3f& location,
+			const LVecBase4& color);
+	void setTextScale(float textScale)
+	{
+		m_textScale = textScale;
+	}
+};
 }
 
 #endif /* DRAWMESHDRAWER_H_ */

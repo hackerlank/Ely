@@ -167,9 +167,9 @@ protected:
 	LVecBase2f m_triUV[2];
 	int m_triIdx;
 	///Quad previous store.
-	LVecBase3f m_quadVertex[2];
-	LVecBase4f m_quadColor[2];
-	LVecBase2f m_quadUV[2];
+	LVecBase3f m_quadVertex[3];
+	LVecBase4f m_quadColor[3];
+	LVecBase2f m_quadUV[3];
 	int m_quadIdx;
 
 private:

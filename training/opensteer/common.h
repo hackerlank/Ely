@@ -31,6 +31,7 @@
 
 namespace ely
 {
+
 //LVecBase3f-OpenSteer::Vec3 conversion functions
 inline OpenSteer::Vec3 LVecBase3fToOpenSteerVec3(const LVecBase3f& v)
 {
@@ -78,6 +79,12 @@ protected:
 	NodePath mActor;
 
 };
+}
+
+namespace OpenSteer
+{
+void gridUtility(const Vec3& gridTarget, const float size = 50,
+		const int subsquares = 50);
 }
 
 #endif /* COMMON_H_ */

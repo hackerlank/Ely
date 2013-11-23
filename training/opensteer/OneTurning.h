@@ -143,12 +143,16 @@ public:
 		annote << "      speed: " << gOneTurning->speed() << std::ends;
 //            draw2dTextAt3dLocation (annote, gOneTurning->position(), gRed, drawGetWindowWidth(), drawGetWindowHeight());
 //            draw2dTextAt3dLocation (*"start", Vec3::zero, gGreen, drawGetWindowWidth(), drawGetWindowHeight());
+		draw2dTextAt3dLocation (annote, gOneTurning->position(), gRed, 0.0, 0.0);
+		draw2dTextAt3dLocation (*"start", Vec3::zero, gGreen, 0.0, 0.0);
 
 		// update camera, tracking test vehicle
 //            OpenSteerDemo::updateCamera (currentTime, elapsedTime, *gOneTurning);
 
 		// draw "ground plane"
 //            OpenSteerDemo::gridUtility (gOneTurning->position());
+		///very slow
+		gridUtility (gOneTurning->position(), 600, 20);
 	}
 
 	void close(void)

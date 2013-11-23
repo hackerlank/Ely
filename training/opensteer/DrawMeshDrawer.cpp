@@ -30,10 +30,10 @@ namespace ely
 {
 
 DrawMeshDrawer::DrawMeshDrawer(NodePath render, NodePath camera, int budget,
-		bool singleMesh) :
+		float textScale, bool singleMesh) :
 		m_render(render), m_camera(camera), m_meshDrawersSize(0), m_budget(
 				budget), m_singleMesh(singleMesh), m_size(1.0 / 50.0), m_twoSided(
-				false), m_textNodesSize(0)
+				false), m_textNodesSize(0), m_textScale(textScale)
 {
 	reset();
 }
@@ -75,7 +75,7 @@ void DrawMeshDrawer::begin(DrawPrimitive prim)
 	}
 	//setup current MeshDrawer
 	m_generators[m_meshDrawerIdx]->get_root().set_depth_write(m_depthMask);
-//	m_generator[m_meshDrawerIdx]->get_root().set_render_mode_thickness(size);
+//	m_generator[m_meshDrawerIdx]->get_root().set_render_mode_thickness(m_size);
 	m_generators[m_meshDrawerIdx]->get_root().set_two_sided(m_twoSided);
 	//begin current MeshDrawer
 	m_generators[m_meshDrawerIdx]->begin(m_camera, m_render);
@@ -253,7 +253,6 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 void DrawMeshDrawer::drawText(const std::string& text, const LPoint3f& location,
 		const LVecBase4& color)
 {
-	///TODO
 	//dynamically allocate TextNodes if necessary
 	if (m_textNodeIdx >= m_textNodesSize)
 	{
@@ -261,22 +260,23 @@ void DrawMeshDrawer::drawText(const std::string& text, const LPoint3f& location,
 		std::string textNum =
 				dynamic_cast<ostringstream&>(ostringstream().operator <<(
 						m_textNodeIdx)).str();
-		PT(TextNode) textNode = new TextNode("TextNode-" + textNum);
-		m_textNodes.push_back(NodePath(textNode));
+		m_textNodes.push_back(NodePath(new TextNode("TextNode-" + textNum)));
 		//common TextNodes setup
 		m_textNodes.back().reparent_to(m_render);
+		m_textNodes.back().set_scale(m_textScale);
+		m_textNodes.back().set_bin("fixed", 50);
+		m_textNodes.back().set_depth_write(false);
+		m_textNodes.back().set_depth_test(false);
+		m_textNodes.back().set_billboard_point_eye();
 		//update number of TextNodes
 		m_textNodesSize = m_textNodes.size();
 	}
-	//setup current MeshDrawer
-	m_generators[m_meshDrawerIdx]->get_root().set_depth_write(m_depthMask);
-//	m_generator[m_meshDrawerIdx]->get_root().set_render_mode_thickness(size);
-	m_generators[m_meshDrawerIdx]->get_root().set_two_sided(m_twoSided);
-	//begin current MeshDrawer
-	m_generators[m_meshDrawerIdx]->begin(m_camera, m_render);
-	m_prim = prim;
-	m_lineIdx = m_triIdx = m_quadIdx = 0;
-	m_triStripUp = true;
+	//setup current TextNode
+	DCAST(TextNode, m_textNodes[m_textNodeIdx].node())->set_text(text);
+	m_textNodes[m_textNodeIdx].set_pos(location);
+	m_textNodes[m_textNodeIdx].set_color(color);
+	//increase index
+	++m_textNodeIdx;
 }
 
 }  // namespace ely

@@ -38,7 +38,9 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <load_prc_file.h>
+#include <textNode.h>
 
+#include "common.h"
 //#include "OpenSteer/OpenSteerDemo.h"        // OpenSteerDemo application
 //#include "OpenSteer/Draw.h"                 // OpenSteerDemo graphics
 #include "DrawMeshDrawer.h"
@@ -53,8 +55,16 @@ AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data);
 
 extern std::string baseDir;
 
-//global drawers
-ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d, *currentDrawer;
+namespace OpenSteer
+{
+//global variables initializations
+bool enableAnnotation = true;
+bool updatePhaseActive = false;
+bool drawPhaseActive = true;
+bool gDelayedResetPlugInXXX = false;
+}
+
+ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
 
 int main(int argc, char *argv[])
 {
@@ -94,8 +104,14 @@ int main(int argc, char *argv[])
 	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
 
 	//create global drawers
-	gDrawer3d = new ely::DrawMeshDrawer(window->get_render(),window->get_camera_group().get_child(0));
-	gDrawer2d = new ely::DrawMeshDrawer(window->get_aspect_2d(),window->get_camera_group().get_child(0));
+	NodePath drawer3dNP = window->get_render().attach_new_node("Drawer3dNP");
+	NodePath drawer2dNP = window->get_aspect_2d().attach_new_node("Drawer2dNP");
+	gDrawer3d = new ely::DrawMeshDrawer(drawer3dNP,
+			window->get_camera_group().get_child(0));
+	gDrawerGrid3d = new ely::DrawMeshDrawer(drawer3dNP,
+			window->get_camera_group().get_child(0), 5000, 0.75, true);
+	gDrawer2d = new ely::DrawMeshDrawer(drawer2dNP,
+			window->get_camera_group().get_child(0));
 
 	//current plugin
 	OpenSteer::PlugIn* selectedPlugIn = NULL;
@@ -124,6 +140,14 @@ int main(int argc, char *argv[])
 //		gLowSpeedTurnPlugIn.all[i]->setActor(elyInst);
 //	}
 
+	// draw the name of the selected PlugIn
+	NodePath pluginNameNP(new TextNode("pluginName"));
+	DCAST(TextNode, pluginNameNP.node())->set_text(selectedPlugIn->name());
+	DCAST(TextNode, pluginNameNP.node())->set_align(TextProperties::A_left);
+	pluginNameNP.set_scale(0.05);
+	pluginNameNP.set_pos(-1.0, 0.0, 0.95);
+	pluginNameNP.reparent_to(drawer2dNP);
+
 	//add opensteer update task
 	AsyncTask* task = new GenericAsyncTask("opensteer update",
 			&opensteer_update, reinterpret_cast<void*>(selectedPlugIn));
@@ -140,12 +164,6 @@ int main(int argc, char *argv[])
 }
 
 std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
-namespace OpenSteer
-{
-bool enableAnnotation = true;
-bool updatePhaseActive = false;
-bool drawPhaseActive = true;
-}
 
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 {
@@ -158,15 +176,21 @@ AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 	//reset drawers
 	gDrawer2d->reset();
 	gDrawer3d->reset();
+	gDrawerGrid3d->reset();
 
 	// service queued reset request, if any
-//    doDelayedResetPlugInXXX ();
-
+	if (OpenSteer::gDelayedResetPlugInXXX)
+	{
+		selectedPlugIn->reset();
+		OpenSteer::gDelayedResetPlugInXXX = false;
+	}
 	// invoke selected PlugIn's Update method
 	selectedPlugIn->update(currentTime, elapsedTime);
-
 	// invoke selected PlugIn's Redraw method
 	selectedPlugIn->redraw(currentTime, elapsedTime);
+	// draw any annotation queued up during selected PlugIn's Update method
+	OpenSteer::drawAllDeferredLines();
+	OpenSteer::drawAllDeferredCirclesOrDisks();
 
 	return AsyncTask::DS_cont;
 }
