@@ -46,6 +46,7 @@
 #include "DrawMeshDrawer.h"
 #include "OneTurning.h"
 #include "LowSpeedTurn.h"
+#include "Pedestrian.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -65,6 +66,8 @@ bool gDelayedResetPlugInXXX = false;
 }
 
 ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
+bool gDrawGrid = false;
+OpenSteer::AbstractVehicle* selectedVehicle;
 
 int main(int argc, char *argv[])
 {
@@ -100,45 +103,130 @@ int main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	//here is room for your own code
-	//load actor
-	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
 
 	//create global drawers
 	NodePath drawer3dNP = window->get_render().attach_new_node("Drawer3dNP");
 	NodePath drawer2dNP = window->get_aspect_2d().attach_new_node("Drawer2dNP");
 	gDrawer3d = new ely::DrawMeshDrawer(drawer3dNP,
-			window->get_camera_group().get_child(0));
+			window->get_camera_group().get_child(0), 100);
 	gDrawerGrid3d = new ely::DrawMeshDrawer(drawer3dNP,
 			window->get_camera_group().get_child(0), 5000, 0.75, true);
 	gDrawer2d = new ely::DrawMeshDrawer(drawer2dNP,
-			window->get_camera_group().get_child(0));
+			window->get_camera_group().get_child(0), 50, 0.04);
 
-	//current plugin
-	OpenSteer::PlugIn* selectedPlugIn = NULL;
+	//current plugin: the last specified will be run
+	std::string currPlug;
+	OpenSteer::AbstractPlugIn* selectedPlugIn = NULL;
+	//actor scale
+	float actorScale = 1.0;
 
-	//OneTurning plugin
-	ely::OneTurningPlugIn gOneTurningPlugIn;
-	selectedPlugIn = &gOneTurningPlugIn;
-	gOneTurningPlugIn.open();
-	//view actor
-	NodePath elyInst = window->get_render().attach_new_node("OneTurning");
-	ely.instance_to(elyInst);
-	gOneTurningPlugIn.gOneTurning->setActor(elyInst);
+	//get program options
+	int c;
+	opterr = 0;
+	while ((c = getopt(argc, argv, "olpg:s:")) != -1)
+	{
+		switch (c)
+		{
+		case 'o':
+			currPlug = "OneTurning";
+			break;
+		case 'l':
+			currPlug = "LowSpeedTurn";
+			break;
+		case 'p':
+			currPlug = "Pedestrian";
+			break;
+		case 'g':
+			//draw grid
+		{
+			if (std::string(optarg) == "yes")
+			{
+				gDrawGrid = true;
+			}
+		}
+			break;
+		case 's':
+			//actor scale
+		{
+			actorScale = atof(optarg);
+			if (actorScale <= 0.0)
+			{
+				actorScale = 1.0;
+			}
+		}
+			break;
+		case '?':
+			if ((optopt == 'g'))
+				std::cerr << "Option " << optopt << " requires an argument.\n"
+						<< std::endl;
+			else if (isprint(optopt))
+				std::cerr << "Unknown option " << optopt << std::endl;
+			else
+				std::cerr << "Unknown option character " << optopt << std::endl;
+			return 1;
+		default:
+			abort();
+		}
+	}
 
-	//LowSpeedTurn plugin
-//	ely::LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;
-//	selectedPlugIn = &gLowSpeedTurnPlugIn;
-//	gLowSpeedTurnPlugIn.open();
-//	for (int i = 0; i < ely::lstCount; i++)
-//	{
-//		//view actor
-//		std::string instNum =
-//				dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
-//		NodePath elyInst = window->get_render().attach_new_node(
-//				"LowSpeedTurn-" + instNum);
-//		ely.instance_to(elyInst);
-//		gLowSpeedTurnPlugIn.all[i]->setActor(elyInst);
-//	}
+	//load actor
+	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
+	ely.set_scale(actorScale);
+
+	//create plugin
+	if (currPlug == "LowSpeedTurn")
+	{
+		//LowSpeedTurn plugin
+		selectedPlugIn = new ely::LowSpeedTurnPlugIn;
+		selectedPlugIn->open();
+		ely::LowSpeedTurnPlugIn* lowSpeedPlugIn =
+				dynamic_cast<ely::LowSpeedTurnPlugIn*>(selectedPlugIn);
+		for (int i = 0; i < ely::lstCount; i++)
+		{
+			//view actor
+			std::string instNum =
+					dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
+			NodePath elyInst = window->get_render().attach_new_node(
+					"LowSpeedTurn-" + instNum);
+			ely.instance_to(elyInst);
+			lowSpeedPlugIn->all[i]->setActor(elyInst);
+		}
+		selectedVehicle = *lowSpeedPlugIn->all.begin();
+	}
+	else if (currPlug == "Pedestrian")
+	{
+		//Pedestrian plugin
+		selectedPlugIn = new ely::PedestrianPlugIn;
+		selectedPlugIn->open();
+		ely::PedestrianPlugIn::iterator iter;
+		int i;
+		ely::PedestrianPlugIn* pedPlugIn =
+				dynamic_cast<ely::PedestrianPlugIn*>(selectedPlugIn);
+		for (i = 0, iter = pedPlugIn->crowd.begin();
+				iter != pedPlugIn->crowd.end(); ++i, ++iter)
+		{
+			//view actor
+			std::string instNum =
+					dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
+			NodePath elyInst = window->get_render().attach_new_node(
+					"Pedestrian-" + instNum);
+			ely.instance_to(elyInst);
+			dynamic_cast<ely::Pedestrian*>(*iter)->setActor(elyInst);
+		}
+		//first vehicle is selected by selectedPlugIn->open() too
+		selectedVehicle = *pedPlugIn->crowd.begin();
+	}
+	else
+	{
+		//OneTurning plugin: default
+		selectedPlugIn = new ely::OneTurningPlugIn;
+		selectedPlugIn->open();
+		//view actor
+		NodePath elyInst = window->get_render().attach_new_node("OneTurning");
+		ely.instance_to(elyInst);
+		dynamic_cast<ely::OneTurningPlugIn*>(selectedPlugIn)->gOneTurning->setActor(
+				elyInst);
+	}
 
 	// draw the name of the selected PlugIn
 	NodePath pluginNameNP(new TextNode("pluginName"));
@@ -157,6 +245,8 @@ int main(int argc, char *argv[])
 	framework.main_loop();
 	//close the window framework
 	framework.close_framework();
+	//delete selected plugin
+	delete selectedPlugIn;
 	//delete global drawers
 	delete gDrawer3d;
 	delete gDrawer2d;

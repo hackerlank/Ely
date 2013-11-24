@@ -202,6 +202,11 @@ public:
 
 		// draw "ground plane"
 //		OpenSteerDemo::gridUtility(selected.position());
+		if (gDrawGrid)
+		{
+			///very slow
+			gridUtility(selectedVehicle->position(), 600, 20);
+		}
 
 		// update, draw and annotate each agent
 		for (iterator i = all.begin(); i != all.end(); i++)
@@ -219,6 +224,7 @@ public:
 					<< agent.speed() << std::ends;
 //			draw2dTextAt3dLocation(annote, textPosition, textColor,
 //					drawGetWindowWidth(), drawGetWindowHeight());
+			draw2dTextAt3dLocation(annote, textPosition, textColor, 0.0, 0.0);
 		}
 
 		// highlight vehicle nearest mouse

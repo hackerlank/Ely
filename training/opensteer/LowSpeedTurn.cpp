@@ -51,4 +51,4 @@ const float lstLookDownDistance = 18;
 const Vec3 lstViewCenter(7, 0, -2);
 const Vec3 lstPlusZ(0, 0, 1);
 
-}// anonymous namespace
+}// ely namespace

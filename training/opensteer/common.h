@@ -28,6 +28,10 @@
 #include <nodePath.h>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
+#include <OpenSteer/AbstractVehicle.h>
+
+extern bool gDrawGrid;
+extern OpenSteer::AbstractVehicle* selectedVehicle;
 
 namespace ely
 {
@@ -51,7 +55,7 @@ inline LVecBase4f OpenSteerColorToLVecBase4f(const OpenSteer::Color& c)
 	return LVecBase4f(c.r(), c.g(), c.b(), c.a());
 }
 
-template<class Super>
+template<typename Super>
 class ActorMixin: public Super
 {
 public:
@@ -77,8 +81,41 @@ public:
 
 protected:
 	NodePath mActor;
-
 };
+
+template<typename Super, typename CP1>
+class ActorCP1Mixin: public Super
+{
+public:
+
+	ActorCP1Mixin(CP1& param1) :
+			Super(param1)
+	{
+	}
+
+	void update(const float currentTime, const float elapsedTime)
+	{
+		Super::update(currentTime, elapsedTime);
+		//update actor
+		LPoint3f pos = OpenSteerVec3ToLVecBase3f(Super::position());
+		mActor.set_pos(pos);
+		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(Super::forward()),
+				OpenSteerVec3ToLVecBase3f(Super::up()));
+	}
+
+	void setActor(NodePath actor)
+	{
+		mActor = actor;
+		// set size of bounding sphere
+		LPoint3f minP, maxP;
+		actor.calc_tight_bounds(minP, maxP);
+		Super::setRadius((maxP - minP).length() / 2.0);
+	}
+
+protected:
+	NodePath mActor;
+};
+
 }
 
 namespace OpenSteer
