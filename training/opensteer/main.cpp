@@ -302,15 +302,15 @@ void toggleDraw(const Event * event, void *data)
 		bool* toggleEnable = reinterpret_cast<bool*>(data);
 		*toggleEnable = not *toggleEnable;
 		//clear drawers
-//		gDrawer2d->clear();
-//		gDrawer3d->clear();
+		gDrawer2d->clear();
+		gDrawer3d->clear();
 	}
 	if (eventName == "g")
 	{
 		bool* toggleEnable = reinterpret_cast<bool*>(data);
 		*toggleEnable = not *toggleEnable;
 		//clear drawers
-//		gDrawerGrid3d->clear();
+		gDrawerGrid3d->clear();
 	}
 	if (eventName == "d")
 	{
