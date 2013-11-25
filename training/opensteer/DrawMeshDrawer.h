@@ -89,8 +89,8 @@ protected:
 	int m_quadIdx;
 	///Inner TextNode node paths.
 	std::vector<NodePath> m_textNodes;
-	///Current TextNode index.
-	int m_textNodeIdx;
+	///Current and previous TextNode index.
+	int m_textNodeIdx, m_prevTextNodeIdx;
 	///Current TextNodes number.
 	int m_textNodesSize;
 	///Text scale.
@@ -102,6 +102,7 @@ public:
 	virtual ~DrawMeshDrawer();
 
 	void reset();
+	void clear();
 
 	void begin(DrawPrimitive prim);
 	void vertex(const LVector3f& vertex, const LVector2f& uv =

@@ -151,7 +151,7 @@ public:
 
 		// draw "ground plane"
 //            OpenSteerDemo::gridUtility (gOneTurning->position());
-		if (gDrawGrid)
+		if (gToggleDrawGrid)
 		{
 			///very slow
 			gridUtility(gOneTurning->position(), 600, 20);

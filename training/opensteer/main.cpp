@@ -56,17 +56,21 @@ AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data);
 
 extern std::string baseDir;
 
+//draw enabling
+NodePath drawer3dNP, drawer2dNP;
+void toggleDraw(const Event *, void *);
+bool gToggleDrawGrid = false;
+
 namespace OpenSteer
 {
 //global variables initializations
-bool enableAnnotation = true;
+bool enableAnnotation = false;
 bool updatePhaseActive = false;
 bool drawPhaseActive = true;
 bool gDelayedResetPlugInXXX = false;
 }
 
 ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
-bool gDrawGrid = false;
 OpenSteer::AbstractVehicle* selectedVehicle;
 
 int main(int argc, char *argv[])
@@ -102,15 +106,17 @@ int main(int argc, char *argv[])
 	trackball->set_pos(0, 50, 0);
 	trackball->set_hpr(0, 15, 0);
 
-	//here is room for your own code
+	///here is room for your own code
 
 	//create global drawers
-	NodePath drawer3dNP = window->get_render().attach_new_node("Drawer3dNP");
-	NodePath drawer2dNP = window->get_aspect_2d().attach_new_node("Drawer2dNP");
+	drawer3dNP = window->get_render().attach_new_node("Drawer3dNP");
+	drawer2dNP = window->get_aspect_2d().attach_new_node("Drawer2dNP");
 	gDrawer3d = new ely::DrawMeshDrawer(drawer3dNP,
-			window->get_camera_group().get_child(0), 100);
+			window->get_camera_group().get_child(0), 100, 0.04);
+	gDrawer3d->depthMask(true);
 	gDrawerGrid3d = new ely::DrawMeshDrawer(drawer3dNP,
 			window->get_camera_group().get_child(0), 5000, 0.75, true);
+	gDrawer3d->depthMask(true);
 	gDrawer2d = new ely::DrawMeshDrawer(drawer2dNP,
 			window->get_camera_group().get_child(0), 50, 0.04);
 
@@ -123,7 +129,7 @@ int main(int argc, char *argv[])
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olpg:s:")) != -1)
+	while ((c = getopt(argc, argv, "olps:")) != -1)
 	{
 		switch (c)
 		{
@@ -136,15 +142,6 @@ int main(int argc, char *argv[])
 		case 'p':
 			currPlug = "Pedestrian";
 			break;
-		case 'g':
-			//draw grid
-		{
-			if (std::string(optarg) == "yes")
-			{
-				gDrawGrid = true;
-			}
-		}
-			break;
 		case 's':
 			//actor scale
 		{
@@ -156,7 +153,7 @@ int main(int argc, char *argv[])
 		}
 			break;
 		case '?':
-			if ((optopt == 'g'))
+			if ((optopt == 's'))
 				std::cerr << "Option " << optopt << " requires an argument.\n"
 						<< std::endl;
 			else if (isprint(optopt))
@@ -241,6 +238,16 @@ int main(int argc, char *argv[])
 			&opensteer_update, reinterpret_cast<void*>(selectedPlugIn));
 	AsyncTaskManager::get_global_ptr()->add(task);
 
+	//toggle draw grid enabling
+	framework.define_key("a", "toggle-annotation", &toggleDraw,
+			static_cast<void*>(&OpenSteer::enableAnnotation));
+	//toggle draw annotation enabling
+	framework.define_key("g", "toggle-draw-grid", &toggleDraw,
+			static_cast<void*>(&gToggleDrawGrid));
+	//toggle draw enabling
+	framework.define_key("d", "toggle-draw-grid", &toggleDraw,
+			static_cast<void*>(NULL));
+
 	//do the main loop, equal to run() in python
 	framework.main_loop();
 	//close the window framework
@@ -276,13 +283,48 @@ AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data)
 	}
 	// invoke selected PlugIn's Update method
 	selectedPlugIn->update(currentTime, elapsedTime);
+
 	// invoke selected PlugIn's Redraw method
 	selectedPlugIn->redraw(currentTime, elapsedTime);
+
 	// draw any annotation queued up during selected PlugIn's Update method
 	OpenSteer::drawAllDeferredLines();
 	OpenSteer::drawAllDeferredCirclesOrDisks();
 
 	return AsyncTask::DS_cont;
+}
+
+void toggleDraw(const Event * event, void *data)
+{
+	std::string eventName = event->get_name();
+	if (eventName == "a")
+	{
+		bool* toggleEnable = reinterpret_cast<bool*>(data);
+		*toggleEnable = not *toggleEnable;
+		//clear drawers
+//		gDrawer2d->clear();
+//		gDrawer3d->clear();
+	}
+	if (eventName == "g")
+	{
+		bool* toggleEnable = reinterpret_cast<bool*>(data);
+		*toggleEnable = not *toggleEnable;
+		//clear drawers
+//		gDrawerGrid3d->clear();
+	}
+	if (eventName == "d")
+	{
+		if (drawer3dNP.is_hidden() and drawer2dNP.is_hidden())
+		{
+			drawer3dNP.show();
+			drawer2dNP.show();
+		}
+		else
+		{
+			drawer3dNP.hide();
+			drawer2dNP.hide();
+		}
+	}
 }
 
 // ------------------------------------------------------------------------

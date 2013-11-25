@@ -30,7 +30,7 @@
 #include <OpenSteer/Color.h>
 #include <OpenSteer/AbstractVehicle.h>
 
-extern bool gDrawGrid;
+extern bool gToggleDrawGrid;
 extern OpenSteer::AbstractVehicle* selectedVehicle;
 
 namespace ely

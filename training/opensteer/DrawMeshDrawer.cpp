@@ -31,9 +31,10 @@ namespace ely
 
 DrawMeshDrawer::DrawMeshDrawer(NodePath render, NodePath camera, int budget,
 		float textScale, bool singleMesh) :
-		m_render(render), m_camera(camera), m_meshDrawersSize(0), m_budget(
-				budget), m_singleMesh(singleMesh), m_size(1.0 / 50.0), m_twoSided(
-				false), m_textNodesSize(0), m_textScale(textScale)
+		m_render(render), m_camera(camera), m_depthMask(true), m_meshDrawersSize(
+				0), m_budget(budget), m_singleMesh(singleMesh), m_size(
+				1.0 / 50.0), m_twoSided(false), m_prevTextNodeIdx(-1), m_textNodesSize(
+				0), m_textScale(textScale)
 {
 	reset();
 }
@@ -51,8 +52,36 @@ void DrawMeshDrawer::reset()
 	//reset current MeshDrawer index
 	m_meshDrawerIdx = 0;
 	m_prim = NULL_PRIM;
-	//reset current TextNode index
+	//clear text on not used text nodes
+	for (int idx = m_textNodeIdx; idx <= m_prevTextNodeIdx; ++idx)
+	{
+		DCAST(TextNode, m_textNodes[idx].node())->clear_text();
+	}
+	//reset current and previous TextNode indexes
+	m_prevTextNodeIdx = m_textNodeIdx - 1;
 	m_textNodeIdx = 0;
+}
+
+void DrawMeshDrawer::clear()
+{
+	//reset to initial values
+	m_meshDrawerIdx = 0;
+	m_meshDrawersSize = 0;
+	m_prim = NULL_PRIM;
+	m_textNodeIdx = 0;
+	m_prevTextNodeIdx = -1;
+	m_textNodesSize = 0;
+	//clear internal storage
+	for (unsigned int i; i < m_generators.size(); ++i)
+	{
+		delete m_generators[i];
+	}
+	for (unsigned int i; i < m_generators.size(); ++i)
+	{
+		m_textNodes[i].remove_node();
+	}
+	m_generators.clear();
+	m_textNodes.clear();
 }
 
 void DrawMeshDrawer::begin(DrawPrimitive prim)
@@ -66,9 +95,9 @@ void DrawMeshDrawer::begin(DrawPrimitive prim)
 		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->get_root().set_transparency(
 				TransparencyAttrib::M_alpha);
-		m_generators.back()->get_root().get_child(0).node()->set_bounds(
+		m_generators.back()->get_root().node()->set_bounds(
 				new OmniBoundingVolume());
-		m_generators.back()->get_root().get_child(0).node()->set_final(true);
+		m_generators.back()->get_root().node()->set_final(true);
 		m_generators.back()->get_root().reparent_to(m_render);
 		//update number of MeshDrawers
 		m_meshDrawersSize = m_generators.size();

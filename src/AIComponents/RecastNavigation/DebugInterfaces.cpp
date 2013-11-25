@@ -388,9 +388,9 @@ void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 		m_generators.back()->set_budget(m_budget);
 		m_generators.back()->get_root().set_transparency(
 				TransparencyAttrib::M_alpha);
-		m_generators.back()->get_root().get_child(0).node()->set_bounds(
+		m_generators.back()->get_root().node()->set_bounds(
 				new OmniBoundingVolume());
-		m_generators.back()->get_root().get_child(0).node()->set_final(true);
+		m_generators.back()->get_root().node()->set_final(true);
 		m_generators.back()->get_root().reparent_to(m_render);
 		//update number of MeshDrawers
 		m_meshDrawersSize = m_generators.size();

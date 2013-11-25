@@ -451,7 +451,7 @@ public:
 //		if (OpenSteerDemo::selectedVehicle)
 //			gridCenter = selected.position();
 //		OpenSteerDemo::gridUtility(gridCenter);
-		if (gDrawGrid)
+		if (gToggleDrawGrid)
 		{
 			///very slow
 			if (selectedVehicle)
