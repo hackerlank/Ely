@@ -13,5 +13,5 @@ nodist_ely_opensteer_SOURCES = \
 		DrawMeshDrawer.cpp \
 		LowSpeedTurn.cpp \
 		Pedestrian.cpp \
-		PedestriansWalkingAnEight.cpp
-		
+		PedestriansWalkingAnEight.cpp \
+		CaptureTheFlag.cpp		

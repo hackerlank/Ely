@@ -48,6 +48,7 @@
 #include "LowSpeedTurn.h"
 #include "Pedestrian.h"
 #include "PedestriansWalkingAnEight.h"
+#include "CaptureTheFlag.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -130,7 +131,7 @@ int main(int argc, char *argv[])
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olpws:")) != -1)
+	while ((c = getopt(argc, argv, "olpwcs:")) != -1)
 	{
 		switch (c)
 		{
@@ -145,6 +146,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'w':
 			currPlug = "PedestriansWalkingAnEight";
+			break;
+		case 'c':
+			currPlug = "CaptureTheFlag";
 			break;
 		case 's':
 			//actor scale
@@ -170,9 +174,11 @@ int main(int argc, char *argv[])
 		}
 	}
 
-	//load actor
+	//load actors
 	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
 	ely.set_scale(actorScale);
+	NodePath panda = window->load_model(framework.get_models(), "panda.bam");
+	panda.set_scale(actorScale * 0.5);
 
 	//create plugin
 	if (currPlug == "LowSpeedTurn")
@@ -235,10 +241,45 @@ int main(int argc, char *argv[])
 			NodePath elyInst = window->get_render().attach_new_node(
 					"PedestrianWalkingAnEight-" + instNum);
 			ely.instance_to(elyInst);
-			dynamic_cast<ely::PedestrianWalkingAnEight*>(*iter)->setActor(elyInst);
+			dynamic_cast<ely::PedestrianWalkingAnEight*>(*iter)->setActor(
+					elyInst);
 		}
 		//first vehicle is selected by selectedPlugIn->open() too
 		selectedVehicle = *pedPlugIn->crowd.begin();
+	}
+	else if (currPlug == "CaptureTheFlag")
+	{
+		//CaptureTheFlag plugin
+		selectedPlugIn = new ely::CtfPlugIn;
+		selectedPlugIn->open();
+		std::vector<ely::CtfBase*>::iterator iter;
+		int i = 0;
+		ely::CtfPlugIn* ctfPlugIn =
+				dynamic_cast<ely::CtfPlugIn*>(selectedPlugIn);
+		for (i = 0, iter = ctfPlugIn->all.begin(); iter != ctfPlugIn->all.end();
+				++i, ++iter)
+		{
+			//view actor
+			std::string instNum =
+					dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
+			NodePath nodeInst = window->get_render().attach_new_node(
+					"CaptureTheFlag-" + instNum);
+			if (i == 0)
+			{
+				//seeker
+				ely.instance_to(nodeInst);
+				dynamic_cast<ely::CtfSeeker*>(*iter)->setActor(nodeInst);
+
+			}
+			else
+			{
+				//enemies
+				panda.instance_to(nodeInst);
+				dynamic_cast<ely::CtfEnemy*>(*iter)->setActor(nodeInst);
+			}
+		}
+		//seeker is selected by selectedPlugIn->open() too
+		selectedVehicle = *ctfPlugIn->all.begin();
 	}
 	else
 	{
