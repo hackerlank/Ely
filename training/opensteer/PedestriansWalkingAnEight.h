@@ -28,10 +28,10 @@
 // ----------------------------------------------------------------------------
 //
 //
-// An autonomous "pedestrian":
-// follows paths, avoids collisions with obstacles and other pedestrians
+// Pedestrian following path tests with one pedestrian following a pathway of
+// the shape of an eight.
 //
-// 10-29-01 cwr: created
+// 06-20-05 bk: created
 //
 //
 // ----------------------------------------------------------------------------
@@ -63,45 +63,40 @@ typedef AbstractTokenForProximityDatabase<AbstractVehicle*> ProximityToken;
 // ----------------------------------------------------------------------------
 
 // How many pedestrians to create when the plugin starts first?
-extern int const gPedestrianStartCount;
+extern int const gPedestrianStartCountEight; // 100
 // creates a path for the PlugIn
-PolylineSegmentedPathwaySingleRadius* getTestPath(void);
-extern PolylineSegmentedPathwaySingleRadius* gTestPath;
-extern SphereObstacle gObstacle1;
-extern SphereObstacle gObstacle2;
-extern ObstacleGroup gObstacles;
-extern Vec3 gEndpoint0;
-extern Vec3 gEndpoint1;
-extern bool gUseDirectedPathFollowing;
-// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
-extern RectangleObstacle gObstacle3;
-// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
+PolylineSegmentedPathwaySingleRadius* getTestPathEight(void);
+extern PolylineSegmentedPathwaySingleRadius* gTestPathEight;
+extern ObstacleGroup gObstaclesEight;
+extern Vec3 gEndpoint0Eight;
+extern Vec3 gEndpoint1Eight;
+extern bool gUseDirectedPathFollowingEight;
 
 // this was added for debugging tool, but I might as well leave it in
-extern bool gWanderSwitch;
+extern bool gWanderSwitchEight;
 
 // ----------------------------------------------------------------------------
 
-class _Pedestrian: public SimpleVehicle
+class _PedestrianWalkingAnEight: public SimpleVehicle
 {
 public:
 
-	// type for a group of Pedestrians
-	typedef std::vector<_Pedestrian*> groupType;
+	// type for a group of _PedestrianWalkingAnEights
+	typedef std::vector<_PedestrianWalkingAnEight*> groupType;
 
 	// constructor
-	_Pedestrian(ProximityDatabase& pd)
+	_PedestrianWalkingAnEight(ProximityDatabase& pd)
 	{
 		// allocate a token for this boid in the proximity database
 		proximityToken = NULL;
 		newPD(pd);
 
-		// reset Pedestrian state
+		// reset PedestrianWalkingAnEight state
 		reset();
 	}
 
 	// destructor
-	virtual ~_Pedestrian()
+	virtual ~_PedestrianWalkingAnEight()
 	{
 		// delete this boid's token in the proximity database
 		delete proximityToken;
@@ -123,8 +118,8 @@ public:
 		// size of bounding sphere, for obstacle avoidance, etc.
 		setRadius(0.5); // width = 0.7, add 0.3 margin, take half
 
-		// set the path for this Pedestrian to follow
-		path = getTestPath();
+		// set the path for this PedestrianWalkingAnEight to follow
+		path = getTestPathEight();
 
 		// set initial position
 		// (random point on path + random horizontal offset)
@@ -153,20 +148,20 @@ public:
 		applySteeringForce(determineCombinedSteering(elapsedTime), elapsedTime);
 
 		// reverse direction when we reach an endpoint
-		if (gUseDirectedPathFollowing)
+		if (gUseDirectedPathFollowingEight)
 		{
 			const Color darkRed(0.7f, 0, 0);
 			float const pathRadius = path->radius();
 
-			if (Vec3::distance(position(), gEndpoint0) < pathRadius)
+			if (Vec3::distance(position(), gEndpoint0Eight) < pathRadius)
 			{
 				pathDirection = +1;
-				annotationXZCircle(pathRadius, gEndpoint0, darkRed, 20);
+				annotationXZCircle(pathRadius, gEndpoint0Eight, darkRed, 20);
 			}
-			if (Vec3::distance(position(), gEndpoint1) < pathRadius)
+			if (Vec3::distance(position(), gEndpoint1Eight) < pathRadius)
 			{
 				pathDirection = -1;
-				annotationXZCircle(pathRadius, gEndpoint1, darkRed, 20);
+				annotationXZCircle(pathRadius, gEndpoint1Eight, darkRed, 20);
 			}
 		}
 
@@ -195,12 +190,12 @@ public:
 		if (leakThrough < frandom01())
 		{
 			const float oTime = 6; // minTimeToCollision = 6 seconds
-			// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
-			// just for testing
-			//             obstacleAvoidance = steerToAvoidObstacles (oTime, gObstacles);
-			//             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle1);
-			//             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle3);
-			obstacleAvoidance = steerToAvoidObstacles(oTime, gObstacles);
+								   // ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
+								   // just for testing
+								   //             obstacleAvoidance = steerToAvoidObstacles (oTime, gObstaclesEight);
+								   //             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle1);
+								   //             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle3);
+			obstacleAvoidance = steerToAvoidObstacles(oTime, gObstaclesEight);
 			// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 		}
 
@@ -234,13 +229,13 @@ public:
 			else
 			{
 				// add in wander component (according to user switch)
-				if (gWanderSwitch)
+				if (gWanderSwitchEight)
 					steeringForce += steerForWander(elapsedTime);
 
 				// do (interactively) selected type of path following
 				const float pfLeadTime = 3;
 				const Vec3 pathFollow = (
-						gUseDirectedPathFollowing ?
+						gUseDirectedPathFollowingEight ?
 								steerToFollowPath(pathDirection, pfLeadTime,
 										*path) :
 								steerToStayOnPath(pfLeadTime, *path));
@@ -254,7 +249,7 @@ public:
 		return steeringForce.setYtoZero();
 	}
 
-	// draw this pedestrian into scene
+	// draw this PedestrianWalkingAnEight into scene
 	void draw(void)
 	{
 		drawBasic2dCircularVehicle(*this, gGray50);
@@ -354,7 +349,7 @@ public:
 	// (change to per-instance allocation to be more MP-safe)
 	static AVGroup neighbors;
 
-	// path to be followed by this pedestrian
+	// path to be followed by this PedestrianWalkingAnEight
 	// XXX Ideally this should be a generic Pathway, but we use the
 	// XXX getTotalPathLength and radius methods (currently defined only
 	// XXX on PolylinePathway) to set random initial positions.  Could
@@ -365,50 +360,30 @@ public:
 	int pathDirection;
 };
 
-typedef ActorCP1Mixin<_Pedestrian, ProximityDatabase> Pedestrian;
+//AVGroup _PedestrianWalkingAnEight::neighbors;
 
-// ----------------------------------------------------------------------------
-// create path for PlugIn
-//
-//
-//        | gap |
-//
-//        f      b
-//        |\    /\        -
-//        | \  /  \       ^
-//        |  \/    \      |
-//        |  /\     \     |
-//        | /  \     c   top
-//        |/    \g  /     |
-//        /        /      |
-//       /|       /       V      z     y=0
-//      / |______/        -      ^
-//     /  e      d               |
-//   a/                          |
-//    |<---out-->|               o----> x
-//
-
+typedef ActorCP1Mixin<_PedestrianWalkingAnEight, ProximityDatabase> PedestrianWalkingAnEight;
 
 // ----------------------------------------------------------------------------
 // OpenSteerDemo PlugIn
 
-class PedestrianPlugIn: public PlugIn
+class PedestriansWalkingAnEightPlugIn: public PlugIn
 {
 public:
 
 	const char* name(void)
 	{
-		return "Pedestrians";
+		return "Pedestrians Walking an Eight";
 	}
 
 	float selectionOrderSortKey(void)
 	{
-		return 0.02f;
+		return 98.0f;
 	}
 
-	virtual ~PedestrianPlugIn()
+	virtual ~PedestriansWalkingAnEightPlugIn()
 	{
-	}    // be more "nice" to avoid a compiler warning
+	}                              // be more "nice" to avoid a compiler warning
 
 	void open(void)
 	{
@@ -419,11 +394,11 @@ public:
 
 		// create the specified number of Pedestrians
 		population = 0;
-		for (int i = 0; i < gPedestrianStartCount; i++)
+		for (int i = 0; i < gPedestrianStartCountEight; i++)
 			addPedestrianToCrowd();
 
 		// initialize camera and selectedVehicle
-//		Pedestrian& firstPedestrian = **crowd.begin();
+//		PedestrianWalkingAnEight& firstPedestrian = **crowd.begin();
 //		OpenSteerDemo::init3dCamera(firstPedestrian);
 //		OpenSteerDemo::camera.mode = Camera::cmFixedDistanceOffset;
 //		OpenSteerDemo::camera.fixedTarget.set(15, 0, 30);
@@ -432,7 +407,7 @@ public:
 
 	void update(const float currentTime, const float elapsedTime)
 	{
-		// update each Pedestrian
+		// update each PedestrianWalkingAnEight
 		for (iterator i = crowd.begin(); i != crowd.end(); i++)
 		{
 			(**i).update(currentTime, elapsedTime);
@@ -441,10 +416,10 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-		// selected Pedestrian (user can mouse click to select another)
+		// selected PedestrianWalkingAnEight (user can mouse click to select another)
 //		AbstractVehicle& selected = *OpenSteerDemo::selectedVehicle;
 
-		// Pedestrian nearest mouse (to be highlighted)
+		// PedestrianWalkingAnEight nearest mouse (to be highlighted)
 //		AbstractVehicle& nearMouse = *OpenSteerDemo::vehicleNearestToMouse();
 
 		// update camera
@@ -464,7 +439,7 @@ public:
 			gridUtility(gridCenter, 600, 20);
 		}
 
-		// draw and annotate each Pedestrian
+		// draw and annotate each PedestrianWalkingAnEight
 		for (iterator i = crowd.begin(); i != crowd.end(); i++)
 			(**i).draw();
 
@@ -473,13 +448,13 @@ public:
 		drawPathAndObstacles();
 		gDrawer3d->setTwoSided(false);
 
-		// highlight Pedestrian nearest mouse
+		// highlight PedestrianWalkingAnEight nearest mouse
 //		OpenSteerDemo::highlightVehicleUtility(nearMouse);
 
 		// textual annotation (at the vehicle's screen position)
 //		serialNumberAnnotationUtility(selected, nearMouse);
 
-		// textual annotation for selected Pedestrian
+		// textual annotation for selected PedestrianWalkingAnEight
 //		if (OpenSteerDemo::selectedVehicle && OpenSteer::annotationIsOn())
 		if (selectedVehicle && enableAnnotation)
 		{
@@ -517,12 +492,12 @@ public:
 			break;
 		}
 		status << "\n[F4] ";
-		if (gUseDirectedPathFollowing)
+		if (gUseDirectedPathFollowingEight)
 			status << "Directed path following.";
 		else
 			status << "Stay on the path.";
 		status << "\n[F5] Wander: ";
-		if (gWanderSwitch)
+		if (gWanderSwitchEight)
 			status << "yes";
 		else
 			status << "no";
@@ -538,7 +513,7 @@ public:
 	void serialNumberAnnotationUtility(const AbstractVehicle& selected,
 			const AbstractVehicle& nearMouse)
 	{
-		// display a Pedestrian's serial number as a text label near its
+		// display a PedestrianWalkingAnEight's serial number as a text label near its
 		// screen position when it is near the selected vehicle or mouse.
 		if (&selected && &nearMouse && OpenSteer::annotationIsOn())
 		{
@@ -553,7 +528,8 @@ public:
 								&& (Vec3::distance(vp, np) < nearDistance)))
 				{
 					std::ostringstream sn;
-					sn << "#" << ((Pedestrian*) vehicle)->serialNumber
+					sn << "#"
+							<< ((PedestrianWalkingAnEight*) vehicle)->serialNumber
 							<< std::ends;
 					const Color textColor(0.8f, 1, 0.8f);
 					const Vec3 textOffset(0, 0.25f, 0);
@@ -571,33 +547,12 @@ public:
 		typedef PolylineSegmentedPathwaySingleRadius::size_type size_type;
 
 		// draw a line along each segment of path
-		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
+		const PolylineSegmentedPathwaySingleRadius& path = *getTestPathEight();
 		for (size_type i = 1; i < path.pointCount(); ++i)
 		{
 			drawLine(path.point(i), path.point(i - 1), gRed);
 		}
 
-		// draw obstacles
-		drawXZCircle(gObstacle1.radius, gObstacle1.center, gWhite, 40);
-		drawXZCircle(gObstacle2.radius, gObstacle2.center, gWhite, 40);
-		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
-		{
-			float w = gObstacle3.width * 0.5f;
-			Vec3 p = gObstacle3.position();
-			Vec3 s = gObstacle3.side();
-			drawLine(p + (s * w), p + (s * -w), gWhite);
-
-			Vec3 v1 = gObstacle3.globalizePosition(Vec3(w, w, 0));
-			Vec3 v2 = gObstacle3.globalizePosition(Vec3(-w, w, 0));
-			Vec3 v3 = gObstacle3.globalizePosition(Vec3(-w, -w, 0));
-			Vec3 v4 = gObstacle3.globalizePosition(Vec3(w, -w, 0));
-
-			drawLine(v1, v2, gWhite);
-			drawLine(v2, v3, gWhite);
-			drawLine(v3, v4, gWhite);
-			drawLine(v4, v1, gWhite);
-		}
-		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 	}
 
 	void close(void)
@@ -609,14 +564,14 @@ public:
 
 	void reset(void)
 	{
-		// reset each Pedestrian
+		// reset each PedestrianWalkingAnEight
 		for (iterator i = crowd.begin(); i != crowd.end(); i++)
 			(**i).reset();
 
-		// reset camera position
+//		// reset camera position
 //		OpenSteerDemo::position2dCamera(*OpenSteerDemo::selectedVehicle);
 
-		// make camera jump immediately to new position
+//		// make camera jump immediately to new position
 //		OpenSteerDemo::camera.doNotSmoothNextMove();
 	}
 
@@ -634,10 +589,10 @@ public:
 			nextPD();
 			break;
 		case 4:
-			gUseDirectedPathFollowing = !gUseDirectedPathFollowing;
+			gUseDirectedPathFollowingEight = !gUseDirectedPathFollowingEight;
 			break;
 		case 5:
-			gWanderSwitch = !gWanderSwitch;
+			gWanderSwitchEight = !gWanderSwitchEight;
 			break;
 		}
 	}
@@ -649,8 +604,8 @@ public:
 		message << '"' << name() << '"' << ':' << std::ends;
 //		OpenSteerDemo::printMessage(message);
 //		OpenSteerDemo::printMessage(message);
-//		OpenSteerDemo::printMessage("  F1     add a pedestrian to the crowd.");
-//		OpenSteerDemo::printMessage("  F2     remove a pedestrian from crowd.");
+//		OpenSteerDemo::printMessage("  F1     add a PedestrianWalkingAnEight to the crowd.");
+//		OpenSteerDemo::printMessage("  F2     remove a PedestrianWalkingAnEight from crowd.");
 //		OpenSteerDemo::printMessage("  F3     use next proximity database.");
 //		OpenSteerDemo::printMessage("  F4     toggle directed path follow.");
 //		OpenSteerDemo::printMessage("  F5     toggle wander component on/off.");
@@ -660,7 +615,8 @@ public:
 	void addPedestrianToCrowd(void)
 	{
 		population++;
-		Pedestrian* pedestrian = new Pedestrian(*pd);
+		PedestrianWalkingAnEight* pedestrian = new PedestrianWalkingAnEight(
+				*pd);
 		crowd.push_back(pedestrian);
 		if (population == 1)
 		{
@@ -674,8 +630,8 @@ public:
 		if (population > 0)
 		{
 			// save pointer to last pedestrian, then remove it from the crowd
-			const Pedestrian* pedestrian =
-					dynamic_cast<Pedestrian*>(crowd.back());
+			const PedestrianWalkingAnEight* pedestrian =
+					dynamic_cast<PedestrianWalkingAnEight*>(crowd.back());
 			crowd.pop_back();
 			population--;
 
@@ -736,8 +692,8 @@ public:
 	}
 
 	// crowd: a group (STL vector) of all Pedestrians
-	Pedestrian::groupType crowd;
-	typedef Pedestrian::groupType::const_iterator iterator;
+	PedestrianWalkingAnEight::groupType crowd;
+	typedef PedestrianWalkingAnEight::groupType::const_iterator iterator;
 
 	Vec3 gridCenter;
 
@@ -751,8 +707,8 @@ public:
 	int cyclePD;
 };
 
-//PedestrianPlugIn gPedestrianPlugIn;
+//PedestriansWalkingAnEightPlugIn gPedestriansWalkingAnEightPlugIn;
 
 // ----------------------------------------------------------------------------
 
-}// anonymous namespace
+}// ely namespace

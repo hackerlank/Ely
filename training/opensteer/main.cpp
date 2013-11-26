@@ -47,6 +47,7 @@
 #include "OneTurning.h"
 #include "LowSpeedTurn.h"
 #include "Pedestrian.h"
+#include "PedestriansWalkingAnEight.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -129,7 +130,7 @@ int main(int argc, char *argv[])
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olps:")) != -1)
+	while ((c = getopt(argc, argv, "olpws:")) != -1)
 	{
 		switch (c)
 		{
@@ -141,6 +142,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'p':
 			currPlug = "Pedestrian";
+			break;
+		case 'w':
+			currPlug = "PedestriansWalkingAnEight";
 			break;
 		case 's':
 			//actor scale
@@ -209,6 +213,29 @@ int main(int argc, char *argv[])
 					"Pedestrian-" + instNum);
 			ely.instance_to(elyInst);
 			dynamic_cast<ely::Pedestrian*>(*iter)->setActor(elyInst);
+		}
+		//first vehicle is selected by selectedPlugIn->open() too
+		selectedVehicle = *pedPlugIn->crowd.begin();
+	}
+	else if (currPlug == "PedestriansWalkingAnEight")
+	{
+		//PedestriansWalkingAnEight plugin
+		selectedPlugIn = new ely::PedestriansWalkingAnEightPlugIn;
+		selectedPlugIn->open();
+		ely::PedestriansWalkingAnEightPlugIn::iterator iter;
+		int i;
+		ely::PedestriansWalkingAnEightPlugIn* pedPlugIn =
+				dynamic_cast<ely::PedestriansWalkingAnEightPlugIn*>(selectedPlugIn);
+		for (i = 0, iter = pedPlugIn->crowd.begin();
+				iter != pedPlugIn->crowd.end(); ++i, ++iter)
+		{
+			//view actor
+			std::string instNum =
+					dynamic_cast<ostringstream&>(ostringstream().operator <<(i)).str();
+			NodePath elyInst = window->get_render().attach_new_node(
+					"PedestrianWalkingAnEight-" + instNum);
+			ely.instance_to(elyInst);
+			dynamic_cast<ely::PedestrianWalkingAnEight*>(*iter)->setActor(elyInst);
 		}
 		//first vehicle is selected by selectedPlugIn->open() too
 		selectedVehicle = *pedPlugIn->crowd.begin();
