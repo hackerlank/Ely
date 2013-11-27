@@ -216,6 +216,10 @@ public:
         }
     }
 
+    void Clear() {
+        _size = 0;
+    }
+
     void Push( T t ) {
         EnsureCapacity( _size+1 );
         _mem[_size++] = t;
@@ -1961,6 +1965,14 @@ public:
     */
     int CStrSize() const {
         return _buffer.Size();
+    }
+    /**
+    	If in print to memory mode, reset the buffer to the
+    	beginning.
+    */
+    void ClearBuffer() {
+        _buffer.Clear();
+        _buffer.Push(0);
     }
 
 protected:

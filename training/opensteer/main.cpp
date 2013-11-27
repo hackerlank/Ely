@@ -37,6 +37,7 @@
 
 #include <pandaFramework.h>
 #include <pandaSystem.h>
+#include <auto_bind.h>
 #include <load_prc_file.h>
 #include <textNode.h>
 
@@ -55,6 +56,10 @@
 #include <sstream>
 
 AsyncTask::DoneStatus opensteer_update(GenericAsyncTask* task, void* data);
+
+NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework *window,
+		const std::string& actorName, std::vector<std::string>& animNames,
+		AnimControlCollection& animCollection);
 
 extern std::string baseDir;
 
@@ -127,11 +132,13 @@ int main(int argc, char *argv[])
 	OpenSteer::AbstractPlugIn* selectedPlugIn = NULL;
 	//actor scale
 	float actorScale = 1.0;
+	//actor anim rate
+	float actorAnimRateFactor = 1.0;
 
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olpwcs:")) != -1)
+	while ((c = getopt(argc, argv, "olpwcs:f:")) != -1)
 	{
 		switch (c)
 		{
@@ -160,8 +167,18 @@ int main(int argc, char *argv[])
 			}
 		}
 			break;
+		case 'f':
+			//actor anim rate
+		{
+			actorAnimRateFactor = atof(optarg);
+			if (actorAnimRateFactor <= 0.0)
+			{
+				actorAnimRateFactor = 1.0;
+			}
+		}
+			break;
 		case '?':
-			if ((optopt == 's'))
+			if ((optopt == 's') or (optopt == 'f'))
 				std::cerr << "Option " << optopt << " requires an argument.\n"
 						<< std::endl;
 			else if (isprint(optopt))
@@ -177,7 +194,10 @@ int main(int argc, char *argv[])
 	//load actors
 	NodePath ely = window->load_model(framework.get_models(), "eve.bam");
 	ely.set_scale(actorScale);
+	window->load_model(ely, "eve-walk.bam");
+	//
 	NodePath panda = window->load_model(framework.get_models(), "panda.bam");
+	panda.set_scale(actorScale);
 	panda.set_scale(actorScale * 0.5);
 
 	//create plugin
@@ -286,11 +306,17 @@ int main(int argc, char *argv[])
 		//OneTurning plugin: default
 		selectedPlugIn = new ely::OneTurningPlugIn;
 		selectedPlugIn->open();
-		//view actor
-		NodePath elyInst = window->get_render().attach_new_node("OneTurning");
-		ely.instance_to(elyInst);
-		dynamic_cast<ely::OneTurningPlugIn*>(selectedPlugIn)->gOneTurning->setActor(
-				elyInst);
+		ely::OneTurningPlugIn* onePlug =
+				dynamic_cast<ely::OneTurningPlugIn*>(selectedPlugIn);
+		//add actor and anims
+		std::vector<std::string> animNames;
+		animNames.push_back("eve-walk.bam");
+		NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
+				animNames, onePlug->gOneTurning->getAnims());
+		ely.set_scale(actorScale);
+		ely.reparent_to(window->get_render());
+		onePlug->gOneTurning->setActor(ely);
+		onePlug->gOneTurning->setAnimRateFactor(actorAnimRateFactor);
 	}
 
 	// draw the name of the selected PlugIn
@@ -393,6 +419,23 @@ void toggleDraw(const Event * event, void *data)
 			drawer2dNP.hide();
 		}
 	}
+}
+
+NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework* window,
+		const std::string& actorName, std::vector<std::string>& animNames,
+		AnimControlCollection& animCollection)
+{
+	NodePath actor = window->load_model(framework.get_models(), actorName);
+	//load animations
+	for (unsigned int i = 0; i < animNames.size(); ++i)
+	{
+		window->load_model(actor, animNames[i]);
+	}
+	//bind animations
+	auto_bind(actor.node(), animCollection,
+			PartGroup::HMF_ok_wrong_root_name | PartGroup::HMF_ok_part_extra
+					| PartGroup::HMF_ok_anim_extra);
+	return actor;
 }
 
 // ------------------------------------------------------------------------

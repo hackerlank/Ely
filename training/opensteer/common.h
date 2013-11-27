@@ -26,6 +26,7 @@
 
 #include <algorithm>
 #include <nodePath.h>
+#include <animControlCollection.h>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/AbstractVehicle.h>
@@ -55,41 +56,16 @@ inline LVecBase4f OpenSteerColorToLVecBase4f(const OpenSteer::Color& c)
 	return LVecBase4f(c.r(), c.g(), c.b(), c.a());
 }
 
-template<typename Super>
+template<typename Super, typename Param = int>
 class ActorMixin: public Super
 {
 public:
-
-	void update(const float currentTime, const float elapsedTime)
+	ActorMixin()
 	{
-		Super::update(currentTime, elapsedTime);
-		//update actor
-		LPoint3f pos = OpenSteerVec3ToLVecBase3f(Super::position());
-		mActor.set_pos(pos);
-		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(Super::forward()),
-				OpenSteerVec3ToLVecBase3f(Super::up()));
 	}
 
-	void setActor(NodePath actor)
-	{
-		mActor = actor;
-		// set size of bounding sphere
-		LPoint3f minP, maxP;
-		actor.calc_tight_bounds(minP, maxP);
-		Super::setRadius((maxP - minP).length() / 2.0);
-	}
-
-protected:
-	NodePath mActor;
-};
-
-template<typename Super, typename CP1>
-class ActorCP1Mixin: public Super
-{
-public:
-
-	ActorCP1Mixin(CP1& param1) :
-			Super(param1)
+	ActorMixin(Param& param) :
+			Super(param)
 	{
 	}
 
@@ -101,6 +77,24 @@ public:
 		mActor.set_pos(pos);
 		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(Super::forward()),
 				OpenSteerVec3ToLVecBase3f(Super::up()));
+
+		//get relative speed
+		float relSpeed = Super::relativeSpeed();
+		if (relSpeed >= 0.1)
+		{
+			mAnims.get_anim(0)->set_play_rate(relSpeed * mAnimRateFactor);
+			if (not mAnims.get_anim(0)->is_playing())
+			{
+				mAnims.get_anim(0)->loop(true);
+			}
+		}
+		else
+		{
+			if (mAnims.get_anim(0)->is_playing())
+			{
+				mAnims.get_anim(0)->stop();
+			}
+		}
 	}
 
 	void setActor(NodePath actor)
@@ -112,8 +106,20 @@ public:
 		Super::setRadius((maxP - minP).length() / 2.0);
 	}
 
+	void setAnimRateFactor(float animRateFactor)
+	{
+		mAnimRateFactor = animRateFactor;
+	}
+
+	AnimControlCollection& getAnims()
+	{
+		return mAnims;
+	}
+
 protected:
 	NodePath mActor;
+	AnimControlCollection mAnims;
+	float mAnimRateFactor;
 };
 
 }
