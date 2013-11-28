@@ -55,6 +55,9 @@ class MpBase: public SimpleVehicle
 {
 public:
 
+	// type for a flock: an STL vector of MpBase pointers
+	typedef std::vector<MpBase*> groupType;
+
 	// constructor
 	MpBase()
 	{
@@ -167,7 +170,7 @@ public:
 };
 
 typedef ActorMixin<_MpWanderer> MpWanderer;
-typedef ActorMixin<_MpPursuer, _MpWanderer> MpPursuer;
+typedef ActorMixin<_MpPursuer, _MpWanderer*> MpPursuer;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
@@ -279,8 +282,10 @@ public:
 	}
 
 	// a group (STL vector) of all vehicles
-	std::vector<MpBase*> allMP;
-	typedef std::vector<MpBase*>::const_iterator iterator;
+//	std::vector<MpBase*> allMP;
+//	typedef std::vector<MpBase*>::const_iterator iterator;
+	MpBase::groupType allMP;
+	typedef MpBase::groupType::const_iterator iterator;
 	iterator pBegin, pEnd;
 
 	MpWanderer* wanderer;

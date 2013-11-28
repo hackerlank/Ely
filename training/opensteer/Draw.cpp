@@ -271,6 +271,7 @@ inline int begin2dDrawing(float w, float h)
 //
 //	// return original matrix mode for saving (stacking)
 //	return originalMatrixMode;
+	return 0;
 }
 
 //inline void end2dDrawing(GLint originalMatrixMode)

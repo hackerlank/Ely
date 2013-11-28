@@ -362,7 +362,7 @@ public:
 
 //AVGroup _PedestrianWalkingAnEight::neighbors;
 
-typedef ActorMixin<_PedestrianWalkingAnEight, ProximityDatabase> PedestrianWalkingAnEight;
+typedef ActorMixin<_PedestrianWalkingAnEight, ProximityDatabase&> PedestrianWalkingAnEight;
 
 // ----------------------------------------------------------------------------
 // OpenSteerDemo PlugIn

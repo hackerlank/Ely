@@ -79,6 +79,10 @@ typedef SOG::const_iterator SOI;           // SphereObstacle iterator
 class CtfBase: public SimpleVehicle
 {
 public:
+
+	// type for a flock: an STL vector of CtfBase pointers
+	typedef std::vector<CtfBase*> groupType;
+
 	// constructor
 	CtfBase()
 	{
@@ -403,7 +407,8 @@ public:
 	}
 
 	// a group (STL vector) of all vehicles in the PlugIn
-	std::vector<CtfBase*> all;
+//	std::vector<CtfBase*> all;
+	CtfBase::groupType all;
 };
 
 //CtfPlugIn gCtfPlugIn;

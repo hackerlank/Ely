@@ -52,6 +52,7 @@
 #include "CaptureTheFlag.h"
 #include "Boids.h"
 #include "MultiplePursuit.h"
+#include "Soccer.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -212,12 +213,14 @@ int main(int argc, char *argv[])
 		{
 			std::vector<std::string> animNames;
 			animNames.push_back("eve-walk.bam");
+			ely::LowSpeedTurn* lowSpeedTurn =
+					dynamic_cast<ely::LowSpeedTurn*>(currPlugIn->all[i]);
 			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
-					animNames, currPlugIn->all[i]->getAnims());
+					animNames, lowSpeedTurn->getAnims());
 			ely.set_scale(actorScale);
 			ely.reparent_to(window->get_render());
-			currPlugIn->all[i]->setActor(ely);
-			currPlugIn->all[i]->setAnimRateFactor(actorAnimRateFactor);
+			lowSpeedTurn->setActor(ely);
+			lowSpeedTurn->setAnimRateFactor(actorAnimRateFactor);
 		}
 		selectedVehicle = *currPlugIn->all.begin();
 	}

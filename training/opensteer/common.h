@@ -56,7 +56,8 @@ inline LVecBase4f OpenSteerColorToLVecBase4f(const OpenSteer::Color& c)
 	return LVecBase4f(c.r(), c.g(), c.b(), c.a());
 }
 
-template<typename Super, typename Param = int>
+template<typename Super, typename P1 = int, typename P2 = int,
+		typename P3 = int, typename P4 = int, typename P5 = int>
 class ActorMixin: public Super
 {
 public:
@@ -64,13 +65,13 @@ public:
 	{
 	}
 
-	ActorMixin(Param& param) :
-			Super(param)
+	ActorMixin(P1 p1) :
+			Super(p1)
 	{
 	}
 
-	ActorMixin(Param* param) :
-			Super(param)
+	ActorMixin(P1 p1, P2 p2, P3 p3, P4 p4, P5 p5) :
+			Super(p1, p2, p3, p4, p5)
 	{
 	}
 

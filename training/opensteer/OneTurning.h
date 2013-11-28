@@ -56,6 +56,9 @@ class _OneTurning: public SimpleVehicle
 {
 public:
 
+	// type for a flock: an STL vector of _OneTurning pointers
+	typedef std::vector<_OneTurning*> groupType;
+
 	// constructor
 	_OneTurning()
 	{
@@ -177,7 +180,8 @@ public:
 	}
 
 	OneTurning* gOneTurning;
-	std::vector<OneTurning*> theVehicle; // for allVehicles
+//	std::vector<OneTurning*> theVehicle; // for allVehicles
+	OneTurning::groupType theVehicle; // for allVehicles
 };
 
 //    OneTurningPlugInPanda3d gOneTurningPlugIn;

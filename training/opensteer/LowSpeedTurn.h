@@ -58,6 +58,9 @@ class _LowSpeedTurn: public SimpleVehicle
 {
 public:
 
+	// type for a flock: an STL vector of _LowSpeedTurn pointers
+	typedef std::vector<_LowSpeedTurn*> groupType;
+
 	// constructor
 	_LowSpeedTurn()
 	{
@@ -212,7 +215,7 @@ public:
 		for (iterator i = all.begin(); i != all.end(); i++)
 		{
 			// draw this agent
-			LowSpeedTurn& agent = **i;
+			LowSpeedTurn& agent = dynamic_cast<LowSpeedTurn&>(**i);
 			agent.draw();
 
 			// display speed near agent's screen position
@@ -251,8 +254,10 @@ public:
 		return (const AVGroup&) all;
 	}
 
-	std::vector<LowSpeedTurn*> all; // for allVehicles
-	typedef std::vector<LowSpeedTurn*>::const_iterator iterator;
+//	std::vector<_LowSpeedTurn*> all; // for allVehicles
+//	typedef std::vector<_LowSpeedTurn*>::const_iterator iterator;
+	_LowSpeedTurn::groupType all; // for allVehicles
+	typedef _LowSpeedTurn::groupType::const_iterator iterator;
 };
 
 //LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;

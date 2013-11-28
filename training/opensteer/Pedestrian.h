@@ -365,7 +365,7 @@ public:
 	int pathDirection;
 };
 
-typedef ActorMixin<_Pedestrian, ProximityDatabase> Pedestrian;
+typedef ActorMixin<_Pedestrian, ProximityDatabase&> Pedestrian;
 
 // ----------------------------------------------------------------------------
 // create path for PlugIn
