@@ -283,8 +283,8 @@ int main(int argc, char *argv[])
 		int i = 0;
 		ely::CtfPlugIn* currPlugIn =
 				dynamic_cast<ely::CtfPlugIn*>(selectedPlugIn);
-		for (i = 0, iter = currPlugIn->all.begin(); iter != currPlugIn->all.end();
-				++i, ++iter)
+		for (i = 0, iter = currPlugIn->all.begin();
+				iter != currPlugIn->all.end(); ++i, ++iter)
 		{
 			if (i == 0)
 			{
@@ -305,8 +305,8 @@ int main(int argc, char *argv[])
 				ely::CtfEnemy* enemy = dynamic_cast<ely::CtfEnemy*>(*iter);
 				std::vector<std::string> animNames;
 				animNames.push_back("panda-walk.bam");
-				NodePath panda = loadActorAndAnims(framework, window, "panda.bam",
-						animNames, enemy->getAnims());
+				NodePath panda = loadActorAndAnims(framework, window,
+						"panda.bam", animNames, enemy->getAnims());
 				panda.set_scale(actorScale * 0.5);
 				panda.reparent_to(window->get_render());
 				enemy->setActor(panda);
@@ -329,8 +329,7 @@ int main(int argc, char *argv[])
 		for (i = 0, iter = currPlugIn->flock.begin();
 				iter != currPlugIn->flock.end(); ++i, ++iter)
 		{
-			ely::Boid* boid =
-					dynamic_cast<ely::Boid*>(*iter);
+			ely::Boid* boid = dynamic_cast<ely::Boid*>(*iter);
 			std::vector<std::string> animNames;
 			animNames.push_back("eve-walk.bam");
 			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
@@ -351,27 +350,40 @@ int main(int argc, char *argv[])
 		selectedPlugIn->open();
 		ely::MpPlugIn::iterator iter;
 		int i;
-		ely::MpPlugIn* currPlugIn =
-				dynamic_cast<ely::MpPlugIn*>(selectedPlugIn);
-		///TODO
-		//add actor and anims
-//		for (i = 0, iter = currPlugIn->allMP.begin();
-//				iter != currPlugIn->allMP.end(); ++i, ++iter)
-//		{
-//			ely::Boid* boid =
-//					dynamic_cast<ely::Boid*>(*iter);
-//			std::vector<std::string> animNames;
-//			animNames.push_back("eve-walk.bam");
-//			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
-//					animNames, boid->getAnims());
-//			ely.set_scale(actorScale);
-//			ely.reparent_to(window->get_render());
-//			boid->setActor(ely);
-//			boid->setAnimRateFactor(actorAnimRateFactor);
-//		}
-//		currPlugIn->nextBoundaryCondition();
-//		//first vehicle is selected by selectedPlugIn->open() too
-//		selectedVehicle = *currPlugIn->flock.begin();
+		ely::MpPlugIn* currPlugIn = dynamic_cast<ely::MpPlugIn*>(selectedPlugIn);
+		for (i = 0, iter = currPlugIn->allMP.begin();
+				iter != currPlugIn->allMP.end(); ++i, ++iter)
+		{
+			if (i == 0)
+			{
+				//wanderer
+				ely::MpWanderer* wanderer =
+						dynamic_cast<ely::MpWanderer*>(*iter);
+				std::vector<std::string> animNames;
+				animNames.push_back("eve-walk.bam");
+				NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
+						animNames, wanderer->getAnims());
+				ely.set_scale(actorScale);
+				ely.reparent_to(window->get_render());
+				wanderer->setActor(ely);
+				wanderer->setAnimRateFactor(actorAnimRateFactor);
+			}
+			else
+			{
+				//pursuer
+				ely::MpPursuer* pursuer = dynamic_cast<ely::MpPursuer*>(*iter);
+				std::vector<std::string> animNames;
+				animNames.push_back("panda-walk.bam");
+				NodePath panda = loadActorAndAnims(framework, window,
+						"panda.bam", animNames, pursuer->getAnims());
+				panda.set_scale(actorScale * 0.5);
+				panda.reparent_to(window->get_render());
+				pursuer->setActor(panda);
+				pursuer->setAnimRateFactor(actorAnimRateFactor);
+			}
+		}
+		//seeker is selected by selectedPlugIn->open() too
+		selectedVehicle = *currPlugIn->allMP.begin();
 	}
 	else
 	{
