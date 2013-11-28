@@ -69,6 +69,11 @@ public:
 	{
 	}
 
+	ActorMixin(Param* param) :
+			Super(param)
+	{
+	}
+
 	void update(const float currentTime, const float elapsedTime)
 	{
 		Super::update(currentTime, elapsedTime);

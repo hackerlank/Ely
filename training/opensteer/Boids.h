@@ -63,6 +63,8 @@ namespace ely
 // namespaces to search to find names.
 using namespace OpenSteer;
 
+extern int gBoidsNum;
+
 // ----------------------------------------------------------------------------
 
 typedef OpenSteer::AbstractProximityDatabase<AbstractVehicle*> ProximityDatabase;
@@ -333,7 +335,7 @@ public:
 
 		// make default-sized flock
 		population = 0;
-		for (int i = 0; i < 200; i++)
+		for (int i = 0; i < gBoidsNum; i++)
 			addBoidToFlock();
 
 		// initialize camera
@@ -642,13 +644,13 @@ public:
 		}
 	};
 
-///	class RO: public RectangleObstacle
-///	{
-///		void draw(const bool, const Color& color, const Vec3&) const
-///		{
-///			tempDrawRectangle (*this, color);
-///		}
-///	};
+	class _RO: public RectangleObstacle
+	{
+		void draw(const bool, const Color& color, const Vec3&) const
+		{
+			tempDrawRectangle (*this, color);
+		}
+	};
 
 	class BO: public BoxObstacle
 	{
@@ -658,7 +660,7 @@ public:
 		}
 	};
 
-///	RO bigRectangle;
+	_RO bigRectangle;
 	BO outsideBigBox, insideBigBox;
 	SO insideBigSphere, outsideSphere0, outsideSphere1, outsideSphere2,
 			outsideSphere3, outsideSphere4, outsideSphere5, outsideSphere6;
@@ -694,12 +696,12 @@ public:
 		const Vec3 tiltS(0.0f, 0.0f, 1.0f);
 		const Vec3 tiltU = Vec3(-1.0f, 1.0f, 0.0f).normalize();
 
-///		bigRectangle.width = 50.0f;
-///		bigRectangle.height = 80.0f;
-///		bigRectangle.setSeenFrom(Obstacle::both);
-///		bigRectangle.setForward(tiltF);
-///		bigRectangle.setSide(tiltS);
-///		bigRectangle.setUp(tiltU);
+		bigRectangle.width = 50.0f;
+		bigRectangle.height = 80.0f;
+		bigRectangle.setSeenFrom(Obstacle::both);
+		bigRectangle.setForward(tiltF);
+		bigRectangle.setSide(tiltS);
+		bigRectangle.setUp(tiltU);
 
 		outsideBigBox.width = 50.0f;
 		outsideBigBox.height = 80.0f;
@@ -747,9 +749,9 @@ public:
 			break;
 		case rectangle:
 			Boid::obstacles.push_back(&insideBigSphere);
-///			Boid::obstacles.push_back(&bigRectangle);
+			Boid::obstacles.push_back(&bigRectangle);
 		case rectangleNoBig:
-///			Boid::obstacles.push_back(&bigRectangle);
+			Boid::obstacles.push_back(&bigRectangle);
 			break;
 		case outsideBox:
 			Boid::obstacles.push_back(&insideBigSphere);

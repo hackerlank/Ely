@@ -41,8 +41,9 @@ namespace ely
 {
 
 AVGroup _Boid::neighbors;
-float _Boid::worldRadius = 50.0f;
+float _Boid::worldRadius = 10.0f;
 ObstacleGroup _Boid::obstacles;
+int gBoidsNum = 20;
 #ifndef NO_LQ_BIN_STATS
 size_t _Boid::minNeighbors, _Boid::maxNeighbors, _Boid::totalNeighbors;
 #endif // NO_LQ_BIN_STATS

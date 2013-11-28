@@ -50,6 +50,8 @@
 #include "Pedestrian.h"
 #include "PedestriansWalkingAnEight.h"
 #include "CaptureTheFlag.h"
+#include "Boids.h"
+#include "MultiplePursuit.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -138,7 +140,7 @@ int main(int argc, char *argv[])
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olpwcs:f:")) != -1)
+	while ((c = getopt(argc, argv, "olpwcbms:f:")) != -1)
 	{
 		switch (c)
 		{
@@ -156,6 +158,12 @@ int main(int argc, char *argv[])
 			break;
 		case 'c':
 			currPlugInName = "CaptureTheFlag";
+			break;
+		case 'b':
+			currPlugInName = "Boids";
+			break;
+		case 'm':
+			currPlugInName = "MultiplePursuit";
 			break;
 		case 's':
 			//actor scale
@@ -307,6 +315,63 @@ int main(int argc, char *argv[])
 		}
 		//seeker is selected by selectedPlugIn->open() too
 		selectedVehicle = *currPlugIn->all.begin();
+	}
+	else if (currPlugInName == "Boids")
+	{
+		//Boids plugin
+		selectedPlugIn = new ely::BoidsPlugIn;
+		selectedPlugIn->open();
+		ely::BoidsPlugIn::iterator iter;
+		int i;
+		ely::BoidsPlugIn* currPlugIn =
+				dynamic_cast<ely::BoidsPlugIn*>(selectedPlugIn);
+		//add actor and anims
+		for (i = 0, iter = currPlugIn->flock.begin();
+				iter != currPlugIn->flock.end(); ++i, ++iter)
+		{
+			ely::Boid* boid =
+					dynamic_cast<ely::Boid*>(*iter);
+			std::vector<std::string> animNames;
+			animNames.push_back("eve-walk.bam");
+			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
+					animNames, boid->getAnims());
+			ely.set_scale(actorScale);
+			ely.reparent_to(window->get_render());
+			boid->setActor(ely);
+			boid->setAnimRateFactor(actorAnimRateFactor);
+		}
+		currPlugIn->nextBoundaryCondition();
+		//first vehicle is selected by selectedPlugIn->open() too
+		selectedVehicle = *currPlugIn->flock.begin();
+	}
+	else if (currPlugInName == "MultiplePursuit")
+	{
+		//Boids plugin
+		selectedPlugIn = new ely::MpPlugIn;
+		selectedPlugIn->open();
+		ely::MpPlugIn::iterator iter;
+		int i;
+		ely::MpPlugIn* currPlugIn =
+				dynamic_cast<ely::MpPlugIn*>(selectedPlugIn);
+		///TODO
+		//add actor and anims
+//		for (i = 0, iter = currPlugIn->allMP.begin();
+//				iter != currPlugIn->allMP.end(); ++i, ++iter)
+//		{
+//			ely::Boid* boid =
+//					dynamic_cast<ely::Boid*>(*iter);
+//			std::vector<std::string> animNames;
+//			animNames.push_back("eve-walk.bam");
+//			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
+//					animNames, boid->getAnims());
+//			ely.set_scale(actorScale);
+//			ely.reparent_to(window->get_render());
+//			boid->setActor(ely);
+//			boid->setAnimRateFactor(actorAnimRateFactor);
+//		}
+//		currPlugIn->nextBoundaryCondition();
+//		//first vehicle is selected by selectedPlugIn->open() too
+//		selectedVehicle = *currPlugIn->flock.begin();
 	}
 	else
 	{
