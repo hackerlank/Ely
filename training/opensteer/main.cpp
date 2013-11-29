@@ -141,7 +141,7 @@ int main(int argc, char *argv[])
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olpwcbms:f:")) != -1)
+	while ((c = getopt(argc, argv, "olpwcbmes:f:")) != -1)
 	{
 		switch (c)
 		{
@@ -165,6 +165,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'm':
 			currPlugInName = "MultiplePursuit";
+			break;
+		case 'e':
+			currPlugInName = "Soccer";
 			break;
 		case 's':
 			//actor scale
@@ -388,6 +391,57 @@ int main(int argc, char *argv[])
 		//seeker is selected by selectedPlugIn->open() too
 		selectedVehicle = *currPlugIn->allMP.begin();
 	}
+	else if (currPlugInName == "Soccer")
+	{
+		//Soccer plugin
+		selectedPlugIn = new ely::MicTestPlugIn;
+		selectedPlugIn->open();
+		ely::MicTestPlugIn::iterator iterPlayer;
+		int i;
+		ely::MicTestPlugIn* currPlugIn =
+				dynamic_cast<ely::MicTestPlugIn*>(selectedPlugIn);
+		//add actor and anims
+		//ball
+		{
+			std::vector<std::string> animNames;
+			NodePath ball = loadActorAndAnims(framework, window, "smiley.bam",
+					animNames, currPlugIn->m_Ball->getAnims());
+			ball.set_scale(actorScale);
+			ball.reparent_to(window->get_render());
+			currPlugIn->m_Ball->setActor(ball);
+			currPlugIn->m_Ball->setAnimRateFactor(actorAnimRateFactor);
+		}
+		//teamA
+		for (i = 0, iterPlayer = currPlugIn->TeamA.begin();
+				iterPlayer != currPlugIn->TeamA.end(); ++i, ++iterPlayer)
+		{
+			ely::Player* boid = dynamic_cast<ely::Player*>(*iterPlayer);
+			std::vector<std::string> animNames;
+			animNames.push_back("eve-walk.bam");
+			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
+					animNames, boid->getAnims());
+			ely.set_scale(actorScale);
+			ely.reparent_to(window->get_render());
+			boid->setActor(ely);
+			boid->setAnimRateFactor(actorAnimRateFactor);
+		}
+		//teamB
+		for (i = 0, iterPlayer = currPlugIn->TeamB.begin();
+				iterPlayer != currPlugIn->TeamB.end(); ++i, ++iterPlayer)
+		{
+			ely::Player* boid = dynamic_cast<ely::Player*>(*iterPlayer);
+			std::vector<std::string> animNames;
+			animNames.push_back("panda-walk.bam");
+			NodePath panda = loadActorAndAnims(framework, window, "panda.bam",
+					animNames, boid->getAnims());
+			panda.set_scale(actorScale * 0.5);
+			panda.reparent_to(window->get_render());
+			boid->setActor(panda);
+			boid->setAnimRateFactor(actorAnimRateFactor);
+		}
+		//ball vehicle is selected
+		selectedVehicle = currPlugIn->m_Ball;
+	}
 	else
 	{
 		//OneTurning plugin: default
@@ -518,10 +572,13 @@ NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework* window,
 	{
 		window->load_model(actor, animNames[i]);
 	}
-	//bind animations
-	auto_bind(actor.node(), animCollection,
-			PartGroup::HMF_ok_wrong_root_name | PartGroup::HMF_ok_part_extra
-					| PartGroup::HMF_ok_anim_extra);
+	if (animNames.size())
+	{
+		//bind animations
+		auto_bind(actor.node(), animCollection,
+				PartGroup::HMF_ok_wrong_root_name | PartGroup::HMF_ok_part_extra
+						| PartGroup::HMF_ok_anim_extra);
+	}
 	return actor;
 }
 

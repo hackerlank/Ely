@@ -84,21 +84,25 @@ public:
 		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(Super::forward()),
 				OpenSteerVec3ToLVecBase3f(Super::up()));
 
-		//get relative speed
-		float relSpeed = Super::relativeSpeed();
-		if (relSpeed >= 0.1)
+		//update anim if any
+		if (mAnims.get_num_anims() > 0)
 		{
-			mAnims.get_anim(0)->set_play_rate(relSpeed * mAnimRateFactor);
-			if (not mAnims.get_anim(0)->is_playing())
+			//get relative speed
+			float relSpeed = Super::relativeSpeed();
+			if (relSpeed >= 0.1)
 			{
-				mAnims.get_anim(0)->loop(true);
+				mAnims.get_anim(0)->set_play_rate(relSpeed * mAnimRateFactor);
+				if (not mAnims.get_anim(0)->is_playing())
+				{
+					mAnims.get_anim(0)->loop(true);
+				}
 			}
-		}
-		else
-		{
-			if (mAnims.get_anim(0)->is_playing())
+			else
 			{
-				mAnims.get_anim(0)->stop();
+				if (mAnims.get_anim(0)->is_playing())
+				{
+					mAnims.get_anim(0)->stop();
+				}
 			}
 		}
 	}

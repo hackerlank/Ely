@@ -48,6 +48,9 @@
 
 #include "common.h"
 
+#include "DrawMeshDrawer.h"
+extern ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
+
 namespace ely
 {
 
@@ -378,7 +381,9 @@ public:
 		for (unsigned int i = 0; i < m_PlayerCountB; i++)
 			TeamB[i]->draw();
 		m_Ball->draw();
+		gDrawer3d->setTwoSided(true);
 		m_bbox->draw();
+		gDrawer3d->setTwoSided(false);
 		m_TeamAGoal->draw();
 		m_TeamBGoal->draw();
 		{
@@ -464,6 +469,7 @@ public:
 	Player::groupType TeamA;
 	Player::groupType TeamB;
 	Player::groupType m_AllPlayers;
+	typedef Player::groupType::const_iterator iterator;
 
 	Ball *m_Ball;
 	AABBox *m_bbox;
