@@ -16,5 +16,6 @@ nodist_ely_opensteer_SOURCES = \
 		PedestriansWalkingAnEight.cpp \
 		CaptureTheFlag.cpp \
 		Boids.cpp \
-		Soccer.cpp
+		Soccer.cpp \
+		MapDrive.cpp
 		

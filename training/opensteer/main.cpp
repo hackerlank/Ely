@@ -53,6 +53,7 @@
 #include "Boids.h"
 #include "MultiplePursuit.h"
 #include "Soccer.h"
+#include "MapDrive.h"
 
 // To include EXIT_SUCCESS
 #include <cstdlib>
@@ -81,6 +82,7 @@ bool gDelayedResetPlugInXXX = false;
 }
 
 ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
+float windowWidth;
 OpenSteer::AbstractVehicle* selectedVehicle;
 
 int main(int argc, char *argv[])
@@ -117,7 +119,7 @@ int main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-
+	windowWidth = window->get_graphics_window()->get_properties().get_x_size();
 	//create global drawers
 	drawer3dNP = window->get_render().attach_new_node("Drawer3dNP");
 	drawer2dNP = window->get_aspect_2d().attach_new_node("Drawer2dNP");
@@ -141,7 +143,7 @@ int main(int argc, char *argv[])
 	//get program options
 	int c;
 	opterr = 0;
-	while ((c = getopt(argc, argv, "olpwcbmes:f:")) != -1)
+	while ((c = getopt(argc, argv, "olpwcbmeds:f:")) != -1)
 	{
 		switch (c)
 		{
@@ -168,6 +170,9 @@ int main(int argc, char *argv[])
 			break;
 		case 'e':
 			currPlugInName = "Soccer";
+			break;
+		case 'd':
+			currPlugInName = "MapDrive";
 			break;
 		case 's':
 			//actor scale
@@ -441,6 +446,24 @@ int main(int argc, char *argv[])
 		}
 		//ball vehicle is selected
 		selectedVehicle = currPlugIn->m_Ball;
+	}
+	else if (currPlugInName == "MapDrive")
+	{
+		//MapDrive plugin
+		selectedPlugIn = new ely::MapDrivePlugIn;
+		selectedPlugIn->open();
+		ely::MapDrivePlugIn* currPlugIn =
+				dynamic_cast<ely::MapDrivePlugIn*>(selectedPlugIn);
+		//add actor and anims
+		std::vector<std::string> animNames;
+		NodePath ball = loadActorAndAnims(framework, window, "vehicle.bam",
+				animNames, currPlugIn->vehicle->getAnims());
+		ball.set_scale(actorScale);
+		ball.reparent_to(window->get_render());
+		currPlugIn->vehicle->setActor(ball);
+		currPlugIn->vehicle->setAnimRateFactor(actorAnimRateFactor);
+		//vehicle is selected
+		selectedVehicle = currPlugIn->vehicle;
 	}
 	else
 	{
