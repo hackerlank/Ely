@@ -286,6 +286,7 @@ public:
 //	typedef std::vector<MpBase*>::const_iterator iterator;
 	MpBase::groupType allMP;
 	typedef MpBase::groupType::const_iterator iterator;
+
 	iterator pBegin, pEnd;
 
 	MpWanderer* wanderer;

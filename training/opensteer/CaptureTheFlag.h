@@ -409,6 +409,7 @@ public:
 	// a group (STL vector) of all vehicles in the PlugIn
 //	std::vector<CtfBase*> all;
 	CtfBase::groupType all;
+	typedef CtfBase::groupType::const_iterator iterator;
 };
 
 //CtfPlugIn gCtfPlugIn;

@@ -3031,6 +3031,7 @@ public:
 	MapDriver* vehicle;
 //	std::vector<MapDriver*> vehicles; // for allVehicles
 	MapDriver::groupType vehicles; // for allVehicles
+	typedef MapDriver::groupType::const_iterator iterator;
 
 	float initCamDist, initCamElev;
 

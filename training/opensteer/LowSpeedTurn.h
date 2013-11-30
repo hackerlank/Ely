@@ -256,8 +256,8 @@ public:
 
 //	std::vector<_LowSpeedTurn*> all; // for allVehicles
 //	typedef std::vector<_LowSpeedTurn*>::const_iterator iterator;
-	_LowSpeedTurn::groupType all; // for allVehicles
-	typedef _LowSpeedTurn::groupType::const_iterator iterator;
+	LowSpeedTurn::groupType all; // for allVehicles
+	typedef LowSpeedTurn::groupType::const_iterator iterator;
 };
 
 //LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;

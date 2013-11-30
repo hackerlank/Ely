@@ -182,6 +182,7 @@ public:
 	OneTurning* gOneTurning;
 //	std::vector<OneTurning*> theVehicle; // for allVehicles
 	OneTurning::groupType theVehicle; // for allVehicles
+	typedef OneTurning::groupType::const_iterator iterator;
 };
 
 //    OneTurningPlugInPanda3d gOneTurningPlugIn;

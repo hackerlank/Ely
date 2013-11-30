@@ -209,6 +209,7 @@ int main(int argc, char *argv[])
 	}
 
 	//create plugin
+	OpenSteer::AVGroup::const_iterator iter;
 	if (currPlugInName == "LowSpeedTurn")
 	{
 		//LowSpeedTurn plugin
@@ -217,12 +218,13 @@ int main(int argc, char *argv[])
 		ely::LowSpeedTurnPlugIn* currPlugIn =
 				dynamic_cast<ely::LowSpeedTurnPlugIn*>(selectedPlugIn);
 		//add actor and anims
-		for (int i = 0; i < ely::lstCount; i++)
+		for (iter = currPlugIn->allVehicles().begin();
+				iter != currPlugIn->allVehicles().end(); ++iter)
 		{
 			std::vector<std::string> animNames;
 			animNames.push_back("eve-walk.bam");
 			ely::LowSpeedTurn* lowSpeedTurn =
-					dynamic_cast<ely::LowSpeedTurn*>(currPlugIn->all[i]);
+					dynamic_cast<ely::LowSpeedTurn*>(*iter);
 			NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
 					animNames, lowSpeedTurn->getAnims());
 			ely.set_scale(actorScale);
@@ -230,20 +232,18 @@ int main(int argc, char *argv[])
 			lowSpeedTurn->setActor(ely);
 			lowSpeedTurn->setAnimRateFactor(actorAnimRateFactor);
 		}
-		selectedVehicle = *currPlugIn->all.begin();
+		selectedVehicle = *currPlugIn->allVehicles().begin();
 	}
 	else if (currPlugInName == "Pedestrian")
 	{
 		//Pedestrian plugin
 		selectedPlugIn = new ely::PedestrianPlugIn;
 		selectedPlugIn->open();
-		ely::PedestrianPlugIn::iterator iter;
-		int i;
 		ely::PedestrianPlugIn* currPlugIn =
 				dynamic_cast<ely::PedestrianPlugIn*>(selectedPlugIn);
 		//add actor and anims
-		for (i = 0, iter = currPlugIn->crowd.begin();
-				iter != currPlugIn->crowd.end(); ++i, ++iter)
+		for (iter = currPlugIn->allVehicles().begin();
+				iter != currPlugIn->allVehicles().end(); ++iter)
 		{
 			ely::Pedestrian* pedestrian = dynamic_cast<ely::Pedestrian*>(*iter);
 			std::vector<std::string> animNames;
@@ -256,20 +256,18 @@ int main(int argc, char *argv[])
 			pedestrian->setAnimRateFactor(actorAnimRateFactor);
 		}
 		//first vehicle is selected by selectedPlugIn->open() too
-		selectedVehicle = *currPlugIn->crowd.begin();
+		selectedVehicle = *currPlugIn->allVehicles().begin();
 	}
 	else if (currPlugInName == "PedestriansWalkingAnEight")
 	{
 		//PedestriansWalkingAnEight plugin
 		selectedPlugIn = new ely::PedestriansWalkingAnEightPlugIn;
 		selectedPlugIn->open();
-		ely::PedestriansWalkingAnEightPlugIn::iterator iter;
-		int i;
 		ely::PedestriansWalkingAnEightPlugIn* currPlugIn =
 				dynamic_cast<ely::PedestriansWalkingAnEightPlugIn*>(selectedPlugIn);
 		//add actor and anims
-		for (i = 0, iter = currPlugIn->crowd.begin();
-				iter != currPlugIn->crowd.end(); ++i, ++iter)
+		for (iter = currPlugIn->allVehicles().begin();
+				iter != currPlugIn->allVehicles().end(); ++iter)
 		{
 			ely::PedestrianWalkingAnEight* pedestrian =
 					dynamic_cast<ely::PedestrianWalkingAnEight*>(*iter);
@@ -283,21 +281,19 @@ int main(int argc, char *argv[])
 			pedestrian->setAnimRateFactor(actorAnimRateFactor);
 		}
 		//first vehicle is selected by selectedPlugIn->open() too
-		selectedVehicle = *currPlugIn->crowd.begin();
+		selectedVehicle = *currPlugIn->allVehicles().begin();
 	}
 	else if (currPlugInName == "CaptureTheFlag")
 	{
 		//CaptureTheFlag plugin
 		selectedPlugIn = new ely::CtfPlugIn;
 		selectedPlugIn->open();
-		std::vector<ely::CtfBase*>::iterator iter;
-		int i = 0;
 		ely::CtfPlugIn* currPlugIn =
 				dynamic_cast<ely::CtfPlugIn*>(selectedPlugIn);
-		for (i = 0, iter = currPlugIn->all.begin();
-				iter != currPlugIn->all.end(); ++i, ++iter)
+		for (iter = currPlugIn->allVehicles().begin();
+				iter != currPlugIn->allVehicles().end(); ++iter)
 		{
-			if (i == 0)
+			if (iter == currPlugIn->allVehicles().begin())
 			{
 				//seeker
 				ely::CtfSeeker* seeker = dynamic_cast<ely::CtfSeeker*>(*iter);
@@ -325,20 +321,18 @@ int main(int argc, char *argv[])
 			}
 		}
 		//seeker is selected by selectedPlugIn->open() too
-		selectedVehicle = *currPlugIn->all.begin();
+		selectedVehicle = *currPlugIn->allVehicles().begin();
 	}
 	else if (currPlugInName == "Boids")
 	{
 		//Boids plugin
 		selectedPlugIn = new ely::BoidsPlugIn;
 		selectedPlugIn->open();
-		ely::BoidsPlugIn::iterator iter;
-		int i;
 		ely::BoidsPlugIn* currPlugIn =
 				dynamic_cast<ely::BoidsPlugIn*>(selectedPlugIn);
 		//add actor and anims
-		for (i = 0, iter = currPlugIn->flock.begin();
-				iter != currPlugIn->flock.end(); ++i, ++iter)
+		for (iter = currPlugIn->allVehicles().begin();
+				iter != currPlugIn->allVehicles().end(); ++iter)
 		{
 			ely::Boid* boid = dynamic_cast<ely::Boid*>(*iter);
 			std::vector<std::string> animNames;
@@ -352,20 +346,18 @@ int main(int argc, char *argv[])
 		}
 		currPlugIn->nextBoundaryCondition();
 		//first vehicle is selected by selectedPlugIn->open() too
-		selectedVehicle = *currPlugIn->flock.begin();
+		selectedVehicle = *currPlugIn->allVehicles().begin();
 	}
 	else if (currPlugInName == "MultiplePursuit")
 	{
-		//Boids plugin
+		//MultiplePursuit plugin
 		selectedPlugIn = new ely::MpPlugIn;
 		selectedPlugIn->open();
-		ely::MpPlugIn::iterator iter;
-		int i;
 		ely::MpPlugIn* currPlugIn = dynamic_cast<ely::MpPlugIn*>(selectedPlugIn);
-		for (i = 0, iter = currPlugIn->allMP.begin();
-				iter != currPlugIn->allMP.end(); ++i, ++iter)
+		for (iter = currPlugIn->allVehicles().begin();
+				iter != currPlugIn->allVehicles().end(); ++iter)
 		{
-			if (i == 0)
+			if (iter == currPlugIn->allVehicles().begin())
 			{
 				//wanderer
 				ely::MpWanderer* wanderer =
@@ -394,7 +386,7 @@ int main(int argc, char *argv[])
 			}
 		}
 		//seeker is selected by selectedPlugIn->open() too
-		selectedVehicle = *currPlugIn->allMP.begin();
+		selectedVehicle = *currPlugIn->allVehicles().begin();
 	}
 	else if (currPlugInName == "Soccer")
 	{
@@ -402,7 +394,6 @@ int main(int argc, char *argv[])
 		selectedPlugIn = new ely::MicTestPlugIn;
 		selectedPlugIn->open();
 		ely::MicTestPlugIn::iterator iterPlayer;
-		int i;
 		ely::MicTestPlugIn* currPlugIn =
 				dynamic_cast<ely::MicTestPlugIn*>(selectedPlugIn);
 		//add actor and anims
@@ -417,8 +408,8 @@ int main(int argc, char *argv[])
 			currPlugIn->m_Ball->setAnimRateFactor(actorAnimRateFactor);
 		}
 		//teamA
-		for (i = 0, iterPlayer = currPlugIn->TeamA.begin();
-				iterPlayer != currPlugIn->TeamA.end(); ++i, ++iterPlayer)
+		for (iterPlayer = currPlugIn->TeamA.begin();
+				iterPlayer != currPlugIn->TeamA.end(); ++iterPlayer)
 		{
 			ely::Player* boid = dynamic_cast<ely::Player*>(*iterPlayer);
 			std::vector<std::string> animNames;
@@ -431,8 +422,8 @@ int main(int argc, char *argv[])
 			boid->setAnimRateFactor(actorAnimRateFactor);
 		}
 		//teamB
-		for (i = 0, iterPlayer = currPlugIn->TeamB.begin();
-				iterPlayer != currPlugIn->TeamB.end(); ++i, ++iterPlayer)
+		for (iterPlayer = currPlugIn->TeamB.begin();
+				iterPlayer != currPlugIn->TeamB.end(); ++iterPlayer)
 		{
 			ely::Player* boid = dynamic_cast<ely::Player*>(*iterPlayer);
 			std::vector<std::string> animNames;
@@ -455,15 +446,17 @@ int main(int argc, char *argv[])
 		ely::MapDrivePlugIn* currPlugIn =
 				dynamic_cast<ely::MapDrivePlugIn*>(selectedPlugIn);
 		//add actor and anims
+		ely::MapDriver* vehicle =
+				dynamic_cast<ely::MapDriver*>(*currPlugIn->allVehicles().begin());
 		std::vector<std::string> animNames;
 		NodePath ball = loadActorAndAnims(framework, window, "vehicle.bam",
-				animNames, currPlugIn->vehicle->getAnims());
+				animNames, vehicle->getAnims());
 		ball.set_scale(actorScale);
 		ball.reparent_to(window->get_render());
-		currPlugIn->vehicle->setActor(ball);
-		currPlugIn->vehicle->setAnimRateFactor(actorAnimRateFactor);
+		vehicle->setActor(ball);
+		vehicle->setAnimRateFactor(actorAnimRateFactor);
 		//vehicle is selected
-		selectedVehicle = currPlugIn->vehicle;
+		selectedVehicle = vehicle;
 	}
 	else
 	{
@@ -473,14 +466,16 @@ int main(int argc, char *argv[])
 		ely::OneTurningPlugIn* currPlugIn =
 				dynamic_cast<ely::OneTurningPlugIn*>(selectedPlugIn);
 		//add actor and anims
+		ely::OneTurning* oneTurning =
+				dynamic_cast<ely::OneTurning*>(*currPlugIn->allVehicles().begin());
 		std::vector<std::string> animNames;
 		animNames.push_back("eve-walk.bam");
 		NodePath ely = loadActorAndAnims(framework, window, "eve.bam",
-				animNames, currPlugIn->gOneTurning->getAnims());
+				animNames, oneTurning->getAnims());
 		ely.set_scale(actorScale);
 		ely.reparent_to(window->get_render());
-		currPlugIn->gOneTurning->setActor(ely);
-		currPlugIn->gOneTurning->setAnimRateFactor(actorAnimRateFactor);
+		oneTurning->setActor(ely);
+		oneTurning->setAnimRateFactor(actorAnimRateFactor);
 	}
 
 	// draw the name of the selected PlugIn

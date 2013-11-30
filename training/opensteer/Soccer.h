@@ -318,6 +318,7 @@ public:
 		m_TeamBGoal = new AABBox(Vec3(19, 0, -7), Vec3(21, 0, 7));
 		// Make a ball
 		m_Ball = new Ball(m_bbox);
+		m_AllVehicles.push_back(m_Ball);
 		// Build team A
 		m_PlayerCountA = 8;
 		for (unsigned int i = 0; i < m_PlayerCountA; i++)
@@ -327,6 +328,7 @@ public:
 			selectedVehicle = pMicTest;
 			TeamA.push_back(pMicTest);
 			m_AllPlayers.push_back(pMicTest);
+			m_AllVehicles.push_back(pMicTest);
 		}
 		// Build Team B
 		m_PlayerCountB = 8;
@@ -338,6 +340,7 @@ public:
 			selectedVehicle = pMicTest;
 			TeamB.push_back(pMicTest);
 			m_AllPlayers.push_back(pMicTest);
+			m_AllVehicles.push_back(pMicTest);
 		}
 		// initialize camera
 //		OpenSteerDemo::init2dCamera(*m_Ball);
@@ -443,7 +446,9 @@ public:
 		for (unsigned int i = 0; i < m_PlayerCountB; i++)
 			delete TeamB[i];
 		TeamB.clear();
+		delete m_Ball;
 		m_AllPlayers.clear();
+		m_AllVehicles.clear();
 	}
 
 	void reset(void)
@@ -458,7 +463,7 @@ public:
 
 	const AVGroup& allVehicles(void)
 	{
-		return (const AVGroup&) TeamA;
+		return (const AVGroup&) m_AllVehicles;
 	}
 
 	unsigned int m_PlayerCountA;
@@ -478,6 +483,8 @@ public:
 	int junk;
 	int m_redScore;
 	int m_blueScore;
+	//
+	AVGroup m_AllVehicles;
 };
 
 //MicTestPlugIn pMicTestPlugIn;
