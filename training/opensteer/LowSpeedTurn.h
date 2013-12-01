@@ -54,15 +54,15 @@ using namespace OpenSteer;
 
 // ----------------------------------------------------------------------------
 
-class _LowSpeedTurn: public SimpleVehicle
+class LowSpeedTurn: public SimpleVehicle
 {
 public:
 
-	// type for a flock: an STL vector of _LowSpeedTurn pointers
-	typedef std::vector<_LowSpeedTurn*> groupType;
+	// type for a flock: an STL vector of LowSpeedTurn pointers
+	typedef std::vector<LowSpeedTurn*> groupType;
 
 	// constructor
-	_LowSpeedTurn()
+	LowSpeedTurn()
 	{
 		reset();
 	}
@@ -110,6 +110,9 @@ public:
 		// annotation
 		annotationVelocityAcceleration();
 		recordTrailVertex(currentTime, position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	// reset starting positions
@@ -129,8 +132,6 @@ public:
 	static float startX;
 	static float startSpeed;
 };
-
-typedef ActorMixin<_LowSpeedTurn> LowSpeedTurn;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
@@ -215,7 +216,7 @@ public:
 		for (iterator i = all.begin(); i != all.end(); i++)
 		{
 			// draw this agent
-			LowSpeedTurn& agent = dynamic_cast<LowSpeedTurn&>(**i);
+			LowSpeedTurn& agent = **i;
 			agent.draw();
 
 			// display speed near agent's screen position
@@ -254,8 +255,8 @@ public:
 		return (const AVGroup&) all;
 	}
 
-//	std::vector<_LowSpeedTurn*> all; // for allVehicles
-//	typedef std::vector<_LowSpeedTurn*>::const_iterator iterator;
+//	std::vector<LowSpeedTurn*> all; // for allVehicles
+//	typedef std::vector<LowSpeedTurn*>::const_iterator iterator;
 	LowSpeedTurn::groupType all; // for allVehicles
 	typedef LowSpeedTurn::groupType::const_iterator iterator;
 };

@@ -737,15 +737,15 @@ typedef PolylineSegmentedPathwaySegmentRadii GCRoute;
  */
 
 // ----------------------------------------------------------------------------
-class _MapDriver: public SimpleVehicle
+class MapDriver: public SimpleVehicle
 {
 public:
 
-	// type for a flock: an STL vector of _MapDriver pointers
-	typedef std::vector<_MapDriver*> groupType;
+	// type for a flock: an STL vector of MapDriver pointers
+	typedef std::vector<MapDriver*> groupType;
 
 	// constructor
-	_MapDriver() :
+	MapDriver() :
 			map(makeMap()), path(makePath())
 	{
 		reset();
@@ -788,7 +788,7 @@ public:
 	}
 
 	// destructor
-	~_MapDriver()
+	~MapDriver()
 	{
 		delete (map);
 		delete (path);
@@ -991,6 +991,9 @@ public:
 		// annotation
 		perFrameAnnotation();
 		recordTrailVertex(currentTime, position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	//  // QQQ 5-8-04 random experiment, currently unused
@@ -2518,8 +2521,6 @@ public:
 	static float worldSize;
 	static float worldDiag;
 };
-
-typedef ActorMixin<_MapDriver> MapDriver;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo

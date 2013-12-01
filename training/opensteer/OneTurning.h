@@ -52,15 +52,15 @@ using namespace OpenSteer;
 
 // ----------------------------------------------------------------------------
 
-class _OneTurning: public SimpleVehicle
+class OneTurning: public SimpleVehicle
 {
 public:
 
 	// type for a flock: an STL vector of _OneTurning pointers
-	typedef std::vector<_OneTurning*> groupType;
+	typedef std::vector<OneTurning*> groupType;
 
 	// constructor
-	_OneTurning()
+	OneTurning()
 	{
 		reset();
 	}
@@ -81,6 +81,8 @@ public:
 		applySteeringForce(Vec3(-2, 0, -3), elapsedTime);
 		annotationVelocityAcceleration();
 		recordTrailVertex(currentTime, position());
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	// draw this character/vehicle into the scene
@@ -90,8 +92,6 @@ public:
 		drawTrail();
 	}
 };
-
-typedef ActorMixin<_OneTurning> OneTurning;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo

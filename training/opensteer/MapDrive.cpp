@@ -278,18 +278,18 @@ OpenSteer::PolylineSegmentedPathwaySegmentRadii::size_type mapPointToSegmentInde
 }
 
 // define map size (and compute its half diagonal)
-float _MapDriver::worldSize = 200;
-float _MapDriver::worldDiag = sqrtXXX(square(worldSize) / 2);
+float MapDriver::worldSize = 200;
+float MapDriver::worldDiag = sqrtXXX(square(worldSize) / 2);
 
 // 0 = obstacle avoidance and speed control
 // 1 = wander, obstacle avoidance and speed control
 // 2 = path following, obstacle avoidance and speed control
 // int MapDriver::demoSelect = 0;
-int _MapDriver::demoSelect = 2;
+int MapDriver::demoSelect = 2;
 
-float _MapDriver::savedNearestWR = 0;
-float _MapDriver::savedNearestR = 0;
-float _MapDriver::savedNearestL = 0;
-float _MapDriver::savedNearestWL = 0;
+float MapDriver::savedNearestWR = 0;
+float MapDriver::savedNearestR = 0;
+float MapDriver::savedNearestL = 0;
+float MapDriver::savedNearestWL = 0;
 
 } // anonymous namespace

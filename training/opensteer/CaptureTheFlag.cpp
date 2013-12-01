@@ -85,7 +85,7 @@ float gAvoidancePredictTime = gAvoidancePredictTimeMin;
 bool enableAttackSeek = true; // for testing (perhaps retain for UI control?)
 bool enableAttackEvade = true; // for testing (perhaps retain for UI control?)
 
-_CtfSeeker* gSeeker = NULL;
+CtfSeeker* gSeeker = NULL;
 
 // count the number of times the simulation has reset (e.g. for overnight runs)
 int resetCount = 0;
@@ -96,9 +96,9 @@ int resetCount = 0;
 // XXX consider moving this inside CtfPlugIn
 // XXX consider using STL (any advantage? consistency?)
 
-_CtfSeeker* ctfSeeker;
+CtfSeeker* ctfSeeker;
 const int ctfEnemyCount = 4;
-_CtfEnemy* ctfEnemies[ctfEnemyCount];
+CtfEnemy* ctfEnemies[ctfEnemyCount];
 
 // ----------------------------------------------------------------------------
 // reset state
@@ -118,7 +118,7 @@ void CtfBase::reset(void)
 	clearTrailHistory();     // prevent long streaks due to teleportation
 }
 
-void _CtfSeeker::reset(void)
+void CtfSeeker::reset(void)
 {
 	CtfBase::reset();
 	bodyColor.set(0.4f, 0.4f, 0.6f); // blueish
@@ -127,7 +127,7 @@ void _CtfSeeker::reset(void)
 	evading = false;
 }
 
-void _CtfEnemy::reset(void)
+void CtfEnemy::reset(void)
 {
 	CtfBase::reset();
 	bodyColor.set(0.6f, 0.4f, 0.4f); // redish
@@ -168,7 +168,7 @@ void CtfBase::randomizeStartingPositionAndHeading(void)
 
 // ----------------------------------------------------------------------------
 
-void _CtfEnemy::update(const float currentTime, const float elapsedTime)
+void CtfEnemy::update(const float currentTime, const float elapsedTime)
 {
 	// determine upper bound for pursuit prediction time
 	const float seekerToGoalDist = Vec3::distance(gHomeBaseCenter,
@@ -221,12 +221,15 @@ void _CtfEnemy::update(const float currentTime, const float elapsedTime)
 					color, 20);
 		}
 	}
+
+	//update actor
+	updateActor(currentTime, elapsedTime);
 }
 
 // ----------------------------------------------------------------------------
 // are there any enemies along the corridor between us and the goal?
 
-bool _CtfSeeker::clearPathToGoal(void)
+bool CtfSeeker::clearPathToGoal(void)
 {
 	const float sideThreshold = radius() * 8.0f;
 	const float behindThreshold = radius() * 2.0f;
@@ -244,7 +247,7 @@ bool _CtfSeeker::clearPathToGoal(void)
 	for (int i = 0; i < ctfEnemyCount; i++)
 	{
 		// short name for this enemy
-		const _CtfEnemy& e = *ctfEnemies[i];
+		const CtfEnemy& e = *ctfEnemies[i];
 		const float eDistance = Vec3::distance(position(), e.position());
 		const float timeEstimate = 0.3f * eDistance / e.speed(); //xxx
 		const Vec3 eFuture = e.predictFuturePosition(timeEstimate);
@@ -302,7 +305,7 @@ bool _CtfSeeker::clearPathToGoal(void)
 
 // ----------------------------------------------------------------------------
 
-void _CtfSeeker::clearPathAnnotation(const float sideThreshold,
+void CtfSeeker::clearPathAnnotation(const float sideThreshold,
 		const float behindThreshold, const Vec3& goalDirection)
 {
 	const Vec3 behindSide = side() * sideThreshold;
@@ -339,7 +342,7 @@ void CtfBase::annotateAvoidObstacle(const float minDistanceToCollision)
 
 // ----------------------------------------------------------------------------
 
-Vec3 _CtfSeeker::steerToEvadeAllDefenders(void)
+Vec3 CtfSeeker::steerToEvadeAllDefenders(void)
 {
 	Vec3 evade(0, 0, 0);
 	const float goalDistance = Vec3::distance(gHomeBaseCenter, position());
@@ -347,7 +350,7 @@ Vec3 _CtfSeeker::steerToEvadeAllDefenders(void)
 	// sum up weighted evasion
 	for (int i = 0; i < ctfEnemyCount; i++)
 	{
-		const _CtfEnemy& e = *ctfEnemies[i];
+		const CtfEnemy& e = *ctfEnemies[i];
 		const Vec3 eOffset = e.position() - position();
 		const float eDistance = eOffset.length();
 
@@ -375,13 +378,13 @@ Vec3 _CtfSeeker::steerToEvadeAllDefenders(void)
 	return evade;
 }
 
-Vec3 _CtfSeeker::XXXsteerToEvadeAllDefenders(void)
+Vec3 CtfSeeker::XXXsteerToEvadeAllDefenders(void)
 {
 	// sum up weighted evasion
 	Vec3 evade(0, 0, 0);
 	for (int i = 0; i < ctfEnemyCount; i++)
 	{
-		const _CtfEnemy& e = *ctfEnemies[i];
+		const CtfEnemy& e = *ctfEnemies[i];
 		const Vec3 eOffset = e.position() - position();
 		const float eDistance = eOffset.length();
 
@@ -411,7 +414,7 @@ Vec3 _CtfSeeker::XXXsteerToEvadeAllDefenders(void)
 
 // ----------------------------------------------------------------------------
 
-Vec3 _CtfSeeker::steeringForSeeker(void)
+Vec3 CtfSeeker::steeringForSeeker(void)
 {
 	// determine if obstacle avodiance is needed
 	const bool clearPath = clearPathToGoal();
@@ -478,7 +481,7 @@ Vec3 _CtfSeeker::steeringForSeeker(void)
 // adjust obstacle avoidance look ahead time: make it large when we are far
 // from the goal and heading directly towards it, make it small otherwise.
 
-void _CtfSeeker::adjustObstacleAvoidanceLookAhead(const bool clearPath)
+void CtfSeeker::adjustObstacleAvoidanceLookAhead(const bool clearPath)
 {
 	if (clearPath)
 	{
@@ -499,7 +502,7 @@ void _CtfSeeker::adjustObstacleAvoidanceLookAhead(const bool clearPath)
 
 // ----------------------------------------------------------------------------
 
-void _CtfSeeker::updateState(const float currentTime)
+void CtfSeeker::updateState(const float currentTime)
 {
 	// if we reach the goal before being tagged, switch to atGoal state
 	if (state == running)
@@ -529,7 +532,7 @@ void _CtfSeeker::updateState(const float currentTime)
 
 // ----------------------------------------------------------------------------
 
-void _CtfSeeker::draw(void)
+void CtfSeeker::draw(void)
 {
 	// first call the draw method in the base class
 	CtfBase::draw();
@@ -580,7 +583,7 @@ void _CtfSeeker::draw(void)
 // ----------------------------------------------------------------------------
 // update method for goal seeker
 
-void _CtfSeeker::update(const float currentTime, const float elapsedTime)
+void CtfSeeker::update(const float currentTime, const float elapsedTime)
 {
 	// do behavioral state transitions, as needed
 	updateState(currentTime);
@@ -600,6 +603,10 @@ void _CtfSeeker::update(const float currentTime, const float elapsedTime)
 	// annotation
 	annotationVelocityAcceleration();
 	recordTrailVertex(currentTime, position());
+
+	//update actor
+	updateActor(currentTime, elapsedTime);
+
 }
 
 // ----------------------------------------------------------------------------

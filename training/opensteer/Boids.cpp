@@ -40,12 +40,12 @@
 namespace ely
 {
 
-AVGroup _Boid::neighbors;
-float _Boid::worldRadius = 10.0f;
-ObstacleGroup _Boid::obstacles;
+AVGroup Boid::neighbors;
+float Boid::worldRadius = 10.0f;
+ObstacleGroup Boid::obstacles;
 int gBoidsNum = 20;
 #ifndef NO_LQ_BIN_STATS
-size_t _Boid::minNeighbors, _Boid::maxNeighbors, _Boid::totalNeighbors;
+size_t Boid::minNeighbors, Boid::maxNeighbors, Boid::totalNeighbors;
 #endif // NO_LQ_BIN_STATS
 
 }// anonymous namespace

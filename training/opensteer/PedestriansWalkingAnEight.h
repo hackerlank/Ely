@@ -77,15 +77,15 @@ extern bool gWanderSwitchEight;
 
 // ----------------------------------------------------------------------------
 
-class _PedestrianWalkingAnEight: public SimpleVehicle
+class PedestrianWalkingAnEight: public SimpleVehicle
 {
 public:
 
 	// type for a group of _PedestrianWalkingAnEights
-	typedef std::vector<_PedestrianWalkingAnEight*> groupType;
+	typedef std::vector<PedestrianWalkingAnEight*> groupType;
 
 	// constructor
-	_PedestrianWalkingAnEight(ProximityDatabase& pd)
+	PedestrianWalkingAnEight(ProximityDatabase& pd)
 	{
 		// allocate a token for this boid in the proximity database
 		proximityToken = NULL;
@@ -96,7 +96,7 @@ public:
 	}
 
 	// destructor
-	virtual ~_PedestrianWalkingAnEight()
+	virtual ~PedestrianWalkingAnEight()
 	{
 		// delete this boid's token in the proximity database
 		delete proximityToken;
@@ -171,6 +171,9 @@ public:
 
 		// notify proximity database that our position has changed
 		proximityToken->updateForNewPosition(position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	// compute combined steering force: move forward, avoid obstacles
@@ -360,9 +363,7 @@ public:
 	int pathDirection;
 };
 
-//AVGroup _PedestrianWalkingAnEight::neighbors;
-
-typedef ActorMixin<_PedestrianWalkingAnEight, ProximityDatabase&> PedestrianWalkingAnEight;
+//AVGroup PedestrianWalkingAnEight::neighbors;
 
 // ----------------------------------------------------------------------------
 // OpenSteerDemo PlugIn
@@ -630,8 +631,7 @@ public:
 		if (population > 0)
 		{
 			// save pointer to last pedestrian, then remove it from the crowd
-			const PedestrianWalkingAnEight* pedestrian =
-					dynamic_cast<PedestrianWalkingAnEight*>(crowd.back());
+			const PedestrianWalkingAnEight* pedestrian = crowd.back();
 			crowd.pop_back();
 			population--;
 

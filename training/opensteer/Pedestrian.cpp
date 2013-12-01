@@ -26,7 +26,7 @@
 namespace ely
 {
 
-AVGroup _Pedestrian::neighbors;
+AVGroup Pedestrian::neighbors;
 
 // How many pedestrians to create when the plugin starts first?
 int const gPedestrianStartCount = 20;

@@ -86,12 +86,12 @@ public:
 	Color bodyColor;
 };
 
-class _MpWanderer: public MpBase
+class MpWanderer: public MpBase
 {
 public:
 
 	// constructor
-	_MpWanderer()
+	MpWanderer()
 	{
 		reset();
 	}
@@ -112,16 +112,19 @@ public:
 
 		// for annotation
 		recordTrailVertex(currentTime, position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 };
 
-class _MpPursuer: public MpBase
+class MpPursuer: public MpBase
 {
 public:
 
 	// constructor
-	_MpPursuer(_MpWanderer* w)
+	MpPursuer(MpWanderer* w)
 	{
 		wanderer = w;
 		reset();
@@ -149,6 +152,9 @@ public:
 
 		// for annotation
 		recordTrailVertex(currentTime, position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	// reset position
@@ -166,11 +172,8 @@ public:
 		randomizeHeadingOnXZPlane();
 	}
 
-	_MpWanderer* wanderer;
+	MpWanderer* wanderer;
 };
-
-typedef ActorMixin<_MpWanderer> MpWanderer;
-typedef ActorMixin<_MpPursuer, _MpWanderer*> MpPursuer;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
@@ -225,6 +228,7 @@ public:
 		{
 			((MpPursuer&) (**i)).update(currentTime, elapsedTime);
 		}
+
 	}
 
 	void redraw(const float currentTime, const float elapsedTime)

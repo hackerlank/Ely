@@ -43,8 +43,8 @@
 namespace ely
 {
 
-float _LowSpeedTurn::startX;
-float _LowSpeedTurn::startSpeed;
+float LowSpeedTurn::startX;
+float LowSpeedTurn::startSpeed;
 
 const int lstCount = 5;
 const float lstLookDownDistance = 18;

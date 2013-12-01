@@ -101,14 +101,14 @@ private:
 };
 
 // The ball object
-class _Ball: public SimpleVehicle
+class Ball: public SimpleVehicle
 {
 public:
 
-	// type for a flock: an STL vector of _Ball pointers
-	typedef std::vector<_Ball*> groupType;
+	// type for a flock: an STL vector of Ball pointers
+	typedef std::vector<Ball*> groupType;
 
-	_Ball(AABBox *bbox) :
+	Ball(AABBox *bbox) :
 			m_bbox(bbox)
 	{
 		reset();
@@ -146,6 +146,9 @@ public:
 			applySteeringForce(velocity(), elapsedTime);
 		}
 		recordTrailVertex(currentTime, position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	void kick(Vec3 dir, const float elapsedTime)
@@ -166,16 +169,16 @@ public:
 	AABBox *m_bbox;
 };
 
-class _Player: public SimpleVehicle
+class Player: public SimpleVehicle
 {
 public:
 
-	// type for a flock: an STL vector of _Player pointers
-	typedef std::vector<_Player*> groupType;
+	// type for a flock: an STL vector of Player pointers
+	typedef std::vector<Player*> groupType;
 
 	// constructor
-	_Player(std::vector<_Player*> others, std::vector<_Player*> allplayers,
-			_Ball* ball, bool isTeamA, int id) :
+	Player(std::vector<Player*> others, std::vector<Player*> allplayers,
+			Ball* ball, bool isTeamA, int id) :
 			m_others(others), m_AllPlayers(allplayers), m_Ball(ball), b_ImTeamA(
 					isTeamA), m_MyID(id)
 	{
@@ -210,7 +213,7 @@ public:
 
 	// per frame simulation update
 	// (parameter names commented out to prevent compiler warning from "-W")
-	void update(const float /*currentTime*/, const float elapsedTime)
+	void update(const float currentTime, const float elapsedTime)
 	{
 		// if I hit the ball, kick it.
 
@@ -266,6 +269,9 @@ public:
 			}
 
 		}
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	// draw this character/vehicle into the scene
@@ -276,17 +282,13 @@ public:
 		drawTrail();
 	}
 	// per-instance reference to its group
-	const std::vector<_Player*> m_others;
-	const std::vector<_Player*> m_AllPlayers;
-	_Ball* m_Ball;
+	const std::vector<Player*> m_others;
+	const std::vector<Player*> m_AllPlayers;
+	Ball* m_Ball;
 	bool b_ImTeamA;
 	int m_MyID;
 	Vec3 m_home;
 };
-
-typedef ActorMixin<_Ball, AABBox*> Ball;
-typedef ActorMixin<_Player, _Player::groupType, _Player::groupType, Ball*, bool,
-		int> Player;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
@@ -468,9 +470,9 @@ public:
 
 	unsigned int m_PlayerCountA;
 	unsigned int m_PlayerCountB;
-//	std::vector<_Player*> TeamA;
-//	std::vector<_Player*> TeamB;
-//	std::vector<_Player*> m_AllPlayers;
+//	std::vector<Player*> TeamA;
+//	std::vector<Player*> TeamB;
+//	std::vector<Player*> m_AllPlayers;
 	Player::groupType TeamA;
 	Player::groupType TeamB;
 	Player::groupType m_AllPlayers;

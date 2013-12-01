@@ -122,12 +122,12 @@ public:
 	static SOG allObstacles;
 };
 
-class _CtfSeeker: public CtfBase
+class CtfSeeker: public CtfBase
 {
 public:
 
 	// constructor
-	_CtfSeeker()
+	CtfSeeker()
 	{
 		reset();
 	}
@@ -155,12 +155,12 @@ public:
 	float lastRunningTime; // for auto-reset
 };
 
-class _CtfEnemy: public CtfBase
+class CtfEnemy: public CtfBase
 {
 public:
 
 	// constructor
-	_CtfEnemy()
+	CtfEnemy()
 	{
 		reset();
 	}
@@ -171,9 +171,6 @@ public:
 	// per frame simulation update
 	void update(const float currentTime, const float elapsedTime);
 };
-
-typedef ActorMixin<_CtfSeeker> CtfSeeker;
-typedef ActorMixin<_CtfEnemy> CtfEnemy;
 
 // ----------------------------------------------------------------------------
 // globals
@@ -198,7 +195,7 @@ extern float gAvoidancePredictTime;
 extern bool enableAttackSeek; // for testing (perhaps retain for UI control?)
 extern bool enableAttackEvade; // for testing (perhaps retain for UI control?)
 
-extern _CtfSeeker* gSeeker;
+extern CtfSeeker* gSeeker;
 
 // count the number of times the simulation has reset (e.g. for overnight runs)
 extern int resetCount;
@@ -209,9 +206,9 @@ extern int resetCount;
 // XXX consider moving this inside CtfPlugIn
 // XXX consider using STL (any advantage? consistency?)
 
-extern _CtfSeeker* ctfSeeker;
+extern CtfSeeker* ctfSeeker;
 extern const int ctfEnemyCount;
-extern _CtfEnemy* ctfEnemies[];
+extern CtfEnemy* ctfEnemies[];
 
 #define testOneObstacleOverlap(radius, center)               \
     {                                                            \

@@ -72,15 +72,15 @@ typedef OpenSteer::AbstractTokenForProximityDatabase<AbstractVehicle*> Proximity
 
 // ----------------------------------------------------------------------------
 
-class _Boid: public OpenSteer::SimpleVehicle
+class Boid: public SimpleVehicle
 {
 public:
 
 	// type for a flock: an STL vector of Boid pointers
-	typedef std::vector<_Boid*> groupType;
+	typedef std::vector<Boid*> groupType;
 
 	// constructor
-	_Boid(ProximityDatabase& pd)
+	Boid(ProximityDatabase& pd)
 	{
 		// allocate a token for this boid in the proximity database
 		proximityToken = NULL;
@@ -91,7 +91,7 @@ public:
 	}
 
 	// destructor
-	~_Boid()
+	~Boid()
 	{
 		// delete this boid's token in the proximity database
 		delete proximityToken;
@@ -142,6 +142,9 @@ public:
 
 		// notify proximity database that our position has changed
 		proximityToken->updateForNewPosition(position());
+
+		//update actor
+		updateActor(currentTime, elapsedTime);
 	}
 
 	// basic flocking
@@ -303,8 +306,6 @@ public:
 	static size_t minNeighbors, maxNeighbors, totalNeighbors;
 #endif // NO_LQ_BIN_STATS
 };
-
-typedef ActorMixin<_Boid, ProximityDatabase&> Boid;
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
@@ -531,7 +532,7 @@ public:
 #ifndef NO_LQ_BIN_STATS
 		int min, max;
 		float average;
-		Boid& aBoid = dynamic_cast<Boid&>(**(flock.begin()));
+		Boid& aBoid = **(flock.begin());
 		aBoid.proximityToken->getBinPopulationStats(min, max, average);
 		std::cout << std::setprecision(2) << std::setiosflags(std::ios::fixed);
 		std::cout << "Bin populations: min, max, average: " << min << ", "
@@ -573,7 +574,7 @@ public:
 		if (population > 0)
 		{
 			// save a pointer to the last boid, then remove it from the flock
-			const Boid* boid = dynamic_cast<Boid*>(flock.back());
+			const Boid* boid = flock.back();
 			flock.pop_back();
 			population--;
 

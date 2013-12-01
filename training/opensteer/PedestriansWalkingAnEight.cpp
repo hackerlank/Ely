@@ -53,7 +53,7 @@ bool gUseDirectedPathFollowingEight = true;
 // this was added for debugging tool, but I might as well leave it in
 bool gWanderSwitchEight = true;
 
-AVGroup _PedestrianWalkingAnEight::neighbors;
+AVGroup PedestrianWalkingAnEight::neighbors;
 
 /**
  * Creates a path of the form of an eight. Data provided by Nick Porcino.
