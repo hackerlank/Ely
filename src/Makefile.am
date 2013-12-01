@@ -31,6 +31,10 @@ recastnavigation_sources = \
 		AIComponents/RecastNavigation/ConvexVolumeTool.cpp \
 		AIComponents/RecastNavigation/CrowdTool.cpp \
 		AIComponents/RecastNavigation/OffMeshConnectionTool.cpp
+
+opensteer_sources = \
+		AIComponents/OpenSteer/Draw.cpp \
+		AIComponents/OpenSteer/DrawMeshDrawer.cpp
 			
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \

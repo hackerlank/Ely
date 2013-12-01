@@ -13,6 +13,11 @@ recastnavigation_headers = \
 		AIComponents/RecastNavigation/ConvexVolumeTool.h \
 		AIComponents/RecastNavigation/CrowdTool.h \
 		AIComponents/RecastNavigation/OffMeshConnectionTool.h
+		
+opensteer_headers = \
+		AIComponents/OpenSteer/common.h \
+		AIComponents/OpenSteer/DrawMeshDrawer.h \
+		AIComponents/OpenSteer/PlugIn_OneTurning.h
 
 noinst_HEADERS = \
 		AIComponents/Steering.h \
@@ -22,6 +27,7 @@ noinst_HEADERS = \
 		AIComponents/NavMesh.h \
 		AIComponents/NavMeshTemplate.h \
 		$(recastnavigation_headers) \
+		$(opensteer_headers) \
 		AudioComponents/Listener.h \
 		AudioComponents/ListenerTemplate.h \
 		AudioComponents/Sound3d.h \
