@@ -58,24 +58,40 @@ int main(int argc, char **argv)
 	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INSTANCEUPDATES, ELY_INSTANCEUPDATES_LA);
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
+	//AI
+#ifdef ELY_DEBUG
+	GAMESUBMANAGER(GameAIManager, gameAIMgr, 5, 0, default)
+#else
 	TASKCHAIN(AI_chain, 2, true)
-	TASKCHAIN(Control_chain, 2, true)
-	TASKCHAIN(Scene_chain, 2, true)
-//	TASKCHAIN(Physics_chain, 2, true)
-	TASKCHAIN(Audio_chain, 2, true)
-	TASKCHAIN(Behavior_chain, 2, true)
 	GAMESUBMANAGER(GameAIManager, gameAIMgr, 0, 0, AI_chain)
+#endif
+	//Control
+	TASKCHAIN(Control_chain, 2, true)
 	GAMESUBMANAGER(GameControlManager, gameControlMgr, 0, 0, Control_chain)
+	//Scene
+	TASKCHAIN(Scene_chain, 2, true)
 	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, 0, 0, Scene_chain)
+	//Physics
+//	TASKCHAIN(Physics_chain, 2, true)
 	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, 10, 0, default)
+	//Audio
+	TASKCHAIN(Audio_chain, 2, true)
 	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, 0, 0, Audio_chain)
+	//Behavior
+	TASKCHAIN(Behavior_chain, 2, true)
 	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, 0, 0, Behavior_chain)
 #else
+	//AI
 	GameAIManager* gameAIMgr = new GameAIManager();
+	//Control
 	GameControlManager* gameControlMgr = new GameControlManager();
+	//Scene
 	GameSceneManager* gameSceneMgr = new GameSceneManager();
+	//Physics
 	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
+	//Audio
 	GameAudioManager* gameAudioMgr = new GameAudioManager();
+	//Behavior
 	GameBehaviorManager* gameBehaviorMgr = new GameBehaviorManager();
 #endif
 

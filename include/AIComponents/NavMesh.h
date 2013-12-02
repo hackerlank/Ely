@@ -374,6 +374,8 @@ private:
 	/// DebugDrawers.
 	DebugDrawPanda3d* mDD;
 	DebugDrawMeshDrawer* mDDM;
+	///Enable Draw update
+	bool mEnableDrawUpdate;
 	/// Debug render with DebugDrawPanda3d.
 	void doDebugStaticRender();
 	///@{
@@ -449,6 +451,7 @@ inline void NavMesh::reset()
 	mDebugCamera = NodePath();
 	mDD = NULL;
 	mDDM = NULL;
+	mEnableDrawUpdate = false;
 	mDebugRenderData.clear();
 	mDebugRenderTask.clear();
 #endif

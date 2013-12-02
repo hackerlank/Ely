@@ -1507,8 +1507,11 @@ void NavMesh::update(void* data)
 	}
 	//
 #ifdef ELY_DEBUG
-	mDDM->reset();
-	mNavMeshType->renderToolStates(*mDDM);
+	if (mEnableDrawUpdate)
+	{
+		mDDM->reset();
+		mNavMeshType->renderToolStates(*mDDM);
+	}
 #endif
 }
 
@@ -1540,6 +1543,7 @@ NavMesh::Result NavMesh::debug(bool enable)
 		if (mDebugNodePath.is_hidden())
 		{
 			mDebugNodePath.show();
+			mEnableDrawUpdate = true;
 		}
 	}
 	else
@@ -1547,6 +1551,7 @@ NavMesh::Result NavMesh::debug(bool enable)
 		if (not mDebugNodePath.is_hidden())
 		{
 			mDebugNodePath.hide();
+			mEnableDrawUpdate = false;
 		}
 	}
 	//

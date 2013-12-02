@@ -602,6 +602,7 @@ void Vehicle::onAddToSceneSetup()
 		wheel.set_wheels_damping_compression(mWheelDampingCompression[idx]);
 		wheel.set_friction_slip(mWheelFrictionSlip[idx]);
 		wheel.set_roll_influence(mWheelRollInfluence[idx]);
+		wheel.set_world_transform(LMatrix4f::ident_mat());
 		//set the wheel node path
 		wheel.set_node(mWheelObjects[idx]->getNodePath().node());
 	}
