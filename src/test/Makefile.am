@@ -1,6 +1,6 @@
 # Ely Boost Unit Tests
 DEFINITIONS = -DTRANSITIONS_LA=\"dummy\" -DCALLBACKS_LA=\"dummy\" -DINITIALIZATIONS_LA=\"dummy\" -DDEFAULT_CALLBACK_NAME=\"dummy\"
-AM_CPPFLAGS = $(DEFINITIONS) -DELY_GAMEXML=\"ELY_GAMEXML\" -DBOOST_TEST_DYN_LINK -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = $(DEFINITIONS) -DELY_GAMEXML=\"ELY_GAMEXML\" -DBOOST_TEST_DYN_LINK -DTESTING -iquote$(top_srcdir)/include -iquote$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
@@ -50,6 +50,8 @@ libtestaicomponents_a_SOURCES = \
 		aicomponents/CrowdAgent_test.cpp \
 		aicomponents/NavMesh_test.cpp \
 		aicomponents/Steering_test.cpp \
+		aicomponents/OpenSteerPlugIn_test.cpp \
+		aicomponents/OpenSteerVehicle_test.cpp \
 		$(top_srcdir)/src/AIComponents/Steering.cpp  \
 		$(top_srcdir)/src/AIComponents/SteeringTemplate.cpp \
 		$(top_srcdir)/src/AIComponents/CrowdAgent.cpp \
