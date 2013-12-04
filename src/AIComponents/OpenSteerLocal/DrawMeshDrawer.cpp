@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/AIComponents/OpenSteer/DrawMeshDrawer.cpp
+ * \file /Ely/src/AIComponents/OpenSteerLocal/DrawMeshDrawer.cpp
  *
  * \date 30/nov/2013 (11:11:37)
  * \author consultit

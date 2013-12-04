@@ -47,7 +47,7 @@
 //
 // ----------------------------------------------------------------------------
 /**
- * \file /Ely/src/AIComponents/OpenSteer/Draw.cpp
+ * \file /Ely/src/AIComponents/OpenSteerLocal/Draw.cpp
  *
  * \date 30/nov/2013 (11:11:37)
  * \author consultit

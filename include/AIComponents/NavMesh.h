@@ -104,7 +104,7 @@ public:
 	/**
 	 * \brief Updates position/orientation of crowd agents.
 	 *
-	 * Will be called automatically by an control manager update.
+	 * Will be called automatically by an ai manager update.
 	 * @param data The custom data.
 	 */
 	virtual void update(void* data);

@@ -21,6 +21,8 @@
  * \author consultit
  */
 #include "AIComponents/OpenSteerPlugInTemplate.h"
+#include "AIComponents/OpenSteerPlugIn.h"
+#include "Game/GameAIManager.h"
 
 namespace ely
 {
@@ -29,13 +31,54 @@ OpenSteerPlugInTemplate::OpenSteerPlugInTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	// TODO Auto-generated constructor stub
-
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"OpenSteerPlugInTemplate::OpenSteerPlugInTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"OpenSteerPlugInTemplate::OpenSteerPlugInTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
+			"OpenSteerPlugInTemplate::OpenSteerPlugInTemplate: invalid GameAIManager")
+	//
+	setParametersDefaults();
 }
 
 OpenSteerPlugInTemplate::~OpenSteerPlugInTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
+
+ComponentType OpenSteerPlugInTemplate::componentType() const
+{
+	return ComponentType("OpenSteerPlugIn");
+}
+
+ComponentFamilyType OpenSteerPlugInTemplate::familyType() const
+{
+	return ComponentFamilyType("AI");
+}
+
+SMARTPTR(Component)OpenSteerPlugInTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(OpenSteerPlugIn) newOpenSteerPlugIn = new OpenSteerPlugIn(this);
+	newOpenSteerPlugIn->setComponentId(compId);
+	if (not newOpenSteerPlugIn->initialize())
+	{
+		return NULL;
+	}
+	return newOpenSteerPlugIn.p();
+}
+
+void OpenSteerPlugInTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("plugin_type", ""));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle OpenSteerPlugInTemplate::_type_handle;
 
 } /* namespace ely */

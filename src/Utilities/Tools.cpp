@@ -167,6 +167,10 @@ void initTypedObjects()
 	CrowdAgentTemplate::init_type();
 	ely::NavMesh::init_type();
 	NavMeshTemplate::init_type();
+	OpenSteerPlugIn::init_type();
+	OpenSteerPlugInTemplate::init_type();
+	OpenSteerVehicle::init_type();
+	OpenSteerVehicleTemplate::init_type();
 	Listener::init_type();
 	ListenerTemplate::init_type();
 	Sound3d::init_type();

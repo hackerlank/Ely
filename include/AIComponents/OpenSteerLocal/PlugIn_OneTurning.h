@@ -35,7 +35,7 @@
 //
 // ----------------------------------------------------------------------------
 /**
- * \file /Ely/include/AIComponents/OpenSteer/PlugIn_OneTurning.h
+ * \file /Ely/include/AIComponents/OpenSteerLocal/PlugIn_OneTurning.h
  *
  * \date 01/dic/2013 (08:53:52)
  * \author consultit

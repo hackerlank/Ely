@@ -15,9 +15,9 @@ recastnavigation_headers = \
 		AIComponents/RecastNavigation/OffMeshConnectionTool.h
 		
 opensteer_headers = \
-		AIComponents/OpenSteer/common.h \
-		AIComponents/OpenSteer/DrawMeshDrawer.h \
-		AIComponents/OpenSteer/PlugIn_OneTurning.h
+		AIComponents/OpenSteerLocal/common.h \
+		AIComponents/OpenSteerLocal/DrawMeshDrawer.h \
+		AIComponents/OpenSteerLocal/PlugIn_OneTurning.h
 
 noinst_HEADERS = \
 		AIComponents/Steering.h \

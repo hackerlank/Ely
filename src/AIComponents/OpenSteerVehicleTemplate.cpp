@@ -29,13 +29,54 @@ OpenSteerVehicleTemplate::OpenSteerVehicleTemplate(
 		PandaFramework* pandaFramework, WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
-	// TODO Auto-generated constructor stub
-
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"OpenSteerVehicleTemplate::OpenSteerVehicleTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"OpenSteerVehicleTemplate::OpenSteerVehicleTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
+			"OpenSteerVehicleTemplate::OpenSteerVehicleTemplate: invalid GameAIManager")
+	//
+	setParametersDefaults();
 }
 
 OpenSteerVehicleTemplate::~OpenSteerVehicleTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
+
+
+ComponentType OpenSteerVehicleTemplate::componentType() const
+{
+	return ComponentType("OpenSteerVehicle");
+}
+
+ComponentFamilyType OpenSteerVehicleTemplate::familyType() const
+{
+	return ComponentFamilyType("AI");
+}
+
+SMARTPTR(Component)OpenSteerVehicleTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(OpenSteerVehicle) newOpenSteerVehicle = new OpenSteerVehicle(this);
+	newOpenSteerVehicle->setComponentId(compId);
+	if (not newOpenSteerVehicle->initialize())
+	{
+		return NULL;
+	}
+	return newOpenSteerVehicle.p();
+}
+
+void OpenSteerVehicleTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle OpenSteerVehicleTemplate::_type_handle;
 
 } /* namespace ely */

@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/AIComponents/OpenSteer/common.h
+ * \file /Ely/include/AIComponents/OpenSteerLocal/common.h
  *
  * \date 30/nov/2013 (11:11:37)
  * \author consultit

@@ -21,6 +21,7 @@
  * \author consultit
  */
 #include "AIComponents/OpenSteerVehicle.h"
+#include "AIComponents/OpenSteerVehicleTemplate.h"
 
 namespace ely
 {
@@ -31,9 +32,69 @@ OpenSteerVehicle::OpenSteerVehicle()
 
 }
 
+OpenSteerVehicle::OpenSteerVehicle(SMARTPTR(OpenSteerVehicleTemplate)tmpl)
+{
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
+	"OpenSteerVehicle::OpenSteerVehicle: invalid GameAIManager")
+
+	mTmpl = tmpl;
+	reset();
+}
+
 OpenSteerVehicle::~OpenSteerVehicle()
 {
 	// TODO Auto-generated destructor stub
 }
+
+ComponentFamilyType OpenSteerVehicle::familyType() const
+{
+	return mTmpl->familyType();
+}
+
+ComponentType OpenSteerVehicle::componentType() const
+{
+	return mTmpl->componentType();
+}
+
+bool OpenSteerVehicle::initialize()
+{
+	bool result = true;
+	//
+	return result;
+}
+
+void OpenSteerVehicle::onAddToObjectSetup()
+{
+}
+
+void OpenSteerVehicle::onRemoveFromObjectCleanup()
+{
+	//
+	reset();
+}
+
+void OpenSteerVehicle::onAddToSceneSetup()
+{
+}
+
+void OpenSteerVehicle::onRemoveFromSceneCleanup()
+{
+}
+
+void OpenSteerVehicle::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle OpenSteerVehicle::_type_handle;
 
 } /* namespace ely */
