@@ -60,9 +60,9 @@
 // To include OpenSteer::round.
 #include <OpenSteer/Utilities.h>
 
-#include "common.h"
+#include "AIComponents/OpenSteerLocal/common.h"
 
-#include "DrawMeshDrawer.h"
+#include "AIComponents/OpenSteerLocal/DrawMeshDrawer.h"
 extern ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
 
 // ----------------------------------------------------------------------------
@@ -172,10 +172,6 @@ void OpenSteer::glVertexVec3(const Vec3& v)
 }
 
 // ----------------------------------------------------------------------------
-///WARN: NOT USED
-void OpenSteer::warnIfInUpdatePhase(const char* name)
-{
-}
 
 void OpenSteer::drawLine(const Vec3& startPoint, const Vec3& endPoint,
 		const Color& color)

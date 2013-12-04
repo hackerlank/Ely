@@ -21,8 +21,8 @@
  * \author consultit
  */
 
-#include "DrawMeshDrawer.h"
-#include "common.h"
+#include "AIComponents/OpenSteerLocal/DrawMeshDrawer.h"
+#include "AIComponents/OpenSteerLocal/common.h"
 #include <omniBoundingVolume.h>
 #include <textNode.h>
 

@@ -22,6 +22,7 @@
  */
 #include "AIComponents/OpenSteerVehicle.h"
 #include "AIComponents/OpenSteerVehicleTemplate.h"
+#include "Game/GameAIManager.h"
 
 namespace ely
 {

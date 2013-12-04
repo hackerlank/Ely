@@ -23,6 +23,7 @@
 
 #include "AIComponents/OpenSteerPlugIn.h"
 #include "AIComponents/OpenSteerPlugInTemplate.h"
+#include "Game/GameAIManager.h"
 
 namespace ely
 {

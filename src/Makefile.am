@@ -47,7 +47,8 @@ libaicomponents_la_SOURCES = \
 		AIComponents/OpenSteerPlugInTemplate.cpp \
 		AIComponents/OpenSteerVehicle.cpp \
 		AIComponents/OpenSteerVehicleTemplate.cpp \
-		$(recastnavigation_sources)
+		$(recastnavigation_sources) \
+		$(opensteer_sources)
 
 libaudiocomponents_la_SOURCES = \
 		AudioComponents/Listener.cpp \

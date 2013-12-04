@@ -21,6 +21,8 @@
  * \author consultit
  */
 #include "AIComponents/OpenSteerVehicleTemplate.h"
+#include "AIComponents/OpenSteerVehicle.h"
+#include "Game/GameAIManager.h"
 
 namespace ely
 {
