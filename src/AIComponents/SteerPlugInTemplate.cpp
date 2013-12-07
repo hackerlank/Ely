@@ -15,19 +15,19 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/AIComponents/OpenSteerPlugInTemplate.cpp
+ * \file /Ely/src/AIComponents/SteerPlugInTemplate.cpp
  *
  * \date 04/dic/2013 (09:13:41)
  * \author consultit
  */
-#include "AIComponents/OpenSteerPlugInTemplate.h"
-#include "AIComponents/OpenSteerPlugIn.h"
+#include "AIComponents/SteerPlugInTemplate.h"
+#include "AIComponents/SteerPlugIn.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
 {
 
-OpenSteerPlugInTemplate::OpenSteerPlugInTemplate(PandaFramework* pandaFramework,
+SteerPlugInTemplate::SteerPlugInTemplate(PandaFramework* pandaFramework,
 		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
@@ -41,24 +41,24 @@ OpenSteerPlugInTemplate::OpenSteerPlugInTemplate(PandaFramework* pandaFramework,
 	setParametersDefaults();
 }
 
-OpenSteerPlugInTemplate::~OpenSteerPlugInTemplate()
+SteerPlugInTemplate::~SteerPlugInTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-ComponentType OpenSteerPlugInTemplate::componentType() const
+ComponentType SteerPlugInTemplate::componentType() const
 {
-	return ComponentType("OpenSteerPlugIn");
+	return ComponentType("SteerPlugIn");
 }
 
-ComponentFamilyType OpenSteerPlugInTemplate::familyType() const
+ComponentFamilyType SteerPlugInTemplate::familyType() const
 {
 	return ComponentFamilyType("AI");
 }
 
-SMARTPTR(Component)OpenSteerPlugInTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)SteerPlugInTemplate::makeComponent(const ComponentId& compId)
 {
-	SMARTPTR(OpenSteerPlugIn) newOpenSteerPlugIn = new OpenSteerPlugIn(this);
+	SMARTPTR(SteerPlugIn) newOpenSteerPlugIn = new SteerPlugIn(this);
 	newOpenSteerPlugIn->setComponentId(compId);
 	if (not newOpenSteerPlugIn->initialize())
 	{
@@ -67,7 +67,7 @@ SMARTPTR(Component)OpenSteerPlugInTemplate::makeComponent(const ComponentId& com
 	return newOpenSteerPlugIn.p();
 }
 
-void OpenSteerPlugInTemplate::setParametersDefaults()
+void SteerPlugInTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -79,6 +79,6 @@ void OpenSteerPlugInTemplate::setParametersDefaults()
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle OpenSteerPlugInTemplate::_type_handle;
+TypeHandle SteerPlugInTemplate::_type_handle;
 
 } /* namespace ely */

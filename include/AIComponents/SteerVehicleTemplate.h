@@ -15,29 +15,29 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/AIComponents/OpenSteerPlugInTemplate.h
+ * \file /Ely/include/AIComponents/SteerVehicleTemplate.h
  *
- * \date 04/dic/2013 (09:13:41)
+ * \date 04/dic/2013 (09:23:38)
  * \author consultit
  */
-#ifndef OPENSTEERPLUGINTEMPLATE_H_
-#define OPENSTEERPLUGINTEMPLATE_H_
+#ifndef STEERVEHICLETEMPLATE_H_
+#define STEERVEHICLETEMPLATE_H_
 
 #include "ObjectModel/ComponentTemplate.h"
 
 namespace ely
 {
 
-class OpenSteerPlugInTemplate: public ComponentTemplate
+class SteerVehicleTemplate: public ComponentTemplate
 {
 protected:
 
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 public:
-	OpenSteerPlugInTemplate(PandaFramework* pandaFramework,
+	SteerVehicleTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~OpenSteerPlugInTemplate();
+	virtual ~SteerVehicleTemplate();
 
 	virtual ComponentType componentType() const;
 	virtual ComponentFamilyType familyType() const;
@@ -55,7 +55,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "OpenSteerPlugInTemplate",
+		register_type(_type_handle, "SteerVehicleTemplate",
 				ComponentTemplate::get_class_type());
 	}
 	virtual TypeHandle get_type() const
@@ -70,9 +70,8 @@ public:
 
 private:
 	static TypeHandle _type_handle;
-
 };
 
 } /* namespace ely */
 
-#endif /* OPENSTEERPLUGINTEMPLATE_H_ */
+#endif /* STEERVEHICLETEMPLATE_H_ */

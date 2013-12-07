@@ -88,7 +88,7 @@ public:
 		annotationVelocityAcceleration();
 		recordTrailVertex(currentTime, position());
 		//update actor
-		updateActor(currentTime, elapsedTime);
+		updateNodePath(currentTime, elapsedTime);
 	}
 
 	// draw this character/vehicle into the scene

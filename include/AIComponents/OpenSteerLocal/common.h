@@ -32,9 +32,6 @@
 #include <OpenSteer/AbstractVehicle.h>
 #include <OpenSteer/SimpleVehicle.h>
 
-extern bool gToggleDrawGrid;
-extern OpenSteer::AbstractVehicle* selectedVehicle;
-
 namespace ely
 {
 
@@ -57,75 +54,63 @@ inline LVecBase4f OpenSteerColorToLVecBase4f(const OpenSteer::Color& c)
 	return LVecBase4f(c.r(), c.g(), c.b(), c.a());
 }
 
+/**
+ * \brief SimpleVehicle settings.
+ */
+struct SimpleVehicleSettings
+{
+	// mass
+	float m_mass;
+	// size of bounding sphere, for obstacle avoidance, etc.
+	float m_radius;
+	// speed of vehicle
+	float m_speed;
+	// the maximum steering force this vehicle can apply
+	float m_maxForce;
+	// the maximum speed this vehicle is allowed to move
+	float m_maxSpeed;
+};
+
 template<typename Super>
-class ActorMixin: public Super
+class SimpleVehicleMixin: public Super
 {
 public:
 
-	void updateActor(const float currentTime, const float elapsedTime)
+	void updateNodePath(const float currentTime, const float elapsedTime)
 	{
-		//update actor
+		//update node path
 		LPoint3f pos = OpenSteerVec3ToLVecBase3f(this->position());
-		mActor.set_pos(pos);
-		mActor.heads_up(pos - OpenSteerVec3ToLVecBase3f(this->forward()),
+		m_nodePath.set_pos(pos);
+		m_nodePath.heads_up(pos - OpenSteerVec3ToLVecBase3f(this->forward()),
 				OpenSteerVec3ToLVecBase3f(this->up()));
-
-		//update anim if any
-		if (mAnims.get_num_anims() > 0)
-		{
-			//get relative speed
-			float relSpeed = this->relativeSpeed();
-			if (relSpeed >= 0.1)
-			{
-				mAnims.get_anim(0)->set_play_rate(relSpeed * mAnimRateFactor);
-				if (not mAnims.get_anim(0)->is_playing())
-				{
-					mAnims.get_anim(0)->loop(true);
-				}
-			}
-			else
-			{
-				if (mAnims.get_anim(0)->is_playing())
-				{
-					mAnims.get_anim(0)->stop();
-				}
-			}
-		}
 	}
 
-	void setActor(NodePath actor)
+	void setNodePath(NodePath nodePath)
 	{
-		mActor = actor;
+		m_nodePath = nodePath;
 		// set size of bounding sphere
 		LPoint3f minP, maxP;
-		actor.calc_tight_bounds(minP, maxP);
+		nodePath.calc_tight_bounds(minP, maxP);
 		this->setRadius((maxP - minP).length() / 2.0);
 	}
 
-	void setAnimRateFactor(float animRateFactor)
+	SimpleVehicleSettings& getSettings()
 	{
-		mAnimRateFactor = animRateFactor;
+		return m_settings;
 	}
 
-	AnimControlCollection& getAnims()
+	void setSettings(const SimpleVehicleSettings& settings)
 	{
-		return mAnims;
+		m_settings = settings;
 	}
 
 protected:
-	NodePath mActor;
-	AnimControlCollection mAnims;
-	float mAnimRateFactor;
+	NodePath m_nodePath;
+	SimpleVehicleSettings m_settings;
 };
 
-typedef ActorMixin<OpenSteer::SimpleVehicle> SimpleVehicle;
+typedef SimpleVehicleMixin<OpenSteer::SimpleVehicle> SimpleVehicle;
 
-}
-
-namespace OpenSteer
-{
-void gridUtility(const Vec3& gridTarget, const float size = 50,
-		const int subsquares = 50);
 }
 
 #endif /* COMMON_H_ */

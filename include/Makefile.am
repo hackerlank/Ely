@@ -26,10 +26,10 @@ noinst_HEADERS = \
 		AIComponents/CrowdAgentTemplate.h \
 		AIComponents/NavMesh.h \
 		AIComponents/NavMeshTemplate.h \
-		AIComponents/OpenSteerPlugIn.h \
-		AIComponents/OpenSteerPlugInTemplate.h \
-		AIComponents/OpenSteerVehicle.h \
-		AIComponents/OpenSteerVehicleTemplate.h \
+		AIComponents/SteerPlugIn.h \
+		AIComponents/SteerPlugInTemplate.h \
+		AIComponents/SteerVehicle.h \
+		AIComponents/SteerVehicleTemplate.h \
 		$(recastnavigation_headers) \
 		$(opensteer_headers) \
 		AudioComponents/Listener.h \

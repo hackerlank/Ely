@@ -15,25 +15,25 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/AIComponents/OpenSteerVehicle.cpp
+ * \file /Ely/src/AIComponents/SteerVehicle.cpp
  *
  * \date 04/dic/2013 (09:20:42)
  * \author consultit
  */
-#include "AIComponents/OpenSteerVehicle.h"
-#include "AIComponents/OpenSteerVehicleTemplate.h"
+#include "AIComponents/SteerVehicle.h"
+#include "AIComponents/SteerVehicleTemplate.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
 {
 
-OpenSteerVehicle::OpenSteerVehicle()
+SteerVehicle::SteerVehicle()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-OpenSteerVehicle::OpenSteerVehicle(SMARTPTR(OpenSteerVehicleTemplate)tmpl)
+SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 	"OpenSteerVehicle::OpenSteerVehicle: invalid GameAIManager")
@@ -42,47 +42,67 @@ OpenSteerVehicle::OpenSteerVehicle(SMARTPTR(OpenSteerVehicleTemplate)tmpl)
 	reset();
 }
 
-OpenSteerVehicle::~OpenSteerVehicle()
+SteerVehicle::~SteerVehicle()
 {
 	// TODO Auto-generated destructor stub
 }
 
-ComponentFamilyType OpenSteerVehicle::familyType() const
+ComponentFamilyType SteerVehicle::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-ComponentType OpenSteerVehicle::componentType() const
+ComponentType SteerVehicle::componentType() const
 {
 	return mTmpl->componentType();
 }
 
-bool OpenSteerVehicle::initialize()
+bool SteerVehicle::initialize()
 {
 	bool result = true;
+	//type
+	std::string type = mTmpl->parameter(std::string("type"));
+	if (type == std::string(""))
+	{
+	}
+	else if (type == std::string(""))
+	{
+	}
+	else
+	{
+		mVehicle = new OneTurning;
+	}
+	//get settings
+	SimpleVehicleSettings settings;
+	//radius (default: automatically computed)
+	std::string radius = mTmpl->parameter(std::string("radius"));
+	if (not radius.empty())
+	{
+		settings.m_radius = strtof(radius.c_str(), NULL);
+	}
 	//
 	return result;
 }
 
-void OpenSteerVehicle::onAddToObjectSetup()
+void SteerVehicle::onAddToObjectSetup()
 {
 }
 
-void OpenSteerVehicle::onRemoveFromObjectCleanup()
+void SteerVehicle::onRemoveFromObjectCleanup()
 {
 	//
 	reset();
 }
 
-void OpenSteerVehicle::onAddToSceneSetup()
+void SteerVehicle::onAddToSceneSetup()
 {
 }
 
-void OpenSteerVehicle::onRemoveFromSceneCleanup()
+void SteerVehicle::onRemoveFromSceneCleanup()
 {
 }
 
-void OpenSteerVehicle::update(void* data)
+void SteerVehicle::update(void* data)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -96,6 +116,6 @@ void OpenSteerVehicle::update(void* data)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle OpenSteerVehicle::_type_handle;
+TypeHandle SteerVehicle::_type_handle;
 
 } /* namespace ely */

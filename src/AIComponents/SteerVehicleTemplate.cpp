@@ -15,20 +15,20 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/AIComponents/OpenSteerVehicleTemplate.cpp
+ * \file /Ely/src/AIComponents/SteerVehicleTemplate.cpp
  *
  * \date 04/dic/2013 (09:23:38)
  * \author consultit
  */
-#include "AIComponents/OpenSteerVehicleTemplate.h"
-#include "AIComponents/OpenSteerVehicle.h"
+#include "AIComponents/SteerVehicleTemplate.h"
+#include "AIComponents/SteerVehicle.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
 {
 
-OpenSteerVehicleTemplate::OpenSteerVehicleTemplate(
-		PandaFramework* pandaFramework, WindowFramework* windowFramework) :
+SteerVehicleTemplate::SteerVehicleTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
 		ComponentTemplate(pandaFramework, windowFramework)
 {
 	CHECK_EXISTENCE_DEBUG(pandaFramework,
@@ -41,25 +41,24 @@ OpenSteerVehicleTemplate::OpenSteerVehicleTemplate(
 	setParametersDefaults();
 }
 
-OpenSteerVehicleTemplate::~OpenSteerVehicleTemplate()
+SteerVehicleTemplate::~SteerVehicleTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
 
-
-ComponentType OpenSteerVehicleTemplate::componentType() const
+ComponentType SteerVehicleTemplate::componentType() const
 {
-	return ComponentType("OpenSteerVehicle");
+	return ComponentType("SteerVehicle");
 }
 
-ComponentFamilyType OpenSteerVehicleTemplate::familyType() const
+ComponentFamilyType SteerVehicleTemplate::familyType() const
 {
 	return ComponentFamilyType("AI");
 }
 
-SMARTPTR(Component)OpenSteerVehicleTemplate::makeComponent(const ComponentId& compId)
+SMARTPTR(Component)SteerVehicleTemplate::makeComponent(const ComponentId& compId)
 {
-	SMARTPTR(OpenSteerVehicle) newOpenSteerVehicle = new OpenSteerVehicle(this);
+	SMARTPTR(SteerVehicle) newOpenSteerVehicle = new SteerVehicle(this);
 	newOpenSteerVehicle->setComponentId(compId);
 	if (not newOpenSteerVehicle->initialize())
 	{
@@ -68,7 +67,7 @@ SMARTPTR(Component)OpenSteerVehicleTemplate::makeComponent(const ComponentId& co
 	return newOpenSteerVehicle.p();
 }
 
-void OpenSteerVehicleTemplate::setParametersDefaults()
+void SteerVehicleTemplate::setParametersDefaults()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -76,9 +75,13 @@ void OpenSteerVehicleTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("speed", "1.0"));
+	mParameterTable.insert(ParameterNameValue("maxForce", "1.0"));
+	mParameterTable.insert(ParameterNameValue("maxSpeed", "1.0"));
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle OpenSteerVehicleTemplate::_type_handle;
+TypeHandle SteerVehicleTemplate::_type_handle;
 
 } /* namespace ely */

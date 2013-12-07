@@ -43,10 +43,10 @@ libaicomponents_la_SOURCES = \
 		AIComponents/CrowdAgentTemplate.cpp \
 		AIComponents/NavMesh.cpp \
 		AIComponents/NavMeshTemplate.cpp \
-		AIComponents/OpenSteerPlugIn.cpp \
-		AIComponents/OpenSteerPlugInTemplate.cpp \
-		AIComponents/OpenSteerVehicle.cpp \
-		AIComponents/OpenSteerVehicleTemplate.cpp \
+		AIComponents/SteerPlugIn.cpp \
+		AIComponents/SteerPlugInTemplate.cpp \
+		AIComponents/SteerVehicle.cpp \
+		AIComponents/SteerVehicleTemplate.cpp \
 		$(recastnavigation_sources) \
 		$(opensteer_sources)
 

@@ -15,21 +15,21 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/AIComponents/OpenSteerVehicle.h
+ * \file /Ely/include/AIComponents/SteerVehicle.h
  *
  * \date 04/dic/2013 (09:20:41)
  * \author consultit
  */
-#ifndef OPENSTEERVEHICLE_H_
-#define OPENSTEERVEHICLE_H_
+#ifndef STEERVEHICLE_H_
+#define STEERVEHICLE_H_
 
 #include "ObjectModel/Component.h"
-#include <OpenSteer/SimpleVehicle.h>
 
 namespace ely
 {
 
-class OpenSteerVehicleTemplate;
+class SteerVehicleTemplate;
+class SimpleVehicle;
 
 /**
  * \brief Component implementing OpenSteer Vehicles.
@@ -37,14 +37,19 @@ class OpenSteerVehicleTemplate;
  * \see http://opensteer.sourceforge.net
  *
  * XML Param(s):
- * - ""					|single|""
+ * - "type"						|single|"one_turning" (values: one_turning|)
+ * - "mass"						|single|"1.0"
+ * - "radius"					|single|no default
+ * - "speed"					|single|"1.0"
+ * - "maxForce"					|single|"1.0"
+ * - "maxSpeed"					|single|"1.0"
  *
  * \note parts inside [] are optional.\n
  */
-class OpenSteerVehicle: public Component
+class SteerVehicle: public Component
 {
 protected:
-	friend class OpenSteerVehicleTemplate;
+	friend class SteerVehicleTemplate;
 
 	virtual void reset();
 	virtual bool initialize();
@@ -54,9 +59,9 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	OpenSteerVehicle();
-	OpenSteerVehicle(SMARTPTR(OpenSteerVehicleTemplate)tmpl);
-	virtual ~OpenSteerVehicle();
+	SteerVehicle();
+	SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl);
+	virtual ~SteerVehicle();
 
 	virtual ComponentFamilyType familyType() const;
 	virtual ComponentType componentType() const;
@@ -69,9 +74,17 @@ public:
 	 */
 	virtual void update(void* data);
 
+	/**
+	 * \name SimpleVehicle reference getter & conversion function.
+	 */
+	///@{
+	SimpleVehicle& getSimpleVehicle();
+	operator SimpleVehicle&();
+	///@}
+
 private:
 	///Current underlying Vehicle.
-	OpenSteer::SimpleVehicle* mVehicle;
+	SimpleVehicle* mVehicle;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -82,7 +95,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "OpenSteerVehicle", Component::get_class_type());
+		register_type(_type_handle, "SteerVehicle", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -101,13 +114,22 @@ private:
 
 ///inline definitions
 
-inline void OpenSteerVehicle::reset()
+inline void SteerVehicle::reset()
 {
 	//
 	mVehicle = NULL;
+}
 
+inline SimpleVehicle& SteerVehicle::getSimpleVehicle()
+{
+	return *mVehicle;
+}
+
+inline SteerVehicle::operator SimpleVehicle&()
+{
+	return *mVehicle;
 }
 
 } /* namespace ely */
 
-#endif /* OPENSTEERVEHICLE_H_ */
+#endif /* STEERVEHICLE_H_ */

@@ -63,7 +63,7 @@
 #include "AIComponents/OpenSteerLocal/common.h"
 
 #include "AIComponents/OpenSteerLocal/DrawMeshDrawer.h"
-extern ely::DrawMeshDrawer *gDrawer3d, *gDrawerGrid3d, *gDrawer2d;
+extern ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
 
 // ----------------------------------------------------------------------------
 
@@ -126,28 +126,6 @@ inline void iDrawQuadrangle(const OpenSteer::Vec3& a, const OpenSteer::Vec3& b,
 		OpenSteer::glVertexVec3(d);
 	}
 	gDrawer3d->end();
-}
-
-///
-inline void iDrawQuadrangleStreamBegin()
-{
-	gDrawerGrid3d->begin(ely::DrawMeshDrawer::DRAW_QUADS);
-}
-
-inline void iDrawQuadrangleStream(const OpenSteer::Vec3& a,
-		const OpenSteer::Vec3& b, const OpenSteer::Vec3& c,
-		const OpenSteer::Vec3& d, const OpenSteer::Color& color)
-{
-	gDrawerGrid3d->setColor(ely::OpenSteerColorToLVecBase4f(color));
-	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(a));
-	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(b));
-	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(c));
-	gDrawerGrid3d->vertex(ely::OpenSteerVec3ToLVecBase3f(d));
-}
-
-inline void iDrawQuadrangleStreamEnd()
-{
-	gDrawerGrid3d->end();
 }
 
 // ------------------------------------------------------------------------

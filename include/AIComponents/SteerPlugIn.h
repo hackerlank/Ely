@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/AIComponents/OpenSteerPlugIn.h
+ * \file /Ely/include/AIComponents/SteerPlugIn.h
  *
  * \date 04/dic/2013 (09:11:38)
  * \author consultit
  */
-#ifndef OPENSTEERPLUGIN_H_
-#define OPENSTEERPLUGIN_H_
+#ifndef STEERPLUGIN_H_
+#define STEERPLUGIN_H_
 
 #include "ObjectModel/Component.h"
 #include <OpenSteer/PlugIn.h>
@@ -29,7 +29,7 @@
 namespace ely
 {
 
-class OpenSteerPlugInTemplate;
+class SteerPlugInTemplate;
 
 /**
  * \brief Component implementing OpenSteer PlugIns.
@@ -44,10 +44,10 @@ class OpenSteerPlugInTemplate;
  *
  * \note parts inside [] are optional.\n
  */
-class OpenSteerPlugIn: public Component
+class SteerPlugIn: public Component
 {
 protected:
-	friend class OpenSteerPlugInTemplate;
+	friend class SteerPlugInTemplate;
 
 	virtual void reset();
 	virtual bool initialize();
@@ -57,9 +57,9 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	OpenSteerPlugIn();
-	OpenSteerPlugIn(SMARTPTR(OpenSteerPlugInTemplate)tmpl);
-	virtual ~OpenSteerPlugIn();
+	SteerPlugIn();
+	SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl);
+	virtual ~SteerPlugIn();
 
 	virtual ComponentFamilyType familyType() const;
 	virtual ComponentType componentType() const;
@@ -85,7 +85,7 @@ public:
 	static void init_type()
 	{
 		Component::init_type();
-		register_type(_type_handle, "OpenSteerPlugIn", Component::get_class_type());
+		register_type(_type_handle, "SteerPlugIn", Component::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
@@ -104,7 +104,7 @@ private:
 
 ///inline definitions
 
-inline void OpenSteerPlugIn::reset()
+inline void SteerPlugIn::reset()
 {
 	//
 	mPlugIn = NULL;
@@ -113,4 +113,4 @@ inline void OpenSteerPlugIn::reset()
 
 } /* namespace ely */
 
-#endif /* OPENSTEERPLUGIN_H_ */
+#endif /* STEERPLUGIN_H_ */

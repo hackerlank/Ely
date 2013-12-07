@@ -131,12 +131,12 @@ void GameManager::setupCompTmplMgr()
 	//Steering
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new SteeringTemplate(this, mWindow));
-	//OpenSteerPlugIn
+	//SteerPlugIn
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new OpenSteerPlugInTemplate(this, mWindow));
-	//OpenSteerPlugIn
+			new SteerPlugInTemplate(this, mWindow));
+	//SteerVehicle
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new OpenSteerVehicleTemplate(this, mWindow));
+			new SteerVehicleTemplate(this, mWindow));
 
 	///Audio templates
 	//Listener

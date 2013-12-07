@@ -15,26 +15,26 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/AIComponents/OpenSteerPlugIn.cpp
+ * \file /Ely/src/AIComponents/SteerPlugIn.cpp
  *
  * \date 04/dic/2013 (09:11:38)
  * \author consultit
  */
 
-#include "AIComponents/OpenSteerPlugIn.h"
-#include "AIComponents/OpenSteerPlugInTemplate.h"
+#include "AIComponents/SteerPlugIn.h"
+#include "AIComponents/SteerPlugInTemplate.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
 {
 
-OpenSteerPlugIn::OpenSteerPlugIn()
+SteerPlugIn::SteerPlugIn()
 {
 	// TODO Auto-generated constructor stub
 
 }
 
-OpenSteerPlugIn::OpenSteerPlugIn(SMARTPTR(OpenSteerPlugInTemplate)tmpl)
+SteerPlugIn::SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 	"OpenSteerPlugIn::OpenSteerPlugIn: invalid GameAIManager")
@@ -43,50 +43,50 @@ OpenSteerPlugIn::OpenSteerPlugIn(SMARTPTR(OpenSteerPlugInTemplate)tmpl)
 	reset();
 }
 
-OpenSteerPlugIn::~OpenSteerPlugIn()
+SteerPlugIn::~SteerPlugIn()
 {
 	// TODO Auto-generated destructor stub
 }
 
-ComponentFamilyType OpenSteerPlugIn::familyType() const
+ComponentFamilyType SteerPlugIn::familyType() const
 {
 	return mTmpl->familyType();
 }
 
-ComponentType OpenSteerPlugIn::componentType() const
+ComponentType SteerPlugIn::componentType() const
 {
 	return mTmpl->componentType();
 }
 
-bool OpenSteerPlugIn::initialize()
+bool SteerPlugIn::initialize()
 {
 	bool result = true;
-	//set OpenSteerPlugIn parameters (store internally for future use)
+	//set SteerPlugIn parameters (store internally for future use)
 	//PlugIn type
 	std::string plugInStr = mTmpl->parameter(std::string("plugin_type"));
 	//
 	return result;
 }
 
-void OpenSteerPlugIn::onAddToObjectSetup()
+void SteerPlugIn::onAddToObjectSetup()
 {
 }
 
-void OpenSteerPlugIn::onRemoveFromObjectCleanup()
+void SteerPlugIn::onRemoveFromObjectCleanup()
 {
 	//
 	reset();
 }
 
-void OpenSteerPlugIn::onAddToSceneSetup()
+void SteerPlugIn::onAddToSceneSetup()
 {
 }
 
-void OpenSteerPlugIn::onRemoveFromSceneCleanup()
+void SteerPlugIn::onRemoveFromSceneCleanup()
 {
 }
 
-void OpenSteerPlugIn::update(void* data)
+void SteerPlugIn::update(void* data)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -100,6 +100,6 @@ void OpenSteerPlugIn::update(void* data)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle OpenSteerPlugIn::_type_handle;
+TypeHandle SteerPlugIn::_type_handle;
 
 } /* namespace ely */
