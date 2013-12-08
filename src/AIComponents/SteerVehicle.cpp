@@ -23,6 +23,8 @@
 #include "AIComponents/SteerVehicle.h"
 #include "AIComponents/SteerVehicleTemplate.h"
 #include "Game/GameAIManager.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
@@ -60,6 +62,23 @@ ComponentType SteerVehicle::componentType() const
 bool SteerVehicle::initialize()
 {
 	bool result = true;
+	//throw events setting
+	mThrowEvents = (
+			mTmpl->parameter(std::string("throw_events"))
+					== std::string("true") ? true : false);
+	//mov type
+	std::string movType = mTmpl->parameter(std::string("mov_type"));
+	if (movType == std::string("kinematic"))
+	{
+		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+				"SteerVehicle::initialize: invalid GamePhysicsManager")
+		mMovType = OPENSTEER_KINEMATIC
+		;
+	}
+	else
+	{
+		mMovType = OPENSTEER;
+	}
 	//type
 	std::string type = mTmpl->parameter(std::string("type"));
 	if (type == std::string(""))
@@ -74,32 +93,43 @@ bool SteerVehicle::initialize()
 	}
 	//get settings
 	SimpleVehicleSettings settings;
-	//radius (default: automatically computed)
-	std::string radius = mTmpl->parameter(std::string("radius"));
-	if (not radius.empty())
-	{
-		settings.m_radius = strtof(radius.c_str(), NULL);
-	}
+	//radius
+	mInputRadius = strtof(mTmpl->parameter(std::string("radius")).c_str(),
+	NULL);
+	//
+	float value;
+	//mass
+	value = strtof(mTmpl->parameter(std::string("mass")).c_str(),
+	NULL);
+	settings.m_mass = (value > 0.0 ? value : 1.0);
+	//speed
+	value = strtof(mTmpl->parameter(std::string("speed")).c_str(),
+	NULL);
+	settings.m_speed = (value > 0.0 ? value : -value);
+	//max force
+	value = strtof(mTmpl->parameter(std::string("max_force")).c_str(),
+	NULL);
+	settings.m_maxForce = (value > 0.0 ? value : -value);
+	//max speed
+	value = strtof(mTmpl->parameter(std::string("max_speed")).c_str(),
+	NULL);
+	settings.m_maxSpeed = (value > 0.0 ? value : 1.0);
+	//set vehicle settings
+	mVehicle->setSettings(settings);
 	//
 	return result;
 }
 
 void SteerVehicle::onAddToObjectSetup()
 {
+
 }
 
 void SteerVehicle::onRemoveFromObjectCleanup()
 {
 	//
+	delete mVehicle;
 	reset();
-}
-
-void SteerVehicle::onAddToSceneSetup()
-{
-}
-
-void SteerVehicle::onRemoveFromSceneCleanup()
-{
 }
 
 void SteerVehicle::update(void* data)

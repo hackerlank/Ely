@@ -1,6 +1,6 @@
 # PANDA3D_SEARCH
 # --------------
-# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS, PANDA3D_LIBS, PANDA3D_RN_PHYSICS_LIBS
+# Defines: PANDA3D_CPPFLAGS, PANDA3D_LDFLAGS, PANDA3D_LIBS
 # Argument: expected PYTHON_CPPFLAGS
 # Searches SDK first on cmd line flags then on std locations
 #
@@ -66,8 +66,6 @@ fi
 # check libraries first from cmd line specified ones
 RN_LDFLAGS=""
 RN_LIBS="-lrecastnavigation"
-#RN_PHYSICS_LIBS is not included in PANDA3D_LIBS
-RN_PHYSICS_LIBS="-lrecastnavigationphysics"
 			
 LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${RN_LIBS} ${LIBS_CMDLINE}"
@@ -95,11 +93,55 @@ if test "x${required_libraries}" != xyes; then
 	----------------------------------------])
 fi
 #
+###OpenSteer###
+# check header first from cmd line specified include
+AC_MSG_NOTICE([Looking for OpenSteer headers...])
+OS_CPPFLAGS="-I/usr/include/OpenSteer -I/usr/local/include/OpenSteer"
+CPPFLAGS="${OS_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
+AC_CHECK_HEADERS([SteerLibrary.h])
+if test "x${ac_cv_header_SteerLibrary_h}" != xyes; then
+	AC_MSG_ERROR([
+	----------------------------------------
+	The OpenSteer header files are
+	required to build Ely. Stopping...
+	Check 'config.log' for more information.
+	----------------------------------------])
+fi
+# check libraries first from cmd line specified ones
+OS_LDFLAGS=""
+OS_LIBS="-lOpenSteer"
+			
+LDFLAGS="${OS_LDFLAGS} ${LDFLAGS_CMDLINE}"
+LIBS="${OS_LIBS} ${LIBS_CMDLINE}"
+required_libraries=yes
+os_prologue="#include <SteerLibrary.h>"
+os_body="
+	int argc=1;
+	char** argv=0;
+	
+	####################################################/////
+	####################################################/////
+	
+  	"  	
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([$os_prologue],[$os_body])],
+  AC_MSG_NOTICE([OpenSteer libraries... yes]) 
+  AC_DEFINE([HAVE_OS], 1, [OpenSteer enabled]),
+  [required_libraries="OpenSteer"]
+)
+if test "x${required_libraries}" != xyes; then
+	AC_MSG_ERROR([
+	----------------------------------------
+	The ${required_libraries} libraries are
+	required to build Ely. Stopping...
+	Check 'config.log' for more information.
+	----------------------------------------])
+fi
+#
 #Define third party flags
-PANDA3D_THIRDPARTY_CPPFLAGS="${BULLET_CPPFLAGS} ${EIGEN_CPPFLAGS} ${RN_CPPFLAGS}"
-PANDA3D_THIRDPARTY_LDFLAGS="${BULLET_LDFLAGS} ${EIGEN_LDFLAGS} ${RN_LDFLAGS}"
-PANDA3D_THIRDPARTY_LIBS="${BULLET_LIBS} ${EIGEN_LIBS} ${RN_LIBS}"
-PANDA3D_THIRDPARTY_RN_PHYSICS_LIBS="${BULLET_LIBS} ${EIGEN_LIBS} ${RN_PHYSICS_LIBS}"
+PANDA3D_THIRDPARTY_CPPFLAGS="${BULLET_CPPFLAGS} ${EIGEN_CPPFLAGS} ${RN_CPPFLAGS} ${OS_CPPFLAGS}"
+PANDA3D_THIRDPARTY_LDFLAGS="${BULLET_LDFLAGS} ${EIGEN_LDFLAGS} ${RN_LDFLAGS} ${OS_LDFLAGS}"
+PANDA3D_THIRDPARTY_LIBS="${BULLET_LIBS} ${EIGEN_LIBS} ${RN_LIBS} ${OS_LIBS}"
 #
 ###Panda3d SDK###
 # check headers first from cmd line specified ones
@@ -122,10 +164,6 @@ PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
 			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
 			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${PANDA3D_THIRDPARTY_LIBS}"
-PANDA3D_RN_PHYSICS_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
-			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
-			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
-			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${PANDA3D_THIRDPARTY_RN_PHYSICS_LIBS}"
 			
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3D_LIBS} ${LIBS_CMDLINE}"

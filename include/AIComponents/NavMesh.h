@@ -54,7 +54,7 @@ class NavMeshTemplate;
  * XML Param(s):
  * - "navmesh_type"					|single|"solo" (values: solo|tile|obstacle)
  * - "auto_setup"					|single|"true"
- * - "mov_type"						|single|"recast" (values: recast|kinematic|character)
+ * - "mov_type"						|single|"recast" (values: recast|kinematic)
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
  * - "agent_height"					|single|"2.0"

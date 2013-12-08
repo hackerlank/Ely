@@ -98,8 +98,8 @@ bool NavMesh::initialize()
 	if (movType == std::string("kinematic"))
 	{
 		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
-				"NavMesh::NavMesh: invalid GamePhysicsManager")
-		mMovType = KINEMATIC;
+				"NavMesh::initialize: invalid GamePhysicsManager")
+		mMovType = RECAST_KINEMATIC;
 	}
 	else
 	{

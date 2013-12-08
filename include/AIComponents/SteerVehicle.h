@@ -24,25 +24,44 @@
 #define STEERVEHICLE_H_
 
 #include "ObjectModel/Component.h"
+#include <OpenSteer/SimpleVehicle.h>
 
 namespace ely
 {
 
 class SteerVehicleTemplate;
-class SimpleVehicle;
+template<typename Super> class SimpleVehicleMixin;
+typedef SimpleVehicleMixin<OpenSteer::SimpleVehicle> SimpleVehicle;;
+
+///Vehicle movement type.
+enum VehicleMovTypeEnum
+{
+	OPENSTEER,
+	OPENSTEER_KINEMATIC,
+	VehicleMovType_NONE
+};
 
 /**
  * \brief Component implementing OpenSteer Vehicles.
  *
  * \see http://opensteer.sourceforge.net
  *
+ * This component should be associated to a "Scene" component.\n
+ * Ife enabled, this component will throw an event on starting to move, and
+ * an event on stopping to move. The second argument of both is a reference
+ * to the owner object.\n
+ * This component can throw (if enabled) "OnStartCrowdAgent" and "OnStopCrowdAgent"
+ * events.
+ *
  * XML Param(s):
+ * - "throw_events"				|single|"false"
+ * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
  * - "type"						|single|"one_turning" (values: one_turning|)
  * - "mass"						|single|"1.0"
  * - "radius"					|single|no default
- * - "speed"					|single|"1.0"
- * - "maxForce"					|single|"1.0"
- * - "maxSpeed"					|single|"1.0"
+ * - "speed"					|single|"0.0"
+ * - "max_force"				|single|"0.1"
+ * - "max_speed"				|single|"1.0"
  *
  * \note parts inside [] are optional.\n
  */
@@ -85,6 +104,13 @@ public:
 private:
 	///Current underlying Vehicle.
 	SimpleVehicle* mVehicle;
+	///Input radius.
+	float mInputRadius;
+	///The movement type.
+	VehicleMovTypeEnum mMovType;
+
+	///Throwing events.
+	bool mThrowEvents, mVehicleStartSent, mVehicleStopSent;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -118,6 +144,17 @@ inline void SteerVehicle::reset()
 {
 	//
 	mVehicle = NULL;
+	mInputRadius = 0.0;
+	mMovType = OPENSTEER;
+	mThrowEvents = mVehicleStartSent = mVehicleStopSent = false;
+}
+
+inline void SteerVehicle::onAddToSceneSetup()
+{
+}
+
+inline void SteerVehicle::onRemoveFromSceneCleanup()
+{
 }
 
 inline SimpleVehicle& SteerVehicle::getSimpleVehicle()

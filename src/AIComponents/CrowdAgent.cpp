@@ -116,7 +116,6 @@ bool CrowdAgent::initialize()
 	//
 	float value;
 	int valueInt;
-	char valueChar;
 	//max acceleration
 	value = strtof(mTmpl->parameter(std::string("max_acceleration")).c_str(),
 	NULL);
@@ -331,7 +330,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 			case RECAST:
 				ownerObjectNP.set_pos(pos);
 				break;
-			case KINEMATIC:
+			case RECAST_KINEMATIC:
 				//set recast pos anyway
 				kinematicPos = pos;
 				//correct z
