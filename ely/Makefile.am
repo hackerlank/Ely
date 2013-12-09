@@ -38,7 +38,9 @@ ely_libraries = \
 		$(top_builddir)/src/libsupport.a
 		
 whole_archives = \
-		-Wl,$(top_builddir)/src/libsupport.a
+		-Wl,$(top_builddir)/src/libsupport.a \
+		-Wl,$(top_builddir)/src/librecastnavigation.a \
+		-Wl,$(top_builddir)/src/libopensteer.a
 
 #ely
 ely_SOURCES = \

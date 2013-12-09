@@ -63,7 +63,7 @@
 #include "AIComponents/OpenSteerLocal/common.h"
 
 #include "AIComponents/OpenSteerLocal/DrawMeshDrawer.h"
-extern ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
+ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
 
 // ----------------------------------------------------------------------------
 
@@ -989,6 +989,19 @@ void drawSphereObstacle(const SphereObstacle& so, const float maxEdgeLength,
 	}
 	drawSphere(so.center, so.radius, maxEdgeLength, filled, color, front, back,
 			viewpoint);
+}
+
+///XXX
+//Flags and functions expected by OpenSteer as defined
+bool enableAnnotation = true;
+bool drawPhaseActive = true;
+bool updatePhaseActive = false;
+void drawCameraLookAt(OpenSteer::Vec3 const&, OpenSteer::Vec3 const&,
+		OpenSteer::Vec3 const&)
+{
+}
+void warnIfInUpdatePhase2(const char*)
+{
 }
 
 } // namespace OpenSteer

@@ -2,6 +2,7 @@ AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/tinyxml2 $(ELY_C
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
+#ltlibraries
 noinst_LTLIBRARIES = \
 		libgame.la \
 		libaicomponents.la \
@@ -14,28 +15,13 @@ noinst_LTLIBRARIES = \
 		libobjectmodel.la \
 		libutilities.la
 
+#libraries
 noinst_LIBRARIES = \
-		libsupport.a
+		libsupport.a \
+		librecastnavigation.a \
+		libopensteer.a
 
-recastnavigation_sources = \
-		AIComponents/RecastNavigation/InputGeom.cpp \
-		AIComponents/RecastNavigation/ChunkyTriMesh.cpp \
-		AIComponents/RecastNavigation/MeshLoaderObj.cpp \
-		AIComponents/RecastNavigation/DebugInterfaces.cpp \
-		AIComponents/RecastNavigation/PerfTimer.cpp \
-		AIComponents/RecastNavigation/NavMeshType.cpp \
-		AIComponents/RecastNavigation/NavMeshType_Tile.cpp \
-		AIComponents/RecastNavigation/NavMeshType_Solo.cpp \
-		AIComponents/RecastNavigation/NavMeshType_Obstacle.cpp \
-		AIComponents/RecastNavigation/fastlz.c \
-		AIComponents/RecastNavigation/ConvexVolumeTool.cpp \
-		AIComponents/RecastNavigation/CrowdTool.cpp \
-		AIComponents/RecastNavigation/OffMeshConnectionTool.cpp
-
-opensteer_sources = \
-		AIComponents/OpenSteerLocal/Draw.cpp \
-		AIComponents/OpenSteerLocal/DrawMeshDrawer.cpp
-			
+#ltlibraries sources
 libaicomponents_la_SOURCES = \
 		AIComponents/Steering.cpp  \
 		AIComponents/SteeringTemplate.cpp \
@@ -46,9 +32,7 @@ libaicomponents_la_SOURCES = \
 		AIComponents/SteerPlugIn.cpp \
 		AIComponents/SteerPlugInTemplate.cpp \
 		AIComponents/SteerVehicle.cpp \
-		AIComponents/SteerVehicleTemplate.cpp \
-		$(recastnavigation_sources) \
-		$(opensteer_sources)
+		AIComponents/SteerVehicleTemplate.cpp
 
 libaudiocomponents_la_SOURCES = \
 		AudioComponents/Listener.cpp \
@@ -108,6 +92,7 @@ libscenecomponents_la_SOURCES = \
 libutilities_la_SOURCES = \
 		Utilities/Tools.cpp
 
+#libraries sources
 libsupport_a_SOURCES = \
 		Support/FirstPersonCamera.cpp \
 		Support/FSM.cpp \
@@ -116,3 +101,21 @@ libsupport_a_SOURCES = \
 		Support/Distributed/ClientRepositoryBase.cpp \
 		Support/Distributed/DistributedObjectBase.cpp
 
+librecastnavigation_a_SOURCES = \
+		AIComponents/RecastNavigation/InputGeom.cpp \
+		AIComponents/RecastNavigation/ChunkyTriMesh.cpp \
+		AIComponents/RecastNavigation/MeshLoaderObj.cpp \
+		AIComponents/RecastNavigation/DebugInterfaces.cpp \
+		AIComponents/RecastNavigation/PerfTimer.cpp \
+		AIComponents/RecastNavigation/NavMeshType.cpp \
+		AIComponents/RecastNavigation/NavMeshType_Tile.cpp \
+		AIComponents/RecastNavigation/NavMeshType_Solo.cpp \
+		AIComponents/RecastNavigation/NavMeshType_Obstacle.cpp \
+		AIComponents/RecastNavigation/fastlz.c \
+		AIComponents/RecastNavigation/ConvexVolumeTool.cpp \
+		AIComponents/RecastNavigation/CrowdTool.cpp \
+		AIComponents/RecastNavigation/OffMeshConnectionTool.cpp
+
+libopensteer_a_SOURCES = \
+		AIComponents/OpenSteerLocal/Draw.cpp \
+		AIComponents/OpenSteerLocal/DrawMeshDrawer.cpp
