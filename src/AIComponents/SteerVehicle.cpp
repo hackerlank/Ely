@@ -22,17 +22,19 @@
  */
 #include "AIComponents/SteerVehicle.h"
 #include "AIComponents/SteerVehicleTemplate.h"
-#include "Game/GameAIManager.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
+#include "ObjectModel/Object.h"
+#include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
 
+typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
+
 SteerVehicle::SteerVehicle()
 {
 	// TODO Auto-generated constructor stub
-
 }
 
 SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl)
@@ -72,8 +74,7 @@ bool SteerVehicle::initialize()
 	{
 		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 				"SteerVehicle::initialize: invalid GamePhysicsManager")
-		mMovType = OPENSTEER_KINEMATIC
-		;
+		mMovType = OPENSTEER_KINEMATIC;
 	}
 	else
 	{
@@ -89,19 +90,18 @@ bool SteerVehicle::initialize()
 	}
 	else
 	{
-		mVehicle = new OneTurning;
+		mVehicle = new OneTurning<SteerVehicle>;
 	}
 	//get settings
-	SimpleVehicleSettings settings;
-	//radius
-	mInputRadius = strtof(mTmpl->parameter(std::string("radius")).c_str(),
-	NULL);
-	//
+	VehicleSettings settings;
 	float value;
 	//mass
 	value = strtof(mTmpl->parameter(std::string("mass")).c_str(),
 	NULL);
 	settings.m_mass = (value > 0.0 ? value : 1.0);
+	//radius
+	mInputRadius = strtof(mTmpl->parameter(std::string("radius")).c_str(),
+	NULL);
 	//speed
 	value = strtof(mTmpl->parameter(std::string("speed")).c_str(),
 	NULL);
@@ -115,14 +115,32 @@ bool SteerVehicle::initialize()
 	NULL);
 	settings.m_maxSpeed = (value > 0.0 ? value : 1.0);
 	//set vehicle settings
-	mVehicle->setSettings(settings);
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
 	//
 	return result;
 }
 
 void SteerVehicle::onAddToObjectSetup()
 {
-
+	//set definitive radius
+	if (mInputRadius <= 0.0)
+	{
+		//auto compute radius
+		LPoint3f minP, maxP;
+		mOwnerObject->getNodePath().calc_tight_bounds(minP, maxP);
+		float radius = (maxP - minP).length() / 2.0;
+		// store new radius into settings
+		VehicleSettings settings =
+				dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
+		settings.m_radius = radius;
+		dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
+		// update radius into vehicle
+		mVehicle->setRadius(radius);
+	}
+	//set entity and its related update method
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
+			&SteerVehicle::doUpdateSteerVehicle);
 }
 
 void SteerVehicle::onRemoveFromObjectCleanup()
@@ -132,17 +150,16 @@ void SteerVehicle::onRemoveFromObjectCleanup()
 	reset();
 }
 
-void SteerVehicle::update(void* data)
+void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
+		const float elapsedTime)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	float dt = *(reinterpret_cast<float*>(data));
-
-#ifdef TESTING
-	dt = 0.016666667; //60 fps
-#endif
-
+	//update node path pos
+	LPoint3f pos = OpenSteerVec3ToLVecBase3f(mVehicle->position());
+	mOwnerObject->getNodePath().set_pos(pos);
+	//update node path dir
+	mOwnerObject->getNodePath().heads_up(
+			pos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
+			OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 }
 
 //TypedObject semantics: hardcoded

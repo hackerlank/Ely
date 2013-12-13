@@ -24,14 +24,12 @@
 #define STEERVEHICLE_H_
 
 #include "ObjectModel/Component.h"
-#include <OpenSteer/SimpleVehicle.h>
+#include <OpenSteer/AbstractVehicle.h>
 
 namespace ely
 {
 
 class SteerVehicleTemplate;
-template<typename Super> class SimpleVehicleMixin;
-typedef SimpleVehicleMixin<OpenSteer::SimpleVehicle> SimpleVehicle;;
 
 ///Vehicle movement type.
 enum VehicleMovTypeEnum
@@ -86,28 +84,23 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
-	 * \brief Updates OpenSteer underlying component.
-	 *
-	 * Will be called automatically by an ai manager update.
-	 * @param data The custom data.
-	 */
-	virtual void update(void* data);
-
-	/**
 	 * \name SimpleVehicle reference getter & conversion function.
 	 */
 	///@{
-	SimpleVehicle& getSimpleVehicle();
-	operator SimpleVehicle&();
+	OpenSteer::AbstractVehicle& getAbstractVehicle();
+	operator OpenSteer::AbstractVehicle&();
 	///@}
 
 private:
 	///Current underlying Vehicle.
-	SimpleVehicle* mVehicle;
+	OpenSteer::AbstractVehicle* mVehicle;
 	///Input radius.
 	float mInputRadius;
 	///The movement type.
 	VehicleMovTypeEnum mMovType;
+
+	///Called by the underlying OpenSteer component update.
+	void doUpdateSteerVehicle(const float currentTime, const float elapsedTime);
 
 	///Throwing events.
 	bool mThrowEvents, mVehicleStartSent, mVehicleStopSent;
@@ -157,12 +150,12 @@ inline void SteerVehicle::onRemoveFromSceneCleanup()
 {
 }
 
-inline SimpleVehicle& SteerVehicle::getSimpleVehicle()
+inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
 {
 	return *mVehicle;
 }
 
-inline SteerVehicle::operator SimpleVehicle&()
+inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 {
 	return *mVehicle;
 }

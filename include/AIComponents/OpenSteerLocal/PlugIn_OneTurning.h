@@ -58,7 +58,8 @@ using namespace OpenSteer;
 
 // ----------------------------------------------------------------------------
 
-class OneTurning: public SimpleVehicle
+template<typename Entity>
+class OneTurning: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
 public:
 
@@ -75,33 +76,33 @@ public:
 	void reset(void)
 	{
 		SimpleVehicle::reset(); // reset the vehicle
-		setSpeed(1.5f);         // speed along Forward direction.
-		setMaxForce(0.3f);      // steering force is clipped to this magnitude
-		setMaxSpeed(5);         // velocity is clipped to this magnitude
-		clearTrailHistory();    // prevent long streaks due to teleportation
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		this->clearTrailHistory();  // prevent long streaks due to teleportation
 	}
 
 	// per frame simulation update
 	void update(const float currentTime, const float elapsedTime)
 	{
-		applySteeringForce(Vec3(-2, 0, -3), elapsedTime);
-		annotationVelocityAcceleration();
-		recordTrailVertex(currentTime, position());
-		//update actor
-		updateNodePath(currentTime, elapsedTime);
+		this->applySteeringForce(Vec3(-2, 0, -3), elapsedTime);
+		this->annotationVelocityAcceleration();
+		this->recordTrailVertex(currentTime, this->position());
+
+		//eventually update the entity
+		this->entityUpdate(currentTime, elapsedTime);
 	}
 
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
 		drawBasic2dCircularVehicle(*this, gGray50);
-		drawTrail();
+		this->drawTrail();
 	}
 };
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
+template<typename Entity>
 class OneTurningPlugIn: public PlugIn
 {
 public:
@@ -123,7 +124,7 @@ public:
 
 	void open(void)
 	{
-		gOneTurning = new OneTurning;
+		gOneTurning = new OneTurning<Entity>;
 //            OpenSteerDemo::selectedVehicle = gOneTurning;
 		theVehicle.push_back(gOneTurning);
 
@@ -185,12 +186,12 @@ public:
 		return (const AVGroup&) theVehicle;
 	}
 
-	OneTurning* gOneTurning;
+	OneTurning<Entity>* gOneTurning;
 //	std::vector<OneTurning*> theVehicle; // for allVehicles
-	OneTurning::groupType theVehicle; // for allVehicles
-	typedef OneTurning::groupType::const_iterator iterator;
+	typename OneTurning<Entity>::groupType theVehicle; // for allVehicles
+	typedef typename OneTurning<Entity>::groupType::const_iterator iterator;
 };
 
-}// ely namespace
+} // ely namespace
 
 #endif /* PLUGIN_ONETURNING_H_ */

@@ -55,9 +55,9 @@ inline LVecBase4f OpenSteerColorToLVecBase4f(const OpenSteer::Color& c)
 }
 
 /**
- * \brief SimpleVehicle settings.
+ * \brief Vehicle settings.
  */
-struct SimpleVehicleSettings
+struct VehicleSettings
 {
 	// mass
 	float m_mass;
@@ -71,45 +71,53 @@ struct SimpleVehicleSettings
 	float m_maxSpeed;
 };
 
-template<typename Super>
-class SimpleVehicleMixin: public Super
+template<typename Super, typename Entity>
+class VehicleAddOnMixin: public Super
 {
 public:
 
-	void updateNodePath(const float currentTime, const float elapsedTime)
+	typedef Entity* ENTITY;
+	typedef void (Entity::*ENTITYUPDATEMETHOD)(const float, const float);
+
+	void setEntity(ENTITY entity)
 	{
-		//update node path
-		LPoint3f pos = OpenSteerVec3ToLVecBase3f(this->position());
-		m_nodePath.set_pos(pos);
-		m_nodePath.heads_up(pos - OpenSteerVec3ToLVecBase3f(this->forward()),
-				OpenSteerVec3ToLVecBase3f(this->up()));
+		m_entity = entity;
 	}
 
-	void setNodePath(NodePath nodePath)
+	void setEntityUpdateMethod(ENTITYUPDATEMETHOD entityUpdateMethod)
 	{
-		m_nodePath = nodePath;
-		// set size of bounding sphere
-		LPoint3f minP, maxP;
-		nodePath.calc_tight_bounds(minP, maxP);
-		this->setRadius((maxP - minP).length() / 2.0);
+		m_entityUpdateMethod = entityUpdateMethod;
 	}
 
-	SimpleVehicleSettings& getSettings()
+	void entityUpdate(const float currentTime, const float elapsedTime)
+	{
+		(m_entity->*m_entityUpdateMethod)(currentTime, elapsedTime);
+	}
+
+	VehicleSettings& getSettings()
 	{
 		return m_settings;
 	}
 
-	void setSettings(const SimpleVehicleSettings& settings)
+	void setSettings(const VehicleSettings& settings)
 	{
 		m_settings = settings;
 	}
 
-protected:
-	NodePath m_nodePath;
-	SimpleVehicleSettings m_settings;
-};
+	void reset()
+	{
+		Super::setMass(m_settings.m_mass);
+		Super::setRadius(m_settings.m_radius);
+		Super::setSpeed(m_settings.m_speed); // speed along Forward direction.
+		Super::setMaxForce(m_settings.m_maxForce); // steering force is clipped to this magnitude
+		Super::setMaxSpeed(m_settings.m_maxSpeed); // velocity is clipped to this magnitude
+	}
 
-typedef SimpleVehicleMixin<OpenSteer::SimpleVehicle> SimpleVehicle;
+protected:
+	ENTITY m_entity;
+	ENTITYUPDATEMETHOD m_entityUpdateMethod;
+	VehicleSettings m_settings;
+};
 
 }
 

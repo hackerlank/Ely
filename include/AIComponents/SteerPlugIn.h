@@ -40,7 +40,7 @@ class SteerPlugInTemplate;
  * (i.e. is_steady=true) "Scene" components.\n
  *
  * XML Param(s):
- * - "plugin_type"					|single|"solo" (values: solo|tile|obstacle)
+ * - "plugin_type"					|single|"one_turning" (values: one_turning|)
  *
  * \note parts inside [] are optional.\n
  */
@@ -73,8 +73,8 @@ public:
 	virtual void update(void* data);
 
 private:
-	///Current underlying PlugIn.
-	OpenSteer::PlugIn* mPlugIn;
+	///Current underlying AbstractPlugIn.
+	OpenSteer::AbstractPlugIn* mPlugIn;
 
 	///TypedObject semantics: hardcoded
 public:
