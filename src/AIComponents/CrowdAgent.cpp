@@ -25,7 +25,6 @@
 #include "AIComponents/CrowdAgentTemplate.h"
 #include "AIComponents/NavMesh.h"
 #include "AIComponents/RecastNavigation/CrowdTool.h"
-#include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"

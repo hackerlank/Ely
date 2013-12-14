@@ -1214,24 +1214,30 @@ NavMesh::Result NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 		//return if destroying
 		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-		//return if crowdAgent belongs to some mesh
-		RETURN_ON_COND(crowdAgent->mNavMesh, Result::ERROR)
-
-		//do real adding to update list
-		doAddCrowdAgentToUpdateList(crowdAgent);
-
-		//return if NavMesh has not been setup yet
-		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
-
-		//do real adding to recast update
-		result = doAddCrowdAgentToRecastUpdate(crowdAgent);
-		//check if adding to recast was successful
-		if (not result)
 		{
-			//remove CrowdAgent from update too (if previously added)
-			mCrowdAgents.erase(
-			find(mCrowdAgents.begin(), mCrowdAgents.end(),
-					crowdAgent));
+			//lock (guard) the crowdAgent mutex
+			HOLD_REMUTEX(crowdAgent->mMutex)
+
+			//return if crowdAgent is destroying or belongs to some mesh
+			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
+			RETURN_ON_COND(crowdAgent->mNavMesh, Result::ERROR)
+
+			//do real adding to update list
+			doAddCrowdAgentToUpdateList(crowdAgent);
+
+			//return if NavMesh has not been setup yet
+			RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+
+			//do real adding to recast update
+			result = doAddCrowdAgentToRecastUpdate(crowdAgent);
+			//check if adding to recast was successful
+			if (not result)
+			{
+				//remove CrowdAgent from update too (if previously added)
+				mCrowdAgents.erase(
+				find(mCrowdAgents.begin(), mCrowdAgents.end(),
+						crowdAgent));
+			}
 		}
 	}
 	//
@@ -1340,17 +1346,23 @@ NavMesh::Result NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 		//return if destroying
 		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
-		//return if crowdAgent doesn't belong to any mesh
-		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+		{
+			//lock (guard) the crowdAgent mutex
+			HOLD_REMUTEX(crowdAgent->mMutex)
 
-		//remove from update list
-		doRemoveCrowdAgentFromUpdateList(crowdAgent);
+			//return if crowdAgent is destroying or doesn't belong to any mesh
+			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
+			RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
 
-		//return if NavMesh has not been setup yet
-		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+			//remove from update list
+			doRemoveCrowdAgentFromUpdateList(crowdAgent);
 
-		//remove from recast update
-		doRemoveCrowdAgentFromRecastUpdate(crowdAgent);
+			//return if NavMesh has not been setup yet
+			RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+
+			//remove from recast update
+			doRemoveCrowdAgentFromRecastUpdate(crowdAgent);
+		}
 	}
 	//
 	return Result::OK;

@@ -24,12 +24,14 @@
 #define STEERVEHICLE_H_
 
 #include "ObjectModel/Component.h"
-#include <OpenSteer/AbstractVehicle.h>
+#include "ObjectModel/Object.h"
+#include "OpenSteerLocal/common.h"
 
 namespace ely
 {
 
 class SteerVehicleTemplate;
+class SteerPlugIn;
 
 ///Vehicle movement type.
 enum VehicleMovTypeEnum
@@ -53,6 +55,7 @@ enum VehicleMovTypeEnum
  *
  * XML Param(s):
  * - "throw_events"				|single|"false"
+ * - "add_to_plugin"			|single|""
  * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
  * - "type"						|single|"one_turning" (values: one_turning|)
  * - "mass"						|single|"1.0"
@@ -67,6 +70,7 @@ class SteerVehicle: public Component
 {
 protected:
 	friend class SteerVehicleTemplate;
+	friend class SteerPlugIn;
 
 	virtual void reset();
 	virtual bool initialize();
@@ -84,7 +88,15 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
-	 * \name SimpleVehicle reference getter & conversion function.
+	 * \name Getters/setters of SteerVehicle default settings.
+	 */
+	///@{
+	void setSettings(const VehicleSettings& settings);
+	VehicleSettings getSettings();
+	///@}
+
+	/**
+	 * \name AbstractVehicle reference getter & conversion function.
 	 */
 	///@{
 	OpenSteer::AbstractVehicle& getAbstractVehicle();
@@ -94,6 +106,9 @@ public:
 private:
 	///Current underlying Vehicle.
 	OpenSteer::AbstractVehicle* mVehicle;
+	///The SteerPlugIn owner object.
+	SMARTPTR(SteerPlugIn) mSteerPlugIn;
+	ObjectId mSteerPlugInObjectId;
 	///Input radius.
 	float mInputRadius;
 	///The movement type.
@@ -103,7 +118,7 @@ private:
 	void doUpdateSteerVehicle(const float currentTime, const float elapsedTime);
 
 	///Throwing events.
-	bool mThrowEvents, mVehicleStartSent, mVehicleStopSent;
+	bool mThrowEvents, mSteerVehicleStartSent, mSteerVehicleStopSent;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -137,9 +152,10 @@ inline void SteerVehicle::reset()
 {
 	//
 	mVehicle = NULL;
+	mSteerPlugInObjectId = ObjectId();
 	mInputRadius = 0.0;
 	mMovType = OPENSTEER;
-	mThrowEvents = mVehicleStartSent = mVehicleStopSent = false;
+	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
 }
 
 inline void SteerVehicle::onAddToSceneSetup()

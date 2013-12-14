@@ -177,8 +177,8 @@ public:
 	 * mechanism.
 	 *
 	 * If CrowdAgent belongs to any NavMesh it is not added.\n
-	 * @param crowdAgentObject The CrowdAgent object to add.
-	 * @return True if CrowdAgent was added to recast update, false otherwise.
+	 * @param crowdAgent The CrowdAgent to add.
+	 * @return Result::OK on successful addition, various error conditions otherwise.
 	 */
 	Result addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent);
 
@@ -187,8 +187,8 @@ public:
 	 * mechanism.
 	 *
 	 * If CrowdAgent doesn't belong to any NavMesh it is not removed.\n
-	 * @param crowdAgentObject The CrowdAgent object to add.
-	 * @return True if CrowdAgent was added to recast update, false otherwise.
+	 * @param crowdAgent The CrowdAgent to remove.
+	 * @return Result::OK on successful removal, various error conditions otherwise.
 	 */
 	Result removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent);
 
@@ -364,6 +364,7 @@ private:
 	///@}
 
 	///The mutex associated with all NavMesh components.
+	///Protects addition/removal of CrowdAgents.
 	static ReMutex mStaticMutex;
 
 #ifdef ELY_DEBUG

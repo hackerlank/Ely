@@ -21,8 +21,8 @@
  * \author marco
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef RECASTNAVIGATIONCOMMON_H_
+#define RECASTNAVIGATIONCOMMON_H_
 
 #include <lvector3.h>
 
@@ -94,4 +94,4 @@ inline unsigned int ilog2(unsigned int v)
 
 } // namespace ely
 
-#endif /* COMMON_H_ */
+#endif /* RECASTNAVIGATIONCOMMON_H_ */

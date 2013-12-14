@@ -21,12 +21,11 @@
  * \author consultit
  */
 
-#ifndef COMMON_H_
-#define COMMON_H_
+#ifndef OPENSTEERLOCALCOMMON_H_
+#define OPENSTEERLOCALCOMMON_H_
 
 #include <algorithm>
 #include <nodePath.h>
-#include <animControlCollection.h>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/AbstractVehicle.h>
@@ -121,4 +120,4 @@ protected:
 
 }
 
-#endif /* COMMON_H_ */
+#endif /* OPENSTEERLOCALCOMMON_H_ */

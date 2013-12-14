@@ -23,6 +23,7 @@
 
 #include "AIComponents/SteerPlugIn.h"
 #include "AIComponents/SteerPlugInTemplate.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
@@ -30,8 +31,6 @@ namespace ely
 
 SteerPlugIn::SteerPlugIn()
 {
-	// TODO Auto-generated constructor stub
-
 }
 
 SteerPlugIn::SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl)
@@ -45,7 +44,6 @@ SteerPlugIn::SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl)
 
 SteerPlugIn::~SteerPlugIn()
 {
-	// TODO Auto-generated destructor stub
 }
 
 ComponentFamilyType SteerPlugIn::familyType() const
@@ -62,14 +60,26 @@ bool SteerPlugIn::initialize()
 {
 	bool result = true;
 	//set SteerPlugIn parameters (store internally for future use)
-	//PlugIn type
-	std::string plugInStr = mTmpl->parameter(std::string("plugin_type"));
+	//type
+	std::string type = mTmpl->parameter(std::string("plugin_type"));
+	if (type == std::string(""))
+	{
+	}
+	else if (type == std::string(""))
+	{
+	}
+	else
+	{
+		//default: OneTurningPlugIn
+		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
+	}
 	//
 	return result;
 }
 
 void SteerPlugIn::onAddToObjectSetup()
 {
+	mPlugIn->open();
 }
 
 void SteerPlugIn::onRemoveFromObjectCleanup()
@@ -78,12 +88,63 @@ void SteerPlugIn::onRemoveFromObjectCleanup()
 	reset();
 }
 
-void SteerPlugIn::onAddToSceneSetup()
+SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
 {
+	RETURN_ON_COND(not steerVehicle,false)
+
+	bool result;
+	//lock (guard) the static mutex
+	HOLD_REMUTEX(mStaticMutex)
+	{
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//return if destroying
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
+
+		{
+			//lock (guard) the steerVehicle mutex
+			HOLD_REMUTEX(steerVehicle->mMutex)
+
+			//return if steerVehicle is destroying or belongs to some plug in
+			RETURN_ON_ASYNC_COND(steerVehicle->mDestroying, Result::Result::ERROR)
+			RETURN_ON_COND(steerVehicle->mSteerPlugIn, Result::ERROR)
+
+			//do real adding to update list
+//			doAddCrowdAgentToUpdateList(crowdAgent);
+		}
+	}
+	//
+	return (result = true ? Result::OK:Result::ERROR);
 }
 
-void SteerPlugIn::onRemoveFromSceneCleanup()
+SteerPlugIn::Result SteerPlugIn::removeSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
 {
+	RETURN_ON_COND(not steerVehicle, Result::ERROR)
+
+	//lock (guard) the static mutex
+	HOLD_REMUTEX(mStaticMutex)
+	{
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//return if destroying
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
+
+		{
+			//lock (guard) the steerVehicle mutex
+			HOLD_REMUTEX(steerVehicle->mMutex)
+
+			//return if steerVehicle is destroying or doesn't belong to any plug in
+			RETURN_ON_ASYNC_COND(steerVehicle->mDestroying, Result::Result::ERROR)
+			RETURN_ON_COND(not steerVehicle->mSteerPlugIn, Result::ERROR)
+
+			//remove from update list
+//			doRemoveCrowdAgentFromUpdateList(crowdAgent);
+		}
+	}
+	//
+	return Result::OK;
 }
 
 void SteerPlugIn::update(void* data)
@@ -98,6 +159,8 @@ void SteerPlugIn::update(void* data)
 #endif
 
 }
+
+ReMutex SteerPlugIn::mStaticMutex;
 
 //TypedObject semantics: hardcoded
 TypeHandle SteerPlugIn::_type_handle;

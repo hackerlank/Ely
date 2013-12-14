@@ -22,10 +22,18 @@
  */
 #include "AIComponents/SteerVehicle.h"
 #include "AIComponents/SteerVehicleTemplate.h"
+#include "AIComponents/SteerPlugIn.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
-#include "ObjectModel/Object.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
+#include <throw_event.h>
+
+namespace
+{
+const std::string STARTEVENT("OnStartSteerVehicle");
+const std::string STOPEVENT("OnStopSteerVehicle");
+}  // namespace
 
 namespace ely
 {
@@ -34,7 +42,6 @@ typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
 
 SteerVehicle::SteerVehicle()
 {
-	// TODO Auto-generated constructor stub
 }
 
 SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl)
@@ -43,12 +50,12 @@ SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl)
 	"OpenSteerVehicle::OpenSteerVehicle: invalid GameAIManager")
 
 	mTmpl = tmpl;
+	mSteerPlugIn.clear();
 	reset();
 }
 
 SteerVehicle::~SteerVehicle()
 {
-	// TODO Auto-generated destructor stub
 }
 
 ComponentFamilyType SteerVehicle::familyType() const
@@ -68,6 +75,9 @@ bool SteerVehicle::initialize()
 	mThrowEvents = (
 			mTmpl->parameter(std::string("throw_events"))
 					== std::string("true") ? true : false);
+	//register to SteerPlugIn objectId
+	mSteerPlugInObjectId = ObjectId(
+			mTmpl->parameter(std::string("add_to_plugin")));
 	//mov type
 	std::string movType = mTmpl->parameter(std::string("mov_type"));
 	if (movType == std::string("kinematic"))
@@ -90,6 +100,7 @@ bool SteerVehicle::initialize()
 	}
 	else
 	{
+		//default: OneTurning
 		mVehicle = new OneTurning<SteerVehicle>;
 	}
 	//get settings
@@ -141,25 +152,93 @@ void SteerVehicle::onAddToObjectSetup()
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
 			&SteerVehicle::doUpdateSteerVehicle);
+
+	//set SteerPlugIn object (if any)
+	SMARTPTR(Object)steerPlugInObject = ObjectTemplateManager::
+	GetSingleton().getCreatedObject(mSteerPlugInObjectId);
+	//add to SteerPlugIn update
+	if (steerPlugInObject)
+	{
+		mSteerPlugIn = DCAST(SteerPlugIn,
+				steerPlugInObject->getComponent(familyType()));
+		//
+		if (mSteerPlugIn)
+		{
+			mSteerPlugIn->addSteerVehicle(this);
+		}
+	}
 }
 
 void SteerVehicle::onRemoveFromObjectCleanup()
 {
+	//lock (guard) the SteerPlugIn static mutex
+	HOLD_REMUTEX(SteerPlugIn::getStaticMutex())
+
+	//Remove from SteerPlugIn update (if previously added)
+	if (mSteerPlugIn)
+	{
+		mSteerPlugIn->removeSteerVehicle(this);
+	}
 	//
 	delete mVehicle;
+	mSteerPlugIn.clear();
 	reset();
+}
+
+void SteerVehicle::setSettings(const VehicleSettings& settings)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying,)
+
+	//set vehicle settings
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
+}
+
+VehicleSettings SteerVehicle::getSettings()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//get vehicle settings
+	return dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
 }
 
 void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 		const float elapsedTime)
 {
-	//update node path pos
-	LPoint3f pos = OpenSteerVec3ToLVecBase3f(mVehicle->position());
-	mOwnerObject->getNodePath().set_pos(pos);
-	//update node path dir
-	mOwnerObject->getNodePath().heads_up(
-			pos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
-			OpenSteerVec3ToLVecBase3f(mVehicle->up()));
+	if (mVehicle->speed() > 0.0)
+	{
+		//update node path pos
+		LPoint3f pos = OpenSteerVec3ToLVecBase3f(mVehicle->position());
+		mOwnerObject->getNodePath().set_pos(pos);
+		//update node path dir
+		mOwnerObject->getNodePath().heads_up(
+				pos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
+				OpenSteerVec3ToLVecBase3f(mVehicle->up()));
+
+		//throw SteerVehicleStart event (if enabled)
+		if (mThrowEvents and (not mSteerVehicleStartSent))
+		{
+			throw_event(STARTEVENT, EventParameter(this),
+					EventParameter(std::string(mOwnerObject->objectId())));
+			mSteerVehicleStartSent = true;
+			mSteerVehicleStopSent = false;
+		}
+	}
+	else
+	{
+		//throw SteerVehicleStop event (if enabled)
+		if (mThrowEvents and (not mSteerVehicleStopSent))
+		{
+			throw_event(STOPEVENT, EventParameter(this),
+					EventParameter(std::string(mOwnerObject->objectId())));
+			mSteerVehicleStopSent = true;
+			mSteerVehicleStartSent = false;
+		}
+	}
 }
 
 //TypedObject semantics: hardcoded

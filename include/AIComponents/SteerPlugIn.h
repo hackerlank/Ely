@@ -24,6 +24,7 @@
 #define STEERPLUGIN_H_
 
 #include "ObjectModel/Component.h"
+#include "SteerVehicle.h"
 #include <OpenSteer/PlugIn.h>
 
 namespace ely
@@ -64,6 +65,36 @@ public:
 	virtual ComponentFamilyType familyType() const;
 	virtual ComponentType componentType() const;
 
+	struct Result: public Component::Result
+	{
+		Result(int value):Component::Result(value)
+		{
+		}
+		enum
+		{
+		};
+	};
+
+	/**
+	 * \brief Adds a SteerVehicle component to the OpenSteer handling
+	 * mechanism.
+	 *
+	 * If SteerVehicle belongs to any SteerPlugIn it is not added.\n
+	 * @param steerVehicle The SteerVehicle to add.
+	 * @return Result::OK on successful addition, various error conditions otherwise.
+	 */
+	Result addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle);
+
+	/**
+	 * \brief Removes a SteerVehicle component from the OpenSteer handling
+	 * mechanism.
+	 *
+	 * If SteerVehicle doesn't belong to any SteerPlugIn it is not removed.\n
+	 * @param steerVehicle The SteerVehicle to remove.
+	 * @return Result::OK on successful removal, various error conditions otherwise.
+	 */
+	Result removeSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle);
+
 	/**
 	 * \brief Updates OpenSteer underlying component.
 	 *
@@ -72,9 +103,27 @@ public:
 	 */
 	virtual void update(void* data);
 
+	/**
+	 * \name AbstractPlugIn reference getter & conversion function.
+	 */
+	///@{
+	OpenSteer::AbstractPlugIn& getAbstractPlugIn();
+	operator OpenSteer::AbstractPlugIn&();
+	///@}
+
+	/**
+	 * \brief Get the static mutex associated with all SteerPlugIn components.
+	 * @return The static mutex.
+	 */
+	static ReMutex& getStaticMutex();
+
 private:
 	///Current underlying AbstractPlugIn.
 	OpenSteer::AbstractPlugIn* mPlugIn;
+
+	///The mutex associated with all SteerPlugIn components.
+	///Protects addition/removal of SteerVehicles.
+	static ReMutex mStaticMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -109,6 +158,29 @@ inline void SteerPlugIn::reset()
 	//
 	mPlugIn = NULL;
 
+}
+
+inline void SteerPlugIn::onAddToSceneSetup()
+{
+}
+
+inline void SteerPlugIn::onRemoveFromSceneCleanup()
+{
+}
+
+inline OpenSteer::AbstractPlugIn& SteerPlugIn::getAbstractPlugIn()
+{
+	return *mPlugIn;
+}
+
+inline SteerPlugIn::operator OpenSteer::AbstractPlugIn&()
+{
+	return *mPlugIn;
+}
+
+inline ReMutex& SteerPlugIn::getStaticMutex()
+{
+	return mStaticMutex;
 }
 
 } /* namespace ely */

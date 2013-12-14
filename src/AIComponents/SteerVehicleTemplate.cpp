@@ -76,6 +76,7 @@ void SteerVehicleTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
+	mParameterTable.insert(ParameterNameValue("add_to_plugin", ""));
 	mParameterTable.insert(ParameterNameValue("mov_type", "opensteer"));
 	mParameterTable.insert(ParameterNameValue("type", "one_turning"));
 	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
