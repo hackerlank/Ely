@@ -158,14 +158,6 @@ inline void SteerVehicle::reset()
 	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
 }
 
-inline void SteerVehicle::onAddToSceneSetup()
-{
-}
-
-inline void SteerVehicle::onRemoveFromSceneCleanup()
-{
-}
-
 inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
 {
 	return *mVehicle;

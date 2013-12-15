@@ -193,7 +193,7 @@ public:
 	Result removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent);
 
 	///@{
-	///CrowdAgents' requests handling.
+	///CrowdAgents' settings setters.
 	Result setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 			const dtCrowdAgentParams& params);
 	Result setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,

@@ -233,9 +233,6 @@ void CrowdAgent::onAddToSceneSetup()
 
 AsyncTask::DoneStatus CrowdAgent::addCrowdAgentAsync(GenericAsyncTask* task)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	mStartNavMesh->addCrowdAgent(this);
 	//
 	return AsyncTask::DS_done;
@@ -247,73 +244,56 @@ void CrowdAgent::onRemoveFromSceneCleanup()
 	HOLD_REMUTEX(NavMesh::getStaticMutex())
 
 	///Remove from NavMesh update (if previously added)
-	if(mNavMesh)
+	//mNavMesh will be cleared during removing, so
+	//remove through a temporary pointer
+	SMARTPTR(NavMesh) navMesh = mNavMesh;
+	if(navMesh)
 	{
-		mNavMesh->removeCrowdAgent(this);
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//removeCrowdAgent will return if mDestroying, so
+		//disable it and re-enable afterwards
+		mDestroying = false;
+		navMesh->removeCrowdAgent(this);
+		mDestroying = true;
 	}
 }
 
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+	//lock (guard) the NavMesh static mutex
+	HOLD_REMUTEX(NavMesh::getStaticMutex())
 
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	//return if crowdAgent doesn't belong to any mesh
+	RETURN_ON_COND(not mNavMesh,)
 
-	{
-		//lock (guard) the NavMesh static mutex
-		HOLD_REMUTEX(NavMesh::getStaticMutex())
-
-		//request NavMesh (if any) to update params for this CrowdAgent
-		if (mNavMesh)
-		{
-			mNavMesh->setCrowdAgentParams(this, agentParams);
-		}
-	}
-	mAgentParams = agentParams;
+	//request NavMesh to update move target for this CrowdAgent
+	mNavMesh->setCrowdAgentParams(this, agentParams);
 }
 
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+	//lock (guard) the NavMesh static mutex
+	HOLD_REMUTEX(NavMesh::getStaticMutex())
 
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	//return if crowdAgent doesn't belong to any mesh
+	RETURN_ON_COND(not mNavMesh,)
 
-	{
-		//lock (guard) the NavMesh static mutex
-		HOLD_REMUTEX(NavMesh::getStaticMutex())
-
-		//request NavMesh (if any) to update move target for this CrowdAgent
-		if (mNavMesh)
-		{
-			mNavMesh->setCrowdAgentTarget(this, pos);
-		}
-	}
-	mMoveTarget = pos;
+	//request NavMesh to update move target for this CrowdAgent
+	mNavMesh->setCrowdAgentTarget(this, pos);
 }
 
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+	//lock (guard) the NavMesh static mutex
+	HOLD_REMUTEX(NavMesh::getStaticMutex())
 
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying,)
+	//return if crowdAgent doesn't belong to any mesh
+	RETURN_ON_COND(not mNavMesh,)
 
-	{
-		//lock (guard) the NavMesh static mutex
-		HOLD_REMUTEX(NavMesh::getStaticMutex())
-
-		//request NavMesh (if any) to update move velocity for this CrowdAgent
-		if (mNavMesh)
-		{
-			mNavMesh->setCrowdAgentVelocity(this, vel);
-		}
-	}
-	mMoveVelocity = vel;
+	//request NavMesh to update move target for this CrowdAgent
+	mNavMesh->setCrowdAgentVelocity(this, vel);
 }
 
 void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)

@@ -152,11 +152,22 @@ void SteerVehicle::onAddToObjectSetup()
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
 			&SteerVehicle::doUpdateSteerVehicle);
+}
 
+void SteerVehicle::onRemoveFromObjectCleanup()
+{
+	//
+	delete mVehicle;
+	mSteerPlugIn.clear();
+	reset();
+}
+
+void SteerVehicle::onAddToSceneSetup()
+{
 	//set SteerPlugIn object (if any)
 	SMARTPTR(Object)steerPlugInObject = ObjectTemplateManager::
 	GetSingleton().getCreatedObject(mSteerPlugInObjectId);
-	//add to SteerPlugIn update
+	///Add to SteerPlugIn update
 	if (steerPlugInObject)
 	{
 		mSteerPlugIn = DCAST(SteerPlugIn,
@@ -169,20 +180,26 @@ void SteerVehicle::onAddToObjectSetup()
 	}
 }
 
-void SteerVehicle::onRemoveFromObjectCleanup()
+void SteerVehicle::onRemoveFromSceneCleanup()
 {
 	//lock (guard) the SteerPlugIn static mutex
 	HOLD_REMUTEX(SteerPlugIn::getStaticMutex())
 
-	//Remove from SteerPlugIn update (if previously added)
-	if (mSteerPlugIn)
+	///Remove from SteerPlugIn update (if previously added)
+	//mSteerPlugIn will be cleared during removing, so
+	//remove through a temporary pointer
+	SMARTPTR(SteerPlugIn) steerPlugIn = mSteerPlugIn;
+	if (steerPlugIn)
 	{
-		mSteerPlugIn->removeSteerVehicle(this);
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//removeSteerVehicle will return if mDestroying, so
+		//disable it and re-enable afterwards
+		mDestroying = false;
+		steerPlugIn->removeSteerVehicle(this);
+		mDestroying = true;
 	}
-	//
-	delete mVehicle;
-	mSteerPlugIn.clear();
-	reset();
 }
 
 void SteerVehicle::setSettings(const VehicleSettings& settings)
@@ -201,6 +218,9 @@ VehicleSettings SteerVehicle::getSettings()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying, VehicleSettings)
 
 	//get vehicle settings
 	return dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();

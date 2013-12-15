@@ -99,7 +99,10 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
-	 * \name Getters/setters of CrowdAgent data.
+	 * \name Helper getters/setters of CrowdAgent data.
+	 *
+	 * \note Getters/setters from NavMesh should be used for
+	 * performance and detailed return result.
 	 */
 	///@{
 	void setParams(const dtCrowdAgentParams& agentParams);

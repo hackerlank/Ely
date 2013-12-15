@@ -1403,29 +1403,43 @@ NavMesh::Result NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if NavMesh has not been setup yet
-	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
-
-	//there is a crowd tool because the recast nav mesh
-	//has been completely setup
-	//check if crowdAgent has been already added to recast
-	if (crowdAgent->mAgentIdx != -1)
+	//lock (guard) the static mutex
+	HOLD_REMUTEX(mStaticMutex)
 	{
-		//second parameter should be the parameter to update
-		int agentIdx = crowdAgent->mAgentIdx;
-		dtCrowdAgentParams ap = params;
-		//all crowd agent have the same dimensions: those
-		//registered into the current mNavMeshType
-		ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
-		ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
-		dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
+		//return if crowdAgent doesn't belong to any mesh
+		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//return if destroying or NavMeshType has not been setup yet
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
+		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+
+		{
+			//lock (guard) the crowdAgent mutex
+			HOLD_REMUTEX(crowdAgent->mMutex)
+
+			//return if crowdAgent is destroying
+			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
+
+			//there is a crowd tool because the recast nav mesh
+			//has been completely setup
+			//check if crowdAgent has been already added to recast
+			if (crowdAgent->mAgentIdx != -1)
+			{
+				//second parameter should be the parameter to update
+				int agentIdx = crowdAgent->mAgentIdx;
+				dtCrowdAgentParams ap = params;
+				//all crowd agent have the same dimensions: those
+				//registered into the current mNavMeshType
+				ap.radius = mNavMeshType->getNavMeshSettings().m_agentRadius;
+				ap.height = mNavMeshType->getNavMeshSettings().m_agentHeight;
+				dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
 				getState()->getCrowd()->updateAgentParameters(crowdAgent->mAgentIdx, &ap);
+			}
+			crowdAgent->mAgentParams = params;
+		}
 	}
 	//
 	return Result::OK;
@@ -1436,24 +1450,38 @@ NavMesh::Result NavMesh::setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if NavMesh has not been setup yet
-	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
-
-	//there is a crowd tool because the recast nav mesh
-	//has been completely setup
-	//check if crowdAgent has been already added to recast
-	if (crowdAgent->mAgentIdx != -1)
+	//lock (guard) the static mutex
+	HOLD_REMUTEX(mStaticMutex)
 	{
-		float p[3];
-		LVecBase3fToRecast(moveTarget, p);
-		dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
+		//return if crowdAgent doesn't belong to any mesh
+		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//return if destroying or NavMeshType has not been setup yet
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
+		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+
+		{
+			//lock (guard) the crowdAgent mutex
+			HOLD_REMUTEX(crowdAgent->mMutex)
+
+			//return if crowdAgent is destroying
+			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
+
+			//there is a crowd tool because the recast nav mesh
+			//has been completely setup
+			//check if crowdAgent has been already added to recast
+			if (crowdAgent->mAgentIdx != -1)
+			{
+				float p[3];
+				LVecBase3fToRecast(moveTarget, p);
+				dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
 				getState()->setMoveTarget(crowdAgent->mAgentIdx, p);
+			}
+			crowdAgent->mMoveTarget = moveTarget;
+		}
 	}
 	//
 	return Result::OK;
@@ -1464,24 +1492,38 @@ NavMesh::Result NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//return if NavMesh has not been setup yet
-	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
-
-	//there is a crowd tool because the recast nav mesh
-	//has been completely setup
-	//check if crowdAgent has been already added to recast
-	if (crowdAgent->mAgentIdx != -1)
+	//lock (guard) the static mutex
+	HOLD_REMUTEX(mStaticMutex)
 	{
-		float v[3];
-		LVecBase3fToRecast(moveVelocity, v);
-		dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
+		//return if crowdAgent doesn't belong to any mesh
+		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
+
+		//return if destroying or NavMeshType has not been setup yet
+		RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
+		RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+
+		{
+			//lock (guard) the crowdAgent mutex
+			HOLD_REMUTEX(crowdAgent->mMutex)
+
+			//return if crowdAgent is destroying
+			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
+
+			//there is a crowd tool because the recast nav mesh
+			//has been completely setup
+			//check if crowdAgent has been already added to recast
+			if (crowdAgent->mAgentIdx != -1)
+			{
+				float v[3];
+				LVecBase3fToRecast(moveVelocity, v);
+				dynamic_cast<CrowdTool*>(mNavMeshType->getTool())->
 				getState()->setMoveVelocity(crowdAgent->mAgentIdx, v);
+			}
+			crowdAgent->mMoveVelocity = moveVelocity;
+		}
 	}
 	//
 	return Result::OK;
