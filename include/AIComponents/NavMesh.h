@@ -241,12 +241,6 @@ public:
 	Result debug(bool enable);
 #endif
 
-	/**
-	 * \brief Get the static mutex associated with all NavMesh components.
-	 * @return The static mutex.
-	 */
-	static ReMutex& getStaticMutex();
-
 private:
 	///Current underlying NavMeshType.
 	NavMeshType* mNavMeshType;
@@ -362,10 +356,6 @@ private:
 	bool mAsyncSetupComplete;
 #endif
 	///@}
-
-	///The mutex associated with all NavMesh components.
-	///Protects addition/removal of CrowdAgents.
-	static ReMutex mStaticMutex;
 
 #ifdef ELY_DEBUG
 	/// Recast debug node path.
@@ -666,11 +656,6 @@ inline NavMeshType& NavMesh::getNavMeshType()
 inline NavMesh::operator NavMeshType&()
 {
 	return *mNavMeshType;
-}
-
-inline ReMutex& NavMesh::getStaticMutex()
-{
-	return mStaticMutex;
 }
 
 } // namespace ely

@@ -182,8 +182,8 @@ void SteerVehicle::onAddToSceneSetup()
 
 void SteerVehicle::onRemoveFromSceneCleanup()
 {
-	//lock (guard) the SteerPlugIn static mutex
-	HOLD_REMUTEX(SteerPlugIn::getStaticMutex())
+	//lock (guard) the SteerVehicle SteerPlugIn mutex
+	HOLD_REMUTEX(mSteerPlugInMutex)
 
 	///Remove from SteerPlugIn update (if previously added)
 	//mSteerPlugIn will be cleared during removing, so

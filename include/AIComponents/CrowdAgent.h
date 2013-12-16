@@ -113,6 +113,12 @@ public:
 	LVector3f getMoveVelocity();
 	///@}
 
+	/**
+	 * \brief Get the NavMesh object reference mutex.
+	 * @return The NavMesh mutex.
+	 */
+	static ReMutex& getNavMeshMutex();
+
 private:
 
 	///The NavMesh owner object.
@@ -161,6 +167,9 @@ private:
 	std::string mTaskChainName;
 #endif
 	///@}
+
+	///Protects the NavMesh object reference (mNavMesh).
+	ReMutex mNavMeshMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -229,6 +238,11 @@ inline LVector3f CrowdAgent::getMoveVelocity()
 	HOLD_REMUTEX(mMutex)
 
 	return mMoveVelocity;
+}
+
+inline ReMutex& CrowdAgent::getNavMeshMutex()
+{
+	return mNavMeshMutex;
 }
 
 }  // namespace ely

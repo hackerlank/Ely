@@ -111,19 +111,9 @@ public:
 	operator OpenSteer::AbstractPlugIn&();
 	///@}
 
-	/**
-	 * \brief Get the static mutex associated with all SteerPlugIn components.
-	 * @return The static mutex.
-	 */
-	static ReMutex& getStaticMutex();
-
 private:
 	///Current underlying AbstractPlugIn.
 	OpenSteer::AbstractPlugIn* mPlugIn;
-
-	///The mutex associated with all SteerPlugIn components.
-	///Protects addition/removal of SteerVehicles.
-	static ReMutex mStaticMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -176,11 +166,6 @@ inline OpenSteer::AbstractPlugIn& SteerPlugIn::getAbstractPlugIn()
 inline SteerPlugIn::operator OpenSteer::AbstractPlugIn&()
 {
 	return *mPlugIn;
-}
-
-inline ReMutex& SteerPlugIn::getStaticMutex()
-{
-	return mStaticMutex;
 }
 
 } /* namespace ely */

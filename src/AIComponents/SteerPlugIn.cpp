@@ -93,8 +93,8 @@ SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehi
 	RETURN_ON_COND(not steerVehicle,false)
 
 	bool result;
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the SteerVehicle SteerPlugIn mutex
+	HOLD_REMUTEX(steerVehicle->mSteerPlugInMutex)
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -122,8 +122,8 @@ SteerPlugIn::Result SteerPlugIn::removeSteerVehicle(SMARTPTR(SteerVehicle)steerV
 {
 	RETURN_ON_COND(not steerVehicle, Result::ERROR)
 
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the SteerVehicle SteerPlugIn mutex
+	HOLD_REMUTEX(steerVehicle->mSteerPlugInMutex)
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -159,8 +159,6 @@ void SteerPlugIn::update(void* data)
 #endif
 
 }
-
-ReMutex SteerPlugIn::mStaticMutex;
 
 //TypedObject semantics: hardcoded
 TypeHandle SteerPlugIn::_type_handle;

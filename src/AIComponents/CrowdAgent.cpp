@@ -240,8 +240,8 @@ AsyncTask::DoneStatus CrowdAgent::addCrowdAgentAsync(GenericAsyncTask* task)
 
 void CrowdAgent::onRemoveFromSceneCleanup()
 {
-	//lock (guard) the NavMesh static mutex
-	HOLD_REMUTEX(NavMesh::getStaticMutex())
+	//lock (guard) the CrowdAgent NavMesh mutex
+	HOLD_REMUTEX(mNavMeshMutex)
 
 	///Remove from NavMesh update (if previously added)
 	//mNavMesh will be cleared during removing, so
@@ -262,8 +262,8 @@ void CrowdAgent::onRemoveFromSceneCleanup()
 
 void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 {
-	//lock (guard) the NavMesh static mutex
-	HOLD_REMUTEX(NavMesh::getStaticMutex())
+	//lock (guard) the CrowdAgent NavMesh mutex
+	HOLD_REMUTEX(mNavMeshMutex)
 
 	//return if crowdAgent doesn't belong to any mesh
 	RETURN_ON_COND(not mNavMesh,)
@@ -274,8 +274,8 @@ void CrowdAgent::setParams(const dtCrowdAgentParams& agentParams)
 
 void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 {
-	//lock (guard) the NavMesh static mutex
-	HOLD_REMUTEX(NavMesh::getStaticMutex())
+	//lock (guard) the CrowdAgent NavMesh mutex
+	HOLD_REMUTEX(mNavMeshMutex)
 
 	//return if crowdAgent doesn't belong to any mesh
 	RETURN_ON_COND(not mNavMesh,)
@@ -286,8 +286,8 @@ void CrowdAgent::setMoveTarget(const LPoint3f& pos)
 
 void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 {
-	//lock (guard) the NavMesh static mutex
-	HOLD_REMUTEX(NavMesh::getStaticMutex())
+	//lock (guard) the CrowdAgent NavMesh mutex
+	HOLD_REMUTEX(mNavMeshMutex)
 
 	//return if crowdAgent doesn't belong to any mesh
 	RETURN_ON_COND(not mNavMesh,)

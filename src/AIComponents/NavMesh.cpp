@@ -1205,8 +1205,8 @@ NavMesh::Result NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 	RETURN_ON_COND(not crowdAgent,false)
 
 	bool result;
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the crowdAgent NavMesh mutex
+	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -1337,8 +1337,8 @@ NavMesh::Result NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the crowdAgent NavMesh mutex
+	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -1403,8 +1403,8 @@ NavMesh::Result NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the crowdAgent NavMesh mutex
+	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
 		//return if crowdAgent doesn't belong to any mesh
 		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
@@ -1450,8 +1450,8 @@ NavMesh::Result NavMesh::setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the crowdAgent NavMesh mutex
+	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
 		//return if crowdAgent doesn't belong to any mesh
 		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
@@ -1492,8 +1492,8 @@ NavMesh::Result NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
 {
 	RETURN_ON_COND(not crowdAgent, Result::ERROR)
 
-	//lock (guard) the static mutex
-	HOLD_REMUTEX(mStaticMutex)
+	//lock (guard) the crowdAgent NavMesh mutex
+	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
 		//return if crowdAgent doesn't belong to any mesh
 		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
@@ -1612,8 +1612,6 @@ NavMesh::Result NavMesh::debug(bool enable)
 	return Result::OK;
 }
 #endif
-
-ReMutex NavMesh::mStaticMutex;
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMesh::_type_handle;

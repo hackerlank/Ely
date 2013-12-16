@@ -103,6 +103,12 @@ public:
 	operator OpenSteer::AbstractVehicle&();
 	///@}
 
+	/**
+	 * \brief Get the SteerPlugIn object reference mutex.
+	 * @return The SteerPlugIn mutex.
+	 */
+	ReMutex& getSteerPlugInMutex();
+
 private:
 	///Current underlying Vehicle.
 	OpenSteer::AbstractVehicle* mVehicle;
@@ -119,6 +125,9 @@ private:
 
 	///Throwing events.
 	bool mThrowEvents, mSteerVehicleStartSent, mSteerVehicleStopSent;
+
+	///Protects the SteerPlugIn object reference (mNavMesh).
+	ReMutex mSteerPlugInMutex;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -166,6 +175,11 @@ inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
 inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 {
 	return *mVehicle;
+}
+
+inline ReMutex& SteerVehicle::getSteerPlugInMutex()
+{
+	return mSteerPlugInMutex;
 }
 
 } /* namespace ely */
