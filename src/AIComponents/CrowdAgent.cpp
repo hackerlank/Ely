@@ -249,14 +249,18 @@ void CrowdAgent::onRemoveFromSceneCleanup()
 	SMARTPTR(NavMesh) navMesh = mNavMesh;
 	if(navMesh)
 	{
+#ifdef ELY_THREAD
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
 
 		//removeCrowdAgent will return if mDestroying, so
 		//disable it and re-enable afterwards
 		mDestroying = false;
+#endif
 		navMesh->removeCrowdAgent(this);
+#ifdef ELY_THREAD
 		mDestroying = true;
+#endif
 	}
 }
 

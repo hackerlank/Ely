@@ -191,14 +191,18 @@ void SteerVehicle::onRemoveFromSceneCleanup()
 	SMARTPTR(SteerPlugIn) steerPlugIn = mSteerPlugIn;
 	if (steerPlugIn)
 	{
+#ifdef ELY_THREAD
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
 
 		//removeSteerVehicle will return if mDestroying, so
 		//disable it and re-enable afterwards
 		mDestroying = false;
+#endif
 		steerPlugIn->removeSteerVehicle(this);
+#ifdef ELY_THREAD
 		mDestroying = true;
+#endif
 	}
 }
 
