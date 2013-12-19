@@ -28,8 +28,8 @@
 #include <nodePath.h>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
-#include <OpenSteer/AbstractVehicle.h>
 #include <OpenSteer/SimpleVehicle.h>
+#include <OpenSteer/PlugIn.h>
 
 namespace ely
 {
@@ -116,6 +116,59 @@ protected:
 	ENTITY m_entity;
 	ENTITYUPDATEMETHOD m_entityUpdateMethod;
 	VehicleSettings m_settings;
+};
+
+template<typename Super>
+class PlugInAddOnMixin: public Super
+{
+public:
+
+	virtual ~PlugInAddOnMixin()
+	{
+	}
+
+	virtual void addVehicle(OpenSteer::AbstractVehicle* vehicle)
+	{
+		OpenSteer::AVGroup::iterator iter;
+		//check if vehicle has not been already added
+		for (iter = const_cast<OpenSteer::AVGroup&>(this->allVehicles()).begin();
+				iter
+						!= const_cast<OpenSteer::AVGroup&>(this->allVehicles()).end();
+				++iter)
+		{
+			if (*iter == vehicle)
+			{
+				break;
+			}
+		}
+		if (iter == this->allVehicles().end())
+		{
+			//vehicle needs to be added
+			(const_cast<OpenSteer::AVGroup&>(this->allVehicles())).push_back(
+					vehicle);
+		}
+	}
+
+	virtual void removeVehicle(OpenSteer::AbstractVehicle* vehicle)
+	{
+		OpenSteer::AVGroup::iterator iter;
+		//check if vehicle has been already removed or not
+		for (iter = const_cast<OpenSteer::AVGroup&>(this->allVehicles()).begin();
+				iter
+						!= const_cast<OpenSteer::AVGroup&>(this->allVehicles()).end();
+				++iter)
+		{
+			if (*iter == vehicle)
+			{
+				break;
+			}
+		}
+		if (iter != this->allVehicles().end())
+		{
+			//vehicle needs to be removed
+			(const_cast<OpenSteer::AVGroup&>(this->allVehicles())).erase(iter);
+		}
+	}
 };
 
 }

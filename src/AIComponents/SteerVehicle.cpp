@@ -220,7 +220,7 @@ VehicleSettings SteerVehicle::getSettings()
 	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying, VehicleSettings)
+	RETURN_ON_ASYNC_COND(mDestroying, VehicleSettings())
 
 	//get vehicle settings
 	return dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();

@@ -102,6 +102,8 @@ public:
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
+typedef PlugInAddOnMixin<OpenSteer::PlugIn> PlugIn;
+
 template<typename Entity>
 class OneTurningPlugIn: public PlugIn
 {
@@ -124,16 +126,9 @@ public:
 
 	void open(void)
 	{
-		gOneTurning = new OneTurning<Entity>;
-//            OpenSteerDemo::selectedVehicle = gOneTurning;
-		theVehicle.push_back(gOneTurning);
-
-		// initialize camera
-//            OpenSteerDemo::init2dCamera (*gOneTurning);
-//            OpenSteerDemo::camera.setPosition (10,
-//                                               OpenSteerDemo::camera2dElevation,
-//                                               10);
-//            OpenSteerDemo::camera.fixedPosition.set (40, 40, 40);
+///		gOneTurning = new OneTurning<Entity>;
+/////            OpenSteerDemo::selectedVehicle = gOneTurning;
+///		theVehicle.push_back(gOneTurning);
 	}
 
 	void update(const float currentTime, const float elapsedTime)
@@ -151,34 +146,28 @@ public:
 		std::ostringstream annote;
 		annote << std::setprecision(2) << std::setiosflags(std::ios::fixed);
 		annote << "      speed: " << gOneTurning->speed() << std::ends;
-//            draw2dTextAt3dLocation (annote, gOneTurning->position(), gRed, drawGetWindowWidth(), drawGetWindowHeight());
-//            draw2dTextAt3dLocation (*"start", Vec3::zero, gGreen, drawGetWindowWidth(), drawGetWindowHeight());
+/////            draw2dTextAt3dLocation (annote, gOneTurning->position(), gRed, drawGetWindowWidth(), drawGetWindowHeight());
+/////            draw2dTextAt3dLocation (*"start", Vec3::zero, gGreen, drawGetWindowWidth(), drawGetWindowHeight());
 		draw2dTextAt3dLocation(annote, gOneTurning->position(), gRed, 0.0, 0.0);
 		draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen, 0.0, 0.0);
-
-		// update camera, tracking test vehicle
-//            OpenSteerDemo::updateCamera (currentTime, elapsedTime, *gOneTurning);
-
-		// draw "ground plane"
-//            OpenSteerDemo::gridUtility (gOneTurning->position());
-//		if (gToggleDrawGrid)
-//		{
-//			///very slow
-//			gridUtility(gOneTurning->position(), 600, 20);
-//		}
 	}
 
 	void close(void)
 	{
 		theVehicle.clear();
-		delete (gOneTurning);
-		gOneTurning = NULL;
+///		delete (gOneTurning);
+///		gOneTurning = NULL;
 	}
 
 	void reset(void)
 	{
-		// reset vehicle
-		gOneTurning->reset();
+///		// reset vehicle
+///		gOneTurning->reset();
+		iterator iter;
+		for (iter = theVehicle.begin(); iter != theVehicle.end(); ++iter)
+		{
+			(*iter)->reset();
+		}
 	}
 
 	const AVGroup& allVehicles(void)
@@ -187,7 +176,7 @@ public:
 	}
 
 	OneTurning<Entity>* gOneTurning;
-//	std::vector<OneTurning*> theVehicle; // for allVehicles
+////	std::vector<OneTurning*> theVehicle; // for allVehicles
 	typename OneTurning<Entity>::groupType theVehicle; // for allVehicles
 	typedef typename OneTurning<Entity>::groupType::const_iterator iterator;
 };

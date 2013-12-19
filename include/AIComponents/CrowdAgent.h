@@ -117,7 +117,7 @@ public:
 	 * \brief Get the NavMesh object reference mutex.
 	 * @return The NavMesh mutex.
 	 */
-	static ReMutex& getNavMeshMutex();
+	ReMutex& getNavMeshMutex();
 
 private:
 

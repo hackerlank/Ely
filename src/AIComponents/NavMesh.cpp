@@ -1406,8 +1406,8 @@ NavMesh::Result NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 	//lock (guard) the crowdAgent NavMesh mutex
 	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
-		//return if crowdAgent doesn't belong to any mesh
-		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+		//return if crowdAgent doesn't belong to this mesh
+		RETURN_ON_COND(crowdAgent->mNavMesh != this, Result::ERROR)
 
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -1453,8 +1453,8 @@ NavMesh::Result NavMesh::setCrowdAgentTarget(SMARTPTR(CrowdAgent)crowdAgent,
 	//lock (guard) the crowdAgent NavMesh mutex
 	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
-		//return if crowdAgent doesn't belong to any mesh
-		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+		//return if crowdAgent doesn't belong to this mesh
+		RETURN_ON_COND(crowdAgent->mNavMesh != this, Result::ERROR)
 
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -1495,8 +1495,8 @@ NavMesh::Result NavMesh::setCrowdAgentVelocity(SMARTPTR(CrowdAgent)crowdAgent,
 	//lock (guard) the crowdAgent NavMesh mutex
 	HOLD_REMUTEX(crowdAgent->mNavMeshMutex)
 	{
-		//return if crowdAgent doesn't belong to any mesh
-		RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+		//return if crowdAgent doesn't belong to this mesh
+		RETURN_ON_COND(crowdAgent->mNavMesh != this, Result::ERROR)
 
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
