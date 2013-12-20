@@ -111,7 +111,7 @@ SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehi
 			RETURN_ON_COND(steerVehicle->mSteerPlugIn, Result::ERROR)
 
 			//do real adding to update list
-//			doAddCrowdAgentToUpdateList(crowdAgent);
+			dynamic_cast<PlugIn*>(mPlugIn)->addVehicle(&steerVehicle->getAbstractVehicle());
 		}
 	}
 	//
@@ -140,7 +140,7 @@ SteerPlugIn::Result SteerPlugIn::removeSteerVehicle(SMARTPTR(SteerVehicle)steerV
 			RETURN_ON_COND(not steerVehicle->mSteerPlugIn, Result::ERROR)
 
 			//remove from update list
-//			doRemoveCrowdAgentFromUpdateList(crowdAgent);
+			dynamic_cast<PlugIn*>(mPlugIn)->removeVehicle(&steerVehicle->getAbstractVehicle());
 		}
 	}
 	//

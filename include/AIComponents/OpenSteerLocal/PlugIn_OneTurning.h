@@ -78,6 +78,7 @@ public:
 		SimpleVehicle::reset(); // reset the vehicle
 		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
 		this->clearTrailHistory();  // prevent long streaks due to teleportation
+		m_start = this->position();
 	}
 
 	// per frame simulation update
@@ -97,6 +98,14 @@ public:
 		drawBasic2dCircularVehicle(*this, gGray50);
 		this->drawTrail();
 	}
+
+	Vec3 getStart()
+	{
+		return m_start;
+	}
+
+private:
+	Vec3 m_start;
 };
 
 // ----------------------------------------------------------------------------
@@ -134,22 +143,37 @@ public:
 	void update(const float currentTime, const float elapsedTime)
 	{
 		// update simulation of test vehicle
-		gOneTurning->update(currentTime, elapsedTime);
+///		gOneTurning->update(currentTime, elapsedTime);
+		iterator iter;
+		for (iter = theVehicle.begin(); iter < theVehicle.end(); ++iter)
+		{
+			(*iter)->update(currentTime, elapsedTime);
+		}
 	}
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
 		// draw test vehicle
-		gOneTurning->draw();
+///		gOneTurning->draw();
+		iterator iter;
+		for (iter = theVehicle.begin(); iter < theVehicle.end(); ++iter)
+		{
+			(*iter)->draw();
 
-		// textual annotation (following the test vehicle's screen position)
-		std::ostringstream annote;
-		annote << std::setprecision(2) << std::setiosflags(std::ios::fixed);
-		annote << "      speed: " << gOneTurning->speed() << std::ends;
+			// textual annotation (following the test vehicle's screen position)
+			std::ostringstream annote;
+			annote << std::setprecision(2) << std::setiosflags(std::ios::fixed);
+///			annote << "      speed: " << gOneTurning->speed() << std::ends;
+			annote << "      speed: " << (*iter)->speed() << std::ends;
+
 /////            draw2dTextAt3dLocation (annote, gOneTurning->position(), gRed, drawGetWindowWidth(), drawGetWindowHeight());
 /////            draw2dTextAt3dLocation (*"start", Vec3::zero, gGreen, drawGetWindowWidth(), drawGetWindowHeight());
-		draw2dTextAt3dLocation(annote, gOneTurning->position(), gRed, 0.0, 0.0);
-		draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen, 0.0, 0.0);
+///			draw2dTextAt3dLocation(annote, gOneTurning->position(), gRed, 0.0, 0.0);
+			draw2dTextAt3dLocation(annote, (*iter)->position(), gRed, 0.0, 0.0);
+///			draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen, 0.0, 0.0);
+			draw2dTextAt3dLocation(*"start", (*iter)->getStart(), gGreen, 0.0,
+					0.0);
+		}
 	}
 
 	void close(void)
@@ -161,7 +185,7 @@ public:
 
 	void reset(void)
 	{
-///		// reset vehicle
+		// reset vehicle
 ///		gOneTurning->reset();
 		iterator iter;
 		for (iter = theVehicle.begin(); iter != theVehicle.end(); ++iter)
@@ -175,8 +199,8 @@ public:
 		return (const AVGroup&) theVehicle;
 	}
 
-	OneTurning<Entity>* gOneTurning;
-////	std::vector<OneTurning*> theVehicle; // for allVehicles
+///	OneTurning<Entity>* gOneTurning;
+/////	std::vector<OneTurning*> theVehicle; // for allVehicles
 	typename OneTurning<Entity>::groupType theVehicle; // for allVehicles
 	typedef typename OneTurning<Entity>::groupType::const_iterator iterator;
 };
