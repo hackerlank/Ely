@@ -115,6 +115,9 @@ private:
 	///Current underlying AbstractPlugIn.
 	OpenSteer::AbstractPlugIn* mPlugIn;
 
+	///Current time.
+	float mCurrentTime;
+
 	///TypedObject semantics: hardcoded
 public:
 	static TypeHandle get_class_type()
@@ -147,15 +150,7 @@ inline void SteerPlugIn::reset()
 {
 	//
 	mPlugIn = NULL;
-
-}
-
-inline void SteerPlugIn::onAddToSceneSetup()
-{
-}
-
-inline void SteerPlugIn::onRemoveFromSceneCleanup()
-{
+	mCurrentTime = 0.0;
 }
 
 inline OpenSteer::AbstractPlugIn& SteerPlugIn::getAbstractPlugIn()

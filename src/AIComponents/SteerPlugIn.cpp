@@ -85,7 +85,20 @@ void SteerPlugIn::onAddToObjectSetup()
 void SteerPlugIn::onRemoveFromObjectCleanup()
 {
 	//
+	delete mPlugIn;
 	reset();
+}
+
+void SteerPlugIn::onAddToSceneSetup()
+{
+	//Add to the AI manager update
+	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+}
+
+void SteerPlugIn::onRemoveFromSceneCleanup()
+{
+	//remove from AI manager update
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 }
 
 SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
@@ -152,12 +165,34 @@ void SteerPlugIn::update(void* data)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+	//elapsedTime
 	float dt = *(reinterpret_cast<float*>(data));
+	//currentTime
+	mCurrentTime += dt;
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
 
+//	// service queued reset request, if any
+//	if (OpenSteer::gDelayedResetPlugInXXX)
+//	{
+//		mPlugIn->reset();
+//		OpenSteer::gDelayedResetPlugInXXX = false;
+//	}
+	// invoke PlugIn's Update method
+	mPlugIn->update(mCurrentTime, dt);
+
+#ifdef ELY_DEBUG
+//	//reset drawers
+//	gDrawer2d->reset();
+//	gDrawer3d->reset();
+//	// invoke selected PlugIn's Redraw method
+//	mPlugIn->redraw(mCurrentTime, dt);
+//	// draw any annotation queued up during selected PlugIn's Update method
+//	OpenSteer::drawAllDeferredLines();
+//	OpenSteer::drawAllDeferredCirclesOrDisks();
+#endif
 }
 
 //TypedObject semantics: hardcoded
