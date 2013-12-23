@@ -63,7 +63,9 @@
 #include "AIComponents/OpenSteerLocal/common.h"
 
 #include "AIComponents/OpenSteerLocal/DrawMeshDrawer.h"
+#include <reMutex.h>
 ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
+ReMutex gOpenSteerDebugMutex;
 
 // ----------------------------------------------------------------------------
 
@@ -144,14 +146,17 @@ inline void endDoubleSidedDrawing(void)
 
 }   // end anonymous namespace
 
-void OpenSteer::glVertexVec3(const Vec3& v)
+namespace OpenSteer
+{
+
+void glVertexVec3(const Vec3& v)
 {
 	iglVertexVec3(v);
 }
 
 // ----------------------------------------------------------------------------
 
-void OpenSteer::drawLine(const Vec3& startPoint, const Vec3& endPoint,
+void drawLine(const Vec3& startPoint, const Vec3& endPoint,
 		const Color& color)
 {
 	iDrawLine(startPoint, endPoint, color);
@@ -160,23 +165,23 @@ void OpenSteer::drawLine(const Vec3& startPoint, const Vec3& endPoint,
 // ----------------------------------------------------------------------------
 // draw a line with alpha blending
 
-void OpenSteer::drawLineAlpha(const Vec3& startPoint, const Vec3& endPoint,
+void drawLineAlpha(const Vec3& startPoint, const Vec3& endPoint,
 		const Color& color, const float alpha)
 {
 	gDrawer3d->setColor(LVecBase4f(color.r(), color.g(), color.b(), alpha));
 	gDrawer3d->begin(ely::DrawMeshDrawer::DRAW_LINES);
-	OpenSteer::glVertexVec3(startPoint);
-	OpenSteer::glVertexVec3(endPoint);
+	glVertexVec3(startPoint);
+	glVertexVec3(endPoint);
 	gDrawer3d->end();
 }
 
-void OpenSteer::drawTriangle(const Vec3& a, const Vec3& b, const Vec3& c,
+void drawTriangle(const Vec3& a, const Vec3& b, const Vec3& c,
 		const Color& color)
 {
 	iDrawTriangle(a, b, c, color);
 }
 
-void OpenSteer::drawQuadrangle(const Vec3& a, const Vec3& b, const Vec3& c,
+void drawQuadrangle(const Vec3& a, const Vec3& b, const Vec3& c,
 		const Vec3& d, const Color& color)
 {
 	iDrawQuadrangle(a, b, c, d, color);
@@ -186,7 +191,7 @@ void OpenSteer::drawQuadrangle(const Vec3& a, const Vec3& b, const Vec3& c,
 // draws a "wide line segment": a rectangle of the given width and color
 // whose mid-line connects two given endpoints
 
-void OpenSteer::drawXZWideLine(const Vec3& startPoint, const Vec3& endPoint,
+void drawXZWideLine(const Vec3& startPoint, const Vec3& endPoint,
 		const Color& color, float width)
 {
 	const Vec3 offset = endPoint - startPoint;
@@ -208,7 +213,7 @@ void OpenSteer::drawXZWideLine(const Vec3& startPoint, const Vec3& endPoint,
 // on the XZ plane or arbitrary circles in 3d space (as specified by "in3d"
 // argument)
 
-void OpenSteer::drawCircleOrDisk(const float radius, const Vec3& axis,
+void drawCircleOrDisk(const float radius, const Vec3& axis,
 		const Vec3& center, const Color& color, const int segments,
 		const bool filled, const bool in3d)
 {
@@ -269,7 +274,7 @@ void OpenSteer::drawCircleOrDisk(const float radius, const Vec3& axis,
 
 // ------------------------------------------------------------------------
 
-void OpenSteer::draw3dCircleOrDisk(const float radius, const Vec3& center,
+void draw3dCircleOrDisk(const float radius, const Vec3& center,
 		const Vec3& axis, const Color& color, const int segments,
 		const bool filled)
 {
@@ -280,7 +285,7 @@ void OpenSteer::draw3dCircleOrDisk(const float radius, const Vec3& center,
 // ------------------------------------------------------------------------
 // drawing utility used by both drawXZCircle and drawXZDisk
 
-void OpenSteer::drawXZCircleOrDisk(const float radius, const Vec3& center,
+void drawXZCircleOrDisk(const float radius, const Vec3& center,
 		const Color& color, const int segments, const bool filled)
 {
 	// draw a circle-or-disk on the XZ plane
@@ -297,7 +302,7 @@ void OpenSteer::drawXZCircleOrDisk(const float radius, const Vec3& center,
 // XXX maybe there should be a "filled" version of this
 // XXX maybe this should be merged in with drawCircleOrDisk
 
-void OpenSteer::drawXZArc(const Vec3& start, const Vec3& center,
+void drawXZArc(const Vec3& start, const Vec3& center,
 		const float arcLength, const int segments, const Color& color)
 {
 	// "spoke" is initially the vector from center to start,
@@ -335,7 +340,7 @@ void OpenSteer::drawXZArc(const Vec3& start, const Vec3& center,
 // ------------------------------------------------------------------------
 // a simple 2d vehicle on the XZ plane
 
-void OpenSteer::drawBasic2dCircularVehicle(const AbstractVehicle& vehicle,
+void drawBasic2dCircularVehicle(const AbstractVehicle& vehicle,
 		const Color& color)
 {
 	// "aspect ratio" of body (as seen from above)
@@ -364,7 +369,7 @@ void OpenSteer::drawBasic2dCircularVehicle(const AbstractVehicle& vehicle,
 // ------------------------------------------------------------------------
 // a simple 3d vehicle
 
-void OpenSteer::drawBasic3dSphericalVehicle(const AbstractVehicle& vehicle,
+void drawBasic3dSphericalVehicle(const AbstractVehicle& vehicle,
 		const Color& color)
 {
 	// "aspect ratio" of body (as seen from above)
@@ -409,7 +414,7 @@ void OpenSteer::drawBasic3dSphericalVehicle(const AbstractVehicle& vehicle,
 // drawBasic3dSphericalVehicle with a supplied draw routine
 // provided so non-OpenGL based apps can draw a boid
 
-void OpenSteer::drawBasic3dSphericalVehicle(drawTriangleRoutine draw,
+void drawBasic3dSphericalVehicle(drawTriangleRoutine draw,
 		const AbstractVehicle& vehicle, const Color& color)
 {
 	// "aspect ratio" of body (as seen from above)
@@ -459,7 +464,7 @@ void OpenSteer::drawBasic3dSphericalVehicle(drawTriangleRoutine draw,
 // has eight), "center" is the 3d position of the center of the grid, lines
 // are drawn in the specified "color".)
 
-void OpenSteer::drawXZLineGrid(const float size, const int subsquares,
+void drawXZLineGrid(const float size, const int subsquares,
 		const Vec3& center, const Color& color)
 {
 	const float half = size / 2;
@@ -493,7 +498,7 @@ void OpenSteer::drawXZLineGrid(const float size, const int subsquares,
 // basis vectors of the space, centered at its origin, of lengths
 // given by the coordinates of "size".
 
-void OpenSteer::drawAxes(const AbstractLocalSpace& ls, const Vec3& size,
+void drawAxes(const AbstractLocalSpace& ls, const Vec3& size,
 		const Color& color)
 {
 	const Vec3 x(size.x / 2, 0, 0);
@@ -513,7 +518,7 @@ void OpenSteer::drawAxes(const AbstractLocalSpace& ls, const Vec3& size,
 //
 // use gGlobalSpace to draw a box aligned with global space
 
-void OpenSteer::drawBoxOutline(const AbstractLocalSpace& localSpace,
+void drawBoxOutline(const AbstractLocalSpace& localSpace,
 		const Vec3& size, const Color& color)
 {
 	const Vec3 s = size / 2.0f;  // half of main diagonal
@@ -554,7 +559,7 @@ void OpenSteer::drawBoxOutline(const AbstractLocalSpace& localSpace,
 	iDrawLine(H, E, color);
 }
 
-void OpenSteer::draw2dLine(const Vec3& startPoint, const Vec3& endPoint,
+void draw2dLine(const Vec3& startPoint, const Vec3& endPoint,
 		const Color& color, float w, float h)
 {
 	gDrawer2d->setColor(ely::OpenSteerColorToLVecBase4f(color));
@@ -568,7 +573,7 @@ void OpenSteer::draw2dLine(const Vec3& startPoint, const Vec3& endPoint,
 // draw a reticle at the center of the window.  Currently it is small
 // crosshair with a gap at the center, drawn in white with black borders
 
-void OpenSteer::drawReticle(float w, float h)
+void drawReticle(float w, float h)
 {
 	const int a = 10;
 	const int b = 30;
@@ -584,6 +589,8 @@ void OpenSteer::drawReticle(float w, float h)
 	draw2dLine(Vec3(w - a, h, 0), Vec3(w - b, h, 0), gBlack, w, h);
 	draw2dLine(Vec3(w, h - a, 0), Vec3(w, h - b, 0), gBlack, w, h);
 	gDrawer3d->setSize(1);
+}
+
 }
 
 namespace
@@ -638,15 +645,19 @@ DeferredLine::DeferredLines DeferredLine::lines;
 
 } // anonymous namespace
 
-void OpenSteer::deferredDrawLine(const Vec3& startPoint, const Vec3& endPoint,
+namespace OpenSteer
+{
+void deferredDrawLine(const Vec3& startPoint, const Vec3& endPoint,
 		const Color& color)
 {
 	DeferredLine::addToBuffer(startPoint, endPoint, color);
 }
 
-void OpenSteer::drawAllDeferredLines(void)
+void drawAllDeferredLines(void)
 {
 	DeferredLine::drawAll();
+}
+
 }
 
 namespace
@@ -712,7 +723,10 @@ DeferredCircle::DeferredCircles DeferredCircle::circles;
 
 } // anonymous namesopace
 
-void OpenSteer::deferredDrawCircleOrDisk(const float radius, const Vec3& axis,
+namespace OpenSteer
+{
+
+void deferredDrawCircleOrDisk(const float radius, const Vec3& axis,
 		const Vec3& center, const Color& color, const int segments,
 		const bool filled, const bool in3d)
 {
@@ -720,12 +734,12 @@ void OpenSteer::deferredDrawCircleOrDisk(const float radius, const Vec3& axis,
 			in3d);
 }
 
-void OpenSteer::drawAllDeferredCirclesOrDisks(void)
+void drawAllDeferredCirclesOrDisks(void)
 {
 	DeferredCircle::drawAll();
 }
 
-void OpenSteer::draw2dTextAt3dLocation(const char& text, const Vec3& location,
+void draw2dTextAt3dLocation(const char& text, const Vec3& location,
 		const Color& color, float w, float h)
 {
 	gDrawer3d->drawText(std::string(&text),
@@ -733,13 +747,13 @@ void OpenSteer::draw2dTextAt3dLocation(const char& text, const Vec3& location,
 			ely::OpenSteerColorToLVecBase4f(color));
 }
 
-void OpenSteer::draw2dTextAt3dLocation(const std::ostringstream& text,
+void draw2dTextAt3dLocation(const std::ostringstream& text,
 		const Vec3& location, const Color& color, float w, float h)
 {
 	draw2dTextAt3dLocation(*text.str().c_str(), location, color, w, h);
 }
 
-void OpenSteer::draw2dTextAt2dLocation(const char& text, const Vec3 location,
+void draw2dTextAt2dLocation(const char& text, const Vec3 location,
 		const Color& color, float w, float h)
 {
 	gDrawer2d->drawText(std::string(&text),
@@ -747,16 +761,13 @@ void OpenSteer::draw2dTextAt2dLocation(const char& text, const Vec3 location,
 			ely::OpenSteerColorToLVecBase4f(color));
 }
 
-void OpenSteer::draw2dTextAt2dLocation(const std::ostringstream& text,
+void draw2dTextAt2dLocation(const std::ostringstream& text,
 		const Vec3 location, const Color& color, float w, float h)
 {
 	draw2dTextAt2dLocation(*text.str().c_str(), location, color, w, h);
 }
 
 // ----------------------------------------------------------------------------
-
-namespace OpenSteer
-{
 
 // This class provides methods to draw spheres.  The shape is represented
 // as a "geodesic" mesh of triangles generated by subviding an icosahedron
@@ -993,11 +1004,11 @@ void drawSphereObstacle(const SphereObstacle& so, const float maxEdgeLength,
 
 ///XXX
 //Flags and functions expected by OpenSteer as defined
-bool enableAnnotation = true;
+bool enableAnnotation = false;
 bool drawPhaseActive = true;
 bool updatePhaseActive = false;
-void drawCameraLookAt(OpenSteer::Vec3 const&, OpenSteer::Vec3 const&,
-		OpenSteer::Vec3 const&)
+void drawCameraLookAt(Vec3 const&, Vec3 const&,
+		Vec3 const&)
 {
 }
 void warnIfInUpdatePhase2(const char*)

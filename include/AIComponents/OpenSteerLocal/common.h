@@ -30,6 +30,10 @@
 #include <OpenSteer/Color.h>
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/PlugIn.h>
+#include "DrawMeshDrawer.h"
+
+extern ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
+extern ReMutex gOpenSteerDebugMutex;
 
 namespace ely
 {

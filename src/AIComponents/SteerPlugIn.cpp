@@ -24,6 +24,7 @@
 #include "AIComponents/SteerPlugIn.h"
 #include "AIComponents/SteerPlugInTemplate.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 
 namespace ely
@@ -93,12 +94,54 @@ void SteerPlugIn::onAddToSceneSetup()
 {
 	//Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
+
+#ifdef ELY_DEBUG
+	mDrawer3dNP = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
+			"render")->getNodePath().attach_new_node(
+			"Drawer3dNP_" + COMPONENT_STANDARD_NAME);
+	mDrawer2dNP = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
+			"aspect2d")->getNodePath().attach_new_node(
+			"Drawer2dNP_" + COMPONENT_STANDARD_NAME);
+
+	//get the camera object
+	SMARTPTR(Object)cameraDebug = ObjectTemplateManager::GetSingletonPtr()->
+	getCreatedObject("camera");
+	if (cameraDebug)
+	{
+		//set debug node paths
+		mDrawer3dNP.set_bin("fixed", 10);
+		mDrawer2dNP.set_bin("fixed", 10);
+		//by default Debug NodePaths are hidden
+		mDrawer3dNP.hide();
+		mDrawer2dNP.hide();
+		//set the recast debug camera to the first child of "camera" node path
+		mDebugCamera = cameraDebug->getNodePath().get_child(0);
+	}
+	//create new Debug Drawers
+	mDrawer3d = new DrawMeshDrawer(mDrawer3dNP, mDebugCamera, 100, 0.04);
+	mDrawer2d = new DrawMeshDrawer(mDrawer2dNP, mDebugCamera, 50, 0.04);
+#endif //ELY_DEBUG
 }
 
 void SteerPlugIn::onRemoveFromSceneCleanup()
 {
 	//remove from AI manager update
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+
+#ifdef ELY_DEBUG
+	if (not mDebugCamera.is_empty())
+	{
+		//set the recast debug camera to empty node path
+		mDebugCamera = NodePath();
+		//remove the recast debug node paths
+		mDrawer3dNP.remove_node();
+		mDrawer2dNP.remove_node();
+	}
+	//delete the DebugDrawers
+	delete mDrawer3d;
+	delete mDrawer2d;
+#endif
+
 }
 
 SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
@@ -174,26 +217,102 @@ void SteerPlugIn::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-//	// service queued reset request, if any
-//	if (OpenSteer::gDelayedResetPlugInXXX)
-//	{
-//		mPlugIn->reset();
-//		OpenSteer::gDelayedResetPlugInXXX = false;
-//	}
-	// invoke PlugIn's Update method
-	mPlugIn->update(mCurrentTime, dt);
+#ifdef ELY_DEBUG
+	{
+		//lock (guard) the Drawers' mutex
+		HOLD_REMUTEX(gOpenSteerDebugMutex)
+
+		if (mEnableDebugDrawUpdate)
+		{
+			//unset enableAnnotation
+			enableAnnotation = true;
+
+//			// service queued reset request, if any
+//			if (OpenSteer::gDelayedResetPlugInXXX)
+//			{
+//				mPlugIn->reset();
+//				OpenSteer::gDelayedResetPlugInXXX = false;
+//			}
+
+			// invoke PlugIn's Update method
+			mPlugIn->update(mCurrentTime, dt);
+
+			//set drawers
+			mDrawer3d->reset();
+			mDrawer2d->reset();
+			gDrawer3d = mDrawer3d;
+			gDrawer2d = mDrawer2d;
+			// invoke selected PlugIn's Redraw method
+			mPlugIn->redraw(mCurrentTime, dt);
+			// draw any annotation queued up during selected PlugIn's Update method
+			OpenSteer::drawAllDeferredLines();
+			OpenSteer::drawAllDeferredCirclesOrDisks();
+		}
+		else
+		{
+			//unset enableAnnotation
+			enableAnnotation = false;
+#endif
+
+//			// service queued reset request, if any
+//			if (OpenSteer::gDelayedResetPlugInXXX)
+//			{
+//				mPlugIn->reset();
+//				OpenSteer::gDelayedResetPlugInXXX = false;
+//			}
+
+			// invoke PlugIn's Update method
+			mPlugIn->update(mCurrentTime, dt);
 
 #ifdef ELY_DEBUG
-//	//reset drawers
-//	gDrawer2d->reset();
-//	gDrawer3d->reset();
-//	// invoke selected PlugIn's Redraw method
-//	mPlugIn->redraw(mCurrentTime, dt);
-//	// draw any annotation queued up during selected PlugIn's Update method
-//	OpenSteer::drawAllDeferredLines();
-//	OpenSteer::drawAllDeferredCirclesOrDisks();
+		}
+	}
 #endif
 }
+
+#ifdef ELY_DEBUG
+SteerPlugIn::Result SteerPlugIn::debug(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//return if destroying
+	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
+
+	//return if mDrawer3dNP or mDrawer2dNP is empty
+	RETURN_ON_COND(mDrawer3dNP.is_empty() or mDrawer2dNP.is_empty(), Result::ERROR)
+
+	if (enable)
+	{
+		if (mDrawer3dNP.is_hidden())
+		{
+			mDrawer3dNP.show();
+		}
+		if (mDrawer2dNP.is_hidden())
+		{
+			mDrawer2dNP.show();
+		}
+	}
+	else
+	{
+		if (not mDrawer3dNP.is_hidden())
+		{
+			mDrawer3dNP.hide();
+		}
+		if (not mDrawer2dNP.is_hidden())
+		{
+			mDrawer2dNP.hide();
+		}
+	}
+	//set Debug Draw Update
+	mEnableDebugDrawUpdate = enable;
+	//clear drawers
+	mDrawer3d->clear();
+	mDrawer2d->clear();
+	//
+	return Result::OK;
+}
+#endif
 
 //TypedObject semantics: hardcoded
 TypeHandle SteerPlugIn::_type_handle;

@@ -270,7 +270,8 @@ void NavMesh::onAddToSceneSetup()
 	if (cameraDebug)
 	{
 		//add a debug node path
-		mDebugNodePath = mReferenceNP.attach_new_node("RecastDebugNodePath");
+		mDebugNodePath = mReferenceNP.attach_new_node(
+				"RecastDebugNodePath_" + COMPONENT_STANDARD_NAME);
 		mDebugNodePath.set_bin("fixed", 10);
 		//by default mDebugNodePath is hidden
 		mDebugNodePath.hide();

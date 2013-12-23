@@ -111,12 +111,41 @@ public:
 	operator OpenSteer::AbstractPlugIn&();
 	///@}
 
+#ifdef ELY_DEBUG
+	/**
+	 * \brief Gets a reference to the OpenSteer Drawer3d Debug node path.
+	 * @return The OpenSteer Debug node.
+	 */
+	NodePath getDrawer3dDebugNodePath() const;
+	/**
+	 * \brief Gets a reference to the OpenSteer Drawer2d Debug node path.
+	 * @return The OpenSteer Debug node.
+	 */
+	NodePath getDrawer2dDebugNodePath() const;
+	/**
+	 * \brief Enables/disables debugging.
+	 * @param enable True to enable, false to disable.
+	 */
+	Result debug(bool enable);
+#endif
+
 private:
 	///Current underlying AbstractPlugIn.
 	OpenSteer::AbstractPlugIn* mPlugIn;
 
 	///Current time.
 	float mCurrentTime;
+
+#ifdef ELY_DEBUG
+	///OpenSteer debug node paths.
+	NodePath mDrawer3dNP, mDrawer2dNP;
+	///OpenSteer debug camera.
+	NodePath mDebugCamera;
+	///OpenSteer DebugDrawers.
+	DrawMeshDrawer *mDrawer3d, *mDrawer2d;
+	///Enable Debug Draw update.
+	bool mEnableDebugDrawUpdate;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:
@@ -151,6 +180,13 @@ inline void SteerPlugIn::reset()
 	//
 	mPlugIn = NULL;
 	mCurrentTime = 0.0;
+#ifdef ELY_DEBUG
+	mDrawer3dNP = NodePath();
+	mDrawer2dNP = NodePath();
+	mDebugCamera = NodePath();
+	mDrawer3d = mDrawer2d = NULL;
+	mEnableDebugDrawUpdate = false;
+#endif
 }
 
 inline OpenSteer::AbstractPlugIn& SteerPlugIn::getAbstractPlugIn()
@@ -162,6 +198,24 @@ inline SteerPlugIn::operator OpenSteer::AbstractPlugIn&()
 {
 	return *mPlugIn;
 }
+
+#ifdef ELY_DEBUG
+inline NodePath SteerPlugIn::getDrawer3dDebugNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mDrawer3dNP;
+}
+
+inline NodePath SteerPlugIn::getDrawer2dDebugNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mDrawer2dNP;
+}
+#endif
 
 } /* namespace ely */
 

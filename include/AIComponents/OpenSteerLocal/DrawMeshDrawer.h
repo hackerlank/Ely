@@ -24,7 +24,6 @@
 #define DRAWMESHDRAWER_H_
 
 #include <meshDrawer.h>
-#include "common.h"
 
 namespace ely
 {
