@@ -145,8 +145,6 @@ void SteerVehicle::onAddToObjectSetup()
 				dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
 		settings.m_radius = radius;
 		dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
-		// update radius into vehicle
-		mVehicle->setRadius(radius);
 	}
 	//set entity and its related update method
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
@@ -158,7 +156,6 @@ void SteerVehicle::onRemoveFromObjectCleanup()
 {
 	//
 	delete mVehicle;
-	mSteerPlugIn.clear();
 	reset();
 }
 
@@ -170,12 +167,12 @@ void SteerVehicle::onAddToSceneSetup()
 	///Add to SteerPlugIn update
 	if (steerPlugInObject)
 	{
-		mSteerPlugIn = DCAST(SteerPlugIn,
+		SMARTPTR(SteerPlugIn) steerPlugIn = DCAST(SteerPlugIn,
 				steerPlugInObject->getComponent(familyType()));
 		//
-		if (mSteerPlugIn)
+		if (steerPlugIn)
 		{
-			mSteerPlugIn->addSteerVehicle(this);
+			steerPlugIn->addSteerVehicle(this);
 		}
 	}
 }

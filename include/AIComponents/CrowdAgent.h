@@ -52,11 +52,12 @@ enum AgentMovTypeEnum
  * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
  * This component should be associated to a "Scene" component.\n
- * Ife enabled, this component will throw an event on starting to move,
- * and an event on stopping to move. The second argument of both is a reference
+ * It could be associated to a kinematic rigid body, if the associated NavMesh
+ * movement type is "kinematic".\n
+ * If enabled, this component will throw an event on starting to move
+ * ("OnStartCrowdAgent"), and an event on stopping to move
+ * ("OnStopCrowdAgent"). The second argument of both is a reference
  * to the owner object.\n
- * This component can throw (if enabled) "OnStartCrowdAgent" and "OnStopCrowdAgent"
- * events.\n
  * \note the owner object of this component will be reparented (if necessary)
  * when added to a NavMesh, to the same reference node (i.e. parent) of
  * the NavMesh owner object.

@@ -134,6 +134,24 @@
 			<ComponentTmpl family="AI" type="NavMesh" priority="80"/> 
 		</ObjectTmpl>
 
+		<!-- templates for AI OpenSteer -->
+		<ObjectTmpl type="OpenSteerVehicle">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
+		</ObjectTmpl>
+
+		<ObjectTmpl type="KinematicOpenSteerVehicle">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
+			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
+		</ObjectTmpl>
+
+		<ObjectTmpl type="OpenSteerPlugIn">
+			<ComponentTmpl family="AI" type="SteerPlugIn" priority="80"/> 
+		</ObjectTmpl>
+
 		<!-- templates for vehicles -->
 		<ObjectTmpl type="Car">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
@@ -275,6 +293,7 @@
 			</Component>
 		</Object>
 		
+<!--
 		<Object type="InstancedActorAI" id="Steerer1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -301,6 +320,7 @@
 				<Param scale="0.6,0.6,0.6"/>
 			</Component>
 		</Object>
+-->
 
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity">
@@ -396,6 +416,7 @@
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 
+<!--
 		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -414,6 +435,7 @@
 				<Param move_target="-22.4522,-21.3515,40.7907"/>
 			</Component>
 		</Object>
+-->
 
 		<Object type="Car" id="auto1" priority="90">
 			<Param parent="render"/>
@@ -557,10 +579,42 @@
 		</Object>
 -->
 
+		<Object type="OpenSteerVehicle" id="steerVehicle1" priority="70">
+			<Param parent="render"/>
+			<Param is_steady="false"/>
+			<Param store_params="false"/>
+			<Param pos="0.0,0.0,0.0"/>
+			<Param rot="-90.0,0.0,0.0"/>
+			<Component type="InstanceOf">
+				<Param instance_of="Gorilla1"/>
+				<Param scale="0.6,0.6,0.6"/>
+			</Component>
+			<Component type="Sound3d">
+				<Param sound_files="walk-sound@GUI_click.wav"/>
+			</Component>
+			<Component type="SteerVehicle">
+				<Param add_to_plugin="steerPlugIn1"/>
+				<Param mov_type="opensteer"/>
+				<Param mov_type="one_turning"/>
+				<Param mass="1.0"/>
+				<Param speed="0.0"/>
+				<Param max_force="1.0"/>
+				<Param max_speed="10.0"/>
+			</Component>
+		</Object>
+
 		<!-- ------------------- -->
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 
+		<Object type="OpenSteerPlugIn" id="steerPlugIn1" priority="80">
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param plugin_type="one_turning"/>
+			</Component>
+		</Object>
+		
+<!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -594,7 +648,6 @@
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
-<!--
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elydatadir@/textures/heightfield.png"/>
@@ -693,6 +746,7 @@
 			<Param rot="100.0,5.0,3.5"/>
 			<Param pos="156.8,349.4,27.2"/>
 		</Object>
+-->
 
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
@@ -719,6 +773,7 @@
 			<Param rot="0.0,-90.0,0.0"/>
 		</Object>
 
+<!--
 		<Object type="StaticActor" id="Plane2">
 			<Component type="Model">
 				<Param from_file="true"/>

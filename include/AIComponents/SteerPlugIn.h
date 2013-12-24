@@ -37,8 +37,8 @@ class SteerPlugInTemplate;
  *
  * \see http://opensteer.sourceforge.net
  *
- * This component should be used only in association to stationary
- * (i.e. is_steady=true) "Scene" components.\n
+ * This component could be used alone or in association with
+ * other components.\n
  *
  * XML Param(s):
  * - "plugin_type"					|single|"one_turning" (values: one_turning|)
@@ -136,6 +136,9 @@ private:
 	///Current time.
 	float mCurrentTime;
 
+	///The SteerVehicle components handled by this SteerPlugIn.
+	std::set<SMARTPTR(SteerVehicle)> mSteerVehicles;
+
 #ifdef ELY_DEBUG
 	///OpenSteer debug node paths.
 	NodePath mDrawer3dNP, mDrawer2dNP;
@@ -180,6 +183,7 @@ inline void SteerPlugIn::reset()
 	//
 	mPlugIn = NULL;
 	mCurrentTime = 0.0;
+	mSteerVehicles.clear();
 #ifdef ELY_DEBUG
 	mDrawer3dNP = NodePath();
 	mDrawer2dNP = NodePath();

@@ -33,7 +33,7 @@ DrawMeshDrawer::DrawMeshDrawer(NodePath render, NodePath camera, int budget,
 		float textScale, bool singleMesh) :
 		m_render(render), m_camera(camera), m_depthMask(true), m_meshDrawersSize(
 				0), m_budget(budget), m_singleMesh(singleMesh), m_size(
-				1.0 / 50.0), m_twoSided(false), m_prevTextNodeIdx(-1), m_textNodesSize(
+				1.0 / 50.0), m_twoSided(false), m_textNodeIdx(0), m_prevTextNodeIdx(-1), m_textNodesSize(
 				0), m_textScale(textScale)
 {
 	reset();

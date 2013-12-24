@@ -47,11 +47,12 @@ enum VehicleMovTypeEnum
  * \see http://opensteer.sourceforge.net
  *
  * This component should be associated to a "Scene" component.\n
- * Ife enabled, this component will throw an event on starting to move, and
- * an event on stopping to move. The second argument of both is a reference
+ * If enabled, this component will throw an event on starting to move
+ * ("OnStartSteerVehicle"), and  an event on stopping to move
+ * ("OnStopSteerVehicle"). The second argument of both is a reference
  * to the owner object.\n
- * This component can throw (if enabled) "OnStartCrowdAgent" and "OnStopCrowdAgent"
- * events.
+ * \note debug drawing works correctly only if the owner object's
+ * parent is "render".\n
  *
  * XML Param(s):
  * - "throw_events"				|single|"false"

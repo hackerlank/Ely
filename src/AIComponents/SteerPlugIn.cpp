@@ -85,6 +85,31 @@ void SteerPlugIn::onAddToObjectSetup()
 
 void SteerPlugIn::onRemoveFromObjectCleanup()
 {
+
+	//remove all handled SteerVehicles (if any) from update
+	std::set<SMARTPTR(SteerVehicle)>::const_iterator iter;
+	for (iter = mSteerVehicles.begin(); iter != mSteerVehicles.end();
+			++iter)
+	{
+		//set steerVehicle reference to null
+		(*iter)->mSteerPlugIn.clear();
+		//do remove from real update list
+		dynamic_cast<PlugIn*>(mPlugIn)->removeVehicle(&(*iter)->getAbstractVehicle());
+	}
+
+#ifdef ELY_DEBUG
+	if (not mDebugCamera.is_empty())
+	{
+		//set the recast debug camera to empty node path
+		mDebugCamera = NodePath();
+		//remove the recast debug node paths
+		mDrawer3dNP.remove_node();
+		mDrawer2dNP.remove_node();
+	}
+	//delete the DebugDrawers
+	delete mDrawer3d;
+	delete mDrawer2d;
+#endif
 	//
 	delete mPlugIn;
 	reset();
@@ -127,21 +152,6 @@ void SteerPlugIn::onRemoveFromSceneCleanup()
 {
 	//remove from AI manager update
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
-
-#ifdef ELY_DEBUG
-	if (not mDebugCamera.is_empty())
-	{
-		//set the recast debug camera to empty node path
-		mDebugCamera = NodePath();
-		//remove the recast debug node paths
-		mDrawer3dNP.remove_node();
-		mDrawer2dNP.remove_node();
-	}
-	//delete the DebugDrawers
-	delete mDrawer3d;
-	delete mDrawer2d;
-#endif
-
 }
 
 SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
@@ -162,12 +172,16 @@ SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehi
 			//lock (guard) the steerVehicle mutex
 			HOLD_REMUTEX(steerVehicle->mMutex)
 
-			//return if steerVehicle is destroying or belongs to some plug in
+			//return if steerVehicle is destroying or already belongs to any plug in
 			RETURN_ON_ASYNC_COND(steerVehicle->mDestroying, Result::Result::ERROR)
 			RETURN_ON_COND(steerVehicle->mSteerPlugIn, Result::ERROR)
 
-			//do real adding to update list
+			//add to the set of SteerVehicles
+			mSteerVehicles.insert(steerVehicle);
+			//do add to real update list
 			dynamic_cast<PlugIn*>(mPlugIn)->addVehicle(&steerVehicle->getAbstractVehicle());
+			//set steerVehicle reference to this plugin
+			steerVehicle->mSteerPlugIn = this;
 		}
 	}
 	//
@@ -191,12 +205,16 @@ SteerPlugIn::Result SteerPlugIn::removeSteerVehicle(SMARTPTR(SteerVehicle)steerV
 			//lock (guard) the steerVehicle mutex
 			HOLD_REMUTEX(steerVehicle->mMutex)
 
-			//return if steerVehicle is destroying or doesn't belong to any plug in
+			//return if steerVehicle is destroying or doesn't belong to this plug in
 			RETURN_ON_ASYNC_COND(steerVehicle->mDestroying, Result::Result::ERROR)
-			RETURN_ON_COND(not steerVehicle->mSteerPlugIn, Result::ERROR)
+			RETURN_ON_COND(steerVehicle->mSteerPlugIn != this, Result::ERROR)
 
-			//remove from update list
+			//set steerVehicle reference to null
+			steerVehicle->mSteerPlugIn.clear();
+			//do remove from real update list
 			dynamic_cast<PlugIn*>(mPlugIn)->removeVehicle(&steerVehicle->getAbstractVehicle());
+			//remove from the set of SteerVehicles
+			mSteerVehicles.erase(steerVehicle);
 		}
 	}
 	//
@@ -227,6 +245,12 @@ void SteerPlugIn::update(void* data)
 			//unset enableAnnotation
 			enableAnnotation = true;
 
+			//set drawers
+			mDrawer3d->reset();
+			mDrawer2d->reset();
+			gDrawer3d = mDrawer3d;
+			gDrawer2d = mDrawer2d;
+
 //			// service queued reset request, if any
 //			if (OpenSteer::gDelayedResetPlugInXXX)
 //			{
@@ -237,11 +261,6 @@ void SteerPlugIn::update(void* data)
 			// invoke PlugIn's Update method
 			mPlugIn->update(mCurrentTime, dt);
 
-			//set drawers
-			mDrawer3d->reset();
-			mDrawer2d->reset();
-			gDrawer3d = mDrawer3d;
-			gDrawer2d = mDrawer2d;
 			// invoke selected PlugIn's Redraw method
 			mPlugIn->redraw(mCurrentTime, dt);
 			// draw any annotation queued up during selected PlugIn's Update method

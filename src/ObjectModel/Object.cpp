@@ -104,53 +104,58 @@ void Object::onAddToSceneSetup()
 {
 	//Called only by ObjectTemplateManager::createObject(). Thread safe.
 
-	//Parent (by default none)
-	ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
 	//Is static (by default false)
 	mIsSteady = (
 			mTmpl->parameter(std::string("is_steady")) == std::string("true") ?
 					true : false);
-	//find parent into the created objects
-	SMARTPTR(Object)createdObject =
-	ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
-	if (createdObject != NULL)
-	{
-		//reparent to parent
-		mNodePath.reparent_to(createdObject->getNodePath());
-	}
 
-	//
-	std::string param;
-	unsigned int idx, valueNum;
-	std::vector<std::string> paramValuesStr;
-	//position
-	param = mTmpl->parameter(std::string("pos"));
-	paramValuesStr = parseCompoundString(param , ',');
-	valueNum = paramValuesStr.size();
-	if (valueNum < 3)
+	///set up into scene only if NodePath is not empty
+	if (not mNodePath.is_empty())
 	{
-		paramValuesStr.resize(3, "0.0");
+		//Parent (by default none)
+		ObjectId parentId = ObjectId(mTmpl->parameter(std::string("parent")));
+		//find parent into the created objects
+		SMARTPTR(Object)createdObject =
+		ObjectTemplateManager::GetSingleton().getCreatedObject(parentId);
+		if (createdObject != NULL)
+		{
+			//reparent to parent
+			mNodePath.reparent_to(createdObject->getNodePath());
+		}
+
+		//
+		std::string param;
+		unsigned int idx, valueNum;
+		std::vector<std::string> paramValuesStr;
+		//position
+		param = mTmpl->parameter(std::string("pos"));
+		paramValuesStr = parseCompoundString(param, ',');
+		valueNum = paramValuesStr.size();
+		if (valueNum < 3)
+		{
+			paramValuesStr.resize(3, "0.0");
+		}
+		LPoint3f pos;
+		for (idx = 0; idx < 3; ++idx)
+		{
+			pos[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+		}
+		mNodePath.set_pos(pos);
+		//rotation
+		param = mTmpl->parameter(std::string("rot"));
+		paramValuesStr = parseCompoundString(param, ',');
+		valueNum = paramValuesStr.size();
+		if (valueNum < 3)
+		{
+			paramValuesStr.resize(3, "0.0");
+		}
+		LVecBase3f rot;
+		for (idx = 0; idx < 3; ++idx)
+		{
+			rot[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
+		}
+		mNodePath.set_hpr(rot);
 	}
-	LPoint3f pos;
-	for (idx = 0; idx < 3; ++idx)
-	{
-		pos[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
-	}
-	mNodePath.set_pos(pos);
-	//rotation
-	param = mTmpl->parameter(std::string("rot"));
-	paramValuesStr = parseCompoundString(param , ',');
-	valueNum = paramValuesStr.size();
-	if (valueNum < 3)
-	{
-		paramValuesStr.resize(3, "0.0");
-	}
-	LVecBase3f rot;
-	for (idx = 0; idx < 3; ++idx)
-	{
-		rot[idx] = strtof(paramValuesStr[idx].c_str(), NULL);
-	}
-	mNodePath.set_hpr(rot);
 
 	///set initialization function (if any)
 	//get initialization function name
@@ -170,8 +175,8 @@ void Object::onAddToSceneSetup()
 				not mInititializationFuncName.empty() ?
 						mInititializationFuncName :
 						std::string(mObjectId) + "_initialization");
-		mInitializationFunction = (PINITIALIZATION) lt_dlsym(
-				mInitializationLib, functionName.c_str());
+		mInitializationFunction = (PINITIALIZATION) lt_dlsym(mInitializationLib,
+				functionName.c_str());
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
@@ -183,11 +188,15 @@ void Object::onAddToSceneSetup()
 
 void Object::onRemoveFromSceneCleanup()
 {
-	//set default pos/hpr
-	mNodePath.set_hpr(0.0, 0.0, 0.0);
-	mNodePath.set_pos(0.0, 0.0, 0.0);
-	//detach node path from its parent
-	mNodePath.detach_node();
+	///clean up into scene only if NodePath is not empty
+	if (not mNodePath.is_empty())
+	{
+		//set default pos/hpr
+		mNodePath.set_hpr(0.0, 0.0, 0.0);
+		mNodePath.set_pos(0.0, 0.0, 0.0);
+		//detach node path from its parent
+		mNodePath.detach_node();
+	}
 	//set steady to false
 	mIsSteady = false;
 }

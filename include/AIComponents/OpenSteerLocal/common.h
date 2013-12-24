@@ -105,6 +105,8 @@ public:
 	void setSettings(const VehicleSettings& settings)
 	{
 		m_settings = settings;
+		//set vehicle settings effectively
+		reset();
 	}
 
 	void reset()

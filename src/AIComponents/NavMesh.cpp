@@ -1219,7 +1219,7 @@ NavMesh::Result NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 			//lock (guard) the crowdAgent mutex
 			HOLD_REMUTEX(crowdAgent->mMutex)
 
-			//return if crowdAgent is destroying or belongs to some mesh
+			//return if crowdAgent is destroying or already belongs to any mesh
 			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
 			RETURN_ON_COND(crowdAgent->mNavMesh, Result::ERROR)
 
@@ -1351,9 +1351,9 @@ NavMesh::Result NavMesh::removeCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 			//lock (guard) the crowdAgent mutex
 			HOLD_REMUTEX(crowdAgent->mMutex)
 
-			//return if crowdAgent is destroying or doesn't belong to any mesh
+			//return if crowdAgent is destroying or doesn't belong to this nav mesh
 			RETURN_ON_ASYNC_COND(crowdAgent->mDestroying, Result::Result::ERROR)
-			RETURN_ON_COND(not crowdAgent->mNavMesh, Result::ERROR)
+			RETURN_ON_COND(crowdAgent->mNavMesh != this, Result::ERROR)
 
 			//remove from update list
 			doRemoveCrowdAgentFromUpdateList(crowdAgent);
