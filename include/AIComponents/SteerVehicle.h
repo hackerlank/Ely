@@ -26,6 +26,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "OpenSteerLocal/common.h"
+#include <bulletWorld.h>
+#include <bulletClosestHitRayResult.h>
 
 namespace ely
 {
@@ -64,6 +66,7 @@ enum VehicleMovTypeEnum
  * - "speed"					|single|"0.0"
  * - "max_force"				|single|"0.1"
  * - "max_speed"				|single|"1.0"
+ * - "ray_mask"					|single|"all_on"
  *
  * \note parts inside [] are optional.\n
  */
@@ -120,6 +123,16 @@ private:
 	float mInputRadius;
 	///The movement type.
 	VehicleMovTypeEnum mMovType;
+	/**
+	 * \brief Physics data.
+	 */
+	///@{
+	SMARTPTR(BulletWorld) mBulletWorld;
+	float mMaxError;
+	LVector3f mDeltaRayDown, mDeltaRayOrig;
+	BulletClosestHitRayResult mHitResult;
+	BitMask32 mRayMask;
+	///@}
 
 	///Called by the underlying OpenSteer component update.
 	void doUpdateSteerVehicle(const float currentTime, const float elapsedTime);
@@ -165,6 +178,11 @@ inline void SteerVehicle::reset()
 	mSteerPlugInObjectId = ObjectId();
 	mInputRadius = 0.0;
 	mMovType = OPENSTEER;
+	mBulletWorld.clear();
+	mMaxError = 0.0;
+	mDeltaRayDown = mDeltaRayOrig = LVector3f::zero();
+	mHitResult = BulletClosestHitRayResult::empty();
+	mRayMask = BitMask32::all_off();
 	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
 }
 

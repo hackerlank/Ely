@@ -40,11 +40,13 @@ namespace ely
 
 typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
 
-SteerVehicle::SteerVehicle()
+SteerVehicle::SteerVehicle() :
+		mHitResult(BulletClosestHitRayResult::empty())
 {
 }
 
-SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl)
+SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl):
+		mHitResult(BulletClosestHitRayResult::empty())
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 	"OpenSteerVehicle::OpenSteerVehicle: invalid GameAIManager")
@@ -125,6 +127,21 @@ bool SteerVehicle::initialize()
 	value = strtof(mTmpl->parameter(std::string("max_speed")).c_str(),
 	NULL);
 	settings.m_maxSpeed = (value > 0.0 ? value : 1.0);
+	//ray mask
+	std::string rayMask = mTmpl->parameter(std::string("ray_mask"));
+	if (rayMask == std::string("all_on"))
+	{
+		mRayMask = BitMask32::all_on();
+	}
+	else if (rayMask == std::string("all_off"))
+	{
+		mRayMask = BitMask32::all_off();
+	}
+	else
+	{
+		uint32_t mask = (uint32_t) strtol(rayMask.c_str(), NULL, 0);
+		mRayMask.set_word(mask);
+	}
 	//set vehicle settings
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
 	//
@@ -139,13 +156,17 @@ void SteerVehicle::onAddToObjectSetup()
 		//auto compute radius
 		LPoint3f minP, maxP;
 		mOwnerObject->getNodePath().calc_tight_bounds(minP, maxP);
-		float radius = (maxP - minP).length() / 2.0;
+		mInputRadius = (maxP - minP).length() / 2.0;
 		// store new radius into settings
 		VehicleSettings settings =
 				dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
-		settings.m_radius = radius;
+		settings.m_radius = mInputRadius;
 		dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
 	}
+	//set physics parameters
+	mMaxError = 4 * mInputRadius;
+	mDeltaRayOrig = LVector3f(0, 0, mMaxError);
+	mDeltaRayDown = LVector3f(0, 0, -10*mMaxError);
 	//set entity and its related update method
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
@@ -232,12 +253,34 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 {
 	if (mVehicle->speed() > 0.0)
 	{
+		NodePath ownerObjectNP = mOwnerObject->getNodePath();
+		LPoint3f updatedPos = OpenSteerVec3ToLVecBase3f(mVehicle->position());
+		switch (mMovType)
+		{
+		case OPENSTEER:
+			break;
+		case OPENSTEER_KINEMATIC:
+			//correct updatedPos.z if needed
+			//ray down
+			mHitResult = mBulletWorld->ray_test_closest(
+					updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
+					mRayMask);
+			if (mHitResult.has_hit())
+			{
+				//physic mesh is below
+				updatedPos.set_z(mHitResult.get_hit_pos().get_z());
+				//correct vehicle position
+				mVehicle->setPosition(LVecBase3fToOpenSteerVec3(updatedPos));
+			}
+			break;
+		default:
+			break;
+		}
 		//update node path pos
-		LPoint3f pos = OpenSteerVec3ToLVecBase3f(mVehicle->position());
-		mOwnerObject->getNodePath().set_pos(pos);
+		ownerObjectNP.set_pos(updatedPos);
 		//update node path dir
-		mOwnerObject->getNodePath().heads_up(
-				pos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
+		ownerObjectNP.heads_up(
+				updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
 				OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 
 		//throw SteerVehicleStart event (if enabled)
@@ -251,6 +294,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 	}
 	else
 	{
+		//mVehicle.speed == 0.0
 		//throw SteerVehicleStop event (if enabled)
 		if (mThrowEvents and (not mSteerVehicleStopSent))
 		{

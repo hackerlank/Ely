@@ -815,7 +815,6 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
 		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
 		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
-		crowdAgent->mHitResult = BulletClosestHitRayResult::empty();
 		///update move target
 		float target[3];
 		LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
@@ -1317,7 +1316,6 @@ bool NavMesh::doAddCrowdAgentToRecastUpdate(SMARTPTR(CrowdAgent)crowdAgent)
 		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
 		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
 		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10*crowdAgent->mMaxError);
-		crowdAgent->mHitResult = BulletClosestHitRayResult::empty();
 		///update move target
 		float target[3];
 		LVecBase3fToRecast(crowdAgent->mMoveTarget, target);

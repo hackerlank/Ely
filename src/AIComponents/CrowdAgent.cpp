@@ -302,48 +302,47 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 
 void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
-	//only for kinematic case
-	//raycast in the near of recast mesh:
-	LPoint3f kinematicPos;
-	NodePath ownerObjectNP = mOwnerObject->getNodePath();
 	if (vel.length_squared() > 0.0)
 	{
+		NodePath ownerObjectNP = mOwnerObject->getNodePath();
+		LPoint3f updatedPos = pos;
 		switch (mMovType)
 		{
-			case RECAST:
-				ownerObjectNP.set_pos(pos);
-				break;
-			case RECAST_KINEMATIC:
-				//set recast pos anyway
-				kinematicPos = pos;
-				//correct z
-				//ray down
-				mHitResult = mBulletWorld->ray_test_closest(kinematicPos + mDeltaRayOrig,
-						kinematicPos + mDeltaRayDown, mRayMask);
-				if (mHitResult.has_hit())
-				{
-					//check if hit a triangle mesh
-					BulletShape* shape =
-					DCAST(BulletRigidBodyNode, mHitResult.get_node())->get_shape(0);
-					if (shape and shape->is_of_type(BulletTriangleMeshShape::get_class_type()))
-					{
-						//physic mesh is under recast mesh
-						kinematicPos.set_z(mHitResult.get_hit_pos().get_z());
-					}
-				}
-				ownerObjectNP.set_pos(kinematicPos);
+		case RECAST:
 			break;
-			default:
+		case RECAST_KINEMATIC:
+			//correct updatedPos.z (if needed)
+			//ray down
+			mHitResult = mBulletWorld->ray_test_closest(
+					updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
+					mRayMask);
+			if (mHitResult.has_hit())
+			{
+				//check if hit a triangle mesh
+				BulletShape* shape =
+				DCAST(BulletRigidBodyNode, mHitResult.get_node())->get_shape(
+						0);
+				if (shape
+						and shape->is_of_type(
+								BulletTriangleMeshShape::get_class_type()))
+				{
+					//physic mesh is under recast mesh
+					updatedPos.set_z(mHitResult.get_hit_pos().get_z());
+				}
+			}
+			break;
+		default:
 			break;
 		}
-		//
-		LPoint3f lookAtPos = ownerObjectNP.get_pos() - vel * 100000;
-		ownerObjectNP.heads_up(lookAtPos);
+		//update node path pos
+		ownerObjectNP.set_pos(updatedPos);
+		//update node path dir
+		ownerObjectNP.heads_up(updatedPos - vel);
+
 		//throw CrowdAgentStart event (if enabled)
 		if (mThrowEvents and (not mCrowdAgentStartSent))
 		{
-			throw_event(STARTEVENT,
-					EventParameter(this),
+			throw_event(STARTEVENT, EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mCrowdAgentStartSent = true;
 			mCrowdAgentStopSent = false;

@@ -83,6 +83,7 @@ void SteerVehicleTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("speed", "0.0"));
 	mParameterTable.insert(ParameterNameValue("max_force", "0.1"));
 	mParameterTable.insert(ParameterNameValue("max_speed", "1.0"));
+	mParameterTable.insert(ParameterNameValue("ray_mask", "all_on"));
 }
 
 //TypedObject semantics: hardcoded
