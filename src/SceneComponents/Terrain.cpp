@@ -39,7 +39,7 @@ Terrain::Terrain()
 Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
-			"Terrain::Terrain: invalid GameSceneManager")
+	"Terrain::Terrain: invalid GameSceneManager")
 
 	mTmpl = tmpl;
 	reset();

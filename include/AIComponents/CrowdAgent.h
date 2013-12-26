@@ -144,6 +144,7 @@ private:
 	LVector3f mDeltaRayDown, mDeltaRayOrig;
 	BulletClosestHitRayResult mHitResult;
 	BitMask32 mRayMask;
+	float mCorrectHeightRigidBody;
 	///@}
 	/**
 	 * \brief Updates position/velocity/orientation of the controlled object.
@@ -214,6 +215,7 @@ inline void CrowdAgent::reset()
 	mDeltaRayDown = mDeltaRayOrig = LVector3f::zero();
 	mHitResult = BulletClosestHitRayResult::empty();
 	mRayMask = BitMask32::all_off();
+	mCorrectHeightRigidBody = 0.0;
 	mThrowEvents = mCrowdAgentStartSent = mCrowdAgentStopSent = false;
 }
 

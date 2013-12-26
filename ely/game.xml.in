@@ -273,6 +273,7 @@
 			<Param is_steady="true"/>
 		</Object>
 
+<!--
 		<Object type="InstancedActor" id="ball1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -293,7 +294,6 @@
 			</Component>
 		</Object>
 		
-<!--
 		<Object type="InstancedActorAI" id="Steerer1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -320,7 +320,6 @@
 				<Param scale="0.6,0.6,0.6"/>
 			</Component>
 		</Object>
--->
 
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity">
@@ -416,7 +415,6 @@
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 
-<!--
 		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -435,7 +433,6 @@
 				<Param move_target="-22.4522,-21.3515,40.7907"/>
 			</Component>
 		</Object>
--->
 
 		<Object type="Car" id="auto1" priority="90">
 			<Param parent="render"/>
@@ -489,7 +486,6 @@
 			<Param is_steady="true"/>
 		</Object>
 		
-<!--		
 		<Object type="SoftObject" id="rope1">
 			<Component type="Model">
 				<Param from_file="false"/>
@@ -579,11 +575,14 @@
 		</Object>
 -->
 
+		<Object type="KinematicOpenSteerVehicle" id="steerVehicle1" priority="70"> 
+<!--		
 		<Object type="OpenSteerVehicle" id="steerVehicle1" priority="70">
+-->
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="false"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param pos="-33.0144,44.7431,18.695"/>
 			<Param rot="-90.0,0.0,0.0"/>
 			<Component type="InstanceOf">
 				<Param instance_of="Gorilla1"/>
@@ -594,12 +593,21 @@
 			</Component>
 			<Component type="SteerVehicle">
 				<Param add_to_plugin="steerPlugIn1"/>
-				<Param mov_type="opensteer"/>
+				<Param mov_type="kinematic"/>
 				<Param mov_type="one_turning"/>
 				<Param mass="1.0"/>
 				<Param speed="0.0"/>
 				<Param max_force="1.0"/>
 				<Param max_speed="10.0"/>
+				<Param ray_mask="0x7FFFFFFF"/>			
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="kinematic"/>
+				<Param body_friction="0.8"/>
+				<Param body_restitution="0.1"/>
+				<Param shape_type="capsule"/>
+				<Param shape_size="maximum"/>
+				<Param collide_mask="0x80000000"/>
 			</Component>
 		</Object>
 
@@ -647,6 +655,7 @@
 			<Param rot="0.0,0.0,0.0"/>
 			<Param pos="0.0,0.0,0.0"/>
 		</Object>
+-->
 
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
@@ -674,7 +683,8 @@
 			</Component> 
 			<Param parent="render"/>
 		</Object>
-		
+
+<!--		
 		<Object type="StaticActor" id="beachhouse2">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -746,7 +756,6 @@
 			<Param rot="100.0,5.0,3.5"/>
 			<Param pos="156.8,349.4,27.2"/>
 		</Object>
--->
 
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
@@ -773,7 +782,6 @@
 			<Param rot="0.0,-90.0,0.0"/>
 		</Object>
 
-<!--
 		<Object type="StaticActor" id="Plane2">
 			<Component type="Model">
 				<Param from_file="true"/>

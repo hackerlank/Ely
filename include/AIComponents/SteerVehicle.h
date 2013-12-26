@@ -132,6 +132,7 @@ private:
 	LVector3f mDeltaRayDown, mDeltaRayOrig;
 	BulletClosestHitRayResult mHitResult;
 	BitMask32 mRayMask;
+	float mCorrectHeightRigidBody;
 	///@}
 
 	///Called by the underlying OpenSteer component update.
@@ -183,6 +184,7 @@ inline void SteerVehicle::reset()
 	mDeltaRayDown = mDeltaRayOrig = LVector3f::zero();
 	mHitResult = BulletClosestHitRayResult::empty();
 	mRayMask = BitMask32::all_off();
+	mCorrectHeightRigidBody = 0.0;
 	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
 }
 

@@ -28,6 +28,35 @@
 #include "Game/GamePhysicsManager.h"
 #include <mouseWatcher.h>
 
+#if defined (ELY_DEBUG) && !defined (TESTING)
+#	define PRINT_DEBUG_HIT \
+		std::cout << result.get_node()->get_type().get_name() << \
+		"| panda node: " << result.get_node()->get_name() << \
+		"| hit pos: " << "\"" \
+			<< result.get_hit_pos().get_x() << "," \
+			<< result.get_hit_pos().get_y() << "," \
+			<< result.get_hit_pos().get_z() \
+			<< "\"" << \
+		"| hit normal: " << "\"" \
+			<< result.get_hit_normal().get_x() << "," \
+			<< result.get_hit_normal().get_y() << "," \
+			<< result.get_hit_normal().get_z() \
+			<< "\"" << \
+		"| hit fraction: " << "\"" \
+			<< result.get_hit_fraction() \
+			<< "\"" << \
+		"| from pos: " << "\"" \
+			<< result.get_from_pos().get_x() << "," \
+			<< result.get_from_pos().get_y() << "," \
+			<< result.get_from_pos().get_z() \
+			<< "\"" << \
+		"| to pos: " << "\"" \
+			<< result.get_to_pos().get_x() << "," \
+			<< result.get_to_pos().get_y() << "," \
+			<< result.get_to_pos().get_z() \
+			<< "\"" << std::endl
+#endif
+
 namespace ely
 {
 
@@ -156,34 +185,17 @@ void Picker::pickBody(const Event* event)
 									pivotLocalPos);
 							//and attach it to the world
 							mWorld->attach(mCsPick);
-							PRINT_DEBUG(result.get_node()->get_type().get_name() <<
-									"| panda node: " << result.get_node()->get_name() <<
-									"| hit pos: " << result.get_hit_pos() <<
-									"| hit normal: " << result.get_hit_normal() <<
-									"| hit fraction: " << result.get_hit_fraction() <<
-									"| from pos: " << result.get_from_pos() <<
-									"| to pos: " << result.get_to_pos());
+							//
+							PRINT_DEBUG_HIT;
 						}
 						else
 						{
-							PRINT_DEBUG(result.get_node()->get_type().get_name() <<
-									"| panda node: " << result.get_node()->get_name() <<
-									"| hit pos: " << result.get_hit_pos() <<
-									"| hit normal: " << result.get_hit_normal() <<
-									"| hit fraction: " << result.get_hit_fraction() <<
-									"| from pos: " << result.get_from_pos() <<
-									"| to pos: " << result.get_to_pos());
+							PRINT_DEBUG_HIT;
 						}
 					}
 					else
 					{
-						PRINT_DEBUG(result.get_node()->get_type().get_name() <<
-								"| panda node: " << result.get_node()->get_name() <<
-								"| hit pos: " << result.get_hit_pos() <<
-								"| hit normal: " << result.get_hit_normal() <<
-								"| hit fraction: " << result.get_hit_fraction() <<
-								"| from pos: " << result.get_from_pos() <<
-								"| to pos: " << result.get_to_pos());
+						PRINT_DEBUG_HIT;
 					}
 				}
 			}

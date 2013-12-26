@@ -33,6 +33,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
+#include "PhysicsComponents/RigidBody.h"
 
 namespace ely
 {
@@ -772,7 +773,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	std::list<SMARTPTR(CrowdAgent)>::iterator iterCrowdAgents = mCrowdAgents.begin();
 	while (iterCrowdAgents != mCrowdAgents.end())
 	{
-		SMARTPTR(CrowdAgent) crowdAgent = *iterCrowdAgents;
+		SMARTPTR(CrowdAgent)crowdAgent = *iterCrowdAgents;
 		//NavMesh object updates CrowdAgents pos/vel wrt its reference node path
 		LPoint3f pos;
 		if (mReferenceNP
@@ -815,6 +816,17 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
 		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
 		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
+		//correct height if there is a (kinematic) rigid body component
+		//for raycast into update
+		if (DCAST(RigidBody,
+						crowdAgent->mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
+		{
+			crowdAgent->mCorrectHeightRigidBody = crowdAgent->mMaxError / 2.0;
+		}
+		else
+		{
+			crowdAgent->mCorrectHeightRigidBody = 0.0;
+		}
 		///update move target
 		float target[3];
 		LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
@@ -1315,12 +1327,23 @@ bool NavMesh::doAddCrowdAgentToRecastUpdate(SMARTPTR(CrowdAgent)crowdAgent)
 		//set physics parameters
 		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
 		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
-		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10*crowdAgent->mMaxError);
+		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
+		//correct height if there is a (kinematic) rigid body component
+		//for raycast into update
+		if (DCAST(RigidBody,
+						crowdAgent->mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
+		{
+			crowdAgent->mCorrectHeightRigidBody = crowdAgent->mMaxError / 2.0;
+		}
+		else
+		{
+			crowdAgent->mCorrectHeightRigidBody = 0.0;
+		}
 		///update move target
 		float target[3];
 		LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
 		crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
-		///update move velocity
+		///update move velocity (if length != 0)
 		if(length(crowdAgent->mMoveVelocity) > 0.0)
 		{
 			float velocity[3];

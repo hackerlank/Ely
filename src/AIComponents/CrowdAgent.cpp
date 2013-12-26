@@ -327,7 +327,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 								BulletTriangleMeshShape::get_class_type()))
 				{
 					//physic mesh is under recast mesh
-					updatedPos.set_z(mHitResult.get_hit_pos().get_z());
+					updatedPos.set_z(mHitResult.get_hit_pos().get_z() + mCorrectHeightRigidBody);
 				}
 			}
 			break;

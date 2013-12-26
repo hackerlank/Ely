@@ -210,7 +210,7 @@ inline void Terrain::reset()
 {
 	//
 	mTerrain.clear();
-	mHeightField = PNMImage();
+	mHeightField.clear();
 	mOldObjectNodePath = NodePath();
 	mHeightScale = mWidthScale = 1.0;
 	mDoScale = false;

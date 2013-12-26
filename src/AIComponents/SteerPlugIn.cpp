@@ -226,6 +226,13 @@ void SteerPlugIn::update(void* data)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+	///HACK
+	if (mStartFrame > 0)
+	{
+		--mStartFrame;
+		return;
+	}
+
 	//elapsedTime
 	float dt = *(reinterpret_cast<float*>(data));
 	//currentTime

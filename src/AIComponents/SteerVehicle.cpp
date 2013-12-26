@@ -27,6 +27,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
+#include "PhysicsComponents/RigidBody.h"
 #include <throw_event.h>
 
 namespace
@@ -50,6 +51,8 @@ SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl):
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
 	"OpenSteerVehicle::OpenSteerVehicle: invalid GameAIManager")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+			"CrowdAgent::CrowdAgent: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;
 	mSteerPlugIn.clear();
@@ -150,27 +153,42 @@ bool SteerVehicle::initialize()
 
 void SteerVehicle::onAddToObjectSetup()
 {
+	LVector3 modelDims, modelDeltaCenter;
+	float modelRadius;
+	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+			mOwnerObject->getNodePath(), modelDims, modelDeltaCenter,
+			modelRadius);
 	//set definitive radius
 	if (mInputRadius <= 0.0)
 	{
-		//auto compute radius
-		LPoint3f minP, maxP;
-		mOwnerObject->getNodePath().calc_tight_bounds(minP, maxP);
-		mInputRadius = (maxP - minP).length() / 2.0;
 		// store new radius into settings
 		VehicleSettings settings =
 				dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
-		settings.m_radius = mInputRadius;
+		settings.m_radius = modelRadius;
 		dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
 	}
 	//set physics parameters
-	mMaxError = 4 * mInputRadius;
+	mMaxError = modelDims.get_z();
 	mDeltaRayOrig = LVector3f(0, 0, mMaxError);
-	mDeltaRayDown = LVector3f(0, 0, -10*mMaxError);
+	mDeltaRayDown = LVector3f(0, 0, -10 * mMaxError);
+	//correct height if there is a (kinematic) rigid body component
+	//for raycast into update
+	if (DCAST(RigidBody,
+			mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
+	{
+		mCorrectHeightRigidBody = modelDims.get_z() / 2.0;
+	}
+	else
+	{
+		mCorrectHeightRigidBody = 0.0;
+	}
 	//set entity and its related update method
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
 			&SteerVehicle::doUpdateSteerVehicle);
+
+	//set the bullet physics
+	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
 }
 
 void SteerVehicle::onRemoveFromObjectCleanup()
@@ -182,13 +200,28 @@ void SteerVehicle::onRemoveFromObjectCleanup()
 
 void SteerVehicle::onAddToSceneSetup()
 {
+	//set vehicle's forward,( side,) up and position
+	NodePath ownerNP = mOwnerObject->getNodePath();
+	VehicleSettings settings =
+			dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
+	settings.m_forward =
+			LVecBase3fToOpenSteerVec3(
+					ownerNP.get_parent().get_relative_vector(
+							mOwnerObject->getNodePath(), LVector3f::forward())).normalize();
+	settings.m_up = LVecBase3fToOpenSteerVec3(
+			ownerNP.get_parent().get_relative_vector(
+					mOwnerObject->getNodePath(), LVector3f::up())).normalize();
+	settings.m_position = LVecBase3fToOpenSteerVec3(
+			mOwnerObject->getNodePath().get_pos());
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
+
 	//set SteerPlugIn object (if any)
 	SMARTPTR(Object)steerPlugInObject = ObjectTemplateManager::
 	GetSingleton().getCreatedObject(mSteerPlugInObjectId);
 	///Add to SteerPlugIn update
 	if (steerPlugInObject)
 	{
-		SMARTPTR(SteerPlugIn) steerPlugIn = DCAST(SteerPlugIn,
+		SMARTPTR(SteerPlugIn)steerPlugIn = DCAST(SteerPlugIn,
 				steerPlugInObject->getComponent(familyType()));
 		//
 		if (steerPlugIn)
@@ -268,7 +301,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 			if (mHitResult.has_hit())
 			{
 				//physic mesh is below
-				updatedPos.set_z(mHitResult.get_hit_pos().get_z());
+				updatedPos.set_z(mHitResult.get_hit_pos().get_z() + mCorrectHeightRigidBody);
 				//correct vehicle position
 				mVehicle->setPosition(LVecBase3fToOpenSteerVec3(updatedPos));
 			}

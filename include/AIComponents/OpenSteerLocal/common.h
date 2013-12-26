@@ -72,6 +72,14 @@ struct VehicleSettings
 	float m_maxForce;
 	// the maximum speed this vehicle is allowed to move
 	float m_maxSpeed;
+	// forward-pointing unit basis vector
+	OpenSteer::Vec3 m_forward;
+	// side-pointing unit basis vector
+	OpenSteer::Vec3 m_side;
+	// upward-pointing unit basis vector
+	OpenSteer::Vec3 m_up;
+	// origin of local space
+	OpenSteer::Vec3 m_position;
 };
 
 template<typename Super, typename Entity>
@@ -116,6 +124,10 @@ public:
 		Super::setSpeed(m_settings.m_speed); // speed along Forward direction.
 		Super::setMaxForce(m_settings.m_maxForce); // steering force is clipped to this magnitude
 		Super::setMaxSpeed(m_settings.m_maxSpeed); // velocity is clipped to this magnitude
+		Super::setForward(m_settings.m_forward);
+		Super::setSide(Super::localRotateForwardToSide(m_settings.m_forward));
+		Super::setUp(m_settings.m_up);
+		Super::setPosition(m_settings.m_position);
 	}
 
 protected:
