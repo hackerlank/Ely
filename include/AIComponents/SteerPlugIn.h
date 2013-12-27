@@ -135,8 +135,6 @@ private:
 
 	///Current time.
 	float mCurrentTime;
-	///HACK
-	int mStartFrame;
 
 	///The SteerVehicle components handled by this SteerPlugIn.
 	std::set<SMARTPTR(SteerVehicle)> mSteerVehicles;
@@ -185,7 +183,6 @@ inline void SteerPlugIn::reset()
 	//
 	mPlugIn = NULL;
 	mCurrentTime = 0.0;
-	mStartFrame = 2;///HACK
 	mSteerVehicles.clear();
 #ifdef ELY_DEBUG
 	mDrawer3dNP = NodePath();

@@ -28,7 +28,6 @@
 #include "AIComponents/RecastNavigation/NavMeshType_Obstacle.h"
 #include "AIComponents/RecastNavigation/ConvexVolumeTool.h"
 #include "AIComponents/RecastNavigation/OffMeshConnectionTool.h"
-#include "AIComponents/RecastNavigation/CrowdTool.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
@@ -807,37 +806,8 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 			iterCrowdAgents = mCrowdAgents.erase(iterCrowdAgents);
 			continue;
 		}
-		//set the mov type of the crowd agent
-		crowdAgent->mMovType = mMovType;
-		//reset events' sending
-		crowdAgent->mCrowdAgentStartSent = false;
-		crowdAgent->mCrowdAgentStopSent = true;
-		//set physics parameters
-		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
-		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
-		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
-		//correct height if there is a (kinematic) rigid body component
-		//for raycast into update
-		if (DCAST(RigidBody,
-						crowdAgent->mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
-		{
-			crowdAgent->mCorrectHeightRigidBody = crowdAgent->mMaxError / 2.0;
-		}
-		else
-		{
-			crowdAgent->mCorrectHeightRigidBody = 0.0;
-		}
-		///update move target
-		float target[3];
-		LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
-		crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
-		///update move velocity (if length != 0)
-		if(length(crowdAgent->mMoveVelocity) > 0.0)
-		{
-			float velocity[3];
-			LVecBase3fToRecast(crowdAgent->mMoveVelocity, velocity);
-			crowdTool->getState()->setMoveVelocity(crowdAgent->mAgentIdx, velocity);
-		}
+		//set crowd agent other settings
+		doSetCrowdAgentOtherSettings(crowdAgent, crowdTool);
 		//increment iterator
 		++iterCrowdAgents;
 	}
@@ -885,6 +855,42 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 
 	//
 	return AsyncTask::DS_done;
+}
+
+inline void NavMesh::doSetCrowdAgentOtherSettings(
+		SMARTPTR(CrowdAgent)crowdAgent, CrowdTool* crowdTool)
+{
+	//set the mov type of the crowd agent
+	crowdAgent->mMovType = mMovType;
+	//reset events' sending
+	crowdAgent->mCrowdAgentStartSent = false;
+	crowdAgent->mCrowdAgentStopSent = true;
+	//set physics parameters
+	crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
+	crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
+	crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
+	//correct height if there is a (kinematic) rigid body component
+	//for raycast into update
+	if (DCAST(RigidBody,
+			crowdAgent->mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
+	{
+		crowdAgent->mCorrectHeightRigidBody = mNavMeshType->getNavMeshSettings().m_agentHeight / 2.0;
+	}
+	else
+	{
+		crowdAgent->mCorrectHeightRigidBody = 0.0;
+	}
+	///update move target
+	float target[3];
+	LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
+	crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
+	///update move velocity (if length != 0)
+	if(length(crowdAgent->mMoveVelocity) > 0.0)
+	{
+		float velocity[3];
+		LVecBase3fToRecast(crowdAgent->mMoveVelocity, velocity);
+		crowdTool->getState()->setMoveVelocity(crowdAgent->mAgentIdx, velocity);
+	}
 }
 
 #ifdef ELY_DEBUG
@@ -1076,12 +1082,11 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 	{
 		//get obstacle dimensions
 		NodePath objectNP = object->getNodePath();
-		LPoint3f min_point, max_point;
-		objectNP.calc_tight_bounds(min_point, max_point);
-		float dX = max_point.get_x() - min_point.get_x();
-		float dY = max_point.get_y() - min_point.get_y();
-		float radius = sqrt(pow(dX,2) + pow(dY,2)) / 2.0;
-		float heigth = max_point.get_z() - min_point.get_z();
+		LVector3 modelDims, modelDeltaCenter;
+		float modelRadius;
+		GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+				objectNP, modelDims, modelDeltaCenter,
+				modelRadius);
 		//calculate pos wrt reference node path
 		LPoint3f pos = objectNP.get_pos(mReferenceNP);
 		//add detour obstacle
@@ -1090,7 +1095,7 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 		LVecBase3fToRecast(pos, recastPos);
 		dtTileCache* tileCache =
 		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
-		tileCache->addObstacle(recastPos, radius, heigth, &obstacleRef);
+		tileCache->addObstacle(recastPos, modelRadius, modelDims.get_z(), &obstacleRef);
 		//update tile cache
 		tileCache->update(0, mNavMeshType->getNavMesh());
 		//add to the obstacles table
@@ -1319,37 +1324,8 @@ bool NavMesh::doAddCrowdAgentToRecastUpdate(SMARTPTR(CrowdAgent)crowdAgent)
 			crowdAgent->getOwnerObject()->getNodePath().reparent_to(mReferenceNP);
 			crowdAgent->getOwnerObject()->getNodePath().set_pos(pos);
 		}
-		//set the mov type of the crowd agent
-		crowdAgent->mMovType = mMovType;
-		//reset events' sending
-		crowdAgent->mCrowdAgentStartSent = false;
-		crowdAgent->mCrowdAgentStopSent = true;
-		//set physics parameters
-		crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
-		crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
-		crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
-		//correct height if there is a (kinematic) rigid body component
-		//for raycast into update
-		if (DCAST(RigidBody,
-						crowdAgent->mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
-		{
-			crowdAgent->mCorrectHeightRigidBody = crowdAgent->mMaxError / 2.0;
-		}
-		else
-		{
-			crowdAgent->mCorrectHeightRigidBody = 0.0;
-		}
-		///update move target
-		float target[3];
-		LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
-		crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
-		///update move velocity (if length != 0)
-		if(length(crowdAgent->mMoveVelocity) > 0.0)
-		{
-			float velocity[3];
-			LVecBase3fToRecast(crowdAgent->mMoveVelocity, velocity);
-			crowdTool->getState()->setMoveVelocity(crowdAgent->mAgentIdx, velocity);
-		}
+		//set crowd agent other settings
+		doSetCrowdAgentOtherSettings(crowdAgent, crowdTool);
 	}
 	//agent has been added to recast
 	return true;

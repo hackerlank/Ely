@@ -27,6 +27,7 @@
 #include "RecastNavigation/NavMeshType.h"
 #include "RecastNavigation/InputGeom.h"
 #include "RecastNavigation/DebugInterfaces.h"
+#include "RecastNavigation/CrowdTool.h"
 #include "ObjectModel/Component.h"
 #include "CrowdAgent.h"
 #include <DetourCrowd.h>
@@ -342,6 +343,12 @@ private:
 	 * \brief Removes CrowdAgent from recast update.
 	 */
 	void doRemoveCrowdAgentFromRecastUpdate(SMARTPTR(CrowdAgent)crowdAgent);
+
+	/**
+	 * \brief Inline helper: only called by other methods.
+	 */
+	void doSetCrowdAgentOtherSettings(
+			SMARTPTR(CrowdAgent)crowdAgent, CrowdTool* crowdTool);
 
 	///@{
 	///A task data to do asynchronous NavMesh setup.

@@ -28,7 +28,7 @@ namespace ely
 {
 
 GameAIManager::GameAIManager(int sort, int priority,
-		const std::string& asyncTaskChain)
+		const std::string& asyncTaskChain):mStartFrame(2)
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameAIManager::GameAIManager: invalid GameManager")
@@ -107,6 +107,13 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
+
+	///HACK
+	if (mStartFrame > 0)
+	{
+		--mStartFrame;
+		return AsyncTask::DS_cont;
+	}
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 

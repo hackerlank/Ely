@@ -101,6 +101,9 @@ private:
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
+	///HACK: start frame in which components' updates begin.
+	int mStartFrame;
+
 #ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
