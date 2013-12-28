@@ -128,12 +128,19 @@ public:
 		Super::setSide(Super::localRotateForwardToSide(m_settings.m_forward));
 		Super::setUp(m_settings.m_up);
 		Super::setPosition(m_settings.m_position);
+		m_start = Super::position();
+	}
+
+	OpenSteer::Vec3 getStart()
+	{
+		return m_start;
 	}
 
 protected:
 	ENTITY m_entity;
 	ENTITYUPDATEMETHOD m_entityUpdateMethod;
 	VehicleSettings m_settings;
+	OpenSteer::Vec3 m_start;
 };
 
 template<typename Super>
@@ -188,6 +195,9 @@ public:
 		}
 	}
 };
+
+//common typedef
+typedef PlugInAddOnMixin<OpenSteer::PlugIn> PlugIn;
 
 }
 

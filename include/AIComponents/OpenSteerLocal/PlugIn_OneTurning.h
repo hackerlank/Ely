@@ -46,7 +46,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <nodePath.h>
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/PlugIn.h>
 #include "common.h"
@@ -78,7 +77,6 @@ public:
 		SimpleVehicle::reset(); // reset the vehicle
 		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
 		this->clearTrailHistory();  // prevent long streaks due to teleportation
-		m_start = this->position();
 	}
 
 	// per frame simulation update
@@ -98,20 +96,10 @@ public:
 		drawBasic2dCircularVehicle(*this, gGray50);
 		this->drawTrail();
 	}
-
-	Vec3 getStart()
-	{
-		return m_start;
-	}
-
-private:
-	Vec3 m_start;
 };
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
-
-typedef PlugInAddOnMixin<OpenSteer::PlugIn> PlugIn;
 
 template<typename Entity>
 class OneTurningPlugIn: public PlugIn
