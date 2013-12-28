@@ -24,6 +24,7 @@
 #include "AIComponents/SteerPlugIn.h"
 #include "AIComponents/SteerPlugInTemplate.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 
@@ -63,8 +64,9 @@ bool SteerPlugIn::initialize()
 	//set SteerPlugIn parameters (store internally for future use)
 	//type
 	std::string type = mTmpl->parameter(std::string("plugin_type"));
-	if (type == std::string(""))
+	if (type == std::string("pedestrian"))
 	{
+		mPlugIn = new PedestrianPlugIn<SteerVehicle>;
 	}
 	else if (type == std::string(""))
 	{
@@ -111,6 +113,7 @@ void SteerPlugIn::onRemoveFromObjectCleanup()
 	delete mDrawer2d;
 #endif
 	//
+	mPlugIn->close();
 	delete mPlugIn;
 	reset();
 }

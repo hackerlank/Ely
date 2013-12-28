@@ -171,6 +171,8 @@ public:
 			//vehicle needs to be added
 			(const_cast<OpenSteer::AVGroup&>(this->allVehicles())).push_back(
 					vehicle);
+			//this is the new selected vehicle
+			selectedVehicle = vehicle;
 		}
 	}
 
@@ -192,8 +194,22 @@ public:
 		{
 			//vehicle needs to be removed
 			(const_cast<OpenSteer::AVGroup&>(this->allVehicles())).erase(iter);
+			//if this is the selected vehicle set to NULL
+			if (selectedVehicle == vehicle)
+			{
+				selectedVehicle = NULL;
+			}
 		}
 	}
+
+	void setSelectedVehicle(OpenSteer::AbstractVehicle* _selectedVehicle)
+	{
+		selectedVehicle = _selectedVehicle;
+	}
+
+protected:
+	OpenSteer::AbstractVehicle* selectedVehicle;
+
 };
 
 //common typedef

@@ -24,6 +24,7 @@
 #include "AIComponents/SteerVehicleTemplate.h"
 #include "AIComponents/SteerPlugIn.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -97,8 +98,9 @@ bool SteerVehicle::initialize()
 	}
 	//type
 	std::string type = mTmpl->parameter(std::string("type"));
-	if (type == std::string(""))
+	if (type == std::string("pedestrian"))
 	{
+		mVehicle = new Pedestrian<SteerVehicle>;
 	}
 	else if (type == std::string(""))
 	{

@@ -41,7 +41,7 @@ class SteerPlugInTemplate;
  * other components.\n
  *
  * XML Param(s):
- * - "plugin_type"					|single|"one_turning" (values: one_turning|)
+ * - "plugin_type"				|single|"one_turning" (values: one_turning|pedestrian)
  *
  * \note parts inside [] are optional.\n
  */

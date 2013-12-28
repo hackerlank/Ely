@@ -95,11 +95,12 @@ public:
 	typedef std::vector<Pedestrian*> groupType;
 
 	// constructor
-	Pedestrian(ProximityDatabase& pd)
+///	Pedestrian(ProximityDatabase& pd)
+	Pedestrian()
 	{
 		// allocate a token for this boid in the proximity database
 		proximityToken = NULL;
-		newPD(pd);
+///		newPD(pd);
 
 		// reset Pedestrian state
 		reset();
@@ -146,8 +147,8 @@ public:
 		// trail parameters: 3 seconds with 60 points along the trail
 		this->setTrailParameters(3, 60);
 
-		// notify proximity database that our position has changed
-		proximityToken->updateForNewPosition(this->position());
+///		// notify proximity database that our position has changed
+///		proximityToken->updateForNewPosition(this->position());
 	}
 
 	// per frame simulation update
@@ -167,7 +168,7 @@ public:
 				pathDirection = +1;
 				this->annotationXZCircle(pathRadius, gEndpoint0, darkRed, 20);
 			}
-			if (Vec3::distance(position(), gEndpoint1) < pathRadius)
+			if (Vec3::distance(this->position(), gEndpoint1) < pathRadius)
 			{
 				pathDirection = -1;
 				this->annotationXZCircle(pathRadius, gEndpoint1, darkRed, 20);
@@ -226,13 +227,13 @@ public:
 			// (radius is largest distance between vehicles traveling head-on
 			// where a collision is possible within caLeadTime seconds.)
 			const float maxRadius = caLeadTime * this->maxSpeed() * 2;
-			neighbors.clear();
+			neighbors->clear();
 			proximityToken->findNeighbors(this->position(), maxRadius,
-					neighbors);
+					*neighbors);
 
 			if (leakThrough < frandom01())
-				collisionAvoidance = steerToAvoidNeighbors(caLeadTime,
-						neighbors) * 10;
+				collisionAvoidance = this->steerToAvoidNeighbors(caLeadTime,
+						*neighbors) * 10;
 
 			// if collision avoidance is needed, do it
 			if (collisionAvoidance != Vec3::zero)
@@ -279,10 +280,10 @@ public:
 		const Color yellowOrange(1.0f, 0.75f, 0.0f);
 
 		// draw line from our position to our predicted future position
-		this->annotationLine(position(), future, yellow);
+		this->annotationLine(this->position(), future, yellow);
 
 		// draw line from our position to our steering target on the path
-		this->annotationLine(position(), target, yellowOrange);
+		this->annotationLine(this->position(), target, yellowOrange);
 
 		// draw a two-toned line between the future test point and its
 		// projection onto the path, the change from dark to light color
@@ -360,7 +361,8 @@ public:
 
 	// allocate one and share amoung instances just to save memory usage
 	// (change to per-instance allocation to be more MP-safe)
-	static AVGroup neighbors;
+///	static AVGroup neighbors;
+	AVGroup* neighbors;
 
 	// path to be followed by this pedestrian
 	// XXX Ideally this should be a generic Pathway, but we use the
@@ -372,6 +374,8 @@ public:
 	// direction for path following (upstream or downstream)
 	int pathDirection;
 };
+
+//template<typename Entity> AVGroup Pedestrian<Entity>::neighbors;
 
 // ----------------------------------------------------------------------------
 // create path for PlugIn
@@ -454,29 +458,28 @@ public:
 		drawPathAndObstacles();
 		gDrawer3d->setTwoSided(false);
 
-		///TODO (?)
-///		// textual annotation for selected Pedestrian
-///		if (selectedVehicle && OpenSteer::annotationIsOn())
-///		{
-///			const Color color(0.8f, 0.8f, 1.0f);
-///			const Vec3 textOffset(0, 0.25f, 0);
-///			const Vec3 textPosition = selectedVehicle->position() + textOffset;
-///			const char* spacer = "      ";
-///			std::ostringstream annote;
-///			annote << std::setprecision(2);
-///			annote << std::setiosflags(std::ios::fixed);
-///			annote << spacer << "1: speed: " << selectedVehicle->speed()
-///					<< std::endl;
-///			annote << std::setprecision(1);
-///			annote << spacer << "2: no third thing" << std::ends;
+		// textual annotation for selected Pedestrian
+		if (selectedVehicle && OpenSteer::annotationIsOn())
+		{
+			const Color color(0.8f, 0.8f, 1.0f);
+			const Vec3 textOffset(0, 0.25f, 0);
+			const Vec3 textPosition = selectedVehicle->position() + textOffset;
+			const char* spacer = "      ";
+			std::ostringstream annote;
+			annote << std::setprecision(2);
+			annote << std::setiosflags(std::ios::fixed);
+			annote << spacer << "1: speed: " << selectedVehicle->speed()
+					<< std::endl;
+			annote << std::setprecision(1);
+			annote << spacer << "2: no third thing" << std::ends;
 /////			draw2dTextAt3dLocation(annote, textPosition, color,
 /////					drawGetWindowWidth(), drawGetWindowHeight());
-///			draw2dTextAt3dLocation(annote, textPosition, color, 0.0, 0.0);
-///		}
+			draw2dTextAt3dLocation(annote, textPosition, color, 0.0, 0.0);
+		}
 
 		// display status in the upper left corner of the window
 		std::ostringstream status;
-		status << "Crowd size: " << population;
+		status << "Crowd size: " << crowd.size();
 		status << "\nPD type: ";
 		switch (cyclePD)
 		{
@@ -573,88 +576,103 @@ public:
 
 	void close(void)
 	{
-		// delete all Pedestrians
-		while (population > 0)
-			removePedestrianFromCrowd();
+///		// delete all Pedestrians
+///		while (population > 0)
+///			removePedestrianFromCrowd();
 	}
 
 	void reset(void)
 	{
 		// reset each Pedestrian
-		for (iterator i = crowd.begin(); i != crowd.end(); i++)
-			(**i).reset();
-	}
-
-	void handleFunctionKeys(int keyNumber)
-	{
-		switch (keyNumber)
+		iterator iter;
+		for (iter = crowd.begin(); iter != crowd.end(); ++iter)
 		{
-		case 1:
-			addPedestrianToCrowd();
-			break;
-		case 2:
-			removePedestrianFromCrowd();
-			break;
-		case 3:
-			nextPD();
-			break;
-		case 4:
-			gUseDirectedPathFollowing = !gUseDirectedPathFollowing;
-			break;
-		case 5:
-			gWanderSwitch = !gWanderSwitch;
-			break;
+			(*iter)->reset();
 		}
 	}
 
-	void printMiniHelpForFunctionKeys(void)
-	{
-		std::ostringstream message;
-		message << "Function keys handled by ";
-		message << '"' << name() << '"' << ':' << std::ends;
-//		OpenSteerDemo::printMessage(message);
-//		OpenSteerDemo::printMessage(message);
-//		OpenSteerDemo::printMessage("  F1     add a pedestrian to the crowd.");
-//		OpenSteerDemo::printMessage("  F2     remove a pedestrian from crowd.");
-//		OpenSteerDemo::printMessage("  F3     use next proximity database.");
-//		OpenSteerDemo::printMessage("  F4     toggle directed path follow.");
-//		OpenSteerDemo::printMessage("  F5     toggle wander component on/off.");
-//		OpenSteerDemo::printMessage("");
-	}
+///	void handleFunctionKeys(int keyNumber)
+///	{
+///		switch (keyNumber)
+///		{
+///		case 1:
+///			addPedestrianToCrowd();
+///			break;
+///		case 2:
+///			removePedestrianFromCrowd();
+///			break;
+///		case 3:
+///			nextPD();
+///			break;
+///		case 4:
+///			gUseDirectedPathFollowing = !gUseDirectedPathFollowing;
+///			break;
+///		case 5:
+///			gWanderSwitch = !gWanderSwitch;
+///			break;
+///		}
+///	}
 
-	void addPedestrianToCrowd(void)
+///	void printMiniHelpForFunctionKeys(void)
+///	{
+///		std::ostringstream message;
+///		message << "Function keys handled by ";
+///		message << '"' << name() << '"' << ':' << std::ends;
+/////		OpenSteerDemo::printMessage(message);
+/////		OpenSteerDemo::printMessage(message);
+/////		OpenSteerDemo::printMessage("  F1     add a pedestrian to the crowd.");
+/////		OpenSteerDemo::printMessage("  F2     remove a pedestrian from crowd.");
+/////		OpenSteerDemo::printMessage("  F3     use next proximity database.");
+/////		OpenSteerDemo::printMessage("  F4     toggle directed path follow.");
+/////		OpenSteerDemo::printMessage("  F5     toggle wander component on/off.");
+/////		OpenSteerDemo::printMessage("");
+///	}
+
+	virtual void addVehicle(AbstractVehicle* vehicle)
 	{
-		population++;
-		Pedestrian* pedestrian = new Pedestrian(*pd);
-		crowd.push_back(pedestrian);
-		if (population == 1)
+		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
+		// allocate a token for this pedestrian in the proximity database
+		Pedestrian<Entity>* pedestrian =
+				dynamic_cast<Pedestrian<Entity>*>(vehicle);
+		if (pedestrian)
 		{
-//			OpenSteerDemo::selectedVehicle = pedestrian;
-			selectedVehicle = pedestrian;
+			pedestrian->newPD(*pd);
+			// notify proximity database that our position has changed
+			pedestrian->proximityToken->updateForNewPosition(
+					pedestrian->position());
+			//set neighbors
+			pedestrian->neighbors = &neighbors;
 		}
 	}
 
-	void removePedestrianFromCrowd(void)
-	{
-		if (population > 0)
-		{
-			// save pointer to last pedestrian, then remove it from the crowd
-			const Pedestrian* pedestrian = crowd.back();
-			crowd.pop_back();
-			population--;
+///	void addPedestrianToCrowd(void)
+///	{
+///		population++;
+///		Pedestrian<Entity>* pedestrian = new Pedestrian<Entity>(*pd);
+///		crowd.push_back(pedestrian);
+///		if (population == 1)
+///		{
+///			selectedVehicle = pedestrian;
+///		}
+///	}
 
-			// if it is OpenSteerDemo's selected vehicle, unselect it
-//			if (pedestrian == OpenSteerDemo::selectedVehicle)
-//				OpenSteerDemo::selectedVehicle = NULL;
-			if (pedestrian == selectedVehicle)
-			{
-				selectedVehicle = NULL;
-			}
-
-			// delete the Pedestrian
-			delete pedestrian;
-		}
-	}
+///	void removePedestrianFromCrowd(void)
+///	{
+///		if (population > 0)
+///		{
+///			// save pointer to last pedestrian, then remove it from the crowd
+///			const Pedestrian<Entity>* pedestrian = crowd.back();
+///			crowd.pop_back();
+///			population--;
+///			// if it is OpenSteerDemo's selected vehicle, unselect it
+///			if (pedestrian == selectedVehicle)
+///			{
+///				selectedVehicle = NULL;
+///			}
+///			// delete the Pedestrian
+///			delete pedestrian;
+///		}
+///	}
 
 	// for purposes of demonstration, allow cycling through various
 	// types of proximity databases.  this routine is called when the
@@ -703,16 +721,17 @@ public:
 	typename Pedestrian<Entity>::groupType crowd;
 	typedef typename Pedestrian<Entity>::groupType::const_iterator iterator;
 
-	Vec3 gridCenter;
+	AVGroup neighbors;
 
 	// pointer to database used to accelerate proximity queries
 	ProximityDatabase* pd;
 
-	// keep track of current flock size
-	int population;
+///	// keep track of current flock size
+///	int population;
 
 	// which of the various proximity databases is currently in use
 	int cyclePD;
+
 };
 
 //PedestrianPlugIn gPedestrianPlugIn;
