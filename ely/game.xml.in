@@ -619,6 +619,8 @@
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">
 				<Param plugin_type="one_turning"/>
+				<Param pathway=""/>
+				<Param obstacles=""/>
 			</Component>
 		</Object>
 		

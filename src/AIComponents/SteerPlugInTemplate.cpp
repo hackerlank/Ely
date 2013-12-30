@@ -76,6 +76,7 @@ void SteerPlugInTemplate::setParametersDefaults()
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
 	mParameterTable.insert(ParameterNameValue("plugin_type", ""));
+	mParameterTable.insert(ParameterNameValue("pathway", "0.0,0.0,0.0:1.0,1.0,1.0$1.0$false"));
 }
 
 //TypedObject semantics: hardcoded

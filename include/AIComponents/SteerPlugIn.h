@@ -39,9 +39,12 @@ class SteerPlugInTemplate;
  *
  * This component could be used alone or in association with
  * other components.\n
+ * Each SteerPlugIn component could handle a single pathway and several
+ * obstacles.
  *
  * XML Param(s):
- * - "plugin_type"				|single|"one_turning" (values: one_turning|pedestrian)
+ * - "plugin_type"			|single|"one_turning" (values: one_turning|pedestrian)
+ * - "pathway"				|single|"0.0,0.0,0.0:1.0,1.0,1.0$1.0$false" (specified as "p1,py1,pz1:px2,py2,pz2[:...:pxN,pyN,pzN]$r1[:r2:...:rM]$closedCycle" with M,closedCycle=N-1,false|N,true)
  *
  * \note parts inside [] are optional.\n
  */

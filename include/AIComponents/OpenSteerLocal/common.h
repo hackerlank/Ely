@@ -30,6 +30,8 @@
 #include <OpenSteer/Color.h>
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/PlugIn.h>
+#include <OpenSteer/PolylineSegmentedPathwaySegmentRadii.h>
+#include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
 #include "DrawMeshDrawer.h"
 
 extern ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
@@ -137,9 +139,13 @@ public:
 	}
 
 protected:
+	///The entity updated by the vehicle.
 	ENTITY m_entity;
+	///The entity update method.
 	ENTITYUPDATEMETHOD m_entityUpdateMethod;
+	///The vehicle settings.
 	VehicleSettings m_settings;
+	///The vehicle start position.
 	OpenSteer::Vec3 m_start;
 };
 
@@ -150,6 +156,7 @@ public:
 
 	virtual ~PlugInAddOnMixin()
 	{
+		delete m_pathway;
 	}
 
 	virtual void addVehicle(OpenSteer::AbstractVehicle* vehicle)
@@ -207,9 +214,44 @@ public:
 		selectedVehicle = _selectedVehicle;
 	}
 
-protected:
-	OpenSteer::AbstractVehicle* selectedVehicle;
+	OpenSteer::Pathway* getPathway()
+	{
+		return m_pathway;
+	}
 
+	void setPathway(OpenSteer::Vec3 const points[], bool singleRadius,
+			float const radii[], bool closedCycle)
+	{
+		//delete old pathway
+		delete m_pathway;
+		//create a new pathway
+		OpenSteer::SegmentedPathway::size_type numOfPoints = sizeof(points)
+				/ sizeof(OpenSteer::Vec3);
+		if (numOfPoints < 2)
+		{
+			m_pathway = NULL;
+			return;
+		}
+		//check if single radius
+		if (singleRadius)
+		{
+			m_pathway = new OpenSteer::PolylineSegmentedPathwaySingleRadius(
+					numOfPoints, points, radii[0], closedCycle);
+		}
+		else
+		{
+			m_pathway = new OpenSteer::PolylineSegmentedPathwaySegmentRadii(
+					numOfPoints, points, radii, closedCycle);
+		}
+	}
+
+protected:
+	///The selected vehicle (for debug draw only).
+	OpenSteer::AbstractVehicle* selectedVehicle;
+	///The pathway handled by this plugin.
+	OpenSteer::Pathway* m_pathway;
+	///The obstacles handled by this plugin.
+	OpenSteer::ObstacleGroup m_obstacles;
 };
 
 //common typedef

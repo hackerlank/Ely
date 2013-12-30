@@ -61,20 +61,120 @@ ComponentType SteerPlugIn::componentType() const
 bool SteerPlugIn::initialize()
 {
 	bool result = true;
-	//set SteerPlugIn parameters (store internally for future use)
+	//
+	std::string param;
+	std::vector<std::string> paramValues1Str, paramValues2Str, paramValues3Str;
+	unsigned int idx, valueNum;
 	//type
-	std::string type = mTmpl->parameter(std::string("plugin_type"));
-	if (type == std::string("pedestrian"))
+	param = mTmpl->parameter(std::string("plugin_type"));
+	if (param == std::string("pedestrian"))
 	{
 		mPlugIn = new PedestrianPlugIn<SteerVehicle>;
 	}
-	else if (type == std::string(""))
+	else if (param == std::string(""))
 	{
 	}
 	else
 	{
 		//default: OneTurningPlugIn
 		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
+	}
+	///pathway
+	param = mTmpl->parameter(std::string("pathway"));
+	paramValues1Str = parseCompoundString(param, '$');
+	valueNum = paramValues1Str.size();
+	if (valueNum != 3)
+	{
+		//there aren't all mandatory parameters: set hardcoded defaults
+		paramValues1Str = parseCompoundString(
+				std::string("0.0,0.0,0.0:1.0,1.0,1.0$1.0$false"), '$');
+	}
+	//get pathway::points (forced to at least 2)
+	paramValues2Str = parseCompoundString(paramValues1Str[0], ':');
+	valueNum = paramValues2Str.size();
+	if (valueNum == 0)
+	{
+		paramValues2Str = parseCompoundString(
+				std::string("0.0,0.0,0.0:1.0,1.0,1.0"), ':');
+	}
+	else if (valueNum == 1)
+	{
+		paramValues2Str.push_back(std::string("1.0,1.0,1.0"));
+	}
+	unsigned int numPoints = paramValues2Str.size();
+	OpenSteer::Vec3* points = new OpenSteer::Vec3[numPoints];
+	for (idx = 0; idx < numPoints; ++idx)
+	{
+		paramValues3Str = parseCompoundString(paramValues2Str[idx], ',');
+		if (paramValues3Str.size() < 3)
+		{
+			paramValues3Str.resize(3, "0.0");
+		}
+		LVector3f values;
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			values[i] = strtof(paramValues3Str[i].c_str(), NULL);
+		}
+		points[idx] = LVecBase3fToOpenSteerVec3(values);
+	}
+	//get pathway::closedCycle
+	bool closedCycle =
+			(paramValues1Str[2] == std::string("true") ? true : false);
+	//get pathway::radii (forced to at least 1) and set pathway
+	paramValues2Str = parseCompoundString(paramValues1Str[1], ':');
+	valueNum = paramValues2Str.size();
+	if (valueNum == 0)
+	{
+		paramValues2Str.push_back(std::string("1.0"));
+	}
+	unsigned int numRadii = paramValues2Str.size();//radii specified
+	if (numRadii == 1)
+	{
+		//single radius
+		float radius = strtof(paramValues2Str[0].c_str(), NULL);
+		if (radius < 0.0)
+		{
+			radius = -radius;
+		}
+		else if (radius == 0.0)
+		{
+			radius = 1.0;
+		}
+		//set pathway: single radius
+		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, true, &radius,
+				closedCycle);
+	}
+	else
+	{
+		//several radii
+		unsigned int numRadiiAllocated = (
+				closedCycle ? numPoints : numPoints - 1);
+		float *radii = new float[numRadiiAllocated];
+		for (idx = 0; idx < numRadiiAllocated; ++idx)
+		{
+			float value;
+			if (idx < numRadii - 1)
+			{
+				value = strtof(paramValues2Str[idx].c_str(), NULL);
+				if (value < 0.0)
+				{
+					value = -value;
+				}
+				else if (value == 0.0)
+				{
+					value = 1.0;
+				}
+			}
+			else
+			{
+				//radii allocated > radii specified
+				value = 1.0;
+			}
+			radii[idx] = value;
+		}
+		//set pathway: several radius
+		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, true, radii,
+				closedCycle);
 	}
 	//
 	return result;

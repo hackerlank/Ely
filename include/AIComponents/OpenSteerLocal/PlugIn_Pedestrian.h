@@ -69,11 +69,11 @@ typedef AbstractTokenForProximityDatabase<AbstractVehicle*> ProximityToken;
 // How many pedestrians to create when the plugin starts first?
 extern int const gPedestrianStartCount;
 // creates a path for the PlugIn
-PolylineSegmentedPathwaySingleRadius* getTestPath(void);
-extern PolylineSegmentedPathwaySingleRadius* gTestPath;
+///PolylineSegmentedPathwaySingleRadius* getTestPath(void);
+///extern PolylineSegmentedPathwaySingleRadius* gTestPath;
 extern SphereObstacle gObstacle1;
 extern SphereObstacle gObstacle2;
-extern ObstacleGroup gObstacles;
+//extern ObstacleGroup gObstacles;
 extern Vec3 gEndpoint0;
 extern Vec3 gEndpoint1;
 extern bool gUseDirectedPathFollowing;
@@ -129,7 +129,7 @@ public:
 ///		setRadius(0.5); // width = 0.7, add 0.3 margin, take half
 
 		// set the path for this Pedestrian to follow
-		path = getTestPath();
+///		path = getTestPath();
 
 		// set initial position
 		// (random point on path + random horizontal offset)
@@ -208,7 +208,7 @@ public:
 			//             obstacleAvoidance = steerToAvoidObstacles (oTime, gObstacles);
 			//             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle1);
 			//             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle3);
-			obstacleAvoidance = this->steerToAvoidObstacles(oTime, gObstacles);
+			obstacleAvoidance = this->steerToAvoidObstacles(oTime, *gObstacles);
 			// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 		}
 
@@ -373,6 +373,8 @@ public:
 
 	// direction for path following (upstream or downstream)
 	int pathDirection;
+
+	ObstacleGroup* gObstacles;
 };
 
 //template<typename Entity> AVGroup Pedestrian<Entity>::neighbors;
@@ -545,7 +547,9 @@ public:
 		typedef PolylineSegmentedPathwaySingleRadius::size_type size_type;
 
 		// draw a line along each segment of path
-		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
+///		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
+		const PolylineSegmentedPathwaySingleRadius& path =
+				dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*m_pathway);
 		for (size_type i = 1; i < path.pointCount(); ++i)
 		{
 			drawLine(path.point(i), path.point(i - 1), gRed);
@@ -640,6 +644,11 @@ public:
 			// notify proximity database that our position has changed
 			pedestrian->proximityToken->updateForNewPosition(
 					pedestrian->position());
+			//set path
+			pedestrian->path =
+					dynamic_cast<PolylineSegmentedPathwaySingleRadius*>(m_pathway);
+			//set obstacles
+			pedestrian->gObstacles = &m_obstacles;
 			//set neighbors
 			pedestrian->neighbors = &neighbors;
 		}
