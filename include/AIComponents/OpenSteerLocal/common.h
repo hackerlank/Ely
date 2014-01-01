@@ -154,6 +154,12 @@ class PlugInAddOnMixin: public Super
 {
 public:
 
+	PlugInAddOnMixin() :
+			selectedVehicle(NULL), m_pathway(NULL)
+	{
+		m_obstacles.clear();
+	}
+
 	virtual ~PlugInAddOnMixin()
 	{
 		delete m_pathway;
@@ -224,6 +230,7 @@ public:
 	{
 		//delete old pathway
 		delete m_pathway;
+		m_pathway = NULL;
 		//create a new pathway
 		OpenSteer::SegmentedPathway::size_type numOfPoints = sizeof(points)
 				/ sizeof(OpenSteer::Vec3);
@@ -243,6 +250,11 @@ public:
 			m_pathway = new OpenSteer::PolylineSegmentedPathwaySegmentRadii(
 					numOfPoints, points, radii, closedCycle);
 		}
+	}
+
+	OpenSteer::ObstacleGroup& getObstacles()
+	{
+		return m_obstacles;
 	}
 
 protected:

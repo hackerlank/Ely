@@ -616,6 +616,7 @@
 		<!-- ------------------- -->
 
 		<Object type="OpenSteerPlugIn" id="steerPlugIn1" priority="80">
+			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">
 				<Param plugin_type="one_turning"/>

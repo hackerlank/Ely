@@ -67,7 +67,7 @@ typedef AbstractTokenForProximityDatabase<AbstractVehicle*> ProximityToken;
 // ----------------------------------------------------------------------------
 
 // How many pedestrians to create when the plugin starts first?
-extern int const gPedestrianStartCount;
+///extern int const gPedestrianStartCount;
 // creates a path for the PlugIn
 ///PolylineSegmentedPathwaySingleRadius* getTestPath(void);
 ///extern PolylineSegmentedPathwaySingleRadius* gTestPath;
@@ -205,10 +205,10 @@ public:
 			const float oTime = 6; // minTimeToCollision = 6 seconds
 			// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 			// just for testing
-			//             obstacleAvoidance = steerToAvoidObstacles (oTime, gObstacles);
+			//             obstacleAvoidance = steerToAvoidObstacles (oTime, obstacles);
 			//             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle1);
 			//             obstacleAvoidance = steerToAvoidObstacle (oTime, gObstacle3);
-			obstacleAvoidance = this->steerToAvoidObstacles(oTime, *gObstacles);
+			obstacleAvoidance = this->steerToAvoidObstacles(oTime, *obstacles);
 			// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 		}
 
@@ -374,7 +374,7 @@ public:
 	// direction for path following (upstream or downstream)
 	int pathDirection;
 
-	ObstacleGroup* gObstacles;
+	ObstacleGroup* obstacles;
 };
 
 //template<typename Entity> AVGroup Pedestrian<Entity>::neighbors;
@@ -648,7 +648,7 @@ public:
 			pedestrian->path =
 					dynamic_cast<PolylineSegmentedPathwaySingleRadius*>(m_pathway);
 			//set obstacles
-			pedestrian->gObstacles = &m_obstacles;
+			pedestrian->obstacles = &m_obstacles;
 			//set neighbors
 			pedestrian->neighbors = &neighbors;
 		}

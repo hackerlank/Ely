@@ -436,7 +436,6 @@ inline bool Object::isSteady() const
 inline void Object::doReset()
 {
 	//
-	mNodePath = NodePath();
 	mComponents.clear();
 	mIsSteady = false;
 }

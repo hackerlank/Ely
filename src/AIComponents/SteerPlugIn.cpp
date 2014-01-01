@@ -63,9 +63,10 @@ bool SteerPlugIn::initialize()
 	bool result = true;
 	//
 	std::string param;
+	std::list<std::string> paramList;
 	std::vector<std::string> paramValues1Str, paramValues2Str, paramValues3Str;
 	unsigned int idx, valueNum;
-	//type
+	//type: create the plug in
 	param = mTmpl->parameter(std::string("plugin_type"));
 	if (param == std::string("pedestrian"))
 	{
@@ -79,7 +80,7 @@ bool SteerPlugIn::initialize()
 		//default: OneTurningPlugIn
 		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
 	}
-	///pathway
+	//pathway
 	param = mTmpl->parameter(std::string("pathway"));
 	paramValues1Str = parseCompoundString(param, '$');
 	valueNum = paramValues1Str.size();
@@ -89,7 +90,7 @@ bool SteerPlugIn::initialize()
 		paramValues1Str = parseCompoundString(
 				std::string("0.0,0.0,0.0:1.0,1.0,1.0$1.0$false"), '$');
 	}
-	//get pathway::points (forced to at least 2)
+	//pathway::points (forced to at least 2)
 	paramValues2Str = parseCompoundString(paramValues1Str[0], ':');
 	valueNum = paramValues2Str.size();
 	if (valueNum == 0)
@@ -173,8 +174,24 @@ bool SteerPlugIn::initialize()
 			radii[idx] = value;
 		}
 		//set pathway: several radius
-		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, true, radii,
+		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, false, radii,
 				closedCycle);
+		delete [] radii;
+	}
+	//obstacles
+	paramList = mTmpl->parameterList(std::string("obstacles"));
+	std::list<std::string>::iterator iterList;
+	for (iterList = paramList.begin(); iterList != paramList.end(); ++iterList)
+	{
+		//any "obstacles" string is a "compound" one, i.e. could have the form:
+		// "objectId1@shape1@seenFromState1:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN"
+		paramValues1Str = parseCompoundString(*iterList, ':');
+		std::vector<std::string>::const_iterator iter;
+		for (iter = paramValues1Str.begin();
+				iter != paramValues1Str.end(); ++iter)
+		{
+			//any obstacle string should have the form: "objectId@shape@seenFromState"
+		}
 	}
 	//
 	return result;
@@ -182,6 +199,7 @@ bool SteerPlugIn::initialize()
 
 void SteerPlugIn::onAddToObjectSetup()
 {
+	//open the plug in
 	mPlugIn->open();
 }
 
@@ -213,7 +231,9 @@ void SteerPlugIn::onRemoveFromObjectCleanup()
 	delete mDrawer2d;
 #endif
 	//
+	//close the plug in
 	mPlugIn->close();
+	//delete the plug in
 	delete mPlugIn;
 	reset();
 }

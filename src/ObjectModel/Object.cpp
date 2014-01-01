@@ -33,6 +33,8 @@ mTmpl(tmpl), mObjectId(objectId), mOwner(NULL),mInitializationLib(NULL),
 mInitializationsLoaded(false), mInititializationFuncName(""),
 mInitializationFunction(NULL)
 {
+	//by default set node path to not empty
+	mNodePath = NodePath(mObjectId);
 	doReset();
 }
 

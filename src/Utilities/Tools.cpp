@@ -68,7 +68,7 @@ std::vector<std::string> parseCompoundString(
 	//parse
 	std::vector<std::string> substrings;
 	int len = compoundString.size() + 1;
-	char* dest = new char[compoundString.size() + 1];
+	char* dest = new char[len];
 	strncpy(dest, compoundString.c_str(), len);
 	//find
 	char* pch;

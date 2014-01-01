@@ -101,7 +101,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2133312240" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -169,7 +168,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2071251884" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -228,7 +226,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.601151752" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -287,7 +284,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1286370007" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -346,7 +342,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.352187107" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -405,7 +400,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1230342913" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
