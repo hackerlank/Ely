@@ -478,6 +478,11 @@ void Model::onAddToObjectSetup()
 	//set the object node path to this model of node path
 	mOldObjectNodePath = mOwnerObject->getNodePath();
 	mOwnerObject->setNodePath(mNodePath);
+
+	//clear all no more needed "Param" variables
+	mModelNameParam.clear();
+	mAnimFileListParam.clear();
+	mModelTypeParam.clear();
 }
 
 void Model::onRemoveFromObjectCleanup()

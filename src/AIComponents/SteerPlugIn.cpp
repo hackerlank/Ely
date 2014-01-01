@@ -61,18 +61,24 @@ ComponentType SteerPlugIn::componentType() const
 bool SteerPlugIn::initialize()
 {
 	bool result = true;
+	//plugin type
+	mPlugInTypeParam = mTmpl->parameter(std::string("plugin_type"));
+	//pathway
+	mPathwayParam = mTmpl->parameter(std::string("pathway"));
+	//obstacles
+	mObstacleListParam = mTmpl->parameterList(std::string("obstacles"));
 	//
-	std::string param;
-	std::list<std::string> paramList;
-	std::vector<std::string> paramValues1Str, paramValues2Str, paramValues3Str;
-	unsigned int idx, valueNum;
-	//type: create the plug in
-	param = mTmpl->parameter(std::string("plugin_type"));
-	if (param == std::string("pedestrian"))
+	return result;
+}
+
+void SteerPlugIn::onAddToObjectSetup()
+{
+	//create the plug in
+	if (mPlugInTypeParam == std::string("pedestrian"))
 	{
 		mPlugIn = new PedestrianPlugIn<SteerVehicle>;
 	}
-	else if (param == std::string(""))
+	else if (mPlugInTypeParam == std::string(""))
 	{
 	}
 	else
@@ -80,9 +86,52 @@ bool SteerPlugIn::initialize()
 		//default: OneTurningPlugIn
 		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
 	}
-	//pathway
-	param = mTmpl->parameter(std::string("pathway"));
-	paramValues1Str = parseCompoundString(param, '$');
+	//open the plug in
+	mPlugIn->open();
+}
+
+void SteerPlugIn::onRemoveFromObjectCleanup()
+{
+
+	//remove all handled SteerVehicles (if any) from update
+	std::set<SMARTPTR(SteerVehicle)>::const_iterator iter;
+	for (iter = mSteerVehicles.begin(); iter != mSteerVehicles.end();
+			++iter)
+	{
+		//set steerVehicle reference to null
+		(*iter)->mSteerPlugIn.clear();
+		//do remove from real update list
+		dynamic_cast<PlugIn*>(mPlugIn)->removeVehicle(&(*iter)->getAbstractVehicle());
+	}
+
+#ifdef ELY_DEBUG
+	if (not mDebugCamera.is_empty())
+	{
+		//set the recast debug camera to empty node path
+		mDebugCamera = NodePath();
+		//remove the recast debug node paths
+		mDrawer3dNP.remove_node();
+		mDrawer2dNP.remove_node();
+	}
+	//delete the DebugDrawers
+	delete mDrawer3d;
+	delete mDrawer2d;
+#endif
+	//
+	//close the plug in
+	mPlugIn->close();
+	//delete the plug in
+	delete mPlugIn;
+	reset();
+}
+
+inline void SteerPlugIn::doBuildPathway()
+{
+	//
+	std::vector<std::string> paramValues1Str, paramValues2Str, paramValues3Str;
+	unsigned int idx, valueNum;
+	//build pathway
+	paramValues1Str = parseCompoundString(mPathwayParam, '$');
 	valueNum = paramValues1Str.size();
 	if (valueNum != 3)
 	{
@@ -128,7 +177,7 @@ bool SteerPlugIn::initialize()
 	{
 		paramValues2Str.push_back(std::string("1.0"));
 	}
-	unsigned int numRadii = paramValues2Str.size();//radii specified
+	unsigned int numRadii = paramValues2Str.size();	//radii specified
 	if (numRadii == 1)
 	{
 		//single radius
@@ -176,70 +225,114 @@ bool SteerPlugIn::initialize()
 		//set pathway: several radius
 		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, false, radii,
 				closedCycle);
-		delete [] radii;
+		delete[] radii;
 	}
-	//obstacles
-	paramList = mTmpl->parameterList(std::string("obstacles"));
+}
+
+inline void SteerPlugIn::doAddObstacles()
+{
+	//
+	std::vector<std::string> paramValues1Str;
+	//add obstacles
 	std::list<std::string>::iterator iterList;
-	for (iterList = paramList.begin(); iterList != paramList.end(); ++iterList)
+	for (iterList = mObstacleListParam.begin();
+			iterList != mObstacleListParam.end(); ++iterList)
 	{
 		//any "obstacles" string is a "compound" one, i.e. could have the form:
 		// "objectId1@shape1@seenFromState1:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN"
 		paramValues1Str = parseCompoundString(*iterList, ':');
 		std::vector<std::string>::const_iterator iter;
-		for (iter = paramValues1Str.begin();
-				iter != paramValues1Str.end(); ++iter)
+		for (iter = paramValues1Str.begin(); iter != paramValues1Str.end();
+				++iter)
 		{
 			//any obstacle string should have the form: "objectId@shape@seenFromState"
+			if (paramValues1Str.size() != 3)
+			{
+				continue;
+			}
+			//get obstacle object
+			SMARTPTR(Object)obstacleObject =
+			ObjectTemplateManager::GetSingleton().getCreatedObject(
+					paramValues1Str[0]);
+			if (not obstacleObject)
+			{
+				continue;
+			}
+			//get seenFromState (default = both)
+			OpenSteer::AbstractObstacle::seenFromState seenFromState;
+			if (paramValues1Str[2] == std::string("outside"))
+			{
+				seenFromState = OpenSteer::AbstractObstacle::outside;
+			}
+			else if (paramValues1Str[2] == std::string("inside"))
+			{
+				seenFromState = OpenSteer::AbstractObstacle::inside;
+			}
+			else
+			{
+				seenFromState = OpenSteer::AbstractObstacle::both;
+			}
+			//get obstacle dimensions
+			NodePath obstacleNP = obstacleObject->getNodePath();
+			LVector3 modelDims, modelDeltaCenter;
+			float modelRadius;
+			GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+					obstacleNP, modelDims, modelDeltaCenter, modelRadius);
+			//get obstacle position/orientation (wrt reference node path)
+			LPoint3f pos = obstacleNP.get_pos(mReferenceNP);
+			LVector3f forward = mReferenceNP.get_relative_vector(obstacleNP,
+					LVector3f::forward());
+			LVector3f up = mReferenceNP.get_relative_vector(obstacleNP,
+					LVector3f::up());
+			LVector3f side = mReferenceNP.get_relative_vector(obstacleNP,
+					LVector3f::right());
+			//build the obstacle (default shape = sphere)
+			OpenSteer::AbstractObstacle* obstacle;
+			if(paramValues1Str[1] == std::string("box"))
+			{
+				obstacle = dynamic_cast<PlugIn*>(mPlugIn)->addObstacle("box");
+				OpenSteer::BoxObstacle* box =
+						dynamic_cast<OpenSteer::BoxObstacle*>(obstacle);
+				box->width = modelDims.get_x();
+				box->height = modelDims.get_z();
+				box->depth = modelDims.get_y();
+				box->setForward(LVecBase3fToOpenSteerVec3(forward).normalize());
+				box->setSide(LVecBase3fToOpenSteerVec3(side).normalize());
+				box->setUp(LVecBase3fToOpenSteerVec3(up).normalize());
+			}
+			///TODO
+			else if (paramValues1Str[1] == std::string("plane"))
+			{
+
+			}
+			else if (paramValues1Str[1] == std::string("rectangle"))
+			{
+
+			}
+			else
+			{
+				//sphere default
+
+			}
+			//set position
+			//set seenFromState
+
 		}
 	}
-	//
-	return result;
-}
-
-void SteerPlugIn::onAddToObjectSetup()
-{
-	//open the plug in
-	mPlugIn->open();
-}
-
-void SteerPlugIn::onRemoveFromObjectCleanup()
-{
-
-	//remove all handled SteerVehicles (if any) from update
-	std::set<SMARTPTR(SteerVehicle)>::const_iterator iter;
-	for (iter = mSteerVehicles.begin(); iter != mSteerVehicles.end();
-			++iter)
-	{
-		//set steerVehicle reference to null
-		(*iter)->mSteerPlugIn.clear();
-		//do remove from real update list
-		dynamic_cast<PlugIn*>(mPlugIn)->removeVehicle(&(*iter)->getAbstractVehicle());
-	}
-
-#ifdef ELY_DEBUG
-	if (not mDebugCamera.is_empty())
-	{
-		//set the recast debug camera to empty node path
-		mDebugCamera = NodePath();
-		//remove the recast debug node paths
-		mDrawer3dNP.remove_node();
-		mDrawer2dNP.remove_node();
-	}
-	//delete the DebugDrawers
-	delete mDrawer3d;
-	delete mDrawer2d;
-#endif
-	//
-	//close the plug in
-	mPlugIn->close();
-	//delete the plug in
-	delete mPlugIn;
-	reset();
 }
 
 void SteerPlugIn::onAddToSceneSetup()
 {
+	//set mOwnerObject's parent node path as reference
+	mReferenceNP = mOwnerObject->getNodePath().get_parent();
+	//build pathway
+	doBuildPathway();
+	//add obstacles
+	if (not mReferenceNP.is_empty())
+	{
+		doAddObstacles();
+	}
+
 	//Add to the AI manager update
 	GameAIManager::GetSingletonPtr()->addToAIUpdate(this);
 
@@ -269,6 +362,11 @@ void SteerPlugIn::onAddToSceneSetup()
 	mDrawer3d = new DrawMeshDrawer(mDrawer3dNP, mDebugCamera, 100, 0.04);
 	mDrawer2d = new DrawMeshDrawer(mDrawer2dNP, mDebugCamera, 50, 0.04);
 #endif //ELY_DEBUG
+
+	//clear all no more needed "Param" variables
+	mPlugInTypeParam.clear();
+	mPathwayParam.clear();
+	mObstacleListParam.clear();
 }
 
 void SteerPlugIn::onRemoveFromSceneCleanup()
@@ -279,7 +377,7 @@ void SteerPlugIn::onRemoveFromSceneCleanup()
 
 SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
 {
-	RETURN_ON_COND(not steerVehicle,false)
+	RETURN_ON_COND((not steerVehicle) or mReferenceNP.is_empty(), Result::ERROR)
 
 	bool result;
 	//lock (guard) the SteerVehicle SteerPlugIn mutex
@@ -313,7 +411,7 @@ SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehi
 
 SteerPlugIn::Result SteerPlugIn::removeSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
 {
-	RETURN_ON_COND(not steerVehicle, Result::ERROR)
+	RETURN_ON_COND((not steerVehicle) or mReferenceNP.is_empty(), Result::ERROR)
 
 	//lock (guard) the SteerVehicle SteerPlugIn mutex
 	HOLD_REMUTEX(steerVehicle->mSteerPlugInMutex)

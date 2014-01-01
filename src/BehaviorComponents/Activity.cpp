@@ -197,6 +197,10 @@ void Activity::doSetupHelperData()
 			}
 		}
 	}
+
+	//clear all no more needed "Param" variables
+	mStateTransitionListParam.clear();
+	mFromToTransitionListParam.clear();
 }
 
 void Activity::onAddToObjectSetup()

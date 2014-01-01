@@ -42,8 +42,8 @@ class SteerPlugInTemplate;
  * Each SteerPlugIn component could handle a single pathway and several
  * obstacles.\n
  * The parent node path of this component's object, will be the reference
- * to which any SteerVehicle will be reparented (if necessary) and any
- * scene computation will be performed.\n
+ * which any SteerVehicle will be reparented to (if necessary) and which any
+ * scene computation will be performed wrt.\n
  *
  * XML Param(s):
  * - "plugin_type"			|single|"one_turning" (values: one_turning|pedestrian)
@@ -139,12 +139,27 @@ public:
 private:
 	///Current underlying AbstractPlugIn.
 	OpenSteer::AbstractPlugIn* mPlugIn;
+	///The PlugIn type.
+	std::string mPlugInTypeParam;
+
+	///The reference node path (read only after creation).
+	NodePath mReferenceNP;
 
 	///Current time.
 	float mCurrentTime;
 
 	///The SteerVehicle components handled by this SteerPlugIn.
 	std::set<SMARTPTR(SteerVehicle)> mSteerVehicles;
+
+	/**
+	 * \name Helpers variables/functions.
+	 */
+	///@{
+	std::string mPathwayParam;
+	void doBuildPathway();
+	std::list<std::string> mObstacleListParam;
+	void doAddObstacles();
+	///@}
 
 #ifdef ELY_DEBUG
 	///OpenSteer debug node paths.
@@ -189,8 +204,12 @@ inline void SteerPlugIn::reset()
 {
 	//
 	mPlugIn = NULL;
+	mPlugInTypeParam.clear();
+	mReferenceNP = NodePath();
 	mCurrentTime = 0.0;
 	mSteerVehicles.clear();
+	mPathwayParam.clear();
+	mObstacleListParam.clear();
 #ifdef ELY_DEBUG
 	mDrawer3dNP = NodePath();
 	mDrawer2dNP = NodePath();

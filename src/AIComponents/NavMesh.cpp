@@ -480,6 +480,13 @@ void NavMesh::onAddToSceneSetup()
 		///3: do real nav mesh setup
 		doNavMeshSetup();
 	}
+
+	//clear all no more needed "Param" variables
+	mAreaFlagsCostXmlParam.clear();
+	mCrowdIncludeFlagsParam.clear();
+	mCrowdExcludeFlagsParam.clear();
+	mConvexVolumesParam.clear();
+	mOffMeshConnectionsParam.clear();
 }
 
 void NavMesh::onRemoveFromSceneCleanup()

@@ -163,6 +163,11 @@ public:
 	virtual ~PlugInAddOnMixin()
 	{
 		delete m_pathway;
+		OpenSteer::ObstacleIterator iter;
+		for (iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter)
+		{
+			delete *iter;
+		}
 	}
 
 	virtual void addVehicle(OpenSteer::AbstractVehicle* vehicle)
@@ -252,9 +257,36 @@ public:
 		}
 	}
 
-	OpenSteer::ObstacleGroup& getObstacles()
+	OpenSteer::ObstacleGroup getObstacles()
 	{
 		return m_obstacles;
+	}
+
+	OpenSteer::AbstractObstacle* addObstacle(const std::string& type)
+	{
+		OpenSteer::AbstractObstacle* obstacle = NULL;
+		if (type == std::string("sphere"))
+		{
+			obstacle = new OpenSteer::SphereObstacle;
+		}
+		if (type == std::string("box"))
+		{
+			obstacle = new OpenSteer::BoxObstacle;
+		}
+		if (type == std::string("plane"))
+		{
+			obstacle = new OpenSteer::PlaneObstacle;
+		}
+		if (type == std::string("rectangle"))
+		{
+			obstacle = new OpenSteer::RectangleObstacle;
+		}
+		//store obstacle
+		if (obstacle)
+		{
+			m_obstacles.push_back(obstacle);
+		}
+		return obstacle;
 	}
 
 protected:

@@ -124,6 +124,9 @@ void Sound3d::onAddToObjectSetup()
 	{
 		mSceneRoot = NodePath();
 	}
+
+	//clear all no more needed "Param" variables
+	mSoundFileListParam.clear();
 }
 
 void Sound3d::onRemoveFromObjectCleanup()

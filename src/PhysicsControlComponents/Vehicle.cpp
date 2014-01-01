@@ -609,6 +609,10 @@ void Vehicle::onAddToSceneSetup()
 
 	//Add to the physics manager update
 	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
+
+	//clear all no more needed "Param" variables
+	mWheelModelParam.clear();
+	mWheelScaleParam.clear();
 }
 
 void Vehicle::onRemoveFromSceneCleanup()

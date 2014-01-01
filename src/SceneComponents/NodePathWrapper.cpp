@@ -94,6 +94,9 @@ void NodePathWrapper::onAddToObjectSetup()
 	//set the object node path to this NodePathWrapper of node path
 	mOldObjectNodePath = mOwnerObject->getNodePath();
 	mOwnerObject->setNodePath(mNodePath);
+
+	//clear all no more needed "Param" variables
+	mWrappedNodePathParam.clear();
 }
 
 void NodePathWrapper::onRemoveFromObjectCleanup()

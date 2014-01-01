@@ -218,6 +218,8 @@ private:
 inline void Activity::reset()
 {
 	mFSM.cleanup();
+	mStateTransitionListParam.clear();
+	mFromToTransitionListParam.clear();
 }
 
 inline fsm& Activity::getFSM()
