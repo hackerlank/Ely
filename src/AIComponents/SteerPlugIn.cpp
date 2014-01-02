@@ -27,6 +27,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
@@ -258,6 +259,20 @@ inline void SteerPlugIn::doAddObstacles()
 			{
 				continue;
 			}
+			//get obstacle dimensions
+			NodePath obstacleNP = obstacleObject->getNodePath();
+			LVector3 modelDims, modelDeltaCenter;
+			float modelRadius;
+			GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+					obstacleNP, modelDims, modelDeltaCenter, modelRadius);
+			//get obstacle position/orientation (wrt reference node path)
+			LPoint3f position = obstacleNP.get_pos(mReferenceNP);
+			LVector3f forward = mReferenceNP.get_relative_vector(obstacleNP,
+					LVector3f::forward());
+			LVector3f up = mReferenceNP.get_relative_vector(obstacleNP,
+					LVector3f::up());
+			LVector3f side = mReferenceNP.get_relative_vector(obstacleNP,
+					LVector3f::right());
 			//get seenFromState (default = both)
 			OpenSteer::AbstractObstacle::seenFromState seenFromState;
 			if (paramValues1Str[2] == std::string("outside"))
@@ -272,51 +287,13 @@ inline void SteerPlugIn::doAddObstacles()
 			{
 				seenFromState = OpenSteer::AbstractObstacle::both;
 			}
-			//get obstacle dimensions
-			NodePath obstacleNP = obstacleObject->getNodePath();
-			LVector3 modelDims, modelDeltaCenter;
-			float modelRadius;
-			GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
-					obstacleNP, modelDims, modelDeltaCenter, modelRadius);
-			//get obstacle position/orientation (wrt reference node path)
-			LPoint3f pos = obstacleNP.get_pos(mReferenceNP);
-			LVector3f forward = mReferenceNP.get_relative_vector(obstacleNP,
-					LVector3f::forward());
-			LVector3f up = mReferenceNP.get_relative_vector(obstacleNP,
-					LVector3f::up());
-			LVector3f side = mReferenceNP.get_relative_vector(obstacleNP,
-					LVector3f::right());
-			//build the obstacle (default shape = sphere)
-			OpenSteer::AbstractObstacle* obstacle;
-			if(paramValues1Str[1] == std::string("box"))
-			{
-				obstacle = dynamic_cast<PlugIn*>(mPlugIn)->addObstacle("box");
-				OpenSteer::BoxObstacle* box =
-						dynamic_cast<OpenSteer::BoxObstacle*>(obstacle);
-				box->width = modelDims.get_x();
-				box->height = modelDims.get_z();
-				box->depth = modelDims.get_y();
-				box->setForward(LVecBase3fToOpenSteerVec3(forward).normalize());
-				box->setSide(LVecBase3fToOpenSteerVec3(side).normalize());
-				box->setUp(LVecBase3fToOpenSteerVec3(up).normalize());
-			}
-			///TODO
-			else if (paramValues1Str[1] == std::string("plane"))
-			{
-
-			}
-			else if (paramValues1Str[1] == std::string("rectangle"))
-			{
-
-			}
-			else
-			{
-				//sphere default
-
-			}
-			//set position
-			//set seenFromState
-
+			//add the obstacle
+			dynamic_cast<PlugIn*>(mPlugIn)->addObstacle(paramValues1Str[1],
+					modelDims.get_x(), modelDims.get_z(), modelDims.get_y(),
+					modelRadius, LVecBase3fToOpenSteerVec3(side),
+					LVecBase3fToOpenSteerVec3(up),
+					LVecBase3fToOpenSteerVec3(forward),
+					LVecBase3fToOpenSteerVec3(position), seenFromState);
 		}
 	}
 }

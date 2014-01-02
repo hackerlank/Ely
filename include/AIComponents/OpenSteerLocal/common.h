@@ -262,24 +262,42 @@ public:
 		return m_obstacles;
 	}
 
-	OpenSteer::AbstractObstacle* addObstacle(const std::string& type)
+	OpenSteer::AbstractObstacle* addObstacle(const std::string& type,
+			float width, float height, float depth, float radius,
+			const OpenSteer::Vec3& side, const OpenSteer::Vec3& up,
+			const OpenSteer::Vec3& forward, const OpenSteer::Vec3& position,
+			OpenSteer::AbstractObstacle::seenFromState seenFromState)
 	{
 		OpenSteer::AbstractObstacle* obstacle = NULL;
-		if (type == std::string("sphere"))
-		{
-			obstacle = new OpenSteer::SphereObstacle;
-		}
 		if (type == std::string("box"))
 		{
-			obstacle = new OpenSteer::BoxObstacle;
+			obstacle = new OpenSteer::BoxObstacle(width, height, depth);
+			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setSide(
+					side.normalize());
+			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setUp(
+					up.normalize());
+			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setForward(
+					forward.normalize());
+			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setPosition(
+					position);
+			obstacle->setSeenFrom(seenFromState);
 		}
 		if (type == std::string("plane"))
 		{
-			obstacle = new OpenSteer::PlaneObstacle;
+			obstacle = new OpenSteer::PlaneObstacle(side.normalize(),
+					up.normalize(), forward.normalize(), position);
+			obstacle->setSeenFrom(seenFromState);
 		}
 		if (type == std::string("rectangle"))
 		{
-			obstacle = new OpenSteer::RectangleObstacle;
+			obstacle = new OpenSteer::RectangleObstacle(width, height,
+					side.normalize(), up.normalize(), forward.normalize(),
+					position, seenFromState);
+		}
+		if (type == std::string("sphere"))
+		{
+			obstacle = new OpenSteer::SphereObstacle(radius, position);
+			obstacle->setSeenFrom(seenFromState);
 		}
 		//store obstacle
 		if (obstacle)
