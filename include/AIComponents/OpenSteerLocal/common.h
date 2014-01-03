@@ -149,6 +149,62 @@ protected:
 	OpenSteer::Vec3 m_start;
 };
 
+//Obstacles: redefinition of draw
+class SphereObstacle: public OpenSteer::SphereObstacle
+{
+public:
+	SphereObstacle(float r, OpenSteer::Vec3 c) :
+			OpenSteer::SphereObstacle(r, c)
+	{
+	}
+	virtual void draw(const bool filled, const OpenSteer::Color& color,
+			const OpenSteer::Vec3& viewpoint) const
+	{
+	}
+};
+
+class BoxObstacle: public OpenSteer::BoxObstacle
+{
+public:
+	BoxObstacle(float w, float h, float d) :
+			OpenSteer::BoxObstacle(w, h, d)
+	{
+	}
+	virtual void draw(const bool filled, const OpenSteer::Color& color,
+			const OpenSteer::Vec3& viewpoint) const
+	{
+	}
+};
+
+class PlaneObstacle: public OpenSteer::PlaneObstacle
+{
+public:
+	PlaneObstacle(const OpenSteer::Vec3& s, const OpenSteer::Vec3& u,
+			const OpenSteer::Vec3& f, const OpenSteer::Vec3& p) :
+			OpenSteer::PlaneObstacle(s, u, f, p)
+	{
+	}
+	virtual void draw(const bool filled, const OpenSteer::Color& color,
+			const OpenSteer::Vec3& viewpoint) const
+	{
+	}
+};
+
+class RectangleObstacle: public OpenSteer::RectangleObstacle
+{
+public:
+	RectangleObstacle(float w, float h, const OpenSteer::Vec3& s,
+			const OpenSteer::Vec3& u, const OpenSteer::Vec3& f,
+			const OpenSteer::Vec3& p, seenFromState sf) :
+			OpenSteer::RectangleObstacle(w, h, s, u, f, p, sf)
+	{
+	}
+	virtual void draw(const bool filled, const OpenSteer::Color& color,
+			const OpenSteer::Vec3& viewpoint) const
+	{
+	}
+};
+
 template<typename Super>
 class PlugInAddOnMixin: public Super
 {
@@ -271,32 +327,29 @@ public:
 		OpenSteer::AbstractObstacle* obstacle = NULL;
 		if (type == std::string("box"))
 		{
-			obstacle = new OpenSteer::BoxObstacle(width, height, depth);
-			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setSide(
-					side.normalize());
-			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setUp(
-					up.normalize());
-			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setForward(
-					forward.normalize());
-			dynamic_cast<OpenSteer::BoxObstacle*>(obstacle)->setPosition(
-					position);
+			BoxObstacle* box = new BoxObstacle(width, height, depth);
+			obstacle = box;
+			box->setSide(side.normalize());
+			box->setUp(up.normalize());
+			box->setForward(forward.normalize());
+			box->setPosition(position);
 			obstacle->setSeenFrom(seenFromState);
 		}
 		if (type == std::string("plane"))
 		{
-			obstacle = new OpenSteer::PlaneObstacle(side.normalize(),
-					up.normalize(), forward.normalize(), position);
+			obstacle = new PlaneObstacle(side.normalize(), up.normalize(),
+					forward.normalize(), position);
 			obstacle->setSeenFrom(seenFromState);
 		}
 		if (type == std::string("rectangle"))
 		{
-			obstacle = new OpenSteer::RectangleObstacle(width, height,
-					side.normalize(), up.normalize(), forward.normalize(),
-					position, seenFromState);
+			obstacle = new RectangleObstacle(width, height, side.normalize(),
+					up.normalize(), forward.normalize(), position,
+					seenFromState);
 		}
 		if (type == std::string("sphere"))
 		{
-			obstacle = new OpenSteer::SphereObstacle(radius, position);
+			obstacle = new SphereObstacle(radius, position);
 			obstacle->setSeenFrom(seenFromState);
 		}
 		//store obstacle

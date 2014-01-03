@@ -620,8 +620,8 @@
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">
 				<Param plugin_type="one_turning"/>
-				<Param pathway=""/>
-				<Param obstacles=""/>
+				<Param pathway="135.0,124.0,49.6:124.6,169.8,43.6:156.8,349.4,27.2$1.0$true"/>
+				<Param obstacles="gazebo@box@outside:beachhouse2@box@outside:bridge@shape1@outside"/>
 			</Component>
 		</Object>
 		
@@ -687,8 +687,7 @@
 			<Param parent="render"/>
 		</Object>
 
-<!--		
-		<Object type="StaticActor" id="beachhouse2">
+		<Object type="StaticActor" id="beachhouse2" priority="100">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="beachhouse2.bam"/>
@@ -706,7 +705,7 @@
 			<Param pos="124.6,169.8,43.6"/>
 		</Object>
 
-		<Object type="StaticActor" id="gazebo">
+		<Object type="StaticActor" id="gazebo" priority="100">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="gazebo.bam"/>
@@ -723,7 +722,7 @@
 			<Param rot="0.0,0.0,0.0"/>
 			<Param pos="135.0,124.0,49.6"/>
 		</Object>
-		
+
 		<Object type="StaticActor" id="cityhall">
 			<Component type="Model">
 				<Param from_file="true"/>
@@ -760,6 +759,7 @@
 			<Param pos="156.8,349.4,27.2"/>
 		</Object>
 
+<!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
 				<Param from_file="false"/>

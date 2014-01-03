@@ -352,6 +352,8 @@ void SteerPlugIn::onRemoveFromSceneCleanup()
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 }
 
+typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
+
 SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
 {
 	RETURN_ON_COND((not steerVehicle) or mReferenceNP.is_empty(), Result::ERROR)
@@ -373,6 +375,31 @@ SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehi
 			//return if steerVehicle is destroying or already belongs to any plug in
 			RETURN_ON_ASYNC_COND(steerVehicle->mDestroying, Result::Result::ERROR)
 			RETURN_ON_COND(steerVehicle->mSteerPlugIn, Result::ERROR)
+
+			//check if SteerVehicle object needs reparenting
+			NodePath steerVehicleObjectNP = steerVehicle->getOwnerObject()->getNodePath();
+			if(mReferenceNP != steerVehicleObjectNP.get_parent())
+			{
+				//reparenting is needed
+				LPoint3f newPos = steerVehicleObjectNP.get_pos(mReferenceNP);
+				LVector3f newForward = mReferenceNP.get_relative_vector(
+						steerVehicleObjectNP, LVector3f::forward());
+				LVector3f newUp = mReferenceNP.get_relative_vector(
+						steerVehicleObjectNP, LVector3f::up());
+				//the SteerVehicle owner object is reparented to the SteerPlugIn
+				//object reference node path, updating pos/dir
+				steerVehicleObjectNP.reparent_to(mReferenceNP);
+				steerVehicleObjectNP.set_pos(newPos);
+				steerVehicleObjectNP.heads_up(newPos + newForward, newUp);
+				//SteerPlugIn object updates SteerVehicle's pos/dir
+				//wrt its reference node path
+				VehicleSettings settings =
+				dynamic_cast<VehicleAddOn*>(steerVehicle->mVehicle)->getSettings();
+				settings.m_forward = LVecBase3fToOpenSteerVec3(newForward).normalize();
+				settings.m_up = LVecBase3fToOpenSteerVec3(newUp).normalize();
+				settings.m_position = LVecBase3fToOpenSteerVec3(newPos);
+				dynamic_cast<VehicleAddOn*>(steerVehicle->mVehicle)->setSettings(settings);
+			}
 
 			//add to the set of SteerVehicles
 			mSteerVehicles.insert(steerVehicle);
@@ -491,13 +518,14 @@ void SteerPlugIn::update(void* data)
 SteerPlugIn::Result SteerPlugIn::debug(bool enable)
 {
 	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
 	//return if mDrawer3dNP or mDrawer2dNP is empty
-	RETURN_ON_COND(mDrawer3dNP.is_empty() or mDrawer2dNP.is_empty(), Result::ERROR)
+		RETURN_ON_COND(mDrawer3dNP.is_empty() or mDrawer2dNP.is_empty(),
+			Result::ERROR)
 
 	if (enable)
 	{
