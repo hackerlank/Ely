@@ -46,9 +46,9 @@ class SteerPlugInTemplate;
  * scene computation will be performed wrt.\n
  *
  * XML Param(s):
- * - "plugin_type"			|single|"one_turning" (values: one_turning|pedestrian)
- * - "pathway"				|single|"0.0,0.0,0.0:1.0,1.0,1.0$1.0$false" (specified as "p1,py1,pz1:px2,py2,pz2[:...:pxN,pyN,pzN]$r1[:r2:...:rM]$closedCycle" with M,closedCycle=N-1,false|N,true)
- * - "obstacles"  			|multiple|no default (each one specified as "objectId1@shape1@seenFromState1[:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN]"] with shapeX=sphere|box|plane|rectangle and seenFromStateX=outside|inside|both)
+ * - "type"				|single|"one_turning" (values: one_turning|pedestrian)
+ * - "pathway"			|single|"0.0,0.0,0.0:1.0,1.0,1.0$1.0$false" (specified as "p1,py1,pz1:px2,py2,pz2[:...:pxN,pyN,pzN]$r1[:r2:...:rM]$closedCycle" with M,closedCycle=N-1,false|N,true)
+ * - "obstacles"  		|multiple|no default (each one specified as "objectId1@shape1@seenFromState1[:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN]"] with shapeX=sphere|box|plane|rectangle and seenFromStateX=outside|inside|both)
  *
  * \note parts inside [] are optional.\n
  */

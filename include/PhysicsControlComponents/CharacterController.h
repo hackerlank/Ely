@@ -181,7 +181,7 @@ private:
 	SMARTPTR(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
-	LVector3 mModelDims;
+	LVector3f mModelDims;
 	float mModelRadius;
 	//use shape of (another object).
 	ObjectId mUseShapeOfId;
@@ -189,7 +189,7 @@ private:
 	//wrt it; so mModelDeltaCenter represents a transform (translation) to
 	//be applied to the model node path so that the middle point of the
 	//bounding box will overlap the frame center of the parent's node path .
-	LVector3 mModelDeltaCenter;
+	LVector3f mModelDeltaCenter;
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
 	BulletUpAxis mUpAxis;
@@ -251,16 +251,16 @@ inline void CharacterController::reset()
 	mStepHeight = 0.0;
 	mShapeType = GamePhysicsManager::SPHERE;
 	mShapeSize = GamePhysicsManager::MEDIUM;
-	mModelDims = LVector3::zero();
+	mModelDims = LVector3f::zero();
 	mModelRadius = 0.0;
 	mUseShapeOfId = ObjectId();
-	mModelDeltaCenter = LVector3::zero();
+	mModelDeltaCenter = LVector3f::zero();
 	mAutomaticShaping = false;
 	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
 	mUpAxis = Z_up;
 	mAngularSpeed = mFallSpeed = mGravity = mJumpSpeed = mMaxSlope =
 			mMaxJumpHeight = 0.0;
-	mLinearSpeed = LVector3::zero();
+	mLinearSpeed = LVector3f::zero();
 	mIsLocal = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
 			mRollLeft = mRollRight = mJump = false;

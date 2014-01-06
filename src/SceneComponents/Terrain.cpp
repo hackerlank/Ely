@@ -245,7 +245,7 @@ void Terrain::update(void* data)
 
 	//set focal point
 	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
-	LPoint3 focalPointNetPos = mFocalPointNP.get_net_transform()->get_pos();
+	LPoint3f focalPointNetPos = mFocalPointNP.get_net_transform()->get_pos();
 	mTerrain->set_focal_point(focalPointNetPos - mTerrainRootNetPos);
 	//update every frame
 	mTerrain->update();

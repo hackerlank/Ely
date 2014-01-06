@@ -184,7 +184,7 @@ inline void SoftBody::reset()
 	mCollideMask = BitMask32::all_off();
 	mBodyTotalMass = mAirDensity = mWaterDensity = mWaterOffset = 0.0;
 	mBodyMassFromFaces = false;
-	mWaterNormal = LVector3::zero();
+	mWaterNormal = LVector3f::zero();
 	mShowModel = false;
 	mPoints.clear();
 	mRes.clear();

@@ -81,6 +81,20 @@ bool SteerVehicle::initialize()
 	mThrowEvents = (
 			mTmpl->parameter(std::string("throw_events"))
 					== std::string("true") ? true : false);
+	//type
+	std::string type = mTmpl->parameter(std::string("type"));
+	if (type == std::string("pedestrian"))
+	{
+		mVehicle = new Pedestrian<SteerVehicle>;
+	}
+	else if (type == std::string(""))
+	{
+	}
+	else
+	{
+		//default: OneTurning
+		mVehicle = new OneTurning<SteerVehicle>;
+	}
 	//register to SteerPlugIn objectId
 	mSteerPlugInObjectId = ObjectId(
 			mTmpl->parameter(std::string("add_to_plugin")));
@@ -95,20 +109,6 @@ bool SteerVehicle::initialize()
 	else
 	{
 		mMovType = OPENSTEER;
-	}
-	//type
-	std::string type = mTmpl->parameter(std::string("type"));
-	if (type == std::string("pedestrian"))
-	{
-		mVehicle = new Pedestrian<SteerVehicle>;
-	}
-	else if (type == std::string(""))
-	{
-	}
-	else
-	{
-		//default: OneTurning
-		mVehicle = new OneTurning<SteerVehicle>;
 	}
 	//get settings
 	VehicleSettings settings;
@@ -155,7 +155,8 @@ bool SteerVehicle::initialize()
 
 void SteerVehicle::onAddToObjectSetup()
 {
-	LVector3 modelDims, modelDeltaCenter;
+	LVecBase3f modelDims;
+	LVector3f modelDeltaCenter;
 	float modelRadius;
 	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
 			mOwnerObject->getNodePath(), modelDims, modelDeltaCenter,

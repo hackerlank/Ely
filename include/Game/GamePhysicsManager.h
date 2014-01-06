@@ -136,8 +136,8 @@ public:
 	 * controlled by the shapeSize parameter.\n
 	 * If automaticShaping is false shape is built according to this scheme:
 	 * - BulletSphereShape(dim1)
-	 * - BulletPlaneShape(LVector3(dim1, dim2, dim3), dim4)
-	 * - BulletBoxShape(LVector3(dim1, dim2, dim3))
+	 * - BulletPlaneShape(LVector3f(dim1, dim2, dim3), dim4)
+	 * - BulletBoxShape(LVector3f(dim1, dim2, dim3))
 	 * - BulletCylinderShape(dim1, dim2, upAxis)
 	 * - BulletCapsuleShape(dim1, dim2, upAxis)
 	 * - BulletConeShape(dim1, dim2, upAxis)
@@ -164,7 +164,7 @@ public:
 	 * @return A (smart) pointer to the created shape.
 	 */
 	SMARTPTR(BulletShape) createShape(NodePath modelNP, ShapeType shapeType,
-			ShapeSize shapeSize, LVector3& modelDims, LVector3& modelDeltaCenter,
+			ShapeSize shapeSize, LVecBase3f& modelDims, LVector3f& modelDeltaCenter,
 			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
 			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
 			const Filename& heightfieldFile = Filename(""), bool dynamic = false);
@@ -172,17 +172,21 @@ public:
 	 * \brief Calculates geometric characteristics of a GeomNode.
 	 *
 	 * It takes a NodePath, (supposedly) referring to a GeomNode, and
-	 * calculates a tight bounding box surrounding it, hence sets the
+	 * calculates a tight AABB surrounding it, hence sets the
 	 * related dimensions into mModelDims, mModelCenter, mModelRadius
-	 * member variables.
+	 * member variables.\n
+	 * \note Remember that AABB takes into account model rotation/orientation
+	 * so to get a bounding box of the model into the reference pose, no
+	 * rotation/orientation should be applied to the model node path.\n
 	 *
 	 * @param modelNP The model node path.
-	 * @param modelDims Returns the model bounding box dimensions for each axis.
-	 * @param modelDeltaCenter Returns the model bounding box dimensions for each axis.
-	 * @param modelRadius Returns the radius of the model bounding box.
+	 * @param modelDims Returns the model AABB dimensions for each axis.
+	 * @param modelDeltaCenter Returns -(MAXP + minP)/2.0 (MAXP/minP=max/min point
+	 * of the model AABB).
+	 * @param modelRadius Returns the radius of the model AABB.
 	 */
-	void getBoundingDimensions(NodePath modelNP, LVector3& modelDims,
-			LVector3& modelDeltaCenter, float& modelRadius);
+	void getBoundingDimensions(NodePath modelNP, LVecBase3f& modelDims,
+			LVector3f& modelDeltaCenter, float& modelRadius);
 	/**
 	 * \brief Calculates the desired dimension given the shape size.
 	 *

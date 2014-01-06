@@ -28,6 +28,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
+#include "SceneComponents/Model.h"
+#include "SceneComponents/InstanceOf.h"
 
 namespace ely
 {
@@ -62,8 +64,8 @@ ComponentType SteerPlugIn::componentType() const
 bool SteerPlugIn::initialize()
 {
 	bool result = true;
-	//plugin type
-	mPlugInTypeParam = mTmpl->parameter(std::string("plugin_type"));
+	//type
+	mPlugInTypeParam = mTmpl->parameter(std::string("type"));
 	//pathway
 	mPathwayParam = mTmpl->parameter(std::string("pathway"));
 	//obstacles
@@ -192,8 +194,8 @@ inline void SteerPlugIn::doBuildPathway()
 			radius = 1.0;
 		}
 		//set pathway: single radius
-		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, true, &radius,
-				closedCycle);
+		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(numPoints, points, true,
+				&radius, closedCycle);
 	}
 	else
 	{
@@ -224,8 +226,8 @@ inline void SteerPlugIn::doBuildPathway()
 			radii[idx] = value;
 		}
 		//set pathway: several radius
-		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(points, false, radii,
-				closedCycle);
+		dynamic_cast<PlugIn*>(mPlugIn)->setPathway(numPoints, points, false,
+				radii, closedCycle);
 		delete[] radii;
 	}
 }
@@ -233,7 +235,7 @@ inline void SteerPlugIn::doBuildPathway()
 inline void SteerPlugIn::doAddObstacles()
 {
 	//
-	std::vector<std::string> paramValues1Str;
+	std::vector<std::string> paramValues1Str, paramValues2Str;
 	//add obstacles
 	std::list<std::string>::iterator iterList;
 	for (iterList = mObstacleListParam.begin();
@@ -247,26 +249,46 @@ inline void SteerPlugIn::doAddObstacles()
 				++iter)
 		{
 			//any obstacle string should have the form: "objectId@shape@seenFromState"
-			if (paramValues1Str.size() != 3)
+			paramValues2Str = parseCompoundString(*iter, '@');
+			if (paramValues2Str.size() != 3)
 			{
 				continue;
 			}
 			//get obstacle object
 			SMARTPTR(Object)obstacleObject =
 			ObjectTemplateManager::GetSingleton().getCreatedObject(
-					paramValues1Str[0]);
+					paramValues2Str[0]);
 			if (not obstacleObject)
 			{
 				continue;
 			}
-			//get obstacle dimensions
-			NodePath obstacleNP = obstacleObject->getNodePath();
-			LVector3 modelDims, modelDeltaCenter;
+			//get obstacle dimensions wrt the Model or InstanceOf component (if any)
+			NodePath obstacleNP;
+			SMARTPTR(Model) model = DCAST(Model, obstacleObject->getComponent("Scene"));
+			if(model)
+			{
+				obstacleNP = NodePath(model->getNodePath().node());
+			}
+			else
+			{
+				SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, obstacleObject->getComponent("Scene"));
+				if(instanceOf)
+				{
+					obstacleNP = NodePath(instanceOf->getNodePath().node());
+				}
+				else
+				{
+					//no Scene component
+					continue;
+				}
+			}
+			LVecBase3f modelDims;
+			LVector3f modelDeltaCenter;
 			float modelRadius;
 			GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
 					obstacleNP, modelDims, modelDeltaCenter, modelRadius);
 			//get obstacle position/orientation (wrt reference node path)
-			LPoint3f position = obstacleNP.get_pos(mReferenceNP);
+			LPoint3f position = obstacleNP.get_pos(mReferenceNP) - modelDeltaCenter;
 			LVector3f forward = mReferenceNP.get_relative_vector(obstacleNP,
 					LVector3f::forward());
 			LVector3f up = mReferenceNP.get_relative_vector(obstacleNP,
@@ -275,11 +297,11 @@ inline void SteerPlugIn::doAddObstacles()
 					LVector3f::right());
 			//get seenFromState (default = both)
 			OpenSteer::AbstractObstacle::seenFromState seenFromState;
-			if (paramValues1Str[2] == std::string("outside"))
+			if (paramValues2Str[2] == std::string("outside"))
 			{
 				seenFromState = OpenSteer::AbstractObstacle::outside;
 			}
-			else if (paramValues1Str[2] == std::string("inside"))
+			else if (paramValues2Str[2] == std::string("inside"))
 			{
 				seenFromState = OpenSteer::AbstractObstacle::inside;
 			}
@@ -288,7 +310,7 @@ inline void SteerPlugIn::doAddObstacles()
 				seenFromState = OpenSteer::AbstractObstacle::both;
 			}
 			//add the obstacle
-			dynamic_cast<PlugIn*>(mPlugIn)->addObstacle(paramValues1Str[1],
+			dynamic_cast<PlugIn*>(mPlugIn)->addObstacle(paramValues2Str[1],
 					modelDims.get_x(), modelDims.get_z(), modelDims.get_y(),
 					modelRadius, LVecBase3fToOpenSteerVec3(side),
 					LVecBase3fToOpenSteerVec3(up),
@@ -383,9 +405,9 @@ SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehi
 				//reparenting is needed
 				LPoint3f newPos = steerVehicleObjectNP.get_pos(mReferenceNP);
 				LVector3f newForward = mReferenceNP.get_relative_vector(
-						steerVehicleObjectNP, LVector3f::forward());
+				steerVehicleObjectNP, LVector3f::forward());
 				LVector3f newUp = mReferenceNP.get_relative_vector(
-						steerVehicleObjectNP, LVector3f::up());
+				steerVehicleObjectNP, LVector3f::up());
 				//the SteerVehicle owner object is reparented to the SteerPlugIn
 				//object reference node path, updating pos/dir
 				steerVehicleObjectNP.reparent_to(mReferenceNP);
@@ -518,13 +540,13 @@ void SteerPlugIn::update(void* data)
 SteerPlugIn::Result SteerPlugIn::debug(bool enable)
 {
 	//lock (guard) the mutex
-HOLD_REMUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
 	//return if destroying
 	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
 
 	//return if mDrawer3dNP or mDrawer2dNP is empty
-		RETURN_ON_COND(mDrawer3dNP.is_empty() or mDrawer2dNP.is_empty(),
+	RETURN_ON_COND(mDrawer3dNP.is_empty() or mDrawer2dNP.is_empty(),
 			Result::ERROR)
 
 	if (enable)

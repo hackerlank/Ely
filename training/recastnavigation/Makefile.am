@@ -2,7 +2,10 @@
 AM_CPPFLAGS = -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
-LDADD = $(ELY_LIBS)
+LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
+	-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
+	-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lpandagl \
+	-lpandaode -lpandaphysics -lpandaskel -lp3ptloader -lrecastnavigation
 
 noinst_PROGRAMS = ely_recastnavigation ely_recastnavigation_character 
 		

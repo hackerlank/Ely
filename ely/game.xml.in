@@ -592,9 +592,9 @@
 				<Param sound_files="walk-sound@GUI_click.wav"/>
 			</Component>
 			<Component type="SteerVehicle">
+				<Param type="pedestrian"/>
 				<Param add_to_plugin="steerPlugIn1"/>
 				<Param mov_type="kinematic"/>
-				<Param mov_type="one_turning"/>
 				<Param mass="1.0"/>
 				<Param speed="0.0"/>
 				<Param max_force="1.0"/>
@@ -619,9 +619,12 @@
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">
-				<Param plugin_type="one_turning"/>
-				<Param pathway="135.0,124.0,49.6:124.6,169.8,43.6:156.8,349.4,27.2$1.0$true"/>
-				<Param obstacles="gazebo@box@outside:beachhouse2@box@outside:bridge@shape1@outside"/>
+				<Param type="pedestrian"/>
+				<Param pathway="71.9891,346.589,28.4811:
+								240.877,356.564,3.41391:
+								84.5594,150.111,45.4152:
+								169.408,129.243,46.8361$1.0$true"/>
+				<Param obstacles="gazebo@box@outside:beachhouse2@box@outside:bridge@box@outside"/>
 			</Component>
 		</Object>
 		
@@ -741,7 +744,7 @@
 			<Param pos="580.8,560.0,-48.6"/>
 		</Object>
 
-		<Object type="StaticActor" id="bridge">
+		<Object type="StaticActor" id="bridge" priority="100">
 			<Component type="Model">
 				<Param from_file="true"/>
 				<Param model_file="bridge.bam"/>
@@ -756,7 +759,7 @@
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot="100.0,5.0,3.5"/>
-			<Param pos="156.8,349.4,27.2"/>
+			<Param pos="156.8,349.4,24.2"/>
 		</Object>
 
 <!--

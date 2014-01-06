@@ -160,6 +160,13 @@ public:
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
+		OpenSteer::Color yellow(1, 1, 0, 1);
+		//y axis
+		draw3dCircleOrDisk(radius, center, OpenSteer::Vec3(0, 1, 0), yellow, 20,
+				false);
+		//x axis
+		draw3dCircleOrDisk(radius, center, OpenSteer::Vec3(1, 0, 0), yellow, 20,
+				false);
 	}
 };
 
@@ -173,6 +180,33 @@ public:
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
+		OpenSteer::Color brown(0.647, 0.164, 0.164, 1);
+		float w = width * 0.5f;
+		float h = height * 0.5f;
+		float d = depth * 0.5f;
+
+		OpenSteer::Vec3 v1 = globalizePosition(OpenSteer::Vec3(w, h, d));
+		OpenSteer::Vec3 v2 = globalizePosition(OpenSteer::Vec3(-w, h, d));
+		OpenSteer::Vec3 v3 = globalizePosition(OpenSteer::Vec3(-w, -h, d));
+		OpenSteer::Vec3 v4 = globalizePosition(OpenSteer::Vec3(w, -h, d));
+		OpenSteer::Vec3 v5 = globalizePosition(OpenSteer::Vec3(w, h, -d));
+		OpenSteer::Vec3 v6 = globalizePosition(OpenSteer::Vec3(-w, h, -d));
+		OpenSteer::Vec3 v7 = globalizePosition(OpenSteer::Vec3(-w, -h, -d));
+		OpenSteer::Vec3 v8 = globalizePosition(OpenSteer::Vec3(w, -h, -d));
+
+		//sides
+		drawLine(v1, v2, brown);
+		drawLine(v2, v3, brown);
+		drawLine(v3, v4, brown);
+		drawLine(v4, v1, brown);
+		drawLine(v5, v6, brown);
+		drawLine(v6, v7, brown);
+		drawLine(v7, v8, brown);
+		drawLine(v8, v5, brown);
+		drawLine(v1, v5, brown);
+		drawLine(v2, v6, brown);
+		drawLine(v3, v7, brown);
+		drawLine(v4, v8, brown);
 	}
 };
 
@@ -187,6 +221,11 @@ public:
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
+		OpenSteer::Color skyblue(0, 1, 1, 1);
+		drawLine(position() - (forward() * 20), position() + (forward() * 20),
+				skyblue);
+		drawLine(position() - (side() * 20), position() + (side() * 20),
+				skyblue);
 	}
 };
 
@@ -202,6 +241,20 @@ public:
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
+		OpenSteer::Color purple(1, 0, 1, 1);
+		float w = width * 0.5f;
+		float h = height * 0.5f;
+
+		OpenSteer::Vec3 v1 = globalizePosition(OpenSteer::Vec3(w, h, 0));
+		OpenSteer::Vec3 v2 = globalizePosition(OpenSteer::Vec3(-w, h, 0));
+		OpenSteer::Vec3 v3 = globalizePosition(OpenSteer::Vec3(-w, -h, 0));
+		OpenSteer::Vec3 v4 = globalizePosition(OpenSteer::Vec3(w, -h, 0));
+
+		//sides
+		drawLine(v1, v2, purple);
+		drawLine(v2, v3, purple);
+		drawLine(v3, v4, purple);
+		drawLine(v4, v1, purple);
 	}
 };
 
@@ -286,15 +339,14 @@ public:
 		return m_pathway;
 	}
 
-	void setPathway(OpenSteer::Vec3 const points[], bool singleRadius,
+	void setPathway(OpenSteer::SegmentedPathway::size_type numOfPoints,
+			OpenSteer::Vec3 const points[], bool singleRadius,
 			float const radii[], bool closedCycle)
 	{
 		//delete old pathway
 		delete m_pathway;
 		m_pathway = NULL;
 		//create a new pathway
-		OpenSteer::SegmentedPathway::size_type numOfPoints = sizeof(points)
-				/ sizeof(OpenSteer::Vec3);
 		if (numOfPoints < 2)
 		{
 			m_pathway = NULL;
@@ -311,6 +363,8 @@ public:
 			m_pathway = new OpenSteer::PolylineSegmentedPathwaySegmentRadii(
 					numOfPoints, points, radii, closedCycle);
 		}
+		pathEndpoint0 = points[0];
+		pathEndpoint1 = points[numOfPoints - 1];
 	}
 
 	OpenSteer::ObstacleGroup getObstacles()
@@ -365,6 +419,8 @@ protected:
 	OpenSteer::AbstractVehicle* selectedVehicle;
 	///The pathway handled by this plugin.
 	OpenSteer::Pathway* m_pathway;
+	///The pathway endpoints.
+	OpenSteer::Vec3 pathEndpoint0, pathEndpoint1;
 	///The obstacles handled by this plugin.
 	OpenSteer::ObstacleGroup m_obstacles;
 };

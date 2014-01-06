@@ -139,7 +139,7 @@ private:
 	///The focal point NodePath.
 	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
 	NodePath mFocalPointNP;
-	LPoint3 mTerrainRootNetPos;
+	LPoint3f mTerrainRootNetPos;
 	///@}
 	///Flag if brute force is enabled.
 	bool mBruteForce;
@@ -223,7 +223,7 @@ inline void Terrain::reset()
 	mTextureUscale = mTextureVscale = 1.0;
 	mFocalPointObject = ObjectId();
 	mFocalPointNP = NodePath();
-	mTerrainRootNetPos = LPoint3::zero();
+	mTerrainRootNetPos = LPoint3f::zero();
 	mBruteForce = false;
 }
 

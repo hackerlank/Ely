@@ -66,26 +66,16 @@ typedef AbstractTokenForProximityDatabase<AbstractVehicle*> ProximityToken;
 
 // ----------------------------------------------------------------------------
 
-// How many pedestrians to create when the plugin starts first?
-///extern int const gPedestrianStartCount;
-// creates a path for the PlugIn
-///PolylineSegmentedPathwaySingleRadius* getTestPath(void);
-///extern PolylineSegmentedPathwaySingleRadius* gTestPath;
-extern SphereObstacle gObstacle1;
-extern SphereObstacle gObstacle2;
-//extern ObstacleGroup gObstacles;
-extern Vec3 gEndpoint0;
-extern Vec3 gEndpoint1;
-extern bool gUseDirectedPathFollowing;
-// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
-extern RectangleObstacle gObstacle3;
-// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
-
-// this was added for debugging tool, but I might as well leave it in
-extern bool gWanderSwitch;
-
-// ----------------------------------------------------------------------------
-
+/**
+ * \note: Public data member for tweaking:
+ * - \var useDirectedPathFollowing: reverses direction when we reach an
+ * endpoint (bool, default: false)
+ * - \var wanderSwitch: wander behavior flag (bool, default: false)
+ * - \var pathEndpoint0/pathEndpoint1: first/second pathway end point (Vec3, default:
+ * first/last specified point in PedestrianPlugIn)
+ * - \var pathDirection: direction for path following (int upstream=1, downstream=-1,
+ * default: random)
+ */
 template<typename Entity>
 class Pedestrian: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
@@ -102,7 +92,7 @@ public:
 		proximityToken = NULL;
 ///		newPD(pd);
 
-		// reset Pedestrian state
+// reset Pedestrian state
 		reset();
 	}
 
@@ -138,14 +128,17 @@ public:
 ///		const Vec3 randomOffset = randomVectorOnUnitRadiusXZDisk() * r;
 ///		setPosition(path->mapPathDistanceToPoint(d) + randomOffset);
 
-		// randomize 2D heading
-		this->randomizeHeadingOnXZPlane();
+///		// randomize 2D heading
+///		this->randomizeHeadingOnXZPlane();
 
 		// pick a random direction for path following (upstream or downstream)
 		pathDirection = (frandom01() > 0.5) ? -1 : +1;
 
 		// trail parameters: 3 seconds with 60 points along the trail
 		this->setTrailParameters(3, 60);
+
+		useDirectedPathFollowing = false;
+		wanderSwitch = false;
 
 ///		// notify proximity database that our position has changed
 ///		proximityToken->updateForNewPosition(this->position());
@@ -155,23 +148,24 @@ public:
 	void update(const float currentTime, const float elapsedTime)
 	{
 		// apply steering force to our momentum
-		this->applySteeringForce(determineCombinedSteering(elapsedTime), elapsedTime);
+		this->applySteeringForce(determineCombinedSteering(elapsedTime),
+				elapsedTime);
 
 		// reverse direction when we reach an endpoint
-		if (gUseDirectedPathFollowing)
+		if (useDirectedPathFollowing)
 		{
 			const Color darkRed(0.7f, 0, 0);
 			float const pathRadius = path->radius();
 
-			if (Vec3::distance(this->position(), gEndpoint0) < pathRadius)
+			if (Vec3::distance(this->position(), pathEndpoint0) < pathRadius)
 			{
 				pathDirection = +1;
-				this->annotationXZCircle(pathRadius, gEndpoint0, darkRed, 20);
+				this->annotationXZCircle(pathRadius, pathEndpoint0, darkRed, 20);
 			}
-			if (Vec3::distance(this->position(), gEndpoint1) < pathRadius)
+			if (Vec3::distance(this->position(), pathEndpoint1) < pathRadius)
 			{
 				pathDirection = -1;
-				this->annotationXZCircle(pathRadius, gEndpoint1, darkRed, 20);
+				this->annotationXZCircle(pathRadius, pathEndpoint1, darkRed, 20);
 			}
 		}
 
@@ -243,13 +237,13 @@ public:
 			else
 			{
 				// add in wander component (according to user switch)
-				if (gWanderSwitch)
+				if (wanderSwitch)
 					steeringForce += this->steerForWander(elapsedTime);
 
 				// do (interactively) selected type of path following
 				const float pfLeadTime = 3;
 				const Vec3 pathFollow = (
-						gUseDirectedPathFollowing ?
+						useDirectedPathFollowing ?
 								this->steerToFollowPath(pathDirection,
 										pfLeadTime, *path) :
 								this->steerToStayOnPath(pfLeadTime, *path));
@@ -370,11 +364,16 @@ public:
 	// XXX on PolylinePathway) to set random initial positions.  Could
 	// XXX there be a "random position inside path" method on Pathway?
 	PolylineSegmentedPathwaySingleRadius* path;
+	Vec3 pathEndpoint0;
+	Vec3 pathEndpoint1;
 
 	// direction for path following (upstream or downstream)
 	int pathDirection;
 
 	ObstacleGroup* obstacles;
+
+	bool useDirectedPathFollowing;
+	bool wanderSwitch;
 };
 
 //template<typename Entity> AVGroup Pedestrian<Entity>::neighbors;
@@ -403,6 +402,11 @@ public:
 // ----------------------------------------------------------------------------
 // OpenSteerDemo PlugIn
 
+/**
+ * \note: Public member function for tweaking:
+ * - \fn void nextPD(): cycles through various types of proximity databases
+ * (default: LQProximityDatabase).
+ */
 template<typename Entity>
 class PedestrianPlugIn: public PlugIn
 {
@@ -493,15 +497,15 @@ public:
 			break;
 		}
 		status << "\n ";
-		if (gUseDirectedPathFollowing)
-			status << "Directed path following.";
-		else
-			status << "Stay on the path.";
-		status << "\n Wander: ";
-		if (gWanderSwitch)
-			status << "yes";
-		else
-			status << "no";
+///		if (gUseDirectedPathFollowing)
+///			status << "Directed path following.";
+///		else
+///			status << "Stay on the path.";
+///		status << "\n Wander: ";
+///		if (gWanderSwitch)
+///			status << "yes";
+///		else
+///			status << "no";
 		status << std::endl;
 /////		const float h = drawGetWindowHeight();
 /////		const Vec3 screenLocation(10, h - 50, 0);
@@ -556,25 +560,31 @@ public:
 		}
 
 		// draw obstacles
-		drawXZCircle(gObstacle1.radius, gObstacle1.center, gWhite, 40);
-		drawXZCircle(gObstacle2.radius, gObstacle2.center, gWhite, 40);
-		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
+		ObstacleIterator iterObstacle;
+		for (iterObstacle = m_obstacles.begin();
+				iterObstacle != m_obstacles.end(); ++iterObstacle)
 		{
-			float w = gObstacle3.width * 0.5f;
-			Vec3 p = gObstacle3.position();
-			Vec3 s = gObstacle3.side();
-			drawLine(p + (s * w), p + (s * -w), gWhite);
-
-			Vec3 v1 = gObstacle3.globalizePosition(Vec3(w, w, 0));
-			Vec3 v2 = gObstacle3.globalizePosition(Vec3(-w, w, 0));
-			Vec3 v3 = gObstacle3.globalizePosition(Vec3(-w, -w, 0));
-			Vec3 v4 = gObstacle3.globalizePosition(Vec3(w, -w, 0));
-
-			drawLine(v1, v2, gWhite);
-			drawLine(v2, v3, gWhite);
-			drawLine(v3, v4, gWhite);
-			drawLine(v4, v1, gWhite);
+			(*iterObstacle)->draw(false, Color(0, 0, 0),
+					Vec3(0, 0, 0));
 		}
+///		drawXZCircle(gObstacle1.radius, gObstacle1.center, gWhite, 40);
+///		drawXZCircle(gObstacle2.radius, gObstacle2.center, gWhite, 40);
+///		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
+///		{
+///			float w = gObstacle3.width * 0.5f;
+///			Vec3 p = gObstacle3.position();
+///			Vec3 s = gObstacle3.side();
+///			drawLine(p + (s * w), p + (s * -w), gWhite);
+///
+///			Vec3 v1 = gObstacle3.globalizePosition(Vec3(w, w, 0));
+///			Vec3 v2 = gObstacle3.globalizePosition(Vec3(-w, w, 0));
+///			Vec3 v3 = gObstacle3.globalizePosition(Vec3(-w, -w, 0));
+///			Vec3 v4 = gObstacle3.globalizePosition(Vec3(w, -w, 0));
+///			drawLine(v1, v2, gWhite);
+///			drawLine(v2, v3, gWhite);
+///			drawLine(v3, v4, gWhite);
+///			drawLine(v4, v1, gWhite);
+///		}
 		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 	}
 
@@ -640,6 +650,9 @@ public:
 				dynamic_cast<Pedestrian<Entity>*>(vehicle);
 		if (pedestrian)
 		{
+			// randomize 2D heading
+			pedestrian->randomizeHeadingOnXZPlane();
+			// allocate a token for this boid in the proximity database
 			pedestrian->newPD(*pd);
 			// notify proximity database that our position has changed
 			pedestrian->proximityToken->updateForNewPosition(
@@ -647,6 +660,8 @@ public:
 			//set path
 			pedestrian->path =
 					dynamic_cast<PolylineSegmentedPathwaySingleRadius*>(m_pathway);
+			pedestrian->pathEndpoint0 = pathEndpoint0;
+			pedestrian->pathEndpoint1 = pathEndpoint1;
 			//set obstacles
 			pedestrian->obstacles = &m_obstacles;
 			//set neighbors

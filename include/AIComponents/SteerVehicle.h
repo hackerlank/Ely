@@ -58,9 +58,9 @@ enum VehicleMovTypeEnum
  *
  * XML Param(s):
  * - "throw_events"				|single|"false"
- * - "add_to_plugin"			|single|""
- * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
  * - "type"						|single|"one_turning" (values: one_turning|pedestrian)
+ * - "add_to_plugin"			|single|no default
+ * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
  * - "mass"						|single|"1.0"
  * - "radius"					|single|no default
  * - "speed"					|single|"0.0"

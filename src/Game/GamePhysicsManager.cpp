@@ -183,8 +183,8 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 }
 
 SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
-		ShapeType shapeType, ShapeSize shapeSize, LVector3& modelDims,
-		LVector3& modelDeltaCenter, float& modelRadius,
+		ShapeType shapeType, ShapeSize shapeSize, LVecBase3f& modelDims,
+		LVector3f& modelDeltaCenter, float& modelRadius,
 		float& dim1, float& dim2, float& dim3, float& dim4,
 		bool automaticShaping, BulletUpAxis upAxis,
 		const Filename& heightfieldFile, bool dynamic)
@@ -236,7 +236,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			dim3 = 1.0;
 			dim4 = 0.0;
 		}
-		collisionShape = new BulletPlaneShape(LVector3(dim1, dim2, dim3),
+		collisionShape = new BulletPlaneShape(LVector3f(dim1, dim2, dim3),
 				dim4);
 		break;
 		case BOX:
@@ -247,7 +247,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			dim2 = modelDims.get_y() / 2.0;
 			dim3 = modelDims.get_z() / 2.0;
 		}
-		collisionShape = new BulletBoxShape(LVector3(dim1, dim2, dim3));
+		collisionShape = new BulletBoxShape(LVector3f(dim1, dim2, dim3));
 		break;
 		case CYLINDER:
 		if (automaticShaping)
@@ -354,15 +354,15 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 }
 
 void GamePhysicsManager::getBoundingDimensions(NodePath modelNP,
-		LVector3& modelDims, LVector3& modelDeltaCenter, float& modelRadius)
+		LVecBase3f& modelDims, LVector3f& modelDeltaCenter, float& modelRadius)
 {
 	//get "tight" dimensions of model
-	LPoint3 minP, maxP;
+	LPoint3f minP, maxP;
 	modelNP.calc_tight_bounds(minP, maxP);
 	//
 	LVecBase3 delta = maxP - minP;
 	//
-	modelDims = LVector3(abs(delta.get_x()), abs(delta.get_y()),
+	modelDims = LVector3f(abs(delta.get_x()), abs(delta.get_y()),
 			abs(delta.get_z()));
 	modelDeltaCenter = -(minP + delta / 2.0);
 	modelRadius = max(max(modelDims.get_x(), modelDims.get_y()),

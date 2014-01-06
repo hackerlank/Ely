@@ -33,6 +33,8 @@
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "PhysicsComponents/RigidBody.h"
+#include "SceneComponents/Model.h"
+#include "SceneComponents/InstanceOf.h"
 
 namespace ely
 {
@@ -1087,15 +1089,34 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 	if ((mNavMeshTypeEnum == OBSTACLE) and
 			(not mReferenceNP.is_empty()) and object)
 	{
-		//get obstacle dimensions
-		NodePath objectNP = object->getNodePath();
-		LVector3 modelDims, modelDeltaCenter;
+		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
+		NodePath objectNP;
+		SMARTPTR(Model) model = DCAST(Model, object->getComponent("Scene"));
+		if(model)
+		{
+			objectNP = NodePath(model->getNodePath().node());
+		}
+		else
+		{
+			SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, object->getComponent("Scene"));
+			if(instanceOf)
+			{
+				objectNP = NodePath(instanceOf->getNodePath().node());
+			}
+			else
+			{
+				//no Scene component
+				return Result::ERROR;
+			}
+		}
+		LVecBase3f modelDims;
+		LVector3f modelDeltaCenter;
 		float modelRadius;
 		GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
 				objectNP, modelDims, modelDeltaCenter,
 				modelRadius);
 		//calculate pos wrt reference node path
-		LPoint3f pos = objectNP.get_pos(mReferenceNP);
+		LPoint3f pos = objectNP.get_pos(mReferenceNP) - modelDeltaCenter;
 		//add detour obstacle
 		dtObstacleRef obstacleRef;
 		float recastPos[3];

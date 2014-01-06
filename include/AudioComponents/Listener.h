@@ -83,7 +83,7 @@ private:
 	NodePath mSceneRoot;
 	ObjectId mSceneRootId;
 	///Sounds' characteristics.
-	LPoint3 mPosition;
+	LPoint3f mPosition;
 
 	/**
 	 * \brief Actually sets position/velocity for static objects.
@@ -123,7 +123,7 @@ inline void Listener::reset()
 	//
 	mSceneRoot = NodePath();
 	mSceneRootId = ObjectId();
-	mPosition = LPoint3::zero();
+	mPosition = LPoint3f::zero();
 }
 
 }  // namespace ely

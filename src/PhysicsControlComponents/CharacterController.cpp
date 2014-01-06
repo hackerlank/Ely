@@ -354,7 +354,7 @@ void CharacterController::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-	LVector3 speed(0, 0, 0);
+	LVector3f speed(0, 0, 0);
 	float omega = 0.0;
 
 	//handle keys:

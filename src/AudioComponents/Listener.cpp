@@ -131,9 +131,9 @@ void Listener::doSet3dStaticAttributes()
 {
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 	mPosition = ownerNodePath.get_pos(mSceneRoot);
-	LVector3 forward = ownerNodePath.get_relative_vector(mSceneRoot,
-			LVector3::forward());
-	LVector3 up = ownerNodePath.get_relative_vector(mSceneRoot, LVector3::up());
+	LVector3f forward = ownerNodePath.get_relative_vector(mSceneRoot,
+			LVector3f::forward());
+	LVector3f up = ownerNodePath.get_relative_vector(mSceneRoot, LVector3f::up());
 	GameAudioManager::GetSingletonPtr()->audioMgr()->audio_3d_set_listener_attributes(
 			mPosition.get_x(), mPosition.get_y(), mPosition.get_z(), 0.0, 0.0,
 			0.0, forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
@@ -151,8 +151,8 @@ void Listener::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-	LPoint3 newPosition;
-	LVector3 forward, up, deltaPos, velocity;
+	LPoint3f newPosition;
+	LVector3f forward, up, deltaPos, velocity;
 	NodePath ownerNodePath = mOwnerObject->getNodePath();
 
 	//get the new position
@@ -161,18 +161,18 @@ void Listener::update(void* data)
 	CSMARTPTR(TransformState)ownerTransform = ownerNodePath.get_transform(
 			mSceneRoot).p();
 	newPosition = ownerTransform->get_pos();
-	forward = LVector3::forward() * ownerTransform->get_mat();
-	up = LVector3::up() * ownerTransform->get_mat();
+	forward = LVector3f::forward() * ownerTransform->get_mat();
+	up = LVector3f::up() * ownerTransform->get_mat();
 #else
 	newPosition = ownerNodePath.get_pos(mSceneRoot);
 	forward = mSceneRoot.get_relative_vector(ownerNodePath,
-			LVector3::forward());
-	up = mSceneRoot.get_relative_vector(ownerNodePath, LVector3::up());
+			LVector3f::forward());
+	up = mSceneRoot.get_relative_vector(ownerNodePath, LVector3f::up());
 #endif
 
 	//get the velocity (mPosition holds the previous position)
 	deltaPos = (newPosition - mPosition);
-	dt > 0.0 ? velocity = deltaPos / dt : velocity = LVector3::zero();
+	dt > 0.0 ? velocity = deltaPos / dt : velocity = LVector3f::zero();
 	//update listener velocity and position
 	//note on threading: this should be an atomic operation
 	GameAudioManager::GetSingletonPtr()->audioMgr()->audio_3d_set_listener_attributes(

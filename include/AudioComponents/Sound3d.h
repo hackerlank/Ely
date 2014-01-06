@@ -182,7 +182,7 @@ private:
 	///@{
 	/// Sounds' characteristics.
 	float mMinDist, mMaxDist;
-	LPoint3 mPosition;
+	LPoint3f mPosition;
 	///@}
 
 	/**
@@ -227,7 +227,7 @@ inline void Sound3d::reset()
 	mSoundFileListParam.clear();
 	mMinDist = FLT_MIN;
 	mMaxDist = FLT_MAX;
-	mPosition = LPoint3::zero();
+	mPosition = LPoint3f::zero();
 }
 
 inline float Sound3d::getMinDistance()

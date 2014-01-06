@@ -118,5 +118,4 @@ librecastnavigation_a_SOURCES = \
 
 libopensteer_a_SOURCES = \
 		AIComponents/OpenSteerLocal/Draw.cpp \
-		AIComponents/OpenSteerLocal/DrawMeshDrawer.cpp \
-		AIComponents/OpenSteerLocal/PlugIn_Pedestrian.cpp
+		AIComponents/OpenSteerLocal/DrawMeshDrawer.cpp

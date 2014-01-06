@@ -217,7 +217,7 @@ void Chaser::onAddToSceneSetup()
 		//when enabled set chaser initial position/orientation
 		mOwnerObject->getNodePath().set_pos(mChasedNodePath, mChaserPosition);
 		mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
-				LVector3::up());
+				LVector3f::up());
 	}
 	else
 	{
@@ -432,7 +432,7 @@ void Chaser::update(void* data)
 	{
 		//look at fixed location
 		mOwnerObject->getNodePath().look_at(mChasedNodePath, mLookAtPosition,
-				LVector3::up());
+				LVector3f::up());
 	}
 	else
 	{
@@ -498,7 +498,7 @@ void Chaser::update(void* data)
 			//don't want rotate: return to look up to fixed location
 			mFixedLookAtNodePath.set_pos(mOwnerObject->getNodePath().get_pos());
 			mFixedLookAtNodePath.look_at(mChasedNodePath, mLookAtPosition,
-					LVector3::up());
+					LVector3f::up());
 			LVecBase3f deltaHPR = mOwnerObject->getNodePath().get_hpr(mFixedLookAtNodePath);
 			float kReductFactor = mFriction * dt;
 			if (deltaHPR.length_squared() > 0.0)

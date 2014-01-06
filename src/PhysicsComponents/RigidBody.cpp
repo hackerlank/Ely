@@ -128,7 +128,7 @@ bool RigidBody::initialize()
 		if ((not norm_x.empty()) and (not norm_y.empty())
 				and (not norm_z.empty()))
 		{
-			LVector3 normal(strtof(norm_x.c_str(), NULL),
+			LVector3f normal(strtof(norm_x.c_str(), NULL),
 					strtof(norm_y.c_str(), NULL), strtof(norm_z.c_str(), NULL));
 			normal.normalize();
 			mDim1 = normal.get_x();

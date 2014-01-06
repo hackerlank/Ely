@@ -65,6 +65,7 @@ std::vector<std::string> parseCompoundString(
 	std::string compoundString = srcCompoundString;
 	compoundString = eraseCharacter(compoundString, ' ');
 	compoundString = eraseCharacter(compoundString, '\t');
+	compoundString = eraseCharacter(compoundString, '\n');
 	//parse
 	std::vector<std::string> substrings;
 	int len = compoundString.size() + 1;
