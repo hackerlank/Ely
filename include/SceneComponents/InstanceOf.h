@@ -89,8 +89,6 @@ private:
 	ObjectId mInstanceOfId;
 	///The instanced object.
 	SMARTPTR(Object) mInstancedObject;
-	///Old owner object node path.
-	NodePath mOldObjectNodePath;
 	///@}
 
 	///Scaling.
@@ -138,7 +136,6 @@ inline void InstanceOf::reset()
 	mNodePath = NodePath();
 	mInstanceOfId = ObjectId();
 	mInstancedObject.clear();
-	mOldObjectNodePath = NodePath();
 	mScale = LVecBase3f::zero();
 }
 

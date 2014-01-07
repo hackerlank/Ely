@@ -111,8 +111,6 @@ private:
 	///@{
 	///Heightfield image.
 	PNMImage mHeightField;
-	///Old owner object node path.
-	NodePath mOldObjectNodePath;
 	///Scale.
 	float mHeightScale, mWidthScale;
 	bool mDoScale;
@@ -211,7 +209,6 @@ inline void Terrain::reset()
 	//
 	mTerrain.clear();
 	mHeightField.clear();
-	mOldObjectNodePath = NodePath();
 	mHeightScale = mWidthScale = 1.0;
 	mDoScale = false;
 	mNearPercent = 0.0;

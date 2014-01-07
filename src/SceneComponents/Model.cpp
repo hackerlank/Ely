@@ -475,9 +475,8 @@ void Model::onAddToObjectSetup()
 	std::string name = COMPONENT_STANDARD_NAME;
 	mNodePath.set_name(name);
 
-	//set the object node path to this model of node path
-	mOldObjectNodePath = mOwnerObject->getNodePath();
-	mOwnerObject->setNodePath(mNodePath);
+	//reparent this Model node path to the object node path
+	mNodePath.reparent_to(mOwnerObject->getNodePath());
 
 	//clear all no more needed "Param" variables
 	mModelNameParam.clear();
@@ -487,9 +486,6 @@ void Model::onAddToObjectSetup()
 
 void Model::onRemoveFromObjectCleanup()
 {
-	//set the object node path to the old one
-	mOwnerObject->setNodePath(mOldObjectNodePath);
-
 	//Remove node path
 	mNodePath.remove_node();
 	//

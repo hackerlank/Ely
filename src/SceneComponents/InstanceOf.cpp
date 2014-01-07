@@ -107,24 +107,20 @@ void InstanceOf::onAddToObjectSetup()
 			mInstanceOfId);
 	if (mInstancedObject != NULL)
 	{
-		SMARTPTR(Component) component =
-				mInstancedObject->getComponent(ComponentFamilyType("Scene"));
+		SMARTPTR(Component)component =
+		mInstancedObject->getComponent(ComponentFamilyType("Scene"));
 		//an instanceable object should have a model component
 		if (component and component->is_of_type(Model::get_class_type()))
 		{
 			DCAST(Model, component)->getNodePath().instance_to(mNodePath);
 		}
 	}
-	//set the object node path to this instance of node path
-	mOldObjectNodePath = mOwnerObject->getNodePath();
-	mOwnerObject->setNodePath(mNodePath);
+	//reparent this InstanceOf node path to the object node path
+	mNodePath.reparent_to(mOwnerObject->getNodePath());
 }
 
 void InstanceOf::onRemoveFromObjectCleanup()
 {
-	//set the object node path to the old one
-	mOwnerObject->setNodePath(mOldObjectNodePath);
-
 	//detach the first child of this instance of node path (if any)
 	if (mInstancedObject and (mNodePath.get_num_children() > 0))
 	{

@@ -124,8 +124,6 @@ private:
 	///@{
 	///Model.
 	std::string mModelNameParam;
-	///Old owner object node path.
-	NodePath mOldObjectNodePath;
 	///Animations.
 	std::list<std::string> mAnimFileListParam;
 	///Scaling.
@@ -206,7 +204,6 @@ inline void Model::reset()
 	mNodePath = NodePath();
 	mFromFile = false;
 	mModelNameParam.clear();
-	mOldObjectNodePath = NodePath();
 	mAnimFileListParam.clear();
 	mScale = LVecBase3f::zero();
 	mModelTypeParam.clear();

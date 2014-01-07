@@ -24,6 +24,8 @@
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "SceneComponents/Model.h"
+#include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/Terrain.h"
 
 namespace ely
@@ -511,9 +513,24 @@ SMARTPTR(BulletShape)RigidBody::doCreateShape(GamePhysicsManager::ShapeType shap
 		}
 	}
 
-	// create and return the current shape
+	// create and return the current shape: dimensions are wrt the
+	//Model or InstanceOf component (if any)
+	NodePath shapeNodePath = mOwnerObject->getNodePath();
+	SMARTPTR(Model) model = DCAST(Model, mOwnerObject->getComponent("Scene"));
+	if(model)
+	{
+		shapeNodePath = NodePath(model->getNodePath().node());
+	}
+	else
+	{
+		SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, mOwnerObject->getComponent("Scene"));
+		if(instanceOf)
+		{
+			shapeNodePath = NodePath(instanceOf->getNodePath().node());
+		}
+	}
 	return GamePhysicsManager::GetSingletonPtr()->createShape(
-			mOwnerObject->getNodePath(), mShapeType, mShapeSize,
+			shapeNodePath, mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
 			mDim3, mDim4, mAutomaticShaping, mUpAxis,
 			mHeightfieldFile, not (mBodyType == STATIC));

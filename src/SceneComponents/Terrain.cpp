@@ -181,9 +181,8 @@ void Terrain::onAddToObjectSetup()
 		mTerrain->get_root().set_texture(textureStage0,	mTextureImage, 1);
 	}
 
-	//set the object node path to this terrain of node path
-	mOldObjectNodePath = mOwnerObject->getNodePath();
-	mOwnerObject->setNodePath(mTerrain->get_root());
+	//reparent this Terrain node path to the object node path
+	mTerrain->get_root().reparent_to(mOwnerObject->getNodePath());
 
 	//set the focal point
 	SMARTPTR(Object)createdObject =
@@ -203,8 +202,6 @@ void Terrain::onAddToObjectSetup()
 
 void Terrain::onRemoveFromObjectCleanup()
 {
-	//set the object node path to the old one
-	mOwnerObject->setNodePath(mOldObjectNodePath);
 	//
 	reset();
 }
