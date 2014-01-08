@@ -224,7 +224,9 @@ void SoftBody::onAddToObjectSetup()
 	info.set_water_density(mWaterDensity);
 	info.set_water_offset(mWaterOffset);
 	info.set_water_normal(mWaterNormal);
-
+	//
+	SMARTPTR(PandaNode)pandaNode;
+	SMARTPTR(Geom)geom;
 	//create a Soft Body Node
 	if (mBodyType == PATCH)
 	{
@@ -243,18 +245,14 @@ void SoftBody::onAddToObjectSetup()
 				mPoints[1], mPoints[2], mPoints[3], mRes[0], mRes[1], mFixeds,
 				mGendiags);
 		//visualize
-		SMARTPTR(Geom)geom;
-		SMARTPTR(GeomNode)geomNode;
+		pandaNode = mOwnerObject->getNodePath().find_all_matches(
+				"**/+GeomNode").get_path(0).node();
 		if (mShowModel)
 		{
 			//visualize with model GeomNode (if any)
-			geomNode =
-					DCAST(GeomNode,
-							mOwnerObject->getNodePath().find_all_matches(
-									"**/+GeomNode").get_path(0).node());
-			if (geomNode)
+			if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 			{
-				geom = geomNode->modify_geom(0).p();
+				geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 			}
 			else
 			{
@@ -271,11 +269,9 @@ void SoftBody::onAddToObjectSetup()
 			//make texcoords for patch.
 			BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
 			//visualize with GeomNode (if any)
-			geomNode = DCAST(GeomNode,
-					mOwnerObject->getNodePath().node());
-			if (geomNode)
+			if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 			{
-				geomNode->add_geom(geom);
+				DCAST(GeomNode, pandaNode)->add_geom(geom);
 			}
 		}
 		//link with Geom
@@ -297,25 +293,21 @@ void SoftBody::onAddToObjectSetup()
 		mSoftBodyNode = BulletSoftBodyNode::make_ellipsoid(info, mPoints[0],
 				mRadius, mRes[0]);
 		//visualize
-		SMARTPTR(Geom)geom;
-		SMARTPTR(GeomNode)geomNode;
+		pandaNode = mOwnerObject->getNodePath().find_all_matches(
+				"**/+GeomNode").get_path(0).node();
 		if (mShowModel)
 		{
 			//visualize with model GeomNode (if any)
-			geomNode =
-					DCAST(GeomNode,
-							mOwnerObject->getNodePath().find_all_matches(
-									"**/+GeomNode").get_path(0).node());
-			if (geomNode)
+			if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 			{
-				geom = geomNode->modify_geom(0).p();
+				geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 			}
 			else
 			{
 				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 				geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 				//make texcoords for ellipsoid: to be written!!!
-//				BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+///				BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 			}
 		}
 		else
@@ -323,13 +315,11 @@ void SoftBody::onAddToObjectSetup()
 			CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 			geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 			//make texcoords for ellipsoid: to be written!!!
-//			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+///			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 			//visualize with GeomNode (if any)
-			geomNode = DCAST(GeomNode,
-					mOwnerObject->getNodePath().node());
-			if (geomNode)
+			if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 			{
-				geomNode->add_geom(geom);
+				DCAST(GeomNode, pandaNode)->add_geom(geom);
 			}
 		}
 		//link with Geom
@@ -338,16 +328,11 @@ void SoftBody::onAddToObjectSetup()
 	else if (mBodyType == TRIMESH)
 	{
 		//get and visualize with model GeomNode (if any)
-		SMARTPTR(Geom)geom;
-		SMARTPTR(GeomNode)geomNode;
-		//get and visualize with model GeomNode (if any)
-		geomNode =
-		DCAST(GeomNode,
-				mOwnerObject->getNodePath().find_all_matches(
-						"**/+GeomNode").get_path(0).node());
-		if (geomNode)
+		pandaNode = mOwnerObject->getNodePath().find_all_matches(
+						"**/+GeomNode").get_path(0).node();
+		if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 		{
-			geom = geomNode->modify_geom(0).p();
+			geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 		}
 		else
 		{
@@ -431,24 +416,21 @@ void SoftBody::onAddToObjectSetup()
 				mSoftBodyNode = BulletSoftBodyNode::make_tet_mesh(info,
 						buffers["elems"], buffers["faces"], buffers["nodes"]);
 				//visualize
-				SMARTPTR(Geom)geom;
-				SMARTPTR(GeomNode)geomNode;
+				pandaNode = mOwnerObject->getNodePath().find_all_matches(
+								"**/+GeomNode").get_path(0).node();
 				if (mShowModel)
 				{
 					//visualize with model GeomNode (if any)
-					geomNode = DCAST(GeomNode,
-							mOwnerObject->getNodePath().find_all_matches(
-									"**/+GeomNode").get_path(0).node());
-					if (geomNode)
+					if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 					{
-						geom = geomNode->modify_geom(0).p();
+						geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 					}
 					else
 					{
 						CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 						geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 						//make texcoords for tetramesh: to be written!!!
-//						BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+///						BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
 					}
 				}
 				else
@@ -456,13 +438,12 @@ void SoftBody::onAddToObjectSetup()
 					CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 					geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 					//make texcoords for tetramesh: to be written!!!
-//					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+///					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
 					//visualize with GeomNode (if any)
-					geomNode = DCAST(GeomNode,
-							mOwnerObject->getNodePath().node());
-					if (geomNode)
+					if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 					{
-						geomNode->add_geom(geom);
+//						geomNode = DCAST(GeomNode, pandaNode);
+						DCAST(GeomNode, pandaNode)->add_geom(geom);
 					}
 				}
 				//link with Geom
@@ -511,11 +492,12 @@ void SoftBody::onAddToObjectSetup()
 		curve->reset(mRes[0] + 2);
 		mSoftBodyNode->link_curve(curve);
 		//visualize with RopeNode (if any)
-		SMARTPTR(RopeNode)ropeNode = DCAST(RopeNode,
-				mOwnerObject->getNodePath().node());
-		if (ropeNode)
+		pandaNode =
+				mOwnerObject->getNodePath().find_all_matches("**/+RopeNode").get_path(
+						0).node();
+		if (pandaNode and pandaNode->is_of_type(RopeNode::get_class_type()))
 		{
-			ropeNode->set_curve(curve);
+			DCAST(RopeNode, pandaNode)->set_curve(curve);
 		}
 	}
 	//set total mass

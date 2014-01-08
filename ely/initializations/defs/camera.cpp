@@ -166,10 +166,11 @@ unsigned int idx = 0, chasedListSize;
 void toggleChasedObject(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera= reinterpret_cast<Object*>(data);
-	SMARTPTR(Chaser) chaserComp = DCAST(Chaser, camera->getComponent(
-					ComponentFamilyType("Control")));
-	if(chaserComp)
+	SMARTPTR(Component) controlComp = camera->getComponent(
+					ComponentFamilyType("Control"));
+	if(controlComp->is_of_type(Chaser::get_class_type()))
 	{
+		SMARTPTR(Chaser) chaserComp = DCAST(Chaser, controlComp);
 		++idx;
 		idx = idx % chasedListSize;
 		PRINT_DEBUG("Chased object: " << (*chasedDataPtr)[idx].id);

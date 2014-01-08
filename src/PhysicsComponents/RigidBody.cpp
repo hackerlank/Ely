@@ -499,34 +499,33 @@ SMARTPTR(BulletShape)RigidBody::doCreateShape(GamePhysicsManager::ShapeType shap
 		SMARTPTR(Object)createdObject =
 		ObjectTemplateManager::GetSingleton().getCreatedObject(
 				mUseShapeOfId);
-		if (createdObject != NULL)
+		if (createdObject)
 		{
 			//object already exists
-			SMARTPTR(RigidBody)rigidBody = DCAST(RigidBody,
-					createdObject->getComponent(ComponentFamilyType("Physics")));
-			if (rigidBody != NULL)
+			SMARTPTR(Component) physicsComp =
+					createdObject->getComponent(ComponentFamilyType("Physics"));
+			if (physicsComp and physicsComp->is_of_type(RigidBody::get_class_type()))
 			{
 				//physics component is a rigid body:
 				//return a reference to its (first and only) shape
-				return rigidBody->mRigidBodyNode->get_shape(0);
+				return DCAST(RigidBody, physicsComp)->mRigidBodyNode->get_shape(0);
 			}
 		}
 	}
 
 	// create and return the current shape: dimensions are wrt the
 	//Model or InstanceOf component (if any)
-	NodePath shapeNodePath = mOwnerObject->getNodePath();
-	SMARTPTR(Model) model = DCAST(Model, mOwnerObject->getComponent("Scene"));
-	if(model)
+	NodePath shapeNodePath = mOwnerObject->getNodePath();//default
+	SMARTPTR(Component) sceneComp = mOwnerObject->getComponent("Scene");
+	if (sceneComp)
 	{
-		shapeNodePath = NodePath(model->getNodePath().node());
-	}
-	else
-	{
-		SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, mOwnerObject->getComponent("Scene"));
-		if(instanceOf)
+		if (sceneComp->is_of_type(Model::get_class_type()))
 		{
-			shapeNodePath = NodePath(instanceOf->getNodePath().node());
+			shapeNodePath = NodePath(DCAST(Model, sceneComp)->getNodePath().node());
+		}
+		if (sceneComp->is_of_type(InstanceOf::get_class_type()))
+		{
+			shapeNodePath = NodePath(DCAST(InstanceOf, sceneComp)->getNodePath().node());
 		}
 	}
 	return GamePhysicsManager::GetSingletonPtr()->createShape(

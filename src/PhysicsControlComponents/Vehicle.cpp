@@ -443,16 +443,18 @@ void Vehicle::onAddToObjectSetup()
 	//Moreover the Object node path is the RigidBody one.
 
 	//check if there is a RigidBody component
-	SMARTPTR(RigidBody)rigidBodyComp = DCAST(RigidBody,
-			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
-
-	if (not rigidBodyComp)
+	SMARTPTR(Component) physicsComp =
+			mOwnerObject->getComponent(ComponentFamilyType("Physics"));
+	if ((not physicsComp) or
+			(not physicsComp->is_of_type(RigidBody::get_class_type())))
 	{
 		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '" <<
 				mOwnerObject->objectId() <<
 				"' hasn't a RigidBody Component");
 		return;
 	}
+	//there is a RigidBody component
+	SMARTPTR(RigidBody) rigidBodyComp = DCAST(RigidBody, physicsComp);
 	//for vehicle disable deactivation
 	static_cast<BulletRigidBodyNode&>(*rigidBodyComp).set_deactivation_enabled(false);
 
@@ -473,18 +475,17 @@ void Vehicle::onAddToObjectSetup()
 void Vehicle::onRemoveFromObjectCleanup()
 {
 	//check if there is a RigidBody component
-	SMARTPTR(RigidBody)rigidBodyComp = DCAST(RigidBody,
-			mOwnerObject->getComponent(ComponentFamilyType("Physics")));
-
-	RETURN_ON_COND(not rigidBodyComp,)
+	SMARTPTR(Component) physicsComp =
+			mOwnerObject->getComponent(ComponentFamilyType("Physics"));
+	RETURN_ON_COND((not physicsComp) or
+			(not physicsComp->is_of_type(RigidBody::get_class_type())),)
 
 	//remove BulletVehicle from physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
 
 	//re-add temporarily BulletRigidBodyNode of physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			&(rigidBodyComp->getBulletRigidBodyNode()));
-
+			&(DCAST(RigidBody, physicsComp)->getBulletRigidBodyNode()));
 	//
 	reset();
 }

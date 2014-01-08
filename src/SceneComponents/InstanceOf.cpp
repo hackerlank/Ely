@@ -107,12 +107,12 @@ void InstanceOf::onAddToObjectSetup()
 			mInstanceOfId);
 	if (mInstancedObject != NULL)
 	{
-		SMARTPTR(Component)component =
-		mInstancedObject->getComponent(ComponentFamilyType("Scene"));
+		SMARTPTR(Component)sceneComponent =
+				mInstancedObject->getComponent(ComponentFamilyType("Scene"));
 		//an instanceable object should have a model component
-		if (component and component->is_of_type(Model::get_class_type()))
+		if (sceneComponent and sceneComponent->is_of_type(Model::get_class_type()))
 		{
-			DCAST(Model, component)->getNodePath().instance_to(mNodePath);
+			DCAST(Model, sceneComponent)->getNodePath().instance_to(mNodePath);
 		}
 	}
 	//reparent this InstanceOf node path to the object node path
