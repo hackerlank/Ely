@@ -155,7 +155,7 @@ private:
 	 * @param objTmplParams The object template parameters table.
 	 * @param compTmplParams The component templates' parameters' table.
 	 */
-	void storeParameters( const ParameterTable& objTmplParams,
+	void doStoreParameters( const ParameterTable& objTmplParams,
 			const ParameterTableMap& compTmplParams);
 
 public:
@@ -409,7 +409,7 @@ inline ParameterTableMap Object::getStoredCompTmplParams() const
 	return mCompTmplParams;
 }
 
-inline void Object::storeParameters(const ParameterTable& objTmplParams,
+inline void Object::doStoreParameters(const ParameterTable& objTmplParams,
 		const ParameterTableMap& compTmplParams)
 {
 	mObjTmplParams = objTmplParams;

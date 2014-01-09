@@ -198,7 +198,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 			std::string("true") ? true : false);
 	if (storeParams or storeParamsParam)
 	{
-		newObj->storeParameters(objTmplParams, compTmplParams);
+		newObj->doStoreParameters(objTmplParams, compTmplParams);
 	}
 	//give a chance to object to setup itself when being added to scene.
 	newObj->onAddToSceneSetup();
