@@ -552,10 +552,13 @@ void SoftBody::onRemoveFromObjectCleanup()
 
 void SoftBody::onAddToSceneSetup()
 {
-	///HACK: rope node's parent node path correction (see bullet samples)
+	///XXX: HACK: rope node's parent node path correction (see bullet samples)
 	if (mBodyType == ROPE)
 	{
-		if (DCAST(RopeNode,	mNodePath.get_child(0).node()))
+		SMARTPTR(PandaNode)pandaNode =
+		mOwnerObject->getNodePath().find_all_matches("**/+RopeNode").get_path(
+				0).node();
+		if (pandaNode and pandaNode->is_of_type(RopeNode::get_class_type()))
 		{
 			//the child is the rope node: reparent to the owner object node path
 			mRopeNodePath = mNodePath.get_child(0);
@@ -566,7 +569,7 @@ void SoftBody::onAddToSceneSetup()
 
 void SoftBody::onRemoveFromSceneCleanup()
 {
-	///HACK: rope node's parent node path correction (see bullet samples)
+	///XXX: HACK: rope node's parent node path correction (see bullet samples)
 	if (mBodyType == ROPE)
 	{
 		if (not mRopeNodePath.is_empty())
