@@ -272,6 +272,11 @@ void CharacterController::onAddToObjectSetup()
 	std::string name = COMPONENT_STANDARD_NAME;
 	mCharacterController = new BulletCharacterControllerNode(
 			doCreateShape(mShapeType), mStepHeight, name.c_str());
+	//add to table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mCharacterController.p(), this);
+
 	//set the control parameters
 	doSetControlParameters();
 
@@ -317,13 +322,13 @@ void CharacterController::onRemoveFromObjectCleanup()
 	//set the object node path to the old one
 	mOwnerObject->setNodePath(oldObjectNodePath);
 
-	//check if game physics manager exists
-	GamePhysicsManager* physicsMgrPtr = GamePhysicsManager::GetSingletonPtr();
-	if (physicsMgrPtr)
-	{
-		//remove character controller from the physics world
-		physicsMgrPtr->bulletWorld()->remove(mCharacterController);
-	}
+	//remove from table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mCharacterController.p(), NULL);
+
+	//remove character controller from the physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mCharacterController);
 
 	//Remove node path
 	mNodePath.remove_node();

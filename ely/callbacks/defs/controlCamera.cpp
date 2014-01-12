@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/controlCamera.cpp
+ * \file /Ely/ely/callbacks/defs/controlCamera.cpp
  *
  * \date 26/nov/2012 (11:04:25)
  * \author consultit

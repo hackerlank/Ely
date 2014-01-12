@@ -500,6 +500,10 @@ void SoftBody::onAddToObjectSetup()
 			DCAST(RopeNode, pandaNode)->set_curve(curve);
 		}
 	}
+	//add to table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mSoftBodyNode.p(), this);
 	//set total mass
 	mSoftBodyNode->set_total_mass(mBodyTotalMass, mBodyMassFromFaces);
 
@@ -539,6 +543,11 @@ void SoftBody::onRemoveFromObjectCleanup()
 	}
 	//set the object node path to the old one
 	mOwnerObject->setNodePath(oldObjectNodePath);
+
+	//remove from table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mSoftBodyNode.p(), NULL);
 
 	//remove rigid body from the physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(

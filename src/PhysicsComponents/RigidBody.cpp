@@ -288,6 +288,10 @@ void RigidBody::onAddToObjectSetup()
 	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
 	std::string name = COMPONENT_STANDARD_NAME;
 	mRigidBodyNode = new BulletRigidBodyNode(name.c_str());
+	//add to table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mRigidBodyNode.p(), this);
 	//set the physics parameters
 	doSetPhysicalParameters();
 
@@ -427,6 +431,11 @@ void RigidBody::onRemoveFromObjectCleanup()
 	}
 	//set the object node path to the old one
 	mOwnerObject->setNodePath(oldObjectNodePath);
+
+	//remove from table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mRigidBodyNode.p(), NULL);
 
 	//remove rigid body from the physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(

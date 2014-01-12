@@ -553,13 +553,11 @@ void Vehicle::onAddToSceneSetup()
 		compTmplParams[sceneCompType].insert(
 				ParameterTable::value_type("scale", mWheelScaleParam[idx]));
 		//actually create the wheel object
-		std::ostringstream idxStr;
-		idxStr << idx;
-		//object creation
 		mWheelObjects[idx] = ObjectTemplateManager::GetSingletonPtr()->
-				createObject(ObjectType(mWheelTmpl),
-						ObjectId(mComponentId + std::string("Wheel") + idxStr.str()),
-						objTmplParam, compTmplParams, false, mOwnerObject);
+		createObject(ObjectType(mWheelTmpl),
+				ObjectId(mComponentId + std::string("Wheel") +
+						dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(idx)).str()),
+				objTmplParam, compTmplParams, false, mOwnerObject);
 		//object initialization
 		mWheelObjects[idx]->worldSetup();
 

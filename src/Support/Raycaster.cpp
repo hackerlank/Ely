@@ -22,13 +22,14 @@
  */
 
 #include "Support/Raycaster.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
 
 Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
-		SMARTPTR(BulletWorld)world, int N) :
-		mApp(app), mWindow(window), mWorld(world), m_N(N)
+SMARTPTR(BulletWorld)world, int N) :
+mApp(app), mWindow(window), mWorld(world), m_N(N)
 {
 	//get render, camera node paths
 	mRender = window->get_render();
@@ -49,6 +50,12 @@ Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
 	{
 		mHitBodyData[i].clear();
 	}
+	//reset other members
+	mHitNode = NULL;
+	mHitObject.clear();
+	mHitPos = mFromPos = mToPos = LPoint3f::zero();
+	mHitNormal = LVector3f::zero();
+	mHitFraction = 0.0;
 }
 
 Raycaster::~Raycaster()
@@ -71,7 +78,7 @@ Raycaster::~Raycaster()
 }
 
 void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
-		void* data,	const std::string& hitKey, BitMask32 bitMask)
+		void* data, const std::string& hitKey, BitMask32 bitMask)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -80,6 +87,35 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 	{
 		return;
 	}
+	//set the callback
+	doSetCallback(index, callback, data, hitKey, bitMask);
+}
+
+bool Raycaster::setHitCallback(void (*callback)(Raycaster*, void*), void* data,
+		const std::string& hitKey, BitMask32 bitMask)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//get the first callback free slot
+	int freeIdx = 0;
+	while (freeIdx < m_N)
+	{
+		if (mCallback[freeIdx])
+		{
+			break;
+		}
+		++freeIdx;
+	}
+	RETURN_ON_COND(freeIdx >= m_N, false)
+	//there is a free slot
+	doSetCallback(freeIdx, callback, data, hitKey, bitMask);
+	return true;
+}
+
+void Raycaster::doSetCallback(int index, void (*callback)(Raycaster*, void*),
+		void* data, const std::string& hitKey, BitMask32 bitMask)
+{
 	mCallback[index] = callback;
 	mData[index] = data;
 	// setup event callback for picking body
@@ -91,64 +127,18 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 		mApp->get_event_handler().remove_hooks_with(
 				reinterpret_cast<void*>(mHitBodyData[index].p()));
 	}
-	mHitBodyData[index] = new EventCallbackInterface<Raycaster>::EventCallbackData(this,
-			&Raycaster::hitBody);
-	ostringstream idx;
-	idx << index;
-	mApp->define_key(mHitKey[index], "HitBody_" + idx.str(),
+	mHitBodyData[index] =
+			new EventCallbackInterface<Raycaster>::EventCallbackData(this,
+					&Raycaster::hitBodyCallback);
+	mApp->define_key(mHitKey[index],
+			"HitBody_"
+					+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
+							index)).str(),
 			&EventCallbackInterface<Raycaster>::eventCallbackFunction,
 			reinterpret_cast<void*>(mHitBodyData[index].p()));
 }
 
-const PandaNode* Raycaster::getHitNode()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mHitNode;
-}
-
-LPoint3f Raycaster::getHitPos()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mHitPos;
-}
-
-LPoint3f Raycaster::getFromPos()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mFromPos;
-}
-
-LPoint3f Raycaster::getToPos()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mToPos;
-}
-
-LVector3f Raycaster::getHitNormal()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mHitNormal;
-}
-
-float Raycaster::getHitFraction()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mHitFraction;
-}
-
-void Raycaster::hitBody(const Event* event)
+void Raycaster::hitBodyCallback(const Event* event)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -156,7 +146,7 @@ void Raycaster::hitBody(const Event* event)
 	//get OnPickKey index (if any)
 	std::string eventName = event->get_name();
 	int idx = 0;
-	while(idx < m_N)
+	while (idx < m_N)
 	{
 		if (eventName == mHitKey[idx])
 		{
@@ -168,48 +158,69 @@ void Raycaster::hitBody(const Event* event)
 	// handle body picking
 	if (mCallback[idx] and (idx < m_N))
 	{
-		//get the mouse watcher
-		SMARTPTR(MouseWatcher)mwatcher =
-		DCAST(MouseWatcher, mWindow->get_mouse().node());
-		if (mwatcher->has_mouse())
+		doRayCast(mBitMask[idx]);
+		if (mHitNode)
 		{
-			// Get to and from pos in camera coordinates
-			LPoint2f pMouse = mwatcher->get_mouse();
-			//
-			LPoint3f pFrom, pTo;
-			if (mCamLens->extrude(pMouse, pFrom, pTo))
-			{
-				//Transform to global coordinates
-				pFrom = mRender.get_relative_point(mCamera, pFrom);
-				pTo = mRender.get_relative_point(mCamera, pTo);
-				//cast a ray to detect a body
-				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom,
-						pTo, mBitMask[idx]);
-				//
-				if (result.has_hit())
-				{
-					//possible hit objects:
-					//- BulletRigidBodyNode
-					//- BulletCharacterControllerNode
-					//- BulletVehicle
-					//- BulletConstraint
-					//- BulletSoftBodyNode
-					//- BulletGhostNode
+			//there was an hit: call the related callback
+			mCallback[idx](this, mData[idx]);
+		}
+	}
+}
 
-					mHitNode = const_cast<PandaNode*>(result.get_node());
-					mHitPos = result.get_hit_pos();
-					mHitNormal = result.get_hit_normal();
-					mHitFraction = result.get_hit_fraction();
-					mFromPos = result.get_from_pos();
-					mToPos = result.get_to_pos();
-					mCallback[idx](this, mData[idx]);
-				}
+SMARTPTR(Object)Raycaster::rayCast(const BitMask32& bitMask)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	doRayCast(bitMask);
+
+	//return the hit Object
+	return (mHitObject ? mHitObject : NULL);
+}
+
+inline void Raycaster::doRayCast(const BitMask32& bitMask)
+{
+	//get the mouse watcher
+	SMARTPTR(MouseWatcher)mwatcher=
+	DCAST(MouseWatcher, mWindow->get_mouse().node());
+	if (mwatcher->has_mouse())
+	{
+		// Get to and from pos in camera coordinates
+		LPoint2f pMouse = mwatcher->get_mouse();
+		//
+		LPoint3f pFrom, pTo;
+		if (mCamLens->extrude(pMouse, pFrom, pTo))
+		{
+			//Transform to global coordinates
+			pFrom = mRender.get_relative_point(mCamera, pFrom);
+			pTo = mRender.get_relative_point(mCamera, pTo);
+			//cast a ray to detect a body
+			BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom,
+					pTo, bitMask);
+			//
+			if (result.has_hit())
+			{
+				//possible hit objects:
+				//- BulletRigidBodyNode
+				//- BulletCharacterControllerNode
+				//- BulletVehicle
+				//- BulletConstraint
+				//- BulletSoftBodyNode
+				//- BulletGhostNode
+
+				mHitNode = const_cast<PandaNode*>(result.get_node());
+				mHitObject = GamePhysicsManager::GetSingletonPtr()->
+				getPhysicsComponentByPandaNode(mHitNode)->getOwnerObject();
+				mHitPos = result.get_hit_pos();
+				mHitNormal = result.get_hit_normal();
+				mHitFraction = result.get_hit_fraction();
+				mFromPos = result.get_from_pos();
+				mToPos = result.get_to_pos();
 			}
 		}
 	}
 }
 
-} // namespace ely
-
-
+}
+// namespace ely
 

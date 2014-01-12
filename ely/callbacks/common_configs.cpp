@@ -60,6 +60,8 @@ extern void activityActorInit();
 extern void activityActorEnd();
 extern void controlCameraInit();
 extern void controlCameraEnd();
+extern void steerPluginsInit();
+extern void steerPluginsEnd();
 extern void vehicleCarInit();
 extern void vehicleCarEnd();
 
@@ -69,6 +71,7 @@ void callAllInits()
 	activityCharacterInit();
 	activityActorInit();
 	controlCameraInit();
+	steerPluginsInit();
 	vehicleCarInit();
 }
 void callAllEnds()
@@ -76,5 +79,6 @@ void callAllEnds()
 	activityCharacterEnd();
 	activityActorEnd();
 	controlCameraEnd();
+	steerPluginsEnd();
 	vehicleCarEnd();
 }

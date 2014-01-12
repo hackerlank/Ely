@@ -287,7 +287,7 @@ void DrawMeshDrawer::drawText(const std::string& text, const LPoint3f& location,
 	{
 		//allocate a new TextNode
 		std::string textNum =
-				dynamic_cast<ostringstream&>(ostringstream().operator <<(
+				dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
 						m_textNodeIdx)).str();
 		m_textNodes.push_back(NodePath(new TextNode("TextNode-" + textNum)));
 		//common TextNodes setup

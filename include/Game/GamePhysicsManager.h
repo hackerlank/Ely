@@ -198,6 +198,24 @@ public:
 	float getDim(ShapeSize shapeSize, float d1, float d2);
 	///@}
 
+	/**
+	 * \brief Gets physics component given the (underlying) Bullet PandaNode.
+	 *
+	 * @param pandaNode The (underlying) Bullet PandaNode.
+	 * @return The physics component.
+	 */
+	SMARTPTR(Component) getPhysicsComponentByPandaNode(SMARTPTR(PandaNode) pandaNode);
+
+	/**
+	 * \brief Sets physics component given the (underlying) Bullet PandaNode.
+	 *
+	 * @param pandaNode The (underlying) Bullet PandaNode.
+	 * @param physicsComponent The physics component, if set to NULL the
+	 * component related to pandaNode will be erased.
+	 */
+	void setPhysicsComponentByPandaNode(SMARTPTR(PandaNode) pandaNode,
+			SMARTPTR(Component) physicsComponent);
+
 private:
 	/// Bullet world.
 	SMARTPTR(BulletWorld) mBulletWorld;
@@ -213,6 +231,10 @@ private:
 	PhysicsComponentList mPhysicsComponents;
 	///@}
 
+	///Table of all physics components indexed by (underlying) Bullet PandaNodes.
+	///This is used, for example, during ray casting.
+	std::map<SMARTPTR(PandaNode), SMARTPTR(Component)> mPhysicsComponentPandaNodeTable;
+
 	///@{
 	///A task data for step simulation update.
 	SMARTPTR(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;
@@ -222,10 +244,37 @@ private:
 #ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
+	///The mutex associated with table of all physics components.
+	ReMutex mTableMutex;
 #endif
 };
 
 ///inline definitions
+
+inline SMARTPTR(Component) GamePhysicsManager::getPhysicsComponentByPandaNode(
+		SMARTPTR(PandaNode) pandaNode)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mTableMutex)
+
+	return mPhysicsComponentPandaNodeTable[pandaNode];
+}
+
+inline void GamePhysicsManager::setPhysicsComponentByPandaNode(SMARTPTR(PandaNode) pandaNode,
+		SMARTPTR(Component) physicsComponent)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mTableMutex)
+
+	if (physicsComponent)
+	{
+		mPhysicsComponentPandaNodeTable[pandaNode] = physicsComponent;
+	}
+	else
+	{
+		mPhysicsComponentPandaNodeTable.erase(pandaNode);
+	}
+}
 
 #ifdef ELY_THREAD
 inline ReMutex& GamePhysicsManager::getMutex()

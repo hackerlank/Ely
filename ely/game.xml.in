@@ -10,7 +10,12 @@
 		<ObjectTmpl type="Render">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
 		</ObjectTmpl>
+
+		<!-- template for a singleton game object: used only to perform additional
+			 custom initializations besides the ones performed by GameManager -->
+		<ObjectTmpl type="Game"/>
 		
+		<!-- template for camera object(s) -->
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
 <!--
@@ -121,7 +126,7 @@
 			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
 		</ObjectTmpl>
 
-		<ObjectTmpl type="KinematicCrowdAgent">
+		<ObjectTmpl type="KinematicRecastCrowdAgent">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
@@ -149,7 +154,10 @@
 		</ObjectTmpl>
 
 		<ObjectTmpl type="OpenSteerPlugIn">
-			<ComponentTmpl family="AI" type="SteerPlugIn" priority="80"/> 
+			<ComponentTmpl family="AI" type="SteerPlugIn" priority="80">
+				<Param event_types="add_steer_vehicle:remove_steer_vehicle"/>
+				<Param event_types="toggle_debug"/>
+			</ComponentTmpl>
 		</ObjectTmpl>
 
 		<!-- templates for vehicles -->
@@ -575,13 +583,13 @@
 		</Object>
 -->
 
-		<Object type="KinematicOpenSteerVehicle" id="steerVehicle1" priority="70"> 
+		<Object type="KinematicOpenSteerVehicle" id="steerVehicleToBeCloned"> 
 <!--		
-		<Object type="OpenSteerVehicle" id="steerVehicle1" priority="70">
+		<Object type="OpenSteerVehicle" id="steerVehicleToBeCloned" priority="70">
 -->
-			<Param parent="render"/>
+			<Param parent=""/>
 			<Param is_steady="false"/>
-			<Param store_params="false"/>
+			<Param store_params="true"/>
 			<Param pos="-33.0144,44.7431,18.695"/>
 			<Param rot="-90.0,0.0,0.0"/>
 			<Component type="InstanceOf">
@@ -593,7 +601,7 @@
 			</Component>
 			<Component type="SteerVehicle">
 				<Param type="pedestrian"/>
-				<Param add_to_plugin="steerPlugIn1"/>
+				<Param add_to_plugin="NONE"/>
 				<Param mov_type="kinematic"/>
 				<Param mass="1.0"/>
 				<Param speed="0.0"/>
@@ -615,7 +623,7 @@
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 
-		<Object type="OpenSteerPlugIn" id="steerPlugIn1" priority="80">
+		<Object type="OpenSteerPlugIn" id="steerPlugInPedestrian1" priority="80">
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">
@@ -625,6 +633,8 @@
 								84.5594,150.111,45.4152:
 								169.408,129.243,46.8361$1.0$true"/>
 				<Param obstacles="gazebo@box@outside:beachhouse2@box@outside:bridge@box@outside"/>
+				<Param events="add_steer_vehicle@h:remove_steer_vehicle@shift-h$"/>
+				<Param events="toggle_debug@n$toggleDebug"/>
 			</Component>
 		</Object>
 		
@@ -827,6 +837,12 @@
 			<Component type="NodePathWrapper">
 				<Param nodepath="aspect2d"/>
 			</Component>
+			<Param parent=""/>
+		</Object>
+		<Object type="Game" id="elyPreObjects" priority="500">
+			<Param parent=""/>
+		</Object>
+		<Object type="Game" id="elyPostObjects" priority="-500">
 			<Param parent=""/>
 		</Object>
 		

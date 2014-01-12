@@ -6,6 +6,7 @@ initializations_la_SOURCES = \
 		common_configs.cpp common_configs.h \
 		defs/Actor1.cpp \
 		defs/camera.cpp \
+		defs/elyGame.cpp \
 		defs/EnvironmentObjects.cpp \
 		defs/player0.cpp \
 		defs/SoftObjects.cpp \

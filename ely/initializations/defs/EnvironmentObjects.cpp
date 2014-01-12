@@ -33,7 +33,6 @@ extern "C"
 
 INITIALIZATION Terrain1_initialization;
 INITIALIZATION course2_initialization;
-INITIALIZATION steerPlugIn1_initialization;
 
 #ifdef __cplusplus
 }
@@ -79,42 +78,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 #ifdef ELY_DEBUG
 	//enable/disable navigation mesh debugging by event
 	pandaFramework->define_key("m", "toggleDebugNavMesh", &toggleDebugNavMesh,
-			static_cast<void*>(object));
-#endif
-}
-
-///steerPlugIn1
-#ifdef ELY_DEBUG
-//debug flag
-namespace
-{
-bool debugOpenSteerOn = false;
-
-void toggleDebugSteerPlugIn(const Event* event, void* data)
-{
-	SMARTPTR(Object)steerPlugIn1 = reinterpret_cast<Object*>(data);
-	SMARTPTR(Component) compAI = steerPlugIn1->getComponent(
-			ComponentFamilyType("AI"));
-	if (compAI->is_of_type(SteerPlugIn::get_class_type()))
-	{
-		SMARTPTR(SteerPlugIn)steerPlugIn1SteerPlugIn = DCAST(SteerPlugIn, steerPlugIn1->getComponent(
-						ComponentFamilyType("AI")));
-		//toggle debug
-		steerPlugIn1SteerPlugIn->debug(not debugOpenSteerOn);
-		//toggle flag
-		debugOpenSteerOn = not debugOpenSteerOn;
-	}
-}
-}
-#endif
-
-void steerPlugIn1_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
-PandaFramework* pandaFramework, WindowFramework* windowFramework)
-{
-	//steerPlugIn1
-#ifdef ELY_DEBUG
-	//enable/disable SteerPlugIn debugging by event
-	pandaFramework->define_key("n", "toggleDebugSteerPlugIn", &toggleDebugSteerPlugIn,
 			static_cast<void*>(object));
 #endif
 }

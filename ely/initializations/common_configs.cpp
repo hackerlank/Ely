@@ -40,6 +40,8 @@ extern void Actor1Init();
 extern void Actor1End();
 extern void cameraInit();
 extern void cameraEnd();
+extern void elyGameInit();
+extern void elyGameEnd();
 extern void environmentObjectsInit();
 extern void environmentObjectsEnd();
 extern void player0Init();
@@ -54,6 +56,7 @@ void callAllInits()
 {
 	Actor1Init();
 	cameraInit();
+	elyGameInit();
 	environmentObjectsInit();
 	player0Init();
 	softObjectsInit();
@@ -63,6 +66,7 @@ void callAllEnds()
 {
 	Actor1End();
 	cameraEnd();
+	elyGameEnd();
 	environmentObjectsEnd();
 	player0End();
 	softObjectsEnd();

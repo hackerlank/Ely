@@ -159,9 +159,7 @@ struct IdType
 	}
 	operator std::string()
 	{
-		std::ostringstream oStringI;
-		oStringI << i;
-		return oStringI.str();
+		return dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(i)).str();
 	}
 };
 
