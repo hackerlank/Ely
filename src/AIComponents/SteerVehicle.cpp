@@ -304,7 +304,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 			if (mHitResult.has_hit())
 			{
 				//physic mesh is below
-				updatedPos.set_z(mHitResult.get_hit_pos().get_z() + mCorrectHeightRigidBody);
+				updatedPos.set_z(mHitResult.get_hit_pos().get_z());
 				//correct vehicle position
 				mVehicle->setPosition(LVecBase3fToOpenSteerVec3(updatedPos));
 			}
@@ -312,6 +312,8 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 		default:
 			break;
 		}
+		//correct z if there is a kinematic rigid body
+		updatedPos.set_z(updatedPos.get_z() + mCorrectHeightRigidBody);
 		//update node path pos
 		ownerObjectNP.set_pos(updatedPos);
 		//update node path dir

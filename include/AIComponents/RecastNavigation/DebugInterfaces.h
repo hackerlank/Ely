@@ -182,6 +182,7 @@ public:
 	virtual ~DebugDrawMeshDrawer();
 
 	void reset();
+	void clear();
 
 	virtual void depthMask(bool state);
 	virtual void texture(bool state);

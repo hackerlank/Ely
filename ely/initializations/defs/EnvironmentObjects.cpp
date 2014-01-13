@@ -24,6 +24,8 @@
 #include "../common_configs.h"
 #include "AIComponents/NavMesh.h"
 #include "AIComponents/SteerPlugIn.h"
+#include "ObjectModel/ObjectTemplateManager.h"
+#include "Game/GamePhysicsManager.h"
 
 ///Environment objects related
 #ifdef __cplusplus
@@ -32,6 +34,7 @@ extern "C"
 #endif
 
 INITIALIZATION Terrain1_initialization;
+INITIALIZATION course2_initialization;
 
 #ifdef __cplusplus
 }
@@ -66,6 +69,40 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	pandaFramework->define_key("t", "toggleWireframeMode", &toggleWireframeMode,
 			static_cast<void*>(object));
 #endif
+}
+
+///course2
+#define TOBECLONEDOBJECT "crowdAgentToBeCloned"
+
+void course2_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//find the crowd agent TOBECLONEDOBJECT
+	SMARTPTR(Object) crowdAgentObject = ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject(ObjectId(TOBECLONEDOBJECT));
+	if(crowdAgentObject)
+	{
+		//get the TOBECLONEDOBJECT dimensions
+		LVecBase3f modelDims;
+		LVector3f modelDeltaCenter;
+		float modelRadius;
+		GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+				crowdAgentObject->getNodePath(), modelDims, modelDeltaCenter,
+				modelRadius);
+		//get NavMesh component
+		SMARTPTR(NavMesh) navMeshComp = DCAST(NavMesh,
+				object->getComponent(ComponentFamilyType("AI")));
+		//set crowd agent dimensions
+		NavMeshSettings navMeshSettings = navMeshComp->getNavMeshSettings();
+		navMeshSettings.m_agentRadius = modelRadius;
+		navMeshSettings.m_agentHeight = modelDims.get_z();
+		navMeshComp->setNavMeshSettings(navMeshSettings);
+		//now setup the underlying NavMeshType
+		if (navMeshComp->navMeshSetup() != NavMesh::Result::OK)
+		{
+			PRINT_ERR_DEBUG("Error: navMeshSetup()");
+		}
+	}
 }
 
 ///init/end

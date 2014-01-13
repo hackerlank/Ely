@@ -376,6 +376,20 @@ void DebugDrawMeshDrawer::reset()
 	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
 }
 
+void DebugDrawMeshDrawer::clear()
+{
+	//reset to initial values
+	m_meshDrawerIdx = 0;
+	m_meshDrawersSize = 0;
+	m_prim = static_cast<duDebugDrawPrimitives>(DU_NULL_PRIM);
+	//clear internal storage
+	for (unsigned int i; i < m_generators.size(); ++i)
+	{
+		delete m_generators[i];
+	}
+	m_generators.clear();
+}
+
 void DebugDrawMeshDrawer::begin(duDebugDrawPrimitives prim, float size)
 {
 	//dynamically allocate MeshDrawers if necessary

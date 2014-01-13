@@ -1624,6 +1624,7 @@ NavMesh::Result NavMesh::debug(bool enable)
 		{
 			mDebugNodePath.show();
 			mEnableDrawUpdate = true;
+			mDDM->clear();
 		}
 	}
 	else
@@ -1632,6 +1633,7 @@ NavMesh::Result NavMesh::debug(bool enable)
 		{
 			mDebugNodePath.hide();
 			mEnableDrawUpdate = false;
+			mDDM->clear();
 		}
 	}
 	//

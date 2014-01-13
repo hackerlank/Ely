@@ -122,12 +122,6 @@
 		<!-- templates for AI navmesh -->
 		<ObjectTmpl type="RecastCrowdAgent">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
-			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
-		</ObjectTmpl>
-
-		<ObjectTmpl type="KinematicRecastCrowdAgent">
-			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
@@ -144,12 +138,6 @@
 
 		<!-- templates for AI OpenSteer -->
 		<ObjectTmpl type="OpenSteerVehicle">
-			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
-			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
-		</ObjectTmpl>
-
-		<ObjectTmpl type="KinematicOpenSteerVehicle">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
@@ -568,7 +556,6 @@
 -->
 	
 <!--	
-		<Object type="KinematicRecastCrowdAgent" id="crowdAgentToBeCloned" priority="70">
 		<Object type="RecastCrowdAgent" id="crowdAgentToBeCloned" priority="70">
 			<Param parent=""/>
 			<Param is_steady="false"/>
@@ -598,10 +585,7 @@
 		</Object>
 -->
 
-		<Object type="KinematicOpenSteerVehicle" id="steerVehicleToBeCloned"> 
-<!--		
-		<Object type="OpenSteerVehicle" id="steerVehicleToBeCloned" priority="70">
--->
+		<Object type="OpenSteerVehicle" id="steerVehicleToBeCloned" priority="100"> 
 			<Param parent=""/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
@@ -667,6 +651,7 @@
 				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Component type="NavMesh">
+				<Param auto_setup="false"/>
 				<Param mov_type="kinematic"/>
 				<Param area_flags_cost="0@0x01@1.0"/>
 				<Param area_flags_cost="1@0x02@10.0"/>
