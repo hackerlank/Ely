@@ -136,7 +136,10 @@
 		<ObjectTmpl type="RecastNavMesh">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
-			<ComponentTmpl family="AI" type="NavMesh" priority="80"/> 
+			<ComponentTmpl family="AI" type="NavMesh" priority="80">
+				<Param event_types="add_crowd_agent:remove_crowd_agent"/>
+				<Param event_types="toggle_debug"/>
+			</ComponentTmpl>
 		</ObjectTmpl>
 
 		<!-- templates for AI OpenSteer -->
@@ -422,26 +425,7 @@
 			<Param pos="-26.997,-21.8736,40.7907"/>
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
-
-		<Object type="RecastCrowdAgent" id="RecastAgent1" priority="70">
-			<Param parent="render"/>
-			<Param is_steady="false"/>
-			<Param store_params="false"/>
-			<Param pos="-51.23,23.5961,40.6944"/>
-			<Param rot="-90.0,0.0,0.0"/>
-			<Component type="InstanceOf">
-				<Param instance_of="Gorilla1"/>
-				<Param scale="0.6,0.6,0.6"/>
-			</Component>
-			<Component type="Sound3d">
-				<Param sound_files="walk-sound@GUI_click.wav"/>
-			</Component>
-			<Component type="CrowdAgent">
-				<Param add_to_navmesh="course2"/>
-				<Param move_target="-22.4522,-21.3515,40.7907"/>
-			</Component>
-		</Object>
-
+		
 		<Object type="Car" id="auto1" priority="90">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -582,6 +566,37 @@
 			<Param pos="-38.0,-5.9,90.8"/>
 		</Object>
 -->
+	
+<!--	
+		<Object type="KinematicRecastCrowdAgent" id="crowdAgentToBeCloned" priority="70">
+		<Object type="RecastCrowdAgent" id="crowdAgentToBeCloned" priority="70">
+			<Param parent=""/>
+			<Param is_steady="false"/>
+			<Param store_params="true"/>
+			<Param pos="-51.23,23.5961,40.6944"/>
+			<Param rot="-90.0,0.0,0.0"/>
+			<Component type="InstanceOf">
+				<Param instance_of="Gorilla1"/>
+				<Param scale="0.6,0.6,0.6"/>
+			</Component>
+			<Component type="Sound3d">
+				<Param sound_files="walk-sound@GUI_click.wav"/>
+			</Component>
+			<Component type="CrowdAgent">
+				<Param add_to_navmesh="NONE"/>
+				<Param ray_mask="0x7FFFFFFF"/>
+				<Param move_target="-22.4522,-21.3515,40.7907"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="kinematic"/>
+				<Param body_friction="0.8"/>
+				<Param body_restitution="0.1"/>
+				<Param shape_type="capsule"/>
+				<Param shape_size="maximum"/>
+				<Param collide_mask="0x80000000"/>
+			</Component>
+		</Object>
+-->
 
 		<Object type="KinematicOpenSteerVehicle" id="steerVehicleToBeCloned"> 
 <!--		
@@ -607,7 +622,7 @@
 				<Param speed="0.0"/>
 				<Param max_force="1.0"/>
 				<Param max_speed="10.0"/>
-				<Param ray_mask="0x7FFFFFFF"/>			
+				<Param ray_mask="0x7FFFFFFF"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="kinematic"/>
@@ -634,7 +649,7 @@
 								169.408,129.243,46.8361$1.0$true"/>
 				<Param obstacles="gazebo@box@outside:beachhouse2@box@outside:bridge@box@outside"/>
 				<Param events="add_steer_vehicle@h:remove_steer_vehicle@shift-h$"/>
-				<Param events="toggle_debug@n$toggleDebug"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
 		</Object>
 		
@@ -652,6 +667,7 @@
 				<Param shape_type="triangle_mesh"/>
 			</Component> 
 			<Component type="NavMesh">
+				<Param mov_type="kinematic"/>
 				<Param area_flags_cost="0@0x01@1.0"/>
 				<Param area_flags_cost="1@0x02@10.0"/>
 				<Param area_flags_cost="2@0x01@1.0"/>
@@ -665,6 +681,8 @@
 									  -32.7395,-8.40045,40.7907@3"/>
 				<Param offmesh_connection="-33.7841,-4.48785,40.7907:
 									  -52.0533,-29.1533,6.01279@false"/>
+				<Param events="add_crowd_agent@u:remove_crowd_agent@shift-u$"/>
+				<Param events="toggle_debug@m$navMeshesToggleDebug"/>
 			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>

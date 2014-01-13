@@ -32,52 +32,38 @@ extern "C"
 #endif
 
 INITIALIZATION Terrain1_initialization;
-INITIALIZATION course2_initialization;
 
 #ifdef __cplusplus
 }
 #endif
 
 ///Terrain1
-void Terrain1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
-PandaFramework* pandaFramework, WindowFramework* windowFramework)
-{
-	//Terrain1
-//	object->getNodePath().set_render_mode_wireframe(1);
-}
-
-///course2
 #ifdef ELY_DEBUG
-//debug flag
 namespace
 {
-bool debugRecastOn = false;
-
-void toggleDebugNavMesh(const Event* event, void* data)
+void toggleWireframeMode(const Event* event, void* data)
 {
-	SMARTPTR(Object)course2 = reinterpret_cast<Object*>(data);
-	SMARTPTR(Component) compAI = course2->getComponent(
-			ComponentFamilyType("AI"));
-	if (compAI->is_of_type(NavMesh::get_class_type()))
+	SMARTPTR(Object)terrain1= reinterpret_cast<Object*>(data);
+
+	if (terrain1->getNodePath().has_render_mode())
 	{
-		SMARTPTR(NavMesh)course2NavMesh = DCAST(NavMesh, course2->getComponent(
-						ComponentFamilyType("AI")));
-		//toggle debug
-		course2NavMesh->debug(not debugRecastOn);
-		//toggle flag
-		debugRecastOn = not debugRecastOn;
+		terrain1->getNodePath().clear_render_mode();
+	}
+	else
+	{
+		terrain1->getNodePath().set_render_mode_wireframe(1);
 	}
 }
 }
 #endif
 
-void course2_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+void Terrain1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
-	//course2
+	//Terrain1
 #ifdef ELY_DEBUG
-	//enable/disable navigation mesh debugging by event
-	pandaFramework->define_key("m", "toggleDebugNavMesh", &toggleDebugNavMesh,
+	//set toggle Wire frame Mode callback
+	pandaFramework->define_key("t", "toggleWireframeMode", &toggleWireframeMode,
 			static_cast<void*>(object));
 #endif
 }

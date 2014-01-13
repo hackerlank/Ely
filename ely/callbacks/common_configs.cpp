@@ -60,6 +60,8 @@ extern void activityActorInit();
 extern void activityActorEnd();
 extern void controlCameraInit();
 extern void controlCameraEnd();
+extern void navMeshesInit();
+extern void navMeshesEnd();
 extern void steerPluginsInit();
 extern void steerPluginsEnd();
 extern void vehicleCarInit();
@@ -71,6 +73,7 @@ void callAllInits()
 	activityCharacterInit();
 	activityActorInit();
 	controlCameraInit();
+	navMeshesInit();
 	steerPluginsInit();
 	vehicleCarInit();
 }
@@ -79,6 +82,7 @@ void callAllEnds()
 	activityCharacterEnd();
 	activityActorEnd();
 	controlCameraEnd();
+	navMeshesEnd();
 	steerPluginsEnd();
 	vehicleCarEnd();
 }

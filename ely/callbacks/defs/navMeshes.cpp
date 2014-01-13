@@ -15,14 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/defs/steerPlugIns.cpp
+ * \file /Ely/ely/callbacks/defs/navMeshes.cpp
  *
- * \date 11/gen/2014 (10:19:51)
+ * \date 13/gen/2014 (08:47:01)
  * \author consultit
  */
 
 #include "../common_configs.h"
-#include "AIComponents/SteerPlugIn.h"
+#include "AIComponents/NavMesh.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Support/Raycaster.h"
 
@@ -34,34 +34,32 @@ extern "C"
 {
 #endif
 
-///OpenSteerPlugIn + SteerPlugIn related
-CALLBACK add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn;
-CALLBACK remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn;
+///RecastNavMesh + NavMesh related
+CALLBACK add_crowd_agent_NavMesh_RecastNavMesh;
+CALLBACK remove_crowd_agent_NavMesh_RecastNavMesh;
 #ifdef ELY_DEBUG
-CALLBACK steerPluginsToggleDebug;
+CALLBACK navMeshesToggleDebug;
 #endif
 
 #ifdef __cplusplus
 }
 #endif
 
-#define TOBECLONEDOBJECT "steerVehicleToBeCloned"
+#define TOBECLONEDOBJECT "crowdAgentToBeCloned"
 
-///OpenSteerPlugIn + SteerPlugIn related CALLBACKs
-void add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* data)
+///RecastNavMesh + NavMesh related CALLBACKs
+void add_crowd_agent_NavMesh_RecastNavMesh(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(SteerPlugIn)steerPlugIn = reinterpret_cast<SteerPlugIn*>(data);
+	SMARTPTR(NavMesh)navMesh = reinterpret_cast<NavMesh*>(data);
 
 	//get object to be cloned
 	SMARTPTR(Object)toBeClonedObject =
 			ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId(TOBECLONEDOBJECT));
 	RETURN_ON_COND(not toBeClonedObject,)
 
-	//get SteerPlugIn ObjectId
-	std::string steerPlugInObjectId = steerPlugIn->getOwnerObject()->objectId();
-	//get underlying OpenSteer PlugIn name
-	std::string openSteerPlugInName = steerPlugIn->getAbstractPlugIn().name();
+	//get NavMesh ObjectId
+	std::string navMeshObjectId = navMesh->getOwnerObject()->objectId();
 
 	//get the object-to-be-cloned parameter table
 	ParameterTable objParams = toBeClonedObject->getStoredObjTmplParams();
@@ -91,29 +89,19 @@ void add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* dat
 	objParams.insert(std::pair<std::string, std::string>("pos", pos.str()));
 
 	//tweak clone components' parameter tables
-	//set SteerVehicle type
-	compParams["SteerVehicle"].erase("type");
-	if (openSteerPlugInName == "One Turning Away")
-	{
-		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("type", "one_turning"));
-	}
-	else if (openSteerPlugInName == "Pedestrians")
-	{
-		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("type", "pedestrian"));
-	}
-	//set SteerVehicle add_to_plugin
-	compParams["SteerVehicle"].erase("add_to_plugin");
-	compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("add_to_plugin", steerPlugInObjectId));
+	//set CrowdAgent add_to_plugin
+	compParams["CrowdAgent"].erase("add_to_navmesh");
+	compParams["CrowdAgent"].insert(std::pair<std::string, std::string>("add_to_navmesh", navMeshObjectId));
 	//create actually the clone
 	ObjectTemplateManager::GetSingletonPtr()->
 	createObject(toBeClonedObject->objectTmpl()->objectType(), ObjectId(),
 			objParams, compParams, false);
 }
 
-void remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* data)
+void remove_crowd_agent_NavMesh_RecastNavMesh(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(SteerPlugIn)steerPlugIn = reinterpret_cast<SteerPlugIn*>(data);
+	SMARTPTR(NavMesh)navMesh = reinterpret_cast<NavMesh*>(data);
 
 	//get object under mouse pointer
 	Raycaster* rayCaster = Raycaster::GetSingletonPtr();
@@ -121,15 +109,15 @@ void remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* 
 	SMARTPTR(Object) hitObject = rayCaster->rayCast(BitMask32::all_on());
 	if(hitObject)
 	{
-		//check if it is has a SteerVehicle component
+		//check if it is has a CrowdAgent component
 		SMARTPTR(Component) aiComp = hitObject->getComponent(ComponentFamilyType("AI"));
-		if(aiComp and aiComp->is_of_type(SteerVehicle::get_class_type()))
+		if(aiComp and aiComp->is_of_type(CrowdAgent::get_class_type()))
 		{
-			//try to remove this SteerVehicle from this SteerPlugIn
-			if(steerPlugIn->removeSteerVehicle(DCAST(SteerVehicle, aiComp))
-					== SteerPlugIn::Result::OK)
+			//try to remove this CrowdAgent from this NavMesh
+			if(navMesh->removeCrowdAgent(DCAST(CrowdAgent, aiComp))
+					== NavMesh::Result::OK)
 			{
-				//the SteerVehicle belonged to this SteerPlugIn:
+				//the CrowdAgent belonged to this NavMesh:
 				//remove actually the clone
 				ObjectTemplateManager::GetSingletonPtr()->destroyObject(hitObject->objectId());
 			}
@@ -138,28 +126,27 @@ void remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* 
 }
 
 #ifdef ELY_DEBUG
-void steerPluginsToggleDebug(const Event* event, void* data)
+void navMeshesToggleDebug(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(SteerPlugIn)steerPlugIn = reinterpret_cast<SteerPlugIn*>(data);
+	SMARTPTR(NavMesh)navMesh = reinterpret_cast<NavMesh*>(data);
 
-	if (steerPlugIn->getDrawer3dDebugNodePath().is_hidden() and
-			steerPlugIn->getDrawer2dDebugNodePath().is_hidden())
+	if (navMesh->getDebugNodePath().is_hidden())
 	{
-		steerPlugIn->debug(true);
+		navMesh->debug(true);
 	}
 	else
 	{
-		steerPlugIn->debug(false);
+		navMesh->debug(false);
 	}
 }
 #endif
 
 ///Init/end functions: see common_configs.cpp
-void steerPluginsInit()
+void navMeshesInit()
 {
 }
-void steerPluginsEnd()
+void navMeshesEnd()
 {
 }
 

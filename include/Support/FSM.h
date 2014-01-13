@@ -1199,7 +1199,7 @@ bool FSM<StateKey>::removeFromToFunc(const StateKey& stateFrom,
 }
 
 #ifdef ELY_THREAD
-template<typename StateKey> ReMutex& FSM<StateKey>::getMutex()
+template<typename StateKey> inline ReMutex& FSM<StateKey>::getMutex()
 {
 	return mMutex;
 }

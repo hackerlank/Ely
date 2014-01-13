@@ -7,6 +7,7 @@ callbacks_la_SOURCES = \
 		defs/activityActor.cpp \
 		defs/activityCharacter.cpp \
 		defs/controlCamera.cpp \
+		defs/navMeshes.cpp \
 		defs/steerPlugIns.cpp \
 		defs/vehicleCar.cpp
 

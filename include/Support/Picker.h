@@ -95,7 +95,7 @@ private:
 ///inline definitions
 
 #ifdef ELY_THREAD
-ReMutex& Picker::getMutex()
+inline ReMutex& Picker::getMutex()
 {
 	return mMutex;
 }
