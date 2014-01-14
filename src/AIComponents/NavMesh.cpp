@@ -95,18 +95,6 @@ bool NavMesh::initialize()
 	mAutoSetup = (
 			mTmpl->parameter(std::string("auto_setup"))
 					== std::string("false") ? false : true);
-	//mov type
-	std::string movType = mTmpl->parameter(std::string("mov_type"));
-	if (movType == std::string("kinematic"))
-	{
-		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
-				"NavMesh::initialize: invalid GamePhysicsManager")
-		mMovType = RECAST_KINEMATIC;
-	}
-	else
-	{
-		mMovType = RECAST;
-	}
 	//
 	float value;
 	int valueInt;
@@ -869,8 +857,6 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 inline void NavMesh::doSetCrowdAgentOtherSettings(
 		SMARTPTR(CrowdAgent)crowdAgent, CrowdTool* crowdTool)
 {
-	//set the mov type of the crowd agent
-	crowdAgent->mMovType = mMovType;
 	//reset events' sending
 	crowdAgent->mCrowdAgentStartSent = false;
 	crowdAgent->mCrowdAgentStopSent = true;

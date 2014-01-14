@@ -65,6 +65,7 @@ enum AgentMovTypeEnum
  * XML Param(s):
  * - "throw_events"						|single|"false"
  * - "add_to_navmesh"					|single|""
+ * - "mov_type"						|single|"recast" (values: recast|kinematic)
  * - "move_target";						|single|"0.0,0.0,0.0"
  * - "move_velocity";					|single|"0.0,0.0,0.0"
  * - "max_acceleration";				|single|"8.0"
@@ -112,6 +113,8 @@ public:
 	LPoint3f getMoveTarget();
 	void setMoveVelocity(const LVector3f& vel);
 	LVector3f getMoveVelocity();
+	void setMovType(AgentMovTypeEnum movType);
+	AgentMovTypeEnum getMovType() const;
 	///@}
 
 	/**
@@ -241,6 +244,22 @@ inline LVector3f CrowdAgent::getMoveVelocity()
 	HOLD_REMUTEX(mMutex)
 
 	return mMoveVelocity;
+}
+
+inline void CrowdAgent::setMovType(AgentMovTypeEnum movType)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mMovType = movType;
+}
+
+inline AgentMovTypeEnum CrowdAgent::getMovType() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mMovType;
 }
 
 inline ReMutex& CrowdAgent::getNavMeshMutex()

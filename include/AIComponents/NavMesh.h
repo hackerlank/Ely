@@ -55,7 +55,6 @@ class NavMeshTemplate;
  * XML Param(s):
  * - "navmesh_type"					|single|"solo" (values: solo|tile|obstacle)
  * - "auto_setup"					|single|"true"
- * - "mov_type"						|single|"recast" (values: recast|kinematic)
  * - "cell_size"					|single|"0.3"
  * - "cell_height"					|single|"0.2"
  * - "agent_height"					|single|"2.0"
@@ -137,8 +136,6 @@ public:
 	//SOLO TILE OBSTACLE
 	void setNavMeshTypeEnum(NavMeshTypeEnum typeEnum);
 	NavMeshTypeEnum getNavMeshTypeEnum() const;
-	void setMovType(AgentMovTypeEnum movType);
-	AgentMovTypeEnum getMovType() const;
 	void setNavMeshSettings(const NavMeshSettings& settings);
 	NavMeshSettings getNavMeshSettings() const;
 	std::list<SMARTPTR(CrowdAgent)> getCrowdAgents();
@@ -255,8 +252,6 @@ private:
 	std::string mMeshName;
 	///The reference node path (read only after creation).
 	NodePath mReferenceNP;
-	///The movement type.
-	AgentMovTypeEnum mMovType;
 	///NavMeshSettings from template.
 	NavMeshSettings mNavMeshSettings;
 	///NavMeshTileSettings from template.
@@ -421,7 +416,6 @@ inline void NavMesh::reset()
 	mCtx = NULL;
 	mMeshName.clear();
 	mReferenceNP = NodePath();
-	mMovType = RECAST;
 	mNavMeshSettings = NavMeshSettings();
 	mNavMeshTileSettings = NavMeshTileSettings();
 	mAreaFlagsCostXmlParam.clear();
@@ -475,28 +469,6 @@ inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum() const
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, NavMeshType_NONE)
 
 	return mNavMeshTypeEnum;
-}
-
-inline void NavMesh::setMovType(AgentMovTypeEnum movType)
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
-
-	mMovType = movType;
-}
-
-inline AgentMovTypeEnum NavMesh::getMovType() const
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if async-setup is not complete
-	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete, AgentMovType_NONE)
-
-	return mMovType;
 }
 
 inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)

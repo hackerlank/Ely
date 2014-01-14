@@ -571,6 +571,7 @@
 			</Component>
 			<Component type="CrowdAgent">
 				<Param add_to_navmesh="NONE"/>
+				<Param mov_type="kinematic"/>
 				<Param ray_mask="0x7FFFFFFF"/>
 				<Param move_target="-22.4522,-21.3515,40.7907"/>
 			</Component>
@@ -652,7 +653,6 @@
 			</Component> 
 			<Component type="NavMesh">
 				<Param auto_setup="false"/>
-				<Param mov_type="kinematic"/>
 				<Param area_flags_cost="0@0x01@1.0"/>
 				<Param area_flags_cost="1@0x02@10.0"/>
 				<Param area_flags_cost="2@0x01@1.0"/>

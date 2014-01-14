@@ -84,6 +84,18 @@ bool CrowdAgent::initialize()
 	//register to navmesh objectId
 	mNavMeshObjectId = ObjectId(
 			mTmpl->parameter(std::string("add_to_navmesh")));
+	//mov type
+	std::string movType = mTmpl->parameter(std::string("mov_type"));
+	if (movType == std::string("kinematic"))
+	{
+		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+				"NavMesh::initialize: invalid GamePhysicsManager")
+		mMovType = RECAST_KINEMATIC;
+	}
+	else
+	{
+		mMovType = RECAST;
+	}
 	//
 	std::string param;
 	unsigned int idx, valueNum;
