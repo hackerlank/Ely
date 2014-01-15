@@ -42,7 +42,6 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
-									<listOptionValue builtIn="false" value="/usr/include/OpenSteer"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2093535115" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
