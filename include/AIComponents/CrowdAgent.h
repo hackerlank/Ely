@@ -36,8 +36,8 @@ namespace ely
 class CrowdAgentTemplate;
 class NavMesh;
 
-///Agent movement type.
-enum AgentMovTypeEnum
+///CrowdAgent movement type.
+enum CrowdAgentMovType
 {
 	RECAST,
 	RECAST_KINEMATIC,
@@ -54,7 +54,7 @@ enum AgentMovTypeEnum
  * This component should be associated to a "Scene" component.\n
  * It could be associated to a kinematic rigid body, if the associated NavMesh
  * movement type is "kinematic".\n
- * If enabled, this component will throw an event on starting to move
+ * If enabled (with "throw_events"), this component will throw an event on starting to move
  * ("OnStartCrowdAgent"), and an event on stopping to move
  * ("OnStopCrowdAgent"). The second argument of both is a reference
  * to the owner object.\n
@@ -113,15 +113,23 @@ public:
 	LPoint3f getMoveTarget();
 	void setMoveVelocity(const LVector3f& vel);
 	LVector3f getMoveVelocity();
-	void setMovType(AgentMovTypeEnum movType);
-	AgentMovTypeEnum getMovType() const;
+	void setMovType(CrowdAgentMovType movType);
+	CrowdAgentMovType getMovType() const;
 	///@}
 
+	/**
+	 * \brief Enables throwing events.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableThrowEvents(bool enable);
+
+#ifdef ELY_THREAD
 	/**
 	 * \brief Get the NavMesh object reference mutex.
 	 * @return The NavMesh mutex.
 	 */
 	ReMutex& getNavMeshMutex();
+#endif
 
 private:
 
@@ -129,7 +137,7 @@ private:
 	SMARTPTR(NavMesh) mNavMesh;
 	ObjectId mNavMeshObjectId;
 	///The movement type.
-	AgentMovTypeEnum mMovType;
+	CrowdAgentMovType mMovType;
 	///The CrowdAgent index.
 	int mAgentIdx;
 	///The associated dtCrowdAgent data.
@@ -173,8 +181,10 @@ private:
 #endif
 	///@}
 
+#ifdef ELY_THREAD
 	///Protects the NavMesh object reference (mNavMesh).
 	ReMutex mNavMeshMutex;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:
@@ -246,7 +256,7 @@ inline LVector3f CrowdAgent::getMoveVelocity()
 	return mMoveVelocity;
 }
 
-inline void CrowdAgent::setMovType(AgentMovTypeEnum movType)
+inline void CrowdAgent::setMovType(CrowdAgentMovType movType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -254,7 +264,7 @@ inline void CrowdAgent::setMovType(AgentMovTypeEnum movType)
 	mMovType = movType;
 }
 
-inline AgentMovTypeEnum CrowdAgent::getMovType() const
+inline CrowdAgentMovType CrowdAgent::getMovType() const
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -262,10 +272,20 @@ inline AgentMovTypeEnum CrowdAgent::getMovType() const
 	return mMovType;
 }
 
+inline void CrowdAgent::enableThrowEvents(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mThrowEvents = enable;
+}
+
+#ifdef ELY_THREAD
 inline ReMutex& CrowdAgent::getNavMeshMutex()
 {
 	return mNavMeshMutex;
 }
+#endif
 
 }  // namespace ely
 

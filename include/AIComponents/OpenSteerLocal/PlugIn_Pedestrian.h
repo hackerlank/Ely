@@ -151,6 +151,9 @@ public:
 		this->applySteeringForce(determineCombinedSteering(elapsedTime),
 				elapsedTime);
 
+		///call the entity update
+		this->entityUpdate(currentTime, elapsedTime);
+
 		// reverse direction when we reach an endpoint
 		if (useDirectedPathFollowing)
 		{
@@ -175,9 +178,6 @@ public:
 
 		// notify proximity database that our position has changed
 		proximityToken->updateForNewPosition(this->position());
-
-		//eventually update the entity
-		this->entityUpdate(currentTime, elapsedTime);
 	}
 
 	// compute combined steering force: move forward, avoid obstacles
@@ -286,6 +286,9 @@ public:
 		const Vec3 onPathBoundary = future + boundaryOffset;
 		this->annotationLine(onPath, onPathBoundary, darkOrange);
 		this->annotationLine(onPathBoundary, future, lightOrange);
+
+		///call the entityPathFollowing
+		this->entityPathFollowing(future, onPath, target,	outside);
 	}
 
 	// called when steerToAvoidCloseNeighbors decides steering is required
@@ -306,6 +309,9 @@ public:
 //					drawGetWindowWidth(), drawGetWindowHeight());
 			draw2dTextAt3dLocation(*string, location, color, 0.0, 0.0);
 		}
+
+		///call the entityAvoidCloseNeighbor
+		this->entityAvoidCloseNeighbor(other, 0.0);
 	}
 
 	// (parameter names commented out to prevent compiler warning from "-W")
@@ -320,6 +326,9 @@ public:
 		this->annotationLine(ourFuture, threatFuture, gRed);
 		this->annotationXZCircle(this->radius(), ourFuture, green, 12);
 		this->annotationXZCircle(this->radius(), threatFuture, green, 12);
+
+		///call the entityAvoidNeighbor
+		this->entityAvoidNeighbor(threat, 0.0, ourFuture, threatFuture);
 	}
 
 	// xxx perhaps this should be a call to a general purpose annotation for
@@ -338,6 +347,9 @@ public:
 		this->annotationLine(FL, BL, white);
 		this->annotationLine(BL, BR, white);
 		this->annotationLine(BR, FR, white);
+
+		///call the entityAvoidObstacle
+		this->entityAvoidObstacle(minDistanceToCollision);
 	}
 
 	// switch to new proximity database -- just for demo purposes
@@ -374,6 +386,25 @@ public:
 
 	bool useDirectedPathFollowing;
 	bool wanderSwitch;
+};
+
+//Pedestrian externally updated.
+template<typename Entity>
+class ExternalPedestrian: public Pedestrian<Entity>
+{
+public:
+	void update(const float currentTime, const float elapsedTime)
+	{
+		//call the entity update
+		this->entityUpdate(currentTime, elapsedTime);
+
+		// annotation
+		this->annotationVelocityAcceleration(5, 0);
+		this->recordTrailVertex(currentTime, this->position());
+
+		// notify proximity database that our position has changed
+		this->proximityToken->updateForNewPosition(this->position());
+	}
 };
 
 //template<typename Entity> AVGroup Pedestrian<Entity>::neighbors;

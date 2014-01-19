@@ -83,11 +83,12 @@ public:
 	void update(const float currentTime, const float elapsedTime)
 	{
 		this->applySteeringForce(Vec3(-2, 0, -3), elapsedTime);
+
+		///call the entity update
+		this->entityUpdate(currentTime, elapsedTime);
+
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
-
-		//eventually update the entity
-		this->entityUpdate(currentTime, elapsedTime);
 	}
 
 	// draw this character/vehicle into the scene
@@ -95,6 +96,18 @@ public:
 	{
 		drawBasic2dCircularVehicle(*this, gGray50);
 		this->drawTrail();
+	}
+};
+
+//OneTurning externally updated.
+template<typename Entity>
+class ExternalOneTurning: public OneTurning<Entity>
+{
+public:
+	void update(const float currentTime, const float elapsedTime)
+	{
+		//call the entity update
+		this->entityUpdate(currentTime, elapsedTime);
 	}
 };
 

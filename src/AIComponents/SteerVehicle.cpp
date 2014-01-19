@@ -81,11 +81,17 @@ bool SteerVehicle::initialize()
 	mThrowEvents = (
 			mTmpl->parameter(std::string("throw_events"))
 					== std::string("true") ? true : false);
+	//external update
+	mExternalUpdate = (
+			mTmpl->parameter(std::string("external_update"))
+					== std::string("true") ? true : false);
 	//type
 	std::string type = mTmpl->parameter(std::string("type"));
 	if (type == std::string("pedestrian"))
 	{
-		mVehicle = new Pedestrian<SteerVehicle>;
+		not mExternalUpdate ?
+				mVehicle = new Pedestrian<SteerVehicle> :
+				mVehicle = new ExternalPedestrian<SteerVehicle>;
 	}
 	else if (type == std::string(""))
 	{
@@ -93,7 +99,9 @@ bool SteerVehicle::initialize()
 	else
 	{
 		//default: OneTurning
-		mVehicle = new OneTurning<SteerVehicle>;
+		not mExternalUpdate ?
+				mVehicle = new OneTurning<SteerVehicle> :
+				mVehicle = new ExternalOneTurning<SteerVehicle>;
 	}
 	//register to SteerPlugIn objectId
 	mSteerPlugInObjectId = ObjectId(
@@ -174,10 +182,11 @@ void SteerVehicle::onAddToObjectSetup()
 	mMaxError = modelDims.get_z();
 	mDeltaRayOrig = LVector3f(0, 0, mMaxError);
 	mDeltaRayDown = LVector3f(0, 0, -10 * mMaxError);
-	//correct height if there is a (kinematic) rigid body component
+	//correct height if there is a Physics or PhysicsControl component
 	//for raycast into update
-	if (DCAST(RigidBody,
-			mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
+	if (mOwnerObject->getComponent(ComponentFamilyType("Physics"))
+			or mOwnerObject->getComponent(
+					ComponentFamilyType("PhysicsControl")))
 	{
 		mCorrectHeightRigidBody = modelDims.get_z() / 2.0;
 	}
@@ -187,8 +196,12 @@ void SteerVehicle::onAddToObjectSetup()
 	}
 	//set entity and its related update method
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntity(this);
-	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
-			&SteerVehicle::doUpdateSteerVehicle);
+	//
+	not mExternalUpdate ?
+			dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
+			&SteerVehicle::doUpdateSteerVehicle):
+			dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
+			&SteerVehicle::doExternalUpdateSteerVehicle);
 
 	//set the bullet physics
 	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
@@ -210,7 +223,7 @@ void SteerVehicle::onAddToSceneSetup()
 	settings.m_forward =
 			LVecBase3fToOpenSteerVec3(
 					ownerNP.get_parent().get_relative_vector(
-							mOwnerObject->getNodePath(), LVector3f::forward())).normalize();
+							mOwnerObject->getNodePath(), -LVector3f::forward())).normalize();
 	settings.m_up = LVecBase3fToOpenSteerVec3(
 			ownerNP.get_parent().get_relative_vector(
 					mOwnerObject->getNodePath(), LVector3f::up())).normalize();
@@ -321,7 +334,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 				updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
 				OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 
-		//throw SteerVehicleStart event (if enabled)
+		//throw OnStartSteerVehicle event (if enabled)
 		if (mThrowEvents and (not mSteerVehicleStartSent))
 		{
 			throw_event(STARTEVENT, EventParameter(this),
@@ -333,7 +346,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 	else
 	{
 		//mVehicle.speed == 0.0
-		//throw SteerVehicleStop event (if enabled)
+		//throw OnStopSteerVehicle event (if enabled)
 		if (mThrowEvents and (not mSteerVehicleStopSent))
 		{
 			throw_event(STOPEVENT, EventParameter(this),
@@ -342,6 +355,26 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 			mSteerVehicleStartSent = false;
 		}
 	}
+}
+
+void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
+		const float elapsedTime)
+{
+	//set vehicle's position, forward,( side,) up, speed
+	mVehicle->setPosition(
+			LVecBase3fToOpenSteerVec3(
+					mOwnerObject->getNodePath().get_pos()
+							- LVector3f(0.0, 0.0, mCorrectHeightRigidBody)));
+	mVehicle->setForward(
+			LVecBase3fToOpenSteerVec3(
+					mOwnerObject->getNodePath().get_parent().get_relative_vector(
+							mOwnerObject->getNodePath(), -LVector3f::forward())).normalize());
+	mVehicle->setUp(
+			LVecBase3fToOpenSteerVec3(
+					mOwnerObject->getNodePath().get_parent().get_relative_vector(
+							mOwnerObject->getNodePath(), LVector3f::up())).normalize());
+	//
+	//no event thrown: external updating sub-system will do, if expected
 }
 
 //TypedObject semantics: hardcoded

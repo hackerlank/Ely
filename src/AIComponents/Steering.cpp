@@ -160,7 +160,7 @@ void Steering::onRemoveFromObjectCleanup()
 			doEnableMovRot(false);
 			//restore current movement
 			mCharacterController->setIsLocal(mCurrentIsLocal);
-			//throw SteeringForceOff event (if enabled)
+			//throw OnSteeringForceOff event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOffSent))
 			{
 				throw_event(FORCEOFFEVENT,
@@ -309,7 +309,7 @@ void Steering::doDisable()
 		doEnableMovRot(false);
 		//restore current movement
 		mCharacterController->setIsLocal(mCurrentIsLocal);
-		//throw SteeringForceOff event (if enabled)
+		//throw OnSteeringForceOff event (if enabled)
 		if (mThrowEvents and (not mSteeringForceOffSent))
 		{
 			throw_event(FORCEOFFEVENT, EventParameter(this),
@@ -399,7 +399,7 @@ void Steering::doUpdateController(float dt)
 				}
 			}
 			mCharacterController->setAngularSpeed(deltaAngle / (mMass * dt));
-			//throw SteeringForceOn event (if enabled)
+			//throw OnSteeringForceOn event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOnSent))
 			{
 				throw_event(FORCEONEVENT,
@@ -415,7 +415,7 @@ void Steering::doUpdateController(float dt)
 			{
 				doEnableMovRot(false);
 			}
-			//throw SteeringForceOff event (if enabled)
+			//throw OnSteeringForceOff event (if enabled)
 			if (mThrowEvents and (not mSteeringForceOffSent))
 			{
 				throw_event(FORCEOFFEVENT,

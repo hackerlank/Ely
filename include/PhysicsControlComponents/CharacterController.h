@@ -40,7 +40,12 @@ class CharacterControllerTemplate;
  * It constructs a character controller with the single specified collision
  * shape_type along with relevant parameters.\n
  * The up axis is the Z axis.\n
- * This component can throw (if enabled) "OnGroundCharacterController" and
+ * If enabled (with "throw_events"), this component will throw an event when
+ * on ground ("OnGroundCharacterController"), and an event when on air
+ * ("OnAirCharacterController"). The second argument of both is a reference
+ * to the owner object.\n
+ *
+ * This component can throw (if enabled) "" and
  * "OnAirCharacterController" events.
  *
  * XML Param(s):
@@ -162,6 +167,12 @@ public:
 	BulletCharacterControllerNode& getBulletCharacterControllerNode();
 	operator BulletCharacterControllerNode&();
 	///@}
+
+	/**
+	 * \brief Enables throwing events.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableThrowEvents(bool enable);
 
 private:
 	///The NodePath associated to this character controller.
@@ -512,6 +523,14 @@ inline BulletCharacterControllerNode& CharacterController::getBulletCharacterCon
 inline CharacterController::operator BulletCharacterControllerNode&()
 {
 	return *mCharacterController;
+}
+
+inline void CharacterController::enableThrowEvents(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mThrowEvents = enable;
 }
 
 }  // namespace ely

@@ -35,12 +35,21 @@ namespace ely
 class SteerVehicleTemplate;
 class SteerPlugIn;
 
-///Vehicle movement type.
-enum VehicleMovTypeEnum
+///SteerVehicle movement type.
+enum SteerVehicleMovType
 {
 	OPENSTEER,
 	OPENSTEER_KINEMATIC,
 	VehicleMovType_NONE
+};
+
+///Steer event.
+enum SteerEvent
+{
+	PATHFOLOWINGEVENT,
+	AVOIDOBSTACLEEVENT,
+	AVOIDCLOSENEIGHBOREVENT,
+	AVOIDNEIGHBOREVENT
 };
 
 /**
@@ -49,16 +58,28 @@ enum VehicleMovTypeEnum
  * \see http://opensteer.sourceforge.net
  *
  * This component should be associated to a "Scene" component.\n
- * If enabled, this component will throw an event on starting to move
- * ("OnStartSteerVehicle"), and  an event on stopping to move
+ * If enabled (with "throw_events"), this component will throw an event on starting to move
+ * ("OnStartSteerVehicle"), and an event on stopping to move
  * ("OnStopSteerVehicle"). The second argument of both is a reference
  * to the owner object.\n
+ * If specified in "steer_events" (regardless of "throw_events"),
+ * this component will throw events when steering is required to:
+ * - follow path ("OnPathFollowing")
+ * - avoid obstacle ("OnAvoidObstacle")
+ * - avoid close neighbors (i.e. when there is a collision) ("OnAvoidCloseNeighbor")
+ * - avoid neighbors (i.e. when there is a potential collision) ("OnAvoidNeighbor")
+ * The second argument of them is a reference to the owner object.\n
+ * \see annotate* SteerLibraryMixin member functions in SteerLibrary.h for more information.
+ *
  * \note debug drawing works correctly only if the owner object's
  * parent is "render".\n
  *
  * XML Param(s):
  * - "throw_events"				|single|"false"
+ * - "throw_steer_events"		|single|"false"
+ * - "steer_events"				|single|no default (specified as "event1[:event2[:event3[:event4]]]" with eventX = path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
  * - "type"						|single|"one_turning" (values: one_turning|pedestrian)
+ * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
  * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
  * - "mass"						|single|"1.0"
@@ -108,10 +129,31 @@ public:
 	///@}
 
 	/**
+	 * \brief Enables throwing events.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableThrowEvents(bool enable);
+
+	/**
+	 * \brief Enables throwing steer events.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableThrowSteerEvents(bool enable);
+
+	/**
+	 * \brief Enables/disables the steer event to be thrown.
+	 * @param event The steer event.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableSteerEvent(SteerEvent event, bool enable);
+
+#ifdef ELY_THREAD
+	/**
 	 * \brief Get the SteerPlugIn object reference mutex.
 	 * @return The SteerPlugIn mutex.
 	 */
 	ReMutex& getSteerPlugInMutex();
+#endif
 
 private:
 	///Current underlying Vehicle.
@@ -122,7 +164,7 @@ private:
 	///Input radius.
 	float mInputRadius;
 	///The movement type.
-	VehicleMovTypeEnum mMovType;
+	SteerVehicleMovType mMovType;
 	/**
 	 * \brief Physics data.
 	 */
@@ -136,13 +178,27 @@ private:
 	///@}
 
 	///Called by the underlying OpenSteer component update.
+	///@{
 	void doUpdateSteerVehicle(const float currentTime, const float elapsedTime);
+	//Called when component is updated outside of OpenSteer.
+	void doExternalUpdateSteerVehicle(const float currentTime, const float elapsedTime);
+	bool mExternalUpdate;
+	///@}
 
 	///Throwing events.
 	bool mThrowEvents, mSteerVehicleStartSent, mSteerVehicleStopSent;
 
+	///Throwing steer events.
+	bool mThrowSteerEvents;
+	bool mPathFollowing, mPathFollowingSent;
+	bool mAvoidObstacle, mAvoidObstacleSent;
+	bool mAvoidCloseNeighbor, mAvoidCloseNeighborSent;
+	bool mAvoidNeighbor, mAvoidNeighbor;
+
+#ifdef ELY_THREAD
 	///Protects the SteerPlugIn object reference (mNavMesh).
 	ReMutex mSteerPlugInMutex;
+#endif
 
 	///TypedObject semantics: hardcoded
 public:
@@ -185,7 +241,13 @@ inline void SteerVehicle::reset()
 	mHitResult = BulletClosestHitRayResult::empty();
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
+	mExternalUpdate = false;
 	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
+	mThrowSteerEvents = false;
+	mPathFollowing = mPathFollowingSent = false;
+	mAvoidObstacle = mAvoidObstacleSent = false;
+	mAvoidCloseNeighbor = mAvoidCloseNeighborSent = false;
+	mAvoidNeighbor = mAvoidNeighbor = false;
 }
 
 inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
@@ -198,10 +260,52 @@ inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 	return *mVehicle;
 }
 
+inline void SteerVehicle::enableThrowEvents(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mThrowEvents = enable;
+}
+
+inline void SteerVehicle::enableThrowSteerEvents(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mThrowSteerEvents = enable;
+}
+
+inline void SteerVehicle::enableSteerEvent(SteerEvent event, bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	switch (event)
+	{
+	case PATHFOLOWINGEVENT:
+		enable ? mPathFollowing = true : mPathFollowing = false;
+		break;
+	case AVOIDOBSTACLEEVENT:
+		enable ? mAvoidObstacle = true : mAvoidObstacle = false;
+		break;
+	case AVOIDCLOSENEIGHBOREVENT:
+		enable ? mAvoidCloseNeighbor = true : mAvoidCloseNeighbor = false;
+		break;
+	case AVOIDNEIGHBOREVENT:
+		enable ? mAvoidNeighbor = true : mAvoidNeighbor = false;
+		break;
+	default:
+		break;
+	}
+}
+
+#ifdef ELY_THREAD
 inline ReMutex& SteerVehicle::getSteerPlugInMutex()
 {
 	return mSteerPlugInMutex;
 }
+#endif
 
 } /* namespace ely */
 

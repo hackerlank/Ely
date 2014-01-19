@@ -45,8 +45,10 @@ class VehicleTemplate;
  * Wheel object should have, at least, a Scene (Model or InstanceOf)
  * component.\n
  * The default up axis is the Z axis.\n
- * This component can throw (if enabled) "OnStartVehicle" and
- * "OnStopVehicle" events.
+ * If enabled (with "throw_events"), this component will throw an event on starting to move
+ * ("OnStartVehicle"), and an event on stopping to move
+ * ("OnStopVehicle"). The second argument of both is a reference
+ * to the owner object.\n
  *
  * XML Param(s):
  * - "throw_events"					|single|"false"
@@ -156,6 +158,12 @@ public:
 	 * \name Gets the inner wheels' Objects added to this vehicle.
 	 */
 	std::vector<SMARTPTR(Object)> getWheelObjects() const;
+
+	/**
+	 * \brief Enables throwing events.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableThrowEvents(bool enable);
 
 private:
 	///The underlying BulletVehicle (read-only after creation & before destruction).
@@ -448,6 +456,14 @@ inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 	HOLD_REMUTEX(mMutex)
 
 	return mWheelObjects;
+}
+
+inline void Vehicle::enableThrowEvents(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mThrowEvents = enable;
 }
 
 } /* namespace ely */

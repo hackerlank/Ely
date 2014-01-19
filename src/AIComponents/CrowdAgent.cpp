@@ -353,7 +353,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		//update node path dir
 		ownerObjectNP.heads_up(updatedPos - vel);
 
-		//throw CrowdAgentStart event (if enabled)
+		//throw OnStartCrowdAgent event (if enabled)
 		if (mThrowEvents and (not mCrowdAgentStartSent))
 		{
 			throw_event(STARTEVENT, EventParameter(this),
@@ -364,7 +364,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 	}
 	else
 	{
-		//throw CrowdAgentStop event (if enabled)
+		//throw OnStopCrowdAgent event (if enabled)
 		if (mThrowEvents and (not mCrowdAgentStopSent))
 		{
 			throw_event(STOPEVENT,

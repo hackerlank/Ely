@@ -708,7 +708,7 @@ void Vehicle::update(void* data)
 		//handle Vehicle start-stop events
 		if (mVehicle->get_current_speed_km_hour() == 0.0)
 		{
-			//throw mOnStart event (if enabled)
+			//throw OnStartVehicle event (if enabled)
 			if (not mOnStartSent)
 			{
 				throw_event(STARTEVENT, EventParameter(this),
@@ -719,7 +719,7 @@ void Vehicle::update(void* data)
 		}
 		else
 		{
-			//throw OnStop event (if enabled)
+			//throw OnStopVehicle event (if enabled)
 			if (not mOnStopSent)
 			{
 				throw_event(STOPEVENT, EventParameter(this),

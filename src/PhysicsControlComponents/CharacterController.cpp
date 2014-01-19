@@ -402,10 +402,10 @@ void CharacterController::update(void* data)
 	//handle CharacterController ground-air events
 	if (mCharacterController->is_on_ground())
 	{
-		//throw OnGround event (if enabled)
+		//throw OnGroundCharacterController event (if enabled)
 		if (mThrowEvents and (not mOnGroundSent))
 		{
-			throw_event(std::string("OnGround"), EventParameter(this),
+			throw_event(ONGROUNDEVENT, EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mOnGroundSent = true;
 			mOnAirSent = false;
@@ -418,10 +418,10 @@ void CharacterController::update(void* data)
 	}
 	else
 	{
-		//throw OnAir event (if enabled)
+		//throw OnAirCharacterController event (if enabled)
 		if (mThrowEvents and (not mOnAirSent))
 		{
-			throw_event(std::string("OnAir"), EventParameter(this),
+			throw_event(ONAIREVENT, EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
 			mOnAirSent = true;
 			mOnGroundSent = false;

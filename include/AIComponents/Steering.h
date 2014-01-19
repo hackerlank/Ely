@@ -42,13 +42,10 @@ class AICharacterRef;
  * enabled the whole component.\n
  * Steering behaviors' initializations can be done as usual into the
  * libraries' routines.\n
- * This component can throw 2 events (if enabled): "SteeringForceOn" and
- * "SteeringForceOff" on transitions when it begins its steering behavior
- * end when it ends it. These events have these parameters (in order):
- * - a pointer to this component,
- * - the owner object name of this component.\n
- * This component can throw (if enabled) "OnSteeringForceOn" and "OnSteeringForceOff"
- * events.
+ * If enabled (with "throw_events"), this component will throw an event on starting to move
+ * ("OnSteeringForceOn"), and  an event on stopping to move
+ * ("OnSteeringForceOff"). The second argument of both is a reference
+ * to the owner object.\n
  *
  * \note This component should be used only with an object reparented to
  * the root scene node path (i.e. render).
@@ -118,6 +115,12 @@ public:
 	Result disable();
 	bool isEnabled();
 	///@}
+
+	/**
+	 * \brief Enables throwing events.
+	 * @param enable True to enable, false to disable.
+	 */
+	void enableThrowEvents(bool enable);
 
 	/**
 	 * \brief Returns a reference to the underlined AICharacter.
@@ -292,6 +295,14 @@ inline SMARTPTR(AICharacterRef) Steering::getAiCharacter() const
 	RETURN_ON_ASYNC_COND(mDestroying,NULL)
 
 	return mAICharacter;
+}
+
+inline void Steering::enableThrowEvents(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mThrowEvents = enable;
 }
 
 }  // namespace ely

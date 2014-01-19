@@ -24,10 +24,8 @@
 #include "../common_configs.h"
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/Chaser.h"
+#include "ObjectModel/ObjectTemplateManager.h"
 #include "Support/Picker.h"
-
-///shared between camera, picker, actor1
-bool controlGrabbed = false;
 
 ///camera related
 #ifdef __cplusplus
@@ -40,6 +38,9 @@ INITIALIZATION camera_initialization;
 #ifdef __cplusplus
 }
 #endif
+
+///shared between camera, picker, actor1
+bool controlGrabbed = false;
 
 namespace
 {
@@ -59,7 +60,7 @@ void toggleCameraControl(const Event* event, void* data)
 		{
 			//enabled: then disable it
 			//disable
-			cameraControl->disable();
+			RETURN_ON_COND(cameraControl->disable() != Driver::Result::OK,)
 
 			///<DEFAULT CAMERA CONTROL>
 //			//reset trackball transform
@@ -85,7 +86,7 @@ void toggleCameraControl(const Event* event, void* data)
 			///</DEFAULT CAMERA CONTROL>
 
 			//enable
-			cameraControl->enable();
+			RETURN_ON_COND(cameraControl->enable() != Driver::Result::OK,)
 			//
 			controlGrabbed = true;
 		}
@@ -100,7 +101,7 @@ void toggleCameraControl(const Event* event, void* data)
 		{
 			//if enabled then disable it
 			//disable
-			cameraControl->disable();
+			RETURN_ON_COND(cameraControl->disable() != Chaser::Result::OK,)
 
 			///<DEFAULT CAMERA CONTROL>
 //			//reset trackball transform
@@ -126,7 +127,7 @@ void toggleCameraControl(const Event* event, void* data)
 			///</DEFAULT CAMERA CONTROL>
 
 			//enable
-			cameraControl->enable();
+			RETURN_ON_COND(cameraControl->enable() != Chaser::Result::OK,)
 			//
 			controlGrabbed = true;
 		}
@@ -171,8 +172,18 @@ void toggleChasedObject(const Event* event, void* data)
 	if(controlComp->is_of_type(Chaser::get_class_type()))
 	{
 		SMARTPTR(Chaser) chaserComp = DCAST(Chaser, controlComp);
-		++idx;
-		idx = idx % chasedListSize;
+
+		unsigned int count = 0;
+		do
+		{
+			++count;
+			++idx;
+			idx = idx % chasedListSize;
+		}while ((not ObjectTemplateManager::GetSingletonPtr()->getCreatedObject((*chasedDataPtr)[idx].id))
+				or (count > chasedListSize));
+		//return if empty list
+		RETURN_ON_COND(count > chasedListSize,)
+
 		PRINT_DEBUG("Chased object: " << (*chasedDataPtr)[idx].id);
 		HOLD_REMUTEX(chaserComp->getMutex())
 

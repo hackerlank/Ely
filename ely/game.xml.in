@@ -18,7 +18,6 @@
 		<!-- template for camera object(s) -->
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60">
 				<Param event_types="head_left:stop-head_left"/>
 				<Param event_types="head_right:stop-head_right"/>
@@ -26,7 +25,7 @@
 				<Param event_types="pitch_down:stop-pitch_down"/>
 				<Param event_types="hold_lookat:stop-hold_lookat"/>
 			</ComponentTmpl>
--->
+<!--
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -38,6 +37,7 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
+-->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -91,6 +91,7 @@
 				<Param event_types="q:q-up"/>				
 				<Param event_types="ground:air"/>				
 			</ComponentTmpl>
+			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
 			<ComponentTmpl family="PhysicsControl" type="CharacterController" priority="90"/> 
@@ -193,14 +194,14 @@
 		<!-- CAMERA OBJECTS -->
 		<!-- -------------- -->
 	
-		<Object type="Camera" id="camera" priority="90">
+		<Object type="Camera" id="camera" priority="200">
 			<Component type="NodePathWrapper">
 				<Param nodepath="camera"/>
 			</Component>
 			<Component type="Chaser">
 				<Param enabled="false"/>
 				<Param backward="false"/>
-				<Param chased_object="auto1"/>
+				<Param chased_object="NONE"/>
 				<Param fixed_relative_position="false"/>
 				<Param reference_object="render"/>
 				<Param abs_max_distance="25.0"/>
@@ -380,7 +381,7 @@
 			<Param rot="0.0,0.0,90.0"/>
 		</Object>
 
-		<Object type="Character" id="player0" priority="100">
+		<Object type="Character" id="player0" priority="90">
 			<Component type="Activity">
 				<Param instance_update="playerUpdate"/>		
 				<Param events="f@i:f-up@i-up:f-q@alt-i$activityPlayer0"/>
@@ -397,6 +398,11 @@
 				<Param model_file="eve.bam"/>
 				<Param anim_files="jump@eve-jump.bam:run@eve-run.bam:walk@eve-walk.bam:offbalance@eve-offbalance.bam"/>
 				<Param scale="1.0,1.0,1.0"/>
+			</Component>
+			<Component type="SteerVehicle">
+				<Param type="pedestrian"/>
+				<Param add_to_plugin="steerPlugInPedestrian1"/>
+				<Param external_update="true"/>
 			</Component>
 			<Component type="CharacterController">
 				<Param throw_events="true"/>
@@ -553,9 +559,7 @@
 			<Param parent="render"/>
 			<Param pos="-38.0,-5.9,90.8"/>
 		</Object>
--->
 	
-<!--	
 		<Object type="RecastCrowdAgent" id="crowdAgentToBeCloned" priority="70">
 			<Param parent=""/>
 			<Param is_steady="false"/>
@@ -586,7 +590,7 @@
 		</Object>
 -->
 
-		<Object type="OpenSteerVehicle" id="steerVehicleToBeCloned" priority="100"> 
+		<Object type="OpenSteerVehicle" id="steerVehicleToBeCloned" priority="110"> 
 			<Param parent=""/>
 			<Param is_steady="false"/>
 			<Param store_params="true"/>
@@ -623,7 +627,7 @@
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 
-		<Object type="OpenSteerPlugIn" id="steerPlugInPedestrian1" priority="80">
+		<Object type="OpenSteerPlugIn" id="steerPlugInPedestrian1" priority="100">
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">

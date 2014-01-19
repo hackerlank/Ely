@@ -89,8 +89,23 @@ class VehicleAddOnMixin: public Super
 {
 public:
 
+	VehicleAddOnMixin() :
+			m_entity(NULL), m_entityUpdateMethod(NULL), m_entityPathFollowingMethod(
+			NULL), m_entityAvoidObstacleMethod(NULL), m_entityAvoidCloseNeighborMethod(
+			NULL), m_entityAvoidNeighborMethod(NULL)
+	{
+	}
+
 	typedef Entity* ENTITY;
 	typedef void (Entity::*ENTITYUPDATEMETHOD)(const float, const float);
+	typedef void (Entity::*ENTITYPATHFOLLOWINGMETHOD)(const OpenSteer::Vec3&,
+			const OpenSteer::Vec3&, const OpenSteer::Vec3&, const float);
+	typedef void (Entity::*ENTITYAVOIDOBSTACLEMETHOD)(const float);
+	typedef void (Entity::*ENTITYAVOIDCLOSENEIGHBORMETHOD)(
+			const OpenSteer::AbstractVehicle&, const float);
+	typedef void (Entity::*ENTITYAVOIDNEIGHBORMETHOD)(
+			const OpenSteer::AbstractVehicle&, const float,
+			const OpenSteer::Vec3&, const OpenSteer::Vec3&);
 
 	void setEntity(ENTITY entity)
 	{
@@ -105,6 +120,57 @@ public:
 	void entityUpdate(const float currentTime, const float elapsedTime)
 	{
 		(m_entity->*m_entityUpdateMethod)(currentTime, elapsedTime);
+	}
+
+	void setEntityMethods(ENTITYPATHFOLLOWINGMETHOD entityPathFollowingMethod,
+			ENTITYAVOIDOBSTACLEMETHOD entityAvoidObstacleMethod,
+			ENTITYAVOIDCLOSENEIGHBORMETHOD entityAvoidCloseNeighborMethod,
+			ENTITYAVOIDNEIGHBORMETHOD entityAvoidNeighborMethod)
+	{
+		m_entityPathFollowingMethod = entityPathFollowingMethod;
+		m_entityAvoidObstacleMethod = entityAvoidObstacleMethod;
+		m_entityAvoidCloseNeighborMethod = entityAvoidCloseNeighborMethod;
+		m_entityAvoidNeighborMethod = entityAvoidNeighborMethod;
+	}
+
+	void entityPathFollowing(const OpenSteer::Vec3& future,
+			const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
+			const float outside)
+	{
+		if (m_entityPathFollowingMethod)
+		{
+			(m_entity->*m_entityPathFollowingMethod)(future, onPath, target,
+					outside);
+		}
+	}
+
+	void entityAvoidObstacle(const float minDistanceToCollision)
+	{
+		if (m_entityAvoidObstacleMethod)
+		{
+			(m_entity->*m_entityAvoidObstacleMethod)(minDistanceToCollision);
+		}
+	}
+
+	void entityAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
+			const float additionalDistance)
+	{
+		if (m_entityAvoidCloseNeighborMethod)
+		{
+			(m_entity->*m_entityAvoidCloseNeighborMethod)(other,
+					additionalDistance);
+		}
+	}
+
+	void entityAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
+			const float steer, const OpenSteer::Vec3& ourFuture,
+			const OpenSteer::Vec3& threatFuture)
+	{
+		if (m_entityAvoidNeighborMethod)
+		{
+			(m_entity->*m_entityAvoidNeighborMethod)(threat, steer, ourFuture,
+					threatFuture);
+		}
 	}
 
 	VehicleSettings& getSettings()
@@ -141,8 +207,14 @@ public:
 protected:
 	///The entity updated by the vehicle.
 	ENTITY m_entity;
-	///The entity update method.
+	///The entity methods.
+	///@{
 	ENTITYUPDATEMETHOD m_entityUpdateMethod;
+	ENTITYPATHFOLLOWINGMETHOD m_entityPathFollowingMethod;
+	ENTITYAVOIDOBSTACLEMETHOD m_entityAvoidObstacleMethod;
+	ENTITYAVOIDCLOSENEIGHBORMETHOD m_entityAvoidCloseNeighborMethod;
+	ENTITYAVOIDNEIGHBORMETHOD m_entityAvoidNeighborMethod;
+	///@}
 	///The vehicle settings.
 	VehicleSettings m_settings;
 	///The vehicle start position.
