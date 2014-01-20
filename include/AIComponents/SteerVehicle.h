@@ -28,6 +28,7 @@
 #include "OpenSteerLocal/common.h"
 #include <bulletWorld.h>
 #include <bulletClosestHitRayResult.h>
+#include <throw_event.h>
 
 namespace ely
 {
@@ -43,10 +44,26 @@ enum SteerVehicleMovType
 	VehicleMovType_NONE
 };
 
-///Steer event.
-enum SteerEvent
+///Throw event data.
+struct ThrowEventData
 {
-	PATHFOLOWINGEVENT,
+	ThrowEventData() :
+			mEnable(false), mEventName(std::string("")), mFrameCount(0), mDeltaFrame(
+					1)
+	{
+	}
+	bool mEnable;
+	std::string mEventName;
+	int mFrameCount;
+	int mDeltaFrame;
+};
+
+///SteerVehicle event.
+enum SteerVehicleEvent
+{
+	STARTEVENT,
+	STOPEVENT,
+	PATHFOLLOWINGEVENT,
 	AVOIDOBSTACLEEVENT,
 	AVOIDCLOSENEIGHBOREVENT,
 	AVOIDNEIGHBOREVENT
@@ -58,26 +75,28 @@ enum SteerEvent
  * \see http://opensteer.sourceforge.net
  *
  * This component should be associated to a "Scene" component.\n
- * If enabled (with "throw_events"), this component will throw an event on starting to move
- * ("OnStartSteerVehicle"), and an event on stopping to move
- * ("OnStopSteerVehicle"). The second argument of both is a reference
- * to the owner object.\n
- * If specified in "steer_events" (regardless of "throw_events"),
- * this component will throw events when steering is required to:
- * - follow path ("OnPathFollowing")
- * - avoid obstacle ("OnAvoidObstacle")
- * - avoid close neighbors (i.e. when there is a collision) ("OnAvoidCloseNeighbor")
- * - avoid neighbors (i.e. when there is a potential collision) ("OnAvoidNeighbor")
- * The second argument of them is a reference to the owner object.\n
- * \see annotate* SteerLibraryMixin member functions in SteerLibrary.h for more information.
+ * If specified in "thrown_events", this component can throw
+ * these events (with default names):
+ * - on starting to move (<ObjectId>_SteerVehicle_Start)
+ * - on stopping to move (<ObjectId>_SteerVehicle_Stop)
+ * - when steering is required to follow a path
+ * (<ObjectId>_SteerVehicle_FollowPath)
+ * - when steering is required to avoid an obstacle
+ * (<ObjectId>_SteerVehicle_AvoidObstacle)
+ * - when steering is required to avoid a close neighbor (i.e. when
+ * there is a collision) (<ObjectId>_SteerVehicle_AvoidCloseNeighbor)
+ * - when steering is required to avoid a neighbor (i.e. when there
+ * is a potential collision) (<ObjectId>_SteerVehicle_AvoidNeighbor)
+ * The first argument of them is a reference to this component,
+ * the second one is a reference to the owner object.\n
+ * \see annotate* SteerLibraryMixin member functions in SteerLibrary.h
+ * for more information.
  *
  * \note debug drawing works correctly only if the owner object's
  * parent is "render".\n
  *
  * XML Param(s):
- * - "throw_events"				|single|"false"
- * - "throw_steer_events"		|single|"false"
- * - "steer_events"				|single|no default (specified as "event1[:event2[:event3[:event4]]]" with eventX = path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
+ * - "thrown_events"			|single|no default (specified as "event1[@event_name1[@delta_frame1]][:...[:eventN[@event_nameN[@delta_frameN]]]]" with eventX = path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
  * - "type"						|single|"one_turning" (values: one_turning|pedestrian)
  * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
@@ -135,17 +154,11 @@ public:
 	void enableThrowEvents(bool enable);
 
 	/**
-	 * \brief Enables throwing steer events.
-	 * @param enable True to enable, false to disable.
-	 */
-	void enableThrowSteerEvents(bool enable);
-
-	/**
 	 * \brief Enables/disables the steer event to be thrown.
-	 * @param event The steer event.
+	 * @param eventData The steer event data.
 	 * @param enable True to enable, false to disable.
 	 */
-	void enableSteerEvent(SteerEvent event, bool enable);
+	void enableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData);
 
 #ifdef ELY_THREAD
 	/**
@@ -185,15 +198,24 @@ private:
 	bool mExternalUpdate;
 	///@}
 
-	///Throwing events.
-	bool mThrowEvents, mSteerVehicleStartSent, mSteerVehicleStopSent;
-
-	///Throwing steer events.
-	bool mThrowSteerEvents;
-	bool mPathFollowing, mPathFollowingSent;
-	bool mAvoidObstacle, mAvoidObstacleSent;
-	bool mAvoidCloseNeighbor, mAvoidCloseNeighborSent;
-	bool mAvoidNeighbor, mAvoidNeighbor;
+	/**
+	 * \name Throwing SteerVehicle events.
+	 */
+	///@{
+	ThrowEventData mStart, mStop, mPathFollowing, mAvoidObstacle,
+	mAvoidCloseNeighbor, mAvoidNeighbor;
+	void doEntityPathFollowing(const OpenSteer::Vec3& future,
+	const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
+	const float outside);
+	void doEntityAvoidObstacle(const float minDistanceToCollision);
+	void doEntityAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
+	const float additionalDistance);
+	void doEntityAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
+	const float steer, const OpenSteer::Vec3& ourFuture,
+	const OpenSteer::Vec3& threatFuture);
+	///Helper.
+	void doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData);
+	///@}
 
 #ifdef ELY_THREAD
 	///Protects the SteerPlugIn object reference (mNavMesh).
@@ -243,11 +265,8 @@ inline void SteerVehicle::reset()
 	mCorrectHeightRigidBody = 0.0;
 	mExternalUpdate = false;
 	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
-	mThrowSteerEvents = false;
-	mPathFollowing = mPathFollowingSent = false;
-	mAvoidObstacle = mAvoidObstacleSent = false;
-	mAvoidCloseNeighbor = mAvoidCloseNeighborSent = false;
-	mAvoidNeighbor = mAvoidNeighbor = false;
+	mPathFollowing = mAvoidObstacle = mAvoidCloseNeighbor = mAvoidNeighbor =
+			ThrowEventData();
 }
 
 inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
@@ -268,35 +287,68 @@ inline void SteerVehicle::enableThrowEvents(bool enable)
 	mThrowEvents = enable;
 }
 
-inline void SteerVehicle::enableThrowSteerEvents(bool enable)
+inline void SteerVehicle::enableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mThrowSteerEvents = enable;
+	doEnableSteerVehicleEvent(event, eventData);
 }
 
-inline void SteerVehicle::enableSteerEvent(SteerEvent event, bool enable)
+inline void SteerVehicle::doEntityPathFollowing(const OpenSteer::Vec3& future,
+		const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
+		const float outside)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	switch (event)
+	int frameCount = ClockObject::get_global_clock()->get_frame_count();
+	if (frameCount > mPathFollowing.mFrameCount + mPathFollowing.mDeltaFrame)
 	{
-	case PATHFOLOWINGEVENT:
-		enable ? mPathFollowing = true : mPathFollowing = false;
-		break;
-	case AVOIDOBSTACLEEVENT:
-		enable ? mAvoidObstacle = true : mAvoidObstacle = false;
-		break;
-	case AVOIDCLOSENEIGHBOREVENT:
-		enable ? mAvoidCloseNeighbor = true : mAvoidCloseNeighbor = false;
-		break;
-	case AVOIDNEIGHBOREVENT:
-		enable ? mAvoidNeighbor = true : mAvoidNeighbor = false;
-		break;
-	default:
-		break;
+		//enough frames are passed: throw the event
+		throw_event(mPathFollowing.mEventName, EventParameter(this),
+				EventParameter(std::string(mOwnerObject->objectId())));
+		//update frame count
+		mPathFollowing.mFrameCount = frameCount;
+	}
+}
+
+inline void SteerVehicle::doEntityAvoidObstacle(const float minDistanceToCollision)
+{
+	int frameCount = ClockObject::get_global_clock()->get_frame_count();
+	if (frameCount > mAvoidObstacle.mFrameCount + mAvoidObstacle.mDeltaFrame)
+	{
+		//enough frames are passed: throw the event
+		throw_event(mAvoidObstacle.mEventName, EventParameter(this),
+				EventParameter(std::string(mOwnerObject->objectId())));
+		//update frame count
+		mAvoidObstacle.mFrameCount = frameCount;
+	}
+}
+
+inline void SteerVehicle::doEntityAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
+		const float additionalDistance)
+{
+	int frameCount = ClockObject::get_global_clock()->get_frame_count();
+	if (frameCount > mAvoidCloseNeighbor.mFrameCount + mAvoidCloseNeighbor.mDeltaFrame)
+	{
+		//enough frames are passed: throw the event
+		throw_event(mAvoidCloseNeighbor.mEventName, EventParameter(this),
+				EventParameter(std::string(mOwnerObject->objectId())));
+		//update frame count
+		mAvoidCloseNeighbor.mFrameCount = frameCount;
+	}
+}
+
+inline void SteerVehicle::doEntityAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
+		const float steer, const OpenSteer::Vec3& ourFuture,
+		const OpenSteer::Vec3& threatFuture)
+{
+	int frameCount = ClockObject::get_global_clock()->get_frame_count();
+	if (frameCount > mAvoidNeighbor.mFrameCount + mAvoidNeighbor.mDeltaFrame)
+	{
+		//enough frames are passed: throw the event
+		throw_event(mAvoidNeighbor.mEventName, EventParameter(this),
+				EventParameter(std::string(mOwnerObject->objectId())));
+		//update frame count
+		mAvoidNeighbor.mFrameCount = frameCount;
 	}
 }
 

@@ -29,7 +29,6 @@
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "PhysicsComponents/RigidBody.h"
-#include <throw_event.h>
 
 namespace
 {
@@ -40,6 +39,7 @@ const std::string STOPEVENT("OnStopSteerVehicle");
 namespace ely
 {
 
+//VehicleAddOn typedef.
 typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
 
 SteerVehicle::SteerVehicle() :
@@ -77,10 +77,6 @@ ComponentType SteerVehicle::componentType() const
 bool SteerVehicle::initialize()
 {
 	bool result = true;
-	//throw events setting
-	mThrowEvents = (
-			mTmpl->parameter(std::string("throw_events"))
-					== std::string("true") ? true : false);
 	//external update
 	mExternalUpdate = (
 			mTmpl->parameter(std::string("external_update"))
@@ -103,6 +99,8 @@ bool SteerVehicle::initialize()
 				mVehicle = new OneTurning<SteerVehicle> :
 				mVehicle = new ExternalOneTurning<SteerVehicle>;
 	}
+	//thrown events
+	///TODO
 	//register to SteerPlugIn objectId
 	mSteerPlugInObjectId = ObjectId(
 			mTmpl->parameter(std::string("add_to_plugin")));
@@ -334,25 +332,31 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 				updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
 				OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 
-		//throw OnStartSteerVehicle event (if enabled)
-		if (mThrowEvents and (not mSteerVehicleStartSent))
+		//throw Start event (if enabled)
+		int frameCount = ClockObject::get_global_clock()->get_frame_count();
+		if (mStart.mEnable
+				and (frameCount > mStart.mFrameCount + mStart.mDeltaFrame))
 		{
-			throw_event(STARTEVENT, EventParameter(this),
+			//enough frames are passed: throw the event
+			throw_event(mStart.mEventName, EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
-			mSteerVehicleStartSent = true;
-			mSteerVehicleStopSent = false;
+			//update frame count
+			mStart.mFrameCount = frameCount;
 		}
 	}
 	else
 	{
 		//mVehicle.speed == 0.0
-		//throw OnStopSteerVehicle event (if enabled)
-		if (mThrowEvents and (not mSteerVehicleStopSent))
+		//throw Stop event (if enabled)
+		int frameCount = ClockObject::get_global_clock()->get_frame_count();
+		if (mStop.mEnable
+				and (frameCount > mStop.mFrameCount + mStop.mDeltaFrame))
 		{
-			throw_event(STOPEVENT, EventParameter(this),
+			//enough frames are passed: throw the event
+			throw_event(mStop.mEventName, EventParameter(this),
 					EventParameter(std::string(mOwnerObject->objectId())));
-			mSteerVehicleStopSent = true;
-			mSteerVehicleStartSent = false;
+			//update frame count
+			mStop.mFrameCount = frameCount;
 		}
 	}
 }
@@ -375,6 +379,78 @@ void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
 							mOwnerObject->getNodePath(), LVector3f::up())).normalize());
 	//
 	//no event thrown: external updating sub-system will do, if expected
+}
+
+void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData)
+{
+	//some tweaks
+	RETURN_ON_COND(eventData.mEventName == std::string(""),)
+	if (eventData.mDeltaFrame < 1)
+	{
+		eventData.mDeltaFrame = 1;
+	}
+
+	switch (event)
+	{
+	case STARTEVENT:
+		if(mStart.mEnable != eventData.mEnable)
+		{
+			mStart = eventData;
+		}
+		break;
+	case STOPEVENT:
+		if(mStop.mEnable != eventData.mEnable)
+		{
+			mStop = eventData;
+		}
+		break;
+	case PATHFOLLOWINGEVENT:
+		if(mPathFollowing.mEnable != eventData.mEnable)
+		{
+			mPathFollowing = eventData;
+			mPathFollowing.mEnable ?
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
+							&SteerVehicle::doEntityPathFollowing) :
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
+					NULL);
+		}
+		break;
+	case AVOIDOBSTACLEEVENT:
+		if(mAvoidObstacle.mEnable != eventData.mEnable)
+		{
+			mAvoidObstacle = eventData;
+			mAvoidObstacle.mEnable ?
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
+							&SteerVehicle::doEntityAvoidObstacle) :
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
+					NULL);
+		}
+		break;
+	case AVOIDCLOSENEIGHBOREVENT:
+		if(mAvoidCloseNeighbor.mEnable != eventData.mEnable)
+		{
+			mAvoidCloseNeighbor = eventData;
+			mAvoidCloseNeighbor.mEnable ?
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
+							&SteerVehicle::doEntityAvoidCloseNeighbor) :
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
+					NULL);
+		}
+		break;
+	case AVOIDNEIGHBOREVENT:
+		if(mAvoidNeighbor.mEnable != eventData.mEnable)
+		{
+			mAvoidNeighbor = eventData;
+			mAvoidNeighbor.mEnable ?
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
+							&SteerVehicle::doEntityAvoidNeighbor) :
+					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
+					NULL);
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 //TypedObject semantics: hardcoded
