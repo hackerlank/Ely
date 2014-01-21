@@ -30,12 +30,6 @@
 #include "Game/GamePhysicsManager.h"
 #include "PhysicsComponents/RigidBody.h"
 
-namespace
-{
-const std::string STARTEVENT("OnStartSteerVehicle");
-const std::string STOPEVENT("OnStopSteerVehicle");
-}  // namespace
-
 namespace ely
 {
 
@@ -77,19 +71,23 @@ ComponentType SteerVehicle::componentType() const
 bool SteerVehicle::initialize()
 {
 	bool result = true;
+	//
+	std::string param;
+	unsigned int idx1, valueNum1;
+	std::vector<std::string> paramValuesStr1, paramValuesStr2;
 	//external update
 	mExternalUpdate = (
 			mTmpl->parameter(std::string("external_update"))
 					== std::string("true") ? true : false);
 	//type
-	std::string type = mTmpl->parameter(std::string("type"));
-	if (type == std::string("pedestrian"))
+	param = mTmpl->parameter(std::string("type"));
+	if (param == std::string("pedestrian"))
 	{
 		not mExternalUpdate ?
 				mVehicle = new Pedestrian<SteerVehicle> :
 				mVehicle = new ExternalPedestrian<SteerVehicle>;
 	}
-	else if (type == std::string(""))
+	else if (param == std::string(""))
 	{
 	}
 	else
@@ -99,14 +97,12 @@ bool SteerVehicle::initialize()
 				mVehicle = new OneTurning<SteerVehicle> :
 				mVehicle = new ExternalOneTurning<SteerVehicle>;
 	}
-	//thrown events
-	///TODO
 	//register to SteerPlugIn objectId
 	mSteerPlugInObjectId = ObjectId(
 			mTmpl->parameter(std::string("add_to_plugin")));
 	//mov type
-	std::string movType = mTmpl->parameter(std::string("mov_type"));
-	if (movType == std::string("kinematic"))
+	param = mTmpl->parameter(std::string("mov_type"));
+	if (param == std::string("kinematic"))
 	{
 		CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
 				"SteerVehicle::initialize: invalid GamePhysicsManager")
@@ -139,22 +135,166 @@ bool SteerVehicle::initialize()
 	NULL);
 	settings.m_maxSpeed = (value > 0.0 ? value : 1.0);
 	//ray mask
-	std::string rayMask = mTmpl->parameter(std::string("ray_mask"));
-	if (rayMask == std::string("all_on"))
+	param = mTmpl->parameter(std::string("ray_mask"));
+	if (param == std::string("all_on"))
 	{
 		mRayMask = BitMask32::all_on();
 	}
-	else if (rayMask == std::string("all_off"))
+	else if (param == std::string("all_off"))
 	{
 		mRayMask = BitMask32::all_off();
 	}
 	else
 	{
-		uint32_t mask = (uint32_t) strtol(rayMask.c_str(), NULL, 0);
+		uint32_t mask = (uint32_t) strtol(param.c_str(), NULL, 0);
 		mRayMask.set_word(mask);
 	}
 	//set vehicle settings
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
+	//thrown events
+	param = mTmpl->parameter(std::string("thrown_events"));
+	if(param != std::string(""))
+	{
+		//events specified
+		//event1[@event_name1[@delta_frame1]][:...[:eventN[@event_nameN[@delta_frameN]]]]
+		paramValuesStr1 = parseCompoundString(param, ':');
+		valueNum1 = paramValuesStr1.size();
+		for (idx1 = 0; idx1 < valueNum1; ++idx1)
+		{
+			//eventX[@event_nameX[@delta_frameX]]
+			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
+			if (paramValuesStr2.size() >= 1)
+			{
+				//get delta frame if any
+				int deltaFrame = 1;
+				if (paramValuesStr2.size() >= 3)
+				{
+					deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
+					if (deltaFrame < 1)
+					{
+						deltaFrame = 1;
+					}
+				}
+				//
+				std::string name;
+				//get event
+				if (paramValuesStr2[0] == "start")
+				{
+					//get name if any
+					name = std::string(mOwnerObject->objectId())
+							+ "_SteerVehicle_Start";
+					if ((paramValuesStr2.size() >= 2)
+							and (paramValuesStr2[1] != ""))
+					{
+						name = paramValuesStr2[1];
+					}
+					//set values
+					mStart.mEnable = true;
+					mStart.mEventName = name;
+					mStart.mFrameCount = 0;
+					mStart.mDeltaFrame = deltaFrame;
+					//enable the event
+					doEnableSteerVehicleEvent(STARTEVENT, mStart);
+				}
+				else if (paramValuesStr2[0] == "stop")
+				{
+					//get name if any
+					name = std::string(mOwnerObject->objectId())
+							+ "_SteerVehicle_Stop";
+					if ((paramValuesStr2.size() >= 2)
+							and (paramValuesStr2[1] != ""))
+					{
+						name = paramValuesStr2[1];
+					}
+					//set values
+					mStop.mEnable = true;
+					mStop.mEventName = name;
+					mStop.mFrameCount = 0;
+					mStop.mDeltaFrame = deltaFrame;
+					//enable the event
+					doEnableSteerVehicleEvent(STOPEVENT, mStop);
+				}
+				else if (paramValuesStr2[0] == "path_following")
+				{
+					//get name if any
+					name = std::string(mOwnerObject->objectId())
+							+ "_SteerVehicle_PathFollowing";
+					if ((paramValuesStr2.size() >= 2)
+							and (paramValuesStr2[1] != ""))
+					{
+						name = paramValuesStr2[1];
+					}
+					//set values
+					mPathFollowing.mEnable = true;
+					mPathFollowing.mEventName = name;
+					mPathFollowing.mFrameCount = 0;
+					mPathFollowing.mDeltaFrame = deltaFrame;
+					//enable the event
+					doEnableSteerVehicleEvent(PATHFOLLOWINGEVENT, mPathFollowing);
+				}
+				else if (paramValuesStr2[0] == "avoid_obstacle")
+				{
+					//get name if any
+					name = std::string(mOwnerObject->objectId())
+							+ "_SteerVehicle_AvoidObstacle";
+					if ((paramValuesStr2.size() >= 2)
+							and (paramValuesStr2[1] != ""))
+					{
+						name = paramValuesStr2[1];
+					}
+					//set values
+					mAvoidObstacle.mEnable = true;
+					mAvoidObstacle.mEventName = name;
+					mAvoidObstacle.mFrameCount = 0;
+					mAvoidObstacle.mDeltaFrame = deltaFrame;
+					//enable the event
+					doEnableSteerVehicleEvent(AVOIDOBSTACLEEVENT, mAvoidObstacle);
+				}
+				else if (paramValuesStr2[0] == "avoid_close_neighbor")
+				{
+					//get name if any
+					name = std::string(mOwnerObject->objectId())
+							+ "_SteerVehicle_AvoidCloseNeighbor";
+					if ((paramValuesStr2.size() >= 2)
+							and (paramValuesStr2[1] != ""))
+					{
+						name = paramValuesStr2[1];
+					}
+					//set values
+					mAvoidCloseNeighbor.mEnable = true;
+					mAvoidCloseNeighbor.mEventName = name;
+					mAvoidCloseNeighbor.mFrameCount = 0;
+					mAvoidCloseNeighbor.mDeltaFrame = deltaFrame;
+					//enable the event
+					doEnableSteerVehicleEvent(AVOIDCLOSENEIGHBOREVENT, mAvoidCloseNeighbor);
+				}
+				else if (paramValuesStr2[0] == "avoid_neighbor")
+				{
+					//get name if any
+					name = std::string(mOwnerObject->objectId())
+							+ "_SteerVehicle_AvoidNeighbor";
+					if ((paramValuesStr2.size() >= 2)
+							and (paramValuesStr2[1] != ""))
+					{
+						name = paramValuesStr2[1];
+					}
+					//set values
+					mAvoidNeighbor.mEnable = true;
+					mAvoidNeighbor.mEventName = name;
+					mAvoidNeighbor.mFrameCount = 0;
+					mAvoidNeighbor.mDeltaFrame = deltaFrame;
+					//enable the event
+					doEnableSteerVehicleEvent(AVOIDNEIGHBOREVENT, mAvoidNeighbor);
+				}
+				else
+				{
+					//paramValuesStr2[0] is not a suitable event
+					break;
+				}
+			}
+		}
+	}
+
 	//
 	return result;
 }
@@ -383,7 +523,7 @@ void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
 
 void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData)
 {
-	//some tweaks
+	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)
 	if (eventData.mDeltaFrame < 1)
 	{
@@ -396,21 +536,24 @@ void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEvent
 		if(mStart.mEnable != eventData.mEnable)
 		{
 			mStart = eventData;
+			mStart.mFrameCount = 0;
 		}
 		break;
 	case STOPEVENT:
 		if(mStop.mEnable != eventData.mEnable)
 		{
 			mStop = eventData;
+			mStop.mFrameCount = 0;
 		}
 		break;
 	case PATHFOLLOWINGEVENT:
 		if(mPathFollowing.mEnable != eventData.mEnable)
 		{
 			mPathFollowing = eventData;
+			mPathFollowing.mFrameCount = 0;
 			mPathFollowing.mEnable ?
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
-							&SteerVehicle::doEntityPathFollowing) :
+							&SteerVehicle::doThrowPathFollowing) :
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
 					NULL);
 		}
@@ -419,9 +562,10 @@ void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEvent
 		if(mAvoidObstacle.mEnable != eventData.mEnable)
 		{
 			mAvoidObstacle = eventData;
+			mAvoidObstacle.mFrameCount = 0;
 			mAvoidObstacle.mEnable ?
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
-							&SteerVehicle::doEntityAvoidObstacle) :
+							&SteerVehicle::doThrowAvoidObstacle) :
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
 					NULL);
 		}
@@ -430,9 +574,10 @@ void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEvent
 		if(mAvoidCloseNeighbor.mEnable != eventData.mEnable)
 		{
 			mAvoidCloseNeighbor = eventData;
+			mAvoidCloseNeighbor.mFrameCount = 0;
 			mAvoidCloseNeighbor.mEnable ?
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
-							&SteerVehicle::doEntityAvoidCloseNeighbor) :
+							&SteerVehicle::doThrowAvoidCloseNeighbor) :
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
 					NULL);
 		}
@@ -441,9 +586,10 @@ void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEvent
 		if(mAvoidNeighbor.mEnable != eventData.mEnable)
 		{
 			mAvoidNeighbor = eventData;
+			mAvoidNeighbor.mFrameCount = 0;
 			mAvoidNeighbor.mEnable ?
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
-							&SteerVehicle::doEntityAvoidNeighbor) :
+							&SteerVehicle::doThrowAvoidNeighbor) :
 					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
 					NULL);
 		}

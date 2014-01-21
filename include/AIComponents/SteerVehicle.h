@@ -76,11 +76,11 @@ enum SteerVehicleEvent
  *
  * This component should be associated to a "Scene" component.\n
  * If specified in "thrown_events", this component can throw
- * these events (with default names):
+ * these events (shown with default names):
  * - on starting to move (<ObjectId>_SteerVehicle_Start)
  * - on stopping to move (<ObjectId>_SteerVehicle_Stop)
  * - when steering is required to follow a path
- * (<ObjectId>_SteerVehicle_FollowPath)
+ * (<ObjectId>_SteerVehicle_PathFollowing)
  * - when steering is required to avoid an obstacle
  * (<ObjectId>_SteerVehicle_AvoidObstacle)
  * - when steering is required to avoid a close neighbor (i.e. when
@@ -96,7 +96,7 @@ enum SteerVehicleEvent
  * parent is "render".\n
  *
  * XML Param(s):
- * - "thrown_events"			|single|no default (specified as "event1[@event_name1[@delta_frame1]][:...[:eventN[@event_nameN[@delta_frameN]]]]" with eventX = path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
+ * - "thrown_events"			|single|no default (specified as "event1[@event_name1[@delta_frame1]][:...[:eventN[@event_nameN[@delta_frameN]]]]" with eventX = start|stop|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
  * - "type"						|single|"one_turning" (values: one_turning|pedestrian)
  * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
@@ -148,15 +148,10 @@ public:
 	///@}
 
 	/**
-	 * \brief Enables throwing events.
-	 * @param enable True to enable, false to disable.
-	 */
-	void enableThrowEvents(bool enable);
-
-	/**
-	 * \brief Enables/disables the steer event to be thrown.
-	 * @param eventData The steer event data.
-	 * @param enable True to enable, false to disable.
+	 * \brief Enables/disables the SteerVehicle event to be thrown.
+	 * @param event The steer event.
+	 * @param eventData The steer event data. ThrowEventData::mEnable
+	 * will enable/disable the event.
 	 */
 	void enableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData);
 
@@ -204,13 +199,13 @@ private:
 	///@{
 	ThrowEventData mStart, mStop, mPathFollowing, mAvoidObstacle,
 	mAvoidCloseNeighbor, mAvoidNeighbor;
-	void doEntityPathFollowing(const OpenSteer::Vec3& future,
+	void doThrowPathFollowing(const OpenSteer::Vec3& future,
 	const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
 	const float outside);
-	void doEntityAvoidObstacle(const float minDistanceToCollision);
-	void doEntityAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
+	void doThrowAvoidObstacle(const float minDistanceToCollision);
+	void doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
 	const float additionalDistance);
-	void doEntityAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
+	void doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
 	const float steer, const OpenSteer::Vec3& ourFuture,
 	const OpenSteer::Vec3& threatFuture);
 	///Helper.
@@ -264,9 +259,8 @@ inline void SteerVehicle::reset()
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
 	mExternalUpdate = false;
-	mThrowEvents = mSteerVehicleStartSent = mSteerVehicleStopSent = false;
-	mPathFollowing = mAvoidObstacle = mAvoidCloseNeighbor = mAvoidNeighbor =
-			ThrowEventData();
+	mStart = mStop = mPathFollowing = mAvoidObstacle =
+			mAvoidCloseNeighbor = mAvoidNeighbor = ThrowEventData();
 }
 
 inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
@@ -279,14 +273,6 @@ inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 	return *mVehicle;
 }
 
-inline void SteerVehicle::enableThrowEvents(bool enable)
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	mThrowEvents = enable;
-}
-
 inline void SteerVehicle::enableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
@@ -295,7 +281,7 @@ inline void SteerVehicle::enableSteerVehicleEvent(SteerVehicleEvent event, Throw
 	doEnableSteerVehicleEvent(event, eventData);
 }
 
-inline void SteerVehicle::doEntityPathFollowing(const OpenSteer::Vec3& future,
+inline void SteerVehicle::doThrowPathFollowing(const OpenSteer::Vec3& future,
 		const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
 		const float outside)
 {
@@ -310,7 +296,7 @@ inline void SteerVehicle::doEntityPathFollowing(const OpenSteer::Vec3& future,
 	}
 }
 
-inline void SteerVehicle::doEntityAvoidObstacle(const float minDistanceToCollision)
+inline void SteerVehicle::doThrowAvoidObstacle(const float minDistanceToCollision)
 {
 	int frameCount = ClockObject::get_global_clock()->get_frame_count();
 	if (frameCount > mAvoidObstacle.mFrameCount + mAvoidObstacle.mDeltaFrame)
@@ -323,7 +309,7 @@ inline void SteerVehicle::doEntityAvoidObstacle(const float minDistanceToCollisi
 	}
 }
 
-inline void SteerVehicle::doEntityAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
+inline void SteerVehicle::doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
 		const float additionalDistance)
 {
 	int frameCount = ClockObject::get_global_clock()->get_frame_count();
@@ -337,7 +323,7 @@ inline void SteerVehicle::doEntityAvoidCloseNeighbor(const OpenSteer::AbstractVe
 	}
 }
 
-inline void SteerVehicle::doEntityAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
+inline void SteerVehicle::doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
 		const float steer, const OpenSteer::Vec3& ourFuture,
 		const OpenSteer::Vec3& threatFuture)
 {
