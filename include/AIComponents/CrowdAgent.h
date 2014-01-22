@@ -44,6 +44,13 @@ enum CrowdAgentMovType
 	AgentMovType_NONE
 };
 
+///CrowdAgent event.
+enum CrowdAgentEvent
+{
+	STARTEVENT,
+	STOPEVENT
+};
+
 /**
  * \brief Component implementing dtCrowdAgent from Recast Navigation library.
  *
@@ -54,28 +61,30 @@ enum CrowdAgentMovType
  * This component should be associated to a "Scene" component.\n
  * It could be associated to a kinematic rigid body, if the associated NavMesh
  * movement type is "kinematic".\n
- * If enabled (with "throw_events"), this component will throw an event on starting to move
- * ("OnStartCrowdAgent"), and an event on stopping to move
- * ("OnStopCrowdAgent"). The second argument of both is a reference
- * to the owner object.\n
+ * If specified in "thrown_events", this component can throw
+ * these events (shown with default names):
+ * - on starting to move (<ObjectType>_CrowdAgent_Start)
+ * - on stopping to move (<ObjectType>_CrowdAgent_Stop)
+ * The argument of each event is a reference to this component.\n
+ *
  * \note the owner object of this component will be reparented (if necessary)
  * when added to a NavMesh, to the same reference node (i.e. parent) of
  * the NavMesh owner object.
  *
  * XML Param(s):
- * - "throw_events"						|single|"false"
- * - "add_to_navmesh"					|single|""
+ * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop)
+ * - "add_to_navmesh"				|single|""
  * - "mov_type"						|single|"recast" (values: recast|kinematic)
- * - "move_target";						|single|"0.0,0.0,0.0"
- * - "move_velocity";					|single|"0.0,0.0,0.0"
- * - "max_acceleration";				|single|"8.0"
- * - "max_speed"						|single|"3.5"
- * - "collision_query_range"			|single|"12.0" (* NavMesh::agent_radius)
- * - "path_optimization_range"			|single|"30.0" (* NavMesh::agent_radius)
- * - "separation_weight" 				|single|"2.0"
- * - "update_flags"						|single|"0x1b"
- * - "obstacle_avoidance_type"			|single|"3" (values: 0|1|2|3)
- * - "ray_mask"							|single|"all_on"
+ * - "move_target";					|single|"0.0,0.0,0.0"
+ * - "move_velocity";				|single|"0.0,0.0,0.0"
+ * - "max_acceleration";			|single|"8.0"
+ * - "max_speed"					|single|"3.5"
+ * - "collision_query_range"		|single|"12.0" (* NavMesh::agent_radius)
+ * - "path_optimization_range"		|single|"30.0" (* NavMesh::agent_radius)
+ * - "separation_weight" 			|single|"2.0"
+ * - "update_flags"					|single|"0x1b"
+ * - "obstacle_avoidance_type"		|single|"3" (values: 0|1|2|3)
+ * - "ray_mask"						|single|"all_on"
  *
  * \note parts inside [] are optional.\n
  */
@@ -118,10 +127,12 @@ public:
 	///@}
 
 	/**
-	 * \brief Enables throwing events.
-	 * @param enable True to enable, false to disable.
+	 * \brief Enables/disables the CrowdAgent event to be thrown.
+	 * @param event The agent event.
+	 * @param eventData The agent event data. ThrowEventData::mEnable
+	 * will enable/disable the event.
 	 */
-	void enableThrowEvents(bool enable);
+	void enableCrowdAgentEvent(CrowdAgentEvent event, ThrowEventData eventData);
 
 #ifdef ELY_THREAD
 	/**
@@ -167,8 +178,14 @@ private:
 	 */
 	void doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel);
 
-	///Throwing events.
-	bool mThrowEvents, mCrowdAgentStartSent, mCrowdAgentStopSent;
+	/**
+	 * \name Throwing CrowdAgent events.
+	 */
+	///@{
+	ThrowEventData mStart, mStop;
+	///Helper.
+	void doEnableCrowdAgentEvent(CrowdAgentEvent event, ThrowEventData eventData);
+	///@}
 
 	///@{
 	///A task data to do asynchronous adding to NavMesh during creation.
@@ -229,7 +246,7 @@ inline void CrowdAgent::reset()
 	mHitResult = BulletClosestHitRayResult::empty();
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
-	mThrowEvents = mCrowdAgentStartSent = mCrowdAgentStopSent = false;
+	mStart = mStop = ThrowEventData();
 }
 
 inline dtCrowdAgentParams CrowdAgent::getParams()
@@ -272,12 +289,13 @@ inline CrowdAgentMovType CrowdAgent::getMovType() const
 	return mMovType;
 }
 
-inline void CrowdAgent::enableThrowEvents(bool enable)
+inline void CrowdAgent::enableCrowdAgentEvent(CrowdAgentEvent event,
+		ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mThrowEvents = enable;
+	doEnableCrowdAgentEvent(event, eventData);
 }
 
 #ifdef ELY_THREAD

@@ -76,10 +76,6 @@ ComponentType CrowdAgent::componentType() const
 bool CrowdAgent::initialize()
 {
 	bool result = true;
-	//throw events setting
-	mThrowEvents = (
-			mTmpl->parameter(std::string("throw_events"))
-					== std::string("true") ? true : false);
 	//set CrowdAgent parameters
 	//register to navmesh objectId
 	mNavMeshObjectId = ObjectId(
@@ -191,6 +187,74 @@ void CrowdAgent::onAddToObjectSetup()
 	AsyncTaskManager::get_global_ptr()->
 				find_task_chain(mTaskChainName)->set_frame_sync(false);
 #endif
+
+	///set thrown events if any
+	std::string param;
+	unsigned int idx1, valueNum1;
+	std::vector<std::string> paramValuesStr1, paramValuesStr2;
+	param = mTmpl->parameter(std::string("thrown_events"));
+	if(param != std::string(""))
+	{
+		//events specified
+		//event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]
+		paramValuesStr1 = parseCompoundString(param, ':');
+		valueNum1 = paramValuesStr1.size();
+		for (idx1 = 0; idx1 < valueNum1; ++idx1)
+		{
+			//eventX@[event_nameX]@[delta_frameX]
+			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
+			if (paramValuesStr2.size() >= 3)
+			{
+				CrowdAgentEvent event;
+				ThrowEventData eventData;
+				//get default name prefix
+				std::string objectType = std::string(
+						mOwnerObject->objectTmpl()->objectType());
+				//get name
+				std::string name = paramValuesStr2[1];
+				//get delta frame
+				int deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (deltaFrame < 1)
+				{
+					deltaFrame = 1;
+				}
+				//get event
+				if (paramValuesStr2[0] == "start")
+				{
+					event = STARTEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_CrowdAgent_Start";
+					}
+				}
+				else if (paramValuesStr2[0] == "stop")
+				{
+					event = STOPEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_CrowdAgent_Stop";
+					}
+				}
+				else
+				{
+					//paramValuesStr2[0] is not a suitable event:
+					//continue with the next event
+					continue;
+				}
+				//set event data
+				eventData.mEnable = true;
+				eventData.mEventName = name;
+				eventData.mFrameCount = 0;
+				eventData.mDeltaFrame = deltaFrame;
+				//enable the event
+				doEnableCrowdAgentEvent(event, eventData);
+			}
+		}
+	}
 }
 
 void CrowdAgent::onRemoveFromObjectCleanup()
@@ -353,26 +417,65 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		//update node path dir
 		ownerObjectNP.heads_up(updatedPos - vel);
 
-		//throw OnStartCrowdAgent event (if enabled)
-		if (mThrowEvents and (not mCrowdAgentStartSent))
+		//throw Start event (if enabled)
+		if (mStart.mEnable)
 		{
-			throw_event(STARTEVENT, EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
-			mCrowdAgentStartSent = true;
-			mCrowdAgentStopSent = false;
+			int frameCount = ClockObject::get_global_clock()->get_frame_count();
+			if (frameCount > mStart.mFrameCount + mStart.mDeltaFrame)
+			{
+				//enough frames are passed: throw the event
+				throw_event(mStart.mEventName, EventParameter(this));
+			}
+			//update frame count
+			mStart.mFrameCount = frameCount;
 		}
 	}
 	else
 	{
-		//throw OnStopCrowdAgent event (if enabled)
-		if (mThrowEvents and (not mCrowdAgentStopSent))
+		//vel.length_squared() == 0.0
+		//throw Stop event (if enabled)
+		if (mStop.mEnable)
 		{
-			throw_event(STOPEVENT,
-					EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
-			mCrowdAgentStopSent = true;
-			mCrowdAgentStartSent = false;
+			int frameCount = ClockObject::get_global_clock()->get_frame_count();
+			if (frameCount > mStop.mFrameCount + mStop.mDeltaFrame)
+			{
+				//enough frames are passed: throw the event
+				throw_event(mStop.mEventName, EventParameter(this));
+			}
+			//update frame count
+			mStop.mFrameCount = frameCount;
 		}
+	}
+}
+
+
+void CrowdAgent::doEnableCrowdAgentEvent(CrowdAgentEvent event, ThrowEventData eventData)
+{
+	//some checks
+	RETURN_ON_COND(eventData.mEventName == std::string(""),)
+	if (eventData.mDeltaFrame < 1)
+	{
+		eventData.mDeltaFrame = 1;
+	}
+
+	switch (event)
+	{
+	case STARTEVENT:
+		if(mStart.mEnable != eventData.mEnable)
+		{
+			mStart = eventData;
+			mStart.mFrameCount = 0;
+		}
+		break;
+	case STOPEVENT:
+		if(mStop.mEnable != eventData.mEnable)
+		{
+			mStop = eventData;
+			mStop.mFrameCount = 0;
+		}
+		break;
+	default:
+		break;
 	}
 }
 

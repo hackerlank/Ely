@@ -79,7 +79,6 @@ void CrowdAgentTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values:
-	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
 	mParameterTable.insert(ParameterNameValue("add_to_navmesh", ""));
 	mParameterTable.insert(ParameterNameValue("mov_type", "recast"));
 	mParameterTable.insert(ParameterNameValue("move_target", "0.0,0.0,0.0"));

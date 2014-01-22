@@ -44,20 +44,6 @@ enum SteerVehicleMovType
 	VehicleMovType_NONE
 };
 
-///Throw event data.
-struct ThrowEventData
-{
-	ThrowEventData() :
-			mEnable(false), mEventName(std::string("")), mFrameCount(0), mDeltaFrame(
-					1)
-	{
-	}
-	bool mEnable;
-	std::string mEventName;
-	int mFrameCount;
-	int mDeltaFrame;
-};
-
 ///SteerVehicle event.
 enum SteerVehicleEvent
 {
@@ -77,18 +63,17 @@ enum SteerVehicleEvent
  * This component should be associated to a "Scene" component.\n
  * If specified in "thrown_events", this component can throw
  * these events (shown with default names):
- * - on starting to move (<ObjectId>_SteerVehicle_Start)
- * - on stopping to move (<ObjectId>_SteerVehicle_Stop)
+ * - on starting to move (<ObjectType>_SteerVehicle_Start)
+ * - on stopping to move (<ObjectType>_SteerVehicle_Stop)
  * - when steering is required to follow a path
- * (<ObjectId>_SteerVehicle_PathFollowing)
+ * (<ObjectType>_SteerVehicle_PathFollowing)
  * - when steering is required to avoid an obstacle
- * (<ObjectId>_SteerVehicle_AvoidObstacle)
+ * (<ObjectType>_SteerVehicle_AvoidObstacle)
  * - when steering is required to avoid a close neighbor (i.e. when
- * there is a collision) (<ObjectId>_SteerVehicle_AvoidCloseNeighbor)
+ * there is a collision) (<ObjectType>_SteerVehicle_AvoidCloseNeighbor)
  * - when steering is required to avoid a neighbor (i.e. when there
- * is a potential collision) (<ObjectId>_SteerVehicle_AvoidNeighbor)
- * The first argument of them is a reference to this component,
- * the second one is a reference to the owner object.\n
+ * is a potential collision) (<ObjectType>_SteerVehicle_AvoidNeighbor)
+ * The argument of each event is a reference to this component.\n
  * \see annotate* SteerLibraryMixin member functions in SteerLibrary.h
  * for more information.
  *
@@ -96,7 +81,7 @@ enum SteerVehicleEvent
  * parent is "render".\n
  *
  * XML Param(s):
- * - "thrown_events"			|single|no default (specified as "event1[@event_name1[@delta_frame1]][:...[:eventN[@event_nameN[@delta_frameN]]]]" with eventX = start|stop|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
+ * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
  * - "type"						|single|"one_turning" (values: one_turning|pedestrian)
  * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
@@ -273,7 +258,8 @@ inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 	return *mVehicle;
 }
 
-inline void SteerVehicle::enableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData)
+inline void SteerVehicle::enableSteerVehicleEvent(SteerVehicleEvent event,
+		ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -289,11 +275,10 @@ inline void SteerVehicle::doThrowPathFollowing(const OpenSteer::Vec3& future,
 	if (frameCount > mPathFollowing.mFrameCount + mPathFollowing.mDeltaFrame)
 	{
 		//enough frames are passed: throw the event
-		throw_event(mPathFollowing.mEventName, EventParameter(this),
-				EventParameter(std::string(mOwnerObject->objectId())));
-		//update frame count
-		mPathFollowing.mFrameCount = frameCount;
+		throw_event(mPathFollowing.mEventName, EventParameter(this));
 	}
+	//update frame count
+	mPathFollowing.mFrameCount = frameCount;
 }
 
 inline void SteerVehicle::doThrowAvoidObstacle(const float minDistanceToCollision)
@@ -302,11 +287,10 @@ inline void SteerVehicle::doThrowAvoidObstacle(const float minDistanceToCollisio
 	if (frameCount > mAvoidObstacle.mFrameCount + mAvoidObstacle.mDeltaFrame)
 	{
 		//enough frames are passed: throw the event
-		throw_event(mAvoidObstacle.mEventName, EventParameter(this),
-				EventParameter(std::string(mOwnerObject->objectId())));
-		//update frame count
-		mAvoidObstacle.mFrameCount = frameCount;
+		throw_event(mAvoidObstacle.mEventName, EventParameter(this));
 	}
+	//update frame count
+	mAvoidObstacle.mFrameCount = frameCount;
 }
 
 inline void SteerVehicle::doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
@@ -316,11 +300,10 @@ inline void SteerVehicle::doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVeh
 	if (frameCount > mAvoidCloseNeighbor.mFrameCount + mAvoidCloseNeighbor.mDeltaFrame)
 	{
 		//enough frames are passed: throw the event
-		throw_event(mAvoidCloseNeighbor.mEventName, EventParameter(this),
-				EventParameter(std::string(mOwnerObject->objectId())));
-		//update frame count
-		mAvoidCloseNeighbor.mFrameCount = frameCount;
+		throw_event(mAvoidCloseNeighbor.mEventName, EventParameter(this));
 	}
+	//update frame count
+	mAvoidCloseNeighbor.mFrameCount = frameCount;
 }
 
 inline void SteerVehicle::doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
@@ -331,11 +314,10 @@ inline void SteerVehicle::doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle&
 	if (frameCount > mAvoidNeighbor.mFrameCount + mAvoidNeighbor.mDeltaFrame)
 	{
 		//enough frames are passed: throw the event
-		throw_event(mAvoidNeighbor.mEventName, EventParameter(this),
-				EventParameter(std::string(mOwnerObject->objectId())));
-		//update frame count
-		mAvoidNeighbor.mFrameCount = frameCount;
+		throw_event(mAvoidNeighbor.mEventName, EventParameter(this));
 	}
+	//update frame count
+	mAvoidNeighbor.mFrameCount = frameCount;
 }
 
 #ifdef ELY_THREAD

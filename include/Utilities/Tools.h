@@ -255,6 +255,24 @@ template<typename A> struct EventCallbackInterface
 };
 
 /**
+ * \brief Throwing event data.
+ *
+ * Data related to throwing events by components.
+ */
+struct ThrowEventData
+{
+	ThrowEventData() :
+			mEnable(false), mEventName(std::string("")), mFrameCount(0), mDeltaFrame(
+					1)
+	{
+	}
+	bool mEnable;
+	std::string mEventName;
+	int mFrameCount;
+	int mDeltaFrame;
+};
+
+/**
  * \brief Table for parameters management.
  *
  * See ObjectTemplate, ComponentTemplate.

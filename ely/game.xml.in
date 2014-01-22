@@ -18,6 +18,7 @@
 		<!-- template for camera object(s) -->
 		<ObjectTmpl type="Camera">
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
+<!--
 			<ComponentTmpl family="Control" type="Chaser" priority="60">
 				<Param event_types="head_left:stop-head_left"/>
 				<Param event_types="head_right:stop-head_right"/>
@@ -25,7 +26,7 @@
 				<Param event_types="pitch_down:stop-pitch_down"/>
 				<Param event_types="hold_lookat:stop-hold_lookat"/>
 			</ComponentTmpl>
-<!--
+-->
 			<ComponentTmpl family="Control" type="Driver" priority="60">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
@@ -37,7 +38,6 @@
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
 			</ComponentTmpl>
--->
 			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
 		</ObjectTmpl>
 		
@@ -148,6 +148,7 @@
 		<ObjectTmpl type="OpenSteerPlugIn">
 			<ComponentTmpl family="AI" type="SteerPlugIn" priority="80">
 				<Param event_types="add_steer_vehicle:remove_steer_vehicle"/>
+				<Param event_types="hit_obstacle:hit_vehicle"/>
 				<Param event_types="toggle_debug"/>
 			</ComponentTmpl>
 		</ObjectTmpl>
@@ -605,6 +606,7 @@
 			</Component>
 			<Component type="SteerVehicle">
 				<Param type="pedestrian"/>
+				<Param thrown_events="avoid_obstacle@@3:avoid_close_neighbor@@"/>
 				<Param add_to_plugin="NONE"/>
 				<Param mov_type="kinematic"/>
 				<Param mass="1.0"/>
@@ -638,6 +640,7 @@
 								169.408,129.243,46.8361$1.0$true"/>
 				<Param obstacles="gazebo@box@outside:beachhouse2@box@outside:bridge@box@outside"/>
 				<Param events="add_steer_vehicle@h:remove_steer_vehicle@shift-h$"/>
+				<Param events="hit_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:hit_vehicle@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
 		</Object>

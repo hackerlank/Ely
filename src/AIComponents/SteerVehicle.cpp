@@ -73,8 +73,7 @@ bool SteerVehicle::initialize()
 	bool result = true;
 	//
 	std::string param;
-	unsigned int idx1, valueNum1;
-	std::vector<std::string> paramValuesStr1, paramValuesStr2;
+	float value;
 	//external update
 	mExternalUpdate = (
 			mTmpl->parameter(std::string("external_update"))
@@ -114,7 +113,6 @@ bool SteerVehicle::initialize()
 	}
 	//get settings
 	VehicleSettings settings;
-	float value;
 	//mass
 	value = strtof(mTmpl->parameter(std::string("mass")).c_str(),
 	NULL);
@@ -151,150 +149,6 @@ bool SteerVehicle::initialize()
 	}
 	//set vehicle settings
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
-	//thrown events
-	param = mTmpl->parameter(std::string("thrown_events"));
-	if(param != std::string(""))
-	{
-		//events specified
-		//event1[@event_name1[@delta_frame1]][:...[:eventN[@event_nameN[@delta_frameN]]]]
-		paramValuesStr1 = parseCompoundString(param, ':');
-		valueNum1 = paramValuesStr1.size();
-		for (idx1 = 0; idx1 < valueNum1; ++idx1)
-		{
-			//eventX[@event_nameX[@delta_frameX]]
-			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
-			if (paramValuesStr2.size() >= 1)
-			{
-				//get delta frame if any
-				int deltaFrame = 1;
-				if (paramValuesStr2.size() >= 3)
-				{
-					deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
-					if (deltaFrame < 1)
-					{
-						deltaFrame = 1;
-					}
-				}
-				//
-				std::string name;
-				//get event
-				if (paramValuesStr2[0] == "start")
-				{
-					//get name if any
-					name = std::string(mOwnerObject->objectId())
-							+ "_SteerVehicle_Start";
-					if ((paramValuesStr2.size() >= 2)
-							and (paramValuesStr2[1] != ""))
-					{
-						name = paramValuesStr2[1];
-					}
-					//set values
-					mStart.mEnable = true;
-					mStart.mEventName = name;
-					mStart.mFrameCount = 0;
-					mStart.mDeltaFrame = deltaFrame;
-					//enable the event
-					doEnableSteerVehicleEvent(STARTEVENT, mStart);
-				}
-				else if (paramValuesStr2[0] == "stop")
-				{
-					//get name if any
-					name = std::string(mOwnerObject->objectId())
-							+ "_SteerVehicle_Stop";
-					if ((paramValuesStr2.size() >= 2)
-							and (paramValuesStr2[1] != ""))
-					{
-						name = paramValuesStr2[1];
-					}
-					//set values
-					mStop.mEnable = true;
-					mStop.mEventName = name;
-					mStop.mFrameCount = 0;
-					mStop.mDeltaFrame = deltaFrame;
-					//enable the event
-					doEnableSteerVehicleEvent(STOPEVENT, mStop);
-				}
-				else if (paramValuesStr2[0] == "path_following")
-				{
-					//get name if any
-					name = std::string(mOwnerObject->objectId())
-							+ "_SteerVehicle_PathFollowing";
-					if ((paramValuesStr2.size() >= 2)
-							and (paramValuesStr2[1] != ""))
-					{
-						name = paramValuesStr2[1];
-					}
-					//set values
-					mPathFollowing.mEnable = true;
-					mPathFollowing.mEventName = name;
-					mPathFollowing.mFrameCount = 0;
-					mPathFollowing.mDeltaFrame = deltaFrame;
-					//enable the event
-					doEnableSteerVehicleEvent(PATHFOLLOWINGEVENT, mPathFollowing);
-				}
-				else if (paramValuesStr2[0] == "avoid_obstacle")
-				{
-					//get name if any
-					name = std::string(mOwnerObject->objectId())
-							+ "_SteerVehicle_AvoidObstacle";
-					if ((paramValuesStr2.size() >= 2)
-							and (paramValuesStr2[1] != ""))
-					{
-						name = paramValuesStr2[1];
-					}
-					//set values
-					mAvoidObstacle.mEnable = true;
-					mAvoidObstacle.mEventName = name;
-					mAvoidObstacle.mFrameCount = 0;
-					mAvoidObstacle.mDeltaFrame = deltaFrame;
-					//enable the event
-					doEnableSteerVehicleEvent(AVOIDOBSTACLEEVENT, mAvoidObstacle);
-				}
-				else if (paramValuesStr2[0] == "avoid_close_neighbor")
-				{
-					//get name if any
-					name = std::string(mOwnerObject->objectId())
-							+ "_SteerVehicle_AvoidCloseNeighbor";
-					if ((paramValuesStr2.size() >= 2)
-							and (paramValuesStr2[1] != ""))
-					{
-						name = paramValuesStr2[1];
-					}
-					//set values
-					mAvoidCloseNeighbor.mEnable = true;
-					mAvoidCloseNeighbor.mEventName = name;
-					mAvoidCloseNeighbor.mFrameCount = 0;
-					mAvoidCloseNeighbor.mDeltaFrame = deltaFrame;
-					//enable the event
-					doEnableSteerVehicleEvent(AVOIDCLOSENEIGHBOREVENT, mAvoidCloseNeighbor);
-				}
-				else if (paramValuesStr2[0] == "avoid_neighbor")
-				{
-					//get name if any
-					name = std::string(mOwnerObject->objectId())
-							+ "_SteerVehicle_AvoidNeighbor";
-					if ((paramValuesStr2.size() >= 2)
-							and (paramValuesStr2[1] != ""))
-					{
-						name = paramValuesStr2[1];
-					}
-					//set values
-					mAvoidNeighbor.mEnable = true;
-					mAvoidNeighbor.mEventName = name;
-					mAvoidNeighbor.mFrameCount = 0;
-					mAvoidNeighbor.mDeltaFrame = deltaFrame;
-					//enable the event
-					doEnableSteerVehicleEvent(AVOIDNEIGHBOREVENT, mAvoidNeighbor);
-				}
-				else
-				{
-					//paramValuesStr2[0] is not a suitable event
-					break;
-				}
-			}
-		}
-	}
-
 	//
 	return result;
 }
@@ -343,6 +197,114 @@ void SteerVehicle::onAddToObjectSetup()
 
 	//set the bullet physics
 	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
+
+	///set thrown events if any
+	std::string param;
+	unsigned int idx1, valueNum1;
+	std::vector<std::string> paramValuesStr1, paramValuesStr2;
+	param = mTmpl->parameter(std::string("thrown_events"));
+	if(param != std::string(""))
+	{
+		//events specified
+		//event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]
+		paramValuesStr1 = parseCompoundString(param, ':');
+		valueNum1 = paramValuesStr1.size();
+		for (idx1 = 0; idx1 < valueNum1; ++idx1)
+		{
+			//eventX@[event_nameX]@[delta_frameX]
+			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
+			if (paramValuesStr2.size() >= 3)
+			{
+				SteerVehicleEvent event;
+				ThrowEventData eventData;
+				//get default name prefix
+				std::string objectType = std::string(
+						mOwnerObject->objectTmpl()->objectType());
+				//get name
+				std::string name = paramValuesStr2[1];
+				//get delta frame
+				int deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (deltaFrame < 1)
+				{
+					deltaFrame = 1;
+				}
+				//get event
+				if (paramValuesStr2[0] == "start")
+				{
+					event = STARTEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_SteerVehicle_Start";
+					}
+				}
+				else if (paramValuesStr2[0] == "stop")
+				{
+					event = STOPEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_SteerVehicle_Stop";
+					}
+				}
+				else if (paramValuesStr2[0] == "path_following")
+				{
+					event = PATHFOLLOWINGEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_SteerVehicle_PathFollowing";
+					}
+				}
+				else if (paramValuesStr2[0] == "avoid_obstacle")
+				{
+					event = AVOIDOBSTACLEEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_SteerVehicle_AvoidObstacle";
+					}
+				}
+				else if (paramValuesStr2[0] == "avoid_close_neighbor")
+				{
+					event = AVOIDCLOSENEIGHBOREVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_SteerVehicle_AvoidCloseNeighbor";
+					}
+				}
+				else if (paramValuesStr2[0] == "avoid_neighbor")
+				{
+					event = AVOIDNEIGHBOREVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_SteerVehicle_AvoidNeighbor";
+					}
+				}
+				else
+				{
+					//paramValuesStr2[0] is not a suitable event:
+					//continue with the next event
+					continue;
+				}
+				//set event data
+				eventData.mEnable = true;
+				eventData.mEventName = name;
+				eventData.mFrameCount = 0;
+				eventData.mDeltaFrame = deltaFrame;
+				//enable the event
+				doEnableSteerVehicleEvent(event, eventData);
+			}
+		}
+	}
 }
 
 void SteerVehicle::onRemoveFromObjectCleanup()
@@ -473,13 +435,14 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 				OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 
 		//throw Start event (if enabled)
-		int frameCount = ClockObject::get_global_clock()->get_frame_count();
-		if (mStart.mEnable
-				and (frameCount > mStart.mFrameCount + mStart.mDeltaFrame))
+		if (mStart.mEnable)
 		{
-			//enough frames are passed: throw the event
-			throw_event(mStart.mEventName, EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
+			int frameCount = ClockObject::get_global_clock()->get_frame_count();
+			if (frameCount > mStart.mFrameCount + mStart.mDeltaFrame)
+			{
+				//enough frames are passed: throw the event
+				throw_event(mStart.mEventName, EventParameter(this));
+			}
 			//update frame count
 			mStart.mFrameCount = frameCount;
 		}
@@ -488,13 +451,14 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 	{
 		//mVehicle.speed == 0.0
 		//throw Stop event (if enabled)
-		int frameCount = ClockObject::get_global_clock()->get_frame_count();
-		if (mStop.mEnable
-				and (frameCount > mStop.mFrameCount + mStop.mDeltaFrame))
+		if (mStop.mEnable)
 		{
-			//enough frames are passed: throw the event
-			throw_event(mStop.mEventName, EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
+			int frameCount = ClockObject::get_global_clock()->get_frame_count();
+			if (frameCount > mStop.mFrameCount + mStop.mDeltaFrame)
+			{
+				//enough frames are passed: throw the event
+				throw_event(mStop.mEventName, EventParameter(this));
+			}
 			//update frame count
 			mStop.mFrameCount = frameCount;
 		}
