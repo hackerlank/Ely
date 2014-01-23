@@ -47,7 +47,7 @@
 
 #include <iomanip>
 #include <sstream>
-#include "OpenSteer/PolylineSegmentedPathwaySingleRadius.h"
+#include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Proximity.h>
 #include <OpenSteer/Color.h>
@@ -67,7 +67,7 @@ typedef AbstractTokenForProximityDatabase<AbstractVehicle*> ProximityToken;
 // ----------------------------------------------------------------------------
 
 /**
- * \note: Public data member for tweaking:
+ * \note: Public class members for tweaking:
  * - \var useDirectedPathFollowing: reverses direction when we reach an
  * endpoint (bool, default: false)
  * - \var wanderSwitch: wander behavior flag (bool, default: false)
@@ -434,7 +434,7 @@ public:
 // OpenSteerDemo PlugIn
 
 /**
- * \note: Public member function for tweaking:
+ * \note: Public class members for tweaking:
  * - \fn void nextPD(): cycles through various types of proximity databases
  * (default: LQProximityDatabase).
  */
@@ -793,6 +793,6 @@ public:
 
 // ----------------------------------------------------------------------------
 
-}// anonymous namespace
+}// ely namespace
 
 #endif /* PLUGIN_PEDESTRIAN_H_ */
