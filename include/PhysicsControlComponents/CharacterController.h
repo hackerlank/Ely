@@ -40,16 +40,14 @@ class CharacterControllerTemplate;
  * It constructs a character controller with the single specified collision
  * shape_type along with relevant parameters.\n
  * The up axis is the Z axis.\n
- * If enabled (with "throw_events"), this component will throw an event when
- * on ground ("OnGroundCharacterController"), and an event when on air
- * ("OnAirCharacterController"). The second argument of both is a reference
- * to the owner object.\n
- *
- * This component can throw (if enabled) "" and
- * "OnAirCharacterController" events.
+ * If specified in "thrown_events", this component can throw
+ * these events (shown with default names):
+ * - when landing over ground (<ObjectType>_CharacterController_OnGround)
+ * - when soaring in air (<ObjectType>_CharacterController_InAir)
+ * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
- * - "throw_events"				|single|"false"
+ * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = on_ground|in_air)
  * - "step_height"  			|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
@@ -168,11 +166,20 @@ public:
 	operator BulletCharacterControllerNode&();
 	///@}
 
+	///CharacterController event.
+	enum Event
+	{
+		ONGROUNDEVENT,
+		INAIREVENT
+	};
+
 	/**
-	 * \brief Enables throwing events.
-	 * @param enable True to enable, false to disable.
+	 * \brief Enables/disables the CharacterController event to be thrown.
+	 * @param event The CharacterController event.
+	 * @param eventData The CharacterController event data. ThrowEventData::mEnable
+	 * will enable/disable the event.
 	 */
-	void enableThrowEvents(bool enable);
+	void enableCharacterControllerEvent(Event event, ThrowEventData eventData);
 
 private:
 	///The NodePath associated to this character controller.
@@ -222,8 +229,14 @@ private:
 	mRollLeftKey, mRollRightKey, mJumpKey;
 	///@}
 
-	///Throwing events.
-	bool mThrowEvents, mOnGroundSent, mOnAirSent;
+	/**
+	 * \name Throwing CharacterController events.
+	 */
+	///@{
+	ThrowEventData mOnGround, mInAir;
+	///Helper.
+	void doEnableCharacterControllerEvent(Event event, ThrowEventData eventData);
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
@@ -277,7 +290,7 @@ inline void CharacterController::reset()
 			mRollLeft = mRollRight = mJump = false;
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey, mDownKey =
 			mRollLeftKey = mRollRightKey = mJumpKey = false;
-	mThrowEvents = mOnGroundSent = mOnAirSent = false;
+	mOnGround = mInAir = ThrowEventData();
 }
 
 inline void CharacterController::enableForward(bool enable)
@@ -525,12 +538,12 @@ inline CharacterController::operator BulletCharacterControllerNode&()
 	return *mCharacterController;
 }
 
-inline void CharacterController::enableThrowEvents(bool enable)
+inline void CharacterController::enableCharacterControllerEvent(Event event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mThrowEvents = enable;
+	doEnableCharacterControllerEvent(event, eventData);
 }
 
 }  // namespace ely

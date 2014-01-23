@@ -44,17 +44,6 @@ enum SteerVehicleMovType
 	VehicleMovType_NONE
 };
 
-///SteerVehicle event.
-enum SteerVehicleEvent
-{
-	STARTEVENT,
-	STOPEVENT,
-	PATHFOLLOWINGEVENT,
-	AVOIDOBSTACLEEVENT,
-	AVOIDCLOSENEIGHBOREVENT,
-	AVOIDNEIGHBOREVENT
-};
-
 /**
  * \brief Component implementing OpenSteer Vehicles.
  *
@@ -132,13 +121,24 @@ public:
 	operator OpenSteer::AbstractVehicle&();
 	///@}
 
+	///SteerVehicle event.
+	enum Event
+	{
+		STARTEVENT,
+		STOPEVENT,
+		PATHFOLLOWINGEVENT,
+		AVOIDOBSTACLEEVENT,
+		AVOIDCLOSENEIGHBOREVENT,
+		AVOIDNEIGHBOREVENT
+	};
+
 	/**
 	 * \brief Enables/disables the SteerVehicle event to be thrown.
-	 * @param event The steer event.
-	 * @param eventData The steer event data. ThrowEventData::mEnable
+	 * @param event The SteerVehicle event.
+	 * @param eventData The SteerVehicle event data. ThrowEventData::mEnable
 	 * will enable/disable the event.
 	 */
-	void enableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData);
+	void enableSteerVehicleEvent(Event event, ThrowEventData eventData);
 
 #ifdef ELY_THREAD
 	/**
@@ -194,7 +194,7 @@ private:
 	const float steer, const OpenSteer::Vec3& ourFuture,
 	const OpenSteer::Vec3& threatFuture);
 	///Helper.
-	void doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData);
+	void doEnableSteerVehicleEvent(Event event, ThrowEventData eventData);
 	///@}
 
 #ifdef ELY_THREAD
@@ -258,7 +258,7 @@ inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 	return *mVehicle;
 }
 
-inline void SteerVehicle::enableSteerVehicleEvent(SteerVehicleEvent event,
+inline void SteerVehicle::enableSteerVehicleEvent(Event event,
 		ThrowEventData eventData)
 {
 	//lock (guard) the mutex

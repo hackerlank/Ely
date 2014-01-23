@@ -45,13 +45,14 @@ class VehicleTemplate;
  * Wheel object should have, at least, a Scene (Model or InstanceOf)
  * component.\n
  * The default up axis is the Z axis.\n
- * If enabled (with "throw_events"), this component will throw an event on starting to move
- * ("OnStartVehicle"), and an event on stopping to move
- * ("OnStopVehicle"). The second argument of both is a reference
- * to the owner object.\n
+ * If specified in "thrown_events", this component can throw
+ * these events (shown with default names):
+ * - on starting to move (<ObjectType>_Vehicle_Start)
+ * - on stopping to move (<ObjectType>_Vehicle_Stop)
+ * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
- * - "throw_events"					|single|"false"
+ * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop)
  * - "up_axis"						|single|"z" (values: x|y|z)
  * - "wheels_number"  				|single|"4" (== N)
  * - "wheel_object_template"		|single|no default
@@ -159,11 +160,20 @@ public:
 	 */
 	std::vector<SMARTPTR(Object)> getWheelObjects() const;
 
+	///Vehicle event.
+	enum Event
+	{
+		STARTEVENT,
+		STOPEVENT
+	};
+
 	/**
-	 * \brief Enables throwing events.
-	 * @param enable True to enable, false to disable.
+	 * \brief Enables/disables the Vehicle event to be thrown.
+	 * @param event The Vehicle event.
+	 * @param eventData The Vehicle event data. ThrowEventData::mEnable
+	 * will enable/disable the event.
 	 */
-	void enableThrowEvents(bool enable);
+	void enableVehicleEvent(Event event, ThrowEventData eventData);
 
 private:
 	///The underlying BulletVehicle (read-only after creation & before destruction).
@@ -201,8 +211,14 @@ private:
 	bool mForwardKey, mBackwardKey, mBrakeKey, mTurnLeftKey, mTurnRightKey;
 	///@}
 
-	///Throwing events.
-	bool mThrowEvents, mOnStartSent, mOnStopSent;
+	/**
+	 * \name Throwing Vehicle events.
+	 */
+	///@{
+	ThrowEventData mStart, mStop;
+	///Helper.
+	void doEnableVehicleEvent(Event event, ThrowEventData eventData);
+	///@}
 
 	///TypedObject semantics: hardcoded
 public:
@@ -262,7 +278,7 @@ inline void Vehicle::reset()
 			mSteeringIncrement = mSteeringDecrement = 0.0;
 	mForward = mBackward = mBrake = mTurnLeft = mTurnRight = mForwardKey =
 			mBackwardKey = mBrakeKey = mTurnLeftKey = mTurnRightKey = false;
-	mThrowEvents = mOnStartSent = mOnStopSent = false;
+	mStart = mStop = ThrowEventData();
 }
 
 inline void Vehicle::enableForward(bool enable)
@@ -458,12 +474,12 @@ inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 	return mWheelObjects;
 }
 
-inline void Vehicle::enableThrowEvents(bool enable)
+inline void Vehicle::enableVehicleEvent(Event event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mThrowEvents = enable;
+	doEnableVehicleEvent(event, eventData);
 }
 
 } /* namespace ely */

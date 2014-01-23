@@ -76,7 +76,6 @@ void VehicleTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
-	mParameterTable.insert(ParameterNameValue("throw_events", "false"));
 	mParameterTable.insert(ParameterNameValue("up_axis", "z"));
 	mParameterTable.insert(ParameterNameValue("wheels_number", "4"));
 	mParameterTable.insert(ParameterNameValue("wheel_scale", "1.0"));

@@ -37,6 +37,8 @@ class AICharacterRef;
 /**
  * \brief Component implementing AI Steering Behaviors and Path Finding.
  *
+ * \note This component is DEPRECATED. In the future it could be removed.
+ *
  * This is a tiny wrapper around an AICharacter object: any AI steering
  * behavior should be done by getting a reference to it, after having
  * enabled the whole component.\n

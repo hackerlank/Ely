@@ -26,12 +26,6 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <throw_event.h>
 
-namespace
-{
-const std::string ONGROUNDEVENT("OnGroundCharacterController");
-const std::string ONAIREVENT("OnAirCharacterController");
-}  // namespace
-
 namespace ely
 {
 CharacterController::CharacterController()
@@ -65,10 +59,6 @@ ComponentType CharacterController::componentType() const
 bool CharacterController::initialize()
 {
 	bool result = true;
-	//throw events setting
-	mThrowEvents = (
-			mTmpl->parameter(std::string("throw_events"))
-					== std::string("true") ? true : false);
 	//
 	float value, absValue;
 	//step height
@@ -303,6 +293,74 @@ void CharacterController::onAddToObjectSetup()
 
 	//set this character controller node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
+
+	///set thrown events if any
+	std::string param;
+	unsigned int idx1, valueNum1;
+	std::vector<std::string> paramValuesStr1, paramValuesStr2;
+	param = mTmpl->parameter(std::string("thrown_events"));
+	if (param != std::string(""))
+	{
+		//events specified
+		//event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]
+		paramValuesStr1 = parseCompoundString(param, ':');
+		valueNum1 = paramValuesStr1.size();
+		for (idx1 = 0; idx1 < valueNum1; ++idx1)
+		{
+			//eventX@[event_nameX]@[delta_frameX]
+			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
+			if (paramValuesStr2.size() >= 3)
+			{
+				Event event;
+				ThrowEventData eventData;
+				//get default name prefix
+				std::string objectType = std::string(
+						mOwnerObject->objectTmpl()->objectType());
+				//get name
+				std::string name = paramValuesStr2[1];
+				//get delta frame
+				int deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (deltaFrame < 1)
+				{
+					deltaFrame = 1;
+				}
+				//get event
+				if (paramValuesStr2[0] == "on_ground")
+				{
+					event = ONGROUNDEVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_CharacterController_OnGround";
+					}
+				}
+				else if (paramValuesStr2[0] == "in_air")
+				{
+					event = INAIREVENT;
+					//check name
+					if (name == "")
+					{
+						//set default name
+						name = objectType + "_CharacterController_InAir";
+					}
+				}
+				else
+				{
+					//paramValuesStr2[0] is not a suitable event:
+					//continue with the next event
+					continue;
+				}
+				//set event data
+				eventData.mEnable = true;
+				eventData.mEventName = name;
+				eventData.mFrameCount = 0;
+				eventData.mDeltaFrame = deltaFrame;
+				//enable the event
+				doEnableCharacterControllerEvent(event, eventData);
+			}
+		}
+	}
 }
 
 void CharacterController::onRemoveFromObjectCleanup()
@@ -402,14 +460,19 @@ void CharacterController::update(void* data)
 	//handle CharacterController ground-air events
 	if (mCharacterController->is_on_ground())
 	{
-		//throw OnGroundCharacterController event (if enabled)
-		if (mThrowEvents and (not mOnGroundSent))
+		//throw OnGround event (if enabled)
+		if (mOnGround.mEnable)
 		{
-			throw_event(ONGROUNDEVENT, EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
-			mOnGroundSent = true;
-			mOnAirSent = false;
+			int frameCount = ClockObject::get_global_clock()->get_frame_count();
+			if (frameCount > mOnGround.mFrameCount + mOnGround.mDeltaFrame)
+			{
+				//enough frames are passed: throw the event
+				throw_event(mOnGround.mEventName, EventParameter(this));
+			}
+			//update frame count
+			mOnGround.mFrameCount = frameCount;
 		}
+
 		//jump if requested
 		if (mJump)
 		{
@@ -418,13 +481,17 @@ void CharacterController::update(void* data)
 	}
 	else
 	{
-		//throw OnAirCharacterController event (if enabled)
-		if (mThrowEvents and (not mOnAirSent))
+		//throw InAir event (if enabled)
+		if (mInAir.mEnable)
 		{
-			throw_event(ONAIREVENT, EventParameter(this),
-					EventParameter(std::string(mOwnerObject->objectId())));
-			mOnAirSent = true;
-			mOnGroundSent = false;
+			int frameCount = ClockObject::get_global_clock()->get_frame_count();
+			if (frameCount > mInAir.mFrameCount + mInAir.mDeltaFrame)
+			{
+				//enough frames are passed: throw the event
+				throw_event(mInAir.mEventName, EventParameter(this));
+			}
+			//update frame count
+			mInAir.mFrameCount = frameCount;
 		}
 	}
 }
@@ -468,6 +535,36 @@ void CharacterController::doSetControlParameters()
 	if (mMaxJumpHeight > 0.0)
 	{
 		mCharacterController->set_max_jump_height(mMaxJumpHeight);
+	}
+}
+
+void CharacterController::doEnableCharacterControllerEvent(Event event, ThrowEventData eventData)
+{
+	//some checks
+	RETURN_ON_COND(eventData.mEventName == std::string(""),)
+	if (eventData.mDeltaFrame < 1)
+	{
+		eventData.mDeltaFrame = 1;
+	}
+
+	switch (event)
+	{
+	case ONGROUNDEVENT:
+		if(mOnGround.mEnable != eventData.mEnable)
+		{
+			mOnGround = eventData;
+			mOnGround.mFrameCount = 0;
+		}
+		break;
+	case INAIREVENT:
+		if(mInAir.mEnable != eventData.mEnable)
+		{
+			mInAir = eventData;
+			mInAir.mFrameCount = 0;
+		}
+		break;
+	default:
+		break;
 	}
 }
 

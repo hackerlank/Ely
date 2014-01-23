@@ -215,7 +215,7 @@ void SteerVehicle::onAddToObjectSetup()
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{
-				SteerVehicleEvent event;
+				Event event;
 				ThrowEventData eventData;
 				//get default name prefix
 				std::string objectType = std::string(
@@ -485,7 +485,7 @@ void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
 	//no event thrown: external updating sub-system will do, if expected
 }
 
-void SteerVehicle::doEnableSteerVehicleEvent(SteerVehicleEvent event, ThrowEventData eventData)
+void SteerVehicle::doEnableSteerVehicleEvent(Event event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)

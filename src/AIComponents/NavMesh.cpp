@@ -857,9 +857,6 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 inline void NavMesh::doSetCrowdAgentOtherSettings(
 		SMARTPTR(CrowdAgent)crowdAgent, CrowdTool* crowdTool)
 {
-	//reset events' sending
-	crowdAgent->mCrowdAgentStartSent = false;
-	crowdAgent->mCrowdAgentStopSent = true;
 	//set physics parameters
 	crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
 	crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);

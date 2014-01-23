@@ -44,13 +44,6 @@ enum CrowdAgentMovType
 	AgentMovType_NONE
 };
 
-///CrowdAgent event.
-enum CrowdAgentEvent
-{
-	STARTEVENT,
-	STOPEVENT
-};
-
 /**
  * \brief Component implementing dtCrowdAgent from Recast Navigation library.
  *
@@ -126,13 +119,20 @@ public:
 	CrowdAgentMovType getMovType() const;
 	///@}
 
+	///CrowdAgent event.
+	enum Event
+	{
+		STARTEVENT,
+		STOPEVENT
+	};
+
 	/**
 	 * \brief Enables/disables the CrowdAgent event to be thrown.
-	 * @param event The agent event.
-	 * @param eventData The agent event data. ThrowEventData::mEnable
+	 * @param event The CrowdAgent event.
+	 * @param eventData The CrowdAgent event data. ThrowEventData::mEnable
 	 * will enable/disable the event.
 	 */
-	void enableCrowdAgentEvent(CrowdAgentEvent event, ThrowEventData eventData);
+	void enableCrowdAgentEvent(Event event, ThrowEventData eventData);
 
 #ifdef ELY_THREAD
 	/**
@@ -184,7 +184,7 @@ private:
 	///@{
 	ThrowEventData mStart, mStop;
 	///Helper.
-	void doEnableCrowdAgentEvent(CrowdAgentEvent event, ThrowEventData eventData);
+	void doEnableCrowdAgentEvent(Event event, ThrowEventData eventData);
 	///@}
 
 	///@{
@@ -289,7 +289,7 @@ inline CrowdAgentMovType CrowdAgent::getMovType() const
 	return mMovType;
 }
 
-inline void CrowdAgent::enableCrowdAgentEvent(CrowdAgentEvent event,
+inline void CrowdAgent::enableCrowdAgentEvent(Event event,
 		ThrowEventData eventData)
 {
 	//lock (guard) the mutex

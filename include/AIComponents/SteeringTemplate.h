@@ -28,6 +28,9 @@
 
 namespace ely
 {
+/**
+ * \note This component is DEPRECATED. In the future it could be removed.
+ */
 class SteeringTemplate: public ComponentTemplate
 {
 protected:

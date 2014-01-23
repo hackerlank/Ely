@@ -205,7 +205,7 @@ void CrowdAgent::onAddToObjectSetup()
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{
-				CrowdAgentEvent event;
+				Event event;
 				ThrowEventData eventData;
 				//get default name prefix
 				std::string objectType = std::string(
@@ -449,7 +449,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 }
 
 
-void CrowdAgent::doEnableCrowdAgentEvent(CrowdAgentEvent event, ThrowEventData eventData)
+void CrowdAgent::doEnableCrowdAgentEvent(Event event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)
