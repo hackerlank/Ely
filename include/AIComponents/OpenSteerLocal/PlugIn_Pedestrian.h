@@ -592,8 +592,8 @@ public:
 
 		// draw obstacles
 		ObstacleIterator iterObstacle;
-		for (iterObstacle = m_obstacles.begin();
-				iterObstacle != m_obstacles.end(); ++iterObstacle)
+		for (iterObstacle = m_localObstacles.begin();
+				iterObstacle != m_localObstacles.end(); ++iterObstacle)
 		{
 			(*iterObstacle)->draw(false, Color(0, 0, 0),
 					Vec3(0, 0, 0));

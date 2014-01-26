@@ -23,6 +23,9 @@
 
 #include "../common_configs.h"
 #include "AIComponents/SteerPlugIn.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Support/Raycaster.h"
 
@@ -35,8 +38,8 @@ extern "C"
 #endif
 
 ///OpenSteerPlugIn + SteerPlugIn related
-CALLBACK add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn;
-CALLBACK remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn;
+CALLBACK add_vehicle;
+CALLBACK remove_vehicle;
 CALLBACK handleHits;
 #ifdef ELY_DEBUG
 CALLBACK steerPluginsToggleDebug;
@@ -49,7 +52,7 @@ CALLBACK steerPluginsToggleDebug;
 #define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 
 ///OpenSteerPlugIn + SteerPlugIn related CALLBACKs
-void add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* data)
+void add_vehicle(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(SteerPlugIn)steerPlugIn = reinterpret_cast<SteerPlugIn*>(data);
@@ -76,12 +79,18 @@ void add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* dat
 	{
 		HOLD_REMUTEX(rayCaster->getMutex())
 
-		rayCaster->rayCast(BitMask32::all_on());
-		hitPos = rayCaster->getHitPos();
+		if (rayCaster->rayCast(BitMask32::all_on()))
+		{
+			hitPos = rayCaster->getHitPos();
+		}
+		else
+		{
+			hitPos = LPoint3f::zero();
+		}
 	}
 
 	///create the clone
-	//tweak clone object's parameters
+	//tweak clone object's common parameters
 	//set clone object store_params
 	objParams.erase("store_params");
 	objParams.insert(std::pair<std::string, std::string>("store_params", "false"));
@@ -92,29 +101,56 @@ void add_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* dat
 	objParams.insert(std::pair<std::string, std::string>("pos", pos.str()));
 
 	//tweak clone components' parameter tables
-	//set SteerVehicle type
 	compParams["SteerVehicle"].erase("type");
+	compParams["SteerVehicle"].erase("mov_type");
 	if (openSteerPlugInName == "One Turning Away")
 	{
+		//set SteerVehicle type, mov_type
 		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("type", "one_turning"));
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("mov_type", "kinematic"));
 	}
 	else if (openSteerPlugInName == "Pedestrians")
 	{
+		//set SteerVehicle type, mov_type, thrown_events
 		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("type", "pedestrian"));
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("mov_type", "kinematic"));
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("thrown_events", "avoid_obstacle@@3:avoid_close_neighbor@@"));
+	}
+	else if (openSteerPlugInName == "Boids")
+	{
+		//set SteerVehicle type, mov_type, max_force, max_speed, speed
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("type", "boid"));
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("mov_type", "opensteer"));
+		//
+		compParams["SteerVehicle"].erase("max_force");
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("max_force", "27"));
+		compParams["SteerVehicle"].erase("max_speed");
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("max_speed", "20"));
+		compParams["SteerVehicle"].erase("speed");
+		compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("speed", "3"));
+		//set InstanceOf instance_of, scale
+		compParams["InstanceOf"].erase("instance_of");
+		compParams["InstanceOf"].insert(std::pair<std::string, std::string>("instance_of", "Smiley1"));
+		compParams["InstanceOf"].erase("max_speed");
+		compParams["InstanceOf"].insert(std::pair<std::string, std::string>("scale", "0.1,0.1,0.1"));
 	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(std::pair<std::string, std::string>("add_to_plugin", steerPlugInObjectId));
+
 	//create actually the clone
 	ObjectTemplateManager::GetSingletonPtr()->
 	createObject(toBeClonedObject->objectTmpl()->objectType(), ObjectId(),
 			objParams, compParams, false);
 }
 
-void remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* data)
+void remove_vehicle(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(SteerPlugIn)steerPlugIn = reinterpret_cast<SteerPlugIn*>(data);
+
+	//get underlying OpenSteer PlugIn name
+	std::string openSteerPlugInName = steerPlugIn->getAbstractPlugIn().name();
 
 	//get object under mouse pointer
 	Raycaster* rayCaster = Raycaster::GetSingletonPtr();
@@ -126,9 +162,40 @@ void remove_steer_vehicle_SteerPlugIn_OpenSteerPlugIn(const Event* event, void* 
 		SMARTPTR(Component) aiComp = hitObject->getComponent(ComponentFamilyType("AI"));
 		if(aiComp and aiComp->is_of_type(SteerVehicle::get_class_type()))
 		{
+			//check if it is the type requested
+			OpenSteer::AbstractVehicle* vehicle =
+					&DCAST(SteerVehicle, aiComp)->getAbstractVehicle();
+			if(openSteerPlugInName == "One Turning Away")
+			{
+				if((not dynamic_cast<OneTurning<SteerVehicle>*>(vehicle)) and
+				(not dynamic_cast<ExternalOneTurning<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
+			else if (openSteerPlugInName == "Pedestrians")
+			{
+				if((not dynamic_cast<Pedestrian<SteerVehicle>*>(vehicle)) and
+				(not dynamic_cast<ExternalPedestrian<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
+			else if (openSteerPlugInName == "Boids")
+			{
+				if((not dynamic_cast<Boid<SteerVehicle>*>(vehicle)) and
+				(not dynamic_cast<ExternalBoid<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
+			else
+			{
+				return;
+			}
 			//try to remove this SteerVehicle from this SteerPlugIn
 			if(steerPlugIn->removeSteerVehicle(DCAST(SteerVehicle, aiComp))
-					== SteerPlugIn::Result::OK)
+			== SteerPlugIn::Result::OK)
 			{
 				//the SteerVehicle belonged to this SteerPlugIn:
 				//remove actually the clone

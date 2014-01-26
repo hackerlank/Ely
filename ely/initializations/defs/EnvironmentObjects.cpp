@@ -24,6 +24,7 @@
 #include "../common_configs.h"
 #include "AIComponents/NavMesh.h"
 #include "AIComponents/SteerPlugIn.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
@@ -35,6 +36,7 @@ extern "C"
 
 INITIALIZATION Terrain1_initialization;
 INITIALIZATION course2_initialization;
+INITIALIZATION steerPlugInBoid1_initialization;
 
 #ifdef __cplusplus
 }
@@ -103,6 +105,29 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 			PRINT_ERR_DEBUG("Error: navMeshSetup()");
 		}
 	}
+}
+
+///steerPlugInBoid1
+#define WORLDCENTEROBJECT "beachhouse2_1"
+void steerPlugInBoid1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//tweak some parameter
+	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
+
+	//set world center/radius around WORLDCENTEROBJECT
+	NodePath worldCenterObjectNP = ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject(ObjectId(WORLDCENTEROBJECT))->getNodePath();
+	LVecBase3f modelDims;
+	LVector3f modelDeltaCenter;
+	float modelRadius;
+	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+			worldCenterObjectNP, modelDims, modelDeltaCenter, modelRadius);
+	BoidsPlugIn<SteerVehicle>* boidsPlugIn = dynamic_cast<BoidsPlugIn<SteerVehicle>*>
+		(&DCAST(SteerPlugIn, aiComp)->getAbstractPlugIn());
+	boidsPlugIn->worldCenter = LVecBase3fToOpenSteerVec3(
+			worldCenterObjectNP.get_pos() + LVector3f(0.0, 0.0, 1.5 * modelDims.get_z()));
+	boidsPlugIn->worldRadius = 1.5 * modelDims.get_z();
 }
 
 ///init/end

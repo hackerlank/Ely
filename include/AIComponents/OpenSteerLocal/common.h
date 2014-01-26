@@ -357,11 +357,24 @@ public:
 	virtual ~PlugInAddOnMixin()
 	{
 		delete m_pathway;
-		OpenSteer::ObstacleIterator iter;
-		for (iter = m_obstacles.begin(); iter != m_obstacles.end(); ++iter)
+		//remove all local obstacles
+		OpenSteer::ObstacleIterator iterLocal;
+		for (iterLocal = m_localObstacles.begin();
+				iterLocal != m_localObstacles.end(); ++iterLocal)
 		{
-			delete *iter;
+			//find in global obstacles and remove it
+			OpenSteer::ObstacleGroup::iterator iter = std::find(
+					m_obstacles.begin(), m_obstacles.end(), *iterLocal);
+			if (iter != m_obstacles.end())
+			{
+				//remove from global obstacles
+				m_obstacles.erase(iter);
+			}
+			//delete obstacle
+			delete *iterLocal;
 		}
+		//clear local obstacles
+		m_localObstacles.clear();
 	}
 
 	virtual void addVehicle(OpenSteer::AbstractVehicle* vehicle)
@@ -494,9 +507,34 @@ public:
 		//store obstacle
 		if (obstacle)
 		{
-			m_obstacles.push_back(obstacle);
+			//add to local obstacles
+			m_localObstacles.push_back(obstacle);
+			//add to global obstacles
+			m_obstacles.push_back(*m_localObstacles.rbegin());
 		}
 		return obstacle;
+	}
+
+	void removeObstacle(OpenSteer::AbstractObstacle* obstacle)
+	{
+		//remove only if obstacle is local
+		OpenSteer::ObstacleGroup::iterator iterLocal = std::find(
+				m_localObstacles.begin(), m_localObstacles.end(), obstacle);
+		if (iterLocal != m_localObstacles.end())
+		{
+			//find in global obstacles and remove it
+			OpenSteer::ObstacleGroup::iterator iter = std::find(
+					m_obstacles.begin(), m_obstacles.end(), *iterLocal);
+			if (iter != m_obstacles.end())
+			{
+				//remove from global obstacles
+				m_obstacles.erase(iter);
+			}
+			//delete obstacle
+			delete *iterLocal;
+			//remove from local obstacles
+			m_localObstacles.erase(iterLocal);
+		}
 	}
 
 protected:
@@ -506,9 +544,14 @@ protected:
 	OpenSteer::Pathway* m_pathway;
 	///The pathway endpoints.
 	OpenSteer::Vec3 pathEndpoint0, pathEndpoint1;
-	///The obstacles handled by this plugin.
-	OpenSteer::ObstacleGroup m_obstacles;
+	///The global obstacles handled by all plugins.
+	static OpenSteer::ObstacleGroup m_obstacles;
+	///The obstacles handled by this plugins.
+	OpenSteer::ObstacleGroup m_localObstacles;
 };
+
+//static definition
+template<typename Super> OpenSteer::ObstacleGroup PlugInAddOnMixin<Super>::m_obstacles;
 
 //common typedef
 typedef PlugInAddOnMixin<OpenSteer::PlugIn> PlugIn;

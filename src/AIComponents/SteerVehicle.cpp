@@ -25,6 +25,7 @@
 #include "AIComponents/SteerPlugIn.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -86,12 +87,15 @@ bool SteerVehicle::initialize()
 				mVehicle = new Pedestrian<SteerVehicle> :
 				mVehicle = new ExternalPedestrian<SteerVehicle>;
 	}
-	else if (param == std::string(""))
+	else if (param == std::string("boid"))
 	{
+		not mExternalUpdate ?
+				mVehicle = new Boid<SteerVehicle> :
+				mVehicle = new ExternalBoid<SteerVehicle>;
 	}
 	else
 	{
-		//default: OneTurning
+		//default: one_turning
 		not mExternalUpdate ?
 				mVehicle = new OneTurning<SteerVehicle> :
 				mVehicle = new ExternalOneTurning<SteerVehicle>;

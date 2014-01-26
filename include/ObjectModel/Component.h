@@ -74,15 +74,16 @@ class ComponentTemplate;
  * are defined: this means that, by default, all Components of the same type
  * (belonging to any Object of that type), will respond to the same event value
  * with the same callback function.\n
- * Both the event value and the callback function can be overridden by parameters
- * on a "per Object basis".\n
+ * Any event can be ignored on a "per Object basis" by not specifying it in
+ * parameters. Moreover, both the event value and the callback function
+ * can be overridden by parameters on a "per Object basis".\n
  * The callback functions are loaded at runtime from a dynamic linked library
  * (\see GameManager::GameDataInfo::CALLBACKS).\n
  * If a callback function doesn't exist or if any error occurs, the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
  * To check if a "name" is an allowed event type call:
  * \code
- * 	ObjectTemplateManager::isComponentParameter();
+ * 	ObjectTemplate::isComponentParameter();
  * \endcode
  *
  * XML Param(s):

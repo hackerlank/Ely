@@ -25,6 +25,7 @@
 #include "AIComponents/SteerPlugInTemplate.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -81,8 +82,9 @@ void SteerPlugIn::onAddToObjectSetup()
 	{
 		mPlugIn = new PedestrianPlugIn<SteerVehicle>;
 	}
-	else if (mPlugInTypeParam == std::string(""))
+	else if (mPlugInTypeParam == std::string("boid"))
 	{
+		mPlugIn = new BoidsPlugIn<SteerVehicle>;
 	}
 	else
 	{

@@ -87,25 +87,7 @@ AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
 void Component::doSetupEventTables()
 {
 	std::list<std::string>::const_iterator iter;
-	//fill up event tables with event values == event type,
-	//callbackName == empty string and callback function == NULL
-	std::list<std::string> eventTypes =
-			mOwnerObject->objectTmpl()->componentParameterValues(
-					std::string("event_types"), componentType());
-	for (iter = eventTypes.begin(); iter != eventTypes.end(); ++iter)
-	{
-		//a valid event type must be not empty
-		if (not iter->empty())
-		{
-			//insert event keyed by eventType;
-			mEventTable[*iter] = *iter;
-			//insert eventType keyed by event;
-			mEventTypeTable[*iter] = *iter;
-			//insert the <callbackName,NULL> pair keyed by eventType;
-			mCallbackTable[*iter] = NameCallbackPair(std::string(""), NULL);
-		}
-	}
-	//override event values and callback functions on a per Object basis
+	//get events specifications on a per Object basis
 	std::list<std::string> eventList = mTmpl->parameterList(
 			std::string("events"));
 	for (iter = eventList.begin(); iter != eventList.end(); ++iter)
@@ -118,7 +100,7 @@ void Component::doSetupEventTables()
 		//check if there is (at least) a pair
 		if (typeValuesCallback.size() >= 2)
 		{
-			//set the callback name as the second element (could be empty)
+			//set the callback name as the second element, that could be empty string
 			std::string callbackName = typeValuesCallback[1];
 			//parse first element as (evType,evValue) pair list
 			std::vector<std::string> typeValues = parseCompoundString(
@@ -130,26 +112,23 @@ void Component::doSetupEventTables()
 				//get event type and event value
 				std::vector<std::string> typeValue = parseCompoundString(
 						*iterTypeValue, '@');
-				//check if there is (at least) a pair
-				if (typeValue.size() >= 2)
+				//check in order:
+				//- if there is (at least) a pair and
+				//- if there is a valid "event type" (== typeValue[0]) and
+				//- if there is non empty "event value" (== typeValue[1])
+				if ((typeValue.size() >= 2)
+						and (mOwnerObject->objectTmpl()->isComponentParameterValue(
+								"event_types", typeValue[0], componentType()))
+						and (not typeValue[1].empty()))
 				{
-					//insert only if it is a valid event type (== typeValue[0])
-					if (mEventTable.find(typeValue[0]) != mEventTable.end())
-					{
-						//change only non empty event value (== typeValue[1])
-						if (not typeValue[1].empty())
-						{
-							//insert event keyed by eventType;
-							mEventTable[typeValue[0]] = typeValue[1];
-							//insert eventType keyed by event;
-							mEventTypeTable[typeValue[1]] = typeValue[0];
-						}
-						//insert the <callbackName,NULL> pair keyed by eventType;
-						mCallbackTable[typeValue[0]] = NameCallbackPair(
-								callbackName, NULL);
-					}
+					//insert event keyed by eventType;
+					mEventTable[typeValue[0]] = typeValue[1];
+					//insert eventType keyed by event;
+					mEventTypeTable[typeValue[1]] = typeValue[0];
+					//insert the <callbackName,NULL> pair keyed by eventType;
+					mCallbackTable[typeValue[0]] = NameCallbackPair(
+							callbackName, NULL);
 				}
-
 			}
 		}
 	}

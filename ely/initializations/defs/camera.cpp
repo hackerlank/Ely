@@ -44,6 +44,24 @@ bool controlGrabbed = false;
 
 namespace
 {
+//common text writing
+NodePath textNode;
+void writeText(const std::string& text, float scale,
+		const LVecBase4& color, const LVector3f& location)
+{
+	textNode = NodePath(new TextNode("CommonTextNode"));
+	textNode.reparent_to(ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject(ObjectId("render2d"))->getNodePath());
+	textNode.set_bin("fixed", 50);
+	textNode.set_depth_write(false);
+	textNode.set_depth_test(false);
+	textNode.set_billboard_point_eye();
+	DCAST(TextNode, textNode.node())->set_text(text);
+	textNode.set_scale(scale);
+	textNode.set_color(color);
+	textNode.set_pos(location);
+}
+
 void toggleCameraControl(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera = reinterpret_cast<Object*>(data);
@@ -75,6 +93,8 @@ void toggleCameraControl(const Event* event, void* data)
 
 			//
 			controlGrabbed = false;
+			//remove text
+			textNode.remove_node();
 		}
 		else if (not controlGrabbed)
 		{
@@ -89,8 +109,10 @@ void toggleCameraControl(const Event* event, void* data)
 			RETURN_ON_COND(cameraControl->enable() != Driver::Result::OK,)
 			//
 			controlGrabbed = true;
+			//write text
+			writeText("Free View Camera", 0.05,
+					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 		}
-
 	}
 	else if (compControl->is_of_type(Chaser::get_class_type()))
 	{
@@ -116,6 +138,8 @@ void toggleCameraControl(const Event* event, void* data)
 
 			//
 			controlGrabbed = false;
+			//remove text
+			textNode.remove_node();
 		}
 		else if (not controlGrabbed)
 		{
@@ -130,6 +154,9 @@ void toggleCameraControl(const Event* event, void* data)
 			RETURN_ON_COND(cameraControl->enable() != Chaser::Result::OK,)
 			//
 			controlGrabbed = true;
+			//write text
+			writeText("Camera Chasing " + cameraControl->getChasedObject(), 0.05,
+					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 		}
 	}
 }
@@ -142,6 +169,8 @@ void togglePicker(const Event* event, void* data)
 		delete Picker::GetSingletonPtr();
 		//
 		controlGrabbed = false;
+		//remove text
+		textNode.remove_node();
 	}
 	else if (not controlGrabbed)
 	{
@@ -151,6 +180,9 @@ void togglePicker(const Event* event, void* data)
 				"shift-mouse1", "mouse1-up");
 		//
 		controlGrabbed = true;
+		//write text
+		writeText("Object Picker Active", 0.05,
+				LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 	}
 }
 
