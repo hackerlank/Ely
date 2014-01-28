@@ -592,8 +592,8 @@ public:
 
 		// draw obstacles
 		ObstacleIterator iterObstacle;
-		for (iterObstacle = m_localObstacles.begin();
-				iterObstacle != m_localObstacles.end(); ++iterObstacle)
+		for (iterObstacle = localObstacles->begin();
+				iterObstacle != localObstacles->end(); ++iterObstacle)
 		{
 			(*iterObstacle)->draw(false, Color(0, 0, 0),
 					Vec3(0, 0, 0));
@@ -694,7 +694,7 @@ public:
 			pedestrian->pathEndpoint0 = pathEndpoint0;
 			pedestrian->pathEndpoint1 = pathEndpoint1;
 			//set obstacles
-			pedestrian->obstacles = &m_obstacles;
+			pedestrian->obstacles = obstacles;
 			//set neighbors
 			pedestrian->neighbors = &neighbors;
 		}

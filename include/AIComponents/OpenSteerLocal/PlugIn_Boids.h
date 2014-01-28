@@ -623,7 +623,7 @@ public:
 			// notify proximity database that our position has changed
 			boid->proximityToken->updateForNewPosition(boid->position());
 			//set obstacles
-			boid->obstacles = &m_obstacles;
+			boid->obstacles = obstacles;
 			//set neighbors
 			boid->neighbors = &neighbors;
 		}
@@ -689,8 +689,8 @@ public:
 	{
 		// draw obstacles
 		ObstacleIterator iterObstacle;
-		for (iterObstacle = m_localObstacles.begin();
-				iterObstacle != m_localObstacles.end(); ++iterObstacle)
+		for (iterObstacle = localObstacles->begin();
+				iterObstacle != localObstacles->end(); ++iterObstacle)
 		{
 			(*iterObstacle)->draw(false, Color(0, 0, 0), Vec3(0, 0, 0));
 		}

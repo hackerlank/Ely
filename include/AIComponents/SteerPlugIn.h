@@ -26,6 +26,7 @@
 #include "ObjectModel/Component.h"
 #include "SteerVehicle.h"
 #include <OpenSteer/PlugIn.h>
+#include <conditionVar.h>
 
 namespace ely
 {
@@ -103,6 +104,53 @@ public:
 	Result removeSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle);
 
 	/**
+	 * \brief Sets the pathway of this SteerPlugin.
+	 * @param numOfPoints Number of points.
+	 * @param points Points' vector.
+	 * @param singleRadius Single radius flag.
+	 * @param radii Radii' vector.
+	 * @param closedCycle Closed cycle flag.
+	 */
+	void setPathway(int numOfPoints, LPoint3f const points[], bool singleRadius,
+			float const radii[], bool closedCycle);
+
+	/**
+	 * \brief Adds an OpenSteer obstacle, seen by all SteerPlugins.
+	 *
+	 * If the object parameter is not NULL,
+	 * @param object The Object used as obstacle.
+	 * @param type The obstacle type: box, plane, rectangle, sphere.
+	 * @param width Obstacle's width (box, rectangle).
+	 * @param height Obstacle's height (box, rectangle).
+	 * @param depth Obstacle's depth (box).
+	 * @param radius Obstacle's radius (sphere).
+	 * @param side Obstacle's right side direction.
+	 * @param up Obstacle's up direction.
+	 * @param forward Obstacle's forward direction.
+	 * @param position Obstacle's position.
+	 * @param seenFromState Possible values: outside, inside, both.
+	 * @return
+	 */
+	OpenSteer::AbstractObstacle* addObstacle(SMARTPTR(Object) object,
+			const std::string& type, const std::string& seenFromState,
+			float width = 0.0, float height = 0.0, float depth = 0.0,
+			float radius = 0.0, const LVector3f& side = LVector3f::zero(),
+			const LVector3f& up = LVector3f::zero(), const LVector3f& = LVector3f::zero(),
+			const LPoint3f& position = LPoint3f::zero());
+
+	/**
+	 * \brief Removes an OpenSteer obstacle, seen by all plugins.
+	 * @param obstacle The obstacle to remove.
+	 */
+	void removeObstacle(OpenSteer::AbstractObstacle* obstacle);
+
+	/**
+	 * \brief Gets the obstacles, seen by all plugins.
+	 * @return The obstacles.
+	 */
+	OpenSteer::ObstacleGroup getObstacles();
+
+	/**
 	 * \brief Updates OpenSteer underlying component.
 	 *
 	 * Will be called automatically by an ai manager update.
@@ -136,6 +184,14 @@ public:
 	Result debug(bool enable);
 #endif
 
+#ifdef ELY_THREAD
+	/**
+	 * \brief Get the Obstacles member reference mutex.
+	 * @return The Obstacles mutex.
+	 */
+	Mutex& getObstaclesMutex();
+#endif
+
 private:
 	///Current underlying AbstractPlugIn.
 	OpenSteer::AbstractPlugIn* mPlugIn;
@@ -150,6 +206,11 @@ private:
 
 	///The SteerVehicle components handled by this SteerPlugIn.
 	std::set<SMARTPTR(SteerVehicle)> mSteerVehicles;
+
+	///The global obstacles handled by all SteerPlugIns.
+	static OpenSteer::ObstacleGroup mObstacles;
+	///The local obstacles handled by this SteerPlugIn.
+	OpenSteer::ObstacleGroup mLocalObstacles;
 
 	/**
 	 * \name Helpers variables/functions.
@@ -170,6 +231,15 @@ private:
 	DrawMeshDrawer *mDrawer3d, *mDrawer2d;
 	///Enable Debug Draw update.
 	bool mEnableDebugDrawUpdate;
+#endif
+
+#ifdef ELY_THREAD
+	///Protect Obstacles reference members (mObstacles, mLocalObstacles).
+	///During updates Obstacles are only read, so add/removeObstacle
+	///must wait until no update is active.
+	static Mutex mObstaclesMutex;
+	static ConditionVar mObstaclesVar;
+	static unsigned int mUpdateCounter;
 #endif
 
 	///TypedObject semantics: hardcoded
@@ -219,6 +289,14 @@ inline void SteerPlugIn::reset()
 #endif
 }
 
+inline OpenSteer::ObstacleGroup SteerPlugIn::getObstacles()
+{
+	//lock (guard) the obstacles' mutex
+	HOLD_MUTEX(mObstaclesMutex)
+
+	return mObstacles;
+}
+
 inline OpenSteer::AbstractPlugIn& SteerPlugIn::getAbstractPlugIn()
 {
 	return *mPlugIn;
@@ -244,6 +322,13 @@ inline NodePath SteerPlugIn::getDrawer2dDebugNodePath() const
 	HOLD_REMUTEX(mMutex)
 
 	return mDrawer2dNP;
+}
+#endif
+
+#ifdef ELY_THREAD
+inline Mutex& SteerPlugIn::getObstaclesMutex()
+{
+	return mObstaclesMutex;
 }
 #endif
 

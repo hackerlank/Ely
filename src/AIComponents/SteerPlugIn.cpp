@@ -232,103 +232,22 @@ inline void SteerPlugIn::doBuildPathway()
 				radii, closedCycle);
 		delete[] radii;
 	}
-}
-
-inline void SteerPlugIn::doAddObstacles()
-{
-	//
-	std::vector<std::string> paramValues1Str, paramValues2Str;
-	//add obstacles
-	std::list<std::string>::iterator iterList;
-	for (iterList = mObstacleListParam.begin();
-			iterList != mObstacleListParam.end(); ++iterList)
-	{
-		//any "obstacles" string is a "compound" one, i.e. could have the form:
-		// "objectId1@shape1@seenFromState1:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN"
-		paramValues1Str = parseCompoundString(*iterList, ':');
-		std::vector<std::string>::const_iterator iter;
-		for (iter = paramValues1Str.begin(); iter != paramValues1Str.end();
-				++iter)
-		{
-			//any obstacle string should have the form: "objectId@shape@seenFromState"
-			paramValues2Str = parseCompoundString(*iter, '@');
-			if (paramValues2Str.size() != 3)
-			{
-				continue;
-			}
-			//get obstacle object
-			SMARTPTR(Object)obstacleObject =
-			ObjectTemplateManager::GetSingleton().getCreatedObject(
-					paramValues2Str[0]);
-			if (not obstacleObject)
-			{
-				continue;
-			}
-			//get obstacle dimensions wrt the Model or InstanceOf component (if any)
-			NodePath obstacleNP;
-			SMARTPTR(Model) model = DCAST(Model, obstacleObject->getComponent("Scene"));
-			if(model)
-			{
-				obstacleNP = NodePath(model->getNodePath().node());
-			}
-			else
-			{
-				SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, obstacleObject->getComponent("Scene"));
-				if(instanceOf)
-				{
-					obstacleNP = NodePath(instanceOf->getNodePath().node());
-				}
-				else
-				{
-					//no Scene component
-					continue;
-				}
-			}
-			LVecBase3f modelDims;
-			LVector3f modelDeltaCenter;
-			float modelRadius;
-			GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
-					obstacleNP, modelDims, modelDeltaCenter, modelRadius);
-			//get obstacle position/orientation (wrt reference node path)
-			LPoint3f position = obstacleNP.get_pos(mReferenceNP) - modelDeltaCenter;
-			LVector3f forward = mReferenceNP.get_relative_vector(obstacleNP,
-					LVector3f::forward());
-			LVector3f up = mReferenceNP.get_relative_vector(obstacleNP,
-					LVector3f::up());
-			LVector3f side = mReferenceNP.get_relative_vector(obstacleNP,
-					LVector3f::right());
-			//get seenFromState (default = both)
-			OpenSteer::AbstractObstacle::seenFromState seenFromState;
-			if (paramValues2Str[2] == std::string("outside"))
-			{
-				seenFromState = OpenSteer::AbstractObstacle::outside;
-			}
-			else if (paramValues2Str[2] == std::string("inside"))
-			{
-				seenFromState = OpenSteer::AbstractObstacle::inside;
-			}
-			else
-			{
-				seenFromState = OpenSteer::AbstractObstacle::both;
-			}
-			//add the obstacle
-			dynamic_cast<PlugIn*>(mPlugIn)->addObstacle(paramValues2Str[1],
-					modelDims.get_x(), modelDims.get_z(), modelDims.get_y(),
-					modelRadius, LVecBase3fToOpenSteerVec3(side),
-					LVecBase3fToOpenSteerVec3(up),
-					LVecBase3fToOpenSteerVec3(forward),
-					LVecBase3fToOpenSteerVec3(position), seenFromState);
-		}
-	}
+	delete[] points;
 }
 
 void SteerPlugIn::onAddToSceneSetup()
 {
 	//set mOwnerObject's parent node path as reference
 	mReferenceNP = mOwnerObject->getNodePath().get_parent();
+
 	//build pathway
 	doBuildPathway();
-	//add obstacles
+
+	//set the plugin local obstacles reference
+	dynamic_cast<PlugIn*>(mPlugIn)->localObstacles = &mLocalObstacles;
+	//set the plugin global obstacles reference
+	dynamic_cast<PlugIn*>(mPlugIn)->obstacles = &mObstacles;
+	//add its own obstacles
 	if (not mReferenceNP.is_empty())
 	{
 		doAddObstacles();
@@ -374,6 +293,37 @@ void SteerPlugIn::onRemoveFromSceneCleanup()
 {
 	//remove from AI manager update
 	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+
+#ifdef ELY_THREAD
+	//lock (guard) the obstacles' mutex
+	HOLD_MUTEX(mObstaclesMutex)
+
+	//check condition var
+	while (mUpdateCounter > 0)
+	{
+		//there are updates: wait
+		mObstaclesVar.wait();
+	}
+#endif
+
+	//remove all local obstacles
+	OpenSteer::ObstacleGroup::iterator iterLocal;
+	for (iterLocal = mLocalObstacles.begin();
+			iterLocal != mLocalObstacles.end(); ++iterLocal)
+	{
+		//find in global obstacles and remove it
+		OpenSteer::ObstacleGroup::iterator iter = std::find(mObstacles.begin(),
+				mObstacles.end(), *iterLocal);
+		if (iter != mObstacles.end())
+		{
+			//remove from global obstacles
+			mObstacles.erase(iter);
+		}
+		//delete obstacle
+		delete *iterLocal;
+	}
+	//clear local obstacles
+	mLocalObstacles.clear();
 }
 
 typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
@@ -470,6 +420,214 @@ SteerPlugIn::Result SteerPlugIn::removeSteerVehicle(SMARTPTR(SteerVehicle)steerV
 	return Result::OK;
 }
 
+void SteerPlugIn::setPathway(int numOfPoints, LPoint3f const points[],
+		bool singleRadius, float const radii[], bool closedCycle)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//convert to OpenSteer points
+	OpenSteer::Vec3* osPoints = new OpenSteer::Vec3[numOfPoints];
+	for (int idx = 0; idx < numOfPoints; ++idx)
+	{
+		osPoints[idx] = LVecBase3fToOpenSteerVec3(points[idx]);
+	}
+	//set pathway actually
+	dynamic_cast<PlugIn*>(mPlugIn)->setPathway(numOfPoints, osPoints, true,
+			radii, closedCycle);
+	//
+	delete[] osPoints;
+}
+
+
+void SteerPlugIn::doAddObstacles()
+{
+	//
+	std::vector<std::string> paramValues1Str, paramValues2Str;
+	//add obstacles
+	std::list<std::string>::iterator iterList;
+	for (iterList = mObstacleListParam.begin();
+			iterList != mObstacleListParam.end(); ++iterList)
+	{
+		//any "obstacles" string is a "compound" one, i.e. could have the form:
+		// "objectId1@shape1@seenFromState1:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN"
+		paramValues1Str = parseCompoundString(*iterList, ':');
+		std::vector<std::string>::const_iterator iter;
+		for (iter = paramValues1Str.begin(); iter != paramValues1Str.end();
+				++iter)
+		{
+			//any obstacle string must have the form:
+			//"objectId@shape@seenFromState"
+			paramValues2Str = parseCompoundString(*iter, '@');
+			if (paramValues2Str.size() < 3)
+			{
+				continue;
+			}
+			//get obstacle object
+			SMARTPTR(Object)obstacleObject =
+			ObjectTemplateManager::GetSingleton().getCreatedObject(
+					paramValues2Str[0]);
+			if (not obstacleObject)
+			{
+				continue;
+			}
+			//add the obstacle
+			addObstacle(obstacleObject, paramValues2Str[1], paramValues2Str[2]);
+		}
+	}
+}
+
+OpenSteer::AbstractObstacle* SteerPlugIn::addObstacle(SMARTPTR(Object) object,
+		const std::string& type, const std::string& seenFromState,
+		float width, float height,	float depth,
+		float radius, const LVector3f& side, const LVector3f& up,
+		const LVector3f& forward, const LPoint3f& position)
+{
+#ifdef ELY_THREAD
+	//lock (guard) the obstacles' mutex
+	HOLD_MUTEX(mObstaclesMutex)
+
+	//check condition var
+	while (mUpdateCounter > 0)
+	{
+		//there are some "updating": wait
+		mObstaclesVar.wait();
+	}
+#endif
+
+	LPoint3f newPos = position;
+	LVector3f newSide = side, newUp = up, newForw = forward;
+	if (object)
+	{
+		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
+		NodePath obstacleNP;
+		SMARTPTR(Model) model = DCAST(Model, object->getComponent("Scene"));
+		if(model)
+		{
+			obstacleNP = NodePath(model->getNodePath().node());
+		}
+		else
+		{
+			SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, object->getComponent("Scene"));
+			if(instanceOf)
+			{
+				obstacleNP = NodePath(instanceOf->getNodePath().node());
+			}
+			else
+			{
+				//no Scene component
+				return NULL;
+			}
+		}
+		//get object dimensions
+		LVecBase3f modelDims;
+		LVector3f modelDeltaCenter;
+		float modelRadius;
+		GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+		obstacleNP, modelDims, modelDeltaCenter, modelRadius);
+		//correct obstacle's parameters
+		newPos = obstacleNP.get_pos(mReferenceNP) - modelDeltaCenter;
+		newForw = mReferenceNP.get_relative_vector(obstacleNP, LVector3f::forward());
+		newUp = mReferenceNP.get_relative_vector(obstacleNP, LVector3f::up());
+		newSide = mReferenceNP.get_relative_vector(obstacleNP, LVector3f::right());
+		width = modelDims.get_x();
+		height = modelDims.get_z();
+		depth = modelDims.get_y();
+		radius = modelRadius;
+	}
+	//set seen from state
+	OpenSteer::AbstractObstacle::seenFromState seenFS;
+	if (seenFromState == "outside")
+	{
+		seenFS = OpenSteer::AbstractObstacle::outside;
+	}
+	else if(seenFromState == "inside")
+	{
+		seenFS = OpenSteer::AbstractObstacle::inside;
+	}
+	else
+	{
+		//default: both
+		seenFS = OpenSteer::AbstractObstacle::both;
+	}
+	///create actually the obstacle
+	OpenSteer::AbstractObstacle* obstacle = NULL;
+	if (type == std::string("box"))
+	{
+		BoxObstacle* box = new BoxObstacle(width, height, depth);
+		obstacle = box;
+		box->setSide(LVecBase3fToOpenSteerVec3(newSide).normalize());
+		box->setUp(LVecBase3fToOpenSteerVec3(newUp).normalize());
+		box->setForward(LVecBase3fToOpenSteerVec3(newForw).normalize());
+		box->setPosition(LVecBase3fToOpenSteerVec3(newPos));
+		obstacle->setSeenFrom(seenFS);
+	}
+	if (type == std::string("plane"))
+	{
+		obstacle = new PlaneObstacle(LVecBase3fToOpenSteerVec3(newSide).normalize(),
+		LVecBase3fToOpenSteerVec3(newUp).normalize(),
+		LVecBase3fToOpenSteerVec3(newForw).normalize(),
+		LVecBase3fToOpenSteerVec3(newPos));
+		obstacle->setSeenFrom(seenFS);
+	}
+	if (type == std::string("rectangle"))
+	{
+		obstacle = new RectangleObstacle(width, height,
+		LVecBase3fToOpenSteerVec3(newSide).normalize(),
+		LVecBase3fToOpenSteerVec3(newUp).normalize(),
+		LVecBase3fToOpenSteerVec3(newForw).normalize(),
+		LVecBase3fToOpenSteerVec3(newPos), seenFS);
+	}
+	if (type == std::string("sphere"))
+	{
+		obstacle = new SphereObstacle(radius, LVecBase3fToOpenSteerVec3(newPos));
+		obstacle->setSeenFrom(seenFS);
+	}
+	//store obstacle
+	if (obstacle)
+	{
+		//add to local obstacles
+		mLocalObstacles.push_back(obstacle);
+		//add to global obstacles
+		mObstacles.push_back(obstacle);
+	}
+	return obstacle;
+}
+
+void SteerPlugIn::removeObstacle(OpenSteer::AbstractObstacle* obstacle)
+{
+#ifdef ELY_THREAD
+	//lock (guard) the obstacles' mutex
+	HOLD_MUTEX(mObstaclesMutex)
+
+	//check condition var
+	while (mUpdateCounter > 0)
+	{
+		//there are updates: wait
+		mObstaclesVar.wait();
+	}
+#endif
+
+	//remove only if obstacle is local
+	OpenSteer::ObstacleGroup::iterator iterLocal = std::find(
+			mLocalObstacles.begin(), mLocalObstacles.end(), obstacle);
+	if (iterLocal != mLocalObstacles.end())
+	{
+		//find in global obstacles and remove it
+		OpenSteer::ObstacleGroup::iterator iter = std::find(
+				mObstacles.begin(), mObstacles.end(), *iterLocal);
+		if (iter != mObstacles.end())
+		{
+			//remove from global obstacles
+			mObstacles.erase(iter);
+		}
+		//delete obstacle
+		delete *iterLocal;
+		//remove from local obstacles
+		mLocalObstacles.erase(iterLocal);
+	}
+}
+
 void SteerPlugIn::update(void* data)
 {
 	//lock (guard) the mutex
@@ -484,21 +642,31 @@ void SteerPlugIn::update(void* data)
 	dt = 0.016666667; //60 fps
 #endif
 
-#ifdef ELY_DEBUG
+#ifdef ELY_THREAD
 	{
-		//lock (guard) the Drawers' mutex
-		HOLD_REMUTEX(gOpenSteerDebugMutex)
+		//lock (guard) the obstacles' mutex
+		HOLD_MUTEX(mObstaclesMutex)
 
-		if (mEnableDebugDrawUpdate)
+		//start this update and increment counter
+		++mUpdateCounter;
+	}
+#endif
+
+#ifdef ELY_DEBUG
 		{
-			//unset enableAnnotation
-			enableAnnotation = true;
+			//lock (guard) the Drawers' mutex
+			HOLD_REMUTEX(gOpenSteerDebugMutex)
 
-			//set drawers
-			mDrawer3d->reset();
-			mDrawer2d->reset();
-			gDrawer3d = mDrawer3d;
-			gDrawer2d = mDrawer2d;
+			if (mEnableDebugDrawUpdate)
+			{
+				//unset enableAnnotation
+				enableAnnotation = true;
+
+				//set drawers
+				mDrawer3d->reset();
+				mDrawer2d->reset();
+				gDrawer3d = mDrawer3d;
+				gDrawer2d = mDrawer2d;
 
 //			// service queued reset request, if any
 //			if (OpenSteer::gDelayedResetPlugInXXX)
@@ -507,19 +675,19 @@ void SteerPlugIn::update(void* data)
 //				OpenSteer::gDelayedResetPlugInXXX = false;
 //			}
 
-			// invoke PlugIn's Update method
-			mPlugIn->update(mCurrentTime, dt);
+				// invoke PlugIn's Update method
+				mPlugIn->update(mCurrentTime, dt);
 
-			// invoke selected PlugIn's Redraw method
-			mPlugIn->redraw(mCurrentTime, dt);
-			// draw any annotation queued up during selected PlugIn's Update method
-			OpenSteer::drawAllDeferredLines();
-			OpenSteer::drawAllDeferredCirclesOrDisks();
-		}
-		else
-		{
-			//unset enableAnnotation
-			enableAnnotation = false;
+				// invoke selected PlugIn's Redraw method
+				mPlugIn->redraw(mCurrentTime, dt);
+				// draw any annotation queued up during selected PlugIn's Update method
+				OpenSteer::drawAllDeferredLines();
+				OpenSteer::drawAllDeferredCirclesOrDisks();
+			}
+			else
+			{
+				//unset enableAnnotation
+				enableAnnotation = false;
 #endif
 
 //			// service queued reset request, if any
@@ -529,11 +697,23 @@ void SteerPlugIn::update(void* data)
 //				OpenSteer::gDelayedResetPlugInXXX = false;
 //			}
 
-			// invoke PlugIn's Update method
-			mPlugIn->update(mCurrentTime, dt);
+				// invoke PlugIn's Update method
+				mPlugIn->update(mCurrentTime, dt);
 
 #ifdef ELY_DEBUG
+			}
 		}
+#endif
+
+#ifdef ELY_THREAD
+	{
+		//lock (guard) the obstacles' mutex
+		HOLD_MUTEX(mObstaclesMutex)
+
+		//decrements update counter
+		--mUpdateCounter;
+		//notify some thread this update is complete
+		mObstaclesVar.notify();
 	}
 #endif
 }
@@ -581,6 +761,14 @@ SteerPlugIn::Result SteerPlugIn::debug(bool enable)
 	//
 	return Result::OK;
 }
+#endif
+
+//defines static members
+OpenSteer::ObstacleGroup SteerPlugIn::mObstacles;
+#ifdef ELY_THREAD
+Mutex SteerPlugIn::mObstaclesMutex;
+ConditionVar SteerPlugIn::mObstaclesVar(mObstaclesMutex);
+unsigned int SteerPlugIn::mUpdateCounter = 0;
 #endif
 
 //TypedObject semantics: hardcoded

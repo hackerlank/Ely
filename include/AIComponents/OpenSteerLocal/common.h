@@ -351,30 +351,11 @@ public:
 	PlugInAddOnMixin() :
 			selectedVehicle(NULL), m_pathway(NULL)
 	{
-		m_obstacles.clear();
 	}
 
 	virtual ~PlugInAddOnMixin()
 	{
 		delete m_pathway;
-		//remove all local obstacles
-		OpenSteer::ObstacleIterator iterLocal;
-		for (iterLocal = m_localObstacles.begin();
-				iterLocal != m_localObstacles.end(); ++iterLocal)
-		{
-			//find in global obstacles and remove it
-			OpenSteer::ObstacleGroup::iterator iter = std::find(
-					m_obstacles.begin(), m_obstacles.end(), *iterLocal);
-			if (iter != m_obstacles.end())
-			{
-				//remove from global obstacles
-				m_obstacles.erase(iter);
-			}
-			//delete obstacle
-			delete *iterLocal;
-		}
-		//clear local obstacles
-		m_localObstacles.clear();
 	}
 
 	virtual void addVehicle(OpenSteer::AbstractVehicle* vehicle)
@@ -465,77 +446,10 @@ public:
 		pathEndpoint1 = points[numOfPoints - 1];
 	}
 
-	OpenSteer::ObstacleGroup getObstacles()
-	{
-		return m_obstacles;
-	}
-
-	OpenSteer::AbstractObstacle* addObstacle(const std::string& type,
-			float width, float height, float depth, float radius,
-			const OpenSteer::Vec3& side, const OpenSteer::Vec3& up,
-			const OpenSteer::Vec3& forward, const OpenSteer::Vec3& position,
-			OpenSteer::AbstractObstacle::seenFromState seenFromState)
-	{
-		OpenSteer::AbstractObstacle* obstacle = NULL;
-		if (type == std::string("box"))
-		{
-			BoxObstacle* box = new BoxObstacle(width, height, depth);
-			obstacle = box;
-			box->setSide(side.normalize());
-			box->setUp(up.normalize());
-			box->setForward(forward.normalize());
-			box->setPosition(position);
-			obstacle->setSeenFrom(seenFromState);
-		}
-		if (type == std::string("plane"))
-		{
-			obstacle = new PlaneObstacle(side.normalize(), up.normalize(),
-					forward.normalize(), position);
-			obstacle->setSeenFrom(seenFromState);
-		}
-		if (type == std::string("rectangle"))
-		{
-			obstacle = new RectangleObstacle(width, height, side.normalize(),
-					up.normalize(), forward.normalize(), position,
-					seenFromState);
-		}
-		if (type == std::string("sphere"))
-		{
-			obstacle = new SphereObstacle(radius, position);
-			obstacle->setSeenFrom(seenFromState);
-		}
-		//store obstacle
-		if (obstacle)
-		{
-			//add to local obstacles
-			m_localObstacles.push_back(obstacle);
-			//add to global obstacles
-			m_obstacles.push_back(*m_localObstacles.rbegin());
-		}
-		return obstacle;
-	}
-
-	void removeObstacle(OpenSteer::AbstractObstacle* obstacle)
-	{
-		//remove only if obstacle is local
-		OpenSteer::ObstacleGroup::iterator iterLocal = std::find(
-				m_localObstacles.begin(), m_localObstacles.end(), obstacle);
-		if (iterLocal != m_localObstacles.end())
-		{
-			//find in global obstacles and remove it
-			OpenSteer::ObstacleGroup::iterator iter = std::find(
-					m_obstacles.begin(), m_obstacles.end(), *iterLocal);
-			if (iter != m_obstacles.end())
-			{
-				//remove from global obstacles
-				m_obstacles.erase(iter);
-			}
-			//delete obstacle
-			delete *iterLocal;
-			//remove from local obstacles
-			m_localObstacles.erase(iterLocal);
-		}
-	}
+	///A reference to global obstacles handled by all plugins.
+	OpenSteer::ObstacleGroup* obstacles;
+	///A reference to local obstacles handled by this plugins.
+	OpenSteer::ObstacleGroup* localObstacles;
 
 protected:
 	///The selected vehicle (for debug draw only).
@@ -544,14 +458,7 @@ protected:
 	OpenSteer::Pathway* m_pathway;
 	///The pathway endpoints.
 	OpenSteer::Vec3 pathEndpoint0, pathEndpoint1;
-	///The global obstacles handled by all plugins.
-	static OpenSteer::ObstacleGroup m_obstacles;
-	///The obstacles handled by this plugins.
-	OpenSteer::ObstacleGroup m_localObstacles;
 };
-
-//static definition
-template<typename Super> OpenSteer::ObstacleGroup PlugInAddOnMixin<Super>::m_obstacles;
 
 //common typedef
 typedef PlugInAddOnMixin<OpenSteer::PlugIn> PlugIn;
