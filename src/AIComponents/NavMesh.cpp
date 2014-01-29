@@ -1074,30 +1074,25 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 	{
 		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
 		NodePath objectNP;
-		SMARTPTR(Model) model = DCAST(Model, object->getComponent("Scene"));
-		if(model)
+		SMARTPTR(Component) aiComp = object->getComponent("Scene");
+		if (not aiComp)
 		{
-			objectNP = NodePath(model->getNodePath().node());
+			//no Scene component
+			return Result::ERROR;
 		}
-		else
+		else if(aiComp->is_of_type(Model::get_class_type()))
 		{
-			SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, object->getComponent("Scene"));
-			if(instanceOf)
-			{
-				objectNP = NodePath(instanceOf->getNodePath().node());
-			}
-			else
-			{
-				//no Scene component
-				return Result::ERROR;
-			}
+			objectNP = NodePath(DCAST(Model, aiComp)->getNodePath().node());
+		}
+		else if (aiComp->is_of_type(InstanceOf::get_class_type()))
+		{
+			objectNP = NodePath(DCAST(InstanceOf, aiComp)->getNodePath().node());
 		}
 		LVecBase3f modelDims;
 		LVector3f modelDeltaCenter;
 		float modelRadius;
 		GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
-				objectNP, modelDims, modelDeltaCenter,
-				modelRadius);
+				objectNP, modelDims, modelDeltaCenter, modelRadius);
 		//calculate pos wrt reference node path
 		LPoint3f pos = objectNP.get_pos(mReferenceNP) - modelDeltaCenter;
 		//add detour obstacle

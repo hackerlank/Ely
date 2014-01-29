@@ -24,6 +24,7 @@
 #include "../common_configs.h"
 #include "SceneComponents/Model.h"
 #include "BehaviorComponents/Activity.h"
+#include "PhysicsControlComponents/CharacterController.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
 using namespace ely;
@@ -86,8 +87,8 @@ void activityPlayer0(const Event * event, void * data)
 void groundAirPlayer0(const Event * event, void * data)
 {
 	//get data
-	SMARTPTR(Object)characterObj = ObjectTemplateManager::GetSingletonPtr()->
-					getCreatedObject(event->get_parameter(1).get_string_value());
+	SMARTPTR(Object)characterObj =
+			DCAST(CharacterController, event->get_parameter(0).get_ptr())->getOwnerObject();
 	SMARTPTR(Model) characterModel = DCAST(Model, characterObj->getComponent(
 					ComponentFamilyType("Scene")));
 	if (event->get_name() == "OnGround")
@@ -95,7 +96,7 @@ void groundAirPlayer0(const Event * event, void * data)
 		//stop animation
 		characterModel->animations().stop("run");
 	}
-	else if (event->get_name() == "OnAir")
+	else if (event->get_name() == "InAir")
 	{
 		//play animation
 		characterModel->animations().loop("run", true);

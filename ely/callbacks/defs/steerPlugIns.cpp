@@ -208,15 +208,11 @@ void remove_vehicle(const Event* event, void* data)
 void handleHits(const Event* event, void* data)
 {
 	//get first parameter
-	if (event->get_parameter(0).get_ptr()->is_of_type(
-			SteerVehicle::get_class_type()))
-	{
-		SMARTPTR(SteerVehicle)steerVehicle =
-				DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
-		//
-		std::cout << "Got: " << event->get_name() << " - Object: " <<
-		std::string(steerVehicle->getOwnerObject()->objectId()) << std::endl;
-	}
+	SMARTPTR(SteerVehicle)steerVehicle =
+			DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
+	//
+	std::cout << "Got: " << event->get_name() << " - Object: " <<
+	std::string(steerVehicle->getOwnerObject()->objectId()) << std::endl;
 }
 
 #ifdef ELY_DEBUG

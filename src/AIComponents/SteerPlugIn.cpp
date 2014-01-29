@@ -501,23 +501,19 @@ OpenSteer::AbstractObstacle* SteerPlugIn::addObstacle(SMARTPTR(Object) object,
 	{
 		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
 		NodePath obstacleNP;
-		SMARTPTR(Model) model = DCAST(Model, object->getComponent("Scene"));
-		if(model)
+		SMARTPTR(Component) aiComp = object->getComponent("Scene");
+		if (not aiComp)
 		{
-			obstacleNP = NodePath(model->getNodePath().node());
+			//no Scene component
+			return NULL;
 		}
-		else
+		else if(aiComp->is_of_type(Model::get_class_type()))
 		{
-			SMARTPTR(InstanceOf)instanceOf = DCAST(InstanceOf, object->getComponent("Scene"));
-			if(instanceOf)
-			{
-				obstacleNP = NodePath(instanceOf->getNodePath().node());
-			}
-			else
-			{
-				//no Scene component
-				return NULL;
-			}
+			obstacleNP = NodePath(DCAST(Model, aiComp)->getNodePath().node());
+		}
+		else if (aiComp->is_of_type(InstanceOf::get_class_type()))
+		{
+			obstacleNP = NodePath(DCAST(InstanceOf, aiComp)->getNodePath().node());
 		}
 		//get object dimensions
 		LVecBase3f modelDims;
