@@ -52,7 +52,7 @@ CrowdAgentTemplate::~CrowdAgentTemplate()
 
 ComponentType CrowdAgentTemplate::componentType() const
 {
-	return ComponentType("CrowdAgent");
+	return ComponentType(CrowdAgent::get_class_type().get_name());
 }
 
 ComponentFamilyType CrowdAgentTemplate::familyType() const

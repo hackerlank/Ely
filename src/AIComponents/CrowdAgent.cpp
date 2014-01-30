@@ -56,6 +56,7 @@ CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):
 
 	mTmpl = tmpl;
 	mNavMesh.clear();
+	mStartNavMesh.clear();
 	reset();
 }
 
@@ -280,10 +281,11 @@ void CrowdAgent::onAddToSceneSetup()
 	///3: add to NavMesh update
 	if(navMeshObject)
 	{
-		mStartNavMesh = DCAST(NavMesh, navMeshObject->getComponent(familyType()));
+		SMARTPTR(Component) aiComp = navMeshObject->getComponent(familyType());
 		//
-		if(mStartNavMesh)
+		if(aiComp and (aiComp->componentType() == ComponentType("NavMesh")))
 		{
+			mStartNavMesh = DCAST(NavMesh, aiComp);
 			//create the task for executing addCrowdAgentAsync()
 			//the task is executed only once and then removed from AsyncTaskManager
 			mAddData.clear();

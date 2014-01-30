@@ -70,12 +70,8 @@ bool isFast = false;
 void fast_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-//	SMARTPTR(Activity)activity = reinterpret_cast<Activity*>(data);
-//	SMARTPTR(Object) actorObj = activity->getOwnerObject();
-//	SMARTPTR(Driver) actorDrv = DCAST (Driver, actorObj->getComponent("Control"));
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	if (not isFast)
 	{
@@ -89,9 +85,8 @@ void fast_Activity_Actor(const Event* event, void* data)
 void stop_fast_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	if (isFast)
 	{
@@ -106,18 +101,16 @@ void stop_fast_Activity_Actor(const Event* event, void* data)
 void forward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableForward(true);
 }
 void stop_forward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableForward(false);
 }
@@ -130,18 +123,16 @@ void fast_forward_Activity_Actor(const Event* event, void* data)
 void backward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableBackward(true);
 }
 void stop_backward_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableBackward(false);
 }
@@ -154,18 +145,16 @@ void fast_backward_Activity_Actor(const Event* event, void* data)
 void roll_left_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableRollLeft(true);
 }
 void stop_roll_left_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableRollLeft(false);
 }
@@ -178,18 +167,16 @@ void fast_roll_left_Activity_Actor(const Event* event, void* data)
 void roll_right_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableRollRight(true);
 }
 void stop_roll_right_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableRollRight(false);
 }
@@ -202,18 +189,16 @@ void fast_roll_right_Activity_Actor(const Event* event, void* data)
 void up_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableUp(true);
 }
 void stop_up_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableUp(false);
 }
@@ -226,18 +211,16 @@ void fast_up_Activity_Actor(const Event* event, void* data)
 void down_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableDown(true);
 }
 void stop_down_Activity_Actor(const Event* event, void* data)
 {
 	//get data
-	SMARTPTR(Driver)actorDrv =
-	DCAST (Driver, reinterpret_cast<Activity*>(data)->
-			getOwnerObject()->getComponent("Control"));
+	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
+			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
 	actorDrv->enableDown(false);
 }

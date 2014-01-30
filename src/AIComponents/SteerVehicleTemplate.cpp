@@ -48,7 +48,7 @@ SteerVehicleTemplate::~SteerVehicleTemplate()
 
 ComponentType SteerVehicleTemplate::componentType() const
 {
-	return ComponentType("SteerVehicle");
+	return ComponentType(SteerVehicle::get_class_type().get_name());
 }
 
 ComponentFamilyType SteerVehicleTemplate::familyType() const

@@ -70,7 +70,7 @@ void toggleCameraControl(const Event* event, void* data)
 	///<DEFAULT CAMERA CONTROL>
 //	WindowFramework* gameWindow = GameManager::GetSingletonPtr()->windowFramework();
 	///</DEFAULT CAMERA CONTROL>
-	if (compControl->is_of_type(Driver::get_class_type()))
+	if (compControl->componentType() == ComponentType("Driver"))
 	{
 		SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
 						ComponentFamilyType("Control")));
@@ -114,7 +114,7 @@ void toggleCameraControl(const Event* event, void* data)
 					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 		}
 	}
-	else if (compControl->is_of_type(Chaser::get_class_type()))
+	else if (compControl->componentType() == ComponentType("Chaser"))
 	{
 		SMARTPTR(Chaser)cameraControl = DCAST(Chaser, camera->getComponent(
 						ComponentFamilyType("Control")));
@@ -201,7 +201,7 @@ void toggleChasedObject(const Event* event, void* data)
 	SMARTPTR(Object)camera= reinterpret_cast<Object*>(data);
 	SMARTPTR(Component) controlComp = camera->getComponent(
 					ComponentFamilyType("Control"));
-	if(controlComp->is_of_type(Chaser::get_class_type()))
+	if(controlComp->componentType() == ComponentType("Chaser"))
 	{
 		SMARTPTR(Chaser) chaserComp = DCAST(Chaser, controlComp);
 

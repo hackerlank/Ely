@@ -339,11 +339,11 @@ void RigidBody::onAddToObjectSetup()
 		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
 		{
 			//check if there is already a scene component
-			SMARTPTR(Component)sceneComp = mOwnerObject->getComponent("Scene");
+			SMARTPTR(Component)sceneComp = mOwnerObject->getComponent(ComponentFamilyType("Scene"));
 			if (sceneComp)
 			{
 				//check if the scene component is a Terrain
-				if (sceneComp->componentType() == std::string("Terrain"))
+				if (sceneComp->componentType() == ComponentType("Terrain"))
 				{
 					float widthScale = DCAST(Terrain, sceneComp)->getWidthScale();
 					float heightScale = DCAST(Terrain, sceneComp)->getHeightScale();
@@ -525,14 +525,14 @@ SMARTPTR(BulletShape)RigidBody::doCreateShape(GamePhysicsManager::ShapeType shap
 	// create and return the current shape: dimensions are wrt the
 	//Model or InstanceOf component (if any)
 	NodePath shapeNodePath = mOwnerObject->getNodePath();//default
-	SMARTPTR(Component) sceneComp = mOwnerObject->getComponent("Scene");
+	SMARTPTR(Component) sceneComp = mOwnerObject->getComponent(ComponentFamilyType("Scene"));
 	if (sceneComp)
 	{
-		if (sceneComp->is_of_type(Model::get_class_type()))
+		if (sceneComp->componentType() == ComponentType("Model"))
 		{
 			shapeNodePath = NodePath(DCAST(Model, sceneComp)->getNodePath().node());
 		}
-		if (sceneComp->is_of_type(InstanceOf::get_class_type()))
+		if (sceneComp->componentType() == ComponentType("InstanceOf"))
 		{
 			shapeNodePath = NodePath(DCAST(InstanceOf, sceneComp)->getNodePath().node());
 		}

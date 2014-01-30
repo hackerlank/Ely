@@ -49,7 +49,7 @@ ListenerTemplate::~ListenerTemplate()
 
 ComponentType ListenerTemplate::componentType() const
 {
-	return ComponentType("Listener");
+	return ComponentType(Listener::get_class_type().get_name());
 }
 
 ComponentFamilyType ListenerTemplate::familyType() const

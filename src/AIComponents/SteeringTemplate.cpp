@@ -49,7 +49,7 @@ SteeringTemplate::~SteeringTemplate()
 
 ComponentType SteeringTemplate::componentType() const
 {
-	return ComponentType("Steering");
+	return ComponentType(Steering::get_class_type().get_name());
 }
 
 ComponentFamilyType SteeringTemplate::familyType() const

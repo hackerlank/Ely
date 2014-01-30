@@ -105,12 +105,13 @@ void InstanceOf::onAddToObjectSetup()
 	//if not this component is instance of nothing.
 	mInstancedObject = ObjectTemplateManager::GetSingleton().getCreatedObject(
 			mInstanceOfId);
-	if (mInstancedObject != NULL)
+	if (mInstancedObject)
 	{
 		SMARTPTR(Component)sceneComponent =
 				mInstancedObject->getComponent(ComponentFamilyType("Scene"));
 		//an instanceable object should have a model component
-		if (sceneComponent and sceneComponent->is_of_type(Model::get_class_type()))
+		if (sceneComponent and
+				(sceneComponent->componentType() == ComponentType("Model")))
 		{
 			DCAST(Model, sceneComponent)->getNodePath().instance_to(mNodePath);
 		}

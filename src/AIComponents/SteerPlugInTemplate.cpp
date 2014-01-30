@@ -48,7 +48,7 @@ SteerPlugInTemplate::~SteerPlugInTemplate()
 
 ComponentType SteerPlugInTemplate::componentType() const
 {
-	return ComponentType("SteerPlugIn");
+	return ComponentType(SteerPlugIn::get_class_type().get_name());
 }
 
 ComponentFamilyType SteerPlugInTemplate::familyType() const

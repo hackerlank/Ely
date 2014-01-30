@@ -49,7 +49,7 @@ TerrainTemplate::~TerrainTemplate()
 
 ComponentType TerrainTemplate::componentType() const
 {
-	return ComponentType("Terrain");
+	return ComponentType(Terrain::get_class_type().get_name());
 }
 
 ComponentFamilyType TerrainTemplate::familyType() const

@@ -111,7 +111,7 @@ void remove_crowd_agent_NavMesh_RecastNavMesh(const Event* event, void* data)
 	{
 		//check if it is has a CrowdAgent component
 		SMARTPTR(Component) aiComp = hitObject->getComponent(ComponentFamilyType("AI"));
-		if(aiComp and aiComp->is_of_type(CrowdAgent::get_class_type()))
+		if(aiComp and (aiComp->componentType() == ComponentType("CrowdAgent")))
 		{
 			//try to remove this CrowdAgent from this NavMesh
 			if(navMesh->removeCrowdAgent(DCAST(CrowdAgent, aiComp))

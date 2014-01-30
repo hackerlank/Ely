@@ -49,7 +49,7 @@ DriverTemplate::~DriverTemplate()
 
 ComponentType DriverTemplate::componentType() const
 {
-	return ComponentType("Driver");
+	return ComponentType(Driver::get_class_type().get_name());
 }
 
 ComponentFamilyType DriverTemplate::familyType() const

@@ -436,7 +436,7 @@ void Vehicle::onAddToObjectSetup()
 	SMARTPTR(Component) physicsComp =
 			mOwnerObject->getComponent(ComponentFamilyType("Physics"));
 	if ((not physicsComp) or
-			(not physicsComp->is_of_type(RigidBody::get_class_type())))
+			(physicsComp->componentType() != ComponentType("RigidBody")))
 	{
 		PRINT_ERR_DEBUG("Vehicle::onAddToObjectSetup: '" <<
 				mOwnerObject->objectId() <<

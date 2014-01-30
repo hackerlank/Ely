@@ -258,15 +258,15 @@ void SteerPlugIn::onAddToSceneSetup()
 
 #ifdef ELY_DEBUG
 	mDrawer3dNP = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
-			"render")->getNodePath().attach_new_node(
+			ObjectId("render"))->getNodePath().attach_new_node(
 			"Drawer3dNP_" + COMPONENT_STANDARD_NAME);
 	mDrawer2dNP = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
-			"aspect2d")->getNodePath().attach_new_node(
+			ObjectId("aspect2d"))->getNodePath().attach_new_node(
 			"Drawer2dNP_" + COMPONENT_STANDARD_NAME);
 
 	//get the camera object
 	SMARTPTR(Object)cameraDebug = ObjectTemplateManager::GetSingletonPtr()->
-	getCreatedObject("camera");
+	getCreatedObject(ObjectId("camera"));
 	if (cameraDebug)
 	{
 		//set debug node paths
@@ -466,7 +466,7 @@ void SteerPlugIn::doAddObstacles()
 			//get obstacle object
 			SMARTPTR(Object)obstacleObject =
 			ObjectTemplateManager::GetSingleton().getCreatedObject(
-					paramValues2Str[0]);
+					ObjectId(paramValues2Str[0]));
 			if (not obstacleObject)
 			{
 				continue;
@@ -501,17 +501,17 @@ OpenSteer::AbstractObstacle* SteerPlugIn::addObstacle(SMARTPTR(Object) object,
 	{
 		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
 		NodePath obstacleNP;
-		SMARTPTR(Component) aiComp = object->getComponent("Scene");
+		SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("Scene"));
 		if (not aiComp)
 		{
 			//no Scene component
 			return NULL;
 		}
-		else if(aiComp->is_of_type(Model::get_class_type()))
+		else if(aiComp->componentType() == ComponentType("Model"))
 		{
 			obstacleNP = NodePath(DCAST(Model, aiComp)->getNodePath().node());
 		}
-		else if (aiComp->is_of_type(InstanceOf::get_class_type()))
+		else if (aiComp->componentType() == ComponentType("InstanceOf"))
 		{
 			obstacleNP = NodePath(DCAST(InstanceOf, aiComp)->getNodePath().node());
 		}

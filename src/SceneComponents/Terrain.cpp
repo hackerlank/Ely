@@ -193,7 +193,7 @@ void Terrain::onAddToObjectSetup()
 		//set render as focal point
 		createdObject =
 				ObjectTemplateManager::GetSingleton().getCreatedObject(
-				"render");
+						ObjectId("render"));
 	}
 	mFocalPointNP = createdObject->getNodePath();
 	//Generate the terrain

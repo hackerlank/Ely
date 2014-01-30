@@ -50,7 +50,7 @@ NodePathWrapperTemplate::~NodePathWrapperTemplate()
 
 ComponentType NodePathWrapperTemplate::componentType() const
 {
-	return ComponentType("NodePathWrapper");
+	return ComponentType(NodePathWrapper::get_class_type().get_name());
 }
 
 ComponentFamilyType NodePathWrapperTemplate::familyType() const

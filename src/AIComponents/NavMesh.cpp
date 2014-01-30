@@ -256,7 +256,7 @@ void NavMesh::onAddToSceneSetup()
 	//set the recast debug node path as child of mReferenceNP node path
 	//set the recast debug camera to the first child of "camera" node path
 	SMARTPTR(Object) cameraDebug = ObjectTemplateManager::GetSingletonPtr()->
-			getCreatedObject("camera");
+			getCreatedObject(ObjectId("camera"));
 	if (cameraDebug)
 	{
 		//add a debug node path
@@ -861,10 +861,10 @@ inline void NavMesh::doSetCrowdAgentOtherSettings(
 	crowdAgent->mMaxError = mNavMeshType->getNavMeshSettings().m_agentHeight;
 	crowdAgent->mDeltaRayOrig = LVector3f(0, 0, crowdAgent->mMaxError);
 	crowdAgent->mDeltaRayDown = LVector3f(0, 0, -10 * crowdAgent->mMaxError);
-	//correct height if there is a (kinematic) rigid body component
+	//correct height if there is a Physics or PhysicsControl component
 	//for raycast into update
-	if (DCAST(RigidBody,
-			crowdAgent->mOwnerObject->getComponent(ComponentFamilyType("Physics"))))
+	if (mOwnerObject->getComponent(ComponentFamilyType("Physics")) or
+			mOwnerObject->getComponent(ComponentFamilyType("PhysicsControl")))
 	{
 		crowdAgent->mCorrectHeightRigidBody = mNavMeshType->getNavMeshSettings().m_agentHeight / 2.0;
 	}
@@ -1074,17 +1074,17 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 	{
 		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
 		NodePath objectNP;
-		SMARTPTR(Component) aiComp = object->getComponent("Scene");
+		SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("Scene"));
 		if (not aiComp)
 		{
 			//no Scene component
 			return Result::ERROR;
 		}
-		else if(aiComp->is_of_type(Model::get_class_type()))
+		else if(aiComp->componentType() == ComponentType("Model"))
 		{
 			objectNP = NodePath(DCAST(Model, aiComp)->getNodePath().node());
 		}
-		else if (aiComp->is_of_type(InstanceOf::get_class_type()))
+		else if (aiComp->componentType() == ComponentType("InstanceOf"))
 		{
 			objectNP = NodePath(DCAST(InstanceOf, aiComp)->getNodePath().node());
 		}

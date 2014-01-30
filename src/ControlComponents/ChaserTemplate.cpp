@@ -49,7 +49,7 @@ ChaserTemplate::~ChaserTemplate()
 
 ComponentType ChaserTemplate::componentType() const
 {
-	return ComponentType("Chaser");
+	return ComponentType(Chaser::get_class_type().get_name());
 }
 
 ComponentFamilyType ChaserTemplate::familyType() const

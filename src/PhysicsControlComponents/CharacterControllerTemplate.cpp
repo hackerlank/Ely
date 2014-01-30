@@ -48,7 +48,7 @@ CharacterControllerTemplate::~CharacterControllerTemplate()
 
 ComponentType CharacterControllerTemplate::componentType() const
 {
-	return ComponentType("CharacterController");
+	return ComponentType(CharacterController::get_class_type().get_name());
 }
 
 ComponentFamilyType CharacterControllerTemplate::familyType() const

@@ -49,7 +49,7 @@ NavMeshTemplate::~NavMeshTemplate()
 
 ComponentType NavMeshTemplate::componentType() const
 {
-	return ComponentType("NavMesh");
+	return ComponentType(NavMesh::get_class_type().get_name());
 }
 
 ComponentFamilyType NavMeshTemplate::familyType() const

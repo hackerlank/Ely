@@ -114,11 +114,11 @@ void Sound3d::onAddToObjectSetup()
 	{
 		mSceneRoot = sceneRoot->getNodePath();
 	}
-	else if (ObjectTemplateManager::GetSingleton().getCreatedObject("render"))
+	else if (ObjectTemplateManager::GetSingleton().getCreatedObject(ObjectId("render")))
 	{
 		mSceneRoot =
 				ObjectTemplateManager::GetSingleton().getCreatedObject(
-				"render")->getNodePath();
+						ObjectId("render"))->getNodePath();
 	}
 	else
 	{

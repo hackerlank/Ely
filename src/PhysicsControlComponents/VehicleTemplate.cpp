@@ -49,7 +49,7 @@ VehicleTemplate::~VehicleTemplate()
 
 ComponentType VehicleTemplate::componentType() const
 {
-	return ComponentType("Vehicle");
+	return ComponentType(Vehicle::get_class_type().get_name());
 }
 
 ComponentFamilyType VehicleTemplate::familyType() const

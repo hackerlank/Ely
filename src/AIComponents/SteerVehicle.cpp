@@ -181,8 +181,7 @@ void SteerVehicle::onAddToObjectSetup()
 	//correct height if there is a Physics or PhysicsControl component
 	//for raycast into update
 	if (mOwnerObject->getComponent(ComponentFamilyType("Physics"))
-			or mOwnerObject->getComponent(
-					ComponentFamilyType("PhysicsControl")))
+			or mOwnerObject->getComponent(ComponentFamilyType("PhysicsControl")))
 	{
 		mCorrectHeightRigidBody = modelDims.get_z() / 2.0;
 	}
@@ -336,17 +335,16 @@ void SteerVehicle::onAddToSceneSetup()
 	dynamic_cast<VehicleAddOn*>(mVehicle)->setSettings(settings);
 
 	//set SteerPlugIn object (if any)
-	SMARTPTR(Object)steerPlugInObject = ObjectTemplateManager::
-	GetSingleton().getCreatedObject(mSteerPlugInObjectId);
+	SMARTPTR(Object)steerPlugInObject =
+			ObjectTemplateManager::GetSingleton().getCreatedObject(mSteerPlugInObjectId);
 	///Add to SteerPlugIn update
 	if (steerPlugInObject)
 	{
-		SMARTPTR(SteerPlugIn)steerPlugIn = DCAST(SteerPlugIn,
-				steerPlugInObject->getComponent(familyType()));
+		SMARTPTR(Component)aiComp = steerPlugInObject->getComponent(familyType());
 		//
-		if (steerPlugIn)
+		if (aiComp and (aiComp->componentType() == ComponentType("SteerPlugIn")))
 		{
-			steerPlugIn->addSteerVehicle(this);
+			DCAST(SteerPlugIn, aiComp)->addSteerVehicle(this);
 		}
 	}
 }

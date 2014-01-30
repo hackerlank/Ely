@@ -49,7 +49,7 @@ ModelTemplate::~ModelTemplate()
 
 ComponentType ModelTemplate::componentType() const
 {
-	return ComponentType("Model");
+	return ComponentType(Model::get_class_type().get_name());
 }
 
 ComponentFamilyType ModelTemplate::familyType() const

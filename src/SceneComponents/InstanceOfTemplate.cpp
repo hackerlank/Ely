@@ -49,7 +49,7 @@ InstanceOfTemplate::~InstanceOfTemplate()
 
 ComponentType InstanceOfTemplate::componentType() const
 {
-	return ComponentType("InstanceOf");
+	return ComponentType(InstanceOf::get_class_type().get_name());
 }
 
 ComponentFamilyType InstanceOfTemplate::familyType() const

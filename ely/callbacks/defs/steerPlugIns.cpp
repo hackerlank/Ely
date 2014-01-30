@@ -160,7 +160,7 @@ void remove_vehicle(const Event* event, void* data)
 	{
 		//check if it is has a SteerVehicle component
 		SMARTPTR(Component) aiComp = hitObject->getComponent(ComponentFamilyType("AI"));
-		if(aiComp and aiComp->is_of_type(SteerVehicle::get_class_type()))
+		if(aiComp and (aiComp->componentType() == ComponentType("SteerVehicle")))
 		{
 			//check if it is the type requested
 			OpenSteer::AbstractVehicle* vehicle =

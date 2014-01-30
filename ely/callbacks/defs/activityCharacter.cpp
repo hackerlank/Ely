@@ -87,10 +87,10 @@ void activityPlayer0(const Event * event, void * data)
 void groundAirPlayer0(const Event * event, void * data)
 {
 	//get data
-	SMARTPTR(Object)characterObj =
-			DCAST(CharacterController, event->get_parameter(0).get_ptr())->getOwnerObject();
-	SMARTPTR(Model) characterModel = DCAST(Model, characterObj->getComponent(
-					ComponentFamilyType("Scene")));
+	SMARTPTR(Object) characterObj = DCAST(CharacterController,
+			event->get_parameter(0).get_ptr())->getOwnerObject();
+	SMARTPTR(Model) characterModel = DCAST(Model,
+			characterObj->getComponent(ComponentFamilyType("Scene")));
 	if (event->get_name() == "OnGround")
 	{
 		//stop animation

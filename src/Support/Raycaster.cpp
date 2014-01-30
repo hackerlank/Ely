@@ -181,8 +181,8 @@ SMARTPTR(Object)Raycaster::rayCast(const BitMask32& bitMask)
 inline void Raycaster::doRayCast(const BitMask32& bitMask)
 {
 	//get the mouse watcher
-	SMARTPTR(MouseWatcher)mwatcher=
-	DCAST(MouseWatcher, mWindow->get_mouse().node());
+	SMARTPTR(MouseWatcher)mwatcher = DCAST(MouseWatcher,
+			mWindow->get_mouse().node());
 	if (mwatcher->has_mouse())
 	{
 		// Get to and from pos in camera coordinates

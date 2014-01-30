@@ -68,27 +68,27 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 	CHECK_EXISTENCE_DEBUG(mApp, "Picker::Picker: invalid PandaFramework")
 	CHECK_EXISTENCE_DEBUG(mWindow, "Picker::Picker: invalid WindowFramework")
 	SMARTPTR(Object)render =
-	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("render");
+	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId("render"));
 	CHECK_EXISTENCE_DEBUG(render, "Picker::Picker: invalid render object")
 	SMARTPTR(Object)camera =
-	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject("camera");
+	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId("camera"));
 	CHECK_EXISTENCE_DEBUG(camera, "Picker::Picker: invalid camera object")
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
 			"invalid GamePhysicsManager")
 	//get bullet world reference
 	mWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
 	//get render, camera node paths
-	if (render->getComponent("Scene")->is_of_type(
-					NodePathWrapper::get_class_type()))
+	if (render->getComponent(ComponentFamilyType("Scene"))->componentType()
+			== ComponentType("NodePathWrapper"))
 	{
-		mRender =
-		DCAST(NodePathWrapper, render->getComponent("Scene"))->getNodePath();
+		mRender = DCAST(NodePathWrapper,
+				render->getComponent(ComponentFamilyType("Scene")))->getNodePath();
 	}
-	if (camera->getComponent("Scene")->is_of_type(
-					NodePathWrapper::get_class_type()))
+	if (camera->getComponent(ComponentFamilyType("Scene"))->componentType()
+			== ComponentType("NodePathWrapper"))
 	{
-		mCamera =
-		DCAST(NodePathWrapper, camera->getComponent("Scene"))->getNodePath();
+		mCamera = DCAST(NodePathWrapper,
+				camera->getComponent(ComponentFamilyType("Scene")))->getNodePath();
 		mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
 	}
 	//reset picking logic data
@@ -141,8 +141,8 @@ void Picker::pickBody(const Event* event)
 	if (event->get_name() == mPickKeyOn)
 	{
 		//get the mouse watcher
-		SMARTPTR(MouseWatcher)mwatcher =
-		DCAST(MouseWatcher, mWindow->get_mouse().node());
+		SMARTPTR(MouseWatcher)mwatcher = DCAST(MouseWatcher,
+				mWindow->get_mouse().node());
 		if (mwatcher->has_mouse())
 		{
 			// Get to and from pos in camera coordinates
@@ -169,7 +169,8 @@ void Picker::pickBody(const Event* event)
 					//- BulletGhostNode
 					if (result.get_node()->is_of_type(BulletRigidBodyNode::get_class_type()))
 					{
-						mPickedBody = DCAST(BulletRigidBodyNode,const_cast<PandaNode*>(result.get_node()));
+						mPickedBody = DCAST(BulletRigidBodyNode,
+								const_cast<PandaNode*>(result.get_node()));
 						if (not(mPickedBody->is_static() or mPickedBody->is_kinematic()))
 						{
 							//

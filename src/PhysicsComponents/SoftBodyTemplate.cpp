@@ -49,7 +49,7 @@ SoftBodyTemplate::~SoftBodyTemplate()
 
 ComponentType SoftBodyTemplate::componentType() const
 {
-	return ComponentType("SoftBody");
+	return ComponentType(SoftBody::get_class_type().get_name());
 }
 
 ComponentFamilyType SoftBodyTemplate::familyType() const
