@@ -55,6 +55,8 @@
 			<< result.get_to_pos().get_y() << "," \
 			<< result.get_to_pos().get_z() \
 			<< "\"" << std::endl
+#else
+#	define PRINT_DEBUG_HIT
 #endif
 
 namespace ely

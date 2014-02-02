@@ -43,6 +43,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1251153096" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2093535115" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -100,6 +103,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.620884677" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2133312240" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -168,6 +174,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1391760603" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2071251884" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -225,6 +234,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.119989242" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.601151752" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -284,6 +296,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1442098817" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1286370007" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -342,6 +357,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1497002299" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
+								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.352187107" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
 						</toolChain>
@@ -399,6 +417,9 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
+								</option>
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1663106571" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1230342913" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
