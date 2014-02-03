@@ -18,6 +18,7 @@ opensteer_headers = \
 		AIComponents/OpenSteerLocal/common.h \
 		AIComponents/OpenSteerLocal/DrawMeshDrawer.h \
 		AIComponents/OpenSteerLocal/PlugIn_Boids.h \
+		AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h \
 		AIComponents/OpenSteerLocal/PlugIn_OneTurning.h \
 		AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h
 
