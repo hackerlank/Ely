@@ -420,7 +420,7 @@ public:
 
 		// update flock simulation for each boid
 		iterator iter;
-		for (iter = flock.begin(); iter < flock.end(); ++iter)
+		for (iter = flock.begin(); iter != flock.end(); ++iter)
 		{
 			(*iter)->update(currentTime, elapsedTime);
 		}
@@ -430,7 +430,7 @@ public:
 	{
 		// draw each boid in flock
 		iterator iter;
-		for (iter = flock.begin(); iter < flock.end(); ++iter)
+		for (iter = flock.begin(); iter != flock.end(); ++iter)
 		{
 			(*iter)->draw();
 		}

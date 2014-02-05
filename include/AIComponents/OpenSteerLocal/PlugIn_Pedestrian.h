@@ -475,7 +475,7 @@ public:
 	{
 		// update each Pedestrian
 		iterator iter;
-		for (iter = crowd.begin(); iter < crowd.end(); ++iter)
+		for (iter = crowd.begin(); iter != crowd.end(); ++iter)
 		{
 			(*iter)->update(currentTime, elapsedTime);
 		}
@@ -485,7 +485,7 @@ public:
 	{
 		// draw and annotate each Pedestrian
 		iterator iter;
-		for (iter = crowd.begin(); iter < crowd.end(); ++iter)
+		for (iter = crowd.begin(); iter != crowd.end(); ++iter)
 		{
 			(*iter)->draw();
 		}

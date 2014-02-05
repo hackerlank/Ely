@@ -251,13 +251,6 @@ public:
 		pBegin = allMP.begin() + 1;  // iterator pointing to first pursuer
 		pEnd = allMP.end();          // iterator pointing to last pursuer
 
-		// initialize camera
-//		OpenSteerDemo::selectedVehicle = wanderer;
-//		OpenSteerDemo::camera.mode = Camera::cmStraightDown;
-//		OpenSteerDemo::camera.fixedDistDistance =
-//				OpenSteerDemo::cameraTargetDistance;
-//		OpenSteerDemo::camera.fixedDistVOffset =
-//				OpenSteerDemo::camera2dElevation;
 	}
 
 	void update(const float currentTime, const float elapsedTime)
@@ -266,60 +259,41 @@ public:
 		wanderer->update(currentTime, elapsedTime);
 
 		// update each pursuer
-		for (iterator i = pBegin; i != pEnd; i++)
+		iterator iter;
+		for (iter = pBegin; iter != pEnd; ++iter)
 		{
-			((MpPursuer&) (**i)).update(currentTime, elapsedTime);
+			(*iter)->update(currentTime, elapsedTime);
 		}
-
 	}
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-		// selected vehicle (user can mouse click to select another)
-//		AbstractVehicle& selected = *OpenSteerDemo::selectedVehicle;
-
-		// vehicle nearest mouse (to be highlighted)
-//		AbstractVehicle& nearMouse = *OpenSteerDemo::vehicleNearestToMouse();
-
-		// update camera
-//		OpenSteerDemo::updateCamera(currentTime, elapsedTime, selected);
-
-		// draw "ground plane"
-//		OpenSteerDemo::gridUtility(selected.position());
-		if (gToggleDrawGrid)
-		{
-			///very slow
-			gridUtility(selectedVehicle->position(), 600, 20);
-		}
-
 		// draw each vehicles
-		for (iterator i = allMP.begin(); i != pEnd; i++)
-			(**i).draw();
-
-		// highlight vehicle nearest mouse
-//		OpenSteerDemo::highlightVehicleUtility(nearMouse);
-//		OpenSteerDemo::circleHighlightVehicleUtility(selected);
+		iterator iter;
+		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+		{
+			(*iter)->draw();
+		}
 	}
 
 	void close(void)
 	{
 		// delete wanderer, all pursuers, and clear list
-		delete (wanderer);
-		for (iterator i = pBegin; i != pEnd; i++)
-			delete ((MpPursuer*) *i);
-		allMP.clear();
+///		delete (wanderer);
+///		for (iterator i = pBegin; i != pEnd; i++)
+///			delete ((MpPursuer*) *i);
+///		allMP.clear();
 	}
 
 	void reset(void)
 	{
 		// reset wanderer and pursuers
 		wanderer->reset();
-		for (iterator i = pBegin; i != pEnd; i++)
-			((MpPursuer&) (**i)).reset();
-
-		// immediately jump to default camera position
-//		OpenSteerDemo::camera.doNotSmoothNextMove();
-//		OpenSteerDemo::camera.resetLocalSpace();
+		iterator iter;
+		for (iter = pBegin; iter != pEnd; ++iter)
+		{
+			(*iter)->reset();
+		}
 	}
 
 	const AVGroup& allVehicles(void)
@@ -328,14 +302,12 @@ public:
 	}
 
 	// a group (STL vector) of all vehicles
-//	std::vector<MpBase*> allMP;
-//	typedef std::vector<MpBase*>::const_iterator iterator;
-	MpBase::groupType allMP;
-	typedef MpBase::groupType::const_iterator iterator;
+	typename MpBase<Entity>::groupType allMP;
+	typedef typename MpBase<Entity>::groupType::const_iterator iterator;
 
 	iterator pBegin, pEnd;
 
-	MpWanderer* wanderer;
+	MpWanderer<Entity>* wanderer;
 };
 
 //MpPlugIn gMpPlugIn;

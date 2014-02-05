@@ -142,7 +142,7 @@ public:
 	{
 		// update simulation of test vehicle
 		iterator iter;
-		for (iter = theVehicle.begin(); iter < theVehicle.end(); ++iter)
+		for (iter = theVehicle.begin(); iter != theVehicle.end(); ++iter)
 		{
 			(*iter)->update(currentTime, elapsedTime);
 		}
@@ -152,7 +152,7 @@ public:
 	{
 		// draw test vehicle
 		iterator iter;
-		for (iter = theVehicle.begin(); iter < theVehicle.end(); ++iter)
+		for (iter = theVehicle.begin(); iter != theVehicle.end(); ++iter)
 		{
 			(*iter)->draw();
 
