@@ -612,12 +612,17 @@ public:
 			//set boid world sphere (center/radius)
 			boid->worldCenter = worldCenter;
 			boid->worldRadius = worldRadius;
-			// randomize initial orientation
-			boid->regenerateOrthonormalBasisUF(RandomUnitVector());
-			// randomize initial position: inside the world sphere
-			boid->setPosition(
-					worldCenter
-							+ RandomVectorInUnitRadiusSphere() * worldRadius);
+			//if not ExternalBoid then randomize
+			if (not dynamic_cast<ExternalBoid<Entity>*>(boid))
+			{
+				// randomize initial orientation
+				boid->regenerateOrthonormalBasisUF(RandomUnitVector());
+				// randomize initial position: inside the world sphere
+				boid->setPosition(
+						worldCenter
+								+ RandomVectorInUnitRadiusSphere()
+										* worldRadius);
+			}
 			// allocate a token for this boid in the proximity database
 			boid->newPD(*pd);
 			// notify proximity database that our position has changed

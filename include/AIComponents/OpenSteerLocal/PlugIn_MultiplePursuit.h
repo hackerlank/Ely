@@ -150,9 +150,10 @@ class MpPursuer: public MpBase<Entity>
 public:
 
 	// constructor
-	MpPursuer(MpWanderer* w)
+///	MpPursuer(MpWanderer* w)
+	MpPursuer()
 	{
-		wanderer = w;
+		wanderer = NULL;
 		reset();
 	}
 
@@ -161,7 +162,7 @@ public:
 	{
 		MpBase<Entity>::reset();
 		bodyColor.set(0.6f, 0.4f, 0.4f); // redish
-		randomizeStartingPositionAndHeading();
+///		randomizeStartingPositionAndHeading();
 	}
 
 	// one simulation step
@@ -183,16 +184,16 @@ public:
 		this->recordTrailVertex(currentTime, position());
 	}
 
-	// reset position
+	// randomize heading only
 	void randomizeStartingPositionAndHeading(void)
 	{
-		// randomize position on a ring between inner and outer radii
-		// centered around the home base
-		const float inner = 20;
-		const float outer = 30;
-		const float radius = frandom2(inner, outer);
-		const Vec3 randomOnRing = RandomUnitVectorOnXZPlane() * radius;
-		this->setPosition(wanderer->position() + randomOnRing);
+///		// randomize position on a ring between inner and outer radii
+///		// centered around the home base
+///		const float inner = 20;
+///		const float outer = 30;
+///		const float radius = frandom2(inner, outer);
+///		const Vec3 randomOnRing = RandomUnitVectorOnXZPlane() * radius;
+///		this->setPosition(wanderer->position() + randomOnRing);
 
 		// randomize 2D heading
 		this->randomizeHeadingOnXZPlane();
@@ -219,6 +220,12 @@ public:
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
+//used only initially by the MpPlugIn
+struct DummyEntity
+{
+	void update(const float, const float){}
+};
+
 template<typename Entity>
 class MpPlugIn: public PlugIn
 {
@@ -240,27 +247,31 @@ public:
 
 	void open(void)
 	{
-		// create the wanderer, saving a pointer to it
-		wanderer = new MpWanderer;
-		allMP.push_back(wanderer);
+		/// XXX
+		//create a dummy wanderer based on DummyEntity
+		DummyEntity* entity = new DummyEntity;
+		wanderer = new MpWanderer<DummyEntity>;
+		wanderer->setEntity(entity);
+		wanderer->setEntityUpdateMethod(&DummyEntity::update);
+		/// XXX
 
-		// create the specified number of pursuers, save pointers to them
-		const int pursuerCount = 30;
-		for (int i = 0; i < pursuerCount; i++)
-			allMP.push_back(new MpPursuer(wanderer));
-		pBegin = allMP.begin() + 1;  // iterator pointing to first pursuer
-		pEnd = allMP.end();          // iterator pointing to last pursuer
+///		// create the wanderer, saving a pointer to it
+///		wanderer = new MpWanderer;
+///		allMP.push_back(wanderer);
+///		// create the specified number of pursuers, save pointers to them
+///		const int pursuerCount = 30;
+///		for (int i = 0; i < pursuerCount; i++)
+///			allMP.push_back(new MpPursuer(wanderer));
+///		pBegin = allMP.begin() + 1;  // iterator pointing to first pursuer
+///		pEnd = allMP.end();          // iterator pointing to last pursuer
 
 	}
 
 	void update(const float currentTime, const float elapsedTime)
 	{
-		// update the wanderer
-		wanderer->update(currentTime, elapsedTime);
-
-		// update each pursuer
+		// update each vehicles
 		iterator iter;
-		for (iter = pBegin; iter != pEnd; ++iter)
+		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
 		{
 			(*iter)->update(currentTime, elapsedTime);
 		}
@@ -287,12 +298,48 @@ public:
 
 	void reset(void)
 	{
-		// reset wanderer and pursuers
-		wanderer->reset();
+		// reset each vehicles
 		iterator iter;
-		for (iter = pBegin; iter != pEnd; ++iter)
+		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
 		{
 			(*iter)->reset();
+		}
+	}
+
+	virtual void addVehicle(AbstractVehicle* vehicle)
+	{
+		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
+		//check if this is a MpWanderer or MpPursuer
+		MpWanderer<Entity>* wandererVehicle =
+				dynamic_cast<MpWanderer<Entity>*>(vehicle);
+		MpPursuer<Entity>* pursuerVehicle =
+				dynamic_cast<MpPursuer<Entity>*>(vehicle);
+		if (wandererVehicle)
+		{
+			//delete old wanderer
+			delete wanderer;
+			// set the plugin's wanderer
+			wanderer = wandererVehicle;
+			//update each pursuer's wanderer
+			iterator iter;
+			for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+			{
+				MpPursuer<Entity>* pursuerVehicle =
+						dynamic_cast<MpPursuer<Entity>*>(*iter);
+				// update the pursuer's wanderer
+				pursuerVehicle->wanderer = wanderer;
+			}
+		}
+		if (pursuerVehicle)
+		{
+			//if not ExternalMpPursuer then randomize
+			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuerVehicle))
+			{
+				// randomize only 2D heading
+				pursuerVehicle->randomizeStartingPositionAndHeading();
+			}
+			// set the pursuer's wanderer
+			pursuerVehicle->wanderer = wanderer;
 		}
 	}
 
@@ -305,7 +352,7 @@ public:
 	typename MpBase<Entity>::groupType allMP;
 	typedef typename MpBase<Entity>::groupType::const_iterator iterator;
 
-	iterator pBegin, pEnd;
+///	iterator pBegin, pEnd;
 
 	MpWanderer<Entity>* wanderer;
 };

@@ -681,8 +681,12 @@ public:
 				dynamic_cast<Pedestrian<Entity>*>(vehicle);
 		if (pedestrian)
 		{
-			// randomize 2D heading
-			pedestrian->randomizeHeadingOnXZPlane();
+			//if not ExternalPedestrian then randomize
+			if (not dynamic_cast<ExternalPedestrian<Entity>*>(pedestrian))
+			{
+				// randomize 2D heading
+				pedestrian->randomizeHeadingOnXZPlane();
+			}
 			// allocate a token for this boid in the proximity database
 			pedestrian->newPD(*pd);
 			// notify proximity database that our position has changed
