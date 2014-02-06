@@ -168,6 +168,10 @@ public:
 	// one simulation step
 	void update(const float currentTime, const float elapsedTime)
 	{
+		if (not wanderer)
+		{
+			return;
+		}
 		// when pursuer touches quarry ("wanderer"), reset its position
 		const float d = Vec3::distance(this->position(), wanderer->position());
 		const float r = this->radius() + wanderer->radius();
@@ -220,12 +224,6 @@ public:
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
-//used only initially by the MpPlugIn
-struct DummyEntity
-{
-	void update(const float, const float){}
-};
-
 template<typename Entity>
 class MpPlugIn: public PlugIn
 {
@@ -247,16 +245,9 @@ public:
 
 	void open(void)
 	{
-		/// XXX
-		//create a dummy wanderer based on DummyEntity
-		DummyEntity* entity = new DummyEntity;
-		wanderer = new MpWanderer<DummyEntity>;
-		wanderer->setEntity(entity);
-		wanderer->setEntityUpdateMethod(&DummyEntity::update);
-		/// XXX
-
 ///		// create the wanderer, saving a pointer to it
 ///		wanderer = new MpWanderer;
+		wanderer = NULL;
 ///		allMP.push_back(wanderer);
 ///		// create the specified number of pursuers, save pointers to them
 ///		const int pursuerCount = 30;
@@ -309,37 +300,66 @@ public:
 	virtual void addVehicle(AbstractVehicle* vehicle)
 	{
 		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
-		//check if this is a MpWanderer or MpPursuer
-		MpWanderer<Entity>* wandererVehicle =
-				dynamic_cast<MpWanderer<Entity>*>(vehicle);
-		MpPursuer<Entity>* pursuerVehicle =
-				dynamic_cast<MpPursuer<Entity>*>(vehicle);
-		if (wandererVehicle)
+		//check if this is a MpWanderer
+		if (dynamic_cast<MpWanderer<Entity>*>(vehicle))
 		{
-			//delete old wanderer
-			delete wanderer;
-			// set the plugin's wanderer
-			wanderer = wandererVehicle;
+			// set the plugin's wanderer: the last added one
+			wanderer = vehicle;
 			//update each pursuer's wanderer
+			setAllPursuersWanderer();
+			//that's all
+			return;
+		}
+		//or if this is a MpPursuer
+		MpPursuer<Entity>* pursuer =
+			dynamic_cast<MpPursuer<Entity>*>(vehicle);
+		if (pursuer)
+		{
+			//if not ExternalMpPursuer then randomize
+			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuer))
+			{
+				// randomize only 2D heading
+				pursuer->randomizeStartingPositionAndHeading();
+			}
+			// set the pursuer's wanderer
+			pursuer->wanderer = wanderer;
+		}
+	}
+
+	virtual void removeVehicle(OpenSteer::AbstractVehicle* vehicle)
+	{
+		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
+		//check if this is the current wanderer
+		if (vehicle == wanderer)
+		{
+			wanderer = NULL;
+			// find a new wanderer (if any): the first found or NULL
 			iterator iter;
 			for (iter = allMP.begin(); iter != allMP.end(); ++iter)
 			{
-				MpPursuer<Entity>* pursuerVehicle =
-						dynamic_cast<MpPursuer<Entity>*>(*iter);
+				wanderer = dynamic_cast<MpWanderer<Entity>*>(*iter);
+				if (wanderer)
+				{
+					break;
+				}
+			}
+			//update each pursuer's wanderer
+			setAllPursuersWanderer();
+		}
+	}
+
+	void setAllPursuersWanderer()
+	{
+		iterator iter;
+		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+		{
+			MpPursuer<Entity>* pursuerVehicle =
+					dynamic_cast<MpPursuer<Entity>*>(*iter);
+			if (pursuerVehicle)
+			{
 				// update the pursuer's wanderer
 				pursuerVehicle->wanderer = wanderer;
 			}
-		}
-		if (pursuerVehicle)
-		{
-			//if not ExternalMpPursuer then randomize
-			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuerVehicle))
-			{
-				// randomize only 2D heading
-				pursuerVehicle->randomizeStartingPositionAndHeading();
-			}
-			// set the pursuer's wanderer
-			pursuerVehicle->wanderer = wanderer;
 		}
 	}
 
