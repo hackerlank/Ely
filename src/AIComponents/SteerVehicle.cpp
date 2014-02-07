@@ -26,6 +26,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -92,6 +93,18 @@ bool SteerVehicle::initialize()
 		not mExternalUpdate ?
 				mVehicle = new Boid<SteerVehicle> :
 				mVehicle = new ExternalBoid<SteerVehicle>;
+	}
+	else if (param == std::string("multiple_pursuit_wanderer"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new MpWanderer<SteerVehicle> :
+				mVehicle = new ExternalMpWanderer<SteerVehicle>;
+	}
+	else if (param == std::string("multiple_pursuit_pursuer"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new MpPursuer<SteerVehicle> :
+				mVehicle = new ExternalMpPursuer<SteerVehicle>;
 	}
 	else
 	{

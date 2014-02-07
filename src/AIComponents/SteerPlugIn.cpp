@@ -26,6 +26,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -85,6 +86,10 @@ void SteerPlugIn::onAddToObjectSetup()
 	else if (mPlugInTypeParam == std::string("boid"))
 	{
 		mPlugIn = new BoidsPlugIn<SteerVehicle>;
+	}
+	else if (mPlugInTypeParam == std::string("multiple_pursuit"))
+	{
+		mPlugIn = new MpPlugIn<SteerVehicle>;
 	}
 	else
 	{
