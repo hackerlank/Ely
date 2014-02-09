@@ -9,13 +9,14 @@ LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 
 #SUBDIRS = recastnavigation
 #SUBDIRS = interrogate
-SUBDIRS = opensteer
+#SUBDIRS = opensteer
 
 noinst_PROGRAMS = ely_training 
 
 #ely_training
 nodist_ely_training_SOURCES = \
 		training.cpp \
+		generic_test.cpp \
 		ai.cpp \
 		anim.cpp \
 		network.cpp \
@@ -25,4 +26,4 @@ nodist_ely_training_SOURCES = \
 		draw_geometry.cpp \
 		test_wo_local_scale.cpp \
 		meshdrawer.cpp \
-		nodepath_test.cpp
+		pgGUI.cpp

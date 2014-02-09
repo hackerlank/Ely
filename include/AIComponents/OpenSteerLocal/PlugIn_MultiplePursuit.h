@@ -110,7 +110,7 @@ public:
 	void reset(void)
 	{
 		MpBase<Entity>::reset();
-		bodyColor.set(0.4f, 0.6f, 0.4f); // greenish
+		this->bodyColor.set(0.4f, 0.6f, 0.4f); // greenish
 	}
 
 	// one simulation step
@@ -161,7 +161,7 @@ public:
 	void reset(void)
 	{
 		MpBase<Entity>::reset();
-		bodyColor.set(0.6f, 0.4f, 0.4f); // redish
+		this->bodyColor.set(0.6f, 0.4f, 0.4f); // redish
 ///		randomizeStartingPositionAndHeading();
 	}
 
@@ -185,7 +185,7 @@ public:
 		this->entityUpdate(currentTime, elapsedTime);
 
 		// for annotation
-		this->recordTrailVertex(currentTime, position());
+		this->recordTrailVertex(currentTime, this->position());
 	}
 
 	// randomize heading only
@@ -217,7 +217,7 @@ public:
 		this->entityUpdate(currentTime, elapsedTime);
 
 		// for annotation
-		this->recordTrailVertex(currentTime, position());
+		this->recordTrailVertex(currentTime, this->position());
 	}
 };
 
@@ -301,28 +301,30 @@ public:
 	{
 		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
 		//check if this is a MpWanderer
-		if (dynamic_cast<MpWanderer<Entity>*>(vehicle))
+		MpWanderer<Entity>* wandererTmp =
+				dynamic_cast<MpWanderer<Entity>*>(vehicle);
+		if (wandererTmp)
 		{
 			// set the plugin's wanderer: the last added one
-			wanderer = vehicle;
+			wanderer = wandererTmp;
 			//update each pursuer's wanderer
 			setAllPursuersWanderer();
 			//that's all
 			return;
 		}
 		//or if this is a MpPursuer
-		MpPursuer<Entity>* pursuer =
+		MpPursuer<Entity>* pursuerTmp =
 			dynamic_cast<MpPursuer<Entity>*>(vehicle);
-		if (pursuer)
+		if (pursuerTmp)
 		{
 			//if not ExternalMpPursuer then randomize
-			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuer))
+			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuerTmp))
 			{
 				// randomize only 2D heading
-				pursuer->randomizeStartingPositionAndHeading();
+				pursuerTmp->randomizeStartingPositionAndHeading();
 			}
 			// set the pursuer's wanderer
-			pursuer->wanderer = wanderer;
+			pursuerTmp->wanderer = wanderer;
 		}
 	}
 
@@ -353,12 +355,12 @@ public:
 		iterator iter;
 		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
 		{
-			MpPursuer<Entity>* pursuerVehicle =
+			MpPursuer<Entity>* pursuerTmp =
 					dynamic_cast<MpPursuer<Entity>*>(*iter);
-			if (pursuerVehicle)
+			if (pursuerTmp)
 			{
 				// update the pursuer's wanderer
-				pursuerVehicle->wanderer = wanderer;
+				pursuerTmp->wanderer = wanderer;
 			}
 		}
 	}

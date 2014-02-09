@@ -50,7 +50,7 @@
 
 extern std::string baseDir;
 
-int nodepath_test(int argc, char *argv[])
+int generic_test(int argc, char *argv[])
 {
 	// Load your configuration
 	load_prc_file_data("", "model-path " + baseDir + "data/models");
