@@ -181,11 +181,11 @@ fi
 # check libraries first from cmd line specified ones
 #remaining libraries: 
 PANDA3DSDK_LDFLAGS="-L/usr/lib/panda3d -L/usr/lib64/panda3d \
-				-L/usr/local/lib/panda3d ${EIGEN_LDFLAGS}"
+				-L/usr/local/lib/panda3d ${EIGEN_LDFLAGS} $2"
 PANDA3DSDK_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
-			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
-			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${EIGEN_LIBS}"
+			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lp3rocket \
+			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${EIGEN_LIBS} $3"
 			
 LDFLAGS="${PANDA3DSDK_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3DSDK_LIBS} ${LIBS_CMDLINE}"
