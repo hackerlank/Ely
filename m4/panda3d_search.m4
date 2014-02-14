@@ -46,6 +46,7 @@ if test "x${ac_cv_header_Recast_h}" != xyes; then
 	----------------------------------------])
 fi
 # check libraries first from cmd line specified ones
+AC_MSG_NOTICE([Looking for Recast Navigation libraries...])
 RN_LDFLAGS=""
 RN_LIBS="-lrecastnavigation"
 			
@@ -90,6 +91,7 @@ if test "x${ac_cv_header_SteerLibrary_h}" != xyes; then
 	----------------------------------------])
 fi
 # check libraries first from cmd line specified ones
+AC_MSG_NOTICE([Looking for OpenSteer libraries...])
 OS_LDFLAGS=""
 OS_LIBS="-lOpenSteer"
 			
@@ -141,13 +143,58 @@ if test "x${required_libraries}" != xyes; then
 	----------------------------------------])
 fi
 #
+###libRocket###
+# check header first from cmd line specified include
+AC_MSG_NOTICE([Looking for libRocket headers...])
+ROCKET_CPPFLAGS="-I/usr/include/Rocket -I/usr/local/include/Rocket"
+CPPFLAGS="${ROCKET_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
+AC_CHECK_HEADERS([Core.h])
+if test "x${ac_cv_header_Core_h}" != xyes; then
+	AC_MSG_ERROR([
+	----------------------------------------
+	The libRocket header files are
+	required to build Ely. Stopping...
+	Check 'config.log' for more information.
+	----------------------------------------])
+fi
+# check libraries first from cmd line specified ones
+AC_MSG_NOTICE([Looking for libRocket libraries...])
+ROCKET_LDFLAGS=""
+ROCKET_LIBS="-lRocketControls -lRocketCore -lRocketDebugger"
+
+LDFLAGS="${ROCKET_LDFLAGS} ${LDFLAGS_CMDLINE}"
+LIBS="${ROCKET_LIBS} ${LIBS_CMDLINE}"
+required_libraries=yes
+rocket_prologue="#include <Core.h>"
+
+rocket_body="
+	int argc=1;
+	char** argv=0;
+	Rocket::Core::Initialise();
+	Rocket::Core::Shutdown();
+  	"  	
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([$rocket_prologue],[$rocket_body])],
+  AC_MSG_NOTICE([libRocket libraries... yes]) 
+  AC_DEFINE([HAVE_ROCKET], 1, [libRocket enabled]),
+  [required_libraries="libRocket"]
+)
+if test "x${required_libraries}" != xyes; then
+	AC_MSG_ERROR([
+	----------------------------------------
+	The ${required_libraries} libraries are
+	required to build Ely. Stopping...
+	Check 'config.log' for more information.
+	----------------------------------------])
+fi
+#
 #Define third party flags
-PANDA3D_THIRDPARTY_CPPFLAGS="${BULLET_CPPFLAGS} ${RN_CPPFLAGS} ${OS_CPPFLAGS}"
-PANDA3D_THIRDPARTY_LDFLAGS="${BULLET_LDFLAGS} ${RN_LDFLAGS} ${OS_LDFLAGS}"
-PANDA3D_THIRDPARTY_LIBS="${BULLET_LIBS} ${RN_LIBS} ${OS_LIBS}"
+PANDA3D_THIRDPARTY_CPPFLAGS="${BULLET_CPPFLAGS} ${RN_CPPFLAGS} ${OS_CPPFLAGS} ${ROCKET_CPPFLAGS}"
+PANDA3D_THIRDPARTY_LDFLAGS="${BULLET_LDFLAGS} ${RN_LDFLAGS} ${OS_LDFLAGS} ${ROCKET_LDFLAGS}"
+PANDA3D_THIRDPARTY_LIBS="${BULLET_LIBS} ${RN_LIBS} ${OS_LIBS} ${ROCKET_LIBS}"
 #
 ###Panda3d SDK###
-#prerequisites: Eigen
+#prerequisites: Eigen, libRocket
 ###Eigen###
 # check header first from cmd line specified include
 AC_MSG_NOTICE([Looking for Eigen headers...])
@@ -166,8 +213,10 @@ fi
 EIGEN_LDFLAGS=""
 EIGEN_LIBS=""
 #
+###Panda3d SDK###
 # check headers first from cmd line specified ones
-PANDA3DSDK_CPPFLAGS="-I/usr/include/panda3d -I/usr/local/include/panda3d ${EIGEN_CPPFLAGS} $1"
+AC_MSG_NOTICE([Looking for Panda3d SDK headers...])
+PANDA3DSDK_CPPFLAGS="-I/usr/include/panda3d -I/usr/local/include/panda3d -I$1 ${EIGEN_CPPFLAGS}"
 CPPFLAGS="${PANDA3DSDK_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADERS([pandaFramework.h])
 if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
@@ -179,13 +228,14 @@ if test "x${ac_cv_header_pandaFramework_h}" != xyes; then
 	----------------------------------------])
 fi	
 # check libraries first from cmd line specified ones
+AC_MSG_NOTICE([Looking for Panda3d SDK libraries...])
 #remaining libraries: 
 PANDA3DSDK_LDFLAGS="-L/usr/lib/panda3d -L/usr/lib64/panda3d \
-				-L/usr/local/lib/panda3d ${EIGEN_LDFLAGS} $2"
+				-L/usr/local/lib/panda3d ${EIGEN_LDFLAGS}"
 PANDA3DSDK_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
 			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lp3rocket \
-			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader ${EIGEN_LIBS} $3"
+			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader -l$2 ${EIGEN_LIBS}"
 			
 LDFLAGS="${PANDA3DSDK_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3DSDK_LIBS} ${LIBS_CMDLINE}"

@@ -5,7 +5,7 @@ AM_LDFLAGS = $(ELY_LDFLAGS)
 LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 	-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
 	-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lpandagl \
-	-lpandaode -lpandaphysics -lpandaskel -lp3ptloader
+	-lpandaode -lpandaphysics -lpandaskel -lp3ptloader -lp3rocket -lpython2.7
 
 #SUBDIRS = recastnavigation
 #SUBDIRS = interrogate

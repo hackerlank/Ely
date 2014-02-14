@@ -36,12 +36,16 @@ ELY_CXXFLAGS="-O3 -w -fmessage-length=0"
 
 # checks/sets options
 AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
+
+BUILDTYPE=""
 # ELY_DEVEL
 AC_ARG_ENABLE([ely-devel],
 	AS_HELP_STRING([--enable-ely-devel],
 		[@<:@=yes@:>@ enable Ely development mode (disabled by default)]),
     [ely_devel=${enableval}], [ely_devel=no])
 AM_CONDITIONAL([ELY_DEVEL], [test "x${ely_devel}" != xno])
+AS_IF([test "x${ely_devel}" != xno], 
+	[BUILDTYPE=${BUILDTYPE}"Devel-"])
 # ELY_DEBUG
 AC_ARG_ENABLE([ely-debug],
 	AS_HELP_STRING([--enable-ely-debug],
@@ -49,8 +53,10 @@ AC_ARG_ENABLE([ely-debug],
     [ely_debug=${enableval}], [ely_debug=no])
 AS_IF([test "x${ely_debug}" != xno],
 	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
-	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"],
-	[AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])])
+	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
+	BUILDTYPE=${BUILDTYPE}"Debug"],
+	[AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])
+	BUILDTYPE=${BUILDTYPE}"Release"])
 # enables silent rules
 #AS_IF([test "x${ely_devel}" = xno -a "x${ely_debug}" = xno],
 #	[AM_SILENT_RULES])
@@ -60,7 +66,8 @@ AC_ARG_ENABLE([ely-thread],
     	[@<:@=yes@:>@ enable Ely threading mode (disabled by default)]),
     [ely_thread=${enableval}], [ely_thread=no])
 AS_IF([test "x${ely_thread}" != xno],
-	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])])
+	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
+	BUILDTYPE=${BUILDTYPE}"-Thread"])
 
 # checks for libraries.
 AC_SEARCH_LIBS([lt_dlopen], [ltdl])
@@ -77,10 +84,13 @@ AX_BOOST_BASE([],[],[
 	----------------------------------------])
 ])
 
-# checks Pyhton 2.6.
-AX_PYTHON_DEVEL([>= '2.6'])
+# checks for Python.
+AX_PYTHON
+# checks for Python >= 2.7.
+AX_PYTHON_DEVEL([>= '2.7'])
+
 # checks Panda3d sdk environment
-PANDA3D_SEARCH([${PYTHON_CPPFLAGS} ${PYTHON_LDFLAGS} ${PYTHON_EXTRA_LIBS}])
+PANDA3D_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
 # Ely flags for Makefiles
 ELY_CPPFLAGS="${PANDA3D_CPPFLAGS}"
 ELY_LDFLAGS="${PANDA3D_LDFLAGS}"
@@ -152,3 +162,18 @@ AC_CONFIG_FILES([
 		])
 
 AC_OUTPUT
+
+echo \
+"-------------------------------------------------
+${PACKAGE_NAME} Version ${PACKAGE_VERSION}
+Prefix: '${prefix}'.
+Compiler: '${CC} ${CFLAGS} ${CPPFLAGS}'
+Build Type: ${BUILDTYPE}
+PANDA3D_CPPFLAGS: ${PANDA3D_CPPFLAGS}
+PANDA3D_LDFLAGS: ${PANDA3D_LDFLAGS}
+PANDA3D_LIBS: ${PANDA3D_LIBS}
+Now type 'make @<:@<target>@:>@'
+where the optional <target> is:
+	all -->for building all binaries
+	install -->for installing everything
+--------------------------------------------------"
