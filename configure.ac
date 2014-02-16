@@ -167,11 +167,9 @@ echo \
 "-------------------------------------------------
 ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 Prefix: '${prefix}'.
-Compiler: '${CC} ${CFLAGS} ${CPPFLAGS}'
+Compiler command: '${CXX} ${ELY_CXXFLAGS} ${ELY_CPPFLAGS}'
+Linker command: '${CXX} ${ELY_LDFLAGS} ${ELY_LIBS}'
 Build Type: ${BUILDTYPE}
-PANDA3D_CPPFLAGS: ${PANDA3D_CPPFLAGS}
-PANDA3D_LDFLAGS: ${PANDA3D_LDFLAGS}
-PANDA3D_LIBS: ${PANDA3D_LIBS}
 Now type 'make @<:@<target>@:>@'
 where the optional <target> is:
 	all -->for building all binaries

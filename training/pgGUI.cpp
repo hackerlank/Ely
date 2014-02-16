@@ -26,9 +26,11 @@
 #include <load_prc_file.h>
 #include <rocketRegion.h>
 #include <Rocket/Core.h>
+#include <Rocket/Debugger.h>
 #include "Utilities/Tools.h"
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
+void LoadFonts(const char* directory);
 
 int pgGUI_main(int argc, char *argv[])
 {
@@ -64,25 +66,50 @@ int pgGUI_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-	Rocket::Core::FontDatabase::LoadFontFace("assets/Delicious-Roman.otf");
+	LoadFonts("/REPOSITORY/KProjects/libRocket/Samples/assets/");
 
 	PT(RocketRegion)r = RocketRegion::make("pandaRocket", window->get_graphics_window());
 	r->set_active(true);
-	Rocket::Core::Context *context = r->get_context();
-
-	context->LoadDocument("data/background.rml")->Show();
-
-	Rocket::Core::ElementDocument* doc = context->LoadDocument(
-			"data/main_menu.rml");
-	doc->Show();
 
 	PT(RocketInputHandler)ih = new RocketInputHandler();
 	window->get_mouse().attach_new_node(ih);
 	r->set_input_handler(ih);
+
+	Rocket::Core::Context *context = r->get_context();
+
+///	Rocket::Debugger::Initialise(context);
+///	Rocket::Debugger::SetVisible(true);
+
+	Rocket::Core::ElementDocument* document =
+			context->LoadDocument(
+					"/REPOSITORY/KProjects/libRocket/Samples/tutorial/template/data/tutorial.rml");
+	if (document != NULL)
+	{
+		document->GetElementById("title")->SetInnerRML(document->GetTitle());
+		document->Show();
+		document->RemoveReference();
+	}
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
 	//close the window framework
 	framework.close_framework();
 	return (0);
+}
+
+/// Loads the default fonts from the given path.
+void LoadFonts(const char* directory)
+{
+	Rocket::Core::String font_names[4];
+	font_names[0] = "Delicious-Roman.otf";
+	font_names[1] = "Delicious-Italic.otf";
+	font_names[2] = "Delicious-Bold.otf";
+	font_names[3] = "Delicious-BoldItalic.otf";
+
+	for (unsigned int i = 0;
+			i < sizeof(font_names) / sizeof(Rocket::Core::String); i++)
+	{
+		Rocket::Core::FontDatabase::LoadFontFace(
+				Rocket::Core::String(directory) + font_names[i]);
+	}
 }
