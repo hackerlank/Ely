@@ -26,4 +26,4 @@ nodist_ely_training_SOURCES = \
 		draw_geometry.cpp \
 		test_wo_local_scale.cpp \
 		meshdrawer.cpp \
-		pgGUI.cpp
+		rocket.cpp

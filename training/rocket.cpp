@@ -31,8 +31,11 @@
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 void LoadFonts(const char* directory);
+void showMenu(const Event* e, void* data);
+bool toggleMenu = false;
+Rocket::Core::ElementDocument* document;
 
-int pgGUI_main(int argc, char *argv[])
+int rocket_main(int argc, char *argv[])
 {
 	// Load your configuration
 	load_prc_file_data("", "model-path " + baseDir + "data/models");
@@ -66,32 +69,31 @@ int pgGUI_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-	LoadFonts("/REPOSITORY/KProjects/libRocket/Samples/assets/");
+	EventHandler::get_global_event_handler()->add_hook("m", showMenu,
+			reinterpret_cast<void*>(&toggleMenu));
 
+	LoadFonts("/REPOSITORY/KProjects/libRocket/Samples/assets/");
 	PT(RocketRegion)r = RocketRegion::make("pandaRocket", window->get_graphics_window());
 	r->set_active(true);
-
 	PT(RocketInputHandler)ih = new RocketInputHandler();
 	window->get_mouse().attach_new_node(ih);
 	r->set_input_handler(ih);
-
 	Rocket::Core::Context *context = r->get_context();
-
 ///	Rocket::Debugger::Initialise(context);
 ///	Rocket::Debugger::SetVisible(true);
 
-	Rocket::Core::ElementDocument* document =
-			context->LoadDocument(
-					"/REPOSITORY/KProjects/libRocket/Samples/tutorial/template/data/tutorial.rml");
+	// Load and show the tutorial document.
+	document = context->LoadDocument(
+			(baseDir + "data/models/rocket.rml").c_str());
 	if (document != NULL)
 	{
-		document->GetElementById("title")->SetInnerRML(document->GetTitle());
-		document->Show();
+		document->Hide();
 		document->RemoveReference();
 	}
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
+
 	//close the window framework
 	framework.close_framework();
 	return (0);
@@ -112,4 +114,19 @@ void LoadFonts(const char* directory)
 		Rocket::Core::FontDatabase::LoadFontFace(
 				Rocket::Core::String(directory) + font_names[i]);
 	}
+}
+
+void showMenu(const Event* e, void* data)
+{
+	bool* toggleMenu = reinterpret_cast<bool*>(data);
+	//remove generator updating
+	if (*toggleMenu)
+	{
+		document->Hide();
+	}
+	else
+	{
+		document->Show();
+	}
+	*toggleMenu = not *toggleMenu;
 }
