@@ -31,9 +31,10 @@
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 void LoadFonts(const char* directory);
+Rocket::Core::Context *context;
+///rocket-doc
 void showMenu(const Event* e, void* data);
 bool toggleMenu = false;
-Rocket::Core::ElementDocument* document;
 
 int rocket_main(int argc, char *argv[])
 {
@@ -69,27 +70,23 @@ int rocket_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-	EventHandler::get_global_event_handler()->add_hook("m", showMenu,
-			reinterpret_cast<void*>(&toggleMenu));
-
 	LoadFonts("/REPOSITORY/KProjects/libRocket/Samples/assets/");
+
 	PT(RocketRegion)r = RocketRegion::make("pandaRocket", window->get_graphics_window());
 	r->set_active(true);
+
 	PT(RocketInputHandler)ih = new RocketInputHandler();
 	window->get_mouse().attach_new_node(ih);
 	r->set_input_handler(ih);
-	Rocket::Core::Context *context = r->get_context();
+
+	context = r->get_context();
+
 ///	Rocket::Debugger::Initialise(context);
 ///	Rocket::Debugger::SetVisible(true);
 
-	// Load and show the tutorial document.
-	document = context->LoadDocument(
-			(baseDir + "data/models/rocket.rml").c_str());
-	if (document != NULL)
-	{
-		document->Hide();
-		document->RemoveReference();
-	}
+	//show rocket-doc handler
+	EventHandler::get_global_event_handler()->add_hook("m", showMenu,
+			reinterpret_cast<void*>(&toggleMenu));
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -116,17 +113,101 @@ void LoadFonts(const char* directory)
 	}
 }
 
+///
+class EventListener: public Rocket::Core::EventListener
+{
+public:
+	EventListener(const Rocket::Core::String& value);
+	virtual ~EventListener();
+
+protected:
+	virtual void ProcessEvent(Rocket::Core::Event& event);
+
+private:
+	Rocket::Core::String mValue;
+};
+
+class EventListenerInstancer: public Rocket::Core::EventListenerInstancer
+{
+public:
+	EventListenerInstancer();
+	virtual ~EventListenerInstancer();
+
+	/// Instances a new event handle for Invaders.
+	virtual Rocket::Core::EventListener* InstanceEventListener(
+			const Rocket::Core::String& value, Rocket::Core::Element* element);
+
+	/// Destroys the instancer.
+	virtual void Release();
+};
+
+Rocket::Core::ElementDocument* document;
+EventListenerInstancer* eventListenerInstancer;
+
 void showMenu(const Event* e, void* data)
 {
 	bool* toggleMenu = reinterpret_cast<bool*>(data);
 	//remove generator updating
 	if (*toggleMenu)
 	{
+		//hide and unload the tutorial document.
 		document->Hide();
+		context->UnloadDocument(document);
 	}
 	else
 	{
-		document->Show();
+		//register EventListenerInstancer
+		eventListenerInstancer = new EventListenerInstancer;
+		Rocket::Core::Factory::RegisterEventListenerInstancer(
+				eventListenerInstancer);
+		eventListenerInstancer->RemoveReference();
+
+		// Load and show the tutorial document.
+		document = context->LoadDocument(
+				(baseDir + "data/models/rocket-doc.rml").c_str());
+		if (document != NULL)
+		{
+			document->GetElementById("title")->SetInnerRML(
+					document->GetTitle());
+			document->Show();
+			document->RemoveReference();
+		}
 	}
 	*toggleMenu = not *toggleMenu;
+}
+
+EventListener::EventListener(const Rocket::Core::String& value) :
+		mValue(value)
+{
+}
+
+EventListener::~EventListener()
+{
+}
+
+void EventListener::ProcessEvent(Rocket::Core::Event& event)
+{
+	std::cout << event.GetType().CString() << std::endl;
+	std::cout << mValue.CString() << std::endl;
+}
+
+EventListenerInstancer::EventListenerInstancer()
+{
+}
+
+EventListenerInstancer::~EventListenerInstancer()
+{
+}
+
+// Instances a new event handle for Invaders.
+Rocket::Core::EventListener* EventListenerInstancer::InstanceEventListener(
+		const Rocket::Core::String& value, Rocket::Core::Element* element)
+{
+	return new EventListener(value);
+}
+
+// Destroys the instancer.
+void EventListenerInstancer::Release()
+{
+	delete this;
 }
