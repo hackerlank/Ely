@@ -26,6 +26,7 @@
 #include <load_prc_file.h>
 #include <rocketRegion.h>
 #include <Rocket/Core.h>
+#include <Rocket/Controls.h>
 #include <Rocket/Debugger.h>
 #include "Utilities/Tools.h"
 
@@ -81,8 +82,12 @@ int rocket_main(int argc, char *argv[])
 
 	context = r->get_context();
 
-///	Rocket::Debugger::Initialise(context);
-///	Rocket::Debugger::SetVisible(true);
+	Rocket::Controls::Initialise();
+
+#ifdef ELY_DEBUG
+	Rocket::Debugger::Initialise(context);
+	Rocket::Debugger::SetVisible(true);
+#endif
 
 	//show rocket-doc handler
 	EventHandler::get_global_event_handler()->add_hook("m", showMenu,
@@ -187,8 +192,60 @@ EventListener::~EventListener()
 
 void EventListener::ProcessEvent(Rocket::Core::Event& event)
 {
-	std::cout << event.GetType().CString() << std::endl;
-	std::cout << mValue.CString() << std::endl;
+#ifdef ELY_DEBUG
+	Rocket::Core::Event::EventPhase phase = event.GetPhase();
+	Rocket::Core::String phaseStr;
+	switch (phase)
+	{
+	case Rocket::Core::Event::PHASE_BUBBLE:
+		phaseStr = "PHASE_BUBBLE";
+		break;
+	case Rocket::Core::Event::PHASE_CAPTURE:
+		phaseStr = "PHASE_CAPTURE";
+		break;
+	case Rocket::Core::Event::PHASE_TARGET:
+		phaseStr = "PHASE_TARGET";
+		break;
+	default:
+		phaseStr = "PHASE_UNKNOWN";
+		break;
+	}
+	std::cout << "Event type: " << event.GetType().CString() << std::endl;
+	std::cout << "Event value: " << mValue.CString() << std::endl;
+	std::cout << "Event phase: " << phaseStr.CString() << std::endl;
+	std::cout << "Event target element tag: "
+			<< event.GetTargetElement()->GetTagName().CString() << std::endl;
+	std::cout << "Event current element tag: "
+			<< event.GetTargetElement()->GetTagName().CString() << std::endl;
+	int pos = 0;
+	Rocket::Core::String key, strRepr;
+	Rocket::Core::Variant* value;
+	while (event.GetParameters()->Iterate(pos, key, value))
+	{
+		strRepr = value->Get<Rocket::Core::String>();
+		std::cout << "Event parameter: pos = " << pos << " key = \""
+				<< key.CString() << "\"" << " value = " << strRepr.CString()
+				<< std::endl;
+	}
+	std::cout << std::endl;
+#endif
+
+	if (mValue == "body::load_logo")
+	{
+
+	}
+	else if (mValue == "form::store_options")
+	{
+
+	}
+	else if (mValue == "input::bad_graphics")
+	{
+
+	}
+	else
+	{
+
+	}
 }
 
 EventListenerInstancer::EventListenerInstancer()
