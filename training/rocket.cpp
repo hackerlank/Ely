@@ -24,6 +24,7 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <load_prc_file.h>
+#include <throw_event.h>
 #include <rocketRegion.h>
 #include <Rocket/Core.h>
 #include <Rocket/Controls.h>
@@ -34,8 +35,7 @@ static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 void LoadFonts(const char* directory);
 Rocket::Core::Context *context;
 ///rocket-doc
-void showMenu(const Event* e, void* data);
-bool toggleMenu = false;
+void showMainMenu(const Event* e, void* data);
 
 int rocket_main(int argc, char *argv[])
 {
@@ -89,9 +89,9 @@ int rocket_main(int argc, char *argv[])
 	Rocket::Debugger::SetVisible(true);
 #endif
 
-	//show rocket-doc handler
-	EventHandler::get_global_event_handler()->add_hook("m", showMenu,
-			reinterpret_cast<void*>(&toggleMenu));
+	//show rocket-main event handler
+	EventHandler::get_global_event_handler()->add_hook("m", showMainMenu,
+			reinterpret_cast<void*>(NULL));
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -146,39 +146,30 @@ public:
 	virtual void Release();
 };
 
-Rocket::Core::ElementDocument* document;
-EventListenerInstancer* eventListenerInstancer;
+Rocket::Core::ElementDocument *mainMenu = NULL, *optionMenu = NULL;
+EventListenerInstancer* eventListenerInstancer = NULL;
 
-void showMenu(const Event* e, void* data)
+void showMainMenu(const Event* e, void* data)
 {
-	bool* toggleMenu = reinterpret_cast<bool*>(data);
-	//remove generator updating
-	if (*toggleMenu)
+	if (mainMenu)
 	{
-		//hide and unload the tutorial document.
-		document->Hide();
-		context->UnloadDocument(document);
+		return;
 	}
-	else
-	{
-		//register EventListenerInstancer
-		eventListenerInstancer = new EventListenerInstancer;
-		Rocket::Core::Factory::RegisterEventListenerInstancer(
-				eventListenerInstancer);
-		eventListenerInstancer->RemoveReference();
+	//register EventListenerInstancer
+	eventListenerInstancer = new EventListenerInstancer;
+	Rocket::Core::Factory::RegisterEventListenerInstancer(
+			eventListenerInstancer);
+	eventListenerInstancer->RemoveReference();
 
-		// Load and show the tutorial document.
-		document = context->LoadDocument(
-				(baseDir + "data/models/rocket-doc.rml").c_str());
-		if (document != NULL)
-		{
-			document->GetElementById("title")->SetInnerRML(
-					document->GetTitle());
-			document->Show();
-			document->RemoveReference();
-		}
+	// Load and show the main document.
+	mainMenu = context->LoadDocument(
+			(baseDir + "data/models/rocket-main.rml").c_str());
+	if (mainMenu != NULL)
+	{
+		mainMenu->GetElementById("title")->SetInnerRML(mainMenu->GetTitle());
+		mainMenu->Show();
+		mainMenu->RemoveReference();
 	}
-	*toggleMenu = not *toggleMenu;
 }
 
 EventListener::EventListener(const Rocket::Core::String& value) :
@@ -230,21 +221,41 @@ void EventListener::ProcessEvent(Rocket::Core::Event& event)
 	std::cout << std::endl;
 #endif
 
-	if (mValue == "body::load_logo")
+	if (mValue == "main::body::load_logo")
 	{
 
 	}
-	else if (mValue == "form::store_options")
+	else if (mValue == "main::button::start_game")
 	{
-
+		//hide and unload the main document.
+		mainMenu->Close();
+		context->UnloadDocument(mainMenu);
+		mainMenu = NULL;
 	}
-	else if (mValue == "input::bad_graphics")
+	else if (mValue == "main::button::options")
+	{
+		mainMenu->Hide();
+		// Load and show the options document.
+		optionMenu = context->LoadDocument(
+				(baseDir + "data/models/rocket-options.rml").c_str());
+		if (optionMenu != NULL)
+		{
+			//populate controls
+			optionMenu->GetElementById("title")->SetInnerRML(optionMenu->GetTitle());
+			optionMenu->Show();
+			optionMenu->RemoveReference();
+		}
+	}
+	else if (mValue == "main::button::exit")
+	{
+		throw_event("window-event");
+	}
+	else if (mValue == "options::body::load_logo")
 	{
 
 	}
 	else
 	{
-
 	}
 }
 
