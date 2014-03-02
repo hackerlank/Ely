@@ -24,7 +24,6 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <load_prc_file.h>
-#include <throw_event.h>
 #include <rocketRegion.h>
 #include <Rocket/Core.h>
 #include <Rocket/Controls.h>
@@ -71,7 +70,7 @@ int rocket_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-	LoadFonts("/REPOSITORY/KProjects/libRocket/Samples/assets/");
+	LoadFonts((baseDir + "data/misc/").c_str());
 
 	PT(RocketRegion)r = RocketRegion::make("pandaRocket", window->get_graphics_window());
 	r->set_active(true);
@@ -91,7 +90,7 @@ int rocket_main(int argc, char *argv[])
 
 	//show rocket-main event handler
 	EventHandler::get_global_event_handler()->add_hook("m", showMainMenu,
-			reinterpret_cast<void*>(NULL));
+			reinterpret_cast<void*>(&framework));
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -119,66 +118,107 @@ void LoadFonts(const char* directory)
 }
 
 ///
-class EventListener: public Rocket::Core::EventListener
+class EventListener: public Rocket::Core::EventListener,
+		Rocket::Core::ReferenceCountable
 {
 public:
-	EventListener(const Rocket::Core::String& value);
-	virtual ~EventListener();
+	EventListener(const Rocket::Core::String& value, PandaFramework* framework) :
+			Rocket::Core::ReferenceCountable(0), mValue(value), mFramework(
+					framework)
+	{
+		std::cout << "Creating EventListener: " << mValue.CString() << " "
+				<< this << std::endl;
+	}
+	virtual ~EventListener()
+	{
+		std::cout << "Destroying EventListener: " << mValue.CString() << " "
+				<< this << std::endl;
+	}
+
+	virtual void ProcessEvent(Rocket::Core::Event& event);
+
+	virtual void OnAttach(Rocket::Core::Element* ROCKET_UNUSED(element))
+	{
+		std::cout << "Attaching EventListener: " << mValue.CString() << " "
+				<< this << std::endl;
+		AddReference();
+	}
+
+	virtual void OnDetach(Rocket::Core::Element* ROCKET_UNUSED(element))
+	{
+		std::cout << "Detaching EventListener: " << mValue.CString() << " "
+				<< this << std::endl;
+		RemoveReference();
+	}
 
 protected:
-	virtual void ProcessEvent(Rocket::Core::Event& event);
+	virtual void OnReferenceDeactivate()
+	{
+		delete this;
+	}
 
 private:
 	Rocket::Core::String mValue;
+	PandaFramework* mFramework;
 };
 
 class EventListenerInstancer: public Rocket::Core::EventListenerInstancer
 {
 public:
-	EventListenerInstancer();
-	virtual ~EventListenerInstancer();
+	EventListenerInstancer(PandaFramework* framework) :
+			mFramework(framework)
+	{
+		std::cout << "Creating EventListenerInstancer " << " " << this
+				<< std::endl;
+	}
+	virtual ~EventListenerInstancer()
+	{
+		std::cout << "Destroying EventListenerInstancer " << " " << this
+				<< std::endl;
+	}
 
-	/// Instances a new event handle for Invaders.
 	virtual Rocket::Core::EventListener* InstanceEventListener(
-			const Rocket::Core::String& value, Rocket::Core::Element* element);
+			const Rocket::Core::String& value, Rocket::Core::Element* element)
+	{
+		return new EventListener(value, mFramework);
+	}
 
-	/// Destroys the instancer.
-	virtual void Release();
+	virtual void Release()
+	{
+		delete this;
+	}
+
+private:
+	PandaFramework* mFramework;
 };
 
+///
 Rocket::Core::ElementDocument *mainMenu = NULL, *optionMenu = NULL;
 EventListenerInstancer* eventListenerInstancer = NULL;
+//simulate program control variables
+//graphics: 0=default,1=good,2=bad
+int graphicsQuality = 0;
+//audio
+bool audioReverb = true, audio3d = false;
 
 void showMainMenu(const Event* e, void* data)
 {
-	if (mainMenu)
-	{
-		return;
-	}
+	PandaFramework* framework = reinterpret_cast<PandaFramework*>(data);
 	//register EventListenerInstancer
-	eventListenerInstancer = new EventListenerInstancer;
+	eventListenerInstancer = new EventListenerInstancer(framework);
 	Rocket::Core::Factory::RegisterEventListenerInstancer(
 			eventListenerInstancer);
 	eventListenerInstancer->RemoveReference();
 
 	// Load and show the main document.
 	mainMenu = context->LoadDocument(
-			(baseDir + "data/models/rocket-main.rml").c_str());
+			(baseDir + "data/misc/rocket-main.rml").c_str());
 	if (mainMenu != NULL)
 	{
 		mainMenu->GetElementById("title")->SetInnerRML(mainMenu->GetTitle());
 		mainMenu->Show();
 		mainMenu->RemoveReference();
 	}
-}
-
-EventListener::EventListener(const Rocket::Core::String& value) :
-		mValue(value)
-{
-}
-
-EventListener::~EventListener()
-{
 }
 
 void EventListener::ProcessEvent(Rocket::Core::Event& event)
@@ -209,13 +249,13 @@ void EventListener::ProcessEvent(Rocket::Core::Event& event)
 	std::cout << "Event current element tag: "
 			<< event.GetTargetElement()->GetTagName().CString() << std::endl;
 	int pos = 0;
-	Rocket::Core::String key, strRepr;
+	Rocket::Core::String key, valueAsStr;
 	Rocket::Core::Variant* value;
 	while (event.GetParameters()->Iterate(pos, key, value))
 	{
-		strRepr = value->Get<Rocket::Core::String>();
+		valueAsStr = value->Get<Rocket::Core::String>();
 		std::cout << "Event parameter: pos = " << pos << " key = \""
-				<< key.CString() << "\"" << " value = " << strRepr.CString()
+				<< key.CString() << "\"" << " value = " << valueAsStr.CString()
 				<< std::endl;
 	}
 	std::cout << std::endl;
@@ -227,55 +267,129 @@ void EventListener::ProcessEvent(Rocket::Core::Event& event)
 	}
 	else if (mValue == "main::button::start_game")
 	{
-		//hide and unload the main document.
+		//close (i.e. unload) the main document.
 		mainMenu->Close();
-		context->UnloadDocument(mainMenu);
-		mainMenu = NULL;
 	}
 	else if (mValue == "main::button::options")
 	{
 		mainMenu->Hide();
 		// Load and show the options document.
 		optionMenu = context->LoadDocument(
-				(baseDir + "data/models/rocket-options.rml").c_str());
+				(baseDir + "data/misc/rocket-options.rml").c_str());
 		if (optionMenu != NULL)
 		{
-			//populate controls
-			optionMenu->GetElementById("title")->SetInnerRML(optionMenu->GetTitle());
+			optionMenu->GetElementById("title")->SetInnerRML(
+					optionMenu->GetTitle());
+			///update controls
+			//graphics
+			switch (graphicsQuality)
+			{
+			case 0:
+				optionMenu->GetElementById("default_graphics")->SetAttribute(
+						"checked", true);
+				break;
+			case 1:
+				optionMenu->GetElementById("good_graphics")->SetAttribute(
+						"checked", true);
+				break;
+			case 2:
+				optionMenu->GetElementById("bad_graphics")->SetAttribute(
+						"checked", true);
+				break;
+			default:
+				break;
+			}
+			//audio
+			Rocket::Core::Element* audioElem;
+			audioElem = optionMenu->GetElementById("reverb_audio");
+			audioReverb ?
+					audioElem->SetAttribute("checked", true) :
+					audioElem->RemoveAttribute("checked");
+			audioElem = optionMenu->GetElementById("3d_audio");
+			audio3d ?
+					audioElem->SetAttribute("checked", true) :
+					audioElem->RemoveAttribute("checked");
+			//
 			optionMenu->Show();
 			optionMenu->RemoveReference();
 		}
 	}
 	else if (mValue == "main::button::exit")
 	{
-		throw_event("window-event");
+		//close (i.e. unload) the main document.
+		mainMenu->Close();
+		//set PandaFramework exit flag
+		mFramework->set_exit_flag();
 	}
 	else if (mValue == "options::body::load_logo")
 	{
 
 	}
+	else if (mValue == "options::form::submit_options")
+	{
+		Rocket::Core::String paramValue;
+		//check if ok or cancel
+		paramValue = event.GetParameter<Rocket::Core::String>("submit",
+				"cancel");
+		if (paramValue == "ok")
+		{
+			//get controls values
+			//graphics
+			paramValue = event.GetParameter<Rocket::Core::String>("graphics",
+					"default");
+			if (paramValue == "good")
+			{
+				graphicsQuality = 1;
+			}
+			else if (paramValue == "bad")
+			{
+				graphicsQuality = 2;
+			}
+			else
+			{
+				//default
+				graphicsQuality = 0;
+			}
+			//audio
+			paramValue = event.GetParameter<Rocket::Core::String>("reverb",
+					"NONE");
+			paramValue == "true" ? audioReverb = true : audioReverb = false;
+			paramValue = event.GetParameter<Rocket::Core::String>("3d", "NONE");
+			paramValue == "true" ? audio3d = true : audio3d = false;
+		}
+		//close (i.e. unload) the options document.
+		optionMenu->Close();
+		//return to main document.
+		mainMenu->Show();
+	}
+	else if (mValue == "options::input::bad_graphics")
+	{
+		// This event is sent from the 'onchange' of the bad graphics
+		//radio button. It shows or hides the bad graphics warning message.
+		Rocket::Core::ElementDocument* options_body =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (options_body == NULL)
+			return;
+
+		Rocket::Core::Element* bad_warning = options_body->GetElementById(
+				"bad_warning");
+		if (bad_warning)
+		{
+			// The 'value' parameter of an onchange event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the 'value'
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				bad_warning->SetProperty("display", "none");
+			}
+			else
+			{
+				bad_warning->SetProperty("display", "block");
+			}
+		}
+	}
 	else
 	{
 	}
-}
-
-EventListenerInstancer::EventListenerInstancer()
-{
-}
-
-EventListenerInstancer::~EventListenerInstancer()
-{
-}
-
-// Instances a new event handle for Invaders.
-Rocket::Core::EventListener* EventListenerInstancer::InstanceEventListener(
-		const Rocket::Core::String& value, Rocket::Core::Element* element)
-{
-	return new EventListener(value);
-}
-
-// Destroys the instancer.
-void EventListenerInstancer::Release()
-{
-	delete this;
 }

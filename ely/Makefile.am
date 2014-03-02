@@ -1,4 +1,4 @@
-DIST_SUBDIRS = callbacks transitions initializations instanceupdates data 
+DIST_SUBDIRS = callbacks transitions initializations instanceupdates
 
 # if !BOOST_TEST and !TRAINING then ELY_ELF 
 if ELY_ELF
