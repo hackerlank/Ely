@@ -142,6 +142,12 @@ AM_COND_IF([ELY_ELF],
 		ely/transitions/Makefile
 		ely/instanceupdates/Makefile
 		ely/initializations/Makefile
+		ely/data/Makefile
+		ely/data/misc/Makefile
+		ely/data/models/Makefile
+		ely/data/shaders/Makefile
+		ely/data/sounds/Makefile
+		ely/data/textures/Makefile
 		])])
 
 # checks for typedefs, structures, and compiler characteristics.

@@ -94,7 +94,6 @@ libutilities_la_SOURCES = \
 
 #libraries sources
 libsupport_a_SOURCES = \
-		Support/FirstPersonCamera.cpp \
 		Support/FSM.cpp \
 		Support/Picker.cpp \
 		Support/Raycaster.cpp \

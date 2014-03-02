@@ -74,7 +74,6 @@ noinst_HEADERS = \
 		SceneComponents/NodePathWrapperTemplate.h \
 		SceneComponents/Terrain.h \
 		SceneComponents/TerrainTemplate.h \
-		Support/FirstPersonCamera.h \
 		Support/FSM.h \
 		Support/Picker.h \
 		Support/Raycaster.h \

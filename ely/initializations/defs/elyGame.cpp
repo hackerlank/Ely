@@ -24,6 +24,7 @@
 #include "../common_configs.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
+#include "Ely.h"
 
 ///ely related
 #ifdef __cplusplus

@@ -1,4 +1,4 @@
-DIST_SUBDIRS = callbacks transitions initializations instanceupdates
+DIST_SUBDIRS = callbacks transitions initializations instanceupdates data 
 
 # if !BOOST_TEST and !TRAINING then ELY_ELF 
 if ELY_ELF
@@ -7,7 +7,7 @@ endif
 
 SUBDIRS = $(ELYELFDIRS)
 
-AM_CPPFLAGS = -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
