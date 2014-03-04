@@ -26,8 +26,6 @@
 
 #include <load_prc_file.h>
 #include <Rocket/Core.h>
-#include <Rocket/Controls.h>
-#include <Rocket/Debugger.h>
 #include "Game/GameManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GameAudioManager.h"
