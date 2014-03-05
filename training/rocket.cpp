@@ -32,7 +32,7 @@
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 void LoadFonts(const char* directory);
-Rocket::Core::Context *gRocketContext;
+Rocket::Core::Context *rocketContext;
 ///rocket-doc
 void showMainMenu(const Event* e, void* data);
 
@@ -79,12 +79,12 @@ int rocket_main(int argc, char *argv[])
 	window->get_mouse().attach_new_node(ih);
 	r->set_input_handler(ih);
 
-	gRocketContext = r->get_context();
+	rocketContext = r->get_context();
 
 	Rocket::Controls::Initialise();
 
 #ifdef ELY_DEBUG
-	Rocket::Debugger::Initialise(gRocketContext);
+	Rocket::Debugger::Initialise(rocketContext);
 	Rocket::Debugger::SetVisible(true);
 #endif
 
@@ -211,7 +211,7 @@ void showMainMenu(const Event* e, void* data)
 	eventListenerInstancer->RemoveReference();
 
 	// Load and show the main document.
-	mainMenu = gRocketContext->LoadDocument(
+	mainMenu = rocketContext->LoadDocument(
 			(baseDir + "data/misc/rocket-main.rml").c_str());
 	if (mainMenu != NULL)
 	{
@@ -274,7 +274,7 @@ void EventListener::ProcessEvent(Rocket::Core::Event& event)
 	{
 		mainMenu->Hide();
 		// Load and show the options document.
-		optionMenu = gRocketContext->LoadDocument(
+		optionMenu = rocketContext->LoadDocument(
 				(baseDir + "data/misc/rocket-options.rml").c_str());
 		if (optionMenu != NULL)
 		{

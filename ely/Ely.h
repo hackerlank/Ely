@@ -101,7 +101,6 @@ protected:
 		delete this;
 	}
 
-private:
 	Rocket::Core::String mValue;
 	PandaFramework* mFramework;
 };
@@ -135,7 +134,7 @@ public:
 		delete this;
 	}
 
-private:
+protected:
 	PandaFramework* mFramework;
 };
 }
