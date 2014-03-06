@@ -43,6 +43,11 @@ INITIALIZATION elyPostObjects_initialization;
 }
 #endif
 
+//globals
+Rocket::Core::Context *gRocketContext;
+Rocket::Core::ElementDocument *gMainMenu = NULL;
+std::vector<void (*)(Rocket::Core::ElementDocument *)> gAddElementsFunctions;
+
 //locals
 namespace
 {
@@ -83,9 +88,6 @@ public:
 };
 MainEventListenerInstancer* eventListenerInstancer = NULL;
 }  // namespace
-//globals
-Rocket::Core::Context *gRocketContext;
-Rocket::Core::ElementDocument *gMainMenu = NULL;
 
 void elyPreObjects_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
@@ -93,7 +95,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//create the global ray caster
 	new Raycaster(pandaFramework, windowFramework, GamePhysicsManager::GetSingleton().bulletWorld(), CALLBACKSNUM);
 
-	//initialize libRocket: one region for the main window
+	//libRocket: initialize one region for the main window
 	LoadFonts((baseDir + "data/misc/").c_str());
 
 	SMARTPTR(RocketRegion)region = RocketRegion::make("elyRocket", windowFramework->get_graphics_window());
@@ -107,10 +109,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 
 	Rocket::Controls::Initialise();
 
-	//show rocket-main event handler
-	EventHandler::get_global_event_handler()->add_hook("m", showMainMenu,
-	reinterpret_cast<void*>(&pandaFramework));
-
 #ifdef ELY_DEBUG
 	Rocket::Debugger::Initialise(gRocketContext);
 	Rocket::Debugger::SetVisible(true);
@@ -120,6 +118,9 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 void elyPostObjects_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
+	//libRocket: add show main menu event handler
+	EventHandler::get_global_event_handler()->add_hook("m", showMainMenu,
+	reinterpret_cast<void*>(&pandaFramework));
 }
 
 namespace
@@ -144,7 +145,7 @@ void LoadFonts(const char* directory)
 void showMainMenu(const Event* e, void* data)
 {
 	PandaFramework* framework = reinterpret_cast<PandaFramework*>(data);
-	//register EventListenerInstancer
+	//register MainEventListenerInstancer
 	eventListenerInstancer = new MainEventListenerInstancer(framework);
 	Rocket::Core::Factory::RegisterEventListenerInstancer(
 			eventListenerInstancer);
@@ -152,10 +153,17 @@ void showMainMenu(const Event* e, void* data)
 
 	// Load and show the main document.
 	gMainMenu = gRocketContext->LoadDocument(
-			(baseDir + "data/misc/rocket-main.rml").c_str());
+			(baseDir + "data/misc/ely-main-menu.rml").c_str());
 	if (gMainMenu != NULL)
 	{
 		gMainMenu->GetElementById("title")->SetInnerRML(gMainMenu->GetTitle());
+		//add elements to gMainMenu
+		std::vector<void (*)(Rocket::Core::ElementDocument *)>::iterator iter;
+		for (iter = gAddElementsFunctions.begin();
+				iter != gAddElementsFunctions.end(); ++iter)
+		{
+			(*iter)(gMainMenu);
+		}
 		gMainMenu->Show();
 		gMainMenu->RemoveReference();
 	}

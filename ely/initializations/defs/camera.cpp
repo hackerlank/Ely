@@ -26,6 +26,7 @@
 #include "ControlComponents/Chaser.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Support/Picker.h"
+#include <Rocket/Core.h>
 
 ///camera related
 #ifdef __cplusplus
@@ -39,19 +40,26 @@ INITIALIZATION camera_initialization;
 }
 #endif
 
+//externs
+extern Rocket::Core::Context *gRocketContext;
+extern Rocket::Core::ElementDocument *gMainMenu;
+extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gAddElementsFunctions;
+
 ///shared between camera, picker, actor1
 bool controlGrabbed = false;
 
+//locals
 namespace
 {
 //common text writing
 NodePath textNode;
-void writeText(const std::string& text, float scale,
-		const LVecBase4& color, const LVector3f& location)
+void writeText(const std::string& text, float scale, const LVecBase4& color,
+		const LVector3f& location)
 {
 	textNode = NodePath(new TextNode("CommonTextNode"));
-	textNode.reparent_to(ObjectTemplateManager::GetSingletonPtr()->
-			getCreatedObject(ObjectId("render2d"))->getNodePath());
+	textNode.reparent_to(
+			ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
+					ObjectId("render2d"))->getNodePath());
 	textNode.set_bin("fixed", 50);
 	textNode.set_depth_write(false);
 	textNode.set_depth_test(false);
@@ -200,7 +208,7 @@ void toggleChasedObject(const Event* event, void* data)
 {
 	SMARTPTR(Object)camera= reinterpret_cast<Object*>(data);
 	SMARTPTR(Component) controlComp = camera->getComponent(
-					ComponentFamilyType("Control"));
+			ComponentFamilyType("Control"));
 	if(controlComp->componentType() == ComponentType("Chaser"))
 	{
 		SMARTPTR(Chaser) chaserComp = DCAST(Chaser, controlComp);
@@ -227,27 +235,58 @@ void toggleChasedObject(const Event* event, void* data)
 	}
 }
 
+//libRocket: main menu add element function
+void addElements(Rocket::Core::ElementDocument * mainMenu)
+{
+	//<button onclick="camera::options">Camera options</button><br/>
+	Rocket::Core::Element* content = mainMenu->GetElementById("content");
+	Rocket::Core::Element* exit = mainMenu->GetElementById("main::button::exit");
+	if (content)
+	{
+		//create input element
+		Rocket::Core::Dictionary params;
+		params.Set("onclick", "camera::options");
+		Rocket::Core::Element* input = Rocket::Core::Factory::InstanceElement(
+				NULL, "button", "button", params);
+		Rocket::Core::Factory::InstanceElementText(input, "Camera options");
+		//create br element
+		params.Clear();
+		params.Set("id", "br");
+		Rocket::Core::Element* br = Rocket::Core::Factory::InstanceElement(
+				NULL, "br", "br", params);
+		//inster elements
+		content->InsertBefore(input, exit);
+		input->RemoveReference();
+		content->InsertBefore(br, exit);
+		br->RemoveReference();
+	}
 }
+} // namespace
 void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
 	//enable/disable camera control by event
 	pandaFramework->define_key("c", "toggleCameraControl", &toggleCameraControl,
-			static_cast<void*>(object));
+	static_cast<void*>(object));
 	//enable/disable a picker
 	pandaFramework->define_key("x", "togglePicker", &togglePicker,
-			static_cast<void*>(object));
+	static_cast<void*>(object));
 	//toggle chased object
 	pandaFramework->define_key("z", "toggleChasedObject", &toggleChasedObject,
-			static_cast<void*>(object));
+	static_cast<void*>(object));
+
+	//libRocket: register addElements to main menu
+	gAddElementsFunctions.push_back(&addElements);
 }
 
 void cameraInit()
 {
 	chasedDataPtr = new std::vector<ChasedObjectData>();
-	chasedDataPtr->push_back({25.0,18.0,8.0,5.0,ObjectId("auto1")});
-	chasedDataPtr->push_back({15.0,8.0,6.0,3.0,ObjectId("player0")});
+	chasedDataPtr->push_back(
+	{ 25.0, 18.0, 8.0, 5.0, ObjectId("auto1") });
+	chasedDataPtr->push_back(
+	{ 15.0, 8.0, 6.0, 3.0, ObjectId("player0") });
 	chasedListSize = chasedDataPtr->size();
 }
 
@@ -255,5 +294,4 @@ void cameraEnd()
 {
 	delete chasedDataPtr;
 }
-
 
