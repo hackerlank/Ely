@@ -45,8 +45,9 @@ INITIALIZATION elyPostObjects_initialization;
 
 //globals
 Rocket::Core::Context *gRocketContext;
-Rocket::Core::ElementDocument *gMainMenu = NULL;
-std::vector<void (*)(Rocket::Core::ElementDocument *)> gAddElementsFunctions;
+Rocket::Core::ElementDocument *gRocketMainMenu = NULL;
+std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
+std::map<Rocket::Core::String, void (*)(const Rocket::Core::String&)> gRocketHandleEventFunctions;
 
 //locals
 namespace
@@ -152,20 +153,20 @@ void showMainMenu(const Event* e, void* data)
 	eventListenerInstancer->RemoveReference();
 
 	// Load and show the main document.
-	gMainMenu = gRocketContext->LoadDocument(
+	gRocketMainMenu = gRocketContext->LoadDocument(
 			(baseDir + "data/misc/ely-main-menu.rml").c_str());
-	if (gMainMenu != NULL)
+	if (gRocketMainMenu != NULL)
 	{
-		gMainMenu->GetElementById("title")->SetInnerRML(gMainMenu->GetTitle());
-		//add elements to gMainMenu
+		gRocketMainMenu->GetElementById("title")->SetInnerRML(gRocketMainMenu->GetTitle());
+		//add registered elements to gRocketMainMenu
 		std::vector<void (*)(Rocket::Core::ElementDocument *)>::iterator iter;
-		for (iter = gAddElementsFunctions.begin();
-				iter != gAddElementsFunctions.end(); ++iter)
+		for (iter = gRocketAddElementsFunctions.begin();
+				iter != gRocketAddElementsFunctions.end(); ++iter)
 		{
-			(*iter)(gMainMenu);
+			(*iter)(gRocketMainMenu);
 		}
-		gMainMenu->Show();
-		gMainMenu->RemoveReference();
+		gRocketMainMenu->Show();
+		gRocketMainMenu->RemoveReference();
 	}
 }
 
@@ -215,10 +216,10 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	else if (mValue == "main::button::start_game")
 	{
 		//close (i.e. unload) the main document.
-		gMainMenu->Close();
+		gRocketMainMenu->Close();
 	}
-	else if (mValue == "main::button::options")
-	{
+//	else if (mValue == "main::button::options")
+//	{
 //		gMainMenu->Hide();
 //		// Load and show the options document.
 //		optionMenu = gRocketContext->LoadDocument(
@@ -260,11 +261,11 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 //			optionMenu->Show();
 //			optionMenu->RemoveReference();
 //		}
-	}
+//	}
 	else if (mValue == "main::button::exit")
 	{
 		//close (i.e. unload) the main document.
-		gMainMenu->Close();
+		gRocketMainMenu->Close();
 		//set PandaFramework exit flag
 		mFramework->set_exit_flag();
 	}
@@ -338,6 +339,14 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 //	}
 	else
 	{
+		//check if it is a registered event name
+		if (gRocketHandleEventFunctions.find(mValue) != gRocketHandleEventFunctions.end())
+		{
+			//hide main menu
+			gRocketMainMenu->Hide();
+			//call the registered event handler
+			gRocketHandleEventFunctions[mValue](mValue);
+		}
 	}
 }
 
@@ -349,6 +358,6 @@ void elyGameInit()
 
 void elyGameEnd()
 {
-	//delete the global ray caster
+//delete the global ray caster
 	delete Raycaster::GetSingletonPtr();
 }

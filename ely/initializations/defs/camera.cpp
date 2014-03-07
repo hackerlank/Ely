@@ -42,8 +42,9 @@ INITIALIZATION camera_initialization;
 
 //externs
 extern Rocket::Core::Context *gRocketContext;
-extern Rocket::Core::ElementDocument *gMainMenu;
-extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gAddElementsFunctions;
+extern Rocket::Core::ElementDocument *gRocketMainMenu;
+extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
+extern std::map<Rocket::Core::String, void (*)(const Rocket::Core::String&)> gRocketHandleEventFunctions;
 
 ///shared between camera, picker, actor1
 bool controlGrabbed = false;
@@ -236,7 +237,7 @@ void toggleChasedObject(const Event* event, void* data)
 }
 
 //libRocket: main menu add element function
-void addElements(Rocket::Core::ElementDocument * mainMenu)
+void addRocketMainMenuElements(Rocket::Core::ElementDocument * mainMenu)
 {
 	//<button onclick="camera::options">Camera options</button><br/>
 	Rocket::Core::Element* content = mainMenu->GetElementById("content");
@@ -245,10 +246,10 @@ void addElements(Rocket::Core::ElementDocument * mainMenu)
 	{
 		//create input element
 		Rocket::Core::Dictionary params;
-		params.Set("onclick", "camera::options");
+		params.Set("onclick", "control::options");
 		Rocket::Core::Element* input = Rocket::Core::Factory::InstanceElement(
 				NULL, "button", "button", params);
-		Rocket::Core::Factory::InstanceElementText(input, "Camera options");
+		Rocket::Core::Factory::InstanceElementText(input, "Control options");
 		//create br element
 		params.Clear();
 		params.Set("id", "br");
@@ -261,7 +262,14 @@ void addElements(Rocket::Core::ElementDocument * mainMenu)
 		br->RemoveReference();
 	}
 }
+//libRocket: main menu add event handler
+void addRocketMainMenuEventHandler(const Rocket::Core::String&)
+{
+	///TODO
+}
+
 } // namespace
+
 void camera_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
@@ -276,8 +284,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	pandaFramework->define_key("z", "toggleChasedObject", &toggleChasedObject,
 	static_cast<void*>(object));
 
-	//libRocket: register addElements to main menu
-	gAddElementsFunctions.push_back(&addElements);
+	//libRocket: register addRocketMainMenuElements to main menu
+	gRocketAddElementsFunctions.push_back(&addRocketMainMenuElements);
+	//libRocket: register addRocketMainMenuElements to main menu
+	gRocketAddElementsFunctions.push_back(&addRocketMainMenuElements);
 }
 
 void cameraInit()
