@@ -40,12 +40,6 @@ INITIALIZATION camera_initialization;
 }
 #endif
 
-//externs
-extern Rocket::Core::Context *gRocketContext;
-extern Rocket::Core::ElementDocument *gRocketMainMenu;
-extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
-extern std::map<Rocket::Core::String, void (*)(const Rocket::Core::String&)> gRocketHandleEventFunctions;
-
 ///shared between camera, picker, actor1
 bool controlGrabbed = false;
 
@@ -235,26 +229,50 @@ void toggleChasedObject(const Event* event, void* data)
 		chaserComp->setAbsMinHeight((*chasedDataPtr)[idx].abs_min_height);
 	}
 }
+}
+////////////////////////////////////////////////////////////////////////////////
+///libRocket
 
-//libRocket: main menu add element function
-void addRocketMainMenuElements(Rocket::Core::ElementDocument * mainMenu)
+//externs
+extern Rocket::Core::Context *gRocketContext;
+extern Rocket::Core::ElementDocument *gRocketMainMenu;
+extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
+extern std::map<Rocket::Core::String,
+		void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> gRocketEventHandlers;
+extern std::vector<void (*)()> gRocketPresetFunctions;
+extern std::vector<void (*)()> gRocketCommitFunctions;
+extern std::string rocketBaseDir;
+
+//locals
+namespace
+{
+enum CameraType
+{
+	free_view_camera, object_picker, none
+} cameraType = none;
+Rocket::Core::ElementDocument *cameraOptionsMenu = NULL;
+SMARTPTR(Object)camera;
+
+//add elements (tags) function for main menu
+void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
 {
 	//<button onclick="camera::options">Camera options</button><br/>
 	Rocket::Core::Element* content = mainMenu->GetElementById("content");
-	Rocket::Core::Element* exit = mainMenu->GetElementById("main::button::exit");
+	Rocket::Core::Element* exit = mainMenu->GetElementById(
+			"main::button::exit");
 	if (content)
 	{
 		//create input element
 		Rocket::Core::Dictionary params;
-		params.Set("onclick", "control::options");
+		params.Set("onclick", "camera::options");
 		Rocket::Core::Element* input = Rocket::Core::Factory::InstanceElement(
-				NULL, "button", "button", params);
-		Rocket::Core::Factory::InstanceElementText(input, "Control options");
+		NULL, "button", "button", params);
+		Rocket::Core::Factory::InstanceElementText(input, "Camera options");
 		//create br element
 		params.Clear();
 		params.Set("id", "br");
 		Rocket::Core::Element* br = Rocket::Core::Factory::InstanceElement(
-				NULL, "br", "br", params);
+		NULL, "br", "br", params);
 		//inster elements
 		content->InsertBefore(input, exit);
 		input->RemoveReference();
@@ -262,10 +280,170 @@ void addRocketMainMenuElements(Rocket::Core::ElementDocument * mainMenu)
 		br->RemoveReference();
 	}
 }
-//libRocket: main menu add event handler
-void addRocketMainMenuEventHandler(const Rocket::Core::String&)
+
+//event handler added to the main one
+void rocketEventHandler(const Rocket::Core::String& value,
+		Rocket::Core::Event& event)
 {
-	///TODO
+	if (value == "camera::options")
+	{
+		//hide main menu
+		gRocketMainMenu->Hide();
+		// Load and show the camera options document.
+		cameraOptionsMenu = gRocketContext->LoadDocument(
+				(rocketBaseDir + "misc/ely-camera-options.rml").c_str());
+		if (cameraOptionsMenu != NULL)
+		{
+			cameraOptionsMenu->GetElementById("title")->SetInnerRML(
+					cameraOptionsMenu->GetTitle());
+			///update radio buttons
+			//camera type
+			switch (cameraType)
+			{
+			case free_view_camera:
+				cameraOptionsMenu->GetElementById("free_view_camera")->SetAttribute(
+						"checked", true);
+				break;
+			case object_picker:
+				cameraOptionsMenu->GetElementById("object_picker")->SetAttribute(
+						"checked", true);
+				break;
+			case none:
+				cameraOptionsMenu->GetElementById("none")->SetAttribute(
+						"checked", true);
+				break;
+			default:
+				break;
+			}
+			//
+			cameraOptionsMenu->Show();
+			cameraOptionsMenu->RemoveReference();
+		}
+	}
+	else if (value == "camera::body::load_logo")
+	{
+	}
+	else if (value == "camera::form::submit_options")
+	{
+		Rocket::Core::String paramValue;
+		//check if ok or cancel
+		paramValue = event.GetParameter<Rocket::Core::String>("submit",	"cancel");
+		if (paramValue == "ok")
+		{
+			//set new camera type
+			paramValue = event.GetParameter<Rocket::Core::String>("camera", "none");
+			if (paramValue == "free_view_camera")
+			{
+				cameraType = free_view_camera;
+			}
+			else if (paramValue == "object_picker")
+			{
+				cameraType = object_picker;
+			}
+			else
+			{
+				//default
+				cameraType = none;
+			}
+		}
+		//close (i.e. unload) the camera options menu and set as closed..
+		cameraOptionsMenu->Close();
+		cameraOptionsMenu = NULL;
+		//return to main menu.
+		gRocketMainMenu->Show();
+	}
+}
+
+//helper
+inline void setCameraType(const CameraType& newType, const CameraType& actualType)
+{
+	//return if no camera type change is needed
+	RETURN_ON_COND(newType == actualType,)
+
+	//unset actual camera type
+	if (actualType == free_view_camera)
+	{
+		SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+						ComponentFamilyType("Control")));
+		if (cameraControl->isEnabled())
+		{
+			//enabled: then disable it
+			//disable
+			RETURN_ON_COND(cameraControl->disable() != Driver::Result::OK,)
+
+			///<DEFAULT CAMERA CONTROL>
+//			WindowFramework* gameWindow =
+//				GameManager::GetSingletonPtr()->windowFramework();
+//			//reset trackball transform
+//			LMatrix4 cameraMat = gameWindow->get_camera_group().get_transform()->get_mat();
+//			cameraMat.invert_in_place();
+//			SMARTPTR(Trackball)trackBall =
+//			DCAST(Trackball, gameWindow->get_mouse().find("**/+Trackball").node());
+//			trackBall->set_mat(cameraMat);
+//			//(re)enable trackball
+//			GameManager::GetSingletonPtr()->enable_mouse();
+			///</DEFAULT CAMERA CONTROL>
+
+			//remove text
+			textNode.remove_node();
+		}
+	}
+	else if(actualType == object_picker)
+	{
+		if (Picker::GetSingletonPtr())
+		{
+			//picker on: remove
+			delete Picker::GetSingletonPtr();
+			//remove text
+			textNode.remove_node();
+		}
+	}
+	//set new type
+	if (newType == free_view_camera)
+	{
+		SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+						ComponentFamilyType("Control")));
+		if (not cameraControl->isEnabled())
+		{
+			//disabled: then enable it
+
+			///<DEFAULT CAMERA CONTROL>
+//			//disable the trackball
+//			GameManager::GetSingletonPtr()->disable_mouse();
+			///</DEFAULT CAMERA CONTROL>
+
+			//enable
+			RETURN_ON_COND(cameraControl->enable() != Driver::Result::OK,)
+			//write text
+			writeText("Free View Camera", 0.05,
+					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
+		}
+	}
+	else if(newType == object_picker)
+	{
+		if (not Picker::GetSingletonPtr())
+		{
+			//picker off: add
+			new Picker(camera->objectTmpl()->pandaFramework(),
+					camera->objectTmpl()->windowFramework(),
+					"shift-mouse1", "mouse1-up");
+			//write text
+			writeText("Object Picker Active", 0.05,
+					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
+		}
+	}
+}
+
+//preset function calle from main menu
+void rocketPreset()
+{
+	setCameraType(none, cameraType);
+}
+
+//commit function called main menu
+void rocketCommit()
+{
+	setCameraType(cameraType, none);
 }
 
 } // namespace
@@ -284,10 +462,18 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	pandaFramework->define_key("z", "toggleChasedObject", &toggleChasedObject,
 	static_cast<void*>(object));
 
-	//libRocket: register addRocketMainMenuElements to main menu
-	gRocketAddElementsFunctions.push_back(&addRocketMainMenuElements);
-	//libRocket: register addRocketMainMenuElements to main menu
-	gRocketAddElementsFunctions.push_back(&addRocketMainMenuElements);
+	///libRocket
+	camera = object;
+	//register the add element function to main menu
+	gRocketAddElementsFunctions.push_back(&rocketAddElements);
+	//register the event handler to main menu for each event value
+	gRocketEventHandlers["camera::options"] = &rocketEventHandler;
+	gRocketEventHandlers["camera::body::load_logo"] = &rocketEventHandler;
+	gRocketEventHandlers["camera::form::submit_options"] = &rocketEventHandler;
+	//register the preset function to main menu
+	gRocketPresetFunctions.push_back(&rocketPreset);
+	//register the commit function to main menu
+	gRocketCommitFunctions.push_back(&rocketCommit);
 }
 
 void cameraInit()

@@ -25,6 +25,7 @@
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
 #include "Ely.h"
+#include "Ely_ini.h"
 #include <rocketRegion.h>
 #include <Rocket/Core.h>
 #include <Rocket/Controls.h>
@@ -46,16 +47,25 @@ INITIALIZATION elyPostObjects_initialization;
 //globals
 Rocket::Core::Context *gRocketContext;
 Rocket::Core::ElementDocument *gRocketMainMenu = NULL;
+//registered by subsystems to add their element (tags) to main menu
 std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
-std::map<Rocket::Core::String, void (*)(const Rocket::Core::String&)> gRocketHandleEventFunctions;
+//registered by subsystems to handle their events
+std::map<Rocket::Core::String,
+		void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> gRocketEventHandlers;
+//registered by some subsystems that need to preset themselves before main/exit menus are shown
+std::vector<void (*)()> gRocketPresetFunctions;
+//registered by some subsystems that need to commit their changes after main/exit menus are closed
+std::vector<void (*)()> gRocketCommitFunctions;
+std::string rocketBaseDir(ELY_DATADIR);
 
 //locals
 namespace
 {
 const int CALLBACKSNUM = 5;
-std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
-void LoadFonts(const char* directory);
-void showMainMenu(const Event* e, void* data);
+Rocket::Core::ElementDocument *exitMenu = NULL;
+bool mainPresetsCommits = false;
+
+void showExitMenu(const Event* e, void* data);
 
 class MainEventListener: public EventListener
 {
@@ -88,87 +98,6 @@ public:
 	}
 };
 MainEventListenerInstancer* eventListenerInstancer = NULL;
-}  // namespace
-
-void elyPreObjects_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
-PandaFramework* pandaFramework, WindowFramework* windowFramework)
-{
-	//create the global ray caster
-	new Raycaster(pandaFramework, windowFramework, GamePhysicsManager::GetSingleton().bulletWorld(), CALLBACKSNUM);
-
-	//libRocket: initialize one region for the main window
-	LoadFonts((baseDir + "data/misc/").c_str());
-
-	SMARTPTR(RocketRegion)region = RocketRegion::make("elyRocket", windowFramework->get_graphics_window());
-	region->set_active(true);
-
-	SMARTPTR(RocketInputHandler)inputHandler = new RocketInputHandler();
-	windowFramework->get_mouse().attach_new_node(inputHandler);
-	region->set_input_handler(inputHandler);
-
-	gRocketContext = region->get_context();
-
-	Rocket::Controls::Initialise();
-
-#ifdef ELY_DEBUG
-	Rocket::Debugger::Initialise(gRocketContext);
-	Rocket::Debugger::SetVisible(true);
-#endif
-}
-
-void elyPostObjects_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
-PandaFramework* pandaFramework, WindowFramework* windowFramework)
-{
-	//libRocket: add show main menu event handler
-	EventHandler::get_global_event_handler()->add_hook("m", showMainMenu,
-	reinterpret_cast<void*>(&pandaFramework));
-}
-
-namespace
-{
-// Loads libRocket fonts from the given path.
-void LoadFonts(const char* directory)
-{
-	Rocket::Core::String font_names[4];
-	font_names[0] = "Delicious-Roman.otf";
-	font_names[1] = "Delicious-Italic.otf";
-	font_names[2] = "Delicious-Bold.otf";
-	font_names[3] = "Delicious-BoldItalic.otf";
-
-	for (unsigned int i = 0;
-			i < sizeof(font_names) / sizeof(Rocket::Core::String); i++)
-	{
-		Rocket::Core::FontDatabase::LoadFontFace(
-				Rocket::Core::String(directory) + font_names[i]);
-	}
-}
-
-void showMainMenu(const Event* e, void* data)
-{
-	PandaFramework* framework = reinterpret_cast<PandaFramework*>(data);
-	//register MainEventListenerInstancer
-	eventListenerInstancer = new MainEventListenerInstancer(framework);
-	Rocket::Core::Factory::RegisterEventListenerInstancer(
-			eventListenerInstancer);
-	eventListenerInstancer->RemoveReference();
-
-	// Load and show the main document.
-	gRocketMainMenu = gRocketContext->LoadDocument(
-			(baseDir + "data/misc/ely-main-menu.rml").c_str());
-	if (gRocketMainMenu != NULL)
-	{
-		gRocketMainMenu->GetElementById("title")->SetInnerRML(gRocketMainMenu->GetTitle());
-		//add registered elements to gRocketMainMenu
-		std::vector<void (*)(Rocket::Core::ElementDocument *)>::iterator iter;
-		for (iter = gRocketAddElementsFunctions.begin();
-				iter != gRocketAddElementsFunctions.end(); ++iter)
-		{
-			(*iter)(gRocketMainMenu);
-		}
-		gRocketMainMenu->Show();
-		gRocketMainMenu->RemoveReference();
-	}
-}
 
 void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 {
@@ -215,8 +144,18 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	}
 	else if (mValue == "main::button::start_game")
 	{
-		//close (i.e. unload) the main document.
+		//call all registered commit functions
+		std::vector<void (*)()>::iterator iter;
+		for (iter = gRocketCommitFunctions.begin();
+				iter != gRocketCommitFunctions.end(); ++iter)
+		{
+			(*iter)();
+		}
+		//presets & commits are not being executed by main menu any more
+		mainPresetsCommits = false;
+		//close (i.e. unload) the main document and set as closed..
 		gRocketMainMenu->Close();
+		gRocketMainMenu = NULL;
 	}
 //	else if (mValue == "main::button::options")
 //	{
@@ -264,10 +203,39 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 //	}
 	else if (mValue == "main::button::exit")
 	{
-		//close (i.e. unload) the main document.
-		gRocketMainMenu->Close();
-		//set PandaFramework exit flag
-		mFramework->set_exit_flag();
+		showExitMenu(NULL, NULL);
+	}
+	else if (mValue == "exit::form::submit_exit")
+	{
+		Rocket::Core::String paramValue;
+		//check if ok or cancel
+		paramValue = event.GetParameter<Rocket::Core::String>("submit",
+				"cancel");
+		//close (i.e. unload) the exit menu and set as closed..
+		exitMenu->Close();
+		exitMenu = NULL;
+		if (paramValue == "ok")
+		{
+			if (gRocketMainMenu)
+			{
+				//close (i.e. unload) the main document and set as closed.
+				gRocketMainMenu->Close();
+				gRocketMainMenu = NULL;
+			}
+			//set PandaFramework exit flag
+			mFramework->set_exit_flag();
+		}
+		//if presets & commits are not being executed by main menu
+		if (not mainPresetsCommits)
+		{
+			//call all registered commit functions
+			std::vector<void (*)()>::iterator iter;
+			for (iter = gRocketCommitFunctions.begin();
+					iter != gRocketCommitFunctions.end(); ++iter)
+			{
+				(*iter)();
+			}
+		}
 	}
 //	else if (mValue == "options::body::load_logo")
 //	{
@@ -340,16 +308,147 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	else
 	{
 		//check if it is a registered event name
-		if (gRocketHandleEventFunctions.find(mValue) != gRocketHandleEventFunctions.end())
+		if (gRocketEventHandlers.find(mValue) != gRocketEventHandlers.end())
 		{
-			//hide main menu
-			gRocketMainMenu->Hide();
 			//call the registered event handler
-			gRocketHandleEventFunctions[mValue](mValue);
+			gRocketEventHandlers[mValue](mValue, event);
 		}
 	}
 }
 
+void showMainMenu(const Event* e, void* data)
+{
+	//return if already shown or we are asking to exit
+	RETURN_ON_COND(gRocketMainMenu or exitMenu,)
+
+	//call all registered preset functions
+	std::vector<void (*)()>::iterator iter;
+	for (iter = gRocketPresetFunctions.begin();
+			iter != gRocketPresetFunctions.end(); ++iter)
+	{
+		(*iter)();
+	}
+	//presets & commits are executing by main menu
+	mainPresetsCommits = true;
+
+	// Load and show the main document.
+	gRocketMainMenu = gRocketContext->LoadDocument(
+			(rocketBaseDir + "misc/ely-main-menu.rml").c_str());
+	if (gRocketMainMenu != NULL)
+	{
+		gRocketMainMenu->GetElementById("title")->SetInnerRML(
+				gRocketMainMenu->GetTitle());
+		//call all registered add elements functions
+		std::vector<void (*)(Rocket::Core::ElementDocument *)>::iterator iter;
+		for (iter = gRocketAddElementsFunctions.begin();
+				iter != gRocketAddElementsFunctions.end(); ++iter)
+		{
+			(*iter)(gRocketMainMenu);
+		}
+		gRocketMainMenu->Show();
+		gRocketMainMenu->RemoveReference();
+	}
+}
+
+void showExitMenu(const Event* e, void* data)
+{
+	//return if we are already asking to exit
+	RETURN_ON_COND(exitMenu,)
+
+	//if presets & commits are not being executed by main menu
+	if (not mainPresetsCommits)
+	{
+		//call all registered preset functions
+		std::vector<void (*)()>::iterator iter;
+		for (iter = gRocketPresetFunctions.begin();
+				iter != gRocketPresetFunctions.end(); ++iter)
+		{
+			(*iter)();
+		}
+	}
+
+	// Load and show the exit menu modal document.
+	exitMenu = gRocketContext->LoadDocument(
+			(rocketBaseDir + "misc/ely-exit-menu.rml").c_str());
+	if (exitMenu != NULL)
+	{
+		exitMenu->GetElementById("title")->SetInnerRML(
+				exitMenu->GetTitle());
+		//
+		exitMenu->Show(Rocket::Core::ElementDocument::MODAL);
+		exitMenu->RemoveReference();
+	}
+}
+
+// Loads libRocket fonts from the given path.
+void LoadFonts(const char* directory)
+{
+	Rocket::Core::String font_names[4];
+	font_names[0] = "Delicious-Roman.otf";
+	font_names[1] = "Delicious-Italic.otf";
+	font_names[2] = "Delicious-Bold.otf";
+	font_names[3] = "Delicious-BoldItalic.otf";
+
+	for (unsigned int i = 0;
+			i < sizeof(font_names) / sizeof(Rocket::Core::String); i++)
+	{
+		Rocket::Core::FontDatabase::LoadFontFace(
+				Rocket::Core::String(directory) + font_names[i]);
+	}
+}
+
+}  // namespace
+
+void elyPreObjects_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//create the global ray caster
+	new Raycaster(pandaFramework, windowFramework, GamePhysicsManager::GetSingleton().bulletWorld(), CALLBACKSNUM);
+
+	///libRocket initialization
+	//load fonts
+	LoadFonts((rocketBaseDir + "misc/").c_str());
+
+	//initialize one region for all documents
+	SMARTPTR(RocketRegion)region = RocketRegion::make("elyRocket", windowFramework->get_graphics_window());
+	region->set_active(true);
+
+	//set input handler
+	SMARTPTR(RocketInputHandler)inputHandler = new RocketInputHandler();
+	windowFramework->get_mouse().attach_new_node(inputHandler);
+	region->set_input_handler(inputHandler);
+
+	//set global context variable
+	gRocketContext = region->get_context();
+
+	//initialize controls
+	Rocket::Controls::Initialise();
+
+	//register the main EventListenerInstancer: used by all the application documents
+	eventListenerInstancer = new MainEventListenerInstancer(pandaFramework);
+	Rocket::Core::Factory::RegisterEventListenerInstancer(
+			eventListenerInstancer);
+	eventListenerInstancer->RemoveReference();
+
+#ifdef ELY_DEBUG
+	Rocket::Debugger::Initialise(gRocketContext);
+	Rocket::Debugger::SetVisible(true);
+#endif
+}
+
+void elyPostObjects_initialization(SMARTPTR(Object)object, const ParameterTable& paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	///libRocket
+	//add show main menu event handler
+	EventHandler::get_global_event_handler()->add_hook("m", &showMainMenu,
+	reinterpret_cast<void*>(NULL));
+	//handle "close request" and "esc" events
+	windowFramework->get_graphics_window()->set_close_request_event("close_request_event");
+	EventHandler::get_global_event_handler()->add_hook("close_request_event", &showExitMenu,
+	reinterpret_cast<void*>(NULL));
+	EventHandler::get_global_event_handler()->add_hook("escape", &showExitMenu,
+	reinterpret_cast<void*>(NULL));
 }
 
 void elyGameInit()
