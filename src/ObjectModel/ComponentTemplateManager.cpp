@@ -104,7 +104,7 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::getComponentTemplate(
 }
 
 SMARTPTR(Component) ComponentTemplateManager::doCreateComponent(
-		ComponentType componentType)
+		ComponentType componentType, bool freeComponent)
 {
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(
 			componentType);
@@ -116,6 +116,7 @@ SMARTPTR(Component) ComponentTemplateManager::doCreateComponent(
 	ComponentId newCompId = ComponentId(componentType) + ComponentId(getId());
 	//create component
 	SMARTPTR(Component) newComp = (*it).second->makeComponent(newCompId);
+	newComp->setFreeFlag(freeComponent);
 	return newComp;
 }
 

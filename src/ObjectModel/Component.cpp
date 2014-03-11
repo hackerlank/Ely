@@ -38,6 +38,7 @@ Component::Component() :
 	mTmpl.clear();
 	mComponentId = ComponentId();
 	mOwnerObject.clear();
+	mFreeComponent = false;
 	doCleanupEventTables();
 }
 
@@ -114,20 +115,30 @@ void Component::doSetupEventTables()
 						*iterTypeValue, '@');
 				//check in order:
 				//- if there is (at least) a pair and
-				//- if there is a valid "event type" (== typeValue[0]) and
 				//- if there is non empty "event value" (== typeValue[1])
-				if ((typeValue.size() >= 2)
-						and (mOwnerObject->objectTmpl()->isComponentParameterValue(
-								"event_types", typeValue[0], componentType()))
-						and (not typeValue[1].empty()))
+				if ((typeValue.size() >= 2)	and (not typeValue[1].empty()))
 				{
-					//insert event keyed by eventType;
-					mEventTable[typeValue[0]] = typeValue[1];
-					//insert eventType keyed by event;
-					mEventTypeTable[typeValue[1]] = typeValue[0];
-					//insert the <callbackName,NULL> pair keyed by eventType;
-					mCallbackTable[typeValue[0]] = NameCallbackPair(
-							callbackName, NULL);
+					//check:
+					//- if (component is free and
+					//		there is non empty "event type" (== typeValue[0]))
+					//	or
+					//- (if component is not free and
+					//		there is a valid "event type" (== typeValue[0]))
+					if ((mFreeComponent and (not typeValue[0].empty()))
+						or
+						((not mFreeComponent) and
+								(mOwnerObject->objectTmpl()->isComponentParameterValue(
+									"event_types", typeValue[0], componentType())))
+						)
+					{
+						//insert event keyed by eventType;
+						mEventTable[typeValue[0]] = typeValue[1];
+						//insert eventType keyed by event;
+						mEventTypeTable[typeValue[1]] = typeValue[0];
+						//insert the <callbackName,NULL> pair keyed by eventType;
+						mCallbackTable[typeValue[0]] = NameCallbackPair(
+								callbackName, NULL);
+					}
 				}
 			}
 		}

@@ -252,6 +252,7 @@ enum CameraType
 } cameraType = none;
 Rocket::Core::ElementDocument *cameraOptionsMenu = NULL;
 SMARTPTR(Object)camera;
+ParameterTable cameraDriverParams, cameraChaserParams;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -453,17 +454,34 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	//camera
 	//enable/disable camera control by event
-	pandaFramework->define_key("c", "toggleCameraControl", &toggleCameraControl,
-	static_cast<void*>(object));
-	//enable/disable a picker
-	pandaFramework->define_key("x", "togglePicker", &togglePicker,
-	static_cast<void*>(object));
-	//toggle chased object
-	pandaFramework->define_key("z", "toggleChasedObject", &toggleChasedObject,
-	static_cast<void*>(object));
+//	pandaFramework->define_key("c", "toggleCameraControl", &toggleCameraControl,
+//	static_cast<void*>(object));
+//	//enable/disable a picker
+//	pandaFramework->define_key("x", "togglePicker", &togglePicker,
+//	static_cast<void*>(object));
+//	//toggle chased object
+//	pandaFramework->define_key("z", "toggleChasedObject", &toggleChasedObject,
+//	static_cast<void*>(object));
 
 	///libRocket
 	camera = object;
+	//get Driver and Chaser component template parameters
+	cameraDriverParams = ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject(ObjectId("cameraDriverTmp"))->getStoredCompTmplParams()["Driver"];
+	cameraChaserParams =  ObjectTemplateManager::GetSingletonPtr()->
+			getCreatedObject(ObjectId("cameraChaserTmp"))->getStoredCompTmplParams()["Driver"];
+	//destroy no more needed cameraDriver and cameraChaser objects
+	ObjectTemplateManager::GetSingletonPtr()->destroyObject(
+			ObjectId("cameraDriverTmp"));
+	ObjectTemplateManager::GetSingletonPtr()->destroyObject(
+			ObjectId("cameraChaserTmp"));
+
+	///XXX for testing
+	//add the cameraDriver by default to camera
+	ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
+			ObjectId("camera"), ComponentType("Driver"), cameraDriverParams);
+	///XXX
+
 	//register the add element function to main menu
 	gRocketAddElementsFunctions.push_back(&rocketAddElements);
 	//register the event handler to main menu for each event value

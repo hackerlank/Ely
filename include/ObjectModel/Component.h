@@ -280,6 +280,12 @@ public:
 	 */
 	std::string getEventType(const std::string& event);
 
+	/**
+	 * \brief Set the component as free.
+	 * @param free The free flag.
+	 */
+	void setFreeFlag(bool freeComponent);
+
 #ifdef ELY_THREAD
 	/**
 	 * \brief Get the mutex to lock the entire structure.
@@ -295,6 +301,8 @@ protected:
 	ComponentId mComponentId;
 	///The object this component is a member of (read only after component creation).
 	SMARTPTR(Object) mOwnerObject;
+	///Free component flag.
+	bool mFreeComponent;
 #ifdef ELY_THREAD
 	///Signals this component is going to be destroyed.
 	bool mDestroying;
@@ -415,6 +423,11 @@ inline void Component::removeFromSceneCleanup()
 
 inline void Component::update(void* data)
 {
+}
+
+inline void Component::setFreeFlag(bool freeComponent)
+{
+	mFreeComponent = freeComponent;
 }
 
 #ifdef ELY_THREAD

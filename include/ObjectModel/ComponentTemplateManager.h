@@ -42,9 +42,12 @@ private:
 	/**
 	 * \brief Creates a component given its type.
 	 * @param componentID The component type.
+	 * @param freeComponent If this is a free component or if it belongs
+	 * to an Object template, default is false.
 	 * @return The just created component, or NULL on failure (for any reason).
 	 */
-	SMARTPTR(Component) doCreateComponent(ComponentType componentID);
+	SMARTPTR(Component) doCreateComponent(ComponentType componentID,
+			bool freeComponent = false);
 
 public:
 	/**

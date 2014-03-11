@@ -380,9 +380,9 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 		//...if not empty
 		componentTemplate->setParameters(compTmplParams);
 	}
-	//create the new component
+	//create the new free component
 	SMARTPTR(Component) newComp =
-	ComponentTemplateManager::GetSingleton().doCreateComponent(componentType);
+	ComponentTemplateManager::GetSingleton().doCreateComponent(componentType, true);
 	if (not newComp)
 	{
 		return false;
