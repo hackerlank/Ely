@@ -353,6 +353,33 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		//return to main menu.
 		gRocketMainMenu->Show();
 	}
+	else if (value == "camera::free_view_camera::options")
+	{
+		// This event is sent from the "onchange" of the "free_view_camera"
+		//radio button. It shows or hides the related options.
+		Rocket::Core::ElementDocument* options_body =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (options_body == NULL)
+			return;
+
+		Rocket::Core::Element* free_view_camera_options = options_body->GetElementById(
+				"free_view_camera_options");
+		if (free_view_camera_options)
+		{
+			//The "value" parameter of an "onchange" event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the "value"
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				free_view_camera_options->SetProperty("display", "none");
+			}
+			else
+			{
+				free_view_camera_options->SetProperty("display", "block");
+			}
+		}
+	}
 }
 
 //helper
@@ -488,6 +515,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["camera::options"] = &rocketEventHandler;
 	gRocketEventHandlers["camera::body::load_logo"] = &rocketEventHandler;
 	gRocketEventHandlers["camera::form::submit_options"] = &rocketEventHandler;
+	gRocketEventHandlers["camera::free_view_camera::options"] = &rocketEventHandler;
 	//register the preset function to main menu
 	gRocketPresetFunctions.push_back(&rocketPreset);
 	//register the commit function to main menu

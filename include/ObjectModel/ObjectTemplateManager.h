@@ -98,11 +98,13 @@ public:
 			bool storeParams = false, SMARTPTR(Object) owner = NULL);
 
 	/**
-	 * \brief Adds a component of the given type to an existing object with
+	 * \brief Adds a "free" component of the given type to an existing object with
 	 * the given object identifier.\n
 	 * \note you can add any component of any given type, even if the object template
 	 * doesn't contain it.\n
 	 * \note the new component will replace a component of the same family if any.
+	 * \note event types of this new component need not to be the same as the
+	 * declared ones in Object template if any.
 	 * @param objectId The given object identifier.
 	 * @param componentType The given component type.
 	 * @param compTmplParams Map of component  templates' parameter tables,
