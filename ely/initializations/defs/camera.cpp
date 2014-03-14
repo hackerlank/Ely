@@ -282,6 +282,18 @@ void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
 	}
 }
 
+//helper
+inline void setElementValue(const std::string& param)
+{
+	float valueFloat;
+	valueFloat =
+			strtof(
+					(*cameraDriverParams.find(param.c_str())).second.c_str(),
+					NULL);
+	cameraOptionsMenu->GetElementById(param.c_str())->SetAttribute<float>("value",
+			(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+}
+
 //event handler added to the main one
 void rocketEventHandler(const Rocket::Core::String& value,
 		Rocket::Core::Event& event)
@@ -378,65 +390,24 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			{
 				free_view_camera_options->SetProperty("display", "block");
 				//set options values
-				float valueFloat;
-				int valueInt;
 				//max linear speed
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("max_linear_speed")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("max_linear_speed")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+				setElementValue("max_linear_speed");
 				//max angular speed
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("max_angular_speed")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("max_angular_speed")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+				setElementValue("max_angular_speed");
 				//linear accel
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("linear_accel")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("linear_accel")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+				setElementValue("linear_accel");
 				//angular accel
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("angular_accel")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("angular_accel")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+				setElementValue("angular_accel");
 				//linear friction
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("linear_friction")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("linear_friction")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+				setElementValue("linear_friction");
 				//angular friction
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("angular_friction")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("angular_friction")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
+				setElementValue("angular_friction");
 				//fast factor
-				valueFloat =
-						strtof(
-								(*cameraDriverParams.find("fast_factor")).second.c_str(),
-								NULL);
-				cameraOptionsMenu->GetElementById("fast_factor")->SetAttribute<
-						float>("value",
-						(valueFloat >= 0.0 ? valueFloat : -valueFloat));
-
+				setElementValue("fast_factor");
+				//sens_x
+				setElementValue("sens_x");
+				//sens_y
+				setElementValue("sens_y");
 			}
 		}
 	}
