@@ -46,7 +46,7 @@ INITIALIZATION elyPostObjects_initialization;
 
 //globals
 Rocket::Core::Context *gRocketContext;
-Rocket::Core::ElementDocument *gRocketMainMenu = NULL;
+Rocket::Core::ElementDocument *gRocketMainMenu;
 //registered by subsystems to add their element (tags) to main menu
 std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
 //registered by subsystems to handle their events
@@ -62,7 +62,7 @@ std::string rocketBaseDir(ELY_DATADIR);
 namespace
 {
 const int CALLBACKSNUM = 5;
-Rocket::Core::ElementDocument *exitMenu = NULL;
+Rocket::Core::ElementDocument *exitMenu;
 bool mainPresetsCommits = false;
 
 void showExitMenu(const Event* e, void* data);
@@ -155,7 +155,6 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 		mainPresetsCommits = false;
 		//close (i.e. unload) the main document and set as closed..
 		gRocketMainMenu->Close();
-		gRocketMainMenu = NULL;
 	}
 //	else if (mValue == "main::button::options")
 //	{
@@ -213,15 +212,10 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 				"cancel");
 		//close (i.e. unload) the exit menu and set as closed..
 		exitMenu->Close();
-		exitMenu = NULL;
 		if (paramValue == "ok")
 		{
-			if (gRocketMainMenu)
-			{
-				//close (i.e. unload) the main document and set as closed.
-				gRocketMainMenu->Close();
-				gRocketMainMenu = NULL;
-			}
+			//user wants to exit: unload all documents
+			gRocketContext->UnloadAllDocuments();
 			//set PandaFramework exit flag
 			mFramework->set_exit_flag();
 		}
@@ -319,7 +313,8 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 void showMainMenu(const Event* e, void* data)
 {
 	//return if already shown or we are asking to exit
-	RETURN_ON_COND(gRocketMainMenu or exitMenu,)
+	RETURN_ON_COND(gRocketContext->GetDocument("main_menu") or
+			gRocketContext->GetDocument("exit_menu"),)
 
 	//call all registered preset functions
 	std::vector<void (*)()>::iterator iter;
@@ -353,7 +348,7 @@ void showMainMenu(const Event* e, void* data)
 void showExitMenu(const Event* e, void* data)
 {
 	//return if we are already asking to exit
-	RETURN_ON_COND(exitMenu,)
+	RETURN_ON_COND(gRocketContext->GetDocument("exit_menu"),)
 
 	//if presets & commits are not being executed by main menu
 	if (not mainPresetsCommits)

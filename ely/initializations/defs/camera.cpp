@@ -250,7 +250,7 @@ enum CameraType
 {
 	free_view_camera, object_picker, none
 } cameraType = none;
-Rocket::Core::ElementDocument *cameraOptionsMenu = NULL;
+Rocket::Core::ElementDocument *cameraOptionsMenu;
 SMARTPTR(Object)camera;
 ParameterTable cameraDriverParams, cameraChaserParams;
 
@@ -361,7 +361,6 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		}
 		//close (i.e. unload) the camera options menu and set as closed..
 		cameraOptionsMenu->Close();
-		cameraOptionsMenu = NULL;
 		//return to main menu.
 		gRocketMainMenu->Show();
 	}
@@ -493,7 +492,7 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 	}
 }
 
-//preset function calle from main menu
+//preset function called from main menu
 void rocketPreset()
 {
 	setCameraType(none, cameraType);
