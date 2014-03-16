@@ -137,6 +137,8 @@ public:
 	void setAbsLookAtHeight(float absLookAtHeight);
 	void setFriction(float friction);
 	float getFriction() const;
+	void enableFixedRelativePosition(bool enable);
+	bool isFixedRelativePosition();
 	///@}
 
 	/**
@@ -484,6 +486,22 @@ inline void Chaser::holdLookAt(bool enable)
 	HOLD_REMUTEX(mMutex)
 
 	mHoldLookAt = enable;
+}
+
+inline void Chaser::enableFixedRelativePosition(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mFixedRelativePosition = enable;
+}
+
+inline bool Chaser::isFixedRelativePosition()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mFixedRelativePosition;
 }
 
 inline ObjectId Chaser::getChasedObject()

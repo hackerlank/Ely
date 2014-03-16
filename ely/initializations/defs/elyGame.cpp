@@ -156,50 +156,6 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 		//close (i.e. unload) the main document and set as closed..
 		gRocketMainMenu->Close();
 	}
-//	else if (mValue == "main::button::options")
-//	{
-//		gMainMenu->Hide();
-//		// Load and show the options document.
-//		optionMenu = gRocketContext->LoadDocument(
-//				(baseDir + "data/misc/rocket-options.rml").c_str());
-//		if (optionMenu != NULL)
-//		{
-//			optionMenu->GetElementById("title")->SetInnerRML(
-//					optionMenu->GetTitle());
-//			///update controls
-//			//graphics
-//			switch (graphicsQuality)
-//			{
-//			case 0:
-//				optionMenu->GetElementById("default_graphics")->SetAttribute(
-//						"checked", true);
-//				break;
-//			case 1:
-//				optionMenu->GetElementById("good_graphics")->SetAttribute(
-//						"checked", true);
-//				break;
-//			case 2:
-//				optionMenu->GetElementById("bad_graphics")->SetAttribute(
-//						"checked", true);
-//				break;
-//			default:
-//				break;
-//			}
-//			//audio
-//			Rocket::Core::Element* audioElem;
-//			audioElem = optionMenu->GetElementById("reverb_audio");
-//			audioReverb ?
-//					audioElem->SetAttribute("checked", true) :
-//					audioElem->RemoveAttribute("checked");
-//			audioElem = optionMenu->GetElementById("3d_audio");
-//			audio3d ?
-//					audioElem->SetAttribute("checked", true) :
-//					audioElem->RemoveAttribute("checked");
-//			//
-//			optionMenu->Show();
-//			optionMenu->RemoveReference();
-//		}
-//	}
 	else if (mValue == "main::button::exit")
 	{
 		showExitMenu(NULL, NULL);
@@ -231,74 +187,6 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 			}
 		}
 	}
-//	else if (mValue == "options::body::load_logo")
-//	{
-//
-//	}
-//	else if (mValue == "options::form::submit_options")
-//	{
-//		Rocket::Core::String paramValue;
-//		//check if ok or cancel
-//		paramValue = event.GetParameter<Rocket::Core::String>("submit",
-//				"cancel");
-//		if (paramValue == "ok")
-//		{
-//			//get controls values
-//			//graphics
-//			paramValue = event.GetParameter<Rocket::Core::String>("graphics",
-//					"default");
-//			if (paramValue == "good")
-//			{
-//				graphicsQuality = 1;
-//			}
-//			else if (paramValue == "bad")
-//			{
-//				graphicsQuality = 2;
-//			}
-//			else
-//			{
-//				//default
-//				graphicsQuality = 0;
-//			}
-//			//audio
-//			paramValue = event.GetParameter<Rocket::Core::String>("reverb",
-//					"NONE");
-//			paramValue == "true" ? audioReverb = true : audioReverb = false;
-//			paramValue = event.GetParameter<Rocket::Core::String>("3d", "NONE");
-//			paramValue == "true" ? audio3d = true : audio3d = false;
-//		}
-//		//close (i.e. unload) the options document.
-//		optionMenu->Close();
-//		//return to main document.
-//		gMainMenu->Show();
-//	}
-//	else if (mValue == "options::input::bad_graphics")
-//	{
-//		// This event is sent from the 'onchange' of the bad graphics
-//		//radio button. It shows or hides the bad graphics warning message.
-//		Rocket::Core::ElementDocument* options_body =
-//				event.GetTargetElement()->GetOwnerDocument();
-//		if (options_body == NULL)
-//			return;
-//
-//		Rocket::Core::Element* bad_warning = options_body->GetElementById(
-//				"bad_warning");
-//		if (bad_warning)
-//		{
-//			// The 'value' parameter of an onchange event is set to
-//			//the value the control would send if it was submitted;
-//			//so, the empty string if it is clear or to the 'value'
-//			//attribute of the control if it is set.
-//			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
-//			{
-//				bad_warning->SetProperty("display", "none");
-//			}
-//			else
-//			{
-//				bad_warning->SetProperty("display", "block");
-//			}
-//		}
-//	}
 	else
 	{
 		//check if it is a registered event name
@@ -452,6 +340,6 @@ void elyGameInit()
 
 void elyGameEnd()
 {
-//delete the global ray caster
+	//delete the global ray caster
 	delete Raycaster::GetSingletonPtr();
 }

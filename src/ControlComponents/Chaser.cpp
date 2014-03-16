@@ -501,6 +501,10 @@ void Chaser::update(void* data)
 					LVector3f::up());
 			LVecBase3f deltaHPR = mOwnerObject->getNodePath().get_hpr(mFixedLookAtNodePath);
 			float kReductFactor = mFriction * dt;
+			if (kReductFactor > 1.0)
+			{
+				kReductFactor = 1.0;
+			}
 			if (deltaHPR.length_squared() > 0.0)
 			{
 				deltaHPR -= deltaHPR * kReductFactor;
@@ -514,6 +518,10 @@ LPoint3f Chaser::doGetChaserPos(LPoint3f desiredChaserPos,
 		LPoint3f currentChaserPos, float deltaTime)
 {
 	float kReductFactor = mFriction * deltaTime;
+	if (kReductFactor > 1.0)
+	{
+		kReductFactor = 1.0;
+	}
 	//calculate difference between desiredChaserPos and currentChaserPos
 	LVector3f deltaPos = currentChaserPos - desiredChaserPos;
 	//converge deltaPos.lenght toward zero: proportionally to deltaPos.lenght

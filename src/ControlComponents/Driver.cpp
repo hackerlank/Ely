@@ -152,16 +152,12 @@ bool Driver::initialize()
 	//reset actual speeds
 	mActualSpeedXYZ = LVector3f::zero();
 	mActualSpeedH = 0.0;
-	//linear friction [0.0, 1.0]
-	value = 1 - strtof(mTmpl->parameter(std::string("linear_friction")).c_str(),
-	NULL);
-	absValue = (value >= 0.0 ? value - floor(value) : ceil(value) - value);
-	mFrictionXYZ = LVector3f(absValue, absValue, absValue);
-	//angular friction [0.0, 1.0]
-	value = 1
-			- strtof(mTmpl->parameter(std::string("angular_friction")).c_str(),
-			NULL);
-	mFrictionH = (value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	//linear friction
+	value = strtof(mTmpl->parameter(std::string("linear_friction")).c_str(), NULL);
+	mFrictionXYZ = (value >= 0.0 ? value : -value);
+	//angular friction
+	value = strtof(mTmpl->parameter(std::string("angular_friction")).c_str(), NULL);
+	mFrictionH = (value >= 0.0 ? value : -value);
 	//stop threshold [0.0, 1.0]
 	value = strtof(mTmpl->parameter(std::string("stop_threshold")).c_str(),
 	NULL);
@@ -376,6 +372,11 @@ void Driver::update(void* data)
 			+ mActualSpeedH * dt * mSignOfMouse);
 
 	//update speeds
+	float kLinearReductFactor = mFrictionXYZ * dt;
+	if (kLinearReductFactor > 1.0)
+	{
+		kLinearReductFactor = 1.0;
+	}
 	//y axis
 	if (mForward and (not mBackward))
 	{
@@ -427,7 +428,7 @@ void Driver::update(void* data)
 		{
 			//decelerate
 			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() * mFrictionXYZ.get_y());
+					mActualSpeedXYZ.get_y() * (1 - kLinearReductFactor));
 		}
 	}
 	//x axis
@@ -481,7 +482,7 @@ void Driver::update(void* data)
 		{
 			//decelerate
 			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() * mFrictionXYZ.get_x());
+					mActualSpeedXYZ.get_x() * (1 - kLinearReductFactor));
 		}
 	}
 	//z axis
@@ -535,7 +536,7 @@ void Driver::update(void* data)
 		{
 			//decelerate
 			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() * mFrictionXYZ.get_z());
+					mActualSpeedXYZ.get_z() * (1 - kLinearReductFactor));
 		}
 	}
 	//rotation
@@ -586,7 +587,12 @@ void Driver::update(void* data)
 		else
 		{
 			//decelerate
-			mActualSpeedH *= mFrictionH;
+			float kAngularReductFactor = mFrictionH * dt;
+			if (kAngularReductFactor > 1.0)
+			{
+				kAngularReductFactor = 1.0;
+			}
+			mActualSpeedH = mActualSpeedH * (1 - kAngularReductFactor);
 		}
 	}
 }

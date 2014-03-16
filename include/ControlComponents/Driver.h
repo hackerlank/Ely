@@ -181,7 +181,7 @@ public:
 	LVector3f getAccels(float& angularAccel);
 	void setLinearFriction(float linearFriction);
 	void setAngularFriction(float angularFriction);
-	LVector3f getFrictions(float& angularFriction);
+	void getFrictions(float& linearFriction, float& angularFriction);
 	void setSens(float sensX, float sensY);
 	void getSens(float& sensX, float& sensY);
 	void setFastFactor(float factor);
@@ -213,7 +213,7 @@ private:
 	float mActualSpeedH, mMaxSpeedH, mMaxSpeedSquaredH;
 	LVecBase3f mAccelXYZ;
 	float mAccelH;
-	LVecBase3f mFrictionXYZ;
+	float mFrictionXYZ;
 	float mFrictionH;
 	float mStopThreshold;
 	float mSensX, mSensY;
@@ -280,8 +280,7 @@ inline void Driver::reset()
 	mActualSpeedH = mMaxSpeedH = mMaxSpeedSquaredH = 0.0;
 	mAccelXYZ = LVecBase3f::zero();
 	mAccelH = 0.0;
-	mFrictionXYZ = LVecBase3f::zero();
-	mFrictionH = 0.0;
+	mFrictionXYZ = mFrictionH = 0.0;
 	mStopThreshold = 0.0;
 	mSensX = mSensY = 0.0;
 	mCentX = mCentY = 0.0;
@@ -530,18 +529,6 @@ inline void Driver::setLinearFriction(float linearFriction)
 	HOLD_REMUTEX(mMutex)
 
 	mFrictionXYZ = linearFriction;
-	if ((mFrictionXYZ.get_x() < 0.0) or (mFrictionXYZ.get_x() > 1.0))
-	{
-		mFrictionXYZ.set_x(0.1);
-	}
-	if ((mFrictionXYZ.get_y() < 0.0) or (mFrictionXYZ.get_y() > 1.0))
-	{
-		mFrictionXYZ.set_y(0.1);
-	}
-	if ((mFrictionXYZ.get_z() < 0.0) or (mFrictionXYZ.get_z() > 1.0))
-	{
-		mFrictionXYZ.set_z(0.1);
-	}
 }
 
 inline void Driver::setAngularFriction(float angularFriction)
@@ -556,13 +543,13 @@ inline void Driver::setAngularFriction(float angularFriction)
 	}
 }
 
-inline LVector3f Driver::getFrictions(float& angularFriction)
+inline void Driver::getFrictions(float& linearFriction, float& angularFriction)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+	linearFriction	= mFrictionXYZ;
 	angularFriction	= mFrictionH;
-	return mFrictionXYZ;
 }
 
 inline void Driver::setSens(float sensX, float sensY)

@@ -205,8 +205,8 @@
 				<Param max_angular_speed="40.0"/>
 				<Param linear_accel="30.0"/>
 				<Param angular_accel="30.0"/>
-				<Param linear_friction="0.025"/>
-				<Param angular_friction="0.025"/>
+				<Param linear_friction="5.0"/>
+				<Param angular_friction="5.0"/>
 				<Param stop_threshold="0.0"/>
 				<Param fast_factor="5.0"/>
 				<Param sens_x="0.05"/>
@@ -391,6 +391,7 @@
 			<Param pos="0.0,0.0,-0.75"/>
 			<Param rot="0.0,0.0,90.0"/>
 		</Object>
+-->
 
 		<Object type="Character" id="player0" priority="90">
 			<Component type="Activity">
@@ -430,7 +431,8 @@
 			<Param pos="-26.997,-21.8736,40.7907"/>
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
-		
+
+<!--		
 		<Object type="Car" id="auto1" priority="90">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
