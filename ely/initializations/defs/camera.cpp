@@ -301,9 +301,16 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					for (objectIter = createdObjects.begin();
 							objectIter != createdObjects.end(); ++objectIter)
 					{
+						//don't add steady or with no parent objects
+						if ((*objectIter)->isSteady()
+								or (*objectIter)->getNodePath().get_parent().is_empty())
+						{
+							continue;
+						}
 						//add options
 						ObjectId objectId = (*objectIter)->objectId();
-						int i = objectsSelect->Add(objectId.c_str(), objectId.c_str());
+						int i = objectsSelect->Add(objectId.c_str(),
+								objectId.c_str());
 						if (objectId == chasedObject)
 						{
 							selectedIdx = i;

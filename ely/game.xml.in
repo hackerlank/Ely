@@ -284,7 +284,6 @@
 			<Param is_steady="true"/>
 		</Object>
 
-<!--
 		<Object type="InstancedActor" id="ball1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -305,6 +304,7 @@
 			</Component>
 		</Object>
 		
+<!--
 		<Object type="InstancedActorAI" id="Steerer1">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
@@ -331,6 +331,7 @@
 				<Param scale="0.6,0.6,0.6"/>
 			</Component>
 		</Object>
+-->
 
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity">
@@ -391,7 +392,6 @@
 			<Param pos="0.0,0.0,-0.75"/>
 			<Param rot="0.0,0.0,90.0"/>
 		</Object>
--->
 
 		<Object type="Character" id="player0" priority="90">
 			<Component type="Activity">
@@ -432,12 +432,11 @@
 			<Param rot="180.0,0.0,0.0"/>
 		</Object>
 
-<!--		
 		<Object type="Car" id="auto1" priority="90">
 			<Param parent="render"/>
 			<Param is_steady="false"/>
 			<Param store_params="false"/>
-			<Param pos="-38.0555,-5.94453,45.7907"/>
+			<Param pos="-38.0555,-5.94453,47.7907"/>
 			<Param rot="180.0,0.0,0.0"/>
 			<Component type="Model">
 				<Param model_file="vehicle.bam"/>
@@ -485,6 +484,7 @@
 			<Param is_steady="true"/>
 		</Object>
 		
+<!--		
 		<Object type="SoftObject" id="rope1">
 			<Component type="Model">
 				<Param from_file="false"/>
