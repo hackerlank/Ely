@@ -431,7 +431,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 					mRayMask);
 			if (mHitResult.has_hit())
 			{
-				//physic mesh is below
+				//updatedPos.z needs correction
 				updatedPos.set_z(mHitResult.get_hit_pos().get_z());
 				//correct vehicle position
 				mVehicle->setPosition(LVecBase3fToOpenSteerVec3(updatedPos));

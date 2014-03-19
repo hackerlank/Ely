@@ -396,17 +396,8 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 					mRayMask);
 			if (mHitResult.has_hit())
 			{
-				//check if hit a triangle mesh
-				BulletShape* shape =
-				DCAST(BulletRigidBodyNode, mHitResult.get_node())->get_shape(
-						0);
-				if (shape
-						and shape->is_of_type(
-								BulletTriangleMeshShape::get_class_type()))
-				{
-					//physic mesh is under recast mesh
-					updatedPos.set_z(mHitResult.get_hit_pos().get_z());
-				}
+				//updatedPos.z needs correction
+				updatedPos.set_z(mHitResult.get_hit_pos().get_z());
 			}
 			break;
 		default:
