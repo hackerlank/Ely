@@ -161,9 +161,6 @@ void initTypedObjects()
 	Object::init_type();
 	ObjectTemplate::init_type();
 	//
-	Steering::init_type();
-	SteeringTemplate::init_type();
-	AICharacterRef::init_type();
 	CrowdAgent::init_type();
 	CrowdAgentTemplate::init_type();
 	ely::NavMesh::init_type();

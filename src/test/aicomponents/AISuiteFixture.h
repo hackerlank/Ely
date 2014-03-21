@@ -26,8 +26,6 @@
 #define AISUITEFIXTURE_H_
 
 #include <boost/test/unit_test.hpp>
-#include "AIComponents/Steering.h"
-#include "AIComponents/SteeringTemplate.h"
 #include "Game/GameAIManager.h"
 
 struct AISuiteFixture

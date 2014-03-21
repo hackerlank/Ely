@@ -9,7 +9,6 @@ initializations_la_SOURCES = \
 		defs/elyGame.cpp \
 		defs/EnvironmentObjects.cpp \
 		defs/player0.cpp \
-		defs/SoftObjects.cpp \
-		defs/Steerer1.cpp
+		defs/SoftObjects.cpp
 
 initializations_la_LDFLAGS = -module -avoid-version

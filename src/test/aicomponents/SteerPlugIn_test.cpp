@@ -15,33 +15,14 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/aicomponents/Steering_test.cpp
+ * \file /Ely/src/test/aicomponents/SteerPlugIn_test.cpp
  *
- * \date 03/dic/2012 (13:39:59)
+ * \date 04/dic/2013 (09:11:38)
  * \author consultit
  */
+#include "AIComponents/SteerPlugIn.h"
 
-#include "AISuiteFixture.h"
-
-struct SteeringTestCaseFixture
+namespace ely
 {
-	SteeringTestCaseFixture()
-	{
-	}
-	~SteeringTestCaseFixture()
-	{
-	}
-};
 
-/// AI suite
-BOOST_FIXTURE_TEST_SUITE(AI, AISuiteFixture)
-
-/// Test cases
-BOOST_AUTO_TEST_CASE(TEST)
-{
-	BOOST_TEST_MESSAGE("TESTING");
-	BOOST_CHECK(true);
-}
-
-BOOST_AUTO_TEST_SUITE_END() // AI suite
-
+} /* namespace ely */

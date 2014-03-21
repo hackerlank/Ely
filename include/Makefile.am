@@ -23,8 +23,6 @@ opensteer_headers = \
 		AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h
 
 noinst_HEADERS = \
-		AIComponents/Steering.h \
-		AIComponents/SteeringTemplate.h \
 		AIComponents/CrowdAgent.h \
 		AIComponents/CrowdAgentTemplate.h \
 		AIComponents/NavMesh.h \

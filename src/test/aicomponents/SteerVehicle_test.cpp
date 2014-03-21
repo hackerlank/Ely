@@ -15,12 +15,12 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/aicomponents/OpenSteerVehicle_test.cpp
+ * \file /Ely/src/test/aicomponents/SteerVehicle_test.cpp
  *
  * \date 04/dic/2013 (09:20:42)
  * \author consultit
  */
-#include "AIComponents/OpenSteerVehicle.h"
+#include "AIComponents/SteerVehicle.h"
 
 namespace ely
 {

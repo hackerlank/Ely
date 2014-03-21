@@ -8,16 +8,16 @@
 	<ObjectTmplSet>
 		<!-- template for wrapper around predefined nodepath - Mandatory -->
 		<ObjectTmpl type="Render">
-			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
+			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="100"/>
 		</ObjectTmpl>
 
-		<!-- template for a singleton game object: used only to perform additional
+		<!-- template for objects without components: used only to perform additional
 			 custom initializations besides the ones performed by GameManager -->
 		<ObjectTmpl type="Game"/>
 		
 		<!-- template for camera object(s) -->
 		<ObjectTmpl type="CameraDriver">
-			<ComponentTmpl family="Control" type="Driver" priority="60">
+			<ComponentTmpl family="Control" type="Driver">
 				<Param event_types="forward:stop-forward:fast-forward"/>
 				<Param event_types="backward:stop-backward:fast-backward"/>
 				<Param event_types="strafe_left:stop-strafe_left:fast-strafe_left"/>
@@ -30,7 +30,7 @@
 			</ComponentTmpl>
 		</ObjectTmpl>
 		<ObjectTmpl type="CameraChaser">
-			<ComponentTmpl family="Control" type="Chaser" priority="60">
+			<ComponentTmpl family="Control" type="Chaser">
 				<Param event_types="head_left:stop-head_left"/>
 				<Param event_types="head_right:stop-head_right"/>
 				<Param event_types="pitch_up:stop-pitch_up"/>
@@ -39,13 +39,13 @@
 			</ComponentTmpl>
 		</ObjectTmpl>
 		<ObjectTmpl type="Camera">
-			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="200"/>
-			<ComponentTmpl family="Audio" type="Listener" priority="50"/>
+			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="100"/>
+			<ComponentTmpl family="Audio" type="Listener"/>
 		</ObjectTmpl>	
 		
 		<ObjectTmpl type="Actor">
 <!--
-			<ComponentTmpl family="Behavior" type="Activity" priority="40">
+			<ComponentTmpl family="Behavior" type="Activity">
 				<Param states="forward:backward"/>
 				<Param states="strafe_left:strafe_right"/>
 				<Param states="up:down"/>
@@ -59,27 +59,27 @@
 				<Param event_types="down:stop-down:fast-down"/>
 				<Param event_types="fast:stop-fast"/>							
 			</ComponentTmpl>
-			<ComponentTmpl family="Control" type="Driver" priority="60"/>
+			<ComponentTmpl family="Control" type="Driver"/>
 --> 
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="HUD">
-			<ComponentTmpl family="Behavior" type="Activity" priority="40">
+			<ComponentTmpl family="Behavior" type="Activity">
 				<Param states="idle:fire"/>
 				<Param states="walk:run"/>
 				<Param from_to="walk@run:fire@walk"/>
 				<Param from_to="idle@run:fire@idle"/>
 				<Param event_types="fire:stop-fire"/>
 			</ComponentTmpl>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="Character">
-			<ComponentTmpl family="Behavior" type="Activity" priority="40">
+			<ComponentTmpl family="Behavior" type="Activity">
 				<Param states="I:F:B:Sr:Sl:Rr:Rl:J"/>
 				<Param states="F-Rr:F-Rl:F-Rr-Rl:Rr-Rl:F-J:B-Rr:B-Rl"/>
 				<Param states="Sr-Rr:Sr-Rl:Sl-Rr:Sl-Rl"/>
@@ -93,9 +93,9 @@
 				<Param event_types="q:q-up"/>				
 				<Param event_types="ground:air"/>				
 			</ComponentTmpl>
-			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
+			<ComponentTmpl family="AI" type="SteerVehicle" priority="80"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="PhysicsControl" type="CharacterController" priority="90"/> 
 		</ObjectTmpl>
 		
@@ -111,29 +111,22 @@
 		
 		<ObjectTmpl type="InstancedActor">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
-		</ObjectTmpl>
-		
-		<ObjectTmpl type="InstancedActorAI">
-			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="AI" type="Steering" priority="40"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
-			<ComponentTmpl family="PhysicsControl" type="CharacterController" priority="90"/>
 		</ObjectTmpl>
 
 		<!-- templates for AI navmesh -->
 		<ObjectTmpl type="RecastCrowdAgent">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="AI" type="CrowdAgent" priority="40"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="AI" type="CrowdAgent"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="RecastNavMesh">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
-			<ComponentTmpl family="AI" type="NavMesh" priority="80">
+			<ComponentTmpl family="AI" type="NavMesh">
 				<Param event_types="add_crowd_agent:remove_crowd_agent"/>
 				<Param event_types="toggle_debug"/>
 			</ComponentTmpl>
@@ -142,13 +135,13 @@
 		<!-- templates for AI OpenSteer -->
 		<ObjectTmpl type="OpenSteerVehicle">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="AI" type="SteerVehicle" priority="40"/>
-			<ComponentTmpl family="Audio" type="Sound3d" priority="50"/>
+			<ComponentTmpl family="AI" type="SteerVehicle" priority="80"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/>
 		</ObjectTmpl>
 
 		<ObjectTmpl type="OpenSteerPlugIn">
-			<ComponentTmpl family="AI" type="SteerPlugIn" priority="80">
+			<ComponentTmpl family="AI" type="SteerPlugIn">
 				<Param event_types="add_steer_vehicle:remove_steer_vehicle"/>
 				<Param event_types="hit_obstacle:hit_vehicle"/>
 				<Param event_types="toggle_debug"/>
@@ -304,35 +297,6 @@
 			</Component>
 		</Object>
 		
-<!--
-		<Object type="InstancedActorAI" id="Steerer1">
-			<Param parent="render"/>
-			<Param is_steady="false"/>
-			<Param store_params="true"/>
-			<Param pos="-14.5016,-12.6806,42.6722"/>
-			<Param rot="-90.0,0.0,0.0"/>
-			<Component type="Steering">
-				<Param enabled="false"/>
-				<Param throw_events="true"/>
-				<Param controlled_type="character_controller"/>
-				<Param mass="20.0"/>
-				<Param movt_force="0.05"/>
-				<Param max_force="5.0"/>
-				<Param obstacle_hit_mask="0x80000000"/>
-				<Param obstacle_max_distance_fraction="1.5"/>
-			</Component>
-			<Component type="CharacterController">
-				<Param shape_type="capsule"/>
-				<Param shape_size="medium"/>
-				<Param is_local="false"/>
-			</Component>
-			<Component type="InstanceOf">
-				<Param instance_of="Gorilla1"/>
-				<Param scale="0.6,0.6,0.6"/>
-			</Component>
-		</Object>
--->
-
 		<Object type="Actor" id="Actor1"  priority="100">
 			<Component type="Activity">
 				<Param events="forward@h:stop-forward@h-up:fast-forward@shift-h$"/>

@@ -49,11 +49,8 @@ libtestaicomponents_a_SOURCES = \
 		aicomponents/AISuiteFixture.h \
 		aicomponents/CrowdAgent_test.cpp \
 		aicomponents/NavMesh_test.cpp \
-		aicomponents/Steering_test.cpp \
-		aicomponents/OpenSteerPlugIn_test.cpp \
-		aicomponents/OpenSteerVehicle_test.cpp \
-		$(top_srcdir)/src/AIComponents/Steering.cpp  \
-		$(top_srcdir)/src/AIComponents/SteeringTemplate.cpp \
+		aicomponents/SteerPlugIn_test.cpp \
+		aicomponents/SteerVehicle_test.cpp \
 		$(top_srcdir)/src/AIComponents/CrowdAgent.cpp \
 		$(top_srcdir)/src/AIComponents/CrowdAgentTemplate.cpp \
 		$(top_srcdir)/src/AIComponents/NavMesh.cpp \

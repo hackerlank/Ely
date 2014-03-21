@@ -128,9 +128,6 @@ void GameManager::setupCompTmplMgr()
 	//NavMesh
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new NavMeshTemplate(this, mWindow));
-	//Steering
-	ComponentTemplateManager::GetSingleton().addComponentTemplate(
-			new SteeringTemplate(this, mWindow));
 	//SteerPlugIn
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new SteerPlugInTemplate(this, mWindow));

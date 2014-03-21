@@ -48,8 +48,6 @@ extern void player0Init();
 extern void player0End();
 extern void softObjectsInit();
 extern void softObjectsEnd();
-extern void Steerer1Init();
-extern void Steerer1End();
 
 ///Call all init/end functions
 void callAllInits()
@@ -60,7 +58,6 @@ void callAllInits()
 	environmentObjectsInit();
 	player0Init();
 	softObjectsInit();
-	Steerer1Init();
 }
 void callAllEnds()
 {
@@ -70,6 +67,5 @@ void callAllEnds()
 	environmentObjectsEnd();
 	player0End();
 	softObjectsEnd();
-	Steerer1End();
 }
 

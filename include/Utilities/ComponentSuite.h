@@ -30,8 +30,6 @@
 #include "ObjectModel/ComponentTemplate.h"
 
 /// List of all components and component templates
-#include "AIComponents/Steering.h"
-#include "AIComponents/SteeringTemplate.h"
 #include "AIComponents/CrowdAgent.h"
 #include "AIComponents/CrowdAgentTemplate.h"
 #include "AIComponents/NavMesh.h"
