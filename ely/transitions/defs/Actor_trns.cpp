@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/transitions/defs/Actor.cpp
+ * \file /Ely/ely/transitions/defs/Actor_trns.cpp
  *
  * \date 26/nov/2012 (11:37:57)
  * \author consultit
@@ -186,9 +186,9 @@ void forward_FromTo_strafe_right_Actor(fsm*, Activity& activity,
 }
 
 ///Init/end functions: see common_configs.cpp
-void actorInit()
+void Actor_trnsInit()
 {
 }
-void actorEnd()
+void Actor_trnsEnd()
 {
 }

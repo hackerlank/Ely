@@ -36,20 +36,20 @@ void transitionsEnd()
 }
 
 ///Insert declarations of all init/end functions
-extern void actorInit();
-extern void actorEnd();
-extern void characterInit();
-extern void characterEnd();
+extern void Actor_trnsInit();
+extern void Actor_trnsEnd();
+extern void Character_trnsInit();
+extern void Character_trnsEnd();
 
 ///Call all init/end functions
 void callAllInits()
 {
-	actorInit();
-	characterInit();
+	Actor_trnsInit();
+	Character_trnsInit();
 }
 void callAllEnds()
 {
-	actorEnd();
-	characterEnd();
+	Actor_trnsEnd();
+	Character_trnsEnd();
 }
 

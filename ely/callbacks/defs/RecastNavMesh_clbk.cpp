@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/defs/navMeshes.cpp
+ * \file /Ely/ely/callbacks/defs/RecastNavMesh_clbk.cpp
  *
  * \date 13/gen/2014 (08:47:01)
  * \author consultit
@@ -143,10 +143,10 @@ void navMeshesToggleDebug(const Event* event, void* data)
 #endif
 
 ///Init/end functions: see common_configs.cpp
-void navMeshesInit()
+void RecastNavMesh_clbkInit()
 {
 }
-void navMeshesEnd()
+void RecastNavMesh_clbkEnd()
 {
 }
 

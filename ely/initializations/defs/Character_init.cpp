@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/player0.cpp
+ * \file /Ely/ely/initializations/defs/Character_init.cpp
  *
  * \date 14/lug/2013 (08:48:01)
  * \author consultit
@@ -51,10 +51,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	npc1Sound3d->getSound("walk-sound")->play();
 }
 
-void player0Init()
+void Character_initInit()
 {
 }
 
-void player0End()
+void Character_initEnd()
 {
 }

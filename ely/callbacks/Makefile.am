@@ -3,12 +3,15 @@ AM_CXXFLAGS = $(ELY_CXXFLAGS)
 
 pkglib_LTLIBRARIES = callbacks.la
 callbacks_la_SOURCES = \
-		common_configs.cpp common_configs.h \
-		defs/activityActor.cpp \
-		defs/activityCharacter.cpp \
-		defs/controlCamera.cpp \
-		defs/navMeshes.cpp \
-		defs/steerPlugIns.cpp \
-		defs/vehicleCar.cpp
+		common_configs.cpp \
+		defs/Actor_clbk.cpp \
+		defs/Character_clbk.cpp \
+		defs/Camera_clbk.cpp \
+		defs/RecastNavMesh_clbk.cpp \
+		defs/OpenSteerPlugIn_clbk.cpp \
+		defs/Car_clbk.cpp
 
+noinst_HEADERS = \
+		common_configs.h
+		
 callbacks_la_LDFLAGS = -module -avoid-version

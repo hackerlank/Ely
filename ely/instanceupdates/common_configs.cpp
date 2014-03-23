@@ -36,16 +36,16 @@ void instanceupdatesEnd()
 }
 
 ///Insert declarations of all init/end functions
-extern void playerInit();
-extern void playerEnd();
+extern void Character_updtInit();
+extern void Character_updtEnd();
 
 ///Call all init/end functions
 void callAllInits()
 {
-	playerInit();
+	Character_updtInit();
 }
 void callAllEnds()
 {
-	playerEnd();
+	Character_updtEnd();
 }
 

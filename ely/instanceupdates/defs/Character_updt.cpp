@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/instanceupdates/defs/player.cpp
+ * \file /Ely/ely/instanceupdates/defs/Character_updt.cpp
  *
  * \date 01/set/2013 (20:18:30)
  * \author consultit
@@ -81,10 +81,10 @@ void playerUpdate(float dt, Activity& activity)
 }
 
 ///Init/end functions: see common_configs.cpp
-void playerInit()
+void Character_updtInit()
 {
 }
-void playerEnd()
+void Character_updtEnd()
 {
 }
 

@@ -36,36 +36,44 @@ void initializationsEnd()
 }
 
 ///Insert declarations of all init/end functions
-extern void Actor1Init();
-extern void Actor1End();
-extern void cameraInit();
-extern void cameraEnd();
-extern void elyGameInit();
-extern void elyGameEnd();
-extern void environmentObjectsInit();
-extern void environmentObjectsEnd();
-extern void player0Init();
-extern void player0End();
-extern void softObjectsInit();
-extern void softObjectsEnd();
+extern void Actor_initInit();
+extern void Actor_initEnd();
+extern void Camera_initInit();
+extern void Camera_initEnd();
+extern void Game_initInit();
+extern void Game_initEnd();
+extern void StaticObjects_initInit();
+extern void StaticObjects_initEnd();
+extern void Character_initInit();
+extern void Character_initEnd();
+extern void SoftObject_initInit();
+extern void SoftObject_initEnd();
+extern void OpenSteerPlugIn_initInit();
+extern void OpenSteerPlugIn_initEnd();
+extern void RecastNavMesh_initInit();
+extern void RecastNavMesh_initEnd();
 
 ///Call all init/end functions
 void callAllInits()
 {
-	Actor1Init();
-	cameraInit();
-	elyGameInit();
-	environmentObjectsInit();
-	player0Init();
-	softObjectsInit();
+	Actor_initInit();
+	Camera_initInit();
+	Game_initInit();
+	StaticObjects_initInit();
+	Character_initInit();
+	SoftObject_initInit();
+	OpenSteerPlugIn_initInit();
+	RecastNavMesh_initInit();
 }
 void callAllEnds()
 {
-	Actor1End();
-	cameraEnd();
-	elyGameEnd();
-	environmentObjectsEnd();
-	player0End();
-	softObjectsEnd();
+	Actor_initEnd();
+	Camera_initEnd();
+	Game_initEnd();
+	StaticObjects_initEnd();
+	Character_initEnd();
+	SoftObject_initEnd();
+	OpenSteerPlugIn_initEnd();
+	RecastNavMesh_initEnd();
 }
 

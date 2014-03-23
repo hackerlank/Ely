@@ -15,63 +15,28 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/EnvironmentObjects.cpp
+ * \file /Ely/ely/initializations/defs/RecastNavMesh_init.cpp
  *
- * \date 20/ott/2013 (10:00:47)
+ * \date 22/mar/2014 (10:14:24)
  * \author consultit
  */
 
 #include "../common_configs.h"
 #include "AIComponents/NavMesh.h"
-#include "AIComponents/SteerPlugIn.h"
-#include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 
-///Environment objects related
+///RecastNavMesh objects related
 #ifdef __cplusplus
 extern "C"
 {
 #endif
 
-INITIALIZATION Terrain1_initialization;
 INITIALIZATION course2_initialization;
-INITIALIZATION steerPlugInBoid1_initialization;
 
 #ifdef __cplusplus
 }
 #endif
-
-///Terrain1
-#ifdef ELY_DEBUG
-namespace
-{
-void toggleWireframeMode(const Event* event, void* data)
-{
-	SMARTPTR(Object)terrain1= reinterpret_cast<Object*>(data);
-
-	if (terrain1->getNodePath().has_render_mode())
-	{
-		terrain1->getNodePath().clear_render_mode();
-	}
-	else
-	{
-		terrain1->getNodePath().set_render_mode_wireframe(1);
-	}
-}
-}
-#endif
-
-void Terrain1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
-PandaFramework* pandaFramework, WindowFramework* windowFramework)
-{
-	//Terrain1
-#ifdef ELY_DEBUG
-	//set toggle Wire frame Mode callback
-	pandaFramework->define_key("t", "toggleWireframeMode", &toggleWireframeMode,
-			static_cast<void*>(object));
-#endif
-}
 
 ///course2
 #define TOBECLONEDOBJECT "crowdAgentToBeCloned"
@@ -107,34 +72,12 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	}
 }
 
-///steerPlugInBoid1
-#define WORLDCENTEROBJECT "beachhouse2_1"
-void steerPlugInBoid1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
-PandaFramework* pandaFramework, WindowFramework* windowFramework)
-{
-	//tweak some parameter
-	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
-
-	//set world center/radius around WORLDCENTEROBJECT
-	NodePath worldCenterObjectNP = ObjectTemplateManager::GetSingletonPtr()->
-			getCreatedObject(ObjectId(WORLDCENTEROBJECT))->getNodePath();
-	LVecBase3f modelDims;
-	LVector3f modelDeltaCenter;
-	float modelRadius;
-	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
-			worldCenterObjectNP, modelDims, modelDeltaCenter, modelRadius);
-	BoidsPlugIn<SteerVehicle>* boidsPlugIn = dynamic_cast<BoidsPlugIn<SteerVehicle>*>
-		(&DCAST(SteerPlugIn, aiComp)->getAbstractPlugIn());
-	boidsPlugIn->worldCenter = LVecBase3fToOpenSteerVec3(
-			worldCenterObjectNP.get_pos() + LVector3f(0.0, 0.0, 1.5 * modelDims.get_z()));
-	boidsPlugIn->worldRadius = 1.5 * modelDims.get_z();
-}
-
 ///init/end
-void environmentObjectsInit()
+void RecastNavMesh_initInit()
 {
 }
 
-void environmentObjectsEnd()
+void RecastNavMesh_initEnd()
 {
 }
+

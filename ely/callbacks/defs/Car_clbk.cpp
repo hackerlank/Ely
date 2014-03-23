@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/defs/vehicleCar.cpp
+ * \file /Ely/ely/callbacks/defs/Car_clbk.cpp
  *
  * \date 04/ott/2013 (16:45:21)
  * \author consultit
@@ -122,10 +122,10 @@ void stop_brake_Vehicle_Car(const Event* event, void* data)
 }
 
 ///Init/end functions: see common_configs.cpp
-void vehicleCarInit()
+void Car_clbkInit()
 {
 }
-void vehicleCarEnd()
+void Car_clbkEnd()
 {
 }
 

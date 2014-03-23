@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/Actor1.cpp
+ * \file /Ely/ely/initializations/defs/Actor_init.cpp
  *
  * \date 14/lug/2013 (08:46:36)
  * \author consultit
@@ -105,10 +105,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	static_cast<void*>(object));
 }
 
-void Actor1Init()
+void Actor_initInit()
 {
 }
 
-void Actor1End()
+void Actor_initEnd()
 {
 }

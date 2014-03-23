@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/defs/activityActor.cpp
+ * \file /Ely/ely/callbacks/defs/Actor_clbk.cpp
  *
  * \date 26/nov/2012 (10:37:44)
  * \author consultit
@@ -231,9 +231,9 @@ void fast_down_Activity_Actor(const Event* event, void* data)
 }
 
 ///Init/end functions: see common_configs.cpp
-void activityActorInit()
+void Actor_clbkInit()
 {
 }
-void activityActorEnd()
+void Actor_clbkEnd()
 {
 }

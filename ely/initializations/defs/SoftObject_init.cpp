@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/SoftObjects.cpp
+ * \file /Ely/ely/initializations/defs/SoftObject_init.cpp
  *
  * \date 20/ott/2013 (10:01:07)
  * \author consultit
@@ -126,10 +126,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 }
 
 ///init/end
-void softObjectsInit()
+void SoftObject_initInit()
 {
 }
 
-void softObjectsEnd()
+void SoftObject_initEnd()
 {
 }

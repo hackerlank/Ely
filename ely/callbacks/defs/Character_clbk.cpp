@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/defs/activityCharacter.cpp
+ * \file /Ely/ely/callbacks/defs/Character_clbk.cpp
  *
  * \date 26/nov/2012 (10:29:22)
  * \author consultit
@@ -108,7 +108,7 @@ void groundAirPlayer0(const Event * event, void * data)
 }
 
 ///Init/end functions: see common_configs.cpp
-void activityCharacterInit()
+void Character_clbkInit()
 {
 	tablePtr = new TransitionTable();
 	//insert transitions
@@ -337,7 +337,7 @@ void activityCharacterInit()
 	TABLEINSERT(tablePtr, "Sl-Rl-Q", "rl-up", "Sl-Q");
 	TABLEINSERT(tablePtr, "Sl-Rl-Q", "q-up", "Sr-Rl");
 }
-void activityCharacterEnd()
+void Character_clbkEnd()
 {
 	delete tablePtr;
 }

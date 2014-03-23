@@ -98,24 +98,8 @@
 			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="PhysicsControl" type="CharacterController" priority="90"/> 
 		</ObjectTmpl>
-		
-		<ObjectTmpl type="StaticActor">
-			<ComponentTmpl family="Scene" type="Model" priority="100"/>
-			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
-		</ObjectTmpl>
-		
-		<!-- templates for instancing -->
-		<ObjectTmpl type="Instanceable">
-			<ComponentTmpl family="Scene" type="Model" priority="100"/>
-		</ObjectTmpl>
-		
-		<ObjectTmpl type="InstancedActor">
-			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
-			<ComponentTmpl family="Audio" type="Sound3d"/>
-			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
-		</ObjectTmpl>
 
-		<!-- templates for AI navmesh -->
+		<!-- templates for AI Recast Navigation -->
 		<ObjectTmpl type="RecastCrowdAgent">
 			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
 			<ComponentTmpl family="AI" type="CrowdAgent"/>
@@ -142,7 +126,6 @@
 
 		<ObjectTmpl type="OpenSteerPlugIn">
 			<ComponentTmpl family="AI" type="SteerPlugIn">
-				<Param event_types="add_steer_vehicle:remove_steer_vehicle"/>
 				<Param event_types="hit_obstacle:hit_vehicle"/>
 				<Param event_types="toggle_debug"/>
 			</ComponentTmpl>
@@ -171,9 +154,25 @@
 			<ComponentTmpl family="Physics" type="SoftBody" priority="90"/> 
 		</ObjectTmpl>
 		
-		<!-- templates for terrains -->
+		<!-- templates for static objects -->		
+		<ObjectTmpl type="StaticActor">
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
+		</ObjectTmpl>
+		
 		<ObjectTmpl type="Terrain">
 			<ComponentTmpl family="Scene" type="Terrain" priority="100"/>
+			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
+		</ObjectTmpl>
+		
+		<!-- templates for instancing -->
+		<ObjectTmpl type="Instanceable">
+			<ComponentTmpl family="Scene" type="Model" priority="100"/>
+		</ObjectTmpl>
+		
+		<ObjectTmpl type="InstancedActor">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="Audio" type="Sound3d"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
 
@@ -604,6 +603,15 @@
 		<!-- ENVIRONMENT OBJECTS -->
 		<!-- ------------------- -->
 
+		<Object type="OpenSteerPlugIn" id="steerPlugInOneTurning1" priority="100">
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param type="one_turning"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+			</Component>
+		</Object>
+		
 		<Object type="OpenSteerPlugIn" id="steerPlugInPedestrian1" priority="100">
 			<Param parent="render"/>
 			<Param is_steady="true"/>
@@ -618,8 +626,6 @@
 				<Param obstacles="gazebo_1@box@outside:gazebo_2@box@outside:gazebo_3@box@outside"/>
 				<Param obstacles="bridge_1@box@outside:bridge_2@box@outside"/>
 				<Param obstacles="cityhall_1@box@outside:cityhall_2@box@outside"/>
-				<Param events="add_steer_vehicle@h$add_vehicle"/>
-				<Param events="remove_steer_vehicle@shift-h$remove_vehicle"/>
 				<Param events="hit_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:hit_vehicle@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
@@ -631,12 +637,19 @@
 			<Component type="SteerPlugIn">
 				<Param type="boid"/>
 				<Param obstacles="beachhouse2_1@box@outside"/>
-				<Param events="add_steer_vehicle@y$add_vehicle"/>
-				<Param events="remove_steer_vehicle@shift-y$remove_vehicle"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
 		</Object>
-		
+
+		<Object type="OpenSteerPlugIn" id="steerPlugInMultiplePursuit1" priority="100">
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param type="multiple_pursuit"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+			</Component>
+		</Object>
+				
 <!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">

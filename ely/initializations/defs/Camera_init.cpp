@@ -15,19 +15,18 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/callback_defs.cpp
+ * \file /Ely/ely/initializations/defs/Camera_init.cpp
  *
  * \date 05/set/2012 (20:07:54)
  * \author consultit
  */
 
 #include "../common_configs.h"
+#include "Game_init.h"
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/Chaser.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Support/Picker.h"
-#include <Rocket/Core.h>
-#include <Rocket/Controls.h>
 
 ///camera related
 #ifdef __cplusplus
@@ -44,37 +43,11 @@ INITIALIZATION camera_initialization;
 //XXX to be removed
 bool controlGrabbed = false;
 
-//(Rocket) externs
-extern Rocket::Core::Context *gRocketContext;
-extern Rocket::Core::ElementDocument *gRocketMainMenu;
-extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
-extern std::map<Rocket::Core::String,
-		void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> gRocketEventHandlers;
-extern std::vector<void (*)()> gRocketPresetFunctions;
-extern std::vector<void (*)()> gRocketCommitFunctions;
-extern std::string rocketBaseDir;
-
 //locals
 namespace
 {
 //common text writing
 NodePath textNode;
-void writeText(const std::string& text, float scale, const LVecBase4& color,
-		const LVector3f& location)
-{
-	textNode = NodePath(new TextNode("CommonTextNode"));
-	textNode.reparent_to(
-			ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
-					ObjectId("render2d"))->getNodePath());
-	textNode.set_bin("fixed", 50);
-	textNode.set_depth_write(false);
-	textNode.set_depth_test(false);
-	textNode.set_billboard_point_eye();
-	DCAST(TextNode, textNode.node())->set_text(text);
-	textNode.set_scale(scale);
-	textNode.set_color(color);
-	textNode.set_pos(location);
-}
 
 enum CameraType
 {
@@ -493,7 +466,7 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 				ComponentFamilyType("Control")))->enable() != Driver::Result::OK,)
 
 		//write text
-		writeText("Free View Camera", 0.05,
+		writeText(textNode, "Free View Camera", 0.05,
 				LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 	}
 	else if (newType == chaser_camera)
@@ -506,7 +479,7 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 				ComponentFamilyType("Control")))->enable() != Chaser::Result::OK,)
 
 		//write text
-		writeText("Camera Chasing '" + DCAST(Chaser, camera->getComponent(
+		writeText(textNode, "Camera Chasing '" + DCAST(Chaser, camera->getComponent(
 				ComponentFamilyType("Control")))->getChasedObject() + "'", 0.05,
 				LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 
@@ -520,7 +493,7 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 					camera->objectTmpl()->windowFramework(),
 					"shift-mouse1", "mouse1-up");
 			//write text
-			writeText("Object Picker Active", 0.05,
+			writeText(textNode, "Object Picker Active", 0.05,
 					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
 		}
 	}
@@ -570,11 +543,11 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketCommitFunctions.push_back(&rocketCommit);
 }
 
-void cameraInit()
+void Camera_initInit()
 {
 }
 
-void cameraEnd()
+void Camera_initEnd()
 {
 }
 

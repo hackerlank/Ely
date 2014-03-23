@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/transitions/defs/Character.cpp
+ * \file /Ely/ely/transitions/defs/Character_trns.cpp
  *
  * \date 26/nov/2012 (12:02:39)
  * \author consultit
@@ -986,9 +986,9 @@ void Exit_Sl_Rl_Q_Character(fsm*, Activity& activity)
 }
 
 ///Init/end functions: see common_configs.cpp
-void characterInit()
+void Character_trnsInit()
 {
 }
-void characterEnd()
+void Character_trnsEnd()
 {
 }

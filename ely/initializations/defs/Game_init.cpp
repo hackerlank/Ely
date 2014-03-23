@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/initializations/defs/ely.cpp
+ * \file /Ely/ely/initializations/defs/Game_init.cpp
  *
  * \date 11/gen/2014 (11:22:20)
  * \author consultit
@@ -25,10 +25,8 @@
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
 #include "Ely.h"
-#include "Ely_ini.h"
+#include "Game_init.h"
 #include <rocketRegion.h>
-#include <Rocket/Core.h>
-#include <Rocket/Controls.h>
 #include <Rocket/Debugger.h>
 
 ///ely related
@@ -57,6 +55,23 @@ std::vector<void (*)()> gRocketPresetFunctions;
 //registered by some subsystems that need to commit their changes after main/exit menus are closed
 std::vector<void (*)()> gRocketCommitFunctions;
 std::string rocketBaseDir(ELY_DATADIR);
+//common text writing
+void writeText(NodePath& textNode, const std::string& text, float scale, const LVecBase4& color,
+		const LVector3f& location)
+{
+	textNode = NodePath(new TextNode("CommonTextNode"));
+	textNode.reparent_to(
+			ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
+					ObjectId("render2d"))->getNodePath());
+	textNode.set_bin("fixed", 50);
+	textNode.set_depth_write(false);
+	textNode.set_depth_test(false);
+	textNode.set_billboard_point_eye();
+	DCAST(TextNode, textNode.node())->set_text(text);
+	textNode.set_scale(scale);
+	textNode.set_color(color);
+	textNode.set_pos(location);
+}
 
 //locals
 namespace
@@ -65,7 +80,7 @@ const int CALLBACKSNUM = 5;
 Rocket::Core::ElementDocument *exitMenu;
 bool mainPresetsCommits = false;
 
-void showExitMenu(const Event* e, void* data);
+void showExitMenu(const Event* e);
 
 class MainEventListener: public EventListener
 {
@@ -158,7 +173,7 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	}
 	else if (mValue == "main::button::exit")
 	{
-		showExitMenu(NULL, NULL);
+		showExitMenu(NULL);
 	}
 	else if (mValue == "exit::form::submit_exit")
 	{
@@ -198,7 +213,7 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	}
 }
 
-void showMainMenu(const Event* e, void* data)
+void showMainMenu(const Event* e)
 {
 	//return if already shown or we are asking to exit
 	RETURN_ON_COND(gRocketContext->GetDocument("main_menu") or
@@ -233,7 +248,7 @@ void showMainMenu(const Event* e, void* data)
 	}
 }
 
-void showExitMenu(const Event* e, void* data)
+void showExitMenu(const Event* e)
 {
 	//return if we are already asking to exit
 	RETURN_ON_COND(gRocketContext->GetDocument("exit_menu"),)
@@ -324,21 +339,18 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	///libRocket
 	//add show main menu event handler
-	EventHandler::get_global_event_handler()->add_hook("m", &showMainMenu,
-	reinterpret_cast<void*>(NULL));
+	EventHandler::get_global_event_handler()->add_hook("m", &showMainMenu);
 	//handle "close request" and "esc" events
 	windowFramework->get_graphics_window()->set_close_request_event("close_request_event");
-	EventHandler::get_global_event_handler()->add_hook("close_request_event", &showExitMenu,
-	reinterpret_cast<void*>(NULL));
-	EventHandler::get_global_event_handler()->add_hook("escape", &showExitMenu,
-	reinterpret_cast<void*>(NULL));
+	EventHandler::get_global_event_handler()->add_hook("close_request_event", &showExitMenu);
+	EventHandler::get_global_event_handler()->add_hook("escape", &showExitMenu);
 }
 
-void elyGameInit()
+void Game_initInit()
 {
 }
 
-void elyGameEnd()
+void Game_initEnd()
 {
 	//delete the global ray caster
 	delete Raycaster::GetSingletonPtr();

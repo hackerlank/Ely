@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/ely/callbacks/defs/controlCamera.cpp
+ * \file /Ely/ely/callbacks/defs/Camera_clbk.cpp
  *
  * \date 26/nov/2012 (11:04:25)
  * \author consultit
@@ -353,10 +353,10 @@ void stop_hold_lookat_Chaser_Camera(const Event* event, void* data)
 }
 
 ///Init/end functions: see common_configs.cpp
-void controlCameraInit()
+void Camera_clbkInit()
 {
 }
-void controlCameraEnd()
+void Camera_clbkEnd()
 {
 }
 
