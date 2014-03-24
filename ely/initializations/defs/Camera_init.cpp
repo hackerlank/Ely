@@ -270,7 +270,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					std::list<SMARTPTR(Object)> createdObjects =
 					//to be safe with threads get a copy of created objects' list
 					ObjectTemplateManager::GetSingletonPtr()->getCreatedObjects();
-					int selectedIdx = 0;
+					int selectedIdx = objectsSelect->Add("", "");
 					for (objectIter = createdObjects.begin();
 							objectIter != createdObjects.end(); ++objectIter)
 					{

@@ -49,10 +49,8 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyId) con
 
 	ComponentOrderedList::const_iterator it =
 	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
-	if (it == mComponents.end())
-	{
-		return NULL;
-	}
+	RETURN_ON_COND(it == mComponents.end(), NULL)
+
 	return (*it).second;
 }
 
@@ -65,10 +63,8 @@ const ComponentFamilyType& familyId)
 	}
 	ComponentOrderedList::iterator it =
 	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
-	if (it != mComponents.end())
-	{
-		return false;
-	}
+	RETURN_ON_COND(it != mComponents.end(), false)
+
 	//insert the new component into the list at the back end
 	mComponents.push_back(FamilyTypeComponentPair(familyId, component));
 	//
@@ -84,10 +80,8 @@ const ComponentFamilyType& familyId)
 	}
 	ComponentOrderedList::iterator it =
 	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyId));
-	if ((it == mComponents.end()) or (it->second != component))
-	{
-		return false;
-	}
+	RETURN_ON_COND((it == mComponents.end()) or (it->second != component), false)
+
 	//erase component
 	mComponents.erase(it);
 	//
@@ -218,10 +212,8 @@ void Object::worldSetup()
 void Object::doLoadInitializationFunctions()
 {
 	//if initializations loaded do nothing
-	if (mInitializationsLoaded)
-	{
-		return;
-	}
+	RETURN_ON_COND(mInitializationsLoaded,)
+
 	// doReset errors
 	lt_dlerror();
 	//load the initialization functions library
@@ -243,10 +235,8 @@ void Object::doLoadInitializationFunctions()
 void Object::doUnloadInitializationFunctions()
 {
 	//if initializations not loaded do nothing
-	if (not mInitializationsLoaded)
-	{
-		return;
-	}
+	RETURN_ON_COND(not mInitializationsLoaded,)
+
 	//Close the initialization functions library
 	// doReset errors
 	lt_dlerror();

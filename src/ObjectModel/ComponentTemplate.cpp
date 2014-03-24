@@ -42,10 +42,8 @@ void ComponentTemplate::setParameters(const ParameterTable& parameterTable)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if(parameterTable.empty())
-	{
-		return;
-	}
+	RETURN_ON_COND(parameterTable.empty(),)
+
 	ParameterTableConstIter constIter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters

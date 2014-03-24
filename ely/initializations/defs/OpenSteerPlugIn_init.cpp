@@ -27,6 +27,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
@@ -61,7 +62,8 @@ enum SteerPlugInType
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
-ObjectId wandererObject, newWanderedObject;
+ObjectId wandererObjectId, newWanderedObjectId;
+bool wandererExternalUpdate = false;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -205,7 +207,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					std::list<SMARTPTR(Object)> createdObjects =
 					//to be safe with threads get a copy of created objects' list
 					ObjectTemplateManager::GetSingletonPtr()->getCreatedObjects();
-					int selectedIdx = 0;
+					//add an empty object
+					int selectedIdx = objectsSelect->Add("", "");
 					for (objectIter = createdObjects.begin();
 							objectIter != createdObjects.end(); ++objectIter)
 					{
@@ -219,7 +222,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 						ObjectId objectId = (*objectIter)->objectId();
 						int i = objectsSelect->Add(objectId.c_str(),
 								objectId.c_str());
-						if (objectId == wandererObject)
+						if (objectId == wandererObjectId)
 						{
 							selectedIdx = i;
 						}
@@ -227,6 +230,12 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					//set first option as selected
 					objectsSelect->SetSelection(selectedIdx);
 				}
+				//external update
+				wandererExternalUpdate ?
+					steerPlugInOptionsMenu->GetElementById("external_update_yes")->SetAttribute(
+							"checked", true):
+					steerPlugInOptionsMenu->GetElementById("external_update_no")->SetAttribute(
+							"checked", true);
 			}
 		}
 	}
@@ -266,8 +275,15 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				steerPlugInType = multiple_pursuit;
 				//set options' values from elements' values
 				//new wanderer object
-				newWanderedObject = event.GetParameter<Rocket::Core::String>(
+				newWanderedObjectId = event.GetParameter<Rocket::Core::String>(
 							"wanderer_object", "").CString();
+				//external update
+				paramValue = event.GetParameter<Rocket::Core::String>("external_update",
+									"");
+				paramValue == "yes" ?
+					wandererExternalUpdate = true:
+					//paramValue == "no"
+					wandererExternalUpdate = false;
 			}
 			else
 			{
@@ -382,15 +398,11 @@ void add_vehicle(const Event* event)
 	}
 	else if (openSteerPlugInName == "Multiple Pursuit")
 	{
-		///TODO
-		//set SteerVehicle type, mov_type, thrown_events
-//		compParams["SteerVehicle"].insert(
-//				std::pair<std::string, std::string>("type", "pedestrian"));
-//		compParams["SteerVehicle"].insert(
-//				std::pair<std::string, std::string>("mov_type", "kinematic"));
-//		compParams["SteerVehicle"].insert(
-//				std::pair<std::string, std::string>("thrown_events",
-//						"avoid_obstacle@@3:avoid_close_neighbor@@"));
+		//set SteerVehicle type, mov_type
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("type", "multiple_pursuit_pursuer"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("mov_type", "kinematic"));
 	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
@@ -450,6 +462,14 @@ void remove_vehicle(const Event* event)
 					return;
 				}
 			}
+			else if (openSteerPlugInName == "Multiple Pursuit")
+			{
+				if((not dynamic_cast<MpPursuer<SteerVehicle>*>(vehicle)) and
+						(not dynamic_cast<ExternalMpPursuer<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
 			else
 			{
 				return;
@@ -489,10 +509,56 @@ void rocketCommit()
 //commit function for Multiple Pursuit
 void rocketMultiplePursuitCommit()
 {
-	RETURN_ON_COND(wandererObject == newWanderedObject,)
+	RETURN_ON_COND(steerPlugInType == none,)
+	//get data
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[steerPlugInType];
+	//get SteerPlugIn ObjectId
+	std::string steerPlugInObjectId = steerPlugIn->getOwnerObject()->objectId();
+
+	RETURN_ON_COND(wandererObjectId == newWanderedObjectId,)
+
+	//remove SteerVehicle component from wandererObject
+	ObjectTemplateManager::GetSingletonPtr()->removeComponentFromObject(
+			wandererObjectId, ComponentType("SteerVehicle"));
+
+	//get object to be cloned
+	SMARTPTR(Object)toBeClonedObject =
+	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId(TOBECLONEDOBJECT));
+	RETURN_ON_COND(not toBeClonedObject,)
+	//get the object-to-be-cloned components' parameter tables
+	ParameterTableMap compParams = toBeClonedObject->getStoredCompTmplParams();
+	//tweak clone components' parameter tables
+	compParams["SteerVehicle"].erase("type");
+	compParams["SteerVehicle"].insert(
+			std::pair<std::string, std::string>("type",
+					"multiple_pursuit_wanderer"));
+	if (wandererExternalUpdate)
+	{
+		//replace the AI component with a externally updated wanderer
+		//set SteerVehicle external_update
+		compParams["SteerVehicle"].erase("external_update");
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("external_update", "true"));
+	}
+	else
+	{
+		//replace the AI component with a normal wanderer
+		//set SteerVehicle mov_type
+		compParams["SteerVehicle"].erase("mov_type");
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("mov_type", "kinematic"));
+	}
+	//set SteerVehicle add_to_plugin
+	compParams["SteerVehicle"].erase("add_to_plugin");
+	compParams["SteerVehicle"].insert(
+			std::pair<std::string, std::string>("add_to_plugin",
+					steerPlugInObjectId));
+	//add the SteerVehicle component
+	ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
+			newWanderedObjectId, ComponentType("SteerVehicle"),
+			compParams["SteerVehicle"]);
 	//change wanderer object
-	wandererObject = newWanderedObject;
-	///TODO
+	wandererObjectId = newWanderedObjectId;
 }
 
 //called by all steer plugins, executed only once
@@ -577,6 +643,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	///init libRocket
 	steerPlugIns[multiple_pursuit] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
+	//custom setup
+	gRocketEventHandlers["steerPlugIn::multiple_pursuit::options"] =
+			&rocketEventHandler;
+	gRocketCommitFunctions.push_back(&rocketMultiplePursuitCommit);
 }
 
 ///init/end

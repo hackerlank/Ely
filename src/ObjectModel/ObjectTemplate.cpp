@@ -81,10 +81,8 @@ SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
 	ComponentTemplateList::const_iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
 			idIsEqualTo(componentType));
-	if (it == mComponentTemplates.end())
-	{
-		return NULL;
-	}
+	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
+
 	return *it;
 }
 
@@ -93,10 +91,8 @@ void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if(parameterTable.empty())
-	{
-		return;
-	}
+	RETURN_ON_COND(parameterTable.empty(),)
+
 	ParameterTableConstIter iter;
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters

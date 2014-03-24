@@ -78,10 +78,8 @@ bool ComponentTemplateManager::removeComponentTemplate(
 	HOLD_REMUTEX(mMutex)
 
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
-	if (it == mComponentTemplates.end())
-	{
-		return false;
-	}
+	RETURN_ON_COND(it == mComponentTemplates.end(), false)
+
 	PRINT_DEBUG(
 			"Removing component template for type '" << componentType << "'");
 	mComponentTemplates.erase(it);
@@ -96,10 +94,8 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::getComponentTemplate(
 
 	ComponentTemplateTable::const_iterator it = mComponentTemplates.find(
 			componentType);
-	if (it == mComponentTemplates.end())
-	{
-		return NULL;
-	}
+	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
+
 	return (*it).second;
 }
 
@@ -108,10 +104,8 @@ SMARTPTR(Component) ComponentTemplateManager::doCreateComponent(
 {
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(
 			componentType);
-	if (it == mComponentTemplates.end())
-	{
-		return NULL;
-	}
+	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
+
 	//new unique id
 	ComponentId newCompId = ComponentId(componentType) + ComponentId(getId());
 	//create component

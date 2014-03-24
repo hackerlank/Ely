@@ -98,7 +98,7 @@ public:
 			bool storeParams = false, SMARTPTR(Object) owner = NULL);
 
 	/**
-	 * \brief Adds a "free" component of the given type to an existing object with
+	 * \brief Adds/replaces a component of the given type to an existing object with
 	 * the given object identifier.\n
 	 * \note you can add any component of any given type, even if the object template
 	 * doesn't contain it.\n
@@ -113,6 +113,17 @@ public:
 	 */
 	bool addComponentToObject(ObjectId objectId, ComponentType componentType,
 			const ParameterTable& compTmplParams = ParameterTable());
+
+	/**
+	 * \brief Removes a component, if any, of the given type from an existing
+	 * object with the given object identifier.\n
+	 * \note the component is removed only if the object template doesn't
+	 * contain it.\n
+	 * @param objectId The given object identifier.
+	 * @param componentType The given component type.
+	 * @return True if successfully removed, false otherwise.
+	 */
+	bool removeComponentFromObject(ObjectId objectId, ComponentType componentType);
 
 	/**
 	 * \brief Object templates and object tables typedefs.
