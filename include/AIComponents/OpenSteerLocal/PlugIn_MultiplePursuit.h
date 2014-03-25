@@ -77,9 +77,9 @@ public:
 	{
 		SimpleVehicle::reset(); // reset the vehicle
 		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
-///		setSpeed(0);            // speed along Forward direction.
-///		setMaxForce(5.0);       // steering force is clipped to this magnitude
-///		setMaxSpeed(3.0);       // velocity is clipped to this magnitude
+///		this->setSpeed(0);            // speed along Forward direction.
+///		this->setMaxForce(5.0);       // steering force is clipped to this magnitude
+///		this->setMaxSpeed(3.0);       // velocity is clipped to this magnitude
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->gaudyPursuitAnnotation = true; // select use of 9-color annotation
 	}
@@ -176,10 +176,15 @@ public:
 		const float d = Vec3::distance(this->position(), wanderer->position());
 		const float r = this->radius() + wanderer->radius();
 		if (d < r)
+		{
 			reset();
+			this->setPosition(this->m_start);
+		}
 
 		const float maxTime = 20; // xxx hard-to-justify value
-		this->applySteeringForce(this->steerForPursuit(*wanderer, maxTime), elapsedTime);
+		//XXX put "steering force for pursuit" constrained to global XZ "ground" plane
+///		this->applySteeringForce(this->steerForPursuit(*wanderer, maxTime), elapsedTime);
+		this->applySteeringForce(this->steerForPursuit(*wanderer, maxTime).setYtoZero(), elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);

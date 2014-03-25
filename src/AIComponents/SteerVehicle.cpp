@@ -133,22 +133,22 @@ bool SteerVehicle::initialize()
 	//mass
 	value = strtof(mTmpl->parameter(std::string("mass")).c_str(),
 	NULL);
-	settings.m_mass = (value > 0.0 ? value : 1.0);
+	settings.m_mass = (value >= 0.0 ? value : 1.0);
 	//radius
 	mInputRadius = strtof(mTmpl->parameter(std::string("radius")).c_str(),
 	NULL);
 	//speed
 	value = strtof(mTmpl->parameter(std::string("speed")).c_str(),
 	NULL);
-	settings.m_speed = (value > 0.0 ? value : -value);
+	settings.m_speed = (value >= 0.0 ? value : -value);
 	//max force
 	value = strtof(mTmpl->parameter(std::string("max_force")).c_str(),
 	NULL);
-	settings.m_maxForce = (value > 0.0 ? value : -value);
+	settings.m_maxForce = (value >= 0.0 ? value : -value);
 	//max speed
 	value = strtof(mTmpl->parameter(std::string("max_speed")).c_str(),
 	NULL);
-	settings.m_maxSpeed = (value > 0.0 ? value : 1.0);
+	settings.m_maxSpeed = (value >= 0.0 ? value : 1.0);
 	//ray mask
 	param = mTmpl->parameter(std::string("ray_mask"));
 	if (param == std::string("all_on"))
