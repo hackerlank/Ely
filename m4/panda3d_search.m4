@@ -28,8 +28,33 @@ if test "x${ac_cv_header_Bullet_C_Api_h}" != xyes; then
 	----------------------------------------])
 fi
 # check libraries first from cmd line specified ones
+AC_MSG_NOTICE([Looking for Bullet libraries...])
 BULLET_LDFLAGS=""
-BULLET_LIBS=""
+BULLET_LIBS="-lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody"
+
+LDFLAGS="${BULLET_LDFLAGS} ${LDFLAGS_CMDLINE}"
+LIBS="${BULLET_LIBS} ${LIBS_CMDLINE}"
+required_libraries=yes
+bullet_prologue="#include <btBulletCollisionCommon.h>"
+bullet_body="
+	int argc=1;
+	char** argv=0;
+  	btCollisionWorld(NULL, NULL, NULL);
+  	"  	
+AC_LINK_IFELSE(
+  [AC_LANG_PROGRAM([$bullet_prologue],[$bullet_body])],
+  AC_MSG_NOTICE([Bullet libraries... yes]) 
+  AC_DEFINE([HAVE_RN], 1, [Bullet enabled]),
+  [required_libraries="Bullet"]
+)
+if test "x${required_libraries}" != xyes; then
+	AC_MSG_ERROR([
+	----------------------------------------
+	The ${required_libraries} libraries are
+	required to build Ely. Stopping...
+	Check 'config.log' for more information.
+	----------------------------------------])
+fi
 #
 ###Recast Navigation###
 # check header first from cmd line specified include
