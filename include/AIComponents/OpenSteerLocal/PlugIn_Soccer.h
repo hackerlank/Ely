@@ -354,6 +354,7 @@ public:
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
+template<typename Entity>
 class MicTestPlugIn: public PlugIn
 {
 public:
@@ -374,6 +375,7 @@ public:
 
 	void open(void)
 	{
+		///TODO
 		// Make a field
 		m_bbox = new AABBox(Vec3(-20, 0, -10), Vec3(20, 0, 10));
 		// Red goal
@@ -381,37 +383,31 @@ public:
 		// Blue Goal
 		m_TeamBGoal = new AABBox(Vec3(19, 0, -7), Vec3(21, 0, 7));
 		// Make a ball
-		m_Ball = new Ball(m_bbox);
-		m_AllVehicles.push_back(m_Ball);
-		// Build team A
-		m_PlayerCountA = 8;
-		for (unsigned int i = 0; i < m_PlayerCountA; i++)
-		{
-			Player *pMicTest = new Player(TeamA, m_AllPlayers, m_Ball, true, i);
-//			OpenSteerDemo::selectedVehicle = pMicTest;
-			selectedVehicle = pMicTest;
-			TeamA.push_back(pMicTest);
-			m_AllPlayers.push_back(pMicTest);
-			m_AllVehicles.push_back(pMicTest);
-		}
-		// Build Team B
-		m_PlayerCountB = 8;
-		for (unsigned int i = 0; i < m_PlayerCountB; i++)
-		{
-			Player *pMicTest = new Player(TeamB, m_AllPlayers, m_Ball, false,
-					i);
-//			OpenSteerDemo::selectedVehicle = pMicTest;
-			selectedVehicle = pMicTest;
-			TeamB.push_back(pMicTest);
-			m_AllPlayers.push_back(pMicTest);
-			m_AllVehicles.push_back(pMicTest);
-		}
-		// initialize camera
-//		OpenSteerDemo::init2dCamera(*m_Ball);
-//		OpenSteerDemo::camera.setPosition(10, OpenSteerDemo::camera2dElevation,
-//				10);
-//		OpenSteerDemo::camera.fixedPosition.set(40, 40, 40);
-//		OpenSteerDemo::camera.mode = Camera::cmFixed;
+///		m_Ball = new Ball(m_bbox);
+		m_Ball = NULL;
+///		m_AllVehicles.push_back(m_Ball);
+///		// Build team A
+///		m_PlayerCountA = 8;
+///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
+///		{
+///			Player *pMicTest = new Player(TeamA, m_AllPlayers, m_Ball, true, i);
+///			selectedVehicle = pMicTest;
+///			TeamA.push_back(pMicTest);
+///			m_AllPlayers.push_back(pMicTest);
+///			m_AllVehicles.push_back(pMicTest);
+///		}
+///		// Build Team B
+///		m_PlayerCountB = 8;
+///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
+///		{
+///			Player *pMicTest = new Player(TeamB, m_AllPlayers, m_Ball, false,
+///					i);
+///			selectedVehicle = pMicTest;
+///			TeamB.push_back(pMicTest);
+///			m_AllPlayers.push_back(pMicTest);
+///			m_AllVehicles.push_back(pMicTest);
+///		}
+
 		m_redScore = 0;
 		m_blueScore = 0;
 	}
@@ -419,11 +415,17 @@ public:
 	void update(const float currentTime, const float elapsedTime)
 	{
 		// update simulation of test vehicle
-		for (unsigned int i = 0; i < m_PlayerCountA; i++)
-			TeamA[i]->update(currentTime, elapsedTime);
-		for (unsigned int i = 0; i < m_PlayerCountB; i++)
-			TeamB[i]->update(currentTime, elapsedTime);
-		m_Ball->update(currentTime, elapsedTime);
+///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
+///			TeamA[i]->update(currentTime, elapsedTime);
+///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
+///			TeamB[i]->update(currentTime, elapsedTime);
+///		m_Ball->update(currentTime, elapsedTime);
+		iterator iter;
+		for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
+		{
+			(*iter)->update(currentTime, elapsedTime);
+		}
+
 
 		if (m_TeamAGoal->InsideX(m_Ball->position())
 				&& m_TeamAGoal->InsideZ(m_Ball->position()))
@@ -443,11 +445,19 @@ public:
 	void redraw(const float currentTime, const float elapsedTime)
 	{
 		// draw test vehicle
-		for (unsigned int i = 0; i < m_PlayerCountA; i++)
-			TeamA[i]->draw();
-		for (unsigned int i = 0; i < m_PlayerCountB; i++)
-			TeamB[i]->draw();
-		m_Ball->draw();
+///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
+///			TeamA[i]->draw();
+///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
+///			TeamB[i]->draw();
+///		m_Ball->draw();
+		// draw each vehicles
+		iterator iter;
+		for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
+		{
+			(*iter)->draw();
+		}
+
+		//TODO
 		gDrawer3d->setTwoSided(true);
 		m_bbox->draw();
 		gDrawer3d->setTwoSided(false);
@@ -456,73 +466,138 @@ public:
 		{
 			std::ostringstream annote;
 			annote << "Red: " << m_redScore;
-//			draw2dTextAt3dLocation(annote, Vec3(23, 0, 0),
-//					Color(1.0f, 0.7f, 0.7f), drawGetWindowWidth(),
-//					drawGetWindowHeight());
+/////			draw2dTextAt3dLocation(annote, Vec3(23, 0, 0),
+/////					Color(1.0f, 0.7f, 0.7f), drawGetWindowWidth(),
+/////					drawGetWindowHeight());
 			draw2dTextAt3dLocation(annote, Vec3(23, 0, 0),
 					Color(1.0f, 0.7f, 0.7f), 0.0, 0.0);
 		}
 		{
 			std::ostringstream annote;
 			annote << "Blue: " << m_blueScore;
-//			draw2dTextAt3dLocation(annote, Vec3(-23, 0, 0),
-//					Color(0.7f, 0.7f, 1.0f), drawGetWindowWidth(),
-//					drawGetWindowHeight());
+/////			draw2dTextAt3dLocation(annote, Vec3(-23, 0, 0),
+/////					Color(0.7f, 0.7f, 1.0f), drawGetWindowWidth(),
+/////					drawGetWindowHeight());
 			draw2dTextAt3dLocation(annote, Vec3(-23, 0, 0),
 					Color(0.7f, 0.7f, 1.0f), 0.0, 0.0);
 		}
 
 		// textual annotation (following the test vehicle's screen position)
 		if (0)
-			for (unsigned int i = 0; i < m_PlayerCountA; i++)
+			for (unsigned int i = 0; i < TeamA.size(); i++)
 			{
 				std::ostringstream annote;
 				annote << std::setprecision(2)
 						<< std::setiosflags(std::ios::fixed);
 				annote << "      speed: " << TeamA[i]->speed() << "ID:" << i
 						<< std::ends;
-//				draw2dTextAt3dLocation(annote, TeamA[i]->position(), gRed,
-//						drawGetWindowWidth(), drawGetWindowHeight());
-//				draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen,
-//						drawGetWindowWidth(), drawGetWindowHeight());
+/////				draw2dTextAt3dLocation(annote, TeamA[i]->position(), gRed,
+/////						drawGetWindowWidth(), drawGetWindowHeight());
+/////				draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen,
+/////						drawGetWindowWidth(), drawGetWindowHeight());
 				draw2dTextAt3dLocation(annote, TeamA[i]->position(), gRed, 0.0,
 						0.0);
 				draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen, 0.0, 0.0);
 			}
-		// update camera, tracking test vehicle
-//		OpenSteerDemo::updateCamera(currentTime, elapsedTime,
-//				*OpenSteerDemo::selectedVehicle);
 
-		// draw "ground plane"
-//		OpenSteerDemo::gridUtility(Vec3(0, 0, 0));
-		if (gToggleDrawGrid)
-		{
-			///very slow
-			gridUtility(Vec3(0, 0, 0), 600, 20);
-		}
 	}
 
 	void close(void)
 	{
-		for (unsigned int i = 0; i < m_PlayerCountA; i++)
-			delete TeamA[i];
-		TeamA.clear();
-		for (unsigned int i = 0; i < m_PlayerCountB; i++)
-			delete TeamB[i];
-		TeamB.clear();
-		delete m_Ball;
-		m_AllPlayers.clear();
-		m_AllVehicles.clear();
+///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
+///			delete TeamA[i];
+///		TeamA.clear();
+///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
+///			delete TeamB[i];
+///		TeamB.clear();
+///		delete m_Ball;
+///		m_AllPlayers.clear();
+///		m_AllVehicles.clear();
 	}
 
 	void reset(void)
 	{
 		// reset vehicle
-		for (unsigned int i = 0; i < m_PlayerCountA; i++)
-			TeamA[i]->reset();
-		for (unsigned int i = 0; i < m_PlayerCountB; i++)
-			TeamB[i]->reset();
-		m_Ball->reset();
+///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
+///			TeamA[i]->reset();
+///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
+///			TeamB[i]->reset();
+///		m_Ball->reset();
+		iterator iter;
+		for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
+		{
+			(*iter)->reset();
+		}
+
+	}
+
+	//TODO
+	virtual void addVehicle(AbstractVehicle* vehicle)
+	{
+		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
+		//check if this is a Ball
+		Ball<Entity>* ballTmp =
+				dynamic_cast<Ball<Entity>*>(vehicle);
+		if (ballTmp)
+		{
+			// set the plugin's ball: the last added one
+			m_Ball = ballTmp;
+			//update each player's ball
+			setAllPlayersBall();
+			//that's all
+			return;
+		}
+		//or if this is a Player
+		Player<Entity>* playerTmp =
+			dynamic_cast<Player<Entity>*>(vehicle);
+		if (playerTmp)
+		{
+			//if not ExternalMpPursuer then randomize
+			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuerTmp))
+			{
+				// randomize only 2D heading
+				pursuerTmp->randomizeStartingPositionAndHeading();
+			}
+			// set the pursuer's wanderer
+			pursuerTmp->wanderer = wanderer;
+		}
+	}
+	//TODO
+	virtual void removeVehicle(OpenSteer::AbstractVehicle* vehicle)
+	{
+		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
+		//check if this is the current wanderer
+		if (vehicle == wanderer)
+		{
+			wanderer = NULL;
+			// find a new wanderer (if any): the first found or NULL
+			iterator iter;
+			for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+			{
+				wanderer = dynamic_cast<MpWanderer<Entity>*>(*iter);
+				if (wanderer)
+				{
+					break;
+				}
+			}
+			//update each pursuer's wanderer
+			setAllPursuersWanderer();
+		}
+	}
+	//TODO
+	void setAllPlayersBall()
+	{
+		iterator iter;
+		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+		{
+			MpPursuer<Entity>* pursuerTmp =
+					dynamic_cast<MpPursuer<Entity>*>(*iter);
+			if (pursuerTmp)
+			{
+				// update the pursuer's wanderer
+				pursuerTmp->wanderer = wanderer;
+			}
+		}
 	}
 
 	const AVGroup& allVehicles(void)
@@ -530,17 +605,15 @@ public:
 		return (const AVGroup&) m_AllVehicles;
 	}
 
-	unsigned int m_PlayerCountA;
-	unsigned int m_PlayerCountB;
-//	std::vector<Player*> TeamA;
-//	std::vector<Player*> TeamB;
-//	std::vector<Player*> m_AllPlayers;
-	Player::groupType TeamA;
-	Player::groupType TeamB;
-	Player::groupType m_AllPlayers;
-	typedef Player::groupType::const_iterator iterator;
+///	unsigned int m_PlayerCountA;
+///	unsigned int m_PlayerCountB;
+	typename Player<Entity>::groupType TeamA;
+	typename Player<Entity>::groupType TeamB;
+	typename Player<Entity>::groupType m_AllPlayers;
+	Ball<Entity> *m_Ball;
 
-	Ball *m_Ball;
+	typedef typename Player<Entity>::groupType::const_iterator iterator;
+
 	AABBox *m_bbox;
 	AABBox *m_TeamAGoal;
 	AABBox *m_TeamBGoal;
@@ -557,23 +630,3 @@ public:
 
 }// anonymous namespace
 
-
-//#include "Soccer.h"
-//
-//namespace ely
-//{
-//
-//Vec3 playerPosition[9] =
-//{
-//		Vec3(4, 0, 0),
-//		Vec3(7, 0, -5),
-//		Vec3(7, 0, 5),
-//		Vec3(10, 0, -3),
-//		Vec3(10, 0, 3),
-//		Vec3(15, 0, -8),
-//		Vec3(15, 0, 0),
-//		Vec3(15, 0, 8),
-//		Vec3(4, 0, 0)
-//};
-//
-//} // anonymous namespace
