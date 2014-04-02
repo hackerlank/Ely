@@ -198,6 +198,8 @@ public:
 ///					isTeamA), m_MyID(id)
 	Player()
 	{
+		m_Ball = NULL;
+		b_ImTeamA = true;
 		reset();
 	}
 
@@ -235,6 +237,11 @@ public:
 	// (parameter names commented out to prevent compiler warning from "-W")
 	void update(const float currentTime, const float elapsedTime)
 	{
+		if (not m_Ball)
+		{
+			return;
+		}
+
 		// if I hit the ball, kick it.
 
 		const float distToBall = Vec3::distance(this->position(), m_Ball->position());
@@ -244,7 +251,7 @@ public:
 
 		// otherwise consider avoiding collisions with others
 		Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
-				(AVGroup&) m_AllPlayers);
+				(AVGroup&) *m_AllPlayers);
 		if (collisionAvoidance != Vec3::zero)
 			this->applySteeringForce(collisionAvoidance, elapsedTime);
 		else
@@ -304,11 +311,11 @@ public:
 		this->drawTrail();
 	}
 	// per-instance reference to its group
-	const std::vector<Player*> m_others;
-	const std::vector<Player*> m_AllPlayers;
+///	const std::vector<Player*> m_others;
+	std::vector<Player*>* m_AllPlayers;
 	Ball<Entity>* m_Ball;
 	bool b_ImTeamA;
-	int m_MyID;
+///	int m_MyID;
 ///	Vec3 m_home;
 };
 
@@ -484,18 +491,18 @@ public:
 
 		// textual annotation (following the test vehicle's screen position)
 		if (0)
-			for (unsigned int i = 0; i < TeamA.size(); i++)
+			for (unsigned int i = 0; i < m_AllPlayers.size(); i++)
 			{
 				std::ostringstream annote;
 				annote << std::setprecision(2)
 						<< std::setiosflags(std::ios::fixed);
-				annote << "      speed: " << TeamA[i]->speed() << "ID:" << i
+				annote << "      speed: " << m_AllPlayers[i]->speed() << "ID:" << i
 						<< std::ends;
 /////				draw2dTextAt3dLocation(annote, TeamA[i]->position(), gRed,
 /////						drawGetWindowWidth(), drawGetWindowHeight());
 /////				draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen,
 /////						drawGetWindowWidth(), drawGetWindowHeight());
-				draw2dTextAt3dLocation(annote, TeamA[i]->position(), gRed, 0.0,
+				draw2dTextAt3dLocation(annote, m_AllPlayers[i]->position(), gRed, 0.0,
 						0.0);
 				draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen, 0.0, 0.0);
 			}
@@ -513,6 +520,9 @@ public:
 ///		delete m_Ball;
 ///		m_AllPlayers.clear();
 ///		m_AllVehicles.clear();
+		delete m_bbox;
+		delete m_TeamAGoal;
+		delete m_TeamBGoal;
 	}
 
 	void reset(void)
@@ -532,9 +542,13 @@ public:
 	}
 
 	//TODO
-	virtual void addVehicle(AbstractVehicle* vehicle)
+	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
-		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
+		bool result = false;
+		if(not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
+		{
+			return result;
+		}
 		//check if this is a Ball
 		Ball<Entity>* ballTmp =
 				dynamic_cast<Ball<Entity>*>(vehicle);
@@ -542,61 +556,85 @@ public:
 		{
 			// set the plugin's ball: the last added one
 			m_Ball = ballTmp;
+			// set the ball's AABB
+			m_Ball->m_bbox = m_bbox;
 			//update each player's ball
 			setAllPlayersBall();
 			//that's all
-			return;
+			result = true;
 		}
 		//or if this is a Player
 		Player<Entity>* playerTmp =
 			dynamic_cast<Player<Entity>*>(vehicle);
 		if (playerTmp)
 		{
-			//if not ExternalMpPursuer then randomize
-			if (not dynamic_cast<ExternalMpPursuer<Entity>*>(pursuerTmp))
-			{
-				// randomize only 2D heading
-				pursuerTmp->randomizeStartingPositionAndHeading();
-			}
-			// set the pursuer's wanderer
-			pursuerTmp->wanderer = wanderer;
+			// add player to all players repo
+			m_AllPlayers.push_bask(playerTmp);
+			// set the player's all player repo
+			playerTmp->m_AllPlayers = &m_AllPlayers;
+			// set the player's ball
+			playerTmp->m_Ball = m_Ball;
+			//that's all
+			result = true;
 		}
+		//
+		return result;
 	}
 	//TODO
-	virtual void removeVehicle(OpenSteer::AbstractVehicle* vehicle)
+	virtual bool removeVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
-		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
-		//check if this is the current wanderer
-		if (vehicle == wanderer)
+		bool result = false;
+		if(not PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle))
 		{
-			wanderer = NULL;
-			// find a new wanderer (if any): the first found or NULL
+			return result;
+		}
+		//set result
+		result = true;
+		//check if this is a Player
+		Player<Entity>* playerTmp =
+			dynamic_cast<Player<Entity>*>(vehicle);
+		if (playerTmp)
+		{
+			//get player
 			iterator iter;
-			for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+			for (iter = m_AllPlayers.begin(); iter != m_AllPlayers.end();
+					++iter)
 			{
-				wanderer = dynamic_cast<MpWanderer<Entity>*>(*iter);
-				if (wanderer)
+				if (*iter == playerTmp)
+				{
+					break;
+				}
+			}
+			//player needs to be removed
+			m_AllPlayers.erase(iter);
+		}
+		//check if this is the current ball
+		if (vehicle == m_Ball)
+		{
+			m_Ball = NULL;
+			// find a new ball (if any): the first found or NULL
+			iterator iter;
+			for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
+			{
+				m_Ball = dynamic_cast<Ball<Entity>*>(*iter);
+				if (m_Ball)
 				{
 					break;
 				}
 			}
 			//update each pursuer's wanderer
-			setAllPursuersWanderer();
+			setAllPlayersBall();
 		}
+		//
+		return result;
 	}
-	//TODO
+
 	void setAllPlayersBall()
 	{
 		iterator iter;
-		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
+		for (iter = m_AllPlayers.begin(); iter != m_AllPlayers.end(); ++iter)
 		{
-			MpPursuer<Entity>* pursuerTmp =
-					dynamic_cast<MpPursuer<Entity>*>(*iter);
-			if (pursuerTmp)
-			{
-				// update the pursuer's wanderer
-				pursuerTmp->wanderer = wanderer;
-			}
+			(*iter)->m_Ball = m_Ball;
 		}
 	}
 
@@ -607,8 +645,8 @@ public:
 
 ///	unsigned int m_PlayerCountA;
 ///	unsigned int m_PlayerCountB;
-	typename Player<Entity>::groupType TeamA;
-	typename Player<Entity>::groupType TeamB;
+///	typename Player<Entity>::groupType TeamA;
+///	typename Player<Entity>::groupType TeamB;
 	typename Player<Entity>::groupType m_AllPlayers;
 	Ball<Entity> *m_Ball;
 

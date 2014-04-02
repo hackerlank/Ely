@@ -178,7 +178,6 @@ public:
 		if (d < r)
 		{
 			reset();
-			this->setPosition(this->m_start);
 		}
 
 		const float maxTime = 20; // xxx hard-to-justify value
@@ -302,9 +301,13 @@ public:
 		}
 	}
 
-	virtual void addVehicle(AbstractVehicle* vehicle)
+	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
-		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
+		bool result = false;
+		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
+		{
+			return result;
+		}
 		//check if this is a MpWanderer
 		MpWanderer<Entity>* wandererTmp =
 				dynamic_cast<MpWanderer<Entity>*>(vehicle);
@@ -315,7 +318,7 @@ public:
 			//update each pursuer's wanderer
 			setAllPursuersWanderer();
 			//that's all
-			return;
+			result = true;
 		}
 		//or if this is a MpPursuer
 		MpPursuer<Entity>* pursuerTmp =
@@ -330,12 +333,22 @@ public:
 			}
 			// set the pursuer's wanderer
 			pursuerTmp->wanderer = wanderer;
+			//that's all
+			result = true;
 		}
+		//
+		return result;
 	}
 
-	virtual void removeVehicle(OpenSteer::AbstractVehicle* vehicle)
+	virtual bool removeVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
-		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
+		bool result = false;
+		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle))
+		{
+			return result;
+		}
+		//set result
+		result = true;
 		//check if this is the current wanderer
 		if (vehicle == wanderer)
 		{
@@ -353,6 +366,8 @@ public:
 			//update each pursuer's wanderer
 			setAllPursuersWanderer();
 		}
+		//
+		return result;
 	}
 
 	void setAllPursuersWanderer()

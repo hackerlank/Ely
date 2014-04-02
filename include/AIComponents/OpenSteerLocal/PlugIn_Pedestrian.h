@@ -673,9 +673,13 @@ public:
 /////		OpenSteerDemo::printMessage("");
 ///	}
 
-	virtual void addVehicle(AbstractVehicle* vehicle)
+	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
-		PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle);
+		bool result = false;
+		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
+		{
+			return result;
+		}
 		// allocate a token for this pedestrian in the proximity database
 		Pedestrian<Entity>* pedestrian =
 				dynamic_cast<Pedestrian<Entity>*>(vehicle);
@@ -701,7 +705,11 @@ public:
 			pedestrian->obstacles = obstacles;
 			//set neighbors
 			pedestrian->neighbors = &neighbors;
+			//set result
+			result = true;
 		}
+		//
+		return result;
 	}
 
 ///	void addPedestrianToCrowd(void)

@@ -358,8 +358,9 @@ public:
 		delete m_pathway;
 	}
 
-	virtual void addVehicle(OpenSteer::AbstractVehicle* vehicle)
+	virtual bool addVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
+		bool result = false;
 		OpenSteer::AVGroup::iterator iter;
 		//check if vehicle has not been already added
 		for (iter = const_cast<OpenSteer::AVGroup&>(this->allVehicles()).begin();
@@ -379,11 +380,16 @@ public:
 					vehicle);
 			//this is the new selected vehicle
 			selectedVehicle = vehicle;
+			//set result
+			result = true;
 		}
+		//
+		return result;
 	}
 
-	virtual void removeVehicle(OpenSteer::AbstractVehicle* vehicle)
+	virtual bool removeVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
+		bool result = false;
 		OpenSteer::AVGroup::iterator iter;
 		//check if vehicle has been already removed or not
 		for (iter = const_cast<OpenSteer::AVGroup&>(this->allVehicles()).begin();
@@ -405,7 +411,11 @@ public:
 			{
 				selectedVehicle = NULL;
 			}
+			//set result
+			result = true;
 		}
+		//
+		return result;
 	}
 
 	void setSelectedVehicle(OpenSteer::AbstractVehicle* _selectedVehicle)
