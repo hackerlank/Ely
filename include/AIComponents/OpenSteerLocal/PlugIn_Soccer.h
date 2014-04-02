@@ -102,7 +102,6 @@ public:
 	// type for a flock: an STL vector of Ball pointers
 	typedef std::vector<Ball*> groupType;
 
-	//TODO
 ///	Ball(AABBox *bbox) :
 ///			m_bbox(bbox)
 	Ball()
@@ -190,7 +189,6 @@ public:
 	// type for a flock: an STL vector of Player pointers
 	typedef std::vector<Player*> groupType;
 
-	//TODO
 	// constructor
 ///	Player(std::vector<Player*> others, std::vector<Player*> allplayers,
 ///			Ball* ball, bool isTeamA, int id) :
@@ -329,7 +327,6 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-		//TODO
 		//annotation
 		Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
 				(AVGroup&) m_AllPlayers);
@@ -544,10 +541,9 @@ public:
 	//TODO
 	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
-		bool result = false;
 		if(not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
 		{
-			return result;
+			return false;
 		}
 		//check if this is a Ball
 		Ball<Entity>* ballTmp =
@@ -561,35 +557,34 @@ public:
 			//update each player's ball
 			setAllPlayersBall();
 			//that's all
-			result = true;
+			return true;
 		}
 		//or if this is a Player
 		Player<Entity>* playerTmp =
 			dynamic_cast<Player<Entity>*>(vehicle);
 		if (playerTmp)
 		{
-			// add player to all players repo
+			// add player to all players' repo
 			m_AllPlayers.push_bask(playerTmp);
 			// set the player's all player repo
 			playerTmp->m_AllPlayers = &m_AllPlayers;
 			// set the player's ball
 			playerTmp->m_Ball = m_Ball;
 			//that's all
-			result = true;
+			return true;
 		}
+		//roll back addition
+		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
 		//
-		return result;
+		return false;
 	}
 	//TODO
 	virtual bool removeVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
-		bool result = false;
 		if(not PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle))
 		{
-			return result;
+			return false;
 		}
-		//set result
-		result = true;
 		//check if this is a Player
 		Player<Entity>* playerTmp =
 			dynamic_cast<Player<Entity>*>(vehicle);
@@ -605,7 +600,7 @@ public:
 					break;
 				}
 			}
-			//player needs to be removed
+			//remove from all players' repo
 			m_AllPlayers.erase(iter);
 		}
 		//check if this is the current ball
@@ -626,7 +621,7 @@ public:
 			setAllPlayersBall();
 		}
 		//
-		return result;
+		return true;
 	}
 
 	void setAllPlayersBall()

@@ -675,12 +675,11 @@ public:
 
 	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
-		bool result = false;
 		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
 		{
-			return result;
+			return false;
 		}
-		// allocate a token for this pedestrian in the proximity database
+		// try to allocate a token for this pedestrian in the proximity database
 		Pedestrian<Entity>* pedestrian =
 				dynamic_cast<Pedestrian<Entity>*>(vehicle);
 		if (pedestrian)
@@ -706,10 +705,12 @@ public:
 			//set neighbors
 			pedestrian->neighbors = &neighbors;
 			//set result
-			result = true;
+			return true;
 		}
+		//roll back addition
+		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
 		//
-		return result;
+		return false;
 	}
 
 ///	void addPedestrianToCrowd(void)

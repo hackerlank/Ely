@@ -303,10 +303,9 @@ public:
 
 	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
-		bool result = false;
 		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
 		{
-			return result;
+			return false;
 		}
 		//check if this is a MpWanderer
 		MpWanderer<Entity>* wandererTmp =
@@ -318,7 +317,7 @@ public:
 			//update each pursuer's wanderer
 			setAllPursuersWanderer();
 			//that's all
-			result = true;
+			return true;
 		}
 		//or if this is a MpPursuer
 		MpPursuer<Entity>* pursuerTmp =
@@ -334,21 +333,20 @@ public:
 			// set the pursuer's wanderer
 			pursuerTmp->wanderer = wanderer;
 			//that's all
-			result = true;
+			return true;
 		}
+		//roll back addition
+		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
 		//
-		return result;
+		return false;
 	}
 
 	virtual bool removeVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
-		bool result = false;
 		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle))
 		{
-			return result;
+			return false;
 		}
-		//set result
-		result = true;
 		//check if this is the current wanderer
 		if (vehicle == wanderer)
 		{
@@ -367,7 +365,7 @@ public:
 			setAllPursuersWanderer();
 		}
 		//
-		return result;
+		return true;
 	}
 
 	void setAllPursuersWanderer()
