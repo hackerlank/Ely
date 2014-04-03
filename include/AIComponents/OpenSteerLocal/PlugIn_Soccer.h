@@ -88,6 +88,14 @@ public:
 		drawLineAlpha(m_max, c, color, 1.0f);
 		drawLineAlpha(c, m_min, color, 1.0f);
 	}
+	Vec3 getMin()
+	{
+		return m_min;
+	}
+	Vec3 getMax()
+	{
+		return m_max;
+	}
 private:
 	Vec3 m_min;
 	Vec3 m_max;
@@ -199,6 +207,8 @@ public:
 		m_Ball = NULL;
 		b_ImTeamA = true;
 		reset();
+		//set default home
+		m_home = this->m_start;
 	}
 
 	// reset state
@@ -237,6 +247,10 @@ public:
 	{
 		if (not m_Ball)
 		{
+			//reach your home until there is a ball
+			Vec3 seekTarget = this->xxxsteerForSeek(m_home);
+			Vec3 seekHome = this->xxxsteerForSeek(m_home);
+			this->applySteeringForce(seekTarget + seekHome, elapsedTime);
 			return;
 		}
 
@@ -254,8 +268,7 @@ public:
 			this->applySteeringForce(collisionAvoidance, elapsedTime);
 		else
 		{
-///			float distHomeToBall = Vec3::distance(m_home, m_Ball->position());
-			float distHomeToBall = Vec3::distance(this->m_start, m_Ball->position());
+			float distHomeToBall = Vec3::distance(m_home, m_Ball->position());
 			if (distHomeToBall < 12.0f)
 			{
 				// go for ball if I'm on the 'right' side of the ball
@@ -289,10 +302,8 @@ public:
 			}
 			else	// Go home
 			{
-///				Vec3 seekTarget = this->xxxsteerForSeek(m_home);
-///				Vec3 seekHome = this->xxxsteerForSeek(m_home);
-				Vec3 seekTarget = this->xxxsteerForSeek(this->m_start);
-				Vec3 seekHome = this->xxxsteerForSeek(this->m_start);
+				Vec3 seekTarget = this->xxxsteerForSeek(m_home);
+				Vec3 seekHome = this->xxxsteerForSeek(m_home);
 				this->applySteeringForce(seekTarget + seekHome, elapsedTime);
 			}
 		}
@@ -314,7 +325,7 @@ public:
 	Ball<Entity>* m_Ball;
 	bool b_ImTeamA;
 ///	int m_MyID;
-///	Vec3 m_home;
+	Vec3 m_home;
 };
 
 //Pedestrian externally updated.
@@ -564,6 +575,11 @@ public:
 			dynamic_cast<Player<Entity>*>(vehicle);
 		if (playerTmp)
 		{
+			// add player to its team
+			playerTmp->b_ImTeamA ?
+					TeamA.push_bask(playerTmp): TeamB.push_bask(playerTmp);
+			// update the team players' homes
+			updatePlayerHomes(playerTmp->b_ImTeamA ? &TeamA: &TeamB);
 			// add player to all players' repo
 			m_AllPlayers.push_bask(playerTmp);
 			// set the player's all player repo
@@ -590,7 +606,7 @@ public:
 			dynamic_cast<Player<Entity>*>(vehicle);
 		if (playerTmp)
 		{
-			//get player
+			//get player from all players
 			iterator iter;
 			for (iter = m_AllPlayers.begin(); iter != m_AllPlayers.end();
 					++iter)
@@ -602,6 +618,21 @@ public:
 			}
 			//remove from all players' repo
 			m_AllPlayers.erase(iter);
+
+			//get player from its team
+			typename Player<Entity>::groupType* team = (
+					playerTmp->b_ImTeamA ? &TeamA : &TeamB);
+			for (iter = (*team).begin(); iter != (*team).end(); ++iter)
+			{
+				if (*iter == playerTmp)
+				{
+					break;
+				}
+			}
+			//remove from its team
+			(*team).erase(iter);
+			// update the team players' homes
+			updatePlayerHomes(team);
 		}
 		//check if this is the current ball
 		if (vehicle == m_Ball)
@@ -633,6 +664,74 @@ public:
 		}
 	}
 
+	//TODO
+	void updatePlayerHomes(typename Player<Entity>::groupType* team)
+	{
+		unsigned int numPlayers = (*team).size();
+		if (numPlayers == 0)
+		{
+			return;
+		}
+		float dX = abs(m_bbox->getMax().x - m_bbox->getMin().x)
+				/ (float) numPlayers;
+		float dZ = abs(m_bbox->getMax().z - m_bbox->getMin().z)
+				/ (float) numPlayers;
+		if (team == &TeamA)
+		{
+			///		this->setPosition(b_ImTeamA ? frandom01() * 20 : -frandom01() * 20, 0,
+			///				(frandom01() - 0.5f) * 20);
+			Vec3 fieldCenter = (m_bbox->getMin() + m_bbox->getMax())/2.0;
+			iterator iter;
+			unsigned int i;
+			for (iter = (*team).begin(), i = 0; iter != (*team).end();
+					++iter, ++i)
+			{
+				float xi = dX * (i + 0.5);
+				float zi = dZ * (i + 0.5);
+				(*iter)->m_home = Vec3();
+			}
+		}
+		else if (team == &TeamB)
+		{
+
+		}
+	}
+
+	void setSoccerField(Vec3 &min, Vec3& max)
+	{
+		//delete old boxes
+		delete m_bbox;
+		delete m_TeamAGoal;
+		delete m_TeamBGoal;
+		//add new boxes, with minimum soccer field dims: 40x20
+		float xDim = abs(max.x - min.x), zDim = abs(max.z - min.z);
+		if (xDim < 40)
+		{
+			xDim = 40;
+		}
+		if (zDim < 20)
+		{
+			zDim = 20;
+		}
+		Vec3 newMin = (max + min) / 2.0 - Vec3(xDim / 2.0, 0, zDim / 2.0);
+		Vec3 newMax = (max + min) / 2.0 + Vec3(xDim / 2.0, 0, zDim / 2.0);
+		//create soccer field
+		m_bbox = new AABBox(Vec3(newMin), Vec3(newMax));
+		// goal dims
+		float xGoalDim = xDim * 0.05, zGoalDim = zDim * 0.7;
+		// Red goal
+		m_TeamAGoal = new AABBox(newMin + Vec3(-xGoalDim / 2.0, 0, (zDim - zGoalDim) / 2.0),
+				newMin + Vec3(xGoalDim / 2.0, 0, (zDim + zGoalDim) / 2.0));
+		// Blue Goal
+		m_TeamBGoal = new AABBox(newMax + Vec3(-xGoalDim / 2.0, 0, (zDim - zGoalDim) / 2.0),
+				newMax + Vec3(xGoalDim / 2.0, 0, (zDim + zGoalDim) / 2.0));
+		// update the ball's AABB if any
+		if (m_Ball)
+		{
+			m_Ball->m_bbox = m_bbox;
+		}
+	}
+
 	const AVGroup& allVehicles(void)
 	{
 		return (const AVGroup&) m_AllVehicles;
@@ -640,8 +739,8 @@ public:
 
 ///	unsigned int m_PlayerCountA;
 ///	unsigned int m_PlayerCountB;
-///	typename Player<Entity>::groupType TeamA;
-///	typename Player<Entity>::groupType TeamB;
+	typename Player<Entity>::groupType TeamA;
+	typename Player<Entity>::groupType TeamB;
 	typename Player<Entity>::groupType m_AllPlayers;
 	Ball<Entity> *m_Ball;
 
