@@ -255,7 +255,6 @@ public:
 		}
 
 		// if I hit the ball, kick it.
-
 		const float distToBall = Vec3::distance(this->position(), m_Ball->position());
 		const float sumOfRadii = this->radius() + m_Ball->radius();
 		if (distToBall < sumOfRadii)
@@ -328,6 +327,7 @@ public:
 	Vec3 m_home;
 };
 
+///TODO
 //Pedestrian externally updated.
 template<typename Entity>
 class ExternalPlayer: public Player<Entity>
@@ -335,6 +335,13 @@ class ExternalPlayer: public Player<Entity>
 public:
 	void update(const float currentTime, const float elapsedTime)
 	{
+
+		// if I hit the ball, kick it.
+		const float distToBall = Vec3::distance(this->position(), m_Ball->position());
+		const float sumOfRadii = this->radius() + m_Ball->radius();
+		if (distToBall < sumOfRadii)
+			m_Ball->kick((m_Ball->position() - this->position()) * 50, elapsedTime);
+
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
@@ -694,6 +701,27 @@ public:
 		else if (team == &TeamB)
 		{
 
+//#include <iostream>
+//#include <cmath>
+//#include <cassert>
+//			const float A = 40.0;
+//			const float B = 4.0;
+//			float k;
+//
+//			for (int N = 1; N < 10000; ++N)
+//			{
+//				A > B ? k = A / B : k = B / A;
+//				float subv = sqrt((float) N / k);
+//				int subMinI, subMaxI;
+//				(subv - (int) subv) > 0.0 ? subMinI = (int) subv + 1 : subMinI =
+//													(int) subv;
+//				float fact = (float) N / (float) subMinI;
+//				(fact - (int) fact) > 0.0 ? subMaxI = (int) fact + 1 : subMaxI =
+//													(int) fact;
+//				std::cout << N << ": " << subMinI << " - " << subMaxI << ": "
+//						<< subMinI * subMaxI << std::endl;
+//				assert(N <= subMinI * subMaxI);
+//			}
 		}
 	}
 
