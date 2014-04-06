@@ -378,6 +378,14 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	mNavMesh->setCrowdAgentVelocity(this, vel);
 }
 
+SMARTPTR(NavMesh) CrowdAgent::getNavMesh() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mNavMesh;
+}
+
 void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
 	if (vel.length_squared() > 0.0)

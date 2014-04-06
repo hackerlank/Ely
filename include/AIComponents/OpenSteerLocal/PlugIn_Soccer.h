@@ -57,14 +57,16 @@ using namespace OpenSteer;
 class AABBox
 {
 public:
-	AABBox(Vec3 &min, Vec3& max) :
+	AABBox(const Vec3 &min, const Vec3& max) :
 			m_min(min), m_max(max)
 	{
+		m_mid_y = (m_min.y + m_max.y) / 2.0;
 	}
-	AABBox(Vec3 min, Vec3 max) :
-			m_min(min), m_max(max)
-	{
-	}
+///	AABBox(Vec3 min, Vec3 max) :
+///			m_min(min), m_max(max)
+///	{
+///		m_mid_y = (m_min.y + m_max.y) / 2.0;
+///	}
 	bool InsideX(const Vec3 p)
 	{
 		if (p.x < m_min.x || p.x > m_max.x)
@@ -80,8 +82,8 @@ public:
 	void draw()
 	{
 		Vec3 b, c;
-		b = Vec3(m_min.x, 0, m_max.z);
-		c = Vec3(m_max.x, 0, m_min.z);
+		b = Vec3(m_min.x, m_mid_y, m_max.z);
+		c = Vec3(m_max.x, m_mid_y, m_min.z);
 		Color color(1.0f, 1.0f, 0.0f);
 		drawLineAlpha(m_min, b, color, 1.0f);
 		drawLineAlpha(b, m_max, color, 1.0f);
@@ -99,6 +101,7 @@ public:
 private:
 	Vec3 m_min;
 	Vec3 m_max;
+	float m_mid_y;
 };
 
 // The ball object
@@ -107,13 +110,15 @@ class Ball: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
 public:
 
-	// type for a flock: an STL vector of Ball pointers
-	typedef std::vector<Ball*> groupType;
+	// type for a ball: an STL vector of Ball pointers
+	typedef typename std::vector<Ball<Entity>*> groupType;
 
 ///	Ball(AABBox *bbox) :
 ///			m_bbox(bbox)
-	Ball()
+	Ball():m_bbox(NULL)
 	{
+		//set default home
+		m_home = this->m_start;
 		reset();
 	}
 
@@ -126,7 +131,7 @@ public:
 ///		setSpeed(0.0f);         // speed along Forward direction.
 ///		setMaxForce(9.0f);      // steering force is clipped to this magnitude
 ///		setMaxSpeed(9.0f);         // velocity is clipped to this magnitude
-///		setPosition(0, 0, 0);
+		this->setPosition(m_home);
 
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->setTrailParameters(100, 6000);
@@ -136,19 +141,22 @@ public:
 	void update(const float currentTime, const float elapsedTime)
 	{
 		this->applyBrakingForce(1.5f, elapsedTime);
-		this->applySteeringForce(this->velocity(), elapsedTime);
+///		this->applySteeringForce(this->velocity(), elapsedTime);
+		this->applySteeringForce(this->velocity().setYtoZero(), elapsedTime);
 		// are we now outside the field?
 		if (!m_bbox->InsideX(this->position()))
 		{
 			Vec3 d = this->velocity();
 			this->regenerateOrthonormalBasis(Vec3(-d.x, d.y, d.z));
-			this->applySteeringForce(this->velocity(), elapsedTime);
+///			this->applySteeringForce(this->velocity(), elapsedTime);
+			this->applySteeringForce(this->velocity().setYtoZero(), elapsedTime);
 		}
 		if (!m_bbox->InsideZ(this->position()))
 		{
 			Vec3 d = this->velocity();
 			this->regenerateOrthonormalBasis(Vec3(d.x, d.y, -d.z));
-			this->applySteeringForce(this->velocity(), elapsedTime);
+///			this->applySteeringForce(this->velocity(), elapsedTime);
+			this->applySteeringForce(this->velocity().setYtoZero(), elapsedTime);
 		}
 
 		///call the entity update
@@ -173,6 +181,7 @@ public:
 	}
 
 	AABBox *m_bbox;
+	Vec3 m_home;
 };
 
 //Ball externally updated.
@@ -194,8 +203,8 @@ class Player: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
 public:
 
-	// type for a flock: an STL vector of Player pointers
-	typedef std::vector<Player*> groupType;
+	// type for a player: an STL vector of Player pointers
+	typedef typename std::vector<Player<Entity>*> groupType;
 
 	// constructor
 ///	Player(std::vector<Player*> others, std::vector<Player*> allplayers,
@@ -206,9 +215,10 @@ public:
 	{
 		m_Ball = NULL;
 		b_ImTeamA = true;
-		reset();
+		m_TeamAssigned = false;
 		//set default home
 		m_home = this->m_start;
+		reset();
 	}
 
 	// reset state
@@ -221,7 +231,6 @@ public:
 ///		setMaxForce(3000.7f);     // steering force is clipped to this magnitude
 ///		setMaxSpeed(10);         // velocity is clipped to this magnitude
 
-		///TODO
 		// Place me on my part of the field, looking at oponnents goal
 ///		this->setPosition(b_ImTeamA ? frandom01() * 20 : -frandom01() * 20, 0,
 ///				(frandom01() - 0.5f) * 20);
@@ -245,42 +254,58 @@ public:
 	// (parameter names commented out to prevent compiler warning from "-W")
 	void update(const float currentTime, const float elapsedTime)
 	{
-		if (not m_Ball)
+		if ((not m_Ball) or (not m_TeamAssigned))
 		{
-			//reach your home until there is a ball
-			Vec3 seekTarget = this->xxxsteerForSeek(m_home);
-			Vec3 seekHome = this->xxxsteerForSeek(m_home);
-			this->applySteeringForce(seekTarget + seekHome, elapsedTime);
-			return;
+			// otherwise consider avoiding collisions with others
+			Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
+					(AVGroup&) *m_AllPlayers);
+			if (collisionAvoidance != Vec3::zero)
+///				this->applySteeringForce(collisionAvoidance, elapsedTime);
+				this->applySteeringForce(collisionAvoidance.setYtoZero(), elapsedTime);
+			else
+			{
+				//reach your home until there is a ball
+				Vec3 seekTarget = this->xxxsteerForSeek(m_home);
+				Vec3 seekHome = this->xxxsteerForSeek(m_home);
+///				this->applySteeringForce(seekTarget + seekHome, elapsedTime);
+				this->applySteeringForce((seekTarget + seekHome).setYtoZero(), elapsedTime);
+			}
 		}
-
-		// if I hit the ball, kick it.
-		const float distToBall = Vec3::distance(this->position(), m_Ball->position());
-		const float sumOfRadii = this->radius() + m_Ball->radius();
-		if (distToBall < sumOfRadii)
-			m_Ball->kick((m_Ball->position() - this->position()) * 50, elapsedTime);
-
-		// otherwise consider avoiding collisions with others
-		Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
-				(AVGroup&) *m_AllPlayers);
-		if (collisionAvoidance != Vec3::zero)
-			this->applySteeringForce(collisionAvoidance, elapsedTime);
 		else
 		{
-			float distHomeToBall = Vec3::distance(m_home, m_Ball->position());
-			if (distHomeToBall < 12.0f)
+			// if I hit the ball, kick it.
+			const float distToBall = Vec3::distance(this->position(),
+					m_Ball->position());
+			const float sumOfRadii = this->radius() + m_Ball->radius();
+			if (distToBall < sumOfRadii)
+				m_Ball->kick((m_Ball->position() - this->position()) * 50,
+						elapsedTime);
+
+			// otherwise consider avoiding collisions with others
+			Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
+					(AVGroup&) *m_AllPlayers);
+			if (collisionAvoidance != Vec3::zero)
+///				this->applySteeringForce(collisionAvoidance, elapsedTime);
+				this->applySteeringForce(collisionAvoidance.setYtoZero(), elapsedTime);
+			else
 			{
-				// go for ball if I'm on the 'right' side of the ball
-				if (b_ImTeamA ?
-						this->position().x > m_Ball->position().x :
-						this->position().x < m_Ball->position().x)
+				float distHomeToBall = Vec3::distance(m_home,
+						m_Ball->position());
+				if (distHomeToBall < m_distHomeToBall)
 				{
-					Vec3 seekTarget = this->xxxsteerForSeek(m_Ball->position());
-					this->applySteeringForce(seekTarget, elapsedTime);
-				}
-				else
-				{
-///					if (distHomeToBall < 12.0f)
+					// go for ball if I'm on the 'right' side of the ball
+					if (b_ImTeamA ?
+							this->position().x > m_Ball->position().x :
+							this->position().x < m_Ball->position().x)
+					{
+						Vec3 seekTarget = this->xxxsteerForSeek(
+								m_Ball->position());
+///						this->applySteeringForce(seekTarget, elapsedTime);
+						this->applySteeringForce(seekTarget.setYtoZero(), elapsedTime);
+					}
+					else
+					{
+///					if (distHomeToBall < m_distHomeToBall)
 ///					{
 						float Z =
 								m_Ball->position().z - this->position().z > 0 ?
@@ -289,21 +314,30 @@ public:
 								+ (b_ImTeamA ?
 										Vec3(2.0f, 0.0f, Z) :
 										Vec3(-2.0f, 0.0f, Z));
-						Vec3 behindBallForce = this->xxxsteerForSeek(behindBall);
+						Vec3 behindBallForce = this->xxxsteerForSeek(
+								behindBall);
 						this->annotationLine(this->position(), behindBall,
 								Color(0.0f, 1.0f, 0.0f));
-						Vec3 evadeTarget = this->xxxsteerForFlee(m_Ball->position());
+						Vec3 evadeTarget = this->xxxsteerForFlee(
+								m_Ball->position());
+///						this->applySteeringForce(
+///								behindBallForce * 10.0f + evadeTarget,
+///								elapsedTime);
 						this->applySteeringForce(
-								behindBallForce * 10.0f + evadeTarget,
+								(behindBallForce * 10.0f + evadeTarget).setYtoZero(),
 								elapsedTime);
 ///					}
+					}
 				}
-			}
-			else	// Go home
-			{
-				Vec3 seekTarget = this->xxxsteerForSeek(m_home);
-				Vec3 seekHome = this->xxxsteerForSeek(m_home);
-				this->applySteeringForce(seekTarget + seekHome, elapsedTime);
+				else	// Go home
+				{
+					Vec3 seekTarget = this->xxxsteerForSeek(m_home);
+					Vec3 seekHome = this->xxxsteerForSeek(m_home);
+///					this->applySteeringForce(seekTarget + seekHome,
+///							elapsedTime);
+					this->applySteeringForce((seekTarget + seekHome).setYtoZero(),
+							elapsedTime);
+				}
 			}
 		}
 
@@ -323,12 +357,13 @@ public:
 	std::vector<Player*>* m_AllPlayers;
 	Ball<Entity>* m_Ball;
 	bool b_ImTeamA;
+	bool m_TeamAssigned;
 ///	int m_MyID;
 	Vec3 m_home;
+	float m_distHomeToBall;
 };
 
-///TODO
-//Pedestrian externally updated.
+//Player externally updated.
 template<typename Entity>
 class ExternalPlayer: public Player<Entity>
 {
@@ -337,34 +372,34 @@ public:
 	{
 
 		// if I hit the ball, kick it.
-		const float distToBall = Vec3::distance(this->position(), m_Ball->position());
-		const float sumOfRadii = this->radius() + m_Ball->radius();
+		const float distToBall = Vec3::distance(this->position(), this->m_Ball->position());
+		const float sumOfRadii = this->radius() + this->m_Ball->radius();
 		if (distToBall < sumOfRadii)
-			m_Ball->kick((m_Ball->position() - this->position()) * 50, elapsedTime);
+			this->m_Ball->kick((this->m_Ball->position() - this->position()) * 50, elapsedTime);
 
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
 		//annotation
 		Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
-				(AVGroup&) m_AllPlayers);
+				(AVGroup&) this->m_AllPlayers);
 		if (collisionAvoidance == Vec3::zero)
 		{
 			float distHomeToBall = Vec3::distance(this->m_start,
-					m_Ball->position());
+					this->m_Ball->position());
 			if (distHomeToBall < 12.0f)
 			{
 				// go for ball if I'm on the 'right' side of the ball
 				if (not (
-						b_ImTeamA ?
-								this->position().x > m_Ball->position().x :
-								this->position().x < m_Ball->position().x))
+						this->b_ImTeamA ?
+								this->position().x > this->m_Ball->position().x :
+								this->position().x < this->m_Ball->position().x))
 				{
 					float Z =
-							m_Ball->position().z - this->position().z > 0 ?
+							this->m_Ball->position().z - this->position().z > 0 ?
 									-1.0f : 1.0f;
-					Vec3 behindBall = m_Ball->position()
-							+ (b_ImTeamA ?
+					Vec3 behindBall = this->m_Ball->position()
+							+ (this->b_ImTeamA ?
 									Vec3(2.0f, 0.0f, Z) : Vec3(-2.0f, 0.0f, Z));
 					this->annotationLine(this->position(), behindBall,
 							Color(0.0f, 1.0f, 0.0f));
@@ -397,7 +432,6 @@ public:
 
 	void open(void)
 	{
-		///TODO
 		// Make a field
 		m_bbox = new AABBox(Vec3(-20, 0, -10), Vec3(20, 0, 10));
 		// Red goal
@@ -442,12 +476,16 @@ public:
 ///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
 ///			TeamB[i]->update(currentTime, elapsedTime);
 ///		m_Ball->update(currentTime, elapsedTime);
-		iterator iter;
+		AVIterator iter;
 		for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
 		{
 			(*iter)->update(currentTime, elapsedTime);
 		}
 
+		if (not m_Ball)
+		{
+			return;
+		}
 
 		if (m_TeamAGoal->InsideX(m_Ball->position())
 				&& m_TeamAGoal->InsideZ(m_Ball->position()))
@@ -471,15 +509,16 @@ public:
 ///			TeamA[i]->draw();
 ///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
 ///			TeamB[i]->draw();
-///		m_Ball->draw();
-		// draw each vehicles
 		iterator iter;
-		for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
+		for (iter = m_AllPlayers.begin(); iter != m_AllPlayers.end(); ++iter)
 		{
 			(*iter)->draw();
 		}
+		if (m_Ball)
+		{
+			m_Ball->draw();
+		}
 
-		//TODO
 		gDrawer3d->setTwoSided(true);
 		m_bbox->draw();
 		gDrawer3d->setTwoSided(false);
@@ -547,16 +586,17 @@ public:
 ///			TeamA[i]->reset();
 ///		for (unsigned int i = 0; i < m_PlayerCountB; i++)
 ///			TeamB[i]->reset();
-///		m_Ball->reset();
 		iterator iter;
-		for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
+		for (iter = m_AllPlayers.begin(); iter != m_AllPlayers.end(); ++iter)
 		{
 			(*iter)->reset();
 		}
-
+		if (m_Ball)
+		{
+			m_Ball->reset();
+		}
 	}
 
-	//TODO
 	virtual bool addVehicle(AbstractVehicle* vehicle)
 	{
 		if(not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
@@ -572,6 +612,9 @@ public:
 			m_Ball = ballTmp;
 			// set the ball's AABB
 			m_Ball->m_bbox = m_bbox;
+			// update the ball home: the field center
+			m_Ball->m_home = (m_bbox->getMin() + m_bbox->getMax()) / 2.0;
+			m_Ball->reset();
 			//update each player's ball
 			setAllPlayersBall();
 			//that's all
@@ -582,13 +625,8 @@ public:
 			dynamic_cast<Player<Entity>*>(vehicle);
 		if (playerTmp)
 		{
-			// add player to its team
-			playerTmp->b_ImTeamA ?
-					TeamA.push_bask(playerTmp): TeamB.push_bask(playerTmp);
-			// update the team players' homes
-			updatePlayerHomes(playerTmp->b_ImTeamA ? &TeamA: &TeamB);
 			// add player to all players' repo
-			m_AllPlayers.push_bask(playerTmp);
+			m_AllPlayers.push_back(playerTmp);
 			// set the player's all player repo
 			playerTmp->m_AllPlayers = &m_AllPlayers;
 			// set the player's ball
@@ -601,7 +639,7 @@ public:
 		//
 		return false;
 	}
-	//TODO
+
 	virtual bool removeVehicle(OpenSteer::AbstractVehicle* vehicle)
 	{
 		if(not PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle))
@@ -613,7 +651,7 @@ public:
 			dynamic_cast<Player<Entity>*>(vehicle);
 		if (playerTmp)
 		{
-			//get player from all players
+			//remove it also from all players' repo
 			iterator iter;
 			for (iter = m_AllPlayers.begin(); iter != m_AllPlayers.end();
 					++iter)
@@ -623,30 +661,17 @@ public:
 					break;
 				}
 			}
-			//remove from all players' repo
 			m_AllPlayers.erase(iter);
 
-			//get player from its team
-			typename Player<Entity>::groupType* team = (
-					playerTmp->b_ImTeamA ? &TeamA : &TeamB);
-			for (iter = (*team).begin(); iter != (*team).end(); ++iter)
-			{
-				if (*iter == playerTmp)
-				{
-					break;
-				}
-			}
-			//remove from its team
-			(*team).erase(iter);
-			// update the team players' homes
-			updatePlayerHomes(team);
+			//remove it also from its team, if already added
+			removePlayerFromTeam(playerTmp);
 		}
 		//check if this is the current ball
 		if (vehicle == m_Ball)
 		{
 			m_Ball = NULL;
 			// find a new ball (if any): the first found or NULL
-			iterator iter;
+			AVIterator iter;
 			for (iter = m_AllVehicles.begin(); iter != m_AllVehicles.end(); ++iter)
 			{
 				m_Ball = dynamic_cast<Ball<Entity>*>(*iter);
@@ -655,7 +680,7 @@ public:
 					break;
 				}
 			}
-			//update each pursuer's wanderer
+			//update each player's ball
 			setAllPlayersBall();
 		}
 		//
@@ -671,61 +696,145 @@ public:
 		}
 	}
 
-	//TODO
-	void updatePlayerHomes(typename Player<Entity>::groupType* team)
+	void addPlayerToTeam(Player<Entity>* player, bool teamA)
+	{
+		if(player->m_TeamAssigned == true)
+		{
+			return;
+		}
+		//add player to its team, if not already added
+		typename Player<Entity>::groupType* team = (
+				teamA ? &TeamA : &TeamB);
+		iterator iter;
+		for (iter = (*team).begin(); iter != (*team).end(); ++iter)
+		{
+			if (*iter == player)
+			{
+				break;
+			}
+		}
+		if (iter == (*team).end())
+		{
+			(*team).push_back(player);
+			// update the team players' homes
+			updatePlayersHome(team);
+			//
+			player->b_ImTeamA = teamA;
+			player->m_TeamAssigned = true;
+		}
+	}
+
+	void removePlayerFromTeam(Player<Entity>* player)
+	{
+		if(player->m_TeamAssigned == false)
+		{
+			return;
+		}
+		//remove it also from its team, if already added
+		typename Player<Entity>::groupType* team = (
+				player->b_ImTeamA ? &TeamA : &TeamB);
+		iterator iter;
+		for (iter = (*team).begin(); iter != (*team).end(); ++iter)
+		{
+			if (*iter == player)
+			{
+				break;
+			}
+		}
+		if (iter != (*team).end())
+		{
+			(*team).erase(iter);
+			// update the remaining team players' homes
+			updatePlayersHome(team);
+			//
+			player->m_TeamAssigned = false;
+		}
+	}
+
+	void updatePlayersHome(typename Player<Entity>::groupType* team)
 	{
 		unsigned int numPlayers = (*team).size();
 		if (numPlayers == 0)
 		{
 			return;
 		}
-		float dX = abs(m_bbox->getMax().x - m_bbox->getMin().x)
-				/ (float) numPlayers;
-		float dZ = abs(m_bbox->getMax().z - m_bbox->getMin().z)
-				/ (float) numPlayers;
-		if (team == &TeamA)
+		//get half field dims
+		float dimX = abs(m_bbox->getMax().x - m_bbox->getMin().x) / 2.0;
+		float dimZ = abs(m_bbox->getMax().z - m_bbox->getMin().z);
+		//compute distHomeToBall: diagonal * 0.424264069
+		float distHomeToBall = sqrt(dimX * dimX + dimZ * dimZ) * 0.424264069;
+		//set k factor = MaxDim / minDim
+		float k = (dimX >= dimZ ? dimX / dimZ : dimZ / dimX);
+		//get subdivisions for the shorter dim (float)
+		float subv = sqrt((float) numPlayers / k);
+		//set min and max subdivisions (int)
+		int subvMinI = ((subv - (int) subv) > 0.0 ? 1 : 0) + (int) subv;
+		float subvMax = (float) numPlayers / (float) subvMinI;
+		int subvMaxI = ((subvMax - (int) subvMax) > 0.0 ? 1 : 0)
+				+ (int) subvMax;
+		//set x,z data
+		int numPlayerX, numPlayerZ;
+		float dX, dZ;
+		if (dimX >= dimZ)
 		{
-			///		this->setPosition(b_ImTeamA ? frandom01() * 20 : -frandom01() * 20, 0,
-			///				(frandom01() - 0.5f) * 20);
-			Vec3 fieldCenter = (m_bbox->getMin() + m_bbox->getMax())/2.0;
-			iterator iter;
-			unsigned int i;
-			for (iter = (*team).begin(), i = 0; iter != (*team).end();
-					++iter, ++i)
-			{
-				float xi = dX * (i + 0.5);
-				float zi = dZ * (i + 0.5);
-				(*iter)->m_home = Vec3();
-			}
+			numPlayerX = subvMaxI;
+			numPlayerZ = subvMinI;
 		}
-		else if (team == &TeamB)
+		else
 		{
+			numPlayerX = subvMinI;
+			numPlayerZ = subvMaxI;
+		}
+		dX = dimX / (float) (numPlayerX + 1);
+		dZ = dimZ / (float) (numPlayerZ + 1);
+		//invert dX direction for team B
+		if (team == &TeamB)
+		{
+			dX = -dX;
+		}
+		//get field low center
+		Vec3 lowCenter =
+				(m_bbox->getMin() + m_bbox->getMax() - Vec3(0, 0, dimZ)) / 2.0;
+		//set players' homes
+		iterator iter = (*team).begin();
+		int XI = (int) (frandom01() * (numPlayerX - 1));
+		for (int xi = 0; xi < numPlayerX; ++xi)
+		{
+			//evenly distribute along last column
+			if (xi == (numPlayerX - 1))
+			{
+				//recompute last players
+				numPlayerZ = numPlayers - numPlayerZ * xi;
+				dZ = dimZ / (float) (numPlayerZ + 1);
+			}
 
-//#include <iostream>
-//#include <cmath>
-//#include <cassert>
-//			const float A = 40.0;
-//			const float B = 4.0;
-//			float k;
-//
-//			for (int N = 1; N < 10000; ++N)
-//			{
-//				A > B ? k = A / B : k = B / A;
-//				float subv = sqrt((float) N / k);
-//				int subMinI, subMaxI;
-//				(subv - (int) subv) > 0.0 ? subMinI = (int) subv + 1 : subMinI =
-//													(int) subv;
-//				float fact = (float) N / (float) subMinI;
-//				(fact - (int) fact) > 0.0 ? subMaxI = (int) fact + 1 : subMaxI =
-//													(int) fact;
-//				std::cout << N << ": " << subMinI << " - " << subMaxI << ": "
-//						<< subMinI * subMaxI << std::endl;
-//				assert(N <= subMinI * subMaxI);
-//			}
+			int ZI = (int) (frandom01() * (numPlayerZ - 1));
+			for (int zi = 0; zi < numPlayerZ; ++zi)
+			{
+				//update m_home
+				(*iter)->m_home = lowCenter
+						+ Vec3((XI + 1) * dX + frandom01() * (*iter)->radius(), 0,
+								(ZI + 1) * dZ + frandom01() * (*iter)->radius());
+				//update also m_distHomeToBall
+				(*iter)->m_distHomeToBall = distHomeToBall;
+				//go on
+				++iter;
+				if (iter == (*team).end())
+				{
+					break;
+				}
+				ZI = (ZI + 1) % numPlayerZ;
+			}
+			//
+			if (iter == (*team).end())
+			{
+				break;
+			}
+			XI = (XI + 1) % numPlayerX;
 		}
 	}
 
-	void setSoccerField(Vec3 &min, Vec3& max)
+	void setSoccerField(const Vec3& min, const Vec3& max)
 	{
 		//delete old boxes
 		delete m_bbox;
@@ -741,18 +850,19 @@ public:
 		{
 			zDim = 20;
 		}
-		Vec3 newMin = (max + min) / 2.0 - Vec3(xDim / 2.0, 0, zDim / 2.0);
-		Vec3 newMax = (max + min) / 2.0 + Vec3(xDim / 2.0, 0, zDim / 2.0);
+		//new min/max: middle point -/+ half dim
+		Vec3 middle = (max + min) / 2.0, halfDim = Vec3(xDim / 2.0, 0, zDim / 2.0);
+		Vec3 newMin = middle - halfDim, newMax = middle + halfDim;
 		//create soccer field
-		m_bbox = new AABBox(Vec3(newMin), Vec3(newMax));
+		m_bbox = new AABBox(newMin, newMax);
 		// goal dims
 		float xGoalDim = xDim * 0.05, zGoalDim = zDim * 0.7;
 		// Red goal
-		m_TeamAGoal = new AABBox(newMin + Vec3(-xGoalDim / 2.0, 0, (zDim - zGoalDim) / 2.0),
-				newMin + Vec3(xGoalDim / 2.0, 0, (zDim + zGoalDim) / 2.0));
+		m_TeamAGoal = new AABBox(newMax + Vec3(-xGoalDim * 0.25, 0, -(zDim + zGoalDim) / 2.0),
+				newMax + Vec3(xGoalDim * 0.75, 0, -(zDim - zGoalDim) / 2.0));
 		// Blue Goal
-		m_TeamBGoal = new AABBox(newMax + Vec3(-xGoalDim / 2.0, 0, (zDim - zGoalDim) / 2.0),
-				newMax + Vec3(xGoalDim / 2.0, 0, (zDim + zGoalDim) / 2.0));
+		m_TeamBGoal = new AABBox(newMin + Vec3(-xGoalDim * 0.75, 0, (zDim - zGoalDim) / 2.0),
+				newMin + Vec3(xGoalDim * 0.25, 0, (zDim + zGoalDim) / 2.0));
 		// update the ball's AABB if any
 		if (m_Ball)
 		{
@@ -772,7 +882,7 @@ public:
 	typename Player<Entity>::groupType m_AllPlayers;
 	Ball<Entity> *m_Ball;
 
-	typedef typename Player<Entity>::groupType::const_iterator iterator;
+	typedef typename Player<Entity>::groupType::iterator iterator;
 
 	AABBox *m_bbox;
 	AABBox *m_TeamAGoal;

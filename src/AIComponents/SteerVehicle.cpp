@@ -27,6 +27,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -105,6 +106,18 @@ bool SteerVehicle::initialize()
 		not mExternalUpdate ?
 				mVehicle = new MpPursuer<SteerVehicle> :
 				mVehicle = new ExternalMpPursuer<SteerVehicle>;
+	}
+	else if (param == std::string("player"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new Player<SteerVehicle> :
+				mVehicle = new ExternalPlayer<SteerVehicle>;
+	}
+	else if (param == std::string("ball"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new Ball<SteerVehicle> :
+				mVehicle = new ExternalBall<SteerVehicle>;
 	}
 	else
 	{
@@ -410,6 +423,14 @@ VehicleSettings SteerVehicle::getSettings()
 
 	//get vehicle settings
 	return dynamic_cast<VehicleAddOn*>(mVehicle)->getSettings();
+}
+
+SMARTPTR(SteerPlugIn) SteerVehicle::getSteerPlugIn() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mSteerPlugIn;
 }
 
 void SteerVehicle::doUpdateSteerVehicle(const float currentTime,

@@ -268,6 +268,13 @@
 			<Param parent=""/>
 			<Param is_steady="true"/>
 		</Object>
+		<Object type="Instanceable" id="Panda1" priority="100">
+			<Component type="Model">
+				<Param model_file="panda.bam"/>
+			</Component>
+			<Param parent=""/>
+			<Param is_steady="true"/>
+		</Object>
 		<Object type="Instanceable" id="Gorilla1" priority="100">
 			<Component type="Model">
 				<Param model_file="walk@gorillawalking.bam"/>
@@ -572,6 +579,7 @@
 			<Param store_params="true"/>
 			<Param pos="-33.0144,44.7431,18.695"/>
 			<Param rot="-90.0,0.0,0.0"/>
+			<Param init_func="steerVehicleToBeCloned_init"/>
 			<Component type="InstanceOf">
 				<Param instance_of="Gorilla1"/>
 				<Param scale="0.6,0.6,0.6"/>
@@ -609,6 +617,7 @@
 			<Component type="SteerPlugIn">
 				<Param type="one_turning"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+				<Param events="hit_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:hit_vehicle@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
 			</Component>
 		</Object>
 		
@@ -626,7 +635,6 @@
 				<Param obstacles="gazebo_1@box@outside:gazebo_2@box@outside:gazebo_3@box@outside"/>
 				<Param obstacles="bridge_1@box@outside:bridge_2@box@outside"/>
 				<Param obstacles="cityhall_1@box@outside:cityhall_2@box@outside"/>
-				<Param events="hit_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:hit_vehicle@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
 		</Object>
@@ -649,7 +657,16 @@
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
 		</Object>
-				
+		
+		<Object type="OpenSteerPlugIn" id="steerPlugInSoccer1" priority="100">
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param type="soccer"/>
+				<Param pathway="385.634,463.934,-25.8791:496.655,586.035,-42.3251$1.0$false"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+			</Component>
+		</Object>				
 <!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">

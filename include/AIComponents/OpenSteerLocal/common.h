@@ -122,71 +122,73 @@ public:
 		(m_entity->*m_entityUpdateMethod)(currentTime, elapsedTime);
 	}
 
-	void setEntityPathFollowingMethod(
-			ENTITYPATHFOLLOWINGMETHOD entityPathFollowingMethod)
-	{
-		m_entityPathFollowingMethod = entityPathFollowingMethod;
-	}
-
-	void entityPathFollowing(const OpenSteer::Vec3& future,
-			const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
-			const float outside)
-	{
+    virtual void annotatePathFollowing (const OpenSteer::Vec3& future,
+                                        const OpenSteer::Vec3& onPath,
+                                        const OpenSteer::Vec3& target,
+                                        const float outside)
+    {
+		///call the m_entityPathFollowingMethod
 		if (m_entityPathFollowingMethod)
 		{
 			(m_entity->*m_entityPathFollowingMethod)(future, onPath, target,
 					outside);
 		}
+    }
+    void setEntityPathFollowingMethod(
+			ENTITYPATHFOLLOWINGMETHOD entityPathFollowingMethod)
+	{
+		m_entityPathFollowingMethod = entityPathFollowingMethod;
 	}
 
+    virtual void annotateAvoidObstacle (const float minDistanceToCollision)
+    {
+		///call the m_entityAvoidObstacleMethod
+		if (m_entityAvoidObstacleMethod)
+		{
+			(m_entity->*m_entityAvoidObstacleMethod)(minDistanceToCollision);
+		}
+    }
 	void setEntityAvoidObstacleMethod(
 			ENTITYAVOIDOBSTACLEMETHOD entityAvoidObstacleMethod)
 	{
 		m_entityAvoidObstacleMethod = entityAvoidObstacleMethod;
 	}
 
-	void entityAvoidObstacle(const float minDistanceToCollision)
-	{
-		if (m_entityAvoidObstacleMethod)
+    virtual void annotateAvoidCloseNeighbor (const OpenSteer::AbstractVehicle& other,
+                                             const float additionalDistance)
+    {
+		///call the m_entityAvoidCloseNeighborMethod
+		if (m_entityAvoidCloseNeighborMethod)
 		{
-			(m_entity->*m_entityAvoidObstacleMethod)(minDistanceToCollision);
+			(m_entity->*m_entityAvoidCloseNeighborMethod)(other,
+					additionalDistance);
 		}
-	}
-
+    }
 	void setEntityAvoidCloseNeighborMethod(
 			ENTITYAVOIDCLOSENEIGHBORMETHOD entityAvoidCloseNeighborMethod)
 	{
 		m_entityAvoidCloseNeighborMethod = entityAvoidCloseNeighborMethod;
 	}
 
-	void entityAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
-			const float additionalDistance)
-	{
-		if (m_entityAvoidCloseNeighborMethod)
-		{
-			(m_entity->*m_entityAvoidCloseNeighborMethod)(other,
-					additionalDistance);
-		}
-	}
-
-	void setEntityAvoidNeighborMethod(
-			ENTITYAVOIDNEIGHBORMETHOD entityAvoidNeighborMethod)
-	{
-		m_entityAvoidNeighborMethod = entityAvoidNeighborMethod;
-	}
-
-	void entityAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
-			const float steer, const OpenSteer::Vec3& ourFuture,
-			const OpenSteer::Vec3& threatFuture)
-	{
+    virtual void annotateAvoidNeighbor (const OpenSteer::AbstractVehicle& threat,
+                                        const float steer,
+                                        const OpenSteer::Vec3& ourFuture,
+                                        const OpenSteer::Vec3& threatFuture)
+    {
+		///call the m_entityAvoidNeighborMethod
 		if (m_entityAvoidNeighborMethod)
 		{
 			(m_entity->*m_entityAvoidNeighborMethod)(threat, steer, ourFuture,
 					threatFuture);
 		}
+    }
+    void setEntityAvoidNeighborMethod(
+			ENTITYAVOIDNEIGHBORMETHOD entityAvoidNeighborMethod)
+	{
+		m_entityAvoidNeighborMethod = entityAvoidNeighborMethod;
 	}
 
-	VehicleSettings& getSettings()
+    VehicleSettings& getSettings()
 	{
 		return m_settings;
 	}

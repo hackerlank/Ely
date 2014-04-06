@@ -71,7 +71,7 @@ enum SteerVehicleMovType
  *
  * XML Param(s):
  * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
- * - "type"						|single|"one_turning" (values: one_turning|pedestrian|boid|multiple_pursuit_wanderer|multiple_pursuit_pursuer)
+ * - "type"						|single|"one_turning" (values: one_turning|pedestrian|boid|multiple_pursuit_wanderer|multiple_pursuit_pursuer|player|ball)
  * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
  * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
@@ -120,6 +120,13 @@ public:
 	OpenSteer::AbstractVehicle& getAbstractVehicle();
 	operator OpenSteer::AbstractVehicle&();
 	///@}
+
+	/**
+	 * \name Get the SteerPlugIn owner object.
+	 *
+	 * \return The SteerPlugIn object.
+	 */
+	SMARTPTR(SteerPlugIn) getSteerPlugIn() const;
 
 	///SteerVehicle event.
 	enum Event
@@ -198,7 +205,7 @@ private:
 	///@}
 
 #ifdef ELY_THREAD
-	///Protects the SteerPlugIn object reference (mNavMesh).
+	///Protects the SteerPlugIn object reference (mSteerPlugIn).
 	ReMutex mSteerPlugInMutex;
 #endif
 

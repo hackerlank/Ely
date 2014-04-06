@@ -27,6 +27,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -91,9 +92,13 @@ void SteerPlugIn::onAddToObjectSetup()
 	{
 		mPlugIn = new MpPlugIn<SteerVehicle>;
 	}
+	else if (mPlugInTypeParam == std::string("soccer"))
+	{
+		mPlugIn = new MicTestPlugIn<SteerVehicle>;
+	}
 	else
 	{
-		//default: OneTurningPlugIn
+		///default: "one_turning"
 		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
 	}
 	//open the plug in

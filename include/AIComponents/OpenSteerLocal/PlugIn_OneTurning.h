@@ -62,8 +62,8 @@ class OneTurning: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
 public:
 
-	// type for a flock: an STL vector of _OneTurning pointers
-	typedef std::vector<OneTurning*> groupType;
+	// type for a one turning: an STL vector of _OneTurning pointers
+	typedef typename std::vector<OneTurning<Entity>*> groupType;
 
 	// constructor
 	OneTurning()

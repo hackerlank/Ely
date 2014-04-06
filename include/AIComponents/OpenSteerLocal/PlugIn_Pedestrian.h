@@ -82,7 +82,7 @@ class Pedestrian: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 public:
 
 	// type for a group of Pedestrians
-	typedef std::vector<Pedestrian*> groupType;
+	typedef typename std::vector<Pedestrian<Entity>*> groupType;
 
 	// constructor
 ///	Pedestrian(ProximityDatabase& pd)
@@ -287,8 +287,9 @@ public:
 		this->annotationLine(onPath, onPathBoundary, darkOrange);
 		this->annotationLine(onPathBoundary, future, lightOrange);
 
-		///call the entityPathFollowing
-		this->entityPathFollowing(future, onPath, target,	outside);
+		///call parent::annotatePathFollowing
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotatePathFollowing(
+				future, onPath, target, outside);
 	}
 
 	// called when steerToAvoidCloseNeighbors decides steering is required
@@ -310,8 +311,9 @@ public:
 			draw2dTextAt3dLocation(*string, location, color, 0.0, 0.0);
 		}
 
-		///call the entityAvoidCloseNeighbor
-		this->entityAvoidCloseNeighbor(other, 0.0);
+		///call parent::annotateAvoidCloseNeighbor
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidCloseNeighbor(
+				other, 0.0);
 	}
 
 	// (parameter names commented out to prevent compiler warning from "-W")
@@ -327,8 +329,9 @@ public:
 		this->annotationXZCircle(this->radius(), ourFuture, green, 12);
 		this->annotationXZCircle(this->radius(), threatFuture, green, 12);
 
-		///call the entityAvoidNeighbor
-		this->entityAvoidNeighbor(threat, 0.0, ourFuture, threatFuture);
+		///call parent::annotateAvoidNeighbor
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidNeighbor(
+				threat, 0.0, ourFuture, threatFuture);
 	}
 
 	// xxx perhaps this should be a call to a general purpose annotation for
@@ -348,8 +351,9 @@ public:
 		this->annotationLine(BL, BR, white);
 		this->annotationLine(BR, FR, white);
 
-		///call the entityAvoidObstacle
-		this->entityAvoidObstacle(minDistanceToCollision);
+		///call parent::annotateAvoidObstacle
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidObstacle(
+				minDistanceToCollision);
 	}
 
 	// switch to new proximity database -- just for demo purposes

@@ -63,8 +63,8 @@ class MpBase: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
 public:
 
-	// type for a flock: an STL vector of MpBase pointers
-	typedef std::vector<MpBase*> groupType;
+	// type for a mp base: an STL vector of MpBase pointers
+	typedef typename std::vector<MpBase<Entity>*> groupType;
 
 	// constructor
 	MpBase()
@@ -118,7 +118,8 @@ public:
 	{
 		const Vec3 wander2d = this->steerForWander(elapsedTime).setYtoZero();
 		const Vec3 steer = this->forward() + (wander2d * 3);
-		this->applySteeringForce(steer, elapsedTime);
+///		this->applySteeringForce(steer, elapsedTime);
+		this->applySteeringForce(steer.setYtoZero(), elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);

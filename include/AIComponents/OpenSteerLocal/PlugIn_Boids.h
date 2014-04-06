@@ -83,8 +83,8 @@ class Boid: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
 {
 public:
 
-	// type for a flock: an STL vector of Boid pointers
-	typedef std::vector<Boid*> groupType;
+	// type for a boid: an STL vector of Boid pointers
+	typedef typename std::vector<Boid<Entity>*> groupType;
 
 	// constructor
 ///	Boid(ProximityDatabase& pd)
@@ -310,6 +310,10 @@ public:
 		this->annotationLine(FL, BL, white);
 		this->annotationLine(BL, BR, white);
 		this->annotationLine(BR, FR, white);
+
+		///call parent::annotateAvoidObstacle
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidObstacle(
+				minDistanceToCollision);
 	}
 
 	void setFlockParameters(float sR, float sA, float sW,

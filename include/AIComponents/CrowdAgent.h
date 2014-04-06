@@ -119,6 +119,13 @@ public:
 	CrowdAgentMovType getMovType() const;
 	///@}
 
+	/**
+	 * \name Get the NavMesh owner object.
+	 *
+	 * \return The NavMesh object.
+	 */
+	SMARTPTR(NavMesh) getNavMesh() const;
+
 	///CrowdAgent event.
 	enum Event
 	{

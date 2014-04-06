@@ -28,6 +28,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
@@ -42,6 +43,9 @@ INITIALIZATION steerPlugInOneTurning1_initialization;
 INITIALIZATION steerPlugInPedestrian1_initialization;
 INITIALIZATION steerPlugInBoid1_initialization;
 INITIALIZATION steerPlugInMultiplePursuit1_initialization;
+INITIALIZATION steerPlugInSoccer1_initialization;
+//common SteerVehicle initialization
+INITIALIZATION steerVehicleToBeCloned_init;
 
 #ifdef __cplusplus
 }
@@ -57,13 +61,17 @@ NodePath textNode;
 bool rocketInitialized = false;
 enum SteerPlugInType
 {
-	one_turning, pedestrians, boids, multiple_pursuit, none
+	one_turning, pedestrians, boids, multiple_pursuit, soccer, none
 } steerPlugInType = none;
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
 ObjectId wandererObjectId, newWanderedObjectId;
 bool wandererExternalUpdate = false;
+enum SoccerActor
+{
+	player_teamA, player_teamB, ball
+} soccerActorSelected = ball;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -134,6 +142,10 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				steerPlugInOptionsMenu->GetElementById("multiple_pursuit")->SetAttribute(
 						"checked", true);
 				break;
+			case soccer:
+				steerPlugInOptionsMenu->GetElementById("soccer")->SetAttribute(
+						"checked", true);
+				break;
 			case none:
 				steerPlugInOptionsMenu->GetElementById("none")->SetAttribute(
 						"checked", true);
@@ -172,7 +184,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	}
 	else if (value == "steerPlugIn::multiple_pursuit::options")
 	{
-		// This event is sent from the "onchange" of the "chaser_camera"
+		// This event is sent from the "onchange" of the "multiple_pursuit"
 		//radio button. It shows or hides the related options.
 		Rocket::Core::ElementDocument* options_body =
 				event.GetTargetElement()->GetOwnerDocument();
@@ -239,6 +251,52 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			}
 		}
 	}
+	else if (value == "steerPlugIn::soccer::options")
+	{
+		// This event is sent from the "onchange" of the "soccer"
+		//radio button. It shows or hides the related options.
+		Rocket::Core::ElementDocument* options_body =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (options_body == NULL)
+			return;
+
+		Rocket::Core::Element* soccer_options = options_body->GetElementById(
+				"soccer_options");
+		if (soccer_options)
+		{
+			//The "value" parameter of an "onchange" event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the "value"
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				soccer_options->SetProperty("display", "none");
+			}
+			else
+			{
+				soccer_options->SetProperty("display", "block");
+				//set elements' values from options' values
+				//players/ball
+				switch (soccerActorSelected)
+				{
+				case player_teamA:
+					steerPlugInOptionsMenu->GetElementById("player_teamA")->SetAttribute(
+							"checked", true);
+					break;
+				case player_teamB:
+					steerPlugInOptionsMenu->GetElementById("player_teamB")->SetAttribute(
+							"checked", true);
+					break;
+				case ball:
+					steerPlugInOptionsMenu->GetElementById("ball")->SetAttribute(
+							"checked", true);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
 	else if (value == "steerPlugIn::form::submit_options")
 	{
 		Rocket::Core::String paramValue;
@@ -284,6 +342,26 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					wandererExternalUpdate = true:
 					//paramValue == "no"
 					wandererExternalUpdate = false;
+			}
+			else if (paramValue == "soccer")
+			{
+				steerPlugInType = soccer;
+				//set options' values from elements' values
+				//external update
+				paramValue = event.GetParameter<Rocket::Core::String>("player_ball", "");
+				if (paramValue == "player_teamA")
+				{
+					soccerActorSelected = player_teamA;
+				}
+				else if (paramValue == "player_teamB")
+				{
+					soccerActorSelected = player_teamB;
+				}
+				else
+				{
+					//default: ball
+					soccerActorSelected = ball;
+				}
 			}
 			else
 			{
@@ -352,6 +430,7 @@ void add_vehicle(const Event* event)
 	//tweak clone components' parameter tables
 	compParams["SteerVehicle"].erase("type");
 	compParams["SteerVehicle"].erase("mov_type");
+	compParams["SteerVehicle"].erase("thrown_events");
 	if (openSteerPlugInName == "One Turning Away")
 	{
 		//set SteerVehicle type, mov_type
@@ -378,6 +457,9 @@ void add_vehicle(const Event* event)
 				std::pair<std::string, std::string>("type", "boid"));
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("mov_type", "opensteer"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("thrown_events",
+						"avoid_obstacle@@3:avoid_close_neighbor@@"));
 		//
 		compParams["SteerVehicle"].erase("max_force");
 		compParams["SteerVehicle"].insert(
@@ -392,9 +474,9 @@ void add_vehicle(const Event* event)
 		compParams["InstanceOf"].erase("instance_of");
 		compParams["InstanceOf"].insert(
 				std::pair<std::string, std::string>("instance_of", "Smiley1"));
-		compParams["InstanceOf"].erase("max_speed");
+		compParams["InstanceOf"].erase("scale");
 		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("scale", "0.1,0.1,0.1"));
+				std::pair<std::string, std::string>("scale", "0.5,0.5,0.5"));
 	}
 	else if (openSteerPlugInName == "Multiple Pursuit")
 	{
@@ -404,16 +486,55 @@ void add_vehicle(const Event* event)
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("mov_type", "kinematic"));
 	}
+	else if (openSteerPlugInName == "Michael's Simple Soccer")
+	{
+		compParams["SteerVehicle"].erase("max_force");
+		compParams["SteerVehicle"].erase("max_speed");
+		compParams["SteerVehicle"].erase("speed");
+		compParams["InstanceOf"].erase("instance_of");
+		compParams["InstanceOf"].erase("scale");
+		//set SteerVehicle type, mov_type, max_force, max_speed
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("type",
+						(soccerActorSelected == ball ? "ball" : "player")));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("mov_type", "kinematic"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("max_force",
+						(soccerActorSelected == ball ? "9.0" : "3000.7")));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("max_speed",
+						(soccerActorSelected == ball ? "9.0" : "10")));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("speed",
+						(soccerActorSelected == ball ? "1.0" : "0.0")));
+		//set InstanceOf instance_of
+		compParams["InstanceOf"].insert(
+				std::pair<std::string, std::string>("instance_of",
+						(soccerActorSelected == ball ?
+								"Smiley1" :
+								(soccerActorSelected == player_teamA ?
+										"Panda1" : "Gorilla1"))));
+		//set InstanceOf scale
+		compParams["InstanceOf"].insert(
+				std::pair<std::string, std::string>("scale",
+						(soccerActorSelected == ball ?
+								"1.0" :
+								(soccerActorSelected == player_teamA ?
+										"0.5" : "0.5"))));
+	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(
 			std::pair<std::string, std::string>("add_to_plugin",
 					steerPlugInObjectId));
 
-	//create actually the clone
-	ObjectTemplateManager::GetSingletonPtr()->createObject(
+	//create actually the clone and...
+	SMARTPTR(Object) clone = ObjectTemplateManager::GetSingletonPtr()->createObject(
 			toBeClonedObject->objectTmpl()->objectType(), ObjectId(), objParams,
 			compParams, false);
+	//...initialize it
+	clone->worldSetup();
 }
 
 void remove_vehicle(const Event* event)
@@ -440,32 +561,44 @@ void remove_vehicle(const Event* event)
 			&DCAST(SteerVehicle, aiComp)->getAbstractVehicle();
 			if(openSteerPlugInName == "One Turning Away")
 			{
-				if((not dynamic_cast<OneTurning<SteerVehicle>*>(vehicle)) and
-						(not dynamic_cast<ExternalOneTurning<SteerVehicle>*>(vehicle)))
+				if(not (dynamic_cast<OneTurning<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalOneTurning<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
 			}
 			else if (openSteerPlugInName == "Pedestrians")
 			{
-				if((not dynamic_cast<Pedestrian<SteerVehicle>*>(vehicle)) and
-						(not dynamic_cast<ExternalPedestrian<SteerVehicle>*>(vehicle)))
+				if(not(dynamic_cast<Pedestrian<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalPedestrian<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
 			}
 			else if (openSteerPlugInName == "Boids")
 			{
-				if((not dynamic_cast<Boid<SteerVehicle>*>(vehicle)) and
-						(not dynamic_cast<ExternalBoid<SteerVehicle>*>(vehicle)))
+				if(not (dynamic_cast<Boid<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalBoid<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
 			}
 			else if (openSteerPlugInName == "Multiple Pursuit")
 			{
-				if((not dynamic_cast<MpPursuer<SteerVehicle>*>(vehicle)) and
-						(not dynamic_cast<ExternalMpPursuer<SteerVehicle>*>(vehicle)))
+				if(not (dynamic_cast<MpPursuer<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalMpPursuer<SteerVehicle>*>(vehicle) or
+						dynamic_cast<MpWanderer<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalMpWanderer<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
+			else if (openSteerPlugInName == "Michael's Simple Soccer")
+			{
+				if(not (dynamic_cast<Ball<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalBall<SteerVehicle>*>(vehicle) or
+						dynamic_cast<Player<SteerVehicle>*>(vehicle) or
+						dynamic_cast<ExternalPlayer<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -647,6 +780,50 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["steerPlugIn::multiple_pursuit::options"] =
 			&rocketEventHandler;
 	gRocketCommitFunctions.push_back(&rocketMultiplePursuitCommit);
+}
+
+///steerPlugInSoccer1
+void steerPlugInSoccer1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
+
+	//set soccer field
+	MicTestPlugIn<SteerVehicle>* micTestplugIn =
+			dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
+					getAbstractPlugIn());
+	OpenSteer::SegmentedPathway* pathWay =
+			dynamic_cast<OpenSteer::SegmentedPathway*>(micTestplugIn->getPathway());
+	if (pathWay->pointCount() >= 2)
+	{
+		micTestplugIn->setSoccerField(pathWay->point(0), pathWay->point(1));
+	}
+
+	///init libRocket
+	steerPlugIns[soccer] = DCAST(SteerPlugIn, aiComp);
+	rocketInitOnce();
+	//custom setup
+	gRocketEventHandlers["steerPlugIn::soccer::options"] = &rocketEventHandler;
+}
+
+///steerVehicleToBeCloned_init
+void steerVehicleToBeCloned_init(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
+
+	//check if it is a soccer player
+	Player<SteerVehicle>* player =
+			dynamic_cast<Player<SteerVehicle>*>(&DCAST(SteerVehicle, aiComp)->
+					getAbstractVehicle());
+	if (player)
+	{
+		MicTestPlugIn<SteerVehicle>* micTestplugIn =
+				dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerVehicle, aiComp)->
+						getSteerPlugIn()->getAbstractPlugIn());
+		micTestplugIn->addPlayerToTeam(player,
+				soccerActorSelected == player_teamA ? true: false);
+	}
 }
 
 ///init/end
