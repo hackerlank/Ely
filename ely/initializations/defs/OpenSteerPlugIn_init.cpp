@@ -508,6 +508,9 @@ void add_vehicle(const Event* event)
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("speed",
 						(soccerActorSelected == ball ? "1.0" : "0.0")));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("thrown_events",
+						"avoid_neighbor@@"));
 		//set InstanceOf instance_of
 		compParams["InstanceOf"].insert(
 				std::pair<std::string, std::string>("instance_of",

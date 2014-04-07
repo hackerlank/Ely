@@ -380,8 +380,8 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 
 SMARTPTR(NavMesh) CrowdAgent::getNavMesh() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+	//lock (guard) the CrowdAgent NavMesh mutex
+	HOLD_REMUTEX(mNavMeshMutex)
 
 	return mNavMesh;
 }

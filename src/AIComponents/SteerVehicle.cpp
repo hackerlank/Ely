@@ -427,8 +427,8 @@ VehicleSettings SteerVehicle::getSettings()
 
 SMARTPTR(SteerPlugIn) SteerVehicle::getSteerPlugIn() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+	//lock (guard) the SteerVehicle SteerPlugIn mutex
+	HOLD_REMUTEX(mSteerPlugInMutex)
 
 	return mSteerPlugIn;
 }
