@@ -28,6 +28,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -95,6 +96,10 @@ void SteerPlugIn::onAddToObjectSetup()
 	else if (mPlugInTypeParam == std::string("soccer"))
 	{
 		mPlugIn = new MicTestPlugIn<SteerVehicle>;
+	}
+	else if (mPlugInTypeParam == std::string("capture_the_flag"))
+	{
+		mPlugIn = new CtfPlugIn<SteerVehicle>;
 	}
 	else
 	{
@@ -674,13 +679,6 @@ void SteerPlugIn::update(void* data)
 				gDrawer3d = mDrawer3d;
 				gDrawer2d = mDrawer2d;
 
-//			// service queued reset request, if any
-//			if (OpenSteer::gDelayedResetPlugInXXX)
-//			{
-//				mPlugIn->reset();
-//				OpenSteer::gDelayedResetPlugInXXX = false;
-//			}
-
 				// invoke PlugIn's Update method
 				mPlugIn->update(mCurrentTime, dt);
 
@@ -695,13 +693,6 @@ void SteerPlugIn::update(void* data)
 				//unset enableAnnotation
 				enableAnnotation = false;
 #endif
-
-//			// service queued reset request, if any
-//			if (OpenSteer::gDelayedResetPlugInXXX)
-//			{
-//				mPlugIn->reset();
-//				OpenSteer::gDelayedResetPlugInXXX = false;
-//			}
 
 				// invoke PlugIn's Update method
 				mPlugIn->update(mCurrentTime, dt);

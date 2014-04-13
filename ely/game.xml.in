@@ -1,10 +1,10 @@
 <?xml version="1.0"?>
 <Game>
-	<!-- ------------------------------------------------ -->
-	<!-- ------------------------------------------------ -->
+	<!-- ************************************************ -->
+	<!-- ************************************************ -->
 	<!-- 		Object Templates Definitions              -->
-	<!-- ------------------------------------------------ -->
-	<!-- ------------------------------------------------ -->
+	<!-- ************************************************ -->
+	<!-- ************************************************ -->
 	<ObjectTmplSet>
 		<!-- template for wrapper around predefined nodepath - Mandatory -->
 		<ObjectTmpl type="Render">
@@ -178,16 +178,16 @@
 
 	</ObjectTmplSet>
 
-	<!-- ------------------------------------------------ -->
-	<!-- ------------------------------------------------ -->
+	<!-- ************************************************ -->
+	<!-- ************************************************ -->
 	<!-- 		Objects and Scene Creation                -->
-	<!-- ------------------------------------------------ -->
-	<!-- ------------------------------------------------ -->	
+	<!-- ************************************************ -->
+	<!-- ************************************************ -->	
 	<ObjectSet>
 
-		<!-- -------------- -->
+		<!-- ************** -->
 		<!-- CAMERA OBJECTS -->
-		<!-- -------------- -->
+		<!-- ************** -->
 	
 		<Object type="CameraDriver" id="cameraDriverTmp" priority="300">
 			<Param store_params="true"/>
@@ -257,9 +257,9 @@
 			<Param rot="0.0,-28.0,0.0"/>
 		</Object>
 
-		<!-- ------------- -->
+		<!-- ************* -->
 		<!-- WORLD OBJECTS -->
-		<!-- ------------- -->
+		<!-- ************* -->
 
 		<Object type="Instanceable" id="Smiley1" priority="100">
 			<Component type="Model">
@@ -607,9 +607,9 @@
 			</Component>
 		</Object>
 
-		<!-- ------------------- -->
+		<!-- ******************* -->
 		<!-- ENVIRONMENT OBJECTS -->
-		<!-- ------------------- -->
+		<!-- ******************* -->
 
 		<Object type="OpenSteerPlugIn" id="steerPlugInOneTurning1" priority="100">
 			<Param parent="render"/>
@@ -663,10 +663,23 @@
 			<Param is_steady="true"/>
 			<Component type="SteerPlugIn">
 				<Param type="soccer"/>
+				<!-- use first two points of pathway for soccer field dimensions -->
 				<Param pathway="385.634,463.934,-25.8791:496.655,586.035,-42.3251$1.0$false"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
-		</Object>				
+		</Object>		
+		
+		<Object type="OpenSteerPlugIn" id="steerPlugInCtf1" priority="100">
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param type="capture_the_flag"/>
+				<!-- use first point of pathway for gHomeBaseCenter -->
+				<Param pathway="284.704,247.331,12.9898:0.0,0.0,0.0$1.0$false"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+			</Component>
+		</Object>		
+				
 <!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
 			<Component type="Model">
@@ -996,9 +1009,9 @@
 		</Object>
 -->
 		
-		<!-- ----------------- -->
+		<!-- ***************** -->
 		<!-- MANDATORY OBJECTS -->
-		<!-- ----------------- -->
+		<!-- ***************** -->
 
 		<Object type="Render" id="render" priority="1000">
 			<Component type="NodePathWrapper">

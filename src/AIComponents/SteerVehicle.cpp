@@ -28,6 +28,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -119,9 +120,21 @@ bool SteerVehicle::initialize()
 				mVehicle = new Ball<SteerVehicle> :
 				mVehicle = new ExternalBall<SteerVehicle>;
 	}
+	else if (param == std::string("ctf_seeker"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new CtfSeeker<SteerVehicle> :
+				mVehicle = new ExternalCtfSeeker<SteerVehicle>;
+	}
+	else if (param == std::string("ctf_enemy"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new CtfEnemy<SteerVehicle> :
+				mVehicle = new ExternalCtfEnemy<SteerVehicle>;
+	}
 	else
 	{
-		//default: one_turning
+		///default: one_turning
 		not mExternalUpdate ?
 				mVehicle = new OneTurning<SteerVehicle> :
 				mVehicle = new ExternalOneTurning<SteerVehicle>;

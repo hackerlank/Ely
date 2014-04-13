@@ -29,6 +29,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Boids.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
@@ -44,6 +45,7 @@ INITIALIZATION steerPlugInPedestrian1_initialization;
 INITIALIZATION steerPlugInBoid1_initialization;
 INITIALIZATION steerPlugInMultiplePursuit1_initialization;
 INITIALIZATION steerPlugInSoccer1_initialization;
+INITIALIZATION steerPlugInCtf1_initialization;
 //common SteerVehicle initialization
 INITIALIZATION steerVehicleToBeCloned_init;
 
@@ -61,13 +63,20 @@ NodePath textNode;
 bool rocketInitialized = false;
 enum SteerPlugInType
 {
-	one_turning, pedestrians, boids, multiple_pursuit, soccer, none
+	one_turning,
+	pedestrians,
+	boids,
+	multiple_pursuit,
+	soccer,
+	capture_the_flag,
+	none
 } steerPlugInType = none;
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
 ObjectId wandererObjectId, newWanderedObjectId;
-bool wandererExternalUpdate = false;
+ObjectId seekerObjectId, newSeekerObjectId;
+bool wandererExternalUpdate = false, seekerExternalUpdate = false;
 enum SoccerActor
 {
 	player_teamA, player_teamB, ball
@@ -102,6 +111,40 @@ void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
 	}
 }
 
+//helper to create a selection list of objects
+inline void createObjectSelectionList(
+		Rocket::Controls::ElementFormControlSelect *objectsSelect,
+		ObjectId actualSelectedObject)
+{
+	//remove all options
+	objectsSelect->RemoveAll();
+	//set object list
+	std::list<SMARTPTR(Object)>::iterator objectIter;
+	std::list<SMARTPTR(Object)> createdObjects =
+	//to be safe with threads get a copy of created objects' list
+	ObjectTemplateManager::GetSingletonPtr()->getCreatedObjects();
+	//add an empty object
+	int selectedIdx = objectsSelect->Add("", "");
+	for (objectIter = createdObjects.begin();
+			objectIter != createdObjects.end(); ++objectIter)
+	{
+		//don't add steady or with no parent objects
+		if ((*objectIter)->isSteady()
+				or (*objectIter)->getNodePath().get_parent().is_empty())
+		{
+			continue;
+		}
+		//add options
+		ObjectId objectId = (*objectIter)->objectId();
+		int i = objectsSelect->Add(objectId.c_str(), objectId.c_str());
+		if (objectId == actualSelectedObject)
+		{
+			selectedIdx = i;
+		}
+	}
+	//set first option as selected
+	objectsSelect->SetSelection(selectedIdx);
+}
 //event handler added to the main one
 void rocketEventHandler(const Rocket::Core::String& value,
 		Rocket::Core::Event& event)
@@ -144,6 +187,10 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				break;
 			case soccer:
 				steerPlugInOptionsMenu->GetElementById("soccer")->SetAttribute(
+						"checked", true);
+				break;
+			case capture_the_flag:
+				steerPlugInOptionsMenu->GetElementById("capture_the_flag")->SetAttribute(
 						"checked", true);
 				break;
 			case none:
@@ -191,8 +238,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		if (options_body == NULL)
 			return;
 
-		Rocket::Core::Element* multiple_pursuit_options = options_body->GetElementById(
-				"multiple_pursuit_options");
+		Rocket::Core::Element* multiple_pursuit_options =
+				options_body->GetElementById("multiple_pursuit_options");
 		if (multiple_pursuit_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -209,45 +256,21 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//set elements' values from options' values
 				//wanderer object
 				Rocket::Controls::ElementFormControlSelect *objectsSelect =
-						dynamic_cast<Rocket::Controls::ElementFormControlSelect *>(steerPlugInOptionsMenu->GetElementById("wanderer_object"));
+						dynamic_cast<Rocket::Controls::ElementFormControlSelect *>(steerPlugInOptionsMenu->GetElementById(
+								"wanderer_object"));
 				if (objectsSelect)
 				{
-					//remove all options
-					objectsSelect->RemoveAll();
-					//set object list
-					std::list<SMARTPTR(Object)>::iterator objectIter;
-					std::list<SMARTPTR(Object)> createdObjects =
-					//to be safe with threads get a copy of created objects' list
-					ObjectTemplateManager::GetSingletonPtr()->getCreatedObjects();
-					//add an empty object
-					int selectedIdx = objectsSelect->Add("", "");
-					for (objectIter = createdObjects.begin();
-							objectIter != createdObjects.end(); ++objectIter)
-					{
-						//don't add steady or with no parent objects
-						if ((*objectIter)->isSteady()
-								or (*objectIter)->getNodePath().get_parent().is_empty())
-						{
-							continue;
-						}
-						//add options
-						ObjectId objectId = (*objectIter)->objectId();
-						int i = objectsSelect->Add(objectId.c_str(),
-								objectId.c_str());
-						if (objectId == wandererObjectId)
-						{
-							selectedIdx = i;
-						}
-					}
-					//set first option as selected
-					objectsSelect->SetSelection(selectedIdx);
+					//use the helper to create the selection list
+					createObjectSelectionList(objectsSelect, wandererObjectId);
 				}
 				//external update
 				wandererExternalUpdate ?
-					steerPlugInOptionsMenu->GetElementById("external_update_yes")->SetAttribute(
-							"checked", true):
-					steerPlugInOptionsMenu->GetElementById("external_update_no")->SetAttribute(
-							"checked", true);
+						steerPlugInOptionsMenu->GetElementById(
+								"external_update_wanderer_yes")->SetAttribute(
+								"checked", true) :
+						steerPlugInOptionsMenu->GetElementById(
+								"external_update_wanderer_no")->SetAttribute(
+								"checked", true);
 			}
 		}
 	}
@@ -297,6 +320,52 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			}
 		}
 	}
+	else if (value == "steerPlugIn::capture_the_flag::options")
+	{
+		// This event is sent from the "onchange" of the "capture_the_flag"
+		//radio button. It shows or hides the related options.
+		Rocket::Core::ElementDocument* options_body =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (options_body == NULL)
+			return;
+
+		Rocket::Core::Element* capture_the_flag_options =
+				options_body->GetElementById("capture_the_flag_options");
+		if (capture_the_flag_options)
+		{
+			//The "value" parameter of an "onchange" event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the "value"
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				capture_the_flag_options->SetProperty("display", "none");
+			}
+			else
+			{
+				capture_the_flag_options->SetProperty("display", "block");
+				//set elements' values from options' values
+				//seeker object
+				Rocket::Controls::ElementFormControlSelect *objectsSelect =
+						dynamic_cast<Rocket::Controls::ElementFormControlSelect *>(steerPlugInOptionsMenu->GetElementById(
+								"seeker_object"));
+				if (objectsSelect)
+				{
+					//use the helper to create the selection list
+					createObjectSelectionList(objectsSelect, seekerObjectId);
+				}
+				//external update
+				seekerExternalUpdate ?
+						steerPlugInOptionsMenu->GetElementById(
+								"external_update_seeker_yes")->SetAttribute(
+								"checked", true) :
+						steerPlugInOptionsMenu->GetElementById(
+								"external_update_seeker_no")->SetAttribute(
+								"checked", true);
+			}
+		}
+	}
+	///Submit
 	else if (value == "steerPlugIn::form::submit_options")
 	{
 		Rocket::Core::String paramValue;
@@ -334,21 +403,22 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//set options' values from elements' values
 				//new wanderer object
 				newWanderedObjectId = event.GetParameter<Rocket::Core::String>(
-							"wanderer_object", "").CString();
+						"wanderer_object", "").CString();
 				//external update
-				paramValue = event.GetParameter<Rocket::Core::String>("external_update",
-									"");
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"external_update_wanderer", "");
 				paramValue == "yes" ?
-					wandererExternalUpdate = true:
-					//paramValue == "no"
-					wandererExternalUpdate = false;
+						wandererExternalUpdate = true :
+						//paramValue == "no"
+						wandererExternalUpdate = false;
 			}
 			else if (paramValue == "soccer")
 			{
 				steerPlugInType = soccer;
 				//set options' values from elements' values
 				//external update
-				paramValue = event.GetParameter<Rocket::Core::String>("player_ball", "");
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"player_ball", "");
 				if (paramValue == "player_teamA")
 				{
 					soccerActorSelected = player_teamA;
@@ -362,6 +432,20 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					//default: ball
 					soccerActorSelected = ball;
 				}
+			}
+			else if (paramValue == "capture_the_flag")
+			{
+				steerPlugInType = capture_the_flag;
+				//set options' values from elements' values
+				//new seeker object
+				newSeekerObjectId = event.GetParameter<Rocket::Core::String>(
+						"seeker_object", "").CString();
+				//external update
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"external_update_seeker", "");
+				paramValue == "yes" ? seekerExternalUpdate = true :
+				//paramValue == "no"
+						seekerExternalUpdate = false;
 			}
 			else
 			{
@@ -482,7 +566,8 @@ void add_vehicle(const Event* event)
 	{
 		//set SteerVehicle type, mov_type
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type", "multiple_pursuit_pursuer"));
+				std::pair<std::string, std::string>("type",
+						"multiple_pursuit_pursuer"));
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("mov_type", "kinematic"));
 	}
@@ -533,7 +618,7 @@ void add_vehicle(const Event* event)
 					steerPlugInObjectId));
 
 	//create actually the clone and...
-	SMARTPTR(Object) clone = ObjectTemplateManager::GetSingletonPtr()->createObject(
+	SMARTPTR(Object)clone = ObjectTemplateManager::GetSingletonPtr()->createObject(
 			toBeClonedObject->objectTmpl()->objectType(), ObjectId(), objParams,
 			compParams, false);
 	//...initialize it
@@ -565,7 +650,7 @@ void remove_vehicle(const Event* event)
 			if(openSteerPlugInName == "One Turning Away")
 			{
 				if(not (dynamic_cast<OneTurning<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalOneTurning<SteerVehicle>*>(vehicle)))
+								dynamic_cast<ExternalOneTurning<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -573,7 +658,7 @@ void remove_vehicle(const Event* event)
 			else if (openSteerPlugInName == "Pedestrians")
 			{
 				if(not(dynamic_cast<Pedestrian<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalPedestrian<SteerVehicle>*>(vehicle)))
+								dynamic_cast<ExternalPedestrian<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -581,7 +666,7 @@ void remove_vehicle(const Event* event)
 			else if (openSteerPlugInName == "Boids")
 			{
 				if(not (dynamic_cast<Boid<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalBoid<SteerVehicle>*>(vehicle)))
+								dynamic_cast<ExternalBoid<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -589,9 +674,9 @@ void remove_vehicle(const Event* event)
 			else if (openSteerPlugInName == "Multiple Pursuit")
 			{
 				if(not (dynamic_cast<MpPursuer<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalMpPursuer<SteerVehicle>*>(vehicle) or
-						dynamic_cast<MpWanderer<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalMpWanderer<SteerVehicle>*>(vehicle)))
+								dynamic_cast<ExternalMpPursuer<SteerVehicle>*>(vehicle) or
+								dynamic_cast<MpWanderer<SteerVehicle>*>(vehicle) or
+								dynamic_cast<ExternalMpWanderer<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -599,9 +684,9 @@ void remove_vehicle(const Event* event)
 			else if (openSteerPlugInName == "Michael's Simple Soccer")
 			{
 				if(not (dynamic_cast<Ball<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalBall<SteerVehicle>*>(vehicle) or
-						dynamic_cast<Player<SteerVehicle>*>(vehicle) or
-						dynamic_cast<ExternalPlayer<SteerVehicle>*>(vehicle)))
+								dynamic_cast<ExternalBall<SteerVehicle>*>(vehicle) or
+								dynamic_cast<Player<SteerVehicle>*>(vehicle) or
+								dynamic_cast<ExternalPlayer<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -781,7 +866,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	rocketInitOnce();
 	//custom setup
 	gRocketEventHandlers["steerPlugIn::multiple_pursuit::options"] =
-			&rocketEventHandler;
+	&rocketEventHandler;
 	gRocketCommitFunctions.push_back(&rocketMultiplePursuitCommit);
 }
 
@@ -793,10 +878,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 
 	//set soccer field
 	MicTestPlugIn<SteerVehicle>* micTestplugIn =
-			dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
-					getAbstractPlugIn());
+	dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
+	getAbstractPlugIn());
 	OpenSteer::SegmentedPathway* pathWay =
-			dynamic_cast<OpenSteer::SegmentedPathway*>(micTestplugIn->getPathway());
+	dynamic_cast<OpenSteer::SegmentedPathway*>(micTestplugIn->getPathway());
 	if (pathWay->pointCount() >= 2)
 	{
 		micTestplugIn->setSoccerField(pathWay->point(0), pathWay->point(1));
@@ -809,6 +894,30 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["steerPlugIn::soccer::options"] = &rocketEventHandler;
 }
 
+///steerPlugInCtf1
+void steerPlugInCtf1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
+
+	//set soccer field
+//	MicTestPlugIn<SteerVehicle>* micTestplugIn =
+//			dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
+//					getAbstractPlugIn());
+//	OpenSteer::SegmentedPathway* pathWay =
+//			dynamic_cast<OpenSteer::SegmentedPathway*>(micTestplugIn->getPathway());
+//	if (pathWay->pointCount() >= 2)
+//	{
+//		micTestplugIn->setSoccerField(pathWay->point(0), pathWay->point(1));
+//	}
+
+	///init libRocket
+	steerPlugIns[capture_the_flag] = DCAST(SteerPlugIn, aiComp);
+	rocketInitOnce();
+	//custom setup
+	gRocketEventHandlers["steerPlugIn::capture_the_flag::options"] = &rocketEventHandler;
+}
+
 ///steerVehicleToBeCloned_init
 void steerVehicleToBeCloned_init(SMARTPTR(Object)object, const ParameterTable&paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
@@ -817,15 +926,15 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 
 	//check if it is a soccer player
 	Player<SteerVehicle>* player =
-			dynamic_cast<Player<SteerVehicle>*>(&DCAST(SteerVehicle, aiComp)->
-					getAbstractVehicle());
+	dynamic_cast<Player<SteerVehicle>*>(&DCAST(SteerVehicle, aiComp)->
+	getAbstractVehicle());
 	if (player)
 	{
 		MicTestPlugIn<SteerVehicle>* micTestplugIn =
-				dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerVehicle, aiComp)->
-						getSteerPlugIn()->getAbstractPlugIn());
+		dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerVehicle, aiComp)->
+		getSteerPlugIn()->getAbstractPlugIn());
 		micTestplugIn->addPlayerToTeam(player,
-				soccerActorSelected == player_teamA ? true: false);
+		soccerActorSelected == player_teamA ? true: false);
 	}
 }
 

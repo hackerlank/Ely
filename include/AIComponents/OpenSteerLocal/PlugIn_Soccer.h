@@ -658,10 +658,10 @@ public:
 			{
 				if (*iter == playerTmp)
 				{
+					m_AllPlayers.erase(iter);
 					break;
 				}
 			}
-			m_AllPlayers.erase(iter);
 
 			//remove it also from its team, if already added
 			removePlayerFromTeam(playerTmp);
