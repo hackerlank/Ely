@@ -74,9 +74,11 @@ enum SteerPlugInType
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
-ObjectId wandererObjectId, newWanderedObjectId;
-ObjectId seekerObjectId, newSeekerObjectId;
-bool wandererExternalUpdate = false, seekerExternalUpdate = false;
+ObjectId mpWandererObjectId, mpNewWanderedObjectId;
+ObjectId cftSeekerObjectId, ctfNewSeekerObjectId;
+float ctfHomeBaseRadius, ctfMinStartRadius, ctfMaxStartRadius,
+		ctfBrakingRate, ctfAvoidancePredictTimeMin, ctfAvoidancePredictTimeMax;
+bool mpWandererExternalUpdate = false, ctfSeekerExternalUpdate = false;
 enum SoccerActor
 {
 	player_teamA, player_teamB, ball
@@ -111,7 +113,8 @@ void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
 	}
 }
 
-//helper to create a selection list of objects
+//helpers
+//to create a selection list of objects
 inline void createObjectSelectionList(
 		Rocket::Controls::ElementFormControlSelect *objectsSelect,
 		ObjectId actualSelectedObject)
@@ -145,6 +148,17 @@ inline void createObjectSelectionList(
 	//set first option as selected
 	objectsSelect->SetSelection(selectedIdx);
 }
+
+inline void setElementValue(const std::string& param, float value)
+{
+	Rocket::Core::Element *inputElem =
+			steerPlugInOptionsMenu->GetElementById(param.c_str());
+	if (inputElem)
+	{
+		inputElem->SetAttribute<float>("value", value);
+	}
+}
+
 //event handler added to the main one
 void rocketEventHandler(const Rocket::Core::String& value,
 		Rocket::Core::Event& event)
@@ -261,10 +275,10 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				if (objectsSelect)
 				{
 					//use the helper to create the selection list
-					createObjectSelectionList(objectsSelect, wandererObjectId);
+					createObjectSelectionList(objectsSelect, mpWandererObjectId);
 				}
 				//external update
-				wandererExternalUpdate ?
+				mpWandererExternalUpdate ?
 						steerPlugInOptionsMenu->GetElementById(
 								"external_update_wanderer_yes")->SetAttribute(
 								"checked", true) :
@@ -352,17 +366,94 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				if (objectsSelect)
 				{
 					//use the helper to create the selection list
-					createObjectSelectionList(objectsSelect, seekerObjectId);
+					createObjectSelectionList(objectsSelect, cftSeekerObjectId);
 				}
 				//external update
-				seekerExternalUpdate ?
+				ctfSeekerExternalUpdate ?
 						steerPlugInOptionsMenu->GetElementById(
 								"external_update_seeker_yes")->SetAttribute(
 								"checked", true) :
 						steerPlugInOptionsMenu->GetElementById(
 								"external_update_seeker_no")->SetAttribute(
 								"checked", true);
+				//other options
+				//home base radius
+				setElementValue("home_base_radius", ctfHomeBaseRadius);
+				//min start radius
+				setElementValue("min_start_radius", ctfMinStartRadius);
+				//max start radius
+				setElementValue("max_start_radius", ctfMaxStartRadius);
+				//braking rate
+				setElementValue("braking_rate", ctfBrakingRate);
+				//avoidance predict time_min
+				setElementValue("avoidance_predict_time_min", ctfAvoidancePredictTimeMin);
+				//avoidance predict time_max
+				setElementValue("avoidance_predict_time_max", ctfAvoidancePredictTimeMax);
 			}
+		}
+	}
+	else if (value == "min_start_radius::change")
+	{
+		float max =
+				steerPlugInOptionsMenu->GetElementById("min_start_radius")->GetAttribute<
+						float>("max", 0.0);
+		float step =
+				steerPlugInOptionsMenu->GetElementById("min_start_radius")->GetAttribute<
+						float>("step", 0.0);
+		ctfMinStartRadius = max * event.GetParameter<float>("value", 0.0);
+		//check
+		if (ctfMinStartRadius > ctfMaxStartRadius)
+		{
+			ctfMaxStartRadius = ctfMinStartRadius + step;
+			setElementValue("max_start_radius", ctfMaxStartRadius);
+		}
+	}
+	else if (value == "max_start_radius::change")
+	{
+		float max =
+				steerPlugInOptionsMenu->GetElementById("max_start_radius")->GetAttribute<
+						float>("max", 0.0);
+		float step =
+				steerPlugInOptionsMenu->GetElementById("max_start_radius")->GetAttribute<
+						float>("step", 0.0);
+		ctfMaxStartRadius = max * event.GetParameter<float>("value", 0.0);
+		//check
+		if (ctfMaxStartRadius < ctfMinStartRadius)
+		{
+			ctfMinStartRadius = ctfMaxStartRadius - step;
+			setElementValue("min_start_radius", ctfMinStartRadius);
+		}
+	}
+	else if (value == "avoidance_predict_time_min::change")
+	{
+		float max = steerPlugInOptionsMenu->GetElementById(
+				"avoidance_predict_time_min")->GetAttribute<float>("max", 0.0);
+		float step = steerPlugInOptionsMenu->GetElementById(
+				"avoidance_predict_time_min")->GetAttribute<float>("step", 0.0);
+		ctfAvoidancePredictTimeMin = max
+				* event.GetParameter<float>("value", 0.0);
+		//check
+		if (ctfAvoidancePredictTimeMin > ctfAvoidancePredictTimeMax)
+		{
+			ctfAvoidancePredictTimeMax = ctfAvoidancePredictTimeMin + step;
+			setElementValue("avoidance_predict_time_max",
+					ctfAvoidancePredictTimeMax);
+		}
+	}
+	else if (value == "avoidance_predict_time_max::change")
+	{
+		float max = steerPlugInOptionsMenu->GetElementById(
+				"avoidance_predict_time_max")->GetAttribute<float>("max", 0.0);
+		float step = steerPlugInOptionsMenu->GetElementById(
+				"avoidance_predict_time_max")->GetAttribute<float>("step", 0.0);
+		ctfAvoidancePredictTimeMax = max
+				* event.GetParameter<float>("value", 0.0);
+		//check
+		if (ctfAvoidancePredictTimeMax < ctfAvoidancePredictTimeMin)
+		{
+			ctfAvoidancePredictTimeMin = ctfAvoidancePredictTimeMax - step;
+			setElementValue("avoidance_predict_time_min",
+					ctfAvoidancePredictTimeMin);
 		}
 	}
 	///Submit
@@ -402,15 +493,15 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				steerPlugInType = multiple_pursuit;
 				//set options' values from elements' values
 				//new wanderer object
-				newWanderedObjectId = event.GetParameter<Rocket::Core::String>(
+				mpNewWanderedObjectId = event.GetParameter<Rocket::Core::String>(
 						"wanderer_object", "").CString();
 				//external update
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"external_update_wanderer", "");
 				paramValue == "yes" ?
-						wandererExternalUpdate = true :
+						mpWandererExternalUpdate = true :
 						//paramValue == "no"
-						wandererExternalUpdate = false;
+						mpWandererExternalUpdate = false;
 			}
 			else if (paramValue == "soccer")
 			{
@@ -438,14 +529,33 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				steerPlugInType = capture_the_flag;
 				//set options' values from elements' values
 				//new seeker object
-				newSeekerObjectId = event.GetParameter<Rocket::Core::String>(
+				ctfNewSeekerObjectId = event.GetParameter<Rocket::Core::String>(
 						"seeker_object", "").CString();
 				//external update
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"external_update_seeker", "");
-				paramValue == "yes" ? seekerExternalUpdate = true :
-				//paramValue == "no"
-						seekerExternalUpdate = false;
+				paramValue == "yes" ?
+						ctfSeekerExternalUpdate = true :
+						//paramValue == "no"
+						ctfSeekerExternalUpdate = false;
+				//other options
+				//home base radius
+				ctfHomeBaseRadius = event.GetParameter<float>(
+						"home_base_radius", 0.0);
+				//min start radius
+				ctfMinStartRadius = event.GetParameter<float>(
+						"min_start_radius", 0.0);
+				//max start radius
+				ctfMaxStartRadius = event.GetParameter<float>(
+						"max_start_radius", 0.0);
+				//braking rate
+				ctfBrakingRate = event.GetParameter<float>("braking_rate", 0.0);
+				//avoidance predict time_min
+				ctfAvoidancePredictTimeMin = event.GetParameter<float>(
+						"avoidance_predict_time_min", 0.0);
+				//avoidance predict time_max
+				ctfAvoidancePredictTimeMax = event.GetParameter<float>(
+						"avoidance_predict_time_max", 0.0);
 			}
 			else
 			{
@@ -611,6 +721,10 @@ void add_vehicle(const Event* event)
 								(soccerActorSelected == player_teamA ?
 										"0.5" : "0.5"))));
 	}
+	else if (openSteerPlugInName == "Capture the Flag")
+	{
+		///TODO add ctf stuff
+	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(
@@ -691,6 +805,10 @@ void remove_vehicle(const Event* event)
 					return;
 				}
 			}
+			else if (openSteerPlugInName == "Capture the Flag")
+			{
+				///TODO add ctf stuff
+			}
 			else
 			{
 				return;
@@ -727,6 +845,8 @@ void rocketCommit()
 			&remove_vehicle);
 }
 
+///TODO add ctf stuff - extract common code and pack into a function
+///for ctf: update options (with gAvoidancePredictTime included)
 //commit function for Multiple Pursuit
 void rocketMultiplePursuitCommit()
 {
@@ -736,11 +856,11 @@ void rocketMultiplePursuitCommit()
 	//get SteerPlugIn ObjectId
 	std::string steerPlugInObjectId = steerPlugIn->getOwnerObject()->objectId();
 
-	RETURN_ON_COND(wandererObjectId == newWanderedObjectId,)
+	RETURN_ON_COND(mpWandererObjectId == mpNewWanderedObjectId,)
 
 	//remove SteerVehicle component from wandererObject
 	ObjectTemplateManager::GetSingletonPtr()->removeComponentFromObject(
-			wandererObjectId, ComponentType("SteerVehicle"));
+			mpWandererObjectId, ComponentType("SteerVehicle"));
 
 	//get object to be cloned
 	SMARTPTR(Object)toBeClonedObject =
@@ -753,7 +873,7 @@ void rocketMultiplePursuitCommit()
 	compParams["SteerVehicle"].insert(
 			std::pair<std::string, std::string>("type",
 					"multiple_pursuit_wanderer"));
-	if (wandererExternalUpdate)
+	if (mpWandererExternalUpdate)
 	{
 		//replace the AI component with a externally updated wanderer
 		//set SteerVehicle external_update
@@ -776,10 +896,10 @@ void rocketMultiplePursuitCommit()
 					steerPlugInObjectId));
 	//add the SteerVehicle component
 	ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
-			newWanderedObjectId, ComponentType("SteerVehicle"),
+			mpNewWanderedObjectId, ComponentType("SteerVehicle"),
 			compParams["SteerVehicle"]);
 	//change wanderer object
-	wandererObjectId = newWanderedObjectId;
+	mpWandererObjectId = mpNewWanderedObjectId;
 }
 
 //called by all steer plugins, executed only once
@@ -900,22 +1020,35 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
 	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
 
-	//set soccer field
-//	MicTestPlugIn<SteerVehicle>* micTestplugIn =
-//			dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
-//					getAbstractPlugIn());
-//	OpenSteer::SegmentedPathway* pathWay =
-//			dynamic_cast<OpenSteer::SegmentedPathway*>(micTestplugIn->getPathway());
-//	if (pathWay->pointCount() >= 2)
-//	{
-//		micTestplugIn->setSoccerField(pathWay->point(0), pathWay->point(1));
-//	}
+	//set home base center
+	CtfPlugIn<SteerVehicle>* ctfPlugIn =
+	dynamic_cast<CtfPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
+	getAbstractPlugIn());
+	OpenSteer::SegmentedPathway* pathWay =
+	dynamic_cast<OpenSteer::SegmentedPathway*>(ctfPlugIn->getPathway());
+	if (pathWay->pointCount() >= 1)
+	{
+		ctfPlugIn->m_CtfPlugInData.gHomeBaseCenter = pathWay->point(0);
+	}
+	//get default options
+	ctfHomeBaseRadius = ctfPlugIn->m_CtfPlugInData.gHomeBaseRadius;//1.5
+	ctfMinStartRadius = ctfPlugIn->m_CtfPlugInData.gMinStartRadius;//30.0
+	ctfMaxStartRadius = ctfPlugIn->m_CtfPlugInData.gMaxStartRadius;//40.0
+	ctfBrakingRate = ctfPlugIn->m_CtfPlugInData.gBrakingRate;//0.75
+	ctfAvoidancePredictTimeMin =
+			ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMin;//0.9
+	ctfAvoidancePredictTimeMax =
+			ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMax;//2.0
 
 	///init libRocket
 	steerPlugIns[capture_the_flag] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
 	gRocketEventHandlers["steerPlugIn::capture_the_flag::options"] = &rocketEventHandler;
+	gRocketEventHandlers["min_start_radius::change"] = &rocketEventHandler;
+	gRocketEventHandlers["max_start_radius::change"] = &rocketEventHandler;
+	gRocketEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
+	gRocketEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
 }
 
 ///steerVehicleToBeCloned_init

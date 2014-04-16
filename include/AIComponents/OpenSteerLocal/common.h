@@ -475,6 +475,6 @@ protected:
 //common typedef
 typedef PlugInAddOnMixin<OpenSteer::PlugIn> PlugIn;
 
-}
+} // namespace ely
 
 #endif /* OPENSTEERLOCALCOMMON_H_ */
