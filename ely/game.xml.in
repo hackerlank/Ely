@@ -679,6 +679,15 @@
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
 		</Object>		
+
+		<Object type="OpenSteerPlugIn" id="steerPlugInLST1" priority="100">
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param type="low_speed_turn"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+			</Component>
+		</Object>		
 				
 <!--
 		<Object type="RecastNavMesh" id="course2" priority="80">

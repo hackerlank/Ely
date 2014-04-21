@@ -30,6 +30,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
@@ -46,6 +47,7 @@ INITIALIZATION steerPlugInBoid1_initialization;
 INITIALIZATION steerPlugInMultiplePursuit1_initialization;
 INITIALIZATION steerPlugInSoccer1_initialization;
 INITIALIZATION steerPlugInCtf1_initialization;
+INITIALIZATION steerPlugInLST1_initialization;
 //common SteerVehicle initialization
 INITIALIZATION steerVehicleToBeCloned_init;
 
@@ -69,6 +71,7 @@ enum SteerPlugInType
 	multiple_pursuit,
 	soccer,
 	capture_the_flag,
+	low_speed_turn,
 	none
 } activeSteerPlugInType = none;
 ///XXX
@@ -80,6 +83,7 @@ const char* steerPlugInNames[] =
 	"multiple_pursuit",
 	"soccer",
 	"capture_the_flag",
+	"low_speed_turn",
 	"none"
 };
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
@@ -90,6 +94,7 @@ ObjectId ctfSeekerObjectId, ctfNewSeekerObjectId;
 float ctfHomeBaseRadius, ctfMinStartRadius, ctfMaxStartRadius,
 		ctfBrakingRate, ctfAvoidancePredictTimeMin, ctfAvoidancePredictTimeMax;
 bool mpWandererExternalUpdate = false, ctfSeekerExternalUpdate = false;
+float lstSteeringSpeed;
 enum SoccerActor
 {
 	player_teamA, player_teamB, ball
@@ -453,6 +458,36 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					ctfAvoidancePredictTimeMin);
 		}
 	}
+	else if (value == "steerPlugIn::low_speed_turn::options")
+	{
+		// This event is sent from the "onchange" of the "low_speed_turn"
+		//radio button. It shows or hides the related options.
+		Rocket::Core::ElementDocument* options_body =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (options_body == NULL)
+			return;
+
+		Rocket::Core::Element* low_speed_turn_options =
+				options_body->GetElementById("low_speed_turn_options");
+		if (low_speed_turn_options)
+		{
+			//The "value" parameter of an "onchange" event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the "value"
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				low_speed_turn_options->SetProperty("display", "none");
+			}
+			else
+			{
+				low_speed_turn_options->SetProperty("display", "block");
+				//set elements' values from options' values
+				//steering speed
+				setElementValue("steering_speed", lstSteeringSpeed);
+			}
+		}
+	}
 	///Submit
 	else if (value == "steerPlugIn::form::submit_options")
 	{
@@ -553,6 +588,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//avoidance predict time_max
 				ctfAvoidancePredictTimeMax = event.GetParameter<float>(
 						"avoidance_predict_time_max", 0.0);
+			}
+			else if (paramValue == steerPlugInNames[low_speed_turn])
+			{
+				activeSteerPlugInType = low_speed_turn;
+				//other options
+				//home base radius
+				lstSteeringSpeed = event.GetParameter<float>(
+						"steering_speed", 0.0);
 			}
 			else
 			{
@@ -730,6 +773,15 @@ void add_vehicle(const Event* event)
 				std::pair<std::string, std::string>("thrown_events",
 						"avoid_obstacle@@3:avoid_close_neighbor@@"));
 	}
+	else if (openSteerPlugInName == "Low Speed Turn")
+	{
+		//set SteerVehicle type, mov_type
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("type",
+						"low_speed_turn"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("mov_type", "kinematic"));
+	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(
@@ -816,6 +868,14 @@ void remove_vehicle(const Event* event)
 								dynamic_cast<ExternalCtfEnemy<SteerVehicle>*>(vehicle) or
 								dynamic_cast<CtfSeeker<SteerVehicle>*>(vehicle) or
 								dynamic_cast<ExternalCtfSeeker<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
+			else if (openSteerPlugInName == "Low Speed Turn")
+			{
+				if(not(dynamic_cast<LowSpeedTurn<SteerVehicle>*>(vehicle) or
+								dynamic_cast<ExternalLowSpeedTurn<SteerVehicle>*>(vehicle)))
 				{
 					return;
 				}
@@ -942,6 +1002,19 @@ void rocketCaptureTheFlagCommit()
 			ctfAvoidancePredictTimeMax;
 	ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTime =
 			ctfAvoidancePredictTimeMin;
+}
+
+//commit function for Low Speed Turn
+void rocketLowSpeedTurnCommit()
+{
+	//update plugin options
+	RETURN_ON_COND(activeSteerPlugInType != low_speed_turn,)
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
+	//set home base center
+	LowSpeedTurnPlugIn<SteerVehicle>* lstPlugIn =
+			dynamic_cast<LowSpeedTurnPlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
+	//set options
+	lstPlugIn->steeringSpeed = lstSteeringSpeed;
 }
 
 //called by all steer plugins, executed only once
@@ -1092,6 +1165,26 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
 	gRocketEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
 	gRocketCommitFunctions.push_back(&rocketCaptureTheFlagCommit);
+}
+
+///steerPlugInLST1_initialization
+void steerPlugInLST1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
+	//set home base center
+	LowSpeedTurnPlugIn<SteerVehicle>* lstPlugIn =
+	dynamic_cast<LowSpeedTurnPlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
+	getAbstractPlugIn());
+	//get default options
+	lstSteeringSpeed = lstPlugIn->steeringSpeed;//1.0
+
+	///init libRocket
+	steerPlugIns[low_speed_turn] = DCAST(SteerPlugIn, aiComp);
+	rocketInitOnce();
+	//custom setup
+	gRocketEventHandlers["steerPlugIn::low_speed_turn::options"] = &rocketEventHandler;
+	gRocketCommitFunctions.push_back(&rocketLowSpeedTurnCommit);
 }
 
 ///steerVehicleToBeCloned_init

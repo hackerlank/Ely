@@ -29,6 +29,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_MultiplePursuit.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -131,6 +132,12 @@ bool SteerVehicle::initialize()
 		not mExternalUpdate ?
 				mVehicle = new CtfEnemy<SteerVehicle> :
 				mVehicle = new ExternalCtfEnemy<SteerVehicle>;
+	}
+	else if (param == std::string("low_speed_turn"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new LowSpeedTurn<SteerVehicle> :
+				mVehicle = new ExternalLowSpeedTurn<SteerVehicle>;
 	}
 	else
 	{

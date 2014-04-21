@@ -22,7 +22,8 @@ opensteer_headers = \
 		AIComponents/OpenSteerLocal/PlugIn_OneTurning.h \
 		AIComponents/OpenSteerLocal/PlugIn_Pedestrian.h \
 		AIComponents/OpenSteerLocal/PlugIn_Soccer.h \
-		AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h
+		AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h \
+		AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h
 		
 noinst_HEADERS = \
 		AIComponents/CrowdAgent.h \
