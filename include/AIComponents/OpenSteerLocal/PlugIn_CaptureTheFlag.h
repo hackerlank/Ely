@@ -103,7 +103,6 @@ struct CtfPlugInData
 	Color evadeColor; //Color(0.6f, 0.6f, 0.3f)
 	Color seekColor; //Color(0.3f, 0.6f, 0.6f)
 	Color clearPathColor; //Color(0.3f, 0.6f, 0.3f)
-	ObstacleGroup* allObstacles;
 };
 
 // ----------------------------------------------------------------------------
@@ -123,6 +122,7 @@ public:
 	{
 		reset();
 		gCtfPlugInData = NULL;
+		allObstacles = NULL;
 	}
 
 	// reset state
@@ -166,6 +166,10 @@ public:
 		this->annotationLine(FL, BL, white);
 		this->annotationLine(BL, BR, white);
 		this->annotationLine(BR, FR, white);
+
+		///call parent::annotateAvoidObstacle
+		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidObstacle(
+				minDistanceToCollision);
 	}
 
 ///	void drawHomeBase(void);
@@ -174,9 +178,9 @@ public:
 	{
 ///		// randomize position on a ring between inner and outer radii
 ///		// centered around the home base
-///		const float rRadius = frandom2(m_CtfPlugInData->gMinStartRadius, m_CtfPlugInData->gMaxStartRadius);
+///		const float rRadius = frandom2(gCtfPlugInData->gMinStartRadius, m_CtfPlugInData->gMaxStartRadius);
 ///		const Vec3 randomOnRing = RandomUnitVectorOnXZPlane() * rRadius;
-///		this->setPosition(m_CtfPlugInData->gHomeBaseCenter + randomOnRing);
+///		this->setPosition(gCtfPlugInData->gHomeBaseCenter + randomOnRing);
 ///		// are we are too close to an obstacle?
 ///		if (minDistanceToObstacle(this->position()) < this->radius() * 5)
 ///		{
@@ -203,7 +207,7 @@ public:
 	bool avoiding;
 
 	CtfPlugInData* gCtfPlugInData;
-
+	ObstacleGroup* allObstacles;
 };
 
 //enemy declarations
@@ -269,7 +273,7 @@ public:
 		adjustObstacleAvoidanceLookAhead(clearPath);
 		const Vec3 obstacleAvoidance = this->steerToAvoidObstacles(
 				this->gCtfPlugInData->gAvoidancePredictTime,
-				*(this->gCtfPlugInData->allObstacles));
+				*(this->allObstacles));
 
 		// saved for annotation
 		this->avoiding = (obstacleAvoidance != Vec3::zero);
@@ -402,7 +406,7 @@ public:
 		std::ostringstream status;
 		status << seekerStateString << std::endl;
 ///		status << obstacleCount << " obstacles [F1/F2]" << std::endl;
-		status << this->m_CtfPlugInData->resetCount << " restarts" << std::ends;
+		status << this->gCtfPlugInData->resetCount << " restarts" << std::ends;
 ///	//	const float h = drawGetWindowHeight();
 ///	//	const Vec3 screenLocation(10, h - 50, 0);
 		const Vec3 screenLocation(-1.0, 0.9, 0);
@@ -476,6 +480,9 @@ class ExternalCtfSeeker: public CtfSeeker<Entity>
 public:
 	void update(const float currentTime, const float elapsedTime)
 	{
+		// do behavioral state transitions, as needed
+		this->updateState(currentTime);
+
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
@@ -531,7 +538,7 @@ public:
 		{
 			const Vec3 avoidance = this->steerToAvoidObstacles(
 					this->gCtfPlugInData->gAvoidancePredictTimeMin,
-					*(this->gCtfPlugInData->allObstacles));
+					*(this->allObstacles));
 
 			// saved for annotation
 			this->avoiding = (avoidance == Vec3::zero);
@@ -818,7 +825,6 @@ public:
 		m_CtfPlugInData.evadeColor = Color(0.6f, 0.6f, 0.3f); // annotation
 		m_CtfPlugInData.seekColor = Color(0.3f, 0.6f, 0.6f); // annotation
 		m_CtfPlugInData.clearPathColor = Color(0.3f, 0.6f, 0.3f); // annotation
-		m_CtfPlugInData.allObstacles = this->obstacles;
 
 ///		// create the seeker ("hero"/"attacker")
 ///		ctfSeeker = new CtfSeeker;
@@ -897,7 +903,6 @@ public:
 		{
 			(*iter)->reset();
 		}
-
 	}
 
 ///	void handleFunctionKeys(int keyNumber)
@@ -941,8 +946,9 @@ public:
 				// randomize 2D heading
 				ctfSeekerTmp->randomizeStartingPositionAndHeading();
 			}
-			// set seeker plugin data
+			// set seeker plugin data & obstacles
 			ctfSeekerTmp->gCtfPlugInData = &m_CtfPlugInData;
+			ctfSeekerTmp->allObstacles = obstacles;
 			// set seeker enemies
 			ctfSeekerTmp->gCtfEnemies = &ctfEnemies;
 			// set the plugin's seeker: the last added one
@@ -963,8 +969,9 @@ public:
 				// randomize only 2D heading
 				ctfEnemyTmp->randomizeStartingPositionAndHeading();
 			}
-			// set enemy plugin data
+			// set enemy plugin data & obstacles
 			ctfEnemyTmp->gCtfPlugInData = &m_CtfPlugInData;
+			ctfEnemyTmp->allObstacles = obstacles;
 			// set the enemy's seeker
 			ctfEnemyTmp->gSeeker = ctfSeeker;
 			// add enemy to enemy repo
@@ -1040,7 +1047,15 @@ public:
 		const Vec3 up(0, 0.01f, 0);
 		const Color atColor(0.3f, 0.3f, 0.5f);
 		const Color noColor = gGray50;
-		const bool reached = ctfSeeker->state == CtfSeeker<Entity>::atGoal;
+		bool reached;
+		if(ctfSeeker)
+		{
+			reached = ctfSeeker->state == CtfSeeker<Entity>::atGoal;
+		}
+		else
+		{
+			reached = false;
+		}
 		const Color baseColor = (reached ? atColor : noColor);
 		drawXZDisk(m_CtfPlugInData.gHomeBaseRadius, m_CtfPlugInData.gHomeBaseCenter, baseColor, 40);
 		drawXZDisk(m_CtfPlugInData.gHomeBaseRadius / 15, m_CtfPlugInData.gHomeBaseCenter + up, gBlack, 20);

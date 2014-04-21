@@ -200,7 +200,7 @@ public:
 		reset();
 	}
 
-	void reset()
+	virtual void reset()
 	{
 		Super::setMass(m_settings.m_mass);
 		Super::setRadius(m_settings.m_radius);
@@ -212,6 +212,10 @@ public:
 		Super::setUp(m_settings.m_up);
 		Super::setPosition(m_settings.m_position);
 		m_start = Super::position();
+	}
+
+	virtual void draw()
+	{
 	}
 
 	OpenSteer::Vec3 getStart()
@@ -351,7 +355,8 @@ class PlugInAddOnMixin: public Super
 public:
 
 	PlugInAddOnMixin() :
-			selectedVehicle(NULL), m_pathway(NULL)
+			obstacles(NULL), localObstacles(NULL), selectedVehicle(NULL), m_pathway(
+			NULL)
 	{
 	}
 

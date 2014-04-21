@@ -356,8 +356,11 @@ template<typename Entity>
 class ExternalBoid: public Boid<Entity>
 {
 public:
+
 	void update(const float currentTime, const float elapsedTime)
 	{
+		OPENSTEER_UNUSED_PARAMETER(currentTime);
+
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 

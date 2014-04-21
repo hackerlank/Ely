@@ -165,7 +165,7 @@ public:
 		this->recordTrailVertex(currentTime, this->position());
 	}
 
-	void kick(Vec3 dir, const float elapsedTime)
+	virtual void kick(Vec3 dir, const float elapsedTime)
 	{
 		OPENSTEER_UNUSED_PARAMETER(elapsedTime);
 

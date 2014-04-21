@@ -108,6 +108,9 @@ public:
 	{
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
+
+		this->annotationVelocityAcceleration();
+		this->recordTrailVertex(currentTime, this->position());
 	}
 };
 

@@ -96,13 +96,13 @@ bool SteerVehicle::initialize()
 				mVehicle = new Boid<SteerVehicle> :
 				mVehicle = new ExternalBoid<SteerVehicle>;
 	}
-	else if (param == std::string("multiple_pursuit_wanderer"))
+	else if (param == std::string("mp_wanderer"))
 	{
 		not mExternalUpdate ?
 				mVehicle = new MpWanderer<SteerVehicle> :
 				mVehicle = new ExternalMpWanderer<SteerVehicle>;
 	}
-	else if (param == std::string("multiple_pursuit_pursuer"))
+	else if (param == std::string("mp_pursuer"))
 	{
 		not mExternalUpdate ?
 				mVehicle = new MpPursuer<SteerVehicle> :
@@ -517,19 +517,27 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
 		const float elapsedTime)
 {
-	//set vehicle's position, forward,( side,) up, speed
+	OpenSteer::Vec3 oldPos = mVehicle->position();
+	//update vehicle's
+	//position,
 	mVehicle->setPosition(
 			LVecBase3fToOpenSteerVec3(
 					mOwnerObject->getNodePath().get_pos()
 							- LVector3f(0.0, 0.0, mCorrectHeightRigidBody)));
+	//forward,
 	mVehicle->setForward(
 			LVecBase3fToOpenSteerVec3(
 					mOwnerObject->getNodePath().get_parent().get_relative_vector(
 							mOwnerObject->getNodePath(), -LVector3f::forward())).normalize());
+	//up,
 	mVehicle->setUp(
 			LVecBase3fToOpenSteerVec3(
 					mOwnerObject->getNodePath().get_parent().get_relative_vector(
 							mOwnerObject->getNodePath(), LVector3f::up())).normalize());
+	//side,
+	mVehicle->setUnitSideFromForwardAndUp();
+	//speed (elapsedTime should be != 0)
+	mVehicle->setSpeed((mVehicle->position() - oldPos).length() / elapsedTime);
 	//
 	//no event thrown: external updating sub-system will do, if expected
 }

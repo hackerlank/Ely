@@ -63,19 +63,30 @@ NodePath textNode;
 bool rocketInitialized = false;
 enum SteerPlugInType
 {
-	one_turning,
-	pedestrians,
-	boids,
+	one_turning = 0,
+	pedestrian,
+	boid,
 	multiple_pursuit,
 	soccer,
 	capture_the_flag,
 	none
-} steerPlugInType = none;
+} activeSteerPlugInType = none;
+///XXX
+const char* steerPlugInNames[] =
+{
+	"one_turning",
+	"pedestrian",
+	"boid",
+	"multiple_pursuit",
+	"soccer",
+	"capture_the_flag",
+	"none"
+};
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
 ObjectId mpWandererObjectId, mpNewWanderedObjectId;
-ObjectId cftSeekerObjectId, ctfNewSeekerObjectId;
+ObjectId ctfSeekerObjectId, ctfNewSeekerObjectId;
 float ctfHomeBaseRadius, ctfMinStartRadius, ctfMaxStartRadius,
 		ctfBrakingRate, ctfAvoidancePredictTimeMin, ctfAvoidancePredictTimeMax;
 bool mpWandererExternalUpdate = false, ctfSeekerExternalUpdate = false;
@@ -180,39 +191,25 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					"value", addKey.c_str());
 			steerPlugInOptionsMenu->GetElementById("remove_key")->SetInnerRML(
 					removeKey.c_str());
-			//steerPlugIn type
-			switch (steerPlugInType)
+			//hide element for not existing plug in and check the active one
+			Rocket::Core::Element* elem;
+			for (int p = one_turning; p != (none + 1); ++p)
 			{
-			case one_turning:
-				steerPlugInOptionsMenu->GetElementById("one_turning_away")->SetAttribute(
-						"checked", true);
-				break;
-			case pedestrians:
-				steerPlugInOptionsMenu->GetElementById("pedestrians")->SetAttribute(
-						"checked", true);
-				break;
-			case boids:
-				steerPlugInOptionsMenu->GetElementById("boids")->SetAttribute(
-						"checked", true);
-				break;
-			case multiple_pursuit:
-				steerPlugInOptionsMenu->GetElementById("multiple_pursuit")->SetAttribute(
-						"checked", true);
-				break;
-			case soccer:
-				steerPlugInOptionsMenu->GetElementById("soccer")->SetAttribute(
-						"checked", true);
-				break;
-			case capture_the_flag:
-				steerPlugInOptionsMenu->GetElementById("capture_the_flag")->SetAttribute(
-						"checked", true);
-				break;
-			case none:
-				steerPlugInOptionsMenu->GetElementById("none")->SetAttribute(
-						"checked", true);
-				break;
-			default:
-				break;
+				elem = steerPlugInOptionsMenu->GetElementById(
+						steerPlugInNames[p]);
+				if ((p == none) or (steerPlugIns.find((SteerPlugInType) p)
+						!= steerPlugIns.end()))
+				{
+					//there is the plugin
+					if (activeSteerPlugInType == p)
+					{
+						elem->SetAttribute("checked", true);
+					}
+				}
+				else
+				{
+					elem->GetParentNode()->SetProperty("display", "none");
+				}
 			}
 			//
 			steerPlugInOptionsMenu->Show();
@@ -366,7 +363,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				if (objectsSelect)
 				{
 					//use the helper to create the selection list
-					createObjectSelectionList(objectsSelect, cftSeekerObjectId);
+					createObjectSelectionList(objectsSelect, ctfSeekerObjectId);
 				}
 				//external update
 				ctfSeekerExternalUpdate ?
@@ -476,21 +473,21 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			//set new steer plugin type
 			paramValue = event.GetParameter<Rocket::Core::String>("steerPlugIn",
 					"");
-			if (paramValue == "one_turning_away")
+			if (paramValue == steerPlugInNames[one_turning])
 			{
-				steerPlugInType = one_turning;
+				activeSteerPlugInType = one_turning;
 			}
-			else if (paramValue == "pedestrians")
+			else if (paramValue == steerPlugInNames[pedestrian])
 			{
-				steerPlugInType = pedestrians;
+				activeSteerPlugInType = pedestrian;
 			}
-			else if (paramValue == "boids")
+			else if (paramValue == steerPlugInNames[boid])
 			{
-				steerPlugInType = boids;
+				activeSteerPlugInType = boid;
 			}
-			else if (paramValue == "multiple_pursuit")
+			else if (paramValue == steerPlugInNames[multiple_pursuit])
 			{
-				steerPlugInType = multiple_pursuit;
+				activeSteerPlugInType = multiple_pursuit;
 				//set options' values from elements' values
 				//new wanderer object
 				mpNewWanderedObjectId = event.GetParameter<Rocket::Core::String>(
@@ -503,9 +500,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 						//paramValue == "no"
 						mpWandererExternalUpdate = false;
 			}
-			else if (paramValue == "soccer")
+			else if (paramValue == steerPlugInNames[soccer])
 			{
-				steerPlugInType = soccer;
+				activeSteerPlugInType = soccer;
 				//set options' values from elements' values
 				//external update
 				paramValue = event.GetParameter<Rocket::Core::String>(
@@ -524,9 +521,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					soccerActorSelected = ball;
 				}
 			}
-			else if (paramValue == "capture_the_flag")
+			else if (paramValue == steerPlugInNames[capture_the_flag])
 			{
-				steerPlugInType = capture_the_flag;
+				activeSteerPlugInType = capture_the_flag;
 				//set options' values from elements' values
 				//new seeker object
 				ctfNewSeekerObjectId = event.GetParameter<Rocket::Core::String>(
@@ -560,7 +557,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			else
 			{
 				//default
-				steerPlugInType = none;
+				activeSteerPlugInType = none;
 			}
 		}
 		//close (i.e. unload) the camera options menu and set as closed..
@@ -573,9 +570,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 #define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 void add_vehicle(const Event* event)
 {
-	RETURN_ON_COND(steerPlugInType == none,)
+	RETURN_ON_COND(activeSteerPlugInType == none,)
 	//get data
-	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[steerPlugInType];
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
 
 	//get object to be cloned
 	SMARTPTR(Object)toBeClonedObject =
@@ -677,7 +674,7 @@ void add_vehicle(const Event* event)
 		//set SteerVehicle type, mov_type
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("type",
-						"multiple_pursuit_pursuer"));
+						"mp_pursuer"));
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("mov_type", "kinematic"));
 	}
@@ -723,7 +720,15 @@ void add_vehicle(const Event* event)
 	}
 	else if (openSteerPlugInName == "Capture the Flag")
 	{
-		///TODO add ctf stuff
+		//set SteerVehicle type, mov_type
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("type",
+						"ctf_enemy"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("mov_type", "kinematic"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("thrown_events",
+						"avoid_obstacle@@3:avoid_close_neighbor@@"));
 	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
@@ -741,9 +746,9 @@ void add_vehicle(const Event* event)
 
 void remove_vehicle(const Event* event)
 {
-	RETURN_ON_COND(steerPlugInType == none,)
+	RETURN_ON_COND(activeSteerPlugInType == none,)
 	//get data
-	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[steerPlugInType];
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
 
 	//get underlying OpenSteer PlugIn name
 	std::string openSteerPlugInName = steerPlugIn->getAbstractPlugIn().name();
@@ -807,7 +812,13 @@ void remove_vehicle(const Event* event)
 			}
 			else if (openSteerPlugInName == "Capture the Flag")
 			{
-				///TODO add ctf stuff
+					if(not (dynamic_cast<CtfEnemy<SteerVehicle>*>(vehicle) or
+								dynamic_cast<ExternalCtfEnemy<SteerVehicle>*>(vehicle) or
+								dynamic_cast<CtfSeeker<SteerVehicle>*>(vehicle) or
+								dynamic_cast<ExternalCtfSeeker<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
 			}
 			else
 			{
@@ -828,7 +839,7 @@ void remove_vehicle(const Event* event)
 //preset function called from main menu
 void rocketPreset()
 {
-	RETURN_ON_COND(steerPlugInType == none,)
+	RETURN_ON_COND(activeSteerPlugInType == none,)
 	//remove add/remove vehicle event handlers
 	EventHandler::get_global_event_handler()->remove_hook(addKey, &add_vehicle);
 	EventHandler::get_global_event_handler()->remove_hook(removeKey,
@@ -838,29 +849,29 @@ void rocketPreset()
 //commit function called main menu
 void rocketCommit()
 {
-	RETURN_ON_COND(steerPlugInType == none,)
+	RETURN_ON_COND(activeSteerPlugInType == none,)
 	//add add/remove vehicle event handlers
 	EventHandler::get_global_event_handler()->add_hook(addKey, &add_vehicle);
 	EventHandler::get_global_event_handler()->add_hook(removeKey,
 			&remove_vehicle);
 }
 
-///TODO add ctf stuff - extract common code and pack into a function
-///for ctf: update options (with gAvoidancePredictTime included)
-//commit function for Multiple Pursuit
-void rocketMultiplePursuitCommit()
+//helper commit for mp and ctf
+inline void rocketHelperCommit(SteerPlugInType plugInType, ObjectId& objectId,
+		const ObjectId& newObjectId, const std::string& vehicleType,
+		bool externalUpdate)
 {
-	RETURN_ON_COND(steerPlugInType == none,)
+	RETURN_ON_COND(activeSteerPlugInType != plugInType,)
 	//get data
-	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[steerPlugInType];
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
 	//get SteerPlugIn ObjectId
 	std::string steerPlugInObjectId = steerPlugIn->getOwnerObject()->objectId();
 
-	RETURN_ON_COND(mpWandererObjectId == mpNewWanderedObjectId,)
+	RETURN_ON_COND(objectId == newObjectId,)
 
 	//remove SteerVehicle component from wandererObject
 	ObjectTemplateManager::GetSingletonPtr()->removeComponentFromObject(
-			mpWandererObjectId, ComponentType("SteerVehicle"));
+			objectId, ComponentType("SteerVehicle"));
 
 	//get object to be cloned
 	SMARTPTR(Object)toBeClonedObject =
@@ -871,9 +882,8 @@ void rocketMultiplePursuitCommit()
 	//tweak clone components' parameter tables
 	compParams["SteerVehicle"].erase("type");
 	compParams["SteerVehicle"].insert(
-			std::pair<std::string, std::string>("type",
-					"multiple_pursuit_wanderer"));
-	if (mpWandererExternalUpdate)
+			std::pair<std::string, std::string>("type", vehicleType));
+	if (externalUpdate)
 	{
 		//replace the AI component with a externally updated wanderer
 		//set SteerVehicle external_update
@@ -895,11 +905,43 @@ void rocketMultiplePursuitCommit()
 			std::pair<std::string, std::string>("add_to_plugin",
 					steerPlugInObjectId));
 	//add the SteerVehicle component
-	ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
-			mpNewWanderedObjectId, ComponentType("SteerVehicle"),
-			compParams["SteerVehicle"]);
-	//change wanderer object
-	mpWandererObjectId = mpNewWanderedObjectId;
+	ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(newObjectId,
+			ComponentType("SteerVehicle"), compParams["SteerVehicle"]);
+	//change object
+	objectId = newObjectId;
+}
+
+//commit function for Multiple Pursuit
+void rocketMultiplePursuitCommit()
+{
+	//call helper
+	rocketHelperCommit(multiple_pursuit, mpWandererObjectId,
+			mpNewWanderedObjectId, "mp_wanderer", mpWandererExternalUpdate);
+}
+
+//commit function for Capture The Flag
+void rocketCaptureTheFlagCommit()
+{
+	//call helper
+	rocketHelperCommit(capture_the_flag, ctfSeekerObjectId,
+			ctfNewSeekerObjectId, "ctf_seeker", ctfSeekerExternalUpdate);
+	//update plugin options (with gAvoidancePredictTime included)
+	RETURN_ON_COND(activeSteerPlugInType != capture_the_flag,)
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
+	//set home base center
+	CtfPlugIn<SteerVehicle>* ctfPlugIn =
+			dynamic_cast<CtfPlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
+	//set options
+	ctfPlugIn->m_CtfPlugInData.gHomeBaseRadius = ctfHomeBaseRadius;
+	ctfPlugIn->m_CtfPlugInData.gMinStartRadius = ctfMinStartRadius;
+	ctfPlugIn->m_CtfPlugInData.gMaxStartRadius = ctfMaxStartRadius;
+	ctfPlugIn->m_CtfPlugInData.gBrakingRate = ctfBrakingRate;
+	ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMin =
+			ctfAvoidancePredictTimeMin;
+	ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMax =
+			ctfAvoidancePredictTimeMax;
+	ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTime =
+			ctfAvoidancePredictTimeMin;
 }
 
 //called by all steer plugins, executed only once
@@ -944,7 +986,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
 
 	///init libRocket
-	steerPlugIns[pedestrians] = DCAST(SteerPlugIn, aiComp);
+	steerPlugIns[pedestrian] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 }
 
@@ -971,7 +1013,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	boidsPlugIn->worldRadius = 1.5 * modelDims.get_z();
 
 	///init libRocket
-	steerPlugIns[boids] = DCAST(SteerPlugIn, aiComp);
+	steerPlugIns[boid] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 }
 
@@ -1049,6 +1091,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["max_start_radius::change"] = &rocketEventHandler;
 	gRocketEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
 	gRocketEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
+	gRocketCommitFunctions.push_back(&rocketCaptureTheFlagCommit);
 }
 
 ///steerVehicleToBeCloned_init
