@@ -1,0 +1,125 @@
+<rml>
+	<head>
+		<title>Camera Options</title>
+		<link type="text/template" href="rocket-tmpl.rml" />
+		<style>
+			body
+			{
+				width: 400px;
+				height: 300px;
+				
+				margin: auto;
+			}
+
+			div#title_bar div#icon
+			{
+				icon-image-s: 230px 281px;
+				icon-image-t: 152px 191px;
+
+				display: none;
+			}
+
+			form div
+			{
+				width: 200px;
+				margin-left: 0px;
+				margin-right: auto;
+			}
+		
+			form div p
+			{
+				color: black;
+				width: 300px;
+			}
+
+			form div p p
+			{
+				position: relative;
+				left: 8%;
+			}
+			
+			form input,
+			form input.text,
+			form select
+			{
+				font-size: 15;
+				vertical-align: text-bottom;
+			}
+			
+			form select selectbox
+			{
+				height: 150px;
+				overflow-y: auto;
+				background-color: white;
+			}
+			
+			form select selectbox scrollbarvertical,
+			{
+							/* t    r    b   l */
+				margin: 0px 3px 3px 3px;
+				width: 16px;
+			}
+			
+			form select selectbox scrollbarvertical sliderbar
+			{
+				margin: 0px 1px 5px 2px;
+				width: 14px;
+			}
+			
+			form select selectbox scrollbarvertical sliderarrowdec,
+			form select selectbox scrollbarvertical sliderarrowinc
+			{
+				height: 0px;
+			}
+		</style>
+	</head>
+	<body id="camera_options" template="window" onload="camera::body::load_logo">
+		<form onsubmit="camera::form::submit_options">
+			<div>
+				<p >
+					<strong style="font-size: 17;"><em>Camera type:</em></strong><br />
+					
+					<!-- Free View Camera -->
+					<input id="free_view_camera" type="radio" name="camera" value="free_view_camera" onchange="camera::free_view_camera::options" /> <strong>Free View Camera</strong><br />
+					<!--options -->
+					<p id="free_view_camera_options" style="display: none;">
+						<input id="max_linear_speed" type="range" name="max_linear_speed" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> max linear speed<br />
+						<input id="max_angular_speed" type="range" name="max_angular_speed" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> max angular speed<br />
+						<input id="linear_accel" type="range" name="linear_accel" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> linear accel<br />
+						<input id="angular_accel" type="range" name="angular_accel" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> angular accel<br />
+						<input id="linear_friction" type="text" name="linear_friction" value="0.0" size="4em" /> linear friction<br />
+						<input id="angular_friction" type="text" name="angular_friction" value="0.0" size="4em" /> angular friction<br />
+						<input id="fast_factor" type="text" name="fast_factor" value="0.0" size="4em" />  fast factor<br />
+						<input id="sens_x" type="range" name="sens_x" value="0.0" min="0.0" max="1.0" step="0.01" orientation="horizontal" /> mouse sens x<br />
+						<input id="sens_y" type="range" name="sens_y" value="0.0" min="0.0" max="1.0" step="0.01" orientation="horizontal" /> mouse sens y<br />
+					</p>
+
+					<!-- Chaser Camera -->
+					<input id="chaser_camera" type="radio" name="camera" value="chaser_camera" onchange="camera::chaser_camera::options" /> <strong>Chaser Camera</strong><br />
+					<!-- options -->
+					<p id="chaser_camera_options" style="display: none;">
+						<select id="chased_object" name="chased_object"  style="margin-right: -6px; margin-bottom: -11px;">
+								<!-- <option selected value="DUMMY">DUMMY</option> -->
+						</select> chased object<br />
+						<input id="fixed_relative_position" type="checkbox" name="fixed_relative_position" value="true" checked="true" /> fixed relative position<br />
+						<input id="abs_max_distance" type="range" name="abs_max_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs max distance<br />
+						<input id="abs_min_distance" type="range" name="abs_min_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs min distance<br />
+						<input id="abs_max_height" type="range" name="abs_max_height" value="0.0" min="0.0" max="50.0" step="1.0" orientation="horizontal" /> abs max height<br />
+						<input id="abs_min_height" type="range" name="abs_min_height" value="0.0" min="0.0" max="50.0" step="1.0" orientation="horizontal" /> abs min height<br />
+						<input id="abs_lookat_distance" type="range" name="abs_lookat_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs lookat distance<br />
+						<input id="abs_lookat_height" type="range" name="abs_lookat_height" value="0.0" min="0.0" max="50.0" step="1.0" orientation="horizontal" /> abs lookat height<br />
+						<input id="friction" type="text" name="friction" value="0.0" size="4em" /> friction<br />
+					</p>
+					
+					<!-- Object Picker -->
+					<input id="object_picker" type="radio" name="camera" value="object_picker" /> <strong>Object Picker</strong><br />
+					
+					<!-- None -->
+					<input id="none" type="radio" name="camera" value="none" checked="true" /> <strong>None</strong><br />
+				</p>
+			</div>
+			<input style="color: white;" type="submit" value="cancel">Cancel</input>
+			<input style="color: white;" type="submit" value="ok">OK</input>
+		</form>
+	</body>
+</rml>

@@ -1,0 +1,49 @@
+<rml>
+	<head>
+		<title>Options</title>
+		<link type="text/template" href="rocket-tmpl.rml" />
+		<style>
+			body
+			{
+				width: 350px;
+				height: 350px;
+				
+				margin: auto;
+			}
+
+			div#title_bar div#icon
+			{
+				icon-image-s: 230px 281px;
+				icon-image-t: 152px 191px;
+
+				display: none;
+			}
+
+			form div
+			{
+				width: 200px;
+				margin: auto;
+			}
+		</style>
+	</head>
+	<body template="window" onload="options::body::load_logo">
+		<form onsubmit="options::form::submit_options">
+			<div>
+				<p>
+					Graphics:<br />
+					<input id="good_graphics" type="radio" name="graphics" value="good" /> Good<br />
+					<input id="default_graphics" type="radio" name="graphics" value="default" checked="true" /> Default<br />
+					<input id="bad_graphics" type="radio" name="graphics" value="bad" onchange="options::input::bad_graphics" /> Bad<br />
+				</p>
+				<p id="bad_warning" style="display: none;">Are you sure about this? Bad graphics are just plain <em>bad.</em></p>
+				<p>
+					Audio:<br />
+					<input id="reverb_audio" type="checkbox" name="reverb" value="true" checked="true" /> Reverb<br />
+					<input id="3d_audio" type="checkbox" name="3d" value="true" /> 3D Spatialisation
+				</p>
+			</div>
+			<input type="submit" value="cancel">Cancel</input>
+			<input type="submit" value="ok">OK</input>
+		</form>
+	</body>
+</rml>

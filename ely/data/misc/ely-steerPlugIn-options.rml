@@ -1,0 +1,285 @@
+<rml>
+	<head>
+		<title>SteerPlugIn Options</title>
+		<link type="text/template" href="rocket-tmpl.rml" />
+		<style>
+			body
+			{
+				width: 400px;
+				height: 300px;
+				margin: auto;
+			}
+
+			div#title_bar div#icon
+			{
+				icon-image-s: 230px 281px;
+				icon-image-t: 152px 191px;
+				display: none;
+			}
+
+			form div
+			{
+				width: 200px;
+				margin-left: 0px;
+				margin-right: auto;
+			}
+		
+			form div p
+			{
+				color: black;
+				width: 300px;
+			}
+
+			form div p p
+			{
+				position: relative;
+				left: 8%;
+			}
+			
+			form input,
+			form input.text,
+			form select
+			{
+				font-size: 15;
+				vertical-align: text-bottom;
+			}
+			
+			form select selectbox
+			{
+				height: 150px;
+				overflow-y: auto;
+				background-color: white;
+			}
+			
+			form select selectbox scrollbarvertical
+			{
+				/* t    r    b   l */
+				margin: 0px 3px 3px 3px;
+				width: 16px;
+			}
+			
+			form select selectbox scrollbarvertical sliderbar
+			{
+				margin: 0px 1px 5px 2px;
+				width: 14px;
+			}
+			
+			form select selectbox scrollbarvertical sliderarrowdec,
+			form select selectbox scrollbarvertical sliderarrowinc
+			{
+				height: 0px;
+			}
+		</style>
+	</head>
+	<body id="steerPlugIn_options" template="window"
+		onload="steerPlugIn::body::load_logo">
+		<form onsubmit="steerPlugIn::form::submit_options">
+			<div>
+				<p>
+					<strong style="font-size: 17;">
+						<em>Steer PlugIn type:</em>
+					</strong>
+					<br />
+					<!-- One Turning -->
+					<div style="width: 300px;">
+						<input id="one_turning" type="radio" name="steerPlugIn"
+							value="one_turning" />
+						<strong>One Turning Away PlugIn</strong>
+						<br />
+					</div>
+
+					<!-- Pedestrian -->
+					<div style="width: 300px;">
+						<input id="pedestrian" type="radio" name="steerPlugIn"
+							value="pedestrian" />
+						<strong>Pedestrians PlugIn</strong>
+						<br />
+					</div>
+
+					<!-- Boids -->
+					<div style="width: 300px;">
+						<input id="boid" type="radio" name="steerPlugIn" value="boid" />
+						<strong>Boids PlugIn</strong>
+						<br />
+					</div>
+
+					<!-- Multiple Pursuit -->
+					<div style="width: 300px;">
+						<input id="multiple_pursuit" type="radio" name="steerPlugIn"
+							value="multiple_pursuit" onchange="steerPlugIn::multiple_pursuit::options" />
+						<strong>Multiple Pursuit PlugIn</strong>
+						<br />
+						<!-- Multiple Pursuit Options -->
+						<p id="multiple_pursuit_options" style="display: none;">
+							<p>
+								<!-- Wanderer -->
+								<select id="wanderer_object" name="wanderer_object"
+									style="margin-right: -6px; margin-bottom: -11px;">
+									<!-- <option selected value="DUMMY">DUMMY</option> -->
+								</select>
+								wanderer object
+								<br />
+								<p>
+									externally updated:
+									<input id="external_update_wanderer_yes" type="radio"
+										name="external_update_wanderer" value="yes" style="margin-left: 0px;" />
+									yes
+									<input id="external_update_wanderer_no" type="radio"
+										name="external_update_wanderer" value="no" checked="true"
+										style="margin-left: 0px;" />
+									no
+									<br />
+								</p>
+							</p>
+						</p>
+					</div>
+
+					<!-- Soccer -->
+					<div style="width: 300px;">
+						<input id="soccer" type="radio" name="steerPlugIn" value="soccer"
+							onchange="steerPlugIn::soccer::options" />
+						<strong>Soccer PlugIn</strong>
+						<br />
+						<!-- Players/Ball -->
+						<p id="soccer_options" style="display: none; margin-left: 30px;">
+							What to add?
+							<br />
+							<input id="player_teamA" type="radio" name="player_ball"
+								value="player_teamA" style="margin-left: 0px;" />
+							Team A player
+							<br />
+							<input id="player_teamB" type="radio" name="player_ball"
+								value="player_teamB" style="margin-left: 0px;" />
+							Team B player
+							<br />
+							<input id="ball" type="radio" name="player_ball" value="ball"
+								checked="true" style="margin-left: 0px;" />
+							ball
+							<br />
+						</p>
+					</div>
+
+					<!-- Capture The Flag -->
+					<div style="width: 300px;">
+						<input id="capture_the_flag" type="radio" name="steerPlugIn"
+							value="capture_the_flag" onchange="steerPlugIn::capture_the_flag::options" />
+						<strong>Capture The Flag PlugIn</strong>
+						<br />
+						<!-- Capture The Flag Options -->
+						<p id="capture_the_flag_options" style="display: none;">
+							<p>
+								<!-- Seeker -->
+								<select id="seeker_object" name="seeker_object"
+									style="margin-right: -6px; margin-bottom: -11px;">
+									<!-- <option selected value="DUMMY">DUMMY</option> -->
+								</select>
+								seeker object
+								<br />
+								<p>
+									externally updated:
+									<input id="external_update_seeker_yes" type="radio"
+										name="external_update_seeker" value="yes" style="margin-left: 0px;" />
+									yes
+									<input id="external_update_seeker_no" type="radio"
+										name="external_update_seeker" value="no" checked="true"
+										style="margin-left: 0px;" />
+									no
+									<br />
+								</p>
+							</p>
+							<!-- Other options -->
+							<p>
+								<input id="home_base_radius" type="range" name="home_base_radius"
+									value="0.0" min="0.0" max="10.0" step="1.0" orientation="horizontal" />
+								home base radius
+								<br />
+								<input id="min_start_radius" type="range" name="min_start_radius"
+									value="0.0" min="0.0" max="200.0" step="1.0" orientation="horizontal"
+									onchange="min_start_radius::change" />
+								min start radius
+								<br />
+								<input id="max_start_radius" type="range" name="max_start_radius"
+									value="0.0" min="0.0" max="300.0" step="1.0" orientation="horizontal"
+									onchange="max_start_radius::change" />
+								max start radius
+								<br />
+								<input id="braking_rate" type="range" name="braking_rate" value="0.0"
+									min="0.0" max="1.0" step="0.05" orientation="horizontal" />
+								braking rate
+								<br />
+								<input id="avoidance_predict_time_min" type="range" name="avoidance_predict_time_min" value="0.0"
+									min="0.0" max="15.0" step="0.1" orientation="horizontal"
+									onchange="avoidance_predict_time_min::change" />
+								avoidance predict time min
+								<br />
+								<input id="avoidance_predict_time_max" type="range" name="avoidance_predict_time_max" value="0.0"
+									min="0.0" max="25.0" step="0.1" orientation="horizontal"
+									onchange="avoidance_predict_time_max::change" />
+								avoidance predict time max
+								<br />
+							</p>
+						</p>
+					</div>
+
+					<!-- Low Speed Turn -->
+					<div style="width: 300px;">
+						<input id="low_speed_turn" type="radio" name="steerPlugIn"
+							value="low_speed_turn" onchange="steerPlugIn::low_speed_turn::options" />
+						<strong>Low Speed Turn PlugIn</strong>
+						<br />
+						<!-- Speed -->
+						<p id="low_speed_turn_options" style="display: none;">
+							<input id="steering_speed" type="range" name="steering_speed" value="0.0"
+								min="0.0" max="50.0" step="1.0" orientation="horizontal" />
+							steering speed
+							<br />
+						</p>
+					</div>
+					
+					<!-- None -->
+					<div style="width: 300px;">
+						<input id="none" type="radio" name="steerPlugIn" value="none"
+							checked="true" />
+						<strong>None PlugIn</strong>
+						<br />
+					</div>
+					
+					<div style="width: 300px;">
+						<!-- Add Key -->
+						To add a
+						<em>SteerVehicle</em>
+						: hit
+						<strong>
+							<em>
+								<input style="margin-left: 0px; margin-bottom: -2px;" id="add_key"
+									type="text" name="add_key" value="y" size="2em" maxlength="1"
+									onchange="add_key::change" />
+							</em>
+						</strong>
+						key and click
+						<strong>
+							<em>left mouse button</em>
+						</strong>
+						where you want to add it.
+						<br />
+						To remove a
+						<em>SteerVehicle</em>
+						: hit
+						<strong>
+							<em id="remove_key">shift-y</em>
+						</strong>
+						and click
+						<strong>
+							<em>left mouse button</em>
+						</strong>
+						over it.
+						<br />
+					</div>
+
+				</p>
+			</div>
+			<input style="color: white;" type="submit" value="cancel">Cancel</input>
+			<input style="color: white;" type="submit" value="ok">OK</input>
+		</form>
+	</body>
+</rml>
