@@ -46,7 +46,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/PlugIn.h>
 #include "common.h"
 
@@ -58,7 +57,7 @@ using namespace OpenSteer;
 // ----------------------------------------------------------------------------
 
 template<typename Entity>
-class OneTurning: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class OneTurning: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -75,8 +74,10 @@ public:
 	void reset(void)
 	{
 		SimpleVehicle::reset(); // reset the vehicle
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();  // prevent long streaks due to teleportation
+#endif
 	}
 
 	// per frame simulation update
@@ -87,16 +88,20 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
 		drawBasic2dCircularVehicle(*this, gGray50);
 		this->drawTrail();
 	}
+#endif
 };
 
 //OneTurning externally updated.
@@ -109,8 +114,10 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 };
 
@@ -153,6 +160,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
+#ifdef ELY_DEBUG
 		// draw test vehicle
 		iterator iter;
 		for (iter = theVehicle.begin(); iter != theVehicle.end(); ++iter)
@@ -168,6 +176,7 @@ public:
 			draw2dTextAt3dLocation(*"start", (*iter)->getStart(), gGreen, 0.0,
 					0.0);
 		}
+#endif
 	}
 
 	void close(void)

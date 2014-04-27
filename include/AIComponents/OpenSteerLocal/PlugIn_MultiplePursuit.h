@@ -44,7 +44,6 @@
 #ifndef PLUGIN_MULTIPLEPURSUIT_H_
 #define PLUGIN_MULTIPLEPURSUIT_H_
 
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/PlugIn.h>
 #include "common.h"
@@ -59,7 +58,7 @@ using namespace OpenSteer;
 // a common base class, MpBase, which is a specialization of SimpleVehicle.
 
 template<typename Entity>
-class MpBase: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class MpBase: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -76,14 +75,17 @@ public:
 	void reset(void)
 	{
 		SimpleVehicle::reset(); // reset the vehicle
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 ///		this->setSpeed(0);            // speed along Forward direction.
 ///		this->setMaxForce(5.0);       // steering force is clipped to this magnitude
 ///		this->setMaxSpeed(3.0);       // velocity is clipped to this magnitude
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->gaudyPursuitAnnotation = true; // select use of 9-color annotation
+#endif
 	}
 
+#ifdef ELY_DEBUG
 	// draw into the scene
 	void draw(void)
 	{
@@ -93,6 +95,7 @@ public:
 
 	// for draw method
 	Color bodyColor;
+#endif
 };
 
 template<typename Entity>
@@ -110,7 +113,9 @@ public:
 	void reset(void)
 	{
 		MpBase<Entity>::reset();
+#ifdef ELY_DEBUG
 		this->bodyColor.set(0.4f, 0.6f, 0.4f); // greenish
+#endif
 	}
 
 	// one simulation step
@@ -124,8 +129,10 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 
 };
@@ -140,8 +147,10 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 };
 
@@ -162,7 +171,9 @@ public:
 	void reset(void)
 	{
 		MpBase<Entity>::reset();
+#ifdef ELY_DEBUG
 		this->bodyColor.set(0.6f, 0.4f, 0.4f); // redish
+#endif
 ///		randomizeStartingPositionAndHeading();
 	}
 
@@ -189,8 +200,10 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 
 	// randomize heading only
@@ -221,8 +234,10 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 };
 
@@ -275,12 +290,14 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
+#ifdef ELY_DEBUG
 		// draw each vehicles
 		iterator iter;
 		for (iter = allMP.begin(); iter != allMP.end(); ++iter)
 		{
 			(*iter)->draw();
 		}
+#endif
 	}
 
 	void close(void)

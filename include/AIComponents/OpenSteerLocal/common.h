@@ -28,10 +28,10 @@
 #include <nodePath.h>
 #include <OpenSteer/Vec3.h>
 #include <OpenSteer/Color.h>
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/PlugIn.h>
 #include <OpenSteer/PolylineSegmentedPathwaySegmentRadii.h>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
+#include "SimpleVehicle.h"
 #include "DrawMeshDrawer.h"
 
 extern ely::DrawMeshDrawer *gDrawer3d, *gDrawer2d;
@@ -214,9 +214,11 @@ public:
 		m_start = Super::position();
 	}
 
+#ifdef ELY_DEBUG
 	virtual void draw()
 	{
 	}
+#endif
 
 	OpenSteer::Vec3 getStart()
 	{
@@ -248,6 +250,7 @@ public:
 			OpenSteer::SphereObstacle(r, c)
 	{
 	}
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -259,6 +262,7 @@ public:
 		draw3dCircleOrDisk(radius, center, OpenSteer::Vec3(1, 0, 0), yellow, 20,
 				false);
 	}
+#endif
 };
 
 class BoxObstacle: public OpenSteer::BoxObstacle
@@ -268,6 +272,7 @@ public:
 			OpenSteer::BoxObstacle(w, h, d)
 	{
 	}
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -299,6 +304,7 @@ public:
 		drawLine(v3, v7, brown);
 		drawLine(v4, v8, brown);
 	}
+#endif
 };
 
 class PlaneObstacle: public OpenSteer::PlaneObstacle
@@ -309,6 +315,7 @@ public:
 			OpenSteer::PlaneObstacle(s, u, f, p)
 	{
 	}
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -318,6 +325,7 @@ public:
 		drawLine(position() - (side() * 20), position() + (side() * 20),
 				skyblue);
 	}
+#endif
 };
 
 class RectangleObstacle: public OpenSteer::RectangleObstacle
@@ -329,6 +337,7 @@ public:
 			OpenSteer::RectangleObstacle(w, h, s, u, f, p, sf)
 	{
 	}
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -347,6 +356,7 @@ public:
 		drawLine(v3, v4, purple);
 		drawLine(v4, v1, purple);
 	}
+#endif
 };
 
 template<typename Super>

@@ -48,7 +48,6 @@
 #include <iomanip>
 #include <sstream>
 #include <OpenSteer/PolylineSegmentedPathwaySingleRadius.h>
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Proximity.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/PlugIn.h>
@@ -77,7 +76,7 @@ typedef AbstractTokenForProximityDatabase<AbstractVehicle*> ProximityToken;
  * default: random)
  */
 template<typename Entity>
-class Pedestrian: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class Pedestrian: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -108,7 +107,7 @@ public:
 	{
 		// reset the vehicle
 		SimpleVehicle::reset();
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 
 		// max speed and max steering force (maneuverability)
 ///		setMaxSpeed(2.0);
@@ -134,9 +133,10 @@ public:
 		// pick a random direction for path following (upstream or downstream)
 		pathDirection = (frandom01() > 0.5) ? -1 : +1;
 
+#ifdef ELY_DEBUG
 		// trail parameters: 3 seconds with 60 points along the trail
 		this->setTrailParameters(3, 60);
-
+#endif
 		useDirectedPathFollowing = false;
 		wanderSwitch = false;
 
@@ -163,18 +163,24 @@ public:
 			if (Vec3::distance(this->position(), pathEndpoint0) < pathRadius)
 			{
 				pathDirection = +1;
+#ifdef ELY_DEBUG
 				this->annotationXZCircle(pathRadius, pathEndpoint0, darkRed, 20);
+#endif
 			}
 			if (Vec3::distance(this->position(), pathEndpoint1) < pathRadius)
 			{
 				pathDirection = -1;
+#ifdef ELY_DEBUG
 				this->annotationXZCircle(pathRadius, pathEndpoint1, darkRed, 20);
+#endif
 			}
 		}
 
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration(5, 0);
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 
 		// notify proximity database that our position has changed
 		proximityToken->updateForNewPosition(this->position());
@@ -257,17 +263,20 @@ public:
 		return steeringForce.setYtoZero();
 	}
 
+#ifdef ELY_DEBUG
 	// draw this pedestrian into scene
 	void draw(void)
 	{
 		drawBasic2dCircularVehicle(*this, gGray50);
 		this->drawTrail();
 	}
+#endif
 
 	// called when steerToFollowPath decides steering is required
 	void annotatePathFollowing(const Vec3& future, const Vec3& onPath,
 			const Vec3& target, const float outside)
 	{
+#ifdef ELY_DEBUG
 		const Color yellow(1, 1, 0);
 		const Color lightOrange(1.0f, 0.5f, 0.0f);
 		const Color darkOrange(0.6f, 0.3f, 0.0f);
@@ -286,9 +295,10 @@ public:
 		const Vec3 onPathBoundary = future + boundaryOffset;
 		this->annotationLine(onPath, onPathBoundary, darkOrange);
 		this->annotationLine(onPathBoundary, future, lightOrange);
+#endif
 
 		///call parent::annotatePathFollowing
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotatePathFollowing(
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotatePathFollowing(
 				future, onPath, target, outside);
 	}
 
@@ -297,6 +307,7 @@ public:
 	void annotateAvoidCloseNeighbor(const AbstractVehicle& other,
 			const float /*additionalDistance*/)
 	{
+#ifdef ELY_DEBUG
 		// draw the word "Ouch!" above colliding vehicles
 		const float headOn = this->forward().dot(other.forward()) < 0;
 		const Color green(0.4f, 0.8f, 0.1f);
@@ -310,9 +321,10 @@ public:
 //					drawGetWindowWidth(), drawGetWindowHeight());
 			draw2dTextAt3dLocation(*string, location, color, 0.0, 0.0);
 		}
+#endif
 
 		///call parent::annotateAvoidCloseNeighbor
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidCloseNeighbor(
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotateAvoidCloseNeighbor(
 				other, 0.0);
 	}
 
@@ -321,6 +333,7 @@ public:
 			const float /*steer*/, const Vec3& ourFuture,
 			const Vec3& threatFuture)
 	{
+#ifdef ELY_DEBUG
 		const Color green(0.15f, 0.6f, 0.0f);
 
 		this->annotationLine(this->position(), ourFuture, green);
@@ -328,9 +341,10 @@ public:
 		this->annotationLine(ourFuture, threatFuture, gRed);
 		this->annotationXZCircle(this->radius(), ourFuture, green, 12);
 		this->annotationXZCircle(this->radius(), threatFuture, green, 12);
+#endif
 
 		///call parent::annotateAvoidNeighbor
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidNeighbor(
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotateAvoidNeighbor(
 				threat, 0.0, ourFuture, threatFuture);
 	}
 
@@ -339,6 +353,7 @@ public:
 	// xxx CaptureTheFlag.cpp
 	void annotateAvoidObstacle(const float minDistanceToCollision)
 	{
+#ifdef ELY_DEBUG
 		const Vec3 boxSide = this->side() * this->radius();
 		const Vec3 boxFront = this->forward() * minDistanceToCollision;
 		const Vec3 FR = this->position() + boxFront - boxSide;
@@ -350,9 +365,10 @@ public:
 		this->annotationLine(FL, BL, white);
 		this->annotationLine(BL, BR, white);
 		this->annotationLine(BR, FR, white);
+#endif
 
 		///call parent::annotateAvoidObstacle
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidObstacle(
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotateAvoidObstacle(
 				minDistanceToCollision);
 	}
 
@@ -402,9 +418,11 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration(5, 0);
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 
 		// notify proximity database that our position has changed
 		this->proximityToken->updateForNewPosition(this->position());
@@ -487,6 +505,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
+#ifdef ELY_DEBUG
 		// draw and annotate each Pedestrian
 		iterator iter;
 		for (iter = crowd.begin(); iter != crowd.end(); ++iter)
@@ -548,8 +567,10 @@ public:
 /////		draw2dTextAt2dLocation(status, screenLocation, gGray80,
 /////			drawGetWindowWidth(), drawGetWindowHeight());
 		draw2dTextAt2dLocation(status, screenLocation, gGray80, 0.0, 0.0);
+#endif
 	}
 
+#ifdef ELY_DEBUG
 	void serialNumberAnnotationUtility(const AbstractVehicle& selected,
 			const AbstractVehicle& nearMouse)
 	{
@@ -622,6 +643,7 @@ public:
 ///		}
 		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
 	}
+#endif
 
 	void close(void)
 	{

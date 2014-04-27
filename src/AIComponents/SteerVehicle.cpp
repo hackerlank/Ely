@@ -39,7 +39,7 @@ namespace ely
 {
 
 //VehicleAddOn typedef.
-typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
+typedef VehicleAddOnMixin<SimpleVehicle, SteerVehicle> VehicleAddOn;
 
 SteerVehicle::SteerVehicle() :
 		mHitResult(BulletClosestHitRayResult::empty())

@@ -45,7 +45,6 @@
 #define PLUGIN_BOIDS_H_
 
 #include <sstream>
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Proximity.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/UnusedParameter.h>
@@ -79,7 +78,7 @@ typedef OpenSteer::AbstractTokenForProximityDatabase<AbstractVehicle*> Proximity
  * 				float cohesionRadius, float cohesionAngle, float cohesionWeight)
  */
 template<typename Entity>
-class Boid: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class Boid: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -113,7 +112,7 @@ public:
 	{
 		// reset the vehicle
 		SimpleVehicle::reset();
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 
 		// steering force is clipped to this magnitude
 ///		setMaxForce(27);
@@ -134,12 +133,14 @@ public:
 ///		proximityToken->updateForNewPosition(position());
 	}
 
+#ifdef ELY_DEBUG
 	// draw this boid into the scene
 	void draw(void)
 	{
 		drawBasic3dSphericalVehicle(*this, gGray70);
 		// this->drawTrail ();
 	}
+#endif
 
 	// per frame simulation update
 	void update(const float currentTime, const float elapsedTime)
@@ -210,11 +211,13 @@ public:
 		const Vec3 alignmentW = alignment * alignmentWeight;
 		const Vec3 cohesionW = cohesion * cohesionWeight;
 
+#ifdef ELY_DEBUG
 		// annotation
 		// const float s = 0.1;
 		// this->annotationLine (this->position(), this->position() + (separationW * s), gRed);
 		// this->annotationLine (this->position(), this->position() + (alignmentW  * s), gOrange);
 		// this->annotationLine (this->position(), this->position() + (cohesionW   * s), gYellow);
+#endif
 
 		return separationW + alignmentW + cohesionW;
 	}
@@ -299,6 +302,7 @@ public:
 	// xxx CaptureTheFlag.cpp
 	void annotateAvoidObstacle(const float minDistanceToCollision)
 	{
+#ifdef ELY_DEBUG
 		const Vec3 boxSide = this->side() * this->radius();
 		const Vec3 boxFront = this->forward() * minDistanceToCollision;
 		const Vec3 FR = this->position() + boxFront - boxSide;
@@ -310,9 +314,10 @@ public:
 		this->annotationLine(FL, BL, white);
 		this->annotationLine(BL, BR, white);
 		this->annotationLine(BR, FR, white);
+#endif
 
 		///call parent::annotateAvoidObstacle
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::annotateAvoidObstacle(
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotateAvoidObstacle(
 				minDistanceToCollision);
 	}
 
@@ -435,6 +440,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
+#ifdef ELY_DEBUG
 		// draw each boid in flock
 		iterator iter;
 		for (iter = flock.begin(); iter != flock.end(); ++iter)
@@ -495,6 +501,7 @@ public:
 		draw2dTextAt2dLocation(status, screenLocation, gGray80, 0.0, 0.0);
 
 		drawObstacles();
+#endif
 	}
 
 	void close(void)
@@ -706,6 +713,7 @@ public:
 	float worldRadius;
 	Vec3 worldCenter;
 
+#ifdef ELY_DEBUG
 	void drawObstacles(void)
 	{
 		// draw obstacles
@@ -720,7 +728,7 @@ public:
 		drawSphere(worldCenter, worldRadius, 0.66667 * worldRadius, false, Color(0, 0, 1, 1),
 				true, true, Vec3::zero);
 	}
-
+#endif
 };
 
 //BoidsPlugIn gBoidsPlugIn;

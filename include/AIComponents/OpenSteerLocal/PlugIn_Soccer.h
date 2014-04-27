@@ -39,7 +39,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Draw.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/UnusedParameter.h>
@@ -79,6 +78,7 @@ public:
 			return false;
 		return true;
 	}
+#ifdef ELY_DEBUG
 	void draw()
 	{
 		Vec3 b, c;
@@ -90,6 +90,8 @@ public:
 		drawLineAlpha(m_max, c, color, 1.0f);
 		drawLineAlpha(c, m_min, color, 1.0f);
 	}
+#endif
+
 	Vec3 getMin()
 	{
 		return m_min;
@@ -106,7 +108,7 @@ private:
 
 // The ball object
 template<typename Entity>
-class Ball: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class Ball: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -126,15 +128,17 @@ public:
 	void reset(void)
 	{
 		SimpleVehicle::reset(); // reset the vehicle
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 
 ///		setSpeed(0.0f);         // speed along Forward direction.
 ///		setMaxForce(9.0f);      // steering force is clipped to this magnitude
 ///		setMaxSpeed(9.0f);         // velocity is clipped to this magnitude
 		this->setPosition(m_home);
 
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->setTrailParameters(100, 6000);
+#endif
 	}
 
 	// per frame simulation update
@@ -162,7 +166,9 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 
 	virtual void kick(Vec3 dir, const float elapsedTime)
@@ -173,12 +179,14 @@ public:
 		this->regenerateOrthonormalBasis(dir);
 	}
 
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
 		drawBasic2dCircularVehicle(*this, Color(0.0f, 1.0f, 0.0f));
 		this->drawTrail();
 	}
+#endif
 
 	AABBox *m_bbox;
 	Vec3 m_home;
@@ -194,12 +202,14 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 };
 
 template<typename Entity>
-class Player: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class Player: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -225,7 +235,7 @@ public:
 	void reset(void)
 	{
 		SimpleVehicle::reset(); // reset the vehicle
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 
 ///		setSpeed(0.0f);         // speed along Forward direction.
 ///		setMaxForce(3000.7f);     // steering force is clipped to this magnitude
@@ -246,8 +256,10 @@ public:
 ///		}
 ///		m_home = this->position();
 
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->setTrailParameters(10, 60);
+#endif
 	}
 
 	// per frame simulation update
@@ -316,8 +328,10 @@ public:
 										Vec3(-2.0f, 0.0f, Z));
 						Vec3 behindBallForce = this->xxxsteerForSeek(
 								behindBall);
+#ifdef ELY_DEBUG
 						this->annotationLine(this->position(), behindBall,
 								Color(0.0f, 1.0f, 0.0f));
+#endif
 						Vec3 evadeTarget = this->xxxsteerForFlee(
 								m_Ball->position());
 ///						this->applySteeringForce(
@@ -345,6 +359,7 @@ public:
 		this->entityUpdate(currentTime, elapsedTime);
 	}
 
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
@@ -352,6 +367,7 @@ public:
 				b_ImTeamA ? Color(1.0f, 0.0f, 0.0f) : Color(0.0f, 0.0f, 1.0f));
 		this->drawTrail();
 	}
+#endif
 	// per-instance reference to its group
 ///	const std::vector<Player*> m_others;
 	std::vector<Player*>* m_AllPlayers;
@@ -380,6 +396,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		//annotation
 		Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
 				(AVGroup&) this->m_AllPlayers);
@@ -406,6 +423,7 @@ public:
 				}
 			}
 		}
+#endif
 	}
 };
 
@@ -504,6 +522,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
+#ifdef ELY_DEBUG
 		// draw test vehicle
 ///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
 ///			TeamA[i]->draw();
@@ -560,7 +579,7 @@ public:
 						0.0);
 				draw2dTextAt3dLocation(*"start", Vec3::zero, gGreen, 0.0, 0.0);
 			}
-
+#endif
 	}
 
 	void close(void)

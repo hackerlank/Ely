@@ -5,7 +5,7 @@
 		<style>
 			body
 			{
-				width: 400px;
+				width: 420px;
 				height: 300px;
 				margin: auto;
 			}
@@ -160,7 +160,7 @@
 					</div>
 
 					<!-- Capture The Flag -->
-					<div style="width: 300px;">
+					<div style="width: 350px;">
 						<input id="capture_the_flag" type="radio" name="steerPlugIn"
 							value="capture_the_flag" onchange="steerPlugIn::capture_the_flag::options" />
 						<strong>Capture The Flag PlugIn</strong>
@@ -188,7 +188,7 @@
 								</p>
 							</p>
 							<!-- Other options -->
-							<p>
+							<p style="width: 350px;">
 								<input id="home_base_radius" type="range" name="home_base_radius"
 									value="0.0" min="0.0" max="10.0" step="1.0" orientation="horizontal" />
 								home base radius

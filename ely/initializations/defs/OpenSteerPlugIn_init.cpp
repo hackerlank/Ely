@@ -763,7 +763,7 @@ void add_vehicle(const Event* event)
 	}
 	else if (openSteerPlugInName == "Capture the Flag")
 	{
-		//set SteerVehicle type, mov_type
+		//set SteerVehicle type, mov_type, thrown_events, speed
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("type",
 						"ctf_enemy"));
@@ -772,6 +772,10 @@ void add_vehicle(const Event* event)
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("thrown_events",
 						"avoid_obstacle@@3:avoid_close_neighbor@@"));
+		compParams["SteerVehicle"].erase("speed");
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("speed", "1.0"));
+
 	}
 	else if (openSteerPlugInName == "Low Speed Turn")
 	{

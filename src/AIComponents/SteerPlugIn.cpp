@@ -346,7 +346,7 @@ void SteerPlugIn::onRemoveFromSceneCleanup()
 	mLocalObstacles.clear();
 }
 
-typedef VehicleAddOnMixin<OpenSteer::SimpleVehicle, SteerVehicle> VehicleAddOn;
+typedef VehicleAddOnMixin<SimpleVehicle, SteerVehicle> VehicleAddOn;
 
 SteerPlugIn::Result SteerPlugIn::addSteerVehicle(SMARTPTR(SteerVehicle)steerVehicle)
 {

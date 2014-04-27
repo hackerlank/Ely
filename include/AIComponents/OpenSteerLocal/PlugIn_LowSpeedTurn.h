@@ -40,7 +40,6 @@
 
 #include <iomanip>
 #include <sstream>
-#include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/PlugIn.h>
 #include "common.h"
@@ -53,7 +52,7 @@ using namespace OpenSteer;
 // ----------------------------------------------------------------------------
 
 template<typename Entity>
-class LowSpeedTurn: public VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>
+class LowSpeedTurn: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
@@ -72,7 +71,7 @@ public:
 	{
 		// reset vehicle state
 		SimpleVehicle::reset();
-		VehicleAddOnMixin<OpenSteer::SimpleVehicle, Entity>::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 
 ///		// speed along Forward direction.
 ///		setSpeed(startSpeed);
@@ -87,16 +86,20 @@ public:
 ///		// for next instance: step speed
 ///		startSpeed += 0.15f;
 
+#ifdef ELY_DEBUG
 		// 15 seconds and 150 points along the trail
 		this->setTrailParameters(15, 150);
+#endif
 	}
 
+#ifdef ELY_DEBUG
 	// draw into the scene
 	void draw(void)
 	{
 		drawBasic2dCircularVehicle(*this, gGray50);
 		this->drawTrail();
 	}
+#endif
 
 	// per frame simulation update
 	void update(const float currentTime, const float elapsedTime)
@@ -106,9 +109,11 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 
 	// reset starting positions
@@ -140,9 +145,11 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 };
 
@@ -191,6 +198,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
+#ifdef ELY_DEBUG
 		// update, draw and annotate each agent
 		iterator iter;
 		for (iter = all.begin(); iter != all.end(); ++iter)
@@ -210,6 +218,7 @@ public:
 /////					drawGetWindowWidth(), drawGetWindowHeight());
 			draw2dTextAt3dLocation(annote, textPosition, textColor, 0.0, 0.0);
 		}
+#endif
 	}
 
 	void close(void)
