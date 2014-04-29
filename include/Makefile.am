@@ -26,6 +26,9 @@ opensteer_headers = \
 		AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h \
 		AIComponents/OpenSteerLocal/SimpleVehicle.h
 		
+bullet_headers = \
+		PhysicsComponents/BulletLocal/common.h
+		
 noinst_HEADERS = \
 		AIComponents/CrowdAgent.h \
 		AIComponents/CrowdAgentTemplate.h \
@@ -63,6 +66,7 @@ noinst_HEADERS = \
 		PhysicsComponents/RigidBody.h \
 		PhysicsComponents/RigidBodyTemplate.h \
 		PhysicsComponents/SoftBody.h \
+		$(bullet_headers) \
 		PhysicsComponents/SoftBodyTemplate.h \
 		PhysicsControlComponents/CharacterController.h \
 		PhysicsControlComponents/CharacterControllerTemplate.h \

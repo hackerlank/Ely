@@ -24,15 +24,17 @@
 #include <cmath>
 #include <asyncTaskManager.h>
 #include <nodePathCollection.h>
-#include <bulletSphereShape.h>
-#include <bulletPlaneShape.h>
-#include <bulletBoxShape.h>
-#include <bulletCylinderShape.h>
-#include <bulletCapsuleShape.h>
-#include <bulletConeShape.h>
-#include <bulletHeightfieldShape.h>
-#include <bulletTriangleMesh.h>
-#include <bulletTriangleMeshShape.h>
+#include <bullet/BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
+#include <bullet/BulletSoftBody/btSoftRigidDynamicsWorld.h>
+#include <BulletCollision/CollisionShapes/btSphereShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btStaticPlaneShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btBoxShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btCylinderShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btCapsuleShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btConeShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
+#include <bullet/BulletCollision/CollisionShapes/btTriangleMesh.h>
+#include <bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
 #include "Game/GamePhysicsManager.h"
 #include "Game/GameManager.h"
 
@@ -47,8 +49,16 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 	mPhysicsComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	mBulletWorld = new BulletWorld();
-	mBulletWorld->set_gravity(0.0, 0.0, -9.81);
+
+	//begin all Bullet physics
+	mCollisionConfiguration = new btSoftBodyRigidBodyCollisionConfiguration();
+	mCollisionDispatcher = new btCollisionDispatcher(mCollisionConfiguration);
+	mBroadphaseInterface = new btDbvtBroadphase();
+	mConstraintSolver = new btSequentialImpulseConstraintSolver;
+	mBulletWorld = new btSoftRigidDynamicsWorld(mCollisionDispatcher,
+			mBroadphaseInterface, mConstraintSolver, mCollisionConfiguration);
+	mBulletWorld->setGravity(LVecBase3fTobtVector3(LVecBase3f(0.0, 0.0, -9.81)));
+
 	//create the task for updating step simulation and physics component
 	mUpdateData = new TaskInterface<GamePhysicsManager>::TaskData(this,
 			&GamePhysicsManager::update);
@@ -177,12 +187,12 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	{
 		maxSubSteps = 9;
 	}
-	mBulletWorld->do_physics(dt, maxSubSteps);
+	mBulletWorld->stepSimulation(dt, maxSubSteps);
 	//
 	return AsyncTask::DS_cont;
 }
 
-SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
+btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 		ShapeType shapeType, ShapeSize shapeSize, LVecBase3f& modelDims,
 		LVector3f& modelDeltaCenter, float& modelRadius,
 		float& dim1, float& dim2, float& dim3, float& dim4,
@@ -190,7 +200,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		const Filename& heightfieldFile, bool dynamic)
 {
 	// create the current shape
-	SMARTPTR(BulletShape) collisionShape = NULL;
+	btCollisionShape* collisionShape = NULL;
 	NodePathCollection geomNodes;
 	//some preliminary check
 	if (modelNP.is_empty())
@@ -225,7 +235,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			//modify radius
 			dim1 = modelRadius;
 		}
-		collisionShape = new BulletSphereShape(dim1);
+		collisionShape = new btSphereShape(dim1);
 		break;
 		case PLANE:
 		if (automaticShaping)
@@ -236,7 +246,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			dim3 = 1.0;
 			dim4 = 0.0;
 		}
-		collisionShape = new BulletPlaneShape(LVector3f(dim1, dim2, dim3),
+		collisionShape = new btStaticPlaneShape(LVecBase3fTobtVector3(LVector3f(dim1, dim2, dim3)),
 				dim4);
 		break;
 		case BOX:
@@ -247,7 +257,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			dim2 = modelDims.get_y() / 2.0;
 			dim3 = modelDims.get_z() / 2.0;
 		}
-		collisionShape = new BulletBoxShape(LVector3f(dim1, dim2, dim3));
+		collisionShape = new btBoxShape(LVecBase3fTobtVector3(LVector3f(dim1, dim2, dim3)));
 		break;
 		case CYLINDER:
 		if (automaticShaping)
@@ -269,7 +279,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 				dim2 = modelDims.get_z();
 			}
 		}
-		collisionShape = new BulletCylinderShape(dim1, dim2, upAxis);
+		collisionShape = new btBulletCylinderShape(dim1, dim2, upAxis);
 		break;
 		case CAPSULE:
 		if (automaticShaping)

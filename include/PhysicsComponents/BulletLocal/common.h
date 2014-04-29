@@ -15,13 +15,13 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/Game/BulletLocal/BulletCommon.h
+ * \file /Ely/include/PhysicsComponents/BulletLocal/common.h
  *
  * \date 29/apr/2014 (12:31:48)
  * \author consultit
  */
-#ifndef BULLETCOMMON_H_
-#define BULLETCOMMON_H_
+#ifndef BULLETLOCALCOMMON_H_
+#define BULLETLOCALCOMMON_H_
 
 #include <nodePath.h>
 #include <lquaternion.h>
@@ -30,6 +30,12 @@
 
 namespace ely
 {
+
+enum BulletUpAxis {
+  X_up = 0,
+  Y_up = 1,
+  Z_up = 2,
+};
 
 // Utility functions
 inline btVector3 LVecBase3fTobtVector3(const LVecBase3f& v)
@@ -125,4 +131,4 @@ protected:
 
 } // namespace ely
 
-#endif /* BULLETCOMMON_H_ */
+#endif /* BULLETLOCALCOMMON_H_ */

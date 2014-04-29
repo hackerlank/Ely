@@ -25,11 +25,12 @@
 #define GAMEPHYSICSMANAGER_H_
 
 #include "Utilities/Tools.h"
+#include "PhysicsComponents/BulletLocal/common.h"
+#include "ObjectModel/Component.h"
 #include <list>
 #include <bullet/btBulletCollisionCommon.h>
 #include <bullet/btBulletDynamicsCommon.h>
 #include <windowFramework.h>
-#include "ObjectModel/Component.h"
 
 namespace ely
 {
