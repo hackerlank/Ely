@@ -26,7 +26,8 @@
 
 #include "Utilities/Tools.h"
 #include <list>
-#include <bulletWorld.h>
+#include <bullet/btBulletCollisionCommon.h>
+#include <bullet/btBulletDynamicsCommon.h>
 #include <windowFramework.h>
 #include "ObjectModel/Component.h"
 
@@ -66,7 +67,7 @@ public:
 	 * \brief Gets a reference to the Bullet world.
 	 * @return The Bullet world.
 	 */
-	SMARTPTR(BulletWorld) bulletWorld() const;
+	btDynamicsWorld* bulletWorld() const;
 
 	/**
 	 * \brief Updates step simulation and physics components.
@@ -163,7 +164,7 @@ public:
 	 * @param heightfieldFile The height field file.
 	 * @return A (smart) pointer to the created shape.
 	 */
-	SMARTPTR(BulletShape) createShape(NodePath modelNP, ShapeType shapeType,
+	btCollisionShape* createShape(NodePath modelNP, ShapeType shapeType,
 			ShapeSize shapeSize, LVecBase3f& modelDims, LVector3f& modelDeltaCenter,
 			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
 			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
@@ -217,8 +218,18 @@ public:
 			SMARTPTR(Component) physicsComponent);
 
 private:
-	/// Bullet world.
-	SMARTPTR(BulletWorld) mBulletWorld;
+	///Current underlying DynamicsWorld.
+	btDynamicsWorld *mBulletWorld;
+	///collision configuration contains default setup for memory, collision setup. Advanced users can create their own configuration.
+	btCollisionConfiguration *mCollisionConfiguration;
+	///use the default collision dispatcher. For parallel processing you can use a different dispatcher (see Extras/BulletMultiThreaded)
+	btCollisionDispatcher *mCollisionDispatcher;
+	///btDbvtBroadphase is a good general purpose broad-phase. You can also try out btAxis3Sweep.
+	btBroadphaseInterface* mBroadphaseInterface;
+	///the default constraint solver. For parallel processing you can use a different solver (see Extras/BulletMultiThreaded)
+	btConstraintSolver *mConstraintSolver;
+	///Dynamics World
+	btVector3 mGravity;
 
 #ifdef ELY_DEBUG
 	/// Bullet Debug node path.

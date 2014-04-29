@@ -112,7 +112,7 @@ void GamePhysicsManager::removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp
 	}
 }
 
-SMARTPTR(BulletWorld) GamePhysicsManager::bulletWorld() const
+btDynamicsWorld* GamePhysicsManager::bulletWorld() const
 {
 	return mBulletWorld;
 }
