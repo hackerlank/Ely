@@ -27,8 +27,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include <DetourCrowd.h>
-#include <bulletWorld.h>
-#include <bulletClosestHitRayResult.h>
+#include <bullet/btBulletDynamicsCommon.h>
 
 namespace ely
 {
@@ -39,9 +38,7 @@ class NavMesh;
 ///CrowdAgent movement type.
 enum CrowdAgentMovType
 {
-	RECAST,
-	RECAST_KINEMATIC,
-	AgentMovType_NONE
+	RECAST, RECAST_KINEMATIC, AgentMovType_NONE
 };
 
 /**
@@ -168,10 +165,11 @@ private:
 	 * \brief Physics data.
 	 */
 	///@{
-	SMARTPTR(BulletWorld) mBulletWorld;
+	btDynamicsWorld* mBulletWorld;
 	float mMaxError;
 	LVector3f mDeltaRayDown, mDeltaRayOrig;
-	BulletClosestHitRayResult mHitResult;
+	///TODO
+	bulletClosestRayResultCallback mHitResult;
 	BitMask32 mRayMask;
 	float mCorrectHeightRigidBody;
 	///@}
@@ -247,10 +245,11 @@ inline void CrowdAgent::reset()
 	mAgentParams = dtCrowdAgentParams();
 	mMoveTarget = LPoint3f::zero();
 	mMoveVelocity = LVector3f::zero();
-	mBulletWorld.clear();
+	mBulletWorld = NULL;
 	mMaxError = 0.0;
 	mDeltaRayDown = mDeltaRayOrig = LVector3f::zero();
-	mHitResult = BulletClosestHitRayResult::empty();
+	mHitResult = btCollisionWorld::ClosestRayResultCallback(btVector3(),
+			btVector3());
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
 	mStart = mStop = ThrowEventData();

@@ -258,9 +258,9 @@ AC_MSG_NOTICE([Looking for Panda3d SDK libraries...])
 PANDA3DSDK_LDFLAGS="-L/usr/lib/panda3d -L/usr/lib64/panda3d \
 				-L/usr/local/lib/panda3d ${EIGEN_LDFLAGS}"
 PANDA3DSDK_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
-			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet \
+			-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct \
 			-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lp3rocket \
-			-lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader -l$2 ${EIGEN_LIBS}"
+			-lpandagl -lpandaskel -lp3ptloader -l$2 ${EIGEN_LIBS}"
 			
 LDFLAGS="${PANDA3DSDK_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3DSDK_LIBS} ${LIBS_CMDLINE}"

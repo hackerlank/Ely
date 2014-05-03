@@ -24,6 +24,7 @@
 #include <cmath>
 #include <asyncTaskManager.h>
 #include <nodePathCollection.h>
+#include <pnmImage.h>
 #include <bullet/BulletSoftBody/btSoftBodyRigidBodyCollisionConfiguration.h>
 #include <bullet/BulletSoftBody/btSoftRigidDynamicsWorld.h>
 #include <BulletCollision/CollisionShapes/btSphereShape.h>
@@ -35,6 +36,7 @@
 #include <bullet/BulletCollision/CollisionShapes/btHeightfieldTerrainShape.h>
 #include <bullet/BulletCollision/CollisionShapes/btTriangleMesh.h>
 #include <bullet/BulletCollision/CollisionShapes/btBvhTriangleMeshShape.h>
+#include <bullet/BulletCollision/Gimpact/btGImpactShape.h>
 #include "Game/GamePhysicsManager.h"
 #include "Game/GameManager.h"
 
@@ -57,7 +59,8 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 	mConstraintSolver = new btSequentialImpulseConstraintSolver;
 	mBulletWorld = new btSoftRigidDynamicsWorld(mCollisionDispatcher,
 			mBroadphaseInterface, mConstraintSolver, mCollisionConfiguration);
-	mBulletWorld->setGravity(LVecBase3fTobtVector3(LVecBase3f(0.0, 0.0, -9.81)));
+	mBulletWorld->setGravity(
+			LVecBase3fTobtVector3(LVecBase3f(0.0, 0.0, -9.81)));
 
 	//create the task for updating step simulation and physics component
 	mUpdateData = new TaskInterface<GamePhysicsManager>::TaskData(this,
@@ -79,8 +82,9 @@ GamePhysicsManager::GamePhysicsManager(int sort, int priority,
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 #ifdef ELY_DEBUG
-	// set up Bullet Debug Renderer (disabled by default)
-	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
+	///TODO
+//	// set up Bullet Debug Renderer (disabled by default)
+//	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
 #endif
 }
 
@@ -96,26 +100,26 @@ GamePhysicsManager::~GamePhysicsManager()
 	mPhysicsComponents.clear();
 }
 
-void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component) physicsComp)
+void GamePhysicsManager::addToPhysicsUpdate(SMARTPTR(Component)physicsComp)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
-			mPhysicsComponents.end(), physicsComp);
+	mPhysicsComponents.end(), physicsComp);
 	if (iter == mPhysicsComponents.end())
 	{
 		mPhysicsComponents.push_back(physicsComp);
 	}
 }
 
-void GamePhysicsManager::removeFromPhysicsUpdate(SMARTPTR(Component) physicsComp)
+void GamePhysicsManager::removeFromPhysicsUpdate(SMARTPTR(Component)physicsComp)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	PhysicsComponentList::iterator iter = find(mPhysicsComponents.begin(),
-			mPhysicsComponents.end(), physicsComp);
+	mPhysicsComponents.end(), physicsComp);
 	if (iter != mPhysicsComponents.end())
 	{
 		mPhysicsComponents.remove(physicsComp);
@@ -194,10 +198,9 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 
 btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 		ShapeType shapeType, ShapeSize shapeSize, LVecBase3f& modelDims,
-		LVector3f& modelDeltaCenter, float& modelRadius,
-		float& dim1, float& dim2, float& dim3, float& dim4,
-		bool automaticShaping, BulletUpAxis upAxis,
-		const Filename& heightfieldFile, bool dynamic)
+		LVector3f& modelDeltaCenter, float& modelRadius, float& dim1,
+		float& dim2, float& dim3, float& dim4, bool automaticShaping,
+		BulletUpAxis upAxis, const Filename& heightfieldFile, bool dynamic)
 {
 	// create the current shape
 	btCollisionShape* collisionShape = NULL;
@@ -217,7 +220,8 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 		{
 			//get the bounding dimensions of object node path, that
 			//should represents a model
-			getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+			getBoundingDimensions(modelNP, modelDims, modelDeltaCenter,
+					modelRadius);
 		}
 		else
 		{
@@ -229,15 +233,16 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 	//
 	switch (shapeType)
 	{
-		case SPHERE:
+	case SPHERE:
 		if (automaticShaping)
 		{
 			//modify radius
 			dim1 = modelRadius;
 		}
+		//create sphere
 		collisionShape = new btSphereShape(dim1);
 		break;
-		case PLANE:
+	case PLANE:
 		if (automaticShaping)
 		{
 			//modify normal and d
@@ -246,10 +251,11 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 			dim3 = 1.0;
 			dim4 = 0.0;
 		}
-		collisionShape = new btStaticPlaneShape(LVecBase3fTobtVector3(LVector3f(dim1, dim2, dim3)),
-				dim4);
+		//create plane
+		collisionShape = new btStaticPlaneShape(
+				LVecBase3fTobtVector3(LVector3f(dim1, dim2, dim3)), dim4);
 		break;
-		case BOX:
+	case BOX:
 		if (automaticShaping)
 		{
 			//modify half dimensions
@@ -257,9 +263,10 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 			dim2 = modelDims.get_y() / 2.0;
 			dim3 = modelDims.get_z() / 2.0;
 		}
-		collisionShape = new btBoxShape(LVecBase3fTobtVector3(LVector3f(dim1, dim2, dim3)));
+		//create box
+		collisionShape = new btBoxShape(btVector3(dim1, dim2, dim3));
 		break;
-		case CYLINDER:
+	case CYLINDER:
 		if (automaticShaping)
 		{
 			//modify radius and height
@@ -279,9 +286,24 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 				dim2 = modelDims.get_z();
 			}
 		}
-		collisionShape = new btBulletCylinderShape(dim1, dim2, upAxis);
+		//create cylinder
+		if (upAxis == X_up)
+		{
+			collisionShape = new btCylinderShapeX(
+					btVector3(dim1, 0.5 * dim2, dim1));
+		}
+		else if (upAxis == Y_up)
+		{
+			collisionShape = new btCylinderShape(
+					btVector3(dim1, 0.5 * dim2, dim1));
+		}
+		else
+		{
+			collisionShape = new btCylinderShapeZ(
+					btVector3(dim1, 0.5 * dim2, dim1));
+		}
 		break;
-		case CAPSULE:
+	case CAPSULE:
 		if (automaticShaping)
 		{
 			//modify radius and height
@@ -305,9 +327,21 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 		{
 			dim2 = 0.0;
 		}
-		collisionShape = new BulletCapsuleShape(dim1, dim2, upAxis);
+		//create capsule
+		if (upAxis == X_up)
+		{
+			collisionShape = new btCapsuleShapeX(dim1, dim2);
+		}
+		else if (upAxis == Y_up)
+		{
+			collisionShape = new btCapsuleShape(dim1, dim2);
+		}
+		else
+		{
+			collisionShape = new btCapsuleShapeZ(dim1, dim2);
+		}
 		break;
-		case CONE:
+	case CONE:
 		if (automaticShaping)
 		{
 			//modify radius and height
@@ -327,36 +361,118 @@ btCollisionShape* GamePhysicsManager::createShape(NodePath modelNP,
 				dim2 = modelDims.get_z();
 			}
 		}
-		collisionShape = new BulletConeShape(dim1, dim2, upAxis);
-		break;
-		case HEIGHTFIELD:
-		collisionShape = new BulletHeightfieldShape(heightfieldFile, 1.0, upAxis);
-		break;
-		case TRIANGLEMESH:
+		//create cone
+		if (upAxis == X_up)
 		{
-			//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
-			BulletTriangleMesh* triMesh = new BulletTriangleMesh();
-			//add geoms from geomNodes to the mesh
-			for (int i = 0; i < geomNodes.get_num_paths(); ++i)
-			{
-				SMARTPTR(GeomNode) geomNode = DCAST(GeomNode,
-						geomNodes.get_path(i).node());
-				//BulletShape::set_local_scale doesn't work anymore
-				//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-				CSMARTPTR(TransformState) ts = (geomNode->get_transform()->
-						compose(TransformState::make_scale(
-							modelNP.get_net_transform()->get_scale()))).p();
-				GeomNode::Geoms geoms = geomNode->get_geoms();
-				for (int j = 0; j < geoms.get_num_geoms(); ++j)
-				{
-					triMesh->add_geom(geoms.get_geom(j), true, ts.p());
-				}
-			}
-			collisionShape = new BulletTriangleMeshShape(triMesh, dynamic);
+			collisionShape = new btConeShapeX(dim1, dim2);
+		}
+		else if (upAxis == Y_up)
+		{
+			collisionShape = new btConeShape(dim1, dim2);
+		}
+		else
+		{
+			collisionShape = new btConeShapeZ(dim1, dim2);
 		}
 		break;
+	case HEIGHTFIELD:
+	{
+		PNMImage image = PNMImage(heightfieldFile);
+		int _num_rows = image.get_x_size();
+		int _num_cols = image.get_y_size();
+
+		float *_data = new float[_num_rows * _num_cols];
+
+		for (int row = 0; row < _num_rows; row++)
+		{
+			for (int column = 0; column < _num_cols; column++)
+			{
+				_data[_num_cols * row + column] = 1.0
+						* image.get_bright(column, _num_cols - row - 1);
+			}
+		}
+		//create heightfield
+		collisionShape = new btHeightfieldTerrainShape(_num_rows, _num_cols,
+				_data, 1.0, upAxis, true, false);
+	}
+		break;
+	case TRIANGLEMESH:
+	{
+		//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
+		btTriangleMesh* triMesh = new btTriangleMesh();
+		//add geoms from geomNodes to the mesh
+		for (int i = 0; i < geomNodes.get_num_paths(); ++i)
+		{
+			SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
+					geomNodes.get_path(i).node());
+			//BulletShape::set_local_scale doesn't work anymore
+			//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
+			CSMARTPTR(TransformState) ts = (geomNode->get_transform()->
+					compose(TransformState::make_scale(
+									modelNP.get_net_transform()->get_scale()))).p();
+			GeomNode::Geoms geoms = geomNode->get_geoms();
+			for (int j = 0; j < geoms.get_num_geoms(); ++j)
+			{
+				const Geom *geom = geoms.get_geom(j);
+				LMatrix4f m = ts->get_mat();
+				// Collect points
+				pvector<LPoint3f> points;
+				CPT(GeomVertexData) vdata = geom->get_vertex_data();
+				GeomVertexReader reader = GeomVertexReader(vdata, InternalName::get_vertex());
+				while (!reader.is_at_end())
+				{
+					points.push_back(m.xform_point(reader.get_data3()));
+				}
+				// Convert points
+				btVector3 *vertices = new btVector3[points.size()];
+				int i = 0;
+				pvector<LPoint3>::const_iterator it;
+				for (it=points.begin(); it!=points.end(); it++)
+				{
+					LPoint3 v = *it;
+					vertices[i] = LVecBase3fTobtVector3(v);
+					i++;
+				}
+				// Add triangles
+				for (int k=0; k<geom->get_num_primitives(); k++)
+				{
+					CPT(GeomPrimitive) prim = geom->get_primitive(k);
+					prim = prim->decompose();
+					for (int l=0; l<prim->get_num_primitives(); l++)
+					{
+						int s = prim->get_primitive_start(l);
+						int e = prim->get_primitive_end(l);
+						btVector3 v0 = vertices[prim->get_vertex(s)];
+						btVector3 v1 = vertices[prim->get_vertex(s+1)];
+						btVector3 v2 = vertices[prim->get_vertex(s+2)];
+						triMesh->addTriangle(v0, v1, v2, true);
+					}
+				}
+			}
+		}
+		//create triangle mesh
+		// Assert that mesh has at least one triangle
+		if (triMesh->getNumTriangles() == 0)
+		{
+			triMesh->addTriangle(LVecBase3fTobtVector3(LPoint3::zero()),
+					LVecBase3fTobtVector3(LPoint3::zero()),
+					LVecBase3fTobtVector3(LPoint3::zero()));
+		}
+		// Dynamic will create a GImpact mesh shape
+		if (dynamic)
+		{
+			collisionShape = new btGImpactMeshShape(triMesh);
+			dynamic_cast<btGImpactMeshShape*>(collisionShape)->updateBound();
+		}
+		// Static will create a Bvh mesh shape
+		else
+		{
+			collisionShape = new btBvhTriangleMeshShape(triMesh, true);
+		}
+	}
+		break;
 		//
-		default:
+	default:
 		break;
 	}
 	//
@@ -399,50 +515,52 @@ float GamePhysicsManager::getDim(ShapeSize shapeSize, float d1, float d2)
 }
 
 #ifdef ELY_DEBUG
-NodePath GamePhysicsManager::getDebugNodePath() const
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return mBulletDebugNodePath;
-}
-
-void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
-	SMARTPTR(BulletDebugNode) bulletDebugNode =
-			DCAST(BulletDebugNode,mBulletDebugNodePath.node());
-	mBulletWorld->set_debug_node(bulletDebugNode);
-	bulletDebugNode->show_wireframe(true);
-	bulletDebugNode->show_constraints(true);
-	bulletDebugNode->show_bounding_boxes(false);
-	bulletDebugNode->show_normals(false);
-	mBulletDebugNodePath.hide();
-}
-
-void GamePhysicsManager::debug(bool enable)
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	if (enable)
-	{
-		if (mBulletDebugNodePath.is_hidden())
-		{
-			mBulletDebugNodePath.show();
-		}
-	}
-	else
-	{
-		if (not mBulletDebugNodePath.is_hidden())
-		{
-			mBulletDebugNodePath.hide();
-		}
-	}
-}
+///TODO
+//NodePath GamePhysicsManager::getDebugNodePath() const
+//{
+//	//lock (guard) the mutex
+//	HOLD_REMUTEX(mMutex)
+//
+//	return mBulletDebugNodePath;
+//}
+//
+//void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
+//{
+//	//lock (guard) the mutex
+//	HOLD_REMUTEX(mMutex)
+//
+//	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
+//	SMARTPTR(BulletDebugNode)bulletDebugNode =
+//	DCAST(BulletDebugNode,mBulletDebugNodePath.node());
+//	///TODO
+////	mBulletWorld->set_debug_node(bulletDebugNode);
+//	bulletDebugNode->show_wireframe(true);
+//	bulletDebugNode->show_constraints(true);
+//	bulletDebugNode->show_bounding_boxes(false);
+//	bulletDebugNode->show_normals(false);
+//	mBulletDebugNodePath.hide();
+//}
+//
+//void GamePhysicsManager::debug(bool enable)
+//{
+//	//lock (guard) the mutex
+//	HOLD_REMUTEX(mMutex)
+//
+//	if (enable)
+//	{
+//		if (mBulletDebugNodePath.is_hidden())
+//		{
+//			mBulletDebugNodePath.show();
+//		}
+//	}
+//	else
+//	{
+//		if (not mBulletDebugNodePath.is_hidden())
+//		{
+//			mBulletDebugNodePath.hide();
+//		}
+//	}
+//}
 #endif
 
 } // namespace ely
