@@ -48,8 +48,6 @@ btTransform TransformState_to_btTrans(
 CPT(TransformState)ts);
 
 // UpAxis
-BEGIN_PUBLISH
-
 enum BulletUpAxis
 {
 	X_up = 0, Y_up = 1, Z_up = 2,
@@ -59,6 +57,5 @@ BulletUpAxis get_default_up_axis();
 void get_node_transform(btTransform &trans, PandaNode *node);
 int get_bullet_version();
 
-END_PUBLISH
 }
 #endif // __BULLET_UTILS_H__
