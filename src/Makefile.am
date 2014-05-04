@@ -19,7 +19,8 @@ noinst_LTLIBRARIES = \
 noinst_LIBRARIES = \
 		libsupport.a \
 		librecastnavigation.a \
-		libopensteer.a
+		libopensteer.a \
+		libbullet.a
 
 #ltlibraries sources
 libaicomponents_la_SOURCES = \
@@ -117,3 +118,54 @@ libopensteer_a_SOURCES = \
 		AIComponents/OpenSteerLocal/Draw.cpp \
 		AIComponents/OpenSteerLocal/DrawMeshDrawer.cpp \
 		AIComponents/OpenSteerLocal/SimpleVehicle.cpp
+
+libbullet_a_SOURCES = \
+		PhysicsComponents/BulletLocal/bulletAllHitsRayResult.cpp \
+		PhysicsComponents/BulletLocal/bulletBaseCharacterControllerNode.cpp \
+		PhysicsComponents/BulletLocal/bulletBodyNode.cpp \
+		PhysicsComponents/BulletLocal/bulletBoxShape.cpp \
+		PhysicsComponents/BulletLocal/bulletCapsuleShape.cpp \
+		PhysicsComponents/BulletLocal/bulletCharacterControllerNode.cpp \
+		PhysicsComponents/BulletLocal/bulletClosestHitRayResult.cpp \
+		PhysicsComponents/BulletLocal/bulletClosestHitSweepResult.cpp \
+		PhysicsComponents/BulletLocal/bulletConeShape.cpp \
+		PhysicsComponents/BulletLocal/bulletConeTwistConstraint.cpp \
+		PhysicsComponents/BulletLocal/bulletConstraint.cpp \
+		PhysicsComponents/BulletLocal/bulletContactCallbackData.cpp \
+		PhysicsComponents/BulletLocal/bulletContactResult.cpp \
+		PhysicsComponents/BulletLocal/bulletConvexHullShape.cpp \
+		PhysicsComponents/BulletLocal/bulletConvexPointCloudShape.cpp \
+		PhysicsComponents/BulletLocal/bulletCylinderShape.cpp \
+		PhysicsComponents/BulletLocal/bulletDebugNode.cpp \
+		PhysicsComponents/BulletLocal/bulletFilterCallbackData.cpp \
+		PhysicsComponents/BulletLocal/bulletGenericConstraint.cpp \
+		PhysicsComponents/BulletLocal/bulletGhostNode.cpp \
+		PhysicsComponents/BulletLocal/bulletHeightfieldShape.cpp \
+		PhysicsComponents/BulletLocal/bulletHelper.cpp \
+		PhysicsComponents/BulletLocal/bulletHingeConstraint.cpp \
+		PhysicsComponents/BulletLocal/bulletManifoldPoint.cpp \
+		PhysicsComponents/BulletLocal/bulletMinkowskiSumShape.cpp \
+		PhysicsComponents/BulletLocal/bulletMultiSphereShape.cpp \
+		PhysicsComponents/BulletLocal/bulletPersistentManifold.cpp \
+		PhysicsComponents/BulletLocal/bulletPlaneShape.cpp \
+		PhysicsComponents/BulletLocal/bulletRigidBodyNode.cpp \
+		PhysicsComponents/BulletLocal/bulletRotationalLimitMotor.cpp \
+		PhysicsComponents/BulletLocal/bulletShape.cpp \
+		PhysicsComponents/BulletLocal/bulletSliderConstraint.cpp \
+		PhysicsComponents/BulletLocal/bulletSoftBodyConfig.cpp \
+		PhysicsComponents/BulletLocal/bulletSoftBodyControl.cpp \
+		PhysicsComponents/BulletLocal/bulletSoftBodyMaterial.cpp \
+		PhysicsComponents/BulletLocal/bulletSoftBodyNode.cpp \
+		PhysicsComponents/BulletLocal/bulletSoftBodyShape.cpp \
+		PhysicsComponents/BulletLocal/bulletSoftBodyWorldInfo.cpp \
+		PhysicsComponents/BulletLocal/bulletSphereShape.cpp \
+		PhysicsComponents/BulletLocal/bulletSphericalConstraint.cpp \
+		PhysicsComponents/BulletLocal/bulletTickCallbackData.cpp \
+		PhysicsComponents/BulletLocal/bulletTranslationalLimitMotor.cpp \
+		PhysicsComponents/BulletLocal/bulletTriangleMesh.cpp \
+		PhysicsComponents/BulletLocal/bulletTriangleMeshShape.cpp \
+		PhysicsComponents/BulletLocal/bullet_utils.cpp \
+		PhysicsComponents/BulletLocal/bulletVehicle.cpp \
+		PhysicsComponents/BulletLocal/bulletWheel.cpp \
+		PhysicsComponents/BulletLocal/bulletWorld.cpp \
+		PhysicsComponents/BulletLocal/config_bullet.cpp

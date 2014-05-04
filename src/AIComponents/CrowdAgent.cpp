@@ -28,7 +28,6 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "PhysicsComponents/BulletLocal/common.h"
 #include <throw_event.h>
 #include <bulletTriangleMesh.h>
 #include <bulletTriangleMeshShape.h>
@@ -42,21 +41,18 @@ const std::string STOPEVENT("OnStopCrowdAgent");
 namespace ely
 {
 
-CrowdAgent::CrowdAgent() :
-		mHitResult(
-				btCollisionWorld::ClosestRayResultCallback(btVector3(),
-						btVector3()))
+CrowdAgent::CrowdAgent():
+		mHitResult(BulletClosestHitRayResult::empty())
 {
 }
 
 CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):
-mHitResult(btCollisionWorld::ClosestRayResultCallback(btVector3(),
-		btVector3()))
+				mHitResult(BulletClosestHitRayResult::empty())
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
-	"CrowdAgent::CrowdAgent: invalid GameAIManager")
+			"CrowdAgent::CrowdAgent: invalid GameAIManager")
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
-	"CrowdAgent::CrowdAgent: invalid GamePhysicsManager")
+			"CrowdAgent::CrowdAgent: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;
 	mNavMesh.clear();
@@ -151,7 +147,7 @@ bool CrowdAgent::initialize()
 	mAgentParams.separationWeight = (value >= 0.0 ? value : -value);
 	//update flags
 	valueInt = strtol(mTmpl->parameter(std::string("update_flags")).c_str(),
-	NULL, 0);
+			NULL, 0);
 	mAgentParams.updateFlags = (valueInt >= 0.0 ? valueInt : -valueInt);
 	//obstacle avoidance type
 	valueInt = strtol(
@@ -187,10 +183,10 @@ void CrowdAgent::onAddToObjectSetup()
 	//add the task chain on which addCrowdAgentAsync() will be running
 	mTaskChainName = mComponentId + "-taskChain";
 	AsyncTaskManager::get_global_ptr()->make_task_chain(mTaskChainName);
-	AsyncTaskManager::get_global_ptr()->find_task_chain(mTaskChainName)->set_num_threads(
-			1);
-	AsyncTaskManager::get_global_ptr()->find_task_chain(mTaskChainName)->set_frame_sync(
-			false);
+	AsyncTaskManager::get_global_ptr()->
+			find_task_chain(mTaskChainName)->set_num_threads(1);
+	AsyncTaskManager::get_global_ptr()->
+				find_task_chain(mTaskChainName)->set_frame_sync(false);
 #endif
 
 	///set thrown events if any
@@ -198,7 +194,7 @@ void CrowdAgent::onAddToObjectSetup()
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;
 	param = mTmpl->parameter(std::string("thrown_events"));
-	if (param != std::string(""))
+	if(param != std::string(""))
 	{
 		//events specified
 		//event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]
@@ -279,8 +275,8 @@ void CrowdAgent::onAddToSceneSetup()
 	///2: add settings for CrowdAgent
 	///set params: already done
 	///set NavMesh object (if any)
-	SMARTPTR(Object)navMeshObject = ObjectTemplateManager::
-	GetSingleton().getCreatedObject(mNavMeshObjectId);
+	SMARTPTR(Object) navMeshObject = ObjectTemplateManager::
+			GetSingleton().getCreatedObject(mNavMeshObjectId);
 
 	///3: add to NavMesh update
 	if(navMeshObject)
@@ -328,8 +324,8 @@ void CrowdAgent::onRemoveFromSceneCleanup()
 	///Remove from NavMesh update (if previously added)
 	//mNavMesh will be cleared during removing, so
 	//remove through a temporary pointer
-	SMARTPTR(NavMesh)navMesh = mNavMesh;
-	if (navMesh)
+	SMARTPTR(NavMesh) navMesh = mNavMesh;
+	if(navMesh)
 	{
 #ifdef ELY_THREAD
 		//lock (guard) the mutex
@@ -382,7 +378,7 @@ void CrowdAgent::setMoveVelocity(const LVector3f& vel)
 	mNavMesh->setCrowdAgentVelocity(this, vel);
 }
 
-SMARTPTR(NavMesh)CrowdAgent::getNavMesh() const
+SMARTPTR(NavMesh) CrowdAgent::getNavMesh() const
 {
 	//lock (guard) the CrowdAgent NavMesh mutex
 	HOLD_REMUTEX(mNavMeshMutex)
@@ -390,8 +386,7 @@ SMARTPTR(NavMesh)CrowdAgent::getNavMesh() const
 	return mNavMesh;
 }
 
-void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos,
-		const LVector3f& vel)
+void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
 	if (vel.length_squared() > 0.0)
 	{
@@ -403,12 +398,10 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos,
 			break;
 		case RECAST_KINEMATIC:
 			//correct updatedPos.z (if needed)
-			///TODO
 			//ray down
 			mHitResult = mBulletWorld->ray_test_closest(
 					updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
 					mRayMask);
-
 			if (mHitResult.has_hit())
 			{
 				//updatedPos.z needs correction
@@ -456,6 +449,7 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos,
 	}
 }
 
+
 void CrowdAgent::doEnableCrowdAgentEvent(Event event, ThrowEventData eventData)
 {
 	//some checks
@@ -468,14 +462,14 @@ void CrowdAgent::doEnableCrowdAgentEvent(Event event, ThrowEventData eventData)
 	switch (event)
 	{
 	case STARTEVENT:
-		if (mStart.mEnable != eventData.mEnable)
+		if(mStart.mEnable != eventData.mEnable)
 		{
 			mStart = eventData;
 			mStart.mFrameCount = 0;
 		}
 		break;
 	case STOPEVENT:
-		if (mStop.mEnable != eventData.mEnable)
+		if(mStop.mEnable != eventData.mEnable)
 		{
 			mStop = eventData;
 			mStop.mFrameCount = 0;

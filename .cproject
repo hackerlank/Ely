@@ -43,7 +43,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1251153096" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1251153096" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2093535115" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -104,7 +104,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.620884677" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.620884677" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.2133312240" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -235,7 +235,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.119989242" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.119989242" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.601151752" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -296,7 +296,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1442098817" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1442098817" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1286370007" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -418,7 +418,7 @@
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/tinyxml2}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/librecastnavigation-dev"/>
 								</option>
-								<option id="gnu.cpp.compiler.option.preprocessor.def.1663106571" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
+								<option id="gnu.cpp.compiler.option.preprocessor.def.1663106571" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1230342913" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
@@ -970,6 +970,14 @@
 				<buildTarget>libopensteer.a</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="libbullet.a" path="build-Devel_Debug_Thread/src" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments/>
+				<buildTarget>libbullet.a</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>false</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="Training_Debug-recastnavigation" path="build-Training_Debug/training/recastnavigation" targetID="org.eclipse.cdt.build.MakeTargetBuilder">

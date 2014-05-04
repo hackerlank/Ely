@@ -27,8 +27,8 @@
 #include "Utilities/Tools.h"
 #include <pandaFramework.h>
 #include <lens.h>
-#include <bullet/btBulletCollisionCommon.h>
-#include <bullet/btBulletDynamicsCommon.h>
+#include <bulletWorld.h>
+#include <bulletSphericalConstraint.h>
 
 namespace ely
 {
@@ -63,9 +63,9 @@ private:
 	///Camera lens reference.
 	SMARTPTR(Lens) mCamLens;
 	///Bullet world.
-	btDynamicsWorld*  mWorld;
+	SMARTPTR(BulletWorld) mWorld;
 	///Picking logic data.
-	btPoint2PointConstraint* mCsPick;
+	SMARTPTR(BulletSphericalConstraint) mCsPick;
 	LPoint3f mPivotPos;
 
 	/**
@@ -74,7 +74,7 @@ private:
 	///@{
 	SMARTPTR(EventCallbackInterface<Picker>::EventCallbackData) mPickBodyData;
 	void pickBody(const Event* event);
-	btRigidBody * mPickedBody;
+	SMARTPTR(BulletRigidBodyNode) mPickedBody;
 	std::string mPickKeyOn, mPickKeyOff;
 	///@}
 	/**

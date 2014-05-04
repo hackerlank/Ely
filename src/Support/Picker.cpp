@@ -94,7 +94,7 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 		mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
 	}
 	//reset picking logic data
-	mCsPick = NULL;
+	mCsPick.clear();
 	mPivotPos = LPoint3f::zero();
 	// setup event callback for picking body
 	mPickKeyOn = pickKeyOn;
@@ -136,123 +136,121 @@ Picker::~Picker()
 
 void Picker::pickBody(const Event* event)
 {
-	///TODO
-//	//lock (guard) the mutex
-//	HOLD_REMUTEX(mMutex)
-//
-//	// handle body picking
-//	if (event->get_name() == mPickKeyOn)
-//	{
-//		//get the mouse watcher
-//		SMARTPTR(MouseWatcher)mwatcher = DCAST(MouseWatcher,
-//				mWindow->get_mouse().node());
-//		if (mwatcher->has_mouse())
-//		{
-//			// Get to and from pos in camera coordinates
-//			LPoint2f pMouse = mwatcher->get_mouse();
-//			//
-//			LPoint3f pFrom, pTo;
-//			if (mCamLens->extrude(pMouse, pFrom, pTo))
-//			{
-//				//Transform to global coordinates
-//				pFrom = mRender.get_relative_point(mCamera, pFrom);
-//				pTo = mRender.get_relative_point(mCamera, pTo);
-//				//cast a ray to detect a body
-//				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom, pTo,
-//						BitMask32::all_on());
-//				//
-//				if (result.has_hit())
-//				{
-//					//possible hit objects:
-//					//- BulletRigidBodyNode
-//					//- BulletCharacterControllerNode
-//					//- BulletVehicle
-//					//- BulletConstraint
-//					//- BulletSoftBodyNode
-//					//- BulletGhostNode
-//					if (result.get_node()->is_of_type(BulletRigidBodyNode::get_class_type()))
-//					{
-//						mPickedBody = DCAST(BulletRigidBodyNode,
-//								const_cast<PandaNode*>(result.get_node()));
-//						if (not(mPickedBody->is_static() or mPickedBody->is_kinematic()))
-//						{
-//							//
-//							mPickedBody->set_active(true);
-//							mPickedBody->set_deactivation_enabled(false);
-//							mPivotPos = result.get_hit_pos();
-//							//
-//							NodePath bodyNP(mPickedBody);
-//							LPoint3f pivotLocalPos = bodyNP.get_relative_point(mRender, mPivotPos);
-//							//create constraint
-//							mCsPick = new BulletSphericalConstraint(
-//									mPickedBody,
-//									pivotLocalPos);
-//							//and attach it to the world
-//							mWorld->attach(mCsPick);
-//							//
-//							PRINT_DEBUG_HIT;
-//						}
-//						else
-//						{
-//							PRINT_DEBUG_HIT;
-//						}
-//					}
-//					else
-//					{
-//						PRINT_DEBUG_HIT;
-//					}
-//				}
-//			}
-//		}
-//	}
-//	else
-//	{
-//		if(not mCsPick.is_null())
-//		{
-//			//remove constraint from world
-//			mWorld->remove(mCsPick);
-//			//delete constraint
-//			mCsPick.clear();
-//			mPickedBody->set_deactivation_enabled(true);
-//			mPickedBody->set_active(false);
-//		}
-//	}
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	// handle body picking
+	if (event->get_name() == mPickKeyOn)
+	{
+		//get the mouse watcher
+		SMARTPTR(MouseWatcher)mwatcher = DCAST(MouseWatcher,
+				mWindow->get_mouse().node());
+		if (mwatcher->has_mouse())
+		{
+			// Get to and from pos in camera coordinates
+			LPoint2f pMouse = mwatcher->get_mouse();
+			//
+			LPoint3f pFrom, pTo;
+			if (mCamLens->extrude(pMouse, pFrom, pTo))
+			{
+				//Transform to global coordinates
+				pFrom = mRender.get_relative_point(mCamera, pFrom);
+				pTo = mRender.get_relative_point(mCamera, pTo);
+				//cast a ray to detect a body
+				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom, pTo,
+						BitMask32::all_on());
+				//
+				if (result.has_hit())
+				{
+					//possible hit objects:
+					//- BulletRigidBodyNode
+					//- BulletCharacterControllerNode
+					//- BulletVehicle
+					//- BulletConstraint
+					//- BulletSoftBodyNode
+					//- BulletGhostNode
+					if (result.get_node()->is_of_type(BulletRigidBodyNode::get_class_type()))
+					{
+						mPickedBody = DCAST(BulletRigidBodyNode,
+								const_cast<PandaNode*>(result.get_node()));
+						if (not(mPickedBody->is_static() or mPickedBody->is_kinematic()))
+						{
+							//
+							mPickedBody->set_active(true);
+							mPickedBody->set_deactivation_enabled(false);
+							mPivotPos = result.get_hit_pos();
+							//
+							NodePath bodyNP(mPickedBody);
+							LPoint3f pivotLocalPos = bodyNP.get_relative_point(mRender, mPivotPos);
+							//create constraint
+							mCsPick = new BulletSphericalConstraint(
+									mPickedBody,
+									pivotLocalPos);
+							//and attach it to the world
+							mWorld->attach(mCsPick);
+							//
+							PRINT_DEBUG_HIT;
+						}
+						else
+						{
+							PRINT_DEBUG_HIT;
+						}
+					}
+					else
+					{
+						PRINT_DEBUG_HIT;
+					}
+				}
+			}
+		}
+	}
+	else
+	{
+		if(not mCsPick.is_null())
+		{
+			//remove constraint from world
+			mWorld->remove(mCsPick);
+			//delete constraint
+			mCsPick.clear();
+			mPickedBody->set_deactivation_enabled(true);
+			mPickedBody->set_active(false);
+		}
+	}
 }
 
 AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 {
-	///TODO
-//	//lock (guard) the mutex
-//	HOLD_REMUTEX(mMutex)
-//
-//	// handle picked body if any
-//	if (not mCsPick.is_null())
-//	{
-//		//get the mouse watcher
-//		SMARTPTR(MouseWatcher)mwatcher =
-//		DCAST(MouseWatcher, mWindow->get_mouse().node());
-//		if (mwatcher->has_mouse())
-//		{
-//			// Get to and from pos in camera coordinates
-//			LPoint2f pMouse = mwatcher->get_mouse();
-//			//
-//			LPoint3f pNear, pFar;
-//			if (mCamLens->extrude(pMouse, pNear, pFar))
-//			{
-//				// Transform to global coordinates
-//				pNear = mRender.get_relative_point(mCamera, pNear);
-//				pFar = mRender.get_relative_point(mCamera, pFar);
-//				// new pivot (b) pos
-//				LVector3f vecFarNear = pFar - pNear;
-//				LVector3f vecPivotNear = mPivotPos - pNear;
-//				mPivotPos = pNear + (vecFarNear / vecFarNear.length_squared()) *
-//				vecPivotNear.dot(vecFarNear);
-//				mCsPick->set_pivot_b(mPivotPos);
-//			}
-//		}
-//	}
-//	//
-//	return AsyncTask::DS_cont;
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	// handle picked body if any
+	if (not mCsPick.is_null())
+	{
+		//get the mouse watcher
+		SMARTPTR(MouseWatcher)mwatcher =
+		DCAST(MouseWatcher, mWindow->get_mouse().node());
+		if (mwatcher->has_mouse())
+		{
+			// Get to and from pos in camera coordinates
+			LPoint2f pMouse = mwatcher->get_mouse();
+			//
+			LPoint3f pNear, pFar;
+			if (mCamLens->extrude(pMouse, pNear, pFar))
+			{
+				// Transform to global coordinates
+				pNear = mRender.get_relative_point(mCamera, pNear);
+				pFar = mRender.get_relative_point(mCamera, pFar);
+				// new pivot (b) pos
+				LVector3f vecFarNear = pFar - pNear;
+				LVector3f vecPivotNear = mPivotPos - pNear;
+				mPivotPos = pNear + (vecFarNear / vecFarNear.length_squared()) *
+				vecPivotNear.dot(vecFarNear);
+				mCsPick->set_pivot_b(mPivotPos);
+			}
+		}
+	}
+	//
+	return AsyncTask::DS_cont;
 }
 
 } // namespace ely
