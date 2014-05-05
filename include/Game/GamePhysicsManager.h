@@ -26,7 +26,7 @@
 
 #include "Utilities/Tools.h"
 #include <list>
-#include <bulletWorld.h>
+#include "PhysicsComponents/BulletLocal/bulletWorld.h"
 #include <windowFramework.h>
 #include "ObjectModel/Component.h"
 

@@ -27,6 +27,8 @@
 #include "Utilities/ComponentSuite.h"
 ///Distributed
 #include "Support/Distributed/DistributedObjectBase.h"
+///Bullet
+#include "PhysicsComponents/BulletLocal/config_bullet.h"
 
 namespace ely
 {
@@ -185,6 +187,8 @@ void initTypedObjects()
 	RigidBodyTemplate::init_type();
 	SoftBody::init_type();
 	SoftBodyTemplate::init_type();
+	///init BulletLocal
+	init_libbullet();
 	Vehicle::init_type();
 	VehicleTemplate::init_type();
 	InstanceOf::init_type();

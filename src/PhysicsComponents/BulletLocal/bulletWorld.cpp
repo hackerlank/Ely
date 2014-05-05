@@ -109,7 +109,7 @@ BulletWorld::BulletWorld()
 		_filter_cb = &_filter_cb3;
 		break;
 	default:
-		bullet_cat.error() << "no proper filter algorithm!" << endl;
+		PRINT_ERR_DEBUG("no proper filter algorithm!");
 		_filter_cb = NULL;
 	}
 
@@ -321,7 +321,7 @@ void BulletWorld::attach(TypedObject *object)
 	}
 	else
 	{
-		bullet_cat->error() << "not a bullet world object!" << endl;
+		PRINT_ERR_DEBUG("not a bullet world object!");
 	}
 }
 
@@ -360,7 +360,7 @@ void BulletWorld::remove(TypedObject *object)
 	}
 	else
 	{
-		bullet_cat->error() << "not a bullet world object!" << endl;
+		PRINT_ERR_DEBUG("not a bullet world object!");
 	}
 }
 
@@ -388,7 +388,7 @@ void BulletWorld::attach_rigid_body(BulletRigidBodyNode *node)
 	}
 	else
 	{
-		bullet_cat.warning() << "rigid body already attached" << endl;
+		PRINT_ERR_DEBUG("rigid body already attached");
 	}
 }
 
@@ -411,7 +411,7 @@ void BulletWorld::remove_rigid_body(BulletRigidBodyNode *node)
 
 	if (found == _bodies.end())
 	{
-		bullet_cat.warning() << "rigid body not attached" << endl;
+		PRINT_ERR_DEBUG("rigid body not attached");
 	}
 	else
 	{
@@ -448,7 +448,7 @@ void BulletWorld::attach_soft_body(BulletSoftBodyNode *node)
 	}
 	else
 	{
-		bullet_cat.warning() << "soft body already attached" << endl;
+		PRINT_ERR_DEBUG("soft body already attached");
 	}
 }
 
@@ -471,7 +471,7 @@ void BulletWorld::remove_soft_body(BulletSoftBodyNode *node)
 
 	if (found == _softbodies.end())
 	{
-		bullet_cat.warning() << "soft body not attached" << endl;
+		PRINT_ERR_DEBUG("soft body not attached");
 	}
 	else
 	{
@@ -521,7 +521,7 @@ void BulletWorld::attach_ghost(BulletGhostNode *node)
 	}
 	else
 	{
-		bullet_cat.warning() << "ghost already attached" << endl;
+		PRINT_ERR_DEBUG("ghost already attached");
 	}
 }
 
@@ -544,7 +544,7 @@ void BulletWorld::remove_ghost(BulletGhostNode *node)
 
 	if (found == _ghosts.end())
 	{
-		bullet_cat.warning() << "ghost not attached" << endl;
+		PRINT_ERR_DEBUG("ghost not attached");
 	}
 	else
 	{
@@ -581,7 +581,7 @@ void BulletWorld::attach_character(BulletBaseCharacterControllerNode *node)
 	}
 	else
 	{
-		bullet_cat.warning() << "character already attached" << endl;
+		PRINT_ERR_DEBUG("character already attached");
 	}
 }
 
@@ -602,7 +602,7 @@ void BulletWorld::remove_character(BulletBaseCharacterControllerNode *node)
 
 	if (found == _characters.end())
 	{
-		bullet_cat.warning() << "character not attached" << endl;
+		PRINT_ERR_DEBUG("character not attached");
 	}
 	else
 	{
@@ -634,7 +634,7 @@ void BulletWorld::attach_vehicle(BulletVehicle *vehicle)
 	}
 	else
 	{
-		bullet_cat.warning() << "vehicle already attached" << endl;
+		PRINT_ERR_DEBUG("vehicle already attached");
 	}
 }
 
@@ -657,7 +657,7 @@ void BulletWorld::remove_vehicle(BulletVehicle *vehicle)
 
 	if (found == _vehicles.end())
 	{
-		bullet_cat.warning() << "vehicle not attached" << endl;
+		PRINT_ERR_DEBUG("vehicle not attached");
 	}
 	else
 	{
@@ -688,7 +688,7 @@ void BulletWorld::attach_constraint(BulletConstraint *constraint)
 	}
 	else
 	{
-		bullet_cat.warning() << "constraint already attached" << endl;
+		PRINT_ERR_DEBUG("constraint already attached");
 	}
 }
 
@@ -709,7 +709,7 @@ void BulletWorld::remove_constraint(BulletConstraint *constraint)
 
 	if (found == _constraints.end())
 	{
-		bullet_cat.warning() << "constraint not attached" << endl;
+		PRINT_ERR_DEBUG("constraint not attached");
 	}
 	else
 	{
@@ -928,7 +928,7 @@ void BulletWorld::set_group_collision_flag(unsigned int group1,
 
 	if (bullet_filter_algorithm != FA_groups_mask)
 	{
-		bullet_cat.warning() << "filter algorithm is not 'groups-mask'" << endl;
+		PRINT_ERR_DEBUG("filter algorithm is not 'groups-mask'");
 	}
 
 	_filter_cb2._collide[group1].set_bit_to(group2, enable);
@@ -1038,7 +1038,7 @@ void BulletWorld::set_filter_callback(CallbackObject *obj)
 
 	if (bullet_filter_algorithm != FA_callback)
 	{
-		bullet_cat.warning() << "filter algorithm is not 'callback'" << endl;
+		PRINT_ERR_DEBUG("filter algorithm is not 'callback'");
 	}
 
 	_filter_cb3._filter_callback_obj = obj;
@@ -1190,8 +1190,8 @@ operator >>(istream &in, BulletWorld::BroadphaseAlgorithm &algorithm)
 	}
 	else
 	{
-		bullet_cat.error() << "Invalid BulletWorld::BroadphaseAlgorithm: "
-				<< word << "\n";
+		PRINT_ERR_DEBUG("Invalid BulletWorld::BroadphaseAlgorithm: "
+				<< word );
 		algorithm = BulletWorld::BA_dynamic_aabb_tree;
 	}
 
@@ -1243,10 +1243,15 @@ operator >>(istream &in, BulletWorld::FilterAlgorithm &algorithm)
 	}
 	else
 	{
-		bullet_cat.error() << "Invalid BulletWorld::FilterAlgorithm: " << word
-				<< "\n";
+		PRINT_ERR_DEBUG("Invalid BulletWorld::FilterAlgorithm: " << word);
 		algorithm = BulletWorld::FA_mask;
 	}
 	return in;
 }
+
+//
+ContactAddedCallback gContactAddedCallback = NULL;
+ContactProcessedCallback gContactProcessedCallback = NULL;
+ContactDestroyedCallback gContactDestroyedCallback = NULL;
+
 }

@@ -31,10 +31,10 @@
 #include <texturePool.h>
 #include <nurbsCurveEvaluator.h>
 #include <ropeNode.h>
-#include <bulletWorld.h>
-#include <bulletRigidBodyNode.h>
-#include <bulletSoftBodyNode.h>
-#include <bulletSoftBodyWorldInfo.h>
+#include "PhysicsComponents/BulletLocal/bulletWorld.h"
+#include "PhysicsComponents/BulletLocal/bulletRigidBodyNode.h"
+#include "PhysicsComponents/BulletLocal/bulletSoftBodyNode.h"
+#include "PhysicsComponents/BulletLocal/bulletSoftBodyWorldInfo.h"
 
 //Bind the Model and the Animation
 // don't use PT or CPT with AnimControlCollection

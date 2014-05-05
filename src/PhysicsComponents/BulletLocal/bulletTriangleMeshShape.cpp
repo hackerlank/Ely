@@ -38,14 +38,14 @@ BulletTriangleMeshShape::BulletTriangleMeshShape(BulletTriangleMesh *mesh,
 	// Assert that mesh is not NULL
 	if (!mesh)
 	{
-		PRINT_ERR_DEBUG("mesh is NULL! creating new mesh.");
+		PRINT_DEBUG("mesh is NULL! creating new mesh.");
 		mesh = new BulletTriangleMesh();
 	}
 
 	// Assert that mesh has at least one triangle
 	if (mesh->get_num_triangles() == 0)
 	{
-		PRINT_ERR_DEBUG(
+		PRINT_DEBUG(
 				"mesh has zero triangles! adding degenerated triangle.");
 		mesh->add_triangle(LPoint3::zero(), LPoint3::zero(), LPoint3::zero());
 	}

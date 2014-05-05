@@ -12,6 +12,8 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
+
 #include "PhysicsComponents/BulletLocal/config_bullet.h"
 
 #include "PhysicsComponents/BulletLocal/bulletBaseCharacterControllerNode.h"
@@ -189,12 +191,8 @@ void init_libbullet()
 	gContactDestroyedCallback = contact_destroyed_callback;
 
 	// Initialize notification category
-	bullet_cat.init();
-	bullet_cat.debug() << "initialize module" << endl;
+	PRINT_DEBUG("initialize module");
 
-	// Register the Bullet system
-	PandaSystem *ps = PandaSystem::get_global_ptr();
-	ps->add_system("Bullet");
 }
 
 }

@@ -24,7 +24,7 @@
 #ifndef CHARACTERCONTROLLER_H_
 #define CHARACTERCONTROLLER_H_
 
-#include <bulletCharacterControllerNode.h>
+#include "PhysicsComponents/BulletLocal/bulletCharacterControllerNode.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Game/GamePhysicsManager.h"

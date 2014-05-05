@@ -25,8 +25,8 @@
 #include "PhysicsComponents/SoftBodyTemplate.h"
 #include "Game/GamePhysicsManager.h"
 #include "SceneComponents/Model.h"
-#include <bulletSoftBodyWorldInfo.h>
-#include <bulletHelper.h>
+#include "PhysicsComponents/BulletLocal/bulletSoftBodyWorldInfo.h"
+#include "PhysicsComponents/BulletLocal/bulletHelper.h"
 #include <nurbsCurveEvaluator.h>
 #include <geomTriangles.h>
 #include <fstream>

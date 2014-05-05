@@ -24,8 +24,8 @@
 #ifndef SOFTBODY_H_
 #define SOFTBODY_H_
 
-#include <bulletRigidBodyNode.h>
-#include <bulletSoftBodyNode.h>
+#include "PhysicsComponents/BulletLocal/bulletRigidBodyNode.h"
+#include "PhysicsComponents/BulletLocal/bulletSoftBodyNode.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 

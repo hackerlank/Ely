@@ -24,15 +24,15 @@
 #include <cmath>
 #include <asyncTaskManager.h>
 #include <nodePathCollection.h>
-#include <bulletSphereShape.h>
-#include <bulletPlaneShape.h>
-#include <bulletBoxShape.h>
-#include <bulletCylinderShape.h>
-#include <bulletCapsuleShape.h>
-#include <bulletConeShape.h>
-#include <bulletHeightfieldShape.h>
-#include <bulletTriangleMesh.h>
-#include <bulletTriangleMeshShape.h>
+#include "PhysicsComponents/BulletLocal/bulletSphereShape.h"
+#include "PhysicsComponents/BulletLocal/bulletPlaneShape.h"
+#include "PhysicsComponents/BulletLocal/bulletBoxShape.h"
+#include "PhysicsComponents/BulletLocal/bulletCylinderShape.h"
+#include "PhysicsComponents/BulletLocal/bulletCapsuleShape.h"
+#include "PhysicsComponents/BulletLocal/bulletConeShape.h"
+#include "PhysicsComponents/BulletLocal/bulletHeightfieldShape.h"
+#include "PhysicsComponents/BulletLocal/bulletTriangleMesh.h"
+#include "PhysicsComponents/BulletLocal/bulletTriangleMeshShape.h"
 #include "Game/GamePhysicsManager.h"
 #include "Game/GameManager.h"
 

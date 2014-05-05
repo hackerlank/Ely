@@ -17,9 +17,9 @@
 
 #include <pandabase.h>
 
-#include <bullet_includes.h>
-#include <bullet_utils.h>
-#include <bulletShape.h>
+#include "PhysicsComponents/BulletLocal/bullet_includes.h"
+#include "PhysicsComponents/BulletLocal/bullet_utils.h"
+#include "PhysicsComponents/BulletLocal/bulletShape.h"
 
 namespace ely
 {

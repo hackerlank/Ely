@@ -17,6 +17,8 @@
 
 #include <pandabase.h>
 
+#include "Utilities/Tools.h"
+
 #include "bullet_includes.h"
 #include "bulletWorld.h"
 #include "bulletContactCallbackData.h"
@@ -66,7 +68,7 @@ static bool contact_added_callback(btManifoldPoint &cp,
 		PT(PandaNode) node1 = (PandaNode *)obj1->getUserPointer();
 #endif
 
-		bullet_cat.debug() << "contact added: " << cp.m_userPersistentData << endl;
+		PRINT_ERR_DEBUG("contact added: " << cp.m_userPersistentData);
 
 		// Gather persistent data
 		UserPersitentData *data = new UserPersitentData();
@@ -132,7 +134,7 @@ static bool contact_processed_callback(btManifoldPoint &cp, void *body0,
 static bool contact_destroyed_callback(void *userPersistentData)
 {
 
-	bullet_cat.debug() << "contact removed: " << userPersistentData << endl;
+	PRINT_ERR_DEBUG("contact removed: " << userPersistentData);
 
 	UserPersitentData *data = (UserPersitentData *) userPersistentData;
 

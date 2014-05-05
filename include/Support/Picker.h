@@ -27,8 +27,8 @@
 #include "Utilities/Tools.h"
 #include <pandaFramework.h>
 #include <lens.h>
-#include <bulletWorld.h>
-#include <bulletSphericalConstraint.h>
+#include "PhysicsComponents/BulletLocal/bulletWorld.h"
+#include "PhysicsComponents/BulletLocal/bulletSphericalConstraint.h"
 
 namespace ely
 {

@@ -26,7 +26,7 @@
 #include <nodePath.h>
 #include <lquaternion.h>
 #include <lvecBase3.h>
-#include <bullet/btBulletCollisionCommon.h>
+#include "PhysicsComponents/BulletLocal/bullet/btBulletCollisionCommon.h"
 
 namespace ely
 {

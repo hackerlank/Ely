@@ -426,7 +426,7 @@ void BulletDebugNode::DebugDraw::drawTriangle(const btVector3 &v0,
 		const btVector3 &n1, const btVector3 &n2, const btVector3 &color,
 		btScalar alpha)
 {
-	PRINT_ERR_DEBUG("drawTriangle(2) - not yet implemented!");
+	PRINT_DEBUG("drawTriangle(2) - not yet implemented!");
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -453,7 +453,7 @@ void BulletDebugNode::DebugDraw::drawContactPoint(const btVector3 &point,
 void BulletDebugNode::DebugDraw::draw3dText(const btVector3 &location,
 		const char *text)
 {
-	PRINT_ERR_DEBUG("draw3dText - not yet implemented!");
+	PRINT_DEBUG("draw3dText - not yet implemented!");
 }
 
 ////////////////////////////////////////////////////////////////////

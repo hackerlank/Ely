@@ -29,8 +29,8 @@
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <throw_event.h>
-#include <bulletTriangleMesh.h>
-#include <bulletTriangleMeshShape.h>
+#include "PhysicsComponents/BulletLocal/bulletTriangleMesh.h"
+#include "PhysicsComponents/BulletLocal/bulletTriangleMeshShape.h"
 
 namespace
 {

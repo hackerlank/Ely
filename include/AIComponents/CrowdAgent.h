@@ -27,8 +27,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include <DetourCrowd.h>
-#include <bulletWorld.h>
-#include <bulletClosestHitRayResult.h>
+#include "PhysicsComponents/BulletLocal/bulletWorld.h"
+#include "PhysicsComponents/BulletLocal/bulletClosestHitRayResult.h"
 
 namespace ely
 {

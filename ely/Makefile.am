@@ -35,7 +35,8 @@ ely_ltlibraries = \
 		$(top_builddir)/src/libutilities.la
 
 ely_libraries = \
-		$(top_builddir)/src/librecastnavigation.a		
+		$(top_builddir)/src/librecastnavigation.a \
+		$(top_builddir)/src/libbullet.a
 whole_archives = \
 		-Wl,$(top_builddir)/src/libsupport.a \
 		-Wl,$(top_builddir)/src/libopensteer.a
