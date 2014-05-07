@@ -326,8 +326,9 @@ public:
 	}
 	static void init_type()
 	{
-		TypedObject::init_type();
-		register_type(_type_handle, "Object", TypedObject::get_class_type());
+		TypedWritableReferenceCount::init_type();
+		register_type(_type_handle, "Object",
+				TypedWritableReferenceCount::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
