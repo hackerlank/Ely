@@ -47,8 +47,9 @@ public:
 	}
 	static void init_type()
 	{
-		TypedObject::init_type();
-		register_type(_type_handle, "DistributedObjectBase", TypedObject::get_class_type());
+		TypedWritableReferenceCount::init_type();
+		register_type(_type_handle, "DistributedObjectBase",
+				TypedWritableReferenceCount::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
