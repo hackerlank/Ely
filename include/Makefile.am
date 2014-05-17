@@ -24,6 +24,7 @@ opensteer_headers = \
 		AIComponents/OpenSteerLocal/PlugIn_Soccer.h \
 		AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h \
 		AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h \
+		AIComponents/OpenSteerLocal/PlugIn_MapDrive.h \
 		AIComponents/OpenSteerLocal/SimpleVehicle.h
 		
 bullet_headers = \
