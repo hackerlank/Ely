@@ -48,35 +48,33 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/include/AIComponents/OpenSteerLocal/PlugIn_MapDrive.h
+ *
+ * \date 17/mag/2014 (08:31:52)
+ * \author consultit
+ */
 
 #include <iomanip>
 #include <sstream>
 #include <cassert>
-//#include "OpenSteer/OpenSteerDemo.h"
-#include "OpenSteer/SimpleVehicle.h"
-#include "OpenSteer/Color.h"
-#include "OpenSteer/UnusedParameter.h"
+#include <OpenSteer/SimpleVehicle.h>
+#include <OpenSteer/Color.h>
+#include <OpenSteer/UnusedParameter.h>
 #include <OpenSteer/PlugIn.h>
-
-#include "common.h"
-
 // Include OpenSteer::PolylineSegmentedPathwaySegmentRadii
-#include "OpenSteer/PolylineSegmentedPathwaySegmentRadii.h"
-
+#include <OpenSteer/PolylineSegmentedPathwaySegmentRadii.h>
 // Include OpenSteer::mapPointToPathway
-#include "OpenSteer/QueryPathAlike.h"
-
+#include <OpenSteer/QueryPathAlike.h>
 // Include OpenSteer::DontExtractPathDistance, OpenSteer::HasSegmentRadii
-#include "OpenSteer/QueryPathAlikeUtilities.h"
-
+#include <OpenSteer/QueryPathAlikeUtilities.h>
 // Include OpenSteer::nextSegment, OpenSteer::previousSegment
-#include "OpenSteer/SegmentedPathAlikeUtilities.h"
-
+#include <OpenSteer/SegmentedPathAlikeUtilities.h>
 // Include OpenSteer::square, OpenSteer::clamp
-#include "OpenSteer/Utilities.h"
-
+#include <OpenSteer/Utilities.h>
 // Include OpenSteer::size_t
-#include "OpenSteer/StandardTypes.h"
+#include <OpenSteer/StandardTypes.h>
+#include "common.h"
 
 // to use local version of the map class
 #define OLDTERRAINMAP
@@ -737,16 +735,17 @@ typedef PolylineSegmentedPathwaySegmentRadii GCRoute;
  */
 
 // ----------------------------------------------------------------------------
-class MapDriver: public SimpleVehicle
+template<typename Entity>
+class MapDriver: public VehicleAddOnMixin<SimpleVehicle, Entity>
 {
 public:
 
 	// type for a flock: an STL vector of MapDriver pointers
-	typedef std::vector<MapDriver*> groupType;
+	typedef typename std::vector<MapDriver<Entity>*> groupType;
 
 	// constructor
-	MapDriver() :
-			map(makeMap()), path(makePath())
+	MapDriver()
+///	: map(makeMap()), path(makePath())
 	{
 		reset();
 
@@ -756,7 +755,6 @@ public:
 
 		// keep track for reliability statistics
 		collisionLastTime = false;
-//		timeOfLastCollision = OpenSteerDemo::clock.getTotalSimulationTime();
 		timeOfLastCollision = ClockObject::get_global_clock()->get_real_time();
 
 		// keep track of average speed
@@ -767,6 +765,7 @@ public:
 		pathFollowTime = 0;
 		pathFollowOffTime = 0;
 
+#ifdef ELY_DEBUG
 		// innitialize counters for various performance data
 		stuckCount = 0;
 		stuckCycleCount = 0;
@@ -775,6 +774,7 @@ public:
 		lapsFinished = 0;
 		hintGivenCount = 0;
 		hintTakenCount = 0;
+#endif
 
 		// follow the path "upstream or downstream" (+1/-1)
 		pathFollowDirection = 1;
@@ -783,15 +783,17 @@ public:
 		curvedSteering = true;
 		incrementalSteering = true;
 
+#ifdef ELY_DEBUG
 		// 10 seconds with 200 points along the trail
-		setTrailParameters(10, 200);
+		this->setTrailParameters(10, 200);
+#endif
 	}
 
 	// destructor
 	~MapDriver()
 	{
-		delete (map);
-		delete (path);
+///		delete (map);
+///		delete (path);
 	}
 
 	// reset state
@@ -799,16 +801,17 @@ public:
 	{
 		// reset the underlying vehicle class
 		SimpleVehicle::reset();
+		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
 
 		// initially stopped
-		setSpeed(0);
+///		setSpeed(0);
 
 		// Assume top speed is 20 meters per second (44.7 miles per hour).
 		// This value will eventually be supplied by a higher level module.
-		setMaxSpeed(20);
+///		setMaxSpeed(20);
 
 		// steering force is clipped to this magnitude
-		setMaxForce(maxSpeed() * 0.4f);
+///		setMaxForce(maxSpeed() * 0.4f);
 
 		// vehicle is 2 meters wide and 3 meters long
 		halfWidth = 1.0f;
@@ -820,8 +823,10 @@ public:
 		// not previously avoiding
 		annotateAvoid = Vec3::zero;
 
+#ifdef ELY_DEBUG
 		// prevent long streaks due to teleportation
-		clearTrailHistory();
+		this->clearTrailHistory();
+#endif
 
 		// first pass at detecting "stuck" state
 		stuck = false;
@@ -867,9 +872,11 @@ public:
 		// pretend we are bigger when going fast
 		adjustVehicleRadiusForSpeed();
 
+#ifdef ELY_DEBUG
 		// state saved for speedometer
 		//      annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 0;
 		annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 1;
+#endif
 
 		// determine combined steering
 		Vec3 steering;
@@ -879,22 +886,27 @@ public:
 			// bring vehicle to a stop if we are stuck (newly or previously
 			// stuck, because off path or collision seemed imminent)
 			// (QQQ combine with stuckCycleCount code at end of this function?)
-			//          applyBrakingForce (curvedSteering ? 3 : 2, elapsedTime); // QQQ
-			applyBrakingForce((curvedSteering ? 3.0f : 2.0f), elapsedTime); // QQQ
+			//          this->applyBrakingForce (curvedSteering ? 3 : 2, elapsedTime); // QQQ
+			this->applyBrakingForce((curvedSteering ? 3.0f : 2.0f),
+					elapsedTime); // QQQ
 			// count "off path" events
 			if (offPath && !stuck && (demoSelect == 2))
 				stuckOffPathCount++;
 			stuck = true;
 
 			// QQQ trying to prevent "creep" during emergency stops
-			resetSmoothedAcceleration();
+			this->resetSmoothedAcceleration();
 			currentSteering = Vec3::zero;
 		}
 		else
 		{
 			// determine steering for obstacle avoidance (save for annotation)
-			const Vec3 avoid = annotateAvoid = steerToAvoidObstaclesOnMap(
-					lookAheadTimeOA(), *map, hintForObstacleAvoidance());
+			const Vec3 avoid =
+#ifdef ELY_DEBUG
+					annotateAvoid =
+#endif
+							steerToAvoidObstaclesOnMap(lookAheadTimeOA(), *map,
+									hintForObstacleAvoidance());
 			const bool needToAvoid = avoid != Vec3::zero;
 
 			// any obstacles to avoid?
@@ -904,24 +916,28 @@ public:
 				const float targetSpeed = (
 						(curvedSteering && QQQoaJustScraping) ?
 								maxSpeedForCurvature() : 0);
-				annoteMaxRelSpeed = targetSpeed / maxSpeed();
-				const float avoidWeight = 3 + (3 * relativeSpeed()); // ad hoc
+#ifdef ELY_DEBUG
+				annoteMaxRelSpeed = targetSpeed / this->maxSpeed();
+#endif
+				const float avoidWeight = 3 + (3 * this->relativeSpeed()); // ad hoc
 				steering = avoid * avoidWeight;
 				steering += steerForTargetSpeed(targetSpeed);
 			}
 			else
 			{
 				// otherwise speed up and...
-				steering = steerForTargetSpeed(maxSpeedForCurvature());
+				steering = this->steerForTargetSpeed(maxSpeedForCurvature());
 
 				// wander for demo 1
 				if (demoSelect == 1)
 				{
-					const Vec3 wander = steerForWander(elapsedTime);
+					const Vec3 wander = this->steerForWander(elapsedTime);
 					const Vec3 flat = wander.setYtoZero();
 					const Vec3 weighted = flat.truncateLength(maxForce()) * 6;
-					const Vec3 a = position() + Vec3(0, 0.2f, 0);
-					annotationLine(a, a + (weighted * 0.3f), gWhite);
+#ifdef ELY_DEBUG
+					const Vec3 a = this->position() + Vec3(0, 0.2f, 0);
+					this->annotationLine(a, a + (weighted * 0.3f), gWhite);
+#endif
 					steering += weighted;
 				}
 
@@ -933,7 +949,7 @@ public:
 					if (pf != Vec3::zero)
 					{
 						// steer to remain on path
-						if (pf.dot(forward()) < 0)
+						if (pf.dot(this->forward()) < 0)
 							steering = pf;
 						else
 							steering = pf + steering;
@@ -943,13 +959,18 @@ public:
 						// path aligment: when neither obstacle avoidance nor
 						// path following is required, align with path segment
 						const Vec3 pathHeading = mapPointAndDirectionToTangent(
-								*path, position(), pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
+								*path, this->position(), pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
 						{
-							const Vec3 b = (position() + (up() * 0.2f)
-									+ (forward() * halfLength * 1.4f));
+							const Vec3 b = (this->position()
+									+ (this->up() * 0.2f)
+									+ (this->forward() * halfLength * 1.4f));
+#ifdef ELY_DEBUG
 							const float l = 2;
-							annotationLine(b, b + (forward() * l), gCyan);
-							annotationLine(b, b + (pathHeading * l), gCyan);
+							this->annotationLine(b, b + (this->forward() * l),
+									gCyan);
+							this->annotationLine(b, b + (pathHeading * l),
+									gCyan);
+#endif
 						}
 						steering +=
 								(steerTowardHeading(pathHeading)
@@ -973,27 +994,34 @@ public:
 
 		// apply selected steering force to vehicle, record data
 		applySteeringForce(steering, elapsedTime);
+
+		///call the entity update
+		this->entityUpdate(currentTime, elapsedTime);
+
+#ifdef ELY_DEBUG
 		collectReliabilityStatistics(currentTime, elapsedTime);
+#endif
 
 		// detect getting stuck in cycles -- we are moving but not
 		// making progress down the route (annotate smoothedPosition)
 		if (demoSelect == 2)
 		{
 			const bool circles = weAreGoingInCircles();
+#ifdef ELY_DEBUG
 			if (circles && !stuck)
 				stuckCycleCount++;
+			this->annotationCircleOrDisk(0.5, up(), smoothedPosition(), gWhite,
+					12, circles, false);
+#endif
 			if (circles)
 				stuck = true;
-			annotationCircleOrDisk(0.5, up(), smoothedPosition(), gWhite, 12,
-					circles, false);
 		}
 
+#ifdef ELY_DEBUG
 		// annotation
-		perFrameAnnotation();
-		recordTrailVertex(currentTime, position());
-
-		//update actor
-		updateActor(currentTime, elapsedTime);
+		this->perFrameAnnotation();
+		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 
 	//  // QQQ 5-8-04 random experiment, currently unused
@@ -1013,12 +1041,13 @@ public:
 	void adjustVehicleRadiusForSpeed(void)
 	{
 		const float minRadius = sqrtXXX(square(halfWidth) + square(halfLength));
-		const float safetyMargin =
-				(curvedSteering ?
-						interpolate(relativeSpeed(), 0.0f, 1.5f) : 0.0f);
-		setRadius(minRadius + safetyMargin);
+		const float safetyMargin = (
+				curvedSteering ?
+						interpolate(this->relativeSpeed(), 0.0f, 1.5f) : 0.0f);
+		this->setRadius(minRadius + safetyMargin);
 	}
 
+#ifdef ELY_DEBUG
 	void collectReliabilityStatistics(const float currentTime,
 			const float elapsedTime)
 	{
@@ -1034,7 +1063,6 @@ public:
 			std::ostringstream message;
 			message << "collision after " << timeSinceLastCollision
 					<< " seconds";
-//			OpenSteerDemo::printMessage(message);
 			std::cout << message.str() << std::ends;
 			sumOfCollisionFreeTimes += timeSinceLastCollision;
 			countOfCollisionFreeTimes++;
@@ -1043,7 +1071,7 @@ public:
 		collisionLastTime = collisionDetected;
 
 		// keep track of average speed
-		totalDistance += speed() * elapsedTime;
+		totalDistance += this->speed() * elapsedTime;
 		totalTime += elapsedTime;
 
 		// keep track of path following failure rate
@@ -1057,6 +1085,7 @@ public:
 				pathFollowOffTime += elapsedTime;
 		}
 	}
+#endif
 
 	Vec3 hintForObstacleAvoidance(void)
 	{
@@ -1065,24 +1094,26 @@ public:
 			return Vec3::zero;
 
 		// are we heading roughly parallel to the current path segment?
-		const Vec3 p = position();
+		const Vec3 p = this->position();
 		const Vec3 pathHeading = mapPointAndDirectionToTangent(*path, p,
 				pathFollowDirection); // path->tangentAt (p, pathFollowDirection);
 		if (pathHeading.dot(forward()) < 0.8f)
 		{
 			// if not, the "hint" is to turn to align with path heading
-			const Vec3 s = side() * halfWidth;
+#ifdef ELY_DEBUG
+			const Vec3 s = this->side() * halfWidth;
 			const float f = halfLength * 2;
-			annotationLine(p + s, p + s + (forward() * f), gBlack);
-			annotationLine(p - s, p - s + (forward() * f), gBlack);
-			annotationLine(p, p + (pathHeading * 5), gMagenta);
+			this->annotationLine(p + s, p + s + (this->forward() * f), gBlack);
+			this->annotationLine(p - s, p - s + (this->forward() * f), gBlack);
+			this->annotationLine(p, p + (pathHeading * 5), gMagenta);
+#endif
 			return pathHeading;
 		}
 		else
 		{
 			// when there is a valid nearest obstacle position
 			const Vec3 obstacle = qqqLastNearestObstacle;
-			const Vec3 o = obstacle + (up() * 0.1f);
+			const Vec3 o = obstacle + (this->up() * 0.1f);
 			if (obstacle != Vec3::zero)
 			{
 				// get offset, distance from obstacle to its image on path
@@ -1110,15 +1141,20 @@ public:
 						const bool usableHint = obstacleDistance > farThreshold;
 						if (usableHint)
 						{
+#ifdef ELY_DEBUG
 							const Vec3 q = p + (offset.normalize() * 5);
-							annotationLine(p, q, gMagenta);
-							annotationCircleOrDisk(0.4f, up(), o, gWhite, 12,
-									false, false);
+							this->annotationLine(p, q, gMagenta);
+							this->annotationCircleOrDisk(0.4f, this->up(), o,
+									gWhite, 12, false, false);
+#endif
 							return offset;
 						}
 					}
 				}
-				annotationCircleOrDisk(0.4f, up(), o, gBlack, 12, false, false);
+#ifdef ELY_DEBUG
+				this->annotationCircleOrDisk(0.4f, this->up(), o, gBlack, 12,
+						false, false);
+#endif
 			}
 		}
 		// otherwise, no hint
@@ -1142,10 +1178,10 @@ public:
 	{
 		const float spacing = map.minSpacing() / 2;
 		const float maxSide = radius();
-		const float maxForward = minTimeToCollision * speed();
+		const float maxForward = minTimeToCollision * this->speed();
 		const int maxSamples = (int) (maxForward / spacing);
-		const Vec3 step = forward() * spacing;
-		const Vec3 fOffset = position();
+		const Vec3 step = this->forward() * spacing;
+		const Vec3 fOffset = this->position();
 		Vec3 sOffset;
 		float s = spacing / 2;
 
@@ -1155,27 +1191,34 @@ public:
 		int nearestWL = infinity;
 		int nearestWR = infinity;
 		Vec3 nearestO;
+
+#ifdef ELY_DEBUG
 		wingDrawFlagL = false;
 		wingDrawFlagR = false;
+#endif
 
 		const bool hintGiven = steerHint != Vec3::zero;
+
+#ifdef ELY_DEBUG
 		if (hintGiven && !dtZero)
 			hintGivenCount++;
 		if (hintGiven)
-			annotationCircleOrDisk(halfWidth * 0.9f, up(),
-					position() + (up() * 0.2f), gWhite, 12, false, false);
+			this->annotationCircleOrDisk(halfWidth * 0.9f, this->up(),
+					this->position() + (this->up() * 0.2f), gWhite, 12, false,
+					false);
+#endif
 
 		// QQQ temporary global QQQoaJustScraping
 		QQQoaJustScraping = true;
 
 		const float signedRadius = 1 / nonZeroCurvatureQQQ();
-		const Vec3 localCenterOfCurvature = side() * signedRadius;
-		const Vec3 center = position() + localCenterOfCurvature;
+		const Vec3 localCenterOfCurvature = this->side() * signedRadius;
+		const Vec3 center = this->position() + localCenterOfCurvature;
 		const float sign = signedRadius < 0 ? 1.0f : -1.0f;
 		const float arcRadius = signedRadius * -sign;
 		const float twoPi = 2 * OPENSTEER_M_PI;
 		const float circumference = twoPi * arcRadius;
-		const float rawLength = speed() * minTimeToCollision * sign;
+		const float rawLength = this->speed() * minTimeToCollision * sign;
 		const float fracLimit = 1.0f / 6.0f;
 		const float distLimit = circumference * fracLimit;
 		const float arcLength = arcLengthLimit(rawLength, distLimit);
@@ -2459,46 +2502,19 @@ public:
 	float halfWidth;
 	float halfLength;
 
-	// keep track of failure rate (when vehicle is on top of obstacle)
-	bool collisionDetected;
-	bool collisionLastTime;
-	float timeOfLastCollision;
-	float sumOfCollisionFreeTimes;
-	int countOfCollisionFreeTimes;
-
-	// keep track of average speed
-	float totalDistance;
-	float totalTime;
-
 	// keep track of path following failure rate
 	// (these are probably obsolete now, replaced by stuckOffPathCount)
 	float pathFollowTime;
 	float pathFollowOffTime;
 
-	// take note when current dt is zero (as in paused) for stat counters
-	bool dtZero;
-
-	// state saved for annotation
-	Vec3 annotateAvoid;
-	bool wingDrawFlagL, wingDrawFlagR;
-
 	// QQQ first pass at detecting "stuck" state
 	bool stuck;
-	int stuckCount;
-	int stuckCycleCount;
-	int stuckOffPathCount;
 
 	Vec3 qqqLastNearestObstacle;
-
-	int lapsStarted;
-	int lapsFinished;
 
 	// QQQ temporary global QQQoaJustScraping
 	// QQQ replace this global flag with a cleaner mechanism
 	bool QQQoaJustScraping;
-
-	int hintGivenCount;
-	int hintTakenCount;
 
 	// for "curvature-based incremental steering" -- contains the current
 	// steering into which new incremental steering is blended
@@ -2508,23 +2524,70 @@ public:
 	bool curvedSteering;
 	bool incrementalSteering;
 
-	// save obstacle avoidance stats for annotation
-	// (nearest obstacle in each of the four zones)
-	static float savedNearestWR, savedNearestR, savedNearestL, savedNearestWL;
-
-	float annoteMaxRelSpeed, annoteMaxRelSpeedCurve, annoteMaxRelSpeedPath;
-
 	// which of the three demo modes is selected
 	static int demoSelect;
 
 	// size of the world (the map actually)
 	static float worldSize;
 	static float worldDiag;
+
+#ifdef ELY_DEBUG
+	// keep track of failure rate (when vehicle is on top of obstacle)
+	bool collisionDetected;
+	bool collisionLastTime;
+	float timeOfLastCollision;
+	float sumOfCollisionFreeTimes;
+	int countOfCollisionFreeTimes;
+	// keep track of average speed
+	float totalDistance;
+	float totalTime;
+	// state saved for annotation
+	Vec3 annotateAvoid;
+	bool wingDrawFlagL, wingDrawFlagR;
+	//stuck
+	int stuckCount;
+	int stuckCycleCount;
+	int stuckOffPathCount;
+	//
+	int lapsStarted;
+	int lapsFinished;
+	// take note when current dt is zero (as in paused) for stat counters
+	bool dtZero;
+	int hintGivenCount;
+	int hintTakenCount;
+	// save obstacle avoidance stats for annotation
+	// (nearest obstacle in each of the four zones)
+	static float savedNearestWR, savedNearestR, savedNearestL, savedNearestWL;
+	float annoteMaxRelSpeed, annoteMaxRelSpeedCurve, annoteMaxRelSpeedPath;
+#endif
+};
+
+//MapDriver externally updated.
+template<typename Entity>
+class ExternalMapDriver: public MapDriver<Entity>
+{
+public:
+	void update(const float currentTime, const float elapsedTime)
+	{
+		///TODO
+		//call the entity update
+		this->entityUpdate(currentTime, elapsedTime);
+
+#ifdef ELY_DEBUG
+		// annotation
+		this->annotationVelocityAcceleration(5, 0);
+		this->recordTrailVertex(currentTime, this->position());
+#endif
+
+		// notify proximity database that our position has changed
+		this->proximityToken->updateForNewPosition(this->position());
+	}
 };
 
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
+template<typename Entity>
 class MapDrivePlugIn: public PlugIn
 {
 public:
