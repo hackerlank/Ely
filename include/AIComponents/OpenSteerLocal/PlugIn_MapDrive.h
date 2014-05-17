@@ -1224,13 +1224,14 @@ public:
 		const float arcLength = arcLengthLimit(rawLength, distLimit);
 		const float arcAngle = twoPi * arcLength / circumference;
 
+#ifdef ELY_DEBUG
 		// XXX temp annotation to show limit on arc angle
 		if (curvedSteering)
 		{
 			if ((speed() * minTimeToCollision) > (circumference * fracLimit))
 			{
 				const float q = twoPi * fracLimit;
-				const Vec3 fooz = position() - center;
+				const Vec3 fooz = this->position() - center;
 				const Vec3 booz = fooz.rotateAboutGlobalY(sign * q);
 				annotationLine(center, center + fooz, gRed);
 				annotationLine(center, center + booz, gRed);
@@ -1239,6 +1240,7 @@ public:
 
 		// assert loops will terminate
 		assert(spacing > 0);
+#endif
 
 		// scan corridor straight ahead of vehicle,
 		// keep track of nearest obstacle on left and right sides
@@ -1254,14 +1256,20 @@ public:
 			const int L = (
 					curvedSteering ?
 							(int) (scanObstacleMap(lOffset, center, arcAngle,
-									maxSamples, 0, gYellow, gRed, lObsPos)
-									/ spacing) :
+									maxSamples, 0,
+#ifdef ELY_DEBUG
+									gYellow, gRed,
+#endif
+									lObsPos) / spacing) :
 							map.scanXZray(lOffset, step, maxSamples));
 			const int R = (
 					curvedSteering ?
 							(int) (scanObstacleMap(rOffset, center, arcAngle,
-									maxSamples, 0, gYellow, gRed, rObsPos)
-									/ spacing) :
+									maxSamples, 0,
+#ifdef ELY_DEBUG
+									gYellow, gRed,
+#endif
+									rObsPos) / spacing) :
 							map.scanXZray(rOffset, step, maxSamples));
 
 			if ((L > 0) && (L < nearestL))
@@ -1281,11 +1289,13 @@ public:
 									rObsPos : rOffset + ((float) R * step));
 			}
 
+#ifdef ELY_DEBUG
 			if (!curvedSteering)
 			{
 				annotateAvoidObstaclesOnMap(lOffset, L, step);
 				annotateAvoidObstaclesOnMap(rOffset, R, step);
 			}
+#endif
 
 			if (curvedSteering)
 			{
@@ -1305,8 +1315,10 @@ public:
 			// QQQ should be a parameter of this method
 			const Vec3 wingWidth = side() * wingSlope() * maxForward;
 
+#ifdef ELY_DEBUG
 			const Color beforeColor(0.75f, 0.9f, 0.0f);  // for annotation
 			const Color afterColor(0.9f, 0.5f, 0.0f);  // for annotation
+#endif
 
 			for (int i = 1; i <= wingScans; i++)
 			{
@@ -1331,10 +1343,13 @@ public:
 							curvedSteering ?
 									(int) (scanObstacleMap(start, center,
 											arcAngle, raySamples, endRadius,
-											beforeColor, afterColor, ignore)
-											/ spacing) :
+#ifdef ELY_DEBUG
+											beforeColor, afterColor,
+#endif
+											ignore) / spacing) :
 									map.scanXZray(start, step, raySamples));
 
+#ifdef ELY_DEBUG
 					if (!curvedSteering)
 						annotateAvoidObstaclesOnMap(start, scan, step);
 
@@ -1348,17 +1363,22 @@ public:
 						if ((scan > 0) && (scan < nearestWR))
 							nearestWR = scan;
 					}
+#endif
 				}
 			}
+#ifdef ELY_DEBUG
 			wingDrawFlagL = nearestWL != infinity;
 			wingDrawFlagR = nearestWR != infinity;
+#endif
 		}
 
+#ifdef ELY_DEBUG
 		// for annotation
 		savedNearestWR = (float) nearestWR;
 		savedNearestR = (float) nearestR;
 		savedNearestL = (float) nearestL;
 		savedNearestWL = (float) nearestWL;
+#endif
 
 		// flags for compound conditions, used below
 		const bool obstacleFreeC = nearestL == infinity && nearestR == infinity;
@@ -1386,15 +1406,16 @@ public:
 		if (obstacleFreeC)
 		{
 			qqqLastNearestObstacle = Vec3::zero;
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("obstacleFreeC");
-
+#endif
 			// qqq  this may be in the wrong place (what would be the right
 			// qqq  place?!) but I'm trying to say "even if the path is
 			// qqq  clear, don't go too fast when driving between obstacles
 			if (obstacleFreeWL || obstacleFreeWR || relativeSpeed() < 0.7f)
 				return Vec3::zero;
 			else
-				return -forward();
+				return -this->forward();
 		}
 
 		// if the nearest obstacle is way out there, take hint if any
@@ -1403,12 +1424,14 @@ public:
 				&& (minXXX((float) nearestL, (float) nearestR)
 						> (maxSamples * 0.8f)))
 		{
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("nearest obstacle is way out there");
 			annotationHintWasTaken();
-			if (steerHint.dot(side()) > 0)
-				return side();
+#endif
+			if (steerHint.dot(this->side()) > 0)
+				return this->side();
 			else
-				return -side();
+				return -this->side();
 		}
 
 		// QQQ experiment 3-9-04
@@ -1419,45 +1442,53 @@ public:
 		// are we turning more sharply than the minimum turning radius?
 		// (code from adjustSteeringForMinimumTurningRadius)
 		const float maxCurvature = 1 / (minimumTurningRadius() * 1.2f);
-		if (absXXX(curvature()) > maxCurvature)
+		if (absXXX(this->curvature()) > maxCurvature)
 		{
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("min turn radius");
-			annotationCircleOrDisk(minimumTurningRadius() * 1.2f, up(), center,
-					gBlue * 0.8f, 40, false, false);
-			return side() * sign;
+			this->annotationCircleOrDisk(minimumTurningRadius() * 1.2f, up(),
+					center, gBlue * 0.8f, 40, false, false);
+#endif
+			return this->side() * sign;
 		}
 
 		// if either side is obstacle-free, turn in that direction
+#ifdef ELY_DEBUG
 		if (obstacleFreeL || obstacleFreeR)
 			annotationNoteOAClauseName("obstacle-free side");
+#endif
 
 		if (obstacleFreeL)
-			return side();
+			return this->side();
 		if (obstacleFreeR)
-			return -side();
+			return -this->side();
 
 		// if wings are clear, turn away from nearest obstacle straight ahead
 		if (obstacleFreeW)
 		{
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("obstacleFreeW");
+#endif
 			// distance to obs on L and R side of corridor roughtly the same
 			const bool same = absXXX(nearestL - nearestR) < 5; // within 5
 			// if they are about the same and a hint is given, use hint
 			if (same && hintGiven)
 			{
+#ifdef ELY_DEBUG
 				annotationHintWasTaken();
-				if (steerHint.dot(side()) > 0)
-					return side();
+#endif
+				if (steerHint.dot(this->side()) > 0)
+					return this->side();
 				else
-					return -side();
+					return -this->side();
 			}
 			else
 			{
 				// otherwise steer toward the less cluttered side
 				if (nearestL > nearestR)
-					return side();
+					return this->side();
 				else
-					return -side();
+					return -this->side();
 			}
 		}
 
@@ -1466,21 +1497,25 @@ public:
 		const bool equallyClear = absXXX(nearestWL - nearestWR) < 2; // within 2
 		if (equallyClear && hintGiven)
 		{
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("equallyClear");
 			annotationHintWasTaken();
-			if (steerHint.dot(side()) > 0)
-				return side();
+#endif
+			if (steerHint.dot(this->side()) > 0)
+				return this->side();
 			else
-				return -side();
+				return -this->side();
 		}
 
 		// turn towards the side whose "wing" region is less cluttered
 		// (the wing whose nearest obstacle is furthest away)
+#ifdef ELY_DEBUG
 		annotationNoteOAClauseName("wing less cluttered");
+#endif
 		if (nearestWL > nearestWR)
-			return side();
+			return this->side();
 		else
-			return -side();
+			return -this->side();
 	}
 
 	// QQQ reconsider calling sequence
@@ -1491,6 +1526,7 @@ public:
 	//                                           const Vec3& scanStep)
 	// {
 	// }
+#ifdef ELY_DEBUG
 	void annotateAvoidObstaclesOnMap(const Vec3& scanOrigin, int scanIndex,
 			const Vec3& scanStep)
 	{
@@ -1540,6 +1576,7 @@ public:
 
 		//OpenSteerDemo::clock.setPausedState (true);
 	}
+#endif
 
 	// scan across the obstacle map along a given arc
 	// (possibly with radius adjustment ramp)
@@ -1556,8 +1593,11 @@ public:
 	//
 	float scanObstacleMap(const Vec3& start, const Vec3& center,
 			const float arcAngle, const int segments,
-			const float endRadiusChange, const Color& beforeColor,
-			const Color& afterColor, Vec3& returnObstaclePosition)
+			const float endRadiusChange,
+#ifdef ELY_DEBUG
+			const Color& beforeColor, const Color& afterColor,
+#endif
+			Vec3& returnObstaclePosition)
 	{
 		// "spoke" is initially the vector from center to start,
 		// which is then rotated step by step around center
@@ -1597,7 +1637,9 @@ public:
 			// to loop only for the sake of annotation (make that optional?)
 			if (obstacleFound)
 			{
-				annotationLine(oldPoint, newPoint, afterColor);
+#ifdef ELY_DEBUG
+				this->annotationLine(oldPoint, newPoint, afterColor);
+#endif
 			}
 			else
 			{
@@ -1613,7 +1655,9 @@ public:
 					obstacleDistance = d2 * 0.5f * (i + 1);
 					returnObstaclePosition = newPoint;
 				}
-				annotationLine(oldPoint, newPoint, beforeColor);
+#ifdef ELY_DEBUG
+				this->annotationLine(oldPoint, newPoint, beforeColor);
+#endif
 			}
 			// save new point for next time around loop
 			oldPoint = newPoint;
@@ -1632,14 +1676,14 @@ public:
 		const float maxSide = halfWidth + spacing;
 		const float minDistance = curvedSteering ? 2.0f : 2.5f; // meters
 		const float predictTime = curvedSteering ? .75f : 1.3f; // seconds
-		const float maxForward = speed()
+		const float maxForward = this->speed()
 				* combinedLookAheadTime(predictTime, minDistance);
-		const Vec3 step = forward() * spacing;
+		const Vec3 step = this->forward() * spacing;
 		float s = curvedSteering ? (spacing / 4) : (spacing / 2);
 
 		const float signedRadius = 1 / nonZeroCurvatureQQQ();
-		const Vec3 localCenterOfCurvature = side() * signedRadius;
-		const Vec3 center = position() + localCenterOfCurvature;
+		const Vec3 localCenterOfCurvature = this->side() * signedRadius;
+		const Vec3 center = this->position() + localCenterOfCurvature;
 		const float sign = signedRadius < 0 ? 1.0f : -1.0f;
 		const float arcRadius = signedRadius * -sign;
 		const float twoPi = 2 * OPENSTEER_M_PI;
@@ -1650,9 +1694,9 @@ public:
 		// scan region ahead of vehicle
 		while (s < maxSide)
 		{
-			const Vec3 sOffset = side() * s;
-			const Vec3 lOffset = position() + sOffset;
-			const Vec3 rOffset = position() - sOffset;
+			const Vec3 sOffset = this->side() * s;
+			const Vec3 lOffset = this->position() + sOffset;
+			const Vec3 rOffset = this->position() - sOffset;
 			const float bevel = 0.3f;
 			const float fraction = s / maxSide;
 			const float scanDist = (halfLength
@@ -1662,19 +1706,26 @@ public:
 			const int L = (
 					curvedSteering ?
 							(int) (scanObstacleMap(lOffset + qqqLift, center,
-									angle, samples, 0, gMagenta, gCyan, ignore)
-									/ spacing) :
+									angle, samples, 0,
+#ifdef ELY_DEBUG
+									gMagenta, gCyan,
+#endif
+									ignore) / spacing) :
 							map->scanXZray(lOffset, step, samples));
 			const int R = (
 					curvedSteering ?
 							(int) (scanObstacleMap(rOffset + qqqLift, center,
-									angle, samples, 0, gMagenta, gCyan, ignore)
-									/ spacing) :
+									angle, samples, 0,
+#ifdef ELY_DEBUG
+									gMagenta, gCyan,
+#endif
+									ignore) / spacing) :
 							map->scanXZray(rOffset, step, samples));
 
 			returnFlag = returnFlag || (L > 0);
 			returnFlag = returnFlag || (R > 0);
 
+#ifdef ELY_DEBUG
 			// annotation
 			if (!curvedSteering)
 			{
@@ -1682,6 +1733,7 @@ public:
 				annotationLine(lOffset, lOffset + d, gWhite);
 				annotationLine(rOffset, rOffset + d, gWhite);
 			}
+#endif
 
 			// increment sideways displacement of scan line
 			s += spacing;
@@ -1705,30 +1757,30 @@ public:
 			// QQQ and now, worse, I rearranged it to try the "limit arc
 			// QQQ angle" trick
 			const float signedRadius = 1 / nonZeroCurvatureQQQ();
-			const Vec3 localCenterOfCurvature = side() * signedRadius;
-			const Vec3 center = position() + localCenterOfCurvature;
+			const Vec3 localCenterOfCurvature = this->side() * signedRadius;
+			const Vec3 center = this->position() + localCenterOfCurvature;
 			const float sign = signedRadius < 0 ? 1.0f : -1.0f;
 			const float arcRadius = signedRadius * -sign;
 			const float twoPi = 2 * OPENSTEER_M_PI;
 			const float circumference = twoPi * arcRadius;
-			const float rawLength = speed() * predictionTime * sign;
+			const float rawLength = this->speed() * predictionTime * sign;
 			const float arcLength = arcLengthLimit(rawLength,
 					circumference * 0.25f);
 			const float arcAngle = twoPi * arcLength / circumference;
 
-			const Vec3 spoke = position() - center;
+			const Vec3 spoke = this->position() - center;
 			const Vec3 newSpoke = spoke.rotateAboutGlobalY(arcAngle);
 			const Vec3 prediction = newSpoke + center;
 
 			// QQQ unify with annotatePathFollowing
 			const Color futurePositionColor(0.5f, 0.5f, 0.6f);
-			annotationXZArc(position(), center, arcLength, 20,
+			annotationXZArc(this->position(), center, arcLength, 20,
 					futurePositionColor);
 			return prediction;
 		}
 		else
 		{
-			return position() + (velocity() * predictionTime);
+			return this->position() + (this->velocity() * predictionTime);
 		}
 	}
 
@@ -1773,18 +1825,20 @@ public:
 			const float predictionTime, GCRoute& path)
 	{
 		// our goal will be offset from our path distance by this amount
-		const float pathDistanceOffset = direction * predictionTime * speed();
+		const float pathDistanceOffset = direction * predictionTime
+				* this->speed();
 
 		// predict our future position
 		const Vec3 futurePosition = predictFuturePosition(predictionTime);
 
 		// measure distance along path of our current and predicted positions
-		const float nowPathDistance = path.mapPointToPathDistance(position());
+		const float nowPathDistance = path.mapPointToPathDistance(
+				this->position());
 
 		// are we facing in the correction direction?
-		const Vec3 pathHeading = mapPointToTangent(path, position())
+		const Vec3 pathHeading = mapPointToTangent(path, this->position())
 				* static_cast<float>(direction); // path.tangentAt(position()) * (float)direction;
-		const bool correctDirection = pathHeading.dot(forward()) > 0;
+		const bool correctDirection = pathHeading.dot(this->forward()) > 0;
 
 		// find the point on the path nearest the predicted future position
 		// XXX need to improve calling sequence, maybe change to return a
@@ -1797,7 +1851,7 @@ public:
 		// determine if we are currently inside the path tube
 		float nowOutside;
 		const Vec3 nowOnPath = mapPointToPointOnCenterLineAndOutside(path,
-				position(), nowOutside); // path.mapPointToPath (position (), nowOutside);
+				this->position(), nowOutside); // path.mapPointToPath (position (), nowOutside);
 
 		// no steering is required if our present and future positions are
 		// inside the path tube and we are facing in the correct direction
@@ -1821,7 +1875,7 @@ public:
 			// the dot of the tangents of the two segments is negative --
 			// increase the target offset to compensate the fold back
 			const int ip = static_cast<int>(mapPointToSegmentIndex(path,
-					position())); // path.indexOfNearestSegment (position ());
+					this->position())); // path.indexOfNearestSegment (position ());
 			const int it =
 					static_cast<int>(mapPointToSegmentIndex(path, target)); // path.indexOfNearestSegment (target);
 			// Because polyline paths have a constant tangent along a segment
@@ -1839,23 +1893,26 @@ public:
 				target = path.mapPathDistanceToPoint(newTargetPathDistance);
 			}
 
-			annotatePathFollowing(futurePosition, onPath, target,
+#ifdef ELY_DEBUG
+			this->annotatePathFollowing(futurePosition, onPath, target,
 					futureOutside);
+#endif
 
 			// if we are currently outside head directly in
 			// (QQQ new, experimental, makes it turn in more sharply)
 			if (nowOutside > 0)
-				return steerForSeek(nowOnPath);
+				return this->steerForSeek(nowOnPath);
 
 			// steering to seek target on path
-			const Vec3 seek = steerForSeek(target).truncateLength(maxForce());
+			const Vec3 seek = this->steerForSeek(target).truncateLength(
+					this->maxForce());
 
 			// return that seek steering -- except when we are heading off
 			// the path (currently on path and future position is off path)
 			// in which case we put on the brakes.
 			if ((nowOutside < 0) && (futureOutside > 0))
-				return (seek.perpendicularComponent(forward())
-						- (forward() * maxForce()));
+				return (seek.perpendicularComponent(this->forward())
+						- (this->forward() * this->maxForce()));
 			else
 				return seek;
 		}
@@ -1878,39 +1935,41 @@ public:
 				futurePosition, futureOutside); // path.mapPointToPath (futurePosition,futureOutside);
 		const Vec3 pathHeading = mapPointAndDirectionToTangent(path, onPath,
 				direction); // path.tangentAt (onPath, direction);
-		const Vec3 rawBraking = forward() * maxForce() * -1;
+		const Vec3 rawBraking = this->forward() * this->maxForce() * -1;
 		const Vec3 braking = ((futureOutside < 0) ? Vec3::zero : rawBraking);
 		//qqq experimental wrong-way-fixer
 		float nowOutside;
 		Vec3 nowTangent;
-		const Vec3 p = position();
+		const Vec3 p = this->position();
 		const Vec3 nowOnPath = path.mapPointToPath(p, nowTangent, nowOutside);
 		nowTangent *= (float) direction;
-		const float alignedness = nowTangent.dot(forward());
+		const float alignedness = nowTangent.dot(this->forward());
 
 		// facing the wrong way?
 		if (alignedness < 0)
 		{
-			annotationLine(p, p + (nowTangent * 10), gCyan);
-
+#ifdef ELY_DEBUG
+			this->annotationLine(p, p + (nowTangent * 10), gCyan);
+#endif
 			// if nearly anti-parallel
 			if (alignedness < -0.707f)
 			{
 				const Vec3 towardCenter = nowOnPath - p;
 				const Vec3 turn = (
-						towardCenter.dot(side()) > 0 ?
-								side() * maxForce() : side() * maxForce() * -1);
+						towardCenter.dot(this->side()) > 0 ?
+								this->side() * this->maxForce() :
+								this->side() * this->maxForce() * -1);
 				return (turn + rawBraking);
 			}
 			else
 			{
 				return (steerTowardHeading(pathHeading).perpendicularComponent(
-						forward()) + braking);
+						this->forward()) + braking);
 			}
 		}
 
 		// is the predicted future position(+radius+margin) inside the path?
-		if (futureOutside < -(radius() + 1.0f)) //QQQ
+		if (futureOutside < -(this->radius() + 1.0f)) //QQQ
 		{
 			// then no steering is required
 			return Vec3::zero;
@@ -1918,17 +1977,21 @@ public:
 		else
 		{
 			// otherwise determine corrective steering (including braking)
-			annotationLine(futurePosition, futurePosition + pathHeading, gRed);
-			annotatePathFollowing(futurePosition, onPath, position(),
+#ifdef ELY_DEBUG
+			this->annotationLine(futurePosition, futurePosition + pathHeading,
+					gRed);
+			annotatePathFollowing(futurePosition, onPath, this->position(),
 					futureOutside);
-
+#endif
 			// two cases, if entering a turn (a waypoint between path segments)
 			if ( /* path.nearWaypoint (onPath) */isNearWaypoint(path, onPath)
 					&& (futureOutside > 0))
 			{
 				// steer to align with next path segment
-				annotationCircleOrDisk(0.5f, up(), futurePosition, gRed, 8,
-						false, false);
+#ifdef ELY_DEBUG
+				this->annotationCircleOrDisk(0.5f, this->up(), futurePosition,
+						gRed, 8, false, false);
+#endif
 				return steerTowardHeading(pathHeading) + braking;
 			}
 			else
@@ -1939,27 +2002,29 @@ public:
 				const Vec3 towardFP = futurePosition - onPath;
 				const float whichSide =
 						(pathSide.dot(towardFP) < 0) ? 1.0f : -1.0f;
-				return (side() * maxForce() * whichSide) + braking;
+				return (this->side() * this->maxForce() * whichSide) + braking;
 			}
 		}
 	}
 
+#ifdef ELY_DEBUG
 	void perFrameAnnotation(void)
 	{
-		const Vec3 p = position();
+		const Vec3 p = this->position();
 
 		// draw the circular collision boundary
-		annotationCircleOrDisk(radius(), up(), p, gBlack, 32, false, false);
+		this->annotationCircleOrDisk(this->radius(), this->up(), p, gBlack, 32,
+				false, false);
 
 		// draw forward sensing corridor and wings ( for non-curved case)
 		if (!curvedSteering)
 		{
-			const float corLength = speed() * lookAheadTimeOA();
+			const float corLength = this->speed() * lookAheadTimeOA();
 			if (corLength > halfLength)
 			{
-				const Vec3 corFront = forward() * corLength;
+				const Vec3 corFront = this->forward() * corLength;
 				const Vec3 corBack = Vec3::zero; // (was bbFront)
-				const Vec3 corSide = side() * radius();
+				const Vec3 corSide = this->side() * this->radius();
 				const Vec3 c1 = p + corSide + corBack;
 				const Vec3 c2 = p + corSide + corFront;
 				const Vec3 c3 = p - corSide + corFront;
@@ -1971,7 +2036,7 @@ public:
 				annotationLine(c3, c4, color);
 
 				// draw sensing "wings"
-				const Vec3 wingWidth = side() * wingSlope() * corLength;
+				const Vec3 wingWidth = this->side() * wingSlope() * corLength;
 				const Vec3 wingTipL = c2 + wingWidth;
 				const Vec3 wingTipR = c3 - wingWidth;
 				const Color wingColor(gOrange);
@@ -1987,10 +2052,10 @@ public:
 		}
 
 		// annotate steering acceleration
-		const Vec3 above = position() + Vec3(0, 0.2f, 0);
-		const Vec3 accel = smoothedAcceleration() * 5 / maxForce();
+		const Vec3 above = this->position() + Vec3(0, 0.2f, 0);
+		const Vec3 accel = this->smoothedAcceleration() * 5 / this->maxForce();
 		const Color aColor(0.4f, 0.4f, 0.8f);
-		annotationLine(above, above + accel, aColor);
+		this->annotationLine(above, above + accel, aColor);
 	}
 
 	// draw vehicle's body and annotation
@@ -2006,9 +2071,9 @@ public:
 			bodyColor = gRed;
 
 		// draw vehicle's bounding box on gound plane (its "shadow")
-		const Vec3 p = position();
-		const Vec3 bbSide = side() * halfWidth;
-		const Vec3 bbFront = forward() * halfLength;
+		const Vec3 p = this->position();
+		const Vec3 bbSide = this->side() * halfWidth;
+		const Vec3 bbFront = this->forward() * halfLength;
 		const Vec3 bbHeight(0, 0.1f, 0);
 		drawQuadrangle(p - bbFront + bbSide + bbHeight,
 				p + bbFront + bbSide + bbHeight,
@@ -2017,13 +2082,15 @@ public:
 
 		// annotate trail
 		const Color darkGreen(0, 0.6f, 0);
-		drawTrail(darkGreen, gBlack);
+		this->drawTrail(darkGreen, gBlack);
 	}
+#endif
 
 	// called when steerToFollowPath decides steering is required
 	void annotatePathFollowing(const Vec3& future, const Vec3& onPath,
 			const Vec3& target, const float outside)
 	{
+#ifdef ELY_DEBUG
 		const Color toTargetColor(gGreen * 0.6f);
 		const Color insidePathColor(gCyan * 0.6f);
 		const Color outsidePathColor(gBlue * 0.6f);
@@ -2046,122 +2113,47 @@ public:
 		const Vec3 onPathBoundary = future + boundaryOffset;
 		annotationLine(onPath, onPathBoundary, insidePathColor);
 		annotationLine(onPathBoundary, future, outsidePathColor);
-	}
-
-	void drawMap(void)
-	{
-#ifdef OLDTERRAINMAP
-		const float xs = map->xSize / (float) map->resolution;
-		const float zs = map->zSize / (float) map->resolution;
-		const Vec3 alongRow(xs, 0, 0);
-		const Vec3 nextRow(-map->xSize, 0, zs);
-		Vec3 g((map->xSize - xs) / -2, 0, (map->zSize - zs) / -2);
-		g += map->center;
-		for (int j = 0; j < map->resolution; j++)
-		{
-			for (int i = 0; i < map->resolution; i++)
-			{
-				if (map->getMapBit(i, j))
-				{
-					// spikes
-					// const Vec3 spikeTop (0, 5.0f, 0);
-					// drawLine (g, g+spikeTop, gWhite);
-
-					// squares
-					const float rockHeight = 0;
-					const Vec3 v1(+xs / 2, rockHeight, +zs / 2);
-					const Vec3 v2(+xs / 2, rockHeight, -zs / 2);
-					const Vec3 v3(-xs / 2, rockHeight, -zs / 2);
-					const Vec3 v4(-xs / 2, rockHeight, +zs / 2);
-					// const Vec3 redRockColor (0.6f, 0.1f, 0.0f);
-					const Color orangeRockColor(0.5f, 0.2f, 0.0f);
-					drawQuadrangle(g + v1, g + v2, g + v3, g + v4,
-							orangeRockColor);
-
-					// pyramids
-					// const Vec3 top (0, xs/2, 0);
-					// const Vec3 redRockColor (0.6f, 0.1f, 0.0f);
-					// const Vec3 orangeRockColor (0.5f, 0.2f, 0.0f);
-					// drawTriangle (g+v1, g+v2, g+top, redRockColor);
-					// drawTriangle (g+v2, g+v3, g+top, orangeRockColor);
-					// drawTriangle (g+v3, g+v4, g+top, redRockColor);
-					// drawTriangle (g+v4, g+v1, g+top, orangeRockColor);
-				}
-				g += alongRow;
-			}
-			g += nextRow;
-		}
-#else
 #endif
+
+		///call parent::annotatePathFollowing
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotatePathFollowing(future,
+				onPath, target, outside);
 	}
 
-	/**
-	 * draw the GCRoute as a series of circles and "wide lines"
-	 * (QQQ this should probably be a method of Path (or a
-	 * closely-related utility function) in which case should pass
-	 * color in, certainly shouldn't be recomputing it each draw)
-	 * @todo Add a <code>Vec3 const* points() const</code> member function to
-	 *       SegmentedPath, etc. to allow for faster point access?
-	 */
-	void drawPath(void)
-	{
-		const Color pathColor(0, 0.5f, 0.5f);
-		const Color sandColor(0.8f, 0.7f, 0.5f);
-		const Color color = interpolate(0.1f, sandColor, pathColor);
-
-		const Vec3 down(0, -0.1f, 0);
-		for (OpenSteer::size_t i = 1; i < path->pointCount(); ++i)
-		{
-			const Vec3 endPoint0 = path->point(i) + down;
-			const Vec3 endPoint1 = path->point(i - 1) + down;
-
-			const float legWidth = path->segmentRadius(i - 1);
-
-			drawXZWideLine(endPoint0, endPoint1, color, legWidth * 2);
-			drawLine(path->point(i), path->point(i - 1), pathColor);
-			drawXZDisk(legWidth, endPoint0, color, 24);
-			drawXZDisk(legWidth, endPoint1, color, 24);
-
-		}
-	}
-
-	GCRoute* makePath(void)
-	{
-		// a few constants based on world size
-		const float m = worldSize * 0.4f; // main diamond size
-		const float n = worldSize / 8;    // notch size
-		const float o = worldSize * 2;    // outside of the sand
-
-		// construction vectors
-		const Vec3 p(0, 0, m);
-		const Vec3 q(0, 0, m - n);
-		const Vec3 r(-m, 0, 0);
-		const Vec3 s(2 * n, 0, 0);
-		const Vec3 t(o, 0, 0);
-		const Vec3 u(-o, 0, 0);
-		const Vec3 v(n, 0, 0);
-		const Vec3 w(0, 0, 0);
-
-		// path vertices
-		const Vec3 a(t - p);
-		const Vec3 b(s + v - p);
-		const Vec3 c(s - q);
-		const Vec3 d(s + q);
-		const Vec3 e(s - v + p);
-		const Vec3 f(p - w);
-		const Vec3 g(r - w);
-		const Vec3 h(-p - w);
-		const Vec3 i(u - p);
-
-		// return Path object
-		const int pathPointCount = 9;
-		const Vec3 pathPoints[pathPointCount] =
-		{ a, b, c, d, e, f, g, h, i };
-		const float k = 10.0f;
-		const float pathRadii[pathPointCount] =
-		{ k, k, k, k, k, k, k, k, k };
-		return new GCRoute(pathPointCount, pathPoints, pathRadii, false);
-	}
+///	GCRoute* makePath(void)
+///	{
+///		// a few constants based on world size
+///		const float m = worldSize * 0.4f; // main diamond size
+///		const float n = worldSize / 8;    // notch size
+///		const float o = worldSize * 2;    // outside of the sand
+///		// construction vectors
+///		const Vec3 p(0, 0, m);
+///		const Vec3 q(0, 0, m - n);
+///		const Vec3 r(-m, 0, 0);
+///		const Vec3 s(2 * n, 0, 0);
+///		const Vec3 t(o, 0, 0);
+///		const Vec3 u(-o, 0, 0);
+///		const Vec3 v(n, 0, 0);
+///		const Vec3 w(0, 0, 0);
+///		// path vertices
+///		const Vec3 a(t - p);
+///		const Vec3 b(s + v - p);
+///		const Vec3 c(s - q);
+///		const Vec3 d(s + q);
+///		const Vec3 e(s - v + p);
+///		const Vec3 f(p - w);
+///		const Vec3 g(r - w);
+///		const Vec3 h(-p - w);
+///		const Vec3 i(u - p);
+///		// return Path object
+///		const int pathPointCount = 9;
+///		const Vec3 pathPoints[pathPointCount] =
+///		{ a, b, c, d, e, f, g, h, i };
+///		const float k = 10.0f;
+///		const float pathRadii[pathPointCount] =
+///		{ k, k, k, k, k, k, k, k, k };
+///		return new GCRoute(pathPointCount, pathPoints, pathRadii, false);
+///	}
 
 	TerrainMap* makeMap(void)
 	{
@@ -2178,24 +2170,22 @@ public:
 		if (demoSelect == 2)
 		{
 			// for path following, do wrap-around (teleport) and make new map
-			const float px = position().x;
-			const float fx = forward().x;
+			const float px = this->position().x;
+			const float fx = this->forward().x;
 			const float ws = worldSize * 0.51f; // slightly past edge
 			if (((fx > 0) && (px > ws)) || ((fx < 0) && (px < -ws)))
 			{
+#ifdef ELY_DEBUG
 				// bump counters
 				lapsStarted++;
 				lapsFinished++;
-
-//				const Vec3 camOffsetBefore = OpenSteerDemo::camera.position()
-//						- position();
-
+#endif
 				// set position on other side of the map (set new X coordinate)
-				setPosition(
+				this->setPosition(
 						(((px < 0) ? 1 : -1)
 								* ((worldSize * 0.5f)
-										+ (speed() * lookAheadTimePF()))),
-						position().y, position().z);
+										+ (this->speed() * lookAheadTimePF()))),
+						this->position().y, this->position().z);
 
 				// reset bookeeping to detect stuck cycles
 				resetStuckCycleDetection();
@@ -2207,9 +2197,10 @@ public:
 				// make camera jump immediately to new position
 //				OpenSteerDemo::camera.doNotSmoothNextMove();
 
+#ifdef ELY_DEBUG
 				// prevent long streaks due to teleportation
 				clearTrailHistory();
-
+#endif
 				return true;
 			}
 		}
@@ -2217,28 +2208,28 @@ public:
 		{
 			// for the non-path-following demos:
 			// reset simulation if the vehicle drives through the fence
-			if (position().length() > worldDiag)
-				reset();
+			if (this->position().length() > worldDiag)
+				this->reset();
 		}
 		return false;
 	}
 
 	float wingSlope(void)
 	{
-		return interpolate(relativeSpeed(), (curvedSteering ? 0.3f : 0.35f),
-				0.06f);
+		return interpolate(this->relativeSpeed(),
+				(curvedSteering ? 0.3f : 0.35f), 0.06f);
 	}
 
 	void resetStuckCycleDetection(void)
 	{
-		resetSmoothedPosition(position() + (forward() * -80)); // qqq
+		resetSmoothedPosition(this->position() + (this->forward() * -80)); // qqq
 	}
 
 	// QQQ just a stop gap, not quite right
 	// (say for example we were going around a circle with radius > 10)
 	bool weAreGoingInCircles(void)
 	{
-		const Vec3 offset = smoothedPosition() - position();
+		const Vec3 offset = this->smoothedPosition() - this->position();
 		return offset.length() < 10;
 	}
 
@@ -2246,7 +2237,7 @@ public:
 	{
 		const float minTime = (baseLookAheadTime
 				* (curvedSteering ?
-						interpolate(relativeSpeed(), 0.4f, 0.7f) : 0.66f));
+						interpolate(this->relativeSpeed(), 0.4f, 0.7f) : 0.66f));
 		return combinedLookAheadTime(minTime, 3);
 	}
 
@@ -2263,7 +2254,7 @@ public:
 	{
 		if (speed() == 0)
 			return 0;
-		return maxXXX(minTime, minDistance / speed());
+		return maxXXX(minTime, minDistance / this->speed());
 	}
 
 	// is vehicle body inside the path?
@@ -2273,19 +2264,19 @@ public:
 	{
 		if (demoSelect == 2)
 		{
-			const Vec3 bbSide = side() * halfWidth;
-			const Vec3 bbFront = forward() * halfLength;
+			const Vec3 bbSide = this->side() * halfWidth;
+			const Vec3 bbFront = this->forward() * halfLength;
 			return ( /* path->isInsidePath (position () - bbFront + bbSide) */isInsidePathway(
 					*path, position() - bbFront + bbSide)
 					&&
 					/* path->isInsidePath (position () + bbFront + bbSide) */isInsidePathway(
-							*path, position() + bbFront + bbSide)
+							*path, this->position() + bbFront + bbSide)
 					&&
 					/* path->isInsidePath (position () + bbFront - bbSide) */isInsidePathway(
-							*path, position() + bbFront - bbSide)
+							*path, this->position() + bbFront - bbSide)
 					&&
 					/* path->isInsidePath (position () - bbFront - bbSide) */isInsidePathway(
-							*path, position() - bbFront - bbSide));
+							*path, this->position() - bbFront - bbSide));
 		}
 		return true;
 	}
@@ -2295,14 +2286,16 @@ public:
 	{
 		const Vec3 curved = convertLinearToCurvedSpaceGlobal(absolute);
 		blendIntoAccumulator(elapsedTime * 8.0f, curved, currentSteering);
+#ifdef ELY_DEBUG
 		{
 			// annotation
 			const Vec3 u(0, 0.5, 0);
 			const Vec3 p = position();
-			annotationLine(p + u, p + u + absolute, gRed);
-			annotationLine(p + u, p + u + curved, gYellow);
-			annotationLine(p + u * 2, p + u * 2 + currentSteering, gGreen);
+			this->annotationLine(p + u, p + u + absolute, gRed);
+			this->annotationLine(p + u, p + u + curved, gYellow);
+			this->annotationLine(p + u * 2, p + u * 2 + currentSteering, gGreen);
 		}
+#endif
 		return currentSteering;
 	}
 
@@ -2316,14 +2309,14 @@ public:
 	//
 	Vec3 convertLinearToCurvedSpaceGlobal(const Vec3& linear)
 	{
-		const Vec3 trimmedLinear = linear.truncateLength(maxForce());
+		const Vec3 trimmedLinear = linear.truncateLength(this->maxForce());
 
 		// ---------- this block imported from steerToAvoidObstaclesOnMap
 		const float signedRadius = 1 / (nonZeroCurvatureQQQ() /*QQQ*/* 1);
 		const Vec3 localCenterOfCurvature = side() * signedRadius;
-		const Vec3 center = position() + localCenterOfCurvature;
+		const Vec3 center = this->position() + localCenterOfCurvature;
 		const float sign = signedRadius < 0 ? 1.0f : -1.0f;
-		const float arcLength = trimmedLinear.dot(forward());
+		const float arcLength = trimmedLinear.dot(this->forward());
 		//
 		const float arcRadius = signedRadius * -sign;
 		const float twoPi = 2 * OPENSTEER_M_PI;
@@ -2333,7 +2326,7 @@ public:
 
 		// ---------- this block imported from scanObstacleMap
 		// vector from center of curvature to position of vehicle
-		const Vec3 initialSpoke = position() - center;
+		const Vec3 initialSpoke = this->position() - center;
 		// rotate by signed arc angle
 		const Vec3 spoke = initialSpoke.rotateAboutGlobalY(arcAngle * sign);
 		// ---------- this block imported from scanObstacleMap
@@ -2342,14 +2335,16 @@ public:
 		const float dRadius = trimmedLinear.dot(fromCenter);
 		const float radiusChangeFactor = (dRadius + arcRadius) / arcRadius;
 		const Vec3 resultLocation = center + (spoke * radiusChangeFactor);
+#ifdef ELY_DEBUG
 		{
-			const Vec3 center = position() + localCenterOfCurvature;
-			annotationXZArc(position(), center, speed() * sign * -3, 20,
+			const Vec3 center = this->position() + localCenterOfCurvature;
+			annotationXZArc(this->position(), center, this->speed() * sign * -3, 20,
 					gWhite);
 		}
+#endif
 		// return the vector from vehicle position to the coimputed location
 		// of the curved image of the original linear offset
-		return resultLocation - position();
+		return resultLocation - this->position();
 	}
 
 	// approximate value for the Polaris Ranger 6x6: 16 feet, 5 meters
@@ -2363,7 +2358,7 @@ public:
 		const float maxCurvature = 1 / (minimumTurningRadius() * 1.1f);
 
 		// are we turning more sharply than the minimum turning radius?
-		if (absXXX(curvature()) > maxCurvature)
+		if (absXXX(this->curvature()) > maxCurvature)
 		{
 			// remove the tangential (non-thrust) component of the steering
 			// force, replace it with a force pointing away from the center
@@ -2371,16 +2366,18 @@ public:
 			// minimum turing radius
 			const float signedRadius = 1 / nonZeroCurvatureQQQ();
 			const float sign = signedRadius < 0 ? 1.0f : -1.0f;
-			const Vec3 thrust = steering.parallelComponent(forward());
-			const Vec3 trimmed = thrust.truncateLength(maxForce());
-			const Vec3 widenOut = side() * maxForce() * sign;
+			const Vec3 thrust = steering.parallelComponent(this->forward());
+			const Vec3 trimmed = thrust.truncateLength(this->maxForce());
+			const Vec3 widenOut = this->side() * this->maxForce() * sign;
+#ifdef ELY_DEBUG
 			{
 				// annotation
-				const Vec3 localCenterOfCurvature = side() * signedRadius;
-				const Vec3 center = position() + localCenterOfCurvature;
-				annotationCircleOrDisk(minimumTurningRadius(), up(), center,
+				const Vec3 localCenterOfCurvature = this->side() * signedRadius;
+				const Vec3 center = this->position() + localCenterOfCurvature;
+				this->annotationCircleOrDisk(minimumTurningRadius(), this->up(), center,
 						gBlue, 40, false, false);
 			}
+#endif
 			return trimmed + widenOut;
 		}
 
@@ -2421,8 +2418,9 @@ public:
 
 			// map from full throttle when straight to 10% at max curvature
 			const float curveSpeed = interpolate(relativeCurvature, 1.0f, 0.1f);
+#ifdef ELY_DEBUG
 			annoteMaxRelSpeedCurve = curveSpeed;
-
+#endif
 			if (demoSelect != 2)
 			{
 				maxRelativeSpeed = curveSpeed;
@@ -2431,9 +2429,9 @@ public:
 			{
 				// heading (unit tangent) of the path segment of interest
 				const Vec3 pathHeading = mapPointAndDirectionToTangent(*path,
-						position(), pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
+						this->position(), pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
 				// measure how parallel we are to the path
-				const float parallelness = pathHeading.dot(forward());
+				const float parallelness = pathHeading.dot(this->forward());
 
 				// determine relative speed for this heading
 				const float mw = 0.2f;
@@ -2441,11 +2439,15 @@ public:
 						(parallelness < 0) ?
 								mw : interpolate(parallelness, mw, 1.0f));
 				maxRelativeSpeed = minXXX(curveSpeed, headingSpeed);
+#ifdef ELY_DEBUG
 				annoteMaxRelSpeedPath = headingSpeed;
+#endif
 			}
 		}
+#ifdef ELY_DEBUG
 		annoteMaxRelSpeed = maxRelativeSpeed;
-		return maxSpeed() * maxRelativeSpeed;
+#endif
+		return this->maxSpeed() * maxRelativeSpeed;
 	}
 
 	// xxx library candidate
@@ -2453,10 +2455,11 @@ public:
 	//
 	Vec3 steerTowardHeading(const Vec3& desiredGlobalHeading)
 	{
-		const Vec3 headingError = desiredGlobalHeading - forward();
-		return headingError.normalize() * maxForce();
+		const Vec3 headingError = desiredGlobalHeading - this->forward();
+		return headingError.normalize() * this->maxForce();
 	}
 
+#ifdef ELY_DEBUG
 	// XXX this should eventually be in a library, make it a first
 	// XXX class annotation queue, tie in with drawXZArc
 	void annotationXZArc(const Vec3& start, const Vec3& center,
@@ -2485,6 +2488,7 @@ public:
 			annotationLine(spoke + center, old, color);
 		}
 	}
+#endif
 
 	// map of obstacles
 	TerrainMap* map;
@@ -2982,6 +2986,85 @@ public:
 		if (usePathFences && (vehicle->demoSelect == 2))
 			drawPathFencesOnMap(*vehicle->map, *vehicle->path);
 	}
+
+#ifdef ELY_DEBUG
+	void drawMap(void)
+	{
+#ifdef OLDTERRAINMAP
+		const float xs = map->xSize / (float) map->resolution;
+		const float zs = map->zSize / (float) map->resolution;
+		const Vec3 alongRow(xs, 0, 0);
+		const Vec3 nextRow(-map->xSize, 0, zs);
+		Vec3 g((map->xSize - xs) / -2, 0, (map->zSize - zs) / -2);
+		g += map->center;
+		for (int j = 0; j < map->resolution; j++)
+		{
+			for (int i = 0; i < map->resolution; i++)
+			{
+				if (map->getMapBit(i, j))
+				{
+					// spikes
+					// const Vec3 spikeTop (0, 5.0f, 0);
+					// drawLine (g, g+spikeTop, gWhite);
+
+					// squares
+					const float rockHeight = 0;
+					const Vec3 v1(+xs / 2, rockHeight, +zs / 2);
+					const Vec3 v2(+xs / 2, rockHeight, -zs / 2);
+					const Vec3 v3(-xs / 2, rockHeight, -zs / 2);
+					const Vec3 v4(-xs / 2, rockHeight, +zs / 2);
+					// const Vec3 redRockColor (0.6f, 0.1f, 0.0f);
+					const Color orangeRockColor(0.5f, 0.2f, 0.0f);
+					drawQuadrangle(g + v1, g + v2, g + v3, g + v4,
+							orangeRockColor);
+
+					// pyramids
+					// const Vec3 top (0, xs/2, 0);
+					// const Vec3 redRockColor (0.6f, 0.1f, 0.0f);
+					// const Vec3 orangeRockColor (0.5f, 0.2f, 0.0f);
+					// drawTriangle (g+v1, g+v2, g+top, redRockColor);
+					// drawTriangle (g+v2, g+v3, g+top, orangeRockColor);
+					// drawTriangle (g+v3, g+v4, g+top, redRockColor);
+					// drawTriangle (g+v4, g+v1, g+top, orangeRockColor);
+				}
+				g += alongRow;
+			}
+			g += nextRow;
+		}
+#else
+#endif
+	}
+
+	/**
+	 * draw the GCRoute as a series of circles and "wide lines"
+	 * (QQQ this should probably be a method of Path (or a
+	 * closely-related utility function) in which case should pass
+	 * color in, certainly shouldn't be recomputing it each draw)
+	 * @todo Add a <code>Vec3 const* points() const</code> member function to
+	 *       SegmentedPath, etc. to allow for faster point access?
+	 */
+	void drawPath(void)
+	{
+		const Color pathColor(0, 0.5f, 0.5f);
+		const Color sandColor(0.8f, 0.7f, 0.5f);
+		const Color color = interpolate(0.1f, sandColor, pathColor);
+
+		const Vec3 down(0, -0.1f, 0);
+		for (OpenSteer::size_t i = 1; i < path->pointCount(); ++i)
+		{
+			const Vec3 endPoint0 = path->point(i) + down;
+			const Vec3 endPoint1 = path->point(i - 1) + down;
+
+			const float legWidth = path->segmentRadius(i - 1);
+
+			drawXZWideLine(endPoint0, endPoint1, color, legWidth * 2);
+			drawLine(path->point(i), path->point(i - 1), pathColor);
+			drawXZDisk(legWidth, endPoint0, color, 24);
+			drawXZDisk(legWidth, endPoint1, color, 24);
+
+		}
+	}
+#endif
 
 	void drawRandomClumpsOfRocksOnMap(TerrainMap& map)
 	{
