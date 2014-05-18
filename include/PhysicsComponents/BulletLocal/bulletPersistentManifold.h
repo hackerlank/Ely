@@ -39,7 +39,7 @@ public:
 	const PandaNode *get_node1();
 
 	int get_num_manifold_points() const;
-	BulletManifoldPoint *get_manifold_point(int idx) const;MAKE_SEQ(get_manifold_points, get_num_manifold_points, get_manifold_point)
+	BulletManifoldPoint *get_manifold_point(int idx) const;
 	;
 
 	PN_stdfloat get_contact_breaking_threshold() const;

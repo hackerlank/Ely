@@ -70,25 +70,25 @@ BulletWorld::BulletWorld()
 		PRINT_ERR_DEBUG("no proper broadphase algorithm!");
 		break;
 	}
-	nassertv(_broadphase);
+	RETURN_ON_COND(not (_broadphase),)
 
 	// Configuration
 	_configuration = new btSoftBodyRigidBodyCollisionConfiguration();
-	nassertv(_configuration);
+	RETURN_ON_COND(not (_configuration),)
 
 	// Dispatcher
 	_dispatcher = new btCollisionDispatcher(_configuration);
-	nassertv(_dispatcher);
+	RETURN_ON_COND(not (_dispatcher),)
 
 	// Solver
 	_solver = new btSequentialImpulseConstraintSolver;
-	nassertv(_solver);
+	RETURN_ON_COND(not (_solver),)
 
 	// World
 	_world = new btSoftRigidDynamicsWorld(_dispatcher, _broadphase, _solver,
 			_configuration);
-	nassertv(_world);
-	nassertv(_world->getPairCache());
+	RETURN_ON_COND(not (_world),)
+	RETURN_ON_COND(not (_world->getPairCache()),)
 
 	_world->setWorldUserInfo(this);
 	_world->setGravity(btVector3(0.0f, 0.0f, 0.0f));
@@ -373,7 +373,7 @@ void BulletWorld::remove(TypedObject *object)
 void BulletWorld::attach_rigid_body(BulletRigidBodyNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	btRigidBody *ptr = btRigidBody::upcast(node->get_object());
 
@@ -401,7 +401,7 @@ void BulletWorld::attach_rigid_body(BulletRigidBodyNode *node)
 void BulletWorld::remove_rigid_body(BulletRigidBodyNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	btRigidBody *ptr = btRigidBody::upcast(node->get_object());
 
@@ -429,7 +429,7 @@ void BulletWorld::remove_rigid_body(BulletRigidBodyNode *node)
 void BulletWorld::attach_soft_body(BulletSoftBodyNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	btSoftBody *ptr = btSoftBody::upcast(node->get_object());
 
@@ -461,7 +461,7 @@ void BulletWorld::attach_soft_body(BulletSoftBodyNode *node)
 void BulletWorld::remove_soft_body(BulletSoftBodyNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	btSoftBody *ptr = btSoftBody::upcast(node->get_object());
 
@@ -489,7 +489,7 @@ void BulletWorld::remove_soft_body(BulletSoftBodyNode *node)
 void BulletWorld::attach_ghost(BulletGhostNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	// TODO group/filter settings...
 	/*
@@ -534,7 +534,7 @@ void BulletWorld::attach_ghost(BulletGhostNode *node)
 void BulletWorld::remove_ghost(BulletGhostNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	btGhostObject *ptr = btGhostObject::upcast(node->get_object());
 
@@ -562,7 +562,7 @@ void BulletWorld::remove_ghost(BulletGhostNode *node)
 void BulletWorld::attach_character(BulletBaseCharacterControllerNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	BulletCharacterControllers::iterator found;
 	PT(BulletBaseCharacterControllerNode)ptnode = node;
@@ -594,7 +594,7 @@ void BulletWorld::attach_character(BulletBaseCharacterControllerNode *node)
 void BulletWorld::remove_character(BulletBaseCharacterControllerNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	BulletCharacterControllers::iterator found;
 	PT(BulletBaseCharacterControllerNode)ptnode = node;
@@ -621,7 +621,7 @@ void BulletWorld::remove_character(BulletBaseCharacterControllerNode *node)
 void BulletWorld::attach_vehicle(BulletVehicle *vehicle)
 {
 
-	nassertv(vehicle);
+	RETURN_ON_COND(not (vehicle),)
 
 	BulletVehicles::iterator found;
 	PT(BulletVehicle)ptvehicle = vehicle;
@@ -647,7 +647,7 @@ void BulletWorld::attach_vehicle(BulletVehicle *vehicle)
 void BulletWorld::remove_vehicle(BulletVehicle *vehicle)
 {
 
-	nassertv(vehicle);
+	RETURN_ON_COND(not (vehicle),)
 
 	remove_rigid_body(vehicle->get_chassis());
 
@@ -675,7 +675,7 @@ void BulletWorld::remove_vehicle(BulletVehicle *vehicle)
 void BulletWorld::attach_constraint(BulletConstraint *constraint)
 {
 
-	nassertv(constraint);
+	RETURN_ON_COND(not (constraint),)
 
 	BulletConstraints::iterator found;
 	PT(BulletConstraint)ptconstraint = constraint;
@@ -701,7 +701,7 @@ void BulletWorld::attach_constraint(BulletConstraint *constraint)
 void BulletWorld::remove_constraint(BulletConstraint *constraint)
 {
 
-	nassertv(constraint);
+	RETURN_ON_COND(not (constraint),)
 
 	BulletConstraints::iterator found;
 	PT(BulletConstraint)ptconstraint = constraint;
@@ -727,8 +727,8 @@ BulletClosestHitRayResult BulletWorld::ray_test_closest(const LPoint3 &from_pos,
 		const LPoint3 &to_pos, const CollideMask &mask) const
 {
 
-	nassertr(!from_pos.is_nan(), BulletClosestHitRayResult::empty());
-	nassertr(!to_pos.is_nan(), BulletClosestHitRayResult::empty());
+	RETURN_ON_COND(not (!from_pos.is_nan()), BulletClosestHitRayResult::empty())
+	RETURN_ON_COND(not (!to_pos.is_nan()), BulletClosestHitRayResult::empty())
 
 	const btVector3 from = LVecBase3_to_btVector3(from_pos);
 	const btVector3 to = LVecBase3_to_btVector3(to_pos);
@@ -747,8 +747,8 @@ BulletAllHitsRayResult BulletWorld::ray_test_all(const LPoint3 &from_pos,
 		const LPoint3 &to_pos, const CollideMask &mask) const
 {
 
-	nassertr(!from_pos.is_nan(), BulletAllHitsRayResult::empty());
-	nassertr(!to_pos.is_nan(), BulletAllHitsRayResult::empty());
+	RETURN_ON_COND(not (!from_pos.is_nan()), BulletAllHitsRayResult::empty())
+	RETURN_ON_COND(not (!to_pos.is_nan()), BulletAllHitsRayResult::empty())
 
 	const btVector3 from = LVecBase3_to_btVector3(from_pos);
 	const btVector3 to = LVecBase3_to_btVector3(to_pos);
@@ -768,10 +768,10 @@ BulletClosestHitSweepResult BulletWorld::sweep_test_closest(BulletShape *shape,
 		const CollideMask &mask, PN_stdfloat penetration) const
 {
 
-	nassertr(shape, BulletClosestHitSweepResult::empty());
-	nassertr(shape->is_convex(), BulletClosestHitSweepResult::empty());
-	nassertr(!from_ts.is_invalid(), BulletClosestHitSweepResult::empty());
-	nassertr(!to_ts.is_invalid(), BulletClosestHitSweepResult::empty());
+	RETURN_ON_COND(not (shape), BulletClosestHitSweepResult::empty())
+	RETURN_ON_COND(not (shape->is_convex()), BulletClosestHitSweepResult::empty())
+	RETURN_ON_COND(not (!from_ts.is_invalid()), BulletClosestHitSweepResult::empty())
+	RETURN_ON_COND(not (!to_ts.is_invalid()), BulletClosestHitSweepResult::empty())
 
 	const btConvexShape *convex = (const btConvexShape *) shape->ptr();
 	const btVector3 from_pos = LVecBase3_to_btVector3(from_ts.get_pos());
@@ -793,21 +793,21 @@ BulletClosestHitSweepResult BulletWorld::sweep_test_closest(BulletShape *shape,
 bool BulletWorld::filter_test(PandaNode *node0, PandaNode *node1) const
 {
 
-	nassertr(node0, false);
-	nassertr(node1, false);
-	nassertr(_filter_cb, false);
+	RETURN_ON_COND(not (node0), false)
+	RETURN_ON_COND(not (node1), false)
+	RETURN_ON_COND(not (_filter_cb), false)
 
 	btCollisionObject *obj0 = get_collision_object(node0);
 	btCollisionObject *obj1 = get_collision_object(node1);
 
-	nassertr(obj0, false);
-	nassertr(obj1, false);
+	RETURN_ON_COND(not (obj0), false)
+	RETURN_ON_COND(not (obj1), false)
 
 	btBroadphaseProxy *proxy0 = obj0->getBroadphaseHandle();
 	btBroadphaseProxy *proxy1 = obj1->getBroadphaseHandle();
 
-	nassertr(proxy0, false);
-	nassertr(proxy1, false);
+	RETURN_ON_COND(not (proxy0), false)
+	RETURN_ON_COND(not (proxy1), false)
 
 	return _filter_cb->needBroadphaseCollision(proxy0, proxy1);
 }
@@ -882,7 +882,7 @@ BulletContactResult BulletWorld::contact_test_pair(PandaNode *node0,
 BulletPersistentManifold *BulletWorld::get_manifold(int idx) const
 {
 
-	nassertr(idx < get_num_manifolds(), NULL);
+	RETURN_ON_COND(not (idx < get_num_manifolds()), NULL)
 
 	btPersistentManifold *ptr = _dispatcher->getManifoldByIndexInternal(idx);
 	return (ptr) ? new BulletPersistentManifold(ptr) : NULL;
@@ -989,7 +989,7 @@ void BulletWorld::clear_contact_added_callback()
 void BulletWorld::set_tick_callback(CallbackObject *obj, bool is_pretick)
 {
 
-	nassertv(obj != NULL);
+	RETURN_ON_COND(not (obj != NULL),)
 	_tick_callback_obj = obj;
 	_world->setInternalTickCallback(&BulletWorld::tick_callback, this,
 			is_pretick);
@@ -1015,7 +1015,7 @@ void BulletWorld::clear_tick_callback()
 void BulletWorld::tick_callback(btDynamicsWorld *world, btScalar timestep)
 {
 
-	nassertv(world->getWorldUserInfo());
+	RETURN_ON_COND(not (world->getWorldUserInfo()),)
 
 	BulletWorld *w = static_cast<BulletWorld *>(world->getWorldUserInfo());
 	CallbackObject *obj = w->_tick_callback_obj;
@@ -1034,7 +1034,7 @@ void BulletWorld::tick_callback(btDynamicsWorld *world, btScalar timestep)
 void BulletWorld::set_filter_callback(CallbackObject *obj)
 {
 
-	nassertv(obj != NULL);
+	RETURN_ON_COND(not (obj != NULL),)
 
 	if (bullet_filter_algorithm != FA_callback)
 	{
@@ -1067,14 +1067,14 @@ bool BulletWorld::btFilterCallback1::needBroadphaseCollision(
 	btCollisionObject *obj0 = (btCollisionObject *) proxy0->m_clientObject;
 	btCollisionObject *obj1 = (btCollisionObject *) proxy1->m_clientObject;
 
-	nassertr(obj0, false);
-	nassertr(obj1, false);
+	RETURN_ON_COND(not (obj0), false)
+	RETURN_ON_COND(not (obj1), false)
 
 	PandaNode *node0 = (PandaNode *) obj0->getUserPointer();
 	PandaNode *node1 = (PandaNode *) obj1->getUserPointer();
 
-	nassertr(node0, false);
-	nassertr(node1, false);
+	RETURN_ON_COND(not (node0), false)
+	RETURN_ON_COND(not (node1), false)
 
 	CollideMask mask0 = node0->get_into_collide_mask();
 	CollideMask mask1 = node1->get_into_collide_mask();
@@ -1094,14 +1094,14 @@ bool BulletWorld::btFilterCallback2::needBroadphaseCollision(
 	btCollisionObject *obj0 = (btCollisionObject *) proxy0->m_clientObject;
 	btCollisionObject *obj1 = (btCollisionObject *) proxy1->m_clientObject;
 
-	nassertr(obj0, false);
-	nassertr(obj1, false);
+	RETURN_ON_COND(not (obj0), false)
+	RETURN_ON_COND(not (obj1), false)
 
 	PandaNode *node0 = (PandaNode *) obj0->getUserPointer();
 	PandaNode *node1 = (PandaNode *) obj1->getUserPointer();
 
-	nassertr(node0, false);
-	nassertr(node1, false);
+	RETURN_ON_COND(not (node0), false)
+	RETURN_ON_COND(not (node1), false)
 
 	CollideMask mask0 = node0->get_into_collide_mask();
 	CollideMask mask1 = node1->get_into_collide_mask();
@@ -1130,19 +1130,19 @@ bool BulletWorld::btFilterCallback3::needBroadphaseCollision(
 		btBroadphaseProxy* proxy0, btBroadphaseProxy* proxy1) const
 {
 
-	nassertr(_filter_callback_obj, false);
+	RETURN_ON_COND(not (_filter_callback_obj), false)
 
 	btCollisionObject *obj0 = (btCollisionObject *) proxy0->m_clientObject;
 	btCollisionObject *obj1 = (btCollisionObject *) proxy1->m_clientObject;
 
-	nassertr(obj0, false);
-	nassertr(obj1, false);
+	RETURN_ON_COND(not (obj0), false)
+	RETURN_ON_COND(not (obj1), false)
 
 	PandaNode *node0 = (PandaNode *) obj0->getUserPointer();
 	PandaNode *node1 = (PandaNode *) obj1->getUserPointer();
 
-	nassertr(node0, false);
-	nassertr(node1, false);
+	RETURN_ON_COND(not (node0), false)
+	RETURN_ON_COND(not (node1), false)
 
 	BulletFilterCallbackData cbdata(node0, node1);
 	_filter_callback_obj->do_callback(&cbdata);

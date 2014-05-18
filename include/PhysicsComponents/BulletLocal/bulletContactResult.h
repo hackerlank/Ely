@@ -69,7 +69,7 @@ struct BulletContactResult: public btCollisionWorld::ContactResultCallback
 
 public:
 	inline int get_num_contacts() const;
-	inline BulletContact &get_contact(int idx);MAKE_SEQ(get_contacts, get_num_contacts, get_contact)
+	inline BulletContact &get_contact(int idx);
 	;
 
 public:
@@ -202,7 +202,7 @@ inline int BulletContactResult::get_num_contacts() const
 inline BulletContact &BulletContactResult::get_contact(int idx)
 {
 
-	nassertr(idx >= 0 && idx < (int ) _contacts.size(), _empty);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int) _contacts.size()), _empty)
 	return _contacts[idx];
 }
 

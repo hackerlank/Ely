@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletSoftBodyWorldInfo.h"
 
 namespace ely
@@ -79,7 +80,7 @@ void BulletSoftBodyWorldInfo::set_water_offset(PN_stdfloat offset)
 void BulletSoftBodyWorldInfo::set_water_normal(const LVector3 &normal)
 {
 
-	nassertv(!normal.is_nan());
+	RETURN_ON_COND(not (!normal.is_nan()),)
 	_info.water_normal.setValue(normal.get_x(), normal.get_y(), normal.get_z());
 }
 
@@ -91,7 +92,7 @@ void BulletSoftBodyWorldInfo::set_water_normal(const LVector3 &normal)
 void BulletSoftBodyWorldInfo::set_gravity(const LVector3 &gravity)
 {
 
-	nassertv(!gravity.is_nan());
+	RETURN_ON_COND(not (!gravity.is_nan()),)
 	_info.m_gravity.setValue(gravity.get_x(), gravity.get_y(), gravity.get_z());
 }
 

@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletHingeConstraint.h"
 #include "PhysicsComponents/BulletLocal/bulletRigidBodyNode.h"
 #include "PhysicsComponents/BulletLocal/bulletShape.h"
@@ -165,7 +166,7 @@ void BulletHingeConstraint::set_limit(PN_stdfloat low, PN_stdfloat high,
 void BulletHingeConstraint::set_axis(const LVector3 &axis)
 {
 
-	nassertv(!axis.is_nan());
+	RETURN_ON_COND(not (!axis.is_nan()),)
 
 	btVector3 v = LVecBase3_to_btVector3(axis);
 	_constraint->setAxis(v);

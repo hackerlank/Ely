@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletHelper.h"
 #include "PhysicsComponents/BulletLocal/bulletRigidBodyNode.h"
 #include "PhysicsComponents/BulletLocal/bulletGhostNode.h"
@@ -209,8 +210,8 @@ make_geom(BulletSoftBodyNode *node, const GeomVertexFormat *format, bool two_sid
 	CPT(GeomVertexFormat) fmt = (format) ? format : GeomVertexFormat::get_v3n3t2();
 	fmt = BulletHelper::add_sb_flip_column(fmt);
 
-	nassertr(fmt->has_column(InternalName::get_vertex()), NULL);
-	nassertr(fmt->has_column(InternalName::get_normal()), NULL);
+	RETURN_ON_COND(not (fmt->has_column(InternalName::get_vertex())), NULL)
+	RETURN_ON_COND(not (fmt->has_column(InternalName::get_normal())), NULL)
 
 	btSoftBody::tNodeArray &nodes(body->m_nodes);
 
@@ -314,7 +315,7 @@ void BulletHelper::make_texcoords_for_patch(Geom *geom, int resx, int resy)
 
 	PT(GeomVertexData)vdata = geom->modify_vertex_data();
 
-	nassertv(vdata->has_column(InternalName::get_texcoord()));
+	RETURN_ON_COND(not (vdata->has_column(InternalName::get_texcoord())),)
 
 	GeomVertexRewriter texcoords(vdata, InternalName::get_texcoord());
 

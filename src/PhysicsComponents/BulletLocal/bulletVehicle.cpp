@@ -124,7 +124,7 @@ void BulletVehicle::reset_suspension()
 PN_stdfloat BulletVehicle::get_steering_value(int idx) const
 {
 
-	nassertr(idx < get_num_wheels(), 0.0f);
+	RETURN_ON_COND(not (idx < get_num_wheels()), 0.0f)
 	return rad_2_deg(_vehicle->getSteeringValue(idx));
 }
 
@@ -137,7 +137,7 @@ PN_stdfloat BulletVehicle::get_steering_value(int idx) const
 void BulletVehicle::set_steering_value(PN_stdfloat steering, int idx)
 {
 
-	nassertv(idx < get_num_wheels());
+	RETURN_ON_COND(not (idx < get_num_wheels()),)
 	_vehicle->setSteeringValue(deg_2_rad(steering), idx);
 }
 
@@ -150,7 +150,7 @@ void BulletVehicle::set_steering_value(PN_stdfloat steering, int idx)
 void BulletVehicle::apply_engine_force(PN_stdfloat force, int idx)
 {
 
-	nassertv(idx < get_num_wheels());
+	RETURN_ON_COND(not (idx < get_num_wheels()),)
 	_vehicle->applyEngineForce(force, idx);
 }
 
@@ -162,7 +162,7 @@ void BulletVehicle::apply_engine_force(PN_stdfloat force, int idx)
 void BulletVehicle::set_brake(PN_stdfloat brake, int idx)
 {
 
-	nassertv(idx < get_num_wheels());
+	RETURN_ON_COND(not (idx < get_num_wheels()),)
 	_vehicle->setBrake(brake, idx);
 }
 
@@ -232,7 +232,7 @@ btVector3 BulletVehicle::get_axis(int idx)
 BulletWheel BulletVehicle::get_wheel(int idx) const
 {
 
-	nassertr(idx < get_num_wheels(), BulletWheel::empty());
+	RETURN_ON_COND(not (idx < get_num_wheels()), BulletWheel::empty())
 	return BulletWheel(_vehicle->getWheelInfo(idx));
 }
 

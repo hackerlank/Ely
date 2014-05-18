@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletSphericalConstraint.h"
 #include "PhysicsComponents/BulletLocal/bulletRigidBodyNode.h"
 #include "PhysicsComponents/BulletLocal/bulletShape.h"
@@ -73,7 +74,7 @@ btTypedConstraint *BulletSphericalConstraint::ptr() const
 void BulletSphericalConstraint::set_pivot_a(const LPoint3 &pivot_a)
 {
 
-	nassertv(!pivot_a.is_nan());
+	RETURN_ON_COND(not (!pivot_a.is_nan()),)
 	_constraint->setPivotA(LVecBase3_to_btVector3(pivot_a));
 }
 
@@ -85,7 +86,7 @@ void BulletSphericalConstraint::set_pivot_a(const LPoint3 &pivot_a)
 void BulletSphericalConstraint::set_pivot_b(const LPoint3 &pivot_b)
 {
 
-	nassertv(!pivot_b.is_nan());
+	RETURN_ON_COND(not (!pivot_b.is_nan()),)
 	_constraint->setPivotB(LVecBase3_to_btVector3(pivot_b));
 }
 

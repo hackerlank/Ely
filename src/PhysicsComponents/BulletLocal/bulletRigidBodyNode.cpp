@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/config_bullet.h"
 #include "PhysicsComponents/BulletLocal/bulletRigidBodyNode.h"
 #include "PhysicsComponents/BulletLocal/bulletShape.h"
@@ -230,8 +231,8 @@ LMatrix3 BulletRigidBodyNode::get_inv_inertia_tensor_world() const
 void BulletRigidBodyNode::apply_force(const LVector3 &force, const LPoint3 &pos)
 {
 
-	nassertv_always(!force.is_nan());
-	nassertv_always(!pos.is_nan());
+	RETURN_ON_COND(not (!force.is_nan()),)
+	RETURN_ON_COND(not (!pos.is_nan()),)
 
 	_rigid->applyForce(LVecBase3_to_btVector3(force),
 			LVecBase3_to_btVector3(pos));
@@ -245,7 +246,7 @@ void BulletRigidBodyNode::apply_force(const LVector3 &force, const LPoint3 &pos)
 void BulletRigidBodyNode::apply_central_force(const LVector3 &force)
 {
 
-	nassertv_always(!force.is_nan());
+	RETURN_ON_COND(not (!force.is_nan()),)
 
 	_rigid->applyCentralForce(LVecBase3_to_btVector3(force));
 }
@@ -258,7 +259,7 @@ void BulletRigidBodyNode::apply_central_force(const LVector3 &force)
 void BulletRigidBodyNode::apply_torque(const LVector3 &torque)
 {
 
-	nassertv_always(!torque.is_nan());
+	RETURN_ON_COND(not (!torque.is_nan()),)
 
 	_rigid->applyTorque(LVecBase3_to_btVector3(torque));
 }
@@ -271,7 +272,7 @@ void BulletRigidBodyNode::apply_torque(const LVector3 &torque)
 void BulletRigidBodyNode::apply_torque_impulse(const LVector3 &torque)
 {
 
-	nassertv_always(!torque.is_nan());
+	RETURN_ON_COND(not (!torque.is_nan()),)
 
 	_rigid->applyTorqueImpulse(LVecBase3_to_btVector3(torque));
 }
@@ -285,8 +286,8 @@ void BulletRigidBodyNode::apply_impulse(const LVector3 &impulse,
 		const LPoint3 &pos)
 {
 
-	nassertv_always(!impulse.is_nan());
-	nassertv_always(!pos.is_nan());
+	RETURN_ON_COND(not (!impulse.is_nan()),)
+	RETURN_ON_COND(not (!pos.is_nan()),)
 
 	_rigid->applyImpulse(LVecBase3_to_btVector3(impulse),
 			LVecBase3_to_btVector3(pos));
@@ -300,7 +301,7 @@ void BulletRigidBodyNode::apply_impulse(const LVector3 &impulse,
 void BulletRigidBodyNode::apply_central_impulse(const LVector3 &impulse)
 {
 
-	nassertv_always(!impulse.is_nan());
+	RETURN_ON_COND(not (!impulse.is_nan()),)
 
 	_rigid->applyCentralImpulse(LVecBase3_to_btVector3(impulse));
 }
@@ -413,7 +414,7 @@ LVector3 BulletRigidBodyNode::get_angular_velocity() const
 void BulletRigidBodyNode::set_linear_velocity(const LVector3 &velocity)
 {
 
-	nassertv_always(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 
 	_rigid->setLinearVelocity(LVecBase3_to_btVector3(velocity));
 }
@@ -426,7 +427,7 @@ void BulletRigidBodyNode::set_linear_velocity(const LVector3 &velocity)
 void BulletRigidBodyNode::set_angular_velocity(const LVector3 &velocity)
 {
 
-	nassertv_always(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 
 	_rigid->setAngularVelocity(LVecBase3_to_btVector3(velocity));
 }
@@ -496,7 +497,7 @@ void BulletRigidBodyNode::set_angular_sleep_threshold(PN_stdfloat threshold)
 void BulletRigidBodyNode::set_gravity(const LVector3 &gravity)
 {
 
-	nassertv_always(!gravity.is_nan());
+	RETURN_ON_COND(not (!gravity.is_nan()),)
 
 	_rigid->setGravity(LVecBase3_to_btVector3(gravity));
 }
@@ -634,7 +635,7 @@ void BulletRigidBodyNode::MotionState::set_net_transform(
 		const TransformState *ts)
 {
 
-	nassertv(ts);
+	RETURN_ON_COND(not (ts),)
 
 	_trans = TransformState_to_btTrans(ts);
 }

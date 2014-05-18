@@ -147,14 +147,14 @@ public:
 
 	// Materials
 	int get_num_materials() const;
-	BulletSoftBodyMaterial get_material(int idx) const;MAKE_SEQ(get_materials, get_num_materials, get_material)
+	BulletSoftBodyMaterial get_material(int idx) const;
 	;
 
 	BulletSoftBodyMaterial append_material();
 
 	// Nodes
 	int get_num_nodes() const;
-	BulletSoftBodyNodeElement get_node(int idx) const;MAKE_SEQ(get_nodes, get_num_nodes, get_node)
+	BulletSoftBodyNodeElement get_node(int idx) const;
 	;
 
 	int get_closest_node_index(LVecBase3 point, bool local);

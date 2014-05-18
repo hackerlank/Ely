@@ -105,10 +105,10 @@ void BulletTriangleMeshShape::refit_tree(const LPoint3 &aabb_min,
 		const LPoint3 &aabb_max)
 {
 
-	nassertv(!aabb_max.is_nan());
-	nassertv(!aabb_max.is_nan());
+	RETURN_ON_COND(not (!aabb_max.is_nan()),)
+	RETURN_ON_COND(not (!aabb_max.is_nan()),)
 
-	nassertv(this->is_static());
+	RETURN_ON_COND(not (this->is_static()),)
 
 	_bvh_shape->refitTree(LVecBase3_to_btVector3(aabb_min),
 			LVecBase3_to_btVector3(aabb_max));

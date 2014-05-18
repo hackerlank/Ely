@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletAllHitsRayResult.h"
 
 namespace ely
@@ -134,7 +135,7 @@ int BulletAllHitsRayResult::get_num_hits() const
 const BulletRayHit BulletAllHitsRayResult::get_hit(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < get_num_hits(), BulletRayHit::empty());
+	RETURN_ON_COND(not (idx >= 0 && idx < get_num_hits()), BulletRayHit::empty())
 
 	BulletRayHit hit;
 

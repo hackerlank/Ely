@@ -17,6 +17,7 @@
 
 #include <pandabase.h>
 
+#include "Utilities/Tools.h"
 #include "bullet_includes.h"
 #include "bullet_utils.h"
 
@@ -46,7 +47,7 @@ public:
 	void remove_shape(BulletShape *shape);
 
 	inline int get_num_shapes() const;
-	inline BulletShape *get_shape(int idx) const;MAKE_SEQ(get_shapes, get_num_shapes, get_shape)
+	inline BulletShape *get_shape(int idx) const;
 	;
 
 	LPoint3 get_shape_pos(int idx) const;
@@ -447,7 +448,7 @@ inline bool BulletBodyNode::is_debug_enabled() const
 inline BulletShape *BulletBodyNode::get_shape(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _shapes.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int) _shapes.size()), NULL)
 	return _shapes[idx];
 }
 

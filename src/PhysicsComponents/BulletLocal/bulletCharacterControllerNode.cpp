@@ -84,7 +84,7 @@ void BulletCharacterControllerNode::set_linear_movement(
 		const LVector3 &movement, bool is_local)
 {
 
-	nassertv(!movement.is_nan());
+	RETURN_ON_COND(not (!movement.is_nan()),)
 
 	_linear_movement = movement;
 	_linear_movement_is_local = is_local;

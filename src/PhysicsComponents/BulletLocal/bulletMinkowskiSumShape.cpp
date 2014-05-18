@@ -27,8 +27,8 @@ BulletMinkowskiSumShape::BulletMinkowskiSumShape(const BulletShape *shape_a,
 		const BulletShape *shape_b)
 {
 
-	nassertv(shape_a->is_convex());
-	nassertv(shape_b->is_convex());
+	RETURN_ON_COND(not (shape_a->is_convex()),)
+	RETURN_ON_COND(not (shape_b->is_convex()),)
 
 	const btConvexShape *ptr_a = (const btConvexShape *) shape_a->ptr();
 	const btConvexShape *ptr_b = (const btConvexShape *) shape_b->ptr();

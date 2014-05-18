@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletTriangleMesh.h"
 
 #include <pvector.h>
@@ -65,9 +66,9 @@ void BulletTriangleMesh::add_triangle(const LPoint3 &p0, const LPoint3 &p1,
 		const LPoint3 &p2, bool remove_duplicate_vertices)
 {
 
-	nassertv(!p0.is_nan());
-	nassertv(!p1.is_nan());
-	nassertv(!p2.is_nan());
+	RETURN_ON_COND(not (!p0.is_nan()),)
+	RETURN_ON_COND(not (!p1.is_nan()),)
+	RETURN_ON_COND(not (!p2.is_nan()),)
 
 	_mesh->addTriangle(LVecBase3_to_btVector3(p0), LVecBase3_to_btVector3(p1),
 			LVecBase3_to_btVector3(p2), remove_duplicate_vertices);
@@ -104,8 +105,8 @@ void BulletTriangleMesh::add_geom(const Geom *geom,
 		bool remove_duplicate_vertices, const TransformState *ts)
 {
 
-	nassertv(geom);
-	nassertv(ts);
+	RETURN_ON_COND(not (geom),)
+	RETURN_ON_COND(not (ts),)
 
 	LMatrix4 m = ts->get_mat();
 
@@ -146,7 +147,7 @@ void BulletTriangleMesh::add_geom(const Geom *geom,
 			int s = prim->get_primitive_start(l);
 			int e = prim->get_primitive_end(l);
 
-			nassertv(e - s == 3);
+			RETURN_ON_COND(not (e - s == 3),)
 
 			btVector3 v0 = vertices[prim->get_vertex(s)];
 			btVector3 v1 = vertices[prim->get_vertex(s+1)];

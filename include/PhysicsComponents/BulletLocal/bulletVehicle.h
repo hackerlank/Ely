@@ -89,7 +89,7 @@ public:
 	BulletWheel create_wheel();
 
 	inline int get_num_wheels() const;
-	BulletWheel get_wheel(int idx) const;MAKE_SEQ(get_wheels, get_num_wheels, get_wheel)
+	BulletWheel get_wheel(int idx) const;
 	;
 
 	// Tuning

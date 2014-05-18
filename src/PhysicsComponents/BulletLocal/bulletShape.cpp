@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletShape.h"
 #include "PhysicsComponents/BulletLocal/bullet_utils.h"
 
@@ -71,7 +72,7 @@ LVecBase3 BulletShape::get_local_scale() const
 void BulletShape::set_local_scale(const LVecBase3 &scale)
 {
 
-	nassertv(!scale.is_nan());
+	RETURN_ON_COND(not (!scale.is_nan()),)
 	ptr()->setLocalScaling(LVecBase3_to_btVector3(scale));
 }
 

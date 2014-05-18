@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bullet_utils.h"
 #include "PhysicsComponents/BulletLocal/bulletConvexHullShape.h"
 
@@ -84,8 +85,8 @@ void BulletConvexHullShape::add_array(const PTA_LVecBase3 &points)
 void BulletConvexHullShape::add_geom(const Geom *geom, const TransformState *ts)
 {
 
-	nassertv(geom);
-	nassertv(ts);
+	RETURN_ON_COND(not (geom),)
+	RETURN_ON_COND(not (ts),)
 
 	LMatrix4 m = ts->get_mat();
 

@@ -78,22 +78,22 @@ public:
 
 	// Ghost object
 	inline int get_num_ghosts() const;
-	inline BulletGhostNode *get_ghost(int idx) const;MAKE_SEQ(get_ghosts, get_num_ghosts, get_ghost)
+	inline BulletGhostNode *get_ghost(int idx) const;
 	;
 
 	// Rigid body
 	inline int get_num_rigid_bodies() const;
-	inline BulletRigidBodyNode *get_rigid_body(int idx) const;MAKE_SEQ(get_rigid_bodies, get_num_rigid_bodies, get_rigid_body)
+	inline BulletRigidBodyNode *get_rigid_body(int idx) const;
 	;
 
 	// Soft body
 	inline int get_num_soft_bodies() const;
-	inline BulletSoftBodyNode *get_soft_body(int idx) const;MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body)
+	inline BulletSoftBodyNode *get_soft_body(int idx) const;
 	;
 
 	// Character controller
 	inline int get_num_characters() const;
-	inline BulletBaseCharacterControllerNode *get_character(int idx) const;MAKE_SEQ(get_characters, get_num_characters, get_character)
+	inline BulletBaseCharacterControllerNode *get_character(int idx) const;
 	;
 
 	// Vehicle
@@ -101,12 +101,12 @@ public:
 	void remove_vehicle(BulletVehicle *vehicle);
 
 	inline int get_num_vehicles() const;
-	inline BulletVehicle *get_vehicle(int idx) const;MAKE_SEQ(get_vehicles, get_num_vehicles, get_vehicle)
+	inline BulletVehicle *get_vehicle(int idx) const;
 	;
 
 	// Constraint
 	inline int get_num_constraints() const;
-	inline BulletConstraint *get_constraint(int idx) const;MAKE_SEQ(get_constraints, get_num_constraints, get_constraint)
+	inline BulletConstraint *get_constraint(int idx) const;
 	;
 
 	// Raycast and other queries
@@ -132,7 +132,7 @@ public:
 
 	// Manifolds
 	inline int get_num_manifolds() const;
-	BulletPersistentManifold *get_manifold(int idx) const;MAKE_SEQ(get_manifolds, get_num_manifolds, get_manifold)
+	BulletPersistentManifold *get_manifold(int idx) const;
 	;
 
 	// Collision filtering
@@ -346,7 +346,7 @@ inline BulletWorld::~BulletWorld()
 inline void BulletWorld::set_debug_node(BulletDebugNode *node)
 {
 
-	nassertv(node);
+	RETURN_ON_COND(not (node),)
 
 	_debug = node;
 	_world->setDebugDrawer(&(_debug->_drawer));
@@ -427,7 +427,7 @@ inline int BulletWorld::get_num_rigid_bodies() const
 inline BulletRigidBodyNode *BulletWorld::get_rigid_body(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _bodies.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int ) _bodies.size()), NULL)
 	return _bodies[idx];
 }
 
@@ -450,7 +450,7 @@ inline int BulletWorld::get_num_soft_bodies() const
 inline BulletSoftBodyNode *BulletWorld::get_soft_body(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _softbodies.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int ) _softbodies.size()), NULL)
 	return _softbodies[idx];
 }
 
@@ -473,7 +473,7 @@ inline int BulletWorld::get_num_ghosts() const
 inline BulletGhostNode *BulletWorld::get_ghost(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _ghosts.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int ) _ghosts.size()), NULL)
 	return _ghosts[idx];
 }
 
@@ -497,7 +497,7 @@ inline BulletBaseCharacterControllerNode *BulletWorld::get_character(
 		int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _characters.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int ) _characters.size()), NULL)
 	return _characters[idx];
 }
 
@@ -520,7 +520,7 @@ inline int BulletWorld::get_num_vehicles() const
 inline BulletVehicle *BulletWorld::get_vehicle(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _vehicles.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int ) _vehicles.size()), NULL)
 	return _vehicles[idx];
 }
 
@@ -543,7 +543,7 @@ inline int BulletWorld::get_num_constraints() const
 inline BulletConstraint *BulletWorld::get_constraint(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int ) _constraints.size(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < (int ) _constraints.size()), NULL)
 	return _constraints[idx];
 }
 

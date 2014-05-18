@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletContactResult.h"
 
 namespace ely
@@ -75,8 +76,8 @@ void BulletContactResult::use_filter(btOverlapFilterCallback *cb,
 		btBroadphaseProxy *proxy)
 {
 
-	nassertv(cb);
-	nassertv(proxy);
+	RETURN_ON_COND(not (cb),)
+	RETURN_ON_COND(not (proxy),)
 
 	_filter_cb = cb;
 	_filter_proxy = proxy;

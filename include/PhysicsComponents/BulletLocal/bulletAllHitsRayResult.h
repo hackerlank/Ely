@@ -73,7 +73,7 @@ public:
 	PN_stdfloat get_closest_hit_fraction() const;
 
 	int get_num_hits() const;
-	const BulletRayHit get_hit(int idx) const;MAKE_SEQ(get_hits, get_num_hits, get_hit)
+	const BulletRayHit get_hit(int idx) const;
 	;
 
 public:

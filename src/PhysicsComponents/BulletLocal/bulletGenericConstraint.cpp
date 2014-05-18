@@ -76,8 +76,8 @@ btTypedConstraint *BulletGenericConstraint::ptr() const
 LVector3 BulletGenericConstraint::get_axis(int axis) const
 {
 
-	nassertr(axis >= 0, LVector3::zero());
-	nassertr(axis <= 3, LVector3::zero());
+	RETURN_ON_COND(not (axis >= 0), LVector3::zero())
+	RETURN_ON_COND(not (axis <= 3), LVector3::zero())
 
 	_constraint->buildJacobian();
 	return btVector3_to_LVector3(_constraint->getAxis(axis));
@@ -91,8 +91,8 @@ LVector3 BulletGenericConstraint::get_axis(int axis) const
 PN_stdfloat BulletGenericConstraint::get_pivot(int axis) const
 {
 
-	nassertr(axis >= 0, 0.0f);
-	nassertr(axis <= 3, 0.0f);
+	RETURN_ON_COND(not (axis >= 0), 0.0f)
+	RETURN_ON_COND(not (axis <= 3), 0.0f)
 
 	_constraint->buildJacobian();
 	return _constraint->getRelativePivotPosition(axis);
@@ -106,8 +106,8 @@ PN_stdfloat BulletGenericConstraint::get_pivot(int axis) const
 PN_stdfloat BulletGenericConstraint::get_angle(int axis) const
 {
 
-	nassertr(axis >= 0, 0.0f);
-	nassertr(axis <= 3, 0.0f);
+	RETURN_ON_COND(not (axis >= 0), 0.0f)
+	RETURN_ON_COND(not (axis <= 3), 0.0f)
 
 	_constraint->buildJacobian();
 	return _constraint->getAngle(axis);
@@ -122,8 +122,8 @@ void BulletGenericConstraint::set_linear_limit(int axis, PN_stdfloat low,
 		PN_stdfloat high)
 {
 
-	nassertv(axis >= 0);
-	nassertv(axis <= 3);
+	RETURN_ON_COND(not (axis >= 0),)
+	RETURN_ON_COND(not (axis <= 3),)
 
 	_constraint->buildJacobian();
 	_constraint->setLimit(axis, low, high);
@@ -138,8 +138,8 @@ void BulletGenericConstraint::set_angular_limit(int axis, PN_stdfloat low,
 		PN_stdfloat high)
 {
 
-	nassertv(axis >= 0);
-	nassertv(axis <= 3);
+	RETURN_ON_COND(not (axis >= 0),)
+	RETURN_ON_COND(not (axis <= 3),)
 
 	low = deg_2_rad(low);
 	high = deg_2_rad(high);

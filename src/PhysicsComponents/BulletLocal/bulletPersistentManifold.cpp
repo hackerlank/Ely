@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletPersistentManifold.h"
 #include "PhysicsComponents/BulletLocal/bulletManifoldPoint.h"
 
@@ -115,7 +116,7 @@ int BulletPersistentManifold::get_num_manifold_points() const
 BulletManifoldPoint *BulletPersistentManifold::get_manifold_point(int idx) const
 {
 
-	nassertr(idx < _manifold->getNumContacts(), NULL)
+	RETURN_ON_COND(not (idx < _manifold->getNumContacts()), NULL)
 
 	return new BulletManifoldPoint(_manifold->getContactPoint(idx));
 }

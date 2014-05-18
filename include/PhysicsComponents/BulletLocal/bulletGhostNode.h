@@ -41,7 +41,7 @@ public:
 
 	// Overlapping
 	inline int get_num_overlapping_nodes() const;
-	inline PandaNode *get_overlapping_node(int idx) const;MAKE_SEQ(get_overlapping_nodes, get_num_overlapping_nodes, get_overlapping_node)
+	inline PandaNode *get_overlapping_node(int idx) const;
 	;
 
 public:
@@ -117,7 +117,8 @@ inline int BulletGhostNode::get_num_overlapping_nodes() const
 inline PandaNode *BulletGhostNode::get_overlapping_node(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < _ghost->getNumOverlappingObjects(), NULL);
+	RETURN_ON_COND(not (idx >= 0 && idx < _ghost->getNumOverlappingObjects()),
+			NULL)
 
 	btCollisionObject *object = _ghost->getOverlappingObject(idx);
 	return (object) ? (PandaNode *) object->getUserPointer() : NULL;

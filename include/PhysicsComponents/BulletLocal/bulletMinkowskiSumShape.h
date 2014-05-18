@@ -17,6 +17,7 @@
 
 #include <pandabase.h>
 
+#include "Utilities/Tools.h"
 #include "bullet_includes.h"
 #include "bullet_utils.h"
 #include "bulletShape.h"
@@ -127,7 +128,7 @@ inline void BulletMinkowskiSumShape::operator =(
 inline void BulletMinkowskiSumShape::set_transform_a(const TransformState *ts)
 {
 
-	nassertv(ts);
+	RETURN_ON_COND(not(ts),)
 	_shape->setTransformA(TransformState_to_btTrans(ts));
 }
 
@@ -139,7 +140,7 @@ inline void BulletMinkowskiSumShape::set_transform_a(const TransformState *ts)
 inline void BulletMinkowskiSumShape::set_transform_b(const TransformState *ts)
 {
 
-	nassertv(ts);
+	RETURN_ON_COND(not(ts),)
 	_shape->setTransformB(TransformState_to_btTrans(ts));
 }
 

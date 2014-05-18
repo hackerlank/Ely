@@ -17,6 +17,7 @@
 
 #include <pandabase.h>
 
+#include "Utilities/Tools.h"
 #include "bullet_includes.h"
 
 #include <numeric_types.h>
@@ -596,7 +597,7 @@ inline int BulletSoftBodyConfig::get_positions_solver_iterations() const
 inline void BulletSoftBodyConfig::set_positions_solver_iterations(int value)
 {
 
-	nassertv(value > 0);
+	RETURN_ON_COND(not(value > 0),)
 	_cfg.piterations = value;
 }
 
@@ -619,7 +620,7 @@ inline int BulletSoftBodyConfig::get_velocities_solver_iterations() const
 inline void BulletSoftBodyConfig::set_velocities_solver_iterations(int value)
 {
 
-	nassertv(value > 0);
+	RETURN_ON_COND(not (value > 0),)
 	_cfg.viterations = value;
 }
 
@@ -642,7 +643,7 @@ inline int BulletSoftBodyConfig::get_drift_solver_iterations() const
 inline void BulletSoftBodyConfig::set_drift_solver_iterations(int value)
 {
 
-	nassertv(value > 0);
+	RETURN_ON_COND(not (value > 0),)
 	_cfg.diterations = value;
 }
 
@@ -665,7 +666,7 @@ inline int BulletSoftBodyConfig::get_cluster_solver_iterations() const
 inline void BulletSoftBodyConfig::set_cluster_solver_iterations(int value)
 {
 
-	nassertv(value > 0);
+	RETURN_ON_COND(not (value > 0),)
 	_cfg.citerations = value;
 }
 }

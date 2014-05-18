@@ -178,13 +178,13 @@ void BulletBodyNode::output(ostream &out) const
 void BulletBodyNode::add_shape(BulletShape *shape, const TransformState *ts)
 {
 
-	nassertv(get_object());
-	nassertv(ts);
+	RETURN_ON_COND(not (get_object()),)
+	RETURN_ON_COND(not (ts),)
 
-	nassertv(
+	RETURN_ON_COND(not (
 			!(shape->ptr()->getShapeType() == CONVEX_HULL_SHAPE_PROXYTYPE
 					&& ((btConvexHullShape * )shape->ptr())->getNumVertices()
-							== 0));
+							== 0)),)
 
 	// Transform
 	btTransform trans = TransformState_to_btTrans(ts);
@@ -201,7 +201,7 @@ void BulletBodyNode::add_shape(BulletShape *shape, const TransformState *ts)
 
 	if (_shapes.size() == 0)
 	{
-		nassertv(previous->getShapeType() == EMPTY_SHAPE_PROXYTYPE);
+		RETURN_ON_COND(not (previous->getShapeType() == EMPTY_SHAPE_PROXYTYPE),)
 
 		if (ts->is_identity())
 		{
@@ -253,7 +253,7 @@ void BulletBodyNode::add_shape(BulletShape *shape, const TransformState *ts)
 		// We already have two or more shapes, and want to add another. So we
 		// already have a compound shape as wrapper, and just need to add the
 		// new shape to the compound.
-		nassertv(previous->getShapeType() == COMPOUND_SHAPE_PROXYTYPE);
+		RETURN_ON_COND(not (previous->getShapeType() == COMPOUND_SHAPE_PROXYTYPE),)
 
 		next = previous;
 		((btCompoundShape *) next)->addChildShape(trans, shape->ptr());
@@ -275,7 +275,7 @@ void BulletBodyNode::add_shape(BulletShape *shape, const TransformState *ts)
 void BulletBodyNode::remove_shape(BulletShape *shape)
 {
 
-	nassertv(get_object());
+	RETURN_ON_COND(not (get_object()),)
 
 	BulletShapes::iterator found;
 	PT(BulletShape)ptshape = shape;
@@ -310,12 +310,12 @@ void BulletBodyNode::remove_shape(BulletShape *shape)
 		else if (_shapes.size() == 1)
 		{
 			// Only one shape remaining
-			nassertv(previous->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+			RETURN_ON_COND(not (previous->getShapeType() == COMPOUND_SHAPE_PROXYTYPE),)
 
 			btCompoundShape *compound = (btCompoundShape *) previous;
 			compound->removeChildShape(shape->ptr());
 
-			nassertv(compound->getNumChildShapes() == 1);
+			RETURN_ON_COND(not (compound->getNumChildShapes() == 1),)
 
 			// The compound is no longer required if the remaining shape 
 			// has no transform
@@ -333,7 +333,7 @@ void BulletBodyNode::remove_shape(BulletShape *shape)
 		else
 		{
 			// More than one shape are remaining
-			nassertv(previous->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
+			RETURN_ON_COND(not (previous->getShapeType() == COMPOUND_SHAPE_PROXYTYPE),)
 
 			btCompoundShape *compound = (btCompoundShape *) previous;
 			compound->removeChildShape(shape->ptr());
@@ -365,7 +365,7 @@ bool BulletBodyNode::is_identity(btTransform &trans)
 LPoint3 BulletBodyNode::get_shape_pos(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int )_shapes.size(), LPoint3::zero());
+	RETURN_ON_COND(not (idx >= 0 && idx < (int )_shapes.size()), LPoint3::zero())
 	return get_shape_mat(idx).get_row3(3);
 }
 
@@ -377,7 +377,7 @@ LPoint3 BulletBodyNode::get_shape_pos(int idx) const
 LMatrix4 BulletBodyNode::get_shape_mat(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < (int )_shapes.size(), LMatrix4::ident_mat());
+	RETURN_ON_COND(not (idx >= 0 && idx < (int )_shapes.size()), LMatrix4::ident_mat())
 
 	btCollisionShape *root = get_object()->getCollisionShape();
 	if (root->getShapeType() == COMPOUND_SHAPE_PROXYTYPE)
@@ -547,7 +547,7 @@ LVecBase3 BulletBodyNode::get_anisotropic_friction() const
 void BulletBodyNode::set_anisotropic_friction(const LVecBase3 &friction)
 {
 
-	nassertv(!friction.is_nan());
+	RETURN_ON_COND(not (!friction.is_nan()),)
 	get_object()->setAnisotropicFriction(LVecBase3_to_btVector3(friction));
 }
 

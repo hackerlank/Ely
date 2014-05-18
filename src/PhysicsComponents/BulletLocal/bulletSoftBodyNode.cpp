@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletSoftBodyNode.h"
 #include "PhysicsComponents/BulletLocal/bulletSoftBodyConfig.h"
 #include "PhysicsComponents/BulletLocal/bulletSoftBodyControl.h"
@@ -47,8 +48,8 @@ BulletSoftBodyNode::BulletSoftBodyNode(btSoftBody *body, const char *name) :
 	// Shape
 	btCollisionShape *shape_ptr = _soft->getCollisionShape();
 
-	nassertv(shape_ptr != NULL);
-	nassertv(shape_ptr->getShapeType() == SOFTBODY_SHAPE_PROXYTYPE);
+	RETURN_ON_COND(not (shape_ptr != NULL),)
+	RETURN_ON_COND(not (shape_ptr->getShapeType() == SOFTBODY_SHAPE_PROXYTYPE),)
 
 	_shapes.push_back(
 			new BulletSoftBodyShape((btSoftBodyCollisionShape *) shape_ptr));
@@ -111,8 +112,8 @@ int BulletSoftBodyNode::get_num_materials() const
 BulletSoftBodyMaterial BulletSoftBodyNode::get_material(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < get_num_materials(),
-			BulletSoftBodyMaterial::empty());
+	RETURN_ON_COND(not (idx >= 0 && idx < get_num_materials()),
+			BulletSoftBodyMaterial::empty())
 
 	btSoftBody::Material *material = _soft->m_materials[idx];
 	return BulletSoftBodyMaterial(*material);
@@ -127,7 +128,7 @@ BulletSoftBodyMaterial BulletSoftBodyNode::append_material()
 {
 
 	btSoftBody::Material *material = _soft->appendMaterial();
-	nassertr(material, BulletSoftBodyMaterial::empty());
+	RETURN_ON_COND(not (material), BulletSoftBodyMaterial::empty())
 
 	return BulletSoftBodyMaterial(*material);
 }
@@ -151,8 +152,8 @@ int BulletSoftBodyNode::get_num_nodes() const
 BulletSoftBodyNodeElement BulletSoftBodyNode::get_node(int idx) const
 {
 
-	nassertr(idx >= 0 && idx < get_num_nodes(),
-			BulletSoftBodyNodeElement::empty());
+	RETURN_ON_COND(not (idx >= 0 && idx < get_num_nodes()),
+			BulletSoftBodyNodeElement::empty())
 	return BulletSoftBodyNodeElement(_soft->m_nodes[idx]);
 }
 
@@ -306,7 +307,7 @@ void BulletSoftBodyNode::sync_b2p()
 
 		int num_u = _surface->get_num_u_vertices();
 		int num_v = _surface->get_num_v_vertices();
-		nassertv(num_u * num_v == nodes.size());
+		RETURN_ON_COND(not (num_u * num_v == nodes.size()),)
 
 		for (int u = 0; u < num_u; u++)
 		{
@@ -385,8 +386,8 @@ int BulletSoftBodyNode::get_closest_node_index(LVecBase3 point, bool local)
 void BulletSoftBodyNode::link_geom(Geom *geom)
 {
 
-	nassertv(geom->get_vertex_data()->has_column(InternalName::get_vertex()));
-	nassertv(geom->get_vertex_data()->has_column(InternalName::get_normal()));
+	RETURN_ON_COND(not (geom->get_vertex_data()->has_column(InternalName::get_vertex())),)
+	RETURN_ON_COND(not (geom->get_vertex_data()->has_column(InternalName::get_normal())),)
 
 	sync_p2b();
 
@@ -438,7 +439,7 @@ void BulletSoftBodyNode::unlink_geom()
 void BulletSoftBodyNode::link_curve(NurbsCurveEvaluator *curve)
 {
 
-	nassertv(curve->get_num_vertices() == _soft->m_nodes.size());
+	RETURN_ON_COND(not (curve->get_num_vertices() == _soft->m_nodes.size()),)
 
 	_curve = curve;
 }
@@ -462,9 +463,9 @@ void BulletSoftBodyNode::unlink_curve()
 void BulletSoftBodyNode::link_surface(NurbsSurfaceEvaluator *surface)
 {
 
-	nassertv(
+	RETURN_ON_COND(not (
 			surface->get_num_u_vertices() * surface->get_num_v_vertices()
-					== _soft->m_nodes.size());
+					== _soft->m_nodes.size()),)
 
 	_surface = surface;
 }
@@ -592,7 +593,7 @@ PN_stdfloat BulletSoftBodyNode::get_volume() const
 void BulletSoftBodyNode::add_force(const LVector3 &force)
 {
 
-	nassertv(!force.is_nan());
+	RETURN_ON_COND(not (!force.is_nan()),)
 	_soft->addForce(LVecBase3_to_btVector3(force));
 }
 
@@ -604,7 +605,7 @@ void BulletSoftBodyNode::add_force(const LVector3 &force)
 void BulletSoftBodyNode::add_force(const LVector3 &force, int node)
 {
 
-	nassertv(!force.is_nan());
+	RETURN_ON_COND(not (!force.is_nan()),)
 	_soft->addForce(LVecBase3_to_btVector3(force), node);
 }
 
@@ -616,7 +617,7 @@ void BulletSoftBodyNode::add_force(const LVector3 &force, int node)
 void BulletSoftBodyNode::set_velocity(const LVector3 &velocity)
 {
 
-	nassertv(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 	_soft->setVelocity(LVecBase3_to_btVector3(velocity));
 }
 
@@ -628,7 +629,7 @@ void BulletSoftBodyNode::set_velocity(const LVector3 &velocity)
 void BulletSoftBodyNode::add_velocity(const LVector3 &velocity)
 {
 
-	nassertv(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 	_soft->addVelocity(LVecBase3_to_btVector3(velocity));
 }
 
@@ -640,7 +641,7 @@ void BulletSoftBodyNode::add_velocity(const LVector3 &velocity)
 void BulletSoftBodyNode::add_velocity(const LVector3 &velocity, int node)
 {
 
-	nassertv(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 	_soft->addVelocity(LVecBase3_to_btVector3(velocity), node);
 }
 
@@ -719,8 +720,8 @@ void BulletSoftBodyNode::append_anchor(int node, BulletRigidBodyNode *body,
 		bool disable)
 {
 
-	nassertv(node < _soft->m_nodes.size())
-	nassertv(body);
+	RETURN_ON_COND(not (node < _soft->m_nodes.size()),)
+	RETURN_ON_COND(not (body),)
 
 	body->sync_p2b();
 
@@ -737,9 +738,9 @@ void BulletSoftBodyNode::append_anchor(int node, BulletRigidBodyNode *body,
 		const LVector3 &pivot, bool disable)
 {
 
-	nassertv(node < _soft->m_nodes.size())
-	nassertv(body);
-	nassertv(!pivot.is_nan());
+	RETURN_ON_COND(not (node < _soft->m_nodes.size()),)
+	RETURN_ON_COND(not (body),)
+	RETURN_ON_COND(not (!pivot.is_nan()),)
 
 	body->sync_p2b();
 
@@ -940,7 +941,7 @@ make_tri_mesh(BulletSoftBodyWorldInfo &info, PTA_LVecBase3 points, PTA_int indic
 			num_triangles,
 			randomizeConstraints);
 
-	nassertr(body, NULL);
+	RETURN_ON_COND(not (body), NULL)
 
 	delete[] vertices;
 	delete[] triangles;
@@ -965,7 +966,7 @@ make_tri_mesh(BulletSoftBodyWorldInfo &info, const Geom *geom, bool randomizeCon
 
 	CPT(GeomVertexData) vdata = geom->get_vertex_data();
 
-	nassertr(vdata->has_column(InternalName::get_vertex()), NULL);
+	RETURN_ON_COND(not (vdata->has_column(InternalName::get_vertex())), NULL)
 
 	GeomVertexReader vreader(vdata, InternalName::get_vertex());
 
@@ -1058,7 +1059,7 @@ PT(BulletSoftBodyNode)BulletSoftBodyNode::
 make_tet_mesh(BulletSoftBodyWorldInfo &info, const char *ele, const char *face, const char *node)
 {
 
-	nassertr(node && node[0], NULL);
+	RETURN_ON_COND(not (node && node[0]), NULL)
 
 	// Nodes
 	btAlignedObjectArray<btVector3> pos;
@@ -1154,7 +1155,7 @@ void BulletSoftBodyNode::append_linear_joint(BulletBodyNode *body, int cluster,
 		PN_stdfloat erp, PN_stdfloat cfm, PN_stdfloat split)
 {
 
-	nassertv(body);
+	RETURN_ON_COND(not (body),)
 
 	btCollisionObject *ptr = body->get_object();
 
@@ -1176,7 +1177,7 @@ void BulletSoftBodyNode::append_linear_joint(BulletBodyNode *body,
 		const LPoint3 &pos, PN_stdfloat erp, PN_stdfloat cfm, PN_stdfloat split)
 {
 
-	nassertv(body);
+	RETURN_ON_COND(not (body),)
 
 	btCollisionObject *ptr = body->get_object();
 
@@ -1199,7 +1200,7 @@ void BulletSoftBodyNode::append_angular_joint(BulletBodyNode *body,
 		PN_stdfloat split, BulletSoftBodyControl *control)
 {
 
-	nassertv(body);
+	RETURN_ON_COND(not (body),)
 
 	btCollisionObject *ptr = body->get_object();
 
@@ -1221,7 +1222,7 @@ void BulletSoftBodyNode::append_angular_joint(BulletBodyNode *body,
 void BulletSoftBodyNode::set_wind_velocity(const LVector3 &velocity)
 {
 
-	nassertv(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 	_soft->setWindVelocity(LVecBase3_to_btVector3(velocity));
 }
 

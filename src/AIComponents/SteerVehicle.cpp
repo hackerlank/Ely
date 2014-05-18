@@ -30,6 +30,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_MapDrive.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
@@ -138,6 +139,12 @@ bool SteerVehicle::initialize()
 		not mExternalUpdate ?
 				mVehicle = new LowSpeedTurn<SteerVehicle> :
 				mVehicle = new ExternalLowSpeedTurn<SteerVehicle>;
+	}
+	else if (param == std::string("map_driver"))
+	{
+		not mExternalUpdate ?
+				mVehicle = new MapDriver<SteerVehicle> :
+				mVehicle = new ExternalMapDriver<SteerVehicle>;
 	}
 	else
 	{

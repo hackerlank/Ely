@@ -17,6 +17,7 @@
 
 #include <pandabase.h>
 
+#include "Utilities/Tools.h"
 #include "bullet_includes.h"
 #include "bulletShape.h"
 
@@ -127,7 +128,8 @@ inline int BulletMultiSphereShape::get_sphere_count() const
 inline LPoint3 BulletMultiSphereShape::get_sphere_pos(int index) const
 {
 
-	nassertr(index >= 0 && index < _shape->getSphereCount(), LPoint3::zero());
+	RETURN_ON_COND(not (index >= 0 && index < _shape->getSphereCount()),
+			LPoint3::zero())
 	return btVector3_to_LPoint3(_shape->getSpherePosition(index));
 }
 
@@ -139,7 +141,7 @@ inline LPoint3 BulletMultiSphereShape::get_sphere_pos(int index) const
 inline PN_stdfloat BulletMultiSphereShape::get_sphere_radius(int index) const
 {
 
-	nassertr(index >= 0 && index < _shape->getSphereCount(), 0.0);
+	RETURN_ON_COND(not (index >= 0 && index < _shape->getSphereCount()), 0.0)
 	return (PN_stdfloat) _shape->getSphereRadius(index);
 }
 }

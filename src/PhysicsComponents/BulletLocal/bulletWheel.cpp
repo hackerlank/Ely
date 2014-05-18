@@ -12,6 +12,7 @@
 //
 ////////////////////////////////////////////////////////////////////
 
+#include "Utilities/Tools.h"
 #include "PhysicsComponents/BulletLocal/bulletWheel.h"
 
 namespace ely
@@ -459,7 +460,7 @@ PN_stdfloat BulletWheel::get_clipped_inv_connection_point_cs() const
 void BulletWheel::set_chassis_connection_point_cs(const LPoint3 &pos)
 {
 
-	nassertv(!pos.is_nan());
+	RETURN_ON_COND(not (!pos.is_nan()),)
 	_info.m_chassisConnectionPointCS = LVecBase3_to_btVector3(pos);
 }
 
@@ -484,7 +485,7 @@ LPoint3 BulletWheel::get_chassis_connection_point_cs() const
 void BulletWheel::set_wheel_direction_cs(const LVector3 &dir)
 {
 
-	nassertv(!dir.is_nan());
+	RETURN_ON_COND(not (!dir.is_nan()),)
 	_info.m_wheelDirectionCS = LVecBase3_to_btVector3(dir);
 }
 
@@ -508,7 +509,7 @@ LVector3 BulletWheel::get_wheel_direction_cs() const
 void BulletWheel::set_wheel_axle_cs(const LVector3 &axle)
 {
 
-	nassertv(!axle.is_nan());
+	RETURN_ON_COND(not (!axle.is_nan()),)
 	_info.m_wheelAxleCS = LVecBase3_to_btVector3(axle);
 }
 
@@ -531,7 +532,7 @@ LVector3 BulletWheel::get_wheel_axle_cs() const
 void BulletWheel::set_world_transform(const LMatrix4 &mat)
 {
 
-	nassertv(!mat.is_nan());
+	RETURN_ON_COND(not (!mat.is_nan()),)
 	_info.m_worldTransform = LMatrix4_to_btTrans(mat);
 }
 

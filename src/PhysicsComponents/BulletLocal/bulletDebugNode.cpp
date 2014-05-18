@@ -221,7 +221,7 @@ void BulletDebugNode::sync_b2p(btDynamicsWorld *world)
 	if (is_overall_hidden())
 		return;
 
-	nassertv(get_num_geoms() == 2);
+	RETURN_ON_COND(not (get_num_geoms() == 2),)
 
 	// Collect debug geometry data
 	_drawer._lines.clear();

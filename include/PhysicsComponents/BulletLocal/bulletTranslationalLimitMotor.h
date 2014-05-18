@@ -17,6 +17,7 @@
 
 #include <pandabase.h>
 
+#include "Utilities/Tools.h"
 #include "bullet_includes.h"
 #include "bullet_utils.h"
 
@@ -69,7 +70,7 @@ private:
 inline bool BulletTranslationalLimitMotor::is_limited(int axis) const
 {
 
-	nassertr((0 <= axis) && (axis <= 2), false);
+	RETURN_ON_COND(not ((0 <= axis) && (axis <= 2)), false);
 	return _motor.isLimited(axis);
 }
 
@@ -82,7 +83,7 @@ inline void BulletTranslationalLimitMotor::set_motor_enabled(int axis,
 		bool enabled)
 {
 
-	nassertv((0 <= axis) && (axis <= 2));
+	RETURN_ON_COND(not ((0 <= axis) && (axis <= 2)),)
 	_motor.m_enableMotor[axis] = enabled;
 }
 
@@ -94,7 +95,7 @@ inline void BulletTranslationalLimitMotor::set_motor_enabled(int axis,
 inline bool BulletTranslationalLimitMotor::get_motor_enabled(int axis) const
 {
 
-	nassertr((0 <= axis) && (axis <= 2), false);
+	RETURN_ON_COND(not ((0 <= axis) && (axis <= 2)), false)
 	return _motor.m_enableMotor[axis];
 }
 
@@ -106,7 +107,7 @@ inline bool BulletTranslationalLimitMotor::get_motor_enabled(int axis) const
 inline void BulletTranslationalLimitMotor::set_low_limit(const LVecBase3 &limit)
 {
 
-	nassertv(!limit.is_nan());
+	RETURN_ON_COND(not (!limit.is_nan()),)
 	_motor.m_lowerLimit = LVecBase3_to_btVector3(limit);
 }
 
@@ -119,7 +120,7 @@ inline void BulletTranslationalLimitMotor::set_high_limit(
 		const LVecBase3 &limit)
 {
 
-	nassertv(!limit.is_nan());
+	RETURN_ON_COND(not (!limit.is_nan()),)
 	_motor.m_upperLimit = LVecBase3_to_btVector3(limit);
 }
 
@@ -132,7 +133,7 @@ inline void BulletTranslationalLimitMotor::set_target_velocity(
 		const LVecBase3 &velocity)
 {
 
-	nassertv(!velocity.is_nan());
+	RETURN_ON_COND(not (!velocity.is_nan()),)
 	_motor.m_targetVelocity = LVecBase3_to_btVector3(velocity);
 }
 
@@ -145,7 +146,7 @@ inline void BulletTranslationalLimitMotor::set_max_motor_force(
 		const LVecBase3 &force)
 {
 
-	nassertv(!force.is_nan());
+	RETURN_ON_COND(not (!force.is_nan()),)
 	_motor.m_maxMotorForce = LVecBase3_to_btVector3(force);
 }
 
@@ -191,7 +192,7 @@ inline void BulletTranslationalLimitMotor::set_restitution(
 inline void BulletTranslationalLimitMotor::set_normal_cfm(const LVecBase3 &cfm)
 {
 
-	nassertv(!cfm.is_nan());
+	RETURN_ON_COND(not (!cfm.is_nan()),)
 	_motor.m_normalCFM = LVecBase3_to_btVector3(cfm);
 }
 
@@ -203,7 +204,7 @@ inline void BulletTranslationalLimitMotor::set_normal_cfm(const LVecBase3 &cfm)
 inline void BulletTranslationalLimitMotor::set_stop_cfm(const LVecBase3 &cfm)
 {
 
-	nassertv(!cfm.is_nan());
+	RETURN_ON_COND(not (!cfm.is_nan()),)
 	_motor.m_stopCFM = LVecBase3_to_btVector3(cfm);
 }
 
@@ -215,7 +216,7 @@ inline void BulletTranslationalLimitMotor::set_stop_cfm(const LVecBase3 &cfm)
 inline void BulletTranslationalLimitMotor::set_stop_erp(const LVecBase3 &erp)
 {
 
-	nassertv(!erp.is_nan());
+	RETURN_ON_COND(not (!erp.is_nan()),)
 	_motor.m_stopERP = LVecBase3_to_btVector3(erp);
 }
 
@@ -230,7 +231,7 @@ inline void BulletTranslationalLimitMotor::set_stop_erp(const LVecBase3 &erp)
 inline int BulletTranslationalLimitMotor::get_current_limit(int axis) const
 {
 
-	nassertr((0 < -axis) && (axis <= 2), false);
+	RETURN_ON_COND(not ((0 < -axis) && (axis <= 2)), false)
 	return _motor.m_currentLimit[axis];
 }
 
