@@ -84,7 +84,7 @@
 
 // ----------------------------------------------------------------------------
 
-extern float windowWidth;
+///extern float windowWidth;
 
 namespace ely
 {
@@ -2352,13 +2352,6 @@ public:
 				// reset bookeeping to detect stuck cycles
 				resetStuckCycleDetection();
 
-				// new camera position and aimpoint to compensate for teleport
-//				OpenSteerDemo::camera.target = position();
-//				OpenSteerDemo::camera.setPosition(position() + camOffsetBefore);
-
-				// make camera jump immediately to new position
-//				OpenSteerDemo::camera.doNotSmoothNextMove();
-
 #ifdef ELY_DEBUG
 				// prevent long streaks due to teleportation
 				this->clearTrailHistory();
@@ -2726,6 +2719,7 @@ public:
 	// (nearest obstacle in each of the four zones)
 	float savedNearestWR, savedNearestR, savedNearestL, savedNearestWL;
 	float annoteMaxRelSpeed, annoteMaxRelSpeedCurve, annoteMaxRelSpeedPath;
+	float windowWidth;
 #endif
 };
 
@@ -2752,6 +2746,10 @@ public:
 // ----------------------------------------------------------------------------
 // PlugIn for OpenSteerDemo
 
+/**
+ * \note: After opening the plugin and before adding a
+ * vehicle you should call makeMap.
+ */
 template<typename Entity>
 class MapDrivePlugIn: public PlugIn
 {
@@ -2779,8 +2777,13 @@ public:
 ///		vehicles.push_back(vehicle);
 ///		selectedVehicle = vehicle;
 
-		//make a new map
-		map = makeMap();
+		demoSelect = 2;
+		//set a NULL map
+		map = NULL;
+
+#ifdef ELY_DEBUG
+		windowWidth = 1.0;
+#endif
 
 ///		// marks as obstacles map cells adjacent to the path
 ///		usePathFences = true;
@@ -2800,8 +2803,9 @@ public:
 			(*iter)->update(currentTime, elapsedTime);
 
 			// when vehicle drives outside the world
-			if ((*iter)->handleExitFromMap())
-				regenerateMap();
+///			if ((*iter)->handleExitFromMap())
+///				regenerateMap();
+			(*iter)->handleExitFromMap();
 
 			// QQQ first pass at detecting "stuck" state
 			if ((*iter)->stuck && ((*iter)->relativeSpeed() < 0.001f))
@@ -2992,7 +2996,7 @@ public:
 
 	void reset(void)
 	{
-		regenerateMap();
+///		regenerateMap();
 
 		// reset each vehicle
 		iterator iter;
@@ -3055,6 +3059,37 @@ public:
 /////		OpenSteerDemo::printMessage("");
 ///	}
 
+	virtual bool addVehicle(AbstractVehicle* vehicle)
+	{
+		if (not PlugInAddOnMixin<OpenSteer::PlugIn>::addVehicle(vehicle))
+		{
+			return false;
+		}
+		// try to allocate a token for this pedestrian in the proximity database
+		MapDriver<Entity>* mapDriver = dynamic_cast<MapDriver<Entity>*>(vehicle);
+		if (mapDriver and map)
+		{
+			//set map
+			mapDriver->map = map;
+			//set world size
+			mapDriver->worldSize = worldSize;
+			mapDriver->worldDiag = worldDiag;
+			//set path
+			mapDriver->path = dynamic_cast<GCRoute*>(m_pathway);
+			//set demo select
+			mapDriver->demoSelect = demoSelect;
+#ifdef ELY_DEBUG
+			mapDriver->windowWidth = windowWidth;
+#endif
+			//set result
+			return true;
+		}
+		//roll back addition
+		PlugInAddOnMixin<OpenSteer::PlugIn>::removeVehicle(vehicle);
+		//
+		return false;
+	}
+
 	void reversePathFollowDirection(MapDriver<Entity>* vehicle)
 	{
 		int& pfd = vehicle->pathFollowDirection;
@@ -3112,6 +3147,11 @@ public:
 
 	void regenerateMap(void)
 	{
+		//if map not made return
+		if (map == NULL)
+		{
+			return;
+		}
 		// regenerate map: clear and add random "rocks"
 		map->clear();
 		drawRandomClumpsOfRocksOnMap(*map);
@@ -3145,6 +3185,11 @@ public:
 	void drawMap(void)
 	{
 #ifdef OLDTERRAINMAP
+		//if map not made return
+		if (map == NULL)
+		{
+			return;
+		}
 		const float xs = map->xSize / (float) map->resolution;
 		const float zs = map->zSize / (float) map->resolution;
 		const Vec3 alongRow(xs, 0, 0);
@@ -3325,14 +3370,24 @@ public:
 		return (const AVGroup&) vehicles;
 	}
 
-	TerrainMap* makeMap(void)
+	void makeMap(const Vec3& c, float _worldSize)
 	{
+		//if already made return
+		if (map != NULL)
+		{
+			return;
+		}
+		//
+		worldSize = _worldSize;
+		worldDiag = sqrtXXX(square(worldSize) / 2);
 #ifdef OLDTERRAINMAP
-		return new TerrainMap(Vec3::zero, worldSize, worldSize,
+		map = new TerrainMap(c, worldSize, worldSize,
 				(int) worldSize + 1);
 #else
-		return new TerrainMap (worldSize, worldSize, 1);
+		map = new TerrainMap (worldSize, worldSize, 1);
 #endif
+
+		regenerateMap();
 	}
 
 	// map of obstacles
@@ -3343,6 +3398,10 @@ public:
 
 	// which of the three demo modes is selected
 	int demoSelect;
+
+#ifdef ELY_DEBUG
+	float windowWidth;
+#endif
 
 ///	MapDriver* vehicle;
 	typename MapDriver<Entity>::groupType vehicles; // for allVehicles
