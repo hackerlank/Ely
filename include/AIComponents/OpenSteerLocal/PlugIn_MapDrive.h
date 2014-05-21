@@ -911,6 +911,11 @@ public:
 ///	: map(makeMap()), path(makePath())
 	{
 		reset();
+		map = 0;
+		path = 0;
+		demoSelect = 2;
+		worldSize = 1.0;
+		worldDiag = sqrtXXX(square(worldSize) / 2);
 
 #ifdef ELY_DEBUG
 		// to compute mean time between collisions
@@ -2735,11 +2740,179 @@ public:
 		this->entityUpdate(currentTime, elapsedTime);
 
 #ifdef ELY_DEBUG
-		// annotation
-		this->annotationVelocityAcceleration(5, 0);
-		this->recordTrailVertex(currentTime, this->position());
+		// take note when current dt is zero (as in paused) for stat counters
+		this->dtZero = (elapsedTime == 0);
 #endif
 
+		// pretend we are bigger when going fast
+		this->adjustVehicleRadiusForSpeed();
+
+#ifdef ELY_DEBUG
+		// state saved for speedometer
+		//      annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 0;
+		this->annoteMaxRelSpeed = this->annoteMaxRelSpeedCurve = this->annoteMaxRelSpeedPath = 1;
+#endif
+
+		// determine combined steering
+//		Vec3 steering;
+		const bool offPath = !this->bodyInsidePath();
+		if (this->stuck || offPath || this->detectImminentCollision())
+		{
+
+			//XXX
+//			// bring vehicle to a stop if we are stuck (newly or previously
+//			// stuck, because off path or collision seemed imminent)
+//			// (QQQ combine with stuckCycleCount code at end of this function?)
+//			//          this->applyBrakingForce (curvedSteering ? 3 : 2, elapsedTime); // QQQ
+//			this->applyBrakingForce((curvedSteering ? 3.0f : 2.0f),
+//					elapsedTime); // QQQ
+
+#ifdef ELY_DEBUG
+			// count "off path" events
+			if (offPath && !this->stuck && (this->demoSelect == 2))
+				this->stuckOffPathCount++;
+#endif
+			stuck = true;
+
+			// QQQ trying to prevent "creep" during emergency stops
+			this->resetSmoothedAcceleration();
+//			currentSteering = Vec3::zero;
+		}
+		else
+		{
+			// determine steering for obstacle avoidance (save for annotation)
+			const Vec3 avoid =
+#ifdef ELY_DEBUG
+					this->annotateAvoid =
+#endif
+							steerToAvoidObstaclesOnMap(this->lookAheadTimeOA(), *map,
+									this->hintForObstacleAvoidance());
+			const bool needToAvoid = avoid != Vec3::zero;
+
+			// any obstacles to avoid?
+			if (needToAvoid)
+			{
+				// slow down and turn to avoid the obstacles
+				const float targetSpeed = (
+						(this->curvedSteering && this->QQQoaJustScraping) ?
+								this->maxSpeedForCurvature() : 0);
+#ifdef ELY_DEBUG
+				annoteMaxRelSpeed = targetSpeed / this->maxSpeed();
+#endif
+				const float avoidWeight = 3 + (3 * this->relativeSpeed()); // ad hoc
+
+				//XXX
+//				steering = avoid * avoidWeight;
+//				steering += this->steerForTargetSpeed(targetSpeed);
+			}
+			else
+			{
+				//XXX
+//				// otherwise speed up and...
+//				steering = this->steerForTargetSpeed(maxSpeedForCurvature());
+
+				// wander for demo 1
+				if (this->demoSelect == 1)
+				{
+					const Vec3 wander = this->steerForWander(elapsedTime);
+					const Vec3 flat = wander.setYtoZero();
+					const Vec3 weighted = flat.truncateLength(this->maxForce())
+							* 6;
+#ifdef ELY_DEBUG
+					const Vec3 a = this->position() + Vec3(0, 0.2f, 0);
+					this->annotationLine(a, a + (weighted * 0.3f), gWhite);
+#endif
+					//XXX
+//					steering += weighted;
+				}
+
+				// follow the path in demo 2
+				if (this->demoSelect == 2)
+				{
+					const Vec3 pf = steerToFollowPath(this->pathFollowDirection,
+							this->lookAheadTimePF(), *this->path);
+					if (pf != Vec3::zero)
+					{
+						///XXX
+//						// steer to remain on path
+//						if (pf.dot(this->forward()) < 0)
+//							steering = pf;
+//						else
+//							steering = pf + steering;
+					}
+					else
+					{
+
+						//XXX
+//						// path aligment: when neither obstacle avoidance nor
+//						// path following is required, align with path segment
+//						const Vec3 pathHeading = mapPointAndDirectionToTangent(
+//								*path, this->position(), pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
+						{
+							const Vec3 b = (this->position()
+									+ (this->up() * 0.2f)
+									+ (this->forward() * this->halfLength * 1.4f));
+#ifdef ELY_DEBUG
+							const float l = 2;
+							this->annotationLine(b, b + (this->forward() * l),
+									gCyan);
+							this->annotationLine(b, b + (this->pathHeading * l),
+									gCyan);
+#endif
+						}
+
+						///XXX
+//						steering +=
+//								(steerTowardHeading(pathHeading)
+//										* (isNearWaypoint(*path,
+//												this->position()) /* path->nearWaypoint (position () ) */?
+//												0.5f : 0.1f));
+					}
+				}
+			}
+		}
+
+		///XXX
+//		if (!stuck)
+//		{
+//			// convert from absolute to incremental steering signal
+//			if (incrementalSteering)
+//				steering = convertAbsoluteToIncrementalSteering(steering,
+//						elapsedTime);
+//			// enforce minimum turning radius
+//			steering = adjustSteeringForMinimumTurningRadius(steering);
+//		}
+//
+//		// apply selected steering force to vehicle, record data
+//		this->applySteeringForce(steering, elapsedTime);
+//
+//		///call the entity update
+//		this->entityUpdate(currentTime, elapsedTime);
+
+#ifdef ELY_DEBUG
+		this->collectReliabilityStatistics(currentTime, elapsedTime);
+#endif
+
+		// detect getting stuck in cycles -- we are moving but not
+		// making progress down the route (annotate smoothedPosition)
+		if (this->demoSelect == 2)
+		{
+			const bool circles = this->weAreGoingInCircles();
+#ifdef ELY_DEBUG
+			if (circles && !this->stuck)
+				this->stuckCycleCount++;
+			this->annotationCircleOrDisk(0.5, this->up(),
+					this->smoothedPosition(), gWhite, 12, circles, false);
+#endif
+			if (circles)
+				this->stuck = true;
+		}
+
+#ifdef ELY_DEBUG
+		// annotation
+		this->perFrameAnnotation();
+		this->recordTrailVertex(currentTime, this->position());
+#endif
 	}
 };
 
