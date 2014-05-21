@@ -389,7 +389,7 @@ class BoidsPlugIn: public PlugIn
 public:
 
 	//set default world radius in constructor
-	BoidsPlugIn(): worldCenter(Vec3::zero), worldRadius(10.0f)
+	BoidsPlugIn(): worldRadius(10.0f), worldCenter(Vec3::zero)
 	{
 	}
 

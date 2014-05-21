@@ -601,6 +601,7 @@ public:
 		}
 	}
 
+#ifdef ELY_DEBUG
 	void xxxDrawMap(void)
 	{
 		const float xs = xSize / (float) resolution;
@@ -644,6 +645,7 @@ public:
 			g += nextRow;
 		}
 	}
+#endif
 
 	float minSpacing(void) const
 	{
@@ -2733,60 +2735,35 @@ template<typename Entity>
 class ExternalMapDriver: public MapDriver<Entity>
 {
 public:
+
 	void update(const float currentTime, const float elapsedTime)
 	{
-		///TODO
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
 #ifdef ELY_DEBUG
 		// take note when current dt is zero (as in paused) for stat counters
 		this->dtZero = (elapsedTime == 0);
-#endif
-
 		// pretend we are bigger when going fast
 		this->adjustVehicleRadiusForSpeed();
-
-#ifdef ELY_DEBUG
 		// state saved for speedometer
 		//      annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 0;
 		this->annoteMaxRelSpeed = this->annoteMaxRelSpeedCurve = this->annoteMaxRelSpeedPath = 1;
-#endif
-
 		// determine combined steering
-//		Vec3 steering;
 		const bool offPath = !this->bodyInsidePath();
 		if (this->stuck || offPath || this->detectImminentCollision())
 		{
-
-			//XXX
-//			// bring vehicle to a stop if we are stuck (newly or previously
-//			// stuck, because off path or collision seemed imminent)
-//			// (QQQ combine with stuckCycleCount code at end of this function?)
-//			//          this->applyBrakingForce (curvedSteering ? 3 : 2, elapsedTime); // QQQ
-//			this->applyBrakingForce((curvedSteering ? 3.0f : 2.0f),
-//					elapsedTime); // QQQ
-
-#ifdef ELY_DEBUG
 			// count "off path" events
 			if (offPath && !this->stuck && (this->demoSelect == 2))
 				this->stuckOffPathCount++;
-#endif
-			stuck = true;
-
-			// QQQ trying to prevent "creep" during emergency stops
-			this->resetSmoothedAcceleration();
-//			currentSteering = Vec3::zero;
+			this->stuck = true;
 		}
 		else
 		{
 			// determine steering for obstacle avoidance (save for annotation)
-			const Vec3 avoid =
-#ifdef ELY_DEBUG
-					this->annotateAvoid =
-#endif
-							steerToAvoidObstaclesOnMap(this->lookAheadTimeOA(), *map,
-									this->hintForObstacleAvoidance());
+			const Vec3 avoid = this->annotateAvoid =
+					this->steerToAvoidObstaclesOnMap(this->lookAheadTimeOA(),
+							*this->map, this->hintForObstacleAvoidance());
 			const bool needToAvoid = avoid != Vec3::zero;
 
 			// any obstacles to avoid?
@@ -2796,21 +2773,10 @@ public:
 				const float targetSpeed = (
 						(this->curvedSteering && this->QQQoaJustScraping) ?
 								this->maxSpeedForCurvature() : 0);
-#ifdef ELY_DEBUG
-				annoteMaxRelSpeed = targetSpeed / this->maxSpeed();
-#endif
-				const float avoidWeight = 3 + (3 * this->relativeSpeed()); // ad hoc
-
-				//XXX
-//				steering = avoid * avoidWeight;
-//				steering += this->steerForTargetSpeed(targetSpeed);
+				this->annoteMaxRelSpeed = targetSpeed / this->maxSpeed();
 			}
 			else
 			{
-				//XXX
-//				// otherwise speed up and...
-//				steering = this->steerForTargetSpeed(maxSpeedForCurvature());
-
 				// wander for demo 1
 				if (this->demoSelect == 1)
 				{
@@ -2818,97 +2784,51 @@ public:
 					const Vec3 flat = wander.setYtoZero();
 					const Vec3 weighted = flat.truncateLength(this->maxForce())
 							* 6;
-#ifdef ELY_DEBUG
 					const Vec3 a = this->position() + Vec3(0, 0.2f, 0);
 					this->annotationLine(a, a + (weighted * 0.3f), gWhite);
-#endif
-					//XXX
-//					steering += weighted;
 				}
-
 				// follow the path in demo 2
 				if (this->demoSelect == 2)
 				{
-					const Vec3 pf = steerToFollowPath(this->pathFollowDirection,
-							this->lookAheadTimePF(), *this->path);
-					if (pf != Vec3::zero)
+					const Vec3 pf = this->steerToFollowPath(
+							this->pathFollowDirection, this->lookAheadTimePF(),
+							*this->path);
+					if (pf == Vec3::zero)
 					{
-						///XXX
-//						// steer to remain on path
-//						if (pf.dot(this->forward()) < 0)
-//							steering = pf;
-//						else
-//							steering = pf + steering;
-					}
-					else
-					{
-
 						//XXX
-//						// path aligment: when neither obstacle avoidance nor
-//						// path following is required, align with path segment
-//						const Vec3 pathHeading = mapPointAndDirectionToTangent(
-//								*path, this->position(), pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
+						// path aligment: when neither obstacle avoidance nor
+						// path following is required, align with path segment
+						const Vec3 pathHeading = mapPointAndDirectionToTangent(
+								*this->path, this->position(),
+								this->pathFollowDirection); // path->tangentAt (position (), pathFollowDirection);
 						{
-							const Vec3 b = (this->position()
-									+ (this->up() * 0.2f)
-									+ (this->forward() * this->halfLength * 1.4f));
-#ifdef ELY_DEBUG
+							const Vec3 b =
+									(this->position() + (this->up() * 0.2f)
+											+ (this->forward()
+													* this->halfLength * 1.4f));
 							const float l = 2;
 							this->annotationLine(b, b + (this->forward() * l),
 									gCyan);
-							this->annotationLine(b, b + (this->pathHeading * l),
+							this->annotationLine(b, b + (pathHeading * l),
 									gCyan);
-#endif
 						}
-
-						///XXX
-//						steering +=
-//								(steerTowardHeading(pathHeading)
-//										* (isNearWaypoint(*path,
-//												this->position()) /* path->nearWaypoint (position () ) */?
-//												0.5f : 0.1f));
 					}
 				}
 			}
 		}
-
-		///XXX
-//		if (!stuck)
-//		{
-//			// convert from absolute to incremental steering signal
-//			if (incrementalSteering)
-//				steering = convertAbsoluteToIncrementalSteering(steering,
-//						elapsedTime);
-//			// enforce minimum turning radius
-//			steering = adjustSteeringForMinimumTurningRadius(steering);
-//		}
-//
-//		// apply selected steering force to vehicle, record data
-//		this->applySteeringForce(steering, elapsedTime);
-//
-//		///call the entity update
-//		this->entityUpdate(currentTime, elapsedTime);
-
-#ifdef ELY_DEBUG
 		this->collectReliabilityStatistics(currentTime, elapsedTime);
-#endif
-
 		// detect getting stuck in cycles -- we are moving but not
 		// making progress down the route (annotate smoothedPosition)
 		if (this->demoSelect == 2)
 		{
 			const bool circles = this->weAreGoingInCircles();
-#ifdef ELY_DEBUG
 			if (circles && !this->stuck)
 				this->stuckCycleCount++;
 			this->annotationCircleOrDisk(0.5, this->up(),
 					this->smoothedPosition(), gWhite, 12, circles, false);
-#endif
 			if (circles)
 				this->stuck = true;
 		}
-
-#ifdef ELY_DEBUG
 		// annotation
 		this->perFrameAnnotation();
 		this->recordTrailVertex(currentTime, this->position());
@@ -3424,7 +3344,8 @@ public:
 		// draw a line along each segment of path
 		const GCRoute& path = dynamic_cast<GCRoute&>(*m_pathway);
 		const Vec3 down(0, -0.1f, 0);
-		for (size_type i = 1; i < path.pointCount(); ++i)
+		for (OpenSteer::SegmentedPathway::size_type i = 1;
+				i < path.pointCount(); ++i)
 		{
 			const Vec3 endPoint0 = path.point(i) + down;
 			const Vec3 endPoint1 = path.point(i - 1) + down;
@@ -3442,30 +3363,30 @@ public:
 	void drawRandomClumpsOfRocksOnMap(TerrainMap& map)
 	{
 		///TODO
-		/*		if (useRandomRocks)
-		 {
-		 const int spread = 4;
-		 const int r = map.cellwidth();
-		 const int k = irandom2(50, 150);
+		if (bool useRandomRocks)
+		{
+			const int spread = 4;
+			const int r = map.cellwidth();
+			const int k = irandom2(50, 150);
 
-		 for (int p = 0; p < k; p++)
-		 {
-		 const int i = irandom2(0, r - spread);
-		 const int j = irandom2(0, r - spread);
-		 const int c = irandom2(0, 10);
+			for (int p = 0; p < k; p++)
+			{
+				const int i = irandom2(0, r - spread);
+				const int j = irandom2(0, r - spread);
+				const int c = irandom2(0, 10);
 
-		 for (int q = 0; q < c; q++)
-		 {
-		 const int m = irandom2(0, spread);
-		 const int n = irandom2(0, spread);
-		 #ifdef OLDTERRAINMAP
-		 map.setMapBit(i + m, j + n, 1);
-		 #else
-		 map.setType (i+m, j+n, CellData::OBSTACLE);
-		 #endif
-		 }
-		 }
-		 }*/
+				for (int q = 0; q < c; q++)
+				{
+					const int m = irandom2(0, spread);
+					const int n = irandom2(0, spread);
+#ifdef OLDTERRAINMAP
+					map.setMapBit(i + m, j + n, 1);
+#else
+					map.setType (i+m, j+n, CellData::OBSTACLE);
+#endif
+				}
+			}
+		}
 	}
 
 ///	void drawBoundaryFencesOnMap(TerrainMap& map)
