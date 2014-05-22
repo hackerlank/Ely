@@ -2748,7 +2748,8 @@ public:
 		this->adjustVehicleRadiusForSpeed();
 		// state saved for speedometer
 		//      annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 0;
-		this->annoteMaxRelSpeed = this->annoteMaxRelSpeedCurve = this->annoteMaxRelSpeedPath = 1;
+		this->annoteMaxRelSpeed = this->annoteMaxRelSpeedCurve =
+				this->annoteMaxRelSpeedPath = 1;
 		// determine combined steering
 		const bool offPath = !this->bodyInsidePath();
 		if (this->stuck || offPath || this->detectImminentCollision())
@@ -2842,6 +2843,7 @@ public:
 /**
  * \note: After opening the plugin and before adding a
  * vehicle you should call makeMap.
+ * \note: obstacles are "projected" along y axis over the path.
  */
 template<typename Entity>
 class MapDrivePlugIn: public PlugIn
@@ -3362,7 +3364,7 @@ public:
 
 	void drawRandomClumpsOfRocksOnMap(TerrainMap& map)
 	{
-		///TODO
+		///TODO remove
 		if (bool useRandomRocks)
 		{
 			const int spread = 4;
@@ -3385,6 +3387,24 @@ public:
 					map.setType (i+m, j+n, CellData::OBSTACLE);
 #endif
 				}
+			}
+		}
+		///TODO replace
+		//project each obstacle
+		OpenSteer::ObstacleGroup::const_iterator iter;
+		for (iter = obstacles->begin(); iter != obstacles->end(); ++iter)
+		{
+			if (dynamic_cast<SphereObstacle*>(*iter))
+			{
+			}
+			else if (dynamic_cast<BoxObstacle*>(*iter))
+			{
+			}
+			else if (dynamic_cast<RectangleObstacle*>(*iter))
+			{
+			}
+			else if (dynamic_cast<PlaneObstacle*>(*iter))
+			{
 			}
 		}
 	}
@@ -3475,8 +3495,7 @@ public:
 		worldSize = _worldSize;
 		worldDiag = sqrtXXX(square(worldSize) / 2);
 #ifdef OLDTERRAINMAP
-		map = new TerrainMap(c, worldSize, worldSize,
-				(int) worldSize + 1);
+		map = new TerrainMap(c, worldSize, worldSize, (int) worldSize + 1);
 #else
 		map = new TerrainMap (worldSize, worldSize, 1);
 #endif
