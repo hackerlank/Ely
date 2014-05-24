@@ -58,6 +58,7 @@
 #include <iomanip>
 #include <sstream>
 #include <cassert>
+#include <cmath>
 #include <OpenSteer/SimpleVehicle.h>
 #include <OpenSteer/Color.h>
 #include <OpenSteer/UnusedParameter.h>
@@ -548,6 +549,14 @@ public:
 					resolution * resolution)
 	{
 		map.reserve(resolution * resolution);
+		if (xSize < 0)
+		{
+			xSize = -xSize;
+		}
+		if (zSize < 0)
+		{
+			zSize = -zSize;
+		}
 	}
 
 	// destructor
@@ -599,6 +608,35 @@ public:
 			const int j = (int) remapInterval(z, -hzs, hzs, 0.0f, r);
 			return getMapBit(i, j);
 		}
+	}
+
+	bool isInside(const Vec3& point) const
+	{
+		const Vec3 local = point - center;
+		const Vec3 localXZ = local.setYtoZero();
+
+		const float hxs = xSize / 2;
+		const float hzs = zSize / 2;
+
+		const float x = localXZ.x;
+		const float z = localXZ.z;
+
+		return (x > +hxs) || (x < -hxs) || (z > +hzs) || (z < -hzs);
+	}
+
+	void getCoords(const Vec3& point, int& i, int& j)
+	{
+		const Vec3 local = point - center;
+		const Vec3 localXZ = local.setYtoZero();
+
+		const float hxs = xSize / 2;
+		const float hzs = zSize / 2;
+
+		const float x = localXZ.x;
+		const float z = localXZ.z;
+
+		i = (int) remapInterval(x, -hxs, hxs, 0.0f, resolution);
+		j = (int) remapInterval(z, -hzs, hzs, 0.0f, resolution);
 	}
 
 #ifdef ELY_DEBUG
@@ -2356,7 +2394,7 @@ public:
 										+ (this->speed() * lookAheadTimePF()))),
 						this->position().y, this->position().z);
 
-				// reset bookeeping to detect stuck cycles
+				// reset bookkeeping to detect stuck cycles
 				resetStuckCycleDetection();
 
 #ifdef ELY_DEBUG
@@ -2420,7 +2458,7 @@ public:
 	}
 
 	// is vehicle body inside the path?
-	// (actually tests if all four corners of the bounbding box are inside)
+	// (actually tests if all four corners of the bounding box are inside)
 	//
 	bool bodyInsidePath(void)
 	{
@@ -2526,7 +2564,7 @@ public:
 			// remove the tangential (non-thrust) component of the steering
 			// force, replace it with a force pointing away from the center
 			// of curvature, causing us to "widen out" easing off from the
-			// minimum turing radius
+			// minimum turning radius
 			const float signedRadius = 1 / nonZeroCurvatureQQQ();
 			const float sign = signedRadius < 0 ? 1.0f : -1.0f;
 			const Vec3 thrust = steering.parallelComponent(this->forward());
@@ -2665,7 +2703,7 @@ public:
 	// master look ahead (prediction) time
 	float baseLookAheadTime;
 
-	// vehicle dimentions in meters
+	// vehicle dimensions in meters
 	float halfWidth;
 	float halfLength;
 
@@ -2797,7 +2835,7 @@ public:
 					if (pf == Vec3::zero)
 					{
 						//XXX
-						// path aligment: when neither obstacle avoidance nor
+						// path alignment: when neither obstacle avoidance nor
 						// path following is required, align with path segment
 						const Vec3 pathHeading = mapPointAndDirectionToTangent(
 								*this->path, this->position(),
@@ -2843,7 +2881,8 @@ public:
 /**
  * \note: After opening the plugin and before adding a
  * vehicle you should call makeMap.
- * \note: obstacles are "projected" along y axis over the path.
+ * \note: obstacles are "projected" along y axis over the map:
+ * no height dimension (y) is taken into account.
  */
 template<typename Entity>
 class MapDrivePlugIn: public PlugIn
@@ -3249,8 +3288,8 @@ public:
 		}
 		// regenerate map: clear and add random "rocks"
 		map->clear();
-		drawRandomClumpsOfRocksOnMap(*map);
-		clearCenterOfMap(*map);
+		drawRandomClumpsOfRocksOnMap();
+		clearCenterOfMap();
 
 		// draw fences for first two demo modes
 ///		if (demoSelect < 2)
@@ -3362,10 +3401,10 @@ public:
 	}
 #endif
 
-	void drawRandomClumpsOfRocksOnMap(TerrainMap& map)
+	void drawRandomClumpsOfRocksOnMap()
 	{
 		///TODO remove
-		if (bool useRandomRocks)
+/*		if (bool useRandomRocks)
 		{
 			const int spread = 4;
 			const int r = map.cellwidth();
@@ -3388,17 +3427,99 @@ public:
 #endif
 				}
 			}
+		}*/
+		///Projects all obstacles over the map using Bresenham's rasterizing algorithms.
+		///This is equivalent to an orthographic projection along the y axis, with
+		///a camera located at y=+infinity and looking downward.
+		///see https://www.cs.umd.edu/class/fall2003/cmsc427/bresenham.html
+
+		//exit if no obstacle
+		if (obstacles->empty())
+		{
+			return;
 		}
-		///TODO replace
-		//project each obstacle
+		//initialize minX, maxX buffers
+		int* minX = new int[map->resolution];
+		int* maxX = new int[map->resolution];
+		for (int i = 0; i < map->resolution; ++i)
+		{
+			minX[i] = INT_MAX;
+			maxX[i] = INT_MIN;
+		}
+		int minZ = INT_MAX;
+		int maxZ = INT_MIN;
+		//project each obstacle over map
 		OpenSteer::ObstacleGroup::const_iterator iter;
 		for (iter = obstacles->begin(); iter != obstacles->end(); ++iter)
 		{
+
 			if (dynamic_cast<SphereObstacle*>(*iter))
 			{
+				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
+				//cull if outside map
+				if ((sphere->center.x - sphere->radius)
+						> (map->center.x + map->xSize / 2.0)
+						or (sphere->center.x + sphere->radius)
+								> (map->center.x - map->xSize / 2.0)
+						or (sphere->center.z - sphere->radius)
+								> (map->center.z + map->zSize / 2.0)
+						or (sphere->center.z + sphere->radius)
+								> (map->center.z - map->zSize / 2.0))
+				{
+					continue;
+				}
+				//it is inside map: get sphere (integer) parameters
+				int ir = (int) ceilf(sphere->radius);
+				int ixc, izc;
+				map->getCoords(sphere->center, ixc, izc);
+				//project sphere over the map
+				rasterizeCircle(ixc, izc, ir, minX, maxX, &minZ, &maxZ);
 			}
 			else if (dynamic_cast<BoxObstacle*>(*iter))
 			{
+				BoxObstacle* box = dynamic_cast<BoxObstacle*>(*iter);
+				//box is a convex polyhedron: get its 12 triangles
+				//defined ccw, and rasterize only those resulting ccw
+				//when projecting downward along y axis.
+				//
+				//		    6--------7
+				//		   /|       /|
+				//		  / |      / |
+				//       /  |     /  | h
+				//		3--------2   |
+				//		|   |    |   |
+				//		|   5----|---4
+				//	    |  /     |  /
+				//		| /      | / d
+				//		|/       |/
+				//		0--------1
+				//          w
+                //
+				//get box vertices
+				float w = box->width * 0.5f;
+				float h = box->height * 0.5f;
+				float d = box->depth * 0.5f;
+				Vec3 v[8];
+				v[0] = box->globalizePosition(OpenSteer::Vec3(-w, -h, -d));
+				v[1] = box->globalizePosition(OpenSteer::Vec3(w, -h, -d));
+				v[2] = box->globalizePosition(OpenSteer::Vec3(w, h, -d));
+				v[3] = box->globalizePosition(OpenSteer::Vec3(-w, h, -d));
+				v[4] = box->globalizePosition(OpenSteer::Vec3(w, -h, d));
+				v[5] = box->globalizePosition(OpenSteer::Vec3(-w, -h, d));
+				v[6] = box->globalizePosition(OpenSteer::Vec3(-w, h, d));
+				v[7] = box->globalizePosition(OpenSteer::Vec3(w, h, d));
+				//get triangles
+				struct Triangle
+				{
+					int p1Idx, p2Idx, p3Idx;
+				};
+				Triangle t[12]={
+						{v[0], v[1], v[2]},
+						{v[0], v[2], v[3]},
+						{v[0], v[1], v[2]},
+						{v[0], v[2], v[3]},
+				};
+
 			}
 			else if (dynamic_cast<RectangleObstacle*>(*iter))
 			{
@@ -3407,6 +3528,86 @@ public:
 			{
 			}
 		}
+		//free buffers
+		delete[] minX;
+		delete[] maxX;
+	}
+
+	///projection function
+	void rasterizeCircle(int xc, int yc, int r, int* minX, int* maxX, int* minY,
+			int* maxY)
+	{
+
+		//calculate boundaries by (not) drawing the circle
+		circleBresenham(xc, yc, r, minX, maxX, minY, maxY);
+		//draw row lines
+		for (int row = *minY; row < *maxY + 1; ++row)
+		{
+			for (int col = minX[row]; col < maxX[row] + 1; ++col)
+			{
+				//set bit only if inside map
+				if (((col >= 0) and (col < map->resolution))
+						and ((row >= 0) and (row < map->resolution)))
+				{
+#ifdef OLDTERRAINMAP
+					map->setMapBit(col, row, true);
+#else
+					map->setType (col, row, CellData::OBSTACLE);
+
+#endif
+				}
+			}
+			//reset X boundaries
+			minX[row] = INT_MAX;
+			maxX[row] = INT_MIN;
+		}
+		//reset Y boundaries
+		*minY = INT_MAX;
+		*maxY = INT_MIN;
+	}
+
+	void circleBresenham(int xc, int yc, int r, int* minX, int* maxX, int* minY,
+			int* maxY)
+	{
+		int x = 0, y = r;
+		int d = 3 - 2 * r;
+
+		while (x < y)
+		{
+			setBoundaries(xc, yc, x, y, minX, maxX, minY, maxY);
+			x++;
+			if (d < 0)
+				d = d + 4 * x + 6;
+			else
+			{
+				y--;
+				d = d + 4 * (x - y) + 10;
+			}
+			setBoundaries(xc, yc, x, y, minX, maxX, minY, maxY);
+		}
+	}
+
+	void setBoundaries(int xc, int yc, int x, int y, int* minX, int* maxX,
+			int* minY, int* maxY)
+	{
+		checkBoundary(xc + x, yc + y, minX, maxX, minY, maxY); //1
+		checkBoundary(xc - x, yc + y, minX, maxX, minY, maxY); //2
+		checkBoundary(xc + x, yc - y, minX, maxX, minY, maxY); //3
+		checkBoundary(xc - x, yc - y, minX, maxX, minY, maxY); //4
+		checkBoundary(xc + y, yc + x, minX, maxX, minY, maxY); //5
+		checkBoundary(xc - y, yc + x, minX, maxX, minY, maxY); //6
+		checkBoundary(xc + y, yc - x, minX, maxX, minY, maxY); //7
+		checkBoundary(xc - y, yc - x, minX, maxX, minY, maxY); //8
+	}
+
+	void checkBoundary(int x, int y, int* minX, int* maxX, int* minY, int* maxY)
+	{
+		//set minX and maxX
+		minX[y] > x ? minX[y] = x : 0;
+		maxX[y] < x ? maxX[y] = x : 0;
+		//set minY and maxY
+		*minY > y ? *minY = y : 0;
+		*maxY < y ? *maxY = y : 0;
 	}
 
 ///	void drawBoundaryFencesOnMap(TerrainMap& map)
@@ -3437,17 +3638,17 @@ public:
 ///		}
 ///	}
 
-	void clearCenterOfMap(TerrainMap& map)
+	void clearCenterOfMap()
 	{
-		const int o = map.cellwidth() >> 4;
-		const int p = (map.cellwidth() - o) >> 1;
-		const int q = (map.cellwidth() + o) >> 1;
+		const int o = map->cellwidth() >> 4;
+		const int p = (map->cellwidth() - o) >> 1;
+		const int q = (map->cellwidth() + o) >> 1;
 		for (int i = p; i <= q; i++)
 			for (int j = p; j <= q; j++)
 #ifdef OLDTERRAINMAP
-				map.setMapBit(i, j, 0);
+				map->setMapBit(i, j, 0);
 #else
-		map.setType (i, j, CellData::CLEAR);
+				map->setType (i, j, CellData::CLEAR);
 #endif
 	}
 
