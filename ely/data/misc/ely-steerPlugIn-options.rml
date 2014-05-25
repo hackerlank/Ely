@@ -227,11 +227,36 @@
 							value="low_speed_turn" onchange="steerPlugIn::low_speed_turn::options" />
 						<strong>Low Speed Turn PlugIn</strong>
 						<br />
-						<!-- Speed -->
+						<!-- Low Speed Turn Options -->
 						<p id="low_speed_turn_options" style="display: none;">
+							<!-- Steering Speed -->
 							<input id="steering_speed" type="range" name="steering_speed" value="0.0"
 								min="0.0" max="50.0" step="1.0" orientation="horizontal" />
 							steering speed
+							<br />
+						</p>
+					</div>
+
+					<!-- Map Drive -->
+					<div style="width: 300px;">
+						<input id="map_drive" type="radio" name="steerPlugIn"
+							value="map_drive" onchange="steerPlugIn::map_drive::options" />
+						<strong>Map Drive PlugIn</strong>
+						<br />
+						<!-- Map Drive Options -->
+						<p id="map_drive_options" style="display: none;">							
+							<!-- DemoSelect -->
+							Demo select:
+							<input id="demo_select_0" type="radio"
+								name="demo_select" value="0" style="margin-left: 0px;" />
+							obstacle avoidance and speed control
+							<input id="demo_select_1" type="radio"
+								name="demo_select" value="1" style="margin-left: 0px;" />
+							wander, obstacle avoidance and speed control
+							<input id="demo_select_2" type="radio"
+								name="demo_select" value="2" checked="true" 
+								style="margin-left: 0px;" />
+							path following, obstacle avoidance and speed control
 							<br />
 						</p>
 					</div>

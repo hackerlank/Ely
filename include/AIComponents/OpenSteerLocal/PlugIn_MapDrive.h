@@ -3245,7 +3245,7 @@ public:
 	{
 		vehicle->curvedSteering = !vehicle->curvedSteering;
 		vehicle->incrementalSteering = !vehicle->incrementalSteering;
-		reset();
+		vehicle->reset();
 	}
 
 	void selectNextDemo(MapDriver<Entity>* vehicle)
@@ -3256,15 +3256,15 @@ public:
 		{
 		case 0:
 			message << "obstacle avoidance and speed control";
-			reset();
+			vehicle->reset();
 			break;
 		case 1:
 			message << "wander, obstacle avoidance and speed control";
-			reset();
+			vehicle->reset();
 			break;
 		case 2:
 			message << "path following, obstacle avoidance and speed control";
-			reset();
+			vehicle->reset();
 			break;
 		default:
 			vehicle->demoSelect = 0; // wrap-around, falls through to case 0:
@@ -3403,35 +3403,9 @@ public:
 
 	void drawRandomClumpsOfRocksOnMap()
 	{
-		///TODO remove
-/*		if (bool useRandomRocks)
-		{
-			const int spread = 4;
-			const int r = map.cellwidth();
-			const int k = irandom2(50, 150);
-
-			for (int p = 0; p < k; p++)
-			{
-				const int i = irandom2(0, r - spread);
-				const int j = irandom2(0, r - spread);
-				const int c = irandom2(0, 10);
-
-				for (int q = 0; q < c; q++)
-				{
-					const int m = irandom2(0, spread);
-					const int n = irandom2(0, spread);
-#ifdef OLDTERRAINMAP
-					map.setMapBit(i + m, j + n, 1);
-#else
-					map.setType (i+m, j+n, CellData::OBSTACLE);
-#endif
-				}
-			}
-		}*/
 		///Projects all obstacles over the map using Bresenham's rasterizing algorithms.
 		///This is equivalent to an orthographic projection along the y axis, with
 		///a camera located at y=+infinity and looking downward.
-		///see https://www.cs.umd.edu/class/fall2003/cmsc427/bresenham.html
 
 		//exit if no obstacle
 		if (obstacles->empty())
@@ -3452,7 +3426,6 @@ public:
 		OpenSteer::ObstacleGroup::const_iterator iter;
 		for (iter = obstacles->begin(); iter != obstacles->end(); ++iter)
 		{
-
 			if (dynamic_cast<SphereObstacle*>(*iter))
 			{
 				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
@@ -3485,16 +3458,16 @@ public:
 				//		    6--------7
 				//		   /|       /|
 				//		  / |      / |
-				//       /  |     /  | h
+				//       /  |     /  | 2h
 				//		3--------2   |
 				//		|   |    |   |
 				//		|   5----|---4
 				//	    |  /     |  /
-				//		| /      | / d
+				//		| /      | / 2d
 				//		|/       |/
 				//		0--------1
-				//          w
-                //
+				//          2w
+				//
 				//get box vertices
 				float w = box->width * 0.5f;
 				float h = box->height * 0.5f;
@@ -3511,21 +3484,93 @@ public:
 				//get triangles
 				struct Triangle
 				{
-					int p1Idx, p2Idx, p3Idx;
+					int p1I, p2I, p3I;
 				};
-				Triangle t[12]={
-						{v[0], v[1], v[2]},
-						{v[0], v[2], v[3]},
-						{v[0], v[1], v[2]},
-						{v[0], v[2], v[3]},
-				};
-
+				Triangle t[12] =
+				{
+				{ 0, 1, 2 },
+				{ 0, 2, 3 },
+				{ 1, 4, 7 },
+				{ 1, 7, 2 },
+				{ 4, 5, 6 },
+				{ 4, 6, 7 },
+				{ 5, 0, 3 },
+				{ 5, 3, 6 },
+				{ 3, 2, 7 },
+				{ 3, 7, 6 },
+				{ 1, 0, 5 },
+				{ 1, 5, 4 } };
+				//try to project triangles
+				for (int i = 0; i < 12; ++i)
+				{
+					//project triangle only if at least one vertex is inside map
+					if (map->isInside(v[t[i].p1I]) or map->isInside(v[t[i].p2I])
+							or map->isInside(v[t[i].p3I]))
+					{
+						//get box (integer) parameters
+						int ix[3], iz[3];
+						map->getCoords(v[t[i].p1I], ix[0], iz[0]);
+						map->getCoords(v[t[i].p2I], ix[1], iz[0]);
+						map->getCoords(v[t[i].p3I], ix[0], iz[0]);
+						//project triangle over the map (culling cw ones)
+						rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2],
+								iz[2], minX, maxX, &minZ, &maxZ, true);
+					}
+				}
 			}
 			else if (dynamic_cast<RectangleObstacle*>(*iter))
 			{
+				RectangleObstacle* rect =
+						dynamic_cast<RectangleObstacle*>(*iter);
+				//rectangle has 2 triangles defined ccw, and rasterize both,
+				//regardless whether cw or ccw.
+				//
+				//		3--------2
+				//	    |        |
+				//		|        | 2h
+				//		|        |
+				//		0--------1
+				//          2w
+				//
+				//get rectangle vertices
+				float w = rect->width * 0.5f;
+				float h = rect->height * 0.5f;
+				Vec3 v[4];
+				v[0] = rect->globalizePosition(OpenSteer::Vec3(-w, -h, 0));
+				v[1] = rect->globalizePosition(OpenSteer::Vec3(w, -h, 0));
+				v[2] = rect->globalizePosition(OpenSteer::Vec3(w, h, 0));
+				v[3] = rect->globalizePosition(OpenSteer::Vec3(-w, h, 0));
+				//get triangles
+				struct Triangle
+				{
+					int p1I, p2I, p3I;
+				};
+				Triangle t[2] =
+				{
+				{ 0, 1, 2 },
+				{ 0, 2, 3 } };
+				//try to project triangles
+				for (int i = 0; i < 2; ++i)
+				{
+					//project triangle only if at least one vertex is inside map
+					if (map->isInside(v[t[i].p1I]) or map->isInside(v[t[i].p2I])
+							or map->isInside(v[t[i].p3I]))
+					{
+						//get rectangle (integer) parameters
+						int ix[3], iz[3];
+						map->getCoords(v[t[i].p1I], ix[0], iz[0]);
+						map->getCoords(v[t[i].p2I], ix[1], iz[0]);
+						map->getCoords(v[t[i].p3I], ix[0], iz[0]);
+						//project triangle over the map (both ccw and cw ones)
+						rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2],
+								iz[2], minX, maxX, &minZ, &maxZ, false);
+					}
+				}
 			}
 			else if (dynamic_cast<PlaneObstacle*>(*iter))
 			{
+				//plane projection would cover the whole map plane,
+				//unless perpendicular to it: use rectangle instead
 			}
 		}
 		//free buffers
@@ -3533,81 +3578,163 @@ public:
 		delete[] maxX;
 	}
 
-	///projection function
-	void rasterizeCircle(int xc, int yc, int r, int* minX, int* maxX, int* minY,
-			int* maxY)
+	///projection (rasterization) functions
+	///see https://www.cs.umd.edu/class/fall2003/cmsc427/bresenham.html
+	void rasterizeCircle(int xc, int zc, int r, int* minX, int* maxX, int* minZ,
+			int* maxZ)
 	{
-
 		//calculate boundaries by (not) drawing the circle
-		circleBresenham(xc, yc, r, minX, maxX, minY, maxY);
+		circleBresenham(xc, zc, r, minX, maxX, minZ, maxZ);
 		//draw row lines
-		for (int row = *minY; row < *maxY + 1; ++row)
+		for (int row = *minZ; row < *maxZ + 1; ++row)
 		{
 			for (int col = minX[row]; col < maxX[row] + 1; ++col)
 			{
-				//set bit only if inside map
-				if (((col >= 0) and (col < map->resolution))
-						and ((row >= 0) and (row < map->resolution)))
-				{
-#ifdef OLDTERRAINMAP
-					map->setMapBit(col, row, true);
-#else
-					map->setType (col, row, CellData::OBSTACLE);
-
-#endif
-				}
+				putPixel(col, row, true);
 			}
 			//reset X boundaries
 			minX[row] = INT_MAX;
 			maxX[row] = INT_MIN;
 		}
-		//reset Y boundaries
-		*minY = INT_MAX;
-		*maxY = INT_MIN;
+		//reset Z boundaries
+		*minZ = INT_MAX;
+		*maxZ = INT_MIN;
 	}
 
-	void circleBresenham(int xc, int yc, int r, int* minX, int* maxX, int* minY,
-			int* maxY)
+	void circleBresenham(int xc, int zc, int r, int* minX, int* maxX, int* minZ,
+			int* maxZ)
 	{
-		int x = 0, y = r;
+		int x = 0, z = r;
 		int d = 3 - 2 * r;
 
-		while (x < y)
+		while (x < z)
 		{
-			setBoundaries(xc, yc, x, y, minX, maxX, minY, maxY);
+			setBoundaries(xc, zc, x, z, minX, maxX, minZ, maxZ);
 			x++;
 			if (d < 0)
 				d = d + 4 * x + 6;
 			else
 			{
-				y--;
-				d = d + 4 * (x - y) + 10;
+				z--;
+				d = d + 4 * (x - z) + 10;
 			}
-			setBoundaries(xc, yc, x, y, minX, maxX, minY, maxY);
+			setBoundaries(xc, zc, x, z, minX, maxX, minZ, maxZ);
 		}
 	}
 
-	void setBoundaries(int xc, int yc, int x, int y, int* minX, int* maxX,
-			int* minY, int* maxY)
+	void setBoundaries(int xc, int zc, int x, int z, int* minX, int* maxX,
+			int* minZ, int* maxZ)
 	{
-		checkBoundary(xc + x, yc + y, minX, maxX, minY, maxY); //1
-		checkBoundary(xc - x, yc + y, minX, maxX, minY, maxY); //2
-		checkBoundary(xc + x, yc - y, minX, maxX, minY, maxY); //3
-		checkBoundary(xc - x, yc - y, minX, maxX, minY, maxY); //4
-		checkBoundary(xc + y, yc + x, minX, maxX, minY, maxY); //5
-		checkBoundary(xc - y, yc + x, minX, maxX, minY, maxY); //6
-		checkBoundary(xc + y, yc - x, minX, maxX, minY, maxY); //7
-		checkBoundary(xc - y, yc - x, minX, maxX, minY, maxY); //8
+		checkBoundary(xc + x, zc + z, minX, maxX, minZ, maxZ); //1
+		checkBoundary(xc - x, zc + z, minX, maxX, minZ, maxZ); //2
+		checkBoundary(xc + x, zc - z, minX, maxX, minZ, maxZ); //3
+		checkBoundary(xc - x, zc - z, minX, maxX, minZ, maxZ); //4
+		checkBoundary(xc + z, zc + x, minX, maxX, minZ, maxZ); //5
+		checkBoundary(xc - z, zc + x, minX, maxX, minZ, maxZ); //6
+		checkBoundary(xc + z, zc - x, minX, maxX, minZ, maxZ); //7
+		checkBoundary(xc - z, zc - x, minX, maxX, minZ, maxZ); //8
 	}
 
-	void checkBoundary(int x, int y, int* minX, int* maxX, int* minY, int* maxY)
+	void checkBoundary(int x, int z, int* minX, int* maxX, int* minZ, int* maxZ)
 	{
 		//set minX and maxX
-		minX[y] > x ? minX[y] = x : 0;
-		maxX[y] < x ? maxX[y] = x : 0;
-		//set minY and maxY
-		*minY > y ? *minY = y : 0;
-		*maxY < y ? *maxY = y : 0;
+		minX[z] > x ? minX[z] = x : 0;
+		maxX[z] < x ? maxX[z] = x : 0;
+		//set minZ and maxZ
+		*minZ > z ? *minZ = z : 0;
+		*maxZ < z ? *maxZ = z : 0;
+	}
+
+	void rasterizeTriangle(int x1, int z1, int x2, int z2, int x3, int z3,
+			int* minX, int* maxX, int* minZ, int* maxZ, bool cullCW)
+	{
+		if (cullCW)
+		{
+			//projection if from up to down
+			//cull back facing triangles: see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
+			int det = (x2 - x1) * (z3 - z1) - (x3 - x1) * (z2 - z1);
+			if (det < 0)
+			{
+				return;
+			}
+		}
+		//calculate boundaries by (not) drawing the edges
+		lineBresenham(x1, x2, z1, z2, minX, maxX, minZ, maxZ);
+		lineBresenham(x2, x3, z2, z3, minX, maxX, minZ, maxZ);
+		lineBresenham(x3, x1, z3, z1, minX, maxX, minZ, maxZ);
+		//draw row lines
+		for (int row = *minZ; row < *maxZ + 1; ++row)
+		{
+			for (int col = minX[row]; col < maxX[row] + 1; ++col)
+			{
+				putPixel(col, row, true);
+			}
+			//reset X boundaries
+			minX[row] = INT_MAX;
+			maxX[row] = INT_MIN;
+		}
+		//reset Z boundaries
+		*minZ = INT_MAX;
+		*maxZ = INT_MIN;
+	}
+
+#define sign(n) ((n > 0)? 1 : ((n < 0)? -1: 0))
+
+	void lineBresenham(int x1, int x2, int z1, int z2, int* minX, int* maxX,
+			int* minZ, int* maxZ)
+	{
+		int x = x1;
+		int z = z1;
+		int dx = abs(x2 - x1);
+		int dz = abs(z2 - z1);
+		int s1 = sign(x2 - x1);
+		int s2 = sign(z2 - z1);
+		int swap = 0;
+		if (dz > dx)
+		{
+			int temp = dx;
+			dx = dz;
+			dz = temp;
+			swap = 1;
+		}
+		int D = 2 * dz - dx;
+		for (int i = 0; i < dx; i++)
+		{
+			//set minX and maxX
+			minX[z] > x ? minX[z] = x : 0;
+			maxX[z] < x ? maxX[z] = x : 0;
+			//set minZ and maxZ
+			*minZ > z ? *minZ = z : 0;
+			*maxZ < z ? *maxZ = z : 0;
+			while (D >= 0)
+			{
+				D = D - 2 * dx;
+				if (swap)
+					x += s1;
+				else
+					z += s2;
+			}
+			D = D + 2 * dz;
+			if (swap)
+				z += s2;
+			else
+				x += s1;
+		}
+	}
+
+	void putPixel(int i, int j, bool value)
+	{
+		//set bit only if inside map
+		if (((i >= 0) and (i < map->resolution))
+				and ((j >= 0) and (j < map->resolution)))
+		{
+#ifdef OLDTERRAINMAP
+			map->setMapBit(i, j, value);
+#else
+			map->setType (i, j, CellData::OBSTACLE);
+
+#endif
+		}
 	}
 
 ///	void drawBoundaryFencesOnMap(TerrainMap& map)

@@ -61,7 +61,7 @@ class RigidBodyTemplate;
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
  * - "collide_mask"  			|single|"all_on"
- * - "shape_type"  				|single|"sphere"
+ * - "shape_type"  				|single|"sphere" (values: sphere|plane|box|cylinder|capsule|cone|heightfield|triangle mesh)
  * - "shape_size"  				|single|"medium"  (values: minimum|medium|maximum)
  * - "use_shape_of"				|single|no default
  * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)

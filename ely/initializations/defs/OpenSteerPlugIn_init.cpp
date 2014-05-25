@@ -31,6 +31,7 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_Soccer.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_CaptureTheFlag.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h"
+#include "AIComponents/OpenSteerLocal/PlugIn_MapDrive.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
@@ -48,6 +49,7 @@ INITIALIZATION steerPlugInMultiplePursuit1_initialization;
 INITIALIZATION steerPlugInSoccer1_initialization;
 INITIALIZATION steerPlugInCtf1_initialization;
 INITIALIZATION steerPlugInLST1_initialization;
+INITIALIZATION steerPlugInMapDrive1_initialization;
 //common SteerVehicle initialization
 INITIALIZATION steerVehicleToBeCloned_init;
 
@@ -72,6 +74,7 @@ enum SteerPlugInType
 	soccer,
 	capture_the_flag,
 	low_speed_turn,
+	map_drive,
 	none
 } activeSteerPlugInType = none;
 ///XXX
@@ -84,21 +87,33 @@ const char* steerPlugInNames[] =
 	"soccer",
 	"capture_the_flag",
 	"low_speed_turn",
+	"map_drive",
 	"none"
 };
+//common globals
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
+//multiple_pursuit globals
 ObjectId mpWandererObjectId, mpNewWanderedObjectId;
+bool mpWandererExternalUpdate = false;
+//capture_the_flag globals
 ObjectId ctfSeekerObjectId, ctfNewSeekerObjectId;
 float ctfHomeBaseRadius, ctfMinStartRadius, ctfMaxStartRadius,
 		ctfBrakingRate, ctfAvoidancePredictTimeMin, ctfAvoidancePredictTimeMax;
-bool mpWandererExternalUpdate = false, ctfSeekerExternalUpdate = false;
+bool ctfSeekerExternalUpdate = false;
+//low_speed_turn globals
 float lstSteeringSpeed;
+//soccer globals
 enum SoccerActor
 {
 	player_teamA, player_teamB, ball
 } soccerActorSelected = ball;
+//map_drive globals
+enum DemoSelect
+{
+	demo_select_0, demo_select_1, demo_select_2
+} demoSelect = demo_select_2;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -488,6 +503,52 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			}
 		}
 	}
+	else if (value == "steerPlugIn::map_drive::options")
+	{
+		// This event is sent from the "onchange" of the "map_drive"
+		//radio button. It shows or hides the related options.
+		Rocket::Core::ElementDocument* options_body =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (options_body == NULL)
+			return;
+
+		Rocket::Core::Element* map_drive_options =
+				options_body->GetElementById("map_drive_options");
+		if (map_drive_options)
+		{
+			//The "value" parameter of an "onchange" event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the "value"
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				map_drive_options->SetProperty("display", "none");
+			}
+			else
+			{
+				map_drive_options->SetProperty("display", "block");
+				//set elements' values from options' values
+				//demo select
+				switch (demoSelect)
+				{
+				case demo_select_0:
+					steerPlugInOptionsMenu->GetElementById("demo_select_0")->SetAttribute(
+							"checked", true);
+					break;
+				case demo_select_1:
+					steerPlugInOptionsMenu->GetElementById("demo_select_1")->SetAttribute(
+							"checked", true);
+					break;
+				case demo_select_2:
+					steerPlugInOptionsMenu->GetElementById("demo_select_2")->SetAttribute(
+							"checked", true);
+					break;
+				default:
+					break;
+				}
+			}
+		}
+	}
 	///Submit
 	else if (value == "steerPlugIn::form::submit_options")
 	{
@@ -539,7 +600,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			{
 				activeSteerPlugInType = soccer;
 				//set options' values from elements' values
-				//external update
+				//player/ball
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"player_ball", "");
 				if (paramValue == "player_teamA")
@@ -596,6 +657,27 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//home base radius
 				lstSteeringSpeed = event.GetParameter<float>(
 						"steering_speed", 0.0);
+			}
+			else if (paramValue == steerPlugInNames[map_drive])
+			{
+				activeSteerPlugInType = map_drive;
+				//set options' values from elements' values
+				//demo select
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"demo_select", "");
+				if (paramValue == "demo_select_0")
+				{
+					demoSelect = demo_select_0;
+				}
+				else if (paramValue == "demo_select_1")
+				{
+					demoSelect = demo_select_1;
+				}
+				else
+				{
+					//default: demo_select_2
+					demoSelect = demo_select_2;
+				}
 			}
 			else
 			{
@@ -786,6 +868,10 @@ void add_vehicle(const Event* event)
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("mov_type", "kinematic"));
 	}
+	else if (openSteerPlugInName == "Driving through map based obstacles")
+	{
+		///TODO
+	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(
@@ -884,6 +970,14 @@ void remove_vehicle(const Event* event)
 					return;
 				}
 			}
+			else if (openSteerPlugInName == "Driving through map based obstacles")
+			{
+				if(not(dynamic_cast<MapDriver<SteerVehicle>*>(vehicle) or
+								dynamic_cast<ExternalMapDriver<SteerVehicle>*>(vehicle)))
+				{
+					return;
+				}
+			}
 			else
 			{
 				return;
@@ -910,7 +1004,7 @@ void rocketPreset()
 			&remove_vehicle);
 }
 
-//commit function called main menu
+//commit function called from main menu
 void rocketCommit()
 {
 	RETURN_ON_COND(activeSteerPlugInType == none,)
@@ -992,7 +1086,7 @@ void rocketCaptureTheFlagCommit()
 	//update plugin options (with gAvoidancePredictTime included)
 	RETURN_ON_COND(activeSteerPlugInType != capture_the_flag,)
 	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
-	//set home base center
+	//
 	CtfPlugIn<SteerVehicle>* ctfPlugIn =
 			dynamic_cast<CtfPlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
@@ -1014,11 +1108,24 @@ void rocketLowSpeedTurnCommit()
 	//update plugin options
 	RETURN_ON_COND(activeSteerPlugInType != low_speed_turn,)
 	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
-	//set home base center
+	//
 	LowSpeedTurnPlugIn<SteerVehicle>* lstPlugIn =
 			dynamic_cast<LowSpeedTurnPlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
 	lstPlugIn->steeringSpeed = lstSteeringSpeed;
+}
+
+//commit function for Map Drive
+void rocketMapDriveCommit()
+{
+	//update plugin options
+	RETURN_ON_COND(activeSteerPlugInType != map_drive,)
+	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
+	//
+	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
+			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
+	//set options
+	mapDrivePlugIn->demoSelect = demoSelect;
 }
 
 //called by all steer plugins, executed only once
@@ -1189,6 +1296,26 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	//custom setup
 	gRocketEventHandlers["steerPlugIn::low_speed_turn::options"] = &rocketEventHandler;
 	gRocketCommitFunctions.push_back(&rocketLowSpeedTurnCommit);
+}
+
+///steerPlugInMapDrive1_initialization
+void steerPlugInMapDrive1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("AI"));
+	//
+	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
+	dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
+	getAbstractPlugIn());
+	//set windowWidth and create the map
+	///TODO
+
+	///init libRocket
+	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
+	rocketInitOnce();
+	//custom setup
+	gRocketEventHandlers["steerPlugIn::map_drive::options"] = &rocketEventHandler;
+	gRocketCommitFunctions.push_back(&rocketMapDriveCommit);
 }
 
 ///steerVehicleToBeCloned_init

@@ -687,7 +687,24 @@
 				<Param type="low_speed_turn"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
 			</Component>
-		</Object>		
+		</Object>
+	
+		<Object type="OpenSteerPlugIn" id="steerPlugInMapDrive1" priority="100">
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Component type="SteerPlugIn">
+				<Param type="map_drive"/>
+				<Param pathway="-657.47,-133.567,-44.1446:-673.301,-85.8572,-44.9555:
+								-665.048,-46.5192,-44.9878:-654.567,3.44992,-44.4471:
+								-607.722,19.3786,-42.599:-571.646,46.0489,-37.0203:
+								-552.311,-11.0309,-41.4369:-579.883,-38.7748,-43.0303:
+								-576.031,-91.8369,-43.0135:-557.025,-119.875,-41.0164:
+								-594.917,-144.434,-41.2785$1.0:1.5:2.0:2.0:2.0:2.5:2.0:1.5:1.5:1.5:1.0$true"/>
+				<Param obstacles="smiley1_1@sphere@outside:smiley1_2@sphere@outside:smiley1_3@sphere@outside"/>
+				<Param obstacles="wheel1_1@box@outside:wheel1_2@box@outside:wheel1_3@box@outside"/>
+				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
+			</Component>
+		</Object>
 				
 <!--
 		<Object type="RecastNavMesh" id="course2" priority="80">
@@ -971,6 +988,108 @@
 			<Param is_steady="true"/>
 			<Param rot="100.0,5.0,3.5"/>
 			<Param pos="321.876,278.439,8.58145"/>
+		</Object>
+
+		<Object type="InstancedActor" id="smiley1_1" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="Smiley1"/>
+				<Param scale="2.0,2.0,2.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="sphere"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
+		</Object>
+
+		<Object type="InstancedActor" id="smiley1_2" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="Smiley1"/>
+				<Param scale="2.0,2.0,2.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="sphere"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
+		</Object>
+
+		<Object type="InstancedActor" id="smiley1_3" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="Smiley1"/>
+				<Param scale="2.0,2.0,2.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="sphere"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
+		</Object>
+
+		<Object type="InstancedActor" id="wheel1_1" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="wheel1"/>
+				<Param scale="1.0,1.0,1.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
+		</Object>
+
+		<Object type="InstancedActor" id="wheel1_2" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="wheel1"/>
+				<Param scale="1.0,1.0,1.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
+		</Object>
+
+		<Object type="InstancedActor" id="wheel1_3" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="wheel1"/>
+				<Param scale="1.0,1.0,1.0"/>
+			</Component>
+			<Component type="RigidBody">
+				<Param body_type="static"/>
+				<Param body_friction="0.9"/>
+				<Param body_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="0.0,0.0,0.0"/>
 		</Object>
 
 <!--

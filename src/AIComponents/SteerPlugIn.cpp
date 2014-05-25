@@ -458,7 +458,7 @@ void SteerPlugIn::setPathway(int numOfPoints, LPoint3f const points[],
 		osPoints[idx] = LVecBase3fToOpenSteerVec3(points[idx]);
 	}
 	//set pathway actually
-	dynamic_cast<PlugIn*>(mPlugIn)->setPathway(numOfPoints, osPoints, true,
+	dynamic_cast<PlugIn*>(mPlugIn)->setPathway(numOfPoints, osPoints, singleRadius,
 			radii, closedCycle);
 	//
 	delete[] osPoints;
