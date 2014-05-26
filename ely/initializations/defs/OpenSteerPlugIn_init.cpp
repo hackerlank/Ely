@@ -828,14 +828,13 @@ void add_vehicle(const Event* event)
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("thrown_events",
 						"avoid_neighbor@@"));
-		//set InstanceOf instance_of
+		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].insert(
 				std::pair<std::string, std::string>("instance_of",
 						(soccerActorSelected == ball ?
 								"Smiley1" :
 								(soccerActorSelected == player_teamA ?
 										"Panda1" : "Gorilla1"))));
-		//set InstanceOf scale
 		compParams["InstanceOf"].insert(
 				std::pair<std::string, std::string>("scale",
 						(soccerActorSelected == ball ?
@@ -870,7 +869,19 @@ void add_vehicle(const Event* event)
 	}
 	else if (openSteerPlugInName == "Driving through map based obstacles")
 	{
-		///TODO
+		compParams["InstanceOf"].erase("instance_of");
+		compParams["InstanceOf"].erase("scale");
+		//set SteerVehicle type, mov_type
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("type",
+						"map_driver"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("mov_type", "kinematic"));
+		//set InstanceOf instance_of, scale
+		compParams["InstanceOf"].insert(
+				std::pair<std::string, std::string>("instance_of", "vehicle1"));
+		compParams["InstanceOf"].insert(
+				std::pair<std::string, std::string>("scale", "1.0"));
 	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
@@ -1310,49 +1321,56 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 #ifdef ELY_DEBUG
 	//set windowWidth
 	mapDrivePlugIn->windowWidth =
-			windowFramework->get_graphics_window()->get_properties().get_x_size();
+	windowFramework->get_graphics_window()->get_properties().get_x_size();
 #endif
 	//create the map
 	OpenSteer::PolylineSegmentedPathwaySegmentRadii* pathWay =
 	dynamic_cast<OpenSteer::PolylineSegmentedPathwaySegmentRadii*>(mapDrivePlugIn->getPathway());
-	//get map bounding box
-	float maxRadius = 0.0;
-	float maxX, minX, maxY, minY;
-	maxX = maxY = FLT_MIN;
-	minX = minY = FLT_MAX;
+	//get map dimensions and center
+	float minMaxX[2] = { FLT_MAX, FLT_MIN}; //min,max
+	float minMaxY[2] = { FLT_MAX, FLT_MIN}; //min,max
+	LPoint3f mapCenter = LPoint3f::zero();
 	for (OpenSteer::SegmentedPathway::size_type i = 0;
-			i<pathWay->pointCount(); ++i)
+			i < pathWay->pointCount(); ++i)
 	{
 		LPoint3f point = OpenSteerVec3ToLVecBase3f(pathWay->point(i));
-		if (point.get_x() < minX)
+		if (point.get_x() < minMaxX[0])
 		{
-			minX = point.get_x();
+			minMaxX[0] = point.get_x();
 		}
-		else if (point.get_x() > maxX)
+		else if (point.get_x() > minMaxX[1])
 		{
-			maxX = point.get_x();
+			minMaxX[1] = point.get_x();
 		}
 		//
-		if (point.get_y() < minY)
+		if (point.get_y() < minMaxY[0])
 		{
-			minY = point.get_y();
+			minMaxY[0] = point.get_y();
 		}
-		else if (point.get_y() < maxY)
+		else if (point.get_y() > minMaxY[1])
 		{
-			minY = point.get_y();
+			minMaxY[1] = point.get_y();
 		}
+		//
+		mapCenter += point;
+	}
+	//take the middle point
+	if(pathWay->pointCount() > 0)
+	{
+		mapCenter /= pathWay->pointCount();
 	}
 	float maxRadius = 0.0;
 	for (OpenSteer::SegmentedPathway::size_type i = 0;
-			i<pathWay->segmentCount(); ++i)
+	i<pathWay->segmentCount(); ++i)
 	{
 		if (pathWay->segmentRadius(i) > maxRadius)
 		{
 			maxRadius = pathWay->segmentRadius(i);
 		}
 	}
-	///TODO
-	mapDrivePlugIn->makeMap(Vec3(),0);
+	//set worldSize to max spread between dX and dY and resolution = 200
+	mapDrivePlugIn->makeMap(LVecBase3fToOpenSteerVec3(mapCenter),
+			max(minMaxX[1] - minMaxX[0], minMaxY[1] - minMaxY[0]), 200);
 	///init libRocket
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();

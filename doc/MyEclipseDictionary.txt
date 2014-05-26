@@ -16,3 +16,5 @@ cw
 boid
 capsule
 heightfield
+namespace
+destructor
