@@ -1307,9 +1307,52 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
 	dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&DCAST(SteerPlugIn, aiComp)->
 	getAbstractPlugIn());
-	//set windowWidth and create the map
+#ifdef ELY_DEBUG
+	//set windowWidth
+	mapDrivePlugIn->windowWidth =
+			windowFramework->get_graphics_window()->get_properties().get_x_size();
+#endif
+	//create the map
+	OpenSteer::PolylineSegmentedPathwaySegmentRadii* pathWay =
+	dynamic_cast<OpenSteer::PolylineSegmentedPathwaySegmentRadii*>(mapDrivePlugIn->getPathway());
+	//get map bounding box
+	float maxRadius = 0.0;
+	float maxX, minX, maxY, minY;
+	maxX = maxY = FLT_MIN;
+	minX = minY = FLT_MAX;
+	for (OpenSteer::SegmentedPathway::size_type i = 0;
+			i<pathWay->pointCount(); ++i)
+	{
+		LPoint3f point = OpenSteerVec3ToLVecBase3f(pathWay->point(i));
+		if (point.get_x() < minX)
+		{
+			minX = point.get_x();
+		}
+		else if (point.get_x() > maxX)
+		{
+			maxX = point.get_x();
+		}
+		//
+		if (point.get_y() < minY)
+		{
+			minY = point.get_y();
+		}
+		else if (point.get_y() < maxY)
+		{
+			minY = point.get_y();
+		}
+	}
+	float maxRadius = 0.0;
+	for (OpenSteer::SegmentedPathway::size_type i = 0;
+			i<pathWay->segmentCount(); ++i)
+	{
+		if (pathWay->segmentRadius(i) > maxRadius)
+		{
+			maxRadius = pathWay->segmentRadius(i);
+		}
+	}
 	///TODO
-
+	mapDrivePlugIn->makeMap(Vec3(),0);
 	///init libRocket
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();

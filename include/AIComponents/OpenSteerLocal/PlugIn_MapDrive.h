@@ -3812,7 +3812,8 @@ public:
 		return (const AVGroup&) vehicles;
 	}
 
-	void makeMap(const Vec3& c, float _worldSize)
+	void makeMap(const Vec3& c, float _worldSize,
+			int resolution)
 	{
 		//if already made return
 		if (map != NULL)
@@ -3823,7 +3824,7 @@ public:
 		worldSize = _worldSize;
 		worldDiag = sqrtXXX(square(worldSize) / 2);
 #ifdef OLDTERRAINMAP
-		map = new TerrainMap(c, worldSize, worldSize, (int) worldSize + 1);
+		map = new TerrainMap(c, worldSize, worldSize, resolution);
 #else
 		map = new TerrainMap (worldSize, worldSize, 1);
 #endif
