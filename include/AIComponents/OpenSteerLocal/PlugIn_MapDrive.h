@@ -621,7 +621,7 @@ public:
 		const float x = localXZ.x;
 		const float z = localXZ.z;
 
-		return (x > +hxs) || (x < -hxs) || (z > +hzs) || (z < -hzs);
+		return (x < +hxs) and (x > -hxs) and (z < +hzs) and (z > -hzs);
 	}
 
 	void getCoords(const Vec3& point, int& i, int& j)
@@ -3430,23 +3430,27 @@ public:
 			{
 				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
 				//cull if outside map
-				if ((sphere->center.x - sphere->radius)
-						> (map->center.x + map->xSize / 2.0)
-						or (sphere->center.x + sphere->radius)
-								> (map->center.x - map->xSize / 2.0)
-						or (sphere->center.z - sphere->radius)
-								> (map->center.z + map->zSize / 2.0)
-						or (sphere->center.z + sphere->radius)
-								> (map->center.z - map->zSize / 2.0))
+				if (
+					///TODO
+					not
+					(
+						((sphere->center.x - sphere->radius) < (map->center.x + map->xSize / 2.0))
+							and
+						((sphere->center.x + sphere->radius) < (map->center.x - map->xSize / 2.0))
+							and
+						((sphere->center.z - sphere->radius) < (map->center.z + map->zSize / 2.0))
+							and
+						((sphere->center.z + sphere->radius) < (map->center.z - map->zSize / 2.0))
+					)
+				   )
 				{
-					continue;
+					//it is inside map: get sphere (integer) parameters
+					int ir = (int) ceilf(sphere->radius);
+					int ixc, izc;
+					map->getCoords(sphere->center, ixc, izc);
+					//project sphere over the map
+					rasterizeCircle(ixc, izc, ir, minX, maxX, &minZ, &maxZ);
 				}
-				//it is inside map: get sphere (integer) parameters
-				int ir = (int) ceilf(sphere->radius);
-				int ixc, izc;
-				map->getCoords(sphere->center, ixc, izc);
-				//project sphere over the map
-				rasterizeCircle(ixc, izc, ir, minX, maxX, &minZ, &maxZ);
 			}
 			else if (dynamic_cast<BoxObstacle*>(*iter))
 			{
