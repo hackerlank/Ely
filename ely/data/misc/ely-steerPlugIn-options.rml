@@ -258,6 +258,16 @@
 								style="margin-left: 0px;" />
 							path following, obstacle avoidance and speed control
 							<br />
+							<!-- UsePathFences -->
+							use path fences:
+							<input id="use_path_fences_yes" type="radio"
+								name="use_path_fences" value="yes" checked="true" 
+								style="margin-left: 0px;" />
+							yes
+							<input id="use_path_fences_no" type="radio"
+								name="use_path_fences" value="no" style="margin-left: 0px;" />
+							no
+							<br />
 						</p>
 					</div>
 					

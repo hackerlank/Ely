@@ -114,6 +114,7 @@ enum DemoSelect
 {
 	demo_select_0, demo_select_1, demo_select_2
 } demoSelect = demo_select_2;
+bool usePathFences = true;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -546,6 +547,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				default:
 					break;
 				}
+				//use path fences
+				usePathFences ?
+						steerPlugInOptionsMenu->GetElementById(
+								"use_path_fences_yes")->SetAttribute(
+								"checked", true) :
+						steerPlugInOptionsMenu->GetElementById(
+								"use_path_fences_no")->SetAttribute(
+								"checked", true);
 			}
 		}
 	}
@@ -678,6 +687,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 					//default: demo_select_2
 					demoSelect = demo_select_2;
 				}
+				//use path fences
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"use_path_fences", "");
+				paramValue == "yes" ?
+						usePathFences = true :
+						//paramValue == "no"
+						usePathFences = false;
 			}
 			else
 			{
@@ -1136,7 +1152,7 @@ void rocketMapDriveCommit()
 	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
 			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
-	mapDrivePlugIn->demoSelect = demoSelect;
+	mapDrivePlugIn->setOptions(demoSelect, usePathFences);
 }
 
 //called by all steer plugins, executed only once

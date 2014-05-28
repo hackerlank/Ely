@@ -2919,8 +2919,8 @@ public:
 		windowWidth = 1.0;
 #endif
 
-///		// marks as obstacles map cells adjacent to the path
-///		usePathFences = true;
+		// marks as obstacles map cells adjacent to the path
+		usePathFences = true;
 ///		// scatter random rock clumps over map
 ///		useRandomRocks = true;
 
@@ -3022,11 +3022,11 @@ public:
 				status << "+1";
 			else
 				status << "-1";
-///			status << "\n[F3] path fence: ";
-///			if (usePathFences)
-///				status << "on";
-///			else
-///				status << "off";
+			status << "\n[F3] path fence: ";
+			if (usePathFences)
+				status << "on";
+			else
+				status << "off";
 		}
 
 ///		status << "\n[F4] rocks: ";
@@ -3230,11 +3230,32 @@ public:
 		pfd = (pfd > 0) ? -1 : +1;
 	}
 
+	void setOptions(int _demoSelect, bool _usePathFences)
+	{
+		bool dirty = false;
+		if (demoSelect != _demoSelect)
+		{
+			//update
+			demoSelect = _demoSelect;
+			dirty = true;
+		}
+		if (usePathFences != _usePathFences)
+		{
+			usePathFences = _usePathFences;
+			dirty = true;
+		}
+		if (dirty)
+		{
+			regenerateMap();
+		}
+	}
+
 ///	void togglePathFences(void)
 ///	{
 ///		usePathFences = !usePathFences;
 ///		reset();
 ///	}
+
 ///	void toggleRandomRocks(void)
 ///	{
 ///		useRandomRocks = !useRandomRocks;
@@ -3292,8 +3313,8 @@ public:
 		clearCenterOfMap();
 
 		// draw fences for first two demo modes
-///		if (demoSelect < 2)
-///			drawBoundaryFencesOnMap(*map);
+		if (demoSelect < 2)
+			drawBoundaryFencesOnMap(*map);
 ///		// randomize path widths
 ///		if (vehicle->demoSelect == 2)
 ///		{
@@ -3309,10 +3330,10 @@ public:
 ///			}
 ///			vehicle->path->setSegmentRadius(entryIndex, lastExitRadius);
 ///		}
-///		// mark path-boundary map cells as obstacles
-///		// (when in path following demo and appropriate mode is set)
-///		if (usePathFences && (vehicle->demoSelect == 2))
-///			drawPathFencesOnMap(*vehicle->map, *vehicle->path);
+		// mark path-boundary map cells as obstacles
+		// (when in path following demo and appropriate mode is set)
+		if (usePathFences && (demoSelect == 2))
+			drawPathFencesOnMap(*map, dynamic_cast<GCRoute&>(*m_pathway));
 	}
 
 #ifdef ELY_DEBUG
@@ -3429,9 +3450,9 @@ public:
 			if (dynamic_cast<SphereObstacle*>(*iter))
 			{
 				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
-				//cull if outside map
+				///TODO: cull away if outside map
 				if (
-					///TODO
+
 					not
 					(
 						((sphere->center.x - sphere->radius) < (map->center.x + map->xSize / 2.0))
@@ -3456,7 +3477,8 @@ public:
 			{
 				BoxObstacle* box = dynamic_cast<BoxObstacle*>(*iter);
 				//box is a convex polyhedron: get its 12 triangles
-				//defined ccw, and rasterize only those resulting ccw
+				//defined front facing (i.e. ccw wrt external normal),
+				//and rasterize only those resulting front facing
 				//when projecting downward along y axis.
 				//
 				//		    6--------7
@@ -3507,74 +3529,36 @@ public:
 				//try to project triangles
 				for (int i = 0; i < 12; ++i)
 				{
-					//project triangle only if at least one vertex is inside map
-					if (map->isInside(v[t[i].p1I]) or map->isInside(v[t[i].p2I])
-							or map->isInside(v[t[i].p3I]))
+					//cull back facing triangles: see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
+					int det = (v[t[i].p2I].x - v[t[i].p1I].x)
+							* (v[t[i].p3I].z - v[t[i].p1I].z)
+							- (v[t[i].p3I].x - v[t[i].p1I].x)
+									* (v[t[i].p2I].z - v[t[i].p1I].z);
+					if (det < 0)
 					{
-						//get box (integer) parameters
-						int ix[3], iz[3];
-						map->getCoords(v[t[i].p1I], ix[0], iz[0]);
-						map->getCoords(v[t[i].p2I], ix[1], iz[0]);
-						map->getCoords(v[t[i].p3I], ix[0], iz[0]);
-						//project triangle over the map (culling cw ones)
-						rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2],
-								iz[2], minX, maxX, &minZ, &maxZ, true);
+						continue;
 					}
+					///TODO: cull away not intersecting triangles
+					///use separating axis algorithm
+					//get box (integer) parameters
+					int ix[3], iz[3];
+					map->getCoords(v[t[i].p1I], ix[0], iz[0]);
+					map->getCoords(v[t[i].p2I], ix[1], iz[0]);
+					map->getCoords(v[t[i].p3I], ix[0], iz[0]);
+					//project triangle over the map
+					rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2], iz[2],
+							minX, maxX, &minZ, &maxZ, false);
 				}
 			}
 			else if (dynamic_cast<RectangleObstacle*>(*iter))
 			{
-				RectangleObstacle* rect =
-						dynamic_cast<RectangleObstacle*>(*iter);
-				//rectangle has 2 triangles defined ccw, and rasterize both,
-				//regardless whether cw or ccw.
-				//
-				//		3--------2
-				//	    |        |
-				//		|        | 2h
-				//		|        |
-				//		0--------1
-				//          2w
-				//
-				//get rectangle vertices
-				float w = rect->width * 0.5f;
-				float h = rect->height * 0.5f;
-				Vec3 v[4];
-				v[0] = rect->globalizePosition(OpenSteer::Vec3(-w, -h, 0));
-				v[1] = rect->globalizePosition(OpenSteer::Vec3(w, -h, 0));
-				v[2] = rect->globalizePosition(OpenSteer::Vec3(w, h, 0));
-				v[3] = rect->globalizePosition(OpenSteer::Vec3(-w, h, 0));
-				//get triangles
-				struct Triangle
-				{
-					int p1I, p2I, p3I;
-				};
-				Triangle t[2] =
-				{
-				{ 0, 1, 2 },
-				{ 0, 2, 3 } };
-				//try to project triangles
-				for (int i = 0; i < 2; ++i)
-				{
-					//project triangle only if at least one vertex is inside map
-					if (map->isInside(v[t[i].p1I]) or map->isInside(v[t[i].p2I])
-							or map->isInside(v[t[i].p3I]))
-					{
-						//get rectangle (integer) parameters
-						int ix[3], iz[3];
-						map->getCoords(v[t[i].p1I], ix[0], iz[0]);
-						map->getCoords(v[t[i].p2I], ix[1], iz[0]);
-						map->getCoords(v[t[i].p3I], ix[0], iz[0]);
-						//project triangle over the map (both ccw and cw ones)
-						rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2],
-								iz[2], minX, maxX, &minZ, &maxZ, false);
-					}
-				}
+				//rectangle projection would cover an area on map,
+				//unless perpendicular to it: use box instead
 			}
 			else if (dynamic_cast<PlaneObstacle*>(*iter))
 			{
 				//plane projection would cover the whole map plane,
-				//unless perpendicular to it: use rectangle instead
+				//unless perpendicular to it: don't use
 			}
 		}
 		//free buffers
@@ -3741,33 +3725,33 @@ public:
 		}
 	}
 
-///	void drawBoundaryFencesOnMap(TerrainMap& map)
-///	{
-///		// QQQ it would make more sense to do this with a "draw line
-///		// QQQ on map" primitive, may need that for other things too
-///		const int cw = map.cellwidth();
-///		const int ch = map.cellheight();
-///		const int r = cw - 1;
-///		const int a = cw >> 3;
-///		const int b = cw - a;
-///		const int o = cw >> 4;
-///		const int p = (cw - o) >> 1;
-///		const int q = (cw + o) >> 1;
-///		for (int i = 0; i < cw; i++)
-///		{
-///			for (int j = 0; j < ch; j++)
-///			{
-///				const bool c = i > a && i < b && (i < p || i > q);
-///				if (i == 0 || j == 0 || i == r || j == r
-///						|| (c && (i == j || i + j == r)))
-///#ifdef OLDTERRAINMAP
-///					map.setMapBit(i, j, 1);
-///#else
-///				map.setType (i, j, CellData::IMPASSABLE);
-///#endif
-///			}
-///		}
-///	}
+	void drawBoundaryFencesOnMap(TerrainMap& map)
+	{
+		// QQQ it would make more sense to do this with a "draw line
+		// QQQ on map" primitive, may need that for other things too
+		const int cw = map.cellwidth();
+		const int ch = map.cellheight();
+		const int r = cw - 1;
+		const int a = cw >> 3;
+		const int b = cw - a;
+		const int o = cw >> 4;
+		const int p = (cw - o) >> 1;
+		const int q = (cw + o) >> 1;
+		for (int i = 0; i < cw; i++)
+		{
+			for (int j = 0; j < ch; j++)
+			{
+				const bool c = i > a && i < b && (i < p || i > q);
+				if (i == 0 || j == 0 || i == r || j == r
+						|| (c && (i == j || i + j == r)))
+#ifdef OLDTERRAINMAP
+					map.setMapBit(i, j, true);
+#else
+				map.setType (i, j, CellData::IMPASSABLE);
+#endif
+			}
+		}
+	}
 
 	void clearCenterOfMap()
 	{
@@ -3777,39 +3761,39 @@ public:
 		for (int i = p; i <= q; i++)
 			for (int j = p; j <= q; j++)
 #ifdef OLDTERRAINMAP
-				map->setMapBit(i, j, 0);
+				map->setMapBit(i, j, false);
 #else
 				map->setType (i, j, CellData::CLEAR);
 #endif
 	}
 
-///	void drawPathFencesOnMap(TerrainMap& map, GCRoute& path)
-///	{
-///#ifdef OLDTERRAINMAP
-///		const float xs = map.xSize / (float) map.resolution;
-///		const float zs = map.zSize / (float) map.resolution;
-///		const Vec3 alongRow(xs, 0, 0);
-///		const Vec3 nextRow(-map.xSize, 0, zs);
-///		Vec3 g((map.xSize - xs) / -2, 0, (map.zSize - zs) / -2);
-///		for (int j = 0; j < map//esolution; j++)
-///		{
-///			for (int i = 0; i < map.resolution; i++)
-///			{
-///				const float outside = mapPointToOutside(path, g); // path.howFarOutsidePath (g);
-///				const float wallThickness = 1.0f;
-///				// set map cells adjacent to the outside edge of the path
-///				if ((outside > 0) && (outside < wallThickness))
-///					map.setMapBit(i, j, true);
-///				// clear all other off-path map cells
-///				if (outside > wallThickness)
-///					map.setMapBit(i, j, false);
-///				g += alongRow;
-///			}
-///			g += nextRow;
-///		}
-///#else
-///#endif
-///	}
+	void drawPathFencesOnMap(TerrainMap& map, GCRoute& path)
+	{
+#ifdef OLDTERRAINMAP
+		const float xs = map.xSize / (float) map.resolution;
+		const float zs = map.zSize / (float) map.resolution;
+		const Vec3 alongRow(xs, 0, 0);
+		const Vec3 nextRow(-map.xSize, 0, zs);
+		Vec3 g((map.xSize - xs) / -2, 0, (map.zSize - zs) / -2);
+		for (int j = 0; j < map.resolution; j++)
+		{
+			for (int i = 0; i < map.resolution; i++)
+			{
+				const float outside = mapPointToOutside(path, g); // path.howFarOutsidePath (g);
+				const float wallThickness = 1.0f;
+				// set map cells adjacent to the outside edge of the path
+				if ((outside > 0) && (outside < wallThickness))
+					map.setMapBit(i, j, true);
+				// clear all other off-path map cells
+				if (outside > wallThickness)
+					map.setMapBit(i, j, false);
+				g += alongRow;
+			}
+			g += nextRow;
+		}
+#else
+#endif
+	}
 
 	const AVGroup& allVehicles(void)
 	{
@@ -3853,7 +3837,7 @@ public:
 	typename MapDriver<Entity>::groupType vehicles; // for allVehicles
 	typedef typename MapDriver<Entity>::groupType::const_iterator iterator;
 
-///	bool usePathFences;
+	bool usePathFences;
 ///	bool useRandomRocks;
 };
 
