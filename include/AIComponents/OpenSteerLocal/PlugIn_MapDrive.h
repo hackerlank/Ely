@@ -3778,18 +3778,20 @@ public:
 		const float zs = map.zSize / (float) map.resolution;
 		const Vec3 alongRow(xs, 0, 0);
 		const Vec3 nextRow(-map.xSize, 0, zs);
-		Vec3 g((map.xSize - xs) / -2, map.center.y, (map.zSize - zs) / -2);
-		//make path flat at map.center.y height
+		Vec3 g((map.xSize - xs) / -2, 0, (map.zSize - zs) / -2);
 		///TODO
-		GCRoute path = _path;
-		Vec3* newPoints = new Vec3[path.pointCount()];
-		for (SegmentedPathway::size_type i = 0;
-				i < path.pointCount(); ++i)
+		g -= map.center;
+		//make a flat path at height map.center.y
+		Vec3* newPoints = new Vec3[_path.pointCount()];
+		for (SegmentedPathway::size_type i = 0; i < _path.pointCount(); ++i)
 		{
-			newPoints[i] = path.point(i);
+			newPoints[i] = _path.point(i);
 			newPoints[i].y = map.center.y;
 		}
-		path.movePoints(0, path.pointCount(), newPoints);
+		GCRoute path = _path;
+		path.movePoints(0, path.pointCount() - (path.isCyclic() ? 1 : 0),
+				newPoints);
+		delete[] newPoints;
 		for (int j = 0; j < map.resolution; j++)
 		{
 			for (int i = 0; i < map.resolution; i++)
