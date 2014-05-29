@@ -2959,10 +2959,10 @@ public:
 	{
 #ifdef ELY_DEBUG
 		// draw "ground plane"  (make it 4x map size)
-		const float s = worldSize * 2;
-		const float u = -0.2f;
-		drawQuadrangle(Vec3(+s, u, +s), Vec3(+s, u, -s), Vec3(-s, u, -s),
-				Vec3(-s, u, +s), Color(0.8f, 0.7f, 0.5f)); // "sand"
+///		const float s = worldSize * 2;
+///		const float u = -0.2f;
+///		drawQuadrangle(Vec3(+s, u, +s), Vec3(+s, u, -s), Vec3(-s, u, -s),
+///				Vec3(-s, u, +s), Color(0.8f, 0.7f, 0.5f)); // "sand"
 
 		// draw map and path
 		drawMap();
@@ -2988,129 +2988,132 @@ public:
 		// display status in the upper left corner of the window
 		MapDriver<Entity>* vehicle =
 				dynamic_cast<MapDriver<Entity>*>(selectedVehicle);
-		std::ostringstream status;
-		status << "Speed: " << (int) vehicle->speed() << " mps ("
-				<< (int) (vehicle->speed() / MPSperMPH) << " mph)"
-				<< ", average: " << std::setprecision(1)
-				<< std::setiosflags(std::ios::fixed)
-				<< vehicle->totalDistance / vehicle->totalTime
-
-				<< " mps\n\n";
-		status << "collisions avoided for "
-				<< (int) (ClockObject::get_global_clock()->get_real_time()
-						- vehicle->timeOfLastCollision) << " seconds";
-		if (vehicle->countOfCollisionFreeTimes > 0)
+		if (vehicle)
 		{
-			status << "\nmean time between collisions: "
-					<< (int) (vehicle->sumOfCollisionFreeTimes
-							/ vehicle->countOfCollisionFreeTimes) << " ("
-					<< (int) vehicle->sumOfCollisionFreeTimes << "/"
-					<< (int) vehicle->countOfCollisionFreeTimes << ")";
-		}
+			std::ostringstream status;
+			status << "Speed: " << (int) vehicle->speed() << " mps ("
+					<< (int) (vehicle->speed() / MPSperMPH) << " mph)"
+					<< ", average: " << std::setprecision(1)
+					<< std::setiosflags(std::ios::fixed)
+					<< vehicle->totalDistance / vehicle->totalTime
 
-		status << "\n\nStuck count: " << vehicle->stuckCount << " ("
-				<< vehicle->stuckCycleCount << " cycles, "
-				<< vehicle->stuckOffPathCount << " off path)";
-		status << "\n\n[F1] ";
-		if (1 == vehicle->demoSelect)
-			status << "wander, ";
-		if (2 == vehicle->demoSelect)
-			status << "follow path, ";
-		status << "avoid obstacle";
+					<< " mps\n\n";
+			status << "collisions avoided for "
+					<< (int) (ClockObject::get_global_clock()->get_real_time()
+							- vehicle->timeOfLastCollision) << " seconds";
+			if (vehicle->countOfCollisionFreeTimes > 0)
+			{
+				status << "\nmean time between collisions: "
+						<< (int) (vehicle->sumOfCollisionFreeTimes
+								/ vehicle->countOfCollisionFreeTimes) << " ("
+						<< (int) vehicle->sumOfCollisionFreeTimes << "/"
+						<< (int) vehicle->countOfCollisionFreeTimes << ")";
+			}
 
-		if (2 == vehicle->demoSelect)
-		{
-			status << "\n[F2] path following direction: ";
-			if (vehicle->pathFollowDirection > 0)
-				status << "+1";
-			else
-				status << "-1";
-			status << "\n[F3] path fence: ";
-			if (usePathFences)
-				status << "on";
-			else
-				status << "off";
-		}
+			status << "\n\nStuck count: " << vehicle->stuckCount << " ("
+					<< vehicle->stuckCycleCount << " cycles, "
+					<< vehicle->stuckOffPathCount << " off path)";
+			status << "\n\n[F1] ";
+			if (1 == vehicle->demoSelect)
+				status << "wander, ";
+			if (2 == vehicle->demoSelect)
+				status << "follow path, ";
+			status << "avoid obstacle";
+
+			if (2 == vehicle->demoSelect)
+			{
+				status << "\n[F2] path following direction: ";
+				if (vehicle->pathFollowDirection > 0)
+					status << "+1";
+				else
+					status << "-1";
+				status << "\n[F3] path fence: ";
+				if (usePathFences)
+					status << "on";
+				else
+					status << "off";
+			}
 
 ///		status << "\n[F4] rocks: ";
 ///		if (useRandomRocks)
 ///			status << "on";
 ///		else
 ///			status << "off";
-		status << "\n[F5] prediction: ";
-		if (vehicle->curvedSteering)
-			status << "curved";
-		else
-			status << "linear";
-		if (2 == vehicle->demoSelect)
-		{
-			status << "\n\nLap " << vehicle->lapsStarted << " (completed: "
-					<< ((vehicle->lapsStarted < 2) ?
-							0 :
-							(int) (100
-									* ((float) vehicle->lapsFinished
-											/ (float) (vehicle->lapsStarted - 1))))
-					<< "%)";
+			status << "\n[F5] prediction: ";
+			if (vehicle->curvedSteering)
+				status << "curved";
+			else
+				status << "linear";
+			if (2 == vehicle->demoSelect)
+			{
+				status << "\n\nLap " << vehicle->lapsStarted << " (completed: "
+						<< ((vehicle->lapsStarted < 2) ?
+								0 :
+								(int) (100
+										* ((float) vehicle->lapsFinished
+												/ (float) (vehicle->lapsStarted
+														- 1)))) << "%)";
 
-			status << "\nHints given: " << vehicle->hintGivenCount
-					<< ", taken: " << vehicle->hintTakenCount;
-		}
-		status << "\n";
-		qqqRange("WR ", vehicle->savedNearestWR, status);
-		qqqRange("R  ", vehicle->savedNearestR, status);
-		qqqRange("L  ", vehicle->savedNearestL, status);
-		qqqRange("WL ", vehicle->savedNearestWL, status);
-		status << std::ends;
+				status << "\nHints given: " << vehicle->hintGivenCount
+						<< ", taken: " << vehicle->hintTakenCount;
+			}
+			status << "\n";
+			qqqRange("WR ", vehicle->savedNearestWR, status);
+			qqqRange("R  ", vehicle->savedNearestR, status);
+			qqqRange("L  ", vehicle->savedNearestL, status);
+			qqqRange("WL ", vehicle->savedNearestWL, status);
+			status << std::ends;
 /////		const float h = drawGetWindowHeight();
 /////		const Vec3 screenLocation(10, h - 50, 0);
-		const Vec3 screenLocation(-1.0, 0.9, 0);
-		const Color color(0.15f, 0.15f, 0.5f);
+			const Vec3 screenLocation(-1.0, 0.9, 0);
+			const Color color(0.15f, 0.15f, 0.5f);
 /////		draw2dTextAt2dLocation(status, screenLocation, color,
 /////				drawGetWindowWidth(), drawGetWindowHeight());
-		draw2dTextAt2dLocation(status, screenLocation, color, 0.0, 0.0);
+			draw2dTextAt2dLocation(status, screenLocation, color, 0.0, 0.0);
 
-		{
-			const float v = 5;
-			const float m = 10;
+			{
+				const float v = 5;
+				const float m = 10;
 /////			const float w = drawGetWindowWidth();
-			const float w = windowWidth;
-			const float f = w - (2 * m);
-			const float s = vehicle->relativeSpeed();
+				const float w = windowWidth;
+				const float f = w - (2 * m);
+				const float s = vehicle->relativeSpeed();
 
-			// limit tick mark
-			const float l = vehicle->annoteMaxRelSpeed;
+				// limit tick mark
+				const float l = vehicle->annoteMaxRelSpeed;
 /////			draw2dLine(Vec3(m + (f * l), v - 3, 0), Vec3(m + (f * l), v + 3, 0),
 /////					gBlack, drawGetWindowWidth(), drawGetWindowHeight());
-			draw2dLine(Vec3(m + (f * l), v - 3, 0), Vec3(m + (f * l), v + 3, 0),
-					gBlack, 0.0, 0.0);
-			// two "inverse speedometers" showing limits due to curvature and
-			// path alignment
-			if (l != 0)
-			{
-				const float c = vehicle->annoteMaxRelSpeedCurve;
-				const float p = vehicle->annoteMaxRelSpeedPath;
+				draw2dLine(Vec3(m + (f * l), v - 3, 0),
+						Vec3(m + (f * l), v + 3, 0), gBlack, 0.0, 0.0);
+				// two "inverse speedometers" showing limits due to curvature and
+				// path alignment
+				if (l != 0)
+				{
+					const float c = vehicle->annoteMaxRelSpeedCurve;
+					const float p = vehicle->annoteMaxRelSpeedPath;
 /////				draw2dLine(Vec3(m + (f * c), v + 1, 0), Vec3(w - m, v + 1, 0),
 /////						gRed, drawGetWindowWidth(), drawGetWindowHeight());
 /////				draw2dLine(Vec3(m + (f * p), v - 2, 0), Vec3(w - m, v - 1, 0),
 /////						gGreen, drawGetWindowWidth(), drawGetWindowHeight());
-				draw2dLine(Vec3(m + (f * c), v + 1, 0), Vec3(w - m, v + 1, 0),
-						gRed, 0.0, 0.0);
-				draw2dLine(Vec3(m + (f * p), v - 2, 0), Vec3(w - m, v - 1, 0),
-						gGreen, 0.0, 0.0);
-			}
-			// speedometer: horizontal line with length proportional to speed
+					draw2dLine(Vec3(m + (f * c), v + 1, 0),
+							Vec3(w - m, v + 1, 0), gRed, 0.0, 0.0);
+					draw2dLine(Vec3(m + (f * p), v - 2, 0),
+							Vec3(w - m, v - 1, 0), gGreen, 0.0, 0.0);
+				}
+				// speedometer: horizontal line with length proportional to speed
 /////			draw2dLine(Vec3(m, v, 0), Vec3(m + (f * s), v, 0), gWhite,
 /////					drawGetWindowWidth(), drawGetWindowHeight());
-			draw2dLine(Vec3(m, v, 0), Vec3(m + (f * s), v, 0), gWhite, 0.0,
-					0.0);
-			// min and max tick marks
+				draw2dLine(Vec3(m, v, 0), Vec3(m + (f * s), v, 0), gWhite, 0.0,
+						0.0);
+				// min and max tick marks
 /////			draw2dLine(Vec3(m, v, 0), Vec3(m, v - 2, 0), gWhite,
 /////					drawGetWindowWidth(), drawGetWindowHeight());
 /////			draw2dLine(Vec3(w - m, v, 0), Vec3(w - m, v - 2, 0), gWhite,
 /////					drawGetWindowWidth(), drawGetWindowHeight());
-			draw2dLine(Vec3(m, v, 0), Vec3(m, v - 2, 0), gWhite, 0.0, 0.0);
-			draw2dLine(Vec3(w - m, v, 0), Vec3(w - m, v - 2, 0), gWhite, 0.0,
-					0.0);
+				draw2dLine(Vec3(m, v, 0), Vec3(m, v - 2, 0), gWhite, 0.0, 0.0);
+				draw2dLine(Vec3(w - m, v, 0), Vec3(w - m, v - 2, 0), gWhite,
+						0.0, 0.0);
+			}
 		}
 #endif
 	}
@@ -3616,12 +3619,17 @@ public:
 
 	void checkBoundary(int x, int z, int* minX, int* maxX, int* minZ, int* maxZ)
 	{
-		//set minX and maxX
-		minX[z] > x ? minX[z] = x : 0;
-		maxX[z] < x ? maxX[z] = x : 0;
-		//set minZ and maxZ
-		*minZ > z ? *minZ = z : 0;
-		*maxZ < z ? *maxZ = z : 0;
+		//check only if (x,z) inside map
+		if (((z >= 0) and (z < map->resolution))
+				and ((x >= 0) and (x < map->resolution)))
+		{
+			//set minX and maxX
+			minX[z] > x ? minX[z] = x : 0;
+			maxX[z] < x ? maxX[z] = x : 0;
+			//set minZ and maxZ
+			*minZ > z ? *minZ = z : 0;
+			*maxZ < z ? *maxZ = z : 0;
+		}
 	}
 
 	void rasterizeTriangle(int x1, int z1, int x2, int z2, int x3, int z3,
@@ -3679,12 +3687,17 @@ public:
 		int D = 2 * dz - dx;
 		for (int i = 0; i < dx; i++)
 		{
-			//set minX and maxX
-			minX[z] > x ? minX[z] = x : 0;
-			maxX[z] < x ? maxX[z] = x : 0;
-			//set minZ and maxZ
-			*minZ > z ? *minZ = z : 0;
-			*maxZ < z ? *maxZ = z : 0;
+			//check only if (x,z) inside map
+			if (((z >= 0) and (z < map->resolution))
+					and ((x >= 0) and (x < map->resolution)))
+			{
+				//set minX and maxX
+				minX[z] > x ? minX[z] = x : 0;
+				maxX[z] < x ? maxX[z] = x : 0;
+				//set minZ and maxZ
+				*minZ > z ? *minZ = z : 0;
+				*maxZ < z ? *maxZ = z : 0;
+			}
 			while (D >= 0)
 			{
 				D = D - 2 * dx;
@@ -3758,14 +3771,25 @@ public:
 #endif
 	}
 
-	void drawPathFencesOnMap(TerrainMap& map, GCRoute& path)
+	void drawPathFencesOnMap(TerrainMap& map, GCRoute& _path)
 	{
 #ifdef OLDTERRAINMAP
 		const float xs = map.xSize / (float) map.resolution;
 		const float zs = map.zSize / (float) map.resolution;
 		const Vec3 alongRow(xs, 0, 0);
 		const Vec3 nextRow(-map.xSize, 0, zs);
-		Vec3 g((map.xSize - xs) / -2, 0, (map.zSize - zs) / -2);
+		Vec3 g((map.xSize - xs) / -2, map.center.y, (map.zSize - zs) / -2);
+		//make path flat at map.center.y height
+		///TODO
+		GCRoute path = _path;
+		Vec3* newPoints = new Vec3[path.pointCount()];
+		for (SegmentedPathway::size_type i = 0;
+				i < path.pointCount(); ++i)
+		{
+			newPoints[i] = path.point(i);
+			newPoints[i].y = map.center.y;
+		}
+		path.movePoints(0, path.pointCount(), newPoints);
 		for (int j = 0; j < map.resolution; j++)
 		{
 			for (int i = 0; i < map.resolution; i++)
