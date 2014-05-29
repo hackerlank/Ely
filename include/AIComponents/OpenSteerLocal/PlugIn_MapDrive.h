@@ -2883,6 +2883,9 @@ public:
  * vehicle you should call makeMap.
  * \note: obstacles are "projected" along y axis over the map:
  * no height dimension (y) is taken into account.
+ * \note: use setOptions when setting these options:
+ * - demoSelect
+ * - usePathFences
  */
 template<typename Entity>
 class MapDrivePlugIn: public PlugIn
@@ -3443,6 +3446,7 @@ public:
 		}
 		int minZ = INT_MAX;
 		int maxZ = INT_MIN;
+
 		//project each obstacle over map
 		OpenSteer::ObstacleGroup::const_iterator iter;
 		for (iter = obstacles->begin(); iter != obstacles->end(); ++iter)
@@ -3451,27 +3455,13 @@ public:
 			{
 				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
 				///TODO: cull away if outside map
-				if (
 
-					not
-					(
-						((sphere->center.x - sphere->radius) < (map->center.x + map->xSize / 2.0))
-							and
-						((sphere->center.x + sphere->radius) < (map->center.x - map->xSize / 2.0))
-							and
-						((sphere->center.z - sphere->radius) < (map->center.z + map->zSize / 2.0))
-							and
-						((sphere->center.z + sphere->radius) < (map->center.z - map->zSize / 2.0))
-					)
-				   )
-				{
-					//it is inside map: get sphere (integer) parameters
-					int ir = (int) ceilf(sphere->radius);
-					int ixc, izc;
-					map->getCoords(sphere->center, ixc, izc);
-					//project sphere over the map
-					rasterizeCircle(ixc, izc, ir, minX, maxX, &minZ, &maxZ);
-				}
+				//it is inside map: get sphere (integer) parameters
+				int ir = (int) ceilf(sphere->radius);
+				int ixc, izc;
+				map->getCoords(sphere->center, ixc, izc);
+				//project sphere over the map
+				rasterizeCircle(ixc, izc, ir, minX, maxX, &minZ, &maxZ);
 			}
 			else if (dynamic_cast<BoxObstacle*>(*iter))
 			{
@@ -3540,11 +3530,12 @@ public:
 					}
 					///TODO: cull away not intersecting triangles
 					///use separating axis algorithm
+
 					//get box (integer) parameters
 					int ix[3], iz[3];
 					map->getCoords(v[t[i].p1I], ix[0], iz[0]);
-					map->getCoords(v[t[i].p2I], ix[1], iz[0]);
-					map->getCoords(v[t[i].p3I], ix[0], iz[0]);
+					map->getCoords(v[t[i].p2I], ix[1], iz[1]);
+					map->getCoords(v[t[i].p3I], ix[2], iz[2]);
 					//project triangle over the map
 					rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2], iz[2],
 							minX, maxX, &minZ, &maxZ, false);
