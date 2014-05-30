@@ -1343,8 +1343,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	OpenSteer::PolylineSegmentedPathwaySegmentRadii* pathWay =
 	dynamic_cast<OpenSteer::PolylineSegmentedPathwaySegmentRadii*>(mapDrivePlugIn->getPathway());
 	//get map dimensions and center
-	float minMaxX[2] = { FLT_MAX, FLT_MIN}; //min,max
-	float minMaxY[2] = { FLT_MAX, FLT_MIN}; //min,max
+	float minMaxX[2] = { FLT_MAX, -FLT_MAX}; //min,max
+	float minMaxY[2] = { FLT_MAX, -FLT_MAX}; //min,max
 	LPoint3f mapCenter = LPoint3f::zero();
 	for (OpenSteer::SegmentedPathway::size_type i = 0;
 			i < pathWay->pointCount(); ++i)
@@ -1354,7 +1354,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 		{
 			minMaxX[0] = point.get_x();
 		}
-		else if (point.get_x() > minMaxX[1])
+		if (point.get_x() > minMaxX[1])
 		{
 			minMaxX[1] = point.get_x();
 		}
@@ -1363,7 +1363,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 		{
 			minMaxY[0] = point.get_y();
 		}
-		else if (point.get_y() > minMaxY[1])
+		if (point.get_y() > minMaxY[1])
 		{
 			minMaxY[1] = point.get_y();
 		}
@@ -1385,8 +1385,10 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 		}
 	}
 	//set worldSize to max spread between dX and dY and resolution = 200
+	float dX = minMaxX[1] - minMaxX[0];
+	float dY =  minMaxY[1] - minMaxY[0];
 	mapDrivePlugIn->makeMap(LVecBase3fToOpenSteerVec3(mapCenter),
-			max(minMaxX[1] - minMaxX[0], minMaxY[1] - minMaxY[0]), 200);
+			max(dX, dY) + maxRadius * 5.0, 200);
 	///init libRocket
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();

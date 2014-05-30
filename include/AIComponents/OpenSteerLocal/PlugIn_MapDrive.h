@@ -3316,7 +3316,7 @@ public:
 		// regenerate map: clear and add random "rocks"
 		map->clear();
 		drawRandomClumpsOfRocksOnMap();
-		clearCenterOfMap();
+///		clearCenterOfMap();
 
 		// draw fences for first two demo modes
 		if (demoSelect < 2)
@@ -3522,6 +3522,9 @@ public:
 				//try to project triangles
 				for (int i = 0; i < 12; ++i)
 				{
+					///TODO: cull away not intersecting triangles
+					///use separating axis algorithm
+
 					//cull back facing triangles: see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
 					int det = (v[t[i].p2I].x - v[t[i].p1I].x)
 							* (v[t[i].p3I].z - v[t[i].p1I].z)
@@ -3531,9 +3534,6 @@ public:
 					{
 						continue;
 					}
-					///TODO: cull away not intersecting triangles
-					///use separating axis algorithm
-
 					//get box (integer) parameters
 					int ix[3], iz[3];
 					map->getCoords(v[t[i].p1I], ix[0], iz[0]);
@@ -3541,7 +3541,7 @@ public:
 					map->getCoords(v[t[i].p3I], ix[2], iz[2]);
 					//project triangle over the map
 					rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2], iz[2],
-							minX, maxX, &minZ, &maxZ, false);
+							minX, maxX, &minZ, &maxZ);
 				}
 			}
 			else if (dynamic_cast<RectangleObstacle*>(*iter))
@@ -3619,7 +3619,7 @@ public:
 
 	void checkBoundary(int x, int z, int* minX, int* maxX, int* minZ, int* maxZ)
 	{
-		//check only if (x,z) inside map
+		//check limits only if (x,z) inside map
 		if (((z >= 0) and (z < map->resolution))
 				and ((x >= 0) and (x < map->resolution)))
 		{
@@ -3633,18 +3633,8 @@ public:
 	}
 
 	void rasterizeTriangle(int x1, int z1, int x2, int z2, int x3, int z3,
-			int* minX, int* maxX, int* minZ, int* maxZ, bool cullCW)
+			int* minX, int* maxX, int* minZ, int* maxZ)
 	{
-		if (cullCW)
-		{
-			//projection if from up to down
-			//cull back facing triangles: see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
-			int det = (x2 - x1) * (z3 - z1) - (x3 - x1) * (z2 - z1);
-			if (det < 0)
-			{
-				return;
-			}
-		}
 		//calculate boundaries by (not) drawing the edges
 		lineBresenham(x1, x2, z1, z2, minX, maxX, minZ, maxZ);
 		lineBresenham(x2, x3, z2, z3, minX, maxX, minZ, maxZ);
@@ -3687,7 +3677,7 @@ public:
 		int D = 2 * dz - dx;
 		for (int i = 0; i < dx; i++)
 		{
-			//check only if (x,z) inside map
+			//check limits only if (x,z) inside map
 			if (((z >= 0) and (z < map->resolution))
 					and ((x >= 0) and (x < map->resolution)))
 			{
@@ -3698,6 +3688,7 @@ public:
 				*minZ > z ? *minZ = z : 0;
 				*maxZ < z ? *maxZ = z : 0;
 			}
+			//
 			while (D >= 0)
 			{
 				D = D - 2 * dx;
@@ -3716,17 +3707,12 @@ public:
 
 	void putPixel(int i, int j, bool value)
 	{
-		//set bit only if inside map
-		if (((i >= 0) and (i < map->resolution))
-				and ((j >= 0) and (j < map->resolution)))
-		{
 #ifdef OLDTERRAINMAP
 			map->setMapBit(i, j, value);
 #else
 			map->setType (i, j, CellData::OBSTACLE);
 
 #endif
-		}
 	}
 
 	void drawBoundaryFencesOnMap(TerrainMap& map)
@@ -3779,8 +3765,7 @@ public:
 		const Vec3 alongRow(xs, 0, 0);
 		const Vec3 nextRow(-map.xSize, 0, zs);
 		Vec3 g((map.xSize - xs) / -2, 0, (map.zSize - zs) / -2);
-		///TODO
-		g -= map.center;
+		g += map.center;
 		//make a flat path at height map.center.y
 		Vec3* newPoints = new Vec3[_path.pointCount()];
 		for (SegmentedPathway::size_type i = 0; i < _path.pointCount(); ++i)

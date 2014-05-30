@@ -261,21 +261,21 @@
 		<!-- WORLD OBJECTS -->
 		<!-- ************* -->
 
-		<Object type="Instanceable" id="Smiley1" priority="100">
+		<Object type="Instanceable" id="Smiley1" priority="120">
 			<Component type="Model">
 				<Param model_file="smiley.bam"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="true"/>
 		</Object>
-		<Object type="Instanceable" id="Panda1" priority="100">
+		<Object type="Instanceable" id="Panda1" priority="120">
 			<Component type="Model">
 				<Param model_file="panda.bam"/>
 			</Component>
 			<Param parent=""/>
 			<Param is_steady="true"/>
 		</Object>
-		<Object type="Instanceable" id="Gorilla1" priority="100">
+		<Object type="Instanceable" id="Gorilla1" priority="120">
 			<Component type="Model">
 				<Param model_file="walk@gorillawalking.bam"/>
 			</Component>
@@ -706,7 +706,7 @@
 								-607.722,19.3786,-42.599:-571.646,46.0489,-37.0203:
 								-552.311,-11.0309,-41.4369:-579.883,-38.7748,-43.0303:
 								-576.031,-91.8369,-43.0135:-557.025,-119.875,-41.0164:
-								-594.917,-144.434,-41.2785$1.0:1.5:2.0:2.0:2.0:2.5:2.0:1.5:1.5:1.5:1.0$true"/>
+								-594.917,-144.434,-41.2785$4.0:5.0:4.0:6.0:6.0:7.0:6.0:5.0:5.0:5.0:4.0$true"/>
 				<Param obstacles="smiley1_1@sphere@outside:smiley1_2@sphere@outside:smiley1_3@sphere@outside"/>
 				<Param obstacles="wheel1_1@box@outside:wheel1_2@box@outside:wheel1_3@box@outside"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
@@ -1011,7 +1011,7 @@
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param pos="-669.703,-63.1781,-42.9188"/>
 		</Object>
 
 		<Object type="InstancedActor" id="smiley1_2" priority="110">
@@ -1028,7 +1028,7 @@
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param pos="-584.879,33.8467,-37.4596"/>
 		</Object>
 
 		<Object type="InstancedActor" id="smiley1_3" priority="110">
@@ -1045,13 +1045,13 @@
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param pos="-577.973,-71.0788,-40.7309"/>
 		</Object>
 
 		<Object type="InstancedActor" id="wheel1_1" priority="110">
 			<Component type="InstanceOf">
 				<Param instance_of="wheel1"/>
-				<Param scale="1.0,1.0,1.0"/>
+				<Param scale="2.5,2.5,2.5"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -1061,14 +1061,14 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param rot="0.0,0.0,90.0"/>
+			<Param pos="-577.936,-133.273,-40.9889"/>
 		</Object>
 
 		<Object type="InstancedActor" id="wheel1_2" priority="110">
 			<Component type="InstanceOf">
 				<Param instance_of="wheel1"/>
-				<Param scale="1.0,1.0,1.0"/>
+				<Param scale="2.5,2.5,2.5"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -1078,14 +1078,14 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param rot="0.0,0.0,90.0"/>
+			<Param pos="-560.649,15.5985,-39.7128"/>
 		</Object>
 
 		<Object type="InstancedActor" id="wheel1_3" priority="110">
 			<Component type="InstanceOf">
 				<Param instance_of="wheel1"/>
-				<Param scale="1.0,1.0,1.0"/>
+				<Param scale="2.0,2.0,2.0"/>
 			</Component>
 			<Component type="RigidBody">
 				<Param body_type="static"/>
@@ -1095,8 +1095,8 @@
 			</Component> 
 			<Param parent="render"/>
 			<Param is_steady="true"/>
-			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="0.0,0.0,0.0"/>
+			<Param rot="0.0,0.0,90.0"/>
+			<Param pos="-641.846,8.89998,-43.56"/>
 		</Object>
 
 <!--
