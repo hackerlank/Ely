@@ -3456,19 +3456,19 @@ public:
 		{
 			//get map vertices (ccw defined looking down y axis)
 			const float dX = map->xSize / 2.0;
-			const float dY = map->zSize	/ 2.0;
-			Vec3 mapVert[4]= {
-				map->center + Vec3(-dX, 0, -dY),
-				map->center + Vec3(dX, 0, -dY),
-				map->center + Vec3(dX, 0, dY),
-				map->center + Vec3(-dX, 0, dY)
+			const float dZ = map->zSize	/ 2.0;
+			Vec3 mapV[4]= {
+				map->center + Vec3(-dX, 0, dZ),
+				map->center + Vec3(dX, 0, dZ),
+				map->center + Vec3(dX, 0, -dZ),
+				map->center + Vec3(-dX, 0, -dZ)
 			};
 
 			if (dynamic_cast<SphereObstacle*>(*iter))
 			{
 				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
 				//cull away if sphere (projection) is outside map
-				if (not rectangleCircleIntersect(mapVert, sphere->center,
+				if (not rectangleCircleIntersect(mapV, sphere->center,
 						sphere->radius))
 				{
 					continue;
@@ -3493,10 +3493,10 @@ public:
 				//		   /|       /|
 				//		  / |      / |
 				//       /  |     /  | 2h
-				//		3--------2   |
-				//		|   |    |   |
-				//		|   5----|---4
-				//	    |  /     |  /
+				//		3--------2   |              y
+				//		|   |    |   |              |_ x
+				//		|   5----|---4             /
+				//	    |  /     |  /             z
 				//		| /      | / 2d
 				//		|/       |/
 				//		0--------1
@@ -3507,20 +3507,20 @@ public:
 				float h = box->height * 0.5f;
 				float d = box->depth * 0.5f;
 				Vec3 v[8];
-				v[0] = box->globalizePosition(OpenSteer::Vec3(-w, -h, -d));
-				v[1] = box->globalizePosition(OpenSteer::Vec3(w, -h, -d));
-				v[2] = box->globalizePosition(OpenSteer::Vec3(w, h, -d));
-				v[3] = box->globalizePosition(OpenSteer::Vec3(-w, h, -d));
-				v[4] = box->globalizePosition(OpenSteer::Vec3(w, -h, d));
-				v[5] = box->globalizePosition(OpenSteer::Vec3(-w, -h, d));
-				v[6] = box->globalizePosition(OpenSteer::Vec3(-w, h, d));
-				v[7] = box->globalizePosition(OpenSteer::Vec3(w, h, d));
+				v[0] = box->globalizePosition(OpenSteer::Vec3(-w, -h, d));
+				v[1] = box->globalizePosition(OpenSteer::Vec3(w, -h, d));
+				v[2] = box->globalizePosition(OpenSteer::Vec3(w, h, d));
+				v[3] = box->globalizePosition(OpenSteer::Vec3(-w, h, d));
+				v[4] = box->globalizePosition(OpenSteer::Vec3(w, -h, -d));
+				v[5] = box->globalizePosition(OpenSteer::Vec3(-w, -h, -d));
+				v[6] = box->globalizePosition(OpenSteer::Vec3(-w, h, -d));
+				v[7] = box->globalizePosition(OpenSteer::Vec3(w, h, -d));
 				//get triangles
 				struct Triangle
 				{
-					int p0I, p1I, p2I;
+					int v0I, v1I, v2I;
 				};
-				Triangle t[12] =
+				Triangle tri[12] =
 				{
 				{ 0, 1, 2 },
 				{ 0, 2, 3 },
@@ -3537,33 +3537,41 @@ public:
 				//try to project triangles
 				for (int i = 0; i < 12; ++i)
 				{
-					//cull if back facing triangle: i.e. triangle resulting
-					//cw defined looking down y axis.
+					Vec3 triV[3];
+					triV[0] = v[tri[i].v0I];
+					triV[1] = v[tri[i].v1I];
+					triV[2] = v[tri[i].v2I];
+					//cull if back facing triangle (i.e. triangle resulting
+					//cw defined looking down y axis): det >= 0 ==> ccw
 					//see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
-					int det = (v[t[i].p1I].x - v[t[i].p0I].x)
-							* (v[t[i].p2I].z - v[t[i].p0I].z)
-							- (v[t[i].p2I].x - v[t[i].p0I].x)
-									* (v[t[i].p1I].z - v[t[i].p0I].z);
-					if (det < 0)
+					int detI = (triV[1].x - triV[0].x) * (triV[2].z - triV[0].z)
+							- (triV[2].x - triV[0].x) * (triV[1].z - triV[0].z);
+//					if (detI < 0)
+//					{
+//						continue;
+//					}
+					//general formula of ccw-ness looking down an axis J
+					//(V1-V0).cross(V2-V0).dot(J) >= 0 ==> ccw
+					//where:
+					//	- V0,V1,V2 = triangle vertices
+					//	- J = axis vector
+					Vec3 VCross;
+					VCross.cross(triV[1] - triV[0], triV[2] - triV[0]);
+					float detF = VCross.dot(Vec3(0, 1, 0));
+					if (detF < 0)
 					{
 						continue;
 					}
-
-					///TODO
-					//general formula of ccw-ness looking down an axis J
-					//(P1-P0).cross(P2-P0).dot(J) > 0 ==> ccw
-					//where:
-					//	- P0,P1,P2 = triangle points
-					//	- J = axis vector
-//					()
-					///TODO
 					//cull away if triangle (projection) is outside map
-
+					if (not polyIntersect(mapV, 4, triV, 3))
+					{
+						continue;
+					}
 					//get box (integer) parameters
 					int ix[3], iz[3];
-					map->getCoords(v[t[i].p0I], ix[0], iz[0]);
-					map->getCoords(v[t[i].p1I], ix[1], iz[1]);
-					map->getCoords(v[t[i].p2I], ix[2], iz[2]);
+					map->getCoords(triV[0], ix[0], iz[0]);
+					map->getCoords(triV[1], ix[1], iz[1]);
+					map->getCoords(triV[2], ix[2], iz[2]);
 					//project triangle over the map
 					rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2], iz[2],
 							minX, maxX, &minZ, &maxZ);
@@ -3758,7 +3766,7 @@ public:
 			int m = (n + 1) % vertN1;
 			//get unit vector along external normal
 			Vec3 edge = (poly1V[m] - poly1V[n]);
-			Vec3 normal = Vec3(edge.z, 0, -edge.x).normalize();
+			Vec3 normal = Vec3(-edge.z, 0, edge.x).normalize();
 			//check every poly2 vertex component wrt normal
 			for (int t = 0; t < vertN2; ++t)
 			{
