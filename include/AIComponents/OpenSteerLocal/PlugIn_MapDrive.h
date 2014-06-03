@@ -3454,12 +3454,27 @@ public:
 		OpenSteer::ObstacleGroup::const_iterator iter;
 		for (iter = obstacles->begin(); iter != obstacles->end(); ++iter)
 		{
+			//get map vertices (ccw defined looking down y axis)
+			const float dX = map->xSize / 2.0;
+			const float dY = map->zSize	/ 2.0;
+			Vec3 mapVert[4]= {
+				map->center + Vec3(-dX, 0, -dY),
+				map->center + Vec3(dX, 0, -dY),
+				map->center + Vec3(dX, 0, dY),
+				map->center + Vec3(-dX, 0, dY)
+			};
+
 			if (dynamic_cast<SphereObstacle*>(*iter))
 			{
 				SphereObstacle* sphere = dynamic_cast<SphereObstacle*>(*iter);
-				///TODO: cull away if outside map
+				//cull away if sphere (projection) is outside map
+				if (not rectangleCircleIntersect(mapVert, sphere->center,
+						sphere->radius))
+				{
+					continue;
+				}
 
-				//it is inside map: get sphere (integer) parameters
+				//(projection) is inside map: get sphere (integer) parameters
 				int ir = (int) ceilf(sphere->radius);
 				int ixc, izc;
 				map->getCoords(sphere->center, ixc, izc);
@@ -3503,7 +3518,7 @@ public:
 				//get triangles
 				struct Triangle
 				{
-					int p1I, p2I, p3I;
+					int p0I, p1I, p2I;
 				};
 				Triangle t[12] =
 				{
@@ -3522,23 +3537,33 @@ public:
 				//try to project triangles
 				for (int i = 0; i < 12; ++i)
 				{
-					///TODO: cull away not intersecting triangles
-					///use separating axis algorithm
-
-					//cull back facing triangles: see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
-					int det = (v[t[i].p2I].x - v[t[i].p1I].x)
-							* (v[t[i].p3I].z - v[t[i].p1I].z)
-							- (v[t[i].p3I].x - v[t[i].p1I].x)
-									* (v[t[i].p2I].z - v[t[i].p1I].z);
+					//cull if back facing triangle: i.e. triangle resulting
+					//cw defined looking down y axis.
+					//see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
+					int det = (v[t[i].p1I].x - v[t[i].p0I].x)
+							* (v[t[i].p2I].z - v[t[i].p0I].z)
+							- (v[t[i].p2I].x - v[t[i].p0I].x)
+									* (v[t[i].p1I].z - v[t[i].p0I].z);
 					if (det < 0)
 					{
 						continue;
 					}
+
+					///TODO
+					//general formula of ccw-ness looking down an axis J
+					//(P1-P0).cross(P2-P0).dot(J) > 0 ==> ccw
+					//where:
+					//	- P0,P1,P2 = triangle points
+					//	- J = axis vector
+//					()
+					///TODO
+					//cull away if triangle (projection) is outside map
+
 					//get box (integer) parameters
 					int ix[3], iz[3];
-					map->getCoords(v[t[i].p1I], ix[0], iz[0]);
-					map->getCoords(v[t[i].p2I], ix[1], iz[1]);
-					map->getCoords(v[t[i].p3I], ix[2], iz[2]);
+					map->getCoords(v[t[i].p0I], ix[0], iz[0]);
+					map->getCoords(v[t[i].p1I], ix[1], iz[1]);
+					map->getCoords(v[t[i].p2I], ix[2], iz[2]);
 					//project triangle over the map
 					rasterizeTriangle(ix[0], iz[0], ix[1], iz[1], ix[2], iz[2],
 							minX, maxX, &minZ, &maxZ);
@@ -3558,6 +3583,204 @@ public:
 		//free buffers
 		delete[] minX;
 		delete[] maxX;
+	}
+
+	///Check rectangle vs circle 2D intersection.
+	///Any point or vertex are first projected over the y=0 plane, and resulting
+	///projected vertices are supposed to form a rectangle defined ccw looking down y axis.
+	///No check is done.
+	///See http://www.geometrictools.com/Documentation/IntersectionRectangleEllipse.pdf.
+	bool rectangleCircleIntersect(Vec3* rectVertices, Vec3 circleCenter,
+			float circleRadius)
+	{
+		bool foundIntersection = false;
+		//let's work in y=0 plane
+		Vec3 rectV[4];
+		for (int i = 0; i < 4; ++i)
+		{
+			rectV[i] = rectVertices[i].setYtoZero();
+		}
+		Vec3 circleC = circleCenter.setYtoZero();
+		//
+		//	3-----------2      ----
+		//  |     u2    |     /    \
+		//	|     |     |    /      \
+		//	|    rC--u1 |   |   cC   |
+		//	|           |    \      /
+		//	0-----------1     \    /
+		//                     ----
+		//
+		//get rectangle half dimensions
+		float halfDim1 = (rectV[1] - rectV[0]).length() / 2.0;
+		float halfDim2 = (rectV[3] - rectV[0]).length() / 2.0;
+		assert((halfDim1 > 0) and (halfDim2 > 0));
+		//get rectangle frame unit vectors (origin=rectangle center)
+		Vec3 rectU1 = (rectV[1] - rectV[0]).normalize();
+		Vec3 rectU2 = (rectV[2] - rectV[1]).normalize();
+		//get rectangle center
+		Vec3 rectC = rectV[0] + rectU1 * halfDim1 + rectU2 * halfDim2;
+		//transform circle center wrt the rectangle frame
+		Vec3 circleCR = Vec3(rectU1.dot(circleC - rectC), 0,
+				rectU2.dot(circleC - rectC));
+		//check if circle center is inside rectangle
+		if ((abs(circleCR.x) <= halfDim1) and (abs(circleCR.z) <= halfDim2))
+		{
+			//intersection
+			foundIntersection = true;
+		}
+		else
+		{
+			//transform rectangle's vertices wrt the rectangle frame
+			Vec3 rectVR[4];
+			for (int i = 0; i < 4; ++i)
+			{
+				rectVR[i] = Vec3(rectU1.dot(rectV[i] - rectC), 0,
+						rectU2.dot(rectV[i] - rectC));
+			}
+			//check circle vs rectangle's edges intersection
+			//according to which quadrant there is the circle center
+			int edge1Idx[2], edge2Idx[2];
+			//1st quadrant: check 2-1 and 3-2 edges
+			if ((circleCR.x > 0) and (circleCR.z > 0))
+			{
+				edge1Idx[0] = 1;
+				edge1Idx[1] = 2;
+				edge2Idx[0] = 2;
+				edge2Idx[1] = 3;
+			}
+			//2nd quadrant: check 3-2 and 0-3 edges
+			else if ((circleCR.x < 0) and (circleCR.z > 0))
+			{
+				edge1Idx[0] = 2;
+				edge1Idx[1] = 3;
+				edge2Idx[0] = 3;
+				edge2Idx[1] = 0;
+			}
+			//3rd quadrant: check 0-3 and 1-0 edges
+			else if ((circleCR.x < 0) and (circleCR.z < 0))
+			{
+				edge1Idx[0] = 3;
+				edge1Idx[1] = 0;
+				edge2Idx[0] = 0;
+				edge2Idx[1] = 1;
+			}
+			//4th quadrant: check 1-0 and 2-1 edges
+			else if ((circleCR.x > 0) and (circleCR.z < 0))
+			{
+				edge1Idx[0] = 0;
+				edge1Idx[1] = 1;
+				edge2Idx[0] = 1;
+				edge2Idx[1] = 2;
+			}
+			foundIntersection = edgeCircleIntersect(rectVR[edge1Idx[0]],
+					rectVR[edge1Idx[1]], circleCR, circleRadius);
+			if (not foundIntersection)
+			{
+				foundIntersection = edgeCircleIntersect(rectVR[edge2Idx[0]],
+						rectVR[edge2Idx[1]], circleCR, circleRadius);
+			}
+		}
+		//
+		return foundIntersection;
+	}
+
+	bool edgeCircleIntersect(Vec3 edgeV0, Vec3 edgeV1, Vec3 center, float radius)
+	{
+		//by default no intersection
+		bool foundIntersection = false;
+		//get quadratic expression: q2*t^2 + q1*t + q0
+		float radius2 = radius * radius;
+		float q2 = (edgeV1 - edgeV0).lengthSquared() / radius2;
+		float q1 = 2 * (edgeV1 - edgeV0).dot(edgeV0 - center) / radius2;
+		float q0 = (edgeV0 - center).lengthSquared() / radius2 - 1.0;
+		//compute discriminant
+		float discriminant = q1 * q1 - 4 * q2 * q0;
+		//check if there are solutions: discriminant >= 0
+		if (discriminant >= 0.0)
+		{
+			//there are 1 or 2 solutions: check if:
+			//- at least one is in [0, 1] or
+			//- they are opposite in sign (meaning that one
+			//	is >1 and the other is <0, i.e. edge is contained
+			//	entirely in circle)
+			float t1 = (-q1 + sqrt(discriminant)) / (2 * q2);
+			float t2 = (-q1 - sqrt(discriminant)) / (2 * q2);
+			if ((0 <= t1 and t1 <= 1.0) or (0 <= t2 and t2 <= 1.0)
+					or (t1 * t2 < 0.0))
+			{
+				foundIntersection = true;
+			}
+		}
+		//
+		return foundIntersection;
+	}
+
+	///Check two convex polygons 2D intersection (by using separating axis algorithm).
+	///Any point or vertex are first projected over the y=0 plane, and resulting
+	///projected vertices are supposed to be defined ccw looking down y axis.
+	///No check is done.
+	///See "D.H. Eberly: 3D Game Engine Design, 2nd edition"
+	bool polyIntersect(Vec3* poly1Vert, int vertN1, Vec3* poly2Vert, int vertN2)
+	{
+		//let's work in y=0 plane
+		Vec3* poly1V = new Vec3[vertN1];
+		Vec3* poly2V = new Vec3[vertN2];
+		for (int i = 0; i < vertN1; ++i)
+		{
+			poly1V[i] = poly1Vert[i].setYtoZero();
+		}
+		for (int i = 0; i < vertN2; ++i)
+		{
+			poly2V[i] = poly2Vert[i].setYtoZero();
+		}
+		//
+		bool foundIntersection = false;
+		if (not seekSeparatingAxis(poly1V, vertN1, poly2V, vertN2))
+		{
+			foundIntersection = not seekSeparatingAxis(poly2V, vertN2, poly1V,
+					vertN1);
+		}
+		//free resources
+		delete[] poly1V;
+		delete[] poly2V;
+		//
+		return foundIntersection;
+	}
+
+	bool seekSeparatingAxis(Vec3* poly1V, int vertN1, Vec3* poly2V,
+			int vertN2)
+	{
+		bool separatingAxisFound = false;
+		//check poly1 normals vs poly2 vertices
+		//for each poly1 external normal do
+		for (int n = 0; n < vertN1; ++n)
+		{
+			int m = (n + 1) % vertN1;
+			//get unit vector along external normal
+			Vec3 edge = (poly1V[m] - poly1V[n]);
+			Vec3 normal = Vec3(edge.z, 0, -edge.x).normalize();
+			//check every poly2 vertex component wrt normal
+			for (int t = 0; t < vertN2; ++t)
+			{
+				//get the poly2 vertex component wrt normal and poly1 vertex:
+				//component = (normal) dot (poly2Vert - poly1Vert)
+				float component = (poly2V[t] - poly1V[n]).dot(normal);
+				if (component < 0.0)
+				{
+					break;
+				}
+				if (t == vertN2 - 1)
+				{
+					//found a separating axis
+					separatingAxisFound = true;
+				}
+			}
+			if (separatingAxisFound)
+			{
+				break;
+			}
+		}
+		return separatingAxisFound;
 	}
 
 	///projection (rasterization) functions
