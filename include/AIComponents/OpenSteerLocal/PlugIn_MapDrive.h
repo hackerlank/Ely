@@ -3456,13 +3456,11 @@ public:
 		{
 			//get map vertices (ccw defined looking down y axis)
 			const float dX = map->xSize / 2.0;
-			const float dZ = map->zSize	/ 2.0;
-			Vec3 mapV[4]= {
-				map->center + Vec3(-dX, 0, dZ),
-				map->center + Vec3(dX, 0, dZ),
-				map->center + Vec3(dX, 0, -dZ),
-				map->center + Vec3(-dX, 0, -dZ)
-			};
+			const float dZ = map->zSize / 2.0;
+			Vec3 mapV[4] =
+			{ map->center + Vec3(-dX, 0, dZ), map->center + Vec3(dX, 0, dZ),
+					map->center + Vec3(dX, 0, -dZ), map->center
+							+ Vec3(-dX, 0, -dZ) };
 
 			if (dynamic_cast<SphereObstacle*>(*iter))
 			{
@@ -3541,11 +3539,11 @@ public:
 					triV[0] = v[tri[i].v0I];
 					triV[1] = v[tri[i].v1I];
 					triV[2] = v[tri[i].v2I];
-					//cull if back facing triangle (i.e. triangle resulting
-					//cw defined looking down y axis): det >= 0 ==> ccw
-					//see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
-					int detI = (triV[1].x - triV[0].x) * (triV[2].z - triV[0].z)
-							- (triV[2].x - triV[0].x) * (triV[1].z - triV[0].z);
+//					//cull if back facing triangle (i.e. triangle resulting
+//					//cw defined looking down y axis): det >= 0 ==> ccw
+//					//see "D.H. Eberly: 3D Game Engine Design, 2nd edition"
+//					int detI = (triV[2].x - triV[0].x) * (triV[1].z - triV[0].z)
+//							- (triV[1].x - triV[0].x) * (triV[2].z - triV[0].z);
 //					if (detI < 0)
 //					{
 //						continue;
@@ -3692,7 +3690,8 @@ public:
 		return foundIntersection;
 	}
 
-	bool edgeCircleIntersect(Vec3 edgeV0, Vec3 edgeV1, Vec3 center, float radius)
+	bool edgeCircleIntersect(Vec3 edgeV0, Vec3 edgeV1, Vec3 center,
+			float radius)
 	{
 		//by default no intersection
 		bool foundIntersection = false;
@@ -3755,8 +3754,7 @@ public:
 		return foundIntersection;
 	}
 
-	bool seekSeparatingAxis(Vec3* poly1V, int vertN1, Vec3* poly2V,
-			int vertN2)
+	bool seekSeparatingAxis(Vec3* poly1V, int vertN1, Vec3* poly2V, int vertN2)
 	{
 		bool separatingAxisFound = false;
 		//check poly1 normals vs poly2 vertices
@@ -3764,9 +3762,11 @@ public:
 		for (int n = 0; n < vertN1; ++n)
 		{
 			int m = (n + 1) % vertN1;
-			//get unit vector along external normal
+			//get external normal as unit vector
 			Vec3 edge = (poly1V[m] - poly1V[n]);
-			Vec3 normal = Vec3(-edge.z, 0, edge.x).normalize();
+			Vec3 crossV;
+			crossV.cross(edge, Vec3(0, 1, 0));
+			Vec3 normal = crossV.normalize();
 			//check every poly2 vertex component wrt normal
 			for (int t = 0; t < vertN2; ++t)
 			{
@@ -3939,9 +3939,9 @@ public:
 	void putPixel(int i, int j, bool value)
 	{
 #ifdef OLDTERRAINMAP
-			map->setMapBit(i, j, value);
+		map->setMapBit(i, j, value);
 #else
-			map->setType (i, j, CellData::OBSTACLE);
+		map->setType (i, j, CellData::OBSTACLE);
 
 #endif
 	}
@@ -3984,7 +3984,7 @@ public:
 #ifdef OLDTERRAINMAP
 				map->setMapBit(i, j, false);
 #else
-				map->setType (i, j, CellData::CLEAR);
+		map->setType (i, j, CellData::CLEAR);
 #endif
 	}
 
@@ -4033,8 +4033,7 @@ public:
 		return (const AVGroup&) vehicles;
 	}
 
-	void makeMap(const Vec3& c, float _worldSize,
-			int resolution)
+	void makeMap(const Vec3& c, float _worldSize, int resolution)
 	{
 		//if already made return
 		if (map != NULL)
