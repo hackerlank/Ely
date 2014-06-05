@@ -1046,9 +1046,9 @@ public:
 #ifdef ELY_DEBUG
 			lapsStarted++;
 #endif
-			const float s = worldSize;
+///			const float s = worldSize;
 			const float d = (float) pathFollowDirection;
-			this->setPosition(Vec3(s * d * 0.6f, 0, s * -0.4f));
+///			this->setPosition(Vec3(s * d * 0.6f, 0, s * -0.4f));
 			this->regenerateOrthonormalBasisUF(Vec3::side * d);
 		}
 
@@ -2388,11 +2388,12 @@ public:
 				lapsFinished++;
 #endif
 				// set position on other side of the map (set new X coordinate)
-				this->setPosition(
-						(((px < 0) ? 1 : -1)
-								* ((worldSize * 0.5f)
-										+ (this->speed() * lookAheadTimePF()))),
-						this->position().y, this->position().z);
+///				this->setPosition(
+///						(((px < 0) ? 1 : -1)
+///								* ((worldSize * 0.5f)
+///										+ (this->speed() * lookAheadTimePF()))),
+///						this->position().y, this->position().z);
+				reset();
 
 				// reset bookkeeping to detect stuck cycles
 				resetStuckCycleDetection();

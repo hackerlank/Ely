@@ -885,14 +885,20 @@ void add_vehicle(const Event* event)
 	}
 	else if (openSteerPlugInName == "Driving through map based obstacles")
 	{
+		compParams["SteerVehicle"].erase("max_speed");
+		compParams["SteerVehicle"].erase("max_force");
 		compParams["InstanceOf"].erase("instance_of");
 		compParams["InstanceOf"].erase("scale");
-		//set SteerVehicle type, mov_type
+		//set SteerVehicle type, mov_type, max_speed, max_force
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("type",
 						"map_driver"));
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("mov_type", "kinematic"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("max_speed", "20"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("max_force", "8"));
 		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].insert(
 				std::pair<std::string, std::string>("instance_of", "vehicle1"));
