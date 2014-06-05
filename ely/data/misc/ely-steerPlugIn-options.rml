@@ -244,19 +244,20 @@
 						<strong>Map Drive PlugIn</strong>
 						<br />
 						<!-- Map Drive Options -->
-						<p id="map_drive_options" style="display: none;">							
+						<p id="map_drive_options" style="display: none;width: 400px;">							
 							<!-- DemoSelect -->
 							Demo select:
+							<br />
 							<input id="demo_select_0" type="radio"
 								name="demo_select" value="0" style="margin-left: 0px;" />
-							obstacle avoidance and speed control
+							obstacle avoidance/speed control <br />
 							<input id="demo_select_1" type="radio"
 								name="demo_select" value="1" style="margin-left: 0px;" />
-							wander, obstacle avoidance and speed control
+							wander, obstacle avoidance/speed control <br />
 							<input id="demo_select_2" type="radio"
 								name="demo_select" value="2" checked="true" 
 								style="margin-left: 0px;" />
-							path following, obstacle avoidance and speed control
+							path following, obstacle avoidance/speed control <br />
 							<br />
 							<!-- UsePathFences -->
 							use path fences:
