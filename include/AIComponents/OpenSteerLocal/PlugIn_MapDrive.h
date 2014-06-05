@@ -3491,28 +3491,28 @@ public:
 				//		   /|       /|
 				//		  / |      / |
 				//       /  |     /  | 2h
-				//		3--------2   |              y
-				//		|   |    |   |              |_ x
-				//		|   5----|---4             /
-				//	    |  /     |  /             z
-				//		| /      | / 2d
-				//		|/       |/
+				//		3--------2   |
+				//		|   |    |   |
+				//		|   5----|---4              u
+				//	    |  /     |  /               |__f
+				//		| /      | / 2w            /
+				//		|/       |/               s
 				//		0--------1
-				//          2w
+				//          2d
 				//
-				//get box vertices
+				//get box features
 				float w = box->width * 0.5f;
 				float h = box->height * 0.5f;
 				float d = box->depth * 0.5f;
 				Vec3 v[8];
-				v[0] = box->globalizePosition(OpenSteer::Vec3(-w, -h, d));
+				v[0] = box->globalizePosition(OpenSteer::Vec3(w, -h, -d));
 				v[1] = box->globalizePosition(OpenSteer::Vec3(w, -h, d));
 				v[2] = box->globalizePosition(OpenSteer::Vec3(w, h, d));
-				v[3] = box->globalizePosition(OpenSteer::Vec3(-w, h, d));
-				v[4] = box->globalizePosition(OpenSteer::Vec3(w, -h, -d));
+				v[3] = box->globalizePosition(OpenSteer::Vec3(w, h, -d));
+				v[4] = box->globalizePosition(OpenSteer::Vec3(-w, -h, d));
 				v[5] = box->globalizePosition(OpenSteer::Vec3(-w, -h, -d));
 				v[6] = box->globalizePosition(OpenSteer::Vec3(-w, h, -d));
-				v[7] = box->globalizePosition(OpenSteer::Vec3(w, h, -d));
+				v[7] = box->globalizePosition(OpenSteer::Vec3(-w, h, d));
 				//get triangles
 				struct Triangle
 				{
