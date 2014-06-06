@@ -1074,6 +1074,18 @@ public:
 	// per frame simulation update
 	void update(const float currentTime, const float elapsedTime)
 	{
+
+		handleExitFromMap();
+
+		// QQQ first pass at detecting "stuck" state
+		if (stuck && (this->relativeSpeed() < 0.001f))
+		{
+#ifdef ELY_DEBUG
+			stuckCount++;
+#endif
+			reset();
+		}
+
 #ifdef ELY_DEBUG
 		// take note when current dt is zero (as in paused) for stat counters
 		dtZero = (elapsedTime == 0);
@@ -2943,16 +2955,15 @@ public:
 			// when vehicle drives outside the world
 ///			if ((*iter)->handleExitFromMap())
 ///				regenerateMap();
-			(*iter)->handleExitFromMap();
-
-			// QQQ first pass at detecting "stuck" state
-			if ((*iter)->stuck && ((*iter)->relativeSpeed() < 0.001f))
-			{
-#ifdef ELY_DEBUG
-				(*iter)->stuckCount++;
-#endif
-				reset();
-			}
+///
+///			// QQQ first pass at detecting "stuck" state
+///			if ((*iter)->stuck && ((*iter)->relativeSpeed() < 0.001f))
+///			{
+///#ifdef ELY_DEBUG
+///				(*iter)->stuckCount++;
+///#endif
+///				reset();
+///			}
 		}
 	}
 
