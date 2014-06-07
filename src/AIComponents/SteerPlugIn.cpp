@@ -233,7 +233,7 @@ inline void SteerPlugIn::doBuildPathway()
 		for (idx = 0; idx < numRadiiAllocated; ++idx)
 		{
 			float value;
-			if (idx < numRadii - 1)
+			if (idx < numRadii)
 			{
 				value = strtof(paramValues2Str[idx].c_str(), NULL);
 				if (value < 0.0)

@@ -524,6 +524,12 @@ inline OpenSteer::PolylineSegmentedPathwaySegmentRadii::size_type mapPointToSegm
 	return mapping.segmentIndex;
 }
 
+// random utility, worth moving to Utilities.h?
+inline int irandom2(int min, int max)
+{
+	return (int) frandom2((float) min, (float) max);
+}
+
 ///// define map size (and compute its half diagonal)
 ///float MapDriver::worldSize = 200;
 ///float MapDriver::worldDiag = sqrtXXX(square(worldSize) / 2);
@@ -1071,6 +1077,48 @@ public:
 		//      annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 1;
 	}
 
+	void resetToPath()
+	{
+		reset();
+		if(path and path->isValid())
+		{
+			Vec3 forward;
+			Vec3 pos;
+			//1
+//			float distance;
+//			pos = path->mapPointToPath(this->position(), forward,
+//					distance);
+//			forward = mapPointAndDirectionToTangent(*path, pos,
+//					pathFollowDirection);
+			//2
+			int start = irandom2(0, path->pointCount());
+			int next = (start + 1) % path->pointCount();
+			Vec3 dP = (path->point(next) - path->point(start));
+			forward = dP.normalize();
+			pos = path->point(start) + forward * frandom2(0.0, dP.length());
+			//set pos and forward
+			this->setPosition(pos);
+			this->setForward(forward);
+		}
+	}
+
+	void resetToMap()
+	{
+		if(path and path->isValid())
+		{
+			resetToPath();
+		}
+		else
+		{
+			reset();
+			float x = frandom2(map->center.x - map->xSize / 2.0 * 0.9,
+					map->center.x + map->xSize / 2.0 * 0.9);
+			float z = frandom2(map->center.z - map->zSize / 2.0 * 0.9,
+					map->center.z + map->zSize / 2.0 * 0.9);
+			this->setPosition(Vec3(x, map->center.y, z));
+		}
+	}
+
 	// per frame simulation update
 	void update(const float currentTime, const float elapsedTime)
 	{
@@ -1083,7 +1131,14 @@ public:
 #ifdef ELY_DEBUG
 			stuckCount++;
 #endif
-			reset();
+			if (demoSelect == 2)
+			{
+				resetToPath();
+			}
+			else
+			{
+				resetToMap();
+			}
 		}
 
 #ifdef ELY_DEBUG
@@ -1218,7 +1273,8 @@ public:
 		}
 
 		// apply selected steering force to vehicle, record data
-		this->applySteeringForce(steering, elapsedTime);
+///		this->applySteeringForce(steering, elapsedTime);
+		this->applySteeringForce(steering.setYtoZero(), elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
@@ -2384,47 +2440,51 @@ public:
 ///		return new GCRoute(pathPointCount, pathPoints, pathRadii, false);
 ///	}
 
-	bool handleExitFromMap(void)
+	/*bool*/ void handleExitFromMap(void)
 	{
-		if (demoSelect == 2)
+		if(not map->isInside(this->position()))
 		{
-			// for path following, do wrap-around (teleport) and make new map
-			const float px = this->position().x;
-			const float fx = this->forward().x;
-			const float ws = worldSize * 0.51f; // slightly past edge
-			if (((fx > 0) && (px > ws)) || ((fx < 0) && (px < -ws)))
+			if (demoSelect == 2)
 			{
+				// for path following, do wrap-around (teleport) and make new map
+///				const float px = this->position().x;
+///				const float fx = this->forward().x;
+///				const float ws = worldSize * 0.51f; // slightly past edge
+///				if (((fx > 0) && (px > ws)) || ((fx < 0) && (px < -ws)))
+///				{
 #ifdef ELY_DEBUG
-				// bump counters
-				lapsStarted++;
-				lapsFinished++;
+					// bump counters
+					lapsStarted++;
+					lapsFinished++;
 #endif
-				// set position on other side of the map (set new X coordinate)
+					// set position on other side of the map (set new X coordinate)
 ///				this->setPosition(
 ///						(((px < 0) ? 1 : -1)
 ///								* ((worldSize * 0.5f)
 ///										+ (this->speed() * lookAheadTimePF()))),
 ///						this->position().y, this->position().z);
-				reset();
+					resetToPath();
 
-				// reset bookkeeping to detect stuck cycles
-				resetStuckCycleDetection();
+					// reset bookkeeping to detect stuck cycles
+					resetStuckCycleDetection();
 
 #ifdef ELY_DEBUG
-				// prevent long streaks due to teleportation
-				this->clearTrailHistory();
+					// prevent long streaks due to teleportation
+					this->clearTrailHistory();
 #endif
-				return true;
+///					return true;
+///				}
+			}
+			else
+			{
+				// for the non-path-following demos:
+				// reset simulation if the vehicle drives through the fence
+///				if (this->position().length() > worldDiag)
+///					this->reset();
+				resetToMap();
 			}
 		}
-		else
-		{
-			// for the non-path-following demos:
-			// reset simulation if the vehicle drives through the fence
-			if (this->position().length() > worldDiag)
-				this->reset();
-		}
-		return false;
+		return /*false*/;
 	}
 
 	float wingSlope(void)
@@ -3310,12 +3370,6 @@ public:
 			break;
 		}
 		message << std::ends;
-	}
-
-	// random utility, worth moving to Utilities.h?
-	int irandom2(int min, int max)
-	{
-		return (int) frandom2((float) min, (float) max);
 	}
 
 	void regenerateMap(void)

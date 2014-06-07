@@ -706,7 +706,7 @@
 								-607.722,19.3786,-42.599:-571.646,46.0489,-37.0203:
 								-552.311,-11.0309,-41.4369:-579.883,-38.7748,-43.0303:
 								-576.031,-91.8369,-43.0135:-557.025,-119.875,-41.0164:
-								-594.917,-144.434,-41.2785$4.0:5.0:4.0:6.0:6.0:7.0:6.0:5.0:5.0:5.0:4.0$true"/>
+								-594.917,-144.434,-41.2785$8.0:10.0:8.0:12.0:12.0:14.0:12.0:10.0:10.0:10.0:8.0$true"/>
 				<Param obstacles="smiley1_1@sphere@outside:smiley1_2@sphere@outside:smiley1_3@sphere@outside"/>
 				<Param obstacles="wheel1_1@box@outside:wheel1_2@box@outside:wheel1_3@box@outside"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
