@@ -1084,18 +1084,18 @@ public:
 		{
 			Vec3 forward;
 			Vec3 pos;
-			//1
-//			float distance;
-//			pos = path->mapPointToPath(this->position(), forward,
-//					distance);
-//			forward = mapPointAndDirectionToTangent(*path, pos,
-//					pathFollowDirection);
-			//2
-			int start = irandom2(0, path->pointCount());
-			int next = (start + 1) % path->pointCount();
-			Vec3 dP = (path->point(next) - path->point(start));
-			forward = dP.normalize();
-			pos = path->point(start) + forward * frandom2(0.0, dP.length());
+			float distance;
+			//get a point on the pathway
+			pos = path->mapPointToPath(this->position(), forward, distance);
+			//get segment index
+			PolylineSegmentedPathwaySegmentRadii::size_type segIdx =
+					mapPointToSegmentIndex(*path, pos);
+			//get forward direction
+			forward = mapPointAndDirectionToTangent(*path, pos,
+					pathFollowDirection);
+			//randomize position on the segment
+			Vec3 start = path->segmentStart(segIdx);
+			pos = start + forward * frandom2(0.0, path->segmentLength(segIdx));
 			//set pos and forward
 			this->setPosition(pos);
 			this->setForward(forward);
