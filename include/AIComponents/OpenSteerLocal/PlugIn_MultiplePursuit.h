@@ -123,8 +123,7 @@ public:
 	{
 		const Vec3 wander2d = this->steerForWander(elapsedTime).setYtoZero();
 		const Vec3 steer = this->forward() + (wander2d * 3);
-///		this->applySteeringForce(steer, elapsedTime);
-		this->applySteeringForce(steer.setYtoZero(), elapsedTime);
+		this->applySteeringForce(steer, elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
@@ -194,8 +193,7 @@ public:
 
 		const float maxTime = 20; // xxx hard-to-justify value
 		//XXX put "steering force for pursuit" constrained to global XZ "ground" plane
-///		this->applySteeringForce(this->steerForPursuit(*wanderer, maxTime), elapsedTime);
-		this->applySteeringForce(this->steerForPursuit(*wanderer, maxTime).setYtoZero(), elapsedTime);
+		this->applySteeringForce(this->steerForPursuit(*wanderer, maxTime), elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);

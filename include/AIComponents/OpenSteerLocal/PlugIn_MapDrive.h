@@ -1273,8 +1273,7 @@ public:
 		}
 
 		// apply selected steering force to vehicle, record data
-///		this->applySteeringForce(steering, elapsedTime);
-		this->applySteeringForce(steering.setYtoZero(), elapsedTime);
+		this->applySteeringForce(steering, elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);

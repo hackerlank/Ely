@@ -260,8 +260,7 @@ public:
 			this->applyBrakingForce(this->gCtfPlugInData->gBrakingRate,
 					elapsedTime);
 		}
-///		this->applySteeringForce(steer, elapsedTime);
-		this->applySteeringForce(steer.setYtoZero(), elapsedTime);
+		this->applySteeringForce(steer, elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
@@ -574,8 +573,7 @@ public:
 			this->applyBrakingForce(this->gCtfPlugInData->gBrakingRate,
 					elapsedTime);
 		}
-///		this->applySteeringForce(steer, elapsedTime);
-		this->applySteeringForce(steer.setYtoZero(), elapsedTime);
+		this->applySteeringForce(steer, elapsedTime);
 
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);

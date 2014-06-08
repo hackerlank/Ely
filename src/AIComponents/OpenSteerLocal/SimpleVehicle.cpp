@@ -256,12 +256,17 @@ void SimpleVehicle::measurePathCurvature(const float elapsedTime)
 	if (elapsedTime > 0)
 	{
 		const OpenSteer::Vec3 dP = _lastPosition - position();
-		const OpenSteer::Vec3 dF = (_lastForward - forward()) / dP.length();
-		const OpenSteer::Vec3 lateral = dF.perpendicularComponent(forward());
-		const float sign = (lateral.dot(side()) < 0) ? 1.0f : -1.0f;
-		_curvature = lateral.length() * sign;
-		OpenSteer::blendIntoAccumulator(elapsedTime * 4.0f, _curvature,
-				_smoothedCurvature);
+		float dPlength = dP.length();
+		if (dPlength > 0.0)
+		{
+			const OpenSteer::Vec3 dF = (_lastForward - forward()) / dPlength;
+			const OpenSteer::Vec3 lateral = dF.perpendicularComponent(
+					forward());
+			const float sign = (lateral.dot(side()) < 0) ? 1.0f : -1.0f;
+			_curvature = lateral.length() * sign;
+			OpenSteer::blendIntoAccumulator(elapsedTime * 4.0f, _curvature,
+					_smoothedCurvature);
+		}
 		_lastForward = forward();
 		_lastPosition = position();
 	}

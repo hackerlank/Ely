@@ -145,22 +145,19 @@ public:
 	void update(const float currentTime, const float elapsedTime)
 	{
 		this->applyBrakingForce(1.5f, elapsedTime);
-///		this->applySteeringForce(this->velocity(), elapsedTime);
-		this->applySteeringForce(this->velocity().setYtoZero(), elapsedTime);
+		this->applySteeringForce(this->velocity(), elapsedTime);
 		// are we now outside the field?
 		if (!m_bbox->InsideX(this->position()))
 		{
 			Vec3 d = this->velocity();
 			this->regenerateOrthonormalBasis(Vec3(-d.x, d.y, d.z));
-///			this->applySteeringForce(this->velocity(), elapsedTime);
-			this->applySteeringForce(this->velocity().setYtoZero(), elapsedTime);
+			this->applySteeringForce(this->velocity(), elapsedTime);
 		}
 		if (!m_bbox->InsideZ(this->position()))
 		{
 			Vec3 d = this->velocity();
 			this->regenerateOrthonormalBasis(Vec3(d.x, d.y, -d.z));
-///			this->applySteeringForce(this->velocity(), elapsedTime);
-			this->applySteeringForce(this->velocity().setYtoZero(), elapsedTime);
+			this->applySteeringForce(this->velocity(), elapsedTime);
 		}
 
 		///call the entity update
@@ -272,15 +269,13 @@ public:
 			Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
 					(AVGroup&) *m_AllPlayers);
 			if (collisionAvoidance != Vec3::zero)
-///				this->applySteeringForce(collisionAvoidance, elapsedTime);
-				this->applySteeringForce(collisionAvoidance.setYtoZero(), elapsedTime);
+				this->applySteeringForce(collisionAvoidance, elapsedTime);
 			else
 			{
 				//reach your home until there is a ball
 				Vec3 seekTarget = this->xxxsteerForSeek(m_home);
 				Vec3 seekHome = this->xxxsteerForSeek(m_home);
-///				this->applySteeringForce(seekTarget + seekHome, elapsedTime);
-				this->applySteeringForce((seekTarget + seekHome).setYtoZero(), elapsedTime);
+				this->applySteeringForce(seekTarget + seekHome, elapsedTime);
 			}
 		}
 		else
@@ -297,8 +292,7 @@ public:
 			Vec3 collisionAvoidance = this->steerToAvoidNeighbors(1,
 					(AVGroup&) *m_AllPlayers);
 			if (collisionAvoidance != Vec3::zero)
-///				this->applySteeringForce(collisionAvoidance, elapsedTime);
-				this->applySteeringForce(collisionAvoidance.setYtoZero(), elapsedTime);
+				this->applySteeringForce(collisionAvoidance, elapsedTime);
 			else
 			{
 				float distHomeToBall = Vec3::distance(m_home,
@@ -312,8 +306,7 @@ public:
 					{
 						Vec3 seekTarget = this->xxxsteerForSeek(
 								m_Ball->position());
-///						this->applySteeringForce(seekTarget, elapsedTime);
-						this->applySteeringForce(seekTarget.setYtoZero(), elapsedTime);
+						this->applySteeringForce(seekTarget, elapsedTime);
 					}
 					else
 					{
@@ -334,11 +327,8 @@ public:
 #endif
 						Vec3 evadeTarget = this->xxxsteerForFlee(
 								m_Ball->position());
-///						this->applySteeringForce(
-///								behindBallForce * 10.0f + evadeTarget,
-///								elapsedTime);
 						this->applySteeringForce(
-								(behindBallForce * 10.0f + evadeTarget).setYtoZero(),
+								behindBallForce * 10.0f + evadeTarget,
 								elapsedTime);
 ///					}
 					}
@@ -347,9 +337,7 @@ public:
 				{
 					Vec3 seekTarget = this->xxxsteerForSeek(m_home);
 					Vec3 seekHome = this->xxxsteerForSeek(m_home);
-///					this->applySteeringForce(seekTarget + seekHome,
-///							elapsedTime);
-					this->applySteeringForce((seekTarget + seekHome).setYtoZero(),
+					this->applySteeringForce(seekTarget + seekHome,
 							elapsedTime);
 				}
 			}

@@ -598,6 +598,7 @@
 				<Param type="NONE"/>
 				<Param add_to_plugin="NONE"/>
 				<Param mov_type="NONE"/>
+				<Param up_axis_fixed="false"/>
 				<Param mass="1.0"/>
 				<Param speed="0.0"/>
 				<Param max_force="1.0"/>

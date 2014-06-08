@@ -168,6 +168,10 @@ bool SteerVehicle::initialize()
 	{
 		mMovType = OPENSTEER;
 	}
+	//up axis fixed
+	mUpAxisFixed = (
+			mTmpl->parameter(std::string("up_axis_fixed"))
+					== std::string("true") ? true : false);
 	//get settings
 	VehicleSettings settings;
 	//mass
@@ -493,9 +497,15 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 		//update node path pos
 		ownerObjectNP.set_pos(updatedPos);
 		//update node path dir
-		ownerObjectNP.heads_up(
-				updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
-				OpenSteerVec3ToLVecBase3f(mVehicle->up()));
+		mUpAxisFixed ?
+			//up axis fixed: z
+			ownerObjectNP.heads_up(
+					updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
+					LVector3f::up()):
+			//up axis free: from mVehicle
+			ownerObjectNP.heads_up(
+						updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
+						OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 
 		//throw Start event (if enabled)
 		if (mStart.mEnable)

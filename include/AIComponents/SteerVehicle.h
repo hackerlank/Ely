@@ -75,6 +75,7 @@ enum SteerVehicleMovType
  * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
  * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
+ * - "up_axis_fixed"			|single|"false"
  * - "mass"						|single|"1.0"
  * - "radius"					|single|no default
  * - "speed"					|single|"0.0"
@@ -165,6 +166,8 @@ private:
 	float mInputRadius;
 	///The movement type.
 	SteerVehicleMovType mMovType;
+	///Flag for up axis fixed (z).
+	bool mUpAxisFixed;
 	/**
 	 * \brief Physics data.
 	 */
@@ -244,6 +247,7 @@ inline void SteerVehicle::reset()
 	mSteerPlugInObjectId = ObjectId();
 	mInputRadius = 0.0;
 	mMovType = OPENSTEER;
+	mUpAxisFixed = false;
 	mBulletWorld.clear();
 	mMaxError = 0.0;
 	mDeltaRayDown = mDeltaRayOrig = LVector3f::zero();
