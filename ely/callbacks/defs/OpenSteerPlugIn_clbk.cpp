@@ -46,10 +46,10 @@ void handleHits(const Event* event, void* data)
 {
 	//get first parameter
 	SMARTPTR(SteerVehicle)steerVehicle =
-			DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
+	DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
 	//
-	PRINT_DEBUG("Got: " << event->get_name() << " - Object: " <<
-	std::string(steerVehicle->getOwnerObject()->objectId()));
+	std::cout << "Got: " << event->get_name() << " - Object: " <<
+			std::string(steerVehicle->getOwnerObject()->objectId()) << std::endl;
 }
 
 #ifdef ELY_DEBUG
