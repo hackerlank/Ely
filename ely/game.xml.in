@@ -126,7 +126,8 @@
 
 		<ObjectTmpl type="OpenSteerPlugIn">
 			<ComponentTmpl family="AI" type="SteerPlugIn">
-				<Param event_types="hit_obstacle:hit_vehicle"/>
+				<Param event_types="path_following:avoid_obstacle"/>
+				<Param event_types="avoid_close_neighbor:avoid_neighbor"/>
 				<Param event_types="toggle_debug"/>
 			</ComponentTmpl>
 		</ObjectTmpl>
@@ -625,7 +626,8 @@
 			<Component type="SteerPlugIn">
 				<Param type="one_turning"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
-				<Param events="hit_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:hit_vehicle@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
+				<Param events="avoid_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:avoid_close_neighbor@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
+				<Param events="path_following@OpenSteerVehicle_SteerVehicle_PathFollowing:avoid_neighbor@OpenSteerVehicle_SteerVehicle_AvoidNeighbor$handleHits"/>
 			</Component>
 		</Object>
 		
