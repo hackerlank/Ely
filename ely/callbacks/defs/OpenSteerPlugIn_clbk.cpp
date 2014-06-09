@@ -33,8 +33,8 @@ extern "C"
 #endif
 
 ///OpenSteerPlugIn related
-#ifdef ELY_DEBUG
 CALLBACK handleHits;
+#ifdef ELY_DEBUG
 CALLBACK steerPluginsToggleDebug;
 #endif
 
@@ -42,7 +42,6 @@ CALLBACK steerPluginsToggleDebug;
 }
 #endif
 
-#ifdef ELY_DEBUG
 void handleHits(const Event* event, void* data)
 {
 	//get first parameter
@@ -53,6 +52,7 @@ void handleHits(const Event* event, void* data)
 	std::string(steerVehicle->getOwnerObject()->objectId()));
 }
 
+#ifdef ELY_DEBUG
 void steerPluginsToggleDebug(const Event* event, void* data)
 {
 	//get data

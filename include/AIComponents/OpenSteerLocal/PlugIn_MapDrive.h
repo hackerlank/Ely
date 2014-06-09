@@ -1570,13 +1570,11 @@ public:
 									rObsPos : rOffset + ((float) R * step));
 			}
 
-#ifdef ELY_DEBUG
 			if (!curvedSteering)
 			{
 				annotateAvoidObstaclesOnMap(lOffset, L, step);
 				annotateAvoidObstaclesOnMap(rOffset, R, step);
 			}
-#endif
 
 			if (curvedSteering)
 			{
@@ -1630,10 +1628,10 @@ public:
 											ignore) / spacing) :
 									map.scanXZray(start, step, raySamples));
 
-#ifdef ELY_DEBUG
 					if (!curvedSteering)
 						annotateAvoidObstaclesOnMap(start, scan, step);
 
+#ifdef ELY_DEBUG
 					if (j == 1)
 					{
 						if ((scan > 0) && (scan < nearestWL))
@@ -1808,17 +1806,22 @@ public:
 	//                                           const Vec3& scanStep)
 	// {
 	// }
-#ifdef ELY_DEBUG
 	void annotateAvoidObstaclesOnMap(const Vec3& scanOrigin, int scanIndex,
 			const Vec3& scanStep)
 	{
+#ifdef ELY_DEBUG
 		if (scanIndex > 0)
 		{
 			const Vec3 hit = scanOrigin + (scanStep * (float) scanIndex);
 			this->annotationLine(scanOrigin, hit, Color(0.7f, 0.3f, 0.3f));
 		}
+#endif
+
+		///call parent::annotateAvoidObstacle
+		VehicleAddOnMixin<SimpleVehicle, Entity>::annotateAvoidObstacle(0.0);
 	}
 
+#ifdef ELY_DEBUG
 	void annotationNoteOAClauseName(const char* clauseName)
 	{
 		OPENSTEER_UNUSED_PARAMETER(clauseName);
@@ -2175,10 +2178,8 @@ public:
 				target = path.mapPathDistanceToPoint(newTargetPathDistance);
 			}
 
-#ifdef ELY_DEBUG
 			this->annotatePathFollowing(futurePosition, onPath, target,
 					futureOutside);
-#endif
 
 			// if we are currently outside head directly in
 			// (QQQ new, experimental, makes it turn in more sharply)
@@ -2262,9 +2263,9 @@ public:
 #ifdef ELY_DEBUG
 			this->annotationLine(futurePosition, futurePosition + pathHeading,
 					gRed);
+#endif
 			annotatePathFollowing(futurePosition, onPath, this->position(),
 					futureOutside);
-#endif
 			// two cases, if entering a turn (a waypoint between path segments)
 			if ( /* path.nearWaypoint (onPath) */isNearWaypoint(path, onPath)
 					&& (futureOutside > 0))
@@ -2987,6 +2988,7 @@ public:
 ///		selectedVehicle = vehicle;
 
 		demoSelect = 2;
+		curvedSteering = true;
 		//set a NULL map
 		map = NULL;
 
@@ -3289,6 +3291,8 @@ public:
 			mapDriver->path = dynamic_cast<GCRoute*>(m_pathway);
 			//set demo select
 			mapDriver->demoSelect = demoSelect;
+			//set curved steering
+			mapDriver->curvedSteering = curvedSteering;
 #ifdef ELY_DEBUG
 			mapDriver->windowWidth = windowWidth;
 #endif
@@ -3307,7 +3311,8 @@ public:
 		pfd = (pfd > 0) ? -1 : +1;
 	}
 
-	void setOptions(int _demoSelect, bool _usePathFences)
+	void setOptions(int _demoSelect = 2, bool _usePathFences = true,
+			bool _curvedSteering = true)
 	{
 		bool dirty = false;
 		if (demoSelect != _demoSelect)
@@ -3325,6 +3330,7 @@ public:
 		{
 			regenerateMap();
 		}
+		curvedSteering = _curvedSteering;
 	}
 
 ///	void togglePathFences(void)
@@ -3332,44 +3338,40 @@ public:
 ///		usePathFences = !usePathFences;
 ///		reset();
 ///	}
-
 ///	void toggleRandomRocks(void)
 ///	{
 ///		useRandomRocks = !useRandomRocks;
 ///		reset();
 ///	}
-
-	void toggleCurvedSteering(MapDriver<Entity>* vehicle)
-	{
-		vehicle->curvedSteering = !vehicle->curvedSteering;
-		vehicle->incrementalSteering = !vehicle->incrementalSteering;
-		vehicle->reset();
-	}
-
-	void selectNextDemo(MapDriver<Entity>* vehicle)
-	{
-		std::ostringstream message;
-		message << name() << ": ";
-		switch (++vehicle->demoSelect)
-		{
-		case 0:
-			message << "obstacle avoidance and speed control";
-			vehicle->reset();
-			break;
-		case 1:
-			message << "wander, obstacle avoidance and speed control";
-			vehicle->reset();
-			break;
-		case 2:
-			message << "path following, obstacle avoidance and speed control";
-			vehicle->reset();
-			break;
-		default:
-			vehicle->demoSelect = 0; // wrap-around, falls through to case 0:
-			break;
-		}
-		message << std::ends;
-	}
+///	void toggleCurvedSteering(void)
+///	{
+///		vehicle->curvedSteering = !vehicle->curvedSteering;
+///		vehicle->incrementalSteering = !vehicle->incrementalSteering;
+///		reset();
+///	}
+///	void selectNextDemo(void)
+///	{
+///		std::ostringstream message;
+///		message << name() << ": ";
+///		switch (++vehicle->demoSelect)
+///		{
+///		default:
+///			vehicle->demoSelect = 0; // wrap-around, falls through to case 0:
+///		case 0:
+///			message << "obstacle avoidance and speed control";
+///			reset();
+///			break;
+///		case 1:
+///			message << "wander, obstacle avoidance and speed control";
+///			reset();
+///			break;
+///		case 2:
+///			message << "path following, obstacle avoidance and speed control";
+///			reset();
+///			break;
+///		}
+///		message << std::ends;
+///	}
 
 	void regenerateMap(void)
 	{
@@ -4125,6 +4127,7 @@ public:
 
 	// which of the three demo modes is selected
 	int demoSelect;
+	bool curvedSteering;
 
 #ifdef ELY_DEBUG
 	float windowWidth;

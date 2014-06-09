@@ -115,6 +115,7 @@ enum DemoSelect
 	demo_select_0, demo_select_1, demo_select_2
 } demoSelect = demo_select_2;
 bool usePathFences = true;
+bool curvedSteering = true;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -555,6 +556,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 						steerPlugInOptionsMenu->GetElementById(
 								"use_path_fences_no")->SetAttribute(
 								"checked", true);
+				//curved steering
+				curvedSteering ?
+						steerPlugInOptionsMenu->GetElementById(
+								"curved_steering_yes")->SetAttribute(
+								"checked", true) :
+						steerPlugInOptionsMenu->GetElementById(
+								"curved_steering_no")->SetAttribute(
+								"checked", true);
 			}
 		}
 	}
@@ -694,6 +703,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 						usePathFences = true :
 						//paramValue == "no"
 						usePathFences = false;
+				//curved steering
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"curved_steering", "");
+				paramValue == "yes" ?
+						curvedSteering = true :
+						//paramValue == "no"
+						curvedSteering = false;
 			}
 			else
 			{
@@ -898,7 +914,7 @@ void add_vehicle(const Event* event)
 		compParams["SteerVehicle"].erase("up_axis_fixed");
 		compParams["InstanceOf"].erase("instance_of");
 		compParams["InstanceOf"].erase("scale");
-		//set SteerVehicle type, mov_type, max_speed, max_force, up_axis_fixed
+		//set SteerVehicle type, mov_type, max_speed, max_force, up_axis_fixed, thrown_events
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("type",
 						"map_driver"));
@@ -910,6 +926,9 @@ void add_vehicle(const Event* event)
 				std::pair<std::string, std::string>("max_force", "8"));
 		compParams["SteerVehicle"].insert(
 				std::pair<std::string, std::string>("up_axis_fixed", "true"));
+		compParams["SteerVehicle"].insert(
+				std::pair<std::string, std::string>("thrown_events",
+						"avoid_obstacle@@3:path_following@@"));
 		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].insert(
 				std::pair<std::string, std::string>("instance_of", "vehicle1"));
@@ -1169,7 +1188,7 @@ void rocketMapDriveCommit()
 	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
 			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
-	mapDrivePlugIn->setOptions(demoSelect, usePathFences);
+	mapDrivePlugIn->setOptions(demoSelect, usePathFences, curvedSteering);
 }
 
 //called by all steer plugins, executed only once
