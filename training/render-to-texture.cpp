@@ -24,8 +24,17 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <load_prc_file.h>
+#include <animControlCollection.h>
+#include <auto_bind.h>
+#include <cardMaker.h>
+#include <textureStage.h>
+#include <orthographicLens.h>
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
+
+NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework* window,
+		const std::string& actorName, std::vector<std::string>& animNames,
+		AnimControlCollection& animCollection);
 
 int render_to_texture_main(int argc, char *argv[])
 {
@@ -56,11 +65,57 @@ int render_to_texture_main(int argc, char *argv[])
 	}
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
-	trackball->set_hpr(0, 15, 0);
+//	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
+	PT(GraphicsOutput)mybuffer = window->get_graphics_output()->make_texture_buffer("My Buffer",
+			512, 512);
+	PT(Texture)mytexture = mybuffer->get_texture();
+	mybuffer->set_sort(-100);
+	PT(DisplayRegion)region = mybuffer->make_display_region();
+	PT(Camera)mycamera = new Camera("my camera");
+	PT(Lens)lens = new OrthographicLens();
+	lens->set_film_size(10.0, 10.0);
+	lens->set_near_far(-10000.0, 10000.0);
+	std::cout << lens->get_film_size() << std::endl;
+	std::cout << lens->get_near() << "-" << lens->get_far() << std::endl;
+	mycamera->set_lens(lens);
+	NodePath mycameraNP = NodePath(mycamera);
+	region->set_camera(mycameraNP);
+	NodePath newRend("newRend");
+	mycameraNP.reparent_to(newRend);
+
+	//actor
+	AnimControlCollection anims;
+	std::vector<std::string> animNames;
+	animNames.push_back("eve-walk.bam");
+	NodePath ely = loadActorAndAnims(framework, window, "eve.bam", animNames,
+			anims);
+	ely.set_scale(1.0);
+	ely.set_pos(0, 0, 0);
+//	ely.set_pos(0, 15, -1.5);
+//	ely.reparent_to(window->get_render());
+	anims.get_anim(0)->loop(true);
+	//texturing
+//	mycameraNP.reparent_to(ely);
+	ely.reparent_to(newRend);
+
+	//mirror
+	CardMaker mirrorCard("mirror");
+	mirrorCard.set_frame(-10.0, 10.0, -10.0, 10.0);
+	mirrorCard.set_uv_range(LTexCoord(0.0, 0.0), LTexCoord(1.0, 0.0),
+			LTexCoord(1.0, 1.0), LTexCoord(0.0, 1.0));
+	NodePath mirror = NodePath(mirrorCard.generate());
+	PT(TextureStage)textureStage0 = new TextureStage("mirror_TextureStage0");
+	mirror.set_tex_scale(textureStage0, 1.0, 1.0);
+	mirror.set_texture(textureStage0, mytexture, 1);
+	mirror.set_scale(1.0);
+	mirror.set_pos(0, -150, 40);
+	mirror.set_hpr(0, 0, 0);
+//	mirror.reparent_to(ely);
+	mirror.reparent_to(window->get_render());
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -69,3 +124,22 @@ int render_to_texture_main(int argc, char *argv[])
 	return (0);
 }
 
+NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework* window,
+		const std::string& actorName, std::vector<std::string>& animNames,
+		AnimControlCollection& animCollection)
+{
+	NodePath actor = window->load_model(framework.get_models(), actorName);
+	//load animations
+	for (unsigned int i = 0; i < animNames.size(); ++i)
+	{
+		window->load_model(actor, animNames[i]);
+	}
+	if (animNames.size())
+	{
+		//bind animations
+		auto_bind(actor.node(), animCollection,
+				PartGroup::HMF_ok_wrong_root_name | PartGroup::HMF_ok_part_extra
+						| PartGroup::HMF_ok_anim_extra);
+	}
+	return actor;
+}
