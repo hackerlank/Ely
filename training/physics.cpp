@@ -59,7 +59,7 @@ int physics_main(int argc, char **argv)
 		window->setup_trackball(); // Enable default camera movement
 	}
 	//physics
-	SMARTPTR(BulletWorld)physicsWorld = new BulletWorld();
+	SMARTPTR(ely::BulletWorld)physicsWorld = new ely::BulletWorld();
 	physicsWorld->set_gravity(0.0, 0.0, -9.81);
 	//physics: advance the simulation state
 	AsyncTask* task = new GenericAsyncTask("update physics", &update_physics,
@@ -85,13 +85,13 @@ int physics_main(int argc, char **argv)
 	ropeNP.set_name("rope");
 
 	//Soft body world information
-	BulletSoftBodyWorldInfo info = physicsWorld->get_world_info();
+	ely::BulletSoftBodyWorldInfo info = physicsWorld->get_world_info();
 	info.set_air_density(1.2);
 	info.set_water_density(0);
 	info.set_water_offset(0);
 	info.set_water_normal(LVector3f::zero());
 	//create soft rope
-	SMARTPTR(BulletSoftBodyNode)softRopeNode = BulletSoftBodyNode::make_rope(info, LPoint3f(-2, -1, 8),
+	SMARTPTR(ely::BulletSoftBodyNode)softRopeNode = ely::BulletSoftBodyNode::make_rope(info, LPoint3f(-2, -1, 8),
 			LPoint3f(8, -1, 8), 16, 1);
 	//link with NURBS curve
 	SMARTPTR(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
@@ -125,7 +125,7 @@ AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data)
 	//lock (guard) the mutex
 	HOLD_MUTEX(mMutex)
 
-	BulletWorld* physicsWorld = reinterpret_cast<BulletWorld*>(data);
+	ely::BulletWorld* physicsWorld = reinterpret_cast<ely::BulletWorld*>(data);
 
 	float dt = ClockObject::get_global_clock()->get_dt();
 
