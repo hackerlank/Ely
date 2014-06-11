@@ -67,23 +67,21 @@ int render_to_texture_main(int argc, char *argv[])
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
 	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
-//	trackball->set_hpr(0, 15, 0);
+	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
 	PT(GraphicsOutput)mybuffer = window->get_graphics_output()->make_texture_buffer("My Buffer",
 			512, 512);
 	PT(Texture)mytexture = mybuffer->get_texture();
-	mybuffer->set_sort(-100);
 	PT(DisplayRegion)region = mybuffer->make_display_region();
 	PT(Camera)mycamera = new Camera("my camera");
 	PT(Lens)lens = new OrthographicLens();
-	lens->set_film_size(10.0, 10.0);
-	lens->set_near_far(-10000.0, 10000.0);
-	std::cout << lens->get_film_size() << std::endl;
-	std::cout << lens->get_near() << "-" << lens->get_far() << std::endl;
+	lens->set_film_size(6.0, 6.0);
+	lens->set_near_far(-1000.0, 1000.0);
 	mycamera->set_lens(lens);
 	NodePath mycameraNP = NodePath(mycamera);
 	region->set_camera(mycameraNP);
+	mycameraNP.set_pos(0, 0, 2.5);
 	NodePath newRend("newRend");
 	mycameraNP.reparent_to(newRend);
 
@@ -95,11 +93,8 @@ int render_to_texture_main(int argc, char *argv[])
 			anims);
 	ely.set_scale(1.0);
 	ely.set_pos(0, 0, 0);
-//	ely.set_pos(0, 15, -1.5);
-//	ely.reparent_to(window->get_render());
 	anims.get_anim(0)->loop(true);
 	//texturing
-//	mycameraNP.reparent_to(ely);
 	ely.reparent_to(newRend);
 
 	//mirror
@@ -109,12 +104,13 @@ int render_to_texture_main(int argc, char *argv[])
 			LTexCoord(1.0, 1.0), LTexCoord(0.0, 1.0));
 	NodePath mirror = NodePath(mirrorCard.generate());
 	PT(TextureStage)textureStage0 = new TextureStage("mirror_TextureStage0");
-	mirror.set_tex_scale(textureStage0, 1.0, 1.0);
+	mirror.set_tex_scale(textureStage0, 2.0, 2.0);
+	mytexture->set_wrap_u(Texture::WM_repeat);
+	mytexture->set_wrap_v(Texture::WM_repeat);
 	mirror.set_texture(textureStage0, mytexture, 1);
 	mirror.set_scale(1.0);
-	mirror.set_pos(0, -150, 40);
 	mirror.set_hpr(0, 0, 0);
-//	mirror.reparent_to(ely);
+	mirror.set_pos(0, 0, 0);
 	mirror.reparent_to(window->get_render());
 
 	//do the main loop, equal to run() in python
