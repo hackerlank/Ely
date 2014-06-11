@@ -72,6 +72,7 @@ int render_to_texture_main(int argc, char *argv[])
 	///here is room for your own code
 	PT(GraphicsOutput)mybuffer = window->get_graphics_output()->make_texture_buffer("My Buffer",
 			512, 512);
+	mybuffer->set_one_shot(true);
 	PT(Texture)mytexture = mybuffer->get_texture();
 	PT(DisplayRegion)region = mybuffer->make_display_region();
 	PT(Camera)mycamera = new Camera("my camera");
