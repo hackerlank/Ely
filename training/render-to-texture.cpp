@@ -104,7 +104,7 @@ int render_to_texture_main(int argc, char *argv[])
 	//mirror
 	float xDim = 20, yDim = 20;
 	float xDimMap = 4, yDimMap = 4;
-	float xCentMap = 3, yCentMap = 17;
+	float xCentMap = 3, yCentMap = 18;
 	CardMaker mirrorCard("mirror");
 	mirrorCard.set_frame(-xDim / 2.0, xDim / 2.0, -yDim / 2.0, yDim / 2.0);
 	mirrorCard.set_uv_range(LTexCoord(0.0, 0.0), LTexCoord(1.0, 0.0),
@@ -125,13 +125,12 @@ int render_to_texture_main(int argc, char *argv[])
 //	tex1->set_wrap_u(Texture::WM_repeat);
 //	tex1->set_wrap_v(Texture::WM_repeat);
 	//tex1 transform
-	///TODO
 	float uOff, vOff;
 	float uScale, vScale;
-	uOff = xDim / 2.0 - xCentMap;
-	vOff = yDim / 2.0 - yCentMap;
 	uScale = xDim / xDimMap;
 	vScale = yDim / yDimMap;
+	uOff = xCentMap / xDim * uScale - 0.5;
+	vOff = yCentMap / yDim * vScale - 0.5;
 	mirror.set_tex_scale(texStage1, uScale, vScale);
 	mirror.set_tex_offset(texStage1, -uOff, -vOff);
 	mirror.set_tex_rotate(texStage1, 0);
