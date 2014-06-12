@@ -28,11 +28,12 @@
 #include <auto_bind.h>
 #include <cardMaker.h>
 #include <textureStage.h>
+#include <texturePool.h>
 #include <orthographicLens.h>
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
 
-NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework* window,
+NodePath loadAnims(PandaFramework& framework, WindowFramework* window,
 		const std::string& actorName, std::vector<std::string>& animNames,
 		AnimControlCollection& animCollection);
 
@@ -70,11 +71,15 @@ int render_to_texture_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
+
+	//tex1: rendered texture
 	PT(GraphicsOutput)mybuffer = window->get_graphics_output()->make_texture_buffer("My Buffer",
 			512, 512);
 	mybuffer->set_one_shot(true);
-	PT(Texture)mytexture = mybuffer->get_texture();
+	PT(Texture)tex1 = mybuffer->get_texture();
 	PT(DisplayRegion)region = mybuffer->make_display_region();
+	region->set_clear_color_active(true);
+	region->set_clear_color(LColorf(1, 1, 1, 1));
 	PT(Camera)mycamera = new Camera("my camera");
 	PT(Lens)lens = new OrthographicLens();
 	lens->set_film_size(6.0, 6.0);
@@ -85,13 +90,11 @@ int render_to_texture_main(int argc, char *argv[])
 	mycameraNP.set_pos(0, 0, 2.5);
 	NodePath newRend("newRend");
 	mycameraNP.reparent_to(newRend);
-
 	//actor
 	AnimControlCollection anims;
 	std::vector<std::string> animNames;
 	animNames.push_back("eve-walk.bam");
-	NodePath ely = loadActorAndAnims(framework, window, "eve.bam", animNames,
-			anims);
+	NodePath ely = loadAnims(framework, window, "eve.bam", animNames, anims);
 	ely.set_scale(1.0);
 	ely.set_pos(0, 0, 0);
 	anims.get_anim(0)->loop(true);
@@ -99,16 +102,42 @@ int render_to_texture_main(int argc, char *argv[])
 	ely.reparent_to(newRend);
 
 	//mirror
+	float xDim = 20, yDim = 20;
+	float xDimMap = 4, yDimMap = 4;
+	float xCentMap = 3, yCentMap = 17;
 	CardMaker mirrorCard("mirror");
-	mirrorCard.set_frame(-10.0, 10.0, -10.0, 10.0);
+	mirrorCard.set_frame(-xDim / 2.0, xDim / 2.0, -yDim / 2.0, yDim / 2.0);
 	mirrorCard.set_uv_range(LTexCoord(0.0, 0.0), LTexCoord(1.0, 0.0),
 			LTexCoord(1.0, 1.0), LTexCoord(0.0, 1.0));
 	NodePath mirror = NodePath(mirrorCard.generate());
-	PT(TextureStage)textureStage0 = new TextureStage("mirror_TextureStage0");
-	mirror.set_tex_scale(textureStage0, 2.0, 2.0);
-	mytexture->set_wrap_u(Texture::WM_repeat);
-	mytexture->set_wrap_v(Texture::WM_repeat);
-	mirror.set_texture(textureStage0, mytexture, 1);
+	PT(TextureStage)texStage0 = new TextureStage("texStage0");
+	//tex0
+	PT(Texture)tex0 = TexturePool::load_texture(
+			Filename(baseDir + "data/textures/terrain.png"));
+	mirror.set_tex_scale(texStage0, 1.0, 1.0);
+	mirror.set_texture(texStage0, tex0, 0);
+	//tex1
+	PT(TextureStage)texStage1 = new TextureStage("texStage1");
+//	texStage1->set_mode(TextureStage::M_blend);
+//	texStage1->set_mode(TextureStage::M_replace);
+//	texStage1->set_mode(TextureStage::M_add);
+	texStage1->set_mode(TextureStage::M_modulate);
+//	tex1->set_wrap_u(Texture::WM_repeat);
+//	tex1->set_wrap_v(Texture::WM_repeat);
+	//tex1 transform
+	///TODO
+	float uOff, vOff;
+	float uScale, vScale;
+	uOff = xDim / 2.0 - xCentMap;
+	vOff = yDim / 2.0 - yCentMap;
+	uScale = xDim / xDimMap;
+	vScale = yDim / yDimMap;
+	mirror.set_tex_scale(texStage1, uScale, vScale);
+	mirror.set_tex_offset(texStage1, -uOff, -vOff);
+	mirror.set_tex_rotate(texStage1, 0);
+	//
+	mirror.set_texture(texStage1, tex1, 1);
+	//
 	mirror.set_scale(1.0);
 	mirror.set_hpr(0, 0, 0);
 	mirror.set_pos(0, 0, 0);
@@ -121,7 +150,7 @@ int render_to_texture_main(int argc, char *argv[])
 	return (0);
 }
 
-NodePath loadActorAndAnims(PandaFramework& framework, WindowFramework* window,
+NodePath loadAnims(PandaFramework& framework, WindowFramework* window,
 		const std::string& actorName, std::vector<std::string>& animNames,
 		AnimControlCollection& animCollection)
 {
