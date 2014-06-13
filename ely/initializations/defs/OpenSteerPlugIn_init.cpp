@@ -1057,6 +1057,12 @@ void remove_vehicle(const Event* event)
 	}
 }
 
+//helper
+void drawTextureOnTerrain()
+{
+	///TODO
+}
+
 //preset function called from main menu
 void rocketPreset()
 {
@@ -1189,6 +1195,7 @@ void rocketMapDriveCommit()
 			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
 	mapDrivePlugIn->setOptions(demoSelect, usePathFences, curvedSteering);
+	drawTextureOnTerrain();
 }
 
 //called by all steer plugins, executed only once
@@ -1425,6 +1432,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	float dY =  minMaxY[1] - minMaxY[0];
 	mapDrivePlugIn->makeMap(LVecBase3fToOpenSteerVec3(mapCenter),
 			max(dX, dY) + maxRadius * 5.0, 200);
+	drawTextureOnTerrain();
 	///init libRocket
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
