@@ -77,7 +77,15 @@ enum SteerPlugInType
 	map_drive,
 	none
 } activeSteerPlugInType = none;
-///XXX
+
+//XXX Render-To-Texture (rtt) stuff
+bool rttDone = false;
+DrawMeshDrawer* rttMeshDrawer = NULL;
+NodePath rttRender, rttCamera;
+SMARTPTR(GraphicsOutput) rttBuffer;
+SMARTPTR(DisplayRegion) rttRegion;
+
+///
 const char* steerPlugInNames[] =
 {
 	"one_turning",
@@ -91,9 +99,13 @@ const char* steerPlugInNames[] =
 	"none"
 };
 //common globals
+#define ENVIRONMENTOBJECT "Terrain1"
+#define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
+//boid globals
+#define WORLDCENTEROBJECT "beachhouse2_1"
 //multiple_pursuit globals
 ObjectId mpWandererObjectId, mpNewWanderedObjectId;
 bool mpWandererExternalUpdate = false;
@@ -724,7 +736,6 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	}
 }
 
-#define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 void add_vehicle(const Event* event)
 {
 	RETURN_ON_COND(activeSteerPlugInType == none,)
@@ -1058,9 +1069,77 @@ void remove_vehicle(const Event* event)
 }
 
 //helper
-void drawTextureOnTerrain()
+//called by some steer plugins, executed only once
+bool rttInitOnce()
 {
-	///TODO
+	SMARTPTR(Object)terrainObj =
+	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ENVIRONMENTOBJECT);
+	RETURN_ON_COND(not terrainObj, false)
+
+	SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent("Scene"));
+	RETURN_ON_COND(not terrain, false)
+
+	GeoMipTerrainRef& terrainRef = terrain->getGeoMipTerrain();
+	float xScale = terrainRef.get_root().get_sx();
+	float yScale = terrainRef.get_root().get_sy();
+	float terrainWidthX = (terrainRef.heightfield().get_x_size() - 1) * xScale;
+	float terrainWidthY = (terrainRef.heightfield().get_y_size() - 1) * yScale;
+
+	//create a graphic output buffer where to render
+	rttBuffer =
+			GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
+					"My Buffer", 512, 512);
+	//set it "one shot"
+	rttBuffer->set_one_shot(true);
+	//start it inactive
+	rttBuffer->set_active(false);
+	//create a display region
+	rttRegion = rttBuffer->make_display_region();
+	rttRegion->set_clear_color_active(true);
+	rttRegion->set_clear_color(LColorf(1, 1, 1, 1));
+	//set the camera for the buffer display region
+	rttCamera = NodePath(new Camera("my camera"));
+	DCAST(Camera, rttCamera.node())->set_lens(new OrthographicLens());
+	DCAST(Camera, rttCamera.node())->get_lens()->set_film_size(terrainWidthX,
+			terrainWidthY);
+	DCAST(Camera, rttCamera.node())->get_lens()->set_near_far(-1000.0,
+			1000.0);
+	//look down
+	rttCamera.set_hpr(0, -90, 0);
+	rttRegion->set_camera(rttCamera);
+	rttCamera.reparent_to(rttRender);
+	//set up texture where to render
+	SMARTPTR(TextureStage)texStage = new TextureStage("rttTexStage");
+	texStage->set_mode(TextureStage::M_modulate);
+	terrainRef.get_root().set_texture(texStage, rttBuffer->get_texture(), 10);
+	//
+	rttMeshDrawer = new DrawMeshDrawer(rttRender, rttCamera, 100, 0.04);
+	//
+	return true;
+}
+void drawTextureOnTerrainOnce()
+{
+	RETURN_ON_COND(rttDone, )
+
+	RETURN_ON_COND(not rttInitOnce(), )
+
+	//activate buffer
+	rttBuffer->set_active(true);
+	//set drawer
+	rttMeshDrawer->reset();
+	gDrawer3d = rttMeshDrawer;
+	//map drive drawing
+	if(steerPlugIns.find(map_drive) != steerPlugIns.end())
+	{
+		//render to texture
+		MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
+		dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIns[map_drive])->
+		getAbstractPlugIn());
+		mapDrivePlugIn->drawMap();
+		mapDrivePlugIn->drawPath();
+	}
+	//flag rtt initialized
+	rttDone = true;
 }
 
 //preset function called from main menu
@@ -1195,7 +1274,7 @@ void rocketMapDriveCommit()
 			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
 	mapDrivePlugIn->setOptions(demoSelect, usePathFences, curvedSteering);
-	drawTextureOnTerrain();
+	drawTextureOnTerrainOnce();
 }
 
 //called by all steer plugins, executed only once
@@ -1245,7 +1324,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 }
 
 ///steerPlugInBoid1
-#define WORLDCENTEROBJECT "beachhouse2_1"
 void steerPlugInBoid1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
@@ -1432,7 +1510,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	float dY =  minMaxY[1] - minMaxY[0];
 	mapDrivePlugIn->makeMap(LVecBase3fToOpenSteerVec3(mapCenter),
 			max(dX, dY) + maxRadius * 5.0, 200);
-	drawTextureOnTerrain();
 	///init libRocket
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
@@ -1468,5 +1545,6 @@ void OpenSteerPlugIn_initInit()
 
 void OpenSteerPlugIn_initEnd()
 {
+	delete rttMeshDrawer;
 }
 

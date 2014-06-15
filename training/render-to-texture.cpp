@@ -30,12 +30,24 @@
 #include <textureStage.h>
 #include <texturePool.h>
 #include <orthographicLens.h>
+#include <nodePathCollection.h>
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
-
+PandaFramework framework;
+WindowFramework *window;
 NodePath loadAnims(PandaFramework& framework, WindowFramework* window,
 		const std::string& actorName, std::vector<std::string>& animNames,
 		AnimControlCollection& animCollection);
+
+void renderToTexure(const Event * event, void * data);
+PT(GraphicsOutput)mybuffer;
+PT(DisplayRegion)region;
+NodePath newRend, mycameraNP, actor, mirror;
+PT(TextureStage)texStage1;
+AnimControlCollection anims;
+int changeActor = 0;
+float xDim = 20, yDim = 20;
+float xDimMap = 4, yDimMap = 4;
 
 int render_to_texture_main(int argc, char *argv[])
 {
@@ -51,12 +63,11 @@ int render_to_texture_main(int argc, char *argv[])
 	load_prc_file_data("", "audio-preload-threshold 2000000");
 	load_prc_file_data("", "sync-video #t");
 	//open a new window framework
-	PandaFramework framework;
 	framework.open_framework(argc, argv);
 	//set the window title to My Panda3D Window
 	framework.set_window_title("My Panda3D Window");
 	//open the window
-	WindowFramework *window = framework.open_window();
+	window = framework.open_window();
 	if (window != (WindowFramework *) NULL)
 	{
 		std::cout << "Opened the window successfully!\n";
@@ -72,75 +83,34 @@ int render_to_texture_main(int argc, char *argv[])
 
 	///here is room for your own code
 
-	//tex1: rendered texture
-	PT(GraphicsOutput)mybuffer = window->get_graphics_output()->make_texture_buffer("My Buffer",
-			512, 512);
-	mybuffer->set_one_shot(true);
-	PT(Texture)tex1 = mybuffer->get_texture();
-	PT(DisplayRegion)region = mybuffer->make_display_region();
-	region->set_clear_color_active(true);
-	region->set_clear_color(LColorf(1, 1, 1, 1));
-	PT(Camera)mycamera = new Camera("my camera");
-	PT(Lens)lens = new OrthographicLens();
-	lens->set_film_size(6.0, 6.0);
-	lens->set_near_far(-1000.0, 1000.0);
-	mycamera->set_lens(lens);
-	NodePath mycameraNP = NodePath(mycamera);
-	region->set_camera(mycameraNP);
-	mycameraNP.set_pos(0, 0, 2.5);
-	NodePath newRend("newRend");
+	mybuffer.clear();
+	region.clear();
+	texStage1 = new TextureStage("texStage1");
+	newRend = NodePath("newRend");
+	mycameraNP = NodePath(new Camera("my camera"));
 	mycameraNP.reparent_to(newRend);
-	//actor
-	AnimControlCollection anims;
-	std::vector<std::string> animNames;
-	animNames.push_back("eve-walk.bam");
-	NodePath ely = loadAnims(framework, window, "eve.bam", animNames, anims);
-	ely.set_scale(1.0);
-	ely.set_pos(0, 0, 0);
-	anims.get_anim(0)->loop(true);
-	//texturing
-	ely.reparent_to(newRend);
 
 	//mirror
-	float xDim = 20, yDim = 20;
-	float xDimMap = 4, yDimMap = 4;
-	float xCentMap = 3, yCentMap = 18;
 	CardMaker mirrorCard("mirror");
 	mirrorCard.set_frame(-xDim / 2.0, xDim / 2.0, -yDim / 2.0, yDim / 2.0);
 	mirrorCard.set_uv_range(LTexCoord(0.0, 0.0), LTexCoord(1.0, 0.0),
 			LTexCoord(1.0, 1.0), LTexCoord(0.0, 1.0));
-	NodePath mirror = NodePath(mirrorCard.generate());
+	mirror = NodePath(mirrorCard.generate());
 	PT(TextureStage)texStage0 = new TextureStage("texStage0");
 	//tex0
 	PT(Texture)tex0 = TexturePool::load_texture(
 			Filename(baseDir + "data/textures/terrain.png"));
 	mirror.set_tex_scale(texStage0, 1.0, 1.0);
 	mirror.set_texture(texStage0, tex0, 0);
-	//tex1
-	PT(TextureStage)texStage1 = new TextureStage("texStage1");
-//	texStage1->set_mode(TextureStage::M_blend);
-//	texStage1->set_mode(TextureStage::M_replace);
-//	texStage1->set_mode(TextureStage::M_add);
-	texStage1->set_mode(TextureStage::M_modulate);
-//	tex1->set_wrap_u(Texture::WM_repeat);
-//	tex1->set_wrap_v(Texture::WM_repeat);
-	//tex1 transform
-	float uOff, vOff;
-	float uScale, vScale;
-	uScale = xDim / xDimMap;
-	vScale = yDim / yDimMap;
-	uOff = xCentMap / xDim * uScale - 0.5;
-	vOff = yCentMap / yDim * vScale - 0.5;
-	mirror.set_tex_scale(texStage1, uScale, vScale);
-	mirror.set_tex_offset(texStage1, -uOff, -vOff);
-	mirror.set_tex_rotate(texStage1, 0);
-	//
-	mirror.set_texture(texStage1, tex1, 1);
 	//
 	mirror.set_scale(1.0);
 	mirror.set_hpr(0, 0, 0);
 	mirror.set_pos(0, 0, 0);
 	mirror.reparent_to(window->get_render());
+
+	//set event callback
+	EventHandler::get_global_event_handler()->add_hook("g", &renderToTexure,
+			static_cast<void*>(NULL));
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -167,4 +137,94 @@ NodePath loadAnims(PandaFramework& framework, WindowFramework* window,
 						| PartGroup::HMF_ok_anim_extra);
 	}
 	return actor;
+}
+
+void renderToTexure(const Event * event, void * data)
+{
+	//remove old buffer if any
+	if (mybuffer)
+	{
+		mybuffer->clear_render_textures();
+		window->get_graphics_window()->get_engine()->remove_window(mybuffer);
+	}
+	mirror.clear_texture(texStage1);
+	//remove all child
+	NodePathCollection children = newRend.get_children();
+	for (int i = 0; i<children.get_num_paths(); ++i)
+	{
+		if (children[i].node()->is_of_type(Camera::get_class_type()))
+		{
+			continue;
+		}
+		children[i].remove_node();
+	}
+
+	//tex1: rendered texture
+	mybuffer = window->get_graphics_output()->make_texture_buffer("My Buffer",
+			512, 512);
+	mybuffer->set_one_shot(true);
+	region = mybuffer->make_display_region();
+	region->set_clear_color_active(true);
+	region->set_clear_color(LColorf(1, 1, 1, 1));
+	DCAST(Camera, mycameraNP.node())->set_lens(new OrthographicLens());
+	DCAST(Camera, mycameraNP.node())->get_lens()->set_film_size(6.0, 6.0);
+	DCAST(Camera, mycameraNP.node())->get_lens()->set_near_far(-1000.0,
+			1000.0);
+	region->set_camera(mycameraNP);
+	mycameraNP.set_pos(0, 0, 2.5);
+//	mycameraNP.set_hpr(0, -90, 0);
+	mycameraNP.set_hpr(0, 0, 0);
+
+	changeActor = changeActor % 2;
+	std::string model,anim;
+	switch (changeActor)
+	{
+		case 0:
+			model = "eve.bam";
+			anim = "eve-walk.bam";
+			break;
+		case 1:
+			model = "panda.bam";
+			anim = "panda-walk.bam";
+			break;
+		default:
+			break;
+	}
+	++changeActor;
+
+	//actors
+	anims.clear_anims();
+	std::vector<std::string> animNames;
+	animNames.push_back(anim);
+	actor = loadAnims(framework, window, model, animNames, anims);
+	actor.set_scale(1.0);
+	actor.set_pos(0, 0, 0);
+//	LPoint3f minP, maxP;
+//	actor.calc_tight_bounds(minP, maxP);
+//	LVecBase3f dims = maxP - minP;
+	anims.get_anim(0)->loop(true);
+	//texturing
+	actor.reparent_to(newRend);
+	//
+	//tex1
+//	texStage1 = new TextureStage("texStage1");
+//	texStage1->set_mode(TextureStage::M_blend);
+//	texStage1->set_mode(TextureStage::M_replace);
+//	texStage1->set_mode(TextureStage::M_add);
+	texStage1->set_mode(TextureStage::M_modulate);
+//	tex1->set_wrap_u(Texture::WM_repeat);
+//	tex1->set_wrap_v(Texture::WM_repeat);
+	//tex1 transform
+	float xCentMap = 3, yCentMap = 18;
+	float uOff, vOff;
+	float uScale, vScale;
+	uScale = xDim / xDimMap;
+	vScale = yDim / yDimMap;
+	uOff = xCentMap / xDim * uScale - 0.5;
+	vOff = yCentMap / yDim * vScale - 0.5;
+	mirror.set_tex_scale(texStage1, uScale, vScale);
+	mirror.set_tex_offset(texStage1, -uOff, -vOff);
+	mirror.set_tex_rotate(texStage1, 0);
+	//
+	mirror.set_texture(texStage1, mybuffer->get_texture(), 1);
 }
