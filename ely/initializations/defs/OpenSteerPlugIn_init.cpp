@@ -1070,6 +1070,7 @@ void remove_vehicle(const Event* event)
 	}
 }
 
+#ifdef ELY_DEBUG
 //helper
 //render plugins' static drawing
 AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
@@ -1077,18 +1078,7 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 {
 	if(rttInitDone)
 	{
-		//render-to-texture already initialized: re-render
-		//remove all child
-		NodePathCollection children = rttRender.get_children();
-		for (int i = 0; i < children.get_num_paths(); ++i)
-		{
-			if (children[i].node()->is_of_type(Camera::get_class_type()))
-			{
-				continue;
-			}
-			children[i].remove_node();
-		}
-		//render next frame
+		//render-to-texture already initialized: re-render next frame
 		rttBuffer->set_one_shot(true);
 	}
 	else
@@ -1154,10 +1144,19 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		getAbstractPlugIn());
 		mapDrivePlugIn->drawMap();
 		mapDrivePlugIn->drawPath();
+
+		///XXX test
+		NodePath actor =
+				GameManager::GetSingletonPtr()->windowFramework()->
+				load_model(GameManager::GetSingletonPtr()->pandaFramework()->get_models(), "eve.bam");
+		actor.reparent_to(rttRender);
+		actor.set_hpr(0, 90, 0);
+		actor.set_scale(500);
 	}
 	//
 	return AsyncTask::DS_done;
 }
+#endif
 
 //preset function called from main menu
 void rocketPreset()
@@ -1179,6 +1178,7 @@ void rocketCommit()
 	EventHandler::get_global_event_handler()->add_hook(removeKey,
 			&remove_vehicle);
 
+#ifdef ELY_DEBUG
 	//set render to texture task
 	SMARTPTR(GenericAsyncTask)renderTask =
 			new GenericAsyncTask("renderTexturesOnTerrain",
@@ -1187,6 +1187,7 @@ void rocketCommit()
 	renderTask->set_priority(0);
 	renderTask->set_task_chain("default");
 	AsyncTaskManager::get_global_ptr()->add(renderTask);
+#endif
 }
 
 //helper commit for mp and ctf
