@@ -33,8 +33,11 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MapDrive.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "SceneComponents/Terrain.h"
+#include "Game/GameManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
+#include <orthographicLens.h>
 
 ///SteerPlugIn objects related
 #ifdef __cplusplus
@@ -78,12 +81,11 @@ enum SteerPlugInType
 	none
 } activeSteerPlugInType = none;
 
-//XXX Render-To-Texture (rtt) stuff
-bool rttDone = false;
+//Render-To-Texture (rtt) stuff
+bool rttInitDone = false;
 DrawMeshDrawer* rttMeshDrawer = NULL;
-NodePath rttRender, rttCamera;
 SMARTPTR(GraphicsOutput) rttBuffer;
-SMARTPTR(DisplayRegion) rttRegion;
+NodePath rttRender;
 
 ///
 const char* steerPlugInNames[] =
@@ -1069,66 +1071,81 @@ void remove_vehicle(const Event* event)
 }
 
 //helper
-//called by some steer plugins, executed only once
-bool rttInitOnce()
+//render plugins' static drawing
+AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
+		void * data)
 {
-	SMARTPTR(Object)terrainObj =
-	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ENVIRONMENTOBJECT);
-	RETURN_ON_COND(not terrainObj, false)
+	if(rttInitDone)
+	{
+		//render-to-texture already initialized: re-render
+		//remove all child
+		NodePathCollection children = rttRender.get_children();
+		for (int i = 0; i < children.get_num_paths(); ++i)
+		{
+			if (children[i].node()->is_of_type(Camera::get_class_type()))
+			{
+				continue;
+			}
+			children[i].remove_node();
+		}
+		//render next frame
+		rttBuffer->set_one_shot(true);
+	}
+	else
+	{
+		SMARTPTR(Object)terrainObj =
+		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ENVIRONMENTOBJECT);
+		RETURN_ON_COND(not terrainObj, AsyncTask::DS_done)
 
-	SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent("Scene"));
-	RETURN_ON_COND(not terrain, false)
+		SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent("Scene"));
+		RETURN_ON_COND(not terrain, AsyncTask::DS_done)
 
-	GeoMipTerrainRef& terrainRef = terrain->getGeoMipTerrain();
-	float xScale = terrainRef.get_root().get_sx();
-	float yScale = terrainRef.get_root().get_sy();
-	float terrainWidthX = (terrainRef.heightfield().get_x_size() - 1) * xScale;
-	float terrainWidthY = (terrainRef.heightfield().get_y_size() - 1) * yScale;
+		//render-to-texture will be initialized (this is executed only once)
+		GeoMipTerrainRef& terrainRef = terrain->getGeoMipTerrain();
+		float xScale = terrainObj->getNodePath().get_sx();
+		float yScale = terrainObj->getNodePath().get_sy();
+		float terrainWidthX = (terrainRef.heightfield().get_x_size() - 1) * xScale;
+		float terrainWidthY = (terrainRef.heightfield().get_y_size() - 1) * yScale;
 
-	//create a graphic output buffer where to render
-	rttBuffer =
-			GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
-					"My Buffer", 512, 512);
-	//set it "one shot"
-	rttBuffer->set_one_shot(true);
-	//start it inactive
-	rttBuffer->set_active(false);
-	//create a display region
-	rttRegion = rttBuffer->make_display_region();
-	rttRegion->set_clear_color_active(true);
-	rttRegion->set_clear_color(LColorf(1, 1, 1, 1));
-	//set the camera for the buffer display region
-	rttCamera = NodePath(new Camera("my camera"));
-	DCAST(Camera, rttCamera.node())->set_lens(new OrthographicLens());
-	DCAST(Camera, rttCamera.node())->get_lens()->set_film_size(terrainWidthX,
-			terrainWidthY);
-	DCAST(Camera, rttCamera.node())->get_lens()->set_near_far(-1000.0,
-			1000.0);
-	//look down
-	rttCamera.set_hpr(0, -90, 0);
-	rttRegion->set_camera(rttCamera);
-	rttCamera.reparent_to(rttRender);
-	//set up texture where to render
-	SMARTPTR(TextureStage)texStage = new TextureStage("rttTexStage");
-	texStage->set_mode(TextureStage::M_modulate);
-	terrainRef.get_root().set_texture(texStage, rttBuffer->get_texture(), 10);
-	//
-	rttMeshDrawer = new DrawMeshDrawer(rttRender, rttCamera, 100, 0.04);
-	//
-	return true;
-}
-void drawTextureOnTerrainOnce()
-{
-	RETURN_ON_COND(rttDone, )
+		NodePath rttCamera;
+		rttRender = NodePath("rttRender");
+		rttCamera = NodePath(new Camera("rttCamera"));
+		rttCamera.reparent_to(rttRender);
 
-	RETURN_ON_COND(not rttInitOnce(), )
+		//create a graphic output buffer where to render
+		rttBuffer =
+				GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
+						"My Buffer", 512, 512);
+		//set it "one shot"
+		rttBuffer->set_one_shot(true);
+		//create a display region
+		SMARTPTR(DisplayRegion) rttRegion = rttBuffer->make_display_region();
+		rttRegion->set_clear_color_active(true);
+		rttRegion->set_clear_color(LColorf(1, 1, 1, 1));
+		//set the camera for the buffer display region
+		rttCamera = NodePath(new Camera("my camera"));
+		DCAST(Camera, rttCamera.node())->set_lens(new OrthographicLens());
+		DCAST(Camera, rttCamera.node())->get_lens()->set_film_size(terrainWidthX,
+				terrainWidthY);
+		DCAST(Camera, rttCamera.node())->get_lens()->set_near_far(-1000.0,
+				1000.0);
+		rttRegion->set_camera(rttCamera);
+		//look down
+		rttCamera.set_hpr(0, -90, 0);
 
-	//activate buffer
-	rttBuffer->set_active(true);
-	//set drawer
+		//set up texture where to render
+		SMARTPTR(TextureStage)rttTexStage = new TextureStage("rttTexStage");
+		rttTexStage->set_mode(TextureStage::M_modulate);
+		terrainRef.get_root().set_texture(rttTexStage, rttBuffer->get_texture(), 10);
+		//create the mesh drawer
+		rttMeshDrawer = new DrawMeshDrawer(rttRender, rttCamera, 100, 0.04);
+		//flag rtt initialized
+		rttInitDone = true;
+	}
+	//set mesh drawer
 	rttMeshDrawer->reset();
 	gDrawer3d = rttMeshDrawer;
-	//map drive drawing
+	//map drive: render path and map
 	if(steerPlugIns.find(map_drive) != steerPlugIns.end())
 	{
 		//render to texture
@@ -1138,8 +1155,8 @@ void drawTextureOnTerrainOnce()
 		mapDrivePlugIn->drawMap();
 		mapDrivePlugIn->drawPath();
 	}
-	//flag rtt initialized
-	rttDone = true;
+	//
+	return AsyncTask::DS_done;
 }
 
 //preset function called from main menu
@@ -1156,10 +1173,20 @@ void rocketPreset()
 void rocketCommit()
 {
 	RETURN_ON_COND(activeSteerPlugInType == none,)
+
 	//add add/remove vehicle event handlers
 	EventHandler::get_global_event_handler()->add_hook(addKey, &add_vehicle);
 	EventHandler::get_global_event_handler()->add_hook(removeKey,
 			&remove_vehicle);
+
+	//set render to texture task
+	SMARTPTR(GenericAsyncTask)renderTask =
+			new GenericAsyncTask("renderTexturesOnTerrain",
+					&renderTexturesOnTerrain, reinterpret_cast<void*>(NULL));
+	renderTask->set_sort(0);
+	renderTask->set_priority(0);
+	renderTask->set_task_chain("default");
+	AsyncTaskManager::get_global_ptr()->add(renderTask);
 }
 
 //helper commit for mp and ctf
@@ -1274,7 +1301,6 @@ void rocketMapDriveCommit()
 			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
 	mapDrivePlugIn->setOptions(demoSelect, usePathFences, curvedSteering);
-	drawTextureOnTerrainOnce();
 }
 
 //called by all steer plugins, executed only once
@@ -1545,6 +1571,7 @@ void OpenSteerPlugIn_initInit()
 
 void OpenSteerPlugIn_initEnd()
 {
+	//delete mesh drawer (if any)
 	delete rttMeshDrawer;
 }
 
