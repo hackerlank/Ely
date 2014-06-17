@@ -606,14 +606,15 @@ public:
 	{
 		typedef PolylineSegmentedPathwaySingleRadius::size_type size_type;
 
+		///FIXME: delegated to external plugin initialization
 		// draw a line along each segment of path
-///		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
-		const PolylineSegmentedPathwaySingleRadius& path =
-				dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*m_pathway);
-		for (size_type i = 1; i < path.pointCount(); ++i)
-		{
-			drawLine(path.point(i), path.point(i - 1), gRed);
-		}
+//////		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
+///		const PolylineSegmentedPathwaySingleRadius& path =
+///				dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*m_pathway);
+///		for (size_type i = 1; i < path.pointCount(); ++i)
+///		{
+///			drawLine(path.point(i), path.point(i - 1), gRed);
+///		}
 
 		// draw obstacles
 		ObstacleIterator iterObstacle;

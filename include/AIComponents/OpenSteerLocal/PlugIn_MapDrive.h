@@ -3037,6 +3037,7 @@ public:
 ///		drawQuadrangle(Vec3(+s, u, +s), Vec3(+s, u, -s), Vec3(-s, u, -s),
 ///				Vec3(-s, u, +s), Color(0.8f, 0.7f, 0.5f)); // "sand"
 
+		///FIXME: delegated to external plugin initialization
 		// draw map and path
 ///		drawMap();
 ///		drawPath();

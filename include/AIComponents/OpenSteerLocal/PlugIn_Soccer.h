@@ -84,7 +84,7 @@ public:
 		Vec3 b, c;
 		b = Vec3(m_min.x, m_mid_y, m_max.z);
 		c = Vec3(m_max.x, m_mid_y, m_min.z);
-		Color color(1.0f, 1.0f, 0.0f);
+		Color color(0.2f, 0.2f, 0.0f);
 		drawLineAlpha(m_min, b, color, 1.0f);
 		drawLineAlpha(b, m_max, color, 1.0f);
 		drawLineAlpha(m_max, c, color, 1.0f);
@@ -526,11 +526,13 @@ public:
 			m_Ball->draw();
 		}
 
-		gDrawer3d->setTwoSided(true);
-		m_bbox->draw();
-		gDrawer3d->setTwoSided(false);
-		m_TeamAGoal->draw();
-		m_TeamBGoal->draw();
+		///FIXME: delegated to external plugin initialization
+///		gDrawer3d->setTwoSided(true);
+///		m_bbox->draw();
+///		gDrawer3d->setTwoSided(false);
+///		m_TeamAGoal->draw();
+///		m_TeamBGoal->draw();
+
 		{
 			std::ostringstream annote;
 			annote << "Red: " << m_redScore;

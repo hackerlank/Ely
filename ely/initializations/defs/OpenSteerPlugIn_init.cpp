@@ -1106,7 +1106,7 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		//create a graphic output buffer where to render
 		rttBuffer =
 				GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
-						"My Buffer", 1024, 1024);
+						"My Buffer", 2048, 2048);
 		//set it "one shot"
 		rttBuffer->set_one_shot(true);
 		//create a display region
@@ -1130,6 +1130,7 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		terrainRef.get_root().set_texture(rttTexStage, rttBuffer->get_texture(), 10);
 		//create the mesh drawer
 		rttMeshDrawer2d = new DrawMeshDrawer(rttRender2d, rttCamera2d, 100, 0.04);
+		rttMeshDrawer2d->setSize(5.0);
 		//flag rtt initialized
 		rttInitDone = true;
 	}
@@ -1145,6 +1146,34 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		getAbstractPlugIn());
 		mapDrivePlugIn->drawMap();
 		mapDrivePlugIn->drawPath();
+	}
+	//pedestrian: render path
+	if(steerPlugIns.find(pedestrian) != steerPlugIns.end())
+	{
+		//render to texture
+		PedestrianPlugIn<SteerVehicle>* pedestrianDrivePlugIn =
+		dynamic_cast<PedestrianPlugIn<SteerVehicle>*>(&(steerPlugIns[pedestrian])->
+				getAbstractPlugIn());
+		// draw a line along each segment of path
+		const OpenSteer::PolylineSegmentedPathwaySingleRadius& path =
+		dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*pedestrianDrivePlugIn->getPathway());
+		for (OpenSteer::PolylineSegmentedPathwaySingleRadius::size_type i = 1; i < path.pointCount(); ++i)
+		{
+			drawLine(path.point(i), path.point(i - 1), gRed);
+		}
+	}
+	//soccer: render path
+	if(steerPlugIns.find(soccer) != steerPlugIns.end())
+	{
+		//render to texture
+		MicTestPlugIn<SteerVehicle>* soccerDrivePlugIn =
+		dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&(steerPlugIns[soccer])->
+				getAbstractPlugIn());
+		gDrawer3d->setTwoSided(true);
+		soccerDrivePlugIn->m_bbox->draw();
+		gDrawer3d->setTwoSided(false);
+		soccerDrivePlugIn->m_TeamAGoal->draw();
+		soccerDrivePlugIn->m_TeamBGoal->draw();
 	}
 	//
 	return AsyncTask::DS_done;
