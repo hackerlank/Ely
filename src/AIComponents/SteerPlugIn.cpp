@@ -134,20 +134,6 @@ void SteerPlugIn::onRemoveFromObjectCleanup()
 		dynamic_cast<PlugIn*>(mPlugIn)->removeVehicle(&(*iter)->getAbstractVehicle());
 	}
 
-#ifdef ELY_DEBUG
-	if (not mDebugCamera.is_empty())
-	{
-		//set the recast debug camera to empty node path
-		mDebugCamera = NodePath();
-		//remove the recast debug node paths
-		mDrawer3dNP.remove_node();
-		mDrawer2dNP.remove_node();
-	}
-	//delete the DebugDrawers
-	delete mDrawer3d;
-	delete mDrawer2d;
-#endif
-	//
 	//close the plug in
 	mPlugIn->close();
 	//delete the plug in
@@ -331,6 +317,20 @@ void SteerPlugIn::onRemoveFromSceneCleanup()
 	}
 #endif
 
+#ifdef ELY_DEBUG
+	if (not mDebugCamera.is_empty())
+	{
+		//set the recast debug camera to empty node path
+		mDebugCamera = NodePath();
+		//remove the recast debug node paths
+		mDrawer3dNP.remove_node();
+		mDrawer2dNP.remove_node();
+	}
+	//delete the DebugDrawers
+	delete mDrawer3d;
+	delete mDrawer2d;
+#endif
+	//
 	//remove all local obstacles
 	OpenSteer::ObstacleGroup::iterator iterLocal;
 	for (iterLocal = mLocalObstacles.begin();

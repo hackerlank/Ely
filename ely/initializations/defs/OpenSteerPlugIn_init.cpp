@@ -33,8 +33,11 @@
 #include "AIComponents/OpenSteerLocal/PlugIn_LowSpeedTurn.h"
 #include "AIComponents/OpenSteerLocal/PlugIn_MapDrive.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "SceneComponents/Terrain.h"
+#include "Game/GameManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
+#include <orthographicLens.h>
 
 ///SteerPlugIn objects related
 #ifdef __cplusplus
@@ -77,7 +80,14 @@ enum SteerPlugInType
 	map_drive,
 	none
 } activeSteerPlugInType = none;
-///XXX
+
+//Render-To-Texture (rtt) stuff
+bool rttInitDone = false;
+DrawMeshDrawer* rttMeshDrawer2d = NULL;
+SMARTPTR(GraphicsOutput) rttBuffer;
+NodePath rttRender2d;
+
+///
 const char* steerPlugInNames[] =
 {
 	"one_turning",
@@ -91,9 +101,13 @@ const char* steerPlugInNames[] =
 	"none"
 };
 //common globals
+#define ENVIRONMENTOBJECT "Terrain1"
+#define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
 Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
+//boid globals
+#define WORLDCENTEROBJECT "beachhouse2_1"
 //multiple_pursuit globals
 ObjectId mpWandererObjectId, mpNewWanderedObjectId;
 bool mpWandererExternalUpdate = false;
@@ -724,7 +738,6 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	}
 }
 
-#define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 void add_vehicle(const Event* event)
 {
 	RETURN_ON_COND(activeSteerPlugInType == none,)
@@ -1057,6 +1070,87 @@ void remove_vehicle(const Event* event)
 	}
 }
 
+#ifdef ELY_DEBUG
+//helper
+//render plugins' static drawing
+AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
+		void * data)
+{
+	if(rttInitDone)
+	{
+		//render-to-texture already initialized: re-render next frame
+		rttBuffer->set_one_shot(true);
+	}
+	else
+	{
+		SMARTPTR(Object)terrainObj =
+		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ENVIRONMENTOBJECT);
+		RETURN_ON_COND(not terrainObj, AsyncTask::DS_done)
+
+		SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent("Scene"));
+		RETURN_ON_COND(not terrain, AsyncTask::DS_done)
+
+		//render-to-texture will be initialized (this is executed only once)
+		GeoMipTerrainRef& terrainRef = terrain->getGeoMipTerrain();
+		float xScale = terrainObj->getNodePath().get_sx();
+		float yScale = terrainObj->getNodePath().get_sy();
+		float terrainWidthX = (terrainRef.heightfield().get_x_size() - 1) * xScale;
+		float terrainWidthY = (terrainRef.heightfield().get_y_size() - 1) * yScale;
+
+		rttRender2d = NodePath("rttRender2d");
+		rttRender2d.set_depth_test(false);
+		rttRender2d.set_depth_write(false);
+		NodePath rttCamera2d = NodePath(new Camera("rttCamera2d"));
+		rttCamera2d.reparent_to(rttRender2d);
+
+		//create a graphic output buffer where to render
+		rttBuffer =
+				GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
+						"My Buffer", 1024, 1024);
+		//set it "one shot"
+		rttBuffer->set_one_shot(true);
+		//create a display region
+		SMARTPTR(DisplayRegion) rttRegion = rttBuffer->make_display_region();
+		rttRegion->set_sort(20);
+		rttRegion->set_clear_color_active(true);
+		rttRegion->set_clear_color(LColorf(1, 1, 1, 1));
+		//set the camera for the buffer display region
+		DCAST(Camera, rttCamera2d.node())->set_lens(new OrthographicLens());
+		DCAST(Camera, rttCamera2d.node())->get_lens()->set_film_size(terrainWidthX,
+				terrainWidthY);
+		DCAST(Camera, rttCamera2d.node())->get_lens()->set_near_far(-1000.0,
+				1000.0);
+		rttRegion->set_camera(rttCamera2d);
+		//look down
+		rttCamera2d.set_hpr(0, -90, 0);
+
+		//set up texture where to render
+		SMARTPTR(TextureStage)rttTexStage = new TextureStage("rttTexStage");
+		rttTexStage->set_mode(TextureStage::M_modulate);
+		terrainRef.get_root().set_texture(rttTexStage, rttBuffer->get_texture(), 10);
+		//create the mesh drawer
+		rttMeshDrawer2d = new DrawMeshDrawer(rttRender2d, rttCamera2d, 100, 0.04);
+		//flag rtt initialized
+		rttInitDone = true;
+	}
+	//set mesh drawer
+	rttMeshDrawer2d->reset();
+	gDrawer3d = rttMeshDrawer2d;
+	//map drive: render path and map
+	if(steerPlugIns.find(map_drive) != steerPlugIns.end())
+	{
+		//render to texture
+		MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
+		dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIns[map_drive])->
+		getAbstractPlugIn());
+		mapDrivePlugIn->drawMap();
+		mapDrivePlugIn->drawPath();
+	}
+	//
+	return AsyncTask::DS_done;
+}
+#endif
+
 //preset function called from main menu
 void rocketPreset()
 {
@@ -1071,10 +1165,22 @@ void rocketPreset()
 void rocketCommit()
 {
 	RETURN_ON_COND(activeSteerPlugInType == none,)
+
 	//add add/remove vehicle event handlers
 	EventHandler::get_global_event_handler()->add_hook(addKey, &add_vehicle);
 	EventHandler::get_global_event_handler()->add_hook(removeKey,
 			&remove_vehicle);
+
+#ifdef ELY_DEBUG
+	//set render to texture task
+	SMARTPTR(GenericAsyncTask)renderTask =
+			new GenericAsyncTask("renderTexturesOnTerrain",
+					&renderTexturesOnTerrain, reinterpret_cast<void*>(NULL));
+	renderTask->set_sort(0);
+	renderTask->set_priority(0);
+	renderTask->set_task_chain("default");
+	AsyncTaskManager::get_global_ptr()->add(renderTask);
+#endif
 }
 
 //helper commit for mp and ctf
@@ -1238,7 +1344,6 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 }
 
 ///steerPlugInBoid1
-#define WORLDCENTEROBJECT "beachhouse2_1"
 void steerPlugInBoid1_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
 PandaFramework* pandaFramework, WindowFramework* windowFramework)
 {
@@ -1460,5 +1565,7 @@ void OpenSteerPlugIn_initInit()
 
 void OpenSteerPlugIn_initEnd()
 {
+	//delete mesh drawer (if any)
+	delete rttMeshDrawer2d;
 }
 

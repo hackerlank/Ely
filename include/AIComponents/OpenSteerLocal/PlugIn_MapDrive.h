@@ -3038,8 +3038,8 @@ public:
 ///				Vec3(-s, u, +s), Color(0.8f, 0.7f, 0.5f)); // "sand"
 
 		// draw map and path
-		drawMap();
-		drawPath();
+///		drawMap();
+///		drawPath();
 
 		// draw test vehicle
 		iterator iter;
