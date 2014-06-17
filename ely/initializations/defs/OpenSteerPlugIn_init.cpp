@@ -83,9 +83,9 @@ enum SteerPlugInType
 
 //Render-To-Texture (rtt) stuff
 bool rttInitDone = false;
-DrawMeshDrawer* rttMeshDrawer = NULL;
+DrawMeshDrawer* rttMeshDrawer2d = NULL;
 SMARTPTR(GraphicsOutput) rttBuffer;
-NodePath rttRender;
+NodePath rttRender2d;
 
 ///
 const char* steerPlugInNames[] =
@@ -1097,44 +1097,45 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		float terrainWidthX = (terrainRef.heightfield().get_x_size() - 1) * xScale;
 		float terrainWidthY = (terrainRef.heightfield().get_y_size() - 1) * yScale;
 
-		NodePath rttCamera;
-		rttRender = NodePath("rttRender");
-		rttCamera = NodePath(new Camera("rttCamera"));
-		rttCamera.reparent_to(rttRender);
+		rttRender2d = NodePath("rttRender2d");
+		rttRender2d.set_depth_test(false);
+		rttRender2d.set_depth_write(false);
+		NodePath rttCamera2d = NodePath(new Camera("rttCamera2d"));
+		rttCamera2d.reparent_to(rttRender2d);
 
 		//create a graphic output buffer where to render
 		rttBuffer =
 				GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
-						"My Buffer", 512, 512);
+						"My Buffer", 1024, 1024);
 		//set it "one shot"
 		rttBuffer->set_one_shot(true);
 		//create a display region
 		SMARTPTR(DisplayRegion) rttRegion = rttBuffer->make_display_region();
+		rttRegion->set_sort(20);
 		rttRegion->set_clear_color_active(true);
 		rttRegion->set_clear_color(LColorf(1, 1, 1, 1));
 		//set the camera for the buffer display region
-		rttCamera = NodePath(new Camera("my camera"));
-		DCAST(Camera, rttCamera.node())->set_lens(new OrthographicLens());
-		DCAST(Camera, rttCamera.node())->get_lens()->set_film_size(terrainWidthX,
+		DCAST(Camera, rttCamera2d.node())->set_lens(new OrthographicLens());
+		DCAST(Camera, rttCamera2d.node())->get_lens()->set_film_size(terrainWidthX,
 				terrainWidthY);
-		DCAST(Camera, rttCamera.node())->get_lens()->set_near_far(-1000.0,
+		DCAST(Camera, rttCamera2d.node())->get_lens()->set_near_far(-1000.0,
 				1000.0);
-		rttRegion->set_camera(rttCamera);
+		rttRegion->set_camera(rttCamera2d);
 		//look down
-		rttCamera.set_hpr(0, -90, 0);
+		rttCamera2d.set_hpr(0, -90, 0);
 
 		//set up texture where to render
 		SMARTPTR(TextureStage)rttTexStage = new TextureStage("rttTexStage");
 		rttTexStage->set_mode(TextureStage::M_modulate);
 		terrainRef.get_root().set_texture(rttTexStage, rttBuffer->get_texture(), 10);
 		//create the mesh drawer
-		rttMeshDrawer = new DrawMeshDrawer(rttRender, rttCamera, 100, 0.04);
+		rttMeshDrawer2d = new DrawMeshDrawer(rttRender2d, rttCamera2d, 100, 0.04);
 		//flag rtt initialized
 		rttInitDone = true;
 	}
 	//set mesh drawer
-	rttMeshDrawer->reset();
-	gDrawer3d = rttMeshDrawer;
+	rttMeshDrawer2d->reset();
+	gDrawer3d = rttMeshDrawer2d;
 	//map drive: render path and map
 	if(steerPlugIns.find(map_drive) != steerPlugIns.end())
 	{
@@ -1144,14 +1145,6 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		getAbstractPlugIn());
 		mapDrivePlugIn->drawMap();
 		mapDrivePlugIn->drawPath();
-
-		///XXX test
-		NodePath actor =
-				GameManager::GetSingletonPtr()->windowFramework()->
-				load_model(GameManager::GetSingletonPtr()->pandaFramework()->get_models(), "eve.bam");
-		actor.reparent_to(rttRender);
-		actor.set_hpr(0, 90, 0);
-		actor.set_scale(500);
 	}
 	//
 	return AsyncTask::DS_done;
@@ -1573,6 +1566,6 @@ void OpenSteerPlugIn_initInit()
 void OpenSteerPlugIn_initEnd()
 {
 	//delete mesh drawer (if any)
-	delete rttMeshDrawer;
+	delete rttMeshDrawer2d;
 }
 
