@@ -1261,6 +1261,7 @@ void rocketCommit()
 	renderTask->set_sort(0);
 	renderTask->set_priority(0);
 	renderTask->set_task_chain("default");
+	renderTask->set_delay(1.0);
 	AsyncTaskManager::get_global_ptr()->add(renderTask);
 #endif
 }

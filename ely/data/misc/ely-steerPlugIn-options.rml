@@ -249,13 +249,13 @@
 							Demo select:
 							<br />
 							<input id="demo_select_0" type="radio"
-								name="demo_select" value="0" style="margin-left: 0px;" />
+								name="demo_select" value="demo_select_0" style="margin-left: 0px;" />
 							obstacle avoidance/speed control <br />
 							<input id="demo_select_1" type="radio"
-								name="demo_select" value="1" style="margin-left: 0px;" />
+								name="demo_select" value="demo_select_1" style="margin-left: 0px;" />
 							wander, obstacle avoidance/speed control <br />
 							<input id="demo_select_2" type="radio"
-								name="demo_select" value="2" checked="true" 
+								name="demo_select" value="demo_select_2" checked="true" 
 								style="margin-left: 0px;" />
 							path following, obstacle avoidance/speed control <br />
 							<br />
