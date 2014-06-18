@@ -63,6 +63,16 @@ INITIALIZATION steerVehicleToBeCloned_init;
 //locals
 namespace
 {
+#ifdef ELY_DEBUG
+bool drawStaticGeometryInitDone = false;
+//Render-To-Texture (rtt) stuff
+DrawMeshDrawer* rttMeshDrawer2d = NULL;
+SMARTPTR(GraphicsOutput) rttBuffer;
+NodePath rttRender2d;
+//draw other static geometry stuff
+DrawMeshDrawer* staticMeshDrawer3d;
+#endif
+
 //common text writing
 NodePath textNode;
 
@@ -80,12 +90,6 @@ enum SteerPlugInType
 	map_drive,
 	none
 } activeSteerPlugInType = none;
-
-//Render-To-Texture (rtt) stuff
-bool rttInitDone = false;
-DrawMeshDrawer* rttMeshDrawer2d = NULL;
-SMARTPTR(GraphicsOutput) rttBuffer;
-NodePath rttRender2d;
 
 ///
 const char* steerPlugInNames[] =
@@ -1073,10 +1077,11 @@ void remove_vehicle(const Event* event)
 #ifdef ELY_DEBUG
 //helper
 //render plugins' static drawing
-AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
+AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
 		void * data)
 {
-	if(rttInitDone)
+	//first render textures on terrain
+	if(drawStaticGeometryInitDone)
 	{
 		//render-to-texture already initialized: re-render next frame
 		rttBuffer->set_one_shot(true);
@@ -1090,7 +1095,7 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent("Scene"));
 		RETURN_ON_COND(not terrain, AsyncTask::DS_done)
 
-		//render-to-texture will be initialized (this is executed only once)
+		///1: render-to-texture will be initialized (this is executed only once)
 		GeoMipTerrainRef& terrainRef = terrain->getGeoMipTerrain();
 		float xScale = terrainObj->getNodePath().get_sx();
 		float yScale = terrainObj->getNodePath().get_sy();
@@ -1105,8 +1110,8 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 
 		//create a graphic output buffer where to render
 		rttBuffer =
-				GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
-						"My Buffer", 2048, 2048);
+		GameManager::GetSingletonPtr()->windowFramework()->get_graphics_output()->make_texture_buffer(
+				"My Buffer", 1024, 1024);
 		//set it "one shot"
 		rttBuffer->set_one_shot(true);
 		//create a display region
@@ -1114,6 +1119,8 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		rttRegion->set_sort(20);
 		rttRegion->set_clear_color_active(true);
 		rttRegion->set_clear_color(LColorf(1, 1, 1, 1));
+		rttRegion->set_clear_depth_active(true);
+		rttRegion->set_clear_depth(1.0);
 		//set the camera for the buffer display region
 		DCAST(Camera, rttCamera2d.node())->set_lens(new OrthographicLens());
 		DCAST(Camera, rttCamera2d.node())->get_lens()->set_film_size(terrainWidthX,
@@ -1128,52 +1135,98 @@ AsyncTask::DoneStatus renderTexturesOnTerrain(GenericAsyncTask* task,
 		SMARTPTR(TextureStage)rttTexStage = new TextureStage("rttTexStage");
 		rttTexStage->set_mode(TextureStage::M_modulate);
 		terrainRef.get_root().set_texture(rttTexStage, rttBuffer->get_texture(), 10);
-		//create the mesh drawer
+		//create the mesh drawer for texture drawing
 		rttMeshDrawer2d = new DrawMeshDrawer(rttRender2d, rttCamera2d, 100, 0.04);
-		rttMeshDrawer2d->setSize(5.0);
+		rttMeshDrawer2d->setSize(40.0);
 		//flag rtt initialized
-		rttInitDone = true;
+		drawStaticGeometryInitDone = true;
+
+		///2: create the mesh drawer for static drawing
+		//get render node path
+		NodePath render = ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(
+				ObjectId("render"))->getNodePath();
+		//get the camera node path
+		NodePath camera =
+		ObjectTemplateManager::GetSingletonPtr()->
+		getCreatedObject(ObjectId("camera"))->getNodePath().get_child(0);
+		staticMeshDrawer3d = new DrawMeshDrawer(render, camera, 100, 0.04);
+		staticMeshDrawer3d->setSize(8.0);
 	}
+	///1: draw textures on terrain
 	//set mesh drawer
 	rttMeshDrawer2d->reset();
 	gDrawer3d = rttMeshDrawer2d;
+	//ctf: render home base
+	if(steerPlugIns.find(capture_the_flag) != steerPlugIns.end())
+	{
+		//render to texture
+		CtfPlugIn<SteerVehicle>* plugIn =
+		dynamic_cast<CtfPlugIn<SteerVehicle>*>(&(steerPlugIns[capture_the_flag])->
+		getAbstractPlugIn());
+		plugIn->drawHomeBase();
+	}
 	//map drive: render path and map
 	if(steerPlugIns.find(map_drive) != steerPlugIns.end())
 	{
 		//render to texture
-		MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
+		MapDrivePlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIns[map_drive])->
 		getAbstractPlugIn());
-		mapDrivePlugIn->drawMap();
-		mapDrivePlugIn->drawPath();
+		plugIn->drawMap();
+		plugIn->drawPath();
 	}
 	//pedestrian: render path
 	if(steerPlugIns.find(pedestrian) != steerPlugIns.end())
 	{
 		//render to texture
-		PedestrianPlugIn<SteerVehicle>* pedestrianDrivePlugIn =
+		PedestrianPlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<PedestrianPlugIn<SteerVehicle>*>(&(steerPlugIns[pedestrian])->
 				getAbstractPlugIn());
 		// draw a line along each segment of path
 		const OpenSteer::PolylineSegmentedPathwaySingleRadius& path =
-		dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*pedestrianDrivePlugIn->getPathway());
-		for (OpenSteer::PolylineSegmentedPathwaySingleRadius::size_type i = 1; i < path.pointCount(); ++i)
-		{
-			drawLine(path.point(i), path.point(i - 1), gRed);
-		}
+		dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*plugIn->getPathway());
+		plugIn->drawPath();
 	}
 	//soccer: render path
 	if(steerPlugIns.find(soccer) != steerPlugIns.end())
 	{
 		//render to texture
-		MicTestPlugIn<SteerVehicle>* soccerDrivePlugIn =
+		MicTestPlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<MicTestPlugIn<SteerVehicle>*>(&(steerPlugIns[soccer])->
 				getAbstractPlugIn());
-		gDrawer3d->setTwoSided(true);
-		soccerDrivePlugIn->m_bbox->draw();
-		gDrawer3d->setTwoSided(false);
-		soccerDrivePlugIn->m_TeamAGoal->draw();
-		soccerDrivePlugIn->m_TeamBGoal->draw();
+		plugIn->drawSoccerField();
+	}
+
+	///2: draw other static geometry
+	//set mesh drawer
+	staticMeshDrawer3d->reset();
+	gDrawer3d = staticMeshDrawer3d;
+	//boids: render obstacles
+	if(steerPlugIns.find(boid) != steerPlugIns.end())
+	{
+		//render static geometry
+		BoidsPlugIn<SteerVehicle>* plugIn =
+		dynamic_cast<BoidsPlugIn<SteerVehicle>*>(&(steerPlugIns[boid])->
+		getAbstractPlugIn());
+		plugIn->drawObstacles();
+	}
+	//ctf: render obstacles
+	if(steerPlugIns.find(capture_the_flag) != steerPlugIns.end())
+	{
+		//render static geometry
+		CtfPlugIn<SteerVehicle>* plugIn =
+		dynamic_cast<CtfPlugIn<SteerVehicle>*>(&(steerPlugIns[capture_the_flag])->
+		getAbstractPlugIn());
+		plugIn->drawObstacles();
+	}
+	//pedestrian: render obstacles
+	if(steerPlugIns.find(pedestrian) != steerPlugIns.end())
+	{
+		//render static geometry
+		PedestrianPlugIn<SteerVehicle>* plugIn =
+		dynamic_cast<PedestrianPlugIn<SteerVehicle>*>(&(steerPlugIns[pedestrian])->
+		getAbstractPlugIn());
+		plugIn->drawObstacles();
 	}
 	//
 	return AsyncTask::DS_done;
@@ -1204,7 +1257,7 @@ void rocketCommit()
 	//set render to texture task
 	SMARTPTR(GenericAsyncTask)renderTask =
 			new GenericAsyncTask("renderTexturesOnTerrain",
-					&renderTexturesOnTerrain, reinterpret_cast<void*>(NULL));
+					&drawStaticGeometry, reinterpret_cast<void*>(NULL));
 	renderTask->set_sort(0);
 	renderTask->set_priority(0);
 	renderTask->set_task_chain("default");
@@ -1594,7 +1647,10 @@ void OpenSteerPlugIn_initInit()
 
 void OpenSteerPlugIn_initEnd()
 {
-	//delete mesh drawer (if any)
+#ifdef ELY_DEBUG
+	//delete mesh drawers (if any)
 	delete rttMeshDrawer2d;
+	delete staticMeshDrawer3d;
+#endif
 }
 

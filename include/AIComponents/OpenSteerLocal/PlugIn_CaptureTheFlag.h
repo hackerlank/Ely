@@ -915,8 +915,11 @@ public:
 		}
 		// draw the seeker, obstacles and home base
 ///		ctfSeeker->draw();
-		drawObstacles();
-		drawHomeBase();
+
+		///FIXME: delegated to external plugin initialization
+///		drawObstacles();
+///		drawHomeBase();
+
 ///		// draw each enemy
 ///		for (int i = 0; i < ctfEnemyCount; i++)
 ///			ctfEnemies[i]->draw();

@@ -59,6 +59,26 @@ public:
 	AABBox(const Vec3 &min, const Vec3& max) :
 			m_min(min), m_max(max)
 	{
+		//reorder min/max
+		float tmp;
+		if (m_min.x > m_max.x)
+		{
+			tmp = m_min.x;
+			m_min.x = m_max.x;
+			m_max.x = tmp;
+		}
+		if (m_min.y > m_max.y)
+		{
+			tmp = m_min.y;
+			m_min.y = m_max.y;
+			m_max.y = tmp;
+		}
+		if (m_min.z > m_max.z)
+		{
+			tmp = m_min.z;
+			m_min.z = m_max.z;
+			m_max.z = tmp;
+		}
 		m_mid_y = (m_min.y + m_max.y) / 2.0;
 	}
 ///	AABBox(Vec3 min, Vec3 max) :
@@ -527,11 +547,7 @@ public:
 		}
 
 		///FIXME: delegated to external plugin initialization
-///		gDrawer3d->setTwoSided(true);
-///		m_bbox->draw();
-///		gDrawer3d->setTwoSided(false);
-///		m_TeamAGoal->draw();
-///		m_TeamBGoal->draw();
+///		drawPlayField();
 
 		{
 			std::ostringstream annote;
@@ -571,6 +587,24 @@ public:
 			}
 #endif
 	}
+
+#ifdef ELY_DEBUG
+	void drawSoccerField()
+	{
+		gDrawer3d->setTwoSided(true);
+		m_bbox->draw();
+		Vec3 c = (m_bbox->getMax() + m_bbox->getMin()) / 2.0;
+		Vec3 d = (m_bbox->getMax() - m_bbox->getMin()) / 2.0;
+		//draw a middle line on xz plane
+		Color color(0.2f, 0.2f, 0.0f);
+		drawLineAlpha(c + Vec3(0, 0, d.z), c - Vec3(0, 0, d.z), color, 1.0f);
+		//draw a middle circle on xz plane
+		drawCircleOrDisk(d.x / 4.0, Vec3(1, 0, 0), c, color, 32, false, false);
+		gDrawer3d->setTwoSided(false);
+		m_TeamAGoal->draw();
+		m_TeamBGoal->draw();
+	}
+#endif
 
 	void close(void)
 	{

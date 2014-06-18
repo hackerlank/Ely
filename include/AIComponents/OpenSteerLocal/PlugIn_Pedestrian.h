@@ -513,10 +513,10 @@ public:
 			(*iter)->draw();
 		}
 
+		///FIXME: delegated to external plugin initialization
 		// draw the path they follow and obstacles they avoid
-		gDrawer3d->setTwoSided(true);
-		drawPathAndObstacles();
-		gDrawer3d->setTwoSided(false);
+///		drawPath();
+///		drawObstacles();
 
 		// textual annotation for selected Pedestrian
 		if (selectedVehicle && OpenSteer::annotationIsOn())
@@ -602,20 +602,25 @@ public:
 		}
 	}
 
-	void drawPathAndObstacles(void)
+	void drawPath(void)
 	{
 		typedef PolylineSegmentedPathwaySingleRadius::size_type size_type;
 
-		///FIXME: delegated to external plugin initialization
 		// draw a line along each segment of path
-//////		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
-///		const PolylineSegmentedPathwaySingleRadius& path =
-///				dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*m_pathway);
-///		for (size_type i = 1; i < path.pointCount(); ++i)
-///		{
-///			drawLine(path.point(i), path.point(i - 1), gRed);
-///		}
+///		const PolylineSegmentedPathwaySingleRadius& path = *getTestPath();
+		const PolylineSegmentedPathwaySingleRadius& path =
+				dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*m_pathway);
+		gDrawer3d->setTwoSided(true);
+		for (size_type i = 1; i < path.pointCount(); ++i)
+		{
+			drawLine(path.point(i), path.point(i - 1), gRed);
+		}
+		gDrawer3d->setTwoSided(false);
+	}
 
+	void drawObstacles(void)
+	{
+		gDrawer3d->setTwoSided(true);
 		// draw obstacles
 		ObstacleIterator iterObstacle;
 		for (iterObstacle = localObstacles->begin();
@@ -643,6 +648,7 @@ public:
 ///			drawLine(v4, v1, gWhite);
 ///		}
 		// ------------------------------------ xxxcwr11-1-04 fixing steerToAvoid
+		gDrawer3d->setTwoSided(false);
 	}
 #endif
 

@@ -500,7 +500,8 @@ public:
 /////				drawGetWindowWidth(), drawGetWindowHeight());
 		draw2dTextAt2dLocation(status, screenLocation, gGray80, 0.0, 0.0);
 
-		drawObstacles();
+		///FIXME: delegated to external plugin initialization
+///		drawObstacles();
 #endif
 	}
 
@@ -724,9 +725,11 @@ public:
 			(*iterObstacle)->draw(false, Color(0, 0, 0), Vec3(0, 0, 0));
 		}
 
+		gDrawer3d->setTwoSided(true);
 		//draw world sphere
 		drawSphere(worldCenter, worldRadius, 0.66667 * worldRadius, false, Color(0, 0, 1, 1),
 				true, true, Vec3::zero);
+		gDrawer3d->setTwoSided(false);
 	}
 #endif
 };
