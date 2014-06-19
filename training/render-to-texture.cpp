@@ -58,6 +58,7 @@ int render_to_texture_main(int argc, char *argv[])
 	load_prc_file_data("", "show-frame-rate-meter #t");
 	load_prc_file_data("", "lock-to-one-cpu 0");
 	load_prc_file_data("", "support-threads 1");
+	load_prc_file_data("", "threading-model Cull/Draw");
 	load_prc_file_data("", "audio-buffering-seconds 5");
 	load_prc_file_data("", "audio-preload-threshold 2000000");
 	load_prc_file_data("", "sync-video #t");
