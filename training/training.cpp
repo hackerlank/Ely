@@ -19,12 +19,12 @@ int main(int argc, char **argv)
 //	result = anim_main(argc, argv);
 //	result = network_main(argc, argv);
 //	result = physics_main(argc, argv);
-//	result = threads_main(argc, argv);
+	result = threads_main(argc, argv);
 //	result = manual_example_main(argc, argv);
 //	result = draw_geometry_main(argc, argv);
 //	result = test_wo_local_scale(argc, argv);
 //	result = meshdrawer_main(argc, argv);
 //	rocket_main(argc, argv);
-	render_to_texture_main(argc, argv);
+//	render_to_texture_main(argc, argv);
 	return result;
 }

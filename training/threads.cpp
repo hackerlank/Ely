@@ -1,267 +1,203 @@
-//#include <string>
-//#include <iostream>
-//#include <sstream>
-//#include <set>
-//#include <queue>
-//#include <list>
-//#include <utility>
-//#include <cstdlib>
-//#include <event.h>
-//#include <cmath>
-//#include <throw_event.h>
-//#include <reMutex.h>
-//#include <reMutexHolder.h>
-//#include <conditionVarFull.h>
-//#include <genericAsyncTask.h>
-//#include <asyncTaskManager.h>
-//#include <asyncTaskChain.h>
-//#include <genericThread.h>
-//#include <pointerTo.h>
-//#include <referenceCount.h>
-//#include <typedWritableReferenceCount.h>
-//#include "Utilities/Tools.h"
-
-////the data
-//struct MSG
-//{
-//	MSG() :
-//			_ready(false)
-//	{
-//	}
-//	bool _ready;
-//	std::string _msg;
-//} msg;
-////condition variable with no shared mutex
-//struct CVFWithMutex
-//{
-//	CVFWithMutex()
-//	{
-//		_cond = new ConditionVarFull(_mutex);
-//	}
-//	~CVFWithMutex()
-//	{
-//		delete _cond;
-//	}
-//	ConditionVarFull& getCV()
-//	{
-//		return *_cond;
-//	}
-//	ConditionVarFull* _cond;
-//	Mutex _mutex;
-//} msgCond;
-//
-//void msgProducer(void* data)
-//{
-//	std::string threadName = Thread::get_current_thread()->get_sync_name();
-//	std::string msgIn;
-//	ConditionVarFull& msgCondIn = msgCond.getCV();
-//	while (std::cin >> msgIn)
-//	{
-//		MutexHolder lock(msgCondIn.get_mutex());
-//		((MSG*) data)->_msg = msgIn;
-//		((MSG*) data)->_ready = true;
-////		msgCondIn.notify_all();
-//		msgCondIn.notify();
-//		std::cout << threadName << " got '" << msgIn << "'" << std::endl;
-//		if (msgIn == "stopp")
-//		{
-//			break;
-//		}
-//	}
-//
-//}
-//
-//void msgConsumer(void* data)
-//{
-//	std::string threadName = Thread::get_current_thread()->get_sync_name();
-//	std::string outMsg;
-//	ConditionVarFull& msgCondIn = msgCond.getCV();
-//	while (true)
-//	{
-//		msgCondIn.get_mutex().acquire();
-//		std::cout << threadName << ": falling asleep" << std::endl;
-//		msgCondIn.wait();
-//		std::cout << threadName << ": awakening" << std::endl;
-//		if (((MSG*) data)->_ready == false)
-//		{
-//			msgCondIn.get_mutex().release();
-//			continue;
-//		}
-//		outMsg = ((MSG*) data)->_msg;
-//		((MSG*) data)->_ready = false;
-//		msgCondIn.get_mutex().release();
-//		//process data
-//		std::cout << threadName << ": " << outMsg << std::endl;
-//		if (outMsg == "stopc")
-//		{
-//			break;
-//		}
-//	}
-//}
-//
-//const int MAXPRODUCERS = 1;
-//const int MAXCONSUMERS = 2;
-
-//int main(int argc, char **argv)
-//{
-//	SMARTPTR(GenericThread) producers[MAXPRODUCERS];
-//	SMARTPTR(GenericThread) consumers[MAXCONSUMERS];
-//	//create producer/consumer threads
-//	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
-//	{
-//		std::ostringstream name;
-//		name << "producer" << prod;
-//		producers[prod] = new GenericThread(name.str(), name.str(),
-//				&msgProducer, (void*) &msg);
-//	}
-//	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
-//	{
-//		std::ostringstream name;
-//		name << "consumer" << cons;
-//		consumers[cons] = new GenericThread(name.str(), name.str(),
-//				&msgConsumer, (void*) &msg);
-//	}
-//	//start producer/consumer threads
-//	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
-//	{
-//		std::cout << producers[prod]->start(TP_normal, true) << std::endl;
-//	}
-//	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
-//	{
-//		std::cout << consumers[cons]->start(TP_normal, true) << std::endl;
-//	}
-//	//join producer/consumer threads
-//	for (int prod = 0; prod < MAXPRODUCERS; ++prod)
-//	{
-//		std::cout << producers[prod]->get_sync_name() << " joined" << std::endl;
-//		producers[prod]->join();
-//	}
-//	for (int cons = 0; cons < MAXCONSUMERS; ++cons)
-//	{
-//		std::cout << consumers[cons]->get_sync_name() << " joined" << std::endl;
-//		consumers[cons]->join();
-//	}
-//	return 0;
-//}
-
-//void f(void* data)
-//{
-//	std::string threadName = Thread::get_current_thread()->get_sync_name();
-//	int i = *((int*) data);
-//	for (int k = 0; k < i; ++k)
-//	{
-//		std::cout << threadName << ": " << sqrt((double) k) << std::endl;
-//	}
-//}
-//
-//const int MAXTHREADS = 2;
-//const int MAXNUM = 100000000;
-//
-//int main(int argc, char **argv)
-//{
-////	srand(100);
-//	int inputs[MAXTHREADS];
-//	SMARTPTR(GenericThread) threads[MAXTHREADS];
-//	//create thread objects
-//	for (int j = 0; j < MAXTHREADS; ++j)
-//	{
-//		int num = (rand() % MAXNUM + 1);
-//		inputs[j] = num;
-//		std::ostringstream name;
-//		name << "thread" << j;
-//		threads[j] = new GenericThread(name.str(), name.str(), &f,
-//				(void*) &inputs[j]);
-//	}
-//	//start threads
-//	for (int j = 0; j < MAXTHREADS; ++j)
-//	{
-//		std::cout << threads[j]->start(TP_normal, true) << std::endl;
-//	}
-//	//join threads
-//	for (int j = 0; j < MAXTHREADS; ++j)
-//	{
-//		std::cout << "thread " << threads[j]->get_sync_name() << " joined"
-//				<< std::endl;
-//		threads[j]->join();
-//	}
-//	return 0;
-//}
-
+#include <pandaFramework.h>
+#include <pandaSystem.h>
+#include <load_prc_file.h>
+#include <conditionVarFull.h>
+#include <conditionVar.h>
 #include <cstdlib>
-#include <dlfcn.h>
-#include <iostream>
-#include <string>
 
-typedef void (*PFUNC)(int *);
+#define ELY_THREAD
+#include "Utilities/Tools.h"
 
-int threads_main(int argc, char **argv)
+static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
+const int maxSec = 2, maxIter = 3;
+
+Mutex mutex1;
+ConditionVarFull var1(mutex1);
+const int complete1 = 1 << 0, completeM1 = 1 << 1, completeM2 = 1 << 2,
+		complete3 = 1 << 3;
+unsigned int completedTask = complete3;
+
+AsyncTask::DoneStatus taskFunction1(GenericAsyncTask* task, void * data)
 {
-	void *lib_handle;
-	PFUNC pfn1, pfn2, pfn11;
-	std::string* fn1, *fn2, *fn11;
-	int x;
-	char *error;
-
-	lib_handle =
-			dlopen(
-					"/REPOSITORY/KProjects/Eclipse/ElyCallbacks/Debug-thread/libElyCallbacks.so",
-					RTLD_LAZY);
-	if (!lib_handle)
-	{
-		std::cerr << dlerror() << std::endl;
-		exit(1);
-	}
-
-	//take the name and then the pointer
-	fn1 = (std::string*) dlsym(lib_handle, "event1");
-	if ((error = dlerror()) != NULL)
-	{
-		std::cerr << error << std::endl;
-		exit(1);
-	}
-	pfn1 = (PFUNC) dlsym(lib_handle, fn1->c_str());
-	if ((error = dlerror()) != NULL)
-	{
-		std::cerr << error << std::endl;
-		exit(1);
-	}
-
-	//take the name and then the pointer
-	fn2 = (std::string*) dlsym(lib_handle, "event2");
-	if ((error = dlerror()) != NULL)
-	{
-		std::cerr << error << std::endl;
-		exit(1);
-	}
-	pfn2 = (PFUNC) dlsym(lib_handle, fn2->c_str());
-	if ((error = dlerror()) != NULL)
-	{
-		std::cerr << error << std::endl;
-		exit(1);
-	}
-
-	//take the name and then the pointer
-	fn11 = (std::string*) dlsym(lib_handle, "event3");
-	if ((error = dlerror()) != NULL)
-	{
-		std::cerr << error << std::endl;
-		exit(1);
-	}
-	pfn11 = (PFUNC) dlsym(lib_handle, fn11->c_str());
-	if ((error = dlerror()) != NULL)
-	{
-		std::cerr << error << std::endl;
-		exit(1);
-	}
-
 	//
-	x = 1000;
-	(*pfn1)(&x);
-	x = 1001;
-	(*pfn2)(&x);
-	x = 1002;
-	(*pfn11)(&x);
+	{
+		HOLD_MUTEX(mutex1)
+		while ((completedTask & complete1) or not (completedTask & complete3))
+		{
+			var1.wait();
+		}
+		completedTask &= (~completeM1 & ~completeM2);
+	}
+	//Do work
+	int t = maxSec > 0 ? rand() % maxSec : 0;
+	sleep(t);
+	std::cout << "taskFunction1 -> " << task->get_elapsed_time() << std::endl;
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		completedTask |= complete1;
+		var1.notify_all();
+	}
+	//
+	return AsyncTask::DS_cont;
+}
 
-	dlclose(lib_handle);
-	return 0;
+AsyncTask::DoneStatus taskM1(GenericAsyncTask* task, void * data)
+{
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		while ((completedTask & completeM1) or not (completedTask & complete1))
+		{
+			var1.wait();
+		}
+		completedTask &= ~complete3;
+	}
+	//Do work
+	for (int i = 0; i < maxIter; ++i)
+	{
+		sleep(maxSec > 0 ? rand() % maxSec : 0);
+		std::cout << "\ttaskM1 -> " << task->get_elapsed_time() << std::endl;
+	}
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		completedTask |= completeM1;
+		var1.notify_all();
+	}
+	//
+	return AsyncTask::DS_cont;
+}
+AsyncTask::DoneStatus taskM2(GenericAsyncTask* task, void * data)
+{
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		while ((completedTask & completeM2) or not (completedTask & complete1))
+		{
+			var1.wait();
+		}
+		completedTask &= ~complete3;
+	}
+	//Do work
+	for (int i = 0; i < maxIter; ++i)
+	{
+		sleep(maxSec > 0 ? rand() % maxSec : 0);
+		std::cout << "\ttaskM2 -> " << task->get_elapsed_time() << std::endl;
+	}
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		completedTask |= completeM2;
+		var1.notify_all();
+	}
+	//
+	return AsyncTask::DS_cont;
+}
+
+AsyncTask::DoneStatus taskFunction3(GenericAsyncTask* task, void * data)
+{
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		while ((completedTask & complete3)
+				or (not ((completedTask & completeM1)
+						and (completedTask & completeM2))))
+		{
+			var1.wait();
+		}
+		completedTask &= ~complete1;
+	}
+	//Do work
+	int t = maxSec > 0 ? rand() % maxSec : 0;
+	sleep(t);
+	std::cout << "taskFunction3 -> " << task->get_elapsed_time() << std::endl;
+	//
+	{
+		HOLD_MUTEX(mutex1)
+		completedTask |= complete3;
+		var1.notify_all();
+	}
+	//
+	return AsyncTask::DS_cont;
+}
+
+int threads_main(int argc, char *argv[])
+{
+	// Load your configuration
+	load_prc_file_data("", "model-path " + baseDir + "data/models");
+	load_prc_file_data("", "model-path " + baseDir + "data/shaders");
+	load_prc_file_data("", "model-path " + baseDir + "data/sounds");
+	load_prc_file_data("", "model-path " + baseDir + "data/textures");
+	load_prc_file_data("", "show-frame-rate-meter #t");
+	load_prc_file_data("", "lock-to-one-cpu 0");
+	load_prc_file_data("", "support-threads 1");
+	load_prc_file_data("", "audio-buffering-seconds 5");
+	load_prc_file_data("", "audio-preload-threshold 2000000");
+	load_prc_file_data("", "sync-video #t");
+	//open a new window framework
+	PandaFramework framework;
+	framework.open_framework(argc, argv);
+	//set the window title to My Panda3D Window
+	framework.set_window_title("My Panda3D Window");
+	//open the window
+	WindowFramework *window = framework.open_window();
+	if (window != (WindowFramework *) NULL)
+	{
+		std::cout << "Opened the window successfully!\n";
+		// common setup
+		window->enable_keyboard(); // Enable keyboard detection
+		window->setup_trackball(); // Enable default camera movement
+	}
+	//setup camera trackball (local coordinate)
+	NodePath tballnp = window->get_mouse().find("**/+Trackball");
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
+	trackball->set_pos(0, 200, 0);
+	trackball->set_hpr(0, 15, 0);
+
+	///here is room for your own code
+	//TASK3
+	AsyncTaskChain* chain3 =
+			AsyncTaskManager::get_global_ptr()->make_task_chain("chain3");
+	chain3->set_num_threads(1);
+	chain3->set_frame_sync(true);
+	PT(AsyncTask)task3 = new GenericAsyncTask("task3",
+			&taskFunction3, reinterpret_cast<void*>(NULL));
+	task3->set_task_chain("chain3");
+	AsyncTaskManager::get_global_ptr()->add(task3);
+
+	//TASKM1
+	AsyncTaskChain* chainM1 =
+			AsyncTaskManager::get_global_ptr()->make_task_chain("chainM1");
+	chainM1->set_num_threads(1);
+	chainM1->set_frame_sync(true);
+	PT(AsyncTask)taskm1 = new GenericAsyncTask("taskM1",
+			&taskM1, reinterpret_cast<void*>(NULL));
+	taskm1->set_task_chain("chainM1");
+	AsyncTaskManager::get_global_ptr()->add(taskm1);
+	//TASKM2
+	AsyncTaskChain* chainM2 =
+			AsyncTaskManager::get_global_ptr()->make_task_chain("chainM2");
+	chainM2->set_num_threads(1);
+	chainM2->set_frame_sync(true);
+	PT(AsyncTask)taskm2 = new GenericAsyncTask("taskM2",
+			&taskM2, reinterpret_cast<void*>(NULL));
+	taskm2->set_task_chain("chainM2");
+	AsyncTaskManager::get_global_ptr()->add(taskm2);
+
+	//TASK1
+	AsyncTaskChain* chain1 =
+			AsyncTaskManager::get_global_ptr()->make_task_chain("chain1");
+	chain1->set_num_threads(1);
+	chain1->set_frame_sync(true);
+	PT(AsyncTask)task1 = new GenericAsyncTask("task1",
+			&taskFunction1, reinterpret_cast<void*>(NULL));
+	task1->set_task_chain("chain1");
+	AsyncTaskManager::get_global_ptr()->add(task1);
+
+	//do the main loop, equal to run() in python
+	framework.main_loop();
+	//close the window framework
+	framework.close_framework();
+	return (0);
 }
