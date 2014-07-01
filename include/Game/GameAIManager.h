@@ -46,18 +46,9 @@ public:
 	 * @param priority The task priority.
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
-	 * @param completedTask If ELY_THREAD is defined this indicates the
-	 * flags to signal update completion.
-	 * @param completedMask If ELY_THREAD is defined this indicates the
-	 * mask with which to "or" the completion flags.
 	 */
 	GameAIManager(int sort = 0, int priority = 0,
-#ifdef ELY_THREAD
-			const std::string& asyncTaskChain = std::string(""),
-			unsigned long int* completedTask = 0,
-			unsigned long int completedMask = 0
-#endif
-			);
+			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GameAIManager();
 
 	/**
@@ -116,11 +107,6 @@ private:
 #ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
-	///Multithreaded stuff
-	///@{
-	unsigned long int* mCompletedTask;
-	unsigned long int mCompletedMask;
-	///@}
 #endif
 };
 

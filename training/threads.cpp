@@ -15,7 +15,9 @@ PT(ClockObject)clockObj;
 
 Mutex mutex1;
 ConditionVarFull var1(mutex1);
-bool completeM1 = true, completeM2 = true;
+const unsigned long int completeM1 = 1 << 0, completeM2 = 1 << 1;
+const unsigned long int completeAllMs = completeM1 | completeM2;
+unsigned long int completedMs = completeAllMs;
 
 //const unsigned long int completePre = 1 << 0, completeM1 = 1 << 1, completeM2 = 1 << 2,
 //		completePost = 1 << 3;
@@ -123,17 +125,17 @@ bool completeM1 = true, completeM2 = true;
 //	return AsyncTask::DS_cont;
 //}
 
-AsyncTask::DoneStatus goTaskM(GenericAsyncTask* task, void * data)
+AsyncTask::DoneStatus fireTasksM(GenericAsyncTask* task, void * data)
 {
 	HOLD_MUTEX(mutex1)
-	std::cout << "start goTaskM -> " << clockObj->get_long_time() << std::endl;
-	completeM1 = completeM2 = false;
+	std::cout << "start fireTasksM -> " << clockObj->get_long_time() << std::endl;
+	completedMs = 0;
 	var1.notify_all();
-	while (not (completeM1 and completeM2))
+	while (completedMs ^ completeAllMs)
 	{
 		var1.wait();
 	}
-	std::cout << "end goTaskM -> " << clockObj->get_long_time() << std::endl;
+	std::cout << "end fireTasksM -> " << clockObj->get_long_time() << std::endl;
 	return AsyncTask::DS_cont;
 }
 
@@ -142,7 +144,7 @@ AsyncTask::DoneStatus taskM1(GenericAsyncTask* task, void * data)
 	//
 	{
 		HOLD_MUTEX(mutex1)
-		while (completeM1)
+		while (completedMs & completeM1)
 		{
 			var1.wait();
 		}
@@ -156,7 +158,7 @@ AsyncTask::DoneStatus taskM1(GenericAsyncTask* task, void * data)
 	//
 	{
 		HOLD_MUTEX(mutex1)
-		completeM1 = true;
+		completedMs |= completeM1;
 		var1.notify_all();
 	}
 	//
@@ -167,7 +169,7 @@ AsyncTask::DoneStatus taskM2(GenericAsyncTask* task, void * data)
 	//
 	{
 		HOLD_MUTEX(mutex1)
-		while (completeM2)
+		while (completedMs & completeM2)
 		{
 			var1.wait();
 		}
@@ -181,7 +183,7 @@ AsyncTask::DoneStatus taskM2(GenericAsyncTask* task, void * data)
 	//
 	{
 		HOLD_MUTEX(mutex1)
-		completeM2 = true;
+		completedMs |= completeM2;
 		var1.notify_all();
 	}
 	//
@@ -248,7 +250,7 @@ int threads_main(int argc, char *argv[])
 
 	//GOTASKM
 	PT(AsyncTask)GOTASKM = new GenericAsyncTask("GOTASKM",
-			&goTaskM, reinterpret_cast<void*>(NULL));
+			&fireTasksM, reinterpret_cast<void*>(NULL));
 //	GOTASKM->set_task_chain("default");
 	GOTASKM->set_sort(10);
 	AsyncTaskManager::get_global_ptr()->add(GOTASKM);

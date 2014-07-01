@@ -28,9 +28,7 @@ namespace ely
 {
 
 GameAIManager::GameAIManager(int sort, int priority,
-		const std::string& asyncTaskChain, unsigned long int* completedTask,
-		unsigned long int completedMask) :
-		mStartFrame(2)
+		const std::string& asyncTaskChain):mStartFrame(2)
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameAIManager::GameAIManager: invalid GameManager")
@@ -54,10 +52,6 @@ GameAIManager::GameAIManager(int sort, int priority,
 	{
 		//Specifies the AsyncTaskChain on which mUpdateTask will be running.
 		mUpdateTask->set_task_chain(asyncTaskChain);
-	}
-	{
-		HOLD_MUTEX(GameManager::GetSingleton().)
-		mCompletedTask = completedTask
 	}
 #endif
 	//Adds mUpdateTask to the active queue.
@@ -84,7 +78,7 @@ void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 	HOLD_REMUTEX(mMutex)
 
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
-	mAIComponents.end(), aiComp);
+			mAIComponents.end(), aiComp);
 	if (iter == mAIComponents.end())
 	{
 		mAIComponents.push_back(aiComp);
@@ -97,7 +91,7 @@ void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 	HOLD_REMUTEX(mMutex)
 
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
-	mAIComponents.end(), aiComp);
+			mAIComponents.end(), aiComp);
 	if (iter != mAIComponents.end())
 	{
 		mAIComponents.remove(aiComp);
@@ -129,7 +123,8 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 
 	// call all AI components update functions, passing delta time
 	AIComponentList::iterator iter;
-	for (iter = mAIComponents.begin(); iter != mAIComponents.end(); ++iter)
+	for (iter = mAIComponents.begin(); iter != mAIComponents.end();
+			++iter)
 	{
 		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
