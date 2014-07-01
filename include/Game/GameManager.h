@@ -126,6 +126,14 @@ public:
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+	/**
+	 * \brief Get multithreaded managers stuff.
+	 */
+	///@{
+	Mutex& getManagersMutex();
+	ConditionVarFull& getManagersVar();
+	void addCompletedTaskMask(unsigned long int completedMask);
+	///@}
 #endif
 
 protected:
@@ -168,8 +176,7 @@ protected:
 
 	/// Common members
 	WindowFramework * mWindow;
-	NodePath mRender;
-	SMARTPTR(ClockObject) mGlobalClock;
+	NodePath mRender;SMARTPTR(ClockObject)mGlobalClock;
 
 	/// NodePaths for enable_mouse/disable_mouse.
 	NodePath mTrackBall, mMouse2cam;
@@ -191,12 +198,20 @@ protected:
 #ifdef ELY_THREAD
 	///The mutex associated with this manager.
 	ReMutex mMutex;
+	///Multithreaded managers stuff.
+	///@{
+	Mutex mManagersMutex;
+	ConditionVarFull mManagersVar;
+	static AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task);
+	unsigned long int mCompletedTask, mAllCompletedTask;
+	///@}
 #endif
 };
 
 ///inline definitions
 
-inline void GameManager::setDataInfo(GameDataInfo info, const std::string& value)
+inline void GameManager::setDataInfo(GameDataInfo info,
+		const std::string& value)
 {
 	mInfoDB[info] = value;
 }
@@ -210,6 +225,21 @@ inline std::string GameManager::getDataInfo(GameDataInfo info)
 inline ReMutex& GameManager::getMutex()
 {
 	return mMutex;
+}
+inline Mutex& GameManager::getManagersMutex()
+{
+	return mManagersMutex;
+}
+inline ConditionVarFull& GameManager::getManagersVar()
+{
+	return mManagersVar;
+}
+inline void GameManager::addCompletedTaskMask(
+		unsigned long int completedMask)
+{
+	HOLD_MUTEX(mManagersMutex)
+
+	mAllCompletedTask |= completedMask;
 }
 #endif
 

@@ -32,6 +32,9 @@ namespace ely
 
 GameManager::GameManager(int argc, char* argv[]) :
 		PandaFramework()
+#ifdef ELY_THREAD
+	, mManagersVar(mManagersMutex), mCompletedTask(0), mAllCompletedTask(0)
+#endif
 {
 	// Open the framework
 	open_framework(argc, argv);
@@ -510,6 +513,20 @@ void GameManager::togglePhysicsDebug(const Event* event)
 	}
 	mPhysicsDebugEnabled = not mPhysicsDebugEnabled;
 }
+#endif
+
+#ifdef ELY_THREAD
+	AsyncTask::DoneStatus GameManager::fireManagers(GenericAsyncTask* task)
+	{
+		HOLD_MUTEX(mManagersMutex)
+		mCompletedTask = 0;
+		mManagersVar.notify_all();
+		while (mCompletedTask ^ mAllCompletedTask)
+		{
+			mManagersVar.wait();
+		}
+		return AsyncTask::DS_cont;
+	}
 #endif
 
 } // namespace ely
