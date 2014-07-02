@@ -114,22 +114,23 @@ AsyncTask::DoneStatus GameBehaviorManager::update(GenericAsyncTask* task)
 			mManagersVar.wait();
 		}
 	}
+	{
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
 
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	float dt = ClockObject::get_global_clock()->get_dt();
+		float dt = ClockObject::get_global_clock()->get_dt();
 
 #ifdef TESTING
-	dt = 0.016666667; //60 fps
+		dt = 0.016666667; //60 fps
 #endif
 
-	// call all Behavior components update functions, passing delta time
-	BehaviorComponentList::iterator iter;
-	for (iter = mBehaviorComponents.begin(); iter != mBehaviorComponents.end();
-			++iter)
-	{
-		(*iter)->update(reinterpret_cast<void*>(&dt));
+		// call all Behavior components update functions, passing delta time
+		BehaviorComponentList::iterator iter;
+		for (iter = mBehaviorComponents.begin();
+				iter != mBehaviorComponents.end(); ++iter)
+		{
+			(*iter)->update(reinterpret_cast<void*>(&dt));
+		}
 	}
 	//manager multithread
 	{

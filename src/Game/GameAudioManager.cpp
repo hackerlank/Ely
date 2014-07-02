@@ -120,24 +120,26 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 			mManagersVar.wait();
 		}
 	}
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+	{
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
 
-	float dt = ClockObject::get_global_clock()->get_dt();
+		float dt = ClockObject::get_global_clock()->get_dt();
 
 #ifdef TESTING
-	dt = 0.016666667; //60 fps
+		dt = 0.016666667; //60 fps
 #endif
 
-	// call all audio components update functions, passing delta time
-	AudioComponentList::iterator iter;
-	for (iter = mAudioComponents.begin(); iter != mAudioComponents.end();
-			++iter)
-	{
-		(*iter)->update(reinterpret_cast<void*>(&dt));
+		// call all audio components update functions, passing delta time
+		AudioComponentList::iterator iter;
+		for (iter = mAudioComponents.begin(); iter != mAudioComponents.end();
+				++iter)
+		{
+			(*iter)->update(reinterpret_cast<void*>(&dt));
+		}
+		//Update audio manager
+		mAudioMgr->update();
 	}
-	//Update audio manager
-	mAudioMgr->update();
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)

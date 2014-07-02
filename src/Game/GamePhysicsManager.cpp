@@ -137,66 +137,67 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 			mManagersVar.wait();
 		}
 	}
+	{
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
 
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+		float dt = ClockObject::get_global_clock()->get_dt();
 
-	float dt = ClockObject::get_global_clock()->get_dt();
-
-	int maxSubSteps;
+		int maxSubSteps;
 
 #ifdef TESTING
-	dt = 0.016666667; //60 fps
+		dt = 0.016666667; //60 fps
 #endif
 
-	// call all physics components update functions, passing delta time
-	PhysicsComponentList::iterator iter;
-	for (iter = mPhysicsComponents.begin(); iter != mPhysicsComponents.end();
-			++iter)
-	{
-		(*iter)->update(reinterpret_cast<void*>(&dt));
+		// call all physics components update functions, passing delta time
+		PhysicsComponentList::iterator iter;
+		for (iter = mPhysicsComponents.begin();
+				iter != mPhysicsComponents.end(); ++iter)
+		{
+			(*iter)->update(reinterpret_cast<void*>(&dt));
+		}
+		// do physics step simulation
+		// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->
+		// supposing a minimum of 6,666666667 fps, we have a maximum
+		// timeStep of 0.15 secs so: maxSubSteps <= 60 * 0.15 = 9
+		if (dt < 0.016666667)
+		{
+			maxSubSteps = 1;
+		}
+		else if (dt < 0.033333333)
+		{
+			maxSubSteps = 2;
+		}
+		else if (dt < 0.05)
+		{
+			maxSubSteps = 3;
+		}
+		else if (dt < 0.066666668)
+		{
+			maxSubSteps = 4;
+		}
+		else if (dt < 0.083333335)
+		{
+			maxSubSteps = 5;
+		}
+		else if (dt < 0.100000002)
+		{
+			maxSubSteps = 6;
+		}
+		else if (dt < 0.116666669)
+		{
+			maxSubSteps = 7;
+		}
+		else if (dt < 0.133333336)
+		{
+			maxSubSteps = 8;
+		}
+		else
+		{
+			maxSubSteps = 9;
+		}
+		mBulletWorld->do_physics(dt, maxSubSteps);
 	}
-	// do physics step simulation
-	// timeStep < maxSubSteps * fixedTimeStep (=1/60.0=0.016666667) -->
-	// supposing a minimum of 6,666666667 fps, we have a maximum
-	// timeStep of 0.15 secs so: maxSubSteps <= 60 * 0.15 = 9
-	if (dt < 0.016666667)
-	{
-		maxSubSteps = 1;
-	}
-	else if (dt < 0.033333333)
-	{
-		maxSubSteps = 2;
-	}
-	else if (dt < 0.05)
-	{
-		maxSubSteps = 3;
-	}
-	else if (dt < 0.066666668)
-	{
-		maxSubSteps = 4;
-	}
-	else if (dt < 0.083333335)
-	{
-		maxSubSteps = 5;
-	}
-	else if (dt < 0.100000002)
-	{
-		maxSubSteps = 6;
-	}
-	else if (dt < 0.116666669)
-	{
-		maxSubSteps = 7;
-	}
-	else if (dt < 0.133333336)
-	{
-		maxSubSteps = 8;
-	}
-	else
-	{
-		maxSubSteps = 9;
-	}
-	mBulletWorld->do_physics(dt, maxSubSteps);
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)

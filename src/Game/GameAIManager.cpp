@@ -123,28 +123,32 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 			mManagersVar.wait();
 		}
 	}
-
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	///XXX: HACK
-	if (mStartFrame > 0)
 	{
-		--mStartFrame;
-		return AsyncTask::DS_cont;
-	}
+		//lock (guard) the mutex
+		HOLD_REMUTEX(mMutex)
 
-	float dt = ClockObject::get_global_clock()->get_dt();
+		///XXX: HACK
+		if (mStartFrame > 0)
+		{
+			--mStartFrame;
+		}
+		else
+		{
+
+			float dt = ClockObject::get_global_clock()->get_dt();
 
 #ifdef TESTING
-	dt = 0.016666667; //60 fps
+			dt = 0.016666667; //60 fps
 #endif
 
-	// call all AI components update functions, passing delta time
-	AIComponentList::iterator iter;
-	for (iter = mAIComponents.begin(); iter != mAIComponents.end(); ++iter)
-	{
-		(*iter)->update(reinterpret_cast<void*>(&dt));
+			// call all AI components update functions, passing delta time
+			AIComponentList::iterator iter;
+			for (iter = mAIComponents.begin(); iter != mAIComponents.end();
+					++iter)
+			{
+				(*iter)->update(reinterpret_cast<void*>(&dt));
+			}
+		}
 	}
 	//manager multithread
 	{

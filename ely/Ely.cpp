@@ -68,48 +68,60 @@ int main(int argc, char **argv)
 	completedAllMask = 0;
 	completedTasks = 0;
 	//AI
+	managersMutex.acquire();
 	completedMask = 1 << 0;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(AI_chain, 2, true)
+	TASKCHAIN(AI_chain, 1, true);
 	GAMESUBMANAGER(GameAIManager, gameAIMgr, managersMutex, managersVar,
-			completedMask, completedTasks, 0, 0, AI_chain)
+			completedMask, completedTasks, 0, 0, AI_chain);
+	managersMutex.release();
 	//Control
+	managersMutex.acquire();
 	completedMask = 1 << 1;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Control_chain, 2, true)
+	TASKCHAIN(Control_chain, 1, true);
 	GAMESUBMANAGER(GameControlManager, gameControlMgr, managersMutex,
-			managersVar, completedMask, completedTasks, 0, 0, Control_chain)
+			managersVar, completedMask, completedTasks, 0, 0, Control_chain);
+	managersMutex.release();
 	//Scene
+	managersMutex.acquire();
 	completedMask = 1 << 2;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Scene_chain, 2, true)
+	TASKCHAIN(Scene_chain, 1, true);
 	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, managersMutex, managersVar,
-			completedMask, completedTasks, 0, 0, Scene_chain)
+			completedMask, completedTasks, 0, 0, Scene_chain);
+	managersMutex.release();
 	//Physics
+	managersMutex.acquire();
 	completedMask = 1 << 3;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Physics_chain, 2, true)
+	TASKCHAIN(Physics_chain, 1, true);
 	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, managersMutex,
-			managersVar, completedMask, completedTasks, 0, 0, Physics_chain)
+			managersVar, completedMask, completedTasks, 0, 0, Physics_chain);
+	managersMutex.release();
 	//Audio
+	managersMutex.acquire();
 	completedMask = 1 << 4;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Audio_chain, 2, true)
+	TASKCHAIN(Audio_chain, 1, true);
 	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, managersMutex, managersVar,
-			completedMask, completedTasks, 0, 0, Audio_chain)
+			completedMask, completedTasks, 0, 0, Audio_chain);
+	managersMutex.release();
 	//Behavior
+	managersMutex.acquire();
 	completedMask = 1 << 5;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Behavior_chain, 2, true)
+	TASKCHAIN(Behavior_chain, 1, true);
 	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, managersMutex,
-			managersVar, completedMask, completedTasks, 0, 0, Behavior_chain)
-	//fireManagers
+			managersVar, completedMask, completedTasks, 0, 0, Behavior_chain);
+	managersMutex.release();
+	///fireManagers
 	SMARTPTR(AsyncTask)fireManagersTask = new GenericAsyncTask("fireManagersTask",
 			&fireManagers, reinterpret_cast<void*>(NULL));
 	fireManagersTask->set_task_chain("default");
@@ -193,6 +205,9 @@ int main(int argc, char **argv)
 	gameMgr->gameCleanup();
 
 	// Close the game framework
+#if ELY_THREAD
+	AsyncTaskManager::get_global_ptr()->remove(fireManagersTask);
+#endif
 	delete gameBehaviorMgr;
 	delete gameAudioMgr;
 	delete gamePhysicsMgr;
