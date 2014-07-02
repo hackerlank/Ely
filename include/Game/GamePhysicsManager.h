@@ -47,7 +47,13 @@ public:
 	 * @param asyncTaskChain If ELY_THREAD is defined this indicates if
 	 * this manager should run in another async task chain.
 	 */
-	GamePhysicsManager(int sort = 0, int priority = 0,
+	GamePhysicsManager(
+#ifdef ELY_THREAD
+			Mutex& managersMutex, ConditionVarFull& managersVar,
+			const unsigned long int completedMask,
+			unsigned long int& completedTasks,
+#endif
+			int sort = 0, int priority = 0,
 			const std::string& asyncTaskChain = std::string(""));
 	virtual ~GamePhysicsManager();
 
@@ -83,6 +89,13 @@ public:
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
+	///Multithreaded managers stuff
+	///@{
+	Mutex& mManagersMutex;
+	ConditionVarFull& mManagersVar;
+	const unsigned long int mCompletedMask;
+	unsigned long int& mCompletedTasks;
+	///@}
 #endif
 
 #ifdef ELY_DEBUG

@@ -27,8 +27,18 @@
 namespace ely
 {
 
-GameAudioManager::GameAudioManager(int sort, int priority,
+GameAudioManager::GameAudioManager(
+#ifdef ELY_THREAD
+		Mutex& managersMutex, ConditionVarFull& managersVar,
+		const unsigned long int completedMask,
+		unsigned long int& completedTasks,
+#endif
+		int sort, int priority,
 		const std::string& asyncTaskChain)
+#ifdef ELY_THREAD
+		:mManagersMutex(managersMutex), mManagersVar(managersVar),
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+#endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameAudioManager::GameAudioManager: invalid GameManager")
@@ -102,6 +112,14 @@ SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
 
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		while (mCompletedTasks & mCompletedMask)
+		{
+			mManagersVar.wait();
+		}
+	}
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
@@ -120,6 +138,12 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	}
 	//Update audio manager
 	mAudioMgr->update();
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		mCompletedTasks |= mCompletedMask;
+		mManagersVar.notify_all();
+	}
 	//
 	return AsyncTask::DS_cont;
 }

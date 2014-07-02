@@ -36,6 +36,7 @@
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
+#ifdef ELY_THREAD
 ///Define a manager for a given subsystem:
 ///@param _chain_ the task chain variable/name
 ///@param _threads_ the task chain number of threads
@@ -49,8 +50,16 @@
 	make_task_chain(#_chain_);\
 	_chain_->set_num_threads(_threads_);\
 	_chain_->set_frame_sync(_framesync_);
-#define GAMESUBMANAGER(_managertype_,_manager_,_sort_,_prio_,_chain_) \
-	_managertype_* _manager_ = new _managertype_(_sort_, _prio_, #_chain_);
+#define GAMESUBMANAGER(_managertype_,_manager_,_managersmutex_,_managersvar_,\
+		_completedmask_,_completedtasks_,_sort_,_prio_,_chain_) \
+	_managertype_* _manager_ = new _managertype_(_managersmutex_,_managersvar_,\
+			_completedmask_,_completedtasks_,_sort_, _prio_, #_chain_);
+extern Mutex managersMutex;
+extern ConditionVarFull managersVar;
+extern unsigned long int completedTasks;
+extern unsigned long int completedAllMask;
+AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data);
+#endif
 
 ///Common ely definitions
 namespace ely

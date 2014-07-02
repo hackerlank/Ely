@@ -27,8 +27,18 @@
 namespace ely
 {
 
-GameAIManager::GameAIManager(int sort, int priority,
-		const std::string& asyncTaskChain):mStartFrame(2)
+GameAIManager::GameAIManager(
+#ifdef ELY_THREAD
+		Mutex& managersMutex, ConditionVarFull& managersVar,
+		const unsigned long int completedMask,
+		unsigned long int& completedTasks,
+#endif
+		int sort, int priority, const std::string& asyncTaskChain) :
+		mStartFrame(2)
+#ifdef ELY_THREAD
+		,mManagersMutex(managersMutex), mManagersVar(managersVar),
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+#endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameAIManager::GameAIManager: invalid GameManager")
@@ -78,7 +88,7 @@ void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
 	HOLD_REMUTEX(mMutex)
 
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
-			mAIComponents.end(), aiComp);
+	mAIComponents.end(), aiComp);
 	if (iter == mAIComponents.end())
 	{
 		mAIComponents.push_back(aiComp);
@@ -91,7 +101,7 @@ void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 	HOLD_REMUTEX(mMutex)
 
 	AIComponentList::iterator iter = find(mAIComponents.begin(),
-			mAIComponents.end(), aiComp);
+	mAIComponents.end(), aiComp);
 	if (iter != mAIComponents.end())
 	{
 		mAIComponents.remove(aiComp);
@@ -105,6 +115,15 @@ AIWorld* GameAIManager::aiWorld() const
 
 AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 {
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		while (mCompletedTasks & mCompletedMask)
+		{
+			mManagersVar.wait();
+		}
+	}
+
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
@@ -123,12 +142,16 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 
 	// call all AI components update functions, passing delta time
 	AIComponentList::iterator iter;
-	for (iter = mAIComponents.begin(); iter != mAIComponents.end();
-			++iter)
+	for (iter = mAIComponents.begin(); iter != mAIComponents.end(); ++iter)
 	{
 		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
-
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		mCompletedTasks |= mCompletedMask;
+		mManagersVar.notify_all();
+	}
 	//
 	return AsyncTask::DS_cont;
 }

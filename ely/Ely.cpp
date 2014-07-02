@@ -23,6 +23,7 @@
 
 #include "Ely.h"
 #include "Ely_ini.h"
+#include <pandaFramework.h>
 
 using namespace ely;
 
@@ -33,8 +34,7 @@ int main(int argc, char **argv)
 #endif
 	// Load your configuration
 	Filename configPrc(std::string());
-	load_prc_file(
-			Filename(std::string(ELY_CONFIGPRC)));
+	load_prc_file(Filename(std::string(ELY_CONFIGPRC)));
 
 	// Libtool: initialize libltdl.
 	if (lt_dlinit() != 0)
@@ -50,36 +50,80 @@ int main(int argc, char **argv)
 	// First create a Game manager: mandatory
 	GameManager* gameMgr = new GameManager(argc, argv);
 	// Add game data info
-	GameManager::GetSingletonPtr()->setDataInfo(GameManager::DATADIR, ELY_DATADIR);
-	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CONFIGFILE, ELY_CONFIGFILE);
-	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CALLBACKS, ELY_CALLBACKS_LA);
-	GameManager::GetSingletonPtr()->setDataInfo(GameManager::TRANSITIONS, ELY_TRANSITIONS_LA);
-	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INITIALIZATIONS, ELY_INITIALIZATIONS_LA);
-	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INSTANCEUPDATES, ELY_INSTANCEUPDATES_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::DATADIR,
+	ELY_DATADIR);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CONFIGFILE,
+	ELY_CONFIGFILE);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::CALLBACKS,
+	ELY_CALLBACKS_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::TRANSITIONS,
+	ELY_TRANSITIONS_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INITIALIZATIONS,
+	ELY_INITIALIZATIONS_LA);
+	GameManager::GetSingletonPtr()->setDataInfo(GameManager::INSTANCEUPDATES,
+	ELY_INSTANCEUPDATES_LA);
 	// Other managers (depending on GameManager)
 #ifdef ELY_THREAD
+	unsigned long int completedMask;
+	completedAllMask = 0;
+	completedTasks = 0;
 	//AI
-#ifdef ELY_DEBUG
-	GAMESUBMANAGER(GameAIManager, gameAIMgr, 5, 0, default)
-#else
+	completedMask = 1 << 0;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
 	TASKCHAIN(AI_chain, 2, true)
-	GAMESUBMANAGER(GameAIManager, gameAIMgr, 0, 0, AI_chain)
-#endif
+	GAMESUBMANAGER(GameAIManager, gameAIMgr, managersMutex, managersVar,
+			completedMask, completedTasks, 0, 0, AI_chain)
 	//Control
+	completedMask = 1 << 1;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
 	TASKCHAIN(Control_chain, 2, true)
-	GAMESUBMANAGER(GameControlManager, gameControlMgr, 0, 0, Control_chain)
+	GAMESUBMANAGER(GameControlManager, gameControlMgr, managersMutex,
+			managersVar, completedMask, completedTasks, 0, 0, Control_chain)
 	//Scene
+	completedMask = 1 << 2;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
 	TASKCHAIN(Scene_chain, 2, true)
-	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, 0, 0, Scene_chain)
+	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, managersMutex, managersVar,
+			completedMask, completedTasks, 0, 0, Scene_chain)
 	//Physics
-//	TASKCHAIN(Physics_chain, 2, true)
-	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, 10, 0, default)
+	completedMask = 1 << 3;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
+	TASKCHAIN(Physics_chain, 2, true)
+	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, managersMutex,
+			managersVar, completedMask, completedTasks, 0, 0, Physics_chain)
 	//Audio
+	completedMask = 1 << 4;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
 	TASKCHAIN(Audio_chain, 2, true)
-	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, 0, 0, Audio_chain)
+	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, managersMutex, managersVar,
+			completedMask, completedTasks, 0, 0, Audio_chain)
 	//Behavior
+	completedMask = 1 << 5;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
 	TASKCHAIN(Behavior_chain, 2, true)
-	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, 0, 0, Behavior_chain)
+	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, managersMutex,
+			managersVar, completedMask, completedTasks, 0, 0, Behavior_chain)
+	//fireManagers
+	SMARTPTR(AsyncTask)fireManagersTask = new GenericAsyncTask("fireManagersTask",
+			&fireManagers, reinterpret_cast<void*>(NULL));
+	fireManagersTask->set_task_chain("default");
+	//sort values on default chain:
+	//task_data_loop: -50
+	//task_event: 0
+	//task_record_frame: 45
+	//task_garbage_collect: 46
+	//task_igloop: 50
+	//task_play_frame: 55
+	//task_clear_screenshot_text: ?
+	//task_clear_text: ?
+	fireManagersTask->set_sort(10);
+	AsyncTaskManager::get_global_ptr()->add(fireManagersTask);
 #else
 	//AI
 	GameAIManager* gameAIMgr = new GameAIManager();
@@ -161,8 +205,27 @@ int main(int argc, char **argv)
 	// Libtool: shut down libltdl and close all modules.
 	if (lt_dlexit() != 0)
 	{
-		std::cerr << "Ely::main: Libtool error on libltdl shutting down" << std::endl;
+		std::cerr << "Ely::main: Libtool error on libltdl shutting down"
+				<< std::endl;
 	}
 	return 0;
 }
 
+#ifdef ELY_THREAD
+Mutex managersMutex;
+ConditionVarFull managersVar(managersMutex);
+unsigned long int completedTasks;
+unsigned long int completedAllMask;
+AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data)
+{
+	HOLD_MUTEX(managersMutex)
+
+	completedTasks = 0;
+	managersVar.notify_all();
+	while (completedTasks ^ completedAllMask)
+	{
+		managersVar.wait();
+	}
+	return AsyncTask::DS_cont;
+}
+#endif

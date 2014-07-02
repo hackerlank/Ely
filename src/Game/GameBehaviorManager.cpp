@@ -27,8 +27,18 @@
 namespace ely
 {
 
-GameBehaviorManager::GameBehaviorManager(int sort, int priority,
+GameBehaviorManager::GameBehaviorManager(
+#ifdef ELY_THREAD
+		Mutex& managersMutex, ConditionVarFull& managersVar,
+		const unsigned long int completedMask,
+		unsigned long int& completedTasks,
+#endif
+		int sort, int priority,
 		const std::string& asyncTaskChain)
+#ifdef ELY_THREAD
+		:mManagersMutex(managersMutex), mManagersVar(managersVar),
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+#endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GameBehaviorManager::GameBehaviorManager: invalid GameManager")
@@ -96,6 +106,15 @@ void GameBehaviorManager::removeFromBehaviorUpdate(SMARTPTR(Component)behaviorCo
 
 AsyncTask::DoneStatus GameBehaviorManager::update(GenericAsyncTask* task)
 {
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		while (mCompletedTasks & mCompletedMask)
+		{
+			mManagersVar.wait();
+		}
+	}
+
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
@@ -112,7 +131,12 @@ AsyncTask::DoneStatus GameBehaviorManager::update(GenericAsyncTask* task)
 	{
 		(*iter)->update(reinterpret_cast<void*>(&dt));
 	}
-
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		mCompletedTasks |= mCompletedMask;
+		mManagersVar.notify_all();
+	}
 	//
 	return AsyncTask::DS_cont;
 }

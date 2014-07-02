@@ -39,8 +39,18 @@
 namespace ely
 {
 
-GamePhysicsManager::GamePhysicsManager(int sort, int priority,
+GamePhysicsManager::GamePhysicsManager(
+#ifdef ELY_THREAD
+		Mutex& managersMutex, ConditionVarFull& managersVar,
+		const unsigned long int completedMask,
+		unsigned long int& completedTasks,
+#endif
+		int sort, int priority,
 		const std::string& asyncTaskChain)
+#ifdef ELY_THREAD
+		:mManagersMutex(managersMutex), mManagersVar(managersVar),
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+#endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
 			"GamePhysicsManager::GamePhysicsManager: invalid GameManager")
@@ -119,6 +129,15 @@ SMARTPTR(BulletWorld) GamePhysicsManager::bulletWorld() const
 
 AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 {
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		while (mCompletedTasks & mCompletedMask)
+		{
+			mManagersVar.wait();
+		}
+	}
+
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
@@ -178,6 +197,12 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		maxSubSteps = 9;
 	}
 	mBulletWorld->do_physics(dt, maxSubSteps);
+	//manager multithread
+	{
+		HOLD_MUTEX(mManagersMutex)
+		mCompletedTasks |= mCompletedMask;
+		mManagersVar.notify_all();
+	}
 	//
 	return AsyncTask::DS_cont;
 }
