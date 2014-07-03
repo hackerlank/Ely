@@ -31,13 +31,15 @@ GameAudioManager::GameAudioManager(
 #ifdef ELY_THREAD
 		Mutex& managersMutex, ConditionVarFull& managersVar,
 		const unsigned long int completedMask,
+		const unsigned long int exiting,
 		unsigned long int& completedTasks,
 #endif
 		int sort, int priority,
 		const std::string& asyncTaskChain)
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
-		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
+		mExiting(exiting)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -112,6 +114,7 @@ SMARTPTR(AudioManager) GameAudioManager::audioMgr() const
 
 AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
+#ifdef ELY_THREAD
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)
@@ -119,7 +122,12 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 		{
 			mManagersVar.wait();
 		}
+		if(mCompletedTasks & mExiting)
+		{
+			return AsyncTask::DS_done;
+		}
 	}
+#endif
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -140,12 +148,14 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 		//Update audio manager
 		mAudioMgr->update();
 	}
+#ifdef ELY_THREAD
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)
 		mCompletedTasks |= mCompletedMask;
 		mManagersVar.notify_all();
 	}
+#endif
 	//
 	return AsyncTask::DS_cont;
 }

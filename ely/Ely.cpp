@@ -69,57 +69,57 @@ int main(int argc, char **argv)
 	completedTasks = 0;
 	//AI
 	managersMutex.acquire();
-	completedMask = 1 << 0;
+	completedMask = 1 << 1;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
 	TASKCHAIN(AI_chain, 1, true);
 	GAMESUBMANAGER(GameAIManager, gameAIMgr, managersMutex, managersVar,
-			completedMask, completedTasks, 0, 0, AI_chain);
+			completedMask, exiting,completedTasks, 0, 0, AI_chain);
 	managersMutex.release();
 	//Control
-	managersMutex.acquire();
-	completedMask = 1 << 1;
-	completedAllMask |= completedMask;
-	completedTasks = completedAllMask;
-	TASKCHAIN(Control_chain, 1, true);
-	GAMESUBMANAGER(GameControlManager, gameControlMgr, managersMutex,
-			managersVar, completedMask, completedTasks, 0, 0, Control_chain);
-	managersMutex.release();
-	//Scene
 	managersMutex.acquire();
 	completedMask = 1 << 2;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Scene_chain, 1, true);
-	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, managersMutex, managersVar,
-			completedMask, completedTasks, 0, 0, Scene_chain);
+	TASKCHAIN(Control_chain, 1, true);
+	GAMESUBMANAGER(GameControlManager, gameControlMgr, managersMutex,
+			managersVar, completedMask, exiting, completedTasks, 0, 0, Control_chain);
 	managersMutex.release();
-	//Physics
+	//Scene
 	managersMutex.acquire();
 	completedMask = 1 << 3;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Physics_chain, 1, true);
-	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, managersMutex,
-			managersVar, completedMask, completedTasks, 0, 0, Physics_chain);
+	TASKCHAIN(Scene_chain, 1, true);
+	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, managersMutex, managersVar,
+			completedMask, exiting, completedTasks, 0, 0, Scene_chain);
 	managersMutex.release();
-	//Audio
+	//Physics
 	managersMutex.acquire();
 	completedMask = 1 << 4;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Audio_chain, 1, true);
-	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, managersMutex, managersVar,
-			completedMask, completedTasks, 0, 0, Audio_chain);
+	TASKCHAIN(Physics_chain, 1, true);
+	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, managersMutex,
+			managersVar, completedMask, exiting, completedTasks, 0, 0, Physics_chain);
 	managersMutex.release();
-	//Behavior
+	//Audio
 	managersMutex.acquire();
 	completedMask = 1 << 5;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
+	TASKCHAIN(Audio_chain, 1, true);
+	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, managersMutex, managersVar,
+			completedMask, exiting, completedTasks, 0, 0, Audio_chain);
+	managersMutex.release();
+	//Behavior
+	managersMutex.acquire();
+	completedMask = 1 << 6;
+	completedAllMask |= completedMask;
+	completedTasks = completedAllMask;
 	TASKCHAIN(Behavior_chain, 1, true);
 	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, managersMutex,
-			managersVar, completedMask, completedTasks, 0, 0, Behavior_chain);
+			managersVar, completedMask, exiting, completedTasks, 0, 0, Behavior_chain);
 	managersMutex.release();
 	///fireManagers
 	SMARTPTR(AsyncTask)fireManagersTask = new GenericAsyncTask("fireManagersTask",
@@ -206,6 +206,12 @@ int main(int argc, char **argv)
 
 	// Close the game framework
 #if ELY_THREAD
+	//exiting
+	{
+		HOLD_MUTEX(managersMutex)
+		completedTasks = exiting;
+		managersVar.notify_all();
+	}
 	AsyncTaskManager::get_global_ptr()->remove(fireManagersTask);
 #endif
 	delete gameBehaviorMgr;
@@ -231,6 +237,7 @@ Mutex managersMutex;
 ConditionVarFull managersVar(managersMutex);
 unsigned long int completedTasks;
 unsigned long int completedAllMask;
+const unsigned long int exiting = 1 << 0;
 AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data)
 {
 	HOLD_MUTEX(managersMutex)
@@ -240,6 +247,10 @@ AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data)
 	while (completedTasks ^ completedAllMask)
 	{
 		managersVar.wait();
+	}
+	if(completedTasks & exiting)
+	{
+		return AsyncTask::DS_done;
 	}
 	return AsyncTask::DS_cont;
 }

@@ -51,13 +51,14 @@
 	_chain_->set_num_threads(_threads_);\
 	_chain_->set_frame_sync(_framesync_)
 #define GAMESUBMANAGER(_managertype_,_manager_,_managersmutex_,_managersvar_,\
-		_completedmask_,_completedtasks_,_sort_,_prio_,_chain_) \
+		_completedmask_,_exiting_,_completedtasks_,_sort_,_prio_,_chain_) \
 	_managertype_* _manager_ = new _managertype_(_managersmutex_,_managersvar_,\
-			_completedmask_,_completedtasks_,_sort_, _prio_, #_chain_)
+			_completedmask_,_exiting_,_completedtasks_,_sort_, _prio_, #_chain_)
 extern Mutex managersMutex;
 extern ConditionVarFull managersVar;
 extern unsigned long int completedTasks;
 extern unsigned long int completedAllMask;
+extern const unsigned long int exiting;
 AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data);
 #endif
 

@@ -43,13 +43,15 @@ GamePhysicsManager::GamePhysicsManager(
 #ifdef ELY_THREAD
 		Mutex& managersMutex, ConditionVarFull& managersVar,
 		const unsigned long int completedMask,
+		const unsigned long int exiting,
 		unsigned long int& completedTasks,
 #endif
 		int sort, int priority,
 		const std::string& asyncTaskChain)
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
-		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
+		mExiting(exiting)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -129,6 +131,7 @@ SMARTPTR(BulletWorld) GamePhysicsManager::bulletWorld() const
 
 AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 {
+#ifdef ELY_THREAD
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)
@@ -136,7 +139,12 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		{
 			mManagersVar.wait();
 		}
+		if(mCompletedTasks & mExiting)
+		{
+			return AsyncTask::DS_done;
+		}
 	}
+#endif
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -198,12 +206,14 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		}
 		mBulletWorld->do_physics(dt, maxSubSteps);
 	}
+#ifdef ELY_THREAD
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)
 		mCompletedTasks |= mCompletedMask;
 		mManagersVar.notify_all();
 	}
+#endif
 	//
 	return AsyncTask::DS_cont;
 }

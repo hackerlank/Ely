@@ -31,13 +31,15 @@ GameSceneManager::GameSceneManager(
 #ifdef ELY_THREAD
 		Mutex& managersMutex, ConditionVarFull& managersVar,
 		const unsigned long int completedMask,
+		const unsigned long int exiting,
 		unsigned long int& completedTasks,
 #endif
 		int sort, int priority,
 		const std::string& asyncTaskChain)
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
-		mCompletedMask(completedMask), mCompletedTasks(completedTasks)
+		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
+		mExiting(exiting)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -106,6 +108,7 @@ void GameSceneManager::removeFromSceneUpdate(SMARTPTR(Component)sceneComp)
 
 AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 {
+#ifdef ELY_THREAD
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)
@@ -113,7 +116,12 @@ AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 		{
 			mManagersVar.wait();
 		}
+		if(mCompletedTasks & mExiting)
+		{
+			return AsyncTask::DS_done;
+		}
 	}
+#endif
 	{
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
@@ -132,12 +140,14 @@ AsyncTask::DoneStatus GameSceneManager::update(GenericAsyncTask* task)
 			(*iter)->update(reinterpret_cast<void*>(&dt));
 		}
 	}
+#ifdef ELY_THREAD
 	//manager multithread
 	{
 		HOLD_MUTEX(mManagersMutex)
 		mCompletedTasks |= mCompletedMask;
 		mManagersVar.notify_all();
 	}
+#endif
 	//
 	return AsyncTask::DS_cont;
 }

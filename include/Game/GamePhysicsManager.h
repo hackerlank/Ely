@@ -51,6 +51,7 @@ public:
 #ifdef ELY_THREAD
 			Mutex& managersMutex, ConditionVarFull& managersVar,
 			const unsigned long int completedMask,
+			const unsigned long int exiting,
 			unsigned long int& completedTasks,
 #endif
 			int sort = 0, int priority = 0,
@@ -93,7 +94,7 @@ public:
 	///@{
 	Mutex& mManagersMutex;
 	ConditionVarFull& mManagersVar;
-	const unsigned long int mCompletedMask;
+	const unsigned long int mCompletedMask, mExiting;
 	unsigned long int& mCompletedTasks;
 	///@}
 #endif

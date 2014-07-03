@@ -15,7 +15,8 @@ PT(ClockObject)clockObj;
 
 Mutex mutex1;
 ConditionVarFull var1(mutex1);
-const unsigned long int completeM1 = 1 << 0, completeM2 = 1 << 1;
+const unsigned long int completeM1 = 1 << 1, completeM2 = 1 << 2;
+const unsigned long int exiting = 1 << 0;
 const unsigned long int completeAllMs = completeM1 | completeM2;
 unsigned long int completedMs = completeAllMs;
 
@@ -135,6 +136,10 @@ AsyncTask::DoneStatus fireTasksM(GenericAsyncTask* task, void * data)
 	{
 		var1.wait();
 	}
+	if(completedMs & exiting)
+	{
+		return AsyncTask::DS_done;
+	}
 	std::cout << "end fireTasksM -> " << clockObj->get_long_time() << std::endl;
 	return AsyncTask::DS_cont;
 }
@@ -147,6 +152,10 @@ AsyncTask::DoneStatus taskM1(GenericAsyncTask* task, void * data)
 		while (completedMs & completeM1)
 		{
 			var1.wait();
+		}
+		if(completedMs & exiting)
+		{
+			return AsyncTask::DS_done;
 		}
 	}
 	//Do work
@@ -172,6 +181,10 @@ AsyncTask::DoneStatus taskM2(GenericAsyncTask* task, void * data)
 		while (completedMs & completeM2)
 		{
 			var1.wait();
+		}
+		if(completedMs & exiting)
+		{
+			return AsyncTask::DS_done;
 		}
 	}
 	//Do work
@@ -274,15 +287,19 @@ int threads_main(int argc, char *argv[])
 	taskm2->set_task_chain("chainM2");
 	AsyncTaskManager::get_global_ptr()->add(taskm2);
 
-//	//notify all for the first time
-//	{
-//		HOLD_MUTEX(mutex1)
-//		var1.notify_all();
-//	}
-
 	//do the main loop, equal to run() in python
 	framework.main_loop();
+	//exiting
+	{
+		HOLD_MUTEX(mutex1)
+		completedMs = exiting;
+		var1.notify_all();
+	}
 	//close the window framework
 	framework.close_framework();
+	bool t = AsyncTaskManager::get_global_ptr()->remove(GOTASKM);
+	t = AsyncTaskManager::get_global_ptr()->remove(taskm1);
+	t = AsyncTaskManager::get_global_ptr()->remove(taskm2);
+	std::cout << t << std::endl;
 	return (0);
 }
