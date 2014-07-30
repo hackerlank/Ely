@@ -63,8 +63,9 @@ namespace ely
 {
 
 Picker::Picker(PandaFramework* app, WindowFramework* window,
-		const std::string& pickKeyOn, const std::string& pickKeyOff) :
-		mApp(app), mWindow(window)
+		const std::string& pickKeyOn, const std::string& pickKeyOff, bool csIsSpherical,
+		float cfm, float erp) :
+		mApp(app), mWindow(window), mCsIsSpherical(csIsSpherical), mCfm(cfm), mErp(erp)
 {
 	//some preliminary checks
 	CHECK_EXISTENCE_DEBUG(mApp, "Picker::Picker: invalid PandaFramework")
@@ -183,11 +184,41 @@ void Picker::pickBody(const Event* event)
 							NodePath bodyNP(mPickedBody);
 							LPoint3f pivotLocalPos = bodyNP.get_relative_point(mRender, mPivotPos);
 							//create constraint
-							mCsPick = new BulletSphericalConstraint(
-									mPickedBody,
-									pivotLocalPos);
+							if (mCsIsSpherical)
+							{
+								//spherical
+								mCsPick = new BulletSphericalConstraint(
+										mPickedBody,
+										pivotLocalPos);
+							}
+							else
+							{
+								//generic
+								mCsPick = new BulletGenericConstraint(mPickedBody,
+										TransformState::make_pos(pivotLocalPos), true);
+								//set parameters (in Bullet environment)
+								btGeneric6DofConstraint* dof6 =
+										dynamic_cast<btGeneric6DofConstraint*>(mCsPick->ptr());
+								dof6->setAngularLowerLimit(LVecBase3_to_btVector3(LVecBase3f(0,0,0)));
+								dof6->setAngularUpperLimit(LVecBase3_to_btVector3(LVecBase3f(0,0,0)));
+								// define the 'strength' of our constraint (each axis)
+								dof6->setParam(BT_CONSTRAINT_STOP_CFM, mCfm, 0);
+								dof6->setParam(BT_CONSTRAINT_STOP_CFM, mCfm, 1);
+								dof6->setParam(BT_CONSTRAINT_STOP_CFM, mCfm, 2);
+								dof6->setParam(BT_CONSTRAINT_STOP_CFM, mCfm, 3);
+								dof6->setParam(BT_CONSTRAINT_STOP_CFM, mCfm, 4);
+								dof6->setParam(BT_CONSTRAINT_STOP_CFM, mCfm, 5);
+								// define the 'error reduction' of our constraint (each axis)
+								dof6->setParam(BT_CONSTRAINT_STOP_ERP, mErp, 0);
+								dof6->setParam(BT_CONSTRAINT_STOP_ERP, mErp, 1);
+								dof6->setParam(BT_CONSTRAINT_STOP_ERP, mErp, 2);
+								dof6->setParam(BT_CONSTRAINT_STOP_ERP, mErp, 3);
+								dof6->setParam(BT_CONSTRAINT_STOP_ERP, mErp, 4);
+								dof6->setParam(BT_CONSTRAINT_STOP_ERP, mErp, 5);
+							}
 							//and attach it to the world
 							mWorld->attach(mCsPick);
+
 							//
 							PRINT_DEBUG_HIT;
 						}
@@ -245,7 +276,17 @@ AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 				LVector3f vecPivotNear = mPivotPos - pNear;
 				mPivotPos = pNear + (vecFarNear / vecFarNear.length_squared()) *
 				vecPivotNear.dot(vecFarNear);
-				mCsPick->set_pivot_b(mPivotPos);
+				if(mCsIsSpherical)
+				{
+					dynamic_cast<BulletSphericalConstraint*>(mCsPick.p())->set_pivot_b(mPivotPos);
+				}
+				else
+				{
+					//(in Bullet environment)
+					btGeneric6DofConstraint* dof6 =
+							dynamic_cast<btGeneric6DofConstraint*>(mCsPick->ptr());
+					dof6->getFrameOffsetA().setOrigin(LVecBase3_to_btVector3(mPivotPos));
+				}
 			}
 		}
 	}

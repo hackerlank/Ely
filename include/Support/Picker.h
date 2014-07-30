@@ -29,6 +29,7 @@
 #include <lens.h>
 #include "PhysicsComponents/BulletLocal/bulletWorld.h"
 #include "PhysicsComponents/BulletLocal/bulletSphericalConstraint.h"
+#include "PhysicsComponents/BulletLocal/bulletGenericConstraint.h"
 
 namespace ely
 {
@@ -42,7 +43,8 @@ class Picker: public Singleton<Picker>
 {
 public:
 	Picker(PandaFramework* app, WindowFramework* window,
-			const std::string& pickKeyOn, const std::string& pickKeyOff);
+			const std::string& pickKeyOn, const std::string& pickKeyOff,
+			bool csIspherical = true, float cfm = 0.5, float erp = 0.5);
 	virtual ~Picker();
 
 #ifdef ELY_THREAD
@@ -61,12 +63,18 @@ private:
 	///Render, camera node paths.
 	NodePath mRender, mCamera;
 	///Camera lens reference.
-	SMARTPTR(Lens) mCamLens;
+	SMARTPTR(Lens)mCamLens;
 	///Bullet world.
 	SMARTPTR(BulletWorld) mWorld;
-	///Picking logic data.
-	SMARTPTR(BulletSphericalConstraint) mCsPick;
+	/**
+	 * \name Picking logic data.
+	 */
+	///@{
+	SMARTPTR(BulletConstraint) mCsPick;
+	bool mCsIsSpherical;
+	float mCfm, mErp;
 	LPoint3f mPivotPos;
+	///@}
 
 	/**
 	 * \name Pick body event callback data.

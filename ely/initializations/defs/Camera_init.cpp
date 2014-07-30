@@ -491,7 +491,7 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 			//picker off: add
 			new Picker(camera->objectTmpl()->pandaFramework(),
 					camera->objectTmpl()->windowFramework(),
-					"shift-mouse1", "mouse1-up");
+					"shift-mouse1", "mouse1-up", false, 0.0);
 			//write text
 			writeText(textNode, "Object Picker Active", 0.05,
 					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
