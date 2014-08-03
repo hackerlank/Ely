@@ -69,6 +69,8 @@ class DriverTemplate;
  * - "backward"  				|single|"enabled"
  * - "roll_left"  				|single|"enabled"
  * - "roll_right"  				|single|"enabled"
+ * - "pitch_up"  				|single|"enabled"
+ * - "pitch_down"  				|single|"enabled"
  * - "strafe_left"  			|single|"enabled"
  * - "strafe_right"  			|single|"enabled"
  * - "up"  						|single|"enabled"
@@ -164,6 +166,10 @@ public:
 	bool isRollLeftEnabled();
 	void enableRollRight(bool enable);
 	bool isRollRightEnabled();
+	void enablePitchUp(bool enable);
+	bool isPitchUpEnabled();
+	void enablePitchDown(bool enable);
+	bool isPitchDownEnabled();
 	void enableMouseMove(bool enable);
 	bool isMouseMoveEnabled();
 	///@}
@@ -187,7 +193,7 @@ public:
 	void setFastFactor(float factor);
 	float getFastFactor();
 	//speed current values
-	LVector3f getCurrentSpeeds(float& angularSpeed);
+	LVector3f getCurrentSpeeds(float& angularSpeedH, float& angularSpeedP);
 	///@}
 
 private:
@@ -196,9 +202,9 @@ private:
 	///@{
 	///Key controls and effective keys.
 	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-	mRollLeft, mRollRight, mMouseMove;
+	mRollLeft, mRollRight, mPitchUp, mPitchDown, mMouseMove;
 	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
-	mDownKey, mRollLeftKey, mRollRightKey, mMouseMoveKey;
+	mDownKey, mRollLeftKey, mRollRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
 	std::string mSpeedKey;
 	///@}
 	///@{
@@ -210,11 +216,11 @@ private:
 	/// Sensitivity settings.
 	float mFastFactor;
 	LVecBase3f mActualSpeedXYZ, mMaxSpeedXYZ, mMaxSpeedSquaredXYZ;
-	float mActualSpeedH, mMaxSpeedH, mMaxSpeedSquaredH;
+	float mActualSpeedH, mActualSpeedP, mMaxSpeedHP, mMaxSpeedSquaredHP;
 	LVecBase3f mAccelXYZ;
-	float mAccelH;
+	float mAccelHP;
 	float mFrictionXYZ;
-	float mFrictionH;
+	float mFrictionHP;
 	float mStopThreshold;
 	float mSensX, mSensY;
 	int mCentX, mCentY;
@@ -263,7 +269,7 @@ inline void Driver::reset()
 	//
 	mStartEnabled = mEnabled = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
-			mRollLeft = mRollRight = false;
+			mRollLeft = mRollRight = mPitchUp = mPitchDown = false;
 	//by default we consider mouse moved on every update, because
 	//we want mouse poll by default; this can be changed by calling
 	//the enabler (for example by an handler responding to mouse-move
@@ -271,16 +277,16 @@ inline void Driver::reset()
 	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
 	mMouseMove = true;
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey,
-	mDownKey = mRollLeftKey = mRollRightKey = mMouseMoveKey = false;
+	mDownKey = mRollLeftKey = mRollRightKey = mPitchUpKey = mPitchDownKey = mMouseMoveKey = false;
 	mSpeedKey = std::string("shift");
 	mMouseEnabledH = mMouseEnabledP = false;
 	mSignOfTranslation = mSignOfMouse = 1;
 	mFastFactor = 0.0;
 	mActualSpeedXYZ = mMaxSpeedXYZ = mMaxSpeedSquaredXYZ = LVecBase3f::zero();
-	mActualSpeedH = mMaxSpeedH = mMaxSpeedSquaredH = 0.0;
+	mActualSpeedH = mActualSpeedP = mMaxSpeedHP = mMaxSpeedSquaredHP = 0.0;
 	mAccelXYZ = LVecBase3f::zero();
-	mAccelH = 0.0;
-	mFrictionXYZ = mFrictionH = 0.0;
+	mAccelHP = 0.0;
+	mFrictionXYZ = mFrictionHP = 0.0;
 	mStopThreshold = 0.0;
 	mSensX = mSensY = 0.0;
 	mCentX = mCentY = 0.0;
@@ -449,6 +455,45 @@ inline bool Driver::isRollRightEnabled()
 	return mRollRight;
 }
 
+inline void Driver::enablePitchUp(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mPitchUpKey)
+	{
+		mPitchUp = enable;
+	}
+}
+
+inline bool Driver::isPitchUpEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mPitchUp;
+}
+
+inline void Driver::enablePitchDown(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (mPitchDownKey)
+	{
+		mPitchDown = enable;
+	}
+}
+
+inline bool Driver::isPitchDownEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mPitchDown;
+}
+
+
 inline void Driver::enableMouseMove(bool enable)
 {
 	//lock (guard) the mutex
@@ -485,8 +530,8 @@ inline void Driver::setMaxAngularSpeed(float maxAngularSpeed)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mMaxSpeedH = maxAngularSpeed;
-	mMaxSpeedSquaredH = maxAngularSpeed * maxAngularSpeed;
+	mMaxSpeedHP = maxAngularSpeed;
+	mMaxSpeedSquaredHP = maxAngularSpeed * maxAngularSpeed;
 }
 
 inline LVector3f Driver::getMaxSpeeds(float& maxAngularSpeed)
@@ -494,7 +539,7 @@ inline LVector3f Driver::getMaxSpeeds(float& maxAngularSpeed)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	maxAngularSpeed = mMaxSpeedH;
+	maxAngularSpeed = mMaxSpeedHP;
 	return mMaxSpeedXYZ;
 }
 
@@ -511,7 +556,7 @@ inline void Driver::setAngularAccel(float angularAccel)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAccelH = angularAccel;
+	mAccelHP = angularAccel;
 }
 
 inline LVector3f Driver::getAccels(float& angularAccel)
@@ -519,7 +564,7 @@ inline LVector3f Driver::getAccels(float& angularAccel)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	angularAccel = mAccelH;
+	angularAccel = mAccelHP;
 	return mAccelXYZ;
 }
 
@@ -536,10 +581,10 @@ inline void Driver::setAngularFriction(float angularFriction)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mFrictionH = angularFriction;
-	if ((mFrictionH < 0.0) or (mFrictionH > 1.0))
+	mFrictionHP = angularFriction;
+	if ((mFrictionHP < 0.0) or (mFrictionHP > 1.0))
 	{
-		mFrictionH = 0.1;
+		mFrictionHP = 0.1;
 	}
 }
 
@@ -549,7 +594,7 @@ inline void Driver::getFrictions(float& linearFriction, float& angularFriction)
 	HOLD_REMUTEX(mMutex)
 
 	linearFriction	= mFrictionXYZ;
-	angularFriction	= mFrictionH;
+	angularFriction	= mFrictionHP;
 }
 
 inline void Driver::setSens(float sensX, float sensY)
@@ -586,12 +631,13 @@ inline float Driver::getFastFactor()
 	return mFastFactor;
 }
 
-inline LVector3f Driver::getCurrentSpeeds(float& angularSpeed)
+inline LVector3f Driver::getCurrentSpeeds(float& angularSpeedH, float& angularSpeedP)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	angularSpeed = mActualSpeedH;
+	angularSpeedH = mActualSpeedH;
+	angularSpeedP = mActualSpeedP;
 	return mActualSpeedXYZ;
 }
 

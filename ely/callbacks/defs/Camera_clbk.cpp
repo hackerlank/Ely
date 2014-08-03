@@ -54,6 +54,12 @@ CALLBACK fast_roll_left_Driver_Camera;
 CALLBACK roll_right_Driver_Camera;
 CALLBACK stop_roll_right_Driver_Camera;
 CALLBACK fast_roll_right_Driver_Camera;
+CALLBACK pitch_up_Driver_Camera;
+CALLBACK stop_pitch_up_Driver_Camera;
+CALLBACK fast_pitch_up_Driver_Camera;
+CALLBACK pitch_down_Driver_Camera;
+CALLBACK stop_pitch_down_Driver_Camera;
+CALLBACK fast_pitch_down_Driver_Camera;
 CALLBACK up_Driver_Camera;
 CALLBACK stop_up_Driver_Camera;
 CALLBACK fast_up_Driver_Camera;
@@ -238,6 +244,46 @@ void fast_roll_right_Driver_Camera(const Event* event, void* data)
 {
 	fast_Driver_Camera(event, data);
 	roll_right_Driver_Camera(event, data);
+}
+//pitch_up:stop-pitch_up:fast-pitch_up
+void pitch_up_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enablePitchUp(true);
+}
+void stop_pitch_up_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enablePitchUp(false);
+}
+void fast_pitch_up_Driver_Camera(const Event* event, void* data)
+{
+	fast_Driver_Camera(event, data);
+	pitch_up_Driver_Camera(event, data);
+}
+//pitch_down:stop-pitch_down:fast-pitch_down
+void pitch_down_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enablePitchDown(true);
+}
+void stop_pitch_down_Driver_Camera(const Event* event, void* data)
+{
+	//get data
+	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
+
+	cameraDrv->enablePitchDown(false);
+}
+void fast_pitch_down_Driver_Camera(const Event* event, void* data)
+{
+	fast_Driver_Camera(event, data);
+	pitch_down_Driver_Camera(event, data);
 }
 //up:stop-up:fast-up
 void up_Driver_Camera(const Event* event, void* data)

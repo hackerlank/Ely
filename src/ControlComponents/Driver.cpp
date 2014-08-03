@@ -64,8 +64,8 @@ bool Driver::initialize()
 	//get settings from template
 	//enabling setting
 	mStartEnabled = (
-			mTmpl->parameter(std::string("enabled")) == std::string("true") ?
-					true : false);
+			mTmpl->parameter(std::string("enabled")) == std::string("false") ?
+					 false : true);
 	//inverted setting
 	mSignOfTranslation = (
 			mTmpl->parameter(std::string("inverted_translation"))
@@ -84,35 +84,43 @@ bool Driver::initialize()
 	//backward key
 	mBackwardKey = (
 			mTmpl->parameter(std::string("backward"))
-					== std::string("enabled") ? true : false);
+					== std::string("disabled") ? false : true);
 	//down key
 	mDownKey = (
-			mTmpl->parameter(std::string("down")) == std::string("enabled") ?
-					true : false);
+			mTmpl->parameter(std::string("down")) == std::string("disabled") ?
+					false : true);
 	//forward key
 	mForwardKey = (
-			mTmpl->parameter(std::string("forward")) == std::string("enabled") ?
-					true : false);
+			mTmpl->parameter(std::string("forward")) == std::string("disabled") ?
+					false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
 			mTmpl->parameter(std::string("strafe_left"))
-					== std::string("enabled") ? true : false);
+					== std::string("disabled") ? false : true);
 	//strafeRight key
 	mStrafeRightKey = (
 			mTmpl->parameter(std::string("strafe_right"))
-					== std::string("enabled") ? true : false);
+					== std::string("disabled") ? false : true);
 	//rollLeft key
 	mRollLeftKey = (
 			mTmpl->parameter(std::string("roll_left"))
-					== std::string("enabled") ? true : false);
+					== std::string("disabled") ? false : true);
 	//rollRight key
 	mRollRightKey = (
 			mTmpl->parameter(std::string("roll_right"))
-					== std::string("enabled") ? true : false);
+					== std::string("disabled") ? false : true);
+	//pitchUp key
+	mPitchUpKey = (
+			mTmpl->parameter(std::string("pitch_up"))
+					== std::string("disabled") ? false : true);
+	//pitchDown key
+	mPitchDownKey = (
+			mTmpl->parameter(std::string("pitch_down"))
+					== std::string("disabled") ? false : true);
 	//up key
 	mUpKey = (
-			mTmpl->parameter(std::string("up")) == std::string("enabled") ?
-					true : false);
+			mTmpl->parameter(std::string("up")) == std::string("disabled") ?
+					false : true);
 	//mouseMove key
 	mMouseMoveKey = (
 			mTmpl->parameter(std::string("mouse_move"))
@@ -139,8 +147,8 @@ bool Driver::initialize()
 	//max angular speed
 	value = strtof(mTmpl->parameter(std::string("max_angular_speed")).c_str(),
 	NULL);
-	mMaxSpeedH = (value >= 0.0 ? value : -value);
-	mMaxSpeedSquaredH = mMaxSpeedH * mMaxSpeedH;
+	mMaxSpeedHP = (value >= 0.0 ? value : -value);
+	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
 	//linear accel
 	value = strtof(mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
 	absValue = (value >= 0.0 ? value : -value);
@@ -148,16 +156,17 @@ bool Driver::initialize()
 	//angular accel
 	value = strtof(mTmpl->parameter(std::string("angular_accel")).c_str(),
 	NULL);
-	mAccelH = (value >= 0.0 ? value : -value);
+	mAccelHP = (value >= 0.0 ? value : -value);
 	//reset actual speeds
 	mActualSpeedXYZ = LVector3f::zero();
 	mActualSpeedH = 0.0;
+	mActualSpeedP = 0.0;
 	//linear friction
 	value = strtof(mTmpl->parameter(std::string("linear_friction")).c_str(), NULL);
 	mFrictionXYZ = (value >= 0.0 ? value : -value);
 	//angular friction
 	value = strtof(mTmpl->parameter(std::string("angular_friction")).c_str(), NULL);
-	mFrictionH = (value >= 0.0 ? value : -value);
+	mFrictionHP = (value >= 0.0 ? value : -value);
 	//stop threshold [0.0, 1.0]
 	value = strtof(mTmpl->parameter(std::string("stop_threshold")).c_str(),
 	NULL);
@@ -370,6 +379,8 @@ void Driver::update(void* data)
 			mActualSpeedXYZ.get_z() * dt);
 	ownerNodePath.set_h(ownerNodePath.get_h()
 			+ mActualSpeedH * dt * mSignOfMouse);
+	ownerNodePath.set_p(ownerNodePath.get_p()
+			+ mActualSpeedP * dt * mSignOfMouse);
 
 	//update speeds
 	float kLinearReductFactor = mFrictionXYZ * dt;
@@ -539,47 +550,47 @@ void Driver::update(void* data)
 					mActualSpeedXYZ.get_z() * (1 - kLinearReductFactor));
 		}
 	}
-	//rotation
+	//rotation h
 	if (mRollLeft and (not mRollRight))
 	{
-		if(mAccelH != 0)
+		if(mAccelHP != 0)
 		{
 			//accelerate
-			mActualSpeedH += mAccelH * dt;
-			if (mActualSpeedH > mMaxSpeedH)
+			mActualSpeedH += mAccelHP * dt;
+			if (mActualSpeedH > mMaxSpeedHP)
 			{
 				//limit speed
-				mActualSpeedH = mMaxSpeedH;
+				mActualSpeedH = mMaxSpeedHP;
 			}
 		}
 		else
 		{
 			//kinematic
-			mActualSpeedH = mMaxSpeedH;
+			mActualSpeedH = mMaxSpeedHP;
 		}
 	}
 	else if (mRollRight and (not mRollLeft))
 	{
-		if(mAccelH != 0)
+		if(mAccelHP != 0)
 		{
 			//accelerate
-			mActualSpeedH -= mAccelH * dt;
-			if (mActualSpeedH < -mMaxSpeedH)
+			mActualSpeedH -= mAccelHP * dt;
+			if (mActualSpeedH < -mMaxSpeedHP)
 			{
 				//limit speed
-				mActualSpeedH = -mMaxSpeedH;
+				mActualSpeedH = -mMaxSpeedHP;
 			}
 		}
 		else
 		{
 			//kinematic
-			mActualSpeedH = -mMaxSpeedH;
+			mActualSpeedH = -mMaxSpeedHP;
 		}
 	}
 	else if (mActualSpeedH != 0.0)
 	{
 		if (mActualSpeedH * mActualSpeedH <
-				mMaxSpeedSquaredH * mStopThreshold)
+				mMaxSpeedSquaredHP * mStopThreshold)
 		{
 			//stop
 			mActualSpeedH = 0.0;
@@ -587,12 +598,68 @@ void Driver::update(void* data)
 		else
 		{
 			//decelerate
-			float kAngularReductFactor = mFrictionH * dt;
+			float kAngularReductFactor = mFrictionHP * dt;
 			if (kAngularReductFactor > 1.0)
 			{
 				kAngularReductFactor = 1.0;
 			}
 			mActualSpeedH = mActualSpeedH * (1 - kAngularReductFactor);
+		}
+	}
+	//rotation p
+	if (mPitchUp and (not mPitchDown))
+	{
+		if(mAccelHP != 0)
+		{
+			//accelerate
+			mActualSpeedP += mAccelHP * dt;
+			if (mActualSpeedP > mMaxSpeedHP)
+			{
+				//limit speed
+				mActualSpeedP = mMaxSpeedHP;
+			}
+		}
+		else
+		{
+			//kinematic
+			mActualSpeedP = mMaxSpeedHP;
+		}
+	}
+	else if (mPitchDown and (not mPitchUp))
+	{
+		if(mAccelHP != 0)
+		{
+			//accelerate
+			mActualSpeedP -= mAccelHP * dt;
+			if (mActualSpeedP < -mMaxSpeedHP)
+			{
+				//limit speed
+				mActualSpeedP = -mMaxSpeedHP;
+			}
+		}
+		else
+		{
+			//kinematic
+			mActualSpeedP = -mMaxSpeedHP;
+		}
+	}
+	else if (mActualSpeedP != 0.0)
+	{
+		if (mActualSpeedP * mActualSpeedP <
+				mMaxSpeedSquaredHP * mStopThreshold)
+		{
+			//stop
+			mActualSpeedP = 0.0;
+		}
+		else
+		{
+			//decelerate
+			float kAngularReductFactor = mFrictionHP * dt;
+			if (kAngularReductFactor > 1.0)
+			{
+				kAngularReductFactor = 1.0;
+			}
+			mActualSpeedP = mActualSpeedP * (1 - kAngularReductFactor);
 		}
 	}
 }

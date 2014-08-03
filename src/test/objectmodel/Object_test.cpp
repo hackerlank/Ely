@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE(ObjectComponentsTEST)
 	mObject = new Object(ObjectId("TestObject"), mObjectTmpl);
 	mModelTmpl = new ModelTemplate(mPanda,mWin);
 	ParameterTable paramTable;
-	paramTable.insert(std::pair<std::string,std::string>("model_file","panda"));
+	paramTable.insert(std::make_pair("model_file","panda"));
 	mModelTmpl->setParameters(paramTable);
 	mModel =
 	DCAST(Model, mModelTmpl->makeComponent(ComponentId("TestModel")));

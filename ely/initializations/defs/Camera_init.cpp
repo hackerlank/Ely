@@ -53,10 +53,10 @@ enum CameraType
 {
 	free_view_camera, chaser_camera, object_picker, none
 } cameraType = none;
-Rocket::Core::ElementDocument *cameraOptionsMenu;
 SMARTPTR(Object)camera;
 ParameterTable cameraDriverParams, cameraChaserParams;
 ObjectId chasedObject;
+bool pickerCsIspherical = true;
 
 //add elements (tags) function for main menu
 void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
@@ -88,10 +88,10 @@ void rocketAddElements(Rocket::Core::ElementDocument * mainMenu)
 
 //helpers
 inline void setElementValue(const std::string& param,
-	ParameterTable& paramsTable)
+		ParameterTable& paramsTable, Rocket::Core::ElementDocument *document)
 {
 	Rocket::Controls::ElementFormControlInput *inputElem =
-			dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+			dynamic_cast<Rocket::Controls::ElementFormControlInput *>(document->GetElementById(
 					param.c_str()));
 	if (inputElem)
 	{
@@ -101,10 +101,11 @@ inline void setElementValue(const std::string& param,
 
 inline void setElementChecked(const std::string& param,
 		const std::string& checked, const std::string& unchecked,
-		const std::string& defaultValue, ParameterTable& paramsTable)
+		const std::string& defaultValue, ParameterTable& paramsTable,
+		Rocket::Core::ElementDocument *document)
 {
 	Rocket::Controls::ElementFormControlInput *inputElem =
-			dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+			dynamic_cast<Rocket::Controls::ElementFormControlInput *>(document->GetElementById(
 					param.c_str()));
 	std::string actualChecked = (*paramsTable.find(param)).second;
 	if (actualChecked == checked)
@@ -118,13 +119,14 @@ inline void setElementChecked(const std::string& param,
 	else
 	{
 		defaultValue == checked ?
-				inputElem->SetAttribute<Rocket::Core::String>("checked", "true") :
+				inputElem->SetAttribute<Rocket::Core::String>("checked",
+						"true") :
 				inputElem->RemoveAttribute("checked");
 	}
 }
 
 inline void setOptionValue(Rocket::Core::Event& event, const std::string& param,
-	ParameterTable& paramsTable)
+		ParameterTable& paramsTable)
 {
 	(*paramsTable.find(param)).second =
 			event.GetParameter<Rocket::Core::String>(param.c_str(), "0.0").CString();
@@ -150,8 +152,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		//hide main menu
 		gRocketMainMenu->Hide();
 		// Load and show the camera options document.
-		cameraOptionsMenu = gRocketContext->LoadDocument(
-				(rocketBaseDir + "misc/ely-camera-options.rml").c_str());
+		Rocket::Core::ElementDocument *cameraOptionsMenu =
+				gRocketContext->LoadDocument(
+						(rocketBaseDir + "misc/ely-camera-options.rml").c_str());
 		if (cameraOptionsMenu != NULL)
 		{
 			cameraOptionsMenu->GetElementById("title")->SetInnerRML(
@@ -191,13 +194,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "free_view_camera"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* cameraOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (cameraOptionsMenu == NULL)
 			return;
 
-		Rocket::Core::Element* free_view_camera_options = options_body->GetElementById(
-				"free_view_camera_options");
+		Rocket::Core::Element* free_view_camera_options =
+				cameraOptionsMenu->GetElementById("free_view_camera_options");
 		if (free_view_camera_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -213,23 +216,30 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				free_view_camera_options->SetProperty("display", "block");
 				//set elements' values from options' values
 				//max linear speed
-				setElementValue("max_linear_speed", cameraDriverParams);
+				setElementValue("max_linear_speed", cameraDriverParams,
+						cameraOptionsMenu);
 				//max angular speed
-				setElementValue("max_angular_speed", cameraDriverParams);
+				setElementValue("max_angular_speed", cameraDriverParams,
+						cameraOptionsMenu);
 				//linear accel
-				setElementValue("linear_accel", cameraDriverParams);
+				setElementValue("linear_accel", cameraDriverParams,
+						cameraOptionsMenu);
 				//angular accel
-				setElementValue("angular_accel", cameraDriverParams);
+				setElementValue("angular_accel", cameraDriverParams,
+						cameraOptionsMenu);
 				//linear friction
-				setElementValue("linear_friction", cameraDriverParams);
+				setElementValue("linear_friction", cameraDriverParams,
+						cameraOptionsMenu);
 				//angular friction
-				setElementValue("angular_friction", cameraDriverParams);
+				setElementValue("angular_friction", cameraDriverParams,
+						cameraOptionsMenu);
 				//fast factor
-				setElementValue("fast_factor", cameraDriverParams);
+				setElementValue("fast_factor", cameraDriverParams,
+						cameraOptionsMenu);
 				//sens_x
-				setElementValue("sens_x", cameraDriverParams);
+				setElementValue("sens_x", cameraDriverParams, cameraOptionsMenu);
 				//sens_y
-				setElementValue("sens_y", cameraDriverParams);
+				setElementValue("sens_y", cameraDriverParams, cameraOptionsMenu);
 			}
 		}
 	}
@@ -237,13 +247,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "chaser_camera"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* cameraOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (cameraOptionsMenu == NULL)
 			return;
 
-		Rocket::Core::Element* chaser_camera_options = options_body->GetElementById(
-				"chaser_camera_options");
+		Rocket::Core::Element* chaser_camera_options =
+				cameraOptionsMenu->GetElementById("chaser_camera_options");
 		if (chaser_camera_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -260,7 +270,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//set elements' values from options' values
 				//chased object
 				Rocket::Controls::ElementFormControlSelect *objectsSelect =
-						dynamic_cast<Rocket::Controls::ElementFormControlSelect *>(cameraOptionsMenu->GetElementById("chased_object"));
+						dynamic_cast<Rocket::Controls::ElementFormControlSelect *>(cameraOptionsMenu->GetElementById(
+								"chased_object"));
 				if (objectsSelect)
 				{
 					//remove all options
@@ -294,33 +305,76 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				}
 				//fixed relative position
 				setElementChecked("fixed_relative_position", "true", "false",
-						"true", cameraChaserParams);
+						"true", cameraChaserParams, cameraOptionsMenu);
 				//abs max distance
-				setElementValue("abs_max_distance", cameraChaserParams);
+				setElementValue("abs_max_distance", cameraChaserParams,
+						cameraOptionsMenu);
 				//abs min distance
-				setElementValue("abs_min_distance", cameraChaserParams);
+				setElementValue("abs_min_distance", cameraChaserParams,
+						cameraOptionsMenu);
 				//abs max height
-				setElementValue("abs_max_height", cameraChaserParams);
+				setElementValue("abs_max_height", cameraChaserParams,
+						cameraOptionsMenu);
 				//abs min height
-				setElementValue("abs_min_height", cameraChaserParams);
+				setElementValue("abs_min_height", cameraChaserParams,
+						cameraOptionsMenu);
 				//abs lookat distance
-				setElementValue("abs_lookat_distance", cameraChaserParams);
+				setElementValue("abs_lookat_distance", cameraChaserParams,
+						cameraOptionsMenu);
 				//abs lookat height
-				setElementValue("abs_lookat_height", cameraChaserParams);
+				setElementValue("abs_lookat_height", cameraChaserParams,
+						cameraOptionsMenu);
 				//friction
-				setElementValue("friction", cameraChaserParams);
+				setElementValue("friction", cameraChaserParams, cameraOptionsMenu);
 			}
 		}
 	}
+	else if (value == "camera::object_picker::options")
+	{
+		// This event is sent from the "onchange" of the "object_picker"
+		//radio button. It shows or hides the related options.
+		Rocket::Core::ElementDocument* cameraOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
+		if (cameraOptionsMenu == NULL)
+			return;
+
+		Rocket::Core::Element* object_picker_options =
+				cameraOptionsMenu->GetElementById("object_picker_options");
+		if (object_picker_options)
+		{
+			//The "value" parameter of an "onchange" event is set to
+			//the value the control would send if it was submitted;
+			//so, the empty string if it is clear or to the "value"
+			//attribute of the control if it is set.
+			if (event.GetParameter<Rocket::Core::String>("value", "").Empty())
+			{
+				object_picker_options->SetProperty("display", "none");
+			}
+			else
+			{
+				object_picker_options->SetProperty("display", "block");
+				//set elements' values from options' values
+				//constraint type
+				pickerCsIspherical ?
+						cameraOptionsMenu->GetElementById("spherical_constraint")->SetAttribute(
+								"checked", true) :
+						cameraOptionsMenu->GetElementById("generic_constraint")->SetAttribute(
+								"checked", true);
+			}
+		}
+	}
+	///Submit
 	else if (value == "camera::form::submit_options")
 	{
 		Rocket::Core::String paramValue;
 		//check if ok or cancel
-		paramValue = event.GetParameter<Rocket::Core::String>("submit",	"cancel");
+		paramValue = event.GetParameter<Rocket::Core::String>("submit",
+				"cancel");
 		if (paramValue == "ok")
 		{
 			//set new camera type
-			paramValue = event.GetParameter<Rocket::Core::String>("camera", "none");
+			paramValue = event.GetParameter<Rocket::Core::String>("camera",
+					"none");
 			if (paramValue == "free_view_camera")
 			{
 				cameraType = free_view_camera;
@@ -350,7 +404,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//set options' values from elements' values
 				//chased object
 				chasedObject = event.GetParameter<Rocket::Core::String>(
-							"chased_object", "").CString();
+						"chased_object", "").CString();
 				if (not chasedObject.empty())
 				{
 					(*cameraChaserParams.find("chased_object")).second =
@@ -378,6 +432,18 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			else if (paramValue == "object_picker")
 			{
 				cameraType = object_picker;
+				//set options' values from elements' values
+				//constraint type
+				paramValue = event.GetParameter<Rocket::Core::String>(
+						"constraint_type", "");
+				if (paramValue == "spherical")
+				{
+					pickerCsIspherical = true;
+				}
+				else if (paramValue == "generic")
+				{
+					pickerCsIspherical = false;
+				}
 			}
 			else
 			{
@@ -386,6 +452,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			}
 		}
 		//close (i.e. unload) the camera options menu and set as closed..
+		Rocket::Core::ElementDocument* cameraOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
 		cameraOptionsMenu->Close();
 		//return to main menu.
 		gRocketMainMenu->Show();
@@ -393,24 +461,25 @@ void rocketEventHandler(const Rocket::Core::String& value,
 }
 
 ///<DEFAULT CAMERA CONTROL>
-	///ENABLING
-		//	WindowFramework* gameWindow =
-		//	GameManager::GetSingletonPtr()->windowFramework();
-		//	//reset trackball transform
-		//	LMatrix4 cameraMat = gameWindow->get_camera_group().get_transform()->get_mat();
-		//	cameraMat.invert_in_place();
-		//	SMARTPTR(Trackball)trackBall =
-		//	DCAST(Trackball, gameWindow->get_mouse().find("**/+Trackball").node());
-		//	trackBall->set_mat(cameraMat);
-		//	//(re)enable trackball
-		//	GameManager::GetSingletonPtr()->enable_mouse();
-	///DISABLING
-		//	//disable the trackball
-		//	GameManager::GetSingletonPtr()->disable_mouse();
+///ENABLING
+//	WindowFramework* gameWindow =
+//	GameManager::GetSingletonPtr()->windowFramework();
+//	//reset trackball transform
+//	LMatrix4 cameraMat = gameWindow->get_camera_group().get_transform()->get_mat();
+//	cameraMat.invert_in_place();
+//	SMARTPTR(Trackball)trackBall =
+//	DCAST(Trackball, gameWindow->get_mouse().find("**/+Trackball").node());
+//	trackBall->set_mat(cameraMat);
+//	//(re)enable trackball
+//	GameManager::GetSingletonPtr()->enable_mouse();
+///DISABLING
+//	//disable the trackball
+//	GameManager::GetSingletonPtr()->disable_mouse();
 ///</DEFAULT CAMERA CONTROL>
 
 //helper
-inline void setCameraType(const CameraType& newType, const CameraType& actualType)
+inline void setCameraType(const CameraType& newType,
+		const CameraType& actualType)
 {
 	//return if no camera type change is needed
 	RETURN_ON_COND(newType == actualType,)
@@ -425,7 +494,6 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 			//enabled: then disable it
 			//disable
 			RETURN_ON_COND(cameraControl->disable() != Driver::Result::OK,)
-
 
 			//remove text
 			textNode.remove_node();
@@ -449,6 +517,15 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 	{
 		if (Picker::GetSingletonPtr())
 		{
+			SMARTPTR(Driver)cameraControl = DCAST(Driver, camera->getComponent(
+							ComponentFamilyType("Control")));
+			if (cameraControl->isEnabled())
+			{
+				//enabled: then disable it
+				//disable
+				RETURN_ON_COND(cameraControl->disable() != Driver::Result::OK,)
+			}
+
 			//picker on: remove
 			delete Picker::GetSingletonPtr();
 			//remove text
@@ -459,11 +536,14 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 	if (newType == free_view_camera)
 	{
 		//add a new Driver component to camera and ...
-		RETURN_ON_COND(not ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
-				ObjectId("camera"), ComponentType("Driver"), cameraDriverParams),)
+		RETURN_ON_COND(
+				not ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
+						ObjectId("camera"), ComponentType("Driver"),
+						cameraDriverParams),)
 		//... enable it
-		RETURN_ON_COND(DCAST(Driver, camera->getComponent(
-				ComponentFamilyType("Control")))->enable() != Driver::Result::OK,)
+		RETURN_ON_COND(
+				DCAST(Driver, camera->getComponent( ComponentFamilyType("Control")))->enable() != Driver::Result::OK,
+				)
 
 		//write text
 		writeText(textNode, "Free View Camera", 0.05,
@@ -472,26 +552,52 @@ inline void setCameraType(const CameraType& newType, const CameraType& actualTyp
 	else if (newType == chaser_camera)
 	{
 		//add a new Chaser component to camera and ...
-		RETURN_ON_COND(not ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
-				ObjectId("camera"), ComponentType("Chaser"), cameraChaserParams),)
+		RETURN_ON_COND(
+				not ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
+						ObjectId("camera"), ComponentType("Chaser"),
+						cameraChaserParams),)
 		//... enable it
-		RETURN_ON_COND(DCAST(Chaser, camera->getComponent(
-				ComponentFamilyType("Control")))->enable() != Chaser::Result::OK,)
+		RETURN_ON_COND(
+				DCAST(Chaser, camera->getComponent( ComponentFamilyType("Control")))->enable() != Chaser::Result::OK,
+				)
 
 		//write text
-		writeText(textNode, "Camera Chasing '" + DCAST(Chaser, camera->getComponent(
-				ComponentFamilyType("Control")))->getChasedObject() + "'", 0.05,
-				LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
+		writeText(textNode,
+				"Camera Chasing '"
+						+ DCAST(Chaser, camera->getComponent(
+										ComponentFamilyType("Control")))->getChasedObject()
+						+ "'", 0.05, LVecBase4(1.0, 1.0, 0.0, 1.0),
+				LVector3f(-1.0, 0, -0.9));
 
 	}
-	else if(newType == object_picker)
+	else if (newType == object_picker)
 	{
 		if (not Picker::GetSingletonPtr())
 		{
+			//add a new Driver component to camera without mouse movement control and ...
+			ParameterTable cameraDriverParamsNoMouse = cameraDriverParams;
+			cameraDriverParamsNoMouse.erase("mouse_enabled_h");
+			cameraDriverParamsNoMouse.erase("mouse_enabled_p");
+			cameraDriverParamsNoMouse.erase("mouse_move");
+			cameraDriverParamsNoMouse.insert(
+					std::make_pair("mouse_enabled_h", "false"));
+			cameraDriverParamsNoMouse.insert(
+					std::make_pair("mouse_enabled_p", "false"));
+			cameraDriverParamsNoMouse.insert(
+					std::make_pair("mouse_move", "disabled"));
+			RETURN_ON_COND(
+					not ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(
+							ObjectId("camera"), ComponentType("Driver"),
+							cameraDriverParamsNoMouse),)
+			//... enable it
+			RETURN_ON_COND(
+					DCAST(Driver, camera->getComponent( ComponentFamilyType("Control")))->enable() != Driver::Result::OK,
+					)
 			//picker off: add
 			new Picker(camera->objectTmpl()->pandaFramework(),
-					camera->objectTmpl()->windowFramework(),
-					"shift-mouse1", "mouse1-up", false, 0.0);
+					camera->objectTmpl()->windowFramework(), "shift-mouse1",
+					"mouse1-up", pickerCsIspherical, 0.0);
+
 			//write text
 			writeText(textNode, "Object Picker Active", 0.05,
 					LVecBase4(1.0, 1.0, 0.0, 1.0), LVector3f(-1.0, 0, -0.9));
@@ -520,14 +626,14 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	camera = object;
 	//get Driver and Chaser component template parameters
 	cameraDriverParams = ObjectTemplateManager::GetSingletonPtr()->
-			getCreatedObject(ObjectId("cameraDriverTmp"))->getStoredCompTmplParams()["Driver"];
-	cameraChaserParams =  ObjectTemplateManager::GetSingletonPtr()->
-			getCreatedObject(ObjectId("cameraChaserTmp"))->getStoredCompTmplParams()["Chaser"];
+	getCreatedObject(ObjectId("cameraDriverTmp"))->getStoredCompTmplParams()["Driver"];
+	cameraChaserParams = ObjectTemplateManager::GetSingletonPtr()->
+	getCreatedObject(ObjectId("cameraChaserTmp"))->getStoredCompTmplParams()["Chaser"];
 	//destroy no more needed cameraDriver and cameraChaser objects
 	ObjectTemplateManager::GetSingletonPtr()->destroyObject(
-			ObjectId("cameraDriverTmp"));
+	ObjectId("cameraDriverTmp"));
 	ObjectTemplateManager::GetSingletonPtr()->destroyObject(
-			ObjectId("cameraChaserTmp"));
+	ObjectId("cameraChaserTmp"));
 
 	//register the add element function to (Rocket) main menu
 	gRocketAddElementsFunctions.push_back(&rocketAddElements);
@@ -537,6 +643,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["camera::form::submit_options"] = &rocketEventHandler;
 	gRocketEventHandlers["camera::free_view_camera::options"] = &rocketEventHandler;
 	gRocketEventHandlers["camera::chaser_camera::options"] = &rocketEventHandler;
+	gRocketEventHandlers["camera::object_picker::options"] = &rocketEventHandler;
 	//register the preset function to main menu
 	gRocketPresetFunctions.push_back(&rocketPreset);
 	//register the commit function to main menu

@@ -67,7 +67,7 @@ namespace
 bool drawStaticGeometryInitDone = false;
 //Render-To-Texture (rtt) stuff
 DrawMeshDrawer* rttMeshDrawer2d = NULL;
-SMARTPTR(GraphicsOutput) rttBuffer;
+SMARTPTR(GraphicsOutput)rttBuffer;
 NodePath rttRender2d;
 //draw other static geometry stuff
 DrawMeshDrawer* staticMeshDrawer3d;
@@ -93,23 +93,13 @@ enum SteerPlugInType
 
 ///
 const char* steerPlugInNames[] =
-{
-	"one_turning",
-	"pedestrian",
-	"boid",
-	"multiple_pursuit",
-	"soccer",
-	"capture_the_flag",
-	"low_speed_turn",
-	"map_drive",
-	"none"
-};
+{ "one_turning", "pedestrian", "boid", "multiple_pursuit", "soccer",
+		"capture_the_flag", "low_speed_turn", "map_drive", "none" };
 //common globals
 #define ENVIRONMENTOBJECT "Terrain1"
 #define TOBECLONEDOBJECT "steerVehicleToBeCloned"
 std::map<SteerPlugInType, SteerPlugIn*> steerPlugIns;
 std::string addKey = "y", removeKey = "shift-y";
-Rocket::Core::ElementDocument *steerPlugInOptionsMenu;
 //boid globals
 #define WORLDCENTEROBJECT "beachhouse2_1"
 //multiple_pursuit globals
@@ -117,8 +107,8 @@ ObjectId mpWandererObjectId, mpNewWanderedObjectId;
 bool mpWandererExternalUpdate = false;
 //capture_the_flag globals
 ObjectId ctfSeekerObjectId, ctfNewSeekerObjectId;
-float ctfHomeBaseRadius, ctfMinStartRadius, ctfMaxStartRadius,
-		ctfBrakingRate, ctfAvoidancePredictTimeMin, ctfAvoidancePredictTimeMax;
+float ctfHomeBaseRadius, ctfMinStartRadius, ctfMaxStartRadius, ctfBrakingRate,
+		ctfAvoidancePredictTimeMin, ctfAvoidancePredictTimeMax;
 bool ctfSeekerExternalUpdate = false;
 //low_speed_turn globals
 float lstSteeringSpeed;
@@ -200,10 +190,10 @@ inline void createObjectSelectionList(
 	objectsSelect->SetSelection(selectedIdx);
 }
 
-inline void setElementValue(const std::string& param, float value)
+inline void setElementValue(const std::string& param, float value,
+		Rocket::Core::ElementDocument *document)
 {
-	Rocket::Core::Element *inputElem =
-			steerPlugInOptionsMenu->GetElementById(param.c_str());
+	Rocket::Core::Element *inputElem = document->GetElementById(param.c_str());
 	if (inputElem)
 	{
 		inputElem->SetAttribute<float>("value", value);
@@ -219,8 +209,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		//hide main menu
 		gRocketMainMenu->Hide();
 		// Load and show the camera options document.
-		steerPlugInOptionsMenu = gRocketContext->LoadDocument(
-				(rocketBaseDir + "misc/ely-steerPlugIn-options.rml").c_str());
+		Rocket::Core::ElementDocument *steerPlugInOptionsMenu =
+				gRocketContext->LoadDocument(
+						(rocketBaseDir + "misc/ely-steerPlugIn-options.rml").c_str());
 		if (steerPlugInOptionsMenu != NULL)
 		{
 			steerPlugInOptionsMenu->GetElementById("title")->SetInnerRML(
@@ -237,8 +228,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			{
 				elem = steerPlugInOptionsMenu->GetElementById(
 						steerPlugInNames[p]);
-				if ((p == none) or (steerPlugIns.find((SteerPlugInType) p)
-						!= steerPlugIns.end()))
+				if ((p == none)
+						or (steerPlugIns.find((SteerPlugInType) p)
+								!= steerPlugIns.end()))
 				{
 					//there is the plugin
 					if (activeSteerPlugInType == p)
@@ -263,9 +255,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "add_key"
 		//input button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* body =
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (body == NULL)
+		if (steerPlugInOptionsMenu == NULL)
 			return;
 
 		//The "value" parameter of an "onchange" event is set to
@@ -276,7 +268,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				Rocket::Core::String>("value", "");
 		if (not paramValue.Empty())
 		{
-			body->GetElementById("remove_key")->SetInnerRML(
+			steerPlugInOptionsMenu->GetElementById("remove_key")->SetInnerRML(
 					"shift-" + paramValue);
 		}
 	}
@@ -284,13 +276,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "multiple_pursuit"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (steerPlugInOptionsMenu == NULL)
 			return;
 
 		Rocket::Core::Element* multiple_pursuit_options =
-				options_body->GetElementById("multiple_pursuit_options");
+				steerPlugInOptionsMenu->GetElementById(
+						"multiple_pursuit_options");
 		if (multiple_pursuit_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -312,7 +305,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				if (objectsSelect)
 				{
 					//use the helper to create the selection list
-					createObjectSelectionList(objectsSelect, mpWandererObjectId);
+					createObjectSelectionList(objectsSelect,
+							mpWandererObjectId);
 				}
 				//external update
 				mpWandererExternalUpdate ?
@@ -329,13 +323,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "soccer"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (steerPlugInOptionsMenu == NULL)
 			return;
 
-		Rocket::Core::Element* soccer_options = options_body->GetElementById(
-				"soccer_options");
+		Rocket::Core::Element* soccer_options =
+				steerPlugInOptionsMenu->GetElementById("soccer_options");
 		if (soccer_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -375,13 +369,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "capture_the_flag"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (steerPlugInOptionsMenu == NULL)
 			return;
 
 		Rocket::Core::Element* capture_the_flag_options =
-				options_body->GetElementById("capture_the_flag_options");
+				steerPlugInOptionsMenu->GetElementById(
+						"capture_the_flag_options");
 		if (capture_the_flag_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -415,22 +410,30 @@ void rocketEventHandler(const Rocket::Core::String& value,
 								"checked", true);
 				//other options
 				//home base radius
-				setElementValue("home_base_radius", ctfHomeBaseRadius);
+				setElementValue("home_base_radius", ctfHomeBaseRadius,
+						steerPlugInOptionsMenu);
 				//min start radius
-				setElementValue("min_start_radius", ctfMinStartRadius);
+				setElementValue("min_start_radius", ctfMinStartRadius,
+						steerPlugInOptionsMenu);
 				//max start radius
-				setElementValue("max_start_radius", ctfMaxStartRadius);
+				setElementValue("max_start_radius", ctfMaxStartRadius,
+						steerPlugInOptionsMenu);
 				//braking rate
-				setElementValue("braking_rate", ctfBrakingRate);
+				setElementValue("braking_rate", ctfBrakingRate,
+						steerPlugInOptionsMenu);
 				//avoidance predict time_min
-				setElementValue("avoidance_predict_time_min", ctfAvoidancePredictTimeMin);
+				setElementValue("avoidance_predict_time_min",
+						ctfAvoidancePredictTimeMin, steerPlugInOptionsMenu);
 				//avoidance predict time_max
-				setElementValue("avoidance_predict_time_max", ctfAvoidancePredictTimeMax);
+				setElementValue("avoidance_predict_time_max",
+						ctfAvoidancePredictTimeMax, steerPlugInOptionsMenu);
 			}
 		}
 	}
 	else if (value == "min_start_radius::change")
 	{
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
 		float max =
 				steerPlugInOptionsMenu->GetElementById("min_start_radius")->GetAttribute<
 						float>("max", 0.0);
@@ -442,11 +445,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		if (ctfMinStartRadius > ctfMaxStartRadius)
 		{
 			ctfMaxStartRadius = ctfMinStartRadius + step;
-			setElementValue("max_start_radius", ctfMaxStartRadius);
+			setElementValue("max_start_radius", ctfMaxStartRadius,
+					steerPlugInOptionsMenu);
 		}
 	}
 	else if (value == "max_start_radius::change")
 	{
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
 		float max =
 				steerPlugInOptionsMenu->GetElementById("max_start_radius")->GetAttribute<
 						float>("max", 0.0);
@@ -458,11 +464,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		if (ctfMaxStartRadius < ctfMinStartRadius)
 		{
 			ctfMinStartRadius = ctfMaxStartRadius - step;
-			setElementValue("min_start_radius", ctfMinStartRadius);
+			setElementValue("min_start_radius", ctfMinStartRadius,
+					steerPlugInOptionsMenu);
 		}
 	}
 	else if (value == "avoidance_predict_time_min::change")
 	{
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
 		float max = steerPlugInOptionsMenu->GetElementById(
 				"avoidance_predict_time_min")->GetAttribute<float>("max", 0.0);
 		float step = steerPlugInOptionsMenu->GetElementById(
@@ -474,11 +483,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		{
 			ctfAvoidancePredictTimeMax = ctfAvoidancePredictTimeMin + step;
 			setElementValue("avoidance_predict_time_max",
-					ctfAvoidancePredictTimeMax);
+					ctfAvoidancePredictTimeMax, steerPlugInOptionsMenu);
 		}
 	}
 	else if (value == "avoidance_predict_time_max::change")
 	{
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
 		float max = steerPlugInOptionsMenu->GetElementById(
 				"avoidance_predict_time_max")->GetAttribute<float>("max", 0.0);
 		float step = steerPlugInOptionsMenu->GetElementById(
@@ -490,20 +501,21 @@ void rocketEventHandler(const Rocket::Core::String& value,
 		{
 			ctfAvoidancePredictTimeMin = ctfAvoidancePredictTimeMax - step;
 			setElementValue("avoidance_predict_time_min",
-					ctfAvoidancePredictTimeMin);
+					ctfAvoidancePredictTimeMin, steerPlugInOptionsMenu);
 		}
 	}
 	else if (value == "steerPlugIn::low_speed_turn::options")
 	{
 		// This event is sent from the "onchange" of the "low_speed_turn"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (steerPlugInOptionsMenu == NULL)
 			return;
 
 		Rocket::Core::Element* low_speed_turn_options =
-				options_body->GetElementById("low_speed_turn_options");
+				steerPlugInOptionsMenu->GetElementById(
+						"low_speed_turn_options");
 		if (low_speed_turn_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -519,7 +531,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				low_speed_turn_options->SetProperty("display", "block");
 				//set elements' values from options' values
 				//steering speed
-				setElementValue("steering_speed", lstSteeringSpeed);
+				setElementValue("steering_speed", lstSteeringSpeed,
+						steerPlugInOptionsMenu);
 			}
 		}
 	}
@@ -527,13 +540,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	{
 		// This event is sent from the "onchange" of the "map_drive"
 		//radio button. It shows or hides the related options.
-		Rocket::Core::ElementDocument* options_body =
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
 				event.GetTargetElement()->GetOwnerDocument();
-		if (options_body == NULL)
+		if (steerPlugInOptionsMenu == NULL)
 			return;
 
 		Rocket::Core::Element* map_drive_options =
-				options_body->GetElementById("map_drive_options");
+				steerPlugInOptionsMenu->GetElementById("map_drive_options");
 		if (map_drive_options)
 		{
 			//The "value" parameter of an "onchange" event is set to
@@ -569,19 +582,19 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//use path fences
 				usePathFences ?
 						steerPlugInOptionsMenu->GetElementById(
-								"use_path_fences_yes")->SetAttribute(
-								"checked", true) :
+								"use_path_fences_yes")->SetAttribute("checked",
+								true) :
 						steerPlugInOptionsMenu->GetElementById(
-								"use_path_fences_no")->SetAttribute(
-								"checked", true);
+								"use_path_fences_no")->SetAttribute("checked",
+								true);
 				//curved steering
 				curvedSteering ?
 						steerPlugInOptionsMenu->GetElementById(
-								"curved_steering_yes")->SetAttribute(
-								"checked", true) :
+								"curved_steering_yes")->SetAttribute("checked",
+								true) :
 						steerPlugInOptionsMenu->GetElementById(
-								"curved_steering_no")->SetAttribute(
-								"checked", true);
+								"curved_steering_no")->SetAttribute("checked",
+								true);
 			}
 		}
 	}
@@ -622,14 +635,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				activeSteerPlugInType = multiple_pursuit;
 				//set options' values from elements' values
 				//new wanderer object
-				mpNewWanderedObjectId = event.GetParameter<Rocket::Core::String>(
-						"wanderer_object", "").CString();
+				mpNewWanderedObjectId =
+						event.GetParameter<Rocket::Core::String>(
+								"wanderer_object", "").CString();
 				//external update
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"external_update_wanderer", "");
-				paramValue == "yes" ?
-						mpWandererExternalUpdate = true :
-						//paramValue == "no"
+				paramValue == "yes" ? mpWandererExternalUpdate = true :
+				//paramValue == "no"
 						mpWandererExternalUpdate = false;
 			}
 			else if (paramValue == steerPlugInNames[soccer])
@@ -663,9 +676,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//external update
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"external_update_seeker", "");
-				paramValue == "yes" ?
-						ctfSeekerExternalUpdate = true :
-						//paramValue == "no"
+				paramValue == "yes" ? ctfSeekerExternalUpdate = true :
+				//paramValue == "no"
 						ctfSeekerExternalUpdate = false;
 				//other options
 				//home base radius
@@ -691,8 +703,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				activeSteerPlugInType = low_speed_turn;
 				//other options
 				//home base radius
-				lstSteeringSpeed = event.GetParameter<float>(
-						"steering_speed", 0.0);
+				lstSteeringSpeed = event.GetParameter<float>("steering_speed",
+						0.0);
 			}
 			else if (paramValue == steerPlugInNames[map_drive])
 			{
@@ -717,16 +729,14 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//use path fences
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"use_path_fences", "");
-				paramValue == "yes" ?
-						usePathFences = true :
-						//paramValue == "no"
+				paramValue == "yes" ? usePathFences = true :
+				//paramValue == "no"
 						usePathFences = false;
 				//curved steering
 				paramValue = event.GetParameter<Rocket::Core::String>(
 						"curved_steering", "");
-				paramValue == "yes" ?
-						curvedSteering = true :
-						//paramValue == "no"
+				paramValue == "yes" ? curvedSteering = true :
+				//paramValue == "no"
 						curvedSteering = false;
 			}
 			else
@@ -736,6 +746,8 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			}
 		}
 		//close (i.e. unload) the camera options menu and set as closed..
+		Rocket::Core::ElementDocument* steerPlugInOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
 		steerPlugInOptionsMenu->Close();
 		//return to main menu.
 		gRocketMainMenu->Show();
@@ -784,13 +796,12 @@ void add_vehicle(const Event* event)
 	//tweak clone object's common parameters
 	//set clone object store_params
 	objParams.erase("store_params");
-	objParams.insert(
-			std::pair<std::string, std::string>("store_params", "false"));
+	objParams.insert(std::make_pair("store_params", "false"));
 	//set clone object pos
 	objParams.erase("pos");
 	std::ostringstream pos;
 	pos << hitPos.get_x() << "," << hitPos.get_y() << "," << hitPos.get_z();
-	objParams.insert(std::pair<std::string, std::string>("pos", pos.str()));
+	objParams.insert(std::make_pair("pos", pos.str()));
 
 	//tweak clone components' parameter tables
 	compParams["SteerVehicle"].erase("type");
@@ -800,60 +811,52 @@ void add_vehicle(const Event* event)
 	{
 		//set SteerVehicle type, mov_type
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type", "one_turning"));
+				std::make_pair("type", "one_turning"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
+				std::make_pair("mov_type", "kinematic"));
 	}
 	else if (openSteerPlugInName == "Pedestrians")
 	{
 		//set SteerVehicle type, mov_type, thrown_events
+		compParams["SteerVehicle"].insert(std::make_pair("type", "pedestrian"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type", "pedestrian"));
+				std::make_pair("mov_type", "kinematic"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("thrown_events",
+				std::make_pair("thrown_events",
 						"avoid_obstacle@@3:avoid_close_neighbor@@"));
 	}
 	else if (openSteerPlugInName == "Boids")
 	{
 		//set SteerVehicle type, mov_type, max_force, max_speed, speed
+		compParams["SteerVehicle"].insert(std::make_pair("type", "boid"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type", "boid"));
+				std::make_pair("mov_type", "opensteer"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "opensteer"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("thrown_events",
+				std::make_pair("thrown_events",
 						"avoid_obstacle@@3:avoid_close_neighbor@@"));
 		//
 		compParams["SteerVehicle"].erase("max_force");
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("max_force", "27"));
+		compParams["SteerVehicle"].insert(std::make_pair("max_force", "27"));
 		compParams["SteerVehicle"].erase("max_speed");
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("max_speed", "20"));
+		compParams["SteerVehicle"].insert(std::make_pair("max_speed", "20"));
 		compParams["SteerVehicle"].erase("speed");
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("speed", "3"));
+		compParams["SteerVehicle"].insert(std::make_pair("speed", "3"));
 		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].erase("instance_of");
 		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("instance_of", "Smiley1"));
+				std::make_pair("instance_of", "Smiley1"));
 		compParams["InstanceOf"].erase("scale");
-		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("scale", "0.5,0.5,0.5"));
+		compParams["InstanceOf"].insert(std::make_pair("scale", "0.5,0.5,0.5"));
 	}
 	else if (openSteerPlugInName == "Multiple Pursuit")
 	{
 		compParams["SteerVehicle"].erase("up_axis_fixed");
 		//set SteerVehicle type, mov_type, up_axis_fixed
+		compParams["SteerVehicle"].insert(std::make_pair("type", "mp_pursuer"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type",
-						"mp_pursuer"));
+				std::make_pair("mov_type", "kinematic"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("up_axis_fixed", "true"));
+				std::make_pair("up_axis_fixed", "true"));
 	}
 	else if (openSteerPlugInName == "Michael's Simple Soccer")
 	{
@@ -865,33 +868,32 @@ void add_vehicle(const Event* event)
 		compParams["InstanceOf"].erase("scale");
 		//set SteerVehicle type, mov_type, max_force, max_speed, up_axis_fixed
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type",
+				std::make_pair("type",
 						(soccerActorSelected == ball ? "ball" : "player")));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
+				std::make_pair("mov_type", "kinematic"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("max_force",
+				std::make_pair("max_force",
 						(soccerActorSelected == ball ? "9.0" : "3000.7")));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("max_speed",
+				std::make_pair("max_speed",
 						(soccerActorSelected == ball ? "9.0" : "10")));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("speed",
+				std::make_pair("speed",
 						(soccerActorSelected == ball ? "1.0" : "0.0")));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("thrown_events",
-						"avoid_neighbor@@"));
+				std::make_pair("thrown_events", "avoid_neighbor@@"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("up_axis_fixed", "true"));
+				std::make_pair("up_axis_fixed", "true"));
 		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("instance_of",
+				std::make_pair("instance_of",
 						(soccerActorSelected == ball ?
 								"Smiley1" :
 								(soccerActorSelected == player_teamA ?
 										"Panda1" : "Gorilla1"))));
 		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("scale",
+				std::make_pair("scale",
 						(soccerActorSelected == ball ?
 								"1.0" :
 								(soccerActorSelected == player_teamA ?
@@ -901,28 +903,24 @@ void add_vehicle(const Event* event)
 	{
 		compParams["SteerVehicle"].erase("up_axis_fixed");
 		//set SteerVehicle type, mov_type, thrown_events, speed, up_axis_fixed
+		compParams["SteerVehicle"].insert(std::make_pair("type", "ctf_enemy"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type",
-						"ctf_enemy"));
+				std::make_pair("mov_type", "kinematic"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("thrown_events",
+				std::make_pair("thrown_events",
 						"avoid_obstacle@@3:avoid_close_neighbor@@"));
 		compParams["SteerVehicle"].erase("speed");
+		compParams["SteerVehicle"].insert(std::make_pair("speed", "1.0"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("speed", "1.0"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("up_axis_fixed", "true"));
+				std::make_pair("up_axis_fixed", "true"));
 	}
 	else if (openSteerPlugInName == "Low Speed Turn")
 	{
 		//set SteerVehicle type, mov_type
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type",
-						"low_speed_turn"));
+				std::make_pair("type", "low_speed_turn"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
+				std::make_pair("mov_type", "kinematic"));
 	}
 	else if (openSteerPlugInName == "Driving through map based obstacles")
 	{
@@ -932,31 +930,25 @@ void add_vehicle(const Event* event)
 		compParams["InstanceOf"].erase("instance_of");
 		compParams["InstanceOf"].erase("scale");
 		//set SteerVehicle type, mov_type, max_speed, max_force, up_axis_fixed, thrown_events
+		compParams["SteerVehicle"].insert(std::make_pair("type", "map_driver"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("type",
-						"map_driver"));
+				std::make_pair("mov_type", "kinematic"));
+		compParams["SteerVehicle"].insert(std::make_pair("max_speed", "20"));
+		compParams["SteerVehicle"].insert(std::make_pair("max_force", "8"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
+				std::make_pair("up_axis_fixed", "true"));
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("max_speed", "20"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("max_force", "8"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("up_axis_fixed", "true"));
-		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("thrown_events",
+				std::make_pair("thrown_events",
 						"avoid_obstacle@@3:path_following@@"));
 		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("instance_of", "vehicle1"));
-		compParams["InstanceOf"].insert(
-				std::pair<std::string, std::string>("scale", "1.0"));
+				std::make_pair("instance_of", "vehicle1"));
+		compParams["InstanceOf"].insert(std::make_pair("scale", "1.0"));
 	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(
-			std::pair<std::string, std::string>("add_to_plugin",
-					steerPlugInObjectId));
+			std::make_pair("add_to_plugin", steerPlugInObjectId));
 
 	//create actually the clone and...
 	SMARTPTR(Object)clone = ObjectTemplateManager::GetSingletonPtr()->createObject(
@@ -1034,7 +1026,7 @@ void remove_vehicle(const Event* event)
 			}
 			else if (openSteerPlugInName == "Capture the Flag")
 			{
-					if(not (dynamic_cast<CtfEnemy<SteerVehicle>*>(vehicle) or
+				if(not (dynamic_cast<CtfEnemy<SteerVehicle>*>(vehicle) or
 								dynamic_cast<ExternalCtfEnemy<SteerVehicle>*>(vehicle) or
 								dynamic_cast<CtfSeeker<SteerVehicle>*>(vehicle) or
 								dynamic_cast<ExternalCtfSeeker<SteerVehicle>*>(vehicle)))
@@ -1077,11 +1069,10 @@ void remove_vehicle(const Event* event)
 #ifdef ELY_DEBUG
 //helper
 //render plugins' static drawing
-AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
-		void * data)
+AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task, void * data)
 {
 	//first render textures on terrain
-	if(drawStaticGeometryInitDone)
+	if (drawStaticGeometryInitDone)
 	{
 		//render-to-texture already initialized: re-render next frame
 		rttBuffer->set_one_shot(true);
@@ -1162,7 +1153,7 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
 		//render to texture
 		CtfPlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<CtfPlugIn<SteerVehicle>*>(&(steerPlugIns[capture_the_flag])->
-		getAbstractPlugIn());
+				getAbstractPlugIn());
 		plugIn->drawHomeBase();
 	}
 	//map drive: render path and map
@@ -1171,7 +1162,7 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
 		//render to texture
 		MapDrivePlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIns[map_drive])->
-		getAbstractPlugIn());
+				getAbstractPlugIn());
 		plugIn->drawMap();
 		plugIn->drawPath();
 	}
@@ -1207,7 +1198,7 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
 		//render static geometry
 		BoidsPlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<BoidsPlugIn<SteerVehicle>*>(&(steerPlugIns[boid])->
-		getAbstractPlugIn());
+				getAbstractPlugIn());
 		plugIn->drawObstacles();
 	}
 	//ctf: render obstacles
@@ -1216,7 +1207,7 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
 		//render static geometry
 		CtfPlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<CtfPlugIn<SteerVehicle>*>(&(steerPlugIns[capture_the_flag])->
-		getAbstractPlugIn());
+				getAbstractPlugIn());
 		plugIn->drawObstacles();
 	}
 	//pedestrian: render obstacles
@@ -1225,7 +1216,7 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task,
 		//render static geometry
 		PedestrianPlugIn<SteerVehicle>* plugIn =
 		dynamic_cast<PedestrianPlugIn<SteerVehicle>*>(&(steerPlugIns[pedestrian])->
-		getAbstractPlugIn());
+				getAbstractPlugIn());
 		plugIn->drawObstacles();
 	}
 	//
@@ -1256,8 +1247,8 @@ void rocketCommit()
 #ifdef ELY_DEBUG
 	//set render to texture task
 	SMARTPTR(GenericAsyncTask)renderTask =
-			new GenericAsyncTask("renderTexturesOnTerrain",
-					&drawStaticGeometry, reinterpret_cast<void*>(NULL));
+	new GenericAsyncTask("renderTexturesOnTerrain",
+			&drawStaticGeometry, reinterpret_cast<void*>(NULL));
 	renderTask->set_sort(0);
 	renderTask->set_priority(0);
 	renderTask->set_task_chain("default");
@@ -1291,15 +1282,14 @@ inline void rocketHelperCommit(SteerPlugInType plugInType, ObjectId& objectId,
 	ParameterTableMap compParams = toBeClonedObject->getStoredCompTmplParams();
 	//tweak clone components' parameter tables
 	compParams["SteerVehicle"].erase("type");
-	compParams["SteerVehicle"].insert(
-			std::pair<std::string, std::string>("type", vehicleType));
+	compParams["SteerVehicle"].insert(std::make_pair("type", vehicleType));
 	if (externalUpdate)
 	{
 		//replace the AI component with a externally updated wanderer
 		//set SteerVehicle external_update
 		compParams["SteerVehicle"].erase("external_update");
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("external_update", "true"));
+				std::make_pair("external_update", "true"));
 	}
 	else
 	{
@@ -1307,13 +1297,12 @@ inline void rocketHelperCommit(SteerPlugInType plugInType, ObjectId& objectId,
 		//set SteerVehicle mov_type
 		compParams["SteerVehicle"].erase("mov_type");
 		compParams["SteerVehicle"].insert(
-				std::pair<std::string, std::string>("mov_type", "kinematic"));
+				std::make_pair("mov_type", "kinematic"));
 	}
 	//set SteerVehicle add_to_plugin
 	compParams["SteerVehicle"].erase("add_to_plugin");
 	compParams["SteerVehicle"].insert(
-			std::pair<std::string, std::string>("add_to_plugin",
-					steerPlugInObjectId));
+			std::make_pair("add_to_plugin", steerPlugInObjectId));
 	//add the SteerVehicle component
 	ObjectTemplateManager::GetSingletonPtr()->addComponentToObject(newObjectId,
 			ComponentType("SteerVehicle"), compParams["SteerVehicle"]);
@@ -1374,8 +1363,8 @@ void rocketMapDriveCommit()
 	RETURN_ON_COND(activeSteerPlugInType != map_drive,)
 	SMARTPTR(SteerPlugIn)steerPlugIn = steerPlugIns[activeSteerPlugInType];
 	//
-	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn =
-			dynamic_cast<MapDrivePlugIn<SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
+	MapDrivePlugIn<SteerVehicle>* mapDrivePlugIn = dynamic_cast<MapDrivePlugIn<
+			SteerVehicle>*>(&(steerPlugIn->getAbstractPlugIn()));
 	//set options
 	mapDrivePlugIn->setOptions(demoSelect, usePathFences, curvedSteering);
 }
@@ -1513,9 +1502,9 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	ctfMaxStartRadius = ctfPlugIn->m_CtfPlugInData.gMaxStartRadius;//40.0
 	ctfBrakingRate = ctfPlugIn->m_CtfPlugInData.gBrakingRate;//0.75
 	ctfAvoidancePredictTimeMin =
-			ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMin;//0.9
+	ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMin;//0.9
 	ctfAvoidancePredictTimeMax =
-			ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMax;//2.0
+	ctfPlugIn->m_CtfPlugInData.gAvoidancePredictTimeMax;//2.0
 
 	///init libRocket
 	steerPlugIns[capture_the_flag] = DCAST(SteerPlugIn, aiComp);
@@ -1567,11 +1556,13 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	OpenSteer::PolylineSegmentedPathwaySegmentRadii* pathWay =
 	dynamic_cast<OpenSteer::PolylineSegmentedPathwaySegmentRadii*>(mapDrivePlugIn->getPathway());
 	//get map dimensions and center
-	float minMaxX[2] = { FLT_MAX, -FLT_MAX}; //min,max
-	float minMaxY[2] = { FLT_MAX, -FLT_MAX}; //min,max
+	float minMaxX[2] =
+	{	FLT_MAX, -FLT_MAX}; //min,max
+	float minMaxY[2] =
+	{	FLT_MAX, -FLT_MAX}; //min,max
 	LPoint3f mapCenter = LPoint3f::zero();
 	for (OpenSteer::SegmentedPathway::size_type i = 0;
-			i < pathWay->pointCount(); ++i)
+	i < pathWay->pointCount(); ++i)
 	{
 		LPoint3f point = OpenSteerVec3ToLVecBase3f(pathWay->point(i));
 		if (point.get_x() < minMaxX[0])
@@ -1610,9 +1601,9 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	}
 	//set worldSize to max spread between dX and dY and resolution = 200
 	float dX = minMaxX[1] - minMaxX[0];
-	float dY =  minMaxY[1] - minMaxY[0];
+	float dY = minMaxY[1] - minMaxY[0];
 	mapDrivePlugIn->makeMap(LVecBase3fToOpenSteerVec3(mapCenter),
-			max(dX, dY) + maxRadius * 5.0, 200);
+	max(dX, dY) + maxRadius * 5.0, 200);
 	///init libRocket
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();

@@ -112,7 +112,18 @@
 					</p>
 					
 					<!-- Object Picker -->
-					<input id="object_picker" type="radio" name="camera" value="object_picker" /> <strong>Object Picker</strong><br />
+					<input id="object_picker" type="radio" name="camera" value="object_picker" onchange="camera::object_picker::options" /> <strong>Object Picker</strong><br />
+					<!--options -->
+					<p id="object_picker_options" style="display: none;">
+						constraint type:
+						<input id="spherical_constraint" type="radio"
+							name="constraint_type" value="spherical" checked="true"
+							style="margin-left: 0px;" />
+						spherical
+						<input id="generic_constraint" type="radio"
+							name="constraint_type" value="generic" style="margin-left: 0px;" />
+						generic
+					</p>
 					
 					<!-- None -->
 					<input id="none" type="radio" name="camera" value="none" checked="true" /> <strong>None</strong><br />

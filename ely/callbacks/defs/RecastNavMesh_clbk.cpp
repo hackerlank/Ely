@@ -81,17 +81,17 @@ void add_crowd_agent_NavMesh_RecastNavMesh(const Event* event, void* data)
 	//tweak clone object's parameters
 	//set clone object store_params
 	objParams.erase("store_params");
-	objParams.insert(std::pair<std::string, std::string>("store_params", "false"));
+	objParams.insert(std::make_pair("store_params", "false"));
 	//set clone object pos
 	objParams.erase("pos");
 	std::ostringstream pos;
 	pos << hitPos.get_x() << "," << hitPos.get_y() << "," << hitPos.get_z();
-	objParams.insert(std::pair<std::string, std::string>("pos", pos.str()));
+	objParams.insert(std::make_pair("pos", pos.str()));
 
 	//tweak clone components' parameter tables
 	//set CrowdAgent add_to_plugin
 	compParams["CrowdAgent"].erase("add_to_navmesh");
-	compParams["CrowdAgent"].insert(std::pair<std::string, std::string>("add_to_navmesh", navMeshObjectId));
+	compParams["CrowdAgent"].insert(std::make_pair("add_to_navmesh", navMeshObjectId));
 	//create actually the clone
 	ObjectTemplateManager::GetSingletonPtr()->
 	createObject(toBeClonedObject->objectTmpl()->objectType(), ObjectId(),

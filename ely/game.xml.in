@@ -24,6 +24,8 @@
 				<Param event_types="strafe_right:stop-strafe_right:fast-strafe_right"/>
 				<Param event_types="roll_left:stop-roll_left:fast-roll_left"/>
 				<Param event_types="roll_right:stop-roll_right:fast-roll_right"/>
+				<Param event_types="pitch_up:stop-pitch_up:fast-pitch_up"/>
+				<Param event_types="pitch_down:stop-pitch_down:fast-pitch_down"/>
 				<Param event_types="up:stop-up:fast-up"/>
 				<Param event_types="down:stop-down:fast-down"/>				
 				<Param event_types="fast:stop-fast"/>				
@@ -211,11 +213,13 @@
 				<Param mouse_enabled_h="true"/>
 				<Param mouse_enabled_p="true"/>
 				<Param events="forward@mouse3:stop-forward@mouse3-up:fast-forward@shift-mouse3$"/>
-				<Param events="backward@s:stop-backward@s-up:fast-backward@shift-s$"/>
-				<Param events="strafe_left@a:stop-strafe_left@a-up:fast-strafe_left@shift-a$"/>
-				<Param events="strafe_right@d:stop-strafe_right@d-up:fast-strafe_right@shift-d$"/>
-				<Param events="roll_left@q:stop-roll_left@q-up:fast-roll_left@shift-q$"/>
-				<Param events="roll_right@e:stop-roll_right@e-up:fast-roll_right@shift-e$"/>
+				<Param events="backward@x:stop-backward@x-up:fast-backward@shift-x$"/>
+				<Param events="strafe_left@q:stop-strafe_left@q-up:fast-strafe_left@shift-q$"/>
+				<Param events="strafe_right@e:stop-strafe_right@e-up:fast-strafe_right@shift-e$"/>
+				<Param events="roll_left@a:stop-roll_left@a-up:fast-roll_left@shift-a$"/>
+				<Param events="roll_right@d:stop-roll_right@d-up:fast-roll_right@shift-d$"/>
+				<Param events="pitch_up@w:stop-pitch_up@w-up:fast-pitch_up@shift-w$"/>
+				<Param events="pitch_down@s:stop-pitch_down@s-up:fast-pitch_down@shift-s$"/>
 				<Param events="up@r:stop-up@r-up:fast-up@shift-r$"/>
 				<Param events="down@f:stop-down@f-up:fast-down@shift-f$"/>				
 				<Param events="fast@shift:stop-fast@shift-up$"/>
