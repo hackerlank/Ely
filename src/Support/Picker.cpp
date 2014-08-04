@@ -96,7 +96,7 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 	}
 	//reset picking logic data
 	mCsPick.clear();
-	mPivotPos = LPoint3f::zero();
+	mPivotCamDist = 0.0;
 	// setup event callback for picking body
 	mPickKeyOn = pickKeyOn;
 	mPickKeyOff = pickKeyOff;
@@ -176,13 +176,16 @@ void Picker::pickBody(const Event* event)
 								const_cast<PandaNode*>(result.get_node()));
 						if (not(mPickedBody->is_static() or mPickedBody->is_kinematic()))
 						{
-							//
+							//set body as active and not deactivable
 							mPickedBody->set_active(true);
 							mPickedBody->set_deactivation_enabled(false);
-							mPivotPos = result.get_hit_pos();
-							//
+							//get global pivot pos
+							LPoint3f pivotPos = result.get_hit_pos();
+							//get the initial distance from camera
+							mPivotCamDist = (pivotPos - mCamera.get_pos(mRender)).length();
+							//compute pivot pos relative to body
 							NodePath bodyNP(mPickedBody);
-							LPoint3f pivotLocalPos = bodyNP.get_relative_point(mRender, mPivotPos);
+							LPoint3f pivotLocalPos = bodyNP.get_relative_point(mRender, pivotPos);
 							//create constraint
 							if (mCsIsSpherical)
 							{
@@ -243,6 +246,7 @@ void Picker::pickBody(const Event* event)
 			mWorld->remove(mCsPick);
 			//delete constraint
 			mCsPick.clear();
+			//set body as inactive and deactivable
 			mPickedBody->set_deactivation_enabled(true);
 			mPickedBody->set_active(false);
 		}
@@ -273,19 +277,18 @@ AsyncTask::DoneStatus Picker::movePicked(GenericAsyncTask* task)
 				pFar = mRender.get_relative_point(mCamera, pFar);
 				// new pivot (b) pos
 				LVector3f vecFarNear = pFar - pNear;
-				LVector3f vecPivotNear = mPivotPos - pNear;
-				mPivotPos = pNear + (vecFarNear / vecFarNear.length_squared()) *
-				vecPivotNear.dot(vecFarNear);
+				vecFarNear.normalize();
+				LPoint3f pivotPos = mCamera.get_pos(mRender) + vecFarNear * mPivotCamDist;
 				if(mCsIsSpherical)
 				{
-					dynamic_cast<BulletSphericalConstraint*>(mCsPick.p())->set_pivot_b(mPivotPos);
+					dynamic_cast<BulletSphericalConstraint*>(mCsPick.p())->set_pivot_b(pivotPos);
 				}
 				else
 				{
 					//(in Bullet environment)
 					btGeneric6DofConstraint* dof6 =
 							dynamic_cast<btGeneric6DofConstraint*>(mCsPick->ptr());
-					dof6->getFrameOffsetA().setOrigin(LVecBase3_to_btVector3(mPivotPos));
+					dof6->getFrameOffsetA().setOrigin(LVecBase3_to_btVector3(pivotPos));
 				}
 			}
 		}

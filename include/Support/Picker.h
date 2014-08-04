@@ -73,7 +73,7 @@ private:
 	SMARTPTR(BulletConstraint) mCsPick;
 	bool mCsIsSpherical;
 	float mCfm, mErp;
-	LPoint3f mPivotPos;
+	float mPivotCamDist;
 	///@}
 
 	/**
