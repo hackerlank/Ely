@@ -83,6 +83,15 @@ enum NavMeshPolyFlagsEnum
 	NAVMESH_POLYFLAGS_DISABLED = 0x10,		// Disabled polygon
 	NAVMESH_POLYFLAGS_ALL = 0xffff	// All abilities.
 };
+/**
+ * \brief NavMesh partition type.
+ */
+enum NavMeshPartitionType
+{
+	NAVMESH_PARTITION_WATERSHED,
+	NAVMESH_PARTITION_MONOTONE,
+	NAVMESH_PARTITION_LAYERS,
+};
 
 ///Table giving for each area the corresponding (or'ed) flags.
 typedef std::map<int,int> NavMeshPolyAreaFlags;
@@ -136,12 +145,12 @@ struct NavMeshSettings
 	float m_agentMaxSlope;
 	float m_regionMinSize;
 	float m_regionMergeSize;
-	bool m_monotonePartitioning;
 	float m_edgeMaxLen;
 	float m_edgeMaxError;
 	float m_vertsPerPoly;
 	float m_detailSampleDist;
 	float m_detailSampleMaxError;
+	int m_partitionType;
 };
 
 /**
@@ -173,12 +182,12 @@ protected:
 	float m_agentMaxSlope;
 	float m_regionMinSize;
 	float m_regionMergeSize;
-	bool m_monotonePartitioning;
 	float m_edgeMaxLen;
 	float m_edgeMaxError;
 	float m_vertsPerPoly;
 	float m_detailSampleDist;
 	float m_detailSampleMaxError;
+	int m_partitionType;
 
 	NavMeshTypeTool* m_tool;
 	NavMeshTypeToolState* m_toolStates[MAX_TOOLS];

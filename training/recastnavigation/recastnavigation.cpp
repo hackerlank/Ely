@@ -49,6 +49,8 @@ inline unsigned int ilog2(unsigned int v)
 
 int main(int argc, char **argv)
 {
+	std::cout << "This training works only with librecastnavigation version 1.0" << std::endl;
+
 	App* app = new App;
 
 	app->allOnButZeroMask = BitMask32::all_on();

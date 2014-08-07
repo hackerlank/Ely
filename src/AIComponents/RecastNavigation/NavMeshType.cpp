@@ -117,12 +117,12 @@ void NavMeshType::resetNavMeshSettings()
 	m_agentMaxSlope = 45.0f;
 	m_regionMinSize = 8;
 	m_regionMergeSize = 20;
-	m_monotonePartitioning = false;
 	m_edgeMaxLen = 12.0f;
 	m_edgeMaxError = 1.3f;
 	m_vertsPerPoly = 6.0f;
 	m_detailSampleDist = 6.0f;
 	m_detailSampleMaxError = 1.0f;
+	m_partitionType = NAVMESH_PARTITION_WATERSHED;
 }
 
 void NavMeshType::handleClick(const float* s, const float* p, bool shift)
@@ -195,12 +195,12 @@ void NavMeshType::setNavMeshSettings(const NavMeshSettings& settings)
 	m_agentMaxSlope = settings.m_agentMaxSlope;
 	m_regionMinSize = settings.m_regionMinSize;
 	m_regionMergeSize = settings.m_regionMergeSize;
-	m_monotonePartitioning = settings.m_monotonePartitioning;
 	m_edgeMaxLen = settings.m_edgeMaxLen;
 	m_edgeMaxError = settings.m_edgeMaxError;
 	m_vertsPerPoly = settings.m_vertsPerPoly;
 	m_detailSampleDist = settings.m_detailSampleDist;
 	m_detailSampleMaxError = settings.m_detailSampleMaxError;
+	m_partitionType = settings.m_partitionType;
 }
 
 NavMeshSettings NavMeshType::getNavMeshSettings()
@@ -214,12 +214,12 @@ NavMeshSettings NavMeshType::getNavMeshSettings()
 	settings.m_agentMaxSlope = m_agentMaxSlope;
 	settings.m_regionMinSize = m_regionMinSize;
 	settings.m_regionMergeSize = m_regionMergeSize;
-	settings.m_monotonePartitioning = m_monotonePartitioning;
 	settings.m_edgeMaxLen = m_edgeMaxLen;
 	settings.m_edgeMaxError = m_edgeMaxError;
 	settings.m_vertsPerPoly = m_vertsPerPoly;
 	settings.m_detailSampleDist = m_detailSampleDist;
 	settings.m_detailSampleMaxError = m_detailSampleMaxError;
+	settings.m_partitionType = m_partitionType;
 	return settings;
 }
 

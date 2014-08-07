@@ -735,6 +735,7 @@
 			</Component> 
 			<Component type="NavMesh">
 				<Param auto_setup="false"/>
+				<Param partition_type="watershed"/>
 				<Param area_flags_cost="0@0x01@1.0"/>
 				<Param area_flags_cost="1@0x02@10.0"/>
 				<Param area_flags_cost="2@0x01@1.0"/>
@@ -748,8 +749,8 @@
 									  -32.7395,-8.40045,40.7907@3"/>
 				<Param offmesh_connection="-33.7841,-4.48785,40.7907:
 									  -52.0533,-29.1533,6.01279@false"/>
-				<Param events="add_crowd_agent@u:remove_crowd_agent@shift-u$"/>
-				<Param events="toggle_debug@m$navMeshesToggleDebug"/>
+				<Param events="add_crowd_agent@9:remove_crowd_agent@shift-9$"/>
+				<Param events="toggle_debug@0$navMeshesToggleDebug"/>
 			</Component>
 			<Param parent="render"/>
 			<Param is_steady="true"/>

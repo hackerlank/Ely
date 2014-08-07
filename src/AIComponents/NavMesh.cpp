@@ -76,14 +76,18 @@ ComponentType NavMesh::componentType() const
 bool NavMesh::initialize()
 {
 	bool result = true;
+	//
+	float value;
+	int valueInt;
+	std::string valueStr;
 	//set NavMesh parameters (store internally for future use)
 	//navmesh type
-	std::string navMeshtypeStr = mTmpl->parameter(std::string("navmesh_type"));
-	if (navMeshtypeStr == std::string("tile"))
+	valueStr = mTmpl->parameter(std::string("navmesh_type"));
+	if (valueStr == std::string("tile"))
 	{
 		mNavMeshTypeEnum = TILE;
 	}
-	else if (navMeshtypeStr == std::string("obstacle"))
+	else if (valueStr == std::string("obstacle"))
 	{
 		mNavMeshTypeEnum = OBSTACLE;
 	}
@@ -95,9 +99,6 @@ bool NavMesh::initialize()
 	mAutoSetup = (
 			mTmpl->parameter(std::string("auto_setup"))
 					== std::string("false") ? false : true);
-	//
-	float value;
-	int valueInt;
 	//cell size
 	value = strtof(mTmpl->parameter(std::string("cell_size")).c_str(), NULL);
 	mNavMeshSettings.m_cellSize = (value >= 0.0 ? value : -value);
@@ -126,10 +127,21 @@ bool NavMesh::initialize()
 	value = strtof(mTmpl->parameter(std::string("region_merge_size")).c_str(),
 	NULL);
 	mNavMeshSettings.m_regionMergeSize = (value >= 0.0 ? value : -value);
-	//monotone partitioning
-	mNavMeshSettings.m_monotonePartitioning = (
-			mTmpl->parameter(std::string("monotone_partitioning"))
-					== std::string("true") ? true : false);
+	//partition type
+	valueStr = mTmpl->parameter(std::string("partition_type"));
+	if (valueStr == std::string("monotone"))
+	{
+		mNavMeshSettings.m_partitionType = NAVMESH_PARTITION_MONOTONE;
+	}
+	else if (valueStr == std::string("layer"))
+	{
+		mNavMeshSettings.m_partitionType = NAVMESH_PARTITION_LAYERS;
+	}
+	else
+	{
+		//watershed
+		mNavMeshSettings.m_partitionType = NAVMESH_PARTITION_WATERSHED;
+	}
 	//edge max len
 	value = strtof(mTmpl->parameter(std::string("edge_max_len")).c_str(), NULL);
 	mNavMeshSettings.m_edgeMaxLen = (value >= 0.0 ? value : -value);
@@ -749,7 +761,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 
 	///set recast areas' costs
 	dtQueryFilter* filter =
-			crowdTool->getState()->getCrowd()->getEditableFilter();
+			crowdTool->getState()->getCrowd()->getEditableFilter(0);
 	NavMeshPolyAreaCost::const_iterator iterAC;
 	for (iterAC = mPolyAreaCost.begin(); iterAC != mPolyAreaCost.end();
 			++iterAC)
@@ -758,9 +770,9 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	}
 
 	///set recast crowd include & exclude flags
-	crowdTool->getState()->getCrowd()->getEditableFilter()->setIncludeFlags(
+	crowdTool->getState()->getCrowd()->getEditableFilter(0)->setIncludeFlags(
 			mCrowdIncludeFlags);
-	crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
+	crowdTool->getState()->getCrowd()->getEditableFilter(0)->setExcludeFlags(
 			mCrowdExcludeFlags);
 
 	///<this code is executed only when in manual setup:

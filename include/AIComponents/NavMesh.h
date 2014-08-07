@@ -63,7 +63,7 @@ class NavMeshTemplate;
  * - "agent_max_slope"				|single|"45.0"
  * - "region_min_size"				|single|"8"
  * - "region_merge_size"			|single|"20"
- * - "monotone_partitioning"		|single|"false"
+ * - "partition_type"				|single|"watershed" (values: watershed|monotone|layer)
  * - "edge_max_len"					|single|"12.0"
  * - "edge_max_error"				|single|"1.3"
  * - "verts_per_poly"				|single|"6.0"

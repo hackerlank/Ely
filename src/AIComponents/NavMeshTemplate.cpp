@@ -86,8 +86,7 @@ void NavMeshTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("agent_max_slope", "45.0"));
 	mParameterTable.insert(ParameterNameValue("region_min_size", "8"));
 	mParameterTable.insert(ParameterNameValue("region_merge_size", "20"));
-	mParameterTable.insert(
-			ParameterNameValue("monotone_partitioning", "false"));
+	mParameterTable.insert(ParameterNameValue("partition_type", "watershed"));
 	mParameterTable.insert(ParameterNameValue("edge_max_len", "12.0"));
 	mParameterTable.insert(ParameterNameValue("edge_max_error", "1.3"));
 	mParameterTable.insert(ParameterNameValue("verts_per_poly", "6.0"));

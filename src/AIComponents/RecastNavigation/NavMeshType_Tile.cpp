@@ -156,7 +156,12 @@ dtNavMesh* NavMeshType_Tile::loadAll(const char* path)
 
 	// Read header.
 	NavMeshSetHeader header;
-	fread(&header, sizeof(NavMeshSetHeader), 1, fp);
+	size_t readLen = fread(&header, sizeof(NavMeshSetHeader), 1, fp);
+	if (readLen != 1)
+	{
+		fclose(fp);
+		return 0;
+	}
 	if (header.magic != NAVMESHSET_MAGIC)
 	{
 		fclose(fp);
@@ -185,7 +190,10 @@ dtNavMesh* NavMeshType_Tile::loadAll(const char* path)
 	for (int i = 0; i < header.numTiles; ++i)
 	{
 		NavMeshTileHeader tileHeader;
-		fread(&tileHeader, sizeof(tileHeader), 1, fp);
+		readLen = fread(&tileHeader, sizeof(tileHeader), 1, fp);
+		if (readLen != 1)
+			return 0;
+
 		if (!tileHeader.tileRef || !tileHeader.dataSize)
 			break;
 
@@ -194,7 +202,9 @@ dtNavMesh* NavMeshType_Tile::loadAll(const char* path)
 		if (!data)
 			break;
 		memset(data, 0, tileHeader.dataSize);
-		fread(data, tileHeader.dataSize, 1, fp);
+		readLen = fread(data, tileHeader.dataSize, 1, fp);
+		if (readLen != 1)
+			return 0;
 
 		mesh->addTile(data, tileHeader.dataSize, DT_TILE_FREE_DATA,
 				tileHeader.tileRef, 0);
@@ -230,19 +240,21 @@ void NavMeshType_Tile::handleRender(duDebugDraw& dd)
 	// Draw bounds
 	const float* bmin = m_geom->getMeshBoundsMin();
 	const float* bmax = m_geom->getMeshBoundsMax();
-	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
+	duDebugDrawBoxWire(&dd, bmin[0], bmin[1], bmin[2], bmax[0], bmax[1],
+			bmax[2], duRGBA(255, 255, 255, 128), 1.0f);
 
 	// Tiling grid.
 	int gw = 0, gh = 0;
 	rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
-	const int tw = (gw + (int)m_tileSize-1) / (int)m_tileSize;
-	const int th = (gh + (int)m_tileSize-1) / (int)m_tileSize;
-	const float s = m_tileSize*m_cellSize;
-	duDebugDrawGridXZ(&dd, bmin[0],bmin[1],bmin[2], tw,th, s, duRGBA(0,0,0,64), 1.0f);
+	const int tw = (gw + (int) m_tileSize - 1) / (int) m_tileSize;
+	const int th = (gh + (int) m_tileSize - 1) / (int) m_tileSize;
+	const float s = m_tileSize * m_cellSize;
+	duDebugDrawGridXZ(&dd, bmin[0], bmin[1], bmin[2], tw, th, s,
+			duRGBA(0, 0, 0, 64), 1.0f);
 
 	// Draw active tile
-	duDebugDrawBoxWire(&dd, m_tileBmin[0],m_tileBmin[1],m_tileBmin[2],
-					   m_tileBmax[0],m_tileBmax[1],m_tileBmax[2], m_tileCol, 1.0f);
+	duDebugDrawBoxWire(&dd, m_tileBmin[0], m_tileBmin[1], m_tileBmin[2],
+			m_tileBmax[0], m_tileBmax[1], m_tileBmax[2], m_tileCol, 1.0f);
 
 //	if (m_navMesh && m_navQuery &&
 //		(m_drawMode == DRAWMODE_NAVMESH ||
@@ -253,14 +265,16 @@ void NavMeshType_Tile::handleRender(duDebugDraw& dd)
 //		 m_drawMode == DRAWMODE_NAVMESH_INVIS))
 //	{
 //		if (m_drawMode != DRAWMODE_NAVMESH_INVIS)
-			duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery, m_navMeshDrawFlags);
+			duDebugDrawNavMeshWithClosedList(&dd, *m_navMesh, *m_navQuery,
+					m_navMeshDrawFlags);
 //		if (m_drawMode == DRAWMODE_NAVMESH_BVTREE)
 //			duDebugDrawNavMeshBVTree(&dd, *m_navMesh);
 //		if (m_drawMode == DRAWMODE_NAVMESH_PORTALS)
 //			duDebugDrawNavMeshPortals(&dd, *m_navMesh);
 //		if (m_drawMode == DRAWMODE_NAVMESH_NODES)
 //			duDebugDrawNavMeshNodes(&dd, *m_navQuery);
-		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, NAVMESH_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
+		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh,
+				NAVMESH_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
 //	}
 
 //	glDepthMask(GL_TRUE);
@@ -550,6 +564,7 @@ void NavMeshType_Tile::buildAllTiles()
 #ifdef ELY_DEBUG
 	// Start the build process.	
 	m_ctx->stopTimer(RC_TIMER_TEMP);
+
 	m_totalBuildTimeMs = m_ctx->getAccumulatedTime(RC_TIMER_TEMP) / 1000.0f;
 #endif
 
@@ -736,25 +751,40 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		rcMarkConvexPolyArea(m_ctx, vols[i].verts, vols[i].nverts, vols[i].hmin,
 				vols[i].hmax, (unsigned char) vols[i].area, *m_chf);
 
-	if (m_monotonePartitioning)
-	{
-		// Partition the walkable surface into simple regions without holes.
-		if (!rcBuildRegionsMonotone(m_ctx, *m_chf, m_cfg.borderSize,
-				m_cfg.minRegionArea, m_cfg.mergeRegionArea))
-		{
-			CTXLOG(m_ctx, RC_LOG_ERROR,
-					"buildNavigation: Could not build regions.");
-			return 0;
-		}
-	}
-	else
+	// Partition the heightfield so that we can use simple algorithm later to triangulate the walkable areas.
+	// There are 3 martitioning methods, each with some pros and cons:
+	// 1) Watershed partitioning
+	//   - the classic Recast partitioning
+	//   - creates the nicest tessellation
+	//   - usually slowest
+	//   - partitions the heightfield into nice regions without holes or overlaps
+	//   - the are some corner cases where this method creates produces holes and overlaps
+	//      - holes may appear when a small obstacles is close to large open area (triangulation can handle this)
+	//      - overlaps may occur if you have narrow spiral corridors (i.e stairs), this make triangulation to fail
+	//   * generally the best choice if you precompute the nacmesh, use this if you have large open areas
+	// 2) Monotone partioning
+	//   - fastest
+	//   - partitions the heightfield into regions without holes and overlaps (guaranteed)
+	//   - creates long thin polygons, which sometimes causes paths with detours
+	//   * use this if you want fast navmesh generation
+	// 3) Layer partitoining
+	//   - quite fast
+	//   - partitions the heighfield into non-overlapping regions
+	//   - relies on the triangulation code to cope with holes (thus slower than monotone partitioning)
+	//   - produces better triangles than monotone partitioning
+	//   - does not have the corner cases of watershed partitioning
+	//   - can be slow and create a bit ugly tessellation (still better than monotone)
+	//     if you have large open areas with small obstacles (not a problem if you use tiles)
+	//   * good choice to use for tiled navmesh with medium and small sized tiles
+
+	if (m_partitionType == NAVMESH_PARTITION_WATERSHED)
 	{
 		// Prepare for region partitioning, by calculating distance field along the walkable surface.
 		if (!rcBuildDistanceField(m_ctx, *m_chf))
 		{
 			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build distance field.");
-			return 0;
+			return false;
 		}
 
 		// Partition the walkable surface into simple regions without holes.
@@ -762,8 +792,31 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 				m_cfg.minRegionArea, m_cfg.mergeRegionArea))
 		{
 			CTXLOG(m_ctx, RC_LOG_ERROR,
-					"buildNavigation: Could not build regions.");
-			return 0;
+					"buildNavigation: Could not build watershed regions.");
+			return false;
+		}
+	}
+	else if (m_partitionType == NAVMESH_PARTITION_MONOTONE)
+	{
+		// Partition the walkable surface into simple regions without holes.
+		// Monotone partitioning does not need distancefield.
+		if (!rcBuildRegionsMonotone(m_ctx, *m_chf, m_cfg.borderSize,
+				m_cfg.minRegionArea, m_cfg.mergeRegionArea))
+		{
+			CTXLOG(m_ctx, RC_LOG_ERROR,
+					"buildNavigation: Could not build monotone regions.");
+			return false;
+		}
+	}
+	else // SAMPLE_PARTITION_LAYERS
+	{
+		// Partition the walkable surface into simple regions without holes.
+		if (!rcBuildLayerRegions(m_ctx, *m_chf, m_cfg.borderSize,
+				m_cfg.minRegionArea))
+		{
+			CTXLOG(m_ctx, RC_LOG_ERROR,
+					"buildNavigation: Could not build layer regions.");
+			return false;
 		}
 	}
 
