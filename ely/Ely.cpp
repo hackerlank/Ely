@@ -72,16 +72,16 @@ int main(int argc, char **argv)
 	completedMask = 1 << 1;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(AI_chain, 1, true);
+	TASKCHAIN(AI_chain, 1, false);
 	GAMESUBMANAGER(GameAIManager, gameAIMgr, managersMutex, managersVar,
-			completedMask, exiting,completedTasks, 0, 0, AI_chain);
+			completedMask, exiting, completedTasks, 0, 0, AI_chain);
 	managersMutex.release();
 	//Control
 	managersMutex.acquire();
 	completedMask = 1 << 2;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Control_chain, 1, true);
+	TASKCHAIN(Control_chain, 1, false);
 	GAMESUBMANAGER(GameControlManager, gameControlMgr, managersMutex,
 			managersVar, completedMask, exiting, completedTasks, 0, 0, Control_chain);
 	managersMutex.release();
@@ -90,7 +90,7 @@ int main(int argc, char **argv)
 	completedMask = 1 << 3;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Scene_chain, 1, true);
+	TASKCHAIN(Scene_chain, 1, false);
 	GAMESUBMANAGER(GameSceneManager, gameSceneMgr, managersMutex, managersVar,
 			completedMask, exiting, completedTasks, 0, 0, Scene_chain);
 	managersMutex.release();
@@ -99,7 +99,7 @@ int main(int argc, char **argv)
 	completedMask = 1 << 4;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Physics_chain, 1, true);
+	TASKCHAIN(Physics_chain, 1, false);
 	GAMESUBMANAGER(GamePhysicsManager, gamePhysicsMgr, managersMutex,
 			managersVar, completedMask, exiting, completedTasks, 0, 0, Physics_chain);
 	managersMutex.release();
@@ -108,7 +108,7 @@ int main(int argc, char **argv)
 	completedMask = 1 << 5;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Audio_chain, 1, true);
+	TASKCHAIN(Audio_chain, 1, false);
 	GAMESUBMANAGER(GameAudioManager, gameAudioMgr, managersMutex, managersVar,
 			completedMask, exiting, completedTasks, 0, 0, Audio_chain);
 	managersMutex.release();
@@ -117,7 +117,7 @@ int main(int argc, char **argv)
 	completedMask = 1 << 6;
 	completedAllMask |= completedMask;
 	completedTasks = completedAllMask;
-	TASKCHAIN(Behavior_chain, 1, true);
+	TASKCHAIN(Behavior_chain, 1, false);
 	GAMESUBMANAGER(GameBehaviorManager, gameBehaviorMgr, managersMutex,
 			managersVar, completedMask, exiting, completedTasks, 0, 0, Behavior_chain);
 	managersMutex.release();
