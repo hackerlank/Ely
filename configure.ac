@@ -65,6 +65,7 @@ AC_ARG_ENABLE([ely-thread],
     AS_HELP_STRING([--enable-ely-thread],
     	[@<:@=yes@:>@ enable Ely threading mode (disabled by default)]),
     [ely_thread=${enableval}], [ely_thread=no])
+AM_CONDITIONAL([ELY_THREAD], [test "x${ely_thread}" != xno])
 AS_IF([test "x${ely_thread}" != xno],
 	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
 	BUILDTYPE=${BUILDTYPE}"-Thread"])

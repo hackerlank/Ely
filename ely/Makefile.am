@@ -79,6 +79,7 @@ substInitializations = sed -e 's/@initializations[@]/initializations/g'
 substInstanceupdates = sed -e 's/@instanceupdates[@]/instanceupdates/g'
 endif 
 
+#Ely_ini.h rules
 Ely_ini.h : $(top_srcdir)/ely/Ely_ini.h.in Makefile
 	$(substDataDir) $(top_srcdir)/ely/$@.in | \
 	$(substLibDir) | \
@@ -87,9 +88,18 @@ Ely_ini.h : $(top_srcdir)/ely/Ely_ini.h.in Makefile
 	$(substInitializations) | \
 	$(substInstanceupdates) > $@
 
-config.prc : $(top_srcdir)/ely/config.prc.in Makefile
-	$(substDataDir) $(top_srcdir)/ely/$@.in > $@
+#config.prc rules
+if !ELY_THREAD
+substMultiThreadRenderPipe = sed -e 's|@multithreadrenderpipe[@]|threading-model Cull\/Draw|g'
+else
+substMultiThreadRenderPipe = sed -e 's|@multithreadrenderpipe[@]|threading-model|g'
+endif 
 
+config.prc : $(top_srcdir)/ely/config.prc.in Makefile
+	$(substDataDir) $(top_srcdir)/ely/$@.in | \
+	$(substMultiThreadRenderPipe) > $@
+
+#game.xml rules
 game.xml : $(top_srcdir)/ely/game.xml.in Makefile
 	$(substDataDir) $(top_srcdir)/ely/$@.in > $@
 

@@ -138,17 +138,17 @@ int main(int argc, char **argv)
 	AsyncTaskManager::get_global_ptr()->add(fireManagersTask);
 #else
 	//AI
-	GameAIManager* gameAIMgr = new GameAIManager();
+	GameAIManager* gameAIMgr = new GameAIManager(10);
 	//Control
-	GameControlManager* gameControlMgr = new GameControlManager();
+	GameControlManager* gameControlMgr = new GameControlManager(10);
 	//Scene
-	GameSceneManager* gameSceneMgr = new GameSceneManager();
+	GameSceneManager* gameSceneMgr = new GameSceneManager(10);
 	//Physics
-	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager();
+	GamePhysicsManager* gamePhysicsMgr = new GamePhysicsManager(10);
 	//Audio
-	GameAudioManager* gameAudioMgr = new GameAudioManager();
+	GameAudioManager* gameAudioMgr = new GameAudioManager(10);
 	//Behavior
-	GameBehaviorManager* gameBehaviorMgr = new GameBehaviorManager();
+	GameBehaviorManager* gameBehaviorMgr = new GameBehaviorManager(10);
 #endif
 
 #if defined (ELY_THREAD) && defined (ELY_DEBUG)
