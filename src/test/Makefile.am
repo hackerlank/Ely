@@ -109,8 +109,11 @@ libtestobjectmodel_a_SOURCES = \
 
 libtestphysicscomponents_a_SOURCES = \
 		physicscomponents/PhysicsSuiteFixture.h \
+		physicscomponents/Ghost_test.cpp \
 		physicscomponents/RigidBody_test.cpp \
 		physicscomponents/SoftBody_test.cpp \
+		$(top_srcdir)/src/PhysicsComponents/Ghost.cpp \
+		$(top_srcdir)/src/PhysicsComponents/GhostTemplate.cpp \
 		$(top_srcdir)/src/PhysicsComponents/RigidBody.cpp \
 		$(top_srcdir)/src/PhysicsComponents/RigidBodyTemplate.cpp \
 		$(top_srcdir)/src/PhysicsComponents/SoftBody.cpp \

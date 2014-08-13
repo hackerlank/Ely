@@ -67,6 +67,8 @@ libobjectmodel_la_SOURCES = \
 		ObjectModel/ObjectTemplateManager.cpp
 
 libphysicscomponents_la_SOURCES = \
+		PhysicsComponents/Ghost.cpp \
+		PhysicsComponents/GhostTemplate.cpp \
 		PhysicsComponents/RigidBody.cpp \
 		PhysicsComponents/RigidBodyTemplate.cpp \
 		PhysicsComponents/SoftBody.cpp \

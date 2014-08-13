@@ -114,11 +114,13 @@ noinst_HEADERS = \
 		ObjectModel/Object.h \
 		ObjectModel/ObjectTemplate.h \
 		ObjectModel/ObjectTemplateManager.h \
+		PhysicsComponents/Ghost.h \
+		PhysicsComponents/GhostTemplate.h \
 		PhysicsComponents/RigidBody.h \
 		PhysicsComponents/RigidBodyTemplate.h \
 		PhysicsComponents/SoftBody.h \
-		$(bullet_headers) \
 		PhysicsComponents/SoftBodyTemplate.h \
+		$(bullet_headers) \
 		PhysicsControlComponents/CharacterController.h \
 		PhysicsControlComponents/CharacterControllerTemplate.h \
 		PhysicsControlComponents/Vehicle.h \

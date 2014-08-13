@@ -27,8 +27,6 @@
 #include <boost/test/unit_test.hpp>
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
-#include "PhysicsComponents/CharacterController.h"
-#include "PhysicsComponents/CharacterControllerTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <pandaFramework.h>

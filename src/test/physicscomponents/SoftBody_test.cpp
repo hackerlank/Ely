@@ -5,9 +5,27 @@
  *      Author: marco
  */
 
-#include "../../../include/PhysicsComponents/SoftBody.h"
+#include "PhysicsSuiteFixture.h"
 
-namespace ely
+struct SoftBodyTestCaseFixture
 {
+	SoftBodyTestCaseFixture()
+	{
+	}
 
-} /* namespace ely */
+	~SoftBodyTestCaseFixture()
+	{
+	}
+};
+
+/// Physics suite
+BOOST_FIXTURE_TEST_SUITE(Physics, PhysicsSuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(TEST)
+{
+	BOOST_TEST_MESSAGE("TESTING");
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Physics suite
