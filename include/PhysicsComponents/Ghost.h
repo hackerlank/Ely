@@ -24,7 +24,11 @@
 #ifndef GHOST_H_
 #define GHOST_H_
 
+#include <nodePath.h>
+#include "PhysicsComponents/BulletLocal/bulletGhostNode.h"
 #include "ObjectModel/Component.h"
+#include "ObjectModel/Object.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
@@ -33,7 +37,7 @@ class GhostTemplate;
 /**
  * \brief Component representing a ghost object attached to an object.
  *
- * It constructs a rigid body with the single specified collision shape_type
+ * It constructs a ghost object with the single specified collision shape_type
  * along with relevant parameters.\n
  * Collision shapes are:
  * - "sphere"
@@ -52,8 +56,6 @@ class GhostTemplate;
  * a plane with normal = (0,0,1) and d = 0.
  *
  * XML Param(s):
- * - "body_type"  				|single|"dynamic" (values: static|kinematic)
- * - "body_mass"  				|single|"1.0"
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
  * - "collide_mask"  			|single|"all_on"
@@ -92,9 +94,150 @@ protected:
 
 public:
 	Ghost();
+	Ghost(SMARTPTR(GhostTemplate)tmpl);
 	virtual ~Ghost();
-};
 
+	virtual ComponentFamilyType familyType() const;
+	virtual ComponentType componentType() const;
+	/**
+	 * \brief Gets/sets the node path of this rigid body.
+	 */
+
+	///@{
+	NodePath getNodePath() const;
+	void setNodePath(const NodePath& nodePath);
+	///@}
+
+	/**
+	 * \name BulletGhostNode reference getter & conversion function.
+	 */
+	///@{
+	BulletGhostNode& getBulletGhostNode();
+	operator BulletGhostNode&();
+	///@}
+
+private:
+	///The NodePath associated to this rigid body.
+	NodePath mNodePath;
+	///The underlying BulletGhostNode (read-only after creation & before destruction).
+	SMARTPTR(BulletGhostNode) mGhostNode;
+	///@{
+	///Physical parameters.
+	float mBodyFriction, mBodyRestitution;
+	GamePhysicsManager::ShapeType mShapeType;
+	GamePhysicsManager::ShapeSize mShapeSize;
+	BitMask32 mCollideMask;
+	//ccd stuff
+	float mCcdMotionThreshold, mCcdSweptSphereRadius;
+	bool mCcdEnabled;
+	/**
+	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
+	 */
+	void doSetPhysicalParameters();
+	///@}
+
+	///Geometric functions and parameters.
+	///@{
+	/**
+	 * \brief Create a shape given its type.
+	 * @param shapeType The shape type.
+	 * @return The created shape.
+	 */
+	SMARTPTR(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
+	LVecBase3f mModelDims;
+	float mModelRadius;
+	//use shape of (another object).
+	ObjectId mUseShapeOfId;
+	//any model has a local frame and the tight bounding box is computed
+	//wrt it; so mModelDeltaCenter represents a transform (translation) to
+	//be applied to the model node path so that the middle point of the
+	//bounding box will overlap the frame center of the parent's node path .
+	LVector3f mModelDeltaCenter;
+	bool mAutomaticShaping;
+	float mDim1, mDim2, mDim3, mDim4;
+	Filename mHeightfieldFile;
+	BulletUpAxis mUpAxis;
+	///@}
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		Component::init_type();
+		register_type(_type_handle, "Ghost", Component::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+
+};
+///inline definitions
+
+inline void Ghost::reset()
+{
+	//
+	mNodePath = NodePath();
+	mGhostNode.clear();
+	mBodyFriction = mBodyRestitution = 0.0;
+	mShapeType = GamePhysicsManager::SPHERE;
+	mShapeSize = GamePhysicsManager::MEDIUM;
+	mCollideMask = BitMask32::all_off();
+	mCcdMotionThreshold = mCcdSweptSphereRadius = 0.0;
+	mCcdEnabled = false;
+	mModelDims = LVector3f::zero();
+	mModelRadius = 0.0;
+	mUseShapeOfId = ObjectId();
+	mModelDeltaCenter = LVector3f::zero();
+	mAutomaticShaping = false;
+	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
+	mHeightfieldFile = Filename();
+	mUpAxis = Z_up;
+}
+
+inline void Ghost::onRemoveFromSceneCleanup()
+{
+}
+
+inline NodePath Ghost::getNodePath() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mNodePath;
+}
+
+inline void Ghost::setNodePath(const NodePath& nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mNodePath = nodePath;
+}
+
+inline BulletGhostNode& Ghost::getBulletGhostNode()
+{
+	return *mGhostNode;
+}
+
+inline Ghost::operator BulletGhostNode&()
+{
+	return *mGhostNode;
+}
+
+}  // namespace ely
 } /* namespace ely */
 
 #endif /* GHOST_H_ */

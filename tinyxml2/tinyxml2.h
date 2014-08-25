@@ -91,7 +91,7 @@ distribution.
 #endif
 
 
-#if defined(_MSC_VER) && (_MSC_VER >= 1400 )
+#if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE)
 // Microsoft visual studio, version 2005 and higher.
 /*int _snprintf_s(
    char *buffer,
@@ -109,6 +109,9 @@ inline int TIXML_SNPRINTF( char* buffer, size_t size, const char* format, ... )
     return result;
 }
 #define TIXML_SSCANF   sscanf_s
+#elif defined WINCE
+#define TIXML_SNPRINTF _snprintf
+#define TIXML_SSCANF   sscanf
 #else
 // GCC version 3 and higher
 //#warning( "Using sn* functions." )
@@ -367,7 +370,7 @@ public:
             return;
         }
         --_currentAllocs;
-        Chunk* chunk = (Chunk*)mem;
+        Chunk* chunk = static_cast<Chunk*>( mem );
 #ifdef DEBUG
         memset( chunk, 0xfe, sizeof(Chunk) );
 #endif
