@@ -24,6 +24,7 @@
 #include "PhysicsComponents/RigidBody.h"
 #include "PhysicsComponents/RigidBodyTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
+#include "PhysicsComponents/Ghost.h"
 #include "SceneComponents/Model.h"
 #include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/Terrain.h"
@@ -512,12 +513,21 @@ SMARTPTR(BulletShape)RigidBody::doCreateShape(GamePhysicsManager::ShapeType shap
 		{
 			//object already exists
 			SMARTPTR(Component) physicsComp =
-					createdObject->getComponent(ComponentFamilyType("Physics"));
-			if (physicsComp and physicsComp->is_of_type(RigidBody::get_class_type()))
+			createdObject->getComponent(ComponentFamilyType("Physics"));
+			if (physicsComp)
 			{
-				//physics component is a rigid body:
-				//return a reference to its (first and only) shape
-				return DCAST(RigidBody, physicsComp)->mRigidBodyNode->get_shape(0);
+				if (physicsComp->is_of_type(RigidBody::get_class_type()))
+				{
+					//physics component is a rigid body:
+					//return a reference to its (first and only) shape
+					return DCAST(RigidBody, physicsComp)->getBulletRigidBodyNode().get_shape(0);
+				}
+				else if (physicsComp->is_of_type(Ghost::get_class_type()))
+				{
+					//physics component is a ghost:
+					//return a reference to its (first and only) shape
+					return DCAST(Ghost, physicsComp)->getBulletGhostNode().get_shape(0);
+				}
 			}
 		}
 	}

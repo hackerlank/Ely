@@ -15,29 +15,29 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/include/PhysicsComponents/GhostTemplate.h
+ * \file /Ely/include/CommonComponents/DefaultTemplate.h
  *
- * \date 13/ago/2014 (11:39:39)
+ * \date 27/ago/2014 (10:47:41)
  * \author consultit
  */
 
-#ifndef GHOSTTEMPLATE_H_
-#define GHOSTTEMPLATE_H_
+#ifndef DEFAULTTEMPLATE_H_
+#define DEFAULTTEMPLATE_H_
 
 #include "ObjectModel/ComponentTemplate.h"
 
 namespace ely
 {
-class GhostTemplate: public ComponentTemplate
+class DefaultTemplate: public ComponentTemplate
 {
 protected:
 
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
 
 public:
-	GhostTemplate(PandaFramework* pandaFramework,
+	DefaultTemplate(PandaFramework* pandaFramework,
 			WindowFramework* windowFramework);
-	virtual ~GhostTemplate();
+	virtual ~DefaultTemplate();
 
 	virtual ComponentType componentType() const;
 	virtual ComponentFamilyType familyType() const;
@@ -56,7 +56,7 @@ public:
 	static void init_type()
 	{
 		ComponentTemplate::init_type();
-		register_type(_type_handle, "GhostTemplate",
+		register_type(_type_handle, "DefaultTemplate",
 				ComponentTemplate::get_class_type());
 	}
 
@@ -73,8 +73,9 @@ public:
 
 private:
 	static TypeHandle _type_handle;
+
 };
 
 } /* namespace ely */
 
-#endif /* GHOSTTEMPLATE_H_ */
+#endif /* DEFAULTTEMPLATE_H_ */

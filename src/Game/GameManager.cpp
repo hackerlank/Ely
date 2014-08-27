@@ -147,6 +147,11 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ActivityTemplate(this, mWindow));
 
+	///Common templates
+	//Default
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new DefaultTemplate(this, mWindow));
+
 	///Control templates
 	//Chaser
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
@@ -157,6 +162,9 @@ void GameManager::setupCompTmplMgr()
 			new DriverTemplate(this, mWindow));
 
 	///Physics templates
+	//Ghost
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new GhostTemplate(this, mWindow));
 	//RigidBody
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new RigidBodyTemplate(this, mWindow));

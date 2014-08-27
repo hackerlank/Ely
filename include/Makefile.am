@@ -97,6 +97,8 @@ noinst_HEADERS = \
 		AudioComponents/Sound3dTemplate.h \
 		BehaviorComponents/Activity.h \
 		BehaviorComponents/ActivityTemplate.h \
+		CommonComponents/Default.h \
+		CommonComponents/DefaultTemplate.h \
 		ControlComponents/Chaser.h \
 		ControlComponents/ChaserTemplate.h \
 		ControlComponents/Driver.h \

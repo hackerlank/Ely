@@ -8,6 +8,7 @@ noinst_LTLIBRARIES = \
 		libaicomponents.la \
 		libaudiocomponents.la \
 		libbehaviorcomponents.la \
+		libcommoncomponents.la \
 		libcontrolcomponents.la \
 		libphysicscomponents.la \
 		libphysicscontrolcomponents.la \
@@ -42,6 +43,10 @@ libaudiocomponents_la_SOURCES = \
 libbehaviorcomponents_la_SOURCES = \
 		BehaviorComponents/Activity.cpp \
 		BehaviorComponents/ActivityTemplate.cpp
+
+libcommoncomponents_la_SOURCES = \
+		CommonComponents/Default.cpp \
+		CommonComponents/DefaultTemplate.cpp
 
 libcontrolcomponents_la_SOURCES = \
 		ControlComponents/Chaser.cpp \

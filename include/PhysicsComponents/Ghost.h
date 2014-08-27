@@ -53,11 +53,18 @@ class GhostTemplate;
  * constructed by guessing them through calculation of a tight bounding volume
  * of object geometry (supposedly specified by the model component).\n
  * For "plane" shape, in case of missing parameters, the default is
- * a plane with normal = (0,0,1) and d = 0.
+ * a plane with normal = (0,0,1) and d = 0.\n
+///TODO
+ * If specified in "thrown_events", this component can throw
+ * these events (shown with default names):
+ * - when one object overlaps it(<GhostObjectType>_<OverlappingObjectType>_Overlap)
+ * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
- * - "body_friction"  			|single|"0.8"
- * - "body_restitution"  		|single|"0.1"
+ * - "thrown_events"			|single|"overlap" (specified as "event@[event_name]@[delta_frame]" with event = overlap)
+ * - "ghost_type"  				|single|"static" (values: static|dynamic)
+ * - "ghost_friction"  			|single|"0.8"
+ * - "ghost_restitution"  		|single|"0.1"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere" (values: sphere|plane|box|cylinder|capsule|cone|heightfield|triangle mesh)
  * - "shape_size"  				|single|"medium"  (values: minimum|medium|maximum)
@@ -99,10 +106,28 @@ public:
 
 	virtual ComponentFamilyType familyType() const;
 	virtual ComponentType componentType() const;
+
+	/**
+	 * \brief The current component's type.
+	 *
+	 * It may change during the component's lifetime.
+	 */
+	enum GhostType
+	{
+		STATIC,
+		DYNAMIC
+	};
+
+	/**
+	 * \brief Switches the current component's type.
+	 *
+	 * @param ghostType The new component's type.
+	 */
+	void switchType(GhostType ghostType);
+
 	/**
 	 * \brief Gets/sets the node path of this rigid body.
 	 */
-
 	///@{
 	NodePath getNodePath() const;
 	void setNodePath(const NodePath& nodePath);
@@ -123,7 +148,8 @@ private:
 	SMARTPTR(BulletGhostNode) mGhostNode;
 	///@{
 	///Physical parameters.
-	float mBodyFriction, mBodyRestitution;
+	float mGhostFriction, mGhostRestitution;
+	GhostType mGhostType;
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
 	BitMask32 mCollideMask;
@@ -135,6 +161,12 @@ private:
 	 */
 	void doSetPhysicalParameters();
 	///@}
+
+	/**
+	 * \brief Sets ghost type.
+	 * @param ghostType The body type.
+	 */
+	void doSwitchGhostType(GhostType ghostType);
 
 	///Geometric functions and parameters.
 	///@{
@@ -191,7 +223,8 @@ inline void Ghost::reset()
 	//
 	mNodePath = NodePath();
 	mGhostNode.clear();
-	mBodyFriction = mBodyRestitution = 0.0;
+	mGhostFriction = mGhostRestitution = 0.0;
+	mGhostType = STATIC;
 	mShapeType = GamePhysicsManager::SPHERE;
 	mShapeSize = GamePhysicsManager::MEDIUM;
 	mCollideMask = BitMask32::all_off();
@@ -237,7 +270,6 @@ inline Ghost::operator BulletGhostNode&()
 	return *mGhostNode;
 }
 
-}  // namespace ely
 } /* namespace ely */
 
 #endif /* GHOST_H_ */

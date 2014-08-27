@@ -56,7 +56,7 @@ class RigidBodyTemplate;
  * a plane with normal = (0,0,1) and d = 0.
  *
  * XML Param(s):
- * - "body_type"  				|single|"dynamic" (values: static|kinematic)
+ * - "body_type"  				|single|"dynamic" (values: static|dynamic|kinematic)
  * - "body_mass"  				|single|"1.0"
  * - "body_friction"  			|single|"0.8"
  * - "body_restitution"  		|single|"0.1"
