@@ -311,7 +311,7 @@ void CharacterController::onAddToObjectSetup()
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{
-				Event event;
+				EventThrown event;
 				ThrowEventData eventData;
 				//get default name prefix
 				std::string objectType = std::string(
@@ -464,13 +464,13 @@ void CharacterController::update(void* data)
 		if (mOnGround.mEnable)
 		{
 			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount > mOnGround.mFrameCount + mOnGround.mDeltaFrame)
+			if (frameCount >= mOnGround.mFrameCount + mOnGround.mDeltaFrame)
 			{
 				//enough frames are passed: throw the event
 				throw_event(mOnGround.mEventName, EventParameter(this));
+				//update frame count
+				mOnGround.mFrameCount = frameCount;
 			}
-			//update frame count
-			mOnGround.mFrameCount = frameCount;
 		}
 
 		//jump if requested
@@ -485,13 +485,13 @@ void CharacterController::update(void* data)
 		if (mInAir.mEnable)
 		{
 			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount > mInAir.mFrameCount + mInAir.mDeltaFrame)
+			if (frameCount >= mInAir.mFrameCount + mInAir.mDeltaFrame)
 			{
 				//enough frames are passed: throw the event
 				throw_event(mInAir.mEventName, EventParameter(this));
+				//update frame count
+				mInAir.mFrameCount = frameCount;
 			}
-			//update frame count
-			mInAir.mFrameCount = frameCount;
 		}
 	}
 }
@@ -538,7 +538,7 @@ void CharacterController::doSetControlParameters()
 	}
 }
 
-void CharacterController::doEnableCharacterControllerEvent(Event event, ThrowEventData eventData)
+void CharacterController::doEnableCharacterControllerEvent(EventThrown event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)

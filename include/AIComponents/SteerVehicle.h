@@ -129,8 +129,8 @@ public:
 	 */
 	SMARTPTR(SteerPlugIn) getSteerPlugIn() const;
 
-	///SteerVehicle event.
-	enum Event
+	///SteerVehicle thrown events.
+	enum EventThrown
 	{
 		STARTEVENT,
 		STOPEVENT,
@@ -146,7 +146,7 @@ public:
 	 * @param eventData The SteerVehicle event data. ThrowEventData::mEnable
 	 * will enable/disable the event.
 	 */
-	void enableSteerVehicleEvent(Event event, ThrowEventData eventData);
+	void enableSteerVehicleEvent(EventThrown event, ThrowEventData eventData);
 
 #ifdef ELY_THREAD
 	/**
@@ -204,7 +204,7 @@ private:
 	const float steer, const OpenSteer::Vec3& ourFuture,
 	const OpenSteer::Vec3& threatFuture);
 	///Helper.
-	void doEnableSteerVehicleEvent(Event event, ThrowEventData eventData);
+	void doEnableSteerVehicleEvent(EventThrown event, ThrowEventData eventData);
 	///@}
 
 #ifdef ELY_THREAD
@@ -269,7 +269,7 @@ inline SteerVehicle::operator OpenSteer::AbstractVehicle&()
 	return *mVehicle;
 }
 
-inline void SteerVehicle::enableSteerVehicleEvent(Event event,
+inline void SteerVehicle::enableSteerVehicleEvent(EventThrown event,
 		ThrowEventData eventData)
 {
 	//lock (guard) the mutex

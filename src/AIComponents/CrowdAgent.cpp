@@ -206,7 +206,7 @@ void CrowdAgent::onAddToObjectSetup()
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{
-				Event event;
+				EventThrown event;
 				ThrowEventData eventData;
 				//get default name prefix
 				std::string objectType = std::string(
@@ -422,13 +422,13 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		if (mStart.mEnable)
 		{
 			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount > mStart.mFrameCount + mStart.mDeltaFrame)
+			if (frameCount >= mStart.mFrameCount + mStart.mDeltaFrame)
 			{
 				//enough frames are passed: throw the event
 				throw_event(mStart.mEventName, EventParameter(this));
+				//update frame count
+				mStart.mFrameCount = frameCount;
 			}
-			//update frame count
-			mStart.mFrameCount = frameCount;
 		}
 	}
 	else
@@ -438,19 +438,19 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		if (mStop.mEnable)
 		{
 			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount > mStop.mFrameCount + mStop.mDeltaFrame)
+			if (frameCount >= mStop.mFrameCount + mStop.mDeltaFrame)
 			{
 				//enough frames are passed: throw the event
 				throw_event(mStop.mEventName, EventParameter(this));
+				//update frame count
+				mStop.mFrameCount = frameCount;
 			}
-			//update frame count
-			mStop.mFrameCount = frameCount;
 		}
 	}
 }
 
 
-void CrowdAgent::doEnableCrowdAgentEvent(Event event, ThrowEventData eventData)
+void CrowdAgent::doEnableCrowdAgentEvent(EventThrown event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)

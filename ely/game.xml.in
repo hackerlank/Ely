@@ -11,9 +11,14 @@
 			<ComponentTmpl family="Scene" type="NodePathWrapper" priority="100"/>
 		</ObjectTmpl>
 
-		<!-- template for objects without components: used only to perform additional
-			 custom initializations besides the ones performed by GameManager -->
-		<ObjectTmpl type="Game"/>
+		<!-- template used only to perform additional initializations/finalizations
+			 besides the ones performed by GameManager -->
+		<ObjectTmpl type="Game">
+			<ComponentTmpl family="Common" type="Default" priority="100">
+				<Param event_types="start_car:stop_car"/>
+				<Param event_types="onground_character:inair_character"/>
+			</ComponentTmpl>
+		</ObjectTmpl>
 		
 		<!-- template for camera object(s) -->
 		<ObjectTmpl type="CameraDriver">
@@ -392,7 +397,7 @@
 				<Param external_update="true"/>
 			</Component>
 			<Component type="CharacterController">
-				<Param thrown_events="on_ground@OnGround@:in_air@InAir@"/>
+				<Param thrown_events="on_ground@@:in_air@@"/>
 				<Param collide_mask="0x7FFFFFFF"/>
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
@@ -426,6 +431,7 @@
 				<Param collide_mask="all_on"/>
 			</Component>
 			<Component type="Vehicle">
+				<Param thrown_events="start@@:stop@@"/>
 				<Param wheels_number="4"/>
 				<Param wheel_object_template="CarWheel"/>
 				<Param wheel_model="wheel1,wheel1,wheel1,wheel1"/>
@@ -1176,6 +1182,10 @@
 		</Object>
 		<Object type="Game" id="elyPreObjects" priority="500">
 			<Param parent=""/>
+			<Component type="Default">
+				<Param events="start_car@Car_Vehicle_Start:stop_car@Car_Vehicle_Stop$carStartStop"/>
+				<Param events="onground_character@Character_CharacterController_OnGround:inair_character@Character_CharacterController_InAir$characterGroundAir"/>
+			</Component>
 		</Object>
 		<Object type="Game" id="elyPostObjects" priority="-500">
 			<Param parent=""/>

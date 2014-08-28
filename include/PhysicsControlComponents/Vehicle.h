@@ -160,8 +160,8 @@ public:
 	 */
 	std::vector<SMARTPTR(Object)> getWheelObjects() const;
 
-	///Vehicle event.
-	enum Event
+	///Vehicle thrown events.
+	enum EventThrown
 	{
 		STARTEVENT,
 		STOPEVENT
@@ -173,7 +173,7 @@ public:
 	 * @param eventData The Vehicle event data. ThrowEventData::mEnable
 	 * will enable/disable the event.
 	 */
-	void enableVehicleEvent(Event event, ThrowEventData eventData);
+	void enableVehicleEvent(EventThrown event, ThrowEventData eventData);
 
 private:
 	///The underlying BulletVehicle (read-only after creation & before destruction).
@@ -217,7 +217,7 @@ private:
 	///@{
 	ThrowEventData mStart, mStop;
 	///Helper.
-	void doEnableVehicleEvent(Event event, ThrowEventData eventData);
+	void doEnableVehicleEvent(EventThrown event, ThrowEventData eventData);
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -474,7 +474,7 @@ inline std::vector<SMARTPTR(Object)> Vehicle::getWheelObjects() const
 	return mWheelObjects;
 }
 
-inline void Vehicle::enableVehicleEvent(Event event, ThrowEventData eventData)
+inline void Vehicle::enableVehicleEvent(EventThrown event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)

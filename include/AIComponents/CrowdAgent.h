@@ -126,8 +126,8 @@ public:
 	 */
 	SMARTPTR(NavMesh) getNavMesh() const;
 
-	///CrowdAgent event.
-	enum Event
+	///CrowdAgent thrown events.
+	enum EventThrown
 	{
 		STARTEVENT,
 		STOPEVENT
@@ -139,7 +139,7 @@ public:
 	 * @param eventData The CrowdAgent event data. ThrowEventData::mEnable
 	 * will enable/disable the event.
 	 */
-	void enableCrowdAgentEvent(Event event, ThrowEventData eventData);
+	void enableCrowdAgentEvent(EventThrown event, ThrowEventData eventData);
 
 #ifdef ELY_THREAD
 	/**
@@ -191,7 +191,7 @@ private:
 	///@{
 	ThrowEventData mStart, mStop;
 	///Helper.
-	void doEnableCrowdAgentEvent(Event event, ThrowEventData eventData);
+	void doEnableCrowdAgentEvent(EventThrown event, ThrowEventData eventData);
 	///@}
 
 	///@{
@@ -296,7 +296,7 @@ inline CrowdAgentMovType CrowdAgent::getMovType() const
 	return mMovType;
 }
 
-inline void CrowdAgent::enableCrowdAgentEvent(Event event,
+inline void CrowdAgent::enableCrowdAgentEvent(EventThrown event,
 		ThrowEventData eventData)
 {
 	//lock (guard) the mutex

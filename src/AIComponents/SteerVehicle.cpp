@@ -275,7 +275,7 @@ void SteerVehicle::onAddToObjectSetup()
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{
-				Event event;
+				EventThrown event;
 				ThrowEventData eventData;
 				//get default name prefix
 				std::string objectType = std::string(
@@ -511,13 +511,13 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 		if (mStart.mEnable)
 		{
 			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount > mStart.mFrameCount + mStart.mDeltaFrame)
+			if (frameCount >= mStart.mFrameCount + mStart.mDeltaFrame)
 			{
 				//enough frames are passed: throw the event
 				throw_event(mStart.mEventName, EventParameter(this));
+				//update frame count
+				mStart.mFrameCount = frameCount;
 			}
-			//update frame count
-			mStart.mFrameCount = frameCount;
 		}
 	}
 	else
@@ -527,13 +527,13 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 		if (mStop.mEnable)
 		{
 			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount > mStop.mFrameCount + mStop.mDeltaFrame)
+			if (frameCount >= mStop.mFrameCount + mStop.mDeltaFrame)
 			{
 				//enough frames are passed: throw the event
 				throw_event(mStop.mEventName, EventParameter(this));
+				//update frame count
+				mStop.mFrameCount = frameCount;
 			}
-			//update frame count
-			mStop.mFrameCount = frameCount;
 		}
 	}
 }
@@ -566,7 +566,7 @@ void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
 	//no event thrown: external updating sub-system will do, if expected
 }
 
-void SteerVehicle::doEnableSteerVehicleEvent(Event event, ThrowEventData eventData)
+void SteerVehicle::doEnableSteerVehicleEvent(EventThrown event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)

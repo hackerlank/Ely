@@ -166,8 +166,8 @@ public:
 	operator BulletCharacterControllerNode&();
 	///@}
 
-	///CharacterController event.
-	enum Event
+	///CharacterController thrown events.
+	enum EventThrown
 	{
 		ONGROUNDEVENT,
 		INAIREVENT
@@ -179,7 +179,7 @@ public:
 	 * @param eventData The CharacterController event data. ThrowEventData::mEnable
 	 * will enable/disable the event.
 	 */
-	void enableCharacterControllerEvent(Event event, ThrowEventData eventData);
+	void enableCharacterControllerEvent(EventThrown event, ThrowEventData eventData);
 
 private:
 	///The NodePath associated to this character controller.
@@ -235,7 +235,7 @@ private:
 	///@{
 	ThrowEventData mOnGround, mInAir;
 	///Helper.
-	void doEnableCharacterControllerEvent(Event event, ThrowEventData eventData);
+	void doEnableCharacterControllerEvent(EventThrown event, ThrowEventData eventData);
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -538,7 +538,7 @@ inline CharacterController::operator BulletCharacterControllerNode&()
 	return *mCharacterController;
 }
 
-inline void CharacterController::enableCharacterControllerEvent(Event event, ThrowEventData eventData)
+inline void CharacterController::enableCharacterControllerEvent(EventThrown event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)

@@ -478,7 +478,7 @@ void Vehicle::onAddToObjectSetup()
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{
-				Event event;
+				EventThrown event;
 				ThrowEventData eventData;
 				//get default name prefix
 				std::string objectType = std::string(
@@ -761,33 +761,35 @@ void Vehicle::update(void* data)
 		}
 	}
 
-	//throw Start event (if enabled)
-	if (mStart.mEnable and (mVehicle->get_current_speed_km_hour() != 0.0))
+	//throw Start event (if enabled) (> 1mm/sec)
+	float speedKMH2 = mVehicle->get_current_speed_km_hour()
+							* mVehicle->get_current_speed_km_hour();
+	if (mStart.mEnable and (speedKMH2 > 0.00001296))
 	{
 		int frameCount = ClockObject::get_global_clock()->get_frame_count();
-		if (frameCount > mStart.mFrameCount + mStart.mDeltaFrame)
+		if (frameCount >= mStart.mFrameCount + mStart.mDeltaFrame)
 		{
 			//enough frames are passed: throw the event
 			throw_event(mStart.mEventName, EventParameter(this));
+			//update frame count
+			mStart.mFrameCount = frameCount;
 		}
-		//update frame count
-		mStart.mFrameCount = frameCount;
 	}
-	//throw Stop event (if enabled)
-	else if (mStop.mEnable and (mVehicle->get_current_speed_km_hour() == 0.0))
+	//throw Stop event (if enabled) (<= 1mm/sec)
+	else if (mStop.mEnable and (speedKMH2 <= 0.00001296))
 	{
 		int frameCount = ClockObject::get_global_clock()->get_frame_count();
-		if (frameCount > mStop.mFrameCount + mStop.mDeltaFrame)
+		if (frameCount >= mStop.mFrameCount + mStop.mDeltaFrame)
 		{
 			//enough frames are passed: throw the event
 			throw_event(mStop.mEventName, EventParameter(this));
+			//update frame count
+			mStop.mFrameCount = frameCount;
 		}
-		//update frame count
-		mStop.mFrameCount = frameCount;
 	}
 }
 
-void Vehicle::doEnableVehicleEvent(Event event, ThrowEventData eventData)
+void Vehicle::doEnableVehicleEvent(EventThrown event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)

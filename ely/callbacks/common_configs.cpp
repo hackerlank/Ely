@@ -54,35 +54,39 @@ void default_callback__(const Event* event, void* data)
 }
 
 ///Insert declarations of all init/end functions
-extern void Character_clbkInit();
-extern void Character_clbkEnd();
 extern void Actor_clbkInit();
 extern void Actor_clbkEnd();
 extern void Camera_clbkInit();
 extern void Camera_clbkEnd();
-extern void RecastNavMesh_clbkInit();
-extern void RecastNavMesh_clbkEnd();
-extern void OpenSteerPlugIn_clbkInit();
-extern void OpenSteerPlugIn_clbkEnd();
 extern void Car_clbkInit();
 extern void Car_clbkEnd();
+extern void Character_clbkInit();
+extern void Character_clbkEnd();
+extern void Game_clbkInit();
+extern void Game_clbkEnd();
+extern void OpenSteerPlugIn_clbkInit();
+extern void OpenSteerPlugIn_clbkEnd();
+extern void RecastNavMesh_clbkInit();
+extern void RecastNavMesh_clbkEnd();
 
 ///Call all init/end functions
 void callAllInits()
 {
-	Character_clbkInit();
 	Actor_clbkInit();
 	Camera_clbkInit();
-	RecastNavMesh_clbkInit();
-	OpenSteerPlugIn_clbkInit();
 	Car_clbkInit();
+	Character_clbkInit();
+	Game_clbkInit();
+	OpenSteerPlugIn_clbkInit();
+	RecastNavMesh_clbkInit();
 }
 void callAllEnds()
 {
-	Character_clbkEnd();
 	Actor_clbkEnd();
 	Camera_clbkEnd();
-	RecastNavMesh_clbkEnd();
-	OpenSteerPlugIn_clbkEnd();
 	Car_clbkEnd();
+	Character_clbkEnd();
+	Game_clbkEnd();
+	OpenSteerPlugIn_clbkEnd();
+	RecastNavMesh_clbkEnd();
 }
