@@ -34,7 +34,7 @@ extern "C"
 #endif
 
 ///Car + Vehicle related
-CALLBACK carStartStop;
+CALLBACK carMoveSteady;
 ///Character + CharacterController related
 CALLBACK characterGroundAir;
 
@@ -43,7 +43,7 @@ CALLBACK characterGroundAir;
 #endif
 
 ///Car + Vehicle related CALLBACKs
-void carStartStop(const Event* event, void* data)
+void carMoveSteady(const Event* event, void* data)
 {
 	//get first parameter
 	SMARTPTR(Vehicle) vehicle =
