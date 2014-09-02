@@ -28,7 +28,6 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "PhysicsComponents/BulletLocal/bulletWheel.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -486,30 +485,31 @@ void Vehicle::onAddToObjectSetup()
 				//get name
 				std::string name = paramValuesStr2[1];
 				//get delta frame
-				int deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
-				if (deltaFrame < 1)
+				//get frequency
+				float frequency = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (frequency <= 0.0)
 				{
-					deltaFrame = 1;
+					frequency = 30.0;
 				}
 				//get event
-				if (paramValuesStr2[0] == "start")
+				if (paramValuesStr2[0] == "move")
 				{
-					event = STARTEVENT;
+					event = MOVEEVENT;
 					//check name
 					if (name == "")
 					{
 						//set default name
-						name = objectType + "_Vehicle_Start";
+						name = objectType + "_Vehicle_Move";
 					}
 				}
-				else if (paramValuesStr2[0] == "stop")
+				else if (paramValuesStr2[0] == "steady")
 				{
-					event = STOPEVENT;
+					event = STEADYEVENT;
 					//check name
 					if (name == "")
 					{
 						//set default name
-						name = objectType + "_Vehicle_Stop";
+						name = objectType + "_Vehicle_Steady";
 					}
 				}
 				else
@@ -521,8 +521,8 @@ void Vehicle::onAddToObjectSetup()
 				//set event data
 				eventData.mEnable = true;
 				eventData.mEventName = name;
-				eventData.mFrameCount = 0;
-				eventData.mDeltaFrame = deltaFrame;
+				eventData.mTimeElapsed = 0;
+				eventData.mFrequency = frequency;
 				//enable the event
 				doEnableVehicleEvent(event, eventData);
 			}
@@ -761,31 +761,17 @@ void Vehicle::update(void* data)
 		}
 	}
 
-	//throw Start event (if enabled) (> 1mm/sec)
+	//throw Move event (if enabled) (> 1mm/sec)
 	float speedKMH2 = mVehicle->get_current_speed_km_hour()
 							* mVehicle->get_current_speed_km_hour();
-	if (mStart.mEnable and (speedKMH2 > 0.00001296))
+	if (mMove.mEnable and (speedKMH2 > 0.00001296))
 	{
-		int frameCount = ClockObject::get_global_clock()->get_frame_count();
-		if (frameCount >= mStart.mFrameCount + mStart.mDeltaFrame)
-		{
-			//enough frames are passed: throw the event
-			throw_event(mStart.mEventName, EventParameter(this));
-			//update frame count
-			mStart.mFrameCount = frameCount;
-		}
+		doThrowIfTimeElapsed(mMove);
 	}
 	//throw Stop event (if enabled) (<= 1mm/sec)
-	else if (mStop.mEnable and (speedKMH2 <= 0.00001296))
+	else if (mSteady.mEnable and (speedKMH2 <= 0.00001296))
 	{
-		int frameCount = ClockObject::get_global_clock()->get_frame_count();
-		if (frameCount >= mStop.mFrameCount + mStop.mDeltaFrame)
-		{
-			//enough frames are passed: throw the event
-			throw_event(mStop.mEventName, EventParameter(this));
-			//update frame count
-			mStop.mFrameCount = frameCount;
-		}
+		doThrowIfTimeElapsed(mSteady);
 	}
 }
 
@@ -793,25 +779,25 @@ void Vehicle::doEnableVehicleEvent(EventThrown event, ThrowEventData eventData)
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)
-	if (eventData.mDeltaFrame < 1)
+	if (eventData.mFrequency <= 0.0)
 	{
-		eventData.mDeltaFrame = 1;
+		eventData.mFrequency = 30.0;
 	}
 
 	switch (event)
 	{
-	case STARTEVENT:
-		if(mStart.mEnable != eventData.mEnable)
+	case MOVEEVENT:
+		if(mMove.mEnable != eventData.mEnable)
 		{
-			mStart = eventData;
-			mStart.mFrameCount = 0;
+			mMove = eventData;
+			mMove.mTimeElapsed = 0;
 		}
 		break;
-	case STOPEVENT:
-		if(mStop.mEnable != eventData.mEnable)
+	case STEADYEVENT:
+		if(mSteady.mEnable != eventData.mEnable)
 		{
-			mStop = eventData;
-			mStop.mFrameCount = 0;
+			mSteady = eventData;
+			mSteady.mTimeElapsed = 0;
 		}
 		break;
 	default:

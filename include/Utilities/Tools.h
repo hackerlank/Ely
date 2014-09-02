@@ -259,17 +259,65 @@ template<typename A> struct EventCallbackInterface
  *
  * Data related to throwing events by components.
  */
-struct ThrowEventData
+class ThrowEventData
 {
-	ThrowEventData() :
-			mEnable(false), mEventName(std::string("")), mFrameCount(0), mDeltaFrame(
-					1)
+	struct Period
 	{
+		Period& operator =(float value)
+		{
+			mPeriod = value;
+			return *this;
+		}
+		operator float()
+		{
+			return mPeriod;
+		}
+	private:
+		float mPeriod;
+	};
+	struct Frequency
+	{
+		Frequency(float value): mFrequency(value)
+		{
+			mFrequency == 0.0 ? mPeriod = 1.0 : mPeriod = 1.0 / mFrequency;
+			mEventData = NULL;
+		}
+		Frequency& operator =(float value)
+		{
+			mFrequency = value;
+			mFrequency == 0.0 ? mPeriod = 1.0 : mPeriod = 1.0 / mFrequency;
+			if (mEventData != NULL)
+			{
+				mEventData->mPeriod = mPeriod;
+			}
+			return *this;
+		}
+		operator float()
+		{
+			return mFrequency;
+		}
+		void setEventData(ThrowEventData *eventData)
+		{
+			mEventData = eventData;
+		}
+	private:
+		float mFrequency;
+		Period mPeriod;
+		ThrowEventData *mEventData;
+	};
+
+public:
+	ThrowEventData() :
+			mEnable(false), mEventName(std::string("")), mTimeElapsed(0), mFrequency(
+					30)
+	{
+		mFrequency.setEventData(this);
 	}
 	bool mEnable;
 	std::string mEventName;
-	int mFrameCount;
-	int mDeltaFrame;
+	float mTimeElapsed;
+	Frequency mFrequency;
+	Period mPeriod;
 };
 
 /**

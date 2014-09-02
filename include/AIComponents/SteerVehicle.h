@@ -52,8 +52,8 @@ enum SteerVehicleMovType
  * This component should be associated to a "Scene" component.\n
  * If specified in "thrown_events", this component can throw
  * these events (shown with default names):
- * - on starting to move (<ObjectType>_SteerVehicle_Start)
- * - on stopping to move (<ObjectType>_SteerVehicle_Stop)
+ * - on moving (<ObjectType>_SteerVehiclet_Move)
+ * - on being steady (<ObjectType>_SteerVehicle_Steady)
  * - when steering is required to follow a path
  * (<ObjectType>_SteerVehicle_PathFollowing)
  * - when steering is required to avoid an obstacle
@@ -62,6 +62,8 @@ enum SteerVehicleMovType
  * there is a collision) (<ObjectType>_SteerVehicle_AvoidCloseNeighbor)
  * - when steering is required to avoid a neighbor (i.e. when there
  * is a potential collision) (<ObjectType>_SteerVehicle_AvoidNeighbor)
+ * Events are thrown continuously at a frequency which is the minimum between
+ * the fps and the frequency specified (which defaults to 30 times per seconds).\n
  * The argument of each event is a reference to this component.\n
  * \see annotate* SteerLibraryMixin member functions in SteerLibrary.h
  * for more information.
@@ -70,7 +72,7 @@ enum SteerVehicleMovType
  * parent is "render".\n
  *
  * XML Param(s):
- * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
+ * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = move|steady|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
  * - "type"						|single|"one_turning" (values: one_turning|pedestrian|boid|mp_wanderer|mp_pursuer|player|ball|ctf_seeker|ctf_enemy|low_speed_turn|map_driver)
  * - "external_update"			|single|"false"
  * - "add_to_plugin"			|single|no default
@@ -132,8 +134,8 @@ public:
 	///SteerVehicle thrown events.
 	enum EventThrown
 	{
-		STARTEVENT,
-		STOPEVENT,
+		MOVEEVENT,
+		STEADYEVENT,
 		PATHFOLLOWINGEVENT,
 		AVOIDOBSTACLEEVENT,
 		AVOIDCLOSENEIGHBOREVENT,
@@ -192,7 +194,7 @@ private:
 	 * \name Throwing SteerVehicle events.
 	 */
 	///@{
-	ThrowEventData mStart, mStop, mPathFollowing, mAvoidObstacle,
+	ThrowEventData mMove, mSteady, mPathFollowing, mAvoidObstacle,
 	mAvoidCloseNeighbor, mAvoidNeighbor;
 	void doThrowPathFollowing(const OpenSteer::Vec3& future,
 	const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
@@ -205,6 +207,7 @@ private:
 	const OpenSteer::Vec3& threatFuture);
 	///Helper.
 	void doEnableSteerVehicleEvent(EventThrown event, ThrowEventData eventData);
+	void doThrowIfTimeElapsed(ThrowEventData& eventData);
 	///@}
 
 #ifdef ELY_THREAD
@@ -255,7 +258,7 @@ inline void SteerVehicle::reset()
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
 	mExternalUpdate = false;
-	mStart = mStop = mPathFollowing = mAvoidObstacle =
+	mMove = mSteady = mPathFollowing = mAvoidObstacle =
 			mAvoidCloseNeighbor = mAvoidNeighbor = ThrowEventData();
 }
 
@@ -282,53 +285,37 @@ inline void SteerVehicle::doThrowPathFollowing(const OpenSteer::Vec3& future,
 		const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
 		const float outside)
 {
-	int frameCount = ClockObject::get_global_clock()->get_frame_count();
-	if (frameCount > mPathFollowing.mFrameCount + mPathFollowing.mDeltaFrame)
-	{
-		//enough frames are passed: throw the event
-		throw_event(mPathFollowing.mEventName, EventParameter(this));
-	}
-	//update frame count
-	mPathFollowing.mFrameCount = frameCount;
+	doThrowIfTimeElapsed(mPathFollowing);
 }
 
 inline void SteerVehicle::doThrowAvoidObstacle(const float minDistanceToCollision)
 {
-	int frameCount = ClockObject::get_global_clock()->get_frame_count();
-	if (frameCount > mAvoidObstacle.mFrameCount + mAvoidObstacle.mDeltaFrame)
-	{
-		//enough frames are passed: throw the event
-		throw_event(mAvoidObstacle.mEventName, EventParameter(this));
-	}
-	//update frame count
-	mAvoidObstacle.mFrameCount = frameCount;
+	doThrowIfTimeElapsed(mAvoidObstacle);
 }
 
 inline void SteerVehicle::doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
 		const float additionalDistance)
 {
-	int frameCount = ClockObject::get_global_clock()->get_frame_count();
-	if (frameCount > mAvoidCloseNeighbor.mFrameCount + mAvoidCloseNeighbor.mDeltaFrame)
-	{
-		//enough frames are passed: throw the event
-		throw_event(mAvoidCloseNeighbor.mEventName, EventParameter(this));
-	}
-	//update frame count
-	mAvoidCloseNeighbor.mFrameCount = frameCount;
+	doThrowIfTimeElapsed(mAvoidCloseNeighbor);
 }
 
 inline void SteerVehicle::doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
 		const float steer, const OpenSteer::Vec3& ourFuture,
 		const OpenSteer::Vec3& threatFuture)
 {
-	int frameCount = ClockObject::get_global_clock()->get_frame_count();
-	if (frameCount > mAvoidNeighbor.mFrameCount + mAvoidNeighbor.mDeltaFrame)
+	doThrowIfTimeElapsed(mAvoidNeighbor);
+}
+
+inline void SteerVehicle::doThrowIfTimeElapsed(ThrowEventData& eventData)
+{
+	eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+	if (eventData.mTimeElapsed >=  eventData.mPeriod)
 	{
-		//enough frames are passed: throw the event
-		throw_event(mAvoidNeighbor.mEventName, EventParameter(this));
+		//enough time is passed: throw the event
+		throw_event(eventData.mEventName, EventParameter(this));
+		//update elapsed time
+		eventData.mTimeElapsed -= eventData.mPeriod;
 	}
-	//update frame count
-	mAvoidNeighbor.mFrameCount = frameCount;
 }
 
 #ifdef ELY_THREAD

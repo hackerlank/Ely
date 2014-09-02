@@ -28,15 +28,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
-#include <throw_event.h>
 #include "PhysicsComponents/BulletLocal/bulletTriangleMesh.h"
 #include "PhysicsComponents/BulletLocal/bulletTriangleMeshShape.h"
-
-namespace
-{
-const std::string STARTEVENT("OnStartCrowdAgent");
-const std::string STOPEVENT("OnStopCrowdAgent");
-}  // namespace
 
 namespace ely
 {
@@ -213,31 +206,31 @@ void CrowdAgent::onAddToObjectSetup()
 						mOwnerObject->objectTmpl()->objectType());
 				//get name
 				std::string name = paramValuesStr2[1];
-				//get delta frame
-				int deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
-				if (deltaFrame < 1)
+				//get frequency
+				float frequency = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (frequency <= 0.0)
 				{
-					deltaFrame = 1;
+					frequency = 30.0;
 				}
 				//get event
-				if (paramValuesStr2[0] == "start")
+				if (paramValuesStr2[0] == "move")
 				{
-					event = STARTEVENT;
+					event = MOVEEVENT;
 					//check name
 					if (name == "")
 					{
 						//set default name
-						name = objectType + "_CrowdAgent_Start";
+						name = objectType + "_CrowdAgent_Move";
 					}
 				}
-				else if (paramValuesStr2[0] == "stop")
+				else if (paramValuesStr2[0] == "steady")
 				{
-					event = STOPEVENT;
+					event = STEADYEVENT;
 					//check name
 					if (name == "")
 					{
 						//set default name
-						name = objectType + "_CrowdAgent_Stop";
+						name = objectType + "_CrowdAgent_Steady";
 					}
 				}
 				else
@@ -249,8 +242,8 @@ void CrowdAgent::onAddToObjectSetup()
 				//set event data
 				eventData.mEnable = true;
 				eventData.mEventName = name;
-				eventData.mFrameCount = 0;
-				eventData.mDeltaFrame = deltaFrame;
+				eventData.mTimeElapsed = 0;
+				eventData.mFrequency = frequency;
 				//enable the event
 				doEnableCrowdAgentEvent(event, eventData);
 			}
@@ -418,33 +411,19 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		//update node path dir
 		ownerObjectNP.heads_up(updatedPos - vel);
 
-		//throw Start event (if enabled)
-		if (mStart.mEnable)
+		//throw Move event (if enabled)
+		if (mMove.mEnable)
 		{
-			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount >= mStart.mFrameCount + mStart.mDeltaFrame)
-			{
-				//enough frames are passed: throw the event
-				throw_event(mStart.mEventName, EventParameter(this));
-				//update frame count
-				mStart.mFrameCount = frameCount;
-			}
+			doThrowIfTimeElapsed(mMove);
 		}
 	}
 	else
 	{
 		//vel.length_squared() == 0.0
-		//throw Stop event (if enabled)
-		if (mStop.mEnable)
+		//throw Steady event (if enabled)
+		if (mSteady.mEnable)
 		{
-			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount >= mStop.mFrameCount + mStop.mDeltaFrame)
-			{
-				//enough frames are passed: throw the event
-				throw_event(mStop.mEventName, EventParameter(this));
-				//update frame count
-				mStop.mFrameCount = frameCount;
-			}
+			doThrowIfTimeElapsed(mSteady);
 		}
 	}
 }
@@ -454,25 +433,25 @@ void CrowdAgent::doEnableCrowdAgentEvent(EventThrown event, ThrowEventData event
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)
-	if (eventData.mDeltaFrame < 1)
+	if (eventData.mFrequency <= 0.0)
 	{
-		eventData.mDeltaFrame = 1;
+		eventData.mFrequency = 30.0;
 	}
 
 	switch (event)
 	{
-	case STARTEVENT:
-		if(mStart.mEnable != eventData.mEnable)
+	case MOVEEVENT:
+		if(mMove.mEnable != eventData.mEnable)
 		{
-			mStart = eventData;
-			mStart.mFrameCount = 0;
+			mMove = eventData;
+			mMove.mTimeElapsed = 0;
 		}
 		break;
-	case STOPEVENT:
-		if(mStop.mEnable != eventData.mEnable)
+	case STEADYEVENT:
+		if(mSteady.mEnable != eventData.mEnable)
 		{
-			mStop = eventData;
-			mStop.mFrameCount = 0;
+			mSteady = eventData;
+			mSteady.mTimeElapsed = 0;
 		}
 		break;
 	default:

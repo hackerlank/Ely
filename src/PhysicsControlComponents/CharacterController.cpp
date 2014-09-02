@@ -24,7 +24,6 @@
 #include "PhysicsControlComponents/CharacterController.h"
 #include "PhysicsControlComponents/CharacterControllerTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
-#include <throw_event.h>
 
 namespace ely
 {
@@ -318,11 +317,11 @@ void CharacterController::onAddToObjectSetup()
 						mOwnerObject->objectTmpl()->objectType());
 				//get name
 				std::string name = paramValuesStr2[1];
-				//get delta frame
-				int deltaFrame = strtof(paramValuesStr2[2].c_str(), NULL);
-				if (deltaFrame < 1)
+				//get frequency
+				float frequency = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (frequency <= 0.0)
 				{
-					deltaFrame = 1;
+					frequency = 30.0;
 				}
 				//get event
 				if (paramValuesStr2[0] == "on_ground")
@@ -354,8 +353,8 @@ void CharacterController::onAddToObjectSetup()
 				//set event data
 				eventData.mEnable = true;
 				eventData.mEventName = name;
-				eventData.mFrameCount = 0;
-				eventData.mDeltaFrame = deltaFrame;
+				eventData.mTimeElapsed = 0;
+				eventData.mFrequency = frequency;
 				//enable the event
 				doEnableCharacterControllerEvent(event, eventData);
 			}
@@ -463,14 +462,7 @@ void CharacterController::update(void* data)
 		//throw OnGround event (if enabled)
 		if (mOnGround.mEnable)
 		{
-			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount >= mOnGround.mFrameCount + mOnGround.mDeltaFrame)
-			{
-				//enough frames are passed: throw the event
-				throw_event(mOnGround.mEventName, EventParameter(this));
-				//update frame count
-				mOnGround.mFrameCount = frameCount;
-			}
+			doThrowIfTimeElapsed(mOnGround);
 		}
 
 		//jump if requested
@@ -484,14 +476,7 @@ void CharacterController::update(void* data)
 		//throw InAir event (if enabled)
 		if (mInAir.mEnable)
 		{
-			int frameCount = ClockObject::get_global_clock()->get_frame_count();
-			if (frameCount >= mInAir.mFrameCount + mInAir.mDeltaFrame)
-			{
-				//enough frames are passed: throw the event
-				throw_event(mInAir.mEventName, EventParameter(this));
-				//update frame count
-				mInAir.mFrameCount = frameCount;
-			}
+			doThrowIfTimeElapsed(mInAir);
 		}
 	}
 }
@@ -542,9 +527,9 @@ void CharacterController::doEnableCharacterControllerEvent(EventThrown event, Th
 {
 	//some checks
 	RETURN_ON_COND(eventData.mEventName == std::string(""),)
-	if (eventData.mDeltaFrame < 1)
+	if (eventData.mFrequency <= 0.0)
 	{
-		eventData.mDeltaFrame = 1;
+		eventData.mFrequency = 30.0;
 	}
 
 	switch (event)
@@ -553,14 +538,14 @@ void CharacterController::doEnableCharacterControllerEvent(EventThrown event, Th
 		if(mOnGround.mEnable != eventData.mEnable)
 		{
 			mOnGround = eventData;
-			mOnGround.mFrameCount = 0;
+			mOnGround.mTimeElapsed = 0;
 		}
 		break;
 	case INAIREVENT:
 		if(mInAir.mEnable != eventData.mEnable)
 		{
 			mInAir = eventData;
-			mInAir.mFrameCount = 0;
+			mInAir.mTimeElapsed = 0;
 		}
 		break;
 	default:

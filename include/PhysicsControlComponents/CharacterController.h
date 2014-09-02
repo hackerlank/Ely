@@ -27,6 +27,7 @@
 #include "PhysicsComponents/BulletLocal/bulletCharacterControllerNode.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include <throw_event.h>
 #include "Game/GamePhysicsManager.h"
 
 namespace ely
@@ -42,8 +43,10 @@ class CharacterControllerTemplate;
  * The up axis is the Z axis.\n
  * If specified in "thrown_events", this component can throw
  * these events (shown with default names):
- * - when landing over ground (<ObjectType>_CharacterController_OnGround)
+ * - when standing on ground (<ObjectType>_CharacterController_OnGround)
  * - when soaring in air (<ObjectType>_CharacterController_InAir)
+ * Events are thrown continuously at a frequency which is the minimum between
+ * the fps and the frequency specified (which defaults to 30 times per seconds).\n
  * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
@@ -236,6 +239,7 @@ private:
 	ThrowEventData mOnGround, mInAir;
 	///Helper.
 	void doEnableCharacterControllerEvent(EventThrown event, ThrowEventData eventData);
+	void doThrowIfTimeElapsed(ThrowEventData& eventData);
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -544,6 +548,18 @@ inline void CharacterController::enableCharacterControllerEvent(EventThrown even
 	HOLD_REMUTEX(mMutex)
 
 	doEnableCharacterControllerEvent(event, eventData);
+}
+
+inline void CharacterController::doThrowIfTimeElapsed(ThrowEventData& eventData)
+{
+	eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+	if (eventData.mTimeElapsed >=  eventData.mPeriod)
+	{
+		//enough time is passed: throw the event
+		throw_event(eventData.mEventName, EventParameter(this));
+		//update elapsed time
+		eventData.mTimeElapsed -= eventData.mPeriod;
+	}
 }
 
 }  // namespace ely

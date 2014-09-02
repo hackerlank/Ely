@@ -27,6 +27,7 @@
 #include "PhysicsComponents/BulletLocal/bulletVehicle.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -47,12 +48,14 @@ class VehicleTemplate;
  * The default up axis is the Z axis.\n
  * If specified in "thrown_events", this component can throw
  * these events (shown with default names):
- * - on starting to move (<ObjectType>_Vehicle_Start)
- * - on stopping to move (<ObjectType>_Vehicle_Stop)
+ * - on moving (<ObjectType>_Vehicle_Move)
+ * - on being steady (<ObjectType>_Vehicle_Steady)
+ * Events are thrown continuously at a frequency which is the minimum between
+ * the fps and the frequency specified (which defaults to 30 times per seconds).\n
  * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
- * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop)
+ * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = move|steady)
  * - "up_axis"						|single|"z" (values: x|y|z)
  * - "wheels_number"  				|single|"4" (== N)
  * - "wheel_object_template"		|single|no default
@@ -163,8 +166,8 @@ public:
 	///Vehicle thrown events.
 	enum EventThrown
 	{
-		STARTEVENT,
-		STOPEVENT
+		MOVEEVENT,
+		STEADYEVENT
 	};
 
 	/**
@@ -215,9 +218,10 @@ private:
 	 * \name Throwing Vehicle events.
 	 */
 	///@{
-	ThrowEventData mStart, mStop;
+	ThrowEventData mMove, mSteady;
 	///Helper.
 	void doEnableVehicleEvent(EventThrown event, ThrowEventData eventData);
+	void doThrowIfTimeElapsed(ThrowEventData& eventData);
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -278,7 +282,7 @@ inline void Vehicle::reset()
 			mSteeringIncrement = mSteeringDecrement = 0.0;
 	mForward = mBackward = mBrake = mTurnLeft = mTurnRight = mForwardKey =
 			mBackwardKey = mBrakeKey = mTurnLeftKey = mTurnRightKey = false;
-	mStart = mStop = ThrowEventData();
+	mMove = mSteady = ThrowEventData();
 }
 
 inline void Vehicle::enableForward(bool enable)
@@ -480,6 +484,18 @@ inline void Vehicle::enableVehicleEvent(EventThrown event, ThrowEventData eventD
 	HOLD_REMUTEX(mMutex)
 
 	doEnableVehicleEvent(event, eventData);
+}
+
+inline void Vehicle::doThrowIfTimeElapsed(ThrowEventData& eventData)
+{
+	eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+	if (eventData.mTimeElapsed >=  eventData.mPeriod)
+	{
+		//enough time is passed: throw the event
+		throw_event(eventData.mEventName, EventParameter(this));
+		//update elapsed time
+		eventData.mTimeElapsed -= eventData.mPeriod;
+	}
 }
 
 } /* namespace ely */

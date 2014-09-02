@@ -27,6 +27,7 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include <DetourCrowd.h>
+#include <throw_event.h>
 #include "PhysicsComponents/BulletLocal/bulletWorld.h"
 #include "PhysicsComponents/BulletLocal/bulletClosestHitRayResult.h"
 
@@ -56,8 +57,10 @@ enum CrowdAgentMovType
  * movement type is "kinematic".\n
  * If specified in "thrown_events", this component can throw
  * these events (shown with default names):
- * - on starting to move (<ObjectType>_CrowdAgent_Start)
- * - on stopping to move (<ObjectType>_CrowdAgent_Stop)
+ * - on moving (<ObjectType>_CrowdAgent_Move)
+ * - on being steady (<ObjectType>_CrowdAgent_Steady)
+ * Events are thrown continuously at a frequency which is the minimum between
+ * the fps and the frequency specified (which defaults to 30 times per seconds).\n
  * The argument of each event is a reference to this component.\n
  *
  * \note the owner object of this component will be reparented (if necessary)
@@ -65,7 +68,7 @@ enum CrowdAgentMovType
  * the NavMesh owner object.
  *
  * XML Param(s):
- * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = start|stop)
+ * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move|steady)
  * - "add_to_navmesh"				|single|""
  * - "mov_type"						|single|"recast" (values: recast|kinematic)
  * - "move_target";					|single|"0.0,0.0,0.0"
@@ -129,8 +132,8 @@ public:
 	///CrowdAgent thrown events.
 	enum EventThrown
 	{
-		STARTEVENT,
-		STOPEVENT
+		MOVEEVENT,
+		STEADYEVENT
 	};
 
 	/**
@@ -189,9 +192,10 @@ private:
 	 * \name Throwing CrowdAgent events.
 	 */
 	///@{
-	ThrowEventData mStart, mStop;
+	ThrowEventData mMove, mSteady;
 	///Helper.
 	void doEnableCrowdAgentEvent(EventThrown event, ThrowEventData eventData);
+	void doThrowIfTimeElapsed(ThrowEventData& eventData);
 	///@}
 
 	///@{
@@ -253,7 +257,7 @@ inline void CrowdAgent::reset()
 	mHitResult = BulletClosestHitRayResult::empty();
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
-	mStart = mStop = ThrowEventData();
+	mMove = mSteady = ThrowEventData();
 }
 
 inline dtCrowdAgentParams CrowdAgent::getParams()
@@ -303,6 +307,18 @@ inline void CrowdAgent::enableCrowdAgentEvent(EventThrown event,
 	HOLD_REMUTEX(mMutex)
 
 	doEnableCrowdAgentEvent(event, eventData);
+}
+
+inline void CrowdAgent::doThrowIfTimeElapsed(ThrowEventData& eventData)
+{
+	eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+	if (eventData.mTimeElapsed >=  eventData.mPeriod)
+	{
+		//enough time is passed: throw the event
+		throw_event(eventData.mEventName, EventParameter(this));
+		//update elapsed time
+		eventData.mTimeElapsed -= eventData.mPeriod;
+	}
 }
 
 #ifdef ELY_THREAD
