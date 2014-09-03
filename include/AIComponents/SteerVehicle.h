@@ -191,23 +191,28 @@ private:
 	///@}
 
 	/**
+	 * \brief SteerLibrary callbacks.
+	 */
+	///@{
+	void doPathFollowing(const OpenSteer::Vec3& future, const OpenSteer::Vec3& onPath,
+			const OpenSteer::Vec3& target, const float outside);
+	void doAvoidObstacle(const float minDistanceToCollision);
+	void doAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other, const float additionalDistance);
+	void doAvoidNeighbor(const OpenSteer::AbstractVehicle& threat, const float steer,
+			const OpenSteer::Vec3& ourFuture, const OpenSteer::Vec3& threatFuture);
+	///@}
+
+	/**
 	 * \name Throwing SteerVehicle events.
 	 */
 	///@{
+	bool mPFCallbackCalled, mAOCallbackCalled, mACNCallbackCalled, mANCallbackCalled;
 	ThrowEventData mMove, mSteady, mPathFollowing, mAvoidObstacle,
 	mAvoidCloseNeighbor, mAvoidNeighbor;
-	void doThrowPathFollowing(const OpenSteer::Vec3& future,
-	const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
-	const float outside);
-	void doThrowAvoidObstacle(const float minDistanceToCollision);
-	void doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
-	const float additionalDistance);
-	void doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
-	const float steer, const OpenSteer::Vec3& ourFuture,
-	const OpenSteer::Vec3& threatFuture);
 	///Helper.
 	void doEnableSteerVehicleEvent(EventThrown event, ThrowEventData eventData);
-	void doThrowIfTimeElapsed(ThrowEventData& eventData);
+	void doThrowEvent(ThrowEventData& eventData);
+	void doHandleSteerLibraryEvent(ThrowEventData& eventData, bool callbackCalled);
 	///@}
 
 #ifdef ELY_THREAD
@@ -258,8 +263,10 @@ inline void SteerVehicle::reset()
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
 	mExternalUpdate = false;
-	mMove = mSteady = mPathFollowing = mAvoidObstacle =
-			mAvoidCloseNeighbor = mAvoidNeighbor = ThrowEventData();
+	mPFCallbackCalled = mAOCallbackCalled = mACNCallbackCalled =
+			mANCallbackCalled = false;
+	mMove = mSteady = mPathFollowing = mAvoidObstacle = mAvoidCloseNeighbor =
+			mAvoidNeighbor = ThrowEventData();
 }
 
 inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()
@@ -281,40 +288,94 @@ inline void SteerVehicle::enableSteerVehicleEvent(EventThrown event,
 	doEnableSteerVehicleEvent(event, eventData);
 }
 
-inline void SteerVehicle::doThrowPathFollowing(const OpenSteer::Vec3& future,
+inline void SteerVehicle::doPathFollowing(const OpenSteer::Vec3& future,
 		const OpenSteer::Vec3& onPath, const OpenSteer::Vec3& target,
 		const float outside)
 {
-	doThrowIfTimeElapsed(mPathFollowing);
+	//handle Path Following event
+	if (mPathFollowing.mEnable)
+	{
+		doThrowEvent(mPathFollowing);
+		//set the flag
+		mPFCallbackCalled = true;
+	}
 }
 
-inline void SteerVehicle::doThrowAvoidObstacle(const float minDistanceToCollision)
+inline void SteerVehicle::doAvoidObstacle(const float minDistanceToCollision)
 {
-	doThrowIfTimeElapsed(mAvoidObstacle);
+	//handle Avoid Obstacle event
+	if (mAvoidObstacle.mEnable)
+	{
+		doThrowEvent(mAvoidObstacle);
+		//set the flag
+		mAOCallbackCalled = true;
+	}
 }
 
-inline void SteerVehicle::doThrowAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
+inline void SteerVehicle::doAvoidCloseNeighbor(const OpenSteer::AbstractVehicle& other,
 		const float additionalDistance)
 {
-	doThrowIfTimeElapsed(mAvoidCloseNeighbor);
+	//handle Avoid Close Neighbor event
+	if (mAvoidCloseNeighbor.mEnable)
+	{
+		doThrowEvent(mAvoidCloseNeighbor);
+		//set the flag
+		mACNCallbackCalled = true;
+	}
 }
 
-inline void SteerVehicle::doThrowAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
+inline void SteerVehicle::doAvoidNeighbor(const OpenSteer::AbstractVehicle& threat,
 		const float steer, const OpenSteer::Vec3& ourFuture,
 		const OpenSteer::Vec3& threatFuture)
 {
-	doThrowIfTimeElapsed(mAvoidNeighbor);
+	//handle Avoid Neighbor event
+	if (mAvoidNeighbor.mEnable)
+	{
+		doThrowEvent(mAvoidNeighbor);
+		//set the flag
+		mANCallbackCalled = true;
+	}
 }
 
-inline void SteerVehicle::doThrowIfTimeElapsed(ThrowEventData& eventData)
+inline void SteerVehicle::doThrowEvent(ThrowEventData& eventData)
 {
-	eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
-	if (eventData.mTimeElapsed >=  eventData.mPeriod)
+	if (eventData.mThrown)
 	{
-		//enough time is passed: throw the event
+		eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+		if (eventData.mTimeElapsed >= eventData.mPeriod)
+		{
+			//enough time is passed: throw the event
+			throw_event(eventData.mEventName, EventParameter(this));
+			//update elapsed time
+			eventData.mTimeElapsed -= eventData.mPeriod;
+		}
+	}
+	else
+	{
+		//throw the event
 		throw_event(eventData.mEventName, EventParameter(this));
-		//update elapsed time
-		eventData.mTimeElapsed -= eventData.mPeriod;
+		eventData.mThrown = true;
+	}
+}
+
+inline void SteerVehicle::doHandleSteerLibraryEvent(ThrowEventData& eventData, bool callbackCalled)
+{
+	if (eventData.mEnable)
+	{
+		if (callbackCalled)
+		{
+			//event was handled this (or last) frame
+			callbackCalled = false;
+		}
+		else
+		{
+			//reset event
+			if (eventData.mThrown)
+			{
+				eventData.mThrown = false;
+				eventData.mTimeElapsed = 0.0;
+			}
+		}
 	}
 }
 

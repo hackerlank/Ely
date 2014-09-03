@@ -24,6 +24,7 @@
 #include "../common_configs.h"
 #include "PhysicsControlComponents/Vehicle.h"
 #include "PhysicsControlComponents/CharacterController.h"
+#include "AIComponents/SteerVehicle.h"
 
 using namespace ely;
 
@@ -37,6 +38,8 @@ extern "C"
 CALLBACK carMoveSteady;
 ///Character + CharacterController related
 CALLBACK characterGroundAir;
+///OpenSteerVehicle + SteerVehicle related
+CALLBACK handleHits;
 
 #ifdef __cplusplus
 }
@@ -62,6 +65,17 @@ void characterGroundAir(const Event* event, void* data)
 	//
 	std::cout << "Got: " << event->get_name() << " - Object: " <<
 			std::string(characterController->getOwnerObject()->objectId()) << std::endl;
+}
+
+///OpenSteerVehicle + SteerVehicle related CALLBACKs
+void handleHits(const Event* event, void* data)
+{
+	//get first parameter
+	SMARTPTR(SteerVehicle)steerVehicle =
+	DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
+	//
+	std::cout << "Got: " << event->get_name() << " - Object: " <<
+			std::string(steerVehicle->getOwnerObject()->objectId()) << std::endl;
 }
 
 ///Init/end functions: see common_configs.cpp

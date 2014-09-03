@@ -459,12 +459,20 @@ void CharacterController::update(void* data)
 	//handle CharacterController ground-air events
 	if (mCharacterController->is_on_ground())
 	{
+		//handle events
 		//throw OnGround event (if enabled)
 		if (mOnGround.mEnable)
 		{
-			doThrowIfTimeElapsed(mOnGround);
+			doThrowEvent(mOnGround);
+		}
+		//reset InAir event (if enabled and if thrown)
+		if (mInAir.mEnable and mInAir.mThrown)
+		{
+			mInAir.mThrown = false;
+			mInAir.mTimeElapsed = 0.0;
 		}
 
+		//take other actions
 		//jump if requested
 		if (mJump)
 		{
@@ -473,10 +481,17 @@ void CharacterController::update(void* data)
 	}
 	else
 	{
+		//handle events
+		//reset OnGround event (if enabled and if thrown)
+		if (mOnGround.mEnable and mOnGround.mThrown)
+		{
+			mOnGround.mThrown = false;
+			mOnGround.mTimeElapsed = 0.0;
+		}
 		//throw InAir event (if enabled)
 		if (mInAir.mEnable)
 		{
-			doThrowIfTimeElapsed(mInAir);
+			doThrowEvent(mInAir);
 		}
 	}
 }

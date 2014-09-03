@@ -761,17 +761,35 @@ void Vehicle::update(void* data)
 		}
 	}
 
-	//throw Move event (if enabled) (> 1mm/sec)
-	float speedKMH2 = mVehicle->get_current_speed_km_hour()
-							* mVehicle->get_current_speed_km_hour();
-	if (mMove.mEnable and (speedKMH2 > 0.00001296))
+	//handle events
+	float speedKMH = mVehicle->get_current_speed_km_hour();
+	if(speedKMH * speedKMH > 0.001296)
 	{
-		doThrowIfTimeElapsed(mMove);
+		//throw Move event (if enabled) (> 1cm/sec)
+		if (mMove.mEnable)
+		{
+			doThrowEvent(mMove);
+		}
+		//reset Steady event (if enabled and if thrown)
+		if (mSteady.mEnable and mSteady.mThrown)
+		{
+			mSteady.mThrown = false;
+			mSteady.mTimeElapsed = 0.0;
+		}
 	}
-	//throw Stop event (if enabled) (<= 1mm/sec)
-	else if (mSteady.mEnable and (speedKMH2 <= 0.00001296))
+	else
 	{
-		doThrowIfTimeElapsed(mSteady);
+		//reset Move event (if enabled and if thrown)
+		if (mMove.mEnable and mMove.mThrown)
+		{
+			mMove.mThrown = false;
+			mMove.mTimeElapsed = 0.0;
+		}
+		//throw Steady event (if enabled)(<= 1cm/sec)
+		if (mSteady.mEnable)
+		{
+			doThrowEvent(mSteady);
+		}
 	}
 }
 

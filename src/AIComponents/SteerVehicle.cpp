@@ -238,7 +238,8 @@ void SteerVehicle::onAddToObjectSetup()
 	//correct height if there is a Physics or PhysicsControl component
 	//for raycast into update
 	if (mOwnerObject->getComponent(ComponentFamilyType("Physics"))
-			or mOwnerObject->getComponent(ComponentFamilyType("PhysicsControl")))
+			or mOwnerObject->getComponent(
+					ComponentFamilyType("PhysicsControl")))
 	{
 		mCorrectHeightRigidBody = modelDims.get_z() / 2.0;
 	}
@@ -251,9 +252,9 @@ void SteerVehicle::onAddToObjectSetup()
 	//
 	not mExternalUpdate ?
 			dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
-			&SteerVehicle::doUpdateSteerVehicle):
+					&SteerVehicle::doUpdateSteerVehicle) :
 			dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityUpdateMethod(
-			&SteerVehicle::doExternalUpdateSteerVehicle);
+					&SteerVehicle::doExternalUpdateSteerVehicle);
 
 	//set the bullet physics
 	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
@@ -263,7 +264,7 @@ void SteerVehicle::onAddToObjectSetup()
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;
 	param = mTmpl->parameter(std::string("thrown_events"));
-	if(param != std::string(""))
+	if (param != std::string(""))
 	{
 		//events specified
 		//event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]
@@ -365,6 +366,20 @@ void SteerVehicle::onAddToObjectSetup()
 			}
 		}
 	}
+
+	//set the callbacks
+	//Path Following
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
+			&SteerVehicle::doPathFollowing);
+	//Avoid Obstacle
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
+			&SteerVehicle::doAvoidObstacle);
+	//Avoid Close Neighbor
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
+			&SteerVehicle::doAvoidCloseNeighbor);
+	//Avoid Neighbor
+	dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
+			&SteerVehicle::doAvoidNeighbor);
 }
 
 void SteerVehicle::onRemoveFromObjectCleanup()
@@ -507,21 +522,41 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 						updatedPos - OpenSteerVec3ToLVecBase3f(mVehicle->forward()),
 						OpenSteerVec3ToLVecBase3f(mVehicle->up()));
 
+		//handle Move/Steady events
 		//throw Move event (if enabled)
 		if (mMove.mEnable)
 		{
-			doThrowIfTimeElapsed(mMove);
+			doThrowEvent(mMove);
+		}
+		//reset Steady event (if enabled and if thrown)
+		if (mSteady.mEnable and mSteady.mThrown)
+		{
+			mSteady.mThrown = false;
+			mSteady.mTimeElapsed = 0.0;
 		}
 	}
 	else
 	{
+		//handle Move/Steady events
 		//mVehicle.speed == 0.0
+		//reset Move event (if enabled and if thrown)
+		if (mMove.mEnable and mMove.mThrown)
+		{
+			mMove.mThrown = false;
+			mMove.mTimeElapsed = 0.0;
+		}
 		//throw Steady event (if enabled)
 		if (mSteady.mEnable)
 		{
-			doThrowIfTimeElapsed(mSteady);
+			doThrowEvent(mSteady);
 		}
 	}
+
+	//handle SteerLibrary events
+	doHandleSteerLibraryEvent(mPathFollowing, mPFCallbackCalled);
+	doHandleSteerLibraryEvent(mAvoidObstacle, mAOCallbackCalled);
+	doHandleSteerLibraryEvent(mAvoidCloseNeighbor, mACNCallbackCalled);
+	doHandleSteerLibraryEvent(mAvoidNeighbor, mANCallbackCalled);
 }
 
 void SteerVehicle::doExternalUpdateSteerVehicle(const float currentTime,
@@ -582,11 +617,7 @@ void SteerVehicle::doEnableSteerVehicleEvent(EventThrown event, ThrowEventData e
 		{
 			mPathFollowing = eventData;
 			mPathFollowing.mTimeElapsed = 0;
-			mPathFollowing.mEnable ?
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
-							&SteerVehicle::doThrowPathFollowing) :
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityPathFollowingMethod(
-					NULL);
+			mPFCallbackCalled = false;
 		}
 		break;
 	case AVOIDOBSTACLEEVENT:
@@ -594,11 +625,7 @@ void SteerVehicle::doEnableSteerVehicleEvent(EventThrown event, ThrowEventData e
 		{
 			mAvoidObstacle = eventData;
 			mAvoidObstacle.mTimeElapsed = 0;
-			mAvoidObstacle.mEnable ?
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
-							&SteerVehicle::doThrowAvoidObstacle) :
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidObstacleMethod(
-					NULL);
+			mAOCallbackCalled = false;
 		}
 		break;
 	case AVOIDCLOSENEIGHBOREVENT:
@@ -606,11 +633,7 @@ void SteerVehicle::doEnableSteerVehicleEvent(EventThrown event, ThrowEventData e
 		{
 			mAvoidCloseNeighbor = eventData;
 			mAvoidCloseNeighbor.mTimeElapsed = 0;
-			mAvoidCloseNeighbor.mEnable ?
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
-							&SteerVehicle::doThrowAvoidCloseNeighbor) :
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidCloseNeighborMethod(
-					NULL);
+			mACNCallbackCalled = false;
 		}
 		break;
 	case AVOIDNEIGHBOREVENT:
@@ -618,11 +641,7 @@ void SteerVehicle::doEnableSteerVehicleEvent(EventThrown event, ThrowEventData e
 		{
 			mAvoidNeighbor = eventData;
 			mAvoidNeighbor.mTimeElapsed = 0;
-			mAvoidNeighbor.mEnable ?
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
-							&SteerVehicle::doThrowAvoidNeighbor) :
-					dynamic_cast<VehicleAddOn*>(mVehicle)->setEntityAvoidNeighborMethod(
-					NULL);
+			mANCallbackCalled = false;
 		}
 		break;
 	default:

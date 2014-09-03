@@ -277,7 +277,8 @@ class ThrowEventData
 	};
 	struct Frequency
 	{
-		Frequency(float value): mFrequency(value)
+		Frequency(float value) :
+				mFrequency(value)
 		{
 			mFrequency == 0.0 ? mPeriod = 1.0 : mPeriod = 1.0 / mFrequency;
 			mEventData = NULL;
@@ -308,13 +309,14 @@ class ThrowEventData
 
 public:
 	ThrowEventData() :
-			mEnable(false), mEventName(std::string("")), mTimeElapsed(0), mFrequency(
-					30)
+			mEnable(false), mEventName(std::string("")), mThrown(false), mTimeElapsed(
+					0), mFrequency(30)
 	{
 		mFrequency.setEventData(this);
 	}
 	bool mEnable;
 	std::string mEventName;
+	bool mThrown;
 	float mTimeElapsed;
 	Frequency mFrequency;
 	Period mPeriod;

@@ -33,7 +33,6 @@ extern "C"
 #endif
 
 ///OpenSteerPlugIn related
-CALLBACK handleHits;
 #ifdef ELY_DEBUG
 CALLBACK steerPluginsToggleDebug;
 #endif
@@ -41,16 +40,6 @@ CALLBACK steerPluginsToggleDebug;
 #ifdef __cplusplus
 }
 #endif
-
-void handleHits(const Event* event, void* data)
-{
-	//get first parameter
-	SMARTPTR(SteerVehicle)steerVehicle =
-	DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
-	//
-	std::cout << "Got: " << event->get_name() << " - Object: " <<
-			std::string(steerVehicle->getOwnerObject()->objectId()) << std::endl;
-}
 
 #ifdef ELY_DEBUG
 void steerPluginsToggleDebug(const Event* event, void* data)

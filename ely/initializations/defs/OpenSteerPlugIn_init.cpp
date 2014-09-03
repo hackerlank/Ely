@@ -823,7 +823,7 @@ void add_vehicle(const Event* event)
 				std::make_pair("mov_type", "kinematic"));
 		compParams["SteerVehicle"].insert(
 				std::make_pair("thrown_events",
-						"avoid_obstacle@@3:avoid_close_neighbor@@"));
+						"avoid_obstacle@@1.0:avoid_close_neighbor@@"));
 	}
 	else if (openSteerPlugInName == "Boids")
 	{
@@ -833,7 +833,7 @@ void add_vehicle(const Event* event)
 				std::make_pair("mov_type", "opensteer"));
 		compParams["SteerVehicle"].insert(
 				std::make_pair("thrown_events",
-						"avoid_obstacle@@3:avoid_close_neighbor@@"));
+						"avoid_obstacle@@1.0:avoid_close_neighbor@@"));
 		//
 		compParams["SteerVehicle"].erase("max_force");
 		compParams["SteerVehicle"].insert(std::make_pair("max_force", "27"));
@@ -882,7 +882,7 @@ void add_vehicle(const Event* event)
 				std::make_pair("speed",
 						(soccerActorSelected == ball ? "1.0" : "0.0")));
 		compParams["SteerVehicle"].insert(
-				std::make_pair("thrown_events", "avoid_neighbor@@"));
+				std::make_pair("thrown_events", "avoid_neighbor@@1.0"));
 		compParams["SteerVehicle"].insert(
 				std::make_pair("up_axis_fixed", "true"));
 		//set InstanceOf instance_of, scale
@@ -908,7 +908,7 @@ void add_vehicle(const Event* event)
 				std::make_pair("mov_type", "kinematic"));
 		compParams["SteerVehicle"].insert(
 				std::make_pair("thrown_events",
-						"avoid_obstacle@@3:avoid_close_neighbor@@"));
+						"avoid_obstacle@@1.0:avoid_close_neighbor@@"));
 		compParams["SteerVehicle"].erase("speed");
 		compParams["SteerVehicle"].insert(std::make_pair("speed", "1.0"));
 		compParams["SteerVehicle"].insert(
@@ -939,7 +939,7 @@ void add_vehicle(const Event* event)
 				std::make_pair("up_axis_fixed", "true"));
 		compParams["SteerVehicle"].insert(
 				std::make_pair("thrown_events",
-						"avoid_obstacle@@3:path_following@@"));
+						"avoid_obstacle@@1.0:path_following@@"));
 		//set InstanceOf instance_of, scale
 		compParams["InstanceOf"].insert(
 				std::make_pair("instance_of", "vehicle1"));

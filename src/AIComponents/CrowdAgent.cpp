@@ -411,19 +411,33 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		//update node path dir
 		ownerObjectNP.heads_up(updatedPos - vel);
 
+		//handle events
 		//throw Move event (if enabled)
 		if (mMove.mEnable)
 		{
-			doThrowIfTimeElapsed(mMove);
+			doThrowEvent(mMove);
+		}
+		//reset Steady event (if enabled and if thrown)
+		if (mSteady.mEnable and mSteady.mThrown)
+		{
+			mSteady.mThrown = false;
+			mSteady.mTimeElapsed = 0.0;
 		}
 	}
 	else
 	{
+		//handle events
 		//vel.length_squared() == 0.0
+		//reset Move event (if enabled and if thrown)
+		if (mMove.mEnable and mMove.mThrown)
+		{
+			mMove.mThrown = false;
+			mMove.mTimeElapsed = 0.0;
+		}
 		//throw Steady event (if enabled)
 		if (mSteady.mEnable)
 		{
-			doThrowIfTimeElapsed(mSteady);
+			doThrowEvent(mSteady);
 		}
 	}
 }

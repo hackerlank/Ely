@@ -17,6 +17,8 @@
 			<ComponentTmpl family="Common" type="Default" priority="100">
 				<Param event_types="move_car:steady_car"/>
 				<Param event_types="onground_character:inair_character"/>
+				<Param event_types="path_following:avoid_obstacle"/>
+				<Param event_types="avoid_close_neighbor:avoid_neighbor"/>
 			</ComponentTmpl>
 		</ObjectTmpl>
 		
@@ -133,8 +135,6 @@
 
 		<ObjectTmpl type="OpenSteerPlugIn">
 			<ComponentTmpl family="AI" type="SteerPlugIn">
-				<Param event_types="path_following:avoid_obstacle"/>
-				<Param event_types="avoid_close_neighbor:avoid_neighbor"/>
 				<Param event_types="toggle_debug"/>
 			</ComponentTmpl>
 		</ObjectTmpl>
@@ -397,7 +397,7 @@
 				<Param external_update="true"/>
 			</Component>
 			<Component type="CharacterController">
-				<Param thrown_events="on_ground@@0.5:in_air@@0.5"/>
+				<Param thrown_events="on_ground@@0.25:in_air@@0.25"/>
 				<Param collide_mask="0x7FFFFFFF"/>
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
@@ -636,8 +636,6 @@
 			<Component type="SteerPlugIn">
 				<Param type="one_turning"/>
 				<Param events="toggle_debug@n$steerPluginsToggleDebug"/>
-				<Param events="avoid_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:avoid_close_neighbor@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
-				<Param events="path_following@OpenSteerVehicle_SteerVehicle_PathFollowing:avoid_neighbor@OpenSteerVehicle_SteerVehicle_AvoidNeighbor$handleHits"/>
 			</Component>
 		</Object>
 		
@@ -1185,6 +1183,8 @@
 			<Component type="Default">
 				<Param events="move_car@Car_Vehicle_Move:steady_car@Car_Vehicle_Steady$carMoveSteady"/>
 				<Param events="onground_character@Character_CharacterController_OnGround:inair_character@Character_CharacterController_InAir$characterGroundAir"/>
+				<Param events="avoid_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:avoid_close_neighbor@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
+				<Param events="path_following@OpenSteerVehicle_SteerVehicle_PathFollowing:avoid_neighbor@OpenSteerVehicle_SteerVehicle_AvoidNeighbor$handleHits"/>
 			</Component>
 		</Object>
 		<Object type="Game" id="elyPostObjects" priority="-500">

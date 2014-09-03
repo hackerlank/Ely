@@ -239,7 +239,7 @@ private:
 	ThrowEventData mOnGround, mInAir;
 	///Helper.
 	void doEnableCharacterControllerEvent(EventThrown event, ThrowEventData eventData);
-	void doThrowIfTimeElapsed(ThrowEventData& eventData);
+	void doThrowEvent(ThrowEventData& eventData);
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -550,15 +550,24 @@ inline void CharacterController::enableCharacterControllerEvent(EventThrown even
 	doEnableCharacterControllerEvent(event, eventData);
 }
 
-inline void CharacterController::doThrowIfTimeElapsed(ThrowEventData& eventData)
+inline void CharacterController::doThrowEvent(ThrowEventData& eventData)
 {
-	eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
-	if (eventData.mTimeElapsed >=  eventData.mPeriod)
+	if (eventData.mThrown)
 	{
-		//enough time is passed: throw the event
+		eventData.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+		if (eventData.mTimeElapsed >= eventData.mPeriod)
+		{
+			//enough time is passed: throw the event
+			throw_event(eventData.mEventName, EventParameter(this));
+			//update elapsed time
+			eventData.mTimeElapsed -= eventData.mPeriod;
+		}
+	}
+	else
+	{
+		//throw the event
 		throw_event(eventData.mEventName, EventParameter(this));
-		//update elapsed time
-		eventData.mTimeElapsed -= eventData.mPeriod;
+		eventData.mThrown = true;
 	}
 }
 
