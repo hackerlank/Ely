@@ -55,7 +55,7 @@ class VehicleTemplate;
  * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
- * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = move|steady)
+ * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move|steady)
  * - "up_axis"						|single|"z" (values: x|y|z)
  * - "wheels_number"  				|single|"4" (== N)
  * - "wheel_object_template"		|single|no default

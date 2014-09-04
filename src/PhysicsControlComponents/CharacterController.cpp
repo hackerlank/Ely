@@ -301,12 +301,12 @@ void CharacterController::onAddToObjectSetup()
 	if (param != std::string(""))
 	{
 		//events specified
-		//event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]
+		//event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]
 		paramValuesStr1 = parseCompoundString(param, ':');
 		valueNum1 = paramValuesStr1.size();
 		for (idx1 = 0; idx1 < valueNum1; ++idx1)
 		{
-			//eventX@[event_nameX]@[delta_frameX]
+			//eventX@[event_nameX]@[frequencyX]
 			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
 			if (paramValuesStr2.size() >= 3)
 			{

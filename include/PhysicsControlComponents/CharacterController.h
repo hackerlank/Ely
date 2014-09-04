@@ -50,7 +50,7 @@ class CharacterControllerTemplate;
  * The argument of each event is a reference to this component.\n
  *
  * XML Param(s):
- * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[delta_frame1][:...[:eventN@[event_nameN]@[delta_frameN]]]" with eventX = on_ground|in_air)
+ * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = on_ground|in_air)
  * - "step_height"  			|single|"1.0"
  * - "collide_mask"  			|single|"all_on"
  * - "shape_type"  				|single|"sphere"
