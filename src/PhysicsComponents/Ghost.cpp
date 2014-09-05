@@ -473,6 +473,115 @@ void Ghost::doSwitchGhostType(GhostType ghostType)
 		break;
 	}
 }
+void Ghost::update(void* data)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	float dt = *(reinterpret_cast<float*>(data));
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+
+	//handle events
+	if (mOverlap.mEnable)
+	{
+		//1) get overlap nodes
+		//for each overlap node
+		//	insert it to the overlap node list
+		//	if it is new
+		//		add a new event in the overlap event list
+		//		set it as not thrown
+		//	else (not new)
+		//
+
+
+		//get overlapping nodes
+		std::set<PandaNode *> thisOverlappingNodes;
+		for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
+		{
+			SMARTPTR(PandaNode) overlappingNode = mGhostNode->get_overlapping_node(i);
+			ObjectType overlappingObjectType = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(overlappingNode)->getOwnerObject()->objectTmpl()->objectType();
+			std::string eventName =
+			throw_event(mOverlap.mEventName, EventParameter(this),
+					EventParameter(
+							);
+
+			thisOverlappingNodes.insert();
+		}
+		//set/reset Overlap event
+		if(not thisOverlappingNodes.empty())
+		{
+			if (mOverlap.mThrown)
+			{
+				mOverlap.mTimeElapsed +=
+						ClockObject::get_global_clock()->get_dt();
+				if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
+				{
+					//enough time is passed: throw the events if any
+					for (std::set<PandaNode *>::const_iterator i =
+							thisOverlappingNodes.begin();
+							i < thisOverlappingNodes.end(); ++i)
+					{
+						throw_event(mOverlap.mEventName, EventParameter(this),
+								EventParameter(
+										GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+												*i)));
+					}
+					//update elapsed time
+					mOverlap.mTimeElapsed -= mOverlap.mPeriod;
+				}
+			}
+			else
+			{
+				//throw the event if any
+				for (std::set<PandaNode *>::const_iterator i =
+						thisOverlappingNodes.begin();
+						i < thisOverlappingNodes.end(); ++i)
+				{
+					throw_event(mOverlap.mEventName, EventParameter(this),
+							EventParameter(
+									GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+											*i)));
+				}
+				//set Overlap event
+				mOverlap.mThrown = true;
+			}
+		}
+		else
+		{
+			//reset Overlap event
+			mOverlap.mThrown = false;
+		}
+
+		//handle Overlap Off event
+		std::set<PandaNode *> removedOverlappingNodes;
+		// this handy function gets the difference between
+		// two sets. It takes the difference between
+		// overlapping nodes from the last update, and this
+		// update and pushes them into the removed overlapping node list
+		std::set_difference(mOverlapNodes.begin(),
+				mOverlapNodes.end(), thisOverlappingNodes.begin(),
+				thisOverlappingNodes.end(),
+				std::inserter(removedOverlappingNodes,
+						removedOverlappingNodes.begin()));
+		// iterate through all of the removed overlapping nodes
+		// throwing Off events for them if any
+		for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
+		{
+			throw_event(mOverlapOff.mEventName, EventParameter(this),
+					EventParameter(
+							GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+									mGhostNode->get_overlapping_node(i))));
+		}
+
+		// in the next iteration we'll want to
+		// compare against the overlapping nodes we found
+		// in this iteration
+		mOverlapNodes = thisOverlappingNodes;
+	}
+}
 
 SMARTPTR(BulletShape)Ghost::doCreateShape(GamePhysicsManager::ShapeType shapeType)
 {
@@ -535,6 +644,29 @@ void Ghost::doSetPhysicalParameters()
 	{
 		mGhostNode->set_ccd_motion_threshold(mCcdMotionThreshold);
 		mGhostNode->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
+	}
+}
+
+void Ghost::doEnableGhostEvent(EventThrown event, ThrowEventData eventData)
+{
+	//some checks
+	RETURN_ON_COND(eventData.mEventName == std::string(""),)
+	if (eventData.mFrequency <= 0.0)
+	{
+		eventData.mFrequency = 30.0;
+	}
+
+	switch (event)
+	{
+	case OVERLAP:
+		if(mOverlap.mEnable != eventData.mEnable)
+		{
+			mOverlap = eventData;
+			mOverlap.mTimeElapsed = 0;
+		}
+		break;
+	default:
+		break;
 	}
 }
 

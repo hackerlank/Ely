@@ -108,6 +108,14 @@ public:
 	virtual ComponentType componentType() const;
 
 	/**
+	 * \brief Updates the controlled object.
+	 *
+	 * Will be called automatically by an physics manager update.
+	 * @param data The custom data.
+	 */
+	virtual void update(void* data);
+
+	/**
 	 * \brief The current component's type.
 	 *
 	 * It may change during the component's lifetime.
@@ -140,6 +148,20 @@ public:
 	BulletGhostNode& getBulletGhostNode();
 	operator BulletGhostNode&();
 	///@}
+
+	///Ghost thrown events.
+	enum EventThrown
+	{
+		OVERLAP
+	};
+
+	/**
+	 * \brief Enables/disables the Ghost event to be thrown.
+	 * @param event The Ghost event.
+	 * @param eventData The Ghost event data. ThrowEventData::mEnable
+	 * will enable/disable the event.
+	 */
+	void enableGhostEvent(EventThrown event, ThrowEventData eventData);
 
 private:
 	///The NodePath associated to this rigid body.
@@ -191,6 +213,16 @@ private:
 	BulletUpAxis mUpAxis;
 	///@}
 
+	/**
+	 * \name Throwing Ghost events.
+	 */
+	///@{
+	ThrowEventData mOverlap, mOverlapOff;
+	std::set<PandaNode *> mOverlapNodes;
+	///Helper.
+	void doEnableGhostEvent(EventThrown event, ThrowEventData eventData);
+	///@}
+
 	///TypedObject semantics: hardcoded
 public:
 	static TypeHandle get_class_type()
@@ -238,6 +270,8 @@ inline void Ghost::reset()
 	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
 	mHeightfieldFile = Filename();
 	mUpAxis = Z_up;
+	mOverlap = mOverlapOff = ThrowEventData();
+	mOverlapNodes.clear();
 }
 
 inline void Ghost::onRemoveFromSceneCleanup()
@@ -268,6 +302,15 @@ inline BulletGhostNode& Ghost::getBulletGhostNode()
 inline Ghost::operator BulletGhostNode&()
 {
 	return *mGhostNode;
+}
+
+inline void Ghost::enableGhostEvent(EventThrown event,
+		ThrowEventData eventData)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	doEnableGhostEvent(event, eventData);
 }
 
 } /* namespace ely */
