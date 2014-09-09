@@ -310,7 +310,7 @@ class ThrowEventData
 public:
 	ThrowEventData() :
 			mEnable(false), mEventName(std::string("")), mThrown(false), mTimeElapsed(
-					0), mFrequency(30)
+					0), mCount(0), mFrequency(30)
 	{
 		mFrequency.setEventData(this);
 	}
@@ -318,6 +318,7 @@ public:
 	std::string mEventName;
 	bool mThrown;
 	float mTimeElapsed;
+	unsigned int mCount;
 	Frequency mFrequency;
 	Period mPeriod;
 };

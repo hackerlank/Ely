@@ -28,6 +28,7 @@
 #include "SceneComponents/Model.h"
 #include "SceneComponents/InstanceOf.h"
 #include "SceneComponents/Terrain.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -487,99 +488,80 @@ void Ghost::update(void* data)
 	//handle events
 	if (mOverlap.mEnable)
 	{
-		//1) get overlap nodes
-		//for each overlap node
-		//	insert it to the overlap node list
-		//	if it is new
-		//		add a new event in the overlap event list
-		//		set it as not thrown
-		//	else (not new)
-		//
+		//update general count:
+		//only actual overlapping objects have their count updated,
+		//while just gone out objects will be erased from the set
+		++mOverlap.mCount;
 
-
-		//get overlapping nodes
-		std::set<PandaNode *> thisOverlappingNodes;
-		for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
+		//elaborate current overlapping object list
+		if (mGhostNode->get_num_overlapping_nodes() > 0)
 		{
-			SMARTPTR(PandaNode) overlappingNode = mGhostNode->get_overlapping_node(i);
-			ObjectType overlappingObjectType = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(overlappingNode)->getOwnerObject()->objectTmpl()->objectType();
-			std::string eventName =
-			throw_event(mOverlap.mEventName, EventParameter(this),
-					EventParameter(
-							);
-
-			thisOverlappingNodes.insert();
-		}
-		//set/reset Overlap event
-		if(not thisOverlappingNodes.empty())
-		{
-			if (mOverlap.mThrown)
+			//update elapsed time
+			mOverlap.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+			for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
 			{
-				mOverlap.mTimeElapsed +=
-						ClockObject::get_global_clock()->get_dt();
-				if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
+				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+						mGhostNode->get_overlapping_node(i));
+				//insert a default: check of equality is done only on OverlapNodeData::mPnode member
+				pair<std::set<OverlappingNode>::iterator, bool> res =
+				mOverlappingNodes.insert(
+						OverlappingNode(
+								mGhostNode->get_overlapping_node(i)));
+				if (res.second)
 				{
-					//enough time is passed: throw the events if any
-					for (std::set<PandaNode *>::const_iterator i =
-							thisOverlappingNodes.begin();
-							i < thisOverlappingNodes.end(); ++i)
+					//this is a "new" overlapping object
+					//event name: <GhostObjectType>_<OverlappingObjectType>_Overlap
+					(res.first)->mOverlappingNodeData->mEventName =
+						this->getOwnerObject()->objectTmpl()->objectType() + "_"
+						+ physicsComponent->getOwnerObject()->objectTmpl()->objectType()
+						+ "_Overlap";
+					//throw the event
+					throw_event((res.first)->mOverlappingNodeData->mEventName,
+							EventParameter(this), EventParameter(physicsComponent));
+				}
+				else
+				{
+					//this is an "old" overlapping object
+					if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
 					{
-						throw_event(mOverlap.mEventName, EventParameter(this),
-								EventParameter(
-										GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
-												*i)));
+						//throw the event
+						throw_event((res.first)->mOverlappingNodeData->mEventName,
+								EventParameter(this), EventParameter(physicsComponent));
 					}
-					//update elapsed time
-					mOverlap.mTimeElapsed -= mOverlap.mPeriod;
 				}
+				//update count flag
+				(res.first)->mOverlappingNodeData->mCount = mOverlap.mCount;
 			}
-			else
+			//update elapsed time
+			if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
 			{
-				//throw the event if any
-				for (std::set<PandaNode *>::const_iterator i =
-						thisOverlappingNodes.begin();
-						i < thisOverlappingNodes.end(); ++i)
-				{
-					throw_event(mOverlap.mEventName, EventParameter(this),
-							EventParameter(
-									GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
-											*i)));
-				}
-				//set Overlap event
-				mOverlap.mThrown = true;
+				mOverlap.mTimeElapsed -= mOverlap.mPeriod;
 			}
 		}
 		else
 		{
-			//reset Overlap event
-			mOverlap.mThrown = false;
+			mOverlap.mTimeElapsed = 0.0;
 		}
 
-		//handle Overlap Off event
-		std::set<PandaNode *> removedOverlappingNodes;
-		// this handy function gets the difference between
-		// two sets. It takes the difference between
-		// overlapping nodes from the last update, and this
-		// update and pushes them into the removed overlapping node list
-		std::set_difference(mOverlapNodes.begin(),
-				mOverlapNodes.end(), thisOverlappingNodes.begin(),
-				thisOverlappingNodes.end(),
-				std::inserter(removedOverlappingNodes,
-						removedOverlappingNodes.begin()));
-		// iterate through all of the removed overlapping nodes
-		// throwing Off events for them if any
-		for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
+		//erase gone "out" objects (which have not the count flag updated)
+		for (std::set<OverlappingNode>::iterator i = mOverlappingNodes.begin(); i != mOverlappingNodes.end();)
 		{
-			throw_event(mOverlapOff.mEventName, EventParameter(this),
-					EventParameter(
-							GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
-									mGhostNode->get_overlapping_node(i))));
+			//check if it has a previous count
+			if (i->mOverlappingNodeData->mCount != mOverlap.mCount)
+			{
+				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+						i->mOverlappingNodeData->mPnode);
+				//throw the "off" event
+				throw_event(i->mOverlappingNodeData->mEventName + "Off",
+						EventParameter(this), EventParameter(physicsComponent));
+				//erase the object
+				mOverlappingNodes.erase(i++);
+			}
+			else
+			{
+				++i;
+			}
 		}
-
-		// in the next iteration we'll want to
-		// compare against the overlapping nodes we found
-		// in this iteration
-		mOverlapNodes = thisOverlappingNodes;
 	}
 }
 

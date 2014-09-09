@@ -54,14 +54,19 @@ class GhostTemplate;
  * of object geometry (supposedly specified by the model component).\n
  * For "plane" shape, in case of missing parameters, the default is
  * a plane with normal = (0,0,1) and d = 0.\n
-///TODO
- * If specified in "thrown_events", this component can throw
- * these events (shown with default names):
- * - when one object overlaps it(<GhostObjectType>_<OverlappingObjectType>_Overlap)
- * The argument of each event is a reference to this component.\n
+ * If specified in "thrown_events", this component throws:
+ * - the event "<GhostObjectType>_<OverlappingObjectType>_Overlap" when when an object overlaps it
+ * and this is thrown continuously at a frequency which is the minimum between
+ * the fps and the frequency specified (which defaults to 30 times per seconds) until the
+ * object keeps overlapping
+ * - the event "<GhostObjectType>_<OverlappingObjectType>_OverlapOff" when when the object stops
+ * overlapping it and this is thrown only once
+ * The first argument of each event is a reference to this component, the second argument is
+ * a reference of the overlapping object's Physics component.\n
+ * \note: "event_name" xml parameter is ignored.\n
  *
  * XML Param(s):
- * - "thrown_events"			|single|"overlap" (specified as "event@[event_name]@[delta_frame]" with event = overlap)
+ * - "thrown_events"			|single|"overlap" (specified as "event@[event_name]@[frequency]" with event = overlap)
  * - "ghost_type"  				|single|"static" (values: static|dynamic)
  * - "ghost_friction"  			|single|"0.8"
  * - "ghost_restitution"  		|single|"0.1"
@@ -217,8 +222,63 @@ private:
 	 * \name Throwing Ghost events.
 	 */
 	///@{
+	struct OverlappingNode
+	{
+		struct OverlappingNodeData
+		{
+			PandaNode* mPnode;
+			std::string mEventName;
+			int mCount;
+		};
+		//main constructors
+		OverlappingNode(PandaNode* _pnode) :
+				mOverlappingNodeData(new OverlappingNodeData), mRefCount(new int)
+		{
+			mOverlappingNodeData->mPnode = _pnode;
+			*mRefCount = 1;
+		}
+		OverlappingNode(PandaNode* _pnode, const std::string& _name, int _count) :
+				mOverlappingNodeData(new OverlappingNodeData), mRefCount(new int)
+		{
+			mOverlappingNodeData->mPnode = _pnode;
+			mOverlappingNodeData->mEventName = _name;
+			mOverlappingNodeData->mCount = _count;
+			*mRefCount = 1;
+		}
+		//copy constructor
+		OverlappingNode(const OverlappingNode& on) :
+				mOverlappingNodeData(on.mOverlappingNodeData), mRefCount(on.mRefCount)
+		{
+			++(*mRefCount);
+		}
+		//destructor
+		~OverlappingNode()
+		{
+			if (--(*mRefCount) == 0)
+			{
+				delete mOverlappingNodeData;
+				delete mRefCount;
+			}
+		}
+		//assignment operator
+		OverlappingNode& operator=(const OverlappingNode& on)
+		{
+			mOverlappingNodeData = on.mOverlappingNodeData;
+			++(*mRefCount);
+			return *this;
+		}
+		//comparison operator
+		bool operator<(const OverlappingNode& on) const
+		{
+			return mOverlappingNodeData->mPnode < on.mOverlappingNodeData->mPnode;
+		}
+		//owned resource
+		OverlappingNodeData* mOverlappingNodeData;
+	private:
+		int* mRefCount;
+	};
 	ThrowEventData mOverlap, mOverlapOff;
-	std::set<PandaNode *> mOverlapNodes;
+	std::set<OverlappingNode> mOverlappingNodes;
 	///Helper.
 	void doEnableGhostEvent(EventThrown event, ThrowEventData eventData);
 	///@}
@@ -271,7 +331,7 @@ inline void Ghost::reset()
 	mHeightfieldFile = Filename();
 	mUpAxis = Z_up;
 	mOverlap = mOverlapOff = ThrowEventData();
-	mOverlapNodes.clear();
+	mOverlappingNodes.clear();
 }
 
 inline void Ghost::onRemoveFromSceneCleanup()
