@@ -172,7 +172,12 @@
 			<ComponentTmpl family="Scene" type="Terrain" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
 		</ObjectTmpl>
-		
+
+		<ObjectTmpl type="GhostObject">
+			<ComponentTmpl family="Scene" type="InstanceOf" priority="100"/>
+			<ComponentTmpl family="Physics" type="Ghost" priority="90"/> 
+		</ObjectTmpl>
+
 		<!-- templates for instancing -->
 		<ObjectTmpl type="Instanceable">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
@@ -397,7 +402,7 @@
 				<Param external_update="true"/>
 			</Component>
 			<Component type="CharacterController">
-				<Param thrown_events="on_ground@@0.25:in_air@@0.25"/>
+				<!-- <Param thrown_events="on_ground@@0.25:in_air@@0.25"/> -->
 				<Param collide_mask="0x7FFFFFFF"/>
 				<Param shape_type="capsule"/>
 				<Param shape_size="medium"/>
@@ -431,7 +436,7 @@
 				<Param collide_mask="all_on"/>
 			</Component>
 			<Component type="Vehicle">
-				<Param thrown_events="move@@0.25:steady@@0.25"/>
+				<!-- <Param thrown_events="move@@0.25:steady@@0.25"/> -->
 				<Param wheels_number="4"/>
 				<Param wheel_object_template="CarWheel"/>
 				<Param wheel_model="wheel1,wheel1,wheel1,wheel1"/>
@@ -1110,7 +1115,24 @@
 			<Param rot="0.0,0.0,90.0"/>
 			<Param pos="-641.846,8.89998,-43.56"/>
 		</Object>
-
+		
+<!-- 		<Object type="GhostObjet" id="ghost_beachhouse2" priority="110">
+			<Component type="InstanceOf">
+				<Param instance_of="beachhouse2"/>
+				<Param scale="0.8,0.8,0.8"/>
+			</Component>
+			<Component type="Ghost">
+				<Param ghost_type="static"/>
+				<Param ghost_friction="0.9"/>
+				<Param ghost_restitution="0.2"/>
+				<Param shape_type="box"/>
+			</Component> 
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+			<Param rot="0.0,0.0,0.0"/>
+			<Param pos="79.3756,333.252,23.636"/>
+		</Object> -->
+		
 <!--
 		<Object type="StaticActor" id="Plane1">
 			<Component type="Model">
