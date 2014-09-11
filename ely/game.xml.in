@@ -1116,10 +1116,10 @@
 			<Param pos="-641.846,8.89998,-43.56"/>
 		</Object>
 		
-<!-- 		<Object type="GhostObjet" id="ghost_beachhouse2" priority="110">
+		<Object type="GhostObject" id="ghost_beachhouse2" priority="110">
 			<Component type="InstanceOf">
 				<Param instance_of="beachhouse2"/>
-				<Param scale="0.8,0.8,0.8"/>
+				<Param scale="1.0,1.0,1.0"/>
 			</Component>
 			<Component type="Ghost">
 				<Param ghost_type="static"/>
@@ -1130,8 +1130,8 @@
 			<Param parent="render"/>
 			<Param is_steady="true"/>
 			<Param rot="0.0,0.0,0.0"/>
-			<Param pos="79.3756,333.252,23.636"/>
-		</Object> -->
+			<Param pos="79.3756,333.252,35.636"/>
+		</Object>
 		
 <!--
 		<Object type="StaticActor" id="Plane1">

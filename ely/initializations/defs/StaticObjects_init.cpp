@@ -30,15 +30,16 @@ extern "C"
 #endif
 
 INITIALIZATION Terrain1_initialization;
+INITIALIZATION ghost_beachhouse2_initialization;
 
 #ifdef __cplusplus
 }
 #endif
 
-///Terrain1
 #ifdef ELY_DEBUG
 namespace
 {
+///Terrain1
 void toggleWireframeMode(const Event* event, void* data)
 {
 	SMARTPTR(Object)terrain1= reinterpret_cast<Object*>(data);
@@ -52,6 +53,21 @@ void toggleWireframeMode(const Event* event, void* data)
 		terrain1->getNodePath().set_render_mode_wireframe(1);
 	}
 }
+
+///ghost_beachhouse2
+void toggleVisibility(const Event* event, void* data)
+{
+	SMARTPTR(Object)ghost= reinterpret_cast<Object*>(data);
+
+	if (ghost->getNodePath().is_hidden())
+	{
+		ghost->getNodePath().show();
+	}
+	else
+	{
+		ghost->getNodePath().hide();
+	}
+}
 }
 #endif
 
@@ -62,6 +78,17 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 #ifdef ELY_DEBUG
 	//set toggle Wire frame Mode callback
 	pandaFramework->define_key("t", "toggleWireframeMode", &toggleWireframeMode,
+			static_cast<void*>(object));
+#endif
+}
+
+void ghost_beachhouse2_initialization(SMARTPTR(Object)object, const ParameterTable&paramTable,
+PandaFramework* pandaFramework, WindowFramework* windowFramework)
+{
+	//ghost_beachhouse2
+#ifdef ELY_DEBUG
+	//set toggle visibility callback
+	pandaFramework->define_key("g", "toggleVisibility", &toggleVisibility,
 			static_cast<void*>(object));
 #endif
 }
