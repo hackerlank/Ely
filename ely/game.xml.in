@@ -19,6 +19,7 @@
 				<Param event_types="onground_character:inair_character"/>
 				<Param event_types="path_following:avoid_obstacle"/>
 				<Param event_types="avoid_close_neighbor:avoid_neighbor"/>
+				<Param event_types="overlap:overlap_off"/>
 			</ComponentTmpl>
 		</ObjectTmpl>
 		
@@ -1122,6 +1123,7 @@
 				<Param scale="1.0,1.0,1.0"/>
 			</Component>
 			<Component type="Ghost">
+				<Param thrown_events="overlap@@0.5"/>
 				<Param ghost_type="static"/>
 				<Param ghost_friction="0.9"/>
 				<Param ghost_restitution="0.2"/>
@@ -1207,6 +1209,7 @@
 				<Param events="onground_character@Character_CharacterController_OnGround:inair_character@Character_CharacterController_InAir$characterGroundAir"/>
 				<Param events="avoid_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:avoid_close_neighbor@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
 				<Param events="path_following@OpenSteerVehicle_SteerVehicle_PathFollowing:avoid_neighbor@OpenSteerVehicle_SteerVehicle_AvoidNeighbor$handleHits"/>
+				<Param events="overlap@Car_GhostObject_Overlap:overlap_off@Car_GhostObject_OverlapOff$carGhostOverlap"/>
 			</Component>
 		</Object>
 		<Object type="Game" id="elyPostObjects" priority="-500">

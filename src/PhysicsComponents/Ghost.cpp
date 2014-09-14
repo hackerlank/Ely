@@ -399,6 +399,64 @@ void Ghost::onAddToObjectSetup()
 
 	//set this rigid body node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
+
+	///set thrown events if any
+	std::string param;
+	unsigned int idx1, valueNum1;
+	std::vector<std::string> paramValuesStr1, paramValuesStr2;
+	param = mTmpl->parameter(std::string("thrown_events"));
+	if (param != std::string(""))
+	{
+		//events specified
+		//event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]
+		paramValuesStr1 = parseCompoundString(param, ':');
+		valueNum1 = paramValuesStr1.size();
+		for (idx1 = 0; idx1 < valueNum1; ++idx1)
+		{
+			//eventX@[event_nameX]@[frequencyX]
+			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
+			if (paramValuesStr2.size() >= 3)
+			{
+				EventThrown event;
+				ThrowEventData eventData;
+				//get default name prefix
+				std::string objectType = std::string(
+						mOwnerObject->objectTmpl()->objectType());
+				//get name
+				std::string name = paramValuesStr2[1];
+				//get frequency
+				float frequency = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (frequency <= 0.0)
+				{
+					frequency = 30.0;
+				}
+				//get event
+				if (paramValuesStr2[0] == "overlap")
+				{
+					event = OVERLAP;
+					//set default suffix name
+					if (name == "")
+					{
+						//set default suffix name
+						name = objectType + "_Overlap";
+					}
+				}
+				else
+				{
+					//paramValuesStr2[0] is not a suitable event:
+					//continue with the next event
+					continue;
+				}
+				//set event data
+				eventData.mEnable = true;
+				eventData.mEventName = name;
+				eventData.mTimeElapsed = 0;
+				eventData.mFrequency = frequency;
+				//enable the event
+				doEnableGhostEvent(event, eventData);
+			}
+		}
+	}
 }
 
 void Ghost::onRemoveFromObjectCleanup()
@@ -443,6 +501,14 @@ void Ghost::onAddToSceneSetup()
 	}
 	//
 	doSwitchGhostType(mGhostType);
+	//Add to the physics manager update
+	GamePhysicsManager::GetSingletonPtr()->addToPhysicsUpdate(this);
+}
+
+void Ghost::onRemoveFromSceneCleanup()
+{
+	//remove from the physics manager update
+	GamePhysicsManager::GetSingletonPtr()->removeFromPhysicsUpdate(this);
 }
 
 void Ghost::switchType(GhostType ghostType)
@@ -510,14 +576,13 @@ void Ghost::update(void* data)
 				if (res.second)
 				{
 					//this is a "new" overlapping object
-					//event name: <GhostObjectType>_<OverlappingObjectType>_Overlap
+					//event name: <OverlappingObjectType>_<GhostObjectType>_Overlap
 					(res.first)->mOverlappingNodeData->mEventName =
-						this->getOwnerObject()->objectTmpl()->objectType() + "_"
-						+ physicsComponent->getOwnerObject()->objectTmpl()->objectType()
-						+ "_Overlap";
+						physicsComponent->getOwnerObject()->objectTmpl()->objectType()
+						+ "_" + mOverlap.mEventName;
 					//throw the event
 					throw_event((res.first)->mOverlappingNodeData->mEventName,
-							EventParameter(this), EventParameter(physicsComponent));
+							EventParameter(physicsComponent), EventParameter(this));
 				}
 				else
 				{
@@ -526,7 +591,7 @@ void Ghost::update(void* data)
 					{
 						//throw the event
 						throw_event((res.first)->mOverlappingNodeData->mEventName,
-								EventParameter(this), EventParameter(physicsComponent));
+								EventParameter(physicsComponent), EventParameter(this));
 					}
 				}
 				//update count flag
@@ -553,7 +618,7 @@ void Ghost::update(void* data)
 						i->mOverlappingNodeData->mPnode);
 				//throw the "off" event
 				throw_event(i->mOverlappingNodeData->mEventName + "Off",
-						EventParameter(this), EventParameter(physicsComponent));
+						EventParameter(physicsComponent), EventParameter(this));
 				//erase the object
 				mOverlappingNodes.erase(i++);
 			}

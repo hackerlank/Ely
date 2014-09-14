@@ -76,6 +76,7 @@ void GhostTemplate::setParametersDefaults()
 	//mParameterTable must be the first cleared
 	mParameterTable.clear();
 	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("thrown_events", "overlap@@30.0"));
 	mParameterTable.insert(ParameterNameValue("ghost_type", "static"));
 	mParameterTable.insert(ParameterNameValue("ghost_friction", "0.8"));
 	mParameterTable.insert(ParameterNameValue("ghost_restitution", "0.1"));

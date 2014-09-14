@@ -55,18 +55,20 @@ class GhostTemplate;
  * For "plane" shape, in case of missing parameters, the default is
  * a plane with normal = (0,0,1) and d = 0.\n
  * If specified in "thrown_events", this component throws:
- * - the event "<GhostObjectType>_<OverlappingObjectType>_Overlap" when when an object overlaps it
- * and this is thrown continuously at a frequency which is the minimum between
- * the fps and the frequency specified (which defaults to 30 times per seconds) until the
- * object keeps overlapping
- * - the event "<GhostObjectType>_<OverlappingObjectType>_OverlapOff" when when the object stops
- * overlapping it and this is thrown only once
- * The first argument of each event is a reference to this component, the second argument is
- * a reference of the overlapping object's Physics component.\n
- * \note: "event_name" xml parameter is ignored.\n
+ * - when an object overlaps it, the event "<OverlappingObjectType>_<SUFFIX>",
+ * with default <SUFFIX> = <GhostObjectType>_Overlap; this event is thrown
+ * continuously at a frequency which is the minimum between the fps and
+ * the frequency specified (which defaults to 30 times per seconds) until
+ * the object keeps overlapping
+ * - when the object stops overlapping it, the event
+ * "<OverlappingObjectType>_<SUFFIX>Off"; this event is thrown only once\n
+ * The first argument of each event is a reference of the overlapping object's
+ * Physics component, the second argument is a reference to this component.\n
+ * \note: "event_name" xml parameter is used to specify a <SUFFIX> of the event
+ * names.\n
  *
  * XML Param(s):
- * - "thrown_events"			|single|"overlap" (specified as "event@[event_name]@[frequency]" with event = overlap)
+ * - "thrown_events"			|single|"overlap" (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = overlap)
  * - "ghost_type"  				|single|"static" (values: static|dynamic)
  * - "ghost_friction"  			|single|"0.8"
  * - "ghost_restitution"  		|single|"0.1"
@@ -277,7 +279,7 @@ private:
 	private:
 		int* mRefCount;
 	};
-	ThrowEventData mOverlap, mOverlapOff;
+	ThrowEventData mOverlap;
 	std::set<OverlappingNode> mOverlappingNodes;
 	///Helper.
 	void doEnableGhostEvent(EventThrown event, ThrowEventData eventData);
@@ -330,12 +332,8 @@ inline void Ghost::reset()
 	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
 	mHeightfieldFile = Filename();
 	mUpAxis = Z_up;
-	mOverlap = mOverlapOff = ThrowEventData();
+	mOverlap = ThrowEventData();
 	mOverlappingNodes.clear();
-}
-
-inline void Ghost::onRemoveFromSceneCleanup()
-{
 }
 
 inline NodePath Ghost::getNodePath() const
