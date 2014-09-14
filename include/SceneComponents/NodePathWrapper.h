@@ -36,8 +36,10 @@ class NodePathWrapperTemplate;
  *
  * On error default NodePath is render.
  *
- * XML Param(s):
- * - "nodepath"  		|single|no default
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *nodepath*  		|single| - | -
  *
  * \note parts inside [] are optional.\n
  */

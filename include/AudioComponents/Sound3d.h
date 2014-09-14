@@ -48,9 +48,11 @@ class Sound3dTemplate;
  * and is not automatically updated.\n
  * All updates is done wrt scene root (e.g. render).
  *
- * XML Param(s):
- * - "scene_root" 			|single|"render"
- * - "sound_files" 			|multiple|no default (each one specified as "sound_name1@sound_file1[:sound_name2@sound_file2:...:sound_nameN@sound_fileN]")
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *scene_root* 			|single| *render* | -
+ * | *sound_files* 			|multiple| - | each one specified as "sound_name1@sound_file1[:sound_name2@sound_file2:...:sound_nameN@sound_fileN]"
  *
  * \note parts inside [] are optional.\n
  */

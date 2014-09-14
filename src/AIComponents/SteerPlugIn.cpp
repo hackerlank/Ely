@@ -113,7 +113,7 @@ void SteerPlugIn::onAddToObjectSetup()
 	}
 	else
 	{
-		///default: "one_turning"
+		//default: "one_turning"
 		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
 	}
 	//open the plug in
@@ -571,7 +571,7 @@ OpenSteer::AbstractObstacle* SteerPlugIn::addObstacle(SMARTPTR(Object) object,
 		//default: both
 		seenFS = OpenSteer::AbstractObstacle::both;
 	}
-	///create actually the obstacle
+	//create actually the obstacle
 	OpenSteer::AbstractObstacle* obstacle = NULL;
 	if (type == std::string("box"))
 	{

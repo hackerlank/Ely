@@ -105,7 +105,7 @@ void Object::onAddToSceneSetup()
 			mTmpl->parameter(std::string("is_steady")) == std::string("true") ?
 					true : false);
 
-	///set up into scene only if NodePath is not empty
+	//set up into scene only if NodePath is not empty
 	if (not mNodePath.is_empty())
 	{
 		//Parent (by default none)
@@ -153,7 +153,7 @@ void Object::onAddToSceneSetup()
 		mNodePath.set_hpr(rot);
 	}
 
-	///set initialization function (if any)
+	//set initialization function (if any)
 	//get initialization function name
 	mInititializationFuncName = mTmpl->parameter(std::string("init_func"));
 	//load initialization functions library.
@@ -184,7 +184,7 @@ void Object::onAddToSceneSetup()
 
 void Object::onRemoveFromSceneCleanup()
 {
-	///clean up into scene only if NodePath is not empty
+	//clean up into scene only if NodePath is not empty
 	if (not mNodePath.is_empty())
 	{
 		//set default pos/hpr

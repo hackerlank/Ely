@@ -39,29 +39,31 @@ class ChaserTemplate;
  *
  * The up axis is the "z" axis.
  *
- * XML Param(s):
- * - "enabled"  				|single|"true"
- * - "backward"					|single|"true"
- * - "chased_object"			|single|no default
- * - "fixed_relative_position"	|single|"true"
- * - "reference_object"			|single|no default
- * - "abs_max_distance"			|single|no default
- * - "abs_min_distance"			|single|no default
- * - "abs_max_height"			|single|no default
- * - "abs_min_height"			|single|no default
- * - "friction"					|single|"1.0"
- * - "fixed_lookat"				|single|"true"
- * - "abs_lookat_distance"		|single|no default
- * - "abs_lookat_height"		|single|no default
- * - "mouse_enabled_h"  		|single|"false"
- * - "mouse_enabled_p"  		|single|"false"
- * - "head_left"  				|single|"enabled"
- * - "head_right"  				|single|"enabled"
- * - "pitch_up"  				|single|"enabled"
- * - "pitch_down"  				|single|"enabled"
- * - "sens_x"  					|single|"0.2"
- * - "sens_y"  					|single|"0.2"
- * - "inverted_rotation"		|single|"false"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *enabled*  				|single| *true* | -
+ * | *backward*					|single| *true* | -
+ * | *chased_object*			|single| - | -
+ * | *fixed_relative_position*	|single| *true* | -
+ * | *reference_object*			|single| - | -
+ * | *abs_max_distance*			|single| - | -
+ * | *abs_min_distance*			|single| - | -
+ * | *abs_max_height*			|single| - | -
+ * | *abs_min_height*			|single| - | -
+ * | *friction*					|single| 1.0 | -
+ * | *fixed_lookat*				|single| *true* | -
+ * | *abs_lookat_distance*		|single| - | -
+ * | *abs_lookat_height*		|single| - | -
+ * | *mouse_enabled_h*  		|single| *false* | -
+ * | *mouse_enabled_p*  		|single| *false* | -
+ * | *head_left*  				|single| *enabled* | -
+ * | *head_right*  				|single| *enabled* | -
+ * | *pitch_up*  				|single| *enabled* | -
+ * | *pitch_down*  				|single| *enabled* | -
+ * | *sens_x*  					|single| 0.2 | -
+ * | *sens_y*  					|single| 0.2 | -
+ * | *inverted_rotation*		|single| *false* | -
  *
  * \note parts inside [] are optional.\n
  */

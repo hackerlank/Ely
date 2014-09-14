@@ -35,9 +35,11 @@ class InstanceOfTemplate;
 /**
  * \brief Component representing an instance of another object.
  *
- * XML Param(s):
- * - "instance_of"  		|single|no default
- * - "scale"  				|single|"1.0" (specified as "scalex[,scaley,scalez]")
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *instance_of*  		|single| - | -
+ * | *scale*  				|single| 1.0 | specified as "scalex[,scaley,scalez]"
  *
  * \note parts inside [] are optional.\n
  */

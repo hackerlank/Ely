@@ -125,7 +125,7 @@ void InstanceOf::onRemoveFromObjectCleanup()
 	//detach the first child of this instance of node path (if any)
 	if (mInstancedObject and (mNodePath.get_num_children() > 0))
 	{
-		/// \see NodePath::instance_to() documentation.
+		// \see NodePath::instance_to() documentation.
 		mNodePath.get_child(0).detach_node();
 	}
 

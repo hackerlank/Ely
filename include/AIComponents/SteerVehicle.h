@@ -71,19 +71,21 @@ enum SteerVehicleMovType
  * \note debug drawing works correctly only if the owner object's
  * parent is "render".\n
  *
- * XML Param(s):
- * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move|steady|path_following|avoid_obstacle|avoid_close_neighbor|avoid_neighbor)
- * - "type"						|single|"one_turning" (values: one_turning|pedestrian|boid|mp_wanderer|mp_pursuer|player|ball|ctf_seeker|ctf_enemy|low_speed_turn|map_driver)
- * - "external_update"			|single|"false"
- * - "add_to_plugin"			|single|no default
- * - "mov_type"					|single|"opensteer" (values: opensteer|kinematic)
- * - "up_axis_fixed"			|single|"false"
- * - "mass"						|single|"1.0"
- * - "radius"					|single|no default
- * - "speed"					|single|"0.0"
- * - "max_force"				|single|"0.1"
- * - "max_speed"				|single|"1.0"
- * - "ray_mask"					|single|"all_on"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *thrown_events*			|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move,steady,path_following,avoid_obstacle,avoid_close_neighbor,avoid_neighbor
+ * | *type*						|single| *one_turning* | values: one_turning,pedestrian,boid,mp_wanderer,mp_pursuer,player,ball,ctf_seeker,ctf_enemy,low_speed_turn,map_driver
+ * | *external_update*			|single| *false* | -
+ * | *add_to_plugin*			|single| - | -
+ * | *mov_type*					|single| *opensteer* | values: opensteer,kinematic
+ * | *up_axis_fixed*			|single| *false* | -
+ * | *mass*						|single| 1.0 | -
+ * | *radius*					|single| - | -
+ * | *speed*					|single| 0.0 | -
+ * | *max_force*				|single| 0.1 | -
+ * | *max_speed*				|single| 1.0 | -
+ * | *ray_mask*					|single| *all_on* | -
  *
  * \note parts inside [] are optional.\n
  */

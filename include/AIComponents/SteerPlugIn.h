@@ -46,10 +46,12 @@ class SteerPlugInTemplate;
  * which any SteerVehicle will be reparented to (if necessary) and which any
  * scene computation will be performed wrt.\n
  *
- * XML Param(s):
- * - "type"				|single|"one_turning" (values: one_turning|pedestrian|boid|multiple_pursuit|soccer|capture_the_flag|low_speed_turn|map_drive)
- * - "pathway"			|single|"0.0,0.0,0.0:1.0,1.0,1.0$1.0$false" (specified as "p1,py1,pz1:px2,py2,pz2[:...:pxN,pyN,pzN]$r1[:r2:...:rM]$closedCycle" with M,closedCycle=N-1,false|N,true)
- * - "obstacles"  		|multiple|no default (each one specified as "objectId1@shape1@seenFromState1[:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN]"] with shapeX=sphere|box|plane|rectangle and seenFromStateX=outside|inside|both)
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *type*				|single| *one_turning* | values: one_turning,pedestrian,boid,multiple_pursuit,soccer,capture_the_flag,low_speed_turn,map_drive
+ * | *pathway*			|single|"0.0,0.0,0.0:1.0,1.0,1.0$1.0$false" (specified as "p1,py1,pz1:px2,py2,pz2[:...:pxN,pyN,pzN]$r1[:r2:...:rM]$closedCycle" with M,closedCycle=N-1,false,N,true)
+ * | *obstacles*  		|multiple| - | each one specified as "objectId1@shape1@seenFromState1[:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN]"] with shapeX=sphere,box,plane,rectangle and seenFromStateX=outside,inside,both
  *
  * \note parts inside [] are optional.\n
  */

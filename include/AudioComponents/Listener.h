@@ -37,8 +37,10 @@ class ListenerTemplate;
 /**
  * \brief Component manipulating the listener for 3d sounds.
  *
- * XML Param(s):
- * - "scene_root" 			|single|"render"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *scene_root* 			|single| *render* | -
  *
  * \note parts inside [] are optional.\n
  */

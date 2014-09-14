@@ -40,30 +40,33 @@ class SoftBodyTemplate;
  * Others settings could be made in programs by directly referring to the
  * underlying BulletSoftBodyNode.\n
  * \note rope is visualized as nurbs curse; patch is visualized as GeomNode.\n
- * Soft body types are:
- * - "rope"
- * - "patch"
- * - "ellipsoid"
- * - "tri(angle) mesh"
- * - "tetra(hedron) mesh"
  *
- * XML Param(s):
- * - "body_type"				|single|"rope" (values: rope|patch|ellipsoid|tri_mesh|tetra_mesh)
- * - "collide_mask"				|single|"all_on"
- * - "body_total_mass"			|single|"1.0"
- * - "body_mass_from_faces"		|single|"false"
- * - "air_density"				|single|"1.2"
- * - "water_density"  			|single|"0.0"
- * - "water_offset"  			|single|"0.0"
- * - "water_normal"  			|single|"0.0,0.0,0.0"
- * - "show_model"				|single|false (for patch,ellipsoid,tetra_mesh)
- * - "points"  					|single|no default (for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4)
- * - "res"  					|single|no default (for rope,patch,ellipsoid specified as "res1[:res2]")
- * - "fixeds"  					|single|no default (for rope,patch)
- * - "gendiags"  				|single|true (for patch)
- * - "radius"					|single|"1.0,1.0,1.0" (for ellipsoid)
- * - "randomize_constraints"	|single|true (for tri_mesh)
- * - "tetra_data_files"			|single|no default (for tetra_mesh specified as "elems,faces,nodes")
+ * Soft body types are:
+ * - *rope*
+ * - *patch*
+ * - *ellipsoid*
+ * - *tri(angle) mesh*
+ * - *tetra(hedron) mesh*
+ *
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *body_type*				|single| *rope* | values: rope,patch,ellipsoid,tri_mesh,tetra_mesh
+ * | *collide_mask*				|single| *all_on* | -
+ * | *body_total_mass*			|single| 1.0 | -
+ * | *body_mass_from_faces*		|single| *false* | -
+ * | *air_density*				|single| 1.2 | -
+ * | *water_density*  			|single| 0.0 | -
+ * | *water_offset*  			|single| 0.0 | -
+ * | *water_normal*  			|single| 0.0,0.0,0.0 | -
+ * | *show_model*				|single| *false* | for patch,ellipsoid,tetra_mesh
+ * | *points*  					|single| - | for rope,patch,ellipsoid specified as "x1,y1,z1[:x2,y2,z2:...:xN,yN,zN]" with N=1..4
+ * | *res*  					|single| - | for rope,patch,ellipsoid specified as "res1[:res2]"
+ * | *fixeds*  					|single| - | for rope,patch
+ * | *gendiags*  				|single| *true* | for patch
+ * | *radius*					|single| 1.0,1.0,1.0 | for ellipsoid
+ * | *randomize_constraints*	|single| *true* | for tri_mesh
+ * | *tetra_data_files*			|single| - | for tetra_mesh specified as "elems,faces,nodes"
  *
  * \note parts inside [] are optional.\n
  */

@@ -25,9 +25,9 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
-///Distributed
+//Distributed
 #include "Support/Distributed/DistributedObjectBase.h"
-///Bullet
+//Bullet
 #include "PhysicsComponents/BulletLocal/config_bullet.h"
 
 namespace ely
@@ -191,7 +191,7 @@ void initTypedObjects()
 	RigidBodyTemplate::init_type();
 	SoftBody::init_type();
 	SoftBodyTemplate::init_type();
-	///init BulletLocal
+	//init BulletLocal
 	init_libbullet();
 	Vehicle::init_type();
 	VehicleTemplate::init_type();
@@ -205,7 +205,7 @@ void initTypedObjects()
 	TerrainTemplate::init_type();
 	GeoMipTerrainRef::init_type();
 	//
-	///Distributed
+	//Distributed
 	DistributedObjectBase::init_type();
 }
 

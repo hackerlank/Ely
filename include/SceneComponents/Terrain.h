@@ -39,21 +39,23 @@ class GeoMipTerrainRef;
 /**
  * \brief Component representing the terrain model of an object.
  *
- * XML Param(s):
- * - "heightfield_file"  		|single|no default
- * - "height_scale"				|single|"1.0"
- * - "width_scale"				|single|"1.0"
- * - "do_scale"					|single|"true" (hack for rigid body)
- * - "block_size"				|single|"64"
- * - "near_percent"				|single|"0.1"
- * - "far_percent"				|single|"1.0"
- * - "brute_force"				|single|"true"
- * - "auto_flatten"				|single|"AFM_medium"
- * - "focal_point"				|single|"camera"
- * - "minimum_level"			|single|"0"
- * - "texture_file"				|single|no default
- * - "texture_uscale"			|single|"1.0"
- * - "texture_vscale"			|single|"1.0"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *heightfield_file*  		|single| - | -
+ * | *height_scale*				|single| 1.0 | -
+ * | *width_scale*				|single| 1.0 | -
+ * | *do_scale*					|single| *true* | hack for rigid body
+ * | *block_size*				|single| 64 | -
+ * | *near_percent*				|single| 0.1 | -
+ * | *far_percent*				|single| 1.0 | -
+ * | *brute_force*				|single| *true* | -
+ * | *auto_flatten*				|single| *AFM_medium* | -
+ * | *focal_point*				|single| *camera* | -
+ * | *minimum_level*			|single| 0 | -
+ * | *texture_file*				|single| - | -
+ * | *texture_uscale*			|single| 1.0 | -
+ * | *texture_vscale*			|single| 1.0 | -
  *
  * \note parts inside [] are optional.\n
  */

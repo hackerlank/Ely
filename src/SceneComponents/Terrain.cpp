@@ -241,7 +241,7 @@ void Terrain::update(void* data)
 #endif
 
 	//set focal point
-	///see https://www.panda3d.org/forums/viewtopic.php?t=5384
+	//see https://www.panda3d.org/forums/viewtopic.php?t=5384
 	LPoint3f focalPointNetPos = mFocalPointNP.get_net_transform()->get_pos();
 	mTerrain->set_focal_point(focalPointNetPos - mTerrainRootNetPos);
 	//update every frame
@@ -251,7 +251,7 @@ void Terrain::update(void* data)
 //TypedObject semantics: hardcoded
 TypeHandle Terrain::_type_handle;
 
-///GeoMipTerrainRef stuff
+//GeoMipTerrainRef stuff
 GeoMipTerrainRef::GeoMipTerrainRef(const std::string& name) :
 		GeoMipTerrain(name)
 {

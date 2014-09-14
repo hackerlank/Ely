@@ -67,20 +67,22 @@ enum CrowdAgentMovType
  * when added to a NavMesh, to the same reference node (i.e. parent) of
  * the NavMesh owner object.
  *
- * XML Param(s):
- * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move|steady)
- * - "add_to_navmesh"				|single|""
- * - "mov_type"						|single|"recast" (values: recast|kinematic)
- * - "move_target";					|single|"0.0,0.0,0.0"
- * - "move_velocity";				|single|"0.0,0.0,0.0"
- * - "max_acceleration";			|single|"8.0"
- * - "max_speed"					|single|"3.5"
- * - "collision_query_range"		|single|"12.0" (* NavMesh::agent_radius)
- * - "path_optimization_range"		|single|"30.0" (* NavMesh::agent_radius)
- * - "separation_weight" 			|single|"2.0"
- * - "update_flags"					|single|"0x1b"
- * - "obstacle_avoidance_type"		|single|"3" (values: 0|1|2|3)
- * - "ray_mask"						|single|"all_on"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *thrown_events*				|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move,steady
+ * | *add_to_navmesh*				|single| - | -
+ * | *mov_type*						|single| *recast* | values: recast,kinematic
+ * | *move_target";					|single| 0.0,0.0,0.0 | -
+ * | *move_velocity";				|single| 0.0,0.0,0.0 | -
+ * | *max_acceleration";			|single| 8.0 | -
+ * | *max_speed*					|single| 3.5 | -
+ * | *collision_query_range*		|single| 12.0 | * NavMesh::agent_radius
+ * | *path_optimization_range*		|single| 30.0 | * NavMesh::agent_radius
+ * | *separation_weight* 			|single| 2.0 | -
+ * | *update_flags*					|single| *0x1b* | -
+ * | *obstacle_avoidance_type*		|single| *3* | values: 0,1,2,3
+ * | *ray_mask*						|single| *all_on* | -
  *
  * \note parts inside [] are optional.\n
  */

@@ -182,7 +182,7 @@ void CrowdAgent::onAddToObjectSetup()
 				find_task_chain(mTaskChainName)->set_frame_sync(false);
 #endif
 
-	///set thrown events if any
+	//set thrown events if any
 	std::string param;
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;
@@ -264,14 +264,14 @@ void CrowdAgent::onRemoveFromObjectCleanup()
 
 void CrowdAgent::onAddToSceneSetup()
 {
-	///1: get the input from xml
-	///2: add settings for CrowdAgent
-	///set params: already done
-	///set NavMesh object (if any)
+	//1: get the input from xml
+	//2: add settings for CrowdAgent
+	//set params: already done
+	//set NavMesh object (if any)
 	SMARTPTR(Object) navMeshObject = ObjectTemplateManager::
 			GetSingleton().getCreatedObject(mNavMeshObjectId);
 
-	///3: add to NavMesh update
+	//3: add to NavMesh update
 	if(navMeshObject)
 	{
 		SMARTPTR(Component) aiComp = navMeshObject->getComponent(familyType());
@@ -314,7 +314,7 @@ void CrowdAgent::onRemoveFromSceneCleanup()
 	//lock (guard) the CrowdAgent NavMesh mutex
 	HOLD_REMUTEX(mNavMeshMutex)
 
-	///Remove from NavMesh update (if previously added)
+	//Remove from NavMesh update (if previously added)
 	//mNavMesh will be cleared during removing, so
 	//remove through a temporary pointer
 	SMARTPTR(NavMesh) navMesh = mNavMesh;

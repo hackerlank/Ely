@@ -49,36 +49,40 @@ class CharacterControllerTemplate;
  * the fps and the frequency specified (which defaults to 30 times per seconds).\n
  * The argument of each event is a reference to this component.\n
  *
- * XML Param(s):
- * - "thrown_events"			|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = on_ground|in_air)
- * - "step_height"  			|single|"1.0"
- * - "collide_mask"  			|single|"all_on"
- * - "shape_type"  				|single|"sphere"
- * - "shape_size"  				|single|"medium"  (values min|medium|max)
- * - "use_shape_of"				|single|no default
- * - "shape_radius"  			|single|no default (for sphere,cylinder,capsule,cone)
- * - "shape_height"  			|single|no default (for cylinder,capsule,cone)
- * - "shape_up"  				|single|"z" (values: x|y|z for cylinder,capsule,cone)
- * - "shape_half_x"  			|single|no default (for box)
- * - "shape_half_y"  			|single|no default (for box)
- * - "shape_half_z"  			|single|no default (for box)
- * - "fall_speed"  				|single|"55.0"
- * - "gravity"  				|single|"29.4" (==3G)
- * - "jump_speed"  				|single|"10.0"
- * - "max_slope"  				|single|"45.0" (measured in degrees)
- * - "max_jump_height"  		|single|no default
- * - "forward"  				|single|"enabled"
- * - "backward"  				|single|"enabled"
- * - "up"  						|single|"enabled"
- * - "down"  					|single|"enabled"
- * - "roll_left"  				|single|"enabled"
- * - "roll_right"  				|single|"enabled"
- * - "strafe_left"  			|single|"enabled"
- * - "strafe_right"  			|single|"enabled"
- * - "jump"  					|single|"enabled"
- * - "linear_speed"  			|single|"10.0"
- * - "angular_speed"  			|single|"45.0"
- * - "is_local"  				|single|"true"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *thrown_events*			|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = on_ground,in_air
+ * | *step_height*  			|single| 1.0 | -
+ * | *collide_mask*  			|single| *all_on* | -
+ * | *shape_type*  				|single| *sphere* | -
+ * | *shape_size*  				|single| *medium* | values min,medium,max
+ * | *use_shape_of*				|single| - | -
+ * | *shape_radius*  			|single| - | for sphere,cylinder,capsule,cone
+ * | *shape_height*  			|single| - | for cylinder,capsule,cone
+ * | *shape_up*  				|single| *z* | values: x,y,z for cylinder,capsule,cone
+ * | *shape_half_x*  			|single| - | for box
+ * | *shape_half_y*  			|single| - | for box
+ * | *shape_half_z*  			|single| - | for box
+ * | *fall_speed*  				|single| 55.0 | -
+ * | *gravity*  				|single| 29.4 | ==3G
+ * | *jump_speed*  				|single| 10.0 | -
+ * | *max_slope*  				|single| 45.0 | measured in degrees
+ * | *max_jump_height*  		|single| - | -
+ * | *forward*  				|single| *enabled* | -
+ * | *backward*  				|single| *enabled* | -
+ * | *up*  						|single| *enabled* | -
+ * | *down*  					|single| *enabled* | -
+ * | *roll_left*  				|single| *enabled* | -
+ * | *roll_right*  				|single| *enabled* | -
+ * | *strafe_left*  			|single| *enabled* | -
+ * | *strafe_right*  			|single| *enabled* | -
+ * | *jump*  					|single| *enabled* | -
+ * | *linear_speed*  			|single| 10.0 | -
+ * | *angular_speed*  			|single| 45.0 | -
+ * | *is_local*  				|single| *true* | -
+ *
+ * \note parts inside [] are optional.\n
  */
 class CharacterController: public Component
 {

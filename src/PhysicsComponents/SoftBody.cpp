@@ -307,7 +307,7 @@ void SoftBody::onAddToObjectSetup()
 				CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 				geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 				//make texcoords for ellipsoid: to be written!!!
-///				BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+//				BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 			}
 		}
 		else
@@ -315,7 +315,7 @@ void SoftBody::onAddToObjectSetup()
 			CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 			geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 			//make texcoords for ellipsoid: to be written!!!
-///			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+//			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 			//visualize with GeomNode (if any)
 			if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 			{
@@ -430,7 +430,7 @@ void SoftBody::onAddToObjectSetup()
 						CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 						geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 						//make texcoords for tetramesh: to be written!!!
-///						BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+//						BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
 					}
 				}
 				else
@@ -438,7 +438,7 @@ void SoftBody::onAddToObjectSetup()
 					CSMARTPTR(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
 					geom = BulletHelper::make_geom_from_faces(mSoftBodyNode, format).p();
 					//make texcoords for tetramesh: to be written!!!
-///					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+//					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
 					//visualize with GeomNode (if any)
 					if (pandaNode and pandaNode->is_of_type(GeomNode::get_class_type()))
 					{
@@ -561,7 +561,7 @@ void SoftBody::onRemoveFromObjectCleanup()
 
 void SoftBody::onAddToSceneSetup()
 {
-	///XXX: HACK: rope node's parent node path correction (see bullet samples)
+	//XXX: HACK: rope node's parent node path correction (see bullet samples)
 	if (mBodyType == ROPE)
 	{
 		SMARTPTR(PandaNode)pandaNode =
@@ -578,7 +578,7 @@ void SoftBody::onAddToSceneSetup()
 
 void SoftBody::onRemoveFromSceneCleanup()
 {
-	///XXX: HACK: rope node's parent node path correction (see bullet samples)
+	//XXX: HACK: rope node's parent node path correction (see bullet samples)
 	if (mBodyType == ROPE)
 	{
 		if (not mRopeNodePath.is_empty())

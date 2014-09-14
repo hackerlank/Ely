@@ -282,9 +282,9 @@ void NavMesh::onAddToSceneSetup()
 	}
 #endif
 
-	///1: get the input from xml
+	//1: get the input from xml
 	std::list<std::string>::iterator iterStr;
-	///get area ability flags and cost (for crowd)
+	//get area ability flags and cost (for crowd)
 	NavMeshPolyAreaFlags flagsAreaTable;
 	flagsAreaTable.clear();
 	NavMeshPolyAreaCost costAreaTable;
@@ -332,7 +332,7 @@ void NavMesh::onAddToSceneSetup()
 			costAreaTable[area] = cost;
 		}
 	}
-	///get crowd include & exclude flags
+	//get crowd include & exclude flags
 	std::vector<std::string>::const_iterator iterIEFStr;
 	std::vector<std::string> ieFlagsStr;
 	//1:iterate over include flags
@@ -363,7 +363,7 @@ void NavMesh::onAddToSceneSetup()
 		//or flag
 		excludeFlags |= flag;
 	}
-	///get convex volumes
+	//get convex volumes
 	std::list<PointListArea> convexVolumes;
 	for (iterStr = mConvexVolumesParam.begin();
 			iterStr != mConvexVolumesParam.end(); ++iterStr)
@@ -406,7 +406,7 @@ void NavMesh::onAddToSceneSetup()
 		//insert convex volume to the list
 		convexVolumes.push_back(PointListArea(pointList, areaType));
 	}
-	///get off mesh connections
+	//get off mesh connections
 	std::list<PointPairBidir> offMeshConnections;
 	for (iterStr = mOffMeshConnectionsParam.begin();
 			iterStr != mOffMeshConnectionsParam.end(); ++iterStr)
@@ -460,26 +460,26 @@ void NavMesh::onAddToSceneSetup()
 		//insert off mesh connection to the list
 		offMeshConnections.push_back(PointPairBidir(pointPair, bidir));
 	}
-	///2: add settings for nav mesh
-	///set nav mesh type enum: already done
-	///set mov type: already done
-	///set nav mesh settings: already done
-	///set nav mesh tile settings: already done
-	///set area ability flags
+	//2: add settings for nav mesh
+	//set nav mesh type enum: already done
+	//set mov type: already done
+	//set nav mesh settings: already done
+	//set nav mesh tile settings: already done
+	//set area ability flags
 	mPolyAreaFlags = flagsAreaTable;
-	///set area cost (for crowd)
+	//set area cost (for crowd)
 	mPolyAreaCost = costAreaTable;
-	///set crowd include & exclude flags
+	//set crowd include & exclude flags
 	mCrowdIncludeFlags = includeFlags;
 	mCrowdExcludeFlags = excludeFlags;
-	///set convex volumes
+	//set convex volumes
 	mConvexVolumes = convexVolumes;
-	///set off mesh connections
+	//set off mesh connections
 	mOffMeshConnections = offMeshConnections;
 	//setup nav mesh if auto setup is true
 	if (mAutoSetup)
 	{
-		///3: do real nav mesh setup
+		//3: do real nav mesh setup
 		doNavMeshSetup();
 	}
 
@@ -613,10 +613,10 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	PRINT_DEBUG(
 			"'" <<mOwnerObject->objectId() << "'::'" << mComponentId << "'::navMeshSetup");
 
-	///don't load model mesh more than once
+	//don't load model mesh more than once
 	if (not mGeom)
 	{
-		///load the mesh from the owner node path
+		//load the mesh from the owner node path
 		if (not doLoadModelMesh(mOwnerObject->getNodePath()))
 		{
 			throw GameException(
@@ -624,7 +624,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		}
 	}
 
-	///set up the type of navigation mesh
+	//set up the type of navigation mesh
 	switch (mNavMeshTypeEnum)
 	{
 	case SOLO:
@@ -677,10 +677,10 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		break;
 	}
 
-	///set recast areas' flags table
+	//set recast areas' flags table
 	mNavMeshType->setFlagsAreaTable(mPolyAreaFlags);
 
-	///set recast convex volumes
+	//set recast convex volumes
 	ConvexVolumeTool* cvTool = new ConvexVolumeTool();
 	mNavMeshType->setTool(cvTool);
 	std::list<PointListArea>::iterator iterPLA;
@@ -721,7 +721,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	}
 	mNavMeshType->setTool(NULL);
 
-	///set recast off mesh connections
+	//set recast off mesh connections
 	OffMeshConnectionTool* omcTool = new OffMeshConnectionTool();
 	mNavMeshType->setTool(omcTool);
 	std::list<PointPairBidir>::iterator iterPPB;
@@ -752,14 +752,14 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	}
 	mNavMeshType->setTool(NULL);
 
-	///build navigation mesh effectively
+	//build navigation mesh effectively
 	doBuildNavMesh();
 
-	///set recast crowd
+	//set recast crowd
 	CrowdTool* crowdTool = new CrowdTool();
 	mNavMeshType->setTool(crowdTool);
 
-	///set recast areas' costs
+	//set recast areas' costs
 	dtQueryFilter* filter =
 			crowdTool->getState()->getCrowd()->getEditableFilter(0);
 	NavMeshPolyAreaCost::const_iterator iterAC;
@@ -769,14 +769,14 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		filter->setAreaCost((*iterAC).first, (*iterAC).second);
 	}
 
-	///set recast crowd include & exclude flags
+	//set recast crowd include & exclude flags
 	crowdTool->getState()->getCrowd()->getEditableFilter(0)->setIncludeFlags(
 			mCrowdIncludeFlags);
 	crowdTool->getState()->getCrowd()->getEditableFilter(0)->setExcludeFlags(
 			mCrowdExcludeFlags);
 
-	///<this code is executed only when in manual setup:
-	///add to recast previously added CrowdAgents.
+	//<this code is executed only when in manual setup:
+	//add to recast previously added CrowdAgents.
 	//mCrowdAgents could be modified during iteration so use this pattern:
 	std::list<SMARTPTR(CrowdAgent)>::iterator iterCrowdAgents = mCrowdAgents.begin();
 	while (iterCrowdAgents != mCrowdAgents.end())
@@ -811,7 +811,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		crowdAgent->mAgentIdx = crowdTool->getState()->addAgent(p, &ap);
 		if (crowdAgent->mAgentIdx == -1)
 		{
-			///\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
 			iterCrowdAgents = mCrowdAgents.erase(iterCrowdAgents);
 			continue;
 		}
@@ -820,7 +820,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		//increment iterator
 		++iterCrowdAgents;
 	}
-	///>
+	//>
 
 #ifdef ELY_DEBUG
 	//delete old DebugDrawers (if any)
@@ -829,7 +829,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	//create new DebugDrawers
 	mDD = new DebugDrawPanda3d(mDebugNodePath);
 	mDDM = new DebugDrawMeshDrawer(mDebugNodePath, mDebugCamera);
-	///create the task for executing debug render
+	//create the task for executing debug render
 	//the task is executed only once and then removed from AsyncTaskManager
 	mDebugRenderData.clear();
 	mDebugRenderTask.clear();
@@ -884,11 +884,11 @@ inline void NavMesh::doSetCrowdAgentOtherSettings(
 	{
 		crowdAgent->mCorrectHeightRigidBody = 0.0;
 	}
-	///update move target
+	//update move target
 	float target[3];
 	LVecBase3fToRecast(crowdAgent->mMoveTarget, target);
 	crowdTool->getState()->setMoveTarget(crowdAgent->mAgentIdx, target);
-	///update move velocity (if length != 0)
+	//update move velocity (if length != 0)
 	if(length(crowdAgent->mMoveVelocity) > 0.0)
 	{
 		float velocity[3];

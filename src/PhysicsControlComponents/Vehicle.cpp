@@ -460,7 +460,7 @@ void Vehicle::onAddToObjectSetup()
 	//add BulletVehicle to physics world
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
 
-	///set thrown events if any
+	//set thrown events if any
 	std::string param;
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;

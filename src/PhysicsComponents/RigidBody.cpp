@@ -313,13 +313,13 @@ void RigidBody::onAddToObjectSetup()
 	//attach to Bullet World
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
 			mRigidBodyNode);
-	///<BUG: if you want to switch the body type (e.g. dynamic to static, static to
-	///dynamic, etc...) after it has been attached to the world, you must first
-	///attach it as a dynamic body and then switch its type:
-	///		mRigidBodyNode->set_mass(1.0);
-	///		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
-	///		switchType(mBodyType);
-	////BUG>
+	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
+	//dynamic, etc...) after it has been attached to the world, you must first
+	//attach it as a dynamic body and then switch its type:
+	//		mRigidBodyNode->set_mass(1.0);
+	//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
+	//		switchType(mBodyType);
+	///BUG>
 
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);

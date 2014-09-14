@@ -52,32 +52,34 @@ class NavMeshTemplate;
  * \note convex volumes and off mesh connections points are are given wrt
  * the scaled owner object node path.
  *
- * XML Param(s):
- * - "navmesh_type"					|single|"solo" (values: solo|tile|obstacle)
- * - "auto_setup"					|single|"true"
- * - "cell_size"					|single|"0.3"
- * - "cell_height"					|single|"0.2"
- * - "agent_height"					|single|"2.0"
- * - "agent_radius"					|single|"0.6"
- * - "agent_max_climb"				|single|"0.9"
- * - "agent_max_slope"				|single|"45.0"
- * - "region_min_size"				|single|"8"
- * - "region_merge_size"			|single|"20"
- * - "partition_type"				|single|"watershed" (values: watershed|monotone|layer)
- * - "edge_max_len"					|single|"12.0"
- * - "edge_max_error"				|single|"1.3"
- * - "verts_per_poly"				|single|"6.0"
- * - "detail_sample_dist"			|single|"6.0"
- * - "detail_sample_max_error"		|single|"1.0"
- * - "build_all_tiles"				|single|"false"
- * - "max_tiles"					|single|"128"
- * - "max_polys_per_tile"			|single|"32768"
- * - "tile_size"					|single|"32"
- * - "area_flags_cost"				|multiple|no default (each one specified as "area@flag1[:flag2...:flagN]@cost" note: flags are or-ed)
- * - "crowd_include_flags"			|single|no default (specified as "flag1[:flag2...:flagN]" note: flags are or-ed)
- * - "crowd_exclude_flags"			|single|no default (specified as "flag1[:flag2...:flagN]" note: flags are or-ed)
- * - "convex_volume"				|multiple|no default (each one specified as "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type")
- * - "offmesh_connection"			|multiple|no default (each one specified as	"xB,yB,zB:xE,yE,zE@bidirectional")
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *navmesh_type*					|single| *solo* | values: solo,tile,obstacle
+ * | *auto_setup*					|single| *true* | -
+ * | *cell_size*					|single| 0.3 | -
+ * | *cell_height*					|single| 0.2 | -
+ * | *agent_height*					|single| 2.0 | -
+ * | *agent_radius*					|single| 0.6 | -
+ * | *agent_max_climb*				|single| 0.9 | -
+ * | *agent_max_slope*				|single| 45.0 | -
+ * | *region_min_size*				|single| 8 | -
+ * | *region_merge_size*			|single| 20 | -
+ * | *partition_type*				|single| *watershed* | values: watershed,monotone,layer
+ * | *edge_max_len*					|single| 12.0 | -
+ * | *edge_max_error*				|single| 1.3 | -
+ * | *verts_per_poly*				|single| 6.0 | -
+ * | *detail_sample_dist*			|single| 6.0 | -
+ * | *detail_sample_max_error*		|single| 1.0 | -
+ * | *build_all_tiles*				|single| *false* | -
+ * | *max_tiles*					|single| 128 | -
+ * | *max_polys_per_tile*			|single| 32768 | -
+ * | *tile_size*					|single| 32 | -
+ * | *area_flags_cost*				|multiple| - | each one specified as "area@flag1[:flag2...:flagN]@cost" note: flags are or-ed
+ * | *crowd_include_flags*			|single| - | specified as "flag1[:flag2...:flagN]" note: flags are or-ed
+ * | *crowd_exclude_flags*			|single| - | specified as "flag1[:flag2...:flagN]" note: flags are or-ed
+ * | *convex_volume*				|multiple| - | each one specified as "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type"
+ * | *offmesh_connection*			|multiple| - | each one specified as	"xB,yB,zB:xE,yE,zE@bidirectional"
  *
  * \note parts inside [] are optional.\n
  */

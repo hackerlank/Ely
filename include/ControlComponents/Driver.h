@@ -63,34 +63,36 @@ class DriverTemplate;
  * no control through mouse movements.\n
  * All movements (but up and down) can be inverted (default: not inverted).
  *
- * XML Param(s):
- * - "enabled"  				|single|"true"
- * - "forward"  				|single|"enabled"
- * - "backward"  				|single|"enabled"
- * - "roll_left"  				|single|"enabled"
- * - "roll_right"  				|single|"enabled"
- * - "pitch_up"  				|single|"enabled"
- * - "pitch_down"  				|single|"enabled"
- * - "strafe_left"  			|single|"enabled"
- * - "strafe_right"  			|single|"enabled"
- * - "up"  						|single|"enabled"
- * - "down"  					|single|"enabled"
- * - "mouse_move"  				|single|"disabled"
- * - "mouse_enabled_h"  		|single|"false"
- * - "mouse_enabled_p"  		|single|"false"
- * - "speed_key"  				|single|"shift"
- * - "inverted_translation"  	|single|"false"
- * - "inverted_rotation"		|single|"false"
- * - "max_linear_speed"  		|single|"5.0"
- * - "max_angular_speed"  		|single|"5.0"
- * - "linear_accel"  			|single|"5.0"
- * - "angular_accel"  			|single|"5.0"
- * - "linear_friction"  		|single|"0.1"
- * - "angular_friction"  		|single|"0.1"
- * - "stop_threshold"	  		|single|"0.01"
- * - "fast_factor"  			|single|"5.0"
- * - "sens_x"  					|single|"0.2"
- * - "sens_y"  					|single|"0.2"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *enabled*  				|single| *true* | -
+ * | *forward*  				|single| *enabled* | -
+ * | *backward*  				|single| *enabled* | -
+ * | *roll_left*  				|single| *enabled* | -
+ * | *roll_right*  				|single| *enabled* | -
+ * | *pitch_up*  				|single| *enabled* | -
+ * | *pitch_down*  				|single| *enabled* | -
+ * | *strafe_left*  			|single| *enabled* | -
+ * | *strafe_right*  			|single| *enabled* | -
+ * | *up*  						|single| *enabled* | -
+ * | *down*  					|single| *enabled* | -
+ * | *mouse_move*  				|single| *disabled* | -
+ * | *mouse_enabled_h*  		|single| *false* | -
+ * | *mouse_enabled_p*  		|single| *false* | -
+ * | *speed_key*  				|single| *shift* | -
+ * | *inverted_translation*  	|single| *false* | -
+ * | *inverted_rotation*		|single| *false* | -
+ * | *max_linear_speed*  		|single| 5.0 | -
+ * | *max_angular_speed*  		|single| 5.0 | -
+ * | *linear_accel*  			|single| 5.0 | -
+ * | *angular_accel*  			|single| 5.0 | -
+ * | *linear_friction*  		|single| 0.1 | -
+ * | *angular_friction*  		|single| 0.1 | -
+ * | *stop_threshold*	  		|single| 0.01 | -
+ * | *fast_factor*  			|single| 5.0 | -
+ * | *sens_x*  					|single| 0.2 | -
+ * | *sens_y*  					|single| 0.2 | -
  *
  * \note parts inside [] are optional.\n
  */

@@ -54,13 +54,15 @@ typedef std::string ObjectId;
  * loaded at runtime from a dynamic linked library
  * (\see GameManager::GameDataInfo::INITIALIZATIONS).
  *
- * XML Param(s):
- * - "parent"  				|single|no default
- * - "store_params"			|single|"false"
- * - "is_steady"  			|single|"false"
- * - "pos"  				|single|"0.0,0.0,0.0"
- * - "rot"  				|single|"0.0,0.0,0.0"
- * - "init_func" 			|single|""
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *parent*  				|single| - | -
+ * | *store_params*			|single| *false* | -
+ * | *is_steady*  			|single| *false* | -
+ * | *pos*  				|single| 0.0,0.0,0.0 | -
+ * | *rot*  				|single| 0.0,0.0,0.0 | -
+ * | *init_func* 			|single| - | -
  *
  * \note The Object Model is based on the article "Game Object
  * Component System" by Chris Stoy in "Game Programming Gems 6" book.

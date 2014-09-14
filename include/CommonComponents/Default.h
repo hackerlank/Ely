@@ -35,7 +35,10 @@ class DefaultTemplate;
  *
  * It could be useful for attaching events' callbacks.
  *
- * XML Param(s):
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | - | - | - | -
  *
  * \note parts inside [] are optional.\n
  */

@@ -148,7 +148,7 @@ bool SteerVehicle::initialize()
 	}
 	else
 	{
-		///default: one_turning
+		//default: one_turning
 		not mExternalUpdate ?
 				mVehicle = new OneTurning<SteerVehicle> :
 				mVehicle = new ExternalOneTurning<SteerVehicle>;
@@ -259,7 +259,7 @@ void SteerVehicle::onAddToObjectSetup()
 	//set the bullet physics
 	mBulletWorld = GamePhysicsManager::GetSingletonPtr()->bulletWorld();
 
-	///set thrown events if any
+	//set thrown events if any
 	std::string param;
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;
@@ -409,7 +409,7 @@ void SteerVehicle::onAddToSceneSetup()
 	//set SteerPlugIn object (if any)
 	SMARTPTR(Object)steerPlugInObject =
 			ObjectTemplateManager::GetSingleton().getCreatedObject(mSteerPlugInObjectId);
-	///Add to SteerPlugIn update
+	//Add to SteerPlugIn update
 	if (steerPlugInObject)
 	{
 		SMARTPTR(Component)aiComp = steerPlugInObject->getComponent(familyType());
@@ -426,7 +426,7 @@ void SteerVehicle::onRemoveFromSceneCleanup()
 	//lock (guard) the SteerVehicle SteerPlugIn mutex
 	HOLD_REMUTEX(mSteerPlugInMutex)
 
-	///Remove from SteerPlugIn update (if previously added)
+	//Remove from SteerPlugIn update (if previously added)
 	//mSteerPlugIn will be cleared during removing, so
 	//remove through a temporary pointer
 	SMARTPTR(SteerPlugIn) steerPlugIn = mSteerPlugIn;

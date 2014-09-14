@@ -54,36 +54,38 @@ class VehicleTemplate;
  * the fps and the frequency specified (which defaults to 30 times per seconds).\n
  * The argument of each event is a reference to this component.\n
  *
- * XML Param(s):
- * - "thrown_events"				|single|no default (specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move|steady)
- * - "up_axis"						|single|"z" (values: x|y|z)
- * - "wheels_number"  				|single|"4" (== N)
- * - "wheel_object_template"		|single|no default
- * - "wheel_model"  				|single|no default (specified as "model1[,model2,...,modelN]")
- * - "wheel_scale"  				|single|"1.0" (specified as "scale1[,scale2,...,scaleN]")
- * - "wheel_is_front"				|single|"false" (specified as "bool1[,bool2,...,boolN]")
- * - "wheel_set_steering"			|single|"false" (specified as "bool1[,bool2,...,boolN]")
- * - "wheel_apply_engine_force"		|single|"false" (specified as "bool1[,bool2,...,boolN]")
- * - "wheel_set_brake"				|single|"false" (specified as "bool1[,bool2,...,boolN]")
- * - "wheel_connection_point_ratio"	|single|"1.0,1.0,1.0" (specified as "rx1,ry1,rz1[$rx2,ry2,rz2$...$rxN,ryN,rzN]" with connectionPointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z)
- * - "wheel_axle"					|single|"1.0,0.0,0.0" (specified as "ax1,ay1,az1[$ax2,ay2,az2$...$axN,ayN,azN]")
- * - "wheel_direction"				|single|"0.0,0.0,-1.0" (specified as "dx1,dy1,dz1[$dx2,dy2,dz2$...$dxN,dyN,dzN]")
- * - "wheel_suspension_travel"		|single|"40.0" (specified as "st1[,st2,...,stN]")
- * - "wheel_suspension_stiffness"	|single|"40.0" (specified as "ss1[,ss2,...,ssN]")
- * - "wheel_damping_relaxation"		|single|"2.0"  (specified as "dr1[,dr2,...,drN]")
- * - "wheel_damping_compression"	|single|"4.0"  (specified as "dc1[,dc2,...,dcN]")
- * - "wheel_friction_slip"			|single|"100.0"  (specified as "fs1[,fs2,...,fsN]")
- * - "wheel_roll_influence"			|single|"0.1"  (specified as "ri1[,ri1,...,riN]")
- * - "max_engine_force"				|single|no default
- * - "max_brake"					|single|no default
- * - "steering_clamp"				|single|"45.0" (in degree)
- * - "steering_increment"			|single|"120.0" (in degree/sec)
- * - "steering_decrement"			|single|"60.0" (in degree/sec)
- * - "forward"  					|single|"enabled"
- * - "backward"  					|single|"enabled"
- * - "brake"  						|single|"enabled"
- * - "turn_left"					|single|"enabled"
- * - "turn_right"  					|single|"enabled"
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *thrown_events*				|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move,steady
+ * | *up_axis*						|single| *z* | values: x,y,z
+ * | *wheels_number*  				|single| 4 | == N
+ * | *wheel_object_template*		|single| - | -
+ * | *wheel_model*  				|single| - | specified as "model1[,model2,...,modelN]"
+ * | *wheel_scale*  				|single| 1.0 | specified as "scale1[,scale2,...,scaleN]"
+ * | *wheel_is_front*				|single| *false* | specified as "bool1[,bool2,...,boolN]"
+ * | *wheel_set_steering*			|single| *false* | specified as "bool1[,bool2,...,boolN]"
+ * | *wheel_apply_engine_force*		|single| *false* | specified as "bool1[,bool2,...,boolN]"
+ * | *wheel_set_brake*				|single| *false* | specified as "bool1[,bool2,...,boolN]"
+ * | *wheel_connection_point_ratio*	|single| 1.0,1.0,1.0 | specified as "rx1,ry1,rz1[$rx2,ry2,rz2$...$rxN,ryN,rzN]" with connectionPointX,Y,Z=chassisCenterX,Y,Z + chassisHalfDimX,Y,Z * rX,Y,Z
+ * | *wheel_axle*					|single| 1.0,0.0,0.0 | specified as "ax1,ay1,az1[$ax2,ay2,az2$...$axN,ayN,azN]"
+ * | *wheel_direction*				|single| 0.0,0.0,-1.0 | specified as "dx1,dy1,dz1[$dx2,dy2,dz2$...$dxN,dyN,dzN]"
+ * | *wheel_suspension_travel*		|single| 40.0 | specified as "st1[,st2,...,stN]"
+ * | *wheel_suspension_stiffness*	|single| 40.0 | specified as "ss1[,ss2,...,ssN]"
+ * | *wheel_damping_relaxation*		|single| 2.0 | specified as "dr1[,dr2,...,drN]"
+ * | *wheel_damping_compression*	|single| 4.0 | specified as "dc1[,dc2,...,dcN]"
+ * | *wheel_friction_slip*			|single| 100.0 | specified as "fs1[,fs2,...,fsN]"
+ * | *wheel_roll_influence*			|single| 0.1 | specified as "ri1[,ri1,...,riN]"
+ * | *max_engine_force*				|single| - | -
+ * | *max_brake*					|single| - | -
+ * | *steering_clamp*				|single| 45.0 | in degree
+ * | *steering_increment*			|single| 120.0 | in degree/sec
+ * | *steering_decrement*			|single| 60.0 | in degree/sec
+ * | *forward*  					|single| *enabled* | -
+ * | *backward*  					|single| *enabled* | -
+ * | *brake*  						|single| *enabled* | -
+ * | *turn_left*					|single| *enabled* | -
+ * | *turn_right*  					|single| *enabled* | -
  *
  * \note parts inside [] are optional.\n
  */

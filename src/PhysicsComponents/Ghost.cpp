@@ -400,7 +400,7 @@ void Ghost::onAddToObjectSetup()
 	//set this rigid body node path as the object's one
 	mOwnerObject->setNodePath(mNodePath);
 
-	///set thrown events if any
+	//set thrown events if any
 	std::string param;
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;

@@ -66,7 +66,7 @@ GameManager::~GameManager()
 
 void GameManager::gameSetup()
 {
-	///<DEFAULT CAMERA CONTROL>
+	//<DEFAULT CAMERA CONTROL>
 //	mWindow->setup_trackball(); // Enable default camera movement
 //	mTrackBall = mWindow->get_mouse().find("**/+Trackball");
 //  mMouse2cam = mTrackBall.find("**/+Transform2SG");
@@ -77,7 +77,7 @@ void GameManager::gameSetup()
 //	cameraMat.invert_in_place();
 //	SMARTPTR(Trackball)trackBall = DCAST(Trackball, mTrackBall.node());
 //	trackBall->set_mat(cameraMat);
-	///</DEFAULT CAMERA CONTROL>
+	//</DEFAULT CAMERA CONTROL>
 
 #ifdef ELY_DEBUG
 	GamePhysicsManager::GetSingletonPtr()->initDebug(mWindow);
@@ -121,7 +121,7 @@ void GameManager::setupCompTmplMgr()
 {
 	// Add all kind of component templates
 
-	///AI templates
+	//AI templates
 	//CrowdAgent
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new CrowdAgentTemplate(this, mWindow));
@@ -135,7 +135,7 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new SteerVehicleTemplate(this, mWindow));
 
-	///Audio templates
+	//Audio templates
 	//Listener
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ListenerTemplate(this, mWindow));
@@ -143,16 +143,16 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new Sound3dTemplate(this, mWindow));
 
-	///Behavior templates
+	//Behavior templates
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ActivityTemplate(this, mWindow));
 
-	///Common templates
+	//Common templates
 	//Default
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new DefaultTemplate(this, mWindow));
 
-	///Control templates
+	//Control templates
 	//Chaser
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new ChaserTemplate(this, mWindow));
@@ -161,7 +161,7 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new DriverTemplate(this, mWindow));
 
-	///Physics templates
+	//Physics templates
 	//Ghost
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new GhostTemplate(this, mWindow));
@@ -172,7 +172,7 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new SoftBodyTemplate(this, mWindow));
 
-	///PhysicsControl templates
+	//PhysicsControl templates
 	//Character
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new CharacterControllerTemplate(this, mWindow));
@@ -180,7 +180,7 @@ void GameManager::setupCompTmplMgr()
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new VehicleTemplate(this, mWindow));
 
-	///Scene templates
+	//Scene templates
 	//InstanceOf
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new InstanceOfTemplate(this, mWindow));
@@ -238,7 +238,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		throw GameException(
 				"GameManager::setupGameWorld: No <Game> in " + gameWorldXML);
 	}
-	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////
 	//<!-- Object Templates Definition -->
 	//Setup object template manager
 	PRINT_DEBUG("Setting up Object Template Manager");
@@ -331,7 +331,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 		// add 'type' object template to manager
 		ObjectTemplateManager::GetSingleton().addObjectTemplate(objTmplPtr);
 	}
-	//////////////////////////////////////////////////////////////
+	//////////////////////////////////////////
 	//<!-- Objects Creation -->
 	//Create game objects
 	PRINT_DEBUG("Creating Game Objects");
@@ -417,7 +417,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 								attributeTAG->Value()));
 			}
 		}
-		//////////////////////////////////////////////////////////////
+		//////////////////////////////////////////
 		//set parameters for the object
 		PRINT_DEBUG( "    Initializing object '" <<
 				(objIdTAG != NULL ? objIdTAG : "UNNAMED") << "' itself" );
@@ -440,7 +440,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 					ParameterTable::value_type(attributeTAG->Name(),
 							attributeTAG->Value()));
 		}
-		//////////////////////////////////////////////////////////////
+		//////////////////////////////////////////
 		//create the object actually
 		SMARTPTR(Object)objectPtr;
 		if ((objIdTAG != NULL) and (std::string(objIdTAG) != std::string("")))

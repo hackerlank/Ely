@@ -135,7 +135,7 @@ AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 		//lock (guard) the mutex
 		HOLD_REMUTEX(mMutex)
 
-		///XXX: HACK
+		//XXX: HACK
 		if (mStartFrame > 0)
 		{
 			--mStartFrame;
