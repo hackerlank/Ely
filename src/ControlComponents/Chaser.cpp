@@ -253,31 +253,6 @@ Chaser::Result Chaser::enable()
 
 void Chaser::doEnable()
 {
-	//check kinematic parameters
-	if (mAbsMaxDistance < 0.0)
-	{
-		mAbsMaxDistance = 0.0;
-	}
-	if ((mAbsMinDistance > mAbsMaxDistance) or (mAbsMinDistance < 0.0))
-	{
-		mAbsMinDistance = mAbsMaxDistance;
-	}
-	if (mAbsMaxHeight < 0.0)
-	{
-		mAbsMaxHeight = 0.0;
-	}
-	if ((mAbsMinHeight > mAbsMaxHeight) or (mAbsMinHeight < 0.0))
-	{
-		mAbsMinHeight = mAbsMaxHeight;
-	}
-	if (mAbsLookAtDistance < 0.0)
-	{
-		mAbsLookAtDistance = 0.0;
-	}
-	if (mAbsLookAtHeight < 0.0)
-	{
-		mAbsLookAtHeight = 0.0;
-	}
 	//check if backward located
 	float sign = (mBackward ? 1.0 : -1.0);
 	//set chaser position (wrt chased node)

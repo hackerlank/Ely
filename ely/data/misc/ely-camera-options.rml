@@ -102,6 +102,7 @@
 								<!-- <option selected value="DUMMY">DUMMY</option> -->
 						</select> chased object<br />
 						<input id="fixed_relative_position" type="checkbox" name="fixed_relative_position" value="true" checked="true" /> fixed relative position<br />
+						<input id="backward" type="checkbox" name="backward" value="true" checked="true" /> backward<br />
 						<input id="abs_max_distance" type="range" name="abs_max_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs max distance<br />
 						<input id="abs_min_distance" type="range" name="abs_min_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs min distance<br />
 						<input id="abs_max_height" type="range" name="abs_max_height" value="0.0" min="0.0" max="50.0" step="1.0" orientation="horizontal" /> abs max height<br />

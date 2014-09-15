@@ -306,6 +306,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//fixed relative position
 				setElementChecked("fixed_relative_position", "true", "false",
 						"true", cameraChaserParams, cameraOptionsMenu);
+				//backward
+				setElementChecked("backward", "true", "false",
+						"true", cameraChaserParams, cameraOptionsMenu);
 				//abs max distance
 				setElementValue("abs_max_distance", cameraChaserParams,
 						cameraOptionsMenu);
@@ -413,6 +416,9 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//fixed relative position
 				setOptionChecked(event, "fixed_relative_position", "true",
 						"false", cameraChaserParams);
+				//backward
+				setOptionChecked(event, "backward", "true", "false",
+						cameraChaserParams);
 				//abs max distance
 				setOptionValue(event, "abs_max_distance", cameraChaserParams);
 				//abs min distance

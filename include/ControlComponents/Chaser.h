@@ -307,7 +307,8 @@ inline void Chaser::setAbsMaxDistance(float absMaxDistance)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAbsMaxDistance = absMaxDistance;
+	absMaxDistance >= 0.0 ? mAbsMaxDistance = absMaxDistance : mAbsMaxDistance =
+									-absMaxDistance;
 }
 
 inline float Chaser::getAbsMinDistance() const
@@ -323,7 +324,8 @@ inline void Chaser::setAbsMinDistance(float absMinDistance)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAbsMinDistance = absMinDistance;
+	absMinDistance >= 0.0 ? mAbsMinDistance = absMinDistance : mAbsMinDistance =
+									-absMinDistance;
 }
 
 inline float Chaser::getAbsMaxHeight() const
@@ -339,7 +341,8 @@ inline void Chaser::setAbsMaxHeight(float absMaxHeight)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAbsMaxHeight = absMaxHeight;
+	absMaxHeight >= 0.0 ? mAbsMaxHeight = absMaxHeight : mAbsMaxHeight =
+									-absMaxHeight;
 }
 
 inline float Chaser::getAbsMinHeight() const
@@ -355,7 +358,8 @@ inline void Chaser::setAbsMinHeight(float absMinHeight)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAbsMinHeight = absMinHeight;
+	absMinHeight >= 0.0 ? mAbsMinHeight = absMinHeight : mAbsMinHeight =
+									-absMinHeight;
 }
 
 inline float Chaser::getAbsLookAtDistance() const
@@ -371,7 +375,8 @@ inline void Chaser::setAbsLookAtDistance(float absLookAtDistance)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAbsLookAtDistance = absLookAtDistance;
+	absLookAtDistance >= 0.0 ? mAbsLookAtDistance = absLookAtDistance : mAbsLookAtDistance =
+									-absLookAtDistance;
 }
 
 inline float Chaser::getAbsLookAtHeight() const
@@ -387,15 +392,8 @@ inline void Chaser::setAbsLookAtHeight(float absLookAtHeight)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mAbsLookAtHeight = absLookAtHeight;
-}
-
-inline void Chaser::setFriction(float friction)
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	mFriction = friction;
+	absLookAtHeight >= 0.0 ? mAbsLookAtHeight = absLookAtHeight : mAbsLookAtHeight =
+									-absLookAtHeight;
 }
 
 inline float Chaser::getFriction() const
@@ -404,6 +402,15 @@ inline float Chaser::getFriction() const
 	HOLD_REMUTEX(mMutex)
 
 	return mFriction;
+}
+
+inline void Chaser::setFriction(float friction)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	friction >= 0.0 ? mFriction = friction : mFriction =
+									-friction;
 }
 
 inline void Chaser::enableHeadLeft(bool enable)
