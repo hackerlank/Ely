@@ -83,8 +83,8 @@
 					<input id="free_view_camera" type="radio" name="camera" value="free_view_camera" onchange="camera::free_view_camera::options" /> <strong>Free View Camera</strong><br />
 					<!--options -->
 					<p id="free_view_camera_options" style="display: none;">
-						<input id="pitch_limit" type="checkbox" name="pitch_limit" value="false" onchange="pitch_limit::change"/> pitch limit:
-							<input id="pitch_limit_value" type="range" name="pitch_limit_value" value="90.0" min="0.0" max="90.0" step="1.0" orientation="horizontal" disabled="true" /><br />
+						<input id="pitch_limit" type="checkbox" name="pitch_limit" value="true" onchange="pitch_limit::change"/> pitch limit:
+							<input id="pitch_limit_value" type="range" name="pitch_limit_value" value="60.0" min="0.0" max="90.0" step="1.0" orientation="horizontal" disabled="true" /><br />
 						<input id="max_linear_speed" type="range" name="max_linear_speed" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> max linear speed<br />
 						<input id="max_angular_speed" type="range" name="max_angular_speed" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> max angular speed<br />
 						<input id="linear_accel" type="range" name="linear_accel" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> linear accel<br />
@@ -103,8 +103,8 @@
 						<select id="chased_object" name="chased_object"  style="margin-right: -6px; margin-bottom: -11px;">
 								<!-- <option selected value="DUMMY">DUMMY</option> -->
 						</select> chased object<br />
-						<input id="fixed_relative_position" type="checkbox" name="fixed_relative_position" value="false" /> fixed relative position<br />
-						<input id="backward" type="checkbox" name="backward" value="false" /> backward<br />
+						<input id="fixed_relative_position" type="checkbox" name="fixed_relative_position" value="true" /> fixed relative position<br />
+						<input id="backward" type="checkbox" name="backward" value="true" /> backward<br />
 						<input id="abs_max_distance" type="range" name="abs_max_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs max distance<br />
 						<input id="abs_min_distance" type="range" name="abs_min_distance" value="0.0" min="0.0" max="100.0" step="1.0" orientation="horizontal" /> abs min distance<br />
 						<input id="abs_max_height" type="range" name="abs_max_height" value="0.0" min="0.0" max="50.0" step="1.0" orientation="horizontal" /> abs max height<br />

@@ -194,10 +194,7 @@ inline void setElementValue(const std::string& param, float value,
 		Rocket::Core::ElementDocument *document)
 {
 	Rocket::Core::Element *inputElem = document->GetElementById(param.c_str());
-	if (inputElem)
-	{
-		inputElem->SetAttribute<float>("value", value);
-	}
+	inputElem->SetAttribute<float>("value", value);
 }
 
 //event handler added to the main one
