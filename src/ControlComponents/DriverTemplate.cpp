@@ -79,8 +79,10 @@ void DriverTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("enabled", "true"));
 	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
 	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
-	mParameterTable.insert(ParameterNameValue("roll_left", "enabled"));
-	mParameterTable.insert(ParameterNameValue("roll_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
+	mParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
 	mParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
 	mParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
 	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));

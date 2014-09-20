@@ -212,7 +212,7 @@ private:
 	///@}
 	///@{
 	/// Sensitivity settings.
-	float mSensX, mSensY, mRollSensX, mRollSensY;
+	float mSensX, mSensY, mHeadSensX, mHeadSensY;
 	int mCentX, mCentY;
 	///@}
 

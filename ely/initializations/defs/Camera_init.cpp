@@ -215,6 +215,25 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			{
 				free_view_camera_options->SetProperty("display", "block");
 				//set elements' values from options' values
+
+				///TODO set checked
+				//pitch limit and value: enabled@limit
+				std::vector<std::string> paramValuesStr = parseCompoundString(
+						(*cameraDriverParams.find("pitch_limit")).second, '@');
+				Rocket::Controls::ElementFormControlInput *inputElem =
+						dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+								"pitch_limit"));
+				if (inputElem)
+				{
+					inputElem->SetValue(paramValuesStr[0].c_str());
+				}
+				inputElem =
+						dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+								"pitch_limit_value"));
+				if (inputElem)
+				{
+					inputElem->SetValue(paramValuesStr[1].c_str());
+				}
 				//max linear speed
 				setElementValue("max_linear_speed", cameraDriverParams,
 						cameraOptionsMenu);
@@ -237,9 +256,11 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				setElementValue("fast_factor", cameraDriverParams,
 						cameraOptionsMenu);
 				//sens_x
-				setElementValue("sens_x", cameraDriverParams, cameraOptionsMenu);
+				setElementValue("sens_x", cameraDriverParams,
+						cameraOptionsMenu);
 				//sens_y
-				setElementValue("sens_y", cameraDriverParams, cameraOptionsMenu);
+				setElementValue("sens_y", cameraDriverParams,
+						cameraOptionsMenu);
 			}
 		}
 	}
@@ -366,6 +387,23 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			}
 		}
 	}
+	else if (value == "pitch_limit::change")
+	{
+		Rocket::Core::ElementDocument* cameraOptionsMenu =
+				event.GetTargetElement()->GetOwnerDocument();
+		//check
+		if (dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+				"pitch_limit"))->GetAttribute("checked"))
+		{
+			dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+					"pitch_limit_value"))->SetDisabled(false);
+		}
+		else
+		{
+			dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
+					"pitch_limit_value"))->SetDisabled(true);
+		}
+	}
 	///Submit
 	else if (value == "camera::form::submit_options")
 	{
@@ -382,6 +420,13 @@ void rocketEventHandler(const Rocket::Core::String& value,
 			{
 				cameraType = free_view_camera;
 				//set options' values from elements' values
+				//pitch limit and value: enabled@limit
+				(*cameraDriverParams.find("pitch_limit")).second = (
+						event.GetParameter<Rocket::Core::String>("pitch_limit",
+								"").CString() == "true" ? "true" : "false")
+						+ std::string("@")
+						+ event.GetParameter<Rocket::Core::String>(
+								"pitch_limit_value", "0.0").CString();
 				//max linear speed
 				setOptionValue(event, "max_linear_speed", cameraDriverParams);
 				//max angular speed
@@ -650,6 +695,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	gRocketEventHandlers["camera::free_view_camera::options"] = &rocketEventHandler;
 	gRocketEventHandlers["camera::chaser_camera::options"] = &rocketEventHandler;
 	gRocketEventHandlers["camera::object_picker::options"] = &rocketEventHandler;
+	gRocketEventHandlers["pitch_limit::change"] = &rocketEventHandler;
 	//register the preset function to main menu
 	gRocketPresetFunctions.push_back(&rocketPreset);
 	//register the commit function to main menu

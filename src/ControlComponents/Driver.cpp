@@ -65,7 +65,7 @@ bool Driver::initialize()
 	//enabling setting
 	mStartEnabled = (
 			mTmpl->parameter(std::string("enabled")) == std::string("false") ?
-					 false : true);
+					false : true);
 	//inverted setting
 	mSignOfTranslation = (
 			mTmpl->parameter(std::string("inverted_translation"))
@@ -73,6 +73,32 @@ bool Driver::initialize()
 	mSignOfMouse = (
 			mTmpl->parameter(std::string("inverted_rotation"))
 					== std::string("true") ? -1 : 1);
+	//head limit: enabled@[limit]
+	std::vector<std::string> paramValuesStr = parseCompoundString(
+			mTmpl->parameter(std::string("head_limit")), '@');
+	if (paramValuesStr.size() >= 2)
+	{
+		//enabled
+		mHeadLimitEnabled = (
+				paramValuesStr[0] == std::string("true") ? true : false);
+		float value;
+		//limit
+		value = strtof(paramValuesStr[1].c_str(), NULL);
+		value >= 0.0 ? mHLimit = value : mHLimit = -value;
+	}
+	//pitch limit: enabled@[limit]
+	paramValuesStr = parseCompoundString(
+			mTmpl->parameter(std::string("pitch_limit")), '@');
+	if (paramValuesStr.size() >= 2)
+	{
+		//enabled
+		mPitchLimitEnabled = (
+				paramValuesStr[0] == std::string("true") ? true : false);
+		float value;
+		//limit
+		value = strtof(paramValuesStr[1].c_str(), NULL);
+		value >= 0.0 ? mPLimit = value : mPLimit = -value;
+	}
 	//mouse movement setting
 	mMouseEnabledH = (
 			mTmpl->parameter(std::string("mouse_enabled_h"))
@@ -91,8 +117,8 @@ bool Driver::initialize()
 					false : true);
 	//forward key
 	mForwardKey = (
-			mTmpl->parameter(std::string("forward")) == std::string("disabled") ?
-					false : true);
+			mTmpl->parameter(std::string("forward"))
+					== std::string("disabled") ? false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
 			mTmpl->parameter(std::string("strafe_left"))
@@ -101,13 +127,13 @@ bool Driver::initialize()
 	mStrafeRightKey = (
 			mTmpl->parameter(std::string("strafe_right"))
 					== std::string("disabled") ? false : true);
-	//rollLeft key
-	mRollLeftKey = (
-			mTmpl->parameter(std::string("roll_left"))
+	//headLeft key
+	mHeadLeftKey = (
+			mTmpl->parameter(std::string("head_left"))
 					== std::string("disabled") ? false : true);
-	//rollRight key
-	mRollRightKey = (
-			mTmpl->parameter(std::string("roll_right"))
+	//headRight key
+	mHeadRightKey = (
+			mTmpl->parameter(std::string("head_right"))
 					== std::string("disabled") ? false : true);
 	//pitchUp key
 	mPitchUpKey = (
@@ -162,10 +188,12 @@ bool Driver::initialize()
 	mActualSpeedH = 0.0;
 	mActualSpeedP = 0.0;
 	//linear friction
-	value = strtof(mTmpl->parameter(std::string("linear_friction")).c_str(), NULL);
+	value = strtof(mTmpl->parameter(std::string("linear_friction")).c_str(),
+			NULL);
 	mFrictionXYZ = (value >= 0.0 ? value : -value);
 	//angular friction
-	value = strtof(mTmpl->parameter(std::string("angular_friction")).c_str(), NULL);
+	value = strtof(mTmpl->parameter(std::string("angular_friction")).c_str(),
+			NULL);
 	mFrictionHP = (value >= 0.0 ? value : -value);
 	//stop threshold [0.0, 1.0]
 	value = strtof(mTmpl->parameter(std::string("stop_threshold")).c_str(),
@@ -377,10 +405,46 @@ void Driver::update(void* data)
 			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
 	ownerNodePath.set_z(ownerNodePath,
 			mActualSpeedXYZ.get_z() * dt);
-	ownerNodePath.set_h(ownerNodePath.get_h()
-			+ mActualSpeedH * dt * mSignOfMouse);
-	ownerNodePath.set_p(ownerNodePath.get_p()
-			+ mActualSpeedP * dt * mSignOfMouse);
+	//head
+	if (mHeadLimitEnabled)
+	{
+		float head = ownerNodePath.get_h()
+				+ mActualSpeedH * dt * mSignOfMouse;
+		if (head > mHLimit)
+		{
+			head = mHLimit;
+		}
+		else if(head < -mHLimit)
+		{
+			head = -mHLimit;
+		}
+		ownerNodePath.set_h(head);
+	}
+	else
+	{
+		ownerNodePath.set_h(ownerNodePath.get_h()
+				+ mActualSpeedH * dt * mSignOfMouse);
+	}
+	//pitch
+	if (mPitchLimitEnabled)
+	{
+		float pitch = ownerNodePath.get_p()
+						+ mActualSpeedP * dt * mSignOfMouse;
+		if (pitch > mPLimit)
+		{
+			pitch = mPLimit;
+		}
+		else if(pitch < -mPLimit)
+		{
+			pitch = -mPLimit;
+		}
+		ownerNodePath.set_p(pitch);
+	}
+	else
+	{
+		ownerNodePath.set_p(ownerNodePath.get_p()
+				+ mActualSpeedP * dt * mSignOfMouse);
+	}
 
 	//update speeds
 	float kLinearReductFactor = mFrictionXYZ * dt;
@@ -551,7 +615,7 @@ void Driver::update(void* data)
 		}
 	}
 	//rotation h
-	if (mRollLeft and (not mRollRight))
+	if (mHeadLeft and (not mHeadRight))
 	{
 		if(mAccelHP != 0)
 		{
@@ -569,7 +633,7 @@ void Driver::update(void* data)
 			mActualSpeedH = mMaxSpeedHP;
 		}
 	}
-	else if (mRollRight and (not mRollLeft))
+	else if (mHeadRight and (not mHeadLeft))
 	{
 		if(mAccelHP != 0)
 		{

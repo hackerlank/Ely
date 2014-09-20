@@ -48,12 +48,12 @@ CALLBACK fast_strafe_left_Driver_Camera;
 CALLBACK strafe_right_Driver_Camera;
 CALLBACK stop_strafe_right_Driver_Camera;
 CALLBACK fast_strafe_right_Driver_Camera;
-CALLBACK roll_left_Driver_Camera;
-CALLBACK stop_roll_left_Driver_Camera;
-CALLBACK fast_roll_left_Driver_Camera;
-CALLBACK roll_right_Driver_Camera;
-CALLBACK stop_roll_right_Driver_Camera;
-CALLBACK fast_roll_right_Driver_Camera;
+CALLBACK head_left_Driver_Camera;
+CALLBACK stop_head_left_Driver_Camera;
+CALLBACK fast_head_left_Driver_Camera;
+CALLBACK head_right_Driver_Camera;
+CALLBACK stop_head_right_Driver_Camera;
+CALLBACK fast_head_right_Driver_Camera;
 CALLBACK pitch_up_Driver_Camera;
 CALLBACK stop_pitch_up_Driver_Camera;
 CALLBACK fast_pitch_up_Driver_Camera;
@@ -205,45 +205,45 @@ void fast_strafe_right_Driver_Camera(const Event* event, void* data)
 	fast_Driver_Camera(event, data);
 	strafe_right_Driver_Camera(event, data);
 }
-//roll_left:stop-roll_left:fast-roll_left
-void roll_left_Driver_Camera(const Event* event, void* data)
+//head_left:stop-head_left:fast-head_left
+void head_left_Driver_Camera(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
 
-	cameraDrv->enableRollLeft(true);
+	cameraDrv->enableHeadLeft(true);
 }
-void stop_roll_left_Driver_Camera(const Event* event, void* data)
+void stop_head_left_Driver_Camera(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
 
-	cameraDrv->enableRollLeft(false);
+	cameraDrv->enableHeadLeft(false);
 }
-void fast_roll_left_Driver_Camera(const Event* event, void* data)
+void fast_head_left_Driver_Camera(const Event* event, void* data)
 {
 	fast_Driver_Camera(event, data);
-	roll_left_Driver_Camera(event, data);
+	head_left_Driver_Camera(event, data);
 }
-//roll_right:stop-roll_right:fast-roll_right
-void roll_right_Driver_Camera(const Event* event, void* data)
+//head_right:stop-head_right:fast-head_right
+void head_right_Driver_Camera(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
 
-	cameraDrv->enableRollRight(true);
+	cameraDrv->enableHeadRight(true);
 }
-void stop_roll_right_Driver_Camera(const Event* event, void* data)
+void stop_head_right_Driver_Camera(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)cameraDrv = reinterpret_cast<Driver*>(data);
 
-	cameraDrv->enableRollRight(false);
+	cameraDrv->enableHeadRight(false);
 }
-void fast_roll_right_Driver_Camera(const Event* event, void* data)
+void fast_head_right_Driver_Camera(const Event* event, void* data)
 {
 	fast_Driver_Camera(event, data);
-	roll_right_Driver_Camera(event, data);
+	head_right_Driver_Camera(event, data);
 }
 //pitch_up:stop-pitch_up:fast-pitch_up
 void pitch_up_Driver_Camera(const Event* event, void* data)

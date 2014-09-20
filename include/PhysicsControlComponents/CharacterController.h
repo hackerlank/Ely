@@ -73,8 +73,8 @@ class CharacterControllerTemplate;
  * | *backward*  				|single| *enabled* | -
  * | *up*  						|single| *enabled* | -
  * | *down*  					|single| *enabled* | -
- * | *roll_left*  				|single| *enabled* | -
- * | *roll_right*  				|single| *enabled* | -
+ * | *head_left*  				|single| *enabled* | -
+ * | *head_right*  				|single| *enabled* | -
  * | *strafe_left*  			|single| *enabled* | -
  * | *strafe_right*  			|single| *enabled* | -
  * | *jump*  					|single| *enabled* | -
@@ -131,10 +131,10 @@ public:
 	bool isStrafeLeftEnabled();
 	void enableStrafeRight(bool enable);
 	bool isStrafeRightEnabled();
-	void enableRollLeft(bool enable);
-	bool isRollLeftEnabled();
-	void enableRollRight(bool enable);
-	bool isRollRightEnabled();
+	void enableHeadLeft(bool enable);
+	bool isHeadLeftEnabled();
+	void enableHeadRight(bool enable);
+	bool isHeadRightEnabled();
 	void enableJump(bool enable);
 	bool isJumpEnabled();
 	///@}
@@ -231,9 +231,9 @@ private:
 	 */
 	void doSetControlParameters();
 	///Key controls and effective keys.
-	bool mForward, mBackward, mUp, mDown, mStrafeLeft, mStrafeRight,mRollLeft, mRollRight, mJump;
+	bool mForward, mBackward, mUp, mDown, mStrafeLeft, mStrafeRight,mHeadLeft, mHeadRight, mJump;
 	bool mForwardKey, mBackwardKey, mUpKey, mDownKey, mStrafeLeftKey, mStrafeRightKey,
-	mRollLeftKey, mRollRightKey, mJumpKey;
+	mHeadLeftKey, mHeadRightKey, mJumpKey;
 	///@}
 
 	/**
@@ -295,9 +295,9 @@ inline void CharacterController::reset()
 	mLinearSpeed = LVector3f::zero();
 	mIsLocal = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
-			mRollLeft = mRollRight = mJump = false;
+			mHeadLeft = mHeadRight = mJump = false;
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey, mDownKey =
-			mRollLeftKey = mRollRightKey = mJumpKey = false;
+			mHeadLeftKey = mHeadRightKey = mJumpKey = false;
 	mOnGround = mInAir = ThrowEventData();
 }
 
@@ -415,42 +415,42 @@ inline bool CharacterController::isStrafeRightEnabled()
 	return mStrafeRight;
 }
 
-inline void CharacterController::enableRollLeft(bool enable)
+inline void CharacterController::enableHeadLeft(bool enable)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if (mRollLeftKey)
+	if (mHeadLeftKey)
 	{
-		mRollLeft = enable;
+		mHeadLeft = enable;
 	}
 }
 
-inline bool CharacterController::isRollLeftEnabled()
+inline bool CharacterController::isHeadLeftEnabled()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mRollLeft;
+	return mHeadLeft;
 }
 
-inline void CharacterController::enableRollRight(bool enable)
+inline void CharacterController::enableHeadRight(bool enable)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if (mRollRightKey)
+	if (mHeadRightKey)
 	{
-		mRollRight = enable;
+		mHeadRight = enable;
 	}
 }
 
-inline bool CharacterController::isRollRightEnabled()
+inline bool CharacterController::isHeadRightEnabled()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mRollRight;
+	return mHeadRight;
 }
 
 inline void CharacterController::enableJump(bool enable)

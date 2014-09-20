@@ -143,12 +143,12 @@ bool Chaser::initialize()
 	value = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
 	NULL);
 	mSensX = (value >= 0.0 ? value : -value);
-	mRollSensX = mSensX * 375.0;
+	mHeadSensX = mSensX * 375.0;
 	//sens y
 	value = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
 	NULL);
 	mSensY = (value >= 0.0 ? value : -value);
-	mRollSensY = mSensY * 375.0;
+	mHeadSensY = mSensY * 375.0;
 	//
 	return result;
 }
@@ -441,22 +441,22 @@ void Chaser::update(void* data)
 		//handle keys:
 		if (mHeadLeft and (not mHeadRight))
 		{
-			deltaH += mRollSensX * dt * mSignOfMouse;
+			deltaH += mHeadSensX * dt * mSignOfMouse;
 			wantRotate = true;
 		}
 		else if (mHeadRight and (not mHeadLeft))
 		{
-			deltaH -= mRollSensX * dt * mSignOfMouse;
+			deltaH -= mHeadSensX * dt * mSignOfMouse;
 			wantRotate = true;
 		}
 		if (mPitchUp and (not mPitchDown))
 		{
-			deltaP += mRollSensY * dt * mSignOfMouse;
+			deltaP += mHeadSensY * dt * mSignOfMouse;
 			wantRotate = true;
 		}
 		else if (mPitchDown and (not mPitchUp))
 		{
-			deltaP -= mRollSensY * dt * mSignOfMouse;
+			deltaP -= mHeadSensY * dt * mSignOfMouse;
 			wantRotate = true;
 		}
 

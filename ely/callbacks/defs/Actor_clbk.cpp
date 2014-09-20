@@ -43,12 +43,12 @@ CALLBACK fast_forward_Activity_Actor;
 CALLBACK backward_Activity_Actor;
 CALLBACK stop_backward_Activity_Actor;
 CALLBACK fast_backward_Activity_Actor;
-CALLBACK roll_left_Activity_Actor;
-CALLBACK stop_roll_left_Activity_Actor;
-CALLBACK fast_roll_left_Activity_Actor;
-CALLBACK roll_right_Activity_Actor;
-CALLBACK stop_roll_right_Activity_Actor;
-CALLBACK fast_roll_right_Activity_Actor;
+CALLBACK head_left_Activity_Actor;
+CALLBACK stop_head_left_Activity_Actor;
+CALLBACK fast_head_left_Activity_Actor;
+CALLBACK head_right_Activity_Actor;
+CALLBACK stop_head_right_Activity_Actor;
+CALLBACK fast_head_right_Activity_Actor;
 CALLBACK up_Activity_Actor;
 CALLBACK stop_up_Activity_Actor;
 CALLBACK fast_up_Activity_Actor;
@@ -141,49 +141,49 @@ void fast_backward_Activity_Actor(const Event* event, void* data)
 	fast_Activity_Actor(event, data);
 	backward_Activity_Actor(event, data);
 }
-//roll_left:stop-roll_left:fast-roll_left
-void roll_left_Activity_Actor(const Event* event, void* data)
+//head_left:stop-head_left:fast-head_left
+void head_left_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
 			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
-	actorDrv->enableRollLeft(true);
+	actorDrv->enableHeadLeft(true);
 }
-void stop_roll_left_Activity_Actor(const Event* event, void* data)
+void stop_head_left_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
 			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
-	actorDrv->enableRollLeft(false);
+	actorDrv->enableHeadLeft(false);
 }
-void fast_roll_left_Activity_Actor(const Event* event, void* data)
+void fast_head_left_Activity_Actor(const Event* event, void* data)
 {
 	fast_Activity_Actor(event, data);
-	roll_left_Activity_Actor(event, data);
+	head_left_Activity_Actor(event, data);
 }
-//roll_right:stop-roll_right:fast-roll_right
-void roll_right_Activity_Actor(const Event* event, void* data)
+//head_right:stop-head_right:fast-head_right
+void head_right_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
 			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
-	actorDrv->enableRollRight(true);
+	actorDrv->enableHeadRight(true);
 }
-void stop_roll_right_Activity_Actor(const Event* event, void* data)
+void stop_head_right_Activity_Actor(const Event* event, void* data)
 {
 	//get data
 	SMARTPTR(Driver)actorDrv = DCAST(Driver, reinterpret_cast<Activity*>(data)->
 			getOwnerObject()->getComponent(ComponentFamilyType("Control")));
 
-	actorDrv->enableRollRight(false);
+	actorDrv->enableHeadRight(false);
 }
-void fast_roll_right_Activity_Actor(const Event* event, void* data)
+void fast_head_right_Activity_Actor(const Event* event, void* data)
 {
 	fast_Activity_Actor(event, data);
-	roll_right_Activity_Actor(event, data);
+	head_right_Activity_Actor(event, data);
 }
 //up:stop-up:fast-up
 void up_Activity_Actor(const Event* event, void* data)

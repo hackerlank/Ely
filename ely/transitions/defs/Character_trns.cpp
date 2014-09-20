@@ -255,7 +255,7 @@ void Enter_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_Rr_Character(fsm*, Activity& activity)
 {
@@ -265,7 +265,7 @@ void Exit_Rr_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //Rl
 void Enter_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -276,7 +276,7 @@ void Enter_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_Rl_Character(fsm*, Activity& activity)
 {
@@ -286,7 +286,7 @@ void Exit_Rl_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 //J
 void Enter_J_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -320,7 +320,7 @@ void Enter_F_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_F_Rr_Character(fsm*, Activity& activity)
 {
@@ -334,7 +334,7 @@ void Exit_F_Rr_Character(fsm*, Activity& activity)
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //F-Rl
 void Enter_F_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -349,7 +349,7 @@ void Enter_F_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableForward(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_F_Rl_Character(fsm*, Activity& activity)
 {
@@ -363,7 +363,7 @@ void Exit_F_Rl_Character(fsm*, Activity& activity)
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableForward(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 //F-Rr-Rl
 void Enter_F_Rr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -439,7 +439,7 @@ void Enter_B_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_B_Rr_Character(fsm*, Activity& activity)
 {
@@ -453,7 +453,7 @@ void Exit_B_Rr_Character(fsm*, Activity& activity)
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //B-Rl
 void Enter_B_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -468,7 +468,7 @@ void Enter_B_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 	//
 	npc1Model->animations().loop("walk", false);
 	npc1CharCtrl->enableBackward(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_B_Rl_Character(fsm*, Activity& activity)
 {
@@ -482,7 +482,7 @@ void Exit_B_Rl_Character(fsm*, Activity& activity)
 	//
 	npc1Model->animations().stop("walk");
 	npc1CharCtrl->enableBackward(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 //Sr-Rr
 void Enter_Sr_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -496,7 +496,7 @@ void Enter_Sr_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeRight(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_Sr_Rr_Character(fsm*, Activity& activity)
 {
@@ -509,7 +509,7 @@ void Exit_Sr_Rr_Character(fsm*, Activity& activity)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeRight(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //Sr-Rl
 void Enter_Sr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -523,7 +523,7 @@ void Enter_Sr_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeRight(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_Sr_Rl_Character(fsm*, Activity& activity)
 {
@@ -536,7 +536,7 @@ void Exit_Sr_Rl_Character(fsm*, Activity& activity)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeRight(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 //Sl-Rr
 void Enter_Sl_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -550,7 +550,7 @@ void Enter_Sl_Rr_Character(fsm*, Activity& activity, const ValueList& valueList)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeLeft(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_Sl_Rr_Character(fsm*, Activity& activity)
 {
@@ -563,7 +563,7 @@ void Exit_Sl_Rr_Character(fsm*, Activity& activity)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeLeft(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //Sl-Rl
 void Enter_Sl_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -577,7 +577,7 @@ void Enter_Sl_Rl_Character(fsm*, Activity& activity, const ValueList& valueList)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeLeft(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_Sl_Rl_Character(fsm*, Activity& activity)
 {
@@ -590,7 +590,7 @@ void Exit_Sl_Rl_Character(fsm*, Activity& activity)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->enableStrafeLeft(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 static float linearSpeedFactor = 3.0;
 static float angularSpeedFactor = 3.0;
@@ -689,7 +689,7 @@ void Enter_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_Rr_Q_Character(fsm*, Activity& activity)
 {
@@ -701,7 +701,7 @@ void Exit_Rr_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 }
 //Rl-Q
@@ -716,7 +716,7 @@ void Enter_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_Rl_Q_Character(fsm*, Activity& activity)
 {
@@ -728,7 +728,7 @@ void Exit_Rl_Q_Character(fsm*, Activity& activity)
 	SMARTPTR(CharacterController)npc1CharCtrl = DCAST (CharacterController,
 			npc1->getComponent(ComponentFamilyType("PhysicsControl")));
 	//
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 }
 //F-Rr-Q
@@ -746,7 +746,7 @@ void Enter_F_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableForward(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_F_Rr_Q_Character(fsm*, Activity& activity)
 {
@@ -760,7 +760,7 @@ void Exit_F_Rr_Q_Character(fsm*, Activity& activity)
 	//
 	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 }
@@ -779,7 +779,7 @@ void Enter_F_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableForward(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 {
@@ -793,7 +793,7 @@ void Exit_F_Rl_Q_Character(fsm*, Activity& activity)
 	//
 	npc1Model->animations().stop("run");
 	npc1CharCtrl->enableForward(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 }
@@ -874,7 +874,7 @@ void Enter_Sr_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableStrafeRight(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_Sr_Rr_Q_Character(fsm*, Activity& activity)
 {
@@ -889,7 +889,7 @@ void Exit_Sr_Rr_Q_Character(fsm*, Activity& activity)
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 	npc1CharCtrl->enableStrafeRight(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //Sr-Rl-Q
 void Enter_Sr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -905,7 +905,7 @@ void Enter_Sr_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableStrafeRight(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_Sr_Rl_Q_Character(fsm*, Activity& activity)
 {
@@ -920,7 +920,7 @@ void Exit_Sr_Rl_Q_Character(fsm*, Activity& activity)
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 	npc1CharCtrl->enableStrafeRight(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 //Sl-Rr-Q
 void Enter_Sl_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -936,7 +936,7 @@ void Enter_Sl_Rr_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableStrafeLeft(true);
-	npc1CharCtrl->enableRollRight(true);
+	npc1CharCtrl->enableHeadRight(true);
 }
 void Exit_Sl_Rr_Q_Character(fsm*, Activity& activity)
 {
@@ -951,7 +951,7 @@ void Exit_Sl_Rr_Q_Character(fsm*, Activity& activity)
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 	npc1CharCtrl->enableStrafeLeft(false);
-	npc1CharCtrl->enableRollRight(false);
+	npc1CharCtrl->enableHeadRight(false);
 }
 //Sl-Rl-Q
 void Enter_Sl_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueList)
@@ -967,7 +967,7 @@ void Enter_Sl_Rl_Q_Character(fsm*, Activity& activity, const ValueList& valueLis
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() * linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() * angularSpeedFactor);
 	npc1CharCtrl->enableStrafeLeft(true);
-	npc1CharCtrl->enableRollLeft(true);
+	npc1CharCtrl->enableHeadLeft(true);
 }
 void Exit_Sl_Rl_Q_Character(fsm*, Activity& activity)
 {
@@ -982,7 +982,7 @@ void Exit_Sl_Rl_Q_Character(fsm*, Activity& activity)
 	npc1CharCtrl->setLinearSpeed(npc1CharCtrl->getLinearSpeed() / linearSpeedFactor);
 	npc1CharCtrl->setAngularSpeed(npc1CharCtrl->getAngularSpeed() / angularSpeedFactor);
 	npc1CharCtrl->enableStrafeLeft(false);
-	npc1CharCtrl->enableRollLeft(false);
+	npc1CharCtrl->enableHeadLeft(false);
 }
 
 ///Init/end functions: see common_configs.cpp

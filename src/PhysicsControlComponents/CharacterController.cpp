@@ -231,12 +231,12 @@ bool CharacterController::initialize()
 			mTmpl->parameter(std::string("strafe_right"))
 					== std::string("enabled") ? true : false);
 	//rollLeft key
-	mRollLeftKey = (
-			mTmpl->parameter(std::string("roll_left"))
+	mHeadLeftKey = (
+			mTmpl->parameter(std::string("head_left"))
 					== std::string("enabled") ? true : false);
 	//rollRight key
-	mRollRightKey = (
-			mTmpl->parameter(std::string("roll_right"))
+	mHeadRightKey = (
+			mTmpl->parameter(std::string("head_right"))
 					== std::string("enabled") ? true : false);
 	//jump key
 	mJumpKey = (
@@ -444,11 +444,11 @@ void CharacterController::update(void* data)
 	{
 		speed.set_x(mLinearSpeed.get_x());
 	}
-	if (mRollLeft)
+	if (mHeadLeft)
 	{
 		omega = mAngularSpeed;
 	}
-	if (mRollRight)
+	if (mHeadRight)
 	{
 		omega = -mAngularSpeed;
 	}

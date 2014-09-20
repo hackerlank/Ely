@@ -42,7 +42,7 @@ class DriverTemplate;
  * To obtain a fixed movement (i.e. "kinematic") in any direction or
  * angular, the related acceleration and friction value should be set
  * to zero and one respectively.\n
- * Each basic movement (forward, backward, roll_left, roll_right etc...)
+ * Each basic movement (forward, backward, head_left, head_right etc...)
  * can be enabled/disabled through a corresponding "enabler", which in
  * turn set a control key true or false.\n
  * An event handlers could enable/disable movement calling the "enablers".
@@ -69,8 +69,10 @@ class DriverTemplate;
  * | *enabled*  				|single| *true* | -
  * | *forward*  				|single| *enabled* | -
  * | *backward*  				|single| *enabled* | -
- * | *roll_left*  				|single| *enabled* | -
- * | *roll_right*  				|single| *enabled* | -
+ * | *head_limit*  				|single| *false@0.0* | specified as "enabled@[limit] with enabled = true,false, with limit >= 0.0
+ * | *head_left*  				|single| *enabled* | -
+ * | *head_right*  				|single| *enabled* | -
+ * | *pitch_limit*  			|single| *false@0.0* | specified as "enabled@[limit] with enabled = true,false, with limit >= 0.0
  * | *pitch_up*  				|single| *enabled* | -
  * | *pitch_down*  				|single| *enabled* | -
  * | *strafe_left*  			|single| *enabled* | -
@@ -164,10 +166,10 @@ public:
 	bool isUpEnabled();
 	void enableDown(bool enable);
 	bool isDownEnabled();
-	void enableRollLeft(bool enable);
-	bool isRollLeftEnabled();
-	void enableRollRight(bool enable);
-	bool isRollRightEnabled();
+	void enableHeadLeft(bool enable);
+	bool isHeadLeftEnabled();
+	void enableHeadRight(bool enable);
+	bool isHeadRightEnabled();
 	void enablePitchUp(bool enable);
 	bool isPitchUpEnabled();
 	void enablePitchDown(bool enable);
@@ -177,10 +179,12 @@ public:
 	///@}
 
 	/**
-	 * \name Speeds getters/setters.
+	 * \name Parameters getters/setters.
 	 */
 	///@{
 	//max values
+	void setHeadLimit(bool enabled = false, float hLimit = 0.0);
+	void setPitchLimit(bool enabled = false, float pLimit = 0.0);
 	void setMaxLinearSpeed(const LVector3f& linearSpeed);
 	void setMaxAngularSpeed(float angularSpeed);
 	LVector3f getMaxSpeeds(float& angularSpeed);
@@ -204,14 +208,16 @@ private:
 	///@{
 	///Key controls and effective keys.
 	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-	mRollLeft, mRollRight, mPitchUp, mPitchDown, mMouseMove;
+	mHeadLeft, mHeadRight, mPitchUp, mPitchDown, mMouseMove;
 	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
-	mDownKey, mRollLeftKey, mRollRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
+	mDownKey, mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
 	std::string mSpeedKey;
 	///@}
 	///@{
 	///Key control values.
 	bool mMouseEnabledH,	mMouseEnabledP;
+	bool mHeadLimitEnabled, mPitchLimitEnabled;
+	float mHLimit, mPLimit;
 	int mSignOfTranslation, mSignOfMouse;
 	///@}
 	///@{
@@ -271,7 +277,7 @@ inline void Driver::reset()
 	//
 	mStartEnabled = mEnabled = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
-			mRollLeft = mRollRight = mPitchUp = mPitchDown = false;
+			mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
 	//by default we consider mouse moved on every update, because
 	//we want mouse poll by default; this can be changed by calling
 	//the enabler (for example by an handler responding to mouse-move
@@ -279,9 +285,10 @@ inline void Driver::reset()
 	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
 	mMouseMove = true;
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey,
-	mDownKey = mRollLeftKey = mRollRightKey = mPitchUpKey = mPitchDownKey = mMouseMoveKey = false;
+	mDownKey = mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey = mMouseMoveKey = false;
 	mSpeedKey = std::string("shift");
-	mMouseEnabledH = mMouseEnabledP = false;
+	mMouseEnabledH = mMouseEnabledP = mHeadLimitEnabled = mPitchLimitEnabled = false;
+	mHLimit = mPLimit = 0.0;
 	mSignOfTranslation = mSignOfMouse = 1;
 	mFastFactor = 0.0;
 	mActualSpeedXYZ = mMaxSpeedXYZ = mMaxSpeedSquaredXYZ = LVecBase3f::zero();
@@ -419,42 +426,42 @@ inline bool Driver::isDownEnabled()
 	return mDown;
 }
 
-inline void Driver::enableRollLeft(bool enable)
+inline void Driver::enableHeadLeft(bool enable)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if (mRollLeftKey)
+	if (mHeadLeftKey)
 	{
-		mRollLeft = enable;
+		mHeadLeft = enable;
 	}
 }
 
-inline bool Driver::isRollLeftEnabled()
+inline bool Driver::isHeadLeftEnabled()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mRollLeft;
+	return mHeadLeft;
 }
 
-inline void Driver::enableRollRight(bool enable)
+inline void Driver::enableHeadRight(bool enable)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if (mRollRightKey)
+	if (mHeadRightKey)
 	{
-		mRollRight = enable;
+		mHeadRight = enable;
 	}
 }
 
-inline bool Driver::isRollRightEnabled()
+inline bool Driver::isHeadRightEnabled()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	return mRollRight;
+	return mHeadRight;
 }
 
 inline void Driver::enablePitchUp(bool enable)
@@ -513,6 +520,24 @@ inline bool Driver::isMouseMoveEnabled()
 	HOLD_REMUTEX(mMutex)
 
 	return mMouseMove;
+}
+
+inline void Driver::setHeadLimit(bool enabled, float hLimit)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mHeadLimitEnabled = enabled;
+	hLimit >= 0.0 ? mHLimit = hLimit: mHLimit = -hLimit;
+}
+
+inline void Driver::setPitchLimit(bool enabled, float pLimit)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mPitchLimitEnabled = enabled;
+	pLimit >= 0.0 ? mPLimit = pLimit: mPLimit = -pLimit;
 }
 
 inline void Driver::setMaxLinearSpeed(const LVector3f& maxLinearSpeed)
