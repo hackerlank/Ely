@@ -453,9 +453,17 @@ input.range
 input.range slidertrack
 {
 	background-decorator: tiled-horizontal;
-	background-left-image: ../textures/rocket.tga 76px 206px 77px 232px;
-	background-center-image: ../textures/rocket.tga stretch 77px 206px 78px 232px;
-	background-right-image: ../textures/rocket.tga 79px 206px 81px 232px;
+	background-left-image: ../textures/rocket.tga 74px 199px 76px 204px;
+	background-center-image: ../textures/rocket.tga stretch 76px 199px 78px 204px;
+	background-right-image: ../textures/rocket.tga 96px 199px 97px 204px;
+}
+
+input.range:disabled slidertrack
+{
+	background-decorator: tiled-horizontal;
+	background-left-image: ../textures/rocket.tga 56px 199px 58px 203px;
+	background-center-image: ../textures/rocket.tga stretch 58px 199px 67px 203px;
+	background-right-image: ../textures/rocket.tga 67px 199px 68px 203px;
 }
 
 input.range sliderbar
@@ -468,6 +476,15 @@ input.range sliderbar
 	background-image: ../textures/rocket.tga 133px 199px 154px 223px;
 }
 
+input.range:disabled sliderbar
+{
+	width: 8px;
+	height: 12px;
+	margin-top: -2px;
+	
+	background-decorator: image;
+	background-image: ../textures/rocket.tga 360px 199px 367px 213px;
+}
 
 scrollbarvertical
 {
