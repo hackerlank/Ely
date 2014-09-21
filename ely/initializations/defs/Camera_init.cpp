@@ -215,28 +215,44 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				//pitch limit and pitch limit value: enabled@limit
 				std::vector<std::string> paramValuesStr = parseCompoundString(
 						(*cameraDriverParams.find("pitch_limit")).second, '@');
-				Rocket::Controls::ElementFormControlInput *inputElem;
+				Rocket::Controls::ElementFormControlInput *inputValueElem,
+						*inputPitchElem;
 				//pitch limit value
-				inputElem =
+				inputValueElem =
 						dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
 								"pitch_limit_value"));
-				inputElem->SetValue(paramValuesStr[1].c_str());
+				inputValueElem->SetValue(paramValuesStr[1].c_str());
 				//pitch limit
-				inputElem =
+				inputPitchElem =
 						dynamic_cast<Rocket::Controls::ElementFormControlInput *>(cameraOptionsMenu->GetElementById(
 								"pitch_limit"));
-				if ((inputElem->GetAttribute("checked"))
-						and (paramValuesStr[0] != "true"))
+				//checks
+				if (inputPitchElem->GetAttribute("checked"))
 				{
-					//checked -> unchecked: change (event)
-					inputElem->RemoveAttribute("checked");
+					if (paramValuesStr[0] == "true")
+					{
+						//enable value input element
+						inputValueElem->SetDisabled(false);
+					}
+					else
+					{
+						//checked -> unchecked: change event thrown
+						inputPitchElem->RemoveAttribute("checked");
+					}
 				}
-				else if ((not inputElem->GetAttribute("checked"))
-						and (paramValuesStr[0] == "true"))
+				else
 				{
-					//unchecked -> checked: change (event)
-					inputElem->SetAttribute<Rocket::Core::String>("checked",
-							"true");
+					if (paramValuesStr[0] != "true")
+					{
+						//disable value input element
+						inputValueElem->SetDisabled(true);
+					}
+					else
+					{
+						//unchecked -> checked: change event thrown
+						inputPitchElem->SetAttribute<Rocket::Core::String>(
+								"checked", "true");
+					}
 				}
 				//max linear speed
 				setElementValue("max_linear_speed", cameraDriverParams,
