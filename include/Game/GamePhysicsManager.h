@@ -230,6 +230,17 @@ public:
 	void setPhysicsComponentByPandaNode(SMARTPTR(PandaNode) pandaNode,
 			SMARTPTR(Component) physicsComponent);
 
+	/**
+	 * \brief Enable/disable collisions' notification through events.
+	 *
+	 */
+	/**
+	 * \brief Enable/disable collisions' notification through events.
+	 * @param enable Enabling flag.
+	 */
+	void enableCollisionNotify(bool enable);
+
+
 private:
 	/// Bullet world.
 	SMARTPTR(BulletWorld) mBulletWorld;
@@ -253,6 +264,70 @@ private:
 	///A task data for step simulation update.
 	SMARTPTR(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;
 	SMARTPTR(AsyncTask) mUpdateTask;
+	///@}
+
+	///TODO
+	/**
+	 * \name Collision notification  through events.
+	 */
+	///@{
+	struct CollidingNodePair
+	{
+		struct CollidingNodePairData
+		{
+			std::pair<PandaNode*, PandaNode*> mPnode;
+			std::string mEventName;
+			int mCount;
+		};
+		//main constructors
+		CollidingNodePair(std::pair<PandaNode*, PandaNode*> _pnode) :
+				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
+		{
+			mCollidingNodePairData->mPnode = _pnode;
+			*mRefCount = 1;
+		}
+		CollidingNodePair(std::pair<PandaNode*, PandaNode*> _pnode, const std::string& _name, int _count) :
+				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
+		{
+			mCollidingNodePairData->mPnode = _pnode;
+			mCollidingNodePairData->mEventName = _name;
+			mCollidingNodePairData->mCount = _count;
+			*mRefCount = 1;
+		}
+		//copy constructor
+		CollidingNodePair(const CollidingNodePair& on) :
+				mCollidingNodePairData(on.mCollidingNodePairData), mRefCount(on.mRefCount)
+		{
+			++(*mRefCount);
+		}
+		//destructor
+		~CollidingNodePair()
+		{
+			if (--(*mRefCount) == 0)
+			{
+				delete mCollidingNodePairData;
+				delete mRefCount;
+			}
+		}
+		//assignment operator
+		CollidingNodePair& operator=(const CollidingNodePair& on)
+		{
+			mCollidingNodePairData = on.mCollidingNodePairData;
+			++(*mRefCount);
+			return *this;
+		}
+		//comparison operator
+		bool operator<(const CollidingNodePair& on) const
+		{
+			return mCollidingNodePairData->mPnode < on.mCollidingNodePairData->mPnode;
+		}
+		//owned resource
+		CollidingNodePairData* mCollidingNodePairData;
+	private:
+		int* mRefCount;
+	};
+	ThrowEventData mCollisionNotify;
+	std::set<CollidingNodePair> mCollidingNodePairs;
 	///@}
 
 #ifdef ELY_THREAD
@@ -288,6 +363,14 @@ inline void GamePhysicsManager::setPhysicsComponentByPandaNode(SMARTPTR(PandaNod
 	{
 		mPhysicsComponentPandaNodeTable.erase(pandaNode);
 	}
+}
+
+inline void GamePhysicsManager::enableCollisionNotify(bool enable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	mCollisionNotify.mEnable = enable;
 }
 
 #ifdef ELY_THREAD

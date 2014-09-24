@@ -51,7 +51,7 @@ GamePhysicsManager::GamePhysicsManager(
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
 		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
-		mExiting(exiting)
+		mExiting(exiting), mCollisionNotify(true)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -206,6 +206,86 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		}
 		mBulletWorld->do_physics(dt, maxSubSteps);
 	}
+
+	///TODO
+	//notify collisions
+	if (mOverlap.mEnable)
+	{
+		//update general count:
+		//only actual overlapping objects have their count updated,
+		//while just gone out objects will be erased from the set
+		++mOverlap.mCount;
+
+		//elaborate current overlapping object list
+		if (mGhostNode->get_num_overlapping_nodes() > 0)
+		{
+			//update elapsed time
+			mOverlap.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
+			for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
+			{
+				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+						mGhostNode->get_overlapping_node(i));
+				//insert a default: check of equality is done only on OverlapNodeData::mPnode member
+				pair<std::set<OverlappingNode>::iterator, bool> res =
+				mOverlappingNodes.insert(
+						OverlappingNode(
+								mGhostNode->get_overlapping_node(i)));
+				if (res.second)
+				{
+					//this is a "new" overlapping object
+					//event name: <OverlappingObjectType>_<GhostObjectType>_Overlap
+					(res.first)->mOverlappingNodeData->mEventName =
+						physicsComponent->getOwnerObject()->objectTmpl()->objectType()
+						+ "_" + mOverlap.mEventName;
+					//throw the event
+					throw_event((res.first)->mOverlappingNodeData->mEventName,
+							EventParameter(physicsComponent), EventParameter(this));
+				}
+				else
+				{
+					//this is an "old" overlapping object
+					if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
+					{
+						//throw the event
+						throw_event((res.first)->mOverlappingNodeData->mEventName,
+								EventParameter(physicsComponent), EventParameter(this));
+					}
+				}
+				//update count flag
+				(res.first)->mOverlappingNodeData->mCount = mOverlap.mCount;
+			}
+			//update elapsed time
+			if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
+			{
+				mOverlap.mTimeElapsed -= mOverlap.mPeriod;
+			}
+		}
+		else
+		{
+			mOverlap.mTimeElapsed = 0.0;
+		}
+
+		//erase gone "out" objects (which have not the count flag updated)
+		for (std::set<OverlappingNode>::iterator i = mOverlappingNodes.begin(); i != mOverlappingNodes.end();)
+		{
+			//check if it has a previous count
+			if (i->mOverlappingNodeData->mCount != mOverlap.mCount)
+			{
+				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
+						i->mOverlappingNodeData->mPnode);
+				//throw the "off" event
+				throw_event(i->mOverlappingNodeData->mEventName + "Off",
+						EventParameter(physicsComponent), EventParameter(this));
+				//erase the object
+				mOverlappingNodes.erase(i++);
+			}
+			else
+			{
+				++i;
+			}
+		}
+	}
+
 #ifdef ELY_THREAD
 	//manager multithread
 	{
