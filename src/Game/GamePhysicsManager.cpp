@@ -35,6 +35,9 @@
 #include "PhysicsComponents/BulletLocal/bulletTriangleMeshShape.h"
 #include "Game/GamePhysicsManager.h"
 #include "Game/GameManager.h"
+#include "ObjectModel/Object.h"
+#include "Utilities/Tools.h"
+#include <throw_event.h>
 
 namespace ely
 {
@@ -51,7 +54,7 @@ GamePhysicsManager::GamePhysicsManager(
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
 		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
-		mExiting(exiting), mCollisionNotify(true)
+		mExiting(exiting)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -84,6 +87,13 @@ GamePhysicsManager::GamePhysicsManager(
 	// set up Bullet Debug Renderer (disabled by default)
 	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
 #endif
+	//get a reference to collision dispatcher (for collision management)
+	mCollisionDispatcher = static_cast<btCollisionDispatcher*>(mBulletWorld->get_dispatcher());
+	//set default collision notify data
+	ThrowEventData collisionNotifyData;
+	collisionNotifyData.mEnable = true;
+	collisionNotifyData.mFrequency = 30.0;
+	doEnableCollisionNotify(COLLISIONNOTIFY, collisionNotifyData);
 }
 
 GamePhysicsManager::~GamePhysicsManager()
@@ -139,7 +149,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		{
 			mManagersVar.wait();
 		}
-		if(mCompletedTasks & mExiting)
+		if (mCompletedTasks & mExiting)
 		{
 			return AsyncTask::DS_done;
 		}
@@ -207,77 +217,121 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		mBulletWorld->do_physics(dt, maxSubSteps);
 	}
 
-	///TODO
 	//notify collisions
-	if (mOverlap.mEnable)
+	if (mCollisionNotify.mEnable)
 	{
 		//update general count:
-		//only actual overlapping objects have their count updated,
-		//while just gone out objects will be erased from the set
-		++mOverlap.mCount;
+		//only actual colliding object pairs have their counts updated,
+		//while just stopped to collide object pairs will be erased from the set
+		++mCollisionNotify.mCount;
 
-		//elaborate current overlapping object list
-		if (mGhostNode->get_num_overlapping_nodes() > 0)
+		//elaborate current colliding object pair list
+		if (mCollisionDispatcher->getNumManifolds() > 0)
 		{
 			//update elapsed time
-			mOverlap.mTimeElapsed += ClockObject::get_global_clock()->get_dt();
-			for (int i = 0; i < mGhostNode->get_num_overlapping_nodes(); ++i)
+			mCollisionNotify.mTimeElapsed +=
+					ClockObject::get_global_clock()->get_dt();
+			// iterate through all of the manifolds in the dispatcher
+			for (int i = 0; i < mCollisionDispatcher->getNumManifolds(); ++i)
 			{
-				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
-						mGhostNode->get_overlapping_node(i));
-				//insert a default: check of equality is done only on OverlapNodeData::mPnode member
-				pair<std::set<OverlappingNode>::iterator, bool> res =
-				mOverlappingNodes.insert(
-						OverlappingNode(
-								mGhostNode->get_overlapping_node(i)));
-				if (res.second)
+				// get the manifold
+				btPersistentManifold* pManifold =
+						mCollisionDispatcher->getManifoldByIndexInternal(i);
+
+				// ignore manifolds that have
+				// no contact points.
+				if (pManifold->getNumContacts() > 0)
 				{
-					//this is a "new" overlapping object
-					//event name: <OverlappingObjectType>_<GhostObjectType>_Overlap
-					(res.first)->mOverlappingNodeData->mEventName =
-						physicsComponent->getOwnerObject()->objectTmpl()->objectType()
-						+ "_" + mOverlap.mEventName;
-					//throw the event
-					throw_event((res.first)->mOverlappingNodeData->mEventName,
-							EventParameter(physicsComponent), EventParameter(this));
-				}
-				else
-				{
-					//this is an "old" overlapping object
-					if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
+					// get the two rigid bodies' panda nodes involved in the collision
+					PandaNode *node0 =
+							(PandaNode *) static_cast<const btRigidBody*>(pManifold->getBody0())->getUserPointer();
+					PandaNode *node1 =
+							(PandaNode *) static_cast<const btRigidBody*>(pManifold->getBody1())->getUserPointer();
+					SMARTPTR(Component)physicsComponent0 =
+					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node0);
+					SMARTPTR(Component)physicsComponent1 =
+					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node1);
+					//insert a default: check of equality is done only on CollidingNodePair::mPnode member
+					pair<std::set<CollidingNodePair>::iterator, bool> res =
+							mCollidingNodePairs.insert(
+									CollidingNodePair(node0, node1));
+					if (res.second)
 					{
+						//this is a "new" colliding object pair
+						//event name: <CollidingObjectType1>_<CollidingObjectType2>_Collision
+						std::string objectType0 =
+								physicsComponent0->getOwnerObject()->objectTmpl()->objectType();
+						std::string objectType1 =
+								physicsComponent1->getOwnerObject()->objectTmpl()->objectType();
+						//alphabetically compare
+						if (objectType0 < objectType1)
+						{
+							(res.first)->mCollidingNodePairData->mEventName =
+									objectType0 + "_" + objectType1
+											+ "_Collision";
+							(res.first)->mCollidingNodePairData->mEventParameters[0] =
+									EventParameter(physicsComponent0);
+							(res.first)->mCollidingNodePairData->mEventParameters[1] =
+									EventParameter(physicsComponent1);
+						}
+						else
+						{
+							(res.first)->mCollidingNodePairData->mEventName =
+									objectType1 + "_" + objectType0
+											+ "_Collision";
+							(res.first)->mCollidingNodePairData->mEventParameters[0] =
+									EventParameter(physicsComponent1);
+							(res.first)->mCollidingNodePairData->mEventParameters[1] =
+									EventParameter(physicsComponent0);
+						}
 						//throw the event
-						throw_event((res.first)->mOverlappingNodeData->mEventName,
-								EventParameter(physicsComponent), EventParameter(this));
+						throw_event(
+								(res.first)->mCollidingNodePairData->mEventName,
+								(res.first)->mCollidingNodePairData->mEventParameters[0],
+								(res.first)->mCollidingNodePairData->mEventParameters[1]);
 					}
+					else
+					{
+						//this is an "old" colliding object pair
+						if (mCollisionNotify.mTimeElapsed
+								>= mCollisionNotify.mPeriod)
+						{
+							//throw the event
+							throw_event(
+									(res.first)->mCollidingNodePairData->mEventName,
+									(res.first)->mCollidingNodePairData->mEventParameters[0],
+									(res.first)->mCollidingNodePairData->mEventParameters[1]);
+						}
+					}
+					//update count flag
+					(res.first)->mCollidingNodePairData->mCount =
+							mCollisionNotify.mCount;
 				}
-				//update count flag
-				(res.first)->mOverlappingNodeData->mCount = mOverlap.mCount;
 			}
 			//update elapsed time
-			if (mOverlap.mTimeElapsed >= mOverlap.mPeriod)
+			if (mCollisionNotify.mTimeElapsed >= mCollisionNotify.mPeriod)
 			{
-				mOverlap.mTimeElapsed -= mOverlap.mPeriod;
+				mCollisionNotify.mTimeElapsed -= mCollisionNotify.mPeriod;
 			}
 		}
 		else
 		{
-			mOverlap.mTimeElapsed = 0.0;
+			mCollisionNotify.mTimeElapsed = 0.0;
 		}
 
-		//erase gone "out" objects (which have not the count flag updated)
-		for (std::set<OverlappingNode>::iterator i = mOverlappingNodes.begin(); i != mOverlappingNodes.end();)
+		//erase just stopped to collide object pairs (which have not the count flag updated)
+		for (std::set<CollidingNodePair>::iterator i =
+				mCollidingNodePairs.begin(); i != mCollidingNodePairs.end();)
 		{
 			//check if it has a previous count
-			if (i->mOverlappingNodeData->mCount != mOverlap.mCount)
+			if (i->mCollidingNodePairData->mCount != mCollisionNotify.mCount)
 			{
-				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
-						i->mOverlappingNodeData->mPnode);
 				//throw the "off" event
-				throw_event(i->mOverlappingNodeData->mEventName + "Off",
-						EventParameter(physicsComponent), EventParameter(this));
+				throw_event(i->mCollidingNodePairData->mEventName + "Off",
+						i->mCollidingNodePairData->mEventParameters[0],
+						i->mCollidingNodePairData->mEventParameters[1]);
 				//erase the object
-				mOverlappingNodes.erase(i++);
+				mCollidingNodePairs.erase(i++);
 			}
 			else
 			{
@@ -502,6 +556,29 @@ float GamePhysicsManager::getDim(ShapeSize shapeSize, float d1, float d2)
 	}
 	//
 	return dim;
+}
+
+void GamePhysicsManager::doEnableCollisionNotify(EventThrown event, ThrowEventData eventData)
+{
+	//some checks
+	RETURN_ON_COND(eventData.mEventName == std::string(""),)
+	if (eventData.mFrequency <= 0.0)
+	{
+		eventData.mFrequency = 30.0;
+	}
+
+	switch (event)
+	{
+	case COLLISIONNOTIFY:
+		if(mCollisionNotify.mEnable != eventData.mEnable)
+		{
+			mCollisionNotify = eventData;
+			mCollisionNotify.mTimeElapsed = 0;
+		}
+		break;
+	default:
+		break;
+	}
 }
 
 #ifdef ELY_DEBUG

@@ -36,6 +36,19 @@ namespace ely
  * \brief Singleton manager updating attributes of physics components.
  *
  * Prepared for multi-threading.
+ * .
+ * By default, this manager will throw events when objects collide. It throws:
+ * - when two objects collide, the event "<CollidingObjectType1>_<CollidingObjectType2>_Collision",
+ * with the first type name less the second one in alphabetical ascending order (A to Z)
+ * (i.e. using the std::string::operator<()).
+ * This event is thrown continuously at a frequency which is the minimum between the fps and
+ * the frequency specified (which defaults to 30 times per seconds) until
+ * the object keeps overlapping
+ * - when the two objects stop collide, the event
+ * "<CollidingObjectType1>_<CollidingObjectType2>_CollisionOff"; this event is thrown only once\n
+ * The first argument of each event is a reference of the overlapping object's
+ * Physics component, the second argument is a reference to this component.
+ *
  */
 class GamePhysicsManager: public Singleton<GamePhysicsManager>
 {
@@ -230,6 +243,12 @@ public:
 	void setPhysicsComponentByPandaNode(SMARTPTR(PandaNode) pandaNode,
 			SMARTPTR(Component) physicsComponent);
 
+	///Thrown events.
+	enum EventThrown
+	{
+		COLLISIONNOTIFY
+	};
+
 	/**
 	 * \brief Enable/disable collisions' notification through events.
 	 *
@@ -238,7 +257,8 @@ public:
 	 * \brief Enable/disable collisions' notification through events.
 	 * @param enable Enabling flag.
 	 */
-	void enableCollisionNotify(bool enable);
+	void enableCollisionNotify(EventThrown event,
+			ThrowEventData eventData);
 
 
 private:
@@ -266,7 +286,6 @@ private:
 	SMARTPTR(AsyncTask) mUpdateTask;
 	///@}
 
-	///TODO
 	/**
 	 * \name Collision notification  through events.
 	 */
@@ -277,19 +296,38 @@ private:
 		{
 			std::pair<PandaNode*, PandaNode*> mPnode;
 			std::string mEventName;
+			EventParameter mEventParameters[2];
 			int mCount;
 		};
 		//main constructors
-		CollidingNodePair(std::pair<PandaNode*, PandaNode*> _pnode) :
+		CollidingNodePair(PandaNode *_pnode0, PandaNode *_pnode1) :
 				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
 		{
-			mCollidingNodePairData->mPnode = _pnode;
+			// always create the pair in a predictable order
+			// (use the pointer value..)
+			if (_pnode0 > _pnode1)
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode1, _pnode0);
+			}
+			else
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode0, _pnode1);
+			}
 			*mRefCount = 1;
 		}
-		CollidingNodePair(std::pair<PandaNode*, PandaNode*> _pnode, const std::string& _name, int _count) :
+		CollidingNodePair(PandaNode *_pnode0, PandaNode *_pnode1, const std::string& _name, int _count) :
 				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
 		{
-			mCollidingNodePairData->mPnode = _pnode;
+			// always create the pair in a predictable order
+			// (use the pointer value..)
+			if (_pnode0 > _pnode1)
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode1, _pnode0);
+			}
+			else
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode0, _pnode1);
+			}
 			mCollidingNodePairData->mEventName = _name;
 			mCollidingNodePairData->mCount = _count;
 			*mRefCount = 1;
@@ -328,6 +366,9 @@ private:
 	};
 	ThrowEventData mCollisionNotify;
 	std::set<CollidingNodePair> mCollidingNodePairs;
+	btCollisionDispatcher* mCollisionDispatcher;
+	///Helper.
+	void doEnableCollisionNotify(EventThrown event, ThrowEventData eventData);
 	///@}
 
 #ifdef ELY_THREAD
@@ -365,12 +406,12 @@ inline void GamePhysicsManager::setPhysicsComponentByPandaNode(SMARTPTR(PandaNod
 	}
 }
 
-inline void GamePhysicsManager::enableCollisionNotify(bool enable)
+inline void GamePhysicsManager::enableCollisionNotify(EventThrown event, ThrowEventData eventData)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	mCollisionNotify.mEnable = enable;
+	doEnableCollisionNotify(event, eventData);
 }
 
 #ifdef ELY_THREAD
