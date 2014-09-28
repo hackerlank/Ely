@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/physicscomponents/Default_test.cpp
+ * \file /Ely/src/test/commoncomponents/Default_test.cpp
  *
  * \date 27/ago/2014 (12:05:33)
  * \author consultit

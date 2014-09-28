@@ -15,31 +15,26 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/commoncomponents/CommonSuiteFixture.h
+ * \file /Ely/src/CommonComponents/GameConfigTemplate.cpp
  *
- * \date 27/ago/2014 (12:05:03)
+ * \date 28/set/2014 (11:09:29)
  * \author consultit
  */
 
-#ifndef COMMONSUITEFIXTURE_H_
-#define COMMONSUITEFIXTURE_H_
+#include <CommonComponents/GameConfigTemplate.h>
 
-#include <boost/test/unit_test.hpp>
-#include "CommonComponents/Default.h"
-#include "CommonComponents/DefaultTemplate.h"
-#include "CommonComponents/GameConfig.h"
-#include "CommonComponents/GameConfigTemplate.h"
-
-using namespace ely;
-
-struct CommonSuiteFixture
+namespace ely
 {
-	CommonSuiteFixture()
-	{
-	}
-	~CommonSuiteFixture()
-	{
-	}
-};
 
-#endif /* COMMONSUITEFIXTURE_H_ */
+GameConfigTemplate::GameConfigTemplate()
+{
+	// TODO Auto-generated constructor stub
+
+}
+
+GameConfigTemplate::~GameConfigTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+} /* namespace ely */

@@ -36,7 +36,6 @@
 #include "Game/GamePhysicsManager.h"
 #include "Game/GameManager.h"
 #include "ObjectModel/Object.h"
-#include "Utilities/Tools.h"
 #include <throw_event.h>
 
 namespace ely
@@ -87,13 +86,13 @@ GamePhysicsManager::GamePhysicsManager(
 	// set up Bullet Debug Renderer (disabled by default)
 	mBulletDebugNodePath = NodePath(new BulletDebugNode("Debug"));
 #endif
+	//set default collision notify data
+	mCollisionNotify.mEnable = false;
+	mCollisionNotify.mFrequency = 30.0;
+	//clear the colliding pair set
+	mCollidingNodePairs.clear();
 	//get a reference to collision dispatcher (for collision management)
 	mCollisionDispatcher = static_cast<btCollisionDispatcher*>(mBulletWorld->get_dispatcher());
-	//set default collision notify data
-	ThrowEventData collisionNotifyData;
-	collisionNotifyData.mEnable = true;
-	collisionNotifyData.mFrequency = 30.0;
-	doEnableCollisionNotify(COLLISIONNOTIFY, collisionNotifyData);
 }
 
 GamePhysicsManager::~GamePhysicsManager()

@@ -99,6 +99,8 @@ noinst_HEADERS = \
 		BehaviorComponents/ActivityTemplate.h \
 		CommonComponents/Default.h \
 		CommonComponents/DefaultTemplate.h \
+		CommonComponents/GameConfig.h \
+		CommonComponents/GameConfigTemplate.h \
 		ControlComponents/Chaser.h \
 		ControlComponents/ChaserTemplate.h \
 		ControlComponents/Driver.h \

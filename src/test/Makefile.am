@@ -8,6 +8,7 @@ noinst_LIBRARIES = \
 		libtestaicomponents.a \
 		libtestaudiocomponents.a \
 		libtestbehaviorcomponents.a \
+		libtestcommoncomponents.a \
 		libtestcontrolcomponents.a \
 		libtestely.a \
 		libtestphysicscomponents.a \
@@ -20,6 +21,7 @@ whole_archives = \
 		-Wl,libtestaicomponents.a \
 		-Wl,libtestaudiocomponents.a \
 		-Wl,libtestbehaviorcomponents.a \
+		-Wl,libtestcommoncomponents.a \
 		-Wl,libtestcontrolcomponents.a \
 		-Wl,libtestely.a \
 		-Wl,libtestphysicscomponents.a \
@@ -70,6 +72,15 @@ libtestbehaviorcomponents_a_SOURCES = \
 		behaviorcomponents/Activity_test.cpp \
 		$(top_srcdir)/src/BehaviorComponents/Activity.cpp \
 		$(top_srcdir)/src/BehaviorComponents/ActivityTemplate.cpp
+
+libtestcommoncomponents_a_SOURCES = \
+		commoncomponents/CommonSuiteFixture.h \
+		commoncomponents/Default_test.cpp \
+		commoncomponents/GameConfig_test.cpp \
+		$(top_srcdir)/src/CommonComponents/Default.cpp \
+		$(top_srcdir)/src/CommonComponents/DefaultTemplate.cpp \
+		$(top_srcdir)/src/CommonComponents/GameConfig.cpp \
+		$(top_srcdir)/src/CommonComponents/GameConfigTemplate.cpp
 
 libtestcontrolcomponents_a_SOURCES = \
 		controlcomponents/ControlSuiteFixture.h \

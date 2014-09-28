@@ -46,7 +46,9 @@ libbehaviorcomponents_la_SOURCES = \
 
 libcommoncomponents_la_SOURCES = \
 		CommonComponents/Default.cpp \
-		CommonComponents/DefaultTemplate.cpp
+		CommonComponents/DefaultTemplate.cpp \
+		CommonComponents/GameConfig.cpp \
+		CommonComponents/GameConfigTemplate.cpp
 
 libcontrolcomponents_la_SOURCES = \
 		ControlComponents/Chaser.cpp \

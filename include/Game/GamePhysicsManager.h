@@ -37,9 +37,11 @@ namespace ely
  *
  * Prepared for multi-threading.
  * .
- * By default, this manager will throw events when objects collide. It throws:
+ * This manager could throw events when objects collide. By default this
+ * feature is disabled.\n
+ * It throws:
  * - when two objects collide, the event "<CollidingObjectType1>_<CollidingObjectType2>_Collision",
- * with the first type name less the second one in alphabetical ascending order (A to Z)
+ * with the two type names ordered in alphabetical ascending order (A to Z)
  * (i.e. using the std::string::operator<()).
  * This event is thrown continuously at a frequency which is the minimum between the fps and
  * the frequency specified (which defaults to 30 times per seconds) until

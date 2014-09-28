@@ -15,31 +15,36 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/test/commoncomponents/CommonSuiteFixture.h
+ * \file /Ely/src/test/commoncomponents/GameConfig_test.cpp
  *
- * \date 27/ago/2014 (12:05:03)
+ * \date 28/set/2014 (11:10:41)
  * \author consultit
  */
 
-#ifndef COMMONSUITEFIXTURE_H_
-#define COMMONSUITEFIXTURE_H_
+#include "CommonSuiteFixture.h"
 
-#include <boost/test/unit_test.hpp>
-#include "CommonComponents/Default.h"
-#include "CommonComponents/DefaultTemplate.h"
-#include "CommonComponents/GameConfig.h"
-#include "CommonComponents/GameConfigTemplate.h"
-
-using namespace ely;
-
-struct CommonSuiteFixture
+struct GameConfigTestCaseFixture
 {
-	CommonSuiteFixture()
+	GameConfigTestCaseFixture()
 	{
 	}
-	~CommonSuiteFixture()
+
+	~GameConfigTestCaseFixture()
 	{
 	}
 };
 
-#endif /* COMMONSUITEFIXTURE_H_ */
+/// Common suite
+BOOST_FIXTURE_TEST_SUITE(Common, CommonSuiteFixture)
+
+/// Test cases
+BOOST_AUTO_TEST_CASE(TEST)
+{
+	BOOST_TEST_MESSAGE("TESTING");
+	BOOST_CHECK(true);
+}
+
+BOOST_AUTO_TEST_SUITE_END() // Common suite
+
+
+
