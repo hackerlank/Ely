@@ -65,7 +65,8 @@ dist_pkgdata_DATA = game.xml config.prc
 EXTRA_DIST = Ely_ini.h.in config.prc.in game.xml.in
 
 if !ELY_DEVEL
-substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)|g'
+substDataDir = sed -e 's|@elydatadir[@]|$(pkgdatadir)/data|g'
+substShareDir = sed -e 's|@elysharedir[@]|$(pkgdatadir)|g'
 substLibDir = sed -e 's|@elylibdir[@]|$(pkglibdir)|g'
 substCallbacks = sed -e 's/@callbacks[@]\///g'
 substTransitions = sed -e 's/@transitions[@]\///g'
@@ -73,6 +74,7 @@ substInitializations = sed -e 's/@initializations[@]\///g'
 substInstanceupdates = sed -e 's/@instanceupdates[@]\///g'
 else
 substDataDir = sed -e 's|@elydatadir[@]|$(abs_top_srcdir)/ely/data|g'
+substShareDir = sed -e 's|@elysharedir[@]|$(abs_top_builddir)/ely|g'
 substLibDir = sed -e 's|@elylibdir[@]|$(abs_top_builddir)/ely|g'
 substCallbacks = sed -e 's/@callbacks[@]/callbacks/g'
 substTransitions = sed -e 's/@transitions[@]/transitions/g'
@@ -83,6 +85,7 @@ endif
 #Ely_ini.h rules
 Ely_ini.h : $(top_srcdir)/ely/Ely_ini.h.in Makefile
 	$(substDataDir) $(top_srcdir)/ely/$@.in | \
+	$(substShareDir) | \
 	$(substLibDir) | \
 	$(substCallbacks) | \
 	$(substTransitions) | \

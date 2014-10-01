@@ -4,9 +4,9 @@
 #define ELY_DATADIR "@elydatadir@/"
 
 /// Ely Panda3d config.prc configuration file path
-#define ELY_CONFIGPRC "@elylibdir@/config.prc"
+#define ELY_CONFIGPRC "@elysharedir@/config.prc"
 /// Ely game.xml configuration file path
-#define ELY_CONFIGFILE "@elylibdir@/game.xml"
+#define ELY_CONFIGFILE "@elysharedir@/game.xml"
 ///Event callbacks module (See Component)
 #define ELY_CALLBACKS_LA "@elylibdir@/@callbacks@/callbacks.la"
 ///Transition functions module (see Activity component).
