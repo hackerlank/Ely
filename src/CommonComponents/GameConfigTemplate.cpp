@@ -21,20 +21,57 @@
  * \author consultit
  */
 
-#include <CommonComponents/GameConfigTemplate.h>
+#include "CommonComponents/GameConfigTemplate.h"
+#include "CommonComponents/GameConfig.h"
 
 namespace ely
 {
 
-GameConfigTemplate::GameConfigTemplate()
+GameConfigTemplate::GameConfigTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
 {
-	// TODO Auto-generated constructor stub
-
+	//
+	setParametersDefaults();
 }
 
 GameConfigTemplate::~GameConfigTemplate()
 {
 	// TODO Auto-generated destructor stub
 }
+
+ComponentType GameConfigTemplate::componentType() const
+{
+	return ComponentType(GameConfig::get_class_type().get_name());
+}
+
+ComponentFamilyType GameConfigTemplate::familyType() const
+{
+	return ComponentFamilyType("Common");
+}
+
+SMARTPTR(Component)GameConfigTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(GameConfig) newGameConfig = new GameConfig(this);
+	newGameConfig->setComponentId(compId);
+	if (not newGameConfig->initialize())
+	{
+		return NULL;
+	}
+	return newGameConfig.p();
+}
+
+void GameConfigTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle GameConfigTemplate::_type_handle;
 
 } /* namespace ely */

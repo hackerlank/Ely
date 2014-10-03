@@ -46,6 +46,8 @@
 #include "BehaviorComponents/ActivityTemplate.h"
 #include "CommonComponents/Default.h"
 #include "CommonComponents/DefaultTemplate.h"
+#include "CommonComponents/GameConfig.h"
+#include "CommonComponents/GameConfigTemplate.h"
 #include "ControlComponents/Chaser.h"
 #include "ControlComponents/ChaserTemplate.h"
 #include "ControlComponents/Driver.h"

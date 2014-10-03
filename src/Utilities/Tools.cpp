@@ -179,6 +179,8 @@ void initTypedObjects()
 	ActivityTemplate::init_type();
 	Default::init_type();
 	DefaultTemplate::init_type();
+	GameConfig::init_type();
+	GameConfigTemplate::init_type();
 	Chaser::init_type();
 	ChaserTemplate::init_type();
 	Driver::init_type();

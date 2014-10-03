@@ -151,6 +151,9 @@ void GameManager::setupCompTmplMgr()
 	//Default
 	ComponentTemplateManager::GetSingleton().addComponentTemplate(
 			new DefaultTemplate(this, mWindow));
+	//GameConfig
+	ComponentTemplateManager::GetSingleton().addComponentTemplate(
+			new GameConfigTemplate(this, mWindow));
 
 	//Control templates
 	//Chaser

@@ -21,7 +21,8 @@
  * \author consultit
  */
 
-#include <CommonComponents/GameConfig.h>
+#include "CommonComponents/GameConfig.h"
+#include "CommonComponents/GameConfigTemplate.h"
 
 namespace ely
 {
@@ -29,12 +30,29 @@ namespace ely
 GameConfig::GameConfig()
 {
 	// TODO Auto-generated constructor stub
+}
 
+GameConfig::GameConfig(SMARTPTR(GameConfigTemplate)tmpl)
+{
+	mTmpl = tmpl;
+	reset();
 }
 
 GameConfig::~GameConfig()
 {
-	// TODO Auto-generated destructor stub
 }
+
+ComponentFamilyType GameConfig::familyType() const
+{
+	return mTmpl->familyType();
+}
+
+ComponentType GameConfig::componentType() const
+{
+	return mTmpl->componentType();
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle GameConfig::_type_handle;
 
 } /* namespace ely */
