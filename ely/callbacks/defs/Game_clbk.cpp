@@ -56,8 +56,8 @@ void carMoveSteady(const Event* event, void* data)
 	SMARTPTR(Vehicle) vehicle =
 	DCAST(Vehicle, event->get_parameter(0).get_ptr());
 	//
-	std::cout << "Got: " << event->get_name() << " - Object: " <<
-			std::string(vehicle->getOwnerObject()->objectId()) << std::endl;
+	PRINT_DEBUG("Got: " << event->get_name() << " - Object: " <<
+			std::string(vehicle->getOwnerObject()->objectId()));
 }
 
 ///Character + CharacterController related CALLBACKs
@@ -67,8 +67,8 @@ void characterGroundAir(const Event* event, void* data)
 	SMARTPTR(CharacterController) characterController =
 	DCAST(CharacterController, event->get_parameter(0).get_ptr());
 	//
-	std::cout << "Got: " << event->get_name() << " - Object: " <<
-			std::string(characterController->getOwnerObject()->objectId()) << std::endl;
+	PRINT_DEBUG("Got: " << event->get_name() << " - Object: " <<
+			std::string(characterController->getOwnerObject()->objectId()));
 }
 
 ///OpenSteerVehicle + SteerVehicle related CALLBACKs
@@ -78,8 +78,8 @@ void handleHits(const Event* event, void* data)
 	SMARTPTR(SteerVehicle)steerVehicle =
 	DCAST(SteerVehicle, event->get_parameter(0).get_ptr());
 	//
-	std::cout << "Got: " << event->get_name() << " - Object: " <<
-			std::string(steerVehicle->getOwnerObject()->objectId()) << std::endl;
+	PRINT_DEBUG("Got: " << event->get_name() << " - Object: " <<
+			std::string(steerVehicle->getOwnerObject()->objectId()));
 }
 
 ///Car + GhostObject related CALLBACKs
@@ -92,10 +92,10 @@ void carGhostOverlap(const Event* event, void* data)
 	SMARTPTR(Component)overlappedGhost =
 	DCAST(Component, event->get_parameter(1).get_ptr());
 	//
-	std::cout << "Got: " << event->get_name() << " - Overlapping object: " <<
+	PRINT_DEBUG("Got: " << event->get_name() << " - Overlapping object: " <<
 		std::string(overlappingCar->getOwnerObject()->objectId())
 		<< " - Overlapped object: " <<
-		std::string(overlappedGhost->getOwnerObject()->objectId()) << std::endl;
+		std::string(overlappedGhost->getOwnerObject()->objectId()));
 }
 
 ///Notify Collisions related
@@ -108,10 +108,10 @@ void notifyCollisions(const Event* event, void* data)
 	SMARTPTR(Component)collidingCharacter =
 	DCAST(Component, event->get_parameter(1).get_ptr());
 	//
-	std::cout << "Got: " << event->get_name() << " - Colliding objects: " <<
+	PRINT_DEBUG("Got: " << event->get_name() << " - Colliding objects: " <<
 		std::string(collidingCar->getOwnerObject()->objectId())
 		<< " - " <<
-		std::string(collidingCharacter->getOwnerObject()->objectId()) << std::endl;
+		std::string(collidingCharacter->getOwnerObject()->objectId()));
 }
 
 ///Init/end functions: see common_configs.cpp
