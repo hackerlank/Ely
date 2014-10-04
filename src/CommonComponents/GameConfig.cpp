@@ -23,6 +23,8 @@
 
 #include "CommonComponents/GameConfig.h"
 #include "CommonComponents/GameConfigTemplate.h"
+#include "ObjectModel/Object.h"
+#include "Game/GamePhysicsManager.h"
 
 namespace ely
 {
@@ -50,6 +52,61 @@ ComponentFamilyType GameConfig::familyType() const
 ComponentType GameConfig::componentType() const
 {
 	return mTmpl->componentType();
+}
+
+void GameConfig::onAddToObjectSetup()
+{
+	//set thrown events if any
+	std::string param;
+	unsigned int idx1, valueNum1;
+	std::vector<std::string> paramValuesStr1, paramValuesStr2;
+	param = mTmpl->parameter(std::string("thrown_events"));
+	if (param != std::string(""))
+	{
+		//events specified
+		//event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]
+		paramValuesStr1 = parseCompoundString(param, ':');
+		valueNum1 = paramValuesStr1.size();
+		for (idx1 = 0; idx1 < valueNum1; ++idx1)
+		{
+			//eventX@[event_nameX]@[frequencyX]
+			paramValuesStr2 = parseCompoundString(paramValuesStr1[idx1], '@');
+			if (paramValuesStr2.size() >= 3)
+			{
+				ThrowEventData eventData;
+				//get default name prefix
+				std::string objectType = std::string(
+						mOwnerObject->objectTmpl()->objectType());
+				//get name
+				std::string name = paramValuesStr2[1];
+				//get frequency
+				float frequency = strtof(paramValuesStr2[2].c_str(), NULL);
+				if (frequency <= 0.0)
+				{
+					frequency = 30.0;
+				}
+				//get event
+				if (paramValuesStr2[0] == "collision_notify")
+				{
+					GamePhysicsManager::EventThrown event;
+					event = GamePhysicsManager::COLLISIONNOTIFY;
+					//set event data
+					eventData.mEnable = true;
+					eventData.mEventName = "collision_notify"; //must not be null
+					eventData.mTimeElapsed = 0;
+					eventData.mFrequency = frequency;
+					//enable the event
+					GamePhysicsManager::GetSingletonPtr()->enableCollisionNotify(event, eventData);
+				}
+				else
+				{
+					//paramValuesStr2[0] is not a suitable event:
+					//continue with the next event
+					continue;
+				}
+			}
+		}
+	}
 }
 
 //TypedObject semantics: hardcoded

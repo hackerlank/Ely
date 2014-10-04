@@ -31,12 +31,21 @@ namespace ely
 class GameConfigTemplate;
 
 /**
- * \brief Component representing the overall game configuration.
+ * \brief Component representing the overall game configuration at startup.
+ *
+ * Game configuration is done through both xml parameters and its methods.
+ * .
+ * > *Collision notify*
+ * This configuration allows throwing events when objects collide. It is performed by
+ * the GamePhysicsManager and, by default, it's disabled.\n
+ * It can be enabled at startup by specifying "collision_notify@<EVENTNAME>@<FREQUENCY>" in "thrown_events"
+ * xml parameter, with <EVENTNAME> ignored (so it could be empty).
+ * \see GamePhysicsManager documentation for details.
  *
  * > **XML Param(s)**:
  * param | type | default | note
  * ------|------|---------|-----
- * | - | - | - | -
+ * | *thrown_events* 			|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = collision_notify
  *
  * \note parts inside [] are optional.\n
  */
@@ -100,10 +109,6 @@ inline bool GameConfig::initialize()
 	bool result = true;
 	//
 	return result;
-}
-
-inline void GameConfig::onAddToObjectSetup()
-{
 }
 
 inline void GameConfig::onRemoveFromObjectCleanup()

@@ -42,6 +42,8 @@ CALLBACK characterGroundAir;
 CALLBACK handleHits;
 ///Car + GhostObject related
 CALLBACK carGhostOverlap;
+///Notify Collisions related
+CALLBACK notifyCollisions;
 
 #ifdef __cplusplus
 }
@@ -88,12 +90,28 @@ void carGhostOverlap(const Event* event, void* data)
 	DCAST(Component, event->get_parameter(0).get_ptr());
 	//get second parameter: overlapped ghost component
 	SMARTPTR(Component)overlappedGhost =
-	DCAST(Component, event->get_parameter(0).get_ptr());
+	DCAST(Component, event->get_parameter(1).get_ptr());
 	//
 	std::cout << "Got: " << event->get_name() << " - Overlapping object: " <<
 		std::string(overlappingCar->getOwnerObject()->objectId())
 		<< " - Overlapped object: " <<
 		std::string(overlappedGhost->getOwnerObject()->objectId()) << std::endl;
+}
+
+///Notify Collisions related
+void notifyCollisions(const Event* event, void* data)
+{
+	//get first parameter: overlapping physics component
+	SMARTPTR(Component)collidingCar =
+	DCAST(Component, event->get_parameter(0).get_ptr());
+	//get second parameter: overlapped ghost component
+	SMARTPTR(Component)collidingCharacter =
+	DCAST(Component, event->get_parameter(1).get_ptr());
+	//
+	std::cout << "Got: " << event->get_name() << " - Colliding objects: " <<
+		std::string(collidingCar->getOwnerObject()->objectId())
+		<< " - " <<
+		std::string(collidingCharacter->getOwnerObject()->objectId()) << std::endl;
 }
 
 ///Init/end functions: see common_configs.cpp

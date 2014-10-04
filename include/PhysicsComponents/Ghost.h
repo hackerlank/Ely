@@ -72,7 +72,7 @@ class GhostTemplate;
  * > **XML Param(s)**:
  * param | type | default | note
  * ------|------|---------|-----
- * | *thrown_events* 			|single| *overlap* | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = overlap
+ * | *thrown_events* 			|single| *overlap@@30.0* | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = overlap
  * | *ghost_type* 				|single| *static* | values: static,dynamic
  * | *ghost_friction*  			|single| 0.8 | -
  * | *ghost_restitution*  		|single| 0.1 | -

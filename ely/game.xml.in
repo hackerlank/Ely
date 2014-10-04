@@ -14,12 +14,14 @@
 		<!-- template used only to perform additional initializations/finalizations
 			 besides the ones performed by GameManager -->
 		<ObjectTmpl type="Game">
-			<ComponentTmpl family="Common" type="Default" priority="100">
+			<ComponentTmpl family="Common" type="GameConfig" priority="100">
 				<Param event_types="move_car:steady_car"/>
 				<Param event_types="onground_character:inair_character"/>
 				<Param event_types="path_following:avoid_obstacle"/>
 				<Param event_types="avoid_close_neighbor:avoid_neighbor"/>
 				<Param event_types="overlap:overlap_off"/>
+				<Param event_types="car_character_collision:car_character_collision_off"/>
+				<Param event_types="actor_car_collision:actor_car_collision_off"/>
 			</ComponentTmpl>
 		</ObjectTmpl>
 		
@@ -1205,12 +1207,15 @@
 		</Object>
 		<Object type="Game" id="elyPreObjects" priority="500">
 			<Param parent=""/>
-			<Component type="Default">
+			<Component type="GameConfig">
+				<Param thrown_events="collision_notify@@0.0001"/>
 				<Param events="move_car@Car_Vehicle_Move:steady_car@Car_Vehicle_Steady$carMoveSteady"/>
 				<Param events="onground_character@Character_CharacterController_OnGround:inair_character@Character_CharacterController_InAir$characterGroundAir"/>
 				<Param events="avoid_obstacle@OpenSteerVehicle_SteerVehicle_AvoidObstacle:avoid_close_neighbor@OpenSteerVehicle_SteerVehicle_AvoidCloseNeighbor$handleHits"/>
 				<Param events="path_following@OpenSteerVehicle_SteerVehicle_PathFollowing:avoid_neighbor@OpenSteerVehicle_SteerVehicle_AvoidNeighbor$handleHits"/>
 				<Param events="overlap@Car_GhostObject_Overlap:overlap_off@Car_GhostObject_OverlapOff$carGhostOverlap"/>
+				<Param events="car_character_collision@Car_Character_Collision:car_character_collision_off@Car_Character_CollisionOff$notifyCollisions"/>
+				<Param events="actor_car_collision@Actor_Car_Collision:actor_car_collision_off@Actor_Car_CollisionOff$notifyCollisions"/>
 			</Component>
 		</Object>
 		<Object type="Game" id="elyPostObjects" priority="-500">
