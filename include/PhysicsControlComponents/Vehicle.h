@@ -224,6 +224,7 @@ private:
 	///Helper.
 	void doEnableVehicleEvent(EventThrown event, ThrowEventData eventData);
 	void doThrowEvent(ThrowEventData& eventData);
+	std::string mThrownEventsParam;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -285,6 +286,7 @@ inline void Vehicle::reset()
 	mForward = mBackward = mBrake = mTurnLeft = mTurnRight = mForwardKey =
 			mBackwardKey = mBrakeKey = mTurnLeftKey = mTurnRightKey = false;
 	mMove = mSteady = ThrowEventData();
+	mThrownEventsParam.clear();
 }
 
 inline void Vehicle::enableForward(bool enable)

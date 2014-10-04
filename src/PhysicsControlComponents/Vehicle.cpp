@@ -418,6 +418,8 @@ bool Vehicle::initialize()
 	mTurnRightKey = (
 			mTmpl->parameter(std::string("turn_right"))
 					== std::string("enabled") ? true : false);
+	//thrown events
+	mThrownEventsParam = mTmpl->parameter(std::string("thrown_events"));
 	//
 	return result;
 }
@@ -461,15 +463,13 @@ void Vehicle::onAddToObjectSetup()
 	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
 
 	//set thrown events if any
-	std::string param;
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;
-	param = mTmpl->parameter(std::string("thrown_events"));
-	if(param != std::string(""))
+	if(mThrownEventsParam != std::string(""))
 	{
 		//events specified
 		//event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]
-		paramValuesStr1 = parseCompoundString(param, ':');
+		paramValuesStr1 = parseCompoundString(mThrownEventsParam, ':');
 		valueNum1 = paramValuesStr1.size();
 		for (idx1 = 0; idx1 < valueNum1; ++idx1)
 		{
@@ -528,6 +528,8 @@ void Vehicle::onAddToObjectSetup()
 			}
 		}
 	}
+	//clear all no more needed "Param" variables
+	mThrownEventsParam.clear();
 }
 
 void Vehicle::onRemoveFromObjectCleanup()

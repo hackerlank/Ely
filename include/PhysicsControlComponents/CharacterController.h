@@ -244,6 +244,7 @@ private:
 	///Helper.
 	void doEnableCharacterControllerEvent(EventThrown event, ThrowEventData eventData);
 	void doThrowEvent(ThrowEventData& eventData);
+	std::string mThrownEventsParam;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -299,6 +300,7 @@ inline void CharacterController::reset()
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey, mDownKey =
 			mHeadLeftKey = mHeadRightKey = mJumpKey = false;
 	mOnGround = mInAir = ThrowEventData();
+	mThrownEventsParam.clear();
 }
 
 inline void CharacterController::enableForward(bool enable)

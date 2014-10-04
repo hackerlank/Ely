@@ -215,6 +215,7 @@ private:
 	void doEnableSteerVehicleEvent(EventThrown event, ThrowEventData eventData);
 	void doThrowEvent(ThrowEventData& eventData);
 	void doHandleSteerLibraryEvent(ThrowEventData& eventData, bool callbackCalled);
+	std::string mThrownEventsParam;
 	///@}
 
 #ifdef ELY_THREAD
@@ -269,6 +270,7 @@ inline void SteerVehicle::reset()
 			mANCallbackCalled = false;
 	mMove = mSteady = mPathFollowing = mAvoidObstacle = mAvoidCloseNeighbor =
 			mAvoidNeighbor = ThrowEventData();
+	mThrownEventsParam.clear();
 }
 
 inline OpenSteer::AbstractVehicle& SteerVehicle::getAbstractVehicle()

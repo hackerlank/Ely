@@ -287,6 +287,7 @@ private:
 	std::set<OverlappingNode> mOverlappingNodes;
 	///Helper.
 	void doEnableGhostEvent(EventThrown event, ThrowEventData eventData);
+	std::string mThrownEventsParam;
 	///@}
 
 	///TypedObject semantics: hardcoded
@@ -338,6 +339,7 @@ inline void Ghost::reset()
 	mUpAxis = Z_up;
 	mOverlap = ThrowEventData();
 	mOverlappingNodes.clear();
+	mThrownEventsParam.clear();
 }
 
 inline NodePath Ghost::getNodePath() const

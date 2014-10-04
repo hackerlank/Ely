@@ -72,6 +72,14 @@ public:
 
 private:
 
+	/**
+	 * \name Throwing notify collision events.
+	 */
+	///@{
+	///Helper.
+	std::string mThrownEventsParam;
+	///@}
+
 	///TypedObject semantics: hardcoded
 public:
 	static TypeHandle get_class_type()
@@ -102,13 +110,8 @@ private:
 
 inline void GameConfig::reset()
 {
-}
-
-inline bool GameConfig::initialize()
-{
-	bool result = true;
 	//
-	return result;
+	mThrownEventsParam.clear();
 }
 
 inline void GameConfig::onRemoveFromObjectCleanup()

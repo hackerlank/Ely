@@ -198,6 +198,7 @@ private:
 	///Helper.
 	void doEnableCrowdAgentEvent(EventThrown event, ThrowEventData eventData);
 	void doThrowEvent(ThrowEventData& eventData);
+	std::string mThrownEventsParam;
 	///@}
 
 	///@{
@@ -260,6 +261,7 @@ inline void CrowdAgent::reset()
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
 	mMove = mSteady = ThrowEventData();
+	mThrownEventsParam.clear();
 }
 
 inline dtCrowdAgentParams CrowdAgent::getParams()
