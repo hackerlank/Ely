@@ -47,14 +47,4 @@ CALLBACK default_callback__;
 }
 #endif
 
-///Common declarations
-typedef std::pair<std::string, std::string> StateEventType;
-typedef std::string NextState;
-typedef std::pair<StateEventType, NextState> TransitionTableItem;
-typedef std::map<StateEventType, NextState> TransitionTable;
-
-#define TABLEINSERT(tablePtr,state,eventType,nextState) \
-	(*tablePtr).insert(TransitionTableItem\
-			(StateEventType(state, eventType), NextState(nextState)))
-
 #endif /* COMMON_CONFIGS_H_ */

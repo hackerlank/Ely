@@ -103,7 +103,31 @@
 				<Param event_types="rr:rr-up:rr-q:rl:rl-up:rl-q"/>
 				<Param event_types="j:j-up:j-q"/>				
 				<Param event_types="q:q-up"/>				
-				<Param event_types="ground:air"/>				
+				<Param event_types="ground:air"/>
+				<Param transition_table="I,f@F:I,f-q@F-Q:I,b@B:I,sr@Sr:I,sr-q@Sr-Q:I,sl@Sl:I,sl-q@Sl-Q:I,rr@Rr:I,rr-q@Rr-Q:I,rl@Rl:I,rl-q@Rl-Q:I,j@J"/>
+				<Param transition_table="F,f-up@I:F,f-q@F-Q:F,sr@F-Sr:F,sl@F-Sl:F,rr@F-Rr:F,rr-q@F-Rr-Q:F,rl@F-Rl:F,rl-q@F-Rl-Q:F,j@F-J:F,j-q@F-J-Q:F,q@F-Q"/>
+				<Param transition_table="B,b-up@I:B,sr@B-Sr:B,sl@B-Sl:B,rr@B-Rr:B,rl@B-Rl"/>
+				<Param transition_table="Sr,sr-up@I:Sr,sr-q@Sr-Q:Sr,rr@Sr-Rr:Sr,rr-q@Sr-Rr-Q:Sr,rl@Sr-Rl:Sr,rl-q@Sr-Rl-Q:Sr,q@Sr-Q:Sl,sl-up@I"/>
+				<Param transition_table="Sl,sl-q@Sl-Q:Sl,rr@Sl-Rr:Sl,rr-q@Sl-Rr-Q:Sl,rl@Sl-Rl:Sl,rl-q@Sl-Rl-Q:Sl,q@Sl-Q"/>
+				<Param transition_table="Rr,f@F-Rr:Rr,f-q@F-Rr-Q:Rr,b@B-Rr:Rr,sr@Sr-Rr:Rr,sr-q@Sr-Rr-Q:Rr,sl@Sl-Rr:Rr,sl-q@Sr-Rl-Q:Rr,rr-up@I:Rr,rr-q@Rr-Q:Rr,q@Rr-Q"/>
+				<Param transition_table="Rl,f@F-Rl:Rl,f-q@F-Rl-Q:Rl,b@B-Rl:Rl,sr@Sr-Rl:Rl,sr-q@Sr-Rl-Q:Rl,sl@Sl-Rl:Rl,sl-q@Sl-Rl-Q:Rl,rl-up@I:Rl,rl-q@Rl-Q:Rl,q@Rl-Q"/>
+				<Param transition_table="J,f@F-J:J,f-q@F-J-Q:J,j-up@I"/>
+				<Param transition_table="F-Rr,f-up@Rr:F-Rr,f-q@F-Rr-Q:F-Rr,rr-up@F:F-Rr,rr-q@F-Rr-Q:F-Rr,rl@F-Rr-Rl:F-Rr,rl-q@F-Rr-Rl-Q:F-Rr,q@F-Rr-Q:F-Rl,f-up@Rl:F-Rl,f-q@F-Rl-Q:F-Rl,rr@F-Rr-Rl:F-Rl,rr-q@F-Rr-Rl-Q:F-Rl,rl-up@F:F-Rl,rl-q@F-Rl-Q:F-Rl,q@F-Rl-Q:F-Rr-Rl,f-up@Rr-Rl:F-Rr-Rl,f-q@F-Rr-Rl-Q:F-Rr-Rl,rr-up@F-Rl:F-Rr-Rl,rr-q@F-Rr-Rl-Q:F-Rr-Rl,rl-up@F-Rr:F-Rr-Rl,rl-q@F-Rr-Rl-Q:F-Rr-Rl,q@F-Rr-Rl-Q"/>
+				<Param transition_table="Rr-Rl,f@F-Rr-Rl:Rr-Rl,f-q@F-Rr-Rl-Q:Rr-Rl,rr-up@Rl:Rr-Rl,rr-q@Rr-Rl-Q:Rr-Rl,rl-up@Rr:Rr-Rl,rl-q@Rr-Rl-Q:Rr-Rl,q@Rr-Rl-Q"/>
+				<Param transition_table="F-J,f-up@J:F-J,f-q@F-J-Q:F-J,j-up@F:F-J,j-q@F-J-Q:F-J,q@F-J-Q"/>
+				<Param transition_table="B-Rr,b-up@Rr:B-Rr,rr-up@B:B-Rl,b-up@Rl:B-Rl,rl-up@B"/>
+				<Param transition_table="Sr-Rr,sr-up@Rr:Sr-Rr,sr-q@Sr-Rr-Q:Sr-Rr,rr-up@Sr:Sr-Rr,rr-q@Sr-Rr-Q:Sr-Rr,q@Sr-Rr-Q:Sr-Rl,sr-up@Rl:Sr-Rl,sr-q@Sr-Rl-Q:Sr-Rl,rl-up@Sr:Sr-Rl,rl-q@Sr-Rl-Q:Sr-Rl,q@Sr-Rl-Q"/>
+				<Param transition_table="Sl-Rr,sl-up@Rr:Sl-Rr,sl-q@Sl-Rr-Q:Sl-Rr,rr-up@Sl:Sl-Rr,rr-q@Sl-Rr-Q:Sl-Rr,q@Sl-Rr-Q:Sl-Rl,sl-up@Rl:Sl-Rl,sl-q@Sl-Rl-Q:Sl-Rl,rl-up@Sl:Sl-Rl,rl-q@Sl-Rl-Q:Sl-Rl,q@Sl-Rl-Q:F-Q,f-up@I"/>
+				<Param transition_table="F-Q,rr@F-Rr-Q:F-Q,rr-q@F-Rr-Q:F-Q,rl@F-Rl-Q:F-Q,rl-q@F-Rl-Q:F-Q,j@F-J-Q:F-Q,q-up@F"/>
+				<Param transition_table="Sr-Q,sr-up@I:Sr-Q,rr@Sr-Rr-Q:Sr-Q,rr-q@Sr-Rr-Q:Sr-Q,rl@Sr-Rl-Q:Sr-Q,rl-q@Sr-Rl-Q:Sr-Q,q-up@Sr"/>
+				<Param transition_table="Sl-Q,sl-up@I:Sl-Q,rr@Sl-Rr-Q:Sl-Q,rr-q@Sl-Rr-Q:Sl-Q,rl@Sl-Rl-Q:Sl-Q,rl-q@Sl-Rl-Q:Sl-Q,q-up@Sl"/>
+				<Param transition_table="Rr-Q,f@F-Rr-Q:Rr-Q,f-q@F-Rr-Q:Rr-Q,sr@Sr-Rr-Q:Rr-Q,sr-q@Sr-Rr-Q:Rr-Q,sl@Sl-Rr-Q:Rr-Q,sl-q@Sl-Rr-Q:Rr-Q,rr-up@I:Rr-Q,q-up@Rr"/>
+				<Param transition_table="Rl-Q,f@F-Rl-Q:Rl-Q,f-q@F-Rl-Q:Rl-Q,sr@Sr-Rl-Q:Rl-Q,sr-q@Sr-Rl-Q:Rl-Q,sl@Sl-Rl-Q:Rl-Q,sl-q@Sl-Rl-Q:Rl-Q,rl-up@I:Rl-Q,q-up@Rl"/>
+				<Param transition_table="F-Rr-Q,f-up@Rr-Q:F-Rr-Q,rr-up@F-Q:F-Rr-Q,rl@F-Rr-Rl:F-Rr-Q,rl-q@F-Rr-Rl-Q:F-Rr-Q,q-up@F-Rr:F-Rl-Q,f-up@Rl-Q:F-Rl-Q,rr@F-Rr-Rl:F-Rl-Q,rr-q@F-Rr-Rl-Q:F-Rl-Q,rl-up@F-Q:F-Rl-Q,q-up@F-Rl:F-Rr-Rl-Q,f-up@Rr-Rl-Q:F-Rr-Rl-Q,rr-up@F-Rl-Q:F-Rr-Rl-Q,rl-up@F-Rr-Q:F-Rr-Rl-Q,q-up@F-Rr-Rl"/>
+				<Param transition_table="Rr-Rl-Q,f@F-Rr-Rl-Q:Rr-Rl-Q,f-q@F-Rr-Rl-Q:Rr-Rl-Q,rr-up@Rl-Q:Rr-Rl-Q,rl-up@Rr-Q:Rr-Rl-Q,q-up@Rr-Rl"/>
+				<Param transition_table="F-J-Q,f-up@J:F-J-Q,j-up@F-Q:F-J-Q,q-up@F-J"/>
+				<Param transition_table="Sr-Rr-Q,sr-up@Rr-Q:Sr-Rr-Q,rr-up@Sr-Q:Sr-Rr-Q,q-up@Sr-Rr:Sr-Rl-Q,sr-up@Rl-Q:Sr-Rl-Q,rl-up@Sr-Q:Sr-Rl-Q,q-up@Sr-Rl"/>
+				<Param transition_table="Sl-Rr-Q,sl-up@Rr-Q:Sl-Rr-Q,rr-up@Sl-Q:Sl-Rr-Q,q-up@Sl-Rr:Sl-Rl-Q,sl-up@Rl-Q:Sl-Rl-Q,rl-up@Sl-Q:Sl-Rl-Q,q-up@Sr-Rl"/>
 			</ComponentTmpl>
 			<ComponentTmpl family="AI" type="SteerVehicle" priority="80"/>
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>

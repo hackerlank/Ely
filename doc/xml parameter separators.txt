@@ -3,3 +3,7 @@ XML Parameters separators
 "@" -> Component, NavMesh, Sound3d, Activity, Model
 "$" -> Component, Activity, Vehicle
 ":" -> Component, Sound3d, Activity, Model, NavMesh
+
+-A parameter is "compound" when it is composed by substrings separated by ":".
+-A parameter is "single" when can be specified once.
+-A parameter is "multiple" when can be specified many times.

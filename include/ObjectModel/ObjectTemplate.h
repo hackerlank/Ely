@@ -145,8 +145,13 @@ public:
 	WindowFramework* const windowFramework() const;
 
 	/**
-	 * \brief Adds a common attribute for a given component type of
-	 * this object.
+	 * \brief Adds a common "multi-valued" parameter to a component type
+	 * of this object.
+	 *
+	 * Any parameter value is interpreted as a "compound" one, i.e. as having
+	 * the form: "value1:value2:...:valueN" and each valueX is stored in a
+	 * list as returned by componentParameterValues().\n
+	 *
 	 * @param parameterName The parameter name.
 	 * @param parameterValue The parameter value.
 	 * @param componentType The component type the parameter is related to.
@@ -167,8 +172,9 @@ public:
 			ComponentType compType);
 
 	/**
-	 * \brief Gets the parameter multi-values associated with the parameter
-	 * associated to the component type of the object.
+	 * \brief Gets all values of the common parameter associated to
+	 * the component type of the object.
+	 *
 	 * @param paramName The name of the parameter.
 	 * @param componentType The component type.
 	 * @return The value list  of the parameter, empty list if none exists.

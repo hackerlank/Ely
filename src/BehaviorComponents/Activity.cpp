@@ -74,7 +74,7 @@ bool Activity::initialize()
 	return result;
 }
 
-void Activity::doSetupHelperData()
+void Activity::doSetupFSMData()
 {
 	//clear helper data
 	mStateTransitionTable.clear();
@@ -203,10 +203,52 @@ void Activity::doSetupHelperData()
 	mFromToTransitionListParam.clear();
 }
 
+void Activity::doSetupTransitionTableData()
+{
+	//
+	std::list<std::string>::const_iterator iter;
+	//fill up transition table
+	std::list<std::string> transitionTableItems =
+			mOwnerObject->objectTmpl()->componentParameterValues(
+					std::string("transition_table"), componentType());
+	for (iter = transitionTableItems.begin();
+			iter != transitionTableItems.end(); ++iter)
+	{
+		//each parameter value is of the form:
+		//	"current_state,event_type@next_state"
+		std::vector<std::string> currentTypeNext = parseCompoundString(*iter,
+				'@');
+		if (currentTypeNext.size() >= 2)
+		{
+			std::vector<std::string> currentType = parseCompoundString(
+					currentTypeNext[0], ',');
+			if (currentType.size() >= 2)
+			{
+				if (mOwnerObject->objectTmpl()->isComponentParameterValue(
+						"states", currentType[0], componentType())
+						and mOwnerObject->objectTmpl()->isComponentParameterValue(
+								"states", currentTypeNext[1], componentType())
+						and mOwnerObject->objectTmpl()->isComponentParameterValue(
+								"event_types", currentType[1], componentType()))
+				{
+					//insert element into the transition table
+					mTransitionTable.insert(
+							TransitionTableItem(
+									StateEventType(currentType[0],
+											currentType[1]),
+									NextState(currentTypeNext[1])));
+				}
+			}
+		}
+	}
+}
+
 void Activity::onAddToObjectSetup()
 {
 	//setup the FSM
-	doSetupHelperData();
+	doSetupFSMData();
+	//setup the Transition Table
+	doSetupTransitionTableData();
 
 	//load transitions library
 	doLoadTransitionFunctions();
