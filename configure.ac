@@ -138,17 +138,17 @@ AM_COND_IF([ELY_ELF],
 		tinyxml2/Makefile
 		src/Makefile
 		doc/Makefile
-		ely/Makefile
-		ely/callbacks/Makefile
-		ely/transitions/Makefile
-		ely/instanceupdates/Makefile
-		ely/initializations/Makefile
-		ely/data/Makefile
-		ely/data/misc/Makefile
-		ely/data/models/Makefile
-		ely/data/shaders/Makefile
-		ely/data/sounds/Makefile
-		ely/data/textures/Makefile
+		elygame/Makefile
+		elygame/callbacks/Makefile
+		elygame/transitions/Makefile
+		elygame/instanceupdates/Makefile
+		elygame/initializations/Makefile
+		elygame/data/Makefile
+		elygame/data/misc/Makefile
+		elygame/data/models/Makefile
+		elygame/data/shaders/Makefile
+		elygame/data/sounds/Makefile
+		elygame/data/textures/Makefile
 		])])
 
 # checks for typedefs, structures, and compiler characteristics.

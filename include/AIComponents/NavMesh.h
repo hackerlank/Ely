@@ -24,10 +24,10 @@
 #ifndef NAVMESH_H_
 #define NAVMESH_H_
 
-#include "RecastNavigation/NavMeshType.h"
-#include "RecastNavigation/InputGeom.h"
-#include "RecastNavigation/DebugInterfaces.h"
-#include "RecastNavigation/CrowdTool.h"
+#include "RecastNavigationLocal/NavMeshType.h"
+#include "RecastNavigationLocal/InputGeom.h"
+#include "RecastNavigationLocal/DebugInterfaces.h"
+#include "RecastNavigationLocal/CrowdTool.h"
 #include "ObjectModel/Component.h"
 #include "CrowdAgent.h"
 #include <DetourCrowd.h>

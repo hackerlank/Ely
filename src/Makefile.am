@@ -109,19 +109,19 @@ libsupport_a_SOURCES = \
 		Support/Distributed/DistributedObjectBase.cpp
 
 librecastnavigation_a_SOURCES = \
-		AIComponents/RecastNavigation/InputGeom.cpp \
-		AIComponents/RecastNavigation/ChunkyTriMesh.cpp \
-		AIComponents/RecastNavigation/MeshLoaderObj.cpp \
-		AIComponents/RecastNavigation/DebugInterfaces.cpp \
-		AIComponents/RecastNavigation/PerfTimer.cpp \
-		AIComponents/RecastNavigation/NavMeshType.cpp \
-		AIComponents/RecastNavigation/NavMeshType_Tile.cpp \
-		AIComponents/RecastNavigation/NavMeshType_Solo.cpp \
-		AIComponents/RecastNavigation/NavMeshType_Obstacle.cpp \
-		AIComponents/RecastNavigation/fastlz.c \
-		AIComponents/RecastNavigation/ConvexVolumeTool.cpp \
-		AIComponents/RecastNavigation/CrowdTool.cpp \
-		AIComponents/RecastNavigation/OffMeshConnectionTool.cpp
+		AIComponents/RecastNavigationLocal/InputGeom.cpp \
+		AIComponents/RecastNavigationLocal/ChunkyTriMesh.cpp \
+		AIComponents/RecastNavigationLocal/MeshLoaderObj.cpp \
+		AIComponents/RecastNavigationLocal/DebugInterfaces.cpp \
+		AIComponents/RecastNavigationLocal/PerfTimer.cpp \
+		AIComponents/RecastNavigationLocal/NavMeshType.cpp \
+		AIComponents/RecastNavigationLocal/NavMeshType_Tile.cpp \
+		AIComponents/RecastNavigationLocal/NavMeshType_Solo.cpp \
+		AIComponents/RecastNavigationLocal/NavMeshType_Obstacle.cpp \
+		AIComponents/RecastNavigationLocal/fastlz.c \
+		AIComponents/RecastNavigationLocal/ConvexVolumeTool.cpp \
+		AIComponents/RecastNavigationLocal/CrowdTool.cpp \
+		AIComponents/RecastNavigationLocal/OffMeshConnectionTool.cpp
 
 libopensteer_a_SOURCES = \
 		AIComponents/OpenSteerLocal/Draw.cpp \

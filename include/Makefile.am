@@ -1,18 +1,18 @@
 recastnavigation_headers = \
-		AIComponents/RecastNavigation/common.h \
-		AIComponents/RecastNavigation/InputGeom.h \
-		AIComponents/RecastNavigation/ChunkyTriMesh.h \
-		AIComponents/RecastNavigation/MeshLoaderObj.h \
-		AIComponents/RecastNavigation/DebugInterfaces.h \
-		AIComponents/RecastNavigation/PerfTimer.h \
-		AIComponents/RecastNavigation/NavMeshType.h \
-		AIComponents/RecastNavigation/NavMeshType_Tile.h \
-		AIComponents/RecastNavigation/NavMeshType_Solo.h \
-		AIComponents/RecastNavigation/NavMeshType_Obstacle.h \
-		AIComponents/RecastNavigation/fastlz.h \
-		AIComponents/RecastNavigation/ConvexVolumeTool.h \
-		AIComponents/RecastNavigation/CrowdTool.h \
-		AIComponents/RecastNavigation/OffMeshConnectionTool.h
+		AIComponents/RecastNavigationLocal/common.h \
+		AIComponents/RecastNavigationLocal/InputGeom.h \
+		AIComponents/RecastNavigationLocal/ChunkyTriMesh.h \
+		AIComponents/RecastNavigationLocal/MeshLoaderObj.h \
+		AIComponents/RecastNavigationLocal/DebugInterfaces.h \
+		AIComponents/RecastNavigationLocal/PerfTimer.h \
+		AIComponents/RecastNavigationLocal/NavMeshType.h \
+		AIComponents/RecastNavigationLocal/NavMeshType_Tile.h \
+		AIComponents/RecastNavigationLocal/NavMeshType_Solo.h \
+		AIComponents/RecastNavigationLocal/NavMeshType_Obstacle.h \
+		AIComponents/RecastNavigationLocal/fastlz.h \
+		AIComponents/RecastNavigationLocal/ConvexVolumeTool.h \
+		AIComponents/RecastNavigationLocal/CrowdTool.h \
+		AIComponents/RecastNavigationLocal/OffMeshConnectionTool.h
 		
 opensteer_headers = \
 		AIComponents/OpenSteerLocal/common.h \

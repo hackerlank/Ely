@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = include tinyxml2 src doc ely
+DIST_SUBDIRS = include tinyxml2 src doc elygame
 
 if BOOST_TEST
 BOOSTTESTDIR = src/test
