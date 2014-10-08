@@ -24,12 +24,12 @@
 #include "AIComponents/CrowdAgent.h"
 #include "AIComponents/CrowdAgentTemplate.h"
 #include "AIComponents/NavMesh.h"
-#include "AIComponents/RecastNavigationLocal/CrowdTool.h"
+#include "Support/RecastNavigationLocal/CrowdTool.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "PhysicsComponents/BulletLocal/bulletTriangleMesh.h"
-#include "PhysicsComponents/BulletLocal/bulletTriangleMeshShape.h"
+#include "Support/BulletLocal/bulletTriangleMesh.h"
+#include "Support/BulletLocal/bulletTriangleMeshShape.h"
 
 namespace ely
 {

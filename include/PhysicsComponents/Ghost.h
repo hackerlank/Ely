@@ -25,7 +25,7 @@
 #define GHOST_H_
 
 #include <nodePath.h>
-#include "PhysicsComponents/BulletLocal/bulletGhostNode.h"
+#include "Support/BulletLocal/bulletGhostNode.h"
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Game/GamePhysicsManager.h"

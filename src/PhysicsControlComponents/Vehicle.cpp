@@ -27,7 +27,7 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "PhysicsComponents/BulletLocal/bulletWheel.h"
+#include "Support/BulletLocal/bulletWheel.h"
 
 namespace ely
 {

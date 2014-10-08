@@ -27,9 +27,9 @@
 #include "texturePool.h"
 #include "load_prc_file.h"
 #include "Utilities/Tools.h"
-#include "PhysicsComponents/BulletLocal/bulletWorld.h"
-#include "PhysicsComponents/BulletLocal/bulletHeightfieldShape.h"
-#include "PhysicsComponents/BulletLocal/bulletSphereShape.h"
+#include "Support/BulletLocal/bulletWorld.h"
+#include "Support/BulletLocal/bulletHeightfieldShape.h"
+#include "Support/BulletLocal/bulletSphereShape.h"
 
 AsyncTask::DoneStatus updateTerrain(GenericAsyncTask* task, void* data);
 AsyncTask::DoneStatus updatePhysics(GenericAsyncTask* task, void* data);

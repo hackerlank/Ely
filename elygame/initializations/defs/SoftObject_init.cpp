@@ -23,9 +23,9 @@
 
 #include "../common_configs.h"
 #include "PhysicsComponents/SoftBody.h"
-#include "PhysicsComponents/BulletLocal/bulletSoftBodyMaterial.h"
-#include "PhysicsComponents/BulletLocal/bulletSoftBodyConfig.h"
-#include "PhysicsComponents/BulletLocal/bulletShape.h"
+#include "Support/BulletLocal/bulletSoftBodyMaterial.h"
+#include "Support/BulletLocal/bulletSoftBodyConfig.h"
+#include "Support/BulletLocal/bulletShape.h"
 
 ///Soft objects related
 #ifdef __cplusplus

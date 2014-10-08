@@ -28,8 +28,8 @@
 #include "ObjectModel/Object.h"
 #include <DetourCrowd.h>
 #include <throw_event.h>
-#include "PhysicsComponents/BulletLocal/bulletWorld.h"
-#include "PhysicsComponents/BulletLocal/bulletClosestHitRayResult.h"
+#include "Support/BulletLocal/bulletWorld.h"
+#include "Support/BulletLocal/bulletClosestHitRayResult.h"
 
 namespace ely
 {

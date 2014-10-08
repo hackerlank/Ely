@@ -28,7 +28,7 @@
 //Distributed
 #include "Support/Distributed/DistributedObjectBase.h"
 //Bullet
-#include "PhysicsComponents/BulletLocal/config_bullet.h"
+#include "Support/BulletLocal/config_bullet.h"
 
 namespace ely
 {
