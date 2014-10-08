@@ -113,7 +113,7 @@ AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" != xno])
 AM_COND_IF([BOOST_TEST],
 	[AX_BOOST_BASE
 	AX_BOOST_UNIT_TEST_FRAMEWORK
-	AC_CONFIG_FILES([src/test/Makefile])])
+	AC_CONFIG_FILES([test/Makefile])])
 
 # checks for training tests (mantainer only)
 AC_ARG_ENABLE([ely-training],
@@ -135,7 +135,6 @@ AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" = xno -a "x${ely_training}" = xno
 AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile
-		tinyxml2/Makefile
 		src/Makefile
 		doc/Makefile
 		elygame/Makefile

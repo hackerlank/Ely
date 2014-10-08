@@ -1,3 +1,6 @@
+tinyxml2_headers = \
+		Support/tinyxlm2/tinyxml2.h
+
 recastnavigation_headers = \
 		Support/RecastNavigationLocal/common.h \
 		Support/RecastNavigationLocal/InputGeom.h \
@@ -89,8 +92,6 @@ noinst_HEADERS = \
 		AIComponents/SteerPlugInTemplate.h \
 		AIComponents/SteerVehicle.h \
 		AIComponents/SteerVehicleTemplate.h \
-		$(recastnavigation_headers) \
-		$(opensteer_headers) \
 		AudioComponents/Listener.h \
 		AudioComponents/ListenerTemplate.h \
 		AudioComponents/Sound3d.h \
@@ -124,7 +125,6 @@ noinst_HEADERS = \
 		PhysicsComponents/RigidBodyTemplate.h \
 		PhysicsComponents/SoftBody.h \
 		PhysicsComponents/SoftBodyTemplate.h \
-		$(bullet_headers) \
 		PhysicsControlComponents/CharacterController.h \
 		PhysicsControlComponents/CharacterControllerTemplate.h \
 		PhysicsControlComponents/Vehicle.h \
@@ -142,6 +142,10 @@ noinst_HEADERS = \
 		Support/Raycaster.h \
 		Support/Distributed/ClientRepositoryBase.h \
 		Support/Distributed/DistributedObjectBase.h \
+		$(bullet_headers) \
+		$(opensteer_headers) \
+		$(recastnavigation_headers) \
+		$(tinyxml2_headers) \
 		Utilities/ComponentSuite.h \
 		Utilities/Tools.h
 

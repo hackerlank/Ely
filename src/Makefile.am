@@ -1,4 +1,4 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
@@ -18,6 +18,7 @@ noinst_LTLIBRARIES = \
 
 #libraries
 noinst_LIBRARIES = \
+		libtinyxml2.a \
 		libsupport.a \
 		librecastnavigation.a \
 		libopensteer.a \
@@ -101,6 +102,9 @@ libutilities_la_SOURCES = \
 		Utilities/Tools.cpp
 
 #libraries sources
+libtinyxml2_a_SOURCES = \
+		Support/tinyxml2/tinyxml2.cpp
+
 libsupport_a_SOURCES = \
 		Support/FSM.cpp \
 		Support/Picker.cpp \

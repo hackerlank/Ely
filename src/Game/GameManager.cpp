@@ -25,7 +25,7 @@
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Utilities/ComponentSuite.h"
-#include "tinyxml2.h"
+#include "Support/tinyxlm2/tinyxml2.h"
 
 namespace ely
 {

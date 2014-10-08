@@ -7,7 +7,7 @@ endif
 
 SUBDIRS = $(ELYELFDIRS)
 
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
@@ -36,6 +36,7 @@ elygame_ltlibraries = \
 		$(top_builddir)/src/libutilities.la
 
 elygame_libraries = \
+		$(top_builddir)/src/libtinyxml2.a \
 		$(top_builddir)/src/librecastnavigation.a \
 		$(top_builddir)/src/libbullet.a
 whole_archives = \
@@ -54,7 +55,6 @@ elygame_LDFLAGS = $(AM_LDFLAGS) -export-dynamic \
 elygame_LDADD = \
 		$(elygame_ltlibraries) \
 		$(elygame_libraries) \
-		$(top_builddir)/tinyxml2/libtinyxml2.la \
 		-dlopen $(builddir)/callbacks/callbacks.la \
 		-dlopen $(builddir)/initializations/initializations.la \
 		-dlopen $(builddir)/transitions/transitions.la \
