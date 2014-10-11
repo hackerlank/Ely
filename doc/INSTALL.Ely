@@ -1,8 +1,69 @@
 Ely Installation
 ****************
-Ely depends on several libraries, with some of them supplied by the 
-Debian and Ubuntu distributions and others that have to be built manually, as 
-described by the following instructions.
+Ely is a game development environment and, as such, it is not so trivial to install.
+The overall environment is composed of many packages with interdependencies between them.
+Some of these packages are supplied by the distribution (Debian or Ubuntu), while others 
+are to be built manually.
+Most manually installed packages, included Ely, uses 'GNU autotools' build system and are 
+supplied in custom source repositories which are kept, as far as possible, up to date with 
+the original ones (the only difference is the build system).
+Moreover these custom repositories, included Ely, are in 'maintainer mode', meaning that you
+need to use the full autotools suite to build the packages, although you can obtain distributable 
+source packages (with make dist) which can be build with only the classic triad:
+
+ $ configure
+ $ make
+ $ sudo make install
+ 
+In the following instructions these conventions are used:
+-the given order of installation should be followed (because of (inter)dependencies)
+-packages are built into 'build' directories inside the source trees (but they can be anywhere in 
+ the filesystem)
+-the $ sign means that commands are issued as normal user
+-commands that could be run as root are prefixed with 'sudo' command
+
+Mandatory packages
+------------------
+Install a minimun development environment from distribution:
+
+ $ sudo apt-get install build-essential git autoconf automake libtool
+ 
+GNU Autoconf Archive
+--------------------
+Get source package:
+
+ $ git clone git://git.sv.gnu.org/autoconf-archive.git
+
+install dependencies from distribution:
+
+ $ sudo apt-get install gnulib
+
+issue these commands:
+ 
+ $ cd autoconf-archive
+ $ ./bootstrap.sh
+ $ ./configure --prefix=/usr
+ $ make maintainer-all
+ $ sudo make install
+
+libRocket
+*********
+Get source package (original source repository: https://github.com/libRocket/libRocket.git):
+
+ $ git clone https://github.com/consultit/my_librocket.git
+ 
+install dependencies from distribution:
+
+ $ sudo apt-get install libfreetype6-dev
+ 
+issue these commands:
+
+ $ cd my_librocket
+ $ autoreconf -i -v
+ $ mkdir build
+ $ cd build
+ $ ../configure --prefix=/usr
+
 
 Obtaining Ely
 *************

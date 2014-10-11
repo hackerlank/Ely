@@ -57,6 +57,7 @@ elygame_LDADD = \
 		$(elygame_libraries) \
 		-dlopen $(builddir)/callbacks/callbacks.la \
 		-dlopen $(builddir)/initializations/initializations.la \
+		-dlopen $(builddir)/instanceupdates/instanceupdates.la \
 		-dlopen $(builddir)/transitions/transitions.la \
 		$(ELY_LIBS)
 		
