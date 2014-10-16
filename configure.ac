@@ -90,18 +90,18 @@ AX_PYTHON
 # checks for Python >= 2.7.
 AX_PYTHON_DEVEL([>= '2.7'])
 
-# checks Panda3d sdk environment
-PANDA3D_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
+# checks Ely dependency packages
+ELY_DEPS_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
 # Ely flags for Makefiles
-ELY_CPPFLAGS="${PANDA3D_CPPFLAGS}"
-ELY_LDFLAGS="${PANDA3D_LDFLAGS}"
-ELY_LIBS="${PANDA3D_LIBS}"
+ELY_CPPFLAGS="${ELY_DEPS_CPPFLAGS}"
+ELY_LDFLAGS="${ELY_DEPS_LDFLAGS}"
+ELY_LIBS="${ELY_DEPS_LIBS}"
 AC_SUBST(ELY_CXXFLAGS)
 AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
 #libs for using RN with Physics bullet character
-ELY_RN_PHYSICS_LIBS="${PANDA3D_RN_PHYSICS_LIBS}"
+ELY_RN_PHYSICS_LIBS="${ELY_DEPS_RN_PHYSICS_LIBS}"
 AC_SUBST(ELY_RN_PHYSICS_LIBS)
 
 # checks for Boost Unit Test Framework tests (mantainer only)
@@ -167,10 +167,17 @@ AC_OUTPUT
 echo \
 "-------------------------------------------------
 ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
-Prefix: '${prefix}'.
-Compiler command: '${CXX} ${ELY_CXXFLAGS} ${ELY_CPPFLAGS}'
-Linker command: '${CXX} ${ELY_LDFLAGS} ${ELY_LIBS}'
-Build Type: ${BUILDTYPE}
+
+-Prefix: '${prefix}'.
+
+- ${CXX} compiler flags: 
+    ' ${ELY_CXXFLAGS} ${ELY_CPPFLAGS}'
+
+- ${CXX} linker flags: 
+    '${ELY_LDFLAGS} ${ELY_LIBS}'
+
+-Build Type: ${BUILDTYPE}
+
 Now type 'make @<:@<target>@:>@'
 where the optional <target> is:
 	all -->for building all binaries
