@@ -73,6 +73,14 @@ AS_IF([test "x${ely_thread}" != xno],
 # checks for libraries.
 AC_SEARCH_LIBS([lt_dlopen], [ltdl])
 
+# checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_STDBOOL
+AC_TYPE_SIZE_T
+AC_TYPE_UINT32_T
+
+# checks for library functions.
+AC_CHECK_FUNCS([pow sqrt strchr strtol])
+
 # checks for standard header files.
 AC_CHECK_HEADERS([stdint.h ltdl.h])
 AX_CXX_HEADER_STDCXX_98
@@ -90,7 +98,7 @@ AX_PYTHON
 # checks for Python >= 2.7.
 AX_PYTHON_DEVEL([>= '2.7'])
 
-# checks Ely dependency packages
+# checks for Ely dependency packages
 ELY_DEPS_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
 # Ely flags for Makefiles
 ELY_CPPFLAGS="${ELY_DEPS_CPPFLAGS}"
@@ -100,14 +108,11 @@ AC_SUBST(ELY_CXXFLAGS)
 AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
-#libs for using RN with Physics bullet character
-ELY_RN_PHYSICS_LIBS="${ELY_DEPS_RN_PHYSICS_LIBS}"
-AC_SUBST(ELY_RN_PHYSICS_LIBS)
 
-# checks for Boost Unit Test Framework tests (mantainer only)
+# checks for Boost Unit Test Framework tests (maintainer only)
 AC_ARG_ENABLE([ely-test],
     AS_HELP_STRING([--enable-ely-test],
-    	[@<:@=yes@:>@ enable Ely Boost Unit Test programs - mantainer only (disabled by default)]),
+    	[@<:@=yes@:>@ enable Ely Boost Unit Test programs - maintainer only (disabled by default)]),
     [ely_test=${enableval}], [ely_test=no])
 AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" != xno])
 AM_COND_IF([BOOST_TEST],
@@ -115,15 +120,16 @@ AM_COND_IF([BOOST_TEST],
 	AX_BOOST_UNIT_TEST_FRAMEWORK
 	AC_CONFIG_FILES([test/Makefile])])
 
-# checks for training tests (mantainer only)
+# checks for training tests (maintainer only)
 AC_ARG_ENABLE([ely-training],
     AS_HELP_STRING([--enable-ely-training],
-    	[@<:@=yes@:>@ enable Ely training test programs - mantainer only (disabled by default)]),
-    [ely_training=${enableval}], [ely_training=no])
+    	[@<:@=yes@:>@ enable Ely training test programs - maintainer only (disabled by default)]),
+    [ely_training=${enableval}
+    AM_PROG_CC_C_O], 
+    [ely_training=no])
 AM_CONDITIONAL([TRAINING], [test "x${ely_training}" != xno])
 AM_COND_IF([TRAINING],
-	[AM_PROG_CC_C_O
-	AC_CONFIG_FILES([
+	[AC_CONFIG_FILES([
 		training/Makefile
 		training/recastnavigation/Makefile
 		training/interrogate/Makefile
@@ -150,14 +156,6 @@ AM_COND_IF([ELY_ELF],
 		elygame/data/textures/Makefile
 		])])
 
-# checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_TYPE_SIZE_T
-AC_TYPE_UINT32_T
-
-# checks for library functions.
-AC_CHECK_FUNCS([pow sqrt strchr strtol])
-
 AC_CONFIG_FILES([
 		Makefile
 		])
@@ -170,10 +168,10 @@ ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 
 -Prefix: '${prefix}'.
 
-- ${CXX} compiler flags: 
+-${CXX} compiler flags: 
     ' ${ELY_CXXFLAGS} ${ELY_CPPFLAGS}'
 
-- ${CXX} linker flags: 
+-${CXX} linker flags: 
     '${ELY_LDFLAGS} ${ELY_LIBS}'
 
 -Build Type: ${BUILDTYPE}
