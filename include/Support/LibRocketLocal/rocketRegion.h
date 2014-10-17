@@ -16,7 +16,7 @@
 #define ROCKETREGION_H
 
 #include "config_rocket.h"
-#include "displayRegion.h"
+#include <displayRegion.h>
 #include "rocketRenderInterface.h"
 #include "rocketInputHandler.h"
 

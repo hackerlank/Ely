@@ -36,9 +36,10 @@ elygame_ltlibraries = \
 		$(top_builddir)/src/libutilities.la
 
 elygame_libraries = \
-		$(top_builddir)/src/libtinyxml2.a \
+		$(top_builddir)/src/libbullet.a \
 		$(top_builddir)/src/librecastnavigation.a \
-		$(top_builddir)/src/libbullet.a
+		$(top_builddir)/src/librocket.a \
+		$(top_builddir)/src/libtinyxml2.a
 whole_archives = \
 		-Wl,$(top_builddir)/src/libsupport.a \
 		-Wl,$(top_builddir)/src/libopensteer.a

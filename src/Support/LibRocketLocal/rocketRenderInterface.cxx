@@ -12,22 +12,24 @@
 //
 ////////////////////////////////////////////////////////////////////
 
-#include "rocketRenderInterface.h"
-#include "cullableObject.h"
-#include "cullHandler.h"
-#include "geomVertexData.h"
-#include "geomVertexArrayData.h"
-#include "internalName.h"
-#include "geomVertexWriter.h"
-#include "geomTriangles.h"
-#include "colorBlendAttrib.h"
-#include "cullBinAttrib.h"
-#include "depthTestAttrib.h"
-#include "depthWriteAttrib.h"
-#include "scissorAttrib.h"
-#include "texture.h"
-#include "textureAttrib.h"
-#include "texturePool.h"
+#include "Support/LibRocketLocal/rocketRenderInterface.h"
+#include <cullableObject.h>
+#include <cullHandler.h>
+#include <geomVertexData.h>
+#include <geomVertexArrayData.h>
+#include <internalName.h>
+#include <geomVertexWriter.h>
+#include <geomTriangles.h>
+#include <colorBlendAttrib.h>
+#include <cullBinAttrib.h>
+#include <depthTestAttrib.h>
+#include <depthWriteAttrib.h>
+#include <scissorAttrib.h>
+#include <texture.h>
+#include <textureAttrib.h>
+#include <texturePool.h>
+
+#include <Rocket/Core/Context.h>
 
 ////////////////////////////////////////////////////////////////////
 //     Function: RocketRenderInterface::render

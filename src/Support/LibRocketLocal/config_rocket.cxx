@@ -12,15 +12,15 @@
 //
 ////////////////////////////////////////////////////////////////////
 
-#include "config_rocket.h"
-#include "rocketFileInterface.h"
-#include "rocketInputHandler.h"
-#include "rocketRegion.h"
-#include "rocketSystemInterface.h"
+#include "Support/LibRocketLocal/config_rocket.h"
+#include "Support/LibRocketLocal/rocketFileInterface.h"
+#include "Support/LibRocketLocal/rocketInputHandler.h"
+#include "Support/LibRocketLocal/rocketRegion.h"
+#include "Support/LibRocketLocal/rocketSystemInterface.h"
 
-#include "pandaSystem.h"
-#include "dconfig.h"
-#include "default_font.h"
+#include <pandaSystem.h>
+#include <dconfig.h>
+#include <default_font.h>
 
 // This is defined by both Panda and Rocket.
 #define Factory RocketFactory

@@ -12,14 +12,16 @@
 //
 ////////////////////////////////////////////////////////////////////
 
-#include "rocketRegion.h"
-#include "graphicsOutput.h"
-#include "orthographicLens.h"
-#include "pStatTimer.h"
+#include "Support/LibRocketLocal/rocketRegion.h"
+#include <graphicsOutput.h>
+#include <orthographicLens.h>
+#include <pStatTimer.h>
 
 #if defined(HAVE_ROCKET_DEBUGGER) && !defined(CPPPARSER)
 #include <Rocket/Debugger.h>
 #endif
+
+#include <Rocket/Core.h>
 
 TypeHandle RocketRegion::_type_handle;
 

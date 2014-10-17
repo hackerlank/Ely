@@ -16,11 +16,11 @@
 #define ROCKET_RENDER_INTERFACE_H
 
 #include "config_rocket.h"
-#include "cullTraverser.h"
-#include "cullTraverserData.h"
-#include "geom.h"
-#include "renderState.h"
-#include "transformState.h"
+#include <cullTraverser.h>
+#include <cullTraverserData.h>
+#include <geom.h>
+#include <renderState.h>
+#include <transformState.h>
 
 #include <Rocket/Core/RenderInterface.h>
 

@@ -16,7 +16,7 @@
 #define ROCKET_FILE_INTERFACE_H
 
 #include "config_rocket.h"
-#include "virtualFile.h"
+#include <virtualFile.h>
 #include <Rocket/Core/FileInterface.h>
 
 class VirtualFileSystem;

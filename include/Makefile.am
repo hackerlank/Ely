@@ -52,13 +52,12 @@ bullet_headers = \
 		Support/BulletLocal/config_bullet.h		
 
 librocket_headers = \
+		Support/LibRocketLocal/config_rocket.h \
 		Support/LibRocketLocal/rocketSystemInterface.h \
-		Support/LibRocketLocal/rocketRegion_ext.h \
 		Support/LibRocketLocal/rocketInputHandler.h \
 		Support/LibRocketLocal/rocketRegion.h \
 		Support/LibRocketLocal/rocketFileInterface.h \
 		Support/LibRocketLocal/rocketRegion.I \
-		Support/LibRocketLocal/config_rocket.h \
 		Support/LibRocketLocal/rocketRenderInterface.h
 		
 opensteer_headers = \

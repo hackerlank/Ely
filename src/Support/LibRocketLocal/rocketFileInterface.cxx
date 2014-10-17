@@ -12,8 +12,8 @@
 //
 ////////////////////////////////////////////////////////////////////
 
-#include "rocketFileInterface.h"
-#include "virtualFileSystem.h"
+#include "Support/LibRocketLocal/rocketFileInterface.h"
+#include <virtualFileSystem.h>
 
 ////////////////////////////////////////////////////////////////////
 //     Function: RocketFileInterface::Constructor

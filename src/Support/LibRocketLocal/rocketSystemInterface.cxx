@@ -12,8 +12,8 @@
 //
 ////////////////////////////////////////////////////////////////////
 
-#include "rocketSystemInterface.h"
-#include "clockObject.h"
+#include "Support/LibRocketLocal/rocketSystemInterface.h"
+#include <clockObject.h>
 
 ////////////////////////////////////////////////////////////////////
 //     Function: RocketSystemInterface::GetElapsedTime

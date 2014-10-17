@@ -16,8 +16,8 @@
 #define ROCKETINPUTHANDLER_H
 
 #include "config_rocket.h"
-#include "dataNode.h"
-#include "buttonHandle.h"
+#include <dataNode.h>
+#include <buttonHandle.h>
 
 namespace Rocket {
   namespace Core {

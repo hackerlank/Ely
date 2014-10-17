@@ -15,8 +15,8 @@
 #ifndef CONFIG_ROCKET_H
 #define CONFIG_ROCKET_H
 
-#include "pandabase.h"
-#include "notifyCategoryProxy.h"
+#include <pandabase.h>
+#include <notifyCategoryProxy.h>
 
 NotifyCategoryDecl(rocket, EXPCL_ROCKET, EXPTP_ROCKET);
 

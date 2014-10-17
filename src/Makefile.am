@@ -165,11 +165,9 @@ libbullet_a_SOURCES = \
 		Support/BulletLocal/config_bullet.cpp
 
 librocket_a_SOURCES = \
-		Support/LibRocketLocal/rocketSystemInterface.cxx \
-		Support/LibRocketLocal/rocketRegion_ext.cxx \
-		Support/LibRocketLocal/rocketInputHandler.cxx \
 		Support/LibRocketLocal/config_rocket.cxx \
-		Support/LibRocketLocal/p3rocket_composite1.cxx \
+		Support/LibRocketLocal/rocketSystemInterface.cxx \
+		Support/LibRocketLocal/rocketInputHandler.cxx \
 		Support/LibRocketLocal/rocketRenderInterface.cxx \
 		Support/LibRocketLocal/rocketRegion.cxx \
 		Support/LibRocketLocal/rocketFileInterface.cxx
