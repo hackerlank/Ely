@@ -1,35 +1,3 @@
-tinyxml2_headers = \
-		Support/tinyxlm2/tinyxml2.h
-
-recastnavigation_headers = \
-		Support/RecastNavigationLocal/common.h \
-		Support/RecastNavigationLocal/InputGeom.h \
-		Support/RecastNavigationLocal/ChunkyTriMesh.h \
-		Support/RecastNavigationLocal/MeshLoaderObj.h \
-		Support/RecastNavigationLocal/DebugInterfaces.h \
-		Support/RecastNavigationLocal/PerfTimer.h \
-		Support/RecastNavigationLocal/NavMeshType.h \
-		Support/RecastNavigationLocal/NavMeshType_Tile.h \
-		Support/RecastNavigationLocal/NavMeshType_Solo.h \
-		Support/RecastNavigationLocal/NavMeshType_Obstacle.h \
-		Support/RecastNavigationLocal/fastlz.h \
-		Support/RecastNavigationLocal/ConvexVolumeTool.h \
-		Support/RecastNavigationLocal/CrowdTool.h \
-		Support/RecastNavigationLocal/OffMeshConnectionTool.h
-		
-opensteer_headers = \
-		Support/OpenSteerLocal/common.h \
-		Support/OpenSteerLocal/DrawMeshDrawer.h \
-		Support/OpenSteerLocal/PlugIn_Boids.h \
-		Support/OpenSteerLocal/PlugIn_MultiplePursuit.h \
-		Support/OpenSteerLocal/PlugIn_OneTurning.h \
-		Support/OpenSteerLocal/PlugIn_Pedestrian.h \
-		Support/OpenSteerLocal/PlugIn_Soccer.h \
-		Support/OpenSteerLocal/PlugIn_CaptureTheFlag.h \
-		Support/OpenSteerLocal/PlugIn_LowSpeedTurn.h \
-		Support/OpenSteerLocal/PlugIn_MapDrive.h \
-		Support/OpenSteerLocal/SimpleVehicle.h
-		
 bullet_headers = \
 		Support/BulletLocal/bulletAllHitsRayResult.h \
 		Support/BulletLocal/bulletBaseCharacterControllerNode.h \
@@ -82,6 +50,48 @@ bullet_headers = \
 		Support/BulletLocal/bulletWheel.h \
 		Support/BulletLocal/bulletWorld.h \
 		Support/BulletLocal/config_bullet.h		
+
+librocket_headers = \
+		Support/LibRocketLocal/rocketSystemInterface.h \
+		Support/LibRocketLocal/rocketRegion_ext.h \
+		Support/LibRocketLocal/rocketInputHandler.h \
+		Support/LibRocketLocal/rocketRegion.h \
+		Support/LibRocketLocal/rocketFileInterface.h \
+		Support/LibRocketLocal/rocketRegion.I \
+		Support/LibRocketLocal/config_rocket.h \
+		Support/LibRocketLocal/rocketRenderInterface.h
+		
+opensteer_headers = \
+		Support/OpenSteerLocal/common.h \
+		Support/OpenSteerLocal/DrawMeshDrawer.h \
+		Support/OpenSteerLocal/PlugIn_Boids.h \
+		Support/OpenSteerLocal/PlugIn_MultiplePursuit.h \
+		Support/OpenSteerLocal/PlugIn_OneTurning.h \
+		Support/OpenSteerLocal/PlugIn_Pedestrian.h \
+		Support/OpenSteerLocal/PlugIn_Soccer.h \
+		Support/OpenSteerLocal/PlugIn_CaptureTheFlag.h \
+		Support/OpenSteerLocal/PlugIn_LowSpeedTurn.h \
+		Support/OpenSteerLocal/PlugIn_MapDrive.h \
+		Support/OpenSteerLocal/SimpleVehicle.h
+
+recastnavigation_headers = \
+		Support/RecastNavigationLocal/common.h \
+		Support/RecastNavigationLocal/InputGeom.h \
+		Support/RecastNavigationLocal/ChunkyTriMesh.h \
+		Support/RecastNavigationLocal/MeshLoaderObj.h \
+		Support/RecastNavigationLocal/DebugInterfaces.h \
+		Support/RecastNavigationLocal/PerfTimer.h \
+		Support/RecastNavigationLocal/NavMeshType.h \
+		Support/RecastNavigationLocal/NavMeshType_Tile.h \
+		Support/RecastNavigationLocal/NavMeshType_Solo.h \
+		Support/RecastNavigationLocal/NavMeshType_Obstacle.h \
+		Support/RecastNavigationLocal/fastlz.h \
+		Support/RecastNavigationLocal/ConvexVolumeTool.h \
+		Support/RecastNavigationLocal/CrowdTool.h \
+		Support/RecastNavigationLocal/OffMeshConnectionTool.h
+	
+tinyxml2_headers = \
+		Support/tinyxlm2/tinyxml2.h
 		
 noinst_HEADERS = \
 		AIComponents/CrowdAgent.h \
@@ -143,6 +153,7 @@ noinst_HEADERS = \
 		Support/Distributed/ClientRepositoryBase.h \
 		Support/Distributed/DistributedObjectBase.h \
 		$(bullet_headers) \
+		$(librocket_headers) \
 		$(opensteer_headers) \
 		$(recastnavigation_headers) \
 		$(tinyxml2_headers) \

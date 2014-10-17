@@ -18,11 +18,12 @@ noinst_LTLIBRARIES = \
 
 #libraries
 noinst_LIBRARIES = \
-		libtinyxml2.a \
 		libsupport.a \
-		librecastnavigation.a \
+		libbullet.a \
+		librocket.a \
 		libopensteer.a \
-		libbullet.a
+		librecastnavigation.a \
+		libtinyxml2.a
 
 #ltlibraries sources
 libaicomponents_la_SOURCES = \
@@ -112,26 +113,6 @@ libsupport_a_SOURCES = \
 		Support/Distributed/ClientRepositoryBase.cpp \
 		Support/Distributed/DistributedObjectBase.cpp
 
-librecastnavigation_a_SOURCES = \
-		Support/RecastNavigationLocal/InputGeom.cpp \
-		Support/RecastNavigationLocal/ChunkyTriMesh.cpp \
-		Support/RecastNavigationLocal/MeshLoaderObj.cpp \
-		Support/RecastNavigationLocal/DebugInterfaces.cpp \
-		Support/RecastNavigationLocal/PerfTimer.cpp \
-		Support/RecastNavigationLocal/NavMeshType.cpp \
-		Support/RecastNavigationLocal/NavMeshType_Tile.cpp \
-		Support/RecastNavigationLocal/NavMeshType_Solo.cpp \
-		Support/RecastNavigationLocal/NavMeshType_Obstacle.cpp \
-		Support/RecastNavigationLocal/fastlz.c \
-		Support/RecastNavigationLocal/ConvexVolumeTool.cpp \
-		Support/RecastNavigationLocal/CrowdTool.cpp \
-		Support/RecastNavigationLocal/OffMeshConnectionTool.cpp
-
-libopensteer_a_SOURCES = \
-		Support/OpenSteerLocal/Draw.cpp \
-		Support/OpenSteerLocal/DrawMeshDrawer.cpp \
-		Support/OpenSteerLocal/SimpleVehicle.cpp
-
 libbullet_a_SOURCES = \
 		Support/BulletLocal/bulletAllHitsRayResult.cpp \
 		Support/BulletLocal/bulletBaseCharacterControllerNode.cpp \
@@ -182,3 +163,33 @@ libbullet_a_SOURCES = \
 		Support/BulletLocal/bulletWheel.cpp \
 		Support/BulletLocal/bulletWorld.cpp \
 		Support/BulletLocal/config_bullet.cpp
+
+librocket_a_SOURCES = \
+		Support/LibRocketLocal/rocketSystemInterface.cxx \
+		Support/LibRocketLocal/rocketRegion_ext.cxx \
+		Support/LibRocketLocal/rocketInputHandler.cxx \
+		Support/LibRocketLocal/config_rocket.cxx \
+		Support/LibRocketLocal/p3rocket_composite1.cxx \
+		Support/LibRocketLocal/rocketRenderInterface.cxx \
+		Support/LibRocketLocal/rocketRegion.cxx \
+		Support/LibRocketLocal/rocketFileInterface.cxx
+
+libopensteer_a_SOURCES = \
+		Support/OpenSteerLocal/Draw.cpp \
+		Support/OpenSteerLocal/DrawMeshDrawer.cpp \
+		Support/OpenSteerLocal/SimpleVehicle.cpp
+
+librecastnavigation_a_SOURCES = \
+		Support/RecastNavigationLocal/InputGeom.cpp \
+		Support/RecastNavigationLocal/ChunkyTriMesh.cpp \
+		Support/RecastNavigationLocal/MeshLoaderObj.cpp \
+		Support/RecastNavigationLocal/DebugInterfaces.cpp \
+		Support/RecastNavigationLocal/PerfTimer.cpp \
+		Support/RecastNavigationLocal/NavMeshType.cpp \
+		Support/RecastNavigationLocal/NavMeshType_Tile.cpp \
+		Support/RecastNavigationLocal/NavMeshType_Solo.cpp \
+		Support/RecastNavigationLocal/NavMeshType_Obstacle.cpp \
+		Support/RecastNavigationLocal/fastlz.c \
+		Support/RecastNavigationLocal/ConvexVolumeTool.cpp \
+		Support/RecastNavigationLocal/CrowdTool.cpp \
+		Support/RecastNavigationLocal/OffMeshConnectionTool.cpp
