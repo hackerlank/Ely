@@ -1,5 +1,7 @@
-Ely Installation
-****************
+******************
+*Ely Installation*
+******************
+
 Ely is a game development environment and, as such, it is not so trivial to install.
 The overall environment is composed of many packages with interdependencies between them.
 Some of these packages are supplied by the distribution (Debian or Ubuntu), while others 
@@ -17,28 +19,24 @@ source packages (with make dist) which can be build with only the classic triad:
  
 In the following instructions these conventions are used:
 -the given order of installation should be followed (because of (inter)dependencies)
--packages are built into 'build' directories inside the source trees (but they can be anywhere in 
- the filesystem)
+-packages are built into 'build-release' directories inside the source trees (but they 
+can be anywhere in the filesystem)
 -the $ sign means that commands are issued as normal user
 -commands that could be run as root are prefixed with 'sudo' command
 
 Mandatory packages
-------------------
-Install a minimun development environment from distribution:
+******************
+These packages are mandatory for any of the later ones.
+Install the minimun development environment from distribution:
 
- $ sudo apt-get install build-essential git autoconf automake libtool
+ $ sudo apt-get install build-essential git autoconf automake \
+   libtool checkinstall gnulib
  
-GNU Autoconf Archive
---------------------
-Get source package:
+Install the latest 'GNU Autoconf Archive' source package:
 
  $ git clone git://git.sv.gnu.org/autoconf-archive.git
 
-install dependencies from distribution:
-
- $ sudo apt-get install gnulib
-
-issue these commands:
+build and install with these commands:
  
  $ cd autoconf-archive
  $ ./bootstrap.sh
@@ -48,22 +46,50 @@ issue these commands:
 
 libRocket
 *********
-Get source package (original source repository: https://github.com/libRocket/libRocket.git):
+NOTE: The original source repository is 'https://github.com/libRocket/libRocket.git'.
+
+Get source package:
 
  $ git clone https://github.com/consultit/my_librocket.git
  
 install dependencies from distribution:
 
- $ sudo apt-get install libfreetype6-dev
+ $ sudo apt-get install libfreetype6-dev libx11-dev libxxf86vm-dev libgl1-mesa-dev \
+   libglu1-mesa-dev python-dev libboost-python-dev
  
-issue these commands:
+build with these commands:
 
  $ cd my_librocket
  $ autoreconf -i -v
- $ mkdir build
- $ cd build
- $ ../configure --prefix=/usr
+ $ mkdir build-release
+ $ cd build-release
+ $ ../configure --enable-python --enable-lr-extra-samples
+ $ make
+ $ sudo make install
 
+Bullet
+******
+NOTE: The original source repository is 'http://bullet.googlecode.com/svn/trunk'.   
+NOTE: This is the latest svn 2.x version repository. Some Development continues at 
+      'https://github.com/bulletphysics/bullet3.git' which is focused on 3.x version.
+
+Get source package:
+
+ $ git clone https://github.com/consultit/my_bullet2.git
+ 
+install dependencies from distribution:
+
+ $ sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
+
+build with these commands:
+
+ $ cd my_bullet2
+ $ autoreconf -i -v
+ $ mkdir build-release
+ $ cd build-release
+ $ ../configure
+ $ make
+ $ sudo make install
 
 Obtaining Ely
 *************
@@ -71,5 +97,34 @@ To get the complete source of Ely issue:
 	$ git clone https://github.com/consultit/Ely.git
 
 This source is an Eclipse (luna) project.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 *TODO*
