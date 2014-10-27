@@ -69,13 +69,11 @@ build with these commands:
 
 Bullet
 ******
-NOTE: The original source repository is 'http://bullet.googlecode.com/svn/trunk'.   
-NOTE: This is the latest svn 2.x version repository. Some Development continues at 
-      'https://github.com/bulletphysics/bullet3.git' which is focused on 3.x version.
+NOTE: The original source repository is 'https://github.com/bulletphysics/bullet3.git'.   
 
 Get source package:
 
- $ git clone https://github.com/consultit/my_bullet2.git
+ $ git clone https://github.com/consultit/my_bullet3.git
  
 install dependencies from distribution:
 
@@ -83,7 +81,29 @@ install dependencies from distribution:
 
 build with these commands:
 
- $ cd my_bullet2
+ $ cd my_bullet3
+ $ autoreconf -i -v
+ $ mkdir build-release
+ $ cd build-release
+ $ ../configure
+ $ make
+ $ sudo make install
+
+RecastNavigation
+*****************
+NOTE: The original source repository is 'https://github.com/memononen/recastnavigation.git'.   
+
+Get source package:
+
+ $ git clone https://github.com/consultit/my_recastnavigation.git
+ 
+install dependencies from distribution:
+
+ $ sudo apt-get install 
+
+build with these commands:
+
+ $ cd my_recastnavigation
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
