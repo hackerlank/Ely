@@ -43,8 +43,8 @@ AC_LINK_IFELSE(
   [AC_MSG_RESULT([no])
   required_libraries="${required_libraries}'Bullet'"]
 )
-###Recast Navigation###
-AC_MSG_CHECKING([for Recast Navigation libs])
+###RecastNavigation###
+AC_MSG_CHECKING([for RecastNavigation libs])
 RN_LDFLAGS=""
 RN_LIBS="-lrecastnavigation"			
 LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
@@ -72,9 +72,9 @@ rn_body="
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([$rn_prologue],[$rn_body])],
   [AC_MSG_RESULT([yes]) 
-  AC_DEFINE([HAVE_RN], 1, [Recast Navigation enabled])],
+  AC_DEFINE([HAVE_RN], 1, [RecastNavigation enabled])],
   [AC_MSG_RESULT([no])
-  required_libraries="${required_libraries} 'Recast Navigation'"]
+  required_libraries="${required_libraries} 'RecastNavigation'"]
 )
 ###OpenSteer###
 # check libraries first from cmd line specified ones

@@ -1,6 +1,5 @@
 #                                               -*- Autoconf -*-
 # Process this file with auto(re)conf to produce a configure script.
-
 ###Standard `configure.ac' Layout###
 # Autoconf requirements
 # `AC_INIT(PACKAGE, VERSION, BUG-REPORT-ADDRESS)'
@@ -16,16 +15,17 @@
 # `AC_CONFIG_FILES([FILE...])'
 # `AC_OUTPUT'
 
-AC_PREREQ([2.67])
+AC_PREREQ([2.69])
 AC_INIT([Ely], [1.0], [consultit@katamail.com])
 AM_INIT_AUTOMAKE
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
 
-AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_SRCDIR([src/ObjectModel/Object.cpp])
 AC_CONFIG_HEADERS([include/config.h])
+AC_CONFIG_MACRO_DIR([m4])
 AC_PREFIX_DEFAULT([/usr])
+AM_SILENT_RULES
 
 # checks for programs.
 :${CXXFLAGS=""}
@@ -33,11 +33,7 @@ AC_PROG_CXX
 AC_LANG([C++])
 # default Ely CXXFLAGS (release mode)
 ELY_CXXFLAGS="-O3 -w -fmessage-length=0"
-
-# checks/sets options
-AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
-
-BUILDTYPE=""
+buildtype=""
 # ELY_DEVEL
 AC_ARG_ENABLE([ely-devel],
 	AS_HELP_STRING([--enable-ely-devel],
@@ -45,7 +41,7 @@ AC_ARG_ENABLE([ely-devel],
     [ely_devel=${enableval}], [ely_devel=no])
 AM_CONDITIONAL([ELY_DEVEL], [test "x${ely_devel}" != xno])
 AS_IF([test "x${ely_devel}" != xno], 
-	[BUILDTYPE=${BUILDTYPE}"Devel-"])
+	[buildtype=${buildtype}"Devel-"])
 # ELY_DEBUG
 AC_ARG_ENABLE([ely-debug],
 	AS_HELP_STRING([--enable-ely-debug],
@@ -54,12 +50,9 @@ AC_ARG_ENABLE([ely-debug],
 AS_IF([test "x${ely_debug}" != xno],
 	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
 	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
-	BUILDTYPE=${BUILDTYPE}"Debug"],
+	buildtype=${buildtype}"Debug"],
 	[AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])
-	BUILDTYPE=${BUILDTYPE}"Release"])
-# enables silent rules
-#AS_IF([test "x${ely_devel}" = xno -a "x${ely_debug}" = xno],
-#	[AM_SILENT_RULES])
+	buildtype=${buildtype}"Release"])
 # ELY_THREAD
 AC_ARG_ENABLE([ely-thread],
     AS_HELP_STRING([--enable-ely-thread],
@@ -68,7 +61,7 @@ AC_ARG_ENABLE([ely-thread],
 AM_CONDITIONAL([ELY_THREAD], [test "x${ely_thread}" != xno])
 AS_IF([test "x${ely_thread}" != xno],
 	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
-	BUILDTYPE=${BUILDTYPE}"-Thread"])
+	buildtype=${buildtype}"-Thread"])
 
 # checks for libraries.
 AC_SEARCH_LIBS([lt_dlopen], [ltdl])
@@ -93,6 +86,8 @@ AX_BOOST_BASE([],[],[
 	----------------------------------------])
 ])
 
+# checks/sets options
+AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
 # checks for Python.
 AX_PYTHON
 # checks for Python >= 2.7.
@@ -174,7 +169,7 @@ ${PACKAGE_NAME} Version ${PACKAGE_VERSION}
 -${CXX} linker flags: 
     '${ELY_LDFLAGS} ${ELY_LIBS}'
 
--Build Type: ${BUILDTYPE}
+-Build Type: ${buildtype}
 
 Now type 'make @<:@<target>@:>@'
 where the optional <target> is:
