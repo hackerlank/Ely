@@ -46,7 +46,7 @@ AC_LINK_IFELSE(
 ###RecastNavigation###
 AC_MSG_CHECKING([for RecastNavigation libs])
 RN_LDFLAGS=""
-RN_LIBS="-lrecastnavigation"			
+RN_LIBS="-lDebugUtils -lDetour -lDetourCrowd -lDetourTileCache -lRecast"			
 LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${RN_LIBS} ${LIBS_CMDLINE}"
 rn_prologue="
@@ -191,11 +191,11 @@ required_headers=
 ###Bullet###
 BULLET_CPPFLAGS="-I/usr/include/bullet -I/usr/local/include/bullet"
 CPPFLAGS="${BULLET_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
-AC_CHECK_HEADER([Bullet-C-Api.h],[],[required_headers="${required_headers}'Bullet'"])
-###Recast Navigation###
-RN_CPPFLAGS="-I/usr/include/librecastnavigation-dev -I/usr/local/include/librecastnavigation-dev"
+AC_CHECK_HEADER([btBulletCollisionCommon.h],[],[required_headers="${required_headers}'Bullet'"])
+###RecastNavigation###
+RN_CPPFLAGS="-I/usr/include/recastnavigation -I/usr/local/include/recastnavigation"
 CPPFLAGS="${RN_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
-AC_CHECK_HEADER([Recast.h],[],[required_headers="${required_headers} 'Recast Navigation'"])
+AC_CHECK_HEADER([Recast.h],[],[required_headers="${required_headers} 'RecastNavigation'"])
 ###OpenSteer###
 OS_CPPFLAGS="-I/usr/include/OpenSteer -I/usr/local/include/OpenSteer"
 CPPFLAGS="${OS_CPPFLAGS} ${CPPFLAGS_CMDLINE}"

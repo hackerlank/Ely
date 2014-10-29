@@ -133,6 +133,10 @@ build with these commands:
  $ make
  $ sudo make install
 
+Panda3d
+*******
+
+
 Obtaining Ely
 *************
 To get the complete source of Ely issue:
