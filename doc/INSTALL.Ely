@@ -2,24 +2,24 @@
 *Ely Installation*
 ******************
 
-Ely is a game development environment and, as such, it is not so trivial to install.
-The overall environment is composed of many packages with from which Ely depends.
-Some of these packages are supplied by the distribution (Debian or Ubuntu), while others 
-are to be built manually.
-Most manually installed packages, included Ely, uses 'GNU autotools' build system and are 
-supplied in custom source repositories which are kept, as far as possible, up to date with 
-the original ones (the only difference is the build system).
-Moreover these custom repositories, included Ely, are in 'maintainer mode', meaning that you
-need to use the full autotools suite to build the packages, although you can obtain distributable 
-source packages (with make dist) which can be build with only the classic triad:
+To setup the overall Ely game development environment, you need to install
+several dependency packages.
+Some of these are supplied by the distribution (Debian or Ubuntu), while 
+others (included Ely) are built manually, using a refactored build system 
+based on 'GNU autotools'. These packages can be got from custom 
+repositories, kept up to date with the original ones.
+Moreover these custom repositories are in 'maintainer mode', meaning that you
+need to use the full autotools suite to build the packages, although they can 
+be obtained distributable source packages (through make dist) which can be 
+build using the classic triad:
 
  $ configure
  $ make
  $ sudo make install
  
 Note that in the following instructions: 
--packages are built into 'build-release' directories inside the source trees (but they 
-can be anywhere in the filesystem)
+-packages are built into 'build-release' directories inside the source 
+trees (but they can be anywhere in the filesystem)
 -the $ sign means that commands are issued as normal user
 -commands that could be run as root are prefixed with 'sudo' command
 
