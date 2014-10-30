@@ -3,7 +3,7 @@
 ******************
 
 Ely is a game development environment and, as such, it is not so trivial to install.
-The overall environment is composed of many packages with interdependencies between them.
+The overall environment is composed of many packages with from which Ely depends.
 Some of these packages are supplied by the distribution (Debian or Ubuntu), while others 
 are to be built manually.
 Most manually installed packages, included Ely, uses 'GNU autotools' build system and are 
@@ -17,8 +17,7 @@ source packages (with make dist) which can be build with only the classic triad:
  $ make
  $ sudo make install
  
-In the following instructions these conventions are used:
--the given order of installation should be followed (because of (inter)dependencies)
+Note that in the following instructions: 
 -packages are built into 'build-release' directories inside the source trees (but they 
 can be anywhere in the filesystem)
 -the $ sign means that commands are issued as normal user
@@ -30,7 +29,7 @@ These packages are mandatory for any of the later ones.
 Install the minimun development environment from distribution:
 
  $ sudo apt-get install build-essential git autoconf automake \
-   libtool checkinstall gnulib cvs
+    libtool checkinstall gnulib cvs
  
 Install the latest 'GNU Autoconf Archive' source package:
 
@@ -55,7 +54,7 @@ Get source package:
 install dependencies from distribution:
 
  $ sudo apt-get install libfreetype6-dev libx11-dev libxxf86vm-dev libgl1-mesa-dev \
-   libglu1-mesa-dev python-dev libboost-python-dev
+    libglu1-mesa-dev python-dev libboost-python-dev
  
 build with these commands:
 
@@ -138,11 +137,13 @@ Panda3d
 Get source package (giving no CVS password):
 
  $ cvs -d:pserver:anonymous@panda3d.cvs.sourceforge.net:/cvsroot/panda3d login
- $ cvs -z3 -d:pserver:anonymous@panda3d.cvs.sourceforge.net:/cvsroot/panda3d co -P panda3d 
+ $ cvs -z3 -d:pserver:anonymous@panda3d.cvs.sourceforge.net:/cvsroot/panda3d co -P panda3d
  
 install dependencies from distribution:
 
- $ sudo apt-get install 
+ $ sudo apt-get install pkg-config libeigen3-dev libswscale-dev fftw-dev \
+    libfreetype6-dev libgl1-mesa-dev nvidia-cg-dev libode-dev libopenal-dev \
+    libopencv-dev libvorbis-dev libssl-dev python-dev libxxf86dga-dev
 
 build with these commands:
 
@@ -150,40 +151,24 @@ build with these commands:
  $ makepanda/makepanda.py --verbose --everything --no-bullet --no-rocket \
  	--threads 2 --optimize 3 --installer --no-ffmpeg
 
-Obtaining Ely
-*************
-To get the complete source of Ely issue:
-	$ git clone https://github.com/consultit/Ely.git
+install the package:
+ 
+ $ sudo dpkg -i panda3d1.9_1.9.0_amd64.deb
 
-This source is an Eclipse (luna) project.
+Ely
+***
+Get source package:
 
+ $ git clone https://github.com/consultit/Ely.git
+ 
+install all the previous dependencies and build with these commands:
 
+ $ cd Ely
+ $ autoreconf -i -v
+ $ mkdir build-release
+ $ cd build-release
+ $ ../configure
+ $ make
+ $ sudo make install
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-*TODO*
+From now on read documentation for developing with Ely.
