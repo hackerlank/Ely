@@ -2,6 +2,9 @@
 AM_CPPFLAGS = -DTESTING -iquote$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
+
+AUTOMAKE_OPTIONS = subdir-objects
+
 LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 	-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct \
 	-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lpandagl \

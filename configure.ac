@@ -35,36 +35,39 @@ AC_LANG([C++])
 ELY_CXXFLAGS="-O3 -w -fmessage-length=0"
 buildtype=""
 # ELY_DEVEL
-AC_ARG_ENABLE([ely-devel],
-	AS_HELP_STRING([--enable-ely-devel],
-		[@<:@=yes@:>@ enable Ely development mode (disabled by default)]),
-    [ely_devel=${enableval}], [ely_devel=no])
-AM_CONDITIONAL([ELY_DEVEL], [test "x${ely_devel}" != xno])
-AS_IF([test "x${ely_devel}" != xno], 
+AC_ARG_ENABLE([devel],
+	AS_HELP_STRING([--enable-devel],
+		[@<:@=yes@:>@ enable Development mode (disabled by default)]),
+    [devel=${enableval}], [devel=no])
+AM_CONDITIONAL([ELY_DEVEL], [test "x${devel}" != xno])
+AS_IF([test "x${devel}" != xno], 
 	[buildtype=${buildtype}"Devel-"])
 # ELY_DEBUG
-AC_ARG_ENABLE([ely-debug],
-	AS_HELP_STRING([--enable-ely-debug],
-		[@<:@=yes@:>@ enable Ely debug mode (disabled by default)]),
-    [ely_debug=${enableval}], [ely_debug=no])
-AS_IF([test "x${ely_debug}" != xno],
+AC_ARG_ENABLE([debug],
+	AS_HELP_STRING([--enable-debug],
+		[@<:@=yes@:>@ enable Debug mode (disabled by default)]),
+    [debug=${enableval}], [debug=no])
+AS_IF([test "x${debug}" != xno],
 	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
 	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
 	buildtype=${buildtype}"Debug"],
 	[AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])
 	buildtype=${buildtype}"Release"])
 # ELY_THREAD
-AC_ARG_ENABLE([ely-thread],
-    AS_HELP_STRING([--enable-ely-thread],
-    	[@<:@=yes@:>@ enable Ely threading mode (disabled by default)]),
-    [ely_thread=${enableval}], [ely_thread=no])
-AM_CONDITIONAL([ELY_THREAD], [test "x${ely_thread}" != xno])
-AS_IF([test "x${ely_thread}" != xno],
+AC_ARG_ENABLE([thread],
+    AS_HELP_STRING([--enable-thread],
+    	[@<:@=yes@:>@ enable Threading mode (disabled by default)]),
+    [thread=${enableval}], [thread=no])
+AM_CONDITIONAL([ELY_THREAD], [test "x${thread}" != xno])
+AS_IF([test "x${thread}" != xno],
 	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
 	buildtype=${buildtype}"-Thread"])
 
 # checks for libraries.
 AC_SEARCH_LIBS([lt_dlopen], [ltdl])
+AX_PTHREAD
+LIBS="$PTHREAD_LIBS $LIBS"
+CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
 
 # checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_STDBOOL
@@ -105,24 +108,24 @@ AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
 
 # checks for Boost Unit Test Framework tests (maintainer only)
-AC_ARG_ENABLE([ely-test],
-    AS_HELP_STRING([--enable-ely-test],
-    	[@<:@=yes@:>@ enable Ely Boost Unit Test programs - maintainer only (disabled by default)]),
-    [ely_test=${enableval}], [ely_test=no])
-AM_CONDITIONAL([BOOST_TEST], [test "x${ely_test}" != xno])
+AC_ARG_ENABLE([unit-test],
+    AS_HELP_STRING([--enable-unit-test],
+    	[@<:@=yes@:>@ enable Boost Unit Test programs - maintainer only (disabled by default)]),
+    [unit_test=${enableval}], [unit_test=no])
+AM_CONDITIONAL([BOOST_TEST], [test "x${unit_test}" != xno])
 AM_COND_IF([BOOST_TEST],
 	[AX_BOOST_BASE
 	AX_BOOST_UNIT_TEST_FRAMEWORK
 	AC_CONFIG_FILES([test/Makefile])])
 
 # checks for training tests (maintainer only)
-AC_ARG_ENABLE([ely-training],
-    AS_HELP_STRING([--enable-ely-training],
-    	[@<:@=yes@:>@ enable Ely training test programs - maintainer only (disabled by default)]),
-    [ely_training=${enableval}
+AC_ARG_ENABLE([training],
+    AS_HELP_STRING([--enable-training],
+    	[@<:@=yes@:>@ enable training test programs - maintainer only (disabled by default)]),
+    [training=${enableval}
     AM_PROG_CC_C_O], 
-    [ely_training=no])
-AM_CONDITIONAL([TRAINING], [test "x${ely_training}" != xno])
+    [training=no])
+AM_CONDITIONAL([TRAINING], [test "x${training}" != xno])
 AM_COND_IF([TRAINING],
 	[AC_CONFIG_FILES([
 		training/Makefile
@@ -132,7 +135,7 @@ AM_COND_IF([TRAINING],
 		])])
 
 # checks for Ely ELF executable build (if no boost and no training tests)
-AM_CONDITIONAL([ELY_ELF], [test "x${ely_test}" = xno -a "x${ely_training}" = xno])
+AM_CONDITIONAL([ELY_ELF], [test "x${unit_test}" = xno -a "x${training}" = xno])
 AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile

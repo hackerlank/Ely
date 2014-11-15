@@ -4,6 +4,8 @@ AM_CPPFLAGS = $(DEFINITIONS) -DELY_GAMEXML=\"ELY_GAMEXML\" -DBOOST_TEST_DYN_LINK
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
+AUTOMAKE_OPTIONS = subdir-objects
+
 noinst_LIBRARIES = \
 		libtestaicomponents.a \
 		libtestaudiocomponents.a \

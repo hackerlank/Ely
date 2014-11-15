@@ -141,7 +141,7 @@ Get source package (giving no CVS password):
  
 install dependencies from distribution:
 
- $ sudo apt-get install pkg-config libeigen3-dev libswscale-dev fftw-dev \
+ $ sudo apt-get install pkg-config libeigen3-dev libswscale-dev \
     libfreetype6-dev libgl1-mesa-dev nvidia-cg-dev libode-dev libopenal-dev \
     libopencv-dev libvorbis-dev libssl-dev python-dev libxxf86dga-dev
 
@@ -149,7 +149,7 @@ build with these commands:
 
  $ cd panda3d
  $ makepanda/makepanda.py --verbose --everything --no-bullet --no-rocket \
- 	--threads 2 --optimize 3 --installer --no-ffmpeg
+ 	--threads 2 --optimize 3 --installer --no-ffmpeg --no-fftw
 
 install the package:
  

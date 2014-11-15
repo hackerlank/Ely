@@ -1,5 +1,7 @@
 2014-10-31  consultit <consultit@katamail.com>
 
+  * .autotools, .cproject, AUTHORS: Added author name.
+
   * include/Support/tinyxlm2/tinyxml2.h, src/Support/tinyxml2/tinyxml2.cpp: *
   Ely: tinyxml2 update.
 

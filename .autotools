@@ -1,44 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <configurations>
-<configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1061592952">
-<option id="configure" value="configure"/>
-<option id="configdir" value=""/>
-<option id="cache-file" value=""/>
-<option id="help" value="false"/>
-<option id="no-create" value="false"/>
-<option id="quiet" value="false"/>
-<option id="version" value="false"/>
-<option id="host" value=""/>
-<option id="build" value=""/>
-<option id="target" value=""/>
-<option id="prefix" value=""/>
-<option id="exec-prefix" value=""/>
-<option id="libdir" value=""/>
-<option id="bindir" value=""/>
-<option id="sbindir" value=""/>
-<option id="includedir" value=""/>
-<option id="datadir" value=""/>
-<option id="sysconfdir" value=""/>
-<option id="infodir" value=""/>
-<option id="mandir" value=""/>
-<option id="srcdir" value=""/>
-<option id="localstatedir" value=""/>
-<option id="sharedstatedir" value=""/>
-<option id="libexecdir" value=""/>
-<option id="oldincludedir" value=""/>
-<option id="program-prefix" value=""/>
-<option id="program-suffix" value=""/>
-<option id="program-transform-name" value=""/>
-<option id="enable-maintainer-mode" value="false"/>
-<flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
-<flagvalue id="cflags-debug" value="false"/>
-<flagvalue id="cflags-gprof" value="false"/>
-<flagvalue id="cflags-gcov" value="false"/>
-</flag>
-<option id="user" value=""/>
-<option id="autogen" value="autogen.sh"/>
-<option id="autogenOpts" value=""/>
-</configuration>
 <configuration id="org.eclipse.linuxtools.cdt.autotools.core.configuration.build.1061592952.1932297738">
 <option id="configure" value="configure"/>
 <option id="configdir" value=""/>
@@ -74,7 +35,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-devel=yes --enable-ely-debug=yes"/>
+<option id="user" value="--enable-devel --enable-debug"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
@@ -113,7 +74,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-devel=yes --enable-ely-debug=yes --enable-ely-thread=yes"/>
+<option id="user" value="--enable-devel --enable-debug --enable-thread"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
@@ -152,7 +113,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-test=yes --enable-ely-debug=yes"/>
+<option id="user" value="--enable-test --enable-debug"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
@@ -191,7 +152,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-training=yes --enable-ely-debug=yes"/>
+<option id="user" value="--enable-training --enable-debug"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
@@ -230,7 +191,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-devel=yes --enable-ely-thread=yes"/>
+<option id="user" value="--enable-devel --enable-thread"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
@@ -269,7 +230,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-ely-devel=yes"/>
+<option id="user" value="--enable-devel"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
