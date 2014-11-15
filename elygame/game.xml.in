@@ -505,7 +505,6 @@
 			<Param is_steady="true"/>
 		</Object>
 		
-<!--		
 		<Object type="SoftObject" id="rope1">
 			<Component type="Model">
 				<Param from_file="false"/>
@@ -541,6 +540,7 @@
 			<Param parent="render"/>
 		</Object>
 		
+<!--		
 		<Object type="SoftObject" id="softBall1">
 			<Component type="Model">
 				<Param from_file="false"/>
