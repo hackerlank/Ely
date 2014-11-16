@@ -42,6 +42,7 @@ namespace ely
 
 SteerPlugIn::SteerPlugIn()
 {
+	reset();
 }
 
 SteerPlugIn::SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl)

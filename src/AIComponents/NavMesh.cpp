@@ -44,7 +44,7 @@ NavMesh::NavMesh()
 :mAsyncSetupVar(mAsyncSetupMutex), mAsyncSetupComplete(true)
 #endif
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl)
@@ -1445,7 +1445,6 @@ NavMesh::Result NavMesh::setCrowdAgentParams(SMARTPTR(CrowdAgent)crowdAgent,
 			if (crowdAgent->mAgentIdx != -1)
 			{
 				//second parameter should be the parameter to update
-				int agentIdx = crowdAgent->mAgentIdx;
 				dtCrowdAgentParams ap = params;
 				//all crowd agent have the same dimensions: those
 				//registered into the current mNavMeshType

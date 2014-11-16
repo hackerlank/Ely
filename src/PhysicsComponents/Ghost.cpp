@@ -35,7 +35,7 @@ namespace ely
 
 Ghost::Ghost()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Ghost::Ghost(SMARTPTR(GhostTemplate)tmpl)
@@ -547,9 +547,9 @@ void Ghost::update(void* data)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+#ifdef TESTING
 	float dt = *(reinterpret_cast<float*>(data));
 
-#ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
 
@@ -614,7 +614,7 @@ void Ghost::update(void* data)
 		for (std::set<OverlappingNode>::iterator i = mOverlappingNodes.begin(); i != mOverlappingNodes.end();)
 		{
 			//check if it has a previous count
-			if (i->mOverlappingNodeData->mCount != mOverlap.mCount)
+			if (i->mOverlappingNodeData->mCount != (int)mOverlap.mCount)
 			{
 				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
 						i->mOverlappingNodeData->mPnode);

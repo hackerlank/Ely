@@ -45,6 +45,8 @@ typedef VehicleAddOnMixin<SimpleVehicle, SteerVehicle> VehicleAddOn;
 SteerVehicle::SteerVehicle() :
 		mHitResult(BulletClosestHitRayResult::empty())
 {
+	mSteerPlugIn.clear();
+	reset();
 }
 
 SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl):

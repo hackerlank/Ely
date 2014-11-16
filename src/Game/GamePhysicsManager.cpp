@@ -52,8 +52,8 @@ GamePhysicsManager::GamePhysicsManager(
 		const std::string& asyncTaskChain)
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
-		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
-		mExiting(exiting)
+		mCompletedMask(completedMask), mExiting(exiting),
+		mCompletedTasks(completedTasks)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -323,7 +323,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 				mCollidingNodePairs.begin(); i != mCollidingNodePairs.end();)
 		{
 			//check if it has a previous count
-			if (i->mCollidingNodePairData->mCount != mCollisionNotify.mCount)
+			if (i->mCollidingNodePairData->mCount != (int) mCollisionNotify.mCount)
 			{
 				//throw the "off" event
 				throw_event(i->mCollidingNodePairData->mEventName + "Off",

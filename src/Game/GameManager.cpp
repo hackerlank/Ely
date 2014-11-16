@@ -31,7 +31,7 @@ namespace ely
 {
 
 GameManager::GameManager(int argc, char* argv[]) :
-		PandaFramework()
+		PandaFramework(), mPhysicsDebugEnabled(false)
 {
 	// Open the framework
 	open_framework(argc, argv);

@@ -34,7 +34,7 @@ Activity::Activity() :
 		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false),
 		mInstanceUpdateLib(NULL), mInstanceUpdate(NULL), mInstanceUpdateName("")
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :

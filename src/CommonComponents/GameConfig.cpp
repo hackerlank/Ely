@@ -31,7 +31,7 @@ namespace ely
 
 GameConfig::GameConfig()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 GameConfig::GameConfig(SMARTPTR(GameConfigTemplate)tmpl)

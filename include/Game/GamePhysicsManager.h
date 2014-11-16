@@ -105,13 +105,6 @@ public:
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
-	///Multithreaded managers stuff
-	///@{
-	Mutex& mManagersMutex;
-	ConditionVarFull& mManagersVar;
-	const unsigned long int mCompletedMask, mExiting;
-	unsigned long int& mCompletedTasks;
-	///@}
 #endif
 
 #ifdef ELY_DEBUG
@@ -374,6 +367,13 @@ private:
 	///@}
 
 #ifdef ELY_THREAD
+	///Multithreaded managers stuff
+	///@{
+	Mutex& mManagersMutex;
+	ConditionVarFull& mManagersVar;
+	const unsigned long int mCompletedMask, mExiting;
+	unsigned long int& mCompletedTasks;
+	///@}
 	///The mutex associated with this manager.
 	ReMutex mMutex;
 	///The mutex associated with table of all physics components.

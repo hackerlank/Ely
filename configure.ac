@@ -94,7 +94,8 @@ AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
 # checks for Python.
 AX_PYTHON
 # checks for Python >= 2.7.
-AX_PYTHON_DEVEL([>= '2.7'])
+AX_PYTHON_PATH
+AX_PYTHON_VERSION_ENSURE([2.7])
 
 # checks for Ely dependency packages
 ELY_DEPS_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
@@ -140,18 +141,30 @@ AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile
 		src/Makefile
-		doc/Makefile
+		src/AIComponents/Makefile
+		src/AudioComponents/Makefile
+		src/BehaviorComponents/Makefile
+		src/CommonComponents/Makefile
+		src/ControlComponents/Makefile
+		src/Game/Makefile
+		src/ObjectModel/Makefile
+		src/PhysicsComponents/Makefile
+		src/PhysicsControlComponents/Makefile
+		src/SceneComponents/Makefile
+		src/Support/Makefile
+		src/Utilities/Makefile
 		elygame/Makefile
 		elygame/callbacks/Makefile
-		elygame/transitions/Makefile
-		elygame/instanceupdates/Makefile
-		elygame/initializations/Makefile
 		elygame/data/Makefile
 		elygame/data/misc/Makefile
 		elygame/data/models/Makefile
 		elygame/data/shaders/Makefile
 		elygame/data/sounds/Makefile
 		elygame/data/textures/Makefile
+		elygame/initializations/Makefile
+		elygame/instanceupdates/Makefile
+		elygame/transitions/Makefile
+		doc/Makefile
 		])])
 
 AC_CONFIG_FILES([

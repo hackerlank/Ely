@@ -45,10 +45,10 @@ public:
 	virtual btCollisionShape *ptr() const;
 
 private:
+	btHeightfieldTerrainShape *_shape;
 	int _num_rows;
 	int _num_cols;
 	float *_data;
-	btHeightfieldTerrainShape *_shape;
 
 ////////////////////////////////////////////////////////////////////
 public:

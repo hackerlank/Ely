@@ -33,7 +33,7 @@ namespace ely
 
 Terrain::Terrain()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
@@ -234,9 +234,9 @@ void Terrain::update(void* data)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+#ifdef TESTING
 	float dt = *(reinterpret_cast<float*>(data));
 
-#ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
 

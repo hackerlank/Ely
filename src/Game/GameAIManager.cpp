@@ -38,8 +38,8 @@ GameAIManager::GameAIManager(
 		mStartFrame(2)
 #ifdef ELY_THREAD
 		,mManagersMutex(managersMutex), mManagersVar(managersVar),
-		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
-		mExiting(exiting)
+		mCompletedMask(completedMask), mExiting(exiting),
+		mCompletedTasks(completedTasks)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
@@ -47,8 +47,6 @@ GameAIManager::GameAIManager(
 	mAIComponents.clear();
 	mUpdateData.clear();
 	mUpdateTask.clear();
-	mAIWorld = new AIWorld(
-			GameManager::GetSingletonPtr()->windowFramework()->get_render());
 	//create the task for updating AI components
 	mUpdateData = new TaskInterface<GameAIManager>::TaskData(this,
 			&GameAIManager::update);
@@ -80,8 +78,6 @@ GameAIManager::~GameAIManager()
 		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
 	}
 	mAIComponents.clear();
-	//
-	delete mAIWorld;
 }
 
 void GameAIManager::addToAIUpdate(SMARTPTR(Component)aiComp)
@@ -108,11 +104,6 @@ void GameAIManager::removeFromAIUpdate(SMARTPTR(Component)aiComp)
 	{
 		mAIComponents.remove(aiComp);
 	}
-}
-
-AIWorld* GameAIManager::aiWorld() const
-{
-	return mAIWorld;
 }
 
 AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)

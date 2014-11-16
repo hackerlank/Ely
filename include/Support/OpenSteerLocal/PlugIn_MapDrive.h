@@ -3675,15 +3675,15 @@ public:
 			rectV[i] = rectVertices[i].setYtoZero();
 		}
 		Vec3 circleC = circleCenter.setYtoZero();
-		//
-		//	3-----------2      ----
-		//  |     u2    |     /    \
-		//	|     |     |    /      \
-		//	|    rC--u1 |   |   cC   |
-		//	|           |    \      /
-		//	0-----------1     \    /
-		//                     ----
-		//
+		/*
+			3-----------2      ----
+		    |     u2    |     /    \
+			|     |     |    /      \
+			|    rC--u1 |   |   cC   |
+			|           |    \      /
+			0-----------1     \    /
+		                       ----
+		*/
 		//get rectangle half dimensions
 		float halfDim1 = (rectV[1] - rectV[0]).length() / 2.0;
 		float halfDim2 = (rectV[3] - rectV[0]).length() / 2.0;

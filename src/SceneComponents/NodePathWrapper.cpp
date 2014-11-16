@@ -31,7 +31,7 @@ namespace ely
 
 NodePathWrapper::NodePathWrapper()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl)

@@ -32,7 +32,7 @@ namespace ely
 
 Listener::Listener()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Listener::Listener(SMARTPTR(ListenerTemplate)tmpl)

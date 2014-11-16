@@ -89,13 +89,6 @@ public:
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
-	///Multithreaded managers stuff
-	///@{
-	Mutex& mManagersMutex;
-	ConditionVarFull& mManagersVar;
-	const unsigned long int mCompletedMask, mExiting;
-	unsigned long int& mCompletedTasks;
-	///@}
 #endif
 
 private:
@@ -115,6 +108,13 @@ private:
 	///@}
 
 #ifdef ELY_THREAD
+	///Multithreaded managers stuff
+	///@{
+	Mutex& mManagersMutex;
+	ConditionVarFull& mManagersVar;
+	const unsigned long int mCompletedMask, mExiting;
+	unsigned long int& mCompletedTasks;
+	///@}
 	///The mutex associated with this manager.
 	ReMutex mMutex;
 #endif

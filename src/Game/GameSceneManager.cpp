@@ -38,8 +38,8 @@ GameSceneManager::GameSceneManager(
 		const std::string& asyncTaskChain)
 #ifdef ELY_THREAD
 		:mManagersMutex(managersMutex), mManagersVar(managersVar),
-		mCompletedMask(completedMask), mCompletedTasks(completedTasks),
-		mExiting(exiting)
+		mCompletedMask(completedMask), mExiting(exiting),
+		mCompletedTasks(completedTasks)
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),

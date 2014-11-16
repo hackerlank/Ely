@@ -32,7 +32,7 @@ namespace ely
 
 InstanceOf::InstanceOf()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl)

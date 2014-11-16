@@ -31,7 +31,7 @@ namespace ely
 
 Chaser::Chaser()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)

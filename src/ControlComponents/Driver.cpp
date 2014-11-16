@@ -32,7 +32,7 @@ namespace ely
 
 Driver::Driver()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Driver::Driver(SMARTPTR(DriverTemplate)tmpl)

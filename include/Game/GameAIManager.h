@@ -25,7 +25,7 @@
 #define GAMEAIMANAGER_H_
 
 #include "Utilities/Tools.h"
-#include <aiWorld.h>
+#include <list>
 #include "ObjectModel/Component.h"
 
 namespace ely
@@ -70,12 +70,6 @@ public:
 	void removeFromAIUpdate(SMARTPTR(Component) aiComp);
 
 	/**
-	 * \brief Gets a reference to the AIWorld.
-	 * @return The AIWorld.
-	 */
-	AIWorld* aiWorld() const;
-
-	/**
 	 * \brief Updates AI components.
 	 *
 	 * Will be called automatically in a task.
@@ -90,18 +84,9 @@ public:
 	 * @return The internal mutex.
 	 */
 	ReMutex& getMutex();
-	///Multithreaded managers stuff
-	///@{
-	Mutex& mManagersMutex;
-	ConditionVarFull& mManagersVar;
-	const unsigned long int mCompletedMask, mExiting;
-	unsigned long int& mCompletedTasks;
-	///@}
 #endif
 
 private:
-	/// AIWorld.
-	AIWorld* mAIWorld;
 
 	///@{
 	///List of AI components to be updated.
@@ -119,6 +104,13 @@ private:
 	int mStartFrame;
 
 #ifdef ELY_THREAD
+	///Multithreaded managers stuff
+	///@{
+	Mutex& mManagersMutex;
+	ConditionVarFull& mManagersVar;
+	const unsigned long int mCompletedMask, mExiting;
+	unsigned long int& mCompletedTasks;
+	///@}
 	///The mutex associated with this manager.
 	ReMutex mMutex;
 #endif

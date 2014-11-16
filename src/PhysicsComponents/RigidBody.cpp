@@ -34,7 +34,7 @@ namespace ely
 
 RigidBody::RigidBody()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate)tmpl)

@@ -34,7 +34,7 @@ namespace ely
 
 Vehicle::Vehicle()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Vehicle::Vehicle(SMARTPTR(VehicleTemplate)tmpl)

@@ -29,7 +29,7 @@ namespace ely
 {
 CharacterController::CharacterController()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl)
@@ -412,9 +412,9 @@ void CharacterController::update(void* data)
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+#ifdef TESTING
 	float dt = *(reinterpret_cast<float*>(data));
 
-#ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
 

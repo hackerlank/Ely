@@ -23,43 +23,42 @@ nodist_noinst_HEADERS =\
 bin_PROGRAMS = elygame
 
 elygame_ltlibraries = \
-		$(top_builddir)/src/libgame.la \
-		$(top_builddir)/src/libaicomponents.la \
-		$(top_builddir)/src/libaudiocomponents.la \
-		$(top_builddir)/src/libbehaviorcomponents.la \
-		$(top_builddir)/src/libcommoncomponents.la \
-		$(top_builddir)/src/libcontrolcomponents.la \
-		$(top_builddir)/src/libphysicscomponents.la \
-		$(top_builddir)/src/libphysicscontrolcomponents.la \
-		$(top_builddir)/src/libscenecomponents.la \
-		$(top_builddir)/src/libobjectmodel.la \
-		$(top_builddir)/src/libutilities.la
-
-elygame_libraries = \
-		$(top_builddir)/src/libbullet.a \
-		$(top_builddir)/src/librecastnavigation.a \
-		$(top_builddir)/src/librocket.a \
-		$(top_builddir)/src/libtinyxml2.a
-whole_archives = \
-		-Wl,$(top_builddir)/src/libsupport.a \
-		-Wl,$(top_builddir)/src/libopensteer.a
+		$(top_builddir)/src/Game/libgame.la \
+		$(top_builddir)/src/AIComponents/libaicomponents.la \
+		$(top_builddir)/src/AudioComponents/libaudiocomponents.la \
+		$(top_builddir)/src/BehaviorComponents/libbehaviorcomponents.la \
+		$(top_builddir)/src/CommonComponents/libcommoncomponents.la \
+		$(top_builddir)/src/ControlComponents/libcontrolcomponents.la \
+		$(top_builddir)/src/PhysicsComponents/libphysicscomponents.la \
+		$(top_builddir)/src/PhysicsControlComponents/libphysicscontrolcomponents.la \
+		$(top_builddir)/src/SceneComponents/libscenecomponents.la \
+		$(top_builddir)/src/ObjectModel/libobjectmodel.la \
+		$(top_builddir)/src/Utilities/libutilities.la \
+		$(top_builddir)/src/Support/libbullet.la \
+		$(top_builddir)/src/Support/librecastnavigation.la \
+		$(top_builddir)/src/Support/librocket.la \
+		$(top_builddir)/src/Support/libtinyxml2.la \
+		$(top_builddir)/src/Support/libsupport.la \
+		$(top_builddir)/src/Support/libopensteer.la
 
 #elygame
 elygame_SOURCES = \
 		Ely.cpp
-		
-elygame_LDFLAGS = $(AM_LDFLAGS) -export-dynamic \
-		-Wl,--whole-archive \
-		$(whole_archives) \
-		-Wl,--no-whole-archive
+
+if ELY_DEVEL
+ldrpath = -rpath $(abs_top_builddir)/src/.libs
+else
+ldrpath = -rpath $(pkglibdir)
+endif
+
+elygame_LDFLAGS = $(AM_LDFLAGS) -export-dynamic $(ldrpath)
 		
 elygame_LDADD = \
-		$(elygame_ltlibraries) \
-		$(elygame_libraries) \
 		-dlopen $(builddir)/callbacks/callbacks.la \
 		-dlopen $(builddir)/initializations/initializations.la \
 		-dlopen $(builddir)/instanceupdates/instanceupdates.la \
 		-dlopen $(builddir)/transitions/transitions.la \
+		$(elygame_ltlibraries) \
 		$(ELY_LIBS)
 		
 dist_pkgdata_DATA = game.xml config.prc

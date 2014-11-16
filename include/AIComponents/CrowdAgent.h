@@ -257,7 +257,6 @@ inline void CrowdAgent::reset()
 	mBulletWorld.clear();
 	mMaxError = 0.0;
 	mDeltaRayDown = mDeltaRayOrig = LVector3f::zero();
-	mHitResult = BulletClosestHitRayResult::empty();
 	mRayMask = BitMask32::all_off();
 	mCorrectHeightRigidBody = 0.0;
 	mMove = mSteady = ThrowEventData();

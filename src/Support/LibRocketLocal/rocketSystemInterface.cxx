@@ -51,6 +51,9 @@ LogMessage(Rocket::Core::Log::Type type, const Rocket::Core::String& message) {
     return true;
   case Rocket::Core::Log::LT_DEBUG:
     rocket_cat->debug() << message.CString() << "\n";
+    break;
+  default:
+	  break;
   }
   return true;
 }

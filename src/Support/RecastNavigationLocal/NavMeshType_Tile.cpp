@@ -784,7 +784,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		{
 			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build distance field.");
-			return false;
+			return (unsigned char*)false;
 		}
 
 		// Partition the walkable surface into simple regions without holes.
@@ -793,7 +793,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		{
 			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build watershed regions.");
-			return false;
+			return (unsigned char*)false;
 		}
 	}
 	else if (m_partitionType == NAVMESH_PARTITION_MONOTONE)
@@ -805,7 +805,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		{
 			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build monotone regions.");
-			return false;
+			return (unsigned char*)false;
 		}
 	}
 	else // SAMPLE_PARTITION_LAYERS
@@ -816,7 +816,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty,
 		{
 			CTXLOG(m_ctx, RC_LOG_ERROR,
 					"buildNavigation: Could not build layer regions.");
-			return false;
+			return (unsigned char*)false;
 		}
 	}
 

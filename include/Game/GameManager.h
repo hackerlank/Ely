@@ -137,7 +137,8 @@ protected:
 		T* mPtr;
 		int mPrio;
 	public:
-		Orderable()
+		Orderable() :
+				mPtr(NULL), mPrio(int())
 		{
 		}
 		Orderable(T* ptr, int prio) :

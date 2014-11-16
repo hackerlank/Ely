@@ -30,10 +30,10 @@ namespace ely
 {
 
 Component::Component() :
-		mCallbackLib(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
 #ifdef ELY_THREAD
-				, mDestroying(false)
+		mDestroying(false),
 #endif
+		mCallbackLib(NULL), mCallbacksLoaded(false), mCallbacksRegistered(false)
 {
 	mTmpl.clear();
 	mComponentId = ComponentId();

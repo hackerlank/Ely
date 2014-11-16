@@ -29,7 +29,7 @@ namespace ely
 
 Default::Default()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Default::Default(SMARTPTR(DefaultTemplate)tmpl)

@@ -37,7 +37,7 @@ namespace ely
 
 Model::Model()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Model::Model(SMARTPTR(ModelTemplate)tmpl)

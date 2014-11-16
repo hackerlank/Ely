@@ -37,6 +37,9 @@ namespace ely
 CrowdAgent::CrowdAgent():
 		mHitResult(BulletClosestHitRayResult::empty())
 {
+	mNavMesh.clear();
+	mStartNavMesh.clear();
+	reset();
 }
 
 CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):

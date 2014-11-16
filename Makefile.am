@@ -1,6 +1,6 @@
 ACLOCAL_AMFLAGS = -I m4
 
-DIST_SUBDIRS = include src doc elygame
+DIST_SUBDIRS = include src elygame doc
 
 if BOOST_TEST
 BOOSTTESTDIR = test

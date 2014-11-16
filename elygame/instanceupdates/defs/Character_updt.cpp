@@ -38,8 +38,8 @@ INSTANCEUPDATE playerUpdate;
 
 namespace
 {
-float timeElapsed = 0;
-bool jumping = false;
+//float timeElapsed = 0;
+//bool jumping = false;
 const float TIMETHRESHOLD = 3.0; //seconds
 }
 ///player custom update

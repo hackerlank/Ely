@@ -32,7 +32,7 @@ namespace ely
 
 Sound3d::Sound3d()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 Sound3d::Sound3d(SMARTPTR(Sound3dTemplate)tmpl)

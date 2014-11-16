@@ -1171,8 +1171,8 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task, void * data)
 		dynamic_cast<PedestrianPlugIn<SteerVehicle>*>(&(steerPlugIns[pedestrian])->
 				getAbstractPlugIn());
 		// draw a line along each segment of path
-		const OpenSteer::PolylineSegmentedPathwaySingleRadius& path =
-		dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*plugIn->getPathway());
+//		const OpenSteer::PolylineSegmentedPathwaySingleRadius& path =
+//		dynamic_cast<PolylineSegmentedPathwaySingleRadius&>(*plugIn->getPathway());
 		plugIn->drawPath();
 	}
 	//soccer: render path

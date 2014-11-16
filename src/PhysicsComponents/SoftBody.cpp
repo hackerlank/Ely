@@ -36,7 +36,7 @@ namespace ely
 
 SoftBody::SoftBody()
 {
-	// TODO Auto-generated constructor stub
+	reset();
 }
 
 SoftBody::SoftBody(SMARTPTR(SoftBodyTemplate)tmpl)
