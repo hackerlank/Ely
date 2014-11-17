@@ -12,41 +12,58 @@ AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
 noinst_HEADERS = \
-		Ely.h
+	Ely.h
 	
 BUILT_SOURCES = Ely_ini.h
 
 nodist_noinst_HEADERS =\
-		Ely_ini.h
+	Ely_ini.h
 
 #elygame
 bin_PROGRAMS = elygame
 
 elygame_ltlibraries = \
-		$(top_builddir)/src/Game/libgame.la \
-		$(top_builddir)/src/AIComponents/libaicomponents.la \
-		$(top_builddir)/src/AudioComponents/libaudiocomponents.la \
-		$(top_builddir)/src/BehaviorComponents/libbehaviorcomponents.la \
-		$(top_builddir)/src/CommonComponents/libcommoncomponents.la \
-		$(top_builddir)/src/ControlComponents/libcontrolcomponents.la \
-		$(top_builddir)/src/PhysicsComponents/libphysicscomponents.la \
-		$(top_builddir)/src/PhysicsControlComponents/libphysicscontrolcomponents.la \
-		$(top_builddir)/src/SceneComponents/libscenecomponents.la \
-		$(top_builddir)/src/ObjectModel/libobjectmodel.la \
-		$(top_builddir)/src/Utilities/libutilities.la \
-		$(top_builddir)/src/Support/libbullet.la \
-		$(top_builddir)/src/Support/librecastnavigation.la \
-		$(top_builddir)/src/Support/librocket.la \
-		$(top_builddir)/src/Support/libtinyxml2.la \
-		$(top_builddir)/src/Support/libsupport.la \
-		$(top_builddir)/src/Support/libopensteer.la
+	$(top_builddir)/src/Game/libgame.la \
+	$(top_builddir)/src/AIComponents/libaicomponents.la \
+	$(top_builddir)/src/AudioComponents/libaudiocomponents.la \
+	$(top_builddir)/src/BehaviorComponents/libbehaviorcomponents.la \
+	$(top_builddir)/src/CommonComponents/libcommoncomponents.la \
+	$(top_builddir)/src/ControlComponents/libcontrolcomponents.la \
+	$(top_builddir)/src/PhysicsComponents/libphysicscomponents.la \
+	$(top_builddir)/src/PhysicsControlComponents/libphysicscontrolcomponents.la \
+	$(top_builddir)/src/SceneComponents/libscenecomponents.la \
+	$(top_builddir)/src/ObjectModel/libobjectmodel.la \
+	$(top_builddir)/src/Utilities/libutilities.la \
+	$(top_builddir)/src/Support/libbullet.la \
+	$(top_builddir)/src/Support/librecastnavigation.la \
+	$(top_builddir)/src/Support/librocket.la \
+	$(top_builddir)/src/Support/libtinyxml2.la \
+	$(top_builddir)/src/Support/libsupport.la \
+	$(top_builddir)/src/Support/libopensteer.la
 
 #elygame
 elygame_SOURCES = \
-		Ely.cpp
+	Ely.cpp
 
 if ELY_DEVEL
-ldrpath = -rpath $(abs_top_builddir)/src/.libs
+ldrpath = \
+	-rpath $(abs_top_builddir)/src/Game/.libs \
+	-rpath $(abs_top_builddir)/src/AIComponents/.libs \
+	-rpath $(abs_top_builddir)/src/AudioComponents/.libs \
+	-rpath $(abs_top_builddir)/src/BehaviorComponents/.libs \
+	-rpath $(abs_top_builddir)/src/CommonComponents/.libs \
+	-rpath $(abs_top_builddir)/src/ControlComponents/.libs \
+	-rpath $(abs_top_builddir)/src/PhysicsComponents/.libs \
+	-rpath $(abs_top_builddir)/src/PhysicsControlComponents/.libs \
+	-rpath $(abs_top_builddir)/src/SceneComponents/.libs \
+	-rpath $(abs_top_builddir)/src/ObjectModel/.libs \
+	-rpath $(abs_top_builddir)/src/Utilities/.libs \
+	-rpath $(abs_top_builddir)/src/Support/.libs \
+	-rpath $(abs_top_builddir)/src/Support/.libs \
+	-rpath $(abs_top_builddir)/src/Support/.libs \
+	-rpath $(abs_top_builddir)/src/Support/.libs \
+	-rpath $(abs_top_builddir)/src/Support/.libs \
+	-rpath $(abs_top_builddir)/src/Support/.libs
 else
 ldrpath = -rpath $(pkglibdir)
 endif
