@@ -45,6 +45,8 @@ elygame_ltlibraries = \
 elygame_SOURCES = \
 	Ely.cpp
 
+elygame_CXXFLAGS = $(AM_CXXFLAGS) -frepo
+
 if ELY_DEVEL
 ldrpath = \
 	-rpath $(abs_top_builddir)/src/Game/.libs \
@@ -69,7 +71,7 @@ ldrpath = -rpath $(pkglibdir)
 endif
 
 elygame_LDFLAGS = $(AM_LDFLAGS) -export-dynamic $(ldrpath)
-		
+
 elygame_LDADD = \
 		-dlopen $(builddir)/callbacks/callbacks.la \
 		-dlopen $(builddir)/initializations/initializations.la \
