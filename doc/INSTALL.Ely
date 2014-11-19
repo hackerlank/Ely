@@ -62,7 +62,7 @@ build with these commands:
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
- $ ../configure --enable-python --enable-lr-extra-samples
+ $ ../configure --enable-python --enable-extra-samples
  $ make
  $ sudo make install
 
