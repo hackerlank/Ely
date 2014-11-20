@@ -24,7 +24,6 @@
 #ifndef PICKER_H_
 #define PICKER_H_
 
-#include "Utilities/Tools.h"
 #include <pandaFramework.h>
 #include <lens.h>
 #include "Support/BulletLocal/bulletWorld.h"
@@ -74,6 +73,11 @@ private:
 	bool mCsIsSpherical;
 	float mCfm, mErp;
 	float mPivotCamDist;
+	//soft body
+	btSoftBody::sRayCast mSoftResults;
+	btSoftBody::Node* mSoftNode;
+	btVector3 mSoftImpact, mSoftGoal;
+	bool mSoftDrag;
 	///@}
 
 	/**
@@ -84,14 +88,10 @@ private:
 	void pickBody(const Event* event);
 	SMARTPTR(BulletRigidBodyNode) mPickedBody;
 	std::string mPickKeyOn, mPickKeyOff;
-	///@}
 	/**
-	 * \name Move picked body task data.
+	 * \name Move picked body with "PreTickCallback".
 	 */
-	///@{
-	SMARTPTR(TaskInterface<Picker>::TaskData) mMovePickedData;
-	AsyncTask::DoneStatus movePicked(GenericAsyncTask* task);
-	SMARTPTR(AsyncTask) mMovePickedTask;
+	static void movePicked (btDynamicsWorld *world, btScalar timeStep);
 	///@}
 
 #ifdef ELY_THREAD

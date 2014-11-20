@@ -194,29 +194,33 @@ inline void Raycaster::doRayCast(const BitMask32& bitMask)
 			//Transform to global coordinates
 			pFrom = mRender.get_relative_point(mCamera, pFrom);
 			pTo = mRender.get_relative_point(mCamera, pTo);
-			//cast a ray to detect a body
-			BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom,
-					pTo, bitMask);
-			//
-			if (result.has_hit())
-			{
-				//possible hit objects:
-				//- BulletRigidBodyNode
-				//- BulletCharacterControllerNode
-				//- BulletVehicle
-				//- BulletConstraint
-				//- BulletSoftBodyNode
-				//- BulletGhostNode
 
-				mHitNode = const_cast<PandaNode*>(result.get_node());
-				mHitObject = GamePhysicsManager::GetSingletonPtr()->
-				getPhysicsComponentByPandaNode(mHitNode)->getOwnerObject();
-				mHitPos = result.get_hit_pos();
-				mHitNormal = result.get_hit_normal();
-				mHitFraction = result.get_hit_fraction();
-				mFromPos = result.get_from_pos();
-				mToPos = result.get_to_pos();
+			HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+			{
+				//cast a ray to detect a body
+				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom, pTo, bitMask);
+				//
+				if (result.has_hit())
+				{
+					//possible hit objects:
+					//- BulletRigidBodyNode
+					//- BulletCharacterControllerNode
+					//- BulletVehicle
+					//- BulletConstraint
+					//- BulletSoftBodyNode
+					//- BulletGhostNode
+
+					mHitNode = const_cast<PandaNode*>(result.get_node());
+					mHitObject = GamePhysicsManager::GetSingletonPtr()->
+					getPhysicsComponentByPandaNode(mHitNode)->getOwnerObject();
+					mHitPos = result.get_hit_pos();
+					mHitNormal = result.get_hit_normal();
+					mHitFraction = result.get_hit_fraction();
+					mFromPos = result.get_from_pos();
+					mToPos = result.get_to_pos();
+				}
 			}
+
 		}
 	}
 }
