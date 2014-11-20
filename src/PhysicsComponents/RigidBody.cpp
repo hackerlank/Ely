@@ -310,9 +310,12 @@ void RigidBody::onAddToObjectSetup()
 	//create a node path for the rigid body
 	mNodePath = NodePath(mRigidBodyNode);
 
-	//attach to Bullet World
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			mRigidBodyNode);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//attach to Bullet World
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+				mRigidBodyNode);
+	}
 	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
 	//dynamic, etc...) after it has been attached to the world, you must first
 	//attach it as a dynamic body and then switch its type:
@@ -438,9 +441,12 @@ void RigidBody::onRemoveFromObjectCleanup()
 	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
 			mRigidBodyNode.p(), NULL);
 
-	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-			mRigidBodyNode);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//remove rigid body from the physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+				mRigidBodyNode);
+	}
 
 	//Remove node path
 	mNodePath.remove_node();

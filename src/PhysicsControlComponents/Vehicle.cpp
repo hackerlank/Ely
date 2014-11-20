@@ -459,8 +459,12 @@ void Vehicle::onAddToObjectSetup()
 	GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
 			mOwnerObject->getNodePath(),
 			mVehicleDims, mVehicleDeltaCenter, mVehicleRadius);
-	//add BulletVehicle to physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
+
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//add BulletVehicle to physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mVehicle);
+	}
 
 	//set thrown events if any
 	unsigned int idx1, valueNum1;
@@ -540,12 +544,15 @@ void Vehicle::onRemoveFromObjectCleanup()
 	RETURN_ON_COND((not physicsComp) or
 			(not physicsComp->is_of_type(RigidBody::get_class_type())),)
 
-	//remove BulletVehicle from physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//remove BulletVehicle from physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mVehicle);
 
-	//re-add temporarily BulletRigidBodyNode of physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			&(DCAST(RigidBody, physicsComp)->getBulletRigidBodyNode()));
+		//re-add temporarily BulletRigidBodyNode of physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+				&(DCAST(RigidBody, physicsComp)->getBulletRigidBodyNode()));
+	}
 	//
 	reset();
 }

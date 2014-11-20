@@ -152,6 +152,11 @@ AM_COND_IF([ELY_ELF],
 		src/PhysicsControlComponents/Makefile
 		src/SceneComponents/Makefile
 		src/Support/Makefile
+		src/Support/BulletLocal/Makefile
+		src/Support/LibRocketLocal/Makefile
+		src/Support/OpenSteerLocal/Makefile
+		src/Support/RecastNavigationLocal/Makefile
+		src/Support/tinyxml2/Makefile
 		src/Utilities/Makefile
 		elygame/Makefile
 		elygame/callbacks/Makefile

@@ -28,25 +28,25 @@ namespace ely
 {
 
 Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
-SMARTPTR(BulletWorld)world, int N) :
-mApp(app), mWindow(window), mWorld(world), m_N(N)
+SMARTPTR(BulletWorld)world, int N) : mApp(app), mWindow(window), mWorld(world),
+		mNumCallbacks(N), mHitResult(BulletClosestHitRayResult::empty())
 {
 	//get render, camera node paths
 	mRender = window->get_render();
 	mCamera = window->get_camera_group();
 	mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
-	if(m_N <= 0)
+	if(mNumCallbacks <= 0)
 	{
-		m_N = 3;
+		mNumCallbacks = 3;
 	}
 	//allocated room for vectors
-	mCallback.resize(m_N);
-	mData.resize(m_N);
-	mBitMask.resize(m_N);
-	mHitBodyData.resize(m_N);
-	mHitKey.resize(m_N);
+	mCallback.resize(mNumCallbacks);
+	mData.resize(mNumCallbacks);
+	mBitMask.resize(mNumCallbacks);
+	mHitBodyData.resize(mNumCallbacks);
+	mHitKey.resize(mNumCallbacks);
 	//reset callback data
-	for (int i = 0; i < m_N; ++i)
+	for (int i = 0; i < mNumCallbacks; ++i)
 	{
 		mHitBodyData[i].clear();
 	}
@@ -66,7 +66,7 @@ Raycaster::~Raycaster()
 	if (mApp)
 	{
 		// remove event callbacks for picking body
-		for (int i = 0; i < m_N; ++i)
+		for (int i = 0; i < mNumCallbacks; ++i)
 		{
 			if (mHitBodyData[i])
 			{
@@ -83,7 +83,7 @@ void Raycaster::setHitCallback(int index, void (*callback)(Raycaster*, void*),
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	if (not ((index >= 0) and (index < m_N)))
+	if (not ((index >= 0) and (index < mNumCallbacks)))
 	{
 		return;
 	}
@@ -99,7 +99,7 @@ bool Raycaster::setHitCallback(void (*callback)(Raycaster*, void*), void* data,
 
 	//get the first callback free slot
 	int freeIdx = 0;
-	while (freeIdx < m_N)
+	while (freeIdx < mNumCallbacks)
 	{
 		if (mCallback[freeIdx])
 		{
@@ -107,7 +107,7 @@ bool Raycaster::setHitCallback(void (*callback)(Raycaster*, void*), void* data,
 		}
 		++freeIdx;
 	}
-	RETURN_ON_COND(freeIdx >= m_N, false)
+	RETURN_ON_COND(freeIdx >= mNumCallbacks, false)
 	//there is a free slot
 	doSetCallback(freeIdx, callback, data, hitKey, bitMask);
 	return true;
@@ -146,7 +146,7 @@ void Raycaster::hitBodyCallback(const Event* event)
 	//get OnPickKey index (if any)
 	std::string eventName = event->get_name();
 	int idx = 0;
-	while (idx < m_N)
+	while (idx < mNumCallbacks)
 	{
 		if (eventName == mHitKey[idx])
 		{
@@ -156,7 +156,7 @@ void Raycaster::hitBodyCallback(const Event* event)
 	}
 
 	// handle body picking
-	if (mCallback[idx] and (idx < m_N))
+	if (mCallback[idx] and (idx < mNumCallbacks))
 	{
 		doRayCast(mBitMask[idx]);
 		if (mHitNode)
@@ -198,29 +198,28 @@ inline void Raycaster::doRayCast(const BitMask32& bitMask)
 			HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
 			{
 				//cast a ray to detect a body
-				BulletClosestHitRayResult result = mWorld->ray_test_closest(pFrom, pTo, bitMask);
-				//
-				if (result.has_hit())
-				{
-					//possible hit objects:
-					//- BulletRigidBodyNode
-					//- BulletCharacterControllerNode
-					//- BulletVehicle
-					//- BulletConstraint
-					//- BulletSoftBodyNode
-					//- BulletGhostNode
-
-					mHitNode = const_cast<PandaNode*>(result.get_node());
-					mHitObject = GamePhysicsManager::GetSingletonPtr()->
-					getPhysicsComponentByPandaNode(mHitNode)->getOwnerObject();
-					mHitPos = result.get_hit_pos();
-					mHitNormal = result.get_hit_normal();
-					mHitFraction = result.get_hit_fraction();
-					mFromPos = result.get_from_pos();
-					mToPos = result.get_to_pos();
-				}
+				mHitResult = mWorld->ray_test_closest(pFrom, pTo, bitMask);
 			}
+			//
+			if (mHitResult.has_hit())
+			{
+				//possible hit objects:
+				//- BulletRigidBodyNode
+				//- BulletCharacterControllerNode
+				//- BulletVehicle
+				//- BulletConstraint
+				//- BulletSoftBodyNode
+				//- BulletGhostNode
 
+				mHitNode = const_cast<PandaNode*>(mHitResult.get_node());
+				mHitObject = GamePhysicsManager::GetSingletonPtr()->
+				getPhysicsComponentByPandaNode(mHitNode)->getOwnerObject();
+				mHitPos = mHitResult.get_hit_pos();
+				mHitNormal = mHitResult.get_hit_normal();
+				mHitFraction = mHitResult.get_hit_fraction();
+				mFromPos = mHitResult.get_from_pos();
+				mToPos = mHitResult.get_to_pos();
+			}
 		}
 	}
 }

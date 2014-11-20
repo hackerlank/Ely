@@ -134,7 +134,7 @@ private:
 	LVector3f mHitNormal;
 	float mHitFraction;
 	///The max number of callbacks.
-	int m_N;
+	int mNumCallbacks;
 	///Set callback helper.
 	void doSetCallback(int index, void (*callback)(Raycaster*, void*),
 			void* data, const std::string& hitKey, BitMask32 bitMask);
@@ -153,6 +153,7 @@ private:
 	///@}
 	///Ray cast helper.
 	void doRayCast(const BitMask32& bitMask);
+	BulletClosestHitRayResult mHitResult;
 
 #ifdef ELY_THREAD
 	///The mutex associated with this ray caster.

@@ -34,12 +34,12 @@ elygame_ltlibraries = \
 	$(top_builddir)/src/SceneComponents/libscenecomponents.la \
 	$(top_builddir)/src/ObjectModel/libobjectmodel.la \
 	$(top_builddir)/src/Utilities/libutilities.la \
-	$(top_builddir)/src/Support/libbullet.la \
-	$(top_builddir)/src/Support/librecastnavigation.la \
-	$(top_builddir)/src/Support/librocket.la \
-	$(top_builddir)/src/Support/libtinyxml2.la \
+	$(top_builddir)/src/Support/BulletLocal/libbullet.la \
+	$(top_builddir)/src/Support/RecastNavigationLocal/librecastnavigation.la \
+	$(top_builddir)/src/Support/LibRocketLocal/librocket.la \
+	$(top_builddir)/src/Support/tinyxml2/libtinyxml2.la \
 	$(top_builddir)/src/Support/libsupport.la \
-	$(top_builddir)/src/Support/libopensteer.la
+	$(top_builddir)/src/Support/OpenSteerLocal/libopensteer.la
 
 #elygame
 elygame_SOURCES = \
@@ -60,12 +60,12 @@ ldrpath = \
 	-rpath $(abs_top_builddir)/src/SceneComponents/.libs \
 	-rpath $(abs_top_builddir)/src/ObjectModel/.libs \
 	-rpath $(abs_top_builddir)/src/Utilities/.libs \
+	-rpath $(abs_top_builddir)/src/Support/BulletLocal/.libs \
+	-rpath $(abs_top_builddir)/src/Support/RecastNavigationLocal/.libs \
+	-rpath $(abs_top_builddir)/src/Support/LibRocketLocal/.libs \
+	-rpath $(abs_top_builddir)/src/Support/tinyxml2/.libs \
 	-rpath $(abs_top_builddir)/src/Support/.libs \
-	-rpath $(abs_top_builddir)/src/Support/.libs \
-	-rpath $(abs_top_builddir)/src/Support/.libs \
-	-rpath $(abs_top_builddir)/src/Support/.libs \
-	-rpath $(abs_top_builddir)/src/Support/.libs \
-	-rpath $(abs_top_builddir)/src/Support/.libs
+	-rpath $(abs_top_builddir)/src/Support/OpenSteerLocal/.libs
 else
 ldrpath = -rpath $(pkglibdir)
 endif

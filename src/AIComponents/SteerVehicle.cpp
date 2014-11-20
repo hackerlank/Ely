@@ -495,11 +495,15 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 		case OPENSTEER:
 			break;
 		case OPENSTEER_KINEMATIC:
+		{
 			//correct updatedPos.z if needed
-			//ray down
-			mHitResult = mBulletWorld->ray_test_closest(
-					updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
-					mRayMask);
+			HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+			{
+				//ray down
+				mHitResult = mBulletWorld->ray_test_closest(
+						updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
+						mRayMask);
+			}
 			if (mHitResult.has_hit())
 			{
 				//updatedPos.z needs correction
@@ -507,6 +511,7 @@ void SteerVehicle::doUpdateSteerVehicle(const float currentTime,
 				//correct vehicle position
 				mVehicle->setPosition(LVecBase3fToOpenSteerVec3(updatedPos));
 			}
+		}
 			break;
 		default:
 			break;

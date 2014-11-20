@@ -510,8 +510,11 @@ void SoftBody::onAddToObjectSetup()
 	//create a node path for the soft body
 	mNodePath = NodePath(mSoftBodyNode);
 
-	//attach to Bullet World
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mSoftBodyNode);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//attach to Bullet World
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mSoftBodyNode);
+	}
 
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
@@ -549,9 +552,12 @@ void SoftBody::onRemoveFromObjectCleanup()
 	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
 			mSoftBodyNode.p(), NULL);
 
-	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-			mSoftBodyNode);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//remove rigid body from the physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+				mSoftBodyNode);
+	}
 
 	//Remove node path
 	mNodePath.remove_node();

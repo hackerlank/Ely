@@ -274,9 +274,12 @@ void CharacterController::onAddToObjectSetup()
 	//create a node path for the character controller
 	mNodePath = NodePath(mCharacterController);
 
-	//attach it to Bullet World
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			mCharacterController);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//attach it to Bullet World
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+				mCharacterController);
+	}
 
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
@@ -386,8 +389,11 @@ void CharacterController::onRemoveFromObjectCleanup()
 	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
 			mCharacterController.p(), NULL);
 
-	//remove character controller from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mCharacterController);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//remove character controller from the physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(mCharacterController);
+	}
 
 	//Remove node path
 	mNodePath.remove_node();

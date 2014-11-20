@@ -395,16 +395,21 @@ void CrowdAgent::doUpdatePosDir(float dt, const LPoint3f& pos, const LVector3f& 
 		case RECAST:
 			break;
 		case RECAST_KINEMATIC:
+		{
 			//correct updatedPos.z (if needed)
-			//ray down
-			mHitResult = mBulletWorld->ray_test_closest(
-					updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
-					mRayMask);
+			HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+			{
+				//ray down
+				mHitResult = mBulletWorld->ray_test_closest(
+						updatedPos + mDeltaRayOrig, updatedPos + mDeltaRayDown,
+						mRayMask);
+			}
 			if (mHitResult.has_hit())
 			{
 				//updatedPos.z needs correction
 				updatedPos.set_z(mHitResult.get_hit_pos().get_z());
 			}
+		}
 			break;
 		default:
 			break;

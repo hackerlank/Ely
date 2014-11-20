@@ -301,9 +301,12 @@ void Ghost::onAddToObjectSetup()
 	//create a node path for the rigid body
 	mNodePath = NodePath(mGhostNode);
 
-	//attach to Bullet World
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
-			mGhostNode);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//attach to Bullet World
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(
+				mGhostNode);
+	}
 
 	//set collide mask
 	mNodePath.set_collide_mask(mCollideMask);
@@ -483,9 +486,12 @@ void Ghost::onRemoveFromObjectCleanup()
 	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
 			mGhostNode.p(), NULL);
 
-	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-			mGhostNode);
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//remove rigid body from the physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+				mGhostNode);
+	}
 
 	//Remove node path
 	mNodePath.remove_node();
