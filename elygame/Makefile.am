@@ -3,6 +3,8 @@ DIST_SUBDIRS = callbacks transitions initializations instanceupdates data
 # if !BOOST_TEST and !TRAINING then ELY_ELF 
 if ELY_ELF
 ELYELFDIRS = $(DIST_SUBDIRS)
+else
+ELYELFDIRS =
 endif 
 
 SUBDIRS = $(ELYELFDIRS)
