@@ -134,10 +134,9 @@ build with these commands:
 
 Panda3d
 *******
-Get source package (giving no CVS password):
+Get source package:
 
- $ cvs -d:pserver:anonymous@panda3d.cvs.sourceforge.net:/cvsroot/panda3d login
- $ cvs -z3 -d:pserver:anonymous@panda3d.cvs.sourceforge.net:/cvsroot/panda3d co -P panda3d
+$ git clone https://github.com/panda3d/panda3d.git
  
 install dependencies from distribution:
 
