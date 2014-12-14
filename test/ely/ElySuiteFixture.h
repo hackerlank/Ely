@@ -24,8 +24,8 @@
 #ifndef ELYSUITEFIXTURE_H_
 #define ELYSUITEFIXTURE_H_
 
-#include "Ely.h"
 #include <boost/test/unit_test.hpp>
+#include "../../elygame/elygame.h"
 
 struct ElySuiteFixture
 {

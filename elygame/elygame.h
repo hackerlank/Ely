@@ -21,8 +21,8 @@
  * \author consultit
  */
 
-#ifndef ELY_H_
-#define ELY_H_
+#ifndef ELYGAME_H_
+#define ELYGAME_H_
 
 #include <load_prc_file.h>
 #include <Rocket/Core.h>
@@ -149,4 +149,4 @@ protected:
 };
 }
 
-#endif /* ELY_H_ */
+#endif /* ELYGAME_H_ */

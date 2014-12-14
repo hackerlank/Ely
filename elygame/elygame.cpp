@@ -21,8 +21,8 @@
  * \author consultit
  */
 
-#include "Ely.h"
-#include "Ely_ini.h"
+#include "elygame.h"
+#include "elygame_ini.h"
 #include <pandaFramework.h>
 
 using namespace ely;

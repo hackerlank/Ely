@@ -14,12 +14,12 @@ AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
 noinst_HEADERS = \
-	Ely.h
+	elygame.h
 	
-BUILT_SOURCES = Ely_ini.h
+BUILT_SOURCES = elygame_ini.h
 
 nodist_noinst_HEADERS =\
-	Ely_ini.h
+	elygame_ini.h
 
 #elygame
 bin_PROGRAMS = elygame
@@ -46,7 +46,8 @@ elygame_ltlibraries = \
 
 #elygame
 elygame_SOURCES = \
-	Ely.cpp
+	elygame.cpp \
+	elygame_memory_pools.cpp
 
 elygame_CXXFLAGS = $(AM_CXXFLAGS) -frepo
 
@@ -66,6 +67,7 @@ ldrpath = \
 	-rpath $(abs_top_builddir)/src/Support/BulletLocal/.libs \
 	-rpath $(abs_top_builddir)/src/Support/RecastNavigationLocal/.libs \
 	-rpath $(abs_top_builddir)/src/Support/LibRocketLocal/.libs \
+	-rpath $(abs_top_builddir)/src/Support/MemoryPool/.libs \
 	-rpath $(abs_top_builddir)/src/Support/tinyxml2/.libs \
 	-rpath $(abs_top_builddir)/src/Support/.libs \
 	-rpath $(abs_top_builddir)/src/Support/OpenSteerLocal/.libs
@@ -85,7 +87,7 @@ elygame_LDADD = \
 		
 dist_pkgdata_DATA = game.xml config.prc
 
-EXTRA_DIST = Ely_ini.h.in config.prc.in game.xml.in
+EXTRA_DIST = elygame_ini.h.in config.prc.in game.xml.in
 
 if !ELY_DEVEL
 substDataDir = sed -e 's|@elygamedatadir[@]|$(pkgdatadir)/data|g'
@@ -105,8 +107,8 @@ substInitializations = sed -e 's/@initializations[@]/initializations/g'
 substInstanceupdates = sed -e 's/@instanceupdates[@]/instanceupdates/g'
 endif 
 
-#Ely_ini.h rules
-Ely_ini.h : $(top_srcdir)/elygame/Ely_ini.h.in Makefile
+#elygame_ini.h rules
+elygame_ini.h : $(top_srcdir)/elygame/elygame_ini.h.in Makefile
 	$(substDataDir) $(top_srcdir)/elygame/$@.in | \
 	$(substShareDir) | \
 	$(substLibDir) | \
@@ -130,5 +132,5 @@ config.prc : $(top_srcdir)/elygame/config.prc.in Makefile
 game.xml : $(top_srcdir)/elygame/game.xml.in Makefile
 	$(substDataDir) $(top_srcdir)/elygame/$@.in > $@
 
-CLEANFILES = Ely_ini.h config.prc game.xml
+CLEANFILES = elygame_ini.h config.prc game.xml
 		

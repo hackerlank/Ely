@@ -15,47 +15,22 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/src/CommonComponents/Default.cpp
+ * \file /Ely/elygame/elygame_memory_pools.cpp
  *
- * \date 27/ago/2014 (10:45:49)
+ * \date 14/dic/2014 (14:16:22)
  * \author consultit
  */
 
+#include "Support/MemoryPool/MemoryPool.h"
+#include "Support/MemoryPool/MemoryMacros.h"
+
+//Set the static objects used to initialize/finalize memory pools
+//that some objects and/or components would use
 #include "CommonComponents/Default.h"
-#include "CommonComponents/DefaultTemplate.h"
 
 namespace ely
 {
+GCC_MEMORYPOOL_AUTOINIT(Default, 16);
 
-Default::Default()
-{
-	reset();
-}
+}  // namespace ely
 
-Default::Default(SMARTPTR(DefaultTemplate)tmpl)
-{
-	mTmpl = tmpl;
-	reset();
-}
-
-Default::~Default()
-{
-}
-
-ComponentFamilyType Default::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Default::componentType() const
-{
-	return mTmpl->componentType();
-}
-
-//TypedObject semantics: hardcoded
-TypeHandle Default::_type_handle;
-
-//MemoryPool semantics: hardcoded
-GCC_MEMORYPOOL_DEFINITION(Default);
-
-} /* namespace ely */

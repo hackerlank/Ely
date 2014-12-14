@@ -24,10 +24,10 @@
 #include "../common_configs.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
-#include "Ely.h"
 #include "Game_init.h"
 #include "Support/LibRocketLocal/rocketRegion.h"
 #include <Rocket/Debugger.h>
+#include "../../elygame.h"
 
 ///ely related
 #ifdef __cplusplus

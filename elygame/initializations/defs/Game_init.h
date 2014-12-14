@@ -24,7 +24,7 @@
 #ifndef GAME_INIT_H_
 #define GAME_INIT_H_
 
-#include "Ely_ini.h"
+#include "elygame_ini.h"
 #include <Rocket/Core.h>
 #include <Rocket/Controls.h>
 
