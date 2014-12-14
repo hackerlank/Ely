@@ -24,6 +24,9 @@
 
 #include <Rocket/Core/RenderInterface.h>
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //       Class : RocketRenderInterface
 // Description : Class that provides the main render interface for
@@ -71,5 +74,7 @@ private:
   CPT(RenderState) _net_state;
   Rocket::Core::Vector2i _dimensions;
 };
+
+}
 
 #endif

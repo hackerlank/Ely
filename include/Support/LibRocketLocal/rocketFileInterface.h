@@ -21,6 +21,9 @@
 
 class VirtualFileSystem;
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //       Class : RocketFileInterface
 // Description : Implementation of FileInterface to allow libRocket
@@ -48,5 +51,7 @@ protected:
 
   VirtualFileSystem* _vfs;
 };
+
+}
 
 #endif

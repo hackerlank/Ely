@@ -55,4 +55,8 @@ ComponentType Default::componentType() const
 //TypedObject semantics: hardcoded
 TypeHandle Default::_type_handle;
 
+//MemoryPool semantics: hardcoded
+GCC_MEMORYPOOL_DEFINITION(Default);
+GCC_MEMORYPOOL_AUTOINIT(Default, 16);
+
 } /* namespace ely */

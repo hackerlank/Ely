@@ -25,6 +25,9 @@ namespace Rocket {
   }
 }
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //       Class : RocketInputHandler
 // Description : DataNode that listens for keyboard and mouse
@@ -80,5 +83,7 @@ public:
 private:
   static TypeHandle _type_handle;
 };
+
+}
 
 #endif

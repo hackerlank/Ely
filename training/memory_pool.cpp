@@ -24,10 +24,38 @@
 #include <pandaFramework.h>
 #include <pandaSystem.h>
 #include <load_prc_file.h>
+#include "Utilities/Tools.h"
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/elygame/");
 
-int manual_example_main(int argc, char *argv[])
+///Memory Pool
+#include "memory_pool/MemoryPool.h"
+#include "memory_pool/MemoryMacros.h"
+
+///GameObject methods' declaration
+class GameObject
+{
+	float mPos[3] __attribute__ ((__aligned__(16)));
+	float mDir[3] __attribute__ ((__aligned__(16)));
+public:
+	GameObject()
+	{
+	}
+	~GameObject()
+	{
+	}
+
+	const float* getDir() const;
+	void setDir(float* dir);
+
+	const float* getPos() const;
+	void setPos(float* pos);
+
+GCC_MEMORYPOOL_DECLARATION(0)
+
+}__attribute__ ((__packed__));
+
+int memory_pool_main(int argc, char *argv[])
 {
 	// Load your configuration
 	load_prc_file_data("", "model-path " + baseDir + "data/models");
@@ -56,11 +84,21 @@ int manual_example_main(int argc, char *argv[])
 	}
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
+	const int NUM = 10;
+	GameObject* go[NUM];
+	for (int i = 0; i < NUM; ++i)
+	{
+		go[i] = new GameObject();
+	}
+	for (int i = 0; i < NUM; ++i)
+	{
+		delete go[i];
+	}
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
@@ -69,3 +107,30 @@ int manual_example_main(int argc, char *argv[])
 	return (0);
 }
 
+///GameObject methods' definitions
+GCC_MEMORYPOOL_DEFINITION(GameObject);
+GCC_MEMORYPOOL_AUTOINIT(GameObject, 128);
+
+const float* GameObject::getDir() const
+{
+	return mDir;
+}
+
+void GameObject::setDir(float* dir)
+{
+	this->mDir[0] = *dir;
+	this->mDir[1] = *(dir + 1);
+	this->mDir[2] = *(dir + 2);
+}
+
+const float* GameObject::getPos() const
+{
+	return mPos;
+}
+
+void GameObject::setPos(float* pos)
+{
+	this->mPos[0] = *pos;
+	this->mPos[1] = *(pos + 1);
+	this->mPos[2] = *(pos + 2);
+}

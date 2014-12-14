@@ -31,6 +31,9 @@
 
 #include <Rocket/Core/Context.h>
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //     Function: RocketRenderInterface::render
 //       Access: Public
@@ -321,4 +324,6 @@ SetScissorRegion(int x, int y, int width, int height) {
   _scissor[1] = (x + width) / (PN_stdfloat) _dimensions.x;
   _scissor[2] = 1.0f - ((y + height) / (PN_stdfloat) _dimensions.y);
   _scissor[3] = 1.0f - (y / (PN_stdfloat) _dimensions.y);
+}
+
 }

@@ -22,6 +22,9 @@
 
 class OrthographicLens;
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //       Class : RocketRegion
 // Description : Represents a region in a window or buffer where
@@ -80,6 +83,8 @@ public:
 private:
   static TypeHandle _type_handle;
 };
+
+} //namespace ely
 
 #include "rocketRegion.I"
 

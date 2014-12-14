@@ -1,6 +1,7 @@
 SUBDIRS = \
 		BulletLocal \
 		LibRocketLocal \
+		MemoryPool \
 		OpenSteerLocal \
 		RecastNavigationLocal \
 		tinyxml2

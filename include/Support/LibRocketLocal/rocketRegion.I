@@ -1,6 +1,10 @@
 // Filename: rocketRegion.I
 // Created by:  rdb (01Dec11)
 //
+
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //
 // PANDA 3D SOFTWARE
@@ -83,3 +87,5 @@ INLINE RocketInputHandler *RocketRegion::
 get_input_handler() const {
   return _input_handler;
 }
+
+} //namespace ely

@@ -27,6 +27,8 @@
 #include <Rocket/Core.h>
 #undef Factory
 
+namespace ely
+{
 Configure(config_rocket);
 NotifyCategoryDef(rocket, "");
 
@@ -67,4 +69,6 @@ init_librocket() {
   Rocket::Core::FontDatabase::LoadFontFace(default_font_data, default_font_size);
 #endif
 #endif
+}
+
 }

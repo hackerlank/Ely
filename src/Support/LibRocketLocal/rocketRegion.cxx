@@ -23,6 +23,9 @@
 
 #include <Rocket/Core.h>
 
+namespace ely
+{
+
 TypeHandle RocketRegion::_type_handle;
 
 ////////////////////////////////////////////////////////////////////
@@ -185,4 +188,6 @@ is_debugger_visible() const {
 #else
   return false;
 #endif
+}
+
 }

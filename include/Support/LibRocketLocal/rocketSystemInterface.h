@@ -20,6 +20,9 @@
 #include <Rocket/Core/SystemInterface.h>
 #include <Rocket/Core/Log.h>
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //       Class : RocketSystemInterface
 // Description : This is an implementation of SystemInterface
@@ -31,5 +34,7 @@ public:
   float GetElapsedTime();
   bool LogMessage(Rocket::Core::Log::Type type, const Rocket::Core::String& message);
 };
+
+}
 
 #endif

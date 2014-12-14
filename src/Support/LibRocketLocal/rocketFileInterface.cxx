@@ -1,6 +1,7 @@
 // Filename: rocketFileInterface.cxx
 // Created by:  rdb (03Nov11)
 //
+
 ////////////////////////////////////////////////////////////////////
 //
 // PANDA 3D SOFTWARE
@@ -15,6 +16,8 @@
 #include "Support/LibRocketLocal/rocketFileInterface.h"
 #include <virtualFileSystem.h>
 
+namespace ely
+{
 ////////////////////////////////////////////////////////////////////
 //     Function: RocketFileInterface::Constructor
 //       Access: Public
@@ -145,4 +148,6 @@ Length(Rocket::Core::FileHandle file) {
   }
 
   return handle->_file->get_file_size(handle->_stream);
+}
+
 }

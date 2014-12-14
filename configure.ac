@@ -154,6 +154,7 @@ AM_COND_IF([ELY_ELF],
 		src/Support/Makefile
 		src/Support/BulletLocal/Makefile
 		src/Support/LibRocketLocal/Makefile
+		src/Support/MemoryPool/Makefile
 		src/Support/OpenSteerLocal/Makefile
 		src/Support/RecastNavigationLocal/Makefile
 		src/Support/tinyxml2/Makefile

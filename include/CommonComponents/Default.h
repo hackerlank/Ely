@@ -25,6 +25,8 @@
 #define DEFAULT_H_
 
 #include "ObjectModel/Component.h"
+#include "Support/MemoryPool/MemoryPool.h"
+#include "Support/MemoryPool/MemoryMacros.h"
 
 namespace ely
 {
@@ -89,6 +91,8 @@ public:
 private:
 	static TypeHandle _type_handle;
 
+	///MemoryPool semantics: hardcoded
+	GCC_MEMORYPOOL_DECLARATION(0)
 };
 
 ///inline definitions

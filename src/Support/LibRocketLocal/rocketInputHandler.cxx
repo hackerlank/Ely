@@ -23,6 +23,9 @@
 #include <Rocket/Core/Input.h>
 #include <Rocket/Core/Context.h>
 
+namespace ely
+{
+
 using namespace Rocket::Core::Input;
 
 TypeHandle RocketInputHandler::_type_handle;
@@ -335,4 +338,6 @@ update_context(Rocket::Core::Context *context, int xoffs, int yoffs) {
   }
 
   context->Update();
+}
+
 }

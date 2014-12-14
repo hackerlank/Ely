@@ -15,6 +15,9 @@
 #include "Support/LibRocketLocal/rocketSystemInterface.h"
 #include <clockObject.h>
 
+namespace ely
+{
+
 ////////////////////////////////////////////////////////////////////
 //     Function: RocketSystemInterface::GetElapsedTime
 //       Access: Public
@@ -56,4 +59,6 @@ LogMessage(Rocket::Core::Log::Type type, const Rocket::Core::String& message) {
 	  break;
   }
   return true;
+}
+
 }

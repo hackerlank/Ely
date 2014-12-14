@@ -39,6 +39,7 @@ elygame_ltlibraries = \
 	$(top_builddir)/src/Support/BulletLocal/libbullet.la \
 	$(top_builddir)/src/Support/RecastNavigationLocal/librecastnavigation.la \
 	$(top_builddir)/src/Support/LibRocketLocal/librocket.la \
+	$(top_builddir)/src/Support/MemoryPool/libmemorypool.la \
 	$(top_builddir)/src/Support/tinyxml2/libtinyxml2.la \
 	$(top_builddir)/src/Support/libsupport.la \
 	$(top_builddir)/src/Support/OpenSteerLocal/libopensteer.la

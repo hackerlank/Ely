@@ -59,6 +59,10 @@ librocket_headers = \
 		Support/LibRocketLocal/rocketFileInterface.h \
 		Support/LibRocketLocal/rocketRegion.I \
 		Support/LibRocketLocal/rocketRenderInterface.h
+
+memorypool_headers = \
+		Support/MemoryPool/MemoryMacros.h \
+		Support/MemoryPool/MemoryPool.h
 		
 opensteer_headers = \
 		Support/OpenSteerLocal/common.h \
@@ -153,13 +157,14 @@ noinst_HEADERS = \
 		Support/Distributed/DistributedObjectBase.h \
 		$(bullet_headers) \
 		$(librocket_headers) \
+		$(memorypool_headers) \
 		$(opensteer_headers) \
 		$(recastnavigation_headers) \
 		$(tinyxml2_headers) \
 		Utilities/ComponentSuite.h \
 		Utilities/Tools.h
 
-nodist_noinst_HEADERS =\
+nodist_noinst_HEADERS = \
 		config.h
 
 	

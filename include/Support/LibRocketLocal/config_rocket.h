@@ -18,8 +18,13 @@
 #include <pandabase.h>
 #include <notifyCategoryProxy.h>
 
+namespace ely
+{
+
 NotifyCategoryDecl(rocket, EXPCL_ROCKET, EXPTP_ROCKET);
 
 extern EXPCL_ROCKET void init_librocket();
+
+}
 
 #endif
