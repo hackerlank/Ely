@@ -669,6 +669,7 @@ void XMLNode::DeleteChild( XMLNode* node )
 
 XMLNode* XMLNode::InsertEndChild( XMLNode* addThis )
 {
+    TIXMLASSERT( addThis );
     if ( addThis->_document != _document ) {
         TIXMLASSERT( false );
         return 0;
@@ -702,6 +703,7 @@ XMLNode* XMLNode::InsertEndChild( XMLNode* addThis )
 
 XMLNode* XMLNode::InsertFirstChild( XMLNode* addThis )
 {
+    TIXMLASSERT( addThis );
     if ( addThis->_document != _document ) {
         TIXMLASSERT( false );
         return 0;
@@ -1763,6 +1765,24 @@ static FILE* callfopen( const char* filepath, const char* mode )
 #endif
     return fp;
 }
+    
+void XMLDocument::DeleteNode( XMLNode* node )	{
+    TIXMLASSERT( node );
+    TIXMLASSERT(node->_document == this );
+    if (node->_parent) {
+        node->_parent->DeleteChild( node );
+    }
+    else {
+        // Isn't in the tree.
+        // Use the parent delete.
+        // Also, we need to mark it tracked: we 'know'
+        // it was never used.
+        node->_memPool->SetTracked();
+        // Call the static XMLNode version:
+        XMLNode::DeleteNode(node);
+    }
+}
+
 
 XMLError XMLDocument::LoadFile( const char* filename )
 {
@@ -1947,6 +1967,8 @@ XMLPrinter::XMLPrinter( FILE* file, bool compact, int depth ) :
             _entityFlag[ (int)entities[i].value ] = true;
         }
     }
+    // Clang doesn't like indexing arrays with 'char'
+    // so cast to int. (Looks strange.)
     _restrictedEntityFlag[(int)'&'] = true;
     _restrictedEntityFlag[(int)'<'] = true;
     _restrictedEntityFlag[(int)'>'] = true;	// not required, but consistency is nice
