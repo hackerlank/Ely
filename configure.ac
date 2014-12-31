@@ -124,7 +124,9 @@ AC_ARG_ENABLE([training],
     AS_HELP_STRING([--enable-training],
     	[@<:@=yes@:>@ enable training test programs - maintainer only (disabled by default)]),
     [training=${enableval}
-    AM_PROG_CC_C_O], 
+    AM_PROG_CC_C_O
+    ELY_CXXFLAGS="${ELY_CXXFLAGS} -std=c++11"
+    ELY_CPPFLAGS="${ELY_CPPFLAGS} -D__GXX_EXPERIMENTAL_CXX0X__"], 
     [training=no])
 AM_CONDITIONAL([TRAINING], [test "x${training}" != xno])
 AM_COND_IF([TRAINING],
