@@ -112,7 +112,9 @@ AC_SUBST(ELY_LIBS)
 AC_ARG_ENABLE([unit-test],
     AS_HELP_STRING([--enable-unit-test],
     	[@<:@=yes@:>@ enable Boost Unit Test programs - maintainer only (disabled by default)]),
-    [unit_test=${enableval}], [unit_test=no])
+    [unit_test=${enableval}
+    buildtype="Boost_Unit_Test"], 
+    [unit_test=no])
 AM_CONDITIONAL([BOOST_TEST], [test "x${unit_test}" != xno])
 AM_COND_IF([BOOST_TEST],
 	[AX_BOOST_BASE
@@ -125,6 +127,7 @@ AC_ARG_ENABLE([training],
     	[@<:@=yes@:>@ enable training test programs - maintainer only (disabled by default)]),
     [training=${enableval}
     AM_PROG_CC_C_O
+    buildtype="Training"
     ELY_CXXFLAGS="${ELY_CXXFLAGS} -std=c++11"
     ELY_CPPFLAGS="${ELY_CPPFLAGS} -D__GXX_EXPERIMENTAL_CXX0X__"], 
     [training=no])
