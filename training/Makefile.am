@@ -20,8 +20,9 @@ noinst_PROGRAMS = ely_training
 #ely_training
 nodist_ely_training_SOURCES = \
 		training.cpp \
-		memory_pool.cpp \
-		memory_pool/MemoryPool.cpp
+		octree.cpp
+#		memory_pool.cpp
+#		memory_pool/MemoryPool.cpp
 #		generic_test.cpp
 #		ai.cpp
 #		anim.cpp
