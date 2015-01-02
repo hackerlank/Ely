@@ -30,7 +30,7 @@
 #include <cmath>
 #include <set>
 #include <map>
-#include <vector>
+#include <list>
 #include <random>
 
 using namespace std;
@@ -404,13 +404,12 @@ void testCollision(Entity *pA, Entity *pB)
 } // ely
 
 //some values and declaration
-const LPoint3f WORLDCENTER(0.0, 0.0, 0.0);
-const float WORLDWIDTH = 200.0;
-float WORLDHALFWIDTH;
-const int OBJECTSNUM = 3;
-vector<ely::Entity> entities;
-const float OBJECTMAXRADIUS = 5.0;
-const float OBJECTMAXSPEED = 10.0;
+LPoint3f WORLDCENTER(0.0, 0.0, 0.0);
+float WORLDWIDTH = 200.0, WORLDHALFWIDTH;
+int OBJECTSNUM = 3;
+list<ely::Entity> entities;
+float OBJECTMAXRADIUS = 5.0;
+float OBJECTMAXSPEED = 10.0;
 AsyncTask::DoneStatus updateAndTestCollisions(GenericAsyncTask* task,
 		void* data);
 
@@ -448,6 +447,40 @@ int octree_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
+	// get parameters
+	int c;
+	opterr = 0;
+	while ((c = getopt(argc, argv, "w:o:r:s:")) != -1)
+	{
+		switch (c)
+		{
+		case 'w':
+			WORLDWIDTH = atof(optarg);
+			break;
+		case 'o':
+			OBJECTSNUM = atoi(optarg);
+			break;
+		case 'r':
+			OBJECTMAXRADIUS = atof(optarg);
+			break;
+		case 's':
+			OBJECTMAXSPEED = atof(optarg);
+			break;
+		case '?':
+			if ((optopt == 'w') or (optopt == 'o') or (optopt == 'r')
+					or (optopt == 's'))
+				std::cerr << "Option " << optopt << " requires an argument.\n"
+						<< std::endl;
+			else if (isprint(optopt))
+				std::cerr << "Unknown option " << optopt << std::endl;
+			else
+				std::cerr << "Unknown option character " << optopt << std::endl;
+			return 1;
+		default:
+			abort();
+		}
+	}
+	//
 	WORLDHALFWIDTH = WORLDWIDTH / 2.0;
 	// Create the octree root node
 	ely::OctreeNode* octree = new ely::OctreeNode;
@@ -467,26 +500,26 @@ int octree_main(int argc, char *argv[])
 		// Add entities
 		entities.push_back(ely::Entity());
 		// Entity starts by being (possibly) contained into octree root
-		entities[i].pNode = octree;
+		entities.back().pNode = octree;
 		// set random position (between +/-(WORLDWIDTH/2.0 - radius))
 		// set random speed (between +/- OBJECTMAXSPEED)
 		for (auto j = 0; j < 3; ++j)
 		{
 			// position (-1.0 <= rnd <= 1.0)
 			rnd = (1.0 - 2.0 * (float) rd() / (float) rangeRND);
-			entities[i].center[j] = rnd
+			entities.back().center[j] = rnd
 					* (octree->halfWidth - OBJECTMAXRADIUS * 1.1);
 			// speed (-0.5 <= rnd <= 0.5)
 			rnd = 0.5 - (float) rd() / (float) rangeRND;
 			rnd >= 0.0 ?
-					entities[i].speed[j] = (1.0 - rnd) * OBJECTMAXSPEED :
-					entities[i].speed[j] = (-1.0 - rnd) * OBJECTMAXSPEED;
+					entities.back().speed[j] = (1.0 - rnd) * OBJECTMAXSPEED :
+					entities.back().speed[j] = (-1.0 - rnd) * OBJECTMAXSPEED;
 		}
 		// set radius (0.5 <= rnd <= 1.0)
 		rnd = (1.0 - 0.5 * (float) rd() / (float) rangeRND);
-		entities[i].radius = rnd * OBJECTMAXRADIUS;
+		entities.back().radius = rnd * OBJECTMAXRADIUS;
 		// add geometry
-		entities[i].addGeometry(window->get_render(), window, framework);
+		entities.back().addGeometry(window->get_render(), window, framework);
 	}
 
 	// Entities' updates and test all collisions
@@ -511,7 +544,7 @@ AsyncTask::DoneStatus updateAndTestCollisions(GenericAsyncTask* task,
 	float dt = ClockObject::get_global_clock()->get_dt();
 
 	// First: update Entities' positions
-	vector<ely::Entity>::iterator entityIt;
+	list<ely::Entity>::iterator entityIt;
 	for (entityIt = entities.begin(); entityIt != entities.end(); ++entityIt)
 	{
 		entityIt->update(dt, WORLDCENTER, WORLDHALFWIDTH);
