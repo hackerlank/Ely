@@ -866,14 +866,16 @@ char* XMLNode::ParseDeep( char* p, StrPair* parentEnd )
             // Handle an end tag returned to this level.
             // And handle a bunch of annoying errors.
             bool mismatch = false;
-            if ( endTag.Empty() && ele->ClosingType() == XMLElement::OPEN ) {
-                mismatch = true;
+            if ( endTag.Empty() ) {
+                if ( ele->ClosingType() == XMLElement::OPEN ) {
+                    mismatch = true;
+                }
             }
-            else if ( !endTag.Empty() && ele->ClosingType() != XMLElement::OPEN ) {
-                mismatch = true;
-            }
-            else if ( !endTag.Empty() ) {
-                if ( !XMLUtil::StringEqual( endTag.GetStr(), node->Value() )) {
+            else {
+                if ( ele->ClosingType() != XMLElement::OPEN ) {
+                    mismatch = true;
+                }
+                else if ( !XMLUtil::StringEqual( endTag.GetStr(), node->Value() ) ) {
                     mismatch = true;
                 }
             }
@@ -929,7 +931,8 @@ char* XMLText::ParseDeep( char* p, StrPair* )
         p = _value.ParseText( p, "<", flags );
         if ( p && *p ) {
             return p-1;
-        } else if ( !p ) {
+        }
+        if ( !p ) {
             _document->SetError( XML_ERROR_PARSING_TEXT, start, 0 );
         }
     }
@@ -1927,7 +1930,7 @@ void XMLDocument::Parse()
     TIXMLASSERT( _charBuffer );
     char* p = _charBuffer;
     p = XMLUtil::SkipWhiteSpace( p );
-    p = (char*) XMLUtil::ReadBOM( p, &_writeBOM );
+    p = const_cast<char*>( XMLUtil::ReadBOM( p, &_writeBOM ) );
     if ( !*p ) {
         SetError( XML_ERROR_EMPTY_DOCUMENT, 0, 0 );
         return;
