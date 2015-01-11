@@ -239,6 +239,7 @@
 									<listOptionValue builtIn="false" value="SEEK_SET=0"/>
 									<listOptionValue builtIn="false" value="SEEK_END=2"/>
 									<listOptionValue builtIn="false" value="EOF=(-1)"/>
+									<listOptionValue builtIn="false" value="__GXX_EXPERIMENTAL_CXX0X__"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.cpp.compiler.input.1286370007" superClass="cdt.managedbuild.tool.gnu.cpp.compiler.input"/>
 							</tool>
@@ -429,11 +430,11 @@
 		</configuration>
 		<configuration configurationName="Devel_Debug_Thread"/>
 		<configuration configurationName="Devel_Debug"/>
-		<configuration configurationName="Build (GNU)"/>
+		<configuration configurationName="InitializationsLib"/>
 		<configuration configurationName="Release-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="InitializationsLib"/>
+		<configuration configurationName="Build (GNU)"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>

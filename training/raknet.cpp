@@ -27,13 +27,21 @@
 #include <geomLines.h>
 #include <lpoint3.h>
 #include <iostream>
+#include <string>
+#include <getopt.h>
 #include <raknet/MessageIdentifiers.h>
 #include <raknet/RakPeerInterface.h>
 #include <raknet/RakNetTypes.h>
+#include <config.h>
 
 using namespace std;
 
 static string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/elygame/");
+#define COPYRIGHT_LICENSE \
+"Copyright (C) 2015 Consultit.\n" \
+"License GPLv3+: GNU GPL version 3 or later <http://gnu.org/licenses/gpl.html> \n" \
+"This is free software: you are free to change and redistribute it. \n" \
+"There is NO WARRANTY, to the extent permitted by law."
 
 int raknet_main(int argc, char *argv[])
 {
@@ -71,50 +79,128 @@ int raknet_main(int argc, char *argv[])
 	///here is room for your own code
 	enum
 	{
-		CLIENT, SERVER
-	} peerType = CLIENT;
+		CLIENT = 1, SERVER = 2, PEER = 3
+	};
+	int peerType = (int) CLIENT;
 	string serverIP = "127.0.0.1";
 	unsigned short int serverPort = 20000;
 	unsigned int maxConnectionsAllowed = 2;
 	unsigned short int maxPlayersPerServer = 2;
-	// get parameters
+	// get options and parameters
 	int c;
-	opterr = 0;
-	while ((c = getopt(argc, argv, "csa:p:m:n:")) != -1)
+	while (1)
 	{
+		static struct option long_options[] =
+		{
+		// --version, --help (from GNU Coding Standards)
+				{ "version", no_argument, 0, 1000 },
+				{ "help", no_argument, 0, 1001 },
+				// These options set a flag.
+				{ "client", no_argument, &peerType, (int) CLIENT },
+				{ "server", no_argument, &peerType, (int) SERVER },
+				{ "peer", no_argument, &peerType, (int) PEER },
+				// These options don't set a flag.
+				// We distinguish them by their indices.
+				{ "address", required_argument, 0, 'a' },
+				{ "port", required_argument, 0, 'p' },
+				{ "max-connections-allowed", required_argument, 0, 1002 },
+				{ "max-players-per-server", required_argument, 0, 1003 },
+				{ 0, 0, 0, 0 } };
+		// getopt_long stores the option index here.
+		int option_index = 0;
+		c = getopt_long(argc, argv, "a:p:", long_options, &option_index);
+
+		// Detect the end of the options.
+		if (c == -1)
+			break;
+
 		switch (c)
 		{
-		case 'c':
-			peerType = CLIENT;
+		case 0:
+			// If option.flag != 0 then *option.flag = option.val
+			// and getopt_long returns 0.
+			if (long_options[option_index].flag != 0)
+			{
+				break;
+			}
+			// If option.flag == 0 then getopt_long returns option.val.
 			break;
-		case 's':
-			peerType = SERVER;
-			break;
+		case 1000:
+			//--version
+			cout << endl;
+			cout << PACKAGE_NAME << " " << PACKAGE_VERSION << endl;
+			cout << COPYRIGHT_LICENSE << endl;
+			exit(0);
+		case 1001:
+		{
+			//--help
+			cout << endl;
+			cout << argv[0] << " tests some feature to be used in "
+					<< PACKAGE_NAME << "." << endl;
+			cout << "Options: \n" << endl;
+			option* opt = &long_options[0];
+			while (opt->name)
+			{
+				string val, vall;
+				if (opt->has_arg == required_argument)
+				{
+					val = " VALUE";
+					vall = "=VALUE";
+				}
+				else if (opt->has_arg == optional_argument)
+				{
+					val = " [VALUE]";
+					vall = "[=VALUE]";
+				}
+				else
+				{
+					val = vall = "";
+				}
+				// print short if is alpha
+				if (isalpha(opt->val))
+				{
+					cout << "\t-" << (char) opt->val << val << endl;
+				}
+				// print long
+				cout << "\t--" << opt->name << vall << endl;
+				//
+				cout << endl;
+				++opt;
+			}
+		}
+			exit(0);
 		case 'a':
+			//--address
 			serverIP = string(optarg);
 			break;
 		case 'p':
-			serverPort = (unsigned short int) atoi(optarg);
+			//--port
+			serverPort = (unsigned short int) stoi(string(optarg));
 			break;
-		case 'm':
-			maxConnectionsAllowed = (unsigned int) atoi(optarg);
+		case 1002:
+			//--max-connections-allowed
+			maxConnectionsAllowed = (unsigned int) stoi(string(optarg));
 			break;
-		case 'n':
-			maxPlayersPerServer = (unsigned short int) atoi(optarg);
+		case 1003:
+			//--max-players-per-server
+			maxPlayersPerServer = (unsigned short int) stoi(string(optarg));
 			break;
 		case '?':
-			if ((optopt == 'a') or (optopt == 'p') or (optopt == 'm')
-					or (optopt == 'n'))
-				std::cerr << "Option " << optopt << " requires an argument.\n"
-						<< std::endl;
-			else if (isprint(optopt))
-				std::cerr << "Unknown option " << optopt << std::endl;
-			else
-				std::cerr << "Unknown option character " << optopt << std::endl;
-			return 1;
+			// getopt_long already printed an error message.
+			break;
 		default:
 			abort();
 		}
+	}
+	// Print any remaining command line arguments (not options).
+	if (optind < argc)
+	{
+		cout << "non-option arguments: ";
+		while (optind < argc)
+		{
+			cout << argv[optind++];
+		}
+		cout << endl;
 	}
 	//
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
