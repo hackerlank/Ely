@@ -29,10 +29,11 @@
 #include <iostream>
 #include <string>
 #include <getopt.h>
+#include <config.h>
+// RakNet Headers
 #include <raknet/MessageIdentifiers.h>
 #include <raknet/RakPeerInterface.h>
 #include <raknet/RakNetTypes.h>
-#include <config.h>
 
 using namespace std;
 
@@ -202,22 +203,32 @@ int raknet_main(int argc, char *argv[])
 		}
 		cout << endl;
 	}
-	//
+	// Instancing
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
 	//connect
 	switch (peerType)
 	{
+	// Connection as Client
 	case CLIENT:
 	{
-		RakNet::SocketDescriptor clientSocket = RakNet::SocketDescriptor();
-		peer->Startup(1, &clientSocket, 1);
+		RakNet::SocketDescriptor clientSD = RakNet::SocketDescriptor();
+		peer->Startup(1, &clientSD, 1);
 		peer->Connect(serverIP.c_str(), serverPort, 0, 0);
 	}
 		break;
+		// Connection as Server
 	case SERVER:
 	{
-		RakNet::SocketDescriptor serverSocket(serverPort, 0);
-		peer->Startup(maxConnectionsAllowed, &serverSocket, 1);
+		RakNet::SocketDescriptor serverSD(serverPort, 0);
+		peer->Startup(maxConnectionsAllowed, &serverSD, 1);
+		peer->SetMaximumIncomingConnections(maxPlayersPerServer);
+	}
+		break;
+		// Peer to peer connections
+	case PEER:
+	{
+		RakNet::SocketDescriptor serverSD(serverPort, 0);
+		peer->Startup(maxConnectionsAllowed, &serverSD, 1);
 		peer->SetMaximumIncomingConnections(maxPlayersPerServer);
 	}
 		break;
