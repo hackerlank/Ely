@@ -84,8 +84,8 @@ int raknet_main(int argc, char *argv[])
 	};
 	int peerType = (int) CLIENT;
 	string serverIP = "127.0.0.1";
-	unsigned short int serverPort = 20000;
-	unsigned int maxConnectionsAllowed = 2;
+	unsigned short int serverPort = 60000;
+	unsigned int maxConnectionsAllowed = 10;
 	unsigned short int maxPlayersPerServer = 2;
 	// get options and parameters
 	int c;
@@ -205,7 +205,7 @@ int raknet_main(int argc, char *argv[])
 	}
 	// Instancing
 	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
-	//connect
+	// Connect
 	switch (peerType)
 	{
 	// Connection as Client
@@ -238,6 +238,10 @@ int raknet_main(int argc, char *argv[])
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
+
+	// Cleaning Up
+	RakNet::RakPeerInterface::DestroyInstance(peer);
+
 	//close the window framework
 	framework.close_framework();
 	return (0);
