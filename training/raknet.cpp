@@ -34,6 +34,7 @@
 #include <raknet/MessageIdentifiers.h>
 #include <raknet/RakPeerInterface.h>
 #include <raknet/RakNetTypes.h>
+#include <raknet/BitStream.h>
 
 using namespace std;
 
@@ -51,6 +52,10 @@ enum PeerType
 RakNet::RakPeerInterface* peer;
 AsyncTask::DoneStatus readMessagesFunction(GenericAsyncTask* task,
 		void * peerType);
+enum GameMessages
+{
+	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1
+};
 
 int raknet_main(int argc, char *argv[])
 {
@@ -284,8 +289,20 @@ AsyncTask::DoneStatus readMessagesFunction(GenericAsyncTask* task,
 					<< ": Another client has connected." << endl;
 			break;
 		case ID_CONNECTION_REQUEST_ACCEPTED:
+		{
 			cout << ID_CONNECTION_REQUEST_ACCEPTED
 					<< ": Our connection request has been accepted." << endl;
+
+			// Use a BitStream to write a custom user message
+			// Bitstreams are easier to use than sending casted structures,
+			// and handle endian swapping automatically
+			RakNet::BitStream bsOut;
+			bsOut.Write((RakNet::MessageID) ID_GAME_MESSAGE_1);
+			bsOut.Write("Hello world");
+			peer->Send(&bsOut, HIGH_PRIORITY, RELIABLE_ORDERED, 0,
+					packet->systemAddress, false);
+		}
+
 			break;
 		case ID_NEW_INCOMING_CONNECTION:
 			cout << ID_NEW_INCOMING_CONNECTION << ": A connection is incoming."
@@ -316,6 +333,15 @@ AsyncTask::DoneStatus readMessagesFunction(GenericAsyncTask* task,
 			{
 				cout << ": Connection lost." << endl;
 			}
+			break;
+		case ID_GAME_MESSAGE_1:
+		{
+			RakNet::RakString rs;
+			RakNet::BitStream bsIn(packet->data, packet->length, false);
+			bsIn.IgnoreBytes(sizeof(RakNet::MessageID));
+			bsIn.Read(rs);
+			cout << rs.C_String() << endl;
+		}
 			break;
 		default:
 			cout << "Message with identifier '" << packet->data[0]
