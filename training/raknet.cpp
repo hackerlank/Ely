@@ -44,6 +44,14 @@ static string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/elygame/");
 "This is free software: you are free to change and redistribute it. \n" \
 "There is NO WARRANTY, to the extent permitted by law."
 
+enum PeerType
+{
+	CLIENT = 1, SERVER = 2, PEER = 3
+};
+RakNet::RakPeerInterface* peer;
+AsyncTask::DoneStatus readMessagesFunction(GenericAsyncTask* task,
+		void * peerType);
+
 int raknet_main(int argc, char *argv[])
 {
 	// Load your configuration
@@ -78,10 +86,6 @@ int raknet_main(int argc, char *argv[])
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-	enum
-	{
-		CLIENT = 1, SERVER = 2, PEER = 3
-	};
 	int peerType = (int) CLIENT;
 	string serverIP = "127.0.0.1";
 	unsigned short int serverPort = 60000;
@@ -204,7 +208,7 @@ int raknet_main(int argc, char *argv[])
 		cout << endl;
 	}
 	// Instancing
-	RakNet::RakPeerInterface* peer = RakNet::RakPeerInterface::GetInstance();
+	peer = RakNet::RakPeerInterface::GetInstance();
 	// Connect
 	switch (peerType)
 	{
@@ -236,6 +240,13 @@ int raknet_main(int argc, char *argv[])
 		abort();
 	}
 
+	// Set up a "read messages task" (synchronous, i.e. into the main task chain)
+	PT(GenericAsyncTask)readMessagesTask = new GenericAsyncTask("readMessagesTask",
+			&readMessagesFunction,
+			reinterpret_cast<void*>(&peerType));
+	readMessagesTask->set_sort(0);
+	AsyncTaskManager::get_global_ptr()->add(readMessagesTask);
+
 	//do the main loop, equal to run() in python
 	framework.main_loop();
 
@@ -247,3 +258,71 @@ int raknet_main(int argc, char *argv[])
 	return (0);
 }
 
+AsyncTask::DoneStatus readMessagesFunction(GenericAsyncTask* task,
+		void * pPeerType)
+{
+	PeerType peerType = *(reinterpret_cast<PeerType*>(pPeerType));
+
+	RakNet::Packet* packet;
+	// Cycle until packet are present; there should be a limitation
+	// when this task is synchronous with the main panda task chain
+	for (packet = peer->Receive(); packet;
+			peer->DeallocatePacket(packet), packet = peer->Receive())
+	{
+		switch (packet->data[0])
+		{
+		case ID_REMOTE_DISCONNECTION_NOTIFICATION:
+			cout << ID_REMOTE_DISCONNECTION_NOTIFICATION
+					<< ": Another client has disconnected." << endl;
+			break;
+		case ID_REMOTE_CONNECTION_LOST:
+			cout << ID_REMOTE_CONNECTION_LOST
+					<< ": Another client has lost the connection." << endl;
+			break;
+		case ID_REMOTE_NEW_INCOMING_CONNECTION:
+			cout << ID_REMOTE_NEW_INCOMING_CONNECTION
+					<< ": Another client has connected." << endl;
+			break;
+		case ID_CONNECTION_REQUEST_ACCEPTED:
+			cout << ID_CONNECTION_REQUEST_ACCEPTED
+					<< ": Our connection request has been accepted." << endl;
+			break;
+		case ID_NEW_INCOMING_CONNECTION:
+			cout << ID_NEW_INCOMING_CONNECTION << ": A connection is incoming."
+					<< endl;
+			break;
+		case ID_NO_FREE_INCOMING_CONNECTIONS:
+			cout << ID_NO_FREE_INCOMING_CONNECTIONS << ": The server is full."
+					<< endl;
+			break;
+		case ID_DISCONNECTION_NOTIFICATION:
+			cout << ID_DISCONNECTION_NOTIFICATION;
+			if (peerType == SERVER)
+			{
+				cout << ": A client has disconnected." << endl;
+			}
+			else if (peerType == CLIENT)
+			{
+				cout << ": We have been disconnected." << endl;
+			}
+			break;
+		case ID_CONNECTION_LOST:
+			cout << ID_CONNECTION_LOST;
+			if (peerType == SERVER)
+			{
+				cout << ": A client lost the connection." << endl;
+			}
+			else if (peerType == CLIENT)
+			{
+				cout << ": Connection lost." << endl;
+			}
+			break;
+		default:
+			cout << "Message with identifier '" << packet->data[0]
+					<< "' has arrived." << endl;
+			break;
+		}
+	}
+	//
+	return AsyncTask::DS_cont;
+}
