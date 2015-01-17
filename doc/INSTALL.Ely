@@ -29,7 +29,7 @@ These packages are mandatory for any of the later ones.
 Install the minimun development environment from distribution:
 
  $ sudo apt-get install build-essential git autoconf automake \
-    libtool checkinstall gnulib cvs gdebi
+    libtool checkinstall gnulib gdebi
  
 Install the latest 'GNU Autoconf Archive' source package:
 
