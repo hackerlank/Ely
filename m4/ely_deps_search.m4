@@ -4,19 +4,45 @@
 # Argument: expected PYTHON_CPPFLAGS
 # Searches SDK first on cmd line flags then on std locations
 #
+
+#dnl $1=library $2=package
+AC_DEFUN([GET_LDFLAGS], 
+[
+ld_cmd=$(which ld)
+LDFLAGSFOUND=""
+path_found=no
+#dnl search without pkg prefix
+${ld_cmd} --warn-unresolved-symbols -l$1 -o /dev/null 2>/dev/null && path_found=yes
+#dnl search with pkg prefix ($2) if not already found
+AS_IF([test "x${path_found}" != xyes],
+	[
+	libpathsgrep=$(${ld_cmd} --verbose | grep SEARCH_DIR)
+	OLDIFS=$IFS
+	IFS=';'
+	for libpathstr in ${libpathsgrep}
+	do
+		libpath=$(echo ${libpathstr} | cut -f2 -d"\"" | cut -f2 -d"=")
+		${ld_cmd} -nostdlib --warn-unresolved-symbols -L${libpath}/$2 -l$1 -o /dev/null 2>/dev/null \
+			&& LDFLAGSFOUND="-L${libpath}/$2" \
+			&& break
+	done
+	IFS=$OLDIFS
+	])
+])# GET_LDFLAGS
+
 AC_DEFUN([ELY_DEPS_SEARCH], 
 [
 CPPFLAGS_CMDLINE=${CPPFLAGS}
 LDFLAGS_CMDLINE=${LDFLAGS}
 LIBS_CMDLINE=${LIBS}
-
 # check LIBRARIES first from cmd line specified ones
 AC_MSG_NOTICE([searching for Ely dependency library packages...])
 CPPFLAGS=
 required_libraries=
 ###Bullet###
 AC_MSG_CHECKING([for Bullet libs])
-BULLET_LDFLAGS=""
+GET_LDFLAGS([BulletCollision], [bullet])
+BULLET_LDFLAGS="${LDFLAGSFOUND}"
 BULLET_LIBS="-lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody"
 LDFLAGS="${BULLET_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${BULLET_LIBS} ${LIBS_CMDLINE}"
@@ -39,13 +65,14 @@ bullet_body="
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([$bullet_prologue],[$bullet_body])],
   [AC_MSG_RESULT([yes])
-  AC_DEFINE([HAVE_RN], 1, [Bullet enabled])],
+  AC_DEFINE([HAVE_BULLET], 1, [Bullet enabled])],
   [AC_MSG_RESULT([no])
   required_libraries="${required_libraries}'Bullet'"]
 )
 ###RecastNavigation###
 AC_MSG_CHECKING([for RecastNavigation libs])
-RN_LDFLAGS=""
+GET_LDFLAGS([Recast], [recastnavigation])
+RN_LDFLAGS="${LDFLAGSFOUND}"
 RN_LIBS="-lDebugUtils -lDetour -lDetourCrowd -lDetourTileCache -lRecast"			
 LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${RN_LIBS} ${LIBS_CMDLINE}"
@@ -72,14 +99,15 @@ rn_body="
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([$rn_prologue],[$rn_body])],
   [AC_MSG_RESULT([yes]) 
-  AC_DEFINE([HAVE_RN], 1, [RecastNavigation enabled])],
+  AC_DEFINE([HAVE_RECASTNAVIGATION], 1, [RecastNavigation enabled])],
   [AC_MSG_RESULT([no])
   required_libraries="${required_libraries} 'RecastNavigation'"]
 )
 ###OpenSteer###
 # check libraries first from cmd line specified ones
 AC_MSG_CHECKING([for OpenSteer libs])
-OS_LDFLAGS=""
+GET_LDFLAGS([OpenSteer], [OpenSteer])
+OS_LDFLAGS="${LDFLAGSFOUND}"
 OS_LIBS="-lOpenSteer"			
 LDFLAGS="${OS_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${OS_LIBS} ${LIBS_CMDLINE}"
@@ -109,13 +137,14 @@ os_body="
 AC_LINK_IFELSE(
   [AC_LANG_PROGRAM([$os_prologue],[$os_body])],
   [AC_MSG_RESULT([yes])
-  AC_DEFINE([HAVE_OS], 1, [OpenSteer enabled])],
+  AC_DEFINE([HAVE_OPENSTEER], 1, [OpenSteer enabled])],
   [AC_MSG_RESULT([no])
   required_libraries="${required_libraries} 'OpenSteer'"]
 )
 ###libRocket###
 AC_MSG_CHECKING([for libRocket libs])
-ROCKET_LDFLAGS="-L/usr/lib/rocket -L/usr/local/lib/rocket"
+GET_LDFLAGS([RocketCore], [rocket])
+ROCKET_LDFLAGS="${LDFLAGSFOUND}"
 ROCKET_LIBS="-lRocketControls -lRocketCore -lRocketDebugger"
 LDFLAGS="${ROCKET_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${ROCKET_LIBS} ${LIBS_CMDLINE}"
@@ -145,7 +174,8 @@ EIGEN_LDFLAGS=""
 EIGEN_LIBS=""
 ###Panda3d###
 AC_MSG_CHECKING([for Panda3d libs])
-PANDA3D_LDFLAGS="-L/usr/lib/panda3d -L/usr/lib64/panda3d -L/usr/local/lib/panda3d"
+GET_LDFLAGS([p3framework], [panda3d])
+PANDA3D_LDFLAGS="${LDFLAGSFOUND}"
 PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress -lp3dtoolconfig \
 -lp3pystub -lp3dtool -lp3direct -lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
 -lpandagl -lpandaskel -lp3ptloader -l$2"	
