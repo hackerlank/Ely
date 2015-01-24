@@ -179,6 +179,7 @@ bool rcMeshLoaderObj::load(const char* filename, float scale,
 
 	if (readLen != 1)
 	{
+		delete[] buf;
 		return false;
 	}
 

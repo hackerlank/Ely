@@ -707,7 +707,7 @@ class TempObstacleCreateTool : public NavMeshTypeTool
 	
 public:
 	
-	TempObstacleCreateTool()
+	TempObstacleCreateTool() : m_sample(0)
 	{
 	}
 	
