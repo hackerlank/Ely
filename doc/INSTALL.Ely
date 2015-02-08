@@ -43,29 +43,6 @@ build and install with these commands:
  $ make maintainer-all
  $ sudo make install
 
-libRocket
-*********
-NOTE: The original source repository is 'https://github.com/libRocket/libRocket.git'.
-
-Get source package:
-
- $ git clone https://github.com/consultit/my_librocket.git
- 
-install dependencies from distribution:
-
- $ sudo apt-get install libfreetype6-dev libx11-dev libxxf86vm-dev libgl1-mesa-dev \
-    libglu1-mesa-dev python-dev libboost-python-dev
- 
-build with these commands:
-
- $ cd my_librocket
- $ autoreconf -i -v
- $ mkdir build-release
- $ cd build-release
- $ ../configure --enable-python --enable-extra-samples
- $ make
- $ sudo make install
-
 Bullet
 ******
 NOTE: The original source repository is 'https://github.com/bulletphysics/bullet3.git'.   
@@ -85,6 +62,29 @@ build with these commands:
  $ mkdir build-release
  $ cd build-release
  $ ../configure
+ $ make
+ $ sudo make install
+
+libRocket
+*********
+NOTE: The original source repository is 'https://github.com/libRocket/libRocket.git'.
+
+Get source package:
+
+ $ git clone https://github.com/consultit/my_librocket.git
+ 
+install dependencies from distribution:
+
+ $ sudo apt-get install libfreetype6-dev libx11-dev libxxf86vm-dev libgl1-mesa-dev \
+    libglu1-mesa-dev python-dev libboost-python-dev
+
+build with these commands:
+
+ $ cd my_librocket
+ $ autoreconf -i -v
+ $ mkdir build-release
+ $ cd build-release
+ $ ../configure --enable-python --enable-extra-samples
  $ make
  $ sudo make install
 
