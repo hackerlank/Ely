@@ -88,6 +88,28 @@ build with these commands:
  $ make
  $ sudo make install
 
+OpenSteer
+*********
+NOTE: The original source repository is 'http://svn.code.sf.net/p/opensteer/code/trunk'.   
+
+Get source package:
+
+ $ git clone https://github.com/consultit/my_opensteer.git
+ 
+install dependencies from distribution:
+
+ $ sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev freeglut3-dev
+
+build with these commands:
+
+ $ cd my_opensteer
+ $ autoreconf -i -v
+ $ mkdir build-release
+ $ cd build-release
+ $ ../configure
+ $ make
+ $ sudo make install
+
 RecastNavigation
 *****************
 NOTE: The original source repository is 'https://github.com/memononen/recastnavigation.git'.   
@@ -103,28 +125,6 @@ install dependencies from distribution:
 build with these commands:
 
  $ cd my_recastnavigation
- $ autoreconf -i -v
- $ mkdir build-release
- $ cd build-release
- $ ../configure
- $ make
- $ sudo make install
-
-OpenSteer
-*********
-NOTE: The original source repository is 'http://svn.code.sf.net/p/opensteer/code/trunk'.   
-
-Get source package:
-
- $ git clone https://github.com/consultit/my_opensteer.git
- 
-install dependencies from distribution:
-
- $ sudo apt-get install libgl1-mesa-dev libglu1-mesa-dev 
-
-build with these commands:
-
- $ cd my_opensteer
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
