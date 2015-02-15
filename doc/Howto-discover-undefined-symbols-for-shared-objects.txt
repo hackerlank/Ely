@@ -1,0 +1,16 @@
+###This method finds undefineds for a family of libraries linked together to make another shared object.
+###The development libraries (libLIBRARYX.so X=1..N) should be in the current directory.
+
+$ ld --shared -L$(pwd) -lLIBRARY1 -lLIBRARY2 -l... -lLIBRARYN -o libout.so
+[ $ for l in *.so ; do ln -s $l $(objdump -p $l | grep SONAME | awk '{print $2}') ; done ]
+$ LD_LIBRARY_PATH=$(pwd):${LD_LIBRARY_PATH} 2>&1 ldd -r -d libout.so | grep "undefined symbol:" | awk '{print $3}' | c++filt
+
+################################################################################
+
+$ out="/PATH/TO/LIBRARIES-undefineds.txt" ; rm -f $out ; for l in *.so.X.Y.Z ; do echo "<<< $l >>>" >> $out ; nm -DC $l  | grep " U " | sort | uniq | awk '{print $2}' >> $out ; echo >> $out ; done
+################################################################################
+
+$ out="/PATH/TO/LIBRARIES-undefineds.txt" ; rm -f $out ; for l in *.so.X.Y.Z ; do echo "<<< $l >>>" >> $out ; 2>&1 ldd -r -d $l  | grep "undefined symbol:" | awk '{print $3}' | c++filt >> $out ; echo >> $out ; done
+################################################################################
+
+
