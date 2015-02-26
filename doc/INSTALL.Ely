@@ -61,7 +61,7 @@ build with these commands:
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
- $ ../configure
+ $ ../configure --enable-demos
  $ make
  $ sudo make install
 
@@ -84,7 +84,7 @@ build with these commands:
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
- $ ../configure --enable-python --enable-extra-samples
+ $ ../configure --enable-python --enable-samples --enable-extra-samples
  $ make
  $ sudo make install
 
@@ -106,7 +106,7 @@ build with these commands:
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
- $ ../configure
+ $ ../configure --enable-opensteerdemo
  $ make
  $ sudo make install
 
@@ -128,7 +128,7 @@ build with these commands:
  $ autoreconf -i -v
  $ mkdir build-release
  $ cd build-release
- $ ../configure
+ $ ../configure --enable-recastdemo
  $ make
  $ sudo make install
 
