@@ -8,10 +8,10 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libBehaviorComponents.a
+noinst_LTLIBRARIES = \
+	libBehaviorComponents.la
 
 #library sources
-libBehaviorComponents_a_SOURCES = \
+libBehaviorComponents_la_SOURCES = \
 	Activity.cpp \
 	ActivityTemplate.cpp

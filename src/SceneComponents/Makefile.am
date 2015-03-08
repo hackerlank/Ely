@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libSceneComponents.a
+noinst_LTLIBRARIES = \
+	libSceneComponents.la
 
 #library sources
-libSceneComponents_a_SOURCES = \
+libSceneComponents_la_SOURCES = \
 	InstanceOf.cpp \
 	InstanceOfTemplate.cpp \
 	Model.cpp \

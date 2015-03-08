@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libRocketLocal.a
+noinst_LTLIBRARIES = \
+	libRocketLocal.la
 
 #library sources
-libRocketLocal_a_SOURCES = \
+libRocketLocal_la_SOURCES = \
 	config_rocket.cxx \
 	rocketSystemInterface.cxx \
 	rocketInputHandler.cxx \

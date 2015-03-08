@@ -1,1 +1,1 @@
-EXTRA_DIST = INSTALL.Ely "Makehuman+Blender+bvh_Animations.odt"
+EXTRA_DIST = INSTALL.Ely Makehuman+Blender+bvh_Animations.odt

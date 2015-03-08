@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libGame.a
+noinst_LTLIBRARIES = \
+	libGame.la
 
 #library sources
-libGame_a_SOURCES = \
+libGame_la_SOURCES = \
 	GameAIManager.cpp \
 	GameAudioManager.cpp \
 	GameBehaviorManager.cpp \

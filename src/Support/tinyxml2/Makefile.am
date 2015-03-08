@@ -9,9 +9,9 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libtinyxml2.a
+noinst_LTLIBRARIES = \
+	libtinyxml2.la
 
 #library sources
-libtinyxml2_a_SOURCES = \
+libtinyxml2_la_SOURCES = \
 	tinyxml2.cpp

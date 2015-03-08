@@ -24,27 +24,7 @@ nodist_noinst_HEADERS =\
 #elygame
 bin_PROGRAMS = elygame
 
-elygame_ltlibraries = \
-	$(top_builddir)/src/Game/libgame.la \
-	$(top_builddir)/src/AIComponents/libaicomponents.la \
-	$(top_builddir)/src/AudioComponents/libaudiocomponents.la \
-	$(top_builddir)/src/BehaviorComponents/libbehaviorcomponents.la \
-	$(top_builddir)/src/CommonComponents/libcommoncomponents.la \
-	$(top_builddir)/src/ControlComponents/libcontrolcomponents.la \
-	$(top_builddir)/src/PhysicsComponents/libphysicscomponents.la \
-	$(top_builddir)/src/PhysicsControlComponents/libphysicscontrolcomponents.la \
-	$(top_builddir)/src/SceneComponents/libscenecomponents.la \
-	$(top_builddir)/src/ObjectModel/libobjectmodel.la \
-	$(top_builddir)/src/Utilities/libutilities.la \
-	$(top_builddir)/src/Support/BulletLocal/libbullet.la \
-	$(top_builddir)/src/Support/RecastNavigationLocal/librecastnavigation.la \
-	$(top_builddir)/src/Support/LibRocketLocal/librocket.la \
-	$(top_builddir)/src/Support/MemoryPool/libmemorypool.la \
-	$(top_builddir)/src/Support/tinyxml2/libtinyxml2.la \
-	$(top_builddir)/src/Support/libsupport.la \
-	$(top_builddir)/src/Support/OpenSteerLocal/libopensteer.la
-
-#elygame
+#elygame sources
 elygame_SOURCES = \
 	elygame.cpp \
 	elygame_memory_pools.cpp
@@ -52,25 +32,7 @@ elygame_SOURCES = \
 elygame_CXXFLAGS = $(AM_CXXFLAGS) -frepo
 
 if ELY_DEVEL
-ldrpath = \
-	-rpath $(abs_top_builddir)/src/Game/.libs \
-	-rpath $(abs_top_builddir)/src/AIComponents/.libs \
-	-rpath $(abs_top_builddir)/src/AudioComponents/.libs \
-	-rpath $(abs_top_builddir)/src/BehaviorComponents/.libs \
-	-rpath $(abs_top_builddir)/src/CommonComponents/.libs \
-	-rpath $(abs_top_builddir)/src/ControlComponents/.libs \
-	-rpath $(abs_top_builddir)/src/PhysicsComponents/.libs \
-	-rpath $(abs_top_builddir)/src/PhysicsControlComponents/.libs \
-	-rpath $(abs_top_builddir)/src/SceneComponents/.libs \
-	-rpath $(abs_top_builddir)/src/ObjectModel/.libs \
-	-rpath $(abs_top_builddir)/src/Utilities/.libs \
-	-rpath $(abs_top_builddir)/src/Support/BulletLocal/.libs \
-	-rpath $(abs_top_builddir)/src/Support/RecastNavigationLocal/.libs \
-	-rpath $(abs_top_builddir)/src/Support/LibRocketLocal/.libs \
-	-rpath $(abs_top_builddir)/src/Support/MemoryPool/.libs \
-	-rpath $(abs_top_builddir)/src/Support/tinyxml2/.libs \
-	-rpath $(abs_top_builddir)/src/Support/.libs \
-	-rpath $(abs_top_builddir)/src/Support/OpenSteerLocal/.libs
+ldrpath = -rpath $(abs_top_builddir)/src/.libs
 else
 ldrpath = -rpath $(pkglibdir)
 endif
@@ -82,7 +44,7 @@ elygame_LDADD = \
 	-dlopen $(builddir)/initializations/initializations.la \
 	-dlopen $(builddir)/instanceupdates/instanceupdates.la \
 	-dlopen $(builddir)/transitions/transitions.la \
-	$(elygame_ltlibraries) \
+	$(top_builddir)/src/libely.la \
 	$(ELY_LIBS)
 		
 dist_pkgdata_DATA = game.xml config.prc

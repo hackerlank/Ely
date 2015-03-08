@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libBulletLocal.a
+noinst_LTLIBRARIES = \
+	libBulletLocal.la
 
 #library sources
-libBulletLocal_a_SOURCES = \
+libBulletLocal_la_SOURCES = \
 	bulletAllHitsRayResult.cpp \
 	bulletBaseCharacterControllerNode.cpp \
 	bulletBodyNode.cpp \

@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libAudioComponents.a
+noinst_LTLIBRARIES = \
+	libAudioComponents.la
 
 #library sources
-libAudioComponents_a_SOURCES = \
+libAudioComponents_la_SOURCES = \
 	Listener.cpp \
 	ListenerTemplate.cpp \
 	Sound3d.cpp \

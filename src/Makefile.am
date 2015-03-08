@@ -23,21 +23,21 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #ltlibraries: libely.la
-lib_LTLIBRARIES = \
+pkglib_LTLIBRARIES = \
 	libely.la
 
 libely_la_LIBADD = \
-	$(builddir)/Support/libSupport.a \
-	$(builddir)/Utilities/libUtilities.a \
-	$(builddir)/AIComponents/libAIComponents.a \
-	$(builddir)/AudioComponents/libAudioComponents.a \
-	$(builddir)/BehaviorComponents/libBehaviorComponents.a \
-	$(builddir)/ControlComponents/libControlComponents.a \
-	$(builddir)/CommonComponents/libCommonComponents.a \
-	$(builddir)/Game/libGame.a \
-	$(builddir)/ObjectModel/libObjectModel.a \
-	$(builddir)/PhysicsComponents/libPhysicsComponents.a \
-	$(builddir)/PhysicsControlComponents/libPhysicsControlComponents.a \
-	$(builddir)/SceneComponents/libSceneComponents.a
+	$(builddir)/Support/libSupport.la \
+	$(builddir)/Utilities/libUtilities.la \
+	$(builddir)/AIComponents/libAIComponents.la \
+	$(builddir)/AudioComponents/libAudioComponents.la \
+	$(builddir)/BehaviorComponents/libBehaviorComponents.la \
+	$(builddir)/ControlComponents/libControlComponents.la \
+	$(builddir)/CommonComponents/libCommonComponents.la \
+	$(builddir)/Game/libGame.la \
+	$(builddir)/ObjectModel/libObjectModel.la \
+	$(builddir)/PhysicsComponents/libPhysicsComponents.la \
+	$(builddir)/PhysicsControlComponents/libPhysicsControlComponents.la \
+	$(builddir)/SceneComponents/libSceneComponents.la
 
 libely_la_SOURCES =

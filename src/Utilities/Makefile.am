@@ -8,9 +8,9 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libUtilities.a
+noinst_LTLIBRARIES = \
+	libUtilities.la
 
 #library sources
-libUtilities_a_SOURCES = \
+libUtilities_la_SOURCES = \
 	Tools.cpp

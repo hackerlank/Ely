@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libAIComponents.a
+noinst_LTLIBRARIES = \
+	libAIComponents.la
 
 #library sources
-libAIComponents_a_SOURCES = \
+libAIComponents_la_SOURCES = \
 	CrowdAgent.cpp \
 	CrowdAgentTemplate.cpp \
 	NavMesh.cpp \

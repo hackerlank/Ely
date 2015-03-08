@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libCommonComponents.a
+noinst_LTLIBRARIES = \
+	libCommonComponents.la
 
 #library sources
-libCommonComponents_a_SOURCES = \
+libCommonComponents_la_SOURCES = \
 	Default.cpp \
 	DefaultTemplate.cpp \
 	GameConfig.cpp \

@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libOpenSteerLocal.a
+noinst_LTLIBRARIES = \
+	libOpenSteerLocal.la
 
 #library sources
-libOpenSteerLocal_a_SOURCES = \
+libOpenSteerLocal_la_SOURCES = \
 	Draw.cpp \
 	DrawMeshDrawer.cpp \
 	SimpleVehicle.cpp

@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libRecastNavigationLocal.a
+noinst_LTLIBRARIES = \
+	libRecastNavigationLocal.la
 
 #library sources
-libRecastNavigationLocal_a_SOURCES = \
+libRecastNavigationLocal_la_SOURCES = \
 	InputGeom.cpp \
 	ChunkyTriMesh.cpp \
 	MeshLoaderObj.cpp \

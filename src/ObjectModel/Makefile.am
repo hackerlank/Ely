@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libObjectModel.a
+noinst_LTLIBRARIES = \
+	libObjectModel.la
 
 #library sources
-libObjectModel_a_SOURCES = \
+libObjectModel_la_SOURCES = \
 	Component.cpp \
 	ComponentTemplate.cpp \
 	ComponentTemplateManager.cpp \

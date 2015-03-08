@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libPhysicsControlComponents.a
+noinst_LTLIBRARIES = \
+	libPhysicsControlComponents.la
 
 #library sources
-libPhysicsControlComponents_a_SOURCES = \
+libPhysicsControlComponents_la_SOURCES = \
 	CharacterController.cpp \
 	CharacterControllerTemplate.cpp \
 	Vehicle.cpp \

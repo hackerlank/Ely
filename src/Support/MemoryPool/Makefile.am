@@ -8,9 +8,9 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libMemoryPool.a
+noinst_LTLIBRARIES = \
+	libMemoryPool.la
 
 #library sources
-libMemoryPool_a_SOURCES = \
+libMemoryPool_la_SOURCES = \
 	MemoryPool.cpp

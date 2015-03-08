@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libControlComponents.a
+noinst_LTLIBRARIES = \
+	libControlComponents.la
 
 #library sources
-libControlComponents_a_SOURCES = \
+libControlComponents_la_SOURCES = \
 	Chaser.cpp \
 	ChaserTemplate.cpp \
 	Driver.cpp \

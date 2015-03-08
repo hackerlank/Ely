@@ -18,20 +18,20 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libSupport.a
+noinst_LTLIBRARIES = \
+	libSupport.la
 
 #library sources
-libSupport_a_SOURCES = \
+libSupport_la_SOURCES = \
 	FSM.cpp \
 	Picker.cpp \
 	Raycaster.cpp
 
-libSupport_a_LIBADD = \
-	$(builddir)/BulletLocal/libBulletLocal.a \
-	$(builddir)/LibRocketLocal/libRocketLocal.a \
-	$(builddir)/MemoryPool/libMemoryPool.a \
-	$(builddir)/OpenSteerLocal/libOpenSteerLocal.a \
-	$(builddir)/RecastNavigationLocal/libRecastNavigationLocal.a \
-	$(builddir)/tinyxml2/libtinyxml2.a
+libSupport_la_LIBADD = \
+	$(builddir)/BulletLocal/libBulletLocal.la \
+	$(builddir)/LibRocketLocal/libRocketLocal.la \
+	$(builddir)/MemoryPool/libMemoryPool.la \
+	$(builddir)/OpenSteerLocal/libOpenSteerLocal.la \
+	$(builddir)/RecastNavigationLocal/libRecastNavigationLocal.la \
+	$(builddir)/tinyxml2/libtinyxml2.la
 	

@@ -8,11 +8,11 @@ LIBS = $(ELY_LIBS)
 AUTOMAKE_OPTIONS = subdir-objects
 
 #convenience library
-noinst_LIBRARIES = \
-	libPhysicsComponents.a
+noinst_LTLIBRARIES = \
+	libPhysicsComponents.la
 
 #library sources
-libPhysicsComponents_a_SOURCES = \
+libPhysicsComponents_la_SOURCES = \
 	Ghost.cpp \
 	GhostTemplate.cpp \
 	RigidBody.cpp \
