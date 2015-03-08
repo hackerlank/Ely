@@ -97,14 +97,22 @@ AX_CXX_HEADER_STDCXX_98
 
 # Checks for libraries.
 required_libraries=
+#pthread
+PTHREAD_LIBS=
 AC_SEARCH_LIBS([pthread_create], 
 			   [pthread], 
-			   [ELY_LIBS="${ELY_LIBS} ${ac_cv_search_pthread_create}"], 
+			   [PTHREAD_LIBS=${ac_cv_search_pthread_create}
+			   ELY_LIBS="${ELY_LIBS} ${PTHREAD_LIBS}"], 
 			   [required_libraries=${required_libraries}" 'pthread' "])
+AC_SUBST(PTHREAD_LIBS)
+#ltdl
+LTDL_LIBS=
 AC_SEARCH_LIBS([lt_dlopen], 
 			   [ltdl], 
-			   [ELY_LIBS="${ELY_LIBS} ${ac_cv_search_pthread_create}"], 
+			   [LTDL_LIBS=${ac_cv_search_lt_dlopen}
+			   ELY_LIBS="${ELY_LIBS} ${LTDL_LIBS}"], 
 			   [required_libraries=${required_libraries}" 'ltdl' "])
+AC_SUBST(LTDL_LIBS)
 
 # Checks for header files.
 AC_CHECK_HEADERS([float.h stddef.h stdlib.h string.h sys/time.h])
@@ -166,7 +174,7 @@ AC_ARG_ENABLE([threading],
 		#
 		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
 		AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
-		buildtype=${buildtype}"-Thread"
+		buildtype=${buildtype}"-Threading"
 	fi
 	], 
     [threading=no])

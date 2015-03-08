@@ -13,7 +13,7 @@ AM_CPPFLAGS = -iquote$(top_srcdir)/include \
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-LIBS = $(ELY_LIBS)
+LIBS = 
 
 AUTOMAKE_OPTIONS = subdir-objects
 

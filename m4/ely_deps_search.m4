@@ -7,6 +7,13 @@
 #	AC_SUBST(ELY_DEPS_CPPFLAGS)
 #	AC_SUBST(ELY_DEPS_LDFLAGS)
 #	AC_SUBST(ELY_DEPS_LIBS)
+# and AC_SUBST for the equivalent CPPFLAGS,LDFLAGS,LIBS
+# related to 
+#	Bullet (BULLET_)
+#	libRocket (ROCKET_)
+#	OpenSteer (OPENSTEER_)
+#	RecastNavigation (_RECAST)
+#	Panda3d (PANDA3D_) 
 #
 
 #dnl $1=library $2=package
@@ -76,10 +83,10 @@ AC_LINK_IFELSE(
 ###RecastNavigation###
 AC_MSG_CHECKING([for RecastNavigation libs])
 GET_LDFLAGS([Recast], [recastnavigation])
-RN_LDFLAGS="${LDFLAGSFOUND}"
-RN_LIBS="-lDebugUtils -lDetour -lDetourCrowd -lDetourTileCache -lRecast"			
-LDFLAGS="${RN_LDFLAGS} ${LDFLAGS_CMDLINE}"
-LIBS="${RN_LIBS} ${LIBS_CMDLINE}"
+RECAST_LDFLAGS="${LDFLAGSFOUND}"
+RECAST_LIBS="-lDebugUtils -lDetour -lDetourCrowd -lDetourTileCache -lRecast"			
+LDFLAGS="${RECAST_LDFLAGS} ${LDFLAGS_CMDLINE}"
+LIBS="${RECAST_LIBS} ${LIBS_CMDLINE}"
 rn_prologue="
 	enum rcTimerLabel
 	{
@@ -111,10 +118,10 @@ AC_LINK_IFELSE(
 # check libraries first from cmd line specified ones
 AC_MSG_CHECKING([for OpenSteer libs])
 GET_LDFLAGS([OpenSteer], [OpenSteer])
-OS_LDFLAGS="${LDFLAGSFOUND}"
-OS_LIBS="-lOpenSteer"			
-LDFLAGS="${OS_LDFLAGS} ${LDFLAGS_CMDLINE}"
-LIBS="${OS_LIBS} ${LIBS_CMDLINE}"
+OPENSTEER_LDFLAGS="${LDFLAGSFOUND}"
+OPENSTEER_LIBS="-lOpenSteer"			
+LDFLAGS="${OPENSTEER_LDFLAGS} ${LDFLAGS_CMDLINE}"
+LIBS="${OPENSTEER_LIBS} ${LIBS_CMDLINE}"
 os_prologue="
 	namespace OpenSteer {
 	class Vec3{};
@@ -180,9 +187,7 @@ EIGEN_LIBS=""
 AC_MSG_CHECKING([for Panda3d libs])
 GET_LDFLAGS([p3framework], [panda3d])
 PANDA3D_LDFLAGS="${LDFLAGSFOUND}"
-PANDA3D_LIBS="-lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress -lp3dtoolconfig \
--lp3pystub -lp3dtool -lp3direct -lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision \
--lpandagl -lpandaskel -lp3ptloader -l$2"	
+PANDA3D_LIBS="-lp3framework -l$2"	
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3D_LIBS} ${LIBS_CMDLINE}"
 panda3d_prologue="
@@ -217,12 +222,12 @@ BULLET_CPPFLAGS="-I/usr/include/bullet -I/usr/local/include/bullet"
 CPPFLAGS="${BULLET_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADER([btBulletCollisionCommon.h],[],[required_headers="${required_headers}'Bullet'"])
 ###RecastNavigation###
-RN_CPPFLAGS="-I/usr/include/recastnavigation -I/usr/local/include/recastnavigation"
-CPPFLAGS="${RN_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
+RECAST_CPPFLAGS="-I/usr/include/recastnavigation -I/usr/local/include/recastnavigation"
+CPPFLAGS="${RECAST_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADER([Recast.h],[],[required_headers="${required_headers} 'RecastNavigation'"])
 ###OpenSteer###
-OS_CPPFLAGS="-I/usr/include/OpenSteer -I/usr/local/include/OpenSteer"
-CPPFLAGS="${OS_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
+OPENSTEER_CPPFLAGS="-I/usr/include/OpenSteer -I/usr/local/include/OpenSteer"
+CPPFLAGS="${OPENSTEER_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADER([SteerLibrary.h],[],[required_headers="${required_headers} 'OpenSteer'"])
 ###libRocket###
 ROCKET_CPPFLAGS="-I/usr/include/Rocket -I/usr/local/include/Rocket"
@@ -238,15 +243,29 @@ CPPFLAGS="${PANDA3D_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADER([pandaFramework.h],[],[required_headers="${required_headers} 'Panda3d'"])
 #
 STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['Ely'])
-
-#ELY_DEPS flags
+#
+ELY_DEPS_CPPFLAGS="${PANDA3D_CPPFLAGS} ${BULLET_CPPFLAGS} ${RECAST_CPPFLAGS} ${OPENSTEER_CPPFLAGS} ${ROCKET_CPPFLAGS}"
+ELY_DEPS_LDFLAGS="${PANDA3D_LDFLAGS} ${BULLET_LDFLAGS} ${RECAST_LDFLAGS} ${OPENSTEER_LDFLAGS} ${ROCKET_LDFLAGS}"
+ELY_DEPS_LIBS="${PANDA3D_LIBS} ${BULLET_LIBS} ${RECAST_LIBS} ${OPENSTEER_LIBS} ${ROCKET_LIBS}"
+#Dependencies flags
 AC_SUBST(ELY_DEPS_CPPFLAGS)
 AC_SUBST(ELY_DEPS_LDFLAGS)
 AC_SUBST(ELY_DEPS_LIBS)
-#
-ELY_DEPS_CPPFLAGS="${PANDA3D_CPPFLAGS} ${BULLET_CPPFLAGS} ${RN_CPPFLAGS} ${OS_CPPFLAGS} ${ROCKET_CPPFLAGS}"
-ELY_DEPS_LDFLAGS="${PANDA3D_LDFLAGS} ${BULLET_LDFLAGS} ${RN_LDFLAGS} ${OS_LDFLAGS} ${ROCKET_LDFLAGS}"
-ELY_DEPS_LIBS="${PANDA3D_LIBS} ${BULLET_LIBS} ${RN_LIBS} ${OS_LIBS} ${ROCKET_LIBS}"
+AC_SUBST(BULLET_CPPFLAGS)
+AC_SUBST(BULLET_LDFLAGS)
+AC_SUBST(BULLET_LIBS)
+AC_SUBST(RECAST_CPPFLAGS)
+AC_SUBST(RECAST_LDFLAGS)
+AC_SUBST(RECAST_LIBS)
+AC_SUBST(OPENSTEER_CPPFLAGS)
+AC_SUBST(OPENSTEER_LDFLAGS)
+AC_SUBST(OPENSTEER_LIBS)
+AC_SUBST(ROCKET_CPPFLAGS)
+AC_SUBST(ROCKET_LDFLAGS)
+AC_SUBST(ROCKET_LIBS)
+AC_SUBST(PANDA3D_CPPFLAGS)
+AC_SUBST(PANDA3D_LDFLAGS)
+AC_SUBST(PANDA3D_LIBS)
 #
 CPPFLAGS=${CPPFLAGS_CMDLINE}
 LDFLAGS=${LDFLAGS_CMDLINE}

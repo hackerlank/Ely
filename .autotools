@@ -74,7 +74,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-devel --enable-debug --enable-thread"/>
+<option id="user" value="--enable-devel --enable-debug --enable-threading"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
@@ -191,7 +191,7 @@
 <flagvalue id="cflags-gprof" value="false"/>
 <flagvalue id="cflags-gcov" value="false"/>
 </flag>
-<option id="user" value="--enable-devel --enable-thread"/>
+<option id="user" value="--enable-devel --enable-threading"/>
 <option id="autogen" value="autogen.sh"/>
 <option id="autogenOpts" value=""/>
 </configuration>
