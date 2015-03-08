@@ -17,6 +17,8 @@
 
 AC_PREREQ([2.69])
 AC_INIT([Ely], [1.0], [consultit@katamail.com])
+:${CXXFLAGS=""}
+:${CFLAGS=""}
 AM_INIT_AUTOMAKE
 LT_PREREQ([2.2])
 LT_INIT([dlopen])
@@ -27,111 +29,212 @@ AC_CONFIG_MACRO_DIR([m4])
 AC_PREFIX_DEFAULT([/usr])
 AM_SILENT_RULES
 
-# checks for programs.
-:${CXXFLAGS=""}
+# Checks for programs.
 AC_PROG_CXX
+AC_PROG_CC
 AC_LANG([C++])
-# default Ely CXXFLAGS (release mode)
-ELY_CXXFLAGS="-O3 -w -fmessage-length=0"
-buildtype=""
-# ELY_DEVEL
-AC_ARG_ENABLE([devel],
-	AS_HELP_STRING([--enable-devel],
-		[@<:@=yes@:>@ enable Development mode (disabled by default)]),
-    [devel=${enableval}], [devel=no])
-AM_CONDITIONAL([ELY_DEVEL], [test "x${devel}" != xno])
-AS_IF([test "x${devel}" != xno], 
-	[buildtype=${buildtype}"Devel-"])
-# ELY_DEBUG
-AC_ARG_ENABLE([debug],
-	AS_HELP_STRING([--enable-debug],
-		[@<:@=yes@:>@ enable Debug mode (disabled by default)]),
-    [debug=${enableval}], [debug=no])
-AS_IF([test "x${debug}" != xno],
-	[AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
-	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"
-	buildtype=${buildtype}"Debug"],
-	[AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])
-	buildtype=${buildtype}"Release"])
-# ELY_THREAD
-AC_ARG_ENABLE([thread],
-    AS_HELP_STRING([--enable-thread],
-    	[@<:@=yes@:>@ enable Threading mode (disabled by default)]),
-    [thread=${enableval}], [thread=no])
-AM_CONDITIONAL([ELY_THREAD], [test "x${thread}" != xno])
-AS_IF([test "x${thread}" != xno],
-	[AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
-	buildtype=${buildtype}"-Thread"])
 
-# checks for libraries.
-AC_SEARCH_LIBS([lt_dlopen], [ltdl])
-AX_PTHREAD
-LIBS="$PTHREAD_LIBS $LIBS"
-CXXFLAGS="$PTHREAD_CFLAGS $CXXFLAGS"
-
-# checks for typedefs, structures, and compiler characteristics.
-AC_HEADER_STDBOOL
-AC_TYPE_SIZE_T
-AC_TYPE_UINT32_T
-
-# checks for library functions.
-AC_CHECK_FUNCS([pow sqrt strchr strtol])
-
-# checks for standard header files.
-AC_CHECK_HEADERS([stdint.h ltdl.h])
-AX_CXX_HEADER_STDCXX_98
-AX_BOOST_BASE([],[],[
-	AC_MSG_ERROR([
-	----------------------------------------
-	The Boost header files are
-	required to build Ely. Stopping...
-	Check 'config.log' for more information.
-	----------------------------------------])
-])
-
-# checks/sets options
-AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
-# checks for Python.
-AX_PYTHON
-# checks for Python >= 2.7.
-AX_PYTHON_PATH
-AX_PYTHON_VERSION_ENSURE([2.7])
-
-# checks for Ely dependency packages
-ELY_DEPS_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
-# Ely flags for Makefiles
-ELY_CPPFLAGS="${ELY_DEPS_CPPFLAGS}"
-ELY_LDFLAGS="${ELY_DEPS_LDFLAGS}"
-ELY_LIBS="${ELY_DEPS_LIBS}"
+#
 AC_SUBST(ELY_CXXFLAGS)
 AC_SUBST(ELY_CPPFLAGS)
 AC_SUBST(ELY_LDFLAGS)
 AC_SUBST(ELY_LIBS)
+#
+ELY_CPPFLAGS=
+# default build: Release
+ELY_CXXFLAGS=
+buildtype=
+# ELY_DEVEL
+AC_ARG_ENABLE([devel],
+	AS_HELP_STRING([--enable-devel],
+		[@<:@=yes@:>@ enable Development mode (disabled by default)]),
+    [devel=${enableval}
+    if test "x${devel}" != xno ; then
+		devel=yes
+		buildtype=${buildtype}"Devel-"
+	fi
+	], 
+    [devel=no]
+    )
+AM_CONDITIONAL([ELY_DEVEL], [test "x${devel}" != xno])
 
-# checks for Boost Unit Test Framework tests (maintainer only)
+#
+AC_ARG_ENABLE([relwithdebinfo],
+	AS_HELP_STRING([--enable-relwithdebinfo],
+		[@<:@=yes@:>@ enable Release with Debug info mode (disabled by default)]),
+    [relwithdebinfo=${enableval}],
+    [relwithdebinfo=no]
+    )
+AC_ARG_ENABLE([debug],
+	AS_HELP_STRING([--enable-debug],
+		[@<:@=yes@:>@ enable Debug mode (disabled by default)]),
+    [debug=${enableval}],
+    [debug=no]
+    )
+
+AS_IF(
+		#RelWithDebInfo
+	[test "x${relwithdebinfo}" != xno],
+	[buildtype=${buildtype}"RelWithDebInfo"
+	AC_DEFINE([ELY_RELWITHDEBINFO],[1],[release with debug info mode enabled])
+	ELY_CXXFLAGS="-O2 -g -fmessage-length=0"],
+		#Debug
+	[test "x${debug}" != xno],
+	[buildtype=${buildtype}"Debug"
+	AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
+	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"],
+		#Release
+	[buildtype=${buildtype}"Release"
+	AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])
+	ELY_CXXFLAGS="-O3 -w -fmessage-length=0"]
+	)	
+#
+ELY_LDFLAGS=
+ELY_LIBS=
+
+#c++d std headers
+AX_CXX_HEADER_STDCXX_98
+
+# Checks for libraries.
+required_libraries=
+AC_SEARCH_LIBS([pthread_create], 
+			   [pthread], 
+			   [ELY_LIBS="${ELY_LIBS} ${ac_cv_search_pthread_create}"], 
+			   [required_libraries=${required_libraries}" 'pthread' "])
+AC_SEARCH_LIBS([lt_dlopen], 
+			   [ltdl], 
+			   [ELY_LIBS="${ELY_LIBS} ${ac_cv_search_pthread_create}"], 
+			   [required_libraries=${required_libraries}" 'ltdl' "])
+
+# Checks for header files.
+AC_CHECK_HEADERS([float.h stddef.h stdlib.h string.h sys/time.h])
+
+required_headers=
+AC_CHECK_HEADER([pthread.h],[],[required_headers=${required_headers}" 'pthread' "])
+AC_CHECK_HEADER([ltdl.h],[],[required_headers=${required_headers}" 'ltdl' "])
+AX_BOOST_BASE([],
+	[ELY_CPPFLAGS="${ELY_CPPFLAGS} ${BOOST_CPPFLAGS}"
+	ELY_LDFLAGS="${ELY_LDFLAGS} ${BOOST_LDFLAGS}"],
+	[required_headers=${required_headers}" 'Boost' "])
+#
+STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['Ely'])
+
+# Checks for typedefs, structures, and compiler characteristics.
+AC_CHECK_HEADER_STDBOOL
+AC_C_INLINE
+AC_TYPE_SIZE_T
+AC_TYPE_UINT32_T
+AC_CHECK_TYPES([ptrdiff_t])
+
+# Checks for library functions.
+AC_FUNC_ERROR_AT_LINE
+AC_FUNC_MALLOC
+AC_CHECK_FUNCS([floor gettimeofday memmove memset pow strchr strtol])
+
+# Checks/sets options
+AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
+# Checks for Python.
+AX_PYTHON
+# Checks for Python >= 2.7.
+AX_PYTHON_PATH
+AX_PYTHON_VERSION_ENSURE([2.7])
+
+# Checks for Ely dependency packages
+ELY_DEPS_SEARCH([${PYTHON_INCLUDE_DIR}], [${PYTHON_LIB}])
+
+# Ely flags for Makefiles
+ELY_CPPFLAGS="${ELY_CPPFLAGS} ${ELY_DEPS_CPPFLAGS}"
+ELY_LDFLAGS="${ELY_LDFLAGS} ${ELY_DEPS_LDFLAGS}"
+ELY_LIBS="${ELY_LIBS} ${ELY_DEPS_LIBS}"
+
+#----------------------------------------------------------------------------
+# Package configuration switches.
+#----------------------------------------------------------------------------
+# Threading
+AC_ARG_ENABLE([threading],
+    AS_HELP_STRING([--enable-threading],
+    	[@<:@=yes@:>@ enable Threading mode (disabled by default)]),
+    [threading=${enableval}
+    if test "x${threading}" != xno ; then
+		threading=yes
+		# Checks libraries for samples.
+		required_libraries=
+		# Checks header files for samples.
+		required_headers=
+		# Checks for typedefs, structures, and compiler characteristics.
+		# Checks for library functions.
+		#
+		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
+		AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
+		buildtype=${buildtype}"-Thread"
+	fi
+	], 
+    [threading=no])
+AM_CONDITIONAL([ELY_THREAD], [test "x${threading}" != xno])
+
+# Unit Tests (maintainer only)
 AC_ARG_ENABLE([unit-test],
     AS_HELP_STRING([--enable-unit-test],
     	[@<:@=yes@:>@ enable Boost Unit Test programs - maintainer only (disabled by default)]),
     [unit_test=${enableval}
-    buildtype="Boost_Unit_Test"], 
+    if test "x${unit_test}" != xno ; then
+		unit_test=yes
+		# Checks libraries for samples.
+		required_libraries=
+		# Checks header files for samples.
+		required_headers=
+		#Check Boost Unit Test Framework
+		AX_BOOST_UNIT_TEST_FRAMEWORK
+		# Checks for typedefs, structures, and compiler characteristics.
+		# Checks for library functions.
+		#
+		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
+    	buildtype="Boost_Unit_Test" 
+	fi
+	],
     [unit_test=no])
 AM_CONDITIONAL([BOOST_TEST], [test "x${unit_test}" != xno])
-AM_COND_IF([BOOST_TEST],
-	[AX_BOOST_BASE
-	AX_BOOST_UNIT_TEST_FRAMEWORK
-	AC_CONFIG_FILES([test/Makefile])])
 
-# checks for training tests (maintainer only)
+# Training test programs (maintainer only)
 AC_ARG_ENABLE([training],
     AS_HELP_STRING([--enable-training],
     	[@<:@=yes@:>@ enable training test programs - maintainer only (disabled by default)]),
     [training=${enableval}
-    AM_PROG_CC_C_O
-    buildtype="Training"
-    ELY_CXXFLAGS="${ELY_CXXFLAGS} -std=c++11"
-    ELY_CPPFLAGS="${ELY_CPPFLAGS} -D__GXX_EXPERIMENTAL_CXX0X__"], 
+    if test "x${training}" != xno ; then
+		training=yes
+		# Checks libraries for samples.
+		required_libraries=
+		# Checks header files for samples.
+		required_headers=
+		AC_CHECK_HEADERS([unistd.h])
+		# Checks for typedefs, structures, and compiler characteristics.
+		AC_TYPE_INT64_T
+		# Checks for library functions.
+		AC_CHECK_FUNCS([sqrt])
+		#
+		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
+		AM_PROG_CC_C_O
+		ELY_CXXFLAGS="${ELY_CXXFLAGS} -std=c++11"
+		ELY_CPPFLAGS="${ELY_CPPFLAGS} -D__GXX_EXPERIMENTAL_CXX0X__"
+    	buildtype="Training"
+	fi
+	],
     [training=no])
 AM_CONDITIONAL([TRAINING], [test "x${training}" != xno])
+
+# Set Ely ELF executable build (if no boost and no training tests)
+AM_CONDITIONAL([ELY_ELF], [test "x${unit_test}" = xno -a "x${training}" = xno])
+
+#----------------------------------------------------------------------------
+# Makefiles.
+#----------------------------------------------------------------------------
+AC_CONFIG_FILES([
+		Makefile
+		])
+		
+AM_COND_IF([BOOST_TEST],
+	[AC_CONFIG_FILES([test/Makefile])])
+
 AM_COND_IF([TRAINING],
 	[AC_CONFIG_FILES([
 		training/Makefile
@@ -140,8 +243,6 @@ AM_COND_IF([TRAINING],
 		training/opensteer/Makefile
 		])])
 
-# checks for Ely ELF executable build (if no boost and no training tests)
-AM_CONDITIONAL([ELY_ELF], [test "x${unit_test}" = xno -a "x${training}" = xno])
 AM_COND_IF([ELY_ELF],
 	[AC_CONFIG_FILES([
 		include/Makefile
@@ -178,12 +279,12 @@ AM_COND_IF([ELY_ELF],
 		doc/Makefile
 		])])
 
-AC_CONFIG_FILES([
-		Makefile
-		])
-
+#----------------------------------------------------------------------------
+# Emit generated files.
+#----------------------------------------------------------------------------
 AC_OUTPUT
 
+echo
 echo \
 "-------------------------------------------------
 ${PACKAGE_NAME} Version ${PACKAGE_VERSION}

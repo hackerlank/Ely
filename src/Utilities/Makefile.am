@@ -1,11 +1,16 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include \
+	$(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-#ltlibraries
-pkglib_LTLIBRARIES = \
-		libutilities.la
+LIBS = $(ELY_LIBS)
 
-#ltlibraries sources
-libutilities_la_SOURCES = \
-		Tools.cpp
+AUTOMAKE_OPTIONS = subdir-objects
+
+#convenience library
+noinst_LIBRARIES = \
+	libUtilities.a
+
+#library sources
+libUtilities_a_SOURCES = \
+	Tools.cpp

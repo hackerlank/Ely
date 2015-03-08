@@ -1,16 +1,21 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include \
+	$(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-#ltlibraries
-pkglib_LTLIBRARIES = \
-		librocket.la
+LIBS = $(ELY_LIBS)
 
-#ltlibraries sources
-librocket_la_SOURCES = \
-		config_rocket.cxx \
-		rocketSystemInterface.cxx \
-		rocketInputHandler.cxx \
-		rocketRenderInterface.cxx \
-		rocketRegion.cxx \
-		rocketFileInterface.cxx
+AUTOMAKE_OPTIONS = subdir-objects
+
+#convenience library
+noinst_LIBRARIES = \
+	libRocketLocal.a
+
+#library sources
+libRocketLocal_a_SOURCES = \
+	config_rocket.cxx \
+	rocketSystemInterface.cxx \
+	rocketInputHandler.cxx \
+	rocketRenderInterface.cxx \
+	rocketRegion.cxx \
+	rocketFileInterface.cxx

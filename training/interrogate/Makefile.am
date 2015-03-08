@@ -12,19 +12,19 @@ MODLIB_NAME = testinterrogate
 
 INTERR_CMD = /usr/bin/interrogate
 INTERR_CPPFLAGS = $(AM_CPPFLAGS) \
-		-S/usr/include/panda3d/parser-inc -S/usr/include/panda3d \
-		-D__inline -DCPPPARSER -D__cplusplus -Dvolatile=
+	-S/usr/include/panda3d/parser-inc -S/usr/include/panda3d \
+	-D__inline -DCPPPARSER -D__cplusplus -Dvolatile=
 INTERR_OPTS = -fnames -string -refcount -assert -python-native \
-		-module $(MODLIB_NAME) -library $(MODLIB_NAME)
+	-module $(MODLIB_NAME) -library $(MODLIB_NAME)
 
 INTERR_MODULE_CMD = $(INTERR_CMD)_module
 INTERR_MODULE_OPTS = -python-native \
-		-module $(MODLIB_NAME) -library $(MODLIB_NAME)
+	-module $(MODLIB_NAME) -library $(MODLIB_NAME)
 
 testinterrogate_la_SOURCES = \
-		testinterrogate.cpp \
-		testinterrogate_igate.cpp \
-		testinterrogate_module.cpp
+	testinterrogate.cpp \
+	testinterrogate_igate.cpp \
+	testinterrogate_module.cpp
 
 testinterrogate_igate.cpp: testinterrogate.h
 	$(INTERR_CMD) $(INTERR_CPPFLAGS) $(INTERR_OPTS) \
@@ -36,6 +36,6 @@ testinterrogate_module.cpp: testinterrogate_igate.cpp
 	testinterrogate.in 
 		
 nodist_noinst_HEADERS = \
-		testinterrogate.h
+	testinterrogate.h
 
 CLEANFILES = testinterrogate_igate.cpp testinterrogate_module.cpp testinterrogate.in

@@ -25,8 +25,6 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
-//Distributed
-#include "Support/Distributed/DistributedObjectBase.h"
 //Bullet
 #include "Support/BulletLocal/config_bullet.h"
 //libRocket
@@ -211,8 +209,6 @@ void initTypedObjects()
 	TerrainTemplate::init_type();
 	GeoMipTerrainRef::init_type();
 	//
-	//Distributed
-	DistributedObjectBase::init_type();
 }
 
 } // namespace ely

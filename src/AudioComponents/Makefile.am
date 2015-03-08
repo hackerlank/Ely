@@ -1,14 +1,19 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include \
+	$(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-#ltlibraries
-pkglib_LTLIBRARIES = \
-		libaudiocomponents.la
+LIBS = $(ELY_LIBS)
 
-#ltlibraries sources
-libaudiocomponents_la_SOURCES = \
-		Listener.cpp \
-		ListenerTemplate.cpp \
-		Sound3d.cpp \
-		Sound3dTemplate.cpp
+AUTOMAKE_OPTIONS = subdir-objects
+
+#convenience library
+noinst_LIBRARIES = \
+	libAudioComponents.a
+
+#library sources
+libAudioComponents_a_SOURCES = \
+	Listener.cpp \
+	ListenerTemplate.cpp \
+	Sound3d.cpp \
+	Sound3dTemplate.cpp

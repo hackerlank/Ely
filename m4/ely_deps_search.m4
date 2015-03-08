@@ -2,7 +2,11 @@
 # --------------
 # Defines: ELY_DEPS_CPPFLAGS, ELY_DEPS_LDFLAGS, ELY_DEPS_LIBS
 # Argument: expected PYTHON_CPPFLAGS
-# Searches SDK first on cmd line flags then on std locations
+# Searches SDK first on cmd line flags then on std locations.
+# This macro calls:
+#	AC_SUBST(ELY_DEPS_CPPFLAGS)
+#	AC_SUBST(ELY_DEPS_LDFLAGS)
+#	AC_SUBST(ELY_DEPS_LIBS)
 #
 
 #dnl $1=library $2=package
@@ -204,16 +208,6 @@ AC_LINK_IFELSE(
   [AC_MSG_RESULT([no])
   required_libraries="${required_libraries} 'Panda3d'"]
 )
-# LIBRARIES checks result
-if test -n "${required_libraries}" ; then
-	AC_MSG_ERROR([
-	-----------------------------------------------
-	The ${required_libraries} 
-	library packages are required to build Ely. 
-	Stopping...
-	Check 'config.log' for more information.
-	-----------------------------------------------])
-fi
 
 # check HEADERS first from cmd line specified include
 AC_MSG_NOTICE([searching for Ely dependency development packages...])
@@ -242,18 +236,14 @@ AC_CHECK_HEADER([Eigen/Dense],[],[required_headers="${required_headers} 'Eigen'"
 PANDA3D_CPPFLAGS="-I/usr/include/panda3d -I/usr/local/include/panda3d -I$1 ${EIGEN_CPPFLAGS}"
 CPPFLAGS="${PANDA3D_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADER([pandaFramework.h],[],[required_headers="${required_headers} 'Panda3d'"])
-# HEADERS checks result
-if test -n "${required_headers}" ; then
-	AC_MSG_ERROR([
-	-----------------------------------------------
-	The ${required_headers} 
-	development	packages are required to build Ely.
-	Stopping...
-	Check 'config.log' for more information.
-	-----------------------------------------------])
-fi
+#
+STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['Ely'])
 
 #ELY_DEPS flags
+AC_SUBST(ELY_DEPS_CPPFLAGS)
+AC_SUBST(ELY_DEPS_LDFLAGS)
+AC_SUBST(ELY_DEPS_LIBS)
+#
 ELY_DEPS_CPPFLAGS="${PANDA3D_CPPFLAGS} ${BULLET_CPPFLAGS} ${RN_CPPFLAGS} ${OS_CPPFLAGS} ${ROCKET_CPPFLAGS}"
 ELY_DEPS_LDFLAGS="${PANDA3D_LDFLAGS} ${BULLET_LDFLAGS} ${RN_LDFLAGS} ${OS_LDFLAGS} ${ROCKET_LDFLAGS}"
 ELY_DEPS_LIBS="${PANDA3D_LIBS} ${BULLET_LIBS} ${RN_LIBS} ${OS_LIBS} ${ROCKET_LIBS}"

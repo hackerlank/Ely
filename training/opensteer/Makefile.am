@@ -10,23 +10,23 @@ LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 noinst_LTLIBRARIES = libopensteerplugins.la
 
 libopensteerplugins_la_SOURCES = \
-		Draw.cpp \
-		DrawMeshDrawer.cpp \
-		LowSpeedTurn.cpp \
-		Pedestrian.cpp \
-		PedestriansWalkingAnEight.cpp \
-		CaptureTheFlag.cpp \
-		Boids.cpp \
-		Soccer.cpp \
-		MapDrive.cpp
+	Draw.cpp \
+	DrawMeshDrawer.cpp \
+	LowSpeedTurn.cpp \
+	Pedestrian.cpp \
+	PedestriansWalkingAnEight.cpp \
+	CaptureTheFlag.cpp \
+	Boids.cpp \
+	Soccer.cpp \
+	MapDrive.cpp
 		
 noinst_PROGRAMS = ely_opensteer
 		
 #ely_opensteer
 nodist_ely_opensteer_SOURCES = \
-		main.cpp
+	main.cpp
 
 ely_opensteer_LDADD = \
-		$(LDADD) \
-		libopensteerplugins.la
+	$(LDADD) \
+	libopensteerplugins.la
 		

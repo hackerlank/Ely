@@ -1,16 +1,21 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include \
+	$(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-#ltlibraries
-pkglib_LTLIBRARIES = \
-		libobjectmodel.la
+LIBS = $(ELY_LIBS)
 
-#ltlibraries sources
-libobjectmodel_la_SOURCES = \
-		Component.cpp \
-		ComponentTemplate.cpp \
-		ComponentTemplateManager.cpp \
-		Object.cpp \
-		ObjectTemplate.cpp \
-		ObjectTemplateManager.cpp
+AUTOMAKE_OPTIONS = subdir-objects
+
+#convenience library
+noinst_LIBRARIES = \
+	libObjectModel.a
+
+#library sources
+libObjectModel_a_SOURCES = \
+	Component.cpp \
+	ComponentTemplate.cpp \
+	ComponentTemplateManager.cpp \
+	Object.cpp \
+	ObjectTemplate.cpp \
+	ObjectTemplateManager.cpp

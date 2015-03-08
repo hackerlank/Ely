@@ -1,17 +1,22 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include \
+	$(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-#ltlibraries
-pkglib_LTLIBRARIES = \
-		libgame.la
+LIBS = $(ELY_LIBS)
 
-#ltlibraries sources
-libgame_la_SOURCES = \
-		GameAIManager.cpp \
-		GameAudioManager.cpp \
-		GameBehaviorManager.cpp \
-		GameControlManager.cpp \
-		GameManager.cpp \
-		GamePhysicsManager.cpp \
-		GameSceneManager.cpp
+AUTOMAKE_OPTIONS = subdir-objects
+
+#convenience library
+noinst_LIBRARIES = \
+	libGame.a
+
+#library sources
+libGame_a_SOURCES = \
+	GameAIManager.cpp \
+	GameAudioManager.cpp \
+	GameBehaviorManager.cpp \
+	GameControlManager.cpp \
+	GameManager.cpp \
+	GamePhysicsManager.cpp \
+	GameSceneManager.cpp

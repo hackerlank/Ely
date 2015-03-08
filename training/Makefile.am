@@ -20,21 +20,21 @@ noinst_PROGRAMS = ely_training
 
 #ely_training
 nodist_ely_training_SOURCES = \
-		training.cpp \
-		raknet.cpp
-#		octree.cpp
-#		memory_pool.cpp
-#		memory_pool/MemoryPool.cpp
-#		generic_test.cpp
-#		ai.cpp
-#		anim.cpp
-#		network.cpp
-#		threads.cpp
-#		manual_example.cpp
-#		draw_geometry.cpp
-#		meshdrawer.cpp
-#		rocket.cpp
-#		render-to-texture.cpp
-#		physics.cpp
-#		test_wo_local_scale.cpp
+	training.cpp \
+	raknet.cpp
+#	octree.cpp
+#	memory_pool.cpp
+#	memory_pool/MemoryPool.cpp
+#	generic_test.cpp
+#	ai.cpp
+#	anim.cpp
+#	network.cpp
+#	threads.cpp
+#	manual_example.cpp
+#	draw_geometry.cpp
+#	meshdrawer.cpp
+#	rocket.cpp
+#	render-to-texture.cpp
+#	physics.cpp
+#	test_wo_local_scale.cpp
 		

@@ -6,14 +6,14 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 pkglib_LTLIBRARIES = instanceupdates.la
 instanceupdates_la_SOURCES = \
-		common_configs.cpp \
-		defs/Character_updt.cpp
+	common_configs.cpp \
+	defs/Character_updt.cpp
 
 noinst_HEADERS = \
-		common_configs.h
+	common_configs.h
 
 instanceupdates_la_LDFLAGS = -module -avoid-version \
-		$(AM_LDFLAGS)
+	$(AM_LDFLAGS)
 
 instanceupdates_la_LIBADD = \
-		$(ELY_LIBS)
+	$(ELY_LIBS)

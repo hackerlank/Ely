@@ -78,12 +78,12 @@ endif
 elygame_LDFLAGS = $(AM_LDFLAGS) -export-dynamic $(ldrpath)
 
 elygame_LDADD = \
-		-dlopen $(builddir)/callbacks/callbacks.la \
-		-dlopen $(builddir)/initializations/initializations.la \
-		-dlopen $(builddir)/instanceupdates/instanceupdates.la \
-		-dlopen $(builddir)/transitions/transitions.la \
-		$(elygame_ltlibraries) \
-		$(ELY_LIBS)
+	-dlopen $(builddir)/callbacks/callbacks.la \
+	-dlopen $(builddir)/initializations/initializations.la \
+	-dlopen $(builddir)/instanceupdates/instanceupdates.la \
+	-dlopen $(builddir)/transitions/transitions.la \
+	$(elygame_ltlibraries) \
+	$(ELY_LIBS)
 		
 dist_pkgdata_DATA = game.xml config.prc
 

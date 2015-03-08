@@ -1,12 +1,17 @@
-AM_CPPFLAGS = -iquote$(top_srcdir)/include -iquote$(top_srcdir)/include/Support/tinyxlm2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -iquote$(top_srcdir)/include \
+	$(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-#ltlibraries
-pkglib_LTLIBRARIES = \
-		libbehaviorcomponents.la
+LIBS = $(ELY_LIBS)
 
-#ltlibraries sources
-libbehaviorcomponents_la_SOURCES = \
-		Activity.cpp \
-		ActivityTemplate.cpp
+AUTOMAKE_OPTIONS = subdir-objects
+
+#convenience library
+noinst_LIBRARIES = \
+	libBehaviorComponents.a
+
+#library sources
+libBehaviorComponents_a_SOURCES = \
+	Activity.cpp \
+	ActivityTemplate.cpp
