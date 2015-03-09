@@ -36,7 +36,7 @@ struct BulletRayHit
 public:
 	inline static BulletRayHit empty();
 
-	PandaNode *get_node() const;
+	const PandaNode *get_node() const;
 	LPoint3 get_hit_pos() const;
 	LVector3 get_hit_normal() const;
 	PN_stdfloat get_hit_fraction() const;

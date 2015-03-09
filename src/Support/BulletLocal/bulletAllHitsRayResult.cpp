@@ -166,7 +166,7 @@ PN_stdfloat BulletRayHit::get_hit_fraction() const
 //       Access: Published
 //  Description:
 ////////////////////////////////////////////////////////////////////
-PandaNode *BulletRayHit::get_node() const
+const PandaNode *BulletRayHit::get_node() const
 {
 
 	return (_object) ? (PandaNode *) _object->getUserPointer() : NULL;

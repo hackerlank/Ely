@@ -27,7 +27,6 @@
 #include <event.h>
 #include <eventQueue.h>
 #include <eventParameter.h>
-#include <eventStorePandaNode.h>
 #include <pandaNode.h>
 
 namespace ely
@@ -82,8 +81,8 @@ static bool contact_added_callback(btManifoldPoint &cp,
 		{
 
 			Event *event = new Event("bullet-contact-added");
-			event->add_parameter(EventParameter(new EventStorePandaNode(node0)));
-			event->add_parameter(EventParameter(new EventStorePandaNode(node1)));
+			event->add_parameter(EventParameter(node0));
+			event->add_parameter(EventParameter(node1));
 
 			EventQueue::get_global_event_queue()->queue_event(event);
 		}
@@ -144,9 +143,9 @@ static bool contact_destroyed_callback(void *userPersistentData)
 
 		Event *event = new Event("bullet-contact-destroyed");
 		event->add_parameter(
-				EventParameter(new EventStorePandaNode(data->node0)));
+				EventParameter(EventParameter(data->node0)));
 		event->add_parameter(
-				EventParameter(new EventStorePandaNode(data->node1)));
+				EventParameter(EventParameter(data->node1)));
 
 		EventQueue::get_global_event_queue()->queue_event(event);
 	}

@@ -187,7 +187,7 @@ EIGEN_LIBS=""
 AC_MSG_CHECKING([for Panda3d libs])
 GET_LDFLAGS([p3framework], [panda3d])
 PANDA3D_LDFLAGS="${LDFLAGSFOUND}"
-PANDA3D_LIBS="-lp3framework -l$2"	
+PANDA3D_LIBS="-lp3framework -lXxf86dga -l$2"	
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3D_LIBS} ${LIBS_CMDLINE}"
 panda3d_prologue="

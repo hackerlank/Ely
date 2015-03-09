@@ -40,10 +40,10 @@ public:
 	inline BulletManifoldPoint &get_manifold_point();
 	inline PandaNode *get_node0() const;
 	inline PandaNode *get_node1() const;
-	inline const int get_idx0() const;
-	inline const int get_idx1() const;
-	inline const int get_part_id0() const;
-	inline const int get_part_id1() const;
+	inline int get_idx0() const;
+	inline int get_idx1() const;
+	inline int get_part_id0() const;
+	inline int get_part_id1() const;
 
 private:
 	static btManifoldPoint _empty;
@@ -145,7 +145,7 @@ inline BulletManifoldPoint &BulletContact::get_manifold_point()
 //       Access: Published
 //  Description:
 ////////////////////////////////////////////////////////////////////
-inline const int BulletContact::get_idx0() const
+inline int BulletContact::get_idx0() const
 {
 
 	return _idx0;
@@ -156,7 +156,7 @@ inline const int BulletContact::get_idx0() const
 //       Access: Published
 //  Description:
 ////////////////////////////////////////////////////////////////////
-inline const int BulletContact::get_idx1() const
+inline int BulletContact::get_idx1() const
 {
 
 	return _idx1;
@@ -167,7 +167,7 @@ inline const int BulletContact::get_idx1() const
 //       Access: Published
 //  Description:
 ////////////////////////////////////////////////////////////////////
-inline const int BulletContact::get_part_id0() const
+inline int BulletContact::get_part_id0() const
 {
 
 	return _part_id0;
@@ -178,7 +178,7 @@ inline const int BulletContact::get_part_id0() const
 //       Access: Published
 //  Description:
 ////////////////////////////////////////////////////////////////////
-inline const int BulletContact::get_part_id1() const
+inline int BulletContact::get_part_id1() const
 {
 
 	return _part_id1;
