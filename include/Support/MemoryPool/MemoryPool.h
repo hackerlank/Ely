@@ -39,6 +39,7 @@
 #ifndef MEMORYPOOL_H_
 #define MEMORYPOOL_H_
 
+#include "Utilities/Tools.h"
 #include <string>
 #include <iostream>
 

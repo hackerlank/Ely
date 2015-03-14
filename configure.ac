@@ -82,7 +82,7 @@ AS_IF(
 	[test "x${debug}" != xno],
 	[buildtype=${buildtype}"Debug"
 	AC_DEFINE([ELY_DEBUG],[1],[debug mode enabled])
-	ELY_CXXFLAGS="-O0 -g3 -Wall -fmessage-length=0"],
+	ELY_CXXFLAGS="-O0 -g3 -Wall -Wno-reorder -fmessage-length=0"],
 		#Release
 	[buildtype=${buildtype}"Release"
 	AC_DEFINE([ELY_RELEASE],[1],[release mode enabled])
