@@ -21,7 +21,8 @@ noinst_PROGRAMS = ely_training
 #ely_training
 nodist_ely_training_SOURCES = \
 	training.cpp \
-	raknet.cpp
+	terrain_sample.cpp
+#	raknet.cpp
 #	octree.cpp
 #	memory_pool.cpp
 #	memory_pool/MemoryPool.cpp
@@ -36,5 +37,4 @@ nodist_ely_training_SOURCES = \
 #	rocket.cpp
 #	render-to-texture.cpp
 #	physics.cpp
-#	test_wo_local_scale.cpp
 		

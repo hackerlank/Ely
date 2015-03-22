@@ -53,7 +53,7 @@ const bool bruteForce = true;
 //const GeoMipTerrain::AutoFlattenMode mFlattenMode = GeoMipTerrain::AFM_off;
 //const bool mDoScale = true;
 
-int physics_main(int argc, char **argv)
+int terrain_sample(int argc, char **argv)
 {
 	///setup
 	// Load your configuration

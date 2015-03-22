@@ -6,13 +6,13 @@
 //int threads_main(int argc, char **argv);
 //int manual_example_main(int argc, char **argv);
 //int draw_geometry_main(int argc, char **argv);
-//int test_wo_local_scale(int argc, char **argv);
+int terrain_sample(int argc, char **argv);
 //int meshdrawer_main(int argc, char **argv);
 //int rocket_main(int argc, char **argv);
 //int render_to_texture_main(int argc, char **argv);
 //int memory_pool_main(int argc, char **argv);
 //int octree_main(int argc, char **argv);
-int raknet_main(int argc, char *argv[]);
+//int raknet_main(int argc, char *argv[]);
 
 int main(int argc, char **argv)
 {
@@ -25,12 +25,12 @@ int main(int argc, char **argv)
 //	result = threads_main(argc, argv);
 //	result = manual_example_main(argc, argv);
 //	result = draw_geometry_main(argc, argv);
-//	result = test_wo_local_scale(argc, argv);
+	result = terrain_sample(argc, argv);
 //	result = meshdrawer_main(argc, argv);
 //	result = rocket_main(argc, argv);
 //	result = render_to_texture_main(argc, argv);
 //	result = memory_pool_main(argc, argv);
 //	result = octree_main(argc, argv);
-	result = raknet_main(argc, argv);
+//	result = raknet_main(argc, argv);
 	return result;
 }
