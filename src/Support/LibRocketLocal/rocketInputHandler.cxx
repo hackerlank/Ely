@@ -43,7 +43,6 @@ RocketInputHandler(const string &name) :
 {
   _pixel_xy_input = define_input("pixel_xy", EventStoreVec2::get_class_type());
   _button_events_input = define_input("button_events", ButtonEventList::get_class_type());
-  _mouse_xy_changed = false;
 }
 
 ////////////////////////////////////////////////////////////////////
@@ -148,7 +147,7 @@ get_rocket_key(const ButtonHandle handle) {
 void RocketInputHandler::
 do_transmit_data(DataGraphTraverser *trav, const DataNodeTransmit &input,
                  DataNodeTransmit &output) {
-//  Thread *current_thread = trav->get_current_thread();
+  Thread *current_thread = trav->get_current_thread();
   MutexHolder holder(_lock);
 
   if (input.has_data(_pixel_xy_input)) {
