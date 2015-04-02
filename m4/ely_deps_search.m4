@@ -12,7 +12,7 @@
 #	Bullet (BULLET_)
 #	libRocket (ROCKET_)
 #	OpenSteer (OPENSTEER_)
-#	RecastNavigation (_RECAST)
+#	RecastNavigation (RECAST_)
 #	Panda3d (PANDA3D_) 
 #
 
@@ -187,7 +187,8 @@ EIGEN_LIBS=""
 AC_MSG_CHECKING([for Panda3d libs])
 GET_LDFLAGS([p3framework], [panda3d])
 PANDA3D_LDFLAGS="${LDFLAGSFOUND}"
-PANDA3D_LIBS="-lp3framework -lp3pystub -lXxf86dga -l$2"	
+PANDA3D_LIBS="-lp3framework -lpanda -lpandaexpress -lp3dtool \
+-lp3dtoolconfig -lp3pystub -lXxf86dga -l$2"	
 LDFLAGS="${PANDA3D_LDFLAGS} ${LDFLAGS_CMDLINE}"
 LIBS="${PANDA3D_LIBS} ${LIBS_CMDLINE}"
 panda3d_prologue="

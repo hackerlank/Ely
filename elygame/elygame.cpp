@@ -255,3 +255,10 @@ AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data)
 	return AsyncTask::DS_cont;
 }
 #endif
+
+//explicit instantiations
+template class PointerToArrayBase<PointerTo<AsyncTask> >;
+template class PointerToBase<ReferenceCountedVector<PointerTo<AsyncTask> > >;
+template TypeHandle _get_type_handle<ReferenceCountedVector<PointerTo<AsyncTask> > >(ReferenceCountedVector<PointerTo<AsyncTask> > const*);
+template void _do_init_type<ReferenceCountedVector<PointerTo<AsyncTask> > >(ReferenceCountedVector<PointerTo<AsyncTask> > const*);
+template void unref_delete<ReferenceCountedVector<PointerTo<AsyncTask> > >(ReferenceCountedVector<PointerTo<AsyncTask> >*);
