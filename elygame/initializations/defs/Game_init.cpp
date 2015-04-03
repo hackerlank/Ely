@@ -43,17 +43,6 @@ INITIALIZATION elyPostObjects_initialization;
 #endif
 
 //globals
-Rocket::Core::Context *gRocketContext;
-Rocket::Core::ElementDocument *gRocketMainMenu;
-//registered by subsystems to add their element (tags) to main menu
-std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
-//registered by subsystems to handle their events
-std::map<Rocket::Core::String,
-		void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> gRocketEventHandlers;
-//registered by some subsystems that need to preset themselves before main/exit menus are shown
-std::vector<void (*)()> gRocketPresetFunctions;
-//registered by some subsystems that need to commit their changes after main/exit menus are closed
-std::vector<void (*)()> gRocketCommitFunctions;
 std::string rocketBaseDir(ELY_DATADIR);
 //common text writing
 void writeText(NodePath& textNode, const std::string& text, float scale, const LVecBase4& color,
@@ -161,15 +150,15 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	{
 		//call all registered commit functions
 		std::vector<void (*)()>::iterator iter;
-		for (iter = gRocketCommitFunctions.begin();
-				iter != gRocketCommitFunctions.end(); ++iter)
+		for (iter = GameManager::gRocketCommitFunctions.begin();
+				iter != GameManager::gRocketCommitFunctions.end(); ++iter)
 		{
 			(*iter)();
 		}
 		//presets & commits are not being executed by main menu any more
 		mainPresetsCommits = false;
 		//close (i.e. unload) the main document and set as closed..
-		gRocketMainMenu->Close();
+		GameManager::gRocketMainMenu->Close();
 	}
 	else if (mValue == "main::button::exit")
 	{
@@ -186,7 +175,7 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 		if (paramValue == "ok")
 		{
 			//user wants to exit: unload all documents
-			gRocketContext->UnloadAllDocuments();
+			GameManager::gRocketContext->UnloadAllDocuments();
 			//set PandaFramework exit flag
 			mFramework->set_exit_flag();
 		}
@@ -195,8 +184,8 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 		{
 			//call all registered commit functions
 			std::vector<void (*)()>::iterator iter;
-			for (iter = gRocketCommitFunctions.begin();
-					iter != gRocketCommitFunctions.end(); ++iter)
+			for (iter = GameManager::gRocketCommitFunctions.begin();
+					iter != GameManager::gRocketCommitFunctions.end(); ++iter)
 			{
 				(*iter)();
 			}
@@ -205,10 +194,10 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 	else
 	{
 		//check if it is a registered event name
-		if (gRocketEventHandlers.find(mValue) != gRocketEventHandlers.end())
+		if (GameManager::gRocketEventHandlers.find(mValue) != GameManager::gRocketEventHandlers.end())
 		{
 			//call the registered event handler
-			gRocketEventHandlers[mValue](mValue, event);
+			GameManager::gRocketEventHandlers[mValue](mValue, event);
 		}
 	}
 }
@@ -216,13 +205,13 @@ void MainEventListener::ProcessEvent(Rocket::Core::Event& event)
 void showMainMenu(const Event* e)
 {
 	//return if already shown or we are asking to exit
-	RETURN_ON_COND(gRocketContext->GetDocument("main_menu") or
-			gRocketContext->GetDocument("exit_menu"),)
+	RETURN_ON_COND(GameManager::gRocketContext->GetDocument("main_menu") or
+			GameManager::gRocketContext->GetDocument("exit_menu"),)
 
 	//call all registered preset functions
 	std::vector<void (*)()>::iterator iter;
-	for (iter = gRocketPresetFunctions.begin();
-			iter != gRocketPresetFunctions.end(); ++iter)
+	for (iter = GameManager::gRocketPresetFunctions.begin();
+			iter != GameManager::gRocketPresetFunctions.end(); ++iter)
 	{
 		(*iter)();
 	}
@@ -230,43 +219,43 @@ void showMainMenu(const Event* e)
 	mainPresetsCommits = true;
 
 	// Load and show the main document.
-	gRocketMainMenu = gRocketContext->LoadDocument(
+	GameManager::gRocketMainMenu = GameManager::gRocketContext->LoadDocument(
 			(rocketBaseDir + "misc/ely-main-menu.rml").c_str());
-	if (gRocketMainMenu != NULL)
+	if (GameManager::gRocketMainMenu != NULL)
 	{
-		gRocketMainMenu->GetElementById("title")->SetInnerRML(
-				gRocketMainMenu->GetTitle());
+		GameManager::gRocketMainMenu->GetElementById("title")->SetInnerRML(
+				GameManager::gRocketMainMenu->GetTitle());
 		//call all registered add elements functions
 		std::vector<void (*)(Rocket::Core::ElementDocument *)>::iterator iter;
-		for (iter = gRocketAddElementsFunctions.begin();
-				iter != gRocketAddElementsFunctions.end(); ++iter)
+		for (iter = GameManager::gRocketAddElementsFunctions.begin();
+				iter != GameManager::gRocketAddElementsFunctions.end(); ++iter)
 		{
-			(*iter)(gRocketMainMenu);
+			(*iter)(GameManager::gRocketMainMenu);
 		}
-		gRocketMainMenu->Show();
-		gRocketMainMenu->RemoveReference();
+		GameManager::gRocketMainMenu->Show();
+		GameManager::gRocketMainMenu->RemoveReference();
 	}
 }
 
 void showExitMenu(const Event* e)
 {
 	//return if we are already asking to exit
-	RETURN_ON_COND(gRocketContext->GetDocument("exit_menu"),)
+	RETURN_ON_COND(GameManager::gRocketContext->GetDocument("exit_menu"),)
 
 	//if presets & commits are not being executed by main menu
 	if (not mainPresetsCommits)
 	{
 		//call all registered preset functions
 		std::vector<void (*)()>::iterator iter;
-		for (iter = gRocketPresetFunctions.begin();
-				iter != gRocketPresetFunctions.end(); ++iter)
+		for (iter = GameManager::gRocketPresetFunctions.begin();
+				iter != GameManager::gRocketPresetFunctions.end(); ++iter)
 		{
 			(*iter)();
 		}
 	}
 
 	// Load and show the exit menu modal document.
-	exitMenu = gRocketContext->LoadDocument(
+	exitMenu = GameManager::gRocketContext->LoadDocument(
 			(rocketBaseDir + "misc/ely-exit-menu.rml").c_str());
 	if (exitMenu != NULL)
 	{
@@ -317,7 +306,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	region->set_input_handler(inputHandler);
 
 	//set global context variable
-	gRocketContext = region->get_context();
+	GameManager::gRocketContext = region->get_context();
 
 	//initialize controls
 	Rocket::Controls::Initialise();
@@ -329,7 +318,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	eventListenerInstancer->RemoveReference();
 
 #ifdef ELY_DEBUG
-	Rocket::Debugger::Initialise(gRocketContext);
+	Rocket::Debugger::Initialise(GameManager::gRocketContext);
 	Rocket::Debugger::SetVisible(true);
 #endif
 }

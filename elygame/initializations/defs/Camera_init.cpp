@@ -22,7 +22,10 @@
  */
 
 #include "../common_configs.h"
+#include <Rocket/Core.h>
+#include <Rocket/Controls.h>
 #include "Game_init.h"
+#include "Game/GameManager.h"
 #include "ControlComponents/Driver.h"
 #include "ControlComponents/Chaser.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -147,10 +150,10 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	if (value == "camera::options")
 	{
 		//hide main menu
-		gRocketMainMenu->Hide();
+		GameManager::gRocketMainMenu->Hide();
 		// Load and show the camera options document.
 		Rocket::Core::ElementDocument *cameraOptionsMenu =
-				gRocketContext->LoadDocument(
+				GameManager::gRocketContext->LoadDocument(
 						(rocketBaseDir + "misc/ely-camera-options.rml").c_str());
 		if (cameraOptionsMenu != NULL)
 		{
@@ -539,7 +542,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				event.GetTargetElement()->GetOwnerDocument();
 		cameraOptionsMenu->Close();
 		//return to main menu.
-		gRocketMainMenu->Show();
+		GameManager::gRocketMainMenu->Show();
 	}
 }
 
@@ -719,19 +722,19 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	ObjectId("cameraChaserTmp"));
 
 	//register the add element function to (Rocket) main menu
-	gRocketAddElementsFunctions.push_back(&rocketAddElements);
+	GameManager::gRocketAddElementsFunctions.push_back(&rocketAddElements);
 	//register the event handler to main menu for each event value
-	gRocketEventHandlers["camera::options"] = &rocketEventHandler;
-	gRocketEventHandlers["camera::body::load_logo"] = &rocketEventHandler;
-	gRocketEventHandlers["camera::form::submit_options"] = &rocketEventHandler;
-	gRocketEventHandlers["camera::free_view_camera::options"] = &rocketEventHandler;
-	gRocketEventHandlers["camera::chaser_camera::options"] = &rocketEventHandler;
-	gRocketEventHandlers["camera::object_picker::options"] = &rocketEventHandler;
-	gRocketEventHandlers["pitch_limit::change"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["camera::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["camera::body::load_logo"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["camera::form::submit_options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["camera::free_view_camera::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["camera::chaser_camera::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["camera::object_picker::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["pitch_limit::change"] = &rocketEventHandler;
 	//register the preset function to main menu
-	gRocketPresetFunctions.push_back(&rocketPreset);
+	GameManager::gRocketPresetFunctions.push_back(&rocketPreset);
 	//register the commit function to main menu
-	gRocketCommitFunctions.push_back(&rocketCommit);
+	GameManager::gRocketCommitFunctions.push_back(&rocketCommit);
 }
 
 void Camera_initInit()

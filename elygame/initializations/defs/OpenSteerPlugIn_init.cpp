@@ -204,10 +204,10 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	if (value == "steerPlugIn::options")
 	{
 		//hide main menu
-		gRocketMainMenu->Hide();
+		GameManager::gRocketMainMenu->Hide();
 		// Load and show the camera options document.
 		Rocket::Core::ElementDocument *steerPlugInOptionsMenu =
-				gRocketContext->LoadDocument(
+				GameManager::gRocketContext->LoadDocument(
 						(rocketBaseDir + "misc/ely-steerPlugIn-options.rml").c_str());
 		if (steerPlugInOptionsMenu != NULL)
 		{
@@ -747,7 +747,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				event.GetTargetElement()->GetOwnerDocument();
 		steerPlugInOptionsMenu->Close();
 		//return to main menu.
-		gRocketMainMenu->Show();
+		GameManager::gRocketMainMenu->Show();
 	}
 }
 
@@ -1373,17 +1373,17 @@ void rocketInitOnce()
 
 	//libRocket initialization
 	//register the add element function to (Rocket) main menu
-	gRocketAddElementsFunctions.push_back(&rocketAddElements);
+	GameManager::gRocketAddElementsFunctions.push_back(&rocketAddElements);
 	//register the event handler to main menu for each event value
-	gRocketEventHandlers["steerPlugIn::options"] = &rocketEventHandler;
-	gRocketEventHandlers["steerPlugIn::body::load_logo"] = &rocketEventHandler;
-	gRocketEventHandlers["add_key::change"] = &rocketEventHandler;
-	gRocketEventHandlers["steerPlugIn::form::submit_options"] =
+	GameManager::gRocketEventHandlers["steerPlugIn::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["steerPlugIn::body::load_logo"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["add_key::change"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["steerPlugIn::form::submit_options"] =
 			&rocketEventHandler;
 	//register the preset function to main menu
-	gRocketPresetFunctions.push_back(&rocketPreset);
+	GameManager::gRocketPresetFunctions.push_back(&rocketPreset);
 	//register the commit function to main menu
-	gRocketCommitFunctions.push_back(&rocketCommit);
+	GameManager::gRocketCommitFunctions.push_back(&rocketCommit);
 	//flag rocket initialized
 	rocketInitialized = true;
 }
@@ -1448,9 +1448,9 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[multiple_pursuit] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	gRocketEventHandlers["steerPlugIn::multiple_pursuit::options"] =
+	GameManager::gRocketEventHandlers["steerPlugIn::multiple_pursuit::options"] =
 	&rocketEventHandler;
-	gRocketCommitFunctions.push_back(&rocketMultiplePursuitCommit);
+	GameManager::gRocketCommitFunctions.push_back(&rocketMultiplePursuitCommit);
 }
 
 ///steerPlugInSoccer1
@@ -1474,7 +1474,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[soccer] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	gRocketEventHandlers["steerPlugIn::soccer::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["steerPlugIn::soccer::options"] = &rocketEventHandler;
 }
 
 ///steerPlugInCtf1
@@ -1507,12 +1507,12 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[capture_the_flag] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	gRocketEventHandlers["steerPlugIn::capture_the_flag::options"] = &rocketEventHandler;
-	gRocketEventHandlers["min_start_radius::change"] = &rocketEventHandler;
-	gRocketEventHandlers["max_start_radius::change"] = &rocketEventHandler;
-	gRocketEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
-	gRocketEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
-	gRocketCommitFunctions.push_back(&rocketCaptureTheFlagCommit);
+	GameManager::gRocketEventHandlers["steerPlugIn::capture_the_flag::options"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["min_start_radius::change"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["max_start_radius::change"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
+	GameManager::gRocketEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
+	GameManager::gRocketCommitFunctions.push_back(&rocketCaptureTheFlagCommit);
 }
 
 ///steerPlugInLST1_initialization
@@ -1531,8 +1531,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[low_speed_turn] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	gRocketEventHandlers["steerPlugIn::low_speed_turn::options"] = &rocketEventHandler;
-	gRocketCommitFunctions.push_back(&rocketLowSpeedTurnCommit);
+	GameManager::gRocketEventHandlers["steerPlugIn::low_speed_turn::options"] = &rocketEventHandler;
+	GameManager::gRocketCommitFunctions.push_back(&rocketLowSpeedTurnCommit);
 }
 
 ///steerPlugInMapDrive1_initialization
@@ -1605,8 +1605,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	gRocketEventHandlers["steerPlugIn::map_drive::options"] = &rocketEventHandler;
-	gRocketCommitFunctions.push_back(&rocketMapDriveCommit);
+	GameManager::gRocketEventHandlers["steerPlugIn::map_drive::options"] = &rocketEventHandler;
+	GameManager::gRocketCommitFunctions.push_back(&rocketMapDriveCommit);
 }
 
 ///steerVehicleToBeCloned_init

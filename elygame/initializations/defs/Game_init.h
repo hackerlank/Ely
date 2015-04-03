@@ -25,17 +25,8 @@
 #define GAME_INIT_H_
 
 #include "elygame_ini.h"
-#include <Rocket/Core.h>
-#include <Rocket/Controls.h>
 
 //(Rocket) externs
-extern Rocket::Core::Context *gRocketContext;
-extern Rocket::Core::ElementDocument *gRocketMainMenu;
-extern std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
-extern std::map<Rocket::Core::String,
-		void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> gRocketEventHandlers;
-extern std::vector<void (*)()> gRocketPresetFunctions;
-extern std::vector<void (*)()> gRocketCommitFunctions;
 extern std::string rocketBaseDir;
 //utilities
 void writeText(NodePath& textNode, const std::string& text, float scale, const LVecBase4& color,

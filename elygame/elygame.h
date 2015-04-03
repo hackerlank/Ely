@@ -25,7 +25,6 @@
 #define ELYGAME_H_
 
 #include <load_prc_file.h>
-#include <Rocket/Core.h>
 #include "Game/GameManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GameAudioManager.h"
@@ -61,92 +60,5 @@ extern unsigned long int completedAllMask;
 extern const unsigned long int exiting;
 AsyncTask::DoneStatus fireManagers(GenericAsyncTask* task, void * data);
 #endif
-
-///Common ely definitions
-namespace ely
-{
-
-/**
- * \brief Abstract class interface for libRocket event listeners.
- *
- * A concrete derived class must implement:
- * \code
- * virtual void ProcessEvent(Rocket::Core::Event& event);
- * \endcode
- */
-class EventListener: public Rocket::Core::EventListener,
-		Rocket::Core::ReferenceCountable
-{
-public:
-	EventListener(const Rocket::Core::String& value, PandaFramework* framework) :
-			Rocket::Core::ReferenceCountable(0), mValue(value), mFramework(
-					framework)
-	{
-		PRINT_DEBUG(
-				"Creating EventListener: " << mValue.CString() << " " << this);
-	}
-	virtual ~EventListener()
-	{
-		PRINT_DEBUG(
-				"Destroying EventListener: " << mValue.CString() << " " << this);
-	}
-
-	virtual void OnAttach(Rocket::Core::Element* ROCKET_UNUSED(element))
-	{
-		PRINT_DEBUG(
-				"Attaching EventListener: " << mValue.CString() << " " << this);
-		AddReference();
-	}
-
-	virtual void OnDetach(Rocket::Core::Element* ROCKET_UNUSED(element))
-	{
-		PRINT_DEBUG(
-				"Detaching EventListener: " << mValue.CString() << " " << this);
-		RemoveReference();
-	}
-
-protected:
-	virtual void OnReferenceDeactivate()
-	{
-		delete this;
-	}
-
-	Rocket::Core::String mValue;
-	PandaFramework* mFramework;
-};
-
-/**
- * \brief Abstract class interface for libRocket event listener instancers.
- *
- * A concrete derived class must implement:
- * \code
- * virtual Rocket::Core::EventListener* InstanceEventListener(
- const Rocket::Core::String& value, Rocket::Core::Element* element);
- * \endcode
- * This interface is designed so that method would create a ely::EventListener
- * derived class.\n
- */
-class EventListenerInstancer: public Rocket::Core::EventListenerInstancer
-{
-public:
-	EventListenerInstancer(PandaFramework* framework) :
-			mFramework(framework)
-	{
-		PRINT_DEBUG("Creating EventListenerInstancer " << " " << this);
-	}
-	virtual ~EventListenerInstancer()
-	{
-		PRINT_DEBUG("Destroying EventListenerInstancer " << " " << this);
-	}
-
-	virtual void Release()
-	{
-		delete this;
-	}
-
-protected:
-	PandaFramework* mFramework;
-};
-}
 
 #endif /* ELYGAME_H_ */

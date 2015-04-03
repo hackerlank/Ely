@@ -439,11 +439,11 @@
 		</configuration>
 		<configuration configurationName="Devel_Debug_Thread"/>
 		<configuration configurationName="Devel_Debug"/>
-		<configuration configurationName="Build (GNU)"/>
+		<configuration configurationName="InitializationsLib"/>
 		<configuration configurationName="Release-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="InitializationsLib"/>
+		<configuration configurationName="Build (GNU)"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
