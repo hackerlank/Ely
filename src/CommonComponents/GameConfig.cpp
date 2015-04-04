@@ -24,6 +24,7 @@
 #include "CommonComponents/GameConfig.h"
 #include "CommonComponents/GameConfigTemplate.h"
 #include "ObjectModel/Object.h"
+#include "Game/GameGUIManager.h"
 #include "Game/GamePhysicsManager.h"
 
 namespace ely
@@ -57,6 +58,12 @@ ComponentType GameConfig::componentType() const
 bool GameConfig::initialize()
 {
 	bool result = true;
+	//gui main menu
+	mGuiMainMenuParam = mTmpl->parameter(std::string("gui_main_menu"));
+	//gui exit menu
+	mGuiExitMenuParam = mTmpl->parameter(std::string("gui_exit_menu"));
+	//gui font paths
+	mGuiFontPathListParam = mTmpl->parameterList(std::string("gui_font_paths"));
 	//thrown events
 	mThrownEventsParam = mTmpl->parameter(std::string("thrown_events"));
 	//
@@ -65,10 +72,40 @@ bool GameConfig::initialize()
 
 void GameConfig::onAddToObjectSetup()
 {
+	//gui main menu if any
+	if (not mGuiMainMenuParam.empty())
+	{
+		GameGUIManager::GetSingletonPtr()->gGuiMainMenuPath = mGuiMainMenuParam;
+	}
+	//gui exit menu if any
+	if (not mGuiExitMenuParam.empty())
+	{
+		GameGUIManager::GetSingletonPtr()->gGuiExitMenuPath = mGuiExitMenuParam;
+	}
+	//set gui font paths if any
+	std::list<std::string>::iterator iter;
+	for (iter = mGuiFontPathListParam.begin();
+			iter != mGuiFontPathListParam.end(); ++iter)
+	{
+		//any "font_path" string is a "compound" one, i.e. could have the form:
+		// "font_path1[:font_path2:...:font_pathN]"
+		std::vector<std::string> fontPaths = parseCompoundString(*iter, ':');
+		std::vector<std::string>::const_iterator iterPath;
+		for (iterPath = fontPaths.begin(); iterPath != fontPaths.end();
+				++iterPath)
+		{
+			//an empty font_path is ignored
+			if (not iterPath->empty())
+			{
+				GameGUIManager::GetSingletonPtr()->gGuiFontPaths.push_back(
+						*iterPath);
+			}
+		}
+	}
 	//set thrown events if any
 	unsigned int idx1, valueNum1;
 	std::vector<std::string> paramValuesStr1, paramValuesStr2;
-	if (mThrownEventsParam != std::string(""))
+	if (not mThrownEventsParam.empty())
 	{
 		//events specified
 		//event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]
@@ -103,7 +140,8 @@ void GameConfig::onAddToObjectSetup()
 					eventData.mTimeElapsed = 0;
 					eventData.mFrequency = frequency;
 					//enable the event
-					GamePhysicsManager::GetSingletonPtr()->enableCollisionNotify(event, eventData);
+					GamePhysicsManager::GetSingletonPtr()->enableCollisionNotify(
+							event, eventData);
 				}
 				else
 				{

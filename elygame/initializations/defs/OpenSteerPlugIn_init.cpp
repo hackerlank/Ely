@@ -35,6 +35,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "SceneComponents/Terrain.h"
 #include "Game/GameManager.h"
+#include "Game/GameGUIManager.h"
 #include "Game/GamePhysicsManager.h"
 #include "Support/Raycaster.h"
 #include <orthographicLens.h>
@@ -204,10 +205,10 @@ void rocketEventHandler(const Rocket::Core::String& value,
 	if (value == "steerPlugIn::options")
 	{
 		//hide main menu
-		GameManager::gRocketMainMenu->Hide();
+		GameGUIManager::GetSingletonPtr()->gGuiMainMenu->Hide();
 		// Load and show the camera options document.
 		Rocket::Core::ElementDocument *steerPlugInOptionsMenu =
-				GameManager::gRocketContext->LoadDocument(
+				GameGUIManager::GetSingletonPtr()->gGuiRocketContext->LoadDocument(
 						(rocketBaseDir + "misc/ely-steerPlugIn-options.rml").c_str());
 		if (steerPlugInOptionsMenu != NULL)
 		{
@@ -747,7 +748,7 @@ void rocketEventHandler(const Rocket::Core::String& value,
 				event.GetTargetElement()->GetOwnerDocument();
 		steerPlugInOptionsMenu->Close();
 		//return to main menu.
-		GameManager::gRocketMainMenu->Show();
+		GameGUIManager::GetSingletonPtr()->gGuiMainMenu->Show();
 	}
 }
 
@@ -1373,17 +1374,23 @@ void rocketInitOnce()
 
 	//libRocket initialization
 	//register the add element function to (Rocket) main menu
-	GameManager::gRocketAddElementsFunctions.push_back(&rocketAddElements);
+	GameGUIManager::GetSingletonPtr()->gGuiAddElementsFunctions.push_back(
+			&rocketAddElements);
 	//register the event handler to main menu for each event value
-	GameManager::gRocketEventHandlers["steerPlugIn::options"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["steerPlugIn::body::load_logo"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["add_key::change"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["steerPlugIn::form::submit_options"] =
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::options"] =
+			&rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::body::load_logo"] =
+			&rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["add_key::change"] =
+			&rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::form::submit_options"] =
 			&rocketEventHandler;
 	//register the preset function to main menu
-	GameManager::gRocketPresetFunctions.push_back(&rocketPreset);
+	GameGUIManager::GetSingletonPtr()->gGuiPresetFunctions.push_back(
+			&rocketPreset);
 	//register the commit function to main menu
-	GameManager::gRocketCommitFunctions.push_back(&rocketCommit);
+	GameGUIManager::GetSingletonPtr()->gGuiCommitFunctions.push_back(
+			&rocketCommit);
 	//flag rocket initialized
 	rocketInitialized = true;
 }
@@ -1448,9 +1455,9 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[multiple_pursuit] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	GameManager::gRocketEventHandlers["steerPlugIn::multiple_pursuit::options"] =
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::multiple_pursuit::options"] =
 	&rocketEventHandler;
-	GameManager::gRocketCommitFunctions.push_back(&rocketMultiplePursuitCommit);
+	GameGUIManager::GetSingletonPtr()->gGuiCommitFunctions.push_back(&rocketMultiplePursuitCommit);
 }
 
 ///steerPlugInSoccer1
@@ -1474,7 +1481,7 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[soccer] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	GameManager::gRocketEventHandlers["steerPlugIn::soccer::options"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::soccer::options"] = &rocketEventHandler;
 }
 
 ///steerPlugInCtf1
@@ -1507,12 +1514,12 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[capture_the_flag] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	GameManager::gRocketEventHandlers["steerPlugIn::capture_the_flag::options"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["min_start_radius::change"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["max_start_radius::change"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
-	GameManager::gRocketEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
-	GameManager::gRocketCommitFunctions.push_back(&rocketCaptureTheFlagCommit);
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::capture_the_flag::options"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["min_start_radius::change"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["max_start_radius::change"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["avoidance_predict_time_min::change"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["avoidance_predict_time_max::change"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiCommitFunctions.push_back(&rocketCaptureTheFlagCommit);
 }
 
 ///steerPlugInLST1_initialization
@@ -1531,8 +1538,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[low_speed_turn] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	GameManager::gRocketEventHandlers["steerPlugIn::low_speed_turn::options"] = &rocketEventHandler;
-	GameManager::gRocketCommitFunctions.push_back(&rocketLowSpeedTurnCommit);
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::low_speed_turn::options"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiCommitFunctions.push_back(&rocketLowSpeedTurnCommit);
 }
 
 ///steerPlugInMapDrive1_initialization
@@ -1605,8 +1612,8 @@ PandaFramework* pandaFramework, WindowFramework* windowFramework)
 	steerPlugIns[map_drive] = DCAST(SteerPlugIn, aiComp);
 	rocketInitOnce();
 	//custom setup
-	GameManager::gRocketEventHandlers["steerPlugIn::map_drive::options"] = &rocketEventHandler;
-	GameManager::gRocketCommitFunctions.push_back(&rocketMapDriveCommit);
+	GameGUIManager::GetSingletonPtr()->gGuiEventHandlers["steerPlugIn::map_drive::options"] = &rocketEventHandler;
+	GameGUIManager::GetSingletonPtr()->gGuiCommitFunctions.push_back(&rocketMapDriveCommit);
 }
 
 ///steerVehicleToBeCloned_init

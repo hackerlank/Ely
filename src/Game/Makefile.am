@@ -17,6 +17,7 @@ libGame_la_SOURCES = \
 	GameAudioManager.cpp \
 	GameBehaviorManager.cpp \
 	GameControlManager.cpp \
+	GameGUIManager.cpp \
 	GameManager.cpp \
 	GamePhysicsManager.cpp \
 	GameSceneManager.cpp

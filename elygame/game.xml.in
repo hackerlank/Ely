@@ -1240,6 +1240,10 @@
 				<Param events="overlap@Car_GhostObject_Overlap:overlap_off@Car_GhostObject_OverlapOff$carGhostOverlap"/>
 				<Param events="car_character_collision@Car_Character_Collision:car_character_collision_off@Car_Character_CollisionOff$notifyCollisions"/>
 				<Param events="actor_car_collision@Actor_Car_Collision:actor_car_collision_off@Actor_Car_CollisionOff$notifyCollisions"/>
+				<Param gui_main_menu="@elygamedatadir@/misc/ely-main-menu.rml"/>
+				<Param gui_exit_menu="@elygamedatadir@/misc/ely-exit-menu.rml"/>
+				<Param gui_font_paths="@elygamedatadir@/misc/Delicious-Roman.otf:@elygamedatadir@/misc/Delicious-Italic.otf"/>
+				<Param gui_font_paths="@elygamedatadir@/misc/Delicious-Bold.otf:@elygamedatadir@/misc/Delicious-BoldItalic.otf"/>
 			</Component>
 		</Object>
 		<Object type="Game" id="elyPostObjects" priority="-500">

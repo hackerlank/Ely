@@ -27,7 +27,7 @@
 		</style>
 	</head>
 	<body id="exit_menu" template="window">
-		<form onsubmit="exit::form::submit_exit">
+		<form onsubmit="EXIT::SUBMIT_EXIT">
 			<div>
 				<p>
 					Do you really want to exit ?

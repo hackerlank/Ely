@@ -35,90 +35,6 @@ namespace ely
 {
 class FuncInterval;
 
-//libRocket stuff
-/**
- * \brief Abstract class interface for libRocket event listeners.
- *
- * A concrete derived class must implement:
- * \code
- * virtual void ProcessEvent(Rocket::Core::Event& event);
- * \endcode
- */
-class EventListener: public Rocket::Core::EventListener,
-		Rocket::Core::ReferenceCountable
-{
-public:
-	EventListener(const Rocket::Core::String& value, PandaFramework* framework) :
-			Rocket::Core::ReferenceCountable(0), mValue(value), mFramework(
-					framework)
-	{
-		PRINT_DEBUG(
-				"Creating EventListener: " << mValue.CString() << " " << this);
-	}
-	virtual ~EventListener()
-	{
-		PRINT_DEBUG(
-				"Destroying EventListener: " << mValue.CString() << " " << this);
-	}
-
-	virtual void OnAttach(Rocket::Core::Element* ROCKET_UNUSED(element))
-	{
-		PRINT_DEBUG(
-				"Attaching EventListener: " << mValue.CString() << " " << this);
-		AddReference();
-	}
-
-	virtual void OnDetach(Rocket::Core::Element* ROCKET_UNUSED(element))
-	{
-		PRINT_DEBUG(
-				"Detaching EventListener: " << mValue.CString() << " " << this);
-		RemoveReference();
-	}
-
-protected:
-	virtual void OnReferenceDeactivate()
-	{
-		delete this;
-	}
-
-	Rocket::Core::String mValue;
-	PandaFramework* mFramework;
-};
-
-/**
- * \brief Abstract class interface for libRocket event listener instancers.
- *
- * A concrete derived class must implement:
- * \code
- * virtual Rocket::Core::EventListener* InstanceEventListener(
- const Rocket::Core::String& value, Rocket::Core::Element* element);
- * \endcode
- * This interface is designed so that method would create a ely::EventListener
- * derived class.\n
- */
-class EventListenerInstancer: public Rocket::Core::EventListenerInstancer
-{
-public:
-	EventListenerInstancer(PandaFramework* framework) :
-			mFramework(framework)
-	{
-		PRINT_DEBUG("Creating EventListenerInstancer " << " " << this);
-	}
-	virtual ~EventListenerInstancer()
-	{
-		PRINT_DEBUG("Destroying EventListenerInstancer " << " " << this);
-	}
-
-	virtual void Release()
-	{
-		delete this;
-	}
-
-protected:
-	PandaFramework* mFramework;
-};
-
-
 /**
  * \brief GameManager.
  *
@@ -206,23 +122,6 @@ public:
 	};
 	void setDataInfo(GameDataInfo info, const std::string& value);
 	std::string getDataInfo(GameDataInfo info);
-	///@}
-
-	/**
-	 * \brief libRocket globals.
-	 */
-	///@{
-	static Rocket::Core::Context *gRocketContext;
-	static Rocket::Core::ElementDocument *gRocketMainMenu;
-	//registered by subsystems to add their element (tags) to main menu
-	static std::vector<void (*)(Rocket::Core::ElementDocument *)> gRocketAddElementsFunctions;
-	//registered by subsystems to handle their events
-	static std::map<Rocket::Core::String,
-			void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> gRocketEventHandlers;
-	//registered by some subsystems that need to preset themselves before main/exit menus are shown
-	static std::vector<void (*)()> gRocketPresetFunctions;
-	//registered by some subsystems that need to commit their changes after main/exit menus are closed
-	static std::vector<void (*)()> gRocketCommitFunctions;
 	///@}
 
 #ifdef ELY_THREAD

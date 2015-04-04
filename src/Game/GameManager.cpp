@@ -26,6 +26,7 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Utilities/ComponentSuite.h"
 #include "Support/tinyxlm2/tinyxml2.h"
+#include "Game/GameGUIManager.h"
 
 namespace ely
 {
@@ -95,6 +96,9 @@ void GameManager::gameSetup()
 
 	//create the game world (static definition)
 	createGameWorld(mInfoDB[CONFIGFILE]);
+
+	//gui system initialization
+	GameGUIManager::GetSingletonPtr()->guiSetup();
 
 	//play the game
 	GamePlay();
@@ -525,18 +529,5 @@ void GameManager::togglePhysicsDebug(const Event* event)
 	mPhysicsDebugEnabled = not mPhysicsDebugEnabled;
 }
 #endif
-
-//libRocket globals.
-Rocket::Core::Context *GameManager::gRocketContext;
-Rocket::Core::ElementDocument *GameManager::gRocketMainMenu;
-//registered by subsystems to add their element (tags) to main menu
-std::vector<void (*)(Rocket::Core::ElementDocument *)> GameManager::gRocketAddElementsFunctions;
-//registered by subsystems to handle their events
-std::map<Rocket::Core::String,
-		void (*)(const Rocket::Core::String&, Rocket::Core::Event&)> GameManager::gRocketEventHandlers;
-//registered by some subsystems that need to preset themselves before main/exit menus are shown
-std::vector<void (*)()> GameManager::gRocketPresetFunctions;
-//registered by some subsystems that need to commit their changes after main/exit menus are closed
-std::vector<void (*)()> GameManager::gRocketCommitFunctions;
 
 } // namespace ely

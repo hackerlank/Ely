@@ -24,6 +24,7 @@
 #ifndef GAMECONFIG_H_
 #define GAMECONFIG_H_
 
+#include <list>
 #include "ObjectModel/Component.h"
 
 namespace ely
@@ -46,6 +47,9 @@ class GameConfigTemplate;
  * param | type | default | note
  * ------|------|---------|-----
  * | *thrown_events* 			|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = collision_notify
+ * | *gui_main_menu* 			|single| - | -
+ * | *gui_exit_menu* 			|single| - | -
+ * | *gui_font_paths* 			|multiple| - | each one specified as "font_path1[:font_path2:...:font_pathN]"]
  *
  * \note parts inside [] are optional.\n
  */
@@ -71,6 +75,15 @@ public:
 	virtual ComponentType componentType() const;
 
 private:
+
+	/**
+	 * \name Gui font paths parameters.
+	 */
+	///@{
+	std::string mGuiMainMenuParam;
+	std::string mGuiExitMenuParam;
+	std::list<std::string> mGuiFontPathListParam;
+	///@}
 
 	/**
 	 * \name Throwing notify collision events.
@@ -111,6 +124,9 @@ private:
 inline void GameConfig::reset()
 {
 	//
+	mGuiMainMenuParam.clear();
+	mGuiExitMenuParam.clear();
+	mGuiFontPathListParam.clear();
 	mThrownEventsParam.clear();
 }
 

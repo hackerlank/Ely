@@ -49,6 +49,8 @@ int main(int argc, char **argv)
 	ObjectTemplateManager* objectTmplMgr = new ObjectTemplateManager();
 	// First create a Game manager: mandatory
 	GameManager* gameMgr = new GameManager(argc, argv);
+	// Then create a Game GUI manager
+	GameGUIManager* gameGUIMgr = new GameGUIManager();
 	// Add game data info
 	GameManager::GetSingletonPtr()->setDataInfo(GameManager::DATADIR,
 	ELY_DATADIR);
@@ -220,6 +222,7 @@ int main(int argc, char **argv)
 	delete gameSceneMgr;
 	delete gameControlMgr;
 	delete gameAIMgr;
+	delete gameGUIMgr;
 	delete gameMgr;
 	delete objectTmplMgr;
 	delete componentTmplMgr;

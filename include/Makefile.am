@@ -133,6 +133,7 @@ nobase_pkginclude_HEADERS = \
 	Game/GameAudioManager.h \
 	Game/GameBehaviorManager.h \
 	Game/GameControlManager.h \
+	Game/GameGUIManager.h \
 	Game/GameManager.h \
 	Game/GamePhysicsManager.h \
 	Game/GameSceneManager.h \

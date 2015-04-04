@@ -19,7 +19,7 @@
 		</style>
 	</head>
 	<body id="main_menu" template="window" onload="main::body::load_logo">
-		<button onclick="main::button::start_game">Start Game</button><br />
-		<button id="main::button::exit" onclick="main::button::exit">Exit</button>
+		<button onclick="MAIN::ENTER_GAME">Enter Game</button><br />
+		<button id="main::button::exit" onclick="MAIN::EXIT_GAME">Exit</button>
 	</body>
 </rml>

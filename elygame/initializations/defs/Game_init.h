@@ -28,6 +28,7 @@
 
 //(Rocket) externs
 extern std::string rocketBaseDir;
+
 //utilities
 void writeText(NodePath& textNode, const std::string& text, float scale, const LVecBase4& color,
 		const LVector3f& location);
