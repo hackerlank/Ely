@@ -1,9 +1,10 @@
-XML Parameters separators
-"," -> Object, CrowdAgent, Sound3d, Activity, SoftBody, Vehicle, InstanceOf, Model
-"@" -> Component, NavMesh, Sound3d, Activity, Model
-"$" -> Component, Activity, Vehicle
-":" -> Component, Sound3d, Activity, Model, NavMesh
+**XML Parameters separators:
+":" -> used to separate multiple elements on the same line (ex. texture1:texture2:...)
+"@" -> used to correspond concrete values to more abstract elements (ex. evTypeN@evValueN)
+"$" -> used to separate an optional element (ex. evTypeN@evValueN]$[callbackName])
+"," -> used to separate generic options
 
+**XML parameters types:
 -A parameter is "compound" when it is composed by substrings separated by ":".
--A parameter is "single" when can be specified once.
--A parameter is "multiple" when can be specified many times.
+-A parameter is "single" when can be specified only once.
+-A parameter is "multiple" when can be specified more than once.
