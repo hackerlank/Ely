@@ -12,7 +12,6 @@
 //int render_to_texture_main(int argc, char **argv);
 //int memory_pool_main(int argc, char **argv);
 //int octree_main(int argc, char **argv);
-int raknet_main(int argc, char *argv[]);
 
 int main(int argc, char **argv)
 {
@@ -31,6 +30,5 @@ int main(int argc, char **argv)
 //	result = render_to_texture_main(argc, argv);
 //	result = memory_pool_main(argc, argv);
 //	result = octree_main(argc, argv);
-	result = raknet_main(argc, argv);
 	return result;
 }

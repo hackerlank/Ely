@@ -222,8 +222,6 @@ AC_ARG_ENABLE([training],
 		#
 		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
 		AM_PROG_CC_C_O
-		ELY_CXXFLAGS="${ELY_CXXFLAGS} -std=c++11"
-		ELY_CPPFLAGS="${ELY_CPPFLAGS} -D__GXX_EXPERIMENTAL_CXX0X__"
     	buildtype="Training"
 	fi
 	],
@@ -248,6 +246,7 @@ AM_COND_IF([TRAINING],
 		training/Makefile
 		training/recastnavigation/Makefile
 		training/interrogate/Makefile
+		training/networking/Makefile
 		training/opensteer/Makefile
 		])])
 

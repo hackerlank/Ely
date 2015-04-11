@@ -3,8 +3,8 @@ AM_CPPFLAGS = -DTESTING -iquote$(top_srcdir)/include $(ELY_CPPFLAGS)
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
 AM_LDFLAGS = $(ELY_LDFLAGS)
 
-STDCpp98_CPPFLAGS = $(AM_CPPFLAGS) -U__GXX_EXPERIMENTAL_CXX0X__
-STDCpp98_CXXFLAGS = $(AM_CXXFLAGS) -std=c++98
+STDCpp11_CPPFLAGS = $(AM_CPPFLAGS) -D__GXX_EXPERIMENTAL_CXX0X__
+STDCpp11_CXXFLAGS = $(AM_CXXFLAGS) -std=c++11
 
 AUTOMAKE_OPTIONS = subdir-objects
 
@@ -22,12 +22,11 @@ SUBDIRS = networking
 
 #ely_training
 noinst_PROGRAMS = ely_training 
-ely_training_CPPFLAGS=$(STDCpp98_CPPFLAGS)
-ely_training_CXXFLAGS=$(STDCpp98_CXXFLAGS)
+#ely_training_CPPFLAGS=$(STDCpp11_CPPFLAGS)
+#ely_training_CXXFLAGS=$(STDCpp11_CXXFLAGS)
 
 nodist_ely_training_SOURCES = \
-	training.cpp \
-	raknet.cpp
+	training.cpp
 #	terrain_sample.cpp
 #	octree.cpp
 #	memory_pool.cpp

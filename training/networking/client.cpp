@@ -58,7 +58,7 @@ enum GameMessages
 	ID_GAME_MESSAGE_1 = ID_USER_PACKET_ENUM + 1
 };
 
-int raknet_main(int argc, char *argv[])
+int main(int argc, char *argv[])
 {
 	// Load your configuration
 	load_prc_file_data("", "model-path " + baseDir + "data/models");
@@ -186,17 +186,17 @@ int raknet_main(int argc, char *argv[])
 			break;
 		case 'p':
 			//--port
-//			serverPort = (unsigned short int) stoi(string(optarg));
+//			serverPort = (unsigned short int) stoi(string(optarg)); //-std=c++11
 			serverPort = (unsigned short int) strtol(string(optarg).c_str(), NULL, 0);
 			break;
 		case 1002:
 			//--max-connections-allowed
-//			maxConnectionsAllowed = (unsigned int) stoi(string(optarg));
+//			maxConnectionsAllowed = (unsigned int) stoi(string(optarg)); //-std=c++11
 			maxConnectionsAllowed = (unsigned int) strtol(string(optarg).c_str(), NULL, 0);
 			break;
 		case 1003:
 			//--max-players-per-server
-//			maxPlayersPerServer = (unsigned short int) stoi(string(optarg));
+//			maxPlayersPerServer = (unsigned short int) stoi(string(optarg)); //-std=c++11
 			maxPlayersPerServer = (unsigned short int) strtol(string(optarg).c_str(), NULL, 0);
 			break;
 		case '?':
