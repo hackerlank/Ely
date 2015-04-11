@@ -30,6 +30,7 @@
 #include <string>
 #include <getopt.h>
 #include <config.h>
+#include <cstdlib>
 // RakNet Headers
 #include <raknet/MessageIdentifiers.h>
 #include <raknet/RakPeerInterface.h>
@@ -185,15 +186,18 @@ int raknet_main(int argc, char *argv[])
 			break;
 		case 'p':
 			//--port
-			serverPort = (unsigned short int) stoi(string(optarg));
+//			serverPort = (unsigned short int) stoi(string(optarg));
+			serverPort = (unsigned short int) strtol(string(optarg).c_str(), NULL, 0);
 			break;
 		case 1002:
 			//--max-connections-allowed
-			maxConnectionsAllowed = (unsigned int) stoi(string(optarg));
+//			maxConnectionsAllowed = (unsigned int) stoi(string(optarg));
+			maxConnectionsAllowed = (unsigned int) strtol(string(optarg).c_str(), NULL, 0);
 			break;
 		case 1003:
 			//--max-players-per-server
-			maxPlayersPerServer = (unsigned short int) stoi(string(optarg));
+//			maxPlayersPerServer = (unsigned short int) stoi(string(optarg));
+			maxPlayersPerServer = (unsigned short int) strtol(string(optarg).c_str(), NULL, 0);
 			break;
 		case '?':
 			// getopt_long already printed an error message.

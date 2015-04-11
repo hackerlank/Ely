@@ -15,32 +15,17 @@ LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 	-lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody \
 	-lRakNet
 
-#SUBDIRS = recastnavigation
-#SUBDIRS = interrogate
-#SUBDIRS = opensteer
-SUBDIRS = networking
+#ely_client & ely_server
+noinst_PROGRAMS = ely_client ely_server
+#
+ely_client_CPPFLAGS=$(STDCpp98_CPPFLAGS)
+ely_client_CXXFLAGS=$(STDCpp98_CXXFLAGS)
 
-#ely_training
-noinst_PROGRAMS = ely_training 
-ely_training_CPPFLAGS=$(STDCpp98_CPPFLAGS)
-ely_training_CXXFLAGS=$(STDCpp98_CXXFLAGS)
+nodist_ely_client_SOURCES = \
+	client.cpp
+#	
+ely_server_CPPFLAGS=$(STDCpp98_CPPFLAGS)
+ely_server_CXXFLAGS=$(STDCpp98_CXXFLAGS)
 
-nodist_ely_training_SOURCES = \
-	training.cpp \
-	raknet.cpp
-#	terrain_sample.cpp
-#	octree.cpp
-#	memory_pool.cpp
-#	memory_pool/MemoryPool.cpp
-#	generic_test.cpp
-#	ai.cpp
-#	anim.cpp
-#	network.cpp
-#	threads.cpp
-#	manual_example.cpp
-#	draw_geometry.cpp
-#	meshdrawer.cpp
-#	rocket.cpp
-#	render-to-texture.cpp
-#	physics.cpp
-		
+nodist_ely_server_SOURCES = \
+	server.cpp
