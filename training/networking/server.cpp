@@ -216,22 +216,18 @@ int main(int argc, char *argv[])
 		cout << endl;
 	}
 
-	// Instancing
+	/// Instancing
 	peer = RakNet::RakPeerInterface::GetInstance();
-	// Connect
-	switch (peerType)
+
+	// Max Incoming Connections <= Max Connections
+	if (maxPlayersPerServer > maxConnectionsAllowed)
 	{
-	// Connection as Server
-	case SERVER:
-	{
-		RakNet::SocketDescriptor serverSD(serverPort, 0);
-		peer->Startup(maxConnectionsAllowed, &serverSD, 1);
-		peer->SetMaximumIncomingConnections(maxPlayersPerServer);
+		maxPlayersPerServer = maxConnectionsAllowed;
 	}
-		break;
-	default:
-		abort();
-	}
+	// Startup as Server
+	RakNet::SocketDescriptor serverSD(serverPort, 0);
+	peer->Startup(maxConnectionsAllowed, &serverSD, 1);
+	peer->SetMaximumIncomingConnections(maxPlayersPerServer);
 
 	// Set up a "read messages task" (synchronous, i.e. into the main task chain)
 	PT(GenericAsyncTask)readMessagesTask = new GenericAsyncTask("readMessagesTask",
@@ -243,7 +239,7 @@ int main(int argc, char *argv[])
 	//do the main loop, equal to run() in python
 	framework.main_loop();
 
-	// Cleaning Up
+	/// Cleaning Up
 	RakNet::RakPeerInterface::DestroyInstance(peer);
 
 	//close the window framework
@@ -306,20 +302,12 @@ AsyncTask::DoneStatus readMessagesFunction(GenericAsyncTask* task,
 			{
 				cout << ": A client has disconnected." << endl;
 			}
-			else if (peerType == CLIENT)
-			{
-				cout << ": We have been disconnected." << endl;
-			}
 			break;
 		case ID_CONNECTION_LOST:
 			cout << ID_CONNECTION_LOST;
 			if (peerType == SERVER)
 			{
 				cout << ": A client lost the connection." << endl;
-			}
-			else if (peerType == CLIENT)
-			{
-				cout << ": Connection lost." << endl;
 			}
 			break;
 		case ID_GAME_MESSAGE_1:
