@@ -28,8 +28,8 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "Support/BulletLocal/bulletTriangleMesh.h"
-#include "Support/BulletLocal/bulletTriangleMeshShape.h"
+#include <bulletTriangleMesh.h>
+#include <bulletTriangleMeshShape.h>
 
 namespace ely
 {

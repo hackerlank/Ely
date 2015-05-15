@@ -26,8 +26,8 @@
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Support/OpenSteerLocal/common.h"
-#include "Support/BulletLocal/bulletWorld.h"
-#include "Support/BulletLocal/bulletClosestHitRayResult.h"
+#include <bulletWorld.h>
+#include <bulletClosestHitRayResult.h>
 #include <throw_event.h>
 
 namespace ely

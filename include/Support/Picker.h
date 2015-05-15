@@ -24,11 +24,12 @@
 #ifndef PICKER_H_
 #define PICKER_H_
 
+#include "Utilities/Tools.h"
 #include <pandaFramework.h>
 #include <lens.h>
-#include "Support/BulletLocal/bulletWorld.h"
-#include "Support/BulletLocal/bulletSphericalConstraint.h"
-#include "Support/BulletLocal/bulletGenericConstraint.h"
+#include <bulletWorld.h>
+#include <bulletSphericalConstraint.h>
+#include <bulletGenericConstraint.h>
 
 namespace ely
 {

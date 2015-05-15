@@ -25,10 +25,6 @@
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
-//Bullet
-#include "Support/BulletLocal/config_bullet.h"
-//libRocket
-#include "Support/LibRocketLocal/config_rocket.h"
 
 namespace ely
 {
@@ -193,10 +189,6 @@ void initTypedObjects()
 	RigidBodyTemplate::init_type();
 	SoftBody::init_type();
 	SoftBodyTemplate::init_type();
-	//init BulletLocal
-	init_libbullet();
-	//init LibRocketLocal
-	init_librocket();
 	Vehicle::init_type();
 	VehicleTemplate::init_type();
 	InstanceOf::init_type();

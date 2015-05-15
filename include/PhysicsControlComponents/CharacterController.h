@@ -24,7 +24,7 @@
 #ifndef CHARACTERCONTROLLER_H_
 #define CHARACTERCONTROLLER_H_
 
-#include "Support/BulletLocal/bulletCharacterControllerNode.h"
+#include <bulletCharacterControllerNode.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include <throw_event.h>

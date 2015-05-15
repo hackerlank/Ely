@@ -1,65 +1,3 @@
-bullet_headers = \
-	Support/BulletLocal/bulletAllHitsRayResult.h \
-	Support/BulletLocal/bulletBaseCharacterControllerNode.h \
-	Support/BulletLocal/bulletBodyNode.h \
-	Support/BulletLocal/bulletBoxShape.h \
-	Support/BulletLocal/bulletCapsuleShape.h \
-	Support/BulletLocal/bulletCharacterControllerNode.h \
-	Support/BulletLocal/bulletClosestHitRayResult.h \
-	Support/BulletLocal/bulletClosestHitSweepResult.h \
-	Support/BulletLocal/bulletConeShape.h \
-	Support/BulletLocal/bulletConeTwistConstraint.h \
-	Support/BulletLocal/bulletConstraint.h \
-	Support/BulletLocal/bulletContactCallbackData.h \
-	Support/BulletLocal/bulletContactCallbacks.h \
-	Support/BulletLocal/bulletContactResult.h \
-	Support/BulletLocal/bulletConvexHullShape.h \
-	Support/BulletLocal/bulletConvexPointCloudShape.h \
-	Support/BulletLocal/bulletCylinderShape.h \
-	Support/BulletLocal/bulletDebugNode.h \
-	Support/BulletLocal/bulletFilterCallbackData.h \
-	Support/BulletLocal/bulletGenericConstraint.h \
-	Support/BulletLocal/bulletGhostNode.h \
-	Support/BulletLocal/bulletHeightfieldShape.h \
-	Support/BulletLocal/bulletHelper.h \
-	Support/BulletLocal/bulletHingeConstraint.h \
-	Support/BulletLocal/bullet_includes.h \
-	Support/BulletLocal/bulletManifoldPoint.h \
-	Support/BulletLocal/bulletMinkowskiSumShape.h \
-	Support/BulletLocal/bulletMultiSphereShape.h \
-	Support/BulletLocal/bulletPersistentManifold.h \
-	Support/BulletLocal/bulletPlaneShape.h \
-	Support/BulletLocal/bulletRigidBodyNode.h \
-	Support/BulletLocal/bulletRotationalLimitMotor.h \
-	Support/BulletLocal/bulletShape.h \
-	Support/BulletLocal/bulletSliderConstraint.h \
-	Support/BulletLocal/bulletSoftBodyConfig.h \
-	Support/BulletLocal/bulletSoftBodyControl.h \
-	Support/BulletLocal/bulletSoftBodyMaterial.h \
-	Support/BulletLocal/bulletSoftBodyNode.h \
-	Support/BulletLocal/bulletSoftBodyShape.h \
-	Support/BulletLocal/bulletSoftBodyWorldInfo.h \
-	Support/BulletLocal/bulletSphereShape.h \
-	Support/BulletLocal/bulletSphericalConstraint.h \
-	Support/BulletLocal/bulletTickCallbackData.h \
-	Support/BulletLocal/bulletTranslationalLimitMotor.h \
-	Support/BulletLocal/bulletTriangleMesh.h \
-	Support/BulletLocal/bulletTriangleMeshShape.h \
-	Support/BulletLocal/bullet_utils.h \
-	Support/BulletLocal/bulletVehicle.h \
-	Support/BulletLocal/bulletWheel.h \
-	Support/BulletLocal/bulletWorld.h \
-	Support/BulletLocal/config_bullet.h		
-
-librocket_headers = \
-	Support/LibRocketLocal/config_rocket.h \
-	Support/LibRocketLocal/rocketSystemInterface.h \
-	Support/LibRocketLocal/rocketInputHandler.h \
-	Support/LibRocketLocal/rocketRegion.h \
-	Support/LibRocketLocal/rocketFileInterface.h \
-	Support/LibRocketLocal/rocketRegion.I \
-	Support/LibRocketLocal/rocketRenderInterface.h
-
 memorypool_headers = \
 	Support/MemoryPool/MemoryMacros.h \
 	Support/MemoryPool/MemoryPool.h
@@ -98,8 +36,6 @@ tinyxml2_headers = \
 
 #noinst headers
 noinst_HEADERS = \
-	$(bullet_headers) \
-	$(librocket_headers) \
 	$(memorypool_headers) \
 	$(opensteer_headers) \
 	$(recastnavigation_headers) \

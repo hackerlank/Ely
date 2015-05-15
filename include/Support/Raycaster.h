@@ -26,7 +26,7 @@
 
 #include "Utilities/Tools.h"
 #include <pandaFramework.h>
-#include "Support/BulletLocal/bulletWorld.h"
+#include <bulletWorld.h>
 #include <mouseWatcher.h>
 #include "ObjectModel/Object.h"
 

@@ -1,7 +1,5 @@
 #last one must be .
 SUBDIRS = \
-	BulletLocal \
-	LibRocketLocal \
 	MemoryPool \
 	OpenSteerLocal \
 	RecastNavigationLocal \
@@ -28,8 +26,6 @@ libSupport_la_SOURCES = \
 	Raycaster.cpp
 
 libSupport_la_LIBADD = \
-	$(builddir)/BulletLocal/libBulletLocal.la \
-	$(builddir)/LibRocketLocal/libRocketLocal.la \
 	$(builddir)/MemoryPool/libMemoryPool.la \
 	$(builddir)/OpenSteerLocal/libOpenSteerLocal.la \
 	$(builddir)/RecastNavigationLocal/libRecastNavigationLocal.la \

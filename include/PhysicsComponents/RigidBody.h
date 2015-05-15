@@ -25,7 +25,7 @@
 #define RIGIDBODY_H_
 
 #include <nodePath.h>
-#include "Support/BulletLocal/bulletRigidBodyNode.h"
+#include <bulletRigidBodyNode.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include "Game/GamePhysicsManager.h"

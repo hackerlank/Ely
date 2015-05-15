@@ -22,7 +22,7 @@
  */
 
 #include "Game/GameGUIManager.h"
-#include "Support/LibRocketLocal/rocketRegion.h"
+#include <rocketRegion.h>
 #include <Rocket/Debugger.h>
 #include "Game/GameManager.h"
 

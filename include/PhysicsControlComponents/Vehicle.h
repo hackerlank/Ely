@@ -24,7 +24,7 @@
 #ifndef VEHICLE_H_
 #define VEHICLE_H_
 
-#include "Support/BulletLocal/bulletVehicle.h"
+#include <bulletVehicle.h>
 #include "ObjectModel/Component.h"
 #include "ObjectModel/Object.h"
 #include <throw_event.h>
