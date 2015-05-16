@@ -147,7 +147,7 @@ install dependencies from distribution:
 build with these commands:
 
  $ cd panda3d
- $ makepanda/makepanda.py --verbose --everything --no-bullet --no-rocket \
+ $ makepanda/makepanda.py --verbose --everything \
  	--threads 2 --optimize 3 --installer --no-fftw
 
 install the package:

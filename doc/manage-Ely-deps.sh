@@ -3,9 +3,8 @@
 CMD=$1
 BUILDMODE=$2
 THREADS=$3
-PANDA3DALL=$4
-WORKDIR=$5
-MYWORKSPACE=$6
+WORKDIR=$4
+MYWORKSPACE=$5
 #
 CMDS="install update uninstall clean distclean"
 BUILDMODES="release debug"
@@ -13,8 +12,7 @@ MYPKGS="my_bullet3 my_librocket my_opensteer my_recastnavigation"
 DISTPKGS="autoconf automake build-essential checkinstall freeglut3-dev gdebi git gnulib libboost-python-dev libeigen3-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libode-dev libopenal-dev libopencv-dev libsdl1.2-dev libssl-dev libswscale-dev libtool libvorbis-dev libx11-dev libxxf86dga-dev libxxf86vm-dev nvidia-cg-dev pkg-config python-dev"
 BUILDDIR="build-elydeps"
 CONFARGS=
-PANDA3DALLEXT=
-PANDA3DNOPKGS=" --no-bullet --no-rocket"
+PANDA3DALLEXT="-all"
 PANDA3DINSTCMD="sudo gdebi --n "
 
 #clean
@@ -119,7 +117,7 @@ updateElyDeps () {
 	[ -d "${WD}" ] && cd ${WD} && \
 		git pull && \
 		makepanda/makepanda.py --verbose --everything --no-fftw \
-	 		--threads ${THREADS} --optimize ${OPTIMIZE} --installer ${PANDA3DNOPKGS} && \
+	 		--threads ${THREADS} --optimize ${OPTIMIZE} --installer && \
 	 	PKG=panda3d1.9_1.9.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
 	 	mv panda3d1.9_1.9.0_amd64.deb ${PKG} && \
 	 	${PANDA3DINSTCMD} ${PKG}
@@ -129,7 +127,7 @@ updateElyDeps () {
 
 #print usage
 printUsage () {
-	echo "Usage: $0 install|uninstall|update|clean [build-mode=release|debug] [threads=half cores] [panda3d-all=no] [work-dir=$(pwd)] [my-workspace=WORKSPACE]"
+	echo "Usage: $0 install|uninstall|update|clean [build-mode=release|debug] [threads=half cores] [work-dir=$(pwd)] [my-workspace=WORKSPACE]"
 }
 
 #MAIN
@@ -150,8 +148,6 @@ else
 	! [[ ${THREADS} =~ ${integer} ]] && THREADS=${T}
 fi
 [ "$((${THREADS} >= 1))" = "0" ] && THREADS=1
-#checks if PANDA3DALL is yes
-[ "${PANDA3DALL}" = "yes" ] && PANDA3DALLEXT="-all" && PANDA3DNOPKGS= && PANDA3DINSTCMD="echo Not installing: "
 #checks if WORKDIR exists else =PWD
 ! [ -d "${WORKDIR}" ] && WORKDIR=$(pwd)
 #checks if MYWORKSPACE specified and WORKDIR}/MYWORKSPACE exists else =WORKSPACE
