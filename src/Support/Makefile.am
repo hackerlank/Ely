@@ -15,17 +15,22 @@ LIBS =
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-#convenience library
+#convenience libraries
 noinst_LTLIBRARIES = \
+	libMiscTools.la \
 	libSupport.la
 
-#library sources
-libSupport_la_SOURCES = \
+#libraries sources
+libMiscTools_la_SOURCES = \
 	FSM.cpp \
 	Picker.cpp \
 	Raycaster.cpp
 
+#libSupport is made up of all other (sub)libraries
+libSupport_la_SOURCES =
+
 libSupport_la_LIBADD = \
+	$(builddir)/libMiscTools.la \
 	$(builddir)/MemoryPool/libMemoryPool.la \
 	$(builddir)/OpenSteerLocal/libOpenSteerLocal.la \
 	$(builddir)/RecastNavigationLocal/libRecastNavigationLocal.la \

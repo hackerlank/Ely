@@ -46,4 +46,5 @@ libely_la_LIBADD = \
 	$(builddir)/PhysicsControlComponents/libPhysicsControlComponents.la \
 	$(builddir)/SceneComponents/libSceneComponents.la
 
+#libely is made up of all other (sub)libraries
 libely_la_SOURCES =
