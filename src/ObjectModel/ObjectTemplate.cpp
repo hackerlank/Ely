@@ -94,7 +94,7 @@ void ObjectTemplate::setParameters(const ParameterTable& parameterTable)
 	RETURN_ON_COND(parameterTable.empty(),)
 
 	ParameterTableConstIter iter;
-	pair<ParameterTableIter, ParameterTableIter> iterRange;
+	std::pair<ParameterTableIter, ParameterTableIter> iterRange;
 	//create the parameterTable key set (i.e. the set of parameters
 	//that will overwrite those of mParameterTable with the same name)
 	std::set<std::string> keySet;
@@ -157,7 +157,7 @@ std::list<std::string> ObjectTemplate::parameterList(
 
 	std::list<std::string> strList;
 	ParameterTableIter iter;
-	pair<ParameterTableIter, ParameterTableIter> iterRange =
+	std::pair<ParameterTableIter, ParameterTableIter> iterRange =
 			mParameterTable.equal_range(paramName);
 	if (iterRange.first != iterRange.second)
 	{
@@ -195,7 +195,7 @@ bool ObjectTemplate::isComponentParameterValue(const std::string& name,
 
 	bool result;
 	//
-	pair<ParameterTableConstIter, ParameterTableConstIter> iterRange =
+	std::pair<ParameterTableConstIter, ParameterTableConstIter> iterRange =
 			mComponentParameterTables[compType].equal_range(name);
 	if (iterRange.first != iterRange.second)
 	{
@@ -219,7 +219,7 @@ std::list<std::string> ObjectTemplate::componentParameterValues(
 
 	std::list<std::string> strList;
 	ParameterTableConstIter iter;
-	pair<ParameterTableConstIter, ParameterTableConstIter> iterRange;
+	std::pair<ParameterTableConstIter, ParameterTableConstIter> iterRange;
 	iterRange = mComponentParameterTables[compType].equal_range(paramName);
 	if (iterRange.first != iterRange.second)
 	{

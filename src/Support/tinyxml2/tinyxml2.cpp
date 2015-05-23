@@ -243,8 +243,8 @@ const char* StrPair::GetStr()
                         }
                     }
                     else {
-                        int i=0;
-                        for(; i<NUM_ENTITIES; ++i ) {
+                        bool entityFound = false;
+                        for( int i = 0; i < NUM_ENTITIES; ++i ) {
                             const Entity& entity = entities[i];
                             if ( strncmp( p + 1, entity.pattern, entity.length ) == 0
                                     && *( p + entity.length + 1 ) == ';' ) {
@@ -252,10 +252,11 @@ const char* StrPair::GetStr()
                                 *q = entity.value;
                                 ++q;
                                 p += entity.length + 2;
+                                entityFound = true;
                                 break;
                             }
                         }
-                        if ( i == NUM_ENTITIES ) {
+                        if ( !entityFound ) {
                             // fixme: treat as error?
                             ++p;
                             ++q;
@@ -272,7 +273,7 @@ const char* StrPair::GetStr()
         }
         // The loop below has plenty going on, and this
         // is a less useful mode. Break it out.
-        if ( _flags & COLLAPSE_WHITESPACE ) {
+        if ( _flags & NEEDS_WHITESPACE_COLLAPSING ) {
             CollapseWhitespace();
         }
         _flags = (_flags & NEEDS_DELETE);
@@ -645,6 +646,9 @@ XMLNode::~XMLNode()
 
 const char* XMLNode::Value() const 
 {
+    // Catch an edge case: XMLDocuments don't have a a Value. Carefully return nullptr.
+    if ( this->ToDocument() )
+        return 0;
     return _value.GetStr();
 }
 
@@ -887,6 +891,17 @@ char* XMLNode::ParseDeep( char* p, StrPair* parentEnd )
             break;
         }
 
+        XMLDeclaration* decl = node->ToDeclaration();
+        if ( decl ) {
+                // A declaration can only be the first child of a document.
+                // Set error, if document already has children.
+                if ( !_document->NoChildren() ) {
+                        _document->SetError( XML_ERROR_PARSING_DECLARATION, decl->Value(), 0);
+                        DeleteNode( decl );
+                        break;
+                }
+        }
+
         XMLElement* ele = node->ToElement();
         if ( ele ) {
             // We read the end tag. Return it to the parent.
@@ -961,7 +976,7 @@ char* XMLText::ParseDeep( char* p, StrPair* )
     else {
         int flags = _document->ProcessEntities() ? StrPair::TEXT_ELEMENT : StrPair::TEXT_ELEMENT_LEAVE_ENTITIES;
         if ( _document->WhitespaceMode() == COLLAPSE_WHITESPACE ) {
-            flags |= StrPair::COLLAPSE_WHITESPACE;
+            flags |= StrPair::NEEDS_WHITESPACE_COLLAPSING;
         }
 
         p = _value.ParseText( p, "<", flags );
@@ -1846,7 +1861,7 @@ XMLError XMLDocument::LoadFile( FILE* fp )
         return _errorID;
     }
 
-    if ( filelength >= (size_t)-1 ) {
+    if ( (size_t)filelength >= (size_t)-1 ) {
         // Cannot handle files which won't fit in buffer together with null terminator
         SetError( XML_ERROR_FILE_READ_ERROR, 0, 0 );
         return _errorID;

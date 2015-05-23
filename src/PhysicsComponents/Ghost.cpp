@@ -577,7 +577,7 @@ void Ghost::update(void* data)
 				SMARTPTR(Component)physicsComponent = GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(
 						mGhostNode->get_overlapping_node(i));
 				//insert a default: check of equality is done only on OverlapNodeData::mPnode member
-				pair<std::set<OverlappingNode>::iterator, bool> res =
+				std::pair<std::set<OverlappingNode>::iterator, bool> res =
 				mOverlappingNodes.insert(
 						OverlappingNode(
 								mGhostNode->get_overlapping_node(i)));

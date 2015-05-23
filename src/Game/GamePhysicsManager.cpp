@@ -251,7 +251,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 					SMARTPTR(Component)physicsComponent1 =
 					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node1);
 					//insert a default: check of equality is done only on CollidingNodePair::mPnode member
-					pair<std::set<CollidingNodePair>::iterator, bool> res =
+					std::pair<std::set<CollidingNodePair>::iterator, bool> res =
 							mCollidingNodePairs.insert(
 									CollidingNodePair(node0, node1));
 					if (res.second)
