@@ -33,8 +33,6 @@
 
 namespace ely
 {
-class FuncInterval;
-
 /**
  * \brief GameManager.
  *
