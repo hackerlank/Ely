@@ -547,8 +547,7 @@ char* XMLDocument::Identify( char* p, XMLNode** node )
         return p;
     }
 
-    // What is this thing?
-	// These strings define the matching patters:
+    // These strings define the matching patterns:
     static const char* xmlHeader		= { "<?" };
     static const char* commentHeader	= { "<!--" };
     static const char* cdataHeader		= { "<![CDATA[" };
@@ -1964,7 +1963,9 @@ void XMLDocument::SetError( XMLError error, const char* str1, const char* str2 )
 const char* XMLDocument::ErrorName() const
 {
 	TIXMLASSERT( _errorID >= 0 && _errorID < XML_ERROR_COUNT );
-	return _errorNames[_errorID];
+    const char* errorName = _errorNames[_errorID];
+    TIXMLASSERT( errorName && errorName[0] );
+    return errorName;
 }
 
 void XMLDocument::PrintError() const
