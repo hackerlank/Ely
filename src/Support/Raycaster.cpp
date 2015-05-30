@@ -31,9 +31,15 @@ Raycaster::Raycaster(PandaFramework* app, WindowFramework* window,
 SMARTPTR(BulletWorld)world, int N) : mApp(app), mWindow(window), mWorld(world),
 		mNumCallbacks(N), mHitResult(BulletClosestHitRayResult::empty())
 {
+	//some preliminary checks
+	CHECK_EXISTENCE_DEBUG(mApp, "Picker::Picker: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(mWindow, "Picker::Picker: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(), "Picker::Picker: "
+			"invalid GamePhysicsManager")
+
 	//get render, camera node paths
-	mRender = window->get_render();
-	mCamera = window->get_camera_group();
+	mRender = mWindow->get_render();
+	mCamera = mWindow->get_camera_group();
 	mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
 	if(mNumCallbacks <= 0)
 	{

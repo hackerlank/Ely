@@ -70,6 +70,8 @@ Picker::Picker(PandaFramework* app, WindowFramework* window,
 	//some preliminary checks
 	CHECK_EXISTENCE_DEBUG(mApp, "Picker::Picker: invalid PandaFramework")
 	CHECK_EXISTENCE_DEBUG(mWindow, "Picker::Picker: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(ObjectTemplateManager::GetSingletonPtr(),
+			"Picker::Picker: invalid ObjectTemplateManager")
 	SMARTPTR(Object)render =
 	ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ObjectId("render"));
 	CHECK_EXISTENCE_DEBUG(render, "Picker::Picker: invalid render object")
