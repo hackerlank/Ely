@@ -134,6 +134,6 @@ public:
 		m_textScale = textScale;
 	}
 };
-}
+} //namespace ely
 
 #endif /* DRAWMESHDRAWER_H_ */

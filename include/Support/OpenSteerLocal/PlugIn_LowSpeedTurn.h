@@ -38,6 +38,9 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifndef PLUGIN_LOWSPEEDTURN_H_
+#define PLUGIN_LOWSPEEDTURN_H_
+
 #include <iomanip>
 #include <sstream>
 #include <OpenSteer/Color.h>
@@ -274,4 +277,6 @@ public:
 
 //LowSpeedTurnPlugIn gLowSpeedTurnPlugIn;
 
-}// ely namespace
+} // ely namespace
+
+#endif /* PLUGIN_LOWSPEEDTURN_H_ */

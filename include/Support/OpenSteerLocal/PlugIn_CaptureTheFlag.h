@@ -50,6 +50,9 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifndef PLUGIN_CAPTURETHEFLAG_H_
+#define PLUGIN_CAPTURETHEFLAG_H_
+
 #include <iomanip>
 #include <string>
 #include <sstream>
@@ -1138,3 +1141,5 @@ public:
 //CtfPlugIn gCtfPlugIn;
 
 } // ely namespace
+
+#endif /* PLUGIN_CAPTURETHEFLAG_H_ */

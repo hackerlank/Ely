@@ -417,6 +417,6 @@ public:
 
 // ----------------------------------------------------------------------------
 
-}// ely namespace
+} // ely namespace
 
 #endif /* PLUGIN_MULTIPLEPURSUIT_H_ */

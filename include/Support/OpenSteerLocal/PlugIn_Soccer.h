@@ -37,6 +37,9 @@
 //
 // ----------------------------------------------------------------------------
 
+#ifndef PLUGIN_SOCCER_H_
+#define PLUGIN_SOCCER_H_
+
 #include <iomanip>
 #include <sstream>
 #include <OpenSteer/Draw.h>
@@ -941,5 +944,6 @@ public:
 
 // ----------------------------------------------------------------------------
 
-}// anonymous namespace
+} // ely namespace
 
+#endif /* PLUGIN_SOCCER_H_ */

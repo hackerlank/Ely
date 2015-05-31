@@ -839,6 +839,6 @@ public:
 
 // ----------------------------------------------------------------------------
 
-}// ely namespace
+} // ely namespace
 
 #endif /* PLUGIN_PEDESTRIAN_H_ */

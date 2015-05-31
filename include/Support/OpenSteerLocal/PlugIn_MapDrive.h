@@ -55,6 +55,9 @@
  * \author consultit
  */
 
+#ifndef PLUGIN_MAPDRIVE_H_
+#define PLUGIN_MAPDRIVE_H_
+
 #include <iomanip>
 #include <sstream>
 #include <cassert>
@@ -4146,4 +4149,6 @@ public:
 
 // ----------------------------------------------------------------------------
 
-}// anonymous namespace
+} // ely namespace
+
+#endif /* PLUGIN_MAPDRIVE_H_ */
