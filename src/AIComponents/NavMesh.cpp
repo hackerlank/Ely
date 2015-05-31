@@ -32,7 +32,6 @@
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAIManager.h"
 #include "Game/GamePhysicsManager.h"
-#include "PhysicsComponents/RigidBody.h"
 #include "SceneComponents/Model.h"
 #include "SceneComponents/InstanceOf.h"
 
