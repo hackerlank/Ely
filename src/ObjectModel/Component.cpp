@@ -22,7 +22,6 @@
  */
 
 #include "ObjectModel/Component.h"
-#include "ObjectModel/ComponentTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameManager.h"
 
@@ -311,5 +310,90 @@ std::string Component::getEventType(const std::string& event)
 
 //TypedObject semantics: hardcoded
 TypeHandle Component::_type_handle;
+
+///Template
+
+ComponentTemplate::ComponentTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		mPandaFramework(pandaFramework), mWindowFramework(windowFramework)
+{
+	mParameterTable.clear();
+}
+
+ComponentTemplate::~ComponentTemplate()
+{
+}
+
+void ComponentTemplate::setParameters(const ParameterTable& parameterTable)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	RETURN_ON_COND(parameterTable.empty(),)
+
+	ParameterTableConstIter constIter;
+	std::pair<ParameterTableIter, ParameterTableIter> iterRange;
+	//create the parameterTable key set (i.e. the set of parameters
+	//that will overwrite those of mParameterTable with the same name)
+	std::set<std::string> keySet;
+	for (constIter = parameterTable.begin(); constIter != parameterTable.end();
+			++constIter)
+	{
+		keySet.insert(constIter->first);
+	}
+	//erase from mParameterTable the parameters to be overwritten
+	std::set<std::string>::iterator keySetIter;
+	for (keySetIter = keySet.begin(); keySetIter != keySet.end(); ++keySetIter)
+	{
+		//find the mParameterTable range of values for
+		//the *keySetIter parameter ...
+		iterRange = mParameterTable.equal_range(*keySetIter);
+		//...and erase it
+		mParameterTable.erase(iterRange.first, iterRange.second);
+	}
+	//now mParameterTable is free from parameters to be overwritten
+	//so insert these ones into it from parameterTable
+	mParameterTable.insert(parameterTable.begin(), parameterTable.end());
+}
+
+std::string ComponentTemplate::parameter(const std::string& name) const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	std::string strPtr;
+	ParameterTable::const_iterator iter;
+	iter = mParameterTable.find(name);
+	//return a reference to a parameter value only if it exists
+	if (iter != mParameterTable.end())
+	{
+		strPtr = iter->second;
+	}
+	//
+	return strPtr;
+}
+
+std::list<std::string> ComponentTemplate::parameterList(const std::string& name)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	std::list<std::string> strList;
+	ParameterTableIter iter;
+	std::pair<ParameterTableIter, ParameterTableIter> iterRange;
+	iterRange = mParameterTable.equal_range(name);
+	if (iterRange.first != iterRange.second)
+	{
+		for (iter = iterRange.first; iter != iterRange.second; ++iter)
+		{
+			strList.push_back(iter->second);
+		}
+	}
+	//
+	return strList;
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ComponentTemplate::_type_handle;
 
 } // namespace ely

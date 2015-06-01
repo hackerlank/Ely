@@ -22,7 +22,6 @@
  */
 
 #include "SceneComponents/Model.h"
-#include "SceneComponents/ModelTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameSceneManager.h"
 #include <animBundleNode.h>
@@ -502,5 +501,73 @@ SMARTPTR(PartBundle)Model::getPartBundle() const
 
 //TypedObject semantics: hardcoded
 TypeHandle Model::_type_handle;
+
+///Template
+
+ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"ModelTemplate::ModelTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"ModelTemplate::ModelTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
+			"ModelTemplate::ModelTemplate: invalid GameSceneManager")
+	//
+	setParametersDefaults();
+}
+
+ModelTemplate::~ModelTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType ModelTemplate::componentType() const
+{
+	return ComponentType(Model::get_class_type().get_name());
+}
+
+ComponentFamilyType ModelTemplate::familyType() const
+{
+	return ComponentFamilyType("Scene");
+}
+
+SMARTPTR(Component)ModelTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Model) newModel = new Model(this);
+	newModel->setComponentId(compId);
+	if (not newModel->initialize())
+	{
+		return NULL;
+	}
+	return newModel.p();
+}
+
+void ModelTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("from_file", "true"));
+	mParameterTable.insert(ParameterNameValue("scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("card_points", "-1.0,1.0,-1.0,1.0"));
+	mParameterTable.insert(ParameterNameValue("rope_render_mode", "tube"));
+	mParameterTable.insert(ParameterNameValue("rope_uv_mode", "parametric"));
+	mParameterTable.insert(ParameterNameValue("rope_normal_mode", "none"));
+	mParameterTable.insert(ParameterNameValue("rope_num_subdiv", "4"));
+	mParameterTable.insert(ParameterNameValue("rope_num_slices", "8"));
+	mParameterTable.insert(ParameterNameValue("rope_thickness", "0.4"));
+	mParameterTable.insert(ParameterNameValue("sheet_num_u_subdiv", "2"));
+	mParameterTable.insert(ParameterNameValue("sheet_num_v_subdiv", "2"));
+	mParameterTable.insert(ParameterNameValue("texture_uscale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("texture_vscale", "1.0"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ModelTemplate::_type_handle;
 
 } // namespace ely

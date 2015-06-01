@@ -22,7 +22,6 @@
  */
 
 #include "SceneComponents/InstanceOf.h"
-#include "SceneComponents/InstanceOfTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "SceneComponents/Model.h"
 #include "Game/GameSceneManager.h"
@@ -137,5 +136,61 @@ void InstanceOf::onRemoveFromObjectCleanup()
 
 //TypedObject semantics: hardcoded
 TypeHandle InstanceOf::_type_handle;
+
+///Template
+
+InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"InstanceOfTemplate::InstanceOfTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"InstanceOfTemplate::InstanceOfTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
+			"InstanceOfTemplate::InstanceOfTemplate: invalid GameSceneManager")
+	//
+	setParametersDefaults();
+}
+
+InstanceOfTemplate::~InstanceOfTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType InstanceOfTemplate::componentType() const
+{
+	return ComponentType(InstanceOf::get_class_type().get_name());
+}
+
+ComponentFamilyType InstanceOfTemplate::familyType() const
+{
+	return ComponentFamilyType("Scene");
+}
+
+SMARTPTR(Component)InstanceOfTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(InstanceOf) newInstanceOf = new InstanceOf(this);
+	newInstanceOf->setComponentId(compId);
+	if (not newInstanceOf->initialize())
+	{
+		return NULL;
+	}
+	return newInstanceOf.p();
+}
+
+void InstanceOfTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("scale", "1.0"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle InstanceOfTemplate::_type_handle;
 
 } // namespace ely

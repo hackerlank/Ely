@@ -25,7 +25,6 @@
 #define OBJECTTEMPLATEMANAGER_H_
 
 #include "Utilities/Tools.h"
-#include "ObjectTemplate.h"
 #include "Object.h"
 
 namespace ely

@@ -22,7 +22,6 @@
  */
 
 #include "ControlComponents/Driver.h"
-#include "ControlComponents/DriverTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameControlManager.h"
 #include <cmath>
@@ -730,5 +729,89 @@ void Driver::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle Driver::_type_handle;
+
+///Template
+
+DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"DriverTemplate::DriverTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"DriverTemplate::DriverTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
+			"DriverTemplate::DriverTemplate: invalid GameControlManager")
+	//
+	setParametersDefaults();
+}
+
+DriverTemplate::~DriverTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType DriverTemplate::componentType() const
+{
+	return ComponentType(Driver::get_class_type().get_name());
+}
+
+ComponentFamilyType DriverTemplate::familyType() const
+{
+	return ComponentFamilyType("Control");
+}
+
+SMARTPTR(Component)DriverTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Driver) newDriver = new Driver(this);
+	newDriver->setComponentId(compId);
+	if (not newDriver->initialize())
+	{
+		return NULL;
+	}
+	return newDriver.p();
+}
+
+void DriverTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("enabled", "true"));
+	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
+	mParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
+	mParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("down", "enabled"));
+	mParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
+	mParameterTable.insert(ParameterNameValue("speed_key", "shift"));
+	mParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
+	mParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+	mParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
+	mParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
+	mParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
+	mParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
+	mParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
+	mParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
+	mParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
+	mParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
+	mParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+	mParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle DriverTemplate::_type_handle;
 
 } // namespace ely

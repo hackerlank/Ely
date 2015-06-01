@@ -25,13 +25,16 @@
 #define OBJECT_H_
 
 #include "Utilities/Tools.h"
+#include "Component.h"
 #include <pandaFramework.h>
 #include <nodePath.h>
 #include <typedWritableReferenceCount.h>
-#include "ObjectTemplate.h"
 
 namespace ely
 {
+
+class ObjectTemplate;
+
 /**
  * \brief Object instance identifier type (by default the name
  * of the NodePath component).
@@ -459,6 +462,272 @@ inline SMARTPTR(Object) Object::getOwner() const
 
 	return mOwner;
 }
+
+///Template
+
+class ObjectTemplateManager;
+
+/**
+ * \brief Object type.
+ *
+ * This type identifies the name of template that create these type of objects.
+ */
+typedef std::string ObjectType;
+
+/**
+ * \brief Class storing all of objects templates used to create an object.
+ */
+class ObjectTemplate: public TypedWritableReferenceCount
+{
+public:
+	/**
+	 * \brief Type used for the ordered list of the component templates.
+	 */
+	typedef std::vector<SMARTPTR(ComponentTemplate)> ComponentTemplateList;
+
+	/**
+	 * \brief Constructor.
+	 * @param name The name of this template.
+	 * @param objectTmplMgr The ObjectTemplateManager.
+	 * @param pandaFramework The PandaFramework.
+	 * @param windowFramework The WindowFramework.
+	 */
+	ObjectTemplate(const ObjectType& name, ObjectTemplateManager* objectTmplMgr,
+			PandaFramework* pandaFramework, WindowFramework* windowFramework);
+
+	/**
+	 * \brief Destructor.
+	 */
+	virtual ~ObjectTemplate();
+
+	/**
+	 * \brief For the object this template is designed to create,
+	 * this function sets the (mandatory) parameters to their default values.
+	 */
+	void setParametersDefaults();
+
+	/**
+	 * \name Parameters management.
+	 * \brief Sets the parameters of the object, this template is
+	 * designed to create, to custom values.
+	 *
+	 * These parameters overwrite (and/or are added to) the parameters defaults
+	 * set by setParametersDefaults.
+	 * @param parameterTable The table of (parameter,value).
+	 */
+	void setParameters(const ParameterTable& parameterTable);
+
+	/**
+	 * \brief Clears the table of all component templates of this
+	 * object template.
+	 */
+	void clearComponentTemplates();
+
+	/**
+	 * \brief Gets a reference to the name (i.e. the object type) of
+	 * this object template.
+	 * @return The name of this object template.
+	 */
+	ObjectType objectType() const;
+
+	/**
+	 * \brief Gets the component template list.
+	 * @return The component template list.
+	 */
+	ComponentTemplateList getComponentTemplates() const;
+
+	/**
+	 * \brief Adds a component template.
+	 * @param componentTmpl The component template.
+	 */
+	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
+
+	/**
+	 * \brief Gets a component template given the component type it can create.
+	 * @param componentType The component type.
+	 * @return The component template, NULL if it doesn't exist.
+	 */
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType&componentType) const;
+
+	/**
+	 * \brief Gets the parameter value associated to the object.
+	 * @param paramName The name of the parameter.
+	 * @return The value of the parameter, empty string if none exists.
+	 */
+	std::string parameter(const std::string& paramName) const;
+	/**
+	 * \brief Gets the parameter multi-values associated to the object.
+	 * @param paramName The name of the parameter.
+	 * @return The value list  of the parameter, empty list if none exists.
+	 */
+	std::list<std::string> parameterList(const std::string& paramName);
+
+	/**
+	 * \brief Gets the entire parameter table.
+	 * @return The parameter table.
+	 */
+	ParameterTable getParameterTable() const;
+
+	/**
+	 * \brief Gets/sets the PandaFramework.
+	 * @return A reference to the PandaFramework.
+	 */
+	PandaFramework* const pandaFramework() const;
+
+	/**
+	 * \brief Gets/sets the WindowFramework.
+	 * @return A reference to the WindowFramework.
+	 */
+	WindowFramework* const windowFramework() const;
+
+	/**
+	 * \brief Adds a common "multi-valued" parameter to a component type
+	 * of this object.
+	 *
+	 * Any parameter value is interpreted as a "compound" one, i.e. as having
+	 * the form: "value1:value2:...:valueN" and each valueX is stored in a
+	 * list as returned by componentParameterValues().\n
+	 *
+	 * @param parameterName The parameter name.
+	 * @param parameterValue The parameter value.
+	 * @param componentType The component type the parameter is related to.
+	 */
+	void addComponentParameter(const std::string& parameterName,
+			const std::string& parameterValue, ComponentType compType);
+
+	/**
+	 * \brief Checks if a name/value pair is an allowed parameter/value
+	 * for a given component type of this object.
+	 * @param name The name to check.
+	 * @param value The value to check.
+	 * @param componentType The component type.
+	 * @return True if the name/value pair match an allowed parameter/value
+	 * for a given component, false otherwise.
+	 */
+	bool isComponentParameterValue(const std::string& name, const std::string& value,
+			ComponentType compType);
+
+	/**
+	 * \brief Gets all values of the common parameter associated to
+	 * the component type of the object.
+	 *
+	 * @param paramName The name of the parameter.
+	 * @param componentType The component type.
+	 * @return The value list  of the parameter, empty list if none exists.
+	 */
+	std::list<std::string> componentParameterValues(const std::string& paramName,
+			ComponentType compType);
+
+#ifdef ELY_THREAD
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex.
+	 */
+	ReMutex& getMutex();
+#endif
+
+private:
+	///Name identifying this object template.
+	ObjectType mName;
+	///Ordered list of all component templates.
+	ComponentTemplateList mComponentTemplates;
+	///The ObjectTemplateManager.
+	ObjectTemplateManager* const mObjectTmplMgr;
+	///Parameter table.
+	ParameterTable mParameterTable;
+	///The PandaFramework.
+	PandaFramework* mPandaFramework;
+	///The WindowFramework.
+	WindowFramework* mWindowFramework;
+
+	///The table of ParameterTables indexed by component type.\n
+	///These represent the allowed common attributes shared by each
+	///component of a given type, belonging to any object of a given type.
+	std::map<ComponentType, ParameterTable> mComponentParameterTables;
+
+#ifdef ELY_THREAD
+	///The mutex associated with this template.
+	ReMutex mMutex;
+#endif
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		TypedWritableReferenceCount::init_type();
+		register_type(_type_handle, "ObjectTemplate",
+				TypedWritableReferenceCount::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+};
+
+struct idIsEqualTo
+{
+	idIsEqualTo(const ComponentType& compType) :
+			mComponentType(compType)
+	{
+	}
+	ComponentType mComponentType;
+	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
+	{
+		return componentTmpl->componentType() == mComponentType;
+	}
+};
+
+///inline definitions
+
+inline ObjectTemplate::ComponentTemplateList ObjectTemplate::getComponentTemplates() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mComponentTemplates;
+}
+
+inline ParameterTable ObjectTemplate::getParameterTable() const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return mParameterTable;
+}
+
+inline ObjectType ObjectTemplate::objectType() const
+{
+	return mName;
+}
+
+inline PandaFramework* const ObjectTemplate::pandaFramework() const
+{
+	return mPandaFramework;
+}
+
+inline WindowFramework* const ObjectTemplate::windowFramework() const
+{
+	return mWindowFramework;
+}
+
+#ifdef ELY_THREAD
+inline ReMutex& ObjectTemplate::getMutex()
+{
+	return mMutex;
+}
+#endif
 
 }  // namespace ely
 

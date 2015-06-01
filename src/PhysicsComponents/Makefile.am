@@ -14,8 +14,5 @@ noinst_LTLIBRARIES = \
 #library sources
 libPhysicsComponents_la_SOURCES = \
 	Ghost.cpp \
-	GhostTemplate.cpp \
 	RigidBody.cpp \
-	RigidBodyTemplate.cpp \
-	SoftBody.cpp \
-	SoftBodyTemplate.cpp
+	SoftBody.cpp

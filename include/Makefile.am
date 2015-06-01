@@ -44,27 +44,16 @@ noinst_HEADERS = \
 #headers
 nobase_pkginclude_HEADERS = \
 	AIComponents/CrowdAgent.h \
-	AIComponents/CrowdAgentTemplate.h \
 	AIComponents/NavMesh.h \
-	AIComponents/NavMeshTemplate.h \
 	AIComponents/SteerPlugIn.h \
-	AIComponents/SteerPlugInTemplate.h \
 	AIComponents/SteerVehicle.h \
-	AIComponents/SteerVehicleTemplate.h \
 	AudioComponents/Listener.h \
-	AudioComponents/ListenerTemplate.h \
 	AudioComponents/Sound3d.h \
-	AudioComponents/Sound3dTemplate.h \
 	BehaviorComponents/Activity.h \
-	BehaviorComponents/ActivityTemplate.h \
 	CommonComponents/Default.h \
-	CommonComponents/DefaultTemplate.h \
 	CommonComponents/GameConfig.h \
-	CommonComponents/GameConfigTemplate.h \
 	ControlComponents/Chaser.h \
-	ControlComponents/ChaserTemplate.h \
 	ControlComponents/Driver.h \
-	ControlComponents/DriverTemplate.h \
 	Game/GameAIManager.h \
 	Game/GameAudioManager.h \
 	Game/GameBehaviorManager.h \
@@ -74,29 +63,18 @@ nobase_pkginclude_HEADERS = \
 	Game/GamePhysicsManager.h \
 	Game/GameSceneManager.h \
 	ObjectModel/Component.h \
-	ObjectModel/ComponentTemplate.h \
 	ObjectModel/ComponentTemplateManager.h \
 	ObjectModel/Object.h \
-	ObjectModel/ObjectTemplate.h \
 	ObjectModel/ObjectTemplateManager.h \
 	PhysicsComponents/Ghost.h \
-	PhysicsComponents/GhostTemplate.h \
 	PhysicsComponents/RigidBody.h \
-	PhysicsComponents/RigidBodyTemplate.h \
 	PhysicsComponents/SoftBody.h \
-	PhysicsComponents/SoftBodyTemplate.h \
 	PhysicsControlComponents/CharacterController.h \
-	PhysicsControlComponents/CharacterControllerTemplate.h \
 	PhysicsControlComponents/Vehicle.h \
-	PhysicsControlComponents/VehicleTemplate.h \
 	SceneComponents/InstanceOf.h \
-	SceneComponents/InstanceOfTemplate.h \
 	SceneComponents/Model.h \
-	SceneComponents/ModelTemplate.h \
 	SceneComponents/NodePathWrapper.h \
-	SceneComponents/NodePathWrapperTemplate.h \
 	SceneComponents/Terrain.h \
-	SceneComponents/TerrainTemplate.h \
 	Support/FSM.h \
 	Support/Picker.h \
 	Support/Raycaster.h \

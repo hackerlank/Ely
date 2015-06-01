@@ -22,7 +22,6 @@
  */
 
 #include "BehaviorComponents/Activity.h"
-#include "BehaviorComponents/ActivityTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameBehaviorManager.h"
 #include "Game/GameManager.h"
@@ -559,5 +558,59 @@ void Activity::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle Activity::_type_handle;
+
+///Template
+
+ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"ActivityTemplate::ActivityTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"ActivityTemplate::ActivityTemplate: invalid WindowFramework")
+	//
+	setParametersDefaults();
+}
+
+ActivityTemplate::~ActivityTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType ActivityTemplate::componentType() const
+{
+	return ComponentType(Activity::get_class_type().get_name());
+}
+
+ComponentFamilyType ActivityTemplate::familyType() const
+{
+	return ComponentFamilyType("Behavior");
+}
+
+SMARTPTR(Component)ActivityTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Activity) newActivity = new Activity(this);
+	newActivity->setComponentId(compId);
+	if (not newActivity->initialize())
+	{
+		return NULL;
+	}
+	return newActivity.p();
+}
+
+void ActivityTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("instance_update", ""));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ActivityTemplate::_type_handle;
 
 } // namespace ely

@@ -22,7 +22,6 @@
  */
 
 #include "ControlComponents/Chaser.h"
-#include "ControlComponents/ChaserTemplate.h"
 #include "Game/GameControlManager.h"
 #include "Game/GamePhysicsManager.h"
 
@@ -539,5 +538,74 @@ void Chaser::doCorrectChaserHeight(LPoint3f& newPos, float baseHeight)
 
 //TypedObject semantics: hardcoded
 TypeHandle Chaser::_type_handle;
+
+///Template
+
+ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"DriverTemplate::ChaserTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"DriverTemplate::ChaserTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
+			"DriverTemplate::ChaserTemplate: invalid GameControlManager")
+	//
+	setParametersDefaults();
+}
+
+ChaserTemplate::~ChaserTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType ChaserTemplate::componentType() const
+{
+	return ComponentType(Chaser::get_class_type().get_name());
+}
+
+ComponentFamilyType ChaserTemplate::familyType() const
+{
+	return ComponentFamilyType("Control");
+}
+
+SMARTPTR(Component)ChaserTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Chaser) newChaser = new Chaser(this);
+	newChaser->setComponentId(compId);
+	if (not newChaser->initialize())
+	{
+		return NULL;
+	}
+	return newChaser.p();
+}
+
+void ChaserTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("enabled", "true"));
+	mParameterTable.insert(ParameterNameValue("backward", "true"));
+	mParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
+	mParameterTable.insert(ParameterNameValue("friction", "1.0"));
+	mParameterTable.insert(ParameterNameValue("fixed_lookat", "true"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
+	mParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
+	mParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+	mParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+	mParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+	mParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ChaserTemplate::_type_handle;
 
 } // namespace ely

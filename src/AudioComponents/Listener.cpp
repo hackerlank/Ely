@@ -22,7 +22,6 @@
  */
 
 #include "AudioComponents/Listener.h"
-#include "AudioComponents/ListenerTemplate.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
@@ -186,5 +185,61 @@ void Listener::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle Listener::_type_handle;
+
+///Template
+
+ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"ListenerTemplate::ListenerTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"ListenerTemplate::ListenerTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
+			"ListenerTemplate::ListenerTemplate: invalid GameAudioManager")
+	//
+	setParametersDefaults();
+}
+
+ListenerTemplate::~ListenerTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType ListenerTemplate::componentType() const
+{
+	return ComponentType(Listener::get_class_type().get_name());
+}
+
+ComponentFamilyType ListenerTemplate::familyType() const
+{
+	return ComponentFamilyType("Audio");
+}
+
+SMARTPTR(Component)ListenerTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Listener) newListener = new Listener(this);
+	newListener->setComponentId(compId);
+	if (not newListener->initialize())
+	{
+		return NULL;
+	}
+	return newListener.p();
+}
+
+void ListenerTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("scene_root", "render"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle ListenerTemplate::_type_handle;
 
 } // namespace ely

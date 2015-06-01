@@ -22,7 +22,6 @@
  */
 
 #include "AIComponents/SteerPlugIn.h"
-#include "AIComponents/SteerPlugInTemplate.h"
 #include "Support/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "Support/OpenSteerLocal/PlugIn_Pedestrian.h"
 #include "Support/OpenSteerLocal/PlugIn_Boids.h"
@@ -781,5 +780,62 @@ unsigned int SteerPlugIn::mUpdateCounter = 0;
 
 //TypedObject semantics: hardcoded
 TypeHandle SteerPlugIn::_type_handle;
+
+///Template
+
+SteerPlugInTemplate::SteerPlugInTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"OpenSteerPlugInTemplate::OpenSteerPlugInTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"OpenSteerPlugInTemplate::OpenSteerPlugInTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
+			"OpenSteerPlugInTemplate::OpenSteerPlugInTemplate: invalid GameAIManager")
+	//
+	setParametersDefaults();
+}
+
+SteerPlugInTemplate::~SteerPlugInTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType SteerPlugInTemplate::componentType() const
+{
+	return ComponentType(SteerPlugIn::get_class_type().get_name());
+}
+
+ComponentFamilyType SteerPlugInTemplate::familyType() const
+{
+	return ComponentFamilyType("AI");
+}
+
+SMARTPTR(Component)SteerPlugInTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(SteerPlugIn) newOpenSteerPlugIn = new SteerPlugIn(this);
+	newOpenSteerPlugIn->setComponentId(compId);
+	if (not newOpenSteerPlugIn->initialize())
+	{
+		return NULL;
+	}
+	return newOpenSteerPlugIn.p();
+}
+
+void SteerPlugInTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("type", "one_turning"));
+	mParameterTable.insert(ParameterNameValue("pathway", "0.0,0.0,0.0:1.0,1.0,1.0$1.0$false"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle SteerPlugInTemplate::_type_handle;
 
 } /* namespace ely */

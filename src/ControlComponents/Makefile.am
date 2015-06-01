@@ -14,6 +14,4 @@ noinst_LTLIBRARIES = \
 #library sources
 libControlComponents_la_SOURCES = \
 	Chaser.cpp \
-	ChaserTemplate.cpp \
-	Driver.cpp \
-	DriverTemplate.cpp
+	Driver.cpp

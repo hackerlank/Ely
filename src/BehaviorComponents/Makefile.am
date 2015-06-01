@@ -13,5 +13,4 @@ noinst_LTLIBRARIES = \
 
 #library sources
 libBehaviorComponents_la_SOURCES = \
-	Activity.cpp \
-	ActivityTemplate.cpp
+	Activity.cpp

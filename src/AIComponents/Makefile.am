@@ -14,10 +14,6 @@ noinst_LTLIBRARIES = \
 #library sources
 libAIComponents_la_SOURCES = \
 	CrowdAgent.cpp \
-	CrowdAgentTemplate.cpp \
 	NavMesh.cpp \
-	NavMeshTemplate.cpp \
 	SteerPlugIn.cpp \
-	SteerPlugInTemplate.cpp \
-	SteerVehicle.cpp \
-	SteerVehicleTemplate.cpp
+	SteerVehicle.cpp

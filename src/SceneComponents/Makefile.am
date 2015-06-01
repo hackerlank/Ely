@@ -14,10 +14,6 @@ noinst_LTLIBRARIES = \
 #library sources
 libSceneComponents_la_SOURCES = \
 	InstanceOf.cpp \
-	InstanceOfTemplate.cpp \
 	Model.cpp \
-	ModelTemplate.cpp \
 	NodePathWrapper.cpp \
-	NodePathWrapperTemplate.cpp \
-	Terrain.cpp \
-	TerrainTemplate.cpp
+	Terrain.cpp

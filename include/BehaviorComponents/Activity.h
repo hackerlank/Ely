@@ -279,6 +279,52 @@ inline Activity::operator Activity::TransitionTable&()
 	return mTransitionTable;
 }
 
+///Template
+
+class ActivityTemplate: public ComponentTemplate
+{
+protected:
+
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
+
+public:
+	ActivityTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
+	virtual ~ActivityTemplate();
+
+	virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+
+	virtual void setParametersDefaults();
+
+private:
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		ComponentTemplate::init_type();
+		register_type(_type_handle, "ActivityTemplate",
+				ComponentTemplate::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+
+};
 }  // namespace ely
 
 #endif /* ACTIVITY_H_ */

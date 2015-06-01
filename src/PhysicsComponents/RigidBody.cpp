@@ -22,7 +22,6 @@
  */
 
 #include "PhysicsComponents/RigidBody.h"
-#include "PhysicsComponents/RigidBodyTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "PhysicsComponents/Ghost.h"
 #include "SceneComponents/Model.h"
@@ -573,5 +572,71 @@ void RigidBody::doSetPhysicalParameters()
 
 //TypedObject semantics: hardcoded
 TypeHandle RigidBody::_type_handle;
+
+///Template
+
+RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"RigidBodyTemplate::RigidBodyTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"RigidBodyTemplate::RigidBodyTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+			"RigidBodyTemplate::RigidBodyTemplate: invalid GamePhysicsManager")
+	//
+	setParametersDefaults();
+}
+
+RigidBodyTemplate::~RigidBodyTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType RigidBodyTemplate::componentType() const
+{
+	return ComponentType(RigidBody::get_class_type().get_name());
+}
+
+ComponentFamilyType RigidBodyTemplate::familyType() const
+{
+	return ComponentFamilyType("Physics");
+}
+
+SMARTPTR(Component)RigidBodyTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(RigidBody) newRigidBody = new RigidBody(this);
+	newRigidBody->setComponentId(compId);
+	if (not newRigidBody->initialize())
+	{
+		return NULL;
+	}
+	return newRigidBody.p();
+}
+
+void RigidBodyTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("body_type", "dynamic"));
+	mParameterTable.insert(ParameterNameValue("body_mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("body_friction", "0.8"));
+	mParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
+	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
+	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("shape_height", "1.0"));
+	mParameterTable.insert(ParameterNameValue("shape_up", "z"));
+	mParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
+	mParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle RigidBodyTemplate::_type_handle;
 
 } // namespace ely

@@ -14,6 +14,4 @@ noinst_LTLIBRARIES = \
 #library sources
 libPhysicsControlComponents_la_SOURCES = \
 	CharacterController.cpp \
-	CharacterControllerTemplate.cpp \
-	Vehicle.cpp \
-	VehicleTemplate.cpp
+	Vehicle.cpp

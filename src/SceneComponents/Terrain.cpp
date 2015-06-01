@@ -22,7 +22,6 @@
  */
 
 #include "SceneComponents/Terrain.h"
-#include "SceneComponents/TerrainTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameSceneManager.h"
 #include <texturePool.h>
@@ -259,5 +258,72 @@ GeoMipTerrainRef::GeoMipTerrainRef(const std::string& name) :
 
 //TypedObject semantics: hardcoded
 TypeHandle GeoMipTerrainRef::_type_handle;
+
+///Template
+
+TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"TerrainTemplate::TerrainTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"TerrainTemplate::TerrainTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
+			"TerrainTemplate::TerrainTemplate: invalid GameSceneManager")
+	//
+	setParametersDefaults();
+}
+
+TerrainTemplate::~TerrainTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType TerrainTemplate::componentType() const
+{
+	return ComponentType(Terrain::get_class_type().get_name());
+}
+
+ComponentFamilyType TerrainTemplate::familyType() const
+{
+	return ComponentFamilyType("Scene");
+}
+
+SMARTPTR(Component)TerrainTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Terrain) newTerrain = new Terrain(this);
+	newTerrain->setComponentId(compId);
+	if (not newTerrain->initialize())
+	{
+		return NULL;
+	}
+	return newTerrain.p();
+}
+
+void TerrainTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("height_scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("width_scale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("do_scale", "true"));
+	mParameterTable.insert(ParameterNameValue("block_size", "64"));
+	mParameterTable.insert(ParameterNameValue("near_percent", "0.1"));
+	mParameterTable.insert(ParameterNameValue("far_percent", "1.0"));
+	mParameterTable.insert(ParameterNameValue("brute_force", "true"));
+	mParameterTable.insert(ParameterNameValue("auto_flatten", "AFM_medium"));
+	mParameterTable.insert(ParameterNameValue("focal_point", "camera"));
+	mParameterTable.insert(ParameterNameValue("minimum_level", "0"));
+	mParameterTable.insert(ParameterNameValue("texture_uscale", "1.0"));
+	mParameterTable.insert(ParameterNameValue("texture_vscale", "1.0"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle TerrainTemplate::_type_handle;
 
 } // namespace ely

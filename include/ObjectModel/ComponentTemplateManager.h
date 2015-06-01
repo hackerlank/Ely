@@ -25,7 +25,7 @@
 #define COMPONENTTEMPLATEMANAGER_H_
 
 #include "Utilities/Tools.h"
-#include "ComponentTemplate.h"
+#include "Component.h"
 
 namespace ely
 {

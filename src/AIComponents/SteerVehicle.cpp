@@ -21,7 +21,6 @@
  * \author consultit
  */
 #include "AIComponents/SteerVehicle.h"
-#include "AIComponents/SteerVehicleTemplate.h"
 #include "AIComponents/SteerPlugIn.h"
 #include "Support/OpenSteerLocal/PlugIn_OneTurning.h"
 #include "Support/OpenSteerLocal/PlugIn_Pedestrian.h"
@@ -659,5 +658,69 @@ void SteerVehicle::doEnableSteerVehicleEvent(EventThrown event, ThrowEventData e
 
 //TypedObject semantics: hardcoded
 TypeHandle SteerVehicle::_type_handle;
+
+///Template
+
+SteerVehicleTemplate::SteerVehicleTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"OpenSteerVehicleTemplate::OpenSteerVehicleTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"OpenSteerVehicleTemplate::OpenSteerVehicleTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
+			"OpenSteerVehicleTemplate::OpenSteerVehicleTemplate: invalid GameAIManager")
+	//
+	setParametersDefaults();
+}
+
+SteerVehicleTemplate::~SteerVehicleTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType SteerVehicleTemplate::componentType() const
+{
+	return ComponentType(SteerVehicle::get_class_type().get_name());
+}
+
+ComponentFamilyType SteerVehicleTemplate::familyType() const
+{
+	return ComponentFamilyType("AI");
+}
+
+SMARTPTR(Component)SteerVehicleTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(SteerVehicle) newOpenSteerVehicle = new SteerVehicle(this);
+	newOpenSteerVehicle->setComponentId(compId);
+	if (not newOpenSteerVehicle->initialize())
+	{
+		return NULL;
+	}
+	return newOpenSteerVehicle.p();
+}
+
+void SteerVehicleTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("type", "one_turning"));
+	mParameterTable.insert(ParameterNameValue("external_update", "false"));
+	mParameterTable.insert(ParameterNameValue("mov_type", "opensteer"));
+	mParameterTable.insert(ParameterNameValue("up_axis_fixed", "false"));
+	mParameterTable.insert(ParameterNameValue("mass", "1.0"));
+	mParameterTable.insert(ParameterNameValue("speed", "0.0"));
+	mParameterTable.insert(ParameterNameValue("max_force", "0.1"));
+	mParameterTable.insert(ParameterNameValue("max_speed", "1.0"));
+	mParameterTable.insert(ParameterNameValue("ray_mask", "all_on"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle SteerVehicleTemplate::_type_handle;
 
 } /* namespace ely */

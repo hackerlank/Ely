@@ -22,7 +22,6 @@
  */
 
 #include "AudioComponents/Sound3d.h"
-#include "AudioComponents/Sound3dTemplate.h"
 #include "ObjectModel/Object.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GameAudioManager.h"
@@ -368,5 +367,61 @@ void Sound3d::update(void* data)
 
 //TypedObject semantics: hardcoded
 TypeHandle Sound3d::_type_handle;
+
+///Template
+
+Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"Sound3dTemplate::Sound3dTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"Sound3dTemplate::Sound3dTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
+			"Sound3dTemplate::Sound3dTemplate: invalid GameAudioManager")
+	//
+	setParametersDefaults();
+}
+
+Sound3dTemplate::~Sound3dTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType Sound3dTemplate::componentType() const
+{
+	return ComponentType(Sound3d::get_class_type().get_name());
+}
+
+ComponentFamilyType Sound3dTemplate::familyType() const
+{
+	return ComponentFamilyType("Audio");
+}
+
+SMARTPTR(Component) Sound3dTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Sound3d) newSound3d = new Sound3d(this);
+	newSound3d->setComponentId(compId);
+	if (not newSound3d->initialize())
+	{
+		return NULL;
+	}
+	return newSound3d.p();
+}
+
+void Sound3dTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("scene_root", "render"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle Sound3dTemplate::_type_handle;
 
 } // namespace ely

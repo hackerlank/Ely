@@ -23,7 +23,6 @@
 
 #include "Utilities/Tools.h"
 #include "ObjectModel/Object.h"
-#include "ObjectModel/ObjectTemplate.h"
 #include "Utilities/ComponentSuite.h"
 
 namespace ely

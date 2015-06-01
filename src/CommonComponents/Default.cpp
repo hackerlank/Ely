@@ -22,7 +22,6 @@
  */
 
 #include "CommonComponents/Default.h"
-#include "CommonComponents/DefaultTemplate.h"
 
 namespace ely
 {
@@ -57,5 +56,54 @@ TypeHandle Default::_type_handle;
 
 //MemoryPool semantics: hardcoded
 GCC_MEMORYPOOL_DEFINITION(Default);
+
+///Template
+
+DefaultTemplate::DefaultTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	//
+	setParametersDefaults();
+}
+
+DefaultTemplate::~DefaultTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType DefaultTemplate::componentType() const
+{
+	return ComponentType(Default::get_class_type().get_name());
+}
+
+ComponentFamilyType DefaultTemplate::familyType() const
+{
+	return ComponentFamilyType("Common");
+}
+
+SMARTPTR(Component)DefaultTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Default) newDefault = new Default(this);
+	newDefault->setComponentId(compId);
+	if (not newDefault->initialize())
+	{
+		return NULL;
+	}
+	return newDefault.p();
+}
+
+void DefaultTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle DefaultTemplate::_type_handle;
 
 } /* namespace ely */

@@ -22,7 +22,6 @@
  */
 
 #include "AIComponents/CrowdAgent.h"
-#include "AIComponents/CrowdAgentTemplate.h"
 #include "AIComponents/NavMesh.h"
 #include "Support/RecastNavigationLocal/CrowdTool.h"
 #include "ObjectModel/ObjectTemplateManager.h"
@@ -486,5 +485,73 @@ void CrowdAgent::doEnableCrowdAgentEvent(EventThrown event, ThrowEventData event
 //TypedObject semantics: hardcoded
 TypeHandle CrowdAgent::_type_handle;
 
-}  // namespace ely
+///Template
 
+CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GameAIManager")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+			"CrowdAgentTemplate::CrowdAgentTemplate: invalid GamePhysicsManager")
+	//
+	setParametersDefaults();
+}
+
+CrowdAgentTemplate::~CrowdAgentTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType CrowdAgentTemplate::componentType() const
+{
+	return ComponentType(CrowdAgent::get_class_type().get_name());
+}
+
+ComponentFamilyType CrowdAgentTemplate::familyType() const
+{
+	return ComponentFamilyType("AI");
+}
+
+SMARTPTR(Component)CrowdAgentTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(CrowdAgent) newCrowdAgent = new CrowdAgent(this);
+	newCrowdAgent->setComponentId(compId);
+	if (not newCrowdAgent->initialize())
+	{
+		return NULL;
+	}
+	return newCrowdAgent.p();
+}
+
+void CrowdAgentTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	mParameterTable.insert(ParameterNameValue("add_to_navmesh", ""));
+	mParameterTable.insert(ParameterNameValue("mov_type", "recast"));
+	mParameterTable.insert(ParameterNameValue("move_target", "0.0,0.0,0.0"));
+	mParameterTable.insert(ParameterNameValue("move_velocity", "0.0,0.0,0.0"));
+	mParameterTable.insert(ParameterNameValue("max_acceleration", "8.0"));
+	mParameterTable.insert(ParameterNameValue("max_speed", "3.5"));
+	mParameterTable.insert(ParameterNameValue("collision_query_range", "12.0"));
+	mParameterTable.insert(ParameterNameValue("path_optimization_range", "30.0"));
+	mParameterTable.insert(ParameterNameValue("separation_weight", "2.0"));
+	mParameterTable.insert(ParameterNameValue("update_flags", "0x1b"));
+	mParameterTable.insert(ParameterNameValue("obstacle_avoidance_type", "3"));
+	mParameterTable.insert(ParameterNameValue("ray_mask", "all_on"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle CrowdAgentTemplate::_type_handle;
+
+}  // namespace ely

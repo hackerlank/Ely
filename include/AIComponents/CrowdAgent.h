@@ -340,6 +340,53 @@ inline ReMutex& CrowdAgent::getNavMeshMutex()
 }
 #endif
 
+///Template
+
+class CrowdAgentTemplate: public ComponentTemplate
+{
+protected:
+
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
+
+public:
+	CrowdAgentTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
+	virtual ~CrowdAgentTemplate();
+
+	virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+
+	virtual void setParametersDefaults();
+
+private:
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		ComponentTemplate::init_type();
+		register_type(_type_handle, "CrowdAgentTemplate",
+				ComponentTemplate::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+
+};
 }  // namespace ely
+
 
 #endif /* CROWDAGENT_H_ */

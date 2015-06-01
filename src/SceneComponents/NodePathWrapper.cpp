@@ -22,7 +22,6 @@
  */
 
 #include "SceneComponents/NodePathWrapper.h"
-#include "SceneComponents/NodePathWrapperTemplate.h"
 #include "ObjectModel/Object.h"
 #include "Game/GameSceneManager.h"
 
@@ -109,5 +108,62 @@ void NodePathWrapper::onRemoveFromObjectCleanup()
 
 //TypedObject semantics: hardcoded
 TypeHandle NodePathWrapper::_type_handle;
+
+///Template
+
+NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
+			"NodePathWrapperTemplate::NodePathWrapperTemplate: invalid GameSceneManager")
+	//
+	setParametersDefaults();
+
+}
+
+NodePathWrapperTemplate::~NodePathWrapperTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType NodePathWrapperTemplate::componentType() const
+{
+	return ComponentType(NodePathWrapper::get_class_type().get_name());
+}
+
+ComponentFamilyType NodePathWrapperTemplate::familyType() const
+{
+	return ComponentFamilyType("Scene");
+}
+
+SMARTPTR(Component)NodePathWrapperTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(NodePathWrapper) newNodePathWrapper = new NodePathWrapper(this);
+	newNodePathWrapper->setComponentId(compId);
+	if (not newNodePathWrapper->initialize())
+	{
+		return NULL;
+	}
+	return newNodePathWrapper.p();
+}
+
+void NodePathWrapperTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values:
+	//no mandatory parameters
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle NodePathWrapperTemplate::_type_handle;
 
 } // namespace ely

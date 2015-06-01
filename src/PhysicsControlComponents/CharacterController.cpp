@@ -22,7 +22,6 @@
  */
 
 #include "PhysicsControlComponents/CharacterController.h"
-#include "PhysicsControlComponents/CharacterControllerTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 
 namespace ely
@@ -578,5 +577,81 @@ void CharacterController::doEnableCharacterControllerEvent(EventThrown event, Th
 
 //TypedObject semantics: hardcoded
 TypeHandle CharacterController::_type_handle;
+
+///Template
+
+CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"CharacterTemplate::CharacterTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"CharacterTemplate::CharacterTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+			"CharacterTemplate::CharacterTemplate: invalid GamePhysicsManager")
+	//
+	setParametersDefaults();
+}
+
+CharacterControllerTemplate::~CharacterControllerTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType CharacterControllerTemplate::componentType() const
+{
+	return ComponentType(CharacterController::get_class_type().get_name());
+}
+
+ComponentFamilyType CharacterControllerTemplate::familyType() const
+{
+	return ComponentFamilyType("PhysicsControl");
+}
+
+SMARTPTR(Component)CharacterControllerTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(CharacterController) newCharacter = new CharacterController(this);
+	newCharacter->setComponentId(compId);
+	if (not newCharacter->initialize())
+	{
+		return NULL;
+	}
+	return newCharacter.p();
+}
+
+void CharacterControllerTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("step_height", "1.0"));
+	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
+	mParameterTable.insert(ParameterNameValue("shape_up", "z"));
+	mParameterTable.insert(ParameterNameValue("fall_speed", "55.0"));
+	mParameterTable.insert(ParameterNameValue("gravity", "29.4"));
+	mParameterTable.insert(ParameterNameValue("jump_speed", "10.0"));
+	mParameterTable.insert(ParameterNameValue("max_slope", "45.0"));
+	mParameterTable.insert(ParameterNameValue("forward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("backward", "enabled"));
+	mParameterTable.insert(ParameterNameValue("up", "enabled"));
+	mParameterTable.insert(ParameterNameValue("down", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+	mParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+	mParameterTable.insert(ParameterNameValue("jump", "enabled"));
+	mParameterTable.insert(ParameterNameValue("linear_speed", "10.0"));
+	mParameterTable.insert(ParameterNameValue("angular_speed", "45.0"));
+	mParameterTable.insert(ParameterNameValue("is_local", "true"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle CharacterControllerTemplate::_type_handle;
 
 }  // namespace ely

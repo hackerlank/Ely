@@ -14,6 +14,4 @@ noinst_LTLIBRARIES = \
 #library sources
 libCommonComponents_la_SOURCES = \
 	Default.cpp \
-	DefaultTemplate.cpp \
-	GameConfig.cpp \
-	GameConfigTemplate.cpp
+	GameConfig.cpp

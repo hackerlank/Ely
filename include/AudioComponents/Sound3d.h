@@ -248,6 +248,54 @@ inline float Sound3d::getMaxDistance()
 	return mMaxDist;
 }
 
+///Template
+
+class Sound3dTemplate: public ComponentTemplate
+{
+protected:
+
+	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId);
+
+public:
+	Sound3dTemplate(PandaFramework* pandaFramework,
+			WindowFramework* windowFramework);
+	virtual ~Sound3dTemplate();
+
+	virtual ComponentType componentType() const;
+	virtual ComponentFamilyType familyType() const;
+
+	virtual void setParametersDefaults();
+
+private:
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+
+	static void init_type()
+	{
+		ComponentTemplate::init_type();
+		register_type(_type_handle, "Sound3dTemplate",
+				ComponentTemplate::get_class_type());
+	}
+
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+};
 }  // namespace ely
 
 #endif /* SOUND3D_H_ */

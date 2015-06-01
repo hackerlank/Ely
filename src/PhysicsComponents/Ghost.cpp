@@ -22,7 +22,6 @@
  */
 
 #include "PhysicsComponents/Ghost.h"
-#include "PhysicsComponents/GhostTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "PhysicsComponents/RigidBody.h"
 #include "SceneComponents/Model.h"
@@ -727,5 +726,71 @@ void Ghost::doEnableGhostEvent(EventThrown event, ThrowEventData eventData)
 
 //TypedObject semantics: hardcoded
 TypeHandle Ghost::_type_handle;
+
+///Template
+
+GhostTemplate::GhostTemplate(PandaFramework* pandaFramework,
+		WindowFramework* windowFramework) :
+		ComponentTemplate(pandaFramework, windowFramework)
+{
+	CHECK_EXISTENCE_DEBUG(pandaFramework,
+			"GhostTemplate::GhostTemplate: invalid PandaFramework")
+	CHECK_EXISTENCE_DEBUG(windowFramework,
+			"GhostTemplate::GhostTemplate: invalid WindowFramework")
+	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
+			"GhostTemplate::GhostTemplate: invalid GamePhysicsManager")
+	//
+	setParametersDefaults();
+}
+
+GhostTemplate::~GhostTemplate()
+{
+	// TODO Auto-generated destructor stub
+}
+
+ComponentType GhostTemplate::componentType() const
+{
+	return ComponentType(Ghost::get_class_type().get_name());
+}
+
+ComponentFamilyType GhostTemplate::familyType() const
+{
+	return ComponentFamilyType("Physics");
+}
+
+SMARTPTR(Component)GhostTemplate::makeComponent(const ComponentId& compId)
+{
+	SMARTPTR(Ghost) newGhost = new Ghost(this);
+	newGhost->setComponentId(compId);
+	if (not newGhost->initialize())
+	{
+		return NULL;
+	}
+	return newGhost.p();
+}
+
+void GhostTemplate::setParametersDefaults()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//mParameterTable must be the first cleared
+	mParameterTable.clear();
+	//sets the (mandatory) parameters to their default values.
+	mParameterTable.insert(ParameterNameValue("thrown_events", "overlap@@30.0"));
+	mParameterTable.insert(ParameterNameValue("ghost_type", "static"));
+	mParameterTable.insert(ParameterNameValue("ghost_friction", "0.8"));
+	mParameterTable.insert(ParameterNameValue("ghost_restitution", "0.1"));
+	mParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+	mParameterTable.insert(ParameterNameValue("shape_size", "medium"));
+	mParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+	mParameterTable.insert(ParameterNameValue("shape_height", "1.0"));
+	mParameterTable.insert(ParameterNameValue("shape_up", "z"));
+	mParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
+	mParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle GhostTemplate::_type_handle;
 
 } /* namespace ely */

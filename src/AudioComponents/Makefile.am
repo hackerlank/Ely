@@ -14,6 +14,4 @@ noinst_LTLIBRARIES = \
 #library sources
 libAudioComponents_la_SOURCES = \
 	Listener.cpp \
-	ListenerTemplate.cpp \
-	Sound3d.cpp \
-	Sound3dTemplate.cpp
+	Sound3d.cpp

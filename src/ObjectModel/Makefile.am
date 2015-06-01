@@ -14,8 +14,6 @@ noinst_LTLIBRARIES = \
 #library sources
 libObjectModel_la_SOURCES = \
 	Component.cpp \
-	ComponentTemplate.cpp \
 	ComponentTemplateManager.cpp \
 	Object.cpp \
-	ObjectTemplate.cpp \
 	ObjectTemplateManager.cpp
