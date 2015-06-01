@@ -19,7 +19,7 @@
 #ifndef RECASTSAMPLETILEMESH_H
 #define RECASTSAMPLETILEMESH_H
 
-#include "Support/RecastNavigationLocal/NavMeshType.h"
+#include "NavMeshType.h"
 #include <DetourNavMesh.h>
 #include <Recast.h>
 
