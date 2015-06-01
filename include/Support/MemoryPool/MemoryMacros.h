@@ -39,9 +39,6 @@
 #ifndef MEMORYMACROS_H_
 #define MEMORYMACROS_H_
 
-namespace ely
-{
-
 //---------------------------------------------------------------------------------------------------------------------
 // These macros are designed to allow classes to easily take advantage of memory pools.  To use, follow this steps:
 // 1) Call GCC_MEMORYPOOL_DECLARATION() in the class declaration
@@ -147,7 +144,5 @@ _className_ ## _AutoInitializedMemoryPool::~_className_ ## _AutoInitializedMemor
 static _className_ ## _AutoInitializedMemoryPool s_ ## _className_ ## _AutoInitializedMemoryPool; \
 
 #define GCC_MEMORYPOOL_AUTOINIT(_className_, _numChunks_) GCC_MEMORYPOOL_AUTOINIT_DEBUGNAME(_className_, _numChunks_, #_className_)
-
-} // namespace ely
 
 #endif /* MEMORYMACROS_H_ */
