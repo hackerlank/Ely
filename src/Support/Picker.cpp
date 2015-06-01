@@ -172,7 +172,6 @@ void Picker::pickBody(const Event* event)
 							if (not(mPickedBody->is_static() or mPickedBody->is_kinematic()))
 							{
 								//set body as active and not deactivable
-								mPickedBody->set_active(true);
 								mPickedBody->set_deactivation_enabled(false);
 								//get global pivot pos
 								LPoint3f pivotPos = result.get_hit_pos();
@@ -304,7 +303,6 @@ void Picker::pickBody(const Event* event)
 			mCsPick.clear();
 			//set body as inactive and deactivable
 			mPickedBody->set_deactivation_enabled(true);
-			mPickedBody->set_active(false);
 		}
 		else if(mSoftDrag)
 		{
