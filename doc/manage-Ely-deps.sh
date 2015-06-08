@@ -118,8 +118,8 @@ updateElyDeps () {
 		git pull && \
 		makepanda/makepanda.py --verbose --everything --no-fftw \
 	 		--threads ${THREADS} --optimize ${OPTIMIZE} --installer && \
-	 	PKG=panda3d1.9_1.9.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
-	 	mv panda3d1.9_1.9.0_amd64.deb ${PKG} && \
+	 	PKG=panda3d1.10_1.10.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
+	 	mv panda3d1.10_1.10.0_amd64.deb ${PKG} && \
 	 	${PANDA3DINSTCMD} ${PKG}
 	#
 	cd ${WORKDIR}
