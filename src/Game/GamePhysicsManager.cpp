@@ -489,7 +489,7 @@ SMARTPTR(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		collisionShape = new BulletConeShape(dim1, dim2, upAxis);
 		break;
 		case HEIGHTFIELD:
-		collisionShape = new BulletHeightfieldShape(heightfieldFile, 1.0, upAxis);
+		collisionShape = new BulletHeightfieldShape(PNMImage(heightfieldFile), 1.0, upAxis);
 		break;
 		case TRIANGLEMESH:
 		{
