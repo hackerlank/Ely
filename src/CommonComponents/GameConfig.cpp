@@ -29,11 +29,6 @@
 namespace ely
 {
 
-GameConfig::GameConfig()
-{
-	reset();
-}
-
 GameConfig::GameConfig(SMARTPTR(GameConfigTemplate)tmpl)
 {
 	mTmpl = tmpl;
@@ -170,7 +165,7 @@ GameConfigTemplate::GameConfigTemplate(PandaFramework* pandaFramework,
 
 GameConfigTemplate::~GameConfigTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType GameConfigTemplate::componentType() const

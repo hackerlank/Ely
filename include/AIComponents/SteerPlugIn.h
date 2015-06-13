@@ -60,6 +60,7 @@ class SteerPlugIn: public Component
 protected:
 	friend class SteerPlugInTemplate;
 
+	SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -68,8 +69,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	SteerPlugIn();
-	SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl);
 	virtual ~SteerPlugIn();
 
 	virtual ComponentFamilyType familyType() const;

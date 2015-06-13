@@ -32,11 +32,6 @@
 namespace ely
 {
 
-Ghost::Ghost()
-{
-	reset();
-}
-
 Ghost::Ghost(SMARTPTR(GhostTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
@@ -745,7 +740,7 @@ GhostTemplate::GhostTemplate(PandaFramework* pandaFramework,
 
 GhostTemplate::~GhostTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType GhostTemplate::componentType() const

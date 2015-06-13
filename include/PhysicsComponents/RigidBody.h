@@ -90,6 +90,7 @@ class RigidBody: public Component
 protected:
 	friend class RigidBodyTemplate;
 
+	RigidBody(SMARTPTR(RigidBodyTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -98,8 +99,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	RigidBody();
-	RigidBody(SMARTPTR(RigidBodyTemplate)tmpl);
 	virtual ~RigidBody();
 
 	virtual ComponentFamilyType familyType() const;

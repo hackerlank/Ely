@@ -34,11 +34,6 @@
 namespace ely
 {
 
-Model::Model()
-{
-	reset();
-}
-
 Model::Model(SMARTPTR(ModelTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
@@ -520,7 +515,7 @@ ModelTemplate::ModelTemplate(PandaFramework* pandaFramework,
 
 ModelTemplate::~ModelTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType ModelTemplate::componentType() const

@@ -28,11 +28,6 @@
 namespace ely
 {
 
-NodePathWrapper::NodePathWrapper()
-{
-	reset();
-}
-
 NodePathWrapper::NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
@@ -128,7 +123,7 @@ NodePathWrapperTemplate::NodePathWrapperTemplate(PandaFramework* pandaFramework,
 
 NodePathWrapperTemplate::~NodePathWrapperTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType NodePathWrapperTemplate::componentType() const

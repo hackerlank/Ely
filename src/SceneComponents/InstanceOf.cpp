@@ -29,11 +29,6 @@
 namespace ely
 {
 
-InstanceOf::InstanceOf()
-{
-	reset();
-}
-
 InstanceOf::InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
@@ -155,7 +150,7 @@ InstanceOfTemplate::InstanceOfTemplate(PandaFramework* pandaFramework,
 
 InstanceOfTemplate::~InstanceOfTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType InstanceOfTemplate::componentType() const

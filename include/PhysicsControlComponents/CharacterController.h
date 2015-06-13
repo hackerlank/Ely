@@ -89,6 +89,7 @@ class CharacterController: public Component
 protected:
 	friend class CharacterControllerTemplate;
 
+	CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -97,8 +98,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	CharacterController();
-	CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl);
 	virtual ~CharacterController();
 
 	virtual ComponentFamilyType familyType() const;

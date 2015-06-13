@@ -29,11 +29,6 @@
 namespace ely
 {
 
-Listener::Listener()
-{
-	reset();
-}
-
 Listener::Listener(SMARTPTR(ListenerTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
@@ -204,7 +199,7 @@ ListenerTemplate::ListenerTemplate(PandaFramework* pandaFramework,
 
 ListenerTemplate::~ListenerTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType ListenerTemplate::componentType() const

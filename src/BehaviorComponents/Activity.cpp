@@ -29,13 +29,6 @@
 namespace ely
 {
 
-Activity::Activity() :
-		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false),
-		mInstanceUpdateLib(NULL), mInstanceUpdate(NULL), mInstanceUpdateName("")
-{
-	reset();
-}
-
 Activity::Activity(SMARTPTR(ActivityTemplate)tmpl) :
 		mFSM("FSM"), mTransitionLib(NULL), mTransitionsLoaded(false),
 		mInstanceUpdateLib(NULL), mInstanceUpdate(NULL), mInstanceUpdateName("")
@@ -575,7 +568,7 @@ ActivityTemplate::ActivityTemplate(PandaFramework* pandaFramework,
 
 ActivityTemplate::~ActivityTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType ActivityTemplate::componentType() const

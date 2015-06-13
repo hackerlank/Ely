@@ -72,6 +72,7 @@ class Chaser: public Component
 protected:
 	friend class ChaserTemplate;
 
+	Chaser(SMARTPTR(ChaserTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -80,8 +81,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Chaser();
-	Chaser(SMARTPTR(ChaserTemplate)tmpl);
 	virtual ~Chaser();
 
 	virtual ComponentFamilyType familyType() const;

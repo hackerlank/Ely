@@ -33,14 +33,6 @@
 namespace ely
 {
 
-CrowdAgent::CrowdAgent():
-		mHitResult(BulletClosestHitRayResult::empty())
-{
-	mNavMesh.clear();
-	mStartNavMesh.clear();
-	reset();
-}
-
 CrowdAgent::CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl):
 				mHitResult(BulletClosestHitRayResult::empty())
 {
@@ -505,7 +497,7 @@ CrowdAgentTemplate::CrowdAgentTemplate(PandaFramework* pandaFramework,
 
 CrowdAgentTemplate::~CrowdAgentTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType CrowdAgentTemplate::componentType() const

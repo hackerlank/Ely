@@ -88,6 +88,7 @@ class NavMesh: public Component
 protected:
 	friend class NavMeshTemplate;
 
+	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -96,8 +97,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	NavMesh();
-	NavMesh(SMARTPTR(NavMeshTemplate)tmpl);
 	virtual ~NavMesh();
 
 	virtual ComponentFamilyType familyType() const;

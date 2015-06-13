@@ -31,11 +31,6 @@
 namespace ely
 {
 
-RigidBody::RigidBody()
-{
-	reset();
-}
-
 RigidBody::RigidBody(SMARTPTR(RigidBodyTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
@@ -591,7 +586,7 @@ RigidBodyTemplate::RigidBodyTemplate(PandaFramework* pandaFramework,
 
 RigidBodyTemplate::~RigidBodyTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType RigidBodyTemplate::componentType() const

@@ -48,6 +48,7 @@ class InstanceOf: public Component
 protected:
 	friend class InstanceOfTemplate;
 
+	InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -56,8 +57,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	InstanceOf();
-	InstanceOf(SMARTPTR(InstanceOfTemplate)tmpl);
 	virtual ~InstanceOf();
 
 	virtual ComponentFamilyType familyType() const;

@@ -103,6 +103,7 @@ class Driver: public Component
 protected:
 	friend class DriverTemplate;
 
+	Driver(SMARTPTR(DriverTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -111,8 +112,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Driver();
-	Driver(SMARTPTR(DriverTemplate)tmpl);
 	virtual ~Driver();
 
 	virtual ComponentFamilyType familyType() const;

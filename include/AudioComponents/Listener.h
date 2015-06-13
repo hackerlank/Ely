@@ -49,6 +49,7 @@ class Listener: public Component
 protected:
 	friend class ListenerTemplate;
 
+	Listener(SMARTPTR(ListenerTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -57,8 +58,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Listener();
-	Listener(SMARTPTR(ListenerTemplate)tmpl);
 	virtual ~Listener();
 
 	virtual ComponentFamilyType familyType() const;

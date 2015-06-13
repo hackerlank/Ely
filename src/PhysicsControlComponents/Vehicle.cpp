@@ -31,11 +31,6 @@
 namespace ely
 {
 
-Vehicle::Vehicle()
-{
-	reset();
-}
-
 Vehicle::Vehicle(SMARTPTR(VehicleTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
@@ -47,7 +42,7 @@ Vehicle::Vehicle(SMARTPTR(VehicleTemplate)tmpl)
 
 Vehicle::~Vehicle()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentFamilyType Vehicle::familyType() const
@@ -852,7 +847,7 @@ VehicleTemplate::VehicleTemplate(PandaFramework* pandaFramework,
 
 VehicleTemplate::~VehicleTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType VehicleTemplate::componentType() const

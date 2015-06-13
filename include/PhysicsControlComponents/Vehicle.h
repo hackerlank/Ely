@@ -94,6 +94,7 @@ class Vehicle: public Component
 protected:
 	friend class VehicleTemplate;
 
+	Vehicle(SMARTPTR(VehicleTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -102,8 +103,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Vehicle();
-	Vehicle(SMARTPTR(VehicleTemplate)tmpl);
 	virtual ~Vehicle();
 
 	virtual ComponentFamilyType familyType() const;

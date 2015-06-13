@@ -33,11 +33,6 @@
 namespace ely
 {
 
-SoftBody::SoftBody()
-{
-	reset();
-}
-
 SoftBody::SoftBody(SMARTPTR(SoftBodyTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
@@ -615,7 +610,7 @@ SoftBodyTemplate::SoftBodyTemplate(PandaFramework* pandaFramework,
 
 SoftBodyTemplate::~SoftBodyTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType SoftBodyTemplate::componentType() const

@@ -48,6 +48,7 @@ class NodePathWrapper: public Component
 protected:
 	friend class NodePathWrapperTemplate;
 
+	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -56,8 +57,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	NodePathWrapper();
-	NodePathWrapper(SMARTPTR(NodePathWrapperTemplate)tmpl);
 	virtual ~NodePathWrapper();
 
 	virtual ComponentFamilyType familyType() const;

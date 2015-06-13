@@ -30,11 +30,6 @@
 namespace ely
 {
 
-Terrain::Terrain()
-{
-	reset();
-}
-
 Terrain::Terrain(SMARTPTR(TerrainTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameSceneManager::GetSingletonPtr(),
@@ -277,7 +272,7 @@ TerrainTemplate::TerrainTemplate(PandaFramework* pandaFramework,
 
 TerrainTemplate::~TerrainTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType TerrainTemplate::componentType() const

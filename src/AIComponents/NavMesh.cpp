@@ -37,14 +37,6 @@
 namespace ely
 {
 
-NavMesh::NavMesh()
-#ifdef ELY_THREAD
-:mAsyncSetupVar(mAsyncSetupMutex), mAsyncSetupComplete(true)
-#endif
-{
-	reset();
-}
-
 NavMesh::NavMesh(SMARTPTR(NavMeshTemplate)tmpl)
 #ifdef ELY_THREAD
 :mAsyncSetupVar(mAsyncSetupMutex), mAsyncSetupComplete(true)
@@ -1649,7 +1641,7 @@ NavMeshTemplate::NavMeshTemplate(PandaFramework* pandaFramework,
 
 NavMeshTemplate::~NavMeshTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType NavMeshTemplate::componentType() const

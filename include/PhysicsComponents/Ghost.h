@@ -103,6 +103,7 @@ class Ghost: public Component
 protected:
 	friend class GhostTemplate;
 
+	Ghost(SMARTPTR(GhostTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -111,8 +112,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Ghost();
-	Ghost(SMARTPTR(GhostTemplate)tmpl);
 	virtual ~Ghost();
 
 	virtual ComponentFamilyType familyType() const;

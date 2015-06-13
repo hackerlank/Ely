@@ -61,6 +61,7 @@ class Sound3d: public Component
 protected:
 	friend class Sound3dTemplate;
 
+	Sound3d(SMARTPTR(Sound3dTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -69,8 +70,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Sound3d();
-	Sound3d(SMARTPTR(Sound3dTemplate)tmpl);
 	virtual ~Sound3d();
 
 	virtual ComponentFamilyType familyType() const;

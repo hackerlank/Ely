@@ -28,11 +28,6 @@
 namespace ely
 {
 
-Chaser::Chaser()
-{
-	reset();
-}
-
 Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
@@ -557,7 +552,7 @@ ChaserTemplate::ChaserTemplate(PandaFramework* pandaFramework,
 
 ChaserTemplate::~ChaserTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType ChaserTemplate::componentType() const

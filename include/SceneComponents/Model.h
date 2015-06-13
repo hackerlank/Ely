@@ -76,6 +76,7 @@ class Model: public Component
 protected:
 	friend class ModelTemplate;
 
+	Model(SMARTPTR(ModelTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -84,8 +85,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Model();
-	Model(SMARTPTR(ModelTemplate)tmpl);
 	virtual ~Model();
 
 	virtual ComponentFamilyType familyType() const;

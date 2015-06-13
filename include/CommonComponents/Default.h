@@ -50,6 +50,7 @@ class Default: public Component
 protected:
 	friend class DefaultTemplate;
 
+	Default(SMARTPTR(DefaultTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -58,8 +59,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Default();
-	Default(SMARTPTR(DefaultTemplate)tmpl);
 	virtual ~Default();
 
 	virtual ComponentFamilyType familyType() const;

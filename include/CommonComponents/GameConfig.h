@@ -59,6 +59,7 @@ class GameConfig: public Component
 protected:
 	friend class GameConfigTemplate;
 
+	GameConfig(SMARTPTR(GameConfigTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -67,8 +68,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	GameConfig();
-	GameConfig(SMARTPTR(GameConfigTemplate)tmpl);
 	virtual ~GameConfig();
 
 	virtual ComponentFamilyType familyType() const;

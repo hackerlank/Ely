@@ -92,6 +92,7 @@ protected:
 	friend class CrowdAgentTemplate;
 	friend class NavMesh;
 
+	CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -100,8 +101,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	CrowdAgent();
-	CrowdAgent(SMARTPTR(CrowdAgentTemplate)tmpl);
 	virtual ~CrowdAgent();
 
 	virtual ComponentFamilyType familyType() const;

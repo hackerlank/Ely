@@ -26,11 +26,6 @@
 namespace ely
 {
 
-Default::Default()
-{
-	reset();
-}
-
 Default::Default(SMARTPTR(DefaultTemplate)tmpl)
 {
 	mTmpl = tmpl;
@@ -69,7 +64,7 @@ DefaultTemplate::DefaultTemplate(PandaFramework* pandaFramework,
 
 DefaultTemplate::~DefaultTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType DefaultTemplate::componentType() const

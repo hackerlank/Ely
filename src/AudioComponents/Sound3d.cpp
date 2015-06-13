@@ -29,11 +29,6 @@
 namespace ely
 {
 
-Sound3d::Sound3d()
-{
-	reset();
-}
-
 Sound3d::Sound3d(SMARTPTR(Sound3dTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameAudioManager::GetSingletonPtr(),
@@ -386,7 +381,7 @@ Sound3dTemplate::Sound3dTemplate(PandaFramework* pandaFramework,
 
 Sound3dTemplate::~Sound3dTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType Sound3dTemplate::componentType() const

@@ -26,10 +26,6 @@
 
 namespace ely
 {
-CharacterController::CharacterController()
-{
-	reset();
-}
 
 CharacterController::CharacterController(SMARTPTR(CharacterControllerTemplate)tmpl)
 {
@@ -596,7 +592,7 @@ CharacterControllerTemplate::CharacterControllerTemplate(PandaFramework* pandaFr
 
 CharacterControllerTemplate::~CharacterControllerTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType CharacterControllerTemplate::componentType() const

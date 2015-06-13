@@ -39,11 +39,6 @@
 namespace ely
 {
 
-SteerPlugIn::SteerPlugIn()
-{
-	reset();
-}
-
 SteerPlugIn::SteerPlugIn(SMARTPTR(SteerPlugInTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameAIManager::GetSingletonPtr(),
@@ -799,7 +794,7 @@ SteerPlugInTemplate::SteerPlugInTemplate(PandaFramework* pandaFramework,
 
 SteerPlugInTemplate::~SteerPlugInTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType SteerPlugInTemplate::componentType() const

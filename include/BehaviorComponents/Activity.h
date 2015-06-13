@@ -103,6 +103,7 @@ class Activity: public Component
 protected:
 	friend class ActivityTemplate;
 
+	Activity(SMARTPTR(ActivityTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -111,8 +112,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Activity();
-	Activity(SMARTPTR(ActivityTemplate)tmpl);
 	virtual ~Activity();
 
 	virtual ComponentFamilyType familyType() const;

@@ -64,6 +64,7 @@ class Terrain: public Component
 protected:
 	friend class TerrainTemplate;
 
+	Terrain(SMARTPTR(TerrainTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -72,8 +73,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	Terrain();
-	Terrain(SMARTPTR(TerrainTemplate)tmpl);
 	virtual ~Terrain();
 
 	virtual ComponentFamilyType familyType() const;

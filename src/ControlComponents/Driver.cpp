@@ -29,11 +29,6 @@
 namespace ely
 {
 
-Driver::Driver()
-{
-	reset();
-}
-
 Driver::Driver(SMARTPTR(DriverTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
@@ -748,7 +743,7 @@ DriverTemplate::DriverTemplate(PandaFramework* pandaFramework,
 
 DriverTemplate::~DriverTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType DriverTemplate::componentType() const

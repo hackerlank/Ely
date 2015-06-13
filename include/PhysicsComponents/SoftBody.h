@@ -75,6 +75,7 @@ class SoftBody: public Component
 protected:
 	friend class SoftBodyTemplate;
 
+	SoftBody(SMARTPTR(SoftBodyTemplate)tmpl);
 	virtual void reset();
 	virtual bool initialize();
 	virtual void onAddToObjectSetup();
@@ -83,8 +84,6 @@ protected:
 	virtual void onRemoveFromSceneCleanup();
 
 public:
-	SoftBody();
-	SoftBody(SMARTPTR(SoftBodyTemplate)tmpl);
 	virtual ~SoftBody();
 
 	virtual ComponentFamilyType familyType() const;

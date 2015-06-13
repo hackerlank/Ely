@@ -40,13 +40,6 @@ namespace ely
 //VehicleAddOn typedef.
 typedef VehicleAddOnMixin<SimpleVehicle, SteerVehicle> VehicleAddOn;
 
-SteerVehicle::SteerVehicle() :
-		mHitResult(BulletClosestHitRayResult::empty())
-{
-	mSteerPlugIn.clear();
-	reset();
-}
-
 SteerVehicle::SteerVehicle(SMARTPTR(SteerVehicleTemplate)tmpl):
 		mHitResult(BulletClosestHitRayResult::empty())
 {
@@ -677,7 +670,7 @@ SteerVehicleTemplate::SteerVehicleTemplate(PandaFramework* pandaFramework,
 
 SteerVehicleTemplate::~SteerVehicleTemplate()
 {
-	// TODO Auto-generated destructor stub
+	
 }
 
 ComponentType SteerVehicleTemplate::componentType() const
