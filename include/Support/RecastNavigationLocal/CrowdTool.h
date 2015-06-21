@@ -48,7 +48,7 @@ struct CrowdToolParams
 	bool m_optimizeVis;
 	bool m_optimizeTopo;
 	bool m_obstacleAvoidance;
-	int m_obstacleAvoidanceType;
+	float m_obstacleAvoidanceType;
 	bool m_separation;
 	float m_separationWeight;
 };

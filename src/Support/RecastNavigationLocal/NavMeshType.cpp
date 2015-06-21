@@ -29,16 +29,19 @@
 
 namespace ely
 {
-
 NavMeshType::NavMeshType() :
-		m_geom(0), m_navMesh(0), m_navQuery(0), m_crowd(0),
-		m_navMeshDrawFlags(
+	m_geom(0),
+	m_navMesh(0),
+	m_navQuery(0),
+	m_crowd(0),
+	m_navMeshDrawFlags(
 				0
 //				| DU_DRAWNAVMESH_OFFMESHCONS
 //				| DU_DRAWNAVMESH_CLOSEDLIST
 //				| DU_DRAWNAVMESH_COLOR_TILES
 				),
-		m_tool(0), m_ctx(0)
+	m_tool(0),
+	m_ctx(0)
 {
 	resetNavMeshSettings();
 	m_navQuery = dtAllocNavMeshQuery();
@@ -75,17 +78,20 @@ void NavMeshType::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom)
 		return;
-
+	
+//	DebugDrawGL dd;
+		
 	// Draw mesh
-	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(),
-			m_geom->getMesh()->getVertCount(), m_geom->getMesh()->getTris(),
-			m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(),
-			0, 1.0f);
+	duDebugDrawTriMesh(&dd, m_geom->getMesh()->getVerts(), m_geom->getMesh()->getVertCount(),
+					   m_geom->getMesh()->getTris(), m_geom->getMesh()->getNormals(), m_geom->getMesh()->getTriCount(), 0, 1.0f);
 	// Draw bounds
 	const float* bmin = m_geom->getMeshBoundsMin();
 	const float* bmax = m_geom->getMeshBoundsMax();
-	duDebugDrawBoxWire(&dd, bmin[0], bmin[1], bmin[2], bmax[0], bmax[1],
-			bmax[2], duRGBA(255, 255, 255, 128), 1.0f);
+	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
+}
+
+void Sample::handleRenderOverlay(double* /*proj*/, double* /*model*/, int* /*view*/)
+{
 }
 
 void NavMeshType::handleMeshChanged(InputGeom* geom)
@@ -95,15 +101,13 @@ void NavMeshType::handleMeshChanged(InputGeom* geom)
 
 const float* NavMeshType::getBoundsMin()
 {
-	if (!m_geom)
-		return 0;
+	if (!m_geom) return 0;
 	return m_geom->getMeshBoundsMin();
 }
 
 const float* NavMeshType::getBoundsMax()
 {
-	if (!m_geom)
-		return 0;
+	if (!m_geom) return 0;
 	return m_geom->getMeshBoundsMax();
 }
 
@@ -136,6 +140,7 @@ void NavMeshType::handleToggle()
 	if (m_tool)
 		m_tool->handleToggle();
 }
+
 
 bool NavMeshType::handleBuild()
 {
@@ -186,7 +191,7 @@ void NavMeshType::renderToolStates(duDebugDraw& dd)
 }
 
 void NavMeshType::setNavMeshSettings(const NavMeshSettings& settings)
-{
+{ 
 	m_cellSize = settings.m_cellSize;
 	m_cellHeight = settings.m_cellHeight;
 	m_agentHeight = settings.m_agentHeight;
@@ -201,10 +206,9 @@ void NavMeshType::setNavMeshSettings(const NavMeshSettings& settings)
 	m_detailSampleDist = settings.m_detailSampleDist;
 	m_detailSampleMaxError = settings.m_detailSampleMaxError;
 	m_partitionType = settings.m_partitionType;
-}
-
+} 
 NavMeshSettings NavMeshType::getNavMeshSettings()
-{
+{ 
 	NavMeshSettings settings;
 	settings.m_cellSize = m_cellSize;
 	settings.m_cellHeight = m_cellHeight;
@@ -221,6 +225,6 @@ NavMeshSettings NavMeshType::getNavMeshSettings()
 	settings.m_detailSampleMaxError = m_detailSampleMaxError;
 	settings.m_partitionType = m_partitionType;
 	return settings;
-}
+} 
 
 } // namespace ely

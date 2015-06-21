@@ -26,15 +26,14 @@
 
 namespace ely
 {
-
-rnTimeVal getPerfTime()
+TimeVal getPerfTime()
 {
 	__int64 count;
 	QueryPerformanceCounter((LARGE_INTEGER*)&count);
 	return count;
 }
 
-int getPerfDeltaTimeUsec(const rnTimeVal start, const rnTimeVal end)
+int getPerfDeltaTimeUsec(const TimeVal start, const TimeVal end)
 {
 	static __int64 freq = 0;
 	if (freq == 0)
@@ -42,7 +41,6 @@ int getPerfDeltaTimeUsec(const rnTimeVal start, const rnTimeVal end)
 	__int64 elapsed = end - start;
 	return (int)(elapsed*1000000 / freq);
 }
-
 }  // namespace ely
 
 #else
@@ -53,19 +51,17 @@ int getPerfDeltaTimeUsec(const rnTimeVal start, const rnTimeVal end)
 
 namespace ely
 {
-
-rnTimeVal getPerfTime()
+TimeVal getPerfTime()
 {
 	timeval now;
 	gettimeofday(&now, 0);
-	return (rnTimeVal)now.tv_sec*1000000L + (rnTimeVal)now.tv_usec;
+	return (TimeVal)now.tv_sec*1000000L + (TimeVal)now.tv_usec;
 }
 
-int getPerfDeltaTimeUsec(const rnTimeVal start, const rnTimeVal end)
+int getPerfDeltaTimeUsec(const TimeVal start, const TimeVal end)
 {
 	return (int)(end - start);
 }
-
 }  // namespace ely
 
 #endif

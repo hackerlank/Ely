@@ -21,16 +21,16 @@
 
 #ifdef __GNUC__
 #include <stdint.h>
-typedef int64_t rnTimeVal;
+typedef int64_t TimeVal;
 #else
-typedef __int64 rnTimeVal;
+typedef __int64 TimeVal;
 #endif
 
 namespace ely
 {
 
-rnTimeVal getPerfTime();
-int getPerfDeltaTimeUsec(const rnTimeVal start, const rnTimeVal end);
+TimeVal getPerfTime();
+int getPerfDeltaTimeUsec(const TimeVal start, const TimeVal end);
 
 } // namespace ely
 

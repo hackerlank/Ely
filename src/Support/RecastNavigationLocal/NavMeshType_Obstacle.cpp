@@ -41,9 +41,9 @@
 
 namespace
 {
-
 // This value specifies how many layers (or "floors") each navmesh tile is expected to have.
 const int EXPECTED_LAYERS_PER_TILE = 4;
+
 
 bool isectSegAABB(const float* sp, const float* sq,
 						 const float* amin, const float* amax,
@@ -90,11 +90,12 @@ int calcLayerBufferSize(const int gridWidth, const int gridHeight)
 	const int gridSize = gridWidth * gridHeight;
 	return headerSize + gridSize*4;
 }
-
 }
-
 namespace ely
 {
+
+
+
 
 struct FastLZCompressor : public dtTileCacheCompressor
 {
@@ -105,14 +106,14 @@ struct FastLZCompressor : public dtTileCacheCompressor
 	{
 		return (int)(bufferSize* 1.05f);
 	}
-
+	
 	virtual dtStatus compress(const unsigned char* buffer, const int bufferSize,
 							  unsigned char* compressed, const int /*maxCompressedSize*/, int* compressedSize)
 	{
 		*compressedSize = fastlz_compress((const void *const)buffer, bufferSize, compressed);
 		return DT_SUCCESS;
 	}
-
+	
 	virtual dtStatus decompress(const unsigned char* compressed, const int compressedSize,
 								unsigned char* buffer, const int maxBufferSize, int* bufferSize)
 	{
@@ -127,12 +128,12 @@ struct LinearAllocator : public dtTileCacheAlloc
 	int capacity;
 	int top;
 	int high;
-
+	
 	LinearAllocator(const int cap) : buffer(0), capacity(0), top(0), high(0)
 	{
 		resize(cap);
 	}
-
+	
 	virtual ~LinearAllocator()
 	{
 		dtFree(buffer);
@@ -144,13 +145,13 @@ struct LinearAllocator : public dtTileCacheAlloc
 		buffer = (unsigned char*)dtAlloc(cap, DT_ALLOC_PERM);
 		capacity = cap;
 	}
-
+	
 	virtual void reset()
 	{
 		high = dtMax(high, top);
 		top = 0;
 	}
-
+	
 	virtual void* alloc(const int size)
 	{
 		if (!buffer)
@@ -161,7 +162,7 @@ struct LinearAllocator : public dtTileCacheAlloc
 		top += size;
 		return mem;
 	}
-
+	
 	virtual void free(void* /*ptr*/)
 	{
 		// Empty
@@ -171,13 +172,11 @@ struct LinearAllocator : public dtTileCacheAlloc
 struct MeshProcess : public dtTileCacheMeshProcess
 {
 	InputGeom* m_geom;
-
 	NavMeshPolyAreaFlags* m_flagsAreaTable;
 
 	inline MeshProcess() : m_geom(0)
 	{
 	}
-
 	virtual ~MeshProcess()
 	{
 	}
@@ -186,7 +185,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
 	{
 		m_geom = geom;
 	}
-
+	
 	virtual void process(struct dtNavMeshCreateParams* params,
 						 unsigned char* polyAreas, unsigned short* polyFlags)
 	{
@@ -198,12 +197,12 @@ struct MeshProcess : public dtTileCacheMeshProcess
 
 			//set polyFlags for polyAreas only if m_flagsAreaTable not empty
 			if (not (*m_flagsAreaTable).empty())
-			{
+			{ 
 				// get flags from a table indexed by areas
 				polyFlags[i] = (*m_flagsAreaTable)[polyAreas[i]];
-			}
+			} 
 			else
-			{
+			{ 
 				if (polyAreas[i] == NAVMESH_POLYAREA_GROUND
 						|| polyAreas[i] == NAVMESH_POLYAREA_GRASS
 						|| polyAreas[i] == NAVMESH_POLYAREA_ROAD)
@@ -219,7 +218,7 @@ struct MeshProcess : public dtTileCacheMeshProcess
 					polyFlags[i] = NAVMESH_POLYFLAGS_WALK
 							| NAVMESH_POLYFLAGS_DOOR;
 				}
-			}
+			} 
 		}
 
 		// Pass in off-mesh connections.
@@ -231,23 +230,22 @@ struct MeshProcess : public dtTileCacheMeshProcess
 			params->offMeshConAreas = m_geom->getOffMeshConnectionAreas();
 			params->offMeshConFlags = m_geom->getOffMeshConnectionFlags();
 			params->offMeshConUserID = m_geom->getOffMeshConnectionId();
-			params->offMeshConCount = m_geom->getOffMeshConnectionCount();
+			params->offMeshConCount = m_geom->getOffMeshConnectionCount();	
 		}
 	}
 };
 
 } // ely
 
+
+
 namespace
 {
-
 const int MAX_LAYERS = 32;
-
 }
 
 namespace ely
 {
-
 struct TileCacheData
 {
 	unsigned char* data;
@@ -286,12 +284,10 @@ struct RasterizationContext
 	TileCacheData tiles[MAX_LAYERS];
 	int ntiles;
 };
-
 } // ely
 
 namespace
 {
-
 int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 							   const int tx, const int ty,
 							   const rcConfig& cfg,
@@ -471,7 +467,6 @@ int rasterizeTileLayers(ely::BuildContext* ctx, ely::InputGeom* geom,
 	
 	return n;
 }
-
 }
 
 namespace ely
@@ -652,6 +647,9 @@ void drawObstacles(duDebugDraw* dd, const dtTileCache* tc)
 	}
 }
 
+
+
+
 class TempObstacleHilightTool : public NavMeshTypeTool
 {
 	NavMeshType_Obstacle* m_sample;
@@ -690,13 +688,15 @@ public:
 		rcVcopy(m_hitPos,p);
 	}
 
-	virtual void handleRender(duDebugDraw& dd) {}
+	virtual void handleToggle() {}
 
 	virtual void handleStep() {}
 
-	virtual void handleToggle() {}
-
 	virtual void handleUpdate(const float /*dt*/) {}
+	
+	virtual void handleRender(duDebugDraw& dd) 
+	{
+	}
 	
 };
 
@@ -716,7 +716,7 @@ public:
 	}
 	
 	virtual int type() { return TOOL_TEMP_OBSTACLE; }
-
+	
 	virtual void init(NavMeshType* sample)
 	{
 		m_sample = (NavMeshType_Obstacle*)sample; 
@@ -735,11 +735,15 @@ public:
 		}
 	}
 	
-	virtual void handleStep() {}
 	virtual void handleToggle() {}
+	virtual void handleStep() {}
 	virtual void handleUpdate(const float /*dt*/) {}
 	virtual void handleRender(duDebugDraw& dd) {}
 };
+
+
+
+
 
 NavMeshType_Obstacle::NavMeshType_Obstacle() :
 	m_keepInterResults(false),
@@ -775,7 +779,7 @@ void NavMeshType_Obstacle::handleRender(duDebugDraw& dd)
 {
 	if (!m_geom || !m_geom->getMesh())
 		return;
-
+	
 //	DebugDrawGL dd;
 
 //	const float texScale = 1.0f / (m_cellSize * 10.0f);
@@ -789,22 +793,22 @@ void NavMeshType_Obstacle::handleRender(duDebugDraw& dd)
 //								m_agentMaxSlope, texScale);
 //		m_geom->drawOffMeshConnections(&dd);
 //	}
-
+	
 	if (m_tileCache && m_drawMode == DRAWMODE_CACHE_BOUNDS)
 		drawTiles(&dd, m_tileCache);
-
+	
 	if (m_tileCache)
 		drawObstacles(&dd, m_tileCache);
-
-//
+	
+	
 //	glDepthMask(GL_FALSE);
+	
 	dd.depthMask(false);
-
 	// Draw bounds
 	const float* bmin = m_geom->getMeshBoundsMin();
 	const float* bmax = m_geom->getMeshBoundsMax();
 	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
-
+	
 	// Tiling grid.
 	int gw = 0, gh = 0;
 	rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
@@ -831,17 +835,17 @@ void NavMeshType_Obstacle::handleRender(duDebugDraw& dd)
 //			duDebugDrawNavMeshNodes(&dd, *m_navQuery);
 		duDebugDrawNavMeshPolysWithFlags(&dd, *m_navMesh, NAVMESH_POLYFLAGS_DISABLED, duRGBA(0,0,0,128));
 //	}
-//
-
+	
+	
 //	glDepthMask(GL_TRUE);
 	dd.depthMask(true);
-
+		
 //	m_geom->drawConvexVolumes(&dd);
-//
+//	
 //	if (m_tool)
 //		m_tool->handleRender();
 //	renderToolStates();
-//
+	
 //	glDepthMask(GL_TRUE);
 //	dd.depthMask(true);
 }
@@ -1010,7 +1014,6 @@ bool NavMeshType_Obstacle::handleBuild()
 	
 
 	// Preprocess tiles.
-
 #ifdef ELY_DEBUG
 	m_ctx->resetTimers();
 	
@@ -1101,19 +1104,16 @@ void NavMeshType_Obstacle::getTilePos(const float* pos, int& tx, int& ty)
 	tx = (int)((pos[0] - bmin[0]) / ts);
 	ty = (int)((pos[2] - bmin[2]) / ts);
 }
-
 dtTileCache* NavMeshType_Obstacle::getTileCache()
 {
 	return m_tileCache;
 }
-
 void NavMeshType_Obstacle::setTileSettings(const NavMeshTileSettings& settings)
 {
 	m_maxTiles = settings.m_maxTiles;
 	m_maxPolysPerTile = settings.m_maxPolysPerTile;
 	m_tileSize = settings.m_tileSize;
 }
-
 NavMeshTileSettings NavMeshType_Obstacle::getTileSettings()
 {
 	NavMeshTileSettings settings;
@@ -1122,7 +1122,6 @@ NavMeshTileSettings NavMeshType_Obstacle::getTileSettings()
 	settings.m_tileSize = m_tileSize;
 	return settings;
 }
-
 } //ely
 
 namespace
@@ -1144,20 +1143,18 @@ struct TileCacheTileHeader
 	dtCompressedTileRef tileRef;
 	int dataSize;
 };
-
 }
 
 namespace ely
-{
-
+{ 
 void NavMeshType_Obstacle::saveAll(const char* path)
 {
 	if (!m_tileCache) return;
-
+	
 	FILE* fp = fopen(path, "wb");
 	if (!fp)
 		return;
-
+	
 	// Store header.
 	TileCacheSetHeader header;
 	header.magic = TILECACHESET_MAGIC;
@@ -1194,7 +1191,7 @@ void NavMeshType_Obstacle::loadAll(const char* path)
 {
 	FILE* fp = fopen(path, "rb");
 	if (!fp) return;
-
+	
 	// Read header.
 	TileCacheSetHeader header;
 	fread(&header, sizeof(TileCacheSetHeader), 1, fp);
@@ -1208,7 +1205,7 @@ void NavMeshType_Obstacle::loadAll(const char* path)
 		fclose(fp);
 		return;
 	}
-
+	
 	m_navMesh = dtAllocNavMesh();
 	if (!m_navMesh)
 	{
@@ -1234,7 +1231,7 @@ void NavMeshType_Obstacle::loadAll(const char* path)
 		fclose(fp);
 		return;
 	}
-
+		
 	// Read tiles.
 	for (int i = 0; i < header.numTiles; ++i)
 	{
@@ -1247,15 +1244,14 @@ void NavMeshType_Obstacle::loadAll(const char* path)
 		if (!data) break;
 		memset(data, 0, tileHeader.dataSize);
 		fread(data, tileHeader.dataSize, 1, fp);
-
+		
 		dtCompressedTileRef tile = 0;
 		m_tileCache->addTile(data, tileHeader.dataSize, DT_COMPRESSEDTILE_FREE_DATA, &tile);
 
 		if (tile)
 			m_tileCache->buildNavMeshTile(tile, m_navMesh);
 	}
-
+	
 	fclose(fp);
 }
-
 } // namespace ely

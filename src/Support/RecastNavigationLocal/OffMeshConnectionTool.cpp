@@ -27,7 +27,6 @@
 
 namespace ely
 {
-
 OffMeshConnectionTool::OffMeshConnectionTool() :
 	m_sample(0),
 	m_hitPosSet(0),
@@ -108,11 +107,11 @@ void OffMeshConnectionTool::handleClick(const float* /*s*/, const float* p, bool
 	
 }
 
-void OffMeshConnectionTool::handleStep()
+void OffMeshConnectionTool::handleToggle()
 {
 }
 
-void OffMeshConnectionTool::handleToggle()
+void OffMeshConnectionTool::handleStep()
 {
 }
 

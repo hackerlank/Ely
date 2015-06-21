@@ -102,7 +102,7 @@ ConvexVolumeTool::ConvexVolumeTool() :
 	m_sample(0),
 	m_areaType(NAVMESH_POLYAREA_GRASS),
 	m_polyOffset(0.0f),
-	m_boxHeight(12.0f),
+	m_boxHeight(6.0f),
 	m_boxDescent(1.0f),
 	m_npts(0),
 	m_nhull(0)
@@ -203,11 +203,11 @@ void ConvexVolumeTool::handleClick(const float* /*s*/, const float* p, bool shif
 	
 }
 
-void ConvexVolumeTool::handleStep()
+void ConvexVolumeTool::handleToggle()
 {
 }
 
-void ConvexVolumeTool::handleToggle()
+void ConvexVolumeTool::handleStep()
 {
 }
 
@@ -248,8 +248,7 @@ void ConvexVolumeTool::handleRender(duDebugDraw& dd)
 		dd.vertex(vj[0],minh,vj[2], duRGBA(255,255,255,64));
 		dd.vertex(vj[0],maxh,vj[2], duRGBA(255,255,255,64));
 	}
-	dd.end();
-
+	dd.end();	
 	m_sample->getInputGeom()->drawConvexVolumes(&dd);
 }
 

@@ -48,8 +48,8 @@ public:
 	virtual void init(NavMeshType* sample);
 	virtual void reset();
 	virtual void handleClick(const float* s, const float* p, bool shift);
-	virtual void handleStep();
 	virtual void handleToggle();
+	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender(duDebugDraw& dd);
 

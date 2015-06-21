@@ -122,7 +122,6 @@ InputGeom::~InputGeom()
 	delete m_mesh;
 }
 		
-
 bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 		NodePath referenceNP, float scale, float* translation)
 {
@@ -145,23 +144,22 @@ bool InputGeom::loadMesh(rcContext* ctx, const char* filepath, NodePath model,
 	//
 	bool loadResult = true;
 	if(filepath)
-	{
+	{ 
 		loadResult = m_mesh->load(filepath, scale, translation);
 	}
 	else if (not model.is_empty())
-	{
+	{ 
 		loadResult = m_mesh->load(model, referenceNP);
 	}
 	else
-	{
+	{ 
 		loadResult = false;
 	}
 	if (!loadResult)
-	{
+	{ 
 		CTXLOG1(ctx, RC_LOG_ERROR, "buildTiledNavigation: Could not load '%s'", filepath);
 		return false;
 	}
-
 
 	rcCalcBounds(m_mesh->getVerts(), m_mesh->getVertCount(), m_meshBMin, m_meshBMax);
 
