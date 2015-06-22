@@ -98,7 +98,7 @@ void BuildContext::doStartTimer(const rcTimerLabel label)
 
 void BuildContext::doStopTimer(const rcTimerLabel label)
 {
-	const rnTimeVal endTime = getPerfTime();
+	const TimeVal endTime = getPerfTime();
 	const int deltaTime = (int)(endTime - m_startTime[label]);
 	if (m_accTime[label] == -1)
 		m_accTime[label] = deltaTime;

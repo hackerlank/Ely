@@ -39,7 +39,7 @@ namespace ely
 /// Recast build context.
 class BuildContext : public rcContext
 {
-	rnTimeVal m_startTime[RC_MAX_TIMERS];
+	TimeVal m_startTime[RC_MAX_TIMERS];
 	int m_accTime[RC_MAX_TIMERS];
 
 	static const int MAX_MESSAGES = 1000;

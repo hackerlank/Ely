@@ -19,15 +19,14 @@
 #ifndef PERFTIMER_H
 #define PERFTIMER_H
 
+namespace ely
+{
 #ifdef __GNUC__
 #include <stdint.h>
 typedef int64_t TimeVal;
 #else
 typedef __int64 TimeVal;
 #endif
-
-namespace ely
-{
 
 TimeVal getPerfTime();
 int getPerfDeltaTimeUsec(const TimeVal start, const TimeVal end);
