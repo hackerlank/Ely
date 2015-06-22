@@ -116,7 +116,7 @@ updateElyDeps () {
 	WD=${WORKDIR}/panda3d
 	[ -d "${WD}" ] && cd ${WD} && \
 		git pull && \
-		makepanda/makepanda.py --verbose --everything --no-fftw \
+		makepanda/makepanda.py --verbose --everything --no-fftw --no-gles --no-gles2 \
 	 		--threads ${THREADS} --optimize ${OPTIMIZE} --installer && \
 	 	PKG=panda3d1.10_1.10.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
 	 	mv panda3d1.10_1.10.0_amd64.deb ${PKG} && \
