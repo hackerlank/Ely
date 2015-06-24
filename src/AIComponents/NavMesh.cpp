@@ -563,8 +563,11 @@ NavMesh::Result NavMesh::navMeshCleanup()
 
 void NavMesh::doNavMeshCleanup()
 {
-	//reset NavMeshTypeTool
-	mNavMeshType->setTool(NULL);
+	if (mNavMeshType)
+	{
+		//reset NavMeshTypeTool
+		mNavMeshType->setTool(NULL);
+	}
 
 	//delete old navigation mesh type
 	delete mNavMeshType;
