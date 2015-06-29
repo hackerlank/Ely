@@ -248,6 +248,7 @@ AM_COND_IF([TRAINING],
 		training/interrogate/Makefile
 		training/networking/Makefile
 		training/opensteer/Makefile
+		training/python_embed/Makefile
 		])])
 
 AM_COND_IF([ELY_ELF],

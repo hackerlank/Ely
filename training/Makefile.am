@@ -9,26 +9,27 @@ STDCpp11_CXXFLAGS = $(AM_CXXFLAGS) -std=c++11
 AUTOMAKE_OPTIONS = subdir-objects
 
 LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
-	-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct \
+	-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct -lpandabullet -lp3rocket \
 	-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lpandagl \
 	-lpandaode -lpandaphysics -lpandaskel -lp3ptloader -lpython2.7 \
 	-lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody \
 	-lRakNet
 
-#SUBDIRS = recastnavigation
-#SUBDIRS = interrogate
-#SUBDIRS = opensteer
-SUBDIRS = networking
+#SUBDIRS = . recastnavigation
+#SUBDIRS = . interrogate
+#SUBDIRS = . opensteer
+#SUBDIRS = . networking
+SUBDIRS = . python_embed
 
 #ely_training
 noinst_PROGRAMS = ely_training 
-#ely_training_CPPFLAGS=$(STDCpp11_CPPFLAGS)
-#ely_training_CXXFLAGS=$(STDCpp11_CXXFLAGS)
+ely_training_CPPFLAGS=$(STDCpp11_CPPFLAGS)
+ely_training_CXXFLAGS=$(STDCpp11_CXXFLAGS)
 
 nodist_ely_training_SOURCES = \
-	training.cpp
+	training.cpp \
+	octree.cpp
 #	terrain_sample.cpp
-#	octree.cpp
 #	memory_pool.cpp
 #	memory_pool/MemoryPool.cpp
 #	generic_test.cpp
