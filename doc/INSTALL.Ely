@@ -171,3 +171,14 @@ install all the previous dependencies and build with these commands:
  $ sudo make install
 
 From now on read documentation for developing with Ely.
+
+NOTE: Using python3 (debian jessie):
+- switch to python3 as system default
+	(see http://linuxconfig.org/how-to-change-from-default-to-alternative-python-version-on-debian-linux) 
+- change manually default boost-python development library:
+	# cd /usr/lib/x86_64-linux-gnu/
+	# ln -s libboost_python-py34.so libboost_python.so
+- reinstall autoconf-archive using "python3" branch of 
+	https://github.com/consultit/autoconf-archive.git repository
+- reinstall my_librocket using "python3" branch of
+	https://github.com/consultit/my_librocket.git repository
