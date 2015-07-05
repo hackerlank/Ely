@@ -177,6 +177,7 @@ NOTE: Using python3 (debian jessie):
 	(see http://linuxconfig.org/how-to-change-from-default-to-alternative-python-version-on-debian-linux) 
 - change manually default boost-python development library:
 	# cd /usr/lib/x86_64-linux-gnu/
+	# rm libboost_python.so
 	# ln -s libboost_python-py34.so libboost_python.so
 - reinstall autoconf-archive using "python3" branch of 
 	https://github.com/consultit/autoconf-archive.git repository
