@@ -48,19 +48,20 @@ installElyDeps () {
 	cd ${WORKDIR}
 	echo "install autoconf archive source"
 	WD=${WORKDIR}/autoconf-archive
-	! [ -d ${WD} ] && git clone git://git.sv.gnu.org/autoconf-archive.git
+	! ( [ -d ${WD} ] || [ -h ${WD} ] ) && 
+		git clone git://git.sv.gnu.org/autoconf-archive.git
 	for PKG in ${MYPKGS}
 	do
 		cd ${WORKDIR}/${MYWORKSPACE}
 		echo "install ${PKG} source"
 		WD=${WORKDIR}/${MYWORKSPACE}/${PKG}
-		! [ -d ${WD} ] && git clone https://github.com/consultit/${PKG}.git
+		! ( [ -d ${WD} ] || [ -h ${WD} ] ) && git clone https://github.com/consultit/${PKG}.git
 	done
 	#
 	cd ${WORKDIR}
 	echo "install Panda3d source"
 	WD=${WORKDIR}/panda3d
-	! [ -d ${WD} ] && git clone https://github.com/panda3d/panda3d.git
+	! ( [ -d ${WD} ] || [ -h ${WD} ] ) && git clone https://github.com/panda3d/panda3d.git
 }
 
 #uninstall
