@@ -26,8 +26,10 @@ distribution.
 #include <new>		// yes, this one new style header, is in the Android SDK.
 #if defined(ANDROID_NDK) || defined(__QNXNTO__)
 #   include <stddef.h>
+#   include <stdarg.h>
 #else
 #   include <cstddef>
+#   include <cstdarg>
 #endif
 
 #if defined(_MSC_VER) && (_MSC_VER >= 1400 ) && (!defined WINCE)
@@ -75,10 +77,12 @@ distribution.
 				const int required = _vsnprintf(str, len, format, va);
 				delete[] str;
 				if ( required != -1 ) {
+					TIXMLASSERT( required >= 0 );
 					len = required;
 					break;
 				}
 			}
+			TIXMLASSERT( len >= 0 );
 			return len;
 		}
 	#endif
@@ -90,6 +94,7 @@ distribution.
 	inline int TIXML_VSCPRINTF( const char* format, va_list va )
 	{
 		int len = vsnprintf( 0, 0, format, va );
+		TIXMLASSERT( len >= 0 );
 		return len;
 	}
 	#define TIXML_SSCANF   sscanf
@@ -174,6 +179,7 @@ void StrPair::SetStr( const char* str, int flags )
 {
     Reset();
     size_t len = strlen( str );
+    TIXMLASSERT( _start == 0 );
     _start = new char[ len+1 ];
     memcpy( _start, str, len+1 );
     _end = _start + len;
@@ -1939,6 +1945,7 @@ XMLError XMLDocument::LoadFile( FILE* fp )
     }
 
     const size_t size = filelength;
+    TIXMLASSERT( _charBuffer == 0 );
     _charBuffer = new char[size+1];
     size_t read = fread( _charBuffer, 1, size, fp );
     if ( read != size ) {
@@ -1988,6 +1995,7 @@ XMLError XMLDocument::Parse( const char* p, size_t len )
     if ( len == (size_t)(-1) ) {
         len = strlen( p );
     }
+    TIXMLASSERT( _charBuffer == 0 );
     _charBuffer = new char[ len+1 ];
     memcpy( _charBuffer, p, len );
     _charBuffer[len] = 0;
@@ -2105,9 +2113,10 @@ void XMLPrinter::Print( const char* format, ... )
         vfprintf( _fp, format, va );
     }
     else {
-        int len = TIXML_VSCPRINTF( format, va );
+        const int len = TIXML_VSCPRINTF( format, va );
         // Close out and re-start the va-args
         va_end( va );
+        TIXMLASSERT( len >= 0 );
         va_start( va, format );
         TIXMLASSERT( _buffer.Size() > 0 && _buffer[_buffer.Size() - 1] == 0 );
         char* p = _buffer.PushArr( len ) - 1;	// back up over the null terminator.
