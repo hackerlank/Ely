@@ -141,8 +141,8 @@ AC_CHECK_FUNCS([floor gettimeofday memmove memset pow strchr strtol])
 
 # Checks/sets options
 AC_DEFINE([WITHIN_PANDA],[1],[within panda enabled])
-# Checks for Python.
-AX_PYTHON
+# Checks for Python version.
+ELY_AX_PYTHON([2],[8])
 # Checks for Python >= 2.7.
 AX_PYTHON_PATH
 AX_PYTHON_VERSION_ENSURE([2.7])
