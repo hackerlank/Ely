@@ -22,7 +22,7 @@
 \graphics default
 \default_output_format default
 \output_sync 0
-\bibtex_command default
+\bibtex_command bibtex
 \index_command default
 \paperfontsize default
 \spacing single
@@ -73,6 +73,33 @@
 Ely Manual
 \end_layout
 
+\begin_layout Author
+by consultit
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+consultit@katamail.com
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Date
+27/09/2015
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
 \begin_layout Chapter
 Ely Introduction
 \end_layout
@@ -92,23 +119,31 @@ target "http://www.panda3d.org/"
 
 \begin_layout Standard
 It is a 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 Data Driven
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  and 
-\begin_inset Quotes eld
-\end_inset
-
+\shape italic
 Component Based
-\begin_inset Quotes erd
-\end_inset
-
+\shape default
  framework written in C++.
  
+\end_layout
+
+\begin_layout Standard
+The aim of Ely is to automate as much as possible the job to create a game,
+ by relegating common and repetitive game structures to 
+\shape italic
+components
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+The component's task is to give a game object a particular behavior in a
+ given operative area.
+ This behavior can be configured through a set of parameters supplied by
+ configuration files.
 \end_layout
 
 \begin_layout Standard
@@ -136,14 +171,221 @@ Game Object Component System
 \shape italic
 Game Programming Gems 6
 \shape default
-"
+" book 
 \begin_inset CommandInset citation
 LatexCommand cite
 key "key-1"
 
 \end_inset
 
- book.
+.
+\end_layout
+
+\begin_layout Standard
+Ely framework is designed to be extensible, by creating new components in
+ existing areas or even in new areas.
+\end_layout
+
+\begin_layout Chapter
+Object Model
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Object Model
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Object-Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Any 
+\shape italic
+game
+\shape default
+ 
+\shape italic
+object
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Objects"
+
+\end_inset
+
+ (or simply object) is made up of 
+\shape italic
+components
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Components"
+
+\end_inset
+
+.
+ Each component gives the object a particular behavior in a specific area:
+ for example a 
+\shape italic
+RigidBody
+\shape default
+ gives object a rigid body behavior in the 
+\shape italic
+Physics
+\shape default
+ area, or the 
+\shape italic
+Sound3d
+\shape default
+ component makes the object able to emit sounds and belongs to the 
+\shape italic
+Audio
+\shape default
+ area.
+\end_layout
+
+\begin_layout Section
+Components
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Component
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Components"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The set of all components belonging to the same area represents a 
+\shape italic
+family
+\shape default
+.
+ All components residing in a given family have similar mutually exclusive
+ behaviors: therefore any object can have only one component of a specific
+ family type.
+ 
+\end_layout
+
+\begin_layout Standard
+A component is globally identified by its 
+\shape italic
+type
+\shape default
+, which has to unique, and resides in a specific 
+\shape italic
+family type
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+A component is created exclusively by a 
+\shape italic
+component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sub:Component-templates"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+\SpecialChar \ldots{}
+
+\end_layout
+
+\begin_layout Subsection
+Component templates
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Component template
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-templates"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Responsibility of a template is to create a component of a given type (and
+ a given family) through its 
+\shape italic
+ComponentTemplate::makeComponent()
+\shape default
+ member function.
+\end_layout
+
+\begin_layout Standard
+Each template stores the component's configuration parameters into a table
+ of 
+\shape italic
+(parameter name, value)
+\shape default
+ pairs.
+\end_layout
+
+\begin_layout Section
+Objects
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Object
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Objects"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
 \end_layout
 
 \begin_layout Bibliography
@@ -153,23 +395,33 @@ key "key-1"
 
 \end_inset
 
-.
- Dickheiser, Michael.
- 
-\begin_inset Quotes eld
-\end_inset
-
-
+ Dickheiser, Michael: 
 \shape italic
-Game Programming Gems 6
+Game Programming Gems 6 First Edition
 \shape default
+.
+ Charles River Media, 2006
+\end_layout
 
-\begin_inset Quotes erd
+\begin_layout Standard
+\begin_inset CommandInset bibtex
+LatexCommand bibtex
+bibfiles "acompat"
+options "bibtotoc,plain"
+
 \end_inset
 
-.
- Charles River Media: 1 edition (March 7, 2006).
- Print.
+
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset index_print
+LatexCommand printindex
+type "idx"
+
+\end_inset
+
+
 \end_layout
 
 \end_body
