@@ -2,7 +2,8 @@
 \lyxformat 474
 \begin_document
 \begin_header
-\textclass recipebook
+\textclass scrbook
+\options bibliography=totoc,index=totoc
 \use_default_options true
 \maintain_unincluded_children false
 \language english
@@ -23,11 +24,11 @@
 \default_output_format default
 \output_sync 0
 \bibtex_command bibtex
-\index_command default
+\index_command makeindex
 \paperfontsize default
 \spacing single
 \use_hyperref false
-\papersize legalpaper
+\papersize a4paper
 \use_geometry false
 \use_package amsmath 1
 \use_package amssymb 1
@@ -192,7 +193,7 @@ Object Model
 status collapsed
 
 \begin_layout Plain Layout
-Object Model
+object model
 \end_layout
 
 \end_inset
@@ -216,14 +217,18 @@ game
 \shape italic
 object
 \shape default
- 
+, or simply 
+\shape italic
+object
+\shape default
+
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "sec:Objects"
 
 \end_inset
 
- (or simply object) is made up of 
+, is made up of 
 \shape italic
 components
 \shape default
@@ -261,7 +266,7 @@ Components
 status collapsed
 
 \begin_layout Plain Layout
-Component
+component
 \end_layout
 
 \end_inset
@@ -321,13 +326,13 @@ reference "sub:Component-templates"
 
 \end_layout
 
-\begin_layout Subsection
+\begin_layout Section
 Component templates
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
-Component template
+component template
 \end_layout
 
 \end_inset
@@ -366,7 +371,7 @@ Objects
 status collapsed
 
 \begin_layout Plain Layout
-Object
+object
 \end_layout
 
 \end_inset
@@ -379,6 +384,10 @@ name "sec:Objects"
 \end_inset
 
 
+\end_layout
+
+\begin_layout Standard
+Objects 
 \end_layout
 
 \begin_layout Standard
@@ -401,17 +410,6 @@ Game Programming Gems 6 First Edition
 \shape default
 .
  Charles River Media, 2006
-\end_layout
-
-\begin_layout Standard
-\begin_inset CommandInset bibtex
-LatexCommand bibtex
-bibfiles "acompat"
-options "bibtotoc,plain"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Standard
