@@ -148,7 +148,7 @@ The component's task is to give a game object a particular behavior in a
 \end_layout
 
 \begin_layout Standard
-Its 
+Ely's 
 \shape italic
 Object Model
 \shape default
@@ -184,7 +184,7 @@ key "key-1"
 
 \begin_layout Standard
 Ely framework is designed to be extensible, by creating new components in
- existing areas or even in new areas.
+ existing or new areas.
 \end_layout
 
 \begin_layout Chapter
@@ -230,9 +230,13 @@ reference "sec:Objects"
 
 , is made up of 
 \shape italic
+game components
+\shape default
+, or simply 
+\shape italic
 components
 \shape default
- 
+
 \begin_inset CommandInset ref
 LatexCommand eqref
 reference "sec:Components"
@@ -286,19 +290,24 @@ The set of all components belonging to the same area represents a
 \shape italic
 family
 \shape default
+ of a given type All components residing in a given family have similar
+ but 
+\shape italic
+mutually exclusive 
+\shape default
+behaviors: therefore 
+\shape italic
+any object can have only one component of a specific family type
+\shape default
 .
- All components residing in a given family have similar mutually exclusive
- behaviors: therefore any object can have only one component of a specific
- family type.
- 
 \end_layout
 
 \begin_layout Standard
-A component is globally identified by its 
+A component is identified by its 
 \shape italic
 type
 \shape default
-, which has to unique, and resides in a specific 
+ which has to be unique globally, and resides in a specific 
 \shape italic
 family type
 \shape default
@@ -306,7 +315,7 @@ family type
 \end_layout
 
 \begin_layout Standard
-A component is created exclusively by a 
+A component is created exclusively by a related 
 \shape italic
 component template
 \shape default
@@ -321,18 +330,151 @@ reference "sub:Component-templates"
  
 \end_layout
 
-\begin_layout Standard
-\SpecialChar \ldots{}
-
-\end_layout
-
-\begin_layout Section
-Component templates
+\begin_layout Subsection
+configuration parameters
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
-component template
+component ! 
+\shape up
+configuration parameter
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-configuration-parameters"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Almost all the components have 
+\shape italic
+configuration parameters
+\shape default
+, used to tweak and customize their behavior.
+\end_layout
+
+\begin_layout Standard
+The values of some parameters can be set up only at creation time and cannot
+ change during the component lifetime; others have not this limitation.
+\end_layout
+
+\begin_layout Standard
+Some parameter is considered 
+\shape italic
+mandatory
+\shape default
+, that is some hard coded (
+\shape italic
+default
+\shape default
+) value need to be specified at component creation time, otherwise the component
+ could fall back in a meaningless behavior.
+\end_layout
+
+\begin_layout Standard
+At creation time, parameters are specified through the 
+\shape italic
+game configuration file
+\shape default
+ (usually 
+\shape italic
+game.xml
+\shape default
+)
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Any component parameter has these attributes:
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+name
+\shape default
+: it is chosen as self-documenting as possible, usually referring to the
+ underlying logics or native component attributes
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+type
+\shape default
+: a parameter can have 
+\shape italic
+single
+\shape default
+ value or 
+\shape italic
+multiple
+\shape default
+ value
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+default
+\shape default
+: the hard-coded specified value at creation time (only for mandatory parameters
+) 
+\end_layout
+
+\begin_layout Standard
+In the 
+\shape italic
+API Documentation
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for each component parameter are reported its 
+\shape italic
+name
+\shape default
+, its 
+\shape italic
+type
+\shape default
+, its 
+\shape italic
+default
+\shape default
+ value (if any) and a 
+\shape italic
+note
+\shape default
+ (optional) describing how its value should be specified in the configuration
+ file and/or other informations.
+\end_layout
+
+\begin_layout Subsection
+templates
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! template
 \end_layout
 
 \end_inset
@@ -348,21 +490,84 @@ name "sub:Component-templates"
 \end_layout
 
 \begin_layout Standard
-Responsibility of a template is to create a component of a given type (and
- a given family) through its 
-\shape italic
-ComponentTemplate::makeComponent()
-\shape default
- member function.
+A component template has the ultimate responsibility to configure and create
+ a component of a given type belonging to a given family.
+ 
 \end_layout
 
 \begin_layout Standard
-Each template stores the component's configuration parameters into a table
- of 
+It is the 
 \shape italic
-(parameter name, value)
+ComponentTemplate::makeComponent()
+\shape default
+ member function that actually create the component.
+\end_layout
+
+\begin_layout Standard
+To this end, each template stores the component's configuration parameters
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-configuration-parameters"
+
+\end_inset
+
+ values into a table of 
+\shape italic
+(parameter-name, value)
 \shape default
  pairs.
+\end_layout
+
+\begin_layout Standard
+The interface of a component template is
+\end_layout
+
+\begin_layout Itemize
+ComponentTemplate::componentType():
+\end_layout
+
+\begin_layout Itemize
+ComponentTemplate::familyType():
+\end_layout
+
+\begin_layout Standard
+Component templates are managed by the 
+\shape italic
+Component Template Manager
+\shape default
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template-Manager"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Component Template Manager
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Component Template Manager
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-Template-Manager"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+ComponentTemplateManager
 \end_layout
 
 \begin_layout Section
@@ -387,7 +592,57 @@ name "sec:Objects"
 \end_layout
 
 \begin_layout Standard
-Objects 
+Objects
+\end_layout
+
+\begin_layout Chapter
+Game configuration file
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game configuration file
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Game-configuration-file"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Game configuration file
+\end_layout
+
+\begin_layout Chapter
+API Documentation
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+API documentation
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:API-Documentation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+API Documentation
 \end_layout
 
 \begin_layout Standard
