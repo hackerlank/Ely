@@ -363,20 +363,32 @@ configuration parameters
 
 \begin_layout Standard
 The values of some parameters can be set up only at creation time and cannot
- be changed during the component lifetime; others have not this limitation.
+ be changed during the component lifetime; others haven't this limitation,
+ and can be modified through component's member functions.
 \end_layout
 
 \begin_layout Standard
-Some parameters are considered 
-\shape italic
-mandatory
-\shape default
-, that is their values need to be specified at component creation time to
- some hard coded values (
+All parameters have hard-coded 
 \shape italic
 default
 \shape default
-), otherwise the component could fall back in a meaningless behavior.
+ values, which are used if not specified at creation time.
+ The default is usually the 
+\shape italic
+null
+\shape default
+ value of the parameter's field of values: 
+\family typewriter
+0
+\family default
+ for numbers (floats, integers), empty string (
+\family typewriter
+''
+\family default
+) for strings etc\SpecialChar \ldots{}
+.
+ But some parameters must have a different default from null, otherwise
+ the component could fall back in an inconsistent behavior.
 \end_layout
 
 \begin_layout Standard
@@ -432,8 +444,7 @@ multiple
 \shape italic
 default
 \shape default
-: the hard-coded specified value at creation time (only for mandatory parameters
-) 
+: a hard-coded value used if the value is not specified
 \end_layout
 
 \begin_layout Standard
@@ -448,19 +459,19 @@ reference "chap:API-Documentation"
 
 \end_inset
 
- for each component parameter are reported its 
+ for each component parameter are reported the 
 \shape italic
 name
 \shape default
-, its 
+, the 
 \shape italic
 type
 \shape default
-, its 
+, the 
 \shape italic
 default
 \shape default
- value (if any) and a 
+ (if different from null) value and a 
 \shape italic
 note
 \shape default
@@ -496,6 +507,7 @@ A component template has the ultimate responsibility to create a component
  makeComponent()
 \shape default
  protected member function.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -503,7 +515,7 @@ A component can be created
 \shape italic
 only
 \shape default
- through its template.
+ through a template.
 \end_layout
 
 \begin_layout Standard
@@ -522,14 +534,17 @@ before
 \end_layout
 
 \begin_layout Standard
-Therefore a template allows to (re)set hard coded default values for the
- component mandatory parameters, besides to get/set any of its parameter
- (both single and multiple valued), and do this by storing them into an
- internal storage (a table of 
+So templates allow to get/set any component parameter (both single and multiple
+ valued), by storing them into an internal storage (a table of 
 \shape italic
 (parameter-name, value)
 \shape default
  pairs).
+\end_layout
+
+\begin_layout Standard
+Moreover a template allows to (re)set hard coded default values for the
+ component mandatory parameters.
 \end_layout
 
 \begin_layout Standard
@@ -580,7 +595,7 @@ reference "sub:Component-templates"
 \shape italic
 Component Template Manager
 \shape default
-s which is a singleton 
+ which is a singleton 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Singletons"
@@ -588,6 +603,23 @@ reference "sec:Singletons"
 \end_inset
 
  global object.
+\end_layout
+
+\begin_layout Standard
+All component templates used in the game must be stored into this manager,
+ because they are retrieved only through it.
+\end_layout
+
+\begin_layout Standard
+Besides adding/removing a template, the manager offers possibility to reset
+ (mandatory) component parameters 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-configuration-parameters"
+
+\end_inset
+
+, stored in templates, to their default values.
 \end_layout
 
 \begin_layout Section
