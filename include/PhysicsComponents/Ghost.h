@@ -114,9 +114,6 @@ protected:
 public:
 	virtual ~Ghost();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Updates the controlled object.
 	 *

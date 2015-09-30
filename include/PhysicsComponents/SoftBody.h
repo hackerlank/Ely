@@ -86,9 +86,6 @@ protected:
 public:
 	virtual ~SoftBody();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief The current component's type.
 	 *

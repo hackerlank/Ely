@@ -42,16 +42,6 @@ Driver::~Driver()
 {
 }
 
-ComponentFamilyType Driver::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Driver::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Driver::initialize()
 {
 	bool result = true;

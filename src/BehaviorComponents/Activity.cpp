@@ -41,16 +41,6 @@ Activity::~Activity()
 {
 }
 
-ComponentFamilyType Activity::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Activity::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Activity::initialize()
 {
 	bool result = true;

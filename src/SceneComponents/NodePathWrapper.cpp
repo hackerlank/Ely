@@ -41,16 +41,6 @@ NodePathWrapper::~NodePathWrapper()
 {
 }
 
-ComponentFamilyType NodePathWrapper::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType NodePathWrapper::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool NodePathWrapper::initialize()
 {
 	bool result = true;

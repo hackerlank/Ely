@@ -101,9 +101,6 @@ protected:
 public:
 	virtual ~RigidBody();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief The current component's type.
 	 *

@@ -52,16 +52,6 @@ SteerPlugIn::~SteerPlugIn()
 {
 }
 
-ComponentFamilyType SteerPlugIn::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType SteerPlugIn::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool SteerPlugIn::initialize()
 {
 	bool result = true;

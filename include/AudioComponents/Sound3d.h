@@ -72,9 +72,6 @@ protected:
 public:
 	virtual ~Sound3d();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	struct Result: public Component::Result
 	{
 		Result(int value):Component::Result(value)

@@ -46,16 +46,6 @@ SoftBody::~SoftBody()
 {
 }
 
-ComponentFamilyType SoftBody::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType SoftBody::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool SoftBody::initialize()
 {
 	bool result = true;

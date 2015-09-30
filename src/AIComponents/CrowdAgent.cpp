@@ -51,16 +51,6 @@ CrowdAgent::~CrowdAgent()
 {
 }
 
-ComponentFamilyType CrowdAgent::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType CrowdAgent::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool CrowdAgent::initialize()
 {
 	bool result = true;

@@ -40,16 +40,6 @@ CharacterController::~CharacterController()
 {
 }
 
-ComponentFamilyType CharacterController::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType CharacterController::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool CharacterController::initialize()
 {
 	bool result = true;

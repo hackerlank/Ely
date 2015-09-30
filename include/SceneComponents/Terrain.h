@@ -75,9 +75,6 @@ protected:
 public:
 	virtual ~Terrain();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Updates the terrain associated to this component.
 	 *

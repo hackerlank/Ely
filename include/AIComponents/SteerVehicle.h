@@ -106,9 +106,6 @@ protected:
 public:
 	virtual ~SteerVehicle();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \name Getters/setters of SteerVehicle default settings.
 	 */

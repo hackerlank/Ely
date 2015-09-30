@@ -42,16 +42,6 @@ Sound3d::~Sound3d()
 {
 }
 
-ComponentFamilyType Sound3d::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Sound3d::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Sound3d::initialize()
 {
 	bool result = true;

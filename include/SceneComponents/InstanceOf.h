@@ -59,9 +59,6 @@ protected:
 public:
 	virtual ~InstanceOf();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Gets/sets the node path associated to this instance of.
 	 */

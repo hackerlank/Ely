@@ -43,16 +43,6 @@ Terrain::~Terrain()
 {
 }
 
-ComponentFamilyType Terrain::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Terrain::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Terrain::initialize()
 {
 	bool result = true;

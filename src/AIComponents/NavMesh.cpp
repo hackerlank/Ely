@@ -53,16 +53,6 @@ NavMesh::~NavMesh()
 {
 }
 
-ComponentFamilyType NavMesh::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType NavMesh::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool NavMesh::initialize()
 {
 	bool result = true;

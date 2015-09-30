@@ -47,16 +47,6 @@ Model::~Model()
 {
 }
 
-ComponentFamilyType Model::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Model::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 void Model::do_r_find_bundles(SMARTPTR(PandaNode)node, Anims& anims, Parts& parts)
 {
 	//on empty node return

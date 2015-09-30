@@ -44,16 +44,6 @@ RigidBody::~RigidBody()
 {
 }
 
-ComponentFamilyType RigidBody::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType RigidBody::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool RigidBody::initialize()
 {
 	bool result = true;

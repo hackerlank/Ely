@@ -71,9 +71,6 @@ protected:
 public:
 	virtual ~SteerPlugIn();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	struct Result: public Component::Result
 	{
 		Result(int value):Component::Result(value)
