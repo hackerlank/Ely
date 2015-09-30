@@ -363,24 +363,24 @@ configuration parameters
 
 \begin_layout Standard
 The values of some parameters can be set up only at creation time and cannot
- change during the component lifetime; others have not this limitation.
+ be changed during the component lifetime; others have not this limitation.
 \end_layout
 
 \begin_layout Standard
-Some parameter is considered 
+Some parameters are considered 
 \shape italic
 mandatory
 \shape default
-, that is some hard coded (
+, that is their values need to be specified at component creation time to
+ some hard coded values (
 \shape italic
 default
 \shape default
-) value need to be specified at component creation time, otherwise the component
- could fall back in a meaningless behavior.
+), otherwise the component could fall back in a meaningless behavior.
 \end_layout
 
 \begin_layout Standard
-At creation time, parameters are specified through the 
+At component creation time, parameters are specified through the 
 \shape italic
 game configuration file
 \shape default
@@ -416,15 +416,15 @@ name
 \shape italic
 type
 \shape default
-: a parameter can have 
+: a parameter can be of 
 \shape italic
 single
 \shape default
- value or 
+ valued or 
 \shape italic
 multiple
 \shape default
- value
+ valued
 \end_layout
 
 \begin_layout Itemize
@@ -490,44 +490,46 @@ name "sub:Component-templates"
 \end_layout
 
 \begin_layout Standard
-A component template has the ultimate responsibility to configure and create
- a component of a given type belonging to a given family.
- 
-\end_layout
-
-\begin_layout Standard
-It is the 
+A component template has the ultimate responsibility to create a component
+ of a given type and family type, through a call to its
 \shape italic
-ComponentTemplate::makeComponent()
+ makeComponent()
 \shape default
- member function that actually create the component.
+ protected member function.
 \end_layout
 
 \begin_layout Standard
-To this end, each template stores the component's configuration parameters
+A component can be created 
+\shape italic
+only
+\shape default
+ through its template.
+\end_layout
+
+\begin_layout Standard
+A component should be configured 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-configuration-parameters"
 
 \end_inset
 
- values into a table of 
+, at least as regards its mandatory parameters, 
 \shape italic
-(parameter-name, value)
+before
 \shape default
- pairs.
+ its creation.
 \end_layout
 
 \begin_layout Standard
-The interface of a component template is
-\end_layout
-
-\begin_layout Itemize
-ComponentTemplate::componentType():
-\end_layout
-
-\begin_layout Itemize
-ComponentTemplate::familyType():
+Therefore a template allows to (re)set hard coded default values for the
+ component mandatory parameters, besides to get/set any of its parameter
+ (both single and multiple valued), and do this by storing them into an
+ internal storage (a table of 
+\shape italic
+(parameter-name, value)
+\shape default
+ pairs).
 \end_layout
 
 \begin_layout Standard
@@ -535,7 +537,7 @@ Component templates are managed by the
 \shape italic
 Component Template Manager
 \shape default
-
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Component-Template-Manager"
@@ -567,7 +569,25 @@ name "sec:Component-Template-Manager"
 \end_layout
 
 \begin_layout Standard
-ComponentTemplateManager
+Component templates 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-templates"
+
+\end_inset
+
+ are handled by the 
+\shape italic
+Component Template Manager
+\shape default
+s which is a singleton 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Singletons"
+
+\end_inset
+
+ global object.
 \end_layout
 
 \begin_layout Section
@@ -618,6 +638,80 @@ name "chap:Game-configuration-file"
 
 \begin_layout Standard
 Game configuration file
+\end_layout
+
+\begin_layout Chapter
+Implementation details
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Implementation-details"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Singletons
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+singleton
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Singletons"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Smart pointers
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+smart pointer
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Smart-pointers"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Multi-threading
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+multi-threading
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Multi-threading"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter
