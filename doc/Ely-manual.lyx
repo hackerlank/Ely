@@ -501,16 +501,6 @@ name "sub:Component-templates"
 \end_layout
 
 \begin_layout Standard
-A component template has the ultimate responsibility to create a component
- of a given type and family type, through a call to its
-\shape italic
- makeComponent()
-\shape default
- protected member function.
- 
-\end_layout
-
-\begin_layout Standard
 A component can be created 
 \shape italic
 only
@@ -519,32 +509,45 @@ only
 \end_layout
 
 \begin_layout Standard
+A component template has the ultimate responsibility to create and initialize
+ a component of a given type and family type, through a call to its
+\shape italic
+ 
+\family typewriter
+\shape default
+ComponentTemplate::makeComponent()
+\family default
+ protected member function.
+ 
+\end_layout
+
+\begin_layout Standard
 A component should be configured 
+\shape italic
+before
+\shape default
+ its creation, so templates allow to set/get any component parameter 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-configuration-parameters"
 
 \end_inset
 
-, at least as regards its mandatory parameters, 
-\shape italic
-before
-\shape default
- its creation.
-\end_layout
-
-\begin_layout Standard
-So templates allow to get/set any component parameter (both single and multiple
- valued), by storing them into an internal storage (a table of 
-\shape italic
+ (both single and multiple valued), by storing their values into an internal
+ storage (a table of 
+\family typewriter
 (parameter-name, value)
-\shape default
+\family default
  pairs).
 \end_layout
 
 \begin_layout Standard
-Moreover a template allows to (re)set hard coded default values for the
- component mandatory parameters.
+Moreover a template allows to (re)set hard coded default values for parameters
+ that cannot have null values (
+\family typewriter
+ComponentTemplate::setParametersDefaults()
+\family default
+) .
 \end_layout
 
 \begin_layout Standard
@@ -595,7 +598,7 @@ reference "sub:Component-templates"
 \shape italic
 Component Template Manager
 \shape default
- which is a singleton 
+, which is a singleton 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Singletons"
@@ -612,7 +615,7 @@ All component templates used in the game must be stored into this manager,
 
 \begin_layout Standard
 Besides adding/removing a template, the manager offers possibility to reset
- (mandatory) component parameters 
+ component parameters 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-configuration-parameters"
