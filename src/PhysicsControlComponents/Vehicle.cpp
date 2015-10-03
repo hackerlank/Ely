@@ -45,16 +45,6 @@ Vehicle::~Vehicle()
 	
 }
 
-ComponentFamilyType Vehicle::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Vehicle::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Vehicle::initialize()
 {
 	bool result = true;

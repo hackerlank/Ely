@@ -83,9 +83,6 @@ protected:
 public:
 	virtual ~Chaser();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Updates position/orientation of the controlled object.
 	 *

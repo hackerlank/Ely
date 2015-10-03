@@ -60,9 +60,6 @@ protected:
 public:
 	virtual ~Listener();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Set position/velocity for static objects.
 	 *

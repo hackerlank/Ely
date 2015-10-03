@@ -114,9 +114,6 @@ protected:
 public:
 	virtual ~Activity();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \name FSM reference getter & conversion functions.
 	 */

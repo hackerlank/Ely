@@ -59,9 +59,6 @@ protected:
 public:
 	virtual ~NodePathWrapper();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Gets/sets the node path of this node path wrapper.
 	 */

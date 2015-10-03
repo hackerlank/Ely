@@ -214,13 +214,13 @@ public:
 	 * \brief Gets the type of this component.
 	 * @return The id of this component.
 	 */
-	virtual ComponentType componentType() const = 0;
+	ComponentType componentType() const;
 
 	/**
 	 * \brief Gets the family type of this component.
 	 * @return The family id of this component.
 	 */
-	virtual ComponentFamilyType familyType() const = 0;
+	ComponentFamilyType familyType() const;
 
 	/**
 	 * \brief The result type a component method can return to signal

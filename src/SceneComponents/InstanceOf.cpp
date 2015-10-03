@@ -42,16 +42,6 @@ InstanceOf::~InstanceOf()
 {
 }
 
-ComponentFamilyType InstanceOf::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType InstanceOf::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool InstanceOf::initialize()
 {
 	bool result = true;

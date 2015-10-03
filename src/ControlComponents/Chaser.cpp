@@ -43,16 +43,6 @@ Chaser::~Chaser()
 {
 }
 
-ComponentFamilyType Chaser::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Chaser::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Chaser::initialize()
 {
 	bool result = true;

@@ -57,16 +57,6 @@ SteerVehicle::~SteerVehicle()
 {
 }
 
-ComponentFamilyType SteerVehicle::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType SteerVehicle::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool SteerVehicle::initialize()
 {
 	bool result = true;

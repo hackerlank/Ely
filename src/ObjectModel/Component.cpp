@@ -45,6 +45,16 @@ Component::~Component()
 {
 }
 
+ComponentFamilyType Component::familyType() const
+{
+	return mTmpl->familyType();
+}
+
+ComponentType Component::componentType() const
+{
+	return mTmpl->componentType();
+}
+
 void Component::addToObjectSetup()
 {
 	//setup event tables (if any)

@@ -1,0 +1,810 @@
+#LyX 2.1 created this file. For more info see http://www.lyx.org/
+\lyxformat 474
+\begin_document
+\begin_header
+\textclass scrbook
+\options bibliography=totoc,index=totoc
+\use_default_options true
+\maintain_unincluded_children false
+\language english
+\language_package default
+\inputencoding auto
+\fontencoding global
+\font_roman default
+\font_sans default
+\font_typewriter default
+\font_math auto
+\font_default_family default
+\use_non_tex_fonts false
+\font_sc false
+\font_osf false
+\font_sf_scale 100
+\font_tt_scale 100
+\graphics default
+\default_output_format default
+\output_sync 0
+\bibtex_command bibtex
+\index_command makeindex
+\paperfontsize default
+\spacing single
+\use_hyperref false
+\papersize a4paper
+\use_geometry false
+\use_package amsmath 1
+\use_package amssymb 1
+\use_package cancel 1
+\use_package esint 1
+\use_package mathdots 1
+\use_package mathtools 1
+\use_package mhchem 1
+\use_package stackrel 1
+\use_package stmaryrd 1
+\use_package undertilde 1
+\cite_engine basic
+\cite_engine_type default
+\biblio_style plain
+\use_bibtopic false
+\use_indices false
+\paperorientation portrait
+\suppress_date false
+\justification true
+\use_refstyle 1
+\index Index
+\shortcut idx
+\color #008000
+\end_index
+\secnumdepth 3
+\tocdepth 3
+\paragraph_separation indent
+\paragraph_indentation default
+\quotes_language english
+\papercolumns 1
+\papersides 1
+\paperpagestyle default
+\tracking_changes false
+\output_changes false
+\html_math_output 0
+\html_css_as_file 0
+\html_be_strict false
+\end_header
+
+\begin_body
+
+\begin_layout Title
+Ely Manual
+\end_layout
+
+\begin_layout Author
+by consultit
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+consultit@katamail.com
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Date
+27/09/2015
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset toc
+LatexCommand tableofcontents
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+Ely Introduction
+\end_layout
+
+\begin_layout Standard
+Ely is a framework for developing games.
+ It's based on the 
+\begin_inset CommandInset href
+LatexCommand href
+name "Panda3d Game Engine"
+target "http://www.panda3d.org/"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+It is a 
+\shape italic
+Data Driven
+\shape default
+ and 
+\shape italic
+Component Based
+\shape default
+ framework written in C++.
+ 
+\end_layout
+
+\begin_layout Standard
+The aim of Ely is to automate as much as possible the job to create a game,
+ by relegating common and repetitive game structures to 
+\shape italic
+components
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+The component's task is to give a game object a particular behavior in a
+ given operative area.
+ This behavior can be configured through a set of parameters supplied by
+ configuration files.
+\end_layout
+
+\begin_layout Standard
+Ely's 
+\shape italic
+Object Model
+\shape default
+ design has been freely inspired by the 
+\shape italic
+Chris Stoy
+\shape default
+ article 
+\begin_inset Quotes eld
+\end_inset
+
+
+\shape italic
+Game Object Component System
+\shape default
+
+\begin_inset Quotes erd
+\end_inset
+
+ in "
+\shape italic
+Game Programming Gems 6
+\shape default
+" book 
+\begin_inset CommandInset citation
+LatexCommand cite
+key "key-1"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Ely framework is designed to be extensible, by creating new components in
+ existing or new areas.
+\end_layout
+
+\begin_layout Chapter
+Object Model
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object model
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Object-Model"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Any 
+\shape italic
+game
+\shape default
+ 
+\shape italic
+object
+\shape default
+, or simply 
+\shape italic
+object
+\shape default
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Objects"
+
+\end_inset
+
+, is made up of 
+\shape italic
+game components
+\shape default
+, or simply 
+\shape italic
+components
+\shape default
+
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Components"
+
+\end_inset
+
+.
+ Each component gives the object a particular behavior in a specific area:
+ for example a 
+\shape italic
+RigidBody
+\shape default
+ gives object a rigid body behavior in the 
+\shape italic
+Physics
+\shape default
+ area, or the 
+\shape italic
+Sound3d
+\shape default
+ component makes the object able to emit sounds and belongs to the 
+\shape italic
+Audio
+\shape default
+ area.
+\end_layout
+
+\begin_layout Section
+Components
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Components"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The set of all components belonging to the same area represents a 
+\shape italic
+family
+\shape default
+ of a given type All components residing in a given family have similar
+ but 
+\shape italic
+mutually exclusive 
+\shape default
+behaviors: therefore 
+\shape italic
+any object can have only one component of a specific family type
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+A component is identified by its 
+\shape italic
+type
+\shape default
+ which has to be unique globally, and resides in a specific 
+\shape italic
+family type
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+A component is created exclusively by a related 
+\shape italic
+component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sub:Component-templates"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Subsection
+configuration parameters
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! 
+\shape up
+configuration parameter
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-configuration-parameters"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Almost all the components have 
+\shape italic
+configuration parameters
+\shape default
+, used to tweak and customize their behavior.
+\end_layout
+
+\begin_layout Standard
+The values of some parameters can be set up only at creation time and cannot
+ be changed during the component lifetime; others haven't this limitation,
+ and can be modified through component's member functions.
+\end_layout
+
+\begin_layout Standard
+All parameters have hard-coded 
+\shape italic
+default
+\shape default
+ values, which are used if not specified at creation time.
+ The default is usually the 
+\shape italic
+null
+\shape default
+ value of the parameter's field of values: 
+\family typewriter
+0
+\family default
+ for numbers (floats, integers), empty string (
+\family typewriter
+''
+\family default
+) for strings etc\SpecialChar \ldots{}
+.
+ But some parameters must have a different default from null, otherwise
+ the component could fall back in an inconsistent behavior.
+\end_layout
+
+\begin_layout Standard
+At component creation time, parameters are specified through the 
+\shape italic
+game configuration file
+\shape default
+ (usually 
+\shape italic
+game.xml
+\shape default
+)
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Any component parameter has these attributes:
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+name
+\shape default
+: it is chosen as self-documenting as possible, usually referring to the
+ underlying logics or native component attributes
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+type
+\shape default
+: a parameter can be of 
+\shape italic
+single
+\shape default
+ valued or 
+\shape italic
+multiple
+\shape default
+ valued
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+default
+\shape default
+: a hard-coded value used if the value is not specified
+\end_layout
+
+\begin_layout Standard
+In the 
+\shape italic
+API Documentation
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for each component parameter are reported the 
+\shape italic
+name
+\shape default
+, the 
+\shape italic
+type
+\shape default
+, the 
+\shape italic
+default
+\shape default
+ (if different from null) value and a 
+\shape italic
+note
+\shape default
+ (optional) describing how its value should be specified in the configuration
+ file and/or other informations.
+\end_layout
+
+\begin_layout Subsection
+templates
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! template
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-templates"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A component can be created 
+\shape italic
+only
+\shape default
+ through a template.
+\end_layout
+
+\begin_layout Standard
+A component template has the ultimate responsibility to create and initialize
+ a component of a given type and family type, through a call to its
+\shape italic
+ 
+\family typewriter
+\shape default
+ComponentTemplate::makeComponent()
+\family default
+ protected member function.
+ 
+\end_layout
+
+\begin_layout Standard
+A component should be configured 
+\shape italic
+before
+\shape default
+ its creation, so templates allow to set/get any component parameter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-configuration-parameters"
+
+\end_inset
+
+ (both single and multiple valued), by storing their values into an internal
+ storage (a table of 
+\family typewriter
+(parameter-name, value)
+\family default
+ pairs).
+\end_layout
+
+\begin_layout Standard
+Moreover a template allows to (re)set hard coded default values for parameters
+ that cannot have null values (
+\family typewriter
+ComponentTemplate::setParametersDefaults()
+\family default
+) .
+\end_layout
+
+\begin_layout Standard
+Component templates are managed by the 
+\shape italic
+Component Template Manager
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template-Manager"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Section
+Component Template Manager
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Component Template Manager
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-Template-Manager"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Component templates 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-templates"
+
+\end_inset
+
+ are handled by the 
+\shape italic
+Component Template Manager
+\shape default
+, which is a singleton 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Singletons"
+
+\end_inset
+
+ global object.
+\end_layout
+
+\begin_layout Standard
+All component templates used in the game must be stored into this manager,
+ because they are retrieved only through it.
+\end_layout
+
+\begin_layout Standard
+Besides adding/removing a template, the manager offers possibility to reset
+ component parameters 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-configuration-parameters"
+
+\end_inset
+
+, stored in templates, to their default values.
+\end_layout
+
+\begin_layout Section
+Objects
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Objects"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Objects
+\end_layout
+
+\begin_layout Chapter
+Game configuration file
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game configuration file
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Game-configuration-file"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Game configuration file
+\end_layout
+
+\begin_layout Chapter
+Implementation details
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Implementation-details"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Singletons
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+singleton
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Singletons"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Smart pointers
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+smart pointer
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Smart-pointers"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Multi-threading
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+multi-threading
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Multi-threading"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Chapter
+API Documentation
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+API documentation
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:API-Documentation"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+API Documentation
+\end_layout
+
+\begin_layout Standard
+\begin_inset Newpage newpage
+\end_inset
+
+
+\end_layout
+
+\begin_layout Bibliography
+\begin_inset CommandInset bibitem
+LatexCommand bibitem
+key "key-1"
+
+\end_inset
+
+ Dickheiser, Michael: 
+\shape italic
+Game Programming Gems 6 First Edition
+\shape default
+.
+ Charles River Media, 2006
+\end_layout
+
+\begin_layout Standard
+\begin_inset CommandInset index_print
+LatexCommand printindex
+type "idx"
+
+\end_inset
+
+
+\end_layout
+
+\end_body
+\end_document

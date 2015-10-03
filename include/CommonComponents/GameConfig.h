@@ -70,9 +70,6 @@ protected:
 public:
 	virtual ~GameConfig();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 private:
 
 	/**

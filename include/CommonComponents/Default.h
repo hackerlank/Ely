@@ -61,9 +61,6 @@ protected:
 public:
 	virtual ~Default();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 private:
 
 	///TypedObject semantics: hardcoded

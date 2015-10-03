@@ -42,16 +42,6 @@ Listener::~Listener()
 {
 }
 
-ComponentFamilyType Listener::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Listener::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Listener::initialize()
 {
 	bool result = true;

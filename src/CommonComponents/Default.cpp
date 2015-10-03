@@ -36,16 +36,6 @@ Default::~Default()
 {
 }
 
-ComponentFamilyType Default::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Default::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 //TypedObject semantics: hardcoded
 TypeHandle Default::_type_handle;
 

@@ -39,16 +39,6 @@ GameConfig::~GameConfig()
 {
 }
 
-ComponentFamilyType GameConfig::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType GameConfig::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool GameConfig::initialize()
 {
 	bool result = true;

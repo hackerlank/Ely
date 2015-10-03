@@ -45,16 +45,6 @@ Ghost::~Ghost()
 {
 }
 
-ComponentFamilyType Ghost::familyType() const
-{
-	return mTmpl->familyType();
-}
-
-ComponentType Ghost::componentType() const
-{
-	return mTmpl->componentType();
-}
-
 bool Ghost::initialize()
 {
 	bool result = true;

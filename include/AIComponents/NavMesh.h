@@ -99,9 +99,6 @@ protected:
 public:
 	virtual ~NavMesh();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \brief Updates position/orientation of crowd agents.
 	 *

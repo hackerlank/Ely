@@ -103,9 +103,6 @@ protected:
 public:
 	virtual ~CrowdAgent();
 
-	virtual ComponentFamilyType familyType() const;
-	virtual ComponentType componentType() const;
-
 	/**
 	 * \name Helper getters/setters of CrowdAgent data.
 	 *
