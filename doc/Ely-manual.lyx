@@ -480,7 +480,7 @@ note
 \end_layout
 
 \begin_layout Subsection
-templates
+Components' templates
 \begin_inset Index idx
 status collapsed
 
@@ -517,8 +517,23 @@ A component template has the ultimate responsibility to create and initialize
 \shape default
 ComponentTemplate::makeComponent()
 \family default
- protected member function.
+ protected member function, which, in the Ely framework, can be (and is)
+ called only from 
+\family typewriter
+ComponentTemplateManager
+\family default
+ object through its 
+\family typewriter
+doCreateComponent()
+\family default
  
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ComponentTemplateManager-doCreateComponent"
+
+\end_inset
+
+ member function.
 \end_layout
 
 \begin_layout Standard
@@ -609,20 +624,48 @@ reference "sec:Singletons"
 \end_layout
 
 \begin_layout Standard
-All component templates used in the game must be stored into this manager,
- because they are retrieved only through it.
-\end_layout
-
-\begin_layout Standard
-Besides adding/removing a template, the manager offers possibility to reset
- component parameters 
+Besides adding/removing/retrieving a template, the manager offers possibility
+ to reset component configuration parameters 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-configuration-parameters"
 
 \end_inset
 
-, stored in templates, to their default values.
+ (stored in the templates) to their default values.
+\end_layout
+
+\begin_layout Standard
+All component templates used in the game must be stored into this manager,
+ because they are retrieved only through it, and components can be created
+ only from the private 
+\family typewriter
+ComponentTemplateManager::doCreateComponent()
+\begin_inset CommandInset label
+LatexCommand label
+name "ComponentTemplateManager-doCreateComponent"
+
+\end_inset
+
+ 
+\family default
+member function, which, in the Ely framework, be (and is) called only from
+ 
+\family typewriter
+ObjectTemplateManager
+\family default
+ object through its 
+\family typewriter
+createObject()
+\family default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ObjectTemplateManager-createObject"
+
+\end_inset
+
+ member function.
 \end_layout
 
 \begin_layout Section
@@ -650,6 +693,69 @@ name "sec:Objects"
 Objects
 \end_layout
 
+\begin_layout Subsection
+Objects' templates
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object ! template
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Objects'-templates"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Objects' templates
+\end_layout
+
+\begin_layout Section
+Object Template Manager
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Object Template Manager
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Object-Template-Manager"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All objects templates used in the game must be stored into this manager,
+ because they are retrieved only through it, and components can be created
+ only from the public 
+\family typewriter
+ObjectTemplateManager::createObject()
+\family default
+
+\begin_inset CommandInset label
+LatexCommand label
+name "ObjectTemplateManager-createObject"
+
+\end_inset
+
+ member function.
+\end_layout
+
 \begin_layout Chapter
 Game configuration file
 \begin_inset Index idx
@@ -673,6 +779,20 @@ name "chap:Game-configuration-file"
 
 \begin_layout Standard
 Game configuration file
+\end_layout
+
+\begin_layout Standard
+Parameters' values are specified through a simple syntax, so to avoid complex
+ parsing techniques, but allowing the use of C/C++ 
+\family typewriter
+string
+\family default
+ methods to interpret their meanings.
+ 
+\end_layout
+
+\begin_layout Standard
+Usually a single That syntax follows this rules:
 \end_layout
 
 \begin_layout Chapter
