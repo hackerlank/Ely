@@ -211,15 +211,15 @@ name "chap:Object-Model"
 \begin_layout Standard
 Any 
 \shape italic
-game
+Game
 \shape default
  
 \shape italic
-object
+Object
 \shape default
 , or simply 
 \shape italic
-object
+Object
 \shape default
 
 \begin_inset CommandInset ref
@@ -228,13 +228,44 @@ reference "sec:Objects"
 
 \end_inset
 
+
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+To avoid ambiguity, from now on we refer to 
+\begin_inset Quotes eld
+\end_inset
+
+Object
+\begin_inset Quotes erd
+\end_inset
+
+ (first letter capitalized) as the entity defined in Ely framework, while
+ to the 
+\begin_inset Quotes eld
+\end_inset
+
+object
+\begin_inset Quotes erd
+\end_inset
+
+ word as a generic
+\shape italic
+ 
+\shape default
+software entity, as usual in a Object-Oriented programming environment.
+\end_layout
+
+\end_inset
+
 , is made up of 
 \shape italic
-game components
+Game Components
 \shape default
 , or simply 
 \shape italic
-components
+Components
 \shape default
 
 \begin_inset CommandInset ref
@@ -244,12 +275,16 @@ reference "sec:Components"
 \end_inset
 
 .
- Each component gives the object a particular behavior in a specific area:
+ Each Component gives the Object a particular behavior in a specific area:
  for example a 
 \shape italic
 RigidBody
 \shape default
- gives object a rigid body behavior in the 
+ is a 
+\shape italic
+Component
+\shape default
+ that gives an Object a rigid body behavior in the 
 \shape italic
 Physics
 \shape default
@@ -257,7 +292,7 @@ Physics
 \shape italic
 Sound3d
 \shape default
- component makes the object able to emit sounds and belongs to the 
+ Component makes an Object able to emit sounds and belongs to the 
 \shape italic
 Audio
 \shape default
@@ -286,43 +321,74 @@ name "sec:Components"
 \end_layout
 
 \begin_layout Standard
-The set of all components belonging to the same area represents a 
+A Component is the building block of any Object
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Objects"
+
+\end_inset
+
+.
+ An Object inherits its overall behavior by the one of each of its Components.
+\end_layout
+
+\begin_layout Standard
+A Component is identified by its 
 \shape italic
-family
+type
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+
+\shape up
+component ! type
+\end_layout
+
+\end_inset
+
+
 \shape default
- of a given type All components residing in a given family have similar
- but 
+ which has to be unique globally.
+ The set of all Components belonging to the same area represents a 
+\shape italic
+family of a given type
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! family type
+\end_layout
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+All Components residing in a given family have conceptually related but
+ 
 \shape italic
 mutually exclusive 
 \shape default
 behaviors: therefore 
 \shape italic
-any object can have only one component of a specific family type
+any Object can have only one Component of a specific family type
 \shape default
 .
 \end_layout
 
 \begin_layout Standard
-A component is identified by its 
+A Component is created exclusively by a related 
 \shape italic
-type
-\shape default
- which has to be unique globally, and resides in a specific 
-\shape italic
-family type
-\shape default
-.
-\end_layout
-
-\begin_layout Standard
-A component is created exclusively by a related 
-\shape italic
-component template
+Component Template
 \shape default
  
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "sub:Component-templates"
+reference "sub:Components'-templates"
 
 \end_inset
 
@@ -331,7 +397,7 @@ reference "sub:Component-templates"
 \end_layout
 
 \begin_layout Subsection
-configuration parameters
+Components' configuration parameters
 \begin_inset Index idx
 status collapsed
 
@@ -346,7 +412,7 @@ configuration parameter
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Component-configuration-parameters"
+name "sub:Components'-configuration-parame"
 
 \end_inset
 
@@ -354,7 +420,7 @@ name "sub:Component-configuration-parameters"
 \end_layout
 
 \begin_layout Standard
-Almost all the components have 
+Almost all the Components have 
 \shape italic
 configuration parameters
 \shape default
@@ -363,8 +429,8 @@ configuration parameters
 
 \begin_layout Standard
 The values of some parameters can be set up only at creation time and cannot
- be changed during the component lifetime; others haven't this limitation,
- and can be modified through component's member functions.
+ be changed during the Component lifetime; others haven't this limitation,
+ and can be modified through Component's member functions.
 \end_layout
 
 \begin_layout Standard
@@ -388,11 +454,11 @@ null
 ) for strings etc\SpecialChar \ldots{}
 .
  But some parameters must have a different default from null, otherwise
- the component could fall back in an inconsistent behavior.
+ the Component could fall back in an inconsistent behavior.
 \end_layout
 
 \begin_layout Standard
-At component creation time, parameters are specified through the 
+At Component creation time, parameters are specified through the 
 \shape italic
 game configuration file
 \shape default
@@ -411,7 +477,7 @@ reference "chap:Game-configuration-file"
 \end_layout
 
 \begin_layout Standard
-Any component parameter has these attributes:
+Any Component parameter has these attributes:
 \end_layout
 
 \begin_layout Itemize
@@ -420,7 +486,7 @@ Any component parameter has these attributes:
 name
 \shape default
 : it is chosen as self-documenting as possible, usually referring to the
- underlying logics or native component attributes
+ underlying logics or native Component attributes
 \end_layout
 
 \begin_layout Itemize
@@ -459,7 +525,7 @@ reference "chap:API-Documentation"
 
 \end_inset
 
- for each component parameter are reported the 
+ for each Component parameter are reported the 
 \shape italic
 name
 \shape default
@@ -480,7 +546,7 @@ note
 \end_layout
 
 \begin_layout Subsection
-Components' templates
+Components' Templates
 \begin_inset Index idx
 status collapsed
 
@@ -493,7 +559,7 @@ component ! template
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Component-templates"
+name "sub:Components'-templates"
 
 \end_inset
 
@@ -501,16 +567,16 @@ name "sub:Component-templates"
 \end_layout
 
 \begin_layout Standard
-A component can be created 
+A Component can be created 
 \shape italic
 only
 \shape default
- through a template.
+ through a Template.
 \end_layout
 
 \begin_layout Standard
-A component template has the ultimate responsibility to create and initialize
- a component of a given type and family type, through a call to its
+A Component Template has the ultimate responsibility to create and initialize
+ a Component of a given type and family type, through a call to its
 \shape italic
  
 \family typewriter
@@ -537,11 +603,11 @@ reference "ComponentTemplateManager-doCreateComponent"
 \end_layout
 
 \begin_layout Standard
-A component should be configured 
+A Component should be configured 
 \shape italic
 before
 \shape default
- its creation, so templates allow to set/get any component parameter 
+ its creation, so Templates allow to set/get any Component parameter 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-configuration-parameters"
@@ -557,7 +623,7 @@ reference "sub:Component-configuration-parameters"
 \end_layout
 
 \begin_layout Standard
-Moreover a template allows to (re)set hard coded default values for parameters
+Moreover a Template allows to (re)set hard coded default values for parameters
  that cannot have null values (
 \family typewriter
 ComponentTemplate::setParametersDefaults()
@@ -566,7 +632,7 @@ ComponentTemplate::setParametersDefaults()
 \end_layout
 
 \begin_layout Standard
-Component templates are managed by the 
+Component Templates are managed by the 
 \shape italic
 Component Template Manager
 \shape default
@@ -578,6 +644,111 @@ reference "sec:Component-Template-Manager"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+Components' interfaces
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Components'-interfaces"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each Component has a series of member functions that forms its interfaces.
+ 
+\end_layout
+
+\begin_layout Standard
+There are two kind of interfaces: 
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+protected
+\shape default
+: can be called 
+\shape italic
+only
+\shape default
+ from the other objects of Ely framework
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+public
+\shape default
+: can be called from anywhere
+\end_layout
+
+\begin_layout Subsubsection
+Component's protected interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! protected interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component's-protected-interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The aim of the protected interface, is to allow other objects in the framework
+ (specifically Object Template Manager 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+ and the related Component Template 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Components'-templates"
+
+\end_inset
+
+), to initialize and customize the Component while being created/destroyed
+ and added/removed to/from an Object:
+\end_layout
+
+\begin_layout Subsubsection
+Component's public interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! public interface
+\end_layout
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Section
@@ -602,10 +773,10 @@ name "sec:Component-Template-Manager"
 \end_layout
 
 \begin_layout Standard
-Component templates 
+Component Templates 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Component-templates"
+reference "sub:Components'-templates"
 
 \end_inset
 
@@ -624,20 +795,20 @@ reference "sec:Singletons"
 \end_layout
 
 \begin_layout Standard
-Besides adding/removing/retrieving a template, the manager offers possibility
- to reset component configuration parameters 
+Besides adding/removing/retrieving a Template, the manager offers possibility
+ to reset Component configuration parameters 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Component-configuration-parameters"
+reference "sub:Components'-configuration-parame"
 
 \end_inset
 
- (stored in the templates) to their default values.
+ (stored in the Templates) to their default values.
 \end_layout
 
 \begin_layout Standard
-All component templates used in the game must be stored into this manager,
- because they are retrieved only through it, and components can be created
+All Component Templates used in the game must be stored into this manager,
+ because they are retrieved only through it, and Components can be created
  only from the private 
 \family typewriter
 ComponentTemplateManager::doCreateComponent()
@@ -694,7 +865,7 @@ Objects
 \end_layout
 
 \begin_layout Subsection
-Objects' templates
+Objects' Templates
 \begin_inset Index idx
 status collapsed
 
@@ -715,7 +886,7 @@ name "sub:Objects'-templates"
 \end_layout
 
 \begin_layout Standard
-Objects' templates
+Objects' Templates
 \end_layout
 
 \begin_layout Section
@@ -740,8 +911,8 @@ name "sec:Object-Template-Manager"
 \end_layout
 
 \begin_layout Standard
-All objects templates used in the game must be stored into this manager,
- because they are retrieved only through it, and components can be created
+All Objects Templates used in the game must be stored into this manager,
+ because they are retrieved only through it, and Components can be created
  only from the public 
 \family typewriter
 ObjectTemplateManager::createObject()
