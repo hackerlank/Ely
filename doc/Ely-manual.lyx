@@ -185,10 +185,19 @@ key "key-1"
 \begin_layout Standard
 Ely framework is designed to be extensible, by creating new components in
  existing or new areas.
+ 
+\end_layout
+
+\begin_layout Standard
+The framework library lies inside the 
+\shape italic
+ely
+\shape default
+ namespace.
 \end_layout
 
 \begin_layout Chapter
-Object Model
+Conceptual Object Model
 \begin_inset Index idx
 status collapsed
 
@@ -209,98 +218,75 @@ name "chap:Object-Model"
 \end_layout
 
 \begin_layout Standard
-Any 
-\shape italic
-Game
-\shape default
- 
-\shape italic
-Object
-\shape default
-, or simply 
-\shape italic
-Object
-\shape default
-
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "sec:Objects"
-
-\end_inset
-
-
-\begin_inset Foot
-status collapsed
-
-\begin_layout Plain Layout
-To avoid ambiguity, from now on we refer to 
-\begin_inset Quotes eld
-\end_inset
-
-Object
-\begin_inset Quotes erd
-\end_inset
-
- (first letter capitalized) as the entity defined in Ely framework, while
- to the 
-\begin_inset Quotes eld
-\end_inset
-
+A game 
+\shape smallcaps
 object
-\begin_inset Quotes erd
-\end_inset
-
- word as a generic
-\shape italic
+\shape default
  
-\shape default
-software entity, as usual in a Object-Oriented programming environment.
-\end_layout
-
-\end_inset
-
-, is made up of 
-\shape italic
-Game Components
-\shape default
-, or simply 
-\shape italic
-Components
-\shape default
-
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "sec:Components"
+reference "sec:Object"
+
+\end_inset
+
+ is made up of a set of 
+\shape smallcaps
+component
+\shape default
+s 
+\begin_inset CommandInset ref
+LatexCommand eqref
+reference "sec:Component"
 
 \end_inset
 
 .
- Each Component gives the Object a particular behavior in a specific area:
- for example a 
-\shape italic
-RigidBody
+ Each 
+\shape smallcaps
+component
 \shape default
- is a 
-\shape italic
-Component
+ gives the 
+\shape smallcaps
+Object
 \shape default
- that gives an Object a rigid body behavior in the 
+ a particular behavior in a specific area: for example a 
+\family typewriter
+ely::RigidBody
+\family default
+ 
+\shape smallcaps
+component
+\shape default
+ gives an 
+\shape smallcaps
+object
+\shape default
+ a rigid body behavior in the 
 \shape italic
 Physics
 \shape default
  area, or the 
-\shape italic
-Sound3d
+\family typewriter
+ely::Sound3d
+\family default
+ 
+\shape smallcaps
+component
 \shape default
- Component makes an Object able to emit sounds and belongs to the 
+ makes an 
+\shape smallcaps
+object
+\shape default
+ able to emit sounds and belongs to the 
 \shape italic
 Audio
 \shape default
  area.
+ 
 \end_layout
 
 \begin_layout Section
-Components
+Component
 \begin_inset Index idx
 status collapsed
 
@@ -313,7 +299,7 @@ component
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Components"
+name "sec:Component"
 
 \end_inset
 
@@ -321,21 +307,60 @@ name "sec:Components"
 \end_layout
 
 \begin_layout Standard
-A Component is the building block of any Object
+A 
+\shape smallcaps
+component
+\shape default
+ is the building block of an 
+\shape smallcaps
+object
+\shape default
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Objects"
+reference "sec:Object"
 
 \end_inset
 
 .
- An Object inherits its overall behavior by the one of each of its Components.
+ 
 \end_layout
 
 \begin_layout Standard
-A Component is identified by its 
+An 
+\shape smallcaps
+object
+\shape default
+ is composed 
 \shape italic
+exclusively
+\shape default
+ of 
+\shape smallcaps
+component
+\shape default
+s.
+ Therefore the 
+\shape smallcaps
+Object
+\shape default
+ structure and its behavior are completely determined by its 
+\shape smallcaps
+component
+\shape default
+s and relationships among them.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is identified by its 
+\shape smallcaps
 type
+\shape italic
+
 \begin_inset Index idx
 status collapsed
 
@@ -349,10 +374,18 @@ component ! type
 
 
 \shape default
- which has to be unique globally.
- The set of all Components belonging to the same area represents a 
-\shape italic
-family of a given type
+, which identifies its structure, its behavior and the states it can assume.
+ 
+\end_layout
+
+\begin_layout Standard
+Furthermore a 
+\shape smallcaps
+component
+\shape default
+ belongs to a 
+\shape smallcaps
+family type
 \shape default
 
 \begin_inset Index idx
@@ -364,31 +397,93 @@ component ! family type
 
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Standard
-All Components residing in a given family have conceptually related but
- 
+, which represents a set of 
+\shape smallcaps
+component
+\shape default
+s that have conceptually related but 
 \shape italic
 mutually exclusive 
 \shape default
-behaviors: therefore 
+behaviors in a given area
 \shape italic
-any Object can have only one Component of a specific family type
+.
+\end_layout
+
+\begin_layout Standard
+Any 
+\shape smallcaps
+object
+\shape default
+ can have 
+\shape italic
+only
+\shape default
+ one 
+\shape smallcaps
+component
+\shape default
+ of a specific 
+\shape smallcaps
+family type
+\shape default
+.
+ That is, two 
+\shape smallcaps
+component
+\shape default
+s with different 
+\shape smallcaps
+type
+\shape default
+ but inside the same 
+\shape smallcaps
+family type
+\shape default
+, cannot coexist into the same 
+\shape smallcaps
+object
 \shape default
 .
 \end_layout
 
 \begin_layout Standard
-A Component is created exclusively by a related 
-\shape italic
-Component Template
+Each 
+\shape smallcaps
+component
+\shape default
+ is identified by a 
+\shape smallcaps
+identifier
+\shape default
+ (
+\shape smallcaps
+id
+\shape default
+), which is assigned at creation time and is unique between all other 
+\shape smallcaps
+component
+\shape default
+s of all 
+\shape smallcaps
+object
+\shape default
+s participating in the game.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is created exclusively by a related 
+\shape smallcaps
+template
 \shape default
  
 \begin_inset CommandInset ref
 LatexCommand eqref
-reference "sub:Components'-templates"
+reference "sec:Component-Template"
 
 \end_inset
 
@@ -396,8 +491,734 @@ reference "sub:Components'-templates"
  
 \end_layout
 
+\begin_layout Subsection*
+
+\series bold
+Implementation
+\end_layout
+
+\begin_layout Quote
+A generic 
+\shape smallcaps
+component
+\shape default
+ is implemented by 
+\family typewriter
+ely::Component
+\family default
+ base abstract class type.
+ 
+\end_layout
+
+\begin_layout Quote
+
+\shape smallcaps
+component
+\shape default
+s with different 
+\shape smallcaps
+type
+\shape default
+s, are implemented by deriving from it concrete classes which implement
+ all its pure virtual member functions, possibly extending its interface
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-interface"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Quote
+
+\shape smallcaps
+component
+\shape default
+'s 
+\shape smallcaps
+type
+\shape default
+, 
+\shape smallcaps
+family
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+ and 
+\shape smallcaps
+id
+\shape default
+ are implemented by 
+\family typewriter
+ely::ComponentType
+\family default
+, 
+\family typewriter
+ely::ComponentFamilyType
+\family default
+ and 
+\family typewriter
+ely::ComponentId
+\family default
+ types respectively (currently all 
+\family typewriter
+typedef
+\family default
+s to 
+\family typewriter
+std::string
+\family default
+).
+\end_layout
+
 \begin_layout Subsection
-Components' configuration parameters
+Component internal state
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! internal state
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-internal-state"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+At any point in time, a 
+\shape smallcaps
+component
+\shape default
+ has an 
+\shape italic
+internal state
+\shape default
+, which determines its particular configuration and behavior (and consequently
+ those of its owner 
+\shape smallcaps
+object
+\shape default
+).
+ The internal state is assembled from a set of 
+\shape italic
+values
+\shape default
+, each one having its own type.
+\end_layout
+
+\begin_layout Standard
+Some internal state values can be set up only at 
+\shape smallcaps
+component
+\shape default
+ creation time and cannot be changed during its lifetime, while others haven't
+ this limitation, and can be modified through member functions.
+\end_layout
+
+\begin_layout Standard
+Moreover all internal state values have hard-coded 
+\shape italic
+default
+\shape default
+s, which are used if not specified at creation and/or during lifetime of
+ the 
+\shape smallcaps
+component
+\shape default
+.
+ A default is usually the 
+\shape italic
+null
+\shape default
+ element of the type field of values, e.g.
+ 
+\family typewriter
+0
+\family default
+ for numbers (floats, integers), empty string (
+\family typewriter
+''
+\family default
+) for strings etc\SpecialChar \ldots{}
+.
+ But some state values must have a different default from null, otherwise
+ the 
+\shape smallcaps
+component
+\shape default
+ could fall back in an inconsistent behavior.
+\end_layout
+
+\begin_layout Standard
+At game startup time, 
+\shape smallcaps
+component
+\shape default
+'s state values are specified through 
+\shape italic
+configuration parameters
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Components'-configuration-parame"
+
+\end_inset
+
+ specified in the 
+\shape italic
+game configuration file
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+Component interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Each Component has a series of member functions that forms its interfaces.
+ 
+\end_layout
+
+\begin_layout Standard
+There are two kind of interfaces: 
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+protected
+\shape default
+: can be called 
+\shape italic
+only
+\shape default
+ from the other objects of Ely framework
+\end_layout
+
+\begin_layout Itemize
+
+\shape italic
+public
+\shape default
+: can be called from anywhere
+\end_layout
+
+\begin_layout Standard
+The protected interface allows to initialize a Component instance at creation
+ time, with the parameters values specified by the configuration file 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+; it includes methods for setting the identifier of an instance and a reference
+ to its owner Object 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object"
+
+\end_inset
+
+.
+ Moreover, there are methods for customizing the instance while being added/remo
+ved to/from the owner Object and to/from the game scene.
+\end_layout
+
+\begin_layout Subsubsection
+Component's protected interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! protected interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component's-protected-interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The aim of the protected interface, is to allow other objects in the framework
+ (specifically Object Template Manager 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+ and the related Component Template 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+), to initialize and customize the Component while being created/destroyed
+ and added/removed to/from an Object:
+\end_layout
+
+\begin_layout Subsubsection
+Component's public interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! public interface
+\end_layout
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Component Template
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component template
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-Template"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A 
+\series bold
+Component
+\series default
+ can be created 
+\shape italic
+only
+\shape default
+ through a 
+\series bold
+Template
+\series default
+, represented by 
+\family typewriter
+ely::ComponentTemplate
+\family default
+ base type.
+\end_layout
+
+\begin_layout Standard
+A 
+\series bold
+Component
+\series default
+ 
+\series bold
+Template
+\series default
+ has the ultimate responsibility to create and initialize a Component of
+ a given type and family type, through a call to its ComponentTemplate::makeComp
+onent() protected member function, which, in the Ely framework, can be (and
+ is) called only from ComponentTemplateManager object through its doCreateCompon
+ent() 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ComponentTemplateManager-doCreateComponent"
+
+\end_inset
+
+ member function.
+\end_layout
+
+\begin_layout Standard
+A Component should be configured before its creation, so Templates allow
+ to set/get any Component parameter 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Components'-configuration-parame"
+
+\end_inset
+
+ (both single and multiple valued), by storing their values into an internal
+ storage (a table of (parameter-name, value) pairs).
+\end_layout
+
+\begin_layout Standard
+Moreover a Template allows to (re)set hard coded default values for parameters
+ that cannot have null values (ComponentTemplate::setParametersDefaults())
+ .
+\end_layout
+
+\begin_layout Standard
+Component Templates are managed by the Component Template Manager 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template-Manager"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection*
+
+\series bold
+Implementation
+\end_layout
+
+\begin_layout Quote
+A generic 
+\shape smallcaps
+component
+\shape default
+ is implemented by 
+\family typewriter
+ely::Component
+\family default
+ base abstract class type.
+ 
+\end_layout
+
+\begin_layout Quote
+
+\shape smallcaps
+component
+\shape default
+s with different 
+\shape smallcaps
+type
+\shape default
+s, are implemented by deriving from it concrete classes which implement
+ all its pure virtual member functions, possibly extending its interface
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-interface"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Quote
+
+\shape smallcaps
+component
+\shape default
+'s 
+\shape smallcaps
+type
+\shape default
+, 
+\shape smallcaps
+family
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+ and 
+\shape smallcaps
+id
+\shape default
+ are implemented by 
+\family typewriter
+ely::ComponentType
+\family default
+, 
+\family typewriter
+ely::ComponentFamilyType
+\family default
+ and 
+\family typewriter
+ely::ComponentId
+\family default
+ types (currently 
+\family typewriter
+typedef
+\family default
+s to 
+\family typewriter
+std::string
+\family default
+).
+\end_layout
+
+\begin_layout Section
+Component Template Manager
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Component Template Manager
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-Template-Manager"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Component Templates 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+ are handled by the 
+\shape italic
+Component Template Manager
+\shape default
+, which is a singleton 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Singletons"
+
+\end_inset
+
+ global object.
+\end_layout
+
+\begin_layout Standard
+Besides adding/removing/retrieving a Template, the manager offers possibility
+ to reset Component configuration parameters 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Components'-configuration-parame"
+
+\end_inset
+
+ (stored in the Templates) to their default values.
+\end_layout
+
+\begin_layout Standard
+All Component Templates used in the game must be stored into this manager,
+ because they are retrieved only through it, and Components can be created
+ only from the private 
+\family typewriter
+ComponentTemplateManager::doCreateComponent()
+\begin_inset CommandInset label
+LatexCommand label
+name "ComponentTemplateManager-doCreateComponent"
+
+\end_inset
+
+ 
+\family default
+member function, which, in the Ely framework, be (and is) called only from
+ 
+\family typewriter
+ObjectTemplateManager
+\family default
+ object through its 
+\family typewriter
+createObject()
+\family default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ObjectTemplateManager-createObject"
+
+\end_inset
+
+ member function.
+\end_layout
+
+\begin_layout Section
+Object
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Object"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Objects, , represented by the 
+\family typewriter
+ely::Object
+\family default
+ type,
+\end_layout
+
+\begin_layout Section
+Object Template
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object ! template
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Object-Template"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Objects' Templates
+\end_layout
+
+\begin_layout Section
+Object Template Manager
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+Object Template Manager
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Object-Template-Manager"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+All Objects Templates used in the game must be stored into this manager,
+ because they are retrieved only through it, and Components can be created
+ only from the public 
+\family typewriter
+ObjectTemplateManager::createObject()
+\family default
+
+\begin_inset CommandInset label
+LatexCommand label
+name "ObjectTemplateManager-createObject"
+
+\end_inset
+
+ member function.
+\end_layout
+
+\begin_layout Chapter
+Game configuration file
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game configuration file
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Game-configuration-file"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+Game configuration file
+\end_layout
+
+\begin_layout Standard
+Parameters' values are specified through a simple syntax, so to avoid complex
+ parsing techniques, but allowing the use of C/C++ 
+\family typewriter
+string
+\family default
+ methods to interpret their meanings.
+ 
+\end_layout
+
+\begin_layout Standard
+Usually a single That syntax follows this rules:
+\end_layout
+
+\begin_layout Section
+Component's configuration parameters
 \begin_inset Index idx
 status collapsed
 
@@ -420,17 +1241,38 @@ name "sub:Components'-configuration-parame"
 \end_layout
 
 \begin_layout Standard
-Almost all the Components have 
+Almost all the 
+\series bold
+Component
+\series default
+s have 
 \shape italic
 configuration parameters
 \shape default
-, used to tweak and customize their behavior.
+ that are specified by the configuration file 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+.
+ These parameters are used to tweak and customize 
+\series bold
+Component
+\series default
+'s internal state configuration at creation time.
+ 
 \end_layout
 
 \begin_layout Standard
-The values of some parameters can be set up only at creation time and cannot
- be changed during the Component lifetime; others haven't this limitation,
- and can be modified through Component's member functions.
+Several internal state values can be set up only 
+\series bold
+Component
+\series default
+ at creation time (through the parameters) and cannot be changed during
+ its lifetime, while others haven't this limitation, and can be modified
+ through member functions.
 \end_layout
 
 \begin_layout Standard
@@ -543,427 +1385,6 @@ note
 \shape default
  (optional) describing how its value should be specified in the configuration
  file and/or other informations.
-\end_layout
-
-\begin_layout Subsection
-Components' Templates
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! template
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Components'-templates"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-A Component can be created 
-\shape italic
-only
-\shape default
- through a Template.
-\end_layout
-
-\begin_layout Standard
-A Component Template has the ultimate responsibility to create and initialize
- a Component of a given type and family type, through a call to its
-\shape italic
- 
-\family typewriter
-\shape default
-ComponentTemplate::makeComponent()
-\family default
- protected member function, which, in the Ely framework, can be (and is)
- called only from 
-\family typewriter
-ComponentTemplateManager
-\family default
- object through its 
-\family typewriter
-doCreateComponent()
-\family default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "ComponentTemplateManager-doCreateComponent"
-
-\end_inset
-
- member function.
-\end_layout
-
-\begin_layout Standard
-A Component should be configured 
-\shape italic
-before
-\shape default
- its creation, so Templates allow to set/get any Component parameter 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Component-configuration-parameters"
-
-\end_inset
-
- (both single and multiple valued), by storing their values into an internal
- storage (a table of 
-\family typewriter
-(parameter-name, value)
-\family default
- pairs).
-\end_layout
-
-\begin_layout Standard
-Moreover a Template allows to (re)set hard coded default values for parameters
- that cannot have null values (
-\family typewriter
-ComponentTemplate::setParametersDefaults()
-\family default
-) .
-\end_layout
-
-\begin_layout Standard
-Component Templates are managed by the 
-\shape italic
-Component Template Manager
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Component-Template-Manager"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsection
-Components' interfaces
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! interface
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Components'-interfaces"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Each Component has a series of member functions that forms its interfaces.
- 
-\end_layout
-
-\begin_layout Standard
-There are two kind of interfaces: 
-\end_layout
-
-\begin_layout Itemize
-
-\shape italic
-protected
-\shape default
-: can be called 
-\shape italic
-only
-\shape default
- from the other objects of Ely framework
-\end_layout
-
-\begin_layout Itemize
-
-\shape italic
-public
-\shape default
-: can be called from anywhere
-\end_layout
-
-\begin_layout Subsubsection
-Component's protected interface
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! protected interface
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Component's-protected-interface"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The aim of the protected interface, is to allow other objects in the framework
- (specifically Object Template Manager 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object-Template-Manager"
-
-\end_inset
-
- and the related Component Template 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components'-templates"
-
-\end_inset
-
-), to initialize and customize the Component while being created/destroyed
- and added/removed to/from an Object:
-\end_layout
-
-\begin_layout Subsubsection
-Component's public interface
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! public interface
-\end_layout
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Section
-Component Template Manager
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Component Template Manager
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Component-Template-Manager"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Component Templates 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components'-templates"
-
-\end_inset
-
- are handled by the 
-\shape italic
-Component Template Manager
-\shape default
-, which is a singleton 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Singletons"
-
-\end_inset
-
- global object.
-\end_layout
-
-\begin_layout Standard
-Besides adding/removing/retrieving a Template, the manager offers possibility
- to reset Component configuration parameters 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components'-configuration-parame"
-
-\end_inset
-
- (stored in the Templates) to their default values.
-\end_layout
-
-\begin_layout Standard
-All Component Templates used in the game must be stored into this manager,
- because they are retrieved only through it, and Components can be created
- only from the private 
-\family typewriter
-ComponentTemplateManager::doCreateComponent()
-\begin_inset CommandInset label
-LatexCommand label
-name "ComponentTemplateManager-doCreateComponent"
-
-\end_inset
-
- 
-\family default
-member function, which, in the Ely framework, be (and is) called only from
- 
-\family typewriter
-ObjectTemplateManager
-\family default
- object through its 
-\family typewriter
-createObject()
-\family default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "ObjectTemplateManager-createObject"
-
-\end_inset
-
- member function.
-\end_layout
-
-\begin_layout Section
-Objects
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-object
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Objects"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Objects
-\end_layout
-
-\begin_layout Subsection
-Objects' Templates
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-object ! template
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Objects'-templates"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Objects' Templates
-\end_layout
-
-\begin_layout Section
-Object Template Manager
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-Object Template Manager
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Object-Template-Manager"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-All Objects Templates used in the game must be stored into this manager,
- because they are retrieved only through it, and Components can be created
- only from the public 
-\family typewriter
-ObjectTemplateManager::createObject()
-\family default
-
-\begin_inset CommandInset label
-LatexCommand label
-name "ObjectTemplateManager-createObject"
-
-\end_inset
-
- member function.
-\end_layout
-
-\begin_layout Chapter
-Game configuration file
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-game configuration file
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "chap:Game-configuration-file"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Game configuration file
-\end_layout
-
-\begin_layout Standard
-Parameters' values are specified through a simple syntax, so to avoid complex
- parsing techniques, but allowing the use of C/C++ 
-\family typewriter
-string
-\family default
- methods to interpret their meanings.
- 
-\end_layout
-
-\begin_layout Standard
-Usually a single That syntax follows this rules:
 \end_layout
 
 \begin_layout Chapter
