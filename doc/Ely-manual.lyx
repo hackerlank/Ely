@@ -491,7 +491,7 @@ reference "sec:Component-Template"
  
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsubsection*
 
 \series bold
 Implementation
@@ -692,6 +692,27 @@ reference "chap:Game-configuration-file"
 .
 \end_layout
 
+\begin_layout Subsubsection*
+
+\series bold
+Implementation
+\end_layout
+
+\begin_layout Quote
+The 
+\end_layout
+
+\begin_layout Quote
+See API Documentation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for details.
+\end_layout
+
 \begin_layout Subsection
 Component interface
 \begin_inset Index idx
@@ -714,7 +735,11 @@ name "sub:Component-interface"
 \end_layout
 
 \begin_layout Standard
-Each Component has a series of member functions that forms its interfaces.
+Each 
+\shape smallcaps
+component
+\shape default
+ has a series of member functions that forms its interfaces.
  
 \end_layout
 
@@ -743,8 +768,12 @@ public
 \end_layout
 
 \begin_layout Standard
-The protected interface allows to initialize a Component instance at creation
- time, with the parameters values specified by the configuration file 
+The protected interface allows to initialize a 
+\shape smallcaps
+component
+\shape default
+ instance at creation time, with the parameters values specified by the
+ configuration file 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "chap:Game-configuration-file"
@@ -752,7 +781,11 @@ reference "chap:Game-configuration-file"
 \end_inset
 
 ; it includes methods for setting the identifier of an instance and a reference
- to its owner Object 
+ to its owner 
+\shape smallcaps
+object
+\shape default
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Object"
@@ -761,11 +794,15 @@ reference "sec:Object"
 
 .
  Moreover, there are methods for customizing the instance while being added/remo
-ved to/from the owner Object and to/from the game scene.
+ved to/from the owner 
+\shape smallcaps
+object
+\shape default
+ and to/from the game scene.
 \end_layout
 
 \begin_layout Subsubsection
-Component's protected interface
+protected interface
 \begin_inset Index idx
 status collapsed
 
@@ -778,7 +815,7 @@ component ! protected interface
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Component's-protected-interface"
+name "sub:protected-interface"
 
 \end_inset
 
@@ -786,33 +823,45 @@ name "sub:Component's-protected-interface"
 \end_layout
 
 \begin_layout Standard
-The aim of the protected interface, is to allow other objects in the framework
- (specifically Object Template Manager 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object-Template-Manager"
+The common protected interface is called to carry out 
+\shape smallcaps
+component
+\shape default
+ initialization during creation and to accomplish particular customization
+ when 
+\shape smallcaps
+component
+\shape default
+ is being added/removed to/from both an 
+\shape smallcaps
+object
+\shape default
+ and the game scene.
+\end_layout
 
-\end_inset
-
- and the related Component Template 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Component-Template"
-
-\end_inset
-
-), to initialize and customize the Component while being created/destroyed
- and added/removed to/from an Object:
+\begin_layout Standard
+Each specialized 
+\shape smallcaps
+component type 
+\shape default
+may extend the basic 
 \end_layout
 
 \begin_layout Subsubsection
-Component's public interface
+public interface
 \begin_inset Index idx
 status collapsed
 
 \begin_layout Plain Layout
 component ! public interface
 \end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:public-interface"
 
 \end_inset
 
