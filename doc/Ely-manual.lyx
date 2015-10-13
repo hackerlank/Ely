@@ -476,19 +476,57 @@ A
 \shape smallcaps
 component
 \shape default
- is created exclusively by a related 
-\shape smallcaps
-template
+ is given the ability to 
+\shape italic
+update
 \shape default
- 
-\begin_inset CommandInset ref
-LatexCommand eqref
-reference "sec:Component-Template"
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! update
+\end_layout
 
 \end_inset
 
-.
+ its state at any tick (or frame) of the game loop.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ can respond to events (stimuli) by registering (and unregistering) function
+ callbacks for them with the global Panda3d EventHandler.
+ This is the only way an 
+\shape smallcaps
+object
+\shape default
+ is allowed to reply to events.
  
+\end_layout
+
+\begin_layout Subsection
+interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-interface"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Standard
@@ -500,18 +538,7 @@ component
 \shape italic
 interface
 \shape default
-
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! interface
-\end_layout
-
-\end_inset
-
-, which is formed by a series of member functions, that can be protected,
- public and private.
+, which is formed by a series of methods.
 \end_layout
 
 \begin_layout Standard
@@ -519,10 +546,10 @@ The protected interface is called
 \shape italic
 only
 \shape default
- from the other objects of Ely framework, the public one can be called from
- external user code.
- Into private interface are relegated helper functions that are delegated
- by the protected and public functions to do the real job.
+ from other objects of Ely framework.
+ The public interface is used for interaction with external user code.
+ Whereas, into private interface are relegated helper functions that are
+ delegated by the protected and public functions to do the real job.
 \end_layout
 
 \begin_layout Standard
@@ -530,7 +557,7 @@ The protected interface common to all
 \shape smallcaps
 component
 \shape default
-s, allows to:
+s includes methods to:
 \end_layout
 
 \begin_layout Itemize
@@ -538,7 +565,7 @@ initialize a
 \shape smallcaps
 component
 \shape default
- at creation time, with the parameters values specified by the configuration
+ at creation time, with the parameters values specified in the configuration
  file 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -546,8 +573,15 @@ reference "chap:Game-configuration-file"
 
 \end_inset
 
-; it includes methods for setting the identifier of an instance and a reference
- to its owner 
+
+\end_layout
+
+\begin_layout Itemize
+set the
+\shape smallcaps
+ component
+\shape default
+ identifier and a reference to its owner 
 \shape smallcaps
 object
 \shape default
@@ -566,17 +600,222 @@ customize
 \shape smallcaps
 component
 \shape default
- while being added/removed to/from both the owner 
+ while being added/removed to/from the owner 
 \shape smallcaps
 object
 \shape default
  and to/from the game scene.
 \end_layout
 
+\begin_layout Itemize
+register and unregister event callbacks functions
+\end_layout
+
+\begin_layout Standard
+The common public interface has methods to:
+\end_layout
+
+\begin_layout Itemize
+get the 
+\shape smallcaps
+type,
+\shape default
+ 
+\shape smallcaps
+family type
+\shape default
+, 
+\shape smallcaps
+id
+\shape default
+ and owner 
+\shape smallcaps
+object
+\shape default
+ of the 
+\shape smallcaps
+component
+\end_layout
+
+\begin_layout Itemize
+update the 
+\shape smallcaps
+component 
+\shape default
+state
+\end_layout
+
+\begin_layout Standard
+Obviously any 
+\shape smallcaps
+component
+\shape default
+ of a given 
+\shape smallcaps
+type
+\shape default
+, usually would specialize and extend the basic common interface, depending
+ on its specific behavior.
+\end_layout
+
+\begin_layout Subsection
+state
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! state
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-state"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+At any point in time, a 
+\shape smallcaps
+component
+\shape default
+ has an internal
+\shape italic
+ state
+\shape default
+, which determines its particular configuration and behavior (and consequently
+ those of its owner 
+\shape smallcaps
+object
+\shape default
+).
+ The internal state is assembled from a set of 
+\shape italic
+values
+\shape default
+, each one having its own type.
+\end_layout
+
+\begin_layout Standard
+Some internal state values can be set up only at 
+\shape smallcaps
+component
+\shape default
+ creation time and cannot be changed during its lifetime, while others haven't
+ this limitation, and can be modified through 
+\shape smallcaps
+component
+\shape default
+ methods.
+\end_layout
+
+\begin_layout Standard
+Moreover all internal state values have hard-coded 
+\shape italic
+default
+\shape default
+s, which are used if not specified at creation and/or during lifetime of
+ the 
+\shape smallcaps
+component
+\shape default
+.
+ A default is usually the 
+\shape italic
+null
+\shape default
+ element of the type field of values, e.g.
+ 
+\family typewriter
+0
+\family default
+ for numbers (floats, integers), empty string (
+\family typewriter
+''
+\family default
+) for strings etc\SpecialChar \ldots{}
+.
+ But some state values must have a different default from null, otherwise
+ the 
+\shape smallcaps
+component
+\shape default
+ could fall back in an inconsistent behavior.
+\end_layout
+
+\begin_layout Standard
+At game startup time, 
+\shape smallcaps
+component
+\shape default
+'s state values are specified through 
+\shape italic
+configuration parameters
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Components'-configuration-parame"
+
+\end_inset
+
+ specified in the 
+\shape italic
+game configuration file
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+During lifetime, many 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+s require their states to be updated at each tick/frame, while others haven't
+ this need (their states possibly change only through methods' calls).
+\end_layout
+
 \begin_layout Subsubsection*
 
 \series bold
-Implementation details
+Implementation
+\end_layout
+
+\begin_layout Quote
+The 
+\end_layout
+
+\begin_layout Quote
+See API Documentation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for details.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Implementation
 \end_layout
 
 \begin_layout Quote
@@ -656,298 +895,6 @@ s to
 std::string
 \family default
 ).
-\end_layout
-
-\begin_layout Subsection
-Component internal state
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! internal state
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sec:Component-internal-state"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-At any point in time, a 
-\shape smallcaps
-component
-\shape default
- has an 
-\shape italic
-internal state
-\shape default
-, which determines its particular configuration and behavior (and consequently
- those of its owner 
-\shape smallcaps
-object
-\shape default
-).
- The internal state is assembled from a set of 
-\shape italic
-values
-\shape default
-, each one having its own type.
-\end_layout
-
-\begin_layout Standard
-Some internal state values can be set up only at 
-\shape smallcaps
-component
-\shape default
- creation time and cannot be changed during its lifetime, while others haven't
- this limitation, and can be modified through member functions.
-\end_layout
-
-\begin_layout Standard
-Moreover all internal state values have hard-coded 
-\shape italic
-default
-\shape default
-s, which are used if not specified at creation and/or during lifetime of
- the 
-\shape smallcaps
-component
-\shape default
-.
- A default is usually the 
-\shape italic
-null
-\shape default
- element of the type field of values, e.g.
- 
-\family typewriter
-0
-\family default
- for numbers (floats, integers), empty string (
-\family typewriter
-''
-\family default
-) for strings etc\SpecialChar \ldots{}
-.
- But some state values must have a different default from null, otherwise
- the 
-\shape smallcaps
-component
-\shape default
- could fall back in an inconsistent behavior.
-\end_layout
-
-\begin_layout Standard
-At game startup time, 
-\shape smallcaps
-component
-\shape default
-'s state values are specified through 
-\shape italic
-configuration parameters
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components'-configuration-parame"
-
-\end_inset
-
- specified in the 
-\shape italic
-game configuration file
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Game-configuration-file"
-
-\end_inset
-
-.
-\end_layout
-
-\begin_layout Subsubsection*
-
-\series bold
-Implementation
-\end_layout
-
-\begin_layout Quote
-The 
-\end_layout
-
-\begin_layout Quote
-See API Documentation 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:API-Documentation"
-
-\end_inset
-
- for details.
-\end_layout
-
-\begin_layout Subsection
-Component interface
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! interface
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Component-interface"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-Each 
-\shape smallcaps
-component
-\shape default
- has a series of member functions that forms its interfaces.
- 
-\end_layout
-
-\begin_layout Standard
-There are two kind of interfaces: 
-\end_layout
-
-\begin_layout Itemize
-
-\shape italic
-protected
-\shape default
-: can be called 
-\shape italic
-only
-\shape default
- from the other objects of Ely framework
-\end_layout
-
-\begin_layout Itemize
-
-\shape italic
-public
-\shape default
-: can be called from anywhere
-\end_layout
-
-\begin_layout Standard
-The protected interface allows to initialize a 
-\shape smallcaps
-component
-\shape default
- instance at creation time, with the parameters values specified by the
- configuration file 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Game-configuration-file"
-
-\end_inset
-
-; it includes methods for setting the identifier of an instance and a reference
- to its owner 
-\shape smallcaps
-object
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object"
-
-\end_inset
-
-.
- Moreover, there are methods for customizing the instance while being added/remo
-ved to/from the owner 
-\shape smallcaps
-object
-\shape default
- and to/from the game scene.
-\end_layout
-
-\begin_layout Subsubsection
-protected interface
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! protected interface
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:protected-interface"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The common protected interface is called to carry out 
-\shape smallcaps
-component
-\shape default
- initialization during creation and to accomplish particular customization
- when 
-\shape smallcaps
-component
-\shape default
- is being added/removed to/from both an 
-\shape smallcaps
-object
-\shape default
- and the game scene.
-\end_layout
-
-\begin_layout Standard
-Each specialized 
-\shape smallcaps
-component type 
-\shape default
-may extend the basic 
-\end_layout
-
-\begin_layout Subsubsection
-public interface
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! public interface
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:public-interface"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Section
