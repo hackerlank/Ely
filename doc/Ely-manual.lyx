@@ -348,7 +348,7 @@ Object
 \shape smallcaps
 component
 \shape default
-s and relationships among them.
+s, their inter-relationships and interactions among them.
 \end_layout
 
 \begin_layout Standard
@@ -356,7 +356,7 @@ A
 \shape smallcaps
 component
 \shape default
- is identified by its 
+ is distinguished by its 
 \shape smallcaps
 type
 \shape italic
@@ -374,7 +374,7 @@ component ! type
 
 
 \shape default
-, which identifies its structure, its behavior and the states it can assume.
+, which defines its structure, its behavior and the states it can assume.
  
 \end_layout
 
@@ -491,10 +491,92 @@ reference "sec:Component-Template"
  
 \end_layout
 
+\begin_layout Standard
+The behavior of any 
+\shape smallcaps
+component
+\shape default
+ is determined by its 
+\shape italic
+interface
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! interface
+\end_layout
+
+\end_inset
+
+, which is formed by a series of member functions, that can be protected,
+ public and private.
+\end_layout
+
+\begin_layout Standard
+The protected interface is called 
+\shape italic
+only
+\shape default
+ from the other objects of Ely framework, the public one can be called from
+ external user code.
+ Into private interface are relegated helper functions that are delegated
+ by the protected and public functions to do the real job.
+\end_layout
+
+\begin_layout Standard
+The protected interface common to all 
+\shape smallcaps
+component
+\shape default
+s, allows to:
+\end_layout
+
+\begin_layout Itemize
+initialize a 
+\shape smallcaps
+component
+\shape default
+ at creation time, with the parameters values specified by the configuration
+ file 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:Game-configuration-file"
+
+\end_inset
+
+; it includes methods for setting the identifier of an instance and a reference
+ to its owner 
+\shape smallcaps
+object
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+customize 
+\shape smallcaps
+component
+\shape default
+ while being added/removed to/from both the owner 
+\shape smallcaps
+object
+\shape default
+ and to/from the game scene.
+\end_layout
+
 \begin_layout Subsubsection*
 
 \series bold
-Implementation
+Implementation details
 \end_layout
 
 \begin_layout Quote
