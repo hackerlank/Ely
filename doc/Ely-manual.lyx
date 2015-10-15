@@ -591,20 +591,11 @@ reference "chap:Game-configuration-file"
 \begin_layout Itemize
 set the
 \shape smallcaps
- component
+ component ID
 \shape default
- identifier and a reference to its owner 
+ and a reference to its owner 
 \shape smallcaps
 object
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object"
-
-\end_inset
-
-
 \end_layout
 
 \begin_layout Itemize
@@ -641,7 +632,7 @@ family type
 \shape smallcaps
 id
 \shape default
- and owner 
+ and reference to owner 
 \shape smallcaps
 object
 \shape default
@@ -655,7 +646,7 @@ update the
 \shape smallcaps
 component 
 \shape default
-state
+state at each game tick
 \end_layout
 
 \begin_layout Standard
@@ -917,7 +908,7 @@ ely::ComponentFamilyType
 \family typewriter
 ely::ComponentId
 \family default
- types (currently 
+ types respectively (currently all are 
 \family typewriter
 typedef
 \family default
@@ -963,7 +954,7 @@ ely::Component::onAddToObjectSetup()
 \family default
 /
 \family typewriter
-ely::Component::onRemoveFromObjectCleanup()
+onRemoveFromObjectCleanup()
 \family default
  to allow a 
 \shape smallcaps
@@ -991,7 +982,7 @@ ely::Component::onAddToSceneSetup()
 \family default
 /
 \family typewriter
-ely::Component::onRemoveFromSceneCleanup()
+onRemoveFromSceneCleanup()
 \family default
  to allow a 
 \shape smallcaps
@@ -1011,21 +1002,29 @@ before
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::setOwnerObject()
+ely::Component::setComponentId()
 \family default
- to sets the owner object reference
+/
+\family typewriter
+setOwnerObject()
+\family default
+ to set the 
+\shape smallcaps
+component ID
+\shape default
+ and a reference to its owner object respectively
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::setComponentId() 
+ely::Component::registerEventCallbacks()
 \family default
-to set the 
-\shape smallcaps
-component
-\shape default
- unique identifier
+/
+\family typewriter
+unregisterEventCallbacks()
+\family default
+ to register/unregister events' callbacks
 \end_layout
 
 \begin_layout Quote
@@ -1033,7 +1032,55 @@ The common public interface includes:
 \end_layout
 
 \begin_layout Itemize
-TODO
+
+\family typewriter
+ely::Component::componentType()
+\family default
+/
+\family typewriter
+familyType()
+\family default
+/
+\family typewriter
+getComponentId()
+\family default
+/
+\family typewriter
+getOwnerObject()
+\family default
+ to get the 
+\shape smallcaps
+type,
+\shape default
+ 
+\shape smallcaps
+family type
+\shape default
+, 
+\shape smallcaps
+id
+\shape default
+ and reference to owner 
+\shape smallcaps
+object
+\shape default
+ of the 
+\shape smallcaps
+component
+\shape default
+ respectively
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::update()
+\family default
+ to possibly update the 
+\shape smallcaps
+component 
+\shape default
+state at each game tick
 \end_layout
 
 \begin_layout Quote
@@ -1070,22 +1117,19 @@ name "sec:Component-Template"
 
 \begin_layout Standard
 A 
-\series bold
-Component
-\series default
+\shape smallcaps
+component
+\shape default
  can be created 
 \shape italic
 only
 \shape default
  through a 
-\series bold
-Template
-\series default
-, represented by 
-\family typewriter
-ely::ComponentTemplate
-\family default
- base type.
+\shape smallcaps
+component template
+\shape default
+.
+ The template 
 \end_layout
 
 \begin_layout Standard
