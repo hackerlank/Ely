@@ -542,14 +542,26 @@ interface
 \end_layout
 
 \begin_layout Standard
-The protected interface is called 
+The 
+\shape italic
+protected
+\shape default
+ interface is called 
 \shape italic
 only
 \shape default
  from other objects of Ely framework.
- The public interface is used for interaction with external user code.
- Whereas, into private interface are relegated helper functions that are
- delegated by the protected and public functions to do the real job.
+ The 
+\shape italic
+public
+\shape default
+ interface is used for interaction with external user code.
+ Whereas, into 
+\shape italic
+private
+\shape default
+ interface are relegated helper functions that are delegated by the protected
+ and public functions to do the real job.
 \end_layout
 
 \begin_layout Standard
@@ -596,11 +608,12 @@ reference "sec:Object"
 \end_layout
 
 \begin_layout Itemize
-customize 
+let
 \shape smallcaps
-component
+ component
 \shape default
- while being added/removed to/from the owner 
+ make additional setup/cleanup while being added/removed to/from the owner
+ 
 \shape smallcaps
 object
 \shape default
@@ -712,6 +725,7 @@ component
 component
 \shape default
  methods.
+ 
 \end_layout
 
 \begin_layout Standard
@@ -791,6 +805,48 @@ s require their states to be updated at each tick/frame, while others haven't
  this need (their states possibly change only through methods' calls).
 \end_layout
 
+\begin_layout Standard
+Among internal state values, common to all 
+\shape smallcaps
+type
+\shape default
+s of 
+\shape smallcaps
+component
+\shape default
+s, that are set at creation time and cannot be changed during lifetime,
+ are the 
+\shape italic
+event
+\shape default
+ 
+\shape italic
+types
+\shape default
+ the 
+\shape smallcaps
+component
+\shape default
+ should respond to.
+ The rationale is that these event types are dependent not only by the 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+ but also by the kind of 
+\shape smallcaps
+object
+\shape default
+ the 
+\shape smallcaps
+component
+\shape default
+ belongs to.
+\end_layout
+
 \begin_layout Subsubsection*
 
 \series bold
@@ -798,51 +854,26 @@ Implementation
 \end_layout
 
 \begin_layout Quote
-The 
-\end_layout
-
-\begin_layout Quote
-See API Documentation 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:API-Documentation"
-
-\end_inset
-
- for details.
-\end_layout
-
-\begin_layout Subsection
-
-\series bold
-Implementation
-\end_layout
-
-\begin_layout Quote
-A generic 
+The common part of all 
 \shape smallcaps
 component
 \shape default
- is implemented by 
+s is implemented by 
 \family typewriter
 ely::Component
 \family default
- base abstract class type.
- 
-\end_layout
-
-\begin_layout Quote
-
+ abstract base class, while a 
 \shape smallcaps
 component
 \shape default
-s with different 
+ of a given 
 \shape smallcaps
 type
 \shape default
-s, are implemented by deriving from it concrete classes which implement
- all its pure virtual member functions, possibly extending its interface
- 
+, is implemented by deriving a concrete class that implements all its pure
+ virtual member functions, and that possibly extends and/or specializes
+ (by overriding its virtual member functions) its interface and its internal
+ state 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-interface"
@@ -886,7 +917,7 @@ ely::ComponentFamilyType
 \family typewriter
 ely::ComponentId
 \family default
- types respectively (currently all 
+ types (currently 
 \family typewriter
 typedef
 \family default
@@ -895,6 +926,125 @@ s to
 std::string
 \family default
 ).
+\end_layout
+
+\begin_layout Quote
+The common protected interface includes:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::reset()
+\family default
+ to reset all 
+\shape smallcaps
+component
+\shape default
+ data members (pure virtual)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::initialize()
+\family default
+ to allow a 
+\shape smallcaps
+component
+\shape default
+ to be initialized (pure virtual)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::onAddToObjectSetup()
+\family default
+/
+\family typewriter
+ely::Component::onRemoveFromObjectCleanup()
+\family default
+ to allow a 
+\shape smallcaps
+component
+\shape default
+ to perform custom setup/cleanup just 
+\shape italic
+after
+\shape default
+/
+\shape italic
+before
+\shape default
+ has been added/removed to/from an 
+\shape smallcaps
+object
+\shape default
+ (pure virtual)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::onAddToSceneSetup()
+\family default
+/
+\family typewriter
+ely::Component::onRemoveFromSceneCleanup()
+\family default
+ to allow a 
+\shape smallcaps
+component
+\shape default
+ to perform custom setup/cleanup just 
+\shape italic
+after
+\shape default
+/
+\shape italic
+before
+\shape default
+ has been added/removed to/from the game scene (pure virtual)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::setOwnerObject()
+\family default
+ to sets the owner object reference
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::setComponentId() 
+\family default
+to set the 
+\shape smallcaps
+component
+\shape default
+ unique identifier
+\end_layout
+
+\begin_layout Quote
+The common public interface includes:
+\end_layout
+
+\begin_layout Itemize
+TODO
+\end_layout
+
+\begin_layout Quote
+See API Documentation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for details.
 \end_layout
 
 \begin_layout Section
