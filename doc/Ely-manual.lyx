@@ -342,7 +342,7 @@ component
 s.
  Therefore the 
 \shape smallcaps
-Object
+object
 \shape default
  structure and its behavior are completely determined by its 
 \shape smallcaps
@@ -672,6 +672,10 @@ component
 state at each game tick
 \end_layout
 
+\begin_layout Itemize
+get the event type of a Panda3d event received 
+\end_layout
+
 \begin_layout Standard
 Obviously any 
 \shape smallcaps
@@ -743,6 +747,20 @@ component
 \end_layout
 
 \begin_layout Standard
+During lifetime, many 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+s require their state's data to be updated at each tick/frame, while others
+ haven't this need (their states can possibly change only through methods'
+ calls).
+\end_layout
+
+\begin_layout Standard
 Moreover all internal data have hard-coded 
 \shape italic
 default
@@ -781,21 +799,7 @@ component
 \end_layout
 
 \begin_layout Standard
-During lifetime, many 
-\shape smallcaps
-component
-\shape default
- 
-\shape smallcaps
-type
-\shape default
-s require their state's data to be updated at each tick/frame, while others
- haven't this need (their states can possibly change only through methods'
- calls).
-\end_layout
-
-\begin_layout Standard
-Among state's data values, common to all 
+Among state's data values common to all 
 \shape smallcaps
 type
 \shape default
@@ -803,7 +807,7 @@ s of
 \shape smallcaps
 component
 \shape default
-s and that are set at creation time and cannot be changed during lifetime,
+s (and that are set at creation time and cannot be changed during lifetime)
  are the 
 \shape italic
 event
@@ -823,7 +827,7 @@ name "event types"
 \shape smallcaps
 component
 \shape default
- should respond to.
+ should respond to, along with their corresponding actual Panda3d events.
  The rationale is that these event types are dependent not only by the 
 \shape smallcaps
 component
@@ -993,7 +997,7 @@ object
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::onAddToSceneSetup()
+ely::Component::onAddToSnceneSetup()
 \family default
 /
 \family typewriter
@@ -1028,6 +1032,18 @@ setOwnerObject()
 component ID
 \shape default
  and a reference to its owner object respectively
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::registerEventCallbacks()
+\family default
+/
+\family typewriter
+unregisterEventCallbacks()
+\family default
+ to register/unregister events' callbacks
 \end_layout
 
 \begin_layout Itemize
@@ -1084,6 +1100,18 @@ object
 component
 \shape default
  respectively
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::Component::getEventType()
+\family default
+ to get the event type of a Panda3d event the 
+\shape smallcaps
+component
+\shape default
+ is supposed to respond to
 \end_layout
 
 \begin_layout Itemize
@@ -1401,35 +1429,23 @@ get both the single and the multiple valued
 \shape smallcaps
 component
 \shape default
- configuration parameters
-\end_layout
-
-\begin_layout Itemize
-/** * 
-\backslash
-brief Gets the entire parameter table.
- * @return The parameter table.
- */ ParameterTable getParameterTable() const;
-\end_layout
-
-\begin_layout Itemize
-/**
+ configuration parameters or a copy of the entire parameter table
 \end_layout
 
 \begin_layout Standard
 Obviously any 
 \shape smallcaps
-component
+component template
 \shape default
  of a given 
 \shape smallcaps
-type
+component type
 \shape default
 , usually would specialize and extend the basic common interface, depending
  on its specific behavior.
 \end_layout
 
-\begin_layout Subsection*
+\begin_layout Subsubsection*
 
 \series bold
 Implementation
