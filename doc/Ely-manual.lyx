@@ -508,6 +508,25 @@ object
  
 \end_layout
 
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is created and initialized by the corresponding
+\shape smallcaps
+ component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
 interface
 \begin_inset Index idx
@@ -577,11 +596,15 @@ initialize a
 \shape smallcaps
 component
 \shape default
- at creation time, with the parameters values specified in the configuration
- file 
+ at creation time, using the data values specified in the corresponding
+ 
+\shape smallcaps
+template
+\shape default
+ parameter table 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "chap:Game-configuration-file"
+reference "component-template-parameter-table"
 
 \end_inset
 
@@ -688,7 +711,7 @@ At any point in time, a
 \shape smallcaps
 component
 \shape default
- has an internal
+ has an
 \shape italic
  state
 \shape default
@@ -698,15 +721,15 @@ component
 object
 \shape default
 ).
- The internal state is assembled from a set of 
+ The state is made up a set of internal 
 \shape italic
-values
+data
 \shape default
-, each one having its own type.
+, each one having its own type and value.
 \end_layout
 
 \begin_layout Standard
-Some internal state values can be set up only at 
+Some internal data values can be set up only at 
 \shape smallcaps
 component
 \shape default
@@ -720,21 +743,25 @@ component
 \end_layout
 
 \begin_layout Standard
-Moreover all internal state values have hard-coded 
+Moreover all internal data have hard-coded 
 \shape italic
 default
 \shape default
-s, which are used if not specified at creation and/or during lifetime of
+ 
+\shape italic
+values
+\shape default
+, which are used if not specified at creation and/or during lifetime of
  the 
 \shape smallcaps
 component
 \shape default
 .
- A default is usually the 
+ A default value is usually the 
 \shape italic
 null
 \shape default
- element of the type field of values, e.g.
+ element of the field of values of the data type, e.g.
  
 \family typewriter
 0
@@ -745,42 +772,12 @@ null
 \family default
 ) for strings etc\SpecialChar \ldots{}
 .
- But some state values must have a different default from null, otherwise
+ But some data must have a different default values from null, otherwise
  the 
 \shape smallcaps
 component
 \shape default
  could fall back in an inconsistent behavior.
-\end_layout
-
-\begin_layout Standard
-At game startup time, 
-\shape smallcaps
-component
-\shape default
-'s state values are specified through 
-\shape italic
-configuration parameters
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components'-configuration-parame"
-
-\end_inset
-
- specified in the 
-\shape italic
-game configuration file
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "chap:Game-configuration-file"
-
-\end_inset
-
-.
 \end_layout
 
 \begin_layout Standard
@@ -792,12 +789,13 @@ component
 \shape smallcaps
 type
 \shape default
-s require their states to be updated at each tick/frame, while others haven't
- this need (their states possibly change only through methods' calls).
+s require their state's data to be updated at each tick/frame, while others
+ haven't this need (their states can possibly change only through methods'
+ calls).
 \end_layout
 
 \begin_layout Standard
-Among internal state values, common to all 
+Among state's data values, common to all 
 \shape smallcaps
 type
 \shape default
@@ -805,7 +803,7 @@ s of
 \shape smallcaps
 component
 \shape default
-s, that are set at creation time and cannot be changed during lifetime,
+s and that are set at creation time and cannot be changed during lifetime,
  are the 
 \shape italic
 event
@@ -814,6 +812,13 @@ event
 \shape italic
 types
 \shape default
+ 
+\begin_inset CommandInset label
+LatexCommand label
+name "event types"
+
+\end_inset
+
  the 
 \shape smallcaps
 component
@@ -932,7 +937,12 @@ ely::Component::reset()
 \shape smallcaps
 component
 \shape default
- data members (pure virtual)
+ state's data members.
+ A derived 
+\shape smallcaps
+component type
+\shape default
+ is supposed to do custom reset so it is pure virtual
 \end_layout
 
 \begin_layout Itemize
@@ -944,7 +954,12 @@ ely::Component::initialize()
 \shape smallcaps
 component
 \shape default
- to be initialized (pure virtual)
+ to be initialized.
+ A derived 
+\shape smallcaps
+component type
+\shape default
+ is supposed to do custom initialization so it is pure virtual
 \end_layout
 
 \begin_layout Itemize
@@ -956,9 +971,9 @@ ely::Component::onAddToObjectSetup()
 \family typewriter
 onRemoveFromObjectCleanup()
 \family default
- to allow a 
+ to allow a derived 
 \shape smallcaps
-component
+component type
 \shape default
  to perform custom setup/cleanup just 
 \shape italic
@@ -972,7 +987,7 @@ before
 \shape smallcaps
 object
 \shape default
- (pure virtual)
+ (so they are pure virtual)
 \end_layout
 
 \begin_layout Itemize
@@ -986,7 +1001,7 @@ onRemoveFromSceneCleanup()
 \family default
  to allow a 
 \shape smallcaps
-component
+component type
 \shape default
  to perform custom setup/cleanup just 
 \shape italic
@@ -996,7 +1011,7 @@ after
 \shape italic
 before
 \shape default
- has been added/removed to/from the game scene (pure virtual)
+ has been added/removed to/from the game scene (so they are pure virtual)
 \end_layout
 
 \begin_layout Itemize
@@ -1080,7 +1095,13 @@ ely::Component::update()
 \shape smallcaps
 component 
 \shape default
-state at each game tick
+state at each game tick.
+ Not all derived 
+\shape smallcaps
+component type
+\shape default
+s need to update their state so it is merely virtual, with the base one
+ doing nothing.
 \end_layout
 
 \begin_layout Quote
@@ -1118,64 +1139,159 @@ name "sec:Component-Template"
 \begin_layout Standard
 A 
 \shape smallcaps
+component template
+\shape default
+ has the ultimate responsibility to create and initialize a 
+\shape smallcaps
+component
+\shape default
+ of a given 
+\shape smallcaps
+type
+\shape default
+ and 
+\shape smallcaps
+family
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+.
+ A 
+\shape smallcaps
 component
 \shape default
  can be created 
 \shape italic
 only
 \shape default
- through a 
+ through the corresponding
+\shape smallcaps
+ template
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+Just after its creation, a 
+\shape smallcaps
+component
+\shape default
+ needs to be initialized and this is accomplished by setting up single and
+ multiple valued 
+\shape smallcaps
+component
+\shape italic
+ configuration parameters
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! configuration parameters
+\end_layout
+
+\end_inset
+
+
+\shape italic
+ 
+\shape default
+
+\begin_inset CommandInset label
+LatexCommand label
+name "component-configuration-parameters"
+
+\end_inset
+
+, each one referred to a specified state's internal data 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-state"
+
+\end_inset
+
+.
+ These parameters are handled by the related 
 \shape smallcaps
 component template
 \shape default
-.
- The template 
+, which stores them into an internal 
+\shape italic
+parameter table
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component template ! parameter table
 \end_layout
 
-\begin_layout Standard
-A 
-\series bold
-Component
-\series default
+\end_inset
+
  
-\series bold
-Template
-\series default
- has the ultimate responsibility to create and initialize a Component of
- a given type and family type, through a call to its ComponentTemplate::makeComp
-onent() protected member function, which, in the Ely framework, can be (and
- is) called only from ComponentTemplateManager object through its doCreateCompon
-ent() 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "ComponentTemplateManager-doCreateComponent"
+\begin_inset CommandInset label
+LatexCommand label
+name "component-template-parameter-table"
 
 \end_inset
 
- member function.
+ of (
+\shape italic
+parameter-name, value
+\shape default
+) pairs.
+ Both parameter
+\shape italic
+ 
+\shape default
+name and value are actually specified as strings.
 \end_layout
 
 \begin_layout Standard
-A Component should be configured before its creation, so Templates allow
- to set/get any Component parameter 
+At game startup time, 
+\shape smallcaps
+component
+\shape default
+'s configuration
+\shape italic
+ 
+\shape default
+parameters are specified in the 
+\shape italic
+game configuration file
+\shape default
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Components'-configuration-parame"
+reference "chap:Game-configuration-file"
 
 \end_inset
 
- (both single and multiple valued), by storing their values into an internal
- storage (a table of (parameter-name, value) pairs).
+ and the related 
+\shape smallcaps
+template
+\shape default
+'s table is built automatically; on the other hand, when the 
+\shape smallcaps
+component
+\shape default
+ is created dynamically the table should be set up manually before its creation.
 \end_layout
 
 \begin_layout Standard
-Moreover a Template allows to (re)set hard coded default values for parameters
- that cannot have null values (ComponentTemplate::setParametersDefaults())
- .
-\end_layout
 
-\begin_layout Standard
-Component Templates are managed by the Component Template Manager 
+\shape smallcaps
+component template
+\shape default
+s are handled by the 
+\shape smallcaps
+component template manager
+\shape default
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Component-Template-Manager"
@@ -1185,6 +1301,134 @@ reference "sec:Component-Template-Manager"
 .
 \end_layout
 
+\begin_layout Subsection
+interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component template ! interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-Template-interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The behavior of any 
+\shape smallcaps
+component template
+\shape default
+ is determined by its 
+\shape italic
+interface
+\shape default
+, which is formed by a series of methods.
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+protected
+\shape default
+ interface is called 
+\shape italic
+only
+\shape default
+ from other objects of Ely framework.
+ The 
+\shape italic
+public
+\shape default
+ interface is used for interaction with external user code.
+ 
+\end_layout
+
+\begin_layout Standard
+The protected interface common to all 
+\shape smallcaps
+component template
+\shape default
+s has the method to
+\end_layout
+
+\begin_layout Itemize
+create a 
+\shape smallcaps
+component
+\shape default
+ and initialize it
+\end_layout
+
+\begin_layout Standard
+The common public interface includes methods to:
+\end_layout
+
+\begin_layout Itemize
+get the 
+\shape smallcaps
+type
+\shape default
+ and 
+\shape smallcaps
+family type
+\shape default
+ of the 
+\shape smallcaps
+component
+\shape default
+s it can create 
+\end_layout
+
+\begin_layout Itemize
+set the 
+\shape smallcaps
+component
+\shape default
+ configuration parameters to both default and custom values
+\end_layout
+
+\begin_layout Itemize
+get both the single and the multiple valued 
+\shape smallcaps
+component
+\shape default
+ configuration parameters
+\end_layout
+
+\begin_layout Itemize
+/** * 
+\backslash
+brief Gets the entire parameter table.
+ * @return The parameter table.
+ */ ParameterTable getParameterTable() const;
+\end_layout
+
+\begin_layout Itemize
+/**
+\end_layout
+
+\begin_layout Standard
+Obviously any 
+\shape smallcaps
+component
+\shape default
+ of a given 
+\shape smallcaps
+type
+\shape default
+, usually would specialize and extend the basic common interface, depending
+ on its specific behavior.
+\end_layout
+
 \begin_layout Subsection*
 
 \series bold
@@ -1192,7 +1436,16 @@ Implementation
 \end_layout
 
 \begin_layout Quote
-A generic 
+through a call to its ComponentTemplate::makeComponent() protected member
+ function, which, in the Ely framework, can be (and is) called only from
+ ComponentTemplateManager object through its doCreateComponent() 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "ComponentTemplateManager-doCreateComponent"
+
+\end_inset
+
+ member function.A generic 
 \shape smallcaps
 component
 \shape default
@@ -1497,7 +1750,7 @@ status collapsed
 \begin_layout Plain Layout
 component ! 
 \shape up
-configuration parameter
+configuration parameters
 \end_layout
 
 \end_inset
