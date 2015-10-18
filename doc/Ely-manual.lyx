@@ -498,21 +498,6 @@ A
 \shape smallcaps
 component
 \shape default
- can respond to events (stimuli) by registering (and unregistering) function
- callbacks for them with the global Panda3d EventHandler.
- This is the only way an 
-\shape smallcaps
-object
-\shape default
- is allowed to reply to events.
- 
-\end_layout
-
-\begin_layout Standard
-A 
-\shape smallcaps
-component
-\shape default
  is created and initialized by the corresponding
 \shape smallcaps
  component template
@@ -525,6 +510,171 @@ reference "sec:Component-Template"
 \end_inset
 
 .
+\end_layout
+
+\begin_layout Subsection
+event handling
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! event handling
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-event-handling"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ can respond to Panda3d
+\shape italic
+ event
+\shape default
+s (stimuli).
+ This is the only way an 
+\shape smallcaps
+object
+\shape default
+ is allowed to reply to events: through its 
+\shape smallcaps
+component
+\shape default
+s.
+ 
+\end_layout
+
+\begin_layout Standard
+All 
+\shape smallcaps
+object
+\shape default
+s of the given type (i.e.
+ generated from the same 
+\shape smallcaps
+object template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template"
+
+\end_inset
+
+) are supposed to behave in a 
+\shape italic
+similar
+\shape default
+ 
+\shape italic
+way
+\shape default
+.
+ Accordingly also their 
+\shape smallcaps
+component
+\shape default
+s, having the same type, should handle events in a similar way, i.e.
+ respond to the same 
+\shape italic
+event
+\shape default
+ 
+\shape italic
+types
+\shape default
+
+\begin_inset CommandInset label
+LatexCommand label
+name "event-types"
+
+\end_inset
+
+ and with similar responses.
+ This thing can be obtained by combining the single event type with a single
+ 
+\shape italic
+event callback
+\shape default
+ 
+\shape italic
+function
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Event-callback-functions"
+
+\end_inset
+
+, which can be registered and unregistered with the Panda3D global 
+\shape italic
+EventHandler
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+Usually, however, different 
+\shape smallcaps
+object
+\shape default
+s of the same type need to respond independently to the same event type
+ and handle it in a custom way.
+ This is accomplished by: 
+\end_layout
+
+\begin_layout Itemize
+associating a different Panda3d event to the same event type on a per 
+\shape smallcaps
+component
+\shape default
+ basis
+\end_layout
+
+\begin_layout Itemize
+passing the 
+\shape smallcaps
+component
+\shape default
+ as argument to the event callback function (in this way one can differentiate
+ the answer according to the specific 
+\shape smallcaps
+component
+\shape default
+ and, indirectly, to its owner 
+\shape smallcaps
+object
+\shape default
+)
+\end_layout
+
+\begin_layout Standard
+In this way, for example, 2 different 
+\shape smallcaps
+object
+\shape default
+s of the same type, each having a 
+\shape smallcaps
+component
+\shape default
+ of the same type, will respond to the same event type, each with a different
+ event Panda3D and with the same event callback function, but with 2 different
+\shape smallcaps
+ component
+\shape default
+ as arguments
 \end_layout
 
 \begin_layout Subsection
@@ -799,52 +949,39 @@ component
 \end_layout
 
 \begin_layout Standard
-Among state's data values common to all 
-\shape smallcaps
-type
-\shape default
-s of 
+A 
 \shape smallcaps
 component
 \shape default
-s (and that are set at creation time and cannot be changed during lifetime)
- are the 
+ state includes also the sets of (
 \shape italic
 event
 \shape default
- 
+, 
 \shape italic
-types
+event-type
 \shape default
- 
-\begin_inset CommandInset label
-LatexCommand label
-name "event types"
+) pairs and (
+\shape italic
+event-type
+\shape default
+, 
+\shape italic
+event-callback
+\shape default
+) pairs which the 
+\shape smallcaps
+component
+\shape default
+ use for event handling 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-event-handling"
 
 \end_inset
 
- the 
-\shape smallcaps
-component
-\shape default
- should respond to, along with their corresponding actual Panda3d events.
- The rationale is that these event types are dependent not only by the 
-\shape smallcaps
-component
-\shape default
- 
-\shape smallcaps
-type
-\shape default
- but also by the kind of 
-\shape smallcaps
-object
-\shape default
- the 
-\shape smallcaps
-component
-\shape default
- belongs to.
+.
+ These data sets can be set up only at creation time.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -997,7 +1134,7 @@ object
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::onAddToSnceneSetup()
+ely::Component::onAddToSceneSetup()
 \family default
 /
 \family typewriter
@@ -1208,10 +1345,8 @@ component
 \shape default
  needs to be initialized and this is accomplished by setting up single and
  multiple valued 
-\shape smallcaps
-component
 \shape italic
- configuration parameters
+configuration parameters
 \shape default
 
 \begin_inset Index idx
@@ -1234,7 +1369,11 @@ name "component-configuration-parameters"
 
 \end_inset
 
-, each one referred to a specified state's internal data 
+, each one corresponding to a specific internal data of the 
+\shape smallcaps
+component
+\shape default
+ state 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Component-state"
@@ -1280,15 +1419,15 @@ name and value are actually specified as strings.
 \end_layout
 
 \begin_layout Standard
-At game startup time, 
-\shape smallcaps
-component
-\shape default
-'s configuration
+At game startup time, configuration
 \shape italic
  
 \shape default
-parameters are specified in the 
+parameters for a 
+\shape smallcaps
+component
+\shape default
+ are specified in the 
 \shape italic
 game configuration file
 \shape default
@@ -1417,23 +1556,24 @@ s it can create
 \end_layout
 
 \begin_layout Itemize
-set the 
+set the configuration parameters for the 
 \shape smallcaps
 component
 \shape default
- configuration parameters to both default and custom values
+ to both default and custom values
 \end_layout
 
 \begin_layout Itemize
-get both the single and the multiple valued 
+get both the single and the multiple valued configuration parameters for
+ the 
 \shape smallcaps
 component
 \shape default
- configuration parameters or a copy of the entire parameter table
+ or a copy of the entire parameter table
 \end_layout
 
 \begin_layout Standard
-Obviously any 
+A 
 \shape smallcaps
 component template
 \shape default
@@ -1441,8 +1581,7 @@ component template
 \shape smallcaps
 component type
 \shape default
-, usually would specialize and extend the basic common interface, depending
- on its specific behavior.
+ would only specialize the basic common interface.
 \end_layout
 
 \begin_layout Subsubsection*
@@ -1452,42 +1591,31 @@ Implementation
 \end_layout
 
 \begin_layout Quote
-through a call to its ComponentTemplate::makeComponent() protected member
- function, which, in the Ely framework, can be (and is) called only from
- ComponentTemplateManager object through its doCreateComponent() 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "ComponentTemplateManager-doCreateComponent"
-
-\end_inset
-
- member function.A generic 
+The common part of all 
 \shape smallcaps
-component
+component template
 \shape default
- is implemented by 
+s is implemented by 
 \family typewriter
-ely::Component
+ely::ComponentTemplate
 \family default
- base abstract class type.
- 
-\end_layout
-
-\begin_layout Quote
-
+ abstract base class, while a 
+\shape smallcaps
+component template
+\shape default
+ for a given 
 \shape smallcaps
 component
 \shape default
-s with different 
+ 
 \shape smallcaps
 type
 \shape default
-s, are implemented by deriving from it concrete classes which implement
- all its pure virtual member functions, possibly extending its interface
- 
+, is implemented by deriving a concrete class that implements all its pure
+ virtual member functions 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Component-interface"
+reference "sub:Component-Template-interface"
 
 \end_inset
 
@@ -1496,47 +1624,150 @@ reference "sub:Component-interface"
 \end_layout
 
 \begin_layout Quote
+The common protected interface is made of:
+\end_layout
 
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplate::makeComponent()
+\family default
+ to create the 
 \shape smallcaps
 component
 \shape default
-'s 
+ of a given 
 \shape smallcaps
-type
+type 
 \shape default
-, 
+and 
 \shape smallcaps
-family
+family type
+\shape default
+.
+ A derived 
+\shape smallcaps
+component template
+\shape default
+ is supposed to do specialized 
+\shape smallcaps
+component
+\shape default
+ creation so it is pure virtual
+\end_layout
+
+\begin_layout Quote
+The common public interface includes:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplate::componentType()
+\family default
+/
+\family typewriter
+familyType()
+\family default
+ to get the 
+\shape smallcaps
+type,
 \shape default
  
 \shape smallcaps
-type
+family type
 \shape default
- and 
+ of the related 
 \shape smallcaps
-id
+component
 \shape default
- are implemented by 
+ respectively.
+ A derived 
+\shape smallcaps
+component template
+\shape default
+ is supposed to create 
+\shape smallcaps
+component
+\shape default
+s with different 
+\shape smallcaps
+type 
+\shape default
+and 
+\shape smallcaps
+family type
+\shape default
+ so they are pure virtual
+\end_layout
+
+\begin_layout Itemize
+
 \family typewriter
-ely::ComponentType
+ely::ComponentTemplate::setParametersDefaults()
 \family default
-, 
+ to set the 
+\shape smallcaps
+component
+\shape default
+ configuration parameters to their default values.
+ A derived 
+\shape smallcaps
+component template
+\shape default
+ is supposed to do specialized default parameter settings so it is pure
+ virtual
+\end_layout
+
+\begin_layout Itemize
+
 \family typewriter
-ely::ComponentFamilyType
+ely::ComponentTemplate::setParameters()
 \family default
+ to set the 
+\shape smallcaps
+component
+\shape default
+ configuration parameters to custom values
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplate::parameter()/parameterList()/getParameterTable()
+\family default
+ to get the configuration parameters single or multiple values for the 
+\shape smallcaps
+component
+\shape default
+ or a copy of the entire parameter table respectively
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplate::pandaFramework()/windowFramework()
+\family default
+ to get a reference to the 
+\shape italic
+PandaFramework
+\shape default
  and 
-\family typewriter
-ely::ComponentId
-\family default
- types (currently 
-\family typewriter
-typedef
-\family default
-s to 
-\family typewriter
-std::string
-\family default
-).
+\shape italic
+WindowFramework
+\shape default
+ respectively
+\end_layout
+
+\begin_layout Quote
+See API Documentation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for details.
 \end_layout
 
 \begin_layout Section
@@ -1561,7 +1792,15 @@ name "sec:Component-Template-Manager"
 \end_layout
 
 \begin_layout Standard
-Component Templates 
+
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+template
+\shape default
+s 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Component-Template"
@@ -1569,10 +1808,14 @@ reference "sec:Component-Template"
 \end_inset
 
  are handled by the 
-\shape italic
-Component Template Manager
+\shape smallcaps
+component template manager
 \shape default
-, which is a singleton 
+, which is a 
+\shape italic
+singleton
+\shape default
+ 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Singletons"
@@ -1583,21 +1826,36 @@ reference "sec:Singletons"
 \end_layout
 
 \begin_layout Standard
-Besides adding/removing/retrieving a Template, the manager offers possibility
- to reset Component configuration parameters 
+Besides adding/removing/retrieving a 
+\shape smallcaps
+component template
+\shape default
+, the manager offers possibility to reset 
+\shape smallcaps
+component
+\shape default
+'s configuration parameters 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Components'-configuration-parame"
 
 \end_inset
 
- (stored in the Templates) to their default values.
+ (stored in the 
+\shape smallcaps
+component template
+\shape default
+) to their default values.
 \end_layout
 
 \begin_layout Standard
-All Component Templates used in the game must be stored into this manager,
- because they are retrieved only through it, and Components can be created
- only from the private 
+All 
+\shape smallcaps
+component template
+\shape default
+s used in the game must be stored into this manager, because they are retrieved
+ only through its interface , and Components can be created only from the
+ private 
 \family typewriter
 ComponentTemplateManager::doCreateComponent()
 \begin_inset CommandInset label
@@ -1926,6 +2184,111 @@ note
 \shape default
  (optional) describing how its value should be specified in the configuration
  file and/or other informations.
+\end_layout
+
+\begin_layout Chapter
+Game design
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game ! design
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "chap:Game-design"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Section
+Event callback functions
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game ! event callback functions
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Event-callback-functions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Object initialization functions
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game ! Object initialization functions
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Object-initialization-functions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+State transition functions
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game ! state transition functions
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:State-transition-functions"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Subsection
+Instance update functions
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+game ! instance update functions
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Instance-update-functions"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Chapter

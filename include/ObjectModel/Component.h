@@ -453,6 +453,7 @@ protected:
 
 	/**
 	 * \brief Creates the current component of that family.
+	 * @param compId The Component identifier.
 	 * @return The component just created, NULL if component cannot be created.
 	 */
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId) = 0;
@@ -483,7 +484,7 @@ public:
 
 	/**
 	 * \brief For the component this template is designed to create,
-	 * this function sets the (mandatory) parameters to their default values.
+	 * this function sets the parameters to their default values.
 	 */
 	virtual void setParametersDefaults() = 0;
 

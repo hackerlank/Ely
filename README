@@ -5,19 +5,19 @@ Ely is a GPL licensed open source project. It's a C++ framework for
 creating games based on the open source Panda3d (https://www.panda3d.org) 
 game engine.
 
-Ely are currently developed on Debian 7 (wheezy) and Ubuntu 14.04 (trusty)
+Ely are currently developed on Debian 8 (jessie) and Ubuntu 14.04 (trusty)
 platforms.
 
 Ely's object model is inspired by the article "Game Object Component System" 
 by Chris Stoy in "Game Programming Gems 6" book.
 
 Ely integrates other external open source library like:
-- OpenAL for sound (TODO)
+- OpenAL for sound
 - Bullet for physics
 - Recastnavigation for artificial intelligence (path finding)
 - OpenSteer for artificial intelligence (steering behavior)
 - Raknet for networking (TODO)
-- libRocket (TODO)
+- libRocket
 
-Currently Ely is in a very alpha stage, and it comes with a fully functional
+Currently Ely is in alpha stage, and it comes with a fully functional
 test game called (with no imagination) "ely".
