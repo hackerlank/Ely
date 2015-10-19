@@ -1823,66 +1823,227 @@ reference "sec:Singletons"
 \end_inset
 
  global object.
-\end_layout
-
-\begin_layout Standard
-Besides adding/removing/retrieving a 
+ All 
 \shape smallcaps
 component template
 \shape default
-, the manager offers possibility to reset 
+s used in the game must be stored into this manager, and they should be
+ retrieved only through it.
+\end_layout
+
+\begin_layout Subsection
+interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component template manager ! interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-template-manager-interface"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The behavior the 
+\shape smallcaps
+component template manager
+\shape default
+ is determined by its 
+\shape italic
+interface
+\shape default
+, which is formed by a series of methods.
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+private
+\shape default
+ interface is called 
+\shape italic
+only
+\shape default
+ from 
+\shape smallcaps
+object template manager
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+.
+ The 
+\shape italic
+public
+\shape default
+ interface is used for interaction with external user code.
+ 
+\end_layout
+
+\begin_layout Standard
+The private interface has a method to:
+\end_layout
+
+\begin_layout Itemize
+create a 
 \shape smallcaps
 component
 \shape default
-'s configuration parameters 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Components'-configuration-parame"
-
-\end_inset
-
- (stored in the 
+, given its 
+\shape smallcaps
+type
+\shape default
+, by retrieving the appropriate 
 \shape smallcaps
 component template
-\shape default
-) to their default values.
 \end_layout
 
 \begin_layout Standard
-All 
+The public interface include methods to:
+\end_layout
+
+\begin_layout Itemize
+add/remove a 
 \shape smallcaps
 component template
 \shape default
-s used in the game must be stored into this manager, because they are retrieved
- only through its interface , and Components can be created only from the
- private 
-\family typewriter
-ComponentTemplateManager::doCreateComponent()
-\begin_inset CommandInset label
-LatexCommand label
-name "ComponentTemplateManager-doCreateComponent"
+ into/from an internal storage
+\end_layout
 
-\end_inset
+\begin_layout Itemize
+retrieve a 
+\shape smallcaps
+component template 
+\shape default
+related to a 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+type
+\end_layout
 
- 
-\family default
-member function, which, in the Ely framework, be (and is) called only from
- 
+\begin_layout Itemize
+reset the 
+\shape smallcaps
+component
+\shape default
+s' configuration parameters to their default values
+\end_layout
+
+\begin_layout Subsubsection*
+
+\series bold
+Implementation
+\end_layout
+
+\begin_layout Quote
+The 
+\shape smallcaps
+component template manager
+\shape default
+ is implemented by 
 \family typewriter
-ObjectTemplateManager
+ely::ComponentTemplateManager
 \family default
- object through its 
+ class.
+\end_layout
+
+\begin_layout Quote
+The private interface is made of:
+\end_layout
+
+\begin_layout Itemize
+
 \family typewriter
-createObject()
+ely::ComponentTemplateManager::doCreateComponent()
 \family default
+ to create the 
+\shape smallcaps
+component
+\shape default
+ given its 
+\shape smallcaps
+type
+\end_layout
+
+\begin_layout Quote
+The public interface includes:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplateManager::addComponentTemplate()
+\family default
+/
+\family typewriter
+removeComponentTemplate()
+\family default
+ to add/remove a 
+\shape smallcaps
+component template
+\shape default
+ into/from an internal storage
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplateManager::getComponentTemplate()
+\family default
+ to retrieve a 
+\shape smallcaps
+component template 
+\shape default
+related to a 
+\shape smallcaps
+component
+\shape default
  
+\shape smallcaps
+type
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+ely::ComponentTemplateManager::resetComponentTemplateParams()
+\family default
+/
+\family typewriter
+resetComponentTemplatesParams()
+\family default
+ to reset one/all 
+\shape smallcaps
+component
+\shape default
+s' configuration parameters to their default values
+\end_layout
+
+\begin_layout Quote
+See API Documentation 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "ObjectTemplateManager-createObject"
+reference "chap:API-Documentation"
 
 \end_inset
 
- member function.
+ for details.
 \end_layout
 
 \begin_layout Section
