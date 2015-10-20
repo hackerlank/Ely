@@ -166,7 +166,6 @@ private:
         NEEDS_DELETE = 0x200
     };
 
-    // After parsing, if *_end != 0, it can be set to zero.
     int     _flags;
     char*   _start;
     char*   _end;
@@ -1422,15 +1421,15 @@ public:
     	@endverbatim
     */
 	void SetText( const char* inText );
-    /// Convenience method for setting text inside and element. See SetText() for important limitations.
+    /// Convenience method for setting text inside an element. See SetText() for important limitations.
     void SetText( int value );
-    /// Convenience method for setting text inside and element. See SetText() for important limitations.
+    /// Convenience method for setting text inside an element. See SetText() for important limitations.
     void SetText( unsigned value );  
-    /// Convenience method for setting text inside and element. See SetText() for important limitations.
+    /// Convenience method for setting text inside an element. See SetText() for important limitations.
     void SetText( bool value );  
-    /// Convenience method for setting text inside and element. See SetText() for important limitations.
+    /// Convenience method for setting text inside an element. See SetText() for important limitations.
     void SetText( double value );  
-    /// Convenience method for setting text inside and element. See SetText() for important limitations.
+    /// Convenience method for setting text inside an element. See SetText() for important limitations.
     void SetText( float value );  
 
     /**
