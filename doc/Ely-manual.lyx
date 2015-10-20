@@ -285,6 +285,46 @@ Audio
  
 \end_layout
 
+\begin_layout Standard
+In this discussion, we use the following typographical conventions:
+\end_layout
+
+\begin_layout Itemize
+
+\shape smallcaps
+small
+\shape default
+ 
+\shape smallcaps
+caps
+\shape default
+ used for a conceptual entity (like 
+\shape smallcaps
+component
+\shape default
+ and 
+\shape smallcaps
+object
+\shape default
+)
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+typewriter
+\family default
+ used for implementation details of conceptual entities (like 
+\family typewriter
+ely::Component 
+\family default
+and 
+\family typewriter
+ely::Object
+\family default
+)
+\end_layout
+
 \begin_layout Section
 Component
 \begin_inset Index idx
@@ -991,25 +1031,48 @@ Implementation
 \end_layout
 
 \begin_layout Quote
-The common part of all 
+The 
 \shape smallcaps
 component
 \shape default
-s is implemented by 
+ entities are modeled by a shallow class hierarchy.
+\end_layout
+
+\begin_layout Quote
+The common interface and internal state are declared into the 
 \family typewriter
 ely::Component
 \family default
- abstract base class, while a 
+ 
+\family typewriter
+
+\begin_inset CommandInset label
+LatexCommand label
+name "ely::Component"
+
+\end_inset
+
+
+\family default
+ abstract base class, while 
 \shape smallcaps
 component
 \shape default
- of a given 
+s of any 
 \shape smallcaps
 type
 \shape default
-, is implemented by deriving a concrete class that implements all its pure
- virtual member functions, and that possibly extends and/or specializes
- (by overriding its virtual member functions) its interface and its internal
+, are modeled by specific concrete classes derived from 
+\family typewriter
+ely::Component
+\family default
+.
+ These classes should implement all 
+\family typewriter
+ely::Component
+\family default
+'s pure virtual member functions, and, possibly, would extend and/or specialize
+ (by overriding its virtual member functions) its interface and internal
  state 
 \begin_inset CommandInset ref
 LatexCommand ref
@@ -1018,7 +1081,11 @@ reference "sub:Component-interface"
 \end_inset
 
 .
- 
+ Instances of these concrete classes represent 
+\shape smallcaps
+component
+\shape default
+ entities.
 \end_layout
 
 \begin_layout Quote
@@ -1054,7 +1121,7 @@ ely::ComponentFamilyType
 \family typewriter
 ely::ComponentId
 \family default
- types respectively (currently all are 
+ types respectively (currently all 
 \family typewriter
 typedef
 \family default
@@ -1066,47 +1133,93 @@ std::string
 \end_layout
 
 \begin_layout Quote
-The common protected interface includes:
-\end_layout
 
-\begin_layout Itemize
-
-\family typewriter
-ely::Component::reset()
-\family default
- to reset all 
 \shape smallcaps
 component
 \shape default
- state's data members.
- A derived 
+s' common protected interface is called by methods of its related 
 \shape smallcaps
-component type
+component template
 \shape default
- is supposed to do custom reset so it is pure virtual
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+and of the 
+\shape smallcaps
+object template manager
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+.
+ This interface includes:
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::initialize()
+reset()
+\family default
+ to reset a 
+\shape smallcaps
+component
+\shape default
+ state's data members to default values.
+ 
+\shape smallcaps
+component
+\shape default
+s of different
+\shape smallcaps
+ type
+\shape default
+s are supposed to do different resets, so it is pure virtual and should
+ be implemented by derived concrete classes.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+initialize()
 \family default
  to allow a 
 \shape smallcaps
 component
 \shape default
  to be initialized.
- A derived 
+ 
 \shape smallcaps
-component type
+component
 \shape default
- is supposed to do custom initialization so it is pure virtual
+s of different
+\shape smallcaps
+ type
+\shape default
+s are supposed to do different initialization so it is pure virtual and
+ should be implemented by derived concrete classes.
+ It is called by related 
+\shape smallcaps
+component template 
+\shape default
+when it creates the 
+\shape smallcaps
+component
+\shape default
+.
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::onAddToObjectSetup()
+onAddToObjectSetup()
 \family default
 /
 \family typewriter
@@ -1134,7 +1247,7 @@ object
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::onAddToSceneSetup()
+onAddToSceneSetup()
 \family default
 /
 \family typewriter
@@ -1158,7 +1271,7 @@ before
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::setComponentId()
+setComponentId()
 \family default
 /
 \family typewriter
@@ -1174,7 +1287,7 @@ component ID
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::registerEventCallbacks()
+registerEventCallbacks()
 \family default
 /
 \family typewriter
@@ -1186,7 +1299,7 @@ unregisterEventCallbacks()
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::registerEventCallbacks()
+registerEventCallbacks()
 \family default
 /
 \family typewriter
@@ -1202,7 +1315,7 @@ The common public interface includes:
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::componentType()
+componentType()
 \family default
 /
 \family typewriter
@@ -1242,7 +1355,7 @@ component
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::getEventType()
+getEventType()
 \family default
  to get the event type of a Panda3d event the 
 \shape smallcaps
@@ -1254,7 +1367,7 @@ component
 \begin_layout Itemize
 
 \family typewriter
-ely::Component::update()
+update()
 \family default
  to possibly update the 
 \shape smallcaps
@@ -2078,7 +2191,7 @@ ely::Object
 \begin_layout Section
 Object Template
 \begin_inset Index idx
-status collapsed
+status open
 
 \begin_layout Plain Layout
 object ! template
@@ -2136,6 +2249,35 @@ name "ObjectTemplateManager-createObject"
 \end_inset
 
  member function.
+\end_layout
+
+\begin_layout Subsubsection*
+
+\series bold
+Implementation
+\end_layout
+
+\begin_layout Quote
+The 
+\shape smallcaps
+object template manager
+\shape default
+ is implemented by 
+\family typewriter
+ely::ObjectTemplateManager
+\begin_inset CommandInset label
+LatexCommand label
+name "ely::ObjectTemplateManager"
+
+\end_inset
+
+
+\family default
+ class.
+\end_layout
+
+\begin_layout Quote
+The private interface is made of:
 \end_layout
 
 \begin_layout Chapter
