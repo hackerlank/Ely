@@ -314,7 +314,7 @@ object
 \family typewriter
 typewriter
 \family default
- used for implementation details of conceptual entities (like 
+ used for implementation of conceptual entities (like 
 \family typewriter
 ely::Component 
 \family default
@@ -500,7 +500,7 @@ identifier
 \shape smallcaps
 id
 \shape default
-), which is assigned at creation time and is unique between all other 
+), which is assigned at creation time and is unique between all 
 \shape smallcaps
 component
 \shape default
@@ -600,7 +600,7 @@ All
 \shape smallcaps
 object
 \shape default
-s of the given type (i.e.
+s of a given type (i.e.
  generated from the same 
 \shape smallcaps
 object template
@@ -625,7 +625,11 @@ way
 \shape smallcaps
 component
 \shape default
-s, having the same type, should handle events in a similar way, i.e.
+s, having the same 
+\shape smallcaps
+type
+\shape default
+, should handle events in a similar way, i.e.
  respond to the same 
 \shape italic
 event
@@ -1028,6 +1032,13 @@ reference "sub:Component-event-handling"
 
 \series bold
 Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-Implementation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Quote
@@ -1160,7 +1171,7 @@ reference "sec:Object-Template-Manager"
 \end_inset
 
 .
- This interface includes:
+ This interface includes this member functions:
 \end_layout
 
 \begin_layout Itemize
@@ -1168,21 +1179,13 @@ reference "sec:Object-Template-Manager"
 \family typewriter
 reset()
 \family default
- to reset a 
+ to set a 
 \shape smallcaps
 component
 \shape default
- state's data members to default values.
- 
-\shape smallcaps
-component
-\shape default
-s of different
-\shape smallcaps
- type
-\shape default
-s are supposed to do different resets, so it is pure virtual and should
- be implemented by derived concrete classes.
+ state's data members to some default values.
+ This member is pure virtual and should be implemented by derived concrete
+ classes to perform specialized resets.
 \end_layout
 
 \begin_layout Itemize
@@ -1195,23 +1198,15 @@ initialize()
 component
 \shape default
  to be initialized.
- 
+ This member is pure virtual and should be implemented by derived concrete
+ classes.
+ It is called by 
+\family typewriter
+ely::ComponentTemplate::makeComponent()
+\family default
+ specialization of the related 
 \shape smallcaps
-component
-\shape default
-s of different
-\shape smallcaps
- type
-\shape default
-s are supposed to do different initialization so it is pure virtual and
- should be implemented by derived concrete classes.
- It is called by related 
-\shape smallcaps
-component template 
-\shape default
-when it creates the 
-\shape smallcaps
-component
+component template
 \shape default
 .
 \end_layout
@@ -1219,53 +1214,81 @@ component
 \begin_layout Itemize
 
 \family typewriter
-onAddToObjectSetup()
+addToObjectSetup()
 \family default
 /
 \family typewriter
-onRemoveFromObjectCleanup()
+onAddToObjectSetup()
 \family default
- to allow a derived 
+ to let a 
 \shape smallcaps
-component type
+component 
 \shape default
- to perform custom setup/cleanup just 
-\shape italic
-after
-\shape default
-/
-\shape italic
-before
-\shape default
- has been added/removed to/from an 
+to perform additional setup when it is being added to an 
 \shape smallcaps
 object
 \shape default
- (so they are pure virtual)
+.
+ The second one is pure virtual and should be implemented by derived concrete
+ classes to implement the optional specialized piece of setup.
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
+removeFromObjectCleanup()
+\family default
+/
+\family typewriter
+onRemoveFromObjectCleanup()
+\family default
+ to let a 
+\shape smallcaps
+component 
+\shape default
+to perform additional cleanup when it is being removed from an 
+\shape smallcaps
+object
+\shape default
+.
+ The second one is pure virtual and should be implemented by derived concrete
+ classes to implement the optional specialized piece of cleanup.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+addToSceneSetup()
+\family default
+/
+\family typewriter
 onAddToSceneSetup()
+\family default
+ to let a 
+\shape smallcaps
+component 
+\shape default
+to perform additional setup when it is being added to the game scene.
+ The second one is pure virtual and should be implemented by derived concrete
+ classes to implement the optional specialized piece of setup.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+removeFromSceneCleanup()
 \family default
 /
 \family typewriter
 onRemoveFromSceneCleanup()
 \family default
- to allow a 
+ to let a 
 \shape smallcaps
-component type
+component 
 \shape default
- to perform custom setup/cleanup just 
-\shape italic
-after
-\shape default
-/
-\shape italic
-before
-\shape default
- has been added/removed to/from the game scene (so they are pure virtual)
+to perform additional cleanup when it is being removed from the game scene.
+ The second one is pure virtual and should be implemented by derived concrete
+ classes to implement the optional specialized piece of cleanup.
 \end_layout
 
 \begin_layout Itemize
@@ -1701,6 +1724,13 @@ component type
 
 \series bold
 Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-Template-Implementation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Quote
