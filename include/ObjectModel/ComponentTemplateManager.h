@@ -30,7 +30,7 @@
 namespace ely
 {
 /**
- * \brief Singleton template manager that stores all the component templates.
+ * \brief Singleton Template manager that stores all the Component templates.
  *
  * Thread-safe during utilization.
  */
@@ -40,13 +40,13 @@ private:
 	friend class ObjectTemplateManager;
 
 	/**
-	 * \brief Creates a component given its type.
-	 * @param componentID The component type.
-	 * @param freeComponent If this is a free component or if it belongs
-	 * to an Object template, default is false.
-	 * @return The just created component, or NULL on failure (for any reason).
+	 * \brief Creates a Component given its type.
+	 * @param componentType The Component type.
+	 * @param freeComponent If this is a free Component or if it belongs
+	 * to an Object Template, default is false.
+	 * @return The just created Component, or NULL on failure (for any reason).
 	 */
-	SMARTPTR(Component) doCreateComponent(ComponentType componentID,
+	SMARTPTR(Component) doCreateComponent(ComponentType componentType,
 			bool freeComponent = false);
 
 public:
@@ -60,42 +60,42 @@ public:
 	~ComponentTemplateManager();
 
 	/**
-	 * \brief Adds a component template for a given the component type it can create.
+	 * \brief Adds a Component Template for a given the Component type it can create.
 	 *
-	 * It will add the component template to the internal table and if a
-	 * template for that component type already existed it'll be replaced
-	 * by this new template (and its ownership released by the manager).
-	 * @param componentTmpl The component template to add.
-	 * @return SMARTPTR(NULL) if there wasn't a template for that component, otherwise
-	 * the previous template.
+	 * It will add the Component Template to the internal table and if a
+	 * Template for that Component type already existed it'll be replaced
+	 * by this new Template (and its ownership released by the manager).
+	 * @param componentTmpl The Component Template to add.
+	 * @return SMARTPTR(NULL) if there wasn't a Template for that Component, otherwise
+	 * the previous Template.
 	 */
 	SMARTPTR(ComponentTemplate)addComponentTemplate(
 			SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/**
-	 * \brief Removes the component template given the component type it can create.
-	 * @param componentID The component type.
-	 * @return True if the component template existed, false otherwise.
+	 * \brief Removes the Component Template given the Component type it can create.
+	 * @param componentType The Component type.
+	 * @return True if the Component Template existed, false otherwise.
 	 */
-	bool removeComponentTemplate(ComponentType componentID);
+	bool removeComponentTemplate(ComponentType componentType);
 
 	/**
-	 * \brief Gets the component template given the component type it can create.
-	 * @param componentID The component type.
-	 * @return The component template.
+	 * \brief Gets the Component Template given the Component type it can create.
+	 * @param componentType The Component type.
+	 * @return The Component Template.
 	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentID) const;
+	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentType) const;
 
 	/**
-	 * \brief Resets the component template, of the given component type,
+	 * \brief Resets the Component Template, of the given Component type,
 	 * to its default parameters.
 	 *
-	 * @param componentID The component type.
+	 * @param componentType The Component type.
 	 */
-	void resetComponentTemplateParams(ComponentType componentID);
+	void resetComponentTemplateParams(ComponentType componentType);
 
 	/**
-	 * \brief Resets all component templates to their default parameters.
+	 * \brief Resets all Component templates to their default parameters.
 	 */
 	void resetComponentTemplatesParams();
 
@@ -109,7 +109,7 @@ public:
 
 private:
 
-	///Table of component templates indexed by component type.
+	///Table of Component templates indexed by Component type.
 	typedef std::map<const ComponentType, SMARTPTR(ComponentTemplate)> ComponentTemplateTable;
 	ComponentTemplateTable mComponentTemplates;
 	///The unique id for created components.

@@ -530,7 +530,7 @@ component ! update
 
 \end_inset
 
- its state at any tick (or frame) of the game loop.
+ its state at every tick (or frame) of the game loop.
 \end_layout
 
 \begin_layout Standard
@@ -621,16 +621,15 @@ similar
 way
 \shape default
 .
- Accordingly also their 
+ Accordingly their owned 
 \shape smallcaps
 component
 \shape default
-s, having the same 
+s having the same 
 \shape smallcaps
 type
 \shape default
-, should handle events in a similar way, i.e.
- respond to the same 
+, should possibly handle the same set of 
 \shape italic
 event
 \shape default
@@ -645,8 +644,12 @@ name "event-types"
 
 \end_inset
 
- and with similar responses.
- This thing can be obtained by combining the single event type with a single
+.
+ 
+\end_layout
+
+\begin_layout Standard
+This thing can be obtained by combining the single event type with a single
  
 \shape italic
 event callback
@@ -806,16 +809,6 @@ reference "component-template-parameter-table"
 \end_layout
 
 \begin_layout Itemize
-set the
-\shape smallcaps
- component ID
-\shape default
- and a reference to its owner 
-\shape smallcaps
-object
-\end_layout
-
-\begin_layout Itemize
 let
 \shape smallcaps
  component
@@ -828,8 +821,16 @@ object
  and to/from the game scene.
 \end_layout
 
-\begin_layout Itemize
-register and unregister event callbacks functions
+\begin_layout Standard
+In addition, there are protected members used as helpers to set the
+\shape smallcaps
+ component ID
+\shape default
+, a reference to its owner 
+\shape smallcaps
+object
+\shape default
+ and to register and unregister event callbacks functions
 \end_layout
 
 \begin_layout Standard
@@ -1028,7 +1029,7 @@ reference "sub:Component-event-handling"
  These data sets can be set up only at creation time.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection
 
 \series bold
 Implementation

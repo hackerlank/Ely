@@ -89,11 +89,6 @@ void Component::setOwnerObject(SMARTPTR(Object)ownerObject)
 	mOwnerObject = ownerObject;
 }
 
-AsyncTask::DoneStatus Component::update(GenericAsyncTask* task)
-{
-	return AsyncTask::DS_done;
-}
-
 void Component::doSetupEventTables()
 {
 	std::list<std::string>::const_iterator iter;

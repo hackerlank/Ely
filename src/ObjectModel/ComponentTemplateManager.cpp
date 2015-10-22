@@ -114,13 +114,13 @@ SMARTPTR(Component) ComponentTemplateManager::doCreateComponent(
 	return newComp;
 }
 
-void ComponentTemplateManager::resetComponentTemplateParams(ComponentType componentID)
+void ComponentTemplateManager::resetComponentTemplateParams(ComponentType componentType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	ComponentTemplateTable::const_iterator iter = mComponentTemplates.find(
-			componentID);
+			componentType);
 	if(iter != mComponentTemplates.end())
 	{
 		iter->second->setParametersDefaults();

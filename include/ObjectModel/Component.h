@@ -35,16 +35,16 @@
 namespace ely
 {
 /**
- * \brief Component identifier type.
+ * \brief Component type.
  */
 typedef std::string ComponentType;
 /**
- * \brief Component family identifier type.
+ * \brief Component family type.
  */
 typedef std::string ComponentFamilyType;
 /**
- * \brief Object instance identifier type (by default the name
- * of the NodePath component).
+ * \brief Component instance identifier type (by default the name
+ * of the NodePath Component).
  */
 typedef std::string ComponentId;
 
@@ -53,39 +53,40 @@ class ComponentTemplate;
 
 /**
  * \brief Base abstract class to provide a common interface for
- * all object components.
+ * all Components.
  *
- * Components are organized into class hierarchies called families.
- * Each component belongs to a family and is derived from a base
- * family component. Any object can have only one component of
- * each family type.\n
- * Each component can be updated directly or indirectly through a
- * Panda task.\n
- * Each component can respond to Panda events (stimuli) by registering
+ * Components are organized into sets of similar behavior called families.
+ * Each Component has type and belongs to a family and is derived from this base
+ * class. Any Object can have only one Component of each family type.\n
+ * Each Component can be updated directly at each game loop tick (or frame).\n
+ * Each Component can respond to Panda events (stimuli) by registering
  * or unregistering callbacks for them with the global EventHandler.\n
- * Each Object of a given type has, for a given Component, the same
- * event types to respond to. This means that each event type, for a
- * Component is defined  on "per ObjectTemplate (i.e. Object type)"
- * basis.\n
- * By default, when an event type is defined, it is assumed that an event
- * with the same value as the event type associated to a callback function
+ * An Object can respond to events only through its owned Components.
+ * For any owned Component type, an Object type can optionally declare, the set
+ * of event types which that Component type has to respond to.
+ * This means that each event type, declared for a Component type,
+ * is defined  on "per ObjectTemplate (i.e. Object type) basis".
+ * Panda events are specified as values of these event types on a "per
+ * Object basis".\n
+ * By default, when an event type is defined, any event specified
+ * as value of the event type, is associated to a callback function
  * with this signature:
  * \code
  * void <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>(const Event* event, void* data);
  * \endcode
- * are defined: this means that, by default, all Components of the same type
- * (belonging to any Object of that type), will respond to the same event value
+ * This means that, by default, Components of the same type that
+ * belong to any Object of a given type, will respond to these events
  * with the same callback function.\n
  * Any event can be ignored on a "per Object basis" by not specifying it in
- * parameters. Moreover, both the event value and the callback function
+ * parameters. Moreover, both the event type values and the callback function
  * can be overridden by parameters on a "per Object basis".\n
  * The callback functions are loaded at runtime from a dynamic linked library
  * (\see GameManager::GameDataInfo::CALLBACKS).\n
  * If a callback function doesn't exist or if any error occurs, the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
- * To check if a "name" is an allowed event type call:
+ * To check if a (name,value) pair is a declared legitimate event type call:
  * \code
- * 	ObjectTemplate::isComponentParameter();
+ * 	ObjectTemplate::isComponentParameterValue();
  * \endcode
  *
  * > **XML Param(s)**:
@@ -112,14 +113,14 @@ protected:
 	Component();
 
 	/**
-	 * \brief Resets all component data members.
+	 * \brief Resets all Component data members.
 	 */
 	virtual void reset() = 0;
 
 	/**
-	 * \brief Allows a component to be initialized.
+	 * \brief Allows a Component to be initialized.
 	 *
-	 * This can be done after creation but "before" insertion into an object.\n
+	 * This can be done after creation but "before" insertion into an Object.\n
 	 * This method for all derived classes are called only by methods of the
 	 * respective ComponentTemplate derived class.\n
 	 * This method for all derived classes are called (indirectly) only
@@ -129,25 +130,28 @@ protected:
 	virtual bool initialize() = 0;
 
 	/**
-	 * \brief Sets the component unique identifier.
+	 * \brief Sets the Component unique identifier.
 	 *
 	 * This method for all derived classes are called only by methods of the
 	 * respective ComponentTemplate derived class.\n
 	 * This method for all derived classes are called (indirectly) only
 	 * by ObjectTemplateManager methods during its creation and before
 	 * it is publicly available to other threads.\n
-	 * \param componentId The component unique identifier.
+	 * \param componentId The Component unique identifier.
 	 */
 	void setComponentId(const ComponentId& componentId);
 
 	/**
-	 * \brief On addition to object setup.
+	 * \brief On addition to Object setup.
 	 *
-	 * Gives a component the ability to do some setup just "after" this
-	 * component has been added to an object. Optional.\n
+	 * Gives a Component the ability to do some setup just "after" this
+	 * Component has been added to an Object. Optional.\n
 	 * This method for all derived classes are called only by ObjectTemplateManager
 	 * methods during its creation and before it is publicly available to
 	 * other threads.\n
+	 * addToObjectSetup() is the setup common to all Component's types, while
+	 * onAddToObjectSetup() is the specialized setup implemented by a derived
+	 * Component type.
 	 */
 	///@{
 	void addToObjectSetup();
@@ -155,10 +159,13 @@ protected:
 	///@}
 
 	/**
-	 * \brief On remove from object cleanup.
+	 * \brief On remove from Object cleanup.
 	 *
-	 * Gives a component the ability to do some cleanup just "before" this
-	 * component will be removed from an object. Optional.\n
+	 * Gives a Component the ability to do some cleanup just "before" this
+	 * Component will be removed from an Object. Optional.\n
+	 * removeFromObjectCleanup() is the cleanup common to all Component's types, while
+	 * onRemoveFromObjectCleanup() is the specialized cleanup implemented by a derived
+	 * Component type.
 	 */
 	///@{
 	void removeFromObjectCleanup();
@@ -166,16 +173,19 @@ protected:
 	///@}
 
 	/**
-	 * \brief On object addition to scene setup.
+	 * \brief On Object addition to scene setup.
 	 *
-	 * Gives a component the ability to do some setup just "after" the
-	 * object, this component belongs to, has been added to the scene
+	 * Gives a Component the ability to do some setup just "after" the
+	 * Object, this Component belongs to, has been added to the scene
 	 * and set up. Optional.\n
 	 * This method for all derived classes are called only by ObjectTemplateManager
 	 * methods during its creation and before it is publicly available to
 	 * other threads.\n
 	 * A possible request registration to any "Game*Manager" for updating
 	 * "must" be done in this method as the last thing.\n
+	 * addToSceneSetup() is the setup common to all Component types, while
+	 * onAddToSceneSetup() is the specialized setup implemented by a derived
+	 * Component type.
 	 */
 	///@{
 	void addToSceneSetup();
@@ -183,12 +193,15 @@ protected:
 	///@}
 
 	/**
-	 * \brief On object removal from scene cleanup.
+	 * \brief On Object removal from scene cleanup.
 	 *
-	 * Gives a component the ability to do some cleanup just "before" this
-	 * component will be removed from the scene. Optional.\n
+	 * Gives a Component the ability to do some cleanup just "before" this
+	 * Component will be removed from the scene. Optional.\n
 	 * A possible request for cancellation from any "Game*Manager" for updating
 	 * "must" be done in this method as the first thing (before locking the mutex).\n
+	 * removeFromSceneCleanup() is the cleanup common to all Component's types, while
+	 * onRemoveFromSceneCleanup() is the specialized cleanup implemented by a derived
+	 * Component type.
 	 */
 	///@{
 	void removeFromSceneCleanup();
@@ -196,10 +209,10 @@ protected:
 	///@}
 
 	/**
-	 * \brief Sets the owner object.
+	 * \brief Sets the owner Object.
 	 *
-	 * This method for all derived classes are called only by object methods.
-	 * \param ownerObject The owner object.
+	 * This method for all derived classes are called only by Object methods.
+	 * \param ownerObject The owner Object.
 	 */
 	void setOwnerObject(SMARTPTR(Object)ownerObject);
 
@@ -211,22 +224,22 @@ public:
 	virtual ~Component();
 
 	/**
-	 * \brief Gets the type of this component.
-	 * @return The id of this component.
+	 * \brief Gets the type of this Component.
+	 * @return The id of this Component.
 	 */
 	ComponentType componentType() const;
 
 	/**
-	 * \brief Gets the family type of this component.
-	 * @return The family id of this component.
+	 * \brief Gets the family type of this Component.
+	 * @return The family type of this Component.
 	 */
 	ComponentFamilyType familyType() const;
 
 	/**
-	 * \brief The result type a component method can return to signal
-	 * the status of result of the operation or of the component.
+	 * \brief The result type a Component method can return to signal
+	 * the status of result of the operation or of the Component.
 	 *
-	 * Derived component can derive from this to add other result status,
+	 * Derived Component can derive from this to add other result status,
 	 * by starting the enum from COMPONENT_RESULT_END+1.\n
 	 */
 	struct Result
@@ -249,31 +262,21 @@ public:
 	};
 
 	/**
-	 * \brief Updates the state of the component.
+	 * \brief Updates the state of the Component.
 	 *
 	 * @param data Generic data.
 	 */
 	virtual void update(void* data);
 
 	/**
-	 * \brief Updates the state of the component.
-	 *
-	 * This overload allows to exploit the Panda framework task management.
-	 * See TaskInterface.
-	 * @param task The task object.
-	 * @return The "done" status.
-	 */
-	virtual AsyncTask::DoneStatus update(GenericAsyncTask* task);
-
-	/**
-	 * \brief Gets the owner object.
-	 * \return The owner object.
+	 * \brief Gets the owner Object.
+	 * \return The owner Object.
 	 */
 	SMARTPTR(Object) getOwnerObject() const;
 
 	/**
-	 * \brief Gets the component unique identifier.
-	 * \return The component unique identifier.
+	 * \brief Gets the Component unique identifier.
+	 * \return The Component unique identifier.
 	 */
 	ComponentId getComponentId() const;
 
@@ -285,7 +288,7 @@ public:
 	std::string getEventType(const std::string& event);
 
 	/**
-	 * \brief Set the component as free.
+	 * \brief Set the Component as free.
 	 * @param free The free flag.
 	 */
 	void setFreeFlag(bool freeComponent);
@@ -299,38 +302,38 @@ public:
 #endif
 
 protected:
-	///The template used to construct this component (read only after creation).
+	///The Template used to construct this Component (read only after creation).
 	SMARTPTR(ComponentTemplate) mTmpl;
-	///Unique identifier for this component (read only after creation).
+	///Unique identifier for this Component (read only after creation).
 	ComponentId mComponentId;
-	///The object this component is a member of (read only after component creation).
+	///The Object this Component is a member of (read only after Component creation).
 	SMARTPTR(Object) mOwnerObject;
-	///Free component flag.
+	///Free Component flag.
 	bool mFreeComponent;
 #ifdef ELY_THREAD
-	///Signals this component is going to be destroyed.
+	///Signals this Component is going to be destroyed.
 	bool mDestroying;
 #endif
 
 #ifdef ELY_THREAD
-	///The mutex associated with this component.
+	///The mutex associated with this Component.
 	ReMutex mMutex;
 #endif
 
 	/**
 	 * \name Helper functions to register/unregister events' callbacks.
 	 *
-	 * This interface can be called by the derived components to setup
-	 * and register/unregister callbacks for events this component
+	 * This interface can be called by the derived Components to setup
+	 * and register/unregister callbacks for events this Component
 	 * should respond to.\n
 	 * Functions registerEventCallbacks/unregisterEventCallbacks can
-	 * be used, after the component has been added to object, to
+	 * be used, after the Component has been added to Object, to
 	 * add/remove callbacks to/from the global EventHandler.\n
 	 * All these functions can be called multiple time in a safe way.\n
-	 * \note Because component's events are shared by all object of the same type,
-	 * and because their types are stored into the object template, these
-	 * functions should be called only after the component's owner object
-	 * has been set, for example into addToObjectSetup component method.
+	 * \note Because Component's events are shared by all Object of the same type,
+	 * and because their types are stored into the Object Template, these
+	 * functions should be called only after the Component's owner Object
+	 * has been set, for example into addToObjectSetup Component method.
 	 */
 	///@{
 	void registerEventCallbacks();
@@ -444,7 +447,7 @@ inline ReMutex& Component::getMutex()
 
 ///Template
 /**
- * \brief Abstract base class of component templates used to create components.
+ * \brief Abstract base class of Component templates used to create Components.
  */
 class ComponentTemplate: public TypedWritableReferenceCount
 {
@@ -452,9 +455,9 @@ protected:
 	friend class ComponentTemplateManager;
 
 	/**
-	 * \brief Creates the current component of that family.
+	 * \brief Creates the current Component of that family.
 	 * @param compId The Component identifier.
-	 * @return The component just created, NULL if component cannot be created.
+	 * @return The Component just created, NULL if Component cannot be created.
 	 */
 	virtual SMARTPTR(Component)makeComponent(const ComponentId& compId) = 0;
 
@@ -472,25 +475,25 @@ public:
 	virtual ~ComponentTemplate();
 
 	/**
-	 * \brief Gets the type id of the component created.
-	 * @return The type id of the component created.
+	 * \brief Gets the type id of the Component created.
+	 * @return The type id of the Component created.
 	 */
 	virtual ComponentType componentType() const = 0;
 	/**
-	 * \brief Gets the family id of the component created.
-	 * @return The family id of the component created.
+	 * \brief Gets the family id of the Component created.
+	 * @return The family id of the Component created.
 	 */
 	virtual ComponentFamilyType familyType() const = 0;
 
 	/**
-	 * \brief For the component this template is designed to create,
+	 * \brief For the Component this Template is designed to create,
 	 * this function sets the parameters to their default values.
 	 */
 	virtual void setParametersDefaults() = 0;
 
 	/**
 	 * \name Parameters management.
-	 * \brief Sets the parameters of the component, this template is
+	 * \brief Sets the parameters of the Component, this Template is
 	 * designed to create, to custom values.
 	 *
 	 * These parameters overwrite (and/or are added to) the parameters defaults
@@ -500,14 +503,14 @@ public:
 	void setParameters(const ParameterTable& parameterTable);
 
 	/**
-	 * \brief Gets the parameter value associated to the component.
+	 * \brief Gets the parameter value associated to the Component.
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
 	std::string parameter(const std::string& paramName) const;
 
 	/**
-	 * \brief Gets the parameter multi-values associated to the component.
+	 * \brief Gets the parameter multi-values associated to the Component.
 	 * @param paramName The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
@@ -548,7 +551,7 @@ protected:
 	WindowFramework* mWindowFramework;
 
 #ifdef ELY_THREAD
-	///The mutex associated with this template.
+	///The mutex associated with this Template.
 	ReMutex mMutex;
 #endif
 
