@@ -455,7 +455,7 @@ protected:
 	friend class ComponentTemplateManager;
 
 	/**
-	 * \brief Creates the current Component of that family.
+	 * \brief Creates the Component of a given type and family type.
 	 * @param compId The Component identifier.
 	 * @return The Component just created, NULL if Component cannot be created.
 	 */
@@ -475,49 +475,51 @@ public:
 	virtual ~ComponentTemplate();
 
 	/**
-	 * \brief Gets the type id of the Component created.
-	 * @return The type id of the Component created.
+	 * \brief Gets the type of the Component created.
+	 * @return The type of the Component created.
 	 */
 	virtual ComponentType componentType() const = 0;
 	/**
-	 * \brief Gets the family id of the Component created.
-	 * @return The family id of the Component created.
+	 * \brief Gets the family type of the Component created.
+	 * @return The family type of the Component created.
 	 */
 	virtual ComponentFamilyType familyType() const = 0;
 
 	/**
-	 * \brief For the Component this Template is designed to create,
+	 * \brief Sets the Component parameters to their default values
+	 *
+	 * For the Component this Template is designed to create,
 	 * this function sets the parameters to their default values.
 	 */
 	virtual void setParametersDefaults() = 0;
 
 	/**
-	 * \name Parameters management.
-	 * \brief Sets the parameters of the Component, this Template is
-	 * designed to create, to custom values.
+	 * \brief Sets the Component parameters to custom values
 	 *
-	 * These parameters overwrite (and/or are added to) the parameters defaults
-	 * set by setParametersDefaults.
+	 * For the Component this Template is designed to create,
+	 * this function sets the parameters to custom values.
+	 * These parameters overwrite (and/or are added to) the parameters
+	 * defaults set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	void setParameters(const ParameterTable& parameterTable);
 
 	/**
-	 * \brief Gets the parameter value associated to the Component.
+	 * \brief Gets the parameter single value associated to the Component
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
 	std::string parameter(const std::string& paramName) const;
 
 	/**
-	 * \brief Gets the parameter multi-values associated to the Component.
+	 * \brief Gets the parameter multiple values associated to the Component
 	 * @param paramName The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
 	std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
-	 * \brief Gets the entire parameter table.
+	 * \brief Gets (a copy of) the entire parameter table
 	 * @return The parameter table.
 	 */
 	ParameterTable getParameterTable() const;

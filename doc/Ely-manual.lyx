@@ -625,11 +625,11 @@ way
 \shape smallcaps
 component
 \shape default
-s having the same 
+s, having the same 
 \shape smallcaps
 type
 \shape default
-, should possibly handle the same set of 
+, should handle the same set of 
 \shape italic
 event
 \shape default
@@ -644,13 +644,8 @@ name "event-types"
 
 \end_inset
 
-.
- 
-\end_layout
-
-\begin_layout Standard
-This thing can be obtained by combining the single event type with a single
- 
+ and in a similar way.
+ So, by default, the single event type is combined with a single 
 \shape italic
 event callback
 \shape default
@@ -670,6 +665,20 @@ reference "sec:Event-callback-functions"
 EventHandler
 \shape default
 .
+ The 
+\shape smallcaps
+component
+\shape default
+ is passed as argument to the event callback function: in this way one can
+ differentiate the answer according to both the specific 
+\shape smallcaps
+component
+\shape default
+ and, indirectly, its owner 
+\shape smallcaps
+object
+\shape default
+.
 \end_layout
 
 \begin_layout Standard
@@ -679,36 +688,17 @@ object
 \shape default
 s of the same type need to respond independently to the same event type
  and handle it in a custom way.
- This is accomplished by: 
-\end_layout
-
-\begin_layout Itemize
-associating a different Panda3d event to the same event type on a per 
-\shape smallcaps
-component
-\shape default
- basis
-\end_layout
-
-\begin_layout Itemize
-passing the 
-\shape smallcaps
-component
-\shape default
- as argument to the event callback function (in this way one can differentiate
- the answer according to the specific 
-\shape smallcaps
-component
-\shape default
- and, indirectly, to its owner 
+ This is accomplished by associating a different Panda3d event to the same
+ event type and by specifying a custom event callback function on a per
+ ( 
 \shape smallcaps
 object
 \shape default
-)
-\end_layout
-
-\begin_layout Standard
-In this way, for example, 2 different 
+,
+\shape smallcaps
+component
+\shape default
+, event type) triple basis: in this way, for example, 2 different 
 \shape smallcaps
 object
 \shape default
@@ -766,7 +756,29 @@ protected
 \shape italic
 only
 \shape default
- from other objects of Ely framework.
+ by its corresponding 
+\shape smallcaps
+component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+and by
+\shape smallcaps
+ object template manager
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+.
  The 
 \shape italic
 public
@@ -776,8 +788,8 @@ public
 \shape italic
 private
 \shape default
- interface are relegated helper functions that are delegated by the protected
- and public functions to do the real job.
+ interface, are relegated some helper functions that are delegated by the
+ protected and public functions to do the real job.
 \end_layout
 
 \begin_layout Standard
@@ -830,7 +842,7 @@ In addition, there are protected members used as helpers to set the
 \shape smallcaps
 object
 \shape default
- and to register and unregister event callbacks functions
+ and to register and unregister event callbacks functions.
 \end_layout
 
 \begin_layout Standard
@@ -864,7 +876,7 @@ update the
 \shape smallcaps
 component 
 \shape default
-state at each game tick
+state at each game tick (frame)
 \end_layout
 
 \begin_layout Itemize
@@ -880,7 +892,7 @@ component
 \shape smallcaps
 type
 \shape default
-, usually would specialize and extend the basic common interface, depending
+, usually would specialize and extend this basic common interface, depending
  on its specific behavior.
 \end_layout
 
@@ -1055,17 +1067,6 @@ The common interface and internal state are declared into the
 \family typewriter
 ely::Component
 \family default
- 
-\family typewriter
-
-\begin_inset CommandInset label
-LatexCommand label
-name "ely::Component"
-
-\end_inset
-
-
-\family default
  abstract base class, while 
 \shape smallcaps
 component
@@ -1079,16 +1080,22 @@ type
 ely::Component
 \family default
 .
- These classes should implement all 
+ These classes must implement all 
 \family typewriter
 ely::Component
 \family default
 's pure virtual member functions, and, possibly, would extend and/or specialize
- (by overriding its virtual member functions) its interface and internal
- state 
+ (by overriding its virtual member functions) its interface 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sub:Component-interface"
+
+\end_inset
+
+ and internal state 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-state"
 
 \end_inset
 
@@ -1145,34 +1152,11 @@ std::string
 \end_layout
 
 \begin_layout Quote
-
-\shape smallcaps
-component
+The common 
+\shape italic
+protected
 \shape default
-s' common protected interface is called by methods of its related 
-\shape smallcaps
-component template
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Component-Template"
-
-\end_inset
-
-and of the 
-\shape smallcaps
-object template manager
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object-Template-Manager"
-
-\end_inset
-
-.
- This interface includes this member functions:
+ interface includes, among others, this member functions:
 \end_layout
 
 \begin_layout Itemize
@@ -1185,8 +1169,8 @@ reset()
 component
 \shape default
  state's data members to some default values.
- This member is pure virtual and should be implemented by derived concrete
- classes to perform specialized resets.
+ This member is pure virtual and must be implemented by derived concrete
+ classes to perform custom resets.
 \end_layout
 
 \begin_layout Itemize
@@ -1199,17 +1183,66 @@ initialize()
 component
 \shape default
  to be initialized.
- This member is pure virtual and should be implemented by derived concrete
- classes.
+ This member is pure virtual and must be implemented by derived concrete
+ classes to perform custom initialization.
  It is called by 
 \family typewriter
 ely::ComponentTemplate::makeComponent()
 \family default
- specialization of the related 
+ implementation of the related 
 \shape smallcaps
 component template
 \shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-Template-Implementation"
+
+\end_inset
+
 .
+ 
+\end_layout
+
+\begin_layout Standard
+Moreover, other protected members functions let 
+\shape smallcaps
+component
+\shape default
+s to perform additional setup/cleanup when they are being added/removed
+ to/from an 
+\shape smallcaps
+object
+\shape default
+s and to/from the game scene (they are called by 
+\family typewriter
+createObject()
+\family default
+/
+\family typewriter
+ destroyObject()
+\family default
+ and 
+\family typewriter
+addComponentToObject()
+\family default
+/
+\family typewriter
+ removeComponentFromObject()
+\family default
+ member functions of 
+\family typewriter
+ely::ObjectTemplateManager
+\family default
+.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Object-Template-Manager-Implementation"
+
+\end_inset
+
+, which carry on the actual additions/removals).
+ They are:
 \end_layout
 
 \begin_layout Itemize
@@ -1219,121 +1252,71 @@ addToObjectSetup()
 \family default
 /
 \family typewriter
-onAddToObjectSetup()
+ removeFromObjectCleanup()
 \family default
- to let a 
-\shape smallcaps
-component 
-\shape default
-to perform additional setup when it is being added to an 
-\shape smallcaps
-object
-\shape default
-.
- The second one is pure virtual and should be implemented by derived concrete
- classes to implement the optional specialized piece of setup.
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-removeFromObjectCleanup()
-\family default
-/
-\family typewriter
-onRemoveFromObjectCleanup()
-\family default
- to let a 
-\shape smallcaps
-component 
-\shape default
-to perform additional cleanup when it is being removed from an 
-\shape smallcaps
-object
-\shape default
-.
- The second one is pure virtual and should be implemented by derived concrete
- classes to implement the optional specialized piece of cleanup.
-\end_layout
-
-\begin_layout Itemize
-
+ and 
 \family typewriter
 addToSceneSetup()
 \family default
-/
-\family typewriter
-onAddToSceneSetup()
-\family default
- to let a 
-\shape smallcaps
-component 
-\shape default
-to perform additional setup when it is being added to the game scene.
- The second one is pure virtual and should be implemented by derived concrete
- classes to implement the optional specialized piece of setup.
-\end_layout
-
-\begin_layout Itemize
-
+/ 
 \family typewriter
 removeFromSceneCleanup()
 \family default
+ which perform the setup/cleanup common of all 
+\shape smallcaps
+component
+\shape default
+s.
+ These, in turn, call the additional member functions 
+\family typewriter
+onAddToObjectSetup()
+\family default
 /
 \family typewriter
-onRemoveFromSceneCleanup()
+ onRemoveFromObjectCleanup()
 \family default
- to let a 
-\shape smallcaps
-component 
-\shape default
-to perform additional cleanup when it is being removed from the game scene.
- The second one is pure virtual and should be implemented by derived concrete
- classes to implement the optional specialized piece of cleanup.
+ and 
+\family typewriter
+onAddToSceneSetup()
+\family default
+/
+\family typewriter
+ onRemoveFromSceneCleanup()
+\family default
+ respectively, which, being pure virtual, must be implemented by derived
+ concrete classes to implement the optional custom piece of setup/cleanup.
 \end_layout
 
-\begin_layout Itemize
-
+\begin_layout Standard
+The remaining protected member functions are used as common helpers: 
 \family typewriter
 setComponentId()
 \family default
 /
 \family typewriter
-setOwnerObject()
+ setOwnerObject()
 \family default
  to set the 
 \shape smallcaps
 component ID
 \shape default
- and a reference to its owner object respectively
-\end_layout
-
-\begin_layout Itemize
-
+ and a reference to its owner object respectively , 
 \family typewriter
 registerEventCallbacks()
 \family default
-/
+/ 
 \family typewriter
 unregisterEventCallbacks()
 \family default
- to register/unregister events' callbacks
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-registerEventCallbacks()
-\family default
-/
-\family typewriter
-unregisterEventCallbacks()
-\family default
- to register/unregister events' callbacks
+ to register/unregister events' callbacks.
 \end_layout
 
 \begin_layout Quote
-The common public interface includes:
+The common 
+\shape italic
+public
+\shape default
+ interface includes:
 \end_layout
 
 \begin_layout Itemize
@@ -1343,15 +1326,15 @@ componentType()
 \family default
 /
 \family typewriter
-familyType()
+ familyType()
 \family default
 /
 \family typewriter
-getComponentId()
+ getComponentId()
 \family default
 /
 \family typewriter
-getOwnerObject()
+ getOwnerObject()
 \family default
  to get the 
 \shape smallcaps
@@ -1385,7 +1368,8 @@ getEventType()
 \shape smallcaps
 component
 \shape default
- is supposed to respond to
+ is supposed to respond to.
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -1397,13 +1381,14 @@ update()
 \shape smallcaps
 component 
 \shape default
-state at each game tick.
- Not all derived 
+state at each game tick (frame).
+ It is virtual, so can possibly be overridden by derived concrete classes
+ to perform specific update.
+ Some derived 
 \shape smallcaps
 component type
 \shape default
-s need to update their state so it is merely virtual, with the base one
- doing nothing.
+s need not to update their state, so they use the base one that does nothing.
 \end_layout
 
 \begin_layout Quote
@@ -1721,7 +1706,7 @@ component type
  would only specialize the basic common interface.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection
 
 \series bold
 Implementation
@@ -1735,46 +1720,71 @@ name "sub:Component-Template-Implementation"
 \end_layout
 
 \begin_layout Quote
-The common part of all 
+The 
 \shape smallcaps
 component template
 \shape default
-s is implemented by 
-\family typewriter
-ely::ComponentTemplate
-\family default
- abstract base class, while a 
-\shape smallcaps
-component template
-\shape default
- for a given 
+ entities are modeled by a shallow class hierarchy, reflecting that of the
+ corresponding 
 \shape smallcaps
 component
 \shape default
- 
-\shape smallcaps
-type
-\shape default
-, is implemented by deriving a concrete class that implements all its pure
- virtual member functions 
+s 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Component-Template-interface"
+reference "sub:Component-Template-Manager-Implementation"
 
 \end_inset
 
 .
- 
 \end_layout
 
 \begin_layout Quote
-The common protected interface is made of:
+The common interface and internal state are declared into the 
+\family typewriter
+ely::ComponentTemplate
+\family default
+ abstract base class, while 
+\shape smallcaps
+component template
+\shape default
+s for
+\shape smallcaps
+ component
+\shape default
+s of any 
+\shape smallcaps
+type
+\shape default
+, are modeled by specific concrete classes derived from 
+\family typewriter
+ely::ComponentTemplate
+\family default
+.
+ These classes must implement all 
+\family typewriter
+ely::ComponentTemplate
+\family default
+'s pure virtual member functions.
+ Instances of these concrete classes represent 
+\shape smallcaps
+component template
+\shape default
+ entities.
+\end_layout
+
+\begin_layout Quote
+The common 
+\shape italic
+protected
+\shape default
+ interface is made of: 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::makeComponent()
+makeComponent()
 \family default
  to create the 
 \shape smallcaps
@@ -1789,35 +1799,52 @@ and
 family type
 \shape default
 .
- A derived 
+ This member is pure virtual and must be implemented by derived concrete
+ classes to perform custom creation.
+ It is called only by 
+\family typewriter
+doCreateComponent()
+\family default
+ (private) member function of 
+\family typewriter
+ely::ComponentTemplateManager() 
+\family default
+
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-Template-Manager-Implementation"
+
+\end_inset
+
+ based on the 
 \shape smallcaps
-component template
+component type
 \shape default
- is supposed to do specialized 
-\shape smallcaps
-component
-\shape default
- creation so it is pure virtual
+ to create.
 \end_layout
 
 \begin_layout Quote
-The common public interface includes:
+The common 
+\shape italic
+public
+\shape default
+ interface includes:
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::componentType()
+componentType()
 \family default
-/
+ and 
 \family typewriter
 familyType()
 \family default
  to get the 
 \shape smallcaps
-type,
+type
 \shape default
- 
+ and 
 \shape smallcaps
 family type
 \shape default
@@ -1826,47 +1853,33 @@ family type
 component
 \shape default
  respectively.
- A derived 
+ This members are pure virtual and must be implemented by derived concrete
+ classes to set custom values of both 
 \shape smallcaps
-component template
+type
 \shape default
- is supposed to create 
-\shape smallcaps
-component
-\shape default
-s with different 
-\shape smallcaps
-type 
-\shape default
-and 
-\shape smallcaps
-family type
-\shape default
- so they are pure virtual
+s.
+ 
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::setParametersDefaults()
+setParametersDefaults()
 \family default
  to set the 
 \shape smallcaps
 component
 \shape default
  configuration parameters to their default values.
- A derived 
-\shape smallcaps
-component template
-\shape default
- is supposed to do specialized default parameter settings so it is pure
- virtual
+ This member is pure virtual and must be implemented by derived concrete
+ classes to do custom default parameter settings.
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::setParameters()
+setParameters()
 \family default
  to set the 
 \shape smallcaps
@@ -1878,13 +1891,13 @@ component
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::parameter()/parameterList()/getParameterTable()
+parameter()/ parameterList()/ getParameterTable()
 \family default
  to get the configuration parameters single or multiple values for the 
 \shape smallcaps
 component
 \shape default
- or a copy of the entire parameter table respectively
+ or a copy of the entire parameter table respectively.
 \end_layout
 
 \begin_layout Itemize
@@ -2089,10 +2102,17 @@ component
 s' configuration parameters to their default values
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection
 
 \series bold
 Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-Template-Manager-Implementation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Quote
@@ -2222,7 +2242,7 @@ ely::Object
 \begin_layout Section
 Object Template
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 object ! template
@@ -2272,20 +2292,20 @@ All Objects Templates used in the game must be stored into this manager,
 \family typewriter
 ObjectTemplateManager::createObject()
 \family default
-
-\begin_inset CommandInset label
-LatexCommand label
-name "ObjectTemplateManager-createObject"
-
-\end_inset
-
- member function.
+member function.
 \end_layout
 
-\begin_layout Subsubsection*
+\begin_layout Subsection
 
 \series bold
 Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Object-Template-Manager-Implementation"
+
+\end_inset
+
+
 \end_layout
 
 \begin_layout Quote
@@ -2296,13 +2316,6 @@ object template manager
  is implemented by 
 \family typewriter
 ely::ObjectTemplateManager
-\begin_inset CommandInset label
-LatexCommand label
-name "ely::ObjectTemplateManager"
-
-\end_inset
-
-
 \family default
  class.
 \end_layout
