@@ -106,8 +106,8 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::getObjectTemplate(ObjectType obje
 
 SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ObjectId objectId,
-		const ParameterTable& objTmplParams,
-		const ParameterTableMap& compTmplParams,
+		const ParameterTable& objectParams,
+		const ParameterTableMap& componentsParams,
 		bool storeParams,
 		SMARTPTR(Object)owner)
 {
@@ -150,8 +150,8 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		ComponentTemplateManager::GetSingleton().resetComponentTemplateParams(compType);
 		//set parameters for this component template...
 		ParameterTableMap::const_iterator it3;
-		it3 = compTmplParams.find(std::string(compType));
-		if (it3 != compTmplParams.end())
+		it3 = componentsParams.find(std::string(compType));
+		if (it3 != componentsParams.end())
 		{
 			//...if not empty
 			compTmplList[idx2]->setParameters(it3->second);
@@ -175,10 +175,10 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	//initialize parameters' object template to defaults
 	objectTmpl->setParametersDefaults();
 	//set parameters for this object template...
-	if(not objTmplParams.empty())
+	if(not objectParams.empty())
 	{
 		//...if not empty
-		objectTmpl->setParameters(objTmplParams);
+		objectTmpl->setParameters(objectParams);
 	}
 	//store object and component templates' parameters into
 	//the created object and before it will be added to the
@@ -188,7 +188,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 			std::string("true") ? true : false);
 	if (storeParams or storeParamsParam)
 	{
-		newObj->doStoreParameters(objTmplParams, compTmplParams);
+		newObj->doStoreParameters(objectParams, componentsParams);
 	}
 	//give a chance to object to setup itself when being added to scene.
 	newObj->onAddToSceneSetup();
@@ -345,7 +345,7 @@ void ObjectTemplateManager::destroyAllObjects()
 }
 
 bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
-		ComponentType componentType, const ParameterTable& compTmplParams)
+		ComponentType componentType, const ParameterTable& componentParams)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -361,10 +361,10 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	//set component' parameters to their default values
 	componentTemplate->setParametersDefaults();
 	//set parameters for this component template...
-	if (not compTmplParams.empty())
+	if (not componentParams.empty())
 	{
 		//...if not empty
-		componentTemplate->setParameters(compTmplParams);
+		componentTemplate->setParameters(componentParams);
 	}
 	//create the new free component
 	SMARTPTR(Component)newComp =

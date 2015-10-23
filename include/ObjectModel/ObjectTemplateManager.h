@@ -30,10 +30,10 @@
 namespace ely
 {
 /**
- * \brief Singleton template manager that stores all the object templates.
+ * \brief Singleton manager that handles all the ObjectTemplates.
  *
- * This manager takes responsibility to create game objects and maintains
- * a table of (pointers to) created objects, indexed by ObjectId.\n
+ * This manager has the additional responsibility to create game Objects
+ * and to maintain a table of (references to) all created Objects, indexed by ObjectId.\n
  * Thread-safe during utilization.
  */
 class ObjectTemplateManager: public Singleton<ObjectTemplateManager>
@@ -49,83 +49,84 @@ public:
 	~ObjectTemplateManager();
 
 	/**
-	 * \brief Adds an object template for a given object type it can create.
+	 * \brief Adds an ObjectTemplate for a given Object type it can create.
 	 *
-	 * It will add the object template to the internal table and if a
-	 * template for that object type already existed it'll be replaced
-	 * by this new template (and its ownership released by the manager).
-	 * @param objectTmpl The object template to add.
-	 * @return SMARTPTR(NULL) if there wasn't a template for that object, otherwise
+	 * It will add the ObjectTemplate to the internal table and, if a
+	 * template for that Object type (i.e. having the same name) already existed,
+	 * it'll be replaced by this new template (and its ownership released by the manager).
+	 * @param objectTmpl The ObjectTemplate to add.
+	 * @return NULL if there wasn't a template for that Object, otherwise
 	 * the previous template.
 	 */
 	SMARTPTR(ObjectTemplate)addObjectTemplate(SMARTPTR(ObjectTemplate) objectTmpl);
 
 	/**
-	 * \brief Removes the object template given the object type it can create.
-	 * @param objectType The object type.
-	 * @return True if the object template existed, false otherwise.
+	 * \brief Removes the ObjectTemplate given the Object type it can create.
+	 * @param objectType The Object type.
+	 * @return True if the ObjectTemplate existed, false otherwise.
 	 */
 	bool removeObjectTemplate(ObjectType objectType);
 
 	/**
-	 * \brief Gets the object template given the object type it can create.
-	 * @param objectType The object type.
-	 * @return The object template.
+	 * \brief Gets the ObjectTemplate given the Object type it can create.
+	 * @param objectType The Object type.
+	 * @return The ObjectTemplate.
 	 */
 	SMARTPTR(ObjectTemplate) getObjectTemplate(ObjectType objectType) const;
 
 	/**
-	 * \brief Creates a object given its type and a NodePath.
+	 * \brief Creates a game Object.
 	 *
-	 * The type is needed to select the correct template.\n
-	 * The object creation can be made "ONLY" by calling this function.
-	 *
-	 * @param objectType The object type.
-	 * @param objectId The object id.
-	 * @param objTmplParams Object template parameter table used to setup the
-	 * object in the scene.
-	 * @param compTmplParams Map of component  templates' parameter tables,
-	 * indexed by component type, used to initialize the object components.
-	 * @param storeParams If to store object and component templates'
-	 * parameters into the created object  and before it will be
-	 * added to the scene (and initialized).
-	 * @return The just created object, or NULL if the object cannot be created.
+	 * The Object creation can be performed "ONLY" by calling this function.\n
+	 * The type is needed to select the correct ObjectTemplate.\n
+	 * @param objectType The Object type.
+	 * @param objectId The Object identifier.
+	 * @param objectParams Object parameter table used to setup the
+	 * Object in the game scene.
+	 * @param componentsParams Map of Components' parameter tables, indexed by
+	 * Component type, used to initialize the owned Components of the Object.
+	 * @param storeParams Whether to store Object and Components' parameters
+	 * into the created Object and before it will be added to the game scene
+	 * (and before being initialized).
+	 * @param owner The owner Object
+	 * @return The just created Object, or NULL if the Object cannot be created.
 	 */
 	SMARTPTR(Object) createObject(ObjectType objectType, ObjectId objectId = ObjectId(""),
-			const ParameterTable& objTmplParams = ParameterTable(),
-			const ParameterTableMap& compTmplParams = ParameterTableMap(),
+			const ParameterTable& objectParams = ParameterTable(),
+			const ParameterTableMap& componentsParams = ParameterTableMap(),
 			bool storeParams = false, SMARTPTR(Object) owner = NULL);
 
 	/**
-	 * \brief Adds/replaces a component of the given type to an existing object with
-	 * the given object identifier.\n
-	 * \note you can add any component of any given type, even if the object template
+	 * \brief Adds/replaces a Component of the given type to an existing Object with
+	 * the given Object identifier.
+	 *
+	 * \note you can add any Component of any given type, even if the ObjectTemplate
 	 * doesn't contain it.\n
-	 * \note the new component will replace a component of the same family if any.
-	 * \note event types of this new component need not to be the same as the
-	 * declared ones in Object template if any.
-	 * @param objectId The given object identifier.
-	 * @param componentType The given component type.
-	 * @param compTmplParams Map of component  templates' parameter tables,
-	 * indexed by component type, used to initialize the object components.
+	 * \note the new Component will replace a pre-existing Component of the same
+	 * family type, if any.
+	 * \note event types of this new Component need not to be the same as the
+	 * declared ones in ObjectTemplate, if any.
+	 * @param objectId The given Object identifier.
+	 * @param componentType The given Component type.
+	 * @param componentParams Parameters used to initialize the Component.
 	 * @return True if successfully added, false otherwise.
 	 */
 	bool addComponentToObject(ObjectId objectId, ComponentType componentType,
-			const ParameterTable& compTmplParams = ParameterTable());
+			const ParameterTable& componentParams = ParameterTable());
 
 	/**
-	 * \brief Removes a component, if any, of the given type from an existing
-	 * object with the given object identifier.\n
-	 * \note the component is removed only if the object template doesn't
-	 * contain it.\n
-	 * @param objectId The given object identifier.
-	 * @param componentType The given component type.
+	 * \brief Removes a Component, if any, with the given type, from an existing
+	 * Object with the given identifier.
+	 *
+	 * \note the Component is removed only if the ObjectTemplate doesn't contain it.\n
+	 * @param objectId The given Object identifier.
+	 * @param componentType The given Component type.
 	 * @return True if successfully removed, false otherwise.
 	 */
 	bool removeComponentFromObject(ObjectId objectId, ComponentType componentType);
 
 	/**
-	 * \brief Object templates and object tables typedefs.
+	 * \brief ObjectTemplate and Object tables typedefs.
 	 */
 	///@{
 	typedef std::map<const ObjectType, SMARTPTR(ObjectTemplate)> ObjectTemplateTable;
@@ -133,25 +134,25 @@ public:
 	///@}
 
 	/**
-	 * \brief Gets a created object give its object id.
-	 * @return A pointer to the created object (NULL on error).
+	 * \brief Gets a created Object by its identifier.
+	 * @return A reference to the created Object (NULL on error).
 	 */
 	SMARTPTR(Object) getCreatedObject(const ObjectId& objectId) const;
 
 	/**
-	 * \brief Gets a list of all created objects.
-	 * @return A list of pointers to each created object.
+	 * \brief Gets a list of all created Objects.
+	 * @return A list of references to the created Objects.
 	 */
 	std::list<SMARTPTR(Object)> getCreatedObjects() const;
 
 	/**
-	 * \brief Destroys a created object give its object id.
+	 * \brief Destroys a created Object by its identifier.
 	 * @return True if successful, false otherwise.
 	 */
 	bool destroyObject(const ObjectId& objectId);
 
 	/**
-	 * \brief Destroys all created objects.
+	 * \brief Destroys all created Objects.
 	 */
 	void destroyAllObjects();
 
@@ -164,15 +165,15 @@ public:
 #endif
 
 private:
-	///Table of object templates indexed by their name.
+	///Table of ObjectTemplates indexed by their name.
 	ObjectTemplateTable mObjectTemplates;
-	/// The table of created game objects.
+	/// The table of created game Objects.
 	ObjectTable mCreatedObjects;
 
-	///The unique id for created objects.
+	///The unique identifier for created Objects.
 	IdType id;
 	/**
-	 * \brief Return an unique id for created objects.
+	 * \brief Return an unique identifier for created Objects.
 	 * @return The unique id.
 	 */
 	IdType doGetId();

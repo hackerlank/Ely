@@ -36,22 +36,24 @@ namespace ely
 class ObjectTemplate;
 
 /**
- * \brief Object instance identifier type (by default the name
- * of the NodePath component).
+ * \brief Object instance identifier type.
  */
 typedef std::string ObjectId;
 
 /**
- * \brief The object is the basic entity that can exist in the game world.
+ * \brief The Object is the basic entity that can exist in the game world.
  *
- * Because Panda3d is used as game engine, a object should
- * "compose" the different aspects (graphics, sound, ai,
- * physics, animation, etc...), already existing in Panda3d.
- * An object can have only one component of a given family.
- * Each object has a NodePath embedded.\n
- * An object is an aggregation of components: a “has a,” or whole/part,
- * relationship where neither class owns the other.\n
- * Object can be initialized after it is added to the scene, by
+ * A Object should "compose", as far as possible, the different features
+ * (graphics, sound, ai, physics, animation, etc...), supplied by Panda3d
+ * game engine. When a feature is missing or considered of low quality,
+ * other external libraries may be used.\n
+ * Each Object has an embedded NodePath.\n
+ * An Object is an aggregation of Components: a “has a,” or whole/part,
+ * relationship where neither class owns the other.
+ * An Object can have any number of Components of different types, but only
+ * one can belong to any family type: two Components with different types
+ * belonging to the same family type, cannot coexist into an Object.\n
+ * Objects can be initialized after they are added to the game scene, through
  * an initialization function, whose name can be specified as parameter
  * or by a default which is the string "<OBJECTID>_initialization",
  * loaded at runtime from a dynamic linked library
@@ -82,32 +84,34 @@ private:
 	Object(const ObjectId& objectId, SMARTPTR(ObjectTemplate)tmpl);
 
 	/**
-	 * \brief Resets all object data members.
+	 * \brief Resets all Object data members.
 	 */
 	void doReset();
 
 	/**
-	 * \brief Adds a component to this object.
+	 * \brief Adds a Component to this Object.
 	 *
-	 * It will add the component to the object.\n
-	 * @param component The new component to add.
-	 * @param familyId The family type of the component.
+	 * It will add the Component to the Object removing
+	 * the possibly existing one.\n
+	 * @param component The new Component to add.
+	 * @param familyType The Component family type.
 	 * @return True if successfully removed, false otherwise.
 	 */
 	bool doAddComponent(SMARTPTR(Component) component,
-			const ComponentFamilyType& familyId);
+			const ComponentFamilyType& familyType);
 
 	/**
-	 * \brief Removes a component from this object.
+	 * \brief Removes a Component from this Object.
 	 *
-	 * It will remove the component from the object.\n
-	 * @param component The component to remove.
+	 * It will remove the Component from the Object.\n
+	 * @param component The Component to remove.
+	 * @param familyType The Component family type.
 	 * @return True if successfully removed, false otherwise.
 	 */
 	bool doRemoveComponent(SMARTPTR(Component) component,
-			const ComponentFamilyType& familyId);
+			const ComponentFamilyType& familyType);
 
-	///List of all <family,component>s pair stored by insertion order.
+	///List of all <family,Component>s pair stored by insertion order.
 	typedef std::pair<const ComponentFamilyType, SMARTPTR(Component)> FamilyTypeComponentPair;
 	typedef std::list<FamilyTypeComponentPair> ComponentOrderedList;
 	/**
@@ -120,7 +124,7 @@ private:
 	/**
 	 * \brief On remove Object cleanup.
 	 *
-	 * Gives an object the ability to perform the cleanup and any
+	 * Gives an Object the ability to perform the cleanup and any
 	 * required finalization before being definitively destroyed.\n
 	 * Called only by ObjectTemplateManager::destroyObject().\n
 	 */
@@ -129,36 +133,39 @@ private:
 	/**
 	 * \brief On addition to scene setup.
 	 *
-	 * Gives an object the ability to perform the
+	 * Gives an Object the ability to perform the
 	 * addition to scene setup and any required initialization.\n
 	 * Called only by ObjectTemplateManager::createObject().\n
-	 * \note this method is called exclusively by the object creation thread,
+	 * \note this method is called exclusively by the Object creation thread,
 	 * i.e. before it will be publicly accessible, so no other thread can access
-	 * the object during its execution, then it doesn't need to hold the mutex.
+	 * the Object during its execution, then it doesn't need to hold the mutex.
 	 */
 	void onAddToSceneSetup();
 
 	/**
 	 * \brief On remove from scene cleanup.
 	 *
-	 * Gives an object the ability to perform the
-	 * removing from scene cleanup and any required finalization.\n
+	 * Gives an Object the ability to perform the
+	 * removal from scene cleanup and any required finalization.\n
 	 * Called only by ObjectTemplateManager::destroyObject().\n
-	 * \note this method is called by the object destruction thread,
+	 * \note this method is called by the Object destruction thread,
 	 * i.e. when it is be publicly accessible, so other thread can access
-	 * the object during its execution, then it does need to hold the mutex.
+	 * the Object during its execution, then it does need to hold the mutex.
 	 */
 	void onRemoveFromSceneCleanup();
 
 	/**
 	 * \brief This methods will store, in an internal storage, the
-	 * object template and component templates' parameters.\n
-	 * \note This method is intended to be used during the object
-	 * creation if the object is susceptible to be cloned with clones
-	 * having (more or less) the same parameters values, so they are
+	 * Object and Components' parameters.\n
+	 *
+	 * Both Object and Components' parameters, are stored into the
+	 * corresponding templates.
+	 * \note This method is intended to be used during the Object
+	 * creation if the Object is susceptible to be cloned with clones
+	 * having (approximately) the same parameters values, so they are
 	 * available at once.
-	 * @param objTmplParams The object template parameters table.
-	 * @param compTmplParams The component templates' parameters' table.
+	 * @param objTmplParams The Object parameters' table.
+	 * @param compTmplParams The Components' parameters' table.
 	 */
 	void doStoreParameters( const ParameterTable& objTmplParams,
 			const ParameterTableMap& compTmplParams);
@@ -171,30 +178,30 @@ public:
 	virtual ~Object();
 
 	/**
-	 * \brief Gets the component of that given family.
-	 * @param familyID The family of the component.
-	 * @return The component, or NULL if no component of that
+	 * \brief Gets the Component of a given family type.
+	 * @param familyType The family of the Component.
+	 * @return The Component, or NULL if no Component of that
 	 * family exists.
 	 */
-	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyId) const;
+	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyType) const;
 
 	/**
-	 * \brief Returns the number of components.
-	 * @return The number of components.
+	 * \brief Returns the number of Components.
+	 * @return The number of Components.
 	 */
 	unsigned int numComponents() const;
 
 	/**
-	 * \brief On world creation setup.
+	 * \brief On game world creation setup.
 	 *
-	 * Gives an object the ability to perform any given
-	 * initialization after the entire world creation.\n
+	 * Gives an Object the ability to perform any given
+	 * initialization after the whole world creation.\n
 	 */
 	void worldSetup();
 
 	/**
-	 * \brief Gets a reference to the id of this object.
-	 * @return The id of this object.
+	 * \brief Gets a the identifier of this Object.
+	 * @return The id of this Object.
 	 */
 	ObjectId objectId() const;
 
@@ -208,17 +215,17 @@ public:
 	///@}
 
 	/**
-	 * \brief Gets a reference to the object template.
-	 * @return The a reference to the object template.
+	 * \brief Gets a reference to the ObjectTemplate.
+	 * @return The a reference to the ObjectTemplate.
 	 */
 	SMARTPTR(ObjectTemplate) const objectTmpl() const;
 
 	/**
-	 * \brief Gets the object steady-ness.
+	 * \brief Gets the Object steady-ness.
 	 *
-	 * This flag represents if this object doesn't move in the world.
+	 * This flag represents if this Object doesn't move in the world.
 	 * Various components can set or get this value to implement
-	 * some optimization. By default false (i.e. object is dynamic).
+	 * some optimization. By default false (i.e. Object is dynamic).\n
 	 */
 	bool isSteady() const;
 
@@ -229,10 +236,11 @@ public:
 			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
 	/**
-	 * \brief Returns the object template and component templates'
-	 * parameters tables.
-	 * @return  The object template and component templates'
-	 * parameters tables.
+	 * \brief Returns the Object and Components' parameters tables.
+	 *
+	 * These tables are stored into their corresponding ObjectTemplate and
+	 * ComponentTemplates.\n
+	 * @return  The Object and Components' parameters tables.
 	 */
 	///@{
 	ParameterTable getStoredObjTmplParams() const;
@@ -240,17 +248,18 @@ public:
 	///@}
 
 	/**
-	 * \brief This method will free the stored object template
-	 * and component templates' parameters.\n
-	 * \note This method is intended to be used when done with
-	 * the parameters' storage.
+	 * \brief This method will free the stored Object and Components' parameters.\n
+	 *
+	 * These parameters are stored in tables into their corresponding ObjectTemplate
+	 * and ComponentTemplates.\n
+	 * \note This method is intended to be used when done with the parameters' storage.
 	 */
 	void freeParameters();
 
 	/**
-	 * \brief Gets/sets this object's owner, i.e. the object responsible
-	 * of its lifetime.
-	 * @param owner The owner object.
+	 * \brief Gets/sets this Object's owner, i.e. the Object
+	 * responsible of its lifetime (if any).
+	 * @param owner The owner Object. NULL if none.
 	 */
 	///@{
 	SMARTPTR(Object) getOwner() const;
@@ -266,13 +275,13 @@ public:
 #endif
 
 private:
-	///The template used to construct this component.
+	///The ObjectTemplate used to construct this Object.
 	SMARTPTR(ObjectTemplate) const mTmpl;
 	///The underlying NodePath (read-only after creation & before destruction).
 	NodePath mNodePath;
-	///Unique identifier for this object (read only after creation).
+	///Unique identifier for this Object (read only after creation).
 	ObjectId mObjectId;
-	///The owner of this object (responsible for its lifetime).
+	///The owner of this Object (responsible for its lifetime).
 	SMARTPTR(Object) mOwner;
 	///@{
 	ComponentOrderedList mComponents;
@@ -292,8 +301,8 @@ private:
 		}
 	};
 	///@}
-	///Steady flag: if this object doesn't move in the world.
-	///Various components can set or get this value to implement
+	///Steady flag: if this Object doesn't move in the game world.
+	///Various Components can set or get this value to implement
 	///some optimization.
 	bool mIsSteady;
 
@@ -314,12 +323,16 @@ private:
 	void doUnloadInitializationFunctions();
 	///@}
 
-	///Parameters tables.
+	/**
+	 * \name Object and Components' parameters tables.
+	 */
+	///@{
 	ParameterTable mObjTmplParams;
 	ParameterTableMap mCompTmplParams;
+	///@}
 
 #ifdef ELY_THREAD
-	///The mutex associated with this object.
+	///The mutex associated with this Object.
 	ReMutex mMutex;
 #endif
 
@@ -364,7 +377,7 @@ inline NodePath Object::getNodePath() const
 inline void Object::setNodePath(const NodePath& nodePath)
 {
 	//called only by ObjectTemplateManager methods which
-	//already lock the object mutex
+	//already lock the Object mutex
 
 	mNodePath = nodePath;
 }
@@ -470,18 +483,18 @@ class ObjectTemplateManager;
 /**
  * \brief Object type.
  *
- * This type identifies the name of template that create these type of objects.
+ * This type identifies the name of ObjectTemplate that create these type of Objects.
  */
 typedef std::string ObjectType;
 
 /**
- * \brief Class storing all of objects templates used to create an object.
+ * \brief Class modeling templates used to create Objects.
  */
 class ObjectTemplate: public TypedWritableReferenceCount
 {
 public:
 	/**
-	 * \brief Type used for the ordered list of the component templates.
+	 * \brief Type used for the ordered list of the ComponentTemplates.
 	 */
 	typedef std::vector<SMARTPTR(ComponentTemplate)> ComponentTemplateList;
 
@@ -501,69 +514,82 @@ public:
 	virtual ~ObjectTemplate();
 
 	/**
-	 * \brief For the object this template is designed to create,
-	 * this function sets the (mandatory) parameters to their default values.
+	 * \brief Sets the Object parameters to their default values.
+	 *
+	 * For the Object this template is designed to create,
+	 * this function sets the parameters to their default values.
 	 */
 	void setParametersDefaults();
 
 	/**
-	 * \name Parameters management.
-	 * \brief Sets the parameters of the object, this template is
-	 * designed to create, to custom values.
+	 * \brief Sets the Object parameters to custom values.
 	 *
-	 * These parameters overwrite (and/or are added to) the parameters defaults
-	 * set by setParametersDefaults.
+	 * For the Object this template is designed to create,
+	 * this function sets the parameters to custom values.
+	 * These parameters overwrite (and/or are added to) the parameters
+	 * defaults set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	void setParameters(const ParameterTable& parameterTable);
 
 	/**
-	 * \brief Clears the table of all component templates of this
-	 * object template.
+	 * \brief Clears the table of all ComponentTemplates of this ObjectTemplate.
 	 */
 	void clearComponentTemplates();
 
 	/**
-	 * \brief Gets a reference to the name (i.e. the object type) of
-	 * this object template.
-	 * @return The name of this object template.
+	 * \brief Gets the name (i.e. the Object type) of ObjectTemplate.
+	 * @return The name of this ObjectTemplate.
 	 */
 	ObjectType objectType() const;
 
 	/**
-	 * \brief Gets the component template list.
-	 * @return The component template list.
+	 * \brief Gets the ComponentTemplate list.
+	 *
+	 * This ObjectTemplate has an internal ordered (by addition)
+	 * list of references to ComponentTamplates, corresponding
+	 * to Components owned by Objects it creates.
+	 * @return The ComponentTemplate list.
 	 */
 	ComponentTemplateList getComponentTemplates() const;
 
 	/**
-	 * \brief Adds a component template.
-	 * @param componentTmpl The component template.
+	 * \brief Adds a ComponentTemplate.
+	 *
+	 * This ObjectTemplate has an internal ordered (by addition)
+	 * list of references to ComponentTamplates, corresponding
+	 * to Components owned by Objects it creates.
+	 * @param componentTmpl The ComponentTemplate.
 	 */
 	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/**
-	 * \brief Gets a component template given the component type it can create.
-	 * @param componentType The component type.
-	 * @return The component template, NULL if it doesn't exist.
+	 * \brief Gets a ComponentTemplate corresponding to a given the Component type.
+	 *
+	 * This ObjectTemplate has an internal ordered (by addition)
+	 * list of references to ComponentTamplates, corresponding
+	 * to Components owned by Objects it creates.
+	 * @param componentType The Component type.
+	 * @return The Component template, NULL if it doesn't exist.
 	 */
 	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType&componentType) const;
 
 	/**
-	 * \brief Gets the parameter value associated to the object.
+	 * \brief Gets the parameter single value associated to the Object.
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
 	std::string parameter(const std::string& paramName) const;
+
 	/**
-	 * \brief Gets the parameter multi-values associated to the object.
+	 * \brief Gets the parameter multiple values associated to the Object.
 	 * @param paramName The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
 	std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
-	 * \brief Gets the entire parameter table.
+	 * \brief Gets (a copy of) the entire parameter table.
 	 * @return The parameter table.
 	 */
 	ParameterTable getParameterTable() const;
@@ -581,42 +607,41 @@ public:
 	WindowFramework* const windowFramework() const;
 
 	/**
-	 * \brief Adds a common "multi-valued" parameter to a component type
-	 * of this object.
+	 * \brief Adds a common multiple-valued parameter to a Component type
+	 * of this Object.
 	 *
 	 * Any parameter value is interpreted as a "compound" one, i.e. as having
 	 * the form: "value1:value2:...:valueN" and each valueX is stored in a
 	 * list as returned by componentParameterValues().\n
-	 *
 	 * @param parameterName The parameter name.
 	 * @param parameterValue The parameter value.
-	 * @param componentType The component type the parameter is related to.
+	 * @param componentType The Component type the parameter is related to.
 	 */
 	void addComponentParameter(const std::string& parameterName,
-			const std::string& parameterValue, ComponentType compType);
+			const std::string& parameterValue, ComponentType componentType);
 
 	/**
 	 * \brief Checks if a name/value pair is an allowed parameter/value
-	 * for a given component type of this object.
+	 * for a given Component type of this Object.
 	 * @param name The name to check.
 	 * @param value The value to check.
-	 * @param componentType The component type.
+	 * @param componentType The Component type.
 	 * @return True if the name/value pair match an allowed parameter/value
-	 * for a given component, false otherwise.
+	 * for a given Component, false otherwise.
 	 */
 	bool isComponentParameterValue(const std::string& name, const std::string& value,
-			ComponentType compType);
+			ComponentType componentType);
 
 	/**
 	 * \brief Gets all values of the common parameter associated to
-	 * the component type of the object.
+	 * the Component type of the Object.
 	 *
 	 * @param paramName The name of the parameter.
-	 * @param componentType The component type.
+	 * @param componentType The Component type.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
 	std::list<std::string> componentParameterValues(const std::string& paramName,
-			ComponentType compType);
+			ComponentType componentType);
 
 #ifdef ELY_THREAD
 	/**
@@ -627,9 +652,9 @@ public:
 #endif
 
 private:
-	///Name identifying this object template.
+	///Name identifying this Object template.
 	ObjectType mName;
-	///Ordered list of all component templates.
+	///Ordered list of ComponentTemplates for all the owned Components.
 	ComponentTemplateList mComponentTemplates;
 	///The ObjectTemplateManager.
 	ObjectTemplateManager* const mObjectTmplMgr;
@@ -640,13 +665,13 @@ private:
 	///The WindowFramework.
 	WindowFramework* mWindowFramework;
 
-	///The table of ParameterTables indexed by component type.\n
+	///The table of ParameterTables indexed by Component type.\n
 	///These represent the allowed common attributes shared by each
-	///component of a given type, belonging to any object of a given type.
+	///Component of a given type, belonging to any Object of a given type.
 	std::map<ComponentType, ParameterTable> mComponentParameterTables;
 
 #ifdef ELY_THREAD
-	///The mutex associated with this template.
+	///The mutex associated with this ObjectTemplate.
 	ReMutex mMutex;
 #endif
 
@@ -678,8 +703,8 @@ private:
 
 struct idIsEqualTo
 {
-	idIsEqualTo(const ComponentType& compType) :
-			mComponentType(compType)
+	idIsEqualTo(const ComponentType& componentType) :
+			mComponentType(componentType)
 	{
 	}
 	ComponentType mComponentType;

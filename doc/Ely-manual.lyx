@@ -189,10 +189,10 @@ Ely framework is designed to be extensible, by creating new components in
 \end_layout
 
 \begin_layout Standard
-The framework library lies inside the 
-\shape italic
+The framework library lies inside the C++ 
+\family typewriter
 ely
-\shape default
+\family default
  namespace.
 \end_layout
 
@@ -1903,7 +1903,7 @@ component
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::pandaFramework()/windowFramework()
+ely::ComponentTemplate::pandaFramework()/ windowFramework()
 \family default
  to get a reference to the 
 \shape italic
@@ -2051,7 +2051,11 @@ public
 \end_layout
 
 \begin_layout Standard
-The private interface has a method to:
+The 
+\shape italic
+private
+\shape default
+ interface has a method to:
 \end_layout
 
 \begin_layout Itemize
@@ -2069,7 +2073,11 @@ component template
 \end_layout
 
 \begin_layout Standard
-The public interface include methods to:
+The 
+\shape italic
+public
+\shape default
+ interface include methods to:
 \end_layout
 
 \begin_layout Itemize
@@ -2085,7 +2093,7 @@ retrieve a
 \shape smallcaps
 component template 
 \shape default
-related to a 
+corresponding to a 
 \shape smallcaps
 component
 \shape default
@@ -2099,7 +2107,23 @@ reset the
 \shape smallcaps
 component
 \shape default
-s' configuration parameters to their default values
+s' configuration parameters to their default values (configuration parameters
+ are handled by 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+template
+\shape default
+s 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+).
 \end_layout
 
 \begin_layout Subsection
@@ -2120,7 +2144,7 @@ The
 \shape smallcaps
 component template manager
 \shape default
- is implemented by 
+ singleton is modeled by 
 \family typewriter
 ely::ComponentTemplateManager
 \family default
@@ -2128,13 +2152,17 @@ ely::ComponentTemplateManager
 \end_layout
 
 \begin_layout Quote
-The private interface is made of:
+The 
+\shape italic
+private
+\shape default
+ interface is made of:
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplateManager::doCreateComponent()
+doCreateComponent()
 \family default
  to create the 
 \shape smallcaps
@@ -2143,60 +2171,94 @@ component
  given its 
 \shape smallcaps
 type
+\shape default
+.
+ It called only by 
+\family typewriter
+createObject()
+\family default
+ and 
+\family typewriter
+addComponentToObject()
+\family default
+ member functions of 
+\family typewriter
+ely::ObjectTemplateManager
+\family default
+.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Object-Template-Manager-Implementation"
+
+\end_inset
+
+, when carrying on the actual 
+\shape smallcaps
+component
+\shape default
+ addition to an 
+\shape smallcaps
+object
+\shape default
+.
 \end_layout
 
 \begin_layout Quote
-The public interface includes:
+The 
+\shape italic
+public
+\shape default
+ interface includes:
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplateManager::addComponentTemplate()
+addComponentTemplate()
 \family default
 /
 \family typewriter
-removeComponentTemplate()
+ removeComponentTemplate()
 \family default
  to add/remove a 
 \shape smallcaps
 component template
 \shape default
- into/from an internal storage
+ into/from the internal storage.
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplateManager::getComponentTemplate()
+getComponentTemplate()
 \family default
  to retrieve a 
 \shape smallcaps
 component template 
 \shape default
-related to a 
+corresponding to a 
 \shape smallcaps
 component
 \shape default
  
 \shape smallcaps
-type
+type.
 \end_layout
 
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplateManager::resetComponentTemplateParams()
+resetComponentTemplateParams()
 \family default
 /
 \family typewriter
-resetComponentTemplatesParams()
+ resetComponentTemplatesParams()
 \family default
  to reset one/all 
 \shape smallcaps
 component
 \shape default
-s' configuration parameters to their default values
+s' configuration parameters to their default values.
 \end_layout
 
 \begin_layout Quote
@@ -2237,6 +2299,1066 @@ Objects, , represented by the
 ely::Object
 \family default
  type,
+\end_layout
+
+\begin_layout Standard
+----------------------------------------------------------
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is the building block of an 
+\shape smallcaps
+object
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+An 
+\shape smallcaps
+object
+\shape default
+ is composed 
+\shape italic
+exclusively
+\shape default
+ of 
+\shape smallcaps
+component
+\shape default
+s.
+ Therefore the 
+\shape smallcaps
+object
+\shape default
+ structure and its behavior are completely determined by its 
+\shape smallcaps
+component
+\shape default
+s, their inter-relationships and interactions among them.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is distinguished by its 
+\shape smallcaps
+type
+\shape italic
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+
+\shape up
+component ! type
+\end_layout
+
+\end_inset
+
+
+\shape default
+, which defines its structure, its behavior and the states it can assume.
+ 
+\end_layout
+
+\begin_layout Standard
+Furthermore a 
+\shape smallcaps
+component
+\shape default
+ belongs to a 
+\shape smallcaps
+family type
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! family type
+\end_layout
+
+\end_inset
+
+, which represents a set of 
+\shape smallcaps
+component
+\shape default
+s that have conceptually related but 
+\shape italic
+mutually exclusive 
+\shape default
+behaviors in a given area
+\shape italic
+.
+\end_layout
+
+\begin_layout Standard
+Any 
+\shape smallcaps
+object
+\shape default
+ can have 
+\shape italic
+only
+\shape default
+ one 
+\shape smallcaps
+component
+\shape default
+ of a specific 
+\shape smallcaps
+family type
+\shape default
+.
+ That is, two 
+\shape smallcaps
+component
+\shape default
+s with different 
+\shape smallcaps
+type
+\shape default
+ but inside the same 
+\shape smallcaps
+family type
+\shape default
+, cannot coexist into the same 
+\shape smallcaps
+object
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+Each 
+\shape smallcaps
+component
+\shape default
+ is identified by a 
+\shape smallcaps
+identifier
+\shape default
+ (
+\shape smallcaps
+id
+\shape default
+), which is assigned at creation time and is unique between all 
+\shape smallcaps
+component
+\shape default
+s of all 
+\shape smallcaps
+object
+\shape default
+s participating in the game.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is given the ability to 
+\shape italic
+update
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! update
+\end_layout
+
+\end_inset
+
+ its state at every tick (or frame) of the game loop.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ is created and initialized by the corresponding
+\shape smallcaps
+ component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Subsection
+event handling
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! event handling
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-event-handling-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ can respond to Panda3d
+\shape italic
+ event
+\shape default
+s (stimuli).
+ This is the only way an 
+\shape smallcaps
+object
+\shape default
+ is allowed to reply to events: through its 
+\shape smallcaps
+component
+\shape default
+s.
+ 
+\end_layout
+
+\begin_layout Standard
+All 
+\shape smallcaps
+object
+\shape default
+s of a given type (i.e.
+ generated from the same 
+\shape smallcaps
+object template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template"
+
+\end_inset
+
+) are supposed to behave in a 
+\shape italic
+similar
+\shape default
+ 
+\shape italic
+way
+\shape default
+.
+ Accordingly their owned 
+\shape smallcaps
+component
+\shape default
+s, having the same 
+\shape smallcaps
+type
+\shape default
+, should handle the same set of 
+\shape italic
+event
+\shape default
+ 
+\shape italic
+types
+\shape default
+
+\begin_inset CommandInset label
+LatexCommand label
+name "event-types-1"
+
+\end_inset
+
+ and in a similar way.
+ So, by default, the single event type is combined with a single 
+\shape italic
+event callback
+\shape default
+ 
+\shape italic
+function
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Event-callback-functions"
+
+\end_inset
+
+, which can be registered and unregistered with the Panda3D global 
+\shape italic
+EventHandler
+\shape default
+.
+ The 
+\shape smallcaps
+component
+\shape default
+ is passed as argument to the event callback function: in this way one can
+ differentiate the answer according to both the specific 
+\shape smallcaps
+component
+\shape default
+ and, indirectly, its owner 
+\shape smallcaps
+object
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+Usually, however, different 
+\shape smallcaps
+object
+\shape default
+s of the same type need to respond independently to the same event type
+ and handle it in a custom way.
+ This is accomplished by associating a different Panda3d event to the same
+ event type and by specifying a custom event callback function on a per
+ ( 
+\shape smallcaps
+object
+\shape default
+,
+\shape smallcaps
+component
+\shape default
+, event type) triple basis: in this way, for example, 2 different 
+\shape smallcaps
+object
+\shape default
+s of the same type, each having a 
+\shape smallcaps
+component
+\shape default
+ of the same type, will respond to the same event type, each with a different
+ event Panda3D and with the same event callback function, but with 2 different
+\shape smallcaps
+ component
+\shape default
+ as arguments
+\end_layout
+
+\begin_layout Subsection
+interface
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! interface
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-interface-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+The behavior of any 
+\shape smallcaps
+component
+\shape default
+ is determined by its 
+\shape italic
+interface
+\shape default
+, which is formed by a series of methods.
+\end_layout
+
+\begin_layout Standard
+The 
+\shape italic
+protected
+\shape default
+ interface is called 
+\shape italic
+only
+\shape default
+ by its corresponding 
+\shape smallcaps
+component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+and by
+\shape smallcaps
+ object template manager
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+.
+ The 
+\shape italic
+public
+\shape default
+ interface is used for interaction with external user code.
+ Whereas, into 
+\shape italic
+private
+\shape default
+ interface, are relegated some helper functions that are delegated by the
+ protected and public functions to do the real job.
+\end_layout
+
+\begin_layout Standard
+The protected interface common to all 
+\shape smallcaps
+component
+\shape default
+s includes methods to:
+\end_layout
+
+\begin_layout Itemize
+initialize a 
+\shape smallcaps
+component
+\shape default
+ at creation time, using the data values specified in the corresponding
+ 
+\shape smallcaps
+template
+\shape default
+ parameter table 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "component-template-parameter-table"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Itemize
+let
+\shape smallcaps
+ component
+\shape default
+ make additional setup/cleanup while being added/removed to/from the owner
+ 
+\shape smallcaps
+object
+\shape default
+ and to/from the game scene.
+\end_layout
+
+\begin_layout Standard
+In addition, there are protected members used as helpers to set the
+\shape smallcaps
+ component ID
+\shape default
+, a reference to its owner 
+\shape smallcaps
+object
+\shape default
+ and to register and unregister event callbacks functions.
+\end_layout
+
+\begin_layout Standard
+The common public interface has methods to:
+\end_layout
+
+\begin_layout Itemize
+get the 
+\shape smallcaps
+type,
+\shape default
+ 
+\shape smallcaps
+family type
+\shape default
+, 
+\shape smallcaps
+id
+\shape default
+ and reference to owner 
+\shape smallcaps
+object
+\shape default
+ of the 
+\shape smallcaps
+component
+\end_layout
+
+\begin_layout Itemize
+update the 
+\shape smallcaps
+component 
+\shape default
+state at each game tick (frame)
+\end_layout
+
+\begin_layout Itemize
+get the event type of a Panda3d event received 
+\end_layout
+
+\begin_layout Standard
+Obviously any 
+\shape smallcaps
+component
+\shape default
+ of a given 
+\shape smallcaps
+type
+\shape default
+, usually would specialize and extend this basic common interface, depending
+ on its specific behavior.
+\end_layout
+
+\begin_layout Subsection
+state
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! state
+\end_layout
+
+\end_inset
+
+
+\begin_inset CommandInset label
+LatexCommand label
+name "sec:Component-state-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Standard
+At any point in time, a 
+\shape smallcaps
+component
+\shape default
+ has an
+\shape italic
+ state
+\shape default
+, which determines its particular configuration and behavior (and consequently
+ those of its owner 
+\shape smallcaps
+object
+\shape default
+).
+ The state is made up a set of internal 
+\shape italic
+data
+\shape default
+, each one having its own type and value.
+\end_layout
+
+\begin_layout Standard
+Some internal data values can be set up only at 
+\shape smallcaps
+component
+\shape default
+ creation time and cannot be changed during its lifetime, while others haven't
+ this limitation, and can be modified through 
+\shape smallcaps
+component
+\shape default
+ methods.
+ 
+\end_layout
+
+\begin_layout Standard
+During lifetime, many 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+s require their state's data to be updated at each tick/frame, while others
+ haven't this need (their states can possibly change only through methods'
+ calls).
+\end_layout
+
+\begin_layout Standard
+Moreover all internal data have hard-coded 
+\shape italic
+default
+\shape default
+ 
+\shape italic
+values
+\shape default
+, which are used if not specified at creation and/or during lifetime of
+ the 
+\shape smallcaps
+component
+\shape default
+.
+ A default value is usually the 
+\shape italic
+null
+\shape default
+ element of the field of values of the data type, e.g.
+ 
+\family typewriter
+0
+\family default
+ for numbers (floats, integers), empty string (
+\family typewriter
+''
+\family default
+) for strings etc\SpecialChar \ldots{}
+.
+ But some data must have a different default values from null, otherwise
+ the 
+\shape smallcaps
+component
+\shape default
+ could fall back in an inconsistent behavior.
+\end_layout
+
+\begin_layout Standard
+A 
+\shape smallcaps
+component
+\shape default
+ state includes also the sets of (
+\shape italic
+event
+\shape default
+, 
+\shape italic
+event-type
+\shape default
+) pairs and (
+\shape italic
+event-type
+\shape default
+, 
+\shape italic
+event-callback
+\shape default
+) pairs which the 
+\shape smallcaps
+component
+\shape default
+ use for event handling 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-event-handling-1"
+
+\end_inset
+
+.
+ These data sets can be set up only at creation time.
+\end_layout
+
+\begin_layout Subsection
+
+\series bold
+Implementation
+\begin_inset CommandInset label
+LatexCommand label
+name "sub:Component-Implementation-1"
+
+\end_inset
+
+
+\end_layout
+
+\begin_layout Quote
+The 
+\shape smallcaps
+component
+\shape default
+ entities are modeled by a shallow class hierarchy.
+\end_layout
+
+\begin_layout Quote
+The common interface and internal state are declared into the 
+\family typewriter
+ely::Component
+\family default
+ abstract base class, while 
+\shape smallcaps
+component
+\shape default
+s of any 
+\shape smallcaps
+type
+\shape default
+, are modeled by specific concrete classes derived from 
+\family typewriter
+ely::Component
+\family default
+.
+ These classes must implement all 
+\family typewriter
+ely::Component
+\family default
+'s pure virtual member functions, and, possibly, would extend and/or specialize
+ (by overriding its virtual member functions) its interface 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-interface-1"
+
+\end_inset
+
+ and internal state 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-state-1"
+
+\end_inset
+
+.
+ Instances of these concrete classes represent 
+\shape smallcaps
+component
+\shape default
+ entities.
+\end_layout
+
+\begin_layout Quote
+
+\shape smallcaps
+component
+\shape default
+'s 
+\shape smallcaps
+type
+\shape default
+, 
+\shape smallcaps
+family
+\shape default
+ 
+\shape smallcaps
+type
+\shape default
+ and 
+\shape smallcaps
+id
+\shape default
+ are implemented by 
+\family typewriter
+ely::ComponentType
+\family default
+, 
+\family typewriter
+ely::ComponentFamilyType
+\family default
+ and 
+\family typewriter
+ely::ComponentId
+\family default
+ types respectively (currently all 
+\family typewriter
+typedef
+\family default
+s to 
+\family typewriter
+std::string
+\family default
+).
+\end_layout
+
+\begin_layout Quote
+The common 
+\shape italic
+protected
+\shape default
+ interface includes, among others, this member functions:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+reset()
+\family default
+ to set a 
+\shape smallcaps
+component
+\shape default
+ state's data members to some default values.
+ This member is pure virtual and must be implemented by derived concrete
+ classes to perform custom resets.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+initialize()
+\family default
+ to allow a 
+\shape smallcaps
+component
+\shape default
+ to be initialized.
+ This member is pure virtual and must be implemented by derived concrete
+ classes to perform custom initialization.
+ It is called by 
+\family typewriter
+ely::ComponentTemplate::makeComponent()
+\family default
+ implementation of the related 
+\shape smallcaps
+component template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-Template-Implementation"
+
+\end_inset
+
+.
+ 
+\end_layout
+
+\begin_layout Standard
+Moreover, other protected members functions let 
+\shape smallcaps
+component
+\shape default
+s to perform additional setup/cleanup when they are being added/removed
+ to/from an 
+\shape smallcaps
+object
+\shape default
+s and to/from the game scene (they are called by 
+\family typewriter
+createObject()
+\family default
+/
+\family typewriter
+ destroyObject()
+\family default
+ and 
+\family typewriter
+addComponentToObject()
+\family default
+/
+\family typewriter
+ removeComponentFromObject()
+\family default
+ member functions of 
+\family typewriter
+ely::ObjectTemplateManager
+\family default
+.
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Object-Template-Manager-Implementation"
+
+\end_inset
+
+, which carry on the actual additions/removals).
+ They are:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+addToObjectSetup()
+\family default
+/
+\family typewriter
+ removeFromObjectCleanup()
+\family default
+ and 
+\family typewriter
+addToSceneSetup()
+\family default
+/ 
+\family typewriter
+removeFromSceneCleanup()
+\family default
+ which perform the setup/cleanup common of all 
+\shape smallcaps
+component
+\shape default
+s.
+ These, in turn, call the additional member functions 
+\family typewriter
+onAddToObjectSetup()
+\family default
+/
+\family typewriter
+ onRemoveFromObjectCleanup()
+\family default
+ and 
+\family typewriter
+onAddToSceneSetup()
+\family default
+/
+\family typewriter
+ onRemoveFromSceneCleanup()
+\family default
+ respectively, which, being pure virtual, must be implemented by derived
+ concrete classes to implement the optional custom piece of setup/cleanup.
+\end_layout
+
+\begin_layout Standard
+The remaining protected member functions are used as common helpers: 
+\family typewriter
+setComponentId()
+\family default
+/
+\family typewriter
+ setOwnerObject()
+\family default
+ to set the 
+\shape smallcaps
+component ID
+\shape default
+ and a reference to its owner object respectively , 
+\family typewriter
+registerEventCallbacks()
+\family default
+/ 
+\family typewriter
+unregisterEventCallbacks()
+\family default
+ to register/unregister events' callbacks.
+\end_layout
+
+\begin_layout Quote
+The common 
+\shape italic
+public
+\shape default
+ interface includes:
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+componentType()
+\family default
+/
+\family typewriter
+ familyType()
+\family default
+/
+\family typewriter
+ getComponentId()
+\family default
+/
+\family typewriter
+ getOwnerObject()
+\family default
+ to get the 
+\shape smallcaps
+type,
+\shape default
+ 
+\shape smallcaps
+family type
+\shape default
+, 
+\shape smallcaps
+id
+\shape default
+ and reference to owner 
+\shape smallcaps
+object
+\shape default
+ of the 
+\shape smallcaps
+component
+\shape default
+ respectively
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+getEventType()
+\family default
+ to get the event type of a Panda3d event the 
+\shape smallcaps
+component
+\shape default
+ is supposed to respond to.
+ 
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+update()
+\family default
+ to possibly update the 
+\shape smallcaps
+component 
+\shape default
+state at each game tick (frame).
+ It is virtual, so can possibly be overridden by derived concrete classes
+ to perform specific update.
+ Some derived 
+\shape smallcaps
+component type
+\shape default
+s need not to update their state, so they use the base one that does nothing.
+\end_layout
+
+\begin_layout Quote
+See API Documentation 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "chap:API-Documentation"
+
+\end_inset
+
+ for details.
 \end_layout
 
 \begin_layout Section

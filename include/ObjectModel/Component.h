@@ -43,8 +43,7 @@ typedef std::string ComponentType;
  */
 typedef std::string ComponentFamilyType;
 /**
- * \brief Component instance identifier type (by default the name
- * of the NodePath Component).
+ * \brief Component instance identifier type.
  */
 typedef std::string ComponentId;
 
@@ -447,7 +446,7 @@ inline ReMutex& Component::getMutex()
 
 ///Template
 /**
- * \brief Abstract base class of Component templates used to create Components.
+ * \brief Abstract base class modeling templates used to create Components.
  */
 class ComponentTemplate: public TypedWritableReferenceCount
 {
@@ -486,17 +485,17 @@ public:
 	virtual ComponentFamilyType familyType() const = 0;
 
 	/**
-	 * \brief Sets the Component parameters to their default values
+	 * \brief Sets the Component parameters to their default values.
 	 *
-	 * For the Component this Template is designed to create,
+	 * For the Component this template is designed to create,
 	 * this function sets the parameters to their default values.
 	 */
 	virtual void setParametersDefaults() = 0;
 
 	/**
-	 * \brief Sets the Component parameters to custom values
+	 * \brief Sets the Component parameters to custom values.
 	 *
-	 * For the Component this Template is designed to create,
+	 * For the Component this template is designed to create,
 	 * this function sets the parameters to custom values.
 	 * These parameters overwrite (and/or are added to) the parameters
 	 * defaults set by setParametersDefaults.
@@ -505,21 +504,21 @@ public:
 	void setParameters(const ParameterTable& parameterTable);
 
 	/**
-	 * \brief Gets the parameter single value associated to the Component
+	 * \brief Gets the parameter single value associated to the Component.
 	 * @param paramName The name of the parameter.
 	 * @return The value of the parameter, empty string if none exists.
 	 */
 	std::string parameter(const std::string& paramName) const;
 
 	/**
-	 * \brief Gets the parameter multiple values associated to the Component
+	 * \brief Gets the parameter multiple values associated to the Component.
 	 * @param paramName The name of the parameter.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
 	std::list<std::string> parameterList(const std::string& paramName);
 
 	/**
-	 * \brief Gets (a copy of) the entire parameter table
+	 * \brief Gets (a copy of) the entire parameter table.
 	 * @return The parameter table.
 	 */
 	ParameterTable getParameterTable() const;

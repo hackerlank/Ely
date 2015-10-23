@@ -30,7 +30,7 @@
 namespace ely
 {
 /**
- * \brief Singleton Template manager that stores all the Component templates.
+ * \brief Singleton manager that handles all the ComponentTemplates.
  *
  * Thread-safe during utilization.
  */
@@ -60,42 +60,42 @@ public:
 	~ComponentTemplateManager();
 
 	/**
-	 * \brief Adds a Component Template for a given the Component type it can create.
+	 * \brief Adds a ComponentTemplate for a the Component type it can create.
 	 *
 	 * It will add the Component Template to the internal table and if a
 	 * Template for that Component type already existed it'll be replaced
 	 * by this new Template (and its ownership released by the manager).
 	 * @param componentTmpl The Component Template to add.
-	 * @return SMARTPTR(NULL) if there wasn't a Template for that Component, otherwise
+	 * @return NULL if there wasn't a Template for that Component, otherwise
 	 * the previous Template.
 	 */
 	SMARTPTR(ComponentTemplate)addComponentTemplate(
 			SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/**
-	 * \brief Removes the Component Template given the Component type it can create.
+	 * \brief Removes the ComponentTemplate given the Component type it can create.
 	 * @param componentType The Component type.
 	 * @return True if the Component Template existed, false otherwise.
 	 */
 	bool removeComponentTemplate(ComponentType componentType);
 
 	/**
-	 * \brief Gets the Component Template given the Component type it can create.
+	 * \brief Gets the ComponentTemplate given the Component type it can create.
 	 * @param componentType The Component type.
 	 * @return The Component Template.
 	 */
 	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentType) const;
 
 	/**
-	 * \brief Resets the Component Template, of the given Component type,
-	 * to its default parameters.
+	 * \brief Resets the parameters of the given Component type, to their default parameters.
 	 *
+	 * Component configuration parameters are handled by the corresponding ComponentTemplate.
 	 * @param componentType The Component type.
 	 */
 	void resetComponentTemplateParams(ComponentType componentType);
 
 	/**
-	 * \brief Resets all Component templates to their default parameters.
+	 * \brief Resets all ComponentTemplates to their default parameters.
 	 */
 	void resetComponentTemplatesParams();
 
