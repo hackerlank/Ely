@@ -148,7 +148,7 @@ ComponentType InstanceOfTemplate::componentType() const
 	return ComponentType(InstanceOf::get_class_type().get_name());
 }
 
-ComponentFamilyType InstanceOfTemplate::familyType() const
+ComponentFamilyType InstanceOfTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Scene");
 }

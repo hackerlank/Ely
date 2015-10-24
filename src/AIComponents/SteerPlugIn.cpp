@@ -792,7 +792,7 @@ ComponentType SteerPlugInTemplate::componentType() const
 	return ComponentType(SteerPlugIn::get_class_type().get_name());
 }
 
-ComponentFamilyType SteerPlugInTemplate::familyType() const
+ComponentFamilyType SteerPlugInTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("AI");
 }

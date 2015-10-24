@@ -521,7 +521,7 @@ public:
 	virtual ~VehicleTemplate();
 
 	virtual ComponentType componentType() const;
-	virtual ComponentFamilyType familyType() const;
+	virtual ComponentFamilyType componentFamilyType() const;
 
 	virtual void setParametersDefaults();
 

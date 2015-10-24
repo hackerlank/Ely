@@ -482,7 +482,7 @@ public:
 	 * \brief Gets the family type of the Component created.
 	 * @return The family type of the Component created.
 	 */
-	virtual ComponentFamilyType familyType() const = 0;
+	virtual ComponentFamilyType componentFamilyType() const = 0;
 
 	/**
 	 * \brief Sets the Component parameters to their default values.

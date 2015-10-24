@@ -62,7 +62,7 @@ ComponentType DefaultTemplate::componentType() const
 	return ComponentType(Default::get_class_type().get_name());
 }
 
-ComponentFamilyType DefaultTemplate::familyType() const
+ComponentFamilyType DefaultTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Common");
 }

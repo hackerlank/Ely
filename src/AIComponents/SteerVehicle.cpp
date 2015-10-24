@@ -668,7 +668,7 @@ ComponentType SteerVehicleTemplate::componentType() const
 	return ComponentType(SteerVehicle::get_class_type().get_name());
 }
 
-ComponentFamilyType SteerVehicleTemplate::familyType() const
+ComponentFamilyType SteerVehicleTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("AI");
 }

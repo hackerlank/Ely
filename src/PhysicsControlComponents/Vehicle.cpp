@@ -845,7 +845,7 @@ ComponentType VehicleTemplate::componentType() const
 	return ComponentType(Vehicle::get_class_type().get_name());
 }
 
-ComponentFamilyType VehicleTemplate::familyType() const
+ComponentFamilyType VehicleTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("PhysicsControl");
 }

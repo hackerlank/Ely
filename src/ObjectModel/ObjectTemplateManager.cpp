@@ -442,7 +442,7 @@ bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
 	//get the Component family type
 	ComponentFamilyType familyId =
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-					compType)->familyType();
+					compType)->componentFamilyType();
 	//return false if this Object is designed to have a Component of this family type
 	RETURN_ON_COND(object->objectTmpl()->getComponentTemplate(familyId),
 			false)

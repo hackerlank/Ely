@@ -379,7 +379,7 @@ ComponentType Sound3dTemplate::componentType() const
 	return ComponentType(Sound3d::get_class_type().get_name());
 }
 
-ComponentFamilyType Sound3dTemplate::familyType() const
+ComponentFamilyType Sound3dTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Audio");
 }

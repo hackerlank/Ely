@@ -513,7 +513,7 @@ ComponentType ModelTemplate::componentType() const
 	return ComponentType(Model::get_class_type().get_name());
 }
 
-ComponentFamilyType ModelTemplate::familyType() const
+ComponentFamilyType ModelTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Scene");
 }

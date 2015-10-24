@@ -608,7 +608,7 @@ ComponentType SoftBodyTemplate::componentType() const
 	return ComponentType(SoftBody::get_class_type().get_name());
 }
 
-ComponentFamilyType SoftBodyTemplate::familyType() const
+ComponentFamilyType SoftBodyTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Physics");
 }

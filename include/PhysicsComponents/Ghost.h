@@ -387,7 +387,7 @@ public:
 	virtual ~GhostTemplate();
 
 	virtual ComponentType componentType() const;
-	virtual ComponentFamilyType familyType() const;
+	virtual ComponentFamilyType componentFamilyType() const;
 
 	virtual void setParametersDefaults();
 

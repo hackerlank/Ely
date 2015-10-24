@@ -738,7 +738,7 @@ ComponentType GhostTemplate::componentType() const
 	return ComponentType(Ghost::get_class_type().get_name());
 }
 
-ComponentFamilyType GhostTemplate::familyType() const
+ComponentFamilyType GhostTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Physics");
 }

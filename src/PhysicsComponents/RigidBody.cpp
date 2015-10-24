@@ -584,7 +584,7 @@ ComponentType RigidBodyTemplate::componentType() const
 	return ComponentType(RigidBody::get_class_type().get_name());
 }
 
-ComponentFamilyType RigidBodyTemplate::familyType() const
+ComponentFamilyType RigidBodyTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Physics");
 }

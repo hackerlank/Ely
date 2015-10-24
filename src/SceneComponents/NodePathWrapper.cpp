@@ -121,7 +121,7 @@ ComponentType NodePathWrapperTemplate::componentType() const
 	return ComponentType(NodePathWrapper::get_class_type().get_name());
 }
 
-ComponentFamilyType NodePathWrapperTemplate::familyType() const
+ComponentFamilyType NodePathWrapperTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Scene");
 }

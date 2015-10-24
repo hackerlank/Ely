@@ -495,7 +495,7 @@ ComponentType CrowdAgentTemplate::componentType() const
 	return ComponentType(CrowdAgent::get_class_type().get_name());
 }
 
-ComponentFamilyType CrowdAgentTemplate::familyType() const
+ComponentFamilyType CrowdAgentTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("AI");
 }

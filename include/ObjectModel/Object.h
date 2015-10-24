@@ -732,7 +732,7 @@ struct familyTypeIsEqualTo
 	ComponentFamilyType mComponentFamilyType;
 	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
 	{
-		return componentTmpl->familyType() == mComponentFamilyType;
+		return componentTmpl->componentFamilyType() == mComponentFamilyType;
 	}
 };
 

@@ -47,7 +47,7 @@ Component::~Component()
 
 ComponentFamilyType Component::familyType() const
 {
-	return mTmpl->familyType();
+	return mTmpl->componentFamilyType();
 }
 
 ComponentType Component::componentType() const

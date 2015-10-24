@@ -163,7 +163,7 @@ ComponentType GameConfigTemplate::componentType() const
 	return ComponentType(GameConfig::get_class_type().get_name());
 }
 
-ComponentFamilyType GameConfigTemplate::familyType() const
+ComponentFamilyType GameConfigTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Common");
 }

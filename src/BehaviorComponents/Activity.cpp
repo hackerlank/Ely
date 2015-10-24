@@ -566,7 +566,7 @@ ComponentType ActivityTemplate::componentType() const
 	return ComponentType(Activity::get_class_type().get_name());
 }
 
-ComponentFamilyType ActivityTemplate::familyType() const
+ComponentFamilyType ActivityTemplate::componentFamilyType() const
 {
 	return ComponentFamilyType("Behavior");
 }
