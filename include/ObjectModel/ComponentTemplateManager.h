@@ -41,12 +41,12 @@ private:
 
 	/**
 	 * \brief Creates a Component given its type.
-	 * @param componentType The Component type.
+	 * @param compType The Component type.
 	 * @param freeComponent If this is a free Component or if it belongs
 	 * to an Object Template, default is false.
 	 * @return The just created Component, or NULL on failure (for any reason).
 	 */
-	SMARTPTR(Component) doCreateComponent(ComponentType componentType,
+	SMARTPTR(Component) doCreateComponent(ComponentType compType,
 			bool freeComponent = false);
 
 public:
@@ -74,25 +74,25 @@ public:
 
 	/**
 	 * \brief Removes the ComponentTemplate given the Component type it can create.
-	 * @param componentType The Component type.
+	 * @param compType The Component type.
 	 * @return True if the Component Template existed, false otherwise.
 	 */
-	bool removeComponentTemplate(ComponentType componentType);
+	bool removeComponentTemplate(ComponentType compType);
 
 	/**
 	 * \brief Gets the ComponentTemplate given the Component type it can create.
-	 * @param componentType The Component type.
+	 * @param compType The Component type.
 	 * @return The Component Template.
 	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType componentType) const;
+	SMARTPTR(ComponentTemplate) getComponentTemplate(ComponentType compType) const;
 
 	/**
 	 * \brief Resets the parameters of the given Component type, to their default parameters.
 	 *
 	 * Component configuration parameters are handled by the corresponding ComponentTemplate.
-	 * @param componentType The Component type.
+	 * @param compType The Component type.
 	 */
-	void resetComponentTemplateParams(ComponentType componentType);
+	void resetComponentTemplateParams(ComponentType compType);
 
 	/**
 	 * \brief Resets all ComponentTemplates to their default parameters.

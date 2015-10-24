@@ -345,7 +345,7 @@ void ObjectTemplateManager::destroyAllObjects()
 }
 
 bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
-		ComponentType componentType, const ParameterTable& componentParams)
+		ComponentType compType, const ParameterTable& componentParams)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -356,7 +356,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 
 	//get the ComponentTemplate
 	SMARTPTR(ComponentTemplate)componentTemplate =
-	ComponentTemplateManager::GetSingleton().getComponentTemplate(componentType);
+	ComponentTemplateManager::GetSingleton().getComponentTemplate(compType);
 	//we have to initialize parameters of this Component
 	//set Component' parameters to their default values
 	componentTemplate->setParametersDefaults();
@@ -368,7 +368,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	}
 	//create the new free Component
 	SMARTPTR(Component)newComp =
-	ComponentTemplateManager::GetSingleton().doCreateComponent(componentType, true);
+	ComponentTemplateManager::GetSingleton().doCreateComponent(compType, true);
 	RETURN_ON_COND(not newComp, false)
 
 	ComponentFamilyType familyId = newComp->familyType();
@@ -430,7 +430,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 }
 
 bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
-		ComponentType componentType)
+		ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -439,15 +439,16 @@ bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
 	SMARTPTR(Object)object = getCreatedObject(objectId);
 	RETURN_ON_COND(not object, false)
 
-	//return false if this Object is designed to have an Component of this type
-	RETURN_ON_COND(object->objectTmpl()->getComponentTemplate(componentType),
-			false)
-
-	//check if this Object has a another Component of the same family type
+	//get the Component family type
 	ComponentFamilyType familyId =
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-					componentType)->familyType();
+					compType)->familyType();
+	//return false if this Object is designed to have a Component of this family type
+	RETURN_ON_COND(object->objectTmpl()->getComponentTemplate(familyId),
+			false)
+
 	SMARTPTR(Component)oldComp = object->getComponent(familyId);
+	//return false if there's not such a Component
 	RETURN_ON_COND(not oldComp, false)
 
 	//remove actually the Component:

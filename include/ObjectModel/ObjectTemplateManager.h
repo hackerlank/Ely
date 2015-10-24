@@ -101,29 +101,30 @@ public:
 	 * the given Object identifier.
 	 *
 	 * \note you can add any Component of any given type, even if the ObjectTemplate
-	 * doesn't contain it.\n
+	 * doesn't contain it.
 	 * \note the new Component will replace a pre-existing Component of the same
 	 * family type, if any.
 	 * \note event types of this new Component need not to be the same as the
-	 * declared ones in ObjectTemplate, if any.
+	 * declared ones in ObjectTemplate, if any.\n
 	 * @param objectId The given Object identifier.
-	 * @param componentType The given Component type.
+	 * @param compType The given Component type.
 	 * @param componentParams Parameters used to initialize the Component.
 	 * @return True if successfully added, false otherwise.
 	 */
-	bool addComponentToObject(ObjectId objectId, ComponentType componentType,
+	bool addComponentToObject(ObjectId objectId, ComponentType compType,
 			const ParameterTable& componentParams = ParameterTable());
 
 	/**
 	 * \brief Removes a Component, if any, with the given type, from an existing
 	 * Object with the given identifier.
 	 *
-	 * \note the Component is removed only if the ObjectTemplate doesn't contain it.\n
+	 * \note the Component is removed only if the ObjectTemplate doesn't contain
+	 * one with the same family type.\n
 	 * @param objectId The given Object identifier.
-	 * @param componentType The given Component type.
+	 * @param compType The given Component type.
 	 * @return True if successfully removed, false otherwise.
 	 */
-	bool removeComponentFromObject(ObjectId objectId, ComponentType componentType);
+	bool removeComponentFromObject(ObjectId objectId, ComponentType compType);
 
 	/**
 	 * \brief ObjectTemplate and Object tables typedefs.

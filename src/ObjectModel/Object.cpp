@@ -42,44 +42,44 @@ Object::~Object()
 {
 }
 
-SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& familyType) const
+SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& compFamilyType) const
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	ComponentOrderedList::const_iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyType));
+	find_if(mComponents.begin(), mComponents.end(), IsFamily(compFamilyType));
 	RETURN_ON_COND(it == mComponents.end(), NULL)
 
 	return (*it).second;
 }
 
 bool Object::doAddComponent(SMARTPTR(Component)component,
-const ComponentFamilyType& familyType)
+const ComponentFamilyType& compFamilyType)
 {
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyType));
+	find_if(mComponents.begin(), mComponents.end(), IsFamily(compFamilyType));
 	RETURN_ON_COND(it != mComponents.end(), false)
 
 	//insert the new Component into the list at the back end
-	mComponents.push_back(FamilyTypeComponentPair(familyType, component));
+	mComponents.push_back(FamilyTypeComponentPair(compFamilyType, component));
 	//
 	return true;
 }
 
 bool Object::doRemoveComponent(SMARTPTR(Component)component,
-const ComponentFamilyType& familyType)
+const ComponentFamilyType& compFamilyType)
 {
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyType));
+	find_if(mComponents.begin(), mComponents.end(), IsFamily(compFamilyType));
 	RETURN_ON_COND((it == mComponents.end()) or (it->second != component), false)
 
 	//erase Component
@@ -303,14 +303,28 @@ void ObjectTemplate::addComponentTemplate(SMARTPTR(ComponentTemplate)componentTm
 	}
 
 SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
-		const ComponentType& componentType) const
+		const ComponentType& compType) const
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	ComponentTemplateList::const_iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
-			idIsEqualTo(componentType));
+			typeIsEqualTo(compType));
+	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
+
+	return *it;
+}
+
+SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
+		const ComponentFamilyType& compFamilyType) const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	ComponentTemplateList::const_iterator it;
+	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
+			familyTypeIsEqualTo(compFamilyType));
 	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
 
 	return *it;
@@ -401,7 +415,7 @@ std::list<std::string> ObjectTemplate::parameterList(
 }
 
 void ObjectTemplate::addComponentParameter(const std::string& parameterName,
-		const std::string& parameterValue, ComponentType componentType)
+		const std::string& parameterValue, ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -412,13 +426,13 @@ void ObjectTemplate::addComponentParameter(const std::string& parameterName,
 	std::vector<std::string>::const_iterator iterValue;
 	for (iterValue = values.begin(); iterValue != values.end(); ++iterValue)
 	{
-		mComponentParameterTables[componentType].insert(
+		mComponentParameterTables[compType].insert(
 				ParameterTable::value_type(parameterName, *iterValue));
 	}
 }
 
 bool ObjectTemplate::isComponentParameterValue(const std::string& name,
-		const std::string& value, ComponentType componentType)
+		const std::string& value, ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -426,7 +440,7 @@ bool ObjectTemplate::isComponentParameterValue(const std::string& name,
 	bool result;
 	//
 	std::pair<ParameterTableConstIter, ParameterTableConstIter> iterRange =
-			mComponentParameterTables[componentType].equal_range(name);
+			mComponentParameterTables[compType].equal_range(name);
 	if (iterRange.first != iterRange.second)
 	{
 		result = (iterRange.second
@@ -442,7 +456,7 @@ bool ObjectTemplate::isComponentParameterValue(const std::string& name,
 }
 
 std::list<std::string> ObjectTemplate::componentParameterValues(
-		const std::string& paramName, ComponentType componentType)
+		const std::string& paramName, ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -450,7 +464,7 @@ std::list<std::string> ObjectTemplate::componentParameterValues(
 	std::list<std::string> strList;
 	ParameterTableConstIter iter;
 	std::pair<ParameterTableConstIter, ParameterTableConstIter> iterRange;
-	iterRange = mComponentParameterTables[componentType].equal_range(paramName);
+	iterRange = mComponentParameterTables[compType].equal_range(paramName);
 	if (iterRange.first != iterRange.second)
 	{
 		for (iter = iterRange.first; iter != iterRange.second; ++iter)

@@ -72,55 +72,55 @@ SMARTPTR(ComponentTemplate) ComponentTemplateManager::addComponentTemplate(
 }
 
 bool ComponentTemplateManager::removeComponentTemplate(
-		ComponentType componentType)
+		ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	ComponentTemplateTable::iterator it = mComponentTemplates.find(componentType);
+	ComponentTemplateTable::iterator it = mComponentTemplates.find(compType);
 	RETURN_ON_COND(it == mComponentTemplates.end(), false)
 
 	PRINT_DEBUG(
-			"Removing component template for type '" << componentType << "'");
+			"Removing component template for type '" << compType << "'");
 	mComponentTemplates.erase(it);
 	return true;
 }
 
 SMARTPTR(ComponentTemplate) ComponentTemplateManager::getComponentTemplate(
-		ComponentType componentType) const
+		ComponentType compType) const
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	ComponentTemplateTable::const_iterator it = mComponentTemplates.find(
-			componentType);
+			compType);
 	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
 
 	return (*it).second;
 }
 
 SMARTPTR(Component) ComponentTemplateManager::doCreateComponent(
-		ComponentType componentType, bool freeComponent)
+		ComponentType compType, bool freeComponent)
 {
 	ComponentTemplateTable::iterator it = mComponentTemplates.find(
-			componentType);
+			compType);
 	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
 
 	//new unique id
-	ComponentId newCompId = ComponentId(componentType) + ComponentId(getId());
+	ComponentId newCompId = ComponentId(compType) + ComponentId(getId());
 	//create component
 	SMARTPTR(Component) newComp = (*it).second->makeComponent(newCompId);
 	newComp->setFreeFlag(freeComponent);
 	return newComp;
 }
 
-void ComponentTemplateManager::resetComponentTemplateParams(ComponentType componentType)
+void ComponentTemplateManager::resetComponentTemplateParams(ComponentType compType)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
 	ComponentTemplateTable::const_iterator iter = mComponentTemplates.find(
-			componentType);
+			compType);
 	if(iter != mComponentTemplates.end())
 	{
 		iter->second->setParametersDefaults();

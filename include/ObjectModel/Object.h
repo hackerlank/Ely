@@ -91,25 +91,24 @@ private:
 	/**
 	 * \brief Adds a Component to this Object.
 	 *
-	 * It will add the Component to the Object removing
-	 * the possibly existing one.\n
+	 * Component is added only if it's not there.\n
 	 * @param component The new Component to add.
-	 * @param familyType The Component family type.
+	 * @param compFamilyType The Component family type.
 	 * @return True if successfully removed, false otherwise.
 	 */
 	bool doAddComponent(SMARTPTR(Component) component,
-			const ComponentFamilyType& familyType);
+			const ComponentFamilyType& compFamilyType);
 
 	/**
 	 * \brief Removes a Component from this Object.
 	 *
-	 * It will remove the Component from the Object.\n
+	 * Component is removed only if it's there.\n
 	 * @param component The Component to remove.
-	 * @param familyType The Component family type.
+	 * @param compFamilyType The Component family type.
 	 * @return True if successfully removed, false otherwise.
 	 */
 	bool doRemoveComponent(SMARTPTR(Component) component,
-			const ComponentFamilyType& familyType);
+			const ComponentFamilyType& compFamilyType);
 
 	///List of all <family,Component>s pair stored by insertion order.
 	typedef std::pair<const ComponentFamilyType, SMARTPTR(Component)> FamilyTypeComponentPair;
@@ -179,11 +178,11 @@ public:
 
 	/**
 	 * \brief Gets the Component of a given family type.
-	 * @param familyType The family of the Component.
+	 * @param compFamilyType The family of the Component.
 	 * @return The Component, or NULL if no Component of that
 	 * family exists.
 	 */
-	SMARTPTR(Component) getComponent(const ComponentFamilyType& familyType) const;
+	SMARTPTR(Component) getComponent(const ComponentFamilyType& compFamilyType) const;
 
 	/**
 	 * \brief Returns the number of Components.
@@ -289,7 +288,7 @@ private:
 	{
 		ComponentFamilyType mFamilyType;
 	public:
-		IsFamily(const ComponentFamilyType& familyType):mFamilyType(familyType)
+		IsFamily(const ComponentFamilyType& compFamilyType):mFamilyType(compFamilyType)
 		{
 		}
 		~IsFamily()
@@ -563,16 +562,26 @@ public:
 	 */
 	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
 
-	/**
-	 * \brief Gets a ComponentTemplate corresponding to a given the Component type.
+	/** \name Get a ComponentTemplate contained into this ObjectTemplate
 	 *
 	 * This ObjectTemplate has an internal ordered (by addition)
 	 * list of references to ComponentTamplates, corresponding
 	 * to Components owned by Objects it creates.
-	 * @param componentType The Component type.
+	 */
+	///@{
+	/**
+	 * \brief Gets a ComponentTemplate corresponding to a Component type.
+	 * @param compType The Component type.
 	 * @return The Component template, NULL if it doesn't exist.
 	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType&componentType) const;
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType& compType) const;
+	/**
+	 * \brief Gets a ComponentTemplate corresponding to a Component family type.
+	 * @param componentFamilyType The Component family type.
+	 * @return The Component template, NULL if it doesn't exist.
+	 */
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentFamilyType& componentFamilyType) const;
+	///@}
 
 	/**
 	 * \brief Gets the parameter single value associated to the Object.
@@ -615,33 +624,33 @@ public:
 	 * list as returned by componentParameterValues().\n
 	 * @param parameterName The parameter name.
 	 * @param parameterValue The parameter value.
-	 * @param componentType The Component type the parameter is related to.
+	 * @param compType The Component type the parameter is related to.
 	 */
 	void addComponentParameter(const std::string& parameterName,
-			const std::string& parameterValue, ComponentType componentType);
+			const std::string& parameterValue, ComponentType compType);
 
 	/**
 	 * \brief Checks if a name/value pair is an allowed parameter/value
 	 * for a given Component type of this Object.
 	 * @param name The name to check.
 	 * @param value The value to check.
-	 * @param componentType The Component type.
+	 * @param compType The Component type.
 	 * @return True if the name/value pair match an allowed parameter/value
 	 * for a given Component, false otherwise.
 	 */
 	bool isComponentParameterValue(const std::string& name, const std::string& value,
-			ComponentType componentType);
+			ComponentType compType);
 
 	/**
 	 * \brief Gets all values of the common parameter associated to
 	 * the Component type of the Object.
 	 *
 	 * @param paramName The name of the parameter.
-	 * @param componentType The Component type.
+	 * @param compType The Component type.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
 	std::list<std::string> componentParameterValues(const std::string& paramName,
-			ComponentType componentType);
+			ComponentType compType);
 
 #ifdef ELY_THREAD
 	/**
@@ -701,16 +710,29 @@ private:
 	static TypeHandle _type_handle;
 };
 
-struct idIsEqualTo
+struct typeIsEqualTo
 {
-	idIsEqualTo(const ComponentType& componentType) :
-			mComponentType(componentType)
+	typeIsEqualTo(const ComponentType& compType) :
+			mComponentType(compType)
 	{
 	}
 	ComponentType mComponentType;
 	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
 	{
 		return componentTmpl->componentType() == mComponentType;
+	}
+};
+
+struct familyTypeIsEqualTo
+{
+	familyTypeIsEqualTo(const ComponentFamilyType& compFamilyType) :
+			mComponentFamilyType(compFamilyType)
+	{
+	}
+	ComponentFamilyType mComponentFamilyType;
+	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
+	{
+		return componentTmpl->familyType() == mComponentFamilyType;
 	}
 };
 
