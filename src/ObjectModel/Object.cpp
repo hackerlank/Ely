@@ -65,7 +65,7 @@ const ComponentFamilyType& familyType)
 	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyType));
 	RETURN_ON_COND(it != mComponents.end(), false)
 
-	//insert the new component into the list at the back end
+	//insert the new Component into the list at the back end
 	mComponents.push_back(FamilyTypeComponentPair(familyType, component));
 	//
 	return true;
@@ -82,7 +82,7 @@ const ComponentFamilyType& familyType)
 	find_if(mComponents.begin(), mComponents.end(), IsFamily(familyType));
 	RETURN_ON_COND((it == mComponents.end()) or (it->second != component), false)
 
-	//erase component
+	//erase Component
 	mComponents.erase(it);
 	//
 	return true;

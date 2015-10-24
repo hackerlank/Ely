@@ -2294,11 +2294,51 @@ name "sec:Object"
 \end_layout
 
 \begin_layout Standard
-Objects, , represented by the 
-\family typewriter
-ely::Object
-\family default
- type,
+A game is composed 
+\shape italic
+exclusively
+\shape default
+ of a set of 
+\shape smallcaps
+object
+\shape default
+s.
+ Therefore the game structure and its behavior are completely determined
+ by its 
+\shape smallcaps
+object
+\shape default
+s, their inter-relationships and interactions among them.
+ As stated previously, an 
+\shape smallcaps
+object
+\shape default
+, in turn, is composed 
+\shape italic
+exclusively
+\shape default
+ of 
+\shape smallcaps
+component
+\shape default
+s 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Il tipo di un oggetto è definibile, in prima istanza, come l'insieme dei
+ tipi dei suoi componenti.
+ al contrario, però, dei tipi dei componenti, il tipo di un oggetto non
+ è un concetto fisso, in quanto esso può variare durante il tempo di vita
+ dell'oggetto stesso, aggiungendo o eliminando componenti in modo dinamico.
+ Quello che non varia è, però, ciò che possiamo definire tipo base, e cioè
+ 
 \end_layout
 
 \begin_layout Standard
@@ -2323,31 +2363,6 @@ reference "sec:Object"
 
 .
  
-\end_layout
-
-\begin_layout Standard
-An 
-\shape smallcaps
-object
-\shape default
- is composed 
-\shape italic
-exclusively
-\shape default
- of 
-\shape smallcaps
-component
-\shape default
-s.
- Therefore the 
-\shape smallcaps
-object
-\shape default
- structure and its behavior are completely determined by its 
-\shape smallcaps
-component
-\shape default
-s, their inter-relationships and interactions among them.
 \end_layout
 
 \begin_layout Standard

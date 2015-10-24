@@ -43,7 +43,7 @@ ObjectTemplateManager::~ObjectTemplateManager()
 		ObjectId objId = iter->first;
 		destroyObject(objId);
 	}
-	//remove object templates
+	//remove Object templates
 	while (mObjectTemplates.size() > 0)
 	{
 		ObjectTemplateTable::iterator iter = mObjectTemplates.begin();
@@ -70,11 +70,11 @@ SMARTPTR(ObjectTemplate)ObjectTemplateManager::addObjectTemplate(
 	ObjectTemplateTable::iterator it = mObjectTemplates.find(objectTemplId);
 	if (it != mObjectTemplates.end())
 	{
-		// a previous component template for that component already existed
+		// a previous Component template for that Component already existed
 		previousObjTmpl = (*it).second;
 		mObjectTemplates.erase(it);
 	}
-	//insert the new component template
+	//insert the new Component template
 	mObjectTemplates[objectTemplId] = objectTmpl;
 	return previousObjTmpl;
 
@@ -114,7 +114,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	//check if it is an already created object
+	//check if it is an already created Object
 	SMARTPTR(Object) oldObject = getCreatedObject(objectId);
 	RETURN_ON_COND(oldObject, oldObject)
 
@@ -123,7 +123,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	RETURN_ON_COND(it1 == mObjectTemplates.end(), NULL)
 
 	SMARTPTR(ObjectTemplate) objectTmpl = (*it1).second;
-	//create the new object
+	//create the new Object
 	ObjectId newId;
 	if (objectId == ObjectId(""))
 	{
@@ -133,22 +133,22 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	{
 		newId = objectId;
 	}
-	//create the new object
+	//create the new Object
 	SMARTPTR(Object) newObj = new Object(newId, objectTmpl);
 	//set the owner if any
 	newObj->setOwner(owner);
-	//get the component template ordered list
+	//get the ComponentTemplate ordered list
 	ObjectTemplate::ComponentTemplateList compTmplList =
 	objectTmpl->getComponentTemplates();
-	//iterate in order over the ordered list and add components in the same order
+	//iterate in order over the ordered list and add Components in the same order
 	for (unsigned int idx2 = 0; idx2 < compTmplList.size(); ++idx2)
 	{
-		//use ComponentTemplateManager to create component
+		//use ComponentTemplateManager to create Component
 		ComponentType compType = compTmplList[idx2]->componentType();
-		//we have to initialize parameters of this component template
-		//set component' parameters to their default values
+		//we have to initialize parameters of this Component
+		//set Component' parameters to their default values
 		ComponentTemplateManager::GetSingleton().resetComponentTemplateParams(compType);
-		//set parameters for this component template...
+		//set parameters for this Component...
 		ParameterTableMap::const_iterator it3;
 		it3 = componentsParams.find(std::string(compType));
 		if (it3 != componentsParams.end())
@@ -156,32 +156,32 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 			//...if not empty
 			compTmplList[idx2]->setParameters(it3->second);
 		}
-		//create the component
+		//create the Component
 		SMARTPTR(Component) newComp =
 		ComponentTemplateManager::GetSingleton().doCreateComponent(
 				compType);
-		//add the component into the object
+		//return NULL on error
 		RETURN_ON_COND(not newComp, NULL)
 
-		//add the new component
+		//add the new Component into the Object
 		ComponentFamilyType familyId = newComp->familyType();
 		newObj->doAddComponent(newComp, familyId);
-		//set the component owner object
+		//set the Component owner Object
 		newComp->setOwnerObject(newObj);
-		//give a chance to component to setup itself when being added to object.
+		//give a chance to Component to setup itself when being added to Object.
 		newComp->addToObjectSetup();
 	}
-	//we have to initialize parameters of this object template
-	//initialize parameters' object template to defaults
+	//we have to initialize parameters of this Object template
+	//initialize parameters' Object template to defaults
 	objectTmpl->setParametersDefaults();
-	//set parameters for this object template...
+	//set parameters for this Object template...
 	if(not objectParams.empty())
 	{
 		//...if not empty
 		objectTmpl->setParameters(objectParams);
 	}
-	//store object and component templates' parameters into
-	//the created object and before it will be added to the
+	//store Object and Components' parameters into
+	//the created Object and before it will be added to the
 	//scene (and initialized).
 	bool storeParamsParam = (
 			objectTmpl->parameter(std::string("store_params")) ==
@@ -190,7 +190,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	{
 		newObj->doStoreParameters(objectParams, componentsParams);
 	}
-	//give a chance to object to setup itself when being added to scene.
+	//give a chance to Object to setup itself when being added to scene.
 	newObj->onAddToSceneSetup();
 	Object::ComponentOrderedList::const_iterator compIter;
 
@@ -232,7 +232,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	}
 #endif //ELY_THREAD
 
-	//Now the object is completely existent so insert
+	//Now the Object is completely existent so insert
 	//it in the table of created objects.
 	mCreatedObjects[newId] = newObj;
 	return newObj;
@@ -250,7 +250,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 	PRINT_DEBUG( "Removing object '" << std::string(objectId) << "'");
 	SMARTPTR(Object) object = objectIter->second;
 	Object::ComponentOrderedList::const_reverse_iterator compRIter;
-	//get a copy of object components because original will be modified
+	//get a copy of Object components because original will be modified
 	//and to avoid dropping of reference count
 	Object::ComponentOrderedList objectComponents = object->doGetComponents();
 	//on removal from scene components cleanup in reverse order of insertion
@@ -271,23 +271,23 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 	{
 #endif //ELY_THREAD
 
-		//lock (guard) the object mutex
+		//lock (guard) the Object mutex
 		HOLD_REMUTEX(object->getMutex())
 
-		//on removal from scene object cleanup
+		//on removal from scene Object cleanup
 		object->onRemoveFromSceneCleanup();
 		//remove components in reverse order of insertion
 		for (compRIter = objectComponents.rbegin();
 				compRIter != objectComponents.rend(); ++compRIter)
 		{
-			//on removal from object component cleanup
+			//on removal from Object Component cleanup
 			compRIter->second->removeFromObjectCleanup();
-			//set the old component owner to NULL
+			//set the old Component owner to NULL
 			compRIter->second->setOwnerObject(NULL);
-			//remove old component from object
+			//remove old Component from Object
 			object->doRemoveComponent(compRIter->second, compRIter->first);
 		}
-		//on object removal cleanup
+		//on Object removal cleanup
 		object->onRemoveObjectCleanup();
 
 #ifdef ELY_THREAD
@@ -309,7 +309,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 	}
 #endif //ELY_THREAD
 
-	//remove object from the table of created objects.
+	//remove Object from the table of created objects.
 	mCreatedObjects.erase(objectIter);
 	return true;
 }
@@ -326,7 +326,7 @@ void ObjectTemplateManager::destroyAllObjects()
 	{
 		if (not iter->second->getOwner())
 		{
-			//object has no owner: insert id
+			//Object has no owner: insert id
 			notOwnedObjectIds.push_back(iter->first);
 		}
 	}
@@ -350,58 +350,58 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	//check if it is effectively an already created object
+	//check if it is effectively an already created Object
 	SMARTPTR(Object)object = getCreatedObject(objectId);
 	RETURN_ON_COND(not object, false)
 
-	//get the component template
+	//get the ComponentTemplate
 	SMARTPTR(ComponentTemplate)componentTemplate =
 	ComponentTemplateManager::GetSingleton().getComponentTemplate(componentType);
-	//we have to initialize parameters of this component template
-	//set component' parameters to their default values
+	//we have to initialize parameters of this Component
+	//set Component' parameters to their default values
 	componentTemplate->setParametersDefaults();
-	//set parameters for this component template...
+	//set parameters for this Component...
 	if (not componentParams.empty())
 	{
 		//...if not empty
 		componentTemplate->setParameters(componentParams);
 	}
-	//create the new free component
+	//create the new free Component
 	SMARTPTR(Component)newComp =
 	ComponentTemplateManager::GetSingleton().doCreateComponent(componentType, true);
 	RETURN_ON_COND(not newComp, false)
 
 	ComponentFamilyType familyId = newComp->familyType();
-	//check if there are an old component
+	//check if there are an old Component
 	SMARTPTR(Component)oldComp = object->getComponent(familyId);
 	if (oldComp)
 	{
-		//on removal from scene old component cleanup
+		//on removal from scene old Component cleanup
 		oldComp->removeFromSceneCleanup();
 
-		//lock (guard) the old component mutex
+		//lock (guard) the old Component mutex
 		HOLD_REMUTEX(oldComp->getMutex())
 		{
-			//lock (guard) the new component mutex
+			//lock (guard) the new Component mutex
 			HOLD_REMUTEX(newComp->getMutex())
 			{
-				//lock (guard) the object mutex
+				//lock (guard) the Object mutex
 				HOLD_REMUTEX(object->getMutex())
-				//on removal from object old component cleanup
+				//on removal from Object old Component cleanup
 				oldComp->removeFromObjectCleanup();
-				//set the old component owner to NULL
+				//set the old Component owner to NULL
 				oldComp->setOwnerObject(NULL);
 
-				//remove old component from object
+				//remove old Component from Object
 				object->doRemoveComponent(oldComp, familyId);
 
-				//add the new component to the object
+				//add the new Component to the Object
 				object->doAddComponent(newComp, familyId);
-				//set the new component owner
+				//set the new Component owner
 				newComp->setOwnerObject(object);
-				//on addition to object new component setup
+				//on addition to Object new Component setup
 				newComp->addToObjectSetup();
-				//on addition to scene new component setup
+				//on addition to scene new Component setup
 				newComp->addToSceneSetup();
 			}
 		}
@@ -409,19 +409,19 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 		return true;
 	}
 	{
-		//lock (guard) the new component mutex
+		//lock (guard) the new Component mutex
 		HOLD_REMUTEX(newComp->getMutex())
 		{
-			//lock (guard) the object mutex
+			//lock (guard) the Object mutex
 			HOLD_REMUTEX(object->getMutex())
 
-			//add the new component to the object
+			//add the new Component to the Object
 			object->doAddComponent(newComp, familyId);
-			//set the new component owner
+			//set the new Component owner
 			newComp->setOwnerObject(object);
-			//on addition to object new component setup
+			//on addition to Object new Component setup
 			newComp->addToObjectSetup();
-			//on addition to scene new component setup
+			//on addition to scene new Component setup
 			newComp->addToSceneSetup();
 		}
 	}
@@ -435,37 +435,37 @@ bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	//check if it is effectively an already created object
+	//check if it is effectively an already created Object
 	SMARTPTR(Object)object = getCreatedObject(objectId);
 	RETURN_ON_COND(not object, false)
 
-	//return false if this object is designed to have an componentType component
+	//return false if this Object is designed to have an Component of this type
 	RETURN_ON_COND(object->objectTmpl()->getComponentTemplate(componentType),
 			false)
 
-	//check if this object has a componentType component
+	//check if this Object has a another Component of the same family type
 	ComponentFamilyType familyId =
 			ComponentTemplateManager::GetSingleton().getComponentTemplate(
 					componentType)->familyType();
 	SMARTPTR(Component)oldComp = object->getComponent(familyId);
 	RETURN_ON_COND(not oldComp, false)
 
-	//remove actually the component:
-	//on removal from scene old component cleanup
+	//remove actually the Component:
+	//on removal from scene old Component cleanup
 	oldComp->removeFromSceneCleanup();
 	{
-		//lock (guard) the old component mutex
+		//lock (guard) the old Component mutex
 		HOLD_REMUTEX(oldComp->getMutex())
 		{
-			//lock (guard) the object mutex
+			//lock (guard) the Object mutex
 			HOLD_REMUTEX(object->getMutex())
 
-			//on removal from object old component cleanup
+			//on removal from object old Component cleanup
 			oldComp->removeFromObjectCleanup();
-			//set the old component owner to NULL
+			//set the old Component owner to NULL
 			oldComp->setOwnerObject(NULL);
 
-			//remove old component from object
+			//remove old Component from Object
 			object->doRemoveComponent(oldComp, familyId);
 		}
 	}
