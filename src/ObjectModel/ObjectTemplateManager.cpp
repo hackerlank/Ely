@@ -164,8 +164,8 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		RETURN_ON_COND(not newComp, NULL)
 
 		//add the new Component into the Object
-		ComponentFamilyType familyId = newComp->familyType();
-		newObj->doAddComponent(newComp, familyId);
+		ComponentFamilyType compFamilyType = newComp->componentFamilyType();
+		newObj->doAddComponent(newComp, compFamilyType);
 		//set the Component owner Object
 		newComp->setOwnerObject(newObj);
 		//give a chance to Component to setup itself when being added to Object.
@@ -371,9 +371,9 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 	ComponentTemplateManager::GetSingleton().doCreateComponent(compType, true);
 	RETURN_ON_COND(not newComp, false)
 
-	ComponentFamilyType familyId = newComp->familyType();
+	ComponentFamilyType compFamilyType = newComp->componentFamilyType();
 	//check if there are an old Component
-	SMARTPTR(Component)oldComp = object->getComponent(familyId);
+	SMARTPTR(Component)oldComp = object->getComponent(compFamilyType);
 	if (oldComp)
 	{
 		//on removal from scene old Component cleanup
@@ -393,10 +393,10 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 				oldComp->setOwnerObject(NULL);
 
 				//remove old Component from Object
-				object->doRemoveComponent(oldComp, familyId);
+				object->doRemoveComponent(oldComp, compFamilyType);
 
 				//add the new Component to the Object
-				object->doAddComponent(newComp, familyId);
+				object->doAddComponent(newComp, compFamilyType);
 				//set the new Component owner
 				newComp->setOwnerObject(object);
 				//on addition to Object new Component setup
@@ -416,7 +416,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 			HOLD_REMUTEX(object->getMutex())
 
 			//add the new Component to the Object
-			object->doAddComponent(newComp, familyId);
+			object->doAddComponent(newComp, compFamilyType);
 			//set the new Component owner
 			newComp->setOwnerObject(object);
 			//on addition to Object new Component setup
@@ -439,17 +439,15 @@ bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
 	SMARTPTR(Object)object = getCreatedObject(objectId);
 	RETURN_ON_COND(not object, false)
 
-	//get the Component family type
-	ComponentFamilyType familyId =
-			ComponentTemplateManager::GetSingleton().getComponentTemplate(
-					compType)->componentFamilyType();
-	//return false if this Object is designed to have a Component of this family type
-	RETURN_ON_COND(object->objectTmpl()->getComponentTemplate(familyId),
-			false)
-
-	SMARTPTR(Component)oldComp = object->getComponent(familyId);
+	//get the Component by type
+	SMARTPTR(Component)oldComp = object->getComponent(compType);
 	//return false if there's not such a Component
 	RETURN_ON_COND(not oldComp, false)
+
+	//return false if this Object is designed to have a Component of this family type
+	ComponentFamilyType compFamilyType = oldComp->componentFamilyType();
+	RETURN_ON_COND(object->objectTmpl()->getComponentTemplate(compFamilyType),
+			false)
 
 	//remove actually the Component:
 	//on removal from scene old Component cleanup
@@ -467,7 +465,7 @@ bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
 			oldComp->setOwnerObject(NULL);
 
 			//remove old Component from Object
-			object->doRemoveComponent(oldComp, familyId);
+			object->doRemoveComponent(oldComp, compFamilyType);
 		}
 	}
 	//

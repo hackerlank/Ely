@@ -118,7 +118,7 @@ public:
 	 * \brief Removes a Component, if any, with the given type, from an existing
 	 * Object with the given identifier.
 	 *
-	 * \note the Component is removed only if the ObjectTemplate doesn't contain
+	 * \note the Component is not removed if the ObjectTemplate contains
 	 * one with the same family type.\n
 	 * @param objectId The given Object identifier.
 	 * @param compType The given Component type.

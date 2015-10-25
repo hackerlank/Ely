@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(ModelTemplateTEST)
 	DCAST(Model, mModelTmpl->makeComponent(mModelId));
 	BOOST_REQUIRE(mModel != NULL);
 	BOOST_CHECK(mModel->componentType() == ComponentId("Model"));
-	BOOST_CHECK(mModel->familyType() == ComponentFamilyType("Graphics"));
+	BOOST_CHECK(mModel->componentFamilyType() == ComponentFamilyType("Graphics"));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // Scene suite

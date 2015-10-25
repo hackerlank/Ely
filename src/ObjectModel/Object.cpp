@@ -48,7 +48,19 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& compFamilyTyp
 	HOLD_REMUTEX(mMutex)
 
 	ComponentOrderedList::const_iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsFamily(compFamilyType));
+	find_if(mComponents.begin(), mComponents.end(), IsCompFamilyType(compFamilyType));
+	RETURN_ON_COND(it == mComponents.end(), NULL)
+
+	return (*it).second;
+}
+
+SMARTPTR(Component)Object::getComponent(const ComponentType& compType) const
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	ComponentOrderedList::const_iterator it =
+	find_if(mComponents.begin(), mComponents.end(), IsCompType(compType));
 	RETURN_ON_COND(it == mComponents.end(), NULL)
 
 	return (*it).second;
@@ -62,7 +74,7 @@ const ComponentFamilyType& compFamilyType)
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsFamily(compFamilyType));
+	find_if(mComponents.begin(), mComponents.end(), IsCompFamilyType(compFamilyType));
 	RETURN_ON_COND(it != mComponents.end(), false)
 
 	//insert the new Component into the list at the back end
@@ -79,7 +91,7 @@ const ComponentFamilyType& compFamilyType)
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsFamily(compFamilyType));
+	find_if(mComponents.begin(), mComponents.end(), IsCompFamilyType(compFamilyType));
 	RETURN_ON_COND((it == mComponents.end()) or (it->second != component), false)
 
 	//erase Component

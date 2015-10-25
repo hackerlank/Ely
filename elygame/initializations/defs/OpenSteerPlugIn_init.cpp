@@ -1081,7 +1081,7 @@ AsyncTask::DoneStatus drawStaticGeometry(GenericAsyncTask* task, void * data)
 		ObjectTemplateManager::GetSingletonPtr()->getCreatedObject(ENVIRONMENTOBJECT);
 		RETURN_ON_COND(not terrainObj, AsyncTask::DS_done)
 
-		SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent("Scene"));
+		SMARTPTR(Terrain)terrain = DCAST(Terrain, terrainObj->getComponent(ComponentFamilyType("Scene")));
 		RETURN_ON_COND(not terrain, AsyncTask::DS_done)
 
 		///1: render-to-texture will be initialized (this is executed only once)

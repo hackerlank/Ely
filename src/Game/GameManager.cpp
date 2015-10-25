@@ -324,7 +324,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 				//add attribute for this component type of this object.
 				objTmplPtr->addComponentParameter(attributeTAG->Name(),
-						attributeTAG->Value(), compTypeTAG);
+						attributeTAG->Value(), static_cast<std::string>(compTypeTAG));
 			}
 			//... add all component templates
 			SMARTPTR(ComponentTemplate)compTmpl =

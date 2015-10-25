@@ -61,7 +61,7 @@ BOOST_AUTO_TEST_CASE(Sound3dTEST)
 	BOOST_REQUIRE(mSound3d != NULL);
 	BOOST_CHECK(mSound3d->getSound(1) == NULL);
 	BOOST_CHECK(mSound3d->componentType() == ComponentId("Sound3d"));
-	BOOST_CHECK(mSound3d->familyType() == ComponentFamilyType("Audio"));
+	BOOST_CHECK(mSound3d->componentFamilyType() == ComponentFamilyType("Audio"));
 	mSound3d->removeSound(audioFile);
 	BOOST_CHECK(mSound3d->getSound(0) == NULL);
 	//add mSound3d to an object so will be automatically destroyed

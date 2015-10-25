@@ -49,7 +49,7 @@ BOOST_AUTO_TEST_CASE(CharacterControllerTEST)
 	DCAST(CharacterController, mRigidTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mChar != NULL);
 	BOOST_CHECK(mChar->componentType() == ComponentId("CharacterController"));
-	BOOST_CHECK(mChar->familyType() == ComponentFamilyType("PhysicsControl"));
+	BOOST_CHECK(mChar->componentFamilyType() == ComponentFamilyType("PhysicsControl"));
 }
 
 BOOST_AUTO_TEST_SUITE_END() // PhysicsControl suite

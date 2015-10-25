@@ -28,6 +28,17 @@
 namespace ely
 {
 
+#ifdef ELY_DEBUG
+std::ostream& operator<<(std::ostream& os, const ComponentType& compType)
+{
+    return os << compType.mCompType;
+}
+std::ostream& operator<<(std::ostream& os, const ComponentFamilyType& compFamilyType)
+{
+    return os << compFamilyType.mCompFamilyType;
+}
+#endif
+
 Component::Component() :
 #ifdef ELY_THREAD
 		mDestroying(false),
@@ -45,7 +56,7 @@ Component::~Component()
 {
 }
 
-ComponentFamilyType Component::familyType() const
+ComponentFamilyType Component::componentFamilyType() const
 {
 	return mTmpl->componentFamilyType();
 }

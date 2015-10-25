@@ -55,7 +55,7 @@ BOOST_AUTO_TEST_CASE(RigidBodyTEST)
 	DCAST(RigidBody, mRigidTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mRigid != NULL);
 	BOOST_CHECK(mRigid->componentType() == ComponentId("RigidBody"));
-	BOOST_CHECK(mRigid->familyType() == ComponentFamilyType("Physics"));
+	BOOST_CHECK(mRigid->componentFamilyType() == ComponentFamilyType("Physics"));
 	//add mRigid to an object
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);

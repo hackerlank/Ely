@@ -45,7 +45,7 @@ BOOST_AUTO_TEST_CASE(DriverInitializeTEST)
 	DCAST(Driver, mControlTmpl->makeComponent(mCompId));
 	BOOST_REQUIRE(mControl != NULL);
 	BOOST_CHECK(mControl->componentType() == ComponentId("Driver"));
-	BOOST_CHECK(mControl->familyType() == ComponentFamilyType("Control"));
+	BOOST_CHECK(mControl->componentFamilyType() == ComponentFamilyType("Control"));
 	GeomNode* testGeom = new GeomNode("testGeom");
 	NodePath testNP(testGeom);
 	Object testObj("testObj",mObjectTmpl);

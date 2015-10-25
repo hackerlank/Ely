@@ -37,11 +37,87 @@ namespace ely
 /**
  * \brief Component type.
  */
-typedef std::string ComponentType;
+struct ComponentType
+{
+	ComponentType() :
+			mCompType("")
+	{
+	}
+	ComponentType(const std::string& compType) :
+			mCompType(compType)
+	{
+	}
+	~ComponentType()
+	{
+	}
+	void operator=(const ComponentType& compType)
+	{
+		mCompType = compType.mCompType;
+	}
+	operator std::string()
+	{
+		return mCompType;
+	}
+	bool operator ==(const ComponentType& compType) const
+	{
+		return mCompType == compType.mCompType;
+	}
+	bool operator <(const ComponentType& compType) const
+	{
+		return mCompType < compType.mCompType;
+	}
+private:
+	std::string mCompType;
+#ifdef ELY_DEBUG
+	friend std::ostream& operator<<(std::ostream& os,
+			const ComponentType& compType);
+#endif
+};
 /**
  * \brief Component family type.
  */
-typedef std::string ComponentFamilyType;
+struct ComponentFamilyType
+{
+	ComponentFamilyType() :
+			mCompFamilyType("")
+	{
+	}
+	ComponentFamilyType(const std::string& compFamilyType) :
+			mCompFamilyType(compFamilyType)
+	{
+	}
+	~ComponentFamilyType()
+	{
+	}
+	void operator=(const ComponentFamilyType& compFamilyType)
+	{
+		mCompFamilyType = compFamilyType.mCompFamilyType;
+	}
+	operator std::string()
+	{
+		return mCompFamilyType;
+	}
+	bool operator ==(const ComponentFamilyType& compFamilyType) const
+	{
+		return mCompFamilyType == compFamilyType.mCompFamilyType;
+	}
+	bool operator <(const ComponentFamilyType& compFamilyType) const
+	{
+		return mCompFamilyType < compFamilyType.mCompFamilyType;
+	}
+private:
+	std::string mCompFamilyType;
+#ifdef ELY_DEBUG
+	friend std::ostream& operator<<(std::ostream& os,
+			const ComponentFamilyType& compFamilyType);
+#endif
+};
+
+#ifdef ELY_DEBUG
+std::ostream& operator<<(std::ostream& os, const ComponentType& compType);
+std::ostream& operator<<(std::ostream& os, const ComponentFamilyType& compFamilyType);
+#endif
+
 /**
  * \brief Component instance identifier type.
  */
@@ -232,7 +308,7 @@ public:
 	 * \brief Gets the family type of this Component.
 	 * @return The family type of this Component.
 	 */
-	ComponentFamilyType familyType() const;
+	ComponentFamilyType componentFamilyType() const;
 
 	/**
 	 * \brief The result type a Component method can return to signal

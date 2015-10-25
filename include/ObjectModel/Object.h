@@ -177,12 +177,22 @@ public:
 	virtual ~Object();
 
 	/**
+	 * \name Get a Component.
+	 */
+	///@{
+	/**
 	 * \brief Gets the Component of a given family type.
-	 * @param compFamilyType The family of the Component.
-	 * @return The Component, or NULL if no Component of that
-	 * family exists.
+	 * @param compFamilyType The family type of the Component.
+	 * @return The Component if it exists, NULL otherwise.
 	 */
 	SMARTPTR(Component) getComponent(const ComponentFamilyType& compFamilyType) const;
+	/**
+	 * \brief Gets the Component of a given type.
+	 * @param compType The type of the Component.
+	 * @return The Component if it exists, NULL otherwise.
+	 */
+	SMARTPTR(Component) getComponent(const ComponentType& compType) const;
+	///@}
 
 	/**
 	 * \brief Returns the number of Components.
@@ -234,15 +244,21 @@ public:
 	typedef void (*PINITIALIZATION)(SMARTPTR(Object), const ParameterTable& paramTable,
 			PandaFramework* pandaFramework, WindowFramework* windowFramework);
 
-	/**
-	 * \brief Returns the Object and Components' parameters tables.
+	/** \name Get the parameters' tables.
 	 *
 	 * These tables are stored into their corresponding ObjectTemplate and
 	 * ComponentTemplates.\n
-	 * @return  The Object and Components' parameters tables.
 	 */
 	///@{
+	/**
+	 * \brief Returns the Object parameter table.
+	 * @return The Object parameter table.
+	 */
 	ParameterTable getStoredObjTmplParams() const;
+	/**
+	 * \brief Returns the Components' parameter tables.
+	 * @return The Components' parameter tables.
+	 */
 	ParameterTableMap getStoredCompTmplParams() const;
 	///@}
 
@@ -284,19 +300,34 @@ private:
 	SMARTPTR(Object) mOwner;
 	///@{
 	ComponentOrderedList mComponents;
-	class IsFamily
+	class IsCompFamilyType
 	{
 		ComponentFamilyType mFamilyType;
 	public:
-		IsFamily(const ComponentFamilyType& compFamilyType):mFamilyType(compFamilyType)
+		IsCompFamilyType(const ComponentFamilyType& compFamilyType):mFamilyType(compFamilyType)
 		{
 		}
-		~IsFamily()
+		~IsCompFamilyType()
 		{
 		}
 		bool operator()(const FamilyTypeComponentPair& familyComponentPair)
 		{
 			return (familyComponentPair.first == mFamilyType);
+		}
+	};
+	class IsCompType
+	{
+		ComponentType mCompType;
+	public:
+		IsCompType(const ComponentType& compType):mCompType(compType)
+		{
+		}
+		~IsCompType()
+		{
+		}
+		bool operator()(const FamilyTypeComponentPair& familyComponentPair)
+		{
+			return (familyComponentPair.second->componentType() == mCompType);
 		}
 	};
 	///@}

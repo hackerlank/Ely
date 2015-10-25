@@ -397,7 +397,7 @@ void SteerVehicle::onAddToSceneSetup()
 	//Add to SteerPlugIn update
 	if (steerPlugInObject)
 	{
-		SMARTPTR(Component)aiComp = steerPlugInObject->getComponent(familyType());
+		SMARTPTR(Component)aiComp = steerPlugInObject->getComponent(componentFamilyType());
 		//
 		if (aiComp and (aiComp->componentType() == ComponentType("SteerPlugIn")))
 		{

@@ -260,7 +260,7 @@ void CrowdAgent::onAddToSceneSetup()
 	//3: add to NavMesh update
 	if(navMeshObject)
 	{
-		SMARTPTR(Component) aiComp = navMeshObject->getComponent(familyType());
+		SMARTPTR(Component) aiComp = navMeshObject->getComponent(componentFamilyType());
 		//
 		if(aiComp and (aiComp->componentType() == ComponentType("NavMesh")))
 		{
