@@ -2332,16 +2332,158 @@ reference "sec:Component"
 \end_layout
 
 \begin_layout Standard
-Il tipo di un oggetto è definibile, in prima istanza, come l'insieme dei
- tipi dei suoi componenti.
- al contrario, però, dei tipi dei componenti, il tipo di un oggetto non
- è un concetto fisso, in quanto esso può variare durante il tempo di vita
- dell'oggetto stesso, aggiungendo o eliminando componenti in modo dinamico.
- Quello che non varia è, però, ciò che possiamo definire tipo base, e cioè
+
+\shape smallcaps
+object
+\shape default
+s are dynamic entities: 
+\shape smallcaps
+component
+\shape default
+s can be added/removed to/from them, during their life time.
+ But, while additions can be performed quite freely, removals undergo to
+ some limitations.
+ This stems from the fact that an 
+\shape smallcaps
+object
+\shape default
+ is defined (and generated) from an 
+\shape smallcaps
+object template
+\shape default
  
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template"
+
+\end_inset
+
+, which establishes the 
+\shape smallcaps
+component
+\shape default
+s that need to be present in every 
+\shape smallcaps
+object
+\shape default
+ it can create.
+ These 
+\shape smallcaps
+component
+\shape default
+s, in turn, identify the minimal set of 
+\shape smallcaps
+family type
+\shape default
+s that must be present in the 
+\shape smallcaps
+object
+\shape default
+.
+ So the 
+\shape italic
+base
+\shape default
+ 
+\shape italic
+type
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object ! base type
 \end_layout
 
-\begin_layout Standard
+\end_inset
+
+ of an 
+\shape smallcaps
+object
+\shape default
+ is defined as the set of 
+\shape smallcaps
+family type
+\shape default
+s identified (implicitly) by the 
+\shape smallcaps
+object template
+\shape default
+.
+ As a consequence of all this, we can, finally, state that: 
+\end_layout
+
+\begin_layout Itemize
+to an 
+\shape smallcaps
+object
+\shape default
+, following its creation, can be added 
+\shape smallcaps
+component
+\shape default
+s of any 
+\shape smallcaps
+type
+\shape default
+ and 
+\shape smallcaps
+family type
+\shape default
+.
+ If a 
+\shape smallcaps
+component
+\shape default
+ of the same 
+\shape smallcaps
+family type
+\shape default
+ is already present in the 
+\shape smallcaps
+object
+\shape default
+, it will be replaced by this new one;
+\end_layout
+
+\begin_layout Itemize
+from an 
+\shape smallcaps
+object
+\shape default
+, can be removed only those 
+\shape smallcaps
+component
+\shape default
+s which 
+\shape italic
+are
+\shape default
+ 
+\shape italic
+not
+\shape default
+ of a 
+\shape smallcaps
+family type
+\shape default
+ which belongs to the
+\shape smallcaps
+ object
+\shape default
+ 
+\shape italic
+base
+\shape default
+ 
+\shape italic
+type
+\shape default
+.
+\end_layout
+
+\begin_layout Itemize
 ----------------------------------------------------------
 \end_layout
 

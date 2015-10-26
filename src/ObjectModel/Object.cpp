@@ -48,7 +48,7 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& compFamilyTyp
 	HOLD_REMUTEX(mMutex)
 
 	ComponentOrderedList::const_iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsCompFamilyType(compFamilyType));
+	find_if(mComponents.begin(), mComponents.end(), componentHasFamilyType(compFamilyType));
 	RETURN_ON_COND(it == mComponents.end(), NULL)
 
 	return (*it).second;
@@ -60,7 +60,7 @@ SMARTPTR(Component)Object::getComponent(const ComponentType& compType) const
 	HOLD_REMUTEX(mMutex)
 
 	ComponentOrderedList::const_iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsCompType(compType));
+	find_if(mComponents.begin(), mComponents.end(), componentHasType(compType));
 	RETURN_ON_COND(it == mComponents.end(), NULL)
 
 	return (*it).second;
@@ -74,7 +74,7 @@ const ComponentFamilyType& compFamilyType)
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsCompFamilyType(compFamilyType));
+	find_if(mComponents.begin(), mComponents.end(), componentHasFamilyType(compFamilyType));
 	RETURN_ON_COND(it != mComponents.end(), false)
 
 	//insert the new Component into the list at the back end
@@ -91,7 +91,7 @@ const ComponentFamilyType& compFamilyType)
 		throw GameException("Object::addComponent: NULL new Component");
 	}
 	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), IsCompFamilyType(compFamilyType));
+	find_if(mComponents.begin(), mComponents.end(), componentHasFamilyType(compFamilyType));
 	RETURN_ON_COND((it == mComponents.end()) or (it->second != component), false)
 
 	//erase Component
@@ -322,7 +322,7 @@ SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
 
 	ComponentTemplateList::const_iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
-			typeIsEqualTo(compType));
+			componentHasType(compType));
 	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
 
 	return *it;
@@ -336,7 +336,7 @@ SMARTPTR(ComponentTemplate)ObjectTemplate::getComponentTemplate(
 
 	ComponentTemplateList::const_iterator it;
 	it = find_if(mComponentTemplates.begin(), mComponentTemplates.end(),
-			familyTypeIsEqualTo(compFamilyType));
+			componentHasFamilyType(compFamilyType));
 	RETURN_ON_COND(it == mComponentTemplates.end(), NULL)
 
 	return *it;

@@ -300,34 +300,28 @@ private:
 	SMARTPTR(Object) mOwner;
 	///@{
 	ComponentOrderedList mComponents;
-	class IsCompFamilyType
-	{
-		ComponentFamilyType mFamilyType;
-	public:
-		IsCompFamilyType(const ComponentFamilyType& compFamilyType):mFamilyType(compFamilyType)
-		{
-		}
-		~IsCompFamilyType()
-		{
-		}
-		bool operator()(const FamilyTypeComponentPair& familyComponentPair)
-		{
-			return (familyComponentPair.first == mFamilyType);
-		}
-	};
-	class IsCompType
+	struct componentHasType
 	{
 		ComponentType mCompType;
 	public:
-		IsCompType(const ComponentType& compType):mCompType(compType)
-		{
-		}
-		~IsCompType()
+		componentHasType(const ComponentType& compType):mCompType(compType)
 		{
 		}
 		bool operator()(const FamilyTypeComponentPair& familyComponentPair)
 		{
 			return (familyComponentPair.second->componentType() == mCompType);
+		}
+	};
+	struct componentHasFamilyType
+	{
+		ComponentFamilyType mFamilyType;
+	public:
+		componentHasFamilyType(const ComponentFamilyType& compFamilyType):mFamilyType(compFamilyType)
+		{
+		}
+		bool operator()(const FamilyTypeComponentPair& familyComponentPair)
+		{
+			return (familyComponentPair.first == mFamilyType);
 		}
 	};
 	///@}
@@ -710,6 +704,33 @@ private:
 	///Component of a given type, belonging to any Object of a given type.
 	std::map<ComponentType, ParameterTable> mComponentParameterTables;
 
+	///@{
+	struct componentHasType
+	{
+		componentHasType(const ComponentType& compType) :
+				mComponentType(compType)
+		{
+		}
+		ComponentType mComponentType;
+		bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
+		{
+			return componentTmpl->componentType() == mComponentType;
+		}
+	};
+	struct componentHasFamilyType
+	{
+		componentHasFamilyType(const ComponentFamilyType& compFamilyType) :
+				mComponentFamilyType(compFamilyType)
+		{
+		}
+		ComponentFamilyType mComponentFamilyType;
+		bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
+		{
+			return componentTmpl->componentFamilyType() == mComponentFamilyType;
+		}
+	};
+	///@}
+
 #ifdef ELY_THREAD
 	///The mutex associated with this ObjectTemplate.
 	ReMutex mMutex;
@@ -739,32 +760,6 @@ public:
 
 private:
 	static TypeHandle _type_handle;
-};
-
-struct typeIsEqualTo
-{
-	typeIsEqualTo(const ComponentType& compType) :
-			mComponentType(compType)
-	{
-	}
-	ComponentType mComponentType;
-	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
-	{
-		return componentTmpl->componentType() == mComponentType;
-	}
-};
-
-struct familyTypeIsEqualTo
-{
-	familyTypeIsEqualTo(const ComponentFamilyType& compFamilyType) :
-			mComponentFamilyType(compFamilyType)
-	{
-	}
-	ComponentFamilyType mComponentFamilyType;
-	bool operator()(const SMARTPTR(ComponentTemplate)componentTmpl)
-	{
-		return componentTmpl->componentFamilyType() == mComponentFamilyType;
-	}
 };
 
 ///inline definitions
