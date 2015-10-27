@@ -163,9 +163,12 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 		//return NULL on error
 		RETURN_ON_COND(not newComp, NULL)
 
-		//add the new Component into the Object
-		ComponentFamilyType compFamilyType = newComp->componentFamilyType();
-		newObj->doAddComponent(newComp, compFamilyType);
+		//add the new Component into the Object if there
+		//isn't another one with the same family type
+		if (not newObj->doAddComponent(newComp))
+		{
+			continue;
+		}
 		//set the Component owner Object
 		newComp->setOwnerObject(newObj);
 		//give a chance to Component to setup itself when being added to Object.
@@ -192,7 +195,7 @@ SMARTPTR(Object)ObjectTemplateManager::createObject(ObjectType objectType,
 	}
 	//give a chance to Object to setup itself when being added to scene.
 	newObj->onAddToSceneSetup();
-	Object::ComponentOrderedList::const_iterator compIter;
+	Object::FamilyTypeComponentList::const_iterator compIter;
 
 #ifdef ELY_THREAD
 	//Lock all components during this code execution.
@@ -249,10 +252,10 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 
 	PRINT_DEBUG( "Removing object '" << std::string(objectId) << "'");
 	SMARTPTR(Object) object = objectIter->second;
-	Object::ComponentOrderedList::const_reverse_iterator compRIter;
+	Object::FamilyTypeComponentList::const_reverse_iterator compRIter;
 	//get a copy of Object components because original will be modified
 	//and to avoid dropping of reference count
-	Object::ComponentOrderedList objectComponents = object->doGetComponents();
+	Object::FamilyTypeComponentList objectComponents = object->doGetComponents();
 	//on removal from scene components cleanup in reverse order of insertion
 	for (compRIter = objectComponents.rbegin();
 			compRIter != objectComponents.rend(); ++compRIter)
@@ -285,7 +288,7 @@ bool ObjectTemplateManager::destroyObject(const ObjectId& objectId)
 			//set the old Component owner to NULL
 			compRIter->second->setOwnerObject(NULL);
 			//remove old Component from Object
-			object->doRemoveComponent(compRIter->second, compRIter->first);
+			object->doRemoveComponent(compRIter->second);
 		}
 		//on Object removal cleanup
 		object->onRemoveObjectCleanup();
@@ -393,10 +396,10 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 				oldComp->setOwnerObject(NULL);
 
 				//remove old Component from Object
-				object->doRemoveComponent(oldComp, compFamilyType);
+				object->doRemoveComponent(oldComp);
 
 				//add the new Component to the Object
-				object->doAddComponent(newComp, compFamilyType);
+				object->doAddComponent(newComp);
 				//set the new Component owner
 				newComp->setOwnerObject(object);
 				//on addition to Object new Component setup
@@ -416,7 +419,7 @@ bool ObjectTemplateManager::addComponentToObject(ObjectId objectId,
 			HOLD_REMUTEX(object->getMutex())
 
 			//add the new Component to the Object
-			object->doAddComponent(newComp, compFamilyType);
+			object->doAddComponent(newComp);
 			//set the new Component owner
 			newComp->setOwnerObject(object);
 			//on addition to Object new Component setup
@@ -465,7 +468,7 @@ bool ObjectTemplateManager::removeComponentFromObject(ObjectId objectId,
 			oldComp->setOwnerObject(NULL);
 
 			//remove old Component from Object
-			object->doRemoveComponent(oldComp, compFamilyType);
+			object->doRemoveComponent(oldComp);
 		}
 	}
 	//

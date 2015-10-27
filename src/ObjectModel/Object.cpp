@@ -47,7 +47,7 @@ SMARTPTR(Component)Object::getComponent(const ComponentFamilyType& compFamilyTyp
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	ComponentOrderedList::const_iterator it =
+	FamilyTypeComponentList::const_iterator it =
 	find_if(mComponents.begin(), mComponents.end(), componentHasFamilyType(compFamilyType));
 	RETURN_ON_COND(it == mComponents.end(), NULL)
 
@@ -59,21 +59,21 @@ SMARTPTR(Component)Object::getComponent(const ComponentType& compType) const
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
-	ComponentOrderedList::const_iterator it =
+	FamilyTypeComponentList::const_iterator it =
 	find_if(mComponents.begin(), mComponents.end(), componentHasType(compType));
 	RETURN_ON_COND(it == mComponents.end(), NULL)
 
 	return (*it).second;
 }
 
-bool Object::doAddComponent(SMARTPTR(Component)component,
-const ComponentFamilyType& compFamilyType)
+bool Object::doAddComponent(SMARTPTR(Component)component)
 {
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
-	ComponentOrderedList::iterator it =
+	ComponentFamilyType compFamilyType = component->componentFamilyType();
+	FamilyTypeComponentList::iterator it =
 	find_if(mComponents.begin(), mComponents.end(), componentHasFamilyType(compFamilyType));
 	RETURN_ON_COND(it != mComponents.end(), false)
 
@@ -83,16 +83,16 @@ const ComponentFamilyType& compFamilyType)
 	return true;
 }
 
-bool Object::doRemoveComponent(SMARTPTR(Component)component,
-const ComponentFamilyType& compFamilyType)
+bool Object::doRemoveComponent(SMARTPTR(Component)component)
 {
 	if (not component)
 	{
 		throw GameException("Object::addComponent: NULL new Component");
 	}
-	ComponentOrderedList::iterator it =
-	find_if(mComponents.begin(), mComponents.end(), componentHasFamilyType(compFamilyType));
-	RETURN_ON_COND((it == mComponents.end()) or (it->second != component), false)
+	ComponentType compType = component->componentType();
+	FamilyTypeComponentList::iterator it =
+	find_if(mComponents.begin(), mComponents.end(), componentHasType(compType));
+	RETURN_ON_COND((it == mComponents.end()) or (component != (*it).second), false)
 
 	//erase Component
 	mComponents.erase(it);

@@ -2507,11 +2507,11 @@ object
 \end_layout
 
 \begin_layout Standard
-Moreover there is to say that, during both creation and life time, 
+Moreover, 
 \shape smallcaps
 component
 \shape default
-s may have a priority of adding the 
+s may have a priority in addition to the 
 \shape smallcaps
 object
 \shape default
@@ -2527,17 +2527,26 @@ component
 \shape smallcaps
 component
 \shape default
-(s) of another 
+(s) of other 
 \shape smallcaps
 type
 \shape default
-, for its correct operation (and consequently for the 
+(s) for its correct addition, initialization and operation.
+ Therefore, the indiscriminate additions of components, especially when
+ done dynamically, can lead to problems, if not properly handled.
+ In general, if you add a 
+\shape smallcaps
+component
+\shape default
+ that would replace an existing one inside the 
 \shape smallcaps
 object
 \shape default
-'s one).
- Therefore, the indiscriminate additions of components, especially if done
- dynamically, can lead to problems, if not properly weighted.
+, you should re-add all other 
+\shape smallcaps
+component
+\shape default
+s which depend on it.
 \end_layout
 
 \begin_layout Standard

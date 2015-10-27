@@ -91,34 +91,31 @@ private:
 	/**
 	 * \brief Adds a Component to this Object.
 	 *
-	 * Component is added only if it's not there.\n
+	 * Component is added only there isn't one with
+	 * its family type.\n
 	 * @param component The new Component to add.
-	 * @param compFamilyType The Component family type.
 	 * @return True if successfully removed, false otherwise.
 	 */
-	bool doAddComponent(SMARTPTR(Component) component,
-			const ComponentFamilyType& compFamilyType);
+	bool doAddComponent(SMARTPTR(Component) component);
 
 	/**
 	 * \brief Removes a Component from this Object.
 	 *
 	 * Component is removed only if it's there.\n
 	 * @param component The Component to remove.
-	 * @param compFamilyType The Component family type.
 	 * @return True if successfully removed, false otherwise.
 	 */
-	bool doRemoveComponent(SMARTPTR(Component) component,
-			const ComponentFamilyType& compFamilyType);
+	bool doRemoveComponent(SMARTPTR(Component) component);
 
 	///List of all <family,Component>s pair stored by insertion order.
 	typedef std::pair<const ComponentFamilyType, SMARTPTR(Component)> FamilyTypeComponentPair;
-	typedef std::list<FamilyTypeComponentPair> ComponentOrderedList;
+	typedef std::list<FamilyTypeComponentPair> FamilyTypeComponentList;
 	/**
 	 * \brief Gets a reference to the components list.
 	 *
 	 * @return A reference to the components list.
 	 */
-	ComponentOrderedList& doGetComponents();
+	FamilyTypeComponentList& doGetComponents();
 
 	/**
 	 * \brief On remove Object cleanup.
@@ -299,7 +296,7 @@ private:
 	///The owner of this Object (responsible for its lifetime).
 	SMARTPTR(Object) mOwner;
 	///@{
-	ComponentOrderedList mComponents;
+	FamilyTypeComponentList mComponents;
 	struct componentHasType
 	{
 		ComponentType mCompType;
@@ -411,7 +408,7 @@ inline Object::operator NodePath() const
 	return mNodePath;
 }
 
-inline Object::ComponentOrderedList& Object::doGetComponents()
+inline Object::FamilyTypeComponentList& Object::doGetComponents()
 {
 	return mComponents;
 }
@@ -581,7 +578,7 @@ public:
 	 * \brief Adds a ComponentTemplate.
 	 *
 	 * This ObjectTemplate has an internal ordered (by addition)
-	 * list of references to ComponentTamplates, corresponding
+	 * list of references to ComponentTemplates, corresponding
 	 * to Components owned by Objects it creates.
 	 * @param componentTmpl The ComponentTemplate.
 	 */
