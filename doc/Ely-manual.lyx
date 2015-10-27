@@ -1140,15 +1140,7 @@ ely::ComponentFamilyType
 \family typewriter
 ely::ComponentId
 \family default
- types respectively (currently all 
-\family typewriter
-typedef
-\family default
-s to 
-\family typewriter
-std::string
-\family default
-).
+ types respectively.
 \end_layout
 
 \begin_layout Quote
@@ -2332,22 +2324,11 @@ reference "sec:Component"
 \end_layout
 
 \begin_layout Standard
-
+An 
 \shape smallcaps
 object
 \shape default
-s are dynamic entities: 
-\shape smallcaps
-component
-\shape default
-s can be added/removed to/from them, during their life time.
- But, while additions can be performed quite freely, removals undergo to
- some limitations.
- This stems from the fact that an 
-\shape smallcaps
-object
-\shape default
- is defined (and generated) from an 
+ is defined from an 
 \shape smallcaps
 object template
 \shape default
@@ -2366,23 +2347,27 @@ s that need to be present in every
 \shape smallcaps
 object
 \shape default
- it can create.
- These 
+, when it is created.
+ In turn, 
+\shape smallcaps
+type
+\shape default
+s of these 
 \shape smallcaps
 component
 \shape default
-s, in turn, identify the minimal set of 
+s, implicitly, identify the set of mandatory 
 \shape smallcaps
 family type
 \shape default
-s that must be present in the 
+s present in the 
 \shape smallcaps
 object
 \shape default
 .
- So the 
+ Therefore, we define the
 \shape italic
-base
+ base
 \shape default
  
 \shape italic
@@ -2402,7 +2387,7 @@ object ! base type
 \shape smallcaps
 object
 \shape default
- is defined as the set of 
+ as the set of 
 \shape smallcaps
 family type
 \shape default
@@ -2411,76 +2396,152 @@ s identified (implicitly) by the
 object template
 \shape default
 .
- As a consequence of all this, we can, finally, state that: 
-\end_layout
-
-\begin_layout Itemize
-to an 
-\shape smallcaps
-object
-\shape default
-, following its creation, can be added 
-\shape smallcaps
-component
-\shape default
-s of any 
-\shape smallcaps
-type
-\shape default
- and 
-\shape smallcaps
-family type
-\shape default
-.
- If a 
-\shape smallcaps
-component
-\shape default
- of the same 
-\shape smallcaps
-family type
-\shape default
- is already present in the 
-\shape smallcaps
-object
-\shape default
-, it will be replaced by this new one;
-\end_layout
-
-\begin_layout Itemize
-from an 
-\shape smallcaps
-object
-\shape default
-, can be removed only those 
-\shape smallcaps
-component
-\shape default
-s which 
-\shape italic
-are
-\shape default
  
-\shape italic
-not
-\shape default
- of a 
-\shape smallcaps
-family type
-\shape default
- which belongs to the
+\end_layout
+
+\begin_layout Standard
+However,
 \shape smallcaps
  object
 \shape default
- 
+s are dynamic entities: 
+\shape smallcaps
+component
+\shape default
+s can be added/removed to/from them, during their life time.
+ Consequently, we define the
 \shape italic
-base
+ dynamic
 \shape default
  
 \shape italic
 type
 \shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object ! dynamic type
+\end_layout
+
+\end_inset
+
+ of an 
+\shape smallcaps
+object
+\shape default
+ as the set of 
+\shape smallcaps
+family type
+\shape default
+s which resides, at any moment, into the 
+\shape smallcaps
+object
+\shape default
 .
+\end_layout
+
+\begin_layout Standard
+Additions of 
+\shape smallcaps
+component
+\shape default
+s to the 
+\shape smallcaps
+object
+\shape default
+, are always permitted.
+ However, when you add a 
+\shape smallcaps
+component
+\shape default
+ having the same 
+\shape smallcaps
+family type
+\shape default
+ of one already present into the 
+\shape smallcaps
+object
+\shape default
+, the effect is to replace the old 
+\shape smallcaps
+component
+\shape default
+ with the new one, and this is a consequence of the fact that an 
+\shape smallcaps
+object
+\shape default
+ cannot contain more than one 
+\shape smallcaps
+component
+\shape default
+ with the the same 
+\shape smallcaps
+family type
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component"
+
+\end_inset
+
+.
+\end_layout
+
+\begin_layout Standard
+Conversely, removals of 
+\shape smallcaps
+component
+\shape default
+s have the following restriction: deletion of a component whose 
+\shape smallcaps
+family type
+\shape default
+ belongs to the base type of the 
+\shape smallcaps
+object
+\shape default
+, is not allowed.
+\end_layout
+
+\begin_layout Standard
+Moreover there is to say that, during both creation and life time, 
+\shape smallcaps
+component
+\shape default
+s may have a priority of adding the 
+\shape smallcaps
+object
+\shape default
+, that is a particular 
+\shape smallcaps
+type
+\shape default
+ of 
+\shape smallcaps
+component
+\shape default
+ may require the presence of one (or more) 
+\shape smallcaps
+component
+\shape default
+(s) of another 
+\shape smallcaps
+type
+\shape default
+, for its correct operation (and consequently for the 
+\shape smallcaps
+object
+\shape default
+'s one).
+ Therefore, the indiscriminate additions of components, especially if done
+ dynamically, can lead to problems, if not properly weighted.
+\end_layout
+
+\begin_layout Standard
+
 \end_layout
 
 \begin_layout Itemize
