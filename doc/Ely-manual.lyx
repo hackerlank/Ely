@@ -836,7 +836,7 @@ object
 \begin_layout Standard
 In addition, there are protected members used as helpers to set the
 \shape smallcaps
- component ID
+ component id
 \shape default
 , a reference to its owner 
 \shape smallcaps
@@ -2549,6 +2549,49 @@ component
 s which depend on it.
 \end_layout
 
+\begin_layout Standard
+Each 
+\shape smallcaps
+object
+\shape default
+ is identified by a 
+\shape smallcaps
+identifier
+\shape default
+ (
+\shape smallcaps
+id
+\shape default
+), which is assigned at creation time and is unique between all 
+\shape smallcaps
+object
+\shape default
+s participating in the game.
+\end_layout
+
+\begin_layout Standard
+An 
+\shape smallcaps
+object
+\shape default
+ can be created 
+\shape italic
+exclusively
+\shape default
+ by the 
+\shape smallcaps
+object template manager
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+.
+\end_layout
+
 \begin_layout Subsection
 initialization
 \begin_inset Index idx
@@ -2740,11 +2783,11 @@ reference "sec:Object-Template"
 
 \end_inset
 
-
-\end_layout
-
-\begin_layout Itemize
-----------------------------------------------------------
+ (used as an optimization when cloning an 
+\shape smallcaps
+object
+\shape default
+)
 \end_layout
 
 \begin_layout Standard
@@ -2756,25 +2799,23 @@ public
 \end_layout
 
 \begin_layout Itemize
-add/remove a 
-\shape smallcaps
-component template
-\shape default
- into/from an internal storage
-\end_layout
-
-\begin_layout Itemize
-retrieve a 
-\shape smallcaps
-component template 
-\shape default
-corresponding to a 
+retrieve one of the owned 
 \shape smallcaps
 component
 \shape default
- 
+s or their number
+\end_layout
+
+\begin_layout Itemize
+TODO
+\end_layout
+
+\begin_layout Itemize
+retrieve 
 \shape smallcaps
-type
+object
+\shape default
+'s aa
 \end_layout
 
 \begin_layout Itemize
@@ -2799,120 +2840,6 @@ reference "sec:Component-Template"
 \end_inset
 
 ).
-\end_layout
-
-\begin_layout Standard
-The behavior of any 
-\shape smallcaps
-component
-\shape default
- is determined by its 
-\shape italic
-interface
-\shape default
-, which is formed by a series of methods.
-\end_layout
-
-\begin_layout Standard
-The 
-\shape italic
-protected
-\shape default
- interface is called 
-\shape italic
-only
-\shape default
- by its corresponding 
-\shape smallcaps
-component template
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Component-Template"
-
-\end_inset
-
-and by
-\shape smallcaps
- object template manager
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object-Template-Manager"
-
-\end_inset
-
-.
- The 
-\shape italic
-public
-\shape default
- interface is used for interaction with external user code.
- Whereas, into 
-\shape italic
-private
-\shape default
- interface, are relegated some helper functions that are delegated by the
- protected and public functions to do the real job.
-\end_layout
-
-\begin_layout Standard
-The protected interface common to all 
-\shape smallcaps
-component
-\shape default
-s includes methods to:
-\end_layout
-
-\begin_layout Itemize
-initialize a 
-\shape smallcaps
-component
-\shape default
- at creation time, using the data values specified in the corresponding
- 
-\shape smallcaps
-template
-\shape default
- parameter table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "component-template-parameter-table"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-let
-\shape smallcaps
- component
-\shape default
- make additional setup/cleanup while being added/removed to/from the owner
- 
-\shape smallcaps
-object
-\shape default
- and to/from the game scene.
-\end_layout
-
-\begin_layout Standard
-In addition, there are protected members used as helpers to set the
-\shape smallcaps
- component ID
-\shape default
-, a reference to its owner 
-\shape smallcaps
-object
-\shape default
- and to register and unregister event callbacks functions.
-\end_layout
-
-\begin_layout Standard
-The common public interface has methods to:
 \end_layout
 
 \begin_layout Itemize
@@ -2950,19 +2877,6 @@ get the event type of a Panda3d event received
 \end_layout
 
 \begin_layout Standard
-Obviously any 
-\shape smallcaps
-component
-\shape default
- of a given 
-\shape smallcaps
-type
-\shape default
-, usually would specialize and extend this basic common interface, depending
- on its specific behavior.
-\end_layout
-
-\begin_layout Itemize
 ----------------------------------------------------------
 \end_layout
 
