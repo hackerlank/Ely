@@ -2554,7 +2554,7 @@ Each
 \shape smallcaps
 object
 \shape default
- is identified by a 
+ is given an 
 \shape smallcaps
 identifier
 \shape default
@@ -2567,6 +2567,98 @@ id
 object
 \shape default
 s participating in the game.
+ 
+\end_layout
+
+\begin_layout Standard
+Moreover each 
+\shape smallcaps
+object
+\shape default
+ has an associated Panda3D NodePath, which let it to be hooked to Panda3D
+ game scene graph.
+ Therefore any 
+\shape smallcaps
+object
+\shape default
+ normally has a 
+\shape italic
+parent
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+parent object
+\end_layout
+
+\end_inset
+
+ 
+\begin_inset Foot
+status collapsed
+
+\begin_layout Plain Layout
+Only some basic 
+\shape smallcaps
+object
+\shape default
+ has no parent, as the 
+\shape smallcaps
+object
+\shape default
+s representing the render3d, aspect2d etc...
+ Panda3D NodePaths.
+\end_layout
+
+\end_inset
+
+and, possibly, one or more 
+\shape italic
+children
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+child object
+\end_layout
+
+\end_inset
+
+, that is it has relationships with other 
+\shape smallcaps
+object
+\shape default
+s which directly map Panda3D NodePath parenthoods.
+\end_layout
+
+\begin_layout Standard
+Some 
+\shape smallcaps
+object
+\shape default
+s may have an 
+\shape italic
+owner
+\shape default
+ 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+owner object
+\end_layout
+
+\end_inset
+
+, that is another 
+\shape smallcaps
+object
+\shape default
+ responsible for their lifetimes.
 \end_layout
 
 \begin_layout Standard
@@ -2803,263 +2895,55 @@ retrieve one of the owned
 \shape smallcaps
 component
 \shape default
-s or their number
-\end_layout
-
-\begin_layout Itemize
-TODO
-\end_layout
-
-\begin_layout Itemize
-retrieve 
-\shape smallcaps
-object
-\shape default
-'s aa
-\end_layout
-
-\begin_layout Itemize
-reset the 
-\shape smallcaps
-component
-\shape default
-s' configuration parameters to their default values (configuration parameters
- are handled by 
-\shape smallcaps
-component
-\shape default
- 
-\shape smallcaps
-template
-\shape default
-s 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Component-Template"
-
-\end_inset
-
-).
+s and their number
 \end_layout
 
 \begin_layout Itemize
 get the 
 \shape smallcaps
-type,
+object id
 \shape default
- 
-\shape smallcaps
-family type
-\shape default
-, 
-\shape smallcaps
-id
-\shape default
- and reference to owner 
+, and references to the owner 
 \shape smallcaps
 object
 \shape default
- of the 
+ (if any), to the corresponding 
 \shape smallcaps
-component
+object template
+\shape default
+ and to the associated Panda3D NodePath
 \end_layout
 
 \begin_layout Itemize
-update the 
+retrieve and release the stored the 
 \shape smallcaps
-component 
+object
 \shape default
-state at each game tick (frame)
-\end_layout
-
-\begin_layout Itemize
-get the event type of a Panda3d event received 
-\end_layout
-
-\begin_layout Standard
-----------------------------------------------------------
-\end_layout
-
-\begin_layout Subsection
-interface
-\begin_inset Index idx
-status collapsed
-
-\begin_layout Plain Layout
-component ! interface
-\end_layout
-
-\end_inset
-
-
-\begin_inset CommandInset label
-LatexCommand label
-name "sub:Component-interface-1"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Standard
-The behavior of any 
+ and 
 \shape smallcaps
 component
 \shape default
- is determined by its 
-\shape italic
-interface
-\shape default
-, which is formed by a series of methods.
+s parameters
 \end_layout
 
-\begin_layout Standard
-The 
-\shape italic
-protected
-\shape default
- interface is called 
-\shape italic
-only
-\shape default
- by its corresponding 
+\begin_layout Itemize
+let the 
 \shape smallcaps
-component template
+object
 \shape default
- 
+ to perform the
+\end_layout
+
+\begin_layout Itemize
+custom initialization after the creation of the whole initial game scene
+ (as stated by the game configuration file 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Component-Template"
+reference "chap:Game-configuration-file"
 
 \end_inset
 
-and by
-\shape smallcaps
- object template manager
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object-Template-Manager"
-
-\end_inset
-
-.
- The 
-\shape italic
-public
-\shape default
- interface is used for interaction with external user code.
- Whereas, into 
-\shape italic
-private
-\shape default
- interface, are relegated some helper functions that are delegated by the
- protected and public functions to do the real job.
-\end_layout
-
-\begin_layout Standard
-The protected interface common to all 
-\shape smallcaps
-component
-\shape default
-s includes methods to:
-\end_layout
-
-\begin_layout Itemize
-initialize a 
-\shape smallcaps
-component
-\shape default
- at creation time, using the data values specified in the corresponding
- 
-\shape smallcaps
-template
-\shape default
- parameter table 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "component-template-parameter-table"
-
-\end_inset
-
-
-\end_layout
-
-\begin_layout Itemize
-let
-\shape smallcaps
- component
-\shape default
- make additional setup/cleanup while being added/removed to/from the owner
- 
-\shape smallcaps
-object
-\shape default
- and to/from the game scene.
-\end_layout
-
-\begin_layout Standard
-In addition, there are protected members used as helpers to set the
-\shape smallcaps
- component ID
-\shape default
-, a reference to its owner 
-\shape smallcaps
-object
-\shape default
- and to register and unregister event callbacks functions.
-\end_layout
-
-\begin_layout Standard
-The common public interface has methods to:
-\end_layout
-
-\begin_layout Itemize
-get the 
-\shape smallcaps
-type,
-\shape default
- 
-\shape smallcaps
-family type
-\shape default
-, 
-\shape smallcaps
-id
-\shape default
- and reference to owner 
-\shape smallcaps
-object
-\shape default
- of the 
-\shape smallcaps
-component
-\end_layout
-
-\begin_layout Itemize
-update the 
-\shape smallcaps
-component 
-\shape default
-state at each game tick (frame)
-\end_layout
-
-\begin_layout Itemize
-get the event type of a Panda3d event received 
-\end_layout
-
-\begin_layout Standard
-Obviously any 
-\shape smallcaps
-component
-\shape default
- of a given 
-\shape smallcaps
-type
-\shape default
-, usually would specialize and extend this basic common interface, depending
- on its specific behavior.
+)
 \end_layout
 
 \begin_layout Subsection
@@ -3068,7 +2952,7 @@ state
 status collapsed
 
 \begin_layout Plain Layout
-component ! state
+object ! state
 \end_layout
 
 \end_inset
@@ -3076,7 +2960,7 @@ component ! state
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sec:Component-state-1"
+name "sec:Object-state"
 
 \end_inset
 
@@ -3084,57 +2968,37 @@ name "sec:Component-state-1"
 \end_layout
 
 \begin_layout Standard
-At any point in time, a 
-\shape smallcaps
-component
-\shape default
- has an
-\shape italic
- state
-\shape default
-, which determines its particular configuration and behavior (and consequently
- those of its owner 
+As said before, an 
 \shape smallcaps
 object
 \shape default
-).
- The state is made up a set of internal 
+ is essentially a container of 
+\shape smallcaps
+component
+\shape default
+s, consequently its internal 
 \shape italic
-data
+state
 \shape default
-, each one having its own type and value.
-\end_layout
-
-\begin_layout Standard
-Some internal data values can be set up only at 
+, in addition to its behavior, can be defined as the aggregate of the internal
+ states of the individual 
 \shape smallcaps
 component
 \shape default
- creation time and cannot be changed during its lifetime, while others haven't
- this limitation, and can be modified through 
+s.
+ However, there is also a state of the 
 \shape smallcaps
-component
+object
 \shape default
- methods.
- 
+ as a whole and, currently, this determines: 
 \end_layout
 
-\begin_layout Standard
-During lifetime, many 
+\begin_layout Itemize
+the 
 \shape smallcaps
-component
+object
 \shape default
- 
-\shape smallcaps
-type
-\shape default
-s require their state's data to be updated at each tick/frame, while others
- haven't this need (their states can possibly change only through methods'
- calls).
-\end_layout
-
-\begin_layout Standard
-Moreover all internal data have hard-coded 
+ position and orientation (
 \shape italic
 default
 \shape default
@@ -3142,69 +3006,70 @@ default
 \shape italic
 values
 \shape default
-, which are used if not specified at creation and/or during lifetime of
- the 
-\shape smallcaps
-component
-\shape default
-.
- A default value is usually the 
-\shape italic
-null
-\shape default
- element of the field of values of the data type, e.g.
- 
+: 
 \family typewriter
-0
+(0,0,0)
 \family default
- for numbers (floats, integers), empty string (
+ and 
 \family typewriter
-''
+(0,0,0)
 \family default
-) for strings etc\SpecialChar \ldots{}
-.
- But some data must have a different default values from null, otherwise
- the 
-\shape smallcaps
-component
-\shape default
- could fall back in an inconsistent behavior.
+ respectively)
 \end_layout
 
-\begin_layout Standard
-A 
+\begin_layout Itemize
+the parent and owner (if any) 
 \shape smallcaps
-component
+object
 \shape default
- state includes also the sets of (
+s (
 \shape italic
-event
+default
 \shape default
-, 
+ 
 \shape italic
-event-type
+values
 \shape default
-) pairs and (
-\shape italic
-event-type
-\shape default
-, 
-\shape italic
-event-callback
-\shape default
-) pairs which the 
+: both none)
+\end_layout
+
+\begin_layout Itemize
+if an 
 \shape smallcaps
-component
+object
 \shape default
- use for event handling 
+ is static or dynamic, as a hint to improve performance (
+\shape italic
+default
+\shape default
+ 
+\shape italic
+value
+\shape default
+: dynamic)
+\end_layout
+
+\begin_layout Itemize
+the initialization function 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sub:Object-initialization"
+reference "sub:Object-initialization-functions"
 
 \end_inset
 
-.
- These data sets can be set up only at creation time.
+, which can be set only at creation time (
+\shape italic
+default
+\shape default
+ 
+\shape italic
+value
+\shape default
+: none)
+\end_layout
+
+\begin_layout Standard
+----------------------------------------------------------
 \end_layout
 
 \begin_layout Subsection
