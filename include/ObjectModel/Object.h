@@ -538,6 +538,58 @@ public:
 	virtual ~ObjectTemplate();
 
 	/**
+	 * \brief Gets the name (i.e. the Object type) of ObjectTemplate.
+	 * @return The name of this ObjectTemplate.
+	 */
+	ObjectType objectType() const;
+
+	/**
+	 * \brief Gets the ComponentTemplate list.
+	 *
+	 * This ObjectTemplate has an internal (ordered by insertion)
+	 * list of references to ComponentTamplates, corresponding
+	 * to Components owned by Objects it defines.
+	 * @return The ComponentTemplate list.
+	 */
+	ComponentTemplateList getComponentTemplates() const;
+
+	/**
+	 * \brief Adds a ComponentTemplate.
+	 *
+	 * This ObjectTemplate has an internal (ordered by insertion)
+	 * list of references to ComponentTemplates, corresponding
+	 * to Components owned by Objects it defines.
+	 * @param componentTmpl The ComponentTemplate.
+	 */
+	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
+
+	/** \name Get a ComponentTemplate contained into this ObjectTemplate
+	 *
+	 * This ObjectTemplate has an internal (ordered by insertion)
+	 * list of references to ComponentTamplates, corresponding
+	 * to Components owned by Objects it defines.
+	 */
+	///@{
+	/**
+	 * \brief Gets a ComponentTemplate corresponding to a Component type.
+	 * @param compType The Component type.
+	 * @return The Component template, NULL if it doesn't exist.
+	 */
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType& compType) const;
+	/**
+	 * \brief Gets a ComponentTemplate corresponding to a Component family type.
+	 * @param componentFamilyType The Component family type.
+	 * @return The Component template, NULL if it doesn't exist.
+	 */
+	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentFamilyType& componentFamilyType) const;
+	///@}
+
+	/**
+	 * \brief Clears the table of all ComponentTemplates of this ObjectTemplate.
+	 */
+	void clearComponentTemplates();
+
+	/**
 	 * \brief Sets the Object parameters to their default values.
 	 *
 	 * For the Object this template is designed to create,
@@ -555,58 +607,6 @@ public:
 	 * @param parameterTable The table of (parameter,value).
 	 */
 	void setParameters(const ParameterTable& parameterTable);
-
-	/**
-	 * \brief Clears the table of all ComponentTemplates of this ObjectTemplate.
-	 */
-	void clearComponentTemplates();
-
-	/**
-	 * \brief Gets the name (i.e. the Object type) of ObjectTemplate.
-	 * @return The name of this ObjectTemplate.
-	 */
-	ObjectType objectType() const;
-
-	/**
-	 * \brief Gets the ComponentTemplate list.
-	 *
-	 * This ObjectTemplate has an internal (ordered by insertion)
-	 * list of references to ComponentTamplates, corresponding
-	 * to Components owned by Objects it designs.
-	 * @return The ComponentTemplate list.
-	 */
-	ComponentTemplateList getComponentTemplates() const;
-
-	/**
-	 * \brief Adds a ComponentTemplate.
-	 *
-	 * This ObjectTemplate has an internal (ordered by insertion)
-	 * list of references to ComponentTemplates, corresponding
-	 * to Components owned by Objects it designs.
-	 * @param componentTmpl The ComponentTemplate.
-	 */
-	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
-
-	/** \name Get a ComponentTemplate contained into this ObjectTemplate
-	 *
-	 * This ObjectTemplate has an internal (ordered by insertion)
-	 * list of references to ComponentTamplates, corresponding
-	 * to Components owned by Objects it designs.
-	 */
-	///@{
-	/**
-	 * \brief Gets a ComponentTemplate corresponding to a Component type.
-	 * @param compType The Component type.
-	 * @return The Component template, NULL if it doesn't exist.
-	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentType& compType) const;
-	/**
-	 * \brief Gets a ComponentTemplate corresponding to a Component family type.
-	 * @param componentFamilyType The Component family type.
-	 * @return The Component template, NULL if it doesn't exist.
-	 */
-	SMARTPTR(ComponentTemplate) getComponentTemplate(const ComponentFamilyType& componentFamilyType) const;
-	///@}
 
 	/**
 	 * \brief Gets the parameter single value associated to the Object.

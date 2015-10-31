@@ -2575,8 +2575,11 @@ Moreover each
 \shape smallcaps
 object
 \shape default
- has an associated Panda3D NodePath, which allows it to be hooked to Panda3D
- game scene graph.
+ has an associated Panda3D 
+\shape italic
+NodePath
+\shape default
+, which allows it to be hooked to Panda3D game scene graph.
  Therefore any 
 \shape smallcaps
 object
@@ -2609,7 +2612,11 @@ object
 object
 \shape default
 s representing the render3d, aspect2d etc...
- Panda3D NodePaths.
+ Panda3D 
+\shape italic
+NodePath
+\shape default
+s.
 \end_layout
 
 \end_inset
@@ -2632,7 +2639,11 @@ child object
 \shape smallcaps
 object
 \shape default
-s which directly map Panda3D NodePath parenthoods.
+s which directly map Panda3D 
+\shape italic
+NodePath
+\shape default
+ parenthoods.
 \end_layout
 
 \begin_layout Standard
@@ -2919,7 +2930,9 @@ object
 \shape smallcaps
 object template
 \shape default
- and to the associated Panda3D NodePath
+ and to the associated Panda3D 
+\shape italic
+NodePath
 \end_layout
 
 \begin_layout Itemize
@@ -3455,60 +3468,94 @@ name "sec:Object-Template"
 \end_layout
 
 \begin_layout Standard
-Un template ha il compito di definire quanti e quali componenti devono essere
- (inizialmente) contenuti in un particolare tipo di oggetti di gioco.
- Come detto prima, il template definisce solo il tipo base di un oggetto,
- corrispondente all'insieme dei tipi dei componenti: quindi, il template
- stabilisce i componenti che sono strettamente necessari per dare vita ad
- oggetti di un dato tipo.
- Successivamente, sarà il template manager ad effettuare concretamente la
- creazione dell'oggetto, in base alla descrizione fornita dal template.
-\end_layout
-
-\begin_layout Standard
-A 
+The 
 \shape smallcaps
 object template
 \shape default
- has the task to describe how to create and initialize a 
+ has the task of defining how many and which 
 \shape smallcaps
 component
 \shape default
- of a given 
+s have to be (initially) contained in a particular type of 
 \shape smallcaps
-type
-\shape default
- and 
-\shape smallcaps
-family
-\shape default
- 
-\shape smallcaps
-type
+object
 \shape default
 .
- A 
+ In practice, from its definition are all 
 \shape smallcaps
 component
 \shape default
- can be created 
-\shape italic
-only
-\shape default
- through the corresponding
+s that are necessary to create an object of that type.
+ Subsequently, the 
 \shape smallcaps
- template
+object template manager
 \shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template-Manager"
+
+\end_inset
+
+ will make a concrete 
+\shape smallcaps
+object
+\shape default
+ creation, based on the description provided by the 
+\shape smallcaps
+object template
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+Moreover, as said before, the set of 
+\shape smallcaps
+family type
+\shape default
+s of these 
+\shape smallcaps
+component
+\shape default
+s the 
+\shape italic
+base
+\shape default
+ 
+\shape italic
+type
+\shape default
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+object ! base type
+\end_layout
+
+\end_inset
+
+ of an 
+\shape smallcaps
+object
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object"
+
+\end_inset
+
 .
 \end_layout
 
 \begin_layout Standard
 Just after its creation, a 
 \shape smallcaps
-component
+object
 \shape default
- needs to be initialized and this is accomplished by setting up single and
- multiple valued 
+ needs to be initialized as a whole and this is accomplished by setting
+ up single and multiple valued 
 \shape italic
 configuration parameters
 \shape default
@@ -3517,7 +3564,7 @@ configuration parameters
 status collapsed
 
 \begin_layout Plain Layout
-component ! configuration parameters
+object ! configuration parameters
 \end_layout
 
 \end_inset
@@ -3529,25 +3576,25 @@ component ! configuration parameters
 
 \begin_inset CommandInset label
 LatexCommand label
-name "component-configuration-parameters-1"
+name "object-configuration-parameters"
 
 \end_inset
 
 , each one corresponding to a specific internal data of the 
 \shape smallcaps
-component
+object
 \shape default
  state 
 \begin_inset CommandInset ref
 LatexCommand ref
-reference "sec:Component-state"
+reference "sec:Object-state"
 
 \end_inset
 
 .
  These parameters are handled by the related 
 \shape smallcaps
-component template
+object template
 \shape default
 , which stores them into an internal 
 \shape italic
@@ -3558,7 +3605,7 @@ parameter table
 status collapsed
 
 \begin_layout Plain Layout
-component template ! parameter table
+object template ! parameter table
 \end_layout
 
 \end_inset
@@ -3566,7 +3613,7 @@ component template ! parameter table
  
 \begin_inset CommandInset label
 LatexCommand label
-name "component-template-parameter-table-1"
+name "object-template-parameter-table"
 
 \end_inset
 
@@ -3587,9 +3634,9 @@ At game startup time, configuration
 \shape italic
  
 \shape default
-parameters for a 
+parameters for an 
 \shape smallcaps
-component
+object
 \shape default
  are specified in the 
 \shape italic
@@ -3608,32 +3655,35 @@ template
 \shape default
 's table is built automatically; on the other hand, when the 
 \shape smallcaps
-component
+object
 \shape default
  is created dynamically the table should be set up manually before its creation.
 \end_layout
 
 \begin_layout Standard
+Every 
+\shape smallcaps
+object template
+\shape default
+ has a name, and this is used to refer to the 
+\shape italic
+base type
+\shape default
+ of the 
+\shape smallcaps
+object
+\shape default
+s
+\begin_inset Index idx
+status collapsed
 
-\shape smallcaps
-component template
-\shape default
-s are handled by the 
-\shape smallcaps
-component template manager
-\shape default
- 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Component-Template-Manager"
+\begin_layout Plain Layout
+object ! base type
+\end_layout
 
 \end_inset
 
-.
-\end_layout
-
-\begin_layout Standard
-----------------------------------------------------------
+ the template defines.
 \end_layout
 
 \begin_layout Subsection
@@ -3642,7 +3692,7 @@ interface
 status collapsed
 
 \begin_layout Plain Layout
-component template ! interface
+object template ! interface
 \end_layout
 
 \end_inset
@@ -3650,7 +3700,7 @@ component template ! interface
 
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Component-Template-interface-1"
+name "sub:Object-Template-interface"
 
 \end_inset
 
@@ -3660,9 +3710,9 @@ name "sub:Component-Template-interface-1"
 \begin_layout Standard
 The behavior of any 
 \shape smallcaps
-component template
+object template
 \shape default
- is determined by its 
+ is determined by its public only 
 \shape italic
 interface
 \shape default
@@ -3670,41 +3720,11 @@ interface
 \end_layout
 
 \begin_layout Standard
-The 
-\shape italic
-protected
-\shape default
- interface is called 
-\shape italic
-only
-\shape default
- from other objects of Ely framework.
- The 
-\shape italic
-public
-\shape default
- interface is used for interaction with external user code.
- 
+TODO
 \end_layout
 
 \begin_layout Standard
-The protected interface common to all 
-\shape smallcaps
-component template
-\shape default
-s has the method to
-\end_layout
-
-\begin_layout Itemize
-create a 
-\shape smallcaps
-component
-\shape default
- and initialize it
-\end_layout
-
-\begin_layout Standard
-The common public interface includes methods to:
+The public interface includes methods to:
 \end_layout
 
 \begin_layout Itemize
@@ -3750,6 +3770,10 @@ component template
 component type
 \shape default
  would only specialize the basic common interface.
+\end_layout
+
+\begin_layout Standard
+----------------------------------------------------------
 \end_layout
 
 \begin_layout Subsection
