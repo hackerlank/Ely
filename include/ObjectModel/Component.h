@@ -219,8 +219,8 @@ protected:
 	/**
 	 * \brief On addition to Object setup.
 	 *
-	 * Gives a Component the ability to do some setup just "after" this
-	 * Component has been added to an Object. Optional.\n
+	 * Gives a Component the ability to do any required setup just
+	 * "after" this Component has been added to an Object. Optional.\n
 	 * This method for all derived classes are called only by ObjectTemplateManager
 	 * methods during its creation and before it is publicly available to
 	 * other threads.\n
@@ -236,8 +236,8 @@ protected:
 	/**
 	 * \brief On remove from Object cleanup.
 	 *
-	 * Gives a Component the ability to do some cleanup just "before" this
-	 * Component will be removed from an Object. Optional.\n
+	 * Gives a Component the ability to do any required cleanup just
+	 * "before" this Component will be removed from an Object. Optional.\n
 	 * removeFromObjectCleanup() is the cleanup common to all Component's types, while
 	 * onRemoveFromObjectCleanup() is the specialized cleanup implemented by a derived
 	 * Component type.
@@ -250,9 +250,9 @@ protected:
 	/**
 	 * \brief On Object addition to scene setup.
 	 *
-	 * Gives a Component the ability to do some setup just "after" the
-	 * Object, this Component belongs to, has been added to the scene
-	 * and set up. Optional.\n
+	 * Gives a Component the ability to do any required setup just
+	 * "after" the Object, this Component belongs to, has been added
+	 * to the game scene and set up. Optional.\n
 	 * This method for all derived classes are called only by ObjectTemplateManager
 	 * methods during its creation and before it is publicly available to
 	 * other threads.\n
@@ -270,8 +270,8 @@ protected:
 	/**
 	 * \brief On Object removal from scene cleanup.
 	 *
-	 * Gives a Component the ability to do some cleanup just "before" this
-	 * Component will be removed from the scene. Optional.\n
+	 * Gives a Component the ability to do any required cleanup just
+	 * "before" this Component will be removed from the game scene. Optional.\n
 	 * A possible request for cancellation from any "Game*Manager" for updating
 	 * "must" be done in this method as the first thing (before locking the mutex).\n
 	 * removeFromSceneCleanup() is the cleanup common to all Component's types, while

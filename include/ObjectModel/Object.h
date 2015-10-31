@@ -91,8 +91,8 @@ private:
 	/**
 	 * \brief Adds a Component to this Object.
 	 *
-	 * Component is added only there isn't one with
-	 * its family type.\n
+	 * A Component is added only if there is not another with
+	 * its same family type.\n
 	 * @param component The new Component to add.
 	 * @return True if successfully removed, false otherwise.
 	 */
@@ -107,20 +107,23 @@ private:
 	 */
 	bool doRemoveComponent(SMARTPTR(Component) component);
 
-	///List of all <family,Component>s pair stored by insertion order.
+	///List of all <family,Component> pairs.
 	typedef std::pair<const ComponentFamilyType, SMARTPTR(Component)> FamilyTypeComponentPair;
 	typedef std::list<FamilyTypeComponentPair> FamilyTypeComponentList;
 	/**
-	 * \brief Gets a reference to the components list.
+	 * \brief Gets a reference to the Component list.
 	 *
-	 * @return A reference to the components list.
+	 * The list is ordered by insertion: i.e Component's
+	 * position in the list reflects the Component's
+	 * (relative) insertion order.\n
+	 * @return A reference to the Component list.
 	 */
 	FamilyTypeComponentList& doGetComponents();
 
 	/**
 	 * \brief On remove Object cleanup.
 	 *
-	 * Gives an Object the ability to perform the cleanup and any
+	 * Gives the Object the ability to perform cleanup and any
 	 * required finalization before being definitively destroyed.\n
 	 * Called only by ObjectTemplateManager::destroyObject().\n
 	 */
@@ -129,8 +132,8 @@ private:
 	/**
 	 * \brief On addition to scene setup.
 	 *
-	 * Gives an Object the ability to perform the
-	 * addition to scene setup and any required initialization.\n
+	 * Gives the Object the ability to perform any required
+	 * setup just "after" its addition to the game scene.\n
 	 * Called only by ObjectTemplateManager::createObject().\n
 	 * \note this method is called exclusively by the Object creation thread,
 	 * i.e. before it will be publicly accessible, so no other thread can access
@@ -141,8 +144,8 @@ private:
 	/**
 	 * \brief On remove from scene cleanup.
 	 *
-	 * Gives an Object the ability to perform the
-	 * removal from scene cleanup and any required finalization.\n
+	 * Gives the Object the ability to perform any required
+	 * cleanup just "before" its removal from the game scene.\n
 	 * Called only by ObjectTemplateManager::destroyObject().\n
 	 * \note this method is called by the Object destruction thread,
 	 * i.e. when it is be publicly accessible, so other thread can access
@@ -545,8 +548,8 @@ public:
 	/**
 	 * \brief Sets the Object parameters to custom values.
 	 *
-	 * For the Object this template is designed to create,
-	 * this function sets the parameters to custom values.
+	 * For the Object this template designs, this function
+	 * sets the parameters to custom values.
 	 * These parameters overwrite (and/or are added to) the parameters
 	 * defaults set by setParametersDefaults.
 	 * @param parameterTable The table of (parameter,value).
@@ -567,9 +570,9 @@ public:
 	/**
 	 * \brief Gets the ComponentTemplate list.
 	 *
-	 * This ObjectTemplate has an internal ordered (by addition)
+	 * This ObjectTemplate has an internal (ordered by insertion)
 	 * list of references to ComponentTamplates, corresponding
-	 * to Components owned by Objects it creates.
+	 * to Components owned by Objects it designs.
 	 * @return The ComponentTemplate list.
 	 */
 	ComponentTemplateList getComponentTemplates() const;
@@ -577,18 +580,18 @@ public:
 	/**
 	 * \brief Adds a ComponentTemplate.
 	 *
-	 * This ObjectTemplate has an internal ordered (by addition)
+	 * This ObjectTemplate has an internal (ordered by insertion)
 	 * list of references to ComponentTemplates, corresponding
-	 * to Components owned by Objects it creates.
+	 * to Components owned by Objects it designs.
 	 * @param componentTmpl The ComponentTemplate.
 	 */
 	void addComponentTemplate(SMARTPTR(ComponentTemplate) componentTmpl);
 
 	/** \name Get a ComponentTemplate contained into this ObjectTemplate
 	 *
-	 * This ObjectTemplate has an internal ordered (by addition)
+	 * This ObjectTemplate has an internal (ordered by insertion)
 	 * list of references to ComponentTamplates, corresponding
-	 * to Components owned by Objects it creates.
+	 * to Components owned by Objects it designs.
 	 */
 	///@{
 	/**
