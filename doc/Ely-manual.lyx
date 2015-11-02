@@ -578,7 +578,7 @@ A
 \shape smallcaps
 component
 \shape default
- can respond to Panda3d
+ can respond to (Panda3d)
 \shape italic
  event
 \shape default
@@ -592,15 +592,41 @@ object
 component
 \shape default
 s.
+\end_layout
+
+\begin_layout Standard
+In Ely, a stimulus of a certain type is represented by the concept of the
+ 
+\shape italic
+event-type
+\shape default
+
+\begin_inset Index idx
+status open
+
+\begin_layout Plain Layout
+event-type
+\end_layout
+
+\end_inset
+
+.
+ Now, the issuance of an event-type can take place only by throwing a real
+ event, that has been associated to this event-type.
+ Thus, we can say that events represent the 
+\shape italic
+values
+\shape default
+ that these event-types may take.
  
 \end_layout
 
 \begin_layout Standard
-All 
+Since all 
 \shape smallcaps
 object
 \shape default
-s of a given type (i.e.
+s of a given (base) type (i.e.
  generated from the same 
 \shape smallcaps
 object template
@@ -620,32 +646,17 @@ similar
 \shape italic
 way
 \shape default
-.
- Accordingly their owned 
+, they should respond to the same set of event-types.
+ Therefore, such 
+\shape smallcaps
+object
+\shape default
+s would respond to events, that are values of the same event-type, through
+ one of its 
 \shape smallcaps
 component
 \shape default
-s, having the same 
-\shape smallcaps
-type
-\shape default
-, should handle the same set of 
-\shape italic
-event
-\shape default
- 
-\shape italic
-types
-\shape default
-
-\begin_inset CommandInset label
-LatexCommand label
-name "event-types"
-
-\end_inset
-
- and in a similar way.
- So, by default, the single event type is combined with a single 
+s and, by default, by calling a unique 
 \shape italic
 event callback
 \shape default
@@ -660,7 +671,7 @@ reference "sec:Event-callback-functions"
 
 \end_inset
 
-, which can be registered and unregistered with the Panda3D global 
+, which would be registered/unregistered with the Panda3D global 
 \shape italic
 EventHandler
 \shape default
@@ -682,23 +693,68 @@ object
 \end_layout
 
 \begin_layout Standard
+An event-type is associated with a type of 
+\shape smallcaps
+component
+\shape default
+ and with a callback function, during the definition of the 
+\shape smallcaps
+object
+\shape default
+ (base) type (that is in the 
+\shape smallcaps
+object template
+\shape default
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object-Template"
+
+\end_inset
+
+).
+ While, the association of a event to an event-type, is done when defining
+ an 
+\shape smallcaps
+object
+\shape default
+ and its involved 
+\shape smallcaps
+component
+\shape default
+.
+\end_layout
+
+\begin_layout Standard
+Note that, a type of 
+\shape smallcaps
+component
+\shape default
+ could be associated with different event-types and with different callback
+ functions, depending on the type of 
+\shape smallcaps
+object
+\shape default
+ it belongs.
+\end_layout
+
+\begin_layout Standard
 Usually, however, different 
 \shape smallcaps
 object
 \shape default
-s of the same type need to respond independently to the same event type
- and handle it in a custom way.
- This is accomplished by associating a different Panda3d event to the same
- event type and by specifying a custom event callback function on a per
- ( 
+s of the same type need to respond the same event (corresponding to a given
+ event-type) and handle it in a custom way.
+ This is accomplished by specifying a custom event callback function on
+ a per ( 
 \shape smallcaps
 object
 \shape default
 ,
 \shape smallcaps
-component
+ component
 \shape default
-, event type) triple basis: in this way, for example, 2 different 
+, event) triple basis: in this way, for example, 2 different 
 \shape smallcaps
 object
 \shape default
@@ -711,7 +767,7 @@ component
 \shape smallcaps
  component
 \shape default
- as arguments
+ as arguments.
 \end_layout
 
 \begin_layout Subsection
