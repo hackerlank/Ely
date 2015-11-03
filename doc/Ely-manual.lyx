@@ -397,10 +397,8 @@ A
 component
 \shape default
  is distinguished by its 
-\shape smallcaps
-type
 \shape italic
-
+type
 \begin_inset Index idx
 status collapsed
 
@@ -424,7 +422,7 @@ Furthermore a
 component
 \shape default
  belongs to a 
-\shape smallcaps
+\shape italic
 family type
 \shape default
 
@@ -463,24 +461,16 @@ only
 \shape smallcaps
 component
 \shape default
- of a specific 
-\shape smallcaps
-family type
-\shape default
-.
+ of a specific family type.
  That is, two 
 \shape smallcaps
 component
 \shape default
-s with different 
+s with different type but inside the same family
 \shape smallcaps
-type
+ 
 \shape default
- but inside the same 
-\shape smallcaps
-family type
-\shape default
-, cannot coexist into the same 
+type, cannot coexist into the same 
 \shape smallcaps
 object
 \shape default
@@ -493,14 +483,20 @@ Each
 component
 \shape default
  is identified by a 
-\shape smallcaps
+\shape italic
 identifier
 \shape default
- (
-\shape smallcaps
-id
-\shape default
-), which is assigned at creation time and is unique between all 
+
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component ! identifier
+\end_layout
+
+\end_inset
+
+, which is assigned at creation time and is unique between all 
 \shape smallcaps
 component
 \shape default
@@ -602,7 +598,7 @@ event-type
 \shape default
 
 \begin_inset Index idx
-status open
+status collapsed
 
 \begin_layout Plain Layout
 event-type
@@ -697,11 +693,18 @@ An event-type is associated with a type of
 \shape smallcaps
 component
 \shape default
- and with a callback function, during the definition of the 
+ 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Object-Template-interface"
+
+\end_inset
+
+ and with an event callback function, during the definition of the 
 \shape smallcaps
 object
 \shape default
- (base) type (that is in the 
+ (base) type, that is in the 
 \shape smallcaps
 object template
 \shape default
@@ -712,7 +715,7 @@ reference "sec:Object-Template"
 
 \end_inset
 
-).
+.
  While, the association of a event to an event-type, is done when defining
  an 
 \shape smallcaps
@@ -762,7 +765,7 @@ s of the same type, each having a
 \shape smallcaps
 component
 \shape default
- of the same type, will respond to the same event type, each with a different
+ of the same type, will respond to the same event-type, each with a different
  event Panda3D and with the same event callback function, but with 2 different
 \shape smallcaps
  component
@@ -906,19 +909,11 @@ The common public interface has methods to:
 \end_layout
 
 \begin_layout Itemize
-get the 
+get the type
 \shape smallcaps
-type,
+,
 \shape default
- 
-\shape smallcaps
-family type
-\shape default
-, 
-\shape smallcaps
-id
-\shape default
- and reference to owner 
+ family type, identifier and reference to owner 
 \shape smallcaps
 object
 \shape default
@@ -936,7 +931,7 @@ state at each game tick (frame)
 \end_layout
 
 \begin_layout Itemize
-get the event type of a Panda3d event received 
+get the event-type of a Panda3d event received 
 \end_layout
 
 \begin_layout Standard
@@ -944,12 +939,8 @@ Obviously any
 \shape smallcaps
 component
 \shape default
- of a given 
-\shape smallcaps
-type
-\shape default
-, usually would specialize and extend this basic common interface, depending
- on its specific behavior.
+ of a given type, usually would specialize and extend this basic common
+ interface, depending on its specific behavior.
 \end_layout
 
 \begin_layout Subsection
@@ -1014,13 +1005,9 @@ During lifetime, many
 \shape smallcaps
 component
 \shape default
- 
-\shape smallcaps
-type
-\shape default
-s require their state's data to be updated at each tick/frame, while others
- haven't this need (their states can possibly change only through methods'
- calls).
+ types require their state's data to be updated at each tick/frame, while
+ others haven't this need (their states can possibly change only through
+ methods' calls).
 \end_layout
 
 \begin_layout Standard
@@ -1115,7 +1102,7 @@ The
 \shape smallcaps
 component
 \shape default
- entities are modeled by a shallow class hierarchy.
+s of the various types, are modeled by a shallow class hierarchy.
 \end_layout
 
 \begin_layout Quote
@@ -1127,11 +1114,7 @@ ely::Component
 \shape smallcaps
 component
 \shape default
-s of any 
-\shape smallcaps
-type
-\shape default
-, are modeled by specific concrete classes derived from 
+s of any type, are modeled by specific concrete classes derived from 
 \family typewriter
 ely::Component
 \family default
@@ -1168,19 +1151,7 @@ component
 \shape smallcaps
 component
 \shape default
-'s 
-\shape smallcaps
-type
-\shape default
-, 
-\shape smallcaps
-family
-\shape default
- 
-\shape smallcaps
-type
-\shape default
- and 
+'s type, family type and 
 \shape smallcaps
 id
 \shape default
@@ -1384,19 +1355,11 @@ componentType()
 \family typewriter
  getOwnerObject()
 \family default
- to get the 
+ to get the type
 \shape smallcaps
-type,
+,
 \shape default
- 
-\shape smallcaps
-family type
-\shape default
-, 
-\shape smallcaps
-id
-\shape default
- and reference to owner 
+ family type, identifier and reference to owner 
 \shape smallcaps
 object
 \shape default
@@ -1412,7 +1375,7 @@ component
 \family typewriter
 getEventType()
 \family default
- to get the event type of a Panda3d event the 
+ to get the event-type of a Panda3d event the 
 \shape smallcaps
 component
 \shape default
@@ -1480,19 +1443,7 @@ component template
 \shape smallcaps
 component
 \shape default
- of a given 
-\shape smallcaps
-type
-\shape default
- and 
-\shape smallcaps
-family
-\shape default
- 
-\shape smallcaps
-type
-\shape default
-.
+ of a given type and family type.
  A 
 \shape smallcaps
 component
@@ -1710,15 +1661,7 @@ The common public interface includes methods to:
 \end_layout
 
 \begin_layout Itemize
-get the 
-\shape smallcaps
-type
-\shape default
- and 
-\shape smallcaps
-family type
-\shape default
- of the 
+get the type and family type of the 
 \shape smallcaps
 component
 \shape default
@@ -1749,9 +1692,9 @@ component template
 \shape default
  of a given 
 \shape smallcaps
-component type
+component 
 \shape default
- would only specialize the basic common interface.
+type would only specialize the basic common interface.
 \end_layout
 
 \begin_layout Subsection
@@ -1772,19 +1715,11 @@ The
 \shape smallcaps
 component template
 \shape default
- entities are modeled by a shallow class hierarchy, reflecting that of the
- corresponding 
+s, corresponding to the different types of 
 \shape smallcaps
 component
 \shape default
-s 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Component-Template-Manager-Implementation"
-
-\end_inset
-
-.
+, are modeled by a shallow class hierarchy.
 \end_layout
 
 \begin_layout Quote
@@ -1800,11 +1735,7 @@ s for
 \shape smallcaps
  component
 \shape default
-s of any 
-\shape smallcaps
-type
-\shape default
-, are modeled by specific concrete classes derived from 
+s of any type, are modeled by specific concrete classes derived from 
 \family typewriter
 ely::ComponentTemplate
 \family default
@@ -1838,15 +1769,11 @@ makeComponent()
 \shape smallcaps
 component
 \shape default
- of a given 
+ of a given type
 \shape smallcaps
-type 
+ 
 \shape default
-and 
-\shape smallcaps
-family type
-\shape default
-.
+and family type.
  This member is pure virtual and must be implemented by derived concrete
  classes to perform custom creation.
  It is called only by 
@@ -1866,9 +1793,9 @@ reference "sub:Component-Template-Manager-Implementation"
 
  based on the 
 \shape smallcaps
-component type
+component 
 \shape default
- to create.
+type to create.
 \end_layout
 
 \begin_layout Quote
@@ -1888,15 +1815,7 @@ componentType()
 \family typewriter
 familyType()
 \family default
- to get the 
-\shape smallcaps
-type
-\shape default
- and 
-\shape smallcaps
-family type
-\shape default
- of the related 
+ to get the type and family type of the related 
 \shape smallcaps
 component
 \shape default
@@ -1951,9 +1870,9 @@ component
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::pandaFramework()/ windowFramework()
+pandaFramework()/ windowFramework()
 \family default
- to get a reference to the 
+ to get a reference to the Panda3D 
 \shape italic
 PandaFramework
 \shape default
@@ -2111,11 +2030,7 @@ create a
 \shape smallcaps
 component
 \shape default
-, given its 
-\shape smallcaps
-type
-\shape default
-, by retrieving the appropriate 
+, given its type, by retrieving the appropriate 
 \shape smallcaps
 component template
 \end_layout
@@ -2145,9 +2060,7 @@ corresponding to a
 \shape smallcaps
 component
 \shape default
- 
-\shape smallcaps
-type
+ type
 \end_layout
 
 \begin_layout Itemize
@@ -2216,11 +2129,7 @@ doCreateComponent()
 \shape smallcaps
 component
 \shape default
- given its 
-\shape smallcaps
-type
-\shape default
-.
+ given its type.
  It called only by 
 \family typewriter
 createObject()
@@ -2288,9 +2197,9 @@ corresponding to a
 \shape smallcaps
 component
 \shape default
- 
+ type
 \shape smallcaps
-type.
+.
 \end_layout
 
 \begin_layout Itemize
@@ -2412,11 +2321,8 @@ s of these
 \shape smallcaps
 component
 \shape default
-s, implicitly, identify the set of mandatory 
-\shape smallcaps
-family type
-\shape default
-s present in the 
+s, implicitly, identify the set of mandatory family types present in the
+ 
 \shape smallcaps
 object
 \shape default
@@ -2443,11 +2349,7 @@ object ! base type
 \shape smallcaps
 object
 \shape default
- as the set of 
-\shape smallcaps
-family type
-\shape default
-s identified (implicitly) by the 
+ as the set of family types identified (implicitly) by the 
 \shape smallcaps
 object template
 \shape default
@@ -2487,11 +2389,7 @@ object ! dynamic type
 \shape smallcaps
 object
 \shape default
- as the set of 
-\shape smallcaps
-family type
-\shape default
-s which resides, at any moment, into the 
+ as the set of family types which resides, at any moment, into the 
 \shape smallcaps
 object
 \shape default
@@ -2512,11 +2410,7 @@ object
 \shape smallcaps
 component
 \shape default
- having the same 
-\shape smallcaps
-family type
-\shape default
- of one already present into the 
+ having the same family type of one already present into the 
 \shape smallcaps
 object
 \shape default
@@ -2532,11 +2426,7 @@ object
 \shape smallcaps
 component
 \shape default
- with the the same 
-\shape smallcaps
-family type
-\shape default
- 
+ with the the same family type 
 \begin_inset CommandInset ref
 LatexCommand ref
 reference "sec:Component"
@@ -2551,10 +2441,7 @@ Conversely, removals of
 \shape smallcaps
 component
 \shape default
-s have the following restriction: deletion of a component whose 
-\shape smallcaps
-family type
-\shape default
+s have the following restriction: deletion of a component whose family type
  belongs to the base type of the 
 \shape smallcaps
 object
@@ -2571,11 +2458,7 @@ s may have a priority in addition to the
 \shape smallcaps
 object
 \shape default
-, that is a particular 
-\shape smallcaps
-type
-\shape default
- of 
+, that is a particular type of 
 \shape smallcaps
 component
 \shape default
@@ -2583,11 +2466,7 @@ component
 \shape smallcaps
 component
 \shape default
-(s) of other 
-\shape smallcaps
-type
-\shape default
-(s) for its correct addition, initialization and operation.
+(s) of other type(s) for its correct addition, initialization and operation.
  Therefore, the indiscriminate additions of components, especially when
  done dynamically, can lead to problems, if not properly handled.
  In general, if you add a 
@@ -3288,11 +3167,7 @@ object
 \shape smallcaps
 component
 \shape default
- is added only if there is not another with * its same 
-\shape smallcaps
-family type
-\shape default
-.
+ is added only if there is not another with * its same family type.
 \end_layout
 
 \begin_layout Itemize
@@ -3387,15 +3262,7 @@ object
 \shape smallcaps
 component
 \shape default
-s (given its 
-\shape smallcaps
-type
-\shape default
- or 
-\shape smallcaps
-family type
-\shape default
-) and their number respectively.
+s (given its type or family type) and their number respectively.
 \end_layout
 
 \begin_layout Itemize
@@ -3532,7 +3399,7 @@ object template
 \shape smallcaps
 component
 \shape default
-s have to be (initially) contained in a particular type of 
+s have to be (initially) contained in a particular base type of 
 \shape smallcaps
 object
 \shape default
@@ -3541,8 +3408,43 @@ object
 \shape smallcaps
 component
 \shape default
-s that are necessary to create an object of that type.
- Subsequently, the 
+s that are necessary to create an 
+\shape smallcaps
+object
+\shape default
+ of that base type.
+ An
+\shape smallcaps
+ object template
+\shape default
+ accomplishes its task by storing an ordered (by insertion) list of 
+\shape smallcaps
+component
+\shape default
+ 
+\shape smallcaps
+template
+\shape default
+s 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Component-Template"
+
+\end_inset
+
+, corresponding to 
+\shape smallcaps
+component
+\shape default
+s that make up 
+\shape smallcaps
+object
+\shape default
+s of that type.
+\end_layout
+
+\begin_layout Standard
+Subsequently, the 
 \shape smallcaps
 object template manager
 \shape default
@@ -3557,23 +3459,27 @@ reference "sec:Object-Template-Manager"
 \shape smallcaps
 object
 \shape default
- creation, based on the description provided by the 
+ creation by building 
+\shape smallcaps
+component
+\shape default
+s in the order specified in the 
 \shape smallcaps
 object template
 \shape default
 .
+ 
 \end_layout
 
 \begin_layout Standard
-Moreover, as said before, the set of 
-\shape smallcaps
-family type
-\shape default
-s of these 
-\shape smallcaps
-component
-\shape default
-s the 
+As said before 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sec:Object"
+
+\end_inset
+
+, the 
 \shape italic
 base
 \shape default
@@ -3595,14 +3501,15 @@ object ! base type
 \shape smallcaps
 object
 \shape default
+ is defined as the set set of family
+\shape smallcaps
  
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sec:Object"
-
-\end_inset
-
-.
+\shape default
+types of these 
+\shape smallcaps
+component
+\shape default
+s.
 \end_layout
 
 \begin_layout Standard
@@ -3683,6 +3590,49 @@ parameter-name, value
  
 \shape default
 name and value are actually specified as strings.
+ In addition these parameters, the 
+\shape smallcaps
+object template
+\shape default
+ also manages 
+\shape smallcaps
+component
+\shape default
+ type 
+\shape italic
+configuration
+\shape default
+ 
+\shape italic
+parameters
+\shape default
+ 
+\begin_inset Index idx
+status collapsed
+
+\begin_layout Plain Layout
+component type ! configuration parameter
+\end_layout
+
+\end_inset
+
+, i.e.
+ associated to all 
+\shape smallcaps
+component
+\shape default
+s of a given type that belong to this type of 
+\shape smallcaps
+object
+\shape default
+ (for example, event-types for event handling 
+\begin_inset CommandInset ref
+LatexCommand ref
+reference "sub:Component-event-handling"
+
+\end_inset
+
+) .
 \end_layout
 
 \begin_layout Standard
@@ -3768,7 +3718,11 @@ The behavior of any
 \shape smallcaps
 object template
 \shape default
- is determined by its public only 
+ is determined by its public 
+\shape italic
+only
+\shape default
+ 
 \shape italic
 interface
 \shape default
@@ -3776,33 +3730,21 @@ interface
 \end_layout
 
 \begin_layout Standard
-TODO
-\end_layout
-
-\begin_layout Standard
 The public interface includes methods to:
 \end_layout
 
 \begin_layout Itemize
-get the 
+add/get 
 \shape smallcaps
-type
+component template
 \shape default
- and 
-\shape smallcaps
-family type
-\shape default
- of the 
-\shape smallcaps
-component
-\shape default
-s it can create 
+s to/from the internal ordered (by insertion) list and clear it
 \end_layout
 
 \begin_layout Itemize
 set the configuration parameters for the 
 \shape smallcaps
-component
+object
 \shape default
  to both default and custom values
 \end_layout
@@ -3811,25 +3753,17 @@ component
 get both the single and the multiple valued configuration parameters for
  the 
 \shape smallcaps
-component
+object
 \shape default
  or a copy of the entire parameter table
 \end_layout
 
-\begin_layout Standard
-A 
+\begin_layout Itemize
+associate/get/check 
 \shape smallcaps
-component template
+component
 \shape default
- of a given 
-\shape smallcaps
-component type
-\shape default
- would only specialize the basic common interface.
-\end_layout
-
-\begin_layout Standard
-----------------------------------------------------------
+ type configuration parameters
 \end_layout
 
 \begin_layout Subsection
@@ -3838,119 +3772,52 @@ component type
 Implementation
 \begin_inset CommandInset label
 LatexCommand label
-name "sub:Component-Template-Implementation-1"
+name "sub:Object-Template-Implementation"
 
 \end_inset
 
 
+\end_layout
+
+\begin_layout Quote
+
+\shape smallcaps
+object template
+\shape default
+s are modeled by 
+\family typewriter
+ely::ObjectTemplate
+\family default
+ class.
 \end_layout
 
 \begin_layout Quote
 The 
 \shape smallcaps
-component template
+object
 \shape default
- entities are modeled by a shallow class hierarchy, reflecting that of the
- corresponding 
+ type (i.e.
+ the 
 \shape smallcaps
-component
+object template
 \shape default
-s 
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Component-Template-Manager-Implementation"
-
-\end_inset
-
-.
+ name) is implemented by 
+\family typewriter
+ely::ObjectType
+\family default
+ (currently 
+\family typewriter
+typedef
+\family default
+ to 
+\family typewriter
+std::string
+\family default
+).
 \end_layout
 
 \begin_layout Quote
-The common interface and internal state are declared into the 
-\family typewriter
-ely::ComponentTemplate
-\family default
- abstract base class, while 
-\shape smallcaps
-component template
-\shape default
-s for
-\shape smallcaps
- component
-\shape default
-s of any 
-\shape smallcaps
-type
-\shape default
-, are modeled by specific concrete classes derived from 
-\family typewriter
-ely::ComponentTemplate
-\family default
-.
- These classes must implement all 
-\family typewriter
-ely::ComponentTemplate
-\family default
-'s pure virtual member functions.
- Instances of these concrete classes represent 
-\shape smallcaps
-component template
-\shape default
- entities.
-\end_layout
-
-\begin_layout Quote
-The common 
-\shape italic
-protected
-\shape default
- interface is made of: 
-\end_layout
-
-\begin_layout Itemize
-
-\family typewriter
-makeComponent()
-\family default
- to create the 
-\shape smallcaps
-component
-\shape default
- of a given 
-\shape smallcaps
-type 
-\shape default
-and 
-\shape smallcaps
-family type
-\shape default
-.
- This member is pure virtual and must be implemented by derived concrete
- classes to perform custom creation.
- It is called only by 
-\family typewriter
-doCreateComponent()
-\family default
- (private) member function of 
-\family typewriter
-ely::ComponentTemplateManager() 
-\family default
-
-\begin_inset CommandInset ref
-LatexCommand ref
-reference "sub:Component-Template-Manager-Implementation"
-
-\end_inset
-
- based on the 
-\shape smallcaps
-component type
-\shape default
- to create.
-\end_layout
-
-\begin_layout Quote
-The common 
+The 
 \shape italic
 public
 \shape default
@@ -3960,32 +3827,33 @@ public
 \begin_layout Itemize
 
 \family typewriter
-componentType()
+addComponentTemplate()
 \family default
- and 
+/ 
 \family typewriter
-familyType()
+getComponentTemplate()
 \family default
- to get the 
+ to add/get a 
 \shape smallcaps
-type
+component template
 \shape default
- and 
+ to/from the internal ordered (by insertion) list, respectively.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+getComponentTemplates()
+\family default
+/ 
+\family typewriter
+clearComponentTemplates()
+\family default
+ to get/clear the internal ordered (by insertion) 
 \shape smallcaps
-family type
+component template
 \shape default
- of the related 
-\shape smallcaps
-component
-\shape default
- respectively.
- This members are pure virtual and must be implemented by derived concrete
- classes to set custom values of both 
-\shape smallcaps
-type
-\shape default
-s.
- 
+ list, respectively.
 \end_layout
 
 \begin_layout Itemize
@@ -3995,11 +3863,10 @@ setParametersDefaults()
 \family default
  to set the 
 \shape smallcaps
-component
+object
 \shape default
  configuration parameters to their default values.
- This member is pure virtual and must be implemented by derived concrete
- classes to do custom default parameter settings.
+ 
 \end_layout
 
 \begin_layout Itemize
@@ -4009,9 +3876,9 @@ setParameters()
 \family default
  to set the 
 \shape smallcaps
-component
+object
 \shape default
- configuration parameters to custom values
+ configuration parameters to custom values.
 \end_layout
 
 \begin_layout Itemize
@@ -4021,7 +3888,7 @@ parameter()/ parameterList()/ getParameterTable()
 \family default
  to get the configuration parameters single or multiple values for the 
 \shape smallcaps
-component
+object
 \shape default
  or a copy of the entire parameter table respectively.
 \end_layout
@@ -4029,9 +3896,26 @@ component
 \begin_layout Itemize
 
 \family typewriter
-ely::ComponentTemplate::pandaFramework()/ windowFramework()
+objectType()
 \family default
- to get a reference to the 
+ to get the name of the 
+\shape smallcaps
+object
+\shape default
+ type (i.e.
+ of the 
+\shape smallcaps
+object template
+\shape default
+).
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+pandaFramework()/ windowFramework()
+\family default
+ to get a reference to the Panda3D 
 \shape italic
 PandaFramework
 \shape default
@@ -4040,6 +3924,72 @@ PandaFramework
 WindowFramework
 \shape default
  respectively
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+addComponentTypeParameter()
+\family default
+ to add a (multiple) valued parameter to a 
+\shape smallcaps
+component
+\shape default
+ type of this 
+\shape smallcaps
+object
+\shape default
+.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+isComponentTypeParameterValue()
+\family default
+ to check whether a (name, value) pair is a (parameter, value) allowed for
+ a certain 
+\shape smallcaps
+component
+\shape default
+ type of this 
+\shape smallcaps
+object
+\shape default
+.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+componentTypeParameterValues()
+\family default
+ to get all values of a parameter associated to a certain 
+\shape smallcaps
+component
+\shape default
+ type of the 
+\shape smallcaps
+object
+\shape default
+.
+\end_layout
+
+\begin_layout Itemize
+
+\family typewriter
+getOwner()
+\family default
+/ 
+\family typewriter
+setOwner()
+\family default
+ to get/set this 
+\shape smallcaps
+object
+\shape default
+'s owner (i.e.
+ responsible of its lifetime), if any.
 \end_layout
 
 \begin_layout Quote
@@ -4051,6 +4001,10 @@ reference "chap:API-Documentation"
 \end_inset
 
  for details.
+\end_layout
+
+\begin_layout Standard
+----------------------------------------------------------
 \end_layout
 
 \begin_layout Section

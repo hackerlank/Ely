@@ -125,7 +125,7 @@ void Component::doSetupEventTables()
 			for (iterTypeValue = typeValues.begin();
 					iterTypeValue != typeValues.end(); ++iterTypeValue)
 			{
-				//get event type and event value
+				//get event-type and event value
 				std::vector<std::string> typeValue = parseCompoundString(
 						*iterTypeValue, '@');
 				//check in order:
@@ -135,14 +135,14 @@ void Component::doSetupEventTables()
 				{
 					//check:
 					//- if (component is free and
-					//		there is non empty "event type" (== typeValue[0]))
+					//		there is non empty "event-type" (== typeValue[0]))
 					//	or
 					//- (if component is not free and
-					//		there is a valid "event type" (== typeValue[0]))
+					//		there is a valid "event-type" (== typeValue[0]))
 					if ((mFreeComponent and (not typeValue[0].empty()))
 						or
 						((not mFreeComponent) and
-								(mOwnerObject->objectTmpl()->isComponentParameterValue(
+								(mOwnerObject->objectTmpl()->isComponentTypeParameterValue(
 									"event_types", typeValue[0], componentType())))
 						)
 					{

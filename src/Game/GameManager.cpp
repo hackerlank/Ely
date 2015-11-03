@@ -323,7 +323,7 @@ void GameManager::createGameWorld(const std::string& gameWorldXML)
 				PRINT_DEBUG(
 						"      Param '" << attributeTAG->Name() << "' = '" << attributeTAG->Value() << "'");
 				//add attribute for this component type of this object.
-				objTmplPtr->addComponentParameter(attributeTAG->Name(),
+				objTmplPtr->addComponentTypeParameter(attributeTAG->Name(),
 						attributeTAG->Value(), static_cast<std::string>(compTypeTAG));
 			}
 			//... add all component templates

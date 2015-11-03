@@ -646,35 +646,34 @@ public:
 	 *
 	 * Any parameter value is interpreted as a "compound" one, i.e. as having
 	 * the form: "value1:value2:...:valueN" and each valueX is stored in a
-	 * list as returned by componentParameterValues().\n
+	 * list as returned by componentTypeParameterValues().\n
 	 * @param parameterName The parameter name.
 	 * @param parameterValue The parameter value.
 	 * @param compType The Component type the parameter is related to.
 	 */
-	void addComponentParameter(const std::string& parameterName,
+	void addComponentTypeParameter(const std::string& parameterName,
 			const std::string& parameterValue, ComponentType compType);
 
 	/**
-	 * \brief Checks if a name/value pair is an allowed parameter/value
-	 * for a given Component type of this Object.
+	 * \brief Checks whether a (name, value) pair is a (parameter, value) allowed
+	 * for a certain Component type of this Object.
 	 * @param name The name to check.
 	 * @param value The value to check.
 	 * @param compType The Component type.
 	 * @return True if the name/value pair match an allowed parameter/value
 	 * for a given Component, false otherwise.
 	 */
-	bool isComponentParameterValue(const std::string& name, const std::string& value,
+	bool isComponentTypeParameterValue(const std::string& name, const std::string& value,
 			ComponentType compType);
 
 	/**
 	 * \brief Gets all values of the common parameter associated to
-	 * the Component type of the Object.
-	 *
+	 * a certain Component type of the Object.
 	 * @param paramName The name of the parameter.
 	 * @param compType The Component type.
 	 * @return The value list  of the parameter, empty list if none exists.
 	 */
-	std::list<std::string> componentParameterValues(const std::string& paramName,
+	std::list<std::string> componentTypeParameterValues(const std::string& paramName,
 			ComponentType compType);
 
 #ifdef ELY_THREAD

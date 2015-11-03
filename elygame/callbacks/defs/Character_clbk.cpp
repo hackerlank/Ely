@@ -72,7 +72,7 @@ void activityPlayer0(const Event * event, void * data)
 	}
 	else
 	{
-		PRINT_ERR_DEBUG("activityPlayer0: Transition not defined for event type '" <<
+		PRINT_ERR_DEBUG("activityPlayer0: Transition not defined for event-type '" <<
 				eventType << "' and state '" << currentState << "'");
 	}
 }

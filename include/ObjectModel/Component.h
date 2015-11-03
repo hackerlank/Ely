@@ -139,12 +139,12 @@ class ComponentTemplate;
  * An Object can respond to events only through its owned Components.
  * For any owned Component type, an Object type can optionally declare, the set
  * of event types which that Component type has to respond to.
- * This means that each event type, declared for a Component type,
+ * This means that each event-type, declared for a Component type,
  * is defined  on "per ObjectTemplate (i.e. Object type) basis".
  * Panda events are specified as values of these event types on a "per
  * Object basis".\n
- * By default, when an event type is defined, any event specified
- * as value of the event type, is associated to a callback function
+ * By default, when an event-type is defined, any event specified
+ * as value of the event-type, is associated to a callback function
  * with this signature:
  * \code
  * void <EVENTTYPE>_<COMPONENTTYPE>_<OBJECTTYPE>(const Event* event, void* data);
@@ -153,21 +153,21 @@ class ComponentTemplate;
  * belong to any Object of a given type, will respond to these events
  * with the same callback function.\n
  * Any event can be ignored on a "per Object basis" by not specifying it in
- * parameters. Moreover, both the event type values and the callback function
+ * parameters. Moreover, both the event-type values and the callback function
  * can be overridden by parameters on a "per Object basis".\n
  * The callback functions are loaded at runtime from a dynamic linked library
  * (\see GameManager::GameDataInfo::CALLBACKS).\n
  * If a callback function doesn't exist or if any error occurs, the default
  * callback (referenced by the macro DEFAULT_CALLBACK_NAME) is used.\n
- * To check if a (name,value) pair is a declared legitimate event type call:
+ * To check if a (name,value) pair is a declared legitimate event-type call:
  * \code
- * 	ObjectTemplate::isComponentParameterValue();
+ * 	ObjectTemplate::isComponentTypeParameterValue();
  * \endcode
  *
  * > **XML Param(s)**:
  * param | type | default | note
  * ------|------|---------|-----
- * | *event_types* 		|multiple| - | each specified as "evType1[:evType2:...:evTypeN]" into ObjectTemplate definition
+ * | *event_types* 		|multiple| - | each specified as "evType1[:evType2:...:evTypeN]" into ObjectTemplate definition (as ComponentTemplates' parameters)
  * | *events*			|multiple| - | each specified as "evType1@evValue1[:evType2@evValue2:...:evTypeN@evValueN]$[callbackName]" into Object definition
  *
  * \note in "events" any of evValues or  callbackNamecan be empty
@@ -429,7 +429,7 @@ private:
 	std::map<std::string, std::string> mEventTable;
 	///Table of event types keyed by events.
 	std::map<std::string, std::string> mEventTypeTable;
-	///Table of <name,callback> pairs keyed by event type names.
+	///Table of <name,callback> pairs keyed by event-type names.
 	typedef std::pair<std::string, PCALLBACK> NameCallbackPair;
 	std::map<std::string, NameCallbackPair> mCallbackTable;
 

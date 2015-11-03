@@ -66,7 +66,7 @@ void Activity::doSetupFSMData()
 	//fill up transition functions' names table
 	//with null string for transition function names
 	std::list<std::string> states =
-			mOwnerObject->objectTmpl()->componentParameterValues(
+			mOwnerObject->objectTmpl()->componentTypeParameterValues(
 					std::string("states"), componentType());
 	for (iter = states.begin(); iter != states.end(); ++iter)
 	{
@@ -124,16 +124,16 @@ void Activity::doSetupFSMData()
 	//with null string for fromTo transition function names
 	//only for valid fromTo transitions
 	std::list<std::string> fromTos =
-			mOwnerObject->objectTmpl()->componentParameterValues(
+			mOwnerObject->objectTmpl()->componentTypeParameterValues(
 					std::string("from_to"), componentType());
 	for (iter = fromTos.begin(); iter != fromTos.end(); ++iter)
 	{
 		//parse element as state pair
 		std::vector<std::string> statePair = parseCompoundString(*iter, '@');
 		//a valid fromTo transition must have valid states (== statePair[i])
-		if (mOwnerObject->objectTmpl()->isComponentParameterValue("states",
+		if (mOwnerObject->objectTmpl()->isComponentTypeParameterValue("states",
 				statePair[0], componentType()) and (not statePair[0].empty())
-				and mOwnerObject->objectTmpl()->isComponentParameterValue(
+				and mOwnerObject->objectTmpl()->isComponentTypeParameterValue(
 						"states", statePair[1], componentType())
 				and (not statePair[1].empty()))
 		{
@@ -191,7 +191,7 @@ void Activity::doSetupTransitionTableData()
 	std::list<std::string>::const_iterator iter;
 	//fill up transition table
 	std::list<std::string> transitionTableItems =
-			mOwnerObject->objectTmpl()->componentParameterValues(
+			mOwnerObject->objectTmpl()->componentTypeParameterValues(
 					std::string("transition_table"), componentType());
 	for (iter = transitionTableItems.begin();
 			iter != transitionTableItems.end(); ++iter)
@@ -206,11 +206,11 @@ void Activity::doSetupTransitionTableData()
 					currentTypeNext[0], ',');
 			if (currentType.size() >= 2)
 			{
-				if (mOwnerObject->objectTmpl()->isComponentParameterValue(
+				if (mOwnerObject->objectTmpl()->isComponentTypeParameterValue(
 						"states", currentType[0], componentType())
-						and mOwnerObject->objectTmpl()->isComponentParameterValue(
+						and mOwnerObject->objectTmpl()->isComponentTypeParameterValue(
 								"states", currentTypeNext[1], componentType())
-						and mOwnerObject->objectTmpl()->isComponentParameterValue(
+						and mOwnerObject->objectTmpl()->isComponentTypeParameterValue(
 								"event_types", currentType[1], componentType()))
 				{
 					//insert element into the transition table
