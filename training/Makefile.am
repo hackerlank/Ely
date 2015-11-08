@@ -18,7 +18,7 @@ LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
 #SUBDIRS = recastnavigation
 #SUBDIRS = interrogate
 #SUBDIRS = opensteer
-SUBDIRS = networking
+#SUBDIRS = networking
 
 #ely_training
 noinst_PROGRAMS = ely_training 
@@ -26,20 +26,21 @@ noinst_PROGRAMS = ely_training
 #ely_training_CXXFLAGS=$(STDCpp11_CXXFLAGS)
 
 nodist_ely_training_SOURCES = \
-	training.cpp
-#	terrain_sample.cpp
-#	octree.cpp
-#	memory_pool.cpp
-#	memory_pool/MemoryPool.cpp
-#	generic_test.cpp
+	training.cpp \
+	particles.cpp
 #	ai.cpp
 #	anim.cpp
-#	network.cpp
-#	threads.cpp
-#	manual_example.cpp
 #	draw_geometry.cpp
+#	generic_test.cpp
+#	manual_example.cpp
+#	memory_pool.cpp
+#	memory_pool/MemoryPool.cpp
 #	meshdrawer.cpp
-#	rocket.cpp
-#	render-to-texture.cpp
+#	network.cpp
+#	octree.cpp
 #	physics.cpp
+#	render-to-texture.cpp
+#	rocket.cpp
+#	threads.cpp
+#	terrain_sample.cpp
 		

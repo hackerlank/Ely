@@ -1,17 +1,18 @@
 //int generic_test(int argc, char **argv);
 //int ai_main(int argc, char **argv);
 //int anim_main(int argc, char **argv);
-//int network_main(int argc, char **argv);
-//int physics_main(int argc, char **argv);
-//int threads_main(int argc, char **argv);
-//int manual_example_main(int argc, char **argv);
 //int draw_geometry_main(int argc, char **argv);
-//int terrain_sample(int argc, char **argv);
-//int meshdrawer_main(int argc, char **argv);
-//int rocket_main(int argc, char **argv);
-//int render_to_texture_main(int argc, char **argv);
+//int manual_example_main(int argc, char **argv);
 //int memory_pool_main(int argc, char **argv);
+//int meshdrawer_main(int argc, char **argv);
+//int network_main(int argc, char **argv);
 //int octree_main(int argc, char **argv);
+int particles_main(int argc, char **argv);
+//int physics_main(int argc, char **argv);
+//int render_to_texture_main(int argc, char **argv);
+//int rocket_main(int argc, char **argv);
+//int terrain_sample(int argc, char **argv);
+//int threads_main(int argc, char **argv);
 
 int main(int argc, char **argv)
 {
@@ -30,5 +31,6 @@ int main(int argc, char **argv)
 //	result = render_to_texture_main(argc, argv);
 //	result = memory_pool_main(argc, argv);
 //	result = octree_main(argc, argv);
+	int particles_main(int argc, char **argv);
 	return result;
 }
