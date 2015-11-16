@@ -31,6 +31,6 @@ int main(int argc, char **argv)
 //	result = render_to_texture_main(argc, argv);
 //	result = memory_pool_main(argc, argv);
 //	result = octree_main(argc, argv);
-	int particles_main(int argc, char **argv);
+	result = particles_main(argc, argv);
 	return result;
 }

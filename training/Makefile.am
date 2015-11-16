@@ -8,12 +8,11 @@ STDCpp11_CXXFLAGS = $(AM_CXXFLAGS) -std=c++11
 
 AUTOMAKE_OPTIONS = subdir-objects
 
-LDADD = -lp3framework -lpandaai -lpanda -lpandafx -lpandaexpress \
-	-lp3dtoolconfig -lp3pystub -lp3dtool -lp3direct \
-	-lp3openal_audio -lpandaegg -lp3tinydisplay -lp3vision -lpandagl \
-	-lpandaode -lpandaphysics -lpandaskel -lp3ptloader -lpython2.7 \
-	-lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody \
-	-lRakNet
+LDADD = -lp3framework -lpanda -lpandaexpress -lp3dtool -lp3dtoolconfig -lp3pystub \
+		-lpandabullet -lp3rocket -lXxf86dga -lpython2.7 -lpandaphysics
+#    -lpandaai -lpandafx -lp3direct -lp3openal_audio -lpandaegg -lp3tinydisplay \ 
+#    -lp3vision -lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader  \
+#    -lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody -lRakNet
 
 #SUBDIRS = recastnavigation
 #SUBDIRS = interrogate
