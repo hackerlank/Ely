@@ -135,16 +135,30 @@ int particles_main(int argc, char *argv[])
 	particle_sys->set_renderer(pt_particle_rend);
 	particle_sys->set_emitter(sphere_emitter);
 
-	//spawn node
-	// if spawn and render parents should be different
-	NodePath spawnNode = window->get_render().attach_new_node("spawnNode");
-	spawnNode.set_pos(0.0, 0.0, 0.0);
-	particle_sys->set_spawn_render_node_path(spawnNode);
+	//particle effect
+	NodePath particleEffect("particleEffect");
+	particleEffect.set_pos(-20.0, 0.0, 0.0);
+	//add physical node
+	PT(PhysicalNode) physicalNode = new PhysicalNode("physicalNode");
+	NodePath physicalNodeNP = NodePath(physicalNode);
+	particle_sys->set_render_parent(physicalNode);
+	physicalNode->add_physical(particle_sys);
+	//add particle
+	physicalNodeNP.reparent_to(particleEffect);
 
 	//render parent node
 	NodePath renderParentNode = window->get_render().attach_new_node("renderParent");
-	renderParentNode.set_pos(0.0, 0.0, 0.0);
-	particle_sys->set_render_parent(renderParentNode);
+	//start
+	particle_sys->set_render_parent(renderParentNode.node());
+	//ParticleSystemManager
+	particle_sys_mgr->attach_particlesystem(particle_sys);
+	physics_mgr->attach_physical(particle_sys);
+	//
+	particleEffect.reparent_to(window->get_render());
+
+	//render parent node
+//	renderParentNode.set_pos(0.0, 0.0, 0.0);
+//	particle_sys->set_render_parent(renderParentNode);
 	//render parent node instance 1
 //	NodePath instance1 = window->get_render().attach_new_node("instance1");
 //	instance1.set_pos(-20.0, 100.0, 0.0);
@@ -154,9 +168,11 @@ int particles_main(int argc, char *argv[])
 //	instance2.set_pos(20.0, 100.0, 0.0);
 //	renderParentNode.instance_to(instance2);
 
-	//ParticleSystemManager
-	particle_sys_mgr->attach_particlesystem(particle_sys);
-	physics_mgr->attach_physical(particle_sys);
+	//spawn node
+	// if spawn and render parents should be different
+//	NodePath spawnNode = window->get_render().attach_new_node("spawnNode");
+//	spawnNode.set_pos(0.0, 0.0, 0.0);
+//	particle_sys->set_spawn_render_node_path(spawnNode);
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
