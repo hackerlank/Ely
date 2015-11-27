@@ -117,7 +117,7 @@ int particles_main(int argc, char *argv[])
 
 	//ParticleSystem
 	PT(ParticleSystem) particle_sys = new ParticleSystem();
-	particle_sys->set_pool_size(100);
+	particle_sys->set_pool_size(4);
 	particle_sys->set_birth_rate(0.1);
 	particle_sys->set_litter_size(10);
 	particle_sys->set_litter_spread(0);

@@ -10,7 +10,7 @@ AUTOMAKE_OPTIONS = subdir-objects
 
 LDADD = -lp3framework -lpanda -lpandaexpress -lp3dtool -lp3dtoolconfig -lp3pystub \
 		-lpandabullet -lp3rocket -lXxf86dga -lpython2.7 -lpandaphysics
-#    -lpandaai -lpandafx -lp3direct -lp3openal_audio -lpandaegg -lp3tinydisplay \ 
+#    -lpandaai -lpandafx -lp3direct -lp3openal_audio -lpandaegg -lp3tinydisplay \
 #    -lp3vision -lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader  \
 #    -lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody -lRakNet
 
