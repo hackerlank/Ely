@@ -5,13 +5,15 @@ BUILDMODE=$2
 THREADS=$3
 WORKDIR=$4
 MYWORKSPACE=$5
-#
+#static and default values
 CMDS="install update uninstall clean distclean"
 BUILDMODES="release debug"
 MYPKGS="my_bullet3 my_librocket my_opensteer my_recastnavigation"
 DISTPKGS="autoconf automake build-essential checkinstall freeglut3-dev gdebi git gnulib libboost-python-dev libeigen3-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libode-dev libopenal-dev libopencv-dev libsdl1.2-dev libssl-dev libswscale-dev libtool libvorbis-dev libx11-dev libxxf86dga-dev libxxf86vm-dev nvidia-cg-dev pkg-config python-dev"
 BUILDDIR="build-elydeps"
 CONFARGS=
+PANDA3DPKG="panda3d1.10"
+PANDA3DOUTPUTDIR="built.release"
 PANDA3DALLEXT="-all"
 PANDA3DINSTCMD="sudo gdebi --n "
 
@@ -33,8 +35,8 @@ cleanElyDeps () {
 			make distclean
 	done
 	echo "clean Panda3d"
-	sudo apt-get --purge --yes remove panda3d1.9 
-	rm -rfv ${WORKDIR}/panda3d/built
+	sudo apt-get --purge --yes remove ${PANDA3DPKG} 
+	rm -rfv ${WORKDIR}/panda3d/${PANDA3DOUTPUTDIR}
 	#
 	cd ${WORKDIR}
 }
@@ -97,7 +99,7 @@ updateElyDeps () {
 	#
 	for PKG in ${MYPKGS}
 	do
-		echo "update ${PKG}"
+		echo "update ${PKG} ${BUILDMODE}"
 		WD=${WORKDIR}/${MYWORKSPACE}/${PKG}
 		[ -d "${WD}" ] && cd ${WD} && \
 			git pull && \
@@ -111,16 +113,16 @@ updateElyDeps () {
 			make -j${THREADS} && \
 			sudo make install
 	done
-	echo "update Panda3d"
+	echo "update Panda3d ${BUILDMODE}"
 	OPTIMIZE=3
 	[ "${BUILDMODE}" = "debug" ] && OPTIMIZE=1
 	WD=${WORKDIR}/panda3d
 	[ -d "${WD}" ] && cd ${WD} && \
 		git pull && \
 		CXXFLAGS=-std=c++11 makepanda/makepanda.py --verbose --everything --no-fftw --no-gles --no-gles2 \
-	 		--threads ${THREADS} --optimize ${OPTIMIZE} --installer && \
-	 	PKG=panda3d1.10_1.10.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
-	 	mv panda3d1.10_1.10.0_amd64.deb ${PKG} && \
+	 		--outputdir ${PANDA3DOUTPUTDIR} --threads ${THREADS} --optimize ${OPTIMIZE} --installer && \
+	 	PKG=${PANDA3DPKG}_1.10.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
+	 	mv ${PANDA3DPKG}_1.10.0_amd64.deb ${PKG} && \
 	 	${PANDA3DINSTCMD} ${PKG}
 	#
 	cd ${WORKDIR}
@@ -160,7 +162,9 @@ else
 fi
 
 #check if debug build mode
-[ "${BUILDMODE}" == "debug" ] && CONFARGS="--enable-debug"
+[ "${BUILDMODE}" = "debug" ]  && CONFARGS="--enable-debug" \
+							  && BUILDDIR="build-elydeps-debug" \
+							  && PANDA3DOUTPUTDIR="built.debug"
 
 #start
 case ${CMD} in
