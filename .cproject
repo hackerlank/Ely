@@ -995,7 +995,7 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="all" path="build-Devel_Debug_Thread/elygame" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="all" path="build-Devel_Debug_Thread/src/ControlComponents" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-j2</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -1003,7 +1003,7 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="clean" path="build-Devel_Debug_Thread/elygame" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="clean" path="build-Devel_Debug_Thread/src/ControlComponents" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-j2</buildArguments>
 				<buildTarget>clean</buildTarget>
@@ -1403,7 +1403,7 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>false</runAllBuilders>
 			</target>
-			<target name="all" path="build-Devel_Debug_Thread/src/ControlComponents" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="all" path="build-Devel_Debug_Thread/elygame" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-j2</buildArguments>
 				<buildTarget>all</buildTarget>
@@ -1411,7 +1411,7 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="clean" path="build-Devel_Debug_Thread/src/ControlComponents" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+			<target name="clean" path="build-Devel_Debug_Thread/elygame" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-j2</buildArguments>
 				<buildTarget>clean</buildTarget>
@@ -1451,22 +1451,6 @@
 				<useDefaultCommand>true</useDefaultCommand>
 				<runAllBuilders>true</runAllBuilders>
 			</target>
-			<target name="all" path="build-Devel_Debug_Thread/src/Utilities" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>make</buildCommand>
-				<buildArguments>-j2</buildArguments>
-				<buildTarget>all</buildTarget>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
-			<target name="clean" path="build-Devel_Debug_Thread/src/Utilities" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
-				<buildCommand>make</buildCommand>
-				<buildArguments>-j2</buildArguments>
-				<buildTarget>clean</buildTarget>
-				<stopOnError>true</stopOnError>
-				<useDefaultCommand>true</useDefaultCommand>
-				<runAllBuilders>true</runAllBuilders>
-			</target>
 			<target name="all" path="build-Devel_Debug_Thread/src/PhysicsComponents" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-j2</buildArguments>
@@ -1476,6 +1460,22 @@
 				<runAllBuilders>true</runAllBuilders>
 			</target>
 			<target name="clean" path="build-Devel_Debug_Thread/src/PhysicsComponents" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments>-j2</buildArguments>
+				<buildTarget>clean</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="all" path="build-Devel_Debug_Thread/src/Utilities" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
+				<buildCommand>make</buildCommand>
+				<buildArguments>-j2</buildArguments>
+				<buildTarget>all</buildTarget>
+				<stopOnError>true</stopOnError>
+				<useDefaultCommand>true</useDefaultCommand>
+				<runAllBuilders>true</runAllBuilders>
+			</target>
+			<target name="clean" path="build-Devel_Debug_Thread/src/Utilities" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
 				<buildArguments>-j2</buildArguments>
 				<buildTarget>clean</buildTarget>

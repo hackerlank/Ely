@@ -17,9 +17,9 @@ PANDA3DOUTPUTDIR="built.release"
 PANDA3DALLEXT="-all"
 PANDA3DINSTCMD="sudo gdebi --n "
 
-#clean
-cleanElyDeps () {
-	echo "clean autoconf archive"
+#distclean
+distcleanElyDeps () {
+	echo "distclean autoconf archive"
 	WD=${WORKDIR}/autoconf-archive
 	[ -d ${WD} ] && cd ${WD} && \
 		sudo make uninstall && \
@@ -27,16 +27,37 @@ cleanElyDeps () {
 		make distclean
 	for PKG in ${MYPKGS}
 	do
-		echo "clean ${PKG}"
+		echo "distclean ${PKG}"
 		WD=${WORKDIR}/${MYWORKSPACE}/${PKG}/${BUILDDIR}
 		[ -d ${WD} ] && cd ${WD} && \
 			sudo make uninstall && \
 			make clean && \
 			make distclean
 	done
-	echo "clean Panda3d"
+	echo "distclean Panda3d"
 	sudo apt-get --purge --yes remove ${PANDA3DPKG} 
 	rm -rfv ${WORKDIR}/panda3d/${PANDA3DOUTPUTDIR}
+	#
+	cd ${WORKDIR}
+}
+
+#clean
+cleanElyDeps () {
+	echo "clean autoconf archive"
+	WD=${WORKDIR}/autoconf-archive
+	[ -d ${WD} ] && cd ${WD} && \
+		sudo make uninstall && \
+		make clean
+	for PKG in ${MYPKGS}
+	do
+		echo "clean ${PKG}"
+		WD=${WORKDIR}/${MYWORKSPACE}/${PKG}/${BUILDDIR}
+		[ -d ${WD} ] && cd ${WD} && \
+			sudo make uninstall && \
+			make clean
+	done
+	echo "clean Panda3d"
+	sudo apt-get --purge --yes remove ${PANDA3DPKG} 
 	#
 	cd ${WORKDIR}
 }
@@ -130,7 +151,7 @@ updateElyDeps () {
 
 #print usage
 printUsage () {
-	echo "Usage: $0 install|uninstall|update|clean [build-mode=release|debug] [threads=half cores] [work-dir=$(pwd)] [my-workspace=WORKSPACE]"
+	echo "Usage: $0 install|uninstall|update|clean|distclean [build-mode=release|debug] [threads=half cores] [work-dir=$(pwd)] [my-workspace=WORKSPACE]"
 }
 
 #MAIN
@@ -180,6 +201,9 @@ case ${CMD} in
 	;;
 	clean)
 		cleanElyDeps
+	;;
+	distclean)
+		distcleanElyDeps
 	;;
 	*)
 		printUsage
