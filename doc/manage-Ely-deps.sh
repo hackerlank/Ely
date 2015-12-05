@@ -1,15 +1,22 @@
 #!/bin/bash
 
+#get (ordered) input
 CMD=$1
 BUILDMODE=$2
 THREADS=$3
-WORKDIR=$4
-MYWORKSPACE=$5
+[ -n "${4+x}" ] && MYPKGSINPUT=$4
+WORKDIR=$5
+MYWORKSPACE=$6
+
 #static and default values
 CMDS="install update uninstall clean distclean"
 BUILDMODES="release debug"
 MYPKGS="my_bullet3 my_librocket my_opensteer my_recastnavigation"
-DISTPKGS="autoconf automake build-essential checkinstall freeglut3-dev gdebi git gnulib libboost-python-dev libeigen3-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev libode-dev libopenal-dev libopencv-dev libsdl1.2-dev libssl-dev libswscale-dev libtool libvorbis-dev libx11-dev libxxf86dga-dev libxxf86vm-dev nvidia-cg-dev pkg-config python-dev"
+[ -n "${MYPKGSINPUT+x}" ] && MYPKGS=${MYPKGSINPUT}
+DISTPKGS="autoconf automake build-essential checkinstall freeglut3-dev gdebi git \
+ gnulib libboost-python-dev libeigen3-dev libfreetype6-dev libgl1-mesa-dev libglu1-mesa-dev \
+ libode-dev libopenal-dev libopencv-dev libsdl1.2-dev libssl-dev libswscale-dev libtool \
+ libvorbis-dev libx11-dev libxxf86dga-dev libxxf86vm-dev nvidia-cg-dev pkg-config python-dev"
 BUILDDIR="build-elydeps"
 CONFARGS=
 PANDA3DPKG="panda3d1.10"
@@ -151,7 +158,8 @@ updateElyDeps () {
 
 #print usage
 printUsage () {
-	echo "Usage: $0 install|uninstall|update|clean|distclean [build-mode=release|debug] [threads=half cores] [work-dir=$(pwd)] [my-workspace=WORKSPACE]"
+	echo "Usage: $0 install|uninstall|update|clean|distclean [build-mode=release|debug] [threads=half cores] \
+ [my-packages=\"my_bullet3 my_librocket my_opensteer my_recastnavigation\"] [work-dir=$(pwd)] [my-workspace=WORKSPACE]"
 }
 
 #MAIN
