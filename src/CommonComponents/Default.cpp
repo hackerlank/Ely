@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/CommonComponents/Default.cpp
  *
- * \date 27/ago/2014 (10:45:49)
+ * \date 2014-08-27 
  * \author consultit
  */
 

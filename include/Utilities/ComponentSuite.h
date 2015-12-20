@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/Utilities/ComponentSuite.h
  *
- * \date 17/mag/2012 (18:22:24)
+ * \date 2012-05-17 
  * \author consultit
  */
 

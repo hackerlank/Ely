@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/ely/ElySuiteFixture.h
  *
- * \date 07/mag/2012 (17:38:09)
+ * \date 2012-05-07 
  * \author consultit
  */
 

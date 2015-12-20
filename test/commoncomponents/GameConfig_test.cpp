@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/commoncomponents/GameConfig_test.cpp
  *
- * \date 28/set/2014 (11:10:41)
+ * \date 2014-09-28 
  * \author consultit
  */
 

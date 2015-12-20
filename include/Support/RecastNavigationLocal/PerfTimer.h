@@ -16,6 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/PerfTimer.h
+ *
+ * \date 2013-07-02 
+ * \author consultit
+ */
+
 #ifndef PERFTIMER_H
 #define PERFTIMER_H
 

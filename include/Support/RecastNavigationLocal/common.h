@@ -17,8 +17,8 @@
 /**
  * \file /Ely/include/Support/RecastNavigationLocal/common.h
  *
- * \date 25/giu/2013 10:38:16
- * \author marco
+ * \date 2013-06-25
+ * \author consultit
  */
 
 #ifndef RECASTNAVIGATIONCOMMON_H_

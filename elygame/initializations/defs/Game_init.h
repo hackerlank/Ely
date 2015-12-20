@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/Game_init.h
  *
- * \date 22/mar/2014 (18:19:01)
+ * \date 2014-03-22 
  * \author consultit
  */
 

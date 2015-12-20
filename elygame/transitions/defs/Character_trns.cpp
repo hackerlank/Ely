@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/transitions/defs/Character_trns.cpp
  *
- * \date 26/nov/2012 (12:02:39)
+ * \date 2012-11-26 
  * \author consultit
  */
 

@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/objectmodel/ObjectModelSuiteFixture.h
  *
- * \date 11/mag/2012 (18:05:46)
+ * \date 2012-05-11 
  * \author consultit
  */
 
@@ -27,10 +27,8 @@
 #include <boost/test/unit_test.hpp>
 #include "ObjectModel/ComponentTemplateManager.h"
 #include "ObjectModel/ObjectTemplateManager.h"
-#include "ObjectModel/ObjectTemplate.h"
 #include "ObjectModel/Object.h"
 #include "SceneComponents/Model.h"
-#include "SceneComponents/ModelTemplate.h"
 
 using namespace ely;
 

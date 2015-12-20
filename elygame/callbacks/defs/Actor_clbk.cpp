@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/callbacks/defs/Actor_clbk.cpp
  *
- * \date 26/nov/2012 (10:37:44)
+ * \date 2012-11-26 
  * \author consultit
  */
 

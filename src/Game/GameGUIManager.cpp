@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Game/GameGUIManager.cpp
  *
- * \date 04/apr/2015 (17:24:46)
+ * \date 2015-04-04 
  * \author consultit
  */
 

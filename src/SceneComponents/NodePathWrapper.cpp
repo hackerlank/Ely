@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/SceneComponents/NodePathWrapper.cpp
  *
- * \date 28/giu/2012 (20:16:04)
+ * \date 2012-06-28 
  * \author consultit
  */
 

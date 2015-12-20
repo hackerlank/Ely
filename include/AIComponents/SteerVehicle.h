@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/AIComponents/SteerVehicle.h
  *
- * \date 04/dic/2013 (09:20:41)
+ * \date 2013-12-04 
  * \author consultit
  */
 #ifndef STEERVEHICLE_H_

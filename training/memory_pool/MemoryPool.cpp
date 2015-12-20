@@ -35,6 +35,12 @@
 // Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 //
 //========================================================================
+/**
+ * \file /Ely/training/memory_pool/MemoryPool.cpp
+ *
+ * \date 2014-12-14
+ * \author consultit
+ */
 
 #include "Utilities/Tools.h"
 #include "MemoryPool.h"

@@ -16,6 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/NavMeshType_Solo.h
+ *
+ * \date 2013-07-08 
+ * \author consultit
+ */
+
 #ifndef RECASTSAMPLESOLOMESH_H
 #define RECASTSAMPLESOLOMESH_H
 

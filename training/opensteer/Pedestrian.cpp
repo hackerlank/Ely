@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/opensteer/Pedestrian.cpp
  *
- * \date 24/nov/2013 (09:44:39)
+ * \date 2013-11-24 
  * \author consultit
  */
 

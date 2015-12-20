@@ -16,6 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/OffMeshConnectionTool.h
+ *
+ * \date 2013-07-16 
+ * \author consultit
+ */
+
 #ifndef OFFMESHCONNECTIONTOOL_H
 #define OFFMESHCONNECTIONTOOL_H
 

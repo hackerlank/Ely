@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Utilities/Tools.cpp
  *
- * \date 19/mag/2012 (12:39:59)
+ * \date 2012-05-19 
  * \author consultit
  */
 

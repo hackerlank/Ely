@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/training/recastnavigation/ChunkyTriMesh.h
+ *
+ * \date 2013-03-17
+ * \author consultit
+ */
 
 #ifndef CHUNKYTRIMESH_H
 #define CHUNKYTRIMESH_H

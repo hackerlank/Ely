@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/commoncomponents/CommonSuiteFixture.h
  *
- * \date 27/ago/2014 (12:05:03)
+ * \date 2014-08-27 
  * \author consultit
  */
 
@@ -26,9 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "CommonComponents/Default.h"
-#include "CommonComponents/DefaultTemplate.h"
 #include "CommonComponents/GameConfig.h"
-#include "CommonComponents/GameConfigTemplate.h"
 
 using namespace ely;
 

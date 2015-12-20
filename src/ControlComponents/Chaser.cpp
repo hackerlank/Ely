@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/ControlComponents/Chaser.cpp
  *
- * \date 11/nov/2012 (09:45:00)
+ * \date 2012-11-11 
  * \author consultit
  */
 

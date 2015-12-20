@@ -37,7 +37,7 @@
 /**
  * \file /Ely/include/Support/OpenSteerLocal/PlugIn_Boids.h
  *
- * \date 23/gen/2014 (17:24:52)
+ * \date 2014-01-23 
  * \author consultit
  */
 

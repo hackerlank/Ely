@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/physicscomponents/PhysicsSuiteFixture.h
  *
- * \date 07/lug/2012 (17:14:03)
+ * \date 2012-07-07 
  * \author consultit
  */
 
@@ -26,7 +26,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include "PhysicsComponents/RigidBody.h"
-#include "PhysicsComponents/RigidBodyTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include "Game/GamePhysicsManager.h"
 #include <pandaFramework.h>

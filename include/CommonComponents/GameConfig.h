@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/CommonComponents/GameConfig.h
  *
- * \date 28/set/2014 (11:07:27)
+ * \date 2014-09-28 
  * \author consultit
  */
 

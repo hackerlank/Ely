@@ -35,6 +35,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/Pedestrian.h
+ *
+ * \date 2013-11-26
+ * \author consultit
+ */
 
 #include <iomanip>
 #include <sstream>

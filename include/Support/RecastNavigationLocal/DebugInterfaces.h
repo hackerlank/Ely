@@ -17,8 +17,8 @@
 /**
  * \file /Ely/include/Support/RecastNavigationLocal/DebugInterfaces.h
  *
- * \date 02/lug/2013 09:16:25
- * \author marco
+ * \date 2013-07-02
+ * \author consultit
  */
 
 #ifndef DEBUGINTERFACES_H_

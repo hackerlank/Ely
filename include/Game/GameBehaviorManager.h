@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/Game/GameBehaviorManager.h
  *
- * \date 01/set/2013 (17:47:10)
+ * \date 2013-09-01 
  * \author consultit
  */
 

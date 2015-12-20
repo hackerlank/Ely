@@ -16,8 +16,11 @@ dist_models_DATA = \
 	gazebo.bam \
 	gorillawalking.bam \
 	lilsmiley.bam \
+	Makefile.am \
+	Makefile.in \
 	panda.bam \
 	panda-walk.bam \
+	skybox.bam \
 	smiley.bam \
 	vehicle.bam \
 	wheel.bam

@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/physics.cpp
  *
- * \date 30/giu/2012 (09:56:35)
+ * \date 2012-06-30 
  * \author consultit
  */
 

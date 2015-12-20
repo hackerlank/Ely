@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/physicscomponents/RigidBody_test.cpp
  *
- * \date 07/lug/2012 (15:58:35)
+ * \date 2012-07-07 
  * \author consultit
  */
 

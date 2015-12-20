@@ -1,3 +1,10 @@
+/**
+ * \file /Ely/training/recastnavigation/ValueHistory.h
+ *
+ * \date 2013-03-20
+ * \author consultit
+ */
+
 #ifndef VALUEHISTORY_H
 #define VALUEHISTORY_H
 

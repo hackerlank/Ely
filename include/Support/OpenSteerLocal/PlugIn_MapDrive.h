@@ -51,7 +51,7 @@
 /**
  * \file /Ely/include/Support/OpenSteerLocal/PlugIn_MapDrive.h
  *
- * \date 17/mag/2014 (08:31:52)
+ * \date 2014-05-17 
  * \author consultit
  */
 

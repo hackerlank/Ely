@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/behaviorcomponents/BehaviorSuiteFixture.h
  *
- * \date 17/ago/2012 (09:24:25)
+ * \date 2012-08-17 
  * \author consultit
  */
 
@@ -26,7 +26,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include "BehaviorComponents/Activity.h"
-#include "BehaviorComponents/ActivityTemplate.h"
 #include "Utilities/Tools.h"
 
 struct BehaviorSuiteFixture

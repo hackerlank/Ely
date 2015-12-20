@@ -103,6 +103,13 @@ Typical compiler flags are given below:
 
 */
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/fastlz.h
+ *
+ * \date 2013-07-08 
+ * \author consultit
+ */
+
 #ifndef FASTLZ_H
 #define FASTLZ_H
 

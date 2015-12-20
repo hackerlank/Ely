@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/callbacks/defs/Camera_clbk.cpp
  *
- * \date 26/nov/2012 (11:04:25)
+ * \date 2012-11-26 
  * \author consultit
  */
 

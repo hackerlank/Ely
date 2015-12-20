@@ -17,9 +17,10 @@
 /**
  * \file /Ely/training/opensteer/DrawMeshDrawer.h
  *
- * \date 21/nov/2013 (15:27:04)
+ * \date 2013-11-21 
  * \author consultit
  */
+
 #ifndef DRAWMESHDRAWER_H_
 #define DRAWMESHDRAWER_H_
 

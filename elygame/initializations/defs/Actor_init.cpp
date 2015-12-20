@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/Actor_init.cpp
  *
- * \date 14/lug/2013 (08:46:36)
+ * \date 2013-07-14 
  * \author consultit
  */
 

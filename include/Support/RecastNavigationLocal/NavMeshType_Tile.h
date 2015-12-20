@@ -16,6 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/NavMeshType_Tile.h
+ *
+ * \date 2013-07-08 
+ * \author consultit
+ */
+
 #ifndef RECASTSAMPLETILEMESH_H
 #define RECASTSAMPLETILEMESH_H
 

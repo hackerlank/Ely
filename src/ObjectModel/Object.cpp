@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/ObjectModel/Object.cpp
  *
- * \date 07/mag/2012 (18:10:37)
+ * \date 2012-05-07 
  * \author consultit
  */
 
@@ -188,7 +188,7 @@ void Object::onAddToSceneSetup()
 		dlsymError = lt_dlerror();
 		if (dlsymError)
 		{
-			PRINT_DEBUG(
+			PRINT_ERR_DEBUG(
 					"No initialization function '" << functionName << "': " << dlsymError);
 		}
 	}

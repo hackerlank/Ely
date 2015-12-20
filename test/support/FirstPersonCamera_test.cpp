@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/support/FirstPersonCamera_test.cpp
  *
- * \date 07/mag/2012 (18:15:16)
+ * \date 2012-05-07 
  * \author consultit
  */
 

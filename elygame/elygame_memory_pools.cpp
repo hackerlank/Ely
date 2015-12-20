@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/elygame_memory_pools.cpp
  *
- * \date 14/dic/2014 (14:16:22)
+ * \date 2014-12-14 
  * \author consultit
  */
 

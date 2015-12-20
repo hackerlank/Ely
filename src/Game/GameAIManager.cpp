@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Game/GameAIManager.cpp
  *
- * \date 03/dic/2012 (13:57:43)
+ * \date 2012-12-03 
  * \author consultit
  */
 

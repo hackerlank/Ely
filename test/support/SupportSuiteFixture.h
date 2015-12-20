@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/support/SupportSuiteFixture.h
  *
- * \date 07/mag/2012 (18:15:46)
+ * \date 2012-05-07 
  * \author consultit
  */
 
@@ -25,7 +25,6 @@
 #define SUPPORTSUITEFIXTURE_H_
 
 #include <boost/test/unit_test.hpp>
-#include "Support/FirstPersonCamera.h"
 #include "Support/FSM.h"
 #include "Support/Picker.h"
 

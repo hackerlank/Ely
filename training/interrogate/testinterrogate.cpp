@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/testinterrogate.cpp
  *
- * \date 25/ott/2013 (17:03:57)
+ * \date 2013-10-25 
  * \author consultit
  */
 

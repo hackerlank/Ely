@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/instanceupdates/defs/Character_updt.cpp
  *
- * \date 01/set/2013 (20:18:30)
+ * \date 2013-09-01 
  * \author consultit
  */
 

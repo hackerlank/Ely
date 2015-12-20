@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/aicomponents/AISuiteFixture.h
  *
- * \date 03/dic/2012 (12:59:40)
+ * \date 2012-12-03 
  * \author consultit
  */
 

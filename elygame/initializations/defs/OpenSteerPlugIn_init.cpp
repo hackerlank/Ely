@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/OpenSteerPlugIn_init.cpp
  *
- * \date 22/mar/2014 (09:17:55)
+ * \date 2014-03-22 
  * \author consultit
  */
 

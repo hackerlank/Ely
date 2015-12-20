@@ -37,6 +37,13 @@
 //
 // ----------------------------------------------------------------------------
 
+/**
+ * \file /Ely/include/Support/OpenSteerLocal/PlugIn_Soccer.h
+ *
+ * \date 2014-03-31 
+ * \author consultit
+ */
+
 #ifndef PLUGIN_SOCCER_H_
 #define PLUGIN_SOCCER_H_
 

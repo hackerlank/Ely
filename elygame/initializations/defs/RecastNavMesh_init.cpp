@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/RecastNavMesh_init.cpp
  *
- * \date 22/mar/2014 (10:14:24)
+ * \date 2014-03-22 
  * \author consultit
  */
 

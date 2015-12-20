@@ -34,6 +34,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/Boids.cpp
+ *
+ * \date 2013-11-27
+ * \author consultit
+ */
 
 #include "Boids.h"
 

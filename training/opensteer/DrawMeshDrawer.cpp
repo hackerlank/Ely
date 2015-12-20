@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/opensteer/DrawMeshDrawer.cpp
  *
- * \date 21/nov/2013 (15:29:07)
+ * \date 2013-11-21 
  * \author consultit
  */
 

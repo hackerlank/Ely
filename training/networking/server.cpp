@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/manual_example.cpp
  *
- * \date 10/mar/2013 (15:39:11)
+ * \date 2013-03-10 
  * \author consultit
  */
 

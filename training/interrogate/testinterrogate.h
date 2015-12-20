@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/testinterrogate.h
  *
- * \date 25/ott/2013 (17:04:47)
+ * \date 2013-10-25 
  * \author consultit
  */
 #ifndef TESTINTERROGATE_H_

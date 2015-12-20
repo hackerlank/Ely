@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/Game/GameGUIManager.h
  *
- * \date 04/apr/2015 (17:24:26)
+ * \date 2015-04-04 
  * \author consultit
  */
 

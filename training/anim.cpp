@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/anim.cpp
  *
- * \date 30/giu/2012 (09:45:19)
+ * \date 2012-06-30 
  * \author consultit
  */
 

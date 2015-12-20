@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/controlcomponents/ControlSuiteFixture.h
  *
- * \date 31/mag/2012 (16:24:12)
+ * \date 2012-05-31 
  * \author consultit
  */
 
@@ -26,9 +26,7 @@
 
 #include <boost/test/unit_test.hpp>
 #include "ControlComponents/Driver.h"
-#include "ControlComponents/DriverTemplate.h"
 #include "ControlComponents/Chaser.h"
-#include "ControlComponents/ChaserTemplate.h"
 #include "ObjectModel/ObjectTemplateManager.h"
 #include <pandaFramework.h>
 #include <nodePath.h>

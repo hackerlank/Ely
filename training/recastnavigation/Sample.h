@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/training/recastnavigation/Sample.h
+ *
+ * \date 2013-03-20
+ * \author consultit
+ */
 
 #ifndef RECASTSAMPLE_H
 #define RECASTSAMPLE_H

@@ -15,9 +15,9 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/physics.cpp
+ * \file /Ely/training/terrain_sample.cpp
  *
- * \date 30/giu/2012 (09:56:35)
+ * \date 2012-06-30 
  * \author consultit
  */
 

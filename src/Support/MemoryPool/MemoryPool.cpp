@@ -36,6 +36,13 @@
 //
 //========================================================================
 
+/**
+ * \file /Ely/include/Support/MemoryPool/MemoryPool.cpp
+ *
+ * \date 2014-12-14 
+ * \author consultit
+ */
+
 #include "Utilities/Tools.h"
 #include "Support/MemoryPool/MemoryPool.h"
 #include <cstdlib>

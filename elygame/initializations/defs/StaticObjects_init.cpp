@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/StaticObjects_init.cpp
  *
- * \date 20/ott/2013 (10:00:47)
+ * \date 2013-10-20 
  * \author consultit
  */
 

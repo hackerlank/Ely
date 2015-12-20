@@ -59,6 +59,13 @@
 //
 // ----------------------------------------------------------------------------
 
+/**
+ * \file /Ely/include/Support/OpenSteerLocal/SimpleVehicle.h
+ *
+ * \date 2014-04-27 
+ * \author consultit
+ */
+
 #ifndef OPENSTEER_SIMPLEVEHICLE_H
 #define OPENSTEER_SIMPLEVEHICLE_H
 

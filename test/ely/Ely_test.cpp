@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/ely/Ely_test.cpp
  *
- * \date 07/mag/2012 (17:37:09)
+ * \date 2012-05-07 
  * \author consultit
  */
 

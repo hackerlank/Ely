@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/src/Support/RecastNavigationLocal/ChunkyTriMesh.cpp
+ *
+ * \date 2013-06-25 
+ * \author consultit
+ */
 
 #include "Support/RecastNavigationLocal/ChunkyTriMesh.h"
 #include <stdio.h>

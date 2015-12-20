@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/AIComponents/SteerVehicle.cpp
  *
- * \date 04/dic/2013 (09:20:42)
+ * \date 2013-12-04 
  * \author consultit
  */
 #include "AIComponents/SteerVehicle.h"

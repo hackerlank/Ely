@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/SceneComponents/InstanceOf.h
  *
- * \date 20/mag/2012 (09:42:38)
+ * \date 2012-05-20 
  * \author consultit
  */
 

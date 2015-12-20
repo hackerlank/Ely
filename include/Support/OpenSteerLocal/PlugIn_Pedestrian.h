@@ -38,7 +38,7 @@
 /**
  * \file /Ely/include/Support/OpenSteerLocal/PlugIn_Pedestrian.h
  *
- * \date 28/dic/2013 (11:48:52)
+ * \date 2013-12-28 
  * \author consultit
  */
 

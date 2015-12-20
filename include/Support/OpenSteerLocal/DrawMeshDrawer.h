@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/Support/OpenSteerLocal/DrawMeshDrawer.h
  *
- * \date 30/nov/2013 (11:11:37)
+ * \date 2013-11-30 
  * \author consultit
  */
 #ifndef DRAWMESHDRAWER_H_

@@ -37,7 +37,7 @@
 /**
  * \file /Ely/include/Support/OpenSteerLocal/PlugIn_OneTurning.h
  *
- * \date 01/dic/2013 (08:53:52)
+ * \date 2013-12-01 
  * \author consultit
  */
 

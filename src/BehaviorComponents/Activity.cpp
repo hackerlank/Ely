@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/BehaviorComponents/Activity.cpp
  *
- * \date 17/ago/2012 (09:28:59)
+ * \date 2012-08-17 
  * \author consultit
  */
 

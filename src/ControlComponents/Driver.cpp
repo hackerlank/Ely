@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/ControlComponents/Driver.cpp
  *
- * \date 31/mag/2012 (16:42:14)
+ * \date 2012-05-31 
  * \author consultit
  */
 

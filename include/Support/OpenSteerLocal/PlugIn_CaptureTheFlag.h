@@ -50,6 +50,13 @@
 //
 // ----------------------------------------------------------------------------
 
+/**
+ * \file /Ely/include/Support/OpenSteerLocal/PlugIn_CaptureTheFlag.h
+ *
+ * \date 2014-04-08 
+ * \author consultit
+ */
+
 #ifndef PLUGIN_CAPTURETHEFLAG_H_
 #define PLUGIN_CAPTURETHEFLAG_H_
 

@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/Camera_init.cpp
  *
- * \date 05/set/2012 (20:07:54)
+ * \date 2012-09-05 
  * \author consultit
  */
 

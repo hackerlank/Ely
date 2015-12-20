@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/PhysicsComponents/Ghost.cpp
  *
- * \date 13/ago/2014 (11:36:18)
+ * \date 2014-08-13 
  * \author consultit
  */
 

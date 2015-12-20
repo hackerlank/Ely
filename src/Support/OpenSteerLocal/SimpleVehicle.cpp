@@ -58,6 +58,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/src/Support/OpenSteerLocal/SimpleVehicle.cpp
+ *
+ * \date 2014-04-27 
+ * \author consultit
+ */
 
 #include "Support/OpenSteerLocal/SimpleVehicle.h"
 #include <algorithm>

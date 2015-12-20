@@ -46,6 +46,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/Draw.cpp
+ *
+ * \date 2013-11-12
+ * \author consultit
+ */
 
 #include "OpenSteer/Draw.h"
 

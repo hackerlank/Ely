@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/src/Support/RecastNavigationLocal/MeshLoaderObj.cpp
+ *
+ * \date 2013-06-25 
+ * \author consultit
+ */
 
 #include "Utilities/Tools.h"
 #include "Support/RecastNavigationLocal/MeshLoaderObj.h"

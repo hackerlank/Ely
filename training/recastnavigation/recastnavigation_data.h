@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/recastnavigation/recastnavigation_data.h
  *
- * \date 24/mag/2013 (13:25:56)
+ * \date 2013-05-24 
  * \author consultit
  */
 

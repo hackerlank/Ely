@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/AIComponents/SteerPlugIn.h
  *
- * \date 04/dic/2013 (09:11:38)
+ * \date 2013-12-04 
  * \author consultit
  */
 #ifndef STEERPLUGIN_H_

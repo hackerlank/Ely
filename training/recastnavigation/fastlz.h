@@ -102,6 +102,12 @@ Typical compiler flags are given below:
 * Pelles C: /O2
 
 */
+/**
+ * \file /Ely/training/recastnavigation/fastlz.h
+ *
+ * \date 2013-04-29
+ * \author consultit
+ */
 
 #ifndef FASTLZ_H
 #define FASTLZ_H

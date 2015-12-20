@@ -36,6 +36,13 @@
 //
 //========================================================================
 
+/**
+ * \file /Ely/include/Support/MemoryPool/MemoryMacros.h
+ *
+ * \date 2014-12-14 
+ * \author consultit
+ */
+
 #ifndef MEMORYMACROS_H_
 #define MEMORYMACROS_H_
 

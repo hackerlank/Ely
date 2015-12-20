@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/CommonComponents/Default.h
  *
- * \date 27/ago/2014 (10:45:48)
+ * \date 2014-08-27 
  * \author consultit
  */
 

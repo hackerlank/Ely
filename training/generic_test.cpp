@@ -15,9 +15,9 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/nodepath_test.cpp
+ * \file /Ely/training/generic_test.cpp
  *
- * \date 06/gen/2014 (11:42:30)
+ * \date 2014-01-06 
  * \author consultit
  */
 
@@ -40,7 +40,7 @@
 /**
  * \file /Ely/training/manual_example.cpp
  *
- * \date 10/mar/2013 (15:39:11)
+ * \date 2013-03-10 
  * \author consultit
  */
 

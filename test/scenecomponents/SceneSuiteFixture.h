@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/scenecomponents/SceneSuiteFixture.h
  *
- * \date 15/mag/2012 (15:33:43)
+ * \date 2012-05-15 
  * \author consultit
  */
 
@@ -28,11 +28,8 @@
 #include <pandaFramework.h>
 #include <windowFramework.h>
 #include "SceneComponents/InstanceOf.h"
-#include "SceneComponents/InstanceOfTemplate.h"
-#include "SceneComponents/ModelTemplate.h"
 #include "SceneComponents/Model.h"
 #include "SceneComponents/Terrain.h"
-#include "SceneComponents/TerrainTemplate.h"
 #include "Utilities/Tools.h"
 
 using namespace ely;

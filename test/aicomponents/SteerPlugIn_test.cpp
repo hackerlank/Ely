@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/aicomponents/SteerPlugIn_test.cpp
  *
- * \date 04/dic/2013 (09:11:38)
+ * \date 2013-12-04 
  * \author consultit
  */
 #include "AIComponents/SteerPlugIn.h"

@@ -9,6 +9,7 @@ dist_textures_DATA = \
 	CB_Skin1.png \
 	city1-road.png \
 	city-ground-shadow.png \
+	down.png \
 	eveface.png \
 	eve.png \
 	gorilla.png \
@@ -16,9 +17,16 @@ dist_textures_DATA = \
 	iron.jpg \
 	lilsmiley.rgba \
 	m0cm0.png \
+	Makefile.am \
+	Makefile.in \
 	material-20-cl.png \
 	panda.jpg \
 	rocket.tga \
+	t_east.png \
 	terrain.png \
 	texturemap.png \
-	Tire_tex.png
+	Tire_tex.png \
+	t_north.png \
+	t_south.png \
+	t_up.png \
+	t_west.png

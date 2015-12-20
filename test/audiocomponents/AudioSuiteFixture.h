@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/audiocomponents/AudioSuiteFixture.h
  *
- * \date 20/giu/2012 (12:42:25)
+ * \date 2012-06-20 
  * \author consultit
  */
 
@@ -26,7 +26,6 @@
 
 #include <boost/test/unit_test.hpp>
 #include "AudioComponents/Sound3d.h"
-#include "AudioComponents/Sound3dTemplate.h"
 #include "Game/GameAudioManager.h"
 #include <pointerTo.h>
 #include <audioSound.h>

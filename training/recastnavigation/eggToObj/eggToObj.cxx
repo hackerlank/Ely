@@ -11,6 +11,12 @@
 // with this source code in a file named "LICENSE."
 //
 ////////////////////////////////////////////////////////////////////
+/**
+ * \file /Ely/training/recastnavigation/eggToObj/eggToObj.cxx
+ *
+ * \date 2013-06-05
+ * \author consultit
+ */
 
 #include "eggToObj.h"
 #include "pystub.h"

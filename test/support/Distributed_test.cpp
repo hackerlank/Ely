@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/support/Distributed_test.cpp
  *
- * \date 15/set/2013 (11:05:07)
+ * \date 2013-09-15 
  * \author consultit
  */
 

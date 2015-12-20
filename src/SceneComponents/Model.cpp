@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/SceneComponents/Model.cpp
  *
- * \date 15/mag/2012 (15:32:23)
+ * \date 2012-05-15 
  * \author consultit
  */
 

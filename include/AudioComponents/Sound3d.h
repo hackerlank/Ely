@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/AudioComponents/Sound3d.h
  *
- * \date 20/giu/2012 (12:41:32)
+ * \date 2012-06-20 
  * \author consultit
  */
 

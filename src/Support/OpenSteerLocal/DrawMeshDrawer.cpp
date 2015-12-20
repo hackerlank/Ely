@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Support/OpenSteerLocal/DrawMeshDrawer.cpp
  *
- * \date 30/nov/2013 (11:11:37)
+ * \date 2013-11-30 
  * \author consultit
  */
 

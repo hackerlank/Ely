@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/ObjectModel/ComponentTemplateManager.cpp
  *
- * \date 11/mag/2012 (17:48:53)
+ * \date 2012-05-11 
  * \author consultit
  */
 

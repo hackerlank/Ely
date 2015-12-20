@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/PhysicsComponents/RigidBody.h
  *
- * \date 07/lug/2012 (15:58:35)
+ * \date 2012-07-07 
  * \author consultit
  */
 

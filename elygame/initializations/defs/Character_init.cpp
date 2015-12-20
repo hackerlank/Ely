@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/defs/Character_init.cpp
  *
- * \date 14/lug/2013 (08:48:01)
+ * \date 2013-07-14 
  * \author consultit
  */
 

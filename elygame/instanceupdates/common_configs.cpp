@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/transitions/common_configs.cpp
  *
- * \date 26/nov/2012 (11:29:26)
+ * \date 2012-11-26 
  * \author consultit
  */
 

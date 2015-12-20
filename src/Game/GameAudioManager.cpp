@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Game/GameAudioManager.cpp
  *
- * \date 06/lug/2012 (20:15:17)
+ * \date 2012-07-06 
  * \author consultit
  */
 

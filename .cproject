@@ -59,7 +59,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|elygame|include|test|tinyxml2|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -140,7 +140,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|elygame|include|test|tinyxml2|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
@@ -196,7 +196,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|elygame|include|test|tinyxml2|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -254,7 +254,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|elygame|include|test|tinyxml2|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -323,7 +323,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|elygame|include|test|tinyxml2|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -391,7 +391,7 @@
 						</toolChain>
 					</folderInfo>
 					<sourceEntries>
-						<entry excluding="transitions|elygame|include|test|tinyxml2|initializations|training|callbacks|src" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
+						<entry excluding="initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>

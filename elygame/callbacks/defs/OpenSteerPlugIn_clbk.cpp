@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/callbacks/defs/OpenSteerPlugIn_clbk.cpp
  *
- * \date 11/gen/2014 (10:19:51)
+ * \date 2014-01-11 
  * \author consultit
  */
 

@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/training/recastnavigation/CrowdTool.h
+ *
+ * \date 2013-03-20
+ * \author consultit
+ */
 
 #ifndef CROWDTOOL_H
 #define CROWDTOOL_H

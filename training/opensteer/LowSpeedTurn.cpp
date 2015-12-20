@@ -37,6 +37,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/LowSpeedTurn.cpp
+ *
+ * \date 2013-11-18
+ * \author consultit
+ */
 
 #include "LowSpeedTurn.h"
 

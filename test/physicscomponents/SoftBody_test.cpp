@@ -2,7 +2,7 @@
  * SoftBody_test.cpp
  *
  *  Created on: 08/ott/2013
- *      Author: marco
+ *      Author: consultit
  */
 
 #include "PhysicsSuiteFixture.h"

@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/Ely.cpp
  *
- * \date Aug 30, 2013
+ * \date 2013-08-30
  * \author consultit
  */
 

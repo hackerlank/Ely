@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/initializations/common_configs.h
  *
- * \date 26/nov/2012 (12:15:58)
+ * \date 2012-11-26 
  * \author consultit
  */
 

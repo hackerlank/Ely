@@ -36,6 +36,13 @@
 //
 //========================================================================
 
+/**
+ * \file /Ely/include/Support/MemoryPool/MemoryPool.h
+ *
+ * \date 2014-12-14 
+ * \author consultit
+ */
+
 #ifndef MEMORYPOOL_H_
 #define MEMORYPOOL_H_
 

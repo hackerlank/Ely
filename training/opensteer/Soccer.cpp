@@ -36,6 +36,12 @@
 // (contributed on July 9, 2003)
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/Soccer.cpp
+ *
+ * \date 2013-11-28
+ * \author consultit
+ */
 
 #include "Soccer.h"
 

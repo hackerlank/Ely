@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/support/RayCaster_test.cpp
  *
- * \date 15/set/2013 (11:03:51)
+ * \date 2013-09-15 
  * \author consultit
  */
 

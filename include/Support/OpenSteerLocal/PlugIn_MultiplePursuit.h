@@ -37,7 +37,7 @@
 /**
  * \file /Ely/include/Support/OpenSteerLocal/PlugIn_MultiplePursuit.h
  *
- * \date 03/feb/2014 (19:10:52)
+ * \date 2014-02-03 
  * \author consultit
  */
 

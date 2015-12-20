@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/game/GameSuiteFixture.h
  *
- * \date 07/mag/2012 (18:09:17)
+ * \date 2012-05-07 
  * \author consultit
  */
 

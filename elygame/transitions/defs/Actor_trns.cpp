@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/transitions/defs/Actor_trns.cpp
  *
- * \date 26/nov/2012 (11:37:57)
+ * \date 2012-11-26 
  * \author consultit
  */
 

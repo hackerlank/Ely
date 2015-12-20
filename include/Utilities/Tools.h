@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/Utilities/Tools.h
  *
- * \date 08/mag/2012 (16:49:10)
+ * \date 2012-05-08 
  * \author consultit
  */
 

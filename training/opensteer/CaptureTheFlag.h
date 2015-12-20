@@ -49,6 +49,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/CaptureTheFlag.h
+ *
+ * \date 2013-11-26
+ * \author consultit
+ */
 
 #include <iomanip>
 #include <string>

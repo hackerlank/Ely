@@ -54,6 +54,12 @@
 // IMPORTANT: InitMemoryPool() and DestroyMemoryPool() must be called manually unless you use the GCC_MEMORYPOOL_AUTOINIT()
 // macro below.
 //---------------------------------------------------------------------------------------------------------------------
+/**
+ * \file /Ely/training/memory_pool/MemoryMacros.h
+ *
+ * \date 2014-12-14
+ * \author consultit
+ */
 
 #ifndef MEMORYMACROS_H_
 #define MEMORYMACROS_H_

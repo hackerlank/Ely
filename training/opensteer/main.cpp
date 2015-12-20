@@ -34,6 +34,12 @@
 //
 //
 // ------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/main.cpp
+ *
+ * \date 2013-11-12
+ * \author consultit
+ */
 
 #include <pandaFramework.h>
 #include <pandaSystem.h>

@@ -17,8 +17,8 @@
 /**
  * \file /Ely/training/meshdrawer.cpp
  *
- * \date 15/lug/2013 10:17:13
- * \author marco
+ * \date 2013-07-15
+ * \author consultit
  */
 
 #include <pandaFramework.h>

@@ -1,3 +1,10 @@
+/**
+ * \file /Ely/training/recastnavigation/ValueHistory.cpp
+ *
+ * \date 2013-03-20
+ * \author consultit
+ */
+
 #include "ValueHistory.h"
 //#include "imgui.h"
 #include <string.h>

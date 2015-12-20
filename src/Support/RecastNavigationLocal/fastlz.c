@@ -23,6 +23,12 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
   THE SOFTWARE.
 */
+/**
+ * \file /Ely/src/Support/RecastNavigationLocal/fastlz.c
+ *
+ * \date 2013-07-08 
+ * \author consultit
+ */
 
 #if !defined(FASTLZ__COMPRESSOR) && !defined(FASTLZ_DECOMPRESSOR)
 

@@ -16,6 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/NavMeshType_Obstacle.h
+ *
+ * \date 2013-07-08 
+ * \author consultit
+ */
+
 #ifndef RECASTSAMPLETEMPOBSTACLE_H
 #define RECASTSAMPLETEMPOBSTACLE_H
 

@@ -38,6 +38,13 @@
 //
 // ----------------------------------------------------------------------------
 
+/**
+ * \file /Ely/include/Support/OpenSteerLocal/PlugIn_LowSpeedTurn.h
+ *
+ * \date 2014-04-21 
+ * \author consultit
+ */
+
 #ifndef PLUGIN_LOWSPEEDTURN_H_
 #define PLUGIN_LOWSPEEDTURN_H_
 

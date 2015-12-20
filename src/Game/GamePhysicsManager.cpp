@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Game/GamePhysicsManager.cpp
  *
- * \date 07/lug/2012 (10:58:21)
+ * \date 2012-07-07 
  * \author consultit
  */
 

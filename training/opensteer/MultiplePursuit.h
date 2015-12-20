@@ -34,6 +34,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/MultiplePursuit.h
+ *
+ * \date 2013-11-28
+ * \author consultit
+ */
 
 #include "OpenSteer/SimpleVehicle.h"
 //#include "OpenSteer/OpenSteerDemo.h"

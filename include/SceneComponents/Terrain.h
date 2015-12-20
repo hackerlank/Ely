@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/SceneComponents/Terrain.h
  *
- * \date 15/ago/2012 (10:00:07)
+ * \date 2012-08-15 
  * \author consultit
  */
 

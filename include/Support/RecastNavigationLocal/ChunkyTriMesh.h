@@ -16,6 +16,13 @@
 // 3. This notice may not be removed or altered from any source distribution.
 //
 
+/**
+ * \file /Ely/include/Support/RecastNavigationLocal/ChunkyTriMesh.h
+ *
+ * \date 2013-06-25 
+ * \author consultit
+ */
+
 #ifndef CHUNKYTRIMESH_H
 #define CHUNKYTRIMESH_H
 

@@ -34,6 +34,12 @@
 //
 //
 // ----------------------------------------------------------------------------
+/**
+ * \file /Ely/training/opensteer/OneTurning.h
+ *
+ * \date 2013-11-16
+ * \author consultit
+ */
 
 #include <iomanip>
 #include <sstream>

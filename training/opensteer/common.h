@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/opensteer/common.h
  *
- * \date 17/nov/2013 (11:11:37)
+ * \date 2013-11-17 
  * \author consultit
  */
 

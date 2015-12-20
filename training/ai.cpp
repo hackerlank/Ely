@@ -17,7 +17,7 @@
 /**
  * \file /Ely/training/ai.cpp
  *
- * \date 28/nov/2012 (08:44:38)
+ * \date 2012-11-28 
  * \author consultit
  */
 

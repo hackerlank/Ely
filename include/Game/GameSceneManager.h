@@ -17,7 +17,7 @@
 /**
  * \file  /Ely/include/Game/GameSceneManager.h
  *
- * \date 28/ago/2012
+ * \date 2012-08-28
  * \author consultit
  */
 

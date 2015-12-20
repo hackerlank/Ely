@@ -17,7 +17,7 @@
 /**
  * \file /Ely/elygame/callbacks/defs/Game_clbk.cpp
  *
- * \date 27/ago/2014 (12:17:38)
+ * \date 2014-08-27 
  * \author consultit
  */
 

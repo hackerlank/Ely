@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/Runner.cpp
  *
- * \date Nov 5, 2011
+ * \date 2011-11-05
  * \author consultit
  */
 

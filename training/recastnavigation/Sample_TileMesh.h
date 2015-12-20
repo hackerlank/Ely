@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/training/recastnavigation/Sample_TileMesh.h
+ *
+ * \date 2013-04-28
+ * \author consultit
+ */
 
 #ifndef RECASTSAMPLETILEMESH_H
 #define RECASTSAMPLETILEMESH_H

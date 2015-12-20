@@ -17,8 +17,8 @@
 /**
  * \file /Ely/src/Support/RecastNavigationLocal/DebugInterfaces.cpp
  *
- * \date 02/lug/2013 09:17:03
- * \author marco
+ * \date 2013-07-02
+ * \author consultit
  */
 
 #define _USE_MATH_DEFINES

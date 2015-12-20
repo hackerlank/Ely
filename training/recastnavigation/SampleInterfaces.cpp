@@ -1,3 +1,10 @@
+/**
+ * \file /Ely/training/recastnavigation/SampleInterfaces.cpp
+ *
+ * \date 2013-03-17
+ * \author consultit
+ */
+
 #define _USE_MATH_DEFINES
 #include <cmath>
 #include <cstdio>

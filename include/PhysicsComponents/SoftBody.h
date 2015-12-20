@@ -17,7 +17,7 @@
 /**
  * \file /Ely/include/PhysicsComponents/SoftBody.h
  *
- * \date 08/ott/20132 (08:00:35)
+ * \date 2013-10-08
  * \author consultit
  */
 

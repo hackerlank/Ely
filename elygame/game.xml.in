@@ -190,6 +190,10 @@
 		</ObjectTmpl>
 		
 		<!-- templates for static objects -->		
+		<ObjectTmpl type="Environment">
+			<ComponentTmpl family="Scene" type="Model"/>
+		</ObjectTmpl>
+
 		<ObjectTmpl type="StaticActor">
 			<ComponentTmpl family="Scene" type="Model" priority="100"/>
 			<ComponentTmpl family="Physics" type="RigidBody" priority="90"/> 
@@ -796,6 +800,16 @@
 		</Object>
 -->
 
+		<Object type="Environment" id="Sky">
+			<Component type="Model">
+				<Param from_file="true"/>
+				<Param model_file="skybox.bam"/>
+				<Param scale="768.0,768.0,768.0"/>
+			</Component>
+			<Param parent="render"/>
+			<Param is_steady="true"/>
+		</Object>
+		
 		<Object type="Terrain" id="Terrain1">
 			<Component type="Terrain">
 				<Param heightfield_file="@elygamedatadir@/textures/heightfield.png"/>

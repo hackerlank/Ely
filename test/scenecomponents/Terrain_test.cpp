@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/test/scenecomponents/Terrain_test.cpp
  *
- * \date 15/ago/2012 (10:00:08)
+ * \date 2012-08-15 
  * \author consultit
  */
 

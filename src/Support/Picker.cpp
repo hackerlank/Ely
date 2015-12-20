@@ -17,7 +17,7 @@
 /**
  * \file /Ely/src/Support/Picker.cpp
  *
- * \date 26/dic/2012 (10:58:28)
+ * \date 2012-12-26 
  * \author consultit
  */
 

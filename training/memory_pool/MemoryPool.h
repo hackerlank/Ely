@@ -59,6 +59,12 @@
 // Call the Free() function to release a chunk of memory back into the memory pool for reuse.  This
 // will cause the chunk to the inserted to the front of the list, ready for the next bit.
 //--------------------------------------------------------------------------------------------------
+/**
+ * \file /Ely/training/memory_pool/MemoryPool.h
+ *
+ * \date 2014-12-14
+ * \author consultit
+ */
 
 #ifndef MEMORYPOOL_H_
 #define MEMORYPOOL_H_

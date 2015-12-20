@@ -15,6 +15,12 @@
 //    misrepresented as being the original software.
 // 3. This notice may not be removed or altered from any source distribution.
 //
+/**
+ * \file /Ely/src/Support/RecastNavigationLocal/PerfTimer.cpp
+ *
+ * \date 2013-07-02 
+ * \author consultit
+ */
 
 #include "Support/RecastNavigationLocal/PerfTimer.h"
 
