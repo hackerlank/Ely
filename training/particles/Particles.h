@@ -23,7 +23,12 @@
 #ifndef PARTICLES_PARTICLES_H_
 #define PARTICLES_PARTICLES_H_
 
+#include "Utilities/Tools.h"
 #include <particleSystem.h>
+#include <physicalNode.h>
+#include <baseParticleFactory.h>
+#include <baseParticleRenderer.h>
+#include <baseParticleEmitter.h>
 
 namespace ely
 {
@@ -32,11 +37,27 @@ class Particles: public ParticleSystem
 {
 private:
 	std::string name;
+	SMARTPTR(PhysicalNode) node;
+	NodePath nodePath;
+	SMARTPTR(BaseParticleFactory) factory;
+	SMARTPTR(BaseParticleRenderer) renderer;
+	SMARTPTR(BaseParticleEmitter) emitter;
+	std::string factoryType, rendererType, emitterType;
+	bool fEnabled;
+	std::string geomReference;
 
 public:
 	Particles(const std::string& name = std::string(), unsigned int poolSize =
 			1024);
 	virtual ~Particles();
+
+	void enable();
+	void disable();
+
+	void setFactory(const std::string& type);
+	void setRenderer(const std::string& type);
+	void setEmitter(const std::string& type);
+
 
 protected:
 	static unsigned int id;

@@ -25,8 +25,12 @@
 namespace ely
 {
 
+unsigned int Particles::id = 0;
+
 Particles::Particles(const std::string& name, unsigned int poolSize) :
-		ParticleSystem(poolSize), name(name)
+		ParticleSystem(poolSize), name(name), factory(NULL), renderer(NULL), emitter(
+				NULL), factoryType("undefined"), rendererType("undefined"), emitterType(
+				"undefined"), fEnabled(false), geomReference("")
 {
 	if (not name)
 	{
@@ -40,31 +44,22 @@ Particles::Particles(const std::string& name, unsigned int poolSize) :
 	{
 		this->name = name;
 	}
-	//# self.setBirthRate(0.02)
-	//# self.setLitterSize(10)
-	//# self.setLitterSpread(0)
-//
-//# Set up a physical node
-//self.node = PhysicalNode(self.name)
-//self.nodePath = NodePath(self.node)
-//self.setRenderParent(self.node)
-//self.node.addPhysical(self)
-//
-//self.factory = None
-//self.factoryType = "undefined"
-//# self.setFactory("PointParticleFactory")
-//self.renderer = None
-//self.rendererType = "undefined"
-//# self.setRenderer("PointParticleRenderer")
-//self.emitter = None
-//self.emitterType = "undefined"
-//# self.setEmitter("SphereVolumeEmitter")
-//
-//# Enable particles by default
-//self.fEnabled = 0
-//#self.enable()
-//self.geomReference = ""
-
+	//
+//	set_birth_rate(0.02);
+//	set_litter_size(10);
+//	set_litter_spread(0);
+	// Set up a physical node
+	node = new PhysicalNode(name);
+	nodePath = NodePath(node);
+	set_render_parent(node);
+	node->add_physical(this);
+	//
+//	setFactory("PointParticleFactory");
+//	setRenderer("PointParticleRenderer");
+//	setEmitter("SphereVolumeEmitter");
+	//
+	// Enable particles by default
+//	enable();
 }
 
 Particles::~Particles()
@@ -72,6 +67,24 @@ Particles::~Particles()
 // TODO Auto-generated destructor stub
 }
 
-unsigned int Particles::id = 0;
+void Particles::enable()
+{
+}
+
+void Particles::disable()
+{
+}
+
+void Particles::setFactory(const std::string& type)
+{
+}
+
+void Particles::setRenderer(const std::string& type)
+{
+}
+
+void Particles::setEmitter(const std::string& type)
+{
+}
 
 } /* namespace ely */
