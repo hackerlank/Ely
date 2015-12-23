@@ -29,6 +29,7 @@
 #include <baseParticleFactory.h>
 #include <baseParticleRenderer.h>
 #include <baseParticleEmitter.h>
+#include <baseForce.h>
 
 namespace ely
 {
@@ -51,13 +52,22 @@ public:
 			1024);
 	virtual ~Particles();
 
+	void cleanup();
 	void enable();
 	void disable();
-
+	bool isEnabled();
+	SMARTPTR(PhysicalNode) getNode();
 	void setFactory(const std::string& type);
 	void setRenderer(const std::string& type);
 	void setEmitter(const std::string& type);
-
+	void addForce(SMARTPTR(BaseForce) force);
+	void removeForce(SMARTPTR(BaseForce) force);
+	void setRenderNodePath(NodePath nodePath);
+	// Getters
+	std::string getName();
+	SMARTPTR(BaseParticleFactory) getFactory();
+	SMARTPTR(BaseParticleEmitter) getEmitter();
+	SMARTPTR(BaseParticleEmitter) getRenderer();
 
 protected:
 	static unsigned int id;
