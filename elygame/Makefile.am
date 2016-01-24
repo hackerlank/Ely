@@ -47,7 +47,7 @@ elygame_LDADD = \
 	$(top_builddir)/src/libely.la \
 	$(ELY_LIBS)
 		
-dist_pkgdata_DATA = game.xml config.prc
+pkgdata_DATA = game.xml config.prc
 
 EXTRA_DIST = elygame_ini.h.in config.prc.in game.xml.in
 
