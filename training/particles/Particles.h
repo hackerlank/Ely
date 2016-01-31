@@ -20,8 +20,8 @@
  * \date 2015-12-22
  * \author consultit
  */
-#ifndef PARTICLES_PARTICLES_H_
-#define PARTICLES_PARTICLES_H_
+#ifndef PARTICLES_H_
+#define PARTICLES_H_
 
 #include "Utilities/Tools.h"
 #include <particleSystem.h>
@@ -37,15 +37,23 @@ namespace ely
 class Particles: public ParticleSystem
 {
 private:
+	PhysicsManager* physicsMgr;
+	ParticleSystemManager* particleMgr;
+	//
 	std::string name;
-	SMARTPTR(PhysicalNode) node;
 	NodePath nodePath;
+	//
+	SMARTPTR(PhysicalNode)node;
 	SMARTPTR(BaseParticleFactory) factory;
 	SMARTPTR(BaseParticleRenderer) renderer;
 	SMARTPTR(BaseParticleEmitter) emitter;
 	std::string factoryType, rendererType, emitterType;
 	bool fEnabled;
 	std::string geomReference;
+#ifdef ELY_THREAD
+	///The mutex associated with this Component.
+	ReMutex mMutex;
+#endif
 
 public:
 	Particles(const std::string& name = std::string(), unsigned int poolSize =
@@ -68,11 +76,41 @@ public:
 	SMARTPTR(BaseParticleFactory) getFactory();
 	SMARTPTR(BaseParticleEmitter) getEmitter();
 	SMARTPTR(BaseParticleEmitter) getRenderer();
+	//def getPoolSizeRanges(self); TODO
+	void accelerate(float time, int stepCount = 1, float stepTime=0.0);
 
 protected:
 	static unsigned int id;
+
+	///TypedObject semantics: hardcoded
+public:
+	static TypeHandle get_class_type()
+	{
+		return _type_handle;
+	}
+	static void init_type()
+	{
+		Component::init_type();
+		register_type(_type_handle, "Particles", Component::get_class_type());
+	}
+	virtual TypeHandle get_type() const
+	{
+		return get_class_type();
+	}
+	virtual TypeHandle force_init_type()
+	{
+		init_type();
+		return get_class_type();
+	}
+
+private:
+	static TypeHandle _type_handle;
+
 };
 
-} /* namespace ely */
+///inline definitions
 
-#endif /* PARTICLES_PARTICLES_H_ */
+}
+/* namespace ely */
+
+#endif /* PARTICLES_H_ */

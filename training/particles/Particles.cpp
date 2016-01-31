@@ -21,6 +21,12 @@
  * \author consultit
  */
 #include "Particles.h"
+#include <zSpinParticleFactory.h>
+#include <orientedParticleFactory.h>
+#include <lineParticleRenderer.h>
+#include <geomParticleRenderer.h>
+#include <sparkleParticleRenderer.h>
+#include "SpriteParticleRendererExt.h"
 
 namespace ely
 {
@@ -29,9 +35,13 @@ unsigned int Particles::id = 0;
 
 Particles::Particles(const std::string& name, unsigned int poolSize) :
 		ParticleSystem(poolSize), name(name), factory(NULL), renderer(NULL), emitter(
-				NULL), factoryType("undefined"), rendererType("undefined"), emitterType(
+		NULL), factoryType("undefined"), rendererType("undefined"), emitterType(
 				"undefined"), fEnabled(false), geomReference("")
 {
+	///TODO
+	physicsMgr = NULL; //TOBE inizialized
+	particleMgr = NULL; //TOBE inizialized
+	///
 	if (not name)
 	{
 		name =
@@ -67,24 +77,194 @@ Particles::~Particles()
 // TODO Auto-generated destructor stub
 }
 
+void Particles::cleanup()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	disable();
+	clear_linear_forces();
+	clear_angular_forces();
+	set_render_parent(node);
+	node->remove_physical(this);
+	nodePath.remove_node();
+	node.clear();
+	nodePath.clear();
+	factory.clear();
+	renderer.clear();
+	emitter.clear();
+}
+
 void Particles::enable()
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (fEnabled == false)
+	{
+		physicsMgr->attach_physical(this);
+		particleMgr->attach_particlesystem(this);
+		fEnabled = true;
+	}
 }
 
 void Particles::disable()
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (fEnabled == true)
+	{
+		physicsMgr->remove_physical(this);
+		particleMgr->remove_particlesystem(this);
+		fEnabled = false;
+	}
+}
+
+bool Particles::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return fEnabled;
+}
+
+SMARTPTR(PhysicalNode)Particles::getNode()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return node;
 }
 
 void Particles::setFactory(const std::string& type)
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (factoryType == type)
+	{
+		return;
+	}
+	if (factory)
+	{
+		factory.clear();
+	}
+	factoryType = type;
+	if (type == "PointParticleFactory")
+	{
+		factory = new PointParticleFactory();
+	}
+	else if (type == "ZSpinParticleFactory")
+	{
+		factory = new ZSpinParticleFactory();
+	}
+	else if (type == "OrientedParticleFactory")
+	{
+		factory = OrientedParticleFactory();
+	}
+	else
+	{
+		PRINT_ERR_DEBUG("unknown factory type: " << type);
+		return;
+	}
+	factory->set_lifespan_base(0.5);
+	set_factory(factory);
 }
 
 void Particles::setRenderer(const std::string& type)
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	if (rendererType == type)
+	{
+		return;
+	}
+	if (renderer)
+	{
+		renderer.clear();
+	}
+	rendererType = type;
+	if (type == "PointParticleRenderer")
+	{
+		renderer = new PointParticleRenderer();
+		dynamic_cast<PointParticleRenderer*>(renderer.p())->set_point_size(1.0);
+	}
+	else if (type == "LineParticleRenderer")
+	{
+		renderer = new LineParticleRenderer();
+	}
+	else if (type == "GeomParticleRenderer")
+	{
+		renderer = new GeomParticleRenderer();
+		// This was moved here because we do not want to download
+		// the direct tools with toontown.
+		///TODO
+//		if __dev__:
+//			from direct.directtools import DirectSelection
+//			npath = NodePath('default-geom')
+//			bbox = DirectSelection.DirectBoundingBox(npath)
+//			self.renderer.setGeomNode(bbox.lines.node());
+		///
+	}
+	else if (type == "SparkleParticleRenderer")
+	{
+		renderer = new SparkleParticleRenderer();
+	}
+	else if (type == "SpriteParticleRenderer")
+	{
+		renderer = new SpriteParticleRendererExt();
+		// dynamic_cast<SpriteParticleRendererExt*>(renderer.p())->setTextureFromFile();
+	}
+	else
+	{
+		PRINT_ERR_DEBUG("unknown renderer type: " << type);
+		return;
+	}
+	set_renderer(renderer);
 }
 
 void Particles::setEmitter(const std::string& type)
 {
+	//lock (guard) the mutex
+HOLD_REMUTEX(mMutex)
+
 }
+
+void Particles::addForce(SMARTPTR(BaseForce)force)
+{
+}
+
+void Particles::removeForce(SMARTPTR(BaseForce)force)
+{
+}
+
+void Particles::setRenderNodePath(NodePath nodePath)
+{
+}
+
+std::string Particles::getName()
+{
+}
+
+SMARTPTR(BaseParticleFactory)Particles::getFactory()
+{
+}
+
+SMARTPTR(BaseParticleEmitter)Particles::getEmitter()
+{
+}
+
+SMARTPTR(BaseParticleEmitter)Particles::getRenderer()
+{
+}
+
+void Particles::accelerate(float time, int stepCount, float stepTime)
+{
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle Particles::_type_handle;
 
 } /* namespace ely */
