@@ -34,17 +34,36 @@ namespace ely
 class SpriteParticleRendererExt: public SpriteParticleRenderer
 {
 private:
+	// Initialize class variables for texture, source file and node for texture and
+	// node path textures to None.  These will be initialized to a hardcoded default
+	// or whatever the user specifies in his/her Configrc variable the first time they
+	// are accessed
+	// Will use instance copy of this in functions below
+	static std::string sourceTextureName, sourceFileName, sourceNodeName;
 
 public:
 	SpriteParticleRendererExt();
 	virtual ~SpriteParticleRendererExt();
 
-protected:
+	const std::string& getSourceTextureName();
+	void setSourceTextureName(const std::string& name);
+	bool setTextureFromFile(const Filename& fileName = "");
+	bool addTextureFromFile(const Filename& fileName = "");
+	const Filename& getSourceFileName();
+	void setSourceFileName(const Filename& name);
+	const std::string& getSourceNodeName();
+	void setSourceNodeName(const std::string& name);
+	bool setTextureFromNode(const std::string& modelName = "",
+			const std::string& nodeName = "", bool sizeFromTexels = false);
+	bool addTextureFromNode(const std::string& modelName = "",
+			const std::string& nodeName = "", bool sizeFromTexels = false);
 
+protected:
+	std::string mSourceTextureName, mSourceFileName, mSourceNodeName;
 };
+
 ///inline definitions
 
-}
-/* namespace ely */
+} /* namespace ely */
 
 #endif /* SPRITEPARTICLERENDEREREXT_H_ */
