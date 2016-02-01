@@ -28,8 +28,8 @@ namespace ely
 {
 
 std::string SpriteParticleRendererExt::sourceTextureName = "",
-		SpriteParticleRendererExt::sourceFileName = "",
 		SpriteParticleRendererExt::sourceNodeName = "";
+Filename SpriteParticleRendererExt::sourceFileName = "";
 
 SpriteParticleRendererExt::SpriteParticleRendererExt()
 {
@@ -43,9 +43,8 @@ const std::string& SpriteParticleRendererExt::getSourceTextureName()
 {
 	if (mSourceTextureName == "")
 	{
-		SpriteParticleRendererExt::sourceTextureName = ConfigVariableString(
-				'particle-sprite-texture', 'maps/lightbulb.rgb', "DConfig",
-				ConfigFlags::F_dconfig).get_value();
+		SpriteParticleRendererExt::sourceTextureName = DConfig::GetString(
+				"particle-sprite-texture", "maps/lightbulb.rgb");
 	}
 	// Return instance copy of class variable
 	return mSourceTextureName;
@@ -78,27 +77,93 @@ bool SpriteParticleRendererExt::setTextureFromFile(const Filename& fileName)
 
 bool SpriteParticleRendererExt::addTextureFromFile(const Filename& fileName)
 {
+	if (get_num_anims() == 0)
+	{
+		return setTextureFromFile(fileName);
+	}
+
+	if (fileName == "")
+	{
+		fileName = getSourceTextureName();
+	}
+	Texture* t = TexturePool::load_texture(fileName);
+	if (t != NULL)
+	{
+		add_texture(t, t->get_y_size());
+		return true;
+	}
+	PRINT_ERR_DEBUG("Couldn't find rendererSpriteTexture file: " << fileName);
+	return false;
 }
 
 const Filename& SpriteParticleRendererExt::getSourceFileName()
 {
+	if (mSourceFileName == "")
+	{
+		SpriteParticleRendererExt::sourceFileName = DConfig::GetString(
+				"particle-sprite-model", "models/misc/smiley");
+	}
+	// Return instance copy of class variable
+	return mSourceFileName;
 }
 
-void SpriteParticleRendererExt::setSourceFileName(const Filename& fileName)
+void SpriteParticleRendererExt::setSourceFileName(const Filename& name)
 {
+	// Set instance copy of class variable
+	mSourceFileName = name;
 }
 
 const std::string& SpriteParticleRendererExt::getSourceNodeName()
 {
+	if (mSourceNodeName == "")
+	{
+		SpriteParticleRendererExt::sourceNodeName = DConfig::GetString(
+				"particle-sprite-node", "**/*");
+	}
+	// Return instance copy of class variable
+	return mSourceNodeName;
 }
 
 void SpriteParticleRendererExt::setSourceNodeName(const std::string& name)
 {
+	// Set instance copy of class variable
+	mSourceNodeName = name;
 }
 
 bool SpriteParticleRendererExt::setTextureFromNode(const std::string& modelName,
 		const std::string& nodeName, bool sizeFromTexels)
 {
+	if (modelName == "")
+	{
+		modelName = getSourceFileName();
+		if (nodeName == "")
+		{
+			nodeName = getSourceNodeName();
+		}
+	}
+	///TODO
+    // Load model and get texture
+	PT(PandaNode) node = Loader().load_sync(modelName, LoaderOptions());
+	NodePath("models");
+
+
+
+    m = loader.loadModel(modelName)
+    if (m == None):
+        print "SpriteParticleRendererExt: Couldn't find model: %s!" % modelName
+        return False
+
+    np = m.find(nodeName)
+    if np.isEmpty():
+        print "SpriteParticleRendererExt: Couldn't find node: %s!" % nodeName
+        m.removeNode()
+        return False
+
+    self.setFromNode(np, modelName, nodeName, sizeFromTexels)
+    self.setSourceFileName(modelName)
+    self.setSourceNodeName(nodeName)
+    m.removeNode()
+    return true;
 }
 
 bool SpriteParticleRendererExt::addTextureFromNode(const std::string& modelName,

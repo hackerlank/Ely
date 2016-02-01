@@ -39,7 +39,8 @@ private:
 	// or whatever the user specifies in his/her Configrc variable the first time they
 	// are accessed
 	// Will use instance copy of this in functions below
-	static std::string sourceTextureName, sourceFileName, sourceNodeName;
+	static std::string sourceTextureName, sourceNodeName;
+	static Filename sourceFileName;
 
 public:
 	SpriteParticleRendererExt();
@@ -59,7 +60,8 @@ public:
 			const std::string& nodeName = "", bool sizeFromTexels = false);
 
 protected:
-	std::string mSourceTextureName, mSourceFileName, mSourceNodeName;
+	std::string mSourceTextureName, mSourceNodeName;
+	Filename mSourceFileName;
 };
 
 ///inline definitions
