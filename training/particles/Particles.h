@@ -56,7 +56,7 @@ private:
 #endif
 
 public:
-	Particles(const std::string& name = std::string(), unsigned int poolSize =
+	Particles(std::string name = std::string(), unsigned int poolSize =
 			1024);
 	virtual ~Particles();
 
@@ -72,10 +72,10 @@ public:
 	void removeForce(SMARTPTR(BaseForce) force);
 	void setRenderNodePath(NodePath nodePath);
 	// Getters
-	std::string getName();
+	const std::string& getName();
 	SMARTPTR(BaseParticleFactory) getFactory();
 	SMARTPTR(BaseParticleEmitter) getEmitter();
-	SMARTPTR(BaseParticleEmitter) getRenderer();
+	SMARTPTR(BaseParticleRenderer) getRenderer();
 	//def getPoolSizeRanges(self); TODO
 	void accelerate(float time, int stepCount = 1, float stepTime=0.0);
 
@@ -90,8 +90,8 @@ public:
 	}
 	static void init_type()
 	{
-		Component::init_type();
-		register_type(_type_handle, "Particles", Component::get_class_type());
+		ParticleSystem::init_type();
+		register_type(_type_handle, "Particles", ParticleSystem::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

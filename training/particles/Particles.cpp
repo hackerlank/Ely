@@ -21,19 +21,32 @@
  * \author consultit
  */
 #include "Particles.h"
+#include "SpriteParticleRendererExt.h"
+#include <physicsManager.h>
+#include <particleSystemManager.h>
 #include <zSpinParticleFactory.h>
-#include <orientedParticleFactory.h>
+#include <pointParticleFactory.h>
+//#include <orientedParticleFactory.h>
+#include <pointParticleRenderer.h>
 #include <lineParticleRenderer.h>
 #include <geomParticleRenderer.h>
 #include <sparkleParticleRenderer.h>
-#include "SpriteParticleRendererExt.h"
+#include <arcEmitter.h>
+#include <boxEmitter.h>
+#include <discEmitter.h>
+#include <lineEmitter.h>
+#include <pointEmitter.h>
+#include <rectangleEmitter.h>
+#include <sphereSurfaceEmitter.h>
+#include <sphereVolumeEmitter.h>
+#include <tangentRingEmitter.h>
 
 namespace ely
 {
 
 unsigned int Particles::id = 0;
 
-Particles::Particles(const std::string& name, unsigned int poolSize) :
+Particles::Particles(std::string name, unsigned int poolSize) :
 		ParticleSystem(poolSize), name(name), factory(NULL), renderer(NULL), emitter(
 		NULL), factoryType("undefined"), rendererType("undefined"), emitterType(
 				"undefined"), fEnabled(false), geomReference("")
@@ -42,7 +55,7 @@ Particles::Particles(const std::string& name, unsigned int poolSize) :
 	physicsMgr = NULL; //TOBE inizialized
 	particleMgr = NULL; //TOBE inizialized
 	///
-	if (not name)
+	if (name == "")
 	{
 		name =
 				std::string("particles-")
@@ -159,10 +172,10 @@ void Particles::setFactory(const std::string& type)
 	{
 		factory = new ZSpinParticleFactory();
 	}
-	else if (type == "OrientedParticleFactory")
-	{
-		factory = OrientedParticleFactory();
-	}
+//	else if (type == "OrientedParticleFactory")
+//	{
+//		factory = new OrientedParticleFactory();
+//	}
 	else
 	{
 		PRINT_ERR_DEBUG("unknown factory type: " << type);
@@ -215,7 +228,7 @@ void Particles::setRenderer(const std::string& type)
 	else if (type == "SpriteParticleRenderer")
 	{
 		renderer = new SpriteParticleRendererExt();
-		// dynamic_cast<SpriteParticleRendererExt*>(renderer.p())->setTextureFromFile();
+		dynamic_cast<SpriteParticleRendererExt*>(renderer.p())->setTextureFromFile();
 	}
 	else
 	{
@@ -228,40 +241,151 @@ void Particles::setRenderer(const std::string& type)
 void Particles::setEmitter(const std::string& type)
 {
 	//lock (guard) the mutex
-HOLD_REMUTEX(mMutex)
+	HOLD_REMUTEX(mMutex)
 
+	if (emitterType == type)
+	{
+		return;
+	}
+	if (emitter)
+	{
+		emitter.clear();
+	}
+	emitterType = type;
+	if (type == "ArcEmitter")
+	{
+		emitter = new ArcEmitter();
+	}
+	else if (type == "BoxEmitter")
+	{
+		emitter = new BoxEmitter();
+	}
+	else if (type == "DiscEmitter")
+	{
+		emitter = new DiscEmitter();
+	}
+	else if (type == "LineEmitter")
+	{
+		emitter = new LineEmitter();
+	}
+	else if (type == "PointEmitter")
+	{
+		emitter = new PointEmitter();
+	}
+	else if (type == "RectangleEmitter")
+	{
+		emitter = new RectangleEmitter();
+	}
+	else if (type == "RingEmitter")
+	{
+		emitter = new RingEmitter();
+	}
+	else if (type == "SphereSurfaceEmitter")
+	{
+		emitter = new SphereSurfaceEmitter();
+	}
+	else if (type == "SphereVolumeEmitter")
+	{
+		emitter = new SphereVolumeEmitter();
+		dynamic_cast<SphereVolumeEmitter*>(emitter.p())->set_radius(1.0);
+	}
+	else if (type == "TangentRingEmitter")
+	{
+		emitter = new TangentRingEmitter();
+	}
+	else
+	{
+		PRINT_ERR_DEBUG("unknown emitter type: " << type);
+		return;
+	}
+	set_emitter(emitter);
 }
 
 void Particles::addForce(SMARTPTR(BaseForce)force)
 {
+	if (force->is_linear())
+	{
+		add_linear_force(dynamic_cast<LinearForce*>(force.p()));
+	}
+	else
+	{
+		add_angular_force(dynamic_cast<AngularForce*>(force.p()));
+	}
 }
 
 void Particles::removeForce(SMARTPTR(BaseForce)force)
 {
+	if (force.is_null())
+	{
+		return;
+	}
+	if (force->is_linear())
+	{
+		remove_linear_force(dynamic_cast<LinearForce*>(force.p()));
+	}
+	else
+	{
+		remove_angular_force(dynamic_cast<AngularForce*>(force.p()));
+	}
 }
 
 void Particles::setRenderNodePath(NodePath nodePath)
 {
+	set_render_parent(nodePath.node());
 }
 
-std::string Particles::getName()
+const std::string& Particles::getName()
 {
+	return name;
 }
 
 SMARTPTR(BaseParticleFactory)Particles::getFactory()
 {
+	return factory;
 }
 
 SMARTPTR(BaseParticleEmitter)Particles::getEmitter()
 {
+	return emitter;
 }
 
-SMARTPTR(BaseParticleEmitter)Particles::getRenderer()
+SMARTPTR(BaseParticleRenderer)Particles::getRenderer()
 {
+	return renderer;
 }
+
+//def getPoolSizeRanges(self); TODO
 
 void Particles::accelerate(float time, int stepCount, float stepTime)
 {
+	if (time > 0.0)
+	{
+		float remainder;
+		if (stepTime == 0.0)
+		{
+			stepTime = float(time) / stepCount;
+			remainder = 0.0;
+		}
+		else
+		{
+			stepCount = int(float(time) / stepTime);
+			remainder = time - stepCount * stepTime;
+		}
+
+		for (int var = 0; var < stepCount; ++var)
+		{
+			particleMgr->do_particles(stepTime, this, false);
+			physicsMgr->do_physics(stepTime, this);
+		}
+
+		if (remainder)
+		{
+			particleMgr->do_particles(remainder, this, false);
+			physicsMgr->do_physics(remainder, this);
+		}
+
+		render();
+	}
 }
 
 //TypedObject semantics: hardcoded

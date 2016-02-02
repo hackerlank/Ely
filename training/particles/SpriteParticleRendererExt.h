@@ -23,10 +23,10 @@
 #ifndef SPRITEPARTICLERENDEREREXT_H_
 #define SPRITEPARTICLERENDEREREXT_H_
 
+#include <spriteParticleRenderer.h>
+
 namespace ely
 {
-
-#include <spriteParticleRenderer.h>
 
 /**
  * \brief Contains methods to extend functionality of the SpriteParticleRenderer class.
@@ -39,8 +39,7 @@ private:
 	// or whatever the user specifies in his/her Configrc variable the first time they
 	// are accessed
 	// Will use instance copy of this in functions below
-	static std::string sourceTextureName, sourceNodeName;
-	static Filename sourceFileName;
+	static std::string sourceTextureName, sourceFileName, sourceNodeName;
 
 public:
 	SpriteParticleRendererExt();
@@ -48,10 +47,10 @@ public:
 
 	const std::string& getSourceTextureName();
 	void setSourceTextureName(const std::string& name);
-	bool setTextureFromFile(const Filename& fileName = "");
-	bool addTextureFromFile(const Filename& fileName = "");
-	const Filename& getSourceFileName();
-	void setSourceFileName(const Filename& name);
+	bool setTextureFromFile(const std::string& fileName = "");
+	bool addTextureFromFile(const std::string& fileName = "");
+	const std::string& getSourceFileName();
+	void setSourceFileName(const std::string& name);
 	const std::string& getSourceNodeName();
 	void setSourceNodeName(const std::string& name);
 	bool setTextureFromNode(const std::string& modelName = "",

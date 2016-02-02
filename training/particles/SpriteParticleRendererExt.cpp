@@ -23,13 +23,15 @@
 
 #include "Utilities/Tools.h"
 #include "SpriteParticleRendererExt.h"
+#include <texturePool.h>
+#include <loader.h>
 
 namespace ely
 {
 
 std::string SpriteParticleRendererExt::sourceTextureName = "",
+		SpriteParticleRendererExt::sourceFileName = "",
 		SpriteParticleRendererExt::sourceNodeName = "";
-Filename SpriteParticleRendererExt::sourceFileName = "";
 
 SpriteParticleRendererExt::SpriteParticleRendererExt()
 {
@@ -56,9 +58,10 @@ void SpriteParticleRendererExt::setSourceTextureName(const std::string& name)
 	mSourceTextureName = name;
 }
 
-bool SpriteParticleRendererExt::setTextureFromFile(const Filename& fileName)
+bool SpriteParticleRendererExt::setTextureFromFile(const std::string& _fileName)
 {
-	if (fileName == "")
+	std::string fileName;
+	if (_fileName == "")
 	{
 		fileName = getSourceTextureName();
 	}
@@ -75,14 +78,14 @@ bool SpriteParticleRendererExt::setTextureFromFile(const Filename& fileName)
 	return false;
 }
 
-bool SpriteParticleRendererExt::addTextureFromFile(const Filename& fileName)
+bool SpriteParticleRendererExt::addTextureFromFile(const std::string& _fileName)
 {
 	if (get_num_anims() == 0)
 	{
-		return setTextureFromFile(fileName);
+		return setTextureFromFile(_fileName);
 	}
-
-	if (fileName == "")
+	std::string fileName;
+	if (_fileName == "")
 	{
 		fileName = getSourceTextureName();
 	}
@@ -96,7 +99,7 @@ bool SpriteParticleRendererExt::addTextureFromFile(const Filename& fileName)
 	return false;
 }
 
-const Filename& SpriteParticleRendererExt::getSourceFileName()
+const std::string& SpriteParticleRendererExt::getSourceFileName()
 {
 	if (mSourceFileName == "")
 	{
@@ -107,7 +110,7 @@ const Filename& SpriteParticleRendererExt::getSourceFileName()
 	return mSourceFileName;
 }
 
-void SpriteParticleRendererExt::setSourceFileName(const Filename& name)
+void SpriteParticleRendererExt::setSourceFileName(const std::string& name)
 {
 	// Set instance copy of class variable
 	mSourceFileName = name;
@@ -135,7 +138,7 @@ namespace
 {
 inline NodePath loadModel(const std::string& modelPath)
 {
-	NodePath nodePath();
+	NodePath nodePath = NodePath();
 	PT(PandaNode)node = Loader("loader").load_sync(Filename(modelPath));
 	if (node)
 	{
@@ -147,13 +150,15 @@ inline NodePath loadModel(const std::string& modelPath)
 
 namespace ely
 {
-bool SpriteParticleRendererExt::setTextureFromNode(const std::string& modelName,
-		const std::string& nodeName, bool sizeFromTexels)
+bool SpriteParticleRendererExt::setTextureFromNode(
+		const std::string& _modelName, const std::string& _nodeName,
+		bool sizeFromTexels)
 {
-	if (modelName == "")
+	std::string modelName, nodeName;
+	if (_modelName == "")
 	{
 		modelName = getSourceFileName();
-		if (nodeName == "")
+		if (_nodeName == "")
 		{
 			nodeName = getSourceNodeName();
 		}
@@ -183,18 +188,18 @@ bool SpriteParticleRendererExt::setTextureFromNode(const std::string& modelName,
 	return true;
 }
 
-bool SpriteParticleRendererExt::addTextureFromNode(const std::string& modelName,
-		const std::string& nodeName, bool sizeFromTexels)
+bool SpriteParticleRendererExt::addTextureFromNode(const std::string& _modelName,
+		const std::string& _nodeName, bool sizeFromTexels)
 {
 	if (get_num_anims() == 0)
 	{
-		return setTextureFromNode(modelName, nodeName, sizeFromTexels);
+		return setTextureFromNode(_modelName, _nodeName, sizeFromTexels);
 	}
-
-	if (modelName == "")
+	std::string modelName, nodeName;
+	if (_modelName == "")
 	{
 		modelName = getSourceFileName();
-		if (nodeName == "")
+		if (_nodeName == "")
 		{
 			nodeName = getSourceNodeName();
 		}
