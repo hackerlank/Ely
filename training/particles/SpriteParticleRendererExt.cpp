@@ -129,7 +129,24 @@ void SpriteParticleRendererExt::setSourceNodeName(const std::string& name)
 	// Set instance copy of class variable
 	mSourceNodeName = name;
 }
+} /*namespace ely*/
 
+namespace
+{
+inline NodePath loadModel(const std::string& modelPath)
+{
+	NodePath nodePath();
+	PT(PandaNode)node = Loader("loader").load_sync(Filename(modelPath));
+	if (node)
+	{
+		NodePath nodePath(node);
+	}
+	return nodePath;
+}
+}  // namespace
+
+namespace ely
+{
 bool SpriteParticleRendererExt::setTextureFromNode(const std::string& modelName,
 		const std::string& nodeName, bool sizeFromTexels)
 {
@@ -141,34 +158,69 @@ bool SpriteParticleRendererExt::setTextureFromNode(const std::string& modelName,
 			nodeName = getSourceNodeName();
 		}
 	}
-	///TODO
-    // Load model and get texture
-	PT(PandaNode) node = Loader().load_sync(modelName, LoaderOptions());
-	NodePath("models");
 
+	// Load model and get texture
+	NodePath m = loadModel(modelName);
+	if (m == NodePath())
+	{
+		PRINT_ERR_DEBUG(
+				"SpriteParticleRendererExt: Couldn't find model: " << modelName);
+		return false;
+	}
 
-
-    m = loader.loadModel(modelName)
-    if (m == None):
-        print "SpriteParticleRendererExt: Couldn't find model: %s!" % modelName
-        return False
-
-    np = m.find(nodeName)
-    if np.isEmpty():
-        print "SpriteParticleRendererExt: Couldn't find node: %s!" % nodeName
-        m.removeNode()
-        return False
-
-    self.setFromNode(np, modelName, nodeName, sizeFromTexels)
-    self.setSourceFileName(modelName)
-    self.setSourceNodeName(nodeName)
-    m.removeNode()
-    return true;
+	NodePath np = m.find(nodeName);
+	if (np.is_empty())
+	{
+		PRINT_ERR_DEBUG(
+				"SpriteParticleRendererExt: Couldn't find node: " << nodeName);
+		m.remove_node();
+		return false;
+	}
+	set_from_node(np, modelName, nodeName, sizeFromTexels);
+	setSourceFileName(modelName);
+	setSourceNodeName(nodeName);
+	m.remove_node();
+	return true;
 }
 
 bool SpriteParticleRendererExt::addTextureFromNode(const std::string& modelName,
 		const std::string& nodeName, bool sizeFromTexels)
 {
+	if (get_num_anims() == 0)
+	{
+		return setTextureFromNode(modelName, nodeName, sizeFromTexels);
+	}
+
+	if (modelName == "")
+	{
+		modelName = getSourceFileName();
+		if (nodeName == "")
+		{
+			nodeName = getSourceNodeName();
+		}
+	}
+
+	// Load model and get texture
+	NodePath m = loadModel(modelName);
+	if (m == NodePath())
+	{
+		PRINT_ERR_DEBUG(
+				"SpriteParticleRendererExt: Couldn't find model: " << modelName);
+		return false;
+	}
+	NodePath np = m.find(nodeName);
+	if (np.is_empty())
+	{
+		PRINT_ERR_DEBUG(
+				"SpriteParticleRendererExt: Couldn't find node: " << nodeName);
+		m.remove_node();
+		return false;
+	}
+
+	add_from_node(np, modelName, nodeName, sizeFromTexels);
+	m.remove_node();
+
+	return true;
 }
 
 } /* namespace ely */
