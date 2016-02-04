@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/particles/Particles.cpp
+ * \file /Ely/src/Support/particles/Particles.cpp
  *
  * \date 2015-12-22
  * \author consultit
@@ -87,7 +87,6 @@ Particles::Particles(std::string name, unsigned int poolSize) :
 
 Particles::~Particles()
 {
-// TODO Auto-generated destructor stub
 }
 
 void Particles::cleanup()
@@ -211,15 +210,17 @@ void Particles::setRenderer(const std::string& type)
 	else if (type == "GeomParticleRenderer")
 	{
 		renderer = new GeomParticleRenderer();
-		// This was moved here because we do not want to download
-		// the direct tools with toontown.
+#ifdef ELY_DEBUG
 		///TODO
+//		# This was moved here because we do not want to download
+//		# the direct tools with toontown.
 //		if __dev__:
 //			from direct.directtools import DirectSelection
 //			npath = NodePath('default-geom')
 //			bbox = DirectSelection.DirectBoundingBox(npath)
-//			self.renderer.setGeomNode(bbox.lines.node());
+//			self.renderer.setGeomNode(bbox.lines.node())
 		///
+#endif
 	}
 	else if (type == "SparkleParticleRenderer")
 	{
@@ -334,7 +335,7 @@ void Particles::setRenderNodePath(NodePath nodePath)
 	set_render_parent(nodePath.node());
 }
 
-const std::string& Particles::getName()
+std::string Particles::getName()
 {
 	return name;
 }
@@ -354,7 +355,37 @@ SMARTPTR(BaseParticleRenderer)Particles::getRenderer()
 	return renderer;
 }
 
-//def getPoolSizeRanges(self); TODO
+std::map<std::string, float> Particles::getPoolSizeRanges()
+{
+	int litterRange[3] =
+	{
+			max(1, get_litter_size() - get_litter_spread()),
+			get_litter_size(),
+			get_litter_size() + get_litter_spread()
+	};
+	float lifespanRange[3] =
+	{
+			factory->get_lifespan_base() - factory->get_lifespan_spread(),
+			factory->get_lifespan_base(),
+			factory->get_lifespan_base() + factory->get_lifespan_spread()
+	};
+	float birthRateRange[3] =
+	{
+			get_birth_rate(),
+			get_birth_rate(),
+			get_birth_rate()
+	};
+
+	PRINT_DEBUG("Litter Ranges:    " << litterRange);
+	PRINT_DEBUG("LifeSpan Ranges:  " << lifespanRange);
+	PRINT_DEBUG("BirthRate Ranges: " << birthRateRange);
+
+	std::map<std::string, float> dict;
+	dict["min"] = litterRange[0] * lifespanRange[0] / birthRateRange[0];
+	dict["median"] = litterRange[1] * lifespanRange[1] / birthRateRange[1];
+	dict["max"] = litterRange[2] * lifespanRange[2] / birthRateRange[2];
+	return dict;
+}
 
 void Particles::accelerate(float time, int stepCount, float stepTime)
 {

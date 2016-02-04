@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/particles/SpriteParticleRendererExt.h
+ * \file /Ely/include/Support/particles/SpriteParticleRendererExt.h
  *
  * \date 2016-01-31
  * \author consultit
@@ -45,13 +45,13 @@ public:
 	SpriteParticleRendererExt();
 	virtual ~SpriteParticleRendererExt();
 
-	const std::string& getSourceTextureName();
+	std::string getSourceTextureName();
 	void setSourceTextureName(const std::string& name);
 	bool setTextureFromFile(const std::string& fileName = "");
 	bool addTextureFromFile(const std::string& fileName = "");
-	const std::string& getSourceFileName();
+	std::string getSourceFileName();
 	void setSourceFileName(const std::string& name);
-	const std::string& getSourceNodeName();
+	std::string getSourceNodeName();
 	void setSourceNodeName(const std::string& name);
 	bool setTextureFromNode(const std::string& modelName = "",
 			const std::string& nodeName = "", bool sizeFromTexels = false);

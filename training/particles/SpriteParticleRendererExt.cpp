@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/particles/SpriteParticleRendererExt.cpp
+ * \file /Ely/src/Support/particles/SpriteParticleRendererExt.cpp
  *
  * \date 2016-01-31
  * \author consultit
@@ -41,7 +41,7 @@ SpriteParticleRendererExt::~SpriteParticleRendererExt()
 {
 }
 
-const std::string& SpriteParticleRendererExt::getSourceTextureName()
+std::string SpriteParticleRendererExt::getSourceTextureName()
 {
 	if (mSourceTextureName == "")
 	{
@@ -99,7 +99,7 @@ bool SpriteParticleRendererExt::addTextureFromFile(const std::string& _fileName)
 	return false;
 }
 
-const std::string& SpriteParticleRendererExt::getSourceFileName()
+std::string SpriteParticleRendererExt::getSourceFileName()
 {
 	if (mSourceFileName == "")
 	{
@@ -116,7 +116,7 @@ void SpriteParticleRendererExt::setSourceFileName(const std::string& name)
 	mSourceFileName = name;
 }
 
-const std::string& SpriteParticleRendererExt::getSourceNodeName()
+std::string SpriteParticleRendererExt::getSourceNodeName()
 {
 	if (mSourceNodeName == "")
 	{

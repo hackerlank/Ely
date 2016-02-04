@@ -15,7 +15,7 @@
  *   along with Ely.  If not, see <http://www.gnu.org/licenses/>.
  */
 /**
- * \file /Ely/training/particles/Particles.h
+ * \file /Ely/include/Support/particles/Particles.h
  *
  * \date 2015-12-22
  * \author consultit
@@ -72,11 +72,11 @@ public:
 	void removeForce(SMARTPTR(BaseForce) force);
 	void setRenderNodePath(NodePath nodePath);
 	// Getters
-	const std::string& getName();
+	std::string getName();
 	SMARTPTR(BaseParticleFactory) getFactory();
 	SMARTPTR(BaseParticleEmitter) getEmitter();
 	SMARTPTR(BaseParticleRenderer) getRenderer();
-	//def getPoolSizeRanges(self); TODO
+	std::map<std::string,float> getPoolSizeRanges();
 	void accelerate(float time, int stepCount = 1, float stepTime=0.0);
 
 protected:
