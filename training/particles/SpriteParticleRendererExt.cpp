@@ -52,12 +52,6 @@ std::string SpriteParticleRendererExt::getSourceTextureName()
 	return mSourceTextureName;
 }
 
-void SpriteParticleRendererExt::setSourceTextureName(const std::string& name)
-{
-	// Set instance copy of class variable
-	mSourceTextureName = name;
-}
-
 bool SpriteParticleRendererExt::setTextureFromFile(const std::string& _fileName)
 {
 	std::string fileName;
@@ -110,12 +104,6 @@ std::string SpriteParticleRendererExt::getSourceFileName()
 	return mSourceFileName;
 }
 
-void SpriteParticleRendererExt::setSourceFileName(const std::string& name)
-{
-	// Set instance copy of class variable
-	mSourceFileName = name;
-}
-
 std::string SpriteParticleRendererExt::getSourceNodeName()
 {
 	if (mSourceNodeName == "")
@@ -125,12 +113,6 @@ std::string SpriteParticleRendererExt::getSourceNodeName()
 	}
 	// Return instance copy of class variable
 	return mSourceNodeName;
-}
-
-void SpriteParticleRendererExt::setSourceNodeName(const std::string& name)
-{
-	// Set instance copy of class variable
-	mSourceNodeName = name;
 }
 } /*namespace ely*/
 

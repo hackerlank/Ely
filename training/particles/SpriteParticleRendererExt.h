@@ -65,6 +65,24 @@ protected:
 
 ///inline definitions
 
+inline void SpriteParticleRendererExt::setSourceTextureName(const std::string& name)
+{
+	// Set instance copy of class variable
+	mSourceTextureName = name;
+}
+
+inline void SpriteParticleRendererExt::setSourceFileName(const std::string& name)
+{
+	// Set instance copy of class variable
+	mSourceFileName = name;
+}
+
+inline void SpriteParticleRendererExt::setSourceNodeName(const std::string& name)
+{
+	// Set instance copy of class variable
+	mSourceNodeName = name;
+}
+
 } /* namespace ely */
 
 #endif /* SPRITEPARTICLERENDEREREXT_H_ */

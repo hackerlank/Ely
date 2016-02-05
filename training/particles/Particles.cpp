@@ -44,7 +44,7 @@
 namespace ely
 {
 
-unsigned int Particles::id = 0;
+unsigned int Particles::id = 1;
 
 Particles::Particles(std::string name, unsigned int poolSize) :
 		ParticleSystem(poolSize), name(name), factory(NULL), renderer(NULL), emitter(
@@ -52,20 +52,24 @@ Particles::Particles(std::string name, unsigned int poolSize) :
 				"undefined"), fEnabled(false), geomReference("")
 {
 	///TODO
-	physicsMgr = NULL; //TOBE inizialized
-	particleMgr = NULL; //TOBE inizialized
+	physicsMgr = NULL; //TOBE inizialized from global value
+	particleMgr = NULL; //TOBE inizialized from global value
 	///
-	if (name == "")
 	{
-		name =
-				std::string("particles-")
-						+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
-								id)).str();
-		id++;
-	}
-	else
-	{
-		this->name = name;
+		HOLD_REMUTEX(Particles::mMutexId)
+
+		if (name == "")
+		{
+			name =
+					std::string("particles-")
+							+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
+									id)).str();
+			id++;
+		}
+		else
+		{
+			this->name = name;
+		}
 	}
 	//
 //	set_birth_rate(0.02);
@@ -131,22 +135,6 @@ void Particles::disable()
 		particleMgr->remove_particlesystem(this);
 		fEnabled = false;
 	}
-}
-
-bool Particles::isEnabled()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return fEnabled;
-}
-
-SMARTPTR(PhysicalNode)Particles::getNode()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	return node;
 }
 
 void Particles::setFactory(const std::string& type)
@@ -304,6 +292,9 @@ void Particles::setEmitter(const std::string& type)
 
 void Particles::addForce(SMARTPTR(BaseForce)force)
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
 	if (force->is_linear())
 	{
 		add_linear_force(dynamic_cast<LinearForce*>(force.p()));
@@ -316,10 +307,10 @@ void Particles::addForce(SMARTPTR(BaseForce)force)
 
 void Particles::removeForce(SMARTPTR(BaseForce)force)
 {
-	if (force.is_null())
-	{
-		return;
-	}
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	RETURN_ON_COND(force.is_null(),)
 	if (force->is_linear())
 	{
 		remove_linear_force(dynamic_cast<LinearForce*>(force.p()));
@@ -330,33 +321,11 @@ void Particles::removeForce(SMARTPTR(BaseForce)force)
 	}
 }
 
-void Particles::setRenderNodePath(NodePath nodePath)
-{
-	set_render_parent(nodePath.node());
-}
-
-std::string Particles::getName()
-{
-	return name;
-}
-
-SMARTPTR(BaseParticleFactory)Particles::getFactory()
-{
-	return factory;
-}
-
-SMARTPTR(BaseParticleEmitter)Particles::getEmitter()
-{
-	return emitter;
-}
-
-SMARTPTR(BaseParticleRenderer)Particles::getRenderer()
-{
-	return renderer;
-}
-
 std::map<std::string, float> Particles::getPoolSizeRanges()
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
 	int litterRange[3] =
 	{
 			max(1, get_litter_size() - get_litter_spread()),
@@ -389,6 +358,9 @@ std::map<std::string, float> Particles::getPoolSizeRanges()
 
 void Particles::accelerate(float time, int stepCount, float stepTime)
 {
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
 	if (time > 0.0)
 	{
 		float remainder;

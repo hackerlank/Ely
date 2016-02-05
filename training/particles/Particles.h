@@ -37,9 +37,10 @@ namespace ely
 class Particles: public ParticleSystem
 {
 private:
+	///TODO
 	PhysicsManager* physicsMgr;
 	ParticleSystemManager* particleMgr;
-	//
+	///
 	std::string name;
 	NodePath nodePath;
 	//
@@ -71,6 +72,7 @@ public:
 	void addForce(SMARTPTR(BaseForce) force);
 	void removeForce(SMARTPTR(BaseForce) force);
 	void setRenderNodePath(NodePath nodePath);
+	NodePath getNodePath();
 	// Getters
 	std::string getName();
 	SMARTPTR(BaseParticleFactory) getFactory();
@@ -79,8 +81,17 @@ public:
 	std::map<std::string,float> getPoolSizeRanges();
 	void accelerate(float time, int stepCount = 1, float stepTime=0.0);
 
+#ifdef ELY_THREAD
+	/**
+	 * \brief Get the mutex to lock the entire structure.
+	 * @return The internal mutex.
+	 */
+	ReMutex& getMutex();
+#endif
+
 protected:
 	static unsigned int id;
+	static ReMutex mMutexId;
 
 	///TypedObject semantics: hardcoded
 public:
@@ -109,6 +120,74 @@ private:
 };
 
 ///inline definitions
+
+inline bool Particles::isEnabled()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return fEnabled;
+}
+
+inline SMARTPTR(PhysicalNode)Particles::getNode()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return node;
+}
+
+inline void Particles::setRenderNodePath(NodePath nodePath)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	set_render_parent(nodePath.node());
+}
+
+inline NodePath Particles::getNodePath()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return nodePath;
+}
+
+inline std::string Particles::getName()
+{
+	return name;
+}
+
+inline SMARTPTR(BaseParticleFactory)Particles::getFactory()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return factory;
+}
+
+inline SMARTPTR(BaseParticleEmitter)Particles::getEmitter()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return emitter;
+}
+
+inline SMARTPTR(BaseParticleRenderer)Particles::getRenderer()
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	return renderer;
+}
+
+#ifdef ELY_THREAD
+inline ReMutex& Particles::getMutex()
+{
+	return mMutex;
+}
+#endif
 
 }
 /* namespace ely */
