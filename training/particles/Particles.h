@@ -37,10 +37,9 @@ namespace ely
 class Particles: public ParticleSystem
 {
 private:
-	///TODO
 	PhysicsManager* physicsMgr;
 	ParticleSystemManager* particleMgr;
-	///
+	//
 	std::string name;
 	NodePath nodePath;
 	//
@@ -57,7 +56,7 @@ private:
 #endif
 
 public:
-	Particles(std::string name = std::string(), unsigned int poolSize =
+	Particles(const std::string& name = std::string(), unsigned int poolSize =
 			1024);
 	virtual ~Particles();
 

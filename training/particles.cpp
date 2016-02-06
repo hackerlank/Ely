@@ -31,12 +31,22 @@
 #include <sphereVolumeEmitter.h>
 #include <pointParticleRenderer.h>
 #include <lvecBase4.h>
+#include "particles/ParticleEffect.h"
+#include "particles/Particles.h"
+#include "particles/SpriteParticleRendererExt.h"
+#include "particles/ForceGroup.h"
+#include <linearJitterForce.h>
+#include <lineEmitter.h>
+#include "particles/GameParticlesManager.h"
 
 static std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/elygame/");
 
-AsyncTask::DoneStatus update_managers(GenericAsyncTask* task, void* data);
 ParticleSystemManager* particle_sys_mgr;
 PhysicsManager* physics_mgr;
+void loadConfig(ely::ParticleEffect& particleEffect);
+bool fireStarted;
+void toggleFire(const Event* e, void* data);
+void shoot(const Event* e, void* data);
 
 int particles_main(int argc, char *argv[])
 {
@@ -67,128 +77,129 @@ int particles_main(int argc, char *argv[])
 	}
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = window->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
 	trackball->set_hpr(0, 15, 0);
 
 	///here is room for your own code
-	//setup particles update
-	particle_sys_mgr = new ParticleSystemManager();
-    particle_sys_mgr->set_frame_stepping(1);
-    physics_mgr = new PhysicsManager();
-    PT(LinearEulerIntegrator) integrator = new LinearEulerIntegrator();
-    physics_mgr->attach_linear_integrator(integrator);
-	//update managers
-	AsyncTask* task = new GenericAsyncTask("update terrain", &update_managers,
-	NULL);
-	framework.get_task_mgr().add(task);
-
-	//Factory
-	PT(PointParticleFactory) pt_particle_factory = new PointParticleFactory();
-	pt_particle_factory->set_lifespan_base(0.5);
-	pt_particle_factory->set_lifespan_spread(0);
-	pt_particle_factory->set_mass_base(1.0);
-	pt_particle_factory->set_mass_spread(0);
-	pt_particle_factory->set_terminal_velocity_base(400);
-	pt_particle_factory->set_terminal_velocity_spread(0);
-
-	//Emitter
-	PT(SphereVolumeEmitter) sphere_emitter = new SphereVolumeEmitter;
-	sphere_emitter->set_emission_type(SphereVolumeEmitter::ET_RADIATE);
-	sphere_emitter->set_radius(3.0);
-	// negative values emit the particles toward the sphere center
-	sphere_emitter->set_amplitude(1);
-	sphere_emitter->set_amplitude_spread(0);
-	sphere_emitter->set_offset_force(LVector3f(0, 0, 0));
-	sphere_emitter->set_explicit_launch_vector(LVector3f(1, 0, 0));
-	sphere_emitter->set_radiate_origin(LPoint3f(0, 0, 0));
-
-	//Renderer
-	PT(PointParticleRenderer) pt_particle_rend = new PointParticleRenderer();
-	pt_particle_rend->set_alpha_mode(BaseParticleRenderer::PR_ALPHA_OUT);
-	pt_particle_rend->set_user_alpha(1);
-	pt_particle_rend->set_point_size(2.0);
-	pt_particle_rend->set_start_color(LColorf(1, 0, 0, 1)); // alpha value is ignored
-	pt_particle_rend->set_end_color(LColorf(1, 1, 0, 1));
-	pt_particle_rend->set_blend_type(PointParticleRenderer::PP_BLEND_LIFE);
-	pt_particle_rend->set_blend_method(BaseParticleRenderer::PP_BLEND_LINEAR);
-	//pt_particle_rend->set_color_blend_mode(ColorBlendAttrib::Mode::M_inv_subtract);
-	//pt_particle_rend->set_ignore_scale(false);
-
-	//ParticleSystem
-	PT(ParticleSystem) particle_sys = new ParticleSystem();
-	particle_sys->set_pool_size(4);
-	particle_sys->set_birth_rate(0.1);
-	particle_sys->set_litter_size(10);
-	particle_sys->set_litter_spread(0);
-	particle_sys->set_local_velocity_flag(true);
-//	particle_sys->set_spawn_on_death_flag(true); // this caused an exception!!
-	particle_sys->set_system_grows_older_flag(true);
-	particle_sys->set_system_lifespan(3600.0);
-	particle_sys->set_active_system_flag(true);
-	// use it to advance system age, or start at some age
-	//particle_sys->set_system_age(5.0);
-	// system_age is updated only when set_system_grows_older_flag(true);
-	// get_system_age() returns 0 unless system_grows_older_flag is set
-	//The particle factory, emitter and renderer should be attached to the ParticleSystem
-	particle_sys->set_factory(pt_particle_factory);
-	particle_sys->set_renderer(pt_particle_rend);
-	particle_sys->set_emitter(sphere_emitter);
-
-	//particle effect
-	NodePath particleEffect("particleEffect");
-	particleEffect.set_pos(-20.0, 0.0, 0.0);
-	//add physical node
-	PT(PhysicalNode) physicalNode = new PhysicalNode("physicalNode");
-	NodePath physicalNodeNP = NodePath(physicalNode);
-	particle_sys->set_render_parent(physicalNode);
-	physicalNode->add_physical(particle_sys);
-	//add particle
-	physicalNodeNP.reparent_to(particleEffect);
-
-	//render parent node
-	NodePath renderParentNode = window->get_render().attach_new_node("renderParent");
-	//start
-	particle_sys->set_render_parent(renderParentNode.node());
-	//ParticleSystemManager
-	particle_sys_mgr->attach_particlesystem(particle_sys);
-	physics_mgr->attach_physical(particle_sys);
-	//
-	particleEffect.reparent_to(window->get_render());
-
-	//render parent node
-//	renderParentNode.set_pos(0.0, 0.0, 0.0);
-//	particle_sys->set_render_parent(renderParentNode);
-	//render parent node instance 1
-//	NodePath instance1 = window->get_render().attach_new_node("instance1");
-//	instance1.set_pos(-20.0, 100.0, 0.0);
-//	renderParentNode.instance_to(instance1);
-	//render parent node instance 2
-//	NodePath instance2 = window->get_render().attach_new_node("instance2");
-//	instance2.set_pos(20.0, 100.0, 0.0);
-//	renderParentNode.instance_to(instance2);
-
-	//spawn node
-	// if spawn and render parents should be different
-//	NodePath spawnNode = window->get_render().attach_new_node("spawnNode");
-//	spawnNode.set_pos(0.0, 0.0, 0.0);
-//	particle_sys->set_spawn_render_node_path(spawnNode);
+	//setup particles managers
+	ely::GameParticlesManager* gameParticlesMgr = new ely::GameParticlesManager(
+			10);
+	// Base Particle Renderer NodePath
+	NodePath fireBPR = window->get_render().attach_new_node("fireBPR");
+	// particle effect
+	ely::ParticleEffect fire = ely::ParticleEffect();
+	loadConfig(fire);
+	fire.set_pos(0.0, 40.0, 5.0);
+	fire.start(window->get_render(), fireBPR);
+	fireStarted = true;
+	// soft start/stop
+	EventHandler::get_global_event_handler()->add_hook("x", &toggleFire,
+			reinterpret_cast<void*>(&fire));
+	// induce labor: force particles' birth
+	EventHandler::get_global_event_handler()->add_hook("p", &shoot,
+			reinterpret_cast<void*>(&fire));
 
 	//do the main loop, equal to run() in python
 	framework.main_loop();
 	//close the window framework
 	framework.close_framework();
+	//delete gameParticlesMgr
+	delete gameParticlesMgr;
+	//
 	return (0);
 }
 
-AsyncTask::DoneStatus update_managers(GenericAsyncTask* task, void* data)
+void loadConfig(ely::ParticleEffect& particleEffect)
 {
+	particleEffect.reset();
+	particleEffect.set_pos(0.000, 0.000, 0.000);
+	particleEffect.set_hpr(0.000, 0.000, 0.000);
+	particleEffect.set_scale(1.000, 1.000, 1.000);
+	SMARTPTR(ely::Particles)p0 = new ely::Particles("particles-1");
+	// Particles parameters
+	p0->setFactory("PointParticleFactory");
+	p0->setRenderer("SpriteParticleRenderer");
+	p0->setEmitter("LineEmitter");
+	p0->set_pool_size(1024);
+	p0->set_birth_rate(86400.0000);
+	p0->set_litter_size(256);
+	p0->set_litter_spread(0);
+	p0->set_system_lifespan(0.0000);
+	p0->set_local_velocity_flag(1);
+	p0->set_system_grows_older_flag(0);
+	// Factory parameters
+	SMARTPTR(PointParticleFactory)p0_getFactory = dynamic_cast<PointParticleFactory*>(p0->getFactory().p());
+	p0_getFactory->set_lifespan_base(0.6000);
+	p0_getFactory->set_lifespan_spread(0.0000);
+	p0_getFactory->set_mass_base(1.0000);
+	p0_getFactory->set_mass_spread(0.0000);
+	p0_getFactory->set_terminal_velocity_base(400.0000);
+	p0_getFactory->set_terminal_velocity_spread(0.0000);
+	// Point factory parameters
+	// Renderer parameters
+	SMARTPTR(ely::SpriteParticleRendererExt)p0_getRenderer = dynamic_cast<ely::SpriteParticleRendererExt*>(p0->getRenderer().p());
+	p0_getRenderer->set_alpha_mode(BaseParticleRenderer::PR_ALPHA_OUT);
+	p0_getRenderer->set_user_alpha(1.00);
+	// Sprite parameters
+	p0_getRenderer->addTextureFromFile(
+			baseDir + std::string("/data/textures/panda.jpg"));
+	p0_getRenderer->set_color(LVector4f(1.00, 1.00, 1.00, 1.00));
+	p0_getRenderer->set_x_scale_flag(1);
+	p0_getRenderer->set_y_scale_flag(1);
+	p0_getRenderer->set_anim_angle_flag(0);
+	p0_getRenderer->set_initial_x_scale(0.25);
+	p0_getRenderer->set_final_x_scale(1.25);
+	p0_getRenderer->set_initial_y_scale(0.25);
+	p0_getRenderer->set_final_y_scale(1.25);
+	p0_getRenderer->set_nonanimated_theta(0.0000);
+	p0_getRenderer->set_alpha_blend_method(
+			BaseParticleRenderer::PP_BLEND_LINEAR);
+	p0_getRenderer->set_alpha_disable(0);
+	// Emitter parameters
+	SMARTPTR(LineEmitter)p0_getEmitter = dynamic_cast<LineEmitter*>(p0->getEmitter().p());
+	p0_getEmitter->set_emission_type(BaseParticleEmitter::ET_CUSTOM);
+	p0_getEmitter->set_amplitude(0.0000);
+	p0_getEmitter->set_amplitude_spread(0.0000);
+	p0_getEmitter->set_offset_force(LVector3f(0.0000, 0.0000, 0.0000));
+	p0_getEmitter->set_explicit_launch_vector(
+			LVector3f(1.0000, 0.0000, 0.0000));
+	p0_getEmitter->set_radiate_origin(LPoint3f(0.0000, 0.0000, 0.0000));
+	// Line parameters
+	p0_getEmitter->set_endpoint1(LPoint3f(-40.0000, 10.0000, 0.0000));
+	p0_getEmitter->set_endpoint2(LPoint3f(40.0000, 10.0000, 0.0000));
+	particleEffect.addParticles(p0);
+	SMARTPTR(ely::ForceGroup)f0 = new ely::ForceGroup("noise1");
+	// Force parameters
+	SMARTPTR(LinearJitterForce)force0 = new LinearJitterForce(0.6000, 0);
+	force0->set_vector_masks(1, 1, 1);
+	force0->set_active(1);
+	f0->addForce(force0.p());
+	particleEffect.addForceGroup(f0);
+}
 
-	//physics
-	float dt = ClockObject::get_global_clock()->get_dt();
+void toggleFire(const Event* e, void* data)
+{
+	ely::ParticleEffect* fire = reinterpret_cast<ely::ParticleEffect*>(data);
+	if (fireStarted)
+	{
+		fire->softStop();
+		fireStarted = false;
+	}
+	else
+	{
+		fire->softStart();
+		fireStarted = true;
+	}
+}
 
-    particle_sys_mgr->do_particles(dt);
-    physics_mgr->do_physics(dt);
-	//
-	return AsyncTask::DS_cont;
+void shoot(const Event* e, void* data)
+{
+	ely::ParticleEffect* fire = reinterpret_cast<ely::ParticleEffect*>(data);
+
+	std::list<SMARTPTR(ely::Particles)> l = fire->getParticlesList();
+	for (std::list<SMARTPTR(ely::Particles)>::iterator it=l.begin(); it!=l.end();++it)
+	{
+		(*it)->induce_labor();
+	}
 }

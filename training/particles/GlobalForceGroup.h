@@ -32,17 +32,15 @@ namespace ely
 class GlobalForceGroup: public ForceGroup
 {
 private:
-	///TODO
 	PhysicsManager* physicsMgr;
-	void (*addAngularIntegrator)(void);
-	///
+	//
 #ifdef ELY_THREAD
 	///The mutex associated with this Component.
 	ReMutex mMutex;
 #endif
 
 public:
-	GlobalForceGroup(std::string name = std::string());
+	GlobalForceGroup(const std::string& name = std::string());
 	virtual ~GlobalForceGroup();
 
 	virtual void addForce(SMARTPTR(BaseForce) force);

@@ -46,7 +46,7 @@ private:
 #endif
 
 public:
-	ForceGroup(std::string name = std::string());
+	ForceGroup(const std::string& name = std::string());
 	virtual ~ForceGroup();
 
 	void cleanup();

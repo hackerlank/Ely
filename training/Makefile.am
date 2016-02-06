@@ -31,7 +31,8 @@ nodist_ely_training_SOURCES = \
 	particles/SpriteParticleRendererExt.cpp \
 	particles/ForceGroup.cpp \
 	particles/GlobalForceGroup.cpp \
-	particles/ParticleEffect.cpp
+	particles/ParticleEffect.cpp \
+	particles/GameParticlesManager.cpp
 #	ai.cpp
 #	anim.cpp
 #	draw_geometry.cpp

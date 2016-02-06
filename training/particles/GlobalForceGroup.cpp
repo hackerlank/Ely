@@ -23,17 +23,15 @@
 
 #include "GlobalForceGroup.h"
 #include <physicsManager.h>
+#include "GameParticlesManager.h"
 
 namespace ely
 {
 
-GlobalForceGroup::GlobalForceGroup(std::string name) :
+GlobalForceGroup::GlobalForceGroup(const std::string& name) :
 		ForceGroup(name)
 {
-	///TODO
-	physicsMgr = NULL; //TOBE inizialized from global value
-	addAngularIntegrator = NULL; //TOBE inizialized from global value see ShowBase.addAngularIntegrator()
-	///
+	physicsMgr = GameParticlesManager::GetSingletonPtr()->physicsMgr();
 }
 
 GlobalForceGroup::~GlobalForceGroup()
@@ -49,7 +47,7 @@ void GlobalForceGroup::addForce(SMARTPTR(BaseForce)force)
 	if (force->is_linear() == false)
 	{
 		// Physics manager will need an angular integrator
-		addAngularIntegrator();
+		GameParticlesManager::GetSingletonPtr()->addAngularIntegrator();
 	}
 	if (force->is_linear() == true)
 	{

@@ -50,7 +50,7 @@ public:
 	virtual ~ParticleEffect();
 
 	void cleanup();
-	std::string getName();
+	std::string get_name();
 	void reset();
 	void start(NodePath parent = NodePath(), NodePath renderParent = NodePath());
 	void enable();
@@ -84,14 +84,13 @@ public:
 #endif
 
 protected:
-	static std::string set_real_name(const std::string& name);
 	static unsigned int pid;
 	static ReMutex mMutexPid;
 };
 
 ///inline definitions
 
-inline std::string ParticleEffect::getName()
+inline std::string ParticleEffect::get_name()
 {
 	// override NodePath.getName()
 	return name;

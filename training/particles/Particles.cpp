@@ -40,24 +40,27 @@
 #include <sphereSurfaceEmitter.h>
 #include <sphereVolumeEmitter.h>
 #include <tangentRingEmitter.h>
+#include "GameParticlesManager.h"
 
 namespace ely
 {
 
 unsigned int Particles::id = 1;
 
-Particles::Particles(std::string name, unsigned int poolSize) :
-		ParticleSystem(poolSize), name(name), factory(NULL), renderer(NULL), emitter(
+Particles::Particles(const std::string& _name, unsigned int poolSize) :
+		ParticleSystem(poolSize), factory(NULL), renderer(NULL), emitter(
 		NULL), factoryType("undefined"), rendererType("undefined"), emitterType(
 				"undefined"), fEnabled(false), geomReference("")
 {
-	///TODO
-	physicsMgr = NULL; //TOBE inizialized from global value
-	particleMgr = NULL; //TOBE inizialized from global value
-	///
+	CHECK_EXISTENCE_DEBUG(GameParticlesManager::GetSingletonPtr(),
+			"GameParticlesManager::GameParticlesManager: invalid GameParticlesManager")
+	physicsMgr = GameParticlesManager::GetSingletonPtr()->physicsMgr();
+	particleMgr = GameParticlesManager::GetSingletonPtr()->particleSystemMgr();
+	//
 	{
 		HOLD_REMUTEX(Particles::mMutexId)
 
+		name = _name;
 		if (name == "")
 		{
 			name =
@@ -65,10 +68,6 @@ Particles::Particles(std::string name, unsigned int poolSize) :
 							+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
 									id)).str();
 			id++;
-		}
-		else
-		{
-			this->name = name;
 		}
 	}
 	//

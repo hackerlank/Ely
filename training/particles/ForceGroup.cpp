@@ -23,18 +23,22 @@
 
 #include "ForceGroup.h"
 #include "ParticleEffect.h"
+#include "GameParticlesManager.h"
 
 namespace ely
 {
 
 unsigned int ForceGroup::id = 1;
 
-ForceGroup::ForceGroup(std::string name) :
-		name(name), fEnabled(false), particleEffect(NULL)
+ForceGroup::ForceGroup(const std::string& _name) :
+		fEnabled(false), particleEffect(NULL)
 {
+	CHECK_EXISTENCE_DEBUG(GameParticlesManager::GetSingletonPtr(),
+			"GameParticlesManager::GameParticlesManager: invalid GameParticlesManager")
 	{
 		HOLD_REMUTEX(ForceGroup::mMutexId)
 
+		name = _name;
 		if (name == "")
 		{
 			name =
@@ -42,10 +46,6 @@ ForceGroup::ForceGroup(std::string name) :
 							+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
 									id)).str();
 			id++;
-		}
-		else
-		{
-			this->name = name;
 		}
 	}
 	//

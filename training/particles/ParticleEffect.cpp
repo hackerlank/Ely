@@ -41,37 +41,34 @@
 #include <sphereSurfaceEmitter.h>
 #include <sphereVolumeEmitter.h>
 #include <tangentRingEmitter.h>
+#include "GameParticlesManager.h"
 
 namespace ely
 {
 
-std::string ParticleEffect::set_real_name(const std::string& name)
-{
-	HOLD_REMUTEX(ParticleEffect::mMutexPid)
-
-	std::string realName;
-	if (name == "")
-	{
-		realName =
-				std::string("particle-effect-")
-						+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
-								ParticleEffect::pid)).str();
-		ParticleEffect::pid++;
-	}
-	else
-	{
-		realName = name;
-	}
-	return realName;
-}
-
 unsigned int ParticleEffect::pid = 1;
 
-ParticleEffect::ParticleEffect(const std::string& name, SMARTPTR(Particles)particles) :
-NodePath(set_real_name(name)), fEnabled(false)
+ParticleEffect::ParticleEffect(const std::string& _name, SMARTPTR(Particles)particles) :
+NodePath(_name), fEnabled(false)
 {
-	// Record particle effect name
-	this->name = NodePath::get_name();
+	CHECK_EXISTENCE_DEBUG(GameParticlesManager::GetSingletonPtr(),
+	"GameParticlesManager::GameParticlesManager: invalid GameParticlesManager")
+	{
+		// Record particle effect name
+		HOLD_REMUTEX(ParticleEffect::mMutexPid)
+
+		name = _name;
+		if (name == "")
+		{
+			name =
+			std::string("particle-effect-")
+			+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
+					ParticleEffect::pid)).str();
+			ParticleEffect::pid++;
+		}
+	}
+	// update NodePath name
+	set_name(name);
 	// Dictionary of particles and forceGroups
 	particlesDict.clear();
 	forceGroupDict.clear();

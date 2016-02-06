@@ -29,9 +29,12 @@
 namespace ely
 {
 
-std::string SpriteParticleRendererExt::sourceTextureName = "",
-		SpriteParticleRendererExt::sourceFileName = "",
-		SpriteParticleRendererExt::sourceNodeName = "";
+std::string SpriteParticleRendererExt::sourceTextureName = DConfig::GetString(
+		"particle-sprite-texture", "maps/lightbulb.rgb");
+std::string SpriteParticleRendererExt::sourceFileName = DConfig::GetString(
+		"particle-sprite-model", "models/misc/smiley");
+std::string SpriteParticleRendererExt::sourceNodeName = DConfig::GetString(
+		"particle-sprite-node", "**/*");
 
 SpriteParticleRendererExt::SpriteParticleRendererExt()
 {
@@ -45,8 +48,7 @@ std::string SpriteParticleRendererExt::getSourceTextureName()
 {
 	if (mSourceTextureName == "")
 	{
-		SpriteParticleRendererExt::sourceTextureName = DConfig::GetString(
-				"particle-sprite-texture", "maps/lightbulb.rgb");
+		mSourceTextureName = SpriteParticleRendererExt::sourceTextureName;
 	}
 	// Return instance copy of class variable
 	return mSourceTextureName;
@@ -54,8 +56,8 @@ std::string SpriteParticleRendererExt::getSourceTextureName()
 
 bool SpriteParticleRendererExt::setTextureFromFile(const std::string& _fileName)
 {
-	std::string fileName;
-	if (_fileName == "")
+	std::string fileName = _fileName;
+	if (fileName == "")
 	{
 		fileName = getSourceTextureName();
 	}
@@ -74,15 +76,16 @@ bool SpriteParticleRendererExt::setTextureFromFile(const std::string& _fileName)
 
 bool SpriteParticleRendererExt::addTextureFromFile(const std::string& _fileName)
 {
+	std::string fileName = _fileName;
 	if (get_num_anims() == 0)
 	{
-		return setTextureFromFile(_fileName);
+		return setTextureFromFile(fileName);
 	}
-	std::string fileName;
-	if (_fileName == "")
+	if (fileName == "")
 	{
 		fileName = getSourceTextureName();
 	}
+
 	Texture* t = TexturePool::load_texture(fileName);
 	if (t != NULL)
 	{
@@ -97,8 +100,7 @@ std::string SpriteParticleRendererExt::getSourceFileName()
 {
 	if (mSourceFileName == "")
 	{
-		SpriteParticleRendererExt::sourceFileName = DConfig::GetString(
-				"particle-sprite-model", "models/misc/smiley");
+		mSourceFileName = SpriteParticleRendererExt::sourceFileName;
 	}
 	// Return instance copy of class variable
 	return mSourceFileName;
@@ -108,8 +110,7 @@ std::string SpriteParticleRendererExt::getSourceNodeName()
 {
 	if (mSourceNodeName == "")
 	{
-		SpriteParticleRendererExt::sourceNodeName = DConfig::GetString(
-				"particle-sprite-node", "**/*");
+		mSourceNodeName = SpriteParticleRendererExt::sourceNodeName;
 	}
 	// Return instance copy of class variable
 	return mSourceNodeName;
@@ -136,11 +137,11 @@ bool SpriteParticleRendererExt::setTextureFromNode(
 		const std::string& _modelName, const std::string& _nodeName,
 		bool sizeFromTexels)
 {
-	std::string modelName, nodeName;
-	if (_modelName == "")
+	std::string modelName = _modelName, nodeName = _nodeName;
+	if (modelName == "")
 	{
 		modelName = getSourceFileName();
-		if (_nodeName == "")
+		if (nodeName == "")
 		{
 			nodeName = getSourceNodeName();
 		}
@@ -170,18 +171,19 @@ bool SpriteParticleRendererExt::setTextureFromNode(
 	return true;
 }
 
-bool SpriteParticleRendererExt::addTextureFromNode(const std::string& _modelName,
-		const std::string& _nodeName, bool sizeFromTexels)
+bool SpriteParticleRendererExt::addTextureFromNode(
+		const std::string& _modelName, const std::string& _nodeName,
+		bool sizeFromTexels)
 {
+	std::string modelName = _modelName, nodeName = _nodeName;
 	if (get_num_anims() == 0)
 	{
-		return setTextureFromNode(_modelName, _nodeName, sizeFromTexels);
+		return setTextureFromNode(modelName, nodeName, sizeFromTexels);
 	}
-	std::string modelName, nodeName;
-	if (_modelName == "")
+	if (modelName == "")
 	{
 		modelName = getSourceFileName();
-		if (_nodeName == "")
+		if (nodeName == "")
 		{
 			nodeName = getSourceNodeName();
 		}
