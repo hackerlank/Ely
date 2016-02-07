@@ -3,11 +3,18 @@
 
 $insert baseclass_h
 
+class ParticleEffect;
+
 $insert namespace-open
 
 $insert classHead
 
 $insert 8 lexFunctionDecl
+
+		void setParticleEffect(ParticleEffect* particleEffect)
+		{
+			this->particleEffect = particleEffect;
+		}
 
     private:
         int lex__();
@@ -20,6 +27,7 @@ $insert 8 lexFunctionDecl
         void postCode(PostEnum__ type);
                             // re-implement this function for code that must
                             // be exec'ed after the rules's actions.
+        ParticleEffect* particleEffect;
 };
 
 $insert scannerConstructors

@@ -29,13 +29,13 @@ nodist_libparticles_la_SOURCES = \
 BUILT_SOURCES = $(nodist_libparticles_la_SOURCES)
 
 #nodist_libparticles_la_SOURCES rules
-$(nodist_libparticles_la_SOURCES) : lexer Scanner_Skel.h Scanner_Skel.ih
+$(nodist_libparticles_la_SOURCES) : $(srcdir)/lexer $(srcdir)/Scanner_Skel.h $(srcdir)/Scanner_Skel.ih
 	@echo "Creating $@ ..."
-	-rm -f $(nodist_scanner_SOURCES)
+	-rm -f $(nodist_libparticles_la_SOURCES)
 	-$(ELY_FLEXCPP) --class-skeleton=$(srcdir)/Scanner_Skel.h \
 		--implementation-skeleton=$(srcdir)/Scanner_Skel.ih \
 		--namespace='ely' $(srcdir)/lexer
 
 EXTRA_DIST = lexer Scanner_Skel.h Scanner_Skel.ih
 
-CLEANFILES = $(nodist_scanner_SOURCES)
+CLEANFILES = $(nodist_libparticles_la_SOURCES)

@@ -42,6 +42,7 @@
 #include <sphereVolumeEmitter.h>
 #include <tangentRingEmitter.h>
 #include "GameParticlesManager.h"
+#include "Scanner.h"
 
 namespace ely
 {
@@ -362,11 +363,20 @@ void ParticleEffect::softStart()
 	}
 }
 
-void ParticleEffect::loadConfig(const std::string& filename)
+bool ParticleEffect::loadConfig(const std::string& filename)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
 
+	// open the "ptf" file
+	ifstream inFile(filename);
+	RETURN_ON_COND(not inFile.is_open(), false)
+	// create the scanner
+	Scanner scanner(inFile);
+	scanner.setParticleEffect(this);
+	scanner.lex();
+	//
+	return true;
 }
 
 } /* namespace ely */
