@@ -1,0 +1,69 @@
+SP	[ \t]*
+PX	p[[:digit:]]+
+FGX	f[[:digit:]]+
+FX	force[[:digit:]]+
+%x	self 
+%x	particles factory renderer emitter 
+%x	forcegroup force
+%x	getnewname getmethod getarguments
+
+%%
+//new particles
+{PX}/({SP}={SP})		{
+							std::cout << "NEW PARTICLE: " << matched() << " -";
+							begin(StartCondition__::getmethod);
+						}
+//new forcegroup
+{FGX}/({SP}={SP})		{
+							std::cout << "NEW FORCEGROUP: " << matched() << " -";
+							begin(StartCondition__::getmethod);
+						}
+//new force
+{FX}/({SP}={SP})		{
+							std::cout << "NEW FORCE: " << matched() << " -";
+							begin(StartCondition__::getmethod);
+						}
+
+//self
+self/(\.)				echo();begin(StartCondition__::self);
+<self>\.					echo();begin(StartCondition__::getmethod);
+//particles
+{PX}/(\.)				echo();begin(StartCondition__::particles);
+<particles>\.				echo();begin(StartCondition__::getmethod);
+//particles.factory 
+{PX}/(\.factory\.)		echo();begin(StartCondition__::factory);
+<factory>\.factory\.		echo();begin(StartCondition__::getmethod);
+//particles.renderer 
+{PX}/(\.renderer\.)		echo();begin(StartCondition__::renderer);
+<renderer>\.renderer\.		echo();begin(StartCondition__::getmethod);
+//particles.emitter 
+{PX}/(\.emitter\.)		echo();begin(StartCondition__::emitter);
+<emitter>\.emitter\.		echo();begin(StartCondition__::getmethod);
+//forcegroup
+{FGX}/(\.)				echo();begin(StartCondition__::forcegroup);
+<forcegroup>\.				echo();begin(StartCondition__::getmethod);
+//force
+{FX}/(\.)				echo();begin(StartCondition__::force);
+<force>\.					echo();begin(StartCondition__::getmethod);
+
+//getmethod
+<getmethod>{
+	([^=(]+)/(\()			{
+								std::cout << " METHOD " << matched();
+								begin(StartCondition__::getarguments);
+							}
+	{SP}={SP}				//ignore
+}
+//getarguments
+<getarguments>{
+	(\()/(.+\n)				//ignore
+	(.+)/(\){SP}\n)			std::cout << " - ARGUMENTS " << matched();
+	(\))/({SP}\n)			begin(StartCondition__::INITIAL);
+}
+
+//comments
+^#.*					std::cout << "COMMENT: " << matched();
+
+//default
+\n						echo();
+.						std::cout << "€";

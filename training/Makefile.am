@@ -19,6 +19,12 @@ LDADD = -lp3framework -lpanda -lpandaexpress -lp3dtool -lp3dtoolconfig -lp3pystu
 #SUBDIRS = opensteer
 #SUBDIRS = networking
 
+#particles
+SUBDIRS = particles
+ely_training_LDADD = $(builddir)/particles/libparticles.la $(LDADD)
+ely_training_LDFLAGS = $(AM_LDFLAGS) -rpath $(pkglibdir)
+#
+
 #ely_training
 noinst_PROGRAMS = ely_training 
 #ely_training_CPPFLAGS=$(STDCpp11_CPPFLAGS)
@@ -26,13 +32,7 @@ noinst_PROGRAMS = ely_training
 
 nodist_ely_training_SOURCES = \
 	training.cpp \
-	particles.cpp \
-	particles/Particles.cpp \
-	particles/SpriteParticleRendererExt.cpp \
-	particles/ForceGroup.cpp \
-	particles/GlobalForceGroup.cpp \
-	particles/ParticleEffect.cpp \
-	particles/GameParticlesManager.cpp
+	particles.cpp
 #	ai.cpp
 #	anim.cpp
 #	draw_geometry.cpp

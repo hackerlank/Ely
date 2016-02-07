@@ -362,4 +362,11 @@ void ParticleEffect::softStart()
 	}
 }
 
+void ParticleEffect::loadConfig(const std::string& filename)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+}
+
 } /* namespace ely */

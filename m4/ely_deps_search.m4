@@ -1,6 +1,6 @@
 # ELY_DEPS_SEARCH
 # --------------
-# Defines: ELY_DEPS_CPPFLAGS, ELY_DEPS_LDFLAGS, ELY_DEPS_LIBS
+# Defines: ELY_DEPS_CPPFLAGS, ELY_DEPS_LDFLAGS, ELY_DEPS_LIBS, ELY_FLEXCPP
 # Argument: expected PYTHON_CPPFLAGS
 # Searches SDK first on cmd line flags then on std locations.
 # This macro calls:
@@ -46,6 +46,14 @@ AC_DEFUN([ELY_DEPS_SEARCH],
 CPPFLAGS_CMDLINE=${CPPFLAGS}
 LDFLAGS_CMDLINE=${LDFLAGS}
 LIBS_CMDLINE=${LIBS}
+# checks for PROGRAMS
+AC_MSG_NOTICE([searching for Ely dependency programs...])
+required_programs=
+###flexc++###
+AC_CHECK_PROGS([ELY_FLEXCPP], [flexc++],)
+if test -z "${ELY_FLEXCPP}" ; then
+	required_programs=${required_programs}" 'flexc++' "
+fi
 # check LIBRARIES first from cmd line specified ones
 AC_MSG_NOTICE([searching for Ely dependency library packages...])
 CPPFLAGS=
@@ -243,7 +251,7 @@ PANDA3D_CPPFLAGS="-I/usr/include/panda3d -I/usr/local/include/panda3d -I$1 ${EIG
 CPPFLAGS="${PANDA3D_CPPFLAGS} ${CPPFLAGS_CMDLINE}"
 AC_CHECK_HEADER([pandaFramework.h],[],[required_headers="${required_headers} 'Panda3d'"])
 #
-STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['Ely'])
+STOP_ON_CHECKS_ERR([$required_programs],[$required_libraries],[$required_headers],['Ely'])
 #
 ELY_DEPS_CPPFLAGS="${PANDA3D_CPPFLAGS} ${BULLET_CPPFLAGS} ${RECAST_CPPFLAGS} ${OPENSTEER_CPPFLAGS} ${ROCKET_CPPFLAGS}"
 ELY_DEPS_LDFLAGS="${PANDA3D_LDFLAGS} ${BULLET_LDFLAGS} ${RECAST_LDFLAGS} ${OPENSTEER_LDFLAGS} ${ROCKET_LDFLAGS}"

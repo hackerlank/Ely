@@ -74,6 +74,7 @@ public:
 	void clearToInitial();
 	void softStop();
 	void softStart();
+	void loadConfig(const std::string& filename);
 
 #ifdef ELY_THREAD
 	/**

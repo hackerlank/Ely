@@ -45,7 +45,7 @@ GameParticlesManager::GameParticlesManager(
 #endif
 {
 	CHECK_EXISTENCE_DEBUG(GameManager::GetSingletonPtr(),
-			"GameAudioManager::GameAudioManager: invalid GameManager")
+			"GameParticlesManager::GameParticlesManager: invalid GameManager")
 	mUpdateData.clear();
 	mUpdateTask.clear();
 	// setup ParticleSystemManager

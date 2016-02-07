@@ -30,6 +30,7 @@ AC_PREFIX_DEFAULT([/usr])
 AM_SILENT_RULES
 
 # Checks for programs.
+required_programs=
 AC_PROG_CXX
 AC_PROG_CC
 AC_LANG([C++])
@@ -125,7 +126,7 @@ AX_BOOST_BASE([],
 	ELY_LDFLAGS="${ELY_LDFLAGS} ${BOOST_LDFLAGS}"],
 	[required_headers=${required_headers}" 'Boost' "])
 #
-STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['Ely'])
+STOP_ON_CHECKS_ERR([$required_programs],[$required_libraries],[$required_headers],['Ely'])
 
 # Checks for typedefs, structures, and compiler characteristics.
 AC_CHECK_HEADER_STDBOOL
@@ -165,14 +166,16 @@ AC_ARG_ENABLE([threading],
     [threading=${enableval}
     if test "x${threading}" != xno ; then
 		threading=yes
-		# Checks libraries for samples.
+		# Checks programs for Threading.
+		required_programs=
+		# Checks libraries for Threading.
 		required_libraries=
-		# Checks header files for samples.
+		# Checks header files for Threading.
 		required_headers=
 		# Checks for typedefs, structures, and compiler characteristics.
 		# Checks for library functions.
 		#
-		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
+		STOP_ON_CHECKS_ERR([$required_programs],[$required_libraries],[$required_headers],['Ely' in Threading mode])
 		AC_DEFINE([ELY_THREAD],[1],[threading mode enabled])
 		buildtype=${buildtype}"-Threading"
 	fi
@@ -187,16 +190,18 @@ AC_ARG_ENABLE([unit-test],
     [unit_test=${enableval}
     if test "x${unit_test}" != xno ; then
 		unit_test=yes
-		# Checks libraries for samples.
+		# Checks programs for Unit Tests.
+		required_programs=
+		# Checks libraries for Unit Tests.
 		required_libraries=
-		# Checks header files for samples.
+		# Checks header files for Unit Tests.
 		required_headers=
 		#Check Boost Unit Test Framework
 		AX_BOOST_UNIT_TEST_FRAMEWORK
 		# Checks for typedefs, structures, and compiler characteristics.
 		# Checks for library functions.
 		#
-		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
+		STOP_ON_CHECKS_ERR([$required_programs],[$required_libraries],[$required_headers],['Ely' Unit Tests])
     	buildtype="Boost_Unit_Test" 
 	fi
 	],
@@ -210,9 +215,11 @@ AC_ARG_ENABLE([training],
     [training=${enableval}
     if test "x${training}" != xno ; then
 		training=yes
-		# Checks libraries for samples.
+		# Checks programs for Training.
+		required_programs=
+		# Checks libraries for Training.
 		required_libraries=
-		# Checks header files for samples.
+		# Checks header files for Training.
 		required_headers=
 		AC_CHECK_HEADERS([unistd.h])
 		# Checks for typedefs, structures, and compiler characteristics.
@@ -220,7 +227,7 @@ AC_ARG_ENABLE([training],
 		# Checks for library functions.
 		AC_CHECK_FUNCS([sqrt])
 		#
-		STOP_ON_CHECKS_ERR([$required_libraries],[$required_headers],['libRocket' sample programs])
+		STOP_ON_CHECKS_ERR([$required_programs],[$required_libraries],[$required_headers],['Ely' Training test programs])
 		AM_PROG_CC_C_O
     	buildtype="Training"
 	fi
@@ -248,6 +255,7 @@ AM_COND_IF([TRAINING],
 		training/interrogate/Makefile
 		training/networking/Makefile
 		training/opensteer/Makefile
+		training/particles/Makefile
 		])])
 
 AM_COND_IF([ELY_ELF],
