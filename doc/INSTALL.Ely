@@ -26,16 +26,16 @@ trees (but they can be anywhere in the filesystem)
 Mandatory packages
 ******************
 These packages are mandatory for any of the later ones.
-Install the minimun development environment from distribution:
+Get and install the minimun development environment from distribution:
 
  $ sudo apt-get install build-essential git autoconf automake \
-    libtool checkinstall gnulib gdebi
+    libtool checkinstall gnulib gdebi bisonc++ flexc++
  
-Install the latest 'GNU Autoconf Archive' source package:
+Get the latest 'GNU Autoconf Archive' source package:
 
  $ git clone git://git.sv.gnu.org/autoconf-archive.git
 
-build and install with these commands:
+and build and install it with these commands:
  
  $ cd autoconf-archive
  $ ./bootstrap.sh
