@@ -96,9 +96,7 @@ void rcMeshLoaderObj::addTriangle(int a, int b, int c, int& cap)
 }
 } //ely
 
-namespace
-{ 
-char* parseRow(char* buf, char* bufEnd, char* row, int len)
+static char* parseRow(char* buf, char* bufEnd, char* row, int len)
 {
 	bool start = true;
 	bool done = false;
@@ -133,7 +131,7 @@ char* parseRow(char* buf, char* bufEnd, char* row, int len)
 	return buf;
 }
 
-int parseFace(char* row, int* data, int n, int vcnt)
+static int parseFace(char* row, int* data, int n, int vcnt)
 {
 	int j = 0;
 	while (*row != '\0')
@@ -156,14 +154,13 @@ int parseFace(char* row, int* data, int n, int vcnt)
 	}
 	return j;
 }
-} //anonymous
 
 namespace ely
 { 
-bool rcMeshLoaderObj::load(const char* filename, float scale, float* translation)
+bool rcMeshLoaderObj::load(const std::string& filename, float scale, float* translation)
 {
 	char* buf = 0;
-	FILE* fp = fopen(filename, "rb");
+	FILE* fp = fopen(filename.c_str(), "rb");
 	if (!fp)
 		return false;
 	m_scale = scale;
@@ -258,9 +255,7 @@ bool rcMeshLoaderObj::load(const char* filename, float scale, float* translation
 		}
 	}
 	
-	strncpy(m_filename, filename, sizeof(m_filename));
-	m_filename[sizeof(m_filename)-1] = '\0';
-	
+	m_filename = filename;
 	return true;
 }
 

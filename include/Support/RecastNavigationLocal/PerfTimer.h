@@ -36,7 +36,7 @@ typedef __int64 TimeVal;
 #endif
 
 TimeVal getPerfTime();
-int getPerfDeltaTimeUsec(const TimeVal start, const TimeVal end);
+int getPerfTimeUsec(const TimeVal duration);
 
 } // namespace ely
 

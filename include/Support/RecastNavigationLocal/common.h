@@ -48,6 +48,7 @@ inline LVecBase3f Recast3fToLVecBase3f(const float x, const float y, const float
 	return LVecBase3f(x, -z, y);
 }
 
+///XXX Moved (and modified) from NavMeshType_Tile.cpp
 inline unsigned int nextPow2(unsigned int v)
 {
 	v--;

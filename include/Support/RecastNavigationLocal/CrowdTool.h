@@ -95,13 +95,13 @@ public:
 	virtual void init(class NavMeshType* sample);
 	virtual void reset();
 	virtual void handleRender(duDebugDraw& dd);
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleUpdate(const float dt);
 
 	inline bool isRunning() const { return m_run; }
 	inline void setRunning(const bool s) { m_run = s; }
-	
 	dtCrowd* getCrowd(){ return m_crowd; }
-
+	
 	int addAgent(const float* pos);
 	int addAgent(const float* p, const dtCrowdAgentParams* params);
 	void removeAgent(const int idx);
@@ -114,6 +114,11 @@ public:
 	void updateTick(const float dt);
 
 	inline CrowdToolParams* getToolParams() { return &m_toolParams; }
+	
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	CrowdToolState(const CrowdToolState&);
+	CrowdToolState& operator=(const CrowdToolState&);
 };
 
 
@@ -136,18 +141,19 @@ class CrowdTool : public NavMeshTypeTool
 	
 public:
 	CrowdTool();
-	virtual ~CrowdTool();
 	
 	CrowdToolState* getState(){return m_state;}
 
 	virtual int type() { return TOOL_CROWD; }
 	virtual void init(NavMeshType* sample);
 	virtual void reset();
+//	virtual void handleMenu();
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender(duDebugDraw& dd);
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 };
 
 } // namespace ely

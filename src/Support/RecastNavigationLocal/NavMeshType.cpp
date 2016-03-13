@@ -40,12 +40,7 @@ NavMeshType::NavMeshType() :
 	m_navMesh(0),
 	m_navQuery(0),
 	m_crowd(0),
-	m_navMeshDrawFlags(
-				0
-//				| DU_DRAWNAVMESH_OFFMESHCONS
-//				| DU_DRAWNAVMESH_CLOSEDLIST
-//				| DU_DRAWNAVMESH_COLOR_TILES
-				),
+	m_navMeshDrawFlags(DU_DRAWNAVMESH_OFFMESHCONS|DU_DRAWNAVMESH_CLOSEDLIST),
 	m_tool(0),
 	m_ctx(0)
 {
@@ -67,6 +62,11 @@ NavMeshType::~NavMeshType()
 		delete m_toolStates[i];
 }
 
+NavMeshTypeTool* NavMeshType::getTool()
+{
+	return m_tool;
+}
+
 void NavMeshType::setTool(NavMeshTypeTool* tool)
 {
 	delete m_tool;
@@ -75,10 +75,17 @@ void NavMeshType::setTool(NavMeshTypeTool* tool)
 		m_tool->init(this);
 }
 
-NavMeshTypeTool* NavMeshType::getTool()
-{
-	return m_tool;
-}
+//void NavMeshType::handleSettings()
+//{
+//}
+//
+//void NavMeshType::handleTools()
+//{
+//}
+//
+//void NavMeshType::handleDebugMode()
+//{
+//}
 
 void NavMeshType::handleRender(duDebugDraw& dd)
 {
@@ -96,22 +103,52 @@ void NavMeshType::handleRender(duDebugDraw& dd)
 	duDebugDrawBoxWire(&dd, bmin[0],bmin[1],bmin[2], bmax[0],bmax[1],bmax[2], duRGBA(255,255,255,128), 1.0f);
 }
 
+//void NavMeshType::handleRenderOverlay(double* /*proj*/, double* /*model*/, int* /*view*/)
+//{
+//}
+
 void NavMeshType::handleMeshChanged(InputGeom* geom)
 {
 	m_geom = geom;
+
+	const BuildSettings* buildSettings = geom->getBuildSettings();
+	if (buildSettings)
+	{
+		m_cellSize = buildSettings->cellSize;
+		m_cellHeight = buildSettings->cellHeight;
+		m_agentHeight = buildSettings->agentHeight;
+		m_agentRadius = buildSettings->agentRadius;
+		m_agentMaxClimb = buildSettings->agentMaxClimb;
+		m_agentMaxSlope = buildSettings->agentMaxSlope;
+		m_regionMinSize = buildSettings->regionMinSize;
+		m_regionMergeSize = buildSettings->regionMergeSize;
+		m_edgeMaxLen = buildSettings->edgeMaxLen;
+		m_edgeMaxError = buildSettings->edgeMaxError;
+		m_vertsPerPoly = buildSettings->vertsPerPoly;
+		m_detailSampleDist = buildSettings->detailSampleDist;
+		m_detailSampleMaxError = buildSettings->detailSampleMaxError;
+		m_partitionType = buildSettings->partitionType;
+	}
 }
 
-const float* NavMeshType::getBoundsMin()
+void NavMeshType::collectSettings(BuildSettings& settings)
 {
-	if (!m_geom) return 0;
-	return m_geom->getMeshBoundsMin();
+	settings.cellSize = m_cellSize;
+	settings.cellHeight = m_cellHeight;
+	settings.agentHeight = m_agentHeight;
+	settings.agentRadius = m_agentRadius;
+	settings.agentMaxClimb = m_agentMaxClimb;
+	settings.agentMaxSlope = m_agentMaxSlope;
+	settings.regionMinSize = m_regionMinSize;
+	settings.regionMergeSize = m_regionMergeSize;
+	settings.edgeMaxLen = m_edgeMaxLen;
+	settings.edgeMaxError = m_edgeMaxError;
+	settings.vertsPerPoly = m_vertsPerPoly;
+	settings.detailSampleDist = m_detailSampleDist;
+	settings.detailSampleMaxError = m_detailSampleMaxError;
+	settings.partitionType = m_partitionType;
 }
 
-const float* NavMeshType::getBoundsMax()
-{
-	if (!m_geom) return 0;
-	return m_geom->getMeshBoundsMax();
-}
 
 void NavMeshType::resetNavMeshSettings()
 {
@@ -131,6 +168,58 @@ void NavMeshType::resetNavMeshSettings()
 	m_partitionType = NAVMESH_PARTITION_WATERSHED;
 }
 
+//void NavMeshType::handleCommonSettings()
+//{
+//	imguiLabel("Rasterization");
+//	imguiSlider("Cell Size", &m_cellSize, 0.1f, 1.0f, 0.01f);
+//	imguiSlider("Cell Height", &m_cellHeight, 0.1f, 1.0f, 0.01f);
+//
+//	if (m_geom)
+//	{
+//		const float* bmin = m_geom->getNavMeshBoundsMin();
+//		const float* bmax = m_geom->getNavMeshBoundsMax();
+//		int gw = 0, gh = 0;
+//		rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
+//		char text[64];
+//		snprintf(text, 64, "Voxels  %d x %d", gw, gh);
+//		imguiValue(text);
+//	}
+//
+//	imguiSeparator();
+//	imguiLabel("Agent");
+//	imguiSlider("Height", &m_agentHeight, 0.1f, 5.0f, 0.1f);
+//	imguiSlider("Radius", &m_agentRadius, 0.0f, 5.0f, 0.1f);
+//	imguiSlider("Max Climb", &m_agentMaxClimb, 0.1f, 5.0f, 0.1f);
+//	imguiSlider("Max Slope", &m_agentMaxSlope, 0.0f, 90.0f, 1.0f);
+//
+//	imguiSeparator();
+//	imguiLabel("Region");
+//	imguiSlider("Min Region Size", &m_regionMinSize, 0.0f, 150.0f, 1.0f);
+//	imguiSlider("Merged Region Size", &m_regionMergeSize, 0.0f, 150.0f, 1.0f);
+//
+//	imguiSeparator();
+//	imguiLabel("Partitioning");
+//	if (imguiCheck("Watershed", m_partitionType == SAMPLE_PARTITION_WATERSHED))
+//		m_partitionType = SAMPLE_PARTITION_WATERSHED;
+//	if (imguiCheck("Monotone", m_partitionType == SAMPLE_PARTITION_MONOTONE))
+//		m_partitionType = SAMPLE_PARTITION_MONOTONE;
+//	if (imguiCheck("Layers", m_partitionType == SAMPLE_PARTITION_LAYERS))
+//		m_partitionType = SAMPLE_PARTITION_LAYERS;
+//
+//	imguiSeparator();
+//	imguiLabel("Polygonization");
+//	imguiSlider("Max Edge Length", &m_edgeMaxLen, 0.0f, 50.0f, 1.0f);
+//	imguiSlider("Max Edge Error", &m_edgeMaxError, 0.1f, 3.0f, 0.1f);
+//	imguiSlider("Verts Per Poly", &m_vertsPerPoly, 3.0f, 12.0f, 1.0f);
+//
+//	imguiSeparator();
+//	imguiLabel("Detail Mesh");
+//	imguiSlider("Sample Distance", &m_detailSampleDist, 0.0f, 16.0f, 1.0f);
+//	imguiSlider("Max Sample Error", &m_detailSampleMaxError, 0.0f, 16.0f, 1.0f);
+//
+//	imguiSeparator();
+//}
+
 void NavMeshType::handleClick(const float* s, const float* p, bool shift)
 {
 	if (m_tool)
@@ -143,6 +232,11 @@ void NavMeshType::handleToggle()
 		m_tool->handleToggle();
 }
 
+//void NavMeshType::handleStep()
+//{
+//	if (m_tool)
+//		m_tool->handleStep();
+//}
 
 bool NavMeshType::handleBuild()
 {
@@ -155,6 +249,7 @@ void NavMeshType::handleUpdate(const float dt)
 		m_tool->handleUpdate(dt);
 	updateToolStates(dt);
 }
+
 
 void NavMeshType::updateToolStates(const float dt)
 {
@@ -192,6 +287,15 @@ void NavMeshType::renderToolStates(duDebugDraw& dd)
 	}
 }
 
+//void NavMeshType::renderOverlayToolStates(double* proj, double* model, int* view)
+//{
+//	for (int i = 0; i < MAX_TOOLS; i++)
+//	{
+//		if (m_toolStates[i])
+//			m_toolStates[i]->handleRenderOverlay(proj, model, view);
+//	}
+//}
+
 void NavMeshType::setNavMeshSettings(const NavMeshSettings& settings)
 { 
 	m_cellSize = settings.m_cellSize;
@@ -228,5 +332,17 @@ NavMeshSettings NavMeshType::getNavMeshSettings()
 	settings.m_partitionType = m_partitionType;
 	return settings;
 } 
+
+const float* NavMeshType::getBoundsMin()
+{
+	if (!m_geom) return 0;
+	return m_geom->getMeshBoundsMin();
+}
+
+const float* NavMeshType::getBoundsMax()
+{
+	if (!m_geom) return 0;
+	return m_geom->getMeshBoundsMax();
+}
 
 } // namespace ely

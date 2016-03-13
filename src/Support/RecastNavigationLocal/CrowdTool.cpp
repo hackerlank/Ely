@@ -36,10 +36,7 @@
 #	define snprintf _snprintf
 #endif
 
-namespace
-{
-
-bool isectSegAABB(const float* sp, const float* sq,
+static bool isectSegAABB(const float* sp, const float* sq,
 						 const float* amin, const float* amax,
 						 float& tmin, float& tmax)
 {
@@ -78,7 +75,7 @@ bool isectSegAABB(const float* sp, const float* sq,
 	return true;
 }
 
-void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
+static void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
 {
 	const float* p = ag->npos;
 	const float r = ag->params.radius;
@@ -89,8 +86,6 @@ void getAgentBounds(const dtCrowdAgent* ag, float* bmin, float* bmax)
 	bmax[0] = p[0] + r;
 	bmax[1] = p[1] + h;
 	bmax[2] = p[2] + r;
-}
-
 }
 
 namespace ely
@@ -204,7 +199,7 @@ void CrowdToolState::reset()
 
 void CrowdToolState::handleRender(duDebugDraw& dd)
 {
-	//	DebugDrawGL dd;
+//	DebugDrawGL dd;
 	const float rad = m_sample->getAgentRadius();
 	
 	dtNavMesh* nav = m_sample->getNavMesh();
@@ -521,6 +516,119 @@ void CrowdToolState::handleRender(duDebugDraw& dd)
 	dd.depthMask(true);
 }
 
+
+//void CrowdToolState::handleRenderOverlay(double* proj, double* model, int* view)
+//{
+//	GLdouble x, y, z;
+//
+//	// Draw start and end point labels
+//	if (m_targetRef && gluProject((GLdouble)m_targetPos[0], (GLdouble)m_targetPos[1], (GLdouble)m_targetPos[2],
+//								  model, proj, view, &x, &y, &z))
+//	{
+//		imguiDrawText((int)x, (int)(y+25), IMGUI_ALIGN_CENTER, "TARGET", imguiRGBA(0,0,0,220));
+//	}
+//
+//	char label[32];
+//
+//	if (m_toolParams.m_showNodes)
+//	{
+//		dtCrowd* crowd = m_sample->getCrowd();
+//		if (crowd && crowd->getPathQueue())
+//		{
+//			const dtNavMeshQuery* navquery = crowd->getPathQueue()->getNavQuery();
+//			const dtNodePool* pool = navquery->getNodePool();
+//			if (pool)
+//			{
+//				const float off = 0.5f;
+//				for (int i = 0; i < pool->getHashSize(); ++i)
+//				{
+//					for (dtNodeIndex j = pool->getFirst(i); j != DT_NULL_IDX; j = pool->getNext(j))
+//					{
+//						const dtNode* node = pool->getNodeAtIdx(j+1);
+//						if (!node) continue;
+//
+//						if (gluProject((GLdouble)node->pos[0],(GLdouble)node->pos[1]+off,(GLdouble)node->pos[2],
+//									   model, proj, view, &x, &y, &z))
+//						{
+//							const float heuristic = node->total;// - node->cost;
+//							snprintf(label, 32, "%.2f", heuristic);
+//							imguiDrawText((int)x, (int)y+15, IMGUI_ALIGN_CENTER, label, imguiRGBA(0,0,0,220));
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//
+//	if (m_toolParams.m_showLabels)
+//	{
+//		dtCrowd* crowd = m_sample->getCrowd();
+//		if (crowd)
+//		{
+//			for (int i = 0; i < crowd->getAgentCount(); ++i)
+//			{
+//				const dtCrowdAgent* ag = crowd->getAgent(i);
+//				if (!ag->active) continue;
+//				const float* pos = ag->npos;
+//				const float h = ag->params.height;
+//				if (gluProject((GLdouble)pos[0], (GLdouble)pos[1]+h, (GLdouble)pos[2],
+//							   model, proj, view, &x, &y, &z))
+//				{
+//					snprintf(label, 32, "%d", i);
+//					imguiDrawText((int)x, (int)y+15, IMGUI_ALIGN_CENTER, label, imguiRGBA(0,0,0,220));
+//				}
+//			}
+//		}
+//	}
+//	if (m_agentDebug.idx != -1)
+//	{
+//		dtCrowd* crowd = m_sample->getCrowd();
+//		if (crowd)
+//		{
+//			for (int i = 0; i < crowd->getAgentCount(); i++)
+//			{
+//				if (m_toolParams.m_showDetailAll == false && i != m_agentDebug.idx)
+//					continue;
+//				const dtCrowdAgent* ag =crowd->getAgent(i);
+//				if (!ag->active)
+//					continue;
+//				const float radius = ag->params.radius;
+//				if (m_toolParams.m_showNeis)
+//				{
+//					for (int j = 0; j < ag->nneis; ++j)
+//					{
+//						const dtCrowdAgent* nei = crowd->getAgent(ag->neis[j].idx);
+//						if (!nei->active) continue;
+//
+//						if (gluProject((GLdouble)nei->npos[0], (GLdouble)nei->npos[1]+radius, (GLdouble)nei->npos[2],
+//									   model, proj, view, &x, &y, &z))
+//						{
+//							snprintf(label, 32, "%.3f", ag->neis[j].dist);
+//							imguiDrawText((int)x, (int)y+15, IMGUI_ALIGN_CENTER, label, imguiRGBA(255,255,255,220));
+//						}
+//					}
+//				}
+//			}
+//		}
+//	}
+//
+//
+//	if (m_toolParams.m_showPerfGraph)
+//	{
+//		GraphParams gp;
+//		gp.setRect(300, 10, 500, 200, 8);
+//		gp.setValueRange(0.0f, 2.0f, 4, "ms");
+//
+//		drawGraphBackground(&gp);
+//		drawGraph(&gp, &m_crowdTotalTime, 1, "Total", duRGBA(255,128,0,255));
+//
+//		gp.setRect(300, 10, 500, 50, 8);
+//		gp.setValueRange(0.0f, 2000.0f, 1, "");
+//		drawGraph(&gp, &m_crowdSampleCount, 0, "Sample Count", duRGBA(96,96,96,128));
+//	}
+//
+//}
+
 void CrowdToolState::handleUpdate(const float dt)
 {
 	if (m_run)
@@ -610,16 +718,12 @@ void CrowdToolState::hilightAgent(const int idx)
 
 } // ely
 
-namespace
-{
-void calcVel(float* vel, const float* pos, const float* tgt, const float speed)
+static void calcVel(float* vel, const float* pos, const float* tgt, const float speed)
 {
 	dtVsub(vel, tgt, pos);
 	vel[1] = 0.0;
 	dtVnormalize(vel);
 	dtVscale(vel, vel, speed);
-}
-
 }
 
 namespace ely
@@ -815,9 +919,8 @@ void CrowdToolState::updateTick(const float dt)
 	
 	m_agentDebug.vod->normalizeSamples();
 	
-//	m_crowdSampleCount.addSample((float) crowd->getVelocitySampleCount());
-//	m_crowdTotalTime.addSample(
-//			getPerfDeltaTimeUsec(startTime, endTime) / 1000.0f);
+//	m_crowdSampleCount.addSample((float)crowd->getVelocitySampleCount());
+//	m_crowdTotalTime.addSample(getPerfTimeUsec(endTime - startTime) / 1000.0f);
 #else
 	crowd->update(dt, NULL);
 #endif
@@ -830,10 +933,6 @@ CrowdTool::CrowdTool() :
 	m_sample(0),
 	m_state(0),
 	m_mode(TOOLMODE_CREATE)
-{
-}
-
-CrowdTool::~CrowdTool()
 {
 }
 
@@ -859,6 +958,107 @@ void CrowdTool::init(NavMeshType* sample)
 void CrowdTool::reset()
 {	
 }
+
+//void CrowdTool::handleMenu()
+//{
+//	if (!m_state)
+//		return;
+//	CrowdToolParams* params = m_state->getToolParams();
+//
+//	if (imguiCheck("Create Agents", m_mode == TOOLMODE_CREATE))
+//		m_mode = TOOLMODE_CREATE;
+//	if (imguiCheck("Move Target", m_mode == TOOLMODE_MOVE_TARGET))
+//		m_mode = TOOLMODE_MOVE_TARGET;
+//	if (imguiCheck("Select Agent", m_mode == TOOLMODE_SELECT))
+//		m_mode = TOOLMODE_SELECT;
+//	if (imguiCheck("Toggle Polys", m_mode == TOOLMODE_TOGGLE_POLYS))
+//		m_mode = TOOLMODE_TOGGLE_POLYS;
+//
+//	imguiSeparatorLine();
+//
+//	if (imguiCollapse("Options", 0, params->m_expandOptions))
+//		params->m_expandOptions = !params->m_expandOptions;
+//
+//	if (params->m_expandOptions)
+//	{
+//		imguiIndent();
+//		if (imguiCheck("Optimize Visibility", params->m_optimizeVis))
+//		{
+//			params->m_optimizeVis = !params->m_optimizeVis;
+//			m_state->updateAgentParams();
+//		}
+//		if (imguiCheck("Optimize Topology", params->m_optimizeTopo))
+//		{
+//			params->m_optimizeTopo = !params->m_optimizeTopo;
+//			m_state->updateAgentParams();
+//		}
+//		if (imguiCheck("Anticipate Turns", params->m_anticipateTurns))
+//		{
+//			params->m_anticipateTurns = !params->m_anticipateTurns;
+//			m_state->updateAgentParams();
+//		}
+//		if (imguiCheck("Obstacle Avoidance", params->m_obstacleAvoidance))
+//		{
+//			params->m_obstacleAvoidance = !params->m_obstacleAvoidance;
+//			m_state->updateAgentParams();
+//		}
+//		if (imguiSlider("Avoidance Quality", &params->m_obstacleAvoidanceType, 0.0f, 3.0f, 1.0f))
+//		{
+//			m_state->updateAgentParams();
+//		}
+//		if (imguiCheck("Separation", params->m_separation))
+//		{
+//			params->m_separation = !params->m_separation;
+//			m_state->updateAgentParams();
+//		}
+//		if (imguiSlider("Separation Weight", &params->m_separationWeight, 0.0f, 20.0f, 0.01f))
+//		{
+//			m_state->updateAgentParams();
+//		}
+//
+//		imguiUnindent();
+//	}
+//
+//	if (imguiCollapse("Selected Debug Draw", 0, params->m_expandSelectedDebugDraw))
+//		params->m_expandSelectedDebugDraw = !params->m_expandSelectedDebugDraw;
+//
+//	if (params->m_expandSelectedDebugDraw)
+//	{
+//		imguiIndent();
+//		if (imguiCheck("Show Corners", params->m_showCorners))
+//			params->m_showCorners = !params->m_showCorners;
+//		if (imguiCheck("Show Collision Segs", params->m_showCollisionSegments))
+//			params->m_showCollisionSegments = !params->m_showCollisionSegments;
+//		if (imguiCheck("Show Path", params->m_showPath))
+//			params->m_showPath = !params->m_showPath;
+//		if (imguiCheck("Show VO", params->m_showVO))
+//			params->m_showVO = !params->m_showVO;
+//		if (imguiCheck("Show Path Optimization", params->m_showOpt))
+//			params->m_showOpt = !params->m_showOpt;
+//		if (imguiCheck("Show Neighbours", params->m_showNeis))
+//			params->m_showNeis = !params->m_showNeis;
+//		imguiUnindent();
+//	}
+//
+//	if (imguiCollapse("Debug Draw", 0, params->m_expandDebugDraw))
+//		params->m_expandDebugDraw = !params->m_expandDebugDraw;
+//
+//	if (params->m_expandDebugDraw)
+//	{
+//		imguiIndent();
+//		if (imguiCheck("Show Labels", params->m_showLabels))
+//			params->m_showLabels = !params->m_showLabels;
+//		if (imguiCheck("Show Prox Grid", params->m_showGrid))
+//			params->m_showGrid = !params->m_showGrid;
+//		if (imguiCheck("Show Nodes", params->m_showNodes))
+//			params->m_showNodes = !params->m_showNodes;
+//		if (imguiCheck("Show Perf Graph", params->m_showPerfGraph))
+//			params->m_showPerfGraph = !params->m_showPerfGraph;
+//		if (imguiCheck("Show Detail All", params->m_showDetailAll))
+//			params->m_showDetailAll = !params->m_showDetailAll;
+//		imguiUnindent();
+//	}
+//}
 
 void CrowdTool::handleClick(const float* s, const float* p, bool shift)
 {
@@ -943,5 +1143,38 @@ void CrowdTool::handleUpdate(const float dt)
 void CrowdTool::handleRender(duDebugDraw& dd)
 {
 }
+
+//void CrowdTool::handleRenderOverlay(double* proj, double* model, int* view)
+//{
+//	rcIgnoreUnused(model);
+//	rcIgnoreUnused(proj);
+//
+//	// Tool help
+//	const int h = view[3];
+//	int ty = h-40;
+//
+//	if (m_mode == TOOLMODE_CREATE)
+//	{
+//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "LMB: add agent.  Shift+LMB: remove agent.", imguiRGBA(255,255,255,192));
+//	}
+//	else if (m_mode == TOOLMODE_MOVE_TARGET)
+//	{
+//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "LMB: set move target.  Shift+LMB: adjust set velocity.", imguiRGBA(255,255,255,192));
+//		ty -= 20;
+//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "Setting velocity will move the agents without pathfinder.", imguiRGBA(255,255,255,192));
+//	}
+//	else if (m_mode == TOOLMODE_SELECT)
+//	{
+//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "LMB: select agent.", imguiRGBA(255,255,255,192));
+//	}
+//	ty -= 20;
+//	imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "SPACE: Run/Pause simulation.  1: Step simulation.", imguiRGBA(255,255,255,192));
+//	ty -= 20;
+//
+//	if (m_state && m_state->isRunning())
+//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "- RUNNING -", imguiRGBA(255,32,16,255));
+//	else
+//		imguiDrawText(280, ty, IMGUI_ALIGN_LEFT, "- PAUSED -", imguiRGBA(255,255,255,128));
+//}
 
 } // namespace ely

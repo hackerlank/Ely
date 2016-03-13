@@ -78,8 +78,8 @@ protected:
 	float m_tileSize;
 	
 	unsigned int m_tileCol;
-	float m_tileBmin[3];
-	float m_tileBmax[3];
+	float m_lastBuiltTileBmin[3];
+	float m_lastBuiltTileBmax[3];
 	float m_tileBuildTime;
 	float m_tileMemUsage;
 	int m_tileTriCount;
@@ -94,22 +94,32 @@ protected:
 public:
 	NavMeshType_Tile();
 	virtual ~NavMeshType_Tile();
-
+	
+//	virtual void handleSettings();
+//	virtual void handleTools();
+//	virtual void handleDebugMode();
 	virtual void handleRender(duDebugDraw& dd);
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
-
+	virtual void collectSettings(struct BuildSettings& settings);
+	
 	void setTileSettings(const NavMeshTileSettings& settings);
 	NavMeshTileSettings getTileSettings();
-
 	void getTilePos(const float* pos, int& tx, int& ty);
-
+	
 	void buildTile(const float* pos);
 	void removeTile(const float* pos);
 	void buildAllTiles();
 	void removeAllTiles();
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	NavMeshType_Tile(const NavMeshType_Tile&);
+	NavMeshType_Tile& operator=(const NavMeshType_Tile&);
 };
 
+///XXX Moved (and modified) from NavMeshType_Tile.cpp
 class NavMeshTileTool: public NavMeshTypeTool
 {
 	NavMeshType_Tile* m_sample;

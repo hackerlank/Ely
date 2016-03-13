@@ -42,18 +42,22 @@ public:
 	rcMeshLoaderObj();
 	~rcMeshLoaderObj();
 	
-	bool load(const char* fileName, float scale = 1.0, float* translation = NULL);
+	bool load(const std::string& fileName, float scale = 1.0, float* translation = NULL);
+
 	//Model stuff
 	bool load(NodePath model, NodePath referenceNP);
 
-	inline const float* getVerts() const { return m_verts; }
-	inline const float* getNormals() const { return m_normals; }
-	inline const int* getTris() const { return m_tris; }
-	inline int getVertCount() const { return m_vertCount; }
-	inline int getTriCount() const { return m_triCount; }
-	inline const char* getFileName() const { return m_filename; }
+	const float* getVerts() const { return m_verts; }
+	const float* getNormals() const { return m_normals; }
+	const int* getTris() const { return m_tris; }
+	int getVertCount() const { return m_vertCount; }
+	int getTriCount() const { return m_triCount; }
+	const std::string& getFileName() const { return m_filename; }
 
 private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	rcMeshLoaderObj(const rcMeshLoaderObj&);
+	rcMeshLoaderObj& operator=(const rcMeshLoaderObj&);
 	
 	void addVertex(float x, float y, float z, int& cap);
 	void addTriangle(int a, int b, int c, int& cap);
@@ -62,9 +66,9 @@ private:
 	void processGeom(CPT(Geom)geom);
 	void processVertexData(CPT(GeomVertexData)vertexData);
 	void processPrimitive(CPT(GeomPrimitive)primitive, unsigned int geomIndex);
-
-	char m_filename[260];
-	float m_scale;
+	
+	std::string m_filename;
+	float m_scale;	
 	float m_translation[3];
 	float* m_verts;
 	int* m_tris;

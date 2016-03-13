@@ -27,9 +27,6 @@
 #include <stdlib.h>
 #include <math.h>
 
-namespace
-{
-
 struct BoundsItem
 {
 	float bmin[2];
@@ -37,7 +34,7 @@ struct BoundsItem
 	int i;
 };
 
-int compareItemX(const void* va, const void* vb)
+static int compareItemX(const void* va, const void* vb)
 {
 	const BoundsItem* a = (const BoundsItem*)va;
 	const BoundsItem* b = (const BoundsItem*)vb;
@@ -48,7 +45,7 @@ int compareItemX(const void* va, const void* vb)
 	return 0;
 }
 
-int compareItemY(const void* va, const void* vb)
+static int compareItemY(const void* va, const void* vb)
 {
 	const BoundsItem* a = (const BoundsItem*)va;
 	const BoundsItem* b = (const BoundsItem*)vb;
@@ -59,7 +56,7 @@ int compareItemY(const void* va, const void* vb)
 	return 0;
 }
 
-void calcExtends(const BoundsItem* items, const int /*nitems*/,
+static void calcExtends(const BoundsItem* items, const int /*nitems*/,
 						const int imin, const int imax,
 						float* bmin, float* bmax)
 {
@@ -85,7 +82,7 @@ inline int longestAxis(float x, float y)
 	return y > x ? 1 : 0;
 }
 
-void subdivide(BoundsItem* items, int nitems, int imin, int imax, int trisPerChunk,
+static void subdivide(BoundsItem* items, int nitems, int imin, int imax, int trisPerChunk,
 					  int& curNode, ely::rcChunkyTriMeshNode* nodes, const int maxNodes,
 					  int& curTri, int* outTris, const int* inTris)
 {
@@ -127,12 +124,12 @@ void subdivide(BoundsItem* items, int nitems, int imin, int imax, int trisPerChu
 		if (axis == 0)
 		{
 			// Sort along x-axis
-			qsort(items+imin, inum, sizeof(BoundsItem), compareItemX);
+			qsort(items+imin, static_cast<size_t>(inum), sizeof(BoundsItem), compareItemX);
 		}
 		else if (axis == 1)
 		{
 			// Sort along y-axis
-			qsort(items+imin, inum, sizeof(BoundsItem), compareItemY);
+			qsort(items+imin, static_cast<size_t>(inum), sizeof(BoundsItem), compareItemY);
 		}
 		
 		int isplit = imin+inum/2;
@@ -147,8 +144,6 @@ void subdivide(BoundsItem* items, int nitems, int imin, int imax, int trisPerChu
 		node.i = -iescape;
 	}
 }
-
-} //anonymous
 
 namespace ely
 {
@@ -259,9 +254,9 @@ int rcGetChunksOverlappingRect(const rcChunkyTriMesh* cm,
 }
 } //ely
 
-namespace
-{
-bool checkOverlapSegment(const float p[2], const float q[2],
+
+
+static bool checkOverlapSegment(const float p[2], const float q[2],
 								const float bmin[2], const float bmax[2])
 {
 	static const float EPSILON = 1e-6f;
@@ -294,7 +289,6 @@ bool checkOverlapSegment(const float p[2], const float q[2],
 	}
 	return true;
 }
-} //anonymous
 
 namespace ely
 {
@@ -331,5 +325,4 @@ int rcGetChunksOverlappingSegment(const rcChunkyTriMesh* cm,
 	
 	return n;
 }
-
 }  // namespace ely

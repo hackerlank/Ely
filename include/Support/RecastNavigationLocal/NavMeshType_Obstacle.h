@@ -65,7 +65,7 @@ protected:
 	};
 	
 	DrawMode m_drawMode;
-
+	
 	int m_maxTiles;
 	int m_maxPolysPerTile;
 	float m_tileSize;
@@ -74,7 +74,11 @@ public:
 	NavMeshType_Obstacle();
 	virtual ~NavMeshType_Obstacle();
 	
+	virtual void handleSettings();
+	virtual void handleTools();
+	virtual void handleDebugMode();
 	virtual void handleRender(duDebugDraw& dd);
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);
 	virtual bool handleBuild();
 	virtual void handleUpdate(const float dt);
@@ -86,6 +90,7 @@ public:
 	void getTilePos(const float* pos, int& tx, int& ty);
 	
 	void renderCachedTile(duDebugDraw& dd, const int tx, const int ty, const int type);
+//	void renderCachedTileOverlay(const int tx, const int ty, double* proj, double* model, int* view);
 
 	void addTempObstacle(const float* pos);
 	void removeTempObstacle(const float* sp, const float* sq);
@@ -93,6 +98,11 @@ public:
 
 	void saveAll(const char* path);
 	void loadAll(const char* path);
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	NavMeshType_Obstacle(const NavMeshType_Obstacle&);
+	NavMeshType_Obstacle& operator=(const NavMeshType_Obstacle&);
 };
 
 } // namespace ely

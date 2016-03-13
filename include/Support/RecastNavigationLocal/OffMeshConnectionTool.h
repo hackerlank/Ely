@@ -48,16 +48,15 @@ public:
 	virtual int type() { return TOOL_OFFMESH_CONNECTION; }
 	virtual void init(NavMeshType* sample);
 	virtual void reset();
+//	virtual void handleMenu();
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender(duDebugDraw& dd);
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 
-	void setBidir(bool bidir)
-	{
-		m_bidir = bidir;
-	}
+	void setBidir(bool bidir) { m_bidir = bidir; }
 };
 
 } // namespace ely

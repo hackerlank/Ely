@@ -68,21 +68,30 @@ protected:
 	};
 	
 	DrawMode m_drawMode;
-
+	
 	void cleanup();
 		
 public:
 	NavMeshType_Solo();
 	virtual ~NavMeshType_Solo();
 	
+//	virtual void handleSettings();
+//	virtual void handleTools();
+//	virtual void handleDebugMode();
+	
+	virtual void handleRender(duDebugDraw& dd);
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
+	virtual void handleMeshChanged(class InputGeom* geom);
+	virtual bool handleBuild();
+
 	rcConfig& getConfig()
 	{
 		return m_cfg;
 	}
-
-	virtual void handleRender(duDebugDraw& dd);
-	virtual void handleMeshChanged(class InputGeom* geom);
-	virtual bool handleBuild();
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	NavMeshType_Solo(const NavMeshType_Solo&);
+	NavMeshType_Solo& operator=(const NavMeshType_Solo&);
 };
 
 } // namespace ely

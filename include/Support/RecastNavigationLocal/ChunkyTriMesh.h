@@ -32,8 +32,10 @@ namespace ely
 {
 struct rcChunkyTriMeshNode
 {
-	float bmin[2], bmax[2];
-	int i, n;
+	float bmin[2];
+	float bmax[2];
+	int i;
+	int n;
 };
 
 struct rcChunkyTriMesh
@@ -46,6 +48,11 @@ struct rcChunkyTriMesh
 	int* tris;
 	int ntris;
 	int maxTrisPerChunk;
+
+private:
+	// Explicitly disabled copy constructor and copy assignment operator.
+	rcChunkyTriMesh(const rcChunkyTriMesh&);
+	rcChunkyTriMesh& operator=(const rcChunkyTriMesh&);
 };
 
 /// Creates partitioned triangle mesh (AABB tree),

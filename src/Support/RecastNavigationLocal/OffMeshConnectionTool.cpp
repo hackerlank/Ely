@@ -64,6 +64,14 @@ void OffMeshConnectionTool::reset()
 	m_hitPosSet = false;
 }
 
+//void OffMeshConnectionTool::handleMenu()
+//{
+//	if (imguiCheck("One Way", !m_bidir))
+//		m_bidir = false;
+//	if (imguiCheck("Bidirectional", m_bidir))
+//		m_bidir = true;
+//}
+
 void OffMeshConnectionTool::handleClick(const float* /*s*/, const float* p, bool shift)
 {
 	if (!m_sample) return;
@@ -138,4 +146,26 @@ void OffMeshConnectionTool::handleRender(duDebugDraw& dd)
 		geom->drawOffMeshConnections(&dd, true);
 }
 
+//void OffMeshConnectionTool::handleRenderOverlay(double* proj, double* model, int* view)
+//{
+//	GLdouble x, y, z;
+//
+//	// Draw start and end point labels
+//	if (m_hitPosSet && gluProject((GLdouble)m_hitPos[0], (GLdouble)m_hitPos[1], (GLdouble)m_hitPos[2],
+//								model, proj, view, &x, &y, &z))
+//	{
+//		imguiDrawText((int)x, (int)(y-25), IMGUI_ALIGN_CENTER, "Start", imguiRGBA(0,0,0,220));
+//	}
+//
+//	// Tool help
+//	const int h = view[3];
+//	if (!m_hitPosSet)
+//	{
+//		imguiDrawText(280, h-40, IMGUI_ALIGN_LEFT, "LMB: Create new connection.  SHIFT+LMB: Delete existing connection, click close to start or end point.", imguiRGBA(255,255,255,192));
+//	}
+//	else
+//	{
+//		imguiDrawText(280, h-40, IMGUI_ALIGN_LEFT, "LMB: Set connection end point and finish.", imguiRGBA(255,255,255,192));
+//	}
+//}
 } // namespace ely

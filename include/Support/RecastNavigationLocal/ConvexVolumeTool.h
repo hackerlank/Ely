@@ -49,19 +49,20 @@ class ConvexVolumeTool : public NavMeshTypeTool
 	
 public:
 	ConvexVolumeTool();
-	~ConvexVolumeTool();
 	
+	void setAreaType(int type);
+	NavMeshPolyAreasEnum getAreaType();
+
 	virtual int type() { return TOOL_CONVEX_VOLUME; }
 	virtual void init(NavMeshType* sample);
 	virtual void reset();
+//	virtual void handleMenu();
 	virtual void handleClick(const float* s, const float* p, bool shift);
 	virtual void handleToggle();
 	virtual void handleStep();
 	virtual void handleUpdate(const float dt);
 	virtual void handleRender(duDebugDraw& dd);
-
-	void setAreaType(int type);
-	NavMeshPolyAreasEnum getAreaType();
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 };
 
 } // namespace ely
