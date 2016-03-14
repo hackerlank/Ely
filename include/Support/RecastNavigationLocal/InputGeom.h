@@ -108,14 +108,14 @@ class InputGeom
 	int m_volumeCount;
 	///@}
 
-	bool loadMesh(class rcContext* ctx, const std::string& filepath, NodePath model =
-			NodePath(), NodePath referenceNP = NodePath(), float scale = 1.0,
-			float* translation = NULL);
 	bool loadGeomSet(class rcContext* ctx, const std::string& filepath);
 public:
 	InputGeom();
 	~InputGeom();
 	
+	bool loadMesh(class rcContext* ctx, const std::string& filepath, NodePath model =
+			NodePath(), NodePath referenceNP = NodePath(), float scale = 1.0,
+			float* translation = NULL);
 	
 	bool load(class rcContext* ctx, const std::string& filepath);
 	bool saveGeomSet(const BuildSettings* settings);

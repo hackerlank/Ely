@@ -74,9 +74,9 @@ public:
 	NavMeshType_Obstacle();
 	virtual ~NavMeshType_Obstacle();
 	
-	virtual void handleSettings();
-	virtual void handleTools();
-	virtual void handleDebugMode();
+//	virtual void handleSettings();
+//	virtual void handleTools();
+//	virtual void handleDebugMode();
 	virtual void handleRender(duDebugDraw& dd);
 //	virtual void handleRenderOverlay(double* proj, double* model, int* view);
 	virtual void handleMeshChanged(class InputGeom* geom);

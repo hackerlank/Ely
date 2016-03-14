@@ -147,7 +147,7 @@ bool InputGeom::loadMesh(rcContext* ctx, const std::string& filepath,
 	}
 	//
 	bool loadResult = true;
-	if(filepath)
+	if(not filepath.empty())
 	{ 
 		loadResult = m_mesh->load(filepath, scale, translation);
 	}
@@ -307,7 +307,7 @@ bool InputGeom::load(rcContext* ctx, const std::string& filepath)
 		return false;
 
 	std::string extension = filepath.substr(extensionPos);
-	std::transform(extension.begin(), extension.end(), extension.begin(), tolower);
+	std::transform(extension.begin(), extension.end(), extension.begin(), ::tolower);
 
 	if (extension == ".gset")
 		return loadGeomSet(ctx, filepath);

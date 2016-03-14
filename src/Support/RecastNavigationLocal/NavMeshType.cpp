@@ -27,6 +27,7 @@
 #include <stdio.h>
 #include "Support/RecastNavigationLocal/NavMeshType.h"
 #include "Support/RecastNavigationLocal/InputGeom.h"
+#include <DetourDebugDraw.h>
 #include <RecastDebugDraw.h>
 
 #ifdef WIN32

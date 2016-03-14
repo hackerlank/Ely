@@ -99,11 +99,9 @@ struct NavMeshTypeTool
 //	virtual void handleMenu() = 0;
 	virtual void handleClick(const float* s, const float* p, bool shift) = 0;
 	virtual void handleRender(duDebugDraw& dd) = 0;
-	virtual void handleRenderOverlay(double* proj, double* model, int* view) = 0;
-//	virtual void handleToggle() = 0;
-//	virtual void handleStep() = 0;
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view) = 0;
 	virtual void handleToggle() = 0;
-//	virtual void handleStep() = 0;
+	virtual void handleStep() = 0;
 	virtual void handleUpdate(const float dt) = 0;
 };
 
@@ -113,8 +111,8 @@ struct NavMeshTypeToolState
 	virtual void init(class NavMeshType* sample) = 0;
 	virtual void reset() = 0;
 	virtual void handleRender(duDebugDraw& dd) = 0;
-	virtual void handleRenderOverlay(double* proj, double* model, int* view) = 0;
-//	virtual void handleUpdate(const float dt) = 0;
+//	virtual void handleRenderOverlay(double* proj, double* model, int* view) = 0;
+	virtual void handleUpdate(const float dt) = 0;
 };
 
 ///NavMesh settings.
