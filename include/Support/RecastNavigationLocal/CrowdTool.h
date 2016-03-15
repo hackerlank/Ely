@@ -136,9 +136,6 @@ class CrowdTool : public NavMeshTypeTool
 	};
 	ToolMode m_mode;
 	
-	void updateAgentParams();
-	void updateTick(const float dt);
-	
 public:
 	CrowdTool();
 	
