@@ -849,7 +849,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 	return AsyncTask::DS_done;
 }
 
-inline void NavMesh::doSetCrowdAgentOtherSettings(
+void NavMesh::doSetCrowdAgentOtherSettings(
 		SMARTPTR(CrowdAgent)crowdAgent, CrowdTool* crowdTool)
 {
 	//set physics parameters
