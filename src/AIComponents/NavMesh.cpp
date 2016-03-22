@@ -1181,7 +1181,7 @@ bool NavMesh::doLoadModelMesh(NodePath model)
 	mGeom = new InputGeom;
 	mMeshName = model.get_name();
 	//
-	if ((not mGeom) or (not mGeom->loadMesh(mCtx, NULL, model, mReferenceNP)))
+	if ((not mGeom) or (not mGeom->loadMesh(mCtx, std::string(), model, mReferenceNP)))
 	{
 		delete mGeom;
 		mGeom = NULL;
