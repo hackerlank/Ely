@@ -272,6 +272,11 @@ bool rcMeshLoaderObj::load(NodePath model, NodePath referenceNP)
 	//get all ModelRoots for the hierarchy below model
 	NodePathCollection modelRootCollection = model.find_all_matches(
 			"**/+ModelRoot");
+	//add model if not there
+	if (not modelRootCollection.has_path(model))
+	{
+		modelRootCollection.add_path(model);
+	}
 	//iterate over ModelRoots
 	for (int i = 0; i < modelRootCollection.size(); i++)
 	{
