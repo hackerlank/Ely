@@ -49,11 +49,9 @@ BuildContext::BuildContext() :
 	m_messageCount(0),
 	m_textPoolSize(0)
 {
-	resetTimers();
-}
+	memset(m_messages, 0, sizeof(char*) * MAX_MESSAGES);
 
-BuildContext::~BuildContext()
-{
+	resetTimers();
 }
 
 // Virtual functions for custom implementations.
@@ -108,7 +106,7 @@ void BuildContext::doStopTimer(const rcTimerLabel label)
 
 int BuildContext::doGetAccumulatedTime(const rcTimerLabel label) const
 {
-	return m_accTime[label];
+	return getPerfTimeUsec(m_accTime[label]);
 }
 
 void BuildContext::dumpLog(const char* format, ...)
@@ -119,7 +117,7 @@ void BuildContext::dumpLog(const char* format, ...)
 	vprintf(format, ap);
 	va_end(ap);
 	printf("\n");
-
+	
 	// Print messages
 	const int TAB_STOPS[4] = { 28, 36, 44, 52 };
 	for (int i = 0; i < m_messageCount; ++i)
@@ -168,33 +166,204 @@ const char* BuildContext::getLogText(const int i) const
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
 
-DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
-		m_render(render),
-		m_depthMask(true),
-		m_texture(true),
-		m_vertexIdx(0),
-		m_prim(DU_DRAW_TRIS)
+class GLCheckerTexture
+{
+	unsigned int m_texId;
+public:
+	GLCheckerTexture() : m_texId(0)
+	{
+	}
+	
+	~GLCheckerTexture()
+	{
+//		if (m_texId != 0)
+//			glDeleteTextures(1, &m_texId);
+	}
+	void bind()
+	{
+		if (m_texId == 0)
+		{
+			// Create checker pattern.
+			const unsigned int col0 = duRGBA(215,215,215,255);
+			const unsigned int col1 = duRGBA(255,255,255,255);
+			static const int TSIZE = 64;
+			unsigned int data[TSIZE*TSIZE];
+
+//			glGenTextures(1, &m_texId);
+//			glBindTexture(GL_TEXTURE_2D, m_texId);
+
+			int level = 0;
+			int size = TSIZE;
+			while (size > 0)
+			{
+				for (int y = 0; y < size; ++y)
+					for (int x = 0; x < size; ++x)
+						data[x+y*size] = (x==0 || y==0) ? col0 : col1;
+//				glTexImage2D(GL_TEXTURE_2D, level, GL_RGBA, size,size, 0, GL_RGBA, GL_UNSIGNED_BYTE, data);
+				size /= 2;
+				level++;
+			}
+
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_NEAREST);
+//			glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+		}
+		else
+		{
+//			glBindTexture(GL_TEXTURE_2D, m_texId);
+		}
+	}
+};
+GLCheckerTexture g_tex;
+
+
+void DebugDrawGL::depthMask(bool state)
+{
+//	glDepthMask(state ? GL_TRUE : GL_FALSE);
+}
+
+void DebugDrawGL::texture(bool state)
+{
+	if (state)
+	{
+//		glEnable(GL_TEXTURE_2D);
+//		g_tex.bind();
+	}
+	else
+	{
+//		glDisable(GL_TEXTURE_2D);
+	}
+}
+
+void DebugDrawGL::begin(duDebugDrawPrimitives prim, float size)
+{
+	switch (prim)
+	{
+		case DU_DRAW_POINTS:
+//			glPointSize(size);
+//			glBegin(GL_POINTS);
+			break;
+		case DU_DRAW_LINES:
+//			glLineWidth(size);
+//			glBegin(GL_LINES);
+			break;
+		case DU_DRAW_TRIS:
+//			glBegin(GL_TRIANGLES);
+			break;
+		case DU_DRAW_QUADS:
+//			glBegin(GL_QUADS);
+			break;
+	};
+}
+
+void DebugDrawGL::vertex(const float* pos, unsigned int color)
+{
+//	glColor4ubv((GLubyte*)&color);
+//	glVertex3fv(pos);
+}
+
+void DebugDrawGL::vertex(const float x, const float y, const float z, unsigned int color)
+{
+//	glColor4ubv((GLubyte*)&color);
+//	glVertex3f(x,y,z);
+}
+
+void DebugDrawGL::vertex(const float* pos, unsigned int color, const float* uv)
+{
+//	glColor4ubv((GLubyte*)&color);
+//	glTexCoord2fv(uv);
+//	glVertex3fv(pos);
+}
+
+void DebugDrawGL::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+{
+//	glColor4ubv((GLubyte*)&color);
+//	glTexCoord2f(u,v);
+//	glVertex3f(x,y,z);
+}
+
+void DebugDrawGL::end()
+{
+//	glEnd();
+//	glLineWidth(1.0f);
+//	glPointSize(1.0f);
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+
+FileIO::FileIO() :
+	m_fp(0),
+	m_mode(-1)
 {
 }
 
+FileIO::~FileIO()
+{
+	if (m_fp) fclose(m_fp);
+}
+
+bool FileIO::openForWrite(const char* path)
+{
+	if (m_fp) return false;
+	m_fp = fopen(path, "wb");
+	if (!m_fp) return false;
+	m_mode = 1;
+	return true;
+}
+
+bool FileIO::openForRead(const char* path)
+{
+	if (m_fp) return false;
+	m_fp = fopen(path, "rb");
+	if (!m_fp) return false;
+	m_mode = 2;
+	return true;
+}
+
+bool FileIO::isWriting() const
+{
+	return m_mode == 1;
+}
+
+bool FileIO::isReading() const
+{
+	return m_mode == 2;
+}
+
+bool FileIO::write(const void* ptr, const size_t size)
+{
+	if (!m_fp || m_mode != 1) return false;
+	fwrite(ptr, size, 1, m_fp);
+	return true;
+}
+
+bool FileIO::read(void* ptr, const size_t size)
+{
+	if (!m_fp || m_mode != 2) return false;
+	size_t readLen = fread(ptr, size, 1, m_fp);
+	return readLen == 1;
+}
+
+////////////////////////////////////////////////////////////////////////////////////////////////////
+DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
+		m_render(render), m_depthMask(true), m_texture(true), m_vertexIdx(0), m_prim(
+				DU_DRAW_TRIS)
+{
+}
 DebugDrawPanda3d::~DebugDrawPanda3d()
 {
 }
-
 void DebugDrawPanda3d::depthMask(bool state)
 {
 	m_depthMask = state;
 }
-
 void DebugDrawPanda3d::texture(bool state)
 {
 	m_texture = state;
 }
-
 void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 {
-	m_vertexData = new GeomVertexData("VertexData", GeomVertexFormat::get_v3c4t2(),
-					Geom::UH_static);
+	m_vertexData = new GeomVertexData("VertexData",
+			GeomVertexFormat::get_v3c4t2(), Geom::UH_static);
 	m_vertex = GeomVertexWriter(m_vertexData, "vertex");
 	m_color = GeomVertexWriter(m_vertexData, "color");
 	m_texcoord = GeomVertexWriter(m_vertexData, "texcoord");
@@ -218,7 +387,6 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 	m_size = size;
 	m_vertexIdx = 0;
 }
-
 void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
 		const LVector2f& uv)
 {
@@ -285,40 +453,42 @@ void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
 		///
 	}
 }
-
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
 {
 	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color)
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
+		unsigned int color)
 {
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
-
-void DebugDrawPanda3d::vertex(const float* pos, unsigned int color, const float* uv)
+void DebugDrawPanda3d::vertex(const float* pos, unsigned int color,
+		const float* uv)
 {
 	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(uv[0], uv[1]));
 }
-
-void DebugDrawPanda3d::vertex(const float x, const float y, const float z, unsigned int color, const float u, const float v)
+void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
+		unsigned int color, const float u, const float v)
 {
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(u, v));
 }
-
 void DebugDrawPanda3d::end()
 {
 	m_geomPrim->close_primitive();
 	m_geom = new Geom(m_vertexData);
 	m_geom->add_primitive(m_geomPrim);
-	m_geomNodeNP = NodePath(new GeomNode("DebugDrawPanda3d_GeomNode_" +
-			dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(m_geomNodeNPCollection.size())).str()));
+	m_geomNodeNP =
+			NodePath(
+					new GeomNode(
+							"DebugDrawPanda3d_GeomNode_"
+									+ dynamic_cast<std::ostringstream&>(std::ostringstream().operator <<(
+											m_geomNodeNPCollection.size())).str()));
 	DCAST(GeomNode, m_geomNodeNP.node())->add_geom(m_geom);
 	m_geomNodeNP.reparent_to(m_render);
 	m_geomNodeNP.set_depth_write(m_depthMask);
@@ -327,18 +497,14 @@ void DebugDrawPanda3d::end()
 	//add to geom node paths.
 	m_geomNodeNPCollection.push_back(m_geomNodeNP);
 }
-
-
 NodePath DebugDrawPanda3d::getGeomNode(int i)
 {
 	return m_geomNodeNPCollection[i];
 }
-
 int DebugDrawPanda3d::getGeomNodesNum()
 {
 	return m_geomNodeNPCollection.size();
 }
-
 void DebugDrawPanda3d::reset()
 {
 	std::vector<NodePath>::iterator iter;
@@ -354,9 +520,8 @@ void DebugDrawPanda3d::reset()
 
 DebugDrawMeshDrawer::DebugDrawMeshDrawer(NodePath render, NodePath camera,
 		int budget, bool singleMesh) :
-		m_render(render), m_camera(camera),
-		m_meshDrawersSize(0),
-		m_budget(budget), m_singleMesh(singleMesh)
+		m_render(render), m_camera(camera), m_meshDrawersSize(0), m_budget(
+				budget), m_singleMesh(singleMesh)
 {
 	reset();
 }

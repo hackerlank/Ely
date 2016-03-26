@@ -319,7 +319,10 @@ dtNavMesh* NavMeshType_Tile::loadAll(const char* path)
 		NavMeshTileHeader tileHeader;
 		readLen = fread(&tileHeader, sizeof(tileHeader), 1, fp);
 		if (readLen != 1)
+		{
+			fclose(fp);
 			return 0;
+		}
 
 		if (!tileHeader.tileRef || !tileHeader.dataSize)
 			break;
@@ -329,7 +332,10 @@ dtNavMesh* NavMeshType_Tile::loadAll(const char* path)
 		memset(data, 0, tileHeader.dataSize);
 		readLen = fread(data, tileHeader.dataSize, 1, fp);
 		if (readLen != 1)
+		{
+			fclose(fp);
 			return 0;
+		}
 
 		mesh->addTile(data, tileHeader.dataSize, DT_TILE_FREE_DATA, tileHeader.tileRef, 0);
 	}

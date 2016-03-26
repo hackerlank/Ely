@@ -170,9 +170,22 @@ bool rcMeshLoaderObj::load(const std::string& filename, float scale, float* tran
 		m_translation[1] = translation[1];
 		m_translation[2] = translation[2];
 	}
-	fseek(fp, 0, SEEK_END);
-	int bufSize = ftell(fp);
-	fseek(fp, 0, SEEK_SET);
+	if (fseek(fp, 0, SEEK_END) != 0)
+	{
+		fclose(fp);
+		return false;
+	}
+	long bufSize = ftell(fp);
+	if (bufSize < 0)
+	{
+		fclose(fp);
+		return false;
+	}
+	if (fseek(fp, 0, SEEK_SET) != 0)
+	{
+		fclose(fp);
+		return false;
+	}
 	buf = new char[bufSize];
 	if (!buf)
 	{

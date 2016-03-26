@@ -751,12 +751,9 @@ public:
 //			glEnd();
 //			glLineWidth(1.0f);
 //
-//			if (m_sample)
-//			{
-//				int tx=0, ty=0;
-//				m_sample->getTilePos(m_hitPos, tx, ty);
-//				m_sample->renderCachedTile(tx,ty,m_drawType);
-//			}
+//			int tx=0, ty=0;
+//			m_sample->getTilePos(m_hitPos, tx, ty);
+//			m_sample->renderCachedTile(tx,ty,m_drawType);
 //
 //		}
 	}
