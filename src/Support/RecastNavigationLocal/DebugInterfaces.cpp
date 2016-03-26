@@ -344,22 +344,27 @@ bool FileIO::read(void* ptr, const size_t size)
 }
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////
+
 DebugDrawPanda3d::DebugDrawPanda3d(NodePath render) :
 		m_render(render), m_depthMask(true), m_texture(true), m_vertexIdx(0), m_prim(
 				DU_DRAW_TRIS)
 {
 }
+
 DebugDrawPanda3d::~DebugDrawPanda3d()
 {
 }
+
 void DebugDrawPanda3d::depthMask(bool state)
 {
 	m_depthMask = state;
 }
+
 void DebugDrawPanda3d::texture(bool state)
 {
 	m_texture = state;
 }
+
 void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 {
 	m_vertexData = new GeomVertexData("VertexData",
@@ -387,6 +392,7 @@ void DebugDrawPanda3d::begin(duDebugDrawPrimitives prim, float size)
 	m_size = size;
 	m_vertexIdx = 0;
 }
+
 void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
 		const LVector2f& uv)
 {
@@ -453,17 +459,20 @@ void DebugDrawPanda3d::doVertex(const LVector3f& vertex, const LVector4f& color,
 		///
 	}
 }
+
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color)
 {
 	doVertex(Recast3fToLVecBase3f(pos[0], pos[1], pos[2]),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
+
 void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
 		unsigned int color)
 {
 	doVertex(Recast3fToLVecBase3f(x, y, z),
 			LVector4f(red(color), green(color), blue(color), alpha(color)));
 }
+
 void DebugDrawPanda3d::vertex(const float* pos, unsigned int color,
 		const float* uv)
 {
@@ -471,6 +480,7 @@ void DebugDrawPanda3d::vertex(const float* pos, unsigned int color,
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(uv[0], uv[1]));
 }
+
 void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
 		unsigned int color, const float u, const float v)
 {
@@ -478,6 +488,7 @@ void DebugDrawPanda3d::vertex(const float x, const float y, const float z,
 			LVector4f(red(color), green(color), blue(color), alpha(color)),
 			LVector2f(u, v));
 }
+
 void DebugDrawPanda3d::end()
 {
 	m_geomPrim->close_primitive();
@@ -497,14 +508,17 @@ void DebugDrawPanda3d::end()
 	//add to geom node paths.
 	m_geomNodeNPCollection.push_back(m_geomNodeNP);
 }
+
 NodePath DebugDrawPanda3d::getGeomNode(int i)
 {
 	return m_geomNodeNPCollection[i];
 }
+
 int DebugDrawPanda3d::getGeomNodesNum()
 {
 	return m_geomNodeNPCollection.size();
 }
+
 void DebugDrawPanda3d::reset()
 {
 	std::vector<NodePath>::iterator iter;
