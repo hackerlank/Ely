@@ -73,9 +73,9 @@ enum CrowdAgentMovType
  * | *thrown_events*				|single| - | specified as "event1@[event_name1]@[frequency1][:...[:eventN@[event_nameN]@[frequencyN]]]" with eventX = move,steady
  * | *add_to_navmesh*				|single| - | -
  * | *mov_type*						|single| *recast* | values: recast,kinematic
- * | *move_target";					|single| 0.0,0.0,0.0 | -
- * | *move_velocity";				|single| 0.0,0.0,0.0 | -
- * | *max_acceleration";			|single| 8.0 | -
+ * | *move_target*					|single| 0.0,0.0,0.0 | -
+ * | *move_velocity*				|single| 0.0,0.0,0.0 | -
+ * | *max_acceleration*				|single| 8.0 | -
  * | *max_speed*					|single| 3.5 | -
  * | *collision_query_range*		|single| 12.0 | * NavMesh::agent_radius
  * | *path_optimization_range*		|single| 30.0 | * NavMesh::agent_radius
