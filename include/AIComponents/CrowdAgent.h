@@ -48,9 +48,10 @@ enum CrowdAgentMovType
 /**
  * \brief Component implementing dtCrowdAgent from Recast Navigation library.
  *
- * \see https://code.google.com/p/recastnavigation
- * 		http://digestingduck.blogspot.it
- * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
+ * \see
+ * 		- https://github.com/recastnavigation/recastnavigation.git
+ * 		- http://digestingduck.blogspot.it
+ * 		- https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
  * This component should be associated to a "Scene" component.\n
  * It could be associated to a kinematic rigid body, if the associated NavMesh

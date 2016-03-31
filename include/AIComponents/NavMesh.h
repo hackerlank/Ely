@@ -43,9 +43,10 @@ class NavMeshTemplate;
 /**
  * \brief Component implementing dtNavMesh from Recast Navigation library.
  *
- * \see https://code.google.com/p/recastnavigation
- * 		http://digestingduck.blogspot.it
- * 		https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
+ * \see
+ * 		- https://github.com/recastnavigation/recastnavigation.git
+ * 		- http://digestingduck.blogspot.it
+ * 		- https://groups.google.com/forum/?fromgroups#!forum/recastnavigation
  *
  * This component should be used only in association to stationary
  * (i.e. is_steady=true) "Scene" components.\n
