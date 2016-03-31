@@ -545,6 +545,9 @@ NavMesh::Result NavMesh::navMeshCleanup()
 	//return if NavMesh has not been setup yet
 	RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
 
+	//remove from AI manager update
+	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
+
 	//do real cleanup
 	doNavMeshCleanup();
 	//
@@ -576,9 +579,6 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		mAsyncSetupVar.wait();
 	}
 #endif
-
-	//remove from AI manager update
-	GameAIManager::GetSingletonPtr()->removeFromAIUpdate(this);
 
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
