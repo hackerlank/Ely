@@ -133,6 +133,7 @@ public:
 	 */
 	///@{
 	//SOLO TILE OBSTACLE
+	void setNavMeshTypeEnum(NavMeshTypeEnum typeEnum);
 	NavMeshTypeEnum getNavMeshTypeEnum() const;
 	void setNavMeshSettings(const NavMeshSettings& settings);
 	NavMeshSettings getNavMeshSettings() const;
@@ -445,6 +446,17 @@ inline void NavMesh::reset()
 	mDebugRenderData.clear();
 	mDebugRenderTask.clear();
 #endif
+}
+
+inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
+{
+	//lock (guard) the mutex
+	HOLD_REMUTEX(mMutex)
+
+	//return if async-setup is not complete
+	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
+
+	mNavMeshTypeEnum = typeEnum;
 }
 
 inline NavMeshTypeEnum NavMesh::getNavMeshTypeEnum() const
