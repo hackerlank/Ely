@@ -479,6 +479,10 @@ inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
 
 	mNavMeshSettings = settings;
+	if (mNavMeshType)
+	{
+		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
+	}
 }
 
 inline NavMeshSettings NavMesh::getNavMeshSettings() const
