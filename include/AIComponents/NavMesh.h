@@ -456,6 +456,9 @@ inline void NavMesh::setNavMeshTypeEnum(NavMeshTypeEnum typeEnum)
 	//return if async-setup is not complete
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
 
+	//can be changed only if mNavMeshType hasn't been setup yet.
+	RETURN_ON_COND(mNavMeshType,)
+
 	mNavMeshTypeEnum = typeEnum;
 }
 
@@ -479,8 +482,9 @@ inline void NavMesh::setNavMeshSettings(const NavMeshSettings& settings)
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
 
 	mNavMeshSettings = settings;
-	if (mNavMeshType)
+	if(mNavMeshType)
 	{
+		//set navigation mesh settings
 		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
 	}
 }
@@ -505,6 +509,20 @@ inline void NavMesh::setNavMeshTileSettings(const NavMeshTileSettings& settings)
 	RETURN_ON_ASYNC_COND(not mAsyncSetupComplete,)
 
 	mNavMeshTileSettings = settings;
+	if (mNavMeshType)
+	{
+		//set navigation mesh tile settings
+		if (mNavMeshTypeEnum == TILE)
+		{
+			static_cast<NavMeshType_Tile*>(mNavMeshType)->setTileSettings(
+					mNavMeshTileSettings);
+		}
+		else if (mNavMeshTypeEnum == OBSTACLE)
+		{
+			static_cast<NavMeshType_Obstacle*>(mNavMeshType)->setTileSettings(
+					mNavMeshTileSettings);
+		}
+	}
 }
 
 inline NavMeshTileSettings NavMesh::getNavMeshTileSettings() const

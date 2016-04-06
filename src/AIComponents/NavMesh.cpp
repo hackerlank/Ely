@@ -623,7 +623,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		//set navigation mesh settings
 		mNavMeshType->setNavMeshSettings(mNavMeshSettings);
 		//set navigation mesh tile settings
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->setTileSettings(
+		static_cast<NavMeshType_Tile*>(mNavMeshType)->setTileSettings(
 				mNavMeshTileSettings);
 	}
 		break;
@@ -652,7 +652,7 @@ AsyncTask::DoneStatus NavMesh::navMeshAsyncSetup(GenericAsyncTask* task)
 		mNavMeshTileSettings.m_maxTiles = 1 << tileBits;
 		mNavMeshTileSettings.m_maxPolysPerTile = 1 << polyBits;
 		//...effectively
-		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->setTileSettings(
+		static_cast<NavMeshType_Obstacle*>(mNavMeshType)->setTileSettings(
 				mNavMeshTileSettings);
 	}
 		break;
@@ -922,12 +922,12 @@ NavMesh::Result NavMesh::getTilePos(const LPoint3f& pos, int& tx, int& ty)
 	LVecBase3fToRecast(pos, recastPos);
 	if (mNavMeshTypeEnum == TILE)
 	{
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->getTilePos(recastPos, tx,
+		static_cast<NavMeshType_Tile*>(mNavMeshType)->getTilePos(recastPos, tx,
 				ty);
 	}
 	else if (mNavMeshTypeEnum == OBSTACLE)
 	{
-		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTilePos(recastPos,
+		static_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTilePos(recastPos,
 				tx, ty);
 	}
 	//
@@ -949,7 +949,7 @@ NavMesh::Result NavMesh::buildTile(const LPoint3f& pos)
 	{
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildTile(recastPos);
+		static_cast<NavMeshType_Tile*>(mNavMeshType)->buildTile(recastPos);
 		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::buildTile : " << pos);
 #ifdef ELY_DEBUG
@@ -975,7 +975,7 @@ NavMesh::Result NavMesh::removeTile(const LPoint3f& pos)
 	{
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeTile(recastPos);
+		static_cast<NavMeshType_Tile*>(mNavMeshType)->removeTile(recastPos);
 		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::removeTile : " << pos);
 #ifdef ELY_DEBUG
@@ -999,7 +999,7 @@ NavMesh::Result NavMesh::buildAllTiles()
 
 	if (mNavMeshTypeEnum == TILE)
 	{
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
+		static_cast<NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
 #endif
@@ -1021,7 +1021,7 @@ NavMesh::Result NavMesh::removeAllTiles()
 
 	if (mNavMeshTypeEnum == TILE)
 	{
-		dynamic_cast<NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
+		static_cast<NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
 #endif
@@ -1046,7 +1046,7 @@ dtTileCache* NavMesh::getTileCache()
 
 	//
 	RETURN_ON_COND(mNavMeshTypeEnum == OBSTACLE,
-			dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache())
+			static_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache())
 	//
 	return NULL;
 }
@@ -1095,7 +1095,7 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 		float recastPos[3];
 		LVecBase3fToRecast(pos, recastPos);
 		dtTileCache* tileCache =
-		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+		static_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
 		tileCache->addObstacle(recastPos, modelRadius, modelDims.get_z(), &obstacleRef);
 		//update tile cache
 		tileCache->update(0, mNavMeshType->getNavMesh());
@@ -1135,7 +1135,7 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 
 		//remove recast obstacle
 		dtTileCache* tileCache =
-		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
+		static_cast<NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
 		tileCache->removeObstacle(obstacleRef);
 		//update tile cache
 		tileCache->update(0, mNavMeshType->getNavMesh());
@@ -1164,7 +1164,7 @@ NavMesh::Result NavMesh::clearAllObstacles()
 
 	if (mNavMeshTypeEnum == OBSTACLE)
 	{
-		dynamic_cast<NavMeshType_Obstacle*>(mNavMeshType)->clearAllTempObstacles();
+		static_cast<NavMeshType_Obstacle*>(mNavMeshType)->clearAllTempObstacles();
 		PRINT_DEBUG("'" << getOwnerObject()->objectId() << "'::'"
 				<< mComponentId << "'::clearAllObstacles");
 #ifdef ELY_DEBUG
@@ -1245,6 +1245,18 @@ NavMesh::Result NavMesh::addCrowdAgent(SMARTPTR(CrowdAgent)crowdAgent)
 
 			//return if NavMesh has not been setup yet
 			RETURN_ON_COND(not mNavMeshType, Result::NAVMESHTYPE_NULL)
+
+			//get crowdAgent dimensions
+			LVecBase3f modelDims;
+			LVector3f modelDeltaCenter;
+			float modelRadius;
+			GamePhysicsManager::GetSingletonPtr()->getBoundingDimensions(
+					crowdAgent->mOwnerObject->getNodePath(), modelDims, modelDeltaCenter, modelRadius);
+			//update RNNavMeshSettings
+			NavMeshSettings settings = getNavMeshSettings();
+			settings.m_agentRadius = modelRadius;
+			settings.m_agentHeight = modelDims.get_z();
+			setNavMeshSettings(settings);
 
 			//do real adding to recast update
 			result = doAddCrowdAgentToRecastUpdate(crowdAgent);
