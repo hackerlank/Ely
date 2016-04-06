@@ -76,7 +76,7 @@ class NavMeshTemplate;
  * | *max_tiles*					|single| 128 | -
  * | *max_polys_per_tile*			|single| 32768 | -
  * | *tile_size*					|single| 32 | -
- * | *area_flags_cost*				|multiple| - | each one specified as "area@flag1[:flag2...:flagN]@cost" note: flags are or-ed
+ * | *area_flags_cost*				|multiple| - | each one specified as "area_type@flag1[:flag2...:flagN]@cost" note: flags are or-ed
  * | *crowd_include_flags*			|single| - | specified as "flag1[:flag2...:flagN]" note: flags are or-ed
  * | *crowd_exclude_flags*			|single| - | specified as "flag1[:flag2...:flagN]" note: flags are or-ed
  * | *convex_volume*				|multiple| - | each one specified as "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type"
