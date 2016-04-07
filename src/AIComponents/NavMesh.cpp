@@ -352,8 +352,8 @@ void NavMesh::onAddToSceneSetup()
 		// "x1,y1,z1:x2,y2,z2...:xN,yN,zN@area_type"
 		std::vector<std::string> pointsAreaTypeStr = parseCompoundString(
 				*iterStr, '@');
-		//check only if there is (at least) three points
-		if (pointsAreaTypeStr.size() < 3)
+		//check only if there is (at least) a pair
+		if (pointsAreaTypeStr.size() < 2)
 		{
 			continue;
 		}
