@@ -39,7 +39,7 @@
 #include <geomTristrips.h>
 #include <transparencyAttrib.h>
 #include <meshDrawer.h>
-#include "Utilities/Tools.h"
+#include "Tools.h"
 
 // These are example implementations of various interfaces used in Recast and Detour.
 

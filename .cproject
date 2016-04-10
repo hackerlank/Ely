@@ -1404,7 +1404,7 @@
 			</target>
 			<target name="Training_Debug-recastnavigation" path="build-Training_Debug/training/recastnavigation" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments>-j2</buildArguments>
+				<buildArguments>-j6</buildArguments>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>true</useDefaultCommand>

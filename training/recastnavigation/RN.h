@@ -47,8 +47,7 @@
 #include <cstring>
 #include <virtualFileSystem.h>
 #include <filename.h>
-
-using namespace ely;
+#include "Raycaster.h"
 
 //RN
 //Sample type

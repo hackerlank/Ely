@@ -1,7 +1,8 @@
 # Ely recastnavigation targets
-AM_CPPFLAGS = -DTESTING -I$(top_srcdir)/include -I$(top_srcdir)/tinyxml2 $(ELY_CPPFLAGS)
+AM_CPPFLAGS = -DTESTING -I/usr/include/panda3d -I/usr/include/eigen3 \
+		-I/usr/include/bullet -I/usr/include/recastnavigation
 AM_CXXFLAGS = $(ELY_CXXFLAGS)
-AM_LDFLAGS = $(ELY_LDFLAGS) -rpath /REPOSITORY/KProjects/WORKSPACE/Ely/build-Devel_Debug/src/.libs
+AM_LDFLAGS = $(ELY_LDFLAGS)
 
 #AUTOMAKE_OPTIONS = subdir-objects
 
@@ -58,7 +59,8 @@ rn_common_sources = \
 		ValueHistory.cpp \
 		ConvexVolumeTool.cpp \
 		OffMeshConnectionTool.cpp \
-		$(top_srcdir)/src/Support/Raycaster.cpp
+		Raycaster.cpp \
+		Tools.cpp
 		
 #ely_recastnavigation
 nodist_ely_recastnavigation_SOURCES = \
@@ -66,8 +68,6 @@ nodist_ely_recastnavigation_SOURCES = \
 
 ely_recastnavigation_LDADD = \
 		$(LDADD) \
-		-dlopen /REPOSITORY/KProjects/WORKSPACE/Ely/build-Devel_Debug/elygame/callbacks/callbacks.la \
-		/REPOSITORY/KProjects/WORKSPACE/Ely/build-Devel_Debug/src/libely.la \
 		libeggToObj.a
 		
 #ely_recastnavigation_character

@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <ctype.h>
 #include <string.h>
-#include "Recast.h"
+#include <Recast.h>
 #include "InputGeom.h"
 #include "ChunkyTriMesh.h"
 #include "MeshLoaderObj.h"

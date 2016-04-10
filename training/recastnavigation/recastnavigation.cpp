@@ -22,6 +22,7 @@
  */
 
 #include "RN.h"
+#include "Raycaster.h"
 
 //hack
 inline unsigned int nextPow2(unsigned int v)
@@ -39,17 +40,25 @@ inline unsigned int ilog2(unsigned int v)
 {
 	unsigned int r;
 	unsigned int shift;
-	r = (v > 0xffff) << 4; v >>= r;
-	shift = (v > 0xff) << 3; v >>= shift; r |= shift;
-	shift = (v > 0xf) << 2; v >>= shift; r |= shift;
-	shift = (v > 0x3) << 1; v >>= shift; r |= shift;
+	r = (v > 0xffff) << 4;
+	v >>= r;
+	shift = (v > 0xff) << 3;
+	v >>= shift;
+	r |= shift;
+	shift = (v > 0xf) << 2;
+	v >>= shift;
+	r |= shift;
+	shift = (v > 0x3) << 1;
+	v >>= shift;
+	r |= shift;
 	r |= (v >> 1);
 	return r;
 }
 
 int main(int argc, char **argv)
 {
-	std::cout << "This training works only with librecastnavigation version 1.0" << std::endl;
+	std::cout << "This training works only with librecastnavigation version 1.0"
+			<< std::endl;
 
 	App* app = new App;
 
@@ -138,10 +147,10 @@ int main(int argc, char **argv)
 			break;
 		case '?':
 			if ((optopt == 'l') or (optopt == 'x') or (optopt == 'y')
-					or (optopt == 'z') or (optopt == 'm')
-					or (optopt == 'e') or (optopt == 'f') or (optopt == 'g'))
-				std::cerr << "Option " << optopt
-						<< " requires an argument.\n" << std::endl;
+					or (optopt == 'z') or (optopt == 'm') or (optopt == 'e')
+					or (optopt == 'f') or (optopt == 'g'))
+				std::cerr << "Option " << optopt << " requires an argument.\n"
+						<< std::endl;
 			else if (isprint(optopt))
 				std::cerr << "Unknown option " << optopt << std::endl;
 			else
@@ -156,17 +165,19 @@ int main(int argc, char **argv)
 		app->meshScale = 1.0;
 	}
 	//start
-	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window), app->debugPhysics);
+	app->mBulletWorld = start(&(app->panda), argc, argv, &(app->window),
+			app->debugPhysics);
 
 	//Create world mesh
-	app->worldMesh = createWorldMesh(meshNameEgg, app->mBulletWorld, app->window, app->meshScale);
+	app->worldMesh = createWorldMesh(meshNameEgg, app->mBulletWorld,
+			app->window, app->meshScale);
 	app->worldMesh.set_pos(app->meshPosition);
 //	worldMesh.hide();
 	//set agent pos
 	app->agentPos = agentPos * app->meshScale + app->worldMesh.get_pos();
 	//setup camera trackball (local coordinate)
 	NodePath tballnp = app->window->get_mouse().find("**/+Trackball");
-	PT(Trackball) trackball = DCAST(Trackball, tballnp.node());
+	PT(Trackball)trackball = DCAST(Trackball, tballnp.node());
 	trackball->set_pos(0, 200, 0);
 	trackball->set_hpr(0, 15, 0);
 
@@ -184,8 +195,9 @@ int main(int argc, char **argv)
 
 	//Create a character
 	app->cs = NULL;
-	app->character = createCharacter(app->mBulletWorld, app->window, app->movType,
-			app->characterRadius, app->characterHeight, &(app->cs));
+	app->character = createCharacter(app->mBulletWorld, app->window,
+			app->movType, app->characterRadius, app->characterHeight,
+			&(app->cs));
 	app->character.hide();
 
 	///RN common
@@ -229,18 +241,21 @@ int main(int argc, char **argv)
 				dynamic_cast<Sample_TempObstacles*>(app->rn->getSample())->getTileSettings();
 		app->tileSettings.m_tileSize = 64;
 		//evaluate m_maxTiles & m_maxPolysPerTile
-		const float* bmin = app->rn->getSample()->getInputGeom()->getMeshBoundsMin();
-		const float* bmax = app->rn->getSample()->getInputGeom()->getMeshBoundsMax();
+		const float* bmin =
+				app->rn->getSample()->getInputGeom()->getMeshBoundsMin();
+		const float* bmax =
+				app->rn->getSample()->getInputGeom()->getMeshBoundsMax();
 		//		char text[64];
 		int gw = 0, gh = 0;
 		rcCalcGridSize(bmin, bmax, m_cellSize, &gw, &gh);
-		const int ts = (int)app->tileSettings.m_tileSize;
-		const int tw = (gw + ts-1) / ts;
-		const int th = (gh + ts-1) / ts;
+		const int ts = (int) app->tileSettings.m_tileSize;
+		const int tw = (gw + ts - 1) / ts;
+		const int th = (gh + ts - 1) / ts;
 		// Max tiles and max polys affect how the tile IDs are caculated.
 		// There are 22 bits available for identifying a tile and a polygon.
-		int tileBits = rcMin((int)ilog2(nextPow2(tw*th)), 14);
-		if (tileBits > 14) tileBits = 14;
+		int tileBits = rcMin((int) ilog2(nextPow2(tw * th)), 14);
+		if (tileBits > 14)
+			tileBits = 14;
 		int polyBits = 22 - tileBits;
 		app->tileSettings.m_maxTiles = 1 << tileBits;
 		app->tileSettings.m_maxPolysPerTile = 1 << polyBits;
@@ -268,7 +283,10 @@ int main(int argc, char **argv)
 	// Do the main loop
 	app->panda->main_loop();
 	//end
-	app->panda->get_task_mgr().remove(app->task);
+	if (app->panda->get_task_mgr().find_task("ai update"))
+	{
+		app->panda->get_task_mgr().remove(app->task);
+	}
 #ifdef DEBUG_DRAW
 	delete app->ddM;
 	delete app->dd;

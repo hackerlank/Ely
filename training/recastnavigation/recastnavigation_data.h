@@ -25,8 +25,7 @@
 #ifndef RECASTNAVIGATION_DATA_H_
 #define RECASTNAVIGATION_DATA_H_
 
-#include "Utilities/Tools.h"
-#include "Support/Raycaster.h"
+#include "Tools.h"
 #include <unistd.h>
 #include <cctype>
 #include <cmath>

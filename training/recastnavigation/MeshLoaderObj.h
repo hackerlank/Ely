@@ -25,7 +25,7 @@
 #ifndef MESHLOADER_OBJ
 #define MESHLOADER_OBJ
 
-#include "Utilities/Tools.h"
+#include "Tools.h"
 
 #include <cstdlib>
 //Model stuff

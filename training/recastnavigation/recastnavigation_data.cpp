@@ -240,8 +240,8 @@ MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstrain
 			rnDir + actorFile);
 	//Load Animations
 	std::vector<std::string> animations;
-	animations.push_back(baseDir + anim0File);
-//	animations.push_back(baseDir + anim1File);
+	animations.push_back(rnDir + anim0File);
+//	animations.push_back(rnDir + anim1File);
 	for (unsigned int i = 0; i < animations.size(); ++i)
 	{
 		window->load_model(Actor, animations[i]);
