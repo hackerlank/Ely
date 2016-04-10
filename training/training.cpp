@@ -30,7 +30,7 @@
 //int meshdrawer_main(int argc, char **argv);
 //int network_main(int argc, char **argv);
 //int octree_main(int argc, char **argv);
-int particles_main(int argc, char **argv);
+//int particles_main(int argc, char **argv);
 //int physics_main(int argc, char **argv);
 //int render_to_texture_main(int argc, char **argv);
 //int rocket_main(int argc, char **argv);
@@ -54,6 +54,6 @@ int main(int argc, char **argv)
 //	result = render_to_texture_main(argc, argv);
 //	result = memory_pool_main(argc, argv);
 //	result = octree_main(argc, argv);
-	result = particles_main(argc, argv);
+//	result = particles_main(argc, argv);
 	return result;
 }

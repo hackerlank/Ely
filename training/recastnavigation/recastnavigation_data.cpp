@@ -24,9 +24,9 @@
 #include "recastnavigation_data.h"
 
 ///Data constants
-std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/ely/");
+std::string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/");
 std::string rnDir(
-		"/REPOSITORY/KProjects/usr/share/DCC/recastnavigation/");
+		"/REPOSITORY/KProjects/WORKSPACE/Ely/training/recastnavigation/");
 ///
 //convert obj to egg: obj2egg -TR 90,0,0 nav_test.obj -o nav_test_panda.egg
 //triangulate nav_test_panda.egg and...
@@ -36,13 +36,13 @@ std::string rnDir(
 //egg2obj -C -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 
 ///default world mesh egg
-std::string meshNameEggDefault("nav_test_panda.egg");
+std::string meshNameEggDefault("nav_test.egg");
 LPoint3f agentPosDefault(4.19123, 9.90642, 8.3);
 
 ///eve character
-std::string actorFile("data/models/eve.bam");
-std::string anim0File("data/models/eve-walk.bam");
-std::string anim1File("data/models/eve-run.bam");
+std::string actorFile("eve.bam");
+std::string anim0File("eve-walk.bam");
+std::string anim1File("eve-run.bam");
 const float characterMaxSpeed = 3;
 const float rateFactor = 1.25;
 const float characterScale = 0.4;
@@ -121,10 +121,10 @@ AsyncTask::DoneStatus update_physics(GenericAsyncTask* task, void* data)
 SMARTPTR(BulletWorld)start(PandaFramework** panda, int argc, char **argv, WindowFramework** window, bool debugPhysics)
 {
 	// Load your configuration
-	load_prc_file_data("", "model-path" + baseDir + "data/models");
+	load_prc_file_data("", "model-path" + rnDir);
 	load_prc_file_data("", "model-path" + baseDir + "data/shaders");
 	load_prc_file_data("", "model-path" + baseDir + "data/sounds");
-	load_prc_file_data("", "model-path" + baseDir + "data/textures");
+	load_prc_file_data("", "model-path" + rnDir);
 	load_prc_file_data("", "show-frame-rate-meter #t");
 	load_prc_file_data("", "lock-to-one-cpu 0");
 	load_prc_file_data("", "support-threads 1");
@@ -183,15 +183,14 @@ void end(PandaFramework* panda)
 }
 
 NodePath createWorldMesh(const std::string& meshNameEgg, SMARTPTR(BulletWorld)mBulletWorld,
-		WindowFramework* window, float scale = 1.0)
+WindowFramework* window, float scale = 1.0)
 {
 	//Load world mesh
-	NodePath worldMesh = window->load_model(window->get_render(),
-			rnDir + meshNameEgg);
+	NodePath worldMesh = window->load_model(window->get_render(), meshNameEgg);
 	if (worldMesh.is_empty())
 	{
 		worldMesh = window->load_model(window->get_render(),
-					rnDir + meshNameEggDefault);
+		rnDir + meshNameEggDefault);
 	}
 	worldMesh.set_pos(0.0, 0.0, 0.0);
 	//attach bullet body
@@ -202,7 +201,7 @@ NodePath createWorldMesh(const std::string& meshNameEgg, SMARTPTR(BulletWorld)mB
 	for (int i = 0; i < geomNodes.get_num_paths(); ++i)
 	{
 		SMARTPTR(GeomNode)geomNode = DCAST(GeomNode,
-				geomNodes.get_path(i).node());
+		geomNodes.get_path(i).node());
 		CSMARTPTR(TransformState) ts = geomNode->get_transform();
 		GeomNode::Geoms geoms = geomNode->get_geoms();
 		for (int j = 0; j < geoms.get_num_geoms(); ++j)
@@ -238,7 +237,7 @@ MOVTYPE movType, float& characterRadius, float& characterHeight, BulletConstrain
 	NodePath playerNP;
 	//Load the Actor Model
 	NodePath Actor = window->load_model(window->get_render(),
-			baseDir + actorFile);
+			rnDir + actorFile);
 	//Load Animations
 	std::vector<std::string> animations;
 	animations.push_back(baseDir + anim0File);

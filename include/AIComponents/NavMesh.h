@@ -82,7 +82,7 @@ class NavMeshTemplate;
  * | *crowd_include_flags*			|single| - | specified as "flag1[:flag2...:flagN]" note: flags are or-ed
  * | *crowd_exclude_flags*			|single| - | specified as "flag1[:flag2...:flagN]" note: flags are or-ed
  * | *convex_volume*				|multiple| - | each one specified as "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type"
- * | *offmesh_connection*			|multiple| - | each one specified as	"xB,yB,zB:xE,yE,zE@bidirectional"
+ * | *offmesh_connection*			|multiple| - | each one specified as "xB,yB,zB:xE,yE,zE@bidirectional" with bidirectional=true,false
  *
  * \note parts inside [] are optional.\n
  */

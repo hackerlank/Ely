@@ -189,15 +189,15 @@ bool RN::loadGeomMesh(const std::string& path, const std::string& meshName,
 	strncpy(inputFileName, (path + meshName).c_str(), inputNameLength);
 	//out obj file name
 	char tmpOutFileName[L_tmpnam];
-	tmpnam (tmpOutFileName);
+	mkstemp (tmpOutFileName);
 	//egg2obj -C -cs y-up -o nav_test_panda.obj nav_test_panda.egg
 	int argc = 7;
 	char *argv[7];
-	argv[0] = "egg2obj";
-	argv[1] = "-C";
-	argv[2] = "-cs";
-	argv[3] = "y-up";
-	argv[4] = "-o";
+	argv[0] = const_cast<char*>("egg2obj");
+	argv[1] = const_cast<char*>("-C");
+	argv[2] = const_cast<char*>("-cs");
+	argv[3] = const_cast<char*>("y-up");
+	argv[4] = const_cast<char*>("-o");
 	argv[5] = tmpOutFileName;
 	argv[6] = inputFileName;
 	EggToObj prog;
@@ -411,30 +411,30 @@ SampleSettings RN::getSettings()
 void RN::setCrowdAreaCost(SamplePolyAreas area, float cost)
 {
 	dtQueryFilter* filter =
-			m_crowdTool->getState()->getCrowd()->getEditableFilter();
+			m_crowdTool->getState()->getCrowd()->getEditableFilter(0);
 	filter->setAreaCost(area, cost);
 }
 
 void RN::setCrowdIncludeFlag(int flag)
 {
-	m_crowdTool->getState()->getCrowd()->getEditableFilter()->setIncludeFlags(
+	m_crowdTool->getState()->getCrowd()->getEditableFilter(0)->setIncludeFlags(
 			flag);
 }
 
 int RN::getCrowdIncludeFlag()
 {
-	return m_crowdTool->getState()->getCrowd()->getFilter()->getIncludeFlags();
+	return m_crowdTool->getState()->getCrowd()->getFilter(0)->getIncludeFlags();
 }
 
 void RN::setCrowdExcludeFlag(int flag)
 {
-	m_crowdTool->getState()->getCrowd()->getEditableFilter()->setExcludeFlags(
+	m_crowdTool->getState()->getCrowd()->getEditableFilter(0)->setExcludeFlags(
 			flag);
 }
 
 int RN::getCrowdExcludeFlag()
 {
-	return m_crowdTool->getState()->getCrowd()->getFilter()->getExcludeFlags();
+	return m_crowdTool->getState()->getCrowd()->getFilter(0)->getExcludeFlags();
 }
 
 void RN::setCrowdTarget(LPoint3f pos)
