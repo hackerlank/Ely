@@ -28,23 +28,15 @@
 							</tool>
 							<tool errorParsers="" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.autogen.1581733160" name="autogen.sh" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.autogen"/>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.661949198" name="GCC C Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc">
-								<option id="gnu.c.compiler.option.include.paths.888556086" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/build-Devel_Debug/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/include/bullet"/>
-									<listOptionValue builtIn="false" value="/usr/include/bullet/BulletDynamics/ConstraintSolver"/>
-								</option>
+								<option id="gnu.c.compiler.option.include.paths.888556086" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.1945885632" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1417063855" name="GCC C++ Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp">
 								<option id="gnu.cpp.compiler.option.include.paths.365971523" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/build-Devel_Debug/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/bullet"/>
-									<listOptionValue builtIn="false" value="/usr/include/bullet/BulletDynamics/ConstraintSolver"/>
-									<listOptionValue builtIn="false" value="/usr/include/recastnavigation"/>
-									<listOptionValue builtIn="false" value="/usr/include/python2.7"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.620884677" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
@@ -108,23 +100,15 @@
 							</tool>
 							<tool errorParsers="" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.autogen.10140359" name="autogen.sh" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.autogen"/>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc.1822422622" name="GCC C Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gcc">
-								<option id="gnu.c.compiler.option.include.paths.571414770" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/build-Devel_Debug_Thread/include}&quot;"/>
-									<listOptionValue builtIn="false" value="/usr/include/bullet"/>
-									<listOptionValue builtIn="false" value="/usr/include/bullet/BulletDynamics/ConstraintSolver"/>
-								</option>
+								<option id="gnu.c.compiler.option.include.paths.571414770" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" valueType="includePath"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.compiler.input.353312821" superClass="cdt.managedbuild.tool.gnu.c.compiler.input"/>
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1032086583" name="GCC C++ Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp">
 								<option id="gnu.cpp.compiler.option.include.paths.300418892" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/build-Devel_Debug_Thread/include}&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/bullet"/>
-									<listOptionValue builtIn="false" value="/usr/include/bullet/BulletDynamics/ConstraintSolver"/>
-									<listOptionValue builtIn="false" value="/usr/include/recastnavigation"/>
-									<listOptionValue builtIn="false" value="/usr/include/python2.7"/>
 								</option>
 								<option id="gnu.cpp.compiler.option.preprocessor.def.1391760603" name="Defined symbols (-D)" superClass="gnu.cpp.compiler.option.preprocessor.def" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="HAVE_CONFIG_H"/>
@@ -407,45 +391,45 @@
 		<project id="Ely.org.eclipse.linuxtools.cdt.autotools.core.projectType.1345492619" name="GNU Autotools" projectType="org.eclipse.linuxtools.cdt.autotools.core.projectType"/>
 	</storageModule>
 	<storageModule moduleId="refreshScope" versionNumber="2">
-		<configuration configurationName="Debug-thread">
+		<configuration configurationName="TransitionsLib">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="Default"/>
-		<configuration configurationName="Devel_Release_Thread"/>
-		<configuration configurationName="Test_Debug"/>
-		<configuration configurationName="Devel_Release"/>
-		<configuration configurationName="Training">
+		<configuration configurationName="Debug-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
 		<configuration configurationName="Debug-src">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="TransitionsLib">
+		<configuration configurationName="Devel_Debug_Thread"/>
+		<configuration configurationName="Test-thread">
+			<resource resourceType="PROJECT" workspacePath="/Ely"/>
+		</configuration>
+		<configuration configurationName="Training_Debug"/>
+		<configuration configurationName="Build (GNU)"/>
+		<configuration configurationName="Default"/>
+		<configuration configurationName="CallbacksLib">
+			<resource resourceType="PROJECT" workspacePath="/Ely"/>
+		</configuration>
+		<configuration configurationName="Devel_Release_Thread"/>
+		<configuration configurationName="Training">
+			<resource resourceType="PROJECT" workspacePath="/Ely"/>
+		</configuration>
+		<configuration configurationName="Debug_Devel">
+			<resource resourceType="PROJECT" workspacePath="/Ely"/>
+		</configuration>
+		<configuration configurationName="Devel_Release"/>
+		<configuration configurationName="Test">
+			<resource resourceType="PROJECT" workspacePath="/Ely"/>
+		</configuration>
+		<configuration configurationName="Devel_Debug"/>
+		<configuration configurationName="InitializationsLib"/>
+		<configuration configurationName="Test_Debug"/>
+		<configuration configurationName="Release-thread">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
 		<configuration configurationName="Debug">
 			<resource resourceType="PROJECT" workspacePath="/Ely"/>
 		</configuration>
-		<configuration configurationName="Training_Debug"/>
-		<configuration configurationName="Debug_Devel">
-			<resource resourceType="PROJECT" workspacePath="/Ely"/>
-		</configuration>
-		<configuration configurationName="Test-thread">
-			<resource resourceType="PROJECT" workspacePath="/Ely"/>
-		</configuration>
-		<configuration configurationName="Test">
-			<resource resourceType="PROJECT" workspacePath="/Ely"/>
-		</configuration>
-		<configuration configurationName="CallbacksLib">
-			<resource resourceType="PROJECT" workspacePath="/Ely"/>
-		</configuration>
-		<configuration configurationName="Devel_Debug_Thread"/>
-		<configuration configurationName="Devel_Debug"/>
-		<configuration configurationName="InitializationsLib"/>
-		<configuration configurationName="Release-thread">
-			<resource resourceType="PROJECT" workspacePath="/Ely"/>
-		</configuration>
-		<configuration configurationName="Build (GNU)"/>
 	</storageModule>
 	<storageModule moduleId="org.eclipse.cdt.core.LanguageSettingsProviders"/>
 	<storageModule moduleId="org.eclipse.cdt.internal.ui.text.commentOwnerProjectMappings"/>
@@ -861,6 +845,7 @@
 			</target>
 			<target name="all" path="build-Devel_Debug_Thread" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

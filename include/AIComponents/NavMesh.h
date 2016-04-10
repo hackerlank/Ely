@@ -25,6 +25,8 @@
 #define NAVMESH_H_
 
 #include "Support/RecastNavigationLocal/NavMeshType.h"
+#include "Support/RecastNavigationLocal/NavMeshType_Tile.h"
+#include "Support/RecastNavigationLocal/NavMeshType_Obstacle.h"
 #include "Support/RecastNavigationLocal/InputGeom.h"
 #include "Support/RecastNavigationLocal/DebugInterfaces.h"
 #include "Support/RecastNavigationLocal/CrowdTool.h"
