@@ -1712,7 +1712,12 @@ void NavMeshTemplate::setParametersDefaults()
 	//NAVMESH_POLYAREA_GRASS@NAVMESH_POLYFLAGS_WALK@2.0
 	mParameterTable.insert(ParameterNameValue("area_flags_cost", "4@0x01@2.0"));
 	//NAVMESH_POLYAREA_JUMP@NAVMESH_POLYFLAGS_JUMP@1.5
-	mParameterTable.insert(ParameterNameValue("area_flags_cost", "5@0x08@1.5"));}
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "5@0x08@1.5"));
+	//crowd include flags = NAVMESH_POLYFLAGS_ALL ^ NAVMESH_POLYFLAGS_DISABLED = 0xffef
+	mParameterTable.insert(ParameterNameValue("crowd_include_flags", "0xffef"));
+	//crowd exclude flags = NAVMESH_POLYFLAGS_DISABLED = 0x10
+	mParameterTable.insert(ParameterNameValue("crowd_exclude_flags", "0x10"));
+}
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMeshTemplate::_type_handle;
