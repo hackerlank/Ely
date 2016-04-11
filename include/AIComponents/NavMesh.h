@@ -54,6 +54,9 @@ class NavMeshTemplate;
  * (i.e. is_steady=true) "Scene" components.\n
  * \note convex volumes and off mesh connections points are are given wrt
  * the scaled owner object node path.
+ * \note area = 5 (NAVMESH_POLYAREA_JUMP) and flags = 0x08 (NAVMESH_POLYFLAGS_JUMP)
+ * are hard-coded for use of off mesh connections (hard-coded), so should be not
+ * redefined.
  *
  * > **XML Param(s)**:
  * param | type | default | note

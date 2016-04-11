@@ -1700,7 +1700,19 @@ void NavMeshTemplate::setParametersDefaults()
 	mParameterTable.insert(ParameterNameValue("max_tiles", "128"));
 	mParameterTable.insert(ParameterNameValue("max_polys_per_tile", "32768"));
 	mParameterTable.insert(ParameterNameValue("tile_size", "32"));
-}
+	//area flags cost
+	//NAVMESH_POLYAREA_GROUND@NAVMESH_POLYFLAGS_WALK@1.0
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "0@0x01@1.0"));
+	//NAVMESH_POLYAREA_WATER@NAVMESH_POLYFLAGS_SWIM@10.0
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "1@0x02@10.0"));
+	//NAVMESH_POLYAREA_ROAD@NAVMESH_POLYFLAGS_WALK@1.0
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "2@0x01@1.0"));
+	//NAVMESH_POLYAREA_DOOR@NAVMESH_POLYFLAGS_WALK:NAVMESH_POLYFLAGS_DOOR@1.0
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "3@0x01:0x04@1.0"));
+	//NAVMESH_POLYAREA_GRASS@NAVMESH_POLYFLAGS_WALK@2.0
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "4@0x01@2.0"));
+	//NAVMESH_POLYAREA_JUMP@NAVMESH_POLYFLAGS_JUMP@1.5
+	mParameterTable.insert(ParameterNameValue("area_flags_cost", "5@0x08@1.5"));}
 
 //TypedObject semantics: hardcoded
 TypeHandle NavMeshTemplate::_type_handle;
