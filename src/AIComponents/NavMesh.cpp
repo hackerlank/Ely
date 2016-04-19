@@ -1110,9 +1110,11 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
 #endif
+		// obstacle added
+		return Result::OK;
 	}
 	//
-	return Result::OK;
+	return Result::ERROR;
 }
 
 NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
@@ -1152,9 +1154,11 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 #ifdef ELY_DEBUG
 		doDebugStaticRender();
 #endif
+		// obstacle removed
+		return Result::OK;
 	}
 	//
-	return Result::OK;
+	return Result::ERROR;
 }
 
 NavMesh::Result NavMesh::clearAllObstacles()
