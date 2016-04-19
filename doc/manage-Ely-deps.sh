@@ -21,6 +21,7 @@ BUILDDIR="build-elydeps"
 CONFARGS=
 PANDA3DPKG="panda3d1.10"
 PANDA3DOUTPUTDIR="built.release"
+PANDAEIGEN="--no-eigen"
 PANDA3DALLEXT="-all"
 PANDA3DINSTCMD="sudo gdebi --n "
 
@@ -148,7 +149,8 @@ updateElyDeps () {
 	[ -d "${WD}" ] && cd ${WD} && \
 		git pull && \
 		CXXFLAGS=-std=c++11 makepanda/makepanda.py --verbose --everything --no-fftw --no-gles --no-gles2 \
-	 		--outputdir ${PANDA3DOUTPUTDIR} --threads ${THREADS} --optimize ${OPTIMIZE} --installer && \
+	 		${PANDAEIGEN} --outputdir ${PANDA3DOUTPUTDIR} --threads ${THREADS} --optimize ${OPTIMIZE} \
+			--installer && \
 	 	PKG=${PANDA3DPKG}_1.10.0_amd64-$(date +'%Y%m%d')-${BUILDMODE}${PANDA3DALLEXT}.deb && \
 	 	mv ${PANDA3DPKG}_1.10.0_amd64.deb ${PKG} && \
 	 	${PANDA3DINSTCMD} ${PKG}
