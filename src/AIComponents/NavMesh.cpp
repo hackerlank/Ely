@@ -1067,6 +1067,9 @@ NavMesh::Result NavMesh::addObstacle(SMARTPTR(Object)object)
 	if ((mNavMeshTypeEnum == OBSTACLE) and
 			(not mReferenceNP.is_empty()) and object)
 	{
+		// return error if object is already present
+		RETURN_ON_COND(mObstacles.find(object) != mObstacles.end(), Component::Result::ERROR)
+
 		//get obstacle dimensions wrt the Model or InstanceOf component (if any)
 		NodePath objectNP;
 		SMARTPTR(Component) aiComp = object->getComponent(ComponentFamilyType("Scene"));
@@ -1128,6 +1131,9 @@ NavMesh::Result NavMesh::removeObstacle(SMARTPTR(Object)object)
 	if ((mNavMeshTypeEnum == OBSTACLE) and
 	(not mReferenceNP.is_empty()) and object)
 	{
+		// return error if objectNP is not yet present
+		RETURN_ON_COND(mObstacles.find(object) == mObstacles.end(), Component::Result::ERROR)
+
 		//get obstacle ref
 		dtObstacleRef obstacleRef = mObstacles[object];
 		//dtObstacleRef cannot be zero
