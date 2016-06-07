@@ -29,7 +29,6 @@
 <option id="program-prefix" value=""/>
 <option id="program-suffix" value=""/>
 <option id="program-transform-name" value=""/>
-<option id="env_vars" value=""/>
 <option id="enable-maintainer-mode" value="false"/>
 <flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
 <flagvalue id="cflags-debug" value="false"/>
@@ -69,7 +68,6 @@
 <option id="program-prefix" value=""/>
 <option id="program-suffix" value=""/>
 <option id="program-transform-name" value=""/>
-<option id="env_vars" value=""/>
 <option id="enable-maintainer-mode" value="false"/>
 <flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
 <flagvalue id="cflags-debug" value="false"/>
@@ -109,7 +107,6 @@
 <option id="program-prefix" value=""/>
 <option id="program-suffix" value=""/>
 <option id="program-transform-name" value=""/>
-<option id="env_vars" value=""/>
 <option id="enable-maintainer-mode" value="false"/>
 <flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
 <flagvalue id="cflags-debug" value="false"/>
@@ -149,7 +146,6 @@
 <option id="program-prefix" value=""/>
 <option id="program-suffix" value=""/>
 <option id="program-transform-name" value=""/>
-<option id="env_vars" value=""/>
 <option id="enable-maintainer-mode" value="false"/>
 <flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
 <flagvalue id="cflags-debug" value="false"/>
@@ -189,7 +185,6 @@
 <option id="program-prefix" value=""/>
 <option id="program-suffix" value=""/>
 <option id="program-transform-name" value=""/>
-<option id="env_vars" value=""/>
 <option id="enable-maintainer-mode" value="false"/>
 <flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
 <flagvalue id="cflags-debug" value="false"/>
@@ -229,7 +224,6 @@
 <option id="program-prefix" value=""/>
 <option id="program-suffix" value=""/>
 <option id="program-transform-name" value=""/>
-<option id="env_vars" value=""/>
 <option id="enable-maintainer-mode" value="false"/>
 <flag id="CFLAGS" value="CFLAGS|CXXFLAGS">
 <flagvalue id="cflags-debug" value="false"/>

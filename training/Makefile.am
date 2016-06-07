@@ -14,7 +14,7 @@ LDADD = -lp3framework -lpanda -lpandaexpress -lp3dtool -lp3dtoolconfig -lp3pystu
 #    -lp3vision -lpandagl -lpandaode -lpandaphysics -lpandaskel -lp3ptloader  \
 #    -lBulletDynamics -lBulletCollision -lLinearMath -lBulletSoftBody -lRakNet
 
-SUBDIRS = recastnavigation
+#SUBDIRS = recastnavigation
 #SUBDIRS = interrogate
 #SUBDIRS = opensteer
 #SUBDIRS = networking
@@ -27,11 +27,14 @@ SUBDIRS = recastnavigation
 
 #ely_training
 noinst_PROGRAMS = ely_training 
-#ely_training_CPPFLAGS=$(STDCpp11_CPPFLAGS)
-#ely_training_CXXFLAGS=$(STDCpp11_CXXFLAGS)
+ely_training_CPPFLAGS=$(STDCpp11_CPPFLAGS)
+ely_training_CXXFLAGS=$(STDCpp11_CXXFLAGS)
 
 nodist_ely_training_SOURCES = \
-	training.cpp
+	training.cpp \
+	octree.cpp
+
+## available sources
 #	particles.cpp
 #	ai.cpp
 #	anim.cpp
