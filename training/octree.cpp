@@ -43,6 +43,11 @@ namespace ely
 struct OctreeNode;
 struct Entity
 {
+	Entity(const string& name)
+	{
+		this->name = name;
+	}
+
 	~Entity()
 	{
 		if (not geometry.is_empty())
@@ -57,6 +62,14 @@ struct Entity
 	float radius;
 	// Speed
 	LVector3f speed;
+	// name
+	string name;
+
+	// return name
+	string get_name() const
+	{
+		return name;
+	}
 
 	// Update position
 	void update(float dt, LPoint3f worldCenter, float maxWidth)
@@ -119,6 +132,12 @@ struct Entity
 		geometry.set_pos_quat(center, LOrientationf(dir, 0.0));
 	}
 };
+
+ostream &operator <<(ostream &out, const Entity & entity)
+{
+	out << entity.get_name();
+	return out;
+}
 
 // Octree node data structure
 struct OctreeNode
@@ -399,6 +418,7 @@ void testAllCollisions(OctreeNode *pTree)
 
 void testCollision(Entity *pA, Entity *pB)
 {
+	cout << *pA << " <---> " << *pB << endl;
 }
 
 } // ely
@@ -498,7 +518,11 @@ int octree_main(int argc, char *argv[])
 	{
 		float rnd;
 		// Add entities
-		entities.push_back(ely::Entity());
+		entities.push_back(
+				ely::Entity(
+						string("entity")
+								+ static_cast<std::ostringstream&>(std::ostringstream().operator <<(
+										i)).str()));
 		// Entity starts by being (possibly) contained into octree root
 		entities.back().pNode = octree;
 		// set random position (between +/-(WORLDWIDTH/2.0 - radius))
