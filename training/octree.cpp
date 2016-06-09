@@ -25,6 +25,7 @@
 #include <pandaSystem.h>
 #include <load_prc_file.h>
 #include <geomLines.h>
+#include <meshDrawer.h>
 #include <lpoint3.h>
 #include <iostream>
 #include <cmath>
@@ -36,6 +37,8 @@
 using namespace std;
 
 static string baseDir("/REPOSITORY/KProjects/WORKSPACE/Ely/elygame/");
+MeshDrawer* generator;
+WindowFramework *window;
 
 namespace ely
 {
@@ -419,6 +422,10 @@ void testAllCollisions(OctreeNode *pTree)
 void testCollision(Entity *pA, Entity *pB)
 {
 	cout << *pA << " <---> " << *pB << endl;
+	generator->begin(window->get_camera_group().get_child(0), window->get_render());
+	generator->segment(pA->geometry.get_pos(), pB->geometry.get_pos(),
+			LVector4f(0, 0, 1, 1), 0.5, LColorf(0, 1, 0, 1));
+	generator->end();
 }
 
 } // ely
@@ -429,7 +436,7 @@ float WORLDWIDTH = 200.0, WORLDHALFWIDTH;
 int OBJECTSNUM = 3;
 list<ely::Entity> entities;
 float OBJECTMAXRADIUS = 5.0;
-float OBJECTMAXSPEED = 10.0;
+float OBJECTMAXSPEED = 5.0;
 AsyncTask::DoneStatus updateAndTestCollisions(GenericAsyncTask* task,
 		void* data);
 
@@ -452,7 +459,8 @@ int octree_main(int argc, char *argv[])
 	//set the window title to My Panda3D Window
 	framework.set_window_title("My Panda3D Window");
 	//open the window
-	WindowFramework *window = framework.open_window();
+
+	window = framework.open_window();
 	if (window != (WindowFramework *) NULL)
 	{
 		std::cout << "Opened the window successfully!\n";
@@ -500,6 +508,17 @@ int octree_main(int argc, char *argv[])
 			abort();
 		}
 	}
+	// set drawer
+	generator = new MeshDrawer();
+	generator->set_budget(1000);
+	NodePath generatorNode = generator->get_root();
+	generatorNode.reparent_to(window->get_render());
+	generatorNode.set_depth_write(false);
+	generatorNode.set_transparency(TransparencyAttrib::M_alpha);
+	generatorNode.set_two_sided(true);
+	generatorNode.set_bin("fixed", 0);
+	generatorNode.set_light_off();
+
 	//
 	WORLDHALFWIDTH = WORLDWIDTH / 2.0;
 	// Create the octree root node
@@ -557,6 +576,9 @@ int octree_main(int argc, char *argv[])
 	// Remove the octree
 	deleteOctree(octree);
 
+	// delete drawer
+	delete generator;
+
 	//close the window framework
 	framework.close_framework();
 	return (0);
@@ -566,6 +588,10 @@ AsyncTask::DoneStatus updateAndTestCollisions(GenericAsyncTask* task,
 		void* data)
 {
 	float dt = ClockObject::get_global_clock()->get_dt();
+
+	//reset generator
+	generator->begin(window->get_camera_group().get_child(0), window->get_render());
+	generator->end();
 
 	// First: update Entities' positions
 	list<ely::Entity>::iterator entityIt;
