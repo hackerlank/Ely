@@ -422,10 +422,8 @@ void testAllCollisions(OctreeNode *pTree)
 void testCollision(Entity *pA, Entity *pB)
 {
 	cout << *pA << " <---> " << *pB << endl;
-	generator->begin(window->get_camera_group().get_child(0), window->get_render());
 	generator->segment(pA->geometry.get_pos(), pB->geometry.get_pos(),
 			LVector4f(0, 0, 1, 1), 0.5, LColorf(0, 1, 0, 1));
-	generator->end();
 }
 
 } // ely
@@ -591,7 +589,6 @@ AsyncTask::DoneStatus updateAndTestCollisions(GenericAsyncTask* task,
 
 	//reset generator
 	generator->begin(window->get_camera_group().get_child(0), window->get_render());
-	generator->end();
 
 	// First: update Entities' positions
 	list<ely::Entity>::iterator entityIt;
@@ -622,7 +619,11 @@ AsyncTask::DoneStatus updateAndTestCollisions(GenericAsyncTask* task,
 	}
 	// Test collisions
 	ely::OctreeNode* octree = reinterpret_cast<ely::OctreeNode*>(data);
+
+	// draw check collision's feedback if any
+	generator->begin(window->get_camera_group().get_child(0), window->get_render());
 	ely::testAllCollisions(octree);
+	generator->end();
 
 	return AsyncTask::DS_again;
 }
