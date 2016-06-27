@@ -76,7 +76,7 @@ void DrawMeshDrawer::clear()
 	{
 		delete m_generators[i];
 	}
-	for (unsigned int i; i < m_generators.size(); ++i)
+	for (unsigned int i; i < m_textNodes.size(); ++i)
 	{
 		m_textNodes[i].remove_node();
 	}
