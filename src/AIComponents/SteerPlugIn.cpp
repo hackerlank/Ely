@@ -101,7 +101,7 @@ void SteerPlugIn::onAddToObjectSetup()
 		//default: "one_turning"
 		mPlugIn = new OneTurningPlugIn<SteerVehicle>;
 	}
-	//open the plug in
+	// open the plug in
 	mPlugIn->open();
 }
 
