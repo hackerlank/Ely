@@ -280,7 +280,7 @@ inline void Driver::reset()
 	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
 	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
 	mMouseMove = true;
-	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey,
+	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey =
 	mDownKey = mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey = mMouseMoveKey = false;
 	mSpeedKey = std::string("shift");
 	mMouseEnabledH = mMouseEnabledP = mHeadLimitEnabled = mPitchLimitEnabled = false;
