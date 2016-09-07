@@ -127,18 +127,20 @@ public:
         NEEDS_NEWLINE_NORMALIZATION		= 0x02,
         NEEDS_WHITESPACE_COLLAPSING     = 0x04,
 
-        TEXT_ELEMENT		            	= NEEDS_ENTITY_PROCESSING | NEEDS_NEWLINE_NORMALIZATION,
+        TEXT_ELEMENT		            = NEEDS_ENTITY_PROCESSING | NEEDS_NEWLINE_NORMALIZATION,
         TEXT_ELEMENT_LEAVE_ENTITIES		= NEEDS_NEWLINE_NORMALIZATION,
-        ATTRIBUTE_NAME		            	= 0,
-        ATTRIBUTE_VALUE		            	= NEEDS_ENTITY_PROCESSING | NEEDS_NEWLINE_NORMALIZATION,
-        ATTRIBUTE_VALUE_LEAVE_ENTITIES  	= NEEDS_NEWLINE_NORMALIZATION,
-        COMMENT				        = NEEDS_NEWLINE_NORMALIZATION
+        ATTRIBUTE_NAME		            = 0,
+        ATTRIBUTE_VALUE		            = NEEDS_ENTITY_PROCESSING | NEEDS_NEWLINE_NORMALIZATION,
+        ATTRIBUTE_VALUE_LEAVE_ENTITIES  = NEEDS_NEWLINE_NORMALIZATION,
+        COMMENT							= NEEDS_NEWLINE_NORMALIZATION
     };
 
     StrPair() : _flags( 0 ), _start( 0 ), _end( 0 ) {}
     ~StrPair();
 
     void Set( char* start, char* end, int flags ) {
+        TIXMLASSERT( start );
+        TIXMLASSERT( end );
         Reset();
         _start  = start;
         _end    = end;
@@ -162,9 +164,9 @@ public:
     char* ParseName( char* in );
 
     void TransferTo( StrPair* other );
+	void Reset();
 
 private:
-    void Reset();
     void CollapseWhitespace();
 
     enum {
@@ -367,8 +369,8 @@ public:
         if ( _currentAllocs > _maxAllocs ) {
             _maxAllocs = _currentAllocs;
         }
-        _nAllocs++;
-        _nUntracked++;
+        ++_nAllocs;
+        ++_nUntracked;
         return result;
     }
     
@@ -391,7 +393,7 @@ public:
     }
 
     void SetTracked() {
-        _nUntracked--;
+        --_nUntracked;
     }
 
     int Untracked() const {
@@ -1757,11 +1759,11 @@ public:
 
     /// Return a possibly helpful diagnostic location or string.
     const char* GetErrorStr1() const {
-        return _errorStr1;
+        return _errorStr1.GetStr();
     }
     /// Return a possibly helpful secondary diagnostic location or string.
     const char* GetErrorStr2() const {
-        return _errorStr2;
+        return _errorStr2.GetStr();
     }
     /// If there is an error, print it to stdout.
     void PrintError() const;
@@ -1787,8 +1789,8 @@ private:
     bool        _processEntities;
     XMLError    _errorID;
     Whitespace  _whitespace;
-    const char* _errorStr1;
-    const char* _errorStr2;
+    mutable StrPair		_errorStr1;
+    mutable StrPair		_errorStr2;
     char*       _charBuffer;
 
     MemPoolT< sizeof(XMLElement) >	 _elementPool;
