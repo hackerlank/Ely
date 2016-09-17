@@ -333,7 +333,7 @@ inline bool isInsidePathSegment(
 		OpenSteer::PolylineSegmentedPathwaySegmentRadii::size_type segmentIndex,
 		OpenSteer::Vec3 const& point)
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	assert(pathway.isValid() && "pathway isn't valid.");
 	assert(
 			segmentIndex < pathway.segmentCount()
@@ -367,7 +367,7 @@ inline OpenSteer::Vec3 mapPointAndDirectionToTangent(
 		OpenSteer::PolylineSegmentedPathwaySegmentRadii const& pathway,
 		OpenSteer::Vec3 const& point, int direction)
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	assert(
 			((1 == direction) || (-1 == direction))
 					&& "direction must be 1 or -1.");
@@ -420,7 +420,7 @@ inline bool isNearWaypoint(
 		OpenSteer::PolylineSegmentedPathwaySegmentRadii const& pathway,
 		OpenSteer::Vec3 const& point)
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	assert(pathway.isValid() && "pathway must be valid.");
 #endif
 
@@ -648,7 +648,7 @@ public:
 		j = (int) remapInterval(z, -hzs, hzs, 0.0f, resolution);
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void xxxDrawMap(void)
 	{
 		const float xs = xSize / (float) resolution;
@@ -977,7 +977,7 @@ public:
 		halfWidth = 1;
 		halfLength = 1;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// to compute mean time between collisions
 		sumOfCollisionFreeTimes = 0;
 		countOfCollisionFreeTimes = 0;
@@ -1007,7 +1007,7 @@ public:
 		curvedSteering = true;
 		incrementalSteering = true;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// 10 seconds with 200 points along the trail
 		this->setTrailParameters(10, 200);
 #endif
@@ -1050,7 +1050,7 @@ public:
 		///called by update: useless here
 ///		adjustVehicleRadiusForSpeed();
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// not previously avoiding
 		annotateAvoid = Vec3::zero;
 		// prevent long streaks due to teleportation
@@ -1069,7 +1069,7 @@ public:
 		// assume no previous steering
 		currentSteering = Vec3::zero;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// assume normal running state
 		dtZero = false;
 #endif
@@ -1087,7 +1087,7 @@ public:
 	{
 		if (demoSelect == 2)
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			lapsStarted++;
 #endif
 ///			const float s = worldSize;
@@ -1168,7 +1168,7 @@ public:
 		// QQQ first pass at detecting "stuck" state
 		if (stuck && (this->relativeSpeed() < 0.001f))
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			stuckCount++;
 #endif
 			if (demoSelect == 2)
@@ -1181,7 +1181,7 @@ public:
 			}
 		}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// take note when current dt is zero (as in paused) for stat counters
 		dtZero = (elapsedTime == 0);
 #endif
@@ -1189,7 +1189,7 @@ public:
 		// pretend we are bigger when going fast
 		adjustVehicleRadiusForSpeed();
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// state saved for speedometer
 		//      annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 0;
 		annoteMaxRelSpeed = annoteMaxRelSpeedCurve = annoteMaxRelSpeedPath = 1;
@@ -1206,7 +1206,7 @@ public:
 			//          this->applyBrakingForce (curvedSteering ? 3 : 2, elapsedTime); // QQQ
 			this->applyBrakingForce((curvedSteering ? 3.0f : 2.0f),
 					elapsedTime); // QQQ
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			// count "off path" events
 			if (offPath && !stuck && (demoSelect == 2))
 				stuckOffPathCount++;
@@ -1221,7 +1221,7 @@ public:
 		{
 			// determine steering for obstacle avoidance (save for annotation)
 			const Vec3 avoid =
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					annotateAvoid =
 #endif
 ///					steerToAvoidObstaclesOnMap(lookAheadTimeOA(), *map,
@@ -1237,7 +1237,7 @@ public:
 				const float targetSpeed = (
 						(curvedSteering && QQQoaJustScraping) ?
 								maxSpeedForCurvature() : 0);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				annoteMaxRelSpeed = targetSpeed / this->maxSpeed();
 #endif
 				const float avoidWeight = 3 + (3 * this->relativeSpeed()); // ad hoc
@@ -1256,7 +1256,7 @@ public:
 					const Vec3 flat = wander.setYtoZero();
 					const Vec3 weighted = flat.truncateLength(this->maxForce())
 							* 6;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					const Vec3 a = this->position() + Vec3(0, 0.2f, 0);
 					this->annotationLine(a, a + (weighted * 0.3f), gWhite);
 #endif
@@ -1288,7 +1288,7 @@ public:
 							const Vec3 b = (this->position()
 									+ (this->up() * 0.2f)
 									+ (this->forward() * halfLength * 1.4f));
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 							const float l = 2;
 							this->annotationLine(b, b + (this->forward() * l),
 									gCyan);
@@ -1323,7 +1323,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		collectReliabilityStatistics(currentTime, elapsedTime);
 #endif
 
@@ -1332,7 +1332,7 @@ public:
 		if (demoSelect == 2)
 		{
 			const bool circles = weAreGoingInCircles();
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			if (circles && !stuck)
 				stuckCycleCount++;
 			this->annotationCircleOrDisk(0.5, this->up(),
@@ -1342,7 +1342,7 @@ public:
 				stuck = true;
 		}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->perFrameAnnotation();
 		this->recordTrailVertex(currentTime, this->position());
@@ -1372,7 +1372,7 @@ public:
 		this->setRadius(minRadius + safetyMargin);
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void collectReliabilityStatistics(const float currentTime,
 			const float elapsedTime)
 	{
@@ -1425,7 +1425,7 @@ public:
 		if (pathHeading.dot(this->forward()) < 0.8f)
 		{
 			// if not, the "hint" is to turn to align with path heading
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			const Vec3 s = this->side() * halfWidth;
 			const float f = halfLength * 2;
 			this->annotationLine(p + s, p + s + (this->forward() * f), gBlack);
@@ -1467,7 +1467,7 @@ public:
 						const bool usableHint = obstacleDistance > farThreshold;
 						if (usableHint)
 						{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 							const Vec3 q = p + (offset.normalize() * 5);
 							this->annotationLine(p, q, gMagenta);
 							this->annotationCircleOrDisk(0.4f, this->up(), o,
@@ -1477,7 +1477,7 @@ public:
 						}
 					}
 				}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationCircleOrDisk(0.4f, this->up(), o, gBlack, 12,
 						false, false);
 #endif
@@ -1541,14 +1541,14 @@ public:
 		int nearestWR = infinity;
 		Vec3 nearestO;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		wingDrawFlagL = false;
 		wingDrawFlagR = false;
 #endif
 
 		const bool hintGiven = steerHint != Vec3::zero;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		if (hintGiven && !dtZero)
 			hintGivenCount++;
 		if (hintGiven)
@@ -1573,7 +1573,7 @@ public:
 		const float arcLength = arcLengthLimit(rawLength, distLimit);
 		const float arcAngle = twoPi * arcLength / circumference;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// XXX temp annotation to show limit on arc angle
 		if (curvedSteering)
 		{
@@ -1607,7 +1607,7 @@ public:
 					curvedSteering ?
 							(int) (scanObstacleMap(lOffset, center, arcAngle,
 									maxSamples, 0,
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 									gYellow, gRed,
 #endif
 									lObsPos) / spacing) :
@@ -1616,7 +1616,7 @@ public:
 					curvedSteering ?
 							(int) (scanObstacleMap(rOffset, center, arcAngle,
 									maxSamples, 0,
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 									gYellow, gRed,
 #endif
 									rObsPos) / spacing) :
@@ -1663,7 +1663,7 @@ public:
 			// QQQ should be a parameter of this method
 			const Vec3 wingWidth = this->side() * wingSlope() * maxForward;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			const Color beforeColor(0.75f, 0.9f, 0.0f);  // for annotation
 			const Color afterColor(0.9f, 0.5f, 0.0f);  // for annotation
 #endif
@@ -1691,7 +1691,7 @@ public:
 							curvedSteering ?
 									(int) (scanObstacleMap(start, center,
 											arcAngle, raySamples, endRadius,
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 											beforeColor, afterColor,
 #endif
 											ignore) / spacing) :
@@ -1700,7 +1700,7 @@ public:
 					if (!curvedSteering)
 						annotateAvoidObstaclesOnMap(start, scan, step);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					if (j == 1)
 					{
 						if ((scan > 0) && (scan < nearestWL))
@@ -1714,13 +1714,13 @@ public:
 #endif
 				}
 			}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			wingDrawFlagL = nearestWL != infinity;
 			wingDrawFlagR = nearestWR != infinity;
 #endif
 		}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// for annotation
 		savedNearestWR = (float) nearestWR;
 		savedNearestR = (float) nearestR;
@@ -1754,7 +1754,7 @@ public:
 		if (obstacleFreeC)
 		{
 			qqqLastNearestObstacle = Vec3::zero;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("obstacleFreeC");
 #endif
 			// qqq  this may be in the wrong place (what would be the right
@@ -1773,7 +1773,7 @@ public:
 				&& (minXXX((float) nearestL, (float) nearestR)
 						> (maxSamples * 0.8f)))
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("nearest obstacle is way out there");
 			annotationHintWasTaken();
 #endif
@@ -1793,7 +1793,7 @@ public:
 		const float maxCurvature = 1 / (minimumTurningRadius() * 1.2f);
 		if (absXXX(this->curvature()) > maxCurvature)
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("min turn radius");
 			this->annotationCircleOrDisk(minimumTurningRadius() * 1.2f,
 					this->up(), center, gBlue * 0.8f, 40, false, false);
@@ -1802,7 +1802,7 @@ public:
 		}
 
 		// if either side is obstacle-free, turn in that direction
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		if (obstacleFreeL || obstacleFreeR)
 			annotationNoteOAClauseName("obstacle-free side");
 #endif
@@ -1815,7 +1815,7 @@ public:
 		// if wings are clear, turn away from nearest obstacle straight ahead
 		if (obstacleFreeW)
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("obstacleFreeW");
 #endif
 			// distance to obs on L and R side of corridor roughtly the same
@@ -1823,7 +1823,7 @@ public:
 			// if they are about the same and a hint is given, use hint
 			if (same && hintGiven)
 			{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				annotationHintWasTaken();
 #endif
 				if (steerHint.dot(this->side()) > 0)
@@ -1846,7 +1846,7 @@ public:
 		const bool equallyClear = absXXX(nearestWL - nearestWR) < 2; // within 2
 		if (equallyClear && hintGiven)
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			annotationNoteOAClauseName("equallyClear");
 			annotationHintWasTaken();
 #endif
@@ -1858,7 +1858,7 @@ public:
 
 		// turn towards the side whose "wing" region is less cluttered
 		// (the wing whose nearest obstacle is furthest away)
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		annotationNoteOAClauseName("wing less cluttered");
 #endif
 		if (nearestWL > nearestWR)
@@ -1878,7 +1878,7 @@ public:
 	void annotateAvoidObstaclesOnMap(const Vec3& scanOrigin, int scanIndex,
 			const Vec3& scanStep)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		if (scanIndex > 0)
 		{
 			const Vec3 hit = scanOrigin + (scanStep * (float) scanIndex);
@@ -1887,7 +1887,7 @@ public:
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void annotationNoteOAClauseName(const char* clauseName)
 	{
 		OPENSTEER_UNUSED_PARAMETER(clauseName);
@@ -1943,7 +1943,7 @@ public:
 	float scanObstacleMap(const Vec3& start, const Vec3& center,
 			const float arcAngle, const int segments,
 			const float endRadiusChange,
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			const Color& beforeColor, const Color& afterColor,
 #endif
 			Vec3& returnObstaclePosition)
@@ -1986,7 +1986,7 @@ public:
 			// to loop only for the sake of annotation (make that optional?)
 			if (obstacleFound)
 			{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationLine(oldPoint, newPoint, afterColor);
 #endif
 			}
@@ -2004,7 +2004,7 @@ public:
 					obstacleDistance = d2 * 0.5f * (i + 1);
 					returnObstaclePosition = newPoint;
 				}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationLine(oldPoint, newPoint, beforeColor);
 #endif
 			}
@@ -2056,7 +2056,7 @@ public:
 					curvedSteering ?
 							(int) (scanObstacleMap(lOffset + qqqLift, center,
 									angle, samples, 0,
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 									gMagenta, gCyan,
 #endif
 									ignore) / spacing) :
@@ -2065,7 +2065,7 @@ public:
 					curvedSteering ?
 							(int) (scanObstacleMap(rOffset + qqqLift, center,
 									angle, samples, 0,
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 									gMagenta, gCyan,
 #endif
 									ignore) / spacing) :
@@ -2074,7 +2074,7 @@ public:
 			returnFlag = returnFlag || (L > 0);
 			returnFlag = returnFlag || (R > 0);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			// annotation
 			if (!curvedSteering)
 			{
@@ -2121,7 +2121,7 @@ public:
 			const Vec3 newSpoke = spoke.rotateAboutGlobalY(arcAngle);
 			const Vec3 prediction = newSpoke + center;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			// QQQ unify with annotatePathFollowing
 			const Color futurePositionColor(0.5f, 0.5f, 0.6f);
 			annotationXZArc(this->position(), center, arcLength, 20,
@@ -2297,7 +2297,7 @@ public:
 		// facing the wrong way?
 		if (alignedness < 0)
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			this->annotationLine(p, p + (nowTangent * 10), gCyan);
 #endif
 			// if nearly anti-parallel
@@ -2326,7 +2326,7 @@ public:
 		else
 		{
 			// otherwise determine corrective steering (including braking)
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			this->annotationLine(futurePosition, futurePosition + pathHeading,
 					gRed);
 #endif
@@ -2337,7 +2337,7 @@ public:
 					&& (futureOutside > 0))
 			{
 				// steer to align with next path segment
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationCircleOrDisk(0.5f, this->up(), futurePosition,
 						gRed, 8, false, false);
 #endif
@@ -2357,7 +2357,7 @@ public:
 		}
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void perFrameAnnotation(void)
 	{
 		const Vec3 p = this->position();
@@ -2440,7 +2440,7 @@ public:
 	void annotatePathFollowing(const Vec3& future, const Vec3& onPath,
 			const Vec3& target, const float outside)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		const Color toTargetColor(gGreen * 0.6f);
 		const Color insidePathColor(gCyan * 0.6f);
 		const Color outsidePathColor(gBlue * 0.6f);
@@ -2518,7 +2518,7 @@ public:
 ///				const float ws = worldSize * 0.51f; // slightly past edge
 ///				if (((fx > 0) && (px > ws)) || ((fx < 0) && (px < -ws)))
 ///				{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					// bump counters
 					lapsStarted++;
 					lapsFinished++;
@@ -2534,7 +2534,7 @@ public:
 					// reset bookkeeping to detect stuck cycles
 					resetStuckCycleDetection();
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					// prevent long streaks due to teleportation
 					this->clearTrailHistory();
 #endif
@@ -2629,7 +2629,7 @@ public:
 	{
 		const Vec3 curved = convertLinearToCurvedSpaceGlobal(absolute);
 		blendIntoAccumulator(elapsedTime * 8.0f, curved, currentSteering);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		{
 			// annotation
 			const Vec3 u(0, 0.5, 0);
@@ -2679,7 +2679,7 @@ public:
 		const float dRadius = trimmedLinear.dot(fromCenter);
 		const float radiusChangeFactor = (dRadius + arcRadius) / arcRadius;
 		const Vec3 resultLocation = center + (spoke * radiusChangeFactor);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		{
 			const Vec3 center = this->position() + localCenterOfCurvature;
 			annotationXZArc(this->position(), center, this->speed() * sign * -3,
@@ -2713,7 +2713,7 @@ public:
 			const Vec3 thrust = steering.parallelComponent(this->forward());
 			const Vec3 trimmed = thrust.truncateLength(this->maxForce());
 			const Vec3 widenOut = this->side() * this->maxForce() * sign;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			{
 				// annotation
 				const Vec3 localCenterOfCurvature = this->side() * signedRadius;
@@ -2762,7 +2762,7 @@ public:
 
 			// map from full throttle when straight to 10% at max curvature
 			const float curveSpeed = interpolate(relativeCurvature, 1.0f, 0.1f);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			annoteMaxRelSpeedCurve = curveSpeed;
 #endif
 			if (demoSelect != 2)
@@ -2783,12 +2783,12 @@ public:
 						(parallelness < 0) ?
 								mw : interpolate(parallelness, mw, 1.0f));
 				maxRelativeSpeed = minXXX(curveSpeed, headingSpeed);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				annoteMaxRelSpeedPath = headingSpeed;
 #endif
 			}
 		}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		annoteMaxRelSpeed = maxRelativeSpeed;
 #endif
 		return this->maxSpeed() * maxRelativeSpeed;
@@ -2803,7 +2803,7 @@ public:
 		return headingError.normalize() * this->maxForce();
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// XXX this should eventually be in a library, make it a first
 	// XXX class annotation queue, tie in with drawXZArc
 	void annotationXZArc(const Vec3& start, const Vec3& center,
@@ -2875,7 +2875,7 @@ public:
 	float worldSize;///updated by plug-in methods
 	float worldDiag;///updated by plug-in methods
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// keep track of path following failure rate
 	// (these are probably obsolete now, replaced by stuckOffPathCount)
 	float pathFollowTime;
@@ -2928,7 +2928,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// take note when current dt is zero (as in paused) for stat counters
 		this->dtZero = (elapsedTime == 0);
 		// pretend we are bigger when going fast
@@ -3047,7 +3047,7 @@ public:
 			map(NULL), worldSize(1.0), worldDiag(1.414), worldCenter(
 					Vec3::zero), worldResolution(1.0), demoSelect(0), curvedSteering(
 					true),
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					windowWidth(1.0),
 #endif
 					usePathFences(false)
@@ -3082,7 +3082,7 @@ public:
 		//set a NULL map
 		map = NULL;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		windowWidth = 1.0;
 #endif
 
@@ -3115,7 +3115,7 @@ public:
 ///			// QQQ first pass at detecting "stuck" state
 ///			if ((*iter)->stuck && ((*iter)->relativeSpeed() < 0.001f))
 ///			{
-///#ifdef OS_DEBUG
+///#ifdef ELY_DEBUG
 ///				(*iter)->stuckCount++;
 ///#endif
 ///				reset();
@@ -3125,7 +3125,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw "ground plane"  (make it 4x map size)
 ///		const float s = worldSize * 2;
 ///		const float u = -0.2f;
@@ -3401,7 +3401,7 @@ public:
 			mapDriverTmp->demoSelect = demoSelect;
 			//set curved steering
 			mapDriverTmp->curvedSteering = curvedSteering;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			mapDriverTmp->windowWidth = windowWidth;
 #endif
 			mapDriverTmp->reset2();
@@ -3573,7 +3573,7 @@ public:
 			drawPathFencesOnMap(*map, static_cast<GCRoute&>(*m_pathway[0]));
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void drawMap(void)
 	{
 #ifdef OLDTERRAINMAP
@@ -4278,7 +4278,7 @@ public:
 		GCRoute* pathway = dynamic_cast<GCRoute*>(m_pathway[0]);
 		if (!pathway)
 		{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			cerr
 			<< "WARNING: MapDrivePlugIn::makeMap():\n"
 			"\tpathway is a 'OpenSteer::PolylineSegmentedPathwaySingleRadius'"
@@ -4418,7 +4418,7 @@ public:
 	int demoSelect;///serializable
 	bool curvedSteering;///serializable
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	float windowWidth;
 #endif
 

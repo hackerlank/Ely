@@ -792,7 +792,7 @@ void NavMeshType_Tile::buildTile(const float* pos)
 	
 	m_tileCol = duRGBA(255,255,255,64);
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->resetLog();
 #endif
 	int dataSize = 0;
@@ -810,7 +810,7 @@ void NavMeshType_Tile::buildTile(const float* pos)
 			dtFree(data);
 	}
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->dumpLog("Build Tile (%d,%d):", tx,ty);
 #endif
 }
@@ -866,7 +866,7 @@ void NavMeshType_Tile::buildAllTiles()
 	const float tcs = m_tileSize*m_cellSize;
 
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// Start the build process.
 	m_ctx->startTimer(RC_TIMER_TEMP);
 #endif
@@ -897,7 +897,7 @@ void NavMeshType_Tile::buildAllTiles()
 		}
 	}
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// Start the build process.	
 	m_ctx->stopTimer(RC_TIMER_TEMP);
 
@@ -991,7 +991,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty, const
 	m_cfg.bmax[0] += m_cfg.borderSize*m_cfg.cs;
 	m_cfg.bmax[2] += m_cfg.borderSize*m_cfg.cs;
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// Reset build times gathering.
 	m_ctx->resetTimers();
 	
@@ -1301,7 +1301,7 @@ unsigned char* NavMeshType_Tile::buildTileMesh(const int tx, const int ty, const
 	}
 	m_tileMemUsage = navDataSize/1024.0f;
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->stopTimer(RC_TIMER_TOTAL);
 	
 	// Show performance stats.

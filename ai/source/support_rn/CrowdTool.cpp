@@ -646,7 +646,7 @@ int CrowdToolState::addAgent(const float* p, const dtCrowdAgentParams* params)
 		if (m_targetRef)
 			crowd->requestMoveTarget(idx, m_targetRef, m_targetPos);
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		// Init trail
 		AgentTrail* trail = &m_trails[idx];
 		for (int i = 0; i < AGENT_MAX_TRAIL; ++i)
@@ -689,7 +689,7 @@ int CrowdToolState::addAgent(const float* p)
 	{
 		if (m_targetRef)
 			crowd->requestMoveTarget(idx, m_targetRef, m_targetPos);
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		// Init trail
 		AgentTrail* trail = &m_trails[idx];
 		for (int i = 0; i < AGENT_MAX_TRAIL; ++i)
@@ -743,7 +743,7 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 	{
 		float vel[3];
 		// Request velocity
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		if (m_agentDebug.idx != -1)
 		{
 			const dtCrowdAgent* ag = crowd->getAgent(m_agentDebug.idx);
@@ -763,14 +763,14 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 				calcVel(vel, ag->npos, p, ag->params.maxSpeed);
 				crowd->requestMoveVelocity(i, vel);
 			}
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		}
 #endif
 	}
 	else
 	{
 		navquery->findNearestPoly(p, ext, filter, &m_targetRef, m_targetPos);
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		if (m_agentDebug.idx != -1)
 		{
 			const dtCrowdAgent* ag = crowd->getAgent(m_agentDebug.idx);
@@ -786,7 +786,7 @@ void CrowdToolState::setMoveTarget(const float* p, bool adjust)
 				if (!ag->active) continue;
 				crowd->requestMoveTarget(i, m_targetRef, m_targetPos);
 			}
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		}
 #endif
 	}
@@ -897,7 +897,7 @@ void CrowdToolState::updateTick(const float dt)
 	dtCrowd* crowd = m_sample->getCrowd();
 	if (!nav || !crowd) return;
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 
 //	TimeVal startTime = getPerfTime();
 	

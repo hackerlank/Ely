@@ -35,7 +35,7 @@
 #	define snprintf _snprintf
 #endif
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 // Uncomment this to dump all the requests in stdout.
 //#define DUMP_REQS
 #endif

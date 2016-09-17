@@ -84,7 +84,7 @@ namespace ossup
 // SimpleVehicle_1 adds concrete LocalSpace methods to AbstractVehicle
 typedef OpenSteer::LocalSpaceMixin<OpenSteer::AbstractVehicle> SimpleVehicle_1;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 
 // SimpleVehicle_2 adds concrete annotation methods to SimpleVehicle_1
 typedef OpenSteer::AnnotationMixin<SimpleVehicle_1> SimpleVehicle_2;
@@ -277,7 +277,7 @@ public:
 	int serialNumber;
 	static int serialNumberCounter;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw lines from vehicle's position showing its velocity and acceleration
 	void annotationVelocityAcceleration(float maxLengthA, float maxLengthV);
 	void annotationVelocityAcceleration(float maxLength)

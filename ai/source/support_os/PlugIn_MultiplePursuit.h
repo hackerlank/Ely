@@ -83,7 +83,7 @@ public:
 ///		this->setSpeed(0);            // speed along Forward direction.
 ///		this->setMaxForce(5.0);       // steering force is clipped to this magnitude
 ///		this->setMaxSpeed(3.0);       // velocity is clipped to this magnitude
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->gaudyPursuitAnnotation = true; // select use of 9-color annotation
 #endif
@@ -92,13 +92,13 @@ public:
 	virtual void resetToStart()
 	{
 		this->setPosition(this->getStart());
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->gaudyPursuitAnnotation = true; // select use of 9-color annotation
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw into the scene
 	void draw(void)
 	{
@@ -130,7 +130,7 @@ public:
 	virtual void reset(void)
 	{
 		MpBase<Entity>::reset();
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->bodyColor.set(0.4f, 0.6f, 0.4f); // greenish
 #endif
 	}
@@ -145,7 +145,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
 #endif
@@ -163,7 +163,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
 #endif
@@ -191,7 +191,7 @@ public:
 	virtual void reset(void)
 	{
 		MpBase<Entity>::reset();
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->bodyColor.set(0.6f, 0.4f, 0.4f); // redish
 #endif
 ///		randomizeStartingPositionAndHeading();
@@ -219,7 +219,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
 #endif
@@ -253,7 +253,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// for annotation
 		this->recordTrailVertex(currentTime, this->position());
 #endif
@@ -315,7 +315,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw each vehicles
 		iterator iter;
 		for (iter = allMP.begin(); iter != allMP.end(); ++iter)

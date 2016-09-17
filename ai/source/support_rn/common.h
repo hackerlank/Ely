@@ -11,7 +11,7 @@
 #include <lvector3.h>
 
 ///Macros
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 #	define PRINT_DEBUG(msg) std::cout << msg << std::endl
 #	define PRINT_ERR_DEBUG(msg) std::cerr << msg << std::endl
 #	define ASSERT_TRUE(cond) \
@@ -82,7 +82,7 @@ inline unsigned int ilog2(unsigned int v)
 	return r;
 }
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 #	define CTXLOG(ctx,type,msg) \
 		ctx->log(type,msg)
 #	define CTXLOG1(ctx,type,msg,par) \

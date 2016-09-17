@@ -109,7 +109,7 @@ struct CtfPlugInData
 ///	float gAvoidancePredictTime;///serializable //0.9 (=gAvoidancePredictTimeMin)
 ///	int resetCount;
 	bool gDelayedResetPlugInXXX;///serializable
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	Color evadeColor; //Color(0.6f, 0.6f, 0.3f)
 	Color seekColor; //Color(0.3f, 0.6f, 0.6f)
 	Color clearPathColor; //Color(0.3f, 0.6f, 0.3f)
@@ -154,7 +154,7 @@ public:
 
 ///		randomizeStartingPositionAndHeading();  // new starting position
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();     // prevent long streaks due to teleportation
 #endif
 	}
@@ -165,12 +165,12 @@ public:
 		avoiding = false;         // not activossup avoiding
 ///		randomizeStartingPositionAndHeading();  // new starting position
 		this->setPosition(this->getStart());
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();     // prevent long streaks due to teleportation
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
@@ -185,7 +185,7 @@ public:
 	// xxx Pedestrian.cpp
 	void annotateAvoidObstacle(const float minDistanceToCollision)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		const Vec3 boxSide = this->side() * this->radius();
 		const Vec3 boxFront = this->forward() * minDistanceToCollision;
 		const Vec3 FR = this->position() + boxFront - boxSide;
@@ -305,7 +305,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
@@ -342,7 +342,7 @@ public:
 				// xxx experiment 9-16-02
 				Vec3 s = limitMaxDeviationAngle(seek, 0.707f, this->forward());
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationLine(this->position(),
 						this->position() + (s * 0.2f),
 						this->gCtfPlugInData->seekColor);
@@ -359,7 +359,7 @@ public:
 							+ limitMaxDeviationAngle(evade, 0.5f,
 									this->forward());
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					// annotation: show evasion steering force
 					this->annotationLine(this->position(),
 							this->position() + (steer * 0.2f),
@@ -374,7 +374,7 @@ public:
 					const Vec3 steer = limitMaxDeviationAngle(seek + evade,
 							0.707f, this->forward());
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					this->annotationLine(this->position(),
 							this->position() + seek, gRed);
 					this->annotationLine(this->position(),
@@ -420,7 +420,7 @@ public:
 		}
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void draw(void)
 	{
 		// first call the draw method in the base class
@@ -501,7 +501,7 @@ public:
 		}
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void clearPathAnnotation(const float sideThreshold,
 			const float behindThreshold, const Vec3& goalDirection)
 	{
@@ -543,7 +543,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
@@ -628,7 +628,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
@@ -643,7 +643,7 @@ public:
 			if (gSeeker->state == CtfBase<Entity>::running)
 				gSeeker->state = CtfBase<Entity>::tagged;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			// annotation:
 			if (gSeeker->state == CtfBase<Entity>::tagged)
 			{
@@ -669,7 +669,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
@@ -684,7 +684,7 @@ public:
 			if (this->gSeeker->state == CtfBase<Entity>::running)
 				this->gSeeker->state = CtfBase<Entity>::tagged;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			// annotation:
 			if (this->gSeeker->state == CtfBase<Entity>::tagged)
 			{
@@ -741,7 +741,7 @@ template<typename Entity> inline bool CtfSeeker<Entity>::clearPathToGoal(void)
 				&& (alongCorridor < goalDistance));
 		const float eForwardDistance = this->forward().dot(eOffset);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// xxx temp move this up before the conditionals
 		this->annotationXZCircle(e.radius(), eFuture,
 				this->gCtfPlugInData->clearPathColor, 20); //xxx
@@ -757,7 +757,7 @@ template<typename Entity> inline bool CtfSeeker<Entity>::clearPathToGoal(void)
 				// not a blocker if behind us and we are perp to corridor
 				const float eFront = eForwardDistance + e.radius();
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				//annotationLine (position, forward*eFront, gGreen); // xxx
 				//annotationLine (e.position, forward*eFront, gGreen); // xxx
 
@@ -776,7 +776,7 @@ template<typename Entity> inline bool CtfSeeker<Entity>::clearPathToGoal(void)
 				if (!safeToTurnTowardsGoal)
 				{
 					// this enemy blocks the path to the goal, so return false
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 					this->annotationLine(this->position(), e.position(),
 							this->gCtfPlugInData->clearPathColor);
 #endif
@@ -791,7 +791,7 @@ template<typename Entity> inline bool CtfSeeker<Entity>::clearPathToGoal(void)
 	// clearPathAnnotation (sideThreshold, behindThreshold, goalDirection);
 	// return true;
 	//if (xxxReturn)
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	clearPathAnnotation(sideThreshold, behindThreshold, goalDirection);
 #endif
 	return xxxReturn;
@@ -822,7 +822,7 @@ template<typename Entity> inline Vec3 CtfSeeker<Entity>::steerToEvadeAllDefender
 				const float timeEstimate = 0.15f * eDistance / e.speed(); //xxx
 				const Vec3 future = e.predictFuturePosition(timeEstimate);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationXZCircle(e.radius(), future,
 						this->gCtfPlugInData->evadeColor, 20); // xxx
 #endif
@@ -854,7 +854,7 @@ template<typename Entity> inline Vec3 CtfSeeker<Entity>::XXXsteerToEvadeAllDefen
 		const float timeEstimate = 0.5f * eDistance / e.speed(); //xxx
 		const Vec3 eFuture = e.predictFuturePosition(timeEstimate);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationXZCircle(e.radius(), eFuture,
 				this->gCtfPlugInData->evadeColor, 20);
@@ -922,7 +922,7 @@ public:
 ///		m_CtfPlugInData.gAvoidancePredictTime = m_CtfPlugInData.gAvoidancePredictTimeMin;
 ///		m_CtfPlugInData.resetCount = 0;
 		m_CtfPlugInData.gDelayedResetPlugInXXX = false;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		m_CtfPlugInData.evadeColor = Color(0.6f, 0.6f, 0.3f); // annotation
 		m_CtfPlugInData.seekColor = Color(0.3f, 0.6f, 0.6f); // annotation
 		m_CtfPlugInData.clearPathColor = Color(0.3f, 0.6f, 0.3f); // annotation
@@ -968,7 +968,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw each vehicles
 		iterator iter;
 		for (iter = all.begin(); iter != all.end(); ++iter)
@@ -1176,7 +1176,7 @@ public:
 		return (const AVGroup&) all;
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void drawHomeBase(void)
 	{
 		const Vec3 up(0, 0.01f, 0);

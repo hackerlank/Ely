@@ -108,7 +108,7 @@ public:
 			return false;
 		return true;
 	}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void draw()
 	{
 		Vec3 b, c;
@@ -172,7 +172,7 @@ public:
 
 ///		setPosition(0,0,0);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->setTrailParameters(100, 6000);
 #endif
@@ -186,7 +186,7 @@ public:
 		//reset only position (and clear debug draw)
 		this->setPosition(m_home);
 		this->setSpeed(0.0);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->setTrailParameters(100, 6000);
 #endif
@@ -222,7 +222,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->recordTrailVertex(currentTime, this->position());
 #endif
 	}
@@ -235,7 +235,7 @@ public:
 		this->regenerateOrthonormalBasis(dir);
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
@@ -258,7 +258,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->recordTrailVertex(currentTime, this->position());
 #endif
 	}
@@ -318,7 +318,7 @@ public:
 ///		}
 ///		m_home = this->position();
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();    // prevent long streaks due to teleportation
 		this->setTrailParameters(10, 60);
 #endif
@@ -388,7 +388,7 @@ public:
 										Vec3(-2.0f, 0.0f, Z));
 						Vec3 behindBallForce = this->xxxsteerForSeek(
 								behindBall);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 						this->annotationLine(this->position(), behindBall,
 								Color(0.0f, 1.0f, 0.0f));
 #endif
@@ -414,7 +414,7 @@ public:
 		this->entityUpdate(currentTime, elapsedTime);
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
@@ -451,7 +451,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		//annotation
 		Vec3 collisionAvoidance = this->steerToAvoidNeighbors(this->getNeighborMinTimeColl(),
 				(AVGroup&) this->m_AllPlayers);
@@ -599,7 +599,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw test vehicle
 ///		for (unsigned int i = 0; i < m_PlayerCountA; i++)
 ///			TeamA[i]->draw();
@@ -662,7 +662,7 @@ public:
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void drawSoccerField()
 	{
 		gDrawer3d->setTwoSided(true);

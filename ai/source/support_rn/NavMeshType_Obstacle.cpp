@@ -1313,7 +1313,7 @@ bool NavMeshType_Obstacle::handleBuild()
 	
 
 	// Preprocess tiles.
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->resetTimers();
 	
 	m_cacheLayerCount = 0;
@@ -1340,7 +1340,7 @@ bool NavMeshType_Obstacle::handleBuild()
 					continue;
 				}
 				
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 				m_cacheLayerCount++;
 				m_cacheCompressedSize += tile->dataSize;
 				m_cacheRawSize += calcLayerBufferSize(tcparams.width, tcparams.height);
@@ -1350,13 +1350,13 @@ bool NavMeshType_Obstacle::handleBuild()
 	}
 
 	// Build initial meshes
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->startTimer(RC_TIMER_TOTAL);
 #endif
 	for (int y = 0; y < th; ++y)
 		for (int x = 0; x < tw; ++x)
 			m_tileCache->buildNavMeshTilesAt(x,y, m_navMesh);
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->stopTimer(RC_TIMER_TOTAL);
 	
 	m_cacheBuildTimeMs = m_ctx->getAccumulatedTime(RC_TIMER_TOTAL)/1000.0f;

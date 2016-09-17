@@ -170,12 +170,12 @@ PUBLISHED:
 	enum OSDebugDrawPrimitives
 	{
 #ifndef CPPPARSER
-		POINTS = ossup::DrawMeshDrawer::DRAW_POINTS,
-		LINES = ossup::DrawMeshDrawer::DRAW_LINES,
-		TRIS = ossup::DrawMeshDrawer::DRAW_TRIS,
-		QUADS = ossup::DrawMeshDrawer::DRAW_QUADS,
+		OS_POINTS = ossup::DrawMeshDrawer::DRAW_POINTS,
+		OS_LINES = ossup::DrawMeshDrawer::DRAW_LINES,
+		OS_TRIS = ossup::DrawMeshDrawer::DRAW_TRIS,
+		OS_QUADS = ossup::DrawMeshDrawer::DRAW_QUADS,
 #else
-		POINTS,LINES,TRIS,QUADS
+		OS_POINTS,OS_LINES,OS_TRIS,OS_QUADS
 #endif //CPPPARSER
 	};
 
@@ -185,17 +185,17 @@ PUBLISHED:
 	enum RNDebugDrawPrimitives
 	{
 #ifndef CPPPARSER
-		POINTS = DU_DRAW_POINTS,
-		LINES = DU_DRAW_LINES,
-		TRIS = DU_DRAW_TRIS,
-		QUADS = DU_DRAW_QUADS,
+		RN_POINTS = DU_DRAW_POINTS,
+		RN_LINES = DU_DRAW_LINES,
+		RN_TRIS = DU_DRAW_TRIS,
+		RN_QUADS = DU_DRAW_QUADS,
 #else
-		POINTS,LINES,TRIS,QUADS
+		RN_POINTS,RN_LINES,RN_TRIS,RN_QUADS
 #endif //CPPPARSER
 	};
 
 	/**
-	 * \name LOW LEVEL DEBUG DRAWING XXX
+	 * \name LOW LEVEL DEBUG DRAWING
 	 */
 	///@{
 	void debug_draw_primitive(OSDebugDrawPrimitives primitive,

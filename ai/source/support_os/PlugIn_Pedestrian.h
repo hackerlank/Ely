@@ -133,7 +133,7 @@ public:
 		// pick a random direction for path following (upstream or downstream)
 		pathDirection = (frandom01() > 0.5) ? -1 : +1;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// trail parameters: 3 seconds with 60 points along the trail
 		this->setTrailParameters(3, 60);
 #endif
@@ -165,7 +165,7 @@ public:
 					< radiusEndpoint0)
 			{
 				pathDirection = +1;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationXZCircle(radiusEndpoint0, pathEndpoint0, darkRed, 20);
 #endif
 			}
@@ -173,13 +173,13 @@ public:
 					< radiusEndpoint1)
 			{
 				pathDirection = -1;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 				this->annotationXZCircle(radiusEndpoint1, pathEndpoint1, darkRed, 20);
 #endif
 			}
 		}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration(5, 0);
 		this->recordTrailVertex(currentTime, this->position());
@@ -266,7 +266,7 @@ public:
 		return steeringForce.setYtoZero();
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw this pedestrian into scene
 	void draw(void)
 	{
@@ -279,7 +279,7 @@ public:
 	void annotatePathFollowing(const Vec3& future, const Vec3& onPath,
 			const Vec3& target, const float outside)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		const Color yellow(1, 1, 0);
 		const Color lightOrange(1.0f, 0.5f, 0.0f);
 		const Color darkOrange(0.6f, 0.3f, 0.0f);
@@ -310,7 +310,7 @@ public:
 	void annotateAvoidCloseNeighbor(const AbstractVehicle& other,
 			const float /*additionalDistance*/)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw the word "Ouch!" above colliding vehicles
 		const float headOn = this->forward().dot(other.forward()) < 0;
 		const Color green(0.4f, 0.8f, 0.1f);
@@ -336,7 +336,7 @@ public:
 			const float /*steer*/, const Vec3& ourFuture,
 			const Vec3& threatFuture)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		const Color green(0.15f, 0.6f, 0.0f);
 
 		this->annotationLine(this->position(), ourFuture, green);
@@ -356,7 +356,7 @@ public:
 	// xxx CaptureTheFlag.cpp
 	void annotateAvoidObstacle(const float minDistanceToCollision)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		const Vec3 boxSide = this->side() * this->radius();
 		const Vec3 boxFront = this->forward() * minDistanceToCollision;
 		const Vec3 FR = this->position() + boxFront - boxSide;
@@ -424,7 +424,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration(5, 0);
 		this->recordTrailVertex(currentTime, this->position());
@@ -520,7 +520,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw and annotate each Pedestrian
 		iterator iter;
 		for (iter = crowd.begin(); iter != crowd.end(); ++iter)
@@ -585,7 +585,7 @@ public:
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void serialNumberAnnotationUtility(const AbstractVehicle& selected,
 			const AbstractVehicle& nearMouse)
 	{

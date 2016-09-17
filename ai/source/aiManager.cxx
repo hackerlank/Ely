@@ -949,16 +949,16 @@ void AIManager::debug_draw_primitive(OSDebugDrawPrimitives primitive,
 	unsigned int realSize;
 	switch (primitive)
 	{
-	case POINTS:
+	case OS_POINTS:
 		realSize = points.size();
 		break;
-	case LINES:
+	case OS_LINES:
 		realSize = points.size() - (points.size() % 2);
 		break;
-	case TRIS:
+	case OS_TRIS:
 		realSize = points.size() - (points.size() % 3);
 		break;
-	case QUADS:
+	case OS_QUADS:
 		realSize = points.size() - (points.size() % 4);
 		break;
 	default:
@@ -984,16 +984,16 @@ void AIManager::debug_draw_primitive(RNDebugDrawPrimitives primitive,
 	unsigned int realSize;
 	switch (primitive)
 	{
-	case POINTS:
+	case RN_POINTS:
 		realSize = points.size();
 		break;
-	case LINES:
+	case RN_LINES:
 		realSize = points.size() - (points.size() % 2);
 		break;
-	case TRIS:
+	case RN_TRIS:
 		realSize = points.size() - (points.size() % 3);
 		break;
-	case QUADS:
+	case RN_QUADS:
 		realSize = points.size() - (points.size() % 4);
 		break;
 	default:

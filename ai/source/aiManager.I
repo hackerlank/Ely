@@ -87,7 +87,7 @@ INLINE int AIManager::get_obstacle(int index) const
 	pvector<ObstacleAttributes>& obstacleAttrs =
 			const_cast<GlobalObstacles&>(mObstacles).second();
 	CONTINUE_IF_ELSE_R((index >= 0) && (index < (int) obstacleAttrs.size()),
-			ELY_ERROR)
+			AI_ERROR)
 
 	return obstacleAttrs[index].first().get_ref();
 }

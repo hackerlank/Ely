@@ -21,3 +21,7 @@ m4/lt~obsolete.m4
 missing
 *~
 .settings*/
+*.pyc
+interrogate*
+linux*/
+*.so

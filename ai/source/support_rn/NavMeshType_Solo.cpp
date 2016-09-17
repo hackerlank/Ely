@@ -407,7 +407,7 @@ bool NavMeshType_Solo::handleBuild()
 	rcVcopy(m_cfg.bmax, bmax);
 	rcCalcGridSize(m_cfg.bmin, m_cfg.bmax, m_cfg.cs, &m_cfg.width, &m_cfg.height);
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// Reset build times gathering.
 	m_ctx->resetTimers();
 
@@ -742,7 +742,7 @@ bool NavMeshType_Solo::handleBuild()
 		}
 	}
 	
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	m_ctx->stopTimer(RC_TIMER_TOTAL);
 
 	// Show performance stats.

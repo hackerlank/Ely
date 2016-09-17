@@ -5,7 +5,7 @@
  * \author consultit
  */
 
-#include "osTools.h"
+#include "aiTools.h"
 
 pvector<string> parseCompoundString(
 		const string& srcCompoundString, char separator)

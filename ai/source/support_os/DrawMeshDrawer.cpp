@@ -184,9 +184,9 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 					LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), uv.get_x(),
 							uv.get_y()), m_size, m_color);
 			m_lineVertex = vertex;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			m_lineIdx = 3; //flag: it signals that at least 2 points have been used.
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 		}
 		else
 		{
@@ -203,9 +203,9 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 					LVector4f(m_lineUV.get_x(), m_lineUV.get_y(), uv.get_x(),
 							uv.get_y()), m_size, m_color);
 			m_lineVertex = vertex;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			m_lineIdx = 3; //flag: it signals that at least 2 points have been used.
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 		}
 		else
 		{
@@ -241,9 +241,9 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 			m_triVertex[1] = vertex;
 			m_triColor[1] = m_color;
 			m_triUV[1] = uv;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			m_triIdx = 5; //flag: it signals that at least 3 points have been used.
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 		}
 		else
 		{
@@ -274,9 +274,9 @@ void DrawMeshDrawer::vertex(const LVector3f& vertex, const LVector2f& uv)
 				m_triUV[1] = uv;
 				m_triStripUp = true;
 			}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 			m_triIdx = 5; //flag: it signals that at least 3 points have been used.
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 		}
 		else
 		{

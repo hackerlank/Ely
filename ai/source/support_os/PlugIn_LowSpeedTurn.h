@@ -100,13 +100,13 @@ public:
 ///		// for next instance: step speed
 ///		startSpeed += 0.15f;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// 15 seconds and 150 points along the trail
 		this->setTrailParameters(15, 150);
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw into the scene
 	void draw(void)
 	{
@@ -123,7 +123,7 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
@@ -159,7 +159,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
@@ -218,7 +218,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// update, draw and annotate each agent
 		iterator iter;
 		for (iter = all.begin(); iter != all.end(); ++iter)

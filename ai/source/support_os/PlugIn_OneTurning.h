@@ -79,7 +79,7 @@ public:
 	{
 		SimpleVehicle::reset(); // reset the vehicle
 		VehicleAddOnMixin<SimpleVehicle, Entity>::reset();
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->clearTrailHistory();  // prevent long streaks due to teleportation
 #endif
 	}
@@ -92,13 +92,13 @@ public:
 		///call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
 #endif
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw this character/vehicle into the scene
 	void draw(void)
 	{
@@ -118,7 +118,7 @@ public:
 		//call the entity update
 		this->entityUpdate(currentTime, elapsedTime);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		this->annotationVelocityAcceleration();
 		this->recordTrailVertex(currentTime, this->position());
 #endif
@@ -169,7 +169,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw test vehicle
 		iterator iter;
 		for (iter = theVehicle.begin(); iter != theVehicle.end(); ++iter)

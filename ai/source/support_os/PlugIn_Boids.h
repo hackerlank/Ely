@@ -136,7 +136,7 @@ public:
 				maxXXX(this->getAlignmentMaxDist(), this->getCohesionMaxDist()));
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	// draw this boid into the scene
 	void draw(void)
 	{
@@ -214,7 +214,7 @@ public:
 		const Vec3 alignmentW = alignment * alignmentWeight;
 		const Vec3 cohesionW = cohesion * cohesionWeight;
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// annotation
 		// const float s = 0.1;
 		// this->annotationLine (this->position(), this->position() + (separationW * s), gRed);
@@ -305,7 +305,7 @@ public:
 	// xxx CaptureTheFlag.cpp
 	void annotateAvoidObstacle(const float minDistanceToCollision)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		const Vec3 boxSide = this->side() * this->radius();
 		const Vec3 boxFront = this->forward() * minDistanceToCollision;
 		const Vec3 FR = this->position() + boxFront - boxSide;
@@ -464,7 +464,7 @@ public:
 
 	void redraw(const float currentTime, const float elapsedTime)
 	{
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		// draw each boid in flock
 		iterator iter;
 		for (iter = flock.begin(); iter != flock.end(); ++iter)
@@ -824,7 +824,7 @@ public:
 	float worldRadius;///serializable
 	Vec3 worldCenter;///serializable
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	void drawObstacles(void)
 	{
 ///		// draw obstacles

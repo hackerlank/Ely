@@ -281,7 +281,7 @@ void SimpleVehicle::measurePathCurvature(const float elapsedTime)
 // ----------------------------------------------------------------------------
 // draw lines from vehicle's position showing its velocity and acceleration
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 void SimpleVehicle::annotationVelocityAcceleration(float maxLengthA,
 		float maxLengthV)
 {

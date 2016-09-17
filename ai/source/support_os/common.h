@@ -19,7 +19,7 @@
 #include "DrawMeshDrawer.h"
 
 ///Macros
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 #	define PRINT_DEBUG(msg) std::cout << msg << std::endl
 #	define PRINT_ERR_DEBUG(msg) std::cerr << msg << std::endl
 #	define ASSERT_TRUE(cond) \
@@ -414,7 +414,7 @@ public:
 		Super::setPosition(m_settings.m_position);
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	virtual void draw()
 	{
 	}
@@ -443,7 +443,7 @@ public:
 			OpenSteer::SphereObstacle(r, c)
 	{
 	}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -465,7 +465,7 @@ public:
 			OpenSteer::BoxObstacle(w, h, d)
 	{
 	}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -508,7 +508,7 @@ public:
 			OpenSteer::PlaneObstacle(s, u, f, p)
 	{
 	}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -530,7 +530,7 @@ public:
 			OpenSteer::RectangleObstacle(w, h, s, u, f, p, sf)
 	{
 	}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	virtual void draw(const bool filled, const OpenSteer::Color& color,
 			const OpenSteer::Vec3& viewpoint) const
 	{
@@ -704,7 +704,7 @@ public:
 		}
 	}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	virtual void drawPath(void)
 	{
 		typedef OpenSteer::SegmentedPathway::size_type size_type;
