@@ -9,14 +9,14 @@
 #define OSSTEERVEHICLE_H_
 
 #include "osSteerPlugIn.h"
-#include "osSteerManager.h"
-#include "osTools.h"
+#include "aiManager.h"
+#include "aiTools.h"
 #include "opensteer_includes.h"
 #include "nodePath.h"
 
 #ifndef CPPPARSER
-#include "support/common.h"
-#include "support/PlugIn_CaptureTheFlag.h"
+#include "support_os/common.h"
+#include "support_os/PlugIn_CaptureTheFlag.h"
 #endif //CPPPARSER
 
 /**
@@ -51,7 +51,7 @@
  * for more information.
  *
  * \note A OSSteerVehicle will be reparented to the default reference node on
- * creation (see OSSteerManager).
+ * creation (see AIManager).
  *
  * > **OSSteerVehicle text parameters**:
  * param | type | default | note
@@ -345,7 +345,7 @@ public:
 
 protected:
 	friend void unref_delete<OSSteerVehicle>(OSSteerVehicle*);
-	friend class OSSteerManager;
+	friend class AIManager;
 	friend class OSSteerPlugIn;
 
 	OSSteerVehicle(const string& name);

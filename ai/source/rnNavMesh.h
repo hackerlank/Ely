@@ -8,16 +8,16 @@
 #ifndef RNNAVMESH_H_
 #define RNNAVMESH_H_
 
-#include "rnTools.h"
+#include "aiTools.h"
 #include "recastnavigation_includes.h"
 #include "nodePath.h"
 
 #ifndef CPPPARSER
-#include "support/CrowdTool.h"
-#include "support/NavMeshType_Tile.h"
-#include "support/NavMeshType_Obstacle.h"
-#include "support/NavMeshTesterTool.h"
-#include "library/DetourTileCache.h"
+#include "support_rn/CrowdTool.h"
+#include "support_rn/NavMeshType_Tile.h"
+#include "support_rn/NavMeshType_Obstacle.h"
+#include "support_rn/NavMeshTesterTool.h"
+#include "library_rn/DetourTileCache.h"
 #endif //CPPPARSER
 
 class RNCrowdAgent;
@@ -39,7 +39,7 @@ class RNCrowdAgent;
  * \note A model can "own" many RNNavMesh(es), so the typical pattern is to
  * have a common parent (ie reference) NodePath to which both model and its
  * RNNavMesh(es) are reparented. A RNNavMesh will be reparented to the default
- * reference node on creation (see RNNavMeshManager).
+ * reference node on creation (see AIManager).
  *
  * > **RNNavMesh text parameters**:
  * param | type | default | note
@@ -394,7 +394,7 @@ public:
 
 protected:
 	friend void unref_delete<RNNavMesh>(RNNavMesh*);
-	friend class RNNavMeshManager;
+	friend class AIManager;
 	friend class RNCrowdAgent;
 
 	RNNavMesh(const string& name = "NavMesh");
@@ -421,15 +421,15 @@ private:
 	RNNavMeshSettings mNavMeshSettings;
 	///RNNavMesh's NavMeshTileSettings equivalent.
 	RNNavMeshTileSettings mNavMeshTileSettings;
-	///Area types with ability flags settings (see support/NavMeshType.h).
+	///Area types with ability flags settings (see support_rn/NavMeshType.h).
 	rnsup::NavMeshPolyAreaFlags mPolyAreaFlags;
-	///Area types with cost settings (see support/NavMeshType.h).
+	///Area types with cost settings (see support_rn/NavMeshType.h).
 	rnsup::NavMeshPolyAreaCost mPolyAreaCost;
 	///Crowd include & exclude flags settings (see library/DetourNavMeshQuery.h).
 	int mCrowdIncludeFlags, mCrowdExcludeFlags;
-	///Convex volumes (see support/ConvexVolumeTool.h).
+	///Convex volumes (see support_rn/ConvexVolumeTool.h).
 	pvector<PointListConvexVolumeSettings> mConvexVolumes;
-	///Off mesh connections (see support/OffMeshConnectionTool.h).
+	///Off mesh connections (see support_rn/OffMeshConnectionTool.h).
 	pvector<PointPairOffMeshConnectionSettings> mOffMeshConnections;
 	///Obstacles.
 	pvector<Obstacle> mObstacles;
@@ -481,7 +481,7 @@ private:
 			bool buildFromBam = false);
 	int do_remove_obstacle_from_recast(NodePath& objectNP, int obstacleRef);
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	/// Recast debug node path.
 	NodePath mDebugNodePath;
 	/// Recast debug camera.
@@ -497,7 +497,7 @@ private:
 	rnsup::DebugDrawPanda3d* mDDUnsetup;
 	///Debug render when mNavMeshType is un-setup.
 	void do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)
 	/**

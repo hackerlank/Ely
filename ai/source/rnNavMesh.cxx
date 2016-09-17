@@ -6,20 +6,20 @@
  */
 
 #if !defined(CPPPARSER) && defined(_WIN32)
-#include "support/pstdint.h"
+#include "support_rn/pstdint.h"
 #endif
 
 #include "rnNavMesh.h"
 
 #include "rnCrowdAgent.h"
-#include "rnNavMeshManager.h"
+#include "aiManager.h"
 #include "camera.h"
 
 #ifndef CPPPARSER
-#include "library/DetourCommon.h"
-#include "support/ConvexVolumeTool.h"
-#include "support/NavMeshType_Solo.h"
-#include "support/OffMeshConnectionTool.h"
+#include "library_rn/DetourCommon.h"
+#include "support_rn/ConvexVolumeTool.h"
+#include "support_rn/NavMeshType_Solo.h"
+#include "support_rn/OffMeshConnectionTool.h"
 #endif //CPPPARSER
 #ifdef PYTHON_BUILD
 #include <py_panda.h>
@@ -160,7 +160,7 @@ void RNNavMesh::set_nav_mesh_tile_settings(
  */
 void RNNavMesh::do_initialize()
 {
-	WPT(RNNavMeshManager) mTmpl = RNNavMeshManager::get_global_ptr();
+	WPT(AIManager) mTmpl = AIManager::get_global_ptr();
 	//
 	float value;
 	int valueInt;
@@ -168,50 +168,50 @@ void RNNavMesh::do_initialize()
 	//set RNNavMesh parameters (store internally for future use)
 	//cell size
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("cell_size")).c_str(), NULL);
 	mNavMeshSettings.set_cellSize(value >= 0.0 ? value : -value);
 	//cell height
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("cell_height")).c_str(), NULL);
 	mNavMeshSettings.set_cellHeight(value >= 0.0 ? value : -value);
 	//agent height
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("agent_height")).c_str(), NULL);
 	mNavMeshSettings.set_agentHeight(value >= 0.0 ? value : -value);
 	//agent radius
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("agent_radius")).c_str(), NULL);
 	mNavMeshSettings.set_agentRadius(value >= 0.0 ? value : -value);
 	//agent max climb
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("agent_max_climb")).c_str(),
 			NULL);
 	mNavMeshSettings.set_agentMaxClimb(value >= 0.0 ? value : -value);
 	//agent max slope
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("agent_max_slope")).c_str(),
 			NULL);
 	mNavMeshSettings.set_agentMaxSlope(value >= 0.0 ? value : -value);
 	//region min size
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("region_min_size")).c_str(),
 			NULL);
 	mNavMeshSettings.set_regionMinSize(value >= 0.0 ? value : -value);
 	//region merge size
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("region_merge_size")).c_str(),
 			NULL);
 	mNavMeshSettings.set_regionMergeSize(value >= 0.0 ? value : -value);
 	//partition type
-	valueStr = mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+	valueStr = mTmpl->get_parameter_value(AIManager::NAVMESH,
 			string("partition_type"));
 	if (valueStr == string("monotone"))
 	{
@@ -228,57 +228,57 @@ void RNNavMesh::do_initialize()
 	}
 	//edge max len
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("edge_max_len")).c_str(), NULL);
 	mNavMeshSettings.set_edgeMaxLen(value >= 0.0 ? value : -value);
 	//edge max error
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("edge_max_error")).c_str(),
 			NULL);
 	mNavMeshSettings.set_edgeMaxError(value >= 0.0 ? value : -value);
 	//verts per poly
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("verts_per_poly")).c_str(),
 			NULL);
 	mNavMeshSettings.set_vertsPerPoly(value >= 0.0 ? value : -value);
 	//detail sample dist
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("detail_sample_dist")).c_str(),
 			NULL);
 	mNavMeshSettings.set_detailSampleDist(value >= 0.0 ? value : -value);
 	//detail sample max error
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("detail_sample_max_error")).c_str(),
 			NULL);
 	mNavMeshSettings.set_detailSampleMaxError(value >= 0.0 ? value : -value);
 	//build all tiles
 	mNavMeshTileSettings.set_buildAllTiles(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("build_all_tiles")) == string("true") ?
 					true : false);
 	//max tiles
 	valueInt = strtol(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("max_tiles")).c_str(), NULL, 0);
 	mNavMeshTileSettings.set_maxTiles(valueInt >= 0 ? valueInt : -valueInt);
 	//max polys per tile
 	valueInt = strtol(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("max_polys_per_tile")).c_str(), NULL, 0);
 	mNavMeshTileSettings.set_maxPolysPerTile(
 			valueInt >= 0 ? valueInt : -valueInt);
 	//tile size
 	value = STRTOF(
-			mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+			mTmpl->get_parameter_value(AIManager::NAVMESH,
 					string("tile_size")).c_str(), NULL);
 	mNavMeshTileSettings.set_tileSize(value >= 0.0 ? value : -value);
 	///
 	//0: get navmesh type
-	valueStr = mTmpl->get_parameter_value(RNNavMeshManager::NAVMESH,
+	valueStr = mTmpl->get_parameter_value(AIManager::NAVMESH,
 			string("navmesh_type"));
 	if (valueStr == string("tile"))
 	{
@@ -295,7 +295,7 @@ void RNNavMesh::do_initialize()
 	//get string parameters
 	//1: get the input from xml
 	//area-flags-cost settings
-	plist<string> mAreaFlagsCostParam = mTmpl->get_parameter_values(RNNavMeshManager::NAVMESH,
+	plist<string> mAreaFlagsCostParam = mTmpl->get_parameter_values(AIManager::NAVMESH,
 			string("area_flags_cost"));
 	plist<string>::iterator iterStr;
 
@@ -351,7 +351,7 @@ void RNNavMesh::do_initialize()
 	pvector<string> ieFlagsStr;
 	//1:iterate over include flags
 	string mCrowdIncludeFlagsParam = mTmpl->get_parameter_value(
-			RNNavMeshManager::NAVMESH, string("crowd_include_flags"));
+			AIManager::NAVMESH, string("crowd_include_flags"));
 	ieFlagsStr = parseCompoundString(mCrowdIncludeFlagsParam, ':');
 	//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
 	mCrowdIncludeFlags = (ieFlagsStr.empty() ? rnsup::NAVMESH_POLYFLAGS_WALK : 0x0);
@@ -367,7 +367,7 @@ void RNNavMesh::do_initialize()
 	}
 	//2:iterate over exclude flags
 	string mCrowdExcludeFlagsParam = mTmpl->get_parameter_value(
-			RNNavMeshManager::NAVMESH, string("crowd_exclude_flags"));
+			AIManager::NAVMESH, string("crowd_exclude_flags"));
 	ieFlagsStr = parseCompoundString(mCrowdExcludeFlagsParam, ':');
 	//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
 	mCrowdExcludeFlags = (ieFlagsStr.empty() ? rnsup::NAVMESH_POLYFLAGS_DISABLED : 0x0);
@@ -383,7 +383,7 @@ void RNNavMesh::do_initialize()
 	}
 
 	///get convex volumes
-	plist<string> mConvexVolumesParam = mTmpl->get_parameter_values(RNNavMeshManager::NAVMESH,
+	plist<string> mConvexVolumesParam = mTmpl->get_parameter_values(AIManager::NAVMESH,
 			string("convex_volume"));
 	mConvexVolumes.clear();
 	for (iterStr = mConvexVolumesParam.begin();
@@ -444,7 +444,7 @@ void RNNavMesh::do_initialize()
 
 	///get off mesh connections
 	plist<string> mOffMeshConnectionsParam = mTmpl->get_parameter_values(
-			RNNavMeshManager::NAVMESH, string("offmesh_connection"));
+			AIManager::NAVMESH, string("offmesh_connection"));
 	mOffMeshConnections.clear();
 	for (iterStr = mOffMeshConnectionsParam.begin();
 			iterStr != mOffMeshConnectionsParam.end(); ++iterStr)
@@ -513,7 +513,7 @@ void RNNavMesh::do_initialize()
 	//set nav mesh settings: already done
 	//set nav mesh tile settings: already done
 	//
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// un-setup debug node path
 	NodePath debugNodePathUnsetup = mReferenceDebugNP.attach_new_node(
 				string("DebugNodePathUsetup") + get_name());
@@ -522,7 +522,7 @@ void RNNavMesh::do_initialize()
 	// enable un-setup debug drawing
 	mDDUnsetup = new rnsup::DebugDrawPanda3d(debugNodePathUnsetup);
 	do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 #ifdef PYTHON_BUILD
 	//Python callback
 	this->ref();
@@ -539,10 +539,10 @@ void RNNavMesh::do_initialize()
 int RNNavMesh::setup()
 {
 	// continue if nav mesh has not been setup yet
-	CONTINUE_IF_ELSE_R(!mNavMeshType, RN_SUCCESS)
+	CONTINUE_IF_ELSE_R(!mNavMeshType, AI_SUCCESS)
 
 	// continue if owner object not empty
-	CONTINUE_IF_ELSE_R(!mOwnerObject.is_empty(), RN_ERROR)
+	CONTINUE_IF_ELSE_R(!mOwnerObject.is_empty(), AI_ERROR)
 
 	set_name(mOwnerObject.get_name() + string("_RNNavMesh"));
 
@@ -562,7 +562,7 @@ int RNNavMesh::setup()
 		if (!do_load_model_mesh(mOwnerObject))
 		{
 			cleanup();
-			return RN_ERROR;
+			return AI_ERROR;
 		}
 	}
 	else
@@ -572,7 +572,7 @@ int RNNavMesh::setup()
 		if (!do_load_model_mesh(mOwnerObject, &mMeshLoader))
 		{
 			cleanup();
-			return RN_ERROR;
+			return AI_ERROR;
 		}
 	}
 
@@ -693,9 +693,9 @@ int RNNavMesh::setup()
 				centroid /= points.get_num_values();
 				//mConvexVolumes and mGeom::m_volumes have the same order
 				nassertr_always(mGeom->getConvexVolumeCount() - 1 == idx,
-						RN_ERROR)
+						AI_ERROR)
 				nassertr_always((iter - mConvexVolumes.begin()) == idx,
-						RN_ERROR)
+						AI_ERROR)
 				//
 				mConvexVolumes[idx].set_first(points);
 				mConvexVolumes[idx].second().set_centroid(centroid);
@@ -757,9 +757,9 @@ int RNNavMesh::setup()
 				pointPair.add_value(rnsup::RecastToLVecBase3f(&v[3]));
 				//mOffMeshConnections and mGeom's off mesh connections have the same order
 				nassertr_always(mGeom->getOffMeshConnectionCount() - 1 == idx,
-						RN_ERROR)
+						AI_ERROR)
 				nassertr_always((iter - mOffMeshConnections.begin()) == idx,
-						RN_ERROR)
+						AI_ERROR)
 
 				mOffMeshConnections[idx].set_first(pointPair);
 				// update hard coded parameters: rad, bidir, userId
@@ -857,14 +857,14 @@ int RNNavMesh::setup()
 	}
 	//>
 	//
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// disable un-setup debug drawing
 	mDDUnsetup->reset();
 	delete mDDUnsetup;
 	mDDUnsetup = NULL;
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -874,14 +874,14 @@ int RNNavMesh::setup()
  */
 bool RNNavMesh::do_build_navMesh()
 {
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	mCtx->resetLog();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//build navigation mesh
 	bool result = mNavMeshType->handleBuild();
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	mCtx->dumpLog("Build log %s:", mMeshName.c_str());
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	return result;
 }
 
@@ -898,7 +898,7 @@ int RNNavMesh::add_convex_volume(const ValueList<LPoint3f>& points,
 		int area)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 3), RN_ERROR)
+	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 3), AI_ERROR)
 
 	// add to convex volumes
 	// compute centroid
@@ -916,9 +916,9 @@ int RNNavMesh::add_convex_volume(const ValueList<LPoint3f>& points,
 	int ref = unique_ref();
 	settings.set_ref(ref);
 	mConvexVolumes.push_back(PointListConvexVolumeSettings(points, settings));
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	return ref;
 }
 
@@ -931,10 +931,10 @@ int RNNavMesh::add_convex_volume(const ValueList<LPoint3f>& points,
 int RNNavMesh::remove_convex_volume(const LPoint3f& insidePoint)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R(!mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(!mNavMeshType, AI_ERROR)
 
-	//set oldRef=RN_ERROR in case of error
-	int oldRef = RN_ERROR;
+	//set oldRef=AI_ERROR in case of error
+	int oldRef = AI_ERROR;
 	///HACK: use support functionality to remove convex volumes
 	//create fake InputGeom, NavMeshType and ConvexVolumeTool
 	rnsup::InputGeom* geom = new rnsup::InputGeom;
@@ -982,9 +982,9 @@ int RNNavMesh::remove_convex_volume(const LPoint3f& insidePoint)
 	navMeshType->setTool(NULL);
 	delete navMeshType;
 	delete geom;
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//return oldRef or -1
 	return oldRef;
 }
@@ -1000,7 +1000,7 @@ int RNNavMesh::do_get_convex_volume_from_point(const LPoint3f& insidePoint) cons
 	float hitPos[3];
 	rnsup::LVecBase3fToRecast(insidePoint, hitPos);
 	//check if a convex volume was hit (see: Delete case of ConvexVolumeTool::handleClick)
-	int convexVolumeID = RN_ERROR;
+	int convexVolumeID = AI_ERROR;
 	const rnsup::ConvexVolume* vols =
 			mNavMeshType->getInputGeom()->getConvexVolumes();
 	for (int i = 0; i < mNavMeshType->getInputGeom()->getConvexVolumeCount();
@@ -1072,7 +1072,7 @@ int RNNavMesh::do_find_convex_volume_polys(int convexVolumeID,
 	if (!(dtStatusSucceed(status)))
 	{
 		delete[] queryPoly;
-		return RN_ERROR;
+		return AI_ERROR;
 	}
 
 	dtPolyRef parent[MAX_POLYS];
@@ -1082,9 +1082,9 @@ int RNNavMesh::do_find_convex_volume_polys(int convexVolumeID,
 
 	delete[] queryPoly;
 
-	CONTINUE_IF_ELSE_R(dtStatusSucceed(status), RN_ERROR)
+	CONTINUE_IF_ELSE_R(dtStatusSucceed(status), AI_ERROR)
 
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -1104,7 +1104,7 @@ int RNNavMesh::set_convex_volume_settings(const LPoint3f& insidePoint,
 		const RNConvexVolumeSettings& settings, float reductionFactor)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	int convexVolumeID = do_get_convex_volume_from_point(insidePoint);
 
@@ -1118,8 +1118,8 @@ int RNNavMesh::set_convex_volume_settings(const LPoint3f& insidePoint,
 		dtStatus status, status2;
 
 		CONTINUE_IF_ELSE_R(
-				do_find_convex_volume_polys(convexVolumeID, filter, polys, npolys, MAX_POLYS, reductionFactor) == RN_SUCCESS,
-				RN_ERROR)
+				do_find_convex_volume_polys(convexVolumeID, filter, polys, npolys, MAX_POLYS, reductionFactor) == AI_SUCCESS,
+				AI_ERROR)
 
 		int area = (
 				settings.get_area() >= 0 ?
@@ -1166,12 +1166,12 @@ int RNNavMesh::set_convex_volume_settings(const LPoint3f& insidePoint,
 			convexVolumeID = -1;
 		}
 	}
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (!mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//return
 	return convexVolumeID;
 }
@@ -1196,7 +1196,7 @@ int RNNavMesh::set_convex_volume_settings(int ref,
 	ValueList<LPoint3f> points = get_convex_volume_by_ref(ref);
 
 	// continue if convex volume found
-	CONTINUE_IF_ELSE_R(points.size() > 0, RN_ERROR)
+	CONTINUE_IF_ELSE_R(points.size() > 0, AI_ERROR)
 
 	// set by point (centroid)
 	return set_convex_volume_settings(
@@ -1213,7 +1213,7 @@ RNConvexVolumeSettings RNNavMesh::get_convex_volume_settings(
 		const LPoint3f& insidePoint) const
 {
 	RNConvexVolumeSettings settings;
-	settings.set_ref(RN_ERROR);
+	settings.set_ref(AI_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1237,7 +1237,7 @@ RNConvexVolumeSettings RNNavMesh::get_convex_volume_settings(
 RNConvexVolumeSettings RNNavMesh::get_convex_volume_settings(int ref) const
 {
 	RNConvexVolumeSettings settings;
-	settings.set_ref(RN_ERROR);
+	settings.set_ref(AI_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1292,7 +1292,7 @@ int RNNavMesh::add_off_mesh_connection(const ValueList<LPoint3f>& points,
 		bool bidirectional)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 2), RN_ERROR)
+	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 2), AI_ERROR)
 
 	// add to off mesh connections
 	RNOffMeshConnectionSettings settings;
@@ -1304,9 +1304,9 @@ int RNNavMesh::add_off_mesh_connection(const ValueList<LPoint3f>& points,
 	settings.set_ref(ref);
 	mOffMeshConnections.push_back(
 			PointPairOffMeshConnectionSettings(points, settings));
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	return ref;
 }
 
@@ -1319,10 +1319,10 @@ int RNNavMesh::add_off_mesh_connection(const ValueList<LPoint3f>& points,
 int RNNavMesh::remove_off_mesh_connection(const LPoint3f& beginOrEndPoint)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R(!mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(!mNavMeshType, AI_ERROR)
 
-	//set oldRef=RN_ERROR in case of error
-	int oldRef = RN_ERROR;
+	//set oldRef=AI_ERROR in case of error
+	int oldRef = AI_ERROR;
 	///HACK: use support functionality to remove off mesh connections
 	//create fake InputGeom, NavMeshType and OffMeshConnectionTool
 	rnsup::InputGeom* geom = new rnsup::InputGeom;
@@ -1369,9 +1369,9 @@ int RNNavMesh::remove_off_mesh_connection(const LPoint3f& beginOrEndPoint)
 	navMeshType->setTool(NULL);
 	delete navMeshType;
 	delete geom;
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//return oldRef or a negative number
 	return oldRef;
 }
@@ -1389,7 +1389,7 @@ int RNNavMesh::do_get_off_mesh_connection_from_point(
 	float hitPos[3];
 	rnsup::LVecBase3fToRecast(startEndPoint, hitPos);
 	//check if a off mesh connection was hit (see: Delete case of OffMeshConnectionTool::handleClick)
-	int offMeshConnectionID = RN_ERROR;
+	int offMeshConnectionID = AI_ERROR;
 	// Find nearest link end-point
 	float nearestDist = FLT_MAX;
 	int nearestIndex = -1;
@@ -1480,7 +1480,7 @@ int RNNavMesh::set_off_mesh_connection_settings(const LPoint3f& beginOrEndPoint,
 	const RNOffMeshConnectionSettings& settings)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	int offMeshConnectionID = do_get_off_mesh_connection_from_point(
 			beginOrEndPoint);
@@ -1517,12 +1517,12 @@ int RNNavMesh::set_off_mesh_connection_settings(const LPoint3f& beginOrEndPoint,
 		}
 	}
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (!mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//return
 	return offMeshConnectionID;
 }
@@ -1540,7 +1540,7 @@ int RNNavMesh::set_off_mesh_connection_settings(int ref,
 	ValueList<LPoint3f> points = get_off_mesh_connection_by_ref(ref);
 
 	// continue if off mesh connection found
-	CONTINUE_IF_ELSE_R(points.size() > 0, RN_ERROR)
+	CONTINUE_IF_ELSE_R(points.size() > 0, AI_ERROR)
 
 	// set by start point
 	return set_off_mesh_connection_settings(points[0], settings);
@@ -1556,7 +1556,7 @@ RNOffMeshConnectionSettings RNNavMesh::get_off_mesh_connection_settings(
 	const LPoint3f& beginOrEndPoint) const
 {
 	RNOffMeshConnectionSettings settings;
-	settings.set_ref(RN_ERROR);
+	settings.set_ref(AI_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1583,7 +1583,7 @@ RNOffMeshConnectionSettings RNNavMesh::get_off_mesh_connection_settings(
 		int ref) const
 {
 	RNOffMeshConnectionSettings settings;
-	settings.set_ref(RN_ERROR);
+	settings.set_ref(AI_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1653,11 +1653,11 @@ void RNNavMesh::do_finalize()
 	//remove this NodePath
 	NodePath::any_path(this).remove_node();
 	//
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// delete un-setup debug drawing
 	mDDUnsetup->reset();
 	delete mDDUnsetup;
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//
 #ifdef PYTHON_BUILD
 	//Python callback
@@ -1675,7 +1675,7 @@ void RNNavMesh::do_finalize()
  */
 int RNNavMesh::cleanup()
 {
-	int result = RN_SUCCESS;
+	int result = AI_SUCCESS;
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, result)
 
@@ -1689,7 +1689,7 @@ int RNNavMesh::cleanup()
 			if (do_remove_obstacle_from_recast(iterO->second(),
 					iterO->first().get_ref()) < 0)
 			{
-				result = RN_ERROR;
+				result = AI_ERROR;
 			}
 		}
 	}
@@ -1726,7 +1726,7 @@ int RNNavMesh::cleanup()
 	//reset name
 	set_name("RNNavMesh");
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// disable debug drawing;
 	disable_debug_drawing();
 	// un-setup debug node path
@@ -1737,7 +1737,7 @@ int RNNavMesh::cleanup()
 	// enable un-setup debug drawing
 	mDDUnsetup = new rnsup::DebugDrawPanda3d(debugNodePathUnsetup);
 	do_debug_static_render_unsetup();
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 
 	//
 	return result;
@@ -1751,7 +1751,7 @@ int RNNavMesh::cleanup()
 LVecBase2i RNNavMesh::get_tile_indexes(const LPoint3f& pos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, LVecBase2i(RN_ERROR, RN_ERROR))
+	CONTINUE_IF_ELSE_R(mNavMeshType, LVecBase2i(AI_ERROR, AI_ERROR))
 
 	int tx, ty;
 	float recastPos[3];
@@ -1778,7 +1778,7 @@ LVecBase2i RNNavMesh::get_tile_indexes(const LPoint3f& pos)
 int RNNavMesh::build_tile(const LPoint3f& pos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -1787,15 +1787,15 @@ int RNNavMesh::build_tile(const LPoint3f& pos)
 		static_cast<rnsup::NavMeshType_Tile*>(mNavMeshType)->buildTile(
 				recastPos);
 		PRINT_DEBUG("'" << get_owner_node_path() << "' build_tile : " << pos);
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		if (! mDebugCamera.is_empty())
 		{
 			do_debug_static_render();
 		}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	}
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -1806,7 +1806,7 @@ int RNNavMesh::build_tile(const LPoint3f& pos)
 int RNNavMesh::remove_tile(const LPoint3f& pos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -1815,15 +1815,15 @@ int RNNavMesh::remove_tile(const LPoint3f& pos)
 		static_cast<rnsup::NavMeshType_Tile*>(mNavMeshType)->removeTile(
 				recastPos);
 		PRINT_DEBUG("'" << get_owner_node_path() << "' remove_tile : " << pos);
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		if (! mDebugCamera.is_empty())
 		{
 			do_debug_static_render();
 		}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	}
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -1834,20 +1834,20 @@ int RNNavMesh::remove_tile(const LPoint3f& pos)
 int RNNavMesh::build_all_tiles()
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
 		static_cast<rnsup::NavMeshType_Tile*>(mNavMeshType)->buildAllTiles();
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		if (! mDebugCamera.is_empty())
 		{
 			do_debug_static_render();
 		}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	}
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -1858,20 +1858,20 @@ int RNNavMesh::build_all_tiles()
 int RNNavMesh::remove_all_tiles()
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
 		static_cast<rnsup::NavMeshType_Tile*>(mNavMeshType)->removeAllTiles();
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		if (! mDebugCamera.is_empty())
 		{
 			do_debug_static_render();
 		}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	}
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -1885,7 +1885,7 @@ int RNNavMesh::add_obstacle(NodePath objectNP)
 	// nav mesh type and mReferenceNP is not empty
 	CONTINUE_IF_ELSE_R(
 			(!objectNP.is_empty()) && (mNavMeshTypeEnum == OBSTACLE)
-					&& (! mReferenceNP.is_empty()), RN_ERROR)
+					&& (! mReferenceNP.is_empty()), AI_ERROR)
 
 	// return error if objectNP is already present
 	pvector<Obstacle>::iterator iterO;
@@ -1897,15 +1897,15 @@ int RNNavMesh::add_obstacle(NodePath objectNP)
 			break;
 		}
 	}
-	CONTINUE_IF_ELSE_R(iterO == mObstacles.end(), RN_ERROR)
+	CONTINUE_IF_ELSE_R(iterO == mObstacles.end(), AI_ERROR)
 
 	// insert obstacle with invalid ref: later will be corrected
 	RNObstacleSettings settings;
-	settings.set_ref(RN_ERROR);
+	settings.set_ref(AI_ERROR);
 	mObstacles.push_back(Obstacle(settings, objectNP));
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	// return the result of adding obstacle to recast
 	return do_add_obstacle_to_recast(objectNP, mObstacles.size() - 1);
@@ -1927,7 +1927,7 @@ int RNNavMesh::do_add_obstacle_to_recast(NodePath& objectNP, int index,
 	{
 		//compute new obstacle dimensions
 		modelRadius =
-				RNNavMeshManager::get_global_ptr()->get_bounding_dimensions(
+				AIManager::get_global_ptr()->get_bounding_dimensions(
 						objectNP, modelDims, modelDeltaCenter);
 	}
 	else
@@ -1950,7 +1950,7 @@ int RNNavMesh::do_add_obstacle_to_recast(NodePath& objectNP, int index,
 	// continue if obstacle addition to tile cache is successful
 	CONTINUE_IF_ELSE_R(
 			tileCache->addObstacle(recastPos, modelRadius, modelDims.get_z(),
-					&obstacleRef) == DT_SUCCESS, RN_ERROR)
+					&obstacleRef) == DT_SUCCESS, AI_ERROR)
 
 	//update tiles cache: repeat for all the tiles touched
 	for (int c = 0; c < DT_MAX_TOUCHED_TILES; ++c)
@@ -1967,12 +1967,12 @@ int RNNavMesh::do_add_obstacle_to_recast(NodePath& objectNP, int index,
 	mObstacles[index].first().set_ref(obstacleRef);
 	PRINT_DEBUG(
 			"'" << get_owner_node_path() << "' add_obstacle: '" << objectNP << "' at pos: " << pos);
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (!mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	// obstacle added: return the last index
 	return (int) obstacleRef;
 }
@@ -1987,7 +1987,7 @@ int RNNavMesh::remove_obstacle(NodePath objectNP)
 	// nav mesh type and mReferenceNP is not empty
 	CONTINUE_IF_ELSE_R(
 			(!objectNP.is_empty()) && (mNavMeshTypeEnum == OBSTACLE)
-					&& (! mReferenceNP.is_empty()), RN_ERROR)
+					&& (! mReferenceNP.is_empty()), AI_ERROR)
 
 	// return error if objectNP is not yet present
 	pvector<Obstacle>::iterator iterO;
@@ -1999,14 +1999,14 @@ int RNNavMesh::remove_obstacle(NodePath objectNP)
 			break;
 		}
 	}
-	CONTINUE_IF_ELSE_R(iterO != mObstacles.end(), RN_ERROR)
+	CONTINUE_IF_ELSE_R(iterO != mObstacles.end(), AI_ERROR)
 
 	// remove obstacle: save ref for later removing from recast
 	int obstacleRef = iterO->first().get_ref();
 	mObstacles.erase(iterO);
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	// return the result of removing obstacle from recast
 	return do_remove_obstacle_from_recast(objectNP, obstacleRef);
@@ -2024,7 +2024,7 @@ int RNNavMesh::do_remove_obstacle_from_recast(NodePath& objectNP,
 	dtTileCache* tileCache =
 			static_cast<rnsup::NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
 	// continue if obstacle removal from tile cache is successful
-	CONTINUE_IF_ELSE_R(tileCache->removeObstacle(obstacleRef) == DT_SUCCESS, RN_ERROR)
+	CONTINUE_IF_ELSE_R(tileCache->removeObstacle(obstacleRef) == DT_SUCCESS, AI_ERROR)
 
 	//update tiles cache: repeat for all the tiles touched
 	for (int c = 0; c < DT_MAX_TOUCHED_TILES; ++c)
@@ -2034,12 +2034,12 @@ int RNNavMesh::do_remove_obstacle_from_recast(NodePath& objectNP,
 	//index and remove from obstacle from the list
 	PRINT_DEBUG(
 			"'" << get_owner_node_path() << "' remove_obstacle: '" << objectNP << "'");
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	// obstacle removed
 	return (int) obstacleRef;
 }
@@ -2073,7 +2073,7 @@ NodePath RNNavMesh::get_obstacle_by_ref(int ref) const
  */
 int RNNavMesh::remove_all_obstacles()
 {
-	CONTINUE_IF_ELSE_R(mNavMeshTypeEnum == OBSTACLE, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshTypeEnum == OBSTACLE, AI_ERROR)
 
 	PTA(Obstacle)::iterator iter = mObstacles.begin();
 	while (iter != mObstacles.end())
@@ -2083,7 +2083,7 @@ int RNNavMesh::remove_all_obstacles()
 	}
 
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -2096,19 +2096,19 @@ int RNNavMesh::add_crowd_agent(NodePath crowdAgentNP)
 	CONTINUE_IF_ELSE_R(
 			(!crowdAgentNP.is_empty())
 					&& (crowdAgentNP.node()->is_of_type(
-							RNCrowdAgent::get_class_type())), RN_ERROR)
+							RNCrowdAgent::get_class_type())), AI_ERROR)
 
 	PT(RNCrowdAgent)crowdAgent = DCAST(RNCrowdAgent, crowdAgentNP.node());
 
 	bool result;
 	// continue if crowdAgent doesn't belong to any mesh
-	CONTINUE_IF_ELSE_R(! crowdAgent->mNavMesh, RN_ERROR)
+	CONTINUE_IF_ELSE_R(! crowdAgent->mNavMesh, AI_ERROR)
 
 	//do real adding to update list
 	do_add_crowd_agent_to_update_list(crowdAgent);
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	//do real adding to recast update
 	result = do_add_crowd_agent_to_recast_update(crowdAgent);
@@ -2120,7 +2120,7 @@ int RNNavMesh::add_crowd_agent(NodePath crowdAgentNP)
 				find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent));
 	}
 	//
-	return (result == true ? RN_SUCCESS : RN_ERROR);
+	return (result == true ? AI_SUCCESS : AI_ERROR);
 }
 
 /**
@@ -2171,7 +2171,7 @@ bool RNNavMesh::do_add_crowd_agent_to_recast_update(PT(RNCrowdAgent)crowdAgent,
 		{
 			//compute new agent dimensions
 			modelRadius =
-				RNNavMeshManager::get_global_ptr()->get_bounding_dimensions(
+				AIManager::get_global_ptr()->get_bounding_dimensions(
 						NodePath::any_path(crowdAgent), modelDims,
 						modelDeltaCenter);
 		}
@@ -2233,23 +2233,23 @@ int RNNavMesh::remove_crowd_agent(NodePath crowdAgentNP)
 	CONTINUE_IF_ELSE_R(
 			(!crowdAgentNP.is_empty())
 					&& (crowdAgentNP.node()->is_of_type(
-							RNCrowdAgent::get_class_type())), RN_ERROR)
+							RNCrowdAgent::get_class_type())), AI_ERROR)
 
 	PT(RNCrowdAgent)crowdAgent = DCAST(RNCrowdAgent, crowdAgentNP.node());
 
 	// continue if crowdAgent belongs to this nav mesh
-	CONTINUE_IF_ELSE_R(crowdAgent->mNavMesh == this, RN_ERROR)
+	CONTINUE_IF_ELSE_R(crowdAgent->mNavMesh == this, AI_ERROR)
 
 	// remove from update list
 	do_remove_crowd_agent_from_update_list(crowdAgent);
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	//remove from recast update
 	do_remove_crowd_agent_from_recast_update(crowdAgent);
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -2300,7 +2300,7 @@ int RNNavMesh::do_set_crowd_agent_params(PT(RNCrowdAgent)crowdAgent,
 const RNCrowdAgentParams& params)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	//there is a crowd tool because the recast nav mesh
 	//has been completely setup
@@ -2314,7 +2314,7 @@ const RNCrowdAgentParams& params)
 	}
 	crowdAgent->mAgentParams = params;
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -2340,7 +2340,7 @@ int RNNavMesh::do_set_crowd_agent_target(PT(RNCrowdAgent)crowdAgent,
 const LPoint3f& moveTarget)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	//there is a crowd tool because the recast nav mesh
 	//has been completely setup
@@ -2354,7 +2354,7 @@ const LPoint3f& moveTarget)
 	}
 	crowdAgent->mMoveTarget = moveTarget;
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -2367,7 +2367,7 @@ int RNNavMesh::do_set_crowd_agent_velocity(PT(RNCrowdAgent)crowdAgent,
 const LVector3f& moveVelocity)
 {
 	//continue if NavMeshType has already been setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, RN_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
 
 	//there is a crowd tool because the recast nav mesh
 	//has been completely setup
@@ -2381,7 +2381,7 @@ const LVector3f& moveVelocity)
 	}
 	crowdAgent->mMoveVelocity = moveVelocity;
 	//
-	return RN_SUCCESS;
+	return AI_SUCCESS;
 }
 
 /**
@@ -2404,7 +2404,7 @@ void RNNavMesh::do_set_crowd_agent_other_settings(PT(RNCrowdAgent)crowdAgent,
 	}
 }
 
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 /**
  * Renders static geometry on debug.
  * \note Internal use only.
@@ -2478,7 +2478,7 @@ void RNNavMesh::do_debug_static_render_unsetup()
 	geomUnsetup->drawOffMeshConnections(mDDUnsetup, true);
 	delete geomUnsetup;
 }
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 
 /**
  * Loads the mesh from a model NodePath.
@@ -2501,9 +2501,9 @@ bool RNNavMesh::do_load_model_mesh(NodePath model,
 	{
 		delete mGeom;
 		mGeom = NULL;
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 		mCtx->dumpLog("Geom load log %s:", mMeshName.c_str());
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 		result = false;
 	}
 	return result;
@@ -2561,7 +2561,7 @@ void RNNavMesh::update(float dt)
 		(*iter)->do_update_pos_dir(dt, agentPos, agentDir);
 	}
 	//
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (mEnableDrawUpdate)
 	{
 		if (mDDM)
@@ -2571,7 +2571,7 @@ void RNNavMesh::update(float dt)
 			mDDM->finalize();
 		}
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 #ifdef PYTHON_BUILD
 	// execute python callback (if any)
 	if (mUpdateCallback && (mUpdateCallback != Py_None))
@@ -2625,12 +2625,12 @@ ValueList<LPoint3f> RNNavMesh::path_find_follow(const LPoint3f& startPos,
 				rnsup::Recast3fToLVecBase3f(path[i * 3], path[i * 3 + 1],
 						path[i * 3 + 2]));
 	}
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//reset tester tool
 	mTesterTool.reset();
 	//
@@ -2648,7 +2648,7 @@ float RNNavMesh::path_find_follow_cost(const LPoint3f& startPos,
 		const LPoint3f& endPos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(path_find_follow(startPos, endPos).size() > 0, RN_ERROR)
+	CONTINUE_IF_ELSE_R(path_find_follow(startPos, endPos).size() > 0, AI_ERROR)
 
 	// get the cost of the last found path
 	return mTesterTool.getTotalCost();
@@ -2690,12 +2690,12 @@ RNNavMesh::PointFlagList RNNavMesh::path_find_straight(
 								points[i * 3 + 1], points[i * 3 + 2]),
 						flags[i]));
 	}
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//reset tester tool
 	mTesterTool.reset();
 	//
@@ -2731,12 +2731,12 @@ LPoint3f RNNavMesh::ray_cast(const LPoint3f& startPos,
 		float* hitPos = mTesterTool.getHitPos();
 		hitPoint = rnsup::Recast3fToLVecBase3f(hitPos[0], hitPos[1], hitPos[2]);
 	}
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//reset tester tool
 	mTesterTool.reset();
 	//
@@ -2764,12 +2764,12 @@ float RNNavMesh::distance_to_wall(const LPoint3f& pos)
 	mTesterTool.recalc();
 	//get the hit point if any
 	distance = mTesterTool.getDistanceToWall();
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 	//reset tester tool
 	mTesterTool.reset();
 	//
@@ -2833,7 +2833,7 @@ void RNNavMesh::set_update_callback(UPDATECALLBACKFUNC value)
  */
 void RNNavMesh::enable_debug_drawing(NodePath debugCamera)
 {
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	CONTINUE_IF_ELSE_V(mDebugCamera.is_empty() && mNavMeshType)
 
 	if ((!debugCamera.is_empty()) &&
@@ -2860,7 +2860,7 @@ void RNNavMesh::enable_debug_drawing(NodePath debugCamera)
 		//debug static render
 		do_debug_static_render();
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 }
 
 /**
@@ -2868,7 +2868,7 @@ void RNNavMesh::enable_debug_drawing(NodePath debugCamera)
  */
 void RNNavMesh::disable_debug_drawing()
 {
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		//set the recast debug camera to empty node path
@@ -2887,7 +2887,7 @@ void RNNavMesh::disable_debug_drawing()
 		delete mDDM;
 		mDDM = NULL;
 	}
-#endif //RN_DEBUG
+#endif //ELY_DEBUG
 }
 
 /**
@@ -2896,11 +2896,11 @@ void RNNavMesh::disable_debug_drawing()
  */
 int RNNavMesh::toggle_debug_drawing(bool enable)
 {
-#ifdef RN_DEBUG
+#ifdef ELY_DEBUG
 	// continue if both mDebugCamera and mDebugNodePath are not empty
 	CONTINUE_IF_ELSE_R(
 			(!mDebugCamera.is_empty()) && (! mDebugNodePath.is_empty()),
-			RN_ERROR)
+			AI_ERROR)
 
 	if (enable)
 	{
@@ -2927,8 +2927,8 @@ int RNNavMesh::toggle_debug_drawing(bool enable)
 		}
 	}
 	//
-#endif //RN_DEBUG
-	return RN_SUCCESS;
+#endif //ELY_DEBUG
+	return AI_SUCCESS;
 }
 
 //TypedWritable API
@@ -2960,7 +2960,7 @@ void RNNavMesh::write_datagram(BamWriter *manager, Datagram &dg)
 	///RNNavMesh's NavMeshTileSettings equivalent.
 	mNavMeshTileSettings.write_datagram(dg);
 
-	///Area types with ability flags settings (see support/NavMeshType.h).
+	///Area types with ability flags settings (see support_rn/NavMeshType.h).
 	dg.add_uint32(mPolyAreaFlags.size());
 	{
 		rnsup::NavMeshPolyAreaFlags::iterator iter;
@@ -2972,7 +2972,7 @@ void RNNavMesh::write_datagram(BamWriter *manager, Datagram &dg)
 		}
 	}
 
-	///Area types with cost settings (see support/NavMeshType.h).
+	///Area types with cost settings (see support_rn/NavMeshType.h).
 	dg.add_uint32(mPolyAreaCost.size());
 	{
 		rnsup::NavMeshPolyAreaCost::iterator iter;
@@ -2987,7 +2987,7 @@ void RNNavMesh::write_datagram(BamWriter *manager, Datagram &dg)
 	dg.add_int32(mCrowdIncludeFlags);
 	dg.add_int32(mCrowdExcludeFlags);
 
-	///Convex volumes (see support/ConvexVolumeTool.h).
+	///Convex volumes (see support_rn/ConvexVolumeTool.h).
 	dg.add_uint32(mConvexVolumes.size());
 	{
 		pvector<PointListConvexVolumeSettings>::iterator iter;
@@ -3005,7 +3005,7 @@ void RNNavMesh::write_datagram(BamWriter *manager, Datagram &dg)
 		}
 	}
 
-	///Off mesh connections (see support/OffMeshConnectionTool.h).
+	///Off mesh connections (see support_rn/OffMeshConnectionTool.h).
 	dg.add_uint32(mOffMeshConnections.size());
 	{
 		pvector<PointPairOffMeshConnectionSettings>::iterator iter;
@@ -3146,14 +3146,14 @@ bool RNNavMesh::require_fully_complete() const
  */
 TypedWritable *RNNavMesh::make_from_bam(const FactoryParams &params)
 {
-	// continue only if RNNavMeshManager exists
-	CONTINUE_IF_ELSE_R(RNNavMeshManager::get_global_ptr(), NULL)
+	// continue only if AIManager exists
+	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
 
 	// create a RNNavMesh with default parameters' values: they'll be restored later
-	RNNavMeshManager::get_global_ptr()->set_parameters_defaults(
-			RNNavMeshManager::NAVMESH);
+	AIManager::get_global_ptr()->set_parameters_defaults(
+			AIManager::NAVMESH);
 	RNNavMesh *node = DCAST(RNNavMesh,
-			RNNavMeshManager::get_global_ptr()->create_nav_mesh().node());
+			AIManager::get_global_ptr()->create_nav_mesh().node());
 
 	DatagramIterator scan;
 	BamReader *manager;
@@ -3185,7 +3185,7 @@ void RNNavMesh::fillin(DatagramIterator &scan, BamReader *manager)
 	///RNNavMesh's NavMeshTileSettings equivalent.
 	mNavMeshTileSettings.read_datagram(scan);
 
-	///Area types with ability flags settings (see support/NavMeshType.h).
+	///Area types with ability flags settings (see support_rn/NavMeshType.h).
 	mPolyAreaFlags.clear();
 	unsigned int size = scan.get_uint32();
 	for (unsigned int i = 0; i < size; ++i)
@@ -3196,7 +3196,7 @@ void RNNavMesh::fillin(DatagramIterator &scan, BamReader *manager)
 		mPolyAreaFlags[area] = flags;
 	}
 
-	///Area types with cost settings (see support/NavMeshType.h).
+	///Area types with cost settings (see support_rn/NavMeshType.h).
 	mPolyAreaCost.clear();
 	size = scan.get_uint32();
 	for (unsigned int i = 0; i < size; ++i)
@@ -3211,7 +3211,7 @@ void RNNavMesh::fillin(DatagramIterator &scan, BamReader *manager)
 	mCrowdIncludeFlags = scan.get_int32();
 	mCrowdExcludeFlags = scan.get_int32();
 
-	///Convex volumes (see support/ConvexVolumeTool.h).
+	///Convex volumes (see support_rn/ConvexVolumeTool.h).
 	mConvexVolumes.clear();
 	size = scan.get_uint32();
 	for (unsigned int i = 0; i < size; ++i)
@@ -3232,7 +3232,7 @@ void RNNavMesh::fillin(DatagramIterator &scan, BamReader *manager)
 				PointListConvexVolumeSettings(pointList, settings));
 	}
 
-	///Off mesh connections (see support/OffMeshConnectionTool.h).
+	///Off mesh connections (see support_rn/OffMeshConnectionTool.h).
 	mOffMeshConnections.clear();
 	size = scan.get_uint32();
 	for (unsigned int i = 0; i < size; ++i)

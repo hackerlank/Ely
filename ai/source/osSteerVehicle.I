@@ -477,7 +477,7 @@ INLINE bool OSSteerVehicle::get_external_update() const
 INLINE void OSSteerVehicle::set_mov_type(OSSteerVehicle::OSSteerVehicleMovType movType)
 {
 	//if there isn't a traverser only OPENSTEER is allowed
-	OSSteerManager::GetSingletonPtr()->get_collision_traverser() ?
+	AIManager::GetSingletonPtr()->get_collision_traverser() ?
 			mMovType = movType : mMovType = OPENSTEER;
 }
 

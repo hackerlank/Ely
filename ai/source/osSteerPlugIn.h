@@ -8,15 +8,15 @@
 #ifndef OSSTEERPLUGIN_H_
 #define OSSTEERPLUGIN_H_
 
-#include "osTools.h"
-#include "osSteerManager.h"
+#include "aiTools.h"
+#include "aiManager.h"
 #include "opensteer_includes.h"
 #include "nodePath.h"
 #include "graphicsOutput.h"
 
 #ifndef CPPPARSER
-#include "library/OpenSteer/PlugIn.h"
-#include "library/OpenSteer/Obstacle.h"
+#include "library_os/OpenSteer/PlugIn.h"
+#include "library_os/OpenSteer/Obstacle.h"
 #endif //CPPPARSER
 
 class OSSteerVehicle;
@@ -33,7 +33,7 @@ class OSSteerVehicle;
  * the OSSteerVehicle(s) (simple vehicles), which are added to it, to perform
  * their own steering behaviors.\n
  * \note A OSSteerPlugIn will be reparented to the default reference node on
- * creation (see OSSteerManager).
+ * creation (see AIManager).
  *
  * > **OSSteerPlugIn text parameters**:
  * param | type | default | note
@@ -280,7 +280,7 @@ public:
 
 protected:
 	friend void unref_delete<OSSteerPlugIn>(OSSteerPlugIn*);
-	friend class OSSteerManager;
+	friend class AIManager;
 
 	OSSteerPlugIn(const string& name = "SteerPlugIn");
 	virtual ~OSSteerPlugIn();
@@ -299,7 +299,7 @@ private:
 	///Steer vehicles.
 	pvector<PT(OSSteerVehicle)> mSteerVehicles;
 	///The "local" obstacles handled by this OSSteerPlugIn.
-	OSSteerManager::GlobalObstacles mLocalObstacles;
+	AIManager::GlobalObstacles mLocalObstacles;
 	///Pathway stuff.
 	///@{
 	ValueList<LPoint3f> mPathwayPoints;
@@ -376,7 +376,7 @@ private:
 	// persistent storage for serialized data
 	///@}
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	///OpenSteer debug node paths.
 	NodePath mDrawer3dNP, mDrawer3dStaticNP, mDrawer2dNP;
 	///OpenSteer debug camera.

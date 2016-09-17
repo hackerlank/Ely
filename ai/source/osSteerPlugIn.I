@@ -106,10 +106,10 @@ INLINE int OSSteerPlugIn::add_obstacle(const string& type, const string& seenFro
  */
 INLINE int OSSteerPlugIn::get_obstacle(int index) const
 {
-	pvector<OSSteerManager::ObstacleAttributes>& obstacleAttrs =
-			const_cast<OSSteerManager::GlobalObstacles&>(mLocalObstacles).second();
+	pvector<AIManager::ObstacleAttributes>& obstacleAttrs =
+			const_cast<AIManager::GlobalObstacles&>(mLocalObstacles).second();
 	CONTINUE_IF_ELSE_R((index >= 0) && (index < (int) obstacleAttrs.size()),
-			OS_ERROR)
+			AI_ERROR)
 
 	return obstacleAttrs[index].first().get_ref();
 }
@@ -119,7 +119,7 @@ INLINE int OSSteerPlugIn::get_obstacle(int index) const
  */
 INLINE int OSSteerPlugIn::get_num_obstacles() const
 {
-	return (int) const_cast<OSSteerManager::GlobalObstacles&>(mLocalObstacles).second().size();
+	return (int) const_cast<AIManager::GlobalObstacles&>(mLocalObstacles).second().size();
 }
 
 /**
@@ -150,7 +150,7 @@ inline void OSSteerPlugIn::do_reset()
 #endif //PYTHON_BUILD
 	//serialization
 	mSerializedDataTmpPtr = NULL;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	mDrawer3dNP.clear();
 	mDrawer3dStaticNP.clear();
 	mDrawer2dNP.clear();

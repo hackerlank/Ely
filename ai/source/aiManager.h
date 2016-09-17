@@ -1,41 +1,44 @@
 /**
- * \file osSteerManager.h
+ * \file aiSteerManager.h
  *
- * \date 2016-09-16
+ * \date 2016-09-17
  * \author consultit
  */
 
-#ifndef OSSTEERMANGER_H_
-#define OSSTEERMANGER_H_
+#ifndef AIMANGER_H_
+#define AIMANGER_H_
 
-#include "osTools.h"
+#include "aiTools.h"
 #include "opensteer_includes.h"
+#include "recastnavigation_includes.h"
 #include "collisionTraverser.h"
 #include "collisionHandlerQueue.h"
 #include "collisionRay.h"
 
 class OSSteerPlugIn;
 class OSSteerVehicle;
+class RNNavMesh;
+class RNCrowdAgent;
 
 /**
- * OSSteerManager Singleton class.
+ * AIManager Singleton class.
  *
- * Used for handling OSSteerPlugIns and OSSteerVehicles.
+ * Used for handling OSSteerPlugIns, OSSteerVehicles, RNNavMeshes and RNCrowdAgents.
  */
-class EXPORT_CLASS OSSteerManager: public TypedReferenceCount,
-		public Singleton<OSSteerManager>
+class EXPORT_CLASS AIManager: public TypedReferenceCount,
+		public Singleton<AIManager>
 {
 public:
 	typedef Pair<OSObstacleSettings, NodePath> ObstacleAttributes;
 	typedef Pair<OpenSteer::ObstacleGroup, pvector<ObstacleAttributes> > GlobalObstacles;
 
 PUBLISHED:
-	OSSteerManager(const NodePath& root = NodePath(),
+	AIManager(const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
-	virtual ~OSSteerManager();
+	virtual ~AIManager();
 
 	/**
-	 * \name REFERENCE NODES
+	 * \name REFERENCE NODES XXX
 	 */
 	///@{
 	INLINE NodePath get_reference_node_path() const;
@@ -67,24 +70,48 @@ PUBLISHED:
 	///@}
 
 	/**
+	 * \name RNNavMesh
+	 */
+	///@{
+	NodePath create_nav_mesh();
+	bool destroy_nav_mesh(NodePath navMeshNP);
+	PT(RNNavMesh) get_nav_mesh(int index) const;
+	INLINE int get_num_nav_meshes() const;
+	MAKE_SEQ(get_nav_meshes, get_num_nav_meshes, get_nav_mesh);
+	///@}
+
+	/**
+	 * \name RNCrowdAgent
+	 */
+	///@{
+	NodePath create_crowd_agent(const string& name);
+	bool destroy_crowd_agent(NodePath crowdAgentNP);
+	PT(RNCrowdAgent) get_crowd_agent(int index) const;
+	INLINE int get_num_crowd_agents() const;
+	MAKE_SEQ(get_crowd_agents, get_num_crowd_agents, get_crowd_agent);
+	///@}
+
+	/**
 	 * The type of object for creation parameters.
 	 */
-	enum OSType
+	enum AIType
 	{
 		STEERPLUGIN = 0,
-		STEERVEHICLE
+		STEERVEHICLE,
+		NAVMESH,
+		CROWDAGENT
 	};
 
 	/**
 	 * \name TEXTUAL PARAMETERS
 	 */
 	///@{
-	ValueList<string> get_parameter_name_list(OSType type) const;
-	void set_parameter_values(OSType type, const string& paramName, const ValueList<string>& paramValues);
-	ValueList<string> get_parameter_values(OSType type, const string& paramName) const;
-	void set_parameter_value(OSType type, const string& paramName, const string& value);
-	string get_parameter_value(OSType type, const string& paramName) const;
-	void set_parameters_defaults(OSType type);
+	ValueList<string> get_parameter_name_list(AIType type) const;
+	void set_parameter_values(AIType type, const string& paramName, const ValueList<string>& paramValues);
+	ValueList<string> get_parameter_values(AIType type, const string& paramName) const;
+	void set_parameter_value(AIType type, const string& paramName, const string& value);
+	string get_parameter_value(AIType type, const string& paramName) const;
+	void set_parameters_defaults(AIType type);
 	///@}
 
 	/**
@@ -100,11 +127,11 @@ PUBLISHED:
 	 * \name SINGLETON
 	 */
 	///@{
-	INLINE static OSSteerManager* get_global_ptr();
+	INLINE static AIManager* get_global_ptr();
 	///@}
 
 	/**
-	 * \name OBSTACLES
+	 * \name OpenSteer OBSTACLES
 	 */
 	///@{
 	OSObstacleSettings get_obstacle_settings(int ref) const;
@@ -138,7 +165,7 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * Equivalent to duDebugDrawPrimitives.
+	 * Equivalent to DrawMeshDrawer::DrawPrimitive.
 	 */
 	enum OSDebugDrawPrimitives
 	{
@@ -153,13 +180,32 @@ PUBLISHED:
 	};
 
 	/**
-	 * \name LOW LEVEL DEBUG DRAWING
+	 * Equivalent to duDebugDrawPrimitives.
+	 */
+	enum RNDebugDrawPrimitives
+	{
+#ifndef CPPPARSER
+		POINTS = DU_DRAW_POINTS,
+		LINES = DU_DRAW_LINES,
+		TRIS = DU_DRAW_TRIS,
+		QUADS = DU_DRAW_QUADS,
+#else
+		POINTS,LINES,TRIS,QUADS
+#endif //CPPPARSER
+	};
+
+	/**
+	 * \name LOW LEVEL DEBUG DRAWING XXX
 	 */
 	///@{
 	void debug_draw_primitive(OSDebugDrawPrimitives primitive,
 			const ValueList<LPoint3f>& points, const LVecBase4f color = LVecBase4f::zero(), float size =
 					1.0f);
-	void debug_draw_reset();
+	void debug_draw_primitive(RNDebugDrawPrimitives primitive,
+			const ValueList<LPoint3f>& points, const LVecBase4f color = LVecBase4f::zero(), float size =
+					1.0f);
+	void debug_draw_reset(OSDebugDrawPrimitives primitive);
+	void debug_draw_reset(RNDebugDrawPrimitives primitive);
 	///@}
 
 public:
@@ -184,11 +230,23 @@ private:
 	///OSSteerPlugIns' parameter table.
 	ParameterTable mSteerPlugInsParameterTable;
 
-	///List of OSSteerVehicles handled by this template.
+	///List of OSSteerVehicles handled by this manager.
 	typedef pvector<PT(OSSteerVehicle)> SteerVehicleList;
 	SteerVehicleList mSteerVehicles;
 	///OSSteerVehicles' parameter table.
 	ParameterTable mSteerVehiclesParameterTable;
+
+	///List of RNNavMeshes handled by this manager.
+	typedef pvector<PT(RNNavMesh)> NavMeshList;
+	NavMeshList mNavMeshes;
+	///RNNavMeshes' parameter table.
+	ParameterTable mNavMeshesParameterTable;
+
+	///List of RNCrowdAgents handled by this manager.
+	typedef pvector<PT(RNCrowdAgent)> CrowdAgentList;
+	CrowdAgentList mCrowdAgents;
+	///RNCrowdAgents' parameter table.
+	ParameterTable mCrowdAgentsParameterTable;
 
 	///This is a Pair:
 	/// -first == list of pointers to all OpenSteer obstacles
@@ -199,7 +257,7 @@ private:
 
 	///@{
 	///A task data for step simulation update.
-	PT(TaskInterface<OSSteerManager>::TaskData) mUpdateData;
+	PT(TaskInterface<AIManager>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
 	///@}
 
@@ -215,10 +273,22 @@ private:
 
 	///The reference node paths for debug drawing.
 	NodePath mReferenceDebugNP, mReferenceDebug2DNP;
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
+	class DebugDrawPrimitives: public rnsup::DebugDrawPanda3d
+	{
+	public:
+		DebugDrawPrimitives(NodePath render): rnsup::DebugDrawPanda3d(render)
+		{
+		}
+		void vertex(const LVector3f& vertex, const LVector4f& color)
+		{
+			doVertex(vertex, color);
+		}
+	};
 	/// DebugDrawers.
-	ossup::DebugDrawPanda3d* mDD;
-#endif //OS_DEBUG
+	ossup::DebugDrawPanda3d* mOSDD;
+	DebugDrawPrimitives* mRNDD;
+#endif //ELY_DEBUG
 
 public:
 	/**
@@ -232,7 +302,7 @@ public:
 	static void init_type()
 	{
 		TypedReferenceCount::init_type();
-		register_type(_type_handle, "OSSteerManager",
+		register_type(_type_handle, "AIManager",
 				TypedReferenceCount::get_class_type());
 	}
 	virtual TypeHandle get_type() const override
@@ -252,6 +322,6 @@ private:
 };
 
 ///inline
-#include "osSteerManager.I"
+#include "aiManager.I"
 
-#endif /* OSSTEERMANGER_H_ */
+#endif /* AIMANGER_H_ */

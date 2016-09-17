@@ -9,8 +9,8 @@
 #define RNCROWDAGENT_H_
 
 #include "rnNavMesh.h"
-#include "rnNavMeshManager.h"
-#include "rnTools.h"
+#include "aiManager.h"
+#include "aiTools.h"
 #include "recastnavigation_includes.h"
 #include "nodePath.h"
 
@@ -37,7 +37,7 @@
  * The argument of each event is a reference to this component.\n
  *
  * \note A RNCrowdAgent will be reparented to the default reference node on
- * creation (see RNNavMeshManager).
+ * creation (see AIManager).
  *
  * > **RNCrowdAgent text parameters**:
  * param | type | default | note
@@ -178,7 +178,7 @@ PUBLISHED:
 
 protected:
 	friend void unref_delete<RNCrowdAgent>(RNCrowdAgent*);
-	friend class RNNavMeshManager;
+	friend class AIManager;
 	friend class RNNavMesh;
 
 	RNCrowdAgent(const string& name);

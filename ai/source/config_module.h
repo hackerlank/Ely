@@ -1,5 +1,5 @@
-#ifndef CONFIG_OPENSTEER_H
-#define CONFIG_OPENSTEER_H
+#ifndef CONFIG_AI_H
+#define CONFIG_AI_H
 
 #pragma once
 
@@ -14,4 +14,4 @@ NotifyCategoryDecl(ai, EXPORT_CLASS, EXPORT_TEMPL);
 
 extern void init_libai();
 
-#endif
+#endif //CONFIG_AI_H

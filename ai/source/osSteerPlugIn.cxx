@@ -5,24 +5,28 @@
  * \author consultit
  */
 
+#if !defined(CPPPARSER) && defined(_WIN32)
+#include "support_os/pstdint.h"
+#endif
+
 #include "osSteerPlugIn.h"
 
 #include "osSteerVehicle.h"
-#include "osSteerManager.h"
+#include "aiManager.h"
 #include "camera.h"
 #include "orthographicLens.h"
 #include "graphicsEngine.h"
 #include "throw_event.h"
 
 #ifndef CPPPARSER
-#include "support/PlugIn_OneTurning.h"
-#include "support/PlugIn_Pedestrian.h"
-#include "support/PlugIn_Boids.h"
-#include "support/PlugIn_MultiplePursuit.h"
-#include "support/PlugIn_Soccer.h"
-#include "support/PlugIn_CaptureTheFlag.h"
-#include "support/PlugIn_LowSpeedTurn.h"
-#include "support/PlugIn_MapDrive.h"
+#include "support_os/PlugIn_OneTurning.h"
+#include "support_os/PlugIn_Pedestrian.h"
+#include "support_os/PlugIn_Boids.h"
+#include "support_os/PlugIn_MultiplePursuit.h"
+#include "support_os/PlugIn_Soccer.h"
+#include "support_os/PlugIn_CaptureTheFlag.h"
+#include "support_os/PlugIn_LowSpeedTurn.h"
+#include "support_os/PlugIn_MapDrive.h"
 #endif //CPPPARSER
 #ifdef PYTHON_BUILD
 #include <py_panda.h>
@@ -64,7 +68,7 @@ void OSSteerPlugIn::set_plug_in_type(OSSteerPlugInType type)
 			&mLocalObstacles.first();
 	//(re)set the new OpenSteer plug-in's global obstacles reference
 	static_cast<ossup::PlugIn*>(mPlugIn)->obstacles =
-			&OSSteerManager::get_global_ptr()->get_global_obstacles().first();
+			&AIManager::get_global_ptr()->get_global_obstacles().first();
 	//open the new OpenSteer plug-in
 	mPlugIn->open();
 }
@@ -75,17 +79,17 @@ void OSSteerPlugIn::set_plug_in_type(OSSteerPlugInType type)
  */
 void OSSteerPlugIn::do_initialize()
 {
-	WPT(OSSteerManager)mTmpl = OSSteerManager::get_global_ptr();
+	WPT(AIManager)mTmpl = AIManager::get_global_ptr();
 	//
 	//set OSSteerPlugIn parameters (store internally for future use)
 	//type
-	string mPlugInTypeParam = mTmpl->get_parameter_value(OSSteerManager::STEERPLUGIN,
+	string mPlugInTypeParam = mTmpl->get_parameter_value(AIManager::STEERPLUGIN,
 			string("plugin_type"));
 	//pathway (will be used on setup())
-	string mPathwayParam = mTmpl->get_parameter_value(OSSteerManager::STEERPLUGIN,
+	string mPathwayParam = mTmpl->get_parameter_value(AIManager::STEERPLUGIN,
 			string("pathway"));
 	//obstacles (will be used on setup())
-	plist<string> mObstacleListParam = mTmpl->get_parameter_values(OSSteerManager::STEERPLUGIN,
+	plist<string> mObstacleListParam = mTmpl->get_parameter_values(AIManager::STEERPLUGIN,
 			string("obstacles"));
 	//
 	//create the steer plug in
@@ -369,8 +373,8 @@ void OSSteerPlugIn::do_finalize()
 	disable_debug_drawing();
 	//remove all local obstacles from the global
 	OpenSteer::ObstacleGroup::iterator iterLocal;
-	OSSteerManager::GlobalObstacles& globalObstacles =
-			OSSteerManager::get_global_ptr()->get_global_obstacles();
+	AIManager::GlobalObstacles& globalObstacles =
+			AIManager::get_global_ptr()->get_global_obstacles();
 	for (iterLocal = mLocalObstacles.first().begin();
 			iterLocal != mLocalObstacles.first().end(); ++iterLocal)
 	{
@@ -391,7 +395,7 @@ void OSSteerPlugIn::do_finalize()
 		//NOTE: the i-th obstacle has pointer and attributes placed into the
 		//i-th places of their respective lists.
 		unsigned int pointerIdx = iterO - globalObstacles.first().begin();
-		pvector<OSSteerManager::ObstacleAttributes>::iterator iterA =
+		pvector<AIManager::ObstacleAttributes>::iterator iterA =
 				globalObstacles.second().begin() + pointerIdx;
 		/*for (iterA = globalObstacles.second().begin();
 				iterA != globalObstacles.second().end(); ++iterA)
@@ -440,16 +444,16 @@ int OSSteerPlugIn::add_steer_vehicle(NodePath steerVehicleNP)
 	CONTINUE_IF_ELSE_R(
 			(!steerVehicleNP.is_empty())
 					&& (steerVehicleNP.node()->is_of_type(
-							OSSteerVehicle::get_class_type())), OS_ERROR)
+							OSSteerVehicle::get_class_type())), AI_ERROR)
 
 	PT(OSSteerVehicle)steerVehicle = DCAST(OSSteerVehicle, steerVehicleNP.node());
 
 	// continue if steerVehicle doesn't belong to any steer plug-in
-	CONTINUE_IF_ELSE_R(!steerVehicle->mSteerPlugIn, OS_ERROR)
+	CONTINUE_IF_ELSE_R(!steerVehicle->mSteerPlugIn, AI_ERROR)
 
 	// continue if steerVehicle is compatible
 	CONTINUE_IF_ELSE_R(check_steer_vehicle_compatibility(steerVehicleNP),
-			OS_ERROR)
+			AI_ERROR)
 
 	bool result = false;
 	//add to update list
@@ -471,7 +475,7 @@ int OSSteerPlugIn::add_steer_vehicle(NodePath steerVehicleNP)
 				LVector3f::forward());
 		up = mReferenceNP.get_relative_vector(steerVehicleNP, LVector3f::up());
 		//get steerVehicle dimensions
-		modelRadius = OSSteerManager::get_global_ptr()->get_bounding_dimensions(
+		modelRadius = AIManager::get_global_ptr()->get_bounding_dimensions(
 				steerVehicleNP, modelDims, modelDeltaCenter);
 		//set orientation
 		steerVehicleNP.heads_up(pos + forward, up);
@@ -500,7 +504,7 @@ int OSSteerPlugIn::add_steer_vehicle(NodePath steerVehicleNP)
 		result = true;
 	}
 	//
-	return (result ? OS_SUCCESS : OS_ERROR);
+	return (result ? AI_SUCCESS : AI_ERROR);
 }
 
 /**
@@ -513,12 +517,12 @@ int OSSteerPlugIn::remove_steer_vehicle(NodePath steerVehicleNP)
 	CONTINUE_IF_ELSE_R(
 			(!steerVehicleNP.is_empty())
 					&& (steerVehicleNP.node()->is_of_type(
-							OSSteerVehicle::get_class_type())), OS_ERROR)
+							OSSteerVehicle::get_class_type())), AI_ERROR)
 
 	PT(OSSteerVehicle)steerVehicle = DCAST(OSSteerVehicle, steerVehicleNP.node());
 
 	// continue if steerVehicle belongs to this steer plug-in
-	CONTINUE_IF_ELSE_R(steerVehicle->mSteerPlugIn == this, OS_ERROR)
+	CONTINUE_IF_ELSE_R(steerVehicle->mSteerPlugIn == this, AI_ERROR)
 
 	bool result = false;
 	//remove from the list of SteerVehicles
@@ -539,7 +543,7 @@ int OSSteerPlugIn::remove_steer_vehicle(NodePath steerVehicleNP)
 		result = true;
 	}
 	//
-	return (result ? OS_SUCCESS : OS_ERROR);
+	return (result ? AI_SUCCESS : AI_ERROR);
 }
 
 /**
@@ -661,9 +665,9 @@ void OSSteerPlugIn::set_pathway(const ValueList<LPoint3f>& pointList,
 	mPathwayClosedCycle = closedCycle;
 	//update static geometry if needed
 	do_on_static_geometry_change(true, false);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 }
 
 /**
@@ -676,7 +680,7 @@ void OSSteerPlugIn::set_pathway(const ValueList<LPoint3f>& pointList,
 int OSSteerPlugIn::add_obstacle(NodePath& objectNP,
 		const string& type, const string& seenFromState)
 {
-	CONTINUE_IF_ELSE_R(!objectNP.is_empty(), OS_ERROR)
+	CONTINUE_IF_ELSE_R(!objectNP.is_empty(), AI_ERROR)
 
 	LPoint3f position;
 	LVector3f side, up, forward;
@@ -686,7 +690,7 @@ int OSSteerPlugIn::add_obstacle(NodePath& objectNP,
 	LVector3f modelDeltaCenter;
 	float modelRadius;
 	//compute new obstacle dimensions
-	modelRadius = OSSteerManager::get_global_ptr()->get_bounding_dimensions(
+	modelRadius = AIManager::get_global_ptr()->get_bounding_dimensions(
 			objectNP, modelDims, modelDeltaCenter);
 	//correct obstacle's parameters
 	position = objectNP.get_pos();
@@ -763,14 +767,14 @@ int OSSteerPlugIn::do_add_obstacle(NodePath objectNP,
 		obstacle->setSeenFrom(seenFS);
 	}
 	//store obstacle and all settings
-	int ref = OS_ERROR;
+	int ref = AI_ERROR;
 	if (obstacle)
 	{
-		OSSteerManager::GlobalObstacles& globalObstacles =
-				OSSteerManager::get_global_ptr()->get_global_obstacles();
+		AIManager::GlobalObstacles& globalObstacles =
+				AIManager::get_global_ptr()->get_global_obstacles();
 		nassertr_always(
 				globalObstacles.first().size()
-						== globalObstacles.second().size(), OS_ERROR)
+						== globalObstacles.second().size(), AI_ERROR)
 
 		//1: set obstacle's settings
 		OSObstacleSettings settings;
@@ -784,13 +788,13 @@ int OSSteerPlugIn::do_add_obstacle(NodePath objectNP,
 		settings.set_height(height);
 		settings.set_depth(depth);
 		settings.set_radius(radius);
-		ref = OSSteerManager::get_global_ptr()->unique_ref();
+		ref = AIManager::get_global_ptr()->unique_ref();
 		settings.set_ref(ref);
 		settings.set_obstacle(obstacle);
 		//2: add OpenSteer obstacle's pointer to global list
 		globalObstacles.first().push_back(obstacle);
 		//3: add obstacle's attributes to global list
-		OSSteerManager::ObstacleAttributes obstacleAttrs(settings, objectNP);
+		AIManager::ObstacleAttributes obstacleAttrs(settings, objectNP);
 		globalObstacles.second().push_back(obstacleAttrs);
 		//4: add OpenSteer obstacle's pointer to local list
 		mLocalObstacles.first().push_back(obstacle);
@@ -803,9 +807,9 @@ int OSSteerPlugIn::do_add_obstacle(NodePath objectNP,
 		}
 		//update static geometry if needed
 		do_on_static_geometry_change(false, true);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 	return ref;
 }
@@ -822,10 +826,10 @@ NodePath OSSteerPlugIn::remove_obstacle(int ref)
 	NodePath resultNP = NodePath::fail();
 	//find in global obstacles
 	//get a reference to the global storage
-	OSSteerManager::GlobalObstacles& globalObstacles =
-			OSSteerManager::get_global_ptr()->get_global_obstacles();
+	AIManager::GlobalObstacles& globalObstacles =
+			AIManager::get_global_ptr()->get_global_obstacles();
 	//find the Obstacle's attributes with the given ref, if any
-	pvector<OSSteerManager::ObstacleAttributes>::iterator iterA;
+	pvector<AIManager::ObstacleAttributes>::iterator iterA;
 	for (iterA = globalObstacles.second().begin();
 			iterA != globalObstacles.second().end(); ++iterA)
 	{
@@ -874,14 +878,14 @@ NodePath OSSteerPlugIn::remove_obstacle(int ref)
 		//NOTE: the i-th obstacle has pointer and attributes placed into the
 		//i-th places of their respective lists.
 		unsigned int pointerIdx = iterOL - mLocalObstacles.first().begin();
-		pvector<OSSteerManager::ObstacleAttributes>::iterator iterAL =
+		pvector<AIManager::ObstacleAttributes>::iterator iterAL =
 				mLocalObstacles.second().begin() + pointerIdx;
 		mLocalObstacles.second().erase(iterAL);
 		//update static geometry if needed
 		do_on_static_geometry_change(false, true);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 	//
 	return resultNP;
@@ -938,7 +942,7 @@ void OSSteerPlugIn::update(float dt)
 	dt = 0.016666667; //60 fps
 #endif
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	{
 		if (mEnableDebugDrawUpdate && mDrawer3d && mDrawer2d)
 		{
@@ -967,15 +971,15 @@ void OSSteerPlugIn::update(float dt)
 		{
 			//clear enableAnnotation
 			ossup::enableAnnotation = false;
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 
 			/// invoke PlugIn's Update method
 			mPlugIn->update(mCurrentTime, dt);
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		}
 	}
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 #ifdef PYTHON_BUILD
 	// execute python callback (if any)
 	if (mUpdateCallback && (mUpdateCallback != Py_None))
@@ -1083,7 +1087,7 @@ OSSteerPlugIn::OSProximityDatabase OSSteerPlugIn::get_proximity_database() const
 			break;
 		}
 	}
-	return (OSProximityDatabase) OS_ERROR;
+	return (OSProximityDatabase) AI_ERROR;
 }
 
 /**
@@ -1097,9 +1101,9 @@ void OSSteerPlugIn::set_world_center(const LPoint3f& center)
 		ossup::BoidsPlugIn<OSSteerVehicle>* plugIn =
 				static_cast<ossup::BoidsPlugIn<OSSteerVehicle>*>(mPlugIn);
 		plugIn->setWorldCenter(ossup::LVecBase3fToOpenSteerVec3(center));
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1131,9 +1135,9 @@ void OSSteerPlugIn::set_world_radius(float radius)
 		ossup::BoidsPlugIn<OSSteerVehicle>* plugIn =
 				static_cast<ossup::BoidsPlugIn<OSSteerVehicle>*>(mPlugIn);
 		plugIn->setWorldRadius(radius);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1149,7 +1153,7 @@ float OSSteerPlugIn::get_world_radius() const
 				static_cast<ossup::BoidsPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->getWorldRadius();
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1172,9 +1176,9 @@ int OSSteerPlugIn::add_player_to_team(PT(OSSteerVehicle) player,
 						player->get_abstract_vehicle())), team == TEAM_A);
 		//update internal reference
 		player->mPlayingTeam_ser = team;
-		return OS_SUCCESS;
+		return AI_SUCCESS;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1194,9 +1198,9 @@ int OSSteerPlugIn::remove_player_from_team(PT(OSSteerVehicle) player)
 						player->get_abstract_vehicle())));
 		//update internal reference
 		player->mPlayingTeam_ser = NO_TEAM;
-		return OS_SUCCESS;
+		return AI_SUCCESS;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1238,9 +1242,9 @@ void OSSteerPlugIn::set_playing_field(const LPoint3f& min, const LPoint3f& max,
 				static_cast<ossup::MicTestPlugIn<OSSteerVehicle>*>(mPlugIn);
 		plugIn->setSoccerField(ossup::LVecBase3fToOpenSteerVec3(min),
 				ossup::LVecBase3fToOpenSteerVec3(max), goalFraction);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1262,7 +1266,7 @@ float OSSteerPlugIn::get_goal_fraction() const
 						- plugIn->m_TeamAGoal->getMin().z);
 		return goalYdim / fieldYdim;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1277,7 +1281,7 @@ int OSSteerPlugIn::get_score_team_a() const
 				static_cast<ossup::MicTestPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_redScore;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1292,7 +1296,7 @@ int OSSteerPlugIn::get_score_team_b() const
 				static_cast<ossup::MicTestPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_blueScore;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1307,9 +1311,9 @@ void OSSteerPlugIn::set_home_base_center(const LPoint3f& center)
 				OSSteerVehicle>*>(mPlugIn);
 		plugIn->m_CtfPlugInData.gHomeBaseCenter =
 				ossup::LVecBase3fToOpenSteerVec3(center);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1342,9 +1346,9 @@ void OSSteerPlugIn::set_home_base_radius(float radius)
 				OSSteerVehicle>*>(mPlugIn);
 		plugIn->m_CtfPlugInData.gHomeBaseRadius = (
 				radius >= 0 ? radius : -radius);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1360,7 +1364,7 @@ float OSSteerPlugIn::get_home_base_radius() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gHomeBaseRadius;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1390,7 +1394,7 @@ float OSSteerPlugIn::get_braking_rate() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gBrakingRate;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1420,7 +1424,7 @@ float OSSteerPlugIn::get_avoidance_predict_time_min() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gAvoidancePredictTimeMin;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1450,7 +1454,7 @@ float OSSteerPlugIn::get_avoidance_predict_time_max() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gAvoidancePredictTimeMax;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1466,9 +1470,9 @@ void OSSteerPlugIn::make_map(int resolution)
 		ossup::MapDrivePlugIn<OSSteerVehicle>* plugIn =
 				static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn);
 		plugIn->makeMap(resolution);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1500,7 +1504,7 @@ float OSSteerPlugIn::get_map_dimension() const
 				static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->worldSize;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1515,7 +1519,7 @@ int OSSteerPlugIn::get_map_resolution() const
 				static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->worldResolution;
 	}
-	return OS_ERROR;
+	return AI_ERROR;
 }
 
 /**
@@ -1528,9 +1532,9 @@ void OSSteerPlugIn::set_map_path_fences(bool enable)
 	{
 		static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn)->setUsePathFences(
 				enable);
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 		do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1544,7 +1548,7 @@ bool OSSteerPlugIn::get_map_path_fences() const
 	{
 		return static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn)->getUsePathFences();
 	}
-	return (OSMapSteeringMode) OS_ERROR;
+	return (OSMapSteeringMode) AI_ERROR;
 }
 
 /**
@@ -1571,9 +1575,9 @@ void OSSteerPlugIn::set_map_steering_mode(OSMapSteeringMode mode)
 		default:
 			break;
 		}
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	do_debug_draw_static_geometry(mDebugCamera, mDrawer3dStatic);
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 	}
 }
 
@@ -1602,7 +1606,7 @@ OSSteerPlugIn::OSMapSteeringMode OSSteerPlugIn::get_map_steering_mode() const
 			break;
 		}
 	}
-	return (OSMapSteeringMode) OS_ERROR;
+	return (OSMapSteeringMode) AI_ERROR;
 }
 
 /**
@@ -1650,7 +1654,7 @@ OSSteerPlugIn::OSMapPredictionType OSSteerPlugIn::get_map_prediction_type() cons
 			return LINEAR_PREDICTION;
 		}
 	}
-	return (OSMapPredictionType) OS_ERROR;
+	return (OSMapPredictionType) AI_ERROR;
 }
 
 /**
@@ -1674,7 +1678,7 @@ float OSSteerPlugIn::get_steering_speed() const
 {
 	return (mPlugInType == LOW_SPEED_TURN) ?
 			static_cast<ossup::LowSpeedTurnPlugIn<OSSteerVehicle>*>(mPlugIn)->steeringSpeed :
-			OS_ERROR;
+			AI_ERROR;
 }
 
 /**
@@ -1733,7 +1737,7 @@ void OSSteerPlugIn::set_update_callback(UPDATECALLBACKFUNC value)
  */
 void OSSteerPlugIn::enable_debug_drawing(NodePath debugCamera)
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	CONTINUE_IF_ELSE_V(mDebugCamera.is_empty())
 
 	if ((!debugCamera.is_empty()) &&
@@ -1775,7 +1779,7 @@ void OSSteerPlugIn::enable_debug_drawing(NodePath debugCamera)
 		mDrawer2d = new ossup::DrawMeshDrawer(mDrawer2dNP, meshDrawerCamera, 50,
 				0.04);
 	}
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 }
 
 /**
@@ -1783,7 +1787,7 @@ void OSSteerPlugIn::enable_debug_drawing(NodePath debugCamera)
  */
 void OSSteerPlugIn::disable_debug_drawing()
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	if (! mDebugCamera.is_empty())
 	{
 		//set the opensteer debug camera to empty node path
@@ -1809,7 +1813,7 @@ void OSSteerPlugIn::disable_debug_drawing()
 			mDrawer2d = NULL;
 		}
 	}
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 }
 
 /**
@@ -1818,13 +1822,13 @@ void OSSteerPlugIn::disable_debug_drawing()
  */
 int OSSteerPlugIn::toggle_debug_drawing(bool enable)
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	//continue if mDebugCamera, mDrawer3dNP, mDrawer3dStaticNP and mDrawer2dNP are not empty
 	CONTINUE_IF_ELSE_R(
 			(!mDebugCamera.is_empty())
 					&& ((!mDrawer3dNP.is_empty())
 							&& (!mDrawer3dStaticNP.is_empty())
-							&& (!mDrawer2dNP.is_empty())), OS_ERROR)
+							&& (!mDrawer2dNP.is_empty())), AI_ERROR)
 
 	if (enable)
 	{
@@ -1889,8 +1893,8 @@ int OSSteerPlugIn::toggle_debug_drawing(bool enable)
 		}
 	}
 	//
-#endif //OS_DEBUG
-	return OS_SUCCESS;
+#endif //ELY_DEBUG
+	return AI_SUCCESS;
 }
 
 /**
@@ -1904,7 +1908,7 @@ int OSSteerPlugIn::toggle_debug_drawing(bool enable)
 void OSSteerPlugIn::debug_drawing_to_texture(const NodePath& scene,
 		PT(GraphicsOutput)window, int size, const string& fileName)
 {
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 	//continue if mDebugCamera is not empty
 	CONTINUE_IF_ELSE_V(!mDebugCamera.is_empty())
 
@@ -1916,7 +1920,7 @@ void OSSteerPlugIn::debug_drawing_to_texture(const NodePath& scene,
 		//get scene dimensions
 		LVecBase3f sceneDims;
 		LVector3f sceneDeltaCenter;
-		OSSteerManager::get_global_ptr()->get_bounding_dimensions(scene,
+		AIManager::get_global_ptr()->get_bounding_dimensions(scene,
 				sceneDims, sceneDeltaCenter);
 
 		mTextureRender2d = NodePath("rttRender2d");
@@ -1956,15 +1960,15 @@ void OSSteerPlugIn::debug_drawing_to_texture(const NodePath& scene,
 	mTextureTaskData = new TaskInterface<OSSteerPlugIn>::TaskData(this,
 			&OSSteerPlugIn::do_debug_draw_to_texture_task);
 	mTextureTask = new GenericAsyncTask(string("OSSteerPlugIn::do_debug_draw_to_texture_task"),
-			&TaskInterface<OSSteerManager>::taskFunction,
+			&TaskInterface<AIManager>::taskFunction,
 	reinterpret_cast<void*>(mTextureTaskData.p()));
 	//Adds mDrawTextureTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mTextureTask);
 
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 }
 
-#ifdef OS_DEBUG
+#ifdef ELY_DEBUG
 /**
  * Draws static geometry.
  * \note Internal use only.
@@ -2041,7 +2045,7 @@ AsyncTask::DoneStatus OSSteerPlugIn::do_debug_draw_to_texture_task(
 	//done
 	return AsyncTask::DS_done;
 }
-#endif //OS_DEBUG
+#endif //ELY_DEBUG
 
 //TypedWritable API
 /**
@@ -2102,7 +2106,7 @@ void OSSteerPlugIn::write_datagram(BamWriter *manager, Datagram &dg)
 	///The "local" obstacles handled by this OSSteerPlugIn.
 	dg.add_uint32(mLocalObstacles.first().size());
 	{
-		pvector<OSSteerManager::ObstacleAttributes>::iterator iter;
+		pvector<AIManager::ObstacleAttributes>::iterator iter;
 		for (iter = mLocalObstacles.second().begin();
 				iter != mLocalObstacles.second().end(); ++iter)
 		{
@@ -2191,7 +2195,7 @@ int OSSteerPlugIn::complete_pointers(TypedWritable **p_list, BamReader *manager)
 
 	///The "local" obstacles handled by this OSSteerPlugIn.
 	{
-		pvector<OSSteerManager::ObstacleAttributes>::iterator iter;
+		pvector<AIManager::ObstacleAttributes>::iterator iter;
 		for (iter = mLocalObstacles.second().begin();
 				iter != mLocalObstacles.second().end(); ++iter)
 		{
@@ -2220,7 +2224,7 @@ void OSSteerPlugIn::finalize(BamReader *manager)
 			&mLocalObstacles.first();
 	//set the new OpenSteer plug-in's global obstacles reference
 	static_cast<ossup::PlugIn*>(mPlugIn)->obstacles =
-			&OSSteerManager::get_global_ptr()->get_global_obstacles().first();
+			&AIManager::get_global_ptr()->get_global_obstacles().first();
 	//open the new OpenSteer plug-in
 	mPlugIn->open();
 	//2: add OpenSteer vehicles to the new OpenSteer plug-in's real update list
@@ -2244,12 +2248,12 @@ void OSSteerPlugIn::finalize(BamReader *manager)
 	}
 	//3: (re)add obstacles
 	//temporarily remove all ObstacleAttributes (if any)
-	pvector<OSSteerManager::ObstacleAttributes> currentObstacleAttrs =
+	pvector<AIManager::ObstacleAttributes> currentObstacleAttrs =
 	mLocalObstacles.second();
 	mLocalObstacles.first().clear();
 	mLocalObstacles.second().clear();
 	{
-		pvector<OSSteerManager::ObstacleAttributes>::iterator iter;
+		pvector<AIManager::ObstacleAttributes>::iterator iter;
 		for (iter = currentObstacleAttrs.begin(); iter != currentObstacleAttrs.end(); ++iter)
 		{
 			do_add_obstacle((*iter).second(),
@@ -2361,14 +2365,14 @@ bool OSSteerPlugIn::require_fully_complete() const
  */
 TypedWritable *OSSteerPlugIn::make_from_bam(const FactoryParams &params)
 {
-	// continue only if OSSteerManager exists
-	CONTINUE_IF_ELSE_R(OSSteerManager::get_global_ptr(), NULL)
+	// continue only if AIManager exists
+	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
 
 	// create a OSSteerPlugIn with default parameters' values: they'll be restored later
-	OSSteerManager::get_global_ptr()->set_parameters_defaults(
-			OSSteerManager::STEERPLUGIN);
+	AIManager::get_global_ptr()->set_parameters_defaults(
+			AIManager::STEERPLUGIN);
 	OSSteerPlugIn *node = DCAST(OSSteerPlugIn,
-			OSSteerManager::get_global_ptr()->create_steer_plug_in().node());
+			AIManager::get_global_ptr()->create_steer_plug_in().node());
 
 	DatagramIterator scan;
 	BamReader *manager;

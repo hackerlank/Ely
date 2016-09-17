@@ -4,16 +4,21 @@
  * \date 2016-09-16
  * \author consultit
  */
+
+#if !defined(CPPPARSER) && defined(_WIN32)
+#include "support_os/pstdint.h"
+#endif
+
 #include "osSteerVehicle.h"
 #include "throw_event.h"
-#include "support/PlugIn_OneTurning.h"
-#include "support/PlugIn_Pedestrian.h"
-#include "support/PlugIn_Boids.h"
-#include "support/PlugIn_MultiplePursuit.h"
-#include "support/PlugIn_Soccer.h"
-#include "support/PlugIn_CaptureTheFlag.h"
-#include "support/PlugIn_LowSpeedTurn.h"
-#include "support/PlugIn_MapDrive.h"
+#include "support_os/PlugIn_OneTurning.h"
+#include "support_os/PlugIn_Pedestrian.h"
+#include "support_os/PlugIn_Boids.h"
+#include "support_os/PlugIn_MultiplePursuit.h"
+#include "support_os/PlugIn_Soccer.h"
+#include "support_os/PlugIn_CaptureTheFlag.h"
+#include "support_os/PlugIn_LowSpeedTurn.h"
+#include "support_os/PlugIn_MapDrive.h"
 #ifdef PYTHON_BUILD
 #include <py_panda.h>
 extern Dtool_PyTypedObject Dtool_OSSteerVehicle;
@@ -187,15 +192,15 @@ void OSSteerVehicle::do_create_vehicle(OSSteerVehicleType type)
  */
 void OSSteerVehicle::do_initialize()
 {
-	WPT(OSSteerManager)mTmpl = OSSteerManager::get_global_ptr();
+	WPT(AIManager)mTmpl = AIManager::get_global_ptr();
 	//set OSSteerVehicle parameters
 	string param;
 	//external update
-	mExternalUpdate = (mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	mExternalUpdate = (mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("external_update")) ==
 			string("true") ? true : false);
 	//type
-	param = mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	param = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 			string("vehicle_type"));
 	//create the steer vehicle
 	if (param == string("pedestrian"))
@@ -248,7 +253,7 @@ void OSSteerVehicle::do_initialize()
 	//get a NodePath for this
 	NodePath thisNP = NodePath::any_path(this);
 	//mov type
-	param = mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	param = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 			string("mov_type"));
 	if (param == string("kinematic"))
 	{
@@ -260,11 +265,11 @@ void OSSteerVehicle::do_initialize()
 	}
 	//up axis fixed
 	mUpAxisFixed = (
-			mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+			mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("up_axis_fixed")) ==
 			string("true") ? true : false);
 	//up axis fixed mode
-	param = mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	param = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("up_axis_fixed_mode"));
 	if (param == string("strong"))
 	{
@@ -281,21 +286,21 @@ void OSSteerVehicle::do_initialize()
 	//initialize settings with underlying OpenSteer vehicle's ones
 	settings = static_cast<VehicleAddOn*>(mVehicle)->getSettings();
 	//mass
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("mass")).c_str(), NULL);
 	settings.set_mass(value >= 0.0 ? value : 1.0);
 	//speed
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("speed")).c_str(),
 			NULL);
 	settings.set_speed(value >= 0.0 ? value : -value);
 	//max force
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("max_force")).c_str(),
 			NULL);
 	settings.set_maxForce(value >= 0.0 ? value : -value);
 	//max speed
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("max_speed")).c_str(),
 			NULL);
 	settings.set_maxSpeed(value >= 0.0 ? value : 1.0);
@@ -314,67 +319,67 @@ void OSSteerVehicle::do_initialize()
 	//start
 	settings.set_start(thisNP.get_pos());
 	//path pred time
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("path_pred_time")).c_str(),
 			NULL);
 	settings.set_path_pred_time(value >= 0.0 ? value : 3.0);
 	//obstacle min time coll
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("obstacle_min_time_coll")).c_str(),
 			NULL);
 	settings.set_obstacle_min_time_coll(value >= 0.0 ? value : 4.5);
 	//neighbor min time coll
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("neighbor_min_time_coll")).c_str(),
 			NULL);
 	settings.set_neighbor_min_time_coll(value >= 0.0 ? value : 3.0);
 	//neighbor min sep dist
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("neighbor_min_sep_dist")).c_str(),
 			NULL);
 	settings.set_neighbor_min_sep_dist(value >= 0.0 ? value : 1.0);
 	//separation max dist
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("separation_max_dist")).c_str(),
 			NULL);
 	settings.set_separation_max_dist(value >= 0.0 ? value : 5.0);
 	//separation cos max angle
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("separation_cos_max_angle")).c_str(),
 			NULL);
 	settings.set_separation_cos_max_angle(value >= 0.0 ? value : -0.707);
 	//alignment max dist
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("alignment_max_dist")).c_str(),
 			NULL);
 	settings.set_alignment_max_dist(value >= 0.0 ? value : 7.5);
 	//alignment cos max angle
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("alignment_cos_max_angle")).c_str(),
 			NULL);
 	settings.set_alignment_cos_max_angle(value >= 0.0 ? value : 0.7);
 	//cohesion max dist
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("cohesion_max_dist")).c_str(),
 			NULL);
 	settings.set_cohesion_max_dist(value >= 0.0 ? value : 9.0);
 	//cohesion cos max angle
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("cohesion_cos_max_angle")).c_str(),
 			NULL);
 	settings.set_cohesion_cos_max_angle(value >= 0.0 ? value : -0.15);
 	//pursuit max pred time
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("pursuit_max_pred_time")).c_str(),
 			NULL);
 	settings.set_pursuit_max_pred_time(value >= 0.0 ? value : 20.0);
 	//evasion max pred time
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("evasion_max_pred_time")).c_str(),
 			NULL);
 	settings.set_evasion_max_pred_time(value >= 0.0 ? value : 20.0);
 	//target speed
-	value = STRTOF(mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 					string("target_speed")).c_str(),
 			NULL);
 	settings.set_target_speed(value >= 0.0 ? value : 1.0);
@@ -386,7 +391,7 @@ void OSSteerVehicle::do_initialize()
 			thisNP.get_collide_mask());
 	//
 	//thrown events
-	string mThrownEventsParam = mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	string mThrownEventsParam = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 			string("thrown_events"));
 	//set thrown events if any
 	unsigned int idx1, valueNum1;
@@ -495,14 +500,14 @@ void OSSteerVehicle::do_initialize()
 	//
 	//add to OSSteerPlugIn if requested
 	string mSteerPlugInObjectId =
-	mTmpl->get_parameter_value(OSSteerManager::STEERVEHICLE,
+	mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
 			string("add_to_plugin"));
 	PT(OSSteerPlugIn) plugIn = NULL;
 	for (int index = 0;
-			index < OSSteerManager::get_global_ptr()->get_num_steer_plug_ins();
+			index < AIManager::get_global_ptr()->get_num_steer_plug_ins();
 			++index)
 	{
-		plugIn = OSSteerManager::get_global_ptr()->get_steer_plug_in(index);
+		plugIn = AIManager::get_global_ptr()->get_steer_plug_in(index);
 		if (plugIn->get_name() == mSteerPlugInObjectId)
 		{
 			plugIn->add_steer_vehicle(thisNP);
@@ -563,7 +568,7 @@ void OSSteerVehicle::set_flock_settings(const OSFlockSettings& settings)
  */
 OSFlockSettings OSSteerVehicle::get_flock_settings() const
 {
-	OSFlockSettings settings(OS_ERROR, OS_ERROR, OS_ERROR);
+	OSFlockSettings settings(AI_ERROR, AI_ERROR, AI_ERROR);
 	if (mVehicleType == BOID)
 	{
 		static_cast<ossup::Boid<OSSteerVehicle>*>(mVehicle)->getFlockParameters(
@@ -590,19 +595,19 @@ OSSteerPlugIn::OSPlayingTeam OSSteerVehicle::get_playing_team() const
 					(static_cast<ossup::Player<OSSteerVehicle>*>(mVehicle)->b_ImTeamA ?
 							OSSteerPlugIn::TEAM_A : OSSteerPlugIn::TEAM_B);
 			nassertr_always(mPlayingTeam_ser == team,
-					(OSSteerPlugIn::OSPlayingTeam)OS_ERROR)
+					(OSSteerPlugIn::OSPlayingTeam)AI_ERROR)
 
 			return team;
 		}
 		else
 		{
 			nassertr_always(mPlayingTeam_ser == OSSteerPlugIn::NO_TEAM,
-					(OSSteerPlugIn::OSPlayingTeam)OS_ERROR)
+					(OSSteerPlugIn::OSPlayingTeam)AI_ERROR)
 
 			return OSSteerPlugIn::NO_TEAM;
 		}
 	}
-	return (OSSteerPlugIn::OSPlayingTeam) OS_ERROR;
+	return (OSSteerPlugIn::OSPlayingTeam) AI_ERROR;
 }
 
 /**
@@ -633,7 +638,7 @@ float OSSteerVehicle::get_playing_distance() const
 	{
 		return static_cast<ossup::Player<OSSteerVehicle>*>(mVehicle)->m_distHomeToBall;
 	}
-	return (OSSteerPlugIn::OSPlayingTeam) OS_ERROR;
+	return (OSSteerPlugIn::OSPlayingTeam) AI_ERROR;
 }
 
 /**
@@ -649,7 +654,7 @@ OSSteerVehicle::OSSeekerState OSSteerVehicle::get_seeker_state() const
 		return (OSSteerVehicle::OSSeekerState) static_cast<ossup::CtfSeeker<
 				OSSteerVehicle>*>(mVehicle)->state;
 	}
-	return (OSSteerVehicle::OSSeekerState) OS_ERROR;
+	return (OSSteerVehicle::OSSeekerState) AI_ERROR;
 }
 
 /**
@@ -674,7 +679,7 @@ bool OSSteerVehicle::get_incremental_steering() const
 {
 	return (mVehicleType == MAP_DRIVER) ?
 			static_cast<ossup::MapDriver<OSSteerVehicle>*>(mVehicle)->incrementalSteering :
-			OS_ERROR;
+			AI_ERROR;
 }
 
 /**
@@ -720,7 +725,7 @@ OSSteerPlugIn::OSMapPredictionType OSSteerVehicle::get_map_prediction_type() con
 			return OSSteerPlugIn::LINEAR_PREDICTION;
 		}
 	}
-	return (OSSteerPlugIn::OSMapPredictionType) OS_ERROR;
+	return (OSSteerPlugIn::OSMapPredictionType) AI_ERROR;
 }
 
 /**
@@ -744,7 +749,7 @@ float OSSteerVehicle::get_steering_speed() const
 {
 	return mVehicleType == LOW_SPEED_TURN ?
 			static_cast<ossup::LowSpeedTurn<OSSteerVehicle>*>(mVehicle)->steeringSpeed :
-			OS_ERROR;
+			AI_ERROR;
 }
 
 /**
@@ -770,7 +775,7 @@ bool OSSteerVehicle::get_reverse_at_end_point() const
 {
 	return (mVehicleType == PEDESTRIAN) ?
 			static_cast<ossup::Pedestrian<OSSteerVehicle>*>(mVehicle)->useDirectedPathFollowing :
-			OS_ERROR;
+			AI_ERROR;
 }
 
 /**
@@ -794,7 +799,7 @@ bool OSSteerVehicle::get_wander_behavior() const
 {
 	return (mVehicleType == PEDESTRIAN) ?
 			static_cast<ossup::Pedestrian<OSSteerVehicle>*>(mVehicle)->wanderSwitch :
-			OS_ERROR;
+			AI_ERROR;
 }
 
 /**
@@ -888,7 +893,7 @@ void OSSteerVehicle::set_pathway_direction(OSPathDirection direction)
  */
 OSSteerVehicle::OSPathDirection OSSteerVehicle::get_pathway_direction() const
 {
-	OSPathDirection result = (OSPathDirection) OS_ERROR;
+	OSPathDirection result = (OSPathDirection) AI_ERROR;
 	if (mVehicleType == PEDESTRIAN)
 	{
 		ossup::Pedestrian<OSSteerVehicle>* vehicle =
@@ -989,7 +994,7 @@ void OSSteerVehicle::do_update_steer_vehicle(const float currentTime,
 	if ((mMovType == OPENSTEER_KINEMATIC) && (mVehicle->speed() > 0.0))
 	{
 		// get steer manager
-		WPT(OSSteerManager)steerMgr = OSSteerManager::get_global_ptr();
+		WPT(AIManager)steerMgr = AIManager::get_global_ptr();
 		// correct panda's Z: set the collision ray origin wrt collision root
 		LPoint3f pOrig = steerMgr->get_collision_root().get_relative_point(
 				mReferenceNP, updatedPos) + mHeigthCorrection * 2.0;
@@ -1652,14 +1657,14 @@ void OSSteerVehicle::finalize(BamReader *manager)
  */
 TypedWritable *OSSteerVehicle::make_from_bam(const FactoryParams &params)
 {
-	// return NULL if OSSteerManager if doesn't exist
-	nassertr_always(OSSteerManager::get_global_ptr(), NULL)
+	// return NULL if AIManager if doesn't exist
+	nassertr_always(AIManager::get_global_ptr(), NULL)
 
 	// create a OSSteerVehicle with default parameters' values: they'll be restored later
-	OSSteerManager::get_global_ptr()->set_parameters_defaults(
-			OSSteerManager::STEERVEHICLE);
+	AIManager::get_global_ptr()->set_parameters_defaults(
+			AIManager::STEERVEHICLE);
 	OSSteerVehicle *node = DCAST(OSSteerVehicle,
-			OSSteerManager::get_global_ptr()->create_steer_vehicle(
+			AIManager::get_global_ptr()->create_steer_vehicle(
 					"SteerVehicle").node());
 
 	DatagramIterator scan;
