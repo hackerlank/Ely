@@ -11,11 +11,11 @@
 #include <rnNavMesh.h>
 #include <rnCrowdAgent.h>
 
-#include "data.h"
+extern string dataDir;
 
 ///global data
-PandaFramework framework;
-WindowFramework *window;
+extern PandaFramework framework;
+extern WindowFramework *window;
 PT(RNCrowdAgent)crowdAgent;
 
 ClockObject* globalClock = NULL;

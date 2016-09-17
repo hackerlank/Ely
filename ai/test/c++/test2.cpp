@@ -1,7 +1,7 @@
 /**
- * \file main.cpp
+ * \file test2.cpp
  *
- * \date 2016-03-30
+ * \date 2016-09-17
  * \author consultit
  */
 
@@ -16,7 +16,7 @@
 #include <random>
 #include <bamFile.h>
 
-#include "data.h"
+extern string dataDir;
 
 ///functions' declarations
 void loadAllScene();
@@ -24,24 +24,24 @@ void restoreAllScene();
 NodePath getOwnerModel();
 void getAgentModelAnims();
 bool readFromBamFile(string);
-void writeToBamFileAndExit(const Event*, void*);
-void printCreationParameters();
+void writeToBamFileAndExit2(const Event*, void*);
+void printCreationParameters2();
 void setParametersBeforeCreation();
-void toggleDebugDraw(const Event*, void*);
+void toggleDebugDraw2(const Event*, void*);
 void toggleSetupCleanup(const Event*, void*);
 void handleCrowdAgentEvent(const Event*, void*);
 void placeCrowdAgents(const Event*, void*);
 void setMoveTarget(const Event*, void*);
-void handleObstacles(const Event*, void*);
-AsyncTask* updateTask;
+void handleObstacles2(const Event*, void*);
+AsyncTask* updateTask2;
 AsyncTask::DoneStatus updateNavMesh(GenericAsyncTask*, void*);
 LPoint3f getRandomPos(NodePath);
 PT(CollisionEntry)getCollisionEntryFromCamera();
 
 ///global data
-PandaFramework framework;
-WindowFramework *window;
-CollideMask mask = BitMask32(0x10);
+extern PandaFramework framework;
+extern WindowFramework *window;
+extern CollideMask mask;
 PT(RNNavMesh)navMesh;
 const int NUMAGENTS = 2;
 PT(RNCrowdAgent)crowdAgent[2];
@@ -57,11 +57,11 @@ string agentAnimFiles[2][2] =
 const float rateFactor = 1.50;
 PT(AnimControl)agentAnimCtls[2][2];
 //obstacle model
-string obstacleFile("plants2.egg");
+extern string obstacleFile;
 //bame file
-string bamFileName("nav_mesh.boo");
+string bamFileName2("nav_mesh.boo");
 //support
-random_device rd;
+extern random_device rd;
 
 int main(int argc, char *argv[])
 {
@@ -109,7 +109,7 @@ int main(int argc, char *argv[])
 
 	// print creation parameters: defult values
 	cout << endl << "Default creation parameters:";
-	printCreationParameters();
+	printCreationParameters2();
 
 	// set creation parameters as strings before nav meshes/crowd agent creation
 	cout << endl << "Current creation parameters:";
@@ -139,9 +139,9 @@ int main(int argc, char *argv[])
 ///	navMesMgr->start_default_update();
 
 /// second option: start a path finding custom update task
-	updateTask = new GenericAsyncTask("updateNavMesh", &updateNavMesh,
+	updateTask2 = new GenericAsyncTask("updateNavMesh", &updateNavMesh,
 			(void*) navMesh.p());
-	framework.get_task_mgr().add(updateTask);
+	framework.get_task_mgr().add(updateTask2);
 
 	// DEBUG DRAWING
 	// make the debug reference node path sibling of the reference node
@@ -153,7 +153,7 @@ int main(int argc, char *argv[])
 	/// set events' callbacks
 	// toggle debug draw
 	bool toggleDebugFlag = false;
-	framework.define_key("d", "toggleDebugDraw", &toggleDebugDraw,
+	framework.define_key("d", "toggleDebugDraw2", &toggleDebugDraw2,
 			(void*) &toggleDebugFlag);
 
 	// toggle setup (true) and cleanup (false)
@@ -177,18 +177,18 @@ int main(int argc, char *argv[])
 
 	// handle obstacle addition
 	bool TRUE = true;
-	framework.define_key("o", "addObstacle", &handleObstacles, (void*) &TRUE);
+	framework.define_key("o", "addObstacle", &handleObstacles2, (void*) &TRUE);
 
 	// handle obstacle removal
 	bool FALSE = false;
-	framework.define_key("shift-o", "removeObstacle", &handleObstacles,
+	framework.define_key("shift-o", "removeObstacle", &handleObstacles2,
 			(void*) &FALSE);
 
 	// write to bam file on exit
 	window->get_graphics_window()->set_close_request_event(
 			"close_request_event");
 	framework.define_key("close_request_event", "writeToBamFile",
-			&writeToBamFileAndExit, (void*) &bamFileName);
+			&writeToBamFileAndExit2, (void*) &bamFileName2);
 
 	// place camera trackball (local coordinate)
 	PT(Trackball)trackball = DCAST(Trackball, window->get_mouse().find("**/+Trackball").node());
@@ -329,19 +329,13 @@ void getAgentModelAnims()
 	}
 }
 
-// read scene from a file
-bool readFromBamFile(string fileName)
-{
-	return AIManager::get_global_ptr()->read_from_bam_file(fileName);
-}
-
 // write scene to a file (and exit)
-void writeToBamFileAndExit(const Event* e, void* data)
+void writeToBamFileAndExit2(const Event* e, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
 	AIManager::get_global_ptr()->write_to_bam_file(fileName);
-	/// second option: remove custom update updateTask
-	framework.get_task_mgr().remove(updateTask);
+	/// second option: remove custom update updateTask2
+	framework.get_task_mgr().remove(updateTask2);
 	// delete nav mesh manager
 	delete AIManager::get_global_ptr();
 	// close the window framework
@@ -351,7 +345,7 @@ void writeToBamFileAndExit(const Event* e, void* data)
 }
 
 // print creation parameters
-void printCreationParameters()
+void printCreationParameters2()
 {
 	AIManager* navMesMgr = AIManager::get_global_ptr();
 	//
@@ -418,11 +412,11 @@ void setParametersBeforeCreation()
 	navMesMgr->set_parameter_values(AIManager::CROWDAGENT,
 			"thrown_events", valueList);
 	//
-	printCreationParameters();
+	printCreationParameters2();
 }
 
 // toggle debug draw
-void toggleDebugDraw(const Event* e, void* data)
+void toggleDebugDraw2(const Event* e, void* data)
 {
 	if(not navMesh->is_setup())
 	{
@@ -444,13 +438,13 @@ void toggleSetupCleanup(const Event* e, void* data)
 		navMesh->setup();
 		navMesh->enable_debug_drawing(window->get_camera_group());
 		//
-		updateTask = new GenericAsyncTask("updateNavMesh", &updateNavMesh,
+		updateTask2 = new GenericAsyncTask("updateNavMesh", &updateNavMesh,
 				(void*) navMesh.p());
-		framework.get_task_mgr().add(updateTask);
+		framework.get_task_mgr().add(updateTask2);
 	}
 	else
 	{
-		framework.get_task_mgr().remove(updateTask);
+		framework.get_task_mgr().remove(updateTask2);
 		// false: cleanup
 		navMesh->cleanup();
 	}
@@ -481,43 +475,6 @@ void placeCrowdAgents(const Event* e, void* data)
 	}
 }
 
-// throws a ray and returns the first collision entry or nullptr
-PT(CollisionEntry)getCollisionEntryFromCamera()
-{
-	// get nav mesh manager
-	AIManager* navMeshMgr = AIManager::get_global_ptr();
-	// get the mouse watcher
-	PT(MouseWatcher)mwatcher = DCAST(MouseWatcher, window->get_mouse().node());
-	if (mwatcher->has_mouse())
-	{
-		// Get to and from pos in camera coordinates
-		LPoint2f pMouse = mwatcher->get_mouse();
-		//
-		LPoint3f pFrom, pTo;
-		NodePath mCamera = window->get_camera_group();
-		PT(Lens)mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
-		if (mCamLens->extrude(pMouse, pFrom, pTo))
-		{
-			// Transform to global coordinates
-			pFrom = window->get_render().get_relative_point(mCamera,
-					pFrom);
-			pTo = window->get_render().get_relative_point(mCamera, pTo);
-			LVector3f direction = (pTo - pFrom).normalized();
-			navMeshMgr->get_collision_ray()->set_origin(pFrom);
-			navMeshMgr->get_collision_ray()->set_direction(direction);
-			navMeshMgr->get_collision_traverser()->traverse(window->get_render());
-			// check collisions
-			if (navMeshMgr->get_collision_handler()->get_num_entries() > 0)
-			{
-				// Get the closest entry
-				navMeshMgr->get_collision_handler()->sort_entries();
-				return navMeshMgr->get_collision_handler()->get_entry(0);
-			}
-		}
-	}
-	return nullptr;
-}
-
 // handle set move target
 void setMoveTarget(const Event* e, void* data)
 {
@@ -532,7 +489,7 @@ void setMoveTarget(const Event* e, void* data)
 }
 
 // handle add/remove obstacles
-void handleObstacles(const Event* e, void* data)
+void handleObstacles2(const Event* e, void* data)
 {
 	if(not navMesh->is_setup())
 	{
@@ -646,33 +603,4 @@ AsyncTask::DoneStatus updateNavMesh(GenericAsyncTask* task, void* data)
 	}
 	//
 	return AsyncTask::DS_cont;
-}
-
-// return a random point on the facing upwards surface of the model
-LPoint3f getRandomPos(NodePath modelNP)
-{
-	// collisions are made wrt render
-	AIManager* navMeshMgr = AIManager::get_global_ptr();
-	// get the bounding box of scene
-	LVecBase3f modelDims;
-	LVector3f modelDeltaCenter;
-	// modelRadius not used
-	navMeshMgr->get_bounding_dimensions(modelNP, modelDims, modelDeltaCenter);
-	// throw a ray downward from a point with z = double scene's height
-	// and x,y randomly within the scene's (x,y) plane
-	float x, y = 0.0;
-	Pair<bool,float> gotCollisionZ;
-	// set the ray origin at double of maximum height of the model
-	float zOrig = ((-modelDeltaCenter.get_z() + modelDims.get_z() / 2.0)
-			+ modelNP.get_z()) * 2.0;
-	do
-	{
-		x = modelDims.get_x() * ((float) rd() / (float) rd.max() - 0.5)
-				- modelDeltaCenter.get_x() + modelNP.get_x();
-		y = modelDims.get_y() * ((float) rd() / (float) rd.max() - 0.5)
-				- modelDeltaCenter.get_y() + modelNP.get_y();
-		gotCollisionZ = navMeshMgr->get_collision_height(LPoint3f(x, y, zOrig));
-
-	} while (not gotCollisionZ.get_first());
-	return LPoint3f(x, y, gotCollisionZ.get_second());
 }

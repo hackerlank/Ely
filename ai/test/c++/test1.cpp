@@ -12,17 +12,17 @@
 #include <rnCrowdAgent.h>
 #include <mouseWatcher.h>
 
-#include "data.h"
+extern string dataDir;
 
 ///global data
-PandaFramework framework;
-WindowFramework *window;
-CollideMask mask = BitMask32(0x10);
+extern PandaFramework framework;
+extern WindowFramework *window;
+extern CollideMask mask;
 PT(RNNavMesh)navMesh;
 PT(RNCrowdAgent)crowdAgent;
 NodePath sceneNP;
 bool setupCleanupFlag = true;
-bool toggleDebugFlag = false;
+extern bool toggleDebugFlag;
 float maxVel = 3.5;
 bool resetVel = true;
 int query = 0;
@@ -41,7 +41,7 @@ void addLink(const Event*, void*);
 void removeLink(const Event*, void*);
 void enableDisableArea(const Event*, void* data);
 void enableDisableLink(const Event*, void* data);
-void toggleDebugDraw(const Event*, void*);
+void toggleDebugDraw1(const Event*, void*);
 void toggleSetupCleanup(const Event*, void*);
 void placeCrowdAgent(const Event*, void*);
 void setMoveTarget(const Event*, void*);
@@ -144,7 +144,7 @@ int main(int argc, char *argv[])
 			(void*) &setupCleanupFlag);
 
 	// toggle debug draw
-	framework.define_key("d", "toggleDebugDraw", &toggleDebugDraw,
+	framework.define_key("d", "toggleDebugDraw1", &toggleDebugDraw1,
 			(void*) &toggleDebugFlag);
 
 	// place crowd agent
@@ -486,45 +486,8 @@ void enableDisableLink(const Event*, void* data)
 	}
 }
 
-// throws a ray and returns the first collision entry or nullptr
-PT(CollisionEntry)getCollisionEntryFromCamera()
-{
-	// get nav mesh manager
-	AIManager* navMeshMgr = AIManager::get_global_ptr();
-	// get the mouse watcher
-	PT(MouseWatcher)mwatcher = DCAST(MouseWatcher, window->get_mouse().node());
-	if (mwatcher->has_mouse())
-	{
-		// Get to and from pos in camera coordinates
-		LPoint2f pMouse = mwatcher->get_mouse();
-		//
-		LPoint3f pFrom, pTo;
-		NodePath mCamera = window->get_camera_group();
-		PT(Lens)mCamLens = DCAST(Camera, mCamera.get_child(0).node())->get_lens();
-		if (mCamLens->extrude(pMouse, pFrom, pTo))
-		{
-			// Transform to global coordinates
-			pFrom = window->get_render().get_relative_point(mCamera,
-					pFrom);
-			pTo = window->get_render().get_relative_point(mCamera, pTo);
-			LVector3f direction = (pTo - pFrom).normalized();
-			navMeshMgr->get_collision_ray()->set_origin(pFrom);
-			navMeshMgr->get_collision_ray()->set_direction(direction);
-			navMeshMgr->get_collision_traverser()->traverse(window->get_render());
-			// check collisions
-			if (navMeshMgr->get_collision_handler()->get_num_entries() > 0)
-			{
-				// Get the closest entry
-				navMeshMgr->get_collision_handler()->sort_entries();
-				return navMeshMgr->get_collision_handler()->get_entry(0);
-			}
-		}
-	}
-	return nullptr;
-}
-
 // toggle debug draw
-void toggleDebugDraw(const Event* e, void* data)
+void toggleDebugDraw1(const Event* e, void* data)
 {
 	bool* toggleDebugFlag = reinterpret_cast<bool*>(data);
 	if (navMesh->toggle_debug_drawing(*toggleDebugFlag) >= 0)

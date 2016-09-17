@@ -22,16 +22,17 @@ noinst_PROGRAMS = os_basic os_callback_test rn_basic rn_callback_test test1 test
 	low_speed_turn pedestrian boid multiple_pursuit capture_the_flag map_drive \
 	pedestrian_external soccer #soccer_gprof soccer_gcov
 
-BUILT_SOURCES = data.h
+BUILT_SOURCES = data.cpp
 
 substDataDir = sed -e 's|@sampledatadir[@]|$(srcdir)/../data|g'
 
-data.h: $(srcdir)/data.h.in Makefile
+data.cpp: $(srcdir)/data.cpp.in Makefile
 	$(substDataDir) $(srcdir)/$@.in > $@
 	
-EXTRA_DIST = data.h.in
+EXTRA_DIST = data.cpp.in
 
 common_sources = \
+	data.cpp \
 	$(srcdir)/../../source/aiManager.cxx \
 	$(srcdir)/../../source/aiTools.cxx \
 	$(srcdir)/../../source/rnCrowdAgent.cxx \
@@ -211,4 +212,4 @@ soccer_gcov_SOURCES = \
 nodist_soccer_gprof_SOURCES = $(common_sources)
 nodist_soccer_gcov_SOURCES = $(common_sources)
 
-CLEANFILES = data.h
+CLEANFILES = data.cpp

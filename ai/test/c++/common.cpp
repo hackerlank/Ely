@@ -8,12 +8,9 @@
 #include "common.h"
 
 ///global data
-#include "data.h"
-PandaFramework framework;
-WindowFramework *window;
-CollideMask mask = BitMask32(0x10);
+extern CollideMask mask;
 AsyncTask* updateTask;
-bool toggleDebugFlag = false;
+extern bool toggleDebugFlag;
 static GeoMipTerrain* terrain;
 static LPoint3f terrainRootNetPos;
 #define DEFAULT_MAXVALUE 1.0
@@ -162,8 +159,8 @@ NodePath loadTerrain(const string& name, float widthScale, float heightScale)
 // throws a ray and returns the first collision entry or nullptr
 PT(CollisionEntry)getCollisionEntryFromCamera()
 {
-	// get steer manager
-	AIManager* steerMgr = AIManager::get_global_ptr();
+	// get ai manager
+	AIManager* aiMgr = AIManager::get_global_ptr();
 	// get the mouse watcher
 	PT(MouseWatcher)mwatcher = DCAST(MouseWatcher, window->get_mouse().node());
 	if (mwatcher->has_mouse())
@@ -181,15 +178,15 @@ PT(CollisionEntry)getCollisionEntryFromCamera()
 					pFrom);
 			pTo = window->get_render().get_relative_point(mCamera, pTo);
 			LVector3f direction = (pTo - pFrom).normalized();
-			steerMgr->get_collision_ray()->set_origin(pFrom);
-			steerMgr->get_collision_ray()->set_direction(direction);
-			steerMgr->get_collision_traverser()->traverse(window->get_render());
+			aiMgr->get_collision_ray()->set_origin(pFrom);
+			aiMgr->get_collision_ray()->set_direction(direction);
+			aiMgr->get_collision_traverser()->traverse(window->get_render());
 			// check collisions
-			if (steerMgr->get_collision_handler()->get_num_entries() > 0)
+			if (aiMgr->get_collision_handler()->get_num_entries() > 0)
 			{
 				// Get the closest entry
-				steerMgr->get_collision_handler()->sort_entries();
-				return steerMgr->get_collision_handler()->get_entry(0);
+				aiMgr->get_collision_handler()->sort_entries();
+				return aiMgr->get_collision_handler()->get_entry(0);
 			}
 		}
 	}
@@ -307,12 +304,12 @@ void changeVehicleMaxForce(const Event* e, void* data)
 LPoint3f getRandomPos(NodePath modelNP)
 {
 	// collisions are made wrt render
-	AIManager* steerMgr = AIManager::get_global_ptr();
+	AIManager* aiMgr = AIManager::get_global_ptr();
 	// get the bounding box of scene
 	LVecBase3f modelDims;
 	LVector3f modelDeltaCenter;
 	// modelRadius not used
-	steerMgr->get_bounding_dimensions(modelNP, modelDims, modelDeltaCenter);
+	aiMgr->get_bounding_dimensions(modelNP, modelDims, modelDeltaCenter);
 	// throw a ray downward from a point with z = double scene's height
 	// and x,y randomly within the scene's (x,y) plane
 	float x, y = 0.0;
@@ -326,7 +323,7 @@ LPoint3f getRandomPos(NodePath modelNP)
 				- modelDeltaCenter.get_x() + modelNP.get_x();
 		y = modelDims.get_y() * ((float) rd() / (float) rd.max() - 0.5)
 				- modelDeltaCenter.get_y() + modelNP.get_y();
-		gotCollisionZ = steerMgr->get_collision_height(LPoint3f(x, y, zOrig));
+		gotCollisionZ = aiMgr->get_collision_height(LPoint3f(x, y, zOrig));
 
 	} while (not gotCollisionZ.get_first());
 	return LPoint3f(x, y, gotCollisionZ.get_second());

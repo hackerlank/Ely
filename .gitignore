@@ -30,7 +30,7 @@ linux*/
 basic
 config.log
 config.status
-data.h
+data.cpp
 libtool
 Makefile
 test1
