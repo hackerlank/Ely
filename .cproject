@@ -52,7 +52,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="ai|initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ai"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -126,7 +125,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="ai|initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ai"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="src"/>
@@ -183,7 +181,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="ai|initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ai"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -242,7 +239,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="ai|initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ai"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -312,7 +308,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="ai|initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ai"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
@@ -381,7 +376,6 @@
 					</folderInfo>
 					<sourceEntries>
 						<entry excluding="ai|initializations|training|transitions|callbacks|elygame|include|src|test|tinyxml2" flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name=""/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="ai"/>
 						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="elygame"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="include"/>
 						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
