@@ -10,7 +10,7 @@ from panda3d.core import load_prc_file_data, NodePath, ClockObject, \
                 BitMask32, LVector3f, LVecBase3f, LPoint3f, \
                 AnimControlCollection, auto_bind, TextNode, BamFile, \
                 Filename
-from p3recastnavigation import RNNavMeshManager, RNCrowdAgent, \
+from p3ai import AIManager, RNCrowdAgent, \
                 ValueList_string
 import random, sys
 
@@ -41,7 +41,7 @@ def loadAllScene():
     """load all scene stuff"""
     
     global app, navMesh, crowdAgent, sceneNP, agentNP
-    navMesMgr = RNNavMeshManager.get_global_ptr()
+    navMesMgr = AIManager.get_global_ptr()
     
     # get a sceneNP as owner model
     sceneNP = getOwnerModel()
@@ -74,7 +74,7 @@ def loadAllScene():
             agentType = "recast"
         else:
             agentType = "kinematic"
-        navMesMgr.set_parameter_value(RNNavMeshManager.CROWDAGENT, "mov_type", agentType)
+        navMesMgr.set_parameter_value(AIManager.CROWDAGENT, "mov_type", agentType)
         # create the crowd agent
         crowdAgentNP = navMesMgr.create_crowd_agent("crowdAgent" + str(i))
         crowdAgent[i] = crowdAgentNP.node()
@@ -92,16 +92,16 @@ def restoreAllScene():
     
     global navMesh, crowdAgent, sceneNP, agentAnimCtls
     # restore nav mesh: through nav mesh manager
-    navMesh = RNNavMeshManager.get_global_ptr().get_nav_mesh(0)
+    navMesh = AIManager.get_global_ptr().get_nav_mesh(0)
     # restore sceneNP: through panda3d
-    sceneNP = RNNavMeshManager.get_global_ptr().get_reference_node_path().find("**/Owner")
+    sceneNP = AIManager.get_global_ptr().get_reference_node_path().find("**/Owner")
     # reparent the reference node to render
-    RNNavMeshManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+    AIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
     
     # restore crowd agents
     for i in range(NUMAGENTS):
         # restore the crowd agent: through nav mesh manager
-        crowdAgent[i] = RNNavMeshManager.get_global_ptr().get_crowd_agent(i)
+        crowdAgent[i] = AIManager.get_global_ptr().get_crowd_agent(i)
         # restore animations
         tmpAnims = AnimControlCollection()
         auto_bind(crowdAgent[i], tmpAnims)
@@ -155,51 +155,51 @@ def getAgentModelAnims():
 def readFromBamFile(fileName):
     """read scene from a file"""
     
-    return RNNavMeshManager.get_global_ptr().read_from_bam_file(fileName)
+    return AIManager.get_global_ptr().read_from_bam_file(fileName)
 
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
-    RNNavMeshManager.get_global_ptr().write_to_bam_file(fileName)
+    AIManager.get_global_ptr().write_to_bam_file(fileName)
     #
     sys.exit(0)
 
 def printCreationParameters():
     """print creation parameters"""
     
-    navMesMgr = RNNavMeshManager.get_global_ptr()
+    navMesMgr = AIManager.get_global_ptr()
     #
-    valueList = navMesMgr.get_parameter_name_list(RNNavMeshManager.NAVMESH)
+    valueList = navMesMgr.get_parameter_name_list(AIManager.NAVMESH)
     print("\n" + "RNNavMesh creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               navMesMgr.get_parameter_value(RNNavMeshManager.NAVMESH, name))
+               navMesMgr.get_parameter_value(AIManager.NAVMESH, name))
     #
-    valueList = navMesMgr.get_parameter_name_list(RNNavMeshManager.CROWDAGENT)
+    valueList = navMesMgr.get_parameter_name_list(AIManager.CROWDAGENT)
     print("\n" + "RNCrowdAgent creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               navMesMgr.get_parameter_value(RNNavMeshManager.CROWDAGENT, name))
+               navMesMgr.get_parameter_value(AIManager.CROWDAGENT, name))
 
 def setParametersBeforeCreation():
     """set parameters as strings before nav meshes/crowd agents creation"""
     
-    navMesMgr = RNNavMeshManager.get_global_ptr()
+    navMesMgr = AIManager.get_global_ptr()
     # tweak some nav mesh parameter
-    navMesMgr.set_parameter_value(RNNavMeshManager.NAVMESH, "navmesh_type",
+    navMesMgr.set_parameter_value(AIManager.NAVMESH, "navmesh_type",
             "obstacle")
-    navMesMgr.set_parameter_value(RNNavMeshManager.NAVMESH, "build_all_tiles",
+    navMesMgr.set_parameter_value(AIManager.NAVMESH, "build_all_tiles",
             "true")
-    navMesMgr.set_parameter_value(RNNavMeshManager.NAVMESH, "agent_max_climb",
+    navMesMgr.set_parameter_value(AIManager.NAVMESH, "agent_max_climb",
             "2.5")
-    navMesMgr.set_parameter_value(RNNavMeshManager.NAVMESH, "agent_radius",
+    navMesMgr.set_parameter_value(AIManager.NAVMESH, "agent_radius",
             "1.0");
     # change an area flags cost (tricky because multi-valued)
-    valueList = navMesMgr.get_parameter_values(RNNavMeshManager.NAVMESH,
+    valueList = navMesMgr.get_parameter_values(AIManager.NAVMESH,
             "area_flags_cost")
     valueList.remove_value("1@0x02@10.0")
     valueList.add_value("1@0x02@100.0")
-    navMesMgr.set_parameter_values(RNNavMeshManager.NAVMESH, "area_flags_cost",
+    navMesMgr.set_parameter_values(AIManager.NAVMESH, "area_flags_cost",
             valueList)
 
     valueList = ValueList_string()
@@ -207,19 +207,19 @@ def setParametersBeforeCreation():
     valueList.add_value("31.6,24.5,-2.0:20.2,9.4,-2.4@true")
     valueList.add_value("21.1,-4.5,-2.4:32.3,-3.0,-1.5@true")
     valueList.add_value("1.2,-13.1,15.2:11.8,-18.3,10.0@true")
-    navMesMgr.set_parameter_values(RNNavMeshManager.NAVMESH,
+    navMesMgr.set_parameter_values(AIManager.NAVMESH,
             "offmesh_connection", valueList)
     # set some convex volumes: "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type"
     valueList.clear()
     valueList.add_value(
             "-15.2,-22.9,-2.4:-13.4,-22.6,-2.4:-13.1,-26.5,-2.4:-16.4,-26.4,-2.7@1")
-    navMesMgr.set_parameter_values(RNNavMeshManager.NAVMESH, "convex_volume",
+    navMesMgr.set_parameter_values(AIManager.NAVMESH, "convex_volume",
             valueList)
 
     # set crowd agent throwing events
     valueList.clear()
     valueList.add_value("move@move-event@0.5")
-    navMesMgr.set_parameter_values(RNNavMeshManager.CROWDAGENT,
+    navMesMgr.set_parameter_values(AIManager.CROWDAGENT,
             "thrown_events", valueList)
     #
     printCreationParameters()
@@ -275,7 +275,7 @@ def getCollisionEntryFromCamera():
     
     global app
     # get nav mesh manager
-    navMeshMgr = RNNavMeshManager.get_global_ptr()
+    navMeshMgr = AIManager.get_global_ptr()
     # get the mouse watcher
     mwatcher = app.mouseWatcherNode
     if mwatcher.has_mouse():
@@ -392,7 +392,7 @@ def getRandomPos(modelNP):
     """return a random point on the facing upwards surface of the model"""
     
     # collisions are made wrt render
-    navMeshMgr = RNNavMeshManager.get_global_ptr()
+    navMeshMgr = AIManager.get_global_ptr()
     # get the bounding box of scene
     modelDims, modelDeltaCenter = (LVecBase3f(), LVector3f())
     # modelRadius not used
@@ -434,7 +434,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a nav mesh manager; set root and mask to manage 'kinematic' agents
-    navMesMgr = RNNavMeshManager(app.render, mask)
+    navMesMgr = AIManager(app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")

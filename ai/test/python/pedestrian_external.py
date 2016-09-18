@@ -6,7 +6,7 @@ Created on Aug 19, 2016
 
 from panda3d.core import TextNode, ClockObject, AnimControlCollection, \
         auto_bind, LPoint3f, LVecBase3f, PartGroup, LVector3f
-from p3opensteer import OSSteerManager, ValueList_string, ValueList_LPoint3f, \
+from p3ai import AIManager, ValueList_string, ValueList_LPoint3f, \
         ValueList_float
 #
 from common import startFramework, toggleDebugFlag, toggleDebugDraw, mask, \
@@ -38,14 +38,14 @@ rightMoveStop = -4
 def setParametersBeforeCreation():
     """set parameters as strings before plug-ins/vehicles creation"""
     
-    steerMgr = OSSteerManager.get_global_ptr()
+    steerMgr = AIManager.get_global_ptr()
     valueList = ValueList_string()
     # set vehicle's mass, speed
-    steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE, "external_update", 
+    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "external_update", 
             "false")
-    steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE, "mass",
+    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "mass",
             "2.0")
-    steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE, "speed",
+    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "speed",
             "0.01")
 
     # set vehicle throwing events
@@ -53,7 +53,7 @@ def setParametersBeforeCreation():
     valueList.add_value("avoid_obstacle@avoid_obstacle@1.0:"
             "avoid_close_neighbor@avoid_close_neighbor@1.0:"
             "avoid_neighbor@avoid_neighbor@1.0")
-    steerMgr.set_parameter_values(OSSteerManager.STEERVEHICLE,
+    steerMgr.set_parameter_values(AIManager.STEERVEHICLE,
             "thrown_events", valueList)
     #
     printCreationParameters()
@@ -102,7 +102,7 @@ def updatePlugIn(steerPlugIn, task):
     # make playerNP kinematic (ie stand on floor)
     if playerNP.node().get_speed() > 0.0:
         # get steer manager
-        steerMgr = OSSteerManager.get_global_ptr()
+        steerMgr = AIManager.get_global_ptr()
         # correct panda's Z: set the collision ray origin wrt collision root
         pOrig = steerMgr.get_collision_root().get_relative_point(
                 steerMgr.get_reference_node_path(), playerNP.get_pos()) + playerHeightRayCast * 2.0
@@ -152,7 +152,7 @@ def getPlayerModelAnims(name, scale, vehicleFileIdx, steerPlugIn,
         vehicleAnimNP[0].reparent_to(vehicleNP)
         vehicleAnimNP[1].reparent_to(vehicleNP)
     #
-    steerMgr = OSSteerManager.get_global_ptr()
+    steerMgr = AIManager.get_global_ptr()
     # create the steer vehicle (attached to the reference node)
     # note: vehicle's move type is ignored
     steerVehicleNP = steerMgr.create_steer_vehicle("PlayerVehicle")
@@ -217,7 +217,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a steer manager set root and mask to manage 'kinematic' vehicles
-    steerMgr = OSSteerManager(app.render, mask)
+    steerMgr = AIManager(app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")
@@ -240,15 +240,15 @@ if __name__ == '__main__':
         sceneNP.set_collide_mask(mask)
 
         # set plug-in type and create it (attached to the reference node)
-        steerMgr.set_parameter_value(OSSteerManager.STEERPLUGIN, "plugin_type",
+        steerMgr.set_parameter_value(AIManager.STEERPLUGIN, "plugin_type",
                 "pedestrian")
         plugInNP = steerMgr.create_steer_plug_in()
         steerPlugIn = plugInNP.node()
         
         # set player's creation parameters as string: type and externally updated
-        steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE,
+        steerMgr.set_parameter_value(AIManager.STEERVEHICLE,
                 "vehicle_type", "pedestrian")
-        steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE,
+        steerMgr.set_parameter_value(AIManager.STEERVEHICLE,
                 "external_update", "true")
         # add the player and set a reference to it
         playerNP = getPlayerModelAnims("PlayerNP", 0.8, 0, steerPlugIn,
@@ -277,24 +277,24 @@ if __name__ == '__main__':
     else:
         # valid bamFile
         # restore plug-in: through steer manager
-        steerPlugIn = OSSteerManager.get_global_ptr().get_steer_plug_in(0)
+        steerPlugIn = AIManager.get_global_ptr().get_steer_plug_in(0)
         # restore sceneNP: through panda3d
-        sceneNP = OSSteerManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
+        sceneNP = AIManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
         # reparent the reference node to render
-        OSSteerManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+        AIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
 
         # restore the player's reference
-        playerNP = OSSteerManager.get_global_ptr().get_reference_node_path().find(
+        playerNP = AIManager.get_global_ptr().get_reference_node_path().find(
                 "**/PlayerNP")
     
         # restore all steer vehicles (including the player)
-        NUMVEHICLES = OSSteerManager.get_global_ptr().get_num_steer_vehicles()
+        NUMVEHICLES = AIManager.get_global_ptr().get_num_steer_vehicles()
         tmpList = [None for i in range(NUMVEHICLES)]
         steerVehicles.extend(tmpList)
         vehicleAnimCtls.extend(tmpList)
         for i in range(NUMVEHICLES):
             # restore the steer vehicle: through steer manager
-            steerVehicles[i] = OSSteerManager.get_global_ptr().get_steer_vehicle(i)
+            steerVehicles[i] = AIManager.get_global_ptr().get_steer_vehicle(i)
             # restore animations
             tmpAnims = AnimControlCollection()
             auto_bind(steerVehicles[i], tmpAnims)
@@ -304,9 +304,9 @@ if __name__ == '__main__':
 
         # set creation parameters as strings before other plug-ins/vehicles creation
         print("\n" + "Current creation parameters:")
-        steerMgr.set_parameter_value(OSSteerManager.STEERPLUGIN, "plugin_type",
+        steerMgr.set_parameter_value(AIManager.STEERPLUGIN, "plugin_type",
                 "pedestrian")
-        steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE,
+        steerMgr.set_parameter_value(AIManager.STEERVEHICLE,
                 "vehicle_type", "pedestrian")
         setParametersBeforeCreation()
 

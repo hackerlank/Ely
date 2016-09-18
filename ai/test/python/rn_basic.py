@@ -5,7 +5,7 @@ Created on Mar 24, 2016
 '''
 
 import panda3d.core
-from p3recastnavigation import RNNavMeshManager, RNNavMesh
+from p3ai import AIManager, RNNavMesh
 from panda3d.core import load_prc_file_data, LPoint3f
 from direct.showbase.ShowBase import ShowBase
 
@@ -25,7 +25,7 @@ if __name__ == '__main__':
        
     # # here is room for your own code
     print("create a nav mesh manager")
-    navMesMgr = RNNavMeshManager()
+    navMesMgr = AIManager()
 
     print("reparent the reference node to render")
     navMesMgr.get_reference_node_path().reparent_to(app.render)

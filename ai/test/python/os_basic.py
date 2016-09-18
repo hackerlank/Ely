@@ -5,7 +5,7 @@ Created on Jun 18, 2016
 '''
 
 import panda3d.core
-from p3opensteer import OSSteerManager
+from p3ai import AIManager
 from panda3d.core import LPoint3f
 #
 from common import app, startFramework, dataDir, getCollisionEntryFromCamera, \
@@ -18,7 +18,7 @@ if __name__ == '__main__':
     # # here is room for your own code
     
     print("create a steer manager; set root and mask to manage 'kinematic' vehicles")
-    steerMgr = OSSteerManager(app.render, mask)
+    steerMgr = AIManager(app.render, mask)
 
     print("reparent the reference node to render")
     steerMgr.get_reference_node_path().reparent_to(app.render)

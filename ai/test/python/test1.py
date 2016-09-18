@@ -5,7 +5,7 @@ Created on Mar 24, 2016
 '''
 
 import panda3d.core
-from p3recastnavigation import RNNavMeshManager, RNNavMesh, ValueList_LPoint3f
+from p3ai import AIManager, RNNavMesh, ValueList_LPoint3f
 from panda3d.core import load_prc_file_data, LPoint3f, BitMask32, NodePath, \
                 LVecBase4f, TextNode
 from direct.showbase.ShowBase import ShowBase
@@ -107,15 +107,15 @@ def addArea(data):
         addPoint = data
         point = entry0.get_surface_point(NodePath())
         if addPoint:
-            RNNavMeshManager.get_global_ptr().debug_draw_reset()
+            AIManager.get_global_ptr().debug_draw_reset(AIManager.RN_POINTS)
             # add to list
             areaPointList.add_value(point)
-            RNNavMeshManager.get_global_ptr().debug_draw_primitive(
-                    RNNavMeshManager.POINTS, areaPointList,
+            AIManager.get_global_ptr().debug_draw_primitive(
+                    AIManager.RN_POINTS, areaPointList,
                     LVecBase4f(1.0, 0.0, 0.0, 1.0), 4.0)
             print(point)
         else:
-            RNNavMeshManager.get_global_ptr().debug_draw_reset()
+            AIManager.get_global_ptr().debug_draw_reset(AIManager.RN_POINTS)
             # add last point to list
             areaPointList.add_value(point)
             print(point)
@@ -153,15 +153,15 @@ def addLink():
     if entry0:
         point = entry0.get_surface_point(NodePath())
         if linkPointPair.get_num_values() == 0:
-            RNNavMeshManager.get_global_ptr().debug_draw_reset()
+            AIManager.get_global_ptr().debug_draw_reset(AIManager.RN_POINTS)
             # add start point to list
             linkPointPair.add_value(point)
-            RNNavMeshManager.get_global_ptr().debug_draw_primitive(
-                    RNNavMeshManager.POINTS, linkPointPair,
+            AIManager.get_global_ptr().debug_draw_primitive(
+                    AIManager.RN_POINTS, linkPointPair,
                     LVecBase4f(0.0, 0.0, 1.0, 1.0), 4.0)
             print(point)
         else:
-            RNNavMeshManager.get_global_ptr().debug_draw_reset()
+            AIManager.get_global_ptr().debug_draw_reset(AIManager.RN_POINTS)
             # add end point to list
             linkPointPair.add_value(point)
             print(point)
@@ -257,7 +257,7 @@ def getCollisionEntryFromCamera():
     
     global app
     # get nav mesh manager
-    navMeshMgr = RNNavMeshManager.get_global_ptr()
+    navMeshMgr = AIManager.get_global_ptr()
     # get the mouse watcher
     mwatcher = app.mouseWatcherNode
     if mwatcher.has_mouse():
@@ -425,7 +425,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
 
     # create a nav mesh manager
-    navMesMgr = RNNavMeshManager(app.render, mask)
+    navMesMgr = AIManager(app.render, mask)
 
     # reparent the reference node to render
     navMesMgr.get_reference_node_path().reparent_to(app.render)

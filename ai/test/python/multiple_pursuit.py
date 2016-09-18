@@ -6,7 +6,7 @@ Created on Jun 26, 2016
 
 from panda3d.core import TextNode, ClockObject, AnimControlCollection, \
         auto_bind, LPoint3f, LVector3f, LVecBase3f
-from p3opensteer import OSSteerManager, ValueList_string, ValueList_LPoint3f, \
+from p3ai import AIManager, ValueList_string, ValueList_LPoint3f, \
         ValueList_float
 #
 from common import startFramework, toggleDebugFlag, toggleDebugDraw, mask, \
@@ -26,18 +26,18 @@ steerVehicles = []
 def setParametersBeforeCreation():
     """set parameters as strings before plug-ins/vehicles creation"""
     
-    steerMgr = OSSteerManager.get_global_ptr()
+    steerMgr = AIManager.get_global_ptr()
     valueList = ValueList_string()
     # set plug-in type
-    steerMgr.set_parameter_value(OSSteerManager.STEERPLUGIN, "plugin_type",
+    steerMgr.set_parameter_value(AIManager.STEERPLUGIN, "plugin_type",
             "multiple_pursuit")
 
     # set vehicle's max force, max speed, up axis fixed
-    steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE, "max_force",
+    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "max_force",
             "1.0")
-    steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE, "max_speed",
+    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "max_speed",
             "2.0")
-    steerMgr.set_parameter_value(OSSteerManager.STEERVEHICLE, "up_axis_fixed",
+    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "up_axis_fixed",
             "true")
     #
     printCreationParameters()
@@ -80,7 +80,7 @@ def addWanderer(data=None):
         return
 
     # set vehicle's type == mp_wanderer
-    OSSteerManager.get_global_ptr().set_parameter_value(OSSteerManager.STEERVEHICLE, "vehicle_type",
+    AIManager.get_global_ptr().set_parameter_value(AIManager.STEERVEHICLE, "vehicle_type",
             "mp_wanderer")
     # handle vehicle
     handleVehicles(data)
@@ -92,7 +92,7 @@ def addPursuer(data = None):
         return
 
     # set vehicle's type == mp_pursuer
-    OSSteerManager.get_global_ptr().set_parameter_value(OSSteerManager.STEERVEHICLE, "vehicle_type",
+    AIManager.get_global_ptr().set_parameter_value(AIManager.STEERVEHICLE, "vehicle_type",
             "mp_pursuer")
     # handle vehicle
     handleVehicles(data)
@@ -117,7 +117,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a steer manager; set root and mask to manage 'kinematic' vehicles
-    steerMgr = OSSteerManager(app.render, mask)
+    steerMgr = AIManager(app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")
@@ -153,20 +153,20 @@ if __name__ == '__main__':
     else:
         # valid bamFile
         # restore plug-in: through steer manager
-        steerPlugIn = OSSteerManager.get_global_ptr().get_steer_plug_in(0)
+        steerPlugIn = AIManager.get_global_ptr().get_steer_plug_in(0)
         # restore sceneNP: through panda3d
-        sceneNP = OSSteerManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
+        sceneNP = AIManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
         # reparent the reference node to render
-        OSSteerManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+        AIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
     
         # restore steer vehicles
-        NUMVEHICLES = OSSteerManager.get_global_ptr().get_num_steer_vehicles()
+        NUMVEHICLES = AIManager.get_global_ptr().get_num_steer_vehicles()
         tmpList = [None for i in range(NUMVEHICLES)]
         steerVehicles.extend(tmpList)
         vehicleAnimCtls.extend(tmpList)
         for i in range(NUMVEHICLES):
             # restore the steer vehicle: through steer manager
-            steerVehicles[i] = OSSteerManager.get_global_ptr().get_steer_vehicle(i)
+            steerVehicles[i] = AIManager.get_global_ptr().get_steer_vehicle(i)
             # restore animations
             tmpAnims = AnimControlCollection()
             auto_bind(steerVehicles[i], tmpAnims)
