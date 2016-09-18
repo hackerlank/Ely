@@ -616,7 +616,6 @@ void AIManager::set_parameters_defaults(AIType type)
 		///mSteerPlugInsParameterTable must be the first cleared
 		mSteerPlugInsParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		//sets the (mandatory) parameters to their default values:
 		mSteerPlugInsParameterTable.insert(
 				ParameterNameValue("plugin_type", "one_turning"));
 		mSteerPlugInsParameterTable.insert(

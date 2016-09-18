@@ -11,7 +11,7 @@
 ///AIManager inline definitions
 
 /**
- * Returns the reference NodePath. XXX
+ * Returns the reference NodePath.
  */
 INLINE NodePath AIManager::get_reference_node_path() const
 {
@@ -19,7 +19,7 @@ INLINE NodePath AIManager::get_reference_node_path() const
 }
 
 /**
- * Sets the reference NodePath. XXX
+ * Sets the reference NodePath.
  * This is usually called after restoring from a bam file.
  */
 INLINE void AIManager::set_reference_node_path(const NodePath& reference)
@@ -28,7 +28,7 @@ INLINE void AIManager::set_reference_node_path(const NodePath& reference)
 }
 
 /**
- * Returns the reference NodePath for debug drawing. XXX
+ * Returns the reference NodePath for debug drawing.
  * This node should be made sibling of the reference NodePath in the scene.
  */
 INLINE NodePath AIManager::get_reference_node_path_debug() const
@@ -37,7 +37,7 @@ INLINE NodePath AIManager::get_reference_node_path_debug() const
 }
 
 /**
- * Returns the reference NodePath 2D for debug drawing. XXX
+ * Returns the reference NodePath 2D for debug drawing.
  * This node should be a descendant of a 2D top NodePath of the scene graph (ie
  * aspect2d, render2d, pixel2d).
  */

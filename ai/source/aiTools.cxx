@@ -1,5 +1,5 @@
 /**
- * \file osTools.cxx
+ * \file aiTools.cxx
  *
  * \date 2016-09-17
  * \author consultit
@@ -331,7 +331,6 @@ void OSObstacleSettings::output(ostream &out) const
 	out << "radius: " << get_radius() << endl;
 	out << "ref: " << get_ref() << endl;
 }
-
 
 ///NavMeshSettings
 /**

@@ -8,7 +8,6 @@
 #ifndef AITOOLS_I_
 #define AITOOLS_I_
 
-
 ///ValueList
 /**
  *

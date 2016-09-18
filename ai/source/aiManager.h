@@ -1,5 +1,5 @@
 /**
- * \file aiSteerManager.h
+ * \file aiManager.h
  *
  * \date 2016-09-17
  * \author consultit
