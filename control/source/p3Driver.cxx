@@ -317,332 +317,160 @@ P3Driver::~P3Driver()
  * Initializes the P3Driver with starting settings.
  * \note Internal use only.
  */
-bool P3Driver::initialize()
+void P3Driver::do_initialize()
 {
-	bool result = true;
-	//get settings from template
-	//enabling setting
-	mStartEnabled = (
-			mTmpl->parameter(std::string("enabled")) == std::string("false") ?
-					false : true);
-	//inverted setting
+	WPT(ControlManager)mTmpl = ControlManager::get_global_ptr();
+	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
 	mSignOfTranslation = (
-			mTmpl->parameter(std::string("inverted_translation"))
-					== std::string("true") ? -1 : 1);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("inverted_translation"))
+					== string("true") ? -1 : 1);
 	mSignOfMouse = (
-			mTmpl->parameter(std::string("inverted_rotation"))
-					== std::string("true") ? -1 : 1);
-	//head limit: enabled@[limit]
-	std::vector<std::string> paramValuesStr = parseCompoundString(
-			mTmpl->parameter(std::string("head_limit")), '@');
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("inverted_rotation"))
+					== string("true") ? -1 : 1);
+	//head limit: enabled@[limit]; limit >= 0.0
+	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_limit")), '@');
 	if (paramValuesStr.size() >= 2)
 	{
 		//enabled
 		mHeadLimitEnabled = (
-				paramValuesStr[0] == std::string("true") ? true : false);
+				paramValuesStr[0] == string("true") ? true : false);
 		float value;
 		//limit
-		value = strtof(paramValuesStr[1].c_str(), NULL);
+		value = STRTOF(paramValuesStr[1].c_str(), NULL);
 		value >= 0.0 ? mHLimit = value : mHLimit = -value;
 	}
-	//pitch limit: enabled@[limit]
+	//pitch limit: enabled@[limit]; limit >= 0.0
 	paramValuesStr = parseCompoundString(
-			mTmpl->parameter(std::string("pitch_limit")), '@');
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_limit")), '@');
 	if (paramValuesStr.size() >= 2)
 	{
 		//enabled
 		mPitchLimitEnabled = (
-				paramValuesStr[0] == std::string("true") ? true : false);
+				paramValuesStr[0] == string("true") ? true : false);
 		float value;
 		//limit
-		value = strtof(paramValuesStr[1].c_str(), NULL);
+		value = STRTOF(paramValuesStr[1].c_str(), NULL);
 		value >= 0.0 ? mPLimit = value : mPLimit = -value;
 	}
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->parameter(std::string("mouse_enabled_h"))
-					== std::string("true") ? true : false);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_enabled_h"))
+					== string("true") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->parameter(std::string("mouse_enabled_p"))
-					== std::string("true") ? true : false);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_enabled_p"))
+					== string("true") ? true : false);
 	//key events setting
 	//backward key
 	mBackwardKey = (
-			mTmpl->parameter(std::string("backward"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("backward"))
+					== string("disabled") ? false : true);
 	//down key
 	mDownKey = (
-			mTmpl->parameter(std::string("down")) == std::string("disabled") ?
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("down")) == string("disabled") ?
 					false : true);
 	//forward key
 	mForwardKey = (
-			mTmpl->parameter(std::string("forward"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("forward"))
+					== string("disabled") ? false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
-			mTmpl->parameter(std::string("strafe_left"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_left"))
+					== string("disabled") ? false : true);
 	//strafeRight key
 	mStrafeRightKey = (
-			mTmpl->parameter(std::string("strafe_right"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_right"))
+					== string("disabled") ? false : true);
 	//headLeft key
 	mHeadLeftKey = (
-			mTmpl->parameter(std::string("head_left"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_left"))
+					== string("disabled") ? false : true);
 	//headRight key
 	mHeadRightKey = (
-			mTmpl->parameter(std::string("head_right"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_right"))
+					== string("disabled") ? false : true);
 	//pitchUp key
 	mPitchUpKey = (
-			mTmpl->parameter(std::string("pitch_up"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_up"))
+					== string("disabled") ? false : true);
 	//pitchDown key
 	mPitchDownKey = (
-			mTmpl->parameter(std::string("pitch_down"))
-					== std::string("disabled") ? false : true);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_down"))
+					== string("disabled") ? false : true);
 	//up key
 	mUpKey = (
-			mTmpl->parameter(std::string("up")) == std::string("disabled") ?
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("up")) == string("disabled") ?
 					false : true);
-	//mouseMove key
+	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
-			mTmpl->parameter(std::string("mouse_move"))
-					== std::string("enabled") ? true : false);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_move"))
+					== string("enabled") ? true : false);
 	//speedKey
-	mSpeedKey = mTmpl->parameter(std::string("speed_key"));
-	if (not (mSpeedKey == std::string("control")
-			or mSpeedKey == std::string("alt")
-			or mSpeedKey == std::string("shift")))
+	mSpeedKey = mTmpl->get_parameter_value(ControlManager::DRIVER, string("speed_key"));
+	if ((mSpeedKey != string("control")	and (mSpeedKey != string("alt"))))
 	{
-		mSpeedKey = std::string("shift");
+		mSpeedKey = string("shift");
 	}
-
 	//
 	float value, absValue;
-	//max linear speed
-	value = strtof(mTmpl->parameter(std::string("max_linear_speed")).c_str(),
+	//max linear speed (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("max_linear_speed")).c_str(),
 	NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
 	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
 			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
 			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
-	//max angular speed
-	value = strtof(mTmpl->parameter(std::string("max_angular_speed")).c_str(),
+	//max angular speed (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("max_angular_speed")).c_str(),
 	NULL);
 	mMaxSpeedHP = (value >= 0.0 ? value : -value);
 	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
-	//linear accel
-	value = strtof(mTmpl->parameter(std::string("linear_accel")).c_str(), NULL);
+	//linear accel (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("linear_accel")).c_str(), NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
-	//angular accel
-	value = strtof(mTmpl->parameter(std::string("angular_accel")).c_str(),
+	//angular accel (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("angular_accel")).c_str(),
 	NULL);
 	mAccelHP = (value >= 0.0 ? value : -value);
 	//reset actual speeds
 	mActualSpeedXYZ = LVector3f::zero();
 	mActualSpeedH = 0.0;
 	mActualSpeedP = 0.0;
-	//linear friction
-	value = strtof(mTmpl->parameter(std::string("linear_friction")).c_str(),
+	//linear friction (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("linear_friction")).c_str(),
 			NULL);
 	mFrictionXYZ = (value >= 0.0 ? value : -value);
-	//angular friction
-	value = strtof(mTmpl->parameter(std::string("angular_friction")).c_str(),
+	//angular friction (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("angular_friction")).c_str(),
 			NULL);
 	mFrictionHP = (value >= 0.0 ? value : -value);
-	//stop threshold [0.0, 1.0]
-	value = strtof(mTmpl->parameter(std::string("stop_threshold")).c_str(),
+	//stop threshold ([0.0, 1.0])
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("stop_threshold")).c_str(),
 	NULL);
 	mStopThreshold =
 			(value >= 0.0 ? value - floor(value) : ceil(value) - value);
-	//fast factor
-	value = strtof(mTmpl->parameter(std::string("fast_factor")).c_str(),
+	//fast factor (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("fast_factor")).c_str(),
 	NULL);
 	mFastFactor = (value >= 0.0 ? value : -value);
-	//sens x
-	value = strtof(mTmpl->parameter(std::string("sens_x")).c_str(),
+	//sens x (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("sens_x")).c_str(),
 	NULL);
 	mSensX = (value >= 0.0 ? value : -value);
-	//sens_y
-	value = strtof(mTmpl->parameter(std::string("sens_y")).c_str(),
+	//sens_y (>=0)
+	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("sens_y")).c_str(),
 	NULL);
 	mSensY = (value >= 0.0 ? value : -value);
 	//
-	return result;
-}
-void P3Driver::onAddToObjectSetup()
-{
-	//
-	GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-	mCentX = win->get_properties().get_x_size() / 2;
-	mCentY = win->get_properties().get_y_size() / 2;
-}
-void P3Driver::onAddToSceneSetup()
-{
-	//enable the component (if requested)
-	if (mStartEnabled)
-	{
-		doEnable();
-	}
-	else
-	{
-		unregisterEventCallbacks();
-	}
-}
-void P3Driver::do_initialize()
-{
-	WPT(AIManager)mTmpl = AIManager::get_global_ptr();
-	//
-	//set P3Driver parameters (store internally for future use)
-	//type
-	string mPlugInTypeParam = mTmpl->get_parameter_value(AIManager::STEERPLUGIN,
-			string("plugin_type"));
-	//pathway (will be used on setup())
-	string mPathwayParam = mTmpl->get_parameter_value(AIManager::STEERPLUGIN,
-			string("pathway"));
-	//obstacles (will be used on setup())
-	plist<string> mObstacleListParam = mTmpl->get_parameter_values(AIManager::STEERPLUGIN,
-			string("obstacles"));
-	//
-	//create the steer plug in
-	if (mPlugInTypeParam == string("pedestrian"))
-	{
-		do_create_plug_in(PEDESTRIAN);
-	}
-	else if (mPlugInTypeParam == string("boid"))
-	{
-		do_create_plug_in(BOID);
-	}
-	else if (mPlugInTypeParam == string("multiple_pursuit"))
-	{
-		do_create_plug_in(MULTIPLE_PURSUIT);
-	}
-	else if (mPlugInTypeParam == string("soccer"))
-	{
-		do_create_plug_in(SOCCER);
-	}
-	else if (mPlugInTypeParam == string("capture_the_flag"))
-	{
-		do_create_plug_in(CAPTURE_THE_FLAG);
-	}
-	else if (mPlugInTypeParam == string("low_speed_turn"))
-	{
-		do_create_plug_in(LOW_SPEED_TURN);
-	}
-	else if (mPlugInTypeParam == string("map_drive"))
-	{
-		do_create_plug_in(MAP_DRIVE);
-	}
-	else
-	{
-		//default: "one_turning"
-		do_create_plug_in(ONE_TURNING);
-	}
-	//build pathway
-	do_build_pathway(mPathwayParam);
-	//set the plugin local obstacles reference
-	static_cast<ossup::PlugIn*>(mPlugIn)->localObstacles = &mLocalObstacles.first();
-	//set the plugin global obstacles reference
-	static_cast<ossup::PlugIn*>(mPlugIn)->obstacles = &mTmpl->get_global_obstacles().first();
-	//add its own obstacles
-	do_add_obstacles(mObstacleListParam);
-	//open the steer plug in
-	mPlugIn->open();
+	mCentX = mWin->get_properties().get_x_size() / 2;
+	mCentY = mWin->get_properties().get_y_size() / 2;
 #ifdef PYTHON_BUILD
 	//Python callback
 	this->ref();
 	mSelf = DTool_CreatePyInstanceTyped(this, Dtool_Driver, true, false,
 			get_type_index());
 #endif //PYTHON_BUILD
-}
-
-void P3Driver::do_initialize()
-{
-	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
-	mSignOfTranslation = 1;
-	mSignOfMouse = 1;
-	//head limit: enabled@[limit]; limit >= 0.0
-	mHeadLimitEnabled = false;
-	mHLimit = 0.0;
-	//pitch limit: enabled@[limit]; limit >= 0.0
-	mPitchLimitEnabled = false;
-	mPLimit = 0.0;
-	//mouse movement setting
-	mMouseEnabledH = false;
-	mMouseEnabledP = false;
-	//key events setting
-	//backward key
-	mBackwardKey = true;
-	//down key
-	mDownKey = true;
-	//forward key
-	mForwardKey = true;
-	//strafeLeft key
-	mStrafeLeftKey = true;
-	//strafeRight key
-	mStrafeRightKey = true;
-	//headLeft key
-	mHeadLeftKey = true;
-	//headRight key
-	mHeadRightKey = true;
-	//pitchUp key
-	mPitchUpKey = true;
-	//pitchDown key
-	mPitchDownKey = true;
-	//up key
-	mUpKey = true;
-	//mouseMove key: enabled/disabled
-	mMouseMoveKey = false;
-	//speedKey
-	if (not (mSpeedKey == std::string("control")
-			or mSpeedKey == std::string("alt")
-			or mSpeedKey == std::string("shift")))
-	{
-		mSpeedKey = std::string("shift");
-	}
-	//
-	//max linear speed (>=0)
-	mMaxSpeedXYZ = LVecBase3f(5.0, 5.0, 5.0);
-	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
-			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
-			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
-	//max angular speed (>=0)
-	mMaxSpeedHP = 5.0;
-	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
-	//linear accel (>=0)
-	mAccelXYZ = LVecBase3f(5.0, 5.0, 5.0);
-	//angular accel (>=0)
-	mAccelHP = 5.0;
-	//reset actual speeds
-	mActualSpeedXYZ = LVector3f::zero();
-	mActualSpeedH = 0.0;
-	mActualSpeedP = 0.0;
-	//linear friction (>=0)
-	mFrictionXYZ = 5.0;
-	//angular friction (>=0)
-	mFrictionHP = 5.0;
-	//stop threshold ([0.0, 1.0])
-	mStopThreshold = 0.01;
-	//fast factor (>=0)
-	mFastFactor = 5.0;
-	//sens x (>=0)
-	mSensX = 0.2;
-	//sens_y (>=0)
-	mSensY = 0.2;
-	//create the task for updating P3Driver
-	mUpdateData = new TaskInterface<P3Driver>::TaskData(this,
-			&P3Driver::update);
-	mUpdateTask = new GenericAsyncTask(string("P3Driver::update"),
-			&TaskInterface<P3Driver>::taskFunction,
-			reinterpret_cast<void*>(mUpdateData.p()));
-	mUpdateTask->set_sort(mTaskSort);
-	//
-	mCentX = mWin->get_properties().get_x_size() / 2;
-	mCentY = mWin->get_properties().get_y_size() / 2;
 }
 
 /**

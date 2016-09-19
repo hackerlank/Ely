@@ -114,72 +114,63 @@ PUBLISHED:
 #endif //CPPPARSER
 
 	/**
-	 * \name PLUGIN
+	 * \name DRIVER
 	 */
 	///@{
+	bool enable();
+	bool disable();
+	INLINE bool is_enabled() const;
 	void update(float dt);
 	///@}
 
 	/**
-	 * \name Enabling/disabling.
-	 * \brief Enables/disables this component.
+	 * \name ENABLE/DISABLE CONTROLS
 	 */
 	///@{
-	Result enable();
-	Result disable();
-	bool isEnabled();
+	INLINE void enable_forward(bool enable);
+	INLINE bool is_forward_enabled() const;
+	INLINE void enable_backward(bool enable);
+	INLINE bool is_backward_enabled() const;
+	INLINE void enable_strafe_left(bool enable);
+	INLINE bool is_strafe_left_enabled() const;
+	INLINE void enable_strafe_right(bool enable);
+	INLINE bool is_strafe_right_enabled() const;
+	INLINE void enable_up(bool enable);
+	INLINE bool is_up_enabled() const;
+	INLINE void enable_down(bool enable);
+	INLINE bool is_down_enabled() const;
+	INLINE void enable_head_left(bool enable);
+	INLINE bool is_head_left_enabled() const;
+	INLINE void enable_head_right(bool enable);
+	INLINE bool is_head_right_enabled() const;
+	INLINE void enable_pitch_up(bool enable);
+	INLINE bool is_pitch_up_enabled() const;
+	INLINE void enable_pitch_down(bool enable);
+	INLINE bool is_pitch_down_enabled() const;
+	INLINE void enable_mouse_move(bool enable);
+	INLINE bool is_mouse_move_enabled() const;
 	///@}
 
 	/**
-	 * \name Control keys' getters/setters.
+	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	void enableForward(bool enable);
-	bool isForwardEnabled();
-	void enableBackward(bool enable);
-	bool isBackwardEnabled();
-	void enableStrafeLeft(bool enable);
-	bool isStrafeLeftEnabled();
-	void enableStrafeRight(bool enable);
-	bool isStrafeRightEnabled();
-	void enableUp(bool enable);
-	bool isUpEnabled();
-	void enableDown(bool enable);
-	bool isDownEnabled();
-	void enableHeadLeft(bool enable);
-	bool isHeadLeftEnabled();
-	void enableHeadRight(bool enable);
-	bool isHeadRightEnabled();
-	void enablePitchUp(bool enable);
-	bool isPitchUpEnabled();
-	void enablePitchDown(bool enable);
-	bool isPitchDownEnabled();
-	void enableMouseMove(bool enable);
-	bool isMouseMoveEnabled();
-	///@}
-
-	/**
-	 * \name Parameters getters/setters.
-	 */
-	///@{
-	//max values
-	void setHeadLimit(bool enabled = false, float hLimit = 0.0);
-	void setPitchLimit(bool enabled = false, float pLimit = 0.0);
-	void setMaxLinearSpeed(const LVector3f& linearSpeed);
-	void setMaxAngularSpeed(float angularSpeed);
-	LVector3f getMaxSpeeds(float& angularSpeed);
-	void setLinearAccel(const LVector3f& linearAccel);
-	void setAngularAccel(float angularAccel);
-	LVector3f getAccels(float& angularAccel);
-	void setLinearFriction(float linearFriction);
-	void setAngularFriction(float angularFriction);
-	void getFrictions(float& linearFriction, float& angularFriction);
-	void setSens(float sensX, float sensY);
-	void getSens(float& sensX, float& sensY);
-	void setFastFactor(float factor);
-	float getFastFactor();
-	//speed current values
-	LVector3f getCurrentSpeeds(float& angularSpeedH, float& angularSpeedP);
+	INLINE void set_head_limit(bool enabled = false, float hLimit = 0.0);
+	INLINE void set_pitch_limit(bool enabled = false, float pLimit = 0.0);
+	INLINE void set_max_linear_speed(const LVector3f& linearSpeed);
+	INLINE void set_max_angular_speed(float angularSpeed);
+	INLINE Pair<LVector3f, float> get_max_speeds() const;
+	INLINE void set_linear_accel(const LVector3f& linearAccel);
+	INLINE void set_angular_accel(float angularAccel);
+	INLINE Pair<LVector3f, float> get_accels() const;
+	INLINE void set_linear_friction(float linearFriction);
+	INLINE void set_angular_friction(float angularFriction);
+	INLINE ValueList<float> get_frictions() const;
+	INLINE void set_sens(float sensX, float sensY);
+	INLINE ValueList<float> get_sens() const;
+	INLINE void set_fast_factor(float factor);
+	INLINE float get_fast_factor() const;
+	INLINE Pair<LVector3f, ValueList<float> > get_current_speeds() const;
 	///@}
 
 	/**
@@ -212,8 +203,6 @@ public:
 	 * Library & support low level related methods.
 	 */
 	///@{
-	inline OpenSteer::AbstractPlugIn& get_abstract_plug_in();
-	inline operator OpenSteer::AbstractPlugIn&();
 	///@}
 
 protected:
@@ -226,26 +215,28 @@ protected:
 private:
 	///The reference node path.
 	NodePath mReferenceNP;
-
-	///Enabling flags.
-	bool mStartEnabled, mEnabled;
-	///@{
+	///Main parameters.
+	WPT(GraphicsWindow) mWin;
+	///Enabling flag.
+	bool mEnabled;
 	///Key controls and effective keys.
-	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown,
-	mHeadLeft, mHeadRight, mPitchUp, mPitchDown, mMouseMove;
-	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
-	mDownKey, mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
-	std::string mSpeedKey;
-	///@}
 	///@{
+	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mHeadLeft,
+			mHeadRight, mPitchUp, mPitchDown, mMouseMove;
+	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
+			mDownKey, mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey,
+			mMouseMoveKey;
+	string mSpeedKey;
+	///@}
 	///Key control values.
-	bool mMouseEnabledH,	mMouseEnabledP;
+	///@{
+	bool mMouseEnabledH, mMouseEnabledP;
 	bool mHeadLimitEnabled, mPitchLimitEnabled;
 	float mHLimit, mPLimit;
 	int mSignOfTranslation, mSignOfMouse;
 	///@}
-	///@{
 	/// Sensitivity settings.
+	///@{
 	float mFastFactor;
 	LVecBase3f mActualSpeedXYZ, mMaxSpeedXYZ, mMaxSpeedSquaredXYZ;
 	float mActualSpeedH, mActualSpeedP, mMaxSpeedHP, mMaxSpeedSquaredHP;
@@ -258,16 +249,16 @@ private:
 	int mCentX, mCentY;
 	///@}
 
-	inline void do_reset();
+	void do_reset();
 	void do_initialize();
 	void do_finalize();
 
 	/**
-	 * \name Actual enabling/disabling.
+	 * \name Helpers variables/functions.
 	 */
 	///@{
-	void doEnable();
-	void doDisable();
+	void do_enable();
+	void do_disable();
 	///@}
 
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)
@@ -348,105 +339,10 @@ private:
 	static TypeHandle _type_handle;
 
 };
-class P3Driver
-{
-public:
-	P3Driver(PandaFramework* framework, const NodePath& ownerObject,
-			int taskSort = 0);
-	virtual ~P3Driver();
-
-	AsyncTask::DoneStatus update(GenericAsyncTask* task);
-
-	//enable/disable
-	bool enable();
-	bool disable();
-	inline bool is_enabled() const;
-	//enable/disable controls
-	inline void enable_forward(bool enable);
-	inline bool is_forward_enabled() const;
-	inline void enable_backward(bool enable);
-	inline bool is_backward_enabled() const;
-	inline void enable_strafe_left(bool enable);
-	inline bool is_strafe_left_enabled() const;
-	inline void enable_strafe_right(bool enable);
-	inline bool is_strafe_right_enabled() const;
-	inline void enable_up(bool enable);
-	inline bool is_up_enabled() const;
-	inline void enable_down(bool enable);
-	inline bool is_down_enabled() const;
-	inline void enable_head_left(bool enable);
-	inline bool is_head_left_enabled() const;
-	inline void enable_head_right(bool enable);
-	inline bool is_head_right_enabled() const;
-	inline void enable_pitch_up(bool enable);
-	inline bool is_pitch_up_enabled() const;
-	inline void enable_pitch_down(bool enable);
-	inline bool is_pitch_down_enabled() const;
-	inline void enable_mouse_move(bool enable);
-	inline bool is_mouse_move_enabled() const;
-	//max values
-	inline void set_head_limit(bool enabled = false, float hLimit = 0.0);
-	inline void set_pitch_limit(bool enabled = false, float pLimit = 0.0);
-	inline void set_max_linear_speed(const LVector3f& linearSpeed);
-	inline void set_max_angular_speed(float angularSpeed);
-	inline Pair<LVector3f, float> get_max_speeds() const;
-	inline void set_linear_accel(const LVector3f& linearAccel);
-	inline void set_angular_accel(float angularAccel);
-	inline Pair<LVector3f, float> get_accels() const;
-	inline void set_linear_friction(float linearFriction);
-	inline void set_angular_friction(float angularFriction);
-	inline ValueList<float> get_frictions() const;
-	inline void set_sens(float sensX, float sensY);
-	inline ValueList<float> get_sens() const;
-	inline void set_fast_factor(float factor);
-	inline float get_fast_factor() const;
-	//speed current values
-	inline Pair<LVector3f, ValueList<float> > get_current_speeds() const;
-
-private:
-	///Main parameters.
-	GraphicsWindow* mWin;
-	NodePath mOwnerObjectNP;
-	///Enabling flag.
-	bool mEnabled;
-	///Key controls and effective keys.
-	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mHeadLeft,
-			mHeadRight, mPitchUp, mPitchDown, mMouseMove;
-	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
-			mDownKey, mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey,
-			mMouseMoveKey;
-	std::string mSpeedKey;
-	///Key control values.
-	bool mMouseEnabledH, mMouseEnabledP;
-	bool mHeadLimitEnabled, mPitchLimitEnabled;
-	float mHLimit, mPLimit;
-	int mSignOfTranslation, mSignOfMouse;
-	/// Sensitivity settings.
-	float mFastFactor;
-	LVecBase3f mActualSpeedXYZ, mMaxSpeedXYZ, mMaxSpeedSquaredXYZ;
-	float mActualSpeedH, mActualSpeedP, mMaxSpeedHP, mMaxSpeedSquaredHP;
-	LVecBase3f mAccelXYZ;
-	float mAccelHP;
-	float mFrictionXYZ;
-	float mFrictionHP;
-	float mStopThreshold;
-	float mSensX, mSensY;
-	int mCentX, mCentY;
-	///private member functions
-	void do_reset();
-	void do_initialize();
-	void do_finalize();
-	void do_enable();
-	void do_disable();
-	///A task data for step update.
-	PT(TaskInterface<P3Driver>::TaskData)mUpdateData;
-	PT(AsyncTask) mUpdateTask;
-	int mTaskSort;
-};
 
 INLINE ostream &operator << (ostream &out, const P3Driver & plugIn);
 
 ///inline
-#include "P3Driver.I"
+#include "p3Driver.I"
 
 #endif /* P3DRIVER_H_ */
