@@ -344,6 +344,7 @@ void P3Driver::do_reset()
 	mStopThreshold = 0.0;
 	mSensX = mSensY = 0.0;
 	mCentX = mCentY = 0.0;
+	mReferenceNP.clear();
 #ifdef PYTHON_BUILD
 	mSelf = NULL;
 	mUpdateCallback = NULL;

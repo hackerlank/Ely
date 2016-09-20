@@ -103,6 +103,8 @@ NodePath ControlManager::create_driver()
 	newDriver->mReferenceNP = mReferenceNP;
 	// initialize the new Driver
 	newDriver->do_initialize();
+	// set the reference graphic window.
+	newDriver->mWin = mWin;
 
 	// add the new Driver to the inner list (and to the update task)
 	mDrivers.push_back(newDriver);
@@ -116,19 +118,21 @@ NodePath ControlManager::create_driver()
  * Destroys a P3Driver.
  * Returns false on error.
  */
-bool ControlManager::destroy_driver(NodePath steerPlugInNP)
+bool ControlManager::destroy_driver(NodePath driverNP)
 {
 	CONTINUE_IF_ELSE_R(
-			steerPlugInNP.node()->is_of_type(P3Driver::get_class_type()),
+			driverNP.node()->is_of_type(P3Driver::get_class_type()),
 			false)
 
-	PT(P3Driver)steerPlugIn = DCAST(P3Driver, steerPlugInNP.node());
+	PT(P3Driver)driver = DCAST(P3Driver, driverNP.node());
 	DriverList::iterator iter = find(mDrivers.begin(),
-			mDrivers.end(), steerPlugIn);
+			mDrivers.end(), driver);
 	CONTINUE_IF_ELSE_R(iter != mDrivers.end(), false)
 
-	//give a chance to P3Driver to cleanup itself before being destroyed.
-	steerPlugIn->do_finalize();
+	// reset the reference graphic window.
+	driver->mWin.clear();
+	// give a chance to P3Driver to cleanup itself before being destroyed.
+	driver->do_finalize();
 
 	//remove the P3Driver from the inner list (and from the update task)
 	mDrivers.erase(iter);
@@ -176,19 +180,19 @@ NodePath ControlManager::create_chaser(const string& name)
  * Destroys a P3Chaser.
  * Returns false on error.
  */
-bool ControlManager::destroy_chaser(NodePath steerVehicleNP)
+bool ControlManager::destroy_chaser(NodePath chaserNP)
 {
 //	CONTINUE_IF_ELSE_R( XXX
-//			steerVehicleNP.node()->is_of_type(P3Chaser::get_class_type()),
+//			chaserNP.node()->is_of_type(P3Chaser::get_class_type()),
 //			false)
 //
-//	PT(P3Chaser)steerVehicle = DCAST(P3Chaser, steerVehicleNP.node());
+//	PT(P3Chaser)chaser = DCAST(P3Chaser, chaserNP.node());
 //	ChaserList::iterator iter = find(mChasers.begin(),
-//			mChasers.end(), steerVehicle);
+//			mChasers.end(), chaser);
 //	CONTINUE_IF_ELSE_R(iter != mChasers.end(), false)
 //
 //	//give a chance to P3Chaser to cleanup itself before being destroyed.
-//	steerVehicle->do_finalize();
+//	chaser->do_finalize();
 //	//remove the P3Chaser from the inner list (and from the update task)
 //	mChasers.erase(iter);
 	//

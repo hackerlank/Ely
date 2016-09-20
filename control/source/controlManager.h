@@ -30,7 +30,7 @@ public:
 	typedef Pair<OpenSteer::ObstacleGroup, pvector<ObstacleAttributes> > GlobalObstacles;
 
 PUBLISHED:
-	ControlManager(const NodePath& root = NodePath(),
+	ControlManager(PT(GraphicsWindow) win, const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~ControlManager();
 
@@ -132,6 +132,9 @@ public:
 	inline int unique_ref();
 
 private:
+	///The reference graphic window.
+	PT(GraphicsWindow) mWin;
+
 	///The reference node path.
 	NodePath mReferenceNP;
 

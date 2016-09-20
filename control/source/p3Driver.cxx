@@ -17,7 +17,7 @@
 #endif //CPPPARSER
 #ifdef PYTHON_BUILD
 #include <py_panda.h>
-extern Dtool_PyTypedObject Dtool_Driver;
+extern Dtool_PyTypedObject Dtool_P3Driver;
 #endif //PYTHON_BUILD
 
 /**
@@ -28,15 +28,15 @@ P3Driver::P3Driver(const string& name) :
 {
 	do_reset();
 }
-P3Driver::P3Driver(PandaFramework* framework, const NodePath& ownerObjectNP,
-		int taskSort)
-{
-	mWin = framework->get_window(0)->get_graphics_window();
-	mOwnerObjectNP = ownerObjectNP;
-	mTaskSort = taskSort;
-	do_reset();
-	do_initialize();
-}
+//P3Driver::P3Driver(PandaFramework* framework, const NodePath& ownerObjectNP, XXX
+//		int taskSort)
+//{
+//	mWin = framework->get_window(0)->get_graphics_window();
+//	mOwnerObjectNP = ownerObjectNP;
+//	mTaskSort = taskSort;
+//	do_reset();
+//	do_initialize();
+//}
 
 /**
  *
@@ -44,15 +44,13 @@ P3Driver::P3Driver(PandaFramework* framework, const NodePath& ownerObjectNP,
 P3Driver::~P3Driver()
 {
 }
-P3Driver::~P3Driver()
-{
-	do_finalize();
-	do_reset();
-	mOwnerObjectNP.clear();
-	mWin = nullptr;
-}
-
-
+//P3Driver::~P3Driver() XXX
+//{
+//	do_finalize();
+//	do_reset();
+//	mOwnerObjectNP.clear();
+//	mWin = nullptr;
+//}
 
 /**
  * Enables the debug drawing.
@@ -468,7 +466,7 @@ void P3Driver::do_initialize()
 #ifdef PYTHON_BUILD
 	//Python callback
 	this->ref();
-	mSelf = DTool_CreatePyInstanceTyped(this, Dtool_Driver, true, false,
+	mSelf = DTool_CreatePyInstanceTyped(this, Dtool_P3Driver, true, false,
 			get_type_index());
 #endif //PYTHON_BUILD
 }
@@ -479,92 +477,6 @@ void P3Driver::do_initialize()
  * destroyed.
  * \note Internal use only.
  */
-void P3Driver::onRemoveFromSceneCleanup()
-{
-	//remove from control manager update
-	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
-}
-void P3Driver::onRemoveFromObjectCleanup()
-{
-	//see disable
-	if (mEnabled and (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey))
-	{
-		//we have control through mouse movements
-		//show mouse cursor
-		WindowProperties props;
-		props.set_cursor_hidden(false);
-		SMARTPTR(GraphicsWindow)win =
-		mTmpl->windowFramework()->get_graphics_window();
-		win->request_properties(props);
-	}
-	//
-	reset();
-}
-void P3Driver::do_finalize()
-{
-	//disable debug drawing if enabled
-	disable_debug_drawing();
-	//remove all local obstacles from the global
-	OpenSteer::ObstacleGroup::iterator iterLocal;
-	AIManager::GlobalObstacles& globalObstacles =
-			AIManager::get_global_ptr()->get_global_obstacles();
-	for (iterLocal = mLocalObstacles.first().begin();
-			iterLocal != mLocalObstacles.first().end(); ++iterLocal)
-	{
-		if(	globalObstacles.first().size()
-						!= globalObstacles.second().size())
-		{
-			//VERY BAD!
-			abort();
-		}
-
-		//find in global obstacles and remove it
-		//1: remove the OpenSteer obstacle's pointer from the global list
-		OpenSteer::ObstacleGroup::iterator iterO = find(
-				globalObstacles.first().begin(), globalObstacles.first().end(),
-				(*iterLocal));
-		globalObstacles.first().erase(iterO);
-		//2: remove the obstacle's attributes from the global list
-		//NOTE: the i-th obstacle has pointer and attributes placed into the
-		//i-th places of their respective lists.
-		unsigned int pointerIdx = iterO - globalObstacles.first().begin();
-		pvector<AIManager::ObstacleAttributes>::iterator iterA =
-				globalObstacles.second().begin() + pointerIdx;
-		/*for (iterA = globalObstacles.second().begin();
-				iterA != globalObstacles.second().end(); ++iterA)
-		{
-			if ((*iterA).first().get_obstacle() == (*iterLocal))
-			{
-				break;
-			}
-		}*/
-		globalObstacles.second().erase(iterA);
-		//3: deallocate the OpenSteer obstacle
-		delete *iterLocal;
-	}
-	//remove all added OSSteerVehicle(s) (if any) from update
-	PTA(PT(OSSteerVehicle))::const_iterator iter;
-	for (iter = mSteerVehicles.begin(); iter != mSteerVehicles.end(); ++iter)
-	{
-		//set steerVehicle reference to null
-		(*iter)->mSteerPlugIn.clear();
-		//do remove from real update list
-		static_cast<ossup::PlugIn*>(mPlugIn)->removeVehicle(
-				&(*iter)->get_abstract_vehicle());
-	}
-	//close the steer plug in
-	mPlugIn->close();
-	//delete the steer plug in
-	delete mPlugIn;
-#ifdef PYTHON_BUILD
-	//Python callback
-	Py_DECREF(mSelf);
-	Py_XDECREF(mUpdateCallback);
-	Py_XDECREF(mUpdateArgList);
-#endif //PYTHON_BUILD
-	do_reset();
-}
-
 void P3Driver::do_finalize()
 {
 	//if enabled: disable
@@ -573,50 +485,15 @@ void P3Driver::do_finalize()
 		//actual disabling
 		do_disable();
 	}
+#ifdef PYTHON_BUILD
+	//Python callback
+	Py_DECREF(mSelf);
+	Py_XDECREF(mUpdateCallback);
+	Py_XDECREF(mUpdateArgList);
+#endif //PYTHON_BUILD
+	do_reset();
 	//
 	return;
-}
-
-
-
-P3Driver::Result P3Driver::enable()
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//if enabled return
-	RETURN_ON_COND(mEnabled, Result::ERROR)
-
-	//actual ebnabling
-	doEnable();
-	//
-	return Result::OK;
-}
-
-void P3Driver::doEnable()
-{
-	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
-	{
-		//we want control through mouse movements
-		//hide mouse cursor
-		WindowProperties props;
-		props.set_cursor_hidden(true);
-		SMARTPTR(GraphicsWindow)win =
-		mTmpl->windowFramework()->get_graphics_window();
-		win->request_properties(props);
-		//reset mouse to start position
-		win->move_pointer(0, mCentX, mCentY);
-	}
-	//
-	mEnabled = true;
-	//register event callbacks if any
-	registerEventCallbacks();
-
-	//add to the control manager update
-	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 }
 
 bool P3Driver::enable()
@@ -644,67 +521,6 @@ void P3Driver::do_enable()
 	}
 	//
 	mEnabled = true;
-
-	//Add mUpdateTask to the active queue.
-	if (mUpdateTask)
-	{
-		AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
-	}
-}
-
-P3Driver::Result P3Driver::disable()
-{
-	{
-		//lock (guard) the mutex
-		HOLD_REMUTEX(mMutex)
-
-		//if disabling return
-		RETURN_ON_ASYNC_COND(mDisabling, Result::DRIVER_DISABLING)
-
-		//if not enabled return
-		RETURN_ON_COND(not mEnabled, Result::ERROR)
-
-#ifdef ELY_THREAD
-		mDisabling = true;
-#endif
-	}
-
-	//remove from control manager update
-	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
-
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	//return if destroying
-	RETURN_ON_ASYNC_COND(mDestroying, Result::DESTROYING)
-
-	//actual disabling
-	doDisable();
-	//
-	return Result::OK;
-}
-
-void P3Driver::doDisable()
-{
-	//unregister event callbacks if any
-	unregisterEventCallbacks();
-
-	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
-	{
-		//we have control through mouse movements
-		//show mouse cursor
-		WindowProperties props;
-		props.set_cursor_hidden(false);
-		SMARTPTR(GraphicsWindow)win =
-		mTmpl->windowFramework()->get_graphics_window();
-		win->request_properties(props);
-	}
-	//
-#ifdef ELY_THREAD
-	mDisabling = false;
-#endif
-	//
-	mEnabled = false;
 }
 
 bool P3Driver::disable()
@@ -730,12 +546,6 @@ void P3Driver::do_disable()
 	}
 	//
 	mEnabled = false;
-
-	//Remove mUpdateTask from the active queue.
-	if (mUpdateTask)
-	{
-		AsyncTaskManager::get_global_ptr()->remove(mUpdateTask);
-	}
 }
 
 
@@ -743,453 +553,15 @@ void P3Driver::do_disable()
  * Updates the underlying OpenSteer plug-in.
  * It allows the added OSSteerVehicle(s) to perform their "steering behaviors".
  */
-
-void P3Driver::update(void* data)
-{
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	float dt = *(reinterpret_cast<float*>(data));
-
-	NodePath ownerNodePath = mOwnerObject->getNodePath();
-
-#ifdef TESTING
-	dt = 0.016666667; //60 fps
-#endif
-
-	//handle mouse
-	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
-	{
-		GraphicsWindow* win = mTmpl->windowFramework()->get_graphics_window();
-		MouseData md = win->get_pointer(0);
-		float deltaX = md.get_x() - mCentX;
-		float deltaY = md.get_y() - mCentY;
-
-		if (win->move_pointer(0, mCentX, mCentY))
-		{
-			if (mMouseEnabledH and (deltaX != 0.0))
-			{
-				ownerNodePath.set_h(
-						ownerNodePath.get_h()
-						- deltaX * mSensX * mSignOfMouse);
-			}
-			if (mMouseEnabledP and (deltaY != 0.0))
-			{
-				ownerNodePath.set_p(
-						ownerNodePath.get_p()
-						- deltaY * mSensY * mSignOfMouse);
-			}
-		}
-		//if mMouseMoveKey is true we are controlling mouse movements
-		//so we need to reset mMouseMove to false
-		if (mMouseMoveKey)
-		{
-			mMouseMove = false;
-		}
-	}
-	//update position/orientation
-	ownerNodePath.set_y(ownerNodePath,
-			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
-	ownerNodePath.set_x(ownerNodePath,
-			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
-	ownerNodePath.set_z(ownerNodePath,
-			mActualSpeedXYZ.get_z() * dt);
-	//head
-	if (mHeadLimitEnabled)
-	{
-		float head = ownerNodePath.get_h()
-				+ mActualSpeedH * dt * mSignOfMouse;
-		if (head > mHLimit)
-		{
-			head = mHLimit;
-		}
-		else if(head < -mHLimit)
-		{
-			head = -mHLimit;
-		}
-		ownerNodePath.set_h(head);
-	}
-	else
-	{
-		ownerNodePath.set_h(ownerNodePath.get_h()
-				+ mActualSpeedH * dt * mSignOfMouse);
-	}
-	//pitch
-	if (mPitchLimitEnabled)
-	{
-		float pitch = ownerNodePath.get_p()
-						+ mActualSpeedP * dt * mSignOfMouse;
-		if (pitch > mPLimit)
-		{
-			pitch = mPLimit;
-		}
-		else if(pitch < -mPLimit)
-		{
-			pitch = -mPLimit;
-		}
-		ownerNodePath.set_p(pitch);
-	}
-	else
-	{
-		ownerNodePath.set_p(ownerNodePath.get_p()
-				+ mActualSpeedP * dt * mSignOfMouse);
-	}
-
-	//update speeds
-	float kLinearReductFactor = mFrictionXYZ * dt;
-	if (kLinearReductFactor > 1.0)
-	{
-		kLinearReductFactor = 1.0;
-	}
-	//y axis
-	if (mForward and (not mBackward))
-	{
-		if(mAccelXYZ.get_y() != 0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_y(
-				mActualSpeedXYZ.get_y() - mAccelXYZ.get_y() * dt);
-			if (mActualSpeedXYZ.get_y() < -mMaxSpeedXYZ.get_y())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
-		}
-	}
-	else if (mBackward and (not mForward))
-	{
-		if(mAccelXYZ.get_y() != 0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() + mAccelXYZ.get_y() * dt);
-			if (mActualSpeedXYZ.get_y() > mMaxSpeedXYZ.get_y())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
-		}
-	}
-	else if (mActualSpeedXYZ.get_y() != 0.0)
-	{
-		if (mActualSpeedXYZ.get_y() * mActualSpeedXYZ.get_y() <
-				mMaxSpeedSquaredXYZ.get_y() * mStopThreshold)
-		{
-			//stop
-			mActualSpeedXYZ.set_y(0.0);
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() * (1 - kLinearReductFactor));
-		}
-	}
-	//x axis
-	if (mStrafeLeft and (not mStrafeRight))
-	{
-		if(mAccelXYZ.get_x() != 0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() + mAccelXYZ.get_x() * dt);
-			if (mActualSpeedXYZ.get_x() > mMaxSpeedXYZ.get_x())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
-		}
-	}
-	else if (mStrafeRight and (not mStrafeLeft))
-	{
-		if(mAccelXYZ.get_x() != 0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_x(
-				mActualSpeedXYZ.get_x() - mAccelXYZ.get_x() * dt);
-			if (mActualSpeedXYZ.get_x() < -mMaxSpeedXYZ.get_x())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_x());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_y());
-		}
-	}
-	else if (mActualSpeedXYZ.get_x() != 0.0)
-	{
-		if (mActualSpeedXYZ.get_x() * mActualSpeedXYZ.get_x() <
-				mMaxSpeedSquaredXYZ.get_x() * mStopThreshold)
-		{
-			//stop
-			mActualSpeedXYZ.set_x(0.0);
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() * (1 - kLinearReductFactor));
-		}
-	}
-	//z axis
-	if (mUp and (not mDown))
-	{
-		if(mAccelXYZ.get_z() != 0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() + mAccelXYZ.get_z() * dt);
-			if (mActualSpeedXYZ.get_z() > mMaxSpeedXYZ.get_z())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
-		}
-	}
-	else if (mDown and (not mUp))
-	{
-		if(mAccelXYZ.get_z() != 0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_z(
-				mActualSpeedXYZ.get_z() - mAccelXYZ.get_z() * dt);
-			if (mActualSpeedXYZ.get_z() < -mMaxSpeedXYZ.get_z())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
-		}
-	}
-	else if (mActualSpeedXYZ.get_z() != 0.0)
-	{
-		if (mActualSpeedXYZ.get_z() * mActualSpeedXYZ.get_z() <
-				mMaxSpeedSquaredXYZ.get_z() * mStopThreshold)
-		{
-			//stop
-			mActualSpeedXYZ.set_z(0.0);
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() * (1 - kLinearReductFactor));
-		}
-	}
-	//rotation h
-	if (mHeadLeft and (not mHeadRight))
-	{
-		if(mAccelHP != 0)
-		{
-			//accelerate
-			mActualSpeedH += mAccelHP * dt;
-			if (mActualSpeedH > mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedH = mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedH = mMaxSpeedHP;
-		}
-	}
-	else if (mHeadRight and (not mHeadLeft))
-	{
-		if(mAccelHP != 0)
-		{
-			//accelerate
-			mActualSpeedH -= mAccelHP * dt;
-			if (mActualSpeedH < -mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedH = -mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedH = -mMaxSpeedHP;
-		}
-	}
-	else if (mActualSpeedH != 0.0)
-	{
-		if (mActualSpeedH * mActualSpeedH <
-				mMaxSpeedSquaredHP * mStopThreshold)
-		{
-			//stop
-			mActualSpeedH = 0.0;
-		}
-		else
-		{
-			//decelerate
-			float kAngularReductFactor = mFrictionHP * dt;
-			if (kAngularReductFactor > 1.0)
-			{
-				kAngularReductFactor = 1.0;
-			}
-			mActualSpeedH = mActualSpeedH * (1 - kAngularReductFactor);
-		}
-	}
-	//rotation p
-	if (mPitchUp and (not mPitchDown))
-	{
-		if(mAccelHP != 0)
-		{
-			//accelerate
-			mActualSpeedP += mAccelHP * dt;
-			if (mActualSpeedP > mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedP = mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedP = mMaxSpeedHP;
-		}
-	}
-	else if (mPitchDown and (not mPitchUp))
-	{
-		if(mAccelHP != 0)
-		{
-			//accelerate
-			mActualSpeedP -= mAccelHP * dt;
-			if (mActualSpeedP < -mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedP = -mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedP = -mMaxSpeedHP;
-		}
-	}
-	else if (mActualSpeedP != 0.0)
-	{
-		if (mActualSpeedP * mActualSpeedP <
-				mMaxSpeedSquaredHP * mStopThreshold)
-		{
-			//stop
-			mActualSpeedP = 0.0;
-		}
-		else
-		{
-			//decelerate
-			float kAngularReductFactor = mFrictionHP * dt;
-			if (kAngularReductFactor > 1.0)
-			{
-				kAngularReductFactor = 1.0;
-			}
-			mActualSpeedP = mActualSpeedP * (1 - kAngularReductFactor);
-		}
-	}
-}
 void P3Driver::update(float dt)
 {
-	//currentTime
-	mCurrentTime += dt;
+	RETURN_ON_COND(!mEnabled,)
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
 
-#ifdef ELY_DEBUG
-	{
-		if (mEnableDebugDrawUpdate && mDrawer3d && mDrawer2d)
-		{
-			//set enableAnnotation
-			ossup::enableAnnotation = true;
-
-			//drawers' initializations
-			mDrawer3d->initialize();
-			mDrawer2d->initialize();
-
-			/// invoke PlugIn's Update method
-			mPlugIn->update(mCurrentTime, dt);
-
-			// invoke selected PlugIn's Redraw method
-			mPlugIn->redraw(mCurrentTime, dt);
-
-			// draw any annotation queued up during selected PlugIn's Update method
-			OpenSteer::drawAllDeferredLines();
-			OpenSteer::drawAllDeferredCirclesOrDisks();
-
-			//drawers' finalizations
-			mDrawer3d->finalize();
-			mDrawer2d->finalize();
-		}
-		else
-		{
-			//clear enableAnnotation
-			ossup::enableAnnotation = false;
-#endif //ELY_DEBUG
-
-			/// invoke PlugIn's Update method
-			mPlugIn->update(mCurrentTime, dt);
-
-#ifdef ELY_DEBUG
-		}
-	}
-#endif //ELY_DEBUG
-#ifdef PYTHON_BUILD
-	// execute python callback (if any)
-	if (mUpdateCallback && (mUpdateCallback != Py_None))
-	{
-		PyObject *result;
-		result = PyObject_CallObject(mUpdateCallback, mUpdateArgList);
-		if (result == NULL)
-		{
-			string errStr = get_name() +
-					string(": Error calling callback function");
-			PyErr_SetString(PyExc_TypeError, errStr.c_str());
-			return;
-		}
-		Py_DECREF(result);
-	}
-#else
-	// execute c++ callback (if any)
-	if (mUpdateCallback)
-	{
-		mUpdateCallback(this);
-	}
-#endif //PYTHON_BUILD
-}
-
-AsyncTask::DoneStatus P3Driver::update(GenericAsyncTask* task)
-{
-	float dt = ClockObject::get_global_clock()->get_dt();
+	NodePath thisNP = NodePath::any_path(this);
 
 	//handle mouse
 	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
@@ -1202,13 +574,13 @@ AsyncTask::DoneStatus P3Driver::update(GenericAsyncTask* task)
 		{
 			if (mMouseEnabledH and (deltaX != 0.0))
 			{
-				mOwnerObjectNP.set_h(
-						mOwnerObjectNP.get_h() - deltaX * mSensX * mSignOfMouse);
+				thisNP.set_h(
+						thisNP.get_h() - deltaX * mSensX * mSignOfMouse);
 			}
 			if (mMouseEnabledP and (deltaY != 0.0))
 			{
-				mOwnerObjectNP.set_p(
-						mOwnerObjectNP.get_p() - deltaY * mSensY * mSignOfMouse);
+				thisNP.set_p(
+						thisNP.get_p() - deltaY * mSensY * mSignOfMouse);
 			}
 		}
 		//if mMouseMoveKey is true we are controlling mouse movements
@@ -1219,15 +591,15 @@ AsyncTask::DoneStatus P3Driver::update(GenericAsyncTask* task)
 		}
 	}
 	//update position/orientation
-	mOwnerObjectNP.set_y(mOwnerObjectNP,
+	thisNP.set_y(thisNP,
 			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
-	mOwnerObjectNP.set_x(mOwnerObjectNP,
+	thisNP.set_x(thisNP,
 			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
-	mOwnerObjectNP.set_z(mOwnerObjectNP, mActualSpeedXYZ.get_z() * dt);
+	thisNP.set_z(thisNP, mActualSpeedXYZ.get_z() * dt);
 	//head
 	if (mHeadLimitEnabled)
 	{
-		float head = mOwnerObjectNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
+		float head = thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
 		if (head > mHLimit)
 		{
 			head = mHLimit;
@@ -1236,17 +608,17 @@ AsyncTask::DoneStatus P3Driver::update(GenericAsyncTask* task)
 		{
 			head = -mHLimit;
 		}
-		mOwnerObjectNP.set_h(head);
+		thisNP.set_h(head);
 	}
 	else
 	{
-		mOwnerObjectNP.set_h(
-				mOwnerObjectNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
+		thisNP.set_h(
+				thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
 	}
 	//pitch
 	if (mPitchLimitEnabled)
 	{
-		float pitch = mOwnerObjectNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
+		float pitch = thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
 		if (pitch > mPLimit)
 		{
 			pitch = mPLimit;
@@ -1255,12 +627,12 @@ AsyncTask::DoneStatus P3Driver::update(GenericAsyncTask* task)
 		{
 			pitch = -mPLimit;
 		}
-		mOwnerObjectNP.set_p(pitch);
+		thisNP.set_p(pitch);
 	}
 	else
 	{
-		mOwnerObjectNP.set_p(
-				mOwnerObjectNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
+		thisNP.set_p(
+				thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
 	}
 
 	//update speeds
@@ -1527,7 +899,28 @@ AsyncTask::DoneStatus P3Driver::update(GenericAsyncTask* task)
 		}
 	}
 	//
-	return AsyncTask::DS_cont;
+#ifdef PYTHON_BUILD
+	// execute python callback (if any)
+	if (mUpdateCallback && (mUpdateCallback != Py_None))
+	{
+		PyObject *result;
+		result = PyObject_CallObject(mUpdateCallback, mUpdateArgList);
+		if (result == NULL)
+		{
+			string errStr = get_name() +
+					string(": Error calling callback function");
+			PyErr_SetString(PyExc_TypeError, errStr.c_str());
+			return;
+		}
+		Py_DECREF(result);
+	}
+#else
+	// execute c++ callback (if any)
+	if (mUpdateCallback)
+	{
+		mUpdateCallback(this);
+	}
+#endif //PYTHON_BUILD
 }
 
 

@@ -13,7 +13,7 @@ from direct.showbase.ShowBase import ShowBase
 import sys, random
 
 # global data
-dataDir = "../data"
+dataDir = "../../data"
 app = None
 mask = BitMask32(0x10)
 toggleDebugFlag = False

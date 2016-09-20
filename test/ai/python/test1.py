@@ -10,7 +10,7 @@ from panda3d.core import load_prc_file_data, LPoint3f, BitMask32, NodePath, \
                 LVecBase4f, TextNode
 from direct.showbase.ShowBase import ShowBase
 
-dataDir = "../data"
+dataDir = "../../data"
 # global data
 app = None
 mask = BitMask32(0x10)

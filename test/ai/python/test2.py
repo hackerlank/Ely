@@ -14,7 +14,7 @@ from p3ai import AIManager, RNCrowdAgent, \
                 ValueList_string
 import random, sys
 
-dataDir = "../data"
+dataDir = "../../data"
 # global data
 app = None
 mask = BitMask32(0x10);

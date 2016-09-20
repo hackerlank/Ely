@@ -21,6 +21,7 @@
 
 //
 #ifndef CPPPARSER
+#include "support/common.h"
 #endif //CPPPARSER
 
 //continue if condition is true else return a value

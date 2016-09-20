@@ -215,9 +215,9 @@ protected:
 private:
 	///The reference node path.
 	NodePath mReferenceNP;
-	///Main parameters.
-	WPT(GraphicsWindow) mWin;
-	///Enabling flag.
+	///The reference graphic window.
+	PT(GraphicsWindow) mWin;
+	///Enable/disable flag.
 	bool mEnabled;
 	///Key controls and effective keys.
 	///@{
