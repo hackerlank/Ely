@@ -213,6 +213,8 @@ protected:
 	virtual ~P3Driver();
 
 private:
+	///This NodePath.
+	NodePath mThisNP;
 	///The reference node path.
 	NodePath mReferenceNP;
 	///The reference graphic window.

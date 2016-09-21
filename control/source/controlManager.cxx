@@ -111,10 +111,10 @@ NodePath ControlManager::create_driver(const string& name)
 
 	// add the new Driver to the inner list (and to the update task)
 	mDrivers.push_back(newDriver);
-	// reparent to reference node
-	NodePath np = mReferenceNP.attach_new_node(newDriver);
+	// reparent to reference node and set "this" NodePath
+	newDriver->mThisNP = mReferenceNP.attach_new_node(newDriver);
 	//
-	return np;
+	return newDriver->mThisNP;
 }
 
 /**

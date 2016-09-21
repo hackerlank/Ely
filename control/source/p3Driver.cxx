@@ -562,8 +562,6 @@ void P3Driver::update(float dt)
 	dt = 0.016666667; //60 fps
 #endif
 
-	NodePath thisNP = NodePath::any_path(this);
-
 	//handle mouse
 	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
 	{
@@ -575,13 +573,13 @@ void P3Driver::update(float dt)
 		{
 			if (mMouseEnabledH and (deltaX != 0.0))
 			{
-				thisNP.set_h(
-						thisNP.get_h() - deltaX * mSensX * mSignOfMouse);
+				mThisNP.set_h(
+						mThisNP.get_h() - deltaX * mSensX * mSignOfMouse);
 			}
 			if (mMouseEnabledP and (deltaY != 0.0))
 			{
-				thisNP.set_p(
-						thisNP.get_p() - deltaY * mSensY * mSignOfMouse);
+				mThisNP.set_p(
+						mThisNP.get_p() - deltaY * mSensY * mSignOfMouse);
 			}
 		}
 		//if mMouseMoveKey is true we are controlling mouse movements
@@ -592,15 +590,15 @@ void P3Driver::update(float dt)
 		}
 	}
 	//update position/orientation
-	thisNP.set_y(thisNP,
+	mThisNP.set_y(mThisNP,
 			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
-	thisNP.set_x(thisNP,
+	mThisNP.set_x(mThisNP,
 			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
-	thisNP.set_z(thisNP, mActualSpeedXYZ.get_z() * dt);
+	mThisNP.set_z(mThisNP, mActualSpeedXYZ.get_z() * dt);
 	//head
 	if (mHeadLimitEnabled)
 	{
-		float head = thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
+		float head = mThisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
 		if (head > mHLimit)
 		{
 			head = mHLimit;
@@ -609,17 +607,17 @@ void P3Driver::update(float dt)
 		{
 			head = -mHLimit;
 		}
-		thisNP.set_h(head);
+		mThisNP.set_h(head);
 	}
 	else
 	{
-		thisNP.set_h(
-				thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
+		mThisNP.set_h(
+				mThisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
 	}
 	//pitch
 	if (mPitchLimitEnabled)
 	{
-		float pitch = thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
+		float pitch = mThisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
 		if (pitch > mPLimit)
 		{
 			pitch = mPLimit;
@@ -628,12 +626,12 @@ void P3Driver::update(float dt)
 		{
 			pitch = -mPLimit;
 		}
-		thisNP.set_p(pitch);
+		mThisNP.set_p(pitch);
 	}
 	else
 	{
-		thisNP.set_p(
-				thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
+		mThisNP.set_p(
+				mThisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
 	}
 
 	//update speeds

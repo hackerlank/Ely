@@ -221,9 +221,9 @@ PT(OSSteerPlugIn) AIManager::get_steer_plug_in(int index) const
  */
 NodePath AIManager::create_steer_vehicle(const string& name)
 {
-	nassertr_always(! name.empty(), NodePath::fail())
+	nassertr_always(!name.empty(), NodePath::fail())
 
-	PT(OSSteerVehicle) newSteerVehicle = new OSSteerVehicle(name);
+	PT(OSSteerVehicle)newSteerVehicle = new OSSteerVehicle(name);
 	nassertr_always(newSteerVehicle, NodePath::fail())
 
 	// set reference node
@@ -233,10 +233,10 @@ NodePath AIManager::create_steer_vehicle(const string& name)
 
 	//add the new SteerVehicle to the inner list
 	mSteerVehicles.push_back(newSteerVehicle);
-	// reparent to reference node
-	NodePath np = mReferenceNP.attach_new_node(newSteerVehicle);
+	// reparent to reference node and set "this" NodePath
+	newSteerVehicle->mThisNP = mReferenceNP.attach_new_node(newSteerVehicle);
 	//
-	return np;
+	return newSteerVehicle->mThisNP;
 }
 
 /**
@@ -338,9 +338,9 @@ PT(RNNavMesh) AIManager::get_nav_mesh(int index) const
  */
 NodePath AIManager::create_crowd_agent(const string& name)
 {
-	nassertr_always(! name.empty(), NodePath::fail())
+	nassertr_always(!name.empty(), NodePath::fail())
 
-	PT(RNCrowdAgent) newCrowdAgent = new RNCrowdAgent(name);
+	PT(RNCrowdAgent)newCrowdAgent = new RNCrowdAgent(name);
 	nassertr_always(newCrowdAgent, NodePath::fail())
 
 	// set reference node
@@ -350,10 +350,10 @@ NodePath AIManager::create_crowd_agent(const string& name)
 
 	//add the new CrowdAgent to the inner list
 	mCrowdAgents.push_back(newCrowdAgent);
-	// reparent to reference node
-	NodePath np = mReferenceNP.attach_new_node(newCrowdAgent);
+	// reparent to reference node and set "this" NodePath
+	newCrowdAgent->mThisNP = mReferenceNP.attach_new_node(newCrowdAgent);
 	//
-	return np;
+	return newCrowdAgent->mThisNP;
 }
 
 /**
