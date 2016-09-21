@@ -11,6 +11,7 @@
 
 #include "p3Driver.h"
 #include "controlManager.h"
+#include "graphicsWindow.h"
 #include <cmath>
 
 #ifndef CPPPARSER
@@ -110,13 +111,13 @@ P3Driver::~P3Driver()
  * \note BOID P3Driver only.
  */
 /**
- * Adds a player (OSSteerVehicle) to one of two teams: teamA (= true) or teamB
+ * Adds a player (P3Driver) to one of two teams: teamA (= true) or teamB
  * (= false).
  * Returns a negative value on error.
  * \note SOCCER P3Driver only.
  */
 /**
- * Removes a player (OSSteerVehicle) from his/her current team: teamA or teamB.
+ * Removes a player (P3Driver) from his/her current team: teamA or teamB.
  * Returns a negative value on error.
  * \note SOCCER P3Driver only.
  */
@@ -226,8 +227,8 @@ P3Driver::~P3Driver()
  */
 /**
  * Sets the default prediction type on the map (curved or linear): each newly
- * added OSSteerVehicle will use it by default.
- * \note Also the type of prediction of the already added OSSteerVehicle(s) will
+ * added P3Driver will use it by default.
+ * \note Also the type of prediction of the already added P3Driver(s) will
  * be replaced by this one.
  * \note MAP_DRIVE P3Driver only.
  */
@@ -247,7 +248,7 @@ P3Driver::~P3Driver()
 /**
  * Sets the P3Driver type.
  * \note P3Driver's type can only be changed if there are no attached
- * OSSteerVehicle(s).
+ * P3Driver(s).
  */
 /**
  * Creates actually the steer plug-in.
@@ -264,17 +265,17 @@ P3Driver::~P3Driver()
  * \note Internal use only.
  */
 /**
- * Adds a OSSteerVehicle to this P3Driver (ie to the underlying OpenSteer
+ * Adds a P3Driver to this P3Driver (ie to the underlying OpenSteer
  * management mechanism).
  * Returns a negative value on error.
  */
 /**
- * Removes a OSSteerVehicle from this P3Driver (ie from the OpenSteer
+ * Removes a P3Driver from this P3Driver (ie from the OpenSteer
  * handling mechanism).
  * Returns a negative value on error.
  */
 /**
- * Checks if an OSSteerVehicle could be handled by this P3Driver.
+ * Checks if an P3Driver could be handled by this P3Driver.
  * \note The check is done by effective type comparison.
  */
 /**
@@ -551,7 +552,7 @@ void P3Driver::do_disable()
 
 /**
  * Updates the underlying OpenSteer plug-in.
- * It allows the added OSSteerVehicle(s) to perform their "steering behaviors".
+ * It allows the added P3Driver(s) to perform their "steering behaviors".
  */
 void P3Driver::update(float dt)
 {
@@ -1047,14 +1048,15 @@ bool P3Driver::require_fully_complete() const
  */
 TypedWritable *P3Driver::make_from_bam(const FactoryParams &params)
 {
-	// continue only if AIManager exists
-	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
+	// continue only if ControlManager exists
+	CONTINUE_IF_ELSE_R(ControlManager::get_global_ptr(), NULL)
 
 	// create a P3Driver with default parameters' values: they'll be restored later
-	AIManager::get_global_ptr()->set_parameters_defaults(
-			AIManager::STEERPLUGIN);
+	ControlManager::get_global_ptr()->set_parameters_defaults(
+			ControlManager::DRIVER);
 	P3Driver *node = DCAST(P3Driver,
-			AIManager::get_global_ptr()->create_steer_plug_in().node());
+			ControlManager::get_global_ptr()->create_driver(
+					"Driver").node());
 
 	DatagramIterator scan;
 	BamReader *manager;

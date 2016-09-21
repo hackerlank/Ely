@@ -18,6 +18,7 @@
 #include "control_includes.h"
 #include "genericAsyncTask.h"
 #include "lpoint3.h"
+#include "plist.h"
 
 //
 #ifndef CPPPARSER

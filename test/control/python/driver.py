@@ -6,7 +6,7 @@ Created on Sep 20, 2016
 
 from panda3d.core import TextNode, ClockObject, AnimControlCollection, \
         auto_bind, LPoint3f, LVecBase3f, PartGroup, LVector3f
-from p3ai import AIManager, ValueList_string, ValueList_LPoint3f, \
+from p3control import AIManager, ValueList_string, ValueList_LPoint3f, \
         ValueList_float
 #
 from common import startFramework, toggleDebugFlag, toggleDebugDraw, mask, \
@@ -21,7 +21,6 @@ import sys, random
 # # specific data/functions declarations/definitions
 sceneNP = None
 vehicleAnimCtls = []
-steerPlugIn = None
 steerVehicles = []
 playerNP = None
 playerDriver = None
@@ -101,8 +100,8 @@ def updatePlugIn(steerPlugIn, task):
     #
     return task.cont
 
-def getPlayerModelAnims(name, scale, vehicleFileIdx, steerPlugIn, 
-                           steerVehicles, vehicleAnimCtls, pos):
+def getPlayerModelAnims(name, scale, vehicleFileIdx, steerVehicles, 
+                        vehicleAnimCtls, pos):
     """get the player, model and animations"""
     
     global app, vehicleAnimFiles
@@ -152,8 +151,6 @@ def getPlayerModelAnims(name, scale, vehicleFileIdx, steerPlugIn,
     steerVehicleNP.set_pos(pos)
     # attach some geometry (a model) to steer vehicle
     vehicleNP.reparent_to(steerVehicleNP)
-    # add the steer vehicle to the plug-in
-    steerPlugIn.add_steer_vehicle(steerVehicleNP)
     # return the steerVehicleNP
     return steerVehicleNP
 
@@ -184,7 +181,7 @@ def movePlayer(data):
         
 if __name__ == '__main__':
 
-    msg = "'pedestrian external'"
+    msg = "'P3Driver'"
     app = startFramework(msg)
       
     # # here is room for your own code

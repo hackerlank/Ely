@@ -10,12 +10,15 @@
 #include "p3Driver.h"
 //#include "p3Chaser.h" XXX
 #include "asyncTaskManager.h"
+#include "graphicsWindow.h"
 #include "bamFile.h"
 
 /**
  *
  */
-ControlManager::ControlManager(const NodePath& root, const CollideMask& mask):
+ControlManager::ControlManager(PT(GraphicsWindow) win, const NodePath& root,
+		const CollideMask& mask):
+		mWin(win),
 		mReferenceNP(NodePath("ReferenceNode")),
 		mRoot(root),
 		mMask(mask),
@@ -28,7 +31,7 @@ ControlManager::ControlManager(const NodePath& root, const CollideMask& mask):
 
 	mDrivers.clear();
 	mDriversParameterTable.clear();
-	mChasers.clear();
+//	mChasers.clear(); XXX
 	mChasersParameterTable.clear();
 	set_parameters_defaults(DRIVER);
 	set_parameters_defaults(CHASER);
@@ -65,9 +68,9 @@ ControlManager::~ControlManager()
 		while (iterN != mDrivers.end())
 		{
 			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
-			//give a chance to P3Chaser to cleanup itself before being destroyed.
+			//give a chance to P3Driver to cleanup itself before being destroyed.
 			(*iterN)->do_finalize();
-			//remove the P3Chasers from the inner list (and from the update task)
+			//remove the P3Drivers from the inner list (and from the update task)
 			iterN = mDrivers.erase(iterN);
 		}
 
@@ -94,10 +97,10 @@ ControlManager::~ControlManager()
  * Returns a NodePath to the new P3Driver,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath ControlManager::create_driver()
+NodePath ControlManager::create_driver(const string& name)
 {
-	PT(P3Driver) newDriver = new P3Driver();
-	nassertr_always(newDriver, NodePath::fail())
+	PT(P3Driver)newDriver = new P3Driver(name);
+	nassertr_always(newDriver && (!mWin.is_null()), NodePath::fail())
 
 	// set reference nodes
 	newDriver->mReferenceNP = mReferenceNP;
@@ -202,13 +205,13 @@ bool ControlManager::destroy_chaser(NodePath chaserNP)
 /**
  * Gets an P3Chaser by index, or NULL on error.
  */
-PT(P3Chaser) ControlManager::get_chaser(int index) const
-{
-	nassertr_always((index >= 0) && (index < (int ) mChasers.size()),
-			NULL)
-
-	return mChasers[index];
-}
+//PT(P3Chaser) ControlManager::get_chaser(int index) const XXX
+//{
+//	nassertr_always((index >= 0) && (index < (int ) mChasers.size()),
+//			NULL)
+//
+//	return mChasers[index];
+//}
 
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
@@ -358,11 +361,35 @@ void ControlManager::set_parameters_defaults(ControlType type)
 		///mDriversParameterTable must be the first cleared
 		mDriversParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mDriversParameterTable.insert(
-				ParameterNameValue("plugin_type", "one_turning"));
-		mDriversParameterTable.insert(
-				ParameterNameValue("pathway",
-						"0.0,0.0,0.0:1E-4,1E-4,1E-4$0.0$false"));
+		mDriversParameterTable.insert(ParameterNameValue("enabled", "true"));
+		mDriversParameterTable.insert(ParameterNameValue("forward", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("backward", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
+		mDriversParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
+		mDriversParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("up", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("down", "enabled"));
+		mDriversParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
+		mDriversParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
+		mDriversParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
+		mDriversParameterTable.insert(ParameterNameValue("speed_key", "shift"));
+		mDriversParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
+		mDriversParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+		mDriversParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
+		mDriversParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
+		mDriversParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
+		mDriversParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
+		mDriversParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
+		mDriversParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
+		mDriversParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
+		mDriversParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
+		mDriversParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+		mDriversParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
 		return;
 	}
 	if (type == CHASER)
@@ -370,50 +397,6 @@ void ControlManager::set_parameters_defaults(ControlType type)
 		///mChasersParameterTable must be the first cleared
 		mChasersParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mChasersParameterTable.insert(
-				ParameterNameValue("vehicle_type", "one_turning"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("external_update", "false"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("mov_type", "opensteer"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("up_axis_fixed", "false"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("up_axis_fixed_mode", "light"));
-		mChasersParameterTable.insert(ParameterNameValue("mass", "1.0"));
-		mChasersParameterTable.insert(ParameterNameValue("speed", "0.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("max_force", "0.1"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("max_speed", "1.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("radius", "1.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("path_pred_time", "3.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("obstacle_min_time_coll", "4.5"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("neighbor_min_time_coll", "3.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("neighbor_min_sep_dist", "1.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("separation_max_dist", "5.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("separation_cos_max_angle", "-0.707"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("alignment_max_dist", "7.5"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("alignment_cos_max_angle", "0.7"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("cohesion_max_dist", "9.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("cohesion_cos_max_angle", "-0.15"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("pursuit_max_pred_time", "20.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("evasion_max_pred_time", "20.0"));
-		mChasersParameterTable.insert(
-				ParameterNameValue("target_speed", "1.0"));
 		return;
 	}
 }

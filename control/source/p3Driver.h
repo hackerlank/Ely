@@ -209,7 +209,7 @@ protected:
 	friend void unref_delete<P3Driver>(P3Driver*);
 	friend class ControlManager;
 
-	P3Driver(const string& name = "P3Driver");
+	P3Driver(const string& name);
 	virtual ~P3Driver();
 
 private:
@@ -302,8 +302,8 @@ public:
 	static void register_with_read_factory();
 	virtual void write_datagram (BamWriter *manager, Datagram &dg) override;
 	virtual int complete_pointers(TypedWritable **p_list, BamReader *manager) override;
-	virtual void finalize(BamReader *manager);
-	bool require_fully_complete() const;
+	virtual void finalize(BamReader *manager); //XXX
+	bool require_fully_complete() const; //XXX
 	///@}
 
 protected:

@@ -38,10 +38,10 @@ INLINE int ControlManager::get_num_drivers() const
 /**
  * Returns the number of OSChasers.
  */
-INLINE int ControlManager::get_num_chasers() const
-{
-	return (int) mChasers.size();
-}
+//INLINE int ControlManager::get_num_chasers() const XXX
+//{
+//	return (int) mChasers.size();
+//}
 
 /**
  * Get singleton pointer.
