@@ -26,7 +26,8 @@ class EXPORT_CLASS ControlManager: public TypedReferenceCount,
 		public Singleton<ControlManager>
 {
 PUBLISHED:
-	ControlManager(PT(GraphicsWindow) win, const NodePath& root = NodePath(),
+	ControlManager(PT(GraphicsWindow) win, int taskSort = 10,
+			const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~ControlManager();
 
@@ -128,6 +129,8 @@ public:
 private:
 	///The reference graphic window.
 	PT(GraphicsWindow) mWin;
+	///The update task sort (should be >0).
+	int mTaskSort;
 
 	///The reference node path.
 	NodePath mReferenceNP;

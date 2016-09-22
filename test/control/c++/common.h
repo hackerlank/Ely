@@ -48,7 +48,6 @@ NodePath loadTerrain(const string&, float widthScale = 0.5,
 		float heightScale = 10.0);
 PT(CollisionEntry)getCollisionEntryFromCamera();
 void printCreationParameters();
-void handleVehicleEvent(const Event*, void*);
 LPoint3f getRandomPos(NodePath);
 bool readFromBamFile(string);
 void writeToBamFileAndExit(const Event*, void*);

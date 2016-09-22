@@ -17,7 +17,7 @@ noinst_PROGRAMS = driver driver_gprof driver_gcov
 
 BUILT_SOURCES = data.cpp
 
-substDataDir = sed -e 's|@sampledatadir[@]|$(srcdir)/../data|g'
+substDataDir = sed -e 's|@sampledatadir[@]|$(srcdir)/../../data|g'
 
 data.cpp: $(srcdir)/data.cpp.in Makefile
 	$(substDataDir) $(srcdir)/$@.in > $@
@@ -25,7 +25,7 @@ data.cpp: $(srcdir)/data.cpp.in Makefile
 EXTRA_DIST = data.cpp.in
 
 common_sources = \
-	common. cpp \
+	common.cpp \
 	data.cpp \
 	$(srcdir)/../../../control/source/controlManager.cxx \
 	$(srcdir)/../../../control/source/controlTools.cxx \
@@ -36,12 +36,6 @@ driver_SOURCES = \
 	driver.cpp
 
 nodist_driver_SOURCES = $(common_sources)
-
-#callback_test
-callback_test_SOURCES = \
-	callback_test.cpp
-
-nodist_callback_test_SOURCES = $(common_sources)
 
 ###PROFILE BUILDS###
 PROFILE_CPPFLAGS = $(AM_CPPFLAGS) -UOS_DEBUG

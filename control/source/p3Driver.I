@@ -315,7 +315,7 @@ INLINE Pair<LVector3f, ValueList<float> > P3Driver::get_current_speeds() const
  * Resets the P3Driver.
  * \note Internal use only.
  */
-void P3Driver::do_reset()
+inline void P3Driver::do_reset()
 {
 	//
 	mEnabled = false;

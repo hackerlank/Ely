@@ -16,9 +16,10 @@
 /**
  *
  */
-ControlManager::ControlManager(PT(GraphicsWindow) win, const NodePath& root,
+ControlManager::ControlManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
 		const CollideMask& mask):
 		mWin(win),
+		mTaskSort(taskSort),
 		mReferenceNP(NodePath("ReferenceNode")),
 		mRoot(root),
 		mMask(mask),
@@ -99,15 +100,17 @@ ControlManager::~ControlManager()
  */
 NodePath ControlManager::create_driver(const string& name)
 {
+	nassertr_always(!name.empty(), NodePath::fail())
+
 	PT(P3Driver)newDriver = new P3Driver(name);
 	nassertr_always(newDriver && (!mWin.is_null()), NodePath::fail())
 
 	// set reference nodes
 	newDriver->mReferenceNP = mReferenceNP;
-	// initialize the new Driver
-	newDriver->do_initialize();
 	// set the reference graphic window.
 	newDriver->mWin = mWin;
+	// initialize the new Driver
+	newDriver->do_initialize();
 
 	// add the new Driver to the inner list (and to the update task)
 	mDrivers.push_back(newDriver);
@@ -136,7 +139,6 @@ bool ControlManager::destroy_driver(NodePath driverNP)
 	driver->mWin.clear();
 	// give a chance to P3Driver to cleanup itself before being destroyed.
 	driver->do_finalize();
-
 	//remove the P3Driver from the inner list (and from the update task)
 	mDrivers.erase(iter);
 	//
@@ -442,6 +444,7 @@ void ControlManager::start_default_update()
 	mUpdateTask = new GenericAsyncTask(string("ControlManager::update"),
 			&TaskInterface<ControlManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
+	mUpdateTask->set_sort(mTaskSort);
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 }

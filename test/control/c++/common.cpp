@@ -29,7 +29,7 @@ const float animRateFactor[2] =
 //obstacle model
 string obstacleFile("plants2.egg");
 //bame file
-string bamFileName("plug_in.boo");
+string bamFileName("control.boo");
 //support
 random_device rd;
 
@@ -54,11 +54,9 @@ void startFramework(int argc, char *argv[], const string& msg)
 	}
 
 	/// typed object init; not needed if you build inside panda source tree
-	OSSteerPlugIn::init_type();
-	OSSteerVehicle::init_type();
-	AIManager::init_type();
-	OSSteerPlugIn::register_with_read_factory();
-	OSSteerVehicle::register_with_read_factory();
+	P3Driver::init_type();
+	ControlManager::init_type();
+	P3Driver::register_with_read_factory();
 	///
 
 	//common callbacks
@@ -160,7 +158,7 @@ NodePath loadTerrain(const string& name, float widthScale, float heightScale)
 PT(CollisionEntry)getCollisionEntryFromCamera()
 {
 	// get ai manager
-	AIManager* aiMgr = AIManager::get_global_ptr();
+	ControlManager* aiMgr = ControlManager::get_global_ptr();
 	// get the mouse watcher
 	PT(MouseWatcher)mwatcher = DCAST(MouseWatcher, window->get_mouse().node());
 	if (mwatcher->has_mouse())
@@ -196,57 +194,33 @@ PT(CollisionEntry)getCollisionEntryFromCamera()
 // print creation parameters
 void printCreationParameters()
 {
-	AIManager* steerMgr = AIManager::get_global_ptr();
+	ControlManager* steerMgr = ControlManager::get_global_ptr();
 	//
 	ValueList<string> valueList = steerMgr->get_parameter_name_list(
-			AIManager::STEERPLUGIN);
-	cout << endl << "OSSteerPlugIn creation parameters:" << endl;
+			ControlManager::DRIVER);
+	cout << endl << "P3Driver creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< steerMgr->get_parameter_value(AIManager::STEERPLUGIN,
+				<< steerMgr->get_parameter_value(ControlManager::DRIVER,
 						valueList[i]) << endl;
 	}
 	//
-	valueList = steerMgr->get_parameter_name_list(AIManager::STEERVEHICLE);
-	cout << endl << "OSSteerVehicle creation parameters:" << endl;
+	valueList = steerMgr->get_parameter_name_list(ControlManager::CHASER);
+	cout << endl << "P3Chaser creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< steerMgr->get_parameter_value(AIManager::STEERVEHICLE,
+				<< steerMgr->get_parameter_value(ControlManager::CHASER,
 						valueList[i]) << endl;
 	}
-}
-
-// handle vehicle's events
-void handleVehicleEvent(const Event* e, void* data)
-{
-	PT(OSSteerVehicle)vehicle = DCAST(OSSteerVehicle,
-			e->get_parameter(0).get_ptr());
-	NodePath vehicleNP = NodePath::any_path(vehicle);
-
-	cout << "got " << e->get_name() << " event from '" << vehicleNP.get_name()
-			<< "' at " << vehicleNP.get_pos() << endl;
-}
-
-// toggle debug draw
-void toggleDebugDraw(const Event* e, void* data)
-{
-	PT(OSSteerPlugIn)plugIn = reinterpret_cast<OSSteerPlugIn*>(data);
-	if(not plugIn)
-	{
-		return;
-	}
-
-	toggleDebugFlag = not toggleDebugFlag;
-	plugIn->toggle_debug_drawing(toggleDebugFlag);
 }
 
 // return a random point on the facing upwards surface of the model
 LPoint3f getRandomPos(NodePath modelNP)
 {
 	// collisions are made wrt render
-	AIManager* aiMgr = AIManager::get_global_ptr();
+	ControlManager* aiMgr = ControlManager::get_global_ptr();
 	// get the bounding box of scene
 	LVecBase3f modelDims;
 	LVector3f modelDeltaCenter;
@@ -271,95 +245,41 @@ LPoint3f getRandomPos(NodePath modelNP)
 	return LPoint3f(x, y, gotCollisionZ.get_second());
 }
 
-// handle add vehicles
-void handleVehicles(const Event* e, void* data)
-{
-	if (not data)
-	{
-		return;
-	}
-
-	PT(CollisionEntry)entry0 = getCollisionEntryFromCamera();
-	if (entry0)
-	{
-		// get the hit object
-		NodePath hitObject = entry0->get_into_node_path();
-		cout << "hit " << hitObject << " object" << endl;
-
-		HandleVehicleData* vehicleData =
-				reinterpret_cast<HandleVehicleData*>(data);
-		NodePath sceneNP = vehicleData->sceneNP;
-		// check if sceneNP is the hitObject or an ancestor thereof
-		if ((sceneNP == hitObject) or sceneNP.is_ancestor_of(hitObject))
-		{
-			// the hit object is the scene: add an vehicle to the scene
-			float meanScale = vehicleData->meanScale;
-			int vehicleFileIdx = vehicleData->vehicleFileIdx;
-			string moveType = vehicleData->moveType;
-			PT(OSSteerPlugIn)steerPlugIn = vehicleData->steerPlugIn;
-			vector<PT(OSSteerVehicle)>&steerVehicles = vehicleData->steerVehicles;
-			vector<vector<PT(AnimControl)> >&vehicleAnimCtls = vehicleData->vehicleAnimCtls;
-			LVector3f deltaPos = vehicleData->deltaPos;
-			// add vehicle
-			LPoint3f pos = entry0->get_surface_point(NodePath()) + deltaPos;
-			getVehicleModelAnims(meanScale, vehicleFileIdx, moveType, sceneNP,
-					steerPlugIn, steerVehicles, vehicleAnimCtls, pos);
-			// show the added vehicles
-			cout << "Vehicles added to plug-in so far:" << endl;
-			for (int i = 0; i < steerPlugIn->get_num_steer_vehicles(); ++i)
-			{
-				cout << "\t- " << *((*steerPlugIn)[i]) << endl;
-			}
-		}
-	}
-}
-
 // read scene from a file
 bool readFromBamFile(string fileName)
 {
-	return AIManager::get_global_ptr()->read_from_bam_file(fileName);
+	return ControlManager::get_global_ptr()->read_from_bam_file(fileName);
 }
 
 // write scene to a file (and exit)
 void writeToBamFileAndExit(const Event* e, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-	AIManager::get_global_ptr()->write_to_bam_file(fileName);
+	ControlManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
 	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
-	WPT(AIManager)steerMgr = AIManager::get_global_ptr();
-	// remove steer vehicles from steer plug-ins
-	for (int i = 0; i < steerMgr->get_num_steer_plug_ins(); ++i)
-	{
-		PT(OSSteerPlugIn)plugInTmp = steerMgr->get_steer_plug_in(i);
-		while(plugInTmp->get_num_steer_vehicles() > 0)
-		{
-			// remove the first one on every cycle
-			plugInTmp->remove_steer_vehicle(
-					NodePath::any_path(plugInTmp->get_steer_vehicle(0)));
-		}
-	}
-	// destroy steer vehicles
-	while (steerMgr->get_num_steer_vehicles() > 0)
+	WPT(ControlManager)steerMgr = ControlManager::get_global_ptr();
+	// destroy drivers
+	while (steerMgr->get_num_drivers() > 0)
 	{
 		// destroy the first one on every cycle
-		steerMgr->destroy_steer_vehicle(
-				NodePath::any_path(steerMgr->get_steer_vehicle(0)));
-///		delete DCAST(OSSteerVehicle, steerMgr->get_steer_vehicle(0).node()); //ERROR
+		steerMgr->destroy_driver(
+				NodePath::any_path(steerMgr->get_driver(0)));
+///		delete DCAST(OSSteerVehicle, steerMgr->get_driver(0).node()); //ERROR
 	}
-	// destroy steer plug-ins
-	while (steerMgr->get_num_steer_plug_ins() > 0)
-	{
-		// destroy the first one on every cycle
-		steerMgr->destroy_steer_plug_in(
-				NodePath::any_path(steerMgr->get_steer_plug_in(0)));
-///		delete DCAST(OSSteerPlugIn, steerMgr->get_steer_plug_in(0).node()); //ERROR
-	}
+//	// destroy chasers
+//	while (steerMgr->get_num_chasers() > 0)
+//	{
+//		// destroy the first one on every cycle
+//		steerMgr->destroy_chaser(
+//				NodePath::any_path(steerMgr->get_chaser(0)));
+/////		delete DCAST(OSSteerPlugIn, steerMgr->get_chaser(0).node()); //ERROR
+//	}
 	///
-	// delete steer manager
-	delete AIManager::get_global_ptr();
+	// delete control manager
+	delete ControlManager::get_global_ptr();
 	// close the window framework
 	framework.close_framework();
 	//
