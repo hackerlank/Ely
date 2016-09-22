@@ -33,8 +33,6 @@
 							</tool>
 							<tool errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp.1417063855" name="GCC C++ Compiler" superClass="org.eclipse.linuxtools.cdt.autotools.core.toolchain.tool.gpp">
 								<option id="gnu.cpp.compiler.option.include.paths.365971523" name="Include paths (-I)" superClass="gnu.cpp.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/build-Devel_Debug/include}&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${workspace_loc:/Ely/include}&quot;"/>
 									<listOptionValue builtIn="false" value="/usr/include/panda3d"/>
 									<listOptionValue builtIn="false" value="/usr/include/bullet"/>
 								</option>
@@ -825,6 +823,7 @@
 			</target>
 			<target name="all" path="ai/test/c++" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
+				<buildArguments/>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -864,7 +863,6 @@
 			</target>
 			<target name="all" path="build-Devel_Debug_Thread" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments/>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>
@@ -896,7 +894,7 @@
 			</target>
 			<target name="all" path="test/control/c++" targetID="org.eclipse.cdt.build.MakeTargetBuilder">
 				<buildCommand>make</buildCommand>
-				<buildArguments>-j3</buildArguments>
+				<buildArguments>-j6</buildArguments>
 				<buildTarget>all</buildTarget>
 				<stopOnError>true</stopOnError>
 				<useDefaultCommand>false</useDefaultCommand>

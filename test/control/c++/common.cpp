@@ -25,7 +25,7 @@ string vehicleAnimFiles[5][2] =
 { "", "" },
 { "red_car-anim.egg", "red_car-anim2.egg" }};
 const float animRateFactor[2] =
-{ 1.20, 4.80 };
+{ 1.80, 5.80 };
 //obstacle model
 string obstacleFile("plants2.egg");
 //bame file

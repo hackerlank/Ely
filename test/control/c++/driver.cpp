@@ -203,14 +203,14 @@ AsyncTask::DoneStatus updateDriver(GenericAsyncTask*, void* data)
 	driver->update(dt);
 	// get current velocity size
 	float currentVelSize =
-	driver->get_current_speeds().get_first().length_squared();
+	driver->get_current_speeds().get_first().length();
 	// handle player's animation
 	for (int i = 0; i < (int)playerAnimCtls.size(); ++i)
 	{
 		if (currentVelSize > 0.0)
 		{
 			int animOnIdx, animOffIdx;
-			currentVelSize < 4.0 ? animOnIdx = 0: animOnIdx = 1;
+			currentVelSize < 6.0 ? animOnIdx = 0: animOnIdx = 1;
 			animOffIdx = (animOnIdx + 1) % 2;
 			// Off anim (0:walk, 1:run)
 			if (playerAnimCtls[i][animOffIdx]->is_playing())
