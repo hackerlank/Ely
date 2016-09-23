@@ -225,14 +225,16 @@ NodePath getModelAnims(const string& name, float scale,
 void handlePlayerUpdate()
 {
 	// get current velocity size
-	float currentVelSize = playerDriver->get_current_speeds().get_first().length();
+	float currentVelSize =
+			playerDriver->get_current_speeds().get_first().length();
+	NodePath playerDriverNP = NodePath::any_path(playerDriver);
 	// handle player's animation
-	for (int i = 0; i < (int)playerAnimCtls.size(); ++i)
+	for (int i = 0; i < (int) playerAnimCtls.size(); ++i)
 	{
 		if (currentVelSize > 0.0)
 		{
 			int animOnIdx, animOffIdx;
-			currentVelSize < 6.0 ? animOnIdx = 0: animOnIdx = 1;
+			currentVelSize < 6.0 ? animOnIdx = 0 : animOnIdx = 1;
 			animOffIdx = (animOnIdx + 1) % 2;
 			// Off anim (0:walk, 1:run)
 			if (playerAnimCtls[i][animOffIdx]->is_playing())
@@ -242,7 +244,7 @@ void handlePlayerUpdate()
 			// On amin (0:walk, 1:run)
 			playerAnimCtls[i][animOnIdx]->set_play_rate(
 					currentVelSize / animRateFactor[animOnIdx]);
-			if (! playerAnimCtls[i][animOnIdx]->is_playing())
+			if (!playerAnimCtls[i][animOnIdx]->is_playing())
 			{
 				playerAnimCtls[i][animOnIdx]->loop(true);
 			}
@@ -261,14 +263,14 @@ void handlePlayerUpdate()
 		WPT(ControlManager)controlMgr = ControlManager::get_global_ptr();
 		// correct player's Z: set the collision ray origin wrt collision root
 		LPoint3f pOrig = controlMgr->get_collision_root().get_relative_point(
-				controlMgr->get_reference_node_path(), playerNP.get_pos()) + playerHeightRayCast * 2.0;
+				controlMgr->get_reference_node_path(), playerDriverNP.get_pos()) + playerHeightRayCast * 2.0;
 		// get the collision height wrt the reference node path
 		Pair<bool,float> gotCollisionZ = controlMgr->get_collision_height(pOrig,
 				controlMgr->get_reference_node_path());
 		if (gotCollisionZ.get_first())
 		{
 			//updatedPos.z needs correction
-			playerNP.set_z(gotCollisionZ.get_second());
+			playerDriverNP.set_z(gotCollisionZ.get_second());
 		}
 	}
 }

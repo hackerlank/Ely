@@ -187,6 +187,7 @@ def handlePlayerUpdate():
     global playerDriver, playerAnimCtls, playerNP, playerHeightRayCast
     # get current velocity size
     currentVelSize = playerDriver.get_current_speeds().get_first().length()
+    playerDriverNP = NodePath.any_path(playerDriver)
     # handle vehicle's animation
     for i in range(len(playerAnimCtls)):
         if currentVelSize > 0.0:
@@ -213,14 +214,14 @@ def handlePlayerUpdate():
         controlMgr = ControlManager.get_global_ptr()
         # correct player's Z: set the collision ray origin wrt collision root
         pOrig = controlMgr.get_collision_root().get_relative_point(
-                controlMgr.get_reference_node_path(), playerNP.get_pos()) + \
+                controlMgr.get_reference_node_path(), playerDriverNP.get_pos()) + \
                                         playerHeightRayCast * 2.0
         # get the collision height wrt the reference node path
         gotCollisionZ = controlMgr.get_collision_height(pOrig,
                                         controlMgr.get_reference_node_path())
         if gotCollisionZ.get_first():
             # updatedPos.z needs correction
-            playerNP.set_z(gotCollisionZ.get_second())
+            playerDriverNP.set_z(gotCollisionZ.get_second())
             
 def updateControls(task):
     """custom update task for controls"""
