@@ -21,3 +21,9 @@ m4/lt~obsolete.m4
 missing
 *~
 .settings*/
+*.so
+linux_amd64_py27/
+*.pyc
+interrogate.in
+interrogate_module.cpp
+interrogate_wrapper.cpp

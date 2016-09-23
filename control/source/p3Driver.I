@@ -356,9 +356,9 @@ inline void P3Driver::do_reset()
 	mSerializedDataTmpPtr = NULL;
 }
 
-INLINE ostream &operator <<(ostream &out, const P3Driver& plugIn)
+INLINE ostream &operator <<(ostream &out, const P3Driver& driver)
 {
-	plugIn.output(out);
+	driver.output(out);
 	return out;
 }
 

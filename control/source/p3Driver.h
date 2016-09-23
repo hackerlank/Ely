@@ -342,7 +342,7 @@ private:
 
 };
 
-INLINE ostream &operator << (ostream &out, const P3Driver & plugIn);
+INLINE ostream &operator << (ostream &out, const P3Driver & driver);
 
 ///inline
 #include "p3Driver.I"

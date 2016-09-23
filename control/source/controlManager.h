@@ -8,6 +8,7 @@
 #ifndef CONTROLMANGER_H_
 #define CONTROLMANGER_H_
 
+#include "graphicsWindow.h"
 #include "control_includes.h"
 #include "controlTools.h"
 #include "collisionTraverser.h"

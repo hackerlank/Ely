@@ -33,4 +33,7 @@ soccer
 test1
 test2
 *.boo
-
+control
+control_gcov
+*.gcno
+control_gprof

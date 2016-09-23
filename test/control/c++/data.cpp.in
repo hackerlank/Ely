@@ -6,12 +6,7 @@
  */
 
 #include <string>
-#include <pandaFramework.h>
 
 using namespace std;
 
-PandaFramework framework;
-WindowFramework *window;
-CollideMask mask = BitMask32(0x10);
-bool toggleDebugFlag = false;
 string dataDir("@sampledatadir@");

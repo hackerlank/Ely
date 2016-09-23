@@ -11,7 +11,6 @@
 
 #include "p3Driver.h"
 #include "controlManager.h"
-#include "graphicsWindow.h"
 #include <cmath>
 
 #ifndef CPPPARSER
