@@ -21,7 +21,7 @@ class P3Driver;
 /**
  * ControlManager Singleton class.
  *
- * Used for handling P3Drivers, Chasers, RNNavMeshes and RNCrowdAgents.
+ * Used for handling P3Drivers, P3Chasers.
  */
 class EXPORT_CLASS ControlManager: public TypedReferenceCount,
 		public Singleton<ControlManager>

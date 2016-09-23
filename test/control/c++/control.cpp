@@ -135,7 +135,7 @@ void writeToBamFileAndExit(const Event*, void* data)
 	string fileName = *reinterpret_cast<string*>(data);
 	ControlManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
-	framework.get_task_mgr().remove(updateTask);
+//	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
 	WPT(ControlManager)steerMgr = ControlManager::get_global_ptr();
@@ -155,7 +155,6 @@ void writeToBamFileAndExit(const Event*, void* data)
 //				NodePath::any_path(steerMgr->get_chaser(0)));
 /////		delete DCAST(OSSteerPlugIn, steerMgr->get_chaser(0).node()); //ERROR
 //	}
-	///
 	// delete control manager
 	delete ControlManager::get_global_ptr();
 	// close the window framework
@@ -222,12 +221,9 @@ NodePath getModelAnims(const string& name, float scale,
 	return modelNP;
 }
 
-// custom update task for controls
-AsyncTask::DoneStatus updateControls(GenericAsyncTask*, void* data)
+// handles player on every update
+void handlePlayerUpdate()
 {
-	// call update for controls
-	double dt = ClockObject::get_global_clock()->get_dt();
-	playerDriver->update(dt);
 	// get current velocity size
 	float currentVelSize = playerDriver->get_current_speeds().get_first().length();
 	// handle player's animation
@@ -275,6 +271,16 @@ AsyncTask::DoneStatus updateControls(GenericAsyncTask*, void* data)
 			playerNP.set_z(gotCollisionZ.get_second());
 		}
 	}
+}
+
+// custom update task for controls
+AsyncTask::DoneStatus updateControls(GenericAsyncTask*, void* data)
+{
+	// call update for controls
+	double dt = ClockObject::get_global_clock()->get_dt();
+	playerDriver->update(dt);
+	// handle player on update
+	handlePlayerUpdate();
 	//
 	return AsyncTask::DS_cont;
 }
@@ -322,12 +328,13 @@ void movePlayer(const Event*, void* data)
 void driverCallback(PT(P3Driver)driver)
 {
 	Pair<LVector3f, ValueList<float> > speeds = driver->get_current_speeds();
-	cout << driver << endl;
-	cout << str(globalClock->get_real_time()) + string(" - ") +
+	cout << *driver << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
 			str(globalClock->get_dt()) << endl;
 	cout << "current speeds: " << speeds.get_first() << " - " <<
 			speeds.get_second().get_value(0) << "," <<
 			speeds.get_second().get_value(1) << endl;
+	// handle player on update
+	handlePlayerUpdate();
 }
 
 int main(int argc, char *argv[])

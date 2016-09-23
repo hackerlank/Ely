@@ -30,7 +30,7 @@ bamFileName = "control.boo"
 
 # # specific data/functions declarations/definitions
 sceneNP = None
-vehicleAnimCtls = []
+playerAnimCtls = []
 playerNP = None
 playerDriver = None
 playerHeightRayCast = LVector3f()
@@ -100,7 +100,7 @@ def startFramework(msg):
     props.setTitle("p3ai: " + msg)
     app.win.requestProperties(props)
  
-    #common callbacks     
+    # common callbacks     
     #
     return app
 
@@ -123,7 +123,6 @@ def writeToBamFileAndExit(fileName):
 #     for chaserTmp in controlMgr.get_chasers():
 #         # destroy chaserTmp
 #         controlMgr.destroy_chaser(NodePath.any_path(chaserTmp))
-    # #
     #
     sys.exit(0)
 
@@ -159,9 +158,9 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
         # first anim -> modelAnimCtls[i][0]
         modelAnimNP[0] = app.loader.load_model(playerAnimFiles[modelFileIdx][0])
         modelAnimNP[0].reparent_to(modelNP)
-        auto_bind(modelNP.node(), tmpAnims, 
-                  PartGroup.HMF_ok_part_extra |
-                  PartGroup.HMF_ok_anim_extra |
+        auto_bind(modelNP.node(), tmpAnims,
+                  PartGroup.HMF_ok_part_extra | 
+                  PartGroup.HMF_ok_anim_extra | 
                   PartGroup.HMF_ok_wrong_root_name)
         modelAnimCtls[-1][0] = tmpAnims.get_anim(0)
         tmpAnims.clear_anims()
@@ -169,9 +168,9 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
         # second anim -> modelAnimCtls[i][1]
         modelAnimNP[1] = app.loader.load_model(playerAnimFiles[modelFileIdx][1])
         modelAnimNP[1].reparent_to(modelNP)
-        auto_bind(modelNP.node(), tmpAnims, 
-                  PartGroup.HMF_ok_part_extra |
-                  PartGroup.HMF_ok_anim_extra |
+        auto_bind(modelNP.node(), tmpAnims,
+                  PartGroup.HMF_ok_part_extra | 
+                  PartGroup.HMF_ok_anim_extra | 
                   PartGroup.HMF_ok_wrong_root_name)
         modelAnimCtls[-1][1] = tmpAnims.get_anim(0)
         tmpAnims.clear_anims()
@@ -182,13 +181,10 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
     #
     return modelNP
 
-def updateControls(task):
-    """custom update task for controls"""
-
+def handlePlayerUpdate():
+    """handles player on every update"""
+    
     global playerDriver, playerAnimCtls, playerNP, playerHeightRayCast
-    # call update for controls
-    dt = ClockObject.get_global_clock().get_dt()
-    playerDriver.update(dt)
     # get current velocity size
     currentVelSize = playerDriver.get_current_speeds().get_first().length()
     # handle vehicle's animation
@@ -209,8 +205,8 @@ def updateControls(task):
                 playerAnimCtls[i][animOnIdx].loop(True)
         else:
             # stop any animation
-            vehicleAnimCtls[i][0].stop()
-            vehicleAnimCtls[i][1].stop()
+            playerAnimCtls[i][0].stop()
+            playerAnimCtls[i][1].stop()
     # make playerNP kinematic (ie stand on floor)
     if currentVelSize > 0.0:
         # get control manager
@@ -220,11 +216,21 @@ def updateControls(task):
                 controlMgr.get_reference_node_path(), playerNP.get_pos()) + \
                                         playerHeightRayCast * 2.0
         # get the collision height wrt the reference node path
-        gotCollisionZ = controlMgr.get_collision_height(pOrig, 
+        gotCollisionZ = controlMgr.get_collision_height(pOrig,
                                         controlMgr.get_reference_node_path())
         if gotCollisionZ.get_first():
-            #updatedPos.z needs correction
+            # updatedPos.z needs correction
             playerNP.set_z(gotCollisionZ.get_second())
+            
+def updateControls(task):
+    """custom update task for controls"""
+
+    global playerDriver
+    # call update for controls
+    dt = ClockObject.get_global_clock().get_dt()
+    playerDriver.update(dt)
+    # handle player on update
+    handlePlayerUpdate()
 
 def movePlayer(data):
     """player's movement callback"""
@@ -235,11 +241,11 @@ def movePlayer(data):
 
     action = data
     if action > 0:
-        #start movement
+        # start movement
         enable = True
     else:
         action = -action
-        #stop movement
+        # stop movement
         enable = False
     #
     if action == forwardMove:
@@ -250,6 +256,19 @@ def movePlayer(data):
         playerDriver.enable_backward(enable)
     elif action == rightMove:
         playerDriver.enable_head_right(enable)
+
+def driverCallback(driver):
+    """driver update callback function"""
+    
+    global globalClock
+    speeds = driver.get_current_speeds()
+    print(driver, " " + str(globalClock.get_real_time()) + " - " + 
+            str(globalClock.get_dt()))
+    print("current speeds: ", speeds.get_first(), " - ",
+            speeds.get_second().get_value(0), "," ,
+            speeds.get_second().get_value(1))
+    # handle player on update
+    handlePlayerUpdate()
 
 if __name__ == '__main__':
 
@@ -311,10 +330,12 @@ if __name__ == '__main__':
         # XXX
 
     # # first option: start the default update task for all plug-ins
-#     controlMgr.start_default_update()
+    controlMgr.start_default_update()
+    playerDriver.set_update_callback(driverCallback)
+    globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins
-    app.taskMgr.add(updateControls, "updateControls", 10, appendTask=True)
+#     app.taskMgr.add(updateControls, "updateControls", 10, appendTask=True)
 
     # write to bam file on exit
     app.win.set_close_request_event("close_request_event")
