@@ -29,7 +29,7 @@ string playerAnimFiles[5][2] =
 { "sparrow-flying.egg", "sparrow-flying2.egg" },
 { "", "" },
 { "red_car-anim.egg", "red_car-anim2.egg" }};
-const float animRateFactor[2] = { 1.80, 5.80 };
+const float animRateFactor[2] = { 0.6, 0.175 };
 // bam file
 string bamFileName("control.boo");
 
@@ -224,9 +224,9 @@ NodePath getModelAnims(const string& name, float scale,
 // handles player on every update
 void handlePlayerUpdate()
 {
-	// get current velocity size
+	// get current forward velocity size
 	float currentVelSize =
-			playerDriver->get_current_speeds().get_first().length();
+			abs(playerDriver->get_current_speeds().get_first().get_y());
 	NodePath playerDriverNP = NodePath::any_path(playerDriver);
 	// handle player's animation
 	for (int i = 0; i < (int) playerAnimCtls.size(); ++i)
@@ -234,7 +234,7 @@ void handlePlayerUpdate()
 		if (currentVelSize > 0.0)
 		{
 			int animOnIdx, animOffIdx;
-			currentVelSize < 6.0 ? animOnIdx = 0 : animOnIdx = 1;
+			currentVelSize < 5.0 ? animOnIdx = 0 : animOnIdx = 1;
 			animOffIdx = (animOnIdx + 1) % 2;
 			// Off anim (0:walk, 1:run)
 			if (playerAnimCtls[i][animOffIdx]->is_playing())
@@ -243,7 +243,7 @@ void handlePlayerUpdate()
 			}
 			// On amin (0:walk, 1:run)
 			playerAnimCtls[i][animOnIdx]->set_play_rate(
-					currentVelSize / animRateFactor[animOnIdx]);
+					currentVelSize * animRateFactor[animOnIdx]);
 			if (!playerAnimCtls[i][animOnIdx]->is_playing())
 			{
 				playerAnimCtls[i][animOnIdx]->loop(true);
@@ -310,19 +310,19 @@ void movePlayer(const Event*, void* data)
 	//
 	if (action == forwardMove)
 	{
-		playerDriver->enable_forward(enable);
+		playerDriver->set_move_forward(enable);
 	}
 	else if (action == leftMove)
 	{
-		playerDriver->enable_head_left(enable);
+		playerDriver->set_rotate_head_left(enable);
 	}
 	else if (action == backwardMove)
 	{
-		playerDriver->enable_backward(enable);
+		playerDriver->set_move_backward(enable);
 	}
 	else if (action == rightMove)
 	{
-		playerDriver->enable_head_right(enable);
+		playerDriver->set_rotate_head_right(enable);
 	}
 }
 
@@ -485,8 +485,8 @@ int main(int argc, char *argv[])
 
 	// place camera trackball (local coordinate)
 	PT(Trackball)trackball = DCAST(Trackball, window->get_mouse().find("**/+Trackball").node());
-	trackball->set_pos(0.0, 160.0, -5.0);
-	trackball->set_hpr(0.0, 20.0, 0.0);
+	trackball->set_pos(0.0, 120.0, 5.0);
+	trackball->set_hpr(0.0, 10.0, 0.0);
 
 	// do the main loop, equals to call app.run() in python
 	framework.main_loop();

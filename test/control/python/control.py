@@ -24,7 +24,7 @@ playerAnimFiles = [["eve-walk.egg", "eve-run.egg"],
                   ["sparrow-flying.egg", "sparrow-flying2.egg"],
                   ["", ""],
                   ["red_car-anim.egg", "red_car-anim2.egg"]]
-animRateFactor = [1.20, 4.80]
+animRateFactor = [0.6, 0.175]
 # bame file
 bamFileName = "control.boo"
 
@@ -185,13 +185,13 @@ def handlePlayerUpdate():
     """handles player on every update"""
     
     global playerDriver, playerAnimCtls, playerNP, playerHeightRayCast
-    # get current velocity size
-    currentVelSize = playerDriver.get_current_speeds().get_first().length()
+    # get current forward velocity size
+    currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
     playerDriverNP = NodePath.any_path(playerDriver)
     # handle vehicle's animation
     for i in range(len(playerAnimCtls)):
         if currentVelSize > 0.0:
-            if currentVelSize < 6.0: 
+            if currentVelSize < 5.0: 
                 animOnIdx = 0
             else:
                 animOnIdx = 1
@@ -200,7 +200,7 @@ def handlePlayerUpdate():
             if playerAnimCtls[i][animOffIdx].is_playing():
                 playerAnimCtls[i][animOffIdx].stop()
             # On amin (0:walk, 1:run)
-            playerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize / 
+            playerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
                                                     animRateFactor[animOnIdx])
             if not playerAnimCtls[i][animOnIdx].is_playing():
                 playerAnimCtls[i][animOnIdx].loop(True)
@@ -250,13 +250,13 @@ def movePlayer(data):
         enable = False
     #
     if action == forwardMove:
-        playerDriver.enable_forward(enable)
+        playerDriver.set_move_forward(enable)
     elif action == leftMove:
-        playerDriver.enable_head_left(enable)
+        playerDriver.set_rotate_head_left(enable)
     elif action == backwardMove:
-        playerDriver.enable_backward(enable)
+        playerDriver.set_move_backward(enable)
     elif action == rightMove:
-        playerDriver.enable_head_right(enable)
+        playerDriver.set_rotate_head_right(enable)
 
 def driverCallback(driver):
     """driver update callback function"""
@@ -362,8 +362,8 @@ if __name__ == '__main__':
 
     # place camera
     trackball = app.trackball.node()
-    trackball.set_pos(0.0, 160.0, -5.0)
-    trackball.set_hpr(0.0, 20.0, 0.0)
+    trackball.set_pos(0.0, 120.0, 5.0)
+    trackball.set_hpr(0.0, 10.0, 0.0)
    
     # app.run(), equals to do the main loop in C++
     app.run()

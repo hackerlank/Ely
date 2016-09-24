@@ -46,10 +46,10 @@ void P3Driver::do_initialize()
 	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
 	mSignOfTranslation = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("inverted_translation"))
-					== string("true") ? -1 : 1);
+			== string("true") ? -1 : 1);
 	mSignOfMouse = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("inverted_rotation"))
-					== string("true") ? -1 : 1);
+			== string("true") ? -1 : 1);
 	//head limit: enabled@[limit]; limit >= 0.0
 	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_limit")), '@');
 	if (paramValuesStr.size() >= 2)
@@ -78,66 +78,60 @@ void P3Driver::do_initialize()
 	//mouse movement setting
 	mMouseEnabledH = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_enabled_h"))
-					== string("true") ? true : false);
+			== string("true") ? true : false);
 	mMouseEnabledP = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_enabled_p"))
-					== string("true") ? true : false);
+			== string("true") ? true : false);
 	//key events setting
 	//backward key
 	mBackwardKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("backward"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//down key
 	mDownKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("down")) == string("disabled") ?
-					false : true);
+			false : true);
 	//forward key
 	mForwardKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("forward"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_left"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//strafeRight key
 	mStrafeRightKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_right"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//headLeft key
 	mHeadLeftKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_left"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//headRight key
 	mHeadRightKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_right"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//pitchUp key
 	mPitchUpKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_up"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//pitchDown key
 	mPitchDownKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_down"))
-					== string("disabled") ? false : true);
+			== string("disabled") ? false : true);
 	//up key
 	mUpKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("up")) == string("disabled") ?
-					false : true);
+			false : true);
 	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_move"))
-					== string("enabled") ? true : false);
-	//speedKey
-	mSpeedKey = mTmpl->get_parameter_value(ControlManager::DRIVER, string("speed_key"));
-	if ((mSpeedKey != string("control")	and (mSpeedKey != string("alt"))))
-	{
-		mSpeedKey = string("shift");
-	}
+			== string("enabled") ? true : false);
 	//
 	float value, absValue;
 	//max linear speed (>=0)
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("max_linear_speed")).c_str(),
-	NULL);
+			NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
 	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
@@ -145,7 +139,7 @@ void P3Driver::do_initialize()
 			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
 	//max angular speed (>=0)
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("max_angular_speed")).c_str(),
-	NULL);
+			NULL);
 	mMaxSpeedHP = (value >= 0.0 ? value : -value);
 	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
 	//linear accel (>=0)
@@ -154,7 +148,7 @@ void P3Driver::do_initialize()
 	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
 	//angular accel (>=0)
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("angular_accel")).c_str(),
-	NULL);
+			NULL);
 	mAccelHP = (value >= 0.0 ? value : -value);
 	//reset actual speeds
 	mActualSpeedXYZ = LVector3f::zero();
@@ -170,20 +164,20 @@ void P3Driver::do_initialize()
 	mFrictionHP = (value >= 0.0 ? value : -value);
 	//stop threshold ([0.0, 1.0])
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("stop_threshold")).c_str(),
-	NULL);
+			NULL);
 	mStopThreshold =
-			(value >= 0.0 ? value - floor(value) : ceil(value) - value);
+	(value >= 0.0 ? value - floor(value) : ceil(value) - value);
 	//fast factor (>=0)
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("fast_factor")).c_str(),
-	NULL);
+			NULL);
 	mFastFactor = (value >= 0.0 ? value : -value);
 	//sens x (>=0)
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("sens_x")).c_str(),
-	NULL);
+			NULL);
 	mSensX = (value >= 0.0 ? value : -value);
 	//sens_y (>=0)
 	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("sens_y")).c_str(),
-	NULL);
+			NULL);
 	mSensY = (value >= 0.0 ? value : -value);
 	//
 	mCentX = mWin->get_properties().get_x_size() / 2;
@@ -222,7 +216,7 @@ void P3Driver::do_finalize()
 }
 
 /**
- * Enables the P3Driver to perform its task (default: disabled).
+ * Enables the P3Driver to perform its task (default: enabled).
  */
 bool P3Driver::enable()
 {
@@ -256,7 +250,7 @@ void P3Driver::do_enable()
 }
 
 /**
- * Disables the P3Driver to perform its task (default: disabled).
+ * Disables the P3Driver to perform its task (default: enabled).
  */
 bool P3Driver::disable()
 {
@@ -658,7 +652,6 @@ void P3Driver::update(float dt)
 #endif //PYTHON_BUILD
 }
 
-
 /**
  * Writes a sensible description of the P3Driver to the indicated output
  * stream.
@@ -757,7 +750,6 @@ void P3Driver::write_datagram(BamWriter *manager, Datagram &dg)
 	dg.add_bool(mPitchUpKey);
 	dg.add_bool(mPitchDownKey);
 	dg.add_bool(mMouseMoveKey);
-	dg.add_string(mSpeedKey);
 	///@}
 
 	///Key control values.
@@ -875,7 +867,6 @@ void P3Driver::fillin(DatagramIterator &scan, BamReader *manager)
 	mPitchUpKey = scan.get_bool();
 	mPitchDownKey = scan.get_bool();
 	mMouseMoveKey = scan.get_bool();
-	mSpeedKey = scan.get_string();
 	///@}
 
 	///Key control values.

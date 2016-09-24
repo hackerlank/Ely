@@ -123,7 +123,7 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * \name ENABLE/DISABLE CONTROLS
+	 * \name ENABLE/DISABLE COMMANDS
 	 */
 	///@{
 	INLINE void enable_forward(bool enable);
@@ -151,11 +151,45 @@ PUBLISHED:
 	///@}
 
 	/**
+	 * \name MOVEMENT/ROTATION COMMANDS
+	 */
+	///@{
+	INLINE void set_move_forward(bool activate);
+	INLINE bool get_move_forward() const;
+	INLINE void set_move_backward(bool activate);
+	INLINE bool get_move_backward() const;
+	INLINE void set_move_strafe_left(bool activate);
+	INLINE bool get_move_strafe_left() const;
+	INLINE void set_move_strafe_right(bool activate);
+	INLINE bool get_move_strafe_right() const;
+	INLINE void set_move_up(bool activate);
+	INLINE bool get_move_up() const;
+	INLINE void set_move_down(bool activate);
+	INLINE bool get_move_down() const;
+	INLINE void set_rotate_head_left(bool activate);
+	INLINE bool get_rotate_head_left() const;
+	INLINE void set_rotate_head_right(bool activate);
+	INLINE bool get_rotate_head_right() const;
+	INLINE void set_rotate_pitch_up(bool activate);
+	INLINE bool get_rotate_pitch_up() const;
+	INLINE void set_rotate_pitch_down(bool activate);
+	INLINE bool get_rotate_pitch_down() const;
+	INLINE void set_mouse_move(bool activate);
+	INLINE bool get_mouse_move() const;
+	///@}
+
+	/**
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	INLINE void set_head_limit(bool enabled = false, float hLimit = 0.0);
-	INLINE void set_pitch_limit(bool enabled = false, float pLimit = 0.0);
+	INLINE void set_inverted_translation(bool enable);
+	INLINE bool get_inverted_translation() const;
+	INLINE void set_inverted_rotation(bool enable);
+	INLINE bool get_inverted_rotation() const;
+	INLINE void set_head_limit(bool enabled, float hLimit);
+	INLINE Pair<bool, float> get_head_limit() const;
+	INLINE void set_pitch_limit(bool enabled, float pLimit);
+	INLINE Pair<bool, float> get_pitch_limit() const;
 	INLINE void set_max_linear_speed(const LVector3f& linearSpeed);
 	INLINE void set_max_angular_speed(float angularSpeed);
 	INLINE Pair<LVector3f, float> get_max_speeds() const;
@@ -165,10 +199,16 @@ PUBLISHED:
 	INLINE void set_linear_friction(float linearFriction);
 	INLINE void set_angular_friction(float angularFriction);
 	INLINE ValueList<float> get_frictions() const;
+	INLINE void set_stop_threshold(float threshold);
+	INLINE float get_stop_threshold() const;
 	INLINE void set_sens(float sensX, float sensY);
 	INLINE ValueList<float> get_sens() const;
 	INLINE void set_fast_factor(float factor);
 	INLINE float get_fast_factor() const;
+	INLINE void set_mouse_enable_head(bool enable);
+	INLINE bool get_mouse_enable_head() const;
+	INLINE void set_mouse_enable_pitch(bool enable);
+	INLINE bool get_mouse_enable_pitch() const;
 	INLINE Pair<LVector3f, ValueList<float> > get_current_speeds() const;
 	///@}
 
@@ -227,7 +267,6 @@ private:
 	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
 			mDownKey, mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey,
 			mMouseMoveKey;
-	string mSpeedKey;
 	///@}
 	///Key control values.
 	///@{
