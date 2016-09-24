@@ -16,8 +16,8 @@
 #endif //CPPPARSER
 
 /**
- * \brief Component designed for the control of object movement
- * through keyboard/mouse button events and mouse movement.
+ * This class is designed for the control of object movement through
+ * keyboard/mouse button events and mouse movement.
  *
  * Movement is, by default, based on acceleration (i.e. "dynamic"):
  * accelerations (and max speeds) can independently set for any (local)
@@ -46,10 +46,9 @@
  * no control through mouse movements.\n
  * All movements (but up and down) can be inverted (default: not inverted).
  *
- * > **XML Param(s)**:
+ * > **P3Driver text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
- * | *enabled*  				|single| *true* | -
  * | *forward*  				|single| *enabled* | -
  * | *backward*  				|single| *enabled* | -
  * | *head_limit*  				|single| *false@0.0* | specified as "enabled@[limit] with enabled = true,false, with limit >= 0.0
@@ -235,14 +234,14 @@ private:
 	bool mMouseEnabledH, mMouseEnabledP;
 	bool mHeadLimitEnabled, mPitchLimitEnabled;
 	float mHLimit, mPLimit;
-	int mSignOfTranslation, mSignOfMouse;
+	char mSignOfTranslation, mSignOfMouse;
 	///@}
 	/// Sensitivity settings.
 	///@{
 	float mFastFactor;
-	LVecBase3f mActualSpeedXYZ, mMaxSpeedXYZ, mMaxSpeedSquaredXYZ;
+	LVector3f mActualSpeedXYZ, mMaxSpeedXYZ, mMaxSpeedSquaredXYZ;
 	float mActualSpeedH, mActualSpeedP, mMaxSpeedHP, mMaxSpeedSquaredHP;
-	LVecBase3f mAccelXYZ;
+	LVector3f mAccelXYZ;
 	float mAccelHP;
 	float mFrictionXYZ;
 	float mFrictionHP;
@@ -281,17 +280,6 @@ private:
 	///@}
 #endif //PYTHON_BUILD
 
-	/**
-	 * \name SERIALIZATION ONLY SETTINGS.
-	 */
-	///@{
-	// temporary storage for serialized data
-	struct SerializedDataTmp
-	{
-	}*mSerializedDataTmpPtr;
-	// persistent storage for serialized data
-	///@}
-
 	// Explicitly disabled copy constructor and copy assignment operator.
 	P3Driver(const P3Driver&);
 	P3Driver& operator=(const P3Driver&);
@@ -304,8 +292,6 @@ public:
 	static void register_with_read_factory();
 	virtual void write_datagram (BamWriter *manager, Datagram &dg) override;
 	virtual int complete_pointers(TypedWritable **p_list, BamReader *manager) override;
-	virtual void finalize(BamReader *manager); //XXX
-	bool require_fully_complete() const; //XXX
 	///@}
 
 protected:

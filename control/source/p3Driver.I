@@ -12,57 +12,16 @@
 ///P3Driver inline definitions
 
 /**
- * Returns the P3Driver type.
+ * Returns if the P3Driver is enabled (default: disabled).
  */
-/**
- * Returns the added OSSteerVehicle given its index, or NULL on error.
- */
-/**
- * Returns the number of OSSteerVehicles added to this P3Driver.
- */
-/**
- * Returns the OSSteerVehicle given its index.
- */
-/**
- * Returns the number of OSSteerVehicles added to this P3Driver.
- */
-/**
- * Returns the pathway points.
- */
-/**
- * Returns the pathway points.
- */
-/**
- * Returns the pathway points.
- */
-/**
- * Returns the pathway points.
- */
-/**
- * Adds an obstacle (associated to an empty NodePath) that is only seen by the
- * OpenSteer library.
- * All parameters should be specified.\n
- * Returns the obstacle's unique reference (>0), or a negative value on error.
- */
-/**
- * Returns the obstacle's unique reference (>0) given its index into the list of
- * obstacles added by this P3Driver, or a negative value on error.
- */
-/**
- * Returns the number of obstacles added by this P3Driver.
- */
-/**
- * Returns a reference to underlying OpenSteer::AbstractPlugIn.
- */
-/**
- * OpenSteer::AbstractPlugIn reference conversion function.
- */
-
 INLINE bool P3Driver::is_enabled() const
 {
 	return mEnabled;
 }
 
+/**
+ * Enables/disables the P3Driver for forward movement (default: enabled).
+ */
 INLINE void P3Driver::enable_forward(bool enable)
 {
 	if (mForwardKey)
@@ -71,11 +30,17 @@ INLINE void P3Driver::enable_forward(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's forward movement is enabled.
+ */
 INLINE bool P3Driver::is_forward_enabled() const
 {
 	return mForward;
 }
 
+/**
+ * Enables/disables the P3Driver for backward movement.
+ */
 INLINE void P3Driver::enable_backward(bool enable)
 {
 	if (mBackwardKey)
@@ -84,11 +49,17 @@ INLINE void P3Driver::enable_backward(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's backward movement is enabled.
+ */
 INLINE bool P3Driver::is_backward_enabled() const
 {
 	return mBackward;
 }
 
+/**
+ * Enables/disables the P3Driver for strafe left movement.
+ */
 INLINE void P3Driver::enable_strafe_left(bool enable)
 {
 	if (mStrafeLeftKey)
@@ -97,12 +68,18 @@ INLINE void P3Driver::enable_strafe_left(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's strafe left movement is enabled.
+ */
 INLINE bool P3Driver::is_strafe_left_enabled() const
 {
 
 	return mStrafeLeft;
 }
 
+/**
+ * Enables/disables the P3Driver for strafe right movement.
+ */
 INLINE void P3Driver::enable_strafe_right(bool enable)
 {
 	if (mStrafeRightKey)
@@ -111,12 +88,17 @@ INLINE void P3Driver::enable_strafe_right(bool enable)
 	}
 }
 
-
+/**
+ * Returns if the P3Driver's strafe right movement is enabled.
+ */
 INLINE bool P3Driver::is_strafe_right_enabled() const
 {
 	return mStrafeRight;
 }
 
+/**
+ * Enables/disables the P3Driver for up movement.
+ */
 INLINE void P3Driver::enable_up(bool enable)
 {
 	if (mUpKey)
@@ -125,11 +107,17 @@ INLINE void P3Driver::enable_up(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's up movement is enabled.
+ */
 INLINE bool P3Driver::is_up_enabled() const
 {
 	return mUp;
 }
 
+/**
+ * Enables/disables the P3Driver for down movement.
+ */
 INLINE void P3Driver::enable_down(bool enable)
 {
 	if (mDownKey)
@@ -138,11 +126,17 @@ INLINE void P3Driver::enable_down(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's down movement is enabled.
+ */
 INLINE bool P3Driver::is_down_enabled() const
 {
 	return mDown;
 }
 
+/**
+ * Enables/disables the P3Driver for head left rotation.
+ */
 INLINE void P3Driver::enable_head_left(bool enable)
 {
 	if (mHeadLeftKey)
@@ -151,11 +145,17 @@ INLINE void P3Driver::enable_head_left(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's head left rotation is enabled.
+ */
 INLINE bool P3Driver::is_head_left_enabled() const
 {
 	return mHeadLeft;
 }
 
+/**
+ * Enables/disables the P3Driver for head right rotation.
+ */
 INLINE void P3Driver::enable_head_right(bool enable)
 {
 	if (mHeadRightKey)
@@ -164,11 +164,17 @@ INLINE void P3Driver::enable_head_right(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's head right rotation is enabled.
+ */
 INLINE bool P3Driver::is_head_right_enabled() const
 {
 	return mHeadRight;
 }
 
+/**
+ * Enables/disables the P3Driver for pitch up rotation.
+ */
 INLINE void P3Driver::enable_pitch_up(bool enable)
 {
 	if (mPitchUpKey)
@@ -177,11 +183,17 @@ INLINE void P3Driver::enable_pitch_up(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's pitch up rotation is enabled.
+ */
 INLINE bool P3Driver::is_pitch_up_enabled() const
 {
 	return mPitchUp;
 }
 
+/**
+ * Enables/disables the P3Driver for pitch down rotation.
+ */
 INLINE void P3Driver::enable_pitch_down(bool enable)
 {
 	if (mPitchDownKey)
@@ -190,10 +202,22 @@ INLINE void P3Driver::enable_pitch_down(bool enable)
 	}
 }
 
+/**
+ * Returns if the P3Driver's pitch down rotation is enabled.
+ */
 INLINE bool P3Driver::is_pitch_down_enabled() const
 {
 	return mPitchDown;
 }
+
+
+
+
+//by default we consider mouse moved on every update, because
+//we want mouse poll by default; this can be changed by calling
+//the enabler (for example by an handler responding to mouse-move
+//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
+// http://www.panda3d.org/forums/viewtopic.php?t=6049)
 
 INLINE void P3Driver::enable_mouse_move(bool enable)
 {

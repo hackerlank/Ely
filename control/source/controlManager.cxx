@@ -363,7 +363,6 @@ void ControlManager::set_parameters_defaults(ControlType type)
 		///mDriversParameterTable must be the first cleared
 		mDriversParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mDriversParameterTable.insert(ParameterNameValue("enabled", "true"));
 		mDriversParameterTable.insert(ParameterNameValue("forward", "enabled"));
 		mDriversParameterTable.insert(ParameterNameValue("backward", "enabled"));
 		mDriversParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));

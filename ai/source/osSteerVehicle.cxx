@@ -82,6 +82,7 @@ void OSSteerVehicle::set_external_update(bool enable)
 
 /**
  * Creates actually the OpenSteer vehicle.
+ * \note Internal use only.
  */
 void OSSteerVehicle::do_create_vehicle(OSSteerVehicleType type)
 {

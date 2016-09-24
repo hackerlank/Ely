@@ -28,15 +28,6 @@ P3Driver::P3Driver(const string& name) :
 {
 	do_reset();
 }
-//P3Driver::P3Driver(PandaFramework* framework, const NodePath& ownerObjectNP, XXX
-//		int taskSort)
-//{
-//	mWin = framework->get_window(0)->get_graphics_window();
-//	mOwnerObjectNP = ownerObjectNP;
-//	mTaskSort = taskSort;
-//	do_reset();
-//	do_initialize();
-//}
 
 /**
  *
@@ -44,272 +35,6 @@ P3Driver::P3Driver(const string& name) :
 P3Driver::~P3Driver()
 {
 }
-//P3Driver::~P3Driver() XXX
-//{
-//	do_finalize();
-//	do_reset();
-//	mOwnerObjectNP.clear();
-//	mWin = nullptr;
-//}
-
-/**
- * Enables the debug drawing.
- * A camera node path should be passed as argument.
- */
-/**
- * Disables the debug drawing.
- */
-/**
- * Enables/disables debugging.
- * Returns a negative value on error.
- */
-/**
- * Writes the P3Driver's (static) debug drawing projected to the x,y plane
- * into a (square) texture, given the world scene, a GraphicsOutput and the
- * size.
- * Output will be a size x size texture, written to the "fileName" file into
- * current directory and the event "debug_drawing_texture_ready" (with the
- * texture as parameter) is thrown when all is ready.
- */
-/**
- * Draws static geometry.
- * \note Internal use only.
- */
-/**
- * Drawing to texture one shot task.
- * \note Internal use only.
- */
-/**
- * Sets the type of proximity database:
- * - BruteForceProximityDatabase
- * - LQProximityDatabase (default).
- * \note PEDESTRIAN, BOID P3Driver only.
- */
-/**
- * Returns the type of proximity database
- * - BruteForceProximityDatabase
- * - LQProximityDatabase (default)
- * or a negative value on error.
- * \note PEDESTRIAN, BOID P3Driver only.
- */
-/**
- * Sets the world center point.
- * \note BOID P3Driver only.
- */
-/**
- * Returns the world center point.
- * Returns LPoint3f::zero() on error.
- * \note BOID P3Driver only.
- */
-/**
- * Sets the world radius.
- * \note BOID P3Driver only.
- */
-/**
- * Returns the world radius, or a negative value on error.
- * \note BOID P3Driver only.
- */
-/**
- * Adds a player (P3Driver) to one of two teams: teamA (= true) or teamB
- * (= false).
- * Returns a negative value on error.
- * \note SOCCER P3Driver only.
- */
-/**
- * Removes a player (P3Driver) from his/her current team: teamA or teamB.
- * Returns a negative value on error.
- * \note SOCCER P3Driver only.
- */
-/**
- * Returns the two extreme points, with respect to reference node, of a playing
- * field.
- * \note SOCCER P3Driver only.
- */
-/**
- * Sets a playing field, given two extreme points with respect to reference
- * node and the goal fraction.
- * \note The field will be planar and axis aligned (xy plane), and placed at
- * medium z-height of the two points; the goal fraction is specified with
- * respect to the field's y-dimension. By default a field with dimensions 40x20
- * and placed at (0,0,0) is created, and minimum field's dimensions are 40x20
- * anyway.
- * \note SOCCER P3Driver only.
- */
-/**
- * Returns the goal fraction, with respect to the field's y-dimension, of a
- * playing field, or a negative value on error.
- * \note SOCCER P3Driver only.
- */
-/**
- * Returns the current score of TEAM_A, or a negative value on error.
- * \note SOCCER P3Driver only.
- */
-/**
- * Returns the current score of TEAM_B, or a negative value on error.
- * \note SOCCER P3Driver only.
- */
-/**
- * Sets home base center.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Returns home base center.
- * Returns LPoint3f::zero() on error.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Sets home base radius.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Returns home base radius, or a negative value on error.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Sets braking rate (>=0).
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Returns braking rate (>=0), or a negative value on error.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Sets avoidance predict time min.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Returns avoidance predict time min, or a negative value on error.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Sets avoidance predict time max.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Returns avoidance predict time max, or a negative value on error.
- * \note CAPTURE_THE_FLAG P3Driver only.
- */
-/**
- * Makes the map based on the defined pathway and on its resolution.
- * \note The map is square, and it is divided into resolution x resolution
- * square elements
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Returns the map center.
- * Returns LPoint3f::zero() on error.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Returns the map dimension, or a negative value on error.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Returns the map resolution, or a negative value on error.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Sets the use of path fences on the map.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Returns the use of path fences on the map, or a negative value on error.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Sets the steering mode on the map: path follow or wander steering.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Returns the steering mode on the map, or a negative value on error.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Sets the default prediction type on the map (curved or linear): each newly
- * added P3Driver will use it by default.
- * \note Also the type of prediction of the already added P3Driver(s) will
- * be replaced by this one.
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Returns the default prediction type on the map.
- * \note
- * \note MAP_DRIVE P3Driver only.
- */
-/**
- * Sets steering speed (>=0).
- * \note LOW_SPEED_TURN P3Driver only.
- */
-/**
- * Returns steering speed (>=0), or a negative value on error.
- * \note LOW_SPEED_TURN P3Driver only.
- */
-/**
- * Sets the P3Driver type.
- * \note P3Driver's type can only be changed if there are no attached
- * P3Driver(s).
- */
-/**
- * Creates actually the steer plug-in.
- * \note Internal use only.
- */
-/**
- * Builds the pathway.
- * \note Internal use only.
- */
-/**
- * Adds the initial set of obstacles.
- * \note Obstacles' NodePaths are searched as descendants of the reference node
- * (and directly reparented to it if necessary).
- * \note Internal use only.
- */
-/**
- * Adds a P3Driver to this P3Driver (ie to the underlying OpenSteer
- * management mechanism).
- * Returns a negative value on error.
- */
-/**
- * Removes a P3Driver from this P3Driver (ie from the OpenSteer
- * handling mechanism).
- * Returns a negative value on error.
- */
-/**
- * Checks if an P3Driver could be handled by this P3Driver.
- * \note The check is done by effective type comparison.
- */
-/**
- * Sets the pathway of this P3Driver.
- * \note pointList and radiusList should have the same number of elements; in
- * any case, the number of segments is equal to the number of points if the
- * cycle is closed otherwise to the number of points - 1.
- * \note PEDESTRIAN P3Driver supports currently only single radius
- * pathway.
- */
-/**
- * Adds an obstacle given a non empty NodePath (objectNP), which will correspond
- * to the underlying OpenSteer obstacle, and is directly reparented to the
- * reference node. In this case parameters are extracted from the NodePath.
- * objectNP, type and seenFromState parameters must be always specified.\n
- * Returns the obstacle's unique reference (>0), or a negative value on error.
- */
-/**
- * Adds actually the obstacle.
- * \note Internal use only.
- */
-/**
- * Removes an obstacle given its unique ref (>0).\n
- * Returns the NodePath (possibly empty) that was associated to the underlying
- * obstacle just removed, otherwise an empty NodePath with the ET_fail error
- * type set on error.
- * \note Obstacle will be removed only if it was added by this P3Driver.
- */
-/**
- * Updates the P3Driver static geometry if needed.
- * \note It is called on pathway and/or obstacles changes.
- * \note Internal use only.
- */
-
-
 
 /**
  * Initializes the P3Driver with starting settings.
@@ -496,6 +221,9 @@ void P3Driver::do_finalize()
 	return;
 }
 
+/**
+ * Enables the P3Driver to perform its task (default: disabled).
+ */
 bool P3Driver::enable()
 {
 	//if enabled return
@@ -507,6 +235,10 @@ bool P3Driver::enable()
 	return true;
 }
 
+/**
+ * Enables actually the P3Driver.
+ * \note Internal use only.
+ */
 void P3Driver::do_enable()
 {
 	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
@@ -523,6 +255,9 @@ void P3Driver::do_enable()
 	mEnabled = true;
 }
 
+/**
+ * Disables the P3Driver to perform its task (default: disabled).
+ */
 bool P3Driver::disable()
 {
 	//if not enabled return
@@ -534,6 +269,10 @@ bool P3Driver::disable()
 	return true;
 }
 
+/**
+ * Disables actually the P3Driver.
+ * \note Internal use only.
+ */
 void P3Driver::do_disable()
 {
 	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
@@ -548,10 +287,8 @@ void P3Driver::do_disable()
 	mEnabled = false;
 }
 
-
 /**
- * Updates the underlying OpenSteer plug-in.
- * It allows the added P3Driver(s) to perform their "steering behaviors".
+ * Updates the P3Driver state.
  */
 void P3Driver::update(float dt)
 {
@@ -993,6 +730,69 @@ void P3Driver::write_datagram(BamWriter *manager, Datagram &dg)
 	///Name of this P3Driver.
 	dg.add_string(get_name());
 
+	///Enable/disable flag.
+	dg.add_bool(mEnabled);
+
+	///Key controls and effective keys.
+	///@{
+	dg.add_bool(mForward);
+	dg.add_bool(mBackward);
+	dg.add_bool(mStrafeLeft);
+	dg.add_bool(mStrafeRight);
+	dg.add_bool(mUp);
+	dg.add_bool(mDown);
+	dg.add_bool(mHeadLeft);
+	dg.add_bool(mHeadRight);
+	dg.add_bool(mPitchUp);
+	dg.add_bool(mPitchDown);
+	dg.add_bool(mMouseMove);
+	dg.add_bool(mForwardKey);
+	dg.add_bool(mBackwardKey);
+	dg.add_bool(mStrafeLeftKey);
+	dg.add_bool(mStrafeRightKey);
+	dg.add_bool(mUpKey);
+	dg.add_bool(mDownKey);
+	dg.add_bool(mHeadLeftKey);
+	dg.add_bool(mHeadRightKey);
+	dg.add_bool(mPitchUpKey);
+	dg.add_bool(mPitchDownKey);
+	dg.add_bool(mMouseMoveKey);
+	dg.add_string(mSpeedKey);
+	///@}
+
+	///Key control values.
+	///@{
+	dg.add_bool(mMouseEnabledH);
+	dg.add_bool(mMouseEnabledP);
+	dg.add_bool(mHeadLimitEnabled);
+	dg.add_bool(mPitchLimitEnabled);
+	dg.add_stdfloat(mHLimit);
+	dg.add_stdfloat(mPLimit);
+	dg.add_int8(mSignOfTranslation);
+	dg.add_int8(mSignOfMouse);
+	///@}
+
+	/// Sensitivity settings.
+	///@{
+	dg.add_stdfloat(mFastFactor);
+	mActualSpeedXYZ.write_datagram(dg);
+	mMaxSpeedXYZ.write_datagram(dg);
+	mMaxSpeedSquaredXYZ.write_datagram(dg);
+	dg.add_stdfloat(mActualSpeedH);
+	dg.add_stdfloat(mActualSpeedP);
+	dg.add_stdfloat(mMaxSpeedHP);
+	dg.add_stdfloat(mMaxSpeedSquaredHP);
+	mAccelXYZ.write_datagram(dg);
+	dg.add_stdfloat(mAccelHP);
+	dg.add_stdfloat(mFrictionXYZ);
+	dg.add_stdfloat(mFrictionHP);
+	dg.add_stdfloat(mStopThreshold);
+	dg.add_stdfloat(mSensX);
+	dg.add_stdfloat(mSensY);
+	///@}
+
+	///The reference node path.
+	manager->write_pointer(dg, mReferenceNP.node());
 }
 
 /**
@@ -1009,33 +809,6 @@ int P3Driver::complete_pointers(TypedWritable **p_list, BamReader *manager)
 	mReferenceNP = NodePath::any_path(referenceNPPandaNode);
 
 	return pi;
-}
-
-/**
- * Called by the BamReader to perform any final actions needed for setting up
- * the object after all objects have been read and all pointers have been
- * completed.
- */
-void P3Driver::finalize(BamReader *manager)
-{
-
-	///TYPE SPECIFIC
-	nassertv_always(mSerializedDataTmpPtr != NULL)
-
-	// deallocate SerializedDataTmp
-	delete mSerializedDataTmpPtr;
-	mSerializedDataTmpPtr = NULL;
-}
-
-/**
- * Some objects require all of their nested pointers to have been completed
- * before the objects themselves can be completed.  If this is the case,
- * override this method to return true, and be careful with circular
- * references (which would make the object unreadable from a bam file).
- */
-bool P3Driver::require_fully_complete() const
-{
-	return true;
 }
 
 /**
@@ -1060,7 +833,6 @@ TypedWritable *P3Driver::make_from_bam(const FactoryParams &params)
 
 	parse_params(params, scan, manager);
 	node->fillin(scan, manager);
-	manager->register_finalize(node);
 
 	return node;
 }
@@ -1076,11 +848,69 @@ void P3Driver::fillin(DatagramIterator &scan, BamReader *manager)
 	///Name of this P3Driver.
 	set_name(scan.get_string());
 
-	///TYPE SPECIFIC
-	nassertv_always(mSerializedDataTmpPtr == NULL)
+	///Enable/disable flag.
+	mEnabled = scan.get_bool();
 
-	// allocate SerializedDataTmp
+	///Key controls and effective keys.
+	///@{
+	mForward = scan.get_bool();
+	mBackward = scan.get_bool();
+	mStrafeLeft = scan.get_bool();
+	mStrafeRight = scan.get_bool();
+	mUp = scan.get_bool();
+	mDown = scan.get_bool();
+	mHeadLeft = scan.get_bool();
+	mHeadRight = scan.get_bool();
+	mPitchUp = scan.get_bool();
+	mPitchDown = scan.get_bool();
+	mMouseMove = scan.get_bool();
+	mForwardKey = scan.get_bool();
+	mBackwardKey = scan.get_bool();
+	mStrafeLeftKey = scan.get_bool();
+	mStrafeRightKey = scan.get_bool();
+	mUpKey = scan.get_bool();
+	mDownKey = scan.get_bool();
+	mHeadLeftKey = scan.get_bool();
+	mHeadRightKey = scan.get_bool();
+	mPitchUpKey = scan.get_bool();
+	mPitchDownKey = scan.get_bool();
+	mMouseMoveKey = scan.get_bool();
+	mSpeedKey = scan.get_string();
+	///@}
 
+	///Key control values.
+	///@{
+	mMouseEnabledH = scan.get_bool();
+	mMouseEnabledP = scan.get_bool();
+	mHeadLimitEnabled = scan.get_bool();
+	mPitchLimitEnabled = scan.get_bool();
+	mHLimit = scan.get_stdfloat();
+	mPLimit = scan.get_stdfloat();
+	mSignOfTranslation = scan.get_int8();
+	mSignOfMouse = scan.get_int8();
+	///@}
+
+	/// Sensitivity settings.
+	///@{
+	mFastFactor = scan.get_stdfloat();
+	mActualSpeedXYZ.read_datagram(scan);
+	mMaxSpeedXYZ.read_datagram(scan);
+	mMaxSpeedSquaredXYZ.read_datagram(scan);
+	mActualSpeedH = scan.get_stdfloat();
+	mActualSpeedP = scan.get_stdfloat();
+	mMaxSpeedHP = scan.get_stdfloat();
+	mMaxSpeedSquaredHP = scan.get_stdfloat();
+	mAccelXYZ.read_datagram(scan);
+	mAccelHP = scan.get_stdfloat();
+	mFrictionXYZ = scan.get_stdfloat();
+	mFrictionHP = scan.get_stdfloat();
+	mStopThreshold = scan.get_stdfloat();
+	mSensX = scan.get_stdfloat();
+	mSensY = scan.get_stdfloat();
+	///@}
+
+	///The reference node path.
+	manager->read_pointer(scan);
 }
 
 //TypedObject semantics: hardcoded
