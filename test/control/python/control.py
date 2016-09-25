@@ -369,8 +369,6 @@ if __name__ == '__main__':
     controlMgr.get_bounding_dimensions(playerNP, modelDims, modelDeltaCenter)
     playerHeightRayCast = LVector3f(0.0, 0.0, modelDims.get_z())
 
-    # enable player driver
-    playerDriver.enable()
     # player will be driven by arrows keys
     app.accept("arrow_up", movePlayer, [forwardMove]) 
     app.accept("arrow_up-up", movePlayer, [forwardMoveStop]) 

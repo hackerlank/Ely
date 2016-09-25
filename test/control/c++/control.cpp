@@ -453,8 +453,6 @@ int main(int argc, char *argv[])
 	controlMgr->get_bounding_dimensions(playerNP, modelDims, modelDeltaCenter);
 	playerHeightRayCast = LVector3f(0.0, 0.0, modelDims.get_z());
 
-	// enable player driver
-	playerDriver->enable();
 	// player will be driven by arrows keys
 	framework.define_key("arrow_up", "forwardMove", &movePlayer, &forwardMove);
 	framework.define_key("arrow_up-up", "forwardMoveStop", &movePlayer,

@@ -16,39 +16,53 @@
 #endif //CPPPARSER
 
 /**
- * This class is designed for the control of object movement through
- * keyboard/mouse button events and mouse movement.
+ * P3Driver is a PandaNode class designed for the control of
+ * translation/rotation movements. To be driven, a PandaNode object should be
+ * attached to this P3Driver.\n
  *
+ * Usually movements are activated/deactivated through keyboard/mouse button
+ * events and mouse movements.\n
+ * P3Driver can be enabled/disabled as a whole (enabled by default).\n
+ * P3Driver can handle a given basic movement (forward, backward, head_left,
+ * head_right etc...) only if it is authorized to do so by calling the
+ * corresponding "enabler".\n
+ * When enabled, a movement can be activated/deactivated through the
+ * corresponding "activator".\n
  * Movement is, by default, based on acceleration (i.e. "dynamic"):
- * accelerations (and max speeds) can independently set for any (local)
- * direction and for angular movement.\n
- * To obtain a fixed movement (i.e. "kinematic") in any direction or
- * angular, the related acceleration and friction value should be set
- * to zero and one respectively.\n
- * Each basic movement (forward, backward, head_left, head_right etc...)
- * can be enabled/disabled through a corresponding "enabler", which in
- * turn set a control key true or false.\n
- * An event handlers could enable/disable movement calling the "enablers".
- * A task updates the position/orientation of the controlled object
- * based on the value of control keys.\n
- * The component can be enabled/disabled as a whole.\n
+ * accelerations and max speeds can be independently set for any local direction
+ * (translation) and local axis (rotation).\n
+ * Translation is updated relative to:
+ * - x local axis, ie left-right side direction
+ * - y local axis, ie forward-backward direction
+ * - z local axis, ie up-down direction
+ * Rotation is updated relative to:
+ * - z local axis, ie head (yaw)
+ * - x local axis, ie pitch
+ * Rotation through y local axis (roll) is not considered.\n
+ * To obtain a fixed movement/rotation (i.e. "kinematic") in any direction or
+ * angular, the related acceleration and friction value should be set to zero
+ * and a very high value respectively.\n
+ * A task updates the position/orientation of the attached PandaNode object
+ * based on the currently enabled movements.\n
  * At configuration level (from xml config file), any "enabler" can be
- * enabled/disabled by setting corresponding configuration key
- * to "enabled"/"disabled".\n
- * Mouse movements tracking are special. Since "mouse move" events are not
- * defined by default (they can by using ButtonThrower::set_move_event(),
+ * enabled/disabled by setting corresponding configuration key to
+ * "enabled"/"disabled".\n
+ * XXX
+ * Head (yaw) and pitch rotations can also be activated by "mouse movements" as
+ * well as by explicit activators. To get this, they must be enabled (also
+ * separately).\n
+ * Mouse movements tracking are special: since "mouse move" events are not
+ * defined by default (but they could be defined by using
+ * ButtonThrower::set_move_event()
  * \see: http://www.panda3d.org/forums/viewtopic.php?t=9326
- * 	http://www.panda3d.org/forums/viewtopic.php?t=6049)),
- * mouse movements are polled by default during the "update" task, that is
- * the corresponding "enabler" is disabled.\n
- * The object HEAD (i.e. YAW) and PITCH control through mouse movements
- * can be enabled/disabled separately and if both are disabled (the default)
- * no control through mouse movements.\n
+ * \see: http://www.panda3d.org/forums/viewtopic.php?t=6049)),
+ * mouse movements are polled by default during each the "update" task.\n
  * All movements (but up and down) can be inverted (default: not inverted).
  *
  * > **P3Driver text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
+ * | *enabled*  				|single| *true* | -
  * | *forward*  				|single| *enabled* | -
  * | *backward*  				|single| *enabled* | -
  * | *head_limit*  				|single| *false@0.0* | specified as "enabled@[limit] with enabled = true,false, with limit >= 0.0
@@ -80,29 +94,6 @@
  *
  * \note parts inside [] are optional.\n
  */
-/**
- * This class represents a "plug-in" of the OpenSteer library.
- *
- * \see http://opensteer.sourceforge.net
- *
- * This PandaNode will create a "steer plug-in".\n
- * Each OSSteerPlugIn object could handle a single pathway and several
- * obstacles.\n
- * An "update" task should call this OSSteerPlugIn's update() method to allow
- * the OSSteerVehicle(s) (simple vehicles), which are added to it, to perform
- * their own steering behaviors.\n
- * \note A OSSteerPlugIn will be reparented to the default reference node on
- * creation (see AIManager).
- *
- * > **OSSteerPlugIn text parameters**:
- * param | type | default | note
- * ------|------|---------|-----
- * | *plugin_type*		|single| *one_turning* | values: one_turning,pedestrian,boid,multiple_pursuit,soccer,capture_the_flag,low_speed_turn,map_drive
- * | *pathway*			|single|"0.0,0.0,0.0:1.0,1.0,1.0$1.0$false" (specified as "p1,py1,pz1:px2,py2,pz2[:...:pxN,pyN,pzN]$r1[:r2:...:rM]$closedCycle" with M,closedCycle=N-1,false,N,true)
- * | *obstacles*  		|multiple| - | each one specified as "objectId1@shape1@seenFromState1[:objectId2@shape2@seenFromState2:...:objectIdN@shapeN@seenFromStateN]"] with shapeX=sphere,box,plane,rectangle and seenFromStateX=outside,inside,both
- *
- * \note parts inside [] are optional.\n
- */
 class EXPORT_CLASS P3Driver: public PandaNode
 {
 PUBLISHED:
@@ -123,7 +114,7 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * \name ENABLE/DISABLE COMMANDS
+	 * \name MOVEMENT ENABLERS
 	 */
 	///@{
 	INLINE void enable_forward(bool enable);
@@ -146,12 +137,16 @@ PUBLISHED:
 	INLINE bool is_pitch_up_enabled() const;
 	INLINE void enable_pitch_down(bool enable);
 	INLINE bool is_pitch_down_enabled() const;
+	INLINE void enable_mouse_head(bool enable);
+	INLINE bool is_mouse_head_enabled() const;
+	INLINE void enable_mouse_pitch(bool enable);
+	INLINE bool is_mouse_pitch_enabled() const;
 	INLINE void enable_mouse_move(bool enable);
 	INLINE bool is_mouse_move_enabled() const;
 	///@}
 
 	/**
-	 * \name MOVEMENT/ROTATION COMMANDS
+	 * \name MOVEMENT ACTIVATORS
 	 */
 	///@{
 	INLINE void set_move_forward(bool activate);
@@ -205,10 +200,6 @@ PUBLISHED:
 	INLINE ValueList<float> get_sens() const;
 	INLINE void set_fast_factor(float factor);
 	INLINE float get_fast_factor() const;
-	INLINE void set_mouse_enable_head(bool enable);
-	INLINE bool get_mouse_enable_head() const;
-	INLINE void set_mouse_enable_pitch(bool enable);
-	INLINE bool get_mouse_enable_pitch() const;
 	INLINE Pair<LVector3f, ValueList<float> > get_current_speeds() const;
 	///@}
 
@@ -260,10 +251,13 @@ private:
 	PT(GraphicsWindow) mWin;
 	///Enable/disable flag.
 	bool mEnabled;
-	///Key controls and effective keys.
+	///Movement commands' switches: activated/deactivated.
 	///@{
 	bool mForward, mBackward, mStrafeLeft, mStrafeRight, mUp, mDown, mHeadLeft,
 			mHeadRight, mPitchUp, mPitchDown, mMouseMove;
+	///@}
+	///Movement enablers' keys: enabled/disabled.
+	///@{
 	bool mForwardKey, mBackwardKey, mStrafeLeftKey, mStrafeRightKey, mUpKey,
 			mDownKey, mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey,
 			mMouseMoveKey;

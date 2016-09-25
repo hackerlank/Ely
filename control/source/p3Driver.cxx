@@ -182,6 +182,12 @@ void P3Driver::do_initialize()
 	//
 	mCentX = mWin->get_properties().get_x_size() / 2;
 	mCentY = mWin->get_properties().get_y_size() / 2;
+	//enabling setting
+	if ((mTmpl->get_parameter_value(ControlManager::DRIVER,
+			string("enabled")) == string("false") ? false : true))
+	{
+		do_enable();
+	}
 #ifdef PYTHON_BUILD
 	//Python callback
 	this->ref();

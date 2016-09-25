@@ -219,6 +219,26 @@ INLINE bool P3Driver::is_pitch_down_enabled() const
 	return mPitchDownKey;
 }
 
+INLINE void P3Driver::enable_mouse_head(bool enable)
+{
+	mMouseEnabledH = enable;
+}
+
+INLINE bool P3Driver::is_mouse_head_enabled() const
+{
+	return mMouseEnabledH;
+}
+
+INLINE void P3Driver::enable_mouse_pitch(bool enable)
+{
+	mMouseEnabledP = enable;
+}
+
+INLINE bool P3Driver::is_mouse_pitch_enabled() const
+{
+	return mMouseEnabledP;
+}
+
 /**
  * Enables/disables mouse movement (default: disabled).
  */
@@ -227,7 +247,7 @@ INLINE void P3Driver::enable_mouse_move(bool enable)
 	mMouseMoveKey = enable;
 	if (!enable)
 	{
-		mMouseMove = false;
+		mMouseMove = true;
 	}
 }
 
@@ -596,26 +616,6 @@ INLINE float P3Driver::get_fast_factor() const
 	return mFastFactor;
 }
 
-INLINE void P3Driver::set_mouse_enable_head(bool enable)
-{
-	mMouseEnabledH = enable;
-}
-
-INLINE bool P3Driver::get_mouse_enable_head() const
-{
-	return mMouseEnabledH;
-}
-
-INLINE void P3Driver::set_mouse_enable_pitch(bool enable)
-{
-	mMouseEnabledP = enable;
-}
-
-INLINE bool P3Driver::get_mouse_enable_pitch() const
-{
-	return mMouseEnabledP;
-}
-
 INLINE Pair<LVector3f, ValueList<float> > P3Driver::get_current_speeds() const
 {
 	ValueList<float> angularSpeeds;
@@ -631,7 +631,7 @@ INLINE Pair<LVector3f, ValueList<float> > P3Driver::get_current_speeds() const
 inline void P3Driver::do_reset()
 {
 	//
-	mEnabled = true;
+	mEnabled = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
 			mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
 	//by default we consider mouse moved on every update, because
