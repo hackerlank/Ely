@@ -2237,8 +2237,9 @@ void OSSteerPlugIn::finalize(BamReader *manager)
 					NodePath::any_path((*iter))))
 			{
 				//do add to real update list
-#ifndef NDEBUG
 				bool vehicleAdded =
+#ifdef NDEBUG
+				true;
 #endif
 				static_cast<ossup::PlugIn*>(mPlugIn)->addVehicle(
 						&(*iter)->get_abstract_vehicle());

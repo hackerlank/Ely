@@ -76,7 +76,7 @@ def setParametersBeforeCreation():
     controlMgr.set_parameter_value(ControlManager.DRIVER, "linear_accel",
             "1.0")
     controlMgr.set_parameter_value(ControlManager.DRIVER, "linear_friction",
-            "1.5")
+            "0.5")
     controlMgr.set_parameter_value(ControlManager.DRIVER, "angular_friction",
             "5.0")
     #
@@ -326,9 +326,30 @@ if __name__ == '__main__':
         playerNP.set_color(1.0, 1.0, 0.0, 0)
     else:
         # valid bamFile
-        # restore plug-in: through steer manager
+        # restore sceneNP: through panda3d
+        sceneNP = ControlManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
+        # reparent the reference node to render
+        ControlManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+
+        # restore the player's reference
+        playerNP = ControlManager.get_global_ptr().get_reference_node_path().find(
+                "**/PlayerNP")
+    
+        # restore driver: through control manager
         playerDriver = ControlManager.get_global_ptr().get_driver(0)
-        # XXX
+        # restore animations
+        tmpList = [None for i in range(1)]
+        playerAnimCtls.extend(tmpList)
+        tmpAnims = AnimControlCollection()
+        auto_bind(playerDriver, tmpAnims)
+        playerAnimCtls[i] = [None, None]
+        # restore animations
+        for j in range(tmpAnims.get_num_anims()):
+            playerAnimCtls[i][j] = tmpAnims.get_anim(j)
+
+        # set creation parameters as strings before other drivers creation
+        print("\n" + "Current creation parameters:")
+        setParametersBeforeCreation()
 
     # # first option: start the default update task for all plug-ins
     controlMgr.start_default_update()

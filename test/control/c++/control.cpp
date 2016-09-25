@@ -88,7 +88,7 @@ void setParametersBeforeCreation()
 	controlMgr->set_parameter_value(ControlManager::DRIVER, "linear_accel",
 			"1.0");
 	controlMgr->set_parameter_value(ControlManager::DRIVER, "linear_friction",
-			"1.5");
+			"0.5");
 	controlMgr->set_parameter_value(ControlManager::DRIVER, "angular_friction",
 			"5.0");
 	//
@@ -400,47 +400,34 @@ int main(int argc, char *argv[])
 	else
 	{
 		// valid bamFile
-		// restore plug-in: through control manager
+		// restore sceneNP: through panda3d
+		sceneNP =
+				ControlManager::get_global_ptr()->get_reference_node_path().find(
+						"**/SceneNP");
+		// reparent the reference node to render
+		ControlManager::get_global_ptr()->get_reference_node_path().reparent_to(
+				window->get_render());
+
+		// restore the player's reference
+		playerNP =
+				ControlManager::get_global_ptr()->get_reference_node_path().find(
+						"**/PlayerNP");
+
+		// restore driver: through control manager
 		playerDriver = ControlManager::get_global_ptr()->get_driver(0);
-//		// restore sceneNP: through panda3d
-//		sceneNP =
-//				ControlManager::get_global_ptr()->get_reference_node_path().find(
-//						"**/SceneNP");
-//		// reparent the reference node to render
-//		ControlManager::get_global_ptr()->get_reference_node_path().reparent_to(
-//				window->get_render());
-//
-//		// restore the player's reference
-//		playerNP = ControlManager::get_global_ptr()->get_reference_node_path().find(
-//				"**/PlayerNP");
-//
-//		// restore all control vehicles (including the player)
-//		int NUMVEHICLES =
-//				ControlManager::get_global_ptr()->get_num_control_vehicles();
-//		drivers.resize(NUMVEHICLES);
-//		vehicleAnimCtls.resize(NUMVEHICLES);
-//		for (int i = 0; i < NUMVEHICLES; ++i)
-//		{
-//			// restore the control vehicle: through control manager
-//			drivers[i] =
-//					ControlManager::get_global_ptr()->get_driver(i);
-//			// restore animations
-//			AnimControlCollection tmpAnims;
-//			auto_bind(drivers[i], tmpAnims);
-//			vehicleAnimCtls[i] = vector<PT(AnimControl)>(2);
-//			for (int j = 0; j < tmpAnims.get_num_anims(); ++j)
-//			{
-//				vehicleAnimCtls[i][j] = tmpAnims.get_anim(j);
-//			}
-//		}
-//
-//		// set creation parameters as strings before other drivers/vehicles creation
-//		cout << endl << "Current creation parameters:";
-//        controlMgr->set_parameter_value(ControlManager::DRIVER, "plugin_type",
-//                "pedestrian");
-//        controlMgr->set_parameter_value(ControlManager::DRIVER,
-//                "vehicle_type", "pedestrian");
-//		setParametersBeforeCreation();
+		// restore animations
+		playerAnimCtls.resize(1);
+		AnimControlCollection tmpAnims;
+		auto_bind(playerDriver, tmpAnims);
+		playerAnimCtls[0] = vector<PT(AnimControl)>(2);
+		for (int j = 0; j < tmpAnims.get_num_anims(); ++j)
+		{
+			playerAnimCtls[0][j] = tmpAnims.get_anim(j);
+		}
+
+		// set creation parameters as strings before other drivers creation
+		cout << endl << "Current creation parameters:";
+		setParametersBeforeCreation();
 	}
 
 	/// first option: start the default update task for all drivers
