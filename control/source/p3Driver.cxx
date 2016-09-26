@@ -77,11 +77,11 @@ void P3Driver::do_initialize()
 	}
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_enabled_h"))
-			== string("true") ? true : false);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_head"))
+			== string("enabled") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_enabled_p"))
-			== string("true") ? true : false);
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_pitch"))
+			== string("enabled") ? true : false);
 	//key events setting
 	//backward key
 	mBackwardKey = (
@@ -241,7 +241,7 @@ bool P3Driver::enable()
  */
 void P3Driver::do_enable()
 {
-	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+	if ((mMouseEnabledH or mMouseEnabledP) and (!mMouseMoveKey))
 	{
 		//we want control through mouse movements
 		//hide mouse cursor
@@ -275,7 +275,7 @@ bool P3Driver::disable()
  */
 void P3Driver::do_disable()
 {
-	if (mMouseEnabledH or mMouseEnabledP or mMouseMoveKey)
+	if ((mMouseEnabledH or mMouseEnabledP) and (!mMouseMoveKey))
 	{
 		//we have control through mouse movements
 		//show mouse cursor
@@ -299,7 +299,7 @@ void P3Driver::update(float dt)
 #endif
 
 	//handle mouse
-	if (mMouseMove and (mMouseEnabledH or mMouseEnabledP))
+	if ((!mMouseMoveKey) and (mMouseEnabledH or mMouseEnabledP))
 	{
 		MouseData md = mWin->get_pointer(0);
 		float deltaX = md.get_x() - mCentX;
@@ -317,12 +317,6 @@ void P3Driver::update(float dt)
 				mThisNP.set_p(
 						mThisNP.get_p() - deltaY * mSensY * mSignOfMouse);
 			}
-		}
-		//if mMouseMoveKey is true we are controlling mouse movements
-		//so we need to reset mMouseMove to false
-		if (mMouseMoveKey)
-		{
-			mMouseMove = false;
 		}
 	}
 	//update position/orientation
@@ -744,7 +738,7 @@ void P3Driver::write_datagram(BamWriter *manager, Datagram &dg)
 	dg.add_bool(mHeadRight);
 	dg.add_bool(mPitchUp);
 	dg.add_bool(mPitchDown);
-	dg.add_bool(mMouseMove);
+//	dg.add_bool(mMouseMove);
 	dg.add_bool(mForwardKey);
 	dg.add_bool(mBackwardKey);
 	dg.add_bool(mStrafeLeftKey);
@@ -861,7 +855,7 @@ void P3Driver::fillin(DatagramIterator &scan, BamReader *manager)
 	mHeadRight = scan.get_bool();
 	mPitchUp = scan.get_bool();
 	mPitchDown = scan.get_bool();
-	mMouseMove = scan.get_bool();
+//	mMouseMove = scan.get_bool();
 	mForwardKey = scan.get_bool();
 	mBackwardKey = scan.get_bool();
 	mStrafeLeftKey = scan.get_bool();

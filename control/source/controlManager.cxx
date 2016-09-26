@@ -377,8 +377,8 @@ void ControlManager::set_parameters_defaults(ControlType type)
 		mDriversParameterTable.insert(ParameterNameValue("up", "enabled"));
 		mDriversParameterTable.insert(ParameterNameValue("down", "enabled"));
 		mDriversParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
-		mDriversParameterTable.insert(ParameterNameValue("mouse_enabled_h", "false"));
-		mDriversParameterTable.insert(ParameterNameValue("mouse_enabled_p", "false"));
+		mDriversParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
+		mDriversParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
 		mDriversParameterTable.insert(ParameterNameValue("speed_key", "shift"));
 		mDriversParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
 		mDriversParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));

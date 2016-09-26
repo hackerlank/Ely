@@ -12,7 +12,15 @@
 ///P3Driver inline definitions
 
 /**
- * Returns if the P3Driver is enabled to perform its task(default: enabled).
+ * Sets the reference NodePath of this P3Driver.
+ */
+INLINE void P3Driver::set_reference_node_path(const NodePath& reference)
+{
+	mReferenceNP = reference;
+}
+
+/**
+ * Returns if the P3Driver is enabled (default: enabled).
  */
 INLINE bool P3Driver::is_enabled() const
 {
@@ -219,40 +227,84 @@ INLINE bool P3Driver::is_pitch_down_enabled() const
 	return mPitchDownKey;
 }
 
+/**
+ * Enables/disables mouse head rotation (default: disabled).
+ */
 INLINE void P3Driver::enable_mouse_head(bool enable)
 {
 	mMouseEnabledH = enable;
+	///some code redundancy
+	if (mEnabled)
+	{
+		do_enable();
+	}
+	else if (!mEnabled)
+	{
+		do_disable();
+	}
 }
 
+/**
+ * Returns if mouse head rotation is enabled/disabled (default: disabled).
+ */
 INLINE bool P3Driver::is_mouse_head_enabled() const
 {
 	return mMouseEnabledH;
 }
 
+/**
+ * Enables/disables mouse pitch rotation (default: disabled).
+ */
 INLINE void P3Driver::enable_mouse_pitch(bool enable)
 {
 	mMouseEnabledP = enable;
+	///some code redundancy
+	if (mEnabled)
+	{
+		do_enable();
+	}
+	else if (!mEnabled)
+	{
+		do_disable();
+	}
 }
 
+/**
+ * Returns if mouse pitch rotation is enabled/disabled (default: disabled).
+ */
 INLINE bool P3Driver::is_mouse_pitch_enabled() const
 {
 	return mMouseEnabledP;
 }
 
 /**
- * Enables/disables mouse movement (default: disabled).
+ * Enables/disables mouse movement externally handled (default: disabled).
  */
 INLINE void P3Driver::enable_mouse_move(bool enable)
 {
 	mMouseMoveKey = enable;
-	if (!enable)
+	///some code redundancy
+	if (mMouseMoveKey)
 	{
-		mMouseMove = true;
+		//we have control through mouse movements
+		//show mouse cursor
+		WindowProperties props;
+		props.set_cursor_hidden(false);
+		mWin->request_properties(props);
+	}
+	else if (mEnabled)
+	{
+		do_enable();
+	}
+	else if (!mEnabled)
+	{
+		do_disable();
 	}
 }
 
 /**
- * Returns if mouse movement is enabled/disabled (default: disabled).
+ * Returns if mouse movement externally handled is enabled/disabled (default:
+ * disabled).
  */
 INLINE bool P3Driver::is_mouse_move_enabled() const
 {
@@ -260,7 +312,7 @@ INLINE bool P3Driver::is_mouse_move_enabled() const
 }
 
 /**
- * Activates/deactivates the P3Driver for forward movement.
+ * Activates/deactivates forward movement.
  */
 INLINE void P3Driver::set_move_forward(bool activate)
 {
@@ -271,7 +323,7 @@ INLINE void P3Driver::set_move_forward(bool activate)
 }
 
 /**
- * Returns if the P3Driver's forward movement is activated.
+ * Returns if the forward movement is activated/deactivated.
  */
 INLINE bool P3Driver::get_move_forward() const
 {
@@ -279,7 +331,7 @@ INLINE bool P3Driver::get_move_forward() const
 }
 
 /**
- * Activates/deactivates the P3Driver for backward movement.
+ * Activates/deactivates backward movement.
  */
 INLINE void P3Driver::set_move_backward(bool activate)
 {
@@ -290,7 +342,7 @@ INLINE void P3Driver::set_move_backward(bool activate)
 }
 
 /**
- * Returns if the P3Driver's backward movement is activated.
+ * Returns if backward movement is activated/deactivated.
  */
 INLINE bool P3Driver::get_move_backward() const
 {
@@ -298,7 +350,7 @@ INLINE bool P3Driver::get_move_backward() const
 }
 
 /**
- * Activates/deactivates the P3Driver for strafe left movement.
+ * Activates/deactivates strafe left movement.
  */
 INLINE void P3Driver::set_move_strafe_left(bool activate)
 {
@@ -309,7 +361,7 @@ INLINE void P3Driver::set_move_strafe_left(bool activate)
 }
 
 /**
- * Returns if the P3Driver's strafe left movement is activated.
+ * Returns if strafe left movement is activated/deactivated.
  */
 INLINE bool P3Driver::get_move_strafe_left() const
 {
@@ -318,7 +370,7 @@ INLINE bool P3Driver::get_move_strafe_left() const
 }
 
 /**
- * Activates/deactivates the P3Driver for strafe right movement.
+ * Activates/deactivates strafe right movement.
  */
 INLINE void P3Driver::set_move_strafe_right(bool activate)
 {
@@ -329,7 +381,7 @@ INLINE void P3Driver::set_move_strafe_right(bool activate)
 }
 
 /**
- * Returns if the P3Driver's strafe right movement is activated.
+ * Returns if strafe right movement is activated/deactivated.
  */
 INLINE bool P3Driver::get_move_strafe_right() const
 {
@@ -337,7 +389,7 @@ INLINE bool P3Driver::get_move_strafe_right() const
 }
 
 /**
- * Activates/deactivates the P3Driver for up movement.
+ * Activates/deactivates up movement.
  */
 INLINE void P3Driver::set_move_up(bool activate)
 {
@@ -348,7 +400,7 @@ INLINE void P3Driver::set_move_up(bool activate)
 }
 
 /**
- * Returns if the P3Driver's up movement is activated.
+ * Returns if up movement is activated/deactivated.
  */
 INLINE bool P3Driver::get_move_up() const
 {
@@ -356,7 +408,7 @@ INLINE bool P3Driver::get_move_up() const
 }
 
 /**
- * Activates/deactivates the P3Driver for down movement.
+ * Activates/deactivates down movement.
  */
 INLINE void P3Driver::set_move_down(bool activate)
 {
@@ -367,7 +419,7 @@ INLINE void P3Driver::set_move_down(bool activate)
 }
 
 /**
- * Returns if the P3Driver's down movement is activated.
+ * Returns if down movement is activated/deactivated.
  */
 INLINE bool P3Driver::get_move_down() const
 {
@@ -375,7 +427,7 @@ INLINE bool P3Driver::get_move_down() const
 }
 
 /**
- * Activates/deactivates the P3Driver for head left rotation.
+ * Activates/deactivates head left rotation.
  */
 INLINE void P3Driver::set_rotate_head_left(bool activate)
 {
@@ -386,7 +438,7 @@ INLINE void P3Driver::set_rotate_head_left(bool activate)
 }
 
 /**
- * Returns if the P3Driver's head left rotation is activated.
+ * Returns if head left rotation is activated/deactivated.
  */
 INLINE bool P3Driver::get_rotate_head_left() const
 {
@@ -394,7 +446,7 @@ INLINE bool P3Driver::get_rotate_head_left() const
 }
 
 /**
- * Activates/deactivates the P3Driver for head right rotation.
+ * Activates/deactivates head right rotation.
  */
 INLINE void P3Driver::set_rotate_head_right(bool activate)
 {
@@ -405,7 +457,7 @@ INLINE void P3Driver::set_rotate_head_right(bool activate)
 }
 
 /**
- * Returns if the P3Driver's head right rotation is activated.
+ * Returns if head right rotation is activated/deactivated.
  */
 INLINE bool P3Driver::get_rotate_head_right() const
 {
@@ -413,7 +465,7 @@ INLINE bool P3Driver::get_rotate_head_right() const
 }
 
 /**
- * Activates/deactivates the P3Driver for pitch up rotation.
+ * Activates/deactivates pitch up rotation.
  */
 INLINE void P3Driver::set_rotate_pitch_up(bool activate)
 {
@@ -424,7 +476,7 @@ INLINE void P3Driver::set_rotate_pitch_up(bool activate)
 }
 
 /**
- * Returns if the P3Driver's pitch up rotation is activated.
+ * Returns if pitch up rotation is activated/deactivated.
  */
 INLINE bool P3Driver::get_rotate_pitch_up() const
 {
@@ -432,7 +484,7 @@ INLINE bool P3Driver::get_rotate_pitch_up() const
 }
 
 /**
- * Activates/deactivates the P3Driver for pitch down rotation.
+ * Activates/deactivates pitch down rotation.
  */
 INLINE void P3Driver::set_rotate_pitch_down(bool activate)
 {
@@ -443,7 +495,7 @@ INLINE void P3Driver::set_rotate_pitch_down(bool activate)
 }
 
 /**
- * Returns if the P3Driver's pitch down rotation is activated.
+ * Returns if pitch down rotation is activated/deactivated.
  */
 INLINE bool P3Driver::get_rotate_pitch_down() const
 {
@@ -451,76 +503,75 @@ INLINE bool P3Driver::get_rotate_pitch_down() const
 }
 
 /**
- * Activates/deactivates the P3Driver for mouse movement.
- * \note By default we consider mouse moved on every update, because we want
- * mouse poll by default; this can be changed by calling the enabler (for
- * example by an handler responding to mouse-move event if it is possible.
- * \see http://www.panda3d.org/forums/viewtopic.php?t=9326
- * \see http://www.panda3d.org/forums/viewtopic.php?t=6049)
+ * Activates/deactivates inverted translation (default: deactivated).
  */
-INLINE void P3Driver::set_mouse_move(bool activate)
-{
-	if (mMouseMoveKey)
-	{
-		mMouseMove = activate;
-	}
-}
-
-/**
- * Returns if the P3Driver's mouse movement is activated.
- * \note By default we consider mouse moved on every update, because we want
- * mouse poll by default; this can be changed by calling the enabler (for
- * example by an handler responding to mouse-move event if it is possible.
- * \see http://www.panda3d.org/forums/viewtopic.php?t=9326
- * \see http://www.panda3d.org/forums/viewtopic.php?t=6049)
- */
-INLINE bool P3Driver::get_mouse_move() const
-{
-	return mMouseMove;
-}
-
 INLINE void P3Driver::set_inverted_translation(bool enable)
 {
 	enable ? mSignOfTranslation = -1: mSignOfTranslation = 1;
 }
 
+/**
+ * Returns if inverted translation is activated/deactivated (default:
+ * deactivated).
+ */
 INLINE bool P3Driver::get_inverted_translation() const
 {
 	return (mSignOfTranslation == -1) ? true : false;
 }
 
+/**
+ * Activates/deactivates inverted rotation (default: deactivated).
+ */
 INLINE void P3Driver::set_inverted_rotation(bool enable)
 {
 	enable ? mSignOfMouse = -1: mSignOfMouse = 1;
 }
 
+/**
+ * Returns if inverted rotation is activated/deactivated (default: deactivated).
+ */
 INLINE bool P3Driver::get_inverted_rotation() const
 {
 	return (mSignOfMouse == -1) ? true : false;
 }
 
+/**
+ * Sets head rotation limit (>=0.0).
+ */
 INLINE void P3Driver::set_head_limit(bool enabled, float hLimit)
 {
 	mHeadLimitEnabled = enabled;
 	hLimit >= 0.0 ? mHLimit = hLimit : mHLimit = -hLimit;
 }
 
+/**
+ * Returns head rotation limit (>=0.0).
+ */
 INLINE Pair<bool, float> P3Driver::get_head_limit() const
 {
 	return Pair<bool, float>(mHeadLimitEnabled, mHLimit);
 }
 
+/**
+ * Sets pitch rotation limit (>=0.0).
+ */
 INLINE void P3Driver::set_pitch_limit(bool enabled, float pLimit)
 {
 	mPitchLimitEnabled = enabled;
 	pLimit >= 0.0 ? mPLimit = pLimit : mPLimit = -pLimit;
 }
 
+/**
+ * Returns pitch rotation limit (>=0.0).
+ */
 INLINE Pair<bool, float> P3Driver::get_pitch_limit() const
 {
 	return Pair<bool, float>(mPitchLimitEnabled, mPLimit);
 }
 
+/**
+ * Sets max linear speed along local x,y,z axes independently (>=0.0).
+ */
 INLINE void P3Driver::set_max_linear_speed(const LVector3f& maxLinearSpeed)
 {
 	mMaxSpeedXYZ = LVector3f(
@@ -533,17 +584,26 @@ INLINE void P3Driver::set_max_linear_speed(const LVector3f& maxLinearSpeed)
 			maxLinearSpeed.get_z() * maxLinearSpeed.get_z());
 }
 
+/**
+ * Sets max angular speed for head/pitch rotations (>=0.0).
+ */
 INLINE void P3Driver::set_max_angular_speed(float maxAngularSpeed)
 {
 	mMaxSpeedHP = abs(maxAngularSpeed);
 	mMaxSpeedSquaredHP = maxAngularSpeed * maxAngularSpeed;
 }
 
+/**
+ * Returns linear/angular max speeds (>=0.0).
+ */
 INLINE Pair<LVector3f, float> P3Driver::get_max_speeds() const
 {
 	return Pair<LVector3f, float>(mMaxSpeedXYZ, mMaxSpeedHP);
 }
 
+/**
+ * Sets linear accelerations along local x,y,z axes independently (>=0.0).
+ */
 INLINE void P3Driver::set_linear_accel(const LVector3f& linearAccel)
 {
 	mAccelXYZ = LVector3f(
@@ -552,26 +612,41 @@ INLINE void P3Driver::set_linear_accel(const LVector3f& linearAccel)
 			abs(linearAccel.get_z()));
 }
 
+/**
+ * Sets max angular acceleration for head/pitch rotations (>=0.0).
+ */
 INLINE void P3Driver::set_angular_accel(float angularAccel)
 {
 	mAccelHP = abs(angularAccel);
 }
 
+/**
+ * Returns linear/angular accelerations (>=0.0).
+ */
 INLINE Pair<LVector3f, float> P3Driver::get_accels() const
 {
 	return Pair<LVector3f, float>(mAccelXYZ, mAccelHP);
 }
 
+/**
+ * Sets linear friction along local x,y,z axes (>=0.0).
+ */
 INLINE void P3Driver::set_linear_friction(float linearFriction)
 {
 	mFrictionXYZ = abs(linearFriction);
 }
 
+/**
+ * Sets angular friction for head/pitch rotations (>=0.0).
+ */
 INLINE void P3Driver::set_angular_friction(float angularFriction)
 {
 	mFrictionHP = abs(angularFriction);
 }
 
+/**
+ * Returns linear/angular frictions (>=0.0).
+ */
 INLINE ValueList<float> P3Driver::get_frictions() const
 {
 	ValueList<float> frictions;
@@ -580,6 +655,9 @@ INLINE ValueList<float> P3Driver::get_frictions() const
 	return frictions;
 }
 
+/**
+ * Sets movement stop threshold ([0.0, 1.0]).
+ */
 INLINE void P3Driver::set_stop_threshold(float threshold)
 {
 	mStopThreshold = (
@@ -587,17 +665,26 @@ INLINE void P3Driver::set_stop_threshold(float threshold)
 					threshold - floor(threshold) : ceil(threshold) - threshold);
 }
 
+/**
+ * Returns movement stop threshold ([0.0, 1.0]).
+ */
 INLINE float P3Driver::get_stop_threshold() const
 {
 	return mStopThreshold;
 }
 
+/**
+ * Sets mouse movement sensitivities along screen x,y axes (>=0.0).
+ */
 INLINE void P3Driver::set_sens(float sensX, float sensY)
 {
 	mSensX = abs(sensX);
 	mSensY = abs(sensY);
 }
 
+/**
+ * Returns mouse movement sensitivities along screen x,y axes (>=0.0).
+ */
 INLINE ValueList<float> P3Driver::get_sens() const
 {
 	ValueList<float> sens;
@@ -606,16 +693,26 @@ INLINE ValueList<float> P3Driver::get_sens() const
 	return sens;
 }
 
+/**
+ * Sets movement fast factor (>=0.0).
+ */
 INLINE void P3Driver::set_fast_factor(float factor)
 {
 	mFastFactor = abs(factor);
 }
 
+/**
+ * Returns movement fast factor (>=0.0).
+ */
 INLINE float P3Driver::get_fast_factor() const
 {
 	return mFastFactor;
 }
 
+/**
+ * Returns current linear/angular "signed" speeds along local x,y,z axes and
+ * for head/pitch rotations.
+ */
 INLINE Pair<LVector3f, ValueList<float> > P3Driver::get_current_speeds() const
 {
 	ValueList<float> angularSpeeds;
@@ -634,12 +731,6 @@ inline void P3Driver::do_reset()
 	mEnabled = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
 			mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
-	//by default we consider mouse moved on every update, because
-	//we want mouse poll by default; this can be changed by calling
-	//the enabler (for example by an handler responding to mouse-move
-	//event if it is possible. See: http://www.panda3d.org/forums/viewtopic.php?t=9326
-	// http://www.panda3d.org/forums/viewtopic.php?t=6049)
-	mMouseMove = true;
 	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey = mDownKey =
 			mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey =
 					mMouseMoveKey = false;
