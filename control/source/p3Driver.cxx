@@ -241,18 +241,20 @@ bool P3Driver::enable()
  */
 void P3Driver::do_enable()
 {
-	if ((mMouseEnabledH or mMouseEnabledP) and (!mMouseMoveKey))
+	mEnabled = true;
+	// handle mouse if possible
+	if ((mMouseEnabledH || mMouseEnabledP) && (!mMouseMoveKey))
 	{
 		//we want control through mouse movements
 		//hide mouse cursor
-		WindowProperties props;
+		WindowProperties props = mWin->get_properties();
 		props.set_cursor_hidden(true);
 		mWin->request_properties(props);
 		//reset mouse to start position
 		mWin->move_pointer(0, mCentX, mCentY);
+		// start handle mouse
+		mMouseHandled = true;
 	}
-	//
-	mEnabled = true;
 }
 
 /**
@@ -261,7 +263,7 @@ void P3Driver::do_enable()
 bool P3Driver::disable()
 {
 	//if not enabled return
-	RETURN_ON_COND(not mEnabled, false)
+	RETURN_ON_COND(! mEnabled, false)
 
 	//actual disabling
 	do_disable();
@@ -275,16 +277,45 @@ bool P3Driver::disable()
  */
 void P3Driver::do_disable()
 {
-	if ((mMouseEnabledH or mMouseEnabledP) and (!mMouseMoveKey))
+	mEnabled = false;
+	// don't handle mouse
+	WindowProperties props = mWin->get_properties();
+	//show mouse cursor if hidden
+	props.set_cursor_hidden(false);
+	mWin->request_properties(props);
+	// stop handle mouse
+	mMouseHandled = false;
+}
+
+/**
+ * Make mouse handled if possible.
+ * \note Internal use only.
+ */
+void P3Driver::do_handle_mouse()
+{
+	// handle mouse if possible
+	if (mEnabled && (mMouseEnabledH || mMouseEnabledP) && (!mMouseMoveKey))
 	{
-		//we have control through mouse movements
-		//show mouse cursor
-		WindowProperties props;
+		//we want control through mouse movements
+		//hide mouse cursor
+		WindowProperties props = mWin->get_properties();
+		props.set_cursor_hidden(true);
+		mWin->request_properties(props);
+		//reset mouse to start position
+		mWin->move_pointer(0, mCentX, mCentY);
+		// start handle mouse
+		mMouseHandled = true;
+	}
+	else
+	{
+		// don't handle mouse
+		WindowProperties props = mWin->get_properties();
+		//show mouse cursor if hidden
 		props.set_cursor_hidden(false);
 		mWin->request_properties(props);
+		// stop handle mouse
+		mMouseHandled = false;
 	}
-	//
-	mEnabled = false;
 }
 
 /**
@@ -299,7 +330,7 @@ void P3Driver::update(float dt)
 #endif
 
 	//handle mouse
-	if ((!mMouseMoveKey) and (mMouseEnabledH or mMouseEnabledP))
+	if (mMouseHandled)
 	{
 		MouseData md = mWin->get_pointer(0);
 		float deltaX = md.get_x() - mCentX;
@@ -307,12 +338,12 @@ void P3Driver::update(float dt)
 
 		if (mWin->move_pointer(0, mCentX, mCentY))
 		{
-			if (mMouseEnabledH and (deltaX != 0.0))
+			if (mMouseEnabledH && (deltaX != 0.0))
 			{
 				mThisNP.set_h(
 						mThisNP.get_h() - deltaX * mSensX * mSignOfMouse);
 			}
-			if (mMouseEnabledP and (deltaY != 0.0))
+			if (mMouseEnabledP && (deltaY != 0.0))
 			{
 				mThisNP.set_p(
 						mThisNP.get_p() - deltaY * mSensY * mSignOfMouse);
@@ -366,7 +397,7 @@ void P3Driver::update(float dt)
 
 	//update speeds
 	//y axis
-	if (mForward and (not mBackward))
+	if (mForward && (! mBackward))
 	{
 		if (mAccelXYZ.get_y() != 0.0)
 		{
@@ -385,7 +416,7 @@ void P3Driver::update(float dt)
 			mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
 		}
 	}
-	else if (mBackward and (not mForward))
+	else if (mBackward && (! mForward))
 	{
 		if (mAccelXYZ.get_y() != 0.0)
 		{
@@ -420,7 +451,7 @@ void P3Driver::update(float dt)
 		}
 	}
 	//x axis
-	if (mStrafeLeft and (not mStrafeRight))
+	if (mStrafeLeft && (! mStrafeRight))
 	{
 		if (mAccelXYZ.get_x() != 0.0)
 		{
@@ -439,7 +470,7 @@ void P3Driver::update(float dt)
 			mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
 		}
 	}
-	else if (mStrafeRight and (not mStrafeLeft))
+	else if (mStrafeRight && (! mStrafeLeft))
 	{
 		if (mAccelXYZ.get_x() != 0.0)
 		{
@@ -474,7 +505,7 @@ void P3Driver::update(float dt)
 		}
 	}
 	//z axis
-	if (mUp and (not mDown))
+	if (mUp && (! mDown))
 	{
 		if (mAccelXYZ.get_z() != 0.0)
 		{
@@ -493,7 +524,7 @@ void P3Driver::update(float dt)
 			mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
 		}
 	}
-	else if (mDown and (not mUp))
+	else if (mDown && (! mUp))
 	{
 		if (mAccelXYZ.get_z() != 0.0)
 		{
@@ -528,7 +559,7 @@ void P3Driver::update(float dt)
 		}
 	}
 	//rotation h
-	if (mHeadLeft and (not mHeadRight))
+	if (mHeadLeft && (! mHeadRight))
 	{
 		if (mAccelHP != 0.0)
 		{
@@ -546,7 +577,7 @@ void P3Driver::update(float dt)
 			mActualSpeedH = mMaxSpeedHP;
 		}
 	}
-	else if (mHeadRight and (not mHeadLeft))
+	else if (mHeadRight && (! mHeadLeft))
 	{
 		if (mAccelHP != 0.0)
 		{
@@ -578,7 +609,7 @@ void P3Driver::update(float dt)
 		}
 	}
 	//rotation p
-	if (mPitchUp and (not mPitchDown))
+	if (mPitchUp && (! mPitchDown))
 	{
 		if (mAccelHP != 0.0)
 		{
@@ -596,7 +627,7 @@ void P3Driver::update(float dt)
 			mActualSpeedP = mMaxSpeedHP;
 		}
 	}
-	else if (mPitchDown and (not mPitchUp))
+	else if (mPitchDown && (! mPitchUp))
 	{
 		if (mAccelHP != 0.0)
 		{

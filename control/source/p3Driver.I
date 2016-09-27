@@ -232,16 +232,11 @@ INLINE bool P3Driver::is_pitch_down_enabled() const
  */
 INLINE void P3Driver::enable_mouse_head(bool enable)
 {
+	RETURN_ON_COND(mMouseEnabledH == enable,)
+
 	mMouseEnabledH = enable;
-	///some code redundancy
-	if (mEnabled)
-	{
-		do_enable();
-	}
-	else if (!mEnabled)
-	{
-		do_disable();
-	}
+	// handle mouse if possible
+	do_handle_mouse();
 }
 
 /**
@@ -257,16 +252,11 @@ INLINE bool P3Driver::is_mouse_head_enabled() const
  */
 INLINE void P3Driver::enable_mouse_pitch(bool enable)
 {
+	RETURN_ON_COND(mMouseEnabledP == enable,)
+
 	mMouseEnabledP = enable;
-	///some code redundancy
-	if (mEnabled)
-	{
-		do_enable();
-	}
-	else if (!mEnabled)
-	{
-		do_disable();
-	}
+	// handle mouse if possible
+	do_handle_mouse();
 }
 
 /**
@@ -282,24 +272,11 @@ INLINE bool P3Driver::is_mouse_pitch_enabled() const
  */
 INLINE void P3Driver::enable_mouse_move(bool enable)
 {
+	RETURN_ON_COND(mMouseMoveKey == enable,)
+
 	mMouseMoveKey = enable;
-	///some code redundancy
-	if (mMouseMoveKey)
-	{
-		//we have control through mouse movements
-		//show mouse cursor
-		WindowProperties props;
-		props.set_cursor_hidden(false);
-		mWin->request_properties(props);
-	}
-	else if (mEnabled)
-	{
-		do_enable();
-	}
-	else if (!mEnabled)
-	{
-		do_disable();
-	}
+	// handle mouse if possible
+	do_handle_mouse();
 }
 
 /**
@@ -731,11 +708,11 @@ inline void P3Driver::do_reset()
 	mEnabled = false;
 	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
 			mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
-	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey = mDownKey =
-			mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey =
-					mMouseMoveKey = false;
-	mMouseEnabledH = mMouseEnabledP = mHeadLimitEnabled = mPitchLimitEnabled =
-			false;
+	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey =
+			mDownKey = mHeadLeftKey = mHeadRightKey = mPitchUpKey =
+					mPitchDownKey = mMouseMoveKey = false;
+	mMouseEnabledH = mMouseEnabledP = mMouseHandled = mHeadLimitEnabled =
+			mPitchLimitEnabled = false;
 	mHLimit = mPLimit = 0.0;
 	mSignOfTranslation = mSignOfMouse = 1;
 	mFastFactor = 0.0;

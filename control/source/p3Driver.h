@@ -273,7 +273,7 @@ private:
 	///@}
 	///Key control values.
 	///@{
-	bool mMouseEnabledH, mMouseEnabledP;
+	bool mMouseEnabledH, mMouseEnabledP, mMouseHandled;
 	bool mHeadLimitEnabled, mPitchLimitEnabled;
 	float mHLimit, mPLimit;
 	char mSignOfTranslation, mSignOfMouse;
@@ -302,6 +302,7 @@ private:
 	///@{
 	void do_enable();
 	void do_disable();
+	void do_handle_mouse();
 	///@}
 
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)
