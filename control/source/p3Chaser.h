@@ -36,8 +36,8 @@
  * | *fixed_lookat*				|single| *true* | -
  * | *abs_lookat_distance*		|single| - | -
  * | *abs_lookat_height*		|single| - | -
- * | *mouse_enabled_h*  		|single| *false* | -
- * | *mouse_enabled_p*  		|single| *false* | -
+ * | *mouse_head*  				|single| *false* | -
+ * | *mouse_pitch*  			|single| *false* | -
  * | *head_left*  				|single| *enabled* | -
  * | *head_right*  				|single| *enabled* | -
  * | *pitch_up*  				|single| *enabled* | -
@@ -151,41 +151,16 @@ PUBLISHED:
 	 * \name CHASER
 	 */
 	///@{
-	bool enable();
-	bool disable();
+	bool enable(); //xxx
+	bool disable(); //xxx
 	INLINE bool is_enabled() const;
-	void update(float dt);
+	void update(float dt);//xxx
 	///@}
-
-
 
 	/**
 	 * \name MOVEMENT ENABLERS
 	 */
 	///@{
-	void enableHeadLeft(bool enable); //XXX
-	bool isHeadLeftEnabled();
-	void enableHeadRight(bool enable);
-	bool isHeadRightEnabled();
-	void enablePitchUp(bool enable);
-	bool isPitchUpEnabled();
-	void enablePitchDown(bool enable);
-	bool isPitchDownEnabled();
-	void holdLookAt(bool enable);
-	///@}
-	///@{
-	INLINE void enable_forward(bool enable);
-	INLINE bool is_forward_enabled() const;
-	INLINE void enable_backward(bool enable);
-	INLINE bool is_backward_enabled() const;
-	INLINE void enable_strafe_left(bool enable);
-	INLINE bool is_strafe_left_enabled() const;
-	INLINE void enable_strafe_right(bool enable);
-	INLINE bool is_strafe_right_enabled() const;
-	INLINE void enable_up(bool enable);
-	INLINE bool is_up_enabled() const;
-	INLINE void enable_down(bool enable);
-	INLINE bool is_down_enabled() const;
 	INLINE void enable_head_left(bool enable);
 	INLINE bool is_head_left_enabled() const;
 	INLINE void enable_head_right(bool enable);
@@ -194,30 +169,18 @@ PUBLISHED:
 	INLINE bool is_pitch_up_enabled() const;
 	INLINE void enable_pitch_down(bool enable);
 	INLINE bool is_pitch_down_enabled() const;
-	INLINE void enable_mouse_head(bool enable);
-	INLINE bool is_mouse_head_enabled() const;
-	INLINE void enable_mouse_pitch(bool enable);
-	INLINE bool is_mouse_pitch_enabled() const;
-	INLINE void enable_mouse_move(bool enable);
-	INLINE bool is_mouse_move_enabled() const;
+	INLINE void enable_mouse_head(bool enable); //xxx
+	INLINE bool is_mouse_head_enabled() const; //xxx
+	INLINE void enable_mouse_pitch(bool enable); //xxx
+	INLINE bool is_mouse_pitch_enabled() const; //xxx
+	INLINE void enable_mouse_move(bool enable); //xxx
+	INLINE bool is_mouse_move_enabled() const; //xxx
 	///@}
 
 	/**
 	 * \name MOVEMENT ACTIVATORS
 	 */
 	///@{
-	INLINE void set_move_forward(bool activate);
-	INLINE bool get_move_forward() const;
-	INLINE void set_move_backward(bool activate);
-	INLINE bool get_move_backward() const;
-	INLINE void set_move_strafe_left(bool activate);
-	INLINE bool get_move_strafe_left() const;
-	INLINE void set_move_strafe_right(bool activate);
-	INLINE bool get_move_strafe_right() const;
-	INLINE void set_move_up(bool activate);
-	INLINE bool get_move_up() const;
-	INLINE void set_move_down(bool activate);
-	INLINE bool get_move_down() const;
 	INLINE void set_rotate_head_left(bool activate);
 	INLINE bool get_rotate_head_left() const;
 	INLINE void set_rotate_head_right(bool activate);
@@ -233,48 +196,28 @@ PUBLISHED:
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	float getAbsMaxDistance() const; //XXX
-	void setAbsMaxDistance(float absMaxDistance);
-	float getAbsMinDistance() const;
-	void setAbsMinDistance(float absMinDistance);
-	float getAbsMaxHeight() const;
-	void setAbsMaxHeight(float absMaxHeight);
-	float getAbsMinHeight() const;
-	void setAbsMinHeight(float absMinHeight);
-	float getAbsLookAtDistance() const;
-	void setAbsLookAtDistance(float absLookAtDistance);
-	float getAbsLookAtHeight() const;
-	void setAbsLookAtHeight(float absLookAtHeight);
-	void setFriction(float friction);
-	float getFriction() const;
-	void enableFixedRelativePosition(bool enable);
-	bool isFixedRelativePosition();
-	///@}
-	///@{
-	INLINE void set_inverted_translation(bool enable);
-	INLINE bool get_inverted_translation() const;
+	INLINE void set_hold_look_at(bool activate);
+	INLINE bool get_hold_look_at() const;
+	INLINE void set_fixed_relative_position(bool enable);
+	INLINE bool get_fixed_relative_position();
 	INLINE void set_inverted_rotation(bool enable);
 	INLINE bool get_inverted_rotation() const;
-	INLINE void set_head_limit(bool enabled, float hLimit);
-	INLINE Pair<bool, float> get_head_limit() const;
-	INLINE void set_pitch_limit(bool enabled, float pLimit);
-	INLINE Pair<bool, float> get_pitch_limit() const;
-	INLINE void set_max_linear_speed(const LVector3f& linearSpeed);
-	INLINE void set_max_angular_speed(float angularSpeed);
-	INLINE Pair<LVector3f, float> get_max_speeds() const;
-	INLINE void set_linear_accel(const LVector3f& linearAccel);
-	INLINE void set_angular_accel(float angularAccel);
-	INLINE Pair<LVector3f, float> get_accels() const;
-	INLINE void set_linear_friction(float linearFriction);
-	INLINE void set_angular_friction(float angularFriction);
-	INLINE ValueList<float> get_frictions() const;
-	INLINE void set_stop_threshold(float threshold);
-	INLINE float get_stop_threshold() const;
+	INLINE void set_max_distance(float absMaxDistance);
+	INLINE float get_max_distance() const;
+	INLINE void set_min_distance(float absMinDistance);
+	INLINE float get_min_distance() const;
+	INLINE void set_max_height(float absMaxHeight);
+	INLINE float get_max_height() const;
+	INLINE void set_min_height(float absMinHeight);
+	INLINE float get_min_height() const;
+	INLINE void set_look_at_distance(float absLookAtDistance);
+	INLINE float get_look_at_distance() const;
+	INLINE void set_look_at_height(float absLookAtHeight);
+	INLINE float get_look_at_height() const;
+	INLINE void set_friction(float friction);
+	INLINE float get_friction() const;
 	INLINE void set_sens(float sensX, float sensY);
 	INLINE ValueList<float> get_sens() const;
-	INLINE void set_fast_factor(float factor);
-	INLINE float get_fast_factor() const;
-	INLINE Pair<LVector3f, ValueList<float> > get_current_speeds() const;
 	///@}
 
 	/**
@@ -332,15 +275,15 @@ private:
 	///Flags.
 	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward,
 	mFixedLookAt, mHoldLookAt;
-	/** XXX
-	 * \name Main parameters.
-	 */
-	///@{
-	///Chased object id.
-	ObjectId mChasedId;
-	///Reference object id.
-	ObjectId mReferenceId;
-	///@}
+//	/** XXX
+//	 * \name Main parameters.
+//	 */
+//	///@{
+//	///Chased object id.
+//	ObjectId mChasedId;
+//	///Reference object id.
+//	ObjectId mReferenceId;
+//	///@}
 	///Kinematic parameters.
 	float mAbsLookAtDistance, mAbsLookAtHeight, mAbsMaxDistance, mAbsMinDistance,
 	mAbsMinHeight, mAbsMaxHeight, mFriction;
@@ -353,7 +296,7 @@ private:
 	///@}
 	///@{
 	///Key control values.
-	bool mMouseEnabledH,	mMouseEnabledP;
+	bool mMouseEnabledH, mMouseEnabledP;
 	int mSignOfMouse;
 	///@}
 	///@{
@@ -362,24 +305,24 @@ private:
 	int mCentX, mCentY;
 	///@}
 
-	inline void do_reset();
-	void do_initialize();
-	void do_finalize();
+	inline void do_reset(); //xxx
+	void do_initialize(); //xxx
+	void do_finalize(); //xxx
 
 	/**
 	 * \name Helpers variables/functions.
 	 */
 	///@{
-	void do_enable();
-	void do_disable();
-	void do_handle_mouse();
+	void do_enable(); //xxx
+	void do_disable(); //xxx
+	void do_handle_mouse(); //xxx
 	///@}
 	/**
 	 * \name Actual enabling/disabling.
 	 */
 	///@{
-	void doEnable();
-	void doDisable();
+	void doEnable(); //xxx
+	void doDisable();//xxx
 	///@}
 
 

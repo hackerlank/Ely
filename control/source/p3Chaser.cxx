@@ -21,22 +21,22 @@ extern Dtool_PyTypedObject Dtool_P3Chaser;
 #endif //PYTHON_BUILD
 
 
-Chaser::Chaser(SMARTPTR(ChaserTemplate)tmpl)
+P3Chaser::P3Chaser(SMARTPTR(ChaserTemplate)tmpl)
 {
 	CHECK_EXISTENCE_DEBUG(GameControlManager::GetSingletonPtr(),
-			"Chaser::Chaser: invalid GameControlManager")
+			"P3Chaser::P3Chaser: invalid GameControlManager")
 	CHECK_EXISTENCE_DEBUG(GamePhysicsManager::GetSingletonPtr(),
-			"Chaser::Chaser: invalid GamePhysicsManager")
+			"P3Chaser::P3Chaser: invalid GamePhysicsManager")
 
 	mTmpl = tmpl;
 	reset();
 }
 
-Chaser::~Chaser()
+P3Chaser::~P3Chaser()
 {
 }
 
-bool Chaser::initialize()
+bool P3Chaser::initialize()
 {
 	bool result = true;
 	//get settings from template
@@ -91,10 +91,10 @@ bool Chaser::initialize()
 	mAbsLookAtHeight = (value >= 0.0 ? value : -value);
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->parameter(std::string("mouse_enabled_h"))
+			mTmpl->parameter(std::string("mouse_head"))
 					== std::string("true") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->parameter(std::string("mouse_enabled_p"))
+			mTmpl->parameter(std::string("mouse_pitch"))
 					== std::string("true") ? true : false);
 	//headLeft key
 	mHeadLeftKey = (
@@ -130,7 +130,7 @@ bool Chaser::initialize()
 	return result;
 }
 
-void Chaser::onAddToObjectSetup()
+void P3Chaser::onAddToObjectSetup()
 {
 	//set the (node path of) object chased by this component;
 	//that object is supposed to be already created,
@@ -165,7 +165,7 @@ void Chaser::onAddToObjectSetup()
 	mCentY = win->get_properties().get_y_size() / 2;
 }
 
-void Chaser::onRemoveFromObjectCleanup()
+void P3Chaser::onRemoveFromObjectCleanup()
 {
 	//see disable
 	if (mEnabled and (not mFixedLookAt) and (mMouseEnabledH or mMouseEnabledP))
@@ -182,7 +182,7 @@ void Chaser::onRemoveFromObjectCleanup()
 	reset();
 }
 
-void Chaser::onAddToSceneSetup()
+void P3Chaser::onAddToSceneSetup()
 {
 	//if chased node path is empty return
 	RETURN_ON_COND(mChasedNodePath.is_empty(),)
@@ -202,13 +202,13 @@ void Chaser::onAddToSceneSetup()
 	}
 }
 
-void Chaser::onRemoveFromSceneCleanup()
+void P3Chaser::onRemoveFromSceneCleanup()
 {
 	//remove from control manager update
 	GameControlManager::GetSingletonPtr()->removeFromControlUpdate(this);
 }
 
-Chaser::Result Chaser::enable()
+P3Chaser::Result P3Chaser::enable()
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -228,7 +228,7 @@ Chaser::Result Chaser::enable()
 	return Result::OK;
 }
 
-void Chaser::doEnable()
+void P3Chaser::doEnable()
 {
 	//check if backward located
 	float sign = (mBackward ? 1.0 : -1.0);
@@ -263,7 +263,7 @@ void Chaser::doEnable()
 	GameControlManager::GetSingletonPtr()->addToControlUpdate(this);
 }
 
-Chaser::Result Chaser::disable()
+P3Chaser::Result P3Chaser::disable()
 {
 	{
 		//lock (guard) the mutex
@@ -298,7 +298,7 @@ Chaser::Result Chaser::disable()
 	return Result::OK;
 }
 
-void Chaser::doDisable()
+void P3Chaser::doDisable()
 {
 	//unregister event callbacks if any
 	unregisterEventCallbacks();
@@ -324,7 +324,7 @@ void Chaser::doDisable()
 	mEnabled = false;
 }
 
-void Chaser::update(void* data)
+void P3Chaser::update(void* data)
 {
 	//lock (guard) the mutex
 	HOLD_REMUTEX(mMutex)
@@ -466,7 +466,7 @@ void Chaser::update(void* data)
 	}
 }
 
-LPoint3f Chaser::doGetChaserPos(LPoint3f desiredChaserPos,
+LPoint3f P3Chaser::doGetChaserPos(LPoint3f desiredChaserPos,
 		LPoint3f currentChaserPos, float deltaTime)
 {
 	float kReductFactor = mFriction * deltaTime;
@@ -496,7 +496,7 @@ LPoint3f Chaser::doGetChaserPos(LPoint3f desiredChaserPos,
 	return newPos;
 }
 
-void Chaser::doCorrectChaserHeight(LPoint3f& newPos, float baseHeight)
+void P3Chaser::doCorrectChaserHeight(LPoint3f& newPos, float baseHeight)
 {
 	//correct chaser height (not in OgreBulletDemos)
 	LPoint3f downTo = LPoint3f(newPos.get_x(), newPos.get_y(), -1000000.0);
@@ -525,7 +525,7 @@ void Chaser::doCorrectChaserHeight(LPoint3f& newPos, float baseHeight)
 
 
 
-///////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////// XXX
 
 /**
  *
@@ -1356,7 +1356,7 @@ TypedWritable *P3Chaser::make_from_bam(const FactoryParams &params)
 			ControlManager::CHASER);
 	P3Chaser *node = DCAST(P3Chaser,
 			ControlManager::get_global_ptr()->create_chaser(
-					"Chaser").node());
+					"P3Chaser").node());
 
 	DatagramIterator scan;
 	BamReader *manager;

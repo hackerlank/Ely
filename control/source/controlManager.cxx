@@ -399,6 +399,20 @@ void ControlManager::set_parameters_defaults(ControlType type)
 		///mChasersParameterTable must be the first cleared
 		mChasersParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
+		mChasersParameterTable.insert(ParameterNameValue("enabled", "true"));
+		mChasersParameterTable.insert(ParameterNameValue("backward", "true"));
+		mChasersParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
+		mChasersParameterTable.insert(ParameterNameValue("friction", "1.0"));
+		mChasersParameterTable.insert(ParameterNameValue("fixed_lookat", "true"));
+		mChasersParameterTable.insert(ParameterNameValue("mouse_head", "false"));
+		mChasersParameterTable.insert(ParameterNameValue("mouse_pitch", "false"));
+		mChasersParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+		mChasersParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+		mChasersParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+		mChasersParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+		mChasersParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+		mChasersParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+		mChasersParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
 		return;
 	}
 }
