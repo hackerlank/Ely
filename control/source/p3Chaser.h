@@ -28,16 +28,17 @@
  * | *chased_object*			|single| - | -
  * | *fixed_relative_position*	|single| *true* | -
  * | *reference_object*			|single| - | -
- * | *abs_max_distance*			|single| - | -
- * | *abs_min_distance*			|single| - | -
- * | *abs_max_height*			|single| - | -
- * | *abs_min_height*			|single| - | -
+ * | *max_distance*				|single| - | -
+ * | *min_distance*				|single| - | -
+ * | *max_height*				|single| - | -
+ * | *min_height*				|single| - | -
  * | *friction*					|single| 1.0 | -
- * | *fixed_lookat*				|single| *true* | -
- * | *abs_lookat_distance*		|single| - | -
- * | *abs_lookat_height*		|single| - | -
- * | *mouse_head*  				|single| *false* | -
- * | *mouse_pitch*  			|single| *false* | -
+ * | *fixed_look_at*				|single| *true* | -
+ * | *look_at_distance*			|single| - | -
+ * | *look_at_height*			|single| - | -
+ * | *mouse_move*  				|single| *disabled* | -
+ * | *mouse_head*  				|single| *disabled* | -
+ * | *mouse_pitch*  			|single| *disabled* | -
  * | *head_left*  				|single| *enabled* | -
  * | *head_right*  				|single| *enabled* | -
  * | *pitch_up*  				|single| *enabled* | -
@@ -151,10 +152,12 @@ PUBLISHED:
 	 * \name CHASER
 	 */
 	///@{
-	bool enable(); //xxx
-	bool disable(); //xxx
+	INLINE void set_chased_object(const NodePath& object);
+	INLINE NodePath get_chased_object() const;
+	bool enable();
+	bool disable();
 	INLINE bool is_enabled() const;
-	void update(float dt);//xxx
+	void update(float dt);
 	///@}
 
 	/**
@@ -169,12 +172,12 @@ PUBLISHED:
 	INLINE bool is_pitch_up_enabled() const;
 	INLINE void enable_pitch_down(bool enable);
 	INLINE bool is_pitch_down_enabled() const;
-	INLINE void enable_mouse_head(bool enable); //xxx
-	INLINE bool is_mouse_head_enabled() const; //xxx
-	INLINE void enable_mouse_pitch(bool enable); //xxx
-	INLINE bool is_mouse_pitch_enabled() const; //xxx
-	INLINE void enable_mouse_move(bool enable); //xxx
-	INLINE bool is_mouse_move_enabled() const; //xxx
+	INLINE void enable_mouse_head(bool enable);
+	INLINE bool is_mouse_head_enabled() const;
+	INLINE void enable_mouse_pitch(bool enable);
+	INLINE bool is_mouse_pitch_enabled() const;
+	INLINE void enable_mouse_move(bool enable);
+	INLINE bool is_mouse_move_enabled() const;
 	///@}
 
 	/**
@@ -191,13 +194,14 @@ PUBLISHED:
 	INLINE bool get_rotate_pitch_down() const;
 	///@}
 
-
 	/**
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
 	INLINE void set_hold_look_at(bool activate);
 	INLINE bool get_hold_look_at() const;
+	INLINE void set_backward(bool activate);
+	INLINE bool get_backward() const;
 	INLINE void set_fixed_relative_position(bool enable);
 	INLINE bool get_fixed_relative_position();
 	INLINE void set_inverted_rotation(bool enable);
@@ -260,30 +264,18 @@ protected:
 	virtual ~P3Chaser();
 
 private:
-//	///The chased object's node path. //XXX
-//	NodePath mChasedNodePath;
+	///The chased object's node path.
+	NodePath mChasedNP;
 	///This NodePath.
 	NodePath mThisNP;
-//	///The reference object's node path. //XXX
-//	NodePath mReferenceNodePath;
 	///The reference node path.
 	NodePath mReferenceNP;
 	///The reference graphic window.
 	PT(GraphicsWindow) mWin;
 	///Auxiliary node path to track the fixed look at.
-	NodePath mFixedLookAtNodePath;
+	NodePath mFixedLookAtNP;
 	///Flags.
-	bool mStartEnabled, mEnabled, mFixedRelativePosition, mBackward,
-	mFixedLookAt, mHoldLookAt;
-//	/** XXX
-//	 * \name Main parameters.
-//	 */
-//	///@{
-//	///Chased object id.
-//	ObjectId mChasedId;
-//	///Reference object id.
-//	ObjectId mReferenceId;
-//	///@}
+	bool mEnabled, mFixedRelativePosition, mBackward, mFixedLookAt, mHoldLookAt;
 	///Kinematic parameters.
 	float mAbsLookAtDistance, mAbsLookAtHeight, mAbsMaxDistance, mAbsMinDistance,
 	mAbsMinHeight, mAbsMaxHeight, mFriction;
@@ -292,12 +284,12 @@ private:
 	///@{
 	///Key controls and effective keys.
 	bool mHeadLeft, mHeadRight, mPitchUp, mPitchDown;
-	bool mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey;
+	bool mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
 	///@}
 	///@{
 	///Key control values.
-	bool mMouseEnabledH, mMouseEnabledP;
-	int mSignOfMouse;
+	bool mMouseEnabledH, mMouseEnabledP, mMouseHandled;
+	char mSignOfMouse;
 	///@}
 	///@{
 	/// Sensitivity settings.
@@ -305,45 +297,34 @@ private:
 	int mCentX, mCentY;
 	///@}
 
-	inline void do_reset(); //xxx
-	void do_initialize(); //xxx
-	void do_finalize(); //xxx
+	inline void do_reset();
+	void do_initialize();
+	void do_finalize();
 
 	/**
 	 * \name Helpers variables/functions.
 	 */
 	///@{
-	void do_enable(); //xxx
-	void do_disable(); //xxx
-	void do_handle_mouse(); //xxx
-	///@}
-	/**
-	 * \name Actual enabling/disabling.
-	 */
-	///@{
-	void doEnable(); //xxx
-	void doDisable();//xxx
-	///@}
-
-
-	/**
-	 * \brief Calculates the dynamic position of the chaser.
+	void do_enable();
+	void do_disable();
+	void do_handle_mouse();
+	/*
+	 * Calculates the dynamic position of the chaser.
 	 * \see OgreBulletDemos.
-	 * @param desiredChaserPos The desired chaser position (wrt reference).
-	 * @param currentChaserPos The current chaser position (wrt reference).
-	 * @param deltaTime The delta time update.
-	 * @return The dynamic chaser position.
+	 * - desiredChaserPos: the desired chaser position (wrt reference).
+	 * - currentChaserPos: the current chaser position (wrt reference).
+	 * - deltaTime: the delta time update.
+	 * Returns the dynamic chaser position.
 	 */
-	LPoint3f doGetChaserPos(LPoint3f desiredChaserPos,
+	LPoint3f do_get_chaser_pos(LPoint3f desiredChaserPos,
 			LPoint3f currentChaserPos, float deltaTime);
-	/**
-	 * \brief Correct the dynamic height of the chaser.
-	 * @param newPos The position whose height may be corrected.
-	 * @param baseHeight The corrected height cannot be shorter than this.
+	/*
+	 * Correct the dynamic height of the chaser.
+	 * - newPos: the position whose height may be corrected.
+	 * - baseHeight: the corrected height cannot be shorter than this.
 	 */
-	void doCorrectChaserHeight(LPoint3f& newPos, float baseHeight);
-
-
+	void do_correct_chaser_height(LPoint3f& newPos, float baseHeight);
+	///@}
 
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)
 	/**

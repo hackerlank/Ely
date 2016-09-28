@@ -24,9 +24,9 @@ init_libcontrol() {
   // Init your dynamic types here, e.g.:
   // MyDynamicClass::init_type();
   P3Driver::init_type();
-//  P3Chaser::init_type();
+  P3Chaser::init_type();
   P3Driver::register_with_read_factory();
-//  P3Chaser::register_with_read_factory();
+  P3Chaser::register_with_read_factory();
   ControlManager::init_type();
 
   return;

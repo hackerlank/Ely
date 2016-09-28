@@ -8,7 +8,7 @@
 #include "controlManager.h"
 
 #include "p3Driver.h"
-//#include "p3Chaser.h" XXX
+#include "p3Chaser.h"
 #include "asyncTaskManager.h"
 #include "graphicsWindow.h"
 #include "bamFile.h"
@@ -32,7 +32,7 @@ ControlManager::ControlManager(PT(GraphicsWindow) win, int taskSort, const NodeP
 
 	mDrivers.clear();
 	mDriversParameterTable.clear();
-//	mChasers.clear(); XXX
+	mChasers.clear();
 	mChasersParameterTable.clear();
 	set_parameters_defaults(DRIVER);
 	set_parameters_defaults(CHASER);
@@ -75,16 +75,16 @@ ControlManager::~ControlManager()
 			iterN = mDrivers.erase(iterN);
 		}
 
-//		//destroy all P3Chasers XXX
-//		PTA(PT(P3Chaser))::iterator iterC = mChasers.begin();
-//		while (iterC != mChasers.end())
-//		{
-//			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
-//			//give a chance to P3Chaser to cleanup itself before being destroyed.
-//			(*iterC)->do_finalize();
-//			//remove the P3Chasers from the inner list (and from the update task)
-//			iterC = mChasers.erase(iterC);
-//		}
+		//destroy all P3Chasers
+		PTA(PT(P3Chaser))::iterator iterC = mChasers.begin();
+		while (iterC != mChasers.end())
+		{
+			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+			//give a chance to P3Chaser to cleanup itself before being destroyed.
+			(*iterC)->do_finalize();
+			//remove the P3Chasers from the inner list (and from the update task)
+			iterC = mChasers.erase(iterC);
+		}
 	}
 	//clear parameters' tables
 	mDriversParameterTable.clear();
@@ -94,7 +94,7 @@ ControlManager::~ControlManager()
 }
 
 /**
- * Creates a P3Driver.
+ * Creates a P3Driver with a given (mandatory and not empty) name.
  * Returns a NodePath to the new P3Driver,or an empty NodePath with the
  * ET_fail error type set on error.
  */
@@ -105,7 +105,7 @@ NodePath ControlManager::create_driver(const string& name)
 	PT(P3Driver)newDriver = new P3Driver(name);
 	nassertr_always(newDriver && (!mWin.is_null()), NodePath::fail())
 
-	// set reference nodes
+	// set reference node
 	newDriver->mReferenceNP = mReferenceNP;
 	// set the reference graphic window.
 	newDriver->mWin = mWin;
@@ -163,22 +163,24 @@ PT(P3Driver) ControlManager::get_driver(int index) const
  */
 NodePath ControlManager::create_chaser(const string& name)
 {
-//	nassertr_always(! name.empty(), NodePath::fail()) XXX
-//
-//	PT(P3Chaser) newChaser = new P3Chaser(name);
-//	nassertr_always(newChaser, NodePath::fail())
-//
-//	// set reference node
-//	newChaser->mReferenceNP = mReferenceNP;
-//	//initialize the new Chaser
-//	newChaser->do_initialize();
-//
-//	//add the new Chaser to the inner list
-//	mChasers.push_back(newChaser);
-//	// reparent to reference node
-	NodePath np/* = mReferenceNP.attach_new_node(newChaser)*/;
+	nassertr_always(!name.empty(), NodePath::fail())
+
+	PT(P3Chaser) newChaser = new P3Chaser(name);
+	nassertr_always(newChaser && (!mWin.is_null()), NodePath::fail())
+
+	// set reference node
+	newChaser->mReferenceNP = mReferenceNP;
+	// set the reference graphic window.
+	newChaser->mWin = mWin;
+	// initialize the new Chaser
+	newChaser->do_initialize();
+
+	// add the new Chaser to the inner list (and to the update task)
+	mChasers.push_back(newChaser);
+	// reparent to reference node and set "this" NodePath
+	newChaser->mThisNP = mReferenceNP.attach_new_node(newChaser);
 	//
-	return np;
+	return newChaser->mThisNP;
 }
 
 /**
@@ -187,19 +189,21 @@ NodePath ControlManager::create_chaser(const string& name)
  */
 bool ControlManager::destroy_chaser(NodePath chaserNP)
 {
-//	CONTINUE_IF_ELSE_R( XXX
-//			chaserNP.node()->is_of_type(P3Chaser::get_class_type()),
-//			false)
-//
-//	PT(P3Chaser)chaser = DCAST(P3Chaser, chaserNP.node());
-//	ChaserList::iterator iter = find(mChasers.begin(),
-//			mChasers.end(), chaser);
-//	CONTINUE_IF_ELSE_R(iter != mChasers.end(), false)
-//
-//	//give a chance to P3Chaser to cleanup itself before being destroyed.
-//	chaser->do_finalize();
-//	//remove the P3Chaser from the inner list (and from the update task)
-//	mChasers.erase(iter);
+	CONTINUE_IF_ELSE_R(
+			chaserNP.node()->is_of_type(P3Chaser::get_class_type()),
+			false)
+
+	PT(P3Chaser)chaser = DCAST(P3Chaser, chaserNP.node());
+	ChaserList::iterator iter = find(mChasers.begin(),
+			mChasers.end(), chaser);
+	CONTINUE_IF_ELSE_R(iter != mChasers.end(), false)
+
+	// reset the reference graphic window.
+	chaser->mWin.clear();
+	// give a chance to P3Chaser to cleanup itself before being destroyed.
+	chaser->do_finalize();
+	//remove the P3Chaser from the inner list (and from the update task)
+	mChasers.erase(iter);
 	//
 	return true;
 }
@@ -207,13 +211,13 @@ bool ControlManager::destroy_chaser(NodePath chaserNP)
 /**
  * Gets an P3Chaser by index, or NULL on error.
  */
-//PT(P3Chaser) ControlManager::get_chaser(int index) const XXX
-//{
-//	nassertr_always((index >= 0) && (index < (int ) mChasers.size()),
-//			NULL)
-//
-//	return mChasers[index];
-//}
+PT(P3Chaser) ControlManager::get_chaser(int index) const
+{
+	nassertr_always((index >= 0) && (index < (int ) mChasers.size()),
+			NULL)
+
+	return mChasers[index];
+}
 
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
@@ -403,7 +407,8 @@ void ControlManager::set_parameters_defaults(ControlType type)
 		mChasersParameterTable.insert(ParameterNameValue("backward", "true"));
 		mChasersParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
 		mChasersParameterTable.insert(ParameterNameValue("friction", "1.0"));
-		mChasersParameterTable.insert(ParameterNameValue("fixed_lookat", "true"));
+		mChasersParameterTable.insert(ParameterNameValue("fixed_look_at", "true"));
+		mChasersParameterTable.insert(ParameterNameValue("mouse_move", "false"));
 		mChasersParameterTable.insert(ParameterNameValue("mouse_head", "false"));
 		mChasersParameterTable.insert(ParameterNameValue("mouse_pitch", "false"));
 		mChasersParameterTable.insert(ParameterNameValue("head_left", "enabled"));
@@ -436,12 +441,12 @@ AsyncTask::DoneStatus ControlManager::update(GenericAsyncTask* task)
 	{
 		mDrivers[index]->update(dt);
 	}
-//	// call all P3Chasers' update functions, passing delta time XXX
-//	for (PTA(PT(P3Chaser))::size_type index = 0;
-//			index < mChasers.size(); ++index)
-//	{
-//		mChasers[index]->update(dt);
-//	}
+	// call all P3Chasers' update functions, passing delta time
+	for (PTA(PT(P3Chaser))::size_type index = 0;
+			index < mChasers.size(); ++index)
+	{
+		mChasers[index]->update(dt);
+	}
 	//
 	return AsyncTask::DS_cont;
 }

@@ -16,7 +16,7 @@
 #include "collisionRay.h"
 
 class P3Driver;
-//class P3Chaser; XXX
+class P3Chaser;
 
 /**
  * ControlManager Singleton class.
@@ -33,7 +33,7 @@ PUBLISHED:
 	virtual ~ControlManager();
 
 	/**
-	 * \name REFERENCE NODES XXX
+	 * \name REFERENCE NODES
 	 */
 	///@{
 	INLINE NodePath get_reference_node_path() const;
@@ -57,9 +57,9 @@ PUBLISHED:
 	///@{
 	NodePath create_chaser(const string& name);
 	bool destroy_chaser(NodePath steerVehicleNP);
-//	PT(P3Chaser) get_chaser(int index) const; XXX
-//	INLINE int get_num_chasers() const; XXX
-//	MAKE_SEQ(get_chasers, get_num_chasers, get_chaser); XXX
+	PT(P3Chaser) get_chaser(int index) const;
+	INLINE int get_num_chasers() const;
+	MAKE_SEQ(get_chasers, get_num_chasers, get_chaser);
 	///@}
 
 	/**
@@ -143,8 +143,8 @@ private:
 	ParameterTable mDriversParameterTable;
 
 	///List of Chasers handled by this manager.
-//	typedef pvector<PT(P3Chaser)> ChaserList; XXX
-//	ChaserList mChasers;
+	typedef pvector<PT(P3Chaser)> ChaserList;
+	ChaserList mChasers;
 	///Chasers' parameter table.
 	ParameterTable mChasersParameterTable;
 

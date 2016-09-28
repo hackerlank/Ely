@@ -83,18 +83,22 @@ void P3Driver::do_initialize()
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_pitch"))
 			== string("enabled") ? true : false);
 	//key events setting
-	//backward key
-	mBackwardKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("backward"))
-			== string("disabled") ? false : true);
-	//down key
-	mDownKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("down")) == string("disabled") ?
-			false : true);
 	//forward key
 	mForwardKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("forward"))
 			== string("disabled") ? false : true);
+	//backward key
+	mBackwardKey = (
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("backward"))
+			== string("disabled") ? false : true);
+	//up key
+	mUpKey = (
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("up")) == string("disabled") ?
+			false : true);
+	//down key
+	mDownKey = (
+			mTmpl->get_parameter_value(ControlManager::DRIVER, string("down")) == string("disabled") ?
+			false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_left"))
@@ -119,10 +123,6 @@ void P3Driver::do_initialize()
 	mPitchDownKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_down"))
 			== string("disabled") ? false : true);
-	//up key
-	mUpKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("up")) == string("disabled") ?
-			false : true);
 	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
 			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_move"))
@@ -769,7 +769,6 @@ void P3Driver::write_datagram(BamWriter *manager, Datagram &dg)
 	dg.add_bool(mHeadRight);
 	dg.add_bool(mPitchUp);
 	dg.add_bool(mPitchDown);
-//	dg.add_bool(mMouseMove);
 	dg.add_bool(mForwardKey);
 	dg.add_bool(mBackwardKey);
 	dg.add_bool(mStrafeLeftKey);
@@ -886,7 +885,6 @@ void P3Driver::fillin(DatagramIterator &scan, BamReader *manager)
 	mHeadRight = scan.get_bool();
 	mPitchUp = scan.get_bool();
 	mPitchDown = scan.get_bool();
-//	mMouseMove = scan.get_bool();
 	mForwardKey = scan.get_bool();
 	mBackwardKey = scan.get_bool();
 	mStrafeLeftKey = scan.get_bool();

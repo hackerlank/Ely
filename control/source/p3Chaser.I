@@ -19,6 +19,16 @@ INLINE void P3Chaser::set_reference_node_path(const NodePath& reference)
 	mReferenceNP = reference;
 }
 
+INLINE void P3Chaser::set_chased_object(const NodePath& objectNP)
+{
+	mChasedNP = objectNP;
+}
+
+INLINE NodePath P3Chaser::get_chased_object() const
+{
+	return mChasedNP;
+}
+
 /**
  * Returns if the P3Chaser is enabled (default: enabled).
  */
@@ -97,6 +107,67 @@ INLINE void P3Chaser::enable_pitch_down(bool enable)
 	{
 		mPitchDown = false;
 	}
+}
+
+/**
+ * Enables/disables mouse head rotation (default: disabled).
+ */
+INLINE void P3Chaser::enable_mouse_head(bool enable)
+{
+	RETURN_ON_COND(mMouseEnabledH == enable,)
+
+	mMouseEnabledH = enable;
+	// handle mouse if possible
+	do_handle_mouse();
+}
+
+/**
+ * Returns if mouse head rotation is enabled/disabled (default: disabled).
+ */
+INLINE bool P3Chaser::is_mouse_head_enabled() const
+{
+	return mMouseEnabledH;
+}
+
+/**
+ * Enables/disables mouse pitch rotation (default: disabled).
+ */
+INLINE void P3Chaser::enable_mouse_pitch(bool enable)
+{
+	RETURN_ON_COND(mMouseEnabledP == enable,)
+
+	mMouseEnabledP = enable;
+	// handle mouse if possible
+	do_handle_mouse();
+}
+
+/**
+ * Returns if mouse pitch rotation is enabled/disabled (default: disabled).
+ */
+INLINE bool P3Chaser::is_mouse_pitch_enabled() const
+{
+	return mMouseEnabledP;
+}
+
+/**
+ * Enables/disables mouse movement externally handled (default: disabled).
+ */
+INLINE void P3Chaser::enable_mouse_move(bool enable)
+{
+	RETURN_ON_COND(mMouseMoveKey == enable,)
+
+	mMouseMoveKey = enable;
+	// handle mouse if possible
+	do_handle_mouse();
+}
+
+/**
+ * Returns if mouse movement externally handled is enabled/disabled (default:
+ * disabled).
+ */
+INLINE bool P3Chaser::is_mouse_move_enabled() const
+{
+	return mMouseMoveKey;
 }
 
 /**
@@ -191,6 +262,25 @@ INLINE void P3Chaser::set_hold_look_at(bool enable)
 INLINE bool P3Chaser::get_hold_look_at() const
 {
 	return mHoldLookAt;
+}
+
+INLINE void P3Chaser::set_backward(bool activate)
+{
+	RETURN_ON_COND(mBackward == activate,)
+
+	//check if backward located
+	float sign = (mBackward ? 1.0 : -1.0);
+	//set chaser position (wrt chased node)
+	mChaserPosition = LPoint3f(0.0, -mAbsMaxDistance * sign,
+			mAbsMinHeight * 1.5);
+	//set "look at" position (wrt chased node)
+	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign,
+			mAbsLookAtHeight);
+}
+
+INLINE bool P3Chaser::get_backward() const
+{
+	return mBackward;
 }
 
 INLINE void P3Chaser::set_fixed_relative_position(bool enable)
@@ -359,32 +449,6 @@ INLINE ValueList<float> P3Chaser::get_sens() const
 //	}
 //}
 
-
-inline void P3Chaser::reset()
-{
-	//
-	mChasedNodePath = NodePath();
-	mReferenceNodePath = NodePath();
-	mFixedLookAtNodePath = NodePath();
-	mStartEnabled = mEnabled = mFixedRelativePosition = mBackward =
-			mHoldLookAt = false;
-	mFixedLookAt = true;
-#ifdef ELY_THREAD
-	mDisabling = false;
-#endif
-	mChasedId = ObjectId();
-	mReferenceId = ObjectId();
-	mAbsLookAtDistance = mAbsLookAtHeight = mFriction = 0.0;
-	mAbsMaxDistance = mAbsMaxHeight = FLT_MAX;
-	mAbsMinDistance = mAbsMinHeight = FLT_MIN;
-	mChaserPosition = mLookAtPosition = LPoint3f::zero();
-	mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey = false;
-	mHeadLeft = mHeadRight = mPitchUp = mPitchDown = mMouseEnabledH =
-			mMouseEnabledP = false;
-	mSignOfMouse = 1;
-	mSensX = mSensY = 0.0;
-	mCentX = mCentY = 0.0;
-}
 /**
  * Resets the P3Chaser.
  * \note Internal use only.
@@ -393,22 +457,21 @@ inline void P3Chaser::do_reset()
 {
 	//
 	mEnabled = false;
-	mForward = mBackward = mStrafeLeft = mStrafeRight = mUp = mDown =
-			mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
-	mForwardKey = mBackwardKey = mStrafeLeftKey = mStrafeRightKey = mUpKey =
-			mDownKey = mHeadLeftKey = mHeadRightKey = mPitchUpKey =
-					mPitchDownKey = mMouseMoveKey = false;
-	mMouseEnabledH = mMouseEnabledP = mMouseHandled = mHeadLimitEnabled =
-			mPitchLimitEnabled = false;
-	mHLimit = mPLimit = 0.0;
-	mSignOfTranslation = mSignOfMouse = 1;
-	mFastFactor = 0.0;
-	mActualSpeedXYZ = mMaxSpeedXYZ = mMaxSpeedSquaredXYZ = LVecBase3f::zero();
-	mActualSpeedH = mActualSpeedP = mMaxSpeedHP = mMaxSpeedSquaredHP = 0.0;
-	mAccelXYZ = LVecBase3f::zero();
-	mAccelHP = 0.0;
-	mFrictionXYZ = mFrictionHP = 0.0;
-	mStopThreshold = 0.0;
+	mChasedNP.clear();
+	mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
+	mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey = mMouseMoveKey =
+			false;
+	mMouseEnabledH = mMouseEnabledP = mMouseHandled = false;
+	mSignOfMouse = 1;
+	mFixedLookAtNP.clear();
+	mBackward = mFixedRelativePosition = mHoldLookAt = false;
+	mFixedLookAt = false;
+//	mChasedId = ObjectId(); xxx
+//	mReferenceId = ObjectId();
+	mAbsLookAtDistance = mAbsLookAtHeight = mFriction = 0.0;
+	mAbsMaxDistance = mAbsMaxHeight = FLT_MAX;
+	mAbsMinDistance = mAbsMinHeight = FLT_MIN;
+	mChaserPosition = mLookAtPosition = LPoint3f::zero();
 	mSensX = mSensY = 0.0;
 	mCentX = mCentY = 0.0;
 	mReferenceNP.clear();
