@@ -186,9 +186,9 @@ PUBLISHED:
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	INLINE void set_inverted_translation(bool enable);
+	INLINE void set_inverted_translation(bool activate);
 	INLINE bool get_inverted_translation() const;
-	INLINE void set_inverted_rotation(bool enable);
+	INLINE void set_inverted_rotation(bool activate);
 	INLINE bool get_inverted_rotation() const;
 	INLINE void set_head_limit(bool enabled, float hLimit);
 	INLINE Pair<bool, float> get_head_limit() const;

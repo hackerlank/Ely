@@ -482,9 +482,9 @@ INLINE bool P3Driver::get_rotate_pitch_down() const
 /**
  * Activates/deactivates inverted translation (default: deactivated).
  */
-INLINE void P3Driver::set_inverted_translation(bool enable)
+INLINE void P3Driver::set_inverted_translation(bool activate)
 {
-	enable ? mSignOfTranslation = -1: mSignOfTranslation = 1;
+	activate ? mSignOfTranslation = -1: mSignOfTranslation = 1;
 }
 
 /**
@@ -499,9 +499,9 @@ INLINE bool P3Driver::get_inverted_translation() const
 /**
  * Activates/deactivates inverted rotation (default: deactivated).
  */
-INLINE void P3Driver::set_inverted_rotation(bool enable)
+INLINE void P3Driver::set_inverted_rotation(bool activate)
 {
-	enable ? mSignOfMouse = -1: mSignOfMouse = 1;
+	activate ? mSignOfMouse = -1: mSignOfMouse = 1;
 }
 
 /**

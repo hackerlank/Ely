@@ -16,11 +16,17 @@
 #endif //CPPPARSER
 
 /**
- * \brief Component designed to make an object a chaser of another object.
+ * P3Chaser is a PandaNode class designed to make an object a chaser of another
+ * object.
  *
+ * Chasing can be fixed or dampened, from behind or from the front.\n
+ * With dampened chasing various movement's (like friction, min/max distance,
+ * min/max height etc...) can be set.\n
+ * XXX See P3Driver for enabilg/activating rotations.
+ * P3Chaser could be rotated by both theRotations through mouse movements could be activated.\n
  * The up axis is the "z" axis.
  *
- * > **XML Param(s)**:
+ * > **P3Chaser text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
  * | *enabled*  				|single| *true* | -
@@ -33,7 +39,7 @@
  * | *max_height*				|single| - | -
  * | *min_height*				|single| - | -
  * | *friction*					|single| 1.0 | -
- * | *fixed_look_at*				|single| *true* | -
+ * | *fixed_look_at*			|single| *true* | -
  * | *look_at_distance*			|single| - | -
  * | *look_at_height*			|single| - | -
  * | *mouse_move*  				|single| *disabled* | -
@@ -46,89 +52,6 @@
  * | *sens_x*  					|single| 0.2 | -
  * | *sens_y*  					|single| 0.2 | -
  * | *inverted_rotation*		|single| *false* | -
- *
- * \note parts inside [] are optional.\n *
- *
- *
- * P3Chaser is a PandaNode class designed for the control of
- * translation/rotation movements. To be driven, a PandaNode object should be
- * attached to this P3Chaser.\n
- *
- * P3Chaser can be enabled/disabled as a whole (enabled by default).\n
- * P3Chaser can handle a given basic movement (forward, backward, head_left,
- * head_right etc...) only if it is enabled to do so by calling the
- * corresponding "enabler". In turn, an enabled basic movement can be
- * activated/deactivated through the corresponding "activator".\n
- * Movement is, by default, based on acceleration (i.e. "dynamic"):
- * accelerations and max speeds can be independently set for any local direction
- * (translation) and local axis (rotation).\n
- * Translation is updated relative to:
- * - x local axis, ie left-right side direction
- * - y local axis, ie forward-backward direction
- * - z local axis, ie up-down direction
- * Rotation is updated relative to:
- * - z local axis, ie head (yaw)
- * - x local axis, ie pitch
- * Rotation through y local axis (roll) is not considered.\n
- * To obtain a fixed movement/rotation (i.e. "kinematic") in any direction, the
- * related acceleration and friction value should be set to zero and a very high
- * value respectively.\n
- * A task could update the position/orientation of the attached PandaNode object
- * based on the currently enabled basic movements, by calling the "update()"
- * method.\n
- * Usually movements are activated/deactivated through callback associated to
- * events (keyboard, mouse etc...).\n
- * Since in Panda3d by default, "mouse-move" events are not defined, mouse
- * movements can be enabled/disabled as "implicit activators" of head/pitch
- * basic rotations by calling "enable_mouse_head()"/"enable_mouse_pitch()"
- * methods. In this way head/pitch basic rotations can be activated
- * independently through mouse movements and/or normal activator methods.\n
- * On the other hand, "mouse-move" event could be defined by using
- * \code
- * ButtonThrower::set_move_event()
- * \endcode
- * (\see: http://www.panda3d.org/forums/viewtopic.php?t=9326 and
- * \see: http://www.panda3d.org/forums/viewtopic.php?t=6049), and in this case
- * if an application wishes to handle directly these events, it has to disable
- * the previously described mouse movements handling by calling:
- * \code
- * enable_mouse_move(true)
- * \endcode
- * All movements (but up and down) can be inverted (default: not inverted).\n
- * All movements are computed wrt reference NodePath.\n
- *
- * > **P3Chaser text parameters**:
- * param | type | default | note
- * ------|------|---------|-----
- * | *enabled*  				|single| *true* | -
- * | *forward*  				|single| *enabled* | -
- * | *backward*  				|single| *enabled* | -
- * | *head_limit*  				|single| *false@0.0* | specified as "enabled@[limit] with enabled = true,false, with limit >= 0.0
- * | *head_left*  				|single| *enabled* | -
- * | *head_right*  				|single| *enabled* | -
- * | *pitch_limit*  			|single| *false@0.0* | specified as "enabled@[limit] with enabled = true,false, with limit >= 0.0
- * | *pitch_up*  				|single| *enabled* | -
- * | *pitch_down*  				|single| *enabled* | -
- * | *strafe_left*  			|single| *enabled* | -
- * | *strafe_right*  			|single| *enabled* | -
- * | *up*  						|single| *enabled* | -
- * | *down*  					|single| *enabled* | -
- * | *mouse_move*  				|single| *disabled* | -
- * | *mouse_head*  				|single| *disabled* | -
- * | *mouse_pitch*  			|single| *disabled* | -
- * | *speed_key*  				|single| *shift* | -
- * | *inverted_translation*  	|single| *false* | -
- * | *inverted_rotation*		|single| *false* | -
- * | *max_linear_speed*  		|single| 5.0 | -
- * | *max_angular_speed*  		|single| 5.0 | -
- * | *linear_accel*  			|single| 5.0 | -
- * | *angular_accel*  			|single| 5.0 | -
- * | *linear_friction*  		|single| 0.1 | -
- * | *angular_friction*  		|single| 0.1 | -
- * | *stop_threshold*	  		|single| 0.01 | -
- * | *fast_factor*  			|single| 5.0 | -
- * | *sens_x*  					|single| 0.2 | -
- * | *sens_y*  					|single| 0.2 | -
  *
  * \note parts inside [] are optional.\n
  */
@@ -202,9 +125,9 @@ PUBLISHED:
 	INLINE bool get_hold_look_at() const;
 	INLINE void set_backward(bool activate);
 	INLINE bool get_backward() const;
-	INLINE void set_fixed_relative_position(bool enable);
+	INLINE void set_fixed_relative_position(bool activate);
 	INLINE bool get_fixed_relative_position();
-	INLINE void set_inverted_rotation(bool enable);
+	INLINE void set_inverted_rotation(bool activate);
 	INLINE bool get_inverted_rotation() const;
 	INLINE void set_max_distance(float absMaxDistance);
 	INLINE float get_max_distance() const;

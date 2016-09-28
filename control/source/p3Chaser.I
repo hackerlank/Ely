@@ -19,11 +19,17 @@ INLINE void P3Chaser::set_reference_node_path(const NodePath& reference)
 	mReferenceNP = reference;
 }
 
+/**
+ * Sets the chased object.
+ */
 INLINE void P3Chaser::set_chased_object(const NodePath& objectNP)
 {
 	mChasedNP = objectNP;
 }
 
+/**
+ * Reurns the chased object.
+ */
 INLINE NodePath P3Chaser::get_chased_object() const
 {
 	return mChasedNP;
@@ -254,16 +260,28 @@ INLINE bool P3Chaser::get_rotate_pitch_down() const
 	return mPitchDown;
 }
 
-INLINE void P3Chaser::set_hold_look_at(bool enable)
+/**
+ * Activates/deactivates hold look at.
+ * When activated rotation through mouse movements is disabled.
+ */
+INLINE void P3Chaser::set_hold_look_at(bool activate)
 {
-	mHoldLookAt = enable;
+	mHoldLookAt = activate;
 }
 
+/**
+ * Returns if hold look at is activated.
+ */
 INLINE bool P3Chaser::get_hold_look_at() const
 {
 	return mHoldLookAt;
 }
 
+/**
+ * Activates/deactivates backward chasing (default: deactivated).
+ * When activated the chased object is behind the chaser, otherwise it is in
+ * front of it.
+ */
 INLINE void P3Chaser::set_backward(bool activate)
 {
 	RETURN_ON_COND(mBackward == activate,)
@@ -278,14 +296,21 @@ INLINE void P3Chaser::set_backward(bool activate)
 			mAbsLookAtHeight);
 }
 
+/**
+ * Returns if backward chasing is activated (default: deactivated).
+ */
 INLINE bool P3Chaser::get_backward() const
 {
 	return mBackward;
 }
 
-INLINE void P3Chaser::set_fixed_relative_position(bool enable)
+/**
+ * Activates/deactivates backward chasing.
+ * When activated
+ */
+INLINE void P3Chaser::set_fixed_relative_position(bool activate)
 {
-	mFixedRelativePosition = enable;
+	mFixedRelativePosition = activate;
 }
 
 INLINE bool P3Chaser::get_fixed_relative_position()
@@ -296,9 +321,9 @@ INLINE bool P3Chaser::get_fixed_relative_position()
 /**
  * Activates/deactivates inverted rotation (default: deactivated).
  */
-INLINE void P3Chaser::set_inverted_rotation(bool enable)
+INLINE void P3Chaser::set_inverted_rotation(bool activate)
 {
-	enable ? mSignOfMouse = -1: mSignOfMouse = 1;
+	activate ? mSignOfMouse = -1: mSignOfMouse = 1;
 }
 
 /**
@@ -309,78 +334,120 @@ INLINE bool P3Chaser::get_inverted_rotation() const
 	return (mSignOfMouse == -1) ? true : false;
 }
 
+/**
+ * Sets the max distance from chased object (>=0.0).
+ */
 INLINE void P3Chaser::set_max_distance(float absMaxDistance)
 {
 	absMaxDistance >= 0.0 ? mAbsMaxDistance = absMaxDistance : mAbsMaxDistance =
 									-absMaxDistance;
 }
 
+/**
+ * Returns the max distance from chased object (>=0.0).
+ */
 INLINE float P3Chaser::get_max_distance() const
 {
 	return mAbsMaxDistance;
 }
 
+/**
+ * Sets the min distance from chased object (>=0.0).
+ */
 INLINE void P3Chaser::set_min_distance(float absMinDistance)
 {
 	absMinDistance >= 0.0 ? mAbsMinDistance = absMinDistance : mAbsMinDistance =
 									-absMinDistance;
 }
 
+/**
+ * Returns the min distance from chased object (>=0.0).
+ */
 INLINE float P3Chaser::get_min_distance() const
 {
 	return mAbsMinDistance;
 }
 
+/**
+ * Sets the max height from ground (>=0.0).
+ */
 INLINE void P3Chaser::set_max_height(float absMaxHeight)
 {
 	absMaxHeight >= 0.0 ? mAbsMaxHeight = absMaxHeight : mAbsMaxHeight =
 									-absMaxHeight;
 }
 
+/**
+ * Returns the max height from ground (>=0.0).
+ */
 INLINE float P3Chaser::get_max_height() const
 {
 	return mAbsMaxHeight;
 }
 
+/**
+ * Sets the min height from ground (>=0.0).
+ */
 INLINE void P3Chaser::set_min_height(float absMinHeight)
 {
 	absMinHeight >= 0.0 ? mAbsMinHeight = absMinHeight : mAbsMinHeight =
 									-absMinHeight;
 }
 
+/**
+ * Returns the min height from ground (>=0.0).
+ */
 INLINE float P3Chaser::get_min_height() const
 {
 	return mAbsMinHeight;
 }
 
+/**
+ * Sets the look at distance (>=0.0).
+ */
 INLINE void P3Chaser::set_look_at_distance(float absLookAtDistance)
 {
 	absLookAtDistance >= 0.0 ? mAbsLookAtDistance = absLookAtDistance : mAbsLookAtDistance =
 									-absLookAtDistance;
 }
 
+/**
+ * Returns the look at distance (>=0.0).
+ */
 INLINE float P3Chaser::get_look_at_distance() const
 {
 	return mAbsLookAtDistance;
 }
 
+/**
+ * Sets the look at height (>=0.0).
+ */
 INLINE void P3Chaser::set_look_at_height(float absLookAtHeight)
 {
 	absLookAtHeight >= 0.0 ? mAbsLookAtHeight = absLookAtHeight : mAbsLookAtHeight =
 									-absLookAtHeight;
 }
 
+/**
+ * Returns the look at height (>=0.0).
+ */
 INLINE float P3Chaser::get_look_at_height() const
 {
 	return mAbsLookAtHeight;
 }
 
+/**
+ * Sets the friction (>=0.0).
+ */
 INLINE void P3Chaser::set_friction(float friction)
 {
 	friction >= 0.0 ? mFriction = friction : mFriction =
 									-friction;
 }
 
+/**
+ * Returns the friction (>=0.0).
+ */
 INLINE float P3Chaser::get_friction() const
 {
 	return mFriction;
@@ -406,49 +473,6 @@ INLINE ValueList<float> P3Chaser::get_sens() const
 	return sens;
 }
 
-//INLINE ObjectId P3Chaser::getChasedObject() xxx
-//{
-//	//lock (guard) the mutex
-//	HOLD_REMUTEX(mMutex)
-//
-//	return mChasedId;
-//}
-
-//INLINE void P3Chaser::setChasedObject(const ObjectId& objectId) xxx
-//{
-//	//lock (guard) the mutex
-//	HOLD_REMUTEX(mMutex)
-//
-//	//set the (node path of) object chased by this component;
-//	//that object is supposed to be already created,
-//	//set up and added to the created objects table;
-//	//if not, this component chases nothing.
-//	mChasedId = objectId;
-//	SMARTPTR(Object)chasedObject =
-//	ObjectTemplateManager::GetSingleton().getCreatedObject(
-//			mChasedId);
-//	if (chasedObject != NULL)
-//	{
-//		mChasedNodePath = chasedObject->getNodePath();
-//
-//		//set the (node path of) reference object;
-//		//that object is supposed to be already created,
-//		//set up and added to the created objects table;
-//		//if not, this will be the parent of the chased object.
-//		SMARTPTR(Object)referenceObject =
-//		ObjectTemplateManager::GetSingleton().getCreatedObject(
-//				mReferenceId);
-//		if (referenceObject != NULL)
-//		{
-//			mReferenceNodePath = referenceObject->getNodePath();
-//		}
-//		else
-//		{
-//			mReferenceNodePath = mChasedNodePath.get_parent();
-//		}
-//	}
-//}
-
 /**
  * Resets the P3Chaser.
  * \note Internal use only.
@@ -466,8 +490,6 @@ inline void P3Chaser::do_reset()
 	mFixedLookAtNP.clear();
 	mBackward = mFixedRelativePosition = mHoldLookAt = false;
 	mFixedLookAt = false;
-//	mChasedId = ObjectId(); xxx
-//	mReferenceId = ObjectId();
 	mAbsLookAtDistance = mAbsLookAtHeight = mFriction = 0.0;
 	mAbsMaxDistance = mAbsMaxHeight = FLT_MAX;
 	mAbsMinDistance = mAbsMinHeight = FLT_MIN;
