@@ -18,8 +18,8 @@ app = None
 mask = BitMask32(0x10)
 updateTask = None
 # models and animations
-playerFile = ["eve.egg", "ralph.egg", "sparrow.egg", "ball.egg", "red_car.egg"]
-playerAnimFiles = [["eve-walk.egg", "eve-run.egg"],
+modelFile = ["eve.egg", "ralph.egg", "sparrow.egg", "ball.egg", "red_car.egg"]
+modelAnimFiles = [["eve-walk.egg", "eve-run.egg"],
                   ["ralph-walk.egg", "ralph-run.egg"],
                   ["sparrow-flying.egg", "sparrow-flying2.egg"],
                   ["", ""],
@@ -30,6 +30,8 @@ bamFileName = "control.boo"
 
 # # specific data/functions declarations/definitions
 sceneNP = None
+globalClock = None
+# player specifics
 playerAnimCtls = []
 playerNP = None
 playerDriver = None
@@ -42,7 +44,10 @@ backwardMove = 3
 backwardMoveStop = -3
 rightMove = 4
 rightMoveStop = -4
-globalClock = None
+# pursuer specifics
+pursuerAnimCtls = []
+pursuerNP = None
+pursuerChaser = None
 
 #
 def printCreationParameters():
@@ -79,6 +84,29 @@ def setParametersBeforeCreation():
             "0.5")
     controlMgr.set_parameter_value(ControlManager.DRIVER, "angular_friction",
             "5.0")
+    # set chaser's parameters
+    controlMgr.set_parameter_value(ControlManager.CHASER, "fixed_relative_position",
+            "false")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "max_distance",
+            "25.0")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "min_distance",
+            "18.0")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "max_height",
+            "8.0")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "min_height",
+            "5.0")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "friction",
+            "5.0")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "fixed_look_at",
+            "false")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "mouse_head",
+            "true")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "mouse_pitch",
+            "true")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "look_at_distance",
+            "5.0")
+    controlMgr.set_parameter_value(ControlManager.CHASER, "look_at_height",
+            "1.5")
     #
     printCreationParameters()
 
@@ -119,10 +147,10 @@ def writeToBamFileAndExit(fileName):
     for driverTmp in controlMgr.get_drivers():
         # destroy driverTmp
         controlMgr.destroy_driver(NodePath.any_path(driverTmp))
-#     # destroy chasers
-#     for chaserTmp in controlMgr.get_chasers():
-#         # destroy chaserTmp
-#         controlMgr.destroy_chaser(NodePath.any_path(chaserTmp))
+    # destroy chasers
+    for chaserTmp in controlMgr.get_chasers():
+        # destroy chaserTmp
+        controlMgr.destroy_chaser(NodePath.any_path(chaserTmp))
     #
     sys.exit(0)
 
@@ -141,10 +169,10 @@ def loadTerrainLowPoly(name, widthScale=128, heightScale=64.0,
 def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
     """get model and animations"""
 
-    global app, playerFile, playerAnimFiles
+    global app, modelFile, modelAnimFiles
     # get some models, with animations
     # get the model
-    modelNP = app.loader.load_model(playerFile[modelFileIdx])
+    modelNP = app.loader.load_model(modelFile[modelFileIdx])
     # set the name
     modelNP.set_name(name)
     # set scale
@@ -153,10 +181,10 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
     tmpAnims = AnimControlCollection()
     modelAnimNP = [None, None]
     modelAnimCtls.append([None, None])        
-    if(len(playerAnimFiles[modelFileIdx][0]) != 0) and \
-            (len(playerAnimFiles[modelFileIdx][1]) != 0):
-        # first anim -> modelAnimCtls[i][0]
-        modelAnimNP[0] = app.loader.load_model(playerAnimFiles[modelFileIdx][0])
+    if(len(modelAnimFiles[modelFileIdx][0]) != 0) and \
+            (len(modelAnimFiles[modelFileIdx][1]) != 0):
+        # first anim . modelAnimCtls[i][0]
+        modelAnimNP[0] = app.loader.load_model(modelAnimFiles[modelFileIdx][0])
         modelAnimNP[0].reparent_to(modelNP)
         auto_bind(modelNP.node(), tmpAnims,
                   PartGroup.HMF_ok_part_extra | 
@@ -165,8 +193,8 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
         modelAnimCtls[-1][0] = tmpAnims.get_anim(0)
         tmpAnims.clear_anims()
         modelAnimNP[0].detach_node()
-        # second anim -> modelAnimCtls[i][1]
-        modelAnimNP[1] = app.loader.load_model(playerAnimFiles[modelFileIdx][1])
+        # second anim . modelAnimCtls[i][1]
+        modelAnimNP[1] = app.loader.load_model(modelAnimFiles[modelFileIdx][1])
         modelAnimNP[1].reparent_to(modelNP)
         auto_bind(modelNP.node(), tmpAnims,
                   PartGroup.HMF_ok_part_extra | 
@@ -223,16 +251,48 @@ def handlePlayerUpdate():
             # updatedPos.z needs correction
             playerDriverNP.set_z(gotCollisionZ.get_second())
             
+def handlePursuerUpdate():
+    """handles pursuer on every update"""
+    
+    global pursuerChaser, pursuerAnimCtls, pursuerNP
+    # get current forward velocity size
+    currentVelSize = abs(pursuerChaser.get_chased_object().node().
+            get_current_speeds().get_first().get_y())
+    pursuerDriverNP = NodePath.any_path(pursuerChaser)
+    # handle vehicle's animation
+    for i in range(len(pursuerAnimCtls)):
+        if currentVelSize > 0.0:
+            if currentVelSize < 5.0: 
+                animOnIdx = 0
+            else:
+                animOnIdx = 1
+            animOffIdx = (animOnIdx + 1) % 2
+            # Off anim (0:walk, 1:run)
+            if pursuerAnimCtls[i][animOffIdx].is_playing():
+                pursuerAnimCtls[i][animOffIdx].stop()
+            # On amin (0:walk, 1:run)
+            pursuerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
+                                                    animRateFactor[animOnIdx])
+            if not pursuerAnimCtls[i][animOnIdx].is_playing():
+                pursuerAnimCtls[i][animOnIdx].loop(True)
+        else:
+            # stop any animation
+            pursuerAnimCtls[i][0].stop()
+            pursuerAnimCtls[i][1].stop()
+            
 def updateControls(task):
     """custom update task for controls"""
 
-    global playerDriver
+    global playerDriver, pursuerChaser
     # call update for controls
     dt = ClockObject.get_global_clock().get_dt()
     playerDriver.update(dt)
+    pursuerChaser.update(dt)
     # handle player on update
     handlePlayerUpdate()
-
+    # handle player on update
+    handlePursuerUpdate()
+    
 def movePlayer(data):
     """player's movement callback"""
     
@@ -271,9 +331,20 @@ def driverCallback(driver):
     # handle player on update
     handlePlayerUpdate()
 
+def chaserCallback(chaser):
+    """chaser update callback function"""  
+      
+    distance = (chaser.get_chased_object().get_pos() -
+            NodePath.any_path(chaser).get_pos()).length()
+    print(chaser, " " + str(globalClock.get_real_time()) + " - " + 
+            str(globalClock.get_dt()))
+    print("current distance: " , distance)
+    # handle chaser on update
+    handlePursuerUpdate()
+
 if __name__ == '__main__':
 
-    msg = "'P3Driver'"
+    msg = "'P3Driver & P3Chaser'"
     app = startFramework(msg)
       
     # # here is room for your own code
@@ -312,7 +383,10 @@ if __name__ == '__main__':
         setParametersBeforeCreation()
         # get a player with anims
         playerNP = getModelAnims("PlayerNP", 1.2, 0, playerAnimCtls)
-
+        # get a pursuer with anims
+        pursuerNP = getModelAnims("PursuerNP", 0.01, 2, pursuerAnimCtls)
+        pursuerNP.set_h(180)
+        
         # create the driver (attached to the reference node)
         playerDriverNP = controlMgr.create_driver("PlayerDriver")
         # get a reference to the player driver
@@ -321,9 +395,18 @@ if __name__ == '__main__':
         playerDriverNP.set_pos(LPoint3f(4.1, -12.0, 1.5))
         # attach some geometry (a model) to control vehicle
         playerNP.reparent_to(playerDriverNP)
-
         # highlight the player
         playerNP.set_color(1.0, 1.0, 0.0, 0)
+        
+        
+        # create the pursuer (attached to the reference node)
+        pursuerChaserNP = controlMgr.create_chaser("PursuerChaser")
+        # get a reference to the pursuer's chaser
+        pursuerChaser = pursuerChaserNP.node()
+        # set the chased object: playerDriverNP or playerNP
+        pursuerChaser.set_chased_object(playerDriverNP)
+        # attach some geometry (a model) to pursuer's chaser
+        pursuerNP.reparent_to(pursuerChaserNP)
     else:
         # valid bamFile
         # restore sceneNP: through panda3d
@@ -354,6 +437,7 @@ if __name__ == '__main__':
     # # first option: start the default update task for all plug-ins
     controlMgr.start_default_update()
     playerDriver.set_update_callback(driverCallback)
+    pursuerChaser.set_update_callback(chaserCallback)
     globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins

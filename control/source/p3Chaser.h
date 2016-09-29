@@ -19,21 +19,49 @@
  * P3Chaser is a PandaNode class designed to make an object a chaser of another
  * object.
  *
+ * P3Chaser can be enabled/disabled as a whole (enabled by default).\n
+ * P3Chaser can handle basic rotations movement (head_left, head_right,
+ * pitch_left, pitch_right) only if it is enabled to do so by calling the
+ * corresponding "enabler". In turn, an enabled basic rotation movement can be
+ * activated/deactivated through the corresponding "activator".\n
+ * Rotation is updated relative to:
+ * - z local axis, ie head (yaw)
+ * - x local axis, ie pitch
+ * Rotation through y local axis (roll) is not considered.\n
  * Chasing can be fixed or dampened, from behind or from the front.\n
- * With dampened chasing various movement's (like friction, min/max distance,
- * min/max height etc...) can be set.\n
- * XXX See P3Driver for enabilg/activating rotations.
- * P3Chaser could be rotated by both theRotations through mouse movements could be activated.\n
+ * With dampened chasing various movement's parameters (like friction, min/max
+ * distance, min/max height etc...) can be set.\n
+ * A task could update the position/orientation of the attached PandaNode object
+ * based on the current position/orientation of the chased object, and the
+ * currently enabled basic rotation movements, by calling the "update()"
+ * method.\n
+ * Usually movements are activated/deactivated through callback associated to
+ * events (keyboard, mouse etc...).\n
+ * Since in Panda3d by default, "mouse-move" events are not defined, mouse
+ * movements can be enabled/disabled as "implicit activators" of head/pitch
+ * basic rotations by calling "enable_mouse_head()"/"enable_mouse_pitch()"
+ * methods. In this way head/pitch basic rotations can be activated
+ * independently through mouse movements and/or normal activator methods.\n
+ * On the other hand, "mouse-move" event could be defined by using
+ * \code
+ * ButtonThrower::set_move_event()
+ * \endcode
+ * (\see: http://www.panda3d.org/forums/viewtopic.php?t=9326 and
+ * \see: http://www.panda3d.org/forums/viewtopic.php?t=6049), and in this case
+ * if an application wishes to handle directly these events, it has to disable
+ * the previously described mouse movements handling by calling:
+ * \code
+ * enable_mouse_move(true)
+ * \endcode
  * The up axis is the "z" axis.
+ * Rotation movements can be inverted (default: not inverted).\n
  *
  * > **P3Chaser text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
  * | *enabled*  				|single| *true* | -
  * | *backward*					|single| *true* | -
- * | *chased_object*			|single| - | -
  * | *fixed_relative_position*	|single| *true* | -
- * | *reference_object*			|single| - | -
  * | *max_distance*				|single| - | -
  * | *min_distance*				|single| - | -
  * | *max_height*				|single| - | -
@@ -231,21 +259,8 @@ private:
 	void do_enable();
 	void do_disable();
 	void do_handle_mouse();
-	/*
-	 * Calculates the dynamic position of the chaser.
-	 * \see OgreBulletDemos.
-	 * - desiredChaserPos: the desired chaser position (wrt reference).
-	 * - currentChaserPos: the current chaser position (wrt reference).
-	 * - deltaTime: the delta time update.
-	 * Returns the dynamic chaser position.
-	 */
 	LPoint3f do_get_chaser_pos(LPoint3f desiredChaserPos,
 			LPoint3f currentChaserPos, float deltaTime);
-	/*
-	 * Correct the dynamic height of the chaser.
-	 * - newPos: the position whose height may be corrected.
-	 * - baseHeight: the corrected height cannot be shorter than this.
-	 */
 	void do_correct_chaser_height(LPoint3f& newPos, float baseHeight);
 	///@}
 

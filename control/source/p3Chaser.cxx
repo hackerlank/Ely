@@ -156,10 +156,6 @@ void P3Chaser::do_initialize()
 					string("enabled")) == string("true") ? true : false))
 	{
 		do_enable();
-		//when enabled set chaser initial position/orientation
-		mThisNP.set_pos(mChasedNP, mChaserPosition);
-		mThisNP.look_at(mChasedNP, mLookAtPosition,
-				LVector3f::up());
 	}
 	//
 #ifdef PYTHON_BUILD
@@ -308,6 +304,14 @@ void P3Chaser::do_handle_mouse()
 	}
 }
 
+/**
+ * Calculates the dynamic position of the chaser.
+ * \see OgreBulletDemos.
+ * - desiredChaserPos: the desired chaser position (wrt reference).
+ * - currentChaserPos: the current chaser position (wrt reference).
+ * - deltaTime: the delta time update.
+ * Returns the dynamic chaser position.
+ */
 LPoint3f P3Chaser::do_get_chaser_pos(LPoint3f desiredChaserPos,
 		LPoint3f currentChaserPos, float deltaTime)
 {
@@ -338,6 +342,11 @@ LPoint3f P3Chaser::do_get_chaser_pos(LPoint3f desiredChaserPos,
 	return newPos;
 }
 
+/**
+ * Correct the dynamic height of the chaser.
+ * - newPos: the position whose height may be corrected.
+ * - baseHeight: the corrected height cannot be shorter than this.
+ */
 void P3Chaser::do_correct_chaser_height(LPoint3f& newPos, float baseHeight)
 {
 	//correct chaser height (not in OgreBulletDemos)

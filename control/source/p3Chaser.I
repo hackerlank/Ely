@@ -25,6 +25,10 @@ INLINE void P3Chaser::set_reference_node_path(const NodePath& reference)
 INLINE void P3Chaser::set_chased_object(const NodePath& objectNP)
 {
 	mChasedNP = objectNP;
+	// set chaser initial position/orientation
+	mThisNP.set_pos(mChasedNP, mChaserPosition);
+	mThisNP.look_at(mChasedNP, mLookAtPosition,
+			LVector3f::up());
 }
 
 /**
@@ -278,9 +282,9 @@ INLINE bool P3Chaser::get_hold_look_at() const
 }
 
 /**
- * Activates/deactivates backward chasing (default: deactivated).
- * When activated the chased object is behind the chaser, otherwise it is in
- * front of it.
+ * Activates/deactivates backward chasing (default: activated).
+ * When activated the chased object is in front of the P3Chaser, otherwise it is
+ * behind it.
  */
 INLINE void P3Chaser::set_backward(bool activate)
 {

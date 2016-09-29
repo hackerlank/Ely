@@ -12,6 +12,7 @@
 
 #include <controlManager.h>
 #include <p3Driver.h>
+#include <p3Chaser.h>
 
 /// global data declaration
 extern string dataDir;
@@ -20,9 +21,9 @@ WindowFramework *window = NULL;
 CollideMask mask = BitMask32(0x10);
 AsyncTask* updateTask = NULL;
 // models and animations
-string playerFile[5] =
+string modelFile[5] =
 { "eve.egg", "ralph.egg", "sparrow.egg", "ball.egg", "red_car.egg" };
-string playerAnimFiles[5][2] =
+string modelAnimFiles[5][2] =
 {
 { "eve-walk.egg", "eve-run.egg" },
 { "ralph-walk.egg", "ralph-run.egg" },
@@ -35,6 +36,8 @@ string bamFileName("control.boo");
 
 /// specific data/functions declarations/definitions
 NodePath sceneNP;
+ClockObject* globalClock = NULL;
+// player specifics
 vector<vector<PT(AnimControl)> > playerAnimCtls;
 NodePath playerNP;
 WPT(P3Driver)playerDriver;
@@ -47,7 +50,10 @@ int backwardMove = 3;
 int backwardMoveStop = -3;
 int rightMove = 4;
 int rightMoveStop = -4;
-ClockObject* globalClock = NULL;
+// chaser specifics
+vector<vector<PT(AnimControl)> > pursuerAnimCtls;
+NodePath pursuerNP;
+WPT(P3Chaser)pursuerChaser;
 
 // print creation parameters
 void printCreationParameters()
@@ -91,6 +97,29 @@ void setParametersBeforeCreation()
 			"0.5");
 	controlMgr->set_parameter_value(ControlManager::DRIVER, "angular_friction",
 			"5.0");
+	// set chaser's parameters
+	controlMgr->set_parameter_value(ControlManager::CHASER, "fixed_relative_position",
+			"false");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "max_distance",
+			"25.0");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "min_distance",
+			"18.0");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "max_height",
+			"8.0");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "min_height",
+			"5.0");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "friction",
+			"5.0");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "fixed_look_at",
+			"false");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "mouse_head",
+			"true");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "mouse_pitch",
+			"true");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "look_at_distance",
+			"5.0");
+	controlMgr->set_parameter_value(ControlManager::CHASER, "look_at_height",
+			"1.5");
 	//
 	printCreationParameters();
 }
@@ -116,8 +145,10 @@ void startFramework(int argc, char *argv[], const string& msg)
 
 	/// typed object init; not needed if you build inside panda source tree
 	P3Driver::init_type();
+	P3Chaser::init_type();
 	ControlManager::init_type();
 	P3Driver::register_with_read_factory();
+	P3Chaser::register_with_read_factory();
 	///
 
 	//common callbacks
@@ -138,23 +169,23 @@ void writeToBamFileAndExit(const Event*, void* data)
 //	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
-	WPT(ControlManager)steerMgr = ControlManager::get_global_ptr();
+	WPT(ControlManager)controlMgr = ControlManager::get_global_ptr();
 	// destroy drivers
-	while (steerMgr->get_num_drivers() > 0)
+	while (controlMgr->get_num_drivers() > 0)
 	{
 		// destroy the first one on every cycle
-		steerMgr->destroy_driver(
-				NodePath::any_path(steerMgr->get_driver(0)));
-///		delete DCAST(OSSteerVehicle, steerMgr->get_driver(0).node()); //ERROR
+		controlMgr->destroy_driver(
+				NodePath::any_path(controlMgr->get_driver(0)));
+///		delete DCAST(P3Driver, controlMgr->get_driver(0).node()); //ERROR
 	}
-//	// destroy chasers
-//	while (steerMgr->get_num_chasers() > 0)
-//	{
-//		// destroy the first one on every cycle
-//		steerMgr->destroy_chaser(
-//				NodePath::any_path(steerMgr->get_chaser(0)));
-/////		delete DCAST(OSSteerPlugIn, steerMgr->get_chaser(0).node()); //ERROR
-//	}
+	// destroy chasers
+	while (controlMgr->get_num_chasers() > 0)
+	{
+		// destroy the first one on every cycle
+		controlMgr->destroy_chaser(
+				NodePath::any_path(controlMgr->get_chaser(0)));
+///		delete DCAST(P3Chaser, controlMgr->get_chaser(0).node()); //ERROR
+	}
 	// delete control manager
 	delete ControlManager::get_global_ptr();
 	// close the window framework
@@ -183,7 +214,7 @@ NodePath getModelAnims(const string& name, float scale,
 {
 	// get some models, with animations
 	// get the model
-	NodePath modelNP = window->load_model(framework.get_models(), playerFile[modelFileIdx]);
+	NodePath modelNP = window->load_model(framework.get_models(), modelFile[modelFileIdx]);
 	// set the name
 	modelNP.set_name(name);
 	// set scale
@@ -192,11 +223,11 @@ NodePath getModelAnims(const string& name, float scale,
 	AnimControlCollection tmpAnims;
 	NodePath modelAnimNP[2];
 	modelAnimCtls.push_back(vector<PT(AnimControl)>(2));
-	if((!playerAnimFiles[modelFileIdx][0].empty()) &&
-	(!playerAnimFiles[modelFileIdx][1].empty()))
+	if((!modelAnimFiles[modelFileIdx][0].empty()) &&
+	(!modelAnimFiles[modelFileIdx][1].empty()))
 	{
 		// first anim -> modelAnimCtls[i][0]
-		modelAnimNP[0] = window->load_model(modelNP, playerAnimFiles[modelFileIdx][0]);
+		modelAnimNP[0] = window->load_model(modelNP, modelAnimFiles[modelFileIdx][0]);
 		auto_bind(modelNP.node(), tmpAnims,
 		PartGroup::HMF_ok_part_extra |
 		PartGroup::HMF_ok_anim_extra |
@@ -205,7 +236,7 @@ NodePath getModelAnims(const string& name, float scale,
 		tmpAnims.clear_anims();
 		modelAnimNP[0].detach_node();
 		// second anim -> modelAnimCtls[i][1]
-		modelAnimNP[1] = window->load_model(modelNP, playerAnimFiles[modelFileIdx][1]);
+		modelAnimNP[1] = window->load_model(modelNP, modelAnimFiles[modelFileIdx][1]);
 		auto_bind(modelNP.node(), tmpAnims,
 		PartGroup::HMF_ok_part_extra |
 		PartGroup::HMF_ok_anim_extra |
@@ -275,14 +306,55 @@ void handlePlayerUpdate()
 	}
 }
 
+// handles pursuer on every update
+void handlePursuerUpdate()
+{
+	// get current forward velocity size
+	float currentVelSize =
+			abs(DCAST(P3Driver, pursuerChaser->get_chased_object().node())->
+					get_current_speeds().get_first().get_y());
+	NodePath pursuerDriverNP = NodePath::any_path(pursuerChaser);
+	// handle pursuer's animation
+	for (int i = 0; i < (int) pursuerAnimCtls.size(); ++i)
+	{
+		if (currentVelSize > 0.0)
+		{
+			int animOnIdx, animOffIdx;
+			currentVelSize < 5.0 ? animOnIdx = 0 : animOnIdx = 1;
+			animOffIdx = (animOnIdx + 1) % 2;
+			// Off anim (0:walk, 1:run)
+			if (pursuerAnimCtls[i][animOffIdx]->is_playing())
+			{
+				pursuerAnimCtls[i][animOffIdx]->stop();
+			}
+			// On amin (0:walk, 1:run)
+			pursuerAnimCtls[i][animOnIdx]->set_play_rate(
+					currentVelSize * animRateFactor[animOnIdx]);
+			if (!pursuerAnimCtls[i][animOnIdx]->is_playing())
+			{
+				pursuerAnimCtls[i][animOnIdx]->loop(true);
+			}
+		}
+		else
+		{
+			// stop any animation
+			pursuerAnimCtls[i][0]->stop();
+			pursuerAnimCtls[i][1]->stop();
+		}
+	}
+}
+
 // custom update task for controls
 AsyncTask::DoneStatus updateControls(GenericAsyncTask*, void* data)
 {
 	// call update for controls
 	double dt = ClockObject::get_global_clock()->get_dt();
 	playerDriver->update(dt);
+	pursuerChaser->update(dt);
 	// handle player on update
 	handlePlayerUpdate();
+	// handle player on update
+	handlePursuerUpdate();
 	//
 	return AsyncTask::DS_cont;
 }
@@ -339,9 +411,21 @@ void driverCallback(PT(P3Driver)driver)
 	handlePlayerUpdate();
 }
 
+// chaser update callback function
+void chaserCallback(PT(P3Chaser)chaser)
+{
+	float distance = (chaser->get_chased_object().get_pos() -
+			NodePath::any_path(chaser).get_pos()).length();
+	cout << *chaser << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
+			str(globalClock->get_dt()) << endl;
+	cout << "current distance: " << distance << endl;
+	// handle chaser on update
+	handlePursuerUpdate();
+}
+
 int main(int argc, char *argv[])
 {
-	string msg("'P3Driver'");
+	string msg("'P3Driver & P3Chaser'");
 	startFramework(argc, argv, msg);
 
 	/// here is room for your own code
@@ -384,22 +468,33 @@ int main(int argc, char *argv[])
 		setParametersBeforeCreation();
 		// get a player with anims
 		playerNP = getModelAnims("PlayerNP", 1.2, 0, playerAnimCtls);
+		// get a pursuer with anims
+		pursuerNP = getModelAnims("PursuerNP", 0.01, 2, pursuerAnimCtls);
+		pursuerNP.set_h(180);
 
 		// create the driver (attached to the reference node)
 		NodePath playerDriverNP = controlMgr->create_driver("PlayerDriver");
-		// get a reference to the player driver
+		// get a reference to the player's driver
 		playerDriver = DCAST(P3Driver, playerDriverNP.node());
 		// set the position
 		playerDriverNP.set_pos(LPoint3f(4.1, -12.0, 1.5));
-		// attach some geometry (a model) to control vehicle
+		// attach some geometry (a model) to player's driver
 		playerNP.reparent_to(playerDriverNP);
-
 		// highlight the player
 		playerNP.set_color(1.0, 1.0, 0.0, 0);
+
+		// create the pursuer (attached to the reference node)
+		NodePath pursuerChaserNP = controlMgr->create_chaser("PursuerChaser");
+		// get a reference to the pursuer's chaser
+		pursuerChaser = DCAST(P3Chaser, pursuerChaserNP.node());
+		// set the chased object: playerDriverNP or playerNP
+		pursuerChaser->set_chased_object(playerDriverNP);
+		// attach some geometry (a model) to pursuer's chaser
+		pursuerNP.reparent_to(pursuerChaserNP);
 	}
 	else
 	{
-		// valid bamFile
+		// valid bamFile xxx
 		// restore sceneNP: through panda3d
 		sceneNP =
 				ControlManager::get_global_ptr()->get_reference_node_path().find(
@@ -433,6 +528,7 @@ int main(int argc, char *argv[])
 	/// first option: start the default update task for all drivers
 	controlMgr->start_default_update();
 	playerDriver->set_update_callback(driverCallback);
+	pursuerChaser->set_update_callback(chaserCallback);
     globalClock = ClockObject::get_global_clock();
 
     /// second option: start the custom update task for the drivers

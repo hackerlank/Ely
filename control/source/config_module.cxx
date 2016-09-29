@@ -3,7 +3,7 @@
 #include "dconfig.h"
 #include "controlManager.h"
 #include "p3Driver.h"
-//#include "p3Chaser.h"
+#include "p3Chaser.h"
 
 
 Configure( config_control );
