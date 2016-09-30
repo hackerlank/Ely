@@ -135,10 +135,10 @@ bool ControlManager::destroy_driver(NodePath driverNP)
 			mDrivers.end(), driver);
 	CONTINUE_IF_ELSE_R(iter != mDrivers.end(), false)
 
-	// reset the reference graphic window.
-	driver->mWin.clear();
 	// give a chance to P3Driver to cleanup itself before being destroyed.
 	driver->do_finalize();
+	// reset the reference graphic window.
+	driver->mWin.clear();
 	//remove the P3Driver from the inner list (and from the update task)
 	mDrivers.erase(iter);
 	//
@@ -198,10 +198,10 @@ bool ControlManager::destroy_chaser(NodePath chaserNP)
 			mChasers.end(), chaser);
 	CONTINUE_IF_ELSE_R(iter != mChasers.end(), false)
 
-	// reset the reference graphic window.
-	chaser->mWin.clear();
 	// give a chance to P3Chaser to cleanup itself before being destroyed.
 	chaser->do_finalize();
+	// reset the reference graphic window.
+	chaser->mWin.clear();
 	//remove the P3Chaser from the inner list (and from the update task)
 	mChasers.erase(iter);
 	//

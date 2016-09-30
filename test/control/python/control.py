@@ -92,13 +92,13 @@ def setParametersBeforeCreation():
     controlMgr.set_parameter_value(ControlManager.CHASER, "min_distance",
             "18.0")
     controlMgr.set_parameter_value(ControlManager.CHASER, "max_height",
-            "8.0")
+            "18.0")
     controlMgr.set_parameter_value(ControlManager.CHASER, "min_height",
-            "5.0")
+            "15.0")
     controlMgr.set_parameter_value(ControlManager.CHASER, "friction",
             "5.0")
     controlMgr.set_parameter_value(ControlManager.CHASER, "fixed_look_at",
-            "false")
+            "true")
     controlMgr.set_parameter_value(ControlManager.CHASER, "mouse_head",
             "true")
     controlMgr.set_parameter_value(ControlManager.CHASER, "mouse_pitch",
@@ -106,7 +106,7 @@ def setParametersBeforeCreation():
     controlMgr.set_parameter_value(ControlManager.CHASER, "look_at_distance",
             "5.0")
     controlMgr.set_parameter_value(ControlManager.CHASER, "look_at_height",
-            "1.5")
+            "12.5")
     #
     printCreationParameters()
 
@@ -258,27 +258,21 @@ def handlePursuerUpdate():
     # get current forward velocity size
     currentVelSize = abs(pursuerChaser.get_chased_object().node().
             get_current_speeds().get_first().get_y())
-    pursuerDriverNP = NodePath.any_path(pursuerChaser)
     # handle vehicle's animation
     for i in range(len(pursuerAnimCtls)):
-        if currentVelSize > 0.0:
-            if currentVelSize < 5.0: 
-                animOnIdx = 0
-            else:
-                animOnIdx = 1
-            animOffIdx = (animOnIdx + 1) % 2
-            # Off anim (0:walk, 1:run)
-            if pursuerAnimCtls[i][animOffIdx].is_playing():
-                pursuerAnimCtls[i][animOffIdx].stop()
-            # On amin (0:walk, 1:run)
-            pursuerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
-                                                    animRateFactor[animOnIdx])
-            if not pursuerAnimCtls[i][animOnIdx].is_playing():
-                pursuerAnimCtls[i][animOnIdx].loop(True)
+        if currentVelSize < 5.0: 
+            animOnIdx = 0
         else:
-            # stop any animation
-            pursuerAnimCtls[i][0].stop()
-            pursuerAnimCtls[i][1].stop()
+            animOnIdx = 1
+        animOffIdx = (animOnIdx + 1) % 2
+        # Off anim (0:walk, 1:run)
+        if pursuerAnimCtls[i][animOffIdx].is_playing():
+            pursuerAnimCtls[i][animOffIdx].stop()
+        # On amin (0:walk, 1:run)
+        pursuerAnimCtls[i][animOnIdx].set_play_rate(
+            (currentVelSize + 1.0) * 0.5)
+        if not pursuerAnimCtls[i][animOnIdx].is_playing():
+            pursuerAnimCtls[i][animOnIdx].loop(True)
             
 def updateControls(task):
     """custom update task for controls"""
@@ -395,9 +389,6 @@ if __name__ == '__main__':
         playerDriverNP.set_pos(LPoint3f(4.1, -12.0, 1.5))
         # attach some geometry (a model) to control vehicle
         playerNP.reparent_to(playerDriverNP)
-        # highlight the player
-        playerNP.set_color(1.0, 1.0, 0.0, 0)
-        
         
         # create the pursuer (attached to the reference node)
         pursuerChaserNP = controlMgr.create_chaser("PursuerChaser")
@@ -429,6 +420,16 @@ if __name__ == '__main__':
         # restore animations
         for j in range(tmpAnims.get_num_anims()):
             playerAnimCtls[i][j] = tmpAnims.get_anim(j)
+
+        # restore chaser: through control manager
+        pursuerChaser = ControlManager.get_global_ptr().get_chaser(0)
+        # restore animations
+        pursuerAnimCtls.extend(tmpList)
+        tmpAnims.clear_anims()
+        auto_bind(pursuerChaser, tmpAnims)
+        pursuerAnimCtls[0] = [None, None]
+        for j in range(tmpAnims.get_num_anims()):
+            pursuerAnimCtls[0][j] = tmpAnims.get_anim(j)
 
         # set creation parameters as strings before other drivers creation
         print("\n" + "Current creation parameters:")

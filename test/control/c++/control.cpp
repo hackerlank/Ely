@@ -105,13 +105,13 @@ void setParametersBeforeCreation()
 	controlMgr->set_parameter_value(ControlManager::CHASER, "min_distance",
 			"18.0");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "max_height",
-			"8.0");
+			"18.0");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "min_height",
-			"5.0");
+			"15.0");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "friction",
 			"5.0");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "fixed_look_at",
-			"false");
+			"true");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "mouse_head",
 			"true");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "mouse_pitch",
@@ -119,7 +119,7 @@ void setParametersBeforeCreation()
 	controlMgr->set_parameter_value(ControlManager::CHASER, "look_at_distance",
 			"5.0");
 	controlMgr->set_parameter_value(ControlManager::CHASER, "look_at_height",
-			"1.5");
+			"12.5");
 	//
 	printCreationParameters();
 }
@@ -313,33 +313,23 @@ void handlePursuerUpdate()
 	float currentVelSize =
 			abs(DCAST(P3Driver, pursuerChaser->get_chased_object().node())->
 					get_current_speeds().get_first().get_y());
-	NodePath pursuerDriverNP = NodePath::any_path(pursuerChaser);
 	// handle pursuer's animation
 	for (int i = 0; i < (int) pursuerAnimCtls.size(); ++i)
 	{
-		if (currentVelSize > 0.0)
+		int animOnIdx, animOffIdx;
+		currentVelSize < 5.0 ? animOnIdx = 0 : animOnIdx = 1;
+		animOffIdx = (animOnIdx + 1) % 2;
+		// Off anim (0:walk, 1:run)
+		if (pursuerAnimCtls[i][animOffIdx]->is_playing())
 		{
-			int animOnIdx, animOffIdx;
-			currentVelSize < 5.0 ? animOnIdx = 0 : animOnIdx = 1;
-			animOffIdx = (animOnIdx + 1) % 2;
-			// Off anim (0:walk, 1:run)
-			if (pursuerAnimCtls[i][animOffIdx]->is_playing())
-			{
-				pursuerAnimCtls[i][animOffIdx]->stop();
-			}
-			// On amin (0:walk, 1:run)
-			pursuerAnimCtls[i][animOnIdx]->set_play_rate(
-					currentVelSize * animRateFactor[animOnIdx]);
-			if (!pursuerAnimCtls[i][animOnIdx]->is_playing())
-			{
-				pursuerAnimCtls[i][animOnIdx]->loop(true);
-			}
+			pursuerAnimCtls[i][animOffIdx]->stop();
 		}
-		else
+		// On amin (0:walk, 1:run)
+		pursuerAnimCtls[i][animOnIdx]->set_play_rate(
+				(currentVelSize + 1.0) * 0.5);
+		if (!pursuerAnimCtls[i][animOnIdx]->is_playing())
 		{
-			// stop any animation
-			pursuerAnimCtls[i][0]->stop();
-			pursuerAnimCtls[i][1]->stop();
+			pursuerAnimCtls[i][animOnIdx]->loop(true);
 		}
 	}
 }
@@ -480,8 +470,6 @@ int main(int argc, char *argv[])
 		playerDriverNP.set_pos(LPoint3f(4.1, -12.0, 1.5));
 		// attach some geometry (a model) to player's driver
 		playerNP.reparent_to(playerDriverNP);
-		// highlight the player
-		playerNP.set_color(1.0, 1.0, 0.0, 0);
 
 		// create the pursuer (attached to the reference node)
 		NodePath pursuerChaserNP = controlMgr->create_chaser("PursuerChaser");
@@ -494,7 +482,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		// valid bamFile xxx
+		// valid bamFile
 		// restore sceneNP: through panda3d
 		sceneNP =
 				ControlManager::get_global_ptr()->get_reference_node_path().find(
@@ -518,6 +506,18 @@ int main(int argc, char *argv[])
 		for (int j = 0; j < tmpAnims.get_num_anims(); ++j)
 		{
 			playerAnimCtls[0][j] = tmpAnims.get_anim(j);
+		}
+
+		// restore chaser: through control manager
+		pursuerChaser = ControlManager::get_global_ptr()->get_chaser(0);
+		// restore animations
+		pursuerAnimCtls.resize(1);
+		tmpAnims.clear_anims();
+		auto_bind(pursuerChaser, tmpAnims);
+		pursuerAnimCtls[0] = vector<PT(AnimControl)>(2);
+		for (int j = 0; j < tmpAnims.get_num_anims(); ++j)
+		{
+			pursuerAnimCtls[0][j] = tmpAnims.get_anim(j);
 		}
 
 		// set creation parameters as strings before other drivers creation
