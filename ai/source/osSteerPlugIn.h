@@ -9,7 +9,7 @@
 #define OSSTEERPLUGIN_H_
 
 #include "aiTools.h"
-#include "aiManager.h"
+#include "gameAIManager.h"
 #include "opensteer_includes.h"
 #include "nodePath.h"
 #include "graphicsOutput.h"
@@ -33,7 +33,7 @@ class OSSteerVehicle;
  * the OSSteerVehicle(s) (simple vehicles), which are added to it, to perform
  * their own steering behaviors.\n
  * \note A OSSteerPlugIn will be reparented to the default reference node on
- * creation (see AIManager).
+ * creation (see GameAIManager).
  *
  * > **OSSteerPlugIn text parameters**:
  * param | type | default | note
@@ -280,7 +280,7 @@ public:
 
 protected:
 	friend void unref_delete<OSSteerPlugIn>(OSSteerPlugIn*);
-	friend class AIManager;
+	friend class GameAIManager;
 
 	OSSteerPlugIn(const string& name = "SteerPlugIn");
 	virtual ~OSSteerPlugIn();
@@ -299,7 +299,7 @@ private:
 	///Steer vehicles.
 	pvector<PT(OSSteerVehicle)> mSteerVehicles;
 	///The "local" obstacles handled by this OSSteerPlugIn.
-	AIManager::GlobalObstacles mLocalObstacles;
+	GameAIManager::GlobalObstacles mLocalObstacles;
 	///Pathway stuff.
 	///@{
 	ValueList<LPoint3f> mPathwayPoints;

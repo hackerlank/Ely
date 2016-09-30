@@ -1,11 +1,11 @@
 /**
- * \file aiManager.cxx
+ * \file gameAIManager.cxx
  *
  * \date 2016-09-17
  * \author consultit
  */
 
-#include "aiManager.h"
+#include "gameAIManager.h"
 
 #include "osSteerPlugIn.h"
 #include "osSteerVehicle.h"
@@ -17,7 +17,7 @@
 /**
  *
  */
-AIManager::AIManager(const NodePath& root, const CollideMask& mask):
+GameAIManager::GameAIManager(const NodePath& root, const CollideMask& mask):
 		mReferenceNP(NodePath("ReferenceNode")),
 		mRoot(root),
 		mMask(mask),
@@ -28,7 +28,7 @@ AIManager::AIManager(const NodePath& root, const CollideMask& mask):
 		mReferenceDebug2DNP(NodePath("ReferenceDebugNode2D")),
 		mRef(0)
 {
-	PRINT_DEBUG("AIManager::AIManager: creating the singleton manager.");
+	PRINT_DEBUG("GameAIManager::GameAIManager: creating the singleton manager.");
 
 	mSteerPlugIns.clear();
 	mSteerPlugInsParameterTable.clear();
@@ -54,7 +54,7 @@ AIManager::AIManager(const NodePath& root, const CollideMask& mask):
 		mCTrav = new CollisionTraverser();
 		mCollisionHandler = new CollisionHandlerQueue();
 		mPickerRay = new CollisionRay();
-		PT(CollisionNode)pickerNode = new CollisionNode(string("AIManager::pickerNode"));
+		PT(CollisionNode)pickerNode = new CollisionNode(string("GameAIManager::pickerNode"));
 		pickerNode->add_solid(mPickerRay);
 		pickerNode->set_from_collide_mask(mMask);
 		pickerNode->set_into_collide_mask(BitMask32::all_off());
@@ -80,9 +80,9 @@ AIManager::AIManager(const NodePath& root, const CollideMask& mask):
 /**
  *
  */
-AIManager::~AIManager()
+GameAIManager::~GameAIManager()
 {
-	PRINT_DEBUG("AIManager::~AIManager: destroying the singleton manager.");
+	PRINT_DEBUG("GameAIManager::~GameAIManager: destroying the singleton manager.");
 
 	//stop any default update
 	stop_default_update();
@@ -159,7 +159,7 @@ AIManager::~AIManager()
  * Returns a NodePath to the new OSSteerPlugIn,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath AIManager::create_steer_plug_in()
+NodePath GameAIManager::create_steer_plug_in()
 {
 	PT(OSSteerPlugIn) newSteerPlugIn = new OSSteerPlugIn();
 	nassertr_always(newSteerPlugIn, NodePath::fail())
@@ -183,7 +183,7 @@ NodePath AIManager::create_steer_plug_in()
  * Destroys a OSSteerPlugIn.
  * Returns false on error.
  */
-bool AIManager::destroy_steer_plug_in(NodePath steerPlugInNP)
+bool GameAIManager::destroy_steer_plug_in(NodePath steerPlugInNP)
 {
 	CONTINUE_IF_ELSE_R(
 			steerPlugInNP.node()->is_of_type(OSSteerPlugIn::get_class_type()),
@@ -206,7 +206,7 @@ bool AIManager::destroy_steer_plug_in(NodePath steerPlugInNP)
 /**
  * Gets an OSSteerPlugIn by index, or NULL on error.
  */
-PT(OSSteerPlugIn) AIManager::get_steer_plug_in(int index) const
+PT(OSSteerPlugIn) GameAIManager::get_steer_plug_in(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mSteerPlugIns.size()),
 			NULL)
@@ -219,7 +219,7 @@ PT(OSSteerPlugIn) AIManager::get_steer_plug_in(int index) const
  * Returns a NodePath to the new OSSteerVehicle,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath AIManager::create_steer_vehicle(const string& name)
+NodePath GameAIManager::create_steer_vehicle(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
@@ -243,7 +243,7 @@ NodePath AIManager::create_steer_vehicle(const string& name)
  * Destroys a OSSteerVehicle.
  * Returns false on error.
  */
-bool AIManager::destroy_steer_vehicle(NodePath steerVehicleNP)
+bool GameAIManager::destroy_steer_vehicle(NodePath steerVehicleNP)
 {
 	CONTINUE_IF_ELSE_R(
 			steerVehicleNP.node()->is_of_type(OSSteerVehicle::get_class_type()),
@@ -265,7 +265,7 @@ bool AIManager::destroy_steer_vehicle(NodePath steerVehicleNP)
 /**
  * Gets an OSSteerVehicle by index, or NULL on error.
  */
-PT(OSSteerVehicle) AIManager::get_steer_vehicle(int index) const
+PT(OSSteerVehicle) GameAIManager::get_steer_vehicle(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mSteerVehicles.size()),
 			NULL)
@@ -278,7 +278,7 @@ PT(OSSteerVehicle) AIManager::get_steer_vehicle(int index) const
  * Returns a NodePath to the new RNNavMesh,or an empty NodePath with the ET_fail
  * error type set on error.
  */
-NodePath AIManager::create_nav_mesh()
+NodePath GameAIManager::create_nav_mesh()
 {
 	PT(RNNavMesh) newNavMesh = new RNNavMesh();
 	nassertr_always(newNavMesh, NodePath::fail())
@@ -301,7 +301,7 @@ NodePath AIManager::create_nav_mesh()
  * Destroys a RNNavMesh.
  * Returns false on error.
  */
-bool AIManager::destroy_nav_mesh(NodePath navMeshNP)
+bool GameAIManager::destroy_nav_mesh(NodePath navMeshNP)
 {
 	CONTINUE_IF_ELSE_R(navMeshNP.node()->is_of_type(RNNavMesh::get_class_type()),
 			false)
@@ -323,7 +323,7 @@ bool AIManager::destroy_nav_mesh(NodePath navMeshNP)
 /**
  * Gets an RNNavMesh by index, or NULL on error.
  */
-PT(RNNavMesh) AIManager::get_nav_mesh(int index) const
+PT(RNNavMesh) GameAIManager::get_nav_mesh(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mNavMeshes.size()),
 			NULL);
@@ -336,7 +336,7 @@ PT(RNNavMesh) AIManager::get_nav_mesh(int index) const
  * Returns a NodePath to the new RNCrowdAgent,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath AIManager::create_crowd_agent(const string& name)
+NodePath GameAIManager::create_crowd_agent(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
@@ -360,7 +360,7 @@ NodePath AIManager::create_crowd_agent(const string& name)
  * Destroys a RNCrowdAgent.
  * Returns false on error.
  */
-bool AIManager::destroy_crowd_agent(NodePath crowdAgentNP)
+bool GameAIManager::destroy_crowd_agent(NodePath crowdAgentNP)
 {
 	CONTINUE_IF_ELSE_R(
 			crowdAgentNP.node()->is_of_type(RNCrowdAgent::get_class_type()),
@@ -382,7 +382,7 @@ bool AIManager::destroy_crowd_agent(NodePath crowdAgentNP)
 /**
  * Gets an RNCrowdAgent by index, or NULL on error.
  */
-PT(RNCrowdAgent) AIManager::get_crowd_agent(int index) const
+PT(RNCrowdAgent) GameAIManager::get_crowd_agent(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mCrowdAgents.size()),
 			NULL);
@@ -393,7 +393,7 @@ PT(RNCrowdAgent) AIManager::get_crowd_agent(int index) const
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
  */
-void AIManager::set_parameter_values(AIType type, const string& paramName,
+void GameAIManager::set_parameter_values(AIType type, const string& paramName,
 		const ValueList<string>& paramValues)
 {
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
@@ -459,7 +459,7 @@ void AIManager::set_parameter_values(AIType type, const string& paramName,
 /**
  * Gets the multiple values of a (actually set) parameter.
  */
-ValueList<string> AIManager::get_parameter_values(AIType type,
+ValueList<string> GameAIManager::get_parameter_values(AIType type,
 		const string& paramName) const
 {
 	ValueList<string> strList;
@@ -521,7 +521,7 @@ ValueList<string> AIManager::get_parameter_values(AIType type,
 /**
  * Sets a multi/single-valued parameter to a single value overwriting the existing one(s).
  */
-void AIManager::set_parameter_value(AIType type, const string& paramName,
+void GameAIManager::set_parameter_value(AIType type, const string& paramName,
 		const string& value)
 {
 	ValueList<string> valueList;
@@ -532,7 +532,7 @@ void AIManager::set_parameter_value(AIType type, const string& paramName,
 /**
  * Gets a single value (i.e. the first one) of a parameter.
  */
-string AIManager::get_parameter_value(AIType type,
+string GameAIManager::get_parameter_value(AIType type,
 		const string& paramName) const
 {
 	ValueList<string> valueList = get_parameter_values(type, paramName);
@@ -542,7 +542,7 @@ string AIManager::get_parameter_value(AIType type,
 /**
  * Gets a list of the names of the parameters actually set.
  */
-ValueList<string> AIManager::get_parameter_name_list(AIType type) const
+ValueList<string> GameAIManager::get_parameter_name_list(AIType type) const
 {
 	ValueList<string> strList;
 	ParameterTableIter iter;
@@ -609,7 +609,7 @@ ValueList<string> AIManager::get_parameter_name_list(AIType type) const
  * \note: After reading objects from bam files, the objects' creation parameters
  * which reside in the manager, are reset to their default values.
  */
-void AIManager::set_parameters_defaults(AIType type)
+void GameAIManager::set_parameters_defaults(AIType type)
 {
 	if (type == STEERPLUGIN)
 	{
@@ -780,7 +780,7 @@ void AIManager::set_parameters_defaults(AIType type)
  *
  * Will be called automatically in a task.
  */
-AsyncTask::DoneStatus AIManager::update(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameAIManager::update(GenericAsyncTask* task)
 {
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -808,13 +808,13 @@ AsyncTask::DoneStatus AIManager::update(GenericAsyncTask* task)
 /**
  * Adds a task to repeatedly call ai updates.
  */
-void AIManager::start_default_update()
+void GameAIManager::start_default_update()
 {
 	//create the task for updating AI objects
-	mUpdateData = new TaskInterface<AIManager>::TaskData(this,
-			&AIManager::update);
-	mUpdateTask = new GenericAsyncTask(string("AIManager::update"),
-			&TaskInterface<AIManager>::taskFunction,
+	mUpdateData = new TaskInterface<GameAIManager>::TaskData(this,
+			&GameAIManager::update);
+	mUpdateTask = new GenericAsyncTask(string("GameAIManager::update"),
+			&TaskInterface<GameAIManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
@@ -823,7 +823,7 @@ void AIManager::start_default_update()
 /**
  * Removes a task to repeatedly call ai updates.
  */
-void AIManager::stop_default_update()
+void GameAIManager::stop_default_update()
 {
 	if (mUpdateTask)
 	{
@@ -838,7 +838,7 @@ void AIManager::stop_default_update()
  * Returns the obstacle's settings with the specified unique reference (>0).
  * Returns OSObstacleSettings::ref == a negative number on error.
  */
-OSObstacleSettings AIManager::get_obstacle_settings(int ref) const
+OSObstacleSettings GameAIManager::get_obstacle_settings(int ref) const
 {
 	OSObstacleSettings settings = OSObstacleSettings();
 	settings.set_ref(AI_ERROR);
@@ -864,7 +864,7 @@ OSObstacleSettings AIManager::get_obstacle_settings(int ref) const
  * Returns the NodePath of the obstacle with the specified unique reference (>0).
  * Return an empty NodePath with the ET_fail error type set on error.
  */
-NodePath AIManager::get_obstacle_by_ref(int ref) const
+NodePath GameAIManager::get_obstacle_by_ref(int ref) const
 {
 	NodePath obstacleNP = NodePath::fail();
 	CONTINUE_IF_ELSE_R(ref > 0, obstacleNP)
@@ -892,7 +892,7 @@ NodePath AIManager::get_obstacle_by_ref(int ref) const
  * - modelCenter + modelDeltaCenter = origin of coordinate system
  * - modelRadius = radius of the containing sphere
  */
-float AIManager::get_bounding_dimensions(NodePath modelNP,
+float GameAIManager::get_bounding_dimensions(NodePath modelNP,
 		LVecBase3f& modelDims, LVector3f& modelDeltaCenter) const
 {
 	//get "tight" dimensions of model
@@ -916,7 +916,7 @@ float AIManager::get_bounding_dimensions(NodePath modelNP,
  * with height equal to the z-value of the first one.
  * If collisions are not found returns a Pair<bool,float> == (false, 0.0).
  */
-Pair<bool,float> AIManager::get_collision_height(const LPoint3f& rayOrigin,
+Pair<bool,float> GameAIManager::get_collision_height(const LPoint3f& rayOrigin,
 		const NodePath& space) const
 {
 	//traverse downward starting at rayOrigin
@@ -939,7 +939,7 @@ Pair<bool,float> AIManager::get_collision_height(const LPoint3f& rayOrigin,
 /**
  * Draws the specified primitive, given the points, the color (RGBA) and point's size.
  */
-void AIManager::debug_draw_primitive(OSDebugDrawPrimitives primitive,
+void GameAIManager::debug_draw_primitive(OSDebugDrawPrimitives primitive,
 		const ValueList<LPoint3f>& points, const LVecBase4f color, float size)
 {
 #ifdef ELY_DEBUG
@@ -974,7 +974,7 @@ void AIManager::debug_draw_primitive(OSDebugDrawPrimitives primitive,
 /**
  * Draws the specified primitive, given the points, the color (RGBA) and point's size.
  */
-void AIManager::debug_draw_primitive(RNDebugDrawPrimitives primitive,
+void GameAIManager::debug_draw_primitive(RNDebugDrawPrimitives primitive,
 		const ValueList<LPoint3f>& points, const LVecBase4f color, float size)
 {
 #ifdef ELY_DEBUG
@@ -1009,7 +1009,7 @@ void AIManager::debug_draw_primitive(RNDebugDrawPrimitives primitive,
 /**
  * Erases all primitives drawn until now.
  */
-void AIManager::debug_draw_reset(OSDebugDrawPrimitives)
+void GameAIManager::debug_draw_reset(OSDebugDrawPrimitives)
 {
 #ifdef ELY_DEBUG
 	mOSDD->reset();
@@ -1019,7 +1019,7 @@ void AIManager::debug_draw_reset(OSDebugDrawPrimitives)
 /**
  * Erases all primitives drawn until now.
  */
-void AIManager::debug_draw_reset(RNDebugDrawPrimitives)
+void GameAIManager::debug_draw_reset(RNDebugDrawPrimitives)
 {
 #ifdef ELY_DEBUG
 	mRNDD->reset();
@@ -1030,7 +1030,7 @@ void AIManager::debug_draw_reset(RNDebugDrawPrimitives)
  * Writes to a bam file the entire collections of ai objects and related
  * geometries (i.e. models' NodePaths)
  */
-bool AIManager::write_to_bam_file(const string& fileName)
+bool GameAIManager::write_to_bam_file(const string& fileName)
 {
 	string errorReport;
 	// write to bam file
@@ -1071,7 +1071,7 @@ bool AIManager::write_to_bam_file(const string& fileName)
  * Reads from a bam file the entire hierarchy of ai objects and related
  * geometries (i.e. models' NodePaths)
  */
-bool AIManager::read_from_bam_file(const string& fileName)
+bool GameAIManager::read_from_bam_file(const string& fileName)
 {
 	string errorReport;
 	//read from bamFile
@@ -1121,4 +1121,4 @@ bool AIManager::read_from_bam_file(const string& fileName)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle AIManager::_type_handle;
+TypeHandle GameAIManager::_type_handle;

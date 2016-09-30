@@ -8,7 +8,7 @@
 #include <pandaFramework.h>
 #include <auto_bind.h>
 #include <load_prc_file.h>
-#include <aiManager.h>
+#include <gameAIManager.h>
 #include <rnNavMesh.h>
 #include <rnCrowdAgent.h>
 #include <collisionRay.h>
@@ -86,7 +86,7 @@ int main(int argc, char *argv[])
 	/// typed object init; not needed if you build inside panda source tree
 	RNNavMesh::init_type();
 	RNCrowdAgent::init_type();
-	AIManager::init_type();
+	GameAIManager::init_type();
 	RNNavMesh::register_with_read_factory();
 	RNCrowdAgent::register_with_read_factory();
 	///
@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a nav mesh manager; set root and mask to manage 'kinematic' agents
-	WPT(AIManager)navMesMgr = new AIManager(window->get_render(), mask);
+	WPT(GameAIManager)navMesMgr = new GameAIManager(window->get_render(), mask);
 
 	// print creation parameters: defult values
 	cout << endl << "Default creation parameters:";
@@ -205,7 +205,7 @@ int main(int argc, char *argv[])
 // load all scene stuff
 void loadAllScene()
 {
-	AIManager* navMesMgr = AIManager::get_global_ptr();
+	GameAIManager* navMesMgr = GameAIManager::get_global_ptr();
 
 	// get a sceneNP as owner model
 	sceneNP = getOwnerModel();
@@ -237,7 +237,7 @@ void loadAllScene()
 		// set parameter for crowd agent's type (RECAST or RECAST_KINEMATIC)
 		string agentType;
 		(i % 2) == 0 ? agentType = "recast" : agentType = "kinematic";
-		navMesMgr->set_parameter_value(AIManager::CROWDAGENT,
+		navMesMgr->set_parameter_value(GameAIManager::CROWDAGENT,
 				"mov_type", agentType);
 		// create the crowd agent
 		NodePath crowdAgentNP = navMesMgr->create_crowd_agent(
@@ -258,13 +258,13 @@ void loadAllScene()
 void restoreAllScene()
 {
 	// restore nav mesh: through nav mesh manager
-	navMesh = AIManager::get_global_ptr()->get_nav_mesh(0);
+	navMesh = GameAIManager::get_global_ptr()->get_nav_mesh(0);
 	// restore sceneNP: through panda3d
 	sceneNP =
-			AIManager::get_global_ptr()->get_reference_node_path().find(
+			GameAIManager::get_global_ptr()->get_reference_node_path().find(
 					"**/Owner");
 	// reparent the reference node to render
-	AIManager::get_global_ptr()->get_reference_node_path().reparent_to(
+	GameAIManager::get_global_ptr()->get_reference_node_path().reparent_to(
 			window->get_render());
 
 	// restore crowd agents
@@ -272,7 +272,7 @@ void restoreAllScene()
 	{
 		// restore the crowd agent: through nav mesh manager
 		crowdAgent[i] =
-				AIManager::get_global_ptr()->get_crowd_agent(i);
+				GameAIManager::get_global_ptr()->get_crowd_agent(i);
 		// restore animations
 		AnimControlCollection tmpAnims;
 		auto_bind(crowdAgent[i], tmpAnims);
@@ -333,11 +333,11 @@ void getAgentModelAnims()
 void writeToBamFileAndExit2(const Event* e, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-	AIManager::get_global_ptr()->write_to_bam_file(fileName);
+	GameAIManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask2
 	framework.get_task_mgr().remove(updateTask2);
 	// delete nav mesh manager
-	delete AIManager::get_global_ptr();
+	delete GameAIManager::get_global_ptr();
 	// close the window framework
 	framework.close_framework();
 	//
@@ -347,25 +347,25 @@ void writeToBamFileAndExit2(const Event* e, void* data)
 // print creation parameters
 void printCreationParameters2()
 {
-	AIManager* navMesMgr = AIManager::get_global_ptr();
+	GameAIManager* navMesMgr = GameAIManager::get_global_ptr();
 	//
 	ValueList<string> valueList = navMesMgr->get_parameter_name_list(
-			AIManager::NAVMESH);
+			GameAIManager::NAVMESH);
 	cout << endl << "RNNavMesh creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< navMesMgr->get_parameter_value(AIManager::NAVMESH,
+				<< navMesMgr->get_parameter_value(GameAIManager::NAVMESH,
 						valueList[i]) << endl;
 	}
 	//
 	valueList = navMesMgr->get_parameter_name_list(
-			AIManager::CROWDAGENT);
+			GameAIManager::CROWDAGENT);
 	cout << endl << "RNCrowdAgent creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< navMesMgr->get_parameter_value(AIManager::CROWDAGENT,
+				<< navMesMgr->get_parameter_value(GameAIManager::CROWDAGENT,
 						valueList[i]) << endl;
 	}
 }
@@ -373,23 +373,23 @@ void printCreationParameters2()
 // set parameters as strings before nav meshes/crowd agents creation
 void setParametersBeforeCreation()
 {
-	AIManager* navMesMgr = AIManager::get_global_ptr();
+	GameAIManager* navMesMgr = GameAIManager::get_global_ptr();
 	ValueList<string> valueList;
 	// tweak some nav mesh single-valued parameters
-	navMesMgr->set_parameter_value(AIManager::NAVMESH, "navmesh_type",
+	navMesMgr->set_parameter_value(GameAIManager::NAVMESH, "navmesh_type",
 			"obstacle");
-	navMesMgr->set_parameter_value(AIManager::NAVMESH, "build_all_tiles",
+	navMesMgr->set_parameter_value(GameAIManager::NAVMESH, "build_all_tiles",
 			"true");
-	navMesMgr->set_parameter_value(AIManager::NAVMESH, "agent_max_climb",
+	navMesMgr->set_parameter_value(GameAIManager::NAVMESH, "agent_max_climb",
 			"2.5");
-	navMesMgr->set_parameter_value(AIManager::NAVMESH, "agent_radius",
+	navMesMgr->set_parameter_value(GameAIManager::NAVMESH, "agent_radius",
 			"1.0");
 	// change an area flags cost (tricky because multi-valued)
-	valueList = navMesMgr->get_parameter_values(AIManager::NAVMESH,
+	valueList = navMesMgr->get_parameter_values(GameAIManager::NAVMESH,
 			"area_flags_cost");
 	valueList.remove_value("1@0x02@10.0");
 	valueList.add_value("1@0x02@100.0");
-	navMesMgr->set_parameter_values(AIManager::NAVMESH,
+	navMesMgr->set_parameter_values(GameAIManager::NAVMESH,
 			"area_flags_cost", valueList);
 
 	valueList.clear();
@@ -397,19 +397,19 @@ void setParametersBeforeCreation()
 	valueList.add_value("31.6,24.5,-2.0:20.2,9.4,-2.4@true");
 	valueList.add_value("21.1,-4.5,-2.4:32.3,-3.0,-1.5@true");
 	valueList.add_value("1.2,-13.1,15.2:11.8,-18.3,10.0@true");
-	navMesMgr->set_parameter_values(AIManager::NAVMESH,
+	navMesMgr->set_parameter_values(GameAIManager::NAVMESH,
 			"offmesh_connection", valueList);
 	// set some convex volumes: "x1,y1,z1[:x2,y2,z2...:xN,yN,zN]@area_type"
 	valueList.clear();
 	valueList.add_value(
 			"-15.2,-22.9,-2.4:-13.4,-22.6,-2.4:-13.1,-26.5,-2.4:-16.4,-26.4,-2.7@1");
-	navMesMgr->set_parameter_values(AIManager::NAVMESH, "convex_volume",
+	navMesMgr->set_parameter_values(GameAIManager::NAVMESH, "convex_volume",
 			valueList);
 
 	// set crowd agent throwing events
 	valueList.clear();
 	valueList.add_value("move@move-event@0.5");
-	navMesMgr->set_parameter_values(AIManager::CROWDAGENT,
+	navMesMgr->set_parameter_values(GameAIManager::CROWDAGENT,
 			"thrown_events", valueList);
 	//
 	printCreationParameters2();

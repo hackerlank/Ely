@@ -9,7 +9,7 @@
 #define OSSTEERVEHICLE_H_
 
 #include "osSteerPlugIn.h"
-#include "aiManager.h"
+#include "gameAIManager.h"
 #include "aiTools.h"
 #include "opensteer_includes.h"
 #include "nodePath.h"
@@ -51,7 +51,7 @@
  * for more information.
  *
  * \note A OSSteerVehicle will be reparented to the default reference node on
- * creation (see AIManager).
+ * creation (see GameAIManager).
  *
  * > **OSSteerVehicle text parameters**:
  * param | type | default | note
@@ -345,7 +345,7 @@ public:
 
 protected:
 	friend void unref_delete<OSSteerVehicle>(OSSteerVehicle*);
-	friend class AIManager;
+	friend class GameAIManager;
 	friend class OSSteerPlugIn;
 
 	OSSteerVehicle(const string& name);

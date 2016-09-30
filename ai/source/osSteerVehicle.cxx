@@ -193,15 +193,15 @@ void OSSteerVehicle::do_create_vehicle(OSSteerVehicleType type)
  */
 void OSSteerVehicle::do_initialize()
 {
-	WPT(AIManager)mTmpl = AIManager::get_global_ptr();
+	WPT(GameAIManager)mTmpl = GameAIManager::get_global_ptr();
 	//set OSSteerVehicle parameters
 	string param;
 	//external update
-	mExternalUpdate = (mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	mExternalUpdate = (mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("external_update")) ==
 			string("true") ? true : false);
 	//type
-	param = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	param = mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 			string("vehicle_type"));
 	//create the steer vehicle
 	if (param == string("pedestrian"))
@@ -252,7 +252,7 @@ void OSSteerVehicle::do_initialize()
 	float value;
 	OSVehicleSettings settings;
 	//mov type
-	param = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	param = mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 			string("mov_type"));
 	if (param == string("kinematic"))
 	{
@@ -264,11 +264,11 @@ void OSSteerVehicle::do_initialize()
 	}
 	//up axis fixed
 	mUpAxisFixed = (
-			mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+			mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("up_axis_fixed")) ==
 			string("true") ? true : false);
 	//up axis fixed mode
-	param = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	param = mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("up_axis_fixed_mode"));
 	if (param == string("strong"))
 	{
@@ -285,21 +285,21 @@ void OSSteerVehicle::do_initialize()
 	//initialize settings with underlying OpenSteer vehicle's ones
 	settings = static_cast<VehicleAddOn*>(mVehicle)->getSettings();
 	//mass
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("mass")).c_str(), NULL);
 	settings.set_mass(value >= 0.0 ? value : 1.0);
 	//speed
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("speed")).c_str(),
 			NULL);
 	settings.set_speed(value >= 0.0 ? value : -value);
 	//max force
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("max_force")).c_str(),
 			NULL);
 	settings.set_maxForce(value >= 0.0 ? value : -value);
 	//max speed
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("max_speed")).c_str(),
 			NULL);
 	settings.set_maxSpeed(value >= 0.0 ? value : 1.0);
@@ -318,67 +318,67 @@ void OSSteerVehicle::do_initialize()
 	//start
 	settings.set_start(mThisNP.get_pos());
 	//path pred time
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("path_pred_time")).c_str(),
 			NULL);
 	settings.set_path_pred_time(value >= 0.0 ? value : 3.0);
 	//obstacle min time coll
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("obstacle_min_time_coll")).c_str(),
 			NULL);
 	settings.set_obstacle_min_time_coll(value >= 0.0 ? value : 4.5);
 	//neighbor min time coll
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("neighbor_min_time_coll")).c_str(),
 			NULL);
 	settings.set_neighbor_min_time_coll(value >= 0.0 ? value : 3.0);
 	//neighbor min sep dist
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("neighbor_min_sep_dist")).c_str(),
 			NULL);
 	settings.set_neighbor_min_sep_dist(value >= 0.0 ? value : 1.0);
 	//separation max dist
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("separation_max_dist")).c_str(),
 			NULL);
 	settings.set_separation_max_dist(value >= 0.0 ? value : 5.0);
 	//separation cos max angle
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("separation_cos_max_angle")).c_str(),
 			NULL);
 	settings.set_separation_cos_max_angle(value >= 0.0 ? value : -0.707);
 	//alignment max dist
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("alignment_max_dist")).c_str(),
 			NULL);
 	settings.set_alignment_max_dist(value >= 0.0 ? value : 7.5);
 	//alignment cos max angle
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("alignment_cos_max_angle")).c_str(),
 			NULL);
 	settings.set_alignment_cos_max_angle(value >= 0.0 ? value : 0.7);
 	//cohesion max dist
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("cohesion_max_dist")).c_str(),
 			NULL);
 	settings.set_cohesion_max_dist(value >= 0.0 ? value : 9.0);
 	//cohesion cos max angle
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("cohesion_cos_max_angle")).c_str(),
 			NULL);
 	settings.set_cohesion_cos_max_angle(value >= 0.0 ? value : -0.15);
 	//pursuit max pred time
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("pursuit_max_pred_time")).c_str(),
 			NULL);
 	settings.set_pursuit_max_pred_time(value >= 0.0 ? value : 20.0);
 	//evasion max pred time
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("evasion_max_pred_time")).c_str(),
 			NULL);
 	settings.set_evasion_max_pred_time(value >= 0.0 ? value : 20.0);
 	//target speed
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("target_speed")).c_str(),
 			NULL);
 	settings.set_target_speed(value >= 0.0 ? value : 1.0);
@@ -390,7 +390,7 @@ void OSSteerVehicle::do_initialize()
 			mThisNP.get_collide_mask());
 	//
 	//thrown events
-	string mThrownEventsParam = mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	string mThrownEventsParam = mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 			string("thrown_events"));
 	//set thrown events if any
 	unsigned int idx1, valueNum1;
@@ -499,14 +499,14 @@ void OSSteerVehicle::do_initialize()
 	//
 	//add to OSSteerPlugIn if requested
 	string mSteerPlugInObjectId =
-	mTmpl->get_parameter_value(AIManager::STEERVEHICLE,
+	mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 			string("add_to_plugin"));
 	PT(OSSteerPlugIn) plugIn = NULL;
 	for (int index = 0;
-			index < AIManager::get_global_ptr()->get_num_steer_plug_ins();
+			index < GameAIManager::get_global_ptr()->get_num_steer_plug_ins();
 			++index)
 	{
-		plugIn = AIManager::get_global_ptr()->get_steer_plug_in(index);
+		plugIn = GameAIManager::get_global_ptr()->get_steer_plug_in(index);
 		if (plugIn->get_name() == mSteerPlugInObjectId)
 		{
 			plugIn->add_steer_vehicle(mThisNP);
@@ -992,7 +992,7 @@ void OSSteerVehicle::do_update_steer_vehicle(const float currentTime,
 	if ((mMovType == OPENSTEER_KINEMATIC) && (mVehicle->speed() > 0.0))
 	{
 		// get steer manager
-		WPT(AIManager)steerMgr = AIManager::get_global_ptr();
+		WPT(GameAIManager)steerMgr = GameAIManager::get_global_ptr();
 		// correct panda's Z: set the collision ray origin wrt collision root
 		LPoint3f pOrig = steerMgr->get_collision_root().get_relative_point(
 				mReferenceNP, updatedPos) + mHeigthCorrection * 2.0;
@@ -1655,14 +1655,14 @@ void OSSteerVehicle::finalize(BamReader *manager)
  */
 TypedWritable *OSSteerVehicle::make_from_bam(const FactoryParams &params)
 {
-	// return NULL if AIManager if doesn't exist
-	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
+	// return NULL if GameAIManager if doesn't exist
+	CONTINUE_IF_ELSE_R(GameAIManager::get_global_ptr(), NULL)
 
 	// create a OSSteerVehicle with default parameters' values: they'll be restored later
-	AIManager::get_global_ptr()->set_parameters_defaults(
-			AIManager::STEERVEHICLE);
+	GameAIManager::get_global_ptr()->set_parameters_defaults(
+			GameAIManager::STEERVEHICLE);
 	OSSteerVehicle *node = DCAST(OSSteerVehicle,
-			AIManager::get_global_ptr()->create_steer_vehicle(
+			GameAIManager::get_global_ptr()->create_steer_vehicle(
 					"SteerVehicle").node());
 
 	DatagramIterator scan;

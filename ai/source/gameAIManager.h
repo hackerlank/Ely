@@ -1,12 +1,12 @@
 /**
- * \file aiManager.h
+ * \file gameAIManager.h
  *
  * \date 2016-09-17
  * \author consultit
  */
 
-#ifndef AIMANGER_H_
-#define AIMANGER_H_
+#ifndef GAMEAIMANAGER_H_
+#define GAMEAIMANAGER_H_
 
 #include "aiTools.h"
 #include "opensteer_includes.h"
@@ -21,21 +21,21 @@ class RNNavMesh;
 class RNCrowdAgent;
 
 /**
- * AIManager Singleton class.
+ * GameAIManager Singleton class.
  *
  * Used for handling OSSteerPlugIns, OSSteerVehicles, RNNavMeshes and RNCrowdAgents.
  */
-class EXPORT_CLASS AIManager: public TypedReferenceCount,
-		public Singleton<AIManager>
+class EXPORT_CLASS GameAIManager: public TypedReferenceCount,
+		public Singleton<GameAIManager>
 {
 public:
 	typedef Pair<OSObstacleSettings, NodePath> ObstacleAttributes;
 	typedef Pair<OpenSteer::ObstacleGroup, pvector<ObstacleAttributes> > GlobalObstacles;
 
 PUBLISHED:
-	AIManager(const NodePath& root = NodePath(),
+	GameAIManager(const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
-	virtual ~AIManager();
+	virtual ~GameAIManager();
 
 	/**
 	 * \name REFERENCE NODES XXX
@@ -127,7 +127,7 @@ PUBLISHED:
 	 * \name SINGLETON
 	 */
 	///@{
-	INLINE static AIManager* get_global_ptr();
+	INLINE static GameAIManager* get_global_ptr();
 	///@}
 
 	/**
@@ -257,7 +257,7 @@ private:
 
 	///@{
 	///A task data for step simulation update.
-	PT(TaskInterface<AIManager>::TaskData) mUpdateData;
+	PT(TaskInterface<GameAIManager>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
 	///@}
 
@@ -302,7 +302,7 @@ public:
 	static void init_type()
 	{
 		TypedReferenceCount::init_type();
-		register_type(_type_handle, "AIManager",
+		register_type(_type_handle, "GameAIManager",
 				TypedReferenceCount::get_class_type());
 	}
 	virtual TypeHandle get_type() const override
@@ -322,6 +322,6 @@ private:
 };
 
 ///inline
-#include "aiManager.I"
+#include "gameAIManager.I"
 
-#endif /* AIMANGER_H_ */
+#endif /* GAMEAIMANAGER_H_ */

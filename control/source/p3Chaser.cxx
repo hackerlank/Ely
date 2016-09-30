@@ -10,7 +10,7 @@
 #endif
 
 #include "p3Chaser.h"
-#include "controlManager.h"
+#include "gameControlManager.h"
 #include <cmath>
 
 #ifndef CPPPARSER
@@ -42,99 +42,99 @@ P3Chaser::~P3Chaser()
  */
 void P3Chaser::do_initialize()
 {
-	WPT(ControlManager)mTmpl = ControlManager::get_global_ptr();
+	WPT(GameControlManager)mTmpl = GameControlManager::get_global_ptr();
 	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
 	mSignOfMouse = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("inverted_rotation")) == string("true") ? -1 : 1);
 	//backward setting
 	mBackward = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("backward")) == string("true") ?
 					true : false);
 	//fixed relative position setting
 	mFixedRelativePosition = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("fixed_relative_position")) == string("false") ?
 					false : true);
 	//
 	float value;
 	//max distance (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("max_distance")).c_str(),
 			NULL);
 	mAbsMaxDistance = (value >= 0.0 ? value : -value);
 	//min distance (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("min_distance")).c_str(),
 			NULL);
 	mAbsMinDistance = (value >= 0.0 ? value : -value);
 	//max height (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("max_height")).c_str(),
 			NULL);
 	mAbsMaxHeight = (value >= 0.0 ? value : -value);
 	//min height (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("min_height")).c_str(),
 			NULL);
 	mAbsMinHeight = (value >= 0.0 ? value : -value);
 	//friction (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("friction")).c_str(), NULL);
 	mFriction = (value >= 0.0 ? value : -value);
 	//fixed look at: true/false
 	mFixedLookAt = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("fixed_look_at")) == string("false") ? false : true);
 	//look at distance (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("look_at_distance")).c_str(),
 			NULL);
 	mAbsLookAtDistance = (value >= 0.0 ? value : -value);
 	//look at height (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("look_at_height")).c_str(),
 			NULL);
 	mAbsLookAtHeight = (value >= 0.0 ? value : -value);
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("mouse_head")) == string("enabled") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("mouse_pitch")) == string("enabled") ? true : false);
 	//headLeft key
 	mHeadLeftKey = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("head_left")) == string("enabled") ? true : false);
 	//headRight key
 	mHeadRightKey = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("head_right")) == string("enabled") ? true : false);
 	//pitchUp key
 	mPitchUpKey = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("pitch_up")) == string("enabled") ? true : false);
 	//pitchDown key
 	mPitchDownKey = (
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("pitch_down")) == string("enabled") ? true : false);
 	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
-			mTmpl->get_parameter_value(ControlManager::CHASER, string("mouse_move"))
+			mTmpl->get_parameter_value(GameControlManager::CHASER, string("mouse_move"))
 			== string("enabled") ? true : false);
 	//sens x (>=0)
 	value =
 			STRTOF(
-					mTmpl->get_parameter_value(ControlManager::CHASER,
+					mTmpl->get_parameter_value(GameControlManager::CHASER,
 							string("sens_x")).c_str(),
 					NULL);
 	mSensX = (value >= 0.0 ? value : -value);
@@ -142,7 +142,7 @@ void P3Chaser::do_initialize()
 	//sens y (>=0)
 	value =
 			STRTOF(
-					mTmpl->get_parameter_value(ControlManager::CHASER,
+					mTmpl->get_parameter_value(GameControlManager::CHASER,
 							string("sens_y")).c_str(),
 					NULL);
 	mSensY = (value >= 0.0 ? value : -value);
@@ -152,7 +152,7 @@ void P3Chaser::do_initialize()
 	mCentY = mWin->get_properties().get_y_size() / 2;
 	//enabling setting
 	if((
-			mTmpl->get_parameter_value(ControlManager::CHASER,
+			mTmpl->get_parameter_value(GameControlManager::CHASER,
 					string("enabled")) == string("true") ? true : false))
 	{
 		do_enable();
@@ -351,7 +351,7 @@ void P3Chaser::do_correct_chaser_height(LPoint3f& newPos, float baseHeight)
 {
 	//correct chaser height (not in OgreBulletDemos)
 	// get control manager
-	WPT(ControlManager)navMeshMgr = ControlManager::get_global_ptr();
+	WPT(GameControlManager)navMeshMgr = GameControlManager::get_global_ptr();
 	// correct panda's Z: set the collision ray origin wrt collision root
 	LPoint3f pOrig = navMeshMgr->get_collision_root().get_relative_point(
 			mReferenceNP, newPos);
@@ -699,14 +699,14 @@ int P3Chaser::complete_pointers(TypedWritable **p_list, BamReader *manager)
  */
 TypedWritable *P3Chaser::make_from_bam(const FactoryParams &params)
 {
-	// continue only if ControlManager exists
-	CONTINUE_IF_ELSE_R(ControlManager::get_global_ptr(), NULL)
+	// continue only if GameControlManager exists
+	CONTINUE_IF_ELSE_R(GameControlManager::get_global_ptr(), NULL)
 
 	// create a P3Chaser with default parameters' values: they'll be restored later
-	ControlManager::get_global_ptr()->set_parameters_defaults(
-			ControlManager::CHASER);
+	GameControlManager::get_global_ptr()->set_parameters_defaults(
+			GameControlManager::CHASER);
 	P3Chaser *node = DCAST(P3Chaser,
-			ControlManager::get_global_ptr()->create_chaser(
+			GameControlManager::get_global_ptr()->create_chaser(
 					"P3Chaser").node());
 
 	DatagramIterator scan;

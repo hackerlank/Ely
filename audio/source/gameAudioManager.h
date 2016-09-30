@@ -1,36 +1,36 @@
 /**
- * \file controlManager.h
+ * \file gameAudioManager.h
  *
- * \date 2016-09-18
+ * \date 2016-09-30
  * \author consultit
  */
 
-#ifndef CONTROLMANGER_H_
-#define CONTROLMANGER_H_
+#ifndef GAMEAUDIOMANGER_H_
+#define GAMEAUDIOMANGER_H_
 
 #include "graphicsWindow.h"
-#include "control_includes.h"
-#include "controlTools.h"
+#include "audio_includes.h"
+#include "audioTools.h"
 #include "collisionTraverser.h"
 #include "collisionHandlerQueue.h"
 #include "collisionRay.h"
 
-class P3Driver;
-class P3Chaser;
+class P3Sound3d;
+class P3Listener;
 
 /**
- * ControlManager Singleton class.
+ * GameAudioManager Singleton class.
  *
- * Used for handling P3Drivers, P3Chasers.
+ * Used for handling P3Sound3ds, P3Listeners.
  */
-class EXPORT_CLASS ControlManager: public TypedReferenceCount,
-		public Singleton<ControlManager>
+class EXPORT_CLASS GameAudioManager: public TypedReferenceCount,
+		public Singleton<GameAudioManager>
 {
 PUBLISHED:
-	ControlManager(PT(GraphicsWindow) win, int taskSort = 10,
+	GameAudioManager(PT(GraphicsWindow) win, int taskSort = 10,
 			const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
-	virtual ~ControlManager();
+	virtual ~GameAudioManager();
 
 	/**
 	 * \name REFERENCE NODES
@@ -41,46 +41,46 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * \name P3Driver
+	 * \name P3Sound3d
 	 */
 	///@{
-	NodePath create_driver(const string& name);
-	bool destroy_driver(NodePath plugInNP);
-	PT(P3Driver) get_driver(int index) const;
-	INLINE int get_num_drivers() const;
-	MAKE_SEQ(get_drivers, get_num_drivers, get_driver);
+	NodePath create_sound3d(const string& name);
+	bool destroy_sound3d(NodePath plugInNP);
+	PT(P3Sound3d) get_sound3d(int index) const;
+	INLINE int get_num_sound3ds() const;
+	MAKE_SEQ(get_sound3ds, get_num_sound3ds, get_sound3d);
 	///@}
 
 	/**
-	 * \name P3Chaser
+	 * \name P3Listener
 	 */
 	///@{
-	NodePath create_chaser(const string& name);
-	bool destroy_chaser(NodePath steerVehicleNP);
-	PT(P3Chaser) get_chaser(int index) const;
-	INLINE int get_num_chasers() const;
-	MAKE_SEQ(get_chasers, get_num_chasers, get_chaser);
+	NodePath create_listener(const string& name);
+	bool destroy_listener(NodePath steerVehicleNP);
+	PT(P3Listener) get_listener(int index) const;
+	INLINE int get_num_listeners() const;
+	MAKE_SEQ(get_listeners, get_num_listeners, get_listener);
 	///@}
 
 	/**
 	 * The type of object for creation parameters.
 	 */
-	enum ControlType
+	enum AudioType
 	{
-		DRIVER = 0,
-		CHASER
+		SOUND3D = 0,
+		LISTENER
 	};
 
 	/**
 	 * \name TEXTUAL PARAMETERS
 	 */
 	///@{
-	ValueList<string> get_parameter_name_list(ControlType type) const;
-	void set_parameter_values(ControlType type, const string& paramName, const ValueList<string>& paramValues);
-	ValueList<string> get_parameter_values(ControlType type, const string& paramName) const;
-	void set_parameter_value(ControlType type, const string& paramName, const string& value);
-	string get_parameter_value(ControlType type, const string& paramName) const;
-	void set_parameters_defaults(ControlType type);
+	ValueList<string> get_parameter_name_list(AudioType type) const;
+	void set_parameter_values(AudioType type, const string& paramName, const ValueList<string>& paramValues);
+	ValueList<string> get_parameter_values(AudioType type, const string& paramName) const;
+	void set_parameter_value(AudioType type, const string& paramName, const string& value);
+	string get_parameter_value(AudioType type, const string& paramName) const;
+	void set_parameters_defaults(AudioType type);
 	///@}
 
 	/**
@@ -96,7 +96,7 @@ PUBLISHED:
 	 * \name SINGLETON
 	 */
 	///@{
-	INLINE static ControlManager* get_global_ptr();
+	INLINE static GameAudioManager* get_global_ptr();
 	///@}
 
 	/**
@@ -128,7 +128,7 @@ public:
 	inline int unique_ref();
 
 private:
-	///The reference graphic window.
+	///The reference graphic window. xxx
 	PT(GraphicsWindow) mWin;
 	///The update task sort (should be >0).
 	int mTaskSort;
@@ -136,21 +136,21 @@ private:
 	///The reference node path.
 	NodePath mReferenceNP;
 
-	///List of P3Drivers handled by this manager.
-	typedef pvector<PT(P3Driver)> DriverList;
-	DriverList mDrivers;
-	///P3Drivers' parameter table.
-	ParameterTable mDriversParameterTable;
+	///List of P3Sound3ds handled by this manager.
+	typedef pvector<PT(P3Sound3d)> Sound3dList;
+	Sound3dList mSound3ds;
+	///P3Sound3ds' parameter table.
+	ParameterTable mSound3dsParameterTable;
 
-	///List of Chasers handled by this manager.
-	typedef pvector<PT(P3Chaser)> ChaserList;
-	ChaserList mChasers;
-	///Chasers' parameter table.
-	ParameterTable mChasersParameterTable;
+	///List of P3Listeners handled by this manager.
+	typedef pvector<PT(P3Listener)> ListenerList;
+	ListenerList mListeners;
+	///P3Listeners' parameter table.
+	ParameterTable mListenersParameterTable;
 
 	///@{
 	///A task data for step simulation update.
-	PT(TaskInterface<ControlManager>::TaskData) mUpdateData;
+	PT(TaskInterface<GameAudioManager>::TaskData) mUpdateData;
 	PT(AsyncTask) mUpdateTask;
 	///@}
 
@@ -176,7 +176,7 @@ public:
 	static void init_type()
 	{
 		TypedReferenceCount::init_type();
-		register_type(_type_handle, "ControlManager",
+		register_type(_type_handle, "GameAudioManager",
 				TypedReferenceCount::get_class_type());
 	}
 	virtual TypeHandle get_type() const override
@@ -196,6 +196,6 @@ private:
 };
 
 ///inline
-#include "controlManager.I"
+#include "gameAudioManager.I"
 
-#endif /* CONTROLMANGER_H_ */
+#endif /* GAMEAUDIOMANGER_H_ */

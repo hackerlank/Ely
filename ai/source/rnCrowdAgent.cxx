@@ -86,7 +86,7 @@ int RNCrowdAgent::set_move_velocity(const LVector3f& vel)
 void RNCrowdAgent::set_mov_type(RNCrowdAgentMovType movType)
 {
 	//if there isn't a traverser only RECAST is allowed
-	AIManager::GetSingletonPtr()->get_collision_traverser() ?
+	GameAIManager::GetSingletonPtr()->get_collision_traverser() ?
 			mMovType = movType : mMovType = RECAST;
 }
 
@@ -124,12 +124,12 @@ RNCrowdAgent::RNCrowdAgentState RNCrowdAgent::get_traversing_state() const
  */
 void RNCrowdAgent::do_initialize()
 {
-	WPT(AIManager)mTmpl = AIManager::get_global_ptr();
+	WPT(GameAIManager)mTmpl = GameAIManager::get_global_ptr();
 	//set RNCrowdAgent parameters
 	//register to navmesh objectId
-	string navMeshName = mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("add_to_navmesh"));
+	string navMeshName = mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("add_to_navmesh"));
 	//mov type
-	string movType = mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("mov_type"));
+	string movType = mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("mov_type"));
 	if (movType == string("kinematic"))
 	{
 		set_mov_type(RECAST_KINEMATIC);
@@ -143,7 +143,7 @@ void RNCrowdAgent::do_initialize()
 	unsigned int idx, valueNum;
 	pvector<string> paramValuesStr;
 	//move target
-	param = mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("move_target"));
+	param = mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("move_target"));
 	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if (valueNum < 3)
@@ -155,7 +155,7 @@ void RNCrowdAgent::do_initialize()
 		mMoveTarget[idx] = STRTOF(paramValuesStr[idx].c_str(), NULL);
 	}
 	//move velocity
-	param = mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("move_velocity"));
+	param = mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("move_velocity"));
 	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
 	if (valueNum < 3)
@@ -170,37 +170,37 @@ void RNCrowdAgent::do_initialize()
 	float value;
 	int valueInt;
 	//max acceleration
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("max_acceleration")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("max_acceleration")).c_str(),
 			NULL);
 	mAgentParams.set_maxAcceleration(value >= 0.0 ? value : -value);
 	//max speed
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("max_speed")).c_str(), NULL);
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("max_speed")).c_str(), NULL);
 	mAgentParams.set_maxSpeed(value >= 0.0 ? value : -value);
 	//collision query range
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("collision_query_range")).c_str(),
+			mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("collision_query_range")).c_str(),
 			NULL);
 	mAgentParams.set_collisionQueryRange(value >= 0.0 ? value : -value);
 	//path optimization range
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("path_optimization_range")).c_str(),
+			mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("path_optimization_range")).c_str(),
 			NULL);
 	mAgentParams.set_pathOptimizationRange(value >= 0.0 ? value : -value);
 	//separation weight
-	value = STRTOF(mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("separation_weight")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("separation_weight")).c_str(),
 			NULL);
 	mAgentParams.set_separationWeight(value >= 0.0 ? value : -value);
 	//update flags
-	valueInt = strtol(mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("update_flags")).c_str(),
+	valueInt = strtol(mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("update_flags")).c_str(),
 			NULL, 0);
 	mAgentParams.set_updateFlags(valueInt >= 0.0 ? valueInt : -valueInt);
 	//obstacle avoidance type
 	valueInt = strtol(
-			mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("obstacle_avoidance_type")).c_str(),
+			mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("obstacle_avoidance_type")).c_str(),
 			NULL, 0);
 	mAgentParams.set_obstacleAvoidanceType(valueInt >= 0.0 ? valueInt : -valueInt);
 	//thrown events
-	string thrownEventsParam = mTmpl->get_parameter_value(AIManager::CROWDAGENT, string("thrown_events"));
+	string thrownEventsParam = mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("thrown_events"));
 	//
 	//set thrown events if any
 	unsigned int idx1, valueNum1;
@@ -345,7 +345,7 @@ void RNCrowdAgent::do_update_pos_dir(float dt, const LPoint3f& pos, const LVecto
 	if ((mMovType == RECAST_KINEMATIC) && (velSquared > 0.0))
 	{
 		// get nav mesh manager
-		WPT(AIManager) navMeshMgr = AIManager::get_global_ptr();
+		WPT(GameAIManager) navMeshMgr = GameAIManager::get_global_ptr();
 		// correct panda's Z: set the collision ray origin wrt collision root
 		LPoint3f pOrig = navMeshMgr->get_collision_root().get_relative_point(
 				mReferenceNP, pos) + mHeigthCorrection;
@@ -593,15 +593,15 @@ int RNCrowdAgent::complete_pointers(TypedWritable **p_list, BamReader *manager)
  */
 TypedWritable *RNCrowdAgent::make_from_bam(const FactoryParams &params)
 {
-	// return NULL if AIManager if doesn't exist
-	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
+	// return NULL if GameAIManager if doesn't exist
+	CONTINUE_IF_ELSE_R(GameAIManager::get_global_ptr(), NULL)
 
 	// create a RNCrowdAgent with default parameters' values: they'll be restored later
-	AIManager::get_global_ptr()->set_parameters_defaults(
-			AIManager::CROWDAGENT);
+	GameAIManager::get_global_ptr()->set_parameters_defaults(
+			GameAIManager::CROWDAGENT);
 	RNCrowdAgent *node =
 			DCAST(RNCrowdAgent,
-					AIManager::get_global_ptr()->create_crowd_agent(
+					GameAIManager::get_global_ptr()->create_crowd_agent(
 							"CrowdAgent").node());
 
 	DatagramIterator scan;

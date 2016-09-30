@@ -8,7 +8,7 @@ from panda3d.core import load_prc_file_data, GeoMipTerrain, PNMImage, \
                 Filename, TextureStage, TexturePool, BitMask32, CardMaker, \
                 NodePath, WindowProperties, AnimControlCollection, auto_bind, \
                 LVecBase3f, LVector3f, LPoint3f, PartGroup, ClockObject
-from p3ai import AIManager, ValueList_float
+from p3ai import GameAIManager, ValueList_float
 from direct.showbase.ShowBase import ShowBase
 import sys, random
 
@@ -87,7 +87,7 @@ def loadTerrain(name, widthScale = 0.5, heightScale = 10.0):
 
     global app, terrain, terrainRootNetPos
         
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
 
     terrain = GeoMipTerrain("terrain")
     heightField = PNMImage(Filename(dataDir + "/heightfield.png"))
@@ -150,7 +150,7 @@ def getCollisionEntryFromCamera():
     
     global app
     # get steer manager
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
     # get the mouse watcher
     mwatcher = app.mouseWatcherNode
     if mwatcher.has_mouse():
@@ -176,19 +176,19 @@ def getCollisionEntryFromCamera():
 def printCreationParameters():
     """print creation parameters"""
     
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
     #
-    valueList = steerMgr.get_parameter_name_list(AIManager.STEERPLUGIN)
+    valueList = steerMgr.get_parameter_name_list(GameAIManager.STEERPLUGIN)
     print("\n" + "OSSteerPlugIn creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               steerMgr.get_parameter_value(AIManager.STEERPLUGIN, name))
+               steerMgr.get_parameter_value(GameAIManager.STEERPLUGIN, name))
     #
-    valueList = steerMgr.get_parameter_name_list(AIManager.STEERVEHICLE)
+    valueList = steerMgr.get_parameter_name_list(GameAIManager.STEERVEHICLE)
     print("\n" + "OSSteerVehicle creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               steerMgr.get_parameter_value(AIManager.STEERVEHICLE, name))
+               steerMgr.get_parameter_value(GameAIManager.STEERVEHICLE, name))
 
 def handleVehicleEvent(name, vehicle):
     """handle vehicle's events"""
@@ -246,7 +246,7 @@ def getRandomPos(modelNP):
     """return a random point on the facing upwards surface of the model"""
     
     # collisions are made wrt render
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
     # get the bounding box of scene
     modelDims, modelDeltaCenter = (LVecBase3f(), LVector3f())
     # modelRadius not used
@@ -355,8 +355,8 @@ def getVehicleModelAnims(meanScale, vehicleFileIdx, moveType, sceneNP, steerPlug
         vehicleAnimNP[0].reparent_to(vehicleNP)
         vehicleAnimNP[1].reparent_to(vehicleNP)
     # set parameter for vehicle's move type (OPENSTEER or OPENSTEER_KINEMATIC)
-    steerMgr = AIManager.get_global_ptr()
-    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "mov_type",
+    steerMgr = GameAIManager.get_global_ptr()
+    steerMgr.set_parameter_value(GameAIManager.STEERVEHICLE, "mov_type",
             moveType)
     # create the steer vehicle (attached to the reference node)
     steerVehicleNP = steerMgr.create_steer_vehicle("vehicle" + str(len(steerVehicles)))
@@ -374,14 +374,14 @@ def getVehicleModelAnims(meanScale, vehicleFileIdx, moveType, sceneNP, steerPlug
 def readFromBamFile(fileName):
     """read scene from a file"""
     
-    return AIManager.get_global_ptr().read_from_bam_file(fileName)
+    return GameAIManager.get_global_ptr().read_from_bam_file(fileName)
 
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
-    AIManager.get_global_ptr().write_to_bam_file(fileName)
+    GameAIManager.get_global_ptr().write_to_bam_file(fileName)
     # # this is for testing explicit removal and destruction of all elements
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
     # remove steer vehicles from steer plug-ins
     for plugInTmp in steerMgr.get_steer_plug_ins():
         for vehicleTmp in plugInTmp:
@@ -454,7 +454,7 @@ def handleObstacles(data):
             for index in range(steerPlugIn.get_num_obstacles()):
                 # get the obstacle's NodePath
                 ref = steerPlugIn.get_obstacle(index)
-                obstacleNP = AIManager.get_global_ptr().get_obstacle_by_ref(ref)
+                obstacleNP = GameAIManager.get_global_ptr().get_obstacle_by_ref(ref)
                 # check if obstacleNP is the hitObject or an ancestor thereof
                 if (obstacleNP == hitObject) or obstacleNP.is_ancestor_of(hitObject):
                     # try to remove from plug-in

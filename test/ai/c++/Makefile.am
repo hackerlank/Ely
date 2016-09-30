@@ -33,7 +33,7 @@ EXTRA_DIST = data.cpp.in
 
 common_sources = \
 	data.cpp \
-	$(srcdir)/../../../ai/source/aiManager.cxx \
+	$(srcdir)/../../../ai/source/gameAIManager.cxx \
 	$(srcdir)/../../../ai/source/aiTools.cxx \
 	$(srcdir)/../../../ai/source/rnCrowdAgent.cxx \
 	$(srcdir)/../../../ai/source/rnNavMesh.cxx \

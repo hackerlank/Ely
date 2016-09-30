@@ -10,7 +10,7 @@
 #endif
 
 #include "p3Sound3d.h"
-#include "audioManager.h"
+#include "gameAudioManager.h"
 #include <cmath>
 
 #ifndef CPPPARSER
@@ -42,16 +42,16 @@ P3Sound3d::~P3Sound3d()
  */
 void P3Sound3d::do_initialize()
 {
-	WPT(AudioManager)mTmpl = AudioManager::get_global_ptr();
+	WPT(GameAudioManager)mTmpl = GameAudioManager::get_global_ptr();
 	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
 	mSignOfTranslation = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("inverted_translation"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("inverted_translation"))
 			== string("true") ? -1 : 1);
 	mSignOfMouse = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("inverted_rotation"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("inverted_rotation"))
 			== string("true") ? -1 : 1);
 	//head limit: enabled@[limit]; limit >= 0.0
-	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(AudioManager::DRIVER, string("head_limit")), '@');
+	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("head_limit")), '@');
 	if (paramValuesStr.size() >= 2)
 	{
 		//enabled
@@ -64,7 +64,7 @@ void P3Sound3d::do_initialize()
 	}
 	//pitch limit: enabled@[limit]; limit >= 0.0
 	paramValuesStr = parseCompoundString(
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("pitch_limit")), '@');
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("pitch_limit")), '@');
 	if (paramValuesStr.size() >= 2)
 	{
 		//enabled
@@ -77,60 +77,60 @@ void P3Sound3d::do_initialize()
 	}
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("mouse_head"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("mouse_head"))
 			== string("enabled") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("mouse_pitch"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("mouse_pitch"))
 			== string("enabled") ? true : false);
 	//key events setting
 	//forward key
 	mForwardKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("forward"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("forward"))
 			== string("disabled") ? false : true);
 	//backward key
 	mBackwardKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("backward"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("backward"))
 			== string("disabled") ? false : true);
 	//up key
 	mUpKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("up")) == string("disabled") ?
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("up")) == string("disabled") ?
 			false : true);
 	//down key
 	mDownKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("down")) == string("disabled") ?
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("down")) == string("disabled") ?
 			false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("strafe_left"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("strafe_left"))
 			== string("disabled") ? false : true);
 	//strafeRight key
 	mStrafeRightKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("strafe_right"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("strafe_right"))
 			== string("disabled") ? false : true);
 	//headLeft key
 	mHeadLeftKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("head_left"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("head_left"))
 			== string("disabled") ? false : true);
 	//headRight key
 	mHeadRightKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("head_right"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("head_right"))
 			== string("disabled") ? false : true);
 	//pitchUp key
 	mPitchUpKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("pitch_up"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("pitch_up"))
 			== string("disabled") ? false : true);
 	//pitchDown key
 	mPitchDownKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("pitch_down"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("pitch_down"))
 			== string("disabled") ? false : true);
 	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
-			mTmpl->get_parameter_value(AudioManager::DRIVER, string("mouse_move"))
+			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("mouse_move"))
 			== string("enabled") ? true : false);
 	//
 	float value, absValue;
 	//max linear speed (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("max_linear_speed")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("max_linear_speed")).c_str(),
 			NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
@@ -138,16 +138,16 @@ void P3Sound3d::do_initialize()
 			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
 			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
 	//max angular speed (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("max_angular_speed")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("max_angular_speed")).c_str(),
 			NULL);
 	mMaxSpeedHP = (value >= 0.0 ? value : -value);
 	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
 	//linear accel (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("linear_accel")).c_str(), NULL);
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("linear_accel")).c_str(), NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
 	//angular accel (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("angular_accel")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("angular_accel")).c_str(),
 			NULL);
 	mAccelHP = (value >= 0.0 ? value : -value);
 	//reset actual speeds
@@ -155,35 +155,35 @@ void P3Sound3d::do_initialize()
 	mActualSpeedH = 0.0;
 	mActualSpeedP = 0.0;
 	//linear friction (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("linear_friction")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("linear_friction")).c_str(),
 			NULL);
 	mFrictionXYZ = (value >= 0.0 ? value : -value);
 	//angular friction (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("angular_friction")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("angular_friction")).c_str(),
 			NULL);
 	mFrictionHP = (value >= 0.0 ? value : -value);
 	//stop threshold ([0.0, 1.0])
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("stop_threshold")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("stop_threshold")).c_str(),
 			NULL);
 	mStopThreshold =
 	(value >= 0.0 ? value - floor(value) : ceil(value) - value);
 	//fast factor (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("fast_factor")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("fast_factor")).c_str(),
 			NULL);
 	mFastFactor = (value >= 0.0 ? value : -value);
 	//sens x (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("sens_x")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("sens_x")).c_str(),
 			NULL);
 	mSensX = (value >= 0.0 ? value : -value);
 	//sens_y (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(AudioManager::DRIVER, string("sens_y")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("sens_y")).c_str(),
 			NULL);
 	mSensY = (value >= 0.0 ? value : -value);
 	//
 	mCentX = mWin->get_properties().get_x_size() / 2;
 	mCentY = mWin->get_properties().get_y_size() / 2;
 	//enabling setting
-	if ((mTmpl->get_parameter_value(AudioManager::DRIVER,
+	if ((mTmpl->get_parameter_value(GameAudioManager::SOUND3D,
 			string("enabled")) == string("false") ? false : true))
 	{
 		do_enable();
@@ -840,14 +840,14 @@ int P3Sound3d::complete_pointers(TypedWritable **p_list, BamReader *manager)
  */
 TypedWritable *P3Sound3d::make_from_bam(const FactoryParams &params)
 {
-	// continue only if AudioManager exists
-	CONTINUE_IF_ELSE_R(AudioManager::get_global_ptr(), NULL)
+	// continue only if GameAudioManager exists
+	CONTINUE_IF_ELSE_R(GameAudioManager::get_global_ptr(), NULL)
 
 	// create a P3Sound3d with default parameters' values: they'll be restored later
-	AudioManager::get_global_ptr()->set_parameters_defaults(
-			AudioManager::DRIVER);
+	GameAudioManager::get_global_ptr()->set_parameters_defaults(
+			GameAudioManager::SOUND3D);
 	P3Sound3d *node = DCAST(P3Sound3d,
-			AudioManager::get_global_ptr()->create_sound3d(
+			GameAudioManager::get_global_ptr()->create_sound3d(
 					"Sound3d").node());
 
 	DatagramIterator scan;

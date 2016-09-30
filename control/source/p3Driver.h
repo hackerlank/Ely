@@ -10,7 +10,7 @@
 
 #include "control_includes.h"
 #include "controlTools.h"
-#include "controlManager.h"
+#include "gameControlManager.h"
 
 #ifndef CPPPARSER
 #endif //CPPPARSER
@@ -246,7 +246,7 @@ public:
 
 protected:
 	friend void unref_delete<P3Driver>(P3Driver*);
-	friend class ControlManager;
+	friend class GameControlManager;
 
 	P3Driver(const string& name);
 	virtual ~P3Driver();

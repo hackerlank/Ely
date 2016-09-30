@@ -10,7 +10,7 @@
 #endif
 
 #include "p3Listener.h"
-#include "audioManager.h"
+#include "gameAudioManager.h"
 #include <cmath>
 
 #ifndef CPPPARSER
@@ -42,99 +42,99 @@ P3Listener::~P3Listener()
  */
 void P3Listener::do_initialize()
 {
-	WPT(AudioManager)mTmpl = AudioManager::get_global_ptr();
+	WPT(GameAudioManager)mTmpl = GameAudioManager::get_global_ptr();
 	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
 	mSignOfMouse = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("inverted_rotation")) == string("true") ? -1 : 1);
 	//backward setting
 	mBackward = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("backward")) == string("true") ?
 					true : false);
 	//fixed relative position setting
 	mFixedRelativePosition = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("fixed_relative_position")) == string("false") ?
 					false : true);
 	//
 	float value;
 	//max distance (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("max_distance")).c_str(),
 			NULL);
 	mAbsMaxDistance = (value >= 0.0 ? value : -value);
 	//min distance (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("min_distance")).c_str(),
 			NULL);
 	mAbsMinDistance = (value >= 0.0 ? value : -value);
 	//max height (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("max_height")).c_str(),
 			NULL);
 	mAbsMaxHeight = (value >= 0.0 ? value : -value);
 	//min height (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("min_height")).c_str(),
 			NULL);
 	mAbsMinHeight = (value >= 0.0 ? value : -value);
 	//friction (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("friction")).c_str(), NULL);
 	mFriction = (value >= 0.0 ? value : -value);
 	//fixed look at: true/false
 	mFixedLookAt = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("fixed_look_at")) == string("false") ? false : true);
 	//look at distance (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("look_at_distance")).c_str(),
 			NULL);
 	mAbsLookAtDistance = (value >= 0.0 ? value : -value);
 	//look at height (>=0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("look_at_height")).c_str(),
 			NULL);
 	mAbsLookAtHeight = (value >= 0.0 ? value : -value);
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("mouse_head")) == string("enabled") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("mouse_pitch")) == string("enabled") ? true : false);
 	//headLeft key
 	mHeadLeftKey = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("head_left")) == string("enabled") ? true : false);
 	//headRight key
 	mHeadRightKey = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("head_right")) == string("enabled") ? true : false);
 	//pitchUp key
 	mPitchUpKey = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("pitch_up")) == string("enabled") ? true : false);
 	//pitchDown key
 	mPitchDownKey = (
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("pitch_down")) == string("enabled") ? true : false);
 	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
-			mTmpl->get_parameter_value(AudioManager::CHASER, string("mouse_move"))
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER, string("mouse_move"))
 			== string("enabled") ? true : false);
 	//sens x (>=0)
 	value =
 			STRTOF(
-					mTmpl->get_parameter_value(AudioManager::CHASER,
+					mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 							string("sens_x")).c_str(),
 					NULL);
 	mSensX = (value >= 0.0 ? value : -value);
@@ -142,7 +142,7 @@ void P3Listener::do_initialize()
 	//sens y (>=0)
 	value =
 			STRTOF(
-					mTmpl->get_parameter_value(AudioManager::CHASER,
+					mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 							string("sens_y")).c_str(),
 					NULL);
 	mSensY = (value >= 0.0 ? value : -value);
@@ -152,7 +152,7 @@ void P3Listener::do_initialize()
 	mCentY = mWin->get_properties().get_y_size() / 2;
 	//enabling setting
 	if((
-			mTmpl->get_parameter_value(AudioManager::CHASER,
+			mTmpl->get_parameter_value(GameAudioManager::LISTENER,
 					string("enabled")) == string("true") ? true : false))
 	{
 		do_enable();
@@ -351,7 +351,7 @@ void P3Listener::do_correct_listener_height(LPoint3f& newPos, float baseHeight)
 {
 	//correct listener height (not in OgreBulletDemos)
 	// get audio manager
-	WPT(AudioManager)navMeshMgr = AudioManager::get_global_ptr();
+	WPT(GameAudioManager)navMeshMgr = GameAudioManager::get_global_ptr();
 	// correct panda's Z: set the collision ray origin wrt collision root
 	LPoint3f pOrig = navMeshMgr->get_collision_root().get_relative_point(
 			mReferenceNP, newPos);
@@ -699,14 +699,14 @@ int P3Listener::complete_pointers(TypedWritable **p_list, BamReader *manager)
  */
 TypedWritable *P3Listener::make_from_bam(const FactoryParams &params)
 {
-	// continue only if AudioManager exists
-	CONTINUE_IF_ELSE_R(AudioManager::get_global_ptr(), NULL)
+	// continue only if GameAudioManager exists
+	CONTINUE_IF_ELSE_R(GameAudioManager::get_global_ptr(), NULL)
 
 	// create a P3Listener with default parameters' values: they'll be restored later
-	AudioManager::get_global_ptr()->set_parameters_defaults(
-			AudioManager::CHASER);
+	GameAudioManager::get_global_ptr()->set_parameters_defaults(
+			GameAudioManager::LISTENER);
 	P3Listener *node = DCAST(P3Listener,
-			AudioManager::get_global_ptr()->create_listener(
+			GameAudioManager::get_global_ptr()->create_listener(
 					"P3Listener").node());
 
 	DatagramIterator scan;

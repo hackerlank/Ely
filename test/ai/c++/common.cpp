@@ -56,7 +56,7 @@ void startFramework(int argc, char *argv[], const string& msg)
 	/// typed object init; not needed if you build inside panda source tree
 	OSSteerPlugIn::init_type();
 	OSSteerVehicle::init_type();
-	AIManager::init_type();
+	GameAIManager::init_type();
 	OSSteerPlugIn::register_with_read_factory();
 	OSSteerVehicle::register_with_read_factory();
 	///
@@ -160,7 +160,7 @@ NodePath loadTerrain(const string& name, float widthScale, float heightScale)
 PT(CollisionEntry)getCollisionEntryFromCamera()
 {
 	// get ai manager
-	AIManager* aiMgr = AIManager::get_global_ptr();
+	GameAIManager* aiMgr = GameAIManager::get_global_ptr();
 	// get the mouse watcher
 	PT(MouseWatcher)mwatcher = DCAST(MouseWatcher, window->get_mouse().node());
 	if (mwatcher->has_mouse())
@@ -196,24 +196,24 @@ PT(CollisionEntry)getCollisionEntryFromCamera()
 // print creation parameters
 void printCreationParameters()
 {
-	AIManager* steerMgr = AIManager::get_global_ptr();
+	GameAIManager* steerMgr = GameAIManager::get_global_ptr();
 	//
 	ValueList<string> valueList = steerMgr->get_parameter_name_list(
-			AIManager::STEERPLUGIN);
+			GameAIManager::STEERPLUGIN);
 	cout << endl << "OSSteerPlugIn creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< steerMgr->get_parameter_value(AIManager::STEERPLUGIN,
+				<< steerMgr->get_parameter_value(GameAIManager::STEERPLUGIN,
 						valueList[i]) << endl;
 	}
 	//
-	valueList = steerMgr->get_parameter_name_list(AIManager::STEERVEHICLE);
+	valueList = steerMgr->get_parameter_name_list(GameAIManager::STEERVEHICLE);
 	cout << endl << "OSSteerVehicle creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< steerMgr->get_parameter_value(AIManager::STEERVEHICLE,
+				<< steerMgr->get_parameter_value(GameAIManager::STEERVEHICLE,
 						valueList[i]) << endl;
 	}
 }
@@ -304,7 +304,7 @@ void changeVehicleMaxForce(const Event* e, void* data)
 LPoint3f getRandomPos(NodePath modelNP)
 {
 	// collisions are made wrt render
-	AIManager* aiMgr = AIManager::get_global_ptr();
+	GameAIManager* aiMgr = GameAIManager::get_global_ptr();
 	// get the bounding box of scene
 	LVecBase3f modelDims;
 	LVector3f modelDeltaCenter;
@@ -414,8 +414,8 @@ vector<PT(OSSteerVehicle)>&steerVehicles, vector<vector<PT(AnimControl)> >& vehi
 		vehicleAnimNP[1].reparent_to(vehicleNP);
 	}
 	// set parameter for vehicle's move type (OPENSTEER or OPENSTEER_KINEMATIC)
-	WPT(AIManager) steerMgr = AIManager::get_global_ptr();
-	steerMgr->set_parameter_value(AIManager::STEERVEHICLE, "mov_type",
+	WPT(GameAIManager) steerMgr = GameAIManager::get_global_ptr();
+	steerMgr->set_parameter_value(GameAIManager::STEERVEHICLE, "mov_type",
 	moveType);
 	// create the steer vehicle (attached to the reference node)
 	NodePath steerVehicleNP = steerMgr->create_steer_vehicle("vehicle" + str(steerVehicles.size()));
@@ -436,19 +436,19 @@ vector<PT(OSSteerVehicle)>&steerVehicles, vector<vector<PT(AnimControl)> >& vehi
 // read scene from a file
 bool readFromBamFile(string fileName)
 {
-	return AIManager::get_global_ptr()->read_from_bam_file(fileName);
+	return GameAIManager::get_global_ptr()->read_from_bam_file(fileName);
 }
 
 // write scene to a file (and exit)
 void writeToBamFileAndExit(const Event* e, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-	AIManager::get_global_ptr()->write_to_bam_file(fileName);
+	GameAIManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
 	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
-	WPT(AIManager)steerMgr = AIManager::get_global_ptr();
+	WPT(GameAIManager)steerMgr = GameAIManager::get_global_ptr();
 	// remove steer vehicles from steer plug-ins
 	for (int i = 0; i < steerMgr->get_num_steer_plug_ins(); ++i)
 	{
@@ -478,7 +478,7 @@ void writeToBamFileAndExit(const Event* e, void* data)
 	}
 	///
 	// delete steer manager
-	delete AIManager::get_global_ptr();
+	delete GameAIManager::get_global_ptr();
 	// close the window framework
 	framework.close_framework();
 	//
@@ -538,7 +538,7 @@ void handleObstacles(const Event* e, void* data)
 				// get the obstacle's NodePath
 				int ref = steerPlugIn->get_obstacle(index);
 				NodePath obstacleNP =
-						AIManager::get_global_ptr()->get_obstacle_by_ref(
+						GameAIManager::get_global_ptr()->get_obstacle_by_ref(
 								ref);
 				// check if obstacleNP is the hitObject or an ancestor thereof
 				if ((obstacleNP == hitObject)

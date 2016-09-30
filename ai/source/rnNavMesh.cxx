@@ -12,7 +12,7 @@
 #include "rnNavMesh.h"
 
 #include "rnCrowdAgent.h"
-#include "aiManager.h"
+#include "gameAIManager.h"
 #include "camera.h"
 
 #ifndef CPPPARSER
@@ -160,7 +160,7 @@ void RNNavMesh::set_nav_mesh_tile_settings(
  */
 void RNNavMesh::do_initialize()
 {
-	WPT(AIManager) mTmpl = AIManager::get_global_ptr();
+	WPT(GameAIManager) mTmpl = GameAIManager::get_global_ptr();
 	//
 	float value;
 	int valueInt;
@@ -168,50 +168,50 @@ void RNNavMesh::do_initialize()
 	//set RNNavMesh parameters (store internally for future use)
 	//cell size
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("cell_size")).c_str(), NULL);
 	mNavMeshSettings.set_cellSize(value >= 0.0 ? value : -value);
 	//cell height
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("cell_height")).c_str(), NULL);
 	mNavMeshSettings.set_cellHeight(value >= 0.0 ? value : -value);
 	//agent height
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("agent_height")).c_str(), NULL);
 	mNavMeshSettings.set_agentHeight(value >= 0.0 ? value : -value);
 	//agent radius
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("agent_radius")).c_str(), NULL);
 	mNavMeshSettings.set_agentRadius(value >= 0.0 ? value : -value);
 	//agent max climb
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("agent_max_climb")).c_str(),
 			NULL);
 	mNavMeshSettings.set_agentMaxClimb(value >= 0.0 ? value : -value);
 	//agent max slope
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("agent_max_slope")).c_str(),
 			NULL);
 	mNavMeshSettings.set_agentMaxSlope(value >= 0.0 ? value : -value);
 	//region min size
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("region_min_size")).c_str(),
 			NULL);
 	mNavMeshSettings.set_regionMinSize(value >= 0.0 ? value : -value);
 	//region merge size
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("region_merge_size")).c_str(),
 			NULL);
 	mNavMeshSettings.set_regionMergeSize(value >= 0.0 ? value : -value);
 	//partition type
-	valueStr = mTmpl->get_parameter_value(AIManager::NAVMESH,
+	valueStr = mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 			string("partition_type"));
 	if (valueStr == string("monotone"))
 	{
@@ -228,57 +228,57 @@ void RNNavMesh::do_initialize()
 	}
 	//edge max len
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("edge_max_len")).c_str(), NULL);
 	mNavMeshSettings.set_edgeMaxLen(value >= 0.0 ? value : -value);
 	//edge max error
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("edge_max_error")).c_str(),
 			NULL);
 	mNavMeshSettings.set_edgeMaxError(value >= 0.0 ? value : -value);
 	//verts per poly
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("verts_per_poly")).c_str(),
 			NULL);
 	mNavMeshSettings.set_vertsPerPoly(value >= 0.0 ? value : -value);
 	//detail sample dist
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("detail_sample_dist")).c_str(),
 			NULL);
 	mNavMeshSettings.set_detailSampleDist(value >= 0.0 ? value : -value);
 	//detail sample max error
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("detail_sample_max_error")).c_str(),
 			NULL);
 	mNavMeshSettings.set_detailSampleMaxError(value >= 0.0 ? value : -value);
 	//build all tiles
 	mNavMeshTileSettings.set_buildAllTiles(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("build_all_tiles")) == string("true") ?
 					true : false);
 	//max tiles
 	valueInt = strtol(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("max_tiles")).c_str(), NULL, 0);
 	mNavMeshTileSettings.set_maxTiles(valueInt >= 0 ? valueInt : -valueInt);
 	//max polys per tile
 	valueInt = strtol(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("max_polys_per_tile")).c_str(), NULL, 0);
 	mNavMeshTileSettings.set_maxPolysPerTile(
 			valueInt >= 0 ? valueInt : -valueInt);
 	//tile size
 	value = STRTOF(
-			mTmpl->get_parameter_value(AIManager::NAVMESH,
+			mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 					string("tile_size")).c_str(), NULL);
 	mNavMeshTileSettings.set_tileSize(value >= 0.0 ? value : -value);
 	///
 	//0: get navmesh type
-	valueStr = mTmpl->get_parameter_value(AIManager::NAVMESH,
+	valueStr = mTmpl->get_parameter_value(GameAIManager::NAVMESH,
 			string("navmesh_type"));
 	if (valueStr == string("tile"))
 	{
@@ -295,7 +295,7 @@ void RNNavMesh::do_initialize()
 	//get string parameters
 	//1: get the input from xml
 	//area-flags-cost settings
-	plist<string> mAreaFlagsCostParam = mTmpl->get_parameter_values(AIManager::NAVMESH,
+	plist<string> mAreaFlagsCostParam = mTmpl->get_parameter_values(GameAIManager::NAVMESH,
 			string("area_flags_cost"));
 	plist<string>::iterator iterStr;
 
@@ -351,7 +351,7 @@ void RNNavMesh::do_initialize()
 	pvector<string> ieFlagsStr;
 	//1:iterate over include flags
 	string mCrowdIncludeFlagsParam = mTmpl->get_parameter_value(
-			AIManager::NAVMESH, string("crowd_include_flags"));
+			GameAIManager::NAVMESH, string("crowd_include_flags"));
 	ieFlagsStr = parseCompoundString(mCrowdIncludeFlagsParam, ':');
 	//default include flag: NAVMESH_POLYFLAGS_WALK (== 0x01)
 	mCrowdIncludeFlags = (ieFlagsStr.empty() ? rnsup::NAVMESH_POLYFLAGS_WALK : 0x0);
@@ -367,7 +367,7 @@ void RNNavMesh::do_initialize()
 	}
 	//2:iterate over exclude flags
 	string mCrowdExcludeFlagsParam = mTmpl->get_parameter_value(
-			AIManager::NAVMESH, string("crowd_exclude_flags"));
+			GameAIManager::NAVMESH, string("crowd_exclude_flags"));
 	ieFlagsStr = parseCompoundString(mCrowdExcludeFlagsParam, ':');
 	//default exclude flag: NAVMESH_POLYFLAGS_DISABLED (== 0x10)
 	mCrowdExcludeFlags = (ieFlagsStr.empty() ? rnsup::NAVMESH_POLYFLAGS_DISABLED : 0x0);
@@ -383,7 +383,7 @@ void RNNavMesh::do_initialize()
 	}
 
 	///get convex volumes
-	plist<string> mConvexVolumesParam = mTmpl->get_parameter_values(AIManager::NAVMESH,
+	plist<string> mConvexVolumesParam = mTmpl->get_parameter_values(GameAIManager::NAVMESH,
 			string("convex_volume"));
 	mConvexVolumes.clear();
 	for (iterStr = mConvexVolumesParam.begin();
@@ -444,7 +444,7 @@ void RNNavMesh::do_initialize()
 
 	///get off mesh connections
 	plist<string> mOffMeshConnectionsParam = mTmpl->get_parameter_values(
-			AIManager::NAVMESH, string("offmesh_connection"));
+			GameAIManager::NAVMESH, string("offmesh_connection"));
 	mOffMeshConnections.clear();
 	for (iterStr = mOffMeshConnectionsParam.begin();
 			iterStr != mOffMeshConnectionsParam.end(); ++iterStr)
@@ -1927,7 +1927,7 @@ int RNNavMesh::do_add_obstacle_to_recast(NodePath& objectNP, int index,
 	{
 		//compute new obstacle dimensions
 		modelRadius =
-				AIManager::get_global_ptr()->get_bounding_dimensions(
+				GameAIManager::get_global_ptr()->get_bounding_dimensions(
 						objectNP, modelDims, modelDeltaCenter);
 	}
 	else
@@ -2171,7 +2171,7 @@ bool RNNavMesh::do_add_crowd_agent_to_recast_update(PT(RNCrowdAgent)crowdAgent,
 		{
 			//compute new agent dimensions
 			modelRadius =
-				AIManager::get_global_ptr()->get_bounding_dimensions(
+				GameAIManager::get_global_ptr()->get_bounding_dimensions(
 						NodePath::any_path(crowdAgent), modelDims,
 						modelDeltaCenter);
 		}
@@ -3146,14 +3146,14 @@ bool RNNavMesh::require_fully_complete() const
  */
 TypedWritable *RNNavMesh::make_from_bam(const FactoryParams &params)
 {
-	// continue only if AIManager exists
-	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
+	// continue only if GameAIManager exists
+	CONTINUE_IF_ELSE_R(GameAIManager::get_global_ptr(), NULL)
 
 	// create a RNNavMesh with default parameters' values: they'll be restored later
-	AIManager::get_global_ptr()->set_parameters_defaults(
-			AIManager::NAVMESH);
+	GameAIManager::get_global_ptr()->set_parameters_defaults(
+			GameAIManager::NAVMESH);
 	RNNavMesh *node = DCAST(RNNavMesh,
-			AIManager::get_global_ptr()->create_nav_mesh().node());
+			GameAIManager::get_global_ptr()->create_nav_mesh().node());
 
 	DatagramIterator scan;
 	BamReader *manager;

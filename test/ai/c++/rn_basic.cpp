@@ -7,7 +7,7 @@
 
 #include <pandaFramework.h>
 #include <load_prc_file.h>
-#include <aiManager.h>
+#include <gameAIManager.h>
 #include <rnNavMesh.h>
 #include <rnCrowdAgent.h>
 
@@ -41,13 +41,13 @@ int main(int argc, char *argv[])
 	/// typed object init; not needed if you build inside panda source tree
 	RNNavMesh::init_type();
 	RNCrowdAgent::init_type();
-	AIManager::init_type();
+	GameAIManager::init_type();
 	RNNavMesh::register_with_read_factory();
 	RNCrowdAgent::register_with_read_factory();
 	///
 
 	cout << "create a nav mesh manager" << endl;
-	WPT(AIManager)navMesMgr = new AIManager(window->get_render());
+	WPT(GameAIManager)navMesMgr = new GameAIManager(window->get_render());
 
 	cout << "reparent the reference node to render" << endl;
 	navMesMgr->get_reference_node_path().reparent_to(window->get_render());

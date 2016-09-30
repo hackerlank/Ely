@@ -39,7 +39,7 @@ class RNCrowdAgent;
  * \note A model can "own" many RNNavMesh(es), so the typical pattern is to
  * have a common parent (ie reference) NodePath to which both model and its
  * RNNavMesh(es) are reparented. A RNNavMesh will be reparented to the default
- * reference node on creation (see AIManager).
+ * reference node on creation (see GameAIManager).
  *
  * > **RNNavMesh text parameters**:
  * param | type | default | note
@@ -394,7 +394,7 @@ public:
 
 protected:
 	friend void unref_delete<RNNavMesh>(RNNavMesh*);
-	friend class AIManager;
+	friend class GameAIManager;
 	friend class RNCrowdAgent;
 
 	RNNavMesh(const string& name = "NavMesh");

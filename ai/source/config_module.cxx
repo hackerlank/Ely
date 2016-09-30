@@ -1,7 +1,7 @@
 
 #include "config_module.h"
 #include "dconfig.h"
-#include "aiManager.h"
+#include "gameAIManager.h"
 #include "osSteerVehicle.h"
 #include "osSteerPlugIn.h"
 #include "rnCrowdAgent.h"
@@ -33,7 +33,7 @@ init_libai() {
   RNCrowdAgent::init_type();
   RNNavMesh::register_with_read_factory();
   RNCrowdAgent::register_with_read_factory();
-  AIManager::init_type();
+  GameAIManager::init_type();
 
   return;
 }

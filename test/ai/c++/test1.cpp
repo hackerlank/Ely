@@ -7,7 +7,7 @@
 
 #include <pandaFramework.h>
 #include <load_prc_file.h>
-#include <aiManager.h>
+#include <gameAIManager.h>
 #include <rnNavMesh.h>
 #include <rnCrowdAgent.h>
 #include <mouseWatcher.h>
@@ -70,7 +70,7 @@ int main(int argc, char *argv[])
 	/// typed object init; not needed if you build inside panda source tree
 	RNNavMesh::init_type();
 	RNCrowdAgent::init_type();
-	AIManager::init_type();
+	GameAIManager::init_type();
 	RNNavMesh::register_with_read_factory();
 	RNCrowdAgent::register_with_read_factory();
 	///
@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a nav mesh manager
-	WPT(AIManager)navMesMgr = new AIManager(window->get_render(), mask);
+	WPT(GameAIManager)navMesMgr = new GameAIManager(window->get_render(), mask);
 
 	// reparent the reference node to render
 	navMesMgr->get_reference_node_path().reparent_to(window->get_render());
@@ -302,17 +302,17 @@ void addArea(const Event*, void* data)
 		LPoint3f point = entry0->get_surface_point(NodePath());
 		if (addPoint)
 		{
-			AIManager::get_global_ptr()->debug_draw_reset(AIManager::RN_POINTS);
+			GameAIManager::get_global_ptr()->debug_draw_reset(GameAIManager::RN_POINTS);
 			// add to list
 			areaPointList.add_value(point);
-			AIManager::get_global_ptr()->debug_draw_primitive(
-					AIManager::RN_POINTS, areaPointList,
+			GameAIManager::get_global_ptr()->debug_draw_primitive(
+					GameAIManager::RN_POINTS, areaPointList,
 					LVecBase4f(1.0, 0.0, 0.0, 1.0), 4.0);
 			cout << point << endl;
 		}
 		else
 		{
-			AIManager::get_global_ptr()->debug_draw_reset(AIManager::RN_POINTS);
+			GameAIManager::get_global_ptr()->debug_draw_reset(GameAIManager::RN_POINTS);
 			// add last point to list
 			areaPointList.add_value(point);
 			cout << point << endl;
@@ -358,17 +358,17 @@ void addLink(const Event*, void* data)
 		LPoint3f point = entry0->get_surface_point(NodePath());
 		if (linkPointPair.get_num_values() == 0)
 		{
-			AIManager::get_global_ptr()->debug_draw_reset(AIManager::RN_POINTS);
+			GameAIManager::get_global_ptr()->debug_draw_reset(GameAIManager::RN_POINTS);
 			// add start point to list
 			linkPointPair.add_value(point);
-			AIManager::get_global_ptr()->debug_draw_primitive(
-					AIManager::RN_POINTS, linkPointPair,
+			GameAIManager::get_global_ptr()->debug_draw_primitive(
+					GameAIManager::RN_POINTS, linkPointPair,
 					LVecBase4f(0.0, 0.0, 1.0, 1.0), 4.0);
 			cout << point << endl;
 		}
 		else
 		{
-			AIManager::get_global_ptr()->debug_draw_reset(AIManager::RN_POINTS);
+			GameAIManager::get_global_ptr()->debug_draw_reset(GameAIManager::RN_POINTS);
 			// add end point to list
 			linkPointPair.add_value(point);
 			cout << point << endl;

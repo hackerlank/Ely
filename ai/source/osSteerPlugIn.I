@@ -106,8 +106,8 @@ INLINE int OSSteerPlugIn::add_obstacle(const string& type, const string& seenFro
  */
 INLINE int OSSteerPlugIn::get_obstacle(int index) const
 {
-	pvector<AIManager::ObstacleAttributes>& obstacleAttrs =
-			const_cast<AIManager::GlobalObstacles&>(mLocalObstacles).second();
+	pvector<GameAIManager::ObstacleAttributes>& obstacleAttrs =
+			const_cast<GameAIManager::GlobalObstacles&>(mLocalObstacles).second();
 	CONTINUE_IF_ELSE_R((index >= 0) && (index < (int) obstacleAttrs.size()),
 			AI_ERROR)
 
@@ -119,7 +119,7 @@ INLINE int OSSteerPlugIn::get_obstacle(int index) const
  */
 INLINE int OSSteerPlugIn::get_num_obstacles() const
 {
-	return (int) const_cast<AIManager::GlobalObstacles&>(mLocalObstacles).second().size();
+	return (int) const_cast<GameAIManager::GlobalObstacles&>(mLocalObstacles).second().size();
 }
 
 /**

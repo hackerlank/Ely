@@ -1,11 +1,11 @@
 /**
- * \file audioManager.cxx
+ * \file gameAudioManager.cxx
  *
  * \date 2016-09-30
  * \author consultit
  */
 
-#include "audioManager.h"
+#include "gameAudioManager.h"
 
 #include "p3Sound3d.h"
 #include "p3Listener.h"
@@ -16,7 +16,7 @@
 /**
  *
  */
-AudioManager::AudioManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
+GameAudioManager::GameAudioManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
 		const CollideMask& mask):
 		mWin(win),
 		mTaskSort(taskSort),
@@ -28,14 +28,14 @@ AudioManager::AudioManager(PT(GraphicsWindow) win, int taskSort, const NodePath&
 		mCTrav(NULL),
 		mRef(0)
 {
-	PRINT_DEBUG("AudioManager::AudioManager: creating the singleton manager.");
+	PRINT_DEBUG("GameAudioManager::GameAudioManager: creating the singleton manager.");
 
 	mSound3ds.clear();
 	mSound3dsParameterTable.clear();
 	mListeners.clear();
 	mListenersParameterTable.clear();
-	set_parameters_defaults(DRIVER);
-	set_parameters_defaults(CHASER);
+	set_parameters_defaults(SOUND3D);
+	set_parameters_defaults(LISTENER);
 	//
 	mUpdateData.clear();
 	mUpdateTask.clear();
@@ -45,7 +45,7 @@ AudioManager::AudioManager(PT(GraphicsWindow) win, int taskSort, const NodePath&
 		mCTrav = new CollisionTraverser();
 		mCollisionHandler = new CollisionHandlerQueue();
 		mPickerRay = new CollisionRay();
-		PT(CollisionNode)pickerNode = new CollisionNode(string("AudioManager::pickerNode"));
+		PT(CollisionNode)pickerNode = new CollisionNode(string("GameAudioManager::pickerNode"));
 		pickerNode->add_solid(mPickerRay);
 		pickerNode->set_from_collide_mask(mMask);
 		pickerNode->set_into_collide_mask(BitMask32::all_off());
@@ -57,9 +57,9 @@ AudioManager::AudioManager(PT(GraphicsWindow) win, int taskSort, const NodePath&
 /**
  *
  */
-AudioManager::~AudioManager()
+GameAudioManager::~GameAudioManager()
 {
-	PRINT_DEBUG("AudioManager::~AudioManager: destroying the singleton manager.");
+	PRINT_DEBUG("GameAudioManager::~GameAudioManager: destroying the singleton manager.");
 
 	//stop any default update
 	stop_default_update();
@@ -98,7 +98,7 @@ AudioManager::~AudioManager()
  * Returns a NodePath to the new P3Sound3d,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath AudioManager::create_sound3d(const string& name)
+NodePath GameAudioManager::create_sound3d(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
@@ -124,7 +124,7 @@ NodePath AudioManager::create_sound3d(const string& name)
  * Destroys a P3Sound3d.
  * Returns false on error.
  */
-bool AudioManager::destroy_sound3d(NodePath sound3dNP)
+bool GameAudioManager::destroy_sound3d(NodePath sound3dNP)
 {
 	CONTINUE_IF_ELSE_R(
 			sound3dNP.node()->is_of_type(P3Sound3d::get_class_type()),
@@ -148,7 +148,7 @@ bool AudioManager::destroy_sound3d(NodePath sound3dNP)
 /**
  * Gets an P3Sound3d by index, or NULL on error.
  */
-PT(P3Sound3d) AudioManager::get_sound3d(int index) const
+PT(P3Sound3d) GameAudioManager::get_sound3d(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mSound3ds.size()),
 			NULL)
@@ -161,7 +161,7 @@ PT(P3Sound3d) AudioManager::get_sound3d(int index) const
  * Returns a NodePath to the new P3Listener,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath AudioManager::create_listener(const string& name)
+NodePath GameAudioManager::create_listener(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
@@ -187,7 +187,7 @@ NodePath AudioManager::create_listener(const string& name)
  * Destroys a P3Listener.
  * Returns false on error.
  */
-bool AudioManager::destroy_listener(NodePath listenerNP)
+bool GameAudioManager::destroy_listener(NodePath listenerNP)
 {
 	CONTINUE_IF_ELSE_R(
 			listenerNP.node()->is_of_type(P3Listener::get_class_type()),
@@ -211,7 +211,7 @@ bool AudioManager::destroy_listener(NodePath listenerNP)
 /**
  * Gets an P3Listener by index, or NULL on error.
  */
-PT(P3Listener) AudioManager::get_listener(int index) const
+PT(P3Listener) GameAudioManager::get_listener(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mListeners.size()),
 			NULL)
@@ -222,12 +222,12 @@ PT(P3Listener) AudioManager::get_listener(int index) const
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
  */
-void AudioManager::set_parameter_values(AudioType type, const string& paramName,
+void GameAudioManager::set_parameter_values(AudioType type, const string& paramName,
 		const ValueList<string>& paramValues)
 {
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
 
-	if (type == DRIVER)
+	if (type == SOUND3D)
 	{
 		//find from mParameterTable the paramName's values to be overwritten
 		iterRange = mSound3dsParameterTable.equal_range(paramName);
@@ -241,7 +241,7 @@ void AudioManager::set_parameter_values(AudioType type, const string& paramName,
 		}
 		return;
 	}
-	if (type == CHASER)
+	if (type == LISTENER)
 	{
 		//find from mParameterTable the paramName's values to be overwritten
 		iterRange = mListenersParameterTable.equal_range(paramName);
@@ -260,14 +260,14 @@ void AudioManager::set_parameter_values(AudioType type, const string& paramName,
 /**
  * Gets the multiple values of a (actually set) parameter.
  */
-ValueList<string> AudioManager::get_parameter_values(AudioType type,
+ValueList<string> GameAudioManager::get_parameter_values(AudioType type,
 		const string& paramName) const
 {
 	ValueList<string> strList;
 	ParameterTableConstIter iter;
 	pair<ParameterTableConstIter, ParameterTableConstIter> iterRange;
 
-	if (type == DRIVER)
+	if (type == SOUND3D)
 	{
 		iterRange = mSound3dsParameterTable.equal_range(paramName);
 		if (iterRange.first != iterRange.second)
@@ -279,7 +279,7 @@ ValueList<string> AudioManager::get_parameter_values(AudioType type,
 		}
 		return strList;
 	}
-	if (type == CHASER)
+	if (type == LISTENER)
 	{
 		iterRange = mListenersParameterTable.equal_range(paramName);
 		if (iterRange.first != iterRange.second)
@@ -298,7 +298,7 @@ ValueList<string> AudioManager::get_parameter_values(AudioType type,
 /**
  * Sets a multi/single-valued parameter to a single value overwriting the existing one(s).
  */
-void AudioManager::set_parameter_value(AudioType type, const string& paramName,
+void GameAudioManager::set_parameter_value(AudioType type, const string& paramName,
 		const string& value)
 {
 	ValueList<string> valueList;
@@ -309,7 +309,7 @@ void AudioManager::set_parameter_value(AudioType type, const string& paramName,
 /**
  * Gets a single value (i.e. the first one) of a parameter.
  */
-string AudioManager::get_parameter_value(AudioType type,
+string GameAudioManager::get_parameter_value(AudioType type,
 		const string& paramName) const
 {
 	ValueList<string> valueList = get_parameter_values(type, paramName);
@@ -319,13 +319,13 @@ string AudioManager::get_parameter_value(AudioType type,
 /**
  * Gets a list of the names of the parameters actually set.
  */
-ValueList<string> AudioManager::get_parameter_name_list(AudioType type) const
+ValueList<string> GameAudioManager::get_parameter_name_list(AudioType type) const
 {
 	ValueList<string> strList;
 	ParameterTableIter iter;
 	ParameterTable tempTable;
 
-	if (type == DRIVER)
+	if (type == SOUND3D)
 	{
 		tempTable = mSound3dsParameterTable;
 		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
@@ -338,7 +338,7 @@ ValueList<string> AudioManager::get_parameter_name_list(AudioType type) const
 		}
 		return strList;
 	}
-	if (type == CHASER)
+	if (type == LISTENER)
 	{
 		tempTable = mListenersParameterTable;
 		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
@@ -360,9 +360,9 @@ ValueList<string> AudioManager::get_parameter_name_list(AudioType type) const
  * \note: After reading objects from bam files, the objects' creation parameters
  * which reside in the manager, are reset to their default values.
  */
-void AudioManager::set_parameters_defaults(AudioType type)
+void GameAudioManager::set_parameters_defaults(AudioType type)
 {
-	if (type == DRIVER)
+	if (type == SOUND3D)
 	{
 		///mSound3dsParameterTable must be the first cleared
 		mSound3dsParameterTable.clear();
@@ -398,7 +398,7 @@ void AudioManager::set_parameters_defaults(AudioType type)
 		mSound3dsParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
 		return;
 	}
-	if (type == CHASER)
+	if (type == LISTENER)
 	{
 		///mListenersParameterTable must be the first cleared
 		mListenersParameterTable.clear();
@@ -427,7 +427,7 @@ void AudioManager::set_parameters_defaults(AudioType type)
  *
  * Will be called automatically in a task.
  */
-AsyncTask::DoneStatus AudioManager::update(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 {
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -455,13 +455,13 @@ AsyncTask::DoneStatus AudioManager::update(GenericAsyncTask* task)
 /**
  * Adds a task to repeatedly call audio updates.
  */
-void AudioManager::start_default_update()
+void GameAudioManager::start_default_update()
 {
 	//create the task for updating AI objects
-	mUpdateData = new TaskInterface<AudioManager>::TaskData(this,
-			&AudioManager::update);
-	mUpdateTask = new GenericAsyncTask(string("AudioManager::update"),
-			&TaskInterface<AudioManager>::taskFunction,
+	mUpdateData = new TaskInterface<GameAudioManager>::TaskData(this,
+			&GameAudioManager::update);
+	mUpdateTask = new GenericAsyncTask(string("GameAudioManager::update"),
+			&TaskInterface<GameAudioManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	mUpdateTask->set_sort(mTaskSort);
 	//Adds mUpdateTask to the active queue.
@@ -471,7 +471,7 @@ void AudioManager::start_default_update()
 /**
  * Removes a task to repeatedly call audio updates.
  */
-void AudioManager::stop_default_update()
+void GameAudioManager::stop_default_update()
 {
 	if (mUpdateTask)
 	{
@@ -490,7 +490,7 @@ void AudioManager::stop_default_update()
  * - modelCenter + modelDeltaCenter = origin of coordinate system
  * - modelRadius = radius of the containing sphere
  */
-float AudioManager::get_bounding_dimensions(NodePath modelNP,
+float GameAudioManager::get_bounding_dimensions(NodePath modelNP,
 		LVecBase3f& modelDims, LVector3f& modelDeltaCenter) const
 {
 	//get "tight" dimensions of model
@@ -514,7 +514,7 @@ float AudioManager::get_bounding_dimensions(NodePath modelNP,
  * with height equal to the z-value of the first one.
  * If collisions are not found returns a Pair<bool,float> == (false, 0.0).
  */
-Pair<bool,float> AudioManager::get_collision_height(const LPoint3f& rayOrigin,
+Pair<bool,float> GameAudioManager::get_collision_height(const LPoint3f& rayOrigin,
 		const NodePath& space) const
 {
 	//traverse downward starting at rayOrigin
@@ -538,7 +538,7 @@ Pair<bool,float> AudioManager::get_collision_height(const LPoint3f& rayOrigin,
  * Writes to a bam file the entire collections of audio objects and related
  * geometries (i.e. models' NodePaths)
  */
-bool AudioManager::write_to_bam_file(const string& fileName)
+bool GameAudioManager::write_to_bam_file(const string& fileName)
 {
 	string errorReport;
 	// write to bam file
@@ -579,7 +579,7 @@ bool AudioManager::write_to_bam_file(const string& fileName)
  * Reads from a bam file the entire hierarchy of audio objects and related
  * geometries (i.e. models' NodePaths)
  */
-bool AudioManager::read_from_bam_file(const string& fileName)
+bool GameAudioManager::read_from_bam_file(const string& fileName)
 {
 	string errorReport;
 	//read from bamFile
@@ -629,4 +629,4 @@ bool AudioManager::read_from_bam_file(const string& fileName)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle AudioManager::_type_handle;
+TypeHandle GameAudioManager::_type_handle;

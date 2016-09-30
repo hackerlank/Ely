@@ -5,12 +5,12 @@
  * \author consultit
  */
 
-#ifndef P3CHASER_H_
-#define P3CHASER_H_
+#ifndef P3LISTENER_H_
+#define P3LISTENER_H_
 
 #include "audio_includes.h"
 #include "audioTools.h"
-#include "audioManager.h"
+#include "gameAudioManager.h"
 
 #ifndef CPPPARSER
 #endif //CPPPARSER
@@ -100,7 +100,7 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * \name CHASER
+	 * \name LISTENER
 	 */
 	///@{
 	INLINE void set_chased_object(const NodePath& object);
@@ -209,7 +209,7 @@ public:
 
 protected:
 	friend void unref_delete<P3Listener>(P3Listener*);
-	friend class AudioManager;
+	friend class GameAudioManager;
 
 	P3Listener(const string& name);
 	virtual ~P3Listener();
@@ -335,4 +335,4 @@ INLINE ostream &operator << (ostream &out, const P3Listener & listener);
 ///inline
 #include "p3Listener.I"
 
-#endif /* P3CHASER_H_ */
+#endif /* P3LISTENER_H_ */

@@ -10,7 +10,7 @@
 #endif
 
 #include "p3Driver.h"
-#include "controlManager.h"
+#include "gameControlManager.h"
 #include <cmath>
 
 #ifndef CPPPARSER
@@ -42,16 +42,16 @@ P3Driver::~P3Driver()
  */
 void P3Driver::do_initialize()
 {
-	WPT(ControlManager)mTmpl = ControlManager::get_global_ptr();
+	WPT(GameControlManager)mTmpl = GameControlManager::get_global_ptr();
 	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
 	mSignOfTranslation = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("inverted_translation"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("inverted_translation"))
 			== string("true") ? -1 : 1);
 	mSignOfMouse = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("inverted_rotation"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("inverted_rotation"))
 			== string("true") ? -1 : 1);
 	//head limit: enabled@[limit]; limit >= 0.0
-	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_limit")), '@');
+	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("head_limit")), '@');
 	if (paramValuesStr.size() >= 2)
 	{
 		//enabled
@@ -64,7 +64,7 @@ void P3Driver::do_initialize()
 	}
 	//pitch limit: enabled@[limit]; limit >= 0.0
 	paramValuesStr = parseCompoundString(
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_limit")), '@');
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("pitch_limit")), '@');
 	if (paramValuesStr.size() >= 2)
 	{
 		//enabled
@@ -77,60 +77,60 @@ void P3Driver::do_initialize()
 	}
 	//mouse movement setting
 	mMouseEnabledH = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_head"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("mouse_head"))
 			== string("enabled") ? true : false);
 	mMouseEnabledP = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_pitch"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("mouse_pitch"))
 			== string("enabled") ? true : false);
 	//key events setting
 	//forward key
 	mForwardKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("forward"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("forward"))
 			== string("disabled") ? false : true);
 	//backward key
 	mBackwardKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("backward"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("backward"))
 			== string("disabled") ? false : true);
 	//up key
 	mUpKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("up")) == string("disabled") ?
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("up")) == string("disabled") ?
 			false : true);
 	//down key
 	mDownKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("down")) == string("disabled") ?
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("down")) == string("disabled") ?
 			false : true);
 	//strafeLeft key
 	mStrafeLeftKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_left"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("strafe_left"))
 			== string("disabled") ? false : true);
 	//strafeRight key
 	mStrafeRightKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("strafe_right"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("strafe_right"))
 			== string("disabled") ? false : true);
 	//headLeft key
 	mHeadLeftKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_left"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("head_left"))
 			== string("disabled") ? false : true);
 	//headRight key
 	mHeadRightKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("head_right"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("head_right"))
 			== string("disabled") ? false : true);
 	//pitchUp key
 	mPitchUpKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_up"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("pitch_up"))
 			== string("disabled") ? false : true);
 	//pitchDown key
 	mPitchDownKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("pitch_down"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("pitch_down"))
 			== string("disabled") ? false : true);
 	//mouseMove key: enabled/disabled
 	mMouseMoveKey = (
-			mTmpl->get_parameter_value(ControlManager::DRIVER, string("mouse_move"))
+			mTmpl->get_parameter_value(GameControlManager::DRIVER, string("mouse_move"))
 			== string("enabled") ? true : false);
 	//
 	float value, absValue;
 	//max linear speed (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("max_linear_speed")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("max_linear_speed")).c_str(),
 			NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
@@ -138,16 +138,16 @@ void P3Driver::do_initialize()
 			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
 			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
 	//max angular speed (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("max_angular_speed")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("max_angular_speed")).c_str(),
 			NULL);
 	mMaxSpeedHP = (value >= 0.0 ? value : -value);
 	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
 	//linear accel (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("linear_accel")).c_str(), NULL);
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("linear_accel")).c_str(), NULL);
 	absValue = (value >= 0.0 ? value : -value);
 	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
 	//angular accel (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("angular_accel")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("angular_accel")).c_str(),
 			NULL);
 	mAccelHP = (value >= 0.0 ? value : -value);
 	//reset actual speeds
@@ -155,35 +155,35 @@ void P3Driver::do_initialize()
 	mActualSpeedH = 0.0;
 	mActualSpeedP = 0.0;
 	//linear friction (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("linear_friction")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("linear_friction")).c_str(),
 			NULL);
 	mFrictionXYZ = (value >= 0.0 ? value : -value);
 	//angular friction (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("angular_friction")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("angular_friction")).c_str(),
 			NULL);
 	mFrictionHP = (value >= 0.0 ? value : -value);
 	//stop threshold ([0.0, 1.0])
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("stop_threshold")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("stop_threshold")).c_str(),
 			NULL);
 	mStopThreshold =
 	(value >= 0.0 ? value - floor(value) : ceil(value) - value);
 	//fast factor (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("fast_factor")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("fast_factor")).c_str(),
 			NULL);
 	mFastFactor = (value >= 0.0 ? value : -value);
 	//sens x (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("sens_x")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("sens_x")).c_str(),
 			NULL);
 	mSensX = (value >= 0.0 ? value : -value);
 	//sens_y (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(ControlManager::DRIVER, string("sens_y")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(GameControlManager::DRIVER, string("sens_y")).c_str(),
 			NULL);
 	mSensY = (value >= 0.0 ? value : -value);
 	//
 	mCentX = mWin->get_properties().get_x_size() / 2;
 	mCentY = mWin->get_properties().get_y_size() / 2;
 	//enabling setting
-	if ((mTmpl->get_parameter_value(ControlManager::DRIVER,
+	if ((mTmpl->get_parameter_value(GameControlManager::DRIVER,
 			string("enabled")) == string("false") ? false : true))
 	{
 		do_enable();
@@ -840,14 +840,14 @@ int P3Driver::complete_pointers(TypedWritable **p_list, BamReader *manager)
  */
 TypedWritable *P3Driver::make_from_bam(const FactoryParams &params)
 {
-	// continue only if ControlManager exists
-	CONTINUE_IF_ELSE_R(ControlManager::get_global_ptr(), NULL)
+	// continue only if GameControlManager exists
+	CONTINUE_IF_ELSE_R(GameControlManager::get_global_ptr(), NULL)
 
 	// create a P3Driver with default parameters' values: they'll be restored later
-	ControlManager::get_global_ptr()->set_parameters_defaults(
-			ControlManager::DRIVER);
+	GameControlManager::get_global_ptr()->set_parameters_defaults(
+			GameControlManager::DRIVER);
 	P3Driver *node = DCAST(P3Driver,
-			ControlManager::get_global_ptr()->create_driver(
+			GameControlManager::get_global_ptr()->create_driver(
 					"Driver").node());
 
 	DatagramIterator scan;

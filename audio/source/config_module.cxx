@@ -1,7 +1,7 @@
 
 #include "config_module.h"
 #include "dconfig.h"
-#include "audioManager.h"
+#include "gameAudioManager.h"
 #include "p3Sound3d.h"
 #include "p3Listener.h"
 
@@ -27,7 +27,7 @@ init_libaudio() {
   P3Listener::init_type();
   P3Sound3d::register_with_read_factory();
   P3Listener::register_with_read_factory();
-  AudioManager::init_type();
+  GameAudioManager::init_type();
 
   return;
 }

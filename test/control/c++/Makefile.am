@@ -25,7 +25,7 @@ EXTRA_DIST = data.cpp.in
 
 common_sources = \
 	data.cpp \
-	$(srcdir)/../../../control/source/controlManager.cxx \
+	$(srcdir)/../../../control/source/gameControlManager.cxx \
 	$(srcdir)/../../../control/source/controlTools.cxx \
 	$(srcdir)/../../../control/source/p3Driver.cxx \
 	$(srcdir)/../../../control/source/p3Chaser.cxx

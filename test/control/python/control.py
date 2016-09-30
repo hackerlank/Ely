@@ -8,7 +8,7 @@ from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f
 from direct.showbase.ShowBase import ShowBase
-from p3control import ControlManager
+from p3control import GameControlManager
 #
 import sys
 
@@ -53,59 +53,59 @@ pursuerChaser = None
 def printCreationParameters():
     """print creation parameters"""
     
-    controlMgr = ControlManager.get_global_ptr()
+    controlMgr = GameControlManager.get_global_ptr()
     #
-    valueList = controlMgr.get_parameter_name_list(ControlManager.DRIVER)
+    valueList = controlMgr.get_parameter_name_list(GameControlManager.DRIVER)
     print("\n" + "P3Driver creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               controlMgr.get_parameter_value(ControlManager.DRIVER, name))
+               controlMgr.get_parameter_value(GameControlManager.DRIVER, name))
     #
-    valueList = controlMgr.get_parameter_name_list(ControlManager.CHASER)
+    valueList = controlMgr.get_parameter_name_list(GameControlManager.CHASER)
     print("\n" + "P3Chaser creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               controlMgr.get_parameter_value(ControlManager.CHASER, name))
+               controlMgr.get_parameter_value(GameControlManager.CHASER, name))
 
 def setParametersBeforeCreation():
     """set parameters as strings before drivers/vehicles creation"""
     
-    controlMgr = ControlManager.get_global_ptr()
+    controlMgr = GameControlManager.get_global_ptr()
     # set driver's parameters
-    controlMgr.set_parameter_value(ControlManager.DRIVER, "max_angular_speed",
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_angular_speed",
             "100.0")
-    controlMgr.set_parameter_value(ControlManager.DRIVER, "angular_accel",
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_accel",
             "50.0")
-    controlMgr.set_parameter_value(ControlManager.DRIVER, "max_linear_speed",
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_linear_speed",
             "8.0")
-    controlMgr.set_parameter_value(ControlManager.DRIVER, "linear_accel",
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_accel",
             "1.0")
-    controlMgr.set_parameter_value(ControlManager.DRIVER, "linear_friction",
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_friction",
             "0.5")
-    controlMgr.set_parameter_value(ControlManager.DRIVER, "angular_friction",
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_friction",
             "5.0")
     # set chaser's parameters
-    controlMgr.set_parameter_value(ControlManager.CHASER, "fixed_relative_position",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "fixed_relative_position",
             "false")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "max_distance",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "max_distance",
             "25.0")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "min_distance",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "min_distance",
             "18.0")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "max_height",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "max_height",
             "18.0")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "min_height",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "min_height",
             "15.0")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "friction",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "friction",
             "5.0")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "fixed_look_at",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "fixed_look_at",
             "true")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "mouse_head",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "mouse_head",
             "true")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "mouse_pitch",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "mouse_pitch",
             "true")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "look_at_distance",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "look_at_distance",
             "5.0")
-    controlMgr.set_parameter_value(ControlManager.CHASER, "look_at_height",
+    controlMgr.set_parameter_value(GameControlManager.CHASER, "look_at_height",
             "12.5")
     #
     printCreationParameters()
@@ -135,14 +135,14 @@ def startFramework(msg):
 def readFromBamFile(fileName):
     """read scene from a file"""
     
-    return ControlManager.get_global_ptr().read_from_bam_file(fileName)
+    return GameControlManager.get_global_ptr().read_from_bam_file(fileName)
 
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
-    ControlManager.get_global_ptr().write_to_bam_file(fileName)
+    GameControlManager.get_global_ptr().write_to_bam_file(fileName)
     # # this is for testing explicit removal and destruction of all elements
-    controlMgr = ControlManager.get_global_ptr()
+    controlMgr = GameControlManager.get_global_ptr()
     # destroy drivers
     for driverTmp in controlMgr.get_drivers():
         # destroy driverTmp
@@ -239,7 +239,7 @@ def handlePlayerUpdate():
     # make playerNP kinematic (ie stand on floor)
     if currentVelSize > 0.0:
         # get control manager
-        controlMgr = ControlManager.get_global_ptr()
+        controlMgr = GameControlManager.get_global_ptr()
         # correct player's Z: set the collision ray origin wrt collision root
         pOrig = controlMgr.get_collision_root().get_relative_point(
                 controlMgr.get_reference_node_path(), playerDriverNP.get_pos()) + \
@@ -352,7 +352,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
 
     # create a control manager set root and mask to manage 'kinematic' players
-    controlMgr = ControlManager(app.win, 10, app.render, mask)
+    controlMgr = GameControlManager(app.win, 10, app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")
@@ -401,16 +401,16 @@ if __name__ == '__main__':
     else:
         # valid bamFile
         # restore sceneNP: through panda3d
-        sceneNP = ControlManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
+        sceneNP = GameControlManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
         # reparent the reference node to render
-        ControlManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+        GameControlManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
 
         # restore the player's reference
-        playerNP = ControlManager.get_global_ptr().get_reference_node_path().find(
+        playerNP = GameControlManager.get_global_ptr().get_reference_node_path().find(
                 "**/PlayerNP")
     
         # restore driver: through control manager
-        playerDriver = ControlManager.get_global_ptr().get_driver(0)
+        playerDriver = GameControlManager.get_global_ptr().get_driver(0)
         # restore animations
         tmpList = [None for i in range(1)]
         playerAnimCtls.extend(tmpList)
@@ -422,7 +422,7 @@ if __name__ == '__main__':
             playerAnimCtls[i][j] = tmpAnims.get_anim(j)
 
         # restore chaser: through control manager
-        pursuerChaser = ControlManager.get_global_ptr().get_chaser(0)
+        pursuerChaser = GameControlManager.get_global_ptr().get_chaser(0)
         # restore animations
         pursuerAnimCtls.extend(tmpList)
         tmpAnims.clear_anims()

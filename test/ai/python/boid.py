@@ -6,7 +6,7 @@ Created on Jun 26, 2016
 
 from panda3d.core import TextNode, ClockObject, AnimControlCollection, \
         auto_bind, LPoint3f, LVector3f, LVecBase3f
-from p3ai import AIManager, ValueList_string, ValueList_LPoint3f, \
+from p3ai import GameAIManager, ValueList_string, ValueList_LPoint3f, \
         ValueList_float
 #
 from common import startFramework, toggleDebugFlag, toggleDebugDraw, mask, \
@@ -26,25 +26,25 @@ steerVehicles = []
 def setParametersBeforeCreation():
     """set parameters as strings before plug-ins/vehicles creation"""
     
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
     valueList = ValueList_string()
     # set plug-in type
-    steerMgr.set_parameter_value(AIManager.STEERPLUGIN, "plugin_type",
+    steerMgr.set_parameter_value(GameAIManager.STEERPLUGIN, "plugin_type",
             "boid")
 
     # set vehicle's type, max force, max speed, speed
-    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "vehicle_type",
+    steerMgr.set_parameter_value(GameAIManager.STEERVEHICLE, "vehicle_type",
             "boid")
-    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "max_force",
+    steerMgr.set_parameter_value(GameAIManager.STEERVEHICLE, "max_force",
             "5.0")
-    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "max_speed",
+    steerMgr.set_parameter_value(GameAIManager.STEERVEHICLE, "max_speed",
             "10.0")
-    steerMgr.set_parameter_value(AIManager.STEERVEHICLE, "speed", "3.0")
+    steerMgr.set_parameter_value(GameAIManager.STEERVEHICLE, "speed", "3.0")
 
     # set vehicle throwing events
     valueList.clear()
     valueList.add_value("avoid_obstacle@avoid_obstacle@")
-    steerMgr.set_parameter_values(AIManager.STEERVEHICLE,
+    steerMgr.set_parameter_values(GameAIManager.STEERVEHICLE,
             "thrown_events", valueList)
     #
     printCreationParameters()
@@ -83,8 +83,8 @@ def updatePlugIn(steerPlugIn, task):
 def writeToBamFileAndExitBoid(fileName):
     """override writeToBamFileAndExit"""
     
-    for i in range(AIManager.get_global_ptr().get_num_steer_vehicles()):
-        vehicle = AIManager.get_global_ptr().get_steer_vehicle(i)
+    for i in range(GameAIManager.get_global_ptr().get_num_steer_vehicles()):
+        vehicle = GameAIManager.get_global_ptr().get_steer_vehicle(i)
         print(str(i) + "th OSSteerVehicle's settings: ")
         print(vehicle.get_settings())
         print(vehicle.get_flock_settings())
@@ -111,7 +111,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a steer manager; set root and mask to manage 'kinematic' vehicles
-    steerMgr = AIManager(app.render, mask)
+    steerMgr = GameAIManager(app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")
@@ -147,20 +147,20 @@ if __name__ == '__main__':
     else:
         # valid bamFile
         # restore plug-in: through steer manager
-        steerPlugIn = AIManager.get_global_ptr().get_steer_plug_in(0)
+        steerPlugIn = GameAIManager.get_global_ptr().get_steer_plug_in(0)
         # restore sceneNP: through panda3d
-        sceneNP = AIManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
+        sceneNP = GameAIManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
         # reparent the reference node to render
-        AIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+        GameAIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
     
         # restore steer vehicles
-        NUMVEHICLES = AIManager.get_global_ptr().get_num_steer_vehicles()
+        NUMVEHICLES = GameAIManager.get_global_ptr().get_num_steer_vehicles()
         tmpList = [None for i in range(NUMVEHICLES)]
         steerVehicles.extend(tmpList)
         vehicleAnimCtls.extend(tmpList)
         for i in range(NUMVEHICLES):
             # restore the steer vehicle: through steer manager
-            steerVehicles[i] = AIManager.get_global_ptr().get_steer_vehicle(i)
+            steerVehicles[i] = GameAIManager.get_global_ptr().get_steer_vehicle(i)
             # print vehicle settings
             print(str(i) + "th OSSteerVehicle's settings: ")
             print(steerVehicles[i].get_settings())

@@ -6,7 +6,7 @@ Created on Jun 26, 2016
 
 from panda3d.core import TextNode, ClockObject, AnimControlCollection, \
         auto_bind, LPoint3f, LVecBase3f, NodePath
-from p3ai import AIManager, ValueList_string, ValueList_LPoint3f, \
+from p3ai import GameAIManager, ValueList_string, ValueList_LPoint3f, \
         ValueList_float, OSSteerVehicle
 #
 from common import startFramework, toggleDebugFlag, toggleDebugDraw, mask, \
@@ -29,16 +29,16 @@ flagAnims = AnimControlCollection()
 def setParametersBeforeCreation():
     """set parameters as strings before plug-ins/vehicles creation"""
     
-    steerMgr = AIManager.get_global_ptr()
+    steerMgr = GameAIManager.get_global_ptr()
     valueList = ValueList_string()
     # set plug-in type
-    steerMgr.set_parameter_value(AIManager.STEERPLUGIN, "plugin_type",
+    steerMgr.set_parameter_value(GameAIManager.STEERPLUGIN, "plugin_type",
             "capture_the_flag")
 
     # set vehicle throwing events
     valueList.clear()
     valueList.add_value("avoid_obstacle@avoid_obstacle@1.0")
-    steerMgr.set_parameter_values(AIManager.STEERVEHICLE,
+    steerMgr.set_parameter_values(GameAIManager.STEERVEHICLE,
             "thrown_events", valueList)
     #
     printCreationParameters()
@@ -86,8 +86,8 @@ def createCtfVehicle(data, vehicleType):
     if vehicleType == OSSteerVehicle.CTF_SEEKER:
         typeStr = "ctf_seeker"
         speed = 0.0
-    AIManager.get_global_ptr().set_parameter_value(
-                    AIManager.STEERVEHICLE, "vehicle_type", typeStr)
+    GameAIManager.get_global_ptr().set_parameter_value(
+                    GameAIManager.STEERVEHICLE, "vehicle_type", typeStr)
 
     oldPlayerNum = len(steerVehicles)
     # handle vehicle
@@ -148,7 +148,7 @@ def getFlag(name):
     flag.set_two_sided(True)
     flag.set_scale(1.5)
     flag.set_name(name)
-    flag.reparent_to(AIManager.get_global_ptr().get_reference_node_path())
+    flag.reparent_to(GameAIManager.get_global_ptr().get_reference_node_path())
     flagWave = app.loader.load_model("flag_oga-wave.egg")
     flagWave.reparent_to(flag)
     auto_bind(flag.node(), flagAnims)
@@ -176,7 +176,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a steer manager; set root and mask to manage 'kinematic' vehicles
-    steerMgr = AIManager(app.render, mask)
+    steerMgr = GameAIManager(app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")
@@ -218,20 +218,20 @@ if __name__ == '__main__':
     else:
         # valid bamFile
         # restore plug-in: through steer manager
-        steerPlugIn = AIManager.get_global_ptr().get_steer_plug_in(0)
+        steerPlugIn = GameAIManager.get_global_ptr().get_steer_plug_in(0)
         # restore sceneNP: through panda3d
-        sceneNP = AIManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
+        sceneNP = GameAIManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
         # reparent the reference node to render
-        AIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
+        GameAIManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
     
         # restore steer vehicles
-        NUMVEHICLES = AIManager.get_global_ptr().get_num_steer_vehicles()
+        NUMVEHICLES = GameAIManager.get_global_ptr().get_num_steer_vehicles()
         tmpList = [None for i in range(NUMVEHICLES)]
         steerVehicles.extend(tmpList)
         vehicleAnimCtls.extend(tmpList)
         for i in range(NUMVEHICLES):
             # restore the steer vehicle: through steer manager
-            steerVehicles[i] = AIManager.get_global_ptr().get_steer_vehicle(i)
+            steerVehicles[i] = GameAIManager.get_global_ptr().get_steer_vehicle(i)
             # restore animations
             tmpAnims = AnimControlCollection()
             auto_bind(steerVehicles[i], tmpAnims)
@@ -240,7 +240,7 @@ if __name__ == '__main__':
                 vehicleAnimCtls[i][j] = tmpAnims.get_anim(j)
 
         # restore flag and its animation
-        flagNP = AIManager.get_global_ptr().get_reference_node_path().find(
+        flagNP = GameAIManager.get_global_ptr().get_reference_node_path().find(
                         "**/FlagNP")
         auto_bind(flagNP.node(), flagAnims)
         flagAnims.get_anim(0).loop(True)

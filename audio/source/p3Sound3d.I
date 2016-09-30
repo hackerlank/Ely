@@ -5,8 +5,8 @@
  * \author consultit
  */
 
-#ifndef P3DRIVER_I_
-#define P3DRIVER_I_
+#ifndef P3SOUND3D_I_
+#define P3SOUND3D_I_
 
 
 ///P3Sound3d inline definitions
@@ -740,4 +740,4 @@ INLINE ostream &operator <<(ostream &out, const P3Sound3d& sound3d)
 	return out;
 }
 
-#endif /* P3DRIVER_I_ */
+#endif /* P3SOUND3D_I_ */

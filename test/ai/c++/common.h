@@ -17,7 +17,7 @@
 #include <texturePool.h>
 #include <mouseWatcher.h>
 #include <cardMaker.h>
-#include <aiManager.h>
+#include <gameAIManager.h>
 #include <osSteerPlugIn.h>
 #include <osSteerVehicle.h>
 

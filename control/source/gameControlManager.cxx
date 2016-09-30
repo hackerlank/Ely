@@ -1,11 +1,11 @@
 /**
- * \file controlManager.cxx
+ * \file gameControlManager.cxx
  *
  * \date 2016-09-18
  * \author consultit
  */
 
-#include "controlManager.h"
+#include "gameControlManager.h"
 
 #include "p3Driver.h"
 #include "p3Chaser.h"
@@ -16,7 +16,7 @@
 /**
  *
  */
-ControlManager::ControlManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
+GameControlManager::GameControlManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
 		const CollideMask& mask):
 		mWin(win),
 		mTaskSort(taskSort),
@@ -28,7 +28,7 @@ ControlManager::ControlManager(PT(GraphicsWindow) win, int taskSort, const NodeP
 		mCTrav(NULL),
 		mRef(0)
 {
-	PRINT_DEBUG("ControlManager::ControlManager: creating the singleton manager.");
+	PRINT_DEBUG("GameControlManager::GameControlManager: creating the singleton manager.");
 
 	mDrivers.clear();
 	mDriversParameterTable.clear();
@@ -45,7 +45,7 @@ ControlManager::ControlManager(PT(GraphicsWindow) win, int taskSort, const NodeP
 		mCTrav = new CollisionTraverser();
 		mCollisionHandler = new CollisionHandlerQueue();
 		mPickerRay = new CollisionRay();
-		PT(CollisionNode)pickerNode = new CollisionNode(string("ControlManager::pickerNode"));
+		PT(CollisionNode)pickerNode = new CollisionNode(string("GameControlManager::pickerNode"));
 		pickerNode->add_solid(mPickerRay);
 		pickerNode->set_from_collide_mask(mMask);
 		pickerNode->set_into_collide_mask(BitMask32::all_off());
@@ -57,9 +57,9 @@ ControlManager::ControlManager(PT(GraphicsWindow) win, int taskSort, const NodeP
 /**
  *
  */
-ControlManager::~ControlManager()
+GameControlManager::~GameControlManager()
 {
-	PRINT_DEBUG("ControlManager::~ControlManager: destroying the singleton manager.");
+	PRINT_DEBUG("GameControlManager::~GameControlManager: destroying the singleton manager.");
 
 	//stop any default update
 	stop_default_update();
@@ -98,7 +98,7 @@ ControlManager::~ControlManager()
  * Returns a NodePath to the new P3Driver,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath ControlManager::create_driver(const string& name)
+NodePath GameControlManager::create_driver(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
@@ -124,7 +124,7 @@ NodePath ControlManager::create_driver(const string& name)
  * Destroys a P3Driver.
  * Returns false on error.
  */
-bool ControlManager::destroy_driver(NodePath driverNP)
+bool GameControlManager::destroy_driver(NodePath driverNP)
 {
 	CONTINUE_IF_ELSE_R(
 			driverNP.node()->is_of_type(P3Driver::get_class_type()),
@@ -148,7 +148,7 @@ bool ControlManager::destroy_driver(NodePath driverNP)
 /**
  * Gets an P3Driver by index, or NULL on error.
  */
-PT(P3Driver) ControlManager::get_driver(int index) const
+PT(P3Driver) GameControlManager::get_driver(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mDrivers.size()),
 			NULL)
@@ -161,7 +161,7 @@ PT(P3Driver) ControlManager::get_driver(int index) const
  * Returns a NodePath to the new P3Chaser,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath ControlManager::create_chaser(const string& name)
+NodePath GameControlManager::create_chaser(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
@@ -187,7 +187,7 @@ NodePath ControlManager::create_chaser(const string& name)
  * Destroys a P3Chaser.
  * Returns false on error.
  */
-bool ControlManager::destroy_chaser(NodePath chaserNP)
+bool GameControlManager::destroy_chaser(NodePath chaserNP)
 {
 	CONTINUE_IF_ELSE_R(
 			chaserNP.node()->is_of_type(P3Chaser::get_class_type()),
@@ -211,7 +211,7 @@ bool ControlManager::destroy_chaser(NodePath chaserNP)
 /**
  * Gets an P3Chaser by index, or NULL on error.
  */
-PT(P3Chaser) ControlManager::get_chaser(int index) const
+PT(P3Chaser) GameControlManager::get_chaser(int index) const
 {
 	nassertr_always((index >= 0) && (index < (int ) mChasers.size()),
 			NULL)
@@ -222,7 +222,7 @@ PT(P3Chaser) ControlManager::get_chaser(int index) const
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
  */
-void ControlManager::set_parameter_values(ControlType type, const string& paramName,
+void GameControlManager::set_parameter_values(ControlType type, const string& paramName,
 		const ValueList<string>& paramValues)
 {
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
@@ -260,7 +260,7 @@ void ControlManager::set_parameter_values(ControlType type, const string& paramN
 /**
  * Gets the multiple values of a (actually set) parameter.
  */
-ValueList<string> ControlManager::get_parameter_values(ControlType type,
+ValueList<string> GameControlManager::get_parameter_values(ControlType type,
 		const string& paramName) const
 {
 	ValueList<string> strList;
@@ -298,7 +298,7 @@ ValueList<string> ControlManager::get_parameter_values(ControlType type,
 /**
  * Sets a multi/single-valued parameter to a single value overwriting the existing one(s).
  */
-void ControlManager::set_parameter_value(ControlType type, const string& paramName,
+void GameControlManager::set_parameter_value(ControlType type, const string& paramName,
 		const string& value)
 {
 	ValueList<string> valueList;
@@ -309,7 +309,7 @@ void ControlManager::set_parameter_value(ControlType type, const string& paramNa
 /**
  * Gets a single value (i.e. the first one) of a parameter.
  */
-string ControlManager::get_parameter_value(ControlType type,
+string GameControlManager::get_parameter_value(ControlType type,
 		const string& paramName) const
 {
 	ValueList<string> valueList = get_parameter_values(type, paramName);
@@ -319,7 +319,7 @@ string ControlManager::get_parameter_value(ControlType type,
 /**
  * Gets a list of the names of the parameters actually set.
  */
-ValueList<string> ControlManager::get_parameter_name_list(ControlType type) const
+ValueList<string> GameControlManager::get_parameter_name_list(ControlType type) const
 {
 	ValueList<string> strList;
 	ParameterTableIter iter;
@@ -360,7 +360,7 @@ ValueList<string> ControlManager::get_parameter_name_list(ControlType type) cons
  * \note: After reading objects from bam files, the objects' creation parameters
  * which reside in the manager, are reset to their default values.
  */
-void ControlManager::set_parameters_defaults(ControlType type)
+void GameControlManager::set_parameters_defaults(ControlType type)
 {
 	if (type == DRIVER)
 	{
@@ -427,7 +427,7 @@ void ControlManager::set_parameters_defaults(ControlType type)
  *
  * Will be called automatically in a task.
  */
-AsyncTask::DoneStatus ControlManager::update(GenericAsyncTask* task)
+AsyncTask::DoneStatus GameControlManager::update(GenericAsyncTask* task)
 {
 	float dt = ClockObject::get_global_clock()->get_dt();
 
@@ -455,13 +455,13 @@ AsyncTask::DoneStatus ControlManager::update(GenericAsyncTask* task)
 /**
  * Adds a task to repeatedly call control updates.
  */
-void ControlManager::start_default_update()
+void GameControlManager::start_default_update()
 {
 	//create the task for updating AI objects
-	mUpdateData = new TaskInterface<ControlManager>::TaskData(this,
-			&ControlManager::update);
-	mUpdateTask = new GenericAsyncTask(string("ControlManager::update"),
-			&TaskInterface<ControlManager>::taskFunction,
+	mUpdateData = new TaskInterface<GameControlManager>::TaskData(this,
+			&GameControlManager::update);
+	mUpdateTask = new GenericAsyncTask(string("GameControlManager::update"),
+			&TaskInterface<GameControlManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
 	mUpdateTask->set_sort(mTaskSort);
 	//Adds mUpdateTask to the active queue.
@@ -471,7 +471,7 @@ void ControlManager::start_default_update()
 /**
  * Removes a task to repeatedly call control updates.
  */
-void ControlManager::stop_default_update()
+void GameControlManager::stop_default_update()
 {
 	if (mUpdateTask)
 	{
@@ -490,7 +490,7 @@ void ControlManager::stop_default_update()
  * - modelCenter + modelDeltaCenter = origin of coordinate system
  * - modelRadius = radius of the containing sphere
  */
-float ControlManager::get_bounding_dimensions(NodePath modelNP,
+float GameControlManager::get_bounding_dimensions(NodePath modelNP,
 		LVecBase3f& modelDims, LVector3f& modelDeltaCenter) const
 {
 	//get "tight" dimensions of model
@@ -514,7 +514,7 @@ float ControlManager::get_bounding_dimensions(NodePath modelNP,
  * with height equal to the z-value of the first one.
  * If collisions are not found returns a Pair<bool,float> == (false, 0.0).
  */
-Pair<bool,float> ControlManager::get_collision_height(const LPoint3f& rayOrigin,
+Pair<bool,float> GameControlManager::get_collision_height(const LPoint3f& rayOrigin,
 		const NodePath& space) const
 {
 	//traverse downward starting at rayOrigin
@@ -538,7 +538,7 @@ Pair<bool,float> ControlManager::get_collision_height(const LPoint3f& rayOrigin,
  * Writes to a bam file the entire collections of control objects and related
  * geometries (i.e. models' NodePaths)
  */
-bool ControlManager::write_to_bam_file(const string& fileName)
+bool GameControlManager::write_to_bam_file(const string& fileName)
 {
 	string errorReport;
 	// write to bam file
@@ -579,7 +579,7 @@ bool ControlManager::write_to_bam_file(const string& fileName)
  * Reads from a bam file the entire hierarchy of control objects and related
  * geometries (i.e. models' NodePaths)
  */
-bool ControlManager::read_from_bam_file(const string& fileName)
+bool GameControlManager::read_from_bam_file(const string& fileName)
 {
 	string errorReport;
 	//read from bamFile
@@ -629,4 +629,4 @@ bool ControlManager::read_from_bam_file(const string& fileName)
 }
 
 //TypedObject semantics: hardcoded
-TypeHandle ControlManager::_type_handle;
+TypeHandle GameControlManager::_type_handle;

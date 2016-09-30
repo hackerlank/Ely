@@ -1,19 +1,19 @@
 /**
- * \file aiManager.I
+ * \file gameAIManager.I
  *
  * \date 2016-09-17
  * \author consultit
  */
 
-#ifndef AIMANGER_I_
-#define AIMANGER_I_
+#ifndef GAMEAIMANAGER_I_
+#define GAMEAIMANAGER_I_
 
-///AIManager inline definitions
+///GameAIManager inline definitions
 
 /**
  * Returns the reference NodePath.
  */
-INLINE NodePath AIManager::get_reference_node_path() const
+INLINE NodePath GameAIManager::get_reference_node_path() const
 {
 	return mReferenceNP;
 }
@@ -22,7 +22,7 @@ INLINE NodePath AIManager::get_reference_node_path() const
  * Sets the reference NodePath.
  * This is usually called after restoring from a bam file.
  */
-INLINE void AIManager::set_reference_node_path(const NodePath& reference)
+INLINE void GameAIManager::set_reference_node_path(const NodePath& reference)
 {
 	mReferenceNP = reference;
 }
@@ -31,7 +31,7 @@ INLINE void AIManager::set_reference_node_path(const NodePath& reference)
  * Returns the reference NodePath for debug drawing.
  * This node should be made sibling of the reference NodePath in the scene.
  */
-INLINE NodePath AIManager::get_reference_node_path_debug() const
+INLINE NodePath GameAIManager::get_reference_node_path_debug() const
 {
 	return mReferenceDebugNP;
 }
@@ -41,7 +41,7 @@ INLINE NodePath AIManager::get_reference_node_path_debug() const
  * This node should be a descendant of a 2D top NodePath of the scene graph (ie
  * aspect2d, render2d, pixel2d).
  */
-INLINE NodePath AIManager::get_reference_node_path_debug_2d() const
+INLINE NodePath GameAIManager::get_reference_node_path_debug_2d() const
 {
 	return mReferenceDebug2DNP;
 }
@@ -49,7 +49,7 @@ INLINE NodePath AIManager::get_reference_node_path_debug_2d() const
 /**
  * Returns the number of OSSteerPlugIns.
  */
-INLINE int AIManager::get_num_steer_plug_ins() const
+INLINE int GameAIManager::get_num_steer_plug_ins() const
 {
 	return (int) mSteerPlugIns.size();
 }
@@ -57,7 +57,7 @@ INLINE int AIManager::get_num_steer_plug_ins() const
 /**
  * Returns the number of OSSteerVehicles.
  */
-INLINE int AIManager::get_num_steer_vehicles() const
+INLINE int GameAIManager::get_num_steer_vehicles() const
 {
 	return (int) mSteerVehicles.size();
 }
@@ -65,7 +65,7 @@ INLINE int AIManager::get_num_steer_vehicles() const
 /**
  * Returns the number of RNNavMeshes.
  */
-INLINE int AIManager::get_num_nav_meshes() const
+INLINE int GameAIManager::get_num_nav_meshes() const
 {
 	return (int) mNavMeshes.size();
 }
@@ -73,7 +73,7 @@ INLINE int AIManager::get_num_nav_meshes() const
 /**
  * Returns the number of RNCrowdAgents.
  */
-INLINE int AIManager::get_num_crowd_agents() const
+INLINE int GameAIManager::get_num_crowd_agents() const
 {
 	return (int) mCrowdAgents.size();
 }
@@ -82,7 +82,7 @@ INLINE int AIManager::get_num_crowd_agents() const
  * Returns the obstacle's unique reference (>0) given its index into the list of
  * all defined obstacles, or a negative number on error.
  */
-INLINE int AIManager::get_obstacle(int index) const
+INLINE int GameAIManager::get_obstacle(int index) const
 {
 	pvector<ObstacleAttributes>& obstacleAttrs =
 			const_cast<GlobalObstacles&>(mObstacles).second();
@@ -95,7 +95,7 @@ INLINE int AIManager::get_obstacle(int index) const
 /**
  * Returns the number of all defined obstacles.
  */
-INLINE int AIManager::get_num_obstacles() const
+INLINE int GameAIManager::get_num_obstacles() const
 {
 	return (int) const_cast<GlobalObstacles&>(mObstacles).second().size();
 }
@@ -103,7 +103,7 @@ INLINE int AIManager::get_num_obstacles() const
 /**
  * Returns a reference to the storage of all obstacles.
  */
-inline AIManager::GlobalObstacles& AIManager::get_global_obstacles()
+inline GameAIManager::GlobalObstacles& GameAIManager::get_global_obstacles()
 {
 	return mObstacles;
 }
@@ -111,15 +111,15 @@ inline AIManager::GlobalObstacles& AIManager::get_global_obstacles()
 /**
  * Get singleton pointer.
  */
-INLINE AIManager* AIManager::get_global_ptr()
+INLINE GameAIManager* GameAIManager::get_global_ptr()
 {
-	return Singleton<AIManager>::GetSingletonPtr();
+	return Singleton<GameAIManager>::GetSingletonPtr();
 }
 
 /**
  * Get the collide mask.
  */
-INLINE CollideMask AIManager::get_collide_mask() const
+INLINE CollideMask GameAIManager::get_collide_mask() const
 {
 	return mMask;
 }
@@ -127,7 +127,7 @@ INLINE CollideMask AIManager::get_collide_mask() const
 /**
  * Get the collision root.
  */
-INLINE NodePath AIManager::get_collision_root() const
+INLINE NodePath GameAIManager::get_collision_root() const
 {
 	return mRoot;
 }
@@ -135,7 +135,7 @@ INLINE NodePath AIManager::get_collision_root() const
 /**
  * Get the collision traverser.
  */
-INLINE CollisionTraverser* AIManager::get_collision_traverser() const
+INLINE CollisionTraverser* GameAIManager::get_collision_traverser() const
 {
 	return mCTrav;
 }
@@ -143,7 +143,7 @@ INLINE CollisionTraverser* AIManager::get_collision_traverser() const
 /**
  * Get the collision handler.
  */
-INLINE CollisionHandlerQueue* AIManager::get_collision_handler() const
+INLINE CollisionHandlerQueue* GameAIManager::get_collision_handler() const
 {
 	return mCollisionHandler;
 }
@@ -151,7 +151,7 @@ INLINE CollisionHandlerQueue* AIManager::get_collision_handler() const
 /**
  * Get the collision ray.
  */
-INLINE CollisionRay* AIManager::get_collision_ray() const
+INLINE CollisionRay* GameAIManager::get_collision_ray() const
 {
 	return mPickerRay;
 }
@@ -159,9 +159,9 @@ INLINE CollisionRay* AIManager::get_collision_ray() const
 /**
  *
  */
-inline int AIManager::unique_ref()
+inline int GameAIManager::unique_ref()
 {
 	return ++mRef;
 }
 
-#endif /* AIMANGER_I_ */
+#endif /* GAMEAIMANAGER_I_ */

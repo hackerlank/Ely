@@ -39,7 +39,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a steer manager; set root and mask to manage 'kinematic' vehicles
-	WPT(AIManager)steerMgr = new AIManager(window->get_render(), mask);
+	WPT(GameAIManager)steerMgr = new GameAIManager(window->get_render(), mask);
 
 	// print creation parameters: defult values
 	cout << endl << "Default creation parameters:";
@@ -87,25 +87,25 @@ int main(int argc, char *argv[])
 	{
 		// valid bamFile
 		// restore plug-in: through steer manager
-		steerPlugIn = AIManager::get_global_ptr()->get_steer_plug_in(0);
+		steerPlugIn = GameAIManager::get_global_ptr()->get_steer_plug_in(0);
 		// restore sceneNP: through panda3d
 		sceneNP =
-				AIManager::get_global_ptr()->get_reference_node_path().find(
+				GameAIManager::get_global_ptr()->get_reference_node_path().find(
 						"**/SceneNP");
 		// reparent the reference node to render
-		AIManager::get_global_ptr()->get_reference_node_path().reparent_to(
+		GameAIManager::get_global_ptr()->get_reference_node_path().reparent_to(
 				window->get_render());
 
 		// restore steer vehicles
 		int NUMVEHICLES =
-				AIManager::get_global_ptr()->get_num_steer_vehicles();
+				GameAIManager::get_global_ptr()->get_num_steer_vehicles();
 		steerVehicles.resize(NUMVEHICLES);
 		vehicleAnimCtls.resize(NUMVEHICLES);
 		for (int i = 0; i < NUMVEHICLES; ++i)
 		{
 			// restore the steer vehicle: through steer manager
 			steerVehicles[i] =
-					AIManager::get_global_ptr()->get_steer_vehicle(i);
+					GameAIManager::get_global_ptr()->get_steer_vehicle(i);
 			// restore animations
 			AnimControlCollection tmpAnims;
 			auto_bind(steerVehicles[i], tmpAnims);
@@ -203,23 +203,23 @@ int main(int argc, char *argv[])
 // set parameters as strings before plug-ins/vehicles creation
 void setParametersBeforeCreation()
 {
-	AIManager* steerMgr = AIManager::get_global_ptr();
+	GameAIManager* steerMgr = GameAIManager::get_global_ptr();
 	ValueList<string> valueList;
 	// set plug-in type
-	steerMgr->set_parameter_value(AIManager::STEERPLUGIN, "plugin_type",
+	steerMgr->set_parameter_value(GameAIManager::STEERPLUGIN, "plugin_type",
 			"pedestrian");
 
 	// set vehicle's type, mass, speed
-	steerMgr->set_parameter_value(AIManager::STEERVEHICLE, "vehicle_type",
+	steerMgr->set_parameter_value(GameAIManager::STEERVEHICLE, "vehicle_type",
 			"pedestrian");
-	steerMgr->set_parameter_value(AIManager::STEERVEHICLE, "mass", "2.0");
-	steerMgr->set_parameter_value(AIManager::STEERVEHICLE, "speed",
+	steerMgr->set_parameter_value(GameAIManager::STEERVEHICLE, "mass", "2.0");
+	steerMgr->set_parameter_value(GameAIManager::STEERVEHICLE, "speed",
 			"0.01");
 
 	// set vehicle throwing events
 	valueList.clear();
 	valueList.add_value("avoid_obstacle@avoid_obstacle@1.0:avoid_close_neighbor@avoid_close_neighbor@");
-	steerMgr->set_parameter_values(AIManager::STEERVEHICLE,
+	steerMgr->set_parameter_values(GameAIManager::STEERVEHICLE,
 			"thrown_events", valueList);
 	//
 	printCreationParameters();

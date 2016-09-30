@@ -10,7 +10,7 @@
 
 #include "control_includes.h"
 #include "controlTools.h"
-#include "controlManager.h"
+#include "gameControlManager.h"
 
 #ifndef CPPPARSER
 #endif //CPPPARSER
@@ -209,7 +209,7 @@ public:
 
 protected:
 	friend void unref_delete<P3Chaser>(P3Chaser*);
-	friend class ControlManager;
+	friend class GameControlManager;
 
 	P3Chaser(const string& name);
 	virtual ~P3Chaser();

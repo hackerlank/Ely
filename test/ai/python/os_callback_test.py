@@ -5,7 +5,7 @@ Created on Sep 10, 2016
 '''
 
 from panda3d.core import ClockObject
-from p3ai import AIManager
+from p3ai import GameAIManager
 #
 from common import startFramework, mask, loadPlane
 
@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # # here is room for your own code
     
     print("create a steer manager; set root and mask to manage 'kinematic' vehicles")
-    steerMgr = AIManager(app.render, mask)
+    steerMgr = GameAIManager(app.render, mask)
 
     print("reparent the reference node to render")
     steerMgr.get_reference_node_path().reparent_to(app.render)

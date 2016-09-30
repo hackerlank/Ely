@@ -12,7 +12,7 @@
 #include "osSteerPlugIn.h"
 
 #include "osSteerVehicle.h"
-#include "aiManager.h"
+#include "gameAIManager.h"
 #include "camera.h"
 #include "orthographicLens.h"
 #include "graphicsEngine.h"
@@ -68,7 +68,7 @@ void OSSteerPlugIn::set_plug_in_type(OSSteerPlugInType type)
 			&mLocalObstacles.first();
 	//(re)set the new OpenSteer plug-in's global obstacles reference
 	static_cast<ossup::PlugIn*>(mPlugIn)->obstacles =
-			&AIManager::get_global_ptr()->get_global_obstacles().first();
+			&GameAIManager::get_global_ptr()->get_global_obstacles().first();
 	//open the new OpenSteer plug-in
 	mPlugIn->open();
 }
@@ -79,17 +79,17 @@ void OSSteerPlugIn::set_plug_in_type(OSSteerPlugInType type)
  */
 void OSSteerPlugIn::do_initialize()
 {
-	WPT(AIManager)mTmpl = AIManager::get_global_ptr();
+	WPT(GameAIManager)mTmpl = GameAIManager::get_global_ptr();
 	//
 	//set OSSteerPlugIn parameters (store internally for future use)
 	//type
-	string mPlugInTypeParam = mTmpl->get_parameter_value(AIManager::STEERPLUGIN,
+	string mPlugInTypeParam = mTmpl->get_parameter_value(GameAIManager::STEERPLUGIN,
 			string("plugin_type"));
 	//pathway (will be used on setup())
-	string mPathwayParam = mTmpl->get_parameter_value(AIManager::STEERPLUGIN,
+	string mPathwayParam = mTmpl->get_parameter_value(GameAIManager::STEERPLUGIN,
 			string("pathway"));
 	//obstacles (will be used on setup())
-	plist<string> mObstacleListParam = mTmpl->get_parameter_values(AIManager::STEERPLUGIN,
+	plist<string> mObstacleListParam = mTmpl->get_parameter_values(GameAIManager::STEERPLUGIN,
 			string("obstacles"));
 	//
 	//create the steer plug in
@@ -373,8 +373,8 @@ void OSSteerPlugIn::do_finalize()
 	disable_debug_drawing();
 	//remove all local obstacles from the global
 	OpenSteer::ObstacleGroup::iterator iterLocal;
-	AIManager::GlobalObstacles& globalObstacles =
-			AIManager::get_global_ptr()->get_global_obstacles();
+	GameAIManager::GlobalObstacles& globalObstacles =
+			GameAIManager::get_global_ptr()->get_global_obstacles();
 	for (iterLocal = mLocalObstacles.first().begin();
 			iterLocal != mLocalObstacles.first().end(); ++iterLocal)
 	{
@@ -395,7 +395,7 @@ void OSSteerPlugIn::do_finalize()
 		//NOTE: the i-th obstacle has pointer and attributes placed into the
 		//i-th places of their respective lists.
 		unsigned int pointerIdx = iterO - globalObstacles.first().begin();
-		pvector<AIManager::ObstacleAttributes>::iterator iterA =
+		pvector<GameAIManager::ObstacleAttributes>::iterator iterA =
 				globalObstacles.second().begin() + pointerIdx;
 		/*for (iterA = globalObstacles.second().begin();
 				iterA != globalObstacles.second().end(); ++iterA)
@@ -475,7 +475,7 @@ int OSSteerPlugIn::add_steer_vehicle(NodePath steerVehicleNP)
 				LVector3f::forward());
 		up = mReferenceNP.get_relative_vector(steerVehicleNP, LVector3f::up());
 		//get steerVehicle dimensions
-		modelRadius = AIManager::get_global_ptr()->get_bounding_dimensions(
+		modelRadius = GameAIManager::get_global_ptr()->get_bounding_dimensions(
 				steerVehicleNP, modelDims, modelDeltaCenter);
 		//set orientation
 		steerVehicleNP.heads_up(pos + forward, up);
@@ -690,7 +690,7 @@ int OSSteerPlugIn::add_obstacle(NodePath& objectNP,
 	LVector3f modelDeltaCenter;
 	float modelRadius;
 	//compute new obstacle dimensions
-	modelRadius = AIManager::get_global_ptr()->get_bounding_dimensions(
+	modelRadius = GameAIManager::get_global_ptr()->get_bounding_dimensions(
 			objectNP, modelDims, modelDeltaCenter);
 	//correct obstacle's parameters
 	position = objectNP.get_pos();
@@ -770,8 +770,8 @@ int OSSteerPlugIn::do_add_obstacle(NodePath objectNP,
 	int ref = AI_ERROR;
 	if (obstacle)
 	{
-		AIManager::GlobalObstacles& globalObstacles =
-				AIManager::get_global_ptr()->get_global_obstacles();
+		GameAIManager::GlobalObstacles& globalObstacles =
+				GameAIManager::get_global_ptr()->get_global_obstacles();
 		nassertr_always(
 				globalObstacles.first().size()
 						== globalObstacles.second().size(), AI_ERROR)
@@ -788,13 +788,13 @@ int OSSteerPlugIn::do_add_obstacle(NodePath objectNP,
 		settings.set_height(height);
 		settings.set_depth(depth);
 		settings.set_radius(radius);
-		ref = AIManager::get_global_ptr()->unique_ref();
+		ref = GameAIManager::get_global_ptr()->unique_ref();
 		settings.set_ref(ref);
 		settings.set_obstacle(obstacle);
 		//2: add OpenSteer obstacle's pointer to global list
 		globalObstacles.first().push_back(obstacle);
 		//3: add obstacle's attributes to global list
-		AIManager::ObstacleAttributes obstacleAttrs(settings, objectNP);
+		GameAIManager::ObstacleAttributes obstacleAttrs(settings, objectNP);
 		globalObstacles.second().push_back(obstacleAttrs);
 		//4: add OpenSteer obstacle's pointer to local list
 		mLocalObstacles.first().push_back(obstacle);
@@ -826,10 +826,10 @@ NodePath OSSteerPlugIn::remove_obstacle(int ref)
 	NodePath resultNP = NodePath::fail();
 	//find in global obstacles
 	//get a reference to the global storage
-	AIManager::GlobalObstacles& globalObstacles =
-			AIManager::get_global_ptr()->get_global_obstacles();
+	GameAIManager::GlobalObstacles& globalObstacles =
+			GameAIManager::get_global_ptr()->get_global_obstacles();
 	//find the Obstacle's attributes with the given ref, if any
-	pvector<AIManager::ObstacleAttributes>::iterator iterA;
+	pvector<GameAIManager::ObstacleAttributes>::iterator iterA;
 	for (iterA = globalObstacles.second().begin();
 			iterA != globalObstacles.second().end(); ++iterA)
 	{
@@ -878,7 +878,7 @@ NodePath OSSteerPlugIn::remove_obstacle(int ref)
 		//NOTE: the i-th obstacle has pointer and attributes placed into the
 		//i-th places of their respective lists.
 		unsigned int pointerIdx = iterOL - mLocalObstacles.first().begin();
-		pvector<AIManager::ObstacleAttributes>::iterator iterAL =
+		pvector<GameAIManager::ObstacleAttributes>::iterator iterAL =
 				mLocalObstacles.second().begin() + pointerIdx;
 		mLocalObstacles.second().erase(iterAL);
 		//update static geometry if needed
@@ -1920,7 +1920,7 @@ void OSSteerPlugIn::debug_drawing_to_texture(const NodePath& scene,
 		//get scene dimensions
 		LVecBase3f sceneDims;
 		LVector3f sceneDeltaCenter;
-		AIManager::get_global_ptr()->get_bounding_dimensions(scene,
+		GameAIManager::get_global_ptr()->get_bounding_dimensions(scene,
 				sceneDims, sceneDeltaCenter);
 
 		mTextureRender2d = NodePath("rttRender2d");
@@ -1960,7 +1960,7 @@ void OSSteerPlugIn::debug_drawing_to_texture(const NodePath& scene,
 	mTextureTaskData = new TaskInterface<OSSteerPlugIn>::TaskData(this,
 			&OSSteerPlugIn::do_debug_draw_to_texture_task);
 	mTextureTask = new GenericAsyncTask(string("OSSteerPlugIn::do_debug_draw_to_texture_task"),
-			&TaskInterface<AIManager>::taskFunction,
+			&TaskInterface<GameAIManager>::taskFunction,
 	reinterpret_cast<void*>(mTextureTaskData.p()));
 	//Adds mDrawTextureTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mTextureTask);
@@ -2106,7 +2106,7 @@ void OSSteerPlugIn::write_datagram(BamWriter *manager, Datagram &dg)
 	///The "local" obstacles handled by this OSSteerPlugIn.
 	dg.add_uint32(mLocalObstacles.first().size());
 	{
-		pvector<AIManager::ObstacleAttributes>::iterator iter;
+		pvector<GameAIManager::ObstacleAttributes>::iterator iter;
 		for (iter = mLocalObstacles.second().begin();
 				iter != mLocalObstacles.second().end(); ++iter)
 		{
@@ -2195,7 +2195,7 @@ int OSSteerPlugIn::complete_pointers(TypedWritable **p_list, BamReader *manager)
 
 	///The "local" obstacles handled by this OSSteerPlugIn.
 	{
-		pvector<AIManager::ObstacleAttributes>::iterator iter;
+		pvector<GameAIManager::ObstacleAttributes>::iterator iter;
 		for (iter = mLocalObstacles.second().begin();
 				iter != mLocalObstacles.second().end(); ++iter)
 		{
@@ -2224,7 +2224,7 @@ void OSSteerPlugIn::finalize(BamReader *manager)
 			&mLocalObstacles.first();
 	//set the new OpenSteer plug-in's global obstacles reference
 	static_cast<ossup::PlugIn*>(mPlugIn)->obstacles =
-			&AIManager::get_global_ptr()->get_global_obstacles().first();
+			&GameAIManager::get_global_ptr()->get_global_obstacles().first();
 	//open the new OpenSteer plug-in
 	mPlugIn->open();
 	//2: add OpenSteer vehicles to the new OpenSteer plug-in's real update list
@@ -2249,12 +2249,12 @@ void OSSteerPlugIn::finalize(BamReader *manager)
 	}
 	//3: (re)add obstacles
 	//temporarily remove all ObstacleAttributes (if any)
-	pvector<AIManager::ObstacleAttributes> currentObstacleAttrs =
+	pvector<GameAIManager::ObstacleAttributes> currentObstacleAttrs =
 	mLocalObstacles.second();
 	mLocalObstacles.first().clear();
 	mLocalObstacles.second().clear();
 	{
-		pvector<AIManager::ObstacleAttributes>::iterator iter;
+		pvector<GameAIManager::ObstacleAttributes>::iterator iter;
 		for (iter = currentObstacleAttrs.begin(); iter != currentObstacleAttrs.end(); ++iter)
 		{
 			do_add_obstacle((*iter).second(),
@@ -2366,14 +2366,14 @@ bool OSSteerPlugIn::require_fully_complete() const
  */
 TypedWritable *OSSteerPlugIn::make_from_bam(const FactoryParams &params)
 {
-	// continue only if AIManager exists
-	CONTINUE_IF_ELSE_R(AIManager::get_global_ptr(), NULL)
+	// continue only if GameAIManager exists
+	CONTINUE_IF_ELSE_R(GameAIManager::get_global_ptr(), NULL)
 
 	// create a OSSteerPlugIn with default parameters' values: they'll be restored later
-	AIManager::get_global_ptr()->set_parameters_defaults(
-			AIManager::STEERPLUGIN);
+	GameAIManager::get_global_ptr()->set_parameters_defaults(
+			GameAIManager::STEERPLUGIN);
 	OSSteerPlugIn *node = DCAST(OSSteerPlugIn,
-			AIManager::get_global_ptr()->create_steer_plug_in().node());
+			GameAIManager::get_global_ptr()->create_steer_plug_in().node());
 
 	DatagramIterator scan;
 	BamReader *manager;

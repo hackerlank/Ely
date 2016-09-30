@@ -5,12 +5,12 @@
  * \author consultit
  */
 
-#ifndef P3DRIVER_H_
-#define P3DRIVER_H_
+#ifndef P3SOUND3D_H_
+#define P3SOUND3D_H_
 
 #include "audio_includes.h"
 #include "audioTools.h"
-#include "audioManager.h"
+#include "gameAudioManager.h"
 
 #ifndef CPPPARSER
 #endif //CPPPARSER
@@ -115,7 +115,7 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * \name DRIVER
+	 * \name SOUND3D
 	 */
 	///@{
 	bool enable();
@@ -246,7 +246,7 @@ public:
 
 protected:
 	friend void unref_delete<P3Sound3d>(P3Sound3d*);
-	friend class AudioManager;
+	friend class GameAudioManager;
 
 	P3Sound3d(const string& name);
 	virtual ~P3Sound3d();
@@ -376,4 +376,4 @@ INLINE ostream &operator << (ostream &out, const P3Sound3d & sound3d);
 ///inline
 #include "p3Sound3d.I"
 
-#endif /* P3DRIVER_H_ */
+#endif /* P3SOUND3D_H_ */

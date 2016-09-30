@@ -10,7 +10,7 @@
 #include <texturePool.h>
 #include <auto_bind.h>
 
-#include <controlManager.h>
+#include <gameControlManager.h>
 #include <p3Driver.h>
 #include <p3Chaser.h>
 
@@ -58,24 +58,24 @@ WPT(P3Chaser)pursuerChaser;
 // print creation parameters
 void printCreationParameters()
 {
-	ControlManager* controlMgr = ControlManager::get_global_ptr();
+	GameControlManager* controlMgr = GameControlManager::get_global_ptr();
 	//
 	ValueList<string> valueList = controlMgr->get_parameter_name_list(
-			ControlManager::DRIVER);
+			GameControlManager::DRIVER);
 	cout << endl << "P3Driver creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< controlMgr->get_parameter_value(ControlManager::DRIVER,
+				<< controlMgr->get_parameter_value(GameControlManager::DRIVER,
 						valueList[i]) << endl;
 	}
 	//
-	valueList = controlMgr->get_parameter_name_list(ControlManager::CHASER);
+	valueList = controlMgr->get_parameter_name_list(GameControlManager::CHASER);
 	cout << endl << "P3Chaser creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< controlMgr->get_parameter_value(ControlManager::CHASER,
+				<< controlMgr->get_parameter_value(GameControlManager::CHASER,
 						valueList[i]) << endl;
 	}
 }
@@ -83,42 +83,42 @@ void printCreationParameters()
 // set parameters as strings before drivers/chasers creation
 void setParametersBeforeCreation()
 {
-	ControlManager* controlMgr = ControlManager::get_global_ptr();
+	GameControlManager* controlMgr = GameControlManager::get_global_ptr();
 	// set driver's parameters
-	controlMgr->set_parameter_value(ControlManager::DRIVER, "max_angular_speed",
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_angular_speed",
 			"100.0");
-	controlMgr->set_parameter_value(ControlManager::DRIVER, "angular_accel",
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_accel",
 			"50.0");
-	controlMgr->set_parameter_value(ControlManager::DRIVER, "max_linear_speed",
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_linear_speed",
 			"8.0");
-	controlMgr->set_parameter_value(ControlManager::DRIVER, "linear_accel",
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_accel",
 			"1.0");
-	controlMgr->set_parameter_value(ControlManager::DRIVER, "linear_friction",
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_friction",
 			"0.5");
-	controlMgr->set_parameter_value(ControlManager::DRIVER, "angular_friction",
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_friction",
 			"5.0");
 	// set chaser's parameters
-	controlMgr->set_parameter_value(ControlManager::CHASER, "fixed_relative_position",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "fixed_relative_position",
 			"false");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "max_distance",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "max_distance",
 			"25.0");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "min_distance",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "min_distance",
 			"18.0");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "max_height",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "max_height",
 			"18.0");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "min_height",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "min_height",
 			"15.0");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "friction",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "friction",
 			"5.0");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "fixed_look_at",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "fixed_look_at",
 			"true");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "mouse_head",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "mouse_head",
 			"true");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "mouse_pitch",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "mouse_pitch",
 			"true");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "look_at_distance",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "look_at_distance",
 			"5.0");
-	controlMgr->set_parameter_value(ControlManager::CHASER, "look_at_height",
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "look_at_height",
 			"12.5");
 	//
 	printCreationParameters();
@@ -146,7 +146,7 @@ void startFramework(int argc, char *argv[], const string& msg)
 	/// typed object init; not needed if you build inside panda source tree
 	P3Driver::init_type();
 	P3Chaser::init_type();
-	ControlManager::init_type();
+	GameControlManager::init_type();
 	P3Driver::register_with_read_factory();
 	P3Chaser::register_with_read_factory();
 	///
@@ -157,19 +157,19 @@ void startFramework(int argc, char *argv[], const string& msg)
 // read scene from a file
 bool readFromBamFile(string fileName)
 {
-	return ControlManager::get_global_ptr()->read_from_bam_file(fileName);
+	return GameControlManager::get_global_ptr()->read_from_bam_file(fileName);
 }
 
 // write scene to a file (and exit)
 void writeToBamFileAndExit(const Event*, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-	ControlManager::get_global_ptr()->write_to_bam_file(fileName);
+	GameControlManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
 //	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
-	WPT(ControlManager)controlMgr = ControlManager::get_global_ptr();
+	WPT(GameControlManager)controlMgr = GameControlManager::get_global_ptr();
 	// destroy drivers
 	while (controlMgr->get_num_drivers() > 0)
 	{
@@ -187,7 +187,7 @@ void writeToBamFileAndExit(const Event*, void* data)
 ///		delete DCAST(P3Chaser, controlMgr->get_chaser(0).node()); //ERROR
 	}
 	// delete control manager
-	delete ControlManager::get_global_ptr();
+	delete GameControlManager::get_global_ptr();
 	// close the window framework
 	framework.close_framework();
 	//
@@ -291,7 +291,7 @@ void handlePlayerUpdate()
 	if (currentVelSize > 0.0)
 	{
 		// get control manager
-		WPT(ControlManager)controlMgr = ControlManager::get_global_ptr();
+		WPT(GameControlManager)controlMgr = GameControlManager::get_global_ptr();
 		// correct player's Z: set the collision ray origin wrt collision root
 		LPoint3f pOrig = controlMgr->get_collision_root().get_relative_point(
 				controlMgr->get_reference_node_path(), playerDriverNP.get_pos()) + playerHeightRayCast * 2.0;
@@ -430,7 +430,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a control manager; set root and mask to manage 'kinematic' players
-	WPT(ControlManager)controlMgr = new ControlManager(
+	WPT(GameControlManager)controlMgr = new GameControlManager(
 			framework.get_window(0)->get_graphics_window(), 10,
 			window->get_render(), mask);
 
@@ -485,19 +485,19 @@ int main(int argc, char *argv[])
 		// valid bamFile
 		// restore sceneNP: through panda3d
 		sceneNP =
-				ControlManager::get_global_ptr()->get_reference_node_path().find(
+				GameControlManager::get_global_ptr()->get_reference_node_path().find(
 						"**/SceneNP");
 		// reparent the reference node to render
-		ControlManager::get_global_ptr()->get_reference_node_path().reparent_to(
+		GameControlManager::get_global_ptr()->get_reference_node_path().reparent_to(
 				window->get_render());
 
 		// restore the player's reference
 		playerNP =
-				ControlManager::get_global_ptr()->get_reference_node_path().find(
+				GameControlManager::get_global_ptr()->get_reference_node_path().find(
 						"**/PlayerNP");
 
 		// restore driver: through control manager
-		playerDriver = ControlManager::get_global_ptr()->get_driver(0);
+		playerDriver = GameControlManager::get_global_ptr()->get_driver(0);
 		// restore animations
 		playerAnimCtls.resize(1);
 		AnimControlCollection tmpAnims;
@@ -509,7 +509,7 @@ int main(int argc, char *argv[])
 		}
 
 		// restore chaser: through control manager
-		pursuerChaser = ControlManager::get_global_ptr()->get_chaser(0);
+		pursuerChaser = GameControlManager::get_global_ptr()->get_chaser(0);
 		// restore animations
 		pursuerAnimCtls.resize(1);
 		tmpAnims.clear_anims();

@@ -5,8 +5,8 @@
  * \author consultit
  */
 
-#ifndef P3CHASER_I_
-#define P3CHASER_I_
+#ifndef P3LISTENER_I_
+#define P3LISTENER_I_
 
 
 ///P3Listener inline definitions
@@ -516,4 +516,4 @@ INLINE ostream &operator <<(ostream &out, const P3Listener& listener)
 	return out;
 }
 
-#endif /* P3CHASER_I_ */
+#endif /* P3LISTENER_I_ */

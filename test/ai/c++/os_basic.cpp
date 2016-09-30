@@ -14,7 +14,7 @@ int main(int argc, char *argv[])
 	/// here is room for your own code
 
 	cout << "create a steer manager; set root and mask to manage 'kinematic' vehicles" << endl;
-	WPT(AIManager)steerMgr = new AIManager(window->get_render(), mask);
+	WPT(GameAIManager)steerMgr = new GameAIManager(window->get_render(), mask);
 
 	cout << "reparent the reference node to render" << endl;
 	steerMgr->get_reference_node_path().reparent_to(window->get_render());
