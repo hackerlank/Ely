@@ -41,7 +41,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a steer manager; set root and mask to manage 'kinematic' vehicles
-	WPT(GameAIManager)steerMgr = new GameAIManager(window->get_render(), mask);
+	WPT(GameAIManager)steerMgr = new GameAIManager(0, window->get_render(), mask);
 
 	// print creation parameters: defult values
 	cout << endl << "Default creation parameters:";

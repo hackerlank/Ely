@@ -43,151 +43,58 @@ P3Sound3d::~P3Sound3d()
 void P3Sound3d::do_initialize()
 {
 	WPT(GameAudioManager)mTmpl = GameAudioManager::get_global_ptr();
-	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
-	mSignOfTranslation = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("inverted_translation"))
-			== string("true") ? -1 : 1);
-	mSignOfMouse = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("inverted_rotation"))
-			== string("true") ? -1 : 1);
-	//head limit: enabled@[limit]; limit >= 0.0
-	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("head_limit")), '@');
-	if (paramValuesStr.size() >= 2)
-	{
-		//enabled
-		mHeadLimitEnabled = (
-				paramValuesStr[0] == string("true") ? true : false);
-		float value;
-		//limit
-		value = STRTOF(paramValuesStr[1].c_str(), NULL);
-		value >= 0.0 ? mHLimit = value : mHLimit = -value;
-	}
-	//pitch limit: enabled@[limit]; limit >= 0.0
-	paramValuesStr = parseCompoundString(
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("pitch_limit")), '@');
-	if (paramValuesStr.size() >= 2)
-	{
-		//enabled
-		mPitchLimitEnabled = (
-				paramValuesStr[0] == string("true") ? true : false);
-		float value;
-		//limit
-		value = STRTOF(paramValuesStr[1].c_str(), NULL);
-		value >= 0.0 ? mPLimit = value : mPLimit = -value;
-	}
-	//mouse movement setting
-	mMouseEnabledH = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("mouse_head"))
-			== string("enabled") ? true : false);
-	mMouseEnabledP = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("mouse_pitch"))
-			== string("enabled") ? true : false);
-	//key events setting
-	//forward key
-	mForwardKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("forward"))
-			== string("disabled") ? false : true);
-	//backward key
-	mBackwardKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("backward"))
-			== string("disabled") ? false : true);
-	//up key
-	mUpKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("up")) == string("disabled") ?
-			false : true);
-	//down key
-	mDownKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("down")) == string("disabled") ?
-			false : true);
-	//strafeLeft key
-	mStrafeLeftKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("strafe_left"))
-			== string("disabled") ? false : true);
-	//strafeRight key
-	mStrafeRightKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("strafe_right"))
-			== string("disabled") ? false : true);
-	//headLeft key
-	mHeadLeftKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("head_left"))
-			== string("disabled") ? false : true);
-	//headRight key
-	mHeadRightKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("head_right"))
-			== string("disabled") ? false : true);
-	//pitchUp key
-	mPitchUpKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("pitch_up"))
-			== string("disabled") ? false : true);
-	//pitchDown key
-	mPitchDownKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("pitch_down"))
-			== string("disabled") ? false : true);
-	//mouseMove key: enabled/disabled
-	mMouseMoveKey = (
-			mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("mouse_move"))
-			== string("enabled") ? true : false);
+	//sound files
+	plist<string> mSoundFileListParam =
+			mTmpl->get_parameter_values(GameAudioManager::SOUND3D,
+					string("sound_files"));
 	//
-	float value, absValue;
-	//max linear speed (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("max_linear_speed")).c_str(),
-			NULL);
-	absValue = (value >= 0.0 ? value : -value);
-	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
-	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
-			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
-			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
-	//max angular speed (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("max_angular_speed")).c_str(),
-			NULL);
-	mMaxSpeedHP = (value >= 0.0 ? value : -value);
-	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
-	//linear accel (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("linear_accel")).c_str(), NULL);
-	absValue = (value >= 0.0 ? value : -value);
-	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
-	//angular accel (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("angular_accel")).c_str(),
-			NULL);
-	mAccelHP = (value >= 0.0 ? value : -value);
-	//reset actual speeds
-	mActualSpeedXYZ = LVector3f::zero();
-	mActualSpeedH = 0.0;
-	mActualSpeedP = 0.0;
-	//linear friction (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("linear_friction")).c_str(),
-			NULL);
-	mFrictionXYZ = (value >= 0.0 ? value : -value);
-	//angular friction (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("angular_friction")).c_str(),
-			NULL);
-	mFrictionHP = (value >= 0.0 ? value : -value);
-	//stop threshold ([0.0, 1.0])
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("stop_threshold")).c_str(),
-			NULL);
-	mStopThreshold =
-	(value >= 0.0 ? value - floor(value) : ceil(value) - value);
-	//fast factor (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("fast_factor")).c_str(),
-			NULL);
-	mFastFactor = (value >= 0.0 ? value : -value);
-	//sens x (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("sens_x")).c_str(),
-			NULL);
-	mSensX = (value >= 0.0 ? value : -value);
-	//sens_y (>=0)
-	value = STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D, string("sens_y")).c_str(),
-			NULL);
-	mSensY = (value >= 0.0 ? value : -value);
-	//
-	mCentX = mWin->get_properties().get_x_size() / 2;
-	mCentY = mWin->get_properties().get_y_size() / 2;
-	//enabling setting
-	if ((mTmpl->get_parameter_value(GameAudioManager::SOUND3D,
-			string("enabled")) == string("false") ? false : true))
+	//set sound files
+	plist<string>::iterator iter;
+	for (iter = mSoundFileListParam.begin(); iter != mSoundFileListParam.end();
+			++iter)
 	{
-		do_enable();
+		//any "sound_files" string is a "compound" one, i.e. could have the form:
+		// "sound_name1@sound_file1:sound_name2@sound_file2:...:sound_nameN@sound_fileN"
+		pvector<string> nameFilePairs = parseCompoundString(*iter, ':');
+		pvector<string>::const_iterator iterPair;
+		for (iterPair = nameFilePairs.begin();
+				iterPair != nameFilePairs.end(); ++iterPair)
+		{
+			//an empty sound_name@sound_file is ignored
+			if (not iterPair->empty())
+			{
+				//get sound name and sound file name
+				pvector<string> nameFilePair =
+				parseCompoundString(*iterPair, '@');
+				//check only if there is a pair
+				if (nameFilePair.size() == 2)
+				{
+					//sound name == nameFilePair[0]
+					//sound file name == nameFilePair[1]
+					PT(AudioSound) sound =
+					GameAudioManager::GetSingletonPtr()->
+					get_audio_manager()->get_sound(nameFilePair[1],
+							true).p();
+					if (not sound.is_null())
+					{
+						//an empty ("") sound name is allowed
+						mSounds[nameFilePair[0]] = sound;
+					}
+				}
+			}
+		}
 	}
+	//after getting initial sounds:
+	//min distance
+	set_min_distance(STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D,
+							string("min_distance")).c_str(), NULL));
+	//max distance
+	set_max_distance(STRTOF(mTmpl->get_parameter_value(GameAudioManager::SOUND3D,
+							string("max_distance")).c_str(), NULL));
+	//static flag
+	set_static(mTmpl->get_parameter_value(GameAudioManager::SOUND3D,
+					string("static")) == string("true") ? true : false);
+	//
 #ifdef PYTHON_BUILD
 	//Python callback
 	this->ref();
@@ -204,12 +111,16 @@ void P3Sound3d::do_initialize()
  */
 void P3Sound3d::do_finalize()
 {
-	//if enabled: disable
-	if (mEnabled)
+	//stops every playing sounds
+	SoundTable::iterator iter;
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
-		//actual disabling
-		do_disable();
+		if (iter->second->status() == AudioSound::PLAYING)
+		{
+			iter->second->stop();
+		}
 	}
+	//
 #ifdef PYTHON_BUILD
 	//Python callback
 	Py_DECREF(mSelf);
@@ -217,104 +128,157 @@ void P3Sound3d::do_finalize()
 	Py_XDECREF(mUpdateArgList);
 #endif //PYTHON_BUILD
 	do_reset();
-	//
-	return;
 }
 
 /**
- * Enables the P3Sound3d to perform its task (default: enabled).
+ * Adds dynamically a new AudioSound to this P3Sound3d by loading it from a
+ * file. Parameters are the sound's name and file name. Returns a negative
+ * number on error.
  */
-bool P3Sound3d::enable()
+int P3Sound3d::add_sound(const string& soundName, const string& fileName)
+{
+	int result = AUDIO_ERROR;
+	//get the sound from fileName
+	PT(AudioSound)sound =
+	GameAudioManager::GetSingletonPtr()->get_audio_manager()->get_sound(fileName,
+			true).p();
+	if (sound)
+	{
+		//add sound with soundName
+		mSounds[soundName] = sound;
+		//set current parameters
+		mSounds[soundName]->set_3d_min_distance(mMinDist);
+		mSounds[soundName]->set_3d_max_distance(mMaxDist);
+		if (mStatic)
+		{
+			mSounds[soundName]->set_3d_attributes(mPosition.get_x(),
+					mPosition.get_y(), mPosition.get_z(), 0.0, 0.0, 0.0);
+		}
+		//
+		result = AUDIO_SUCCESS;
+	}
+	//
+	return result;
+}
+
+/**
+ * Removes dynamically a sound from this P3Sound3d.
+ * Parameters are the sound's name. Returns a negative number on error.
+ */
+int P3Sound3d::remove_sound(const string& soundName)
+{
+	int result = AUDIO_ERROR;
+
+	//make mSounds modifications
+	size_t removed = mSounds.erase(soundName);
+	if (removed == 1)
+	{
+		// sound is removed
+		result = AUDIO_SUCCESS;
+	}
+	//
+	return result;
+}
+
+/**
+ * Sets the minimum distance of P3Sound3d's audio sounds (>=0.0).
+ * This is the distance (in units) that these sounds begin to fall off.
+ * Also affects the rate it falls off. Default is 3.28 (in feet, this is equal
+ * to 1.0 meter).
+ * Don't forget to change this when you change the DistanceFactor
+ * (through the AudioManager, ie GameAudioManager::get_audio_manager()).
+ */
+void P3Sound3d::set_min_distance(float dist)
+{
+	mMinDist = abs(dist);
+	SoundTable::iterator iter;
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
+	{
+		iter->second->set_3d_min_distance(mMinDist);
+	}
+}
+
+/**
+ * Sets the maximum distance of P3Sound3d's audio sounds (>=0.0).
+ * This is the maximum distance (in units) that these sounds stop falling off.
+ * The sounds do not stop at that point, they just don't get any quieter.
+ * You should rarely need to adjust this. Default is 32.8 (in feet, this is
+ * equal to 10.0 meters).
+ */
+void P3Sound3d::set_max_distance(float dist)
+{
+	mMaxDist = abs(dist);
+	SoundTable::iterator iter;
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
+	{
+		iter->second->set_3d_max_distance(mMaxDist);
+	}
+}
+
+/**
+ * Sets this P3Sound3d suitable for static objects.
+ */
+void P3Sound3d::set_static(bool enable)
 {
 	//if enabled return
-	RETURN_ON_COND(mEnabled, false)
+	RETURN_ON_COND(mStatic == enable,)
 
-	//actual enabling
-	do_enable();
-	//
-	return true;
-}
-
-/**
- * Enables actually the P3Sound3d.
- * \note Internal use only.
- */
-void P3Sound3d::do_enable()
-{
-	mEnabled = true;
-	// handle mouse if possible
-	if ((mMouseEnabledH || mMouseEnabledP) && (!mMouseMoveKey))
+	mStatic = enable;
+	//do actual set
+	if (mStatic)
 	{
-		//we want audio through mouse movements
-		//hide mouse cursor
-		WindowProperties props = mWin->get_properties();
-		props.set_cursor_hidden(true);
-		mWin->request_properties(props);
-		//reset mouse to start position
-		mWin->move_pointer(0, mCentX, mCentY);
-		// start handle mouse
-		mMouseHandled = true;
+		do_set_3d_static_attributes();
 	}
 }
 
 /**
- * Disables the P3Sound3d to perform its task (default: enabled).
+ * Returns the AudioSound given its name, or NULL on error.
  */
-bool P3Sound3d::disable()
+PT(AudioSound) P3Sound3d::get_sound_by_name(const string& soundName) const
 {
-	//if not enabled return
-	RETURN_ON_COND(! mEnabled, false)
-
-	//actual disabling
-	do_disable();
-	//
-	return true;
-}
-
-/**
- * Disables actually the P3Sound3d.
- * \note Internal use only.
- */
-void P3Sound3d::do_disable()
-{
-	mEnabled = false;
-	// don't handle mouse
-	WindowProperties props = mWin->get_properties();
-	//show mouse cursor if hidden
-	props.set_cursor_hidden(false);
-	mWin->request_properties(props);
-	// stop handle mouse
-	mMouseHandled = false;
-}
-
-/**
- * Make mouse handled if possible.
- * \note Internal use only.
- */
-void P3Sound3d::do_handle_mouse()
-{
-	// handle mouse if possible
-	if (mEnabled && (mMouseEnabledH || mMouseEnabledP) && (!mMouseMoveKey))
+	SoundTable::iterator iter = mSounds.find(soundName);
+	if (iter == mSounds.end())
 	{
-		//we want audio through mouse movements
-		//hide mouse cursor
-		WindowProperties props = mWin->get_properties();
-		props.set_cursor_hidden(true);
-		mWin->request_properties(props);
-		//reset mouse to start position
-		mWin->move_pointer(0, mCentX, mCentY);
-		// start handle mouse
-		mMouseHandled = true;
+		return NULL;
 	}
-	else
+	return iter->second;
+}
+
+/**
+ * Returns the AudioSound given its index, or NULL on error.
+ */
+PT(AudioSound) P3Sound3d::get_sound(int index) const
+{
+	SoundTable::iterator iter;
+	unsigned int idx;
+	for (idx = 0, iter = mSounds.begin(); idx < mSounds.size(); ++idx, ++iter)
 	{
-		// don't handle mouse
-		WindowProperties props = mWin->get_properties();
-		//show mouse cursor if hidden
-		props.set_cursor_hidden(false);
-		mWin->request_properties(props);
-		// stop handle mouse
-		mMouseHandled = false;
+		if (idx == (unsigned int) index)
+		{
+			break;
+		}
+	}
+	if (idx == mSounds.size())
+	{
+		return NULL;
+	}
+	return iter->second;
+}
+
+/**
+ * Actually sets position/velocity for static objects.
+ * Sets position/velocity for static objects. The position is that of this
+ * P3Sound3d with respect to reference node. Velocity is zero.
+ * \note Internal use only.
+ */
+void P3Sound3d::do_set_3d_static_attributes()
+{
+	mPosition = mThisNP.get_pos(mReferenceNP);
+	SoundTable::iterator iter;
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
+	{
+		iter->second->set_3d_attributes(mPosition.get_x(), mPosition.get_y(),
+				mPosition.get_z(), 0.0, 0.0, 0.0);
 	}
 }
 
@@ -323,341 +287,30 @@ void P3Sound3d::do_handle_mouse()
  */
 void P3Sound3d::update(float dt)
 {
-	RETURN_ON_COND(!mEnabled,)
+	RETURN_ON_COND(mStatic,)
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
 
-	//handle mouse
-	if (mMouseHandled)
+	//get the new position
+	//note on threading: this should be an atomic operation
+	LPoint3f newPosition = mThisNP.get_pos(mReferenceNP);
+	//get the velocity (mPosition holds the previous position)
+	LVector3f deltaPos = (newPosition - mPosition);
+	LVector3f velocity;
+	dt > 0.0 ? velocity = deltaPos / dt : velocity = LVector3f::zero();
+	//update sounds' velocity and position
+	SoundTable::iterator iter;
+	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
-		MouseData md = mWin->get_pointer(0);
-		float deltaX = md.get_x() - mCentX;
-		float deltaY = md.get_y() - mCentY;
-
-		if (mWin->move_pointer(0, mCentX, mCentY))
-		{
-			if (mMouseEnabledH && (deltaX != 0.0))
-			{
-				mThisNP.set_h(
-						mThisNP.get_h() - deltaX * mSensX * mSignOfMouse);
-			}
-			if (mMouseEnabledP && (deltaY != 0.0))
-			{
-				mThisNP.set_p(
-						mThisNP.get_p() - deltaY * mSensY * mSignOfMouse);
-			}
-		}
+		//note on threading: this should be an atomic operation
+		iter->second->set_3d_attributes(newPosition.get_x(),
+				newPosition.get_y(), newPosition.get_z(), velocity.get_x(),
+				velocity.get_y(), velocity.get_z());
 	}
-	//update position/orientation
-	mThisNP.set_y(mThisNP,
-			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
-	mThisNP.set_x(mThisNP,
-			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
-	mThisNP.set_z(mThisNP, mActualSpeedXYZ.get_z() * dt);
-	//head
-	if (mHeadLimitEnabled)
-	{
-		float head = mThisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
-		if (head > mHLimit)
-		{
-			head = mHLimit;
-		}
-		else if (head < -mHLimit)
-		{
-			head = -mHLimit;
-		}
-		mThisNP.set_h(head);
-	}
-	else
-	{
-		mThisNP.set_h(
-				mThisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
-	}
-	//pitch
-	if (mPitchLimitEnabled)
-	{
-		float pitch = mThisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
-		if (pitch > mPLimit)
-		{
-			pitch = mPLimit;
-		}
-		else if (pitch < -mPLimit)
-		{
-			pitch = -mPLimit;
-		}
-		mThisNP.set_p(pitch);
-	}
-	else
-	{
-		mThisNP.set_p(
-				mThisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
-	}
-
-	//update speeds
-	//y axis
-	if (mForward && (! mBackward))
-	{
-		if (mAccelXYZ.get_y() != 0.0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() - mAccelXYZ.get_y() * dt);
-			if (mActualSpeedXYZ.get_y() < -mMaxSpeedXYZ.get_y())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
-		}
-	}
-	else if (mBackward && (! mForward))
-	{
-		if (mAccelXYZ.get_y() != 0.0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() + mAccelXYZ.get_y() * dt);
-			if (mActualSpeedXYZ.get_y() > mMaxSpeedXYZ.get_y())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
-		}
-	}
-	else if (mActualSpeedXYZ.get_y() != 0.0)
-	{
-		if (mActualSpeedXYZ.get_y() * mActualSpeedXYZ.get_y()
-				< mMaxSpeedSquaredXYZ.get_y() * mStopThreshold)
-		{
-			//stop
-			mActualSpeedXYZ.set_y(0.0);
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedXYZ.set_y(
-					mActualSpeedXYZ.get_y() * (1.0 - min(mFrictionXYZ * dt, 1.0f)));
-		}
-	}
-	//x axis
-	if (mStrafeLeft && (! mStrafeRight))
-	{
-		if (mAccelXYZ.get_x() != 0.0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() + mAccelXYZ.get_x() * dt);
-			if (mActualSpeedXYZ.get_x() > mMaxSpeedXYZ.get_x())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
-		}
-	}
-	else if (mStrafeRight && (! mStrafeLeft))
-	{
-		if (mAccelXYZ.get_x() != 0.0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() - mAccelXYZ.get_x() * dt);
-			if (mActualSpeedXYZ.get_x() < -mMaxSpeedXYZ.get_x())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_x());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_y());
-		}
-	}
-	else if (mActualSpeedXYZ.get_x() != 0.0)
-	{
-		if (mActualSpeedXYZ.get_x() * mActualSpeedXYZ.get_x()
-				< mMaxSpeedSquaredXYZ.get_x() * mStopThreshold)
-		{
-			//stop
-			mActualSpeedXYZ.set_x(0.0);
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedXYZ.set_x(
-					mActualSpeedXYZ.get_x() * (1.0 - min(mFrictionXYZ * dt, 1.0f)));
-		}
-	}
-	//z axis
-	if (mUp && (! mDown))
-	{
-		if (mAccelXYZ.get_z() != 0.0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() + mAccelXYZ.get_z() * dt);
-			if (mActualSpeedXYZ.get_z() > mMaxSpeedXYZ.get_z())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
-		}
-	}
-	else if (mDown && (! mUp))
-	{
-		if (mAccelXYZ.get_z() != 0.0)
-		{
-			//accelerate
-			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() - mAccelXYZ.get_z() * dt);
-			if (mActualSpeedXYZ.get_z() < -mMaxSpeedXYZ.get_z())
-			{
-				//limit speed
-				mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
-		}
-	}
-	else if (mActualSpeedXYZ.get_z() != 0.0)
-	{
-		if (mActualSpeedXYZ.get_z() * mActualSpeedXYZ.get_z()
-				< mMaxSpeedSquaredXYZ.get_z() * mStopThreshold)
-		{
-			//stop
-			mActualSpeedXYZ.set_z(0.0);
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedXYZ.set_z(
-					mActualSpeedXYZ.get_z() * (1.0 - min(mFrictionXYZ * dt, 1.0f)));
-		}
-	}
-	//rotation h
-	if (mHeadLeft && (! mHeadRight))
-	{
-		if (mAccelHP != 0.0)
-		{
-			//accelerate
-			mActualSpeedH += mAccelHP * dt;
-			if (mActualSpeedH > mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedH = mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedH = mMaxSpeedHP;
-		}
-	}
-	else if (mHeadRight && (! mHeadLeft))
-	{
-		if (mAccelHP != 0.0)
-		{
-			//accelerate
-			mActualSpeedH -= mAccelHP * dt;
-			if (mActualSpeedH < -mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedH = -mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedH = -mMaxSpeedHP;
-		}
-	}
-	else if (mActualSpeedH != 0.0)
-	{
-		if (mActualSpeedH * mActualSpeedH < mMaxSpeedSquaredHP * mStopThreshold)
-		{
-			//stop
-			mActualSpeedH = 0.0;
-		}
-		else
-		{
-			//decelerate
-            mActualSpeedH = mActualSpeedH * (1.0 - min(mFrictionHP * dt, 1.0f));
-		}
-	}
-	//rotation p
-	if (mPitchUp && (! mPitchDown))
-	{
-		if (mAccelHP != 0.0)
-		{
-			//accelerate
-			mActualSpeedP += mAccelHP * dt;
-			if (mActualSpeedP > mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedP = mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedP = mMaxSpeedHP;
-		}
-	}
-	else if (mPitchDown && (! mPitchUp))
-	{
-		if (mAccelHP != 0.0)
-		{
-			//accelerate
-			mActualSpeedP -= mAccelHP * dt;
-			if (mActualSpeedP < -mMaxSpeedHP)
-			{
-				//limit speed
-				mActualSpeedP = -mMaxSpeedHP;
-			}
-		}
-		else
-		{
-			//kinematic
-			mActualSpeedP = -mMaxSpeedHP;
-		}
-	}
-	else if (mActualSpeedP != 0.0)
-	{
-		if (mActualSpeedP * mActualSpeedP < mMaxSpeedSquaredHP * mStopThreshold)
-		{
-			//stop
-			mActualSpeedP = 0.0;
-		}
-		else
-		{
-			//decelerate
-			mActualSpeedP = mActualSpeedP * (1.0 - min(mFrictionHP * dt, 1.0f));
-		}
-	}
+	//update current position
+	mPosition = newPosition;
 	//
 #ifdef PYTHON_BUILD
 	// execute python callback (if any)
@@ -754,63 +407,17 @@ void P3Sound3d::write_datagram(BamWriter *manager, Datagram &dg)
 	///Name of this P3Sound3d.
 	dg.add_string(get_name());
 
-	///Enable/disable flag.
-	dg.add_bool(mEnabled);
+	///Static flag.
+	dg.add_bool(mStatic);
 
-	///Key audios and effective keys.
-	///@{
-	dg.add_bool(mForward);
-	dg.add_bool(mBackward);
-	dg.add_bool(mStrafeLeft);
-	dg.add_bool(mStrafeRight);
-	dg.add_bool(mUp);
-	dg.add_bool(mDown);
-	dg.add_bool(mHeadLeft);
-	dg.add_bool(mHeadRight);
-	dg.add_bool(mPitchUp);
-	dg.add_bool(mPitchDown);
-	dg.add_bool(mForwardKey);
-	dg.add_bool(mBackwardKey);
-	dg.add_bool(mStrafeLeftKey);
-	dg.add_bool(mStrafeRightKey);
-	dg.add_bool(mUpKey);
-	dg.add_bool(mDownKey);
-	dg.add_bool(mHeadLeftKey);
-	dg.add_bool(mHeadRightKey);
-	dg.add_bool(mPitchUpKey);
-	dg.add_bool(mPitchDownKey);
-	dg.add_bool(mMouseMoveKey);
-	///@}
+	///The set of sounds attached to this component. xxx
+	SoundTable mSounds;
 
-	///Key audio values.
+	/// Sounds' characteristics.
 	///@{
-	dg.add_bool(mMouseEnabledH);
-	dg.add_bool(mMouseEnabledP);
-	dg.add_bool(mHeadLimitEnabled);
-	dg.add_bool(mPitchLimitEnabled);
-	dg.add_stdfloat(mHLimit);
-	dg.add_stdfloat(mPLimit);
-	dg.add_int8(mSignOfTranslation);
-	dg.add_int8(mSignOfMouse);
-	///@}
-
-	/// Sensitivity settings.
-	///@{
-	dg.add_stdfloat(mFastFactor);
-	mActualSpeedXYZ.write_datagram(dg);
-	mMaxSpeedXYZ.write_datagram(dg);
-	mMaxSpeedSquaredXYZ.write_datagram(dg);
-	dg.add_stdfloat(mActualSpeedH);
-	dg.add_stdfloat(mActualSpeedP);
-	dg.add_stdfloat(mMaxSpeedHP);
-	dg.add_stdfloat(mMaxSpeedSquaredHP);
-	mAccelXYZ.write_datagram(dg);
-	dg.add_stdfloat(mAccelHP);
-	dg.add_stdfloat(mFrictionXYZ);
-	dg.add_stdfloat(mFrictionHP);
-	dg.add_stdfloat(mStopThreshold);
-	dg.add_stdfloat(mSensX);
-	dg.add_stdfloat(mSensY);
+	dg.add_stdfloat(mMinDist);
+	dg.add_stdfloat(mMaxDist);
+	mPosition.write_datagram(dg);
 	///@}
 
 	///The reference node path.
@@ -870,63 +477,17 @@ void P3Sound3d::fillin(DatagramIterator &scan, BamReader *manager)
 	///Name of this P3Sound3d.
 	set_name(scan.get_string());
 
-	///Enable/disable flag.
-	mEnabled = scan.get_bool();
+	///Static flag.
+	mStatic = scan.get_bool();
 
-	///Key audios and effective keys.
-	///@{
-	mForward = scan.get_bool();
-	mBackward = scan.get_bool();
-	mStrafeLeft = scan.get_bool();
-	mStrafeRight = scan.get_bool();
-	mUp = scan.get_bool();
-	mDown = scan.get_bool();
-	mHeadLeft = scan.get_bool();
-	mHeadRight = scan.get_bool();
-	mPitchUp = scan.get_bool();
-	mPitchDown = scan.get_bool();
-	mForwardKey = scan.get_bool();
-	mBackwardKey = scan.get_bool();
-	mStrafeLeftKey = scan.get_bool();
-	mStrafeRightKey = scan.get_bool();
-	mUpKey = scan.get_bool();
-	mDownKey = scan.get_bool();
-	mHeadLeftKey = scan.get_bool();
-	mHeadRightKey = scan.get_bool();
-	mPitchUpKey = scan.get_bool();
-	mPitchDownKey = scan.get_bool();
-	mMouseMoveKey = scan.get_bool();
-	///@}
+	///The set of sounds attached to this component. xxx
+	SoundTable mSounds;
 
-	///Key audio values.
+	/// Sounds' characteristics.
 	///@{
-	mMouseEnabledH = scan.get_bool();
-	mMouseEnabledP = scan.get_bool();
-	mHeadLimitEnabled = scan.get_bool();
-	mPitchLimitEnabled = scan.get_bool();
-	mHLimit = scan.get_stdfloat();
-	mPLimit = scan.get_stdfloat();
-	mSignOfTranslation = scan.get_int8();
-	mSignOfMouse = scan.get_int8();
-	///@}
-
-	/// Sensitivity settings.
-	///@{
-	mFastFactor = scan.get_stdfloat();
-	mActualSpeedXYZ.read_datagram(scan);
-	mMaxSpeedXYZ.read_datagram(scan);
-	mMaxSpeedSquaredXYZ.read_datagram(scan);
-	mActualSpeedH = scan.get_stdfloat();
-	mActualSpeedP = scan.get_stdfloat();
-	mMaxSpeedHP = scan.get_stdfloat();
-	mMaxSpeedSquaredHP = scan.get_stdfloat();
-	mAccelXYZ.read_datagram(scan);
-	mAccelHP = scan.get_stdfloat();
-	mFrictionXYZ = scan.get_stdfloat();
-	mFrictionHP = scan.get_stdfloat();
-	mStopThreshold = scan.get_stdfloat();
-	mSensX = scan.get_stdfloat();
-	mSensY = scan.get_stdfloat();
+	mMinDist = scan.get_stdfloat();
+	mMaxDist = scan.get_stdfloat();
+	mPosition.read_datagram(scan);
 	///@}
 
 	///The reference node path.

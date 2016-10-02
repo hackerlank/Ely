@@ -225,7 +225,7 @@ INLINE int RNNavMesh::get_num_crowd_agents() const
 }
 
 /**
- * Returns the RNCrowdAgent given its index.
+ * Returns the RNCrowdAgent given its index, or NULL on error.
  */
 INLINE PT(RNCrowdAgent) RNNavMesh::operator [](int index) const
 {

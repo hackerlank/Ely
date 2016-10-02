@@ -16,9 +16,8 @@
 /**
  *
  */
-GameAudioManager::GameAudioManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
+GameAudioManager::GameAudioManager(int taskSort, const NodePath& root,
 		const CollideMask& mask):
-		mWin(win),
 		mTaskSort(taskSort),
 		mReferenceNP(NodePath("ReferenceNode")),
 		mRoot(root),
@@ -39,6 +38,8 @@ GameAudioManager::GameAudioManager(PT(GraphicsWindow) win, int taskSort, const N
 	//
 	mUpdateData.clear();
 	mUpdateTask.clear();
+	//
+	mAudioMgr = AudioManager::create_AudioManager();
 	//
 	if (!mRoot.is_empty())
 	{
@@ -103,12 +104,10 @@ NodePath GameAudioManager::create_sound3d(const string& name)
 	nassertr_always(!name.empty(), NodePath::fail())
 
 	PT(P3Sound3d)newSound3d = new P3Sound3d(name);
-	nassertr_always(newSound3d && (!mWin.is_null()), NodePath::fail())
+	nassertr_always(newSound3d, NodePath::fail())
 
 	// set reference node
 	newSound3d->mReferenceNP = mReferenceNP;
-	// set the reference graphic window.
-	newSound3d->mWin = mWin;
 	// initialize the new Sound3d
 	newSound3d->do_initialize();
 
@@ -137,8 +136,6 @@ bool GameAudioManager::destroy_sound3d(NodePath sound3dNP)
 
 	// give a chance to P3Sound3d to cleanup itself before being destroyed.
 	sound3d->do_finalize();
-	// reset the reference graphic window.
-	sound3d->mWin.clear();
 	//remove the P3Sound3d from the inner list (and from the update task)
 	mSound3ds.erase(iter);
 	//
@@ -166,12 +163,10 @@ NodePath GameAudioManager::create_listener(const string& name)
 	nassertr_always(!name.empty(), NodePath::fail())
 
 	PT(P3Listener) newListener = new P3Listener(name);
-	nassertr_always(newListener && (!mWin.is_null()), NodePath::fail())
+	nassertr_always(newListener, NodePath::fail())
 
 	// set reference node
 	newListener->mReferenceNP = mReferenceNP;
-	// set the reference graphic window.
-	newListener->mWin = mWin;
 	// initialize the new Listener
 	newListener->do_initialize();
 
@@ -367,35 +362,11 @@ void GameAudioManager::set_parameters_defaults(AudioType type)
 		///mSound3dsParameterTable must be the first cleared
 		mSound3dsParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mSound3dsParameterTable.insert(ParameterNameValue("enabled", "true"));
-		mSound3dsParameterTable.insert(ParameterNameValue("forward", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("backward", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("head_left", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("head_right", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("up", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("down", "enabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
-		mSound3dsParameterTable.insert(ParameterNameValue("speed_key", "shift"));
-		mSound3dsParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
-		mSound3dsParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
-		mSound3dsParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
-		mSound3dsParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
-		mSound3dsParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
-		mSound3dsParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
-		mSound3dsParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
-		mSound3dsParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+		mSound3dsParameterTable.insert(ParameterNameValue("static", "false"));
+		mSound3dsParameterTable.insert(
+				ParameterNameValue("min_distance", "3.28"));
+		mSound3dsParameterTable.insert(
+				ParameterNameValue("max_distance", "32.8"));
 		return;
 	}
 	if (type == LISTENER)
@@ -447,6 +418,8 @@ AsyncTask::DoneStatus GameAudioManager::update(GenericAsyncTask* task)
 	{
 		mListeners[index]->update(dt);
 	}
+	//Update audio manager
+	mAudioMgr->update();
 	//
 	return AsyncTask::DS_cont;
 }

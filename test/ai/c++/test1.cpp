@@ -98,7 +98,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a nav mesh manager
-	WPT(GameAIManager)navMesMgr = new GameAIManager(window->get_render(), mask);
+	WPT(GameAIManager)navMesMgr = new GameAIManager(0, window->get_render(), mask);
 
 	// reparent the reference node to render
 	navMesMgr->get_reference_node_path().reparent_to(window->get_render());

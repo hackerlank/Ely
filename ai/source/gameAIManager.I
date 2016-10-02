@@ -109,7 +109,7 @@ inline GameAIManager::GlobalObstacles& GameAIManager::get_global_obstacles()
 }
 
 /**
- * Get singleton pointer.
+ * Returns the singleton pointer.
  */
 INLINE GameAIManager* GameAIManager::get_global_ptr()
 {
@@ -117,7 +117,7 @@ INLINE GameAIManager* GameAIManager::get_global_ptr()
 }
 
 /**
- * Get the collide mask.
+ * Returns the collide mask.
  */
 INLINE CollideMask GameAIManager::get_collide_mask() const
 {
@@ -125,7 +125,7 @@ INLINE CollideMask GameAIManager::get_collide_mask() const
 }
 
 /**
- * Get the collision root.
+ * Returns the collision root.
  */
 INLINE NodePath GameAIManager::get_collision_root() const
 {
@@ -133,7 +133,7 @@ INLINE NodePath GameAIManager::get_collision_root() const
 }
 
 /**
- * Get the collision traverser.
+ * Returns the collision traverser.
  */
 INLINE CollisionTraverser* GameAIManager::get_collision_traverser() const
 {
@@ -141,7 +141,7 @@ INLINE CollisionTraverser* GameAIManager::get_collision_traverser() const
 }
 
 /**
- * Get the collision handler.
+ * Returns the collision handler.
  */
 INLINE CollisionHandlerQueue* GameAIManager::get_collision_handler() const
 {
@@ -149,7 +149,7 @@ INLINE CollisionHandlerQueue* GameAIManager::get_collision_handler() const
 }
 
 /**
- * Get the collision ray.
+ * Returns the collision ray.
  */
 INLINE CollisionRay* GameAIManager::get_collision_ray() const
 {

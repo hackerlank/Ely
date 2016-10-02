@@ -38,7 +38,7 @@ INLINE int OSSteerPlugIn::get_num_steer_vehicles() const
 }
 
 /**
- * Returns the OSSteerVehicle given its index.
+ * Returns the OSSteerVehicle given its index, or NULL on error.
  */
 INLINE PT(OSSteerVehicle) OSSteerPlugIn::operator [](int index) const
 {

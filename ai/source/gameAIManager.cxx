@@ -17,8 +17,10 @@
 /**
  *
  */
-GameAIManager::GameAIManager(const NodePath& root, const CollideMask& mask):
+GameAIManager::GameAIManager(int taskSort, const NodePath& root,
+		const CollideMask& mask):
 		mReferenceNP(NodePath("ReferenceNode")),
+		mTaskSort(taskSort),
 		mRoot(root),
 		mMask(mask),
 		mCollisionHandler(NULL),
@@ -816,6 +818,7 @@ void GameAIManager::start_default_update()
 	mUpdateTask = new GenericAsyncTask(string("GameAIManager::update"),
 			&TaskInterface<GameAIManager>::taskFunction,
 			reinterpret_cast<void*>(mUpdateData.p()));
+	mUpdateTask->set_sort(mTaskSort);
 	//Adds mUpdateTask to the active queue.
 	AsyncTaskManager::get_global_ptr()->add(mUpdateTask);
 }

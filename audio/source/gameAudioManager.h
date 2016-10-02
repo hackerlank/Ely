@@ -9,6 +9,7 @@
 #define GAMEAUDIOMANGER_H_
 
 #include "graphicsWindow.h"
+#include "audioManager.h"
 #include "audio_includes.h"
 #include "audioTools.h"
 #include "collisionTraverser.h"
@@ -27,8 +28,7 @@ class EXPORT_CLASS GameAudioManager: public TypedReferenceCount,
 		public Singleton<GameAudioManager>
 {
 PUBLISHED:
-	GameAudioManager(PT(GraphicsWindow) win, int taskSort = 10,
-			const NodePath& root = NodePath(),
+	GameAudioManager(int taskSort = 0, const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~GameAudioManager();
 
@@ -100,6 +100,13 @@ PUBLISHED:
 	///@}
 
 	/**
+	 * \name AUDIO MANAGER
+	 */
+	///@{
+	INLINE PT(AudioManager) get_audio_manager() const;
+	///@}
+
+	/**
 	 * \name UTILITIES
 	 */
 	///@{
@@ -128,9 +135,9 @@ public:
 	inline int unique_ref();
 
 private:
-	///The reference graphic window. xxx
-	PT(GraphicsWindow) mWin;
-	///The update task sort (should be >0).
+	/// Audio manager.
+	PT(AudioManager) mAudioMgr;
+	///The update task sort (should be >=0).
 	int mTaskSort;
 
 	///The reference node path.

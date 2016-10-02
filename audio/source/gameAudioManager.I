@@ -28,7 +28,7 @@ INLINE void GameAudioManager::set_reference_node_path(const NodePath& reference)
 }
 
 /**
- * Returns the number of OSSound3ds.
+ * Returns the number of P3Sound3ds.
  */
 INLINE int GameAudioManager::get_num_sound3ds() const
 {
@@ -36,7 +36,7 @@ INLINE int GameAudioManager::get_num_sound3ds() const
 }
 
 /**
- * Returns the number of OSListeners.
+ * Returns the number of P3Listeners.
  */
 INLINE int GameAudioManager::get_num_listeners() const
 {
@@ -44,7 +44,7 @@ INLINE int GameAudioManager::get_num_listeners() const
 }
 
 /**
- * Get singleton pointer.
+ * Returns the singleton pointer.
  */
 INLINE GameAudioManager* GameAudioManager::get_global_ptr()
 {
@@ -52,7 +52,15 @@ INLINE GameAudioManager* GameAudioManager::get_global_ptr()
 }
 
 /**
- * Get the collide mask.
+ * Returns a reference to the AudioManager.
+ */
+INLINE PT(AudioManager) GameAudioManager::get_audio_manager() const
+{
+	return mAudioMgr;
+}
+
+/**
+ * Returns the collide mask.
  */
 INLINE CollideMask GameAudioManager::get_collide_mask() const
 {
@@ -60,7 +68,7 @@ INLINE CollideMask GameAudioManager::get_collide_mask() const
 }
 
 /**
- * Get the collision root.
+ * Returns the collision root.
  */
 INLINE NodePath GameAudioManager::get_collision_root() const
 {
@@ -68,7 +76,7 @@ INLINE NodePath GameAudioManager::get_collision_root() const
 }
 
 /**
- * Get the collision traverser.
+ * Returns the collision traverser.
  */
 INLINE CollisionTraverser* GameAudioManager::get_collision_traverser() const
 {
@@ -76,7 +84,7 @@ INLINE CollisionTraverser* GameAudioManager::get_collision_traverser() const
 }
 
 /**
- * Get the collision handler.
+ * Returns the collision handler.
  */
 INLINE CollisionHandlerQueue* GameAudioManager::get_collision_handler() const
 {
@@ -84,7 +92,7 @@ INLINE CollisionHandlerQueue* GameAudioManager::get_collision_handler() const
 }
 
 /**
- * Get the collision ray.
+ * Returns the collision ray.
  */
 INLINE CollisionRay* GameAudioManager::get_collision_ray() const
 {

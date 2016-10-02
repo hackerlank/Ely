@@ -105,7 +105,7 @@ int main(int argc, char *argv[])
 	textNodePath.set_scale(0.035);
 
 	// create a nav mesh manager; set root and mask to manage 'kinematic' agents
-	WPT(GameAIManager)navMesMgr = new GameAIManager(window->get_render(), mask);
+	WPT(GameAIManager)navMesMgr = new GameAIManager(0, window->get_render(), mask);
 
 	// print creation parameters: defult values
 	cout << endl << "Default creation parameters:";

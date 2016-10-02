@@ -28,7 +28,7 @@ INLINE void GameControlManager::set_reference_node_path(const NodePath& referenc
 }
 
 /**
- * Returns the number of OSDrivers.
+ * Returns the number of P3Drivers.
  */
 INLINE int GameControlManager::get_num_drivers() const
 {
@@ -36,7 +36,7 @@ INLINE int GameControlManager::get_num_drivers() const
 }
 
 /**
- * Returns the number of OSChasers.
+ * Returns the number of P3Chasers.
  */
 INLINE int GameControlManager::get_num_chasers() const
 {
@@ -44,7 +44,7 @@ INLINE int GameControlManager::get_num_chasers() const
 }
 
 /**
- * Get singleton pointer.
+ * Returns the singleton pointer.
  */
 INLINE GameControlManager* GameControlManager::get_global_ptr()
 {
@@ -52,7 +52,7 @@ INLINE GameControlManager* GameControlManager::get_global_ptr()
 }
 
 /**
- * Get the collide mask.
+ * Returns the collide mask.
  */
 INLINE CollideMask GameControlManager::get_collide_mask() const
 {
@@ -60,7 +60,7 @@ INLINE CollideMask GameControlManager::get_collide_mask() const
 }
 
 /**
- * Get the collision root.
+ * Returns the collision root.
  */
 INLINE NodePath GameControlManager::get_collision_root() const
 {
@@ -68,7 +68,7 @@ INLINE NodePath GameControlManager::get_collision_root() const
 }
 
 /**
- * Get the collision traverser.
+ * Returns the collision traverser.
  */
 INLINE CollisionTraverser* GameControlManager::get_collision_traverser() const
 {
@@ -76,7 +76,7 @@ INLINE CollisionTraverser* GameControlManager::get_collision_traverser() const
 }
 
 /**
- * Get the collision handler.
+ * Returns the collision handler.
  */
 INLINE CollisionHandlerQueue* GameControlManager::get_collision_handler() const
 {
@@ -84,7 +84,7 @@ INLINE CollisionHandlerQueue* GameControlManager::get_collision_handler() const
 }
 
 /**
- * Get the collision ray.
+ * Returns the collision ray.
  */
 INLINE CollisionRay* GameControlManager::get_collision_ray() const
 {

@@ -434,7 +434,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a nav mesh manager; set root and mask to manage 'kinematic' agents
-    navMesMgr = GameAIManager(app.render, mask)
+    navMesMgr = GameAIManager(0, app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")

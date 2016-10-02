@@ -111,7 +111,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
     
     # create a steer manager; set root and mask to manage 'kinematic' vehicles
-    steerMgr = GameAIManager(app.render, mask)
+    steerMgr = GameAIManager(0, app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")

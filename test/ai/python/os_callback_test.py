@@ -31,7 +31,7 @@ if __name__ == '__main__':
     # # here is room for your own code
     
     print("create a steer manager; set root and mask to manage 'kinematic' vehicles")
-    steerMgr = GameAIManager(app.render, mask)
+    steerMgr = GameAIManager(0, app.render, mask)
 
     print("reparent the reference node to render")
     steerMgr.get_reference_node_path().reparent_to(app.render)

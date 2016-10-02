@@ -425,7 +425,7 @@ if __name__ == '__main__':
     textNodePath.set_scale(0.035)
 
     # create a nav mesh manager
-    navMesMgr = GameAIManager(app.render, mask)
+    navMesMgr = GameAIManager(0, app.render, mask)
 
     # reparent the reference node to render
     navMesMgr.get_reference_node_path().reparent_to(app.render)

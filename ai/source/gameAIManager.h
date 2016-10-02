@@ -33,12 +33,12 @@ public:
 	typedef Pair<OpenSteer::ObstacleGroup, pvector<ObstacleAttributes> > GlobalObstacles;
 
 PUBLISHED:
-	GameAIManager(const NodePath& root = NodePath(),
+	GameAIManager(int taskSort = 0, const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~GameAIManager();
 
 	/**
-	 * \name REFERENCE NODES XXX
+	 * \name REFERENCE NODES
 	 */
 	///@{
 	INLINE NodePath get_reference_node_path() const;
@@ -223,6 +223,8 @@ public:
 private:
 	///The reference node path.
 	NodePath mReferenceNP;
+	///The update task sort (should be >=0).
+	int mTaskSort;
 
 	///List of OSSteerPlugIns handled by this manager.
 	typedef pvector<PT(OSSteerPlugIn)> SteerPlugInList;

@@ -51,7 +51,7 @@ int main(int argc, char *argv[])
 	///
 
 	cout << "create a nav mesh manager" << endl;
-	WPT(GameAIManager)navMesMgr = new GameAIManager(window->get_render());
+	WPT(GameAIManager)navMesMgr = new GameAIManager();
 
 	cout << "reparent the reference node to render" << endl;
 	navMesMgr->get_reference_node_path().reparent_to(window->get_render());
