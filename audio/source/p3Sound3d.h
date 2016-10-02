@@ -8,7 +8,6 @@
 #ifndef P3SOUND3D_H_
 #define P3SOUND3D_H_
 
-//#include "audioSound.h" xxx
 #include "audio_includes.h"
 #include "audioTools.h"
 #include "gameAudioManager.h"
@@ -41,8 +40,8 @@
 class EXPORT_CLASS P3Sound3d: public PandaNode
 {
 public:
-	///sound table xxx: add filenames for serialization.
-	typedef pmap<string, PT(AudioSound)> SoundTable;
+	///sound, sound file table
+	typedef pmap<string, pair<PT(AudioSound), string> > SoundTable;
 
 PUBLISHED:
 
@@ -137,7 +136,7 @@ private:
 	NodePath mReferenceNP;
 	///Static flag.
 	bool mStatic;
-	///The set of sounds attached to this component. xxx
+	///The set of sounds attached to this component.
 	SoundTable mSounds;
 	/// Sounds' characteristics.
 	///@{

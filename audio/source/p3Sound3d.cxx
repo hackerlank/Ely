@@ -78,7 +78,8 @@ void P3Sound3d::do_initialize()
 					if (not sound.is_null())
 					{
 						//an empty ("") sound name is allowed
-						mSounds[nameFilePair[0]] = sound;
+						mSounds[nameFilePair[0]] =
+								make_pair(sound, nameFilePair[1]);
 					}
 				}
 			}
@@ -115,9 +116,9 @@ void P3Sound3d::do_finalize()
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
-		if (iter->second->status() == AudioSound::PLAYING)
+		if (iter->second.first->status() == AudioSound::PLAYING)
 		{
-			iter->second->stop();
+			iter->second.first->stop();
 		}
 	}
 	//
@@ -145,13 +146,13 @@ int P3Sound3d::add_sound(const string& soundName, const string& fileName)
 	if (sound)
 	{
 		//add sound with soundName
-		mSounds[soundName] = sound;
+		mSounds[soundName] = make_pair(sound, fileName);
 		//set current parameters
-		mSounds[soundName]->set_3d_min_distance(mMinDist);
-		mSounds[soundName]->set_3d_max_distance(mMaxDist);
+		mSounds[soundName].first->set_3d_min_distance(mMinDist);
+		mSounds[soundName].first->set_3d_max_distance(mMaxDist);
 		if (mStatic)
 		{
-			mSounds[soundName]->set_3d_attributes(mPosition.get_x(),
+			mSounds[soundName].first->set_3d_attributes(mPosition.get_x(),
 					mPosition.get_y(), mPosition.get_z(), 0.0, 0.0, 0.0);
 		}
 		//
@@ -194,7 +195,7 @@ void P3Sound3d::set_min_distance(float dist)
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
-		iter->second->set_3d_min_distance(mMinDist);
+		iter->second.first->set_3d_min_distance(mMinDist);
 	}
 }
 
@@ -211,7 +212,7 @@ void P3Sound3d::set_max_distance(float dist)
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
-		iter->second->set_3d_max_distance(mMaxDist);
+		iter->second.first->set_3d_max_distance(mMaxDist);
 	}
 }
 
@@ -236,12 +237,12 @@ void P3Sound3d::set_static(bool enable)
  */
 PT(AudioSound) P3Sound3d::get_sound_by_name(const string& soundName) const
 {
-	SoundTable::iterator iter = mSounds.find(soundName);
+	SoundTable::const_iterator iter = mSounds.find(soundName);
 	if (iter == mSounds.end())
 	{
 		return NULL;
 	}
-	return iter->second;
+	return iter->second.first;
 }
 
 /**
@@ -249,7 +250,7 @@ PT(AudioSound) P3Sound3d::get_sound_by_name(const string& soundName) const
  */
 PT(AudioSound) P3Sound3d::get_sound(int index) const
 {
-	SoundTable::iterator iter;
+	SoundTable::const_iterator iter;
 	unsigned int idx;
 	for (idx = 0, iter = mSounds.begin(); idx < mSounds.size(); ++idx, ++iter)
 	{
@@ -262,7 +263,7 @@ PT(AudioSound) P3Sound3d::get_sound(int index) const
 	{
 		return NULL;
 	}
-	return iter->second;
+	return iter->second.first;
 }
 
 /**
@@ -277,8 +278,8 @@ void P3Sound3d::do_set_3d_static_attributes()
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
-		iter->second->set_3d_attributes(mPosition.get_x(), mPosition.get_y(),
-				mPosition.get_z(), 0.0, 0.0, 0.0);
+		iter->second.first->set_3d_attributes(mPosition.get_x(),
+				mPosition.get_y(), mPosition.get_z(), 0.0, 0.0, 0.0);
 	}
 }
 
@@ -305,7 +306,7 @@ void P3Sound3d::update(float dt)
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
 		//note on threading: this should be an atomic operation
-		iter->second->set_3d_attributes(newPosition.get_x(),
+		iter->second.first->set_3d_attributes(newPosition.get_x(),
 				newPosition.get_y(), newPosition.get_z(), velocity.get_x(),
 				velocity.get_y(), velocity.get_z());
 	}
