@@ -170,7 +170,7 @@ NodePath GameAIManager::create_steer_plug_in()
 	newSteerPlugIn->mReferenceNP = mReferenceNP;
 	newSteerPlugIn->mReferenceDebugNP = mReferenceDebugNP;
 	newSteerPlugIn->mReferenceDebug2DNP = mReferenceDebug2DNP;
-	// initialize the new SteerPlugIn
+	// initialize the new SteerPlugIn (could use mReferenceNP)
 	newSteerPlugIn->do_initialize();
 
 	// add the new SteerPlugIn to the inner list (and to the update task)
@@ -230,13 +230,13 @@ NodePath GameAIManager::create_steer_vehicle(const string& name)
 
 	// set reference node
 	newSteerVehicle->mReferenceNP = mReferenceNP;
-	//initialize the new SteerVehicle
+	// reparent to reference node and set "this" NodePath
+	newSteerVehicle->mThisNP = mReferenceNP.attach_new_node(newSteerVehicle);
+	//initialize the new SteerVehicle (could use mReferenceNP and mThisNP)
 	newSteerVehicle->do_initialize();
 
 	//add the new SteerVehicle to the inner list
 	mSteerVehicles.push_back(newSteerVehicle);
-	// reparent to reference node and set "this" NodePath
-	newSteerVehicle->mThisNP = mReferenceNP.attach_new_node(newSteerVehicle);
 	//
 	return newSteerVehicle->mThisNP;
 }
@@ -288,7 +288,7 @@ NodePath GameAIManager::create_nav_mesh()
 	// set reference nodes
 	newNavMesh->mReferenceNP = mReferenceNP;
 	newNavMesh->mReferenceDebugNP = mReferenceDebugNP;
-	// initialize the new NavMesh
+	// initialize the new NavMesh  (could use mReferenceNP)
 	newNavMesh->do_initialize();
 
 	// add the new NavMesh to the inner list (and to the update task)
@@ -347,13 +347,13 @@ NodePath GameAIManager::create_crowd_agent(const string& name)
 
 	// set reference node
 	newCrowdAgent->mReferenceNP = mReferenceNP;
-	//initialize the new CrowdAgent
+	// reparent to reference node and set "this" NodePath
+	newCrowdAgent->mThisNP = mReferenceNP.attach_new_node(newCrowdAgent);
+	// initialize the new CrowdAgent (could use mReferenceNP and mThisNP)
 	newCrowdAgent->do_initialize();
 
 	//add the new CrowdAgent to the inner list
 	mCrowdAgents.push_back(newCrowdAgent);
-	// reparent to reference node and set "this" NodePath
-	newCrowdAgent->mThisNP = mReferenceNP.attach_new_node(newCrowdAgent);
 	//
 	return newCrowdAgent->mThisNP;
 }
