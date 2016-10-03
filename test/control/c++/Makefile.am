@@ -25,8 +25,8 @@ EXTRA_DIST = data.cpp.in
 
 common_sources = \
 	data.cpp \
+	$(srcdir)/../../../common/source/commonTools.cxx \
 	$(srcdir)/../../../control/source/gameControlManager.cxx \
-	$(srcdir)/../../../control/source/controlTools.cxx \
 	$(srcdir)/../../../control/source/p3Driver.cxx \
 	$(srcdir)/../../../control/source/p3Chaser.cxx
 
@@ -57,4 +57,4 @@ control_gcov_SOURCES = \
 nodist_control_gprof_SOURCES = $(common_sources)
 nodist_control_gcov_SOURCES = $(common_sources)
 
-CLEANFILES = data.cpp *.gcno
+CLEANFILES = data.cpp *.boo *.gcno

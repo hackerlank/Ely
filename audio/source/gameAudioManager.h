@@ -8,10 +8,10 @@
 #ifndef GAMEAUDIOMANGER_H_
 #define GAMEAUDIOMANGER_H_
 
+#include "../../common/source/commonTools.h"
 #include "graphicsWindow.h"
 #include "audioManager.h"
 #include "audio_includes.h"
-#include "audioTools.h"
 #include "collisionTraverser.h"
 #include "collisionHandlerQueue.h"
 #include "collisionRay.h"

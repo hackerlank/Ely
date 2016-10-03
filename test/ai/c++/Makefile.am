@@ -213,4 +213,4 @@ soccer_gcov_SOURCES = \
 nodist_soccer_gprof_SOURCES = $(common_sources)
 nodist_soccer_gcov_SOURCES = $(common_sources)
 
-CLEANFILES = data.cpp
+CLEANFILES = data.cpp *.boo *.gcno

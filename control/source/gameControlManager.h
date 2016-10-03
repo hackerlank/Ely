@@ -8,9 +8,9 @@
 #ifndef GAMECONTROLMANGER_H_
 #define GAMECONTROLMANGER_H_
 
+#include "../../common/source/commonTools.h"
 #include "graphicsWindow.h"
 #include "control_includes.h"
-#include "controlTools.h"
 #include "collisionTraverser.h"
 #include "collisionHandlerQueue.h"
 #include "collisionRay.h"

@@ -27,12 +27,11 @@ EXTRA_DIST = data.cpp.in
 
 common_sources = \
 	data.cpp \
+	$(srcdir)/../../../common/source/commonTools.cxx \
 	$(srcdir)/../../../audio/source/gameAudioManager.cxx \
-	$(srcdir)/../../../audio/source/audioTools.cxx \
 	$(srcdir)/../../../audio/source/p3Sound3d.cxx \
 	$(srcdir)/../../../audio/source/p3Listener.cxx \
 	$(srcdir)/../../../control/source/gameControlManager.cxx \
-	$(srcdir)/../../../control/source/controlTools.cxx \
 	$(srcdir)/../../../control/source/p3Driver.cxx \
 	$(srcdir)/../../../control/source/p3Chaser.cxx	
 
@@ -63,4 +62,4 @@ audio_gcov_SOURCES = \
 nodist_audio_gprof_SOURCES = $(common_sources)
 nodist_audio_gcov_SOURCES = $(common_sources)
 
-CLEANFILES = data.cpp *.gcno
+CLEANFILES =  data.cpp *.boo *.gcno

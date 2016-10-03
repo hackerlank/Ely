@@ -9,10 +9,10 @@
 #define P3CHASER_H_
 
 #include "control_includes.h"
-#include "controlTools.h"
 #include "gameControlManager.h"
 
 #ifndef CPPPARSER
+#include "support/common.h"
 #endif //CPPPARSER
 
 /**

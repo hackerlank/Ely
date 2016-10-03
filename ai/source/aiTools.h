@@ -8,6 +8,9 @@
 #ifndef AITOOLS_H_
 #define AITOOLS_H_
 
+#include "pandabase.h"
+#include "lvector3.h"
+#include "lpoint3.h"
 #include "opensteer_includes.h"
 #include "recastnavigation_includes.h"
 

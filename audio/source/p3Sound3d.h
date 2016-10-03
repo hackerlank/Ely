@@ -9,10 +9,10 @@
 #define P3SOUND3D_H_
 
 #include "audio_includes.h"
-#include "audioTools.h"
 #include "gameAudioManager.h"
 
 #ifndef CPPPARSER
+#include "support/common.h"
 #endif //CPPPARSER
 
 /**
