@@ -844,7 +844,7 @@ void GameAIManager::stop_default_update()
 OSObstacleSettings GameAIManager::get_obstacle_settings(int ref) const
 {
 	OSObstacleSettings settings = OSObstacleSettings();
-	settings.set_ref(AI_ERROR);
+	settings.set_ref(RESULT_ERROR);
 	CONTINUE_IF_ELSE_R(ref > 0, settings)
 
 	// find settings by ref

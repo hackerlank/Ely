@@ -1,12 +1,14 @@
 /**
- * \file audioTools.h
+ * \file commonTools.h
  *
- * \date 2016-09-30
+ * \date 2016-10-03
  * \author consultit
  */
+#ifndef COMMONTOOLS_H_
+#define COMMONTOOLS_H_
 
-#ifndef AUDIOTOOLS_H_
-#define AUDIOTOOLS_H_
+#include "genericAsyncTask.h"
+#include "plist.h"
 
 #ifdef _WIN32
 #include <ciso646>
@@ -14,16 +16,6 @@
 #else
 #define STRTOF strtof
 #endif
-
-#include "audio_includes.h"
-#include "genericAsyncTask.h"
-#include "lpoint3.h"
-#include "plist.h"
-
-//
-#ifndef CPPPARSER
-#include "support/common.h"
-#endif //CPPPARSER
 
 //continue if condition is true else return a value
 #define CONTINUE_IF_ELSE_R(condition, return_value) \
@@ -366,10 +358,10 @@ private:
 };
 
 ///Result values
-#define AUDIO_SUCCESS 0
-#define AUDIO_ERROR -1
+#define RESULT_SUCCESS 0
+#define RESULT_ERROR -1
 
 ///inline
-#include "audioTools.I"
+#include "commonTools.I"
 
-#endif /* AUDIOTOOLS_H_ */
+#endif /* COMMONTOOLS_H_ */

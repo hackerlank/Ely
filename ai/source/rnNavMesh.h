@@ -9,6 +9,7 @@
 #define RNNAVMESH_H_
 
 #include "aiTools.h"
+#include "../../common/source/commonTools.h"
 #include "recastnavigation_includes.h"
 #include "nodePath.h"
 

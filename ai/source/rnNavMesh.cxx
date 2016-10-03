@@ -539,10 +539,10 @@ void RNNavMesh::do_initialize()
 int RNNavMesh::setup()
 {
 	// continue if nav mesh has not been setup yet
-	CONTINUE_IF_ELSE_R(!mNavMeshType, AI_SUCCESS)
+	CONTINUE_IF_ELSE_R(!mNavMeshType, RESULT_SUCCESS)
 
 	// continue if owner object not empty
-	CONTINUE_IF_ELSE_R(!mOwnerObject.is_empty(), AI_ERROR)
+	CONTINUE_IF_ELSE_R(!mOwnerObject.is_empty(), RESULT_ERROR)
 
 	set_name(mOwnerObject.get_name() + string("_RNNavMesh"));
 
@@ -562,7 +562,7 @@ int RNNavMesh::setup()
 		if (!do_load_model_mesh(mOwnerObject))
 		{
 			cleanup();
-			return AI_ERROR;
+			return RESULT_ERROR;
 		}
 	}
 	else
@@ -572,7 +572,7 @@ int RNNavMesh::setup()
 		if (!do_load_model_mesh(mOwnerObject, &mMeshLoader))
 		{
 			cleanup();
-			return AI_ERROR;
+			return RESULT_ERROR;
 		}
 	}
 
@@ -693,9 +693,9 @@ int RNNavMesh::setup()
 				centroid /= points.get_num_values();
 				//mConvexVolumes and mGeom::m_volumes have the same order
 				nassertr_always(mGeom->getConvexVolumeCount() - 1 == idx,
-						AI_ERROR)
+						RESULT_ERROR)
 				nassertr_always((iter - mConvexVolumes.begin()) == idx,
-						AI_ERROR)
+						RESULT_ERROR)
 				//
 				mConvexVolumes[idx].set_first(points);
 				mConvexVolumes[idx].second().set_centroid(centroid);
@@ -757,9 +757,9 @@ int RNNavMesh::setup()
 				pointPair.add_value(rnsup::RecastToLVecBase3f(&v[3]));
 				//mOffMeshConnections and mGeom's off mesh connections have the same order
 				nassertr_always(mGeom->getOffMeshConnectionCount() - 1 == idx,
-						AI_ERROR)
+						RESULT_ERROR)
 				nassertr_always((iter - mOffMeshConnections.begin()) == idx,
-						AI_ERROR)
+						RESULT_ERROR)
 
 				mOffMeshConnections[idx].set_first(pointPair);
 				// update hard coded parameters: rad, bidir, userId
@@ -864,7 +864,7 @@ int RNNavMesh::setup()
 	mDDUnsetup = NULL;
 #endif //ELY_DEBUG
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -898,7 +898,7 @@ int RNNavMesh::add_convex_volume(const ValueList<LPoint3f>& points,
 		int area)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 3), AI_ERROR)
+	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 3), RESULT_ERROR)
 
 	// add to convex volumes
 	// compute centroid
@@ -931,10 +931,10 @@ int RNNavMesh::add_convex_volume(const ValueList<LPoint3f>& points,
 int RNNavMesh::remove_convex_volume(const LPoint3f& insidePoint)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R(!mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(!mNavMeshType, RESULT_ERROR)
 
-	//set oldRef=AI_ERROR in case of error
-	int oldRef = AI_ERROR;
+	//set oldRef=RESULT_ERROR in case of error
+	int oldRef = RESULT_ERROR;
 	///HACK: use support functionality to remove convex volumes
 	//create fake InputGeom, NavMeshType and ConvexVolumeTool
 	rnsup::InputGeom* geom = new rnsup::InputGeom;
@@ -1000,7 +1000,7 @@ int RNNavMesh::do_get_convex_volume_from_point(const LPoint3f& insidePoint) cons
 	float hitPos[3];
 	rnsup::LVecBase3fToRecast(insidePoint, hitPos);
 	//check if a convex volume was hit (see: Delete case of ConvexVolumeTool::handleClick)
-	int convexVolumeID = AI_ERROR;
+	int convexVolumeID = RESULT_ERROR;
 	const rnsup::ConvexVolume* vols =
 			mNavMeshType->getInputGeom()->getConvexVolumes();
 	for (int i = 0; i < mNavMeshType->getInputGeom()->getConvexVolumeCount();
@@ -1072,7 +1072,7 @@ int RNNavMesh::do_find_convex_volume_polys(int convexVolumeID,
 	if (!(dtStatusSucceed(status)))
 	{
 		delete[] queryPoly;
-		return AI_ERROR;
+		return RESULT_ERROR;
 	}
 
 	dtPolyRef parent[MAX_POLYS];
@@ -1082,9 +1082,9 @@ int RNNavMesh::do_find_convex_volume_polys(int convexVolumeID,
 
 	delete[] queryPoly;
 
-	CONTINUE_IF_ELSE_R(dtStatusSucceed(status), AI_ERROR)
+	CONTINUE_IF_ELSE_R(dtStatusSucceed(status), RESULT_ERROR)
 
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -1104,7 +1104,7 @@ int RNNavMesh::set_convex_volume_settings(const LPoint3f& insidePoint,
 		const RNConvexVolumeSettings& settings, float reductionFactor)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	int convexVolumeID = do_get_convex_volume_from_point(insidePoint);
 
@@ -1118,8 +1118,8 @@ int RNNavMesh::set_convex_volume_settings(const LPoint3f& insidePoint,
 		dtStatus status, status2;
 
 		CONTINUE_IF_ELSE_R(
-				do_find_convex_volume_polys(convexVolumeID, filter, polys, npolys, MAX_POLYS, reductionFactor) == AI_SUCCESS,
-				AI_ERROR)
+				do_find_convex_volume_polys(convexVolumeID, filter, polys, npolys, MAX_POLYS, reductionFactor) == RESULT_SUCCESS,
+				RESULT_ERROR)
 
 		int area = (
 				settings.get_area() >= 0 ?
@@ -1196,7 +1196,7 @@ int RNNavMesh::set_convex_volume_settings(int ref,
 	ValueList<LPoint3f> points = get_convex_volume_by_ref(ref);
 
 	// continue if convex volume found
-	CONTINUE_IF_ELSE_R(points.size() > 0, AI_ERROR)
+	CONTINUE_IF_ELSE_R(points.size() > 0, RESULT_ERROR)
 
 	// set by point (centroid)
 	return set_convex_volume_settings(
@@ -1213,7 +1213,7 @@ RNConvexVolumeSettings RNNavMesh::get_convex_volume_settings(
 		const LPoint3f& insidePoint) const
 {
 	RNConvexVolumeSettings settings;
-	settings.set_ref(AI_ERROR);
+	settings.set_ref(RESULT_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1237,7 +1237,7 @@ RNConvexVolumeSettings RNNavMesh::get_convex_volume_settings(
 RNConvexVolumeSettings RNNavMesh::get_convex_volume_settings(int ref) const
 {
 	RNConvexVolumeSettings settings;
-	settings.set_ref(AI_ERROR);
+	settings.set_ref(RESULT_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1292,7 +1292,7 @@ int RNNavMesh::add_off_mesh_connection(const ValueList<LPoint3f>& points,
 		bool bidirectional)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 2), AI_ERROR)
+	CONTINUE_IF_ELSE_R((!mNavMeshType) && (points.size() >= 2), RESULT_ERROR)
 
 	// add to off mesh connections
 	RNOffMeshConnectionSettings settings;
@@ -1319,10 +1319,10 @@ int RNNavMesh::add_off_mesh_connection(const ValueList<LPoint3f>& points,
 int RNNavMesh::remove_off_mesh_connection(const LPoint3f& beginOrEndPoint)
 {
 	// continue if nav mesh has not been already setup
-	CONTINUE_IF_ELSE_R(!mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(!mNavMeshType, RESULT_ERROR)
 
-	//set oldRef=AI_ERROR in case of error
-	int oldRef = AI_ERROR;
+	//set oldRef=RESULT_ERROR in case of error
+	int oldRef = RESULT_ERROR;
 	///HACK: use support functionality to remove off mesh connections
 	//create fake InputGeom, NavMeshType and OffMeshConnectionTool
 	rnsup::InputGeom* geom = new rnsup::InputGeom;
@@ -1389,7 +1389,7 @@ int RNNavMesh::do_get_off_mesh_connection_from_point(
 	float hitPos[3];
 	rnsup::LVecBase3fToRecast(startEndPoint, hitPos);
 	//check if a off mesh connection was hit (see: Delete case of OffMeshConnectionTool::handleClick)
-	int offMeshConnectionID = AI_ERROR;
+	int offMeshConnectionID = RESULT_ERROR;
 	// Find nearest link end-point
 	float nearestDist = FLT_MAX;
 	int nearestIndex = -1;
@@ -1480,7 +1480,7 @@ int RNNavMesh::set_off_mesh_connection_settings(const LPoint3f& beginOrEndPoint,
 	const RNOffMeshConnectionSettings& settings)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	int offMeshConnectionID = do_get_off_mesh_connection_from_point(
 			beginOrEndPoint);
@@ -1540,7 +1540,7 @@ int RNNavMesh::set_off_mesh_connection_settings(int ref,
 	ValueList<LPoint3f> points = get_off_mesh_connection_by_ref(ref);
 
 	// continue if off mesh connection found
-	CONTINUE_IF_ELSE_R(points.size() > 0, AI_ERROR)
+	CONTINUE_IF_ELSE_R(points.size() > 0, RESULT_ERROR)
 
 	// set by start point
 	return set_off_mesh_connection_settings(points[0], settings);
@@ -1556,7 +1556,7 @@ RNOffMeshConnectionSettings RNNavMesh::get_off_mesh_connection_settings(
 	const LPoint3f& beginOrEndPoint) const
 {
 	RNOffMeshConnectionSettings settings;
-	settings.set_ref(AI_ERROR);
+	settings.set_ref(RESULT_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1583,7 +1583,7 @@ RNOffMeshConnectionSettings RNNavMesh::get_off_mesh_connection_settings(
 		int ref) const
 {
 	RNOffMeshConnectionSettings settings;
-	settings.set_ref(AI_ERROR);
+	settings.set_ref(RESULT_ERROR);
 
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, settings)
@@ -1675,7 +1675,7 @@ void RNNavMesh::do_finalize()
  */
 int RNNavMesh::cleanup()
 {
-	int result = AI_SUCCESS;
+	int result = RESULT_SUCCESS;
 	// continue if nav mesh has been already setup
 	CONTINUE_IF_ELSE_R(mNavMeshType, result)
 
@@ -1689,7 +1689,7 @@ int RNNavMesh::cleanup()
 			if (do_remove_obstacle_from_recast(iterO->second(),
 					iterO->first().get_ref()) < 0)
 			{
-				result = AI_ERROR;
+				result = RESULT_ERROR;
 			}
 		}
 	}
@@ -1751,7 +1751,7 @@ int RNNavMesh::cleanup()
 LVecBase2i RNNavMesh::get_tile_indexes(const LPoint3f& pos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, LVecBase2i(AI_ERROR, AI_ERROR))
+	CONTINUE_IF_ELSE_R(mNavMeshType, LVecBase2i(RESULT_ERROR, RESULT_ERROR))
 
 	int tx, ty;
 	float recastPos[3];
@@ -1778,7 +1778,7 @@ LVecBase2i RNNavMesh::get_tile_indexes(const LPoint3f& pos)
 int RNNavMesh::build_tile(const LPoint3f& pos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -1795,7 +1795,7 @@ int RNNavMesh::build_tile(const LPoint3f& pos)
 #endif //ELY_DEBUG
 	}
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -1806,7 +1806,7 @@ int RNNavMesh::build_tile(const LPoint3f& pos)
 int RNNavMesh::remove_tile(const LPoint3f& pos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -1823,7 +1823,7 @@ int RNNavMesh::remove_tile(const LPoint3f& pos)
 #endif //ELY_DEBUG
 	}
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -1834,7 +1834,7 @@ int RNNavMesh::remove_tile(const LPoint3f& pos)
 int RNNavMesh::build_all_tiles()
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -1847,7 +1847,7 @@ int RNNavMesh::build_all_tiles()
 #endif //ELY_DEBUG
 	}
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -1858,7 +1858,7 @@ int RNNavMesh::build_all_tiles()
 int RNNavMesh::remove_all_tiles()
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	if (mNavMeshTypeEnum == TILE)
 	{
@@ -1871,7 +1871,7 @@ int RNNavMesh::remove_all_tiles()
 #endif //ELY_DEBUG
 	}
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -1885,7 +1885,7 @@ int RNNavMesh::add_obstacle(NodePath objectNP)
 	// nav mesh type and mReferenceNP is not empty
 	CONTINUE_IF_ELSE_R(
 			(!objectNP.is_empty()) && (mNavMeshTypeEnum == OBSTACLE)
-					&& (! mReferenceNP.is_empty()), AI_ERROR)
+					&& (! mReferenceNP.is_empty()), RESULT_ERROR)
 
 	// return error if objectNP is already present
 	pvector<Obstacle>::iterator iterO;
@@ -1897,15 +1897,15 @@ int RNNavMesh::add_obstacle(NodePath objectNP)
 			break;
 		}
 	}
-	CONTINUE_IF_ELSE_R(iterO == mObstacles.end(), AI_ERROR)
+	CONTINUE_IF_ELSE_R(iterO == mObstacles.end(), RESULT_ERROR)
 
 	// insert obstacle with invalid ref: later will be corrected
 	RNObstacleSettings settings;
-	settings.set_ref(AI_ERROR);
+	settings.set_ref(RESULT_ERROR);
 	mObstacles.push_back(Obstacle(settings, objectNP));
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	// return the result of adding obstacle to recast
 	return do_add_obstacle_to_recast(objectNP, mObstacles.size() - 1);
@@ -1950,7 +1950,7 @@ int RNNavMesh::do_add_obstacle_to_recast(NodePath& objectNP, int index,
 	// continue if obstacle addition to tile cache is successful
 	CONTINUE_IF_ELSE_R(
 			tileCache->addObstacle(recastPos, modelRadius, modelDims.get_z(),
-					&obstacleRef) == DT_SUCCESS, AI_ERROR)
+					&obstacleRef) == DT_SUCCESS, RESULT_ERROR)
 
 	//update tiles cache: repeat for all the tiles touched
 	for (int c = 0; c < DT_MAX_TOUCHED_TILES; ++c)
@@ -1987,7 +1987,7 @@ int RNNavMesh::remove_obstacle(NodePath objectNP)
 	// nav mesh type and mReferenceNP is not empty
 	CONTINUE_IF_ELSE_R(
 			(!objectNP.is_empty()) && (mNavMeshTypeEnum == OBSTACLE)
-					&& (! mReferenceNP.is_empty()), AI_ERROR)
+					&& (! mReferenceNP.is_empty()), RESULT_ERROR)
 
 	// return error if objectNP is not yet present
 	pvector<Obstacle>::iterator iterO;
@@ -1999,14 +1999,14 @@ int RNNavMesh::remove_obstacle(NodePath objectNP)
 			break;
 		}
 	}
-	CONTINUE_IF_ELSE_R(iterO != mObstacles.end(), AI_ERROR)
+	CONTINUE_IF_ELSE_R(iterO != mObstacles.end(), RESULT_ERROR)
 
 	// remove obstacle: save ref for later removing from recast
 	int obstacleRef = iterO->first().get_ref();
 	mObstacles.erase(iterO);
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	// return the result of removing obstacle from recast
 	return do_remove_obstacle_from_recast(objectNP, obstacleRef);
@@ -2024,7 +2024,7 @@ int RNNavMesh::do_remove_obstacle_from_recast(NodePath& objectNP,
 	dtTileCache* tileCache =
 			static_cast<rnsup::NavMeshType_Obstacle*>(mNavMeshType)->getTileCache();
 	// continue if obstacle removal from tile cache is successful
-	CONTINUE_IF_ELSE_R(tileCache->removeObstacle(obstacleRef) == DT_SUCCESS, AI_ERROR)
+	CONTINUE_IF_ELSE_R(tileCache->removeObstacle(obstacleRef) == DT_SUCCESS, RESULT_ERROR)
 
 	//update tiles cache: repeat for all the tiles touched
 	for (int c = 0; c < DT_MAX_TOUCHED_TILES; ++c)
@@ -2073,7 +2073,7 @@ NodePath RNNavMesh::get_obstacle_by_ref(int ref) const
  */
 int RNNavMesh::remove_all_obstacles()
 {
-	CONTINUE_IF_ELSE_R(mNavMeshTypeEnum == OBSTACLE, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshTypeEnum == OBSTACLE, RESULT_ERROR)
 
 	PTA(Obstacle)::iterator iter = mObstacles.begin();
 	while (iter != mObstacles.end())
@@ -2083,7 +2083,7 @@ int RNNavMesh::remove_all_obstacles()
 	}
 
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -2096,19 +2096,19 @@ int RNNavMesh::add_crowd_agent(NodePath crowdAgentNP)
 	CONTINUE_IF_ELSE_R(
 			(!crowdAgentNP.is_empty())
 					&& (crowdAgentNP.node()->is_of_type(
-							RNCrowdAgent::get_class_type())), AI_ERROR)
+							RNCrowdAgent::get_class_type())), RESULT_ERROR)
 
 	PT(RNCrowdAgent)crowdAgent = DCAST(RNCrowdAgent, crowdAgentNP.node());
 
 	bool result;
 	// continue if crowdAgent doesn't belong to any mesh
-	CONTINUE_IF_ELSE_R(! crowdAgent->mNavMesh, AI_ERROR)
+	CONTINUE_IF_ELSE_R(! crowdAgent->mNavMesh, RESULT_ERROR)
 
 	//do real adding to update list
 	do_add_crowd_agent_to_update_list(crowdAgent);
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	//do real adding to recast update
 	result = do_add_crowd_agent_to_recast_update(crowdAgent);
@@ -2120,7 +2120,7 @@ int RNNavMesh::add_crowd_agent(NodePath crowdAgentNP)
 				find(mCrowdAgents.begin(), mCrowdAgents.end(), crowdAgent));
 	}
 	//
-	return (result == true ? AI_SUCCESS : AI_ERROR);
+	return (result == true ? RESULT_SUCCESS : RESULT_ERROR);
 }
 
 /**
@@ -2233,23 +2233,23 @@ int RNNavMesh::remove_crowd_agent(NodePath crowdAgentNP)
 	CONTINUE_IF_ELSE_R(
 			(!crowdAgentNP.is_empty())
 					&& (crowdAgentNP.node()->is_of_type(
-							RNCrowdAgent::get_class_type())), AI_ERROR)
+							RNCrowdAgent::get_class_type())), RESULT_ERROR)
 
 	PT(RNCrowdAgent)crowdAgent = DCAST(RNCrowdAgent, crowdAgentNP.node());
 
 	// continue if crowdAgent belongs to this nav mesh
-	CONTINUE_IF_ELSE_R(crowdAgent->mNavMesh == this, AI_ERROR)
+	CONTINUE_IF_ELSE_R(crowdAgent->mNavMesh == this, RESULT_ERROR)
 
 	// remove from update list
 	do_remove_crowd_agent_from_update_list(crowdAgent);
 
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	//remove from recast update
 	do_remove_crowd_agent_from_recast_update(crowdAgent);
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -2300,7 +2300,7 @@ int RNNavMesh::do_set_crowd_agent_params(PT(RNCrowdAgent)crowdAgent,
 const RNCrowdAgentParams& params)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	//there is a crowd tool because the recast nav mesh
 	//has been completely setup
@@ -2314,7 +2314,7 @@ const RNCrowdAgentParams& params)
 	}
 	crowdAgent->mAgentParams = params;
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -2340,7 +2340,7 @@ int RNNavMesh::do_set_crowd_agent_target(PT(RNCrowdAgent)crowdAgent,
 const LPoint3f& moveTarget)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	//there is a crowd tool because the recast nav mesh
 	//has been completely setup
@@ -2354,7 +2354,7 @@ const LPoint3f& moveTarget)
 	}
 	crowdAgent->mMoveTarget = moveTarget;
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -2367,7 +2367,7 @@ int RNNavMesh::do_set_crowd_agent_velocity(PT(RNCrowdAgent)crowdAgent,
 const LVector3f& moveVelocity)
 {
 	//continue if NavMeshType has already been setup
-	CONTINUE_IF_ELSE_R(mNavMeshType, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshType, RESULT_ERROR)
 
 	//there is a crowd tool because the recast nav mesh
 	//has been completely setup
@@ -2381,7 +2381,7 @@ const LVector3f& moveVelocity)
 	}
 	crowdAgent->mMoveVelocity = moveVelocity;
 	//
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**
@@ -2648,7 +2648,7 @@ float RNNavMesh::path_find_follow_cost(const LPoint3f& startPos,
 		const LPoint3f& endPos)
 {
 	// continue if nav mesh has been already setup
-	CONTINUE_IF_ELSE_R(path_find_follow(startPos, endPos).size() > 0, AI_ERROR)
+	CONTINUE_IF_ELSE_R(path_find_follow(startPos, endPos).size() > 0, RESULT_ERROR)
 
 	// get the cost of the last found path
 	return mTesterTool.getTotalCost();
@@ -2900,7 +2900,7 @@ int RNNavMesh::toggle_debug_drawing(bool enable)
 	// continue if both mDebugCamera and mDebugNodePath are not empty
 	CONTINUE_IF_ELSE_R(
 			(!mDebugCamera.is_empty()) && (! mDebugNodePath.is_empty()),
-			AI_ERROR)
+			RESULT_ERROR)
 
 	if (enable)
 	{
@@ -2928,7 +2928,7 @@ int RNNavMesh::toggle_debug_drawing(bool enable)
 	}
 	//
 #endif //ELY_DEBUG
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 //TypedWritable API

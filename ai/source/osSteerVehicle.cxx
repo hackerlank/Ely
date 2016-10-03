@@ -567,7 +567,7 @@ void OSSteerVehicle::set_flock_settings(const OSFlockSettings& settings)
  */
 OSFlockSettings OSSteerVehicle::get_flock_settings() const
 {
-	OSFlockSettings settings(AI_ERROR, AI_ERROR, AI_ERROR);
+	OSFlockSettings settings(RESULT_ERROR, RESULT_ERROR, RESULT_ERROR);
 	if (mVehicleType == BOID)
 	{
 		static_cast<ossup::Boid<OSSteerVehicle>*>(mVehicle)->getFlockParameters(
@@ -594,19 +594,19 @@ OSSteerPlugIn::OSPlayingTeam OSSteerVehicle::get_playing_team() const
 					(static_cast<ossup::Player<OSSteerVehicle>*>(mVehicle)->b_ImTeamA ?
 							OSSteerPlugIn::TEAM_A : OSSteerPlugIn::TEAM_B);
 			nassertr_always(mPlayingTeam_ser == team,
-					(OSSteerPlugIn::OSPlayingTeam)AI_ERROR)
+					(OSSteerPlugIn::OSPlayingTeam)RESULT_ERROR)
 
 			return team;
 		}
 		else
 		{
 			nassertr_always(mPlayingTeam_ser == OSSteerPlugIn::NO_TEAM,
-					(OSSteerPlugIn::OSPlayingTeam)AI_ERROR)
+					(OSSteerPlugIn::OSPlayingTeam)RESULT_ERROR)
 
 			return OSSteerPlugIn::NO_TEAM;
 		}
 	}
-	return (OSSteerPlugIn::OSPlayingTeam) AI_ERROR;
+	return (OSSteerPlugIn::OSPlayingTeam) RESULT_ERROR;
 }
 
 /**
@@ -637,7 +637,7 @@ float OSSteerVehicle::get_playing_distance() const
 	{
 		return static_cast<ossup::Player<OSSteerVehicle>*>(mVehicle)->m_distHomeToBall;
 	}
-	return (OSSteerPlugIn::OSPlayingTeam) AI_ERROR;
+	return (OSSteerPlugIn::OSPlayingTeam) RESULT_ERROR;
 }
 
 /**
@@ -653,7 +653,7 @@ OSSteerVehicle::OSSeekerState OSSteerVehicle::get_seeker_state() const
 		return (OSSteerVehicle::OSSeekerState) static_cast<ossup::CtfSeeker<
 				OSSteerVehicle>*>(mVehicle)->state;
 	}
-	return (OSSteerVehicle::OSSeekerState) AI_ERROR;
+	return (OSSteerVehicle::OSSeekerState) RESULT_ERROR;
 }
 
 /**
@@ -678,7 +678,7 @@ bool OSSteerVehicle::get_incremental_steering() const
 {
 	return (mVehicleType == MAP_DRIVER) ?
 			static_cast<ossup::MapDriver<OSSteerVehicle>*>(mVehicle)->incrementalSteering :
-			AI_ERROR;
+			RESULT_ERROR;
 }
 
 /**
@@ -724,7 +724,7 @@ OSSteerPlugIn::OSMapPredictionType OSSteerVehicle::get_map_prediction_type() con
 			return OSSteerPlugIn::LINEAR_PREDICTION;
 		}
 	}
-	return (OSSteerPlugIn::OSMapPredictionType) AI_ERROR;
+	return (OSSteerPlugIn::OSMapPredictionType) RESULT_ERROR;
 }
 
 /**
@@ -748,7 +748,7 @@ float OSSteerVehicle::get_steering_speed() const
 {
 	return mVehicleType == LOW_SPEED_TURN ?
 			static_cast<ossup::LowSpeedTurn<OSSteerVehicle>*>(mVehicle)->steeringSpeed :
-			AI_ERROR;
+			RESULT_ERROR;
 }
 
 /**
@@ -774,7 +774,7 @@ bool OSSteerVehicle::get_reverse_at_end_point() const
 {
 	return (mVehicleType == PEDESTRIAN) ?
 			static_cast<ossup::Pedestrian<OSSteerVehicle>*>(mVehicle)->useDirectedPathFollowing :
-			AI_ERROR;
+			RESULT_ERROR;
 }
 
 /**
@@ -798,7 +798,7 @@ bool OSSteerVehicle::get_wander_behavior() const
 {
 	return (mVehicleType == PEDESTRIAN) ?
 			static_cast<ossup::Pedestrian<OSSteerVehicle>*>(mVehicle)->wanderSwitch :
-			AI_ERROR;
+			RESULT_ERROR;
 }
 
 /**
@@ -892,7 +892,7 @@ void OSSteerVehicle::set_pathway_direction(OSPathDirection direction)
  */
 OSSteerVehicle::OSPathDirection OSSteerVehicle::get_pathway_direction() const
 {
-	OSPathDirection result = (OSPathDirection) AI_ERROR;
+	OSPathDirection result = (OSPathDirection) RESULT_ERROR;
 	if (mVehicleType == PEDESTRIAN)
 	{
 		ossup::Pedestrian<OSSteerVehicle>* vehicle =

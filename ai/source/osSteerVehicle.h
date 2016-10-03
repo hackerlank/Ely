@@ -10,7 +10,6 @@
 
 #include "osSteerPlugIn.h"
 #include "gameAIManager.h"
-#include "aiTools.h"
 #include "opensteer_includes.h"
 #include "nodePath.h"
 

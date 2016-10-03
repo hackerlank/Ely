@@ -444,16 +444,16 @@ int OSSteerPlugIn::add_steer_vehicle(NodePath steerVehicleNP)
 	CONTINUE_IF_ELSE_R(
 			(!steerVehicleNP.is_empty())
 					&& (steerVehicleNP.node()->is_of_type(
-							OSSteerVehicle::get_class_type())), AI_ERROR)
+							OSSteerVehicle::get_class_type())), RESULT_ERROR)
 
 	PT(OSSteerVehicle)steerVehicle = DCAST(OSSteerVehicle, steerVehicleNP.node());
 
 	// continue if steerVehicle doesn't belong to any steer plug-in
-	CONTINUE_IF_ELSE_R(!steerVehicle->mSteerPlugIn, AI_ERROR)
+	CONTINUE_IF_ELSE_R(!steerVehicle->mSteerPlugIn, RESULT_ERROR)
 
 	// continue if steerVehicle is compatible
 	CONTINUE_IF_ELSE_R(check_steer_vehicle_compatibility(steerVehicleNP),
-			AI_ERROR)
+			RESULT_ERROR)
 
 	bool result = false;
 	//add to update list
@@ -504,7 +504,7 @@ int OSSteerPlugIn::add_steer_vehicle(NodePath steerVehicleNP)
 		result = true;
 	}
 	//
-	return (result ? AI_SUCCESS : AI_ERROR);
+	return (result ? RESULT_SUCCESS : RESULT_ERROR);
 }
 
 /**
@@ -517,12 +517,12 @@ int OSSteerPlugIn::remove_steer_vehicle(NodePath steerVehicleNP)
 	CONTINUE_IF_ELSE_R(
 			(!steerVehicleNP.is_empty())
 					&& (steerVehicleNP.node()->is_of_type(
-							OSSteerVehicle::get_class_type())), AI_ERROR)
+							OSSteerVehicle::get_class_type())), RESULT_ERROR)
 
 	PT(OSSteerVehicle)steerVehicle = DCAST(OSSteerVehicle, steerVehicleNP.node());
 
 	// continue if steerVehicle belongs to this steer plug-in
-	CONTINUE_IF_ELSE_R(steerVehicle->mSteerPlugIn == this, AI_ERROR)
+	CONTINUE_IF_ELSE_R(steerVehicle->mSteerPlugIn == this, RESULT_ERROR)
 
 	bool result = false;
 	//remove from the list of SteerVehicles
@@ -543,7 +543,7 @@ int OSSteerPlugIn::remove_steer_vehicle(NodePath steerVehicleNP)
 		result = true;
 	}
 	//
-	return (result ? AI_SUCCESS : AI_ERROR);
+	return (result ? RESULT_SUCCESS : RESULT_ERROR);
 }
 
 /**
@@ -680,7 +680,7 @@ void OSSteerPlugIn::set_pathway(const ValueList<LPoint3f>& pointList,
 int OSSteerPlugIn::add_obstacle(NodePath& objectNP,
 		const string& type, const string& seenFromState)
 {
-	CONTINUE_IF_ELSE_R(!objectNP.is_empty(), AI_ERROR)
+	CONTINUE_IF_ELSE_R(!objectNP.is_empty(), RESULT_ERROR)
 
 	LPoint3f position;
 	LVector3f side, up, forward;
@@ -767,14 +767,14 @@ int OSSteerPlugIn::do_add_obstacle(NodePath objectNP,
 		obstacle->setSeenFrom(seenFS);
 	}
 	//store obstacle and all settings
-	int ref = AI_ERROR;
+	int ref = RESULT_ERROR;
 	if (obstacle)
 	{
 		GameAIManager::GlobalObstacles& globalObstacles =
 				GameAIManager::get_global_ptr()->get_global_obstacles();
 		nassertr_always(
 				globalObstacles.first().size()
-						== globalObstacles.second().size(), AI_ERROR)
+						== globalObstacles.second().size(), RESULT_ERROR)
 
 		//1: set obstacle's settings
 		OSObstacleSettings settings;
@@ -1087,7 +1087,7 @@ OSSteerPlugIn::OSProximityDatabase OSSteerPlugIn::get_proximity_database() const
 			break;
 		}
 	}
-	return (OSProximityDatabase) AI_ERROR;
+	return (OSProximityDatabase) RESULT_ERROR;
 }
 
 /**
@@ -1153,7 +1153,7 @@ float OSSteerPlugIn::get_world_radius() const
 				static_cast<ossup::BoidsPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->getWorldRadius();
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1176,9 +1176,9 @@ int OSSteerPlugIn::add_player_to_team(PT(OSSteerVehicle) player,
 						player->get_abstract_vehicle())), team == TEAM_A);
 		//update internal reference
 		player->mPlayingTeam_ser = team;
-		return AI_SUCCESS;
+		return RESULT_SUCCESS;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1198,9 +1198,9 @@ int OSSteerPlugIn::remove_player_from_team(PT(OSSteerVehicle) player)
 						player->get_abstract_vehicle())));
 		//update internal reference
 		player->mPlayingTeam_ser = NO_TEAM;
-		return AI_SUCCESS;
+		return RESULT_SUCCESS;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1266,7 +1266,7 @@ float OSSteerPlugIn::get_goal_fraction() const
 						- plugIn->m_TeamAGoal->getMin().z);
 		return goalYdim / fieldYdim;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1281,7 +1281,7 @@ int OSSteerPlugIn::get_score_team_a() const
 				static_cast<ossup::MicTestPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_redScore;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1296,7 +1296,7 @@ int OSSteerPlugIn::get_score_team_b() const
 				static_cast<ossup::MicTestPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_blueScore;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1364,7 +1364,7 @@ float OSSteerPlugIn::get_home_base_radius() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gHomeBaseRadius;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1394,7 +1394,7 @@ float OSSteerPlugIn::get_braking_rate() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gBrakingRate;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1424,7 +1424,7 @@ float OSSteerPlugIn::get_avoidance_predict_time_min() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gAvoidancePredictTimeMin;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1454,7 +1454,7 @@ float OSSteerPlugIn::get_avoidance_predict_time_max() const
 				static_cast<ossup::CtfPlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->m_CtfPlugInData.gAvoidancePredictTimeMax;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1504,7 +1504,7 @@ float OSSteerPlugIn::get_map_dimension() const
 				static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->worldSize;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1519,7 +1519,7 @@ int OSSteerPlugIn::get_map_resolution() const
 				static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn);
 		return plugIn->worldResolution;
 	}
-	return AI_ERROR;
+	return RESULT_ERROR;
 }
 
 /**
@@ -1548,7 +1548,7 @@ bool OSSteerPlugIn::get_map_path_fences() const
 	{
 		return static_cast<ossup::MapDrivePlugIn<OSSteerVehicle>*>(mPlugIn)->getUsePathFences();
 	}
-	return (OSMapSteeringMode) AI_ERROR;
+	return (OSMapSteeringMode) RESULT_ERROR;
 }
 
 /**
@@ -1606,7 +1606,7 @@ OSSteerPlugIn::OSMapSteeringMode OSSteerPlugIn::get_map_steering_mode() const
 			break;
 		}
 	}
-	return (OSMapSteeringMode) AI_ERROR;
+	return (OSMapSteeringMode) RESULT_ERROR;
 }
 
 /**
@@ -1654,7 +1654,7 @@ OSSteerPlugIn::OSMapPredictionType OSSteerPlugIn::get_map_prediction_type() cons
 			return LINEAR_PREDICTION;
 		}
 	}
-	return (OSMapPredictionType) AI_ERROR;
+	return (OSMapPredictionType) RESULT_ERROR;
 }
 
 /**
@@ -1678,7 +1678,7 @@ float OSSteerPlugIn::get_steering_speed() const
 {
 	return (mPlugInType == LOW_SPEED_TURN) ?
 			static_cast<ossup::LowSpeedTurnPlugIn<OSSteerVehicle>*>(mPlugIn)->steeringSpeed :
-			AI_ERROR;
+			RESULT_ERROR;
 }
 
 /**
@@ -1828,7 +1828,7 @@ int OSSteerPlugIn::toggle_debug_drawing(bool enable)
 			(!mDebugCamera.is_empty())
 					&& ((!mDrawer3dNP.is_empty())
 							&& (!mDrawer3dStaticNP.is_empty())
-							&& (!mDrawer2dNP.is_empty())), AI_ERROR)
+							&& (!mDrawer2dNP.is_empty())), RESULT_ERROR)
 
 	if (enable)
 	{
@@ -1894,7 +1894,7 @@ int OSSteerPlugIn::toggle_debug_drawing(bool enable)
 	}
 	//
 #endif //ELY_DEBUG
-	return AI_SUCCESS;
+	return RESULT_SUCCESS;
 }
 
 /**

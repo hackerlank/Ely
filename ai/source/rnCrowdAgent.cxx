@@ -42,7 +42,7 @@ RNCrowdAgent::~RNCrowdAgent()
 int RNCrowdAgent::set_params(const RNCrowdAgentParams& agentParams)
 {
 	// continue if crowdAgent belongs to a mesh
-	CONTINUE_IF_ELSE_R(mNavMesh, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMesh, RESULT_ERROR)
 
 	//request RNNavMesh to update parameters for this RNCrowdAgent
 	return mNavMesh->do_set_crowd_agent_params(this, agentParams);
@@ -56,7 +56,7 @@ int RNCrowdAgent::set_params(const RNCrowdAgentParams& agentParams)
 int RNCrowdAgent::set_move_target(const LPoint3f& pos)
 {
 	// continue if crowdAgent belongs to a mesh
-	CONTINUE_IF_ELSE_R(mNavMesh, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMesh, RESULT_ERROR)
 
 	//save into mMoveTarget
 	mMoveTarget = pos;
@@ -72,7 +72,7 @@ int RNCrowdAgent::set_move_target(const LPoint3f& pos)
 int RNCrowdAgent::set_move_velocity(const LVector3f& vel)
 {
 	// continue if crowdAgent belongs to a mesh
-	CONTINUE_IF_ELSE_R(mNavMesh, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMesh, RESULT_ERROR)
 
 	//save into mMoveVelocity
 	mMoveVelocity = vel;

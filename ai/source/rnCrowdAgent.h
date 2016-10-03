@@ -10,7 +10,6 @@
 
 #include "rnNavMesh.h"
 #include "gameAIManager.h"
-#include "aiTools.h"
 #include "recastnavigation_includes.h"
 #include "nodePath.h"
 

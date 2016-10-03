@@ -138,7 +138,7 @@ void P3Sound3d::do_finalize()
  */
 int P3Sound3d::add_sound(const string& soundName, const string& fileName)
 {
-	int result = AUDIO_ERROR;
+	int result = RESULT_ERROR;
 	//get the sound from fileName
 	PT(AudioSound)sound =
 	GameAudioManager::GetSingletonPtr()->get_audio_manager()->get_sound(fileName,
@@ -156,7 +156,7 @@ int P3Sound3d::add_sound(const string& soundName, const string& fileName)
 					mPosition.get_y(), mPosition.get_z(), 0.0, 0.0, 0.0);
 		}
 		//
-		result = AUDIO_SUCCESS;
+		result = RESULT_SUCCESS;
 	}
 	//
 	return result;
@@ -168,14 +168,14 @@ int P3Sound3d::add_sound(const string& soundName, const string& fileName)
  */
 int P3Sound3d::remove_sound(const string& soundName)
 {
-	int result = AUDIO_ERROR;
+	int result = RESULT_ERROR;
 
 	//make mSounds modifications
 	size_t removed = mSounds.erase(soundName);
 	if (removed == 1)
 	{
 		// sound is removed
-		result = AUDIO_SUCCESS;
+		result = RESULT_SUCCESS;
 	}
 	//
 	return result;

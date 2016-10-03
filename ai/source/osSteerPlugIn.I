@@ -109,7 +109,7 @@ INLINE int OSSteerPlugIn::get_obstacle(int index) const
 	pvector<GameAIManager::ObstacleAttributes>& obstacleAttrs =
 			const_cast<GameAIManager::GlobalObstacles&>(mLocalObstacles).second();
 	CONTINUE_IF_ELSE_R((index >= 0) && (index < (int) obstacleAttrs.size()),
-			AI_ERROR)
+			RESULT_ERROR)
 
 	return obstacleAttrs[index].first().get_ref();
 }

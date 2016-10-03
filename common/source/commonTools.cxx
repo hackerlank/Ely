@@ -1,11 +1,12 @@
 /**
- * \file audioTools.cxx
+ * \file commonTools.cxx
  *
- * \date 2016-09-30
+ * \date 2016-10-03
  * \author consultit
  */
 
-#include "audioTools.h"
+#include "commonTools.h"
+#include "lpoint3.h"
 
 pvector<string> parseCompoundString(
 		const string& srcCompoundString, char separator)
@@ -129,3 +130,4 @@ void ThrowEventData::read_datagram(DatagramIterator &scan)
 template class ValueList<string>;
 template class ValueList<LPoint3f>;
 template struct Pair<bool,float>;
+

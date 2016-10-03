@@ -1,13 +1,11 @@
 /**
- * \file audioTools.I
+ * \file commonTools.I
  *
- * \date 2016-09-30
+ * \date 2016-10-03
  * \author consultit
  */
-
-#ifndef AUDIOTOOLS_I_
-#define AUDIOTOOLS_I_
-
+#ifndef COMMONTOOLS_I_
+#define COMMONTOOLS_I_
 
 ///ValueList
 /**
@@ -215,4 +213,4 @@ inline ValueList<Type>::operator pvector<Type>() const
 }
 #endif //CPPPARSER
 
-#endif /* AUDIOTOOLS_I_ */
+#endif /* COMMONTOOLS_I_ */

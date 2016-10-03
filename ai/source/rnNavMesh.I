@@ -95,7 +95,7 @@ INLINE void RNNavMesh::set_area_flags(int area, int oredFlags)
 INLINE int RNNavMesh::get_area_flags(int area) const
 {
 	map<int, int>::const_iterator iter = mPolyAreaFlags.find(area);
-	return iter != mPolyAreaFlags.end() ? (*iter).second : AI_ERROR;
+	return iter != mPolyAreaFlags.end() ? (*iter).second : RESULT_ERROR;
 }
 
 /**
@@ -104,7 +104,7 @@ INLINE int RNNavMesh::get_area_flags(int area) const
 INLINE float RNNavMesh::get_crowd_area_cost(int area) const
 {
 	map<int, float>::const_iterator iter = mPolyAreaCost.find(area);
-	return iter != mPolyAreaCost.end() ? (*iter).second : AI_ERROR;
+	return iter != mPolyAreaCost.end() ? (*iter).second : RESULT_ERROR;
 }
 
 /**
@@ -131,7 +131,7 @@ INLINE int RNNavMesh::get_convex_volume(int index) const
 {
 	CONTINUE_IF_ELSE_R(
 				(index >= 0) && (index < (int) mConvexVolumes.size()),
-				AI_ERROR)
+				RESULT_ERROR)
 
 	return mConvexVolumes[index].get_second().get_ref();
 }
@@ -152,7 +152,7 @@ INLINE int RNNavMesh::get_off_mesh_connection(int index) const
 {
 	CONTINUE_IF_ELSE_R(
 			(index >= 0) && (index < (int) mOffMeshConnections.size()),
-			AI_ERROR)
+			RESULT_ERROR)
 
 	return mOffMeshConnections[index].get_second().get_ref();
 }
@@ -174,7 +174,7 @@ INLINE int RNNavMesh::get_obstacle(int index) const
 	CONTINUE_IF_ELSE_R(
 			(mNavMeshTypeEnum == OBSTACLE)
 					&& ((index >= 0) && (index < (int) mObstacles.size())),
-			AI_ERROR)
+			RESULT_ERROR)
 
 	return (int) mObstacles[index].get_first().get_ref();
 }
@@ -185,7 +185,7 @@ INLINE int RNNavMesh::get_obstacle(int index) const
  */
 INLINE int RNNavMesh::get_num_obstacles() const
 {
-	CONTINUE_IF_ELSE_R(mNavMeshTypeEnum == OBSTACLE, AI_ERROR)
+	CONTINUE_IF_ELSE_R(mNavMeshTypeEnum == OBSTACLE, RESULT_ERROR)
 
 	return (int)mObstacles.size();
 }
