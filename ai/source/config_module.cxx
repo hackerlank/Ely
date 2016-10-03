@@ -8,15 +8,15 @@
 #include "rnNavMesh.h"
 
 
-Configure( config_ai );
-NotifyCategoryDef( ai , "");
+Configure( config_p3ai );
+NotifyCategoryDef( p3ai , "");
 
-ConfigureFn( config_ai ) {
-  init_libai();
+ConfigureFn( config_p3ai ) {
+  init_libp3ai();
 }
 
 void
-init_libai() {
+init_libp3ai() {
   static bool initialized = false;
   if (initialized) {
     return;

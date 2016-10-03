@@ -6,8 +6,8 @@
  */
 
 ///library
-#include "library_rn//DetourNavMesh.cpp"
-#include "library_rn//RecastMesh.cpp"
+#include "library_rn/DetourNavMesh.cpp"
+#include "library_rn/RecastMesh.cpp"
 
 ///support
 #include "support_rn/InputGeom.cpp"

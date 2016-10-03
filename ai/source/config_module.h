@@ -10,8 +10,8 @@
 #include "configVariableInt.h"
 
 
-NotifyCategoryDecl(ai, EXPORT_CLASS, EXPORT_TEMPL);
+NotifyCategoryDecl(p3ai, EXPORT_CLASS, EXPORT_TEMPL);
 
-extern void init_libai();
+extern void init_libp3ai();
 
 #endif //CONFIG_AI_H

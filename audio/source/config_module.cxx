@@ -6,15 +6,15 @@
 #include "p3Listener.h"
 
 
-Configure( config_audio );
-NotifyCategoryDef( audio , "");
+Configure( config_p3audio );
+NotifyCategoryDef( p3audio , "");
 
-ConfigureFn( config_audio ) {
-  init_libaudio();
+ConfigureFn( config_p3audio ) {
+  init_libp3audio();
 }
 
 void
-init_libaudio() {
+init_libp3audio() {
   static bool initialized = false;
   if (initialized) {
     return;

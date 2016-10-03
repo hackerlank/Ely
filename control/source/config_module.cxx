@@ -6,15 +6,15 @@
 #include "p3Chaser.h"
 
 
-Configure( config_control );
-NotifyCategoryDef( control , "");
+Configure( config_p3control );
+NotifyCategoryDef( p3control , "");
 
-ConfigureFn( config_control ) {
-  init_libcontrol();
+ConfigureFn( config_p3control ) {
+  init_libp3control();
 }
 
 void
-init_libcontrol() {
+init_libp3control() {
   static bool initialized = false;
   if (initialized) {
     return;

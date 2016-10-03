@@ -10,8 +10,8 @@
 #include "configVariableInt.h"
 
 
-NotifyCategoryDecl(control, EXPORT_CLASS, EXPORT_TEMPL);
+NotifyCategoryDecl(p3control, EXPORT_CLASS, EXPORT_TEMPL);
 
-extern void init_libcontrol();
+extern void init_libp3control();
 
 #endif //CONFIG_CONTROL_H

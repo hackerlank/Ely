@@ -10,8 +10,8 @@
 #include "configVariableInt.h"
 
 
-NotifyCategoryDecl(audio, EXPORT_CLASS, EXPORT_TEMPL);
+NotifyCategoryDecl(p3audio, EXPORT_CLASS, EXPORT_TEMPL);
 
-extern void init_libaudio();
+extern void init_libp3audio();
 
 #endif //CONFIG_AUDIO_H
