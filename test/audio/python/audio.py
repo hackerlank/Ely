@@ -8,6 +8,7 @@ from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f
 from direct.showbase.ShowBase import ShowBase
+from p3audio import GameAudioManager
 from p3control import GameControlManager
 #
 import sys
@@ -25,13 +26,18 @@ modelAnimFiles = [["eve-walk.egg", "eve-run.egg"],
                   ["", ""],
                   ["red_car-anim.egg", "red_car-anim2.egg"]]
 animRateFactor = [0.6, 0.175]
+# sound effects
+soundFile = ["eve_voice.wav", "", "sparrow_chirp.wav", "", ""]
 # bame file
-bamFileName = "control.boo"
+bamFileName = "audio.boo"
 
 # # specific data/functions declarations/definitions
 sceneNP = None
 globalClock = None
+# camera specifics
+cameraListener = None
 # player specifics
+playerSound3d = None
 playerAnimCtls = []
 playerNP = None
 playerDriver = None
@@ -45,6 +51,7 @@ backwardMoveStop = -3
 rightMove = 4
 rightMoveStop = -4
 # pursuer specifics
+pursuerSound3d = None
 pursuerAnimCtls = []
 pursuerNP = None
 pursuerChaser = None
@@ -53,60 +60,33 @@ pursuerChaser = None
 def printCreationParameters():
     """print creation parameters"""
     
-    controlMgr = GameControlManager.get_global_ptr()
+    audioMgr = GameAudioManager.get_global_ptr()
     #
-    valueList = controlMgr.get_parameter_name_list(GameControlManager.DRIVER)
-    print("\n" + "P3Driver creation parameters:")
+    valueList = audioMgr.get_parameter_name_list(GameAudioManager.SOUND3D)
+    print("\n" + "P3Sound3d creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               controlMgr.get_parameter_value(GameControlManager.DRIVER, name))
+               audioMgr.get_parameter_value(GameAudioManager.SOUND3D, name))
     #
-    valueList = controlMgr.get_parameter_name_list(GameControlManager.CHASER)
-    print("\n" + "P3Chaser creation parameters:")
+    valueList = audioMgr.get_parameter_name_list(GameAudioManager.LISTENER)
+    print("\n" + "P3Listener creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               controlMgr.get_parameter_value(GameControlManager.CHASER, name))
+               audioMgr.get_parameter_value(GameAudioManager.LISTENER, name))
 
 def setParametersBeforeCreation():
-    """set parameters as strings before drivers/vehicles creation"""
+    """set parameters as strings before sound3ds/listeners creation"""
     
-    controlMgr = GameControlManager.get_global_ptr()
-    # set driver's parameters
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_angular_speed",
-            "100.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_accel",
+    audioMgr = GameAudioManager.get_global_ptr()
+    # set sound3d's parameters
+    audioMgr.set_parameter_value(GameAudioManager.SOUND3D, "static", "false")
+    audioMgr.set_parameter_value(GameAudioManager.SOUND3D, "min_distance",
+            "5.0")
+    audioMgr.set_parameter_value(GameAudioManager.SOUND3D, "max_distance",
             "50.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_linear_speed",
-            "8.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_accel",
-            "1.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_friction",
-            "0.5")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_friction",
-            "5.0")
-    # set chaser's parameters
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "fixed_relative_position",
+    # set listener's parameters
+    audioMgr.set_parameter_value(GameAudioManager.LISTENER, "static",
             "false")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "max_distance",
-            "25.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "min_distance",
-            "18.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "max_height",
-            "18.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "min_height",
-            "15.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "friction",
-            "5.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "fixed_look_at",
-            "true")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "mouse_head",
-            "true")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "mouse_pitch",
-            "true")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "look_at_distance",
-            "5.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "look_at_height",
-            "12.5")
     #
     printCreationParameters()
 
@@ -125,7 +105,7 @@ def startFramework(msg):
     # Setup your application
     app = ShowBase()
     props = WindowProperties()
-    props.setTitle("p3ai: " + msg)
+    props.setTitle("p3audio: " + msg)
     app.win.requestProperties(props)
  
     # common callbacks     
@@ -338,7 +318,7 @@ def chaserCallback(chaser):
 
 if __name__ == '__main__':
 
-    msg = "'P3Driver & P3Chaser'"
+    msg = "'P3Sound3d & P3Listener'"
     app = startFramework(msg)
       
     # # here is room for your own code
@@ -351,6 +331,8 @@ if __name__ == '__main__':
     textNodePath.set_pos(-1.25, 0.0, 0.8)
     textNodePath.set_scale(0.035)
 
+    # create a audio manager
+    audioMgr = GameAudioManager()
     # create a control manager set root and mask to manage 'kinematic' players
     controlMgr = GameControlManager(app.win, 10, app.render, mask)
 
@@ -362,13 +344,14 @@ if __name__ == '__main__':
     # try to read it from bam file
     if (not len(sys.argv) > 1) or (not readFromBamFile(sys.argv[1])):
         # no argument or no valid bamFile
-        # reparent the reference node to render
-        controlMgr.get_reference_node_path().reparent_to(app.render)
+        # set a common reference node and reparent it to render
+        controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
+        audioMgr.get_reference_node_path().reparent_to(app.render)
 
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         sceneNP = loadTerrainLowPoly("SceneNP")
         # and reparent to the reference node
-        sceneNP.reparent_to(controlMgr.get_reference_node_path())
+        sceneNP.reparent_to(audioMgr.get_reference_node_path())
 
         # set sceneNP's collide mask
         sceneNP.set_collide_mask(mask)
@@ -398,6 +381,35 @@ if __name__ == '__main__':
         pursuerChaser.set_chased_object(playerDriverNP)
         # attach some geometry (a model) to pursuer's chaser
         pursuerNP.reparent_to(pursuerChaserNP)
+        
+        # create some sound3ds (attached to the reference node)
+        playerSound3dNP = audioMgr.create_sound3d("playerSound3d")
+        pursuerSound3dNP = audioMgr.create_sound3d("pursuerSound3d")
+        # get a reference to the sound3ds
+        playerSound3d = playerSound3dNP.node()
+        pursuerSound3d = pursuerSound3dNP.node()
+        # reparent the sound3ds
+        playerSound3dNP.reparent_to(playerNP)
+        pursuerSound3dNP.reparent_to(pursuerNP)
+        # attach some sounds to the sound3ds
+        playerSound3d.add_sound("eve-voice", "eve_voice.wav")
+        pursuerSound3d.add_sound("sparrow-chirp", "sparrow_chirp.wav")
+        # set sounds looping
+        sound = playerSound3d.get_sound_by_name("eve-voice")
+        sound.set_loop(True)
+        sound.play()
+        #
+        sound = pursuerSound3d.get_sound_by_name("sparrow-chirp")
+        sound.set_loop(True)
+        sound.play()
+
+        # create a listener (attached to the reference node)
+        cameraListenerNP = audioMgr.create_listener("cameraListener")
+        # get a reference to the camera's listener
+        cameraListener = cameraListenerNP.node()
+        # reparent listener to the camera
+        cameraListenerNP.reparent_to(app.camera)
+        
     else:
         # valid bamFile
         # restore sceneNP: through panda3d

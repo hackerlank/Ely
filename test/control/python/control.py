@@ -68,7 +68,7 @@ def printCreationParameters():
                controlMgr.get_parameter_value(GameControlManager.CHASER, name))
 
 def setParametersBeforeCreation():
-    """set parameters as strings before drivers/vehicles creation"""
+    """set parameters as strings before drivers/chasers creation"""
     
     controlMgr = GameControlManager.get_global_ptr()
     # set driver's parameters
@@ -125,7 +125,7 @@ def startFramework(msg):
     # Setup your application
     app = ShowBase()
     props = WindowProperties()
-    props.setTitle("p3ai: " + msg)
+    props.setTitle("p3control: " + msg)
     app.win.requestProperties(props)
  
     # common callbacks     

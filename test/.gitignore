@@ -38,4 +38,4 @@ control_gcov
 *.gcno
 control_gprof
 debug_texture.png
-
+audio

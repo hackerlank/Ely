@@ -50,7 +50,7 @@ int backwardMove = 3;
 int backwardMoveStop = -3;
 int rightMove = 4;
 int rightMoveStop = -4;
-// chaser specifics
+// pursuer specifics
 vector<vector<PT(AnimControl)> > pursuerAnimCtls;
 NodePath pursuerNP;
 WPT(P3Chaser)pursuerChaser;
@@ -134,7 +134,7 @@ void startFramework(int argc, char *argv[], const string& msg)
 	load_prc_file_data("", "sync-video #t");
 	// Setup your application
 	framework.open_framework(argc, argv);
-	framework.set_window_title("p3opensteer: " + msg);
+	framework.set_window_title("p3control: " + msg);
 	window = framework.open_window();
 	if (window != (WindowFramework *) nullptr)
 	{

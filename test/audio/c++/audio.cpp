@@ -10,6 +10,9 @@
 #include <texturePool.h>
 #include <auto_bind.h>
 
+#include <gameAudioManager.h>
+#include <p3Sound3d.h>
+#include <p3Listener.h>
 #include <gameControlManager.h>
 #include <p3Driver.h>
 #include <p3Chaser.h>
@@ -31,13 +34,19 @@ string modelAnimFiles[5][2] =
 { "", "" },
 { "red_car-anim.egg", "red_car-anim2.egg" }};
 const float animRateFactor[2] = { 0.6, 0.175 };
+// sound effects
+string soundFile[5] =
+{ "eve_voice.wav", "", "sparrow_chirp.wav", "", "" };
 // bam file
-string bamFileName("control.boo");
+string bamFileName("audio.boo");
 
 /// specific data/functions declarations/definitions
 NodePath sceneNP;
 ClockObject* globalClock = NULL;
+// camera specifics
+WPT(P3Listener)cameraListener;
 // player specifics
+WPT(P3Sound3d)playerSound3d;
 vector<vector<PT(AnimControl)> > playerAnimCtls;
 NodePath playerNP;
 WPT(P3Driver)playerDriver;
@@ -50,7 +59,8 @@ int backwardMove = 3;
 int backwardMoveStop = -3;
 int rightMove = 4;
 int rightMoveStop = -4;
-// chaser specifics
+// pursuer specifics
+WPT(P3Sound3d)pursuerSound3d;
 vector<vector<PT(AnimControl)> > pursuerAnimCtls;
 NodePath pursuerNP;
 WPT(P3Chaser)pursuerChaser;
@@ -58,68 +68,41 @@ WPT(P3Chaser)pursuerChaser;
 // print creation parameters
 void printCreationParameters()
 {
-	GameControlManager* controlMgr = GameControlManager::get_global_ptr();
+	GameAudioManager* audioMgr = GameAudioManager::get_global_ptr();
 	//
-	ValueList<string> valueList = controlMgr->get_parameter_name_list(
-			GameControlManager::DRIVER);
-	cout << endl << "P3Driver creation parameters:" << endl;
+	ValueList<string> valueList = audioMgr->get_parameter_name_list(
+			GameAudioManager::SOUND3D);
+	cout << endl << "P3Sound3d creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< controlMgr->get_parameter_value(GameControlManager::DRIVER,
+				<< audioMgr->get_parameter_value(GameAudioManager::SOUND3D,
 						valueList[i]) << endl;
 	}
 	//
-	valueList = controlMgr->get_parameter_name_list(GameControlManager::CHASER);
-	cout << endl << "P3Chaser creation parameters:" << endl;
+	valueList = audioMgr->get_parameter_name_list(GameAudioManager::LISTENER);
+	cout << endl << "P3Listener creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< controlMgr->get_parameter_value(GameControlManager::CHASER,
+				<< audioMgr->get_parameter_value(GameAudioManager::LISTENER,
 						valueList[i]) << endl;
 	}
 }
 
-// set parameters as strings before drivers/chasers creation
+// set parameters as strings before sound3ds/listeners creation
 void setParametersBeforeCreation()
 {
-	GameControlManager* controlMgr = GameControlManager::get_global_ptr();
-	// set driver's parameters
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_angular_speed",
-			"100.0");
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_accel",
+	GameAudioManager* audioMgr = GameAudioManager::get_global_ptr();
+	// set sound3d's parameters
+	audioMgr->set_parameter_value(GameAudioManager::SOUND3D, "static", "false");
+	audioMgr->set_parameter_value(GameAudioManager::SOUND3D, "min_distance",
+			"5.0");
+	audioMgr->set_parameter_value(GameAudioManager::SOUND3D, "max_distance",
 			"50.0");
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_linear_speed",
-			"8.0");
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_accel",
-			"1.0");
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_friction",
-			"0.5");
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_friction",
-			"5.0");
-	// set chaser's parameters
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "fixed_relative_position",
+	// set listener's parameters
+	audioMgr->set_parameter_value(GameAudioManager::LISTENER, "static",
 			"false");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "max_distance",
-			"25.0");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "min_distance",
-			"18.0");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "max_height",
-			"18.0");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "min_height",
-			"15.0");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "friction",
-			"5.0");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "fixed_look_at",
-			"true");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "mouse_head",
-			"true");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "mouse_pitch",
-			"true");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "look_at_distance",
-			"5.0");
-	controlMgr->set_parameter_value(GameControlManager::CHASER, "look_at_height",
-			"12.5");
 	//
 	printCreationParameters();
 }
@@ -134,7 +117,7 @@ void startFramework(int argc, char *argv[], const string& msg)
 	load_prc_file_data("", "sync-video #t");
 	// Setup your application
 	framework.open_framework(argc, argv);
-	framework.set_window_title("p3opensteer: " + msg);
+	framework.set_window_title("p3audio: " + msg);
 	window = framework.open_window();
 	if (window != (WindowFramework *) nullptr)
 	{
@@ -144,6 +127,11 @@ void startFramework(int argc, char *argv[], const string& msg)
 	}
 
 	/// typed object init; not needed if you build inside panda source tree
+	P3Sound3d::init_type();
+	P3Listener::init_type();
+	GameAudioManager::init_type();
+	P3Sound3d::register_with_read_factory();
+	P3Listener::register_with_read_factory();
 	P3Driver::init_type();
 	P3Chaser::init_type();
 	GameControlManager::init_type();
@@ -415,7 +403,7 @@ void chaserCallback(PT(P3Chaser)chaser)
 
 int main(int argc, char *argv[])
 {
-	string msg("'P3Driver & P3Chaser'");
+	string msg("'P3Sound3d & P3Listener'");
 	startFramework(argc, argv, msg);
 
 	/// here is room for your own code
@@ -429,6 +417,8 @@ int main(int argc, char *argv[])
 	textNodePath.set_pos(-1.25, 0.0, 0.8);
 	textNodePath.set_scale(0.035);
 
+	// create a audio manager
+	WPT(GameAudioManager)audioMgr = new GameAudioManager();
 	// create a control manager; set root and mask to manage 'kinematic' players
 	WPT(GameControlManager)controlMgr = new GameControlManager(
 			framework.get_window(0)->get_graphics_window(), 10,
@@ -443,13 +433,14 @@ int main(int argc, char *argv[])
 	if ((not (argc > 1)) or (not readFromBamFile(argv[1])))
 	{
 		// no argument or no valid bamFile
-		// reparent the reference node to render
-		controlMgr->get_reference_node_path().reparent_to(window->get_render());
+		// set a common reference node and reparent it to render
+		controlMgr->set_reference_node_path(audioMgr->get_reference_node_path());
+		audioMgr->get_reference_node_path().reparent_to(window->get_render());
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
 		sceneNP = loadTerrainLowPoly("SceneNP");
 		// and reparent to the reference node
-		sceneNP.reparent_to(controlMgr->get_reference_node_path());
+		sceneNP.reparent_to(audioMgr->get_reference_node_path());
 
 		// set sceneNP's collide mask
 		sceneNP.set_collide_mask(mask);
@@ -479,6 +470,35 @@ int main(int argc, char *argv[])
 		pursuerChaser->set_chased_object(playerDriverNP);
 		// attach some geometry (a model) to pursuer's chaser
 		pursuerNP.reparent_to(pursuerChaserNP);
+
+		// create some sound3ds (attached to the reference node)
+		NodePath playerSound3dNP = audioMgr->create_sound3d("playerSound3d");
+		NodePath pursuerSound3dNP = audioMgr->create_sound3d("pursuerSound3d");
+		// get a reference to the sound3ds
+		playerSound3d = DCAST(P3Sound3d, playerSound3dNP.node());
+		pursuerSound3d = DCAST(P3Sound3d, pursuerSound3dNP.node());
+		// reparent the sound3ds
+		playerSound3dNP.reparent_to(playerNP);
+		pursuerSound3dNP.reparent_to(pursuerNP);
+		// attach some sounds to the sound3ds
+		playerSound3d->add_sound("eve-voice", "eve_voice.wav");
+		pursuerSound3d->add_sound("sparrow-chirp", "sparrow_chirp.wav");
+		// set sounds looping
+		PT(AudioSound) sound = playerSound3d->get_sound_by_name("eve-voice");
+		sound->set_loop(true);
+		sound->play();
+		//
+		sound = pursuerSound3d->get_sound_by_name("sparrow-chirp");
+		sound->set_loop(true);
+		sound->play();
+
+		// create a listener (attached to the reference node)
+		NodePath cameraListenerNP = audioMgr->create_listener("cameraListener");
+		// get a reference to the camera's listener
+		cameraListener = DCAST(P3Listener, cameraListenerNP.node());
+		// reparent listener to the camera
+		cameraListenerNP.reparent_to(window->get_camera_group());
+
 	}
 	else
 	{
