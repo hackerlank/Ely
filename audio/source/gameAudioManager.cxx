@@ -110,10 +110,10 @@ NodePath GameAudioManager::create_sound3d(const string& name)
 	newSound3d->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
 	newSound3d->mThisNP = mReferenceNP.attach_new_node(newSound3d);
-	// initialize the new Sound3d (could use mReferenceNP, mThisNP)
+	// initialize the new P3Sound3d (could use mReferenceNP, mThisNP)
 	newSound3d->do_initialize();
 
-	// add the new Sound3d to the inner list (and to the update task)
+	// add the new P3Sound3d to the inner list (and to the update task)
 	mSound3ds.push_back(newSound3d);
 	//
 	return newSound3d->mThisNP;
@@ -162,17 +162,17 @@ NodePath GameAudioManager::create_listener(const string& name)
 {
 	nassertr_always(!name.empty(), NodePath::fail())
 
-	PT(P3Listener) newListener = new P3Listener(name);
+	PT(P3Listener)newListener = new P3Listener(name);
 	nassertr_always(newListener, NodePath::fail())
 
 	// set reference node
 	newListener->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
 	newListener->mThisNP = mReferenceNP.attach_new_node(newListener);
-	// initialize the new Listener (could use mReferenceNP, mThisNP)
+	// initialize the new P3Listener (could use mReferenceNP, mThisNP)
 	newListener->do_initialize();
 
-	// add the new Listener to the inner list (and to the update task)
+	// add the new P3Listener to the inner list (and to the update task)
 	mListeners.push_back(newListener);
 	//
 	return newListener->mThisNP;
@@ -195,8 +195,6 @@ bool GameAudioManager::destroy_listener(NodePath listenerNP)
 
 	// give a chance to P3Listener to cleanup itself before being destroyed.
 	listener->do_finalize();
-	// reset the reference graphic window.
-	listener->mWin.clear();
 	//remove the P3Listener from the inner list (and from the update task)
 	mListeners.erase(iter);
 	//
@@ -374,21 +372,7 @@ void GameAudioManager::set_parameters_defaults(AudioType type)
 		///mListenersParameterTable must be the first cleared
 		mListenersParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mListenersParameterTable.insert(ParameterNameValue("enabled", "true"));
-		mListenersParameterTable.insert(ParameterNameValue("backward", "true"));
-		mListenersParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
-		mListenersParameterTable.insert(ParameterNameValue("friction", "1.0"));
-		mListenersParameterTable.insert(ParameterNameValue("fixed_look_at", "true"));
-		mListenersParameterTable.insert(ParameterNameValue("mouse_move", "false"));
-		mListenersParameterTable.insert(ParameterNameValue("mouse_head", "false"));
-		mListenersParameterTable.insert(ParameterNameValue("mouse_pitch", "false"));
-		mListenersParameterTable.insert(ParameterNameValue("head_left", "enabled"));
-		mListenersParameterTable.insert(ParameterNameValue("head_right", "enabled"));
-		mListenersParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
-		mListenersParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
-		mListenersParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
-		mListenersParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
-		mListenersParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+		mListenersParameterTable.insert(ParameterNameValue("static", "false"));
 		return;
 	}
 }

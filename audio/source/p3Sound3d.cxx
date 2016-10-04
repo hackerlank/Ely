@@ -411,8 +411,19 @@ void P3Sound3d::write_datagram(BamWriter *manager, Datagram &dg)
 	///Static flag.
 	dg.add_bool(mStatic);
 
-	///The set of sounds attached to this component. xxx
-	SoundTable mSounds;
+	///The set of sounds attached to this component.
+	dg.add_uint32(mSounds.size());
+	{
+		SoundTable::iterator iter;
+		for (iter = mSounds.begin(); iter != mSounds.end();
+				++iter)
+		{
+			// sound name
+			dg.add_string(iter->first);
+			// sound file name
+			dg.add_string(iter->second.second);
+		}
+	}
 
 	/// Sounds' characteristics.
 	///@{
@@ -481,8 +492,16 @@ void P3Sound3d::fillin(DatagramIterator &scan, BamReader *manager)
 	///Static flag.
 	mStatic = scan.get_bool();
 
-	///The set of sounds attached to this component. xxx
-	SoundTable mSounds;
+	///The set of sounds attached to this component.
+	mSounds.clear();
+	unsigned int size = scan.get_uint32();
+	for (unsigned int i = 0; i < size; ++i)
+	{
+		string name = scan.get_string();
+		string fileName = scan.get_string();
+		// insert into mSounds
+		add_sound(name, fileName);
+	}
 
 	/// Sounds' characteristics.
 	///@{

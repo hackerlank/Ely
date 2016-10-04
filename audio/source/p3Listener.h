@@ -16,6 +16,16 @@
 #endif //CPPPARSER
 
 /**
+ * \brief Component manipulating the listener for 3d sounds.
+ *
+ * > **XML Param(s)**:
+ * param | type | default | note
+ * ------|------|---------|-----
+ * | *static*  				|single| *false* | -
+ *
+ * \note parts inside [] are optional.\n
+ */
+/**
  * P3Listener is a PandaNode class designed to make an object a listener of another
  * object.
  *
@@ -103,76 +113,15 @@ PUBLISHED:
 	 * \name LISTENER
 	 */
 	///@{
-	INLINE void set_chased_object(const NodePath& object);
-	INLINE NodePath get_chased_object() const;
-	bool enable();
-	bool disable();
-	INLINE bool is_enabled() const;
 	void update(float dt);
-	///@}
-
-	/**
-	 * \name MOVEMENT ENABLERS
-	 */
-	///@{
-	INLINE void enable_head_left(bool enable);
-	INLINE bool is_head_left_enabled() const;
-	INLINE void enable_head_right(bool enable);
-	INLINE bool is_head_right_enabled() const;
-	INLINE void enable_pitch_up(bool enable);
-	INLINE bool is_pitch_up_enabled() const;
-	INLINE void enable_pitch_down(bool enable);
-	INLINE bool is_pitch_down_enabled() const;
-	INLINE void enable_mouse_head(bool enable);
-	INLINE bool is_mouse_head_enabled() const;
-	INLINE void enable_mouse_pitch(bool enable);
-	INLINE bool is_mouse_pitch_enabled() const;
-	INLINE void enable_mouse_move(bool enable);
-	INLINE bool is_mouse_move_enabled() const;
-	///@}
-
-	/**
-	 * \name MOVEMENT ACTIVATORS
-	 */
-	///@{
-	INLINE void set_rotate_head_left(bool activate);
-	INLINE bool get_rotate_head_left() const;
-	INLINE void set_rotate_head_right(bool activate);
-	INLINE bool get_rotate_head_right() const;
-	INLINE void set_rotate_pitch_up(bool activate);
-	INLINE bool get_rotate_pitch_up() const;
-	INLINE void set_rotate_pitch_down(bool activate);
-	INLINE bool get_rotate_pitch_down() const;
 	///@}
 
 	/**
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	INLINE void set_hold_look_at(bool activate);
-	INLINE bool get_hold_look_at() const;
-	INLINE void set_backward(bool activate);
-	INLINE bool get_backward() const;
-	INLINE void set_fixed_relative_position(bool activate);
-	INLINE bool get_fixed_relative_position();
-	INLINE void set_inverted_rotation(bool activate);
-	INLINE bool get_inverted_rotation() const;
-	INLINE void set_max_distance(float absMaxDistance);
-	INLINE float get_max_distance() const;
-	INLINE void set_min_distance(float absMinDistance);
-	INLINE float get_min_distance() const;
-	INLINE void set_max_height(float absMaxHeight);
-	INLINE float get_max_height() const;
-	INLINE void set_min_height(float absMinHeight);
-	INLINE float get_min_height() const;
-	INLINE void set_look_at_distance(float absLookAtDistance);
-	INLINE float get_look_at_distance() const;
-	INLINE void set_look_at_height(float absLookAtHeight);
-	INLINE float get_look_at_height() const;
-	INLINE void set_friction(float friction);
-	INLINE float get_friction() const;
-	INLINE void set_sens(float sensX, float sensY);
-	INLINE ValueList<float> get_sens() const;
+	void set_static(bool enable);
+	INLINE bool get_static() const;
 	///@}
 
 	/**
@@ -215,53 +164,27 @@ protected:
 	virtual ~P3Listener();
 
 private:
-	///The chased object's node path.
-	NodePath mChasedNP;
 	///This NodePath.
 	NodePath mThisNP;
 	///The reference node path.
 	NodePath mReferenceNP;
-	///The reference graphic window.
-	PT(GraphicsWindow) mWin;
-	///Auxiliary node path to track the fixed look at.
-	NodePath mFixedLookAtNP;
-	///Flags.
-	bool mEnabled, mFixedRelativePosition, mBackward, mFixedLookAt, mHoldLookAt;
-	///Kinematic parameters.
-	float mAbsLookAtDistance, mAbsLookAtHeight, mAbsMaxDistance, mAbsMinDistance,
-	mAbsMinHeight, mAbsMaxHeight, mFriction;
-	///Positions.
-	LPoint3f mListenerPosition, mLookAtPosition;
+	///Static flag.
+	bool mStatic;
+	/// Sounds' characteristics.
 	///@{
-	///Key audios and effective keys.
-	bool mHeadLeft, mHeadRight, mPitchUp, mPitchDown;
-	bool mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
-	///@}
-	///@{
-	///Key audio values.
-	bool mMouseEnabledH, mMouseEnabledP, mMouseHandled;
-	char mSignOfMouse;
-	///@}
-	///@{
-	/// Sensitivity settings.
-	float mSensX, mSensY, mHeadSensX, mHeadSensY;
-	int mCentX, mCentY;
+	LPoint3f mPosition;
 	///@}
 
 	inline void do_reset();
 	void do_initialize();
 	void do_finalize();
 
+
 	/**
 	 * \name Helpers variables/functions.
 	 */
 	///@{
-	void do_enable();
-	void do_disable();
-	void do_handle_mouse();
-	LPoint3f do_get_listener_pos(LPoint3f desiredListenerPos,
-			LPoint3f currentListenerPos, float deltaTime);
-	void do_correct_listener_height(LPoint3f& newPos, float baseHeight);
+	void do_set_3d_static_attributes();
 	///@}
 
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)
