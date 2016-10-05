@@ -158,8 +158,18 @@ def readFromBamFile(fileName):
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
-    GameControlManager.get_global_ptr().write_to_bam_file(fileName)
+    GameAudioManager.get_global_ptr().write_to_bam_file(fileName)
     # # this is for testing explicit removal and destruction of all elements
+    audioMgr = GameAudioManager.get_global_ptr()
+    # destroy sound3ds
+    for sound3dTmp in audioMgr.get_sound3ds():
+        # destroy sound3dTmp
+        audioMgr.destroy_sound3d(NodePath.any_path(sound3dTmp))
+    # destroy listeners
+    for listenerTmp in audioMgr.get_listeners():
+        # destroy listenerTmp
+        audioMgr.destroy_listener(NodePath.any_path(listenerTmp))
+    #
     controlMgr = GameControlManager.get_global_ptr()
     # destroy drivers
     for driverTmp in controlMgr.get_drivers():
@@ -330,29 +340,18 @@ def movePlayer(data):
     elif action == rightMove:
         playerDriver.set_rotate_head_right(enable)
 
-def driverCallback(driver):
-    """driver update callback function"""
+def sound3dCallback(sound3d):
+    """sound3d update callback function"""
     
     global globalClock
-    speeds = driver.get_current_speeds()
-    print(driver, " " + str(globalClock.get_real_time()) + " - " + 
+    print(sound3d, " " + str(globalClock.get_real_time()) + " - " + 
             str(globalClock.get_dt()))
-    print("current speeds: ", speeds.get_first(), " - ",
-            speeds.get_second().get_value(0), "," ,
-            speeds.get_second().get_value(1))
-    # handle player on update
-    handlePlayerUpdate()
 
-def chaserCallback(chaser):
-    """chaser update callback function"""  
+def listenerCallback(listener):
+    """listener update callback function"""  
       
-    distance = (chaser.get_chased_object().get_pos() -
-            NodePath.any_path(chaser).get_pos()).length()
-    print(chaser, " " + str(globalClock.get_real_time()) + " - " + 
+    print(listener, " " + str(globalClock.get_real_time()) + " - " + 
             str(globalClock.get_dt()))
-    print("current distance: " , distance)
-    # handle chaser on update
-    handlePursuerUpdate()
 
 if __name__ == '__main__':
 
@@ -486,13 +485,14 @@ if __name__ == '__main__':
         setParametersBeforeCreation()
 
     # # first option: start the default update task for all plug-ins
-    controlMgr.start_default_update()
-    playerDriver.set_update_callback(driverCallback)
-    pursuerChaser.set_update_callback(chaserCallback)
+    audioMgr.start_default_update()
+    playerSound3d.set_update_callback(sound3dCallback)
+    pursuerSound3d.set_update_callback(sound3dCallback)
+    cameraListener.set_update_callback(listenerCallback)
     globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins
-#     app.taskMgr.add(updateControls, "updateControls", 10, appendTask=True)
+    app.taskMgr.add(updateControls, "updateControls", 10, appendTask=True)
 
     # write to bam file on exit
     app.win.set_close_request_event("close_request_event")

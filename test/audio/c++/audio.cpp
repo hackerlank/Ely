@@ -190,11 +190,29 @@ bool readFromBamFile(string fileName)
 void writeToBamFileAndExit(const Event*, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-	GameControlManager::get_global_ptr()->write_to_bam_file(fileName);
+	GameAudioManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
-//	framework.get_task_mgr().remove(updateTask);
+	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
+	WPT(GameAudioManager)audioMgr = GameAudioManager::get_global_ptr();
+	// destroy sound3ds
+	while (audioMgr->get_num_sound3ds() > 0)
+	{
+		// destroy the first one on every cycle
+		audioMgr->destroy_sound3d(
+				NodePath::any_path(audioMgr->get_sound3d(0)));
+///		delete DCAST(P3Sound3d, audioMgr->get_sound3d(0).node()); //ERROR
+	}
+	// destroy listeners
+	while (audioMgr->get_num_listeners() > 0)
+	{
+		// destroy the first one on every cycle
+		audioMgr->destroy_listener(
+				NodePath::any_path(audioMgr->get_listener(0)));
+///		delete DCAST(P3Listener, audioMgr->get_listener(0).node()); //ERROR
+	}
+	//
 	WPT(GameControlManager)controlMgr = GameControlManager::get_global_ptr();
 	// destroy drivers
 	while (controlMgr->get_num_drivers() > 0)
@@ -212,7 +230,8 @@ void writeToBamFileAndExit(const Event*, void* data)
 				NodePath::any_path(controlMgr->get_chaser(0)));
 ///		delete DCAST(P3Chaser, controlMgr->get_chaser(0).node()); //ERROR
 	}
-	// delete control manager
+	// delete managers
+	delete GameAudioManager::get_global_ptr();
 	delete GameControlManager::get_global_ptr();
 	// close the window framework
 	framework.close_framework();
@@ -414,29 +433,18 @@ void movePlayer(const Event*, void* data)
 	}
 }
 
-// driver update callback function
-void driverCallback(PT(P3Driver)driver)
+// sound3d update callback function
+void sound3dCallback(PT(P3Sound3d)sound3d)
 {
-	Pair<LVector3f, ValueList<float> > speeds = driver->get_current_speeds();
-	cout << *driver << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
+	cout << *sound3d << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
 			str(globalClock->get_dt()) << endl;
-	cout << "current speeds: " << speeds.get_first() << " - " <<
-			speeds.get_second().get_value(0) << "," <<
-			speeds.get_second().get_value(1) << endl;
-	// handle player on update
-	handlePlayerUpdate();
 }
 
-// chaser update callback function
-void chaserCallback(PT(P3Chaser)chaser)
+// listener update callback function
+void listenerCallback(PT(P3Listener)listener)
 {
-	float distance = (chaser->get_chased_object().get_pos() -
-			NodePath::any_path(chaser).get_pos()).length();
-	cout << *chaser << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
+	cout << *listener << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
 			str(globalClock->get_dt()) << endl;
-	cout << "current distance: " << distance << endl;
-	// handle chaser on update
-	handlePursuerUpdate();
 }
 
 int main(int argc, char *argv[])
@@ -483,7 +491,7 @@ int main(int argc, char *argv[])
 		// set sceneNP's collide mask
 		sceneNP.set_collide_mask(mask);
 
-		// set driver's various creation parameters as string
+		// set various creation parameters as string
 		setParametersBeforeCreation();
 		// get a player with anims
 		playerNP = getModelAnims("PlayerNP", 1.2, 0, playerAnimCtls);
@@ -584,16 +592,17 @@ int main(int argc, char *argv[])
 	}
 
 	/// first option: start the default update task for all drivers
-	controlMgr->start_default_update();
-	playerDriver->set_update_callback(driverCallback);
-	pursuerChaser->set_update_callback(chaserCallback);
+	audioMgr->start_default_update();
+    playerSound3d->set_update_callback(sound3dCallback);
+    pursuerSound3d->set_update_callback(sound3dCallback);
+    cameraListener->set_update_callback(listenerCallback);
     globalClock = ClockObject::get_global_clock();
 
     /// second option: start the custom update task for the drivers
-//	updateTask = new GenericAsyncTask("updateControls", &updateControls,
-//			nullptr);
-//	framework.get_task_mgr().add(updateTask);
-//	updateTask->set_sort(10);
+	updateTask = new GenericAsyncTask("updateControls", &updateControls,
+			nullptr);
+	framework.get_task_mgr().add(updateTask);
+	updateTask->set_sort(10);
 
 	// write to bam file on exit
 	window->get_graphics_window()->set_close_request_event(
