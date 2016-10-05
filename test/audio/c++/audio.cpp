@@ -104,6 +104,44 @@ void setParametersBeforeCreation()
 	audioMgr->set_parameter_value(GameAudioManager::LISTENER, "static",
 			"false");
 	//
+	GameControlManager* controlMgr = GameControlManager::get_global_ptr();
+	// set driver's parameters
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_angular_speed",
+			"100.0");
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_accel",
+			"50.0");
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_linear_speed",
+			"8.0");
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_accel",
+			"1.0");
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_friction",
+			"0.5");
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_friction",
+			"5.0");
+	// set chaser's parameters
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "fixed_relative_position",
+			"false");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "max_distance",
+			"25.0");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "min_distance",
+			"18.0");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "max_height",
+			"18.0");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "min_height",
+			"15.0");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "friction",
+			"5.0");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "fixed_look_at",
+			"true");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "mouse_head",
+			"true");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "mouse_pitch",
+			"true");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "look_at_distance",
+			"5.0");
+	controlMgr->set_parameter_value(GameControlManager::CHASER, "look_at_height",
+			"12.5");
+	//
 	printCreationParameters();
 }
 
