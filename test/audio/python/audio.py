@@ -153,11 +153,14 @@ def startFramework(msg):
 def readFromBamFile(fileName):
     """read scene from a file"""
     
-    return GameControlManager.get_global_ptr().read_from_bam_file(fileName)
+    return GameAudioManager.get_global_ptr().read_from_bam_file(fileName)
 
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
+    # before saving to bam, reparent listener to reference node
+    NodePath.any_path(cameraListener).reparent_to(
+            GameAudioManager.get_global_ptr().get_reference_node_path())
     GameAudioManager.get_global_ptr().write_to_bam_file(fileName)
     # # this is for testing explicit removal and destruction of all elements
     audioMgr = GameAudioManager.get_global_ptr()
@@ -377,14 +380,14 @@ if __name__ == '__main__':
     print("\n" + "Default creation parameters:")
     printCreationParameters()
 
+    # set a common reference node and reparent it to render
+    controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
+    audioMgr.get_reference_node_path().reparent_to(app.render)
+
     # load or restore all scene stuff: if passed an argument
     # try to read it from bam file
     if (not len(sys.argv) > 1) or (not readFromBamFile(sys.argv[1])):
         # no argument or no valid bamFile
-        # set a common reference node and reparent it to render
-        controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
-        audioMgr.get_reference_node_path().reparent_to(app.render)
-
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         sceneNP = loadTerrainLowPoly("SceneNP")
         # and reparent to the reference node
@@ -450,16 +453,12 @@ if __name__ == '__main__':
     else:
         # valid bamFile
         # restore sceneNP: through panda3d
-        sceneNP = GameControlManager.get_global_ptr().get_reference_node_path().find("**/SceneNP")
-        # reparent the reference node to render
-        GameControlManager.get_global_ptr().get_reference_node_path().reparent_to(app.render)
-
+        sceneNP = audioMgr.get_reference_node_path().find("**/SceneNP")
         # restore the player's reference
-        playerNP = GameControlManager.get_global_ptr().get_reference_node_path().find(
-                "**/PlayerNP")
+        playerNP = audioMgr.get_reference_node_path().find("**/PlayerNP");
     
         # restore driver: through control manager
-        playerDriver = GameControlManager.get_global_ptr().get_driver(0)
+        playerDriver = controlMgr.get_driver(0)
         # restore animations
         tmpList = [None for i in range(1)]
         playerAnimCtls.extend(tmpList)
@@ -471,7 +470,7 @@ if __name__ == '__main__':
             playerAnimCtls[i][j] = tmpAnims.get_anim(j)
 
         # restore chaser: through control manager
-        pursuerChaser = GameControlManager.get_global_ptr().get_chaser(0)
+        pursuerChaser = controlMgr.get_chaser(0)
         # restore animations
         pursuerAnimCtls.extend(tmpList)
         tmpAnims.clear_anims()
@@ -480,6 +479,25 @@ if __name__ == '__main__':
         for j in range(tmpAnims.get_num_anims()):
             pursuerAnimCtls[0][j] = tmpAnims.get_anim(j)
 
+        # restore sound3ds: through audio manager
+        for sound3d in audioMgr:
+            if sound3d.get_name() == "playerSound3d":
+                playerSound3d = sound3d
+            if sound3d.get_name() == "pursuerSound3d":
+                pursuerSound3d = sound3d
+        # set sounds looping
+        sound = playerSound3d.get_sound_by_name("eve-voice")
+        sound.set_loop(True)
+        sound.play()
+        #
+        sound = pursuerSound3d.get_sound_by_name("sparrow-chirp")
+        sound.set_loop(True)
+        sound.play()
+
+        # restore listeners: through audio manager
+        cameraListener = audioMgr.get_listener(0)
+        # xxx
+        
         # set creation parameters as strings before other drivers creation
         print("\n" + "Current creation parameters:")
         setParametersBeforeCreation()
