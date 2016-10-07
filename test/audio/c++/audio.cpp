@@ -190,9 +190,9 @@ bool readFromBamFile(string fileName)
 void writeToBamFileAndExit(const Event*, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-//	// before saving to bam, reparent listener to reference node xxx
-//	NodePath::any_path(cameraListener).reparent_to(
-//			GameAudioManager::get_global_ptr()->get_reference_node_path());
+	// before saving to bam, reparent listener to reference node
+	NodePath::any_path(cameraListener).reparent_to(
+			GameAudioManager::get_global_ptr()->get_reference_node_path());
 	GameAudioManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
 	framework.get_task_mgr().remove(updateTask);
@@ -500,15 +500,15 @@ int main(int argc, char *argv[])
 	cout << endl << "Default creation parameters:";
 	printCreationParameters();
 
-	// set a common reference node and reparent it to render
-	controlMgr->set_reference_node_path(audioMgr->get_reference_node_path());
-	audioMgr->get_reference_node_path().reparent_to(window->get_render());
-
 	// load or restore all scene stuff: if passed an argument
 	// try to read it from bam file
 	if ((not (argc > 1)) or (not readFromBamFile(argv[1])))
 	{
 		// no argument or no valid bamFile
+		// set a common reference node and reparent it to render
+		controlMgr->set_reference_node_path(audioMgr->get_reference_node_path());
+		audioMgr->get_reference_node_path().reparent_to(window->get_render());
+
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
 		sceneNP = loadTerrainLowPoly("SceneNP");
 		// and reparent to the reference node
@@ -570,14 +570,18 @@ int main(int argc, char *argv[])
 		cameraListener = DCAST(P3Listener, cameraListenerNP.node());
 		// reparent listener to the camera
 		cameraListenerNP.reparent_to(window->get_camera_group());
-		// reparent camera to reference node xxx
-		window->get_camera_group().set_name("listenerCameraNP");
-		window->get_camera_group().reparent_to(
-				audioMgr->get_reference_node_path());
+//		// reparent camera to reference node xxx
+//		window->get_camera_group().set_name("listenerCameraNP");
+//		window->get_camera_group().reparent_to(
+//				audioMgr->get_reference_node_path());
 	}
 	else
 	{
 		// valid bamFile
+		// set a common reference node and reparent it to render
+		controlMgr->set_reference_node_path(audioMgr->get_reference_node_path());
+		audioMgr->get_reference_node_path().reparent_to(window->get_render());
+
 		// restore sceneNP: through panda3d
 		sceneNP = audioMgr->get_reference_node_path().find("**/SceneNP");
 		// restore the player's reference
@@ -631,8 +635,10 @@ int main(int argc, char *argv[])
 
 		// restore listeners: through audio manager
 		cameraListener = audioMgr->get_listener(0);
-		// reparent listener to the (new) camera xxx
-//		NodePath oldCamera = audioMgr->get_reference_node_path().find(
+		// reparent listener to the camera
+		NodePath::any_path(cameraListener).reparent_to(
+				window->get_camera_group());
+//		NodePath oldCamera = audioMgr->get_reference_node_path().find(xxx
 //				"**/listenerCameraNP");
 //		window->get_camera_group().set_pos_hpr(oldCamera.get_pos(),
 //				oldCamera.get_hpr());

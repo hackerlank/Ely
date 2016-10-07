@@ -411,6 +411,13 @@ void P3Sound3d::write_datagram(BamWriter *manager, Datagram &dg)
 	///Static flag.
 	dg.add_bool(mStatic);
 
+	/// Sounds' characteristics. To be saved first.
+	///@{
+	dg.add_stdfloat(mMinDist);
+	dg.add_stdfloat(mMaxDist);
+	mPosition.write_datagram(dg);
+	///@}
+
 	///The set of sounds attached to this component.
 	dg.add_uint32(mSounds.size());
 	{
@@ -424,13 +431,6 @@ void P3Sound3d::write_datagram(BamWriter *manager, Datagram &dg)
 			dg.add_string(iter->second.second);
 		}
 	}
-
-	/// Sounds' characteristics.
-	///@{
-	dg.add_stdfloat(mMinDist);
-	dg.add_stdfloat(mMaxDist);
-	mPosition.write_datagram(dg);
-	///@}
 
 	///The reference node path.
 	manager->write_pointer(dg, mReferenceNP.node());
@@ -492,6 +492,13 @@ void P3Sound3d::fillin(DatagramIterator &scan, BamReader *manager)
 	///Static flag.
 	mStatic = scan.get_bool();
 
+	/// Sounds' characteristics. To be saved first.
+	///@{
+	mMinDist = scan.get_stdfloat();
+	mMaxDist = scan.get_stdfloat();
+	mPosition.read_datagram(scan);
+	///@}
+
 	///The set of sounds attached to this component.
 	mSounds.clear();
 	unsigned int size = scan.get_uint32();
@@ -502,13 +509,6 @@ void P3Sound3d::fillin(DatagramIterator &scan, BamReader *manager)
 		// insert into mSounds
 		add_sound(name, fileName);
 	}
-
-	/// Sounds' characteristics.
-	///@{
-	mMinDist = scan.get_stdfloat();
-	mMaxDist = scan.get_stdfloat();
-	mPosition.read_datagram(scan);
-	///@}
 
 	///The reference node path.
 	manager->read_pointer(scan);
