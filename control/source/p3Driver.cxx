@@ -329,6 +329,7 @@ void P3Driver::update(float dt)
 	dt = 0.016666667; //60 fps
 #endif
 
+	NodePath thisNP = NodePath::any_path(this);
 	//handle mouse
 	if (mMouseHandled)
 	{
@@ -340,26 +341,26 @@ void P3Driver::update(float dt)
 		{
 			if (mMouseEnabledH && (deltaX != 0.0))
 			{
-				mThisNP.set_h(
-						mThisNP.get_h() - deltaX * mSensX * mSignOfMouse);
+				thisNP.set_h(
+						thisNP.get_h() - deltaX * mSensX * mSignOfMouse);
 			}
 			if (mMouseEnabledP && (deltaY != 0.0))
 			{
-				mThisNP.set_p(
-						mThisNP.get_p() - deltaY * mSensY * mSignOfMouse);
+				thisNP.set_p(
+						thisNP.get_p() - deltaY * mSensY * mSignOfMouse);
 			}
 		}
 	}
 	//update position/orientation
-	mThisNP.set_y(mThisNP,
+	thisNP.set_y(thisNP,
 			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
-	mThisNP.set_x(mThisNP,
+	thisNP.set_x(thisNP,
 			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
-	mThisNP.set_z(mThisNP, mActualSpeedXYZ.get_z() * dt);
+	thisNP.set_z(thisNP, mActualSpeedXYZ.get_z() * dt);
 	//head
 	if (mHeadLimitEnabled)
 	{
-		float head = mThisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
+		float head = thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
 		if (head > mHLimit)
 		{
 			head = mHLimit;
@@ -368,17 +369,17 @@ void P3Driver::update(float dt)
 		{
 			head = -mHLimit;
 		}
-		mThisNP.set_h(head);
+		thisNP.set_h(head);
 	}
 	else
 	{
-		mThisNP.set_h(
-				mThisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
+		thisNP.set_h(
+				thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
 	}
 	//pitch
 	if (mPitchLimitEnabled)
 	{
-		float pitch = mThisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
+		float pitch = thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
 		if (pitch > mPLimit)
 		{
 			pitch = mPLimit;
@@ -387,12 +388,12 @@ void P3Driver::update(float dt)
 		{
 			pitch = -mPLimit;
 		}
-		mThisNP.set_p(pitch);
+		thisNP.set_p(pitch);
 	}
 	else
 	{
-		mThisNP.set_p(
-				mThisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
+		thisNP.set_p(
+				thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
 	}
 
 	//update speeds

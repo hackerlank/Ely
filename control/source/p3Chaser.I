@@ -25,9 +25,10 @@ INLINE void P3Chaser::set_reference_node_path(const NodePath& reference)
 INLINE void P3Chaser::set_chased_object(const NodePath& objectNP)
 {
 	mChasedNP = objectNP;
+	NodePath thisNP = NodePath::any_path(this);
 	// set chaser initial position/orientation
-	mThisNP.set_pos(mChasedNP, mChaserPosition);
-	mThisNP.look_at(mChasedNP, mLookAtPosition,
+	thisNP.set_pos(mChasedNP, mChaserPosition);
+	thisNP.look_at(mChasedNP, mLookAtPosition,
 			LVector3f::up());
 }
 

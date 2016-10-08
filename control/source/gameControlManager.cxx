@@ -108,7 +108,7 @@ NodePath GameControlManager::create_driver(const string& name)
 	// set reference node
 	newDriver->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
-	newDriver->mThisNP = mReferenceNP.attach_new_node(newDriver);
+	NodePath np = mReferenceNP.attach_new_node(newDriver);
 	// set the reference graphic window.
 	newDriver->mWin = mWin;
 	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
@@ -117,7 +117,7 @@ NodePath GameControlManager::create_driver(const string& name)
 	// add the new Driver to the inner list (and to the update task)
 	mDrivers.push_back(newDriver);
 	//
-	return newDriver->mThisNP;
+	return np;
 }
 
 /**
@@ -171,7 +171,7 @@ NodePath GameControlManager::create_chaser(const string& name)
 	// set reference node
 	newChaser->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
-	newChaser->mThisNP = mReferenceNP.attach_new_node(newChaser);
+	NodePath np = mReferenceNP.attach_new_node(newChaser);
 	// set the reference graphic window.
 	newChaser->mWin = mWin;
 	// initialize the new Chaser (could use mReferenceNP, mThisNP, mWin)
@@ -180,7 +180,7 @@ NodePath GameControlManager::create_chaser(const string& name)
 	// add the new Chaser to the inner list (and to the update task)
 	mChasers.push_back(newChaser);
 	//
-	return newChaser->mThisNP;
+	return np;
 }
 
 /**

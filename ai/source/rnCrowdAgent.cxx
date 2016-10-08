@@ -125,6 +125,7 @@ RNCrowdAgent::RNCrowdAgentState RNCrowdAgent::get_traversing_state() const
 void RNCrowdAgent::do_initialize()
 {
 	WPT(GameAIManager)mTmpl = GameAIManager::get_global_ptr();
+	NodePath thisNP = NodePath::any_path(this);
 	//set RNCrowdAgent parameters
 	//register to navmesh objectId
 	string navMeshName = mTmpl->get_parameter_value(GameAIManager::CROWDAGENT, string("add_to_navmesh"));
@@ -269,8 +270,8 @@ void RNCrowdAgent::do_initialize()
 	//clear all no more needed "Param" variables
 	thrownEventsParam.clear();
 	// set the collide mask to avoid hit with the nav mesh manager ray
-	mThisNP.set_collide_mask(~mTmpl->get_collide_mask() &
-			mThisNP.get_collide_mask());
+	thisNP.set_collide_mask(~mTmpl->get_collide_mask() &
+			thisNP.get_collide_mask());
 	//add to RNNavMesh if requested
 	PT(RNNavMesh) navMesh = NULL;
 	for (int index = 0;
@@ -280,7 +281,7 @@ void RNCrowdAgent::do_initialize()
 		navMesh = mTmpl->get_nav_mesh(index);
 		if (navMesh->get_name() == navMeshName)
 		{
-			navMesh->add_crowd_agent(mThisNP);
+			navMesh->add_crowd_agent(thisNP);
 			break;
 		}
 	}
@@ -300,13 +301,14 @@ void RNCrowdAgent::do_initialize()
  */
 void RNCrowdAgent::do_finalize()
 {
+	NodePath thisNP = NodePath::any_path(this);
 	//Remove from RNNavMesh update (if previously added)
 	//mNavMesh will be cleared during removing, so
 	//remove through a temporary pointer
 	WPT(RNNavMesh)navMesh = mNavMesh;
 	if(navMesh)
 	{
-		navMesh->remove_crowd_agent(mThisNP);
+		navMesh->remove_crowd_agent(thisNP);
 	}
 	//
 	mNavMesh.clear();
@@ -317,7 +319,7 @@ void RNCrowdAgent::do_finalize()
 		children[i].detach_node();
 	}
 	//remove this NodePath
-	mThisNP.remove_node();
+	thisNP.remove_node();
 	//
 #ifdef PYTHON_BUILD
 	//Python callback
@@ -337,6 +339,7 @@ void RNCrowdAgent::do_finalize()
  */
 void RNCrowdAgent::do_update_pos_dir(float dt, const LPoint3f& pos, const LVector3f& vel)
 {
+	NodePath thisNP = NodePath::any_path(this);
 	// get the squared velocity module
 	float velSquared = vel.length_squared();
 
@@ -358,13 +361,13 @@ void RNCrowdAgent::do_update_pos_dir(float dt, const LPoint3f& pos, const LVecto
 			updatedPos.set_z(gotCollisionZ.get_second());
 		}
 	}
-	mThisNP.set_pos(updatedPos);
+	thisNP.set_pos(updatedPos);
 
 	//update node path direction & throw events
 	if (velSquared > 0.0)
 	{
 		//update node path direction
-		mThisNP.heads_up(updatedPos - vel);
+		thisNP.heads_up(updatedPos - vel);
 
 		//throw Move event (if enabled)
 		if (mMove.mEnable)

@@ -217,8 +217,6 @@ protected:
 private:
 	///The chased object's node path.
 	NodePath mChasedNP;
-	///This NodePath.
-	NodePath mThisNP;
 	///The reference node path.
 	NodePath mReferenceNP;
 	///The reference graphic window.

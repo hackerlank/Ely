@@ -231,14 +231,14 @@ NodePath GameAIManager::create_steer_vehicle(const string& name)
 	// set reference node
 	newSteerVehicle->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
-	newSteerVehicle->mThisNP = mReferenceNP.attach_new_node(newSteerVehicle);
+	NodePath np = mReferenceNP.attach_new_node(newSteerVehicle);
 	//initialize the new SteerVehicle (could use mReferenceNP and mThisNP)
 	newSteerVehicle->do_initialize();
 
 	//add the new SteerVehicle to the inner list
 	mSteerVehicles.push_back(newSteerVehicle);
 	//
-	return newSteerVehicle->mThisNP;
+	return np;
 }
 
 /**
@@ -348,14 +348,14 @@ NodePath GameAIManager::create_crowd_agent(const string& name)
 	// set reference node
 	newCrowdAgent->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
-	newCrowdAgent->mThisNP = mReferenceNP.attach_new_node(newCrowdAgent);
+	NodePath np = mReferenceNP.attach_new_node(newCrowdAgent);
 	// initialize the new CrowdAgent (could use mReferenceNP and mThisNP)
 	newCrowdAgent->do_initialize();
 
 	//add the new CrowdAgent to the inner list
 	mCrowdAgents.push_back(newCrowdAgent);
 	//
-	return newCrowdAgent->mThisNP;
+	return np;
 }
 
 /**

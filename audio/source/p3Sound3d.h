@@ -130,8 +130,6 @@ protected:
 	virtual ~P3Sound3d();
 
 private:
-	///This NodePath.
-	NodePath mThisNP;
 	///The reference node path.
 	NodePath mReferenceNP;
 	///Static flag.

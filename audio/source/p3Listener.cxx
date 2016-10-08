@@ -95,10 +95,10 @@ void P3Listener::set_static(bool enable)
  */
 void P3Listener::do_set_3d_static_attributes()
 {
-	mPosition = mThisNP.get_pos(mReferenceNP);
-	LVector3f forward = mThisNP.get_relative_vector(mReferenceNP,
+	mPosition = NodePath::any_path(this).get_pos(mReferenceNP);
+	LVector3f forward = NodePath::any_path(this).get_relative_vector(mReferenceNP,
 			LVector3f::forward());
-	LVector3f up = mThisNP.get_relative_vector(mReferenceNP, LVector3f::up());
+	LVector3f up = NodePath::any_path(this).get_relative_vector(mReferenceNP, LVector3f::up());
 	GameAudioManager::GetSingletonPtr()->get_audio_manager()->audio_3d_set_listener_attributes(
 			mPosition.get_x(), mPosition.get_y(), mPosition.get_z(), 0.0, 0.0,
 			0.0, forward.get_x(), forward.get_y(), forward.get_z(), up.get_x(),
@@ -120,10 +120,10 @@ void P3Listener::update(float dt)
 	LVector3f forward, up, deltaPos, velocity;
 
 	//get the new position
-	newPosition = mThisNP.get_pos(mReferenceNP);
-	forward = mReferenceNP.get_relative_vector(mThisNP,
+	newPosition = NodePath::any_path(this).get_pos(mReferenceNP);
+	forward = mReferenceNP.get_relative_vector(NodePath::any_path(this),
 			LVector3f::forward());
-	up = mReferenceNP.get_relative_vector(mThisNP, LVector3f::up());
+	up = mReferenceNP.get_relative_vector(NodePath::any_path(this), LVector3f::up());
 
 	//get the velocity (mPosition holds the previous position)
 	deltaPos = (newPosition - mPosition);

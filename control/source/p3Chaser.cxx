@@ -384,9 +384,10 @@ void P3Chaser::update(float dt)
 #endif
 
 	//update chaser position and orientation (see OgreBulletDemos)
+	NodePath thisNP = NodePath::any_path(this);
 	//position
 	LPoint3f currentChaserPos = mReferenceNP.get_relative_point(
-			mThisNP, LPoint3f::zero());
+			thisNP, LPoint3f::zero());
 	LPoint3f newPos;
 	LPoint3f desiredChaserPos;
 	if (mFixedRelativePosition)
@@ -426,12 +427,12 @@ void P3Chaser::update(float dt)
 		}
 	}
 	//
-	mThisNP.set_pos(mReferenceNP, newPos);
+	thisNP.set_pos(mReferenceNP, newPos);
 	//orientation
 	if (mFixedLookAt)
 	{
 		//look at fixed location
-		mThisNP.look_at(mChasedNP, mLookAtPosition,
+		thisNP.look_at(mChasedNP, mLookAtPosition,
 				LVector3f::up());
 	}
 	else
@@ -487,16 +488,16 @@ void P3Chaser::update(float dt)
 		if (wantRotate)
 		{
 			//want rotate: update to desired look up
-			mThisNP.set_hpr(
-					mThisNP.get_hpr() + LVecBase3f(deltaH, deltaP, deltaR));
+			thisNP.set_hpr(
+					thisNP.get_hpr() + LVecBase3f(deltaH, deltaP, deltaR));
 		}
 		else if (! mHoldLookAt)
 		{
 			//don't want rotate: return to look up to fixed location
-			mFixedLookAtNP.set_pos(mThisNP.get_pos());
+			mFixedLookAtNP.set_pos(thisNP.get_pos());
 			mFixedLookAtNP.look_at(mChasedNP, mLookAtPosition,
 					LVector3f::up());
-			LVecBase3f deltaHPR = mThisNP.get_hpr(mFixedLookAtNP);
+			LVecBase3f deltaHPR = thisNP.get_hpr(mFixedLookAtNP);
 			float kReductFactor = mFriction * dt;
 			if (kReductFactor > 1.0)
 			{
@@ -506,7 +507,7 @@ void P3Chaser::update(float dt)
 			{
 				deltaHPR -= deltaHPR * kReductFactor;
 			}
-			mThisNP.set_hpr(mFixedLookAtNP, deltaHPR);
+			thisNP.set_hpr(mFixedLookAtNP, deltaHPR);
 		}
 	}
 	//

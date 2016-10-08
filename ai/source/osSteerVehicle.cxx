@@ -194,6 +194,7 @@ void OSSteerVehicle::do_create_vehicle(OSSteerVehicleType type)
 void OSSteerVehicle::do_initialize()
 {
 	WPT(GameAIManager)mTmpl = GameAIManager::get_global_ptr();
+	NodePath thisNP = NodePath::any_path(this);
 	//set OSSteerVehicle parameters
 	string param;
 	//external update
@@ -305,18 +306,18 @@ void OSSteerVehicle::do_initialize()
 	settings.set_maxSpeed(value >= 0.0 ? value : 1.0);
 	//forward
 	LVector3f forward = mReferenceNP.get_relative_vector(
-			mThisNP, -LVector3f::forward());
+			thisNP, -LVector3f::forward());
 	settings.set_forward(forward);
 	//up
 	LVector3f up = mReferenceNP.get_relative_vector(
-			mThisNP, LVector3f::up());
+			thisNP, LVector3f::up());
 	settings.set_up(up);
 	//side
 	settings.set_side(forward.cross(up).normalize());
 	//position
-	settings.set_position(mThisNP.get_pos());
+	settings.set_position(thisNP.get_pos());
 	//start
-	settings.set_start(mThisNP.get_pos());
+	settings.set_start(thisNP.get_pos());
 	//path pred time
 	value = STRTOF(mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
 					string("path_pred_time")).c_str(),
@@ -386,8 +387,8 @@ void OSSteerVehicle::do_initialize()
 	set_settings(settings);
 	//
 	// set the collide mask to avoid hit with the steer manager ray
-	mThisNP.set_collide_mask(~mTmpl->get_collide_mask() &
-			mThisNP.get_collide_mask());
+	thisNP.set_collide_mask(~mTmpl->get_collide_mask() &
+			thisNP.get_collide_mask());
 	//
 	//thrown events
 	string mThrownEventsParam = mTmpl->get_parameter_value(GameAIManager::STEERVEHICLE,
@@ -509,7 +510,7 @@ void OSSteerVehicle::do_initialize()
 		plugIn = GameAIManager::get_global_ptr()->get_steer_plug_in(index);
 		if (plugIn->get_name() == mSteerPlugInObjectId)
 		{
-			plugIn->add_steer_vehicle(mThisNP);
+			plugIn->add_steer_vehicle(thisNP);
 			break;
 		}
 	}
@@ -988,6 +989,7 @@ void OSSteerVehicle::do_update_steer_vehicle(const float currentTime,
 {
 	LPoint3f updatedPos = ossup::OpenSteerVec3ToLVecBase3f(
 			mVehicle->position());
+	NodePath thisNP = NodePath::any_path(this);
 	//update node path position
 	if ((mMovType == OPENSTEER_KINEMATIC) && (mVehicle->speed() > 0.0))
 	{
@@ -1007,7 +1009,7 @@ void OSSteerVehicle::do_update_steer_vehicle(const float currentTime,
 			mVehicle->setPosition(ossup::LVecBase3fToOpenSteerVec3(updatedPos));
 		}
 	}
-	mThisNP.set_pos(updatedPos);
+	thisNP.set_pos(updatedPos);
 
 	if (mVehicle->speed() > 0.0)
 	{
@@ -1015,7 +1017,7 @@ void OSSteerVehicle::do_update_steer_vehicle(const float currentTime,
 		if (mUpAxisFixed)
 		{
 			//up axis fixed: z
-			mThisNP.heads_up(
+			thisNP.heads_up(
 					updatedPos
 							- ossup::OpenSteerVec3ToLVecBase3f(
 									mVehicle->forward()), LVector3f::up());
@@ -1065,7 +1067,7 @@ void OSSteerVehicle::do_update_steer_vehicle(const float currentTime,
 		else
 		{
 				//up axis free: from mVehicle
-				mThisNP.heads_up(
+				thisNP.heads_up(
 						updatedPos
 								- ossup::OpenSteerVec3ToLVecBase3f(
 										mVehicle->forward()),
@@ -1141,18 +1143,19 @@ void OSSteerVehicle::do_external_update_steer_vehicle(const float currentTime,
 		const float elapsedTime)
 {
 	OpenSteer::Vec3 oldPos = mVehicle->position();
+	NodePath thisNP = NodePath::any_path(this);
 	//update steer vehicle's
 	//position,
-	mVehicle->setPosition(ossup::LVecBase3fToOpenSteerVec3(mThisNP.get_pos()));
+	mVehicle->setPosition(ossup::LVecBase3fToOpenSteerVec3(thisNP.get_pos()));
 	//forward,
 	mVehicle->setForward(
 			ossup::LVecBase3fToOpenSteerVec3(
-					mReferenceNP.get_relative_vector(mThisNP,
+					mReferenceNP.get_relative_vector(thisNP,
 							-LVector3f::forward())).normalize());
 	//up,
 	mVehicle->setUp(
 			ossup::LVecBase3fToOpenSteerVec3(
-					mReferenceNP.get_relative_vector(mThisNP, LVector3f::up())).normalize());
+					mReferenceNP.get_relative_vector(thisNP, LVector3f::up())).normalize());
 	//side,
 	mVehicle->setUnitSideFromForwardAndUp();
 	//speed (elapsedTime should be != 0)

@@ -109,14 +109,14 @@ NodePath GameAudioManager::create_sound3d(const string& name)
 	// set reference node
 	newSound3d->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
-	newSound3d->mThisNP = mReferenceNP.attach_new_node(newSound3d);
+	NodePath np = mReferenceNP.attach_new_node(newSound3d);
 	// initialize the new P3Sound3d (could use mReferenceNP, mThisNP)
 	newSound3d->do_initialize();
 
 	// add the new P3Sound3d to the inner list (and to the update task)
 	mSound3ds.push_back(newSound3d);
 	//
-	return newSound3d->mThisNP;
+	return np;
 }
 
 /**
@@ -168,14 +168,14 @@ NodePath GameAudioManager::create_listener(const string& name)
 	// set reference node
 	newListener->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
-	newListener->mThisNP = mReferenceNP.attach_new_node(newListener);
+	NodePath np = mReferenceNP.attach_new_node(newListener);
 	// initialize the new P3Listener (could use mReferenceNP, mThisNP)
 	newListener->do_initialize();
 
 	// add the new P3Listener to the inner list (and to the update task)
 	mListeners.push_back(newListener);
 	//
-	return newListener->mThisNP;
+	return np;
 }
 
 /**

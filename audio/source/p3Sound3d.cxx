@@ -274,7 +274,7 @@ PT(AudioSound) P3Sound3d::get_sound(int index) const
  */
 void P3Sound3d::do_set_3d_static_attributes()
 {
-	mPosition = mThisNP.get_pos(mReferenceNP);
+	mPosition = NodePath::any_path(this).get_pos(mReferenceNP);
 	SoundTable::iterator iter;
 	for (iter = mSounds.begin(); iter != mSounds.end(); ++iter)
 	{
@@ -296,7 +296,7 @@ void P3Sound3d::update(float dt)
 
 	//get the new position
 	//note on threading: this should be an atomic operation
-	LPoint3f newPosition = mThisNP.get_pos(mReferenceNP);
+	LPoint3f newPosition = NodePath::any_path(this).get_pos(mReferenceNP);
 	//get the velocity (mPosition holds the previous position)
 	LVector3f deltaPos = (newPosition - mPosition);
 	LVector3f velocity;
