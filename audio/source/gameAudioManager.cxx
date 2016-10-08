@@ -362,9 +362,9 @@ void GameAudioManager::set_parameters_defaults(AudioType type)
 		//sets the (mandatory) parameters to their default values:
 		mSound3dsParameterTable.insert(ParameterNameValue("static", "false"));
 		mSound3dsParameterTable.insert(
-				ParameterNameValue("min_distance", "3.28"));
+				ParameterNameValue("min_distance", "1.0"));
 		mSound3dsParameterTable.insert(
-				ParameterNameValue("max_distance", "32.8"));
+				ParameterNameValue("max_distance", "1000000000.0"));
 		return;
 	}
 	if (type == LISTENER)

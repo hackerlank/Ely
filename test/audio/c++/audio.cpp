@@ -36,7 +36,9 @@ string modelAnimFiles[5][2] =
 const float animRateFactor[2] = { 0.6, 0.175 };
 // sound effects
 string soundFile[5] =
-{ "eve_voice.wav", "", "sparrow_chirp.wav", "", "" };
+{ "eve_voice.wav", "", "sparrow_chirp.wav", "", "red_car_engine.wav" };
+string soundName[5] =
+{ "eve-voice", "", "sparrow-chirp", "", "red-car-engine" };
 // bam file
 string bamFileName("audio.boo");
 
@@ -97,9 +99,7 @@ void setParametersBeforeCreation()
 	// set sound3d's parameters
 	audioMgr->set_parameter_value(GameAudioManager::SOUND3D, "static", "false");
 	audioMgr->set_parameter_value(GameAudioManager::SOUND3D, "min_distance",
-			"5.0");
-	audioMgr->set_parameter_value(GameAudioManager::SOUND3D, "max_distance",
-			"50.0");
+			"0.5");
 	// set listener's parameters
 	audioMgr->set_parameter_value(GameAudioManager::LISTENER, "static",
 			"false");
@@ -107,13 +107,13 @@ void setParametersBeforeCreation()
 	GameControlManager* controlMgr = GameControlManager::get_global_ptr();
 	// set driver's parameters
 	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_angular_speed",
-			"100.0");
-	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_accel",
 			"50.0");
+	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_accel",
+			"10.0");
 	controlMgr->set_parameter_value(GameControlManager::DRIVER, "max_linear_speed",
-			"8.0");
+			"150.0");
 	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_accel",
-			"1.0");
+			"10.0");
 	controlMgr->set_parameter_value(GameControlManager::DRIVER, "linear_friction",
 			"0.5");
 	controlMgr->set_parameter_value(GameControlManager::DRIVER, "angular_friction",
@@ -190,7 +190,7 @@ bool readFromBamFile(string fileName)
 void writeToBamFileAndExit(const Event*, void* data)
 {
 	string fileName = *reinterpret_cast<string*>(data);
-	// before saving to bam, reparent listener to reference node
+	// before saving to bam file, reparent listener to reference node
 	NodePath::any_path(cameraListener).reparent_to(
 			GameAudioManager::get_global_ptr()->get_reference_node_path());
 	GameAudioManager::get_global_ptr()->write_to_bam_file(fileName);
@@ -438,39 +438,24 @@ void movePlayer(const Event*, void* data)
 // sound3d update callback function
 void sound3dCallback(PT(P3Sound3d)sound3d)
 {
-	cout << *sound3d << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
-			str(globalClock->get_dt()) << endl;
+	if (sound3d != playerSound3d)
+	{
+		return;
+	}
+	float currentVelSize =
+			abs(playerDriver->get_current_speeds().get_first().get_y());
+	(*sound3d)[0]->set_play_rate(0.1 + currentVelSize * 0.05);
 }
 
 // listener update callback function
 void listenerCallback(PT(P3Listener)listener)
 {
-	cout << *listener << string(" ") + str(globalClock->get_real_time()) + string(" - ") +
-			str(globalClock->get_dt()) << endl;
-}
-
-// reparent listener to the (new) camera xxx
-AsyncTask::DoneStatus restoreOnce(GenericAsyncTask*, void* data)
-{
-	static int count = 0;
-	if (count == 1)
-	{
-		// reparent listener to the (new) camera
-		NodePath oldCamera =
-				GameAudioManager::get_global_ptr()->get_reference_node_path().find(
-						"**/listenerCameraNP");
-		window->get_camera_group().set_pos_hpr(oldCamera.get_pos(),
-				oldCamera.get_hpr());
-		oldCamera.remove_node();
-		window->get_camera_group().reparent_to(
-				GameAudioManager::get_global_ptr()->get_reference_node_path());
-		NodePath::any_path(cameraListener).reparent_to(
-				window->get_camera_group());
-		return AsyncTask::DS_done;
-	}
-	++count;
-	//
-	return AsyncTask::DS_again;
+	NodePath refNP =
+			GameAudioManager::get_global_ptr()->get_reference_node_path();
+	float distLS = (NodePath::any_path(playerSound3d).get_pos(refNP) -
+			NodePath::any_path(listener).get_pos(refNP)).length();
+	cout << *listener << string(" ") + str(globalClock->get_real_time()) +
+			string(" - ") + str(distLS) << endl;
 }
 
 int main(int argc, char *argv[])
@@ -520,7 +505,7 @@ int main(int argc, char *argv[])
 		// set various creation parameters as string
 		setParametersBeforeCreation();
 		// get a player with anims
-		playerNP = getModelAnims("PlayerNP", 1.2, 0, playerAnimCtls);
+		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
 		// get a pursuer with anims
 		pursuerNP = getModelAnims("PursuerNP", 0.01, 2, pursuerAnimCtls);
 		pursuerNP.set_h(180);
@@ -544,8 +529,8 @@ int main(int argc, char *argv[])
 		pursuerNP.reparent_to(pursuerChaserNP);
 
 		// create some sound3ds (attached to the reference node)
-		NodePath playerSound3dNP = audioMgr->create_sound3d("playerSound3d");
-		NodePath pursuerSound3dNP = audioMgr->create_sound3d("pursuerSound3d");
+		NodePath playerSound3dNP = audioMgr->create_sound3d("PlayerSound3d");
+		NodePath pursuerSound3dNP = audioMgr->create_sound3d("PursuerSound3d");
 		// get a reference to the sound3ds
 		playerSound3d = DCAST(P3Sound3d, playerSound3dNP.node());
 		pursuerSound3d = DCAST(P3Sound3d, pursuerSound3dNP.node());
@@ -553,33 +538,30 @@ int main(int argc, char *argv[])
 		playerSound3dNP.reparent_to(playerNP);
 		pursuerSound3dNP.reparent_to(pursuerNP);
 		// attach some sounds to the sound3ds
-		playerSound3d->add_sound("eve-voice", "eve_voice.wav");
-		pursuerSound3d->add_sound("sparrow-chirp", "sparrow_chirp.wav");
+		playerSound3d->add_sound(soundName[4], soundFile[4]);
+		pursuerSound3d->add_sound(soundName[2], soundFile[2]);
 		// set sounds looping
-		PT(AudioSound)sound = playerSound3d->get_sound_by_name("eve-voice");
+		PT(AudioSound)sound = playerSound3d->get_sound_by_name(soundName[4]);
 		sound->set_loop(true);
 		sound->play();
 		//
-		sound = pursuerSound3d->get_sound_by_name("sparrow-chirp");
+		sound = pursuerSound3d->get_sound_by_name(soundName[2]);
 		sound->set_loop(true);
 		sound->play();
 
 		// create a listener (attached to the reference node)
-		NodePath cameraListenerNP = audioMgr->create_listener("cameraListener");
+		NodePath cameraListenerNP = audioMgr->create_listener("CameraListener");
 		// get a reference to the camera's listener
 		cameraListener = DCAST(P3Listener, cameraListenerNP.node());
 		// reparent listener to the camera
 		cameraListenerNP.reparent_to(window->get_camera_group());
-//		// reparent camera to reference node xxx
-//		window->get_camera_group().set_name("listenerCameraNP");
-//		window->get_camera_group().reparent_to(
-//				audioMgr->get_reference_node_path());
 	}
 	else
 	{
 		// valid bamFile
 		// set a common reference node and reparent it to render
-		controlMgr->set_reference_node_path(audioMgr->get_reference_node_path());
+		controlMgr->set_reference_node_path(
+				audioMgr->get_reference_node_path());
 		audioMgr->get_reference_node_path().reparent_to(window->get_render());
 
 		// restore sceneNP: through panda3d
@@ -615,21 +597,21 @@ int main(int argc, char *argv[])
 		for (int i = 0; i < audioMgr->get_num_sound3ds(); ++i)
 		{
 			PT(P3Sound3d)sound3d = GameAudioManager::get_global_ptr()->get_sound3d(i);
-			if (sound3d->get_name() == "playerSound3d")
+			if (sound3d->get_name() == "PlayerSound3d")
 			{
 				playerSound3d = sound3d;
 			}
-			if (sound3d->get_name() == "pursuerSound3d")
+			if (sound3d->get_name() == "PursuerSound3d")
 			{
 				pursuerSound3d = sound3d;
 			}
 		}
 		// set sounds looping
-		PT(AudioSound)sound = playerSound3d->get_sound_by_name("eve-voice");
+		PT(AudioSound)sound = playerSound3d->get_sound_by_name(soundName[4]);
 		sound->set_loop(true);
 		sound->play();
 		//
-		sound = pursuerSound3d->get_sound_by_name("sparrow-chirp");
+		sound = pursuerSound3d->get_sound_by_name(soundName[2]);
 		sound->set_loop(true);
 		sound->play();
 
@@ -638,19 +620,6 @@ int main(int argc, char *argv[])
 		// reparent listener to the camera
 		NodePath::any_path(cameraListener).reparent_to(
 				window->get_camera_group());
-//		NodePath oldCamera = audioMgr->get_reference_node_path().find(xxx
-//				"**/listenerCameraNP");
-//		window->get_camera_group().set_pos_hpr(oldCamera.get_pos(),
-//				oldCamera.get_hpr());
-//		oldCamera.remove_node();
-//		window->get_camera_group().reparent_to(
-//				audioMgr->get_reference_node_path());
-//		NodePath::any_path(cameraListener).reparent_to(
-//				window->get_camera_group());
-//		AsyncTask* restoreOnceTask = new GenericAsyncTask("restoreOnce", &restoreOnce,
-//				nullptr);
-//		framework.get_task_mgr().add(restoreOnceTask);
-//		restoreOnceTask->set_sort(10);
 
 		// set creation parameters as strings before other objects creation
 		cout << endl << "Current creation parameters:";

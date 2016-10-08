@@ -286,6 +286,8 @@ def updateControls(task):
     handlePlayerUpdate()
     # handle player on update
     handlePursuerUpdate()
+    #
+    return task.cont
     
 def movePlayer(data):
     """player's movement callback"""

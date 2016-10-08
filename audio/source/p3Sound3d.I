@@ -52,10 +52,12 @@ INLINE bool P3Sound3d::get_static() const
 }
 
 /**
- * Returns the minimum distance of P3Sound3d's audio sounds (>=0.0).
- * This is the distance (in units) that these sounds begin to fall off.
- * Also affects the rate it falls off. Default is 3.28 (in feet, this is equal
- * to 1 meter). Don't forget to change this when you change the DistanceFactor
+ * Returns the minimum distance of all audio sounds added to this P3Sound3d's
+ * (>=0.0).
+ * Controls the distance (in units) that this sound begins to fall off. Also
+ * affects the rate it falls off. Default is 1.0 CloserFaster, <1.0
+ * FartherSlower, >1.0.
+ * Don't forget to change this when you change the DistanceFactor
  * (through the AudioManager, ie GameAudioManager::get_audio_manager()).
  */
 INLINE float P3Sound3d::get_min_distance() const
@@ -64,10 +66,11 @@ INLINE float P3Sound3d::get_min_distance() const
 }
 
 /**
- * Returns the maximum distance of P3Sound3d's audio sounds (>=0.0).
- * This is the maximum distance (in units) that these sounds stop falling off.
- * The sounds do not stop at that point, they just don't get any quieter.
- * You should rarely need to adjust this. Default is 1000000000.0
+ * Returns the maximum distance of all audio sounds added to this P3Sound3d's
+ * (>=0.0).
+ * Controls the maximum distance (in units) that this sound stops falling off.
+ * The sound does not stop at that point, it just doesn't get any quieter. You
+ * should rarely need to adjust this. Default is 1000000000.0.
  */
 INLINE float P3Sound3d::get_max_distance() const
 {

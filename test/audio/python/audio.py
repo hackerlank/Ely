@@ -6,7 +6,7 @@ Created on Sep 20, 2016
 
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
-        ClockObject, TextNode, LPoint3f, LVecBase3f
+        ClockObject, TextNode, LPoint3f, LVecBase3f, AudioManager
 from direct.showbase.ShowBase import ShowBase
 from p3audio import GameAudioManager
 from p3control import GameControlManager
@@ -27,7 +27,8 @@ modelAnimFiles = [["eve-walk.egg", "eve-run.egg"],
                   ["red_car-anim.egg", "red_car-anim2.egg"]]
 animRateFactor = [0.6, 0.175]
 # sound effects
-soundFile = ["eve_voice.wav", "", "sparrow_chirp.wav", "", ""]
+soundFile = ["eve_voice.wav", "", "sparrow_chirp.wav", "", "red_car_engine.wav"]
+soundName = ["eve-voice", "", "sparrow-chirp", "", "red-car-engine"]
 # bame file
 bamFileName = "audio.boo"
 
@@ -81,9 +82,7 @@ def setParametersBeforeCreation():
     # set sound3d's parameters
     audioMgr.set_parameter_value(GameAudioManager.SOUND3D, "static", "false")
     audioMgr.set_parameter_value(GameAudioManager.SOUND3D, "min_distance",
-            "5.0")
-    audioMgr.set_parameter_value(GameAudioManager.SOUND3D, "max_distance",
-            "50.0")
+            "0.5")
     # set listener's parameters
     audioMgr.set_parameter_value(GameAudioManager.LISTENER, "static",
             "false")
@@ -91,13 +90,13 @@ def setParametersBeforeCreation():
     controlMgr = GameControlManager.get_global_ptr()
     # set driver's parameters
     controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_angular_speed",
-            "100.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_accel",
             "50.0")
+    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_accel",
+            "10.0")
     controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_linear_speed",
-            "8.0")
+            "150.0")
     controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_accel",
-            "1.0")
+            "10.0")
     controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_friction",
             "0.5")
     controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_friction",
@@ -158,7 +157,7 @@ def readFromBamFile(fileName):
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
-    # before saving to bam, reparent listener to reference node
+    # before saving to bam file, reparent listener to reference node
     NodePath.any_path(cameraListener).reparent_to(
             GameAudioManager.get_global_ptr().get_reference_node_path())
     GameAudioManager.get_global_ptr().write_to_bam_file(fileName)
@@ -317,6 +316,8 @@ def updateControls(task):
     handlePlayerUpdate()
     # handle player on update
     handlePursuerUpdate()
+    #
+    return task.cont
     
 def movePlayer(data):
     """player's movement callback"""
@@ -346,15 +347,20 @@ def movePlayer(data):
 def sound3dCallback(sound3d):
     """sound3d update callback function"""
     
-    global globalClock
-    print(sound3d, " " + str(globalClock.get_real_time()) + " - " + 
-            str(globalClock.get_dt()))
+    global playerDriver
+    if sound3d != playerSound3d:
+        return
+    currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
+    sound3d[0].set_play_rate(0.1 + currentVelSize * 0.05)
 
 def listenerCallback(listener):
     """listener update callback function"""  
-      
-    print(listener, " " + str(globalClock.get_real_time()) + " - " + 
-            str(globalClock.get_dt()))
+
+    global playerSound3d
+    refNP = GameAudioManager.get_global_ptr().get_reference_node_path()
+    distLS = (NodePath.any_path(playerSound3d).get_pos(refNP) - 
+            NodePath.any_path(listener).get_pos(refNP)).length()
+    print(listener, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
 
 if __name__ == '__main__':
 
@@ -380,14 +386,14 @@ if __name__ == '__main__':
     print("\n" + "Default creation parameters:")
     printCreationParameters()
 
-    # set a common reference node and reparent it to render
-    controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
-    audioMgr.get_reference_node_path().reparent_to(app.render)
-
     # load or restore all scene stuff: if passed an argument
     # try to read it from bam file
     if (not len(sys.argv) > 1) or (not readFromBamFile(sys.argv[1])):
         # no argument or no valid bamFile
+        # set a common reference node and reparent it to render
+        controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
+        audioMgr.get_reference_node_path().reparent_to(app.render)
+        
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         sceneNP = loadTerrainLowPoly("SceneNP")
         # and reparent to the reference node
@@ -399,7 +405,7 @@ if __name__ == '__main__':
         # set driver's various creation parameters as string
         setParametersBeforeCreation()
         # get a player with anims
-        playerNP = getModelAnims("PlayerNP", 1.2, 0, playerAnimCtls)
+        playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
         # get a pursuer with anims
         pursuerNP = getModelAnims("PursuerNP", 0.01, 2, pursuerAnimCtls)
         pursuerNP.set_h(180)
@@ -423,8 +429,8 @@ if __name__ == '__main__':
         pursuerNP.reparent_to(pursuerChaserNP)
         
         # create some sound3ds (attached to the reference node)
-        playerSound3dNP = audioMgr.create_sound3d("playerSound3d")
-        pursuerSound3dNP = audioMgr.create_sound3d("pursuerSound3d")
+        playerSound3dNP = audioMgr.create_sound3d("PlayerSound3d")
+        pursuerSound3dNP = audioMgr.create_sound3d("PursuerSound3d")
         # get a reference to the sound3ds
         playerSound3d = playerSound3dNP.node()
         pursuerSound3d = pursuerSound3dNP.node()
@@ -432,19 +438,19 @@ if __name__ == '__main__':
         playerSound3dNP.reparent_to(playerNP)
         pursuerSound3dNP.reparent_to(pursuerNP)
         # attach some sounds to the sound3ds
-        playerSound3d.add_sound("eve-voice", "eve_voice.wav")
-        pursuerSound3d.add_sound("sparrow-chirp", "sparrow_chirp.wav")
+        playerSound3d.add_sound(soundName[4], soundFile[4])
+        pursuerSound3d.add_sound(soundName[2], soundFile[2])
         # set sounds looping
-        sound = playerSound3d.get_sound_by_name("eve-voice")
+        sound = playerSound3d.get_sound_by_name(soundName[4])
         sound.set_loop(True)
         sound.play()
         #
-        sound = pursuerSound3d.get_sound_by_name("sparrow-chirp")
+        sound = pursuerSound3d.get_sound_by_name(soundName[2])
         sound.set_loop(True)
         sound.play()
 
         # create a listener (attached to the reference node)
-        cameraListenerNP = audioMgr.create_listener("cameraListener")
+        cameraListenerNP = audioMgr.create_listener("CameraListener")
         # get a reference to the camera's listener
         cameraListener = cameraListenerNP.node()
         # reparent listener to the camera
@@ -452,10 +458,14 @@ if __name__ == '__main__':
         
     else:
         # valid bamFile
+        # set a common reference node and reparent it to render
+        controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
+        audioMgr.get_reference_node_path().reparent_to(app.render)
+
         # restore sceneNP: through panda3d
         sceneNP = audioMgr.get_reference_node_path().find("**/SceneNP")
         # restore the player's reference
-        playerNP = audioMgr.get_reference_node_path().find("**/PlayerNP");
+        playerNP = audioMgr.get_reference_node_path().find("**/PlayerNP")
     
         # restore driver: through control manager
         playerDriver = controlMgr.get_driver(0)
@@ -480,23 +490,24 @@ if __name__ == '__main__':
             pursuerAnimCtls[0][j] = tmpAnims.get_anim(j)
 
         # restore sound3ds: through audio manager
-        for sound3d in audioMgr:
-            if sound3d.get_name() == "playerSound3d":
+        for sound3d in audioMgr.get_sound3ds():
+            if sound3d.get_name() == "PlayerSound3d":
                 playerSound3d = sound3d
-            if sound3d.get_name() == "pursuerSound3d":
+            if sound3d.get_name() == "PursuerSound3d":
                 pursuerSound3d = sound3d
         # set sounds looping
-        sound = playerSound3d.get_sound_by_name("eve-voice")
+        sound = playerSound3d.get_sound_by_name(soundName[4])
         sound.set_loop(True)
         sound.play()
         #
-        sound = pursuerSound3d.get_sound_by_name("sparrow-chirp")
+        sound = pursuerSound3d.get_sound_by_name(soundName[2])
         sound.set_loop(True)
         sound.play()
 
         # restore listeners: through audio manager
         cameraListener = audioMgr.get_listener(0)
-        # xxx
+        # reparent listener to the camera
+        NodePath.any_path(cameraListener).reparent_to(app.camera)
         
         # set creation parameters as strings before other drivers creation
         print("\n" + "Current creation parameters:")
