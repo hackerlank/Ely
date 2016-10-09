@@ -29,7 +29,7 @@
 #include "support_os/PlugIn_MapDrive.h"
 #endif //CPPPARSER
 #ifdef PYTHON_BUILD
-#include <py_panda.h>
+#include "py_panda.h"
 extern Dtool_PyTypedObject Dtool_OSSteerPlugIn;
 #endif //PYTHON_BUILD
 

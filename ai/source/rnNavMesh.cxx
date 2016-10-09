@@ -22,7 +22,7 @@
 #include "support_rn/OffMeshConnectionTool.h"
 #endif //CPPPARSER
 #ifdef PYTHON_BUILD
-#include <py_panda.h>
+#include "py_panda.h"
 extern Dtool_PyTypedObject Dtool_RNNavMesh;
 #endif //PYTHON_BUILD
 

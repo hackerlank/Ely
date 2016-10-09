@@ -14,7 +14,7 @@
 #include "rnNavMesh.h"
 #include "throw_event.h"
 #ifdef PYTHON_BUILD
-#include <py_panda.h>
+#include "py_panda.h"
 extern Dtool_PyTypedObject Dtool_RNCrowdAgent;
 #endif //PYTHON_BUILD
 

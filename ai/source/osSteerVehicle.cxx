@@ -20,7 +20,7 @@
 #include "support_os/PlugIn_LowSpeedTurn.h"
 #include "support_os/PlugIn_MapDrive.h"
 #ifdef PYTHON_BUILD
-#include <py_panda.h>
+#include "py_panda.h"
 extern Dtool_PyTypedObject Dtool_OSSteerVehicle;
 #endif //PYTHON_BUILD
 
