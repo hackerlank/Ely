@@ -126,8 +126,3 @@ void ThrowEventData::read_datagram(DatagramIterator &scan)
 #ifdef __GNUC__
 #pragma implementation
 #endif
-
-template class ValueList<string>;
-template class ValueList<LPoint3f>;
-template struct Pair<bool,float>;
-
