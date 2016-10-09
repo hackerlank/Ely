@@ -1,0 +1,12 @@
+/**
+ * \file data.cpp
+ *
+ * \date 2016-10-02
+ * \author consultit
+ */
+
+#include <string>
+
+using namespace std;
+
+string dataDir("@sampledatadir@");
