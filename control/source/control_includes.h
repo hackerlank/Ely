@@ -8,6 +8,8 @@
 #ifndef CONTROL_INCLUDES_H_
 #define CONTROL_INCLUDES_H_
 
+#include "../../common/source/commonTools.h"
+
 #ifdef CPPPARSER
 //Panda3d interrogate fake declarations
 

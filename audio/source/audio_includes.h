@@ -8,6 +8,8 @@
 #ifndef AUDIO_INCLUDES_H_
 #define AUDIO_INCLUDES_H_
 
+#include "../../common/source/commonTools.h"
+
 #ifdef CPPPARSER
 //Panda3d interrogate fake declarations
 
