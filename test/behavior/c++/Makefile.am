@@ -3,8 +3,6 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../../behavior/source \
 	-I$(srcdir)/../../../behavior/source/support \
-	-I$(srcdir)/../../../control/source \
-	-I$(srcdir)/../../../control/source/support \
 	-I/usr/include/panda3d -I/usr/include/eigen3 \
 	-DELY_DEBUG=
 
@@ -29,11 +27,7 @@ common_sources = \
 	data.cpp \
 	$(srcdir)/../../../common/source/commonTools.cxx \
 	$(srcdir)/../../../behavior/source/gameBehaviorManager.cxx \
-	$(srcdir)/../../../behavior/source/p3Sound3d.cxx \
 	$(srcdir)/../../../behavior/source/p3Activity.cxx \
-	$(srcdir)/../../../control/source/gameControlManager.cxx \
-	$(srcdir)/../../../control/source/p3Driver.cxx \
-	$(srcdir)/../../../control/source/p3Chaser.cxx	
 
 #behavior
 behavior_SOURCES = \
