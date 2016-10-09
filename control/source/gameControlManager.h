@@ -8,7 +8,6 @@
 #ifndef GAMECONTROLMANGER_H_
 #define GAMECONTROLMANGER_H_
 
-#include "../../common/source/commonTools.h"
 #include "graphicsWindow.h"
 #include "control_includes.h"
 #include "collisionTraverser.h"

@@ -9,7 +9,6 @@
 #define GAMEAIMANAGER_H_
 
 #include "aiTools.h"
-#include "../../common/source/commonTools.h"
 #include "opensteer_includes.h"
 #include "recastnavigation_includes.h"
 #include "collisionTraverser.h"

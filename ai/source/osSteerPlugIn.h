@@ -9,7 +9,6 @@
 #define OSSTEERPLUGIN_H_
 
 #include "aiTools.h"
-#include "../../common/source/commonTools.h"
 #include "gameAIManager.h"
 #include "opensteer_includes.h"
 #include "nodePath.h"

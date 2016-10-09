@@ -10,7 +10,6 @@
 #include "p3Sound3d.h"
 #include "p3Listener.h"
 #include "asyncTaskManager.h"
-#include "graphicsWindow.h"
 #include "bamFile.h"
 
 /**
