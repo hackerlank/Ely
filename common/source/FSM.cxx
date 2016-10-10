@@ -9,7 +9,7 @@
 
 //specializations' definitions
 //StateKey == std::string
-template<> FSM<std::string>::FSM(const std::string& name) :
+template<> FSM<string>::FSM(const string& name) :
 		InTransition("__InTransition"), Null("__Null"), Off("__Off")
 {
 	//any specialization must call this, otherwise no

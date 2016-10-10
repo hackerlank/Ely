@@ -9,8 +9,11 @@
 
 using namespace boost;
 
-void enterF(FSM<char>* fsm, const AnyValueList& values)
+void enterF(FSM<unsigned char>* fsm, const AnyValueList& values)
 {
+	unsigned char currState, nextState;
+	fsm->get_current_state_or_transition(currState, nextState);
+	cout << "entering: " << nextState << endl;
 	AnyValueList::const_iterator iter;
 	for (iter = values.begin(); iter != values.end(); ++iter)
 	{
@@ -18,6 +21,20 @@ void enterF(FSM<char>* fsm, const AnyValueList& values)
 				cout << any_cast<string>(*iter) << endl :
 				cout << "not a string" << endl;
 	}
+}
+void exitF(FSM<unsigned char>* fsm)
+{
+	unsigned char currState, nextState;
+	fsm->get_current_state_or_transition(currState, nextState);
+	cout << "exiting: " << currState << endl;
+}
+
+template<> FSM<unsigned char>::FSM(const unsigned char& name) :
+		InTransition('\n'), Null('\0'), Off('\xFF')
+{
+	//any specialization must call this, otherwise no
+	//initialization would take place
+	initialize(name);
 }
 
 int main(int argc, char **argv)
@@ -56,7 +73,20 @@ int main(int argc, char **argv)
 	any_cast<string>(&s) ? cout << 1 << endl : cout << 0 << endl;
 
 	/// Finite State Machine tests
-	FSM<char> fsmc('1');
+	// creation
+	FSM<unsigned char> fsmc('f');
+	fsmc.add_state('0', &enterF, &exitF, NULL);
+	fsmc.add_state('1', &enterF, &exitF, NULL);
+	fsmc.add_state('2', &enterF, &exitF, NULL);
+	fsmc.add_state('3', &enterF, &exitF, NULL);
+	fsmc.add_state('4', &enterF, &exitF, NULL);
+	// go to start state
+	fsmc.request('0');
+	// transitions
+	AnyValueList values;
+	values.push_back(10);
+	values.push_back(string("ten"));
+	fsmc.request('1', values);
 
 	return 0;
 }
