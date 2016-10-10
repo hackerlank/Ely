@@ -3,6 +3,7 @@ ACLOCAL_AMFLAGS = -I m4
 AM_CPPFLAGS = \
 	-I$(srcdir)/../../../behavior/source \
 	-I$(srcdir)/../../../behavior/source/support \
+	-I$(srcdir)/../../../common/source \
 	-I/usr/include/panda3d -I/usr/include/eigen3 \
 	-DELY_DEBUG=
 
@@ -12,7 +13,7 @@ AM_LDFLAGS = -L/usr/lib/x86_64-linux-gnu/panda3d
 LDADD = -lp3framework -lpanda -lpandaexpress -lp3dtool -lp3dtoolconfig \
 		-lp3pystub -lXxf86dga -lpython2.7 -lpandaphysics -lpthread
 
-noinst_PROGRAMS = behavior #behavior_gprof behavior_gcov
+noinst_PROGRAMS = fsm #behavior #behavior_gprof behavior_gcov
 
 BUILT_SOURCES = data.cpp
 
@@ -27,7 +28,11 @@ common_sources = \
 	data.cpp \
 	$(srcdir)/../../../common/source/commonTools.cxx \
 	$(srcdir)/../../../behavior/source/gameBehaviorManager.cxx \
-	$(srcdir)/../../../behavior/source/p3Activity.cxx \
+	$(srcdir)/../../../behavior/source/p3Activity.cxx
+
+#fsm
+fsm_SOURCES = \
+	fsm.cpp
 
 #behavior
 behavior_SOURCES = \

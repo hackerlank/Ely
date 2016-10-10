@@ -7,14 +7,6 @@
 #ifndef FSM_I_
 #define FSM_I_
 
-#include "Utilities/Tools.h"
-#include <queue>
-#include <list>
-#include <throw_event.h>
-#include <boost/function.hpp>
-#include <boost/bind.hpp>
-#include <boost/any.hpp>
-
 template<typename StateKey> int FSM<StateKey>::SerialNum = 0;
 
 template<typename StateKey> FSM<StateKey>::FSM(const StateKey& name) :
@@ -27,8 +19,6 @@ template<typename StateKey> FSM<StateKey>::FSM(const StateKey& name) :
 
 template<typename StateKey> FSM<StateKey>::~FSM()
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
 }
 
 template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)
@@ -56,17 +46,11 @@ template<typename StateKey> void FSM<StateKey>::initialize(const StateKey& name)
 
 template<typename StateKey> int FSM<StateKey>::get_serial_num()
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	return ++FSM<StateKey>::SerialNum;
 }
 
 template<typename StateKey> void FSM<StateKey>::cleanup()
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	if (mStateKey != Off)
 	{
 		set_state(Off);
@@ -81,27 +65,18 @@ template<typename StateKey> void FSM<StateKey>::cleanup()
 template<typename StateKey> void FSM<StateKey>::set_broadcast_state_changes(
 		bool doBroadcast)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	mBroadcastStateChanges = doBroadcast;
 }
 
-template<typename StateKey> std::string FSM<StateKey>::get_state_change_event() const
+template<typename StateKey> string FSM<StateKey>::get_state_change_event() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
-	std::ostringstream stateChange;
+	ostringstream stateChange;
 	stateChange << "FSM-" << mSerialNum << "-" << mName << "-stateChange";
 	return stateChange.str();
 }
 
 template<typename StateKey> StateKey FSM<StateKey>::get_current_or_next_state() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	if (mStateKey != InTransition)
 	{
 		return mStateKey;
@@ -112,9 +87,6 @@ template<typename StateKey> StateKey FSM<StateKey>::get_current_or_next_state() 
 template<typename StateKey> bool FSM<StateKey>::get_current_state_or_transition(
 		StateKey& currStateKey, StateKey& toStateKey) const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	if (mStateKey != InTransition)
 	{
 		currStateKey = mStateKey;
@@ -127,18 +99,12 @@ template<typename StateKey> bool FSM<StateKey>::get_current_state_or_transition(
 
 template<typename StateKey> bool FSM<StateKey>::is_in_transition() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	return mStateKey == InTransition;
 }
 
 template<typename StateKey> void FSM<StateKey>::force_transition(
-		const StateKey& stateKey, const ValueList& data)
+		const StateKey& stateKey, const AnyValueList& data)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	if (mStateKey == InTransition)
 	{
 		// Queue up the request for later calling.
@@ -152,11 +118,8 @@ template<typename StateKey> void FSM<StateKey>::force_transition(
 }
 
 template<typename StateKey> void FSM<StateKey>::demand(const StateKey& stateKey,
-		const ValueList& data)
+		const AnyValueList& data)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	if (mStateKey == InTransition)
 	{
 		// Queue up the request for later calling.
@@ -168,36 +131,33 @@ template<typename StateKey> void FSM<StateKey>::demand(const StateKey& stateKey,
 	//
 	if (request(stateKey, data) == Null)
 	{
-		std::cerr << "FSM::demand: Request denied from'" << mStateKey
-				<< "' to '" << stateKey << "'" << std::endl;
+		cerr << "FSM::demand: Request denied from'" << mStateKey
+				<< "' to '" << stateKey << "'" << endl;
 	}
 	return;
 }
 
 template<typename StateKey> StateKey FSM<StateKey>::request(
-		const StateKey& newStateKey, const ValueList& data)
+		const StateKey& newStateKey, const AnyValueList& data)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
-
 	StateKey acceptedStateKey = Null;
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::request: Cannot be called in enter/exit/fromTo functions: (state: '"
-				<< mOldStateKey << "')" << std::endl;
+				<< mOldStateKey << "')" << endl;
 	}
 	else if (mFiltering)
 	{
-		std::cerr
+		cerr
 				<< "FSM::request: Cannot be called in filter functions: (state: '"
-				<< mStateKey << "')" << std::endl;
+				<< mStateKey << "')" << endl;
 	}
 	else
 	{
 		//filtering on
 		mFiltering = true;
-		ValueList result = get_current_filter()(this, newStateKey, data);
+		AnyValueList result = get_current_filter()(this, newStateKey, data);
 		//filtering off
 		mFiltering = false;
 		try
@@ -211,8 +171,8 @@ template<typename StateKey> StateKey FSM<StateKey>::request(
 			//
 		} catch (const boost::bad_any_cast&)
 		{
-			std::cerr << "FSM::request: Filter for '" << mStateKey
-					<< "' returned a bad state key type" << std::endl;
+			cerr << "FSM::request: Filter for '" << mStateKey
+					<< "' returned a bad state key type" << endl;
 			acceptedStateKey = Null;
 		}
 	}
@@ -223,18 +183,18 @@ template<typename StateKey> StateKey FSM<StateKey>::request(
 template<typename StateKey> void FSM<StateKey>::set_state_set(
 		const StateSet& stateSet)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	mStateSet = stateSet;
 }
 
-template<typename StateKey> std::set<StateKey> FSM<StateKey>::get_key_state_set() const
+template<typename StateKey> set<StateKey> FSM<StateKey>::get_key_state_set() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
 
-	std::set<StateKey> keyStateSet;
+
+
+	set<StateKey> keyStateSet;
 	typename StateSet::iterator iter;
 	for (iter = mStateSet.begin(); iter != mStateSet.end(); ++iter)
 	{
@@ -245,30 +205,30 @@ template<typename StateKey> std::set<StateKey> FSM<StateKey>::get_key_state_set(
 
 template<typename StateKey> unsigned int FSM<StateKey>::get_num_states() const
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	return mStateSet.size();
 }
 
 template<typename StateKey> StateKey FSM<StateKey>::request_next(
-		const ValueList& data)
+		const AnyValueList& data)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	StateKey newState = Null;
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::request_next: Cannot be called in enter/exit/fromTo functions: (state: '"
-				<< mOldStateKey << "')" << std::endl;
+				<< mOldStateKey << "')" << endl;
 	}
 	else if (mFiltering)
 	{
-		std::cerr
+		cerr
 				<< "FSM::request_next: Cannot be called in filter functions: (state: '"
-				<< mStateKey << "')" << std::endl;
+				<< mStateKey << "')" << endl;
 	}
 	else if (not mStateSet.empty())
 	{
@@ -290,23 +250,23 @@ template<typename StateKey> StateKey FSM<StateKey>::request_next(
 }
 
 template<typename StateKey> StateKey FSM<StateKey>::request_prev(
-		const ValueList& data)
+		const AnyValueList& data)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	StateKey newState = Null;
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::request_prev: Cannot be called in enter/exit/fromTo functions: (state: '"
-				<< mOldStateKey << "')" << std::endl;
+				<< mOldStateKey << "')" << endl;
 	}
 	else if (mFiltering)
 	{
-		std::cerr
+		cerr
 				<< "FSM::request_prev: Cannot be called in filter functions: (state: '"
-				<< mStateKey << "')" << std::endl;
+				<< mStateKey << "')" << endl;
 	}
 	else if (not mStateSet.empty())
 	{
@@ -345,7 +305,7 @@ template<typename StateKey> typename FSM<StateKey>::FilterFuncPTR FSM<StateKey>:
 }
 
 template<typename StateKey> StateKey FSM<StateKey>::set_state(
-		const StateKey& newStateKey, const ValueList& data)
+		const StateKey& newStateKey, const AnyValueList& data)
 {
 	//Internal function to change unconditionally to the
 	//requested new State if it exists or is the Off state
@@ -356,13 +316,13 @@ template<typename StateKey> StateKey FSM<StateKey>::set_state(
 		//the requested new State key neither exists nor is the Off key
 		if (newStateKey == Null)
 		{
-			std::cerr << "FSM::set_state: State transition has been denied"
-					<< std::endl;
+			cerr << "FSM::set_state: State transition has been denied"
+					<< endl;
 		}
 		else
 		{
-			std::cerr << "FSM::set_state: State '" << newStateKey
-					<< "' doesn't exist" << std::endl;
+			cerr << "FSM::set_state: State '" << newStateKey
+					<< "' doesn't exist" << endl;
 		}
 		return mStateKey;
 	}
@@ -371,7 +331,7 @@ template<typename StateKey> StateKey FSM<StateKey>::set_state(
 	mNewStateKey = newStateKey;
 	mStateKey = InTransition;
 	//check what transition function(s) to call
-	std::pair<StateKey, StateKey> fromTo(mOldStateKey, mNewStateKey);
+	pair<StateKey, StateKey> fromTo(mOldStateKey, mNewStateKey);
 	typename FromToFunctionTable::iterator iter = mFromToFunctions.find(fromTo);
 	if (iter != mFromToFunctions.end())
 	{
@@ -454,7 +414,7 @@ template<typename StateKey> StateKey FSM<StateKey>::set_state(
 }
 
 template<typename StateKey> void FSM<StateKey>::default_enter(FSM<StateKey>* fsm,
-		const ValueList& data)
+		const AnyValueList& data)
 {
 }
 
@@ -462,10 +422,10 @@ template<typename StateKey> void FSM<StateKey>::default_exit(FSM<StateKey>* fsm)
 {
 }
 
-template<typename StateKey> ValueList FSM<StateKey>::default_filter(
-		FSM<StateKey>* fsm, const StateKey& toStateKey, const ValueList& data)
+template<typename StateKey> AnyValueList FSM<StateKey>::default_filter(
+		FSM<StateKey>* fsm, const StateKey& toStateKey, const AnyValueList& data)
 {
-	ValueList answerList = data;
+	AnyValueList answerList = data;
 	//check if to state is Off
 	if (toStateKey == fsm->Off)
 	{
@@ -497,16 +457,16 @@ template<typename StateKey> ValueList FSM<StateKey>::default_filter(
 		}
 	}
 	//return Null state key in any other case
-	std::cerr << "FSM::default_filter: No allowed states" << std::endl;
+	cerr << "FSM::default_filter: No allowed states" << endl;
 	answerList.clear();
 	answerList.push_front(fsm->Null);
 	return answerList;
 }
 
-template<typename StateKey> ValueList FSM<StateKey>::filter_off(
-		FSM<StateKey>* fsm, const StateKey& toStateKey, const ValueList& data)
+template<typename StateKey> AnyValueList FSM<StateKey>::filter_off(
+		FSM<StateKey>* fsm, const StateKey& toStateKey, const AnyValueList& data)
 {
-	ValueList answerList = data;
+	AnyValueList answerList = data;
 	//from Off we can always go directly to any other state.
 	answerList.push_front(toStateKey);
 	return answerList;
@@ -519,14 +479,14 @@ bool FSM<StateKey>::add_state(const StateKey& stateKey,
 		const FSM<StateKey>::FilterFuncPTR& filterFunc,
 		const FSM<StateKey>::AllowedStateKeySet& allowedStateKeys)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::add_state: Cannot be called in enter/exit/fromTo functions"
-				<< std::endl;
+				<< endl;
 		return false;
 	}
 	//check if stateKey already exists
@@ -537,8 +497,8 @@ bool FSM<StateKey>::add_state(const StateKey& stateKey,
 		if (not remove_state(stateKey))
 		{
 			//stateKey cannot be removed
-			std::cerr << "FSM::add_state: The state << '" << stateKey
-					<< "' cannot be added/updated" << std::endl;
+			cerr << "FSM::add_state: The state << '" << stateKey
+					<< "' cannot be added/updated" << endl;
 			return false;
 		}
 	}
@@ -557,28 +517,28 @@ bool FSM<StateKey>::add_state(const StateKey& stateKey,
 template<typename StateKey>
 bool FSM<StateKey>::remove_state(const StateKey& stateKey)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::remove_state: Cannot be called in enter/exit/fromTo functions"
-				<< std::endl;
+				<< endl;
 		return false;
 	}
 	//check if stateKey is the current state or Off state
 	if ((stateKey == mStateKey) or (stateKey == Off))
 	{
-		std::cerr << "FSM::remove_state: Current state << '" << stateKey
-				<< "' cannot be removed" << std::endl;
+		cerr << "FSM::remove_state: Current state << '" << stateKey
+				<< "' cannot be removed" << endl;
 		return false;
 	}
 	//check if stateKey exists and remove it
 	if (mStateSet.erase(stateKey) == 0)
 	{
-		std::cerr << "FSM::remove_state: State '" << stateKey
-				<< "' doesn't exist" << std::endl;
+		cerr << "FSM::remove_state: State '" << stateKey
+				<< "' doesn't exist" << endl;
 		return false;
 	}
 	//stateKey removed
@@ -589,18 +549,18 @@ template<typename StateKey>
 bool FSM<StateKey>::add_from_to_func(const StateKey& stateFrom,
 		const StateKey& stateTo, const FSM<StateKey>::FromToFuncPTR& fromToFunc)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::add_from_to_func: Cannot be called in enter/exit/fromTo functions"
-				<< std::endl;
+				<< endl;
 		return false;
 	}
 	//check if fromToFunc already exists
-	std::pair<StateKey, StateKey> fromToStates(stateFrom, stateTo);
+	pair<StateKey, StateKey> fromToStates(stateFrom, stateTo);
 	typename FromToFunctionTable::iterator iter = mFromToFunctions.find(
 			fromToStates);
 	if (iter != mFromToFunctions.end())
@@ -609,9 +569,9 @@ bool FSM<StateKey>::add_from_to_func(const StateKey& stateFrom,
 		if (not remove_from_to_func(stateFrom, stateTo))
 		{
 			//fromToFunc cannot be removed
-			std::cerr << "FSM::add_from_to_func: Function from state '"
+			cerr << "FSM::add_from_to_func: Function from state '"
 					<< stateFrom << "' to state '" << stateTo
-					<< "' cannot be added/updated" << std::endl;
+					<< "' cannot be added/updated" << endl;
 			return false;
 		}
 	}
@@ -625,22 +585,22 @@ template<typename StateKey>
 bool FSM<StateKey>::remove_from_to_func(const StateKey& stateFrom,
 		const StateKey& stateTo)
 {
-	//lock (guard) the mutex
-	HOLD_REMUTEX(mMutex)
+
+
 
 	if (mStateKey == InTransition)
 	{
-		std::cerr
+		cerr
 				<< "FSM::remove_from_to_func: Cannot be called in enter/exit/fromTo functions"
-				<< std::endl;
+				<< endl;
 		return false;
 	}
 	//check if from to function already exists and remove it
-	std::pair<StateKey, StateKey> fromToStates(stateFrom, stateTo);
+	pair<StateKey, StateKey> fromToStates(stateFrom, stateTo);
 	if (mFromToFunctions.erase(fromToStates) == 0)
 	{
-		std::cerr << "FSM::remove_from_to_func: Function from state '" << stateFrom
-				<< "' to state '" << stateTo << "' doesn't exist" << std::endl;
+		cerr << "FSM::remove_from_to_func: Function from state '" << stateFrom
+				<< "' to state '" << stateTo << "' doesn't exist" << endl;
 		return false;
 	}
 	//from to function removed
@@ -655,15 +615,15 @@ template<typename StateKey> inline ReMutex& FSM<StateKey>::getMutex()
 #endif
 
 //specializations' declarations
-//StateKey == std::string
-template<> FSM<std::string>::FSM(const std::string& name);
+//StateKey == string
+template<> FSM<string>::FSM(const string& name);
 //StateKey == int
 template<> FSM<int>::FSM(const int& name);
 
 //typedefs
-//StateKey == std::string
-typedef FSM<std::string> fsm;
-typedef FSM<std::string>::StateTmpl<std::string> State;
+//StateKey == string
+typedef FSM<string> fsm;
+typedef FSM<string>::StateTmpl<string> State;
 //StateKey == int
 typedef FSM<int> fsmi;
 typedef FSM<int>::StateTmpl<int> Statei;

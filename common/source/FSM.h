@@ -16,9 +16,9 @@
 #include <boost/any.hpp>
 
 /**
- * \brief The Value list type.
+ * \brief The any value list type.
  */
-typedef plist<boost::any> ValueList;
+typedef list<boost::any> AnyValueList;
 
 /**
  * \brief A Finite State Machine template class.
@@ -79,11 +79,11 @@ typedef plist<boost::any> ValueList;
  * Provided functions could be free functions, function objects,
  * boost::function objects and should have these signatures
  * (where Key is the type of the state key):\n
- * - <em>Enter functions</em>: <tt> void f(FSM<Key>*, const ValueList&); </tt>
+ * - <em>Enter functions</em>: <tt> void f(FSM<Key>*, const AnyValueList&); </tt>
  * - <em>Exit functions</em>: <tt> void f(FSM<Key>*); </tt>
- * - <em>FromTo functions</em>: <tt> void f(FSM<Key>*, const ValueList&); </tt>
- * - <em>Filter functions</em>: <tt> ValueList f(const StateKey&, const StateKey&, const ValueList&); </tt>
- * \note the Filter functions must return a ValueList with the first element
+ * - <em>FromTo functions</em>: <tt> void f(FSM<Key>*, const AnyValueList&); </tt>
+ * - <em>Filter functions</em>: <tt> AnyValueList f(const StateKey&, const StateKey&, const AnyValueList&); </tt>
+ * \note the Filter functions must return a AnyValueList with the first element
  * set to a state key or Null if the transition must be denied.
  *
  */
@@ -94,21 +94,21 @@ public:
 	/**
 	 * \name The Enter/Exit/FromTo/Filter callbacks boost::function types.
 	 *
-	 * 	Enter/FromTo/Filter callbacks have a ValueList parameter representing
+	 * 	Enter/FromTo/Filter callbacks have a AnyValueList parameter representing
 	 * 	custom data, which can be passed by the various request/Next/Prev,
 	 * 	demand and force_transition FSM functions.
 	 */
 	///@{
-	typedef boost::function<void(FSM<StateKey>*, const ValueList&)> EnterFuncPTR;
+	typedef boost::function<void(FSM<StateKey>*, const AnyValueList&)> EnterFuncPTR;
 	typedef boost::function<void(FSM<StateKey>*)> ExitFuncPTR;
-	typedef boost::function<void(FSM<StateKey>*, const ValueList&)> FromToFuncPTR;
-	///For a filter the first element of the returned ValueList is a
+	typedef boost::function<void(FSM<StateKey>*, const AnyValueList&)> FromToFuncPTR;
+	///For a filter the first element of the returned AnyValueList is a
 	///state key corresponding to the state to transition to, or the
 	///value pFSM->Null if a transition is denied (here pFSM is the
 	///passed pointer to the FSM).
 	typedef boost::function<
-			ValueList(FSM<StateKey>*, const StateKey&, const ValueList&)> FilterFuncPTR;
-	typedef pset<StateKey> AllowedStateKeySet;
+			AnyValueList(FSM<StateKey>*, const StateKey&, const AnyValueList&)> FilterFuncPTR;
+	typedef set<StateKey> AllowedStateKeySet;
 	///@}
 
 	/**
@@ -175,7 +175,7 @@ protected:
 	 * @param fsm The current FSM.
 	 * @param data The custom data passed to this callback.
 	 */
-	static void default_enter(FSM<StateKey>* fsm, const ValueList& data);
+	static void default_enter(FSM<StateKey>* fsm, const AnyValueList& data);
 	EnterFuncPTR default_enterPTR;
 	///@}
 
@@ -204,15 +204,15 @@ protected:
 	 * which is assumed to be a direct request to a particular state.
 	 * - if state.allowedStateKeys is not empty, allow only those
 	 * requests explicitly identified in this set.
-	 * \note: the Filter functions must return a ValueList with the
+	 * \note: the Filter functions must return a AnyValueList with the
 	 * first element set to a state key or Null if the transition
 	 * is denied.
 	 * @param fsm The current FSM.
 	 * @param toStateKey The destination state.
 	 * @param data The custom data passed to this callback.
 	 */
-	static ValueList default_filter(FSM<StateKey>* fsm,
-			const StateKey& toStateKey, const ValueList& data);
+	static AnyValueList default_filter(FSM<StateKey>* fsm,
+			const StateKey& toStateKey, const AnyValueList& data);
 	FilterFuncPTR default_filterPTR;
 	///@}
 
@@ -223,7 +223,7 @@ protected:
 	/**
 	 * This Off State filter function allows always to go directly into
 	 * any other state.
-	 * \note: the Filter functions must return a ValueList with the
+	 * \note: the Filter functions must return a AnyValueList with the
 	 * first element set to a state key or Null if the transition
 	 * is denied.
 	 *
@@ -231,8 +231,8 @@ protected:
 	 * @param toStateKey The destination state.
 	 * @param data The custom data passed to this callback.
 	 */
-	static ValueList filter_off(FSM<StateKey>* fsm, const StateKey& toStateKey,
-			const ValueList& data);
+	static AnyValueList filter_off(FSM<StateKey>* fsm, const StateKey& toStateKey,
+			const AnyValueList& data);
 	FilterFuncPTR filter_offPTR;
 	///@}
 
@@ -250,8 +250,8 @@ protected:
 	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return The current state of this FSM.
 	 */
-	StateKey set_state(const StateKey& newStateKey, const ValueList& data =
-			ValueList());
+	StateKey set_state(const StateKey& newStateKey, const AnyValueList& data =
+			AnyValueList());
 
 	/**
 	 * \brief Initialization function.
@@ -274,11 +274,11 @@ public:
 	/**
 	 * \brief The State set type.
 	 */
-	typedef pset<StateTmpl<StateKey> > StateSet;
+	typedef set<StateTmpl<StateKey> > StateSet;
 	/**
 	 * \brief The FromToFunctions' table type.
 	 */
-	typedef pmap<pair<StateKey, StateKey>, FromToFuncPTR> FromToFunctionTable;
+	typedef map<pair<StateKey, StateKey>, FromToFuncPTR> FromToFunctionTable;
 
 	/**
 	 * \brief The FSM queued methods' boost::function type.
@@ -305,7 +305,7 @@ public:
 	 * This constructor should be specialized to differentiate between
 	 * Null, Off, InTransition state key constants, because them are
 	 * all default initialized in the primary template.
-	 * @param name The FSM's name.
+	 * @param name The FSM's "name".
 	 */
 	FSM(const StateKey& name);
 
@@ -371,8 +371,8 @@ public:
 	 * @param stateKey The destination state.
 	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 */
-	void force_transition(const StateKey& stateKey, const ValueList& data =
-			ValueList());
+	void force_transition(const StateKey& stateKey, const AnyValueList& data =
+			AnyValueList());
 
 	/**
 	 * \brief Requests a state transition, by code that does not expect
@@ -388,7 +388,7 @@ public:
 	 * @param stateKey The destination state.\n
 	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 */
-	void demand(const StateKey& stateKey, const ValueList& data = ValueList());
+	void demand(const StateKey& stateKey, const AnyValueList& data = AnyValueList());
 
 	/**
 	 * \brief Requests a state transition (or other behavior).
@@ -412,8 +412,8 @@ public:
 	 * @return The state the FSM is currently into after the request
 	 * or Null if an unauthorized call or an error occurred.
 	 */
-	StateKey request(const StateKey& newStateKey, const ValueList& data =
-			ValueList());
+	StateKey request(const StateKey& newStateKey, const AnyValueList& data =
+			AnyValueList());
 
 	/**
 	 * \brief Request the 'next' state in the predefined state array.
@@ -428,7 +428,7 @@ public:
 	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return See request().
 	 */
-	StateKey request_next(const ValueList& data = ValueList());
+	StateKey request_next(const AnyValueList& data = AnyValueList());
 
 	/**
 	 * \brief Request the 'previous' state in the predefined state array.
@@ -443,7 +443,7 @@ public:
 	 * @param data The data passed to Enter/FromTo/Filter callbacks.
 	 * @return See request().
 	 */
-	StateKey request_prev(const ValueList& data = ValueList());
+	StateKey request_prev(const AnyValueList& data = AnyValueList());
 
 	/**
 	 * \name State change broadcasting.
@@ -487,7 +487,7 @@ public:
 	 * \brief Return the set of state keys.
 	 * @return The set of state keys.
 	 */
-	pset<StateKey> get_key_state_set() const;
+	set<StateKey> get_key_state_set() const;
 
 	/**
 	 * \brief Return the number of the states belonging to this FSM
