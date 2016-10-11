@@ -28,19 +28,27 @@ INLINE void GamePhysicsManager::set_reference_node_path(const NodePath& referenc
 }
 
 /**
- * Returns the number of BTSoftBodys.
- */
-INLINE int GamePhysicsManager::get_num_soft_bodies() const
-{
-	return (int) mDrivers.size();
-}
-
-/**
  * Returns the number of BTRigidBodys.
  */
 INLINE int GamePhysicsManager::get_num_rigid_bodies() const
 {
-	return (int) mRigidBodys.size();
+	return (int) mRigidBodies.size();
+}
+
+/**
+ * Returns the number of BTSoftBodys.
+ */
+INLINE int GamePhysicsManager::get_num_soft_bodies() const
+{
+	return (int) mSoftBodies.size();
+}
+
+/**
+ * Returns the number of BTGhosts.
+ */
+INLINE int GamePhysicsManager::get_num_ghosts() const
+{
+	return (int) mGhosts.size();
 }
 
 /**

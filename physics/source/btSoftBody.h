@@ -16,7 +16,7 @@
 #endif //CPPPARSER
 
 /**
- * BTSoftBody is a PandaNode class designed for the control of
+ * BTSoftBody is a PandaNode class designed for the physics of
  * translation/rotation movements. To be driven, a PandaNode object should be
  * attached to this BTSoftBody.\n
  *

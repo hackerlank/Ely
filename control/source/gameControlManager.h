@@ -44,7 +44,7 @@ PUBLISHED:
 	 */
 	///@{
 	NodePath create_driver(const string& name);
-	bool destroy_driver(NodePath plugInNP);
+	bool destroy_driver(NodePath driverNP);
 	PT(P3Driver) get_driver(int index) const;
 	INLINE int get_num_drivers() const;
 	MAKE_SEQ(get_drivers, get_num_drivers, get_driver);
@@ -55,7 +55,7 @@ PUBLISHED:
 	 */
 	///@{
 	NodePath create_chaser(const string& name);
-	bool destroy_chaser(NodePath steerVehicleNP);
+	bool destroy_chaser(NodePath chaserNP);
 	PT(P3Chaser) get_chaser(int index) const;
 	INLINE int get_num_chasers() const;
 	MAKE_SEQ(get_chasers, get_num_chasers, get_chaser);

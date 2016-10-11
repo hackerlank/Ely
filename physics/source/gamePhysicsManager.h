@@ -8,25 +8,26 @@
 #ifndef GAMEPHYSICSMANGER_H_
 #define GAMEPHYSICSMANGER_H_
 
-#include "graphicsWindow.h"
+#include "graphicsWindow.h" //xxx
 #include "collisionTraverser.h"
 #include "collisionHandlerQueue.h"
 #include "collisionRay.h"
 #include "physics_includes.h"
 
-class BTSoftBody;
 class BTRigidBody;
+class BTSoftBody;
+class BTGhost;
 
 /**
  * GamePhysicsManager Singleton class.
  *
- * Used for handling BTSoftBodys, BTRigidBodys.
+ * Used for handling BTRigidBodys, BTSoftBodys, BTGhosts.
  */
 class EXPORT_CLASS GamePhysicsManager: public TypedReferenceCount,
 		public Singleton<GamePhysicsManager>
 {
 PUBLISHED:
-	GamePhysicsManager(PT(GraphicsWindow) win, int taskSort = 10,
+	GamePhysicsManager(PT(GraphicsWindow) win/*xxx*/, int taskSort = 10,
 			const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~GamePhysicsManager();
@@ -40,25 +41,36 @@ PUBLISHED:
 	///@}
 
 	/**
+	 * \name BTRigidBody
+	 */
+	///@{
+	NodePath create_rigid_body(const string& name);
+	bool destroy_rigid_body(NodePath rigidBodyNP);
+	PT(BTRigidBody) get_rigid_body(int index) const;
+	INLINE int get_num_rigid_bodies() const;
+	MAKE_SEQ(get_rigid_bodies, get_num_rigid_bodies, get_rigid_body);
+	///@}
+
+	/**
 	 * \name BTSoftBody
 	 */
 	///@{
 	NodePath create_soft_body(const string& name);
-	bool destroy_soft_body(NodePath plugInNP);
+	bool destroy_soft_body(NodePath softBodyNP);
 	PT(BTSoftBody) get_soft_body(int index) const;
 	INLINE int get_num_soft_bodies() const;
 	MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body);
 	///@}
 
 	/**
-	 * \name BTRigidBody
+	 * \name BTGhost
 	 */
 	///@{
-	NodePath create_rigid_body(const string& name);
-	bool destroy_rigid_body(NodePath steerVehicleNP);
-	PT(BTRigidBody) get_rigid_body(int index) const;
-	INLINE int get_num_rigid_bodies() const;
-	MAKE_SEQ(get_rigid_bodies, get_num_rigid_bodies, get_rigid_body);
+	NodePath create_ghost(const string& name);
+	bool destroy_ghost(NodePath ghostNP);
+	PT(BTGhost) get_ghost(int index) const;
+	INLINE int get_num_ghosts() const;
+	MAKE_SEQ(get_ghosts, get_num_ghosts, get_ghost);
 	///@}
 
 	/**
@@ -100,7 +112,7 @@ PUBLISHED:
 	///@}
 
 	/**
-	 * \name UTILITIES
+	 * \name UTILITIES xxx
 	 */
 	///@{
 	float get_bounding_dimensions(NodePath modelNP, LVecBase3f& modelDims,
@@ -128,7 +140,7 @@ public:
 	inline int unique_ref();
 
 private:
-	///The reference graphic window.
+	///The reference graphic window. xxx
 	PT(GraphicsWindow) mWin;
 	///The update task sort (should be >0).
 	int mTaskSort;
@@ -136,17 +148,23 @@ private:
 	///The reference node path.
 	NodePath mReferenceNP;
 
-	///List of BTSoftBodys handled by this manager.
-	typedef pvector<PT(BTSoftBody)> DriverList;
-	DriverList mDrivers;
-	///BTSoftBodys' parameter table.
-	ParameterTable mDriversParameterTable;
-
 	///List of BTRigidBodys handled by this manager.
 	typedef pvector<PT(BTRigidBody)> RigidBodyList;
-	RigidBodyList mRigidBodys;
+	RigidBodyList mRigidBodies;
 	///BTRigidBodys' parameter table.
-	ParameterTable mRigidBodysParameterTable;
+	ParameterTable mRigidBodiesParameterTable;
+
+	///List of BTSoftBodys handled by this manager.
+	typedef pvector<PT(BTSoftBody)> SoftBodyList;
+	SoftBodyList mSoftBodies;
+	///BTSoftBodys' parameter table.
+	ParameterTable mSoftBodiesParameterTable;
+
+	///List of BTGhosts handled by this manager.
+	typedef pvector<PT(BTGhost)> GhostList;
+	GhostList mGhosts;
+	///BTGhosts' parameter table.
+	ParameterTable mGhostsParameterTable;
 
 	///@{
 	///A task data for step simulation update.
@@ -157,7 +175,7 @@ private:
 	///Unique ref.
 	int mRef;
 
-	///Utilities.
+	///Utilities. xxx
 	NodePath mRoot;
 	CollideMask mMask; //a.k.a. BitMask32
 	CollisionTraverser* mCTrav;

@@ -10,8 +10,8 @@
 #include "configVariableInt.h"
 
 
-NotifyCategoryDecl(p3control, EXPORT_CLASS, EXPORT_TEMPL);
+NotifyCategoryDecl(p3physics, EXPORT_CLASS, EXPORT_TEMPL);
 
-extern void init_libp3control();
+extern void init_libp3physics();
 
 #endif //CONFIG_PHYSICS_H

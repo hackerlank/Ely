@@ -132,6 +132,8 @@ protected:
 private:
 	///The reference node path.
 	NodePath mReferenceNP;
+	///The reference graphic window. xxx
+	PT(GraphicsWindow) mWin;
 	///Static flag.
 	bool mStatic;
 	///The set of sounds attached to this component.

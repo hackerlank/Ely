@@ -43,7 +43,7 @@ PUBLISHED:
 	 */
 	///@{
 	NodePath create_sound3d(const string& name);
-	bool destroy_sound3d(NodePath plugInNP);
+	bool destroy_sound3d(NodePath sound3dNP);
 	PT(P3Sound3d) get_sound3d(int index) const;
 	INLINE int get_num_sound3ds() const;
 	MAKE_SEQ(get_sound3ds, get_num_sound3ds, get_sound3d);
@@ -54,7 +54,7 @@ PUBLISHED:
 	 */
 	///@{
 	NodePath create_listener(const string& name);
-	bool destroy_listener(NodePath steerVehicleNP);
+	bool destroy_listener(NodePath listenerNP);
 	PT(P3Listener) get_listener(int index) const;
 	INLINE int get_num_listeners() const;
 	MAKE_SEQ(get_listeners, get_num_listeners, get_listener);

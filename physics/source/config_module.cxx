@@ -7,15 +7,15 @@
 #include "gamePhysicsManager.h"
 
 
-Configure( config_p3control );
-NotifyCategoryDef( p3control , "");
+Configure( config_p3physics );
+NotifyCategoryDef( p3physics , "");
 
-ConfigureFn( config_p3control ) {
-  init_libp3control();
+ConfigureFn( config_p3physics ) {
+  init_libp3physics();
 }
 
 void
-init_libp3control() {
+init_libp3physics() {
   static bool initialized = false;
   if (initialized) {
     return;
