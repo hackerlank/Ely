@@ -16,70 +16,54 @@
 #endif //CPPPARSER
 
 /**
- * BTRigidBody is a PandaNode class designed to make an object a rigid_body of another
- * object.
+ * BTRigidBody is a PandaNode representing a single "rigid body" of the Bullet
+ * library integration of Panda3d.
  *
- * BTRigidBody can be enabled/disabled as a whole (enabled by default).\n
- * BTRigidBody can handle basic rotations movement (head_left, head_right,
- * pitch_left, pitch_right) only if it is enabled to do so by calling the
- * corresponding "enabler". In turn, an enabled basic rotation movement can be
- * activated/deactivated through the corresponding "activator".\n
- * Rotation is updated relative to:
- * - z local axis, ie head (yaw)
- * - x local axis, ie pitch
- * Rotation through y local axis (roll) is not considered.\n
- * Chasing can be fixed or dampened, from behind or from the front.\n
- * With dampened chasing various movement's parameters (like friction, min/max
- * distance, min/max height etc...) can be set.\n
- * A task could update the position/orientation of the attached PandaNode object
- * based on the current position/orientation of the chased object, and the
- * currently enabled basic rotation movements, by calling the "update()"
- * method.\n
- * Usually movements are activated/deactivated through callback associated to
- * events (keyboard, mouse etc...).\n
- * Since in Panda3d by default, "mouse-move" events are not defined, mouse
- * movements can be enabled/disabled as "implicit activators" of head/pitch
- * basic rotations by calling "enable_mouse_head()"/"enable_mouse_pitch()"
- * methods. In this way head/pitch basic rotations can be activated
- * independently through mouse movements and/or normal activator methods.\n
- * On the other hand, "mouse-move" event could be defined by using
- * \code
- * ButtonThrower::set_move_event()
- * \endcode
- * (\see: http://www.panda3d.org/forums/viewtopic.php?t=9326 and
- * \see: http://www.panda3d.org/forums/viewtopic.php?t=6049), and in this case
- * if an application wishes to handle directly these events, it has to disable
- * the previously described mouse movements handling by calling:
- * \code
- * enable_mouse_move(true)
- * \endcode
- * The up axis is the "z" axis.
- * Rotation movements can be inverted (default: not inverted).\n
+ * It constructs a rigid body with the single specified collision shape_type
+ * along with relevant parameters.\n
+ * Collision shape types are:
+ * - *sphere*
+ * - *plane*
+ * - *box*
+ * - *cylinder*
+ * - *capsule*
+ * - *cone*
+ * - *heightfield*
+ * - *triangle mesh*
+ * .
+ * In case of *sphere*, *box*, *cylinder*, *capsule*, *cone*, if any of
+ * the relevant parameters is missing, the shape is automatically
+ * constructed by guessing them through calculation of a tight bounding volume
+ * of object geometry (supposedly specified by the model component).\n
+ * For *plane* shape, in case of missing parameters, the default is
+ * a plane with normal = (0,0,1) and d = 0.
  *
  * > **BTRigidBody text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
- * | *enabled*  				|single| *true* | -
- * | *backward*					|single| *true* | -
- * | *fixed_relative_position*	|single| *true* | -
- * | *max_distance*				|single| - | -
- * | *min_distance*				|single| - | -
- * | *max_height*				|single| - | -
- * | *min_height*				|single| - | -
- * | *friction*					|single| 1.0 | -
- * | *fixed_look_at*			|single| *true* | -
- * | *look_at_distance*			|single| - | -
- * | *look_at_height*			|single| - | -
- * | *mouse_move*  				|single| *disabled* | -
- * | *mouse_head*  				|single| *disabled* | -
- * | *mouse_pitch*  			|single| *disabled* | -
- * | *head_left*  				|single| *enabled* | -
- * | *head_right*  				|single| *enabled* | -
- * | *pitch_up*  				|single| *enabled* | -
- * | *pitch_down*  				|single| *enabled* | -
- * | *sens_x*  					|single| 0.2 | -
- * | *sens_y*  					|single| 0.2 | -
- * | *inverted_rotation*		|single| *false* | -
+ * | *body_type*  				|single| *dynamic* | values: static,dynamic,kinematic
+ * | *body_mass*  				|single| 1.0 | -
+ * | *body_friction*  			|single| 0.8 | -
+ * | *body_restitution*  		|single| 0.1 | -
+ * | *collide_mask*  			|single| *all_on* | -
+ * | *shape_type*  				|single| *sphere* | values: sphere,plane,box,cylinder,capsule,cone,heightfield,triangle_mesh
+ * | *shape_size*  				|single| *medium* | values: minimum,medium,maximum
+ * | *use_shape_of*				|single| - | -
+ * | *shape_radius*  			|single| - | for sphere,cylinder,capsule,cone
+ * | *shape_norm_x*  			|single| - | for plane
+ * | *shape_norm_y*  			|single| - | for plane
+ * | *shape_norm_z*  			|single| - | for plane
+ * | *shape_d*  				|single| - | for plane
+ * | *shape_half_x*  			|single| - | for box
+ * | *shape_half_y*  			|single| - | for box
+ * | *shape_half_z*  			|single| - | for box
+ * | *shape_height*  			|single| 1.0 | for cylinder,capsule,cone,heightfield
+ * | *shape_up*  				|single| *z* | values: x,y,z for cylinder,capsule,cone,heightfield
+ * | *shape_heightfield_file* 	|single| - | for heightfield
+ * | *shape_scale_w*  			|single| 1.0 | for heightfield
+ * | *shape_scale_d*  			|single| 1.0 | for heightfield
+ * | *ccd_motion_threshold*  	|single| - | -
+ * | *ccd_swept_sphere_radius* 	|single| - | -
  *
  * \note parts inside [] are optional.\n
  */
@@ -100,79 +84,81 @@ PUBLISHED:
 	///@}
 
 	/**
+	 * \brief The current component's type. xxx
+	 *
+	 * It may change during the component's lifetime.
+	 */
+	enum BodyType
+	{
+		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
+		STATIC,//!< STATIC: mass == 0.0, no driven
+		KINEMATIC//!< KINEMATIC: mass == 0.0, user driven
+	};
+
+	/**
+	 * \brief Gets/sets the node path of this rigid body.
+	 */
+	///@{
+	INLINE NodePath getNodePath() const;//xxx delete?
+	INLINE void setNodePath(const NodePath& nodePath);//xxx delete?
+	///@}
+
+	/**
 	 * \name RIGIDBODY
 	 */
 	///@{
-	INLINE void set_chased_object(const NodePath& object);
-	INLINE NodePath get_chased_object() const;
-	bool enable();
-	bool disable();
-	INLINE bool is_enabled() const;
+	void setup();//xxx a.k.a. RigidBody::onAddToObjectSetup()
+	void cleanup();//xxx a.k.a. RigidBody::onRemoveFromObjectCleanup()
+	INLINE BulletRigidBodyNode& getBulletRigidBodyNode() const;
+	inline operator BulletRigidBodyNode&() const;//xxx c++ only?
 	void update(float dt);
-	///@}
-
-	/**
-	 * \name MOVEMENT ENABLERS
-	 */
-	///@{
-	INLINE void enable_head_left(bool enable);
-	INLINE bool is_head_left_enabled() const;
-	INLINE void enable_head_right(bool enable);
-	INLINE bool is_head_right_enabled() const;
-	INLINE void enable_pitch_up(bool enable);
-	INLINE bool is_pitch_up_enabled() const;
-	INLINE void enable_pitch_down(bool enable);
-	INLINE bool is_pitch_down_enabled() const;
-	INLINE void enable_mouse_head(bool enable);
-	INLINE bool is_mouse_head_enabled() const;
-	INLINE void enable_mouse_pitch(bool enable);
-	INLINE bool is_mouse_pitch_enabled() const;
-	INLINE void enable_mouse_move(bool enable);
-	INLINE bool is_mouse_move_enabled() const;
-	///@}
-
-	/**
-	 * \name MOVEMENT ACTIVATORS
-	 */
-	///@{
-	INLINE void set_rotate_head_left(bool activate);
-	INLINE bool get_rotate_head_left() const;
-	INLINE void set_rotate_head_right(bool activate);
-	INLINE bool get_rotate_head_right() const;
-	INLINE void set_rotate_pitch_up(bool activate);
-	INLINE bool get_rotate_pitch_up() const;
-	INLINE void set_rotate_pitch_down(bool activate);
-	INLINE bool get_rotate_pitch_down() const;
 	///@}
 
 	/**
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	INLINE void set_hold_look_at(bool activate);
-	INLINE bool get_hold_look_at() const;
-	INLINE void set_backward(bool activate);
-	INLINE bool get_backward() const;
-	INLINE void set_fixed_relative_position(bool activate);
-	INLINE bool get_fixed_relative_position();
-	INLINE void set_inverted_rotation(bool activate);
-	INLINE bool get_inverted_rotation() const;
-	INLINE void set_max_distance(float absMaxDistance);
-	INLINE float get_max_distance() const;
-	INLINE void set_min_distance(float absMinDistance);
-	INLINE float get_min_distance() const;
-	INLINE void set_max_height(float absMaxHeight);
-	INLINE float get_max_height() const;
-	INLINE void set_min_height(float absMinHeight);
-	INLINE float get_min_height() const;
-	INLINE void set_look_at_distance(float absLookAtDistance);
-	INLINE float get_look_at_distance() const;
-	INLINE void set_look_at_height(float absLookAtHeight);
-	INLINE float get_look_at_height() const;
-	INLINE void set_friction(float friction);
-	INLINE float get_friction() const;
-	INLINE void set_sens(float sensX, float sensY);
-	INLINE ValueList<float> get_sens() const;
+	/**
+	 * \brief Switches the current component's type.
+	 *
+	 * It sets the rigid body mass too.
+	 * @param bodyType The new component's type.
+	 */
+	void switchType(BodyType bodyType);//xxx rename in switch_body_type()
+	INLINE void set_body_mass(float value);
+	INLINE float get_body_mass() const;
+	INLINE void set_body_friction(float value);
+	INLINE float get_body_friction() const;
+	INLINE void set_body_restitution(float value);
+	INLINE float get_body_restitution() const;
+	INLINE void set_collide_mask(CollideMask value);
+	INLINE CollideMask get_collide_mask() const;
+	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);//xxx possible after creation?
+	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
+	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);//xxx possible after creation?
+	INLINE GamePhysicsManager::ShapeSize get_shape_size() const;
+//	use_shape_of() XXX ?
+	//xxx possible after creation?
+	INLINE void set_shape_radius(float value);
+	INLINE float get_shape_radius() const;
+	INLINE void set_shape_norm(const LVector3f& value);
+	INLINE LVector3f get_shape_norm() const;
+	INLINE void set_shape_d(float value);
+	INLINE float get_shape_d() const;
+	INLINE void set_shape_half(const LVecBase3f& value);
+	INLINE LVecBase3f get_shape_half() const;
+	INLINE void set_shape_height(float value);
+	INLINE float get_shape_height() const;
+	INLINE void set_shape_up(BulletUpAxis value);
+	INLINE BulletUpAxis get_shape_up() const;
+	INLINE void set_shape_heightfield_file(const string& value);
+	INLINE string get_shape_heightfield_file() const;
+	INLINE void set_shape_scale(const LVecBase3f& value);
+	INLINE LVecBase3f get_shape_scale() const;
+	INLINE void set_ccd_motion_threshold(float value);
+	INLINE float get_ccd_motion_threshold() const;
+	INLINE void set_ccd_swept_sphere_radius(float value);
+	INLINE float get_ccd_swept_sphere_radius() const;
 	///@}
 
 	/**
@@ -215,35 +201,55 @@ protected:
 	virtual ~BTRigidBody();
 
 private:
-	///The chased object's node path.
-	NodePath mChasedNP;
 	///The reference node path.
 	NodePath mReferenceNP;
-	///The reference graphic window.
-	PT(GraphicsWindow) mWin;
-	///Auxiliary node path to track the fixed look at.
-	NodePath mFixedLookAtNP;
-	///Flags.
-	bool mEnabled, mFixedRelativePosition, mBackward, mFixedLookAt, mHoldLookAt;
-	///Kinematic parameters.
-	float mAbsLookAtDistance, mAbsLookAtHeight, mAbsMaxDistance, mAbsMinDistance,
-	mAbsMinHeight, mAbsMaxHeight, mFriction;
-	///Positions.
-	LPoint3f mRigidBodyPosition, mLookAtPosition;
+	///The NodePath associated to this rigid body.
+	NodePath mNodePath;//xxx delete?
+	///The underlying BulletRigidBodyNode (read-only after creation & before destruction).
+	PT(BulletRigidBodyNode) mRigidBodyNode;
 	///@{
-	///Key controls and effective keys.
-	bool mHeadLeft, mHeadRight, mPitchUp, mPitchDown;
-	bool mHeadLeftKey, mHeadRightKey, mPitchUpKey, mPitchDownKey, mMouseMoveKey;
+	///Physical parameters.
+	float mBodyMass, mBodyFriction, mBodyRestitution;
+	BodyType mBodyType;
+	GamePhysicsManager::ShapeType mShapeType;
+	GamePhysicsManager::ShapeSize mShapeSize;
+	BitMask32 mCollideMask;
+	//ccd stuff
+	float mCcdMotionThreshold, mCcdSweptSphereRadius;
+	bool mCcdEnabled;
+	/**
+	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
+	 */
+	void doSetPhysicalParameters();
 	///@}
+
+	/**
+	 * \brief Sets body type.
+	 * @param bodyType The body type.
+	 */
+	void doSwitchBodyType(BodyType bodyType);
+
+	///Geometric functions and parameters.
 	///@{
-	///Key control values.
-	bool mMouseEnabledH, mMouseEnabledP, mMouseHandled;
-	char mSignOfMouse;
-	///@}
-	///@{
-	/// Sensitivity settings.
-	float mSensX, mSensY, mHeadSensX, mHeadSensY;
-	int mCentX, mCentY;
+	/**
+	 * \brief Create a shape given its type.
+	 * @param shapeType The shape type.
+	 * @return The created shape.
+	 */
+	PT(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
+	LVecBase3f mModelDims;
+	float mModelRadius;
+	//use shape of (another object).
+//	ObjectId mUseShapeOfId; //xxx
+	//any model has a local frame and the tight bounding box is computed
+	//wrt it; so mModelDeltaCenter represents a transform (translation) to
+	//be applied to the model node path so that the middle point of the
+	//bounding box will overlap the frame center of the parent's node path .
+	LVector3f mModelDeltaCenter;
+	bool mAutomaticShaping;
+	float mDim1, mDim2, mDim3, mDim4;
+	Filename mHeightfieldFile;
+	BulletUpAxis mUpAxis;
 	///@}
 
 	inline void do_reset();

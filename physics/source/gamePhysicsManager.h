@@ -19,6 +19,26 @@ class BTSoftBody;
 class BTGhost;
 
 /**
+ * \brief Singleton manager updating attributes of physics components.
+ *
+ * Prepared for multi-threading.
+ * .
+ * This manager could throw events when objects collide. By default this
+ * feature is disabled.\n
+ * It throws:
+ * - when two objects collide, the event "<CollidingObjectType1>_<CollidingObjectType2>_Collision",
+ * with the two type names ordered in alphabetical ascending order (A to Z)
+ * (i.e. using the std::string::operator<()).
+ * This event is thrown continuously at a frequency which is the minimum between the fps and
+ * the frequency specified (which defaults to 30 times per seconds) until
+ * the object keeps overlapping
+ * - when the two objects stop collide, the event
+ * "<CollidingObjectType1>_<CollidingObjectType2>_CollisionOff"; this event is thrown only once\n
+ * The first argument of each event is a reference of the overlapping object's
+ * Physics component, the second argument is a reference to this component.
+ *
+ */
+/**
  * GamePhysicsManager Singleton class.
  *
  * Used for handling BTRigidBodys, BTSoftBodys, BTGhosts.
@@ -38,6 +58,7 @@ PUBLISHED:
 	///@{
 	INLINE NodePath get_reference_node_path() const;
 	INLINE void set_reference_node_path(const NodePath& reference);
+	INLINE NodePath get_bullet_debug_node_path() const;
 	///@}
 
 	/**
@@ -112,19 +133,83 @@ PUBLISHED:
 	///@}
 
 	/**
+	 * \name BULLET WORLD
+	 */
+	///@{
+	INLINE PT(BulletWorld) bulletWorld() const; //xxx
+	///@}
+
+	/**
+	 * Shape type.
+	 */
+	enum ShapeType
+	{
+		SPHERE = 0, //!< SPHERE (radius)
+		PLANE,//!< PLANE (norm_x, norm_y, norm_z, d)
+		BOX,//!< BOX (half_x, half_y, half_z)
+		CYLINDER,//!< CYLINDER (radius, height, up)
+		CAPSULE,//!< CAPSULE (radius, height, up)
+		CONE,//!< CONE (radius, height, up)
+		HEIGHTFIELD,//!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
+		TRIANGLEMESH,//!< TRIANGLEMESH (dynamic)
+	};
+
+	/**
+	 * Shape size.
+	 */
+	enum ShapeSize
+	{
+		MINIMUN = 0, //!< MINIMUN shape
+		MAXIMUM,//!< MAXIMUM shape
+		MEDIUM,//!< MEDIUM shape
+	};
+
+	/**
 	 * \name UTILITIES xxx
 	 */
 	///@{
+	PT(BulletShape) createShape(NodePath modelNP, ShapeType shapeType,
+			ShapeSize shapeSize, LVecBase3f& modelDims, LVector3f& modelDeltaCenter,
+			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
+			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
+			const Filename& heightfieldFile = Filename(""), bool dynamic = false);//xxx
+	INLINE PT(PandaNode/*Component*/) getPhysicsComponentByPandaNode(PT(PandaNode) pandaNode);//xxx
+	INLINE void setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,
+			PT(PandaNode/*Component*/) physicsComponent); //xxx
+	void getBoundingDimensions(NodePath modelNP, LVecBase3f& modelDims,
+			LVector3f& modelDeltaCenter, float& modelRadius);//xxx substituted by the other get_bounding_dimensions?
 	float get_bounding_dimensions(NodePath modelNP, LVecBase3f& modelDims,
 			LVector3f& modelDeltaCenter) const;
-	Pair<bool,float> get_collision_height(const LPoint3f& origin,
-			const NodePath& space = NodePath()) const;
+	Pair<bool,float> get_collision_height(const LPoint3f& fromPos) const;
 	INLINE CollideMask get_collide_mask() const;
-	INLINE NodePath get_collision_root() const;
-	INLINE CollisionTraverser* get_collision_traverser() const;
-	INLINE CollisionHandlerQueue* get_collision_handler() const;
-	INLINE CollisionRay* get_collision_ray() const;
 	///@}
+
+	///Thrown events.
+	enum EventThrown
+	{
+		COLLISIONNOTIFY
+	};
+
+	/**
+	 * \brief Enable/disable collisions' notification through events.
+	 *
+	 */
+	/**
+	 * \brief Enable/disable collisions' notification through events.
+	 * @param enable Enabling flag.
+	 */
+	INLINE void enableCollisionNotify(EventThrown event,
+			ThrowEventData eventData);
+
+	/**
+	 * \brief Initializes debugging.
+	 */
+	void initDebug(WindowFramework* windowFramework);
+	/**
+	 * \brief Enables/disables debugging.
+	 * @param enable True to enable, false to disable.
+	 */
+	void debug(bool enable);
 
 	/**
 	 * \name SERIALIZATION
@@ -140,6 +225,9 @@ public:
 	inline int unique_ref();
 
 private:
+	/// Bullet world.
+	PT(BulletWorld) mBulletWorld;
+
 	///The reference graphic window. xxx
 	PT(GraphicsWindow) mWin;
 	///The update task sort (should be >0).
@@ -166,6 +254,10 @@ private:
 	///BTGhosts' parameter table.
 	ParameterTable mGhostsParameterTable;
 
+	///Table of all physics components indexed by (underlying) Bullet PandaNodes.
+	///This is used, for example, during ray casting.
+	pmap<PT(PandaNode), PT(PandaNode/*Component*/)> mPhysicsComponentPandaNodeTable;
+
 	///@{
 	///A task data for step simulation update.
 	PT(TaskInterface<GamePhysicsManager>::TaskData) mUpdateData;
@@ -176,11 +268,97 @@ private:
 	int mRef;
 
 	///Utilities. xxx
-	NodePath mRoot;
+	BulletClosestHitRayResult mHitResult;
 	CollideMask mMask; //a.k.a. BitMask32
-	CollisionTraverser* mCTrav;
-	CollisionHandlerQueue* mCollisionHandler;
-	CollisionRay* mPickerRay;
+
+	/**
+	 * \name Collision notification  through events.
+	 */
+	///@{
+	struct CollidingNodePair
+	{
+		struct CollidingNodePairData
+		{
+			std::pair<PandaNode*, PandaNode*> mPnode;
+			std::string mEventName;
+			EventParameter mEventParameters[2];
+			int mCount;
+		};
+		//main constructors
+		CollidingNodePair(PandaNode *_pnode0, PandaNode *_pnode1) :
+				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
+		{
+			// always create the pair in a predictable order
+			// (use the pointer value..)
+			if (_pnode0 > _pnode1)
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode1, _pnode0);
+			}
+			else
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode0, _pnode1);
+			}
+			*mRefCount = 1;
+		}
+		CollidingNodePair(PandaNode *_pnode0, PandaNode *_pnode1, const std::string& _name, int _count) :
+				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
+		{
+			// always create the pair in a predictable order
+			// (use the pointer value..)
+			if (_pnode0 > _pnode1)
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode1, _pnode0);
+			}
+			else
+			{
+				mCollidingNodePairData->mPnode = std::make_pair(_pnode0, _pnode1);
+			}
+			mCollidingNodePairData->mEventName = _name;
+			mCollidingNodePairData->mCount = _count;
+			*mRefCount = 1;
+		}
+		//copy constructor
+		CollidingNodePair(const CollidingNodePair& on) :
+				mCollidingNodePairData(on.mCollidingNodePairData), mRefCount(on.mRefCount)
+		{
+			++(*mRefCount);
+		}
+		//destructor
+		~CollidingNodePair()
+		{
+			if (--(*mRefCount) == 0)
+			{
+				delete mCollidingNodePairData;
+				delete mRefCount;
+			}
+		}
+		//assignment operator
+		CollidingNodePair& operator=(const CollidingNodePair& on)
+		{
+			mCollidingNodePairData = on.mCollidingNodePairData;
+			++(*mRefCount);
+			return *this;
+		}
+		//comparison operator
+		bool operator<(const CollidingNodePair& on) const
+		{
+			return mCollidingNodePairData->mPnode < on.mCollidingNodePairData->mPnode;
+		}
+		//owned resource
+		CollidingNodePairData* mCollidingNodePairData;
+	private:
+		int* mRefCount;
+	};
+	ThrowEventData mCollisionNotify;
+	std::set<CollidingNodePair> mCollidingNodePairs;
+	btCollisionDispatcher* mCollisionDispatcher;
+	///Helpers.
+	float do_get_dim(ShapeSize shapeSize, float d1, float d2);//xxx private?
+	void doEnableCollisionNotify(EventThrown event, ThrowEventData eventData);
+	///@}
+
+	/// Bullet Debug node path.
+	NodePath mBulletDebugNodePath;
 
 public:
 	/**

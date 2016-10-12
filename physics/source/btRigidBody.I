@@ -8,7 +8,6 @@
 #ifndef BTRIGIDBODY_I_
 #define BTRIGIDBODY_I_
 
-
 ///BTRigidBody inline definitions
 
 /**
@@ -19,463 +18,253 @@ INLINE void BTRigidBody::set_reference_node_path(const NodePath& reference)
 	mReferenceNP = reference;
 }
 
-/**
- * Sets the chased object.
- */
-INLINE void BTRigidBody::set_chased_object(const NodePath& objectNP)
+INLINE NodePath BTRigidBody::getNodePath() const
 {
-	mChasedNP = objectNP;
-	NodePath thisNP = NodePath::any_path(this);
-	// set rigid_body initial position/orientation
-	thisNP.set_pos(mChasedNP, mRigidBodyPosition);
-	thisNP.look_at(mChasedNP, mLookAtPosition,
-			LVector3f::up());
+	return mNodePath;
+}
+
+INLINE void BTRigidBody::setNodePath(const NodePath& nodePath)
+{
+	mNodePath = nodePath;
 }
 
 /**
- * Reurns the chased object.
+ * Sets the body mass (>=0.0).
  */
-INLINE NodePath BTRigidBody::get_chased_object() const
+INLINE void set_body_mass(float value);
+
+/**
+ * Returns the body mass (>=0.0).
+ */
+/**
+ * Returns the body_mass (>=0.0).
+ */
+INLINE float BTRigidBody::get_body_mass() const
 {
-	return mChasedNP;
 }
 
 /**
- * Returns if the BTRigidBody is enabled (default: enabled).
+ * Sets the body_friction (>=0.0).
  */
-INLINE bool BTRigidBody::is_enabled() const
+INLINE void BTRigidBody::set_body_friction(float value)
 {
-	return mEnabled;
 }
 
 /**
- * Enables/disables head left rotation (default: enabled).
+ * Returns the body_friction (>=0.0).
  */
-INLINE void BTRigidBody::enable_head_left(bool enable)
+INLINE float BTRigidBody::get_body_friction() const
 {
-	mHeadLeftKey = enable;
-	if (!enable)
-	{
-		mHeadLeft = false;
-	}
 }
 
 /**
- * Returns if head left rotation is enabled/disabled (default: enabled).
+ * Sets the body_restitution (>=0.0).
  */
-INLINE bool BTRigidBody::is_head_left_enabled() const
+INLINE void BTRigidBody::set_body_restitution(float value)
 {
-	return mHeadLeftKey;
 }
 
 /**
- * Enables/disables head right rotation (default: enabled).
+ * Returns the body_restitution (>=0.0).
  */
-INLINE void BTRigidBody::enable_head_right(bool enable)
+INLINE float BTRigidBody::get_body_restitution() const
 {
-	mHeadRightKey = enable;
-	if (!enable)
-	{
-		mHeadRight = false;
-	}
 }
 
 /**
- * Returns if head right rotation is enabled/disabled (default: enabled).
+ * Sets the collide_mask (>=0.0).
  */
-INLINE bool BTRigidBody::is_head_right_enabled() const
+INLINE void BTRigidBody::set_collide_mask(CollideMask value)
 {
-	return mHeadRightKey;
 }
 
 /**
- * Enables/disables pitch up rotation (default: enabled).
+ * Returns the collide_mask (>=0.0).
  */
-INLINE void BTRigidBody::enable_pitch_up(bool enable)
+INLINE CollideMask BTRigidBody::get_collide_mask() const
 {
-	mPitchUpKey = enable;
-	if (!enable)
-	{
-		mPitchUp = false;
-	}
 }
 
 /**
- * Returns if pitch up rotation is enabled/disabled (default: enabled).
+ * Sets the shape_type (>=0.0).
  */
-INLINE bool BTRigidBody::is_pitch_up_enabled() const
+INLINE void BTRigidBody::set_shape_type(GamePhysicsManager::ShapeType value)
 {
-	return mPitchUpKey;
 }
 
 /**
- * Enables/disables pitch down rotation (default: enabled).
+ * Returns the shape_type (>=0.0).
  */
-INLINE void BTRigidBody::enable_pitch_down(bool enable)
+INLINE GamePhysicsManager::ShapeType BTRigidBody::get_shape_type() const
 {
-	mPitchDownKey = enable;
-	if (!enable)
-	{
-		mPitchDown = false;
-	}
+
 }
 
 /**
- * Enables/disables mouse head rotation (default: disabled).
+ * Sets the shape_size (>=0.0).
  */
-INLINE void BTRigidBody::enable_mouse_head(bool enable)
+INLINE void BTRigidBody::set_shape_size(GamePhysicsManager::ShapeSize value)
 {
-	RETURN_ON_COND(mMouseEnabledH == enable,)
-
-	mMouseEnabledH = enable;
-	// handle mouse if possible
-	do_handle_mouse();
 }
 
 /**
- * Returns if mouse head rotation is enabled/disabled (default: disabled).
+ * Returns the shape_type (>=0.0).
  */
-INLINE bool BTRigidBody::is_mouse_head_enabled() const
+INLINE GamePhysicsManager::ShapeSize BTRigidBody::get_shape_size() const
 {
-	return mMouseEnabledH;
+
+}
+
+//	use_shape_of() XXX ?
+
+/**
+ * Sets the shape_radius (>=0.0).
+ */
+INLINE void BTRigidBody::set_shape_radius(float value)
+{
 }
 
 /**
- * Enables/disables mouse pitch rotation (default: disabled).
+ * Returns the shape_radius (>=0.0).
  */
-INLINE void BTRigidBody::enable_mouse_pitch(bool enable)
+INLINE float BTRigidBody::get_shape_radius() const
 {
-	RETURN_ON_COND(mMouseEnabledP == enable,)
-
-	mMouseEnabledP = enable;
-	// handle mouse if possible
-	do_handle_mouse();
 }
 
 /**
- * Returns if mouse pitch rotation is enabled/disabled (default: disabled).
+ * Sets the shape_norm (>=0.0).
  */
-INLINE bool BTRigidBody::is_mouse_pitch_enabled() const
+INLINE void BTRigidBody::set_shape_norm(const LVector3f& value)
 {
-	return mMouseEnabledP;
 }
 
 /**
- * Enables/disables mouse movement externally handled (default: disabled).
+ * Returns the shape_norm (>=0.0).
  */
-INLINE void BTRigidBody::enable_mouse_move(bool enable)
+INLINE LVector3f BTRigidBody::get_shape_norm() const
 {
-	RETURN_ON_COND(mMouseMoveKey == enable,)
-
-	mMouseMoveKey = enable;
-	// handle mouse if possible
-	do_handle_mouse();
 }
 
 /**
- * Returns if mouse movement externally handled is enabled/disabled (default:
- * disabled).
+ * Sets the shape_d (>=0.0).
  */
-INLINE bool BTRigidBody::is_mouse_move_enabled() const
+INLINE void BTRigidBody::set_shape_d(float value)
 {
-	return mMouseMoveKey;
 }
 
 /**
- * Returns if pitch down rotation is enabled/disabled (default: enabled).
+ * Returns the shape_d (>=0.0).
  */
-INLINE bool BTRigidBody::is_pitch_down_enabled() const
+INLINE float BTRigidBody::get_shape_d() const
 {
-	return mPitchDownKey;
 }
 
 /**
- * Activates/deactivates head left rotation.
+ * Sets the shape_half (>=0.0).
  */
-INLINE void BTRigidBody::set_rotate_head_left(bool activate)
+INLINE void BTRigidBody::set_shape_half(const LVecBase3f& value)
 {
-	if (mHeadLeftKey)
-	{
-		mHeadLeft = activate;
-	}
 }
 
 /**
- * Returns if head left rotation is activated/deactivated.
+ * Returns the shape_half (>=0.0).
  */
-INLINE bool BTRigidBody::get_rotate_head_left() const
+INLINE LVecBase3f BTRigidBody::get_shape_half() const
 {
-	return mHeadLeft;
 }
 
 /**
- * Activates/deactivates head right rotation.
+ * Sets the shape_height (>=0.0).
  */
-INLINE void BTRigidBody::set_rotate_head_right(bool activate)
+INLINE void BTRigidBody::set_shape_height(float value)
 {
-	if (mHeadRightKey)
-	{
-		mHeadRight = activate;
-	}
 }
 
 /**
- * Returns if head right rotation is activated/deactivated.
+ * Returns the shape_height (>=0.0).
  */
-INLINE bool BTRigidBody::get_rotate_head_right() const
+INLINE float BTRigidBody::get_shape_height() const
 {
-	return mHeadRight;
 }
 
 /**
- * Activates/deactivates pitch up rotation.
+ * Sets the shape_up (>=0.0).
  */
-INLINE void BTRigidBody::set_rotate_pitch_up(bool activate)
+INLINE void BTRigidBody::set_shape_up(BulletUpAxis value)
 {
-	if (mPitchUpKey)
-	{
-		mPitchUp = activate;
-	}
 }
 
 /**
- * Returns if pitch up rotation is activated/deactivated.
+ * Returns the shape_up (>=0.0).
  */
-INLINE bool BTRigidBody::get_rotate_pitch_up() const
+INLINE BulletUpAxis BTRigidBody::get_shape_up() const
 {
-	return mPitchUp;
 }
 
 /**
- * Activates/deactivates pitch down rotation.
+ * Sets the shape_heightfield_file (>=0.0).
  */
-INLINE void BTRigidBody::set_rotate_pitch_down(bool activate)
+INLINE void BTRigidBody::set_shape_heightfield_file(const string& value)
 {
-	if (mPitchDownKey)
-	{
-		mPitchDown = activate;
-	}
 }
 
 /**
- * Returns if pitch down rotation is activated/deactivated.
+ * Returns the shape_heightfield_file (>=0.0).
  */
-INLINE bool BTRigidBody::get_rotate_pitch_down() const
+INLINE string BTRigidBody::get_shape_heightfield_file() const
 {
-	return mPitchDown;
 }
 
 /**
- * Activates/deactivates hold look at.
- * When activated rotation through mouse movements is disabled.
+ * Sets the shape_scale (>=0.0).
  */
-INLINE void BTRigidBody::set_hold_look_at(bool activate)
+INLINE void BTRigidBody::set_shape_scale(const LVecBase3f& value)
 {
-	mHoldLookAt = activate;
 }
 
 /**
- * Returns if hold look at is activated.
+ * Returns the shape_scale (>=0.0).
  */
-INLINE bool BTRigidBody::get_hold_look_at() const
+INLINE LVecBase3f BTRigidBody::get_shape_scale() const
 {
-	return mHoldLookAt;
 }
 
 /**
- * Activates/deactivates backward chasing (default: activated).
- * When activated the chased object is in front of the BTRigidBody, otherwise it is
- * behind it.
+ * Sets the ccd_motion_threshold (>=0.0).
  */
-INLINE void BTRigidBody::set_backward(bool activate)
+INLINE void BTRigidBody::set_ccd_motion_threshold(float value)
 {
-	RETURN_ON_COND(mBackward == activate,)
-
-	//check if backward located
-	float sign = (mBackward ? 1.0 : -1.0);
-	//set rigid_body position (wrt chased node)
-	mRigidBodyPosition = LPoint3f(0.0, -mAbsMaxDistance * sign,
-			mAbsMinHeight * 1.5);
-	//set "look at" position (wrt chased node)
-	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign,
-			mAbsLookAtHeight);
 }
 
 /**
- * Returns if backward chasing is activated (default: deactivated).
+ * Returns the ccd_motion_threshold (>=0.0).
  */
-INLINE bool BTRigidBody::get_backward() const
+INLINE float BTRigidBody::get_ccd_motion_threshold() const
 {
-	return mBackward;
 }
 
 /**
- * Activates/deactivates backward chasing.
- * When activated
+ * Sets the ccd_swept_sphere_radius (>=0.0).
  */
-INLINE void BTRigidBody::set_fixed_relative_position(bool activate)
+INLINE void BTRigidBody::set_ccd_swept_sphere_radius(float value)
 {
-	mFixedRelativePosition = activate;
-}
-
-INLINE bool BTRigidBody::get_fixed_relative_position()
-{
-	return mFixedRelativePosition;
 }
 
 /**
- * Activates/deactivates inverted rotation (default: deactivated).
+ * Returns the ccd_swept_sphere_radius (>=0.0).
  */
-INLINE void BTRigidBody::set_inverted_rotation(bool activate)
+INLINE float BTRigidBody::get_ccd_swept_sphere_radius() const
 {
-	activate ? mSignOfMouse = -1: mSignOfMouse = 1;
 }
 
-/**
- * Returns if inverted rotation is activated/deactivated (default: deactivated).
- */
-INLINE bool BTRigidBody::get_inverted_rotation() const
+INLINE BulletRigidBodyNode& BTRigidBody::getBulletRigidBodyNode() const
 {
-	return (mSignOfMouse == -1) ? true : false;
+	return *mRigidBodyNode;
 }
 
-/**
- * Sets the max distance from chased object (>=0.0).
- */
-INLINE void BTRigidBody::set_max_distance(float absMaxDistance)
+inline BTRigidBody::operator BulletRigidBodyNode&() const
 {
-	absMaxDistance >= 0.0 ? mAbsMaxDistance = absMaxDistance : mAbsMaxDistance =
-									-absMaxDistance;
-}
-
-/**
- * Returns the max distance from chased object (>=0.0).
- */
-INLINE float BTRigidBody::get_max_distance() const
-{
-	return mAbsMaxDistance;
-}
-
-/**
- * Sets the min distance from chased object (>=0.0).
- */
-INLINE void BTRigidBody::set_min_distance(float absMinDistance)
-{
-	absMinDistance >= 0.0 ? mAbsMinDistance = absMinDistance : mAbsMinDistance =
-									-absMinDistance;
-}
-
-/**
- * Returns the min distance from chased object (>=0.0).
- */
-INLINE float BTRigidBody::get_min_distance() const
-{
-	return mAbsMinDistance;
-}
-
-/**
- * Sets the max height from ground (>=0.0).
- */
-INLINE void BTRigidBody::set_max_height(float absMaxHeight)
-{
-	absMaxHeight >= 0.0 ? mAbsMaxHeight = absMaxHeight : mAbsMaxHeight =
-									-absMaxHeight;
-}
-
-/**
- * Returns the max height from ground (>=0.0).
- */
-INLINE float BTRigidBody::get_max_height() const
-{
-	return mAbsMaxHeight;
-}
-
-/**
- * Sets the min height from ground (>=0.0).
- */
-INLINE void BTRigidBody::set_min_height(float absMinHeight)
-{
-	absMinHeight >= 0.0 ? mAbsMinHeight = absMinHeight : mAbsMinHeight =
-									-absMinHeight;
-}
-
-/**
- * Returns the min height from ground (>=0.0).
- */
-INLINE float BTRigidBody::get_min_height() const
-{
-	return mAbsMinHeight;
-}
-
-/**
- * Sets the look at distance (>=0.0).
- */
-INLINE void BTRigidBody::set_look_at_distance(float absLookAtDistance)
-{
-	absLookAtDistance >= 0.0 ? mAbsLookAtDistance = absLookAtDistance : mAbsLookAtDistance =
-									-absLookAtDistance;
-}
-
-/**
- * Returns the look at distance (>=0.0).
- */
-INLINE float BTRigidBody::get_look_at_distance() const
-{
-	return mAbsLookAtDistance;
-}
-
-/**
- * Sets the look at height (>=0.0).
- */
-INLINE void BTRigidBody::set_look_at_height(float absLookAtHeight)
-{
-	absLookAtHeight >= 0.0 ? mAbsLookAtHeight = absLookAtHeight : mAbsLookAtHeight =
-									-absLookAtHeight;
-}
-
-/**
- * Returns the look at height (>=0.0).
- */
-INLINE float BTRigidBody::get_look_at_height() const
-{
-	return mAbsLookAtHeight;
-}
-
-/**
- * Sets the friction (>=0.0).
- */
-INLINE void BTRigidBody::set_friction(float friction)
-{
-	friction >= 0.0 ? mFriction = friction : mFriction =
-									-friction;
-}
-
-/**
- * Returns the friction (>=0.0).
- */
-INLINE float BTRigidBody::get_friction() const
-{
-	return mFriction;
-}
-
-/**
- * Sets mouse movement sensitivities along screen x,y axes (>=0.0).
- */
-INLINE void BTRigidBody::set_sens(float sensX, float sensY)
-{
-	mSensX = abs(sensX);
-	mSensY = abs(sensY);
-}
-
-/**
- * Returns mouse movement sensitivities along screen x,y axes (>=0.0).
- */
-INLINE ValueList<float> BTRigidBody::get_sens() const
-{
-	ValueList<float> sens;
-	sens.add_value(mSensX);
-	sens.add_value(mSensY);
-	return sens;
+	return *mRigidBodyNode;
 }
 
 /**
@@ -485,22 +274,23 @@ INLINE ValueList<float> BTRigidBody::get_sens() const
 inline void BTRigidBody::do_reset()
 {
 	//
-	mEnabled = false;
-	mChasedNP.clear();
-	mHeadLeft = mHeadRight = mPitchUp = mPitchDown = false;
-	mHeadLeftKey = mHeadRightKey = mPitchUpKey = mPitchDownKey = mMouseMoveKey =
-			false;
-	mMouseEnabledH = mMouseEnabledP = mMouseHandled = false;
-	mSignOfMouse = 1;
-	mFixedLookAtNP.clear();
-	mBackward = mFixedRelativePosition = mHoldLookAt = false;
-	mFixedLookAt = false;
-	mAbsLookAtDistance = mAbsLookAtHeight = mFriction = 0.0;
-	mAbsMaxDistance = mAbsMaxHeight = FLT_MAX;
-	mAbsMinDistance = mAbsMinHeight = FLT_MIN;
-	mRigidBodyPosition = mLookAtPosition = LPoint3f::zero();
-	mSensX = mSensY = 0.0;
-	mCentX = mCentY = 0.0;
+	mNodePath = NodePath(); // delete?
+	mRigidBodyNode.clear();
+	mBodyMass = mBodyFriction = mBodyRestitution = 0.0;
+	mBodyType = DYNAMIC;
+	mShapeType = GamePhysicsManager::SPHERE;
+	mShapeSize = GamePhysicsManager::MEDIUM;
+	mCollideMask = BitMask32::all_off();
+	mCcdMotionThreshold = mCcdSweptSphereRadius = 0.0;
+	mCcdEnabled = false;
+	mModelDims = LVector3f::zero();
+	mModelRadius = 0.0;
+//	mUseShapeOfId = ObjectId();xxx
+	mModelDeltaCenter = LVector3f::zero();
+	mAutomaticShaping = false;
+	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
+	mHeightfieldFile = Filename();
+	mUpAxis = Z_up;
 	mReferenceNP.clear();
 #ifdef PYTHON_BUILD
 	mSelf = NULL;

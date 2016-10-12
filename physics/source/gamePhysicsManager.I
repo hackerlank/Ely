@@ -19,6 +19,14 @@ INLINE NodePath GamePhysicsManager::get_reference_node_path() const
 }
 
 /**
+ * Returns the Bullet Debug NodePath.
+ */
+INLINE NodePath GamePhysicsManager::get_bullet_debug_node_path() const
+{
+	return mBulletDebugNodePath;
+}
+
+/**
  * Sets the reference NodePath.
  * This is usually called after restoring from a bam file.
  */
@@ -60,43 +68,52 @@ INLINE GamePhysicsManager* GamePhysicsManager::get_global_ptr()
 }
 
 /**
+ * Returns a reference to the Bullet world.
+ */
+INLINE PT(BulletWorld) GamePhysicsManager::bulletWorld() const
+{
+	return mBulletWorld;
+}
+
+/**
+ * Returns the physic PandaNode given the (underlying) Bullet PandaNode.
+ */
+INLINE PT(PandaNode/*Component*/) GamePhysicsManager::getPhysicsComponentByPandaNode(
+		PT(PandaNode) pandaNode)
+{
+	return mPhysicsComponentPandaNodeTable[pandaNode];
+}
+
+/**
+ * Sets the physics PandaNode given the (underlying) Bullet PandaNode as first
+ * parameter.
+ * If the Bullet PandaNode is set to NULL the physics PandaNode related to it
+ * will be erased.
+ */
+INLINE void GamePhysicsManager::setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,
+		PT(PandaNode/*Component*/) physicsComponent)
+{
+	if (physicsComponent)
+	{
+		mPhysicsComponentPandaNodeTable[pandaNode] = physicsComponent;
+	}
+	else
+	{
+		mPhysicsComponentPandaNodeTable.erase(pandaNode);
+	}
+}
+
+INLINE void GamePhysicsManager::enableCollisionNotify(EventThrown event, ThrowEventData eventData)
+{
+	doEnableCollisionNotify(event, eventData);
+}
+
+/**
  * Returns the collide mask.
  */
 INLINE CollideMask GamePhysicsManager::get_collide_mask() const
 {
 	return mMask;
-}
-
-/**
- * Returns the collision root.
- */
-INLINE NodePath GamePhysicsManager::get_collision_root() const
-{
-	return mRoot;
-}
-
-/**
- * Returns the collision traverser.
- */
-INLINE CollisionTraverser* GamePhysicsManager::get_collision_traverser() const
-{
-	return mCTrav;
-}
-
-/**
- * Returns the collision handler.
- */
-INLINE CollisionHandlerQueue* GamePhysicsManager::get_collision_handler() const
-{
-	return mCollisionHandler;
-}
-
-/**
- * Returns the collision ray.
- */
-INLINE CollisionRay* GamePhysicsManager::get_collision_ray() const
-{
-	return mPickerRay;
 }
 
 /**
