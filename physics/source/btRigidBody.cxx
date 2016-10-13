@@ -43,119 +43,229 @@ BTRigidBody::~BTRigidBody()
 void BTRigidBody::do_initialize()
 {
 	WPT(GamePhysicsManager)mTmpl = GamePhysicsManager::get_global_ptr();
-	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
-	mSignOfMouse = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("inverted_rotation")) == string("true") ? -1 : 1);
-	//backward setting
-	mBackward = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("backward")) == string("true") ?
-					true : false);
-	//fixed relative position setting
-	mFixedRelativePosition = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("fixed_relative_position")) == string("false") ?
-					false : true);
+	//body type
+	string bodyType = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_type"));
+	if (bodyType == string("static"))
+	{
+		mBodyType = STATIC;
+	}
+	else if (bodyType == string("kinematic"))
+	{
+		mBodyType = KINEMATIC;
+	}
+	else
+	{
+		mBodyType = DYNAMIC;
+	}
 	//
 	float value;
-	//max distance (>=0)
-	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("max_distance")).c_str(),
+	//body mass (>=0.0)
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_mass")).c_str(), NULL);
+	mBodyMass = (value >= 0.0 ? value : -value);
+	//body friction (>=0.0)
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_friction")).c_str(),
 			NULL);
-	mAbsMaxDistance = (value >= 0.0 ? value : -value);
-	//min distance (>=0)
-	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("min_distance")).c_str(),
+	mBodyFriction = (value >= 0.0 ? value : -value);
+	//body restitution (>=0.0)
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_restitution")).c_str(),
 			NULL);
-	mAbsMinDistance = (value >= 0.0 ? value : -value);
-	//max height (>=0)
+	mBodyRestitution = (value >= 0.0 ? value : -value);
+	//shape type
+	string shapeType = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_type"));
+	//shape size
+	string shapeSize = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_size"));
+	if (shapeSize == string("minimum"))
+	{
+		mShapeSize = GamePhysicsManager::MINIMUN;
+	}
+	else if (shapeSize == string("maximum"))
+	{
+		mShapeSize = GamePhysicsManager::MAXIMUM;
+	}
+	else
+	{
+		mShapeSize = GamePhysicsManager::MEDIUM;
+	}
+	//default auto shaping
+	mAutomaticShaping = true;
+	if (shapeType == string("sphere"))
+	{
+		mShapeType = GamePhysicsManager::SPHERE;
+		string radius = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_radius"));
+		if (not radius.empty())
+		{
+			mDim1 = STRTOF(radius.c_str(), NULL);
+			if (mDim1 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
+	}
+	else if (shapeType == string("plane"))
+	{
+		mShapeType = GamePhysicsManager::PLANE;
+		string norm_x = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_norm_x"));
+		string norm_y = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_norm_y"));
+		string norm_z = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_norm_z"));
+		string d = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_d"));
+		if ((not norm_x.empty()) and (not norm_y.empty())
+				and (not norm_z.empty()))
+		{
+			LVector3f normal(STRTOF(norm_x.c_str(), NULL),
+					STRTOF(norm_y.c_str(), NULL), STRTOF(norm_z.c_str(), NULL));
+			normal.normalize();
+			mDim1 = normal.get_x();
+			mDim2 = normal.get_y();
+			mDim3 = normal.get_z();
+			mDim4 = STRTOF(d.c_str(), NULL);
+			if (normal.length() > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
+	}
+	else if (shapeType == string("box"))
+	{
+		mShapeType = GamePhysicsManager::BOX;
+		string half_x = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_half_x"));
+		string half_y = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_half_y"));
+		string half_z = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_half_z"));
+		if ((not half_x.empty()) and (not half_y.empty())
+				and (not half_z.empty()))
+		{
+			mDim1 = STRTOF(half_x.c_str(), NULL);
+			mDim2 = STRTOF(half_y.c_str(), NULL);
+			mDim3 = STRTOF(half_z.c_str(), NULL);
+			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
+	}
+	else if (shapeType == string("cylinder")
+			or shapeType == string("capsule")
+			or shapeType == string("cone"))
+	{
+		if (shapeType == string("cylinder"))
+		{
+			mShapeType = GamePhysicsManager::CYLINDER;
+		}
+		else if (shapeType == string("capsule"))
+		{
+			mShapeType = GamePhysicsManager::CAPSULE;
+		}
+		else
+		{
+			mShapeType = GamePhysicsManager::CONE;
+		}
+		string radius = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_radius"));
+		string height = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_height"));
+		string upAxis = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_up"));
+		if ((not radius.empty()) and (not height.empty()))
+		{
+			mDim1 = STRTOF(radius.c_str(), NULL);
+			mDim2 = STRTOF(height.c_str(), NULL);
+			if (mDim1 > 0.0 and mDim2 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
+		if (upAxis == string("x"))
+		{
+			mUpAxis = X_up;
+		}
+		else if (upAxis == string("y"))
+		{
+			mUpAxis = Y_up;
+		}
+		else
+		{
+			mUpAxis = Z_up;
+		}
+	}
+	else if (shapeType == string("heightfield"))
+	{
+		mShapeType = GamePhysicsManager::HEIGHTFIELD;
+		string heightfield_file = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
+				string("shape_heightfield_file"));
+		mHeightfieldFile = Filename(heightfield_file);
+		string height = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_height"));
+		string scale_w = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_scale_w"));
+		string scale_d = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_scale_d"));
+		string upAxis = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_up"));
+		if ((not height.empty()) and (not scale_w.empty())
+				and (not scale_d.empty()))
+		{
+			mDim1 = STRTOF(height.c_str(), NULL);
+			mDim2 = STRTOF(scale_w.c_str(), NULL);
+			mDim3 = STRTOF(scale_d.c_str(), NULL);
+			if (mDim1 > 0.0 and mDim2 > 0.0 and mDim3 > 0.0)
+			{
+				mAutomaticShaping = false;
+			}
+		}
+		if (upAxis == string("x"))
+		{
+			mUpAxis = X_up;
+		}
+		else if (upAxis == string("y"))
+		{
+			mUpAxis = Y_up;
+		}
+		else
+		{
+			mUpAxis = Z_up;
+		}
+	}
+	else if (shapeType == string("triangle_mesh"))
+	{
+		mShapeType = GamePhysicsManager::TRIANGLEMESH;
+	}
+	else
+	{
+		//default a sphere (with auto shaping)
+		mShapeType = GamePhysicsManager::SPHERE;
+	}
+	//collide mask
+	string collideMask = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("collide_mask"));
+	if (collideMask == string("all_on"))
+	{
+		mCollideMask = BitMask32::all_on();
+	}
+	else if (collideMask == string("all_off"))
+	{
+		mCollideMask = BitMask32::all_off();
+	}
+	else
+	{
+		uint32_t mask = (uint32_t) strtol(collideMask.c_str(), NULL, 0);
+		mCollideMask.set_word(mask);
+#ifdef ELY_DEBUG
+		mCollideMask.write(cout, 0);
+#endif
+	}
+	//ccd settings: enabled if both are greater than zero (> 0.0)
+	//ccd motion threshold (>=0.0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("max_height")).c_str(),
+			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("ccd_motion_threshold")).c_str(),
 			NULL);
-	mAbsMaxHeight = (value >= 0.0 ? value : -value);
-	//min height (>=0)
+	mCcdMotionThreshold = (value >= 0.0 ? value : -value);
+	//ccd swept sphere radius (>=0.0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("min_height")).c_str(),
+			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("ccd_swept_sphere_radius")).c_str(),
 			NULL);
-	mAbsMinHeight = (value >= 0.0 ? value : -value);
-	//friction (>=0)
-	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("friction")).c_str(), NULL);
-	mFriction = (value >= 0.0 ? value : -value);
-	//fixed look at: true/false
-	mFixedLookAt = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("fixed_look_at")) == string("false") ? false : true);
-	//look at distance (>=0)
-	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("look_at_distance")).c_str(),
-			NULL);
-	mAbsLookAtDistance = (value >= 0.0 ? value : -value);
-	//look at height (>=0)
-	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("look_at_height")).c_str(),
-			NULL);
-	mAbsLookAtHeight = (value >= 0.0 ? value : -value);
-	//mouse movement setting
-	mMouseEnabledH = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("mouse_head")) == string("enabled") ? true : false);
-	mMouseEnabledP = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("mouse_pitch")) == string("enabled") ? true : false);
-	//headLeft key
-	mHeadLeftKey = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("head_left")) == string("enabled") ? true : false);
-	//headRight key
-	mHeadRightKey = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("head_right")) == string("enabled") ? true : false);
-	//pitchUp key
-	mPitchUpKey = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("pitch_up")) == string("enabled") ? true : false);
-	//pitchDown key
-	mPitchDownKey = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("pitch_down")) == string("enabled") ? true : false);
-	//mouseMove key: enabled/disabled
-	mMouseMoveKey = (
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("mouse_move"))
-			== string("enabled") ? true : false);
-	//sens x (>=0)
-	value =
-			STRTOF(
-					mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-							string("sens_x")).c_str(),
-					NULL);
-	mSensX = (value >= 0.0 ? value : -value);
-	mHeadSensX = mSensX * 375.0;
-	//sens y (>=0)
-	value =
-			STRTOF(
-					mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-							string("sens_y")).c_str(),
-					NULL);
-	mSensY = (value >= 0.0 ? value : -value);
-	mHeadSensY = mSensY * 375.0;
+	mCcdSweptSphereRadius = (value >= 0.0 ? value : -value);
+	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
+			mCcdEnabled = true : mCcdEnabled = false;
+	//use shape of (another object)
+//	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); xxx
 	//
-	mCentX = mWin->get_properties().get_x_size() / 2;
-	mCentY = mWin->get_properties().get_y_size() / 2;
-	//enabling setting
+	//setup setting
 	if((
 			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("enabled")) == string("true") ? true : false))
+					string("setup")) == string("false") ? false : true))
 	{
-		do_enable();
+		setup();
 	}
 	//
 #ifdef PYTHON_BUILD
@@ -166,6 +276,149 @@ void BTRigidBody::do_initialize()
 #endif //PYTHON_BUILD
 }
 
+void BTRigidBody::setup()
+{
+	RETURN_ON_COND(mSetup,)
+
+	//create a Rigid Body Node
+	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
+//	string name = COMPONENT_STANDARD_NAME; xxx
+	mRigidBodyNode = new BulletRigidBodyNode(get_name().c_str());
+	//add to table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(
+			mRigidBodyNode.p(), this);
+	//set the physics parameters
+	doSetPhysicalParameters();
+
+	//At this point a Scene component (Model, InstanceOf ...) should have
+	//been already created and added to the object, so its node path should
+	//be the same as the object's one.
+	//Note: scaling is applied to a Scene component, so the object node path
+	//has scaling already applied.
+
+	//create and add a Collision Shape
+	mRigidBodyNode->add_shape(doCreateShape(mShapeType));
+	//set mass and other body type settings
+	switchType(mBodyType);
+
+	//create a node path for the rigid body
+	mNodePath = NodePath(mRigidBodyNode);
+
+	//attach to Bullet World
+	GamePhysicsManager::get_global_ptr()->bulletWorld()->attach(mRigidBodyNode);
+
+	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
+	//dynamic, etc...) after it has been attached to the world, you must first
+	//attach it as a dynamic body and then switch its type:
+	//		mRigidBodyNode->set_mass(1.0);
+	//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
+	//		switchType(mBodyType);
+	///BUG>
+
+	//set collide mask
+	mNodePath.set_collide_mask(mCollideMask);
+
+	NodePath ownerNodePath = NodePath::any_path(this); //xxx
+//	if (not ownerNodePath.is_empty())
+//	{
+		//reparent the object node path as a child of the rigid body's one
+		ownerNodePath.reparent_to(mNodePath);
+		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
+		{
+			//correct (or possibly reset to zero) pos and hpr of the object node path
+			ownerNodePath.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
+		}
+
+//		//BulletShape::set_local_scale doesn't work anymore xxx
+//		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
+//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
+//		{
+//			//check if there is already a scene component
+//			PT (Component)
+//			sceneComp = mOwnerObject->getComponent(
+//					ComponentFamilyType("Scene"));
+//			if (sceneComp)
+//			{
+//				//check if the scene component is a Terrain
+//				if (sceneComp->componentType() == ComponentType("Terrain"))
+//				{
+//					float widthScale =
+//							DCAST(Terrain, sceneComp)->getWidthScale();
+//					float heightScale =
+//							DCAST(Terrain, sceneComp)->getHeightScale();
+//					if (mUpAxis == X_up)
+//					{
+//						mNodePath.set_scale(
+//								LVecBase3f(heightScale, widthScale,
+//										widthScale));
+//					}
+//					else if (mUpAxis == Y_up)
+//					{
+//						mNodePath.set_scale(
+//								LVecBase3f(widthScale, heightScale,
+//										widthScale));
+//					}
+//					else //mUpAxis == Z_up
+//					{
+//						mNodePath.set_scale(
+//								LVecBase3f(widthScale, widthScale,
+//										heightScale));
+//					}
+//				}
+//			}
+//			else
+//			{
+//				//no scene component: scale manually if requested
+//				if (not mAutomaticShaping)
+//				{
+//					if (mUpAxis == X_up)
+//					{
+//						mNodePath.set_scale(mDim1, mDim2, mDim3);
+//					}
+//					else if (mUpAxis == Y_up)
+//					{
+//						mNodePath.set_scale(mDim3, mDim1, mDim2);
+//					}
+//					else
+//					{
+//						mNodePath.set_scale(mDim2, mDim3, mDim1);
+//					}
+//				}
+//			}
+//		}
+		//optimize
+		mNodePath.flatten_strong();
+//	}
+//	else
+//	{
+//		//when ownerNodePath is empty: every rigid body has a shape but xxx
+//		//HEIGHTFIELD, which should have a chance to scale
+//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
+//		{
+//			if (not mAutomaticShaping)
+//			{
+//				if (mUpAxis == X_up)
+//				{
+//					mNodePath.set_scale(mDim1, mDim2, mDim3);
+//				}
+//				else if (mUpAxis == Y_up)
+//				{
+//					mNodePath.set_scale(mDim3, mDim1, mDim2);
+//				}
+//				else
+//				{
+//					mNodePath.set_scale(mDim2, mDim3, mDim1);
+//				}
+//			}
+//		}
+//	}
+
+//	//set this rigid body node path as the object's one xxx
+//	mOwnerObject->setNodePath(mNodePath);
+	mSetup = true;
+}
+
 /**
  * On destruction cleanup.
  * Gives an BTRigidBody the ability to do any cleaning is necessary when
@@ -174,12 +427,8 @@ void BTRigidBody::do_initialize()
  */
 void BTRigidBody::do_finalize()
 {
-	//if enabled: disable
-	if (mEnabled)
-	{
-		//actual disabling
-		do_disable();
-	}
+	//actual cleanup
+	cleanup();
 #ifdef PYTHON_BUILD
 	//Python callback
 	Py_DECREF(mSelf);
@@ -191,184 +440,129 @@ void BTRigidBody::do_finalize()
 	return;
 }
 
-/**
- * Enables the BTRigidBody to perform its task (default: enabled).
- */
-bool BTRigidBody::enable()
+void BTRigidBody::cleanup()
 {
-	//if enabled return or chased node path is empty return
-	RETURN_ON_COND(mEnabled || mChasedNP.is_empty(), false)
+	RETURN_ON_COND(!mSetup,)
 
-	//actual enabling
-	do_enable();
-	//
-	return true;
-}
-
-/**
- * Enables actually the BTRigidBody.
- * \note Internal use only.
- */
-void BTRigidBody::do_enable()
-{
-	mEnabled = true;
-	//check if backward located
-	float sign = (mBackward ? 1.0 : -1.0);
-	//set rigid_body position (wrt chased node)
-	mRigidBodyPosition = LPoint3f(0.0, -mAbsMaxDistance * sign,
-			mAbsMinHeight * 1.5);
-	//set "look at" position (wrt chased node)
-	mLookAtPosition = LPoint3f(0.0, mAbsLookAtDistance * sign,
-			mAbsLookAtHeight);
-	// handle mouse if possible
-	if ((!mFixedLookAt) && (mMouseEnabledH || mMouseEnabledP)
-			&& (!mMouseMoveKey))
+	NodePath oldObjectNodePath;
+	//set the object node path to the first child of rigid body's one (if any)
+	if (mNodePath.get_num_children() > 0)
 	{
-		//we want control through mouse movements
-		//hide mouse cursor
-		WindowProperties props = mWin->get_properties();
-		props.set_cursor_hidden(true);
-		mWin->request_properties(props);
-		//reset mouse to start position
-		mWin->move_pointer(0, mCentX, mCentY);
-		// start handle mouse
-		mMouseHandled = true;
-	}
-	//set fixed look at node
-	mFixedLookAtNP = mReferenceNP.attach_new_node("fixedLookAtNP");
-}
-
-/**
- * Disables the BTRigidBody to perform its task (default: enabled).
- */
-bool BTRigidBody::disable()
-{
-	//if not enabled return
-	RETURN_ON_COND((!mEnabled) || mChasedNP.is_empty(), false)
-
-	//actual disabling
-	do_disable();
-	//
-	return true;
-}
-
-
-/**
- * Disables actually the BTRigidBody.
- * \note Internal use only.
- */
-void BTRigidBody::do_disable()
-{
-	mEnabled = false;
-	//
-	mFixedLookAtNP.remove_node();
-	//
-	// don't handle mouse
-	WindowProperties props = mWin->get_properties();
-	//show mouse cursor if hidden
-	props.set_cursor_hidden(false);
-	mWin->request_properties(props);
-	// stop handle mouse
-	mMouseHandled = false;
-}
-
-/**
- * Make mouse handled if possible.
- * \note Internal use only.
- */
-void BTRigidBody::do_handle_mouse()
-{
-	// handle mouse if possible
-	if (mEnabled && (mMouseEnabledH || mMouseEnabledP) && (!mFixedLookAt)
-			&& (!mMouseMoveKey))
-	{
-		//we want control through mouse movements
-		//hide mouse cursor
-		WindowProperties props = mWin->get_properties();
-		props.set_cursor_hidden(true);
-		mWin->request_properties(props);
-		//reset mouse to start position
-		mWin->move_pointer(0, mCentX, mCentY);
-		// start handle mouse
-		mMouseHandled = true;
+		oldObjectNodePath = mNodePath.get_child(0);
+		//detach the object node path from the rigid body's one
+		oldObjectNodePath.detach_node();
 	}
 	else
 	{
-		// don't handle mouse
-		WindowProperties props = mWin->get_properties();
-		//show mouse cursor if hidden
-		props.set_cursor_hidden(false);
-		mWin->request_properties(props);
-		// stop handle mouse
-		mMouseHandled = false;
+		oldObjectNodePath = NodePath();
+	}
+//	//set the object node path to the old one xxx
+//	mOwnerObject->setNodePath(oldObjectNodePath);
+
+	//remove from table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mRigidBodyNode.p(), NULL);
+
+	//remove rigid body from the physics world
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+			mRigidBodyNode);
+
+	//Remove node path
+	mNodePath.remove_node();
+}
+
+void BTRigidBody::switchType(BodyType bodyType)
+{
+	switch (bodyType)
+	{
+	case DYNAMIC:
+		mRigidBodyNode->set_mass(mBodyMass);
+		mRigidBodyNode->set_kinematic(false);
+		mRigidBodyNode->set_static(false);
+		mRigidBodyNode->set_deactivation_enabled(true);
+		mRigidBodyNode->set_active(true);
+		break;
+	case STATIC:
+		mRigidBodyNode->set_mass(0.0);
+		mRigidBodyNode->set_kinematic(false);
+		mRigidBodyNode->set_static(true);
+		mRigidBodyNode->set_deactivation_enabled(true);
+		mRigidBodyNode->set_active(false);
+		break;
+	case KINEMATIC:
+		mRigidBodyNode->set_mass(0.0);
+		mRigidBodyNode->set_kinematic(true);
+		mRigidBodyNode->set_static(false);
+		mRigidBodyNode->set_deactivation_enabled(false);
+		mRigidBodyNode->set_active(false);
+		break;
+	default:
+		break;
 	}
 }
 
-/**
- * Calculates the dynamic position of the rigid_body.
- * \see OgreBulletDemos.
- * - desiredRigidBodyPos: the desired rigid_body position (wrt reference).
- * - currentRigidBodyPos: the current rigid_body position (wrt reference).
- * - deltaTime: the delta time update.
- * Returns the dynamic rigid_body position.
- */
-LPoint3f BTRigidBody::do_get_rigid_body_pos(LPoint3f desiredRigidBodyPos,
-		LPoint3f currentRigidBodyPos, float deltaTime)
+PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeType)
 {
-	float kReductFactor = mFriction * deltaTime;
-	if (kReductFactor > 1.0)
-	{
-		kReductFactor = 1.0;
-	}
-	//calculate difference between desiredRigidBodyPos and currentRigidBodyPos
-	LVector3f deltaPos = currentRigidBodyPos - desiredRigidBodyPos;
-	//converge deltaPos.lenght toward zero: proportionally to deltaPos.lenght
-	if (deltaPos.length_squared() > 0.0)
-	{
-		deltaPos -= deltaPos * kReductFactor;
-	}
-	//calculate new position
-	LPoint3f newPos = desiredRigidBodyPos + deltaPos;
-	//correct min distance
-	LPoint3f chasedPos = mReferenceNP.get_relative_point(mChasedNP,
-			LPoint3f::zero());
-	LVector3f newTargetDir = newPos - chasedPos;
-	if (newTargetDir.length() < mAbsMinDistance)
-	{
-		newTargetDir.normalize();
-		newPos = chasedPos + newTargetDir * mAbsMinDistance;
-	}
-	//
-	return newPos;
+//	//check if it should use shape of another (already) created object xxx
+//	if (not mUseShapeOfId.empty())
+//	{
+//		SMARTPTR(Object)createdObject =
+//		ObjectTemplateManager::GetSingleton().getCreatedObject(
+//				mUseShapeOfId);
+//		if (createdObject)
+//		{
+//			//object already exists
+//			SMARTPTR(Component) physicsComp =
+//			createdObject->getComponent(ComponentFamilyType("Physics"));
+//			if (physicsComp)
+//			{
+//				if (physicsComp->is_of_type(RigidBody::get_class_type()))
+//				{
+//					//physics component is a rigid body:
+//					//return a reference to its (first and only) shape
+//					return DCAST(RigidBody, physicsComp)->getBulletRigidBodyNode().get_shape(0);
+//				}
+//				else if (physicsComp->is_of_type(Ghost::get_class_type()))
+//				{
+//					//physics component is a ghost:
+//					//return a reference to its (first and only) shape
+//					return DCAST(Ghost, physicsComp)->getBulletGhostNode().get_shape(0);
+//				}
+//			}
+//		}
+//	}
+
+	// create and return the current shape: dimensions are wrt the
+	//Model or InstanceOf component (if any)
+	NodePath shapeNodePath = NodePath::any_path(this);//default
+//	SMARTPTR(Component) sceneComp = mOwnerObject->getComponent(ComponentFamilyType("Scene"));xxx
+//	if (sceneComp)
+//	{
+//		if (sceneComp->componentType() == ComponentType("Model"))
+//		{
+//			shapeNodePath = NodePath(DCAST(Model, sceneComp)->getNodePath().node());
+//		}
+//		if (sceneComp->componentType() == ComponentType("InstanceOf"))
+//		{
+//			shapeNodePath = NodePath(DCAST(InstanceOf, sceneComp)->getNodePath().node());
+//		}
+//	}
+	return GamePhysicsManager::GetSingletonPtr()->createShape(
+			shapeNodePath, mShapeType, mShapeSize,
+			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
+			mDim3, mDim4, mAutomaticShaping, mUpAxis,
+			mHeightfieldFile, not (mBodyType == STATIC));
 }
 
-/**
- * Correct the dynamic height of the rigid_body.
- * - newPos: the position whose height may be corrected.
- * - baseHeight: the corrected height cannot be shorter than this.
- */
-void BTRigidBody::do_correct_rigid_body_height(LPoint3f& newPos, float baseHeight)
+void BTRigidBody::doSetPhysicalParameters()
 {
-	//correct rigid_body height (not in OgreBulletDemos)
-	// get control manager
-	WPT(GamePhysicsManager)navMeshMgr = GamePhysicsManager::get_global_ptr();
-	// correct panda's Z: set the collision ray origin wrt collision root
-	LPoint3f pOrig = navMeshMgr->get_collision_root().get_relative_point(
-			mReferenceNP, newPos);
-	// get the collision height wrt the reference node path
-	Pair<bool,float> gotCollisionZ = navMeshMgr->get_collision_height(pOrig,
-			mReferenceNP);
-	if (gotCollisionZ.get_first())
+	mRigidBodyNode->set_friction(mBodyFriction);
+	mRigidBodyNode->set_restitution(mBodyRestitution);
+	if (mCcdEnabled)
 	{
-		float hitPosZ = max(gotCollisionZ.get_second(), baseHeight);
-		if (newPos.get_z() < hitPosZ + mAbsMinHeight)
-		{
-			newPos.set_z(hitPosZ + mAbsMinHeight);
-		}
-		else if (newPos.get_z() > hitPosZ + mAbsMaxHeight)
-		{
-			newPos.set_z(hitPosZ + mAbsMaxHeight);
-		}
+		mRigidBodyNode->set_ccd_motion_threshold(mCcdMotionThreshold);
+		mRigidBodyNode->set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
 	}
 }
 
@@ -377,139 +571,11 @@ void BTRigidBody::do_correct_rigid_body_height(LPoint3f& newPos, float baseHeigh
  */
 void BTRigidBody::update(float dt)
 {
-	RETURN_ON_COND(!mEnabled,)
+	RETURN_ON_COND(!mSetup,)
 
 #ifdef TESTING
 	dt = 0.016666667; //60 fps
 #endif
-
-	//update rigid_body position and orientation (see OgreBulletDemos)
-	NodePath thisNP = NodePath::any_path(this);
-	//position
-	LPoint3f currentRigidBodyPos = mReferenceNP.get_relative_point(
-			thisNP, LPoint3f::zero());
-	LPoint3f newPos;
-	LPoint3f desiredRigidBodyPos;
-	if (mFixedRelativePosition)
-	{
-		//follow chased node from fixed position wrt it
-		desiredRigidBodyPos = mReferenceNP.get_relative_point(
-				mChasedNP, mRigidBodyPosition);
-		newPos = do_get_rigid_body_pos(desiredRigidBodyPos, currentRigidBodyPos, dt);
-		LPoint3f currentChasedPos = mReferenceNP.get_relative_point(
-				mChasedNP, LPoint3f::zero());
-		do_correct_rigid_body_height(newPos, currentChasedPos.get_z());
-	}
-	else
-	{
-		//correct position only if distance < min distance or distance > max distance
-		LPoint3f currentChasedPos = mReferenceNP.get_relative_point(
-				mChasedNP, LPoint3f::zero());
-		LVector3f distanceDir = currentRigidBodyPos - currentChasedPos;
-		float distance = distanceDir.length();
-		if (distance < mAbsMinDistance)
-		{
-			distanceDir.normalize();
-			desiredRigidBodyPos = currentChasedPos + distanceDir * mAbsMinDistance;
-			newPos = do_get_rigid_body_pos(desiredRigidBodyPos, currentRigidBodyPos, dt);
-			do_correct_rigid_body_height(newPos, currentChasedPos.get_z());
-		}
-		else if (distance > mAbsMaxDistance)
-		{
-			distanceDir.normalize();
-			desiredRigidBodyPos = currentChasedPos + distanceDir * mAbsMaxDistance;
-			newPos = do_get_rigid_body_pos(desiredRigidBodyPos, currentRigidBodyPos, dt);
-			do_correct_rigid_body_height(newPos, currentChasedPos.get_z());
-		}
-		else
-		{
-			newPos = currentRigidBodyPos;
-		}
-	}
-	//
-	thisNP.set_pos(mReferenceNP, newPos);
-	//orientation
-	if (mFixedLookAt)
-	{
-		//look at fixed location
-		thisNP.look_at(mChasedNP, mLookAtPosition,
-				LVector3f::up());
-	}
-	else
-	{
-		//adjust look at with mouse and/or key events
-		//handle mouse
-		float deltaH = 0.0, deltaP = 0.0, deltaR = 0.0;
-		bool wantRotate = false;
-		if (mMouseHandled)
-		{
-			MouseData md = mWin->get_pointer(0);
-			float deltaX = md.get_x() - mCentX;
-			float deltaY = md.get_y() - mCentY;
-
-			if (mWin->move_pointer(0, mCentX, mCentY))
-			{
-				if (mMouseEnabledH && (deltaX != 0.0))
-				{
-					deltaH -= deltaX * mSensX * mSignOfMouse;
-					wantRotate = true;
-				}
-				if (mMouseEnabledP && (deltaY != 0.0))
-				{
-					deltaP -= deltaY * mSensY * mSignOfMouse;
-					wantRotate = true;
-				}
-			}
-		}
-
-		//handle keys:
-		if (mHeadLeft && (! mHeadRight))
-		{
-			deltaH += mHeadSensX * dt * mSignOfMouse;
-			wantRotate = true;
-		}
-		else if (mHeadRight && (! mHeadLeft))
-		{
-			deltaH -= mHeadSensX * dt * mSignOfMouse;
-			wantRotate = true;
-		}
-		if (mPitchUp && (! mPitchDown))
-		{
-			deltaP += mHeadSensY * dt * mSignOfMouse;
-			wantRotate = true;
-		}
-		else if (mPitchDown && (! mPitchUp))
-		{
-			deltaP -= mHeadSensY * dt * mSignOfMouse;
-			wantRotate = true;
-		}
-
-		//update look at
-		if (wantRotate)
-		{
-			//want rotate: update to desired look up
-			thisNP.set_hpr(
-					thisNP.get_hpr() + LVecBase3f(deltaH, deltaP, deltaR));
-		}
-		else if (! mHoldLookAt)
-		{
-			//don't want rotate: return to look up to fixed location
-			mFixedLookAtNP.set_pos(thisNP.get_pos());
-			mFixedLookAtNP.look_at(mChasedNP, mLookAtPosition,
-					LVector3f::up());
-			LVecBase3f deltaHPR = thisNP.get_hpr(mFixedLookAtNP);
-			float kReductFactor = mFriction * dt;
-			if (kReductFactor > 1.0)
-			{
-				kReductFactor = 1.0;
-			}
-			if (deltaHPR.length_squared() > 0.0)
-			{
-				deltaHPR -= deltaHPR * kReductFactor;
-			}
-			thisNP.set_hpr(mFixedLookAtNP, deltaHPR);
-		}
-	}
 	//
 #ifdef PYTHON_BUILD
 	// execute python callback (if any)
@@ -605,67 +671,67 @@ void BTRigidBody::write_datagram(BamWriter *manager, Datagram &dg)
 	///Name of this BTRigidBody.
 	dg.add_string(get_name());
 
-	///Enable/disable flag.
-	dg.add_bool(mEnabled);
-
-	///Flags.
-	///@{
-	dg.add_bool(mFixedRelativePosition);
-	dg.add_bool(mBackward);
-	dg.add_bool(mFixedLookAt);
-	dg.add_bool(mHoldLookAt);
-	///@}
-
-	///Kinematic parameters.
-	///@{
-	dg.add_stdfloat(mAbsLookAtDistance);
-	dg.add_stdfloat(mAbsLookAtHeight);
-	dg.add_stdfloat(mAbsMaxDistance);
-	dg.add_stdfloat(mAbsMinDistance);
-	dg.add_stdfloat(mAbsMinHeight);
-	dg.add_stdfloat(mAbsMaxHeight);
-	dg.add_stdfloat(mFriction);
-	///@}
-
-	///Positions.
-	///@{
-	mRigidBodyPosition.write_datagram(dg);
-	mLookAtPosition.write_datagram(dg);
-	///@}
-
-	///Key controls and effective keys.
-	///@{
-	dg.add_bool(mHeadLeft);
-	dg.add_bool(mHeadRight);
-	dg.add_bool(mPitchUp);
-	dg.add_bool(mPitchDown);
-	dg.add_bool(mHeadLeftKey);
-	dg.add_bool(mHeadRightKey);
-	dg.add_bool(mPitchUpKey);
-	dg.add_bool(mPitchDownKey);
-	dg.add_bool(mMouseMoveKey);
-	///@}
-
-	///Key control values.
-	///@{
-	dg.add_bool(mMouseEnabledH);
-	dg.add_bool(mMouseEnabledP);
-	dg.add_bool(mMouseHandled);
-	dg.add_int8(mSignOfMouse);
-	///@}
-
-	/// Sensitivity settings.
-	///@{
-	dg.add_stdfloat(mSensX);
-	dg.add_stdfloat(mSensY);
-	dg.add_stdfloat(mHeadSensX);
-	dg.add_stdfloat(mHeadSensY);
-	///@}
-
-	///The chased object's node path.
-	manager->write_pointer(dg, mChasedNP.node());
-	///Auxiliary node path to track the fixed look at.
-	manager->write_pointer(dg, mFixedLookAtNP.node());
+//	///Enable/disable flag.
+//	dg.add_bool(mEnabled);
+//
+//	///Flags.
+//	///@{
+//	dg.add_bool(mFixedRelativePosition);
+//	dg.add_bool(mBackward);
+//	dg.add_bool(mFixedLookAt);
+//	dg.add_bool(mHoldLookAt);
+//	///@}
+//
+//	///Kinematic parameters.
+//	///@{
+//	dg.add_stdfloat(mAbsLookAtDistance);
+//	dg.add_stdfloat(mAbsLookAtHeight);
+//	dg.add_stdfloat(mAbsMaxDistance);
+//	dg.add_stdfloat(mAbsMinDistance);
+//	dg.add_stdfloat(mAbsMinHeight);
+//	dg.add_stdfloat(mAbsMaxHeight);
+//	dg.add_stdfloat(mFriction);
+//	///@}
+//
+//	///Positions.
+//	///@{
+//	mRigidBodyPosition.write_datagram(dg);
+//	mLookAtPosition.write_datagram(dg);
+//	///@}
+//
+//	///Key controls and effective keys.
+//	///@{
+//	dg.add_bool(mHeadLeft);
+//	dg.add_bool(mHeadRight);
+//	dg.add_bool(mPitchUp);
+//	dg.add_bool(mPitchDown);
+//	dg.add_bool(mHeadLeftKey);
+//	dg.add_bool(mHeadRightKey);
+//	dg.add_bool(mPitchUpKey);
+//	dg.add_bool(mPitchDownKey);
+//	dg.add_bool(mMouseMoveKey);
+//	///@}
+//
+//	///Key control values.
+//	///@{
+//	dg.add_bool(mMouseEnabledH);
+//	dg.add_bool(mMouseEnabledP);
+//	dg.add_bool(mMouseHandled);
+//	dg.add_int8(mSignOfMouse);
+//	///@}
+//
+//	/// Sensitivity settings.
+//	///@{
+//	dg.add_stdfloat(mSensX);
+//	dg.add_stdfloat(mSensY);
+//	dg.add_stdfloat(mHeadSensX);
+//	dg.add_stdfloat(mHeadSensY);
+//	///@}
+//
+//	///The chased object's node path.
+//	manager->write_pointer(dg, mChasedNP.node());
+//	///Auxiliary node path to track the fixed look at.
+//	manager->write_pointer(dg, mFixedLookAtNP.node());
 	///The reference node path.
 	manager->write_pointer(dg, mReferenceNP.node());
 }
@@ -680,12 +746,12 @@ int BTRigidBody::complete_pointers(TypedWritable **p_list, BamReader *manager)
 
 	/// Pointers
 	PT(PandaNode)savedPandaNode;
-	///The chased object's node path.
-	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
-	mChasedNP = NodePath::any_path(savedPandaNode);
-	///Auxiliary node path to track the fixed look at.
-	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
-	mFixedLookAtNP = NodePath::any_path(savedPandaNode);
+//	///The chased object's node path.
+//	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
+//	mChasedNP = NodePath::any_path(savedPandaNode);
+//	///Auxiliary node path to track the fixed look at.
+//	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
+//	mFixedLookAtNP = NodePath::any_path(savedPandaNode);
 	///The reference node path.
 	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
 	mReferenceNP = NodePath::any_path(savedPandaNode);
@@ -730,62 +796,62 @@ void BTRigidBody::fillin(DatagramIterator &scan, BamReader *manager)
 	///Name of this BTRigidBody.
 	set_name(scan.get_string());
 
-	///Enable/disable flag.
-	mEnabled = scan.get_bool();
-
-	///Flags.
-	///@{
-	mFixedRelativePosition = scan.get_bool();
-	mBackward = scan.get_bool();
-	mFixedLookAt = scan.get_bool();
-	mHoldLookAt = scan.get_bool();
-	///@}
-
-	///Kinematic parameters.
-	///@{
-	mAbsLookAtDistance = scan.get_stdfloat();
-	mAbsLookAtHeight = scan.get_stdfloat();
-	mAbsMaxDistance = scan.get_stdfloat();
-	mAbsMinDistance = scan.get_stdfloat();
-	mAbsMinHeight = scan.get_stdfloat();
-	mAbsMaxHeight = scan.get_stdfloat();
-	mFriction = scan.get_stdfloat();
-	///@}
-
-	///Positions.
-	///@{
-	mRigidBodyPosition.read_datagram(scan);
-	mLookAtPosition.read_datagram(scan);
-	///@}
-
-	///Key controls and effective keys.
-	///@{
-	mHeadLeft = scan.get_bool();
-	mHeadRight = scan.get_bool();
-	mPitchUp = scan.get_bool();
-	mPitchDown = scan.get_bool();
-	mHeadLeftKey = scan.get_bool();
-	mHeadRightKey = scan.get_bool();
-	mPitchUpKey = scan.get_bool();
-	mPitchDownKey = scan.get_bool();
-	mMouseMoveKey = scan.get_bool();
-	///@}
-
-	///Key control values.
-	///@{
-	mMouseEnabledH = scan.get_bool();
-	mMouseEnabledP = scan.get_bool();
-	mMouseHandled = scan.get_bool();
-	mSignOfMouse = scan.get_int8();
-	///@}
-
-	/// Sensitivity settings.
-	///@{
-	mSensX = scan.get_stdfloat();
-	mSensY = scan.get_stdfloat();
-	mHeadSensX = scan.get_stdfloat();
-	mHeadSensY = scan.get_stdfloat();
-	///@}
+//	///Enable/disable flag.
+//	mEnabled = scan.get_bool();
+//
+//	///Flags.
+//	///@{
+//	mFixedRelativePosition = scan.get_bool();
+//	mBackward = scan.get_bool();
+//	mFixedLookAt = scan.get_bool();
+//	mHoldLookAt = scan.get_bool();
+//	///@}
+//
+//	///Kinematic parameters.
+//	///@{
+//	mAbsLookAtDistance = scan.get_stdfloat();
+//	mAbsLookAtHeight = scan.get_stdfloat();
+//	mAbsMaxDistance = scan.get_stdfloat();
+//	mAbsMinDistance = scan.get_stdfloat();
+//	mAbsMinHeight = scan.get_stdfloat();
+//	mAbsMaxHeight = scan.get_stdfloat();
+//	mFriction = scan.get_stdfloat();
+//	///@}
+//
+//	///Positions.
+//	///@{
+//	mRigidBodyPosition.read_datagram(scan);
+//	mLookAtPosition.read_datagram(scan);
+//	///@}
+//
+//	///Key controls and effective keys.
+//	///@{
+//	mHeadLeft = scan.get_bool();
+//	mHeadRight = scan.get_bool();
+//	mPitchUp = scan.get_bool();
+//	mPitchDown = scan.get_bool();
+//	mHeadLeftKey = scan.get_bool();
+//	mHeadRightKey = scan.get_bool();
+//	mPitchUpKey = scan.get_bool();
+//	mPitchDownKey = scan.get_bool();
+//	mMouseMoveKey = scan.get_bool();
+//	///@}
+//
+//	///Key control values.
+//	///@{
+//	mMouseEnabledH = scan.get_bool();
+//	mMouseEnabledP = scan.get_bool();
+//	mMouseHandled = scan.get_bool();
+//	mSignOfMouse = scan.get_int8();
+//	///@}
+//
+//	/// Sensitivity settings.
+//	///@{
+//	mSensX = scan.get_stdfloat();
+//	mSensY = scan.get_stdfloat();
+//	mHeadSensX = scan.get_stdfloat();
+//	mHeadSensY = scan.get_stdfloat();
+//	///@}
 
 	///The chased object's node path.
 	manager->read_pointer(scan);

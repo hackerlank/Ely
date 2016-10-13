@@ -6,22 +6,32 @@
  */
 
 #include "asyncTaskManager.h"
-#include "graphicsWindow.h"
 #include "bamFile.h"
+#include "nodePathCollection.h"
+#include "bulletSphereShape.h"
+#include "bulletPlaneShape.h"
+#include "bulletBoxShape.h"
+#include "bulletCylinderShape.h"
+#include "bulletCapsuleShape.h"
+#include "bulletConeShape.h"
+#include "bulletHeightfieldShape.h"
+#include "bulletTriangleMesh.h"
+#include "bulletTriangleMeshShape.h"
 #include "gamePhysicsManager.h"
+#include "throw_event.h"
 
 #include "btRigidBody.h"
-#include "btSoftBody.h"
+//#include "btSoftBody.h"
+//#include "btGhost.h"
 
 /**
  *
  */
-GamePhysicsManager::GamePhysicsManager(PT(GraphicsWindow) win, int taskSort, const NodePath& root,
+GamePhysicsManager::GamePhysicsManager(/*PT(GraphicsWindow) win, xxx */int taskSort, const NodePath& root,
 		const CollideMask& mask):
-		mWin(win),
+//		mWin(win),xxx
 		mTaskSort(taskSort),
 		mReferenceNP(NodePath("ReferenceNode")),
-		mHitResult(BulletClosestHitRayResult::empty()),
 		mMask(mask),
 		mRef(0)
 {
@@ -29,10 +39,10 @@ GamePhysicsManager::GamePhysicsManager(PT(GraphicsWindow) win, int taskSort, con
 
 	mRigidBodies.clear();
 	mRigidBodiesParameterTable.clear();
-	mSoftBodies.clear();
-	mSoftBodiesParameterTable.clear();
-	mGhosts.clear();
-	mGhostsParameterTable.clear();
+//	mSoftBodies.clear(); xxx
+//	mSoftBodiesParameterTable.clear();
+//	mGhosts.clear();
+//	mGhostsParameterTable.clear();
 	set_parameters_defaults(RIGIDBODY);
 	set_parameters_defaults(SOFTBODY);
 	set_parameters_defaults(GHOST);
@@ -76,32 +86,32 @@ GamePhysicsManager::~GamePhysicsManager()
 			iterA = mRigidBodies.erase(iterA);
 		}
 
-		//destroy all BTSoftBodys
-		PTA(PT(BTSoftBody))::iterator iterB = mSoftBodies.begin();
-		while (iterB != mSoftBodies.end())
-		{
-			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
-			//give a chance to BTSoftBody to cleanup itself before being destroyed.
-			(*iterB)->do_finalize();
-			//remove the BTSoftBodys from the inner list (and from the update task)
-			iterB = mSoftBodies.erase(iterB);
-		}
-
-		//destroy all BTGhosts
-		PTA(PT(BTGhost))::iterator iterC = mGhosts.begin();
-		while (iterC != mGhosts.end())
-		{
-			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
-			//give a chance to BTGhost to cleanup itself before being destroyed.
-			(*iterC)->do_finalize();
-			//remove the BTGhosts from the inner list (and from the update task)
-			iterC = mGhosts.erase(iterC);
-		}
+//		//destroy all BTSoftBodys xxx
+//		PTA(PT(BTSoftBody))::iterator iterB = mSoftBodies.begin();
+//		while (iterB != mSoftBodies.end())
+//		{
+//			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+//			//give a chance to BTSoftBody to cleanup itself before being destroyed.
+//			(*iterB)->do_finalize();
+//			//remove the BTSoftBodys from the inner list (and from the update task)
+//			iterB = mSoftBodies.erase(iterB);
+//		}
+//
+//		//destroy all BTGhosts
+//		PTA(PT(BTGhost))::iterator iterC = mGhosts.begin();
+//		while (iterC != mGhosts.end())
+//		{
+//			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+//			//give a chance to BTGhost to cleanup itself before being destroyed.
+//			(*iterC)->do_finalize();
+//			//remove the BTGhosts from the inner list (and from the update task)
+//			iterC = mGhosts.erase(iterC);
+//		}
 	}
 	//clear parameters' tables
 	mRigidBodiesParameterTable.clear();
-	mSoftBodiesParameterTable.clear();
-	mGhostsParameterTable.clear();
+//	mSoftBodiesParameterTable.clear(); xxx
+//	mGhostsParameterTable.clear();
 }
 
 /**
@@ -114,14 +124,14 @@ NodePath GamePhysicsManager::create_rigid_body(const string& name)
 	nassertr_always(!name.empty(), NodePath::fail())
 
 	PT(BTRigidBody) newRigidBody = new BTRigidBody(name);
-	nassertr_always(newRigidBody && (!mWin.is_null()), NodePath::fail())
+	nassertr_always(newRigidBody /*&& (!mWin.is_null())xxx*/, NodePath::fail())
 
 	// set reference node
 	newRigidBody->mReferenceNP = mReferenceNP;
 	// reparent to reference node and set "this" NodePath
 	NodePath np = mReferenceNP.attach_new_node(newRigidBody);
-	// set the reference graphic window. xxx
-	newRigidBody->mWin = mWin;
+	// set the reference graphic window.
+//	newRigidBody->mWin = mWin;xxx
 	// initialize the new RigidBody (could use mReferenceNP, mThisNP, mWin)
 	newRigidBody->do_initialize();
 
@@ -148,8 +158,8 @@ bool GamePhysicsManager::destroy_rigid_body(NodePath rigidBodyNP)
 
 	// give a chance to BTRigidBody to cleanup itself before being destroyed.
 	rigid_body->do_finalize();
-	// reset the reference graphic window. xxx
-	rigid_body->mWin.clear();
+	// reset the reference graphic window.
+//	rigid_body->mWin.clear();xxx
 	//remove the BTRigidBody from the inner list (and from the update task)
 	mRigidBodies.erase(iter);
 	//
@@ -172,126 +182,126 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
  * Returns a NodePath to the new BTSoftBody,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-NodePath GamePhysicsManager::create_soft_body(const string& name)
-{
-	nassertr_always(!name.empty(), NodePath::fail())
-
-	PT(BTSoftBody)newSoftBody = new BTSoftBody(name);
-	nassertr_always(newSoftBody && (!mWin.is_null()), NodePath::fail())
-
-	// set reference node
-	newSoftBody->mReferenceNP = mReferenceNP;
-	// reparent to reference node and set "this" NodePath
-	NodePath np = mReferenceNP.attach_new_node(newSoftBody);
-	// set the reference graphic window. xxx
-	newSoftBody->mWin = mWin;
-	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
-	newSoftBody->do_initialize();
-
-	// add the new Driver to the inner list (and to the update task)
-	mSoftBodies.push_back(newSoftBody);
-	//
-	return np;
-}
+//NodePath GamePhysicsManager::create_soft_body(const string& name) xxx
+//{
+//	nassertr_always(!name.empty(), NodePath::fail())
+//
+//	PT(BTSoftBody)newSoftBody = new BTSoftBody(name);
+//	nassertr_always(newSoftBody /*&& (!mWin.is_null()) xxx*/, NodePath::fail())
+//
+//	// set reference node
+//	newSoftBody->mReferenceNP = mReferenceNP;
+//	// reparent to reference node and set "this" NodePath
+//	NodePath np = mReferenceNP.attach_new_node(newSoftBody);
+//	// set the reference graphic window.
+////	newSoftBody->mWin = mWin;xxx
+//	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
+//	newSoftBody->do_initialize();
+//
+//	// add the new Driver to the inner list (and to the update task)
+//	mSoftBodies.push_back(newSoftBody);
+//	//
+//	return np;
+//}
 
 /**
  * Destroys a BTSoftBody.
  * Returns false on error.
  */
-bool GamePhysicsManager::destroy_soft_body(NodePath softBodyNP)
-{
-	CONTINUE_IF_ELSE_R(
-			softBodyNP.node()->is_of_type(BTSoftBody::get_class_type()),
-			false)
-
-	PT(BTSoftBody)soft_body = DCAST(BTSoftBody, softBodyNP.node());
-	SoftBodyList::iterator iter = find(mSoftBodies.begin(),
-			mSoftBodies.end(), soft_body);
-	CONTINUE_IF_ELSE_R(iter != mSoftBodies.end(), false)
-
-	// give a chance to BTSoftBody to cleanup itself before being destroyed.
-	soft_body->do_finalize();
-	// reset the reference graphic window. xxx
-	soft_body->mWin.clear();
-	//remove the BTSoftBody from the inner list (and from the update task)
-	mSoftBodies.erase(iter);
-	//
-	return true;
-}
+//bool GamePhysicsManager::destroy_soft_body(NodePath softBodyNP) xxx
+//{
+//	CONTINUE_IF_ELSE_R(
+//			softBodyNP.node()->is_of_type(BTSoftBody::get_class_type()),
+//			false)
+//
+//	PT(BTSoftBody)soft_body = DCAST(BTSoftBody, softBodyNP.node());
+//	SoftBodyList::iterator iter = find(mSoftBodies.begin(),
+//			mSoftBodies.end(), soft_body);
+//	CONTINUE_IF_ELSE_R(iter != mSoftBodies.end(), false)
+//
+//	// give a chance to BTSoftBody to cleanup itself before being destroyed.
+//	soft_body->do_finalize();
+//	// reset the reference graphic window. xxx
+//	soft_body->mWin.clear();
+//	//remove the BTSoftBody from the inner list (and from the update task)
+//	mSoftBodies.erase(iter);
+//	//
+//	return true;
+//}
 
 /**
  * Gets an BTSoftBody by index, or NULL on error.
  */
-PT(BTSoftBody) GamePhysicsManager::get_soft_body(int index) const
-{
-	nassertr_always((index >= 0) && (index < (int ) mSoftBodies.size()),
-			NULL)
-
-	return mSoftBodies[index];
-}
+//PT(BTSoftBody) GamePhysicsManager::get_soft_body(int index) const xxx
+//{
+//	nassertr_always((index >= 0) && (index < (int ) mSoftBodies.size()),
+//			NULL)
+//
+//	return mSoftBodies[index];
+//}
 
 /**
  * Creates a BTGhost with a given (mandatory and not empty) name.
  * Returns a NodePath to the new BTGhost,or an empty NodePath with the xxx
  * ET_fail error type set on error.
  */
-NodePath GamePhysicsManager::create_ghost(const string& name)
-{
-	nassertr_always(!name.empty(), NodePath::fail())
-
-	PT(BTGhost)newGhost = new BTGhost(name);
-	nassertr_always(newGhost && (!mWin.is_null()), NodePath::fail())
-
-	// set reference node
-	newGhost->mReferenceNP = mReferenceNP;
-	// reparent to reference node and set "this" NodePath
-	NodePath np = mReferenceNP.attach_new_node(newGhost);
-	// set the reference graphic window. xxx
-	newGhost->mWin = mWin;
-	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
-	newGhost->do_initialize();
-
-	// add the new Driver to the inner list (and to the update task)
-	mGhosts.push_back(newGhost);
-	//
-	return np;
-}
+//NodePath GamePhysicsManager::create_ghost(const string& name) xxx
+//{
+//	nassertr_always(!name.empty(), NodePath::fail())
+//
+//	PT(BTGhost)newGhost = new BTGhost(name);
+//	nassertr_always(newGhost /*&& (!mWin.is_null()xxx)*/, NodePath::fail())
+//
+//	// set reference node
+//	newGhost->mReferenceNP = mReferenceNP;
+//	// reparent to reference node and set "this" NodePath
+//	NodePath np = mReferenceNP.attach_new_node(newGhost);
+//	// set the reference graphic window.
+////	newGhost->mWin = mWin;xxx
+//	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
+//	newGhost->do_initialize();
+//
+//	// add the new Driver to the inner list (and to the update task)
+//	mGhosts.push_back(newGhost);
+//	//
+//	return np;
+//}
 
 /**
  * Destroys a BTGhost.
  * Returns false on error.
  */
-bool GamePhysicsManager::destroy_ghost(NodePath ghostNP)
-{
-	CONTINUE_IF_ELSE_R(
-			ghostNP.node()->is_of_type(BTGhost::get_class_type()),
-			false)
-
-	PT(BTGhost)ghost = DCAST(BTGhost, ghostNP.node());
-	GhostList::iterator iter = find(mGhosts.begin(),
-			mGhosts.end(), ghost);
-	CONTINUE_IF_ELSE_R(iter != mGhosts.end(), false)
-
-	// give a chance to BTGhost to cleanup itself before being destroyed.
-	ghost->do_finalize();
-	// reset the reference graphic window. xxx
-	ghost->mWin.clear();
-	//remove the BTGhost from the inner list (and from the update task)
-	mGhosts.erase(iter);
-	//
-	return true;
-}
+//bool GamePhysicsManager::destroy_ghost(NodePath ghostNP) xxx
+//{
+//	CONTINUE_IF_ELSE_R(
+//			ghostNP.node()->is_of_type(BTGhost::get_class_type()),
+//			false)
+//
+//	PT(BTGhost)ghost = DCAST(BTGhost, ghostNP.node());
+//	GhostList::iterator iter = find(mGhosts.begin(),
+//			mGhosts.end(), ghost);
+//	CONTINUE_IF_ELSE_R(iter != mGhosts.end(), false)
+//
+//	// give a chance to BTGhost to cleanup itself before being destroyed.
+//	ghost->do_finalize();
+//	// reset the reference graphic window. xxx
+//	ghost->mWin.clear();
+//	//remove the BTGhost from the inner list (and from the update task)
+//	mGhosts.erase(iter);
+//	//
+//	return true;
+//}
 
 /**
  * Gets an BTGhost by index, or NULL on error.
  */
-PT(BTGhost) GamePhysicsManager::get_ghost(int index) const
-{
-	nassertr_always((index >= 0) && (index < (int ) mGhosts.size()),
-			NULL)
-
-	return mGhosts[index];
-}
+//PT(BTGhost) GamePhysicsManager::get_ghost(int index) const xxx
+//{
+//	nassertr_always((index >= 0) && (index < (int ) mGhosts.size()),
+//			NULL)
+//
+//	return mGhosts[index];
+//}
 
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
@@ -315,34 +325,34 @@ void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& pa
 		}
 		return;
 	}
-	if (type == SOFTBODY)
-	{
-		//find from mParameterTable the paramName's values to be overwritten
-		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
-		//...and erase them
-		mSoftBodiesParameterTable.erase(iterRange.first, iterRange.second);
-		//insert the new values
-		for (int idx = 0; idx < paramValues.size(); ++idx)
-		{
-			mSoftBodiesParameterTable.insert(
-					ParameterNameValue(paramName, paramValues[idx]));
-		}
-		return;
-	}
-	if (type == GHOST)
-	{
-		//find from mParameterTable the paramName's values to be overwritten
-		iterRange = mGhostsParameterTable.equal_range(paramName);
-		//...and erase them
-		mGhostsParameterTable.erase(iterRange.first, iterRange.second);
-		//insert the new values
-		for (int idx = 0; idx < paramValues.size(); ++idx)
-		{
-			mGhostsParameterTable.insert(
-					ParameterNameValue(paramName, paramValues[idx]));
-		}
-		return;
-	}
+//	if (type == SOFTBODY) xxx
+//	{
+//		//find from mParameterTable the paramName's values to be overwritten
+//		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
+//		//...and erase them
+//		mSoftBodiesParameterTable.erase(iterRange.first, iterRange.second);
+//		//insert the new values
+//		for (int idx = 0; idx < paramValues.size(); ++idx)
+//		{
+//			mSoftBodiesParameterTable.insert(
+//					ParameterNameValue(paramName, paramValues[idx]));
+//		}
+//		return;
+//	}
+//	if (type == GHOST)
+//	{
+//		//find from mParameterTable the paramName's values to be overwritten
+//		iterRange = mGhostsParameterTable.equal_range(paramName);
+//		//...and erase them
+//		mGhostsParameterTable.erase(iterRange.first, iterRange.second);
+//		//insert the new values
+//		for (int idx = 0; idx < paramValues.size(); ++idx)
+//		{
+//			mGhostsParameterTable.insert(
+//					ParameterNameValue(paramName, paramValues[idx]));
+//		}
+//		return;
+//	}
 }
 
 /**
@@ -367,30 +377,30 @@ ValueList<string> GamePhysicsManager::get_parameter_values(PhysicsType type,
 		}
 		return strList;
 	}
-	if (type == SOFTBODY)
-	{
-		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
-		if (iterRange.first != iterRange.second)
-		{
-			for (iter = iterRange.first; iter != iterRange.second; ++iter)
-			{
-				strList.add_value(iter->second);
-			}
-		}
-		return strList;
-	}
-	if (type == GHOST)
-	{
-		iterRange = mGhostsParameterTable.equal_range(paramName);
-		if (iterRange.first != iterRange.second)
-		{
-			for (iter = iterRange.first; iter != iterRange.second; ++iter)
-			{
-				strList.add_value(iter->second);
-			}
-		}
-		return strList;
-	}
+//	if (type == SOFTBODY) xxx
+//	{
+//		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
+//		if (iterRange.first != iterRange.second)
+//		{
+//			for (iter = iterRange.first; iter != iterRange.second; ++iter)
+//			{
+//				strList.add_value(iter->second);
+//			}
+//		}
+//		return strList;
+//	}
+//	if (type == GHOST)
+//	{
+//		iterRange = mGhostsParameterTable.equal_range(paramName);
+//		if (iterRange.first != iterRange.second)
+//		{
+//			for (iter = iterRange.first; iter != iterRange.second; ++iter)
+//			{
+//				strList.add_value(iter->second);
+//			}
+//		}
+//		return strList;
+//	}
 	//
 	return strList;
 }
@@ -438,32 +448,32 @@ ValueList<string> GamePhysicsManager::get_parameter_name_list(PhysicsType type) 
 		}
 		return strList;
 	}
-	if (type == SOFTBODY)
-	{
-		tempTable = mSoftBodiesParameterTable;
-		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
-		{
-			string name = (*iter).first;
-			if (!strList.has_value(name))
-			{
-				strList.add_value(name);
-			}
-		}
-		return strList;
-	}
-	if (type == GHOST)
-	{
-		tempTable = mGhostsParameterTable;
-		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
-		{
-			string name = (*iter).first;
-			if (!strList.has_value(name))
-			{
-				strList.add_value(name);
-			}
-		}
-		return strList;
-	}
+//	if (type == SOFTBODY) xxx
+//	{
+//		tempTable = mSoftBodiesParameterTable;
+//		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
+//		{
+//			string name = (*iter).first;
+//			if (!strList.has_value(name))
+//			{
+//				strList.add_value(name);
+//			}
+//		}
+//		return strList;
+//	}
+//	if (type == GHOST)
+//	{
+//		tempTable = mGhostsParameterTable;
+//		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
+//		{
+//			string name = (*iter).first;
+//			if (!strList.has_value(name))
+//			{
+//				strList.add_value(name);
+//			}
+//		}
+//		return strList;
+//	}
 	//
 	return strList;
 }
@@ -480,95 +490,91 @@ void GamePhysicsManager::set_parameters_defaults(PhysicsType type)
 		///mRigidBodiesParameterTable must be the first cleared
 		mRigidBodiesParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mRigidBodiesParameterTable.insert(ParameterNameValue("enabled", "true"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("backward", "true"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("fixed_relative_position", "true"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("friction", "1.0"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("fixed_look_at", "true"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("mouse_move", "false"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("mouse_head", "false"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("mouse_pitch", "false"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("head_left", "enabled"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("head_right", "enabled"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("body_type", "dynamic"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("body_mass", "1.0"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("body_friction", "0.8"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_size", "medium"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_height", "1.0"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_up", "z"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
+		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
 		return;
 	}
-	if (type == SOFTBODY)
-	{
-		///mSoftBodiesParameterTable must be the first cleared
-		mSoftBodiesParameterTable.clear();
-		//sets the (mandatory) parameters to their default values:
-		mSoftBodiesParameterTable.insert(ParameterNameValue("enabled", "true"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("forward", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("backward", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("head_left", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("head_right", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("up", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("down", "enabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("speed_key", "shift"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
-		return;
-	}
-	if (type == GHOST)
-	{
-		///mGhostsParameterTable must be the first cleared
-		mGhostsParameterTable.clear();
-		//sets the (mandatory) parameters to their default values:
-		mGhostsParameterTable.insert(ParameterNameValue("enabled", "true"));
-		mGhostsParameterTable.insert(ParameterNameValue("forward", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("backward", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("head_left", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("head_right", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("up", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("down", "enabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
-		mGhostsParameterTable.insert(ParameterNameValue("speed_key", "shift"));
-		mGhostsParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
-		mGhostsParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
-		mGhostsParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
-		mGhostsParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
-		mGhostsParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
-		mGhostsParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
-		mGhostsParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
-		mGhostsParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
-		return;
-	}
+//	if (type == SOFTBODY) xxx
+//	{
+//		///mSoftBodiesParameterTable must be the first cleared
+//		mSoftBodiesParameterTable.clear();
+//		//sets the (mandatory) parameters to their default values:
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("enabled", "true"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("forward", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("backward", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("up", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("down", "enabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("speed_key", "shift"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+//		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+//		return;
+//	}
+//	if (type == GHOST)
+//	{
+//		///mGhostsParameterTable must be the first cleared
+//		mGhostsParameterTable.clear();
+//		//sets the (mandatory) parameters to their default values:
+//		mGhostsParameterTable.insert(ParameterNameValue("enabled", "true"));
+//		mGhostsParameterTable.insert(ParameterNameValue("forward", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("backward", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("head_left", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("head_right", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("up", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("down", "enabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
+//		mGhostsParameterTable.insert(ParameterNameValue("speed_key", "shift"));
+//		mGhostsParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
+//		mGhostsParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
+//		mGhostsParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
+//		mGhostsParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
+//		mGhostsParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
+//		mGhostsParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
+//		mGhostsParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
+//		mGhostsParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
+//		return;
+//	}
 }
 
 /**
@@ -590,18 +596,18 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	{
 		mRigidBodies[index]->update(dt);
 	}
-	// call all BTSoftBodys' update functions, passing delta time
-	for (PTA(PT(BTSoftBody))::size_type index = 0;
-			index < mSoftBodies.size(); ++index)
-	{
-		mSoftBodies[index]->update(dt);
-	}
-	// call all BTGhosts' update functions, passing delta time
-	for (PTA(PT(BTGhost))::size_type index = 0;
-			index < mGhosts.size(); ++index)
-	{
-		mGhosts[index]->update(dt);
-	}
+//	// call all BTSoftBodys' update functions, passing delta time xxx
+//	for (PTA(PT(BTSoftBody))::size_type index = 0;
+//			index < mSoftBodies.size(); ++index)
+//	{
+//		mSoftBodies[index]->update(dt);
+//	}
+//	// call all BTGhosts' update functions, passing delta time
+//	for (PTA(PT(BTGhost))::size_type index = 0;
+//			index < mGhosts.size(); ++index)
+//	{
+//		mGhosts[index]->update(dt);
+//	}
 	//
 	int maxSubSteps;
 	// do physics step simulation
@@ -989,7 +995,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 						geomNodes.get_path(i).node());
 				//BulletShape::set_local_scale doesn't work anymore
 				//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-				PT(TransformState) ts = (geomNode->get_transform()->
+				CPT(TransformState) ts = (geomNode->get_transform()->
 						compose(TransformState::make_scale(
 							modelNP.get_net_transform()->get_scale()))).p();
 				GeomNode::Geoms geoms = geomNode->get_geoms();
@@ -1108,17 +1114,18 @@ float GamePhysicsManager::do_get_dim(ShapeSize shapeSize, float d1, float d2)
  * height equal to the z-value of the first one.
  * If collisions are not found returns a Pair<bool,float> == (false, 0.0).
  */
-Pair<bool,float> GamePhysicsManager::get_collision_height(const LPoint3f& fromPos) const
+Pair<bool,float> GamePhysicsManager::get_collision_height(const LPoint3f& fromPos)
 {
 	//cast a ray downward starting at fromPos
 	LPoint3f toPos = LPoint3f(fromPos.get_x(), fromPos.get_y(), -FLT_MAX);
-	mHitResult = mBulletWorld->ray_test_closest(fromPos, toPos, mMask);
-	if (mHitResult.has_hit())
+	BulletClosestHitRayResult hitResult = mBulletWorld->ray_test_closest(
+			fromPos, toPos, mMask);
+	if (hitResult.has_hit())
 	{
-		return Pair<bool,float>(true, mHitResult.get_hit_pos().get_z());
+		return Pair<bool, float>(true, hitResult.get_hit_pos().get_z());
 	}
 	//
-	return Pair<bool,float>(false, 0.0);
+	return Pair<bool, float>(false, 0.0);
 }
 
 void GamePhysicsManager::doEnableCollisionNotify(EventThrown event, ThrowEventData eventData)
@@ -1239,10 +1246,10 @@ bool GamePhysicsManager::read_from_bam_file(const string& fileName)
 }
 
 
-void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
+void GamePhysicsManager::initDebug()
 {
 #ifdef ELY_DEBUG
-	mBulletDebugNodePath.reparent_to(windowFramework->get_render());
+	mBulletDebugNodePath.reparent_to(mReferenceNP);
 	PT(BulletDebugNode) bulletDebugNode =
 			DCAST(BulletDebugNode,mBulletDebugNodePath.node());
 	mBulletWorld->set_debug_node(bulletDebugNode);
@@ -1251,7 +1258,7 @@ void GamePhysicsManager::initDebug(WindowFramework* windowFramework)
 	bulletDebugNode->show_bounding_boxes(false);
 	bulletDebugNode->show_normals(false);
 	mBulletDebugNodePath.hide();
-#ifdef ELY_DEBUG
+#endif //ELY_DEBUG
 }
 
 void GamePhysicsManager::debug(bool enable)
@@ -1271,7 +1278,7 @@ void GamePhysicsManager::debug(bool enable)
 			mBulletDebugNodePath.hide();
 		}
 	}
-#endif
+#endif //ELY_DEBUG
 }
 
 //TypedObject semantics: hardcoded

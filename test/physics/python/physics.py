@@ -6,10 +6,9 @@ Created on Oct 09, 2016
 
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
-        ClockObject, TextNode, LPoint3f, LVecBase3f, PhysicsManager
+        ClockObject, TextNode, LPoint3f, LVecBase3f
 from direct.showbase.ShowBase import ShowBase
-from p3audio import GamePhysicsManager
-from p3control import GameControlManager
+from p3physics import GamePhysicsManager
 #
 import sys
 
@@ -26,104 +25,46 @@ modelAnimFiles = [["eve-walk.egg", "eve-run.egg"],
                   ["", ""],
                   ["red_car-anim.egg", "red_car-anim2.egg"]]
 animRateFactor = [0.6, 0.175]
-# sound effects
-soundFile = ["eve_voice.wav", "", "sparrow_chirp.wav", "", "red_car_engine.wav"]
-soundName = ["eve-voice", "", "sparrow-chirp", "", "red-car-engine"]
 # bame file
-bamFileName = "audio.boo"
+bamFileName = "physics.boo"
 
 # # specific data/functions declarations/definitions
 sceneNP = None
 globalClock = None
-# camera specifics
-cameraListener = None
 # player specifics
-playerSound3d = None
+playerRigidBody = None
 playerAnimCtls = []
 playerNP = None
-playerDriver = None
-playerHeightRayCast = LVector3f()
-forwardMove = 1
-forwardMoveStop = -1
-leftMove = 2
-leftMoveStop = -2
-backwardMove = 3
-backwardMoveStop = -3
-rightMove = 4
-rightMoveStop = -4
-# pursuer specifics
-pursuerSound3d = None
-pursuerAnimCtls = []
-pursuerNP = None
-pursuerChaser = None
 
 #
 def printCreationParameters():
     """print creation parameters"""
     
-    audioMgr = GamePhysicsManager.get_global_ptr()
+    physicsMgr = GamePhysicsManager.get_global_ptr()
     #
-    valueList = audioMgr.get_parameter_name_list(GamePhysicsManager.SOUND3D)
-    print("\n" + "P3Sound3d creation parameters:")
+    valueList = physicsMgr.get_parameter_name_list(GamePhysicsManager.RIGIDBODY)
+    print("\n" + "BTRigidBody creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               audioMgr.get_parameter_value(GamePhysicsManager.SOUND3D, name))
+               physicsMgr.get_parameter_value(GamePhysicsManager.RIGIDBODY, name))
     #
-    valueList = audioMgr.get_parameter_name_list(GamePhysicsManager.LISTENER)
-    print("\n" + "P3Listener creation parameters:")
+    valueList = physicsMgr.get_parameter_name_list(GamePhysicsManager.SOFTBODY)
+    print("\n" + "BTSoftBody creation parameters:")
     for name in valueList:
         print ("\t" + name + " = " + 
-               audioMgr.get_parameter_value(GamePhysicsManager.LISTENER, name))
+               physicsMgr.get_parameter_value(GamePhysicsManager.SOFTBODY, name))
 
 def setParametersBeforeCreation():
-    """set parameters as strings before sound3ds/listeners creation"""
+    """set parameters as strings before rigid_bodies/soft_bodies creation"""
     
-    audioMgr = GamePhysicsManager.get_global_ptr()
-    # set sound3d's parameters
-    audioMgr.set_parameter_value(GamePhysicsManager.SOUND3D, "static", "false")
-    audioMgr.set_parameter_value(GamePhysicsManager.SOUND3D, "min_distance",
+    physicsMgr = GamePhysicsManager.get_global_ptr()
+    # set rigid_body's parameters
+    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY, "static", "false")
+    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY, "min_distance",
             "0.5")
-    # set listener's parameters
-    audioMgr.set_parameter_value(GamePhysicsManager.LISTENER, "static",
+    # set soft_body's parameters
+    physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "static",
             "false")
-    #
-    controlMgr = GameControlManager.get_global_ptr()
-    # set driver's parameters
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_angular_speed",
-            "50.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_accel",
-            "10.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "max_linear_speed",
-            "150.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_accel",
-            "10.0")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "linear_friction",
-            "0.5")
-    controlMgr.set_parameter_value(GameControlManager.DRIVER, "angular_friction",
-            "5.0")
-    # set chaser's parameters
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "fixed_relative_position",
-            "false")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "max_distance",
-            "25.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "min_distance",
-            "18.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "max_height",
-            "18.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "min_height",
-            "15.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "friction",
-            "5.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "fixed_look_at",
-            "true")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "mouse_head",
-            "true")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "mouse_pitch",
-            "true")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "look_at_distance",
-            "5.0")
-    controlMgr.set_parameter_value(GameControlManager.CHASER, "look_at_height",
-            "12.5")
     #
     printCreationParameters()
 
@@ -142,7 +83,7 @@ def startFramework(msg):
     # Setup your application
     app = ShowBase()
     props = WindowProperties()
-    props.setTitle("p3audio: " + msg)
+    props.setTitle("p3physics: " + msg)
     app.win.requestProperties(props)
  
     # common callbacks     
@@ -157,30 +98,17 @@ def readFromBamFile(fileName):
 def writeToBamFileAndExit(fileName):
     """write scene to a file (and exit)"""
     
-    # before saving to bam file, reparent listener to reference node
-    NodePath.any_path(cameraListener).reparent_to(
-            GamePhysicsManager.get_global_ptr().get_reference_node_path())
     GamePhysicsManager.get_global_ptr().write_to_bam_file(fileName)
     # # this is for testing explicit removal and destruction of all elements
-    audioMgr = GamePhysicsManager.get_global_ptr()
-    # destroy sound3ds
-    for sound3dTmp in audioMgr.get_sound3ds():
-        # destroy sound3dTmp
-        audioMgr.destroy_sound3d(NodePath.any_path(sound3dTmp))
-    # destroy listeners
-    for listenerTmp in audioMgr.get_listeners():
-        # destroy listenerTmp
-        audioMgr.destroy_listener(NodePath.any_path(listenerTmp))
-    #
-    controlMgr = GameControlManager.get_global_ptr()
-    # destroy drivers
-    for driverTmp in controlMgr.get_drivers():
-        # destroy driverTmp
-        controlMgr.destroy_driver(NodePath.any_path(driverTmp))
-    # destroy chasers
-    for chaserTmp in controlMgr.get_chasers():
-        # destroy chaserTmp
-        controlMgr.destroy_chaser(NodePath.any_path(chaserTmp))
+    physicsMgr = GamePhysicsManager.get_global_ptr()
+    # destroy rigid_bodies
+    for rigid_bodyTmp in physicsMgr.get_rigid_bodies():
+        # destroy rigid_bodyTmp
+        physicsMgr.destroy_rigid_body(NodePath.any_path(rigid_bodyTmp))
+    # destroy soft_bodies
+    for soft_bodyTmp in physicsMgr.get_soft_bodies():
+        # destroy soft_bodyTmp
+        physicsMgr.destroy_soft_body(NodePath.any_path(soft_bodyTmp))
     #
     sys.exit(0)
 
@@ -242,67 +170,44 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
 def handlePlayerUpdate():
     """handles player on every update"""
     
-    global playerDriver, playerAnimCtls, playerNP, playerHeightRayCast
-    # get current forward velocity size
-    currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
-    playerDriverNP = NodePath.any_path(playerDriver)
-    # handle vehicle's animation
-    for i in range(len(playerAnimCtls)):
-        if currentVelSize > 0.0:
-            if currentVelSize < 5.0: 
-                animOnIdx = 0
-            else:
-                animOnIdx = 1
-            animOffIdx = (animOnIdx + 1) % 2
-            # Off anim (0:walk, 1:run)
-            if playerAnimCtls[i][animOffIdx].is_playing():
-                playerAnimCtls[i][animOffIdx].stop()
-            # On amin (0:walk, 1:run)
-            playerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
-                                                    animRateFactor[animOnIdx])
-            if not playerAnimCtls[i][animOnIdx].is_playing():
-                playerAnimCtls[i][animOnIdx].loop(True)
-        else:
-            # stop any animation
-            playerAnimCtls[i][0].stop()
-            playerAnimCtls[i][1].stop()
-    # make playerNP kinematic (ie stand on floor)
-    if currentVelSize > 0.0:
-        # get control manager
-        controlMgr = GameControlManager.get_global_ptr()
-        # correct player's Z: set the collision ray origin wrt collision root
-        pOrig = controlMgr.get_collision_root().get_relative_point(
-                controlMgr.get_reference_node_path(), playerDriverNP.get_pos()) + \
-                                        playerHeightRayCast * 2.0
-        # get the collision height wrt the reference node path
-        gotCollisionZ = controlMgr.get_collision_height(pOrig,
-                                        controlMgr.get_reference_node_path())
-        if gotCollisionZ.get_first():
-            # updatedPos.z needs correction
-            playerDriverNP.set_z(gotCollisionZ.get_second())
-            
-def handlePursuerUpdate():
-    """handles pursuer on every update"""
-    
-    global pursuerChaser, pursuerAnimCtls, pursuerNP
-    # get current forward velocity size
-    currentVelSize = abs(pursuerChaser.get_chased_object().node().
-            get_current_speeds().get_first().get_y())
-    # handle vehicle's animation
-    for i in range(len(pursuerAnimCtls)):
-        if currentVelSize < 5.0: 
-            animOnIdx = 0
-        else:
-            animOnIdx = 1
-        animOffIdx = (animOnIdx + 1) % 2
-        # Off anim (0:walk, 1:run)
-        if pursuerAnimCtls[i][animOffIdx].is_playing():
-            pursuerAnimCtls[i][animOffIdx].stop()
-        # On amin (0:walk, 1:run)
-        pursuerAnimCtls[i][animOnIdx].set_play_rate(
-            (currentVelSize + 1.0) * 0.5)
-        if not pursuerAnimCtls[i][animOnIdx].is_playing():
-            pursuerAnimCtls[i][animOnIdx].loop(True)
+#     global playerDriver, playerAnimCtls, playerNP, playerHeightRayCast
+#     # get current forward velocity size
+#     currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
+#     playerDriverNP = NodePath.any_path(playerDriver)
+#     # handle vehicle's animation
+#     for i in range(len(playerAnimCtls)):
+#         if currentVelSize > 0.0:
+#             if currentVelSize < 5.0: 
+#                 animOnIdx = 0
+#             else:
+#                 animOnIdx = 1
+#             animOffIdx = (animOnIdx + 1) % 2
+#             # Off anim (0:walk, 1:run)
+#             if playerAnimCtls[i][animOffIdx].is_playing():
+#                 playerAnimCtls[i][animOffIdx].stop()
+#             # On amin (0:walk, 1:run)
+#             playerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
+#                                                     animRateFactor[animOnIdx])
+#             if not playerAnimCtls[i][animOnIdx].is_playing():
+#                 playerAnimCtls[i][animOnIdx].loop(True)
+#         else:
+#             # stop any animation
+#             playerAnimCtls[i][0].stop()
+#             playerAnimCtls[i][1].stop()
+#     # make playerNP kinematic (ie stand on floor)
+#     if currentVelSize > 0.0:
+#         # get control manager
+#         controlMgr = GameControlManager.get_global_ptr()
+#         # correct player's Z: set the collision ray origin wrt collision root
+#         pOrig = controlMgr.get_collision_root().get_relative_point(
+#                 controlMgr.get_reference_node_path(), playerDriverNP.get_pos()) + \
+#                                         playerHeightRayCast * 2.0
+#         # get the collision height wrt the reference node path
+#         gotCollisionZ = controlMgr.get_collision_height(pOrig,
+#                                         controlMgr.get_reference_node_path())
+#         if gotCollisionZ.get_first():
+#             # updatedPos.z needs correction
+#             playerDriverNP.set_z(gotCollisionZ.get_second())
             
 def updateControls(task):
     """custom update task for controls"""
@@ -314,57 +219,30 @@ def updateControls(task):
     pursuerChaser.update(dt)
     # handle player on update
     handlePlayerUpdate()
-    # handle player on update
-    handlePursuerUpdate()
     #
     return task.cont
-    
-def movePlayer(data):
-    """player's movement callback"""
-    
-    global playerDriver, forwardMove, leftMove, backwardMove, rightMove
-    if not playerDriver:
-        return
 
-    action = data
-    if action > 0:
-        # start movement
-        enable = True
-    else:
-        action = -action
-        # stop movement
-        enable = False
-    #
-    if action == forwardMove:
-        playerDriver.set_move_forward(enable)
-    elif action == leftMove:
-        playerDriver.set_rotate_head_left(enable)
-    elif action == backwardMove:
-        playerDriver.set_move_backward(enable)
-    elif action == rightMove:
-        playerDriver.set_rotate_head_right(enable)
-
-def sound3dCallback(sound3d):
-    """sound3d update callback function"""
+def rigid_bodyCallback(rigid_body):
+    """rigid_body update callback function"""
     
     global playerDriver
-    if sound3d != playerSound3d:
+    if rigid_body != playerRigidBody:
         return
-    currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
-    sound3d[0].set_play_rate(0.1 + currentVelSize * 0.05)
+#     currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
+#     rigid_body[0].set_play_rate(0.1 + currentVelSize * 0.05)
 
-def listenerCallback(listener):
-    """listener update callback function"""  
+def soft_bodyCallback(soft_body):
+    """soft_body update callback function"""  
 
-    global playerSound3d
+    global playerRigidBody
     refNP = GamePhysicsManager.get_global_ptr().get_reference_node_path()
-    distLS = (NodePath.any_path(playerSound3d).get_pos(refNP) - 
-            NodePath.any_path(listener).get_pos(refNP)).length()
-    print(listener, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
+    distLS = (NodePath.any_path(playerRigidBody).get_pos(refNP) - 
+            NodePath.any_path(soft_body).get_pos(refNP)).length()
+    print(soft_body, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
 
 if __name__ == '__main__':
 
-    msg = "'P3Sound3d & P3Listener'"
+    msg = "'BTRigidBody & BTSoftBody'"
     app = startFramework(msg)
       
     # # here is room for your own code
@@ -377,10 +255,8 @@ if __name__ == '__main__':
     textNodePath.set_pos(-1.25, 0.0, 0.8)
     textNodePath.set_scale(0.035)
 
-    # create a audio manager
-    audioMgr = GamePhysicsManager()
-    # create a control manager set root and mask to manage 'kinematic' players
-    controlMgr = GameControlManager(app.win, 10, app.render, mask)
+    # create a physics manager
+    physicsMgr = GamePhysicsManager(10, app.render, mask)
 
     # print creation parameters: defult values
     print("\n" + "Default creation parameters:")
@@ -390,14 +266,13 @@ if __name__ == '__main__':
     # try to read it from bam file
     if (not len(sys.argv) > 1) or (not readFromBamFile(sys.argv[1])):
         # no argument or no valid bamFile
-        # set a common reference node and reparent it to render
-        controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
-        audioMgr.get_reference_node_path().reparent_to(app.render)
+        # reparent reference node to render
+        physicsMgr.get_reference_node_path().reparent_to(app.render)
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         sceneNP = loadTerrainLowPoly("SceneNP")
         # and reparent to the reference node
-        sceneNP.reparent_to(audioMgr.get_reference_node_path())
+        sceneNP.reparent_to(physicsMgr.get_reference_node_path())
 
         # set sceneNP's collide mask
         sceneNP.set_collide_mask(mask)
@@ -406,118 +281,36 @@ if __name__ == '__main__':
         setParametersBeforeCreation()
         # get a player with anims
         playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
-        # get a pursuer with anims
-        pursuerNP = getModelAnims("PursuerNP", 0.01, 2, pursuerAnimCtls)
-        pursuerNP.set_h(180)
         
-        # create the driver (attached to the reference node)
-        playerDriverNP = controlMgr.create_driver("PlayerDriver")
-        # get a reference to the player driver
-        playerDriver = playerDriverNP.node()
-        # set the position
-        playerDriverNP.set_pos(LPoint3f(4.1, -12.0, 1.5))
-        # attach some geometry (a model) to control vehicle
-        playerNP.reparent_to(playerDriverNP)
-        
-        # create the pursuer (attached to the reference node)
-        pursuerChaserNP = controlMgr.create_chaser("PursuerChaser")
-        # get a reference to the pursuer's chaser
-        pursuerChaser = pursuerChaserNP.node()
-        # set the chased object: playerDriverNP or playerNP
-        pursuerChaser.set_chased_object(playerDriverNP)
-        # attach some geometry (a model) to pursuer's chaser
-        pursuerNP.reparent_to(pursuerChaserNP)
-        
-        # create some sound3ds (attached to the reference node)
-        playerSound3dNP = audioMgr.create_sound3d("PlayerSound3d")
-        pursuerSound3dNP = audioMgr.create_sound3d("PursuerSound3d")
-        # get a reference to the sound3ds
-        playerSound3d = playerSound3dNP.node()
-        pursuerSound3d = pursuerSound3dNP.node()
-        # reparent the sound3ds
-        playerSound3dNP.reparent_to(playerNP)
-        pursuerSound3dNP.reparent_to(pursuerNP)
-        # attach some sounds to the sound3ds
-        playerSound3d.add_sound(soundName[4], soundFile[4])
-        pursuerSound3d.add_sound(soundName[2], soundFile[2])
-        # set sounds looping
-        sound = playerSound3d.get_sound_by_name(soundName[4])
-        sound.set_loop(True)
-        sound.play()
-        #
-        sound = pursuerSound3d.get_sound_by_name(soundName[2])
-        sound.set_loop(True)
-        sound.play()
-
-        # create a listener (attached to the reference node)
-        cameraListenerNP = audioMgr.create_listener("CameraListener")
-        # get a reference to the camera's listener
-        cameraListener = cameraListenerNP.node()
-        # reparent listener to the camera
-        cameraListenerNP.reparent_to(app.camera)
+        # create some rigid_bodies (attached to the reference node)
+        playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
+        # get a reference to the rigid_bodies
+        playerRigidBody = playerRigidBodyNP.node()
+        # reparent the rigid_bodies
+        playerRigidBodyNP.reparent_to(playerNP)
         
     else:
         # valid bamFile
-        # set a common reference node and reparent it to render
-        controlMgr.set_reference_node_path(audioMgr.get_reference_node_path())
-        audioMgr.get_reference_node_path().reparent_to(app.render)
+        # reparent reference node to render
+        physicsMgr.get_reference_node_path().reparent_to(app.render)
 
         # restore sceneNP: through panda3d
-        sceneNP = audioMgr.get_reference_node_path().find("**/SceneNP")
+        sceneNP = physicsMgr.get_reference_node_path().find("**/SceneNP")
         # restore the player's reference
-        playerNP = audioMgr.get_reference_node_path().find("**/PlayerNP")
+        playerNP = physicsMgr.get_reference_node_path().find("**/PlayerNP")
     
-        # restore driver: through control manager
-        playerDriver = controlMgr.get_driver(0)
-        # restore animations
-        tmpList = [None for i in range(1)]
-        playerAnimCtls.extend(tmpList)
-        tmpAnims = AnimControlCollection()
-        auto_bind(playerDriver, tmpAnims)
-        playerAnimCtls[i] = [None, None]
-        # restore animations
-        for j in range(tmpAnims.get_num_anims()):
-            playerAnimCtls[i][j] = tmpAnims.get_anim(j)
-
-        # restore chaser: through control manager
-        pursuerChaser = controlMgr.get_chaser(0)
-        # restore animations
-        pursuerAnimCtls.extend(tmpList)
-        tmpAnims.clear_anims()
-        auto_bind(pursuerChaser, tmpAnims)
-        pursuerAnimCtls[0] = [None, None]
-        for j in range(tmpAnims.get_num_anims()):
-            pursuerAnimCtls[0][j] = tmpAnims.get_anim(j)
-
-        # restore sound3ds: through audio manager
-        for sound3d in audioMgr.get_sound3ds():
-            if sound3d.get_name() == "PlayerSound3d":
-                playerSound3d = sound3d
-            if sound3d.get_name() == "PursuerSound3d":
-                pursuerSound3d = sound3d
-        # set sounds looping
-        sound = playerSound3d.get_sound_by_name(soundName[4])
-        sound.set_loop(True)
-        sound.play()
-        #
-        sound = pursuerSound3d.get_sound_by_name(soundName[2])
-        sound.set_loop(True)
-        sound.play()
-
-        # restore listeners: through audio manager
-        cameraListener = audioMgr.get_listener(0)
-        # reparent listener to the camera
-        NodePath.any_path(cameraListener).reparent_to(app.camera)
+        # restore rigid_bodies: through physics manager
+        for rigid_body in physicsMgr.get_rigid_bodies():
+            if rigid_body.get_name() == "PlayerRigidBody":
+                playerRigidBody = rigid_body
         
         # set creation parameters as strings before other drivers creation
         print("\n" + "Current creation parameters:")
         setParametersBeforeCreation()
 
     # # first option: start the default update task for all plug-ins
-    audioMgr.start_default_update()
-    playerSound3d.set_update_callback(sound3dCallback)
-    pursuerSound3d.set_update_callback(sound3dCallback)
-    cameraListener.set_update_callback(listenerCallback)
+    physicsMgr.start_default_update()
+    playerRigidBody.set_update_callback(rigid_bodyCallback)
     globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins
@@ -526,22 +319,6 @@ if __name__ == '__main__':
     # write to bam file on exit
     app.win.set_close_request_event("close_request_event")
     app.accept("close_request_event", writeToBamFileAndExit, [bamFileName])
-
-    # get player dims for kinematic ray cast
-    modelDims = LVecBase3f() 
-    modelDeltaCenter = LVector3f()
-    controlMgr.get_bounding_dimensions(playerNP, modelDims, modelDeltaCenter)
-    playerHeightRayCast = LVector3f(0.0, 0.0, modelDims.get_z())
-
-    # player will be driven by arrows keys
-    app.accept("arrow_up", movePlayer, [forwardMove]) 
-    app.accept("arrow_up-up", movePlayer, [forwardMoveStop]) 
-    app.accept("arrow_left", movePlayer, [leftMove]) 
-    app.accept("arrow_left-up", movePlayer, [leftMoveStop]) 
-    app.accept("arrow_down", movePlayer, [backwardMove]) 
-    app.accept("arrow_down-up", movePlayer, [backwardMoveStop]) 
-    app.accept("arrow_right", movePlayer, [rightMove]) 
-    app.accept("arrow_right-up", movePlayer, [rightMoveStop])
 
     # place camera
     trackball = app.trackball.node()

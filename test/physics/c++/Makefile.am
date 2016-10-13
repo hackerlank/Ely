@@ -4,7 +4,7 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../../physics/source \
 	-I$(srcdir)/../../../physics/source/support \
 	-I/usr/include/panda3d -I/usr/include/eigen3 \
-	-DELY_DEBUG=
+	-I/usr/include/bullet -DELY_DEBUG=
 
 AM_CXXFLAGS = -O0 -g3 -Wall -Wno-reorder -fmessage-length=0 -std=c++11
 AM_LDFLAGS = -L/usr/lib/x86_64-linux-gnu/panda3d
@@ -28,9 +28,9 @@ common_sources = \
 	data.cpp \
 	$(srcdir)/../../../common/source/commonTools.cxx \
 	$(srcdir)/../../../physics/source/gamePhysicsManager.cxx \
-	$(srcdir)/../../../physics/source/btRigidBody.cxx \
-	$(srcdir)/../../../physics/source/btSoftBody.cxx \
-	$(srcdir)/../../../physics/source/btGhost.cxx	
+	$(srcdir)/../../../physics/source/btRigidBody.cxx
+#	$(srcdir)/../../../physics/source/btSoftBody.cxx
+#	$(srcdir)/../../../physics/source/btGhost.cxx	
 
 #physics
 physics_SOURCES = \

@@ -1,5 +1,5 @@
 /**
- * \file control.cpp
+ * \file audio.cpp
  *
  * \date 2016-09-20
  * \author consultit

@@ -41,6 +41,7 @@
  * > **BTRigidBody text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
+ * | *setup*					|single| *true* | - xxx
  * | *body_type*  				|single| *dynamic* | values: static,dynamic,kinematic
  * | *body_mass*  				|single| 1.0 | -
  * | *body_friction*  			|single| 0.8 | -
@@ -207,6 +208,8 @@ private:
 	NodePath mNodePath;//xxx delete?
 	///The underlying BulletRigidBodyNode (read-only after creation & before destruction).
 	PT(BulletRigidBodyNode) mRigidBodyNode;
+	///The setup flag.
+	bool mSetup;
 	///@{
 	///Physical parameters.
 	float mBodyMass, mBodyFriction, mBodyRestitution;
@@ -217,20 +220,25 @@ private:
 	//ccd stuff
 	float mCcdMotionThreshold, mCcdSweptSphereRadius;
 	bool mCcdEnabled;
+
+	inline void do_reset();
+	void do_initialize();
+	void do_finalize();
+
+	/**
+	 * \name Helpers variables/functions.
+	 */
+	///@{
 	/**
 	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
 	 */
 	void doSetPhysicalParameters();
-	///@}
-
 	/**
 	 * \brief Sets body type.
 	 * @param bodyType The body type.
 	 */
-	void doSwitchBodyType(BodyType bodyType);
-
+//	void doSwitchBodyType(BodyType bodyType);
 	///Geometric functions and parameters.
-	///@{
 	/**
 	 * \brief Create a shape given its type.
 	 * @param shapeType The shape type.
@@ -250,22 +258,6 @@ private:
 	float mDim1, mDim2, mDim3, mDim4;
 	Filename mHeightfieldFile;
 	BulletUpAxis mUpAxis;
-	///@}
-
-	inline void do_reset();
-	void do_initialize();
-	void do_finalize();
-
-	/**
-	 * \name Helpers variables/functions.
-	 */
-	///@{
-	void do_enable();
-	void do_disable();
-	void do_handle_mouse();
-	LPoint3f do_get_rigid_body_pos(LPoint3f desiredRigidBodyPos,
-			LPoint3f currentRigidBodyPos, float deltaTime);
-	void do_correct_rigid_body_height(LPoint3f& newPos, float baseHeight);
 	///@}
 
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)

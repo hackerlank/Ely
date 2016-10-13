@@ -276,6 +276,7 @@ inline void BTRigidBody::do_reset()
 	//
 	mNodePath = NodePath(); // delete?
 	mRigidBodyNode.clear();
+	mSetup = false;
 	mBodyMass = mBodyFriction = mBodyRestitution = 0.0;
 	mBodyType = DYNAMIC;
 	mShapeType = GamePhysicsManager::SPHERE;

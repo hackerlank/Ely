@@ -8,15 +8,12 @@
 #ifndef GAMEPHYSICSMANGER_H_
 #define GAMEPHYSICSMANGER_H_
 
-#include "graphicsWindow.h" //xxx
-#include "collisionTraverser.h"
-#include "collisionHandlerQueue.h"
-#include "collisionRay.h"
+#include "bulletWorld.h"
 #include "physics_includes.h"
 
 class BTRigidBody;
-class BTSoftBody;
-class BTGhost;
+//class BTSoftBody; xxx
+//class BTGhost;
 
 /**
  * \brief Singleton manager updating attributes of physics components.
@@ -47,7 +44,7 @@ class EXPORT_CLASS GamePhysicsManager: public TypedReferenceCount,
 		public Singleton<GamePhysicsManager>
 {
 PUBLISHED:
-	GamePhysicsManager(PT(GraphicsWindow) win/*xxx*/, int taskSort = 10,
+	GamePhysicsManager(/*PT(GraphicsWindow) win xxx,*/ int taskSort = 10,
 			const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~GamePhysicsManager();
@@ -72,27 +69,27 @@ PUBLISHED:
 	MAKE_SEQ(get_rigid_bodies, get_num_rigid_bodies, get_rigid_body);
 	///@}
 
-	/**
-	 * \name BTSoftBody
-	 */
-	///@{
-	NodePath create_soft_body(const string& name);
-	bool destroy_soft_body(NodePath softBodyNP);
-	PT(BTSoftBody) get_soft_body(int index) const;
-	INLINE int get_num_soft_bodies() const;
-	MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body);
-	///@}
-
-	/**
-	 * \name BTGhost
-	 */
-	///@{
-	NodePath create_ghost(const string& name);
-	bool destroy_ghost(NodePath ghostNP);
-	PT(BTGhost) get_ghost(int index) const;
-	INLINE int get_num_ghosts() const;
-	MAKE_SEQ(get_ghosts, get_num_ghosts, get_ghost);
-	///@}
+//	/** xxx
+//	 * \name BTSoftBody
+//	 */
+//	///@{
+//	NodePath create_soft_body(const string& name);
+//	bool destroy_soft_body(NodePath softBodyNP);
+//	PT(BTSoftBody) get_soft_body(int index) const;
+//	INLINE int get_num_soft_bodies() const;
+//	MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body);
+//	///@}
+//
+//	/**
+//	 * \name BTGhost
+//	 */
+//	///@{
+//	NodePath create_ghost(const string& name);
+//	bool destroy_ghost(NodePath ghostNP);
+//	PT(BTGhost) get_ghost(int index) const;
+//	INLINE int get_num_ghosts() const;
+//	MAKE_SEQ(get_ghosts, get_num_ghosts, get_ghost);
+//	///@}
 
 	/**
 	 * The type of object for creation parameters.
@@ -180,7 +177,7 @@ PUBLISHED:
 			LVector3f& modelDeltaCenter, float& modelRadius);//xxx substituted by the other get_bounding_dimensions?
 	float get_bounding_dimensions(NodePath modelNP, LVecBase3f& modelDims,
 			LVector3f& modelDeltaCenter) const;
-	Pair<bool,float> get_collision_height(const LPoint3f& fromPos) const;
+	Pair<bool,float> get_collision_height(const LPoint3f& fromPos);
 	INLINE CollideMask get_collide_mask() const;
 	///@}
 
@@ -204,7 +201,7 @@ PUBLISHED:
 	/**
 	 * \brief Initializes debugging.
 	 */
-	void initDebug(WindowFramework* windowFramework);
+	void initDebug();
 	/**
 	 * \brief Enables/disables debugging.
 	 * @param enable True to enable, false to disable.
@@ -228,8 +225,8 @@ private:
 	/// Bullet world.
 	PT(BulletWorld) mBulletWorld;
 
-	///The reference graphic window. xxx
-	PT(GraphicsWindow) mWin;
+	///The reference graphic window.
+//	PT(GraphicsWindow) mWin; xxx
 	///The update task sort (should be >0).
 	int mTaskSort;
 
@@ -242,17 +239,17 @@ private:
 	///BTRigidBodys' parameter table.
 	ParameterTable mRigidBodiesParameterTable;
 
-	///List of BTSoftBodys handled by this manager.
-	typedef pvector<PT(BTSoftBody)> SoftBodyList;
-	SoftBodyList mSoftBodies;
-	///BTSoftBodys' parameter table.
-	ParameterTable mSoftBodiesParameterTable;
-
-	///List of BTGhosts handled by this manager.
-	typedef pvector<PT(BTGhost)> GhostList;
-	GhostList mGhosts;
-	///BTGhosts' parameter table.
-	ParameterTable mGhostsParameterTable;
+//	///List of BTSoftBodys handled by this manager. xxx
+//	typedef pvector<PT(BTSoftBody)> SoftBodyList;
+//	SoftBodyList mSoftBodies;
+//	///BTSoftBodys' parameter table.
+//	ParameterTable mSoftBodiesParameterTable;
+//
+//	///List of BTGhosts handled by this manager.
+//	typedef pvector<PT(BTGhost)> GhostList;
+//	GhostList mGhosts;
+//	///BTGhosts' parameter table.
+//	ParameterTable mGhostsParameterTable;
 
 	///Table of all physics components indexed by (underlying) Bullet PandaNodes.
 	///This is used, for example, during ray casting.
@@ -268,7 +265,6 @@ private:
 	int mRef;
 
 	///Utilities. xxx
-	BulletClosestHitRayResult mHitResult;
 	CollideMask mMask; //a.k.a. BitMask32
 
 	/**
