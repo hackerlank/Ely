@@ -4,14 +4,16 @@ AM_CPPFLAGS = \
 	-I$(srcdir)/../../../physics/source \
 	-I$(srcdir)/../../../physics/source/support \
 	-I/usr/include/panda3d -I/usr/include/eigen3 \
-	-I/usr/include/bullet -DELY_DEBUG=
+	-I/usr/include/bullet -I/usr/local/include/bullet -DELY_DEBUG=
 
 AM_CXXFLAGS = -O0 -g3 -Wall -Wno-reorder -fmessage-length=0 -std=c++11
 AM_LDFLAGS = -L/usr/lib/x86_64-linux-gnu/panda3d
 
 LDADD = -lp3framework -lpanda -lpandaexpress -lp3dtool -lp3dtoolconfig \
-		-lp3pystub -lXxf86dga -lpython2.7 -lpandaphysics -lpthread \
-		-lpandabullet
+	-lp3pystub -lXxf86dga -lpython2.7 -lpandaphysics -lpthread \
+	-lpandabullet -lBulletDynamics -lLinearMath -lBulletCollision \
+	-lBulletFileLoader -lBulletInverseDynamics -lBulletInverseDynamicsUtils \
+	-lBulletSoftBody -lConvexDecomposition -lGIMPACTUtils -lHACD 
 
 noinst_PROGRAMS = physics #physics_gprof physics_gcov
 

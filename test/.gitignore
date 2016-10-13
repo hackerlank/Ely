@@ -39,3 +39,5 @@ control_gcov
 control_gprof
 debug_texture.png
 audio
+physics
+
