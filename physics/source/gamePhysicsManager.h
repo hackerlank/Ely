@@ -26,7 +26,7 @@ class BTRigidBody;
  * - when two objects collide, the event "<CollidingObjectType1>_<CollidingObjectType2>_Collision",
  * with the two type names ordered in alphabetical ascending order (A to Z)
  * (i.e. using the std::string::operator<()).
- * This event is thrown continuously at a frequency which is the minimum between the fps and
+ * This event is thrown continuously at a frequency which is the minimum between the fps &&
  * the frequency specified (which defaults to 30 times per seconds) until
  * the object keeps overlapping
  * - when the two objects stop collide, the event

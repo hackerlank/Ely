@@ -82,7 +82,7 @@ GamePhysicsManager::~GamePhysicsManager()
 			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
 			//give a chance to BTRigidBody to cleanup itself before being destroyed.
 			(*iterA)->do_finalize();
-			//remove the BTRigidBodys from the inner list (and from the update task)
+			//remove the BTRigidBodys from the inner list (&& from the update task)
 			iterA = mRigidBodies.erase(iterA);
 		}
 
@@ -93,7 +93,7 @@ GamePhysicsManager::~GamePhysicsManager()
 //			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
 //			//give a chance to BTSoftBody to cleanup itself before being destroyed.
 //			(*iterB)->do_finalize();
-//			//remove the BTSoftBodys from the inner list (and from the update task)
+//			//remove the BTSoftBodys from the inner list (&& from the update task)
 //			iterB = mSoftBodies.erase(iterB);
 //		}
 //
@@ -104,7 +104,7 @@ GamePhysicsManager::~GamePhysicsManager()
 //			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
 //			//give a chance to BTGhost to cleanup itself before being destroyed.
 //			(*iterC)->do_finalize();
-//			//remove the BTGhosts from the inner list (and from the update task)
+//			//remove the BTGhosts from the inner list (&& from the update task)
 //			iterC = mGhosts.erase(iterC);
 //		}
 	}
@@ -115,7 +115,7 @@ GamePhysicsManager::~GamePhysicsManager()
 }
 
 /**
- * Creates a BTRigidBody with a given (mandatory and not empty) name.
+ * Creates a BTRigidBody with a given (mandatory && not empty) name.
  * Returns a NodePath to the new BTRigidBody,or an empty NodePath with the
  * ET_fail error type set on error.
  */
@@ -128,14 +128,14 @@ NodePath GamePhysicsManager::create_rigid_body(const string& name)
 
 	// set reference node
 	newRigidBody->mReferenceNP = mReferenceNP;
-	// reparent to reference node and set "this" NodePath
+	// reparent to reference node && set "this" NodePath
 	NodePath np = mReferenceNP.attach_new_node(newRigidBody);
 	// set the reference graphic window.
 //	newRigidBody->mWin = mWin;xxx
 	// initialize the new RigidBody (could use mReferenceNP, mThisNP, mWin)
 	newRigidBody->do_initialize();
 
-	// add the new RigidBody to the inner list (and to the update task)
+	// add the new RigidBody to the inner list (&& to the update task)
 	mRigidBodies.push_back(newRigidBody);
 	//
 	return np;
@@ -160,7 +160,7 @@ bool GamePhysicsManager::destroy_rigid_body(NodePath rigidBodyNP)
 	rigid_body->do_finalize();
 	// reset the reference graphic window.
 //	rigid_body->mWin.clear();xxx
-	//remove the BTRigidBody from the inner list (and from the update task)
+	//remove the BTRigidBody from the inner list (&& from the update task)
 	mRigidBodies.erase(iter);
 	//
 	return true;
@@ -178,7 +178,7 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 }
 
 /**
- * Creates a BTSoftBody with a given (mandatory and not empty) name.
+ * Creates a BTSoftBody with a given (mandatory && not empty) name.
  * Returns a NodePath to the new BTSoftBody,or an empty NodePath with the
  * ET_fail error type set on error.
  */
@@ -191,14 +191,14 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 //
 //	// set reference node
 //	newSoftBody->mReferenceNP = mReferenceNP;
-//	// reparent to reference node and set "this" NodePath
+//	// reparent to reference node && set "this" NodePath
 //	NodePath np = mReferenceNP.attach_new_node(newSoftBody);
 //	// set the reference graphic window.
 ////	newSoftBody->mWin = mWin;xxx
 //	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
 //	newSoftBody->do_initialize();
 //
-//	// add the new Driver to the inner list (and to the update task)
+//	// add the new Driver to the inner list (&& to the update task)
 //	mSoftBodies.push_back(newSoftBody);
 //	//
 //	return np;
@@ -223,7 +223,7 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 //	soft_body->do_finalize();
 //	// reset the reference graphic window. xxx
 //	soft_body->mWin.clear();
-//	//remove the BTSoftBody from the inner list (and from the update task)
+//	//remove the BTSoftBody from the inner list (&& from the update task)
 //	mSoftBodies.erase(iter);
 //	//
 //	return true;
@@ -241,7 +241,7 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 //}
 
 /**
- * Creates a BTGhost with a given (mandatory and not empty) name.
+ * Creates a BTGhost with a given (mandatory && not empty) name.
  * Returns a NodePath to the new BTGhost,or an empty NodePath with the xxx
  * ET_fail error type set on error.
  */
@@ -254,14 +254,14 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 //
 //	// set reference node
 //	newGhost->mReferenceNP = mReferenceNP;
-//	// reparent to reference node and set "this" NodePath
+//	// reparent to reference node && set "this" NodePath
 //	NodePath np = mReferenceNP.attach_new_node(newGhost);
 //	// set the reference graphic window.
 ////	newGhost->mWin = mWin;xxx
 //	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
 //	newGhost->do_initialize();
 //
-//	// add the new Driver to the inner list (and to the update task)
+//	// add the new Driver to the inner list (&& to the update task)
 //	mGhosts.push_back(newGhost);
 //	//
 //	return np;
@@ -286,7 +286,7 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 //	ghost->do_finalize();
 //	// reset the reference graphic window. xxx
 //	ghost->mWin.clear();
-//	//remove the BTGhost from the inner list (and from the update task)
+//	//remove the BTGhost from the inner list (&& from the update task)
 //	mGhosts.erase(iter);
 //	//
 //	return true;
@@ -315,7 +315,7 @@ void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& pa
 	{
 		//find from mParameterTable the paramName's values to be overwritten
 		iterRange = mRigidBodiesParameterTable.equal_range(paramName);
-		//...and erase them
+		//...&& erase them
 		mRigidBodiesParameterTable.erase(iterRange.first, iterRange.second);
 		//insert the new values
 		for (int idx = 0; idx < paramValues.size(); ++idx)
@@ -329,7 +329,7 @@ void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& pa
 //	{
 //		//find from mParameterTable the paramName's values to be overwritten
 //		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
-//		//...and erase them
+//		//...&& erase them
 //		mSoftBodiesParameterTable.erase(iterRange.first, iterRange.second);
 //		//insert the new values
 //		for (int idx = 0; idx < paramValues.size(); ++idx)
@@ -343,7 +343,7 @@ void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& pa
 //	{
 //		//find from mParameterTable the paramName's values to be overwritten
 //		iterRange = mGhostsParameterTable.equal_range(paramName);
-//		//...and erase them
+//		//...&& erase them
 //		mGhostsParameterTable.erase(iterRange.first, iterRange.second);
 //		//insert the new values
 //		for (int idx = 0; idx < paramValues.size(); ++idx)
@@ -865,7 +865,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 	{
 		//check if there are some GeomNode
 		geomNodes = modelNP.find_all_matches("**/+GeomNode");
-		if (not geomNodes.is_empty())
+		if (! geomNodes.is_empty())
 		{
 			//get the bounding dimensions of object node path, that
 			//should represents a model
@@ -892,7 +892,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		case PLANE:
 		if (automaticShaping)
 		{
-			//modify normal and d
+			//modify normal && d
 			dim1 = 0.0;
 			dim2 = 0.0;
 			dim3 = 1.0;
@@ -914,7 +914,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		case CYLINDER:
 		if (automaticShaping)
 		{
-			//modify radius and height
+			//modify radius && height
 			if (upAxis == X_up)
 			{
 				dim1 = do_get_dim(shapeSize, modelDims.get_y(), modelDims.get_z());
@@ -936,7 +936,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		case CAPSULE:
 		if (automaticShaping)
 		{
-			//modify radius and height
+			//modify radius && height
 			if (upAxis == X_up)
 			{
 				dim1 = do_get_dim(shapeSize, modelDims.get_y(), modelDims.get_z());
@@ -962,7 +962,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		case CONE:
 		if (automaticShaping)
 		{
-			//modify radius and height
+			//modify radius && height
 			if (upAxis == X_up)
 			{
 				dim1 = do_get_dim(shapeSize, modelDims.get_y(), modelDims.get_z());
@@ -1022,7 +1022,7 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 
 /**
  * Gets bounding dimensions of a model NodePath.
- * Puts results into the out parameters: modelDims, modelDeltaCenter and returns
+ * Puts results into the out parameters: modelDims, modelDeltaCenter && returns
  * modelRadius.
  * - modelDims = absolute dimensions of the model
  * - modelCenter + modelDeltaCenter = origin of coordinate system
@@ -1049,7 +1049,7 @@ float GamePhysicsManager::get_bounding_dimensions(NodePath modelNP,
 /**
  * \brief Calculates geometric characteristics of a GeomNode.
  *
- * It takes a NodePath, (supposedly) referring to a GeomNode, and
+ * It takes a NodePath, (supposedly) referring to a GeomNode, &&
  * calculates a tight AABB surrounding it, hence sets the
  * related dimensions into mModelDims, mModelCenter, mModelRadius
  * member variables.\n
@@ -1152,7 +1152,7 @@ void GamePhysicsManager::doEnableCollisionNotify(EventThrown event, ThrowEventDa
 }
 
 /**
- * Writes to a bam file the entire collections of physics objects and related
+ * Writes to a bam file the entire collections of physics objects && related
  * geometries (i.e. models' NodePaths)
  */
 bool GamePhysicsManager::write_to_bam_file(const string& fileName)
@@ -1193,7 +1193,7 @@ bool GamePhysicsManager::write_to_bam_file(const string& fileName)
 }
 
 /**
- * Reads from a bam file the entire hierarchy of physics objects and related
+ * Reads from a bam file the entire hierarchy of physics objects && related
  * geometries (i.e. models' NodePaths)
  */
 bool GamePhysicsManager::read_from_bam_file(const string& fileName)
@@ -1273,7 +1273,7 @@ void GamePhysicsManager::debug(bool enable)
 	}
 	else
 	{
-		if (not mBulletDebugNodePath.is_hidden())
+		if (! mBulletDebugNodePath.is_hidden())
 		{
 			mBulletDebugNodePath.hide();
 		}

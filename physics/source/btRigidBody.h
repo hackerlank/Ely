@@ -41,6 +41,7 @@
  * > **BTRigidBody text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
+ * | *object*					|single| - | -
  * | *body_type*  				|single| *dynamic* | values: static,dynamic,kinematic
  * | *body_mass*  				|single| 1.0 | -
  * | *body_friction*  			|single| 0.8 | -
@@ -48,7 +49,7 @@
  * | *collide_mask*  			|single| *all_on* | -
  * | *shape_type*  				|single| *sphere* | values: sphere,plane,box,cylinder,capsule,cone,heightfield,triangle_mesh
  * | *shape_size*  				|single| *medium* | values: minimum,medium,maximum
- * | *use_shape_of*				|single| - | -
+ * | *use_shape_of*				|single| - | - xxx
  * | *shape_radius*  			|single| - | for sphere,cylinder,capsule,cone
  * | *shape_norm_x*  			|single| - | for plane
  * | *shape_norm_y*  			|single| - | for plane
@@ -67,7 +68,7 @@
  *
  * \note parts inside [] are optional.\n
  */
-class EXPORT_CLASS BTRigidBody: public PandaNode
+class EXPORT_CLASS BTRigidBody: public BulletRigidBodyNode
 {
 PUBLISHED:
 
@@ -96,21 +97,11 @@ PUBLISHED:
 	};
 
 	/**
-	 * \brief Gets/sets the node path of this rigid body.
-	 */
-	///@{
-	INLINE NodePath getNodePath() const;//xxx delete?
-	INLINE void setNodePath(const NodePath& nodePath);//xxx delete?
-	///@}
-
-	/**
 	 * \name RIGIDBODY
 	 */
 	///@{
-	void setup();//xxx a.k.a. RigidBody::onAddToObjectSetup()
+	void setup(NodePath& objectNP);//xxx a.k.a. RigidBody::onAddToObjectSetup()
 	void cleanup();//xxx a.k.a. RigidBody::onRemoveFromObjectCleanup()
-	INLINE BulletRigidBodyNode& getBulletRigidBodyNode() const;
-	inline operator BulletRigidBodyNode&() const;//xxx c++ only?
 	void update(float dt);
 	///@}
 
@@ -125,14 +116,6 @@ PUBLISHED:
 	 * @param bodyType The new component's type.
 	 */
 	void switchType(BodyType bodyType);//xxx rename in switch_body_type()
-	INLINE void set_body_mass(float value);
-	INLINE float get_body_mass() const;
-	INLINE void set_body_friction(float value);
-	INLINE float get_body_friction() const;
-	INLINE void set_body_restitution(float value);
-	INLINE float get_body_restitution() const;
-	INLINE void set_collide_mask(CollideMask value);
-	INLINE CollideMask get_collide_mask() const;
 	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);//xxx possible after creation?
 	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
 	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);//xxx possible after creation?
@@ -155,10 +138,6 @@ PUBLISHED:
 	INLINE string get_shape_heightfield_file() const;
 	INLINE void set_shape_scale(const LVecBase3f& value);
 	INLINE LVecBase3f get_shape_scale() const;
-	INLINE void set_ccd_motion_threshold(float value);
-	INLINE float get_ccd_motion_threshold() const;
-	INLINE void set_ccd_swept_sphere_radius(float value);
-	INLINE float get_ccd_swept_sphere_radius() const;
 	///@}
 
 	/**
@@ -203,21 +182,14 @@ protected:
 private:
 	///The reference node path.
 	NodePath mReferenceNP;
-	///The NodePath associated to this rigid body.
-	NodePath mNodePath;//xxx delete?
-	///The underlying BulletRigidBodyNode (read-only after creation & before destruction).
-	PT(BulletRigidBodyNode) mRigidBodyNode;
 	///The setup flag.
 	bool mSetup;
 	///@{
 	///Physical parameters.
-	float mBodyMass, mBodyFriction, mBodyRestitution;
 	BodyType mBodyType;
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
-	BitMask32 mCollideMask;
 	//ccd stuff
-	float mCcdMotionThreshold, mCcdSweptSphereRadius;
 	bool mCcdEnabled;
 
 	inline void do_reset();
@@ -306,8 +278,8 @@ public:
 	}
 	static void init_type()
 	{
-		PandaNode::init_type();
-		register_type(_type_handle, "BTRigidBody", PandaNode::get_class_type());
+		BulletRigidBodyNode::init_type();
+		register_type(_type_handle, "BTRigidBody", BulletRigidBodyNode::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
