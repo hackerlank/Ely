@@ -256,17 +256,9 @@ void BTRigidBody::do_initialize()
 			NULL);
 	mCcdSweptSphereRadius = (value >= 0.0 ? value : -value);
 	((mCcdMotionThreshold > 0.0) and (mCcdSweptSphereRadius > 0.0)) ?
-			mCcdEnabled = true : mCcdEnabled = false;
+	mCcdEnabled = true : mCcdEnabled = false;
 	//use shape of (another object)
 //	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); xxx
-	//
-	//setup setting
-	if((
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-					string("setup")) == string("false") ? false : true))
-	{
-		setup();
-	}
 	//
 #ifdef PYTHON_BUILD
 	//Python callback
@@ -416,6 +408,7 @@ void BTRigidBody::setup()
 
 //	//set this rigid body node path as the object's one xxx
 //	mOwnerObject->setNodePath(mNodePath);
+	// set the flag
 	mSetup = true;
 }
 
@@ -427,7 +420,7 @@ void BTRigidBody::setup()
  */
 void BTRigidBody::do_finalize()
 {
-	//actual cleanup
+	//cleanup (if needed)
 	cleanup();
 #ifdef PYTHON_BUILD
 	//Python callback
@@ -470,6 +463,8 @@ void BTRigidBody::cleanup()
 
 	//Remove node path
 	mNodePath.remove_node();
+	// set the flag
+	mSetup = false;
 }
 
 void BTRigidBody::switchType(BodyType bodyType)

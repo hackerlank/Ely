@@ -297,7 +297,7 @@ void rigid_bodyCallback(PT(BTRigidBody)rigid_body)
 
 int main(int argc, char *argv[])
 {
-	string msg("'BTRigidBody & BTSoftBody'");
+	string msg("'BTRigidBody & BTSoftBody & BTGhost'");
 	startFramework(argc, argv, msg);
 
 	/// here is room for your own code
@@ -344,8 +344,10 @@ int main(int argc, char *argv[])
 		NodePath playerRigidBodyNP = physicsMgr->create_rigid_body("PlayerRigidBody");
 		// get a reference to the rigid_bodies
 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
-		// reparent the rigid_bodies
-		playerRigidBodyNP.reparent_to(playerNP);
+		// reparent player to rigid_body and ...
+		playerNP.reparent_to(playerRigidBodyNP);
+		// ...setup the rigid body
+		playerRigidBody->setup();
 
 	}
 	else

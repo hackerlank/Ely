@@ -242,7 +242,7 @@ def soft_bodyCallback(soft_body):
 
 if __name__ == '__main__':
 
-    msg = "'BTRigidBody & BTSoftBody'"
+    msg = "'BTRigidBody & BTSoftBody & BTGhost'"
     app = startFramework(msg)
       
     # # here is room for your own code
@@ -286,8 +286,10 @@ if __name__ == '__main__':
         playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
         # get a reference to the rigid_bodies
         playerRigidBody = playerRigidBodyNP.node()
-        # reparent the rigid_bodies
-        playerRigidBodyNP.reparent_to(playerNP)
+        # reparent player to rigid_body and ...
+        playerNP.reparent_to(playerRigidBodyNP)
+        # ...setup the rigid body
+        playerRigidBody.setup()
         
     else:
         # valid bamFile

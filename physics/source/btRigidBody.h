@@ -41,7 +41,6 @@
  * > **BTRigidBody text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
- * | *setup*					|single| *true* | - xxx
  * | *body_type*  				|single| *dynamic* | values: static,dynamic,kinematic
  * | *body_mass*  				|single| 1.0 | -
  * | *body_friction*  			|single| 0.8 | -
