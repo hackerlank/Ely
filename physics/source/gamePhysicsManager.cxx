@@ -898,8 +898,8 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 			dim3 = 1.0;
 			dim4 = 0.0;
 		}
-		collisionShape = new BulletPlaneShape(LVector3f(dim1, dim2, dim3),
-				dim4);
+		collisionShape = new BulletPlaneShape(
+				LVector3f(dim1, dim2, dim3).normalized(), dim4);
 		break;
 		case BOX:
 		if (automaticShaping)

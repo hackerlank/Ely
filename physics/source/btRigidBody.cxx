@@ -58,17 +58,6 @@ void BTRigidBody::do_initialize()
 	}
 	//
 	float value;
-	//body mass (>=0.0)
-	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_mass")).c_str(), NULL);
-	set_mass(value >= 0.0 ? value : -value);
-	//body friction (>=0.0)
-	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_friction")).c_str(),
-			NULL);
-	set_friction(value >= 0.0 ? value : -value);
-	//body restitution (>=0.0)
-	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_restitution")).c_str(),
-			NULL);
-	set_restitution(value >= 0.0 ? value : -value);
 	//shape type
 	string shapeType = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_type"));
 	//shape size
@@ -195,10 +184,10 @@ void BTRigidBody::do_initialize()
 		if ((! height.empty()) && (! scale_w.empty())
 				&& (! scale_d.empty()))
 		{
-			mDim1 = STRTOF(height.c_str(), NULL);
-			mDim2 = STRTOF(scale_w.c_str(), NULL);
-			mDim3 = STRTOF(scale_d.c_str(), NULL);
-			if (mDim1 > 0.0 && mDim2 > 0.0 && mDim3 > 0.0)
+			mDim2 = STRTOF(height.c_str(), NULL);
+			mDim3 = STRTOF(scale_w.c_str(), NULL);
+			mDim4 = STRTOF(scale_d.c_str(), NULL);
+			if (mDim2 > 0.0 && mDim3 > 0.0 && mDim4 > 0.0)
 			{
 				mAutomaticShaping = false;
 			}
@@ -246,6 +235,17 @@ void BTRigidBody::do_initialize()
 		mCollideMask.write(cout, 0);
 #endif
 	}
+	//body mass (>=0.0)
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_mass")).c_str(), NULL);
+	set_mass(value >= 0.0 ? value : -value);
+	//body friction (>=0.0)
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_friction")).c_str(),
+			NULL);
+	set_friction(value >= 0.0 ? value : -value);
+	//body restitution (>=0.0)
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_restitution")).c_str(),
+			NULL);
+	set_restitution(value >= 0.0 ? value : -value);
 	//ccd settings: enabled if both are greater than zero (> 0.0)
 	//ccd motion threshold (>=0.0)
 	value = STRTOF(
@@ -286,6 +286,50 @@ void BTRigidBody::do_initialize()
 	mSelf = DTool_CreatePyInstanceTyped(this, Dtool_BTRigidBody, true, false,
 			get_type_index());
 #endif //PYTHON_BUILD
+}
+
+void BTRigidBody::do_check_auto_shaping()
+{
+	//check
+	if (mShapeType == GamePhysicsManager::SPHERE)
+	{
+		if (mDim1 > 0.0)
+		{
+			mAutomaticShaping = false;
+		}
+	}
+	else if (mShapeType == GamePhysicsManager::PLANE)
+	{
+		if (LVector3f(mDim1, mDim2, mDim3).length() > 0.0)
+		{
+			mAutomaticShaping = false;
+		}
+	}
+	else if (mShapeType == GamePhysicsManager::BOX)
+	{
+		if (mDim1 > 0.0 && mDim2 > 0.0 && mDim3 > 0.0)
+		{
+			mAutomaticShaping = false;
+		}
+	}
+	else if ((mShapeType == GamePhysicsManager::CYLINDER)
+			|| (mShapeType == GamePhysicsManager::CAPSULE)
+			|| (mShapeType == GamePhysicsManager::CONE))
+	{
+		if (mDim1 > 0.0 && mDim2 > 0.0)
+		{
+			mAutomaticShaping = false;
+		}
+	}
+	else if (mShapeType == GamePhysicsManager::HEIGHTFIELD)
+	{
+		if (mDim2 > 0.0 && mDim3 > 0.0 && mDim4 > 0.0)
+		{
+			mAutomaticShaping = false;
+		}
+	}
+	// default
+	mAutomaticShaping = true;
 }
 
 void BTRigidBody::setup(NodePath& objectNP)
@@ -387,15 +431,15 @@ void BTRigidBody::setup(NodePath& objectNP)
 //				{
 //					if (mUpAxis == X_up)
 //					{
-//						thisNP.set_scale(mDim1, mDim2, mDim3);
+//						thisNP.set_scale(mDim2, mDim3, mDim4);
 //					}
 //					else if (mUpAxis == Y_up)
 //					{
-//						thisNP.set_scale(mDim3, mDim1, mDim2);
+//						thisNP.set_scale(mDim4, mDim2, mDim3);
 //					}
 //					else
 //					{
-//						thisNP.set_scale(mDim2, mDim3, mDim1);
+//						thisNP.set_scale(mDim3, mDim4, mDim2);
 //					}
 //				}
 //			}
@@ -413,15 +457,15 @@ void BTRigidBody::setup(NodePath& objectNP)
 //			{
 //				if (mUpAxis == X_up)
 //				{
-//					thisNP.set_scale(mDim1, mDim2, mDim3);
+//					thisNP.set_scale(mDim2, mDim3, mDim4);
 //				}
 //				else if (mUpAxis == Y_up)
 //				{
-//					thisNP.set_scale(mDim3, mDim1, mDim2);
+//					thisNP.set_scale(mDim4, mDim2, mDim3);
 //				}
 //				else
 //				{
-//					thisNP.set_scale(mDim2, mDim3, mDim1);
+//					thisNP.set_scale(mDim3, mDim4, mDim2);
 //				}
 //			}
 //		}

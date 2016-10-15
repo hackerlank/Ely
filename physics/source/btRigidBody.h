@@ -115,29 +115,28 @@ PUBLISHED:
 	 * It sets the rigid body mass too.
 	 * @param bodyType The new component's type.
 	 */
-	void switchType(BodyType bodyType);//xxx rename in switch_body_type()
-	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);//xxx possible after creation?
+	void switchType(BodyType bodyType);
+	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);
 	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
-	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);//xxx possible after creation?
+	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);
 	INLINE GamePhysicsManager::ShapeSize get_shape_size() const;
 //	use_shape_of() XXX ?
-	//xxx possible after creation?
 	INLINE void set_shape_radius(float value);
 	INLINE float get_shape_radius() const;
 	INLINE void set_shape_norm(const LVector3f& value);
 	INLINE LVector3f get_shape_norm() const;
 	INLINE void set_shape_d(float value);
 	INLINE float get_shape_d() const;
-	INLINE void set_shape_half(const LVecBase3f& value);
-	INLINE LVecBase3f get_shape_half() const;
+	INLINE void set_shape_half_dims(const LVecBase3f& value);
+	INLINE LVecBase3f get_shape_half_dims() const;
 	INLINE void set_shape_height(float value);
 	INLINE float get_shape_height() const;
 	INLINE void set_shape_up(BulletUpAxis value);
 	INLINE BulletUpAxis get_shape_up() const;
 	INLINE void set_shape_heightfield_file(const string& value);
 	INLINE string get_shape_heightfield_file() const;
-	INLINE void set_shape_scale(const LVecBase3f& value);
-	INLINE LVecBase3f get_shape_scale() const;
+	INLINE void set_shape_scale_width_depth(const LVecBase2f& value);
+	INLINE LVecBase2f get_shape_scale_width_depth() const;
 	///@}
 
 	/**
@@ -200,6 +199,7 @@ private:
 	 * \name Helpers variables/functions.
 	 */
 	///@{
+	void do_check_auto_shaping();
 	/**
 	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
 	 */
