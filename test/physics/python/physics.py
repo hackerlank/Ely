@@ -8,7 +8,7 @@ from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f
 from direct.showbase.ShowBase import ShowBase
-from p3physics import GamePhysicsManager
+from p3physics import GamePhysicsManager, BTRigidBody
 #
 import sys
 
@@ -60,9 +60,12 @@ def setParametersBeforeCreation():
     physicsMgr = GamePhysicsManager.get_global_ptr()
     # set rigid_body's parameters
     physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-                                   "shape_type", "box")
+            "shape_type", "box")
     physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-                                   "body_mass", "10.0")
+            "body_mass", "10.0")
+    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+            "collide_mask", "0x10")
+
     # set soft_body's parameters
     physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "static",
             "false")
@@ -272,23 +275,29 @@ if __name__ == '__main__':
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         sceneNP = loadTerrainLowPoly("SceneNP")
-        # and reparent to the reference node
-        sceneNP.reparent_to(physicsMgr.get_reference_node_path())
+        # create scene's rigid_body (attached to the reference node)
+        sceneRigidBodyNP = physicsMgr.create_rigid_body("SceneRigidBody")
+        # get a reference to the scene's rigid_body
+        sceneRigidBody = sceneRigidBodyNP.node()
+        # set some parameters: trimesh shape, static, collide mask etc...
+        sceneRigidBody.set_shape_type(GamePhysicsManager.TRIANGLEMESH)
+        sceneRigidBody.switchType(BTRigidBody.STATIC)
+        sceneRigidBodyNP.set_collide_mask(mask)
+        sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0))
+        # setup the player's rigid body
+        sceneRigidBody.setup(sceneNP)
 
-        # set sceneNP's collide mask
-        sceneNP.set_collide_mask(mask)
-
-        # set driver's various creation parameters as string
+        # set various creation parameters as string for other rigid bodies
         setParametersBeforeCreation()
+
         # get a player with anims
         playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
-        
         # create player's rigid_body (attached to the reference node)
         playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
-        # get a reference to the rigid_bodies
+        # get a reference to the player's rigid_body
         playerRigidBody = playerRigidBodyNP.node()
         # set some parameters
-        playerRigidBodyNP.set_pos(LPoint3f(4.1, -12.0, 30.0))
+        playerRigidBodyNP.set_pos(LPoint3f(4.1, -12.0, 100.0))
         # setup the player's rigid body
         playerRigidBody.setup(playerNP)
         

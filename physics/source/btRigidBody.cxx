@@ -42,20 +42,6 @@ BTRigidBody::~BTRigidBody()
 void BTRigidBody::do_initialize()
 {
 	WPT(GamePhysicsManager)mTmpl = GamePhysicsManager::get_global_ptr();
-	//body type
-	string bodyType = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_type"));
-	if (bodyType == string("static"))
-	{
-		mBodyType = STATIC;
-	}
-	else if (bodyType == string("kinematic"))
-	{
-		mBodyType = KINEMATIC;
-	}
-	else
-	{
-		mBodyType = DYNAMIC;
-	}
 	//
 	float value;
 	//shape type
@@ -278,6 +264,21 @@ void BTRigidBody::do_initialize()
 			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
 					string("ccd_swept_sphere_radius")).c_str(),	NULL);
 	set_ccd_swept_sphere_radius(value >= 0.0 ? value : -value);
+	//body type (after setting the other physics parameters)
+	string bodyType = mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("body_type"));
+	if (bodyType == string("static"))
+	{
+		switchType(STATIC);
+	}
+	else if (bodyType == string("kinematic"))
+	{
+		switchType(KINEMATIC);
+	}
+	else
+	{
+		switchType(DYNAMIC);
+	}
 	//use shape of (another object)
 //	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); xxx
 	//add to table of all physics components indexed by
@@ -375,9 +376,6 @@ void BTRigidBody::setup(NodePath& objectNP)
 	//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
 	//		switchType(mBodyType);
 	///BUG>
-
-	// switch body type (set mass if necessary)
-	switchType(mBodyType);
 
 	// attach this to Bullet World
 	GamePhysicsManager::get_global_ptr()->bulletWorld()->attach(this);
@@ -570,6 +568,7 @@ void BTRigidBody::switchType(BodyType bodyType)
 	default:
 		break;
 	}
+	mBodyType = bodyType;
 }
 
 /**

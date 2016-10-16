@@ -4,6 +4,7 @@
 
 #include "btRigidBody.h"
 #include "btSoftBody.h"
+#include "btGhost.h"
 #include "gamePhysicsManager.h"
 
 
@@ -24,10 +25,12 @@ init_libp3physics() {
 
   // Init your dynamic types here, e.g.:
   // MyDynamicClass::init_type();
-  BTSoftBody::init_type();
   BTRigidBody::init_type();
-  BTSoftBody::register_with_read_factory();
+//  BTSoftBody::init_type(); xxx
+//  BTGhost::init_type();
   BTRigidBody::register_with_read_factory();
+//  BTSoftBody::register_with_read_factory(); xxx
+//  BTGhost::register_with_read_factory();
   GamePhysicsManager::init_type();
 
   return;

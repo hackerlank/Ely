@@ -50,6 +50,41 @@ PUBLISHED:
 	virtual ~GamePhysicsManager();
 
 	/**
+	 * The type of object for creation parameters.
+	 */
+	enum PhysicsType
+	{
+		RIGIDBODY = 0,
+		SOFTBODY,
+		GHOST
+	};
+
+	/**
+	 * Shape type.
+	 */
+	enum ShapeType
+	{
+		SPHERE = 0, //!< SPHERE (radius)
+		PLANE,//!< PLANE (norm_x, norm_y, norm_z, d)
+		BOX,//!< BOX (half_x, half_y, half_z)
+		CYLINDER,//!< CYLINDER (radius, height, up)
+		CAPSULE,//!< CAPSULE (radius, height, up)
+		CONE,//!< CONE (radius, height, up)
+		HEIGHTFIELD,//!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
+		TRIANGLEMESH,//!< TRIANGLEMESH (dynamic)
+	};
+
+	/**
+	 * Shape size.
+	 */
+	enum ShapeSize
+	{
+		MINIMUN = 0, //!< MINIMUN shape
+		MAXIMUM,//!< MAXIMUM shape
+		MEDIUM,//!< MEDIUM shape
+	};
+
+	/**
 	 * \name REFERENCE NODES
 	 */
 	///@{
@@ -92,16 +127,6 @@ PUBLISHED:
 //	///@}
 
 	/**
-	 * The type of object for creation parameters.
-	 */
-	enum PhysicsType
-	{
-		RIGIDBODY = 0,
-		SOFTBODY,
-		GHOST
-	};
-
-	/**
 	 * \name TEXTUAL PARAMETERS
 	 */
 	///@{
@@ -135,31 +160,6 @@ PUBLISHED:
 	///@{
 	INLINE PT(BulletWorld) bulletWorld() const; //xxx
 	///@}
-
-	/**
-	 * Shape type.
-	 */
-	enum ShapeType
-	{
-		SPHERE = 0, //!< SPHERE (radius)
-		PLANE,//!< PLANE (norm_x, norm_y, norm_z, d)
-		BOX,//!< BOX (half_x, half_y, half_z)
-		CYLINDER,//!< CYLINDER (radius, height, up)
-		CAPSULE,//!< CAPSULE (radius, height, up)
-		CONE,//!< CONE (radius, height, up)
-		HEIGHTFIELD,//!< HEIGHTFIELD (image, height, up, scale_w, scale_d)
-		TRIANGLEMESH,//!< TRIANGLEMESH (dynamic)
-	};
-
-	/**
-	 * Shape size.
-	 */
-	enum ShapeSize
-	{
-		MINIMUN = 0, //!< MINIMUN shape
-		MAXIMUM,//!< MAXIMUM shape
-		MEDIUM,//!< MEDIUM shape
-	};
 
 	/**
 	 * \name UTILITIES xxx
