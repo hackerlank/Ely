@@ -72,6 +72,17 @@ class EXPORT_CLASS BTRigidBody: public BulletRigidBodyNode
 {
 PUBLISHED:
 
+	/**
+	 * The body type.
+	 * It may change during the BTRigidBody's lifetime.
+	 */
+	enum BodyType
+	{
+		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
+		STATIC,//!< STATIC: mass == 0.0, no driven
+		KINEMATIC//!< KINEMATIC: mass == 0.0, user driven
+	};
+
 	// To avoid interrogatedb warning.
 #ifdef CPPPARSER
 	virtual ~BTRigidBody();
@@ -83,18 +94,6 @@ PUBLISHED:
 	///@{
 	INLINE void set_reference_node_path(const NodePath& reference);
 	///@}
-
-	/**
-	 * \brief The current component's type. xxx
-	 *
-	 * It may change during the component's lifetime.
-	 */
-	enum BodyType
-	{
-		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
-		STATIC,//!< STATIC: mass == 0.0, no driven
-		KINEMATIC//!< KINEMATIC: mass == 0.0, user driven
-	};
 
 	/**
 	 * \name RIGIDBODY
@@ -109,18 +108,12 @@ PUBLISHED:
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	/**
-	 * \brief Switches the current component's type.
-	 *
-	 * It sets the rigid body mass too.
-	 * @param bodyType The new component's type.
-	 */
 	void switchType(BodyType bodyType);
 	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);
 	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
 	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);
 	INLINE GamePhysicsManager::ShapeSize get_shape_size() const;
-//	use_shape_of() XXX ?
+//	use_shape_of() xxx ?
 	INLINE void set_shape_radius(float value);
 	INLINE float get_shape_radius() const;
 	INLINE void set_shape_norm(const LVector3f& value);
@@ -188,8 +181,6 @@ private:
 	BodyType mBodyType;
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
-	//ccd stuff
-	bool mCcdEnabled;
 
 	inline void do_reset();
 	void do_initialize();
@@ -200,22 +191,9 @@ private:
 	 */
 	///@{
 	void do_check_auto_shaping();
-	/**
-	 * \brief Sets physical parameters of a bullet rigid body node (helper function).
-	 */
-	void doSetPhysicalParameters();
-	/**
-	 * \brief Sets body type.
-	 * @param bodyType The body type.
-	 */
-//	void doSwitchBodyType(BodyType bodyType);
 	///Geometric functions and parameters.
-	/**
-	 * \brief Create a shape given its type.
-	 * @param shapeType The shape type.
-	 * @return The created shape.
-	 */
-	PT(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType);
+	PT(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType,
+			const NodePath& objectNP);
 	LVecBase3f mModelDims;
 	float mModelRadius;
 	//use shape of (another object).

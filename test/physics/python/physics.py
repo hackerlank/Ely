@@ -59,9 +59,10 @@ def setParametersBeforeCreation():
     
     physicsMgr = GamePhysicsManager.get_global_ptr()
     # set rigid_body's parameters
-    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY, "static", "false")
-    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY, "min_distance",
-            "0.5")
+    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+                                   "shape_type", "box")
+    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+                                   "body_mass", "10.0")
     # set soft_body's parameters
     physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "static",
             "false")
@@ -231,14 +232,14 @@ def rigid_bodyCallback(rigid_body):
 #     currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
 #     rigid_body[0].set_play_rate(0.1 + currentVelSize * 0.05)
 
-def soft_bodyCallback(soft_body):
-    """soft_body update callback function"""  
-
-    global playerRigidBody
-    refNP = GamePhysicsManager.get_global_ptr().get_reference_node_path()
-    distLS = (NodePath.any_path(playerRigidBody).get_pos(refNP) - 
-            NodePath.any_path(soft_body).get_pos(refNP)).length()
-    print(soft_body, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
+# def soft_bodyCallback(soft_body):
+#     """soft_body update callback function"""  
+# 
+#     global playerRigidBody
+#     refNP = GamePhysicsManager.get_global_ptr().get_reference_node_path()
+#     distLS = (NodePath.any_path(playerRigidBody).get_pos(refNP) - 
+#             NodePath.any_path(soft_body).get_pos(refNP)).length()
+#     print(soft_body, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
 
 if __name__ == '__main__':
 
@@ -282,14 +283,14 @@ if __name__ == '__main__':
         # get a player with anims
         playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
         
-        # create some rigid_bodies (attached to the reference node)
+        # create player's rigid_body (attached to the reference node)
         playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
         # get a reference to the rigid_bodies
         playerRigidBody = playerRigidBodyNP.node()
-        # reparent player to rigid_body and ...
-        playerNP.reparent_to(playerRigidBodyNP)
-        # ...setup the rigid body
-        playerRigidBody.setup()
+        # set some parameters
+        playerRigidBodyNP.set_pos(LPoint3f(4.1, -12.0, 30.0))
+        # setup the player's rigid body
+        playerRigidBody.setup(playerNP)
         
     else:
         # valid bamFile

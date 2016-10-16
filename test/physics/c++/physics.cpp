@@ -71,9 +71,10 @@ void setParametersBeforeCreation()
 {
 	GamePhysicsManager* physicsMgr = GamePhysicsManager::get_global_ptr();
 	// set rigid_body's parameters
-	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, "static", "false");
-	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, "min_distance",
-			"0.5");
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+			"shape_type", "box");
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+			"body_mass", "10.0");
 	// set soft_body's parameters
 	physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "static",
 			"false");
@@ -340,14 +341,14 @@ int main(int argc, char *argv[])
 		// get a player with anims
 		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
 
-		// create some rigid_bodies (attached to the reference node)
+		// create player's rigid_body (attached to the reference node)
 		NodePath playerRigidBodyNP = physicsMgr->create_rigid_body("PlayerRigidBody");
 		// get a reference to the rigid_bodies
 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
-		// reparent player to rigid_body and ...
-		playerNP.reparent_to(playerRigidBodyNP);
-		// ...setup the rigid body
-		playerRigidBody->setup();
+		// set some parameters
+        playerRigidBodyNP.set_pos(LPoint3f(4.1, -12.0, 100.0));
+		// setup the player's rigid body
+		playerRigidBody->setup(playerNP);
 
 	}
 	else

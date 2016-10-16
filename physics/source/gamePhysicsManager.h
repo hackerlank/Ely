@@ -173,8 +173,6 @@ PUBLISHED:
 	INLINE PT(PandaNode/*Component*/) getPhysicsComponentByPandaNode(PT(PandaNode) pandaNode);//xxx
 	INLINE void setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,
 			PT(PandaNode/*Component*/) physicsComponent); //xxx
-	void getBoundingDimensions(NodePath modelNP, LVecBase3f& modelDims,
-			LVector3f& modelDeltaCenter, float& modelRadius);//xxx substituted by the other get_bounding_dimensions?
 	float get_bounding_dimensions(NodePath modelNP, LVecBase3f& modelDims,
 			LVector3f& modelDeltaCenter) const;
 	Pair<bool,float> get_collision_height(const LPoint3f& fromPos);

@@ -59,9 +59,11 @@ void BTRigidBody::do_initialize()
 	//
 	float value;
 	//shape type
-	string shapeType = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_type"));
+	string shapeType = mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("shape_type"));
 	//shape size
-	string shapeSize = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_size"));
+	string shapeSize = mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("shape_size"));
 	if (shapeSize == string("minimum"))
 	{
 		mShapeSize = GamePhysicsManager::MINIMUN;
@@ -79,7 +81,8 @@ void BTRigidBody::do_initialize()
 	if (shapeType == string("sphere"))
 	{
 		mShapeType = GamePhysicsManager::SPHERE;
-		string radius = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_radius"));
+		string radius = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_radius"));
 		if (! radius.empty())
 		{
 			mDim1 = STRTOF(radius.c_str(), NULL);
@@ -92,10 +95,14 @@ void BTRigidBody::do_initialize()
 	else if (shapeType == string("plane"))
 	{
 		mShapeType = GamePhysicsManager::PLANE;
-		string norm_x = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_norm_x"));
-		string norm_y = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_norm_y"));
-		string norm_z = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_norm_z"));
-		string d = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_d"));
+		string norm_x = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_norm_x"));
+		string norm_y = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_norm_y"));
+		string norm_z = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_norm_z"));
+		string d = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_d"));
 		if ((! norm_x.empty()) && (! norm_y.empty())
 				&& (! norm_z.empty()))
 		{
@@ -115,9 +122,12 @@ void BTRigidBody::do_initialize()
 	else if (shapeType == string("box"))
 	{
 		mShapeType = GamePhysicsManager::BOX;
-		string half_x = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_half_x"));
-		string half_y = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_half_y"));
-		string half_z = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_half_z"));
+		string half_x = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_half_x"));
+		string half_y = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_half_y"));
+		string half_z = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_half_z"));
 		if ((! half_x.empty()) && (! half_y.empty())
 				&& (! half_z.empty()))
 		{
@@ -146,9 +156,12 @@ void BTRigidBody::do_initialize()
 		{
 			mShapeType = GamePhysicsManager::CONE;
 		}
-		string radius = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_radius"));
-		string height = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_height"));
-		string upAxis = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_up"));
+		string radius = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_radius"));
+		string height = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_height"));
+		string upAxis = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_up"));
 		if ((! radius.empty()) && (! height.empty()))
 		{
 			mDim1 = STRTOF(radius.c_str(), NULL);
@@ -174,13 +187,17 @@ void BTRigidBody::do_initialize()
 	else if (shapeType == string("heightfield"))
 	{
 		mShapeType = GamePhysicsManager::HEIGHTFIELD;
-		string heightfield_file = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-				string("shape_heightfield_file"));
+		string heightfield_file = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_heightfield_file"));
 		mHeightfieldFile = Filename(heightfield_file);
-		string height = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_height"));
-		string scale_w = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_scale_w"));
-		string scale_d = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_scale_d"));
-		string upAxis = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("shape_up"));
+		string height = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_height"));
+		string scale_w = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_scale_w"));
+		string scale_d = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_scale_d"));
+		string upAxis = mTmpl->get_parameter_value(
+				GamePhysicsManager::RIGIDBODY, string("shape_up"));
 		if ((! height.empty()) && (! scale_w.empty())
 				&& (! scale_d.empty()))
 		{
@@ -216,7 +233,8 @@ void BTRigidBody::do_initialize()
 	}
 	//collide mask
 	NodePath thisNP = NodePath::any_path(this);
-	string collideMask = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("collide_mask"));
+	string collideMask = mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("collide_mask"));
 	if (collideMask == string("all_on"))
 	{
 		thisNP.set_collide_mask(BitMask32::all_on());
@@ -236,36 +254,36 @@ void BTRigidBody::do_initialize()
 #endif
 	}
 	//body mass (>=0.0)
-	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_mass")).c_str(), NULL);
+	value = STRTOF(mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("body_mass")).c_str(), NULL);
 	set_mass(value >= 0.0 ? value : -value);
 	//body friction (>=0.0)
-	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_friction")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("body_friction")).c_str(),
 			NULL);
 	set_friction(value >= 0.0 ? value : -value);
 	//body restitution (>=0.0)
-	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("body_restitution")).c_str(),
+	value = STRTOF(mTmpl->get_parameter_value(
+			GamePhysicsManager::RIGIDBODY, string("body_restitution")).c_str(),
 			NULL);
 	set_restitution(value >= 0.0 ? value : -value);
 	//ccd settings: enabled if both are greater than zero (> 0.0)
 	//ccd motion threshold (>=0.0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("ccd_motion_threshold")).c_str(),
-			NULL);
+			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
+					string("ccd_motion_threshold")).c_str(), NULL);
 	set_ccd_motion_threshold(value >= 0.0 ? value : -value);
 	//ccd swept sphere radius (>=0.0)
 	value = STRTOF(
-			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("ccd_swept_sphere_radius")).c_str(),
-			NULL);
+			mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
+					string("ccd_swept_sphere_radius")).c_str(),	NULL);
 	set_ccd_swept_sphere_radius(value >= 0.0 ? value : -value);
-	((get_ccd_motion_threshold() > 0.0) && (get_ccd_swept_sphere_radius() > 0.0)) ?
-	mCcdEnabled = true : mCcdEnabled = false;
 	//use shape of (another object)
 //	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); xxx
-//	mRigidBodyNode = new BulletRigidBodyNode(get_name().c_str());xxx
 	//add to table of all physics components indexed by
 	//(underlying) Bullet PandaNodes
 	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(
-			/*mRigidBodyNode.p() xxx*/this, this);
+			this, this);
 	//
 	//object setting
 	string object = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
@@ -290,6 +308,8 @@ void BTRigidBody::do_initialize()
 
 void BTRigidBody::do_check_auto_shaping()
 {
+	// default
+	mAutomaticShaping = true;
 	//check
 	if (mShapeType == GamePhysicsManager::SPHERE)
 	{
@@ -328,42 +348,25 @@ void BTRigidBody::do_check_auto_shaping()
 			mAutomaticShaping = false;
 		}
 	}
-	// default
-	mAutomaticShaping = true;
 }
 
 void BTRigidBody::setup(NodePath& objectNP)
 {
 	RETURN_ON_COND(mSetup,)
 
-//	//create a Rigid Body Node xxx
-//	//Component standard name: ObjectId_ObjectType_ComponentId_ComponentType
-//	string name = COMPONENT_STANDARD_NAME;
+	// get this node path (if !empty)
+	NodePath thisNP = NodePath::any_path(this);
 
-//	mRigidBodyNode = new BulletRigidBodyNode(get_name().c_str()); xxx
-//	//add to table of all physics components indexed by
-//	//(underlying) Bullet PandaNodes
-//	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(
-//			mRigidBodyNode.p(), this);
-//	//set the physics parameters xxx
-//	doSetPhysicalParameters();
+	// reparent the object node path to this
+	if (! objectNP.is_empty())
+	{
+		objectNP.reparent_to(thisNP);
+	}
 
-	//At this point a Scene component (Model, InstanceOf ...) should have
-	//been already created and added to the object, so its node path should
-	//be the same as the object's one.
-	//Note: scaling is applied to a Scene component, so the object node path
-	//has scaling already applied.
+	// Note: the object node path (if !empty) has scaling already applied.
 
-	//create and add a Collision Shape
-	/*mRigidBodyNode-> xxx*/add_shape(doCreateShape(mShapeType));
-	//set mass and other body type settings
-	switchType(mBodyType);
-
-	//create a node path for the rigid body
-	NodePath thisNP = /*NodePath(mRigidBodyNode)xxx*/NodePath::any_path(this);
-
-	//attach to Bullet World
-	GamePhysicsManager::get_global_ptr()->bulletWorld()->attach(/*mRigidBodyNode xxx*/this);
+	// add a Collision Shape
+	add_shape(doCreateShape(mShapeType, objectNP));
 
 	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
 	//dynamic, etc...) after it has been attached to the world, you must first
@@ -373,21 +376,26 @@ void BTRigidBody::setup(NodePath& objectNP)
 	//		switchType(mBodyType);
 	///BUG>
 
-//	//set collide mask xxx
-//	thisNP.set_collide_mask(mCollideMask);
+	// switch body type (set mass if necessary)
+	switchType(mBodyType);
 
-//	NodePath ownerNodePath = NodePath::any_path(this); //xxx
-//	if (! ownerNodePath.is_empty())
-//	{
-		//reparent the object node path as a child of the rigid body's one
-		objectNP.reparent_to(thisNP);//xxx
+	// attach this to Bullet World
+	GamePhysicsManager::get_global_ptr()->bulletWorld()->attach(this);
+
+	// correct (or possibly reset to zero) transform of the object node path
+	if (! objectNP.is_empty())
+	{
 		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
 		{
-			//correct (or possibly reset to zero) pos and hpr of the object node path
 			objectNP.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
 		}
+		//optimize
+		thisNP.flatten_strong();
+	}
 
-//		//BulletShape::set_local_scale doesn't work anymore xxx
+//	if (! objectNP.is_empty()) xxx
+//	{
+//		//BulletShape::set_local_scale doesn't work anymore
 //		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
 //		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
 //		{
@@ -444,12 +452,10 @@ void BTRigidBody::setup(NodePath& objectNP)
 //				}
 //			}
 //		}
-		//optimize
-		thisNP.flatten_strong();
 //	}
 //	else
 //	{
-//		//when ownerNodePath is empty: every rigid body has a shape but xxx
+//		//when objectNP is empty: every rigid body has a shape but
 //		//HEIGHTFIELD, which should have a chance to scale
 //		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
 //		{
@@ -470,9 +476,6 @@ void BTRigidBody::setup(NodePath& objectNP)
 //			}
 //		}
 //	}
-
-//	//set this rigid body node path as the object's one xxx
-//	mOwnerObject->setNodePath(thisNP);
 	// set the flag
 	mSetup = true;
 }
@@ -490,7 +493,7 @@ void BTRigidBody::do_finalize()
 	//remove from table of all physics components indexed by
 	//(underlying) Bullet PandaNodes
 	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
-			/*mRigidBodyNode xxx*/this, NULL);
+			this, NULL);
 #ifdef PYTHON_BUILD
 	//Python callback
 	Py_DECREF(mSelf);
@@ -519,36 +522,32 @@ void BTRigidBody::cleanup()
 	{
 		oldObjectNP = NodePath();
 	}
-//	//set the object node path to the old one xxx
-//	mOwnerObject->setNodePath(oldObjectNP);
-
-//	//remove from table of all physics components indexed by xxx
-//	//(underlying) Bullet PandaNodes
-//	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
-//			/*mRigidBodyNode xxx*/this, NULL);
 
 	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-			/*mRigidBodyNode xxx*/this);
+	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(this);
 
 	// remove all shapes
 	for (int i = 0 ; i < get_num_shapes(); ++i)
 	{
 		remove_shape(get_shape(i));
 	}
-
-	//Remove node path
-//	thisNP.remove_node(); xxx
 	// set the flag
 	mSetup = false;
 }
 
+/**
+ * Switches the current body type of this BTRigidBody.
+ * For DYNAMIC type mass must be >0.0 for type to be changed. For STATIC and
+ * KINEMATIC mass is reset to 0.0.
+ */
 void BTRigidBody::switchType(BodyType bodyType)
 {
+	// return if DYNAMIC && mass==0.0
+	RETURN_ON_COND((bodyType == DYNAMIC) && (get_mass() == 0.0),)
+
 	switch (bodyType)
 	{
 	case DYNAMIC:
-		set_mass(mBodyMass);
 		set_kinematic(false);
 		set_static(false);
 		set_deactivation_enabled(true);
@@ -573,7 +572,11 @@ void BTRigidBody::switchType(BodyType bodyType)
 	}
 }
 
-PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeType)
+/**
+ * Creates a shape given its type.
+ */
+PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeType,
+		const NodePath& objectNP)
 {
 //	//check if it should use shape of another (already) created object xxx
 //	if (! mUseShapeOfId.empty())
@@ -606,7 +609,7 @@ PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeTyp
 
 	// create and return the current shape: dimensions are wrt the
 	//Model or InstanceOf component (if any)
-	NodePath shapeNodePath = NodePath::any_path(this);//default
+	NodePath shapeNodePath = objectNP;//default
 //	SMARTPTR(Component) sceneComp = mOwnerObject->getComponent(ComponentFamilyType("Scene"));xxx
 //	if (sceneComp)
 //	{
@@ -624,17 +627,6 @@ PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeTyp
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
 			mDim3, mDim4, mAutomaticShaping, mUpAxis,
 			mHeightfieldFile, ! (mBodyType == STATIC));
-}
-
-void BTRigidBody::doSetPhysicalParameters()
-{
-	set_friction(mBodyFriction);
-	set_restitution(mBodyRestitution);
-	if (mCcdEnabled)
-	{
-		set_ccd_motion_threshold(mCcdMotionThreshold);
-		set_ccd_swept_sphere_radius(mCcdSweptSphereRadius);
-	}
 }
 
 /**

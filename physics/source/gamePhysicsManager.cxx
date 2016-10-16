@@ -490,17 +490,28 @@ void GamePhysicsManager::set_parameters_defaults(PhysicsType type)
 		///mRigidBodiesParameterTable must be the first cleared
 		mRigidBodiesParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mRigidBodiesParameterTable.insert(ParameterNameValue("body_type", "dynamic"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("body_mass", "1.0"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("body_friction", "0.8"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("body_restitution", "0.1"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_type", "sphere"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_size", "medium"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("collide_mask", "all_on"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_height", "1.0"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_up", "z"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_scale_w", "1.0"));
-		mRigidBodiesParameterTable.insert(ParameterNameValue("shape_scale_d", "1.0"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("body_type", "dynamic"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("body_mass", "1.0"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("body_friction", "0.8"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("body_restitution", "0.1"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("shape_type", "sphere"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("shape_size", "medium"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("collide_mask", "all_on"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("shape_height", "1.0"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("shape_up", "z"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("shape_scale_w", "1.0"));
+		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("shape_scale_d", "1.0"));
 		return;
 	}
 //	if (type == SOFTBODY) xxx
@@ -867,9 +878,10 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
 		geomNodes = modelNP.find_all_matches("**/+GeomNode");
 		if (! geomNodes.is_empty())
 		{
-			//get the bounding dimensions of object node path, that
-			//should represents a model
-			getBoundingDimensions(modelNP, modelDims, modelDeltaCenter, modelRadius);
+			// get the bounding dimensions of object node path,
+			// that should represents a model
+			modelRadius = get_bounding_dimensions(modelNP, modelDims,
+					modelDeltaCenter);
 		}
 		else
 		{
@@ -1028,24 +1040,6 @@ PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
  * - modelCenter + modelDeltaCenter = origin of coordinate system
  * - modelRadius = radius of the containing sphere
  */
-float GamePhysicsManager::get_bounding_dimensions(NodePath modelNP,
-		LVecBase3f& modelDims, LVector3f& modelDeltaCenter) const
-{
-	//get "tight" dimensions of model
-	LPoint3f minP, maxP;
-	modelNP.calc_tight_bounds(minP, maxP);
-	//
-	LVecBase3 delta = maxP - minP;
-	LVector3f deltaCenter = -(minP + delta / 2.0);
-	//
-	modelDims.set(abs(delta.get_x()), abs(delta.get_y()), abs(delta.get_z()));
-	modelDeltaCenter.set(deltaCenter.get_x(), deltaCenter.get_y(),
-			deltaCenter.get_z());
-	float modelRadius = max(max(modelDims.get_x(), modelDims.get_y()),
-			modelDims.get_z()) / 2.0;
-	return modelRadius;
-}
-
 /**
  * \brief Calculates geometric characteristics of a GeomNode.
  *
@@ -1063,22 +1057,23 @@ float GamePhysicsManager::get_bounding_dimensions(NodePath modelNP,
  * of the model AABB).
  * @param modelRadius Returns the radius of the model AABB.
  */
-void GamePhysicsManager::getBoundingDimensions(NodePath modelNP,
-		LVecBase3f& modelDims, LVector3f& modelDeltaCenter, float& modelRadius)
+float GamePhysicsManager::get_bounding_dimensions(NodePath modelNP,
+		LVecBase3f& modelDims, LVector3f& modelDeltaCenter) const
 {
 	//get "tight" dimensions of model
 	LPoint3f minP, maxP;
 	modelNP.calc_tight_bounds(minP, maxP);
 	//
 	LVecBase3 delta = maxP - minP;
+	LVector3f deltaCenter = -(minP + delta / 2.0);
 	//
-	modelDims = LVector3f(abs(delta.get_x()), abs(delta.get_y()),
-			abs(delta.get_z()));
-	modelDeltaCenter = -(minP + delta / 2.0);
-	modelRadius = max(max(modelDims.get_x(), modelDims.get_y()),
+	modelDims.set(abs(delta.get_x()), abs(delta.get_y()), abs(delta.get_z()));
+	modelDeltaCenter.set(deltaCenter.get_x(), deltaCenter.get_y(),
+			deltaCenter.get_z());
+	float modelRadius = max(max(modelDims.get_x(), modelDims.get_y()),
 			modelDims.get_z()) / 2.0;
+	return modelRadius;
 }
-
 
 /**
  * Computes the desired dimension given the shape size.

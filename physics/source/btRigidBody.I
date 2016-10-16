@@ -219,7 +219,6 @@ inline void BTRigidBody::do_reset()
 	mBodyType = DYNAMIC;
 	mShapeType = GamePhysicsManager::SPHERE;
 	mShapeSize = GamePhysicsManager::MEDIUM;
-	mCcdEnabled = false;
 	mModelDims = LVector3f::zero();
 	mModelRadius = 0.0;
 //	mUseShapeOfId = ObjectId();xxx
