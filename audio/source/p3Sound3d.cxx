@@ -61,7 +61,7 @@ void P3Sound3d::do_initialize()
 				iterPair != nameFilePairs.end(); ++iterPair)
 		{
 			//an empty sound_name@sound_file is ignored
-			if (not iterPair->empty())
+			if (! iterPair->empty())
 			{
 				//get sound name and sound file name
 				pvector<string> nameFilePair =
@@ -75,7 +75,7 @@ void P3Sound3d::do_initialize()
 					GameAudioManager::GetSingletonPtr()->
 					get_audio_manager()->get_sound(nameFilePair[1],
 							true).p();
-					if (not sound.is_null())
+					if (! sound.is_null())
 					{
 						//an empty ("") sound name is allowed
 						mSounds[nameFilePair[0]] =
