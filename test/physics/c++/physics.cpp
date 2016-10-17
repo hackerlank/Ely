@@ -215,8 +215,8 @@ void handlePlayerUpdate()
 {
 //	// get current forward velocity size
 //	float currentVelSize =
-//			abs(playerDriver->get_current_speeds().get_first().get_y());
-//	NodePath playerDriverNP = NodePath::any_path(playerDriver);
+//			abs(playerRigidBody->get_current_speeds().get_first().get_y());
+//	NodePath playerRigidBodyNP = NodePath::any_path(playerRigidBody);
 //	// handle player's animation
 //	for (int i = 0; i < (int) playerAnimCtls.size(); ++i)
 //	{
@@ -252,14 +252,14 @@ void handlePlayerUpdate()
 //		WPT(GameControlManager)controlMgr = GameControlManager::get_global_ptr();
 //		// correct player's Z: set the collision ray origin wrt collision root
 //		LPoint3f pOrig = controlMgr->get_collision_root().get_relative_point(
-//				controlMgr->get_reference_node_path(), playerDriverNP.get_pos()) + playerHeightRayCast * 2.0;
+//				controlMgr->get_reference_node_path(), playerRigidBodyNP.get_pos()) + playerHeightRayCast * 2.0;
 //		// get the collision height wrt the reference node path
 //		Pair<bool,float> gotCollisionZ = controlMgr->get_collision_height(pOrig,
 //				controlMgr->get_reference_node_path());
 //		if (gotCollisionZ.get_first())
 //		{
 //			//updatedPos.z needs correction
-//			playerDriverNP.set_z(gotCollisionZ.get_second());
+//			playerRigidBodyNP.set_z(gotCollisionZ.get_second());
 //		}
 //	}
 }
@@ -284,7 +284,7 @@ void rigid_bodyCallback(PT(BTRigidBody)rigid_body)
 		return;
 	}
 //	float currentVelSize =
-//			abs(playerDriver->get_current_speeds().get_first().get_y());
+//			abs(playerRigidBody->get_current_speeds().get_first().get_y());
 //	(*rigid_body)[0]->set_play_rate(0.1 + currentVelSize * 0.05);
 }
 

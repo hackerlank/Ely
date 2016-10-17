@@ -8,6 +8,7 @@ from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f
 from direct.showbase.ShowBase import ShowBase
+import panda3d.bullet
 from p3physics import GamePhysicsManager, BTRigidBody
 #
 import sys
@@ -109,10 +110,10 @@ def writeToBamFileAndExit(fileName):
     for rigid_bodyTmp in physicsMgr.get_rigid_bodies():
         # destroy rigid_bodyTmp
         physicsMgr.destroy_rigid_body(NodePath.any_path(rigid_bodyTmp))
-    # destroy soft_bodies
-    for soft_bodyTmp in physicsMgr.get_soft_bodies():
-        # destroy soft_bodyTmp
-        physicsMgr.destroy_soft_body(NodePath.any_path(soft_bodyTmp))
+#     # destroy soft_bodies
+#     for soft_bodyTmp in physicsMgr.get_soft_bodies():
+#         # destroy soft_bodyTmp
+#         physicsMgr.destroy_soft_body(NodePath.any_path(soft_bodyTmp))
     #
     sys.exit(0)
 
@@ -174,10 +175,10 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
 def handlePlayerUpdate():
     """handles player on every update"""
     
-#     global playerDriver, playerAnimCtls, playerNP, playerHeightRayCast
+#     global playerRigidBody, playerAnimCtls, playerNP, playerHeightRayCast
 #     # get current forward velocity size
-#     currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
-#     playerDriverNP = NodePath.any_path(playerDriver)
+#     currentVelSize = abs(playerRigidBody.get_current_speeds().get_first().get_y())
+#     playerRigidBodyNP = NodePath.any_path(playerRigidBody)
 #     # handle vehicle's animation
 #     for i in range(len(playerAnimCtls)):
 #         if currentVelSize > 0.0:
@@ -204,23 +205,22 @@ def handlePlayerUpdate():
 #         controlMgr = GameControlManager.get_global_ptr()
 #         # correct player's Z: set the collision ray origin wrt collision root
 #         pOrig = controlMgr.get_collision_root().get_relative_point(
-#                 controlMgr.get_reference_node_path(), playerDriverNP.get_pos()) + \
+#                 controlMgr.get_reference_node_path(), playerRigidBodyNP.get_pos()) + \
 #                                         playerHeightRayCast * 2.0
 #         # get the collision height wrt the reference node path
 #         gotCollisionZ = controlMgr.get_collision_height(pOrig,
 #                                         controlMgr.get_reference_node_path())
 #         if gotCollisionZ.get_first():
 #             # updatedPos.z needs correction
-#             playerDriverNP.set_z(gotCollisionZ.get_second())
+#             playerRigidBodyNP.set_z(gotCollisionZ.get_second())
             
 def updateControls(task):
     """custom update task for controls"""
 
-    global playerDriver, pursuerChaser
+    global playerRigidBody
     # call update for controls
     dt = ClockObject.get_global_clock().get_dt()
-    playerDriver.update(dt)
-    pursuerChaser.update(dt)
+    playerRigidBody.update(dt)
     # handle player on update
     handlePlayerUpdate()
     #
@@ -229,10 +229,10 @@ def updateControls(task):
 def rigid_bodyCallback(rigid_body):
     """rigid_body update callback function"""
     
-    global playerDriver
+    global playerRigidBody
     if rigid_body != playerRigidBody:
         return
-#     currentVelSize = abs(playerDriver.get_current_speeds().get_first().get_y())
+#     currentVelSize = abs(playerRigidBody.get_current_speeds().get_first().get_y())
 #     rigid_body[0].set_play_rate(0.1 + currentVelSize * 0.05)
 
 # def soft_bodyCallback(soft_body):
