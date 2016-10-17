@@ -115,6 +115,9 @@ if (WIN32)
 
   # Link panda libraries
   set(PANDA_LIBRARIES "libp3framework;libpanda;libpandaexpress;libp3dtool;libp3dtoolconfig;libp3direct;${INTERROGATE_LIB}")
+  if(USE_LIB_BULLET)
+  	set(PANDA_LIBRARIES "libpandabullet;${PANDA_LIBRARIES}")
+  endif()
   link_directories("${PANDA_LIBRARY_DIRS}")
 
 else()
@@ -155,6 +158,9 @@ else()
   # Locate the Panda3D libraries
 
   set(REQ_LIBRARIES p3framework panda pandaexpress p3dtool p3dtoolconfig p3direct ${INTERROGATE_LIB})
+  if(USE_LIB_BULLET)
+  	set(REQ_LIBRARIES pandabullet ${REQ_LIBRARIES})
+  endif()
 
   set(PANDA_LIBRARIES "")
   foreach (lib ${REQ_LIBRARIES})
