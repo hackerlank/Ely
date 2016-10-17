@@ -32,6 +32,8 @@ string modelAnimFiles[5][2] =
 const float animRateFactor[2] = { 0.6, 0.175 };
 // bam file
 string bamFileName("physics.boo");
+// debug flag
+bool toggleDebugFlag = false;
 
 /// specific data/functions declarations/definitions
 NodePath sceneNP;
@@ -299,6 +301,13 @@ void rigid_bodyCallback(PT(BTRigidBody)rigid_body)
 //			string(" - ") + str(distLS) << endl;
 //}
 
+// toggle debug draw
+void toggleDebugDraw(const Event* e, void* data)
+{
+	toggleDebugFlag = not toggleDebugFlag;
+	GamePhysicsManager::get_global_ptr()->debug(toggleDebugFlag);
+}
+
 int main(int argc, char *argv[])
 {
 	string msg("'BTRigidBody & BTSoftBody & BTGhost'");
@@ -310,6 +319,7 @@ int main(int argc, char *argv[])
 	text = new TextNode("Help");
 	text->set_text(
 			msg + "\n\n"
+			"- press \"d\" to toggle debug drawing\n"
 			"- press \"up\"/\"left\"/\"down\"/\"right\" arrows to move the player\n");
 	NodePath textNodePath = window->get_aspect_2d().attach_new_node(text);
 	textNodePath.set_pos(-1.25, 0.0, 0.8);
@@ -388,6 +398,11 @@ int main(int argc, char *argv[])
 		cout << endl << "Current creation parameters:";
 		setParametersBeforeCreation();
 	}
+
+	// setup DEBUG DRAWING
+	physicsMgr->initDebug();
+	framework.define_key("d", "toggleDebugDraw", &toggleDebugDraw,
+			nullptr);
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();

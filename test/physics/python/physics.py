@@ -28,6 +28,8 @@ modelAnimFiles = [["eve-walk.egg", "eve-run.egg"],
 animRateFactor = [0.6, 0.175]
 # bame file
 bamFileName = "physics.boo"
+# debug flag
+toggleDebugFlag = False
 
 # # specific data/functions declarations/definitions
 sceneNP = None
@@ -244,6 +246,14 @@ def rigid_bodyCallback(rigid_body):
 #             NodePath.any_path(soft_body).get_pos(refNP)).length()
 #     print(soft_body, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
 
+def toggleDebugDraw():
+    """toggle debug draw"""
+    
+    global toggleDebugFlag
+
+    toggleDebugFlag = not toggleDebugFlag
+    GamePhysicsManager.get_global_ptr().debug(toggleDebugFlag)
+
 if __name__ == '__main__':
 
     msg = "'BTRigidBody & BTSoftBody & BTGhost'"
@@ -254,6 +264,7 @@ if __name__ == '__main__':
     text = TextNode("Help")
     text.set_text(
             msg + "\n\n"
+            "- press \"d\" to toggle debug drawing\n"
             "- press \"up\"/\"left\"/\"down\"/\"right\" arrows to move the player\n")
     textNodePath = app.aspect2d.attach_new_node(text)
     textNodePath.set_pos(-1.25, 0.0, 0.8)
@@ -320,6 +331,10 @@ if __name__ == '__main__':
         print("\n" + "Current creation parameters:")
         setParametersBeforeCreation()
 
+    # setup DEBUG DRAWING
+    physicsMgr.initDebug()
+    app.accept("d", toggleDebugDraw)
+            
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()
     playerRigidBody.set_update_callback(rigid_bodyCallback)
