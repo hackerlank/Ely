@@ -73,9 +73,9 @@ if (WIN32)
 
     # TODO: Might need more libs
     if(CMAKE_CL_32)
-      set(${LIBRARIES} "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
+      set(LIBRARIES "${LIBRARIES};LinearMath;BulletCollision;BulletDynamics;BulletSoftBody")
     else()
-      set(${LIBRARIES} "${LIBRARIES};LinearMath_x64;BulletCollision_x64;BulletDynamics_x64;BulletSoftBody_x64")
+      set(LIBRARIES "${LIBRARIES};LinearMath_x64;BulletCollision_x64;BulletDynamics_x64;BulletSoftBody_x64")
     endif()
   endif()
 
@@ -102,7 +102,7 @@ if (WIN32)
   if (USE_LIB_FREETYPE)
     include_directories("${THIRDPARTY_DIR}/freetype/include")
     link_directories("${THIRDPARTY_DIR}/freetype/lib")
-    set(${LIBRARIES} "${LIBRARIES};freetype")
+    set(LIBRARIES "${LIBRARIES};freetype")
   endif()
 
   # Check if all supplied files exist
@@ -126,7 +126,7 @@ else()
   if (USE_LIB_BULLET)
     find_package(Bullet REQUIRED)
     include_directories(${BULLET_INCLUDE_DIRS})
-    set(${LIBRARIES} "${LIBRARIES};${BULLET_LIBRARIES}")
+    set(LIBRARIES "${LIBRARIES};${BULLET_LIBRARIES}")
   endif()
 
   # [LIB] Eigen 3
@@ -146,7 +146,7 @@ else()
   if(USE_LIB_FREETYPE)
     find_package(Freetype REQUIRED)
     include_directories(${FREETYPE_INCLUDE_DIRS})
-    set(${LIBRARIES} "${LIBRARIES};${FREETYPE_LIBRARIES}")
+    set(LIBRARIES "${LIBRARIES};${FREETYPE_LIBRARIES}")
   endif()
 
   # Locate the Panda3D headers
