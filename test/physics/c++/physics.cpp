@@ -79,6 +79,8 @@ void setParametersBeforeCreation()
 			"body_mass", "10.0");
 	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 			"collide_mask", "0x10");
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+			"object", "PlayerNP");
 
 	// set soft_body's parameters
 	physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "static",
@@ -308,6 +310,17 @@ void toggleDebugDraw(const Event* e, void* data)
 	GamePhysicsManager::get_global_ptr()->debug(toggleDebugFlag);
 }
 
+// collision notify
+void collisionNotify(const Event* e, void* data)
+{
+	PT(PandaNode)object0 = DCAST(PandaNode, e->get_parameter(0).get_ptr());
+	PT(PandaNode)object1 = DCAST(PandaNode, e->get_parameter(1).get_ptr());
+
+	cout << string("got '") + e->get_name() + string("' between '") +
+			object0->get_name() + string("' and '") + object1->get_name() +
+			string("'") << endl;
+}
+
 int main(int argc, char *argv[])
 {
 	string msg("'BTRigidBody & BTSoftBody & BTGhost'");
@@ -351,7 +364,7 @@ int main(int argc, char *argv[])
 				DCAST(BTRigidBody, sceneRigidBodyNP.node());
 		// set some parameters: trimesh shape, static, collide mask etc...
 		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
-		sceneRigidBody->switchType(BTRigidBody::STATIC);
+		sceneRigidBody->switch_body_type(BTRigidBody::STATIC);
 		sceneRigidBodyNP.set_collide_mask(mask);
 		sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0));
 		// setup the player's rigid body
@@ -360,18 +373,16 @@ int main(int argc, char *argv[])
 		// set various creation parameters as string for other rigid bodies
 		setParametersBeforeCreation();
 
-		// get a player with anims
+		// get a player with anims, reparent to reference node, set transform
 		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
+		playerNP.reparent_to(physicsMgr->get_reference_node_path());
+		playerNP.set_pos(LPoint3f(4.1, -12.0, 100.1));
+		playerNP.set_hpr(LVecBase3f(0.0, 90.0, 0.0));
 		// create player's rigid_body (attached to the reference node)
 		NodePath playerRigidBodyNP =
 				physicsMgr->create_rigid_body("PlayerRigidBody");
-		// get a reference to the player's rigid_body
-		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
-		// set some parameters
-        playerRigidBodyNP.set_pos(LPoint3f(4.1, -12.0, 100.0));
-		// setup the player's rigid body
-		playerRigidBody->setup(playerNP);
-
+ 		// get a reference to the player's rigid_body
+ 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
 	}
 	else
 	{
@@ -400,9 +411,14 @@ int main(int argc, char *argv[])
 	}
 
 	// setup DEBUG DRAWING
-	physicsMgr->initDebug();
+	physicsMgr->init_debug();
 	framework.define_key("d", "toggleDebugDraw", &toggleDebugDraw,
 			nullptr);
+
+	// enable collision notify event: BTRigidBody_BTRigidBody_Collision
+	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
+	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
+			&collisionNotify, nullptr);
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();

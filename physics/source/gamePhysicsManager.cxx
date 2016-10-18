@@ -27,9 +27,8 @@
 /**
  *
  */
-GamePhysicsManager::GamePhysicsManager(/*PT(GraphicsWindow) win, xxx */int taskSort, const NodePath& root,
+GamePhysicsManager::GamePhysicsManager(int taskSort, const NodePath& root,
 		const CollideMask& mask):
-//		mWin(win),xxx
 		mTaskSort(taskSort),
 		mReferenceNP(NodePath("ReferenceNode")),
 		mMask(mask),
@@ -46,6 +45,8 @@ GamePhysicsManager::GamePhysicsManager(/*PT(GraphicsWindow) win, xxx */int taskS
 	set_parameters_defaults(RIGIDBODY);
 	set_parameters_defaults(SOFTBODY);
 	set_parameters_defaults(GHOST);
+//	//
+//	mPhysicsComponentPandaNodeTable.clear(); todo
 	//
 	mUpdateData.clear();
 	mUpdateTask.clear();
@@ -96,8 +97,8 @@ GamePhysicsManager::~GamePhysicsManager()
 //			//remove the BTSoftBodys from the inner list (&& from the update task)
 //			iterB = mSoftBodies.erase(iterB);
 //		}
-//
-//		//destroy all BTGhosts
+
+//		//destroy all BTGhosts xxx
 //		PTA(PT(BTGhost))::iterator iterC = mGhosts.begin();
 //		while (iterC != mGhosts.end())
 //		{
@@ -111,7 +112,7 @@ GamePhysicsManager::~GamePhysicsManager()
 	//clear parameters' tables
 	mRigidBodiesParameterTable.clear();
 //	mSoftBodiesParameterTable.clear(); xxx
-//	mGhostsParameterTable.clear();
+//	mGhostsParameterTable.clear(); xxx
 }
 
 /**
@@ -130,8 +131,6 @@ NodePath GamePhysicsManager::create_rigid_body(const string& name)
 	newRigidBody->mReferenceNP = mReferenceNP;
 	// reparent to reference node && set "this" NodePath
 	NodePath np = mReferenceNP.attach_new_node(newRigidBody);
-	// set the reference graphic window.
-//	newRigidBody->mWin = mWin;xxx
 	// initialize the new RigidBody (could use mReferenceNP, mThisNP, mWin)
 	newRigidBody->do_initialize();
 
@@ -158,8 +157,6 @@ bool GamePhysicsManager::destroy_rigid_body(NodePath rigidBodyNP)
 
 	// give a chance to BTRigidBody to cleanup itself before being destroyed.
 	rigid_body->do_finalize();
-	// reset the reference graphic window.
-//	rigid_body->mWin.clear();xxx
 	//remove the BTRigidBody from the inner list (&& from the update task)
 	mRigidBodies.erase(iter);
 	//
@@ -242,7 +239,7 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 
 /**
  * Creates a BTGhost with a given (mandatory && not empty) name.
- * Returns a NodePath to the new BTGhost,or an empty NodePath with the xxx
+ * Returns a NodePath to the new BTGhost,or an empty NodePath with the
  * ET_fail error type set on error.
  */
 //NodePath GamePhysicsManager::create_ghost(const string& name) xxx
@@ -339,7 +336,7 @@ void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& pa
 //		}
 //		return;
 //	}
-//	if (type == GHOST)
+//	if (type == GHOST) xxx
 //	{
 //		//find from mParameterTable the paramName's values to be overwritten
 //		iterRange = mGhostsParameterTable.equal_range(paramName);
@@ -389,7 +386,7 @@ ValueList<string> GamePhysicsManager::get_parameter_values(PhysicsType type,
 //		}
 //		return strList;
 //	}
-//	if (type == GHOST)
+//	if (type == GHOST) xxx
 //	{
 //		iterRange = mGhostsParameterTable.equal_range(paramName);
 //		if (iterRange.first != iterRange.second)
@@ -461,7 +458,7 @@ ValueList<string> GamePhysicsManager::get_parameter_name_list(PhysicsType type) 
 //		}
 //		return strList;
 //	}
-//	if (type == GHOST)
+//	if (type == GHOST) xxx
 //	{
 //		tempTable = mGhostsParameterTable;
 //		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
@@ -550,7 +547,7 @@ void GamePhysicsManager::set_parameters_defaults(PhysicsType type)
 //		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
 //		return;
 //	}
-//	if (type == GHOST)
+//	if (type == GHOST) xxx
 //	{
 //		///mGhostsParameterTable must be the first cleared
 //		mGhostsParameterTable.clear();
@@ -613,7 +610,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 //	{
 //		mSoftBodies[index]->update(dt);
 //	}
-//	// call all BTGhosts' update functions, passing delta time
+//	// call all BTGhosts' update functions, passing delta time xxx
 //	for (PTA(PT(BTGhost))::size_type index = 0;
 //			index < mGhosts.size(); ++index)
 //	{
@@ -693,22 +690,22 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 							(PandaNode *) static_cast<const btRigidBody*>(pManifold->getBody0())->getUserPointer();
 					PandaNode *node1 =
 							(PandaNode *) static_cast<const btRigidBody*>(pManifold->getBody1())->getUserPointer();
-					PT(PandaNode/*Component*/)physicsComponent0 =
-					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node0);
-					PT(PandaNode/*Component*/)physicsComponent1 =
-					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node1);
+//					PT(PandaNode/*Component*/)physicsComponent0 = todo
+//					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node0);
+//					PT(PandaNode/*Component*/)physicsComponent1 = todo
+//					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node1);
 					//insert a default: check of equality is done only on CollidingNodePair::mPnode member
-					std::pair<std::set<CollidingNodePair>::iterator, bool> res =
+					pair<pset<CollidingNodePair>::iterator, bool> res =
 							mCollidingNodePairs.insert(
 									CollidingNodePair(node0, node1));
 					if (res.second)
 					{
 						//this is a "new" colliding object pair
 						//event name: <CollidingObjectType1>_<CollidingObjectType2>_Collision
-						std::string objectType0/* =
-								physicsComponent0->getOwnerObject()->objectTmpl()->objectType() xxx*/;
-						std::string objectType1/* =
-								physicsComponent1->getOwnerObject()->objectTmpl()->objectType() xxx*/;
+						string objectType0 = node0->get_type().get_name()
+								/* physicsComponent0->getOwnerObject()->objectTmpl()->objectType() todo*/;
+						string objectType1 = node1->get_type().get_name()
+								/* physicsComponent1->getOwnerObject()->objectTmpl()->objectType() todo*/;
 						//alphabetically compare
 						if (objectType0 < objectType1)
 						{
@@ -716,9 +713,9 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 									objectType0 + "_" + objectType1
 											+ "_Collision";
 							(res.first)->mCollidingNodePairData->mEventParameters[0] =
-									EventParameter(physicsComponent0);
+									EventParameter(/*physicsComponent0 xxx*/node0);
 							(res.first)->mCollidingNodePairData->mEventParameters[1] =
-									EventParameter(physicsComponent1);
+									EventParameter(/*physicsComponent1 xxx*/node1);
 						}
 						else
 						{
@@ -726,9 +723,9 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 									objectType1 + "_" + objectType0
 											+ "_Collision";
 							(res.first)->mCollidingNodePairData->mEventParameters[0] =
-									EventParameter(physicsComponent1);
+									EventParameter(/*physicsComponent1 xxx*/node1);
 							(res.first)->mCollidingNodePairData->mEventParameters[1] =
-									EventParameter(physicsComponent0);
+									EventParameter(/*physicsComponent0 xxx*/node0);
 						}
 						//throw the event
 						throw_event(
@@ -766,7 +763,7 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 		}
 
 		//erase just stopped to collide object pairs (which have not the count flag updated)
-		for (std::set<CollidingNodePair>::iterator i =
+		for (pset<CollidingNodePair>::iterator i =
 				mCollidingNodePairs.begin(); i != mCollidingNodePairs.end();)
 		{
 			//check if it has a previous count
@@ -855,7 +852,7 @@ void GamePhysicsManager::stop_default_update()
  * - dynamic: if true the shape is dynamic (TRIANGLEMESH shape).
  * Returns the created BulletShape, or NULL on error.
  */
-PT(BulletShape)GamePhysicsManager::createShape(NodePath modelNP,
+PT(BulletShape)GamePhysicsManager::create_shape(NodePath modelNP,
 		ShapeType shapeType, ShapeSize shapeSize, LVecBase3f& modelDims,
 		LVector3f& modelDeltaCenter, float& modelRadius,
 		float& dim1, float& dim2, float& dim3, float& dim4,
@@ -1123,15 +1120,21 @@ Pair<bool,float> GamePhysicsManager::get_collision_height(const LPoint3f& fromPo
 	return Pair<bool, float>(false, 0.0);
 }
 
-void GamePhysicsManager::doEnableCollisionNotify(EventThrown event, ThrowEventData eventData)
+void GamePhysicsManager::enable_collision_notify(EventThrown event, /*const string& eventName, xxx*/
+		float eventFreq)
 {
 	//some checks
-	RETURN_ON_COND(eventData.mEventName == std::string(""),)
-	if (eventData.mFrequency <= 0.0)
+//	RETURN_ON_COND(eventName == string(""),) xxx
+
+	if (eventFreq <= 0.0)
 	{
-		eventData.mFrequency = 30.0;
+		eventFreq = 30.0;
 	}
 
+	ThrowEventData eventData;
+	eventData.mEnable = true;
+//	eventData.mEventName = eventName; xxx
+	eventData.mFrequency = eventFreq;
 	switch (event)
 	{
 	case COLLISIONNOTIFY:
@@ -1241,7 +1244,7 @@ bool GamePhysicsManager::read_from_bam_file(const string& fileName)
 }
 
 
-void GamePhysicsManager::initDebug()
+void GamePhysicsManager::init_debug()
 {
 #ifdef ELY_DEBUG
 	mBulletDebugNodePath.reparent_to(mReferenceNP);

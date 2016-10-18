@@ -44,8 +44,7 @@ class EXPORT_CLASS GamePhysicsManager: public TypedReferenceCount,
 		public Singleton<GamePhysicsManager>
 {
 PUBLISHED:
-	GamePhysicsManager(/*PT(GraphicsWindow) win xxx,*/ int taskSort = 10,
-			const NodePath& root = NodePath(),
+	GamePhysicsManager(int taskSort = 10, const NodePath& root = NodePath(),
 			const CollideMask& mask = GeomNode::get_default_collide_mask());
 	virtual ~GamePhysicsManager();
 
@@ -104,8 +103,8 @@ PUBLISHED:
 	MAKE_SEQ(get_rigid_bodies, get_num_rigid_bodies, get_rigid_body);
 	///@}
 
-//	/** xxx
-//	 * \name BTSoftBody
+//	/**
+//	 * \name BTSoftBody xxx
 //	 */
 //	///@{
 //	NodePath create_soft_body(const string& name);
@@ -114,9 +113,9 @@ PUBLISHED:
 //	INLINE int get_num_soft_bodies() const;
 //	MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body);
 //	///@}
-//
+
 //	/**
-//	 * \name BTGhost
+//	 * \name BTGhost xxx
 //	 */
 //	///@{
 //	NodePath create_ghost(const string& name);
@@ -158,21 +157,20 @@ PUBLISHED:
 	 * \name BULLET WORLD
 	 */
 	///@{
-	INLINE PT(BulletWorld) bulletWorld() const; //xxx
+	INLINE PT(BulletWorld) get_bullet_world() const;
 	///@}
 
 	/**
-	 * \name UTILITIES xxx
+	 * \name UTILITIES
 	 */
 	///@{
-	PT(BulletShape) createShape(NodePath modelNP, ShapeType shapeType,
+	PT(BulletShape) create_shape(NodePath modelNP, ShapeType shapeType,
 			ShapeSize shapeSize, LVecBase3f& modelDims, LVector3f& modelDeltaCenter,
 			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
 			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
-			const Filename& heightfieldFile = Filename(""), bool dynamic = false);//xxx
-	INLINE PT(PandaNode/*Component*/) getPhysicsComponentByPandaNode(PT(PandaNode) pandaNode);//xxx
-	INLINE void setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,
-			PT(PandaNode/*Component*/) physicsComponent); //xxx
+			const Filename& heightfieldFile = Filename(""), bool dynamic = false);
+//	INLINE PT(PandaNode/*Component*/) getPhysicsComponentByPandaNode(PT(PandaNode) pandaNode);//todo
+//	INLINE void setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,	PT(PandaNode/*Component*/) physicsComponent); //todo
 	float get_bounding_dimensions(NodePath modelNP, LVecBase3f& modelDims,
 			LVector3f& modelDeltaCenter) const;
 	Pair<bool,float> get_collision_height(const LPoint3f& fromPos);
@@ -193,13 +191,13 @@ PUBLISHED:
 	 * \brief Enable/disable collisions' notification through events.
 	 * @param enable Enabling flag.
 	 */
-	INLINE void enableCollisionNotify(EventThrown event,
-			ThrowEventData eventData);
+	void enable_collision_notify(EventThrown event, /*const string& eventName, xxx*/
+			float eventFreq);
 
 	/**
 	 * \brief Initializes debugging.
 	 */
-	void initDebug();
+	void init_debug();
 	/**
 	 * \brief Enables/disables debugging.
 	 * @param enable True to enable, false to disable.
@@ -223,8 +221,6 @@ private:
 	/// Bullet world.
 	PT(BulletWorld) mBulletWorld;
 
-	///The reference graphic window.
-//	PT(GraphicsWindow) mWin; xxx
 	///The update task sort (should be >0).
 	int mTaskSort;
 
@@ -242,16 +238,16 @@ private:
 //	SoftBodyList mSoftBodies;
 //	///BTSoftBodys' parameter table.
 //	ParameterTable mSoftBodiesParameterTable;
-//
-//	///List of BTGhosts handled by this manager.
+
+//	///List of BTGhosts handled by this manager. xxx
 //	typedef pvector<PT(BTGhost)> GhostList;
 //	GhostList mGhosts;
 //	///BTGhosts' parameter table.
 //	ParameterTable mGhostsParameterTable;
 
-	///Table of all physics components indexed by (underlying) Bullet PandaNodes.
-	///This is used, for example, during ray casting.
-	pmap<PT(PandaNode), PT(PandaNode/*Component*/)> mPhysicsComponentPandaNodeTable;
+//	///Table of all physics components indexed by (underlying) Bullet PandaNodes.
+//	///This is used, for example, during ray casting.
+//	pmap<PT(PandaNode), PT(PandaNode/*Component*/)> mPhysicsComponentPandaNodeTable; todo
 
 	///@{
 	///A task data for step simulation update.
@@ -262,7 +258,7 @@ private:
 	///Unique ref.
 	int mRef;
 
-	///Utilities. xxx
+	///Utilities.
 	CollideMask mMask; //a.k.a. BitMask32
 
 	/**
@@ -273,8 +269,8 @@ private:
 	{
 		struct CollidingNodePairData
 		{
-			std::pair<PandaNode*, PandaNode*> mPnode;
-			std::string mEventName;
+			pair<PandaNode*, PandaNode*> mPnode;
+			string mEventName;
 			EventParameter mEventParameters[2];
 			int mCount;
 		};
@@ -286,26 +282,26 @@ private:
 			// (use the pointer value..)
 			if (_pnode0 > _pnode1)
 			{
-				mCollidingNodePairData->mPnode = std::make_pair(_pnode1, _pnode0);
+				mCollidingNodePairData->mPnode = make_pair(_pnode1, _pnode0);
 			}
 			else
 			{
-				mCollidingNodePairData->mPnode = std::make_pair(_pnode0, _pnode1);
+				mCollidingNodePairData->mPnode = make_pair(_pnode0, _pnode1);
 			}
 			*mRefCount = 1;
 		}
-		CollidingNodePair(PandaNode *_pnode0, PandaNode *_pnode1, const std::string& _name, int _count) :
+		CollidingNodePair(PandaNode *_pnode0, PandaNode *_pnode1, const string& _name, int _count) :
 				mCollidingNodePairData(new CollidingNodePairData), mRefCount(new int)
 		{
 			// always create the pair in a predictable order
 			// (use the pointer value..)
 			if (_pnode0 > _pnode1)
 			{
-				mCollidingNodePairData->mPnode = std::make_pair(_pnode1, _pnode0);
+				mCollidingNodePairData->mPnode = make_pair(_pnode1, _pnode0);
 			}
 			else
 			{
-				mCollidingNodePairData->mPnode = std::make_pair(_pnode0, _pnode1);
+				mCollidingNodePairData->mPnode = make_pair(_pnode0, _pnode1);
 			}
 			mCollidingNodePairData->mEventName = _name;
 			mCollidingNodePairData->mCount = _count;
@@ -344,11 +340,10 @@ private:
 		int* mRefCount;
 	};
 	ThrowEventData mCollisionNotify;
-	std::set<CollidingNodePair> mCollidingNodePairs;
+	pset<CollidingNodePair> mCollidingNodePairs;
 	btCollisionDispatcher* mCollisionDispatcher;
 	///Helpers.
-	float do_get_dim(ShapeSize shapeSize, float d1, float d2);//xxx private?
-	void doEnableCollisionNotify(EventThrown event, ThrowEventData eventData);
+	float do_get_dim(ShapeSize shapeSize, float d1, float d2);
 	///@}
 
 	/// Bullet Debug node path.

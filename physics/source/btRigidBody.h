@@ -108,7 +108,7 @@ PUBLISHED:
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	void switchType(BodyType bodyType);
+	void switch_body_type(BodyType bodyType);
 	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);
 	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
 	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);
@@ -192,7 +192,7 @@ private:
 	///@{
 	void do_check_auto_shaping();
 	///Geometric functions and parameters.
-	PT(BulletShape) doCreateShape(GamePhysicsManager::ShapeType shapeType,
+	PT(BulletShape) do_create_shape(GamePhysicsManager::ShapeType shapeType,
 			const NodePath& objectNP);
 	LVecBase3f mModelDims;
 	float mModelRadius;

@@ -68,6 +68,8 @@ def setParametersBeforeCreation():
             "body_mass", "10.0")
     physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
             "collide_mask", "0x10")
+    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+            "object", "PlayerNP")
 
     # set soft_body's parameters
     physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "static",
@@ -254,6 +256,12 @@ def toggleDebugDraw():
     toggleDebugFlag = not toggleDebugFlag
     GamePhysicsManager.get_global_ptr().debug(toggleDebugFlag)
 
+def collisionNotify(name, object0, object1):
+    """collision notify"""
+
+    print ("got '" + name + "' between '" + object0.get_name() +
+           "' and '" + object1.get_name() + "'")
+
 if __name__ == '__main__':
 
     msg = "'BTRigidBody & BTSoftBody & BTGhost'"
@@ -292,7 +300,7 @@ if __name__ == '__main__':
         sceneRigidBody = sceneRigidBodyNP.node()
         # set some parameters: trimesh shape, static, collide mask etc...
         sceneRigidBody.set_shape_type(GamePhysicsManager.TRIANGLEMESH)
-        sceneRigidBody.switchType(BTRigidBody.STATIC)
+        sceneRigidBody.switch_body_type(BTRigidBody.STATIC)
         sceneRigidBodyNP.set_collide_mask(mask)
         sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0))
         # setup the player's rigid body
@@ -301,17 +309,15 @@ if __name__ == '__main__':
         # set various creation parameters as string for other rigid bodies
         setParametersBeforeCreation()
 
-        # get a player with anims
+        # get a player with anims, reparent to reference node, set transform
         playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
+        playerNP.reparent_to(physicsMgr.get_reference_node_path())
+        playerNP.set_pos(LPoint3f(4.1, -12.0, 100.1))
+        playerNP.set_hpr(LVecBase3f(0.0, 90.0, 0.0))
         # create player's rigid_body (attached to the reference node)
         playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
         # get a reference to the player's rigid_body
         playerRigidBody = playerRigidBodyNP.node()
-        # set some parameters
-        playerRigidBodyNP.set_pos(LPoint3f(4.1, -12.0, 100.0))
-        # setup the player's rigid body
-        playerRigidBody.setup(playerNP)
-        
     else:
         # valid bamFile
         # reparent reference node to render
@@ -332,9 +338,14 @@ if __name__ == '__main__':
         setParametersBeforeCreation()
 
     # setup DEBUG DRAWING
-    physicsMgr.initDebug()
+    physicsMgr.init_debug()
     app.accept("d", toggleDebugDraw)
             
+    # enable collision notify event: BTRigidBody_BTRigidBody_Collision
+    physicsMgr.enable_collision_notify(GamePhysicsManager.COLLISIONNOTIFY, 10.0)
+    app.accept("BTRigidBody_BTRigidBody_Collision", collisionNotify, 
+               ["BTRigidBody_BTRigidBody_Collision"])
+
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()
     playerRigidBody.set_update_callback(rigid_bodyCallback)

@@ -10,7 +10,7 @@
 #endif
 
 #include "btRigidBody.h"
-//#include <cmath>
+#include "transformState.h"
 
 #ifndef CPPPARSER
 #endif //CPPPARSER
@@ -269,23 +269,23 @@ void BTRigidBody::do_initialize()
 			GamePhysicsManager::RIGIDBODY, string("body_type"));
 	if (bodyType == string("static"))
 	{
-		switchType(STATIC);
+		switch_body_type(STATIC);
 	}
 	else if (bodyType == string("kinematic"))
 	{
-		switchType(KINEMATIC);
+		switch_body_type(KINEMATIC);
 	}
 	else
 	{
-		switchType(DYNAMIC);
+		switch_body_type(DYNAMIC);
 	}
-	//use shape of (another object)
+
+	//	// use shape of (another object)
 //	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); xxx
-	//add to table of all physics components indexed by
-	//(underlying) Bullet PandaNodes
-	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(
-			this, this);
-	//
+
+//	// add to table of all physics components indexed by (underlying) Bullet PandaNodes
+//	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(this, this); todo
+
 	//object setting
 	string object = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
 			string("object"));
@@ -295,6 +295,10 @@ void BTRigidBody::do_initialize()
 		NodePath objectNP = mReferenceNP.find(string("**/") + object);
 		if (!objectNP.is_empty())
 		{
+			// inherit the TrasformState from the object
+			set_transform(objectNP.node()->get_transform());
+			// reset object's TrasformState
+			objectNP.set_transform(TransformState::make_identity());
 			setup(objectNP);
 		}
 	}
@@ -367,7 +371,7 @@ void BTRigidBody::setup(NodePath& objectNP)
 	// Note: the object node path (if !empty) has scaling already applied.
 
 	// add a Collision Shape
-	add_shape(doCreateShape(mShapeType, objectNP));
+	add_shape(do_create_shape(mShapeType, objectNP));
 
 	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
 	//dynamic, etc...) after it has been attached to the world, you must first
@@ -378,7 +382,7 @@ void BTRigidBody::setup(NodePath& objectNP)
 	///BUG>
 
 	// attach this to Bullet World
-	GamePhysicsManager::get_global_ptr()->bulletWorld()->attach(this);
+	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
 
 	// correct (or possibly reset to zero) transform of the object node path
 	if (! objectNP.is_empty())
@@ -488,10 +492,10 @@ void BTRigidBody::do_finalize()
 {
 	//cleanup (if needed)
 	cleanup();
-	//remove from table of all physics components indexed by
-	//(underlying) Bullet PandaNodes
-	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
-			this, NULL);
+
+//	//remove from table of all physics components indexed by (underlying) Bullet PandaNodes
+//	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(this, NULL); todo
+
 #ifdef PYTHON_BUILD
 	//Python callback
 	Py_DECREF(mSelf);
@@ -522,7 +526,7 @@ void BTRigidBody::cleanup()
 	}
 
 	//remove rigid body from the physics world
-	GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(this);
+	GamePhysicsManager::GetSingletonPtr()->get_bullet_world()->remove(this);
 
 	// remove all shapes
 	for (int i = 0 ; i < get_num_shapes(); ++i)
@@ -538,7 +542,7 @@ void BTRigidBody::cleanup()
  * For DYNAMIC type mass must be >0.0 for type to be changed. For STATIC and
  * KINEMATIC mass is reset to 0.0.
  */
-void BTRigidBody::switchType(BodyType bodyType)
+void BTRigidBody::switch_body_type(BodyType bodyType)
 {
 	// return if DYNAMIC && mass==0.0
 	RETURN_ON_COND((bodyType == DYNAMIC) && (get_mass() == 0.0),)
@@ -573,8 +577,9 @@ void BTRigidBody::switchType(BodyType bodyType)
 
 /**
  * Creates a shape given its type.
+ * \note Internal use only.
  */
-PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeType,
+PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::ShapeType shapeType,
 		const NodePath& objectNP)
 {
 //	//check if it should use shape of another (already) created object xxx
@@ -621,7 +626,7 @@ PT(BulletShape)BTRigidBody::doCreateShape(GamePhysicsManager::ShapeType shapeTyp
 //			shapeNodePath = NodePath(DCAST(InstanceOf, sceneComp)->getNodePath().node());
 //		}
 //	}
-	return GamePhysicsManager::GetSingletonPtr()->createShape(
+	return GamePhysicsManager::GetSingletonPtr()->create_shape(
 			shapeNodePath, mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
 			mDim3, mDim4, mAutomaticShaping, mUpAxis,

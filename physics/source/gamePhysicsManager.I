@@ -43,16 +43,16 @@ INLINE int GamePhysicsManager::get_num_rigid_bodies() const
 	return (int) mRigidBodies.size();
 }
 
-///** xxx
-// * Returns the number of BTSoftBodys.
+///**
+// * Returns the number of BTSoftBodys. xxx
 // */
 //INLINE int GamePhysicsManager::get_num_soft_bodies() const
 //{
 //	return (int) mSoftBodies.size();
 //}
-//
+
 ///**
-// * Returns the number of BTGhosts.
+// * Returns the number of BTGhosts. xxx
 // */
 //INLINE int GamePhysicsManager::get_num_ghosts() const
 //{
@@ -70,43 +70,38 @@ INLINE GamePhysicsManager* GamePhysicsManager::get_global_ptr()
 /**
  * Returns a reference to the Bullet world.
  */
-INLINE PT(BulletWorld) GamePhysicsManager::bulletWorld() const
+INLINE PT(BulletWorld) GamePhysicsManager::get_bullet_world() const
 {
 	return mBulletWorld;
 }
 
-/**
- * Returns the physic PandaNode given the (underlying) Bullet PandaNode.
- */
-INLINE PT(PandaNode/*Component*/) GamePhysicsManager::getPhysicsComponentByPandaNode(
-		PT(PandaNode) pandaNode)
-{
-	return mPhysicsComponentPandaNodeTable[pandaNode];
-}
+///**
+// * Returns the physic PandaNode given the (underlying) Bullet PandaNode. todo
+// */
+//INLINE PT(PandaNode/*Component*/) GamePhysicsManager::getPhysicsComponentByPandaNode(
+//		PT(PandaNode) pandaNode)
+//{
+//	return mPhysicsComponentPandaNodeTable[pandaNode];
+//}
 
-/**
- * Sets the physics PandaNode given the (underlying) Bullet PandaNode as first
- * parameter.
- * If the Bullet PandaNode is set to NULL the physics PandaNode related to it
- * will be erased.
- */
-INLINE void GamePhysicsManager::setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,
-		PT(PandaNode/*Component*/) physicsComponent)
-{
-	if (physicsComponent)
-	{
-		mPhysicsComponentPandaNodeTable[pandaNode] = physicsComponent;
-	}
-	else
-	{
-		mPhysicsComponentPandaNodeTable.erase(pandaNode);
-	}
-}
-
-INLINE void GamePhysicsManager::enableCollisionNotify(EventThrown event, ThrowEventData eventData)
-{
-	doEnableCollisionNotify(event, eventData);
-}
+///**
+// * Sets the physics PandaNode given the (underlying) Bullet PandaNode as first todo
+// * parameter.
+// * If the Bullet PandaNode is set to NULL the physics PandaNode related to it
+// * will be erased.
+// */
+//INLINE void GamePhysicsManager::setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,
+//		PT(PandaNode/*Component*/) physicsComponent)
+//{
+//	if (physicsComponent)
+//	{
+//		mPhysicsComponentPandaNodeTable[pandaNode] = physicsComponent;
+//	}
+//	else
+//	{
+//		mPhysicsComponentPandaNodeTable.erase(pandaNode);
+//	}
+//}
 
 /**
  * Returns the collide mask.
