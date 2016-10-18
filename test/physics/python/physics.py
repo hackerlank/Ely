@@ -5,8 +5,9 @@ Created on Oct 09, 2016
 '''
 
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
-        LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
-        ClockObject, TextNode, LPoint3f, LVecBase3f
+        PNMImage, NodePath, AnimControlCollection, auto_bind, PartGroup, \
+        ClockObject, TextNode, LPoint3f, LVecBase3f, GeoMipTerrain, \
+        Filename, TextureStage, TexturePool, LVecBase2f
 from direct.showbase.ShowBase import ShowBase
 import panda3d.bullet
 from p3physics import GamePhysicsManager, BTRigidBody
@@ -18,6 +19,8 @@ dataDir = "../../data"
 app = None
 mask = BitMask32(0x10)
 updateTask = None
+terrain = None
+terrainRootNetPos = None
 # models and animations
 modelFile = ["eve.egg", "ralph.egg", "sparrow.egg", "ball.egg", "red_car.egg"]
 modelAnimFiles = [["eve-walk.egg", "eve-run.egg"],
@@ -132,6 +135,66 @@ def loadTerrainLowPoly(name, widthScale=128, heightScale=64.0,
     tex = app.loader.load_texture(texture)
     terrainNP.set_texture(tex)
     return terrainNP
+
+def terrainUpdate(task):
+    """terrain update"""
+
+    global app, terrain, terrainRootNetPos
+    # set focal point
+    # see https:#www.panda3d.org/forums/viewtopic.php?t=5384
+    focalPointNetPos = app.camera.get_net_transform().get_pos()
+    terrain.set_focal_point(focalPointNetPos - terrainRootNetPos)
+    # update every frame
+    terrain.update()
+    #
+    return task.cont
+
+def loadTerrain(name, widthScale = 0.5, heightScale = 10.0):
+    """load terrain stuff"""
+
+    global app, terrain, terrainRootNetPos
+        
+    terrain = GeoMipTerrain("terrain")
+    heightField = PNMImage(Filename(dataDir + "/heightfield.png"))
+    terrain.set_heightfield(heightField)
+    # sizing
+    environmentWidthX = (heightField.get_x_size() - 1) * widthScale
+    environmentWidthY = (heightField.get_y_size() - 1) * widthScale
+    environmentWidth = (environmentWidthX + environmentWidthY) / 2.0
+    terrain.get_root().set_sx(widthScale)
+    terrain.get_root().set_sy(widthScale)
+    terrain.get_root().set_sz(heightScale)
+    # set other terrain's properties
+    blockSize, minimumLevel = (64, 0)
+    nearPercent, farPercent = (0.1, 0.7)
+    terrainLODmin = min(minimumLevel, terrain.get_max_level())
+    flattenMode = GeoMipTerrain.AFM_off
+    terrain.set_block_size(blockSize)
+    terrain.set_near(nearPercent * environmentWidth)
+    terrain.set_far(farPercent * environmentWidth)
+    terrain.set_min_level(terrainLODmin)
+    terrain.set_auto_flatten(flattenMode)
+    # terrain texturing
+    textureStage0 = TextureStage("TextureStage0")
+    textureImage = TexturePool.load_texture(Filename("terrain.png"))
+    terrain.get_root().set_tex_scale(textureStage0, 1.0, 1.0)
+    terrain.get_root().set_texture(textureStage0, textureImage, 1)
+    # reparent this Terrain node path to the object node path
+    terrain.get_root().set_collide_mask(mask)
+    terrain.get_root().set_name(name)
+    # brute force generation
+    bruteForce = True
+    terrain.set_bruteforce(bruteForce)
+    # Generate the terrain
+    terrain.generate()
+    # check if terrain needs update or not
+    if not bruteForce:
+        # save the net pos of terrain root
+        terrainRootNetPos = terrain.get_root().get_net_transform().get_pos()
+        # Add a task to keep updating the terrain
+        app.taskMgr.add(terrainUpdate, "terrainUpdate", appendTask=True)
+    #
+    return terrain.get_root()
 
 def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
     """get model and animations"""
@@ -292,13 +355,19 @@ if __name__ == '__main__':
         physicsMgr.get_reference_node_path().reparent_to(app.render)
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
-        sceneNP = loadTerrainLowPoly("SceneNP")
+#         sceneNP = loadTerrainLowPoly("SceneNP")
+        sceneNP = loadTerrain("SceneNP")
         # create scene's rigid_body (attached to the reference node)
         sceneRigidBodyNP = physicsMgr.create_rigid_body("SceneRigidBody")
         # get a reference to the scene's rigid_body
         sceneRigidBody = sceneRigidBodyNP.node()
         # set some parameters: trimesh shape, static, collide mask etc...
-        sceneRigidBody.set_shape_type(GamePhysicsManager.TRIANGLEMESH)
+#         sceneRigidBody.set_shape_type(GamePhysicsManager.TRIANGLEMESH)
+        sceneRigidBody.set_shape_type(GamePhysicsManager.HEIGHTFIELD)
+        sceneRigidBody.set_shape_heightfield_file(dataDir + "/heightfield.png")
+        sceneRigidBody.set_shape_scale_width_depth(LVecBase2f(0.5, 0.5))
+        sceneRigidBody.set_shape_height(10.0)
+        # other parameters
         sceneRigidBody.switch_body_type(BTRigidBody.STATIC)
         sceneRigidBodyNP.set_collide_mask(mask)
         sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0))
@@ -341,9 +410,9 @@ if __name__ == '__main__':
     app.accept("d", toggleDebugDraw)
             
     # enable collision notify event: BTRigidBody_BTRigidBody_Collision
-#     physicsMgr.enable_collision_notify(GamePhysicsManager.COLLISIONNOTIFY, 10.0)
-#     app.accept("BTRigidBody_BTRigidBody_Collision", collisionNotify, 
-#                ["BTRigidBody_BTRigidBody_Collision"])
+    physicsMgr.enable_collision_notify(GamePhysicsManager.COLLISIONNOTIFY, 10.0)
+    app.accept("BTRigidBody_BTRigidBody_Collision", collisionNotify, 
+               ["BTRigidBody_BTRigidBody_Collision"])
 
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()

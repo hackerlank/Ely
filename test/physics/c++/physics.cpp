@@ -9,6 +9,8 @@
 #include <load_prc_file.h>
 #include <texturePool.h>
 #include <auto_bind.h>
+#include <geoMipTerrain.h>
+#include <texturePool.h>
 
 #include <gamePhysicsManager.h>
 #include <btRigidBody.h>
@@ -19,6 +21,8 @@ PandaFramework framework;
 WindowFramework *window = NULL;
 CollideMask mask = BitMask32(0x10);
 AsyncTask* updateTask = NULL;
+static GeoMipTerrain* terrain;
+static LPoint3f terrainRootNetPos;
 // models and animations
 string modelFile[5] =
 { "eve.egg", "ralph.egg", "sparrow.egg", "ball.egg", "red_car.egg" };
@@ -168,6 +172,71 @@ NodePath loadTerrainLowPoly(const string& name, float widthScale = 128,
 	TexturePool::load_texture(Filename(texture));
 	terrainNP.set_texture(tex);
 	return terrainNP;
+}
+
+// terrain update
+static AsyncTask::DoneStatus terrainUpdate(GenericAsyncTask* task, void* data)
+{
+	//set focal point
+	//see https://www.panda3d.org/forums/viewtopic.php?t=5384
+	LPoint3f focalPointNetPos =
+			window->get_camera_group().get_net_transform()->get_pos();
+	terrain->set_focal_point(focalPointNetPos - terrainRootNetPos);
+	//update every frame
+	terrain->update();
+	//
+	return AsyncTask::DS_cont;
+}
+
+// load terrain stuff
+NodePath loadTerrain(const string& name, float widthScale = 0.5,
+		float heightScale = 10.0)
+{
+	GeoMipTerrain *terrain = new GeoMipTerrain("terrain");
+	PNMImage heightField(Filename(dataDir + string("/heightfield.png")));
+	terrain->set_heightfield(heightField);
+	//sizing
+	float environmentWidthX = (heightField.get_x_size() - 1) * widthScale;
+	float environmentWidthY = (heightField.get_y_size() - 1) * widthScale;
+	float environmentWidth = (environmentWidthX + environmentWidthY) / 2.0;
+	terrain->get_root().set_sx(widthScale);
+	terrain->get_root().set_sy(widthScale);
+	terrain->get_root().set_sz(heightScale);
+	//set other terrain's properties
+	unsigned short blockSize = 64, minimumLevel = 0;
+	float nearPercent = 0.1, farPercent = 0.7;
+	float terrainLODmin = min<float>(minimumLevel, terrain->get_max_level());
+	GeoMipTerrain::AutoFlattenMode flattenMode = GeoMipTerrain::AFM_off;
+	terrain->set_block_size(blockSize);
+	terrain->set_near(nearPercent * environmentWidth);
+	terrain->set_far(farPercent * environmentWidth);
+	terrain->set_min_level(terrainLODmin);
+	terrain->set_auto_flatten(flattenMode);
+	//terrain texturing
+	PT(TextureStage)textureStage0 = new TextureStage("TextureStage0");
+	PT(Texture)textureImage = TexturePool::load_texture(
+			Filename(string("terrain.png")));
+	terrain->get_root().set_tex_scale(textureStage0, 1.0, 1.0);
+	terrain->get_root().set_texture(textureStage0, textureImage, 1);
+	terrain->get_root().set_collide_mask(mask);
+	terrain->get_root().set_name(name);
+	//brute force generation
+	bool bruteForce = true;
+	terrain->set_bruteforce(bruteForce);
+	//Generate the terrain
+	terrain->generate();
+	//check if terrain needs update or not
+	if (not bruteForce)
+	{
+		//save the net pos of terrain root
+		terrainRootNetPos = terrain->get_root().get_net_transform()->get_pos();
+		// Add a task to keep updating the terrain
+		framework.get_task_mgr().add(
+				new GenericAsyncTask("terrainUpdate", &terrainUpdate,
+						(void*) nullptr));
+	}
+	//
+	return terrain->get_root();
 }
 
 // get model and animations
@@ -353,7 +422,8 @@ int main(int argc, char *argv[])
 		physicsMgr->get_reference_node_path().reparent_to(window->get_render());
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
-		sceneNP = loadTerrainLowPoly("SceneNP");
+//		sceneNP = loadTerrainLowPoly("SceneNP");
+		sceneNP = loadTerrain("SceneNP", 0.5, 10.0);
 		// create scene's rigid_body (attached to the reference node)
 		NodePath sceneRigidBodyNP =
 				physicsMgr->create_rigid_body("SceneRigidBody");
@@ -361,7 +431,12 @@ int main(int argc, char *argv[])
 		PT(BTRigidBody) sceneRigidBody =
 				DCAST(BTRigidBody, sceneRigidBodyNP.node());
 		// set some parameters: trimesh shape, static, collide mask etc...
-		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
+//		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
+		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
+		sceneRigidBody->set_shape_heightfield_file(dataDir + string("/heightfield.png"));
+		sceneRigidBody->set_shape_scale_width_depth(LVecBase2f(0.5, 0.5));
+		sceneRigidBody->set_shape_height(10.0);
+		// other parameters
 		sceneRigidBody->switch_body_type(BTRigidBody::STATIC);
 		sceneRigidBodyNP.set_collide_mask(mask);
 		sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0));
@@ -414,9 +489,9 @@ int main(int argc, char *argv[])
 			nullptr);
 
 	// enable collision notify event: BTRigidBody_BTRigidBody_Collision
-//	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
-//	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
-//			&collisionNotify, nullptr);
+	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
+	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
+			&collisionNotify, nullptr);
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();

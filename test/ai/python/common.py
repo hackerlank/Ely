@@ -82,13 +82,24 @@ def loadTerrainLowPoly(name, widthScale=128, heightScale=64.0,
     terrainNP.set_texture(tex)
     return terrainNP
 
+def terrainUpdate(task):
+    """terrain update"""
+
+    global app, terrain, terrainRootNetPos
+    # set focal point
+    # see https:#www.panda3d.org/forums/viewtopic.php?t=5384
+    focalPointNetPos = app.camera.get_net_transform().get_pos()
+    terrain.set_focal_point(focalPointNetPos - terrainRootNetPos)
+    # update every frame
+    terrain.update()
+    #
+    return task.cont
+
 def loadTerrain(name, widthScale = 0.5, heightScale = 10.0):
     """load terrain stuff"""
 
     global app, terrain, terrainRootNetPos
         
-    steerMgr = GameAIManager.get_global_ptr()
-
     terrain = GeoMipTerrain("terrain")
     heightField = PNMImage(Filename(dataDir + "/heightfield.png"))
     terrain.set_heightfield(heightField)
@@ -115,7 +126,6 @@ def loadTerrain(name, widthScale = 0.5, heightScale = 10.0):
     terrain.get_root().set_tex_scale(textureStage0, 1.0, 1.0)
     terrain.get_root().set_texture(textureStage0, textureImage, 1)
     # reparent this Terrain node path to the object node path
-    terrain.get_root().reparent_to(steerMgr.get_reference_node_path())
     terrain.get_root().set_collide_mask(mask)
     terrain.get_root().set_name(name)
     # brute force generation
@@ -131,19 +141,6 @@ def loadTerrain(name, widthScale = 0.5, heightScale = 10.0):
         app.taskMgr.add(terrainUpdate, "terrainUpdate", appendTask=True)
     #
     return terrain.get_root()
-
-def terrainUpdate(task):
-    """terrain update"""
-
-    global app, terrain, terrainRootNetPos
-    # set focal point
-    # see https:#www.panda3d.org/forums/viewtopic.php?t=5384
-    focalPointNetPos = app.camera.get_net_transform().get_pos()
-    terrain.set_focal_point(focalPointNetPos - terrainRootNetPos)
-    # update every frame
-    terrain.update()
-    #
-    return task.cont
 
 def getCollisionEntryFromCamera():
     """throws a ray and returns the first collision entry or nullptr"""    
