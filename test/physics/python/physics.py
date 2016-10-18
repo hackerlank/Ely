@@ -176,33 +176,31 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
     #
     return modelNP
 
-def handlePlayerUpdate():
+def handlePlayerUpdate(currentVelSize = 0.0):
     """handles player on every update"""
     
-#     global playerRigidBody, playerAnimCtls, playerNP, playerHeightRayCast
-#     # get current forward velocity size
-#     currentVelSize = abs(playerRigidBody.get_current_speeds().get_first().get_y())
+    global playerAnimCtls#, playerRigidBody, playerNP, playerHeightRayCast
+    # handle vehicle's animation
+    for i in range(len(playerAnimCtls)):
+        if currentVelSize > 0.0:
+            if currentVelSize < 5.0: 
+                animOnIdx = 0
+            else:
+                animOnIdx = 1
+            animOffIdx = (animOnIdx + 1) % 2
+            # Off anim (0:walk, 1:run)
+            if playerAnimCtls[i][animOffIdx].is_playing():
+                playerAnimCtls[i][animOffIdx].stop()
+            # On amin (0:walk, 1:run)
+            playerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
+                                                    animRateFactor[animOnIdx])
+            if not playerAnimCtls[i][animOnIdx].is_playing():
+                playerAnimCtls[i][animOnIdx].loop(True)
+        else:
+            # stop any animation
+            playerAnimCtls[i][0].stop()
+            playerAnimCtls[i][1].stop()
 #     playerRigidBodyNP = NodePath.any_path(playerRigidBody)
-#     # handle vehicle's animation
-#     for i in range(len(playerAnimCtls)):
-#         if currentVelSize > 0.0:
-#             if currentVelSize < 5.0: 
-#                 animOnIdx = 0
-#             else:
-#                 animOnIdx = 1
-#             animOffIdx = (animOnIdx + 1) % 2
-#             # Off anim (0:walk, 1:run)
-#             if playerAnimCtls[i][animOffIdx].is_playing():
-#                 playerAnimCtls[i][animOffIdx].stop()
-#             # On amin (0:walk, 1:run)
-#             playerAnimCtls[i][animOnIdx].set_play_rate(currentVelSize * 
-#                                                     animRateFactor[animOnIdx])
-#             if not playerAnimCtls[i][animOnIdx].is_playing():
-#                 playerAnimCtls[i][animOnIdx].loop(True)
-#         else:
-#             # stop any animation
-#             playerAnimCtls[i][0].stop()
-#             playerAnimCtls[i][1].stop()
 #     # make playerNP kinematic (ie stand on floor)
 #     if currentVelSize > 0.0:
 #         # get control manager
@@ -236,8 +234,9 @@ def rigidBodyCallback(rigidBody):
     global playerRigidBody
     if rigidBody != playerRigidBody:
         return
-#     currentVelSize = abs(playerRigidBody.get_linear_velocity().length_squared())
-#     rigidBody[0].set_play_rate(0.1 + currentVelSize * 0.05)
+    currentVelSize = abs(playerRigidBody.get_linear_velocity().length())
+    # handle player on callback
+    handlePlayerUpdate(currentVelSize)
 
 # def softBodyCallback(soft_body):
 #     """soft body update callback function"""  
@@ -342,9 +341,9 @@ if __name__ == '__main__':
     app.accept("d", toggleDebugDraw)
             
     # enable collision notify event: BTRigidBody_BTRigidBody_Collision
-    physicsMgr.enable_collision_notify(GamePhysicsManager.COLLISIONNOTIFY, 10.0)
-    app.accept("BTRigidBody_BTRigidBody_Collision", collisionNotify, 
-               ["BTRigidBody_BTRigidBody_Collision"])
+#     physicsMgr.enable_collision_notify(GamePhysicsManager.COLLISIONNOTIFY, 10.0)
+#     app.accept("BTRigidBody_BTRigidBody_Collision", collisionNotify, 
+#                ["BTRigidBody_BTRigidBody_Collision"])
 
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()
@@ -352,7 +351,7 @@ if __name__ == '__main__':
     globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins
-    app.taskMgr.add(updateControls, "updateControls", 10, appendTask=True)
+#     app.taskMgr.add(updateControls, "updateControls", 10, appendTask=True)
 
     # write to bam file on exit
     app.win.set_close_request_event("close_request_event")

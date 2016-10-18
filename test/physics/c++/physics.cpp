@@ -215,40 +215,37 @@ NodePath getModelAnims(const string& name, float scale,
 }
 
 // handles player on every update
-void handlePlayerUpdate()
+void handlePlayerUpdate(float currentVelSize = 0.0)
 {
-//	// get current forward velocity size
-//	float currentVelSize =
-//			abs(playerRigidBody->get_current_speeds().get_first().get_y());
+	// handle player's animation
+	for (int i = 0; i < (int) playerAnimCtls.size(); ++i)
+	{
+		if (currentVelSize > 0.0)
+		{
+			int animOnIdx, animOffIdx;
+			currentVelSize < 5.0 ? animOnIdx = 0 : animOnIdx = 1;
+			animOffIdx = (animOnIdx + 1) % 2;
+			// Off anim (0:walk, 1:run)
+			if (playerAnimCtls[i][animOffIdx]->is_playing())
+			{
+				playerAnimCtls[i][animOffIdx]->stop();
+			}
+			// On amin (0:walk, 1:run)
+			playerAnimCtls[i][animOnIdx]->set_play_rate(
+					currentVelSize * animRateFactor[animOnIdx]);
+			if (!playerAnimCtls[i][animOnIdx]->is_playing())
+			{
+				playerAnimCtls[i][animOnIdx]->loop(true);
+			}
+		}
+		else
+		{
+			// stop any animation
+			playerAnimCtls[i][0]->stop();
+			playerAnimCtls[i][1]->stop();
+		}
+	}
 //	NodePath playerRigidBodyNP = NodePath::any_path(playerRigidBody);
-//	// handle player's animation
-//	for (int i = 0; i < (int) playerAnimCtls.size(); ++i)
-//	{
-//		if (currentVelSize > 0.0)
-//		{
-//			int animOnIdx, animOffIdx;
-//			currentVelSize < 5.0 ? animOnIdx = 0 : animOnIdx = 1;
-//			animOffIdx = (animOnIdx + 1) % 2;
-//			// Off anim (0:walk, 1:run)
-//			if (playerAnimCtls[i][animOffIdx]->is_playing())
-//			{
-//				playerAnimCtls[i][animOffIdx]->stop();
-//			}
-//			// On amin (0:walk, 1:run)
-//			playerAnimCtls[i][animOnIdx]->set_play_rate(
-//					currentVelSize * animRateFactor[animOnIdx]);
-//			if (!playerAnimCtls[i][animOnIdx]->is_playing())
-//			{
-//				playerAnimCtls[i][animOnIdx]->loop(true);
-//			}
-//		}
-//		else
-//		{
-//			// stop any animation
-//			playerAnimCtls[i][0]->stop();
-//			playerAnimCtls[i][1]->stop();
-//		}
-//	}
 //	// make playerNP kinematic (ie stand on floor)
 //	if (currentVelSize > 0.0)
 //	{
@@ -287,9 +284,10 @@ void rigidBodyCallback(PT(BTRigidBody)rigidBody)
 	{
 		return;
 	}
-//	float currentVelSize =
-//			abs(playerRigidBody->get_linear_velocity().length_squared());
-//	(*rigidBody)[0]->set_play_rate(0.1 + currentVelSize * 0.05);
+	float currentVelSize =
+			abs(playerRigidBody->get_linear_velocity().length());
+	// handle player on callback
+	handlePlayerUpdate(currentVelSize);
 }
 
 //// soft body update callback function xxx
@@ -416,20 +414,20 @@ int main(int argc, char *argv[])
 			nullptr);
 
 	// enable collision notify event: BTRigidBody_BTRigidBody_Collision
-	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
-	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
-			&collisionNotify, nullptr);
+//	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
+//	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
+//			&collisionNotify, nullptr);
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();
-    playerRigidBody->set_update_callback(rigidBodyCallback);
-    globalClock = ClockObject::get_global_clock();
+	playerRigidBody->set_update_callback(rigidBodyCallback);
+	globalClock = ClockObject::get_global_clock();
 
     /// second option: start the custom update task for the drivers
-	updateTask = new GenericAsyncTask("updateControls", &updateControls,
-			nullptr);
-	framework.get_task_mgr().add(updateTask);
-	updateTask->set_sort(10);
+//	updateTask = new GenericAsyncTask("updateControls", &updateControls,
+//			nullptr);
+//	framework.get_task_mgr().add(updateTask);
+//	updateTask->set_sort(10);
 
 	// write to bam file on exit
 	window->get_graphics_window()->set_close_request_event(
