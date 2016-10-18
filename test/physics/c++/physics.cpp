@@ -280,20 +280,20 @@ AsyncTask::DoneStatus updateControls(GenericAsyncTask*, void* data)
 	return AsyncTask::DS_cont;
 }
 
-// rigid_body update callback function
-void rigid_bodyCallback(PT(BTRigidBody)rigid_body)
+// rigid body update callback function
+void rigidBodyCallback(PT(BTRigidBody)rigidBody)
 {
-	if (rigid_body != playerRigidBody)
+	if (rigidBody != playerRigidBody)
 	{
 		return;
 	}
 //	float currentVelSize =
-//			abs(playerRigidBody->get_current_speeds().get_first().get_y());
-//	(*rigid_body)[0]->set_play_rate(0.1 + currentVelSize * 0.05);
+//			abs(playerRigidBody->get_linear_velocity().length_squared());
+//	(*rigidBody)[0]->set_play_rate(0.1 + currentVelSize * 0.05);
 }
 
-//// soft_body update callback function xxx
-//void soft_bodyCallback(PT(BTSoftBody)soft_body)
+//// soft body update callback function xxx
+//void softBodyCallback(PT(BTSoftBody)soft_body)
 //{
 //	NodePath refNP =
 //			GamePhysicsManager::get_global_ptr()->get_reference_node_path();
@@ -422,7 +422,7 @@ int main(int argc, char *argv[])
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();
-    playerRigidBody->set_update_callback(rigid_bodyCallback);
+    playerRigidBody->set_update_callback(rigidBodyCallback);
     globalClock = ClockObject::get_global_clock();
 
     /// second option: start the custom update task for the drivers

@@ -230,17 +230,17 @@ def updateControls(task):
     #
     return task.cont
 
-def rigid_bodyCallback(rigid_body):
-    """rigid_body update callback function"""
+def rigidBodyCallback(rigidBody):
+    """rigid body update callback function"""
     
     global playerRigidBody
-    if rigid_body != playerRigidBody:
+    if rigidBody != playerRigidBody:
         return
-#     currentVelSize = abs(playerRigidBody.get_current_speeds().get_first().get_y())
-#     rigid_body[0].set_play_rate(0.1 + currentVelSize * 0.05)
+#     currentVelSize = abs(playerRigidBody.get_linear_velocity().length_squared())
+#     rigidBody[0].set_play_rate(0.1 + currentVelSize * 0.05)
 
-# def soft_bodyCallback(soft_body):
-#     """soft_body update callback function"""  
+# def softBodyCallback(soft_body):
+#     """soft body update callback function"""  
 # 
 #     global playerRigidBody
 #     refNP = GamePhysicsManager.get_global_ptr().get_reference_node_path()
@@ -348,7 +348,7 @@ if __name__ == '__main__':
 
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()
-    playerRigidBody.set_update_callback(rigid_bodyCallback)
+    playerRigidBody.set_update_callback(rigidBodyCallback)
     globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins
