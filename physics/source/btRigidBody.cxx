@@ -295,10 +295,10 @@ void BTRigidBody::do_initialize()
 		NodePath objectNP = mReferenceNP.find(string("**/") + object);
 		if (!objectNP.is_empty())
 		{
-			// inherit the TrasformState from the object
-			set_transform(objectNP.node()->get_transform());
-			// reset object's TrasformState
-			objectNP.set_transform(TransformState::make_identity());
+//			// inherit the TrasformState from the object xxx
+//			set_transform(objectNP.node()->get_transform());
+//			// reset object's TrasformState
+//			objectNP.set_transform(TransformState::make_identity());
 			setup(objectNP);
 		}
 	}
@@ -361,47 +361,38 @@ void BTRigidBody::setup(NodePath& objectNP)
 
 	// get this node path (if !empty)
 	NodePath thisNP = NodePath::any_path(this);
-
-	// Note: the object NodePath (if !empty) has scaling already applied, and
-	// it is is taken into account (except for the HEIGHTFIELD) for the
-	// construction of the shape
-	// add a Collision Shape
-	add_shape(do_create_shape(mShapeType, objectNP));
-
-	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
-	//dynamic, etc...) after it has been attached to the world, you must first
-	//attach it as a dynamic body and then switch its type:
-	//		mRigidBodyNode->set_mass(1.0);
-	//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
-	//		switchType(mBodyType);
-	///BUG>
-
-	// attach this to Bullet World
-	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
-
 	if (!objectNP.is_empty())
 	{
 		//BulletShape::set_local_scale doesn't work anymore
 		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
-		{
-			// it should be checked that there is or is not a
-			// "terrain/heightfield"component down the objectNP hierarchy,
-			// but there is no easy way to do it; the only viable one is finding
-			// by name (e.g. objectNP.find("**/gmm0x0") because GeoMipTerrain
-			// names "gmm*x*" its low level polys), or by using tags. todo
+//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack xxx
+//		{
+//			// it should be checked that there is or is not a
+//			// "terrain/heightfield"component down the objectNP hierarchy,
+//			// but there is no easy way to do it; the only viable one is finding
+//			// by name (e.g. objectNP.find("**/gmm0x0") because GeoMipTerrain
+//			// names "gmm*x*" its low level polys), or by using tags. todo
+//
+//			// get scaling from objectNP (width, depth, height)
+//			LVecBase3f scaling = objectNP.get_scale();
+//			// reset objectNP scaling
+//			objectNP.set_scale(LVecBase3f(1.0, 1.0, 1.0));
+//			// recompute objectNP mModelDeltaCenter
+//			LVecBase3f modelDims;
+//			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
+//					objectNP, modelDims, mModelDeltaCenter);
+//			// set scaling at thisNP level
+//			thisNP.set_scale(scaling);
+//		}
 
-			// get scaling from objectNP (width, depth, height)
-			LVecBase3f scaling = objectNP.get_scale();
-			// reset objectNP scaling
-			objectNP.set_scale(LVecBase3f(1.0, 1.0, 1.0));
-			// recompute objectNP mModelDeltaCenter
-			LVecBase3f modelDims;
-			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
-					objectNP, modelDims, mModelDeltaCenter);
-			// set scaling at thisNP level
-			thisNP.set_scale(scaling);
-		}
+		// inherit the TrasformState from the object
+		set_transform(objectNP.node()->get_transform());
+		// reset object's TrasformState
+		objectNP.set_transform(TransformState::make_identity());
+		// recompute objectNP mModelDeltaCenter
+		LVecBase3f modelDims;
+		GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
+				objectNP, modelDims, mModelDeltaCenter);
 		// reparent the object node path to this
 		objectNP.reparent_to(thisNP);
 		// correct (or possibly reset to zero) transform of the object node path
@@ -416,25 +407,43 @@ void BTRigidBody::setup(NodePath& objectNP)
 	{
 		//when objectNP is empty: every rigid body has a shape but
 		//HEIGHTFIELD, which should have a chance to scale
-		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
-		{
-			if (!mAutomaticShaping)
-			{
-				if (mUpAxis == X_up)
-				{
-					thisNP.set_scale(mDim2, mDim3, mDim4);
-				}
-				else if (mUpAxis == Y_up)
-				{
-					thisNP.set_scale(mDim4, mDim2, mDim3);
-				}
-				else
-				{
-					thisNP.set_scale(mDim3, mDim4, mDim2);
-				}
-			}
-		}
+//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack xxx
+//		{
+//			if (!mAutomaticShaping)
+//			{
+//				if (mUpAxis == X_up)
+//				{
+//					thisNP.set_scale(mDim2, mDim3, mDim4);
+//				}
+//				else if (mUpAxis == Y_up)
+//				{
+//					thisNP.set_scale(mDim4, mDim2, mDim3);
+//				}
+//				else
+//				{
+//					thisNP.set_scale(mDim3, mDim4, mDim2);
+//				}
+//			}
+//		}
 	}
+
+	// Note: the object NodePath (if !empty) has scaling already applied, and
+	// it is is taken into account (except for the HEIGHTFIELD) for the
+	// construction of the shape
+	// add a Collision Shape
+	add_shape(do_create_shape(mShapeType, thisNP));
+
+	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
+	//dynamic, etc...) after it has been attached to the world, you must first
+	//attach it as a dynamic body and then switch its type:
+	//		mRigidBodyNode->set_mass(1.0);
+	//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
+	//		switchType(mBodyType);
+	///BUG>
+
+	// attach this to Bullet World
+	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
+
 	// set the flag
 	mSetup = true;
 }
