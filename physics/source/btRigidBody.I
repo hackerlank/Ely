@@ -51,7 +51,7 @@ INLINE GamePhysicsManager::ShapeSize BTRigidBody::get_shape_size() const
 	return mShapeSize;
 }
 
-//	use_shape_of() XXX ?
+//	use_shape_of() xxx
 
 /**
  * Sets the shape radius (>=0.0).
@@ -191,8 +191,8 @@ INLINE string BTRigidBody::get_shape_heightfield_file() const
  */
 INLINE void BTRigidBody::set_shape_scale_width_depth(const LVecBase2f& value)
 {
-	mDim2 = abs(value.get_x());
-	mDim3 = abs(value.get_y());
+	mDim3 = abs(value.get_x());
+	mDim4 = abs(value.get_y());
 	do_check_auto_shaping();
 }
 

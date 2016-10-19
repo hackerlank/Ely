@@ -362,14 +362,9 @@ void BTRigidBody::setup(NodePath& objectNP)
 	// get this node path (if !empty)
 	NodePath thisNP = NodePath::any_path(this);
 
-	// reparent the object node path to this
-	if (! objectNP.is_empty())
-	{
-		objectNP.reparent_to(thisNP);
-	}
-
-	// Note: the object node path (if !empty) has scaling already applied.
-
+	// Note: the object NodePath (if !empty) has scaling already applied, and
+	// it is is taken into account (except for the HEIGHTFIELD) for the
+	// construction of the shape
 	// add a Collision Shape
 	add_shape(do_create_shape(mShapeType, objectNP));
 
@@ -384,9 +379,32 @@ void BTRigidBody::setup(NodePath& objectNP)
 	// attach this to Bullet World
 	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
 
-	// correct (or possibly reset to zero) transform of the object node path
-	if (! objectNP.is_empty())
+	if (!objectNP.is_empty())
 	{
+		//BulletShape::set_local_scale doesn't work anymore
+		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
+		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
+		{
+			// it should be checked that there is or is not a
+			// "terrain/heightfield"component down the objectNP hierarchy,
+			// but there is no easy way to do it; the only viable one is finding
+			// by name (e.g. objectNP.find("**/gmm0x0") because GeoMipTerrain
+			// names "gmm*x*" its low level polys), or by using tags. todo
+
+			// get scaling from objectNP (width, depth, height)
+			LVecBase3f scaling = objectNP.get_scale();
+			// reset objectNP scaling
+			objectNP.set_scale(LVecBase3f(1.0, 1.0, 1.0));
+			// recompute objectNP mModelDeltaCenter
+			LVecBase3f modelDims;
+			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
+					objectNP, modelDims, mModelDeltaCenter);
+			// set scaling at thisNP level
+			thisNP.set_scale(scaling);
+		}
+		// reparent the object node path to this
+		objectNP.reparent_to(thisNP);
+		// correct (or possibly reset to zero) transform of the object node path
 		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
 		{
 			objectNP.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
@@ -394,90 +412,29 @@ void BTRigidBody::setup(NodePath& objectNP)
 		//optimize
 		thisNP.flatten_strong();
 	}
-
-//	if (! objectNP.is_empty()) xxx
-//	{
-//		//BulletShape::set_local_scale doesn't work anymore
-//		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
-//		{
-//			//check if there is already a scene component
-//			PT (Component)
-//			sceneComp = mOwnerObject->getComponent(
-//					ComponentFamilyType("Scene"));
-//			if (sceneComp)
-//			{
-//				//check if the scene component is a Terrain
-//				if (sceneComp->componentType() == ComponentType("Terrain"))
-//				{
-//					float widthScale =
-//							DCAST(Terrain, sceneComp)->getWidthScale();
-//					float heightScale =
-//							DCAST(Terrain, sceneComp)->getHeightScale();
-//					if (mUpAxis == X_up)
-//					{
-//						thisNP.set_scale(
-//								LVecBase3f(heightScale, widthScale,
-//										widthScale));
-//					}
-//					else if (mUpAxis == Y_up)
-//					{
-//						thisNP.set_scale(
-//								LVecBase3f(widthScale, heightScale,
-//										widthScale));
-//					}
-//					else //mUpAxis == Z_up
-//					{
-//						thisNP.set_scale(
-//								LVecBase3f(widthScale, widthScale,
-//										heightScale));
-//					}
-//				}
-//			}
-//			else
-//			{
-//				//no scene component: scale manually if requested
-//				if (! mAutomaticShaping)
-//				{
-//					if (mUpAxis == X_up)
-//					{
-//						thisNP.set_scale(mDim2, mDim3, mDim4);
-//					}
-//					else if (mUpAxis == Y_up)
-//					{
-//						thisNP.set_scale(mDim4, mDim2, mDim3);
-//					}
-//					else
-//					{
-//						thisNP.set_scale(mDim3, mDim4, mDim2);
-//					}
-//				}
-//			}
-//		}
-//	}
-//	else
-//	{
-//		//when objectNP is empty: every rigid body has a shape but
-//		//HEIGHTFIELD, which should have a chance to scale
-//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
-//		{
-//			if (! mAutomaticShaping)
-//			{
-//				if (mUpAxis == X_up)
-//				{
-//					thisNP.set_scale(mDim2, mDim3, mDim4);
-//				}
-//				else if (mUpAxis == Y_up)
-//				{
-//					thisNP.set_scale(mDim4, mDim2, mDim3);
-//				}
-//				else
-//				{
-//					thisNP.set_scale(mDim3, mDim4, mDim2);
-//				}
-//			}
-//		}
-//	}
+	else
+	{
+		//when objectNP is empty: every rigid body has a shape but
+		//HEIGHTFIELD, which should have a chance to scale
+		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack
+		{
+			if (!mAutomaticShaping)
+			{
+				if (mUpAxis == X_up)
+				{
+					thisNP.set_scale(mDim2, mDim3, mDim4);
+				}
+				else if (mUpAxis == Y_up)
+				{
+					thisNP.set_scale(mDim4, mDim2, mDim3);
+				}
+				else
+				{
+					thisNP.set_scale(mDim3, mDim4, mDim2);
+				}
+			}
+		}
+	}
 	// set the flag
 	mSetup = true;
 }

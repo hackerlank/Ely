@@ -133,7 +133,7 @@ void writeToBamFileAndExit(const Event*, void* data)
 	string fileName = *reinterpret_cast<string*>(data);
 	GamePhysicsManager::get_global_ptr()->write_to_bam_file(fileName);
 	/// second option: remove custom update updateTask
-	framework.get_task_mgr().remove(updateTask);
+//	framework.get_task_mgr().remove(updateTask);
 
 	/// this is for testing explicit removal and destruction of all elements
 	WPT(GamePhysicsManager)physicsMgr = GamePhysicsManager::get_global_ptr();
@@ -167,6 +167,7 @@ NodePath loadTerrainLowPoly(const string& name, float widthScale = 128,
 	NodePath terrainNP = window->load_model(framework.get_models(),
 			"terrain-low-poly.egg");
 	terrainNP.set_name(name);
+	terrainNP.set_transform(TransformState::make_identity());
 	terrainNP.set_scale(widthScale, widthScale, heightScale);
 	PT(Texture)tex =
 	TexturePool::load_texture(Filename(texture));
@@ -195,6 +196,7 @@ NodePath loadTerrain(const string& name, float widthScale = 0.5,
 	GeoMipTerrain *terrain = new GeoMipTerrain("terrain");
 	PNMImage heightField(Filename(dataDir + string("/heightfield.png")));
 	terrain->set_heightfield(heightField);
+	terrain->get_root().set_transform(TransformState::make_identity());
 	//sizing
 	float environmentWidthX = (heightField.get_x_size() - 1) * widthScale;
 	float environmentWidthY = (heightField.get_y_size() - 1) * widthScale;
@@ -423,7 +425,7 @@ int main(int argc, char *argv[])
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
 //		sceneNP = loadTerrainLowPoly("SceneNP");
-		sceneNP = loadTerrain("SceneNP", 0.5, 10.0);
+		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
 		// create scene's rigid_body (attached to the reference node)
 		NodePath sceneRigidBodyNP =
 				physicsMgr->create_rigid_body("SceneRigidBody");
@@ -434,8 +436,6 @@ int main(int argc, char *argv[])
 //		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
 		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
 		sceneRigidBody->set_shape_heightfield_file(dataDir + string("/heightfield.png"));
-		sceneRigidBody->set_shape_scale_width_depth(LVecBase2f(0.5, 0.5));
-		sceneRigidBody->set_shape_height(10.0);
 		// other parameters
 		sceneRigidBody->switch_body_type(BTRigidBody::STATIC);
 		sceneRigidBodyNP.set_collide_mask(mask);

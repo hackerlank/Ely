@@ -7,7 +7,7 @@ Created on Oct 09, 2016
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         PNMImage, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f, GeoMipTerrain, \
-        Filename, TextureStage, TexturePool, LVecBase2f
+        Filename, TextureStage, TexturePool, LVecBase2f, TransformState
 from direct.showbase.ShowBase import ShowBase
 import panda3d.bullet
 from p3physics import GamePhysicsManager, BTRigidBody
@@ -131,6 +131,7 @@ def loadTerrainLowPoly(name, widthScale=128, heightScale=64.0,
     global app
     terrainNP = app.loader.load_model("terrain-low-poly.egg")
     terrainNP.set_name(name)
+    terrainNP.set_transform(TransformState.make_identity())
     terrainNP.set_scale(widthScale, widthScale, heightScale)
     tex = app.loader.load_texture(texture)
     terrainNP.set_texture(tex)
@@ -157,6 +158,7 @@ def loadTerrain(name, widthScale = 0.5, heightScale = 10.0):
     terrain = GeoMipTerrain("terrain")
     heightField = PNMImage(Filename(dataDir + "/heightfield.png"))
     terrain.set_heightfield(heightField)
+    terrain.get_root().set_transform(TransformState.make_identity())
     # sizing
     environmentWidthX = (heightField.get_x_size() - 1) * widthScale
     environmentWidthY = (heightField.get_y_size() - 1) * widthScale
@@ -356,7 +358,7 @@ if __name__ == '__main__':
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
 #         sceneNP = loadTerrainLowPoly("SceneNP")
-        sceneNP = loadTerrain("SceneNP")
+        sceneNP = loadTerrain("SceneNP", 1.0, 60.0)
         # create scene's rigid_body (attached to the reference node)
         sceneRigidBodyNP = physicsMgr.create_rigid_body("SceneRigidBody")
         # get a reference to the scene's rigid_body
@@ -365,8 +367,6 @@ if __name__ == '__main__':
 #         sceneRigidBody.set_shape_type(GamePhysicsManager.TRIANGLEMESH)
         sceneRigidBody.set_shape_type(GamePhysicsManager.HEIGHTFIELD)
         sceneRigidBody.set_shape_heightfield_file(dataDir + "/heightfield.png")
-        sceneRigidBody.set_shape_scale_width_depth(LVecBase2f(0.5, 0.5))
-        sceneRigidBody.set_shape_height(10.0)
         # other parameters
         sceneRigidBody.switch_body_type(BTRigidBody.STATIC)
         sceneRigidBodyNP.set_collide_mask(mask)
