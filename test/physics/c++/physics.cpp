@@ -11,6 +11,7 @@
 #include <auto_bind.h>
 #include <geoMipTerrain.h>
 #include <texturePool.h>
+#include <cardMaker.h>
 
 #include <gamePhysicsManager.h>
 #include <btRigidBody.h>
@@ -77,8 +78,6 @@ void setParametersBeforeCreation()
 {
 	GamePhysicsManager* physicsMgr = GamePhysicsManager::get_global_ptr();
 	// set rigid_body's parameters
-	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-			"shape_type", "box");
 	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 			"body_mass", "10.0");
 	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
@@ -158,6 +157,20 @@ void writeToBamFileAndExit(const Event*, void* data)
 	framework.close_framework();
 	//
 	exit(0);
+}
+
+// load plane stuff
+NodePath loadPlane(const string& name, float widthX = 30.0, float widthY = 30.0)
+{
+	CardMaker cm("plane");
+	cm.set_frame(-widthX / 2.0, widthX / 2.0, -widthY / 2.0, widthY / 2.0);
+	NodePath plane(cm.generate());
+	plane.set_p(-90.0);
+	plane.set_z(0.0);
+	plane.set_color(0.15, 0.35, 0.35);
+	plane.set_collide_mask(mask);
+	plane.set_name(name);
+	return plane;
 }
 
 // load terrain low poly stuff
@@ -424,25 +437,40 @@ int main(int argc, char *argv[])
 		physicsMgr->get_reference_node_path().reparent_to(window->get_render());
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
+		// plane,triangle_mesh,heightfield
+		sceneNP = loadPlane("SceneNP", 60.0, 60.0);
 //		sceneNP = loadTerrainLowPoly("SceneNP");
-		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
+//		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
+		// set sceneNP transform
+		sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0), LVecBase3f(45.0, 25.0, 0.0));
 		// create scene's rigid_body (attached to the reference node)
 		NodePath sceneRigidBodyNP =
 				physicsMgr->create_rigid_body("SceneRigidBody");
 		// get a reference to the scene's rigid_body
 		PT(BTRigidBody) sceneRigidBody =
 				DCAST(BTRigidBody, sceneRigidBodyNP.node());
-		// set some parameters: trimesh shape, static, collide mask etc...
+		// set some parameters
+		sceneRigidBody->set_shape_type(GamePhysicsManager::PLANE);
 //		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
-		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
+//		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
 		sceneRigidBody->set_shape_heightfield_file(dataDir + string("/heightfield.png"));
 		// other parameters
 		sceneRigidBody->switch_body_type(BTRigidBody::STATIC);
 		sceneRigidBodyNP.set_collide_mask(mask);
-		sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0));
 		// setup the player's rigid body
 		sceneRigidBody->setup(sceneNP);
 
+		// box,sphere,cylinder,capsule,cone
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "box");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "sphere");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "cylinder");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "capsule");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "cone");
 		// set various creation parameters as string for other rigid bodies
 		setParametersBeforeCreation();
 
@@ -512,7 +540,7 @@ int main(int argc, char *argv[])
 
 	// place camera trackball (local coordinate)
 	PT(Trackball)trackball = DCAST(Trackball, window->get_mouse().find("**/+Trackball").node());
-	trackball->set_pos(0.0, 120.0, 5.0);
+	trackball->set_pos(10.0, 400.0, -5.0);
 	trackball->set_hpr(0.0, 10.0, 0.0);
 
 	// do the main loop, equals to call app.run() in python

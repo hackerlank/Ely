@@ -7,7 +7,7 @@ Created on Oct 09, 2016
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         PNMImage, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f, GeoMipTerrain, \
-        Filename, TextureStage, TexturePool, LVecBase2f, TransformState
+        Filename, TextureStage, TexturePool, CardMaker, TransformState
 from direct.showbase.ShowBase import ShowBase
 import panda3d.bullet
 from p3physics import GamePhysicsManager, BTRigidBody
@@ -66,8 +66,6 @@ def setParametersBeforeCreation():
     physicsMgr = GamePhysicsManager.get_global_ptr()
     # set rigid_body's parameters
     physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-            "shape_type", "box")
-    physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
             "body_mass", "10.0")
     physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
             "collide_mask", "0x10")
@@ -123,6 +121,19 @@ def writeToBamFileAndExit(fileName):
 #         physicsMgr.destroy_soft_body(NodePath.any_path(soft_bodyTmp))
     #
     sys.exit(0)
+
+def loadPlane(name, widthX = 30.0, widthY = 30.0):
+    """load plane stuff"""
+    
+    cm = CardMaker("plane")
+    cm.set_frame(-widthX / 2.0, widthX / 2.0, -widthY / 2.0, widthY / 2.0)
+    plane = NodePath(cm.generate())
+    plane.set_p(-90.0)
+    plane.set_z(0.0)
+    plane.set_color(0.15, 0.35, 0.35)
+    plane.set_collide_mask(mask)
+    plane.set_name(name)
+    return plane
 
 def loadTerrainLowPoly(name, widthScale=128, heightScale=64.0,
                        texture="dry-grass.png"):
@@ -357,23 +368,38 @@ if __name__ == '__main__':
         physicsMgr.get_reference_node_path().reparent_to(app.render)
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
+        # plane,triangle_mesh,heightfield
+        sceneNP = loadPlane("SceneNP", 60.0, 60.0)
 #         sceneNP = loadTerrainLowPoly("SceneNP")
-        sceneNP = loadTerrain("SceneNP", 1.0, 60.0)
+#         sceneNP = loadTerrain("SceneNP", 1.0, 60.0)
+        # set sceneNP transform
+        sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0), LVecBase3f(45.0, 25.0, 0.0))
         # create scene's rigid_body (attached to the reference node)
         sceneRigidBodyNP = physicsMgr.create_rigid_body("SceneRigidBody")
         # get a reference to the scene's rigid_body
         sceneRigidBody = sceneRigidBodyNP.node()
-        # set some parameters: trimesh shape, static, collide mask etc...
+        # set some parameters
+        sceneRigidBody.set_shape_type(GamePhysicsManager.PLANE)
 #         sceneRigidBody.set_shape_type(GamePhysicsManager.TRIANGLEMESH)
-        sceneRigidBody.set_shape_type(GamePhysicsManager.HEIGHTFIELD)
+#         sceneRigidBody.set_shape_type(GamePhysicsManager.HEIGHTFIELD)
         sceneRigidBody.set_shape_heightfield_file(dataDir + "/heightfield.png")
         # other parameters
         sceneRigidBody.switch_body_type(BTRigidBody.STATIC)
         sceneRigidBodyNP.set_collide_mask(mask)
-        sceneRigidBodyNP.set_pos(LPoint3f(0.0, 0.0, 0.0))
         # setup the player's rigid body
         sceneRigidBody.setup(sceneNP)
 
+        # box,sphere,cylinder,capsule,cone
+        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+                "shape_type", "box")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                 "shape_type", "sphere")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                 "shape_type", "cylinder")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                 "shape_type", "capsule")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                 "shape_type", "cone")
         # set various creation parameters as string for other rigid bodies
         setParametersBeforeCreation()
 
@@ -428,7 +454,7 @@ if __name__ == '__main__':
 
     # place camera
     trackball = app.trackball.node()
-    trackball.set_pos(0.0, 120.0, 5.0)
+    trackball.set_pos(10.0, 400.0, -5.0)
     trackball.set_hpr(0.0, 10.0, 0.0)
    
     # app.run(), equals to do the main loop in C++

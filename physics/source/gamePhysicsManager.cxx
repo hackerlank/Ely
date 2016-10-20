@@ -998,19 +998,15 @@ PT(BulletShape)GamePhysicsManager::create_shape(NodePath modelNP,
 			//see: https://www.panda3d.org/forums/viewtopic.php?t=13981
 			BulletTriangleMesh* triMesh = new BulletTriangleMesh();
 			//add geoms from geomNodes to the mesh
+			CPT(TransformState) modelTS = modelNP.get_transform();
 			for (int i = 0; i < geomNodes.get_num_paths(); ++i)
 			{
 				PT(GeomNode) geomNode = DCAST(GeomNode,
 						geomNodes.get_path(i).node());
-				//BulletShape::set_local_scale doesn't work anymore
-				//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-				CPT(TransformState) ts = (geomNode->get_transform()->
-						compose(TransformState::make_scale(
-							modelNP.get_net_transform()->get_scale()))).p();
 				GeomNode::Geoms geoms = geomNode->get_geoms();
 				for (int j = 0; j < geoms.get_num_geoms(); ++j)
 				{
-					triMesh->add_geom(geoms.get_geom(j), true, ts.p());
+					triMesh->add_geom(geoms.get_geom(j), true, modelTS.p());
 				}
 			}
 			collisionShape = new BulletTriangleMeshShape(triMesh, dynamic);
@@ -1023,11 +1019,6 @@ PT(BulletShape)GamePhysicsManager::create_shape(NodePath modelNP,
 	//
 	return collisionShape;
 }
-
-
-
-
-
 
 /**
  * Gets bounding dimensions of a model NodePath.

@@ -385,14 +385,18 @@ void BTRigidBody::setup(NodePath& objectNP)
 //			thisNP.set_scale(scaling);
 //		}
 
-		// inherit the TrasformState from the object
-		set_transform(objectNP.node()->get_transform());
-		// reset object's TrasformState
-		objectNP.set_transform(TransformState::make_identity());
-		// recompute objectNP mModelDeltaCenter
-		LVecBase3f modelDims;
-		GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
-				objectNP, modelDims, mModelDeltaCenter);
+		// TRIANGLEMESH should preserve its transform
+		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
+		{
+			// inherit the TrasformState from the object
+			set_transform(objectNP.node()->get_transform());
+			// reset object's TrasformState
+			objectNP.set_transform(TransformState::make_identity());
+			// recompute objectNP mModelDeltaCenter
+			LVecBase3f modelDims;
+			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
+					objectNP, modelDims, mModelDeltaCenter);
+		}
 		// reparent the object node path to this
 		objectNP.reparent_to(thisNP);
 		// correct (or possibly reset to zero) transform of the object node path
@@ -431,7 +435,7 @@ void BTRigidBody::setup(NodePath& objectNP)
 	// it is is taken into account (except for the HEIGHTFIELD) for the
 	// construction of the shape
 	// add a Collision Shape
-	add_shape(do_create_shape(mShapeType, thisNP));
+	add_shape(do_create_shape(mShapeType, objectNP));
 
 	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
 	//dynamic, etc...) after it has been attached to the world, you must first
