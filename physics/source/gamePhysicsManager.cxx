@@ -871,8 +871,16 @@ PT(BulletShape)GamePhysicsManager::create_shape(NodePath modelNP,
 	}
 	else
 	{
-		//check if there are some GeomNode
+		// check if there are some GeomNode
 		geomNodes = modelNP.find_all_matches("**/+GeomNode");
+		if (geomNodes.is_empty())
+		{
+			if(modelNP.node()->is_of_type(GeomNode::get_class_type()))
+			{
+				geomNodes.add_path(modelNP);
+			}
+		}
+		// check if automatic shaping is to be on/off
 		if (! geomNodes.is_empty())
 		{
 			// get the bounding dimensions of object node path,
@@ -901,10 +909,24 @@ PT(BulletShape)GamePhysicsManager::create_shape(NodePath modelNP,
 		case PLANE:
 		if (automaticShaping)
 		{
-			//modify normal && d
+			//reset dims
 			dim1 = 0.0;
 			dim2 = 0.0;
-			dim3 = 1.0;
+			dim3 = 0.0;
+			//compute normal
+			if (upAxis == X_up)
+			{
+				dim1 = 1.0;
+			}
+			else if (upAxis == Y_up)
+			{
+				dim2 = 1.0;
+			}
+			else
+			{
+				dim3 = 1.0;
+			}
+			//modify d
 			dim4 = 0.0;
 		}
 		collisionShape = new BulletPlaneShape(

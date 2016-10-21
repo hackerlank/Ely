@@ -49,7 +49,7 @@
  * | *collide_mask*  			|single| *all_on* | -
  * | *shape_type*  				|single| *sphere* | values: sphere,plane,box,cylinder,capsule,cone,heightfield,triangle_mesh
  * | *shape_size*  				|single| *medium* | values: minimum,medium,maximum
- * | *use_shape_of*				|single| - | - xxx
+ * | *use_shape_of*				|single| - | - todo
  * | *shape_radius*  			|single| - | for sphere,cylinder,capsule,cone
  * | *shape_norm_x*  			|single| - | for plane
  * | *shape_norm_y*  			|single| - | for plane
@@ -59,7 +59,7 @@
  * | *shape_half_y*  			|single| - | for box
  * | *shape_half_z*  			|single| - | for box
  * | *shape_height*  			|single| 1.0 | for cylinder,capsule,cone,heightfield
- * | *shape_up*  				|single| *z* | values: x,y,z for cylinder,capsule,cone,heightfield
+ * | *shape_up*  				|single| *z* | values: x,y,z for plane,cylinder,capsule,cone,heightfield
  * | *shape_heightfield_file* 	|single| - | for heightfield
  * | *shape_scale_w*  			|single| 1.0 | for heightfield
  * | *shape_scale_d*  			|single| 1.0 | for heightfield
@@ -99,8 +99,8 @@ PUBLISHED:
 	 * \name RIGIDBODY
 	 */
 	///@{
-	void setup(NodePath& objectNP);//xxx a.k.a. RigidBody::onAddToObjectSetup()
-	void cleanup();//xxx a.k.a. RigidBody::onRemoveFromObjectCleanup()
+	void setup(NodePath& objectNP);
+	void cleanup();
 	void update(float dt);
 	///@}
 
@@ -113,7 +113,7 @@ PUBLISHED:
 	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
 	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);
 	INLINE GamePhysicsManager::ShapeSize get_shape_size() const;
-//	use_shape_of() xxx ?
+//	use_shape_of() todo
 	INLINE void set_shape_radius(float value);
 	INLINE float get_shape_radius() const;
 	INLINE void set_shape_norm(const LVector3f& value);
@@ -197,7 +197,7 @@ private:
 	LVecBase3f mModelDims;
 	float mModelRadius;
 	//use shape of (another object).
-//	ObjectId mUseShapeOfId; //xxx
+//	ObjectId mUseShapeOfId; todo
 	//any model has a local frame and the tight bounding box is computed
 	//wrt it; so mModelDeltaCenter represents a transform (translation) to
 	//be applied to the model node path so that the middle point of the

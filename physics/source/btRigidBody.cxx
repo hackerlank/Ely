@@ -281,7 +281,7 @@ void BTRigidBody::do_initialize()
 	}
 
 	//	// use shape of (another object)
-//	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); xxx
+//	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); todo
 
 //	// add to table of all physics components indexed by (underlying) Bullet PandaNodes
 //	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(this, this); todo
@@ -295,10 +295,6 @@ void BTRigidBody::do_initialize()
 		NodePath objectNP = mReferenceNP.find(string("**/") + object);
 		if (!objectNP.is_empty())
 		{
-//			// inherit the TrasformState from the object xxx
-//			set_transform(objectNP.node()->get_transform());
-//			// reset object's TrasformState
-//			objectNP.set_transform(TransformState::make_identity());
 			setup(objectNP);
 		}
 	}
@@ -363,28 +359,6 @@ void BTRigidBody::setup(NodePath& objectNP)
 	NodePath thisNP = NodePath::any_path(this);
 	if (!objectNP.is_empty())
 	{
-		//BulletShape::set_local_scale doesn't work anymore
-		//see: https://www.panda3d.org/forums/viewtopic.php?f=9&t=10231&start=690#p93583
-//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack xxx
-//		{
-//			// it should be checked that there is or is not a
-//			// "terrain/heightfield"component down the objectNP hierarchy,
-//			// but there is no easy way to do it; the only viable one is finding
-//			// by name (e.g. objectNP.find("**/gmm0x0") because GeoMipTerrain
-//			// names "gmm*x*" its low level polys), or by using tags. todo
-//
-//			// get scaling from objectNP (width, depth, height)
-//			LVecBase3f scaling = objectNP.get_scale();
-//			// reset objectNP scaling
-//			objectNP.set_scale(LVecBase3f(1.0, 1.0, 1.0));
-//			// recompute objectNP mModelDeltaCenter
-//			LVecBase3f modelDims;
-//			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
-//					objectNP, modelDims, mModelDeltaCenter);
-//			// set scaling at thisNP level
-//			thisNP.set_scale(scaling);
-//		}
-
 		// TRIANGLEMESH should preserve its transform
 		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
 		{
@@ -407,43 +381,10 @@ void BTRigidBody::setup(NodePath& objectNP)
 		//optimize
 		thisNP.flatten_strong();
 	}
-	else
-	{
-		//when objectNP is empty: every rigid body has a shape but
-		//HEIGHTFIELD, which should have a chance to scale
-//		if (mShapeType == GamePhysicsManager::HEIGHTFIELD)	//Hack xxx
-//		{
-//			if (!mAutomaticShaping)
-//			{
-//				if (mUpAxis == X_up)
-//				{
-//					thisNP.set_scale(mDim2, mDim3, mDim4);
-//				}
-//				else if (mUpAxis == Y_up)
-//				{
-//					thisNP.set_scale(mDim4, mDim2, mDim3);
-//				}
-//				else
-//				{
-//					thisNP.set_scale(mDim3, mDim4, mDim2);
-//				}
-//			}
-//		}
-	}
-
 	// Note: the object NodePath (if !empty) has scaling already applied, and
-	// it is is taken into account (except for the HEIGHTFIELD) for the
-	// construction of the shape
+	// it is is taken into account for the construction of the shape
 	// add a Collision Shape
 	add_shape(do_create_shape(mShapeType, objectNP));
-
-	//<BUG: if you want to switch the body type (e.g. dynamic to static, static to
-	//dynamic, etc...) after it has been attached to the world, you must first
-	//attach it as a dynamic body and then switch its type:
-	//		mRigidBodyNode->set_mass(1.0);
-	//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->attach(mRigidBodyNode);
-	//		switchType(mBodyType);
-	///BUG>
 
 	// attach this to Bullet World
 	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
@@ -481,28 +422,31 @@ void BTRigidBody::cleanup()
 {
 	RETURN_ON_COND(!mSetup,)
 
-	NodePath oldObjectNP;
-	NodePath thisNP = NodePath::any_path(this);
-	//set the object node path to the first child of rigid body's one (if any)
-	if (thisNP.get_num_children() > 0)
-	{
-		oldObjectNP = thisNP.get_child(0);
-		//detach the object node path from the rigid body's one
-		oldObjectNP.detach_node();
-	}
-	else
-	{
-		oldObjectNP = NodePath();
-	}
-
-	//remove rigid body from the physics world
+	// remove rigid body from the physics world
 	GamePhysicsManager::GetSingletonPtr()->get_bullet_world()->remove(this);
 
-	// remove all shapes
-	for (int i = 0 ; i < get_num_shapes(); ++i)
+	// remove all rigid body's shapes
+	for (int i = 0; i < get_num_shapes(); ++i)
 	{
 		remove_shape(get_shape(i));
 	}
+
+	NodePath thisNP = NodePath::any_path(this);
+	// detach this rigid body's children
+	for (int i = 0; i < thisNP.get_num_children(); ++i)
+	{
+		NodePath childNP = thisNP.get_child(i);
+		// TRIANGLEMESH preserved its transform
+		if (mShapeType != GamePhysicsManager::TRIANGLEMESH)
+		{
+			// restore child's transform to the
+			// current rigid body' one
+			childNP.set_transform(get_transform());
+		}
+		// detach childNP
+		thisNP.get_child(i).detach_node();
+	}
+
 	// set the flag
 	mSetup = false;
 }
@@ -552,7 +496,7 @@ void BTRigidBody::switch_body_type(BodyType bodyType)
 PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::ShapeType shapeType,
 		const NodePath& objectNP)
 {
-//	//check if it should use shape of another (already) created object xxx
+//	//check if it should use shape of another (already) created object todo
 //	if (! mUseShapeOfId.empty())
 //	{
 //		SMARTPTR(Object)createdObject =
@@ -581,23 +525,9 @@ PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::ShapeType shapeT
 //		}
 //	}
 
-	// create and return the current shape: dimensions are wrt the
-	//Model or InstanceOf component (if any)
-	NodePath shapeNodePath = objectNP;//default
-//	SMARTPTR(Component) sceneComp = mOwnerObject->getComponent(ComponentFamilyType("Scene"));xxx
-//	if (sceneComp)
-//	{
-//		if (sceneComp->componentType() == ComponentType("Model"))
-//		{
-//			shapeNodePath = NodePath(DCAST(Model, sceneComp)->getNodePath().node());
-//		}
-//		if (sceneComp->componentType() == ComponentType("InstanceOf"))
-//		{
-//			shapeNodePath = NodePath(DCAST(InstanceOf, sceneComp)->getNodePath().node());
-//		}
-//	}
+	// create and return the current shape
 	return GamePhysicsManager::GetSingletonPtr()->create_shape(
-			shapeNodePath, mShapeType, mShapeSize,
+			objectNP, mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
 			mDim3, mDim4, mAutomaticShaping, mUpAxis,
 			mHeightfieldFile, ! (mBodyType == STATIC));

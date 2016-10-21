@@ -12,6 +12,10 @@
 #include <geoMipTerrain.h>
 #include <texturePool.h>
 #include <cardMaker.h>
+#include <geomVertexArrayFormat.h>
+#include <geomVertexFormat.h>
+#include <geomVertexWriter.h>
+#include <geomTriangles.h>
 
 #include <gamePhysicsManager.h>
 #include <btRigidBody.h>
@@ -74,7 +78,8 @@ void printCreationParameters()
 }
 
 // set parameters as strings before rigid_bodies/soft_bodies creation
-void setParametersBeforeCreation()
+void setParametersBeforeCreation(const string& objectName,
+		const string& upAxis = "z")
 {
 	GamePhysicsManager* physicsMgr = GamePhysicsManager::get_global_ptr();
 	// set rigid_body's parameters
@@ -83,7 +88,9 @@ void setParametersBeforeCreation()
 	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 			"collide_mask", "0x10");
 	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-			"object", "PlayerNP");
+			"object", objectName);
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+			"shape_up", upAxis);
 
 	// set soft_body's parameters
 	physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "static",
@@ -159,18 +166,97 @@ void writeToBamFileAndExit(const Event*, void* data)
 	exit(0);
 }
 
-// load plane stuff
-NodePath loadPlane(const string& name, float widthX = 30.0, float widthY = 30.0)
+// load plane stuff centered at (0,0,0)
+NodePath loadPlane(const string& name, float width = 30.0, float depth = 30.0,
+		BulletUpAxis upAxis = Z_up, const string& texture = "dry-grass.png")
 {
-	CardMaker cm("plane");
-	cm.set_frame(-widthX / 2.0, widthX / 2.0, -widthY / 2.0, widthY / 2.0);
-	NodePath plane(cm.generate());
-	plane.set_p(-90.0);
-	plane.set_z(0.0);
-	plane.set_color(0.15, 0.35, 0.35);
-	plane.set_collide_mask(mask);
-	plane.set_name(name);
-	return plane;
+	// Vertex Format
+	PT(GeomVertexArrayFormat)arrayFormat = new GeomVertexArrayFormat();
+	arrayFormat->add_column(InternalName::make("vertex"), 3,
+			Geom::NT_float32, Geom::C_point);
+	arrayFormat->add_column(InternalName::make("normal"), 3,
+			Geom::NT_float32, Geom::C_vector);
+	arrayFormat->add_column(InternalName::make("texcoord"), 2,
+			Geom::NT_float32, Geom::C_texcoord);
+	PT(GeomVertexFormat) vertexFormat = new GeomVertexFormat();
+	vertexFormat->add_array(arrayFormat);
+	// Pre-defined vertex formats
+//    CPT(GeomVertexFormat) vertexFormatAdded = GeomVertexFormat::get_v3n3t2();
+	CPT(GeomVertexFormat) vertexFormatAdded =
+			GeomVertexFormat::register_format(vertexFormat);
+	// Vertex Data
+	PT(GeomVertexData) vertexData = new GeomVertexData("plane", vertexFormatAdded,
+			Geom::UH_static);
+	GeomVertexWriter vertex(vertexData, "vertex");
+	GeomVertexWriter normal(vertexData, "normal");
+	GeomVertexWriter texcoord(vertexData, "texcoord");
+	// compute coords and normal according to up axis
+	// 3------2      ^y           ^z           ^x
+	// |      |      |            |            |
+	// |      | +d   | Z_up   OR  | X_up   OR  | Y_up
+	// |      |      |            |            |
+	// 0------1      ------>x     ------>y     ------>z
+	//    +w
+	float w = abs(width) / 0.5;
+	float d = abs(depth) / 0.5;
+	// default: Z_up
+	LVector3f n(0.0, 0.0, 1.0);
+	LPoint3f v0(-w, -d, 0.0);
+	LPoint3f v1(w, -d, 0.0);
+	LPoint3f v2(w, d, 0.0);
+	LPoint3f v3(-w, d, 0.0);
+	if (upAxis == X_up)
+	{
+		n = LVector3f(1.0, 0.0, 0.0);
+		v0 = LPoint3f(0.0, -w, -d);
+		v1 = LPoint3f(0.0, w, -d);
+		v2 = LPoint3f(0.0, w, d);
+		v3 = LPoint3f(0.0, -w, d);
+	}
+	else if (upAxis == Y_up)
+	{
+		n = LVector3f(0.0, 1.0, 0.0);
+		v0 = LPoint3f(-d, 0.0, -w);
+		v1 = LPoint3f(d, 0.0, -w);
+		v2 = LPoint3f(d, 0.0, w);
+		v3 = LPoint3f(-d, 0.0, w);
+	}
+	// normalize
+	n.normalize();
+	// fill-up vertex data (plane)
+	// vertex 0
+	vertex.add_data3f(v0);
+	normal.add_data3f(n);
+	texcoord.add_data2f(0.0, 0.0);
+	// vertex 1
+	vertex.add_data3f(v1);
+	normal.add_data3f(n);
+	texcoord.add_data2f(1.0, 0.0);
+	// vertex 2
+	vertex.add_data3f(v2);
+	normal.add_data3f(n);
+	texcoord.add_data2f(1.0, 1.0);
+	// vertex 3
+	vertex.add_data3f(v3);
+	normal.add_data3f(n);
+	texcoord.add_data2f(0.0, 1.0);
+	// Creating the GeomPrimitive objects for plane
+	PT(GeomTriangles) planeTriangles = new GeomTriangles(Geom::UH_static);
+	// lower triangle
+	planeTriangles->add_vertices(0, 1, 3);
+	// higher triangle
+	planeTriangles->add_vertices(2, 3, 1);
+	// Putting your new geometry in the scene graph
+	PT(Geom) planeGeom = new Geom(vertexData);
+	planeGeom->add_primitive(planeTriangles);
+	PT(GeomNode) planeNode = new GeomNode(name + "Node");
+	planeNode->add_geom(planeGeom);
+	NodePath planeNP(planeNode);
+	// apply texture
+	PT(Texture)tex = TexturePool::load_texture(Filename(texture));
+	planeNP.set_texture(tex);
+	//
+	return planeNP;
 }
 
 // load terrain low poly stuff
@@ -182,8 +268,7 @@ NodePath loadTerrainLowPoly(const string& name, float widthScale = 128,
 	terrainNP.set_name(name);
 	terrainNP.set_transform(TransformState::make_identity());
 	terrainNP.set_scale(widthScale, widthScale, heightScale);
-	PT(Texture)tex =
-	TexturePool::load_texture(Filename(texture));
+	PT(Texture)tex = TexturePool::load_texture(Filename(texture));
 	terrainNP.set_texture(tex);
 	return terrainNP;
 }
@@ -437,12 +522,15 @@ int main(int argc, char *argv[])
 		physicsMgr->get_reference_node_path().reparent_to(window->get_render());
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
-		// plane,triangle_mesh,heightfield
-		sceneNP = loadPlane("SceneNP", 60.0, 60.0);
-//		sceneNP = loadTerrainLowPoly("SceneNP");
+		/// plane
+//		BulletUpAxis planeUpAxis = Z_up; // Z_up X_up Y_up
+//		sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis);
+		/// triangle mesh
+		sceneNP = loadTerrainLowPoly("SceneNP");
+		/// heightfield
 //		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
 		// set sceneNP transform
-		sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0), LVecBase3f(45.0, 25.0, 0.0));
+		sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0), LVecBase3f(45.0, 0.0, 0.0));
 		// create scene's rigid_body (attached to the reference node)
 		NodePath sceneRigidBodyNP =
 				physicsMgr->create_rigid_body("SceneRigidBody");
@@ -450,44 +538,84 @@ int main(int argc, char *argv[])
 		PT(BTRigidBody) sceneRigidBody =
 				DCAST(BTRigidBody, sceneRigidBodyNP.node());
 		// set some parameters
-		sceneRigidBody->set_shape_type(GamePhysicsManager::PLANE);
-//		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
+		// plane
+//		sceneRigidBody->set_shape_up(planeUpAxis);
+//		sceneRigidBody->set_shape_type(GamePhysicsManager::PLANE);
+		// triangle mesh
+		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
+		// heightfield
 //		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
 		sceneRigidBody->set_shape_heightfield_file(dataDir + string("/heightfield.png"));
-		// other parameters
+		// other common parameters
 		sceneRigidBody->switch_body_type(BTRigidBody::STATIC);
 		sceneRigidBodyNP.set_collide_mask(mask);
 		// setup the player's rigid body
 		sceneRigidBody->setup(sceneNP);
 
-		// box,sphere,cylinder,capsule,cone
+		/// box
 		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 				"shape_type", "box");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "sphere");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "cylinder");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "capsule");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "cone");
 		// set various creation parameters as string for other rigid bodies
-		setParametersBeforeCreation();
-
+		setParametersBeforeCreation("PlayerNP");
 		// get a player with anims, reparent to reference node, set transform
 		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
 		playerNP.reparent_to(physicsMgr->get_reference_node_path());
-		playerNP.set_pos(LPoint3f(4.1, -12.0, 100.1));
-		playerNP.set_hpr(LVecBase3f(0.0, 90.0, 0.0));
+		playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
+				LVecBase3f(-75.0, 145.0, -235.0));
 		// create player's rigid_body (attached to the reference node)
 		NodePath playerRigidBodyNP =
 				physicsMgr->create_rigid_body("PlayerRigidBody");
  		// get a reference to the player's rigid_body
  		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
+
+ 		// some clones of player with different shapes
+		/// sphere
+ 		NodePath playerSphere = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerSphere");
+ 		playerNP.instance_to(playerSphere);
+ 		playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+				LVecBase3f(145.0, -235.0, -75.0));
+ 		setParametersBeforeCreation("playerSphere");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "sphere");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodySphere");
+
+		/// cylinder
+ 		NodePath playerCylinder = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerCylinder");
+ 		playerNP.instance_to(playerCylinder);
+ 		playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+				LVecBase3f(145.0, -75.0, -235.0));
+ 		setParametersBeforeCreation("playerCylinder", "y");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "cylinder");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodyCylinder");
+
+ 		/// capsule
+ 		NodePath playerCapsule = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerCapsule");
+ 		playerNP.instance_to(playerCapsule);
+ 		playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+				LVecBase3f(-235.0, 145.0, -75.0));
+ 		setParametersBeforeCreation("playerCapsule", "y");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "capsule");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodyCapsule");
+
+ 		/// cone
+ 		NodePath playerCone = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerCone");
+ 		playerNP.instance_to(playerCone);
+ 		playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+				LVecBase3f(-235.0, -75.0, 145.0));
+ 		setParametersBeforeCreation("playerCone", "y");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "cone");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodyCone");
 	}
 	else
 	{
-		// valid bamFile
+		// valid bamFile xxx
 		// reparent reference node to render
 		physicsMgr->get_reference_node_path().reparent_to(window->get_render());
 
@@ -508,7 +636,7 @@ int main(int argc, char *argv[])
 
 		// set creation parameters as strings before other objects creation
 		cout << endl << "Current creation parameters:";
-		setParametersBeforeCreation();
+//		setParametersBeforeCreation();xxx
 	}
 
 	// setup DEBUG DRAWING
