@@ -51,7 +51,23 @@ INLINE GamePhysicsManager::ShapeSize BTRigidBody::get_shape_size() const
 	return mShapeSize;
 }
 
-//	use_shape_of() xxx
+/**
+ * Sets the the name of the object (along the hierarchy of the reference node)
+ * whose shape has to be used by this BTRigidBody.
+ */
+INLINE void BTRigidBody::set_use_shape_of(const string& value)
+{
+	mUseShapeOfId = value;
+}
+
+/**
+ * Returns the the name of the object (along the hierarchy of the reference
+ * node) whose shape has to be used by this BTRigidBody.
+ */
+INLINE string BTRigidBody::get_use_shape_of() const
+{
+	return mUseShapeOfId;
+}
 
 /**
  * Sets the shape radius (>=0.0).
@@ -221,7 +237,7 @@ inline void BTRigidBody::do_reset()
 	mShapeSize = GamePhysicsManager::MEDIUM;
 	mModelDims = LVector3f::zero();
 	mModelRadius = 0.0;
-//	mUseShapeOfId = ObjectId();xxx
+	mUseShapeOfId.clear();
 	mModelDeltaCenter = LVector3f::zero();
 	mAutomaticShaping = false;
 	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;

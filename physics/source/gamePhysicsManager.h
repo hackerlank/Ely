@@ -22,18 +22,17 @@ class BTRigidBody;
  * .
  * This manager could throw events when objects collide. By default this
  * feature is disabled.\n
- * It throws:
- * - when two objects collide, the event "<CollidingObjectType1>_<CollidingObjectType2>_Collision",
- * with the two type names ordered in alphabetical ascending order (A to Z)
- * (i.e. using the std::string::operator<()).
- * This event is thrown continuously at a frequency which is the minimum between the fps &&
- * the frequency specified (which defaults to 30 times per seconds) until
- * the object keeps overlapping
- * - when the two objects stop collide, the event
- * "<CollidingObjectType1>_<CollidingObjectType2>_CollisionOff"; this event is thrown only once\n
- * The first argument of each event is a reference of the overlapping object's
- * Physics component, the second argument is a reference to this component.
- *
+ * The behavior is:
+ * - when two objects collide, it is thrown the
+ * "<CollidingObjectType1>_<CollidingObjectType2>_Collision" event that has as
+ * parameters the two colliding PandNodes. This event is thrown continuously
+ * until the two objects keep overlapping, at a frequency which is the minimum
+ * between the fps && the frequency specified as parameter (which defaults to 30
+ * times per seconds);
+ * - when the two objects stop collide,  it is thrown the
+ * "<CollidingObjectType1>_<CollidingObjectType2>_CollisionOff" event  that has
+ * as parameters the two PandNodes that have just finished colliding. This
+ * event is thrown only once.
  */
 /**
  * GamePhysicsManager Singleton class.
@@ -169,8 +168,6 @@ PUBLISHED:
 			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
 			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
 			const Filename& heightfieldFile = Filename(""), bool dynamic = false);
-//	INLINE PT(PandaNode/*Component*/) getPhysicsComponentByPandaNode(PT(PandaNode) pandaNode);//todo
-//	INLINE void setPhysicsComponentByPandaNode(PT(PandaNode) pandaNode,	PT(PandaNode/*Component*/) physicsComponent); //todo
 	float get_bounding_dimensions(NodePath modelNP, LVecBase3f& modelDims,
 			LVector3f& modelDeltaCenter) const;
 	Pair<bool,float> get_collision_height(const LPoint3f& fromPos);
@@ -244,10 +241,6 @@ private:
 //	GhostList mGhosts;
 //	///BTGhosts' parameter table.
 //	ParameterTable mGhostsParameterTable;
-
-//	///Table of all physics components indexed by (underlying) Bullet PandaNodes.
-//	///This is used, for example, during ray casting.
-//	pmap<PT(PandaNode), PT(PandaNode/*Component*/)> mPhysicsComponentPandaNodeTable; todo
 
 	///@{
 	///A task data for step simulation update.

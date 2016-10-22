@@ -648,6 +648,8 @@ int main(int argc, char *argv[])
 	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
 	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
 			&collisionNotify, nullptr);
+	framework.define_key("BTRigidBody_BTRigidBody_CollisionOff", "collisionNotifyOff",
+			&collisionNotify, nullptr);
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();

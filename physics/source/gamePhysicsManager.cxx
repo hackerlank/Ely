@@ -45,8 +45,6 @@ GamePhysicsManager::GamePhysicsManager(int taskSort, const NodePath& root,
 	set_parameters_defaults(RIGIDBODY);
 	set_parameters_defaults(SOFTBODY);
 	set_parameters_defaults(GHOST);
-//	//
-//	mPhysicsComponentPandaNodeTable.clear(); todo
 	//
 	mUpdateData.clear();
 	mUpdateTask.clear();
@@ -690,10 +688,6 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 							(PandaNode *) static_cast<const btRigidBody*>(pManifold->getBody0())->getUserPointer();
 					PandaNode *node1 =
 							(PandaNode *) static_cast<const btRigidBody*>(pManifold->getBody1())->getUserPointer();
-//					PT(PandaNode/*Component*/)physicsComponent0 = todo
-//					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node0);
-//					PT(PandaNode/*Component*/)physicsComponent1 = todo
-//					GamePhysicsManager::GetSingletonPtr()->getPhysicsComponentByPandaNode(node1);
 					//insert a default: check of equality is done only on CollidingNodePair::mPnode member
 					pair<pset<CollidingNodePair>::iterator, bool> res =
 							mCollidingNodePairs.insert(
@@ -702,10 +696,8 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 					{
 						//this is a "new" colliding object pair
 						//event name: <CollidingObjectType1>_<CollidingObjectType2>_Collision
-						string objectType0 = node0->get_type().get_name()
-								/* physicsComponent0->getOwnerObject()->objectTmpl()->objectType() todo*/;
-						string objectType1 = node1->get_type().get_name()
-								/* physicsComponent1->getOwnerObject()->objectTmpl()->objectType() todo*/;
+						string objectType0 = node0->get_type().get_name();
+						string objectType1 = node1->get_type().get_name();
 						//alphabetically compare
 						if (objectType0 < objectType1)
 						{

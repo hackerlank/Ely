@@ -557,6 +557,8 @@ if __name__ == '__main__':
     physicsMgr.enable_collision_notify(GamePhysicsManager.COLLISIONNOTIFY, 10.0)
     app.accept("BTRigidBody_BTRigidBody_Collision", collisionNotify, 
                ["BTRigidBody_BTRigidBody_Collision"])
+    app.accept("BTRigidBody_BTRigidBody_CollisionOff", collisionNotify, 
+               ["BTRigidBody_BTRigidBody_CollisionOff"])
 
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()

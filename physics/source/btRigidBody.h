@@ -49,7 +49,7 @@
  * | *collide_mask*  			|single| *all_on* | -
  * | *shape_type*  				|single| *sphere* | values: sphere,plane,box,cylinder,capsule,cone,heightfield,triangle_mesh
  * | *shape_size*  				|single| *medium* | values: minimum,medium,maximum
- * | *use_shape_of*				|single| - | - todo
+ * | *use_shape_of*				|single| - | -
  * | *shape_radius*  			|single| - | for sphere,cylinder,capsule,cone
  * | *shape_norm_x*  			|single| - | for plane
  * | *shape_norm_y*  			|single| - | for plane
@@ -113,7 +113,8 @@ PUBLISHED:
 	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
 	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);
 	INLINE GamePhysicsManager::ShapeSize get_shape_size() const;
-//	use_shape_of() todo
+	INLINE void set_use_shape_of(const string& value);
+	INLINE string get_use_shape_of() const;
 	INLINE void set_shape_radius(float value);
 	INLINE float get_shape_radius() const;
 	INLINE void set_shape_norm(const LVector3f& value);
@@ -197,7 +198,7 @@ private:
 	LVecBase3f mModelDims;
 	float mModelRadius;
 	//use shape of (another object).
-//	ObjectId mUseShapeOfId; todo
+	string mUseShapeOfId;
 	//any model has a local frame and the tight bounding box is computed
 	//wrt it; so mModelDeltaCenter represents a transform (translation) to
 	//be applied to the model node path so that the middle point of the

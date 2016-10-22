@@ -280,11 +280,9 @@ void BTRigidBody::do_initialize()
 		switch_body_type(DYNAMIC);
 	}
 
-	//	// use shape of (another object)
-//	mUseShapeOfId = ObjectId(mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY, string("use_shape_of"))); todo
-
-//	// add to table of all physics components indexed by (underlying) Bullet PandaNodes
-//	GamePhysicsManager::get_global_ptr()->setPhysicsComponentByPandaNode(this, this); todo
+	// use shape of (another object)
+	mUseShapeOfId = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
+			string("use_shape_of"));
 
 	//object setting
 	string object = mTmpl->get_parameter_value(GamePhysicsManager::RIGIDBODY,
@@ -404,9 +402,6 @@ void BTRigidBody::do_finalize()
 	//cleanup (if needed)
 	cleanup();
 
-//	//remove from table of all physics components indexed by (underlying) Bullet PandaNodes
-//	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(this, NULL); todo
-
 #ifdef PYTHON_BUILD
 	//Python callback
 	Py_DECREF(mSelf);
@@ -496,38 +491,21 @@ void BTRigidBody::switch_body_type(BodyType bodyType)
 PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::ShapeType shapeType,
 		const NodePath& objectNP)
 {
-//	//check if it should use shape of another (already) created object todo
-//	if (! mUseShapeOfId.empty())
-//	{
-//		SMARTPTR(Object)createdObject =
-//		ObjectTemplateManager::GetSingleton().getCreatedObject(
-//				mUseShapeOfId);
-//		if (createdObject)
-//		{
-//			//object already exists
-//			SMARTPTR(Component) physicsComp =
-//			createdObject->getComponent(ComponentFamilyType("Physics"));
-//			if (physicsComp)
-//			{
-//				if (physicsComp->is_of_type(RigidBody::get_class_type()))
-//				{
-//					//physics component is a rigid body:
-//					//return a reference to its (first and only) shape
-//					return DCAST(RigidBody, physicsComp)->getBulletRigidBodyNode().get_shape(0);
-//				}
-//				else if (physicsComp->is_of_type(Ghost::get_class_type()))
-//				{
-//					//physics component is a ghost:
-//					//return a reference to its (first and only) shape
-//					return DCAST(Ghost, physicsComp)->getBulletGhostNode().get_shape(0);
-//				}
-//			}
-//		}
-//	}
-
+	NodePath objectToShapeNP = objectNP;
+	//check if it should use shape of another (already) created object
+	if(!mUseShapeOfId.empty())
+	{
+		// search object under reference node
+		NodePath objectUseShapeOfNP = mReferenceNP.find(string("**/") +
+				mUseShapeOfId);
+		if (!objectUseShapeOfNP.is_empty())
+		{
+			objectToShapeNP = objectUseShapeOfNP;
+		}
+	}
 	// create and return the current shape
 	return GamePhysicsManager::GetSingletonPtr()->create_shape(
-			objectNP, mShapeType, mShapeSize,
+			objectToShapeNP, mShapeType, mShapeSize,
 			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
 			mDim3, mDim4, mAutomaticShaping, mUpAxis,
 			mHeightfieldFile, ! (mBodyType == STATIC));
