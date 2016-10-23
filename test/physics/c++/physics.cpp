@@ -615,7 +615,7 @@ int main(int argc, char *argv[])
 	}
 	else
 	{
-		// valid bamFile xxx
+		// valid bamFile
 		// reparent reference node to render
 		physicsMgr->get_reference_node_path().reparent_to(window->get_render());
 
@@ -633,10 +633,6 @@ int main(int argc, char *argv[])
 				playerRigidBody = rigid_body;
 			}
 		}
-
-		// set creation parameters as strings before other objects creation
-		cout << endl << "Current creation parameters:";
-//		setParametersBeforeCreation();xxx
 	}
 
 	// setup DEBUG DRAWING

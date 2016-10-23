@@ -182,6 +182,7 @@ private:
 	BodyType mBodyType;
 	GamePhysicsManager::ShapeType mShapeType;
 	GamePhysicsManager::ShapeSize mShapeSize;
+	///@}
 
 	inline void do_reset();
 	void do_initialize();

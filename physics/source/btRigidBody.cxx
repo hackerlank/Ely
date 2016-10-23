@@ -616,67 +616,31 @@ void BTRigidBody::write_datagram(BamWriter *manager, Datagram &dg)
 	///Name of this BTRigidBody.
 	dg.add_string(get_name());
 
-//	///Enable/disable flag.
-//	dg.add_bool(mEnabled);
-//
-//	///Flags.
-//	///@{
-//	dg.add_bool(mFixedRelativePosition);
-//	dg.add_bool(mBackward);
-//	dg.add_bool(mFixedLookAt);
-//	dg.add_bool(mHoldLookAt);
-//	///@}
-//
-//	///Kinematic parameters.
-//	///@{
-//	dg.add_stdfloat(mAbsLookAtDistance);
-//	dg.add_stdfloat(mAbsLookAtHeight);
-//	dg.add_stdfloat(mAbsMaxDistance);
-//	dg.add_stdfloat(mAbsMinDistance);
-//	dg.add_stdfloat(mAbsMinHeight);
-//	dg.add_stdfloat(mAbsMaxHeight);
-//	dg.add_stdfloat(mFriction);
-//	///@}
-//
-//	///Positions.
-//	///@{
-//	mRigidBodyPosition.write_datagram(dg);
-//	mLookAtPosition.write_datagram(dg);
-//	///@}
-//
-//	///Key controls and effective keys.
-//	///@{
-//	dg.add_bool(mHeadLeft);
-//	dg.add_bool(mHeadRight);
-//	dg.add_bool(mPitchUp);
-//	dg.add_bool(mPitchDown);
-//	dg.add_bool(mHeadLeftKey);
-//	dg.add_bool(mHeadRightKey);
-//	dg.add_bool(mPitchUpKey);
-//	dg.add_bool(mPitchDownKey);
-//	dg.add_bool(mMouseMoveKey);
-//	///@}
-//
-//	///Key control values.
-//	///@{
-//	dg.add_bool(mMouseEnabledH);
-//	dg.add_bool(mMouseEnabledP);
-//	dg.add_bool(mMouseHandled);
-//	dg.add_int8(mSignOfMouse);
-//	///@}
-//
-//	/// Sensitivity settings.
-//	///@{
-//	dg.add_stdfloat(mSensX);
-//	dg.add_stdfloat(mSensY);
-//	dg.add_stdfloat(mHeadSensX);
-//	dg.add_stdfloat(mHeadSensY);
-//	///@}
-//
-//	///The chased object's node path.
-//	manager->write_pointer(dg, mChasedNP.node());
-//	///Auxiliary node path to track the fixed look at.
-//	manager->write_pointer(dg, mFixedLookAtNP.node());
+	///The setup flag.
+	dg.add_bool(mSetup);
+
+	///@{
+	///Physical parameters.
+	dg.add_uint8((uint8_t) mBodyType);
+	dg.add_uint8((uint8_t) mShapeType);
+	dg.add_uint8((uint8_t) mShapeSize);
+	///@}
+
+	///@{
+	///Geometric functions and parameters.
+	mModelDims.write_datagram(dg);
+	dg.add_stdfloat(mModelRadius);
+	dg.add_string(mUseShapeOfId);
+	mModelDeltaCenter.write_datagram(dg);
+	dg.add_bool(mAutomaticShaping);
+	dg.add_stdfloat(mDim1);
+	dg.add_stdfloat(mDim2);
+	dg.add_stdfloat(mDim3);
+	dg.add_stdfloat(mDim4);
+	dg.add_string(mHeightfieldFile);
+	dg.add_uint8((uint8_t) mUpAxis);
+	///@}
+
 	///The reference node path.
 	manager->write_pointer(dg, mReferenceNP.node());
 }
@@ -690,16 +654,9 @@ int BTRigidBody::complete_pointers(TypedWritable **p_list, BamReader *manager)
 	int pi = BulletRigidBodyNode::complete_pointers(p_list, manager);
 
 	/// Pointers
-	PT(PandaNode)savedPandaNode;
-//	///The chased object's node path.
-//	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
-//	mChasedNP = NodePath::any_path(savedPandaNode);
-//	///Auxiliary node path to track the fixed look at.
-//	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
-//	mFixedLookAtNP = NodePath::any_path(savedPandaNode);
 	///The reference node path.
-	savedPandaNode = DCAST(PandaNode, p_list[pi++]);
-	mReferenceNP = NodePath::any_path(savedPandaNode);
+	PT(PandaNode)referenceNPPandaNode = DCAST(PandaNode, p_list[pi++]);
+	mReferenceNP = NodePath::any_path(referenceNPPandaNode);
 
 	return pi;
 }
@@ -741,69 +698,41 @@ void BTRigidBody::fillin(DatagramIterator &scan, BamReader *manager)
 	///Name of this BTRigidBody.
 	set_name(scan.get_string());
 
-//	///Enable/disable flag.
-//	mEnabled = scan.get_bool();
-//
-//	///Flags.
-//	///@{
-//	mFixedRelativePosition = scan.get_bool();
-//	mBackward = scan.get_bool();
-//	mFixedLookAt = scan.get_bool();
-//	mHoldLookAt = scan.get_bool();
-//	///@}
-//
-//	///Kinematic parameters.
-//	///@{
-//	mAbsLookAtDistance = scan.get_stdfloat();
-//	mAbsLookAtHeight = scan.get_stdfloat();
-//	mAbsMaxDistance = scan.get_stdfloat();
-//	mAbsMinDistance = scan.get_stdfloat();
-//	mAbsMinHeight = scan.get_stdfloat();
-//	mAbsMaxHeight = scan.get_stdfloat();
-//	mFriction = scan.get_stdfloat();
-//	///@}
-//
-//	///Positions.
-//	///@{
-//	mRigidBodyPosition.read_datagram(scan);
-//	mLookAtPosition.read_datagram(scan);
-//	///@}
-//
-//	///Key controls and effective keys.
-//	///@{
-//	mHeadLeft = scan.get_bool();
-//	mHeadRight = scan.get_bool();
-//	mPitchUp = scan.get_bool();
-//	mPitchDown = scan.get_bool();
-//	mHeadLeftKey = scan.get_bool();
-//	mHeadRightKey = scan.get_bool();
-//	mPitchUpKey = scan.get_bool();
-//	mPitchDownKey = scan.get_bool();
-//	mMouseMoveKey = scan.get_bool();
-//	///@}
-//
-//	///Key control values.
-//	///@{
-//	mMouseEnabledH = scan.get_bool();
-//	mMouseEnabledP = scan.get_bool();
-//	mMouseHandled = scan.get_bool();
-//	mSignOfMouse = scan.get_int8();
-//	///@}
-//
-//	/// Sensitivity settings.
-//	///@{
-//	mSensX = scan.get_stdfloat();
-//	mSensY = scan.get_stdfloat();
-//	mHeadSensX = scan.get_stdfloat();
-//	mHeadSensY = scan.get_stdfloat();
-//	///@}
+	///The setup flag.
+	mSetup = scan.get_bool();
 
-	///The chased object's node path.
-	manager->read_pointer(scan);
-	///Auxiliary node path to track the fixed look at.
-	manager->read_pointer(scan);
+	///@{
+	///Physical parameters.
+	mBodyType = (BodyType) scan.get_uint8();
+	mShapeType = (GamePhysicsManager::ShapeType) scan.get_uint8();
+	mShapeSize = (GamePhysicsManager::ShapeSize) scan.get_uint8();
+	///@}
+
+	///@{
+	///Geometric functions and parameters.
+	mModelDims.read_datagram(scan);
+	mModelRadius = scan.get_stdfloat();
+	mUseShapeOfId = scan.get_string();
+	mModelDeltaCenter.read_datagram(scan);
+	mAutomaticShaping = scan.get_bool();
+	mDim1 = scan.get_stdfloat();
+	mDim2 = scan.get_stdfloat();
+	mDim3 = scan.get_stdfloat();
+	mDim4 = scan.get_stdfloat();
+	mHeightfieldFile = scan.get_string();
+	mUpAxis = (BulletUpAxis) scan.get_uint8();
+	///@}
+
 	///The reference node path.
 	manager->read_pointer(scan);
+
+	/// attach this BTRigidBody to Bullet World if needed
+	/// Note: here is the right place to complete restoring,
+	/// because BulletRigidBodyNode is complete at this point.
+	if (mSetup)
+	{
+		GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
+	}
 }
 
 //TypedObject semantics: hardcoded

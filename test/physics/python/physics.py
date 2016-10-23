@@ -490,46 +490,46 @@ if __name__ == '__main__':
         # get a reference to the player's rigid_body
         playerRigidBody = playerRigidBodyNP.node()
         
-        # some clones of player with different shapes
-        # # sphere
-        playerSphere = physicsMgr.get_reference_node_path().attach_new_node("playerSphere")
-        playerNP.instance_to(playerSphere)
-        playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
-               LVecBase3f(145.0, -235.0, -75.0))
-        setParametersBeforeCreation("playerSphere")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "sphere")
-        physicsMgr.create_rigid_body("PlayerRigidBodySphere")
-        
-        # # cylinder
-        playerCylinder = physicsMgr.get_reference_node_path().attach_new_node("playerCylinder")
-        playerNP.instance_to(playerCylinder)
-        playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
-               LVecBase3f(145.0, -75.0, -235.0))
-        setParametersBeforeCreation("playerCylinder", "y")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "cylinder")
-        physicsMgr.create_rigid_body("PlayerRigidBodyCylinder")
-        
-        # # capsule
-        playerCapsule = physicsMgr.get_reference_node_path().attach_new_node("playerCapsule")
-        playerNP.instance_to(playerCapsule)
-        playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
-               LVecBase3f(-235.0, 145.0, -75.0))
-        setParametersBeforeCreation("playerCapsule", "y")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "capsule")
-        physicsMgr.create_rigid_body("PlayerRigidBodyCapsule")
-        
-        # # cone
-        playerCone = physicsMgr.get_reference_node_path().attach_new_node("playerCone")
-        playerNP.instance_to(playerCone)
-        playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
-               LVecBase3f(-235.0, -75.0, 145.0))
-        setParametersBeforeCreation("playerCone", "y")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "cone")
-        physicsMgr.create_rigid_body("PlayerRigidBodyCone")
+#         # some clones of player with different shapes
+#         # # sphere
+#         playerSphere = physicsMgr.get_reference_node_path().attach_new_node("playerSphere")
+#         playerNP.instance_to(playerSphere)
+#         playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+#                LVecBase3f(145.0, -235.0, -75.0))
+#         setParametersBeforeCreation("playerSphere")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "sphere")
+#         physicsMgr.create_rigid_body("PlayerRigidBodySphere")
+#         
+#         # # cylinder
+#         playerCylinder = physicsMgr.get_reference_node_path().attach_new_node("playerCylinder")
+#         playerNP.instance_to(playerCylinder)
+#         playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+#                LVecBase3f(145.0, -75.0, -235.0))
+#         setParametersBeforeCreation("playerCylinder", "y")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "cylinder")
+#         physicsMgr.create_rigid_body("PlayerRigidBodyCylinder")
+#         
+#         # # capsule
+#         playerCapsule = physicsMgr.get_reference_node_path().attach_new_node("playerCapsule")
+#         playerNP.instance_to(playerCapsule)
+#         playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+#                LVecBase3f(-235.0, 145.0, -75.0))
+#         setParametersBeforeCreation("playerCapsule", "y")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "capsule")
+#         physicsMgr.create_rigid_body("PlayerRigidBodyCapsule")
+#         
+#         # # cone
+#         playerCone = physicsMgr.get_reference_node_path().attach_new_node("playerCone")
+#         playerNP.instance_to(playerCone)
+#         playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+#                LVecBase3f(-235.0, -75.0, 145.0))
+#         setParametersBeforeCreation("playerCone", "y")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "cone")
+#         physicsMgr.create_rigid_body("PlayerRigidBodyCone")
     else:
         # valid bamFile
         # reparent reference node to render
@@ -544,10 +544,6 @@ if __name__ == '__main__':
         for rigid_body in physicsMgr.get_rigid_bodies():
             if rigid_body.get_name() == "PlayerRigidBody":
                 playerRigidBody = rigid_body
-        
-        # set creation parameters as strings before other drivers creation
-        print("\n" + "Current creation parameters:")
-        setParametersBeforeCreation()
 
     # setup DEBUG DRAWING
     physicsMgr.init_debug()

@@ -494,11 +494,11 @@ void GamePhysicsManager::set_parameters_defaults(PhysicsType type)
 		mRigidBodiesParameterTable.insert(
 				ParameterNameValue("body_restitution", "0.1"));
 		mRigidBodiesParameterTable.insert(
+				ParameterNameValue("collide_mask", "all_on"));
+		mRigidBodiesParameterTable.insert(
 				ParameterNameValue("shape_type", "sphere"));
 		mRigidBodiesParameterTable.insert(
 				ParameterNameValue("shape_size", "medium"));
-		mRigidBodiesParameterTable.insert(
-				ParameterNameValue("collide_mask", "all_on"));
 		mRigidBodiesParameterTable.insert(
 				ParameterNameValue("shape_height", "1.0"));
 		mRigidBodiesParameterTable.insert(
