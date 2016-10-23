@@ -353,9 +353,9 @@ protected:
 private:
 	///Current underlying OpenSteer Vehicle.
 	OpenSteer::AbstractVehicle* mVehicle;
-	///The type of this OSSteerPlugIn.
+	///The type of this OSSteerVehicle.
 	OSSteerVehicleType mVehicleType;
-	///The movement type of this OSSteerPlugIn.
+	///The movement type of this OSSteerVehicle.
 	OSSteerVehicleMovType mMovType;
 	///The OSSteerPlugIn this OSSteerVehicle is added to.
 	PT(OSSteerPlugIn) mSteerPlugIn;

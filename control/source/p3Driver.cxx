@@ -752,9 +752,6 @@ void P3Driver::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this P3Driver.
-	dg.add_string(get_name());
-
 	///Enable/disable flag.
 	dg.add_bool(mEnabled);
 
@@ -867,9 +864,6 @@ TypedWritable *P3Driver::make_from_bam(const FactoryParams &params)
 void P3Driver::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
-
-	///Name of this P3Driver.
-	set_name(scan.get_string());
 
 	///Enable/disable flag.
 	mEnabled = scan.get_bool();

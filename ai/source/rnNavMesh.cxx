@@ -2948,9 +2948,6 @@ void RNNavMesh::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this RNNavMesh.
-	dg.add_string(get_name());
-
 	///Current underlying NavMeshType type.
 	dg.add_uint8((uint8_t) mNavMeshTypeEnum);
 
@@ -3172,9 +3169,6 @@ TypedWritable *RNNavMesh::make_from_bam(const FactoryParams &params)
 void RNNavMesh::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
-
-	///Name of this RNNavMesh.
-	set_name(scan.get_string());
 
 	///Current underlying NavMeshType type.
 	mNavMeshTypeEnum = (RNNavMeshTypeEnum) scan.get_uint8();

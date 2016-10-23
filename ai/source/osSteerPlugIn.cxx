@@ -2064,9 +2064,6 @@ void OSSteerPlugIn::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this OSSteerPlugIn.
-	dg.add_string(get_name());
-
 	///The type of this OSSteerPlugIn.
 	dg.add_uint8((uint8_t) mPlugInType);
 
@@ -2392,9 +2389,6 @@ TypedWritable *OSSteerPlugIn::make_from_bam(const FactoryParams &params)
 void OSSteerPlugIn::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
-
-	///Name of this OSSteerPlugIn.
-	set_name(scan.get_string());
 
 	///The type of this OSSteerPlugIn.
 	mPlugInType = (OSSteerPlugInType) scan.get_uint8();

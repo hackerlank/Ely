@@ -613,9 +613,6 @@ void BTRigidBody::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	BulletRigidBodyNode::write_datagram(manager, dg);
 
-	///Name of this BTRigidBody.
-	dg.add_string(get_name());
-
 	///The setup flag.
 	dg.add_bool(mSetup);
 
@@ -694,9 +691,6 @@ TypedWritable *BTRigidBody::make_from_bam(const FactoryParams &params)
 void BTRigidBody::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	BulletRigidBodyNode::fillin(scan, manager);
-
-	///Name of this BTRigidBody.
-	set_name(scan.get_string());
 
 	///The setup flag.
 	mSetup = scan.get_bool();

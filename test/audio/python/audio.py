@@ -6,7 +6,7 @@ Created on Sep 20, 2016
 
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         LVector3f, NodePath, AnimControlCollection, auto_bind, PartGroup, \
-        ClockObject, TextNode, LPoint3f, LVecBase3f, AudioManager
+        ClockObject, TextNode, LPoint3f, LVecBase3f
 from direct.showbase.ShowBase import ShowBase
 from p3audio import GameAudioManager
 from p3control import GameControlManager

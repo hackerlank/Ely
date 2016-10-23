@@ -548,9 +548,6 @@ void RNCrowdAgent::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this RNCrowdAgent.
-	dg.add_string(get_name());
-
 	///The movement type.
 	dg.add_uint8((uint8_t) mMovType);
 	///The associated dtCrowdAgent data.
@@ -623,9 +620,6 @@ TypedWritable *RNCrowdAgent::make_from_bam(const FactoryParams &params)
 void RNCrowdAgent::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
-
-	///Name of this RNCrowdAgent. string mName;
-	set_name(scan.get_string());
 
 	///The movement type. Use setter because of additional check.
 	set_mov_type((RNCrowdAgentMovType)scan.get_uint8());

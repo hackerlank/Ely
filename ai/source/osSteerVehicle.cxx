@@ -1388,13 +1388,10 @@ void OSSteerVehicle::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this OSSteerVehicle.
-	dg.add_string(get_name());
-
-	///The type of this OSSteerPlugIn.
+	///The type of this OSSteerVehicle.
 	dg.add_uint8((uint8_t) mVehicleType);
 
-	///The movement type of this OSSteerPlugIn.
+	///The movement type of this OSSteerVehicle.
 	dg.add_uint8((uint8_t) mMovType);
 
 	///OSSteerVehicle settings.
@@ -1686,13 +1683,10 @@ void OSSteerVehicle::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
 
-	///Name of this OSSteerVehicle.
-	set_name(scan.get_string());
-
-	///The type of this OSSteerPlugIn.
+	///The type of this OSSteerVehicle.
 	mVehicleType = (OSSteerVehicleType)scan.get_uint8();
 
-	///The movement type of this OSSteerPlugIn.
+	///The movement type of this OSSteerVehicle.
 	mMovType = (OSSteerVehicleMovType)scan.get_uint8();
 
 	///OSSteerVehicle settings.

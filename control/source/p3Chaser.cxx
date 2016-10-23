@@ -602,9 +602,6 @@ void P3Chaser::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this P3Chaser.
-	dg.add_string(get_name());
-
 	///Enable/disable flag.
 	dg.add_bool(mEnabled);
 
@@ -726,9 +723,6 @@ TypedWritable *P3Chaser::make_from_bam(const FactoryParams &params)
 void P3Chaser::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
-
-	///Name of this P3Chaser.
-	set_name(scan.get_string());
 
 	///Enable/disable flag.
 	mEnabled = scan.get_bool();

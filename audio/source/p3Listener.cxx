@@ -229,9 +229,6 @@ void P3Listener::write_datagram(BamWriter *manager, Datagram &dg)
 {
 	PandaNode::write_datagram(manager, dg);
 
-	///Name of this P3Listener.
-	dg.add_string(get_name());
-
 	///Static flag.
 	dg.add_bool(mStatic);
 
@@ -293,9 +290,6 @@ TypedWritable *P3Listener::make_from_bam(const FactoryParams &params)
 void P3Listener::fillin(DatagramIterator &scan, BamReader *manager)
 {
 	PandaNode::fillin(scan, manager);
-
-	///Name of this P3Listener.
-	set_name(scan.get_string());
 
 	///Static flag.
 	mStatic = scan.get_bool();
