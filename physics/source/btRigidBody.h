@@ -196,15 +196,8 @@ private:
 	///Geometric functions and parameters.
 	PT(BulletShape) do_create_shape(GamePhysicsManager::ShapeType shapeType,
 			const NodePath& objectNP);
-	LVecBase3f mModelDims;
-	float mModelRadius;
 	//use shape of (another object).
 	string mUseShapeOfId;
-	//any model has a local frame and the tight bounding box is computed
-	//wrt it; so mModelDeltaCenter represents a transform (translation) to
-	//be applied to the model node path so that the middle point of the
-	//bounding box will overlap the frame center of the parent's node path .
-	LVector3f mModelDeltaCenter;
 	bool mAutomaticShaping;
 	float mDim1, mDim2, mDim3, mDim4;
 	Filename mHeightfieldFile;

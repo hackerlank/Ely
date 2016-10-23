@@ -235,10 +235,7 @@ inline void BTRigidBody::do_reset()
 	mBodyType = DYNAMIC;
 	mShapeType = GamePhysicsManager::SPHERE;
 	mShapeSize = GamePhysicsManager::MEDIUM;
-	mModelDims = LVector3f::zero();
-	mModelRadius = 0.0;
 	mUseShapeOfId.clear();
-	mModelDeltaCenter = LVector3f::zero();
 	mAutomaticShaping = false;
 	mDim1 = mDim2 = mDim3 = mDim4 = 0.0;
 	mHeightfieldFile = Filename();

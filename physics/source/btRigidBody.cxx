@@ -357,6 +357,8 @@ void BTRigidBody::setup(NodePath& objectNP)
 	NodePath thisNP = NodePath::any_path(this);
 	if (!objectNP.is_empty())
 	{
+		LVecBase3f modelDims;
+		LVector3f mModelDeltaCenter;
 		// TRIANGLEMESH should preserve its transform
 		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
 		{
@@ -365,7 +367,6 @@ void BTRigidBody::setup(NodePath& objectNP)
 			// reset object's TrasformState
 			objectNP.set_transform(TransformState::make_identity());
 			// recompute objectNP mModelDeltaCenter
-			LVecBase3f modelDims;
 			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
 					objectNP, modelDims, mModelDeltaCenter);
 		}
@@ -503,10 +504,13 @@ PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::ShapeType shapeT
 			objectToShapeNP = objectUseShapeOfNP;
 		}
 	}
+	LVecBase3f modelDims;
+	LVector3f modelDeltaCenter;
+	float modelRadius;
 	// create and return the current shape
 	return GamePhysicsManager::GetSingletonPtr()->create_shape(
 			objectToShapeNP, mShapeType, mShapeSize,
-			mModelDims, mModelDeltaCenter, mModelRadius, mDim1, mDim2,
+			modelDims, modelDeltaCenter, modelRadius, mDim1, mDim2,
 			mDim3, mDim4, mAutomaticShaping, mUpAxis,
 			mHeightfieldFile, ! (mBodyType == STATIC));
 }
@@ -625,10 +629,7 @@ void BTRigidBody::write_datagram(BamWriter *manager, Datagram &dg)
 
 	///@{
 	///Geometric functions and parameters.
-	mModelDims.write_datagram(dg);
-	dg.add_stdfloat(mModelRadius);
 	dg.add_string(mUseShapeOfId);
-	mModelDeltaCenter.write_datagram(dg);
 	dg.add_bool(mAutomaticShaping);
 	dg.add_stdfloat(mDim1);
 	dg.add_stdfloat(mDim2);
@@ -704,10 +705,7 @@ void BTRigidBody::fillin(DatagramIterator &scan, BamReader *manager)
 
 	///@{
 	///Geometric functions and parameters.
-	mModelDims.read_datagram(scan);
-	mModelRadius = scan.get_stdfloat();
 	mUseShapeOfId = scan.get_string();
-	mModelDeltaCenter.read_datagram(scan);
 	mAutomaticShaping = scan.get_bool();
 	mDim1 = scan.get_stdfloat();
 	mDim2 = scan.get_stdfloat();
