@@ -718,6 +718,9 @@ void BTRigidBody::fillin(DatagramIterator &scan, BamReader *manager)
 	///The reference node path.
 	manager->read_pointer(scan);
 
+	/// switch body type
+	switch_body_type(mBodyType);
+
 	/// attach this BTRigidBody to Bullet World if needed
 	/// Note: here is the right place to complete restoring,
 	/// because BulletRigidBodyNode is complete at this point.
