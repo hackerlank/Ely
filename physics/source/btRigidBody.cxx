@@ -305,6 +305,10 @@ void BTRigidBody::do_initialize()
 #endif //PYTHON_BUILD
 }
 
+/**
+ * Checks if set/clear auto shaping flag.
+ * \note Internal use only.
+ */
 void BTRigidBody::do_check_auto_shaping()
 {
 	// default
@@ -349,6 +353,10 @@ void BTRigidBody::do_check_auto_shaping()
 	}
 }
 
+/**
+ * Sets the BTRigidBody up for the given object (if not empty), given the
+ * shape's type and size (among others).
+ */
 void BTRigidBody::setup(NodePath& objectNP)
 {
 	RETURN_ON_COND(mSetup,)
@@ -414,6 +422,9 @@ void BTRigidBody::do_finalize()
 	return;
 }
 
+/**
+ * Cleans the BTRigidBody up from detaching any child objects (if not empty).
+ */
 void BTRigidBody::cleanup()
 {
 	RETURN_ON_COND(!mSetup,)
@@ -452,7 +463,7 @@ void BTRigidBody::cleanup()
  * For DYNAMIC type mass must be >0.0 for type to be changed. For STATIC and
  * KINEMATIC mass is reset to 0.0.
  */
-void BTRigidBody::switch_body_type(BodyType bodyType)
+void BTRigidBody::switch_body_type(BTBodyType bodyType)
 {
 	// return if DYNAMIC && mass==0.0
 	RETURN_ON_COND((bodyType == DYNAMIC) && (get_mass() == 0.0),)
@@ -489,7 +500,7 @@ void BTRigidBody::switch_body_type(BodyType bodyType)
  * Creates a shape given its type.
  * \note Internal use only.
  */
-PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::ShapeType shapeType,
+PT(BulletShape)BTRigidBody::do_create_shape(GamePhysicsManager::BTShapeType shapeType,
 		const NodePath& objectNP)
 {
 	NodePath objectToShapeNP = objectNP;
@@ -698,9 +709,9 @@ void BTRigidBody::fillin(DatagramIterator &scan, BamReader *manager)
 
 	///@{
 	///Physical parameters.
-	mBodyType = (BodyType) scan.get_uint8();
-	mShapeType = (GamePhysicsManager::ShapeType) scan.get_uint8();
-	mShapeSize = (GamePhysicsManager::ShapeSize) scan.get_uint8();
+	mBodyType = (BTBodyType) scan.get_uint8();
+	mShapeType = (GamePhysicsManager::BTShapeType) scan.get_uint8();
+	mShapeSize = (GamePhysicsManager::BTShapeSize) scan.get_uint8();
 	///@}
 
 	///@{

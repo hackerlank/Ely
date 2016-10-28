@@ -50,7 +50,7 @@ PUBLISHED:
 	/**
 	 * The type of object for creation parameters.
 	 */
-	enum PhysicsType
+	enum BTPhysicsType
 	{
 		RIGIDBODY = 0,
 		SOFTBODY,
@@ -60,7 +60,7 @@ PUBLISHED:
 	/**
 	 * Shape type.
 	 */
-	enum ShapeType
+	enum BTShapeType
 	{
 		SPHERE = 0, //!< SPHERE (radius)
 		PLANE,//!< PLANE (norm_x, norm_y, norm_z, d)
@@ -75,7 +75,7 @@ PUBLISHED:
 	/**
 	 * Shape size.
 	 */
-	enum ShapeSize
+	enum BTShapeSize
 	{
 		MINIMUN = 0, //!< MINIMUN shape
 		MAXIMUM,//!< MAXIMUM shape
@@ -128,12 +128,12 @@ PUBLISHED:
 	 * \name TEXTUAL PARAMETERS
 	 */
 	///@{
-	ValueList<string> get_parameter_name_list(PhysicsType type) const;
-	void set_parameter_values(PhysicsType type, const string& paramName, const ValueList<string>& paramValues);
-	ValueList<string> get_parameter_values(PhysicsType type, const string& paramName) const;
-	void set_parameter_value(PhysicsType type, const string& paramName, const string& value);
-	string get_parameter_value(PhysicsType type, const string& paramName) const;
-	void set_parameters_defaults(PhysicsType type);
+	ValueList<string> get_parameter_name_list(BTPhysicsType type) const;
+	void set_parameter_values(BTPhysicsType type, const string& paramName, const ValueList<string>& paramValues);
+	ValueList<string> get_parameter_values(BTPhysicsType type, const string& paramName) const;
+	void set_parameter_value(BTPhysicsType type, const string& paramName, const string& value);
+	string get_parameter_value(BTPhysicsType type, const string& paramName) const;
+	void set_parameters_defaults(BTPhysicsType type);
 	///@}
 
 	/**
@@ -163,8 +163,8 @@ PUBLISHED:
 	 * \name UTILITIES
 	 */
 	///@{
-	PT(BulletShape) create_shape(NodePath modelNP, ShapeType shapeType,
-			ShapeSize shapeSize, LVecBase3f& modelDims, LVector3f& modelDeltaCenter,
+	PT(BulletShape) create_shape(NodePath modelNP, BTShapeType shapeType,
+			BTShapeSize shapeSize, LVecBase3f& modelDims, LVector3f& modelDeltaCenter,
 			float& modelRadius, float& dim1, float& dim2, float& dim3, float& dim4,
 			bool automaticShaping = true, BulletUpAxis upAxis=Z_up,
 			const Filename& heightfieldFile = Filename(""), bool dynamic = false);
@@ -336,7 +336,7 @@ private:
 	pset<CollidingNodePair> mCollidingNodePairs;
 	btCollisionDispatcher* mCollisionDispatcher;
 	///Helpers.
-	float do_get_dim(ShapeSize shapeSize, float d1, float d2);
+	float do_get_dim(BTShapeSize shapeSize, float d1, float d2);
 	///@}
 
 	/// Bullet Debug node path.

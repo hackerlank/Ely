@@ -19,34 +19,34 @@ INLINE void BTRigidBody::set_reference_node_path(const NodePath& reference)
 }
 
 /**
- * Sets the shape type (>=0.0).
+ * Sets the shape type.
  */
-INLINE void BTRigidBody::set_shape_type(GamePhysicsManager::ShapeType value)
+INLINE void BTRigidBody::set_shape_type(GamePhysicsManager::BTShapeType value)
 {
 	mShapeType = value;
 	do_check_auto_shaping();
 }
 
 /**
- * Returns the shape type (>=0.0).
+ * Returns the shape type.
  */
-INLINE GamePhysicsManager::ShapeType BTRigidBody::get_shape_type() const
+INLINE GamePhysicsManager::BTShapeType BTRigidBody::get_shape_type() const
 {
 	return mShapeType;
 }
 
 /**
- * Sets the shape size (>=0.0).
+ * Sets the shape size.
  */
-INLINE void BTRigidBody::set_shape_size(GamePhysicsManager::ShapeSize value)
+INLINE void BTRigidBody::set_shape_size(GamePhysicsManager::BTShapeSize value)
 {
 	mShapeSize = value;
 }
 
 /**
- * Returns the shape type (>=0.0).
+ * Returns the shape size.
  */
-INLINE GamePhysicsManager::ShapeSize BTRigidBody::get_shape_size() const
+INLINE GamePhysicsManager::BTShapeSize BTRigidBody::get_shape_size() const
 {
 	return mShapeSize;
 }
@@ -187,7 +187,7 @@ INLINE BulletUpAxis BTRigidBody::get_shape_up() const
 }
 
 /**
- * Sets the shape height-field file.
+ * Sets the shape height-field file name.
  */
 INLINE void BTRigidBody::set_shape_heightfield_file(const string& value)
 {
@@ -195,7 +195,7 @@ INLINE void BTRigidBody::set_shape_heightfield_file(const string& value)
 }
 
 /**
- * Returns the shape height-field file.
+ * Returns the shape height-field file name.
  */
 INLINE string BTRigidBody::get_shape_heightfield_file() const
 {

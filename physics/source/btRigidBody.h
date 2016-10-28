@@ -16,12 +16,13 @@
 #endif //CPPPARSER
 
 /**
- * BTRigidBody is a PandaNode representing a single "rigid body" of the Bullet
- * library integration of Panda3d.
+ * BTRigidBody is an extension/specialization of the BulletRigidBodyNode
+ * PandaNode representing a "rigid body" of the Bullet library integration of
+ * Panda3d.
  *
  * It constructs a rigid body with the single specified collision shape_type
  * along with relevant parameters.\n
- * Collision shape types are:
+ * Collision shape types currently are:
  * - *sphere*
  * - *plane*
  * - *box*
@@ -30,11 +31,11 @@
  * - *cone*
  * - *heightfield*
  * - *triangle mesh*
- * .
- * In case of *sphere*, *box*, *cylinder*, *capsule*, *cone*, if any of
- * the relevant parameters is missing, the shape is automatically
- * constructed by guessing them through calculation of a tight bounding volume
- * of object geometry (supposedly specified by the model component).\n
+ *
+ * In case of *sphere*, *box*, *cylinder*, *capsule*, *cone*, if any of the
+ * relevant parameters is missing, the shape is automatically constructed by
+ * guessing them through calculation of a tight bounding volume of object
+ * geometry passed as argument to the setup member function.\n
  * For *plane* shape, in case of missing parameters, the default is
  * a plane with normal = (0,0,1) and d = 0.
  *
@@ -76,7 +77,7 @@ PUBLISHED:
 	 * The body type.
 	 * It may change during the BTRigidBody's lifetime.
 	 */
-	enum BodyType
+	enum BTBodyType
 	{
 		DYNAMIC, //!< DYNAMIC: mass != 0.0, physics driven (default)
 		STATIC,//!< STATIC: mass == 0.0, no driven
@@ -108,11 +109,11 @@ PUBLISHED:
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	void switch_body_type(BodyType bodyType);
-	INLINE void set_shape_type(GamePhysicsManager::ShapeType value);
-	INLINE GamePhysicsManager::ShapeType get_shape_type() const;
-	INLINE void set_shape_size(GamePhysicsManager::ShapeSize value);
-	INLINE GamePhysicsManager::ShapeSize get_shape_size() const;
+	void switch_body_type(BTBodyType bodyType);
+	INLINE void set_shape_type(GamePhysicsManager::BTShapeType value);
+	INLINE GamePhysicsManager::BTShapeType get_shape_type() const;
+	INLINE void set_shape_size(GamePhysicsManager::BTShapeSize value);
+	INLINE GamePhysicsManager::BTShapeSize get_shape_size() const;
 	INLINE void set_use_shape_of(const string& value);
 	INLINE string get_use_shape_of() const;
 	INLINE void set_shape_radius(float value);
@@ -179,9 +180,9 @@ private:
 	bool mSetup;
 	///@{
 	///Physical parameters.
-	BodyType mBodyType;
-	GamePhysicsManager::ShapeType mShapeType;
-	GamePhysicsManager::ShapeSize mShapeSize;
+	BTBodyType mBodyType;
+	GamePhysicsManager::BTShapeType mShapeType;
+	GamePhysicsManager::BTShapeSize mShapeSize;
 	///@}
 
 	inline void do_reset();
@@ -194,7 +195,7 @@ private:
 	///@{
 	void do_check_auto_shaping();
 	///Geometric functions and parameters.
-	PT(BulletShape) do_create_shape(GamePhysicsManager::ShapeType shapeType,
+	PT(BulletShape) do_create_shape(GamePhysicsManager::BTShapeType shapeType,
 			const NodePath& objectNP);
 	//use shape of (another object).
 	string mUseShapeOfId;

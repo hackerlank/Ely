@@ -301,7 +301,7 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
 /**
  * Sets a multi-valued parameter to a multi-value overwriting the existing one(s).
  */
-void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& paramName,
+void GamePhysicsManager::set_parameter_values(BTPhysicsType type, const string& paramName,
 		const ValueList<string>& paramValues)
 {
 	pair<ParameterTableIter, ParameterTableIter> iterRange;
@@ -353,7 +353,7 @@ void GamePhysicsManager::set_parameter_values(PhysicsType type, const string& pa
 /**
  * Gets the multiple values of a (actually set) parameter.
  */
-ValueList<string> GamePhysicsManager::get_parameter_values(PhysicsType type,
+ValueList<string> GamePhysicsManager::get_parameter_values(BTPhysicsType type,
 		const string& paramName) const
 {
 	ValueList<string> strList;
@@ -403,7 +403,7 @@ ValueList<string> GamePhysicsManager::get_parameter_values(PhysicsType type,
 /**
  * Sets a multi/single-valued parameter to a single value overwriting the existing one(s).
  */
-void GamePhysicsManager::set_parameter_value(PhysicsType type, const string& paramName,
+void GamePhysicsManager::set_parameter_value(BTPhysicsType type, const string& paramName,
 		const string& value)
 {
 	ValueList<string> valueList;
@@ -414,7 +414,7 @@ void GamePhysicsManager::set_parameter_value(PhysicsType type, const string& par
 /**
  * Gets a single value (i.e. the first one) of a parameter.
  */
-string GamePhysicsManager::get_parameter_value(PhysicsType type,
+string GamePhysicsManager::get_parameter_value(BTPhysicsType type,
 		const string& paramName) const
 {
 	ValueList<string> valueList = get_parameter_values(type, paramName);
@@ -424,7 +424,7 @@ string GamePhysicsManager::get_parameter_value(PhysicsType type,
 /**
  * Gets a list of the names of the parameters actually set.
  */
-ValueList<string> GamePhysicsManager::get_parameter_name_list(PhysicsType type) const
+ValueList<string> GamePhysicsManager::get_parameter_name_list(BTPhysicsType type) const
 {
 	ValueList<string> strList;
 	ParameterTableIter iter;
@@ -478,7 +478,7 @@ ValueList<string> GamePhysicsManager::get_parameter_name_list(PhysicsType type) 
  * \note: After reading objects from bam files, the objects' creation parameters
  * which reside in the manager, are reset to their default values.
  */
-void GamePhysicsManager::set_parameters_defaults(PhysicsType type)
+void GamePhysicsManager::set_parameters_defaults(BTPhysicsType type)
 {
 	if (type == RIGIDBODY)
 	{
@@ -845,7 +845,7 @@ void GamePhysicsManager::stop_default_update()
  * Returns the created BulletShape, or NULL on error.
  */
 PT(BulletShape)GamePhysicsManager::create_shape(NodePath modelNP,
-		ShapeType shapeType, ShapeSize shapeSize, LVecBase3f& modelDims,
+		BTShapeType shapeType, BTShapeSize shapeSize, LVecBase3f& modelDims,
 		LVector3f& modelDeltaCenter, float& modelRadius,
 		float& dim1, float& dim2, float& dim3, float& dim4,
 		bool automaticShaping, BulletUpAxis upAxis,
@@ -1086,7 +1086,7 @@ float GamePhysicsManager::get_bounding_dimensions(NodePath modelNP,
  * Returns the desired dimension.
  * \note Internal use only.
  */
-float GamePhysicsManager::do_get_dim(ShapeSize shapeSize, float d1, float d2)
+float GamePhysicsManager::do_get_dim(BTShapeSize shapeSize, float d1, float d2)
 {
 	float dim;
 	if (shapeSize == MINIMUN)
