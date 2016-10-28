@@ -526,9 +526,9 @@ int main(int argc, char *argv[])
 //		BulletUpAxis planeUpAxis = Z_up; // Z_up X_up Y_up
 //		sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis);
 		/// triangle mesh
-//		sceneNP = loadTerrainLowPoly("SceneNP");
+		sceneNP = loadTerrainLowPoly("SceneNP");
 		/// heightfield
-		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
+//		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
 		// set sceneNP transform
 		sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0), LVecBase3f(45.0, 0.0, 0.0));
 		// create scene's rigid_body (attached to the reference node)
@@ -542,10 +542,10 @@ int main(int argc, char *argv[])
 //		sceneRigidBody->set_shape_up(planeUpAxis);
 //		sceneRigidBody->set_shape_type(GamePhysicsManager::PLANE);
 		// triangle mesh
-//		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
+		sceneRigidBody->set_shape_type(GamePhysicsManager::TRIANGLEMESH);
 		// heightfield
-		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
-		sceneRigidBody->set_shape_heightfield_file(dataDir + string("/heightfield.png"));
+//		sceneRigidBody->set_shape_type(GamePhysicsManager::HEIGHTFIELD);
+//		sceneRigidBody->set_shape_heightfield_file(dataDir + string("/heightfield.png"));
 		// other common parameters
 		sceneRigidBody->switch_body_type(BTRigidBody::STATIC);
 		sceneRigidBodyNP.set_collide_mask(mask);
