@@ -24,7 +24,7 @@ extern Dtool_PyTypedObject Dtool_BTSoftBody;
  *
  */
 BTSoftBody::BTSoftBody(const string& name) :
-		PandaNode(name)
+		BulletSoftBodyNode(name)
 {
 	do_reset();
 }
@@ -665,7 +665,7 @@ void BTSoftBody::register_with_read_factory()
  */
 void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
 {
-	PandaNode::write_datagram(manager, dg);
+	BulletSoftBodyNode::write_datagram(manager, dg);
 
 	///Name of this BTSoftBody.
 	dg.add_string(get_name());
@@ -739,7 +739,7 @@ void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
  */
 int BTSoftBody::complete_pointers(TypedWritable **p_list, BamReader *manager)
 {
-	int pi = PandaNode::complete_pointers(p_list, manager);
+	int pi = BulletSoftBodyNode::complete_pointers(p_list, manager);
 
 	/// Pointers
 	///The reference node path.
@@ -781,7 +781,7 @@ TypedWritable *BTSoftBody::make_from_bam(const FactoryParams &params)
  */
 void BTSoftBody::fillin(DatagramIterator &scan, BamReader *manager)
 {
-	PandaNode::fillin(scan, manager);
+	BulletSoftBodyNode::fillin(scan, manager);
 
 	///Name of this BTSoftBody.
 	set_name(scan.get_string());
