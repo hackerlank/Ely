@@ -52,7 +52,7 @@
  *
  * \note parts inside [] are optional.\n
  */
-class EXPORT_CLASS BTSoftBody: public BulletSoftBodyNode
+class EXPORT_CLASS BTSoftBody: public PandaNode
 {
 PUBLISHED:
 
@@ -241,8 +241,8 @@ public:
 	}
 	static void init_type()
 	{
-		BulletSoftBodyNode::init_type();
-		register_type(_type_handle, "BTSoftBody", BulletSoftBodyNode::get_class_type());
+		PandaNode::init_type();
+		register_type(_type_handle, "BTSoftBody", PandaNode::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{

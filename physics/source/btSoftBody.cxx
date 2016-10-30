@@ -24,7 +24,7 @@ extern Dtool_PyTypedObject Dtool_BTSoftBody;
  *
  */
 BTSoftBody::BTSoftBody(const string& name) :
-		BulletSoftBodyNode(name)
+		PandaNode(name)
 {
 	do_reset();
 }
@@ -91,7 +91,7 @@ void BTSoftBody::do_initialize()
 	//
 	string param;
 	unsigned int idx, valueNum;
-	vector<string> paramValuesStr;
+	pvector<string> paramValuesStr;
 	float value;
 	int valueInt;
 	//body total mass
@@ -136,7 +136,7 @@ void BTSoftBody::do_initialize()
 	valueNum = paramValuesStr.size();
 	for (idx = 0; (idx < valueNum) && (idx < 4); ++idx)
 	{
-		vector<string> paramValuesStrExt = parseCompoundString(
+		pvector<string> paramValuesStrExt = parseCompoundString(
 				paramValuesStr[idx], ',');
 		if (paramValuesStrExt.size() < 3)
 		{
@@ -542,24 +542,24 @@ void BTSoftBody::setup(NodePath& objectNP)
  * destroyed.
  * \note Internal use only.
  */
-void BTSoftBody::do_finalize()
-{
-	//if enabled: disable
-	if (mEnabled)
-	{
-		//actual disabling
-		do_disable();
-	}
-#ifdef PYTHON_BUILD
-	//Python callback
-	Py_DECREF(mSelf);
-	Py_XDECREF(mUpdateCallback);
-	Py_XDECREF(mUpdateArgList);
-#endif //PYTHON_BUILD
-	do_reset();
-	//
-	return;
-}
+//void BTSoftBody::do_finalize() xxx
+//{
+//	//if enabled: disable
+//	if (mEnabled)
+//	{
+//		//actual disabling
+//		do_disable();
+//	}
+//#ifdef PYTHON_BUILD
+//	//Python callback
+//	Py_DECREF(mSelf);
+//	Py_XDECREF(mUpdateCallback);
+//	Py_XDECREF(mUpdateArgList);
+//#endif //PYTHON_BUILD
+//	do_reset();
+//	//
+//	return;
+//}
 
 
 
@@ -665,7 +665,7 @@ void BTSoftBody::register_with_read_factory()
  */
 void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
 {
-	BulletSoftBodyNode::write_datagram(manager, dg);
+	PandaNode::write_datagram(manager, dg);
 
 	///Name of this BTSoftBody.
 	dg.add_string(get_name());
@@ -739,7 +739,7 @@ void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
  */
 int BTSoftBody::complete_pointers(TypedWritable **p_list, BamReader *manager)
 {
-	int pi = BulletSoftBodyNode::complete_pointers(p_list, manager);
+	int pi = PandaNode::complete_pointers(p_list, manager);
 
 	/// Pointers
 	///The reference node path.
@@ -781,7 +781,7 @@ TypedWritable *BTSoftBody::make_from_bam(const FactoryParams &params)
  */
 void BTSoftBody::fillin(DatagramIterator &scan, BamReader *manager)
 {
-	BulletSoftBodyNode::fillin(scan, manager);
+	PandaNode::fillin(scan, manager);
 
 	///Name of this BTSoftBody.
 	set_name(scan.get_string());
@@ -855,69 +855,69 @@ TypeHandle BTSoftBody::_type_handle;
 
 ///////////////////////////////
 
-void SoftBody::onRemoveFromObjectCleanup()
-{
-	NodePath oldObjectNodePath;
-	//set the object node path to the first child of rigid body's one (if any)
-	if (thisNP.get_num_children() > 0)
-	{
-		oldObjectNodePath = thisNP.get_child(0);
-		//detach the object node path from the rigid body's one
-		oldObjectNodePath.detach_node();
-	}
-	else
-	{
-		oldObjectNodePath = NodePath();
-	}
-	//set the object node path to the old one
-	mOwnerObject->setNodePath(oldObjectNodePath);
-
-	//remove from table of all physics components indexed by
-	//(underlying) Bullet PandaNodes
-	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
-			mSoftBodyNode.p(), NULL);
-
-	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
-	{
-		//remove rigid body from the physics world
-		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
-				mSoftBodyNode);
-	}
-
-	//Remove node path
-	thisNP.remove_node();
-	//
-	reset();
-}
-
-void SoftBody::onAddToSceneSetup()
-{
-	//XXX: HACK: rope node's parent node path correction (see bullet samples)
-	if (mBodyType == ROPE)
-	{
-		PT(PandaNode)pandaNode =
-		thisNP.find_all_matches("**/+RopeNode").get_path(
-				0).node();
-		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
-		{
-			//the child is the rope node: reparent to the owner object node path
-			mRopeNodePath = thisNP.get_child(0);
-			mRopeNodePath.reparent_to(thisNP.get_parent());
-		}
-	}
-}
-
-void SoftBody::onRemoveFromSceneCleanup()
-{
-	//XXX: HACK: rope node's parent node path correction (see bullet samples)
-	if (mBodyType == ROPE)
-	{
-		if (! mRopeNodePath.is_empty())
-		{
-			//the child is the rope node reparent to this node path
-			mRopeNodePath.reparent_to(thisNP);
-		}
-	}
-}
+//void SoftBody::onRemoveFromObjectCleanup()
+//{
+//	NodePath oldObjectNodePath;
+//	//set the object node path to the first child of rigid body's one (if any)
+//	if (thisNP.get_num_children() > 0)
+//	{
+//		oldObjectNodePath = thisNP.get_child(0);
+//		//detach the object node path from the rigid body's one
+//		oldObjectNodePath.detach_node();
+//	}
+//	else
+//	{
+//		oldObjectNodePath = NodePath();
+//	}
+//	//set the object node path to the old one
+//	mOwnerObject->setNodePath(oldObjectNodePath);
+//
+//	//remove from table of all physics components indexed by
+//	//(underlying) Bullet PandaNodes
+//	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+//			mSoftBodyNode.p(), NULL);
+//
+//	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+//	{
+//		//remove rigid body from the physics world
+//		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+//				mSoftBodyNode);
+//	}
+//
+//	//Remove node path
+//	thisNP.remove_node();
+//	//
+//	reset();
+//}
+//
+//void SoftBody::onAddToSceneSetup()
+//{
+//	//XXX: HACK: rope node's parent node path correction (see bullet samples)
+//	if (mBodyType == ROPE)
+//	{
+//		PT(PandaNode)pandaNode =
+//		thisNP.find_all_matches("**/+RopeNode").get_path(
+//				0).node();
+//		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
+//		{
+//			//the child is the rope node: reparent to the owner object node path
+//			mRopeNodePath = thisNP.get_child(0);
+//			mRopeNodePath.reparent_to(thisNP.get_parent());
+//		}
+//	}
+//}
+//
+//void SoftBody::onRemoveFromSceneCleanup()
+//{
+//	//XXX: HACK: rope node's parent node path correction (see bullet samples)
+//	if (mBodyType == ROPE)
+//	{
+//		if (! mRopeNodePath.is_empty())
+//		{
+//			//the child is the rope node reparent to this node path
+//			mRopeNodePath.reparent_to(thisNP);
+//		}
+//	}
+//}
 
 
