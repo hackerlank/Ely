@@ -26,10 +26,10 @@ init_libp3physics() {
   // Init your dynamic types here, e.g.:
   // MyDynamicClass::init_type();
   BTRigidBody::init_type();
-//  BTSoftBody::init_type(); xxx
+  BTSoftBody::init_type();
 //  BTGhost::init_type();
   BTRigidBody::register_with_read_factory();
-//  BTSoftBody::register_with_read_factory(); xxx
+  BTSoftBody::register_with_read_factory();
 //  BTGhost::register_with_read_factory();
   GamePhysicsManager::init_type();
 

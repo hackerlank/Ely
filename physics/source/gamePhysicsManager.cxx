@@ -21,8 +21,8 @@
 #include "throw_event.h"
 
 #include "btRigidBody.h"
-//#include "btSoftBody.h"
-//#include "btGhost.h"
+#include "btSoftBody.h"
+//#include "btGhost.h"xxx
 
 /**
  *
@@ -38,9 +38,9 @@ GamePhysicsManager::GamePhysicsManager(int taskSort, const NodePath& root,
 
 	mRigidBodies.clear();
 	mRigidBodiesParameterTable.clear();
-//	mSoftBodies.clear(); xxx
-//	mSoftBodiesParameterTable.clear();
-//	mGhosts.clear();
+	mSoftBodies.clear();
+	mSoftBodiesParameterTable.clear();
+//	mGhosts.clear();xxx
 //	mGhostsParameterTable.clear();
 	set_parameters_defaults(RIGIDBODY);
 	set_parameters_defaults(SOFTBODY);
@@ -85,16 +85,16 @@ GamePhysicsManager::~GamePhysicsManager()
 			iterA = mRigidBodies.erase(iterA);
 		}
 
-//		//destroy all BTSoftBodys xxx
-//		PTA(PT(BTSoftBody))::iterator iterB = mSoftBodies.begin();
-//		while (iterB != mSoftBodies.end())
-//		{
-//			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
-//			//give a chance to BTSoftBody to cleanup itself before being destroyed.
-//			(*iterB)->do_finalize();
-//			//remove the BTSoftBodys from the inner list (&& from the update task)
-//			iterB = mSoftBodies.erase(iterB);
-//		}
+		//destroy all BTSoftBodys
+		PTA(PT(BTSoftBody))::iterator iterB = mSoftBodies.begin();
+		while (iterB != mSoftBodies.end())
+		{
+			//\see http://stackoverflow.com/questions/596162/can-you-remove-elements-from-a-stdlist-while-iterating-through-it
+			//give a chance to BTSoftBody to cleanup itself before being destroyed.
+			(*iterB)->do_finalize();
+			//remove the BTSoftBodys from the inner list (&& from the update task)
+			iterB = mSoftBodies.erase(iterB);
+		}
 
 //		//destroy all BTGhosts xxx
 //		PTA(PT(BTGhost))::iterator iterC = mGhosts.begin();
@@ -109,7 +109,7 @@ GamePhysicsManager::~GamePhysicsManager()
 	}
 	//clear parameters' tables
 	mRigidBodiesParameterTable.clear();
-//	mSoftBodiesParameterTable.clear(); xxx
+	mSoftBodiesParameterTable.clear();
 //	mGhostsParameterTable.clear(); xxx
 }
 
@@ -123,13 +123,13 @@ NodePath GamePhysicsManager::create_rigid_body(const string& name)
 	nassertr_always(!name.empty(), NodePath::fail())
 
 	PT(BTRigidBody) newRigidBody = new BTRigidBody(name);
-	nassertr_always(newRigidBody /*&& (!mWin.is_null())xxx*/, NodePath::fail())
+	nassertr_always(newRigidBody, NodePath::fail())
 
 	// set reference node
 	newRigidBody->mReferenceNP = mReferenceNP;
 	// reparent to reference node && set "this" NodePath
 	NodePath np = mReferenceNP.attach_new_node(newRigidBody);
-	// initialize the new RigidBody (could use mReferenceNP, mThisNP, mWin)
+	// initialize the new RigidBody (could use mReferenceNP, mThisNP)
 	newRigidBody->do_initialize();
 
 	// add the new RigidBody to the inner list (&& to the update task)
@@ -177,63 +177,59 @@ PT(BTRigidBody) GamePhysicsManager::get_rigid_body(int index) const
  * Returns a NodePath to the new BTSoftBody,or an empty NodePath with the
  * ET_fail error type set on error.
  */
-//NodePath GamePhysicsManager::create_soft_body(const string& name) xxx
-//{
-//	nassertr_always(!name.empty(), NodePath::fail())
-//
-//	PT(BTSoftBody)newSoftBody = new BTSoftBody(name);
-//	nassertr_always(newSoftBody /*&& (!mWin.is_null()) xxx*/, NodePath::fail())
-//
-//	// set reference node
-//	newSoftBody->mReferenceNP = mReferenceNP;
-//	// reparent to reference node && set "this" NodePath
-//	NodePath np = mReferenceNP.attach_new_node(newSoftBody);
-//	// set the reference graphic window.
-////	newSoftBody->mWin = mWin;xxx
-//	// initialize the new Driver (could use mReferenceNP, mThisNP, mWin)
-//	newSoftBody->do_initialize();
-//
-//	// add the new Driver to the inner list (&& to the update task)
-//	mSoftBodies.push_back(newSoftBody);
-//	//
-//	return np;
-//}
+NodePath GamePhysicsManager::create_soft_body(const string& name)
+{
+	nassertr_always(!name.empty(), NodePath::fail())
+
+	PT(BTSoftBody)newSoftBody = new BTSoftBody(name);
+	nassertr_always(newSoftBody, NodePath::fail())
+
+	// set reference node
+	newSoftBody->mReferenceNP = mReferenceNP;
+	// reparent to reference node && set "this" NodePath
+	NodePath np = mReferenceNP.attach_new_node(newSoftBody);
+	// initialize the new Driver (could use mReferenceNP, mThisNP)
+	newSoftBody->do_initialize();
+
+	// add the new Driver to the inner list (&& to the update task)
+	mSoftBodies.push_back(newSoftBody);
+	//
+	return np;
+}
 
 /**
  * Destroys a BTSoftBody.
  * Returns false on error.
  */
-//bool GamePhysicsManager::destroy_soft_body(NodePath softBodyNP) xxx
-//{
-//	CONTINUE_IF_ELSE_R(
-//			softBodyNP.node()->is_of_type(BTSoftBody::get_class_type()),
-//			false)
-//
-//	PT(BTSoftBody)soft_body = DCAST(BTSoftBody, softBodyNP.node());
-//	SoftBodyList::iterator iter = find(mSoftBodies.begin(),
-//			mSoftBodies.end(), soft_body);
-//	CONTINUE_IF_ELSE_R(iter != mSoftBodies.end(), false)
-//
-//	// give a chance to BTSoftBody to cleanup itself before being destroyed.
-//	soft_body->do_finalize();
-//	// reset the reference graphic window. xxx
-//	soft_body->mWin.clear();
-//	//remove the BTSoftBody from the inner list (&& from the update task)
-//	mSoftBodies.erase(iter);
-//	//
-//	return true;
-//}
+bool GamePhysicsManager::destroy_soft_body(NodePath softBodyNP)
+{
+	CONTINUE_IF_ELSE_R(
+			softBodyNP.node()->is_of_type(BTSoftBody::get_class_type()),
+			false)
+
+	PT(BTSoftBody)soft_body = DCAST(BTSoftBody, softBodyNP.node());
+	SoftBodyList::iterator iter = find(mSoftBodies.begin(),
+			mSoftBodies.end(), soft_body);
+	CONTINUE_IF_ELSE_R(iter != mSoftBodies.end(), false)
+
+	// give a chance to BTSoftBody to cleanup itself before being destroyed.
+	soft_body->do_finalize();
+	//remove the BTSoftBody from the inner list (&& from the update task)
+	mSoftBodies.erase(iter);
+	//
+	return true;
+}
 
 /**
  * Gets an BTSoftBody by index, or NULL on error.
  */
-//PT(BTSoftBody) GamePhysicsManager::get_soft_body(int index) const xxx
-//{
-//	nassertr_always((index >= 0) && (index < (int ) mSoftBodies.size()),
-//			NULL)
-//
-//	return mSoftBodies[index];
-//}
+PT(BTSoftBody) GamePhysicsManager::get_soft_body(int index) const
+{
+	nassertr_always((index >= 0) && (index < (int ) mSoftBodies.size()),
+			NULL)
+
+	return mSoftBodies[index];
+}
 
 /**
  * Creates a BTGhost with a given (mandatory && not empty) name.
@@ -320,20 +316,20 @@ void GamePhysicsManager::set_parameter_values(BTPhysicsType type, const string& 
 		}
 		return;
 	}
-//	if (type == SOFTBODY) xxx
-//	{
-//		//find from mParameterTable the paramName's values to be overwritten
-//		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
-//		//...&& erase them
-//		mSoftBodiesParameterTable.erase(iterRange.first, iterRange.second);
-//		//insert the new values
-//		for (int idx = 0; idx < paramValues.size(); ++idx)
-//		{
-//			mSoftBodiesParameterTable.insert(
-//					ParameterNameValue(paramName, paramValues[idx]));
-//		}
-//		return;
-//	}
+	if (type == SOFTBODY)
+	{
+		//find from mParameterTable the paramName's values to be overwritten
+		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
+		//...&& erase them
+		mSoftBodiesParameterTable.erase(iterRange.first, iterRange.second);
+		//insert the new values
+		for (int idx = 0; idx < paramValues.size(); ++idx)
+		{
+			mSoftBodiesParameterTable.insert(
+					ParameterNameValue(paramName, paramValues[idx]));
+		}
+		return;
+	}
 //	if (type == GHOST) xxx
 //	{
 //		//find from mParameterTable the paramName's values to be overwritten
@@ -372,18 +368,18 @@ ValueList<string> GamePhysicsManager::get_parameter_values(BTPhysicsType type,
 		}
 		return strList;
 	}
-//	if (type == SOFTBODY) xxx
-//	{
-//		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
-//		if (iterRange.first != iterRange.second)
-//		{
-//			for (iter = iterRange.first; iter != iterRange.second; ++iter)
-//			{
-//				strList.add_value(iter->second);
-//			}
-//		}
-//		return strList;
-//	}
+	if (type == SOFTBODY)
+	{
+		iterRange = mSoftBodiesParameterTable.equal_range(paramName);
+		if (iterRange.first != iterRange.second)
+		{
+			for (iter = iterRange.first; iter != iterRange.second; ++iter)
+			{
+				strList.add_value(iter->second);
+			}
+		}
+		return strList;
+	}
 //	if (type == GHOST) xxx
 //	{
 //		iterRange = mGhostsParameterTable.equal_range(paramName);
@@ -443,19 +439,19 @@ ValueList<string> GamePhysicsManager::get_parameter_name_list(BTPhysicsType type
 		}
 		return strList;
 	}
-//	if (type == SOFTBODY) xxx
-//	{
-//		tempTable = mSoftBodiesParameterTable;
-//		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
-//		{
-//			string name = (*iter).first;
-//			if (!strList.has_value(name))
-//			{
-//				strList.add_value(name);
-//			}
-//		}
-//		return strList;
-//	}
+	if (type == SOFTBODY)
+	{
+		tempTable = mSoftBodiesParameterTable;
+		for (iter = tempTable.begin(); iter != tempTable.end(); ++iter)
+		{
+			string name = (*iter).first;
+			if (!strList.has_value(name))
+			{
+				strList.add_value(name);
+			}
+		}
+		return strList;
+	}
 //	if (type == GHOST) xxx
 //	{
 //		tempTable = mGhostsParameterTable;
@@ -509,42 +505,25 @@ void GamePhysicsManager::set_parameters_defaults(BTPhysicsType type)
 				ParameterNameValue("shape_scale_d", "1.0"));
 		return;
 	}
-//	if (type == SOFTBODY) xxx
-//	{
-//		///mSoftBodiesParameterTable must be the first cleared
-//		mSoftBodiesParameterTable.clear();
-//		//sets the (mandatory) parameters to their default values:
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("enabled", "true"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("forward", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("backward", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("head_limit", "false@0.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("head_left", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("head_right", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_limit", "false@0.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_up", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("pitch_down", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("strafe_left", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("strafe_right", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("up", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("down", "enabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_move", "disabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_head", "disabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("mouse_pitch", "disabled"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("speed_key", "shift"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("inverted_translation", "false"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("inverted_rotation", "false"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("max_linear_speed", "5.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("max_angular_speed", "5.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("linear_accel", "5.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("angular_accel", "5.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("linear_friction", "0.1"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("angular_friction", "0.1"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("stop_threshold", "0.01"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("fast_factor", "5.0"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_x", "0.2"));
-//		mSoftBodiesParameterTable.insert(ParameterNameValue("sens_y", "0.2"));
-//		return;
-//	}
+	if (type == SOFTBODY)
+	{
+		///mSoftBodiesParameterTable must be the first cleared
+		mSoftBodiesParameterTable.clear();
+		//sets the (mandatory) parameters to their default values:
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		return;
+	}
 //	if (type == GHOST) xxx
 //	{
 //		///mGhostsParameterTable must be the first cleared
@@ -602,12 +581,12 @@ AsyncTask::DoneStatus GamePhysicsManager::update(GenericAsyncTask* task)
 	{
 		mRigidBodies[index]->update(dt);
 	}
-//	// call all BTSoftBodys' update functions, passing delta time xxx
-//	for (PTA(PT(BTSoftBody))::size_type index = 0;
-//			index < mSoftBodies.size(); ++index)
-//	{
-//		mSoftBodies[index]->update(dt);
-//	}
+	// call all BTSoftBodys' update functions, passing delta time
+	for (PTA(PT(BTSoftBody))::size_type index = 0;
+			index < mSoftBodies.size(); ++index)
+	{
+		mSoftBodies[index]->update(dt);
+	}
 //	// call all BTGhosts' update functions, passing delta time xxx
 //	for (PTA(PT(BTGhost))::size_type index = 0;
 //			index < mGhosts.size(); ++index)

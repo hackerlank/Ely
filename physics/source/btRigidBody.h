@@ -74,7 +74,7 @@ class EXPORT_CLASS BTRigidBody: public BulletRigidBodyNode
 PUBLISHED:
 
 	/**
-	 * The body type.
+	 * The rigid body type.
 	 * It may change during the BTRigidBody's lifetime.
 	 */
 	enum BTBodyType

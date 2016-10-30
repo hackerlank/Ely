@@ -4,758 +4,673 @@
  * \date 2016-10-09
  * \author consultit
  */
-//TODO: REMOVE COMMENTS EVERYWHERE
-//#if !defined(CPPPARSER) && defined(_WIN32)
-//#include "support_os/pstdint.h"
-//#endif
-//
-//#include "btSoftBody.h"
-//#include "gamePhysicsManager.h"
-//#include <cmath>
-//
-//#ifndef CPPPARSER
-//#endif //CPPPARSER
-//#ifdef PYTHON_BUILD
-//#include "py_panda.h"
-//extern Dtool_PyTypedObject Dtool_BTSoftBody;
-//#endif //PYTHON_BUILD
-//
-///**
-// *
-// */
-//BTSoftBody::BTSoftBody(const string& name) :
-//		PandaNode(name)
-//{
-//	do_reset();
-//}
-//
-///**
-// *
-// */
-//BTSoftBody::~BTSoftBody()
-//{
-//}
-//
-///**
-// * Initializes the BTSoftBody with starting settings.
-// * \note Internal use only.
-// */
-//void BTSoftBody::do_initialize()
-//{
-//	WPT(GamePhysicsManager)mTmpl = GamePhysicsManager::get_global_ptr();
-//	//inverted setting (1/-1): not inverted -> 1, inverted -> -1
-//	mSignOfTranslation = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("inverted_translation"))
-//			== string("true") ? -1 : 1);
-//	mSignOfMouse = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("inverted_rotation"))
-//			== string("true") ? -1 : 1);
-//	//head limit: enabled@[limit]; limit >= 0.0
-//	pvector<string> paramValuesStr = parseCompoundString(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("head_limit")), '@');
-//	if (paramValuesStr.size() >= 2)
-//	{
-//		//enabled
-//		mHeadLimitEnabled = (
-//				paramValuesStr[0] == string("true") ? true : false);
-//		float value;
-//		//limit
-//		value = STRTOF(paramValuesStr[1].c_str(), NULL);
-//		value >= 0.0 ? mHLimit = value : mHLimit = -value;
-//	}
-//	//pitch limit: enabled@[limit]; limit >= 0.0
-//	paramValuesStr = parseCompoundString(
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("pitch_limit")), '@');
-//	if (paramValuesStr.size() >= 2)
-//	{
-//		//enabled
-//		mPitchLimitEnabled = (
-//				paramValuesStr[0] == string("true") ? true : false);
-//		float value;
-//		//limit
-//		value = STRTOF(paramValuesStr[1].c_str(), NULL);
-//		value >= 0.0 ? mPLimit = value : mPLimit = -value;
-//	}
-//	//mouse movement setting
-//	mMouseEnabledH = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("mouse_head"))
-//			== string("enabled") ? true : false);
-//	mMouseEnabledP = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("mouse_pitch"))
-//			== string("enabled") ? true : false);
-//	//key events setting
-//	//forward key
-//	mForwardKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("forward"))
-//			== string("disabled") ? false : true);
-//	//backward key
-//	mBackwardKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("backward"))
-//			== string("disabled") ? false : true);
-//	//up key
-//	mUpKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("up")) == string("disabled") ?
-//			false : true);
-//	//down key
-//	mDownKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("down")) == string("disabled") ?
-//			false : true);
-//	//strafeLeft key
-//	mStrafeLeftKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("strafe_left"))
-//			== string("disabled") ? false : true);
-//	//strafeRight key
-//	mStrafeRightKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("strafe_right"))
-//			== string("disabled") ? false : true);
-//	//headLeft key
-//	mHeadLeftKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("head_left"))
-//			== string("disabled") ? false : true);
-//	//headRight key
-//	mHeadRightKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("head_right"))
-//			== string("disabled") ? false : true);
-//	//pitchUp key
-//	mPitchUpKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("pitch_up"))
-//			== string("disabled") ? false : true);
-//	//pitchDown key
-//	mPitchDownKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("pitch_down"))
-//			== string("disabled") ? false : true);
-//	//mouseMove key: enabled/disabled
-//	mMouseMoveKey = (
-//			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("mouse_move"))
-//			== string("enabled") ? true : false);
-//	//
-//	float value, absValue;
-//	//max linear speed (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("max_linear_speed")).c_str(),
-//			NULL);
-//	absValue = (value >= 0.0 ? value : -value);
-//	mMaxSpeedXYZ = LVecBase3f(absValue, absValue, absValue);
-//	mMaxSpeedSquaredXYZ = LVector3f(mMaxSpeedXYZ.get_x() * mMaxSpeedXYZ.get_x(),
-//			mMaxSpeedXYZ.get_y() * mMaxSpeedXYZ.get_y(),
-//			mMaxSpeedXYZ.get_z() * mMaxSpeedXYZ.get_z());
-//	//max angular speed (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("max_angular_speed")).c_str(),
-//			NULL);
-//	mMaxSpeedHP = (value >= 0.0 ? value : -value);
-//	mMaxSpeedSquaredHP = mMaxSpeedHP * mMaxSpeedHP;
-//	//linear accel (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("linear_accel")).c_str(), NULL);
-//	absValue = (value >= 0.0 ? value : -value);
-//	mAccelXYZ = LVecBase3f(absValue, absValue, absValue);
-//	//angular accel (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("angular_accel")).c_str(),
-//			NULL);
-//	mAccelHP = (value >= 0.0 ? value : -value);
-//	//reset actual speeds
-//	mActualSpeedXYZ = LVector3f::zero();
-//	mActualSpeedH = 0.0;
-//	mActualSpeedP = 0.0;
-//	//linear friction (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("linear_friction")).c_str(),
-//			NULL);
-//	mFrictionXYZ = (value >= 0.0 ? value : -value);
-//	//angular friction (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("angular_friction")).c_str(),
-//			NULL);
-//	mFrictionHP = (value >= 0.0 ? value : -value);
-//	//stop threshold ([0.0, 1.0])
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("stop_threshold")).c_str(),
-//			NULL);
-//	mStopThreshold =
-//	(value >= 0.0 ? value - floor(value) : ceil(value) - value);
-//	//fast factor (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("fast_factor")).c_str(),
-//			NULL);
-//	mFastFactor = (value >= 0.0 ? value : -value);
-//	//sens x (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("sens_x")).c_str(),
-//			NULL);
-//	mSensX = (value >= 0.0 ? value : -value);
-//	//sens_y (>=0)
-//	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("sens_y")).c_str(),
-//			NULL);
-//	mSensY = (value >= 0.0 ? value : -value);
-//	//
-//	mCentX = mWin->get_properties().get_x_size() / 2;
-//	mCentY = mWin->get_properties().get_y_size() / 2;
-//	//enabling setting
-//	if ((mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY,
+
+#if !defined(CPPPARSER) && defined(_WIN32)
+#include "support_os/pstdint.h"
+#endif
+
+#include "btSoftBody.h"
+#include "gamePhysicsManager.h"
+#include <cmath>
+
+#ifndef CPPPARSER
+#endif //CPPPARSER
+#ifdef PYTHON_BUILD
+#include "py_panda.h"
+extern Dtool_PyTypedObject Dtool_BTSoftBody;
+#endif //PYTHON_BUILD
+
+/**
+ *
+ */
+BTSoftBody::BTSoftBody(const string& name) :
+		PandaNode(name)
+{
+	do_reset();
+}
+
+/**
+ *
+ */
+BTSoftBody::~BTSoftBody()
+{
+}
+
+/**
+ * Initializes the BTSoftBody with starting settings.
+ * \note Internal use only.
+ */
+void BTSoftBody::do_initialize()
+{
+	WPT(GamePhysicsManager)mTmpl = GamePhysicsManager::get_global_ptr();
+	//body type
+	string bodyType = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY,
+			string("body_type"));
+	if (bodyType == string("patch"))
+	{
+		mBodyType = PATCH;
+	}
+	else if (bodyType == string("ellipsoid"))
+	{
+		mBodyType = ELLIPSOID;
+	}
+	else if (bodyType == string("tri_mesh"))
+	{
+		mBodyType = TRIMESH;
+	}
+	else if (bodyType == string("tetra_mesh"))
+	{
+		mBodyType = TETRAMESH;
+	}
+	else
+	{
+		mBodyType = ROPE;
+	}
+	//collide mask
+	NodePath thisNP = NodePath::any_path(this);
+	string collideMask = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY,
+			string("collide_mask"));
+	if (collideMask == string("all_on"))
+	{
+		thisNP.set_collide_mask(BitMask32::all_on());
+	}
+	else if (collideMask == string("all_off"))
+	{
+		thisNP.set_collide_mask(BitMask32::all_off());
+	}
+	else
+	{
+		uint32_t mask = (uint32_t) strtol(collideMask.c_str(), NULL, 0);
+		BitMask32 mCollideMask;
+		mCollideMask.set_word(mask);
+		thisNP.set_collide_mask(mCollideMask);
+#ifdef ELY_DEBUG
+		mCollideMask.write(cout, 0);
+#endif
+	}
+	//
+	string param;
+	unsigned int idx, valueNum;
+	vector<string> paramValuesStr;
+	float value;
+	int valueInt;
+	//body total mass
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("body_total_mass")).c_str(),
+	NULL);
+	mBodyTotalMass = (value >= 0.0 ? value : -value);
+	//body mass from faces
+	mBodyMassFromFaces = (
+			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("body_mass_from_faces"))
+					== string("true") ? true : false);
+	//air density
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("air_density")).c_str(),
+	NULL);
+	mAirDensity = (value >= 0.0 ? value : -value);
+	//water density
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("water_density")).c_str(),
+	NULL);
+	mWaterDensity = (value >= 0.0 ? value : -value);
+	//water offset
+	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("water_offset")).c_str(),
+	NULL);
+	mWaterOffset = (value >= 0.0 ? value : -value);
+	//water normal
+	param = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("water_normal"));
+	paramValuesStr = parseCompoundString(param, ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
+	{
+		paramValuesStr.resize(3, "0.0");
+	}
+	for (idx = 0; idx < 3; ++idx)
+	{
+		mWaterNormal[idx] = STRTOF(paramValuesStr[idx].c_str(), NULL);
+	}
+	//show model
+	mShowModel = (
+			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("show_model")) == string("true") ?
+					true : false);
+	//points
+	param = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("points"));
+	paramValuesStr = parseCompoundString(param, ':');
+	valueNum = paramValuesStr.size();
+	for (idx = 0; (idx < valueNum) && (idx < 4); ++idx)
+	{
+		vector<string> paramValuesStrExt = parseCompoundString(
+				paramValuesStr[idx], ',');
+		if (paramValuesStrExt.size() < 3)
+		{
+			paramValuesStrExt.resize(3, "0.0");
+		}
+		LPoint3f point;
+		for (unsigned int i = 0; i < 3; ++i)
+		{
+			point[i] = STRTOF(paramValuesStrExt[i].c_str(), NULL);
+		}
+		mPoints.push_back(point);
+	}
+	//res
+	param = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("res"));
+	paramValuesStr = parseCompoundString(param, ':');
+	valueNum = paramValuesStr.size();
+	for (idx = 0; (idx < valueNum) && (idx < 2); ++idx)
+	{
+		valueInt = strtol(paramValuesStr[idx].c_str(), NULL, 0);
+		mRes.push_back(valueInt >= 0 ? valueInt : -valueInt);
+	}
+	//fixeds
+	mFixeds = strtol(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("fixeds")).c_str(), NULL, 0);
+	//gendiags
+	mGendiags = (
+			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("gendiags")) == string("false") ?
+					false : true);
+	//radius
+	param = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("radius"));
+	paramValuesStr = parseCompoundString(param, ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum < 3)
+	{
+		paramValuesStr.resize(3, "0.0");
+	}
+	for (idx = 0; idx < 3; ++idx)
+	{
+		mRadius[idx] = STRTOF(paramValuesStr[idx].c_str(), NULL);
+	}
+	//randomize constraints
+	mRandomizeConstraints = (
+			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("randomize_constraints"))
+					== string("false") ? false : true);
+	//tetra data files
+	param = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("tetra_data_files"));
+	paramValuesStr = parseCompoundString(param, ',');
+	valueNum = paramValuesStr.size();
+	if (valueNum >= 3)
+	{
+		mTetraDataFileNames["elems"] = paramValuesStr[0];
+		mTetraDataFileNames["faces"] = paramValuesStr[1];
+		mTetraDataFileNames["nodes"] = paramValuesStr[2];
+	}
+	//enabling setting
+//	if ((mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY,xxx
 //			string("enabled")) == string("false") ? false : true))
 //	{
 //		do_enable();
 //	}
-//#ifdef PYTHON_BUILD
-//	//Python callback
-//	this->ref();
-//	mSelf = DTool_CreatePyInstanceTyped(this, Dtool_BTSoftBody, true, false,
-//			get_type_index());
-//#endif //PYTHON_BUILD
-//}
-//
-///**
-// * On destruction cleanup.
-// * Gives an BTSoftBody the ability to do any cleaning is necessary when
-// * destroyed.
-// * \note Internal use only.
-// */
-//void BTSoftBody::do_finalize()
-//{
-//	//if enabled: disable
-//	if (mEnabled)
-//	{
-//		//actual disabling
-//		do_disable();
-//	}
-//#ifdef PYTHON_BUILD
-//	//Python callback
-//	Py_DECREF(mSelf);
-//	Py_XDECREF(mUpdateCallback);
-//	Py_XDECREF(mUpdateArgList);
-//#endif //PYTHON_BUILD
-//	do_reset();
-//	//
-//	return;
-//}
-//
-///**
-// * Enables the BTSoftBody to perform its task (default: enabled).
-// */
-//bool BTSoftBody::enable()
-//{
-//	//if enabled return
-//	RETURN_ON_COND(mEnabled, false)
-//
-//	//actual enabling
-//	do_enable();
-//	//
-//	return true;
-//}
-//
-///**
-// * Enables actually the BTSoftBody.
-// * \note Internal use only.
-// */
-//void BTSoftBody::do_enable()
-//{
-//	mEnabled = true;
-//	// handle mouse if possible
-//	if ((mMouseEnabledH || mMouseEnabledP) && (!mMouseMoveKey))
-//	{
-//		//we want control through mouse movements
-//		//hide mouse cursor
-//		WindowProperties props = mWin->get_properties();
-//		props.set_cursor_hidden(true);
-//		mWin->request_properties(props);
-//		//reset mouse to start position
-//		mWin->move_pointer(0, mCentX, mCentY);
-//		// start handle mouse
-//		mMouseHandled = true;
-//	}
-//}
-//
-///**
-// * Disables the BTSoftBody to perform its task (default: enabled).
-// */
-//bool BTSoftBody::disable()
-//{
-//	//if not enabled return
-//	RETURN_ON_COND(! mEnabled, false)
-//
-//	//actual disabling
-//	do_disable();
-//	//
-//	return true;
-//}
-//
-///**
-// * Disables actually the BTSoftBody.
-// * \note Internal use only.
-// */
-//void BTSoftBody::do_disable()
-//{
-//	mEnabled = false;
-//	// don't handle mouse
-//	WindowProperties props = mWin->get_properties();
-//	//show mouse cursor if hidden
-//	props.set_cursor_hidden(false);
-//	mWin->request_properties(props);
-//	// stop handle mouse
-//	mMouseHandled = false;
-//}
-//
-///**
-// * Make mouse handled if possible.
-// * \note Internal use only.
-// */
-//void BTSoftBody::do_handle_mouse()
-//{
-//	// handle mouse if possible
-//	if (mEnabled && (mMouseEnabledH || mMouseEnabledP) && (!mMouseMoveKey))
-//	{
-//		//we want control through mouse movements
-//		//hide mouse cursor
-//		WindowProperties props = mWin->get_properties();
-//		props.set_cursor_hidden(true);
-//		mWin->request_properties(props);
-//		//reset mouse to start position
-//		mWin->move_pointer(0, mCentX, mCentY);
-//		// start handle mouse
-//		mMouseHandled = true;
-//	}
-//	else
-//	{
-//		// don't handle mouse
-//		WindowProperties props = mWin->get_properties();
-//		//show mouse cursor if hidden
-//		props.set_cursor_hidden(false);
-//		mWin->request_properties(props);
-//		// stop handle mouse
-//		mMouseHandled = false;
-//	}
-//}
-//
-///**
-// * Updates the BTSoftBody state.
-// */
-//void BTSoftBody::update(float dt)
-//{
-//	RETURN_ON_COND(!mEnabled,)
-//
-//#ifdef TESTING
-//	dt = 0.016666667; //60 fps
-//#endif
-//
-//	NodePath thisNP = NodePath::any_path(this);
-//	//handle mouse
-//	if (mMouseHandled)
-//	{
-//		MouseData md = mWin->get_pointer(0);
-//		float deltaX = md.get_x() - mCentX;
-//		float deltaY = md.get_y() - mCentY;
-//
-//		if (mWin->move_pointer(0, mCentX, mCentY))
-//		{
-//			if (mMouseEnabledH && (deltaX != 0.0))
-//			{
-//				thisNP.set_h(
-//						thisNP.get_h() - deltaX * mSensX * mSignOfMouse);
-//			}
-//			if (mMouseEnabledP && (deltaY != 0.0))
-//			{
-//				thisNP.set_p(
-//						thisNP.get_p() - deltaY * mSensY * mSignOfMouse);
-//			}
-//		}
-//	}
-//	//update position/orientation
-//	thisNP.set_y(thisNP,
-//			mActualSpeedXYZ.get_y() * dt * mSignOfTranslation);
-//	thisNP.set_x(thisNP,
-//			mActualSpeedXYZ.get_x() * dt * mSignOfTranslation);
-//	thisNP.set_z(thisNP, mActualSpeedXYZ.get_z() * dt);
-//	//head
-//	if (mHeadLimitEnabled)
-//	{
-//		float head = thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse;
-//		if (head > mHLimit)
-//		{
-//			head = mHLimit;
-//		}
-//		else if (head < -mHLimit)
-//		{
-//			head = -mHLimit;
-//		}
-//		thisNP.set_h(head);
-//	}
-//	else
-//	{
-//		thisNP.set_h(
-//				thisNP.get_h() + mActualSpeedH * dt * mSignOfMouse);
-//	}
-//	//pitch
-//	if (mPitchLimitEnabled)
-//	{
-//		float pitch = thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse;
-//		if (pitch > mPLimit)
-//		{
-//			pitch = mPLimit;
-//		}
-//		else if (pitch < -mPLimit)
-//		{
-//			pitch = -mPLimit;
-//		}
-//		thisNP.set_p(pitch);
-//	}
-//	else
-//	{
-//		thisNP.set_p(
-//				thisNP.get_p() + mActualSpeedP * dt * mSignOfMouse);
-//	}
-//
-//	//update speeds
-//	//y axis
-//	if (mForward && (! mBackward))
-//	{
-//		if (mAccelXYZ.get_y() != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedXYZ.set_y(
-//					mActualSpeedXYZ.get_y() - mAccelXYZ.get_y() * dt);
-//			if (mActualSpeedXYZ.get_y() < -mMaxSpeedXYZ.get_y())
-//			{
-//				//limit speed
-//				mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedXYZ.set_y(-mMaxSpeedXYZ.get_y());
-//		}
-//	}
-//	else if (mBackward && (! mForward))
-//	{
-//		if (mAccelXYZ.get_y() != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedXYZ.set_y(
-//					mActualSpeedXYZ.get_y() + mAccelXYZ.get_y() * dt);
-//			if (mActualSpeedXYZ.get_y() > mMaxSpeedXYZ.get_y())
-//			{
-//				//limit speed
-//				mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedXYZ.set_y(mMaxSpeedXYZ.get_y());
-//		}
-//	}
-//	else if (mActualSpeedXYZ.get_y() != 0.0)
-//	{
-//		if (mActualSpeedXYZ.get_y() * mActualSpeedXYZ.get_y()
-//				< mMaxSpeedSquaredXYZ.get_y() * mStopThreshold)
-//		{
-//			//stop
-//			mActualSpeedXYZ.set_y(0.0);
-//		}
-//		else
-//		{
-//			//decelerate
-//			mActualSpeedXYZ.set_y(
-//					mActualSpeedXYZ.get_y() * (1.0 - min(mFrictionXYZ * dt, 1.0f)));
-//		}
-//	}
-//	//x axis
-//	if (mStrafeLeft && (! mStrafeRight))
-//	{
-//		if (mAccelXYZ.get_x() != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedXYZ.set_x(
-//					mActualSpeedXYZ.get_x() + mAccelXYZ.get_x() * dt);
-//			if (mActualSpeedXYZ.get_x() > mMaxSpeedXYZ.get_x())
-//			{
-//				//limit speed
-//				mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedXYZ.set_x(mMaxSpeedXYZ.get_x());
-//		}
-//	}
-//	else if (mStrafeRight && (! mStrafeLeft))
-//	{
-//		if (mAccelXYZ.get_x() != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedXYZ.set_x(
-//					mActualSpeedXYZ.get_x() - mAccelXYZ.get_x() * dt);
-//			if (mActualSpeedXYZ.get_x() < -mMaxSpeedXYZ.get_x())
-//			{
-//				//limit speed
-//				mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_x());
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedXYZ.set_x(-mMaxSpeedXYZ.get_y());
-//		}
-//	}
-//	else if (mActualSpeedXYZ.get_x() != 0.0)
-//	{
-//		if (mActualSpeedXYZ.get_x() * mActualSpeedXYZ.get_x()
-//				< mMaxSpeedSquaredXYZ.get_x() * mStopThreshold)
-//		{
-//			//stop
-//			mActualSpeedXYZ.set_x(0.0);
-//		}
-//		else
-//		{
-//			//decelerate
-//			mActualSpeedXYZ.set_x(
-//					mActualSpeedXYZ.get_x() * (1.0 - min(mFrictionXYZ * dt, 1.0f)));
-//		}
-//	}
-//	//z axis
-//	if (mUp && (! mDown))
-//	{
-//		if (mAccelXYZ.get_z() != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedXYZ.set_z(
-//					mActualSpeedXYZ.get_z() + mAccelXYZ.get_z() * dt);
-//			if (mActualSpeedXYZ.get_z() > mMaxSpeedXYZ.get_z())
-//			{
-//				//limit speed
-//				mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedXYZ.set_z(mMaxSpeedXYZ.get_z());
-//		}
-//	}
-//	else if (mDown && (! mUp))
-//	{
-//		if (mAccelXYZ.get_z() != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedXYZ.set_z(
-//					mActualSpeedXYZ.get_z() - mAccelXYZ.get_z() * dt);
-//			if (mActualSpeedXYZ.get_z() < -mMaxSpeedXYZ.get_z())
-//			{
-//				//limit speed
-//				mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedXYZ.set_z(-mMaxSpeedXYZ.get_z());
-//		}
-//	}
-//	else if (mActualSpeedXYZ.get_z() != 0.0)
-//	{
-//		if (mActualSpeedXYZ.get_z() * mActualSpeedXYZ.get_z()
-//				< mMaxSpeedSquaredXYZ.get_z() * mStopThreshold)
-//		{
-//			//stop
-//			mActualSpeedXYZ.set_z(0.0);
-//		}
-//		else
-//		{
-//			//decelerate
-//			mActualSpeedXYZ.set_z(
-//					mActualSpeedXYZ.get_z() * (1.0 - min(mFrictionXYZ * dt, 1.0f)));
-//		}
-//	}
-//	//rotation h
-//	if (mHeadLeft && (! mHeadRight))
-//	{
-//		if (mAccelHP != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedH += mAccelHP * dt;
-//			if (mActualSpeedH > mMaxSpeedHP)
-//			{
-//				//limit speed
-//				mActualSpeedH = mMaxSpeedHP;
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedH = mMaxSpeedHP;
-//		}
-//	}
-//	else if (mHeadRight && (! mHeadLeft))
-//	{
-//		if (mAccelHP != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedH -= mAccelHP * dt;
-//			if (mActualSpeedH < -mMaxSpeedHP)
-//			{
-//				//limit speed
-//				mActualSpeedH = -mMaxSpeedHP;
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedH = -mMaxSpeedHP;
-//		}
-//	}
-//	else if (mActualSpeedH != 0.0)
-//	{
-//		if (mActualSpeedH * mActualSpeedH < mMaxSpeedSquaredHP * mStopThreshold)
-//		{
-//			//stop
-//			mActualSpeedH = 0.0;
-//		}
-//		else
-//		{
-//			//decelerate
-//            mActualSpeedH = mActualSpeedH * (1.0 - min(mFrictionHP * dt, 1.0f));
-//		}
-//	}
-//	//rotation p
-//	if (mPitchUp && (! mPitchDown))
-//	{
-//		if (mAccelHP != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedP += mAccelHP * dt;
-//			if (mActualSpeedP > mMaxSpeedHP)
-//			{
-//				//limit speed
-//				mActualSpeedP = mMaxSpeedHP;
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedP = mMaxSpeedHP;
-//		}
-//	}
-//	else if (mPitchDown && (! mPitchUp))
-//	{
-//		if (mAccelHP != 0.0)
-//		{
-//			//accelerate
-//			mActualSpeedP -= mAccelHP * dt;
-//			if (mActualSpeedP < -mMaxSpeedHP)
-//			{
-//				//limit speed
-//				mActualSpeedP = -mMaxSpeedHP;
-//			}
-//		}
-//		else
-//		{
-//			//kinematic
-//			mActualSpeedP = -mMaxSpeedHP;
-//		}
-//	}
-//	else if (mActualSpeedP != 0.0)
-//	{
-//		if (mActualSpeedP * mActualSpeedP < mMaxSpeedSquaredHP * mStopThreshold)
-//		{
-//			//stop
-//			mActualSpeedP = 0.0;
-//		}
-//		else
-//		{
-//			//decelerate
-//			mActualSpeedP = mActualSpeedP * (1.0 - min(mFrictionHP * dt, 1.0f));
-//		}
-//	}
-//	//
-//#ifdef PYTHON_BUILD
-//	// execute python callback (if any)
-//	if (mUpdateCallback && (mUpdateCallback != Py_None))
-//	{
-//		PyObject *result;
-//		result = PyObject_CallObject(mUpdateCallback, mUpdateArgList);
-//		if (result == NULL)
-//		{
-//			string errStr = get_name() +
-//					string(": Error calling callback function");
-//			PyErr_SetString(PyExc_TypeError, errStr.c_str());
-//			return;
-//		}
-//		Py_DECREF(result);
-//	}
-//#else
-//	// execute c++ callback (if any)
-//	if (mUpdateCallback)
-//	{
-//		mUpdateCallback(this);
-//	}
-//#endif //PYTHON_BUILD
-//}
-//
-///**
-// * Writes a sensible description of the BTSoftBody to the indicated output
-// * stream.
-// */
-//void BTSoftBody::output(ostream &out) const
-//{
-//	out << get_type() << " " << get_name();
-//}
-//
-//#ifdef PYTHON_BUILD
-///**
-// * Sets the update callback as a python function taking this BTSoftBody as
-// * an argument, or None. On error raises an python exception.
-// * \note Python only.
-// */
-//void BTSoftBody::set_update_callback(PyObject *value)
-//{
-//	if ((!PyCallable_Check(value)) && (value != Py_None))
-//	{
-//		PyErr_SetString(PyExc_TypeError,
-//				"Error: the argument must be callable or None");
-//		return;
-//	}
-//
-//	if (mUpdateArgList == NULL)
-//	{
-//		mUpdateArgList = Py_BuildValue("(O)", mSelf);
-//		if (mUpdateArgList == NULL)
-//		{
-//			return;
-//		}
-//	}
-//	Py_DECREF(mSelf);
-//
-//	Py_XDECREF(mUpdateCallback);
-//	Py_INCREF(value);
-//	mUpdateCallback = value;
-//}
-//#else
-///**
-// * Sets the update callback as a c++ function taking this BTSoftBody as
-// * an argument, or NULL.
-// * \note C++ only.
-// */
-//void BTSoftBody::set_update_callback(UPDATECALLBACKFUNC value)
-//{
-//	mUpdateCallback = value;
-//}
-//#endif //PYTHON_BUILD
-//
-//
-////TypedWritable API
-///**
-// * Tells the BamReader how to create objects of type BTSoftBody.
-// */
-//void BTSoftBody::register_with_read_factory()
-//{
-//	BamReader::get_factory()->register_factory(get_class_type(), make_from_bam);
-//}
-//
-///**
-// * Writes the contents of this object to the datagram for shipping out to a
-// * Bam file.
-// */
-//void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
-//{
-//	PandaNode::write_datagram(manager, dg);
-//
-//	///Name of this BTSoftBody.
-//	dg.add_string(get_name());
-//
-//	///Enable/disable flag.
+#ifdef PYTHON_BUILD
+	//Python callback
+	this->ref();
+	mSelf = DTool_CreatePyInstanceTyped(this, Dtool_BTSoftBody, true, false,
+			get_type_index());
+#endif //PYTHON_BUILD
+}
+
+
+void BTSoftBody::setup(NodePath& objectNP)
+{
+	RETURN_ON_COND(mSetup,)
+
+	//At this point a Scene component (Model) should have been already xxx
+	//created and added to the object, so its node path should
+	//be the same as the object's one.
+
+	//Soft body world information
+	BulletSoftBodyWorldInfo info = GamePhysicsManager::get_global_ptr()->
+			get_bullet_world()->get_world_info();
+	info.set_air_density(mAirDensity);
+	info.set_water_density(mWaterDensity);
+	info.set_water_offset(mWaterOffset);
+	info.set_water_normal(mWaterNormal);
+	// reset temporary nodes
+	PT(PandaNode)pandaNode;
+	PT(Geom)geom;
+	pandaNode.clear();
+	geom.clear();
+	//create a Soft Body Node
+	if (mBodyType == PATCH)
+	{
+		//get points
+		if (mPoints.size() < 4)
+		{
+			mPoints.resize(4, LPoint3f::zero());
+		}
+		//get res
+		if (mRes.size() < 2)
+		{
+			mRes.resize(2, 0);
+		}
+		//create patch
+		this = BulletSoftBodyNode::make_patch(info, mPoints[0],
+				mPoints[1], mPoints[2], mPoints[3], mRes[0], mRes[1], mFixeds,
+				mGendiags);
+		//visualize
+		if (!objectNP.is_empty())
+		{
+			pandaNode =
+					objectNP.find_all_matches("**/+GeomNode").get_path(0).node();
+		}
+		if (mShowModel)
+		{
+			//visualize with model GeomNode (if any)
+			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			{
+				geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
+			}
+			else
+			{
+				CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+				geom = BulletHelper::make_geom_from_faces(this, format, true).p();
+				//make texcoords for patch.
+				BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+			}
+		}
+		else
+		{
+			CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+			geom = BulletHelper::make_geom_from_faces(this, format, true).p();
+			//make texcoords for patch.
+			BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
+			//visualize with GeomNode (if any)
+			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			{
+				DCAST(GeomNode, pandaNode)->add_geom(geom);
+			}
+		}
+		//link with Geom
+		this->link_geom(geom);
+	}
+	else if (mBodyType == ELLIPSOID)
+	{
+		//get points
+		if (mPoints.size() < 1)
+		{
+			mPoints.resize(1, LPoint3f::zero());
+		}
+		//get res
+		if (mRes.size() < 1)
+		{
+			mRes.resize(1, 0);
+		}
+		//create ellipsoid
+		this = BulletSoftBodyNode::make_ellipsoid(info, mPoints[0],
+				mRadius, mRes[0]);
+		//visualize
+		if (!objectNP.is_empty())
+		{
+			pandaNode =
+					objectNP.find_all_matches("**/+GeomNode").get_path(0).node();
+		}
+		if (mShowModel)
+		{
+			//visualize with model GeomNode (if any)
+			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			{
+				geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
+			}
+			else
+			{
+				CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+				geom = BulletHelper::make_geom_from_faces(this, format).p();
+				//make texcoords for ellipsoid: to be written!!!
+///				BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+			}
+		}
+		else
+		{
+			CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+			geom = BulletHelper::make_geom_from_faces(this, format).p();
+			//make texcoords for ellipsoid: to be written!!!
+///			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
+			//visualize with GeomNode (if any)
+			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			{
+				DCAST(GeomNode, pandaNode)->add_geom(geom);
+			}
+		}
+		//link with Geom
+		this->link_geom(geom);
+	}
+	else if (mBodyType == TRIMESH)
+	{
+		//get and visualize with model GeomNode (if any)
+		if (!objectNP.is_empty())
+		{
+			pandaNode =
+					objectNP.find_all_matches("**/+GeomNode").get_path(0).node();
+		}
+		if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+		{
+			geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
+		}
+		else
+		{
+			//default trimesh
+			LPoint3f point[] =
+			{
+				LPoint3f(0.0,0.0,0.0),
+				LPoint3f(1.0,0.0,0.0),
+				LPoint3f(0.0,1.0,0.0),
+				LPoint3f(0.0,0.0,1.0)
+			};
+			int index[]=
+			{
+				0,1,2,
+				0,1,3,
+				1,2,3,
+				0,3,2
+			};
+			CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3();
+			PT(GeomVertexData) vdata;
+			vdata = new GeomVertexData("defaultTriMesh", format, Geom::UH_static);
+			GeomVertexWriter vertex;
+			for (int i = 0; i < 4; ++i)
+			{
+				vertex.add_data3(point[i]);
+			}
+			PT(GeomTriangles) prim = new GeomTriangles(Geom::UH_static);
+			for (int i = 0; i < 4; ++i)
+			{
+				prim->add_vertex(index[3*i + 0]);
+				prim->add_vertex(index[3*i + 1]);
+				prim->add_vertex(index[3*i + 2]);
+				prim->close_primitive();
+			}
+			geom = new Geom(vdata);
+			geom->add_primitive(prim);
+		}
+		//create trimesh
+		this = BulletSoftBodyNode::make_tri_mesh(info, geom, mRandomizeConstraints);
+		//link with Geom
+		this->link_geom(geom);
+	}
+	else if (mBodyType == TETRAMESH)
+	{
+		bool goodness = true;
+		if (mTetraDataFileNames.size() == 3)
+		{
+			map<string, string>::const_iterator iter;
+			//get files
+			map<string, ifstream*> files;
+			map<string, int> lengths;
+			map<string, char*> buffers;
+			for (iter = mTetraDataFileNames.begin();
+					iter != mTetraDataFileNames.end(); ++iter)
+			{
+				files[iter->first] = new ifstream();
+				files[iter->first]->open(iter->second.c_str(),
+						ifstream::in);
+				if (! files[iter->first]->good())
+				{
+					goodness = false;
+					continue;
+				}
+				//get file's length
+				files[iter->first]->seekg(0, files[iter->first]->end);
+				lengths[iter->first] = files[iter->first]->tellg();
+				files[iter->first]->seekg(0, files[iter->first]->beg);
+			}
+			//check files' goodness
+			if (goodness)
+			{
+				//setup files' buffers and read data as blocks
+				for (iter = mTetraDataFileNames.begin();
+						iter != mTetraDataFileNames.end(); ++iter)
+				{
+					buffers[iter->first] = new char[lengths[iter->first]];
+					files[iter->first]->read(buffers[iter->first],
+							lengths[iter->first]);
+				}
+				//create tetra mesh
+				this = BulletSoftBodyNode::make_tet_mesh(info,
+						buffers["elems"], buffers["faces"], buffers["nodes"]);
+				//visualize
+				if (!objectNP.is_empty())
+				{
+					pandaNode =
+							objectNP.find_all_matches("**/+GeomNode").get_path(
+									0).node();
+				}
+				if (mShowModel)
+				{
+					//visualize with model GeomNode (if any)
+					if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+					{
+						geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
+					}
+					else
+					{
+						CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+						geom = BulletHelper::make_geom_from_faces(this, format).p();
+						//make texcoords for tetramesh: to be written!!!
+///						BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+					}
+				}
+				else
+				{
+					CPT(GeomVertexFormat)format = GeomVertexFormat::get_v3n3t2();
+					geom = BulletHelper::make_geom_from_faces(this, format).p();
+					//make texcoords for tetramesh: to be written!!!
+///					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
+					//visualize with GeomNode (if any)
+					if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+					{
+///						geomNode = DCAST(GeomNode, pandaNode);
+						DCAST(GeomNode, pandaNode)->add_geom(geom);
+					}
+				}
+				//link with Geom
+				this->link_geom(geom);
+			}
+			//clear data
+			for (iter = mTetraDataFileNames.begin();
+					iter != mTetraDataFileNames.end(); ++iter)
+			{
+				//clear buffers
+				delete buffers[iter->first];
+				//close and clear files
+				files[iter->first]->close();
+				delete files[iter->first];
+			}
+		}
+		if ((mTetraDataFileNames.size() < 3) || (! goodness))
+		{
+			//default tetramesh
+			char nodeBuf[] =
+			{	8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
+				1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1};
+			//create null tetra mesh
+			this = BulletSoftBodyNode::make_tet_mesh(info, NULL,
+					NULL, nodeBuf);
+		}
+	}
+	else
+	{
+		//ROPE
+		//get points
+		if (mPoints.size() < 2)
+		{
+			mPoints.resize(2, LPoint3f::zero());
+		}
+		//get res
+		if (mRes.size() < 1)
+		{
+			mRes.resize(1, 0);
+		}
+		//create rope
+		this = BulletSoftBodyNode::make_rope(info, mPoints[0],
+				mPoints[1], mRes[0], mFixeds);
+		//link with NURBS curve
+		PT(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
+		curve->reset(mRes[0] + 2);
+		this->link_curve(curve);
+		//visualize with RopeNode (if any)
+		if (!objectNP.is_empty())
+		{
+			pandaNode =
+					objectNP.find_all_matches("**/+RopeNode").get_path(0).node();
+		}
+		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
+		{
+			DCAST(RopeNode, pandaNode)->set_curve(curve);
+		}
+	}
+//	//add to table of all physics components indexed by xxx
+//	//(underlying) Bullet PandaNodes
+//	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+//			mSoftBodyNode.p(), this);
+	//set total mass
+	this->set_total_mass(mBodyTotalMass, mBodyMassFromFaces);
+
+	//attach to Bullet World
+	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);
+
+	NodePath thisNP = NodePath::any_path(this);
+	if (! objectNP.is_empty())
+	{
+		// reparent the object node path to this
+		objectNP.reparent_to(thisNP);
+	}
+
+	// set the flag
+	mSetup = true;
+}
+
+
+
+/**
+ * On destruction cleanup.
+ * Gives an BTSoftBody the ability to do any cleaning is necessary when
+ * destroyed.
+ * \note Internal use only.
+ */
+void BTSoftBody::do_finalize()
+{
+	//if enabled: disable
+	if (mEnabled)
+	{
+		//actual disabling
+		do_disable();
+	}
+#ifdef PYTHON_BUILD
+	//Python callback
+	Py_DECREF(mSelf);
+	Py_XDECREF(mUpdateCallback);
+	Py_XDECREF(mUpdateArgList);
+#endif //PYTHON_BUILD
+	do_reset();
+	//
+	return;
+}
+
+
+
+
+/**
+ * Updates the BTSoftBody state.
+ */
+void BTSoftBody::update(float dt)
+{
+	RETURN_ON_COND(!mSetup,)
+
+#ifdef TESTING
+	dt = 0.016666667; //60 fps
+#endif
+	//
+#ifdef PYTHON_BUILD
+	// execute python callback (if any)
+	if (mUpdateCallback && (mUpdateCallback != Py_None))
+	{
+		PyObject *result;
+		result = PyObject_CallObject(mUpdateCallback, mUpdateArgList);
+		if (result == NULL)
+		{
+			string errStr = get_name() +
+					string(": Error calling callback function");
+			PyErr_SetString(PyExc_TypeError, errStr.c_str());
+			return;
+		}
+		Py_DECREF(result);
+	}
+#else
+	// execute c++ callback (if any)
+	if (mUpdateCallback)
+	{
+		mUpdateCallback(this);
+	}
+#endif //PYTHON_BUILD
+}
+
+/**
+ * Writes a sensible description of the BTSoftBody to the indicated output
+ * stream.
+ */
+void BTSoftBody::output(ostream &out) const
+{
+	out << get_type() << " " << get_name();
+}
+
+#ifdef PYTHON_BUILD
+/**
+ * Sets the update callback as a python function taking this BTSoftBody as
+ * an argument, or None. On error raises an python exception.
+ * \note Python only.
+ */
+void BTSoftBody::set_update_callback(PyObject *value)
+{
+	if ((!PyCallable_Check(value)) && (value != Py_None))
+	{
+		PyErr_SetString(PyExc_TypeError,
+				"Error: the argument must be callable or None");
+		return;
+	}
+
+	if (mUpdateArgList == NULL)
+	{
+		mUpdateArgList = Py_BuildValue("(O)", mSelf);
+		if (mUpdateArgList == NULL)
+		{
+			return;
+		}
+	}
+	Py_DECREF(mSelf);
+
+	Py_XDECREF(mUpdateCallback);
+	Py_INCREF(value);
+	mUpdateCallback = value;
+}
+#else
+/**
+ * Sets the update callback as a c++ function taking this BTSoftBody as
+ * an argument, or NULL.
+ * \note C++ only.
+ */
+void BTSoftBody::set_update_callback(UPDATECALLBACKFUNC value)
+{
+	mUpdateCallback = value;
+}
+#endif //PYTHON_BUILD
+
+
+//TypedWritable API
+/**
+ * Tells the BamReader how to create objects of type BTSoftBody.
+ */
+void BTSoftBody::register_with_read_factory()
+{
+	BamReader::get_factory()->register_factory(get_class_type(), make_from_bam);
+}
+
+/**
+ * Writes the contents of this object to the datagram for shipping out to a
+ * Bam file.
+ */
+void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
+{
+	PandaNode::write_datagram(manager, dg);
+
+	///Name of this BTSoftBody.
+	dg.add_string(get_name());
+
+//	///Enable/disable flag.xxx
 //	dg.add_bool(mEnabled);
 //
 //	///Key controls and effective keys.
@@ -813,64 +728,64 @@
 //	dg.add_stdfloat(mSensX);
 //	dg.add_stdfloat(mSensY);
 //	///@}
-//
-//	///The reference node path.
-//	manager->write_pointer(dg, mReferenceNP.node());
-//}
-//
-///**
-// * Receives an array of pointers, one for each time manager->read_pointer()
-// * was called in fillin(). Returns the number of pointers processed.
-// */
-//int BTSoftBody::complete_pointers(TypedWritable **p_list, BamReader *manager)
-//{
-//	int pi = PandaNode::complete_pointers(p_list, manager);
-//
-//	/// Pointers
-//	///The reference node path.
-//	PT(PandaNode)referenceNPPandaNode = DCAST(PandaNode, p_list[pi++]);
-//	mReferenceNP = NodePath::any_path(referenceNPPandaNode);
-//
-//	return pi;
-//}
-//
-///**
-// * This function is called by the BamReader's factory when a new object of
-// * type BTSoftBody is encountered in the Bam file.  It should create the
-// * BTSoftBody and extract its information from the file.
-// */
-//TypedWritable *BTSoftBody::make_from_bam(const FactoryParams &params)
-//{
-//	// continue only if GamePhysicsManager exists
-//	CONTINUE_IF_ELSE_R(GamePhysicsManager::get_global_ptr(), NULL)
-//
-//	// create a BTSoftBody with default parameters' values: they'll be restored later
-//	GamePhysicsManager::get_global_ptr()->set_parameters_defaults(
-//			GamePhysicsManager::SOFTBODY);
-//	BTSoftBody *node = DCAST(BTSoftBody,
-//			GamePhysicsManager::get_global_ptr()->create_soft_body(
-//					"Driver").node());
-//
-//	DatagramIterator scan;
-//	BamReader *manager;
-//
-//	parse_params(params, scan, manager);
-//	node->fillin(scan, manager);
-//
-//	return node;
-//}
-//
-///**
-// * This internal function is called by make_from_bam to read in all of the
-// * relevant data from the BamFile for the new BTSoftBody.
-// */
-//void BTSoftBody::fillin(DatagramIterator &scan, BamReader *manager)
-//{
-//	PandaNode::fillin(scan, manager);
-//
-//	///Name of this BTSoftBody.
-//	set_name(scan.get_string());
-//
+
+	///The reference node path.
+	manager->write_pointer(dg, mReferenceNP.node());
+}
+
+/**
+ * Receives an array of pointers, one for each time manager->read_pointer()
+ * was called in fillin(). Returns the number of pointers processed.
+ */
+int BTSoftBody::complete_pointers(TypedWritable **p_list, BamReader *manager)
+{
+	int pi = PandaNode::complete_pointers(p_list, manager);
+
+	/// Pointers
+	///The reference node path.
+	PT(PandaNode)referenceNPPandaNode = DCAST(PandaNode, p_list[pi++]);
+	mReferenceNP = NodePath::any_path(referenceNPPandaNode);
+
+	return pi;
+}
+
+/**
+ * This function is called by the BamReader's factory when a new object of
+ * type BTSoftBody is encountered in the Bam file.  It should create the
+ * BTSoftBody and extract its information from the file.
+ */
+TypedWritable *BTSoftBody::make_from_bam(const FactoryParams &params)
+{
+	// continue only if GamePhysicsManager exists
+	CONTINUE_IF_ELSE_R(GamePhysicsManager::get_global_ptr(), NULL)
+
+	// create a BTSoftBody with default parameters' values: they'll be restored later
+	GamePhysicsManager::get_global_ptr()->set_parameters_defaults(
+			GamePhysicsManager::SOFTBODY);
+	BTSoftBody *node = DCAST(BTSoftBody,
+			GamePhysicsManager::get_global_ptr()->create_soft_body(
+					"Driver").node());
+
+	DatagramIterator scan;
+	BamReader *manager;
+
+	parse_params(params, scan, manager);
+	node->fillin(scan, manager);
+
+	return node;
+}
+
+/**
+ * This internal function is called by make_from_bam to read in all of the
+ * relevant data from the BamFile for the new BTSoftBody.
+ */
+void BTSoftBody::fillin(DatagramIterator &scan, BamReader *manager)
+{
+	PandaNode::fillin(scan, manager);
+
+	///Name of this BTSoftBody.
+	set_name(scan.get_string());
+
 //	///Enable/disable flag.
 //	mEnabled = scan.get_bool();
 //
@@ -929,10 +844,80 @@
 //	mSensX = scan.get_stdfloat();
 //	mSensY = scan.get_stdfloat();
 //	///@}
-//
-//	///The reference node path.
-//	manager->read_pointer(scan);
-//}
-//
-////TypedObject semantics: hardcoded
-//TypeHandle BTSoftBody::_type_handle;
+
+	///The reference node path.
+	manager->read_pointer(scan);
+}
+
+//TypedObject semantics: hardcoded
+TypeHandle BTSoftBody::_type_handle;
+
+
+///////////////////////////////
+
+void SoftBody::onRemoveFromObjectCleanup()
+{
+	NodePath oldObjectNodePath;
+	//set the object node path to the first child of rigid body's one (if any)
+	if (thisNP.get_num_children() > 0)
+	{
+		oldObjectNodePath = thisNP.get_child(0);
+		//detach the object node path from the rigid body's one
+		oldObjectNodePath.detach_node();
+	}
+	else
+	{
+		oldObjectNodePath = NodePath();
+	}
+	//set the object node path to the old one
+	mOwnerObject->setNodePath(oldObjectNodePath);
+
+	//remove from table of all physics components indexed by
+	//(underlying) Bullet PandaNodes
+	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
+			mSoftBodyNode.p(), NULL);
+
+	HOLD_REMUTEX(GamePhysicsManager::GetSingletonPtr()->getMutex())
+	{
+		//remove rigid body from the physics world
+		GamePhysicsManager::GetSingletonPtr()->bulletWorld()->remove(
+				mSoftBodyNode);
+	}
+
+	//Remove node path
+	thisNP.remove_node();
+	//
+	reset();
+}
+
+void SoftBody::onAddToSceneSetup()
+{
+	//XXX: HACK: rope node's parent node path correction (see bullet samples)
+	if (mBodyType == ROPE)
+	{
+		PT(PandaNode)pandaNode =
+		thisNP.find_all_matches("**/+RopeNode").get_path(
+				0).node();
+		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
+		{
+			//the child is the rope node: reparent to the owner object node path
+			mRopeNodePath = thisNP.get_child(0);
+			mRopeNodePath.reparent_to(thisNP.get_parent());
+		}
+	}
+}
+
+void SoftBody::onRemoveFromSceneCleanup()
+{
+	//XXX: HACK: rope node's parent node path correction (see bullet samples)
+	if (mBodyType == ROPE)
+	{
+		if (! mRopeNodePath.is_empty())
+		{
+			//the child is the rope node reparent to this node path
+			mRopeNodePath.reparent_to(thisNP);
+		}
+	}
+}
+
+

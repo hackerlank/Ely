@@ -12,8 +12,8 @@
 #include "physics_includes.h"
 
 class BTRigidBody;
-//class BTSoftBody; xxx
-//class BTGhost;
+class BTSoftBody;
+//class BTGhost;xxx
 
 /**
  * \brief Singleton manager updating attributes of physics components.
@@ -102,16 +102,16 @@ PUBLISHED:
 	MAKE_SEQ(get_rigid_bodies, get_num_rigid_bodies, get_rigid_body);
 	///@}
 
-//	/**
-//	 * \name BTSoftBody xxx
-//	 */
-//	///@{
-//	NodePath create_soft_body(const string& name);
-//	bool destroy_soft_body(NodePath softBodyNP);
-//	PT(BTSoftBody) get_soft_body(int index) const;
-//	INLINE int get_num_soft_bodies() const;
-//	MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body);
-//	///@}
+	/**
+	 * \name BTSoftBody xxx
+	 */
+	///@{
+	NodePath create_soft_body(const string& name);
+	bool destroy_soft_body(NodePath softBodyNP);
+	PT(BTSoftBody) get_soft_body(int index) const;
+	INLINE int get_num_soft_bodies() const;
+	MAKE_SEQ(get_soft_bodies, get_num_soft_bodies, get_soft_body);
+	///@}
 
 //	/**
 //	 * \name BTGhost xxx
@@ -230,11 +230,11 @@ private:
 	///BTRigidBodys' parameter table.
 	ParameterTable mRigidBodiesParameterTable;
 
-//	///List of BTSoftBodys handled by this manager. xxx
-//	typedef pvector<PT(BTSoftBody)> SoftBodyList;
-//	SoftBodyList mSoftBodies;
-//	///BTSoftBodys' parameter table.
-//	ParameterTable mSoftBodiesParameterTable;
+	///List of BTSoftBodys handled by this manager.
+	typedef pvector<PT(BTSoftBody)> SoftBodyList;
+	SoftBodyList mSoftBodies;
+	///BTSoftBodys' parameter table.
+	ParameterTable mSoftBodiesParameterTable;
 
 //	///List of BTGhosts handled by this manager. xxx
 //	typedef pvector<PT(BTGhost)> GhostList;
