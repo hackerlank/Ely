@@ -52,7 +52,7 @@
  *
  * \note parts inside [] are optional.\n
  */
-class EXPORT_CLASS BTSoftBody: public PandaNode
+class EXPORT_CLASS BTSoftBody: public BulletSoftBodyNode
 {
 PUBLISHED:
 
@@ -194,6 +194,24 @@ private:
 	void do_initialize();
 	void do_finalize();
 
+	///@{
+	//HACK 1
+	btSoftBody* do_make_fake_soft_body();
+	void do_set_soft_body(btSoftBody* body);
+	//HACK 2: helpers
+	void do_make_rope(BulletSoftBodyWorldInfo &info, const LPoint3 &from,
+			const LPoint3 &to, int res, int fixeds);
+	void do_make_patch(BulletSoftBodyWorldInfo &info, const LPoint3 &corner00,
+			const LPoint3 &corner10, const LPoint3 &corner01, const LPoint3 &corner11,
+			int resx, int resy, int fixeds, bool gendiags);
+	void do_make_ellipsoid(BulletSoftBodyWorldInfo &info, const LPoint3 &center,
+			const LVecBase3 &radius, int res);
+	void do_make_tri_mesh(BulletSoftBodyWorldInfo &info,const Geom *geom,
+			bool randomizeConstraints);
+	void do_make_tet_mesh(BulletSoftBodyWorldInfo &info, const char *ele,
+			const char *face, const char *node);
+	///@}
+
 #if defined(PYTHON_BUILD) || defined(CPPPARSER)
 	/**
 	 * \name Python callback.
@@ -241,8 +259,8 @@ public:
 	}
 	static void init_type()
 	{
-		PandaNode::init_type();
-		register_type(_type_handle, "BTSoftBody", PandaNode::get_class_type());
+		BulletSoftBodyNode::init_type();
+		register_type(_type_handle, "BTSoftBody", BulletSoftBodyNode::get_class_type());
 	}
 	virtual TypeHandle get_type() const
 	{
