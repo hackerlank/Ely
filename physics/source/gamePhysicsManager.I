@@ -43,13 +43,13 @@ INLINE int GamePhysicsManager::get_num_rigid_bodies() const
 	return (int) mRigidBodies.size();
 }
 
-///**
-// * Returns the number of BTSoftBodys. xxx
-// */
-//INLINE int GamePhysicsManager::get_num_soft_bodies() const
-//{
-//	return (int) mSoftBodies.size();
-//}
+/**
+ * Returns the number of BTSoftBodys.
+ */
+INLINE int GamePhysicsManager::get_num_soft_bodies() const
+{
+	return (int) mSoftBodies.size();
+}
 
 ///**
 // * Returns the number of BTGhosts. xxx

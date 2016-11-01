@@ -33,6 +33,7 @@
  * > **BTSoftBody text parameters**:
  * param | type | default | note
  * ------|------|---------|-----
+ * | *object*					|single| - | -
  * | *body_type*				|single| *rope* | values: rope,patch,ellipsoid,tri_mesh,tetra_mesh
  * | *collide_mask*				|single| *all_on* | -
  * | *body_total_mass*			|single| 1.0 | -
@@ -60,7 +61,7 @@ PUBLISHED:
 	 * The soft body type.
 	 * It may change during the BTRigidBody's lifetime.
 	 */
-	enum BodyType
+	enum BTBodyType
 	{
 		ROPE,
 		PATCH,
@@ -85,8 +86,8 @@ PUBLISHED:
 	 * \name SOFTBODY
 	 */
 	///@{
-	void setup(NodePath& objectNP);//xxx
-	void cleanup();//xxx
+	void setup(NodePath& objectNP);
+	void cleanup();
 	void update(float dt);
 	///@}
 
@@ -94,7 +95,8 @@ PUBLISHED:
 	 * \name PARAMETERS' GETTERS/SETTERS
 	 */
 	///@{
-	void switch_body_type(BodyType bodyType);
+	INLINE void set_body_type(BTBodyType value);
+	INLINE BTBodyType get_body_type() const;
 	INLINE void set_body_total_mass(float value);
 	INLINE float get_body_total_mass() const;
 	INLINE void set_body_mass_from_faces(bool value);
@@ -168,10 +170,10 @@ private:
 	///The reference node path.
 	NodePath mReferenceNP;
 	///The setup flag.
-	bool mSetup;//xxx
+	bool mSetup;
 	///@{
 	///Physical parameters.
-	BodyType mBodyType;
+	BTBodyType mBodyType;
 	float mBodyTotalMass, mAirDensity, mWaterDensity, mWaterOffset;
 	bool mBodyMassFromFaces;
 	LVector3f mWaterNormal;

@@ -20,17 +20,35 @@ INLINE void BTSoftBody::set_reference_node_path(const NodePath& reference)
 }
 
 /**
- * Sets the body_total_mass.
+ * Sets the body type.
  */
-INLINE void BTSoftBody::set_body_total_mass(float value)
+INLINE void BTSoftBody::set_body_type(BTBodyType value)
 {
+	mBodyType = value;
 }
 
 /**
- * Returns the body_total_mass.
+ * Returns the body type.
+ */
+INLINE BTSoftBody::BTBodyType BTSoftBody::get_body_type() const
+{
+	return mBodyType;
+}
+
+/**
+ * Sets the body_total_mass (>=0.0).
+ */
+INLINE void BTSoftBody::set_body_total_mass(float value)
+{
+	mBodyTotalMass = abs(value);
+}
+
+/**
+ * Returns the body_total_mass (>=0.0).
  */
 INLINE float BTSoftBody::get_body_total_mass() const
 {
+	return mBodyTotalMass;
 }
 
 /**
@@ -38,6 +56,7 @@ INLINE float BTSoftBody::get_body_total_mass() const
  */
 INLINE void BTSoftBody::set_body_mass_from_faces(bool value)
 {
+	mBodyMassFromFaces = value;
 }
 
 /**
@@ -45,48 +64,55 @@ INLINE void BTSoftBody::set_body_mass_from_faces(bool value)
  */
 INLINE bool BTSoftBody::get_body_mass_from_faces() const
 {
+	return mBodyMassFromFaces;
 }
 
 /**
- * Sets the air_density.
+ * Sets the air_density (>=0.0).
  */
 INLINE void BTSoftBody::set_air_density(float value)
 {
+	mAirDensity = abs(value);
 }
 
 /**
- * Returns the air_density.
+ * Returns the air_density (>=0.0).
  */
 INLINE float BTSoftBody::get_air_density() const
 {
+	return mAirDensity;
 }
 
 /**
- * Sets the water_density.
+ * Sets the water_density (>=0.0).
  */
 INLINE void BTSoftBody::set_water_density(float value)
 {
+	mWaterDensity = abs(value);
 }
 
 /**
- * Returns the water_density.
+ * Returns the water_density (>=0.0).
  */
 INLINE float BTSoftBody::get_water_density() const
 {
+	return mWaterDensity;
 }
 
 /**
- * Sets the water_offset.
+ * Sets the water_offset (>=0.0).
  */
 INLINE void BTSoftBody::set_water_offset(float value)
 {
+	mWaterOffset = abs(value);
 }
 
 /**
- * Returns the water_offset.
+ * Returns the water_offset (>=0.0).
  */
 INLINE float BTSoftBody::get_water_offset() const
 {
+	return mWaterOffset;
 }
 
 /**
@@ -94,6 +120,7 @@ INLINE float BTSoftBody::get_water_offset() const
  */
 INLINE void BTSoftBody::set_water_normal(const LVector3f& value)
 {
+	mWaterNormal = value;
 }
 
 /**
@@ -101,6 +128,7 @@ INLINE void BTSoftBody::set_water_normal(const LVector3f& value)
  */
 INLINE LVector3f BTSoftBody::get_water_normal() const
 {
+	return mWaterNormal;
 }
 
 /**
@@ -108,6 +136,7 @@ INLINE LVector3f BTSoftBody::get_water_normal() const
  */
 INLINE void BTSoftBody::set_show_model(bool value)
 {
+	mShowModel = value;
 }
 
 /**
@@ -115,6 +144,7 @@ INLINE void BTSoftBody::set_show_model(bool value)
  */
 INLINE bool BTSoftBody::get_show_model() const
 {
+	return mShowModel;
 }
 
 /**
@@ -122,6 +152,11 @@ INLINE bool BTSoftBody::get_show_model() const
  */
 INLINE void BTSoftBody::set_points(const ValueList<LPoint3f>& value)
 {
+	mPoints.clear();
+	for (int i = 0; i < value.get_num_values(); ++i)
+	{
+		mPoints.push_back(value.get_value(i));
+	}
 }
 
 /**
@@ -129,6 +164,12 @@ INLINE void BTSoftBody::set_points(const ValueList<LPoint3f>& value)
  */
 INLINE ValueList<LPoint3f> BTSoftBody::get_points() const
 {
+	ValueList<LPoint3f> points;
+	for (unsigned int i = 0; i < mPoints.size(); ++i)
+	{
+		points.add_value(mPoints[i]);
+	}
+	return points;
 }
 
 /**
@@ -136,6 +177,11 @@ INLINE ValueList<LPoint3f> BTSoftBody::get_points() const
  */
 INLINE void BTSoftBody::set_res(const ValueList<int>& value)
 {
+	mRes.clear();
+	for (int i = 0; i < value.get_num_values(); ++i)
+	{
+		mRes.push_back(value.get_value(i));
+	}
 }
 
 /**
@@ -143,6 +189,12 @@ INLINE void BTSoftBody::set_res(const ValueList<int>& value)
  */
 INLINE ValueList<int> BTSoftBody::get_res() const
 {
+	ValueList<int> res;
+	for (unsigned int i = 0; i < mRes.size(); ++i)
+	{
+		res.add_value(mRes[i]);
+	}
+	return res;
 }
 
 /**
@@ -150,6 +202,7 @@ INLINE ValueList<int> BTSoftBody::get_res() const
  */
 INLINE void BTSoftBody::set_fixeds(int value)
 {
+	mFixeds = value;
 }
 
 /**
@@ -157,6 +210,7 @@ INLINE void BTSoftBody::set_fixeds(int value)
  */
 INLINE int BTSoftBody::get_fixeds() const
 {
+	return mFixeds;
 }
 
 /**
@@ -164,6 +218,7 @@ INLINE int BTSoftBody::get_fixeds() const
  */
 INLINE void BTSoftBody::set_gendiags(bool value)
 {
+	mGendiags = value;
 }
 
 /**
@@ -171,20 +226,24 @@ INLINE void BTSoftBody::set_gendiags(bool value)
  */
 INLINE bool BTSoftBody::get_gendiags() const
 {
+	return mGendiags;
 }
 
 /**
- * Sets the radius.
+ * Sets the radius (each component >=0.0).
  */
 INLINE void BTSoftBody::set_radius(const LVecBase3f& value)
 {
+	mRadius = LVecBase3f(abs(value.get_x()), abs(value.get_y()),
+			abs(value.get_z()));
 }
 
 /**
- * Returns the radius.
+ * Returns the radius (each component >=0.0).
  */
 INLINE LVecBase3f BTSoftBody::get_radius() const
 {
+	return mRadius;
 }
 
 /**
@@ -192,6 +251,7 @@ INLINE LVecBase3f BTSoftBody::get_radius() const
  */
 INLINE void BTSoftBody::set_randomize_constraints(bool value)
 {
+	mRandomizeConstraints = value;
 }
 
 /**
@@ -199,6 +259,7 @@ INLINE void BTSoftBody::set_randomize_constraints(bool value)
  */
 INLINE bool BTSoftBody::get_randomize_constraints() const
 {
+	return mRandomizeConstraints;
 }
 
 /**
@@ -206,6 +267,12 @@ INLINE bool BTSoftBody::get_randomize_constraints() const
  */
 INLINE void BTSoftBody::set_tetra_data_files(const ValueList<string>& value)
 {
+	if (value.get_num_values() >= 3)
+	{
+		mTetraDataFileNames["elems"] = value.get_value(0);
+		mTetraDataFileNames["faces"] = value.get_value(1);
+		mTetraDataFileNames["nodes"] = value.get_value(2);
+	}
 }
 
 /**
@@ -213,8 +280,15 @@ INLINE void BTSoftBody::set_tetra_data_files(const ValueList<string>& value)
  */
 INLINE ValueList<string> BTSoftBody::get_tetra_data_files() const
 {
+	ValueList<string> tetraFiles;
+	if (mTetraDataFileNames.size() >= 3)
+	{
+		tetraFiles.add_value(mTetraDataFileNames.find("elems")->second);
+		tetraFiles.add_value(mTetraDataFileNames.find("faces")->second);
+		tetraFiles.add_value(mTetraDataFileNames.find("nodes")->second);
+	}
+	return tetraFiles;
 }
-
 
 /**
  * Resets the BTSoftBody.

@@ -30,8 +30,8 @@ common_sources = \
 	data.cpp \
 	$(srcdir)/../../../common/source/commonTools.cxx \
 	$(srcdir)/../../../physics/source/gamePhysicsManager.cxx \
-	$(srcdir)/../../../physics/source/btRigidBody.cxx
-#	$(srcdir)/../../../physics/source/btSoftBody.cxx
+	$(srcdir)/../../../physics/source/btRigidBody.cxx \
+	$(srcdir)/../../../physics/source/btSoftBody.cxx
 #	$(srcdir)/../../../physics/source/btGhost.cxx	
 
 #physics

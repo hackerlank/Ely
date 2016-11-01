@@ -7,10 +7,10 @@ Created on Oct 09, 2016
 from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         PNMImage, NodePath, AnimControlCollection, auto_bind, PartGroup, \
         ClockObject, TextNode, LPoint3f, LVecBase3f, GeoMipTerrain, \
-        Filename, TextureStage, TexturePool, CardMaker, TransformState, \
+        Filename, TextureStage, TexturePool, GeomNode, TransformState, \
         GeomVertexArrayFormat, InternalName, Geom, GeomVertexFormat, \
         GeomVertexData, GeomVertexWriter, LVector3f, GeomTriangles, \
-        GeomNode
+        RopeNode
 from direct.showbase.ShowBase import ShowBase
 from panda3d.bullet import Z_up, X_up, Y_up
 from p3physics import GamePhysicsManager, BTRigidBody
@@ -44,6 +44,9 @@ globalClock = None
 playerRigidBody = None
 playerAnimCtls = []
 playerNP = None
+# rope specifics
+ropeSoftBody = None
+softBodyCBCount = 0.0
 
 #
 def printCreationParameters():
@@ -78,8 +81,8 @@ def setParametersBeforeCreation(objectName, upAxis = "z"):
             "shape_up", upAxis)
 
     # set soft_body's parameters
-    physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "static",
-            "false")
+    physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, 
+            "", "")
     #
     printCreationParameters()
 
@@ -120,10 +123,10 @@ def writeToBamFileAndExit(fileName):
     for rigid_bodyTmp in physicsMgr.get_rigid_bodies():
         # destroy rigid_bodyTmp
         physicsMgr.destroy_rigid_body(NodePath.any_path(rigid_bodyTmp))
-#     # destroy soft_bodies
-#     for soft_bodyTmp in physicsMgr.get_soft_bodies():
-#         # destroy soft_bodyTmp
-#         physicsMgr.destroy_soft_body(NodePath.any_path(soft_bodyTmp))
+    # destroy soft_bodies
+    for soft_bodyTmp in physicsMgr.get_soft_bodies():
+        # destroy soft_bodyTmp
+        physicsMgr.destroy_soft_body(NodePath.any_path(soft_bodyTmp))
     #
     sys.exit(0)
 
@@ -155,7 +158,7 @@ def loadPlane(name, width=30.0, depth=30.0, upAxis=Z_up,
     # |      |      |            |            |
     # |      | +d   | Z_up   OR  | X_up   OR  | Y_up
     # |      |      |            |            |
-    # 0------1      ------>x     ------>y     ------>z
+    # 0------1      -----.x     -----.y     -----.z
     #    +w   
     w = abs(width) / 0.5
     d = abs(depth) / 0.5
@@ -213,7 +216,6 @@ def loadPlane(name, width=30.0, depth=30.0, upAxis=Z_up,
     planeNP.set_texture(tex)
     #
     return planeNP
-
 
 def loadTerrainLowPoly(name, widthScale=128, heightScale=64.0,
                        texture="dry-grass.png"):
@@ -394,14 +396,18 @@ def rigidBodyCallback(rigidBody):
     # handle player on callback
     handlePlayerUpdate(currentVelSize)
 
-# def softBodyCallback(soft_body):
-#     """soft body update callback function"""  
-# 
-#     global playerRigidBody
-#     refNP = GamePhysicsManager.get_global_ptr().get_reference_node_path()
-#     distLS = (NodePath.any_path(playerRigidBody).get_pos(refNP) - 
-#             NodePath.any_path(soft_body).get_pos(refNP)).length()
-#     print(soft_body, " " + str(globalClock.get_real_time()) + " - " + str(distLS))
+def softBodyCallback(softBody):
+    """soft body update callback function"""
+
+    global softBodyCBCount, globalClock
+    softBodyCBCount += globalClock.get_dt()
+    if softBodyCBCount <= 5:
+        return
+    softBodyCBCount = 0    
+    refNP = GamePhysicsManager.get_global_ptr().get_reference_node_path()
+    distLS = NodePath.any_path(softBody).get_pos(refNP).length()
+    print(str(softBody) + " callback: " + str(globalClock.get_real_time()) +
+            " - " + str(distLS))
 
 def toggleDebugDraw():
     """toggle debug draw"""
@@ -476,60 +482,104 @@ if __name__ == '__main__':
         # setup the player's rigid body
         sceneRigidBody.setup(sceneNP)
 
+        # # Rigid Bodies
         # # box
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-                "shape_type", "box")
-        # set various creation parameters as string for other rigid bodies
-        setParametersBeforeCreation("PlayerNP")
-        # get a player with anims, reparent to reference node, set transform
-        playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
-        playerNP.reparent_to(physicsMgr.get_reference_node_path())
-        playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
-                LVecBase3f(-75.0, 145.0, -235.0))        # create player's rigid_body (attached to the reference node)
-        playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
-        # get a reference to the player's rigid_body
-        playerRigidBody = playerRigidBodyNP.node()
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                 "shape_type", "box")
+#         # set various creation parameters as string for other rigid bodies
+#         setParametersBeforeCreation("PlayerNP")
+#         # get a player with anims, reparent to reference node, set transform
+#         playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls)
+#         playerNP.reparent_to(physicsMgr.get_reference_node_path())
+#         playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
+#                 LVecBase3f(-75.0, 145.0, -235.0))        # create player's rigid_body (attached to the reference node)
+#         playerRigidBodyNP = physicsMgr.create_rigid_body("PlayerRigidBody")
+#         # get a reference to the player's rigid_body
+#         playerRigidBody = playerRigidBodyNP.node()
+         
+#         # some clones of player with different shapes
+#         # # sphere
+#         playerSphere = physicsMgr.get_reference_node_path().attach_new_node("playerSphere")
+#         playerNP.instance_to(playerSphere)
+#         playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+#                LVecBase3f(145.0, -235.0, -75.0))
+#         setParametersBeforeCreation("playerSphere")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "sphere")
+#         physicsMgr.create_rigid_body("PlayerRigidBodySphere")
+#          
+#         # # cylinder
+#         playerCylinder = physicsMgr.get_reference_node_path().attach_new_node("playerCylinder")
+#         playerNP.instance_to(playerCylinder)
+#         playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+#                LVecBase3f(145.0, -75.0, -235.0))
+#         setParametersBeforeCreation("playerCylinder", "y")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "cylinder")
+#         physicsMgr.create_rigid_body("PlayerRigidBodyCylinder")
+#          
+#         # # capsule
+#         playerCapsule = physicsMgr.get_reference_node_path().attach_new_node("playerCapsule")
+#         playerNP.instance_to(playerCapsule)
+#         playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+#                LVecBase3f(-235.0, 145.0, -75.0))
+#         setParametersBeforeCreation("playerCapsule", "y")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "capsule")
+#         physicsMgr.create_rigid_body("PlayerRigidBodyCapsule")
+#          
+#         # # cone
+#         playerCone = physicsMgr.get_reference_node_path().attach_new_node("playerCone")
+#         playerNP.instance_to(playerCone)
+#         playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+#                LVecBase3f(-235.0, -75.0, 145.0))
+#         setParametersBeforeCreation("playerCone", "y")
+#         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
+#                "shape_type", "cone")
+#         physicsMgr.create_rigid_body("PlayerRigidBodyCone")
+
+        # # Soft Bodies
+        sharedTS0 = TextureStage("sharedTS0")       
+        # # rope
+        # rope_node: this is a generic RopeNode to which
+        # a NurbsCurveEvaluator could be associated.
+        rope = RopeNode("Rope")
+        rope.set_render_mode(RopeNode.RM_tube)
+        rope.set_uv_mode(RopeNode.UV_parametric)
+        rope.set_normal_mode(RopeNode.NM_none)
+        rope.set_num_subdiv(4)
+        rope.set_num_slices(8)
+        rope.set_thickness(0.4)
+        ropeNP = NodePath(rope)
+        # RopeNode texturing
+        ropeTex = TexturePool.load_texture(Filename("iron.jpg"))
+        ropeNP.set_tex_scale(sharedTS0, 1.0, 1.0)
+        ropeNP.set_texture(sharedTS0, ropeTex, 1)
+        # create the rope soft body
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_type", "rope")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "points", "-17.75,-17.2,8.8:-17.75,-5.2,8.8")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "res", "8")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "fixeds", "1")
+        ropeSoftBodyNP = physicsMgr.create_soft_body("RopeSoftBody")
+        ropeSoftBodyNP.set_collide_mask(mask)
+        ropeSoftBody = ropeSoftBodyNP.node()
+        ropeSoftBody.setup(ropeNP)
         
-        # some clones of player with different shapes
-        # # sphere
-        playerSphere = physicsMgr.get_reference_node_path().attach_new_node("playerSphere")
-        playerNP.instance_to(playerSphere)
-        playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
-               LVecBase3f(145.0, -235.0, -75.0))
-        setParametersBeforeCreation("playerSphere")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "sphere")
-        physicsMgr.create_rigid_body("PlayerRigidBodySphere")
-         
-        # # cylinder
-        playerCylinder = physicsMgr.get_reference_node_path().attach_new_node("playerCylinder")
-        playerNP.instance_to(playerCylinder)
-        playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
-               LVecBase3f(145.0, -75.0, -235.0))
-        setParametersBeforeCreation("playerCylinder", "y")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "cylinder")
-        physicsMgr.create_rigid_body("PlayerRigidBodyCylinder")
-         
-        # # capsule
-        playerCapsule = physicsMgr.get_reference_node_path().attach_new_node("playerCapsule")
-        playerNP.instance_to(playerCapsule)
-        playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
-               LVecBase3f(-235.0, 145.0, -75.0))
-        setParametersBeforeCreation("playerCapsule", "y")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "capsule")
-        physicsMgr.create_rigid_body("PlayerRigidBodyCapsule")
-         
-        # # cone
-        playerCone = physicsMgr.get_reference_node_path().attach_new_node("playerCone")
-        playerNP.instance_to(playerCone)
-        playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
-               LVecBase3f(-235.0, -75.0, 145.0))
-        setParametersBeforeCreation("playerCone", "y")
-        physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
-               "shape_type", "cone")
-        physicsMgr.create_rigid_body("PlayerRigidBodyCone")
+        # # patch
+        # GeomNode: this is a generic GeomNode to which
+        # one or more Geoms could be added.
+        patch = GeomNode("Patch")
+        patchNP = NodePath(patch)
+        # GeomNode texturing
+        patchTex = TexturePool.load_texture(Filename("panda.jpg"))
+        patchNP.set_tex_scale(sharedTS0, 1.0, 1.0)
+        patchNP.set_texture(sharedTS0, patchTex, 1)
+
+        
     else:
         # valid bamFile
         # reparent reference node to render
@@ -558,7 +608,8 @@ if __name__ == '__main__':
 
     # # first option: start the default update task for all plug-ins
     physicsMgr.start_default_update()
-    playerRigidBody.set_update_callback(rigidBodyCallback)
+#     playerRigidBody.set_update_callback(rigidBodyCallback)
+    ropeSoftBody.set_update_callback(softBodyCallback)
     globalClock = ClockObject.get_global_clock()
 
     # # second option: start the custom update task for all plug-ins
@@ -570,7 +621,7 @@ if __name__ == '__main__':
 
     # place camera
     trackball = app.trackball.node()
-    trackball.set_pos(10.0, 400.0, -5.0)
+    trackball.set_pos(10.0, 200.0, 15.0)
     trackball.set_hpr(0.0, 10.0, 0.0)
    
     # app.run(), equals to do the main loop in C++

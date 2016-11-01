@@ -13,6 +13,13 @@
 #include "gamePhysicsManager.h"
 #include "bulletSoftBodyWorldInfo.h"
 #include "bulletSoftBodyShape.h"
+#include "bulletHelper.h"
+#include "ropeNode.h"
+#include "geomNode.h"
+#include "geomTriangles.h"
+#include "geomVertexWriter.h"
+#include "geomVertexReader.h"
+#include "nodePathCollection.h"
 #include <cmath>
 
 #ifndef CPPPARSER
@@ -38,7 +45,6 @@ BTSoftBody::BTSoftBody(const string& name) :
 	// _surface = NULL;
 	delete _soft;
 	_soft = NULL;
-	delete _shapes.back();
 	_shapes.pop_back();
 }
 
@@ -107,7 +113,7 @@ void BTSoftBody::do_initialize()
 	pvector<string> paramValuesStr;
 	float value;
 	int valueInt;
-	//body total mass
+	//body total mass (>=0.0)
 	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("body_total_mass")).c_str(),
 	NULL);
 	mBodyTotalMass = (value >= 0.0 ? value : -value);
@@ -115,15 +121,15 @@ void BTSoftBody::do_initialize()
 	mBodyMassFromFaces = (
 			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("body_mass_from_faces"))
 					== string("true") ? true : false);
-	//air density
+	//air density (>=0.0)
 	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("air_density")).c_str(),
 	NULL);
 	mAirDensity = (value >= 0.0 ? value : -value);
-	//water density
+	//water density (>=0.0)
 	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("water_density")).c_str(),
 	NULL);
 	mWaterDensity = (value >= 0.0 ? value : -value);
-	//water offset
+	//water offset (>=0.0)
 	value = STRTOF(mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("water_offset")).c_str(),
 	NULL);
 	mWaterOffset = (value >= 0.0 ? value : -value);
@@ -177,7 +183,7 @@ void BTSoftBody::do_initialize()
 	mGendiags = (
 			mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("gendiags")) == string("false") ?
 					false : true);
-	//radius
+	//radius (each component >=0.0)
 	param = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY, string("radius"));
 	paramValuesStr = parseCompoundString(param, ',');
 	valueNum = paramValuesStr.size();
@@ -187,7 +193,7 @@ void BTSoftBody::do_initialize()
 	}
 	for (idx = 0; idx < 3; ++idx)
 	{
-		mRadius[idx] = STRTOF(paramValuesStr[idx].c_str(), NULL);
+		mRadius[idx] = abs(STRTOF(paramValuesStr[idx].c_str(), NULL));
 	}
 	//randomize constraints
 	mRandomizeConstraints = (
@@ -203,12 +209,19 @@ void BTSoftBody::do_initialize()
 		mTetraDataFileNames["faces"] = paramValuesStr[1];
 		mTetraDataFileNames["nodes"] = paramValuesStr[2];
 	}
-	//enabling setting
-//	if ((mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY,xxx
-//			string("enabled")) == string("false") ? false : true))
-//	{
-//		do_enable();
-//	}
+
+	//object setting
+	string object = mTmpl->get_parameter_value(GamePhysicsManager::SOFTBODY,
+			string("object"));
+	if(!object.empty())
+	{
+		// search object under reference node
+		NodePath objectNP = mReferenceNP.find(string("**/") + object);
+		if (!objectNP.is_empty())
+		{
+			setup(objectNP);
+		}
+	}
 #ifdef PYTHON_BUILD
 	//Python callback
 	this->ref();
@@ -220,10 +233,6 @@ void BTSoftBody::do_initialize()
 void BTSoftBody::setup(NodePath& objectNP)
 {
 	RETURN_ON_COND(mSetup,)
-
-	//At this point a Scene component (Model) should have been already xxx
-	//created and added to the object, so its node path should
-	//be the same as the object's one.
 
 	//Soft body world information
 	BulletSoftBodyWorldInfo info = GamePhysicsManager::get_global_ptr()->
@@ -260,13 +269,20 @@ void BTSoftBody::setup(NodePath& objectNP)
 		//visualize
 		if (!objectNP.is_empty())
 		{
-			pandaNode =
-					objectNP.find_all_matches("**/+GeomNode").get_path(0).node();
+			if (objectNP.node()->is_of_type(GeomNode::get_class_type()))
+			{
+				pandaNode = objectNP.node();
+			}
+			else
+			{
+				pandaNode = objectNP.find_all_matches("**/+GeomNode").get_path(
+						0).node();
+			}
 		}
 		if (mShowModel)
 		{
 			//visualize with model GeomNode (if any)
-			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			if (pandaNode)
 			{
 				geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 			}
@@ -285,7 +301,7 @@ void BTSoftBody::setup(NodePath& objectNP)
 			//make texcoords for patch.
 			BulletHelper::make_texcoords_for_patch(geom, mRes[0], mRes[1]);
 			//visualize with GeomNode (if any)
-			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			if (pandaNode)
 			{
 				DCAST(GeomNode, pandaNode)->add_geom(geom);
 			}
@@ -497,8 +513,9 @@ void BTSoftBody::setup(NodePath& objectNP)
 			{	8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
 				1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1};
 			//create null tetra mesh
-			this = BulletSoftBodyNode::make_tet_mesh(info, NULL,
-					NULL, nodeBuf);
+//			this = BulletSoftBodyNode::make_tet_mesh(info, NULL, xxx
+//					NULL, nodeBuf);
+			do_make_tet_mesh(info, NULL, NULL, nodeBuf);
 		}
 	}
 	else
@@ -515,8 +532,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 			mRes.resize(1, 0);
 		}
 		//create rope
-//		this = BulletSoftBodyNode::make_rope(info, mPoints[0], xxx
-//				mPoints[1], mRes[0], mFixeds);
 		do_make_rope(info, mPoints[0], mPoints[1], mRes[0], mFixeds);
 		//link with NURBS curve
 		PT(NurbsCurveEvaluator)curve = new NurbsCurveEvaluator();
@@ -525,10 +540,17 @@ void BTSoftBody::setup(NodePath& objectNP)
 		//visualize with RopeNode (if any)
 		if (!objectNP.is_empty())
 		{
-			pandaNode =
-					objectNP.find_all_matches("**/+RopeNode").get_path(0).node();
+			if (objectNP.node()->is_of_type(RopeNode::get_class_type()))
+			{
+				pandaNode = objectNP.node();
+			}
+			else
+			{
+				pandaNode = objectNP.find_all_matches("**/+RopeNode").get_path(
+						0).node();
+			}
 		}
-		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
+		if (pandaNode)
 		{
 			DCAST(RopeNode, pandaNode)->set_curve(curve);
 		}
@@ -552,19 +574,19 @@ void BTSoftBody::setup(NodePath& objectNP)
 		objectNP.reparent_to(thisNP);
 	}
 
-	//HACK: rope node's parent node path correction (see bullet samples) xxx
-//	if (mBodyType == ROPE)
-//	{
-//		PT(PandaNode)pandaNode =
-//		thisNP.find_all_matches("**/+RopeNode").get_path(
-//				0).node();
-//		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
-//		{
-//			//the child is the rope node: reparent to the owner object node path
-//			mRopeNodePath = thisNP.get_child(0);
-//			mRopeNodePath.reparent_to(thisNP.get_parent());
-//		}
-//	}
+	//HACK: rope node's parent node path correction (see bullet samples)
+	if (mBodyType == ROPE)
+	{
+		PT(PandaNode)pandaNode =
+				thisNP.find_all_matches("**/+RopeNode").get_path(0).node();
+		if (pandaNode && pandaNode->is_of_type(RopeNode::get_class_type()))
+		{
+			// the child is the rope node: reparent to the parent of
+			// this node (thisNP.get_parent()), ie the reference node path
+			mRopeNodePath = thisNP.get_child(0);
+			mRopeNodePath.reparent_to(mReferenceNP);
+		}
+	}
 
 	// set the flag
 	mSetup = true;
@@ -816,15 +838,16 @@ void BTSoftBody::cleanup()
 	RETURN_ON_COND(!mSetup,)
 
 	NodePath thisNP = NodePath::any_path(this);
-	//HACK: rope node's parent node path correction (see bullet samples)xxx
-//	if (mBodyType == ROPE)
-//	{
-//		if (! mRopeNodePath.is_empty())
-//		{
-//			//the child is the rope node reparent to this node path
-//			mRopeNodePath.reparent_to(thisNP);
-//		}
-//	}
+
+	//HACK: rope node's parent node path correction (see bullet samples)
+	if (mBodyType == ROPE)
+	{
+		if (! mRopeNodePath.is_empty())
+		{
+			//the child is the rope node reparent to this node path
+			mRopeNodePath.reparent_to(thisNP);
+		}
+	}
 
 	// remove rigid body from the physics world
 	GamePhysicsManager::GetSingletonPtr()->get_bullet_world()->remove(this);
@@ -838,7 +861,6 @@ void BTSoftBody::cleanup()
 	_surface.clear();
 	delete _soft;
 	_soft = NULL;
-	delete _shapes.back();
 	_shapes.pop_back();
 
 	// detach this rigid body's children

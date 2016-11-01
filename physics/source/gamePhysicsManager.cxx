@@ -510,18 +510,30 @@ void GamePhysicsManager::set_parameters_defaults(BTPhysicsType type)
 		///mSoftBodiesParameterTable must be the first cleared
 		mSoftBodiesParameterTable.clear();
 		//sets the (mandatory) parameters to their default values:
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
-		mSoftBodiesParameterTable.insert(ParameterNameValue("", ""));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("body_type", "rope"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("collide_mask", "all_on"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("body_total_mass", "1.0"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("body_mass_from_faces", "false"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("air_density", "1.2"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("water_density", "0.0"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("water_offset", "0.0"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("water_normal", "0.0,0.0,0.0"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("show_model", "false"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("gendiags", "true"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("radius", "1.0,1.0,1.0"));
+		mSoftBodiesParameterTable.insert(
+				ParameterNameValue("randomize_constraints", "true"));
 		return;
 	}
 //	if (type == GHOST) xxx

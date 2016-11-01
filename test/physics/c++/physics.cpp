@@ -16,9 +16,12 @@
 #include <geomVertexFormat.h>
 #include <geomVertexWriter.h>
 #include <geomTriangles.h>
+#include <bulletSoftBodyMaterial.h>
+#include <ropeNode.h>
 
 #include <gamePhysicsManager.h>
 #include <btRigidBody.h>
+#include <btSoftBody.h>
 
 /// global data declaration
 extern string dataDir;
@@ -37,8 +40,9 @@ string modelAnimFiles[5][2] =
 { "ralph-walk.egg", "ralph-run.egg" },
 { "sparrow-flying.egg", "sparrow-flying2.egg" },
 { "", "" },
-{ "red_car-anim.egg", "red_car-anim2.egg" }};
-const float animRateFactor[2] = { 0.6, 0.175 };
+{ "red_car-anim.egg", "red_car-anim2.egg" } };
+const float animRateFactor[2] =
+{ 0.6, 0.175 };
 // bam file
 string bamFileName("physics.boo");
 // debug flag
@@ -48,9 +52,12 @@ bool toggleDebugFlag = false;
 NodePath sceneNP;
 ClockObject* globalClock = NULL;
 // player specifics
-WPT(BTRigidBody)playerRigidBody;
+WPT(BTRigidBody)playerRigidBody = NULL;
 vector<vector<PT(AnimControl)> > playerAnimCtls;
 NodePath playerNP;
+// rope specifics
+WPT(BTSoftBody)ropeSoftBody;
+float softBodyCBCount = 0.0;
 
 // print creation parameters
 void printCreationParameters()
@@ -63,11 +70,12 @@ void printCreationParameters()
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
 		cout << "\t" << valueList[i] << " = "
-				<< physicsMgr->get_parameter_value(GamePhysicsManager::RIGIDBODY,
-						valueList[i]) << endl;
+				<< physicsMgr->get_parameter_value(
+						GamePhysicsManager::RIGIDBODY, valueList[i]) << endl;
 	}
 	//
-	valueList = physicsMgr->get_parameter_name_list(GamePhysicsManager::SOFTBODY);
+	valueList = physicsMgr->get_parameter_name_list(
+			GamePhysicsManager::SOFTBODY);
 	cout << endl << "BTSoftBody creation parameters:" << endl;
 	for (int i = 0; i < valueList.get_num_values(); ++i)
 	{
@@ -83,18 +91,17 @@ void setParametersBeforeCreation(const string& objectName,
 {
 	GamePhysicsManager* physicsMgr = GamePhysicsManager::get_global_ptr();
 	// set rigid_body's parameters
-	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-			"body_mass", "10.0");
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, "body_mass",
+			"10.0");
 	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 			"collide_mask", "0x10");
-	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-			"object", objectName);
-	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-			"shape_up", upAxis);
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, "object",
+			objectName);
+	physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, "shape_up",
+			upAxis);
 
 	// set soft_body's parameters
-	physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "static",
-			"false");
+	physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "", "");
 	//
 	printCreationParameters();
 }
@@ -120,8 +127,10 @@ void startFramework(int argc, char *argv[], const string& msg)
 
 	/// typed object init; not needed if you build inside panda source tree
 	BTRigidBody::init_type();
+	BTSoftBody::init_type();
 	GamePhysicsManager::init_type();
 	BTRigidBody::register_with_read_factory();
+	BTSoftBody::register_with_read_factory();
 	///
 
 	//common callbacks
@@ -141,23 +150,24 @@ void writeToBamFileAndExit(const Event*, void* data)
 	/// second option: remove custom update updateTask
 //	framework.get_task_mgr().remove(updateTask);
 
-	/// this is for testing explicit removal and destruction of all elements
+/// this is for testing explicit removal and destruction of all elements
 	WPT(GamePhysicsManager)physicsMgr = GamePhysicsManager::get_global_ptr();
 	// destroy rigid_bodies
 	while (physicsMgr->get_num_rigid_bodies() > 0)
 	{
 		// destroy the first one on every cycle
-		physicsMgr->destroy_rigid_body(NodePath::any_path(physicsMgr->get_rigid_body(0)));
+		physicsMgr->destroy_rigid_body(
+				NodePath::any_path(physicsMgr->get_rigid_body(0)));
 ///		delete DCAST(BTRigidBody, physicsMgr->get_rigid_body(0).node()); //ERROR
 	}
-//	// destroy soft_bodies xxx
-//	while (physicsMgr->get_num_soft_bodies() > 0)
-//	{
-//		// destroy the first one on every cycle
-//		physicsMgr->destroy_soft_body(
-//				NodePath::any_path(physicsMgr->get_soft_body(0)));
-/////		delete DCAST(BTSoftBody, physicsMgr->get_soft_body(0).node()); //ERROR
-//	}
+	// destroy soft_bodies
+	while (physicsMgr->get_num_soft_bodies() > 0)
+	{
+		// destroy the first one on every cycle
+		physicsMgr->destroy_soft_body(
+				NodePath::any_path(physicsMgr->get_soft_body(0)));
+///		delete DCAST(BTSoftBody, physicsMgr->get_soft_body(0).node()); //ERROR
+	}
 	// delete managers
 	delete GamePhysicsManager::get_global_ptr();
 	// close the window framework
@@ -183,7 +193,7 @@ NodePath loadPlane(const string& name, float width = 30.0, float depth = 30.0,
 	// Pre-defined vertex formats
 //    CPT(GeomVertexFormat) vertexFormatAdded = GeomVertexFormat::get_v3n3t2();
 	CPT(GeomVertexFormat) vertexFormatAdded =
-			GeomVertexFormat::register_format(vertexFormat);
+	GeomVertexFormat::register_format(vertexFormat);
 	// Vertex Data
 	PT(GeomVertexData) vertexData = new GeomVertexData("plane", vertexFormatAdded,
 			Geom::UH_static);
@@ -340,8 +350,8 @@ NodePath loadTerrain(const string& name, float widthScale = 0.5,
 }
 
 // get model and animations
-NodePath getModelAnims(const string& name, float scale,
-		int modelFileIdx, vector<vector<PT(AnimControl)> >& modelAnimCtls)
+NodePath getModelAnims(const string& name, float scale, int modelFileIdx,
+		vector<vector<PT(AnimControl)> >& modelAnimCtls)
 {
 	// get some models, with animations
 	// get the model
@@ -454,21 +464,26 @@ void rigidBodyCallback(PT(BTRigidBody)rigidBody)
 		return;
 	}
 	float currentVelSize =
-			abs(playerRigidBody->get_linear_velocity().length());
+	abs(playerRigidBody->get_linear_velocity().length());
 	// handle player on callback
 	handlePlayerUpdate(currentVelSize);
 }
 
-//// soft body update callback function xxx
-//void softBodyCallback(PT(BTSoftBody)soft_body)
-//{
-//	NodePath refNP =
-//			GamePhysicsManager::get_global_ptr()->get_reference_node_path();
-//	float distLS = (NodePath::any_path(playerRigidBody).get_pos(refNP) -
-//			NodePath::any_path(soft_body).get_pos(refNP)).length();
-//	cout << *soft_body << string(" ") + str(globalClock->get_real_time()) +
-//			string(" - ") + str(distLS) << endl;
-//}
+// soft body update callback function
+void softBodyCallback(PT(BTSoftBody)softBody)
+{
+	softBodyCBCount += globalClock->get_dt();
+	if (softBodyCBCount <= 5)
+	{
+		return;
+	}
+	softBodyCBCount = 0;
+	NodePath refNP =
+	GamePhysicsManager::get_global_ptr()->get_reference_node_path();
+	float distLS = NodePath::any_path(softBody).get_pos(refNP).length();
+	cout << *softBody << string(" callback: ") + str(globalClock->get_real_time()) +
+	string(" - ") + str(distLS) << endl;
+}
 
 // toggle debug draw
 void toggleDebugDraw(const Event* e, void* data)
@@ -484,8 +499,8 @@ void collisionNotify(const Event* e, void* data)
 	PT(PandaNode)object1 = DCAST(PandaNode, e->get_parameter(1).get_ptr());
 
 	cout << string("got '") + e->get_name() + string("' between '") +
-			object0->get_name() + string("' and '") + object1->get_name() +
-			string("'") << endl;
+	object0->get_name() + string("' and '") + object1->get_name() +
+	string("'") << endl;
 }
 
 int main(int argc, char *argv[])
@@ -498,9 +513,10 @@ int main(int argc, char *argv[])
 	PT(TextNode)text;
 	text = new TextNode("Help");
 	text->set_text(
-			msg + "\n\n"
-			"- press \"d\" to toggle debug drawing\n"
-			"- press \"up\"/\"left\"/\"down\"/\"right\" arrows to move the player\n");
+			msg
+					+ "\n\n"
+							"- press \"d\" to toggle debug drawing\n"
+							"- press \"up\"/\"left\"/\"down\"/\"right\" arrows to move the player\n");
 	NodePath textNodePath = window->get_aspect_2d().attach_new_node(text);
 	textNodePath.set_pos(-1.25, 0.0, 0.8);
 	textNodePath.set_scale(0.035);
@@ -530,13 +546,14 @@ int main(int argc, char *argv[])
 		/// heightfield
 //		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
 		// set sceneNP transform
-		sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0), LVecBase3f(45.0, 0.0, 0.0));
+		sceneNP.set_pos_hpr(LPoint3f(0.0, 0.0, 0.0),
+				LVecBase3f(45.0, 0.0, 0.0));
 		// create scene's rigid_body (attached to the reference node)
-		NodePath sceneRigidBodyNP =
-				physicsMgr->create_rigid_body("SceneRigidBody");
+		NodePath sceneRigidBodyNP = physicsMgr->create_rigid_body(
+				"SceneRigidBody");
 		// get a reference to the scene's rigid_body
-		PT(BTRigidBody) sceneRigidBody =
-				DCAST(BTRigidBody, sceneRigidBodyNP.node());
+		PT(BTRigidBody)sceneRigidBody =
+		DCAST(BTRigidBody, sceneRigidBodyNP.node());
 		// set some parameters
 		// plane
 //		sceneRigidBody->set_shape_up(planeUpAxis);
@@ -552,66 +569,131 @@ int main(int argc, char *argv[])
 		// setup the player's rigid body
 		sceneRigidBody->setup(sceneNP);
 
+		/// Rigid Bodies
 		/// box
-		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-				"shape_type", "box");
-		// set various creation parameters as string for other rigid bodies
-		setParametersBeforeCreation("PlayerNP");
-		// get a player with anims, reparent to reference node, set transform
-		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
-		playerNP.reparent_to(physicsMgr->get_reference_node_path());
-		playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
-				LVecBase3f(-75.0, 145.0, -235.0));
-		// create player's rigid_body (attached to the reference node)
-		NodePath playerRigidBodyNP =
-				physicsMgr->create_rigid_body("PlayerRigidBody");
- 		// get a reference to the player's rigid_body
- 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, xxx
+//				"shape_type", "box");
+//		// set various creation parameters as string for other rigid bodies
+//		setParametersBeforeCreation("PlayerNP");
+//		// get a player with anims, reparent to reference node, set transform
+//		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
+//		playerNP.reparent_to(physicsMgr->get_reference_node_path());
+//		playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
+//				LVecBase3f(-75.0, 145.0, -235.0));
+//		// create player's rigid_body (attached to the reference node)
+//		NodePath playerRigidBodyNP =
+//				physicsMgr->create_rigid_body("PlayerRigidBody");
+// 		// get a reference to the player's rigid_body
+// 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
 
- 		// some clones of player with different shapes
-		/// sphere
- 		NodePath playerSphere = physicsMgr->
- 				get_reference_node_path().attach_new_node("playerSphere");
- 		playerNP.instance_to(playerSphere);
- 		playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
-				LVecBase3f(145.0, -235.0, -75.0));
- 		setParametersBeforeCreation("playerSphere");
-		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-				"shape_type", "sphere");
- 		physicsMgr->create_rigid_body("PlayerRigidBodySphere");
+// 		// some clones of player with different shapes
+//		/// sphere
+// 		NodePath playerSphere = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerSphere");
+// 		playerNP.instance_to(playerSphere);
+// 		playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+//				LVecBase3f(145.0, -235.0, -75.0));
+// 		setParametersBeforeCreation("playerSphere");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "sphere");
+// 		physicsMgr->create_rigid_body("PlayerRigidBodySphere");
+//
+//		/// cylinder
+// 		NodePath playerCylinder = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerCylinder");
+// 		playerNP.instance_to(playerCylinder);
+// 		playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+//				LVecBase3f(145.0, -75.0, -235.0));
+// 		setParametersBeforeCreation("playerCylinder", "y");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "cylinder");
+// 		physicsMgr->create_rigid_body("PlayerRigidBodyCylinder");
+//
+// 		/// capsule
+// 		NodePath playerCapsule = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerCapsule");
+// 		playerNP.instance_to(playerCapsule);
+// 		playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+//				LVecBase3f(-235.0, 145.0, -75.0));
+// 		setParametersBeforeCreation("playerCapsule", "y");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "capsule");
+// 		physicsMgr->create_rigid_body("PlayerRigidBodyCapsule");
+//
+// 		/// cone
+// 		NodePath playerCone = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerCone");
+// 		playerNP.instance_to(playerCone);
+// 		playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+//				LVecBase3f(-235.0, -75.0, 145.0));
+// 		setParametersBeforeCreation("playerCone", "y");
+//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+//				"shape_type", "cone");
+// 		physicsMgr->create_rigid_body("PlayerRigidBodyCone");
 
-		/// cylinder
- 		NodePath playerCylinder = physicsMgr->
- 				get_reference_node_path().attach_new_node("playerCylinder");
- 		playerNP.instance_to(playerCylinder);
- 		playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
-				LVecBase3f(145.0, -75.0, -235.0));
- 		setParametersBeforeCreation("playerCylinder", "y");
-		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-				"shape_type", "cylinder");
- 		physicsMgr->create_rigid_body("PlayerRigidBodyCylinder");
+		/// Soft Bodies
+		PT(TextureStage)sharedTS0 = new TextureStage("sharedTS0");
+		/// rope
+		// RopeNode: this is a generic RopeNode to which
+		// a NurbsCurveEvaluator could be associated.
+		PT(RopeNode)rope = new RopeNode("Rope");
+		rope->set_render_mode(RopeNode::RM_tube);
+		rope->set_uv_mode(RopeNode::UV_parametric);
+		rope->set_normal_mode(RopeNode::NM_none);
+		rope->set_num_subdiv(4);
+		rope->set_num_slices(8);
+		rope->set_thickness(0.4);
+		NodePath ropeNP(rope);
+		// RopeNode texturing
+		PT(Texture)ropeTex = TexturePool::load_texture(Filename("iron.jpg"));
+		ropeNP.set_tex_scale(sharedTS0, 1.0, 1.0);
+		ropeNP.set_texture(sharedTS0, ropeTex, 1);
+		// create the rope soft body
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_type", "rope");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "points",
+				"-17.75,-17.2,8.8:-17.75,-5.2,8.8");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "res",
+				"8");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "fixeds",
+				"1");
+		NodePath ropeSoftBodyNP = physicsMgr->create_soft_body("RopeSoftBody");
+		ropeSoftBodyNP.set_collide_mask(mask);
+		ropeSoftBody = DCAST(BTSoftBody, ropeSoftBodyNP.node());
+		ropeSoftBody->setup(ropeNP);
 
- 		/// capsule
- 		NodePath playerCapsule = physicsMgr->
- 				get_reference_node_path().attach_new_node("playerCapsule");
- 		playerNP.instance_to(playerCapsule);
- 		playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
-				LVecBase3f(-235.0, 145.0, -75.0));
- 		setParametersBeforeCreation("playerCapsule", "y");
-		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-				"shape_type", "capsule");
- 		physicsMgr->create_rigid_body("PlayerRigidBodyCapsule");
+		/// patch
+		// GeomNode: this is a generic GeomNode to which
+		// one or more Geoms could be added.
+		PT(GeomNode)patch = new GeomNode("Patch");
+		NodePath patchNP(patch);
+		// GeomNode texturing
+		PT(Texture)patchTex = TexturePool::load_texture(Filename("panda.jpg"));
+		patchNP.set_tex_scale(sharedTS0, 1.0, 1.0);
+		patchNP.set_texture(sharedTS0, patchTex, 1);
+		// create the patch soft body
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_type", "patch");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "points",
+				"-35.2,-15.5,15.8:-29.2,-15.5,15.8:-35.2,-21.5,15.8:-29.2,-21.5,15.8");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "res",
+				"31:31");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "fixeds",
+				"3");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"gendiags", "true");
+		NodePath patchSoftBodyNP = physicsMgr->create_soft_body(
+				"PatchSoftBody");
+		PT(BTSoftBody)patchSoftBody = DCAST(BTSoftBody, patchSoftBodyNP.node());
+		patchSoftBodyNP.set_collide_mask(mask);
+		patchSoftBody->setup(patchNP);
+		// generate bending constraints: must be done after soft body setup()
+		BulletSoftBodyMaterial material = patchSoftBody->append_material();
+		material.set_linear_stiffness(0.4);
+		patchSoftBody->generate_bending_constraints(2, &material);
 
- 		/// cone
- 		NodePath playerCone = physicsMgr->
- 				get_reference_node_path().attach_new_node("playerCone");
- 		playerNP.instance_to(playerCone);
- 		playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
-				LVecBase3f(-235.0, -75.0, 145.0));
- 		setParametersBeforeCreation("playerCone", "y");
-		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-				"shape_type", "cone");
- 		physicsMgr->create_rigid_body("PlayerRigidBodyCone");
+
+
 	}
 	else
 	{
@@ -637,22 +719,23 @@ int main(int argc, char *argv[])
 
 	// setup DEBUG DRAWING
 	physicsMgr->init_debug();
-	framework.define_key("d", "toggleDebugDraw", &toggleDebugDraw,
-			nullptr);
+	framework.define_key("d", "toggleDebugDraw", &toggleDebugDraw, nullptr);
 
 	// enable collision notify event: BTRigidBody_BTRigidBody_Collision
-	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY, 10.0);
+	physicsMgr->enable_collision_notify(GamePhysicsManager::COLLISIONNOTIFY,
+			10.0);
 	framework.define_key("BTRigidBody_BTRigidBody_Collision", "collisionNotify",
 			&collisionNotify, nullptr);
-	framework.define_key("BTRigidBody_BTRigidBody_CollisionOff", "collisionNotifyOff",
-			&collisionNotify, nullptr);
+	framework.define_key("BTRigidBody_BTRigidBody_CollisionOff",
+			"collisionNotifyOff", &collisionNotify, nullptr);
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();
-	playerRigidBody->set_update_callback(rigidBodyCallback);
+//	playerRigidBody->set_update_callback(rigidBodyCallback); xxx
+	ropeSoftBody->set_update_callback(softBodyCallback);
 	globalClock = ClockObject::get_global_clock();
 
-    /// second option: start the custom update task for the drivers
+	/// second option: start the custom update task for the drivers
 //	updateTask = new GenericAsyncTask("updateControls", &updateControls,
 //			nullptr);
 //	framework.get_task_mgr().add(updateTask);
@@ -666,7 +749,7 @@ int main(int argc, char *argv[])
 
 	// place camera trackball (local coordinate)
 	PT(Trackball)trackball = DCAST(Trackball, window->get_mouse().find("**/+Trackball").node());
-	trackball->set_pos(10.0, 400.0, -5.0);
+	trackball->set_pos(10.0, 200.0, 15.0);
 	trackball->set_hpr(0.0, 10.0, 0.0);
 
 	// do the main loop, equals to call app.run() in python
