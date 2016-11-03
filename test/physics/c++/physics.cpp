@@ -513,10 +513,9 @@ int main(int argc, char *argv[])
 	PT(TextNode)text;
 	text = new TextNode("Help");
 	text->set_text(
-			msg
-					+ "\n\n"
-							"- press \"d\" to toggle debug drawing\n"
-							"- press \"up\"/\"left\"/\"down\"/\"right\" arrows to move the player\n");
+			msg + "\n\n"
+			"- press \"d\" to toggle debug drawing\n"
+			"- press \"up\"/\"left\"/\"down\"/\"right\" arrows to move the player\n");
 	NodePath textNodePath = window->get_aspect_2d().attach_new_node(text);
 	textNodePath.set_pos(-1.25, 0.0, 0.8);
 	textNodePath.set_scale(0.035);
