@@ -13,7 +13,7 @@ from panda3d.core import PandaSystem
 from common import debug_out, get_panda_bin_path, get_panda_include_path
 from common import get_compiler_name, is_64_bit, try_execute, join_abs, get_script_dir
 
-if len(sys.argv) != 3:
+if len(sys.argv) != 4:
     debug_out("Usage: python interrogate.py <module-name> <verbose-level>")
     sys.exit(1)
 
@@ -21,7 +21,7 @@ if len(sys.argv) != 3:
 # Parameters
 MODULE_NAME = sys.argv[1]
 VERBOSE_LVL = int(sys.argv[2])  # Assume the user did specify something valid
-
+MODULE_SRC_DIR = sys.argv[3]
 
 def check_ignore(source):
     """ This function checks if a file is on the ignore list """
@@ -127,7 +127,7 @@ def interrogate_module():
 if __name__ == "__main__":
 
     # Change into the source directory
-    source_dir = join(get_script_dir(), "../source/")
+    source_dir = join(get_script_dir(), "../" + MODULE_SRC_DIR + "/source/")
     chdir(source_dir)
 
     interrogate()

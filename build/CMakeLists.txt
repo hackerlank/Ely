@@ -210,7 +210,7 @@ include_directories("${PYTHON_INCLUDE_DIRS}")
 
 # Run interrogate over the files
 execute_process(
-    COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/interrogate.py" "${PROJECT_NAME}" "${IGATE_VERBOSE}"
+    COMMAND "${PYTHON_EXECUTABLE}" "-B" "scripts/interrogate.py" "${PROJECT_NAME}" "${IGATE_VERBOSE}" "${MODULE_SRC_DIR}"
     OUTPUT_VARIABLE output
     ERROR_VARIABLE errors
     RESULT_VARIABLE return_code
@@ -330,12 +330,12 @@ add_definitions("/DPB_CFG_MODULE=${PROJECT_NAME}")
 
 # Collect sources for compiling
 #file(GLOB_RECURSE SOURCES source/*.cpp source/*.cxx)
-file(GLOB SOURCES source/*.cpp source/*.cxx)
+file(GLOB SOURCES ${MODULE_SRC_DIR}/source/*.cpp ${MODULE_SRC_DIR}/source/*.cxx)
 include_directories("source/")
 set(SOURCES ${SOURCES_H} ${SOURCES})
 
 # Collect subdirs for compiling
-file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} source/*)
+file(GLOB POSSIBLE_DIRS RELATIVE ${CMAKE_CURRENT_LIST_DIR} ${MODULE_SRC_DIR}/source/*)
 foreach(PDIR ${POSSIBLE_DIRS})
   if (IS_DIRECTORY ${CMAKE_CURRENT_LIST_DIR}/${PDIR})
     include_directories("${PDIR}")

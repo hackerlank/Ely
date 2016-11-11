@@ -18,6 +18,8 @@ if __name__ == "__main__":
     # Arguments
     parser = argparse.ArgumentParser(description="P3DModuleBuilder")
     parser.add_argument(
+        '--dir', type=str, required=True, help="Directory to build",)
+    parser.add_argument(
         '--optimize', type=int, default=None,
         help="Optimize level, should match the one used for the Panda3D build",)
     parser.add_argument(
@@ -28,7 +30,8 @@ if __name__ == "__main__":
     if sys.version_info.major > 2:
         raw_input = input
 
-    config_file = join(dirname(realpath(__file__)), "config.ini")
+#     config_file = join(dirname(realpath(__file__)), "config.ini")
+    config_file = join(args.dir, "config.ini")
     config = get_ini_conf(config_file)
 
     # Find cached module name

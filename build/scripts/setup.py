@@ -88,6 +88,9 @@ def run_cmake(config, args):
 
     cmake_args += ["-DOPTIMIZE=" + str(optimize)]
 
+    module_src_dir = args.dir
+    cmake_args += ["-DMODULE_SRC_DIR:STRING=" + module_src_dir]
+
     try_execute("cmake", join_abs(get_script_dir(), ".."), *cmake_args)
 
 
