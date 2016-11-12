@@ -1,6 +1,4 @@
 Makefile.in
-build-*
-.settings/org.eclipse.cdt.managedbuilder.core.prefs
 aclocal.m4
 autom4te.cache
 compile
