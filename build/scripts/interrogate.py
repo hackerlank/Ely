@@ -23,6 +23,7 @@ MODULE_NAME = sys.argv[1]
 VERBOSE_LVL = int(sys.argv[2])  # Assume the user did specify something valid
 MODULE_SRC_DIR = sys.argv[3]
 
+
 def check_ignore(source):
     """ This function checks if a file is on the ignore list """
     for f in ["interrogate_module.cpp", "interrogate_wrapper.cpp"]:

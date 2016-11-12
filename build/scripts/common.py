@@ -139,8 +139,16 @@ def fatal_error(*args):
 
 def debug_out(*args):
     """ Prints a debug output string """
-    print(*[i.encode('ascii', 'ignore') for i in args])
+    if sys.version_info.major >= 3:
+        def decode_str(s):
+            if isinstance(s, str):
+                return s.encode("ascii", "ignore").decode("ascii", "ignore")
+            else:
+                return str(s)
 
+        print(*[decode_str(i) for i in args])
+    else:
+        print(*[i.encode('ascii', 'ignore') for i in args])
 
 def try_makedir(dirname):
     """ Tries to make the specified dir, but in case it fails it does nothing """
@@ -157,16 +165,15 @@ def try_execute(*args, **kwargs):
     status code """
     debug_out("Executing command: ", ' '.join(args), "\n")
     try:
-        if "verbose" in kwargs and kwargs["verbose"]:
-            process = subprocess.Popen(args)
-            process.communicate()
-            if process.returncode != 0:
-                raise Exception("Return-Code: " + str(process.returncode))
+        process = subprocess.Popen(args, shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        line = process.stdout.readline()
+        while line:
+            debug_out(line.decode(locale.getpreferredencoding(), errors="ignore").rstrip("\r\n"))
+            line = process.stdout.readline()
+        process.wait()
+        if process.returncode != 0:
+            raise Exception("Process had non-zero returncode:", process.returncode)
 
-        else:
-            output = subprocess.check_output(args, bufsize=1, stderr=subprocess.STDOUT)
-            debug_out("Process output: ")
-            debug_out(output.decode(locale.getpreferredencoding(), errors="ignore"))
     except subprocess.CalledProcessError as msg:
         debug_out("Process error:")
         debug_out(msg.output.decode(locale.getpreferredencoding(), errors="ignore"))
