@@ -328,13 +328,20 @@ void BTSoftBody::setup(NodePath& objectNP)
 		//visualize
 		if (!objectNP.is_empty())
 		{
-			pandaNode =
-					objectNP.find_all_matches("**/+GeomNode").get_path(0).node();
+			if (objectNP.node()->is_of_type(GeomNode::get_class_type()))
+			{
+				pandaNode = objectNP.node();
+			}
+			else
+			{
+				pandaNode = objectNP.find_all_matches("**/+GeomNode").get_path(
+						0).node();
+			}
 		}
 		if (mShowModel)
 		{
 			//visualize with model GeomNode (if any)
-			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			if (pandaNode)
 			{
 				geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 			}
@@ -353,7 +360,7 @@ void BTSoftBody::setup(NodePath& objectNP)
 			//make texcoords for ellipsoid: to be written!!!
 ///			BulletHelper::make_texcoords_for_ellipsoid(geom, radius, mRes[0]);
 			//visualize with GeomNode (if any)
-			if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+			if (pandaNode)
 			{
 				DCAST(GeomNode, pandaNode)->add_geom(geom);
 			}
@@ -366,10 +373,17 @@ void BTSoftBody::setup(NodePath& objectNP)
 		//get and visualize with model GeomNode (if any)
 		if (!objectNP.is_empty())
 		{
-			pandaNode =
-					objectNP.find_all_matches("**/+GeomNode").get_path(0).node();
+			if (objectNP.node()->is_of_type(GeomNode::get_class_type()))
+			{
+				pandaNode = objectNP.node();
+			}
+			else
+			{
+				pandaNode = objectNP.find_all_matches("**/+GeomNode").get_path(
+						0).node();
+			}
 		}
-		if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+		if (pandaNode)
 		{
 			geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 		}
@@ -570,6 +584,14 @@ void BTSoftBody::setup(NodePath& objectNP)
 	NodePath thisNP = NodePath::any_path(this);
 	if (! objectNP.is_empty())
 	{
+//		// inherit the TrasformState from the object xxx
+//		set_transform(objectNP.node()->get_transform());
+//		// reset object's TrasformState
+//		objectNP.set_transform(TransformState::make_identity());
+		// inherit position, orientation from the object
+		thisNP.set_pos_hpr(objectNP.get_pos(), objectNP.get_hpr());
+		// reset object's position, orientation
+		objectNP.set_pos_hpr(LPoint3f::zero(), LVecBase3f::zero());
 		// reparent the object node path to this
 		objectNP.reparent_to(thisNP);
 	}

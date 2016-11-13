@@ -17,6 +17,7 @@
 #include <geomVertexWriter.h>
 #include <geomTriangles.h>
 #include <bulletSoftBodyMaterial.h>
+#include <bulletSoftBodyConfig.h>
 #include <ropeNode.h>
 
 #include <gamePhysicsManager.h>
@@ -351,7 +352,7 @@ NodePath loadTerrain(const string& name, float widthScale = 0.5,
 
 // get model and animations
 NodePath getModelAnims(const string& name, float scale, int modelFileIdx,
-		vector<vector<PT(AnimControl)> >& modelAnimCtls)
+		vector<vector<PT(AnimControl)> >* modelAnimCtls)
 {
 	// get some models, with animations
 	// get the model
@@ -360,34 +361,38 @@ NodePath getModelAnims(const string& name, float scale, int modelFileIdx,
 	modelNP.set_name(name);
 	// set scale
 	modelNP.set_scale(scale);
-	// associate an anim with a given anim control
-	AnimControlCollection tmpAnims;
-	NodePath modelAnimNP[2];
-	modelAnimCtls.push_back(vector<PT(AnimControl)>(2));
-	if((!modelAnimFiles[modelFileIdx][0].empty()) &&
-	(!modelAnimFiles[modelFileIdx][1].empty()))
+	// get animations if requested
+	if (modelAnimCtls)
 	{
-		// first anim -> modelAnimCtls[i][0]
-		modelAnimNP[0] = window->load_model(modelNP, modelAnimFiles[modelFileIdx][0]);
-		auto_bind(modelNP.node(), tmpAnims,
-		PartGroup::HMF_ok_part_extra |
-		PartGroup::HMF_ok_anim_extra |
-		PartGroup::HMF_ok_wrong_root_name);
-		modelAnimCtls.back()[0] = tmpAnims.get_anim(0);
-		tmpAnims.clear_anims();
-		modelAnimNP[0].detach_node();
-		// second anim -> modelAnimCtls[i][1]
-		modelAnimNP[1] = window->load_model(modelNP, modelAnimFiles[modelFileIdx][1]);
-		auto_bind(modelNP.node(), tmpAnims,
-		PartGroup::HMF_ok_part_extra |
-		PartGroup::HMF_ok_anim_extra |
-		PartGroup::HMF_ok_wrong_root_name);
-		modelAnimCtls.back()[1] = tmpAnims.get_anim(0);
-		tmpAnims.clear_anims();
-		modelAnimNP[1].detach_node();
-		// reparent all node paths
-		modelAnimNP[0].reparent_to(modelNP);
-		modelAnimNP[1].reparent_to(modelNP);
+		// associate an anim with a given anim control
+		AnimControlCollection tmpAnims;
+		NodePath modelAnimNP[2];
+		modelAnimCtls->push_back(vector<PT(AnimControl)>(2));
+		if((!modelAnimFiles[modelFileIdx][0].empty()) &&
+		(!modelAnimFiles[modelFileIdx][1].empty()))
+		{
+			// first anim -> modelAnimCtls[i][0]
+			modelAnimNP[0] = window->load_model(modelNP, modelAnimFiles[modelFileIdx][0]);
+			auto_bind(modelNP.node(), tmpAnims,
+			PartGroup::HMF_ok_part_extra |
+			PartGroup::HMF_ok_anim_extra |
+			PartGroup::HMF_ok_wrong_root_name);
+			modelAnimCtls->back()[0] = tmpAnims.get_anim(0);
+			tmpAnims.clear_anims();
+			modelAnimNP[0].detach_node();
+			// second anim -> modelAnimCtls[i][1]
+			modelAnimNP[1] = window->load_model(modelNP, modelAnimFiles[modelFileIdx][1]);
+			auto_bind(modelNP.node(), tmpAnims,
+			PartGroup::HMF_ok_part_extra |
+			PartGroup::HMF_ok_anim_extra |
+			PartGroup::HMF_ok_wrong_root_name);
+			modelAnimCtls->back()[1] = tmpAnims.get_anim(0);
+			tmpAnims.clear_anims();
+			modelAnimNP[1].detach_node();
+			// reparent all node paths
+			modelAnimNP[0].reparent_to(modelNP);
+			modelAnimNP[1].reparent_to(modelNP);
+		}
 	}
 	//
 	return modelNP;
@@ -538,10 +543,10 @@ int main(int argc, char *argv[])
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
 		/// plane
-//		BulletUpAxis planeUpAxis = Z_up; // Z_up X_up Y_up
-//		sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis);
+		BulletUpAxis planeUpAxis = Z_up; // Z_up X_up Y_up
+		sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis);
 		/// triangle mesh
-		sceneNP = loadTerrainLowPoly("SceneNP");
+//		sceneNP = loadTerrainLowPoly("SceneNP");
 		/// heightfield
 //		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
 		// set sceneNP transform
@@ -587,45 +592,45 @@ int main(int argc, char *argv[])
 
 // 		// some clones of player with different shapes
 //		/// sphere
-// 		NodePath playerSphere = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerSphere");
-// 		playerNP.instance_to(playerSphere);
-// 		playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+// 		NodePath playerSphereNP = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerSphereNP");
+// 		playerNP.instance_to(playerSphereNP);
+// 		playerSphereNP.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
 //				LVecBase3f(145.0, -235.0, -75.0));
-// 		setParametersBeforeCreation("playerSphere");
+// 		setParametersBeforeCreation("playerSphereNP");
 //		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 //				"shape_type", "sphere");
 // 		physicsMgr->create_rigid_body("PlayerRigidBodySphere");
 //
 //		/// cylinder
-// 		NodePath playerCylinder = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerCylinder");
-// 		playerNP.instance_to(playerCylinder);
-// 		playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+// 		NodePath playerCylinderNP = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerCylinderNP");
+// 		playerNP.instance_to(playerCylinderNP);
+// 		playerCylinderNP.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
 //				LVecBase3f(145.0, -75.0, -235.0));
-// 		setParametersBeforeCreation("playerCylinder", "y");
+// 		setParametersBeforeCreation("playerCylinderNP", "y");
 //		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 //				"shape_type", "cylinder");
 // 		physicsMgr->create_rigid_body("PlayerRigidBodyCylinder");
 //
 // 		/// capsule
-// 		NodePath playerCapsule = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerCapsule");
-// 		playerNP.instance_to(playerCapsule);
-// 		playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+// 		NodePath playerCapsuleNP = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerCapsuleNP");
+// 		playerNP.instance_to(playerCapsuleNP);
+// 		playerCapsuleNP.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
 //				LVecBase3f(-235.0, 145.0, -75.0));
-// 		setParametersBeforeCreation("playerCapsule", "y");
+// 		setParametersBeforeCreation("playerCapsuleNP", "y");
 //		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 //				"shape_type", "capsule");
 // 		physicsMgr->create_rigid_body("PlayerRigidBodyCapsule");
 //
 // 		/// cone
-// 		NodePath playerCone = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerCone");
-// 		playerNP.instance_to(playerCone);
-// 		playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+// 		NodePath playerConeNP = physicsMgr->
+// 				get_reference_node_path().attach_new_node("playerConeNP");
+// 		playerNP.instance_to(playerConeNP);
+// 		playerConeNP.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
 //				LVecBase3f(-235.0, -75.0, 145.0));
-// 		setParametersBeforeCreation("playerCone", "y");
+// 		setParametersBeforeCreation("playerConeNP", "y");
 //		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
 //				"shape_type", "cone");
 // 		physicsMgr->create_rigid_body("PlayerRigidBodyCone");
@@ -687,11 +692,70 @@ int main(int argc, char *argv[])
 		patchSoftBodyNP.set_collide_mask(mask);
 		patchSoftBody->setup(patchNP);
 		// generate bending constraints: must be done after soft body setup()
-		BulletSoftBodyMaterial material = patchSoftBody->append_material();
-		material.set_linear_stiffness(0.4);
-		patchSoftBody->generate_bending_constraints(2, &material);
+		BulletSoftBodyMaterial patchMaterial = patchSoftBody->append_material();
+		patchMaterial.set_linear_stiffness(0.4);
+		patchSoftBody->generate_bending_constraints(2, &patchMaterial);
 
+		/// ellipsoid
+		// GeomNode: this is a generic GeomNode to which
+		// one or more Geoms could be added.
+		PT(GeomNode)ellipsoid = new GeomNode("Ellipsoid");
+		NodePath ellipsoidNP(ellipsoid);
+		ellipsoidNP.set_color(0.5, 0.0, 0.5, 1.0);
+		ellipsoidNP.set_pos(LPoint3f(14.1, -10.0, 50.1));
+		// create the ellipsoid soft body
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_type", "ellipsoid");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "points",
+				"0.0,0.0,0.0");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "res",
+				"128");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY, "radius",
+				"1.5,1.5,1.5");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_total_mass", "30.0");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_mass_from_faces", "true");
+		NodePath ellipsoidSoftBodyNP = physicsMgr->create_soft_body(
+				"EllipsoidSoftBody");
+		PT(BTSoftBody)ellipsoidSoftBody = DCAST(BTSoftBody, ellipsoidSoftBodyNP.node());
+		ellipsoidSoftBodyNP.set_collide_mask(mask);
+		ellipsoidSoftBody->setup(ellipsoidNP);
+		// other features: must be done after soft body setup()
+		ellipsoidSoftBody->get_material(0).set_linear_stiffness(0.1);
+		ellipsoidSoftBody->get_cfg().set_dynamic_friction_coefficient(1);
+		ellipsoidSoftBody->get_cfg().set_damping_coefficient(0.001);
+		ellipsoidSoftBody->get_cfg().set_pressure_coefficient(1500);
+		ellipsoidSoftBody->set_pose(true, false);
 
+		/// trimesh
+		// get a model: should have one only Geom
+		NodePath trimeshNP = getModelAnims("trimeshNP", 1.0, 4, NULL);
+		trimeshNP.set_pos(LPoint3f(30.1, -40.0, 20.1));
+		trimeshNP.set_p(90);
+		trimeshNP.ls();
+		// embed model transform
+		trimeshNP.flatten_strong();
+		trimeshNP.ls();
+		// create the trimesh soft body
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_type", "tri_mesh");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"randomize_constraints", "true");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_total_mass", "50.0");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_mass_from_faces", "true");
+		NodePath trimeshSoftBodyNP = physicsMgr->create_soft_body(
+				"TrimeshSoftBody");
+		PT(BTSoftBody)trimeshSoftBody = DCAST(BTSoftBody, trimeshSoftBodyNP.node());
+		trimeshSoftBodyNP.set_collide_mask(mask);
+		trimeshSoftBody->setup(trimeshNP);
+		// other features: must be done after soft body setup()
+		trimeshSoftBody->generate_bending_constraints(2);
+		trimeshSoftBody->get_cfg().set_positions_solver_iterations(2);
+		trimeshSoftBody->get_cfg().set_collision_flag(
+				BulletSoftBodyConfig::CF_vertex_face_soft_soft, true);
 
 	}
 	else

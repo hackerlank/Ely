@@ -12,7 +12,7 @@ from panda3d.core import load_prc_file_data, WindowProperties, BitMask32, \
         GeomVertexData, GeomVertexWriter, LVector3f, GeomTriangles, \
         RopeNode
 from direct.showbase.ShowBase import ShowBase
-from panda3d.bullet import Z_up, X_up, Y_up
+from panda3d.bullet import Z_up, X_up, Y_up, BulletSoftBodyConfig
 from p3physics import GamePhysicsManager, BTRigidBody
 #
 import sys
@@ -302,35 +302,37 @@ def getModelAnims(name, scale, modelFileIdx, modelAnimCtls):
     modelNP.set_name(name)
     # set scale
     modelNP.set_scale(scale)
-    # associate an anim with a given anim control
-    tmpAnims = AnimControlCollection()
-    modelAnimNP = [None, None]
-    modelAnimCtls.append([None, None])        
-    if(len(modelAnimFiles[modelFileIdx][0]) != 0) and \
-            (len(modelAnimFiles[modelFileIdx][1]) != 0):
-        # first anim . modelAnimCtls[i][0]
-        modelAnimNP[0] = app.loader.load_model(modelAnimFiles[modelFileIdx][0])
-        modelAnimNP[0].reparent_to(modelNP)
-        auto_bind(modelNP.node(), tmpAnims,
-                  PartGroup.HMF_ok_part_extra | 
-                  PartGroup.HMF_ok_anim_extra | 
-                  PartGroup.HMF_ok_wrong_root_name)
-        modelAnimCtls[-1][0] = tmpAnims.get_anim(0)
-        tmpAnims.clear_anims()
-        modelAnimNP[0].detach_node()
-        # second anim . modelAnimCtls[i][1]
-        modelAnimNP[1] = app.loader.load_model(modelAnimFiles[modelFileIdx][1])
-        modelAnimNP[1].reparent_to(modelNP)
-        auto_bind(modelNP.node(), tmpAnims,
-                  PartGroup.HMF_ok_part_extra | 
-                  PartGroup.HMF_ok_anim_extra | 
-                  PartGroup.HMF_ok_wrong_root_name)
-        modelAnimCtls[-1][1] = tmpAnims.get_anim(0)
-        tmpAnims.clear_anims()
-        modelAnimNP[1].detach_node()
-        # reparent all node paths
-        modelAnimNP[0].reparent_to(modelNP)
-        modelAnimNP[1].reparent_to(modelNP)    
+    # get animations if requested
+    if modelAnimCtls:
+        # associate an anim with a given anim control
+        tmpAnims = AnimControlCollection()
+        modelAnimNP = [None, None]
+        modelAnimCtls.append([None, None])        
+        if(len(modelAnimFiles[modelFileIdx][0]) != 0) and \
+                (len(modelAnimFiles[modelFileIdx][1]) != 0):
+            # first anim . modelAnimCtls[i][0]
+            modelAnimNP[0] = app.loader.load_model(modelAnimFiles[modelFileIdx][0])
+            modelAnimNP[0].reparent_to(modelNP)
+            auto_bind(modelNP.node(), tmpAnims,
+                      PartGroup.HMF_ok_part_extra | 
+                      PartGroup.HMF_ok_anim_extra | 
+                      PartGroup.HMF_ok_wrong_root_name)
+            modelAnimCtls[-1][0] = tmpAnims.get_anim(0)
+            tmpAnims.clear_anims()
+            modelAnimNP[0].detach_node()
+            # second anim . modelAnimCtls[i][1]
+            modelAnimNP[1] = app.loader.load_model(modelAnimFiles[modelFileIdx][1])
+            modelAnimNP[1].reparent_to(modelNP)
+            auto_bind(modelNP.node(), tmpAnims,
+                      PartGroup.HMF_ok_part_extra | 
+                      PartGroup.HMF_ok_anim_extra | 
+                      PartGroup.HMF_ok_wrong_root_name)
+            modelAnimCtls[-1][1] = tmpAnims.get_anim(0)
+            tmpAnims.clear_anims()
+            modelAnimNP[1].detach_node()
+            # reparent all node paths
+            modelAnimNP[0].reparent_to(modelNP)
+            modelAnimNP[1].reparent_to(modelNP)    
     #
     return modelNP
 
@@ -455,10 +457,10 @@ if __name__ == '__main__':
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         # # plane
-#         planeUpAxis = Z_up # Z_up X_up Y_up
-#         sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis)
+        planeUpAxis = Z_up # Z_up X_up Y_up
+        sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis)
         # # triangle mesh
-        sceneNP = loadTerrainLowPoly("SceneNP")
+#         sceneNP = loadTerrainLowPoly("SceneNP")
         # # heightfield
 #         sceneNP = loadTerrain("SceneNP", 1.0, 60.0)
         # set sceneNP transform
@@ -499,41 +501,41 @@ if __name__ == '__main__':
          
 #         # some clones of player with different shapes
 #         # # sphere
-#         playerSphere = physicsMgr.get_reference_node_path().attach_new_node("playerSphere")
-#         playerNP.instance_to(playerSphere)
-#         playerSphere.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+#         playerSphereNP = physicsMgr.get_reference_node_path().attach_new_node("playerSphereNP")
+#         playerNP.instance_to(playerSphereNP)
+#         playerSphereNP.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
 #                LVecBase3f(145.0, -235.0, -75.0))
-#         setParametersBeforeCreation("playerSphere")
+#         setParametersBeforeCreation("playerSphereNP")
 #         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
 #                "shape_type", "sphere")
 #         physicsMgr.create_rigid_body("PlayerRigidBodySphere")
 #          
 #         # # cylinder
-#         playerCylinder = physicsMgr.get_reference_node_path().attach_new_node("playerCylinder")
-#         playerNP.instance_to(playerCylinder)
-#         playerCylinder.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+#         playerCylinderNP = physicsMgr.get_reference_node_path().attach_new_node("playerCylinderNP")
+#         playerNP.instance_to(playerCylinderNP)
+#         playerCylinderNP.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
 #                LVecBase3f(145.0, -75.0, -235.0))
-#         setParametersBeforeCreation("playerCylinder", "y")
+#         setParametersBeforeCreation("playerCylinderNP", "y")
 #         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
 #                "shape_type", "cylinder")
 #         physicsMgr.create_rigid_body("PlayerRigidBodyCylinder")
 #          
 #         # # capsule
-#         playerCapsule = physicsMgr.get_reference_node_path().attach_new_node("playerCapsule")
-#         playerNP.instance_to(playerCapsule)
-#         playerCapsule.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+#         playerCapsuleNP = physicsMgr.get_reference_node_path().attach_new_node("playerCapsuleNP")
+#         playerNP.instance_to(playerCapsuleNP)
+#         playerCapsuleNP.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
 #                LVecBase3f(-235.0, 145.0, -75.0))
-#         setParametersBeforeCreation("playerCapsule", "y")
+#         setParametersBeforeCreation("playerCapsuleNP", "y")
 #         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
 #                "shape_type", "capsule")
 #         physicsMgr.create_rigid_body("PlayerRigidBodyCapsule")
 #          
 #         # # cone
-#         playerCone = physicsMgr.get_reference_node_path().attach_new_node("playerCone")
-#         playerNP.instance_to(playerCone)
-#         playerCone.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+#         playerConeNP = physicsMgr.get_reference_node_path().attach_new_node("playerConeNP")
+#         playerNP.instance_to(playerConeNP)
+#         playerConeNP.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
 #                LVecBase3f(-235.0, -75.0, 145.0))
-#         setParametersBeforeCreation("playerCone", "y")
+#         setParametersBeforeCreation("playerConeNP", "y")
 #         physicsMgr.set_parameter_value(GamePhysicsManager.RIGIDBODY,
 #                "shape_type", "cone")
 #         physicsMgr.create_rigid_body("PlayerRigidBodyCone")
@@ -578,8 +580,89 @@ if __name__ == '__main__':
         patchTex = TexturePool.load_texture(Filename("panda.jpg"))
         patchNP.set_tex_scale(sharedTS0, 1.0, 1.0)
         patchNP.set_texture(sharedTS0, patchTex, 1)
-
+        # create the patch soft body
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_type", "patch")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "points",
+                "-35.2,-15.5,15.8:-29.2,-15.5,15.8:-35.2,-21.5,15.8:-29.2,-21.5,15.8")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "res",
+                "31:31")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "fixeds",
+                "3")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "gendiags", "true")
+        patchSoftBodyNP = physicsMgr.create_soft_body(
+                "PatchSoftBody")
+        patchSoftBody = patchSoftBodyNP.node()
+        patchSoftBodyNP.set_collide_mask(mask)
+        patchSoftBody.setup(patchNP)
+        # generate bending constraints: must be done after soft body setup()
+        patchMaterial = patchSoftBody.append_material()
+        patchMaterial.set_linear_stiffness(0.4)
+        patchSoftBody.generate_bending_constraints(2, patchMaterial)
         
+        # # ellipsoid
+        # GeomNode: this is a generic GeomNode to which
+        # one or more Geoms could be added.
+        ellipsoid = GeomNode("Ellipsoid")
+        ellipsoidNP = NodePath(ellipsoid)
+        ellipsoidNP.set_color(0.5, 0.0, 0.5, 1.0)
+        ellipsoidNP.set_pos(LPoint3f(14.1, -10.0, 50.1))
+        # create the ellipsoid soft body
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_type", "ellipsoid")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "points",
+                "0.0,0.0,0.0")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "res",
+                "128")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY, "radius",
+                "1.5,1.5,1.5")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_total_mass", "30.0")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_mass_from_faces", "True")
+        ellipsoidSoftBodyNP = physicsMgr.create_soft_body(
+                "EllipsoidSoftBody")
+        ellipsoidSoftBody = ellipsoidSoftBodyNP.node()
+        ellipsoidSoftBodyNP.set_collide_mask(mask)
+        ellipsoidSoftBody.setup(ellipsoidNP)
+        # other features: must be done after soft body setup()
+        ellipsoidSoftBody.get_material(0).set_linear_stiffness(0.1)
+        ellipsoidSoftBody.get_cfg().set_dynamic_friction_coefficient(1)
+        ellipsoidSoftBody.get_cfg().set_damping_coefficient(0.001)
+        ellipsoidSoftBody.get_cfg().set_pressure_coefficient(1500)
+        ellipsoidSoftBody.set_pose(True, False)
+
+        # # trimesh
+        # get a model: should have one only Geom
+        trimeshNP = getModelAnims("trimeshNP", 1.0, 4, None)
+        trimeshNP.set_pos(LPoint3f(30.1, -40.0, 20.1))
+        trimeshNP.set_p(90)
+        trimeshNP.ls()
+        # embed model transform
+        trimeshNP.flatten_strong()
+        trimeshNP.ls()
+        # create the trimesh soft body
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_type", "tri_mesh")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "randomize_constraints", "True")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_total_mass", "50.0")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_mass_from_faces", "True")
+        trimeshSoftBodyNP = physicsMgr.create_soft_body(
+                "TrimeshSoftBody")
+        trimeshSoftBody = trimeshSoftBodyNP.node()
+        trimeshSoftBodyNP.set_collide_mask(mask)
+        trimeshSoftBody.setup(trimeshNP)
+        # other features: must be done after soft body setup()
+        trimeshSoftBody.generate_bending_constraints(2)
+        trimeshSoftBody.get_cfg().set_positions_solver_iterations(2)
+        trimeshSoftBody.get_cfg().set_collision_flag(
+                BulletSoftBodyConfig.CF_vertex_face_soft_soft, True)
+        
+                
     else:
         # valid bamFile
         # reparent reference node to render
