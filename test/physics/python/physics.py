@@ -635,13 +635,11 @@ if __name__ == '__main__':
 
         # # trimesh
         # get a model: should have one only Geom
-        trimeshNP = getModelAnims("trimeshNP", 1.0, 4, None)
+        trimeshNP = getModelAnims("trimeshNP", 0.02, 2, None)
         trimeshNP.set_pos(LPoint3f(30.1, -40.0, 20.1))
-        trimeshNP.set_p(90)
-        trimeshNP.ls()
+        trimeshNP.set_p(-60)
         # embed model transform
-        trimeshNP.flatten_strong()
-        trimeshNP.ls()
+        trimeshNP.flatten_medium()
         # create the trimesh soft body
         physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
                 "body_type", "tri_mesh")
