@@ -378,20 +378,24 @@ void BTRigidBody::setup(NodePath& objectNP)
 			GamePhysicsManager::get_global_ptr()->get_bounding_dimensions(
 					objectNP, modelDims, mModelDeltaCenter);
 		}
-		// reparent the object node path to this
-		objectNP.reparent_to(thisNP);
 		// correct (or possibly reset to zero) transform of the object node path
 		if (mShapeType != GamePhysicsManager::TRIANGLEMESH) //Hack
 		{
 			objectNP.set_pos_hpr(mModelDeltaCenter, LVecBase3::zero());
 		}
-		//optimize
-		thisNP.flatten_strong();
+		// optimize
+		objectNP.flatten_strong();
 	}
 	// Note: the object NodePath (if !empty) has scaling already applied, and
 	// it is is taken into account for the construction of the shape
 	// add a Collision Shape
 	add_shape(do_create_shape(mShapeType, objectNP));
+
+	if (!objectNP.is_empty())
+	{
+		// reparent the object node path to this
+		objectNP.reparent_to(thisNP);
+	}
 
 	// attach this to Bullet World
 	GamePhysicsManager::get_global_ptr()->get_bullet_world()->attach(this);

@@ -575,65 +575,65 @@ int main(int argc, char *argv[])
 
 		/// Rigid Bodies
 		/// box
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY, xxx
-//				"shape_type", "box");
-//		// set various creation parameters as string for other rigid bodies
-//		setParametersBeforeCreation("PlayerNP");
-//		// get a player with anims, reparent to reference node, set transform
-//		playerNP = getModelAnims("PlayerNP", 1.2, 4, playerAnimCtls);
-//		playerNP.reparent_to(physicsMgr->get_reference_node_path());
-//		playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
-//				LVecBase3f(-75.0, 145.0, -235.0));
-//		// create player's rigid_body (attached to the reference node)
-//		NodePath playerRigidBodyNP =
-//				physicsMgr->create_rigid_body("PlayerRigidBody");
-// 		// get a reference to the player's rigid_body
-// 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "box");
+		// set various creation parameters as string for other rigid bodies
+		setParametersBeforeCreation("PlayerNP");
+		// get a player with anims, reparent to reference node, set transform
+		playerNP = getModelAnims("PlayerNP", 1.2, 4, &playerAnimCtls);
+		playerNP.reparent_to(physicsMgr->get_reference_node_path());
+		playerNP.set_pos_hpr(LPoint3f(4.1, 0.0, 100.1),
+				LVecBase3f(-75.0, 145.0, -235.0));
+		// create player's rigid_body (attached to the reference node)
+		NodePath playerRigidBodyNP =
+				physicsMgr->create_rigid_body("PlayerRigidBody");
+ 		// get a reference to the player's rigid_body
+ 		playerRigidBody = DCAST(BTRigidBody, playerRigidBodyNP.node());
 
-// 		// some clones of player with different shapes
-//		/// sphere
-// 		NodePath playerSphereNP = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerSphereNP");
-// 		playerNP.instance_to(playerSphereNP);
-// 		playerSphereNP.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
-//				LVecBase3f(145.0, -235.0, -75.0));
-// 		setParametersBeforeCreation("playerSphereNP");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "sphere");
-// 		physicsMgr->create_rigid_body("PlayerRigidBodySphere");
-//
-//		/// cylinder
-// 		NodePath playerCylinderNP = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerCylinderNP");
-// 		playerNP.instance_to(playerCylinderNP);
-// 		playerCylinderNP.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
-//				LVecBase3f(145.0, -75.0, -235.0));
-// 		setParametersBeforeCreation("playerCylinderNP", "y");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "cylinder");
-// 		physicsMgr->create_rigid_body("PlayerRigidBodyCylinder");
-//
-// 		/// capsule
-// 		NodePath playerCapsuleNP = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerCapsuleNP");
-// 		playerNP.instance_to(playerCapsuleNP);
-// 		playerCapsuleNP.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
-//				LVecBase3f(-235.0, 145.0, -75.0));
-// 		setParametersBeforeCreation("playerCapsuleNP", "y");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "capsule");
-// 		physicsMgr->create_rigid_body("PlayerRigidBodyCapsule");
-//
-// 		/// cone
-// 		NodePath playerConeNP = physicsMgr->
-// 				get_reference_node_path().attach_new_node("playerConeNP");
-// 		playerNP.instance_to(playerConeNP);
-// 		playerConeNP.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
-//				LVecBase3f(-235.0, -75.0, 145.0));
-// 		setParametersBeforeCreation("playerConeNP", "y");
-//		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
-//				"shape_type", "cone");
-// 		physicsMgr->create_rigid_body("PlayerRigidBodyCone");
+ 		// some clones of player with different shapes
+		/// sphere
+ 		NodePath playerSphereNP = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerSphereNP");
+ 		playerNP.instance_to(playerSphereNP);
+ 		playerSphereNP.set_pos_hpr(LPoint3f(4.1, 0.0, 130.1),
+				LVecBase3f(145.0, -235.0, -75.0));
+ 		setParametersBeforeCreation("playerSphereNP");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "sphere");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodySphere");
+
+		/// cylinder
+ 		NodePath playerCylinderNP = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerCylinderNP");
+ 		playerNP.instance_to(playerCylinderNP);
+ 		playerCylinderNP.set_pos_hpr(LPoint3f(4.1, 0.0, 160.1),
+				LVecBase3f(145.0, -75.0, -235.0));
+ 		setParametersBeforeCreation("playerCylinderNP", "y");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "cylinder");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodyCylinder");
+
+ 		/// capsule
+ 		NodePath playerCapsuleNP = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerCapsuleNP");
+ 		playerNP.instance_to(playerCapsuleNP);
+ 		playerCapsuleNP.set_pos_hpr(LPoint3f(4.1, 0.0, 190.1),
+				LVecBase3f(-235.0, 145.0, -75.0));
+ 		setParametersBeforeCreation("playerCapsuleNP", "y");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "capsule");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodyCapsule");
+
+ 		/// cone
+ 		NodePath playerConeNP = physicsMgr->
+ 				get_reference_node_path().attach_new_node("playerConeNP");
+ 		playerNP.instance_to(playerConeNP);
+ 		playerConeNP.set_pos_hpr(LPoint3f(4.1, 0.0, 210.1),
+				LVecBase3f(-235.0, -75.0, 145.0));
+ 		setParametersBeforeCreation("playerConeNP", "y");
+		physicsMgr->set_parameter_value(GamePhysicsManager::RIGIDBODY,
+				"shape_type", "cone");
+ 		physicsMgr->create_rigid_body("PlayerRigidBodyCone");
 
 		/// Soft Bodies
 		PT(TextureStage)sharedTS0 = new TextureStage("sharedTS0");
@@ -827,7 +827,7 @@ int main(int argc, char *argv[])
 
 	/// first option: start the default update task for all drivers
 	physicsMgr->start_default_update();
-//	playerRigidBody->set_update_callback(rigidBodyCallback); xxx
+	playerRigidBody->set_update_callback(rigidBodyCallback);
 	ropeSoftBody->set_update_callback(softBodyCallback);
 	globalClock = ClockObject::get_global_clock();
 
