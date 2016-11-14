@@ -457,10 +457,10 @@ if __name__ == '__main__':
         
         # get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
         # # plane
-        planeUpAxis = Z_up # Z_up X_up Y_up
-        sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis)
+#         planeUpAxis = Z_up # Z_up X_up Y_up
+#         sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis)
         # # triangle mesh
-#         sceneNP = loadTerrainLowPoly("SceneNP")
+        sceneNP = loadTerrainLowPoly("SceneNP", 128, 128.0)
         # # heightfield
 #         sceneNP = loadTerrain("SceneNP", 1.0, 60.0)
         # set sceneNP transform
@@ -660,7 +660,41 @@ if __name__ == '__main__':
         trimeshSoftBody.get_cfg().set_collision_flag(
                 BulletSoftBodyConfig.CF_vertex_face_soft_soft, True)
         
-                
+        # # tetramesh
+        # GeomNode: this is a generic GeomNode to which
+        # one or more Geoms could be added.
+        tetramesh = GeomNode("Tetramesh")
+        tetrameshNP = NodePath(tetramesh)
+        tetrameshNP.set_pos(LPoint3f(40.1, -50.0, 9.1))
+        tetrameshNP.set_p(-45)
+        # create the tetramesh soft body
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_type", "tetra_mesh")
+        ele = dataDir + "/cube.1.ele,"
+        face = dataDir + "/cube.1.face,"
+        node = dataDir + "/cube.1.node"
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "tetra_data_files", ele + face + node)
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_total_mass", "30.0")
+        physicsMgr.set_parameter_value(GamePhysicsManager.SOFTBODY,
+                "body_mass_from_faces", "false")
+        tetrameshSoftBodyNP = physicsMgr.create_soft_body(
+                "TetrameshSoftBody")
+        tetrameshSoftBody = tetrameshSoftBodyNP.node()
+        tetrameshSoftBodyNP.set_collide_mask(mask)
+        tetrameshSoftBody.setup(tetrameshNP)
+        # other features: must be done after soft body setup()
+        tetrameshSoftBody.set_volume_mass(300)
+        tetrameshSoftBody.get_shape(0).set_margin(0.01)
+        tetrameshSoftBody.get_material(0).set_linear_stiffness(0.1)
+        tetrameshSoftBody.get_cfg().set_positions_solver_iterations(1)
+        tetrameshSoftBody.get_cfg().clear_all_collision_flags()
+        tetrameshSoftBody.get_cfg().set_collision_flag(
+                BulletSoftBodyConfig.CF_cluster_soft_soft, True)
+        tetrameshSoftBody.get_cfg().set_collision_flag(
+                BulletSoftBodyConfig.CF_cluster_rigid_soft, True)
+        tetrameshSoftBody.generate_clusters(6)
     else:
         # valid bamFile
         # reparent reference node to render

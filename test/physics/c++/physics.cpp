@@ -543,10 +543,10 @@ int main(int argc, char *argv[])
 
 		// get a sceneNP, naming it with "SceneNP" to ease restoring from bam file
 		/// plane
-		BulletUpAxis planeUpAxis = Z_up; // Z_up X_up Y_up
-		sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis);
+//		BulletUpAxis planeUpAxis = Z_up; // Z_up X_up Y_up
+//		sceneNP = loadPlane("SceneNP", 128.0, 128.0, planeUpAxis);
 		/// triangle mesh
-//		sceneNP = loadTerrainLowPoly("SceneNP");
+		sceneNP = loadTerrainLowPoly("SceneNP", 128, 128.0);
 		/// heightfield
 //		sceneNP = loadTerrain("SceneNP", 1.0, 60.0);
 		// set sceneNP transform
@@ -730,7 +730,7 @@ int main(int argc, char *argv[])
 
 		/// trimesh
 		// get a model: should have one only Geom
-		NodePath trimeshNP = getModelAnims("trimeshNP", 0.2, 2, NULL);
+		NodePath trimeshNP = getModelAnims("trimeshNP", 0.02, 2, NULL);
 		trimeshNP.set_pos(LPoint3f(30.1, -40.0, 20.1));
 		trimeshNP.set_p(-60);
 		// embed model transform
@@ -755,6 +755,41 @@ int main(int argc, char *argv[])
 		trimeshSoftBody->get_cfg().set_collision_flag(
 				BulletSoftBodyConfig::CF_vertex_face_soft_soft, true);
 
+		/// tetramesh
+		// GeomNode: this is a generic GeomNode to which
+		// one or more Geoms could be added.
+		PT(GeomNode)tetramesh = new GeomNode("Tetramesh");
+		NodePath tetrameshNP(tetramesh);
+		tetrameshNP.set_pos(LPoint3f(40.1, -50.0, 9.1));
+		tetrameshNP.set_p(-45);
+		// create the tetramesh soft body
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_type", "tetra_mesh");
+		string ele = dataDir + string("/cube.1.ele,");
+		string face = dataDir + string("/cube.1.face,");
+		string node = dataDir + string("/cube.1.node");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"tetra_data_files", (ele + face + node).c_str());
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_total_mass", "30.0");
+		physicsMgr->set_parameter_value(GamePhysicsManager::SOFTBODY,
+				"body_mass_from_faces", "false");
+		NodePath tetrameshSoftBodyNP = physicsMgr->create_soft_body(
+				"TetrameshSoftBody");
+		PT(BTSoftBody)tetrameshSoftBody = DCAST(BTSoftBody, tetrameshSoftBodyNP.node());
+		tetrameshSoftBodyNP.set_collide_mask(mask);
+		tetrameshSoftBody->setup(tetrameshNP);
+		// other features: must be done after soft body setup()
+		tetrameshSoftBody->set_volume_mass(300);
+		tetrameshSoftBody->get_shape(0)->set_margin(0.01);
+		tetrameshSoftBody->get_material(0).set_linear_stiffness(0.1);
+		tetrameshSoftBody->get_cfg().set_positions_solver_iterations(1);
+		tetrameshSoftBody->get_cfg().clear_all_collision_flags();
+		tetrameshSoftBody->get_cfg().set_collision_flag(
+				BulletSoftBodyConfig::CF_cluster_soft_soft, true);
+		tetrameshSoftBody->get_cfg().set_collision_flag(
+				BulletSoftBodyConfig::CF_cluster_rigid_soft, true);
+		tetrameshSoftBody->generate_clusters(6);
 	}
 	else
 	{

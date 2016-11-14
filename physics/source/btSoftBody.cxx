@@ -474,14 +474,20 @@ void BTSoftBody::setup(NodePath& objectNP)
 				//visualize
 				if (!objectNP.is_empty())
 				{
-					pandaNode =
-							objectNP.find_all_matches("**/+GeomNode").get_path(
-									0).node();
+					if (objectNP.node()->is_of_type(GeomNode::get_class_type()))
+					{
+						pandaNode = objectNP.node();
+					}
+					else
+					{
+						pandaNode = objectNP.find_all_matches("**/+GeomNode").get_path(
+								0).node();
+					}
 				}
 				if (mShowModel)
 				{
 					//visualize with model GeomNode (if any)
-					if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+					if (pandaNode)
 					{
 						geom = DCAST(GeomNode, pandaNode)->modify_geom(0).p();
 					}
@@ -500,7 +506,7 @@ void BTSoftBody::setup(NodePath& objectNP)
 					//make texcoords for tetramesh: to be written!!!
 ///					BulletHelper::make_texcoords_for_tetramesh(geom, mRes[0], mRes[1]);
 					//visualize with GeomNode (if any)
-					if (pandaNode && pandaNode->is_of_type(GeomNode::get_class_type()))
+					if (pandaNode)
 					{
 ///						geomNode = DCAST(GeomNode, pandaNode);
 						DCAST(GeomNode, pandaNode)->add_geom(geom);
