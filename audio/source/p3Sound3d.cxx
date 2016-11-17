@@ -465,7 +465,7 @@ TypedWritable *P3Sound3d::make_from_bam(const FactoryParams &params)
 			GameAudioManager::SOUND3D);
 	P3Sound3d *node = DCAST(P3Sound3d,
 			GameAudioManager::get_global_ptr()->create_sound3d(
-					"Sound3d").node());
+					"P3Sound3d").node());
 
 	DatagramIterator scan;
 	BamReader *manager;

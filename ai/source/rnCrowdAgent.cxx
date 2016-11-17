@@ -602,7 +602,7 @@ TypedWritable *RNCrowdAgent::make_from_bam(const FactoryParams &params)
 	RNCrowdAgent *node =
 			DCAST(RNCrowdAgent,
 					GameAIManager::get_global_ptr()->create_crowd_agent(
-							"CrowdAgent").node());
+							"RNCrowdAgent").node());
 
 	DatagramIterator scan;
 	BamReader *manager;

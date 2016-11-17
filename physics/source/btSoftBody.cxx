@@ -1008,64 +1008,7 @@ void BTSoftBody::write_datagram(BamWriter *manager, Datagram &dg)
 	///Name of this BTSoftBody.
 	dg.add_string(get_name());
 
-//	///Enable/disable flag.xxx
-//	dg.add_bool(mEnabled);
-//
-//	///Key controls and effective keys.
-//	///@{
-//	dg.add_bool(mForward);
-//	dg.add_bool(mBackward);
-//	dg.add_bool(mStrafeLeft);
-//	dg.add_bool(mStrafeRight);
-//	dg.add_bool(mUp);
-//	dg.add_bool(mDown);
-//	dg.add_bool(mHeadLeft);
-//	dg.add_bool(mHeadRight);
-//	dg.add_bool(mPitchUp);
-//	dg.add_bool(mPitchDown);
-//	dg.add_bool(mForwardKey);
-//	dg.add_bool(mBackwardKey);
-//	dg.add_bool(mStrafeLeftKey);
-//	dg.add_bool(mStrafeRightKey);
-//	dg.add_bool(mUpKey);
-//	dg.add_bool(mDownKey);
-//	dg.add_bool(mHeadLeftKey);
-//	dg.add_bool(mHeadRightKey);
-//	dg.add_bool(mPitchUpKey);
-//	dg.add_bool(mPitchDownKey);
-//	dg.add_bool(mMouseMoveKey);
-//	///@}
-//
-//	///Key control values.
-//	///@{
-//	dg.add_bool(mMouseEnabledH);
-//	dg.add_bool(mMouseEnabledP);
-//	dg.add_bool(mHeadLimitEnabled);
-//	dg.add_bool(mPitchLimitEnabled);
-//	dg.add_stdfloat(mHLimit);
-//	dg.add_stdfloat(mPLimit);
-//	dg.add_int8(mSignOfTranslation);
-//	dg.add_int8(mSignOfMouse);
-//	///@}
-//
-//	/// Sensitivity settings.
-//	///@{
-//	dg.add_stdfloat(mFastFactor);
-//	mActualSpeedXYZ.write_datagram(dg);
-//	mMaxSpeedXYZ.write_datagram(dg);
-//	mMaxSpeedSquaredXYZ.write_datagram(dg);
-//	dg.add_stdfloat(mActualSpeedH);
-//	dg.add_stdfloat(mActualSpeedP);
-//	dg.add_stdfloat(mMaxSpeedHP);
-//	dg.add_stdfloat(mMaxSpeedSquaredHP);
-//	mAccelXYZ.write_datagram(dg);
-//	dg.add_stdfloat(mAccelHP);
-//	dg.add_stdfloat(mFrictionXYZ);
-//	dg.add_stdfloat(mFrictionHP);
-//	dg.add_stdfloat(mStopThreshold);
-//	dg.add_stdfloat(mSensX);
-//	dg.add_stdfloat(mSensY);
-//	///@}
+	///TODO
 
 	///The reference node path.
 	manager->write_pointer(dg, mReferenceNP.node());
@@ -1102,7 +1045,7 @@ TypedWritable *BTSoftBody::make_from_bam(const FactoryParams &params)
 			GamePhysicsManager::SOFTBODY);
 	BTSoftBody *node = DCAST(BTSoftBody,
 			GamePhysicsManager::get_global_ptr()->create_soft_body(
-					"Driver").node());
+					"BTSoftBody").node());
 
 	DatagramIterator scan;
 	BamReader *manager;
@@ -1124,64 +1067,7 @@ void BTSoftBody::fillin(DatagramIterator &scan, BamReader *manager)
 	///Name of this BTSoftBody.
 	set_name(scan.get_string());
 
-//	///Enable/disable flag.
-//	mEnabled = scan.get_bool();
-//
-//	///Key controls and effective keys.
-//	///@{
-//	mForward = scan.get_bool();
-//	mBackward = scan.get_bool();
-//	mStrafeLeft = scan.get_bool();
-//	mStrafeRight = scan.get_bool();
-//	mUp = scan.get_bool();
-//	mDown = scan.get_bool();
-//	mHeadLeft = scan.get_bool();
-//	mHeadRight = scan.get_bool();
-//	mPitchUp = scan.get_bool();
-//	mPitchDown = scan.get_bool();
-//	mForwardKey = scan.get_bool();
-//	mBackwardKey = scan.get_bool();
-//	mStrafeLeftKey = scan.get_bool();
-//	mStrafeRightKey = scan.get_bool();
-//	mUpKey = scan.get_bool();
-//	mDownKey = scan.get_bool();
-//	mHeadLeftKey = scan.get_bool();
-//	mHeadRightKey = scan.get_bool();
-//	mPitchUpKey = scan.get_bool();
-//	mPitchDownKey = scan.get_bool();
-//	mMouseMoveKey = scan.get_bool();
-//	///@}
-//
-//	///Key control values.
-//	///@{
-//	mMouseEnabledH = scan.get_bool();
-//	mMouseEnabledP = scan.get_bool();
-//	mHeadLimitEnabled = scan.get_bool();
-//	mPitchLimitEnabled = scan.get_bool();
-//	mHLimit = scan.get_stdfloat();
-//	mPLimit = scan.get_stdfloat();
-//	mSignOfTranslation = scan.get_int8();
-//	mSignOfMouse = scan.get_int8();
-//	///@}
-//
-//	/// Sensitivity settings.
-//	///@{
-//	mFastFactor = scan.get_stdfloat();
-//	mActualSpeedXYZ.read_datagram(scan);
-//	mMaxSpeedXYZ.read_datagram(scan);
-//	mMaxSpeedSquaredXYZ.read_datagram(scan);
-//	mActualSpeedH = scan.get_stdfloat();
-//	mActualSpeedP = scan.get_stdfloat();
-//	mMaxSpeedHP = scan.get_stdfloat();
-//	mMaxSpeedSquaredHP = scan.get_stdfloat();
-//	mAccelXYZ.read_datagram(scan);
-//	mAccelHP = scan.get_stdfloat();
-//	mFrictionXYZ = scan.get_stdfloat();
-//	mFrictionHP = scan.get_stdfloat();
-//	mStopThreshold = scan.get_stdfloat();
-//	mSensX = scan.get_stdfloat();
-//	mSensY = scan.get_stdfloat();
-//	///@}
+	///TODO
 
 	///The reference node path.
 	manager->read_pointer(scan);

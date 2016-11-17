@@ -846,7 +846,7 @@ TypedWritable *P3Driver::make_from_bam(const FactoryParams &params)
 			GameControlManager::DRIVER);
 	P3Driver *node = DCAST(P3Driver,
 			GameControlManager::get_global_ptr()->create_driver(
-					"Driver").node());
+					"P3Driver").node());
 
 	DatagramIterator scan;
 	BamReader *manager;

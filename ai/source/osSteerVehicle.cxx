@@ -1663,7 +1663,7 @@ TypedWritable *OSSteerVehicle::make_from_bam(const FactoryParams &params)
 			GameAIManager::STEERVEHICLE);
 	OSSteerVehicle *node = DCAST(OSSteerVehicle,
 			GameAIManager::get_global_ptr()->create_steer_vehicle(
-					"SteerVehicle").node());
+					"OSSteerVehicle").node());
 
 	DatagramIterator scan;
 	BamReader *manager;
