@@ -16,7 +16,8 @@
 #endif //CPPPARSER
 
 /**
- * \brief Component representing a single soft body attached to an object.
+ * BTSoftBody is an extension/specialization of the BulletSoftBodyNode PandaNode
+ * representing a "soft body" of the Bullet library integration of Panda3d.
  *
  * It constructs a soft body with basic parameters.\n
  * Others settings could be made in programs by directly referring to the

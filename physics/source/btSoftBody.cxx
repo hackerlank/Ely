@@ -230,6 +230,10 @@ void BTSoftBody::do_initialize()
 #endif //PYTHON_BUILD
 }
 
+/**
+ * Sets the BTSoftBody up for the given object (if not empty), given the body
+ * type and other parameters.
+ */
 void BTSoftBody::setup(NodePath& objectNP)
 {
 	RETURN_ON_COND(mSetup,)
@@ -260,9 +264,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 			mRes.resize(2, 0);
 		}
 		//create patch
-//		this = BulletSoftBodyNode::make_patch(info, mPoints[0], xxx
-//				mPoints[1], mPoints[2], mPoints[3], mRes[0], mRes[1], mFixeds,
-//				mGendiags);
 		do_make_patch(info, mPoints[0],
 						mPoints[1], mPoints[2], mPoints[3], mRes[0], mRes[1], mFixeds,
 						mGendiags);
@@ -322,8 +323,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 			mRes.resize(1, 0);
 		}
 		//create ellipsoid
-//		this = BulletSoftBodyNode::make_ellipsoid(info, mPoints[0], xxx
-//				mRadius, mRes[0]);
 		do_make_ellipsoid(info, mPoints[0], mRadius, mRes[0]);
 		//visualize
 		if (!objectNP.is_empty())
@@ -424,7 +423,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 			geom->add_primitive(prim);
 		}
 		//create trimesh
-//		this = BulletSoftBodyNode::make_tri_mesh(info, geom, mRandomizeConstraints);xxx
 		do_make_tri_mesh(info, geom, mRandomizeConstraints);
 		//link with Geom
 		this->link_geom(geom);
@@ -467,8 +465,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 							lengths[iter->first]);
 				}
 				//create tetra mesh
-//				this = BulletSoftBodyNode::make_tet_mesh(info,xxx
-//						buffers["elems"], buffers["faces"], buffers["nodes"]);
 				do_make_tet_mesh(info, buffers["elems"], buffers["faces"],
 						buffers["nodes"]);
 				//visualize
@@ -533,8 +529,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 			{	8, 3, 0, 0, 1, -1, 1, -1, 2, -1, -1, -1, 3, -1, -1, 1, 4, -1, 1,
 				1, 5, 1, 1, -1, 6, 1, 1, 1, 7, 1, -1, -1, 8, 1, -1, 1};
 			//create null tetra mesh
-//			this = BulletSoftBodyNode::make_tet_mesh(info, NULL, xxx
-//					NULL, nodeBuf);
 			do_make_tet_mesh(info, NULL, NULL, nodeBuf);
 		}
 	}
@@ -576,11 +570,6 @@ void BTSoftBody::setup(NodePath& objectNP)
 		}
 	}
 
-//	//add to table of all physics components indexed by xxx
-//	//(underlying) Bullet PandaNodes
-//	GamePhysicsManager::GetSingletonPtr()->setPhysicsComponentByPandaNode(
-//			mSoftBodyNode.p(), this);
-
 	//set total mass
 	this->set_total_mass(mBodyTotalMass, mBodyMassFromFaces);
 
@@ -590,14 +579,10 @@ void BTSoftBody::setup(NodePath& objectNP)
 	NodePath thisNP = NodePath::any_path(this);
 	if (! objectNP.is_empty())
 	{
-//		// inherit the TrasformState from the object xxx
-//		set_transform(objectNP.node()->get_transform());
-//		// reset object's TrasformState
-//		objectNP.set_transform(TransformState::make_identity());
-		// inherit position, orientation from the object
-		thisNP.set_pos_hpr(objectNP.get_pos(), objectNP.get_hpr());
-		// reset object's position, orientation
-		objectNP.set_pos_hpr(LPoint3f::zero(), LVecBase3f::zero());
+		// inherit the TrasformState from the object
+		set_transform(objectNP.node()->get_transform());
+		// reset object's TrasformState
+		objectNP.set_transform(TransformState::make_identity());
 		// reparent the object node path to this
 		objectNP.reparent_to(thisNP);
 	}
@@ -620,6 +605,11 @@ void BTSoftBody::setup(NodePath& objectNP)
 	mSetup = true;
 }
 
+
+/**
+ * Makes a fake (temporary) Bullet soft body.
+ * \note Internal use only.
+ */
 btSoftBody* BTSoftBody::do_make_fake_soft_body()
 {
 	BulletSoftBodyWorldInfo info =
@@ -630,6 +620,10 @@ btSoftBody* BTSoftBody::do_make_fake_soft_body()
 			LVecBase3_to_btVector3(LPoint3f::zero()), 0, 0);
 }
 
+/**
+ * Sets the actual Bullet soft body.
+ * \note Internal use only.
+ */
 void BTSoftBody::do_set_soft_body(btSoftBody* body)
 {
 	// Softbody
@@ -643,6 +637,10 @@ void BTSoftBody::do_set_soft_body(btSoftBody* body)
 			new BulletSoftBodyShape((btSoftBodyCollisionShape *) shape_ptr));
 }
 
+/**
+ * Makes a rope Bullet soft body.
+ * \note Internal use only.
+ */
 void BTSoftBody::do_make_rope(BulletSoftBodyWorldInfo &info,
 		const LPoint3 &from, const LPoint3 &to, int res, int fixeds)
 {
@@ -654,6 +652,10 @@ void BTSoftBody::do_make_rope(BulletSoftBodyWorldInfo &info,
 	do_set_soft_body(body);
 }
 
+/**
+ * Makes a patch Bullet soft body.
+ * \note Internal use only.
+ */
 void BTSoftBody::do_make_patch(BulletSoftBodyWorldInfo &info,
 		const LPoint3 &corner00, const LPoint3 &corner10,
 		const LPoint3 &corner01, const LPoint3 &corner11, int resx, int resy,
@@ -668,6 +670,10 @@ void BTSoftBody::do_make_patch(BulletSoftBodyWorldInfo &info,
 	do_set_soft_body(body);
 }
 
+/**
+ * Makes a ellipsoid Bullet soft body.
+ * \note Internal use only.
+ */
 void BTSoftBody::do_make_ellipsoid(BulletSoftBodyWorldInfo &info,
 		const LPoint3 &center, const LVecBase3 &radius, int res)
 {
@@ -679,6 +685,10 @@ void BTSoftBody::do_make_ellipsoid(BulletSoftBodyWorldInfo &info,
 	do_set_soft_body(body);
 }
 
+/**
+ * Makes a triangle mesh Bullet soft body.
+ * \note Internal use only.
+ */
 void BTSoftBody::do_make_tri_mesh(BulletSoftBodyWorldInfo &info,
 		const Geom *geom, bool randomizeConstraints)
 {
@@ -708,7 +718,6 @@ void BTSoftBody::do_make_tri_mesh(BulletSoftBodyWorldInfo &info,
 			}
 		}
 	}
-//	BulletSoftBodyNode::make_tri_mesh(info, points, indices, randomizeConstraints);xxx
 	btSoftBody *body = NULL;
 	{
 		// Eliminate duplicate vertices
@@ -765,6 +774,10 @@ void BTSoftBody::do_make_tri_mesh(BulletSoftBodyWorldInfo &info,
 	do_set_soft_body(body);
 }
 
+/**
+ * Makes a tetra mesh Bullet soft body.
+ * \note Internal use only.
+ */
 void BTSoftBody::do_make_tet_mesh(BulletSoftBodyWorldInfo &info,
 		const char *ele, const char *face, const char *node)
 {
@@ -860,6 +873,9 @@ void BTSoftBody::do_finalize()
 	return;
 }
 
+/**
+ * Cleans the BTSoftBody up from detaching any child objects (if not empty).
+ */
 void BTSoftBody::cleanup()
 {
 
